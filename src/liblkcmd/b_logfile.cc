@@ -571,7 +571,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -595,12 +595,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'c':
 	                        lip->have.create = TRUE ;
 	                        lip->final.create = TRUE ;
-	                        lip->f.create = TRUE ;
+	                        lip->fl.create = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.create = (rs > 0) ;
+	                                lip->fl.create = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -840,7 +840,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    ex = EX_CANTCREAT ;
 	}
 
-	if ((rs >= 0) && lip->f.create) {
+	if ((rs >= 0) && lip->fl.create) {
 	    int	oflags = (O_CREAT | O_EXCL | O_WRONLY) ;
 	    rs1 = u_open(lfname,oflags,0666) ;
 	    if (rs1 >= 0)
@@ -900,7 +900,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt = "%s: could not perform function (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
@@ -1027,10 +1027,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.audit) {
 	                        lip->have.audit = TRUE ;
 	                        lip->final.audit = TRUE ;
-	                        lip->f.audit = TRUE ;
+	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.audit = (rs > 0) ;
+	                            lip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1038,10 +1038,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.create) {
 	                        lip->have.create= TRUE ;
 	                        lip->final.create = TRUE ;
-	                        lip->f.create = TRUE ;
+	                        lip->fl.create = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.create = (rs > 0) ;
+	                            lip->fl.create = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
