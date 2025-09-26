@@ -435,7 +435,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->verboselevel = 1 ;
 	pip->to_open = TO_OPEN ;
 	pip->to_read = TO_READ ;
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 #ifdef	COMMENT
 	pip->daytime = time(NULL) ;
@@ -683,7 +683,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* set ANSI confirmance (to ANSI Level 1) */
 	                case argopt_ansi:
 	                    lip->final.ansi = TRUE ;
-	                    lip->f.ansi = TRUE ;
+	                    lip->fl.ansi = TRUE ;
 			    lip->ansi = 1 ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -722,7 +722,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -773,12 +773,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 's':
-	                        lip->f.set = TRUE ;
+	                        lip->fl.set = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.set = (rs > 0) ;
+	                                lip->fl.set = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -969,7 +969,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt = "%s: invalid query (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
@@ -1106,10 +1106,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case progopt_poll:
-	                    lip->f.poll = TRUE ;
+	                    lip->fl.poll = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.poll = (rs > 0) ;
+	                        lip->fl.poll = (rs > 0) ;
 	                    }
 	                    break ;
 	                case progopt_intpoll:
@@ -1124,10 +1124,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.logprog) {
 	                        pip->have.logprog = TRUE ;
 	                        pip->final.logprog = TRUE ;
-	                        pip->f.logprog = TRUE ;
+	                        pip->fl.logprog = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1135,10 +1135,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.latin1) {
 	                        lip->have.latin1 = TRUE ;
 	                        lip->final.latin1 = TRUE ;
-	                        lip->f.latin1 = TRUE ;
+	                        lip->fl.latin1 = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.latin1 = (rs > 0) ;
+	                            lip->fl.latin1 = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1146,7 +1146,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.ansi) {
 	                        lip->have.ansi = TRUE ;
 	                        lip->final.ansi = TRUE ;
-	                        lip->f.ansi = TRUE ;
+	                        lip->fl.ansi = TRUE ;
 			        lip->ansi = 1 ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1192,7 +1192,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	int		wlen = 0 ;
 
 	if ((rs = locinfo_utermbegin(lip)) >= 0) {
-	    if (lip->f.set) {
+	    if (lip->fl.set) {
 	        if ((rs = procsetansi(pip)) >= 0) {
 		    rs = procsetlatin1(pip) ;
 	        }
@@ -1280,7 +1280,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = shio_close(afp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1292,7 +1292,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    rs1 = shio_close(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 		fmt = "%s: inaccessible output (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
 		fmt = "%s: ofile=%s\n" ;
@@ -1417,7 +1417,7 @@ static int procsetansi(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-	if ((rs >= 0) && lip->f.ansi) {
+	if ((rs >= 0) && lip->fl.ansi) {
 	    const int	clen = CONBUFLEN ;
 	    int		name = 'L' ;
 	    char	cbuf[CONBUFLEN+1] ;
@@ -1449,7 +1449,7 @@ static int procsetlatin1(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-	if ((rs >= 0) && lip->f.latin1) {
+	if ((rs >= 0) && lip->fl.latin1) {
 	    SBUF	b ;
 	    const int	clen = CONBUFLEN ;
 	    int		sl = 0 ;
@@ -1826,7 +1826,7 @@ static int locinfo_termbegin(LOCINFO *lip)
 	    cchar	*fn = lip->termfname ;
 	    if ((rs = u_open(fn,of,om)) >= 0) {
 	        lip->tfd = rs ;
-	        lip->f.opened = TRUE ;
+	        lip->fl.opened = TRUE ;
 	    }
 	} else {
 	    const int	rlen = MAXPATHLEN ;
@@ -1836,7 +1836,7 @@ static int locinfo_termbegin(LOCINFO *lip)
 	        if ((rs = u_open(rbuf,of,om)) >= 0) {
 		    cchar	**vpp = &lip->termfname ;
 		    lip->tfd = rs ;
-	            lip->f.opened = TRUE ;
+	            lip->fl.opened = TRUE ;
 	    	    rs = locinfo_setentry(lip,vpp,rbuf,rl) ;
 		}
 	    }
@@ -1855,11 +1855,11 @@ static int locinfo_termend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (lip->f.opened && (lip->tfd >= 0)) {
+	if (lip->fl.opened && (lip->tfd >= 0)) {
 	    rs1 = u_close(lip->tfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    lip->tfd = -1 ;
-	    lip->f.opened = FALSE ;
+	    lip->fl.opened = FALSE ;
 	}
 	return rs ;
 }
