@@ -536,7 +536,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* initialize */
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -760,12 +760,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_notes:
 			    lip->done.notes = true ;
 			    lip->have.notes = true ;
-			    lip->f.notes = true ;
+			    lip->fl.notes = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-				    lip->f.notes = (rs > 0) ;
+				    lip->fl.notes = (rs > 0) ;
 				}
 			    }
 	                    break ;
@@ -824,7 +824,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -888,12 +888,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 			    case 'm':
-				lip->f.msgs = true ;
+				lip->fl.msgs = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-					lip->f.msgs = (rs > 0) ;
+					lip->fl.msgs = (rs > 0) ;
 				    }
 	                        }
 				break ;
@@ -928,7 +928,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    			    lip->done.sort = true ;
 	    			    lip->have.sort = true ;
 				    lip->typesort = typesort_reverse ;
-				    lip->f.sort = true ;
+				    lip->fl.sort = true ;
 				}
 				break ;
 
@@ -1059,7 +1059,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (pm == nullptr) pm = pip->progname ;
 
-	if (lip->f.msgs) {
+	if (lip->fl.msgs) {
 	    pip->progmode = progmode_notes ;
 	} else {
 	    int	progmode = matostr(progmodes,1,pm,-1) ;
@@ -1202,7 +1202,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    	    ex = mapex(mapexs,rs) ;
 		    break ;
 	        } /* end switch */
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 		cchar	*pn = pip->progname ;
 		cchar	*fmt ;
 		fmt = "%s: could not process (%d)\n" ;
@@ -1333,10 +1333,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->done.owner) {
 	                        lip->have.owner = true ;
 	                        lip->done.owner = true ;
-	                        lip->f.owner = true ;
+	                        lip->fl.owner = true ;
 	                        if (vl > 0) {
 			            rs = optbool(vp,vl) ;
-	                            lip->f.owner = (rs > 0) ;
+	                            lip->fl.owner = (rs > 0) ;
 			        }
 	                    }
 	                    break ;
@@ -1356,10 +1356,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->done.notes) {
 	                        lip->have.notes = true ;
 	                        lip->done.notes = true ;
-	                        lip->f.notes = true ;
+	                        lip->fl.notes = true ;
 	                        if (vl > 0) {
 			            rs = optbool(vp,vl) ;
-				    lip->f.notes = (rs > 0) ;
+				    lip->fl.notes = (rs > 0) ;
 				}
 			    }
 			    break ;
@@ -1376,7 +1376,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->done.datelong) {
 	                        lip->done.datelong = true ;
 	                        lip->have.datelong = true ;
-	                        lip->f.datelong = true ;
+	                        lip->fl.datelong = true ;
 	                        if (vl) {
 				    rs = locinfo_optdate(lip,vp,vl) ;
 	                        }
@@ -1537,7 +1537,7 @@ static int procmesgout(PROGINFO *pip,SHIO *ofp,cchar *td,ustat *usbp)
 		    int	c = 0 ;
 		    int	cmd ;
 		    if (lip->have.notes_prev) {
-		        f_notes_prev = lip->f.notes_prev ;
+		        f_notes_prev = lip->fl.notes_prev ;
 		    }
 		    cmd = kshlibcmd_notestate ;
 		    if ((rs = lib_noteadm(cmd)) > 0) {
@@ -1667,13 +1667,13 @@ static int procnoteouter(PROGINFO *pip,SHIO *ofp,LOCNOTE *onp)
 	    cchar	*fmt = "%c %s %s « %r\n" ;
 	    cchar	*tf = "%R" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
-	    if (lip->f.datelong) tf = "%Y%b%d %R" ;
+	    if (lip->fl.datelong) tf = "%Y%b%d %R" ;
 	    if ((rs = sntmtime(tbuf,tlen,&tm,tf)) >= 0) {
 	        int	tl = (lip->linelen-11) ; /* default is eleven */
 		int	pl ;
 	        int	tch ;
 
-		if (lip->f.datelong) tl -= 10 ; /* additional ten for "long" */
+		if (lip->fl.datelong) tl -= 10 ; /* additional ten for "long" */
 		tl -= strlen(onp->user) ;
 		tch = (onp->type < 4) ? types[onp->type] : '¿' ;
 		pl = MIN(onp->nlen,tl) ;
@@ -1759,7 +1759,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	            rs1 = shio_close(afp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 			fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -2053,7 +2053,7 @@ static int proclog_info(PROGINFO *pip)
 	int		rs = SR_OK ;
 	cchar		*ps = progmodes[pip->progmode] ;
 	{
-	    cint	f = MKBOOL(lip->f.notes) ;
+	    cint	f = MKBOOL(lip->fl.notes) ;
 	    cchar	*fmt = "pm=%s" ;
 	    if (lip->have.notes) {
 	        fmt = "pm=%s notes=%u" ;
@@ -2095,7 +2095,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if_constexpr (f_percache) {
-	    if (lip->f.percache) {
+	    if (lip->fl.percache) {
 	        if ((rs1 = percache_finireg(&pc)) > 0) {
 	            rs1 = uc_atexit(ourfini) ;
 	        }
@@ -2742,7 +2742,7 @@ static int locinfo_noteadm(LOCINFO *lip)
 		lip->have.notes) ;
 #endif
 	if (lip->have.notes) {
-	    cint	si = MKBOOL(lip->f.notes) ;
+	    cint	si = MKBOOL(lip->fl.notes) ;
 	    int		ncmd ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -2758,7 +2758,7 @@ static int locinfo_noteadm(LOCINFO *lip)
 	    } /* end switch */
 	    if ((rs = lib_noteadm(ncmd)) >= 0) {
 		lip->have.notes_prev = true ;
-		lip->f.notes_prev = (rs > 0) ;
+		lip->fl.notes_prev = (rs > 0) ;
 		if (pip->debuglevel > 0) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt = "%s: note-adm cmd=%u (%d)\n" ;
@@ -2787,7 +2787,7 @@ static int locinfo_setsort(LOCINFO *lip,cchar *vp,int vl)
 	        lip->done.sort = true ;
 	        if ((v = matostr(typesorts,1,vp,vl)) >= 0) {
 	            lip->typesort = v ;
-		    lip->f.sort = (v>0) ;
+		    lip->fl.sort = (v>0) ;
 	        } else {
 		    rs = SR_INVALID ;
 	        }
@@ -2803,7 +2803,7 @@ static int locinfo_optdate(LOCINFO *lip,cchar *vp,int vl) noex {
 	    if (int oi ; (oi = matpstr(datetypes,1,vp,vl)) >= 0) {
 		switch (oi) {
 		case datetype_long:
-		    lip->f.datelong = true ;
+		    lip->fl.datelong = true ;
 		    break ;
 		} /* end switch */
 	    } /* end if (matpstr) */
