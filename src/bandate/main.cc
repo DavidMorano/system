@@ -11,16 +11,17 @@
 
 /* revision history:
 
-	= 1998-11-01, David AÂ­DÂ­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services
 	(RNS).
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Description:
 	Write ("date") the current date on the banner read on STDIN.
 
 	Synopsis:
@@ -29,14 +30,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<getourenv.h>
 #include	<tmtime.hh>
