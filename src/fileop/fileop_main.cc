@@ -2542,7 +2542,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	            ((pip->megabytes == 1) ? "" : "s"),
 	            pip->bytes) ;
 
-/* calculate UNIX blocks */
+/* calculate UNIX® blocks */
 
 	        blocks = pip->megabytes * 1024 * 2 ;
 	        blocks += (pip->bytes / UNIXBLOCK) ;
