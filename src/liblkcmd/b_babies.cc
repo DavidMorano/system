@@ -495,12 +495,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_info:
-	                    lip->f.info = TRUE ;
+	                    lip->fl.info = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.info = (rs > 0) ;
+	                            lip->fl.info = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -533,7 +533,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -720,7 +720,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -847,7 +847,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 /* asked for information? */
 
-	    if (lip->f.info) {
+	    if (lip->fl.info) {
 	        rs = procinfo(pip,ofp) ;
 	    }
 
@@ -911,7 +911,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	    } /* end if (processing file argument file list) */
 
-	    if ((rs >= 0) && (pan == 0) && (! lip->f.info)) {
+	    if ((rs >= 0) && (pan == 0) && (! lip->fl.info)) {
 
 	        pan += 1 ;
 	        rs = procspec(pip,ofp,"",-1) ;
@@ -1096,8 +1096,8 @@ static int locinfo_dbopen(LOCINFO *lip)
 	if (lip == NULL) return SR_FAULT ;
 
 	pip = lip->pip ;
-	if (! lip->f.babycalc) {
-	    lip->f.babycalc = TRUE ;
+	if (! lip->fl.babycalc) {
+	    lip->fl.babycalc = TRUE ;
 	    rs = babycalc_open(&lip->bc,pip->pr,lip->dbname) ;
 	    lip->open.babycalc = (rs >= 0) ;
 	    if (pip->debuglevel > 0) {
@@ -1122,7 +1122,7 @@ static int locinfo_lookinfo(LOCINFO *lip,BABYCALC_INFO *bip)
 	if (lip == NULL) return SR_FAULT ;
 	if (bip == NULL) return SR_FAULT ;
 
-	if (! lip->f.babycalc) {
+	if (! lip->fl.babycalc) {
 	    rs = locinfo_dbopen(lip) ;
 	}
 
@@ -1149,7 +1149,7 @@ static int locinfo_lookup(LOCINFO *lip,cchar *np,int nl,uint *rp)
 
 	if (nl < 0) nl = strlen(np) ;
 
-	if (! lip->f.babycalc) {
+	if (! lip->fl.babycalc) {
 	    rs = locinfo_dbopen(lip) ;
 	}
 
@@ -1201,10 +1201,10 @@ static int locinfo_lookup(LOCINFO *lip,cchar *np,int nl,uint *rp)
 static int locinfo_cvtdater(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
-	if (! lip->f.cvtdater) {
+	if (! lip->fl.cvtdater) {
 	    PROGINFO	*pip = lip->pip ;
 	    CVTDATER	*cdp = &lip->cvt ;
-	    lip->f.cvtdater = TRUE ;
+	    lip->fl.cvtdater = TRUE ;
 	    rs = cvtdater_start(cdp,pip->daytime) ;
 	    lip->open.cvtdater = (rs >= 0) ;
 	}
