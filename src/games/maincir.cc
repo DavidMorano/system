@@ -1,4 +1,5 @@
 /* main SUPPORT (CIR) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* relative circular array */
@@ -7,15 +8,16 @@
 
 /* revision history:
 
-	= 2017-09-01, David AÂ­DÂ­ Morano
+	= 2017-09-01, David A­D­ Morano
 	Written for fun!
 
 */
 
-/* Copyright Â© 2017 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Description:
 	Given am array of numbers (positive or negative), we determine
 	if traversing through the array by taking the value of an
 	element as a relative addition to the current index in the
@@ -37,6 +39,8 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<new>
 #include	<initializer_list>
