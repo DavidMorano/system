@@ -1,11 +1,12 @@
-/* unlinkd */
+/* unlinkd SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* subroutine to try and invoke the UNLINK daemon */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SETRUID	0		/* set real UID to EUID */
-
 
 /* revision history:
 
@@ -14,43 +15,37 @@
 
 */
 
-/* Copyright © 1998 David Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /******************************************************************************
 
-	This subroutine calls the UNLINKD program to delete (unlink) files.
+  	Description:
+	This subroutine calls the UNLINKD program to delete (unlink)
+	files.
 
 	Synopsis:
-
-	int unlinkd(filename,delay)
-	const char	filename[] ;
-	int		delay ;
+	int unlinkd(cchar *filename,int delay) noex
 
 	Arguments:
-
 	filename	filename to unlink
 	delay		time to wait before the unlink in seconds
 
 	Returns:
-
 	>=0		OK
 	<0		some error
 
-
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
