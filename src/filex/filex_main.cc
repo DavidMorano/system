@@ -2549,7 +2549,7 @@ static int procargs(PI *pip,ARGINFO *aip,BITS *bop,cchar *afn) noex {
 	            ((pip->megabytes == 1) ? "" : "s"),
 	            pip->bytes) ;
 
-/* calculate UNIX blocks */
+/* calculate UNIX® blocks */
 
 	        blocks = pip->megabytes * 1024 * 2 ;
 	        blocks += (pip->bytes / UNIXBLOCK) ;
