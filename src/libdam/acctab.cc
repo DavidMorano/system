@@ -101,7 +101,7 @@ import libutil ;
 #define	PARTTYPE_UNKNOWN	2
 
 #ifndef	CF_REGEX
-#define	CF_REGEX	0		/* stupid UNIX REGEX? (buggy) */
+#define	CF_REGEX	0		/* stupid UNIX® REGEX? (buggy) */
 #endif
 
 
