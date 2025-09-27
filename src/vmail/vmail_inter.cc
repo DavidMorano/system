@@ -22,7 +22,7 @@
 
 /* revision history:
 
-	= 2009-01-20, David AÂ­DÂ­ Morano
+	= 2009-01-20, David A­D­ Morano
         This is a complete rewrite of the (utter) trash that performed
         this function previously.
 
@@ -32,7 +32,7 @@
 
 */
 
-/* Copyright Â© 2009,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2009,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
