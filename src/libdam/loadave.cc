@@ -43,7 +43,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<vsystem.h>
+#include	<usystem.h>
 #include	<baops.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
