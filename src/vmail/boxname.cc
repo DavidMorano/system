@@ -1,15 +1,17 @@
-/* boxname */
+/* boxname USPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* make a mailbox name out of something */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* compile-time debugging */
-
 
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -17,38 +19,59 @@
 
 /*******************************************************************************
 
-        This file contains several short functions relating mailbox names to
-        UNIX® filenames.
+  	Name:
+	boxname
+
+	Description:
+	This file contains several short functions relating mailbox
+	names to UNIX® filenames.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
-
 #include	<bfile.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
 
 
-/* external subroutines */
+/* local defines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
 
 
-/* exported subroutines */
+/* local structures */
 
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
 
 char *maildir(pip)
 struct proginfo	*pip ;
