@@ -1,8 +1,9 @@
-/* mfs-locinfo */
+/* mfs-locinfo SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* MFS-locinfo (extra code) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -10,31 +11,31 @@
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 #define	CF_DEBUGDUMP	0		/* debug-dump */
 
-
 /* revision history:
 
-	= 2011-01-25, David AÂ­DÂ­ Morano
-        I had to separate this code due to AST-code conflicts over the system
-        socket structure definitions.
+	= 2011-01-25, David A­D­ Morano
+	I had to separate this code due to AST-code conflicts over
+	the system socket structure definitions.
 
-	= 2017-08-10, David AÂ­DÂ­ Morano
+	= 2017-08-10, David A­D­ Morano
 	This subroutine was borrowed to code MFSERVE.
 
 */
 
-/* Copyright Â© 2011,2017 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2011,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This is extra MFS code that was sepeated out from the main source due to
-        AST-code conflicts (see notes elsewhere also).
+  	Name:
+	mfs-locinfo
 
+	Description:
+	This is extra MFS code that was sepeated out from the main
+	source due to AST-code conflicts (see notes elsewhere also).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -44,10 +45,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<ugetpw.h>
 #include	<utmpacc.h>
