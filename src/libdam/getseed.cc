@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* get random data from the UNIXÂ® kernel */
+/* get random data from the UNIX® kernel */
 /* version %I% last-modified %G% */
 
 #define	CF_GETHRTIME	1		/* use |gethrtime(3c)| */
