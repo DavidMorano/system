@@ -18,12 +18,18 @@
 
 /*******************************************************************************
 
+  	Name:
+	uc_joinus
+
+	Description:
 	This subroutine joins a UNIX® socket of the datagram variety.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<sockaddress.h>
@@ -100,8 +106,7 @@ static int ucbinder(int fd,SOCKADDR *sap,int sal,int of,mode_t om) noex {
                 sockaddress	*sa = (sockaddress *) sap ;
                 cint		af = AF_UNIX ;
                 if ((rs = sockaddress_getaf(sa)) == af) {
-                    char    *sbuf{} ;
-		    if ((rs = malloc_mp(&sbuf)) >= 0) {
+                    if (char *sbuf ; (rs = malloc_mp(&sbuf)) >= 0) {
 			cint	slen = rs ;
                         if ((rs = sockaddress_getaddr(sa,sbuf,slen)) >= 0) {
                             rs = u_chmod(sbuf,om) ;
@@ -109,7 +114,7 @@ static int ucbinder(int fd,SOCKADDR *sap,int sal,int of,mode_t om) noex {
                                 uc_unlink(sbuf) ;
                             }
                         } /* end if (sockaddress_getaddr) */
-			rs1 = uc_free(sbuf) ;
+			rs1 = malloc_free(sbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
                 } /* end if (UNIX®Â® address family) */
