@@ -16,7 +16,7 @@
 
 */
 
-/* Copyright Â© 2009,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2009,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
