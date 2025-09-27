@@ -2,19 +2,19 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* interface component for UNIX®Â® library-3c */
+/* interface component for UNIX® library-3c */
 /* open a facility-service */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-07-10, David AÂ­DÂ­ Morano
+	= 1998-07-10, David A­D­ Morano
 	This code was originally written.
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
