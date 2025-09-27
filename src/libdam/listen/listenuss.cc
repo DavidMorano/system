@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	listenuss
+
+	Description:
 	This subroutine is used to initiate listening on a UNIX®
 	domain socket stream (USS).
 
