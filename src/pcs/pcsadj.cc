@@ -1,4 +1,5 @@
 /* pcsadj SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* PCS adjunct subroutines */
@@ -17,10 +18,14 @@
 
 */
 
-/* Copyright Â© 2004,2005 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2004,2005 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Name:
+	pcsadj
+
+	Description:
 	This is adjunct code to the main PCS program.
 
 *******************************************************************************/
@@ -37,6 +42,7 @@
 #include	<poll.h>
 #include	<netdb.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
