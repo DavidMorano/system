@@ -44,7 +44,7 @@
 	Description:
 	This is the famous (infamous) old |send(2)| system call.
 	Of course, it has now been a system call for almost two
-	decades (on System V UNIX) but that is still OK! :-)
+	decades (on System V UNIX®) but that is still OK! :-)
 
 	Name:
 	u_shutdown
