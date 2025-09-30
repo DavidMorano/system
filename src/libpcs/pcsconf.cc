@@ -47,7 +47,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<vsystem.h>
+#include	<usystem.h>
 #include	<getbufsize.h>
 #include	<getnodename.h>
 #include	<getusername.h>
