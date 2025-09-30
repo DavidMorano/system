@@ -92,7 +92,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<ucmallreg.h>
 #include	<getourenv.h>
 #include	<mktmp.h>
 #include	<bits.h>
@@ -1218,7 +1217,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->debuglevel = 5 ;
 #endif
 
-	pip->f.logprog = true ;
+	pip->fl.logprog = true ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -1467,7 +1466,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argl) {
 	                            lip->have.xmailer = true ;
 	                            lip->final.xmailer = true ;
-	                            lip->f.xmailer = true ;
+	                            lip->fl.xmailer = true ;
 	                            lip->xmailer = argp ;
 	                        }
 	                    } else
@@ -1491,12 +1490,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_note:
 	                    lip->final.addnote = true ;
 	                    lip->have.addnote = true ;
-	                    lip->f.addnote = true ;
+	                    lip->fl.addnote = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.addnote = (rs > 0) ;
+	                            lip->fl.addnote = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1505,7 +1504,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    if (argr > 0) {
 	                        lip->have.sender = true ;
 	                        lip->final.sender = true ;
-	                        lip->f.sender = true ;
+	                        lip->fl.sender = true ;
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
@@ -1520,12 +1519,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_onefrom:
 	                    lip->final.onefrom = true ;
 	                    lip->have.onefrom = true ;
-	                    lip->f.onefrom = true ;
+	                    lip->fl.onefrom = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.onefrom = (rs > 0) ;
+	                            lip->fl.onefrom = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1562,14 +1561,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_all:
 	                    lip->final.all = true ;
 	                    lip->have.all = true ;
-	                    lip->f.all = true ;
+	                    lip->fl.all = true ;
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
 	                            rs = optbool(argp,argl) ;
-	                            lip->f.all = (rs > 0) ;
+	                            lip->fl.all = (rs > 0) ;
 	                        }
 	                    } else
 	                        rs = SR_INVALID ;
@@ -1618,12 +1617,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = true ;
+	                        pip->fl.quiet = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.quiet = (rs > 0) ;
+	                                pip->fl.quiet = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1654,7 +1653,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                                lip->have.hdrfroms = true ;
 	                                lip->final.hdrfroms = true ;
 	                                if (argp[0] == '+') {
-	                                    lip->f.def_from = true ;
+	                                    lip->fl.def_from = true ;
 	                                } else if (argp[0] != '-') {
 	                                    cint	al = argl ;
 	                                    cchar	*ap = argp ;
@@ -1676,7 +1675,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            if (argl) {
 	                                cchar	*mb = argp ;
 	                                lip->cmbname = argp ;
-	                                lip->f.cmbname = 
+	                                lip->fl.cmbname = 
 	                                    (mb[0] != '\0') && (mb[0] != '-') ;
 	                            }
 	                        } else
@@ -1719,12 +1718,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 't':
 	                        lip->have.take = true ;
 	                        lip->final.take = true ;
-	                        lip->f.take = true ;
+	                        lip->fl.take = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.take = (rs > 0) ;
+	                                lip->fl.take = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1886,7 +1885,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	}
 
 	if ((! pip->final.ignore) && hasalluc(pip->progname,-1)) {
-	    pip->f.ignore = true ;
+	    pip->fl.ignore = true ;
 	}
 
 	if (afname == nullptr) afname = getourenv(pip->envv,VARAFNAME) ;
@@ -1901,20 +1900,20 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            uid_t	euid = geteuid() ;
 	            if (! lip->final.addnote) {
 	                lip->have.addnote = true ;
-	                lip->f.addnote = true ;
+	                lip->fl.addnote = true ;
 	            }
 	            if (! lip->final.addsender) {
 	                lip->have.addsender = true ;
-	                lip->f.addsender = true ;
+	                lip->fl.addsender = true ;
 	            }
 	            if (! lip->final.take) {
 	                lip->have.take = true ;
-	                lip->f.take = false ;
+	                lip->fl.take = false ;
 	            }
 	            if (! lip->final.cmbname) {
 	                cchar	*cmb = "mailnotes" ;
 	                lip->final.cmbname = true ;
-	                lip->f.cmbname = true ;
+	                lip->fl.cmbname = true ;
 	                rs = locinfo_setcmb(lip,cmb,-1) ;
 	            }
 	            if (lip->hdraddr_errorsto == nullptr) {
@@ -2017,7 +2016,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        shio_printf(pip->efp,fmt,pn,rs) ;
 	    } /* end if */
 #ifdef	COMMENT
-	    if ((rs >= 0) && lip->f.reqsubj && lip->f.notsubj) {
+	    if ((rs >= 0) && lip->fl.reqsubj && lip->fl.notsubj) {
 	        rs = SR_AGAIN ;
 	    }
 #endif /* COMMENT */
@@ -2035,7 +2034,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            cchar	*fmt = "%s: invalid operation (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	        }
@@ -2214,10 +2213,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.ignore) {
 	                        pip->have.ignore = true ;
 	                        pip->final.ignore = true ;
-	                        pip->f.ignore = true ;
+	                        pip->fl.ignore = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.ignore = (rs > 0) ;
+	                            pip->fl.ignore = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2232,9 +2231,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.cmbname) {
 	                        if (vl > 0) {
 	                            if ((rs1 = optbool(vp,vl)) >= 0) {
-	                                lip->f.cmbname = (rs1 > 0) ;
+	                                lip->fl.cmbname = (rs1 > 0) ;
 	                            } else {
-	                                lip->f.cmbname = true ;
+	                                lip->fl.cmbname = true ;
 	                                rs = locinfo_setcmb(lip,vp,vl) ;
 	                            }
 	                        }
@@ -2246,10 +2245,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.logprog) {
 	                        pip->have.logprog = true ;
 	                        pip->final.logprog = true ;
-	                        pip->f.logprog = true ;
+	                        pip->fl.logprog = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2257,10 +2256,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.deliver) {
 	                        lip->have.deliver = true ;
 	                        lip->final.deliver = true ;
-	                        lip->f.deliver = true ;
+	                        lip->fl.deliver = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.deliver = (rs > 0) ;
+	                            lip->fl.deliver = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2268,10 +2267,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.take) {
 	                        lip->have.take = true ;
 	                        lip->final.take = true ;
-	                        lip->f.take = true ;
+	                        lip->fl.take = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.take = (rs > 0) ;
+	                            lip->fl.take = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2279,10 +2278,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.useclen) {
 	                        lip->have.useclen = true ;
 	                        lip->final.useclen = true ;
-	                        lip->f.useclen = true ;
+	                        lip->fl.useclen = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.useclen = (rs > 0) ;
+	                            lip->fl.useclen = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2290,10 +2289,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.useclines) {
 	                        lip->have.useclines = true ;
 	                        lip->final.useclines = true ;
-	                        lip->f.useclines = true ;
+	                        lip->fl.useclines = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.useclines = (rs > 0) ;
+	                            lip->fl.useclines = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2312,9 +2311,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if ((! lip->final.xmailer) && (vl > 0)) {
 	                        lip->final.xmailer = true ;
 	                        lip->have.xmailer = true ;
-	                        lip->f.xmailer = true ;
+	                        lip->fl.xmailer = true ;
 	                        if ((rs1 = optbool(vp,vl)) >= 0) {
-	                            lip->f.xmailer = (rs1 > 0) ;
+	                            lip->fl.xmailer = (rs1 > 0) ;
 	                        } else {
 	                            cchar	**vpp = &lip->xmailer ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -2325,10 +2324,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.org) {
 	                        lip->final.org = true ;
 	                        lip->have.org = true ;
-	                        lip->f.org = true ;
+	                        lip->fl.org = true ;
 	                        if (vl > 0) {
 	                            if ((rs1 = optbool(vp,vl)) >= 0) {
-	                                lip->f.org = (rs1 > 0) ;
+	                                lip->fl.org = (rs1 > 0) ;
 	                            } else if (pip->org == nullptr) {
 	                                cchar	**vpp = &pip->org ;
 	                                rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -2340,10 +2339,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.sender) {
 	                        lip->final.sender = true ;
 	                        lip->have.sender = true ;
-	                        lip->f.sender = true ;
+	                        lip->fl.sender = true ;
 	                        if (vl > 0) {
 	                            if ((rs1 = optbool(vp,vl)) >= 0) {
-	                                lip->f.sender = (rs1 > 0) ;
+	                                lip->fl.sender = (rs1 > 0) ;
 	                            } else {
 	                                cchar **vpp = &lip->hdraddr_sender ;
 	                                rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -2355,10 +2354,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.addenv) {
 	                        lip->have.addenv = true ;
 	                        lip->final.addenv = true ;
-	                        lip->f.addenv = true ;
+	                        lip->fl.addenv = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.addenv = (rs > 0) ;
+	                            lip->fl.addenv = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2366,10 +2365,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.addsender) {
 	                        lip->have.addsender = true ;
 	                        lip->final.addsender = true ;
-	                        lip->f.addsender = true ;
+	                        lip->fl.addsender = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.addsender = (rs > 0) ;
+	                            lip->fl.addsender = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2377,10 +2376,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.addfrom) {
 	                        lip->have.addfrom = true ;
 	                        lip->final.addfrom = true ;
-	                        lip->f.addfrom = true ;
+	                        lip->fl.addfrom = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.addfrom = (rs > 0) ;
+	                            lip->fl.addfrom = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2388,7 +2387,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.addsubj) {
 	                        lip->have.addsubj = true ;
 	                        lip->final.addsubj = true ;
-	                        lip->f.addsubj = true ;
+	                        lip->fl.addsubj = true ;
 	                        if ((vl > 0) && (lip->hdrsubject == nullptr)) {
 	                            cchar	**vpp = &lip->hdrsubject ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -2399,10 +2398,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.addxuuid) {
 	                        lip->have.addxuuid = true ;
 	                        lip->final.addxuuid = true ;
-	                        lip->f.addxuuid = true ;
+	                        lip->fl.addxuuid = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.addxuuid = (rs > 0) ;
+	                            lip->fl.addxuuid = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2419,10 +2418,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.reqsubj) {
 	                        lip->have.reqsubj = true ;
 	                        lip->final.reqsubj = true ;
-	                        lip->f.reqsubj = true ;
+	                        lip->fl.reqsubj = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.reqsubj = (rs > 0) ;
+	                            lip->fl.reqsubj = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2430,10 +2429,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.maint) {
 	                        lip->have.maint = true ;
 	                        lip->final.maint = true ;
-	                        lip->f.maint = true ;
+	                        lip->fl.maint = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.maint = (rs > 0) ;
+	                            lip->fl.maint = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2441,10 +2440,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.addnote) {
 	                        lip->have.addnote = true ;
 	                        lip->final.addnote = true ;
-	                        lip->f.addnote = true ;
+	                        lip->fl.addnote = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.addnote = (rs > 0) ;
+	                            lip->fl.addnote = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2452,10 +2451,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.onefrom) {
 	                        lip->have.onefrom = true ;
 	                        lip->final.onefrom = true ;
-	                        lip->f.onefrom = true ;
+	                        lip->fl.onefrom = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.onefrom = (rs > 0) ;
+	                            lip->fl.onefrom = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2463,10 +2462,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.onesender) {
 	                        lip->have.onesender = true ;
 	                        lip->final.onesender = true ;
-	                        lip->f.onesender = true ;
+	                        lip->fl.onesender = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.onesender = (rs > 0) ;
+	                            lip->fl.onesender = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -2637,7 +2636,7 @@ static int procourconf_begin(PROGINFO *pip,cchar *cfname)
 	                } /* end if (locinfo_tmpcheck) */
 	            } /* end if (locinfo_jobdname) */
 
-	            if (! lip->have.take) lip->f.take = true ;
+	            if (! lip->have.take) lip->fl.take = true ;
 
 #if	CF_XMAILER
 	            if (lip->xmailer == nullptr) {
@@ -2659,8 +2658,8 @@ static int procourconf_begin(PROGINFO *pip,cchar *cfname)
 	} /* end if (m-a) */
 
 	if (pip->debuglevel > 0) {
-	    shio_printf(pip->efp,"%s: take=%u\n",pn,lip->f.take) ;
-	    shio_printf(pip->efp,"%s: addsender=%u\n",pn,lip->f.addsender) ;
+	    shio_printf(pip->efp,"%s: take=%u\n",pn,lip->fl.take) ;
+	    shio_printf(pip->efp,"%s: addsender=%u\n",pn,lip->fl.addsender) ;
 	}
 
 	return rs ;
@@ -2702,7 +2701,7 @@ static int procnames(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
-	if (lip->f.all && lip->f.allok) {
+	if (lip->fl.all && lip->fl.allok) {
 	    rs = procall(pip) ;
 	} else {
 	    rs = procargs(pip,aip,bop,afn) ;
@@ -2963,7 +2962,7 @@ static int procall(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (lip->f.all && lip->f.allok) {
+	if (lip->fl.all && lip->fl.allok) {
 	    SYSUSERNAMES	uns ;
 	    if ((rs = sysusernames_open(&uns,nullptr)) >= 0) {
 	        cint	unlen = USERNAMELEN ;
@@ -3005,8 +3004,8 @@ static int processin(PROGINFO *pip,cchar *ifname)
 	    int		opts = 0 ;
 
 #if	CF_PROCMSGSTAGE
-	    opts |= ((lip->f.useclen) ? MAILMSGSTAGE_OUSECLEN : 0) ;
-	    opts |= ((lip->f.useclines) ? MAILMSGSTAGE_OUSECLINES : 0) ;
+	    opts |= ((lip->fl.useclen) ? MAILMSGSTAGE_OUSECLEN : 0) ;
+	    opts |= ((lip->fl.useclines) ? MAILMSGSTAGE_OUSECLINES : 0) ;
 	    if ((rs = mailmsgstage_start(&lip->ms,mfd,lip->to,opts)) >= 0) {
 
 #if	CF_DEBUG
@@ -3035,10 +3034,10 @@ static int processin(PROGINFO *pip,cchar *ifname)
 	                if (DEBUGLEVEL(2))
 	                    debugprintf("b_imail/process: "
 	                        "procprepare() rs=%d f_deliver=%u\n",
-	                        rs,lip->f.deliver) ;
+	                        rs,lip->fl.deliver) ;
 #endif
 
-	                if ((rs >= 0) && lip->f.deliver) {
+	                if ((rs >= 0) && lip->fl.deliver) {
 	                    rs = procdeliver(pip) ;
 	                }
 
@@ -3049,7 +3048,7 @@ static int processin(PROGINFO *pip,cchar *ifname)
 #endif
 
 #if	CF_PROCSAVE
-	                if ((rs >= 0) && lip->f.cmbname) {
+	                if ((rs >= 0) && lip->fl.cmbname) {
 	                    rs = procsave(pip) ;
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(2))
@@ -3104,7 +3103,7 @@ static int processin(PROGINFO *pip,cchar *ifname)
 	} /* end if (mailfile) */
 
 	if (pip->open.logprog) {
-	    if (lip->f.reqsubj && lip->f.notsubj) {
+	    if (lip->fl.reqsubj && lip->fl.notsubj) {
 	        cchar	*fmt = "subjects missing (when required)" ;
 	        proglog_printf(pip,fmt) ;
 	    }
@@ -3116,8 +3115,8 @@ static int processin(PROGINFO *pip,cchar *ifname)
 	}
 
 #ifdef	COMMENT
-	if ((rs >= 0) && lip->f.reqsubj && lip->f.notsubj) {
-	    if (! pip->f.quiet) {
+	if ((rs >= 0) && lip->fl.reqsubj && lip->fl.notsubj) {
+	    if (! pip->fl.quiet) {
 	        cchar	*fmt = "%s: no subject (subject required)\n" ;
 	        shio_printf(pip->efp,fmt,pip->progname) ;
 	    }
@@ -3201,13 +3200,13 @@ static int procdeliver(PROGINFO *pip) noex {
 
 	opts.mkclines = true ;
 	opts.mkcrnl = true ;			/* possible CRNL enforcement */
-	opts.mkenv = lip->f.addenv ;
-	opts.mkfrom = lip->f.addfrom ;
-	opts.mksubj = lip->f.addsubj ;
-	opts.mkxuuid = lip->f.addxuuid ;	/* UUID */
-	opts.mkxnote = lip->f.addnote ;		/* Apple-Note */
-	opts.mkxmcdate = lip->f.addxmcdate ;	/* Mail-Created-Date */
-	opts.reqsubj = lip->f.reqsubj ;
+	opts.mkenv = lip->fl.addenv ;
+	opts.mkfrom = lip->fl.addfrom ;
+	opts.mksubj = lip->fl.addsubj ;
+	opts.mkxuuid = lip->fl.addxuuid ;	/* UUID */
+	opts.mkxnote = lip->fl.addnote ;		/* Apple-Note */
+	opts.mkxmcdate = lip->fl.addxmcdate ;	/* Mail-Created-Date */
+	opts.reqsubj = lip->fl.reqsubj ;
 
 	if ((rs = locinfo_opentmpfile(lip,tbuf,of,pre)) >= 0) {
 	    cint	nmsgs = lip->nmsgs ;
@@ -3256,18 +3255,18 @@ static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp) noex {
 	        rs = uc_ftruncate(sfd,wlen) ;
 	    }
 
-	    if ((rs >= 0) && lip->f.deliver) {
+	    if ((rs >= 0) && lip->fl.deliver) {
 	        MSGDATA		*mdp ;
 	        if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
 	            if ((rs = msgdata_getsubject(mdp,nullptr)) >= 0) {
 	                cint	f_subj = rs ;
 	                cchar	*pn = pip->progname ;
 	                cchar	*fmt ;
-	                if (f_subj || (! lip->f.reqsubj)) {
+	                if (f_subj || (! lip->fl.reqsubj)) {
 	                    if ((rs = procdelivermsg(pip,mi,sfd,optp)) >= 0) {
 	                        cint	nr = rs ;
 	                        if ((rs = msgdata_setnrecips(mdp,nr)) >= 0) {
-	                            if ((nr == 0) && (! pip->f.quiet)) {
+	                            if ((nr == 0) && (! pip->fl.quiet)) {
 	                                fmt = "%s: msg=%u has no recipients\n" ;
 	                                shio_printf(pip->efp,fmt,pn,mi) ;
 	                            } else if (pip->debuglevel > 0) {
@@ -3276,13 +3275,13 @@ static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp) noex {
 	                            }
 	                        } /* end if */
 	                    } /* end if (procdelivermsg) */
-	                } else if (lip->f.reqsubj && (! f_subj)) {
+	                } else if (lip->fl.reqsubj && (! f_subj)) {
 	                    wlen = 0 ;
-	                    if (! pip->f.quiet) {
+	                    if (! pip->fl.quiet) {
 	                        fmt = "%s: msg=%u no-subject (required)\n" ;
 	                        shio_printf(pip->efp,fmt,pn,mi) ;
 	                    }
-	                    if (pip->f.logprog) {
+	                    if (pip->fl.logprog) {
 	                        fmt = "msg=%u no-subject (required)" ;
 	                        proglog_printf(pip,fmt,mi) ;
 	                    }
@@ -3309,7 +3308,7 @@ static int procdelivermsg(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_imail/procdelivermsg: f_take=%u mi=%u\n",
-	        lip->f.take,mi) ;
+	        lip->fl.take,mi) ;
 #endif
 
 	if (pip->debuglevel > 0) {
@@ -3319,7 +3318,7 @@ static int procdelivermsg(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp) noex {
 	if ((rs = vechand_start(&aa,0,0)) >= 0) {
 	    if ((rs = procreciploads(pip,&aa,mi,atypes)) >= 0) {
 
-	        if (lip->f.take) {
+	        if (lip->fl.take) {
 	            rs = procdelivermsgalls(pip,mi,sfd,optp,&aa) ;
 	            c += rs ;
 
@@ -3386,11 +3385,11 @@ vechand		*tlp ;
 	        cint	n = vechand_count(tlp) ;
 	        int		i = 0 ;
 	        int		ai = 0 ;
-	        int		f = lip->f.usingsendmail ;
+	        int		f = lip->fl.usingsendmail ;
 	        char		*ap ;
 
 	        args[ai++] = (f) ? lip->sendmail : lip->postmail ;
-	        if (lip->f.usingsendmail) { /* extra crap needed for SENDMAIL */
+	        if (lip->fl.usingsendmail) { /* extra crap needed for SENDMAIL */
 	            args[ai++] = "-oi" ;
 	            args[ai++] = "-B" ;
 	            args[ai++] = "8BITMIME" ;
@@ -3482,7 +3481,7 @@ vechand		*tlp ;
 
 /* add any BCC "takes" */
 
-	    if (lip->f.take) {
+	    if (lip->fl.take) {
 	        if ((rs = procreciploads(pip,blp,mi,atypes)) >= 0) {
 	            for (i = 0 ; vechand_get(blp,i,&ap) >= 0 ; i += 1) {
 	                if (ap != nullptr) {
@@ -3524,7 +3523,7 @@ vechand		*tlp ;
 #endif
 
 	                rs1 = rsn ;
-	                if (lip->f.take) {
+	                if (lip->fl.take) {
 	                    vrecipsch_t	v = vrecipsch ;
 	                    if ((rs1 = vechand_search(blp,ap,v,nullptr)) == rsn) {
 	                        rs1 = vechand_search(tlp,ap,v,nullptr) ;
@@ -3552,9 +3551,9 @@ vechand		*tlp ;
 	                    int	f ;
 
 	                    ai = 0 ;
-	                    f = lip->f.usingsendmail ;
+	                    f = lip->fl.usingsendmail ;
 	                    args[ai++] = (f) ? lip->sendmail : lip->postmail ;
-	                    if (lip->f.usingsendmail) { /* for SENDMAIL */
+	                    if (lip->fl.usingsendmail) { /* for SENDMAIL */
 	                        args[ai++] = "-oi" ;
 	                        args[ai++] = "-B" ;
 	                        args[ai++] = "8BITMIME" ;
@@ -3782,7 +3781,7 @@ static int procwaitok(PROGINFO *pip,pid_t pid,int cs)
 
 	} else if (WIFSIGNALED(cs)) {
 
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        fmt = "%s: mailer(%u) was signalled sig=%u\n" ;
 	        shio_printf(pip->efp,fmt,pn,
 	            pid,WTERMSIG(cs)) ;
@@ -3796,7 +3795,7 @@ static int procwaitok(PROGINFO *pip,pid_t pid,int cs)
 
 	} else {
 
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        fmt = "%s: mailer(%u) exited "
 	            "abnormally cs=%u\n" ;
 	        shio_printf(pip->efp,fmt,pn,
@@ -3820,7 +3819,7 @@ static int procwaitbad(PROGINFO *pip,pid_t pid,int rrs)
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if (! pip->f.quiet) {
+	if (! pip->fl.quiet) {
 	    fmt = "%s: mailer(%u) exited "
 	        "w/ unknown disposition (%d)\n",
 	        shio_printf(pip->efp,fmt,pn,pid,rrs) ;
@@ -3850,7 +3849,7 @@ static int procsave(PROGINFO *pip)
 	    debugprintf("b_imail/procsave: ent\n") ;
 #endif
 
-	if (lip->f.cmbname) {
+	if (lip->fl.cmbname) {
 	    char	mbfname[MAXPATHLEN + 1] ;
 	    if ((rs = locinfo_cmbfname(lip,mbfname)) >= 0) {
 	        if (mbfname[0] != '\0') {
@@ -3867,10 +3866,10 @@ static int procsave(PROGINFO *pip)
 	                    uc_unlink(tbuf) ;
 
 	                    msgopts_all(&mo) ;
-	                    mo.reqsubj = lip->f.reqsubj ;
-	                    mo.mkxuuid = lip->f.addxuuid ;
-	                    mo.mkxnote = lip->f.addnote ;
-	                    mo.mkxmcdate = lip->f.addxmcdate ;
+	                    mo.reqsubj = lip->fl.reqsubj ;
+	                    mo.mkxuuid = lip->fl.addxuuid ;
+	                    mo.mkxnote = lip->fl.addnote ;
+	                    mo.mkxmcdate = lip->fl.addxmcdate ;
 	                    if ((rs = procextract(pip,sfd,&mo)) > 0) {
 	                        wlen = rs ;
 	                        u_rewind(sfd) ;
@@ -4219,7 +4218,7 @@ int		mi ;
 	        abl -= sl ;
 	    }
 
-	    if (pip->open.logprog && pip->f.logprogmsg) {
+	    if (pip->open.logprog && pip->fl.logprogmsg) {
 	        proglog_printf(pip,"  | %-25s", datebuf) ;
 	        proglog_printf(pip,"  |   %c %r",
 	            atypes[atype],addr,MIN(al,(LOGLINELEN - TABLEN))) ;
@@ -4238,7 +4237,7 @@ int		mi ;
 	    addrbuf[sal] = '\0' ;
 	    strwcpy(mip->e_from,addrbuf,MAILADDRLEN) ;
 
-	    if (pip->open.logprog && pip->f.logprogmsg) {
+	    if (pip->open.logprog && pip->fl.logprogmsg) {
 	        proglog_printf(pip,"  > %r",
 	            addrbuf,MIN(sal,(LOGLINELEN - 4))) ;
 	    }
@@ -4535,7 +4534,7 @@ static int procmsghdr_mid(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *optp)
 	    cchar		*sp ;
 	    char		ibuf[MAILADDRLEN+1] = { 0 } ;
 
-	    if (! lip->f.addnote) {
+	    if (! lip->fl.addnote) {
 	        int		hl = 0 ;
 	        cchar		*hp ;
 	        cchar		*kn = HN_MESSAGEID ;
@@ -4659,7 +4658,7 @@ static int procmsghdr_org(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *optp)
 	    debugprintf("procmsghdr_org: ent\n") ;
 #endif
 
-	if (lip->f.org) {
+	if (lip->fl.org) {
 	    MAILMSGSTAGE	*msp = &lip->ms ;
 	    cchar		*kn = HN_ORGANIZATION ;
 	    cchar		*hp ;
@@ -4949,7 +4948,7 @@ static int procmsghdr_sender(PROGINFO *pip,filer *ofp,int mi,MSGOPTS *mop)
 	            wlen += rs ;
 	        }
 	    } else if (rs == 0) {
-	        if (lip->f.addsender && (! mdp->f.disallowsender)) {
+	        if (lip->fl.addsender && (! mdp->fl.disallowsender)) {
 	            if ((rs = locinfo_mkhdrsender(lip)) >= 0) {
 	                cint	hl = rs ;
 	                cchar		*kn = HN_SENDER ;
@@ -4986,7 +4985,7 @@ static int procmsghdr_vsenders(PROGINFO *pip,filer *ofp,MSGDATA *mdp,
 	                wlen += rs ;
 	            }
 	        } /* end if (msgdara_isvsender) */
-	        if (lip->f.onesender && (wlen > 0)) break ;
+	        if (lip->fl.onesender && (wlen > 0)) break ;
 	    } /* end for */
 	} /* end if (msgdara_getnvsenders) */
 	return (rs >= 0) ? wlen : rs ;
@@ -5038,7 +5037,7 @@ static int procmsghdr_vsenders(PROGINFO *pip,filer *ofp,MSGDATA *mdp,
 	                            }
 	                        }
 	                    }
-	                    if (lip->f.onesender && (c > 0)) break ;
+	                    if (lip->fl.onesender && (c > 0)) break ;
 	                    if (rs < 0) break ;
 	                } /* end for */
 	            } /* end if (hdr-key) */
@@ -5070,7 +5069,7 @@ static int procmsghdr_from(PROGINFO *pip,filer *ofp,int mi,MSGOPTS *mop)
 
 	msp = &lip->ms ;
 	if ((rs = mailmsgstage_hdrval(msp,mi,kn,&hp)) > 0) {
-	    if (lip->f.onefrom) {
+	    if (lip->fl.onefrom) {
 	        rs = procprinthdr_addrsome(pip,ofp,kn,hp,rs,1) ;
 	        wlen += rs ;
 	    } else {
@@ -5082,7 +5081,7 @@ static int procmsghdr_from(PROGINFO *pip,filer *ofp,int mi,MSGOPTS *mop)
 	    if (mop->mkfrom) {
 	        if ((rs = locinfo_mkhdrfrom(lip)) > 0) {
 	            EMA		*elp = &lip->hdrfroms ;
-	            cint	m = (lip->f.onefrom) ? 1 : -1 ;
+	            cint	m = (lip->fl.onefrom) ? 1 : -1 ;
 	            rs = procprinthdr_ema(pip,ofp,kn,elp,m) ;
 	            wlen += rs ;
 	        }
@@ -5417,8 +5416,8 @@ int		mi ;
 	    debugprintf("b_imail/procmsghdr_subj: mid2 rs=%d hl=%d\n",rs,hl) ;
 #endif
 
-	if ((rs >= 0) && (hl <= 0) && lip->f.reqsubj) {
-	    lip->f.notsubj = true ;
+	if ((rs >= 0) && (hl <= 0) && lip->fl.reqsubj) {
+	    lip->fl.notsubj = true ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
 	        debugprintf("b_imail/procmsghdr_subj: DELIVER=0\n") ;
@@ -5544,7 +5543,7 @@ static int procmsghdr_xm(PROGINFO *pip,filer *fbp,int mi,MSGOPTS *mop)
 	} else if (isHdrEmpty(rs)) {
 	    if ((rs = locinfo_xmailer(lip)) >= 0) {
 	        hp = lip->xmailer ;
-	        if (lip->f.xmailer) {
+	        if (lip->fl.xmailer) {
 	            hl = strlen(hp) ;
 	            rs = procprinthdr(pip,fbp,kn,hp,hl) ;
 	            wlen += rs ;
@@ -5853,7 +5852,7 @@ static int procextid(PROGINFO *pip,char id[],cchar hp[],int hl)
 	            int		i ;
 	            for (i = 0 ; ema_get(&aid,i,&ep) >= 0 ; i += 1) {
 	                if (ep != nullptr) {
-	                    if ((! ep->f.error) && (ep->rl > 0)) {
+	                    if ((! ep->fl.error) && (ep->rl > 0)) {
 	                        cint	malen = MAILADDRLEN ;
 	                        char		*bp ;
 	                        bp = strwcpy(id,ep->rp,MIN(malen,ep->rl)) ;
@@ -6274,7 +6273,7 @@ static int proclognmsgs(PROGINFO *pip)
 
 	if (pip->open.logprog) {
 	    proglog_printf(pip,"nmsgs=%u",lip->nmsgs) ;
-	    if (! lip->f.take)
+	    if (! lip->fl.take)
 	        proglog_printf(pip,"take=OFF") ;
 	}
 
@@ -6422,7 +6421,7 @@ static int proclogmsg_org(PROGINFO *pip,int mi)
 	        hl = rs ;
 	    } else if (isHdrEmpty(rs)) {
 	        rs = SR_OK ;
-	        if (lip->f.org && (pip->org != nullptr)) {
+	        if (lip->fl.org && (pip->org != nullptr)) {
 	            hp = pip->org ;
 	            hl = strlen(hp) ;
 	            while (hl && ishigh(hp[hl-1])) hl -= 1 ;
@@ -6502,7 +6501,7 @@ static int proclogmsg_addr(PROGINFO *pip,int mi,int at)
 	        m = 1 ;
 	        break ;
 	    case msgloghdr_from:
-	        if (lip->f.onefrom) m = 1 ;
+	        if (lip->fl.onefrom) m = 1 ;
 	        break ;
 	    }
 	    if ((rs = proclogmsg_addremas(pip,mi,kn,alp,m)) >= 0) {
@@ -6706,7 +6705,7 @@ static int proclogmsg_sender(PROGINFO *pip,int mi)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip->open.logprog && lip->f.addsender) {
+	if (pip->open.logprog && lip->fl.addsender) {
 	    if (lip->hdraddr_sender != nullptr) {
 	        MSGDATA		*mdp = nullptr ;
 	        if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
@@ -6747,10 +6746,10 @@ static int proclogmsg_from(PROGINFO *pip,int mi)
 	    if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
 	        cint	at = msgloghdr_from ;
 	        int		f ;
-	        f = (mdp->naddrs[at] <= 0) || lip->f.addfrom ;
-	        if (f && lip->f.hdrfroms) {
+	        f = (mdp->naddrs[at] <= 0) || lip->fl.addfrom ;
+	        if (f && lip->fl.hdrfroms) {
 	            EMA		*alp = &lip->hdrfroms ;
-	            cint	m = (lip->f.onefrom) ? 1 : -1 ;
+	            cint	m = (lip->fl.onefrom) ? 1 : -1 ;
 	            cchar	*kn = HN_FROM ;
 	            rs = proclogmsg_addremas(pip,mi,kn,alp,m) ;
 	        }
@@ -6891,20 +6890,20 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	lip->postmail = PROG_POSTMAIL ;
 	lip->pagesize = getpagesize() ;
 
-	lip->f.deliver = OPT_DELIVER ;		/* default is to deliver */
-	lip->f.cmbname = OPT_CMBNAME ;		/* save MSG copy */
-	lip->f.xmailer = OPT_MAILER ;		/* include "x-mailer" header */
-	lip->f.org = OPT_ORG ;
-	lip->f.sender = OPT_SENDER ;
-	lip->f.reqsubj = OPT_REQSUBJ ;
-	lip->f.addsubj = OPT_ADDSUBJ ;
-	lip->f.addsender = OPT_ADDSENDER ;
-	lip->f.addfrom = OPT_ADDFROM ;
-	lip->f.onefrom = OPT_ONEFROM ;
-	lip->f.onesender = OPT_ONESENDER ;
-	lip->f.take = OPT_TAKE ;
-	lip->f.useclen = OPT_USECLEN ;
-	lip->f.useclines = OPT_USECLINES ;
+	lip->fl.deliver = OPT_DELIVER ;		/* default is to deliver */
+	lip->fl.cmbname = OPT_CMBNAME ;		/* save MSG copy */
+	lip->fl.xmailer = OPT_MAILER ;		/* include "x-mailer" header */
+	lip->fl.org = OPT_ORG ;
+	lip->fl.sender = OPT_SENDER ;
+	lip->fl.reqsubj = OPT_REQSUBJ ;
+	lip->fl.addsubj = OPT_ADDSUBJ ;
+	lip->fl.addsender = OPT_ADDSENDER ;
+	lip->fl.addfrom = OPT_ADDFROM ;
+	lip->fl.onefrom = OPT_ONEFROM ;
+	lip->fl.onesender = OPT_ONESENDER ;
+	lip->fl.take = OPT_TAKE ;
+	lip->fl.useclen = OPT_USECLEN ;
+	lip->fl.useclines = OPT_USECLINES ;
 
 	if ((rs = vecstr_start(&lip->stores,4,0)) >= 0) {
 	    lip->open.stores = true ;
@@ -6947,8 +6946,8 @@ static int locinfo_finish(LOCINFO *lip)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (lip->f.dater) {
-	    lip->f.dater = false ;
+	if (lip->fl.dater) {
+	    lip->fl.dater = false ;
 	    rs1 = dater_finish(&lip->dc) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -7110,8 +7109,8 @@ static int locinfo_mailerprog(LOCINFO *lip)
 	if (lip == nullptr)
 	    return SR_FAULT ;
 
-	if (! lip->f.epath) {
-	    lip->f.epath = true ;
+	if (! lip->fl.epath) {
+	    lip->fl.epath = true ;
 	    rs = loadpath(pip) ;
 	}
 
@@ -7175,9 +7174,9 @@ static int locinfo_mailerprog(LOCINFO *lip)
 static int locinfo_defopts(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
-	if (lip->f.addnote) {
-	    lip->f.addxmcdate = true ;
-	    lip->f.addxuuid = true ;
+	if (lip->fl.addnote) {
+	    lip->fl.addxmcdate = true ;
+	    lip->fl.addxuuid = true ;
 	}
 	return rs ;
 }
@@ -7263,7 +7262,7 @@ static int locinfo_setcmb(LOCINFO *lip,cchar *vp,int vl)
 	        rs = locinfo_setentry(lip,vpp,vp,vl) ;
 	        if (rs >= 0) {
 	            mb = lip->cmbname ;
-	            lip->f.cmbname = (mb[0] != '\0') && (mb[0] != '-') ;
+	            lip->fl.cmbname = (mb[0] != '\0') && (mb[0] != '-') ;
 	        }
 	    }
 	} /* end if (positive) */
@@ -7395,14 +7394,14 @@ static int locinfo_cmbfname(LOCINFO *lip,char mbfname[])
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("b_imail/locinfo_cmbfname: f_cmbname=%u\n",
-	        lip->f.cmbname) ;
+	        lip->fl.cmbname) ;
 	    debugprintf("b_imail/locinfo_cmbfname: mf=%s\n",mf) ;
 	    debugprintf("b_imail/locinfo_cmbfname: mb=%s\n",mb) ;
 	}
 #endif
 
 	mbfname[0] = '\0' ;
-	if (lip->f.cmbname && ((mb == nullptr) || (mb[0] != '-'))) {
+	if (lip->fl.cmbname && ((mb == nullptr) || (mb[0] != '-'))) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
@@ -7689,7 +7688,7 @@ static int locinfo_mkhdrfrom(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
-	if ((! lip->f.hdrfroms) || lip->f.def_from) {
+	if ((! lip->fl.hdrfroms) || lip->fl.def_from) {
 	    int	al = -1 ;
 
 	    if (lip->hdraddr_from == nullptr) {
@@ -7985,13 +7984,13 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 	if (lip->jobdname != nullptr) {
 	    TMTIME	t ;
 	    if ((rs = tmtime_localtime(&t,pip->daytime)) >= 0) {
-	        if ((t.hour >= HOUR_MAINT) && lip->f.maint) {
+	        if ((t.hour >= HOUR_MAINT) && lip->fl.maint) {
 		    uptsub_t	thr = (uptsub_t) locinfo_tmpmaint ;
 	            pthread_t	tid ;
 	            if ((rs = uptcreate(&tid,nullptr,thr,lip)) >= 0) {
 	                rs = 1 ;
 	                lip->tid = tid ;
-	                lip->f.tmpmaint = true ;
+	                lip->fl.tmpmaint = true ;
 	            } /* end if (uptcreate) */
 	        } /* end if (after hours) */
 	    } /* end if (tmtime_localtime) */
@@ -8009,7 +8008,7 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 	cint	to = TO_TMPFILES ;
 	int		rs ;
 	int		c = 0 ;
-	int		f_need = lip->f.maint ;
+	int		f_need = lip->fl.maint ;
 	cchar		*dname = lip->jobdname ;
 	char		tsfname[MAXPATHLEN+1] ;
 
@@ -8053,7 +8052,7 @@ static int locinfo_tmpdone(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (lip->f.tmpmaint) {
+	if (lip->fl.tmpmaint) {
 	    int	trs ;
 	    rs1 = uptjoin(lip->tid,&trs) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -8110,13 +8109,13 @@ static int locinfo_cvtdate(LOCINFO *lip,char tbuf[],cchar *hp,int hl)
 	            hp,strlinelen(hp,hl,50)) ;
 #endif
 
-	    if (! lip->f.dater) {
+	    if (! lip->fl.dater) {
 	        TIMEB	now ;
 	        cint	zlen = TZABBRLEN ;
 	        char	zbuf[TZABBRLEN + 1] ;
 	        if ((rs = initnow(&now,zbuf,zlen)) >= 0) {
 	            rs = dater_start(dp,&now,zbuf,rs) ;
-	            lip->f.dater = (rs >= 0) ;
+	            lip->fl.dater = (rs >= 0) ;
 	        }
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
@@ -8762,7 +8761,7 @@ static int config_starter(CONFIG *cfp)
 	EXPCOOK		*ckp = &cfp->cooks ;
 	if ((rs = expcook_start(ckp)) >= 0) {
 	    if ((rs = config_loadcooks(cfp)) >= 0) {
-	        cfp->f.p = true ;
+	        cfp->fl.p = true ;
 	        rs = config_read(cfp) ;
 	    }
 	    if (rs < 0)
@@ -8912,7 +8911,7 @@ struct config	*cfp ;
 	if (cfp == nullptr)
 	    return SR_FAULT ;
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    if ((rs = paramfile_check(&cfp->params,pip->daytime)) > 0) {
 	        rs = config_read(cfp) ;
 	    }
@@ -8934,7 +8933,7 @@ static int config_finish(CONFIG *cfp)
 	pip = cfp->pip ;
 	if (pip == nullptr) return SR_FAULT ;
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    rs1 = expcook_finish(&cfp->cooks) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -8964,10 +8963,10 @@ static int config_read(CONFIG *cfp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_imail/config_read: f_p=%u\n",cfp->f.p) ;
+	    debugprintf("b_imail/config_read: f_p=%u\n",cfp->fl.p) ;
 #endif
 
-	if (cfp->f.p) {
+	if (cfp->fl.p) {
 	    rs = config_reader(cfp) ;
 	} /* end if (active) */
 
@@ -9075,7 +9074,7 @@ static int config_reader(CONFIG *cfp)
 	            case param_copy:
 	                if ((! lip->final.cmbname) && (el > 0)) {
 	                    lip->have.cmbname = true ;
-	                    lip->f.cmbname = true ;
+	                    lip->fl.cmbname = true ;
 	                    rs = locinfo_setcmb(lip,ebuf,el) ;
 	                }
 	                break ;
@@ -9104,9 +9103,9 @@ static int config_reader(CONFIG *cfp)
 	            case param_mailer:
 	                if ((! lip->final.xmailer) && (el > 0)) {
 	                    lip->have.xmailer = true ;
-	                    lip->f.xmailer = true ;
+	                    lip->fl.xmailer = true ;
 	                    if ((rs1 = optbool(ebuf,el)) >= 0) {
-	                        lip->f.xmailer = (rs1 > 0) ;
+	                        lip->fl.xmailer = (rs1 > 0) ;
 	                    } else {
 	                        cchar	**vpp = &lip->xmailer ;
 	                        rs = locinfo_setentry(lip,vpp,ebuf,el) ;
@@ -9117,10 +9116,10 @@ static int config_reader(CONFIG *cfp)
 	            case param_org:
 	                if (! lip->final.org) {
 	                    lip->have.org = true ;
-	                    lip->f.org = true ;
+	                    lip->fl.org = true ;
 	                    if (el > 0) {
 	                        if ((rs1 = optbool(ebuf,el)) >= 0) {
-	                            lip->f.org = (rs1 > 0) ;
+	                            lip->fl.org = (rs1 > 0) ;
 	                        } else if (pip->org == nullptr) {
 	                            cchar	**vpp = &pip->org ;
 	                            rs = proginfo_setentry(pip,vpp,ebuf,el) ;
@@ -9133,10 +9132,10 @@ static int config_reader(CONFIG *cfp)
 	                if (! lip->final.useclen) {
 	                    lip->have.useclen = true ;
 	                    lip->final.useclen = true ;
-	                    lip->f.useclen = true ;
+	                    lip->fl.useclen = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.useclen = (rs > 0) ;
+	                        lip->fl.useclen = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -9145,10 +9144,10 @@ static int config_reader(CONFIG *cfp)
 	                if (! lip->final.useclines) {
 	                    lip->have.useclines = true ;
 	                    lip->final.useclines = true ;
-	                    lip->f.useclines = true ;
+	                    lip->fl.useclines = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.useclines = (rs > 0) ;
+	                        lip->fl.useclines = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -9157,10 +9156,10 @@ static int config_reader(CONFIG *cfp)
 	                if (! lip->final.reqsubj) {
 	                    lip->have.reqsubj = true ;
 	                    lip->final.reqsubj = true ;
-	                    lip->f.reqsubj = true ;
+	                    lip->fl.reqsubj = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.reqsubj = (rs > 0) ;
+	                        lip->fl.reqsubj = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -9169,10 +9168,10 @@ static int config_reader(CONFIG *cfp)
 	                if (! lip->final.allok) {
 	                    lip->have.allok = true ;
 	                    lip->final.allok = true ;
-	                    lip->f.allok = true ;
+	                    lip->fl.allok = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.allok = (rs > 0) ;
+	                        lip->fl.allok = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -9181,10 +9180,10 @@ static int config_reader(CONFIG *cfp)
 	                if (! lip->final.addsender) {
 	                    lip->have.addsender = true ;
 	                    lip->final.addsender = true ;
-	                    lip->f.addsender = true ;
+	                    lip->fl.addsender = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
-	                        lip->f.addsender = (rs > 0) ;
+	                        lip->fl.addsender = (rs > 0) ;
 	                    }
 	                }
 	                break ;
@@ -9345,7 +9344,7 @@ static int msgdata_checksubject(MSGDATA *mdp,MAILMSGSTAGE *msp,int mi)
 	    cchar	*sp ;
 	    hl = rs ;
 	    if ((sl = sfshrink(hp,hl,&sp)) > 0) {
-	        mdp->f.subject = true ;
+	        mdp->fl.subject = true ;
 	    } /* end if (positive) */
 	} else if (isHdrEmpty(rs)) {
 	    rs = SR_OK ;
@@ -9398,7 +9397,7 @@ static int msgdata_procsender(MSGDATA *mdp,LOCINFO *lip)
 #endif
 	if (mdp->naddrs[msgloghdr_from] > 0) {
 	    EMA		*flp = (mdp->addrs + msgloghdr_from) ;
-	    cint	f_onesender = lip->f.onesender ;
+	    cint	f_onesender = lip->fl.onesender ;
 	    int		fl ;
 	    cchar	*fp ;
 	    if ((rs = ema_first(flp,&fp)) > 0) {
@@ -9433,7 +9432,7 @@ static int msgdata_procsender(MSGDATA *mdp,LOCINFO *lip)
 #if	CF_DEBUGS
 	        debugprintf("msgdata_procsender: si=%u\n",si) ;
 #endif
-	        if ((rs >= 0) && (si == 0) && lip->f.addsender) {
+	        if ((rs >= 0) && (si == 0) && lip->fl.addsender) {
 	            if ((rs = locinfo_mkhdrsender(lip)) >= 0) {
 	                cint	hl = rs ;
 	                cint	alen = MAILADDRLEN ;
@@ -9450,7 +9449,7 @@ static int msgdata_procsender(MSGDATA *mdp,LOCINFO *lip)
 	                        cint	al = rs ;
 	                        cchar		*ap = abuf ;
 	                        if ((fl == al) && (stremacmp(fp,ap) == 0)) {
-	                            mdp->f.disallowsender = true ;
+	                            mdp->fl.disallowsender = true ;
 	                        }
 	                    } /* end if (mkbestaddr) */
 	                    uc_free(abuf) ;
@@ -9462,7 +9461,7 @@ static int msgdata_procsender(MSGDATA *mdp,LOCINFO *lip)
 	} /* end if (positive) */
 #if	CF_DEBUGS
 	debugprintf("msgdata_procsender: ret rs=%d f_dis=%u\n",rs,
-	    mdp->f.disallowsender) ;
+	    mdp->fl.disallowsender) ;
 #endif
 	return rs ;
 }
@@ -9487,9 +9486,9 @@ static int msgdata_getnsenders(MSGDATA *mdp)
 static int msgdata_setvsender(MSGDATA *mdp,int si)
 {
 	int		rs = SR_OK ;
-	if (! mdp->f.senders) {
+	if (! mdp->fl.senders) {
 	    if ((rs = bits_start(&mdp->senders,1)) >= 0) {
-	        mdp->f.senders = true ;
+	        mdp->fl.senders = true ;
 	    }
 	}
 	if (rs >= 0) {
@@ -9503,7 +9502,7 @@ static int msgdata_setvsender(MSGDATA *mdp,int si)
 static int msgdata_isvsender(MSGDATA *mdp,int si)
 {
 	int		rs = SR_OK ;
-	if (mdp->f.senders) {
+	if (mdp->fl.senders) {
 	    rs = bits_test(&mdp->senders,si) ;
 	}
 	return rs ;
@@ -9524,7 +9523,7 @@ static int msgdata_setsubject(MSGDATA *mdp)
 {
 	int		rs = SR_OK ;
 	if (mdp == nullptr) return SR_FAULT ;
-	mdp->f.subject = true ;
+	mdp->fl.subject = true ;
 	return rs ;
 }
 /* end subroutine (msgdata_setsubject) */
@@ -9553,7 +9552,7 @@ static int msgdata_getsubject(MSGDATA *mdp,cchar **rpp)
 {
 	int		rs = SR_OK ;
 	if (mdp == nullptr) return SR_FAULT ;
-	if (mdp->f.subject) {
+	if (mdp->fl.subject) {
 	    rs = 1 ;
 	}
 	if (rpp != nullptr) *rpp = nullptr ;
@@ -9570,8 +9569,8 @@ static int msgdata_finish(MSGDATA *mdp)
 
 	if (mdp == nullptr) return SR_FAULT ;
 
-	if (mdp->f.senders) {
-	    mdp->f.senders = false ;
+	if (mdp->fl.senders) {
+	    mdp->fl.senders = false ;
 	    rs1 = bits_finish(&mdp->senders) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
