@@ -13,7 +13,7 @@
 
 */
 
-/* Copyright Â© 2014 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2014 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -39,6 +39,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<ctime>			/* |time_t| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
