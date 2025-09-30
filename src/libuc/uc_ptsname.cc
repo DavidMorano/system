@@ -2,14 +2,14 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* interface component for UNIX®Â® library-3c */
+/* interface component for UNIX® library-3c */
 /* get the filename (path) of a slave-pseudo terminal device */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-03-01, David AÂ­DÂ­ Morano
+	= 1998-03-01, David A­D­ Morano
 	This is written to get a portable (reentrant and thread-safe)
 	version of PTRNAME as we can get.
 
@@ -19,12 +19,16 @@
 
 */
 
-/* Copyright Â© 1998,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This code only has meaning on the newer System V UNIX®Â®
-	releases with the PTS dirver. This is now needed to get the
+  	Name:
+	uc_ptsname
+
+	Description:
+	This code only has meaning on the newer System V UNIX®.
+	releases with the PTS dirver.  This is now needed to get the
 	filename of the slave side device of the new pseudo-terminal
 	clone multiplexor driver. A new slave-side filename looks
 	something like '/dev/pts/26'.
@@ -53,6 +57,8 @@
 #include	<sys/ptms.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<snx.h>
