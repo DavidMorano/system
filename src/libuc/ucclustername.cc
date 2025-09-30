@@ -14,7 +14,7 @@
 
 */
 
-/* Copyright Â© 2004 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
