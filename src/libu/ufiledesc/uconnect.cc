@@ -35,18 +35,20 @@
 
 /*******************************************************************************
 
+  	Name:
+	u_connect
+
+	Description:
 	This subroutine is the friendly hack version of the more
-	"standard" UNIX |connect()| subroutine.  I use the term
+	"standard" UNIX® |connect()| subroutine.  I use the term
 	"standard" advisedly since the hot-shot hot-heads working
-	on BSD UNIX keep chaning the semantics slightly on this
+	on BSD UNIX® keep chaning the semantics slightly on this
 	call and then the System V people change their version
 	(usually a while afterwards) to catch up to the new "standard."
-
 	Somewhere along the line, someone suggested to change the
 	error return SR_ISCONN to SR_OK when we get it and if we
 	are currently in blocking mode.  I put the code in there
 	but it is not turned on (see compile flag above 'CF_ISCONN').
-
 
 *******************************************************************************/
 
@@ -67,7 +69,7 @@
 
 #include	"ufiledesc.h"
 
-import libutil ;
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
