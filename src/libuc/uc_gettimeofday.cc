@@ -2,23 +2,24 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* interface component for UNIX®Â® library-3c */
+/* interface component for UNIX® library-3c */
 /* get the current time of day */
 
 
 /* revision history:
 
-	= 1998-04-13, David AÂ­DÂ­ Morano
+	= 1998-04-13, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	Description:
-	This routine calls the system's (library) 'gettimeofday' subroutine.
+	This routine calls the system's (library) 'gettimeofday'
+	subroutine.
 
 	Synopsis:
 	int uc_gettimeofday(struct timeval *tvp,void *np) noex
@@ -30,7 +31,6 @@
 	Returns:
 	>=0		success
 	<0		failure and this is the error code
-
 
 *******************************************************************************/
 
