@@ -65,7 +65,7 @@
 #include	<usysdefs.h>
 
 
-/* UNIX kernal structures */
+/* UNIX® kernal structures */
 
 #ifndef	UTSNAME
 #define	UTSNAME		struct utsname
