@@ -2,18 +2,18 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* interface component for UNIX®Â® library-3c */
+/* interface component for UNIX® library-3c */
 /* set the NONBLOCK file descriptor open-flag */
 
 
 /* revision history:
 
-	= 1998-04-13, David AÂ­DÂ­ Morano
+	= 1998-04-13, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
