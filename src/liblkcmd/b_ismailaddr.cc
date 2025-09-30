@@ -366,7 +366,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 	pip->verboselevel = 1 ;
 	pip->daytime = time(NULL) ;
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -621,7 +621,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -800,7 +800,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 	if (pip->debuglevel > 0) {
 	    shio_printf(pip->efp,"%s: logging=%u\n",
-	        pip->progname,pip->f.logprog) ;
+	        pip->progname,pip->fl.logprog) ;
 	}
 
 /* go */
@@ -961,7 +961,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 
 	opts = VECSTR_OSORTED ;
 	rs = vecstr_start(&lip->names,10,opts) ;
-	lip->f.db = (rs >= 0) ;
+	lip->fl.db = (rs >= 0) ;
 
 	return rs ;
 }
@@ -970,8 +970,8 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (lip->f.rndb) {
-	    lip->f.rndb = false ;
+	if (lip->fl.rndb) {
+	    lip->fl.rndb = false ;
 	    rs1 = pwi_close(&lip->rndb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -980,8 +980,8 @@ static int locinfo_finish(LOCINFO *lip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    lip->rndbfname = NULL ;
 	}
-	if (lip->f.db) {
-	    lip->f.db = false ;
+	if (lip->fl.db) {
+	    lip->fl.db = false ;
 	    rs1 = vecstr_finish(&lip->names) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1020,7 +1020,7 @@ static int locinfo_pwilookup(LOCINFO *lip,cchar *name) noex {
 	if (! lip->init.rndb) {
 	    lip->init.rndb = TRUE ;
 	    rs1 = pwi_open(&lip->rndb,pip->pr,lip->rndbfname) ;
-	    lip->f.rndb = (rs1 >= 0) ;
+	    lip->fl.rndb = (rs1 >= 0) ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
 	        debugprintf("locinfo_pwilookup: pwi_open() rs=%d\n",rs1) ;
@@ -1032,7 +1032,7 @@ static int locinfo_pwilookup(LOCINFO *lip,cchar *name) noex {
 	    debugprintf("locinfo_pwilookup: mid rs=%d name=%s\n",rs,name) ;
 #endif
 
-	if (lip->f.rndb && (name[0] != '\0')) {
+	if (lip->fl.rndb && (name[0] != '\0')) {
 	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    rs = pwi_lookup(&lip->rndb,ubuf,ulen,name) ;
@@ -1245,10 +1245,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.logprog) {
 	                        pip->have.logprog = TRUE ;
 	                        pip->final.logprog = TRUE ;
-	                        pip->f.logprog = TRUE ;
+	                        pip->fl.logprog = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
