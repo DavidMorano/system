@@ -3,7 +3,7 @@
 /* lang=C20 */
 
 /* version %I% last-modified %G% */
-/* UNIX system returns */
+/* UNIX® system returns */
 
 
 /* revision history:
