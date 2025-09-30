@@ -436,7 +436,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* early things to initialize */
 
 	pip->verboselevel = 1 ;
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -563,12 +563,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_all:
-	                    pip->f.all = TRUE ;
+	                    pip->fl.all = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            pip->f.all = (rs > 0) ;
+	                            pip->fl.all = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -709,7 +709,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'V':
@@ -717,7 +717,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        break ;
 
 /* LASTLOG DB file */
@@ -734,12 +734,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'h':
 	                        lip->final.hdr = TRUE ;
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.hdr = (rs > 0) ;
+	                                lip->fl.hdr = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -763,11 +763,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'r':
-	                        lip->f.reverse = TRUE ;
+	                        lip->fl.reverse = TRUE ;
 	                        break ;
 
 	                    case 's':
-	                        lip->f.sort = TRUE ;
+	                        lip->fl.sort = TRUE ;
 	                        break ;
 
 /* verbose output */
@@ -1072,10 +1072,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.linebuf) {
 	                        lip->have.linebuf = TRUE ;
 	                        lip->final.linebuf = TRUE ;
-	                        lip->f.linebuf = TRUE ;
+	                        lip->fl.linebuf = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.linebuf = (rs > 0) ;
+	                            lip->fl.linebuf = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1083,10 +1083,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.all) {
 	                        lip->have.all = TRUE ;
 	                        lip->final.all = TRUE ;
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.all = (rs > 0) ;
+	                            lip->fl.all = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1094,10 +1094,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.realname) {
 	                        lip->have.realname = TRUE ;
 	                        lip->final.realname = TRUE ;
-	                        lip->f.realname = TRUE ;
+	                        lip->fl.realname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.realname = (rs > 0) ;
+	                            lip->fl.realname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1106,10 +1106,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.name) {
 	                        lip->have.name = TRUE ;
 	                        lip->final.name = TRUE ;
-	                        lip->f.name = TRUE ;
+	                        lip->fl.name = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.name = (rs > 0) ;
+	                            lip->fl.name = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1117,10 +1117,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.fullname) {
 	                        lip->have.fullname = TRUE ;
 	                        lip->final.fullname = TRUE ;
-	                        lip->f.fullname = TRUE ;
+	                        lip->fl.fullname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.fullname = (rs > 0) ;
+	                            lip->fl.fullname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1128,10 +1128,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.sysuser) {
 	                        lip->have.sysuser = TRUE ;
 	                        lip->final.sysuser = TRUE ;
-	                        lip->f.sysuser = TRUE ;
+	                        lip->fl.sysuser = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.sysuser = (rs > 0) ;
+	                            lip->fl.sysuser = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1139,10 +1139,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.reguser) {
 	                        lip->have.reguser = TRUE ;
 	                        lip->final.reguser = TRUE ;
-	                        lip->f.reguser = TRUE ;
+	                        lip->fl.reguser = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.reguser = (rs > 0) ;
+	                            lip->fl.reguser = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1150,10 +1150,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.speuser) {
 	                        lip->have.speuser = TRUE ;
 	                        lip->final.speuser = TRUE ;
-	                        lip->f.speuser = TRUE ;
+	                        lip->fl.speuser = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.speuser = (rs > 0) ;
+	                            lip->fl.speuser = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1161,10 +1161,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.hdr) {
 	                        lip->have.hdr = TRUE ;
 	                        lip->final.hdr = TRUE ;
-	                        lip->f.hdr = TRUE ;
+	                        lip->fl.hdr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.hdr = (rs > 0) ;
+	                            lip->fl.hdr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1308,11 +1308,11 @@ static int procer(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,
 	fmt = "LOGNAME  DATE                    LINE                 HOST\n" ;
 	if ((rs = lastlogfile_open(&sll,llfn,O_RDONLY)) >= 0) {
 
-	    if (lip->f.hdr) {
+	    if (lip->fl.hdr) {
 	        shio_printf(ofp,fmt) ;
 	    }
 
-	    if (pip->f.all) {
+	    if (pip->fl.all) {
 	        rs = procerall(pip,ofp,&sll) ;
 	        wlen += rs ;
 	    } else {
@@ -1711,7 +1711,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
-	pip->f.logprog = TRUE ;
+	pip->fl.logprog = TRUE ;
 
 	return SR_OK ;
 }
