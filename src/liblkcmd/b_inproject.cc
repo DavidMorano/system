@@ -522,7 +522,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -710,7 +710,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        }
@@ -730,7 +730,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        ex = EX_TERM ;
 	    } else if ((rs = lib_sigintr()) < 0) {
 	        ex = EX_INTR ;
-	    } else if (lip->f.missed) {
+	    } else if (lip->fl.missed) {
 		ex = EX_NOTFOUND ;
 	    }
 	} /* end if */
@@ -1103,7 +1103,7 @@ static int locinfo_inproj(LOCINFO *lip,cchar *np,int nl)
 	        if ((rs = uc_inproj(un,name,pjbuf,pjlen)) >= 0) {
 	            f = (rs > 0) ;
 	            lip->queries += 1 ;
-	            if (! f) lip->f.missed = TRUE ;
+	            if (! f) lip->fl.missed = TRUE ;
 	        }
 	        rs1 = nulstr_finish(&ns) ;
 	        if (rs >= 0) rs = rs1 ;
