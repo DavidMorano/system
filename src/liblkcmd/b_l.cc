@@ -591,7 +591,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -613,7 +613,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* all */
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        break ;
 
 	                    case 'o':
@@ -636,12 +636,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* reverse sort */
 	                    case 'r':
-	                        lip->f.reverse = TRUE ;
+	                        lip->fl.reverse = TRUE ;
 	                        break ;
 
 /* time order */
 	                    case 't':
-	                        lip->f.timeorder = TRUE ;
+	                        lip->fl.timeorder = TRUE ;
 	                        break ;
 
 /* verbose mode */
@@ -775,8 +775,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
-	    shio_printf(pip->efp,"%s: reverse=%u\n",pn,lip->f.reverse) ;
-	    shio_printf(pip->efp,"%s: timeorder=%u\n",pn,lip->f.timeorder) ;
+	    shio_printf(pip->efp,"%s: reverse=%u\n",pn,lip->fl.reverse) ;
+	    shio_printf(pip->efp,"%s: timeorder=%u\n",pn,lip->fl.timeorder) ;
 	}
 
 	memset(&ainfo,0,sizeof(ARGINFO)) ;
@@ -1041,16 +1041,16 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
-	                debugprintf("b_l: reverse=%u\n",lip->f.reverse) ;
+	                debugprintf("b_l: reverse=%u\n",lip->fl.reverse) ;
 #endif
 
 	            if (pip->debuglevel > 0) {
 	                shio_printf(pip->efp,
 	                    "%s: reverse=%u\n",
-	                    pip->progname,lip->f.reverse) ;
+	                    pip->progname,lip->fl.reverse) ;
 	            }
 
-	            if (lip->f.reverse) {
+	            if (lip->fl.reverse) {
 	                rs = vecstr_sort(&dlist,vstrcmpr) ;
 	            } else {
 	                rs = vecstr_sort(&dlist,NULL) ;
@@ -1110,7 +1110,7 @@ static int procdir(PROGINFO *pip,void *ofp,VECSTR *dlp)
 
 	        fnp = ds.name ;
 	        f = (fnp[0] != '.') ;
-	        f = f || (pip->f.all && (! hasdots(fnp,fnl))) ;
+	        f = f || (pip->fl.all && (! hasdots(fnp,fnl))) ;
 	        if (f) {
 	            c += 1 ;
 	            rs = vecstr_add(dlp,fnp,fnl) ;
@@ -1195,7 +1195,7 @@ static int procprint(PROGINFO *pip,void *ofp,VECSTR *dlp)
 	            wlen += rs ;
 	        }
 
-	    } else if (! pip->f.quiet) {
+	    } else if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt = "%s: inacessible file=%s (%d)\n" ;
 	        rs = shio_printf(pip->efp,fmt,pn,fnp,si) ;
