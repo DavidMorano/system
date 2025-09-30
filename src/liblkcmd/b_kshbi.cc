@@ -636,7 +636,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -658,7 +658,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* all */
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        break ;
 
 /* specify a search library */
@@ -713,24 +713,24 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 			    case 'p':
 	                        lip->final.print = TRUE ;
 	                        lip->have.print = TRUE ;
-	                        lip->f.print = TRUE ;
+	                        lip->fl.print = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.print = (rs > 0) ;
+	                                lip->fl.print = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* unbuffered (really line-buffered) */
 	                    case 'u':
-	                        lip->f.u = TRUE ;
+	                        lip->fl.u = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.u = (rs > 0) ;
+	                                lip->fl.u = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1044,10 +1044,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.maint) {
 	                        lip->have.maint = TRUE ;
 	                        lip->final.maint = TRUE ;
-	                        lip->f.maint = TRUE ;
+	                        lip->fl.maint = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.maint = (rs > 0) ;
+	                            lip->fl.maint = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1055,10 +1055,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.pr) {
 	                        lip->have.pr = TRUE ;
 	                        lip->final.pr = TRUE ;
-	                        lip->f.pr = TRUE ;
+	                        lip->fl.pr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.pr = (rs > 0) ;
+	                            lip->fl.pr = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1066,10 +1066,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.print) {
 	                        lip->have.print = TRUE ;
 	                        lip->final.print = TRUE ;
-	                        lip->f.print = TRUE ;
+	                        lip->fl.print = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.print = (rs > 0) ;
+	                            lip->fl.print = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1112,15 +1112,15 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 
 	if ((rs = shio_open(ofp,ofn,"r",0666)) >= 0) {
 	    LOCINFO	*lip = pip->lip ;
-	    if (lip->f.u) {
+	    if (lip->fl.u) {
 	        rs = shio_control(ofp,SHIO_CSETBUFLINE,TRUE) ;
 	    }
 	    if (rs >= 0) {
 		LOCINFO	*lip = pip->lip ;
-		if (lip->f.print) {
+		if (lip->fl.print) {
 		    rs = procprint(pip,ofp) ;
 	            wlen += rs ;
-	        } else if (pip->f.all) {
+	        } else if (pip->fl.all) {
 	            rs = procall(pip,ofp) ;
 	            wlen += rs ;
 	        } else {
@@ -1551,7 +1551,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
 	        debugprintf("b_kshbi/procname: dlsym() f=%u lib.init=%u\n",
-	            f,lip->f.lib) ;
+	            f,lip->fl.lib) ;
 #endif
 
 	    if (sp == NULL) {
@@ -1611,7 +1611,7 @@ static int locinfo_finish(LOCINFO *lip)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (lip->f.tmpmaint) {
+	if (lip->fl.tmpmaint) {
 	    int	trs ;
 	    rs1 = uptjoin(lip->tid,&trs) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1815,7 +1815,7 @@ static int locinfo_libdirs(LOCINFO *lip)
 {
 	int		rs ;
 	if ((rs = locinfo_libdirpath(lip)) >= 0) {
-	    if (lip->f.pr) {
+	    if (lip->fl.pr) {
 	        rs = locinfo_libdirpr(lip) ;
 	    }
 	}
@@ -1832,8 +1832,8 @@ static int locinfo_libdirpath(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	cchar		*lp ;
-	if (! lip->f.libdirpath) {
-	    lip->f.libdirpath = TRUE ;
+	if (! lip->fl.libdirpath) {
+	    lip->fl.libdirpath = TRUE ;
 	    if ((lp = getourenv(pip->envv,VARLIBPATH)) != NULL) {
 	        if ((rs = locinfo_libdirinit(lip)) >= 0) {
 	            vecstr	*ldp = &lip->libdirs ;
@@ -1949,7 +1949,7 @@ static int locinfo_libset(LOCINFO *lip,cchar *vp,int vl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_kshbi/locinfo_libset: f_lib=%u\n",lip->f.lib) ;
+	    debugprintf("b_kshbi/locinfo_libset: f_lib=%u\n",lip->fl.lib) ;
 #endif
 
 	if (vp != NULL) {
@@ -1973,7 +1973,7 @@ static int locinfo_libopen(LOCINFO *lip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_kshbi/locinfo_libopen: ent f_lib=%u\n",
-	        lip->f.lib) ;
+	        lip->fl.lib) ;
 #endif
 
 	if (! lip->open.lib) {
@@ -2187,13 +2187,13 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 	if (lip->storedname != NULL) {
 	    TMTIME	t ;
 	    if ((rs = tmtime_localtime(&t,pip->daytime)) >= 0) {
-	        if ((t.hour >= HOUR_MAINT) && lip->f.maint) {
+	        if ((t.hour >= HOUR_MAINT) && lip->fl.maint) {
 		    uptsub_t	thr = (uptsub_t) locinfo_tmpmaint ;
 	            pthread_t	tid ;
 	            if ((rs = uptcreate(&tid,NULL,thr,lip)) >= 0) {
 	                rs = 1 ;
 	                lip->tid = tid ;
-	                lip->f.tmpmaint = TRUE ;
+	                lip->fl.tmpmaint = TRUE ;
 	            } /* end if (uptcreate) */
 	        } /* end if (after hours) */
 	    } /* end if (tmtime_localtime) */
@@ -2211,7 +2211,7 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 	const int	to = TO_TMPFILES ;
 	int		rs ;
 	int		c = 0 ;
-	int		f_need = lip->f.maint ;
+	int		f_need = lip->fl.maint ;
 	cchar		*dname = lip->storedname ;
 	char		tsfname[MAXPATHLEN+1] ;
 
