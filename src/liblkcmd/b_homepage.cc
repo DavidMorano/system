@@ -67,7 +67,6 @@
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<ugetpw.h>
-#include	<ucmallreg.h>
 #include	<getourenv.h>
 #include	<estrings.h>
 #include	<getbufsize.h>
@@ -791,7 +790,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->verboselevel = 1 ;
 	pip->daytime = time(NULL) ;
 	pip->to_open = -1 ;
-	pip->f.logprog = OPT_LOGPROG ;
+	pip->fl.logprog = OPT_LOGPROG ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -1085,7 +1084,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_daemon:
 	                    pip->have.daemon = TRUE ;
 	                    pip->final.daemon = TRUE ;
-	                    pip->f.daemon = TRUE ;
+	                    pip->fl.daemon = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -1151,7 +1150,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -1181,7 +1180,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* daemon mode */
 	                    case 'd':
 	                        pip->final.background = TRUE ;
-	                        pip->f.background = TRUE ;
+	                        pip->fl.background = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -1202,12 +1201,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'f':
 	                        lip->final.force = TRUE ;
 	                        lip->have.force = TRUE ;
-	                        lip->f.force = TRUE ;
+	                        lip->fl.force = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.force = (rs > 0) ;
+	                                lip->fl.force = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1248,12 +1247,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* truncate */
 	                    case 't':
-	                        lip->f.trunc = TRUE ;
+	                        lip->fl.trunc = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.trunc = (rs > 0) ;
+	                                lip->fl.trunc = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1449,9 +1448,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    fmt = "%s: wf=%s\n" ;
 	    shio_printf(pip->efp,fmt,pn,lip->wfname) ;
 	    fmt = "%s: force=%u\n" ;
-	    shio_printf(pip->efp,fmt,pn,lip->f.force) ;
+	    shio_printf(pip->efp,fmt,pn,lip->fl.force) ;
 	    fmt = "%s: maint=%u\n" ;
-	    shio_printf(pip->efp,fmt,pn,lip->f.maint) ;
+	    shio_printf(pip->efp,fmt,pn,lip->fl.maint) ;
 	}
 
 /* go */
@@ -1512,7 +1511,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    usage(pip) ;
 	} /* end if (ok) */
 
-	if ((rs < 0) && (! pip->f.quiet)) {
+	if ((rs < 0) && (! pip->fl.quiet)) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    if (rs == SR_TIMEDOUT) {
@@ -1745,56 +1744,56 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case akoname_log:
 	                    if (! pip->final.logprog) {
-	                        pip->f.logprog = TRUE ;
+	                        pip->fl.logprog = TRUE ;
 	                        if (vl > 0) {
 	                            pip->final.logprog = TRUE ;
 	                            pip->have.logprog = TRUE ;
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.logprog = (rs > 0) ;
+	                            pip->fl.logprog = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_quiet:
 	                    if (! pip->final.quiet) {
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            pip->final.quiet = TRUE ;
 	                            pip->have.quiet = TRUE ;
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.quiet = (rs > 0) ;
+	                            pip->fl.quiet = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_quietlock:
 	                    if (! lip->final.quietlock) {
-	                        lip->f.quietlock = TRUE ;
+	                        lip->fl.quietlock = TRUE ;
 	                        if (vl > 0) {
 	                            lip->final.quietlock = TRUE ;
 	                            lip->have.quietlock = TRUE ;
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.quietlock = (rs > 0) ;
+	                            lip->fl.quietlock = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_force:
 	                    if (! lip->final.force) {
-	                        lip->f.force = TRUE ;
+	                        lip->fl.force = TRUE ;
 	                        if (vl > 0) {
 	                            lip->final.force = TRUE ;
 	                            lip->have.force = TRUE ;
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.force = (rs > 0) ;
+	                            lip->fl.force = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_maint:
 	                    if (! lip->final.maint) {
 	                        lip->have.maint = TRUE ;
-	                        lip->f.maint = TRUE ;
+	                        lip->fl.maint = TRUE ;
 	                        if (vl > 0) {
 	                            lip->final.maint = TRUE ;
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.maint = (rs > 0) ;
+	                            lip->fl.maint = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1820,12 +1819,12 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        c += 1 ;
 	                        pip->final.daemon = TRUE ;
 	                        pip->have.daemon = TRUE ;
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecti(vp,vl,&v) ;
 	                            pip->intrun = v ;
 	                            if (v == 0) {
-	                                pip->f.daemon = FALSE ;
+	                                pip->fl.daemon = FALSE ;
 	                            }
 	                        }
 	                    } /* end if */
@@ -2125,13 +2124,13 @@ static int process(PROGINFO *pip,cchar *ofn,cchar *afn)
 
 	if ((rs = ids_load(&pip->id)) >= 0) {
 	    if ((rs = locinfo_tmpourdname(lip)) >= 0) {
-	        if (pip->f.background || pip->f.daemon) {
+	        if (pip->fl.background || pip->fl.daemon) {
 	            if ((rs = procbackdefs(pip)) >= 0) {
 	                if ((rs = procpidfname(pip)) >= 0) {
 	                    if ((rs = procbackinfo(pip)) >= 0) {
-	                        if (pip->f.background) {
+	                        if (pip->fl.background) {
 	                            rs = procback(pip) ;
-	                        } else if (pip->f.daemon) {
+	                        } else if (pip->fl.daemon) {
 	                            rs = procdaemon(pip) ;
 	                            c = rs ;
 	                        }
@@ -2207,11 +2206,11 @@ static int procdaemondefs(PROGINFO *pip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("msumain: daemon=%u logging=%u\n",
-	        pip->f.daemon,pip->have.logprog) ;
+	        pip->fl.daemon,pip->have.logprog) ;
 #endif
 #if	CF_DEBUGS
 	debugprintf("msumain: daemon=%u logging=%u\n",
-	    pip->f.daemon,pip->have.logprog) ;
+	    pip->fl.daemon,pip->have.logprog) ;
 #endif
 
 	if (pip->debuglevel > 0) {
@@ -2269,7 +2268,7 @@ static int procpidfname(PROGINFO *pip)
 	if ((rs >= 0) && (pfp != NULL) && (pfp[0] == '-')) {
 	    pfp = NULL ;
 	    pip->have.pidfname = FALSE ;
-	    pip->f.pidfname = FALSE ;
+	    pip->fl.pidfname = FALSE ;
 	    f_changed = FALSE ;
 	}
 
@@ -2315,7 +2314,7 @@ static int procdaemoninfo(PROGINFO *pip)
 
 	if ((rs >= 0) && (pip->debuglevel > 0)) {
 	    cchar	*pn = pip->progname ;
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 	        shio_printf(pip->efp,"%s: pidfile=%u\n",pn,pip->pidfname) ;
 	        shio_printf(pip->efp,"%s: intrun=%u\n",pn,pip->intrun) ;
 	        shio_printf(pip->efp,"%s: intidle=%u\n",pn,pip->intidle) ;
@@ -2327,7 +2326,7 @@ static int procdaemoninfo(PROGINFO *pip)
 	    shio_flush(pip->efp) ;
 	} /* end if (debugging information) */
 
-	if (pip->f.daemon) {
+	if (pip->fl.daemon) {
 	    proglog_printf(pip,"pidfile=%d",pip->pidfname) ;
 	    proglog_printf(pip,"intrun=%d",pip->intrun) ;
 	    proglog_printf(pip,"intidle=%d",pip->intidle) ;
@@ -2373,7 +2372,7 @@ cchar		*afn ;
 	    int		cl ;
 	    cchar	*cp ;
 
-	    if (lip->f.trunc) lip->start = 0L ;
+	    if (lip->fl.trunc) lip->start = 0L ;
 
 	    if ((rs = shio_isseekable(ofp)) > 0) {
 	        if (lip->start >= 0) {
@@ -2385,14 +2384,14 @@ cchar		*afn ;
 	    } /* end if (stat) */
 
 #ifdef	COMMENT
-	    if (pip->f.bufnone)
+	    if (pip->fl.bufnone)
 	        shio_control(ofp,SHIO_CSETBUFNONE,TRUE) ;
 
 	    if (pip->have.bufline)
-	        shio_control(ofp,SHIO_CSETBUFLINE,pip->f.bufline) ;
+	        shio_control(ofp,SHIO_CSETBUFLINE,pip->fl.bufline) ;
 
 	    if (pip->have.bufwhole)
-	        shio_control(ofp,SHIO_CSETBUFWHOLE,pip->f.bufwhole) ;
+	        shio_control(ofp,SHIO_CSETBUFWHOLE,pip->fl.bufwhole) ;
 #endif /* COMMENT */
 
 	    if (rs >= 0) {
@@ -2518,7 +2517,7 @@ static int procbackmaint(PROGINFO *pip)
 	LOCINFO		*lip = pip->lip ;
 	const int	to = TO_TMPFILES ;
 	int		rs = SR_OK ;
-	if (lip->f.maint || (lip->intmaint > 0)) {
+	if (lip->fl.maint || (lip->intmaint > 0)) {
 	    cchar	*dir = lip->tmpourdname ;
 	    cchar	*prefix = "homepage" ;
 	    if ((rs = rmdirfiles(dir,prefix,to)) > 0) {
@@ -2556,8 +2555,8 @@ static int procbackcheck(PROGINFO *pip)
 	    rs1 = locinfo_lockend(lip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    const int	f = ((pip->debuglevel > 0) || (! lip->f.quietlock)) ;
-	    if ((! pip->f.quiet) && f) {
+	    const int	f = ((pip->debuglevel > 0) || (! lip->fl.quietlock)) ;
+	    if ((! pip->fl.quiet) && f) {
 	        cchar	*lfn = pip->pidfname ;
 	        fmt = "%s: could not acquire PID lock (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
@@ -2589,7 +2588,7 @@ static int procmntcheck(PROGINFO *pip)
 	            rs = SR_BUSY ;
 	        }
 	        if (rs < 0) {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible mount point (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	            }
@@ -2772,15 +2771,15 @@ static int procbackenv(PROGINFO *pip,SPAWNER *srp)
 	            if (v > 0) np = "intspeed" ;
 	            break ;
 	        case 6:
-	            v = (pip->f.reuseaddr&1) ;
+	            v = (pip->fl.reuseaddr&1) ;
 	            if (v > 0) np = "resueaddr" ;
 	            break ;
 	        case 7:
-	            v = (pip->f.quiet&1) ;
+	            v = (pip->fl.quiet&1) ;
 	            if (v > 0) np = "quiet" ;
 	            break ;
 	        case 8:
-	            v = (lip->f.quietlock&1) ;
+	            v = (lip->fl.quietlock&1) ;
 	            if (v > 0) np = "quietlock" ;
 	            break ;
 	        } /* end switch */
@@ -3179,7 +3178,7 @@ static int procpage_begin(PROGINFO *pip,char *dbuf)
 	            const time_t	dt = pip->daytime ;
 	            const int		nrs = SR_NOENT ;
 	            const int		am = R_OK ;
-	            const int		f_force = lip->f.force ;
+	            const int		f_force = lip->fl.force ;
 	            char		tbuf[MAXPATHLEN+1] ;
 
 #if	CF_DEBUG
@@ -3201,7 +3200,7 @@ static int procpage_begin(PROGINFO *pip,char *dbuf)
 	                        debugprintf("procpage_begin: n=%s\n",dbuf) ;
 	                    }
 #endif
-	                    lip->f.defpage = TRUE ;
+	                    lip->fl.defpage = TRUE ;
 	                    rs = u_rename(tbuf,dbuf) ;
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(4))
@@ -3225,12 +3224,12 @@ static int procpage_begin(PROGINFO *pip,char *dbuf)
 #endif
 	                if ((rs = procpage_make(pip,tbuf)) >= 0) {
 	                    clen = rs ;
-	                    lip->f.defpage = TRUE ;
+	                    lip->fl.defpage = TRUE ;
 	                    rs = u_rename(tbuf,dbuf) ;
 	                }
 	            } else {
 	                clen = sb.st_size ;
-	                lip->f.defpage = TRUE ;
+	                lip->fl.defpage = TRUE ;
 	            } /* end if (stat) */
 	        } /* end if (mkpath) */
 	    } else {
@@ -3252,7 +3251,7 @@ static int procpage_end(PROGINFO *pip,char *tbuf)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-	if ((! lip->f.defpage) && (tbuf[0] != '\0')) {
+	if ((! lip->fl.defpage) && (tbuf[0] != '\0')) {
 	    uc_unlink(tbuf) ;
 	    tbuf[0] = '\0' ;
 	}
@@ -3961,7 +3960,7 @@ static int proclockprint(PROGINFO *pip,cchar *lfname,LFM_CHECK *lcp)
 	} /* end switch */
 
 	if (pip->open.logprog) {
-	    if (! lip->f.quietlock) {
+	    if (! lip->fl.quietlock) {
 	        proclocklog(pip,lfname,lcp,np) ;
 	    } else {
 	        proglog_printf(pip,"lock=%s",lfname) ;
@@ -3969,7 +3968,7 @@ static int proclockprint(PROGINFO *pip,cchar *lfname,LFM_CHECK *lcp)
 	    }
 	}
 
-	if (! lip->f.quietlock) {
+	if (! lip->fl.quietlock) {
 	    if ((pip->debuglevel > 0) && (pip->efp != NULL)) {
 	        cchar	*pn = pip->progname ;
 	        char	tbuf[TIMEBUFLEN + 1] ;
@@ -5266,7 +5265,7 @@ static int locinfo_gatherbeginall(LOCINFO *lip)
 	    debugprintf("locinfo_gatherbeginall: ent\n") ;
 #endif
 
-	lip->f.defsvcs = TRUE ;
+	lip->fl.defsvcs = TRUE ;
 	if ((rs = svcfile_curbegin(sfp,&c)) >= 0) {
 	    const int	slen = SVCLEN ;
 	    const int	el = SVCENTLEN ;
@@ -5732,7 +5731,7 @@ int locinfo_ipcpid(LOCINFO *lip,int f)
 	    pf = pip->pidfname ;
 	    if (f) { /* activate */
 
-	        pip->f.pidfname = FALSE ;
+	        pip->fl.pidfname = FALSE ;
 	        if ((rs = u_open(pf,oflags,0664)) >= 0) {
 	            int 	fd = rs ;
 	            int		wl ;
@@ -5741,7 +5740,7 @@ int locinfo_ipcpid(LOCINFO *lip,int f)
 	                wl = rs ;
 	                pidbuf[wl++] = '\n' ;
 	                rs = u_write(fd,pidbuf,wl) ;
-	                pip->f.pidfname = (rs >= 0) ;
+	                pip->fl.pidfname = (rs >= 0) ;
 	            }
 	            u_close(fd) ;
 	        } /* end if (file) */
@@ -5753,8 +5752,8 @@ int locinfo_ipcpid(LOCINFO *lip,int f)
 
 	    } else { /* de-activate */
 
-	        if ((pf != NULL) && pip->f.pidfname) {
-	            pip->f.pidfname = FALSE ;
+	        if ((pf != NULL) && pip->fl.pidfname) {
+	            pip->fl.pidfname = FALSE ;
 	            if (pf[0] != '\0') u_unlink(pf) ;
 	        }
 
