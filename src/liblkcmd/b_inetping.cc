@@ -599,7 +599,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'o':
@@ -630,7 +630,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* scan mode */
 	                    case 's':
-	                        lip->f.scan = TRUE ;
+	                        lip->fl.scan = TRUE ;
 	                        break ;
 
 /* time out */
@@ -789,7 +789,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            if ((kwi = matostr(progopts,2,cp,-1)) >= 0) {
 	                switch (kwi) {
 	                case progopt_scan:
-	                    lip->f.scan = FALSE ;
+	                    lip->fl.scan = FALSE ;
 	                    break ;
 	                } /* end switch */
 	            } /* end if (progopts) */
@@ -838,7 +838,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet)
+	        if (! pip->fl.quiet)
 	            shio_printf(pip->efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
 	        break ;
@@ -998,7 +998,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *pop,
 	                }
 	            }
 
-	            if ((rs < 0) && (! lip->f.scan)) break ;
+	            if ((rs < 0) && (! lip->fl.scan)) break ;
 	        } /* end for (looping through requested circuits) */
 	    } /* end if (ok) */
 
@@ -1028,13 +1028,13 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *pop,
 	                    }
 	                }
 
-	                if ((rs < 0) && (! lip->f.scan)) break ;
+	                if ((rs < 0) && (! lip->fl.scan)) break ;
 	            } /* end while (reading lines) */
 
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n",
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1136,7 +1136,7 @@ int prochost(PROGINFO *pip,PARAMOPT *pop,void *ofp,cchar *hp,int hl)
 	        }
 		rs = SR_OK ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            fmt = "%s: inetping error (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	        }
