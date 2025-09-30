@@ -24,7 +24,7 @@
 	utimeoutdefs
 
 	Description:
-	Timeout values for various UNIX system and UNX C-library
+	Timeout values for various UNIX® system and UNX C-library
 	services are initialized early (as early as possible from
 	module-load time) with the default values below.  All timeout
 	values are in seconds.  These values can be changed at
