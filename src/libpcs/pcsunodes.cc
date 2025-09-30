@@ -1,11 +1,11 @@
-/* pcsunodes */
+/* pcsunodes SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* PCS user-nodes */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -14,25 +14,26 @@
 
 */
 
-/* Copyright © 2000 David Morano.  All rights reserved. */
+/* Copyright © 2000 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This object manages the list of user-nodes.
+  	Name:
+	pcsuunames
 
+	Description:
+	This object manages the list of user-nodes.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<vecpstr.h>
 #include	<localmisc.h>
