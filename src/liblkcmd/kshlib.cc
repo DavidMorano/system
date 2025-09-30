@@ -17,12 +17,12 @@
 
 /* revision history:
 
-	= 2001-11-01, David AÂ­DÂ­ Morano
+	= 2001-11-01, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright Â© 2001 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -41,7 +41,7 @@
 	to implement a MUTEX lock around its operations.  This helps
 	guard against a failure if the KSH-native version of the
 	normal memory management subroutines are somehow linked in
-	(loaded) rather than the standard default UNIXÂ® system
+	(loaded) rather than the standard default UNIX® system
 	subroutines.
 
 	Synopsis:
@@ -112,11 +112,11 @@
 	lets us call a command (CMD) function, otherwise known as
 	a command "builtin" (from the SHELL language on the subject)
 	while giving it an arbitrary environment determined by the
-	caller. In the infinite (short-sighted) wisdom of the
+	caller.  In the infinite (short-sighted) wisdom of the
 	creators of the builtin command interface, it was neglected
 	to provide the capability to pass an arbitrary environment
 	(like what is possible -- but not often used) with regular
-	UNIXÂ® process calls (using 'exec(2)' and friends). Without
+	UNIX® process calls (using |exec(2)| and friends).  Without
 	this subroutine, and having to call the command function
 	directory, there is no way to pass or to create a unique
 	environment for the function since it is forced to simply
