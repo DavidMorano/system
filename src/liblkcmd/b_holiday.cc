@@ -23,16 +23,15 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+  	Description:
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
-
 	$ holiday <query(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -66,7 +65,6 @@
 #include	<wordfill.h>
 #include	<tmtime.hh>
 #include	<dayspec.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -458,7 +456,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	        if (isdigitlatin(ach)) {
 
-	            if (f_optplus) lip->f.apm = TRUE ;
+	            if (f_optplus) lip->fl.apm = TRUE ;
 	            argval = (argp+1) ;
 
 	        } else if (ach == '-') {
@@ -610,12 +608,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_monthname:
 	                    lip->have.monthname = TRUE ;
 	                    lip->final.monthname = TRUE ;
-	                    lip->f.monthname = TRUE ;
+	                    lip->fl.monthname = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.monthname = (rs > 0) ;
+	                            lip->fl.monthname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -648,7 +646,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -669,24 +667,24 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'a':
-	                        lip->f.allents = TRUE ;
+	                        lip->fl.allents = TRUE ;
 	                        break ;
 
 	                    case 'i':
 	                        lip->have.interactive = TRUE ;
 	                        lip->final.interactive = TRUE ;
-	                        lip->f.interactive = TRUE ;
+	                        lip->fl.interactive = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.interactive = (rs > 0) ;
+	                                lip->fl.interactive = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 	                    case 'n':
-	                        lip->f.names = TRUE ;
+	                        lip->fl.names = TRUE ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -766,12 +764,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'z':
 	                        lip->final.gmt = TRUE ;
 	                        lip->have.gmt = TRUE ;
-	                        lip->f.gmt = TRUE ;
+	                        lip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.gmt = (rs > 0) ;
+	                                lip->fl.gmt = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -934,7 +932,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        const char	*pn = pip->progname ;
 	        lip->open.holiday = TRUE ;
 
-	        if (lip->f.audit) {
+	        if (lip->fl.audit) {
 	            rs = holidayer_audit(&lip->holdb) ;
 	            if (pip->debuglevel > 0) {
 	                shio_printf(pip->efp,"%s: DB audit (%d)\n",pn,rs) ;
@@ -975,7 +973,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        const char	*pn = pip->progname ;
 	        const char	*fmt = "%s: could not perform function (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
@@ -1135,10 +1133,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.audit) {
 	                        lip->have.audit = TRUE ;
 	                        lip->final.audit = TRUE ;
-	                        lip->f.audit = TRUE ;
+	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.audit = (rs > 0) ;
+	                            lip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1146,7 +1144,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.linelen) {
 	                        lip->have.linelen = TRUE ;
 	                        lip->final.linelen = TRUE ;
-	                        lip->f.linelen = TRUE ;
+	                        lip->fl.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->linelen = rs ;
@@ -1157,7 +1155,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.indent) {
 	                        lip->have.indent = TRUE ;
 	                        lip->final.indent = TRUE ;
-	                        lip->f.indent = TRUE ;
+	                        lip->fl.indent = TRUE ;
 	                        lip->indent = 1 ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1169,10 +1167,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.monthname) {
 	                        lip->have.monthname = TRUE ;
 	                        lip->final.monthname = TRUE ;
-	                        lip->f.monthname = TRUE ;
+	                        lip->fl.monthname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.monthname = (rs > 0) ;
+	                            lip->fl.monthname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1180,10 +1178,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.separate) {
 	                        lip->have.separate = TRUE ;
 	                        lip->final.separate = TRUE ;
-	                        lip->f.separate = TRUE ;
+	                        lip->fl.separate = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.separate = (rs > 0) ;
+	                            lip->fl.separate = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1191,10 +1189,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.interactive) {
 	                        lip->have.interactive = TRUE ;
 	                        lip->final.interactive = TRUE ;
-	                        lip->f.interactive = TRUE ;
+	                        lip->fl.interactive = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.interactive = (rs > 0) ;
+	                            lip->fl.interactive = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1202,10 +1200,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.citebreak) {
 	                        lip->have.citebreak = TRUE ;
 	                        lip->final.citebreak = TRUE ;
-	                        lip->f.citebreak = TRUE ;
+	                        lip->fl.citebreak = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.citebreak = (rs > 0) ;
+	                            lip->fl.citebreak = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1214,10 +1212,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.defnull) {
 	                        lip->final.defnull = TRUE ;
 	                        lip->have.defnull = TRUE ;
-	                        lip->f.defnull = TRUE ;
+	                        lip->fl.defnull = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.defnull = (rs > 0) ;
+	                            lip->fl.defnull = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1225,10 +1223,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.defall) {
 	                        lip->final.defall = TRUE ;
 	                        lip->have.defall = TRUE ;
-	                        lip->f.defall = TRUE ;
+	                        lip->fl.defall = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.defall = (rs > 0) ;
+	                            lip->fl.defall = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1236,10 +1234,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.gmt) {
 	                        lip->final.gmt = TRUE ;
 	                        lip->have.gmt = TRUE ;
-	                        lip->f.gmt = TRUE ;
+	                        lip->fl.gmt = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.gmt = (rs > 0) ;
+	                            lip->fl.gmt = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1281,7 +1279,7 @@ const char	*afn ;
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    lip->ofp = ofp ;
 
-	    if (lip->f.allents) {
+	    if (lip->fl.allents) {
 	        rs = procallents(pip) ;
 	        wlen += rs ;
 	    } else {
@@ -1384,15 +1382,15 @@ const char	*afn ;
 
 	} /* end if (afile arguments) */
 
-	if ((rs >= 0) && lip->f.apm) {
+	if ((rs >= 0) && lip->fl.apm) {
 
 	    pan += 1 ;
-	    rs = procnow(pip,lip->f.apm,lip->nitems) ;
+	    rs = procnow(pip,lip->fl.apm,lip->nitems) ;
 	    wlen += rs ;
 
 	} /* end if */
 
-	if ((rs >= 0) && (pan == 0) && lip->f.defnull) {
+	if ((rs >= 0) && (pan == 0) && lip->fl.defnull) {
 	    int		ndays = 1 ;
 
 	    pan += 1 ;
@@ -1402,12 +1400,12 @@ const char	*afn ;
 
 	} /* end if */
 
-	if ((rs >= 0) && (pan == 0) && lip->f.defall) {
+	if ((rs >= 0) && (pan == 0) && lip->fl.defall) {
 	    rs = procallents(pip) ;
 	    wlen += rs ;
 	}
 
-	if ((rs >= 0) && lip->f.names) {
+	if ((rs >= 0) && lip->fl.names) {
 	    rs = procnames(pip,pop) ;
 	    wlen += rs ;
 	}
@@ -1424,7 +1422,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 	int		rs ;
 	int		wlen = 0 ;
 
-	if (lip->f.interactive) lip->cout = 0 ;
+	if (lip->fl.interactive) lip->cout = 0 ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
@@ -1495,7 +1493,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	            rs = procqueries(pip,&q,(lip->nitems-1)) ;
 	            wlen += rs ;
 	        } else {
-	            if (lip->f.interactive) {
+	            if (lip->fl.interactive) {
 	                cchar	*fmt = "citation=>%r< invalid\n" ;
 	                rs = shio_printf(lip->ofp,fmt,sp,sl) ;
 	            }
@@ -1504,7 +1502,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 
 	} /* end if */
 
-	if ((rs < 0) && isNotGoodCite(rs) && lip->f.interactive) {
+	if ((rs < 0) && isNotGoodCite(rs) && lip->fl.interactive) {
 	    fmt = "invalid citation=>%r< (%d)\n" ;
 	    rs = shio_printf(lip->ofp,fmt,sp,sl,rs) ;
 	}
@@ -1830,7 +1828,7 @@ static int procoutents(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 	    fmt = "\n" ;
 #endif
 
-	    if (lip->f.separate && (lip->cout++ > 0)) {
+	    if (lip->fl.separate && (lip->cout++ > 0)) {
 	        rs = shio_printf(lip->ofp,fmt) ;
 	        wlen += rs ;
 	    } /* end if (separator) */
@@ -1873,7 +1871,7 @@ static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 
 	    cbl = MIN((lip->linelen - lip->indent),clen) ;
 
-	    if (lip->f.monthname) {
+	    if (lip->fl.monthname) {
 	        const char	*mon = calstrs_months[qp->m] ;
 	        rs = bufprintf(citebuf,CITEBUFLEN,"%r-%02u",mon,3,qp->d) ;
 	        cl = rs ;
@@ -1884,7 +1882,7 @@ static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 	    }
 
 	    if (rs >= 0) {
-	        if (lip->f.citebreak) {
+	        if (lip->fl.citebreak) {
 	            rs = shio_printf(lip->ofp,"%r\n",citebuf,cl) ;
 	            wlen += rs ;
 	            line += 1 ;
@@ -1978,8 +1976,8 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->pip = pip ;
 	lip->count = -1 ;
 	lip->max = -1 ;
-	lip->f.separate = FALSE ;
-	lip->f.monthname = TRUE ;
+	lip->fl.separate = FALSE ;
+	lip->fl.monthname = TRUE ;
 
 	return rs ;
 }
@@ -2032,10 +2030,10 @@ static int locinfo_tmtime(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		y = lip->year ;
 
-	if (! lip->f.tmtime) {
-	    lip->f.tmtime = TRUE ;
+	if (! lip->fl.tmtime) {
+	    lip->fl.tmtime = TRUE ;
 	    if (pip->daytime == 0) pip->daytime = time(NULL) ;
-	    if (lip->f.gmt) {
+	    if (lip->fl.gmt) {
 	        rs = tmtime_gmtime(&lip->tm,pip->daytime) ;
 	    } else {
 	        rs = tmtime_localtime(&lip->tm,pip->daytime) ;
