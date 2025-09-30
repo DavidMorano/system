@@ -447,7 +447,7 @@ const char	*envv[] ;
 
 	if (rs1 >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->fl.errfile = TRUE ;
 	    shio_control(&errfile,SHIO_CLINEBUF,0) ;
 	}
 
@@ -468,10 +468,10 @@ const char	*envv[] ;
 	pip->runint = -1 ;
 	pip->disint = -1 ;
 
-	pip->f.quiet = FALSE ;
-	pip->f.daemon = FALSE ;
-	pip->f.speed = FALSE ;
-	pip->f.zerospeed = FALSE ;
+	pip->fl.quiet = FALSE ;
+	pip->fl.daemon = FALSE ;
+	pip->fl.speed = FALSE ;
+	pip->fl.zerospeed = FALSE ;
 
 
 /* start parsing the arguments */
@@ -710,7 +710,7 @@ const char	*envv[] ;
 	                    break ;
 
 	                case argopt_speed:
-	                    pip->f.speed = TRUE ;
+	                    pip->fl.speed = TRUE ;
 	                    if (f_optequal) {
 
 	                        f_optequal = FALSE ;
@@ -723,7 +723,7 @@ const char	*envv[] ;
 	                    break ;
 
 	                case argopt_zerospeed:
-	                    pip->f.zerospeed = TRUE ;
+	                    pip->fl.zerospeed = TRUE ;
 	                    break ;
 
 	                case argopt_caf:
@@ -732,7 +732,7 @@ const char	*envv[] ;
 
 /* disable interval */
 	                case argopt_disable:
-	                    pip->f.disable = TRUE ;
+	                    pip->fl.disable = TRUE ;
 	                    if (f_optequal) {
 
 	                        f_optequal = FALSE ;
@@ -799,12 +799,12 @@ const char	*envv[] ;
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* daemon mode */
 	                    case 'd':
-	                        pip->f.daemon = TRUE ;
+	                        pip->fl.daemon = TRUE ;
 	                        if (f_optequal) {
 
 	                            f_optequal = FALSE ;
@@ -1077,7 +1077,7 @@ const char	*envv[] ;
 
 	}
 
-	if (pip->f.daemon && (pip->pidfname[0] == '\0')) {
+	if (pip->fl.daemon && (pip->pidfname[0] == '\0')) {
 
 	    mkfnamesuf1(tmpfname,pip->nodename,PIDFNAME) ;
 
@@ -1103,7 +1103,7 @@ const char	*envv[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("b_msu: daemon=%u logging=%u\n",
-	        pip->f.daemon,pip->have.logfile) ;
+	        pip->fl.daemon,pip->have.logfile) ;
 #endif
 
 
@@ -1211,7 +1211,7 @@ const char	*envv[] ;
 	    if (pip->open.logfile)
 	        logfile_printf(&pip->lh, "ms=%s", pip->msfname) ;
 
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 
 	        LFM	pidlock ;
 
@@ -1413,10 +1413,10 @@ const char	*envv[] ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
 	        debugprintf("b_msu: daemon=%u child=%u\n",
-	            pip->f.daemon,f_child) ;
+	            pip->fl.daemon,f_child) ;
 #endif
 
-	    if ((! pip->f.daemon) || f_child) {
+	    if ((! pip->fl.daemon) || f_child) {
 
 	        shio_printf(pip->efp, "%s: MS updates=%u\n",
 	            pip->progname,rs) ;
@@ -1441,7 +1441,7 @@ const char	*envv[] ;
 
 	    case SR_ALREADY:
 	    case SR_AGAIN:
-	        if ((! pip->f.quiet) && (pip->efp != NULL))
+	        if ((! pip->fl.quiet) && (pip->efp != NULL))
 	            shio_printf(pip->efp,
 	                "%s: existing lock (%d)\n",
 	                pip->progname,rs) ;
@@ -1453,7 +1453,7 @@ const char	*envv[] ;
 	        break ;
 
 	    default:
-	        if ((! pip->f.quiet) && (pip->efp != NULL))
+	        if ((! pip->fl.quiet) && (pip->efp != NULL))
 	            shio_printf(pip->efp,
 	                "%s: could not perform update (%d)\n",
 	                pip->progname,rs) ;
@@ -1469,7 +1469,7 @@ const char	*envv[] ;
 
 	if (pip->open.logfile) {
 
-	    if ((! pip->f.daemon) || f_child)
+	    if ((! pip->fl.daemon) || f_child)
 	        logfile_printf(&pip->lh,"exiting (%d) ex=%u",
 	            rs,ex) ;
 
@@ -1480,7 +1480,7 @@ done:
 ret4:
 	if ((pip->debuglevel > 0) && (pip->efp != NULL)) {
 
-	    if (pip->f.daemon) {
+	    if (pip->fl.daemon) {
 
 	        shio_printf(pip->efp,"%s: program (%s) exiting ex=%d\n",
 	            pip->progname,((f_child) ? "child" : "parent"),ex) ;
@@ -1747,10 +1747,10 @@ LFM		*lp ;
 
 /* get some updated information */
 
-	if (! pip->f.zerospeed) {
+	if (! pip->fl.zerospeed) {
 
 #if	CF_CPUSPEED
-	    f = (e.boottime == 0) || (e.speed == 0) || pip->f.speed ;
+	    f = (e.boottime == 0) || (e.speed == 0) || pip->fl.speed ;
 
 	    if (! f)
 	        f = (e.stime == 0) || 
@@ -1771,7 +1771,7 @@ LFM		*lp ;
 
 	        if (rs1 < 0) {
 
-	            if ((! pip->f.quiet) && (pip->efp != NULL)) {
+	            if ((! pip->fl.quiet) && (pip->efp != NULL)) {
 
 	                shio_printf(pip->efp,
 	                    "%s: speed name=%s\n",
@@ -1800,7 +1800,7 @@ LFM		*lp ;
 
 /* were we requested to do a disable? */
 
-	if (pip->f.disable) {
+	if (pip->fl.disable) {
 
 	    e.flags |= MSFLAG_MDISABLED ;
 	    if (pip->disint > 0)
@@ -1824,7 +1824,7 @@ LFM		*lp ;
 	        if (lw <= 0)
 	            break ;
 
-	        if (pip->f.daemon) {
+	        if (pip->fl.daemon) {
 
 	            if (pip->have.pidfile && (lp != NULL)) {
 
@@ -1915,7 +1915,7 @@ LFM		*lp ;
 
 	        c += 1 ;
 
-	        if (! pip->f.daemon)
+	        if (! pip->fl.daemon)
 	            break ;
 
 /* sleep for daemon mode */
