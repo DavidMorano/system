@@ -530,7 +530,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -725,7 +725,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        rs1 = shio_close(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            shio_printf(pip->efp,
 	                "%s: inaccessible list file (%d)\n",
 	                pip->progname,rs) ;
@@ -984,8 +984,8 @@ PROGINFO	*pip ;
 	LOCINFO	*lip = pip->lip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.fla) {
-	    lip->f.fla = TRUE ;
+	if (! lip->fl.fla) {
+	    lip->fl.fla = TRUE ;
 	    rs = uc_getloadavg(lip->fla,3) ;
 	}
 
@@ -1000,9 +1000,9 @@ PROGINFO	*pip ;
 	LOCINFO	*lip = pip->lip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.nusers) {
+	if (! lip->fl.nusers) {
 
-	    lip->f.nusers = TRUE ;
+	    lip->fl.nusers = TRUE ;
 	    rs = nusers(lip->utfname) ;
 
 	    lip->nusers = rs ;
@@ -1018,8 +1018,8 @@ static int getnprocs(PROGINFO *pip)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.nprocs) {
-	    lip->f.nprocs = TRUE ;
+	if (! lip->fl.nprocs) {
+	    lip->fl.nprocs = TRUE ;
 	    if ((rs = uc_nprocs(0)) >= 0) {
 	        lip->nprocs = rs ;
 	    } else if (isNotPresent(rs) || (rs == SR_NOSYS))
