@@ -587,12 +587,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_same:
 	                    lip->final.same = TRUE ;
 	                    lip->have.same = TRUE ;
-	                    lip->f.same = TRUE ;
+	                    lip->fl.same = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.same = (rs > 0) ;
+	                            lip->fl.same = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -650,7 +650,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -770,12 +770,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'z':
 	                        lip->final.zero = TRUE ;
 	                        lip->have.zero = TRUE ;
-	                        lip->f.zero = TRUE ;
+	                        lip->fl.zero = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.zero = (rs > 0) ;
+	                                lip->fl.zero = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1126,7 +1126,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	} /* end if (processing file argument file list) */
 
 	if ((rs >= 0) && (pan == 0)) {
-	    if (! lip->f.zero) {
+	    if (! lip->fl.zero) {
 	        rs = SR_INVALID ;
 	        fmt = "%s: no files specified\n" ;
 	        shio_printf(pip->efp,fmt,pn) ;
@@ -1256,7 +1256,7 @@ static int procfile(PROGINFO *pip,cchar fname[])
 	        }
 	    }
 
-	    if ((rs >= 0) && (rs1 >= 0) && f_ok && lip->f.same) {
+	    if ((rs >= 0) && (rs1 >= 0) && f_ok && lip->fl.same) {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
 	            debugprintf("b/procfile: nsame=%u\n",lip->nsame) ;
@@ -1337,8 +1337,8 @@ static int locinfo_finish(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip->f.id) {
-	    lip->f.id = FALSE ;
+	if (lip->fl.id) {
+	    lip->fl.id = FALSE ;
 	    rs1 = ids_release(&lip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1393,10 +1393,10 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    if (! pip->final.quiet) {
 	                        pip->have.quiet = TRUE ;
 	                        pip->final.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.quiet = (rs > 0) ;
+	                            pip->fl.quiet = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1405,7 +1405,7 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    if (! lip->final.intage) {
 	                        lip->have.intage = TRUE ;
 	                        lip->final.intage = TRUE ;
-	                        lip->f.intage = TRUE ;
+	                        lip->fl.intage = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecti(vp,vl,&v) ;
 	                            lip->intage = v ;
@@ -1417,10 +1417,10 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    if (! lip->final.same) {
 	                        lip->have.same = TRUE ;
 	                        lip->final.same = TRUE ;
-	                        lip->f.same = TRUE ;
+	                        lip->fl.same = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.same = (rs > 0) ;
+	                            lip->fl.same = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1429,10 +1429,10 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    if (! lip->final.zero) {
 	                        lip->have.zero = TRUE ;
 	                        lip->final.zero = TRUE ;
-	                        lip->f.zero = TRUE ;
+	                        lip->fl.zero = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.zero = (rs > 0) ;
+	                            lip->fl.zero = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1529,7 +1529,7 @@ static int locinfo_ftypes(LOCINFO *lip)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (paramfile-_cur) */
 
-	if (c > 0) lip->f.ftypes = TRUE ;
+	if (c > 0) lip->fl.ftypes = TRUE ;
 
 	return (rs >= 0) ? c : rs ;
 }
@@ -1540,9 +1540,9 @@ static int locinfo_ids(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
-	if (! lip->f.id) {
+	if (! lip->fl.id) {
 	    rs = ids_load(&lip->id) ;
-	    lip->f.id = (rs > 0) ;
+	    lip->fl.id = (rs > 0) ;
 	}
 
 	return rs ;
