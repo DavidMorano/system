@@ -594,7 +594,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -785,11 +785,11 @@ static int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 		    const int	f_notrun = (! lip->have.run) ;
 		    switch (pip->progmode) {
 		    case progmode_isproc:
-			if (f_notrun) lip->f.running = TRUE ;
+			if (f_notrun) lip->fl.running = TRUE ;
 			break ;
 		    case progmode_isnotrunning:
 		    case progmode_isNotRunning:
-			if (f_notrun) lip->f.notrunning = TRUE ;
+			if (f_notrun) lip->fl.notrunning = TRUE ;
 			break ;
 		    } /* end switch */
 		}
@@ -1072,9 +1072,9 @@ static int procpid(PROGINFO *pip,cchar *pidspec)
 	if (DEBUGLEVEL(2)) {
 	    debugprintf("b_isproc/procpid: ent\n") ;
 	    debugprintf("b_isproc/procpid: f_running=%u\n",
-		lip->f.running) ;
+		lip->fl.running) ;
 	    debugprintf("b_isproc/procpid: f_notrunning=%u\n",
-		lip->f.notrunning) ;
+		lip->fl.notrunning) ;
 	}
 #endif
 
@@ -1222,7 +1222,7 @@ static int locinfo_pidfile(LOCINFO *lip,cchar *vp,int vl)
 	int		rs ;
 	const char	*po = PO_PIDFILE ;
 	if ((rs = paramopt_loads(pop,po,vp,vl)) >= 0) {
-	     lip->f.pidfile = TRUE ;
+	     lip->fl.pidfile = TRUE ;
 	}
 	return rs ;
 }
@@ -1235,7 +1235,7 @@ static int locinfo_query(LOCINFO *lip,cchar *vp,int vl)
 	int		rs ;
 	const char	*po = PO_QUERY ;
 	if ((rs = paramopt_loads(pop,po,vp,vl)) >= 0) {
-	     lip->f.query = TRUE ;
+	     lip->fl.query = TRUE ;
 	}
 	return rs ;
 }
@@ -1274,10 +1274,10 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    if (! pip->final.quiet) {
 	                        pip->have.quiet = TRUE ;
 	                        pip->final.quiet = TRUE ;
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.quiet = (rs > 0) ;
+	                            pip->fl.quiet = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1348,11 +1348,11 @@ static int locinfo_queries(LOCINFO *lip)
 			    switch (qi) {
 			    case qopt_running:
 				lip->have.run = TRUE ;
-				lip->f.running = TRUE ;
+				lip->fl.running = TRUE ;
 				break ;
 			    case qopt_notrunning:
 				lip->have.run = TRUE ;
-				lip->f.notrunning = TRUE ;
+				lip->fl.notrunning = TRUE ;
 				break ;
 			    } /* end switch */
 			} /* end if (match) */
@@ -1372,7 +1372,7 @@ static int locinfo_procage(LOCINFO *lip,ustat *sbp)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		f_ok = TRUE ;
-	if (lip->f.intage && (lip->intage > 0)) {
+	if (lip->fl.intage && (lip->intage > 0)) {
 	    time_t	dt = pip->daytime ;
 	    if ((dt - sbp->st_mtime) >= lip->intage) {
 		f_ok = FALSE ;
