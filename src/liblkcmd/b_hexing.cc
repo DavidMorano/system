@@ -25,9 +25,7 @@
 
 	This is the front-end subroutine for the HEX and DEHEX program.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -56,7 +54,6 @@
 #include	<paramopt.h>
 #include	<nulstr.h>
 #include	<hexdecoder.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -428,7 +425,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 /* verbose */
 	                case argopt_verbose:
-	                    pip->f.verbose = TRUE ;
+	                    pip->fl.verbose = TRUE ;
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -564,7 +561,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 /* follow symbolic links */
 	                case argopt_follow:
-	                    pip->f.follow = TRUE ;
+	                    pip->fl.follow = TRUE ;
 	                    break ;
 
 /* default action and user specified help */
@@ -599,29 +596,29 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                    case 'e':
 				pip->final.encode = TRUE ;
 				pip->have.encode = TRUE ;
-				pip->f.encode = TRUE ;
+				pip->fl.encode = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-					pip->f.encode = (rs > 0) ;
+					pip->fl.encode = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* no-change */
 	                    case 'n':
-	                        pip->f.nochange = TRUE ;
+	                        pip->fl.nochange = TRUE ;
 	                        break ;
 
 /* quiet */
 	                    case 'q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* verbose output */
 	                    case 'v':
-	                        pip->f.verbose = TRUE ;
+	                        pip->fl.verbose = TRUE ;
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -737,7 +734,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	   switch (pip->progmode) {
 	   case progmode_hex:
 	   case progmode_hexing:
-		pip->f.encode = TRUE ;
+		pip->fl.encode = TRUE ;
 		break ;
 	   } /* end switch */
 	} /* end if (encode-mode) */
@@ -745,7 +742,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: encode=%u\n" ;
-	    shio_printf(pip->efp,fmt,pn,pip->f.encode) ;
+	    shio_printf(pip->efp,fmt,pn,pip->fl.encode) ;
 	}
 
 	if (rs < 0) goto retearly ;
@@ -972,7 +969,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",rs,afn) ;
@@ -1041,13 +1038,13 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("main/procfile: ent enc=%u\n",pip->f.encode) ;
+	debugprintf("main/procfile: ent enc=%u\n",pip->fl.encode) ;
 #endif
 
 	if (np == NULL) return SR_FAULT ;
 
 	if ((rs = nulstr_start(&n,np,nl,&fn)) >= 0) {
-	    if (pip->f.encode) {
+	    if (pip->fl.encode) {
 		rs = procencode(pip,ofp,fn) ;
 		wlen += rs ;
 	    } else {
