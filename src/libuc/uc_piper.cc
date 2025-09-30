@@ -1,31 +1,32 @@
-/* uc_piper */
+/* uc_piper SUPPORT */
 /* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX®Â® library-3c */
 /* create pipes but moved up to a minimum FD number */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
-	= 1998-03-11, David AÂ­DÂ­ Morano
+	= 1998-03-11, David A­D­ Morano
 	This code was originally written.
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Name:
+	uc_piper
+
+	Description:
 	This subroutine creates pipes, like |u_pipe(3u)| does, but with 
 	resulting FDs that are at or above a minimum FD value.
 
 	Synopsis:
-	int uc_piper(pipes,minfd)
-	int	pipes[2] ;
-	int	minfd ;
+	int uc_piper(int *pipes,int minfd) noex
 
 	Arguments:
 	pipes		resulting array of two pipes
@@ -57,6 +58,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
