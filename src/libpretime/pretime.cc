@@ -1,4 +1,5 @@
 /* pretime SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* set or get some program (process) data */
@@ -7,17 +8,20 @@
 
 /* revision history:
 
-	= 2004-11-22, David AÂ­DÂ­ Morano
+	= 2004-11-22, David A­D­ Morano
 	This code was originally written.
 
 */
 
-/* Copyright Â© 2004 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Manipulated system time management.
+  	Name:
+	pretime
 
+	Description:
+	Manipulated system time management.
 
 *******************************************************************************/
 
