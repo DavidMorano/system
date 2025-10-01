@@ -15,7 +15,7 @@
 	Everyone (!) has |strnstr(3c)| now.  After all of these
 	years, the world has caugþt up with me.  I must have actually
 	written this subroutine back in the 1980s or so when
-	|strnstr(3c)| did not yet exist.  So I am adding a compile-time
+	|strnstr(3c)| did not yet exist.  So I am adding a checkable
 	option (see above in this file) to use the UNIX® C-lang
 	Standard-Library subroutine |strnstr(3c)| when calling our
 	own |strnsub(3uc)|.  Oops!  Note that the function signature
@@ -76,7 +76,7 @@
 
 #include	"strnxsub.h"
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
