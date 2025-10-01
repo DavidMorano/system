@@ -404,23 +404,23 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_empty:
-	                    lip->f.empty = TRUE ;
+	                    lip->fl.empty = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.empty = (rs > 0) ;
+	                            lip->fl.empty = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case argopt_onlyfirst:
-	                    lip->f.empty = TRUE ;
+	                    lip->fl.empty = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.onlyfirst = (rs > 0) ;
+	                            lip->fl.onlyfirst = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -547,7 +547,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
