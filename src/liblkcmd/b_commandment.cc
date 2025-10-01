@@ -593,7 +593,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -614,11 +614,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'a':
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        break ;
 
 	                    case 'n':
-	                        lip->f.n = TRUE ;
+	                        lip->fl.n = TRUE ;
 	                        break ;
 
 /* options */
@@ -670,12 +670,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* use GMT */
 	                    case 'z':
 	                        lip->final.gmt = TRUE ;
-	                        lip->f.gmt = TRUE ;
+	                        lip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.gmt = (rs > 0) ;
+	                                lip->fl.gmt = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -816,7 +816,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (rs >= 0) {
 	if ((rs = locinfo_combegin(lip,dbname)) >= 0) {
 
-	    if (lip->f.audit) {
+	    if (lip->fl.audit) {
 	        rs = commandment_audit(&lip->cdb) ;
 	        if ((rs < 0) || (pip->debuglevel > 0))
 	            shio_printf(pip->efp,"%s: DB audit (%d)\n",
@@ -845,7 +845,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt = "%s: could not perform function (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
@@ -971,10 +971,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.audit) {
 	                        lip->have.audit = TRUE ;
 	                        lip->final.audit = TRUE ;
-	                        lip->f.audit = TRUE ;
+	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.audit = (rs > 0) ;
+	                            lip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -982,7 +982,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.linelen) {
 	                        lip->have.linelen = TRUE ;
 	                        lip->final.linelen = TRUE ;
-	                        lip->f.linelen = TRUE ;
+	                        lip->fl.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->linelen = rs ;
@@ -993,7 +993,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.indent) {
 	                        lip->have.indent = TRUE ;
 	                        lip->final.indent = TRUE ;
-	                        lip->f.indent = TRUE ;
+	                        lip->fl.indent = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->indent = rs ;
@@ -1004,10 +1004,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.separate) {
 	                        lip->have.separate = TRUE ;
 	                        lip->final.separate = TRUE ;
-	                        lip->f.separate = TRUE ;
+	                        lip->fl.separate = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.separate = (rs > 0) ;
+	                            lip->fl.separate = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1015,10 +1015,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.interactive) {
 	                        lip->have.interactive = TRUE ;
 	                        lip->final.interactive = TRUE ;
-	                        lip->f.interactive = TRUE ;
+	                        lip->fl.interactive = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.interactive = (rs > 0) ;
+	                            lip->fl.interactive = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1026,10 +1026,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.defall) {
 	                        lip->have.defall = TRUE ;
 	                        lip->final.defall = TRUE ;
-	                        lip->f.defall = TRUE ;
+	                        lip->fl.defall = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.defall = (rs > 0) ;
+	                            lip->fl.defall = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1038,10 +1038,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.defnull) {
 	                        lip->have.defnull = TRUE ;
 	                        lip->final.defnull = TRUE ;
-	                        lip->f.defnull = TRUE ;
+	                        lip->fl.defnull = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.defnull = (rs > 0) ;
+	                            lip->fl.defnull = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1049,10 +1049,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.rotate) {
 	                        lip->have.rotate = TRUE ;
 	                        lip->final.rotate = TRUE ;
-	                        lip->f.rotate = TRUE ;
+	                        lip->fl.rotate = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.rotate = (rs > 0) ;
+	                            lip->fl.rotate = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1060,10 +1060,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.gmt) {
 	                        lip->have.gmt = TRUE ;
 	                        lip->final.gmt = TRUE ;
-	                        lip->f.gmt = TRUE ;
+	                        lip->fl.gmt = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.gmt = (rs > 0) ;
+	                            lip->fl.gmt = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1105,7 +1105,7 @@ int		f_apm ;
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    lip->ofp = ofp ;
 
-	    if (lip->f.all) {
+	    if (lip->fl.all) {
 	        rs = procall(pip) ;
 		wlen += rs ;
 	    } else {
@@ -1203,7 +1203,7 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,int f_apm)
 	} /* end if (afile arguments) */
 
 	if (rs >= 0) {
-	    if (((pan == 0) && lip->f.defnull) || f_apm) {
+	    if (((pan == 0) && lip->fl.defnull) || f_apm) {
 		pan += 1 ;
 	        rs = procspec(pip,"+",1) ;
 	        wlen += rs ;
@@ -1211,7 +1211,7 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,int f_apm)
 	} /* end if */
 
 	if (rs >= 0) {
-	    if ((pan == 0) && lip->f.defall) {
+	    if ((pan == 0) && lip->fl.defall) {
 	        pan += 1 ;
 	        rs = procall(pip) ;
 	        wlen += rs ;
@@ -1230,7 +1230,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 	int		rs ;
 	int		wlen = 0 ;
 
-	if (lip->f.interactive) lip->cout = 0 ;
+	if (lip->fl.interactive) lip->cout = 0 ;
 
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	    int		fl ;
@@ -1308,7 +1308,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	                rs = procout(pip,i,cbuf,cbl) ;
 			wlen += rs ;
 	            }
-	            if (lip->f.rotate) {
+	            if (lip->fl.rotate) {
 	                i = ((i+1) % max) ;
 	                if (i == 0) i = max ;
 	            } else {
@@ -1324,7 +1324,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 
 	} /* end if (type of query) */
 
-	    if ((rs < 0) && isNotGoodCite(rs) && lip->f.interactive) {
+	    if ((rs < 0) && isNotGoodCite(rs) && lip->fl.interactive) {
 		fmt = "invalid citation=>%r< (%d)\n" ;
 	        rs = shio_printf(lip->ofp,fmt,sp,sl,rs) ;
 	    }
@@ -1493,7 +1493,7 @@ static int procout(PROGINFO *pip,uint n,cchar *vp,int vl)
 
 /* print out any necessary separator */
 
-	if ((lip->cout++ > 0) && lip->f.separate) {
+	if ((lip->cout++ > 0) && lip->fl.separate) {
 	    rs = shio_printf(lip->ofp,fmt) ;
 	    wlen += rs ;
 	} /* end if (separator) */
@@ -1608,8 +1608,8 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->linelen = 0 ;
 	lip->count = -1 ;
 	lip->max = -1 ;
-	lip->f.separate = DEFOPT_SEPARATE ;
-	lip->f.rotate = DEFOPT_ROTATE ;
+	lip->fl.separate = DEFOPT_SEPARATE ;
+	lip->fl.rotate = DEFOPT_ROTATE ;
 
 	return SR_OK ;
 }
@@ -1676,10 +1676,10 @@ static int locinfo_tmtime(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (! lip->f.tmtime) {
-	    lip->f.tmtime = TRUE ;
+	if (! lip->fl.tmtime) {
+	    lip->fl.tmtime = TRUE ;
 	    if (pip->daytime == 0) pip->daytime = time(NULL) ;
-	    if (lip->f.gmt) {
+	    if (lip->fl.gmt) {
 	        rs = tmtime_gmtime(&lip->tm,pip->daytime) ;
 	    } else {
 	        rs = tmtime_localtime(&lip->tm,pip->daytime) ;
