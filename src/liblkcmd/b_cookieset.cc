@@ -532,7 +532,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -578,7 +578,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 /* output page headers */
 	                    case 'h':
-	                        lip->f.headers = TRUE ;
+	                        lip->fl.headers = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl)
@@ -792,7 +792,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 /* finish up */
 
-	if ((rs < 0) && (! pip->f.quiet)) {
+	if ((rs < 0) && (! pip->fl.quiet)) {
 	    cchar	*fmt ;
 	    if (cp != NULL) {
 	        if (*cp == '-') cp = "*STDIN*" ;
@@ -984,7 +984,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,SHIO *ofp,cchar *afn)
 	        rs1 = shio_close(afp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            fmt = "%s: inaccessigle argument-list (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	            fmt = "%s: afile=%s\n" ;
