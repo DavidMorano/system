@@ -72,7 +72,7 @@ module ;
 
 module strnwht ;
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 import chrset ;
 
 /* local defines */
@@ -107,11 +107,9 @@ static constexpr cauto		isw = iswhite ;
 /* exported subroutines */
 
 extern "C" {
-    char *strnwht(cchar *sp,int sl) noex {
+    char *strnwht(cchar *sp,int 탎l) noex {
 	char		*rsp = nullptr ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl > 0) ylikely {	
+	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 	        cchar	*lsp = (sp + sl) ;
 		bool	f = false ;
 	        while ((sp < lsp) && *sp && (*sp != '\n')) {
@@ -120,8 +118,7 @@ extern "C" {
 		    sp += 1 ;
 		} /* end while */
 	        rsp = (f) ? charp(sp) : nullptr ;
-	    } /* end if (non-zero positive) */
-	} /* end if (non-null) */
+	} /* end if (non-zero positive) */
 	return rsp ;
     } /* end subroutine (strnwht) */
     char *strnwhtbrk(cchar *sp,int sl,cchar *ss) noex {
@@ -147,11 +144,9 @@ extern "C" {
 } /* end extern */
 
 extern "C++" {
-    char *strnwhtbrk(cchar *sp,int sl,const chrset &sset) noex {
+    char *strnwhtbrk(cchar *sp,int 탎l,const chrset &sset) noex {
 	char		*rsp = nullptr ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl > 0) ylikely {	
+	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 	        cchar	*lsp = (sp + sl) ;
 	        bool	f = false ;
 	        while ((sp < lsp) && *sp) {
@@ -170,8 +165,7 @@ extern "C++" {
 		    } /* end while */
 		    if (f) rsp = charp(sp) ;
 		} /* end if (had white-space) */
-	    } /* end if (non-zero positive) */
-	} /* end if (non-null) */
+	} /* end if (non-zero positive) */
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */
     char *strnwhtchr(cchar *sp,int sl,const chrset &sset) noex {
