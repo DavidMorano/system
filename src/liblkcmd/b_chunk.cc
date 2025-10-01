@@ -533,7 +533,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -941,7 +941,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	            rs1 = shio_close(afp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } else {
-	            if (! pip->f.quiet) {
+	            if (! pip->fl.quiet) {
 	                fmt = "%s: inaccessible argument-list (%d)\n" ;
 	                shio_printf(pip->efp,fmt,pn,rs) ;
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
