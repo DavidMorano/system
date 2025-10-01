@@ -53,7 +53,6 @@
 
 #include	"sispan.h"
 
-import libutil ;			/* |xstrspn(3u)| */
 
 /* local defines */
 
