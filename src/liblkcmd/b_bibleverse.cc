@@ -486,7 +486,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	        if (isdigitlatin(ach)) {
 
-	            if (f_optplus) lip->f.apm = TRUE ;
+	            if (f_optplus) lip->fl.apm = TRUE ;
 	            argval = (argp+1) ;
 
 	        } else if (ach == '-') {
@@ -692,12 +692,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_bookname:
 	                    lip->have.bookname = TRUE ;
 	                    lip->final.bookname = TRUE ;
-	                    lip->f.bookname = TRUE ;
+	                    lip->fl.bookname = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.bookname = (rs > 0) ;
+	                            lip->fl.bookname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -730,7 +730,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -751,12 +751,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'a':
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.all = (rs > 0) ;
+	                                lip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -853,12 +853,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* use GMT */
 	                    case 'z':
 	                        lip->final.gmt = TRUE ;
-	                        lip->f.gmt = TRUE ;
+	                        lip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.gmt = (rs > 0) ;
+	                                lip->fl.gmt = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -1081,7 +1081,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #endif
 
 
-	        if (lip->f.audit) {
+	        if (lip->fl.audit) {
 	            rs = bibleverse_audit(bvp) ;
 	            if (pip->debuglevel > 0) {
 		        fmt = "%s: bibleverse DB audit (%d)\n" ;
@@ -1138,7 +1138,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        shio_printf(pip->efp,
 	            "%s: could not perform function (%d)\n",
 	            pip->progname,rs) ;
@@ -1275,10 +1275,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.audit) {
 	                        lip->have.audit = TRUE ;
 	                        lip->final.audit = TRUE ;
-	                        lip->f.audit = TRUE ;
+	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.audit = (rs > 0) ;
+	                            lip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1286,7 +1286,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.linelen) {
 	                        lip->have.linelen = TRUE ;
 	                        lip->final.linelen = TRUE ;
-	                        lip->f.linelen = TRUE ;
+	                        lip->fl.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->linelen = rs ;
@@ -1297,7 +1297,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.indent) {
 	                        lip->have.indent = TRUE ;
 	                        lip->final.indent = TRUE ;
-	                        lip->f.indent = TRUE ;
+	                        lip->fl.indent = TRUE ;
 	                        lip->indent = 1 ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1309,10 +1309,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.bookname) {
 	                        lip->have.bookname = TRUE ;
 	                        lip->final.bookname = TRUE ;
-	                        lip->f.bookname = TRUE ;
+	                        lip->fl.bookname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.bookname = (rs > 0) ;
+	                            lip->fl.bookname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1320,10 +1320,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.separate) {
 	                        lip->have.separate = TRUE ;
 	                        lip->final.separate = TRUE ;
-	                        lip->f.separate = TRUE ;
+	                        lip->fl.separate = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.separate = (rs > 0) ;
+	                            lip->fl.separate = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1331,10 +1331,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.interactive) {
 	                        lip->have.interactive = TRUE ;
 	                        lip->final.interactive = TRUE ;
-	                        lip->f.interactive = TRUE ;
+	                        lip->fl.interactive = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.interactive = (rs > 0) ;
+	                            lip->fl.interactive = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1343,10 +1343,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.defnull) {
 	                        lip->have.defnull = TRUE ;
 	                        lip->final.defnull = TRUE ;
-	                        lip->f.defnull = TRUE ;
+	                        lip->fl.defnull = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.defnull = (rs > 0) ;
+	                            lip->fl.defnull = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1354,10 +1354,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.para) {
 	                        lip->have.para = TRUE ;
 	                        lip->final.para = TRUE ;
-	                        lip->f.para = TRUE ;
+	                        lip->fl.para = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.para = (rs > 0) ;
+	                            lip->fl.para = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1365,10 +1365,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.gmt) {
 	                        lip->have.gmt = TRUE ;
 	                        lip->final.gmt = TRUE ;
-	                        lip->f.gmt = TRUE ;
+	                        lip->fl.gmt = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.gmt = (rs > 0) ;
+	                            lip->fl.gmt = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1411,7 +1411,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    lip->ofp = ofp ;
 
-	    if (lip->f.all) {
+	    if (lip->fl.all) {
 	        rs = procall(pip) ;
 	        wlen += rs ;
 	    } else {
@@ -1517,7 +1517,7 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 
 	} /* end if (afile arguments) */
 
-	if ((rs >= 0) && lip->f.apm) {
+	if ((rs >= 0) && lip->fl.apm) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -1525,12 +1525,12 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 #endif
 
 	    pan += 1 ;
-	    rs = proctoday(pip,lip->f.apm,(lip->nitems+1)) ;
+	    rs = proctoday(pip,lip->fl.apm,(lip->nitems+1)) ;
 	    wlen += rs ;
 
 	} /* end if */
 
-	if ((rs >= 0) && (pan == 0) && lip->f.defnull) {
+	if ((rs >= 0) && (pan == 0) && lip->fl.defnull) {
 	    int	ndays = 1 ;
 
 	    if (lip->nitems > 1) ndays = lip->nitems ;
@@ -1556,7 +1556,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 	int		rs ;
 	int		wlen = 0 ;
 
-	if (lip->f.interactive) lip->cout = 0 ;
+	if (lip->fl.interactive) lip->cout = 0 ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
@@ -1620,7 +1620,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 	            rs = procmulti(pip,&q,ndays) ;
 	            wlen += rs ;
 	        } else if (rs == 0) {
-	            if (lip->f.interactive) {
+	            if (lip->fl.interactive) {
 			fmt = "citation=>%r< invalid\n" ;
 	                rs = shio_printf(lip->ofp,fmt,sp,sl) ;
 		    }
@@ -1669,7 +1669,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 
 	    } /* end if (handling different query types) */
 
-	    if ((rs < 0) && isNotGoodCite(rs) && lip->f.interactive) {
+	    if ((rs < 0) && isNotGoodCite(rs) && lip->fl.interactive) {
 		fmt = "invalid citation=>%r< (%d)\n" ;
 	        rs = shio_printf(lip->ofp,fmt,sp,sl,rs) ;
 	    }
@@ -1875,7 +1875,7 @@ static int procmulti(PROGINFO *pip,BIBLEVERSE_Q *qp,int ndays)
 		cchar		*fmt = "%u:%u:%u" ;
 		char		specbuf[SPECBUFLEN + 1], *sp = specbuf ;
 		sl = bufprintf(specbuf,speclen,fmt,qp->b,qp->c,qp->v) ;
-		if (lip->f.interactive) {
+		if (lip->fl.interactive) {
 	    	    fmt = "citation=%r not_found\n" ;
 	    	    rs = shio_printf(lip->ofp,fmt,sp,sl) ;
 		}
@@ -1948,7 +1948,7 @@ static int procoutcite(PROGINFO *pip,BIBLEVERSE_Q *qp,int ndays)
 
 /* print out any necessary separator */
 
-	if ((rs >= 0) && lip->f.separate && (lip->cout++ > 0)) {
+	if ((rs >= 0) && lip->fl.separate && (lip->cout++ > 0)) {
 	    if (pip->verboselevel > 0) {
 	        rs = shio_printf(lip->ofp,fmt) ;
 	        wlen += rs ;
@@ -1965,7 +1965,7 @@ static int procoutcite(PROGINFO *pip,BIBLEVERSE_Q *qp,int ndays)
 	    int		v = qp->v ;
 	    char	cbuf[COLBUFLEN + 1] ;
 
-	    if (lip->f.bookname) {
+	    if (lip->fl.bookname) {
 	        const int	blen = BIBLEBOOK_LEN ;
 	        int		bbl ;
 	        char		bbuf[BIBLEBOOK_LEN + 1] ;
@@ -2032,7 +2032,7 @@ static int procout(PROGINFO *pip,BIBLEVERSE_Q *qp,cchar *vp,int vl)
 		clen,lip->linelen,lip->indent,cbl) ;
 #endif
 
-	if ((rs >= 0) && lip->f.para) {
+	if ((rs >= 0) && lip->fl.para) {
 	    rs = locinfo_ispara(lip,qp) ;
 	    f_p = (rs > 0) ;
 	}
@@ -2121,8 +2121,8 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->max = -1 ;
 	lip->nitems = -1 ;
 
-	lip->f.separate = OPT_SEPARATE ;
-	lip->f.bookname = OPT_BOOKNAME ;
+	lip->fl.separate = OPT_SEPARATE ;
+	lip->fl.bookname = OPT_BOOKNAME ;
 
 	return rs ;
 }
@@ -2266,13 +2266,13 @@ static int locinfo_today(LOCINFO *lip)
 	int		mjd = lip->mjd ;
 
 	if ((rs = locinfo_tmtime(lip)) >= 0) {
-	    if ((! lip->f.mjd) || ((pip->daytime - lip->ti_mjd) >= to)) {
+	    if ((! lip->fl.mjd) || ((pip->daytime - lip->ti_mjd) >= to)) {
 	        TMTIME	*tmp = &lip->tm ;
 	        lip->ti_mjd = pip->daytime ;
 	        yr = (tmp->year + TM_YEAR_BASE) ;
 	        rs = getmjd(yr,tmp->mon,tmp->mday) ;
 	        mjd = rs ;
-	        lip->f.mjd = TRUE ;
+	        lip->fl.mjd = TRUE ;
 	        lip->mjd = mjd ;
 	    }
 	} /* end if (locinfo-tmtime) */
@@ -2321,15 +2321,15 @@ static int locinfo_tmtime(LOCINFO *lip)
 	int		tc = TIMECOUNT ;
 	int		to = TO_TMTIME ;
 
-	if ((! lip->f.tmtime) || (lip->timecount++ >= tc)) {
+	if ((! lip->fl.tmtime) || (lip->timecount++ >= tc)) {
 	    if ((pip->daytime == 0) || (lip->timecount == tc)) {
 	        pip->daytime = time(NULL) ;
 	    }
 	    lip->timecount = 0 ;
-	    if ((! lip->f.tmtime) || ((pip->daytime - lip->ti_tmtime) >= to)) {
+	    if ((! lip->fl.tmtime) || ((pip->daytime - lip->ti_tmtime) >= to)) {
 	        lip->ti_tmtime = pip->daytime ;
-	        lip->f.tmtime = TRUE ;
-	        if (lip->f.gmt) {
+	        lip->fl.tmtime = TRUE ;
+	        if (lip->fl.gmt) {
 	            rs = tmtime_gmtime(&lip->tm,pip->daytime) ;
 	        } else {
 	            rs = tmtime_localtime(&lip->tm,pip->daytime) ;
@@ -2402,7 +2402,7 @@ static int locinfo_bvs(LOCINFO *lip)
 	            lip->open.sdb = (rs >= 0) ;
 	        }
 	    }
-	    if ((rs >= 0) && lip->f.audit && lip->open.sdb) {
+	    if ((rs >= 0) && lip->fl.audit && lip->open.sdb) {
 	         rs = bvs_audit(bsp) ;
 	         if (pip->debuglevel > 0) {
 	             shio_printf(pip->efp,"%s: bible-structure audit (%d)\n",
@@ -2573,7 +2573,7 @@ static int locinfo_ispara(LOCINFO *lip,BIBLEVERSE_Q *qp)
 
 	if (qp == NULL) return SR_FAULT ;
 
-	if (lip->f.para) {
+	if (lip->fl.para) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
