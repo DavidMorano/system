@@ -127,7 +127,7 @@ extern "C" {
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtbrk) */
-} /* end extern */
+} /* end extern (C) */
 
 extern "C++" {
     int siwhtbrk(cchar *sp,int sl,const chrset &sset) noex {
@@ -140,6 +140,6 @@ extern "C++" {
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtbrk) */
-} /* end extern */
+} /* end extern (C++) */
 
 
