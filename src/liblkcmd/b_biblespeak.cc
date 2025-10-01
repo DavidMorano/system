@@ -666,12 +666,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_bookname:
 	                    lip->have.bookname = TRUE ;
 	                    lip->final.bookname = TRUE ;
-	                    lip->f.bookname = TRUE ;
+	                    lip->fl.bookname = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.bookname = (rs > 0) ;
+	                            lip->fl.bookname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -704,7 +704,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -725,12 +725,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'a':
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.all = (rs > 0) ;
+	                                lip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -967,7 +967,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        debugprintf("b_biblespeak: bibleverse_open() rs=%d\n",rs) ;
 #endif
 
-	    if (lip->f.audit) {
+	    if (lip->fl.audit) {
 	        rs = bibleverse_audit(&lip->vdb) ;
 	        if (pip->debuglevel > 0) {
 	            shio_printf(pip->efp,
@@ -1014,7 +1014,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if ((rs < 0) && (ex == EX_OK)) {
 	    switch (rs) {
 	    default:
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            const char	*fmt = "%s: could not perform function (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pip->progname,rs) ;
 	        }
@@ -1140,10 +1140,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.audit) {
 	                        lip->have.audit = TRUE ;
 	                        lip->final.audit = TRUE ;
-	                        lip->f.audit = TRUE ;
+	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.audit = (rs > 0) ;
+	                            lip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1151,7 +1151,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.linelen) {
 	                        lip->have.linelen = TRUE ;
 	                        lip->final.linelen = TRUE ;
-	                        lip->f.linelen = TRUE ;
+	                        lip->fl.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->linelen = rs ;
@@ -1162,7 +1162,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.indent) {
 	                        lip->have.indent = TRUE ;
 	                        lip->final.indent = TRUE ;
-	                        lip->f.indent = TRUE ;
+	                        lip->fl.indent = TRUE ;
 	                        lip->indent = 1 ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1174,10 +1174,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.bookname) {
 	                        lip->have.bookname = TRUE ;
 	                        lip->final.bookname = TRUE ;
-	                        lip->f.bookname = TRUE ;
+	                        lip->fl.bookname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.bookname = (rs > 0) ;
+	                            lip->fl.bookname = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1185,10 +1185,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.interactive) {
 	                        lip->have.interactive = TRUE ;
 	                        lip->final.interactive = TRUE ;
-	                        lip->f.interactive = TRUE ;
+	                        lip->fl.interactive = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.interactive = (rs > 0) ;
+	                            lip->fl.interactive = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1196,10 +1196,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.bookchapters) {
 	                        lip->have.bookchapters = TRUE ;
 	                        lip->final.bookchapters = TRUE ;
-	                        lip->f.bookchapters = TRUE ;
+	                        lip->fl.bookchapters = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.bookchapters = (rs > 0) ;
+	                            lip->fl.bookchapters = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1236,7 +1236,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    lip->ofp = ofp ;
 
-	    if (lip->f.all) {
+	    if (lip->fl.all) {
 	        rs = procall(pip) ;
 	        wlen += rs ;
 	    } else {
@@ -1365,7 +1365,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 
 	if (sp == NULL) return SR_FAULT ;
 
-	if (lip->f.interactive) lip->cout = 0 ;
+	if (lip->fl.interactive) lip->cout = 0 ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
@@ -1469,7 +1469,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	                }
 
 	                f = (! f_titlebook) ;
-	                f = f || ((! f_titlechapter) && lip->f.bookchapters) ;
+	                f = f || ((! f_titlechapter) && lip->fl.bookchapters) ;
 	                if (f) {
 	                    f_titlebook = TRUE ;
 
@@ -1522,7 +1522,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	    } /* end for (chapters) */
 
 	} else if (rs == 0) {
-	    if (lip->f.interactive)
+	    if (lip->fl.interactive)
 	        rs = shio_printf(lip->ofp,"citation=>%r< invalid\n",
 	            sp,sl) ;
 	}
@@ -2014,7 +2014,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->pip = pip ;
 	lip->count = -1 ;
 	lip->max = -1 ;
-	lip->f.bookchapters = TRUE ;
+	lip->fl.bookchapters = TRUE ;
 
 	return rs ;
 }
