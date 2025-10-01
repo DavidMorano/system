@@ -551,7 +551,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -573,24 +573,24 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* all-books */
 	                    case 'a':
-	                        lip->f.all = TRUE ;
+	                        lip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.all = (rs > 0) ;
+	                                lip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
 
 /* leading match only */
 	                    case 'l':
-	                        lip->f.leading = TRUE ;
+	                        lip->fl.leading = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                lip->f.leading = (rs > 0) ;
+	                                lip->fl.leading = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -762,7 +762,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (rs >= 0) {
 	if ((rs = biblebook_open(lip->dbp,pip->pr,ndbname)) >= 0) {
 
-	    if (lip->f.audit) {
+	    if (lip->fl.audit) {
 	        rs = biblebook_audit(lip->dbp) ;
 	        if (pip->debuglevel > 0) {
 	            shio_printf(pip->efp,
@@ -798,7 +798,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        shio_printf(pip->efp,
 	            "%s: could not perform function (%d)\n",
 	            pip->progname,rs) ;
@@ -925,10 +925,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.audit) {
 	                        lip->have.audit = TRUE ;
 	                        lip->final.audit = TRUE ;
-	                        lip->f.audit = TRUE ;
+	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.audit = (rs > 0) ;
+	                            lip->fl.audit = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -937,10 +937,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.interactive) {
 	                        lip->have.interactive = TRUE ;
 	                        lip->final.interactive = TRUE ;
-	                        lip->f.interactive = TRUE ;
+	                        lip->fl.interactive = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.interactive = (rs > 0) ;
+	                            lip->fl.interactive = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -982,7 +982,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    lip->ofp = ofp ;
 
-	    if (lip->f.all) {
+	    if (lip->fl.all) {
 	        rs = procall(pip) ;
 	        wlen += rs ;
 	    } else {
@@ -1082,7 +1082,7 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	        rs1 = shio_close(afp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 		    fmt = "%s: inaccessible argument-list (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pn,rs) ;
 	            shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
@@ -1108,7 +1108,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 	int		rs ;
 	int		wlen = 0 ;
 
-	if (lip->f.interactive) lip->cout = 0 ;
+	if (lip->fl.interactive) lip->cout = 0 ;
 
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	    int		fl ;
@@ -1198,7 +1198,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 	            ml = MIN(slen,bl) ;
 	            tl = strwcpyspecial(tmpbuf,bbuf,ml) - tmpbuf ;
 
-	            if (lip->f.leading) {
+	            if (lip->fl.leading) {
 	                int	m = nleadstr(sbuf,tmpbuf,tl) ;
 	                f_match = (m > 0) && (sbuf[m] == '\0') ;
 	            } else {
@@ -1218,7 +1218,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 
 	} /* end if */
 
-	    if ((rs < 0) && isNotGoodCite(rs) && lip->f.interactive) {
+	    if ((rs < 0) && isNotGoodCite(rs) && lip->fl.interactive) {
 		fmt = "invalid citation=>%r< (%d)\n" ;
 	        rs = shio_printf(lip->ofp,fmt,sp,sl,rs) ;
 	    }
