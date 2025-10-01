@@ -669,7 +669,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -736,7 +736,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* line-buffered */
 	                    case 'u':
 	                        pip->have.bufnone = TRUE ;
-	                        pip->f.bufnone = TRUE ;
+	                        pip->fl.bufnone = TRUE ;
 	                        pip->final.bufnone = TRUE ;
 	                        break ;
 
@@ -901,8 +901,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (DEBUGLEVEL(2)) {
 	    debugprintf("b_dhtext: to_open=%d\n",pip->to_open) ;
 	    debugprintf("b_dhtext: to_read=%d\n",pip->to_read) ;
-	    debugprintf("b_dhtext: f_bufline=%u\n",pip->f.bufline) ;
-	    debugprintf("b_dhtext: f_bufnone=%u\n",pip->f.bufnone) ;
+	    debugprintf("b_dhtext: f_bufline=%u\n",pip->fl.bufline) ;
+	    debugprintf("b_dhtext: f_bufnone=%u\n",pip->fl.bufnone) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -939,7 +939,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
-	    if (! pip->f.quiet) {
+	    if (! pip->fl.quiet) {
 	        shio_printf(pip->efp,"%s: could not process file (%d)\n",
 	            pip->progname,rs) ;
 	    }
@@ -1063,7 +1063,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.cvtcase) {
 	                        lip->have.cvtcase = TRUE ;
 	                        lip->final.cvtcase = TRUE ;
-	                        lip->f.cvtcase = TRUE ;
+	                        lip->fl.cvtcase = TRUE ;
 	                        if (vl > 0)
 	                            rs = procsetcase(pip,vp,vl) ;
 	                    }
@@ -1073,10 +1073,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.bufwhole) {
 	                        pip->have.bufwhole = TRUE ;
 	                        pip->final.bufwhole = TRUE ;
-	                        pip->f.bufwhole = TRUE ;
+	                        pip->fl.bufwhole = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufwhole = (rs > 0) ;
+	                            pip->fl.bufwhole = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1085,10 +1085,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.bufline) {
 	                        pip->have.bufline = TRUE ;
 	                        pip->final.bufline = TRUE ;
-	                        pip->f.bufline = TRUE ;
+	                        pip->fl.bufline = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufline = (rs > 0) ;
+	                            pip->fl.bufline = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1098,10 +1098,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! pip->final.bufnone) {
 	                        pip->have.bufnone = TRUE ;
 	                        pip->final.bufnone = TRUE ;
-	                        pip->f.bufnone = TRUE ;
+	                        pip->fl.bufnone = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            pip->f.bufnone = (rs > 0) ;
+	                            pip->fl.bufnone = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1109,10 +1109,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.termout) {
 	                        lip->have.termout = TRUE ;
 	                        lip->final.termout = TRUE ;
-	                        lip->f.termout = TRUE ;
+	                        lip->fl.termout = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.termout = (rs > 0) ;
+	                            lip->fl.termout = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1120,10 +1120,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.dbl) {
 	                        lip->have.dbl = TRUE ;
 	                        lip->final.dbl = TRUE ;
-	                        lip->f.dbl = TRUE ;
+	                        lip->fl.dbl = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
-	                            lip->f.dbl = (rs > 0) ;
+	                            lip->fl.dbl = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1131,7 +1131,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    if (! lip->final.linelen) {
 	                        lip->have.linelen = TRUE ;
 	                        lip->final.linelen = TRUE ;
-	                        lip->f.linelen = TRUE ;
+	                        lip->fl.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->linelen = rs ;
@@ -1171,10 +1171,10 @@ static int procsetcase(PROGINFO *pip,cchar *vp,int vl)
 	    const int	ch = CHAR_TOLC(vp[0]) ;
 	    switch (ch) {
 	    case 'l':
-	        lip->f.cvtlc = TRUE ;
+	        lip->fl.cvtlc = TRUE ;
 	        break ;
 	    case 'u':
-	        lip->f.cvtuc = TRUE ;
+	        lip->fl.cvtuc = TRUE ;
 	        break ;
 	    default:
 	        rs = ci ; /* lint */
@@ -1209,10 +1209,10 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	        shio_control(ofp,SHIO_CSETBUFNONE,TRUE) ;
 
 	    if (pip->have.bufline)
-	        shio_control(ofp,SHIO_CSETBUFLINE,pip->f.bufline) ;
+	        shio_control(ofp,SHIO_CSETBUFLINE,pip->fl.bufline) ;
 
 	    if (pip->have.bufwhole)
-	        shio_control(ofp,SHIO_CSETBUFWHOLE,pip->f.bufwhole) ;
+	        shio_control(ofp,SHIO_CSETBUFWHOLE,pip->fl.bufwhole) ;
 
 /* go through the loops */
 
@@ -1385,11 +1385,11 @@ static int procword(PROGINFO *pip,void *ofp,cchar *fname)
 	if ((rs >= 0) && f_fifo)
 	    rs = shio_control(ifp,SHIO_CNONBLOCK,0) ;
 
-	if ((rs >= 0) && pip->f.bufnone)
+	if ((rs >= 0) && pip->fl.bufnone)
 	    rs = shio_control(ifp,SHIO_CSETBUFNONE,0) ;
 
 #if	CF_BUFLINEIN
-	if (pip->f.bufline)
+	if (pip->fl.bufline)
 	    rs = shio_control(ifp,SHIO_CSETBUFLINE,TRUE) ;
 #endif
 
@@ -1411,7 +1411,7 @@ static int procword(PROGINFO *pip,void *ofp,cchar *fname)
 
 	    while (rs >= 0) {
 
-	        if (pip->f.bufline || pip->f.bufnone) {
+	        if (pip->fl.bufline || pip->fl.bufnone) {
 	            rs = shio_readlinetimed(ifp,lbuf,llen,to_read) ;
 	            len = rs ;
 	        } else {
@@ -1437,7 +1437,7 @@ static int procword(PROGINFO *pip,void *ofp,cchar *fname)
 	            len = 0 ;
 	        }
 
-	        if ((rs >= 0) && (len > 0) && lip->f.cvtcase) {
+	        if ((rs >= 0) && (len > 0) && lip->fl.cvtcase) {
 	            rs = procdata(pip,lbuf,len) ;
 
 #if	CF_DEBUG
@@ -1496,18 +1496,18 @@ static int procdata(PROGINFO *pip,char *bufline,int len)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 
-	if ((len > 0) && lip->f.cvtcase) {
+	if ((len > 0) && lip->fl.cvtcase) {
 	    int		i ;
 	    int		ch, nch ;
 
-	    if (lip->f.cvtlc) {
+	    if (lip->fl.cvtlc) {
 	        for (i = 0 ; i < len ; i += 1) {
 	            ch = (bufline[i] & 0xff) ;
 	            nch = CHAR_TOLC(ch) ;
 	            if (ch != nch)
 	                bufline[i] = nch ;
 	        }
-	    } else if (lip->f.cvtuc) {
+	    } else if (lip->fl.cvtuc) {
 	        for (i = 0 ; i < len ; i += 1) {
 	            ch = (bufline[i] & 0xff) ;
 	            nch = CHAR_TOUC(ch) ;
@@ -1535,7 +1535,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->to = -1 ;
 	lip->termtype = getourenv(pip->envv,varterm) ;
 
-	lip->f.dbl = TRUE ;
+	lip->fl.dbl = TRUE ;
 
 	return rs ;
 }
@@ -1627,7 +1627,7 @@ static int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
 	int		rs1 ;
 	cchar		*tstr = lip->termtype ;
 
-	if (lip->f.termout || ((rs = shio_isterm(ofp)) > 0)) {
+	if (lip->fl.termout || ((rs = shio_isterm(ofp)) > 0)) {
 	    int		ncols = COLUMNS ;
 	    cchar	*vp ;
 	    if ((vp = getourenv(pip->envv,VARCOLUMNS)) != NULL) {
@@ -1693,7 +1693,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 	            }
 #endif /* CF_DEBUG */
 
-	            if (lip->f.dbl) {
+	            if (lip->fl.dbl) {
 	                rs = shio_printdline(ofp,lp,ll) ;
 	                wlen += rs ;
 	            } else {
