@@ -499,7 +499,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -521,12 +521,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* all clusters */
 	                    case 'a':
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        break ;
 
 /* default */
 	                    case 'd':
-	                        pip->f.def = TRUE ;
+	                        pip->fl.def = TRUE ;
 	                        break ;
 
 /* list all clusters for a mode */
@@ -786,7 +786,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    int		cl ;
 	    const char	*cp ;
 
-	    if (! pip->f.all) {
+	    if (! pip->fl.all) {
 	        int	ai ;
 	        int	f ;
 
