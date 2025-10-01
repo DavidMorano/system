@@ -613,7 +613,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -636,12 +636,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'a':
 	                        pip->final.all = TRUE ;
 	                        pip->have.all = TRUE ;
-	                        pip->f.all = TRUE ;
+	                        pip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
-	                                pip->f.all = (rs > 0) ;
+	                                pip->fl.all = (rs > 0) ;
 	                            }
 	                        }
 	                        break ;
@@ -788,7 +788,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (ofname == NULL) ofname = getourenv(envv,VAROFNAME) ;
 
-	if (pip->f.all) pip->pf.lister = TRUE ;
+	if (pip->fl.all) pip->pf.lister = TRUE ;
 
 	gn = NULL ;
 	ai_continue = 1 ;
@@ -982,7 +982,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	    if (pip->pf.lister) {
 	        if (pip->debuglevel > 0) {
-	            cchar	*ms = (pip->f.all) ? "all" : "list" ;
+	            cchar	*ms = (pip->fl.all) ? "all" : "list" ;
 	            fmt = "%s: mode=%s\n" ;
 	            shio_printf(pip->efp,fmt,pn,ms) ;
 	        }
@@ -1135,7 +1135,7 @@ static int proclistfind(PROGINFO *pip,vecpstr *glp)
 
 	if ((rs = vecpstr_loadgrusers(glp,sgid)) >= 0) {
 	    c += rs ;
-	    if (pip->f.all) {
+	    if (pip->fl.all) {
 	        struct group	*grp = &lip->gr ;
 	        if (grp->gr_mem != NULL) {
 	            int		i ;
