@@ -653,7 +653,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 	                    case 'o':
@@ -845,7 +845,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	    switch (rs) {
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            SHIO	*efp = (SHIO *) pip->efp ;
 	            shio_printf(efp,"%s: invalid query (%d)\n",
 	                pip->progname,rs) ;
@@ -1119,7 +1119,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,SHIO *ofp,
 	        rs1 = shio_close(afp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
-	        if (! pip->f.quiet) {
+	        if (! pip->fl.quiet) {
 	            SHIO	*efp = (SHIO *) pip->efp ;
 	            fmt = "%s: inaccessible argument-list (%d)\n" ;
 	            shio_printf(efp,fmt,pn,rs) ;
