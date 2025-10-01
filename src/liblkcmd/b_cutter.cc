@@ -422,23 +422,23 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_empty:
-	                    lip->f.empty = TRUE ;
+	                    lip->fl.empty = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.empty = (rs > 0) ;
+	                            lip->fl.empty = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
 
 	                case argopt_onlyfirst:
-	                    lip->f.empty = TRUE ;
+	                    lip->fl.empty = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->f.onlyfirst = (rs > 0) ;
+	                            lip->fl.onlyfirst = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -565,7 +565,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->fl.quiet = TRUE ;
 	                        break ;
 
 /* program-root */
@@ -1063,7 +1063,7 @@ static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
 	                                i,fp,fl) ;
 #endif
 
-	                        if (! lip->f.empty) {
+	                        if (! lip->fl.empty) {
 	                            if (fl > 0) i += 1 ;
 	                        } else
 	                            i += 1 ;
@@ -1084,7 +1084,7 @@ static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
 
 	        } /* end if (found search string) */
 
-	        if (lip->f.onlyfirst && f) break ;
+	        if (lip->fl.onlyfirst && f) break ;
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
 
