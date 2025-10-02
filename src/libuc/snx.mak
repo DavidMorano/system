@@ -31,26 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= snx.h
+INCS += snx.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_SNX= snabbr.o snadd.o snaddw.o sncpyarray.o
@@ -68,7 +55,22 @@ OBJC_SNX= obj4_snx.o obj5_snx.o obj6_snx.o
 OBJ_SNX= obja.o objb.o objc.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -81,6 +83,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -101,13 +106,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_SNX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_SNX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -119,36 +119,39 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_snx.o:		$(OBJ0_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_SNX)
+obj0_snx.o:		$(OBJ0_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_snx.o:		$(OBJ1_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_SNX)
+obj1_snx.o:		$(OBJ1_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_snx.o:		$(OBJ2_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_SNX)
+obj2_snx.o:		$(OBJ2_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_snx.o:		$(OBJ3_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_SNX)
+obj3_snx.o:		$(OBJ3_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4_snx.o:		$(OBJ4_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_SNX)
+obj4_snx.o:		$(OBJ4_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj5_snx.o:		$(OBJ5_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_SNX)
+obj5_snx.o:		$(OBJ5_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj6_snx.o:		$(OBJ6_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6_SNX)
+obj6_snx.o:		$(OBJ6_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obja.o:			$(OBJA_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_SNX)
+obja.o:			$(OBJA_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb.o:			$(OBJB_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_SNX)
+objb.o:			$(OBJB_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objc.o:			$(OBJC_SNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_SNX)
+objc.o:			$(OBJC_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 snuuid.o:		snuuid.cc			$(INCS)
