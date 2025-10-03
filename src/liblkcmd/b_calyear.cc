@@ -82,7 +82,6 @@
 #include	"b_calyear.h"
 #include	"defs.h"
 #include	"calyear.h"
-#include	"manstr.h"
 
 
 /* local defines */
