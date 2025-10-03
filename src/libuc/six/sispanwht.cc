@@ -28,8 +28,8 @@
 	int sispanwht(cchar *sp,int sl) noex
 
 	Arguments:
-	sp	string to be examined
-	sl	length of string of break character to break on
+	sp	c-string pointer
+	sl	c-string length
 
 	Returns:
 	>0	number of characters skipped
@@ -74,7 +74,7 @@
 
 /* local variables */
 
-constexpr cauto		iswht = char_iswhite ;
+cauto		iswht = char_iswhite ;
 
 
 /* exported variables */
@@ -87,7 +87,7 @@ int sispanwht(cchar *sp,int sl) noex {
 	if (sp) ylikely {
 	    for (i = 0 ; sl-- && sp[i] ; i += 1) {
 	        if (! iswht(sp[i])) break ;
-	    } /* end while */
+	    } /* end for */
 	} /* end if (non-null) */
 	return i ;
 }
