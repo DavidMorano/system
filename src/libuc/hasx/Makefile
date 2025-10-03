@@ -40,12 +40,13 @@ MODS +=
 LIBS +=
 
 
-OBJ0= hasmain.o hasuniq.o
+OBJ0= hasmain.o 
 OBJ1= hasvarprefix.o
 OBJ2= hasmodname.o
-OBJ3=
+OBJ3= hasuniq.o haslead.o
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
 
 OBJ= obja.o 
 
@@ -131,10 +132,15 @@ obj3.o:			$(OBJ3)
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-hasxmain.o:		hasmain.cc			$(INCS)
-hasuniq.o:		hasuniq.cc			$(INCS)
-hasvarprefix.o:		hasvarprefix.cc			$(INCS)
-hasmodname.o:		hasmodname.cc			$(INCS)
+
+hasxmain.o:		hasmain.cc				$(INCS)
+hasvarprefix.o:		hasvarprefix.cc				$(INCS)
+hasmodname.o:		hasmodname.cc				$(INCS)
+
+hasuniq.o:		hasuniq.cc	hasuniq.h		$(INCS)
+haslead.o:		haslead.cc	haslead.h		$(INCS)
 
 
