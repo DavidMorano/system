@@ -103,8 +103,7 @@ int sileader(cchar *sp,int sl) noex {
 	            sl -= si ;
 	        }
 		if (sl > 0) {
-	            cint	ch = mkchar(sp[0]) ;
-	            if (isdigitlatin(ch)) {
+	            if (cint ch = mkchar(sp[0]) ; isdigitlatin(ch)) {
 		        if (int ci ; (ci = sibrk(sp,sl," \t")) >= 0) {
 	                    si += (ci + 1) ;
 			    {
@@ -115,7 +114,7 @@ int sileader(cchar *sp,int sl) noex {
 	                } else {
 	                    si = 0 ;
 		        }
-	        } /* end if (is-digit) */
+	            } /* end if (is-digit) */
 		} /* end if (non-zero positive) */
 	    } /* end if (positive) */
 	} /* end if (non-null) */
