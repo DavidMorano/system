@@ -21,7 +21,7 @@
 
 	Description:
 	Find a string-index that skips over leading zero character
-	('0') and leading whitespace (until one reaches a non-zero
+	('0') or leading whitespace (until one reaches a non-zero
 	character or a non-whitespace character).  A trailing zero
 	character or a trailing whitespace character is left alone.
 
