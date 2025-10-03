@@ -73,7 +73,6 @@
 #include	"b_holiday.h"
 #include	"defs.h"
 #include	"holidayer.h"
-#include	"manstr.h"
 
 
 /* local defines */
