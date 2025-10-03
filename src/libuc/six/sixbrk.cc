@@ -54,7 +54,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
+#include	<cstring>		/* |strchr(3c)| + |strcspn(3n)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -114,12 +114,12 @@ int siobrk(cchar *sp,int sl,const chrset &sset) noex {
 } /* end subroutine (siobrk) */
 
 int siobrk(cchar *sp,int sl,cchar *ss) noex {
+	cnullptr	np{} ;
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	if (sp && ss) ylikely {
 	    if (sl >= 0) {
 	        if_constexpr (f_strchr) {
-	            cnullptr	np{} ;
 	            for (i = 0 ; sl && sp[i] ; i += 1) {
 		        cint	ch = mkchar(sp[i]) ;
 		        f = (strchr(ss,ch) != np) ;
