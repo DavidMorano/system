@@ -82,7 +82,7 @@ int sispan(cchar *sp,int sl,cchar *strclass) noex {
 	if (sp && strclass) {
 	    for (i = 0 ; sl-- && sp[i] ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;
-	        if (strchr(strclass,ch) != nullptr) break ;
+	        if (strchr(strclass,ch) == nullptr) break ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return i ;
