@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* has a counted c-string some characteristic? */
+/* has a counted c-string contain a C+ module-name? */
 /* version %I% last-modified %G% */
 
 
@@ -22,7 +22,7 @@
 
 	Description:
 	This subroutine checks if a specified c-string has a (reasonably)
-	value C++ module name.
+	valid C++ module name.
 
 	Synopsis:
 	int hasmodname(cchar *sp,int sl) noex
@@ -49,7 +49,7 @@
 #include	<ischarx.h>		/* |salphalatin(3u)| */
 #include	<localmisc.h>		/* |UC(3dam)| */
 
-#include	"hasx.h"
+#include	"hasmodname.h"
 
 import libutil ;			/* |lenstr(3u)| */
 
