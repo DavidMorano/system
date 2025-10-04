@@ -24,6 +24,20 @@
 	Description:
 	This subroutine joins a UNIX® socket of the datagram variety.
 
+	Synopsis:
+	int uc_joinus(int fd,SOCKADDR *sap,int sal,int of,mode_t om) noex
+
+	Arguments:
+	fd		file-descriptor
+	sap		socket-address pointer
+	sal		socket-address length
+	of		open-flags
+	om		open-mode
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
