@@ -137,10 +137,10 @@ objb.o:			$(OBJB)
 
 
 hasxmain.o:		hasmain.cc				$(INCS)
-hasvarprefix.o:		hasvarprefix.cc				$(INCS)
 hasmodname.o:		hasmodname.cc				$(INCS)
 
 hasuniq.o:		hasuniq.cc	hasuniq.h		$(INCS)
 haslead.o:		haslead.cc	haslead.h		$(INCS)
+hasvarprefix.o:		hasvarprefix.cc	hasvarprefix.h		$(INCS)
 
 
