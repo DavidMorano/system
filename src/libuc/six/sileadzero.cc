@@ -22,8 +22,10 @@
 	Description:
 	Find a string-index that skips over leading zero character
 	('0') or leading whitespace (until one reaches a non-zero
-	character or a non-whitespace character).  A trailing zero
+	character and a non-whitespace character).  A trailing zero
 	character or a trailing whitespace character is left alone.
+	This subroutine is the same as |sispan(3uc)| with a specified
+	span-class that consists of white-space and a '0' character.
 
 	Synopsis:
 	int sileadzero(cchar *sp,int sl) noex
