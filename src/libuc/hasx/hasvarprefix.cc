@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* has a counted c-string some characteristic? */
+/* does a counted c-string have a varoable-prefix? */
 /* version %I% last-modified %G% */
 
 
@@ -47,11 +47,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ascii.h>
-#include	<mkchar.h>
 #include	<localmisc.h>		/* |UC(3dam)| */
 
-#include	"hasx.h"
+#include	"hasvarprefix.h"
 
 /* local defines */
 
