@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* ID acquisition and stoage */
+/* load up the process identification information (IDs) */
 /* version %I% last-modified %G% */
 
 
