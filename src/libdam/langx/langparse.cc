@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* Quoted-Printable (QP) decoding */
+/* Language-Parse */
 /* version %I% last-modified %G% */
 
 
@@ -62,7 +62,9 @@
 
 #include	"langparse.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -213,7 +215,7 @@ int langparse_load(langparse *op,cchar *sp,int µsl) noex {
 	                            op->fl.esc = false ;
 	                        }
 	                    } else {
-	                        int		si ;
+	                        int	si ;
 	                        while ((si = sichr(sp,sl,'=')) >= 0) {
 	                            op->fl.esc = true ;
 	                            if (si > 0) {
