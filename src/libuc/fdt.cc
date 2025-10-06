@@ -27,9 +27,22 @@
 #include	"ucb.h"
 
 
-/* local variables */
+/* local defines */
 
-static FDT	fdt ;
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -39,6 +52,8 @@ static int	fdt_free(FDT *,int) noex ;
 
 
 /* local variables */
+
+static FDT	fdt ;
 
 
 /* exported variables */
@@ -51,7 +66,7 @@ static int fdt_alloc(FDT *op,int fd,UCB *rpp) noex {
 	int	rs = SR_OK ;
 	int	sz ;
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != FDT_MAGIC) {
@@ -71,13 +86,12 @@ static int fdt_alloc(FDT *op,int fd,UCB *rpp) noex {
 	}
 
 	for (int i = 0 ; vecobj_get(&op->entries,i,&ep) >= 0 ; i += 1) {
-		if (ep == NULL) continue ;
-
+	    if (ep) {
 		if (ep->fd == fd) {
 
 
 		}
-
+	    }
 	} /* end for */
 
 /* allocate a new one */
@@ -89,22 +103,16 @@ ret0:
 /* end subroutine (fdt_alloc) */
 
 static int fdt_getentry(FDT *op,int fd,FDT_ENT **rpp) noex {
-	FDT_ENT	*ep ;
-	int	rs ;
-
-	*rpp = NULL ;
-	for (int i = 0 ; (rs = vecobj_get(&op->entries,i,&ep)) >= 0 ; i += 1) {
-
-		if (ep == NULL) continue ;
-
-		if (ep->fd == fd)
-			break ;
-
+	FDT_ENT		*ep = nullptr ;
+	vecobj		*flp = &op->entries ;
+	int		rs ;
+	*rpp = nullptr ;
+	for (int i = 0 ; (rs = flp->get(i,&ep)) >= 0 ; i += 1) {
+	    if (ep) {
+		if (ep->fd == fd) break ;
+	    }
 	} /* end for */
-
-	if (rs >= 0)
-		*rpp = ep ;
-
+	if (rs >= 0) *rpp = ep ;
 	return rs ;
 }
 /* end subroutine (fdt_getentry) */
