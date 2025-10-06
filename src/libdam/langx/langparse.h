@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* Quoted-Printable (QP) decoder */
+/* Language-Parse */
 /* version %I% last-modified %G% */
 
 
