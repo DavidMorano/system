@@ -42,6 +42,8 @@ LIBS +=
 
 OBJ0= ucsigset.o ucsigx.o
 OBJ1= 
+OBJ2=
+OBJ3=
 
 OBJA= obj0.o
 
@@ -100,9 +102,6 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).a:			$(OBJ)
-	$(AR) $(ARFLAGS) -rc $@ $?
-
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
@@ -126,18 +125,6 @@ obj2.o:			$(OBJ2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj6.o:			$(OBJ6)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
