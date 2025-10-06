@@ -310,7 +310,7 @@
 
 #include	"hasx.h"
 
-import libutil ;			/* |lenstr(3u)| */
+import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
@@ -429,7 +429,7 @@ bool hasempty(cchar *sp,int sl) noex {
 bool hasdots(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
-	    if (sp[0] == '.') {
+	    if ((sl != 0) && (sp[0] == '.')) {
 	        if (sl < 0) sl = lenstr(sp) ;
 	        f = f || (sl == 1) ;
 	        f = f || ((sl == 2) && (sp[1] == '.')) ;
