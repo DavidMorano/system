@@ -82,7 +82,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cmath>			/* |tgamma(3m++)| */
@@ -157,8 +156,7 @@ template<typename T> static T factorialx(int n) noex {
 long factorial(int n) noex {
 	long		v = -1 ;
 	if (n >= 0) {
-	    cint	ne = nelem(facts) ;
-	    if (n < ne) {
+	    if (cint ne = nelem(facts) ; n < ne) {
 	        v = facts[n] ;
 	    }
 	}
