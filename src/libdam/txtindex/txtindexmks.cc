@@ -74,8 +74,8 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -110,7 +110,9 @@
 #include	"txtindexhdr.h"
 #include	"naturalwords.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -174,9 +176,9 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -192,15 +194,6 @@ typedef int *	rectab_t ;
 /* external variables */
 
 
-/* exported variables */
-
-txtindexmks_obj	txtindexmks_modinfo = {
-	"txtindexmks",
-	szof(txtindexmks),
-	0
-} ;
-
-
 /* local structures */
 
 struct vars {
@@ -214,9 +207,9 @@ struct vars {
 template<typename ... Args>
 static int txtindexmks_ctor(txtindexmks *op,Args ... args) noex {
 	TXTINDEXMKS	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->eigenp = new(nothrow) strtab) != np) {
@@ -302,6 +295,12 @@ constexpr char	zerobuf[4] = {
 
 /* exported variables */
 
+txtindexmks_obj	txtindexmks_modinfo = {
+	"txtindexmks",
+	szof(txtindexmks),
+	0
+} ;
+
 
 /* exported subroutines */
 
@@ -318,7 +317,7 @@ int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	            op->pi = *pp ; /* copy the given parameters */
 	            op->fl.ofcreat = MKBOOL(of & O_CREAT) ;
 	            op->fl.ofexcl = MKBOOL(of & O_EXCL) ;
-	            if (cchar *cp ; (rs = uc_mallocstrw(db,-1,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = mem.strw(db,-1,&cp)) >= 0) {
 	                op->dbname = cp ;
 	                if ((rs = txtindexmks_checkparams(op)) >= 0) {
 	                    if ((rs = txtindexmks_idxdirbegin(op)) >= 0) {
@@ -339,7 +338,8 @@ int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	                } /* end if (check-params) */
 	                if (rs < 0) {
 	                    if (op->dbname != nullptr) {
-	                        uc_free(op->dbname) ;
+				void *vp = voidp(op->dbname) ;
+	                        mem.free(vp) ;
 	                        op->dbname = nullptr ;
 	                    }
 	                }
@@ -389,7 +389,8 @@ int txtindexmks_close(TIM *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->dbname) {
-	        rs1 = uc_free(op->dbname) ;
+		void *vp = voidp(op->dbname) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbname = nullptr ;
 	    }
@@ -509,8 +510,7 @@ static int txtindexmks_filesbeginc(TIM *op) noex {
 	int		ai = 0 ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_TAG	 ;
-	char		*ap ;
-	if ((rs = uc_malloc((szinc * 2),&ap)) >= 0) {
+	if (char *ap ; (rs = mem.mall((szinc * 2),&ap)) >= 0) {
 	    char	*tbuf = (ap + (szinc * ai++)) ;
 	    if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
 	        cmode	om = op->om ;
@@ -527,9 +527,8 @@ static int txtindexmks_filesbeginc(TIM *op) noex {
 	            char	ostr[8] = "wc" ;
 	            if (op->fl.ofexcl) strcat(ostr,"e") ;
 	            if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
-	                cchar	*cp ;
 	    	        op->fl.created = true ;
-	                if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
+	                if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
 	                    op->ntagfname = charp(cp) ;
 	                }
 	                if (rs < 0) {
@@ -541,7 +540,7 @@ static int txtindexmks_filesbeginc(TIM *op) noex {
 		    }
 	        } /* end if (ok) */
 	    } /* end if (mknewfname) */
-	    rs1 = uc_free(ap) ;
+	    rs1 = mem.free(ap) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -580,9 +579,8 @@ static int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
 	int		rs ;
 	char		ostr[8] = "wce" ;
 	if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
-	    cchar	*cp ;
 	    op->fl.created = true ;
-	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
 		op->ntagfname = (char *) cp ;
 	    }
 	    if (rs < 0) {
@@ -605,7 +603,8 @@ static int txtindexmks_filesend(TIM *op) noex {
 	    if (op->fl.created && (op->ntagfname[0] != '\0')) {
 	        u_unlink(op->ntagfname) ;
 	    }
-	    rs1 = uc_free(op->ntagfname) ;
+	    void *vp = voidp(op->ntagfname) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->ntagfname = nullptr ;
 	}
@@ -613,7 +612,8 @@ static int txtindexmks_filesend(TIM *op) noex {
 	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
 	    }
-	    rs1 = uc_free(op->nidxfname) ;
+	    void *vp = voidp(op->nidxfname) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nidxfname = nullptr ;
 	}
@@ -634,10 +634,9 @@ static int txtindexmks_idxdirbegin(TIM *op) noex {
 	        rs = mkpath1w(tbuf,dnp,dnl) ;
 	    }
 	    if (rs >= 0) {
-	        int	am = (X_OK | W_OK) ;
+	        cint	am = (X_OK | W_OK) ;
 	        if ((rs = perm(tbuf,-1,-1,nullptr,am)) >= 0) {
-	            cchar	*cp ;
-	            if ((rs = uc_mallocstrw(tbuf,dnl,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = mem.strw(tbuf,dnl,&cp)) >= 0) {
 	                op->idname = cp ;
 	            }
 	        }
@@ -651,7 +650,8 @@ static int txtindexmks_idxdirend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->idname != nullptr) {
-	    rs1 = uc_free(op->idname) ;
+	    void *vp = voidp(op->idname) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->idname = nullptr ;
 	}
@@ -662,8 +662,7 @@ static int txtindexmks_idxdirend(TIM *op) noex {
 static int txtindexmks_listbegin(TIM *op) noex {
 	int		sz = int(op->pi.tablen * szof(LISTOBJ)) ;
 	int		rs ;
-	void		*vp ;
-	if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	if (void *vp ; (rs = mem.mall(sz,&vp)) >= 0) {
 	    LISTOBJ	*lop = (LISTOBJ *) vp ;
 	    cint	lo = LISTOBJ_OORDERED ;
 	    int		n = 0 ;
@@ -689,7 +688,7 @@ static int txtindexmks_listbegin(TIM *op) noex {
 	        }
 	    }
 	    if (rs < 0) {
-	        uc_free(op->lists) ;
+	        mem.free(op->lists) ;
 	        op->lists = nullptr ;
 	    }
 	} /* end if (m-a) */
@@ -713,7 +712,7 @@ static int txtindexmks_listend(TIM *op) noex {
 	    }
 	}
 	if (op->lists != nullptr) {
-	    rs1 = uc_free(op->lists) ;
+	    rs1 = mem.free(op->lists) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->lists = nullptr ;
 	}
@@ -889,12 +888,11 @@ static int txtindexmks_mkhashwrhdr(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 /* end subroutine (txtindexmks_mkhashwrhdr) */
 
 static int txtindexmks_mkhashwrtab(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
-	int		*table = nullptr ;
 	int		tsz = op->pi.tablen * szof(uint) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ; /* return-value */
-	if ((rs = uc_malloc(tsz,&table)) >= 0) {
+	if (int *table ; (rs = mem.mall(tsz,&table)) >= 0) {
 	    cint	tablen = int(op->pi.tablen) ;
 	    hdrp->listoff = off ;
 	    for (int i = 0 ; (rs >= 0) && (i < tablen) ; i += 1) {
@@ -910,7 +908,7 @@ static int txtindexmks_mkhashwrtab(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 	        off += rs ;
 	        wlen += rs ;
 	    }
-	    rs1 = uc_free(table) ;
+	    rs1 = mem.free(table) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? wlen : rs ;
@@ -927,8 +925,7 @@ static int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
 	if ((rs = LISTOBJ_COUNT(lop)) > 0) {
 	    cint	c = rs ;
 	    cint	asize = ((c+1)*szof(int)) ;
-	    int		*va ;
-	    if ((rs = uc_malloc(asize,&va)) >= 0) {
+	    if (int *va ; (rs = mem.mall(asize,&va)) >= 0) {
 	        if ((rs = LISTOBJ_MKVEC(lop,va)) >= 0) {
 		    cint	maxtags = int(op->ti.maxtags) ;
 	            if (c > maxtags) {
@@ -950,7 +947,7 @@ static int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
 	                } /* end if (filer_write) */
 	            } /* end if (positive) */
 	        } /* end if (LISTINT_MKVEC) */
-	        uc_free(va) ;
+	        mem.free(va) ;
 	    } /* end if (m-a) */
 	} else if (rs == 0) {
 	    tab[i] = 0 ;
@@ -967,10 +964,9 @@ static int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	if ((rs = strtab_strsize(elp)) >= 0) {
 	    cint	nskip = TXTINDEXMKS_NSKIP ;
 	    int		essize = rs ;
-	    char	*estab = nullptr ;
 	    hdrp->eiskip = nskip ;
 	    if (essize > 0) {
-	        if ((rs = uc_malloc(essize,&estab)) >= 0) {
+	        if (char *estab ; (rs = mem.mall(essize,&estab)) >= 0) {
 	            hdrp->esoff = off ;
 	            hdrp->essize = essize ;
 	            if ((rs = strtab_strmk(elp,estab,essize)) >= 0) {
@@ -978,11 +974,11 @@ static int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	                off += rs ;
 	                wlen += rs ;
 	            }
-	            uc_free(estab) ;
+	            mem.free(estab) ;
 	        } /* end if (eigen-string table) */
 
 	        if (rs >= 0) {
-	            int		ersize = 0 ;
+	            int		ersz = 0 ;
 	            int		n ;
 	            int		erlen ;
 	            int		*ertab = nullptr ;
@@ -991,49 +987,46 @@ static int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	            erlen = (n+1) ;
 
 	            if ((rs = strtab_recsize(op->eigenp)) >= 0) {
-	                void	*vp ;
-	                ersize = rs ;
-	                if ((rs = uc_malloc(ersize,&vp)) >= 0) {
+	                ersz = rs ;
+	                if (void *vp ; (rs = mem.mall(ersz,&vp)) >= 0) {
 	                    ertab = rectab_t(vp) ;
-	                    hdrp->ersize = ersize ;
+	                    hdrp->ersize = ersz ;
 	                    hdrp->eroff = off ;
 	                    hdrp->erlen = erlen ;
-	                    if ((rs = strtab_recmk(elp,ertab,ersize)) >= 0) {
-	                        rs = filer_write(hfp,ertab,ersize) ;
+	                    if ((rs = strtab_recmk(elp,ertab,ersz)) >= 0) {
+	                        rs = filer_write(hfp,ertab,ersz) ;
 	                        off += rs ;
 	                        wlen += rs ;
 	                    }
-	                    uc_free(ertab) ;
+	                    mem.free(ertab) ;
 	                } /* end if (memory-allocation) */
 	            } /* end if (recsize) */
 
 	        } /* end if (eigen-record table) */
 
 	        if (rs >= 0) {
-	            int		eisize = 0 ;
+	            int		eisz = 0 ;
 	            int		eilen ;
 	            int		(*eitab)[3] = nullptr ;
 
 	            eilen = strtab_indlen(elp) ;
 
 	            if ((rs = strtab_indsize(elp)) >= 0) {
-	                void	*vp ;
-	                eisize = rs ;
-	                if ((rs = uc_malloc(eisize,&vp)) >= 0) {
+	                eisz = rs ;
+	                if (void *vp ; (rs = mem.mall(eisz,&vp)) >= 0) {
 	                    eitab = idxtab_t(vp) ;
-
-	                    hdrp->eisize = eisize ;
+	                    hdrp->eisize = eisz ;
 	                    hdrp->eioff = off ;
 	                    hdrp->eilen = eilen ;
-	                    rs = strtab_indmk(elp,eitab,eisize,nskip) ;
+	                    rs = strtab_indmk(elp,eitab,eisz,nskip) ;
 
 	                    if (rs >= 0) {
-	                        rs = filer_write(hfp,eitab,eisize) ;
+	                        rs = filer_write(hfp,eitab,eisz) ;
 	                        off += rs ;
 	                        wlen += rs ;
 	                    }
 
-	                    uc_free(eitab) ;
+	                    mem.free(eitab) ;
 	                } /* end if (memory-allocation) */
 	            } /* end if (indsize) */
 
@@ -1067,8 +1060,7 @@ static int txtindexmks_nhashopen(TIM *op) noex {
 	        op->nfd = rs ;
 	    }
 	    if (rs >= 0) {
-	        cchar	*cp ;
-	        if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
 	            op->nidxfname = (char *) cp ;
 	        }
 	    } /* end if (ok) */
@@ -1150,24 +1142,23 @@ static int txtindexmks_printeigen(TIM *op) noex {
 	    int		erlen = (rs+1) ;
 	    if ((rs = strtab_strsize(edp)) >= 0) {
 		int	essize = rs ;
-		char	*estab ;
-		if ((rs = uc_malloc(essize,&estab)) >= 0) {
+		if (char *estab ; (rs = mem.mall(essize,&estab)) >= 0) {
 		    if ((rs = strtab_strmk(edp,estab,essize)) >= 0) {
 			if ((rs = strtab_recsize(edp)) >= 0) {
-			    int	ersize = rs ;
-			    int	*ertab ;
-			    if ((rs = uc_malloc(ersize,&ertab)) >= 0) {
-				struct printeigen	a ;
+			    int	ersz = rs ;
+			    int *ertab ; 
+			    if ((rs = mem.mall(ersz,&ertab)) >= 0) {
+				printeigen	a ;
 				a.ertab = ertab ;
 				a.estab = estab ;
-				a.ersize = ersize ;
+				a.ersz = ersz ;
 				a.erlen = erlen ;
 				rs = txtindexmks_printeigener(op,&a) ;
-				uc_free(ertab) ;
+				mem.free(ertab) ;
 			    } /* end if (m-a) */
 			}
 		    }
-		    uc_free(estab) ;
+		    mem.free(estab) ;
 		} /* end if (m-a) */
 	    }
 	}
@@ -1181,16 +1172,16 @@ static int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
 	int		rs1 ;
 	int		*ertab = ap->ertab ;
 	char		*estab = ap->estab ;
-	int		ersize = ap->ersize ;
+	int		ersz = ap->ersz ;
 	int		erlen = ap->erlen ;
-	if ((rs = strtab_recmk(edp,ertab,ersize)) >= 0) {
+	if ((rs = strtab_recmk(edp,ertab,ersz)) >= 0) {
 	    if ((rs = strtab_indsize(edp)) >= 0) {
 		int	(*eitab)[3] ;
-		int	eisize = rs ;
+		int	eisz = rs ;
 		int	eilen = strtab_indlen(edp) ;
-		if ((rs = uc_malloc(eisize,&eitab)) >= 0) {
+		if ((rs = mem.mall(eisz,&eitab)) >= 0) {
 		    int	ns = TXTINDEXMKS_NSKIP ;
-		    if ((rs = strtab_indmk(edp,eitab,eisize,ns)) >= 0) {
+		    if ((rs = strtab_indmk(edp,eitab,eisz,ns)) >= 0) {
 			int	si ;
 			int	sl ;
 			cchar	*sp ;
@@ -1208,7 +1199,7 @@ static int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
 	    		    debugprintf(fmt,rs1) ;
 			} /* end for */
 		    } /* end if (strtab_indmk) */
-		    rs1 = uc_free(eitab) ;
+		    rs1 = mem.free(eitab) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a) */
 	    } /* end if (strtab_indsize) */
@@ -1227,10 +1218,9 @@ static int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
 /* end subroutine (mknewfname) */
 
 static int unlinkstale(cchar *fn,int to) noex {
-	USTAT		sb ;
 	custime		dt = getustime ;
 	int		rs ;
-	if ((rs = uc_stat(fn,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_stat(fn,&sb)) >= 0) {
 	    if ((dt-sb.st_mtime) >= to) {
 		uc_unlink(fn) ;
 		rs = 1 ;
@@ -1246,7 +1236,7 @@ static int unlinkstale(cchar *fn,int to) noex {
 
 static int mkvars() noex {
 	int		rs ;
-	if ((rs = uc_pagesize()) >= 0) {
+	if ((rs = ucpagesize) >= 0) {
 	    var.pagesize = rs ;
 	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 	        var.maxpathlen = rs ;
