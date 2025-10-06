@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get the value of a single hexadecimal digit */
+/* get the value of a single numeric digit */
 /* version %I% last-modified %G% */
 
 
