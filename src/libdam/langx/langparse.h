@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* Language-Parse */
+/* Language-Parse (replacement for LANGSTATE) */
 /* version %I% last-modified %G% */
 
 
