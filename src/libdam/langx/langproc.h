@@ -72,7 +72,7 @@ struct langproc : langproc_head {
 	    finish	(this,langprocmem_finish) ;
 	    count	(this,langprocmem_count) ;
 	    magic = 0 ;
-	} ;
+	} ; /* end ctor */
 	langproc(const langproc &) = delete ;
 	langproc &operator = (const langproc &) = delete ;
 	int proc(int,cchar *,int = -1) noex ;
