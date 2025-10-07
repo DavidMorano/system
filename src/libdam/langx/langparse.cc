@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* Language-Parse */
+/* Language-Parse (replacement for LANGSTATE) */
 /* version %I% last-modified %G% */
 
 
@@ -151,7 +151,7 @@ int langparse_start(langparse *op,int f_space) noex {
 		}
 		if (rs < 0) {
 		    delete obp ;
-		}
+		} /* end if (error) */
 	    } else {
 	        rs = SR_NOMEM ;
 	    } /* end if (new-obuf) */
@@ -177,7 +177,7 @@ int langparse_finish(langparse *op) noex {
 	            delete obp ;
 	            op->outbuf = nullptr ;
 		}
-	    }
+	    } /* end if (outbuf) */
 	    {
 		rs1 = langparse_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
