@@ -114,7 +114,7 @@ local int langproc_ctor(langproc *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete lsp ;
 		    op->lsp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-langstate) */
 	} /* end if (non-null) */
 	return rs ;
