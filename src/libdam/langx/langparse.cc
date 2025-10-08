@@ -10,7 +10,9 @@
 
 	= 2016-06-29, David A­D­ Morano
 	This was made from scratch, although it is (very) similar to
-	many others that I have made like it.
+	several others that I have made like it in the past.  The
+	problem that this code is *supposed* to solve has been
+	handled (poorly) for a long time now.
 
 	= 2018-12-14, David A-D- Morano
 	Made a small enhancement for error handling.
