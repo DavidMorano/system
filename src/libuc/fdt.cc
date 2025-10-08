@@ -62,9 +62,9 @@ static FDT	fdt ;
 /* private subroutines */
 
 static int fdt_alloc(FDT *op,int fd,UCB *rpp) noex {
-	FDT_ENT	*ep ;
-	int	rs = SR_OK ;
-	int	sz ;
+	FDT_ENT		*ep ;
+	int		rs = SR_OK ;
+	int		sz ;
 
 	if (op == nullptr)
 	    return SR_FAULT ;
