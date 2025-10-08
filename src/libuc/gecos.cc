@@ -38,7 +38,7 @@
 	the corresponding username of the entry.  This substitution is
 	not done in this module.
 
-	The original AT&T gecos field contained:
+	The original AT&T GECOS field contained:
 
 	    department-name(account,bin)
 
@@ -51,17 +51,27 @@
 
 	If a real-name 'name' contains a hyphen character naturally
 	(it is part of the actual real-name) then it should be
-	entered into the gecos field with an underscore substituted
+	entered into the GECOS field with an underscore substituted
 	for where original hyphen charaters appear.  These are
 	converted back to hyphen characters when read out to callers
 	by various "read-out" subroutine interfaces.  This object
 	does not do this "hyphen" conversion itself and so a higher
 	level interface must perform that function.
 
-	Some alternatives for the gecos field are:
+	Some alternatives for the GECOS field are:
 
 	    orgdept-name(account,bin)office,workphone,homephone
 	    orgdept-name(account,bin)office,workphone,homephone,printer
+
+	Fields:
+		orgdept		organization-department
+		name		real-name
+		account		account number
+		bin		printer bin
+		office		office address
+		workphone	work phone number
+		homephone	home phone number
+		printer		default printer name
 
 	Actual examples:
 
@@ -86,14 +96,15 @@
 
 #include	"gecos.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
