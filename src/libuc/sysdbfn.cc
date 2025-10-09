@@ -202,7 +202,7 @@ int sysdbmgr::init() noex {
 	        if (rs < 0) {
 	            finit = false ;
 		}
-	    } else if (!finitdone) {
+	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
 	            int		rsl = SR_OK ;
