@@ -196,63 +196,8 @@ int langparse_load(langparse *op,cchar *sp,int µsl) noex {
 	if ((rs = langparse_magic(op,sp)) >= 0) {
 	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	        if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
-	            if (op->fl.space) {
-	                rs = langparse_loadspace(op,sp,sl) ;
-	                c += rs ;
-	            } else {
-	                cint	nl = nstage ;
-	                while ((rs >= 0) && (sl > 0)) {
-	                    if (op->fl.esc) {
-	                        cint	rl = op->rl ;
-	                        int	ml = min(sl,(nl - op->rl)) ;
-	                        char	*rb = op->rb ;
-	                        strwcpy((rb + rl),sp,ml) ;
-	                        op->rl += ml ;
-	                        sp += ml ;
-	                        sl -= ml ;
-	                        if (rl == nl) {
-	                            rs = langparse_cvt(op) ;
-	                            c += rs ;
-	                            op->rl = 0 ;
-	                            op->fl.esc = false ;
-	                        }
-	                    } else {
-	                        int	si ;
-	                        while ((si = sichr(sp,sl,'=')) >= 0) {
-	                            op->fl.esc = true ;
-	                            if (si > 0) {
-	                                rs = langparse_add(op,sp,si) ;
-	                                c += rs ;
-	                                sp += si ;
-	                                sl -= si ;
-	                            }
-	                            sp += 1 ;
-	                            sl -= 1 ;
-	                            if ((rs >= 0) && (sl > 0)) {
-	                                cint	rl = op->rl ;
-	                                int	ml = min(sl,(nl - op->rl)) ;
-	                                char	*rb = op->rb ;
-	                                strwcpy((rb + rl),sp,ml) ;
-	                                op->rl += ml ;
-	                                sp += ml ;
-	                                sl -= ml ;
-	                                if (op->rl == nl) {
-	                                    rs = langparse_cvt(op) ;
-	                                    c += rs ;
-	                                    op->rl = 0 ;
-	                                    op->fl.esc = false ;
-	                                }
-	                            } /* end if */
-			            if (rs < 0) break ;
-	                        } /* end while */
-	                        if ((rs >= 0) && (sl > 0)) {
-	                            rs = langparse_add(op,sp,sl) ;
-	                            c += rs ;
-	                            sl = 0 ;
-	                        } /* end if (remaining source) */
-	                    } /* end if (escape or not) */
-	                } /* end while */
-	            } /* end if (space or not) */
+		    rs = langparse_procln(sp,sl) ;
+		    c = rs ;
 	        } else {
 	            rs = SR_BUGCHECK ;
 	        }
@@ -290,6 +235,90 @@ int langparse_read(langparse *op,char *rbuf,int rlen) noex {
 
 
 /* private subroutines */
+
+local int langparse_proc(langparse *op,int ln,int ch) noex {
+	int		rs ;
+	int		f = false ; /* return-value */
+	if ((rs = langparse_magic(op)) >= 0) {
+	    f = op->fl.clear ;
+	    if (op->fl.comment) {
+	        if ((op->pch == CH_STAR) && (ch == CH_SLASH)) {
+		    op->fl.comment = false ;
+		    op->fl.clear = true ;
+		    op->line = 0 ;
+	        }
+	    } else if (op->fl.quote) {
+	        if (op->fl.skip) {
+		    op->fl.skip = false ;
+	        } else {
+		    if (ch == CH_BSLASH) {
+		        op->fl.skip = true ;
+	            } else if (ch == CH_DQUOTE) {
+		        op->fl.quote = false ;
+		        op->fl.clear = true ;
+		        op->line = 0 ;
+		    }
+	        }
+	    } else if (op->fl.literal) {
+	        if (op->fl.skip) {
+		    op->fl.skip = false ;
+	        } else {
+		    if (ch == CH_BSLASH) {
+		        op->fl.skip = true ;
+	            } else if (ch == CH_SQUOTE) {
+		        op->fl.literal = false ;
+		        op->fl.clear = true ;
+		        op->line = 0 ;
+		    }
+	        }
+	    } else {
+	        switch (ch) {
+	        case CH_STAR:
+		    if (op->pch == CH_SLASH) {
+		        op->fl.comment = true ;
+		        op->fl.clear = false ;
+		        op->line = ln ;
+		        f = false ;
+		    }
+		    break ;
+	        case CH_DQUOTE:
+		    if ((op->pch != CH_BSLASH) && (op->pch != CH_SQUOTE)) {
+		        op->fl.quote = true ;
+		        op->fl.clear = false ;
+		        op->line = ln ;
+		        f = false ;
+		    }
+		    break ;
+	        case CH_SQUOTE:
+		    if (op->pch != CH_BSLASH) {
+		        op->fl.literal = true ;
+		        op->fl.clear = false ;
+		        op->line = ln ;
+		        f = false ;
+		    }
+		    break ;
+	        } /* end switch */
+	    } /* end if */
+	    op->pch = ch ;
+	} /* end if (langparse_magic) */
+	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (langparse_proc) */
+
+local int langparse_procln(langparse *op,int ln,cchar *lp,int ll) noex {
+	int		rs ;
+	int		f = false ; /* return-value */
+	if ((rs = langparse_magic(op,lp)) >= 0) {
+	    while (ll && *lp) {
+		cint ch = mkchar(*lp) ;
+		if ((rs = langparse_proc(op,ln,ch)) > 0) {
+		    if (!f) f = true ;
+		}
+		if (rs < 0) break ;
+	    } /* end while */
+	} /* end if (magic) */
+	return (rs >= 0) ? f : rs ;
+} /* end subroutine (langparse_procln) */
 
 local int langparse_loadspace(langparse *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
