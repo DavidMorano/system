@@ -8,14 +8,14 @@
 
 /* revision history:
 
-	= 2001-03-24, David A­D­ Morano
+	= 2000-05-14, David A-D-­ Morano
 	This code is newly written but modeled after some code that
 	was originally written for the Ethernet-Controller (ETHCON)
 	development work.
 
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SYSDBFN_INCLUDE
 #define	SYSDBFN_INCLUDE
