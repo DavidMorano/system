@@ -64,6 +64,9 @@
 
 #include	"sixbrk.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/chrset.ccm"
+
 import libutil ;			/* |lenstr(3u)| + |xstrcspn(3u)| */
 import chrset ;
 
