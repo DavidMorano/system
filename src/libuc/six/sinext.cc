@@ -50,6 +50,8 @@
 
 #include	"six.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */
@@ -74,8 +76,6 @@ import libutil ;
 
 
 /* local variables */
-
-constexpr cauto		iswht = char_iswhite ;
 
 
 /* exported variables */
