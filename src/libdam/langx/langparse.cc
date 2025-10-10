@@ -36,15 +36,6 @@
 	This object facilitates the parsing of C and C++ language
 	source text.
 
-	Orientation note:
-	Data that is encoded in the Quoted-Printable format is
-	mostly found in MIME-type mail messages.  The data can be
-	either in the mail-message header value fields (header keys
-	still need to be normal -- so far) or the data can be in a
-	section of the mail-message body.  But sometimes data encoded
-	with the Quoted-Printable mechanism are also found outside
-	of any mail-message context.
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -53,10 +44,10 @@
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<six.h>
+#include	<six.h>			/* |sichr(2uc)| */
+#include	<shortq.h>
 #include	<strwcpy.h>
 #include	<digval.h>		/* |digvalhex(3uc)| */
-#include	<obuf.hh>
 #include	<mkchar.h>
 #include	<char.h>
 #include	<ischarx.h>
@@ -80,7 +71,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef obuf *		obufp ;
+typedef shortq *	obufp ;
 
 
 /* external subroutines */
@@ -124,10 +115,9 @@ local inline int langparse_magic(langparse *op,Args ... args) noex {
 }
 /* end subroutine (langparse_magic) */
 
-local int	langparse_loadspace(langparse *,cchar *,int) noex ;
+local int	langparse_proc(langparse *,int) noex ;
 local int	langparse_add(langparse *,cchar *,int) noex ;
 local int	langparse_add(langparse *,int) noex ;
-local int	langparse_cvt(langparse *) noex ;
 
 
 /* local variables */
@@ -145,8 +135,7 @@ int langparse_start(langparse *op,int f_space) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = langparse_ctor(op)) >= 0) {
-	    op->fl.space = bool(f_space) ;
-	    if (obuf *obp ; (obp = new(nt) obuf) != np) {
+	    if (shortq *obp ; (obp = new(nt) shortq) != np) {
 		if ((rs = obp->start) >= 0) {
 	            op->outbuf = obp ;
 	            op->magic = LANGPARSE_MAGIC ;
@@ -156,7 +145,7 @@ int langparse_start(langparse *op,int f_space) noex {
 		} /* end if (error) */
 	    } else {
 	        rs = SR_NOMEM ;
-	    } /* end if (new-obuf) */
+	    } /* end if (new-shortq) */
 	    if (rs < 0) {
 		langparse_dtor(op) ;
 	    }
@@ -169,8 +158,7 @@ int langparse_finish(langparse *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = langparse_magic(op)) >= 0) {
-	    if (op->outbuf) {
-	        obuf 	*obp = obufp(op->outbuf) ;
+	    if (shortq *obp = obufp(op->outbuf) ; obp) {
 		{
 		    rs1 = obp->finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -195,35 +183,39 @@ int langparse_load(langparse *op,cchar *sp,int µsl) noex {
 	int		c = 0 ;
 	if ((rs = langparse_magic(op,sp)) >= 0) {
 	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
-	        if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
-		    rs = langparse_procln(sp,sl) ;
-		    c = rs ;
-	        } else {
-	            rs = SR_BUGCHECK ;
-	        }
+	        while (sl-- && *sp) {
+		    cint ch = mkchar(*sp) ;
+		    rs = langparse_proc(op,ch) ;
+		    c += 1 ;
+		    if (rs < 0) break ;
+	        } /* end while */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (langparse_load) */
 
-int langparse_read(langparse *op,char *rbuf,int rlen) noex {
+int langparse_read(langparse *op,short *rbuf,int rlen) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		i = 0 ; /* return-value */
 	if ((rs = langparse_magic(op,rbuf)) >= 0) {
 	    rs = SR_INVALID ;
-	    rbuf[0] = '\0' ;
+	    rbuf[0] = 0 ;
 	    if (rlen >= 0) {
 	        int	ml ;
-	        if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
+	        if (shortq *obp ; (obp = obufp(op->outbuf)) != np) {
 	            cint	len = obp->len ;
 	            ml = min(len,rlen) ;
 	            for (i = 0 ; i < ml ; i += 1) {
-			cint	ch = obp->at(i) ;
-	                rbuf[i] = charconv(ch) ;
+			if (short code ; (rs = obp->rem(&code)) >= 0) {
+	                    rbuf[i] = code ;
+			} else if (rs == SR_NOTFOUND) {
+			    rs = SR_OK ;
+			    break ;
+			}
 	            } /* end for */
-	            rbuf[i] = '\0' ;
-	            rs = obp->adv(i) ;
+	            rbuf[i] = 0 ;
 	        } else {
 	            rs = SR_BUGCHECK ;
 	        }
@@ -236,7 +228,7 @@ int langparse_read(langparse *op,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-local int langparse_proc(langparse *op,int ln,int ch) noex {
+local int langparse_proc(langparse *op,int ch) noex {
 	int		rs ;
 	int		f = false ; /* return-value */
 	if ((rs = langparse_magic(op)) >= 0) {
@@ -245,7 +237,6 @@ local int langparse_proc(langparse *op,int ln,int ch) noex {
 	        if ((op->pch == CH_STAR) && (ch == CH_SLASH)) {
 		    op->fl.comment = false ;
 		    op->fl.clear = true ;
-		    op->line = 0 ;
 	        }
 	    } else if (op->fl.quote) {
 	        if (op->fl.skip) {
@@ -256,7 +247,6 @@ local int langparse_proc(langparse *op,int ln,int ch) noex {
 	            } else if (ch == CH_DQUOTE) {
 		        op->fl.quote = false ;
 		        op->fl.clear = true ;
-		        op->line = 0 ;
 		    }
 	        }
 	    } else if (op->fl.literal) {
@@ -268,7 +258,6 @@ local int langparse_proc(langparse *op,int ln,int ch) noex {
 	            } else if (ch == CH_SQUOTE) {
 		        op->fl.literal = false ;
 		        op->fl.clear = true ;
-		        op->line = 0 ;
 		    }
 	        }
 	    } else {
@@ -277,7 +266,6 @@ local int langparse_proc(langparse *op,int ln,int ch) noex {
 		    if (op->pch == CH_SLASH) {
 		        op->fl.comment = true ;
 		        op->fl.clear = false ;
-		        op->line = ln ;
 		        f = false ;
 		    }
 		    break ;
@@ -285,7 +273,6 @@ local int langparse_proc(langparse *op,int ln,int ch) noex {
 		    if ((op->pch != CH_BSLASH) && (op->pch != CH_SQUOTE)) {
 		        op->fl.quote = true ;
 		        op->fl.clear = false ;
-		        op->line = ln ;
 		        f = false ;
 		    }
 		    break ;
@@ -293,59 +280,22 @@ local int langparse_proc(langparse *op,int ln,int ch) noex {
 		    if (op->pch != CH_BSLASH) {
 		        op->fl.literal = true ;
 		        op->fl.clear = false ;
-		        op->line = ln ;
 		        f = false ;
 		    }
 		    break ;
 	        } /* end switch */
 	    } /* end if */
+	    if (f) {
+		if (shortq *obp = sbufp(op->outbuf) ; obp) {
+		    cshort code = shortconv(ch) ;
+		    rs = obp->ins(code) ;
+		}
+	    }
 	    op->pch = ch ;
 	} /* end if (langparse_magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (langparse_proc) */
-
-local int langparse_procln(langparse *op,int ln,cchar *lp,int ll) noex {
-	int		rs ;
-	int		f = false ; /* return-value */
-	if ((rs = langparse_magic(op,lp)) >= 0) {
-	    while (ll && *lp) {
-		cint ch = mkchar(*lp) ;
-		if ((rs = langparse_proc(op,ln,ch)) > 0) {
-		    if (!f) f = true ;
-		}
-		if (rs < 0) break ;
-	    } /* end while */
-	} /* end if (magic) */
-	return (rs >= 0) ? f : rs ;
-} /* end subroutine (langparse_procln) */
-
-local int langparse_loadspace(langparse *op,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		c = 0 ;
-	while ((rs >= 0) && (sl-- > 0)) {
-	    cint	ch = mkchar(*sp) ;
-	    if (! CHAR_ISWHITE(ch)) {
-	        if (op->fl.esc) {
-	            op->rb[op->rl++] = charconv(ch) ;
-	            if (op->rl == 2) {
-	                rs = langparse_cvt(op) ;
-	                c += rs ;
-	                op->rl = 0 ;
-	                op->fl.esc = false ;
-	            }
-	        } else if (ch == '=') {
-	            op->fl.esc = true ;
-	        } else {
-	            rs = langparse_add(op,ch) ;
-	            c += rs ;
-	        }
-	    } /* end if (not white-space) */
-	    sp += 1 ;
-	} /* end while */
-	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (langparse_readspace) */
 
 local int langparse_add(langparse *op,cchar *vp,int vl = -1) noex {
 	int		rs = SR_OK ;
@@ -354,41 +304,18 @@ local int langparse_add(langparse *op,cchar *vp,int vl = -1) noex {
 	    rs = langparse_add(op,*vp++) ;
 	    c += rs ;
 	}
-	return c ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subrolutine (langparse_add) */
 
 local int langparse_add(langparse *op,int v) noex {
-    	int		rs ;
-	obuf 		*obp = obufp(op->outbuf) ;
-	if (op->fl.space && (v == '_')) {
-	    v = ' ' ;
+    	int		rs = SR_BUGCHECK ;
+	if (shortq *obp = obufp(op->outbuf) ; obp) {
+	    cshort code = shortconv(v) ;
+	    rs = obp->ins(code) ;
 	}
-	rs = obp->add(v) ;
 	return (rs >= 0) ? 1 : rs ;
 }
 /* end subrolutine (langparse_add) */
-
-local int langparse_cvt(langparse *op) noex {
-	int		rs = SR_OK ;
-	char		*rb = op->rb ;
-	if (op->outbuf != nullptr) {
-	    obuf 	*obp = obufp(op->outbuf) ;
-	    cint	ch0 = mkchar(rb[0]) ;
-	    cint	ch1 = mkchar(rb[1]) ;
-	    int		v = 0 ;
-	    if (ishexlatin(ch0) && ishexlatin(ch1)) {
-		v |= (digvalhex(ch0)<<4) ;
-		v |= (digvalhex(ch1)<<0) ;
-	    } else {
-	        v = '¿' ;
-	    } 
-	    rs = obp->add(v) ;
-	} else {
-	    rs = SR_BUGCHECK ;
-	}
-	return (rs >= 0) ? 1 : rs ;
-}
-/* end subroutine (langparse_cvt) */
 
 
