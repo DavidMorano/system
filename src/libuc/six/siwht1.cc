@@ -60,8 +60,8 @@ module ;
 #include	<strn.h>
 #include	<localmisc.h>
 
-#pragma		GCC dependency	"mod/siwht.ccm"
-#pragma		GCC dependency	"mod/strnwht.ccm"
+#pragma		GCC dependency		"mod/siwht.ccm"
+#pragma		GCC dependency		"mod/strnwht.ccm"
 
 module siwht ;
 
