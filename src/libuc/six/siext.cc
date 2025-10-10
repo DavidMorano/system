@@ -54,8 +54,8 @@
 #include	"six.h"			/* |sirbrk(3uc)| */
 #include	"siext.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"mod/chrset.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/chrset.ccm"
 
 import libutil ;
 import chrset ;
