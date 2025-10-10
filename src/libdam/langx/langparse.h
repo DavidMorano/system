@@ -34,8 +34,10 @@
 
 
 struct langparse_flags {
-	uint		esc:1 ;
-	uint		space:1 ;
+	uint		clear:1 ;
+	uint		literal:1 ;
+	uint		quote:1 ;
+	uint		comment:1 ;
 } ;
 
 struct langparse_head {
@@ -43,6 +45,7 @@ struct langparse_head {
 	LANGPARSE_FL	fl ;
 	uint		magic ;
 	int		rl ;		/* stage length */
+	int		pch ;
 	char		rb[LANGPARSE_NSTAGE + 1] ;	/* stage buffer */
 } ;
 
@@ -53,7 +56,7 @@ EXTERNC_begin
 
 extern int langparse_start	(langparse *,int) noex ;
 extern int langparse_load	(langparse *,cchar *,int) noex ;
-extern int langparse_read	(langparse *,char *,int) noex ;
+extern int langparse_read	(langparse *,short *,int) noex ;
 extern int langparse_finish	(langparse *) noex ;
 
 EXTERNC_end
