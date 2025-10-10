@@ -62,6 +62,8 @@
 
 #include	"qpdecoder.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
@@ -211,17 +213,16 @@ int qpdecoder_load(qpdecoder *op,cchar *sp,int µsl) noex {
 	                            c += rs ;
 	                            op->rl = 0 ;
 	                            op->fl.esc = false ;
-	                        }
+	                        } /* end if */
 	                    } else {
-	                        int si ;
-	                        while ((si = sichr(sp,sl,'=')) >= 0) {
+	                        for (int si ; (si = sichr(sp,sl,'=')) >= 0 ; ) {
 	                            op->fl.esc = true ;
 	                            if (si > 0) {
 	                                rs = qpdecoder_add(op,sp,si) ;
 	                                c += rs ;
 	                                sp += si ;
 	                                sl -= si ;
-	                            }
+	                            } /* end if */
 	                            sp += 1 ;
 	                            sl -= 1 ;
 	                            if ((rs >= 0) && (sl > 0)) {
@@ -237,10 +238,10 @@ int qpdecoder_load(qpdecoder *op,cchar *sp,int µsl) noex {
 	                                    c += rs ;
 	                                    op->rl = 0 ;
 	                                    op->fl.esc = false ;
-	                                }
+	                                } /* end if */
 	                            } /* end if */
 			            if (rs < 0) break ;
-	                        } /* end while */
+	                        } /* end for */
 	                        if ((rs >= 0) && (sl > 0)) {
 	                            rs = qpdecoder_add(op,sp,sl) ;
 	                            c += rs ;
