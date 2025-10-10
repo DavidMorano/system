@@ -79,8 +79,8 @@ struct shortq : shortq_head {
 	shortq &operator = (const shortq &) = delete ;
 	int ins(short) noex ;
 	int rem(short *) noex ;
-	operator int () noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	destruct shortq() {
 	    if (magic) dtor() ;
 	} ;
