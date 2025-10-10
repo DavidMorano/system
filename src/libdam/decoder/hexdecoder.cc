@@ -46,6 +46,8 @@
 
 #include	"hexdecoder.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
