@@ -102,8 +102,8 @@ struct langstate : langstate_head {
 	int proc(int,int = -1) noex ;
 	int procln(int,cchar *,int = -1) noex ;
 	int getstat(langstate_info *) noex ;
-	operator int () noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	destruct langstate() {
 	    if (magic) dtor() ;
 	} ;
