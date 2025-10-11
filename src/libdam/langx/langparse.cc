@@ -48,6 +48,7 @@
 #include	<shortq.h>
 #include	<strwcpy.h>
 #include	<digval.h>		/* |digvalhex(3uc)| */
+#include	<ascii.h>
 #include	<mkchar.h>
 #include	<char.h>
 #include	<ischarx.h>
@@ -116,8 +117,11 @@ local inline int langparse_magic(langparse *op,Args ... args) noex {
 /* end subroutine (langparse_magic) */
 
 local int	langparse_proc(langparse *,int) noex ;
+
+#ifdef	COMMENT
 local int	langparse_add(langparse *,cchar *,int) noex ;
 local int	langparse_add(langparse *,int) noex ;
+#endif /* COMMENT */
 
 
 /* local variables */
@@ -130,7 +134,7 @@ cint		nstage = LANGPARSE_NSTAGE ;
 
 /* exported subroutines */
 
-int langparse_start(langparse *op,int f_space) noex {
+int langparse_start(langparse *op) noex {
     	cnothrow	nt{} ;
 	cnullptr	np{} ;
 	int		rs ;
@@ -286,7 +290,7 @@ local int langparse_proc(langparse *op,int ch) noex {
 	        } /* end switch */
 	    } /* end if */
 	    if (f) {
-		if (shortq *obp = sbufp(op->outbuf) ; obp) {
+		if (shortq *obp = obufp(op->outbuf) ; obp) {
 		    cshort code = shortconv(ch) ;
 		    rs = obp->ins(code) ;
 		}
@@ -297,6 +301,7 @@ local int langparse_proc(langparse *op,int ch) noex {
 }
 /* end subroutine (langparse_proc) */
 
+#ifdef	COMMENT
 local int langparse_add(langparse *op,cchar *vp,int vl = -1) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -305,8 +310,7 @@ local int langparse_add(langparse *op,cchar *vp,int vl = -1) noex {
 	    c += rs ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subrolutine (langparse_add) */
+} /* end subrolutine (langparse_add) */
 
 local int langparse_add(langparse *op,int v) noex {
     	int		rs = SR_BUGCHECK ;
@@ -317,5 +321,46 @@ local int langparse_add(langparse *op,int v) noex {
 	return (rs >= 0) ? 1 : rs ;
 }
 /* end subrolutine (langparse_add) */
+#endif /* COMMENT */
+
+
+/* local subroutines */
+
+int langparse::load(cchar *sp,int sl) noex {
+	return langparse_load(this,sp,sl) ;
+}
+
+int langparse::read(short *rbuf,int rlen) noex {
+	return langparse_read(this,rbuf,rlen) ;
+}
+
+void langparse::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("langparse",rs,"fini-finish") ;
+	}
+} /* end method (langparse::dtor) */
+
+langparse::operator int () noex {
+    	int		rs ;
+	if ((rs = langparse_magic(this)) >= 0) {
+	    rs = 0 ;
+	}
+	return rs ;
+} /* end method (langparse::operator) */
+
+langparse_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case langparsemem_start:
+	        rs = langparse_start(op) ;
+	        break ;
+	    case langparsemem_finish:
+	        rs = langparse_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (langparse_co::operator) */
 
 
