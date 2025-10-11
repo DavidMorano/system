@@ -79,8 +79,8 @@ struct langproc : langproc_head {
 	int curbegin(langproc_cur *) noex ;
 	int curend(langproc_cur *) noex ;
 	int curenum(langproc_cur *,cchar **) noex ;
-	operator int () noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	destruct langproc() {
 	    if (magic) dtor() ;
 	} ;
