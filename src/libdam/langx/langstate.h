@@ -8,10 +8,10 @@
 
 /* revision history:
 
-	= 2008-06-29, David A­D­ Morano
+	= 2008-04-18, David A­D­ Morano
 	This was really made from scratch.
 
-	= 2016-06-29, David A­D­ Morano
+	= 2016-03-17, David A­D­ Morano
 	This code was originally written.
 
 */
