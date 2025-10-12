@@ -8,14 +8,14 @@
 
 /* revision history:
 
-	= 2008-06-29, David A­D­ Morano
+	= 2008-04-18, David A­D­ Morano
 	This was really made from scratch, but was inspired by
 	previous code of a similar nature, dating back a long time
 	(likely to the 1980s).  Various programs that I have made
 	over the earlier decades (of my career) have used code like
 	this object (but that previous code was not objectified).
 
-	= 2016-06-29, David A­D­ Morano
+	= 2016-03-17, David A­D­ Morano
 	I updated this to add the C++11 'noexcept' where appropriate.
 
 	= 2017-10-19, David A­D­ Morano
