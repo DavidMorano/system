@@ -1,10 +1,9 @@
 
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar		*pn = pip->progname ;
+	cchar		*fmt ;
 
 	fmt = "%s: USAGE> %s <file(s)>\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
