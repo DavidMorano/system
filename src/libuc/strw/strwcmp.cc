@@ -53,10 +53,13 @@
 #include	<nleadstr.h>
 #include	<strnxcmp.h>		/* |strnfoldcmp(3uc)| */
 #include	<toxc.h>
+#include	<localmisc.h>
 
 #include	"strwcmp.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
