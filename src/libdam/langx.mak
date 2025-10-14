@@ -42,10 +42,10 @@ LIBS +=
 
 OBJ0= langstate.o
 OBJ1= langproc.o
-OBJ2=
+OBJ2= langparse.o
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 OBJB=
 
 OBJ= obja.o 
