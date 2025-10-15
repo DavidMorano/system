@@ -20,6 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<limits.h>		/* |CHAR_BIT| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -33,11 +34,26 @@
 #define	LANGPARSE_NSTAGE	2
 
 
+enum langparseos {
+	langparseo_comment = CHAR_BIT,
+	langparseo_quote,
+	langparseo_literal,
+	langparseo_overlast
+} ; /* end enum (langparses) */
+
+#ifdef	__cplusplus
+struct langparsems {
+    	static int	comment ;
+    	static int	quote ;
+    	static int	literal ;
+} ; /* end struct (langparsems) */
+#endif /* __cplusplus */
+
 struct langparse_flags {
-	uint		clear:1 ;
-	uint		literal:1 ;
-	uint		quote:1 ;
 	uint		comment:1 ;
+	uint		clear:1 ;
+	uint		quote:1 ;
+	uint		literal:1 ;
 	uint		skip:1 ;
 } ;
 
@@ -101,6 +117,10 @@ extern int langparse_read	(langparse *,short *,int) noex ;
 extern int langparse_finish	(langparse *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const langparsems	langparsem ;
+#endif /* __cplusplus */
 
 
 #endif /* LANGPARSE_INCLUDE */
