@@ -35,24 +35,9 @@ DEFS +=
 
 INCS += setx.h
 
+MODS +=
+
 LIBS +=
-
-
-INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
 
 
 OBJ0= setint.o setoint.o
@@ -62,11 +47,29 @@ OBJ3= sethand.o
 
 OBJ4= retstat.o 
 OBJ5= setstrx_loadfile.o
+OBJ6=
+OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o 
 OBJB= obj3.o obj4.o obj5.o
 
 OBJ= obja.o objb.o
+
+
+INCDIRS +=
+
+LIBDIRS += -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
 .SUFFIXES:		.hh .ii .iim .ccm
@@ -103,7 +106,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -119,29 +122,35 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4.o:			$(OBJ4)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5.o:			$(OBJ5)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 # RETSTAT
