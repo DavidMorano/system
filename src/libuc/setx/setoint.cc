@@ -32,7 +32,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
@@ -49,7 +49,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::set ;			/* type-template */
 using std::pair ;			/* type-template */
 using std::nothrow ;			/* constant */
@@ -76,9 +75,9 @@ typedef set<int>::iterator *	setitp ;
 /* exported subroutines */
 
 int setoint_start(setoint *op) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    try {
 	        if (setint *setp ; (setp = new(nothrow) setint) != np) {
@@ -204,11 +203,11 @@ int setoint_mkvec(setoint *op,int *va) noex {
 /* end subroutine (setoint_mkvec) */
 
 int setoint_curbegin(setoint *op,setoint_cur *curp) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && curp) {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
-		cnullptr	np{} ;
 		setint		*setp = setintp(op->setp) ;
 	        setint::iterator	*interp ;
 		rs = SR_NOMEM ;
