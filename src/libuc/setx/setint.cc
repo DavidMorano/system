@@ -76,9 +76,9 @@ typedef unordered_set<int>::iterator *	usetintitp ;
 /* exported subroutines */
 
 int setint_start(setint *op) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    if (usetint *setp ; (setp = new(nothrow) usetint) != np) {
 	        op->setp = voidp(setp) ;
@@ -198,11 +198,11 @@ int setint_mkvec(setint *op,int *va) noex {
 /* end subroutine (setint_mkvec) */
 
 int setint_curbegin(setint *op,setint_cur *curp) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && curp) {
 	    rs = SR_NOTOPEN ;
 	    if (op->setp) {
-		cnullptr	np{} ;
 	        usetint		*setp = usetintp(op->setp) ;
 	        usetintit	*interp ;
 		rs = SR_NOMEM ;
