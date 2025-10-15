@@ -47,7 +47,7 @@
 
 #include	"vecelem.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |memcopy(3u)| */
 
@@ -57,6 +57,7 @@ import libutil ;			/* |lenstr(3u)| + |memcopy(3u)| */
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
 
 
@@ -87,25 +88,35 @@ static inline int vecelem_magic(vecelem *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (vecelem_magic) */
 
-consteval int mkoptmask() noex {
+static int mkoptmask() noex {
 	int		m = 0 ;
-	m |= VECELEM_OREUSE ;
-	m |= VECELEM_OCOMPACT ;
-	m |= VECELEM_OSWAP ;
-	m |= VECELEM_OSTATIONARY ;
-	m |= VECELEM_OCONSERVE ;
-	m |= VECELEM_OSORTED ;
-	m |= VECELEM_OORDERED ;
+	m |= vecelemm.reuse ;
+	m |= vecelemm.compact ;
+	m |= vecelemm.swap ;
+	m |= vecelemm.stationary ;
+	m |= vecelemm.conserve ;
+	m |= vecelemm.sorted ;
+	m |= vecelemm.ordered ;
 	return m ;
 } /* end subroutine (mkoptmask) */
 
 
 /* local variables */
 
-constexpr int		optmask = mkoptmask() ;
+static cint		optmask = mkoptmask() ;
 
 
 /* exported variables */
+
+int vecelemms::reuse		= (1 << vecelemo_reuse) ;
+int vecelemms::compact		= (1 << vecelemo_compact) ;
+int vecelemms::swap		= (1 << vecelemo_swap) ;
+int vecelemms::stationary	= (1 << vecelemo_stationary) ;
+int vecelemms::conserve		= (1 << vecelemo_conserve) ;
+int vecelemms::sorted		= (1 << vecelemo_sorted) ;
+int vecelemms::ordered		= (1 << vecelemo_ordered) ;
+
+const vecelemms		vecelemm ;
 
 
 /* exported subroutines */
@@ -345,14 +356,14 @@ static int vecelem_setopts(vecelem *op,int vo) noex {
 	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->fl = {} ;
-	    if (vo & VECELEM_OREUSE)		op->fl.oreuse = 1 ;
-	    if (vo & VECELEM_OSWAP)		op->fl.oswap = 1 ;
-	    if (vo & VECELEM_OSTATIONARY)	op->fl.ostationary = 1 ;
-	    if (vo & VECELEM_OCOMPACT)		op->fl.ocompact = 1 ;
-	    if (vo & VECELEM_OSORTED)		op->fl.osorted = 1 ;
-	    if (vo & VECELEM_OORDERED)		op->fl.oordered = 1 ;
-	    if (vo & VECELEM_OCONSERVE)		op->fl.oconserve = 1 ;
-	}
+	    if (vo & vecelemm.reuse)		op->fl.oreuse = 1 ;
+	    if (vo & vecelemm.swap)		op->fl.oswap = 1 ;
+	    if (vo & vecelemm.stationary)	op->fl.ostationary = 1 ;
+	    if (vo & vecelemm.compact)		op->fl.ocompact = 1 ;
+	    if (vo & vecelemm.sorted)		op->fl.osorted = 1 ;
+	    if (vo & vecelemm.ordered)		op->fl.oordered = 1 ;
+	    if (vo & vecelemm.conserve)		op->fl.oconserve = 1 ;
+	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (vecelem_setopts) */
