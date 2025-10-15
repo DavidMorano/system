@@ -131,10 +131,10 @@ namespace {
 	int		sl ;
 	sfnextx(cchar *p,int l,cchar **r) noex : rpp(r), sp(p), sl(l) { } ;
 	operator int () noex ;
-	virtual bool termx(int ch) noex {
+	virtual bool termx(int ch) const noex {
 	    return (ch == 0) ;
 	} ;
-	bool isterm(int ch) noex {
+	bool isterm(int ch) const noex {
 	    bool	f = false ;
 	    ch &= UCHAR_MAX ;
 	    f = f || (ch == '\n') ;
@@ -167,7 +167,7 @@ int sfnextchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	struct esfx : sfnextx {
 	    int		sch ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
-	    bool termx(int ch) noex override final {
+	    bool termx(int ch) const noex override final {
 		return (ch == sch) ;
 	    } ;
 	} ; /* end struct */
@@ -184,7 +184,7 @@ int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 	struct esfx : sfnextx {
 	    cchar	*bstr ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
-	    bool termx(int ch) noex override final {
+	    bool termx(int ch) const noex override final {
 		return (strchr(bstr,ch) != nullptr) ;
 	    } ;
 	} ; /* end struct */
@@ -201,7 +201,7 @@ int sfnextterm(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
 	struct esfx : sfnextx {
 	    cchar	*terms ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
-	    bool termx (int ch) noex override final {
+	    bool termx (int ch) const noex override final {
 		return batst(terms,ch) ;
 	    } ;
 	} ; /* end struct */
