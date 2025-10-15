@@ -33,16 +33,51 @@
 #define	VECELEM			struct vecelem_head
 #define	VECELEM_FL		struct vecelem_flags
 #define	VECELEM_DEFENTS		2
+
+/**** options
+reuse		= reuse empty slots
+compact		= do not allow for holes
+swap		= use swapping for empty slot management
+stationary	= entries do not move
+conserve	= conserve space where possible
+sorted		= maintain a sorted list
+ordered		= maintain an ordered list
+****/
+
+enum vecelemos {
+    vecelemo_reuse,
+    vecelemo_compact,
+    vecelemo_swap,
+    vecelemo_stationary,
+    vecelemo_conserve,
+    vecelemo_sorted,
+    vecelemo_ordered,
+    vecelemo_overlast
+} ;
+
+#ifdef	__cplusplus	/* C++ only! */
+
+struct vecelemms {
+    static int	reuse ;
+    static int	compact ;
+    static int	swap ;
+    static int	stationary ;
+    static int	conserve ;
+    static int	sorted ;
+    static int	ordered ;
+} ;
+
+#endif /* __cplusplus */
+
 /* options */
 #define	VECELEM_ODEFAULT	0
-#define	VECELEM_OREUSE		(1 << 0)	/* reuse empty slots */
-#define	VECELEM_OCOMPACT	(1 << 1)	/* means NOHOLES */
-#define	VECELEM_OSWAP		(1 << 2)	/* use swapping */
-#define	VECELEM_OSTATIONARY	(1 << 3)	/* entries should not move */
-#define	VECELEM_OCONSERVE	(1 << 4)	/* conserve space */
-#define	VECELEM_OSORTED		(1 << 5)	/* keep sorted */
-#define	VECELEM_OORDERED	(1 << 6)	/* keep ordered */
-
+#define	VECELEM_OREUSE		(1 << vecelemo_reuse)
+#define	VECELEM_OCOMPACT	(1 << vecelemo_compact)
+#define	VECELEM_OSWAP		(1 << vecelemo_swap)
+#define	VECELEM_OSTATIONARY	(1 << vecelemo_stationary)
+#define	VECELEM_OCONSERVE	(1 << vecelemo_conserve)
+#define	VECELEM_OSORTED		(1 << vecelemo_sorted)
+#define	VECELEM_OORDERED	(1 << vecelemo_ordered)
 
 struct vecelem_flags {
 	uint		issorted:1 ;
@@ -88,6 +123,12 @@ extern int vecelem_getvec(vecelem *,void *) noex ;
 extern int vecelem_audit(vecelem *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+extern const vecelemms	vecelemm ;
+
+#endif /* __cplusplus */
 
 
 #endif /* VECELEM_INCLUDE */
