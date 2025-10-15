@@ -45,7 +45,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::pair ;			/* type */
 using std::set ;			/* type */
 using std::string ;			/* type */
@@ -79,10 +78,10 @@ typedef	set<string>::iterator *	iterp ;
 /* exported subroutines */
 
 int setostr_start(setostr *op,int n) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (n < 0) n = 0 ;
 	if (op) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if (setstr *setp ; (setp = new(nothrow) setstr) != np) {
@@ -112,10 +111,10 @@ int setostr_finish(setostr *op) noex {
 /* end subroutine (setostr_finish) */
 
 int setostr_already(setostr *op,cchar *sp,int sl) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		f = true ;
 	if ((rs = setostr_magic(op,sp)) >= 0) {
-	    cnullptr	np{} ;
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (string *strp ; (strp = new(nothrow) string(sp,sl)) != np) {
@@ -196,9 +195,9 @@ int setostr_count(setostr *op) noex {
 /* end subroutine (setostr_count) */
 
 int setostr_curbegin(setostr *op,setostr_cur *curp) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = setostr_magic(op,curp)) >= 0) {
-	    cnullptr	np{} ;
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (iter *itp ; (itp = new(nothrow) iter) != np) {
 	        *itp = setp->begin() ;
