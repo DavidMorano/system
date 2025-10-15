@@ -144,7 +144,7 @@ $(T).o:			$(OBJ_VEC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_VEC)
 
 $(T).nm:		$(T).o
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
