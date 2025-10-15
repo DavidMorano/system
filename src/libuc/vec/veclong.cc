@@ -101,9 +101,12 @@ static int	veclong_insertval(veclong *,int,VECLONG_TYPE) noex ;
 static int	veclong_extrange(veclong *,int) noex ;
 
 static int	deflongcmp(const VECLONG_TYPE *,const VECLONG_TYPE *) noex ;
+static int	mkoptmask() noex ;
 
 
 /* local variables */
+
+static cint	optmask = mkoptmask() ;
 
 
 /* exported variables */
@@ -468,7 +471,7 @@ int veclong_audit(veclong *op) noex {
 
 /* private subroutines */
 
-static consteval int mkoptmask() noex {
+static int mkoptmask() noex {
 	int		m = 0 ;
 	m |= VECLONG_OREUSE ;
 	m |= VECLONG_OSWAP ;
@@ -481,7 +484,7 @@ static consteval int mkoptmask() noex {
 } /* end subroutine (mkoptmask) */
 
 static int veclong_setopts(veclong *op,int vo) noex {
-	constexpr int	m = mkoptmask() ;
+	cint		m = optmask ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ m)) == 0) {
 	    rs = SR_OK ;
