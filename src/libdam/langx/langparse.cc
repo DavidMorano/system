@@ -131,6 +131,12 @@ cint		nstage = LANGPARSE_NSTAGE ;
 
 /* exported variables */
 
+int langparsems::comment	= (1 << langparseo_comment) ;
+int langparsems::quote		= (1 << langparseo_quote) ;
+int langparsems::literal	= (1 << langparseo_literal) ;
+
+const langparsems		langparsem ;
+
 
 /* exported subroutines */
 
@@ -188,7 +194,7 @@ int langparse_load(langparse *op,cchar *sp,int µsl) noex {
 	if ((rs = langparse_magic(op,sp)) >= 0) {
 	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	        while (sl-- && *sp) {
-		    cint ch = mkchar(*sp) ;
+		    cint ch = mkchar(*sp++) ;
 		    rs = langparse_proc(op,ch) ;
 		    c += 1 ;
 		    if (rs < 0) break ;
