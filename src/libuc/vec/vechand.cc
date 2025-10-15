@@ -89,6 +89,8 @@ static int	vechand_setopts(vechand *,int) noex ;
 static int	vechand_extend(vechand *) noex ;
 static int	vechand_validx(vechand *,int) noex ;
 
+static int	mkoptmask() noex ;
+
 
 /* local subroutines */
 
@@ -96,6 +98,8 @@ static int	vechand_validx(vechand *,int) noex ;
 /* local variables */
 
 cint			defents = VECHAND_DEFENTS ;
+
+static cint		optmask = mkoptmask() ;
 
 
 /* exported variables */
@@ -497,7 +501,6 @@ static int mkoptmask() noex {
 /* end subroutine (mkoptmask) */
 
 static int vechand_setopts(vechand *op,int vo) noex {
-	static cint	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
