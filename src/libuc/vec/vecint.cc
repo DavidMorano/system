@@ -45,7 +45,9 @@
 
 #include	"vecint.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -83,9 +85,12 @@ static int	vecint_insertval(vecint *,int,VECINT_TYPE) noex ;
 static int	vecint_extrange(vecint *,int) noex ;
 
 static int	deftypecmp(const VECINT_TYPE *,const VECINT_TYPE *) noex ;
+static int	mkoptmask() noex ;
 
 
 /* local variables */
+
+static cint	optmask = mkoptmask() ;
 
 
 /* exported variables */
@@ -466,7 +471,7 @@ int vecint_audit(vecint *op) noex {
 	    volatile int	dummy{} ;
 	    int			i = 0 ; /* <- used afterwards */
 	    for (i = 0 ; i < op->i ; i += 1) {
-	        dummy = op->va[i] ;
+	        dummy += op->va[i] ;
 	    }
 	    (void) dummy ;
 	    c = op->c ;
@@ -479,7 +484,7 @@ int vecint_audit(vecint *op) noex {
 
 /* private subroutines */
 
-consteval int mkoptmask() noex {
+static int mkoptmask() noex {
 	int		m = 0 ;
 	m |= VECINT_OREUSE ;
 	m |= VECINT_OSWAP ;
@@ -493,7 +498,7 @@ consteval int mkoptmask() noex {
 /* end subroutine (mkoptmask) */
 
 static int vecint_setopts(vecint *op,int vo) noex {
-	constexpr int	m = mkoptmask() ;
+	cint		m = optmask ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ m)) == 0) {
 	    rs = SR_OK ;
