@@ -157,6 +157,8 @@ static int	vecstr_insertsp(vecstr *,int,cchar *) noex ;
 static int	vecstr_validx(vecstr *,int) noex ;
 static void	vecstr_arrsort(vecstr *,vecstr_vcmp) noex ;
 
+static int	mkoptmask() noex ;
+
 
 /* local variables */
 
@@ -165,6 +167,8 @@ constexpr bool		f_qsort = CF_QSORT ;
 constexpr int		defents = VECSTR_DEFENTS ;
 constexpr int		rsn = SR_NOTFOUND ;
 constexpr int		resz = szof(int) ;
+
+static cint		optmask = mkoptmask() ;
 
 
 /* exported variables */
@@ -883,7 +887,6 @@ static int mkoptmask() noex {
 /* end subroutine (mkoptmask) */
 
 static int vecstr_setopts(vecstr *op,int vo) noex {
-	static cint	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
