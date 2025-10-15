@@ -37,17 +37,17 @@ typedef SETINT_CUR	setint_cur ;
 
 EXTERNC_begin
 
-extern int setint_start(setint *) noex ;
-extern int setint_finish(setint *) noex ;
-extern int setint_addval(setint *,int) noex ;
-extern int setint_delval(setint *,int) noex ;
-extern int setint_count(setint *) noex ;
-extern int setint_mkvec(setint *,int *) noex ;
-extern int setint_extent(setint *) noex ;
-extern int setint_curbegin(setint *,setint_cur *) noex ;
-extern int setint_curenum(setint *,setint_cur *,int *) noex ;
-extern int setint_curend(setint *,setint_cur *) noex ;
-extern int setint_find(setint *,int) noex ;
+extern int setint_start		(setint *) noex ;
+extern int setint_finish	(setint *) noex ;
+extern int setint_addval	(setint *,int) noex ;
+extern int setint_delval	(setint *,int) noex ;
+extern int setint_count		(setint *) noex ;
+extern int setint_mkvec		(setint *,int *) noex ;
+extern int setint_extent	(setint *) noex ;
+extern int setint_curbegin	(setint *,setint_cur *) noex ;
+extern int setint_curenum	(setint *,setint_cur *,int *) noex ;
+extern int setint_curend	(setint *,setint_cur *) noex ;
+extern int setint_find		(setint *,int) noex ;
 
 EXTERNC_end
 
