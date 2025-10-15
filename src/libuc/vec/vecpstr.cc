@@ -158,7 +158,7 @@ static inline int vecpstr_magic(vecpstr *op,Args ... args) noex {
 	    rs = (op->magic == VECPSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (vecpstr_magic) */
 
 static int chunk_start(VPS_CH *,int) noex ;
 static int chunk_finish(VPS_CH *) noex ;
@@ -168,6 +168,7 @@ static int chunk_addkeyval(VPS_CH *,cchar *,int,cchar *,int,cchar **) noex ;
 
 static int	indexlen(int) noex ;
 static int	indexsize(int) noex ;
+static int	mkoptmask() noex ;
 
 
 /* local subroutines */
@@ -179,6 +180,8 @@ constexpr bool		f_qsort = CF_QSORT ;
 
 constexpr int		defents = VECPSTR_DEFENTS ;
 constexpr int		resz = szof(int) ;
+
+static cint		optmask = mkoptmask() ;
 
 
 /* exported variables */
@@ -885,7 +888,6 @@ static int mkoptmask() noex {
 /* end subroutine (mkoptmask) */
 
 static int vecpstr_setopts(vecpstr *op,int vo) noex {
-	static cint	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
