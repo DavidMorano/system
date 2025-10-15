@@ -140,14 +140,14 @@ typedef VECSORTHAND		vecsorthand ;
 
 EXTERNC_begin
 
-extern int vecsorthand_start(vecsorthand *,vecsorthand_cmpf,int) noex ;
-extern int vecsorthand_finish(vecsorthand *) noex ;
-extern int vecsorthand_add(vecsorthand *,cvoid *) noex ;
-extern int vecsorthand_get(vecsorthand *,int,void *) noex ;
-extern int vecsorthand_del(vecsorthand *,int) noex ;
-extern int vecsorthand_delhand(vecsorthand *,cvoid *) noex ;
-extern int vecsorthand_count(vecsorthand *) noex ;
-extern int vecsorthand_search(vecsorthand *,cvoid *,void *) noex ;
+extern int vecsorthand_start	(vecsorthand *,vecsorthand_cmpf,int) noex ;
+extern int vecsorthand_finish	(vecsorthand *) noex ;
+extern int vecsorthand_add	(vecsorthand *,cvoid *) noex ;
+extern int vecsorthand_get	(vecsorthand *,int,void *) noex ;
+extern int vecsorthand_del	(vecsorthand *,int) noex ;
+extern int vecsorthand_delhand	(vecsorthand *,cvoid *) noex ;
+extern int vecsorthand_count	(vecsorthand *) noex ;
+extern int vecsorthand_search	(vecsorthand *,cvoid *,void *) noex ;
 
 EXTERNC_end
 
