@@ -84,13 +84,17 @@ static int	vecobj_extend(vecobj *) noex ;
 static int	vecobj_iget(vecobj *,int,void **) noex ;
 static int	vecobj_sorted(vecobj *,vecobj_vcf) noex ;
 
+static int	mkoptmask() noex ;
+
 
 /* local subroutines */
 
 
 /* local variables */
 
-constexpr int		defents = VECOBJ_DEFENTS ;
+cint			defents = VECOBJ_DEFENTS ;
+
+static cint		optmask = mkoptmask() ;
 
 
 /* exported variables */
@@ -700,7 +704,6 @@ static int mkoptmask() noex {
 /* end subroutine (mkoptmask) */
 
 static int vecobj_setopts(vecobj *op,int vo) noex {
-	static cint	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
