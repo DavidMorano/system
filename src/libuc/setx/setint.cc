@@ -47,7 +47,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::unordered_set ;		/* type-template */
 using std::pair ;			/* type-template */
 using std::nothrow ;			/* constant */
