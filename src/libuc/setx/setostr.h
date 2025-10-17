@@ -85,6 +85,7 @@ struct setostr : setostr_head {
 	int curenum(setostr_cur *,cchar **) noex ;
 	int curend(setostr_cur *) noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	destruct setostr() {
 	    if (magic) dtor() ;
 	} ;
@@ -96,18 +97,18 @@ typedef SETOSTR		setostr ;
 
 EXTERNC_begin
 
-extern int setostr_start(setostr *,int) noex ;
-extern int setostr_already(setostr *,cchar *,int) noex ;
-extern int setostr_add(setostr *,cchar *,int) noex ;
-extern int setostr_del(setostr *,cchar *,int) noex ;
-extern int setostr_delall(setostr *) noex ;
-extern int setostr_count(setostr *) noex ;
-extern int setostr_curbegin(setostr *,setostr_cur *) noex ;
-extern int setostr_curenum(setostr *,setostr_cur *,cchar **) noex ;
-extern int setostr_curend(setostr *,setostr_cur *) noex ;
-extern int setostr_finish(setostr *) noex ;
+extern int setostr_start	(setostr *,int) noex ;
+extern int setostr_already	(setostr *,cchar *,int) noex ;
+extern int setostr_add		(setostr *,cchar *,int) noex ;
+extern int setostr_del		(setostr *,cchar *,int) noex ;
+extern int setostr_delall	(setostr *) noex ;
+extern int setostr_count	(setostr *) noex ;
+extern int setostr_curbegin	(setostr *,setostr_cur *) noex ;
+extern int setostr_curenum	(setostr *,setostr_cur *,cchar **) noex ;
+extern int setostr_curend	(setostr *,setostr_cur *) noex ;
+extern int setostr_finish	(setostr *) noex ;
 
-extern int setostr_loadfile(setostr *,int,cchar *) noex ;
+extern int setostr_loadfile	(setostr *,int,cchar *) noex ;
 
 EXTERNC_end
 
