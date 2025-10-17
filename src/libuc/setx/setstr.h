@@ -73,6 +73,7 @@ struct setstr : setstr_head {
 	int curenum(setstr_cur *,cchar **) noex ;
 	int curend(setstr_cur *) noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	destruct setstr() {
 	    if (fopen) dtor() ;
 	} ;
@@ -83,16 +84,16 @@ typedef SETSTR		setstr ;
 
 EXTERNC_begin
 
-extern int setstr_start(setstr *,int) noex ;
-extern int setstr_already(setstr *,cchar *,int) noex ;
-extern int setstr_add(setstr *,cchar *,int) noex ;
-extern int setstr_del(setstr *,cchar *,int) noex ;
-extern int setstr_delall(setstr *) noex ;
-extern int setstr_count(setstr *) noex ;
-extern int setstr_curbegin(setstr *,setstr_cur *) noex ;
-extern int setstr_curenum(setstr *,setstr_cur *,cchar **) noex ;
-extern int setstr_curend(setstr *,setstr_cur *) noex ;
-extern int setstr_finish(setstr *) noex ;
+extern int setstr_start		(setstr *,int) noex ;
+extern int setstr_already	(setstr *,cchar *,int) noex ;
+extern int setstr_add		(setstr *,cchar *,int) noex ;
+extern int setstr_del		(setstr *,cchar *,int) noex ;
+extern int setstr_delall	(setstr *) noex ;
+extern int setstr_count		(setstr *) noex ;
+extern int setstr_curbegin	(setstr *,setstr_cur *) noex ;
+extern int setstr_curenum	(setstr *,setstr_cur *,cchar **) noex ;
+extern int setstr_curend	(setstr *,setstr_cur *) noex ;
+extern int setstr_finish	(setstr *) noex ;
 
 EXTERNC_end
 
