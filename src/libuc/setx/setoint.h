@@ -37,17 +37,17 @@ typedef SETOINT_CUR	setoint_cur ;
 
 EXTERNC_begin
 
-extern int setoint_start(setoint *) noex ;
-extern int setoint_finish(setoint *) noex ;
-extern int setoint_addval(setoint *,int) noex ;
-extern int setoint_delval(setoint *,int) noex ;
-extern int setoint_count(setoint *) noex ;
-extern int setoint_mkvec(setoint *,int *) noex ;
-extern int setoint_extent(setoint *) noex ;
-extern int setoint_curbegin(setoint *,setoint_cur *) noex ;
-extern int setoint_curenum(setoint *,setoint_cur *,int *) noex ;
-extern int setoint_curend(setoint *,setoint_cur *) noex ;
-extern int setoint_find(setoint *,int) noex ;
+extern int setoint_start	(setoint *) noex ;
+extern int setoint_finish	(setoint *) noex ;
+extern int setoint_addval	(setoint *,int) noex ;
+extern int setoint_delval	(setoint *,int) noex ;
+extern int setoint_count	(setoint *) noex ;
+extern int setoint_mkvec	(setoint *,int *) noex ;
+extern int setoint_extent	(setoint *) noex ;
+extern int setoint_curbegin	(setoint *,setoint_cur *) noex ;
+extern int setoint_curenum	(setoint *,setoint_cur *,int *) noex ;
+extern int setoint_curend	(setoint *,setoint_cur *) noex ;
+extern int setoint_find		(setoint *,int) noex ;
 
 EXTERNC_end
 
