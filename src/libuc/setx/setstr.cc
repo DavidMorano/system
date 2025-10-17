@@ -251,7 +251,11 @@ void setstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("setstr",rs,"fini-finish") ;
 	}
-} /* end method (strstr::dtor) */
+} /* end method (setstr::dtor) */
+
+setstr::operator int () noex {
+	return hdb_count(this) ;
+} /* end method (setstr::dtor) */
 
 int setstr_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
