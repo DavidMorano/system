@@ -38,7 +38,9 @@
 
 #include	"setostr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -264,7 +266,20 @@ void setostr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("setostr",rs,"fini-finish") ;
 	}
-}
+} /* end method (setostr::dtor) */
+
+setostr::operator int () noex {
+    	int		rs ;
+	if ((rs = setostr_magic(this)) >= 0) {
+	    setstr	*sop = setstrp(setp) ;
+	    rs = SR_BADFMT ;
+	    if (sop) {
+		csize cnt = sop->size() ;
+		rs = intsat(cnt) ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return rs ;
+} /* end method (setostr::operator) */
 
 int setostr_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
@@ -285,7 +300,6 @@ int setostr_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (setostr_co::operator) */
+} /* end method (setostr_co::operator) */
 
 
