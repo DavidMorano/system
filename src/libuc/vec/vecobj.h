@@ -53,7 +53,7 @@ enum vecobjos {
     vecobjo_sorted,
     vecobjo_ordered,
     vecobjo_overlast
-} ;
+} ; /* end enum (options) */
 
 #ifdef	__cplusplus	/* C++ only! */
 
