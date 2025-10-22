@@ -62,7 +62,7 @@ enum vecstros {
     vecstro_sorted,
     vecstro_ordered,
     vecstro_overlast
-} ;
+} ; /* end enum (options) */
 
 #ifdef	__cplusplus	/* C++ only! */
 
