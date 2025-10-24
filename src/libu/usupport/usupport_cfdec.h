@@ -13,8 +13,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<stddef.h>		/* |nullptr_t| */
+#include	<stdlib.h>
 #include	<stdint.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
