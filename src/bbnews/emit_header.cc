@@ -63,12 +63,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
-#include	<getbufsize.h>
-#include	<estrings.h>
 #include	<ugetpw.h>
+#include	<getbufsize.h>
 #include	<getax.h>
+#include	<estrings.h>
 #include	<bfile.h>
 #include	<dater.h>
+#include	<mkx.h>
 #include	<mailmsghdrs.h>
 #include	<hdrdecode.h>
 #include	<localmisc.h>
