@@ -57,24 +57,22 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	pathclean(char *,cchar *,int) ;
 extern int	tcgetlines(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern char	*timestr_logz(time_t,char *) ;
@@ -181,7 +179,7 @@ static int proctermlines(PROGINFO *pip,UTERM *utp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		v ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #ifdef	COMMENT
 	if (pip->termtype == NULL) pip->termtype = getenv(VARTERM) ;
