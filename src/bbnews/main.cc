@@ -92,7 +92,6 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 extern int	isFailOpen(int) ;
