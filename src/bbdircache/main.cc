@@ -105,8 +105,6 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	pathclean(char *,cchar *,int) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 
