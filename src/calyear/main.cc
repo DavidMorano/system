@@ -67,7 +67,6 @@
 
 /* imported namespaces */
 
-using std:nullptr_t ;			/* type */
 using std:nothrow ;			/* constant */
 
 
@@ -105,10 +104,10 @@ struct sigcode {
 
 /* forward references */
 
-static void	main_sighand(int,siginfo_t *,void *) ;
-static int	main_sigdump(siginfo_t *) ;
+static void	main_sighand(int,siginfo_t *,void *) noex ;
+static int	main_sigdump(siginfo_t *) noex ;
 
-static cchar	*strsigcode(const SIGCODE *,int) ;
+static cchar	*strsigcode(const SIGCODE *,int) noex ;
 
 
 /* local variables */
@@ -283,7 +282,7 @@ static int main_sigdump(siginfo_t *sip) noex {
 /* end subroutine (main_sigdump) */
 
 static cchar *strsigcode(const SIGCODE *scp,int code) noex {
-	int		i ;
+	int		i ; /* used-afterwards */
 	bool		f = false ;
 	cchar		*sn = "UNKNOWN" ;
 	for (i = 0 ; scp[i].code != 0 ; i += 1) {
