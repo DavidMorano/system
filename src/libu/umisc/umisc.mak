@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJ00= umisc0.o umisc1.o umisc2.o umisc3.o
-OBJ01= umisc4.o umisc5.o umisc6.o umisc7.o
+OBJ01= umisc4.o umisc5.o umisc6.o
 OBJ02= 
 OBJ03= 
 
