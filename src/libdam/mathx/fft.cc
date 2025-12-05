@@ -17,8 +17,9 @@
 //     Input  - input data
 //     Output - transform result
 //     N      - length of both input data and result
-template <class T> bool TFFT<T>::Forward(const complex<T> *const Input, complex<T> *const Output, const unsigned int N)
-{
+template <class T> 
+bool TFFT<T>::Forward(const complex<T> *const Input, 
+		complex<T> *const Output, const unsigned int N) {
 	//   Check input parameters
 	if (!Input || !Output || N < 1 || N & (N - 1))
 		return false;
@@ -33,8 +34,8 @@ template <class T> bool TFFT<T>::Forward(const complex<T> *const Input, complex<
 //   FORWARD FOURIER TRANSFORM, INPLACE VERSION
 //     Data - both input data and output
 //     N    - length of input data
-template <class T> bool TFFT<T>::Forward(complex<T> *const Data, const unsigned int N)
-{
+template <class T> 
+bool TFFT<T>::Forward(complex<T> *const Data, const unsigned int N) {
 	//   Check input parameters
 	if (!Data || N < 1 || N & (N - 1))
 		return false;

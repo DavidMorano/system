@@ -15,13 +15,14 @@ module ;
 export module complex ;
 
 //   Complex number template, double by default
-template <class T = double> class complex {
-protected:
+export {
+    template <class T = double> class complex {
+    protected:
 	//   Internal presentation - real and imaginary parts
 	T m_re ;
 	T m_im ;
 
-public:
+    public:
 	//   Imaginary unity
 	static const complex<T> i ;
 	static const complex<T> j ;
@@ -210,6 +211,7 @@ public:
 	friend bool operator != (const T left, const complex<T> &right) {
 		return left != right.m_re || right.m_im != T(0.0);
 	} ;
-} ; /* end class (complex) */
+    } ; /* end class (complex) */
+} /* end export */
 
 
