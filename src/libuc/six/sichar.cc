@@ -24,10 +24,10 @@
 	sixdigit
 
 	Description:
-	This subroutine searchs for an alpha character within a
-	given string and returns the index to that character (if
-	it is found).  It returns -1 if the character does not exist
-	within the given string.
+	This subroutine searchs for a character belonging to a
+	character-class within a given string, and returns the index
+	of that character (if it is found).  It returns -1 if the
+	character does not exist within the given string.
 
 	Synopsis:
 	int sialpha(cchar *sp,int sl) noex

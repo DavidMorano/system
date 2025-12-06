@@ -48,7 +48,7 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
-#include	<estrings.h>
+#include	<estrings.h>		/* |sialpha(3uc)| */
 #include	<cfdec.h>
 #include	<pow.h>
 #include	<strn.h>
@@ -83,12 +83,6 @@ extern "C" int	matstr(cchar **,cchar *,int) ;
 extern "C" int	matcasestr(cchar **,cchar *,int) ;
 extern "C" int	optbool(cchar *,int) ;
 extern "C" int	optvalue(cchar *,int) ;
-extern "C" int	sialpha(cchar *,int) ;
-extern "C" int	hasalpha(cchar *,int) ;
-extern "C" int	isalphalatin(int) ;
-extern "C" int	isdigitlatin(int) ;
-extern "C" int	isFailOpen(int) ;
-extern "C" int	isNotPresent(int) ;
 
 extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
