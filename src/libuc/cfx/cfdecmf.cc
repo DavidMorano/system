@@ -1,6 +1,6 @@
 /* cfdecmf SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Convert-From-Decimal-Multiply-Factor */
 /* version %I% last-modified %G% */
@@ -11,9 +11,22 @@
 	= 1998-04-17, David A­D­ Morano
 	This code was originally written.
 
+	= 2011-03-23, David A­D­ Morano
+	I folded some constants (power of 1024) into an array for
+	later reference use.  Admittedly this was not a big deal.
+
+	= 2025-12-04, David A­D­ Morano
+	I added the check for multiply overflow (see subroutine-template
+	|cfdecmfx()| below) using the C++26 |ckd_mul(3c++)| subroutine.
+	Yes, I got to use the check subroutine early due to its
+	early implementation in GCC-14 (or GCC-15).  Actually, it
+	was available some time ago now I think.  Note that the
+	subroutine |ckd_maul(3c++)| is *not* in the 'std' namespace!
+	Yes, a little bit weird.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2011,2025 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -35,39 +48,65 @@
 	multiply-factor		value
 	-------------------------------
 
-	b			512
-	k			1024
-	m			(1024*1024)
-	g			(1024*1024*1024)
-	kb			(1024*512)
-	mb			(1024*1024*512)
+	b	block		512
+	d	deca		10
+	h	hecto		100
+	k	kila		1024
+	m	mega		1024*1024
+	g	giga		1024*1024*1024
+	t	tera		1024*1024*1024*1024
+	p	peta		1024*1024*1024*1024*1024
+	e	exa		1024*1024*1024*1024*1024*1024
+	kb	kilo-blocks	1024*512
+	mb	mega-blocks	1024*1024*512
+
+	Synopsis:
+	int cfdecmf{x}(cchar *sbuf,int slen,{x} *rp) noex
+
+	Arguments:
+	{x}		i = |int|, l = |long|, ll = |longlong|
+	{x}		ui = |int|, ul = |long|, ull = |longlong|
+	sbuf		source string pointer
+	slen		source string length
+	rp		point to receive result
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strnlen(3c)| */
+#include	<cstdint>		/* |int64_t| */
+#include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
+#include	<utility>		/* |in_range(3c++)| */
 #include	<usystem.h>
 #include	<intsat.h>
 #include	<ascii.h>
 #include	<cfdec.h>
-#include	<char.h>
-#include	<toxc.h>
+#include	<six.h>			/* |sialpha(3uc)| + |sichr(3uc)| */
+#include	<rmx.h>			/* |rmwht(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
+#include	<toxc.h>		/* |tolc(3uc)| */
+#include	<stdintx.h>		/* |int128_t| */
 #include	<localmisc.h>
 
 #include	"cfdecmf.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#undef	UBLOCKSIZE
-#define	UBLOCKSIZE	512
 
-#define	OUR_ISWHITE(c)	(CHAR_ISWHITE(c) || ((c) == CH_NBSP))
-#define	TOLC(ch)	CHAR_TOLC(ch)
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -78,35 +117,81 @@ import libutil ;
 
 /* local structures */
 
+constexpr char	xfacts[] = " kmgtpe" ;
+
+constexpr int	nfacts = lenstr(xfacts) ;
+
+namespace {
+    struct efactors {
+	int64_t		v[nfacts] ;
+	consteval efactors() noex ;
+    } ;  /* end struct (efactors) */
+} /* end namespace */
+
 
 /* forward references */
 
-static int	getmf(cchar *,int,long *) noex ;
+local int	getmf(cchar *,int,int64_t *) noex ;
 
+local inline bool ourwht(cchar c) noex {
+    	cint ch = (c & UCHAR_MAX) ;
+    	return (CHAR_ISWHITE(ch) || (ch == CH_NBSP)) ;
+} /* end subroutine (ourwht) */
 
-/* local variables */
-
-
-/* local subroutine-templates */
-
-template<typename T>
-int cfdecmfx(int (*cfdecx)(cchar *,int,T *),cchar *sp,int sl,T *rp) noex {
-	int		rs = SR_FAULT ;
-	if (sp && rp) {
-	    long	mf{} ;
-	    cint	ml = getmf(sp,sl,&mf) ;
-	    if (T v ; (rs = cfdecx(sp,ml,&v)) >= 0) {
-		const T	mfv = (T) mf ;
-	        rs = intsat(v * mfv) ;
-	        if (rp) *rp = (v * mfv) ;
+template<typename T> local int inrange(int64_t v) noex {
+    	cint		nbx = szof(int64_t) ;
+    	cint		nb = szof(T) ;
+    	int		rs = SR_OK ;
+	if (nb <= nbx) {
+	    if (nb >= 2) {
+	        if (v >> ((nb * CHAR_BIT) - 1)) rs = SR_RANGE ;
+	    } else {
+	        rs = SR_DOMAIN ;
 	    }
+	} /* end if (testable size) */
+    	return rs ;
+} /* end subroutine (inrange) */
+
+template<typename T> local int cfdecmfx(cc *sp,int µsl,T *rp) noex {
+	int		rs = SR_FAULT ;
+	int		rv = 0 ; /* return-value */
+	if (sp && rp) ylikely {
+	    rs = SR_INVALID ;
+	    if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
+	        if (int64_t mf{} ; (rs = getmf(sp,sl,&mf)) > 0) ylikely {
+	            cint	ml = rs ;
+	            if ((rs = inrange<T>(mf)) >= 0) ylikely {
+	                if (T v ; (rs = cfdec(sp,ml,&v)) >= 0) ylikely {
+		            const T	mfv = (T) mf ;
+		            if (T res{} ; (! ckd_mul(&res,v,mfv))) ylikely {
+	                        if (rp) *rp = res ;
+				rv = intsat(res) ; /* return-value */
+		            } else {
+			        rs = SR_RANGE ;
+		            }
+	                } /* end if cfdecx) */
+	            } /* end if (inrange) */
+	        } /* end if (getmf) */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine-template (cfdecmfx) */
+	return (rs >= 0) ? rv : rs ;
+} /* end subroutine-template (cfdecmfx) */
+
+consteval efactors::efactors() noex {
+    	int64_t	val = 1 ;
+	v[0] = val ;
+	for (int i = 1 ; i < nfacts ; i += 1) {
+	    val *= 1024L ;
+	    v[i] = val ;
+	} /* end for */
+} ; /* end ctor (efactors) */
 
 
 /* local variables */
+
+constexpr efactors	ef ;
+
+constexpr int		ubsz = 512 ;	/* UNIX® block size */
 
 
 /* exported variables */
@@ -115,73 +200,72 @@ int cfdecmfx(int (*cfdecx)(cchar *,int,T *),cchar *sp,int sl,T *rp) noex {
 /* exported subroutines */
 
 int cfdecmfi(cchar *sbuf,int slen,int *rp) noex {
-	return cfdecmfx(cfdeci,sbuf,slen,rp) ;
-}
-/* end subroutine (cfdecmfi) */
-
-int cfdecmfui(cchar *sbuf,int slen,uint *rp) noex {
-	return cfdecmfx(cfdecui,sbuf,slen,rp) ;
-}
-/* end subroutine (cfdecmfui) */
+	return cfdecmfx(sbuf,slen,rp) ;
+} /* end subroutine (cfdecmfi) */
 
 int cfdecmfl(cchar *sbuf,int slen,long *rp) noex {
-	return cfdecmfx(cfdecl,sbuf,slen,rp) ;
-}
-/* end subroutine (cfdecmfl) */
-
-int cfdecmful(cchar *sbuf,int slen,ulong *rp) noex {
-	return cfdecmfx(cfdecul,sbuf,slen,rp) ;
-}
-/* end subroutine (cfdecmful) */
+	return cfdecmfx(sbuf,slen,rp) ;
+} /* end subroutine (cfdecmfl) */
 
 int cfdecmfll(cchar *sbuf,int slen,longlong *rp) noex {
-	return cfdecmfx(cfdecll,sbuf,slen,rp) ;
-}
-/* end subroutine (cfdecmfll) */
+	return cfdecmfx(sbuf,slen,rp) ;
+} /* end subroutine (cfdecmfll) */
+
+int cfdecmfui(cchar *sbuf,int slen,uint *rp) noex {
+	return cfdecmfx(sbuf,slen,rp) ;
+} /* end subroutine (cfdecmfui) */
+
+int cfdecmful(cchar *sbuf,int slen,ulong *rp) noex {
+	return cfdecmfx(sbuf,slen,rp) ;
+} /* end subroutine (cfdecmful) */
 
 int cfdecmfull(cchar *sbuf,int slen,ulonglong *rp) noex {
-	return cfdecmfx(cfdecull,sbuf,slen,rp) ;
-}
-/* end subroutine (cfdecmfull) */
+	return cfdecmfx(sbuf,slen,rp) ;
+} /* end subroutine (cfdecmfull) */
 
 
 /* local subroutines */
 
-static int getmf(cchar *sbuf,int slen,long *rp) noex {
-	long		mf = 1 ;
-	int		sl = lenstr(sbuf,slen) ;
-	uchar		*ubuf = (uchar *) sbuf ;
-	while ((sl > 0) && OUR_ISWHITE(ubuf[sl - 1])) {
-	    sl -= 1 ;
-	}
-	if (sl > 0) {
-	    if (TOLC(ubuf[sl-1]) == 'b') {
-	        mf = UBLOCKSIZE ;
-	    } else if (TOLC(ubuf[sl-1]) == 'k') {
-	        mf = 1024 ;
-	    } else if (TOLC(ubuf[sl-1]) == 'm') {
-	        mf = 1024 * 1024 ;
-	    } else if (TOLC(ubuf[sl-1]) == 'g') {
-	        mf = 1024 * 1024 * 1024 ;
-	    } else if (sl > 1) {
-	        if ((TOLC(ubuf[sl-2]) == 'k') && (ubuf[sl-1] == 'b')) {
-	            mf = 1024 * UBLOCKSIZE ;
-	            sl -= 1 ;
-	        } else if ((TOLC(ubuf[sl-2]) == 'm') && (ubuf[sl-1] == 'b')) {
-	            mf = 1024 * 1024 * UBLOCKSIZE ;
-	            sl -= 1 ;
-		} /* end if */
-	    } /* end if */
-	    if (mf > 1) {
-	        sl -= 1 ;
-		while ((sl > 0) && OUR_ISWHITE(ubuf[sl-1])) {
-	    	    sl -= 1 ;
-		}
-	    } /* end if (adjusting buffer length) */
-	} /* end if */
-	*rp = mf ;
-	return sl ;
-}
-/* end subroutine (getmf) */
+/* get the "multiply-factor" */
+local int getmf(cchar *sbuf,int slen,int64_t *rp) noex {
+	int64_t		mf = 1 ; /* return-result */
+	int		rs = SR_INVALID ;
+	int		rl = 0 ; /* return-value */
+	if (int sl ; (sl = rmwht(sbuf,slen)) > 0) ylikely {
+	    rs = SR_OK ;
+	    if (int si ; (si = sialpha(sbuf,sl)) > 0) {
+		cint	xl = (sl - si) ;
+	        cint	chx = tolc(sbuf[si]) ;
+		cchar	*xp = (sbuf + si) ;
+		rl = si ; /* <- return-value */
+	        if (chx == 'b') {
+	            mf = ubsz ;
+	        } else if (chx == 'd') {
+	            mf = 10L ;
+	        } else if (chx == 'h') {
+	            mf = 100L ;
+	        } else if ((si = sichr(xfacts,-1,chx)) > 0) {
+	            mf = ef.v[si] ;
+	        } else if (xl > 1) {
+		    cint chy = tolc(xp[1]) ;
+		    if (chy == 'b') {
+	                if (chx == 'k') {
+	                    mf = 1024L * ubsz ;
+	                } else if (chx == 'm') {
+	                    mf = 1024L * 1024L * ubsz ;
+	                } else {
+		            rs = SR_NOTSUP ;
+		        } /* end if */
+	            } else {
+		        rs = SR_NOTSUP ;
+		    } /* end if */
+	        } else {
+		    rs = SR_NOTSUP ;
+	        } /* end if */
+	    } /* end if (have extension) */
+	} /* end if (non-zero positive) */
+	*rp = mf ; /* <- return-result */
+	return (rs >= 0) ? rl : rs ;
+} /* end subroutine (getmf) */
 
 
