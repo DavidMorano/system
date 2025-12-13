@@ -39,7 +39,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
@@ -84,10 +83,10 @@ using cfx::sfdigs ;			/* subroutine */
 
 int cfdecf(cchar *snp,int snl,double *rp) noex {
 	int		rs = SR_FAULT ;
-	if (snp && rp) {
+	if (snp && rp) ylikely {
 	    cchar	*sp{} ;
 	    rs = SR_DOM ;
-	    if (int sl ; (sl = sfdigs(snp,snl,&sp)) > 0) {
+	    if (int sl ; (sl = sfdigs(snp,snl,&sp)) > 0) ylikely {
 		strnul	str(sp,sl) ;
 	        rs = uc_strtod(str,nullptr,rp) ;
 	    } /* end if (sfdigs) */
