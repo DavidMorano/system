@@ -40,7 +40,7 @@ static inline int cfdect(cchar *sp,int sl,int *rp = nullptr) noex {
 	return cfdect(sp,sl,rp) ;
 }
 
-#else 
+#else /* __cplusplus */
 
 static inline int cfdect(cchar *sp,int sl,int *rp) noex {
 	return cfdect(sp,sl,rp) ;
