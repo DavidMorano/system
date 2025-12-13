@@ -17,12 +17,28 @@
 
 /*******************************************************************************
 
-  	Group:
+  	Name:
 	cfdect
 
 	Description:
 	This subroutine converts a character string representing a
-	time-interval.  The time-interval is returned in an integer.
+	time-interval to an integer |int| tpye variable.  The
+	time-interval is returned in an integer.  The character
+	string representing a time-interval has the form:
+		<mum>[<alpha>[<num>[<alpha>[<num>]]]] ...
+
+	Synopsis:
+	int cfdect{x}(cchar *sbuf,int slen,{x} *rp) noex
+
+	Arguments:
+	{x}		i = |int|, l = |long|, ll = |longlong|
+	sbuf		source specification string pointer
+	slen		source specification string length
+	rp		pointer to integer to receive result
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -34,8 +50,9 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<strn.h>
-#include	<sfx.h>
+#include	<intsat.h>		/* |intsat(3u)| */
+#include	<strn.h>		/* |strnalpha(3uc)| */
+#include	<sfx.h>			/* |sfshrink(3uc)| */
 #include	<cfdec.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
@@ -57,7 +74,8 @@
 
 /* forward references */
 
-static int	convert(cchar *,int,int,int *) noex ;
+local int	cfloop(cchar *,int,int *) noex ;
+local int	convert(cchar *,int,int,int *) noex ;
 
 
 /* local variables */
@@ -71,36 +89,27 @@ static int	convert(cchar *,int,int,int *) noex ;
 int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	int		rs = SR_FAULT ;
 	int		res = 0 ;
-	if (sbuf) {
+	if (sbuf) ylikely {
 	    cchar	*sp{} ;
 	    rs = SR_DOM ;
-	    if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
-		bool	f_negative = false ;
-	        cchar	*tp ;
-		rs = SR_OK ;
+	    if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) ylikely {
+		bool	fneg = false ;
 		res = 0 ;
 	        if (sl && (*sp == '-')) {
-	            f_negative = true ;
+	            fneg = true ;
 	            sp += 1 ;
 	            sl -= 1 ;
-	        }
-	        while ((tp = strnbrk(sp,sl,"YMWDwdhms")) != nullptr) {
-		    cint	mch = mkchar(*tp) ;
-		    cint	tl = intconv(tp - sp) ;
-	            rs = convert(sp,tl,mch,&res) ;
-	            if (rs < 0) break ;
-	            sl -= intconv((tp + 1) - sp) ;
-	            sp = (tp + 1) ;
-	        } /* end while */
-	        if ((rs >= 0) && (sl > 0)) {
-	    	    rs = convert(sp,sl,0,&res) ;
-	        }
-	        if (f_negative) {
-		    res = (- res) ;
-		}
+	        } /* end if (test for negative) */
+		if ((rs = cfloop(sp,sl,&res)) >= 0) ylikely {
+	            if (fneg) {
+		        res = (- res) ;
+		    }
+		} /* end if (cfloop) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	if (rp) *rp = ((rs >= 0) ? res : 0) ;
+	if (rp) {
+	    *rp = ((rs >= 0) ? res : 0) ;
+	}
 	if (res < 0) res = 0 ;
 	return (rs >= 0) ? res : rs ;
 }
@@ -109,10 +118,31 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 
 /* local subroutines */
 
-static int convert(cchar *sp,int sl,int mc,int *rp) noex {
+local int cfloop(cchar *sp,int sl,int *rp) noex {
+    	cnullptr	np{} ;
+    	int		rs = SR_OK ;
+	int		res = 0 ; /* accumulated-result */
+	int		inc{} ;
+	for (cc *tp ; (rs >= 0) && (tp = strnalpha(sp,sl)) != np ; ) {
+	    cint	mch = mkchar(*tp) ;
+	    cint	tl = intconv(tp - sp) ;
+	    rs = convert(sp,tl,mch,&inc) ;
+	    res += inc ;
+	    sl -= intconv((tp + 1) - sp) ;
+	    sp = (tp + 1) ;
+	} /* end for */
+	if ((rs >= 0) && (sl > 0)) {
+	    rs = convert(sp,sl,0,&inc) ;
+	    res += inc ;
+	}
+	*rp = res ;
+	return rs ;
+} /* end subroutine (cfloop) */
+
+local int convert(cchar *sp,int sl,int mc,int *rp) noex {
 	int		rs = SR_OK ;
 	cchar		*cp ;
-	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	    int		mf = 1 ;
 	    switch (mc) {
 	    case 'Y':
@@ -137,13 +167,19 @@ static int convert(cchar *sp,int sl,int mc,int *rp) noex {
 	        break ;
 	    case 's':
 	        break ;
+	    default:
+		rs = SR_NOMSG ;
+		break ;
 	    } /* end switch */
-	    if (int v{} ; (rs = cfdeci(cp,cl,&v)) >= 0) {
-	        *rp += (v * mf) ;
-	    }
+	    if (rs >= 0) {
+	        if (int v{} ; (rs = cfdeci(cp,cl,&v)) >= 0) {
+	            cint res = (v * mf) ;
+		    *rp = res ;
+		    rs = intsat(res) ;
+	        } /* end if (cfdeci) */
+	    } /* end if (ok) */
 	} /* end if (non-zero) */
 	return rs ;
-}
-/* end subroutine (convert) */
+} /* end subroutine (convert) */
 
 
