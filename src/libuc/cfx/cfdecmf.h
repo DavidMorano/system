@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-04-17, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -42,23 +42,23 @@ EXTERNC_end
 
 #if	__cplusplus
 
-inline int cfdecmf(cchar *sp,int sl,int *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,int *rp = nullptr) noex {
 	return cfdecmfi(sp,sl,rp) ;
 }
-inline int cfdecmf(cchar *sp,int sl,long *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,long *rp = nullptr) noex {
 	return cfdecmfl(sp,sl,rp) ;
 }
-inline int cfdecmf(cchar *sp,int sl,longlong *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,longlong *rp = nullptr) noex {
 	return cfdecmfll(sp,sl,rp) ;
 }
 
-inline int cfdecmf(cchar *sp,int sl,uint *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,uint *rp = nullptr) noex {
 	return cfdecmfui(sp,sl,rp) ;
 }
-inline int cfdecmf(cchar *sp,int sl,ulong *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,ulong *rp = nullptr) noex {
 	return cfdecmful(sp,sl,rp) ;
 }
-inline int cfdecmf(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,ulonglong *rp = nullptr) noex {
 	return cfdecmfull(sp,sl,rp) ;
 }
 
