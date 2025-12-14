@@ -52,7 +52,9 @@
 
 #include	"cfutil.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -79,7 +81,7 @@ import libutil ;
 
 namespace cfx {
     int rmleadzero(cchar *sp,int sl) noex {		/* used internally */
-	if ((sl > 1) && iszero(*sp++)) {
+	if ((sl > 1) && iszero(*sp++)) ylikely {
 	    sl -= 1 ;
 	}
 	return sl ;
@@ -87,7 +89,7 @@ namespace cfx {
     int sfdigs(cchar *nsp,int nsl,cchar **rpp) noex {
 	int	rl = nsl ;
 	cchar	*sp = nsp ;
-	if (int sl ; (sl = sfshrink(nsp,nsl,&sp)) > 0) {
+	if (int sl ; (sl = sfshrink(nsp,nsl,&sp)) > 0) ylikely {
 	    rl = sl ;
 	    if (sl > 1) {
 		rl = rmleadzero(sp,sl) ;
@@ -100,10 +102,10 @@ namespace cfx {
     int sfchars(cchar *nsp,int nsl,cchar **rpp) noex {
 	int	rl = 0 ;
 	cchar	*sp = nsp ;
-	if (int sl ; (sl = sfshrink(nsp,nsl,&sp)) > 0) {
+	if (int sl ; (sl = sfshrink(nsp,nsl,&sp)) > 0) ylikely {
 	    cauto islead = [] (char ch) noex {
 		return ((ch == ' ') || (ch == '+') || (ch == '0')) ;
-	    } ;
+	    } ; /* end lambda */
 	    while ((sl > 0) && islead(*sp)) {
 		sp += 1 ;
 		sl -= 1 ;
@@ -116,33 +118,36 @@ namespace cfx {
 } /* end namespace (cfx) */
 
 namespace cfx {
-    int getsign(cchar *sp,int sl,bool *fnegp) noex {
+    int getsign(cchar *sp,int µsl,bool *fnegp) noex {
 	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
 	if (sp && fnegp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    }
-	    if ((sl > 0) && isplusminus(*sp)) {
-	        *fnegp = (*sp == '-') ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    }
-	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    }
-	    if (sl > 1) {
-		if (iszero(*sp)) {
-		    sp += 1 ;
-		    sl -= 1 ;
-		}
-	    } else if (sl == 0) {
-		rs = SR_INVALID ;
-	    } /* end if */
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
+	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        if ((sl > 0) && isplusminus(*sp)) {
+	            *fnegp = (*sp == '-') ;
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        if (sl > 1) {
+		    if (iszero(*sp)) {
+		        sp += 1 ;
+		        sl -= 1 ;
+		    }
+	        } else if (sl == 0) {
+		    rs = SR_INVALID ;
+	        } /* end if */
+		rl = sl ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? sl : rs ;
+	return (rs >= 0) ? rl : rs ;
     } ; /* end if (getsign) */
 } /* end namespace (cfx) */
 
