@@ -234,34 +234,41 @@ local int getmf(cchar *sbuf,int slen,int64_t *rp) noex {
 	if (int sl ; (sl = rmwht(sbuf,slen)) > 0) ylikely {
 	    rs = SR_OK ;
 	    if (int si ; (si = sialpha(sbuf,sl)) > 0) {
-		cint	xl = (sl - si) ;
 	        cint	chx = tolc(sbuf[si]) ;
 		cchar	*xp = (sbuf + si) ;
 		rl = si ; /* <- return-value */
-	        if (chx == 'b') {
-	            mf = ubsz ;
-	        } else if (chx == 'd') {
-	            mf = 10L ;
-	        } else if (chx == 'h') {
-	            mf = 100L ;
-	        } else if ((si = sichr(xfacts,-1,chx)) > 0) {
-	            mf = ef.v[si] ;
-	        } else if (xl > 1) {
-		    cint chy = tolc(xp[1]) ;
-		    if (chy == 'b') {
-	                if (chx == 'k') {
-	                    mf = 1024L * ubsz ;
-	                } else if (chx == 'm') {
-	                    mf = 1024L * 1024L * ubsz ;
+		switch (cint xl = (sl - si) ; xl) {
+		case 1:
+	            if (chx == 'b') {
+	                mf = ubsz ;
+	            } else if (chx == 'd') {
+	                mf = 10L ;
+	            } else if (chx == 'h') {
+	                mf = 100L ;
+	            } else if ((si = sichr(xfacts,-1,chx)) > 0) {
+	                mf = ef.v[si] ;
+		    }
+		    break ;
+		case 2:
+		    {
+		        cint chy = tolc(xp[1]) ;
+		        if (chy == 'b') {
+	                    if (chx == 'k') {
+	                        mf = 1024L * ubsz ;
+	                    } else if (chx == 'm') {
+	                        mf = 1024L * 1024L * ubsz ;
+	                    } else {
+		                rs = SR_NOTSUP ;
+		            } /* end if */
 	                } else {
 		            rs = SR_NOTSUP ;
 		        } /* end if */
-	            } else {
-		        rs = SR_NOTSUP ;
-		    } /* end if */
-	        } else {
+		    } /* end block */
+		    break ;
+		default:
 		    rs = SR_NOTSUP ;
-	        } /* end if */
+		    break ;
+	        } /* end switch */
 	    } /* end if (have extension) */
 	} /* end if (non-zero positive) */
 	*rp = mf ; /* <- return-result */
