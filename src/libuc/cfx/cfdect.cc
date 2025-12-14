@@ -142,7 +142,7 @@ local int cfloop(cchar *sp,int sl,int *rp) noex {
 local int convert(cchar *sp,int sl,int mc,int *rp) noex {
 	int		rs = SR_OK ;
 	cchar		*cp ;
-	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) == 1) ylikely {
 	    int		mf = 1 ;
 	    switch (mc) {
 	    case 'Y':
@@ -178,6 +178,8 @@ local int convert(cchar *sp,int sl,int mc,int *rp) noex {
 		    rs = intsat(res) ;
 	        } /* end if (cfdeci) */
 	    } /* end if (ok) */
+	} else {
+	    rs = SR_INVALID ;
 	} /* end if (non-zero) */
 	return rs ;
 } /* end subroutine (convert) */
