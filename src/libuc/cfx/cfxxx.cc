@@ -49,11 +49,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
+#include	<usystem.h>		/* |uc_strto{xx}(3uc)| */
 #include	<stdintx.h>
 #include	<localmisc.h>
 
 #include	"cfxxx.h"
+
+#pragma		GCC dependency		"mod/cfsysx.ccm"
 
 import cfsysx ;
 
