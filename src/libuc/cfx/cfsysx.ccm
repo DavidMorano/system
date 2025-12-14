@@ -121,23 +121,23 @@ export {
 	if (sp && rp) {
 	    cchar	*nsp{} ;
 	    rs = SR_DOM ;
-	    if (int nsl ; (nsl = cfx::sfdigs(sp,sl,&nsp)) > 0) {
-	    	if ((rs = checkbase(nsp,nsl,b)) >= 0) {
+	    if (int nsl ; (nsl = cfx::sfdigs(sp,sl,&nsp)) > 0) ylikely {
+	    	if ((rs = checkbase(nsp,nsl,b)) >= 0) ylikely {
 		    if (nsp[nsl] != '\0') {
-			auto	load = snwcpyshrink ;
+			cauto	load = snwcpyshrink ;
 			cint	dlen = nsl ;
 	                if (nsl <= cfsysx_maxstack) {
-	                    char	dbuf[dlen+1] ;
+	                    char dbuf[dlen+1] ;
 	    	            if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
 		                rs = cfsystox(dbuf,b,rp) ;
 	                    } /* end if (loading) */
 		        } else {
-		            char	*dbuf{} ;
-		            if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
+		            char *dbuf{} ;
+		            if ((rs = lm_mall((dlen+1),&dbuf)) >= 0) {
 	    	                if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
 		                    rs = cfsystox(dbuf,b,rp) ;
 	                        } /* end if (loading) */
-			        rs1 = uc_free(dbuf) ;
+			        rs1 = lm_free(dbuf) ;
 			        if (rs >= 0) rs = rs1 ;
 		            } /* end if (memory-allocation) */
 	                } /* end if */
