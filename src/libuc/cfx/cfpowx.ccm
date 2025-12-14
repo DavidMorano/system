@@ -9,8 +9,8 @@
 /* revision history:
 
 	= 2008-05-06, David A­D­ Morano
-	Convert numeric digit c-strings (of pow-of-two bases) into
-	integers.
+	Convert a numeric digit c-string (of a power-of-two base) into
+	an integer (type).
 
 	= 2020-05-07, David A-D- Morano
 	I converted this (formerly a header-only file) to a module.
@@ -35,8 +35,8 @@
 	Notes:
 	1. This code is limited to a maximum base of 64 (the standard).
 	2. I find it (sort of) funny that I wrote a subroutine that
-	does this very function back in 1983 (40 years ago), but in
-	M68k assembly language!
+	does this very function back in 1983 (37 years ago; it is
+	2020), but in M68k assembly language!
 
 *******************************************************************************/
 
