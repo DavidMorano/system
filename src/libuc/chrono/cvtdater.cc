@@ -45,7 +45,9 @@
 
 #include	"cvtdater.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -72,7 +74,7 @@ static int	cvtdater_daytime(cvtdater *,time_t * = nullptr) noex ;
 int cvtdater_start(cvtdater *op,time_t dt) noex {
 	CVTDATER	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if (dt == 0) dt = getustime ;
 	    rs = memclear(hop) ;
 	    op->daytime = dt ;
@@ -83,7 +85,7 @@ int cvtdater_start(cvtdater *op,time_t dt) noex {
 
 int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	int		rs = SR_FAULT ;
-	if (op && cp) {
+	if (op && cp) ylikely {
 	    tmz		stz ;
 	    if (cl < 0) cl = lenstr(cp) ;
 	    if (hasalpha(cp,cl)) {
@@ -94,7 +96,7 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	    } else {
 	        rs = stz.xday(cp,cl) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        tmtime	tmt ;
 	        if (stz.hasyear == 0) {
 	            cvtdater_daytime(op) ;	/* get current date */
@@ -102,9 +104,9 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 		        rs = stz.setyear(tmt.year) ;
 		    }
 	        } /* end if (getting the current year) */
-	        if (rs >= 0) {
-	            if ((rs = tmt.insert(&stz.st)) >= 0) {
-	                if (time_t t{} ; (rs = tmt.mktime(&t)) >= 0) {
+	        if (rs >= 0) ylikely {
+	            if ((rs = tmt.insert(&stz.st)) >= 0) ylikely {
+	                if (time_t t{} ; (rs = tmt.mktime(&t)) >= 0) ylikely {
 	                    if (dp) *dp = t ;
 		        }
 		    }
@@ -117,7 +119,7 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 
 int cvtdater_finish(cvtdater *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -129,7 +131,7 @@ int cvtdater_finish(cvtdater *op) noex {
 
 static int cvtdater_daytime(cvtdater *op,time_t *rp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->daytime == 0) {
 		op->daytime = getustime ;
@@ -156,7 +158,7 @@ void cvtdater::dtor() noex {
 
 cvtdater_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case cvtdatermem_finish:
 	        rs = cvtdater_finish(op) ;
