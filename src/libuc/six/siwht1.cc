@@ -26,7 +26,7 @@
 	siwhtbrk
 
 	Description:
-	This subroutine searchs for an a character that is either
+	These subroutine searchs for an a character that is either
 	the specified character (if provided), or for a character
 	in a specified chracter-class (if provided), or failing
 	that a white-space character.

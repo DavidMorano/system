@@ -15,6 +15,28 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Group:
+	siwht
+
+	Description:
+	These subroutines search for a break-point that is either
+	a given character or a character within a given c-string,
+	or failing that, it finds the first occurance of white-space
+	instead.  So preference is given to finding the given
+	character first (either the specified single character or
+	a chracter within a character-class), and only failing that
+	is the first character of white-space returned.
+
+	Synopsis:
+	char *strwht(cchar *sp,int sl) noex
+	char *strwhtchr(cchar *sp,int sl,int sch) noex
+	char *strwhtbrk(cchar *sp,int sl,cchar *ss) noex
+	char *strwhtbrk(cchar *sp,int sl,chrset &sset) noex
+
+*******************************************************************************/
+
 #ifndef	STRNWHT_INCLUDE
 #define	STRNWHT_INCLUDE
 
