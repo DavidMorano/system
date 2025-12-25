@@ -1,0 +1,63 @@
+/* hasclass HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* has a counted c-string some characteristic? */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	HASCLASS_INCLUDE
+#define	HASCLASS_INCLUDE
+
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<matstr.h>		/* used below in this header */
+#include	<stdfnames.h>		/* used below in this header */
+
+EXTERNC_begin
+
+extern bool hasalpha(cchar *,int) noex ;
+extern bool hasalnum(cchar *,int) noex ;
+extern bool hasdigit(cchar *,int) noex ;
+extern bool hasdigex(cchar *,int) noex ;
+extern bool haswhite(cchar *,int) noex ;
+extern bool hasoctal(cchar *,int) noex ;
+
+extern bool haslc(cchar *,int) noex ;
+extern bool hasuc(cchar *,int) noex ;
+
+static inline bool hasdig(cchar *sp,int sl) noex {
+    	return hasdigit(sp,sl) ;
+}
+static inline bool hasoct(cchar *sp,int sl) noex {
+    	return hasoctal(sp,sl) ;
+}
+static inline bool hasdec(cchar *sp,int sl) noex {
+    	return hasdigit(sp,sl) ;
+}
+static inline bool hashex(cchar *sp,int sl) noex {
+    	return hasdigex(sp,sl) ;
+}
+static inline bool haswht(cchar *sp,int sl) noex {
+    	return haswhite(sp,sl) ;
+}
+
+EXTERNC_end
+
+
+#endif /* HASCLASS_INCLUDE */
+
+
