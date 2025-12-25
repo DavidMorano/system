@@ -1,0 +1,102 @@
+/* ureserve-isx MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* reserved interfaces */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-21, David A­D­ Morano
+	This module was originally written.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	ureserve
+
+	Description:
+	This module provides miscellaneous UNIX® or other
+	common (library oriented) subroutines.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<vector>
+#include	<string>
+#include	<iostream>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
+
+export module ureserve:isx ;
+
+export {
+    bool	iswhite(int) noex ;
+    bool	isalnumlatin(int) noex ;
+    bool	isalphalatin(int) noex ;
+    bool	isdict(int) noex ;
+    bool	ishexlatin(int) noex ;
+    bool	islowerlatin(int) noex ;
+    bool	isupperlatin(int) noex ;
+    bool	isprintbad(int) noex ;
+    bool	isprintlatin(int) noex ;
+    bool	isprintterm(int) noex ;
+    bool	iscmdstart(int) noex ;
+    bool	ishdrkey(int) noex ;
+    inline bool	isoctlatin(int ch) noex {
+	    return (ch >= '0') && (ch <= '7') ;
+    }
+    inline bool	isdigitlatin(int ch) noex {
+	    return (ch >= '0') && (ch <= '9') ;
+    }
+    inline bool	isdeclatin(int ch) noex {
+    	    return isdigitlatin(ch) ;
+    }
+    inline bool	isnumlatin(int ch) noex {
+    	    return ishexlatin(ch) || (ch == '\\') || (ch == 'x') ;
+    }
+    inline bool	isnumsign(int ch) noex {
+	    return ((ch == '+') || (ch == '-')) ;
+    }
+    inline bool	iseol(int ch) noex {
+	    return (ch == '\n') || (ch == '\r') ;
+    }
+    inline bool	iszero(int ch) noex {
+	    return (ch == '0') ;
+    }
+    inline bool	isplusminus(int ch) noex {
+	    return isnumsign(ch) ;
+    }
+    inline bool	isabbr(int ch) noex {
+	    ch &= UCHAR_MAX ;
+	    return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
+    }
+    inline bool	isblanklatin(int ch) noex {
+	    return (ch == ' ') || (ch == '\t') ;
+    }
+    inline bool	isspacetab(int ch) noex {
+	    return isblank(ch) ;
+    }
+    inline bool	isAbbr(int ch) noex {
+    	    return isabbr(ch) ;
+    }
+} /* end export */
+
+
