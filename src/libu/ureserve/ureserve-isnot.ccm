@@ -1,0 +1,71 @@
+/* ureserve-isnot MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* reserved interfaces */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-21, David A­D­ Morano
+	This module was originally written.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	ureserve:isnot
+
+	Description:
+	This module provides miscellaneous UNIX® or other
+	common (library oriented) subroutines.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<vector>
+#include	<string>
+#include	<iostream>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
+
+export module ureserve:isnot ;
+
+using std::vector ;			/* type */
+
+export {
+    bool isoneof(cint *,int) noex ;
+    inline bool isOneOf(cint *rsa,int rs) noex {
+	    return isoneof(rsa,rs) ;
+    }
+} /* end export */
+
+export {
+    bool isNotPresent(int) noex ;
+    bool isNotAccess(int) noex ;
+    bool isNotValid(int) noex ;
+    bool isNotLib(int) noex ;
+    bool isNotTerm(int) noex ;
+    bool isNotSupport(int) noex ;
+    inline bool isInvalid(int rs) noex {
+	return isNotValid(rs) ;
+    }
+} /* end export */
+
+
