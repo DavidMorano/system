@@ -1,0 +1,141 @@
+/* bitgrp MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* character-bit-set */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-04-10, David A­D­ Morano
+        This code was originally written.
+
+	= 2020-01-09, David A­D­ Morano
+	I modularized this code from a header file.  Whether this
+	really turns out to be a good idea is another question.
+
+*/
+	
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+/*******************************************************************************
+
+	Object:
+	bitgrp
+
+	Description:
+	Provide operations on a character-bit-set.
+
+	Synopsis:
+	int bitgrp::load(cchar *ss) noex
+	bool bitgrp::tst(int ch) const noex
+	void bitgrp::set(int ch) noex
+	void bitgrp::clr(int ch) noex
+
+	Arguments:
+	ss		c-string of character-set to load
+	ch		character to use for particular operation
+
+	Returns:
+	true		for test: character was present
+	false		for test: character was not present
+	>=0		for load: OK
+	<0		for load: error (system-return)
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<concepts>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<stdintx.h>
+#include	<baops.h>
+#include	<localmisc.h>
+
+export module bitgrp ;
+
+typedef ulong	word_t ;
+
+template<typename T> constexpr T xceil(T v,int m) noex {
+	const T		n = (v + (m - 1)) / m ;
+	return (n * m) ;
+} /* end subroutine-template (xceil) */
+
+local cint	wsz	= szof(word_t) ;
+
+cint		wbits	= (wsz * CHAR_BIT) ;
+
+export {
+    template<int n> struct bitgrp {
+	constexpr local cint	nwords = xceil((n / wbits),wbits) ;
+	word_t		ba[nwords] = {} ;	/* 32 bytes (4 words) */
+	constexpr int load(cchar *) noex ;
+	constexpr bitgrp() = default ;
+	constexpr bitgrp(cchar *ss) noex {
+	    load(ss) ;
+	} ;
+	constexpr bitgrp(int ch) noex {
+	    BASETL(ba,ch) ;
+	} ;
+	constexpr int set(int) noex ;
+	constexpr int clr(int) noex ;
+	constexpr int tst(int) const noex ;
+	constexpr int operator [] (int ch) const noex {
+	    return !!BATSTL(ba,ch) ;
+	} ;
+    } ; /* end struct-template (bitgrp) */
+} /* end export */
+
+template<int n> constexpr int bitgrp<n>::load(cchar *ss) noex {
+    	int		rs = SR_FAULT ;
+	if (ss) {
+	    rs = SR_OK ;
+	    for (int ch ; ((ch = (*ss & UCHAR_MAX))) ; ss += 1) {
+		if (ch < n) {
+		    BASETL(ba,ch) ;
+		} else {
+		    rs = SR_INVALID ;
+		    break ;
+		}
+	    } /* end for */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (bitgrp::load) */
+
+template<int n> constexpr int bitgrp<n>::tst(int ch) const noex {
+    	int		rs = SR_INVALID ;
+	if ((ch >= 0) && (ch < n)) {
+	    rs = !!BATSTL(ba,ch) ;
+	}
+	return rs ;
+} /* end method (bitgrp::tst) */
+
+template<int n> constexpr int bitgrp<n>::set(int ch) noex {
+    	int		rs = SR_INVALID ;
+	if ((ch >= 0) && (ch < n)) {
+	    rs = SR_OK ;
+	    BASETL(ba,ch) ;
+	}
+	return rs ;
+} /* end method (bitgrp::set) */
+
+template<int n> constexpr int bitgrp<n>::clr(int ch) noex {
+    	int		rs = SR_INVALID ;
+	if ((ch >= 0) && (ch < n)) {
+	    rs = SR_OK ;
+	    BACLRL(ba,ch) ;
+	}
+	return rs ;
+} /* end method (bitgrp::clr) */
+
+
