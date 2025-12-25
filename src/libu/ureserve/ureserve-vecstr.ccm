@@ -1,0 +1,127 @@
+/* ureserve-vecstr MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* reserved interfaces */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-21, David A­D­ Morano
+	This module was originally written.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	ureserve
+
+	Description:
+	This module provides miscellaneous UNIX® or other
+	common (library oriented) subroutines.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<vector>
+#include	<string>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
+
+export module ureserve:vecstr ;
+
+using std::vector ;			/* type */
+using std::string ;			/* type */
+
+enum vecstrmems {
+    	vecstrmem_start,
+    	vecstrmem_finish,
+    	vecstrmem_count,
+    	vecstrmem_sort,
+    	vecstrmem_delall,
+    	vecstrmem_overlast
+} ; /* end enum (vecstrmems) */
+
+struct vecstr_fl {
+    	uint		open:1 ;
+	uint		sorted:1 ;
+} ; /* end struct (vecstr_fl) */
+
+export {
+    struct vecstr ;
+    struct vecstr_co {
+	vecstr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (vecstr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+    } ; /* end struct (vecstr_co) */
+    struct vecstr_cur ;
+    struct vecstr : vector<string> {
+	friend		vecstr_co ;
+	vecstr_co	start ;
+	vecstr_co	finish;
+	vecstr_co	count ;
+	vecstr_co	sort ;
+	vecstr_co	delall ;
+	vecstr_fl	fl{} ;
+	vecstr &operator = (const vecstr &) = delete ;
+	vecstr(const vecstr &) = delete ;
+	vecstr() noex {
+	    start	(this,vecstrmem_start) ;
+	    finish	(this,vecstrmem_finish) ;
+	    count	(this,vecstrmem_count) ;
+	    sort	(this,vecstrmem_sort) ;
+	    delall	(this,vecstrmem_delall) ;
+	} ; /* end ctor */
+	int add(cchar *,int = -1) noex ;
+	int adduniq(cchar *,int = -1) noex ;
+	int add(string *) noex ;
+	int find(cchar *,int = -1) noex ;
+	int search(cchar *,int = -1) noex ;
+	int get(int,ccharpp) noex ;
+	int del(int) noex ;
+	int curbegin(vecstr_cur *) noex ;
+	int curend(vecstr_cur *) noex ;
+	int curenum(vecstr_cur *,cchar **) noex ;
+	int icount() const noex ;
+	operator int () noex ;
+	destruct vecstr() {
+	    if (fl.open) dtor() ;
+	} ;
+    private:
+	int istart(int = 0) noex ;
+	int ifinish() noex ;
+	int idelall() noex ;
+	int ifind(cchar *,int) noex ;
+	int isort() noex ;
+	void dtor() noex ;
+    } ; /* end struct (vecstr) */
+    struct vecstr_cur {
+	vecstr::iterator	it ;
+    } ; /* end struct (vestr_cur) */
+    int vecstr_add(vecstr *,string *) noex ;
+} /* end export */
+
+
