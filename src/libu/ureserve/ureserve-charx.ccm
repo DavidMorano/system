@@ -1,0 +1,74 @@
+/* ureserve-charx MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* reserved interfaces */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-21, David A­D­ Morano
+	This module was originally written.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	ureserve
+
+	Description:
+	This module provides miscellaneous UNIX® or other
+	common (library oriented) subroutines.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<vector>
+#include	<string>
+#include	<iostream>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
+
+export module ureserve:charx ;
+
+export {
+    bool char_iswhite(int) noex ;
+    bool char_islc(int) noex ;
+    bool char_isuc(int) noex ;
+    bool char_isfc(int) noex ;
+    inline bool char_isspacetab(int ch) noex {
+	return (ch == ' ') || (ch == '\t') ;
+    }
+    inline bool char_isdig(int ch) noex {
+	return ((ch >= '0') && (ch <= '9')) ;
+    }
+} /* end export */
+
+export {
+    short	char_dictorder(int) noex ;
+    inline uchar char_tobc(int ch) noex {
+    	return uchar(ch & UCHAR_MAX) ;
+    }
+    uchar	char_tolc(int) noex ;
+    uchar	char_touc(int) noex ;
+    uchar	char_tofc(int) noex ;
+    int		char_toval(int) noex ;
+} /* end export */
+
+
