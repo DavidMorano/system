@@ -54,10 +54,13 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<hostaddr.h>
 #include	<getprotofamily.h>
 #include	<getproto.h>

@@ -71,7 +71,9 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getproto.h>
 #include	<getprotofamily.h>
 #include	<getportnum.h>
@@ -86,7 +88,9 @@
 
 #include	"dialtcp.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3uc)| */
 
 /* local defines */
 

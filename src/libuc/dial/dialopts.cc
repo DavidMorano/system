@@ -43,7 +43,10 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"dialopts.h"
@@ -65,6 +68,12 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int	uc_setsockopt(int,int,int,int *,int) noex ;
+    extern int	uc_linger(int,int) noex ;
+    extern int	uc_closeonexec(int,int) noex ;
+}
 
 
 /* external variables */

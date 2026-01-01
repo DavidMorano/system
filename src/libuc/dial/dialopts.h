@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 enum dialopts {
@@ -43,7 +40,7 @@ enum dialopts {
 	dialopt_nocheck,
 	dialopt_cloexec,
 	dialopt_overlast
-} ;
+} ; /* end enum (dialopts) */
 
 
 #define	DIALOPT_NONE		0

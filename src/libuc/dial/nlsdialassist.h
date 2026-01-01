@@ -30,7 +30,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	NLPS_REQ0	"NLPS:000:001:"	/* version 0 */
