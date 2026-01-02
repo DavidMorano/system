@@ -47,7 +47,8 @@ module ;
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ulogerror.h>
 #include	<getoflags.h>
 #include	<localmisc.h>
@@ -64,6 +65,11 @@ module ucstream ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */

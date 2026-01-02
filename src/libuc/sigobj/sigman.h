@@ -22,7 +22,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<signal.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	SIGMAN_MAGIC	0x66938271
@@ -33,7 +34,7 @@
 struct sigman_hale {
 	SIGACTION	action ;
 	int		sig ;
-} ;
+} ; /* end struct */
 
 struct sigman_head {
 	SIGMAN_HA	*handles ;
@@ -41,7 +42,7 @@ struct sigman_head {
 	uint		magic ;
 	int		nhs ;
 	int		nblks ;
-} ;
+} ; /* end struct */
 
 typedef	SIGMAN		sigman ;
 typedef	SIGMAN_HA	sigman_ha ;

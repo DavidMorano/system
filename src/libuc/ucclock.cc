@@ -31,7 +31,9 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<ctime>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
 
 
 /* local defines */

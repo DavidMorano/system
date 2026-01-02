@@ -50,7 +50,8 @@ module ;
 #include	<new>			/* placement-new + |nothrow(3c++)| */
 #include	<utility>		/* |pair(3c++)| */
 #include	<unordered_set>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ulogerror.h>
 #include	<localmisc.h>
 
@@ -63,7 +64,6 @@ module ucstream ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::unordered_set ;              /* type */
 using std::pair ;                       /* type */
 using std::nothrow ;			/* constant */

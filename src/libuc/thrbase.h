@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<thrcomm.h>
 
 
@@ -34,7 +35,7 @@ enum thrbasecmds {
 	thrbasecmd_noop,
 	thrbasecmd_exit,
 	thrbasecmd_overlast
-} ;
+} ; /* end struct */
 
 EXTERNC_begin
 
@@ -44,12 +45,12 @@ EXTERNC_end
 
 struct thrbase_info {
 	int		dummy ;
-} ;
+} ; /* end struct */
 
 struct thrbase_startinfo {
 	THRBASE		*op ;
 	thrbase_f	worker ;
-} ;
+} ; /* end struct */
 
 struct thrbase_head {
 	void		*ap ;
@@ -59,7 +60,7 @@ struct thrbase_head {
 	volatile int	trs ;
 	volatile int	f_exiting ;
 	int		f_exited ;
-} ;
+} ; /* end struct */
 
 typedef THRBASE		thrbase ;
 typedef	THRBASE_SI	thrbase_si;

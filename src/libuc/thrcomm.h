@@ -13,7 +13,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ptm.h>
 #include	<ptc.h>
 
@@ -30,7 +31,7 @@ struct thrcomm_head {
 	volatile int	rrs ;
 	volatile int	f_cmd ;
 	volatile int	f_exiting ;
-} ;
+} ; /* end struct */
 
 typedef THRCOMM		thrcomm ;
 

@@ -22,7 +22,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<signal.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	SIGHAND_MAGIC	0x66938271
@@ -41,7 +42,7 @@ EXTERNC_end
 struct sighand_handle {
 	SIGACTION	action ;
 	int		sig ;
-} ;
+} ; /* end struct */
 
 struct sighand_head {
 	SIGHAND_HA	*handles ;
@@ -49,7 +50,7 @@ struct sighand_head {
 	uint		magic ;
 	int		nhandles ;
 	int		nblocks ;
-} ;
+} ; /* end struct */
 
 typedef SIGHAND		sighand ;
 typedef	SIGHAND_HA	sighand_ha ;
