@@ -1,0 +1,42 @@
+/* strabbrsig HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* provide c-string abbreviations for UNIX® signals */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-04-10, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	STRABBTSIG_INCLUDE
+#define	STRABBTSIG_INCLUDE
+
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+
+
+EXTERNC_begin
+
+extern cchar	*strabbrsig(int) noex ;
+
+local inline cchar *strsigabbr(int v) noex {
+    return strabbrsig(v) ;
+}
+
+EXTERNC_end
+
+
+#endif /* STRABBTSIG_INCLUDE */
+
+
