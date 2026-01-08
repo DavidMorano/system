@@ -117,16 +117,16 @@ control:
 
 
 obj0_strd.o:	$(OBJ0_DTRDCPY)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_DTRDCPY)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_strd.o:	$(OBJ1_STRDCPY)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_STRDCPY)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_strd.o:	$(OBJ2_STRDCPY)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_STRDCPY)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_strd.o:	$(OBJ3_STRDCPY)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_STRDCPY)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 strdcpyx.o:		strdcpyx.cc	strdcpyx.h		$(INCS)
