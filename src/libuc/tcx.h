@@ -23,10 +23,7 @@
 #include	<sys/types.h>		/* |uid_t| + |gid_t| */
 #include	<termios.h>		/* |WINSIZE| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>	/* |WINSIZE| */
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
