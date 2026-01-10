@@ -65,12 +65,15 @@
 #include	<climits>		/* for |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<strdcpyx.h>
 #include	<ctdec.h>
 #include	<localmisc.h>		/* for |DECBUFLEN| */
 
 #include	"strval.h"
+
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;			/* |digbufsize(3u)| */
 
