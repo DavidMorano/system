@@ -28,7 +28,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
@@ -45,7 +46,7 @@
 int vecstrx::foilcmp(vecstrx *rnp) noex {
 	int	rs = SR_FAULT ;
 	int	f_match = false ;
-	if (rnp) {
+	if (rnp) ylikely {
 	    cchar	*cp{} ;
 	    for (int i = 0 ; (rs = get(i,&cp)) >= 0 ; i += 1) {
 	        if (cp) {
