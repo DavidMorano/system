@@ -17,11 +17,11 @@
 
 /*******************************************************************************
 
-  	name:
+  	Object:
 	vecint
 
 	Description:
-	These routines are used when the caller wants to store a
+	This object is used when the caller wants to store a
 	COPY of the passed element data into a vector.  These
 	routines will copy and store the copied data in the list.
 	The advantage is that the caller does not have to keep the
@@ -31,14 +31,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |INT_MIN| + |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
@@ -67,33 +65,38 @@ extern "C" {
 }
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* forward references */
 
 template<typename ... Args>
-static inline int vecint_magic(vecint *op,Args ... args) noex {
+local inline int vecint_magic(vecint *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == VECINT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (vecint_magic) */
 
-static int	vecint_addval(vecint *op,VECINT_TYPE) noex ;
-static int	vecint_extend(vecint *,int) noex ;
-static int	vecint_setopts(vecint *,int) noex ;
-static int	vecint_insertval(vecint *,int,VECINT_TYPE) noex ;
-static int	vecint_extrange(vecint *,int) noex ;
+local int	vecint_addval(vecint *op,VECINT_TYPE) noex ;
+local int	vecint_extend(vecint *,int) noex ;
+local int	vecint_setopts(vecint *,int) noex ;
+local int	vecint_insertval(vecint *,int,VECINT_TYPE) noex ;
+local int	vecint_extrange(vecint *,int) noex ;
 
-static int	deftypecmp(const VECINT_TYPE *,const VECINT_TYPE *) noex ;
-static int	mkoptmask() noex ;
+local int	deftypecmp(const VECINT_TYPE *,const VECINT_TYPE *) noex ;
 
 
 /* local variables */
 
-static cint	optmask = mkoptmask() ;
-
 
 /* exported variables */
+
+constexpr vecintms	vecintm ;
 
 
 /* exported subroutines */
@@ -102,15 +105,15 @@ int vecint_start(vecint *op,int vn,int vo) noex {
     	VECINT		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (vn < 0) vn = VECINT_DEFENTS ;
-	if (op) {
+	if (op) ylikely {
 	    memclear(hop) ;
-	    if ((rs = vecint_setopts(op,vo)) >= 0) {
+	    if ((rs = vecint_setopts(op,vo)) >= 0) ylikely {
 	        op->n = vn ;
 	        if (vn > 0) {
 	            cint	sz = (vn + 1) * szof(VECINT_TYPE) ;
-		    if (void *vp{} ; (rs = libmem.mall(sz,&vp)) >= 0) {
+		    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 		        op->va = (VECINT_TYPE *) vp ;
-	    	        op->va[0] = INT_MIN ;
+	    	        op->va[0] = VECINT_MIN ;
 		    }
 	        } /* end if (wanted pre-allocation) */
 	        if (rs >= 0) {
@@ -125,8 +128,8 @@ int vecint_start(vecint *op,int vn,int vo) noex {
 int vecint_finish(vecint *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = vecint_magic(op)) >= 0) {
-	    if (op->va) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
+	    if (op->va) ylikely {
 	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
@@ -142,7 +145,7 @@ int vecint_finish(vecint *op) noex {
 
 int vecint_add(vecint *op,VECINT_TYPE v) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    rs = vecint_addval(op,v) ;
 	} /* end if (magic) */
 	return rs ;
@@ -151,7 +154,7 @@ int vecint_add(vecint *op,VECINT_TYPE v) noex {
 
 extern int vecint_addlist(vecint *op,const VECINT_TYPE *lp,int ll) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op,lp)) >= 0) {
+	if ((rs = vecint_magic(op,lp)) >= 0) ylikely {
 	    for (int i = 0 ; (rs >= 0) && (i < ll) ; i += 1) {
 	        rs = vecint_addval(op,lp[i]) ;
 	    }
@@ -162,25 +165,27 @@ extern int vecint_addlist(vecint *op,const VECINT_TYPE *lp,int ll) noex {
 
 int vecint_adduniq(vecint *op,VECINT_TYPE v) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
-	    int		i = 0 ; /* used-afterwards */
-	    rs = INT_MAX ;
+	int		i = 0 ;
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    for (i = 0 ; i < op->i ; i += 1) {
 	        if (op->va[i] == v) break ;
 	    } /* end for */
 	    if (i >= op->i) {
 	        rs = vecint_addval(op,v) ;
+		i = rs ;
+	    } else {
+	        i = INT_MAX ;
 	    }
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (vecint_adduniq) */
 
 int vecint_insert(vecint *op,int ii,VECINT_TYPE val) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (ii >= 0) {
+	    if (ii >= 0) ylikely {
 		rs = SR_OK ;
 	        if ((ii+1) > op->n) {
 	            rs = vecint_extend(op,((ii+1)-op->n)) ;
@@ -202,13 +207,13 @@ int vecint_assign(vecint *op,int ii,VECINT_TYPE val) noex {
 	    rs = SR_INVALID ;
 	    if (ii >= 0) {
 		rs = SR_OK ;
-	        if ((ii+1) > op->n) {
-	            rs = vecint_extend(op,((ii+1)-op->n)) ;
+	        if ((ii + 1) > op->n) {
+		    cint n = ((ii + 1) - op->n) ;
+	            rs = vecint_extend(op,n) ;
 	        }
-	        if (rs >= 0) {
-		    if ((rs = vecint_extrange(op,(ii+1))) >= 0) {
+	        if (rs >= 0) ylikely {
+		    if ((rs = vecint_extrange(op,(ii + 1))) >= 0) {
 	                op->va[ii] = val ;
-		        op->va[op->i] = INT_MAX ;
 	            }
 	        } /* end if (ok) */
 	    } /* end if (valid) */
@@ -219,9 +224,9 @@ int vecint_assign(vecint *op,int ii,VECINT_TYPE val) noex {
 
 int vecint_resize(vecint *op,int n) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (n >= 0) {
+	    if (n >= 0) ylikely {
 		rs = SR_OK ;
 	        if (n != op->i) {
 	            if (n > op->n) {
@@ -233,7 +238,7 @@ int vecint_resize(vecint *op,int n) noex {
 			        op->i = n ;
 		            }
 		            op->c = n ;
-		            op->va[op->i] = INT_MIN ;
+		            op->va[op->i] = VECINT_MIN ;
 		        }
 	            } /* end if (ok) */
 	        }
@@ -245,12 +250,12 @@ int vecint_resize(vecint *op,int n) noex {
 
 int vecint_getval(vecint *op,int i,VECINT_TYPE *rp) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	     if ((i < 0) || (i >= op->i)) {
 		rs = SR_NOTFOUND ;
 	     }
 	     if (rp) {
-	         *rp = (rs >= 0) ? op->va[i] : INT_MIN ;
+	         *rp = (rs >= 0) ? op->va[i] : VECINT_MIN ;
 	     }
 	} /* end if (magic) */
 	return rs ;
@@ -260,7 +265,7 @@ int vecint_getval(vecint *op,int i,VECINT_TYPE *rp) noex {
 int vecint_del(vecint *op,int i) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if ((i >= 0) && (i < op->i)) {
 	        bool	f_fi = false ;
@@ -269,33 +274,33 @@ int vecint_del(vecint *op,int i) noex {
 	        op->c -= 1 ;			/* decrement list count */
 		/* apply the appropriate deletion based on management policy */
 	        if (op->fl.ostationary) {
-	            (op->va)[i] = INT_MIN ;
+	            (op->va)[i] = VECINT_MIN ;
 	            if (i == (op->i - 1)) {
 	                op->i -= 1 ;
 	            }
 	            f_fi = true ;
 	        } else if (op->fl.issorted || op->fl.oordered) {
 	            if (op->fl.ocompact) {
-		        int	j ;
 	                op->i -= 1 ;
-	                for (j = i ; j < op->i ; j += 1) {
-	                    (op->va)[j] = (op->va)[j + 1] ;
+	                for (int j = i ; j < op->i ; j += 1) {
+	                    op->va[j] = op->va[j + 1] ;
 		        }
-	                (op->va)[op->i] = INT_MIN ;
+	                op->va[op->i] = VECINT_MIN ;
 	            } else {
-	                (op->va)[i] = INT_MIN ;
+	                op->va[i] = VECINT_MIN ;
 	                if (i == (op->i - 1)) {
 	                    op->i -= 1 ;
 		        }
 	                f_fi = true ;
 	            } /* end if */
 	        } else {
-	            if ((op->fl.oswap || op->fl.ocompact) && (i < (op->i - 1))) {
-	                (op->va)[i] = (op->va)[op->i - 1] ;
-	                (op->va)[--op->i] = INT_MIN ;
+		    cbool f = (op->fl.oswap || op->fl.ocompact) ;
+	            if (f && (i < (op->i - 1))) {
+	                op->va[i] = op->va[op->i - 1] ;
+	                op->va[--op->i] = VECINT_MIN ;
 	                op->fl.issorted = false ;
 	            } else {
-	                (op->va)[i] = INT_MIN ;
+	                op->va[i] = VECINT_MIN ;
 	                if (i == (op->i - 1)) {
 	                    op->i -= 1 ;
 		        }
@@ -314,7 +319,7 @@ int vecint_del(vecint *op,int i) noex {
 
 int vecint_delall(vecint *op) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    op->i = 0 ;
 	    op->c = 0 ;
 	    op->fi = 0 ;
@@ -325,7 +330,7 @@ int vecint_delall(vecint *op) noex {
 
 int vecint_count(vecint *op) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
@@ -334,7 +339,7 @@ int vecint_count(vecint *op) noex {
 
 int vecint_extent(vecint *op) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    rs = op->i ;
 	} /* end if (magic) */
 	return rs ;
@@ -343,11 +348,11 @@ int vecint_extent(vecint *op) noex {
 
 int vecint_sort(vecint *op) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    if (! op->fl.issorted) {
 	        op->fl.issorted = true ;
 	        if (op->c > 1) {
-		    cint	esize = szof(VECINT_TYPE) ;
+		    csize	esize = sizeof(VECINT_TYPE) ;
 		    qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
 	            qsort(op->va,op->i,esize,qcf) ;
 	        }
@@ -360,7 +365,7 @@ int vecint_sort(vecint *op) noex {
 
 int vecint_setsorted(vecint *op) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    op->fl.issorted = true ;
 	    rs = op->c ;
 	} /* end if (magic) */
@@ -371,12 +376,13 @@ int vecint_setsorted(vecint *op) noex {
 int vecint_find(vecint *op,VECINT_TYPE v) noex {
 	int		rs ;
 	int		i = 0 ; /* ¥ GCC false complaint */
-	if ((rs = vecint_magic(op)) >= 0) {
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
 	    if (op->fl.issorted) {
-	        cint		esz = szof(VECINT_TYPE) ;
+	        csize		esize = szof(VECINT_TYPE) ;
+		csize		elen = size_t(op->i) ;
 	        qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
-	        int		*rpp ;
-	        rpp = (int *) bsearch(&v,op->va,op->i,esz,qcf) ;
+	        VECINT_TYPE	*rpp ;
+	        rpp = (VECINT_TYPE *) bsearch(&v,op->va,elen,esize,qcf) ;
 	        rs = SR_NOTFOUND ;
 	        if (rpp) {
 	            i = intconv(rpp - op->va) ;
@@ -406,7 +412,7 @@ int vecint_match(vecint *op,VECINT_TYPE v) noex {
 
 int vecint_getvec(vecint *op,VECINT_TYPE **rpp) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op,rpp)) >= 0) {
+	if ((rs = vecint_magic(op,rpp)) >= 0) ylikely {
 	    *rpp = op->va ;
 	    rs = op->i ;
 	} /* end if (magic) */
@@ -417,10 +423,10 @@ int vecint_getvec(vecint *op,VECINT_TYPE **rpp) noex {
 int vecint_mkvec(vecint *op,VECINT_TYPE *va) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = vecint_magic(op,va)) >= 0) {
+	if ((rs = vecint_magic(op,va)) >= 0) ylikely {
 	    for (int i = 0 ; i < op->i ; i += 1) {
-		cint	v = op->va[i] ;
-		if (v != INT_MIN) {
+		const VECINT_TYPE	v = op->va[i] ;
+		if (v != VECINT_MIN) {
 		    va[c++] = op->va[i] ;
 		}
 	    } /* end for */
@@ -431,7 +437,7 @@ int vecint_mkvec(vecint *op,VECINT_TYPE *va) noex {
 
 int vecint_curbegin(vecint *op,vecint_cur *curp) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op,curp)) >= 0) {
+	if ((rs = vecint_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -440,7 +446,7 @@ int vecint_curbegin(vecint *op,vecint_cur *curp) noex {
 
 int vecint_curend(vecint *op,vecint_cur *curp) noex {
 	int		rs ;
-	if ((rs = vecint_magic(op,curp)) >= 0) {
+	if ((rs = vecint_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -450,16 +456,16 @@ int vecint_curend(vecint *op,vecint_cur *curp) noex {
 int vecint_curenum(vecint *op,vecint_cur *curp,VECINT_TYPE *rp) noex {
 	int		rs ;
 	int		v = 0 ;
-	if ((rs = vecint_magic(op,curp)) >= 0) {
+	if ((rs = vecint_magic(op,curp)) >= 0) ylikely {
 	    int		i = curp->i ;
 	    if ((i >= 0) && (i < op->i)) {
-	        v = (op->va)[i] ;
+	        v = intconv(op->va[i]) ;
 	        curp->i = (i+1) ;
 	    } else {
 	        rs = SR_NOTFOUND ;
 	    }
 	} /* end if (magic) */
-	if (rp) *rp = (rs >= 0) ? v : INT_MIN ;
+	if (rp) *rp = (rs >= 0) ? v : VECINT_MIN ;
 	return rs ;
 }
 /* end subroutine (vecint_curenum) */
@@ -467,8 +473,8 @@ int vecint_curenum(vecint *op,vecint_cur *curp,VECINT_TYPE *rp) noex {
 int vecint_audit(vecint *op) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = vecint_magic(op)) >= 0) {
-	    volatile int	dummy{} ;
+	if ((rs = vecint_magic(op)) >= 0) ylikely {
+	    volatile VECINT_TYPE	dummy{} ;
 	    int			i = 0 ; /* <- used afterwards */
 	    for (i = 0 ; i < op->i ; i += 1) {
 	        dummy += op->va[i] ;
@@ -484,71 +490,71 @@ int vecint_audit(vecint *op) noex {
 
 /* private subroutines */
 
-static int mkoptmask() noex {
+consteval int mkoptmask() noex {
 	int		m = 0 ;
-	m |= VECINT_OREUSE ;
-	m |= VECINT_OSWAP ;
-	m |= VECINT_OSTATIONARY ;
-	m |= VECINT_OCOMPACT ;
-	m |= VECINT_OSORTED ;
-	m |= VECINT_OORDERED ;
-	m |= VECINT_OCONSERVE ;
+	m |= vecintm.reuse ;
+	m |= vecintm.compact ;
+	m |= vecintm.swap ;
+	m |= vecintm.stationary ;
+	m |= vecintm.conserve ;
+	m |= vecintm.sorted ;
+	m |= vecintm.ordered ;
 	return m ;
 }
 /* end subroutine (mkoptmask) */
 
-static int vecint_setopts(vecint *op,int vo) noex {
-	cint		m = optmask ;
+local int vecint_setopts(vecint *op,int vo) noex {
+	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ m)) == 0) {
+	if ((vo & (~ optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
-	    if (vo & VECINT_OREUSE) op->fl.oreuse = 1 ;
-	    if (vo & VECINT_OSWAP) op->fl.oswap = 1 ;
-	    if (vo & VECINT_OSTATIONARY) op->fl.ostationary = 1 ;
-	    if (vo & VECINT_OCOMPACT) op->fl.ocompact = 1 ;
-	    if (vo & VECINT_OSORTED) op->fl.osorted = 1 ;
-	    if (vo & VECINT_OORDERED) op->fl.oordered = 1 ;
-	    if (vo & VECINT_OCONSERVE) op->fl.oconserve = 1 ;
+	    if (vo & vecintm.reuse)		op->fl.oreuse = true ;
+	    if (vo & vecintm.swap)		op->fl.oswap = true ;
+	    if (vo & vecintm.stationary)	op->fl.ostationary = true ;
+	    if (vo & vecintm.compact)		op->fl.ocompact = true ;
+	    if (vo & vecintm.sorted)		op->fl.osorted = true ;
+	    if (vo & vecintm.ordered)		op->fl.oordered = true ;
+	    if (vo & vecintm.conserve)		op->fl.oconserve = true ;
 	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (vecint_setopts) */
 
-static int vecint_addval(vecint *op,VECINT_TYPE v) noex {
+local int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ; /* ¥ GCC false complaint */
 	bool		f_done = false ;
 	bool		f ;
-/* can we fit this new entry within the existing extent? */
+	/* can we fit this new entry within the existing extent? */
 	f = (op->fl.oreuse || op->fl.oconserve) && (! op->fl.oordered) ;
 	if (f && (op->c < op->i)) {
 	    i = op->fi ;
-	    while ((i < op->i) && (op->va[i] != INT_MIN)) {
+	    while ((i < op->i) && (op->va[i] != VECINT_MIN)) {
 	        i += 1 ;
 	    }
 	    if (i < op->i) {
-	        (op->va)[i] = v ;
+	        op->va[i] = v ;
 	        op->fi = (i + 1) ;
 	        f_done = true ;
 	    } else {
 	        op->fi = i ;
 	    }
 	} /* end if (possible reuse strategy) */
-/* do we have to grow the vector array? */
+	/* do we have to grow the vector array? */
 	if (! f_done) {
-/* do we have to grow the array? */
+	    /* do we have to grow the array? */
 	    if ((op->i + 1) > op->n) {
 	        rs = vecint_extend(op,1) ;
 	    }
-/* link into the list structure */
-	    if (rs >= 0) {
+	    /* link into the list structure */
+	    if (rs >= 0) ylikely {
 	        i = op->i ;
-	        (op->va)[(op->i)++] = v ;
-	        (op->va)[op->i] = INT_MIN ;
+	        op->va[(op->i)++] = v ;
+	        op->va[op->i] = VECINT_MIN ;
 	    }
 	} /* end if */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    op->c += 1 ;		/* increment list count */
 	    op->fl.issorted = false ;
 	}
@@ -556,43 +562,43 @@ static int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 }
 /* end subroutine (vecint_addval) */
 
-static int vecint_extend(vecint *op,int amount) noex {
+local int vecint_extend(vecint *op,int amount) noex {
 	int		rs = SR_OK ;
-	if (amount > 0) {
-	    cint		esize = szof(VECINT_TYPE) ;
+	if (amount > 0) ylikely {
+	    cint		esz = szof(VECINT_TYPE) ;
 	    int			nn ;
 	    int			sz ;
 	    VECINT_TYPE		*nva{} ;
 	    if (op->va == nullptr) {
 	        nn = max(amount,VECINT_DEFENTS) ;
-	        sz = ((nn + 1) * esize) ;
+	        sz = ((nn + 1) * esz) ;
 	        rs = libmem.mall(sz,&nva) ;
 	    } else {
 	        nn = max((op->n + amount),(op->n * 2)) ;
-	        sz = ((nn + 1) * esize) ;
+	        sz = ((nn + 1) * esz) ;
 	        rs = libmem.rall(op->va,sz,&nva) ;
 	    } /* end if */
 	    if (rs >= 0) {
 	        op->va = nva ;
 	        op->n = nn ;
-		op->va[op->i] = INT_MIN ;
+		op->va[op->i] = VECINT_MIN ;
 	    }
-	}
+	} /* end if (needed) */
 	return rs ;
 }
 /* end subroutine (vecint_extend) */
 
-static int vecint_insertval(vecint *op,int ii,VECINT_TYPE val) noex {
-	if (ii < op->i) {
-	    int		i ;
+local int vecint_insertval(vecint *op,int ii,VECINT_TYPE val) noex {
+	if (ii < op->i) ylikely {
+	    int		i ; /* used-multiple */
 	    /* find */
 	    for (i = (ii + 1) ; i < op->i ; i += 1) {
-		if (op->va[i] == INT_MIN) break ;
+		if (op->va[i] == VECINT_MIN) break ;
 	    }
 	    /* management */
 	    if (i == op->i) {
 	        op->i += 1 ;
-	        op->va[op->i] = INT_MIN ;
+	        op->va[op->i] = VECINT_MIN ;
 	    }
 	    /* move-up */
 	    for (int j = i ; j > ii ; j -= 1) {
@@ -600,7 +606,7 @@ static int vecint_insertval(vecint *op,int ii,VECINT_TYPE val) noex {
 	    }
 	} else if (ii == op->i) {
 	    op->i += 1 ;
-	    op->va[op->i] = INT_MIN ;
+	    op->va[op->i] = VECINT_MIN ;
 	} /* end if */
 	op->va[ii] = val ;
 	op->c += 1 ;
@@ -609,31 +615,19 @@ static int vecint_insertval(vecint *op,int ii,VECINT_TYPE val) noex {
 }
 /* end subroutine (vecint_insertval) */
 
-static int vecint_extrange(vecint *op,int n) noex {
+local int vecint_extrange(vecint *op,int n) noex {
 	if (n > op->i) {
 	    cint	nsz = ((n-op->i) * szof(VECINT_TYPE)) ;
 	    memclear((op->va+op->i),nsz) ;
 	    op->i = n ;
-	    op->va[op->i] = INT_MIN ;
+	    op->va[op->i] = VECINT_MIN ;
 	}
 	return SR_OK ;
 }
 /* end subroutine (vecint_extrange) */
 
-static int deftypecmp(const VECINT_TYPE *l1p,const VECINT_TYPE *l2p) noex {
-	int		rc = 0 ;
-	if (l1p || l2p) {
-	    rc = 1 ;
-	    if (l1p) {
-		rc = -1 ;
-		if (l2p) {
-		    cint	i1 = *l1p ;
-		    cint	i2 = *l2p ;
-	    	    rc = (i1 - i2) ;
-		}
-	    }
-	}
-	return rc ;
+local int deftypecmp(const VECINT_TYPE *l1p,const VECINT_TYPE *l2p) noex {
+	return intsat(*l1p - *l2p) ;
 }
 /* end subroutine (deftypecmp) */
 
@@ -651,6 +645,10 @@ int vecint_st::operator () (int vn,int vo) noex {
 
 int vecint::add(VECINT_TYPE v) noex {
 	return vecint_add(this,v) ;
+}
+
+int vecint::addlist(const VECINT_TYPE *ap,int al) noex {
+	return vecint_addlist(this,ap,al) ;
 }
 
 int vecint::adduniq(VECINT_TYPE v) noex {
@@ -711,11 +709,11 @@ void vecint::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecint",rs,"fini-finish") ;
 	}
-}
+} /* end method (vecint::dtor) */
 
 int vecint_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case vecintmem_count:
 	        rs = vecint_count(op) ;
@@ -744,8 +742,7 @@ int vecint_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (vecint_co::operator) */
+} /* end method (vecint_co::operator) */
 
 bool vecint_iter::operator == (const vecint_iter &oit) noex {
 	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
@@ -794,8 +791,6 @@ void vecint_iter::increment(int n) noex {
 	        i += 1 ;
 	    }
 	}
-}
-/* end method (vecint_iter::increment) */
-
+} /* end method (vecint_iter::increment) */
 
 
