@@ -155,11 +155,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<termios.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"tcx.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -180,6 +186,21 @@
 /* local typedefs */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
 /* local variables */
 
 constexpr bool		f_streams = F_STREAMS ;
@@ -192,12 +213,12 @@ constexpr bool		f_streams = F_STREAMS ;
 
 int tcsetown(int fd,cchar *termdev,uid_t uid,gid_t gid,mode_t perms) noex {
 	int		rs = SR_NOTOPEN ;
-	if (fd >= 0) {
+	if (fd >= 0) ylikely {
 	    rs = SR_NOTTY ;
 	    perms &= S_IAMB ;
 	    if (isatty(fd)) {
-	        if ((rs = u_fchmod(fd,perms)) >= 0) {
-	            if ((rs = u_fchown(fd,uid,gid)) >= 0) {
+	        if ((rs = u_fchmod(fd,perms)) >= 0) ylikely {
+	            if ((rs = u_fchown(fd,uid,gid)) >= 0) ylikely {
 	                if (termdev && termdev[0]) {
 	                    if ((rs = u_chmod(termdev,perms)) >= 0) {
 	                        rs = u_chown(termdev,uid,gid) ;
@@ -214,14 +235,13 @@ int tcsetown(int fd,cchar *termdev,uid_t uid,gid_t gid,mode_t perms) noex {
 int tcsetlines(int fd,int lines) noex {
 	int		rs = SR_NOTOPEN ;
 	int		plines = 0 ;
-	if (fd >= 0) {
-	    WINSIZE	ws{} ;
+	if (fd >= 0) ylikely {
 	    if (lines < 0) {
 	        lines = 0 ;
 	    } else if (lines > SHORT_MAX) {
 	        lines = SHORT_MAX ;
 	    }
-	    if ((rs = u_ioctl(fd,TIOCGWINSZ,&ws)) >= 0) {
+	    if (WINSIZE ws{} ; (rs = u_ioctl(fd,TIOCGWINSZ,&ws)) >= 0) {
 	        plines = ws.ws_row ;
 	        ws.ws_row = short(lines) ;
 	        rs = u_ioctl(fd,TIOCSWINSZ,&ws) ;
@@ -234,8 +254,7 @@ int tcsetlines(int fd,int lines) noex {
 int tcgetlines(int fd) noex {
 	int		rs = SR_NOTOPEN ;
 	if (fd >= 0) {
-	    WINSIZE	ws{} ;
-	    if ((rs = u_ioctl(fd,TIOCGWINSZ,&ws)) >= 0) {
+	    if (WINSIZE ws{} ; (rs = u_ioctl(fd,TIOCGWINSZ,&ws)) >= 0) {
 	        rs = ws.ws_row ;
 	    }
 	} 
@@ -245,9 +264,9 @@ int tcgetlines(int fd) noex {
 
 int tcsetws(int fd,WINSIZE *wsp) noex {
 	int		rs = SR_FAULT ;
-	if (wsp) {
+	if (wsp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (fd >= 0) {
+	    if (fd >= 0) ylikely {
 	        rs = u_ioctl(fd,TIOCSWINSZ,wsp) ;
 	    }
 	} /* end if (non-null) */
@@ -257,9 +276,9 @@ int tcsetws(int fd,WINSIZE *wsp) noex {
 
 int tcgetws(int fd,WINSIZE *wsp) noex {
 	int		rs = SR_FAULT ;
-	if (wsp) {
+	if (wsp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (fd >= 0) {
+	    if (fd >= 0) ylikely {
 	        memclear(wsp) ;
 	        rs = u_ioctl(fd,TIOCGWINSZ,wsp) ;
 	    } /* end if (valid) */
@@ -271,9 +290,8 @@ int tcgetws(int fd,WINSIZE *wsp) noex {
 int tcsetmesg(int fd,int f_new) noex {
 	int		rs = SR_NOTOPEN ;
 	int		f_old = false ;
-	if (fd >= 0) {
-	    USTAT	sb ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	if (fd >= 0) ylikely {
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	        mode_t	m_old = sb.st_mode ;
 	        f_old = (m_old & S_IWGRP) ;
 	        if (! LEQUIV(f_old,f_new)) {
@@ -294,9 +312,8 @@ int tcsetmesg(int fd,int f_new) noex {
 int tcsetbiff(int fd,int f_new) noex {
 	int		rs = SR_NOTOPEN ;
 	int		f_old = false ;
-	if (fd >= 0) {
-	    USTAT		sb ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	if (fd >= 0) ylikely {
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	        mode_t	m_old = sb.st_mode ;
 	        f_old = (m_old & S_IWGRP) ;
 	        if (! LEQUIV(f_old,f_new)) {
@@ -318,13 +335,12 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (dbuf) {
+	if (dbuf) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (fd >= 0) {
+	    if (fd >= 0) ylikely {
 	        if_constexpr (f_streams) {
 	            cint	clen = CMSGBUFLEN ;
-	            char	*cbuf{} ;
-	            if ((rs = lm_mall((clen+1),&cbuf)) >= 0) {
+	            if (char *cbuf ; (rs = lm_mall((clen+1),&cbuf)) >= 0) {
 			{
 	                    STRPEEK	pd{} ;
 	                    pd.flags = 0 ;
