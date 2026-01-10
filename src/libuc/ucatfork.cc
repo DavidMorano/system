@@ -9,7 +9,7 @@
 
 /* revision history:
 
-	= 2014-05-09, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	This is being written to add an "unregister" feature to the
 	'atfork' capability that came with POSIX threads.  In the
 	past we always had pure reentrant subroutines without hidden
@@ -26,17 +26,29 @@
 	
 */
 
-/* Copyright © 2014,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Group:
+	ucatfork
+
+	Names:
+	uc_atforkrec
+	uc_atforkexp
+	ucatfork_init
+	ucatfork_fini
+	ucatfork_trackbegin
+
+	Description:
+	UNIX® operations realted to |fork(2)|.
 	We are attempting to add an "unregister" feature to the
 	|pthread_atfork(3pthread)| facility.  We need to create a
 	whole new interface for this.  This new interface will consist
 	of:
 
-	+ uc_atforkrecord(3uc)
-	+ uc_atforkexpunge(3uc)
+	+ uc_atforkrec(3uc)
+	+ uc_atforkexp(3uc)
 
 	We suffered a lot when first learning that
 	|pthread_atfork(3pthread)| does not get its registered
@@ -50,8 +62,23 @@
 	which made this failure (Slowlaris!).  This should have
 	been in the original POSIX specification on at-fork handlers,
 	but was somehow not mentioned.
-
 	Enjoy.
+
+  	Synopsis:
+	int uc_atforkrec(void_f b,void_f p,void_f c) noex
+	int uc_atforkexp(void_f b,void_f p,void_f c) noex
+	int ucatfork_init() noex
+	int ucatfork_fini() noex
+	int ucatfork_trackbegin() noex
+
+	Arguments:
+	b		handler becore
+	p		handler parent
+	c		handler child
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -59,13 +86,21 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucfork.h>
 #include        <timewatch.hh>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<localmisc.h>
 
-import usysbasic ;
+#include	"ucatfork.h"
+
+#pragma		GCC dependency		"mod/usysbasic.ccm"
+
+import usysbasic ;			/* |uatexit(3u)| + |uatfork(3u)| */
 
 /* local defines */
 
@@ -76,9 +111,6 @@ import usysbasic ;
 
 /* imported namespaces */
 
-using libu::uatfork ;			/* subroutine (libu) */
-using libu::uatexit ;			/* subroutine (libu) */
-
 
 /* local typedefs */
 
@@ -86,8 +118,8 @@ using libu::uatexit ;			/* subroutine (libu) */
 /* external subroutines */
 
 extern "C" {
-    extern int uc_atforkrecord(void_f,void_f,void_f) noex ;
-    extern int uc_atforkexpunge(void_f,void_f,void_f) noex ;
+    extern int uc_atforkrec(void_f,void_f,void_f) noex ;
+    extern int uc_atforkexp(void_f,void_f,void_f) noex ;
     extern int ucatfork_init() noex ;
     extern int ucatfork_fini() noex ;
     extern int ucatfork_trackbegin() noex ;
@@ -130,7 +162,7 @@ namespace {
 	    }
 	} ; /* end dtor (ucatfork) */
     } ; /* end struct (ucatfork) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -159,15 +191,11 @@ static ucatfork_head		ucatfork_data ;
 
 /* exported subroutines */
 
-int uc_atfork(void_f b,void_f p,void_f c) noex {
+int uc_atforkrec(void_f b,void_f p,void_f c) noex {
 	return ucatfork_data.record(b,p,c) ;
 }
 
-int uc_atforkrecord(void_f b,void_f p,void_f c) noex {
-	return ucatfork_data.record(b,p,c) ;
-}
-
-int uc_atforkexpunge(void_f b,void_f p,void_f c) noex {
+int uc_atforkexp(void_f b,void_f p,void_f c) noex {
 	return ucatfork_data.expunge(b,p,c) ;
 }
 
@@ -198,10 +226,13 @@ int ucatfork_head::init() noex {
 	            void_f	sp = ucatfork_atforkparent ;
 	            void_f	sc = ucatfork_atforkchild ;
 	            if ((rs = uatfork(sb,sp,sc)) >= 0) {
-	                if ((rs = uatexit(ucatfork_exit)) >= 0) {
+	                if ((rs = u_atexit(ucatfork_exit)) >= 0) {
 	        	    finitdone = true ;
 	        	    f = true ;
 	                } /* end if (uc_atexit) */
+			if (rs < 0) {
+			    u_atforkexp(sb,sp,sc) ;
+			}
 	            } /* end if (u_atfork) */
 		    if (rs < 0) {
 		        mx.destroy() ;
