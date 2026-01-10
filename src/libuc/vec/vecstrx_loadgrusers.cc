@@ -40,7 +40,9 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<strn.h>
 #include	<cfdec.h>
 #include	<ascii.h>
@@ -76,7 +78,7 @@ namespace {
 	int	pwmapend() noex ;
 	int	finish() noex ;
     } ; /* end struct (subinfo) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -103,9 +105,9 @@ int vecstrx::loadgrusers(gid_t sgid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (this) {
+	if (this) ylikely {
 	    if (numsign(sgid)) sgid = getgid() ;
-	    if (subinfo si ; (rs = si.start(this,sgid)) >= 0) {
+	    if (subinfo si ; (rs = si.start(this,sgid)) >= 0) ylikely {
 		{
 	            rs = si.pwmapload() ;
 	            c = rs ;
@@ -123,7 +125,7 @@ int vecstrx::loadgrusers(gid_t sgid) noex {
 
 int subinfo::start(vecstrx *p,gid_t g) noex {
     	int		rs = SR_BUGCHECK ;
-	if (vsp) {
+	if (vsp) ylikely {
 	    rs = SR_OK ;
 	    vsp = p ;
 	    sgid = g ;
@@ -134,7 +136,7 @@ int subinfo::start(vecstrx *p,gid_t g) noex {
 
 int subinfo::finish() noex {
 	int		rs = SR_FAULT ;
-	if (this) {
+	if (this) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -145,7 +147,7 @@ int subinfo::pwmapload() noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = pwmapbegin()) >= 0) {
+	if ((rs = pwmapbegin()) >= 0) ylikely {
 	    int		ml = intconv(fsize) ;
 	    cchar	*mp = charp(mapdata) ;
 	    cchar	*tp ;
@@ -207,7 +209,7 @@ int subinfo::pwmapbegin() noex {
 int subinfo::pwmapend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (mapdata) {
+	if (mapdata) ylikely {
 	    csize	ms = mapsize ;
 	    void	*md = mapdata ;
 	    rs1 = u_munmap(md,ms) ;
