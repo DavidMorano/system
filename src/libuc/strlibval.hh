@@ -36,7 +36,9 @@
 
 
 #include	<envstandards.h>	/* first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<aflag.hh>
 
 
 enum strlibvals {
