@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 /* object defines */
@@ -32,16 +29,50 @@
 #define	VECITEM_FL		struct vecitem_flags
 #define	VECITEM_CUR		struct vecitem_cursor
 #define	VECITEM_DEFENTS		10
-/* options */
-#define	VECITEM_ODEFAULT	0
-#define	VECITEM_OREUSE		(1 << 0)
-#define	VECITEM_OCOMPACT	(1 << 1)	/* means NOHOLES */
-#define	VECITEM_OSWAP		(1 << 2)
-#define	VECITEM_OSTATIONARY	(1 << 3)
-#define	VECITEM_OCONSERVE	(1 << 4)
-#define	VECITEM_OSORTED		(1 << 5)
-#define	VECITEM_OORDERED	(1 << 6)
 
+/**** options
+reuse		= reuse empty slots
+compact		= do not allow for holes
+swap		= use swapping for empty slot management
+stationary	= entries do not move
+conserve	= conserve space where possible
+sorted		= maintain a sorted list
+ordered		= maintain an ordered list
+****/
+
+enum vecitemos {
+    vecitemo_reuse,
+    vecitemo_compact,
+    vecitemo_swap,
+    vecitemo_stationary,
+    vecitemo_conserve,
+    vecitemo_sorted,
+    vecitemo_ordered,
+    vecitemo_overlast
+} ; /* end enum (options) */
+
+#ifdef	__cplusplus	/* C++ only! */
+
+struct vecitemms {
+    constexpr static int	reuse		= (1 << vecitemo_reuse) ;
+    constexpr static int	compact		= (1 << vecitemo_compact) ;
+    constexpr static int	swap		= (1 << vecitemo_swap) ;
+    constexpr static int	stationary	= (1 << vecitemo_stationary) ;
+    constexpr static int	conserve	= (1 << vecitemo_conserve) ;
+    constexpr static int	sorted		= (1 << vecitemo_sorted) ;
+    constexpr static int	ordered		= (1 << vecitemo_ordered) ;
+} ; /* end struct (vecitemms) */
+
+#endif /* __cplusplus */
+
+#define	VECITEM_ODEFAULT	0
+#define	VECITEM_OREUSE		(1 << vecitemo_reuse)
+#define	VECITEM_OCOMPACT	(1 << vecitemo_compact)
+#define	VECITEM_OSWAP		(1 << vecitemo_swap)
+#define	VECITEM_OSTATIONARY	(1 << vecitemo_stationary)
+#define	VECITEM_OCONSERVE	(1 << vecitemo_conserve)
+#define	VECITEM_OSORTED		(1 << vecitemo_sorted)
+#define	VECITEM_OORDERED	(1 << vecitemo_ordered)
 
 struct vecitem_flags {
 	uint		issorted:1 ;
@@ -53,7 +84,7 @@ struct vecitem_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-} ;
+} ; /* end struct (vecitem_flags) */
 
 struct vecitem_head {
 	void		**va ;
@@ -62,12 +93,12 @@ struct vecitem_head {
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
-} ;
+} ; /* end struct (vecitem_head) */
 
 struct vecitem_cursor  {
 	int		i ;
 	int		c ;
-} ;
+} ; /* end struct (vecitem_cursor) */
 
 typedef VECITEM_FL	vecitem_fl ;
 typedef VECITEM_CUR	vecitem_cur ;
@@ -86,7 +117,7 @@ enum vecitemmems {
 	vecitemmem_audit,
 	vecitemmem_finish,
 	vecitemmem_overlast
-} ;
+} ; /* end enum (vecitemmems) */
 struct vecitem_iter {
 	void		**va = nullptr ;
 	int		i = -1 ;
@@ -147,7 +178,7 @@ struct vecitem : vecitem_head {
 	    audit	(this,vecitemmem_audit) ;
 	    finish	(this,vecitemmem_finish) ;
 	    va = nullptr ;
-	} ;
+	} ; /* end ctor */
 	vecitem(const vecitem &) = delete ;
 	vecitem &operator = (const vecitem &) = delete ;
 	int start(int = 0,int = 0) noex ;
@@ -181,23 +212,27 @@ EXTERNC_begin
 typedef int (*vecitem_cmpf)(cvoid **,cvoid **) noex ;
 typedef int (*vecitem_f)(cvoid **,cvoid **) noex ;
 
-extern int vecitem_start(vecitem *,int,int) noex ;
-extern int vecitem_finish(vecitem *) noex ;
-extern int vecitem_add(vecitem *,cvoid *,int) noex ;
-extern int vecitem_del(vecitem *,int) noex ;
-extern int vecitem_count(vecitem *) noex ;
-extern int vecitem_sort(vecitem *,vecitem_cmpf) noex ;
-extern int vecitem_find(vecitem *,cvoid *,int) noex ;
-extern int vecitem_fetch(vecitem *,cvoid *,vecitem_cur *,
+extern int vecitem_start	(vecitem *,int,int) noex ;
+extern int vecitem_finish	(vecitem *) noex ;
+extern int vecitem_add		(vecitem *,cvoid *,int) noex ;
+extern int vecitem_del		(vecitem *,int) noex ;
+extern int vecitem_count	(vecitem *) noex ;
+extern int vecitem_sort		(vecitem *,vecitem_cmpf) noex ;
+extern int vecitem_find		(vecitem *,cvoid *,int) noex ;
+extern int vecitem_fetch	(vecitem *,cvoid *,vecitem_cur *,
 		vecitem_cmpf,void *) noex ;
-extern int vecitem_search(vecitem *,cvoid *,vecitem_cmpf,void *) noex ;
-extern int vecitem_get(vecitem *,int,void *) noex ;
-extern int vecitem_getvec(vecitem *,void **) noex ;
-extern int vecitem_audit(vecitem *) noex ;
-extern int vecitem_curbegin(vecitem *,vecitem_cur *) noex ;
-extern int vecitem_curend(vecitem *,vecitem_cur *) noex ;
+extern int vecitem_search	(vecitem *,cvoid *,vecitem_cmpf,void *) noex ;
+extern int vecitem_get		(vecitem *,int,void *) noex ;
+extern int vecitem_getvec	(vecitem *,void **) noex ;
+extern int vecitem_audit	(vecitem *) noex ;
+extern int vecitem_curbegin	(vecitem *,vecitem_cur *) noex ;
+extern int vecitem_curend	(vecitem *,vecitem_cur *) noex ;
 
 EXTERNC_end
+
+#if	__cplusplus
+extern const vecitemms	vecitemm ;
+#endif /* __cplusplus */
 
 
 #endif /* VECITEM_INCLUDE */
