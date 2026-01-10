@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* vector long-integer operations */
+/* vector integer operations */
 /* version %I% last-modified %G% */
 
 
@@ -21,26 +21,22 @@
 	veclong
 
 	Description:
-	These routines are used when the caller wants to store a
+	This object is used when the caller wants to store a
 	COPY of the passed element data into a vector.  These
 	routines will copy and store the copied data in the list.
 	The advantage is that the caller does not have to keep the
 	orginal data around in order for the list data to be accessed
-	later.  Element data (unlike string data) can contain nullptr
-	characters-bytes.
+	later.
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |INT_MIN| + |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
@@ -49,7 +45,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -71,68 +67,69 @@ extern "C" {
 
 /* external subroutines */
 
-extern "C" {
-    int		veclong_add(veclong *,VECLONG_TYPE) noex ;
-}
-
 
 /* external variables */
-
-
-/* local structures */
 
 
 /* forward references */
 
 template<typename ... Args>
-static inline int veclong_magic(veclong *op,Args ... args) noex {
+local inline int veclong_magic(veclong *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == VECLONG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (veclong_magic) */
+} /* end subroutine (veclong_magic) */
 
-static int	veclong_addval(veclong *op,VECLONG_TYPE) noex ;
-static int	veclong_extend(veclong *,int) noex ;
-static int	veclong_setopts(veclong *,int) noex ;
-static int	veclong_insertval(veclong *,int,VECLONG_TYPE) noex ;
-static int	veclong_extrange(veclong *,int) noex ;
+local int	veclong_addval(veclong *op,VECLONG_TYPE) noex ;
+local int	veclong_extend(veclong *,int) noex ;
+local int	veclong_setopts(veclong *,int) noex ;
+local int	veclong_insertval(veclong *,int,VECLONG_TYPE) noex ;
+local int	veclong_extrange(veclong *,int) noex ;
 
-static int	deflongcmp(const VECLONG_TYPE *,const VECLONG_TYPE *) noex ;
-static int	mkoptmask() noex ;
+local int	deftypecmp(const VECLONG_TYPE *,const VECLONG_TYPE *) noex ;
 
 
 /* local variables */
 
-static cint	optmask = mkoptmask() ;
-
 
 /* exported variables */
+
+constexpr veclongms	veclongm ;
 
 
 /* exported subroutines */
 
-int veclong_start(veclong *op,int n,int opts) noex {
+int veclong_start(veclong *op,int vn,int vo) noex {
+    	VECLONG		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (n < 0) n = VECLONG_DEFENTS ;
-	if (op) {
-	    memclear(op) ;
-	    if ((rs = veclong_setopts(op,opts)) >= 0) {
-	        op->n = n ;
-	        op->magic = VECLONG_MAGIC ;
-	    }
+	if (vn < 0) vn = VECLONG_DEFENTS ;
+	if (op) ylikely {
+	    memclear(hop) ;
+	    if ((rs = veclong_setopts(op,vo)) >= 0) ylikely {
+	        op->n = vn ;
+	        if (vn > 0) {
+	            cint	sz = (vn + 1) * szof(VECLONG_TYPE) ;
+		    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
+		        op->va = (VECLONG_TYPE *) vp ;
+	    	        op->va[0] = VECLONG_MIN ;
+		    }
+	        } /* end if (wanted pre-allocation) */
+	        if (rs >= 0) {
+		    op->magic = VECLONG_MAGIC ;
+	        }
+	    } /* end if */
 	} /* end if (non-null) */
-	return (rs >= 0) ? n : rs ;
+	return (rs >= 0) ? vn : rs ;
 }
 /* end subroutine (veclong_start) */
 
 int veclong_finish(veclong *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = veclong_magic(op)) >= 0) {
-	    if (op->va) {
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
+	    if (op->va) ylikely {
 	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
@@ -148,16 +145,16 @@ int veclong_finish(veclong *op) noex {
 
 int veclong_add(veclong *op,VECLONG_TYPE v) noex {
 	int		rs ;
-	if ((rs = veclong_magic(op)) >= 0) {
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
 	    rs = veclong_addval(op,v) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (veclong_add) */
 
-int veclong_addlist(veclong *op,const VECLONG_TYPE *lp,int ll) noex {
+extern int veclong_addlist(veclong *op,const VECLONG_TYPE *lp,int ll) noex {
 	int		rs ;
-	if ((rs = veclong_magic(op)) >= 0) {
+	if ((rs = veclong_magic(op,lp)) >= 0) ylikely {
 	    for (int i = 0 ; (rs >= 0) && (i < ll) ; i += 1) {
 	        rs = veclong_addval(op,lp[i]) ;
 	    }
@@ -169,7 +166,7 @@ int veclong_addlist(veclong *op,const VECLONG_TYPE *lp,int ll) noex {
 int veclong_adduniq(veclong *op,VECLONG_TYPE v) noex {
 	int		rs ;
 	int		i = 0 ;
-	if ((rs = veclong_magic(op)) >= 0) {
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
 	    for (i = 0 ; i < op->i ; i += 1) {
 	        if (op->va[i] == v) break ;
 	    } /* end for */
@@ -186,8 +183,10 @@ int veclong_adduniq(veclong *op,VECLONG_TYPE v) noex {
 
 int veclong_insert(veclong *op,int ii,VECLONG_TYPE val) noex {
 	int		rs ;
-	if ((rs = veclong_magic(op)) >= 0) {
-	    if (ii >= 0) {
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if (ii >= 0) ylikely {
+		rs = SR_OK ;
 	        if ((ii+1) > op->n) {
 	            rs = veclong_extend(op,((ii+1)-op->n)) ;
 	        }
@@ -195,30 +194,29 @@ int veclong_insert(veclong *op,int ii,VECLONG_TYPE val) noex {
 		    if ((rs = veclong_extrange(op,(ii+1))) >= 0) {
 	                rs = veclong_insertval(op,ii,val) ;
 		    }
-	        }
-	    } else {
-	        rs = SR_INVALID ;
-	    }
+	        } /* end if (ok) */
+	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (veclong_insert) */
 
-int veclong_assign(veclong *op,int ii,VECLONG_TYPE val)  noex {
+int veclong_assign(veclong *op,int ii,VECLONG_TYPE val) noex {
 	int		rs ;
 	if ((rs = veclong_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
 	    if (ii >= 0) {
-	        if ((ii+1) > op->n) {
-	            rs = veclong_extend(op,((ii+1)-op->n)) ;
+		rs = SR_OK ;
+	        if ((ii + 1) > op->n) {
+		    cint n = ((ii + 1) - op->n) ;
+	            rs = veclong_extend(op,n) ;
 	        }
-	        if (rs >= 0) {
-		    if ((rs = veclong_extrange(op,(ii+1))) >= 0) {
+	        if (rs >= 0) ylikely {
+		    if ((rs = veclong_extrange(op,(ii + 1))) >= 0) {
 	                op->va[ii] = val ;
-		    }
-	        }
-	    } else {
-	        rs = SR_INVALID ;
-	    }
+	            }
+	        } /* end if (ok) */
+	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -226,20 +224,25 @@ int veclong_assign(veclong *op,int ii,VECLONG_TYPE val)  noex {
 
 int veclong_resize(veclong *op,int n) noex {
 	int		rs ;
-	if ((rs = veclong_magic(op)) >= 0) {
-	    if (n >= 0) {
-	        if (n > op->n) {
-	            rs = veclong_extend(op,(n-op->n)) ;
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if (n >= 0) ylikely {
+		rs = SR_OK ;
+	        if (n != op->i) {
+	            if (n > op->n) {
+	                rs = veclong_extend(op,(n-op->n)) ;
+	            }
+	            if (rs >= 0) {
+		        if ((rs = veclong_extrange(op,n)) >= 0) {
+		            if (n < op->i) {
+			        op->i = n ;
+		            }
+		            op->c = n ;
+		            op->va[op->i] = VECLONG_MIN ;
+		        }
+	            } /* end if (ok) */
 	        }
-	        if (rs >= 0) {
-		    if ((rs = veclong_extrange(op,n)) >= 0) {
-		        op->c = n ;
-		        op->va[n] = LONG_MIN ;
-		    }
-	        }
-	    } else {
-	        rs = SR_INVALID ;
-	    }
+	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -247,159 +250,122 @@ int veclong_resize(veclong *op,int n) noex {
 
 int veclong_getval(veclong *op,int i,VECLONG_TYPE *rp) noex {
 	int		rs ;
-	if ((rs = veclong_magic(op)) >= 0) {
-	    if ((i < 0) || (i >= op->i)) {
-	        rs = SR_NOTFOUND ;
-	    }
-	    if (rp) {
-	        *rp = (rs >= 0) ? op->va[i] : long(-1) ;
-	    }
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
+	     if ((i < 0) || (i >= op->i)) {
+		rs = SR_NOTFOUND ;
+	     }
+	     if (rp) {
+	         *rp = (rs >= 0) ? op->va[i] : VECLONG_MIN ;
+	     }
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (veclong_getval) */
 
-int veclong_mkvec(veclong *op,VECLONG_TYPE *va) noex {
-    	typedef VECLONG_TYPE	val_t ;
-	int		rs ;
-	int		c = 0 ;
-	if ((rs = veclong_magic(op,va)) >= 0) {
-	    if (va) {
-	        cint	n = op->i ;
-	        for (int i = 0 ; i < n ; i += 1) {
-		    val_t	tv = op->va[i] ;
-		    if (tv != val_t(INT_MIN)) {
-		        va[c++] = op->va[i] ;
-		    }
-	        } /* end for */
-	    } /* end if */
-	} /* end if (magic) */
-	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (veclong_mkvec) */
-
-int veclong_curbegin(veclong *op,veclong_cur *curp) noex {
-	int		rs ;
-	if ((rs = veclong_magic(op,curp)) >= 0) {
-	    curp->i = 0 ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (veclong_curend) */
-
-int veclong_curend(veclong *op,veclong_cur *curp) noex {
-	int		rs ;
-	if ((rs = veclong_magic(op)) >= 0) {
-	    curp->i = 0 ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (veclong_end) */
-
-int veclong_curenum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp) noex {
-    	typedef VECLONG_TYPE	val_t ;
-	int		rs ;
-	int		i = 0 ;
-	if ((rs = veclong_magic(op,curp,rp)) >= 0) {
-	    val_t	tv{} ;
-	    i = curp->i ;
-	    if ((i >= 0) && (i < op->i)) {
-	        tv = (op->va)[i] ;
-	        curp->i = (i+1) ;
-	    } else {
-	        rs = SR_NOTFOUND ;
-	    }
-	    if (rp) *rp = (rs >= 0) ? tv : val_t(INT_MIN) ;
-	} /* end if (magic) */
-	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (veclong_curenum) */
-
 int veclong_del(veclong *op,int i) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = veclong_magic(op)) >= 0) {
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if ((i >= 0) && (i < op->i)) {
 	        bool	f_fi = false ;
 		rs = SR_OK ;
 		/* delete the entry */
-	        op->c -= 1 ;		/* decrement list count */
-                /* apply the appropriate deletion based on management policy */
+	        op->c -= 1 ;			/* decrement list count */
+		/* apply the appropriate deletion based on management policy */
 	        if (op->fl.ostationary) {
-	            op->va[i] = 0 ;
+	            (op->va)[i] = VECLONG_MIN ;
 	            if (i == (op->i - 1)) {
 	                op->i -= 1 ;
 	            }
 	            f_fi = true ;
 	        } else if (op->fl.issorted || op->fl.oordered) {
-	             if (op->fl.ocompact) {
-		         int	j ;
-	                 op->i -= 1 ;
-	                 for (j = i ; j < op->i ; j += 1) {
-	                     op->va[j] = op->va[j + 1] ;
-		         }
-	                 op->va[op->i] = 0 ;
-	             } else {
-	                 op->va[i] = 0 ;
-	                 if (i == (op->i - 1)) {
-	                     op->i -= 1 ;
-		         }
-	                 f_fi = true ;
-	             } /* end if */
-	         } else {
-	             if ((op->fl.oswap || op->fl.ocompact) && (i < (op->i - 1))) {
-	                 op->va[i] = op->va[op->i - 1] ;
-	                 op->va[--op->i] = 0 ;
-	                 op->fl.issorted = false ;
-	             } else {
-	                 op->va[i] = 0 ;
-	                 if (i == (op->i - 1)) {
-	                     op->i -= 1 ;
-		         }
-	                 f_fi = true ;
-	             } /* end if */
-	         } /* end if */
-	         if (f_fi && (i < op->fi)) {
-	             op->fi = i ;
-	         }
-	         c = op->c ;
-	    } /* end if (valid) */
+	            if (op->fl.ocompact) {
+	                op->i -= 1 ;
+	                for (int j = i ; j < op->i ; j += 1) {
+	                    op->va[j] = op->va[j + 1] ;
+		        }
+	                op->va[op->i] = VECLONG_MIN ;
+	            } else {
+	                op->va[i] = VECLONG_MIN ;
+	                if (i == (op->i - 1)) {
+	                    op->i -= 1 ;
+		        }
+	                f_fi = true ;
+	            } /* end if */
+	        } else {
+		    cbool f = (op->fl.oswap || op->fl.ocompact) ;
+	            if (f && (i < (op->i - 1))) {
+	                op->va[i] = op->va[op->i - 1] ;
+	                op->va[--op->i] = VECLONG_MIN ;
+	                op->fl.issorted = false ;
+	            } else {
+	                op->va[i] = VECLONG_MIN ;
+	                if (i == (op->i - 1)) {
+	                    op->i -= 1 ;
+		        }
+	                f_fi = true ;
+	            } /* end if */
+	        } /* end if */
+	        if (f_fi && (i < op->fi)) {
+	            op->fi = i ;
+	        }
+	        c = op->c ;
+	    } /* end if (found) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (veclong_del) */
 
+int veclong_delall(veclong *op) noex {
+	int		rs ;
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
+	    op->i = 0 ;
+	    op->c = 0 ;
+	    op->fi = 0 ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (veclong_delall) */
+
 int veclong_count(veclong *op) noex {
 	int		rs ;
-	if ((rs = veclong_magic(op)) >= 0) {
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (veclong_count) */
 
+int veclong_extent(veclong *op) noex {
+	int		rs ;
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
+	    rs = op->i ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (veclong_extent) */
+
 int veclong_sort(veclong *op) noex {
 	int		rs ;
-	int		c = 0 ;
-	if ((rs = veclong_magic(op)) >= 0) {
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
 	    if (! op->fl.issorted) {
 	        op->fl.issorted = true ;
 	        if (op->c > 1) {
-		    cint	esz = szof(VECLONG_TYPE) ;
-	            sort_vcmp	scmp = sort_vcmp(deflongcmp) ;
-	            qsort(op->va,op->i,esz,scmp) ;
+		    csize	esize = sizeof(VECLONG_TYPE) ;
+		    qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
+	            qsort(op->va,op->i,esize,qcf) ;
 	        }
 	    }
-	    c = op->c ;
-	} /* end if (non-null) */
-	return (rs >= 0) ? c : rs ;
+	    rs = op->c ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (veclong_sort) */
 
 int veclong_setsorted(veclong *op) noex {
 	int		rs ;
-	if ((rs = veclong_magic(op)) >= 0) {
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
 	    op->fl.issorted = true ;
 	    rs = op->c ;
 	} /* end if (magic) */
@@ -409,16 +375,17 @@ int veclong_setsorted(veclong *op) noex {
 
 int veclong_find(veclong *op,VECLONG_TYPE v) noex {
 	int		rs ;
-	int		i = 0 ;
-	if ((rs = veclong_magic(op)) >= 0) {
+	int		i = 0 ; /* ¥ GCC false complaint */
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
 	    if (op->fl.issorted) {
-	        long		*rpp2 ;
-	        cint		esz = szof(VECLONG_TYPE) ;
-	        sort_vcmp	scmp = sort_vcmp(deflongcmp) ;
-	        rpp2 = (long *) bsearch(&v,op->va,op->i,esz,scmp) ;
+	        csize		esize = szof(VECLONG_TYPE) ;
+		csize		elen = size_t(op->i) ;
+	        qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
+	        VECLONG_TYPE	*rpp ;
+	        rpp = (VECLONG_TYPE *) bsearch(&v,op->va,elen,esize,qcf) ;
 	        rs = SR_NOTFOUND ;
-	        if (rpp2 != nullptr) {
-	            i = intconv(rpp2 - op->va) ;
+	        if (rpp) {
+	            i = intconv(rpp - op->va) ;
 	            rs = SR_OK ;
 	        }
 	    } else {
@@ -445,24 +412,76 @@ int veclong_match(veclong *op,VECLONG_TYPE v) noex {
 
 int veclong_getvec(veclong *op,VECLONG_TYPE **rpp) noex {
 	int		rs ;
-	if ((rs = veclong_magic(op,rpp)) >= 0) {
+	if ((rs = veclong_magic(op,rpp)) >= 0) ylikely {
 	    *rpp = op->va ;
-	    rs = op->i ; 
+	    rs = op->i ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (veclong_getvec) */
 
+int veclong_mkvec(veclong *op,VECLONG_TYPE *va) noex {
+	int		rs ;
+	int		c = 0 ;
+	if ((rs = veclong_magic(op,va)) >= 0) ylikely {
+	    for (int i = 0 ; i < op->i ; i += 1) {
+		const VECLONG_TYPE	v = op->va[i] ;
+		if (v != VECLONG_MIN) {
+		    va[c++] = op->va[i] ;
+		}
+	    } /* end for */
+	} /* end if (magic) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (veclong_mkvec) */
+
+int veclong_curbegin(veclong *op,veclong_cur *curp) noex {
+	int		rs ;
+	if ((rs = veclong_magic(op,curp)) >= 0) ylikely {
+	    curp->i = 0 ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (veclong_curend) */
+
+int veclong_curend(veclong *op,veclong_cur *curp) noex {
+	int		rs ;
+	if ((rs = veclong_magic(op,curp)) >= 0) ylikely {
+	    curp->i = 0 ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (veclong_curend) */
+
+int veclong_curenum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp) noex {
+	int		rs ;
+	int		v = 0 ;
+	if ((rs = veclong_magic(op,curp)) >= 0) ylikely {
+	    int		i = curp->i ;
+	    if ((i >= 0) && (i < op->i)) {
+	        v = intconv(op->va[i]) ;
+	        curp->i = (i+1) ;
+	    } else {
+	        rs = SR_NOTFOUND ;
+	    }
+	} /* end if (magic) */
+	if (rp) *rp = (rs >= 0) ? v : VECLONG_MIN ;
+	return rs ;
+}
+/* end subroutine (veclong_curenum) */
+
 int veclong_audit(veclong *op) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = veclong_magic(op)) >= 0) {
-	    long	v = 0 ;
-	    for (int i = 0 ; i < op->i ; i += 1) {
-	        c += 1 ;
-	        v |= op->va[i] ;
+	if ((rs = veclong_magic(op)) >= 0) ylikely {
+	    volatile VECLONG_TYPE	dummy{} ;
+	    int			i = 0 ; /* <- used afterwards */
+	    for (i = 0 ; i < op->i ; i += 1) {
+	        dummy += op->va[i] ;
 	    }
-	    rs = (c == op->c) ? SR_OK : SR_BADFMT ;
+	    (void) dummy ;
+	    c = op->c ;
+	    rs = (i == c) ? SR_OK : SR_BADFMT ;
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -471,37 +490,38 @@ int veclong_audit(veclong *op) noex {
 
 /* private subroutines */
 
-static int mkoptmask() noex {
+consteval int mkoptmask() noex {
 	int		m = 0 ;
-	m |= VECLONG_OREUSE ;
-	m |= VECLONG_OSWAP ;
-	m |= VECLONG_OSTATIONARY ;
-	m |= VECLONG_OCOMPACT ;
-	m |= VECLONG_OSORTED ;
-	m |= VECLONG_OORDERED ;
-	m |= VECLONG_OCONSERVE ;
+	m |= veclongm.reuse ;
+	m |= veclongm.compact ;
+	m |= veclongm.swap ;
+	m |= veclongm.stationary ;
+	m |= veclongm.conserve ;
+	m |= veclongm.sorted ;
+	m |= veclongm.ordered ;
 	return m ;
-} /* end subroutine (mkoptmask) */
+}
+/* end subroutine (mkoptmask) */
 
-static int veclong_setopts(veclong *op,int vo) noex {
-	cint		m = optmask ;
+local int veclong_setopts(veclong *op,int vo) noex {
+	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ m)) == 0) {
+	if ((vo & (~ optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
-	    if (vo & VECLONG_OREUSE) op->fl.oreuse = 1 ;
-	    if (vo & VECLONG_OSWAP) op->fl.oswap = 1 ;
-	    if (vo & VECLONG_OSTATIONARY) op->fl.ostationary = 1 ;
-	    if (vo & VECLONG_OCOMPACT) op->fl.ocompact = 1 ;
-	    if (vo & VECLONG_OSORTED) op->fl.osorted = 1 ;
-	    if (vo & VECLONG_OORDERED) op->fl.oordered = 1 ;
-	    if (vo & VECLONG_OCONSERVE) op->fl.oconserve = 1 ;
+	    if (vo & veclongm.reuse)		op->fl.oreuse = true ;
+	    if (vo & veclongm.swap)		op->fl.oswap = true ;
+	    if (vo & veclongm.stationary)	op->fl.ostationary = true ;
+	    if (vo & veclongm.compact)		op->fl.ocompact = true ;
+	    if (vo & veclongm.sorted)		op->fl.osorted = true ;
+	    if (vo & veclongm.ordered)		op->fl.oordered = true ;
+	    if (vo & veclongm.conserve)		op->fl.oconserve = true ;
 	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (veclong_setopts) */
 
-int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
+local int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ; /* ¥ GCC false complaint */
 	bool		f_done = false ;
@@ -510,31 +530,31 @@ int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 	f = (op->fl.oreuse || op->fl.oconserve) && (! op->fl.oordered) ;
 	if (f && (op->c < op->i)) {
 	    i = op->fi ;
-	    while ((i < op->i) && (op->va[i] != INT_MIN)) {
+	    while ((i < op->i) && (op->va[i] != VECLONG_MIN)) {
 	        i += 1 ;
 	    }
 	    if (i < op->i) {
-	        (op->va)[i] = v ;
+	        op->va[i] = v ;
 	        op->fi = (i + 1) ;
 	        f_done = true ;
 	    } else {
 	        op->fi = i ;
 	    }
 	} /* end if (possible reuse strategy) */
-/* do we have to grow the vector array? */
+	/* do we have to grow the vector array? */
 	if (! f_done) {
 	    /* do we have to grow the array? */
 	    if ((op->i + 1) > op->n) {
 	        rs = veclong_extend(op,1) ;
 	    }
 	    /* link into the list structure */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        i = op->i ;
-	        (op->va)[(op->i)++] = v ;
-	        (op->va)[op->i] = INT_MIN ;
+	        op->va[(op->i)++] = v ;
+	        op->va[op->i] = VECLONG_MIN ;
 	    }
 	} /* end if */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    op->c += 1 ;		/* increment list count */
 	    op->fl.issorted = false ;
 	}
@@ -542,42 +562,43 @@ int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 }
 /* end subroutine (veclong_addval) */
 
-static int veclong_extend(veclong *op,int amount) noex {
+local int veclong_extend(veclong *op,int amount) noex {
 	int		rs = SR_OK ;
-	if (amount > 0) {
-	    cint		esize = szof(VECLONG_TYPE) ;
+	if (amount > 0) ylikely {
+	    cint		esz = szof(VECLONG_TYPE) ;
 	    int			nn ;
 	    int			sz ;
-	    VECLONG_TYPE	*nva ;
+	    VECLONG_TYPE		*nva{} ;
 	    if (op->va == nullptr) {
 	        nn = max(amount,VECLONG_DEFENTS) ;
-	        sz = ((nn + 1) * esize) ;
+	        sz = ((nn + 1) * esz) ;
 	        rs = libmem.mall(sz,&nva) ;
 	    } else {
 	        nn = max((op->n + amount),(op->n * 2)) ;
-	        sz = ((nn + 1) * esize) ;
+	        sz = ((nn + 1) * esz) ;
 	        rs = libmem.rall(op->va,sz,&nva) ;
 	    } /* end if */
 	    if (rs >= 0) {
 	        op->va = nva ;
 	        op->n = nn ;
+		op->va[op->i] = VECLONG_MIN ;
 	    }
-	}
+	} /* end if (needed) */
 	return rs ;
 }
 /* end subroutine (veclong_extend) */
 
-static int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val) noex {
-	if (ii < op->i) {
-	    int		i ;
+local int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val) noex {
+	if (ii < op->i) ylikely {
+	    int		i ; /* used-multiple */
 	    /* find */
 	    for (i = (ii + 1) ; i < op->i ; i += 1) {
-		if (op->va[i] == LONG_MIN) break ;
+		if (op->va[i] == VECLONG_MIN) break ;
 	    }
 	    /* management */
 	    if (i == op->i) {
 	        op->i += 1 ;
-	        op->va[op->i] = LONG_MIN ;
+	        op->va[op->i] = VECLONG_MIN ;
 	    }
 	    /* move-up */
 	    for (int j = i ; j > ii ; j -= 1) {
@@ -585,7 +606,7 @@ static int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val) noex {
 	    }
 	} else if (ii == op->i) {
 	    op->i += 1 ;
-	    op->va[op->i] = LONG_MIN ;
+	    op->va[op->i] = VECLONG_MIN ;
 	} /* end if */
 	op->va[ii] = val ;
 	op->c += 1 ;
@@ -594,20 +615,182 @@ static int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val) noex {
 }
 /* end subroutine (veclong_insertval) */
 
-static int veclong_extrange(veclong *op,int n) noex {
+local int veclong_extrange(veclong *op,int n) noex {
 	if (n > op->i) {
-	    cint	nsz = ((n - op->i) * szof(VECLONG_TYPE)) ;
-	    memset((op->va + op->i),0,nsz) ;
+	    cint	nsz = ((n-op->i) * szof(VECLONG_TYPE)) ;
+	    memclear((op->va+op->i),nsz) ;
 	    op->i = n ;
-	    op->va[op->i] = LONG_MIN ;
+	    op->va[op->i] = VECLONG_MIN ;
 	}
 	return SR_OK ;
 }
 /* end subroutine (veclong_extrange) */
 
-static int deflongcmp(const VECLONG_TYPE *l1p,const VECLONG_TYPE  *l2p) noex {
+local int deftypecmp(const VECLONG_TYPE *l1p,const VECLONG_TYPE *l2p) noex {
 	return intsat(*l1p - *l2p) ;
 }
-/* end subroutine (deflongcmp) */
+/* end subroutine (deftypecmp) */
+
+int veclong_st::operator () (int vn,int vo) noex {
+    	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case 0:
+    	        rs = veclong_start(op,vn,vo) ;
+		break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+
+int veclong::add(VECLONG_TYPE v) noex {
+	return veclong_add(this,v) ;
+}
+
+int veclong::addlist(const VECLONG_TYPE *ap,int al) noex {
+	return veclong_addlist(this,ap,al) ;
+}
+
+int veclong::adduniq(VECLONG_TYPE v) noex {
+	return veclong_adduniq(this,v) ;
+}
+
+int veclong::insert(int idx,VECLONG_TYPE v) noex {
+	return veclong_insert(this,idx,v) ;
+}
+
+int veclong::assign(int idx,VECLONG_TYPE v) noex {
+	return veclong_insert(this,idx,v) ;
+}
+
+int veclong::del(int idx) noex {
+    	int		rs ;
+	if (idx >= 0) {
+	    rs = veclong_del(this,idx) ;
+	} else {
+	    rs = veclong_delall(this) ;
+	}
+	return rs ;
+}
+
+int veclong::find(VECLONG_TYPE v) noex {
+	return veclong_find(this,v) ;
+}
+
+int veclong::match(VECLONG_TYPE v) noex {
+	return veclong_match(this,v) ;
+}
+
+int veclong::getval(int idx,VECLONG_TYPE *rp) noex {
+	return veclong_getval(this,idx,rp) ;
+}
+
+int veclong::getvec(VECLONG_TYPE **rpp) noex {
+	return veclong_getvec(this,rpp) ;
+}
+
+int veclong::mkvec(VECLONG_TYPE *rva) noex {
+	return veclong_mkvec(this,rva) ;
+}
+
+int veclong::curbegin(veclong_cur *curp) noex {
+	return veclong_curbegin(this,curp) ;
+}
+
+int veclong::curend(veclong_cur *curp) noex {
+	return veclong_curend(this,curp) ;
+}
+
+int veclong::curenum(veclong_cur *curp,VECLONG_TYPE *rp) noex {
+	return veclong_curenum(this,curp,rp) ;
+}
+
+void veclong::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("veclong",rs,"fini-finish") ;
+	}
+} /* end method (veclong::dtor) */
+
+int veclong_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case veclongmem_count:
+	        rs = veclong_count(op) ;
+	        break ;
+	    case veclongmem_extent:
+	        rs = veclong_extent(op) ;
+	        break ;
+	    case veclongmem_delall:
+	        rs = veclong_delall(op) ;
+	        break ;
+	    case veclongmem_sort:
+	        rs = veclong_sort(op) ;
+	        break ;
+	    case veclongmem_setsorted:
+	        rs = veclong_setsorted(op) ;
+	        break ;
+	    case veclongmem_resize:
+	        rs = veclong_resize(op,a) ;
+	        break ;
+	    case veclongmem_audit:
+	        rs = veclong_audit(op) ;
+	        break ;
+	    case veclongmem_finish:
+	        rs = veclong_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (veclong_co::operator) */
+
+bool veclong_iter::operator == (const veclong_iter &oit) noex {
+	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
+}
+
+bool veclong_iter::operator != (const veclong_iter &oit) noex {
+	bool		f = false ;
+	f = f || (va != oit.va) ;
+	f = f || (ii != oit.ii) ;
+	if (!f) {
+	    f = (i < oit.i) ;
+	}
+	return f ;
+}
+/* end method (veclong_iter::operator) */
+
+veclong_iter veclong_iter::operator + (int n) const noex {
+	veclong_iter	rit(va,i,i) ;
+	rit.i = ((rit.i + n) >= 0) ? (rit.i + n) : 0 ;
+	return rit ;
+}
+
+veclong_iter veclong_iter::operator += (int n) noex {
+	veclong_iter	rit(va,i,i) ;
+	i = ((i + n) >= 0) ? (i + n) : 0 ;
+	rit.i = i ;
+	return rit ;
+}
+
+veclong_iter veclong_iter::operator ++ () noex { /* pre */
+	increment() ;
+	return (*this) ;
+}
+
+veclong_iter veclong_iter::operator ++ (int) noex { /* post */
+	veclong_iter	pre(*this) ;
+	increment() ;
+	return pre ;
+}
+
+void veclong_iter::increment(int n) noex {
+	if ((i + n) < 0) n = -i ;
+	if (n != 0) {
+	    i += n ;
+	    while ((i < ii) && (va[i] == -1)) {
+	        i += 1 ;
+	    }
+	}
+} /* end method (veclong_iter::increment) */
 
 
