@@ -23,7 +23,8 @@
 #include	<sys/types.h>		/* |pid_t| */
 #include	<utmpx.h>
 #include	<time.h>		/* |time_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<vecint.h>
 
@@ -109,7 +110,7 @@ struct tmpx_head {
 	TMPX_FL		fl ;
 	uint		mapoff ;	/* file mapping starting offset */
 	uint		magic ;
-	int		pagesize ;
+	int		pagesz ;
 	int		oflags ;	/* open flags */
 	int		operms ;	/* open permissions */
 	int		fd ;		/* file descriptor */
