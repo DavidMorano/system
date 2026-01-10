@@ -26,7 +26,7 @@
 	routines will copy and store the copied data in the list.
 	The advantage is that the caller does not have to keep the
 	orginal data around in order for the list data to be accessed
-	later.  Element data (unlike string data) can contain nullptr
+	later.  Element data (unlike string data) can contain NUL
 	characters-bytes.
 
 *******************************************************************************/
@@ -34,18 +34,21 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |qsort(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
+#include	<debprintf.h>
 
 #include	"vecelem.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/debug.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |memcopy(3u)| */
+import debug ;
 
 /* local defines */
 
@@ -99,17 +102,15 @@ int vecelem_start(vecelem *op,int esz,int vn,int vo) noex {
 	if ((rs = vecelem_ctor(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (esz > 0) ylikely {
-	        if (vn < 0) vn = VECELEM_DEFENTS ;
+	        if (vn <= 0) vn = VECELEM_DEFENTS ;
 	        op->esz = esz ;
 	        if ((rs = vecelem_setopts(op,vo)) >= 0) ylikely {
-	            if (vn > 0) {
-	                cint	sz = (vn + 1) * op->esz ;
-	                if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
-	                    op->va = voidpp(p) ;
-	    	            op->n = vn ;
-		            op->magic = VECELEM_MAGIC ;
-	                } /* end if (memory-allocation) */
-	            } /* end if (early startup) */
+	            cint	sz = (vn + 1) * op->esz ;
+	            if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
+	                op->va = p ;
+	    	        op->n = vn ;
+		    	op->magic = VECELEM_MAGIC ;
+	            } /* end if (memory-allocation) */
 	        } /* end if */
 	    } /* end if (valid) */
 	    if (rs < 0) {
@@ -144,13 +145,13 @@ int vecelem_finish(vecelem *op) noex {
 
 int vecelem_add(vecelem *op,cvoid *ep) noex {
 	int		rs ;
-	int		i = 0 ;
+	int		i = 0 ; /* extern-value */
 	if ((rs = vecelem_magic(op,ep)) >= 0) ylikely {
 	    if ((rs = vecelem_extend(op)) >= 0) ylikely {
-	        voidpp vep = op->va ;
+	        caddr_t vp = caddr_t(op->va) ;
 	        i = op->i ;
-	        vep += (i * op->esz) ;
-	        memcopy(vep,ep,op->esz) ;
+	        vp += (i * op->esz) ;
+	        memcopy(vp,ep,op->esz) ;
 	        op->i = (i + 1) ;
 	        op->c += 1 ;	/* increment list count */
 	        op->fl.issorted = false ;
@@ -160,16 +161,35 @@ int vecelem_add(vecelem *op,cvoid *ep) noex {
 }
 /* end subroutine (vecelem_add) */
 
+int vecelem_addlist(vecelem *op,cvoid *listp,int listl) noex {
+    	int		rs = SR_FAULT ;
+	int		c = 0 ;
+	if (op && listp) {
+	    rs = SR_INVALID ;
+	    if (listl >= 0) {
+		caddr_t	sp = caddr_t(listp) ;
+		rs = SR_OK ;
+	        for (int i = 0 ; i < listl ; i += 1) {
+	            rs = vecelem_add(op,sp) ;
+		    sp += op->esz ;
+	            c += 1 ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	    } /* end if (value) */
+	} /* end if (non-null) */
+    	return (rs >= 0) ? c : rs ;
+} /* end subroutine (vecelem_addlist) */
+
 int vecelem_adduniq(vecelem *op,cvoid *ep) noex {
 	int		rs ;
 	if ((rs = vecelem_magic(op,ep)) >= 0) ylikely {
 	    cint	esz = op->esz ;
-	    int	i{} ;
+	    int	i{} ; /* used-afterwards */
 	    rs = INT_MAX ;
 	    for (i = 0 ; i < op->i ; i += 1) {
-	        voidpp vep = op->va ;
-	        vep += (i * esz) ;
-	        if (memcmp(vep,ep,esz) == 0) break ;
+	        caddr_t vp = caddr_t(op->va) ;
+	        vp += (i * esz) ;
+	        if (memcmp(vp,ep,esz) == 0) break ;
 	    } /* end for */
 	    if (i >= op->i) {
 	        rs = vecelem_add(op,ep) ;
@@ -179,17 +199,17 @@ int vecelem_adduniq(vecelem *op,cvoid *ep) noex {
 }
 /* end subroutine (vecelem_adduniq) */
 
-int vecelem_get(vecelem *op,int i,void *vrp) noex {
+int vecelem_get(vecelem *op,int i,void *arp) noex {
 	int		rs ;
-	if ((rs = vecelem_magic(op,vrp)) >= 0) ylikely {
+	if ((rs = vecelem_magic(op,arp)) >= 0) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if ((i >= 0) && (i < op->i)) {
-	        voidpp	cvpp = voidpp(vrp) ;
-	        voidpp	vep = op->va ;
+	        voidpp	rpp = voidpp(arp) ;
+	        caddr_t	vp = caddr_t(op->va) ;
 		rs = SR_OK ;
-	        vep += (i * op->esz) ;
-	        *cvpp = vep ;
-	    }
+	        vp += (i * op->esz) ;
+	        *rpp = vp ;
+	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -200,11 +220,10 @@ int vecelem_getval(vecelem *op,int i,void *vrp) noex {
 	if ((rs = vecelem_magic(op,vrp)) >= 0) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if ((i >= 0) && (i < op->i)) {
-	        voidpp	cvp = voidpp(vrp) ;
-	        voidpp	vep = op->va ;
+	        caddr_t	vp = caddr_t(op->va) ;
 	        rs = SR_OK ;
-	        vep += (i * op->esz) ;
-	        memcopy(cvp,vep,op->esz) ;
+	        vp += (i * op->esz) ;
+	        memcopy(vrp,vp,op->esz) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -288,7 +307,7 @@ int vecelem_del(vecelem *op,int i) noex {
 /* end subroutine (vecelem_del) */
 
 int vecelem_delall(vecelem *op) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		c = 0 ;
 	if ((rs = vecelem_magic(op)) >= 0) ylikely {
 	    rs = SR_OK ;
@@ -311,10 +330,11 @@ int vecelem_sort(vecelem *op,vecelem_vcmp vcf) noex {
 	        op->fl.issorted = true ;
 	        if (op->c > 1) {
 		    qsort_f	scf = qsort_f(vcf) ;
-		    cint	esz = op->esz ;
-	            qsort(op->va,op->i,esz,scf) ;
-	        }
-		}
+		    csize	esize = size_t(op->esz) ;
+		    csize	elen = size_t(op->i) ;
+	            qsort(op->va,elen,esize,scf) ;
+		} /* end if (sorting needed) */
+	    } /* end if (not already sorted) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -355,7 +375,7 @@ int vecelem_audit(vecelem *op) noex {
 	            if (void *ep ; (rs = libmem.mall(esz,&ep)) >= 0) {
 		        int		i ; /* used-afterwards */
 	                for (i = 0 ; i < op->i ; i += 1) {
-		            voidpp	cap = op->va ;
+		            caddr_t cap = caddr_t(op->va) ;
 		            cap += (i * esz) ;
 	                    memcopy(ep,cap,esz) ;
 	                } /* end for */
@@ -452,7 +472,6 @@ local int vecelem_extend(vecelem *op) noex {
 	    if (rs >= 0) {
 	        op->va = voidpp(va) ;
 	        op->n = nn ;
-		op->va[op->i] = nullptr ;
 	    } /* end if (ok) */
 	} /* end if (extension required) */
 	return rs ;
