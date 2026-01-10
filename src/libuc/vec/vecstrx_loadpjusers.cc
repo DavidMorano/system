@@ -34,17 +34,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucenumua.h>
+#include	<uckvamatch.h>
 #include	<strwcmp.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -53,10 +51,6 @@
 
 
 /* local defines */
-
-#ifndef	USERATTRLEN
-#define	USERATTRLEN		(4 * 1024)
-#endif
 
 
 /* imported namespaces */
@@ -92,13 +86,12 @@ int vecstrx::loadpjusers(cchar *pjn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (pjn) {
+	if (pjn) ylikely {
 	    rs = SR_INVALID ;
-	    if (pjn[0]) {
-		cint ualen = USERATTRLEN ;
-		if (char *uab ; (rs = libmem.mall(ualen,&uab)) >= 0) {
+	    if (pjn[0]) ylikely {
+		if (char *uab ; (rs = lm_ua(&uab)) >= 0) ylikely {
 	            cint	ual = rs ;
-	            if (ucenumua eua ; (rs = eua.open) >= 0) {
+	            if (ucenumua eua ; (rs = eua.open) >= 0) ylikely {
 	                ucentua		ua{} ;
 	                while ((rs = eua.readent(&ua,uab,ual)) > 0) {
 	                    rs = vecstrx_loadpjnent(this,&ua,pjn) ;
@@ -108,7 +101,7 @@ int vecstrx::loadpjusers(cchar *pjn) noex {
 	                rs1 = eua.close ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (sysuserattr) */
-	            rs1 = libmem.free(uab) ;
+	            rs1 = lm_free(uab) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
