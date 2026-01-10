@@ -26,7 +26,7 @@
 	routines will copy and store the copied data in the list.
 	The advantage is that the caller does not have to keep the
 	orginal data around in order for the list data to be accessed
-	later.  Element data (unlike string data) can contain nullptr
+	later.  Element data (unlike string data) can contain NUL
 	characters-bytes.
 
 *******************************************************************************/
@@ -35,10 +35,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
@@ -93,11 +90,11 @@ namespace {
 
 /* forward references */
 
-static int	vecitem_setopts(vecitem *,int) noex ;
-static int	vecitem_extend(vecitem *) noex ;
-static int	vecitem_iget(vecitem *,int,void **) noex ;
-static int	vecitem_fetchbeg(vecitem *,fetchargs *) noex ;
-static int	vecitem_fetchcont(vecitem *,fetchargs *) noex ;
+local int	vecitem_setopts(vecitem *,int) noex ;
+local int	vecitem_extend(vecitem *) noex ;
+local int	vecitem_iget(vecitem *,int,void **) noex ;
+local int	vecitem_fetchbeg(vecitem *,fetchargs *) noex ;
+local int	vecitem_fetchcont(vecitem *,fetchargs *) noex ;
 
 consteval cur mkcurdef() noex {
 	cur	c{} ;
@@ -114,32 +111,34 @@ constexpr cur		curdef = mkcurdef() ;
 
 /* exported variables */
 
+constexpr vecitemms		vecitemm ;
+
 
 /* exported subroutines */
 
-int vecitem_start(vecitem *op,int n,int opts) noex {
+int vecitem_start(vecitem *op,int vn,int opts) noex {
 	VECITEM		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (n < 0) n = VECITEM_DEFENTS ;
-	if (op) {
+	if (vn < 0) vn = VECITEM_DEFENTS ;
+	if (op) ylikely {
 	    memclear(hop) ;	/* <- potentially dangerous if type changes */
-	    if ((rs = vecitem_setopts(op,opts)) >= 0) {
-	        cint	sz = (n + 1) * szof(char **) ;
+	    if ((rs = vecitem_setopts(op,opts)) >= 0) ylikely {
+	        cint	sz = (vn + 1) * szof(char **) ;
 		if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 		    op->va = (void **) vp ;
 	            op->va[0] = nullptr ;
-	            op->n = n ;
+	            op->n = vn ;
 	        }
-	    }
+	    } /* end if (vecitem_setopts) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? n : rs ;
+	return (rs >= 0) ? vn : rs ;
 }
 /* end subroutine (vecitem_start) */
 
 int vecitem_finish(vecitem *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < op->i ; i += 1) {
 		void	*ep = op->va[i] ;
@@ -165,7 +164,7 @@ int vecitem_finish(vecitem *op) noex {
 int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && ep) {
+	if (op && ep) ylikely {
 	    bool	f_done = false ;
 	    bool	f ;
 	    if (el < 0) el = lenstr(charp(ep)) ;
@@ -212,9 +211,9 @@ int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 
 int vecitem_get(vecitem *op,int i,void *vrp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if ((i >= 0) && (i < op->i)) {
+	    if ((i >= 0) && (i < op->i)) ylikely {
 		rs = SR_OK ;
 	        if (vrp) {
 	            void	**rpp = (void **) vrp ;
@@ -228,14 +227,16 @@ int vecitem_get(vecitem *op,int i,void *vrp) noex {
 
 int vecitem_del(vecitem *op,int i) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs1 ;
+	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if ((i >= 0) && (i < op->i)) {
+	    if ((i >= 0) && (i < op->i)) ylikely {
 		bool	f_fi = false ;
 		rs = SR_OK ;
 	        if (op->va[i] != nullptr) {
 	            op->c -= 1 ;		/* decrement list count */
-	            libmem.free(op->va[i]) ;
+	            rs1 = libmem.free(op->va[i]) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if */
 	        if (op->fl.ostationary) {
 	            op->va[i] = nullptr ;
@@ -258,7 +259,8 @@ int vecitem_del(vecitem *op,int i) noex {
 	                f_fi = true ;
 	            } /* end if */
 	        } else {
-	            if ((op->fl.oswap || op->fl.ocompact) && (i < (op->i - 1))) {
+		    cbool f = (op->fl.oswap || op->fl.ocompact) ;
+	            if (f && (i < (op->i - 1))) {
 	                op->va[i] = op->va[op->i - 1] ;
 	                op->va[--op->i] = nullptr ;
 	                op->fl.issorted = false ;
@@ -288,7 +290,7 @@ int vecitem_del(vecitem *op,int i) noex {
 
 int vecitem_count(vecitem *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->c ;
 	} /* end if (non-null) */
 	return rs ;
@@ -297,7 +299,7 @@ int vecitem_count(vecitem *op) noex {
 
 int vecitem_sort(vecitem *op,cmpf cf) noex {
 	int		rs = SR_FAULT ;
-	if (op && cf) {
+	if (op && cf) ylikely {
 	    rs = op->c ;
 	    if (! op->fl.issorted) {
 	        op->fl.issorted = true ;
@@ -314,7 +316,7 @@ int vecitem_sort(vecitem *op,cmpf cf) noex {
 
 int vecitem_curbegin(vecitem *op,cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    rs = SR_OK ;
 	    *curp = curdef ;
 	} /* end if (non-null) */
@@ -324,7 +326,7 @@ int vecitem_curbegin(vecitem *op,cur *curp) noex {
 
 int vecitem_curend(vecitem *op,cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    rs = SR_OK ;
 	    *curp = curdef ;
 	} /* end if (non-null) */
@@ -336,7 +338,7 @@ int vecitem_fetch(vecitem *op,cvoid *cep,cur *curp,cmpf cf,void *vrp) noex {
 	void		**rpp = (void **) vrp ;
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && cep && cf) {
+	if (op && cep && cf) ylikely {
 	    fetchargs	a ;
 	    cur		acur = curdef ;
 	    void	*aep = nullptr ;
@@ -365,10 +367,10 @@ int vecitem_fetch(vecitem *op,cvoid *cep,cur *curp,cmpf cf,void *vrp) noex {
 
 int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	void		**rpp = (void **) vrp ;
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
-	if (op && cep && cf) {
-	    cnullptr	np{} ;
+	if (op && cep && cf) ylikely {
 	    rs = SR_OK ;
 	    if (op->fl.osorted && (! op->fl.issorted)) {
 	        op->fl.issorted = true ;
@@ -407,9 +409,9 @@ int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 int vecitem_find(vecitem *op,cvoid *cep,int len) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && cep) {
+	if (op && cep) ylikely {
 	    rs = SR_INVALID ;
-	    if (len > 0) {
+	    if (len > 0) ylikely {
 	        for (i = 0 ; i < op->i ; i += 1) {
 		    void	*ep = op->va[i] ;
 	            if (ep) {
@@ -425,7 +427,7 @@ int vecitem_find(vecitem *op,cvoid *cep,int len) noex {
 
 int vecitem_getvec(vecitem *op,void **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op && rpp) {
+	if (op && rpp) ylikely {
 	    rs = op->c ;
 	    *rpp = op->va ;
 	} /* end if (non-null) */
@@ -436,7 +438,7 @@ int vecitem_getvec(vecitem *op,void **rpp) noex {
 int vecitem_audit(vecitem *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < op->i ; i += 1) {
 	        void	*ep = op->va[i] ;
@@ -458,49 +460,49 @@ int vecitem_audit(vecitem *op) noex {
 
 consteval int mkoptmask() noex {
 	int		m = 0 ;
-	m |= VECITEM_OREUSE ;
-	m |= VECITEM_OCOMPACT ;
-	m |= VECITEM_OSWAP ;
-	m |= VECITEM_OSTATIONARY ;
-	m |= VECITEM_OCONSERVE ;
-	m |= VECITEM_OSORTED ;
-	m |= VECITEM_OORDERED ;
+	m |= vecitemm.reuse ;
+	m |= vecitemm.compact ;
+	m |= vecitemm.swap ;
+	m |= vecitemm.stationary ;
+	m |= vecitemm.conserve ;
+	m |= vecitemm.sorted ;
+	m |= vecitemm.ordered ;
 	return m ;
 }
 /* end subroutine (mkoptmask) */
 
-static int vecitem_setopts(vecitem *op,int vo) noex {
-	constexpr int	m = mkoptmask() ;
+local int vecitem_setopts(vecitem *op,int vo) noex {
+	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	op->fl = {} ;
-	if ((vo & (~ m)) == 0) {
+	if ((vo & (~ optmask)) == 0) ylikely {
 	    rs = SR_OK ;
-	    if (vo & VECITEM_OREUSE) op->fl.oreuse = 1 ;
-	    if (vo & VECITEM_OSWAP) op->fl.oswap = 1 ;
-	    if (vo & VECITEM_OSTATIONARY) op->fl.ostationary = 1 ;
-	    if (vo & VECITEM_OCOMPACT) op->fl.ocompact = 1 ;
-	    if (vo & VECITEM_OSORTED) op->fl.osorted = 1 ;
-	    if (vo & VECITEM_OORDERED) op->fl.oordered = 1 ;
-	    if (vo & VECITEM_OCONSERVE) op->fl.oconserve = 1 ;
+	    if (vo & vecitemm.reuse)		op->fl.oreuse		= true ;
+	    if (vo & vecitemm.swap)		op->fl.oswap		= true ;
+	    if (vo & vecitemm.stationary)	op->fl.ostationary	= true ;
+	    if (vo & vecitemm.compact)		op->fl.ocompact		= true ;
+	    if (vo & vecitemm.sorted)		op->fl.osorted		= true ;
+	    if (vo & vecitemm.ordered)		op->fl.oordered		= true ;
+	    if (vo & vecitemm.conserve)		op->fl.oconserve	= true ;
 	} /* end if (valid options) */
 	return rs ;
 }
 /* end subroutine (vecitem_setopts) */
 
-static int vecitem_extend(vecitem *op) noex {
+local int vecitem_extend(vecitem *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
-	    cint	esize = szof(char **) ;
+	    cint	esz = szof(char **) ;
 	    int		nn ;
 	    int		sz ;
 	    void	*na{} ;
 	    if (op->va == nullptr) {
 	        nn = VECITEM_DEFENTS ;
-	        sz = (nn + 1) * esize ;
+	        sz = (nn + 1) * esz ;
 	        rs = libmem.mall(sz,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        sz = (nn + 1) * esize ;
+	        sz = (nn + 1) * esz ;
 	        rs = libmem.rall(op->va,sz,&na) ;
 	        op->va = nullptr ;
 	    }
@@ -513,9 +515,9 @@ static int vecitem_extend(vecitem *op) noex {
 }
 /* end subroutine (vecitem_extend) */
 
-static int vecitem_iget(vecitem *op,int i,void **gpp) noex {
+local int vecitem_iget(vecitem *op,int i,void **gpp) noex {
 	int		rs = SR_FAULT ;
-	if (op && gpp) {
+	if (op && gpp) ylikely {
 	    rs = SR_NOTFOUND ;
 	    *gpp = nullptr ;
 	    if ((i >= 0) && (i < op->i)) {
@@ -527,7 +529,7 @@ static int vecitem_iget(vecitem *op,int i,void **gpp) noex {
 }
 /* end subroutine (vecitem_iget) */
 
-static int vecitem_fetchbeg(vecitem *op,fetchargs *ap) noex {
+local int vecitem_fetchbeg(vecitem *op,fetchargs *ap) noex {
 	int		rs ;
 	cvoid		*cep = ap->cep ;
 	cur		*curp = ap->curp ;
@@ -535,7 +537,7 @@ static int vecitem_fetchbeg(vecitem *op,fetchargs *ap) noex {
 	void		**rpp = ap->rpp ;
 	int		i = 0 ;
 	curp->c = 0 ;
-	if ((rs = vecitem_search(op,cep,cf,rpp)) > 0) {
+	if ((rs = vecitem_search(op,cep,cf,rpp)) > 0) ylikely {
 	    auto	vig = vecitem_iget ;
 	    int		j{} ;
 	    i = rs ;
@@ -557,7 +559,7 @@ static int vecitem_fetchbeg(vecitem *op,fetchargs *ap) noex {
                 curp->i = rs ;
             }
 	} /* end if (search) */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    curp->i = i ;
 	    curp->c = 1 ;
 	}
@@ -565,7 +567,7 @@ static int vecitem_fetchbeg(vecitem *op,fetchargs *ap) noex {
 }
 /* end subroutine (vecitem_fetchbeg) */
 
-static int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
+local int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
 	int		rs = SR_OK ;
 	cvoid		*cep = ap->cep ;
 	cur		*curp = ap->curp ;
@@ -602,14 +604,14 @@ static int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
                         i = (j + 1) ;
                         *rpp = last ;
                     } /* end if */
-/* skip up to 'cp->c' count minus one number of matches */
+		    /* skip up to 'cp->c' count minus one number of matches */
                     i += (curp->c - 1) ;
                     curp->i = i ;
                 } else {
                     curp->i = op->i ;
                 }
             } /* end if (it was out-of-order) */
-/* return the next one */
+	    /* return the next one */
             i = (curp->i + 1) ;
 	    if (rs >= 0) {
                 if ((rs = vecitem_iget(op,i,&tep)) >= 0) {
@@ -623,7 +625,7 @@ static int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
             cint        is = (curp->i + 1) ;
             auto	lamb = [&]() noex {
                 return ((rs = vecitem_iget(op,i,&tep)) >= 0) ;
-            } ;
+            } ; /* end lambda */
             for (i = is ; lamb() ; i += 1) {
                 if (tep) {
                     cvoid       *ctep = cvoidp(tep) ;
@@ -676,15 +678,15 @@ void vecitem::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecitem",rs,"fini-finish") ;
 	}
-}
+} /* end method (vecitem_iter::dtor) */
 
 vecitem::operator int () noex {
     	return vecitem_count(this) ;
-}
+} /* end method (vecitem_iter::operator) */
 
 int vecitem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case vecitemmem_del:
 	        rs = vecitem_del(op,a) ;
@@ -701,12 +703,11 @@ int vecitem_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (vecitem_co::operator) */
+} /* end method (vecitem_co::operator) */
 
 bool vecitem_iter::operator == (const vecitem_iter &oit) noex {
 	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
-}
+} /* end method (vecitem_iter::operator) */
 
 bool vecitem_iter::operator != (const vecitem_iter &oit) noex {
 	bool		f = false ;
@@ -716,32 +717,31 @@ bool vecitem_iter::operator != (const vecitem_iter &oit) noex {
 	    f = (i < oit.i) ;
 	}
 	return f ;
-}
-/* end method (vecitem_iter::operator) */
+} /* end method (vecitem_iter::operator) */
 
 vecitem_iter vecitem_iter::operator + (int n) const noex {
 	vecitem_iter	rit(va,i,i) ;
 	rit.i = ((rit.i + n) >= 0) ? (rit.i + n) : 0 ;
 	return rit ;
-}
+} /* end method (vecitem_iter::operator) */
 
 vecitem_iter vecitem_iter::operator += (int n) noex {
 	vecitem_iter	rit(va,i,i) ;
 	i = ((i + n) >= 0) ? (i + n) : 0 ;
 	rit.i = i ;
 	return rit ;
-}
+} /* end method (vecitem_iter::operator) */
 
 vecitem_iter vecitem_iter::operator ++ () noex { /* pre */
 	increment() ;
 	return (*this) ;
-}
+} /* end method (vecitem_iter::operator) */
 
 vecitem_iter vecitem_iter::operator ++ (int) noex { /* post */
 	vecitem_iter	pre(*this) ;
 	increment() ;
 	return pre ;
-}
+} /* end method (vecitem_iter::operator) */
 
 void vecitem_iter::increment(int n) noex {
 	if ((i + n) < 0) n = -i ;
@@ -751,7 +751,6 @@ void vecitem_iter::increment(int n) noex {
 	        i += 1 ;
 	    }
 	}
-}
-/* end method (vecitem_iter::increment) */
+} /* end method (vecitem_iter::increment) */
 
 
