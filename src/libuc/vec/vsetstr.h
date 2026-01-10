@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vecpstr.h>
 
 
@@ -30,11 +27,11 @@
 struct vsetstr_head {
 	vecpstr		*elp ;
 	uint		magic ;
-} ;
+} ; /* end struct (vsetstr_head) */
 
 struct vsetstr_cursor {
 	int		i ;
-} ;
+} ; /* end struct (vsetstr_cursor) */
 
 
 typedef	VSETSTR		vsetstr ;
