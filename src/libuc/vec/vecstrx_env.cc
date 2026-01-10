@@ -53,7 +53,8 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<char.h>
@@ -62,7 +63,9 @@
 
 #include	"vecstrx.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -98,8 +101,8 @@ int vecstrx::envadd(cchar *kp,cchar *vp,int vl) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		i = INT_MAX ;
-	if (kp) {
-	    auto	vcmp = vstrkeycmp ;
+	if (kp) ylikely {
+	    cauto	vcmp = vstrkeycmp ;
 	    if ((rs = finder(kp,vcmp,np)) == rsn) {
 	        rs = addkeyval(kp,-1,vp,vl) ;
 	        i = rs ;
@@ -112,7 +115,7 @@ int vecstrx::envadd(cchar *kp,cchar *vp,int vl) noex {
 int vecstrx::envadds(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    for (cc *tp ; (tp = strnbrk(sp,sl," \t\r\n,")) != nullptr ; ) {
@@ -136,8 +139,8 @@ int vecstrx::envadds(cchar *sp,int sl) noex {
 int vecstrx::envset(cchar *kp,cchar *vp,int vl) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (kp) {
-	    auto	vcmp = vstrkeycmp ;
+	if (kp) ylikely {
+	    cauto	vcmp = vstrkeycmp ;
 	    if ((rs = finder(kp,vcmp,np)) >= 0) {
 	        del(rs) ;
 	    } else if (rs == SR_NOTFOUND) {
@@ -154,7 +157,7 @@ int vecstrx::envset(cchar *kp,cchar *vp,int vl) noex {
 int vecstrx::envget(cchar *kp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (kp) {
+	if (kp) ylikely {
 	    cchar	*rp = nullptr ;
 	    if (rpp) *rpp = nullptr ;
 	    if (cchar *ep ; (rs = finder(kp,vstrkeycmp,&ep)) >= 0) {
