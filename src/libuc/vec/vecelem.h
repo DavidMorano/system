@@ -22,10 +22,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |caddr_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 /* object defines */
@@ -53,19 +50,19 @@ enum vecelemos {
     vecelemo_sorted,
     vecelemo_ordered,
     vecelemo_overlast
-} ;
+} ; /* end enum (vecelemos) */
 
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecelemms {
-    static int	reuse ;
-    static int	compact ;
-    static int	swap ;
-    static int	stationary ;
-    static int	conserve ;
-    static int	sorted ;
-    static int	ordered ;
-} ;
+    constexpr static int	reuse		= (1 << vecelemo_reuse) ;
+    constexpr static int	compact		= (1 << vecelemo_compact) ;
+    constexpr static int	swap		= (1 << vecelemo_swap) ;
+    constexpr static int	stationary	= (1 << vecelemo_stationary) ;
+    constexpr static int	conserve	= (1 << vecelemo_conserve) ;
+    constexpr static int	sorted		= (1 << vecelemo_sorted) ;
+    constexpr static int	ordered		= (1 << vecelemo_ordered) ;
+} ; /* end struct (vecelemms) */
 
 #endif /* __cplusplus */
 
@@ -89,10 +86,10 @@ struct vecelem_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-} ;
+} ; /* end struct (vecelem_flags) */
 
 struct vecelem_head {
-	voidpp		va ;
+	voidp		va ;		/* value-aray */
 	VECELEM_FL	fl ;
 	uint		magic ;
 	int		c ;		/* count of items in list */
@@ -100,34 +97,96 @@ struct vecelem_head {
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
 	int		esz ;		/* element size */
-} ;
+} ; /* end struct (vecelem_head) */
 
+EXTERNC_begin
+typedef int (*vecelem_vcmp)(cvoid **,cvoid **) noex ;
+EXTERNC_end
+
+#ifdef	__cplusplus
+enum vecelemmems {
+	vecelemmem_count,
+	vecelemmem_delall,
+	vecelemmem_extent,
+	vecelemmem_audit,
+	vecelemmem_finish,
+	vecelemmem_overlast
+} ;
+struct vecelem ;
+struct vecelem_co {
+	vecelem		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (vecelem *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (vecelem_co) */
+struct vecelem : vecelem_head {
+	vecelem_co	count ;
+	vecelem_co	delall ;
+	vecelem_co	extent ;
+	vecelem_co	audit ;
+	vecelem_co	finish ;
+	vecelem() noex {
+	    count	(this,vecelemmem_count) ;
+	    delall	(this,vecelemmem_delall) ;
+	    extent	(this,vecelemmem_extent) ;
+	    audit	(this,vecelemmem_audit) ;
+	    finish	(this,vecelemmem_finish) ;
+	    va = nullptr ;
+	} ; /* end tcor */
+	vecelem(const vecelem &) = delete ;
+	vecelem &operator = (const vecelem &) = delete ;
+	int start	(int = 0,int = 0,int = 0) noex ;
+	int add		(cvoid *) noex ;
+	int addlist	(cvoid *,int) noex ;
+	int adduniq	(cvoid *) noex ;
+	int sort	(int,vecelem_vcmp = nullptr) noex ;
+	int get		(int,void *) noex ;
+	int getval	(int,void *) noex ;
+	int getvec	(void **) noex ;
+	int search	(cvoid *,vecelem_vcmp,void **) noex ;
+	int del		(int = -1) noex ;
+	int sort	(vecelem_vcmp) noex ;
+	void dtor() noex ;
+	operator int () noex ;
+	destruct vecelem() {
+	    if (va) dtor() ;
+	} ;
+} ; /* end struct (vecelem) */
+#else	/* __cplusplus */
 typedef VECELEM		vecelem ;
+#endif /* __cplusplus */
+
 typedef VECELEM_FL	vecelem_fl ;
 
 EXTERNC_begin
 
-typedef int (*vecelem_vcmp)(cvoid **,cvoid **) noex ;
-
-extern int vecelem_start(vecelem *,int,int,int) noex ;
-extern int vecelem_finish(vecelem *) noex ;
-extern int vecelem_add(vecelem *,cvoid *) noex ;
-extern int vecelem_adduniq(vecelem *,cvoid *) noex ;
-extern int vecelem_count(vecelem *) noex ;
-extern int vecelem_sort(vecelem *,vecelem_vcmp) noex ;
-extern int vecelem_setsorted(vecelem *) noex ;
-extern int vecelem_search(vecelem *,vecelem_vcmp) noex ;
-extern int vecelem_get(vecelem *,int,void *) noex ;
-extern int vecelem_getval(vecelem *,int,void *) noex ;
-extern int vecelem_getvec(vecelem *,void *) noex ;
-extern int vecelem_audit(vecelem *) noex ;
+extern int vecelem_start	(vecelem *,int,int,int) noex ;
+extern int vecelem_finish	(vecelem *) noex ;
+extern int vecelem_add		(vecelem *,cvoid *) noex ;
+extern int vecelem_addlist	(vecelem *,cvoid *,int) noex ;
+extern int vecelem_adduniq	(vecelem *,cvoid *) noex ;
+extern int vecelem_sort		(vecelem *,vecelem_vcmp) noex ;
+extern int vecelem_setsorted	(vecelem *) noex ;
+extern int vecelem_search	(vecelem *,vecelem_vcmp) noex ;
+extern int vecelem_get		(vecelem *,int,void *) noex ;	/* pointer */
+extern int vecelem_getval	(vecelem *,int,void *) noex ;	/* value */
+extern int vecelem_getvec	(vecelem *,void **) noex ;
+extern int vecelem_count	(vecelem *) noex ;
+extern int vecelem_extent	(vecelem *) noex ;
+extern int vecelem_del		(vecelem *,int) noex ;
+extern int vecelem_delall	(vecelem *) noex ;
+extern int vecelem_audit	(vecelem *) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 extern const vecelemms	vecelemm ;
-
 #endif /* __cplusplus */
 
 
