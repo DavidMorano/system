@@ -43,13 +43,17 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<estrings.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<strn.h>		/* |strnbrk(3uc)| */
+#include	<sfx.h>			/* |sfshrink(3uc)| */
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -77,7 +81,7 @@ import libutil ;
 int vecstrx::adduniqs(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (sp) {
+	if (sp) ylikely {
 	    int		cl ;
 	    cchar	*cp ;
 	    cchar	*tp ;
