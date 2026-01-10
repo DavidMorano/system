@@ -30,14 +30,16 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<new>			/* placement-new + |nothrow| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"vsetstr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -69,10 +71,10 @@ static int vsetstr_ctor(vsetstr *op,Args ... args) noex {
     	VSETSTR		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if (vecpstr *elp ; (elp = new(nothrow) vecpstr) != np) {
+	    if (vecpstr *elp ; (elp = new(nothrow) vecpstr) != np) ylikely {
 		op->elp = elp ;
 		rs = SR_OK ;
 	    }
@@ -83,10 +85,10 @@ static int vsetstr_ctor(vsetstr *op,Args ... args) noex {
 
 static int vsetstr_dtor(vsetstr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    vecpstr	*elp = op->elp ;
 	    rs = SR_OK ;
-	    if (elp) {
+	    if (elp) ylikely {
 		delete elp ;
 		op->elp = nullptr ;
 	    }
@@ -98,7 +100,7 @@ static int vsetstr_dtor(vsetstr *op) noex {
 template<typename ... Args>
 static inline int vsetstr_magic(vsetstr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == VSETSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -116,10 +118,10 @@ static inline int vsetstr_magic(vsetstr *op,Args ... args) noex {
 
 int vsetstr_start(VS *op,int vn) noex {
 	int		rs ;
-	if ((rs = vsetstr_ctor(op)) >= 0) {
+	if ((rs = vsetstr_ctor(op)) >= 0) ylikely {
 	    vecpstr	*elp = op->elp ;
 	    cint	vsz = (vn > 0) ? (vn * 6) : 0 ;
-	    if ((rs = elp->start(vn,vsz,0)) >= 0) {
+	    if ((rs = elp->start(vn,vsz,0)) >= 0) ylikely {
 	        op->magic = VSETSTR_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -133,7 +135,7 @@ int vsetstr_start(VS *op,int vn) noex {
 int vsetstr_finish(VS *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = vsetstr_magic(op)) >= 0) {
+	if ((rs = vsetstr_magic(op)) >= 0) ylikely {
 	    vecpstr	*elp = op->elp ;
 	    {
 	        rs1 = elp->finish ;
@@ -151,7 +153,7 @@ int vsetstr_finish(VS *op) noex {
 
 int vsetstr_look(VS *op,cchar *sbuf,int slen) noex {
 	int		rs ;
-	if ((rs = vsetstr_magic(op,sbuf)) >= 0) {
+	if ((rs = vsetstr_magic(op,sbuf)) >= 0) ylikely {
 	    vecpstr	*elp = op->elp ;
 	    rs = elp->already(sbuf,slen) ;
 	} /* end if (magic) */
@@ -163,7 +165,7 @@ int vsetstr_look(VS *op,cchar *sbuf,int slen) noex {
 int vsetstr_add(VS *op,cchar *sbuf,int slen) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	if ((rs = vsetstr_magic(op,sbuf)) >= 0) {
+	if ((rs = vsetstr_magic(op,sbuf)) >= 0) ylikely {
 	    vecpstr	*elp = op->elp ;
 	    if (slen < 0) slen = lenstr(sbuf) ;
 	    if ((rs = elp->findn(sbuf,slen)) == rsn) {
@@ -178,7 +180,7 @@ int vsetstr_add(VS *op,cchar *sbuf,int slen) noex {
 
 int vsetstr_curbegin(VS *op,VS_CUR *curp) noex {
     	int		rs ;
-	if ((rs = vsetstr_magic(op,curp)) >= 0) {
+	if ((rs = vsetstr_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -196,7 +198,7 @@ int vsetstr_curend(VS *op,VS_CUR *curp) noex {
 
 int vsetstr_curdel(VS *op,VS_CUR *curp) noex {
 	int		rs ;
-	if ((rs = vsetstr_magic(op,curp)) >= 0) {
+	if ((rs = vsetstr_magic(op,curp)) >= 0) ylikely {
 	    vecpstr	*elp = op->elp ;
 	    cint	i = curp->i ;
 	    rs = elp->del(i) ;
@@ -207,7 +209,7 @@ int vsetstr_curdel(VS *op,VS_CUR *curp) noex {
 
 int vsetstr_already(VS *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = vsetstr_magic(op)) >= 0) {
+	if ((rs = vsetstr_magic(op)) >= 0) ylikely {
 	    vecpstr *elp = op->elp ;
 	    if ((rs = elp->findn(sp,sl)) >= 0) {
 	        rs = true ;
@@ -223,7 +225,7 @@ int vsetstr_already(VS *op,cchar *sp,int sl) noex {
 int vsetstr_curenum(VS *op,VS_CUR *curp,cchar **vpp) noex {
 	int		rs ;
 	int		rl = 0 ; /* return-value */
-	if ((rs = vsetstr_magic(op,curp)) >= 0) {
+	if ((rs = vsetstr_magic(op,curp)) >= 0) ylikely {
 	    vecpstr	*elp = op->elp ;
 	    int		i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	    cchar	*rp = nullptr ;
@@ -246,7 +248,7 @@ int vsetstr_curenum(VS *op,VS_CUR *curp,cchar **vpp) noex {
 /* advance the cursor to the next entry regardless of key */
 int vsetstr_curnext(VS *op,VS_CUR *curp) noex {
 	int		rs ;
-	if ((rs = vsetstr_magic(op,curp)) >= 0) {
+	if ((rs = vsetstr_magic(op,curp)) >= 0) ylikely {
 	    int		i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	    curp->i = i ;
 	} /* end if (magic) */
@@ -256,7 +258,7 @@ int vsetstr_curnext(VS *op,VS_CUR *curp) noex {
 
 int vsetstr_count(VS *op) noex {
 	int		rs ;
-	if ((rs = vsetstr_magic(op)) >= 0) {
+	if ((rs = vsetstr_magic(op)) >= 0) ylikely {
 	    vecpstr	*elp = op->elp ;
 	    rs = elp->count ;
 	} /* end if (magic) */
