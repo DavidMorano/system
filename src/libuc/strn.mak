@@ -117,23 +117,23 @@ control:
 
 
 obj0_strn.o:	$(OBJ0_STRN)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_strn.o:	$(OBJ1_STRN)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_strn.o:	$(OBJ2_STRN)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_strn.o:	$(OBJ3_STRN)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 strnxchr.o:		strnxchr.cc	strnxchr.h	$(INCS)
