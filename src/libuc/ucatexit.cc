@@ -9,12 +9,12 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -31,9 +31,14 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |atexit(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysnative.h>
+#include	<usysbase.h>
+#include	<utimeout.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
+
+#include	"ucatexit.h"
 
 
 /* local defines */
@@ -107,6 +112,7 @@ int ucatexit::operator () () noex {
 		    r(false) ;
                     break ;
                 } /* end switch */
+		rs = r ;
             } /* end if (error) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
