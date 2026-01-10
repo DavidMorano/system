@@ -66,10 +66,7 @@
 #include	<cstring>		/* |strcmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<getfdfile.h>
@@ -82,7 +79,7 @@
 
 #pragma		GCC dependency		"mod/ulibvals.ccm"
 
-import ulibvals ;
+import ulibvals ;			/* *nothing-right-now* */
 
 /* local defines */
 
@@ -144,13 +141,13 @@ static vars		var ;
 int vecstrx::loadfile(int fu,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        static cint	rst = mkterms() ;
-	        if ((rs = rst) >= 0) {
+	        if ((rs = rst) >= 0) ylikely {
 	            static cint		rsv = var ;
-	            if ((rs = rsv) >= 0) {
+	            if ((rs = rsv) >= 0) ylikely {
 			rs = vecstrx_loadfiler(this,fu,fname) ;
 			c = rs ;
 		    } /* end if (mkvars) */
@@ -193,7 +190,7 @@ static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
 	    csize	fsz = size_t(sb.st_size) ;
 	    rs = SR_ISDIR ;
 	    if (! S_ISDIR(sb.st_mode)) {
@@ -232,7 +229,7 @@ static int vecstrx_loadline(vecstrx *vsp,int fu,cchar *lbuf,int len) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (field fsb ; (rs = fsb.start(lbuf,len)) >= 0) {
+	if (field fsb ; (rs = fsb.start(lbuf,len)) >= 0) ylikely {
 	    cchar	*fp ;
 	    for (int fl ; (fl = fsb.get(fterms,&fp)) >= 0 ; ) {
 		if (fl > 0) {
@@ -261,7 +258,7 @@ static int mkterms() noex {
 
 vars::operator int () noex {
         int             rs ;
-        if ((rs = maxline) >= 0) {
+        if ((rs = maxline) >= 0) ylikely {
             var.linebuflen = (rs * LINEBUFMULT) ;
         }
         return rs ;
