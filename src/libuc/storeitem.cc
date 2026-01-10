@@ -49,7 +49,9 @@
 #include	<cstdlib>
 #include	<cstdint>
 #include	<bit>			/* |has_single_bit(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<ctdec.h>
 #include	<intceil.h>
 #include	<snwcpy.h>
@@ -57,7 +59,9 @@
 
 #include	"storeitem.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
