@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 /* object defines */
@@ -34,21 +31,56 @@
 #define	VECINT_CUR		struct vecint_cursor
 #define	VECINT_DEFENTS		2
 #define	VECINT_TYPE		int
+#define	VECINT_MIN		INT_MIN
+#define	VECINT_MAX		INT_MAX
 
-/* options */
-#define	VECINT_ODEFAULT		0x0000
-#define	VECINT_OREUSE		0x0001		/* reuse empty slots */
-#define	VECINT_OCOMPACT		0x0002		/* means NOHOLES */
-#define	VECINT_OSWAP		0x0004		/* use swapping */
-#define	VECINT_OSTATIONARY	0x0008		/* entries should not move */
-#define	VECINT_OCONSERVE	0x0010		/* conserve space */
-#define	VECINT_OSORTED		0x0020		/* keep sorted */
-#define	VECINT_OORDERED		0x0040		/* keep ordered */
+/**** options
+reuse		= reuse empty slots
+compact		= do not allow for holes
+swap		= use swapping for empty slot management
+stationary	= entries do not move
+conserve	= conserve space where possible
+sorted		= maintain a sorted list
+ordered		= maintain an ordered list
+****/
 
+enum vecintos {
+    vecinto_reuse,
+    vecinto_compact,
+    vecinto_swap,
+    vecinto_stationary,
+    vecinto_conserve,
+    vecinto_sorted,
+    vecinto_ordered,
+    vecinto_overlast
+} ; /* end enum (options) */
+
+#ifdef	__cplusplus	/* C++ only! */
+
+struct vecintms {
+    constexpr static int	reuse		= (1 << vecinto_reuse) ;
+    constexpr static int	compact		= (1 << vecinto_compact) ;
+    constexpr static int	swap		= (1 << vecinto_swap) ;
+    constexpr static int	stationary	= (1 << vecinto_stationary) ;
+    constexpr static int	conserve	= (1 << vecinto_conserve) ;
+    constexpr static int	sorted		= (1 << vecinto_sorted) ;
+    constexpr static int	ordered		= (1 << vecinto_ordered) ;
+} ; /* end struct (vecintms) */
+
+#endif /* __cplusplus */
+
+#define	VECINT_ODEFAULT		0
+#define	VECINT_OREUSE		(1 << vecinto_reuse)
+#define	VECINT_OCOMPACT		(1 << vecinto_compact)
+#define	VECINT_OSWAP		(1 << vecinto_swap)
+#define	VECINT_OSTATIONARY	(1 << vecinto_stationary)
+#define	VECINT_OCONSERVE	(1 << vecinto_conserve)
+#define	VECINT_OSORTED		(1 << vecinto_sorted)
+#define	VECINT_OORDERED		(1 << vecinto_ordered)
 
 struct vecint_cursor {
 	int		i ;
-} ;
+} ; /* end struct (vecint_cursor) */
 
 struct vecint_flags {
 	uint		issorted:1 ;
@@ -60,7 +92,7 @@ struct vecint_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-} ;
+} ; /* end struct (vecint_flags) */
 
 struct vecint_head {
 	VECINT_TYPE	*va ;
@@ -70,7 +102,7 @@ struct vecint_head {
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
-} ;
+} ; /* end struct (vecint_head) */
 
 typedef VECINT_FL	vecint_fl ;
 typedef VECINT_CUR	vecint_cur ;
@@ -86,7 +118,7 @@ enum vecintmems {
 	vecintmem_audit,
 	vecintmem_finish,
 	vecintmem_overlast
-} ;
+} ; /* end enum (vecintmems) */
 struct vecint_iter {
 	VECINT_TYPE	*va = nullptr ;
 	int		i = -1 ;
@@ -169,10 +201,11 @@ struct vecint : vecint_head {
 	    audit	(this,vecintmem_audit) ;
 	    finish	(this,vecintmem_finish) ;
 	    magic = 0 ;
-	} ;
+	} ; /* end ctor */
 	vecint(const vecint &) = delete ;
 	vecint &operator = (const vecint &) = delete ;
 	int add(VECINT_TYPE) noex ;
+	int addlist(const VECINT_TYPE *,int) noex ;
 	int adduniq(VECINT_TYPE) noex ;
 	int insert(int,VECINT_TYPE) noex ;
 	int assign(int,VECINT_TYPE) noex ;
@@ -228,6 +261,10 @@ extern int vecint_curend(vecint *,vecint_cur *) noex ;
 extern int vecint_audit(vecint *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const vecintms	vecintm ;
+#endif /* __cplusplus */
 
 
 #endif /* VECINT_INCLUDE */
