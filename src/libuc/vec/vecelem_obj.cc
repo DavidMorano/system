@@ -26,7 +26,7 @@
 	routines will copy and store the copied data in the list.
 	The advantage is that the caller does not have to keep the
 	orginal data around in order for the list data to be accessed
-	later.  Element data (unlike string data) can contain nullptr
+	later.  Element data (unlike string data) can contain NUL
 	characters-bytes.
 
 *******************************************************************************/
@@ -67,6 +67,10 @@ int vecelem::start(int µesz,int µvn,int µvo) noex {
 
 int vecelem::add(cvoid *ep) noex {
 	return vecelem_add(this,ep) ;
+}
+
+int vecelem::addlist(cvoid *ep,int el) noex {
+	return vecelem_addlist(this,ep,el) ;
 }
 
 int vecelem::adduniq(cvoid *ep) noex {
@@ -129,7 +133,6 @@ vecelem_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (vecelem_co::operator) */
+} /* end method (vecelem_co::operator) */
 
 
