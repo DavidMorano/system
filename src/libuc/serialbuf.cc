@@ -33,7 +33,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* |strlen(3c)| + |memcpy(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |ulogerror(3u)| */
 #include	<stdintx.h>		/* |longlong| */
 #include	<stdorder.h>
 #include	<strwcpy.h>
@@ -80,7 +82,7 @@ static int serialbuf_wok(serialbuf *op,cvoid *wp,int wl) noex {
 		    }
 		}
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (serialbuf_wok) */
@@ -102,7 +104,7 @@ static int serialbuf_szok(serialbuf *op,int sz) noex {
 		    }
 		}
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (serialbuf_szok) */
