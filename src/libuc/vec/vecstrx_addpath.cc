@@ -67,10 +67,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<usupport.h>
 #include	<usysconf.h>
@@ -111,10 +108,10 @@ using libuc::libmem ;			/* variable */
 
 /* forward references */
 
-static int vecstrx_addone(vecstrx *op,char *pbuf,cchar *sp,int sl) noex {
+local int vecstrx_addone(vecstrx *op,char *pbuf,cchar *sp,int sl) noex {
     	int		rs ;
 	int		c = 0 ;
-	if ((rs = pathclean(pbuf,sp,sl)) >= 0) {
+	if ((rs = pathclean(pbuf,sp,sl)) >= 0) ylikely {
 	    rs = op->adduniq(pbuf,rs) ;
 	    if (rs < INT_MAX) c += 1 ;
 	} /* end if (pathclean) */
@@ -125,7 +122,7 @@ static int vecstrx_addone(vecstrx *op,char *pbuf,cchar *sp,int sl) noex {
 
 /* local variables */
 
-static int		maxpathlen = ulibval.maxpathlen ;
+local int		maxpathlen = ulibval.maxpathlen ;
 
 
 /* exported variables */
@@ -138,11 +135,11 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (lp) {
+	if (lp) ylikely {
 	    rs = SR_OK ;
 	    if (ll < 0) ll = lenstr(lp) ;
 	    if (ll > 0) {
-		if ((rs = maxpathlen) >= 0) {
+		if ((rs = maxpathlen) >= 0) ylikely {
 		    cint	plen = rs ;
 		    if (char *pbuf ; (rs = libmem.mall((plen+1),&pbuf)) >= 0) {
 	                for (cc *tp ; (tp = strnbrk(lp,ll,":;")) != np ; ) {
@@ -172,7 +169,7 @@ int vecstrx::addpath(cchar *lp,int ll) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (lp) {
+	if (lp) ylikely {
 	    rs = SR_OK ;
 	    if (ll < 0) ll = lenstr(lp) ;
 	    if (ll > 0) {
@@ -199,9 +196,9 @@ int vecstrx::addcspath() noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-        if ((rs = maxpathlen) >= 0) {
+        if ((rs = maxpathlen) >= 0) ylikely {
             cint    clen = (NPATH * rs) ;
-            if (char *cbuf ; (rs = libmem.mall((clen+1),&cbuf)) >= 0) {
+            if (char *cbuf ; (rs = libmem.mall((clen+1),&cbuf)) >= 0) ylikely {
                 cint        req = _CS_PATH ;
                 if ((rs = u_sysconfstr(req,cbuf,clen)) >= 0) {
                     rs = addpath(cbuf,rs) ;
