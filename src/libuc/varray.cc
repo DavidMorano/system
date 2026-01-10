@@ -30,10 +30,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdlib>
-#include	<cstring>
 #include	<new>			/* |nothrow(3c++) */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<lookaside.h>
 #include	<localmisc.h>
 
@@ -48,8 +48,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
@@ -71,14 +69,14 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static inline int varray_ctor(varray *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->va = nullptr ;
 	    op->esz = 0 ;
 	    op->c = 0 ;
 	    op->n = 0 ;
 	    op->imax = 0 ;
-	    if ((op->lap = new(nothrow) lookaside) != nullptr) {
+	    if ((op->lap = new(nothrow) lookaside) != nullptr) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-lookaside) */
 	} /* end if (non-null) */
@@ -88,13 +86,13 @@ static inline int varray_ctor(varray *op,Args ... args) noex {
 
 static inline int varray_dtor(varray *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->lap) {
+	    if (op->lap) ylikely {
 		delete op->lap ;
 		op->lap = nullptr ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (varray_dtor) */
@@ -112,13 +110,13 @@ static int	varray_extend(varray *,int) noex ;
 
 int varray_start(varray *op,int esz,int n) noex {
 	int		rs ;
-	if ((rs = varray_ctor(op)) >= 0) {
+	if ((rs = varray_ctor(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (n <= 0) n = VARRAY_DEFENTS ;
-	    if (esz > 0) {
+	    if (esz > 0) ylikely {
 	        cint	sz = (n + 1) * szof(void **) ;
 	        op->esz = esz ;
-	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 	            memclear(vp,sz) ;
 	            op->va = (void **) vp ;
 	            op->n = n ;
@@ -139,15 +137,15 @@ int varray_start(varray *op,int esz,int n) noex {
 int varray_finish(varray *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_OK ;
-	        if (op->lap) {
+	        if (op->lap) ylikely {
 		    rs1 = lookaside_finish(op->lap) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
-		if (op->va) {
+		if (op->va) ylikely {
 	            rs1 = libmem.free(op->va) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->va = nullptr ;
@@ -166,13 +164,13 @@ int varray_finish(varray *op) noex {
 
 int varray_enum(varray *op,int i,void *rp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_INVALID ;
-	        if (i >= 0) {
+	        if (i >= 0) ylikely {
 		    rs = SR_NOTFOUND ;
-	            if (i < (op->imax+1)) {
+	            if (i < (op->imax + 1)) {
 	                if (op->va[i]) rs = 1 ; /* <- return-status */
 	            } 
 	            if (rp) {
@@ -188,11 +186,11 @@ int varray_enum(varray *op,int i,void *rp) noex {
 
 int varray_acc(varray *op,int i,void *rp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_INVALID ;
-	        if (i >= 0) {
+	        if (i >= 0) ylikely {
 		    rs = SR_NOTFOUND ;
 		    void	*ep = nullptr ;
 	            if (i < op->n) {
@@ -213,11 +211,11 @@ int varray_acc(varray *op,int i,void *rp) noex {
 int varray_mk(varray *op,int i,void *rp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_INVALID ;
-	        if (i >= 0) {
+	        if (i >= 0) ylikely {
 		    rs = SR_OK ;
 	            if (i >= op->n) {
 	                rs = varray_extend(op,i) ;
@@ -245,9 +243,9 @@ int varray_mk(varray *op,int i,void *rp) noex {
 int varray_del(varray *op,int i) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_INVALID ;
 	        if ((i > 0) && (i < op->n)) {
 		    void	*ep = op->va[i] ;
@@ -268,9 +266,9 @@ int varray_del(varray *op,int i) noex {
 int varray_delall(varray *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_OK ;
 	        for (int i = 0 ; i < op->n ; i += 1) {
 		    void	*ep = op->va[i] ;
@@ -288,9 +286,9 @@ int varray_delall(varray *op) noex {
 
 int varray_count(varray *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = op->c ;
 	    }
 	} /* end if (non-null) */
@@ -301,9 +299,9 @@ int varray_count(varray *op) noex {
 int varray_search(varray *op,void *oep,varray_vcmp fvcmp,void *vrp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && oep && fvcmp) {
+	if (op && oep && fvcmp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		void	**rpp = (void **) vrp ;
 		cvoid	*cep = (cvoid *) oep ;
 	        for (i = 0 ; i < op->n ; i += 1) {
@@ -325,9 +323,9 @@ int varray_search(varray *op,void *oep,varray_vcmp fvcmp,void *vrp) noex {
 int varray_find(varray *op,void *oep) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && oep) {
+	if (op && oep) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		cint	esz = op->esz ;
 		for (i = 0 ; i < op->n ; i += 1) {
 		    void	*ep = op->va[i] ;
@@ -346,9 +344,9 @@ int varray_find(varray *op,void *oep) noex {
 int varray_audit(varray *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        for (int i = 0 ; i < op->n ; i += 1) {
 	            if (op->va[i]) {
 	                cint	*ip = (int *) op->va[i] ;
@@ -369,14 +367,14 @@ int varray_audit(varray *op) noex {
 
 /* local subroutines */
 
-static int varray_extend(VARRAY *op,int ni) noex {
+static int varray_extend(varray *op,int ni) noex {
 	int		rs = SR_OK ;
-	if (ni >= op->n) {
+	if (ni >= op->n) ylikely {
 	    cint	ninc = VARRAY_DEFENTS ;
 	    cint	ndif = ((ni+1)-op->n) ;
 	    int		nn ;
 	    int		sz ;
-	    void	*vp{} ;
+	    void	*vp{} ; /* used-multiple */
 	    nn = (op->n + MAX(ndif,ninc)) ;
 	    sz = nn * szof(void **) ;
 	    if (op->va == nullptr) {
@@ -397,7 +395,7 @@ static int varray_extend(VARRAY *op,int ni) noex {
 	        op->va = (void **) vp ;
 	        op->n = nn ;
 	    }
-	} /* end if (reallocation needed) */
+	} /* end if (re-allocation needed) */
 	return rs ;
 }
 /* end subroutine (varray_extend) */
