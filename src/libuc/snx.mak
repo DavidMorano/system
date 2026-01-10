@@ -40,19 +40,21 @@ MODS +=
 LIBS +=
 
 
-OBJ0_SNX= snabbr.o snadd.o snaddw.o sncpyarray.o
-OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o snerrabbr.o
-OBJ2_SNX= snfilemode.o snflags.o snfsflags.o sninetaddr.o
-OBJ3_SNX= snkeyval.o snloadavg.o snopenflags.o snpollflags.o
-OBJ4_SNX= snrealname.o snshellunder.o snsigabbr.o sntid.o
+OBJ0_SNX= snadd.o snaddw.o sncpyarray.o
+OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o
+OBJ2_SNX= snfilemode.o snflags.o snflagsx.o sninetaddr.o
+OBJ3_SNX= snkeyval.o snloadavg.o
+OBJ4_SNX= snrealname.o snshellunder.o sntid.o
 OBJ5_SNX= sntmtime.o snuuid.o snxxx.o snwx.o
 OBJ6_SNX= snaddslash.o snclean.o
+OBJ7_SNX= snabbrname.o snabbrnum.o
 
 OBJA_SNX= obj0_snx.o obj1_snx.o
 OBJB_SNX= obj2_snx.o obj3_snx.o
-OBJC_SNX= obj4_snx.o obj5_snx.o obj6_snx.o
+OBJC_SNX= obj4_snx.o obj5_snx.o 
+OBJD_SNX= obj6_snx.o obj7_snx.o
 
-OBJ_SNX= obja.o objb.o objc.o
+OBJ_SNX= obja.o objb.o objc.o objd.o
 
 
 INCDIRS=
@@ -140,6 +142,9 @@ obj5_snx.o:		$(OBJ5_SNX)
 obj6_snx.o:		$(OBJ6_SNX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj7_snx.o:		$(OBJ7_SNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obja.o:			$(OBJA_SNX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -156,7 +161,6 @@ objd.o:			$(OBJD_SNX)
 
 snuuid.o:		snuuid.cc			$(INCS)
 sntid.o:		sntid.cc			$(INCS)
-snerrabbr.o:		snerrabbr.cc			$(INCS)
 sntmtime.o:		sntmtime.cc sntmtime.h		$(INCS)
 snadd.o:		snadd.cc snadd.h		$(INCS)
 snaddw.o:		snaddw.cc snaddw.h		$(INCS)
@@ -166,5 +170,11 @@ snclean.o:		snclean.cc snclean.h		$(INCS)
 sncpyx.o:		sncpyx.cc sncpyx.h		$(INCS)
 sncpyxw.o:		sncpyxw.cc sncpyxw.h		$(INCS)
 sncpyxc.o:		sncpyxc.cc sncpyxc.h		$(INCS)
+
+snabbrname.o:		snabbrname.cc	snabbr.h	$(INCS)
+snabbrnum.o:		snabbrnum.cc	snabbr.h	$(INCS)
+
+snflags.o:		snflags.cc	snflags.h	$(INCS)
+snflagsx.o:		snflagsx.cc	snflagsx.h	$(INCS)
 
 
