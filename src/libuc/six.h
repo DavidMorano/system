@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 #include	<siext.h>
 #include	<sifext.h>
@@ -37,7 +34,6 @@
 #include	<sinon.h>
 #include	<sichar.h>
 #include	<sispan.h>
-#include	<sispanwht.h>
 #include	<sileadchr.h>
 #include	<sileader.h>
 #include	<sileadzero.h>
