@@ -31,29 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= sfx.h
+INCS += sfx.h
 
 MODS +=
 
-LIBS=
-
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_SFX= sfbaselib.o sfbasename.o sfbracketval.o
@@ -78,7 +62,22 @@ OBJG1_SFX= objc_sfx.o objd_sfx.o
 OBJ_SFX= $(OBJG0_SFX) $(OBJG1_SFX)
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -91,6 +90,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -128,54 +130,54 @@ control:
 
 
 obj0_sfx.o:		$(OBJ0_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_sfx.o:		$(OBJ1_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_sfx.o:		$(OBJ2_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_sfx.o:		$(OBJ3_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4_sfx.o:		$(OBJ4_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5_sfx.o:		$(OBJ5_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj6_sfx.o:		$(OBJ6_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj7_sfx.o:		$(OBJ7_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj8_sfx.o:		$(OBJ8_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ8_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj9_sfx.o:		$(OBJ9_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ9_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja_sfx.o:		$(OBJA_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb_sfx.o:		$(OBJB_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc_sfx.o:		$(OBJC_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objd_sfx.o:		$(OBJD_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJD_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 objg0_sfx.o:		$(OBJG0_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJG0_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objg1_sfx.o:		$(OBJG1_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJG1_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 sfxchr.o:		sfxchr.cc	sfxchr.h		$(INCS)
