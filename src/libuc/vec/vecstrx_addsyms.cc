@@ -59,10 +59,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<usupport.h>		/* |libu::sncpy(3u)| */
 #include	<uclibmem.h>
@@ -126,9 +123,9 @@ static int		symnamelen = ulibval.maxsymbol ;
 int vecstrx::addsyms(cc *objn,mainv syms) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (objn && syms) {
+	if (objn && syms) ylikely {
     	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) {
+	    if ((rs = rsv) >= 0) ylikely {
 	        while ((rs >= 0) && syms[c]) {
 	            cchar	*sn = syms[c++] ;
                     if ((rs = sncpy(var.symbuf,var.symlen,objn,"_",sn)) >= 0) {
@@ -146,7 +143,7 @@ int vecstrx::addsyms(cc *objn,mainv syms) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = symnamelen) >= 0) {
+	if ((rs = symnamelen) >= 0) ylikely {
 	    symlen = rs ;
 	    if (char *p ; (rs = libmem.mall((symlen + 1),&p)) >= 0) {
 		symbuf = p ;
@@ -156,7 +153,7 @@ vars::operator int () noex {
 } /* end method (vars:operator) */
 
 void vars::dtor() noex {
-    	if (symbuf) {
+    	if (symbuf) ylikely {
     	    libmem.free(symbuf) ;
 	    symbuf = nullptr ;
 	    symlen = 0 ;
