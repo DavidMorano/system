@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<lookaside.h>
 
 
@@ -39,7 +36,7 @@ struct varray_head {
 	int		c ;		/* count of items in array */
 	int		n ;		/* extent of array */
 	int		imax ;		/* maximum used */
-} ;
+} ; /* end struct (varray_head) */
 
 typedef VARRAY		varray ;
 
