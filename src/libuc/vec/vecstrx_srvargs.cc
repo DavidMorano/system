@@ -37,10 +37,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<field.h>
@@ -49,7 +46,9 @@
 
 #include	"vecstrx.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr93u)| */
 
 /* local defines */
 
@@ -90,11 +89,11 @@ static char		terms[fieldterms_termsize] ;
 int vecstrx::srvargs(cchar *abuf) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (abuf) {
+	if (abuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (abuf[0]) {
+	    if (abuf[0]) ylikely {
 	        static cint	rst = mkterms() ;
-	        if ((rs = rst) >= 0) {
+	        if ((rs = rst) >= 0) ylikely {
 		    rs = vecstrx_arger(this,abuf) ;
 		    c = rs ;
 	        } /* end if (terms) */
@@ -112,9 +111,9 @@ static int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *fbuf{} ; (rs = libmem.mall((alen+1),&fbuf)) >= 0) {
+	if (char *fbuf ; (rs = libmem.mall((alen+1),&fbuf)) >= 0) ylikely {
 	    cint	flen = alen ;
-	    if (field fsb ; (rs = fsb.start(abuf,alen)) >= 0) {
+	    if (field fsb ; (rs = fsb.start(abuf,alen)) >= 0) ylikely {
 	        int	fl ;
 	        while ((fl = fsb.sharg(terms,fbuf,flen)) >= 0) {
 	            c += 1 ;
