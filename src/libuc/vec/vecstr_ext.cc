@@ -21,7 +21,8 @@
 	vecstr_ext
 
 	Description:
-	Below are the so-called extended function for the VECSTR object.
+	Below are the so-called extended function for the VECSTR
+	object.
 
 *******************************************************************************/
 
@@ -29,10 +30,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<localmisc.h>
 
