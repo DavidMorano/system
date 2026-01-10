@@ -50,15 +50,11 @@
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>		/* |strncasecmp(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<uclibmem.h>
 #include	<utimeout.h>
+#include	<uclibmem.h>
 #include	<filer.h>
 #include	<field.h>
 #include	<fieldterms.h>
@@ -73,7 +69,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/ulibvals.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 import ulibvals ;			/* |libval.maxline(3u)| */
 
 /* local defines */
@@ -85,8 +81,6 @@ import ulibvals ;			/* |libval.maxline(3u)| */
 
 /* imported namespaces */
 
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
@@ -162,11 +156,11 @@ static char		fterms[fieldterms_termsize] ;
 int vecstrx::envfile(cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 		static cint	rsi = mkinit() ;
-		if ((rs = rsi) >= 0) {
+		if ((rs = rsi) >= 0) ylikely {
 		    rs = vecstrx_envfiler(this,fname) ;
 		    c = rs ;
 		} /* end if (mkinit) */
@@ -184,12 +178,12 @@ int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (subinfo si(op,fterms) ; (rs = si.start()) >= 0) {
+	if (subinfo si(op,fterms) ; (rs = si.start()) >= 0) ylikely {
             cmode   om = 0666 ;
             cint    of = O_RDONLY ;
-            if ((rs = u_open(fname,of,om)) >= 0) {
+            if ((rs = u_open(fname,of,om)) >= 0) ylikely {
                 cint		fd = rs ;
-                if (filer df ; (rs = df.start(fd,0z,0,0)) >= 0) {
+                if (filer df ; (rs = df.start(fd,0z,0,0)) >= 0) ylikely {
                     cint    to = utimeout[uto_read] ;
                     cint    llen = si.llen ;
                     char    *lbuf = si.lbuf ;
@@ -233,7 +227,7 @@ int subinfo::start() noex {
 int subinfo::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (a) {
+	if (a) ylikely {
 	    rs1 = libmem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
@@ -247,7 +241,7 @@ int subinfo::line(cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
+	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) ylikely {
 	    cchar	*fp{} ;
 	    if (int fl ; (fl = fsb.get(ft,&fp)) > 0) {
 	        if ((fl == ew.l) && (strncasecmp(ew.p,fp,fl) == 0)) {
@@ -270,7 +264,7 @@ int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	char		*kbuf = ebuf ;
-	if (kl <= klen) {
+	if (kl <= klen) ylikely {
 	    vs_f	vs = vstrkeycmp ;
 	    cint	rsn = SR_NOTFOUND ;
 	    cint	vlen = elen ;
@@ -309,7 +303,7 @@ static int mkterms() noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = maxline) >= 0) {
+	if ((rs = maxline) >= 0) ylikely {
 	    linebuflen = (rs * LINEBUFMULT) ;
 	}
 	return rs ;
@@ -318,7 +312,7 @@ vars::operator int () noex {
 
 static int mkinit() noex {
     	int		rs ;
-	if ((rs = mkterms()) >= 0) {
+	if ((rs = mkterms()) >= 0) ylikely {
 	    rs = var ;
 	}
 	return rs ;
