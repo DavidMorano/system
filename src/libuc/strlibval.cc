@@ -35,21 +35,22 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>		/* |utimeout(3u)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucsysconf.h>
 #include	<timewatch.hh>
-#include	<varnames.hh>
-#include	<syswords.hh>
 #include	<bufsizevar.hh>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
-#include	<mallocstuff.h>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
-#include	<varnames.hh>		/* |varname(3u)| */
 #include	<localmisc.h>
 
 #include	"strlibval.hh"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -173,10 +174,10 @@ strlibval::operator ccharp () noex {
 void strlibval::dtor() noex {
 	strp = nullptr ;
 	if (a) {
-	    if (cint rs = uc_free(a) ; rs >= 0) {
+	    if (cint rs = lm_free(a) ; rs >= 0) {
 	        a = nullptr ;
 	    } else {
-		ulogerror("strlibpath::dtor",rs,"dtor-uc_free") ;
+		ulogerror("strlibpath::dtor",rs,"dtor-lm_free") ;
 	    }
 	}
 }
@@ -224,7 +225,7 @@ ccharp strlibval::strpath() noex {
 		int	rs1 ;
 		if ((rs = maxpathlen) >= 0) {
 		    cint	tlen = (rs * PLMULT) ;
-		    if (char *tbuf{} ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+		    if (char *tbuf ; (rs = lm_mall((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;
 		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
 			    int		tl = rs ;
@@ -235,12 +236,15 @@ ccharp strlibval::strpath() noex {
 			        tl += rs ;
 		                if ((rs = uc_sysconfstr(cmd,cbuf,clen)) >= 0) {
 			            tl += rs ;
-			            a = mallocstrw(tbuf,tl) ;
-			            rp = a ;
+				    cchar *cp ;
+				    if ((rs = lm_strw(tbuf,tl,&cp)) >= 0) {
+					a = charp(cp) ;
+			                rp = cp ;
+				    }
 		                } /* end if (uc_sysconfstr) */
 			    } /* end if (sncpy) */
 		        } /* end if (mkpath) */
-		        rs1 = uc_free(tbuf) ;
+		        rs1 = lm_free(tbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
