@@ -52,7 +52,6 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -98,7 +97,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_UCENUM)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_UCENUM)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -114,16 +113,16 @@ control:
 
 
 obj0.o:			$(OBJ0_UCENUM)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_UCENUM)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1_UCENUM)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_UCENUM)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2_UCENUM)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_UCENUM)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3_UCENUM)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_UCENUM)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 ucenumpw.o:		ucenumpw.cc ucenumpw.h $(INCS)
