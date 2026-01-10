@@ -34,17 +34,16 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"raqhand.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -68,8 +67,8 @@ using libuc::libmem ;			/* variable */
 
 /* forward references */
 
-static int	raqhand_setopts(raqhand *,int) noex ;
-static int	raqhand_valid(raqhand *,int) noex ;
+local int	raqhand_setopts	(raqhand *,int) noex ;
+local int	raqhand_valid	(raqhand *,int) noex ;
 
 
 /* local variables */
@@ -77,17 +76,19 @@ static int	raqhand_valid(raqhand *,int) noex ;
 
 /* exported variables */
 
+constexpr raqhandms	raqhandm ;
+
 
 /* exported subroutines */
 
 int raqhand_start(raqhand *op,int n,int opts) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if (n <= 1) n = RAQHAND_DEFENTS ;
 	    memclear(op) ;
-	    if ((rs = raqhand_setopts(op,opts)) >= 0) {
+	    if ((rs = raqhand_setopts(op,opts)) >= 0) ylikely {
 	        cint	sz = ((n+1) * szof(void *)) ;
-	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 		    memclear(vp,sz) ;
 		    op->va = (cvoid **) vp ;
 	            op->n = n ;
@@ -101,9 +102,9 @@ int raqhand_start(raqhand *op,int n,int opts) noex {
 int raqhand_finish(raqhand *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_OK ;
 		{
 		    rs1 = libmem.free(op->va) ;
@@ -121,11 +122,11 @@ int raqhand_finish(raqhand *op) noex {
 int raqhand_ins(raqhand *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && ep) {
+	if (op && ep) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_OVERFLOW ;	/* <- note "overflow" */
-	        if (op->c < op->n) {
+	        if (op->c < op->n) ylikely {
 		    rs = SR_OK ;
 	            i = op->ti ;
 	            op->va[i] = ep ;
@@ -141,12 +142,12 @@ int raqhand_ins(raqhand *op,cvoid *ep) noex {
 int raqhand_acc(raqhand *op,int ai,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_OK ;
 	        if (ai < op->c) {
-	            i = ((ai+op->hi)%op->n) ;
+	            i = ((ai + op->hi) % op->n) ;
 	        } else {
 	            rs = SR_NOTFOUND ;
 	        }
@@ -163,9 +164,9 @@ int raqhand_acc(raqhand *op,int ai,void **rpp) noex {
 int raqhand_acclast(raqhand *op,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_NOTFOUND ;
 	        if (op->c > 0) {
 		    rs = SR_OK ;
@@ -183,9 +184,9 @@ int raqhand_acclast(raqhand *op,void **rpp) noex {
 
 int raqhand_get(raqhand *op,int i,void **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = raqhand_valid(op,i) ;
 	        if (rpp) {
 		    void	*vp = (void *) op->va[i] ;
@@ -200,11 +201,11 @@ int raqhand_get(raqhand *op,int i,void **rpp) noex {
 int raqhand_rem(raqhand *op,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_NOTFOUND ;
-	        if (op->c > 0) {
+	        if (op->c > 0) ylikely {
 		    rs = SR_OK ;
 	            i = op->hi ;
 	            op->hi = ((op->hi+1) % op->n) ;
@@ -223,11 +224,11 @@ int raqhand_rem(raqhand *op,void **rpp) noex {
 int raqhand_ent(raqhand *op,cvoid *cvp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && cvp) {
+	if (op && cvp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_NOTFOUND ;
-	        if (op->c > 0) {
+	        if (op->c > 0) ylikely {
 	            bool	f = false ;
 		    rs = SR_OK ;
 	            for (int j = 0 ; j < op->c ; j += 1) {
@@ -248,10 +249,10 @@ int raqhand_ent(raqhand *op,cvoid *cvp) noex {
 
 int raqhand_del(raqhand *op,int i) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
-	        if ((rs = raqhand_valid(op,i)) >= 0) {
+	    if (op->va) ylikely {
+	        if ((rs = raqhand_valid(op,i)) >= 0) ylikely {
 	            op->va[i] = nullptr ;
 	        } /* end if (valid) */
 	    } /* end if (was open) */
@@ -262,9 +263,9 @@ int raqhand_del(raqhand *op,int i) noex {
 
 int raqhand_delall(raqhand *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_OK ;
 	        op->hi = 0 ;
 	        op->ti = 0 ;
@@ -278,9 +279,9 @@ int raqhand_delall(raqhand *op) noex {
 int raqhand_count(raqhand *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = SR_OK ;
 	        c = op->c ;
 	    }
@@ -294,38 +295,38 @@ int raqhand_count(raqhand *op) noex {
 
 consteval int mkoptmask() noex {
 	int		m = 0 ;
-	m |= RAQHAND_OREUSE ;
-	m |= RAQHAND_OCOMPACT ;
-	m |= RAQHAND_OSWAP ;
-	m |= RAQHAND_OSTATIONARY ;
-	m |= RAQHAND_OCONSERVE ;
-	m |= RAQHAND_OSORTED ;
-	m |= RAQHAND_OORDERED ;
+	m |= raqhandm.reuse ;
+	m |= raqhandm.compact ;
+	m |= raqhandm.swap ;
+	m |= raqhandm.stationary ;
+	m |= raqhandm.conserve ;
+	m |= raqhandm.sorted ;
+	m |= raqhandm.ordered ;
 	return m ;
 }
 /* end subroutine (mkoptmask) */
 
-static int raqhand_setopts(raqhand *op,int vo) noex {
+local int raqhand_setopts(raqhand *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~optmask)) == 0) {
+	if ((vo & (~ optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
-	    if (vo & RAQHAND_OREUSE) op->fl.oreuse = 1 ;
-	    if (vo & RAQHAND_OCOMPACT) op->fl.ocompact = 1 ;
-	    if (vo & RAQHAND_OSWAP) op->fl.oswap = 1 ;
-	    if (vo & RAQHAND_OSTATIONARY) op->fl.ostationary = 1 ;
-	    if (vo & RAQHAND_OCONSERVE) op->fl.oconserve = 1 ;
-	    if (vo & RAQHAND_OSORTED) op->fl.osorted = 1 ;
-	    if (vo & RAQHAND_OORDERED) op->fl.oordered = 1 ;
+	    if (vo & raqhandm.reuse)		op->fl.oreuse		= true ;
+	    if (vo & raqhandm.swap)		op->fl.oswap		= true ;
+	    if (vo & raqhandm.stationary)	op->fl.ostationary	= true ;
+	    if (vo & raqhandm.compact)		op->fl.ocompact		= true ;
+	    if (vo & raqhandm.sorted)		op->fl.osorted		= true ;
+	    if (vo & raqhandm.ordered)		op->fl.oordered		= true ;
+	    if (vo & raqhandm.conserve)		op->fl.oconserve	= true ;
 	} /* end if (valid options) */
 	return rs ;
 }
 /* end subroutine (raqhand_setopts) */
 
-static int raqhand_valid(raqhand *op,int i) noex {
+local int raqhand_valid(raqhand *op,int i) noex {
 	int		rs = SR_NOTFOUND ;
-	if (op->c > 0) {
+	if (op->c > 0) ylikely {
 	    rs = SR_OK ;
 	    if (op->hi != op->ti) {
 		if ((i < op->hi) || (i >= op->ti)) {
@@ -338,7 +339,7 @@ static int raqhand_valid(raqhand *op,int i) noex {
 /* end subroutine (raqhand_valid) */
 
 #ifdef	COMMENT
-static int raqhand_extend(raqhand *op) noex {
+local int raqhand_extend(raqhand *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
 	    int		nn ;
