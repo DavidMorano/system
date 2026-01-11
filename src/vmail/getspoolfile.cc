@@ -53,7 +53,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>
-#include	<time.h>
+#include	<ctime>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>
