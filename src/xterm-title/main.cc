@@ -37,7 +37,7 @@
 #include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<csignal>
 #include	<cstring>
