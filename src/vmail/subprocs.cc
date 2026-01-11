@@ -1,11 +1,11 @@
-/* subprocs */
+/* subprocs SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* manage a list of sub-process PIDs */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -18,38 +18,33 @@
 
 /*******************************************************************************
 
-        This object manages a list of sub-processes that are desired to be
-        tracked.
+  	Description:
+	This object manages a list of sub-processes that are desired
+	to be tracked.
 
 	Synopsis:
-
 	int subprocs_start(SUBPROCS *op)
 
 	Arguments:
-
 	op		pointer to object
 
 	Returns:
-
 	>=0		OK
-	<0		error
-
+	<0		error (system-error)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
+#include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 #include	<exitcodes.h>
@@ -78,31 +73,27 @@
 #define	VARPATH		"PATH"
 #endif
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snshellunder(char *,int,pid_t,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	strkeycmp(const char *,const char *) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	sncpy1(char *,int,cchar *,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	snshellunder(char *,int,pid_t,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	matkeystr(cchar **,cchar *,int) ;
+extern int	strkeycmp(cchar *,cchar *) ;
+extern int	vstrkeycmp(cvoid **,cvoid **) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	dupup(int,int) ;
 extern int	isIOError(int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
