@@ -25,7 +25,7 @@
 #include	<cstdlib>
 #include	<csignal>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<curses.h>
