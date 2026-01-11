@@ -34,12 +34,12 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<utime.h>
+#include	<uctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctype.h>
 #include	<netdb.h>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<baops.h>
