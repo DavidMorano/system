@@ -1,4 +1,4 @@
-/* progterm */
+/* progterm SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -41,10 +41,9 @@
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<tzfile.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<uterm.h>
@@ -71,8 +70,6 @@ extern int	cfdecui(cchar *,int,uint *) ;
 extern int	cfdecti(cchar *,int,int *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	pathclean(char *,cchar *,int) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
 extern int	tcgetlines(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
