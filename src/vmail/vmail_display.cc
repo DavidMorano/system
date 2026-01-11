@@ -48,7 +48,7 @@
 #include	<sbuf.h>
 #include	<tmtime.hh>
 #include	<sntmtime.h>
-#include	<ncol.h>		/* |charcols(3uc)| */
+#include	<ncol.h>		/* |ncolchar(3uc)| */
 #include	<tabexpand.h>
 #include	<char.h>
 #include	<ischarx.h>
@@ -3420,7 +3420,7 @@ static int nstrcols(int ntabcols,int nc,cchar *sp,int sl) noex {
 	    int		scols = nc ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    for (int i = 0 ; i < sl ; i += 1) {
-	        cint	icols = charcols(ntabcols,nc,sp[i]) ;
+	        cint	icols = ncolchar(ntabcols,nc,sp[i]) ;
 	        nc += icols ;
 	    }
 	    n = (nc - scols) ;
