@@ -1,6 +1,6 @@
 /* ucentsp HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* UCENTSP object management */
 /* version %I% last-modified %G% */
@@ -21,10 +21,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<ucsys.h>
 #include	<spwd.h>		/* <- the money shot! */
 
 
