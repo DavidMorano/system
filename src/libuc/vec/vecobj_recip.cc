@@ -39,14 +39,16 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<estrings.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 #include	<localmisc.h>
 
 #include	"recip.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -62,7 +64,7 @@ import libutil ;
 
 /* forward references */
 
-static int	vecobj_reciphave(vecobj *,cchar *,int) noex ;
+local int	vecobj_reciphave(vecobj *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -110,7 +112,7 @@ int vecobj_recipfins(vecobj *op) noex {
 
 /* local subroutines */
 
-static int vecobj_reciphave(vecobj *op,cchar *sp,int sl) noex {
+local int vecobj_reciphave(vecobj *op,cchar *sp,int sl) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -128,6 +130,5 @@ static int vecobj_reciphave(vecobj *op,cchar *sp,int sl) noex {
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (vecobj_reciphave) */
-
 
 
