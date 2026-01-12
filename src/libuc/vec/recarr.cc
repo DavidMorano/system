@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	recarr
+
+	Description:
 	This object is used when the caller just wants to store
 	their own pointer in a vector.  These routines will not
 	copy the structure pointed to by the passed pointer.  The
@@ -31,10 +35,7 @@
 #include	<cstdlib>
 #include	<algorithm>		/* |sort(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
@@ -77,7 +78,7 @@ extern "C" {
 template<typename ... Args>
 static inline int recarr_ctor(recarr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 	    op->va = nullptr ;
 	    op->c = 0 ;
@@ -91,7 +92,7 @@ static inline int recarr_ctor(recarr *op,Args ... args) noex {
 
 static int recarr_dtor(recarr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -101,12 +102,14 @@ static int	recarr_setopts(recarr *,int) noex ;
 static int	recarr_extend(recarr *,int = 0) noex ;
 
 
-/* local subroutines */
-
-
 /* local variables */
 
-constexpr bool		f_qsort = CF_QSORT ;
+cbool			f_qsort = CF_QSORT ;
+
+
+/* exported variables */
+
+constexpr recarrms	recarrm ;
 
 
 /* exported variables */
@@ -116,11 +119,11 @@ constexpr bool		f_qsort = CF_QSORT ;
 
 int recarr_start(recarr *op,int n,int opts) noex {
 	int		rs ;
-	if ((rs = recarr_ctor(op)) >= 0) {
+	if ((rs = recarr_ctor(op)) >= 0) ylikely {
 	    if (n <= 1) n = RECARR_DEFENTS ;
-	    if ((rs = recarr_setopts(op,opts)) >= 0) {
+	    if ((rs = recarr_setopts(op,opts)) >= 0) ylikely {
 	        cint	sz = (n + 1) * szof(void **) ;
-	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 		    op->va = voidpp(vp) ;
 		    op->n = n ;
 	            op->va[0] = nullptr ;
@@ -137,9 +140,9 @@ int recarr_start(recarr *op,int n,int opts) noex {
 int recarr_finish(recarr *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
@@ -159,7 +162,7 @@ int recarr_finish(recarr *op) noex {
 int recarr_add(recarr *op,cvoid *sp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    bool	f_done = false ;
 	    bool 	f = true ;
 	    rs = SR_OK ;
@@ -198,9 +201,9 @@ int recarr_add(recarr *op,cvoid *sp) noex {
 int recarr_audit(recarr *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        for (int i = 0 ; i < op->i ; i += 1) {
 	            if (op->va[i] != nullptr) {
 	                int	*ip = (int *) op->va[i] ;
@@ -216,11 +219,11 @@ int recarr_audit(recarr *op) noex {
 
 int recarr_get(recarr *op,int i,cvoid *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    void	**epp = (void **) vp ;
 	    rs = SR_NOTFOUND ;
-	    if (op->va) {
-	        if ((i >= 0) && (i < op->i)) {
+	    if (op->va) ylikely {
+	        if ((i >= 0) && (i < op->i)) ylikely {
 		    rs = SR_OK ;
 	            if (epp) {
 	                *epp = op->va[i] ;
@@ -236,9 +239,9 @@ int recarr_getlast(recarr *op,cvoid *vp) noex {
 	void		**epp = (void **) vp ;
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        if ((op->c > 0) && (op->i > 0)) {
 		    rs = SR_OK ;
 	            i = (op->i-1) ;
@@ -258,9 +261,9 @@ int recarr_getlast(recarr *op,cvoid *vp) noex {
 int recarr_ent(recarr *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && ep) {
+	if (op && ep) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        for (i = 0 ; i < op->i ; i += 1) {
 	            if (op->va[i]) {
 	                if (op->va[i] == ep) break ;
@@ -276,10 +279,10 @@ int recarr_ent(recarr *op,cvoid *ep) noex {
 int recarr_del(recarr *op,int i) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if ((i >= 0) && (i < op->i)) {
-	        if (op->va) {
+	    if ((i >= 0) && (i < op->i)) ylikely {
+	        if (op->va) ylikely {
 	            bool	f_fi = false ;
 	            op->c -= 1 ;
 	            if (op->fl.ostationary) {
@@ -331,7 +334,7 @@ int recarr_del(recarr *op,int i) noex {
 
 int recarr_delhand(recarr *op,cvoid *ep) noex {
 	int		rs ;
-	if ((rs = recarr_ent(op,ep)) >= 0) {
+	if ((rs = recarr_ent(op,ep)) >= 0) ylikely {
 	    rs = recarr_del(op,rs) ;
 	}
 	return rs ;
@@ -340,9 +343,9 @@ int recarr_delhand(recarr *op,cvoid *ep) noex {
 
 int recarr_delall(recarr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = op->c ;
 	        op->i = 0 ;
 	        op->fi = 0 ;
@@ -356,7 +359,7 @@ int recarr_delall(recarr *op) noex {
 
 int recarr_count(recarr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->c ;
 	} /* end if (non-null) */
 	return rs ;
@@ -366,16 +369,16 @@ int recarr_count(recarr *op) noex {
 int recarr_sort(recarr *op,recarr_cf vcmp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op && vcmp) {
+	if (op && vcmp) ylikely {
 	    rs = SR_OK ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		c = op->c ;
 	        if (! op->fl.issorted) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
 			qsort_f		qcmp = qsort_f(vcmp) ;
 			if_constexpr (f_qsort) {
-			    cint	esize = szof(void *) ;
+			    csize	esize = sizeof(void *) ;
 	                    qsort(op->va,op->i,esize,qcmp) ;
 			} else {
 			    std::sort(op->va,(op->va+op->i),qcmp) ;
@@ -390,7 +393,7 @@ int recarr_sort(recarr *op,recarr_cf vcmp) noex {
 
 int recarr_setsorted(recarr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->c ;
 	    op->fl.issorted = true ;
 	}
@@ -402,8 +405,8 @@ int recarr_search(recarr *op,cvoid *ep,recarr_cf vcmp,void *vrp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	void		**rpp = (void **) vrp ;
-	if (op && ep && vcmp) {
-	    cint	esize = szof(void *) ;
+	if (op && ep && vcmp) ylikely {
+	    csize	esize = sizeof(void *) ;
 	    void	**spp{} ;
 	    if (op->fl.osorted && (! op->fl.issorted)) {
 	        op->fl.issorted = true ;
@@ -462,15 +465,15 @@ int recarr_extent(recarr *op) noex {
 
 /* private subroutines */
 
-consteval int mkoptmask() noex {
+constexpr int mkoptmask() noex {
 	int		m = 0 ;
-	m |= RECARR_OREUSE ;
-	m |= RECARR_OCOMPACT ;
-	m |= RECARR_OSWAP ;
-	m |= RECARR_OSTATIONARY ;
-	m |= RECARR_OCONSERVE ;
-	m |= RECARR_OSORTED ;
-	m |= RECARR_OORDERED ;
+	m |= recarrm.reuse ;
+	m |= recarrm.compact ;
+	m |= recarrm.swap ;
+	m |= recarrm.stationary ;
+	m |= recarrm.conserve ;
+	m |= recarrm.sorted ;
+	m |= recarrm.ordered ;
 	return m ;
 }
 /* end subroutine (mkoptmask) */
@@ -481,13 +484,13 @@ static int recarr_setopts(recarr *op,int vo) noex {
 	if ((vo & (~ optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->fl = {} ;
-	    if (vo & RECARR_OREUSE) op->fl.oreuse = 1 ;
-	    if (vo & RECARR_OCOMPACT) op->fl.ocompact = 1 ;
-	    if (vo & RECARR_OSWAP) op->fl.oswap = 1 ;
-	    if (vo & RECARR_OSTATIONARY) op->fl.ostationary = 1 ;
-	    if (vo & RECARR_OCONSERVE) op->fl.oconserve = 1 ;
-	    if (vo & RECARR_OSORTED) op->fl.osorted = 1 ;
-	    if (vo & RECARR_OORDERED) op->fl.oordered = 1 ;
+	    if (vo & recarrm.reuse)		op->fl.oreuse		= true ;
+	    if (vo & recarrm.swap)		op->fl.oswap		= true ;
+	    if (vo & recarrm.stationary)	op->fl.ostationary	= true ;
+	    if (vo & recarrm.compact)		op->fl.ocompact		= true ;
+	    if (vo & recarrm.sorted)		op->fl.osorted		= true ;
+	    if (vo & recarrm.ordered)		op->fl.oordered		= true ;
+	    if (vo & recarrm.conserve)		op->fl.oconserve	= true ;
 	} /* end if (valid options) */
 	return rs ;
 }
