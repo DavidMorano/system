@@ -1,6 +1,6 @@
 /* ucentgr SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UCENTGR object management */
 /* version %I% last-modified %G% */
@@ -28,14 +28,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<utypealiases.h>
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>
@@ -45,10 +43,13 @@
 #include	<cfdec.h>
 #include	<localmisc.h>
 
+#include	"ucgetgr.h"		/* |uc_getgr{x}(3uc)| */
 #include	"ucentgr.h"
 #include	"ucentxx.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
