@@ -1,6 +1,6 @@
 /* ucentxx SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UCENTXX object management support routines */
 /* version %I% last-modified %G% */
@@ -29,10 +29,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>
@@ -51,7 +51,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
