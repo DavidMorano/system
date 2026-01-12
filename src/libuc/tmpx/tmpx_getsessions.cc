@@ -20,6 +20,7 @@
 /*******************************************************************************
 
   	Name:
+	tmpx_getsessions
 
 	Description:
 	This subroutine will find and return the names of all of
@@ -44,9 +45,8 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<tmpx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecint.h>
 #include	<localmisc.h>
 
@@ -95,7 +95,7 @@ int tmpx_getsessions(tmpx *op,vecint *vip,cchar *un) noex {
 	                f = f && (ue.ut_type == TMPX_TPROCUSER) ;
 	                f = f && (ue.ut_line[0] != '\0') ;
 	                if (f) {
-	                    int	v = ue.ut_pid ;
+	                    cint	v = int(ue.ut_pid) ;
 	                    n += 1 ;
 	                    rs = vecint_add(vip,v) ;
 	                } /* end if (got one) */
