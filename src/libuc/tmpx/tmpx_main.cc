@@ -55,13 +55,16 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<utmpacc.h>
 #include	<getfdfile.h>
 #include	<opentmp.h>
@@ -98,6 +101,14 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_duper(int,int) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_close(int) ;
+    extern int uc_pipe(int *) noex ;
+}
 
 /* external variables */
 
@@ -127,7 +138,7 @@ constexpr int		proctypes[] = {
 	-1
 } ; /* end array (proctypes) */
 
-static sysval		pagesize(sysval_ps) ;
+static sysval		pagesz(sysval_ps) ;
 
 constexpr bool		f_dynents = CF_DYNENTS ;
 constexpr bool		f_utmpacc = CF_UTMPACC ;
@@ -143,7 +154,7 @@ int tmpx_open(tmpx *op,cchar *dbfn,int oflags) noex {
 	if ((dbfn == nullptr) || (dbfn[0] == '\0') || (dbfn[0] == '-')) {
 	    dbfn = TMPX_DEFUTMP ;
 	}
-	if (op) {
+	if (op) ylikely {
 	    op->fname = nullptr ;
 	    op->mapdata = 0 ;
 	    op->ti_open = 0 ;
@@ -160,12 +171,12 @@ int tmpx_open(tmpx *op,cchar *dbfn,int oflags) noex {
 	    op->ncursors = 0 ;
 	    op->mapei = 0 ;
 	    op->mapen = 0 ;
-	    if ((rs = pagesize) >= 0) {
-		op->pagesize = rs ;
-	        if ((rs = tmpx_writable(op,oflags)) >= 0) {
+	    if ((rs = pagesz) >= 0) ylikely {
+		op->pagesz = rs ;
+	        if ((rs = tmpx_writable(op,oflags)) >= 0) ylikely {
 	            rs = tmpx_openbegin(op,dbfn) ;
 	        }
-	    } /* end if (pagesize) */
+	    } /* end if (pagesz) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -174,7 +185,7 @@ int tmpx_open(tmpx *op,cchar *dbfn,int oflags) noex {
 int tmpx_close(tmpx *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = tmpx_magic(op)) >= 0) {
+	if ((rs = tmpx_magic(op)) >= 0) ylikely {
 	    if (op->mapdata && (op->mapsize > 0)) {
 		rs1 = u_mmapend(op->mapdata,op->mapsize) ;
 		if (rs >= 0) rs = rs1 ;
@@ -191,19 +202,19 @@ int tmpx_close(tmpx *op) noex {
 
 int tmpx_write(tmpx *op,int ei,tmpx_ent *ep) noex {
 	int		rs ;
-	if ((rs = tmpx_magic(op,ep)) >= 0) {
+	if ((rs = tmpx_magic(op,ep)) >= 0) ylikely {
             cint    am = (op->oflags & O_ACCMODE) ;
             rs = SR_BADF ;
             if ((am == SR_WRONLY) || (am == O_RDWR)) {
                 if (op->fd < 0) {
                     rs = tmpx_fileopen(op,0L) ;
                 }
-                if (rs >= 0) {
+                if (rs >= 0) ylikely {
                     off_t   poff ;
                     cint    esz = TMPX_ENTSIZE ;
                     poff = (off_t) (ei * esz) ;
                     rs = u_pwrite(op->fd,ep,esz,poff) ;
-                }
+                } /* end if */
             } /* end if */
 	} /* end if (magic) */
 	return rs ;
@@ -213,7 +224,7 @@ int tmpx_write(tmpx *op,int ei,tmpx_ent *ep) noex {
 int tmpx_check(tmpx *op,time_t dt) noex {
 	int		rs ;
 	int		f_ch = false ;
-	if ((rs = tmpx_magic(op)) >= 0) {
+	if ((rs = tmpx_magic(op)) >= 0) ylikely {
             if ((op->ncursors == 0) && (op->fd >= 0)) {
                 if (dt == 0) dt = getustime ;
                 if ((dt - op->ti_check) >= TMPX_INTCHECK) {
@@ -239,7 +250,7 @@ int tmpx_check(tmpx *op,time_t dt) noex {
 
 int tmpx_curbegin(tmpx *op,tmpx_cur *curp) noex {
 	int		rs ;
-	if ((rs = tmpx_magic(op,curp)) >= 0) {
+	if ((rs = tmpx_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	    if (op->ncursors == 0) {
 	        if (op->fd < 0) {
@@ -255,7 +266,7 @@ int tmpx_curbegin(tmpx *op,tmpx_cur *curp) noex {
 
 int tmpx_curend(tmpx *op,tmpx_cur *curp) noex {
 	int		rs ;
-	if ((rs = tmpx_magic(op,curp)) >= 0) {
+	if ((rs = tmpx_magic(op,curp)) >= 0) ylikely {
 	    if (op->ncursors > 0) op->ncursors -= 1 ;
 	    curp->i = -1 ;
 	} /* end if (magic) */
@@ -266,7 +277,7 @@ int tmpx_curend(tmpx *op,tmpx_cur *curp) noex {
 int tmpx_curenum(tmpx *op,tmpx_cur *curp,tmpx_ent *ep) noex {
 	int		rs ;
 	int		ei = 0 ;
-	if ((rs = tmpx_magic(op,curp,ep)) >= 0) {
+	if ((rs = tmpx_magic(op,curp,ep)) >= 0) ylikely {
             int		en = TMPX_NENTS ;
             int		n ;
             ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
@@ -289,11 +300,11 @@ int tmpx_curenum(tmpx *op,tmpx_cur *curp,tmpx_ent *ep) noex {
 int tmpx_fetchpid(tmpx *op,tmpx_ent *ep,pid_t pid) noex {
 	int		rs ;
 	int		ei = 0 ;
-	if ((rs = tmpx_magic(op,ep)) >= 0) {
+	if ((rs = tmpx_magic(op,ep)) >= 0) ylikely {
             if (op->ncursors == 0) {
                 rs = tmpx_filesize(op,0L) ;
             }
-            if (rs >= 0) {
+            if (rs >= 0) ylikely {
                 tmpx_ent    *up ;
                 cint        en = TMPX_NENTS ;
                 bool        f = false ;
@@ -324,14 +335,14 @@ int tmpx_fetchpid(tmpx *op,tmpx_ent *ep,pid_t pid) noex {
 int tmpx_fetchuser(tmpx *op,tmpx_cur *curp,tmpx_ent *ep,cchar *name) noex {
 	int		rs ;
 	int		ei = 0 ;
-	if ((rs = tmpx_magic(op,curp,ep,name)) >= 0) {
+	if ((rs = tmpx_magic(op,curp,ep,name)) >= 0) ylikely {
             if (curp) {
                 ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
             }
             if (op->ncursors == 0) {
                 rs = tmpx_filesize(op,0L) ;
             }
-            if (rs >= 0) {
+            if (rs >= 0) ylikely {
                 tmpx_ent    *up ;
                 cint        esz = TMPX_ENTSIZE ;
                 cint        en = TMPX_NENTS ;
@@ -366,14 +377,14 @@ int tmpx_fetchuser(tmpx *op,tmpx_cur *curp,tmpx_ent *ep,cchar *name) noex {
 int tmpx_read(tmpx *op,int ei,tmpx_ent *ep) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = tmpx_magic(op,ep)) >= 0) {
+	if ((rs = tmpx_magic(op,ep)) >= 0) ylikely {
             rs = SR_INVALID ;
-            if (ei >= 0) {
+            if (ei >= 0) ylikely {
                 rs = SR_OK ;
                 if (op->ncursors == 0) {
                     rs = tmpx_filesize(op,0L) ;
                 }
-                if (rs >= 0) {
+                if (rs >= 0) ylikely {
                     tmpx_ent        *up ;
                     cint            en = TMPX_NENTS ;
                     cint            esz = TMPX_ENTSIZE ;
@@ -394,7 +405,7 @@ int tmpx_read(tmpx *op,int ei,tmpx_ent *ep) noex {
 int tmpx_nusers(tmpx *op) noex {
 	int		rs ;
 	int		nusers = 0 ;
-	if ((rs = tmpx_magic(op)) >= 0) {
+	if ((rs = tmpx_magic(op)) >= 0) ylikely {
             int     en ;
             if_constexpr (f_dynents) {
                 cint        esz = TMPX_ENTSIZE ;
@@ -405,7 +416,7 @@ int tmpx_nusers(tmpx *op) noex {
             if (op->ncursors == 0) {
                 rs = tmpx_filesize(op,0L) ;
             }
-            if (rs >= 0) {
+            if (rs >= 0) ylikely {
                 tmpx_ent    *ep ;
                 int         ei = 0 ;
                 while ((rs = tmpx_mapents(op,ei,en,&ep)) > 0) {
@@ -451,7 +462,7 @@ static int tmpx_writable(tmpx *op,int oflags) noex {
 
 static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 	int		rs ;
-	if (cchar *cp ; (rs = libmem.strw(dbfn,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(dbfn,-1,&cp)) >= 0) ylikely {
 	    custime	dt = getustime ;
 	    op->fname = cp ;
 	    if ((rs = tmpx_fileopen(op,dt)) >= 0) {
@@ -478,11 +489,11 @@ static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 static int tmpx_openend(tmpx *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->fd >= 0) {
+	if (op->fd >= 0) ylikely {
 	    rs1 = tmpx_fileclose(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	if (op->fname) {
+	if (op->fname) ylikely {
 	    void *vp = voidp(op->fname) ;
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -497,8 +508,8 @@ static int tmpx_filesize(tmpx *op,time_t dt) noex {
 	if (op->fd < 0) {
 	    rs = tmpx_fileopen(op,dt) ;
 	}
-	if (rs >= 0) {
-	    if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+	if (rs >= 0) ylikely {
+	    if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) ylikely {
 	        op->ti_mod = sb.st_mtime ;
 	        op->fsize = sb.st_size ;
 	    }
@@ -510,15 +521,15 @@ static int tmpx_filesize(tmpx *op,time_t dt) noex {
 static int tmpx_fileopen(tmpx *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
-	    if ((rs = tmpx_fileopener(op)) >= 0) {
-	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
+	    if ((rs = tmpx_fileopener(op)) >= 0) ylikely {
+	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) ylikely {
 	            if (dt == 0) dt = getustime ;
 	            op->ti_open = dt ;
 	        }
 		if (rs < 0) {
 		    uc_close(op->fd) ;
 		    op->fd = -1 ;
-		}
+		} /* end if (error) */
 	    }
 	} /* end if (open) */
 	return rs ;
@@ -590,8 +601,8 @@ static int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
 	        if (eext > op->fsize) eext = intsat(op->fsize) ;
 	        n = (eext - eoff) / esz ;
 	        if (n > 0) {
-	            cuint	woff = ufloor(eoff,op->pagesize) ;
-	            cuint	wext = uceil(eext,op->pagesize) ;
+	            cuint	woff = ufloor(eoff,op->pagesz) ;
+	            cuint	wext = uceil(eext,op->pagesz) ;
 	            cuint	wsize = (wext - woff) ;
 	            if (wsize > 0) {
 	                bool	f = (woff < op->mapoff) ;
