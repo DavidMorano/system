@@ -98,8 +98,8 @@ int strpcmp(cchar *s1,cchar *s2) noex {
 		    /* no match */
 		    rc = (*s1 - *s2) ;
 		}
-	    }
-	}
+	    } /* end if */
+	} /* end if */
 	return rc ;
 }
 /* end subroutine (strpcmp) */
