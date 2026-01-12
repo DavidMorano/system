@@ -38,13 +38,15 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
 #include	<vecstr.h>
-#include	<tmpx.h>
 #include	<localmisc.h>
+
+#include	"tmpx.h"
 
 
 /* local defines */
@@ -81,7 +83,7 @@ constexpr bool		f_darwin = F_DARWIN ;
 int tmpx_getrunlevel(tmpx *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		runlevel = 0 ;
+	int		runlevel = 0 ; /* return-value */
 	if (op) {
 	    if_constexpr (f_darwin) {
 		runlevel = 3 ;
