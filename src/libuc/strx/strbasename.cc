@@ -40,9 +40,32 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -50,20 +73,24 @@ import libutil ;
 
 /* exported subroutines */
 
-char *strbasename(char *s) noex {
-	int		si = 0 ;
-	int		sl = lenstr(s) ;
-	/* remove trailing slash characters */
-	while ((sl > 1) && (s[sl - 1] == '/')) {
-	    sl -= 1 ;
-	}
-	s[sl] = '\0' ;
-	/* find the next previous slash character */
-	for (si = sl ; si > 0 ; si -= 1) {
-	    if (s[si - 1] == '/') break ;
-	} /* end for */
-	if (s[1] == '\0') si = 0 ;
-	return (s + si) ;
+char *strbasename(char *sp) noex {
+	char		*rp = nullptr ;
+	if (sp) ylikely {
+	   int		si = 0 ;
+	   int		sl = lenstr(sp) ;
+	   /* remove trailing slash characters */
+	   while ((sl > 1) && (sp[sl - 1] == '/')) {
+	       sl -= 1 ;
+	   }
+	   sp[sl] = '\0' ;
+	   /* find the next previous slash character */
+	   for (si = sl ; si > 0 ; si -= 1) {
+	       if (sp[si - 1] == '/') break ;
+	   } /* end for */
+	   if (sp[1] == '\0') si = 0 ;
+	   rp = (sp + si) ;
+	} /* end if (non-null) */
+	return rp ;
 }
 /* end subroutine (strbasename) */
 
