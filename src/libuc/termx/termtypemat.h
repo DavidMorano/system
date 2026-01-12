@@ -37,7 +37,7 @@ struct termtype_head {
 	cchar		*name ;
 	short		pv[4] ;
 	short		sv[4] ;
-} ;
+} ; /* end struct */
 
 typedef	TERMTYPE	termtype ;
 
