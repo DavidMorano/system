@@ -21,7 +21,9 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
 
 #include	"termios_cf.h"
 
@@ -51,7 +53,7 @@
 
 int termios_cfsetispeed(TERMIOS *tp,speed_t speed) noex {
 	int		rs = SR_FAULT ;
-	if (tp) {
+	if (tp) ylikely {
 	    repeat {
 	        if ((rs = cfsetispeed(tp,speed)) < 0) {
 		    rs = (- errno) ;
@@ -64,7 +66,7 @@ int termios_cfsetispeed(TERMIOS *tp,speed_t speed) noex {
 
 int termios_cfsetospeed(TERMIOS *tp,speed_t speed) noex {
 	int		rs = SR_FAULT ;
-	if (tp) {
+	if (tp) ylikely {
 	    repeat {
 	        if ((rs = cfsetospeed(tp,speed)) < 0) {
 	            rs = (- errno) ;
