@@ -1,6 +1,6 @@
 /* ucentnw SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UCENTNW object management */
 /* version %I% last-modified %G% */
@@ -27,17 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<arpa/inet.h>		/* <- |htonl(3c)| */
-#include	<cerrno>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdint>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uinet.h>		/* |AF_INET{x}(3u)| */
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>
@@ -50,10 +47,13 @@
 #include	<nulstr.h>
 #include	<localmisc.h>
 
+#include	"ucgetnw.h"		/* |uc_getnw{x}(3uc)| */
 #include	"ucentnw.h"
 #include	"ucentxx.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
