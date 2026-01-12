@@ -40,6 +40,22 @@ MODS +=
 LIBS +=
 
 
+OBJ0= strxbrk.o straltwchar.o
+OBJ1= strabbrsig.o strabbrerr.o
+OBJ2= strsub.o strwhite.o 
+OBJ3= strbasename.o strdirname.o
+
+OBJ4= strcpyxc.o strlinelen.o strlocktype.o
+OBJ5=
+OBJ6=
+OBJ7=
+
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o
+
+OBJ= $(OBJA) $(OBJB)
+
+
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
@@ -56,20 +72,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= strxbrk.o straltwchar.o
-OBJ1= strsigabbr.o strerrabbr.o
-OBJ2= strsub.o strwhite.o 
-OBJ3= strbasename.o strdirname.o
-
-OBJ4= strcpyxc.o strlinelen.o strlocktype.o
-
-OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o
-
-OBJ= $(OBJA) $(OBJB)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -82,6 +85,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -100,15 +106,10 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
 	$(RM) $(ALL)
@@ -121,29 +122,42 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4.o:			$(OBJ4)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5.o:			$(OBJ5)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 strxbrk.o:		strxbrk.cc				$(INCS)
 strwhite.o:		strwhite.cc				$(INCS)
 strsub.o:		strsub.cc	strsub.h		$(INCS)
-strerrabbr.o:		strerrabbr.cc	strerrabbr.h		$(INCS)
-strsigabbr.o:		strsigabbr.cc	strsigabbr.h		$(INCS)
+strerrabbr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
+strsigabbr.o:		strabbrsig.cc	strabbrsig.h		$(INCS)
 straltwchar.o:		straltwchar.cc	straltwchar.h		$(INCS)
 strcpyxc.o:		strcpyxc.cc	strcpyxc.h		$(INCS)
 strlinelen.o:		strlinelen.cc	strlinelen.h		$(INCS)
