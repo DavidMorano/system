@@ -112,11 +112,11 @@ export {
 	    finish	(this,tardirmem_finish) ;
 	    count	(this,tardirmem_count) ;
 	} ;
-	int add(cchar *,int) noex ;
-	int get(int,ccharpp) noex ;
-	int curbegin(tardir_cur *) noex ;
-	int curenum(tardir_cur *,ccharpp) noex ;
-	int curend(tardir_cur *) noex ;
+	int add		(cchar *,int) noex ;
+	int get		(int,ccharpp) noex ;
+	int curbegin	(tardir_cur *) noex ;
+	int curenum	(tardir_cur *,ccharpp) noex ;
+	int curend	(tardir_cur *) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct tardir() {
