@@ -42,11 +42,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
 
@@ -84,12 +81,10 @@ extern "C" {
 
 /* forward references */
 
-static int	vechand_ctor(vechand *) noex ;
-static int	vechand_setopts(vechand *,int) noex ;
-static int	vechand_extend(vechand *) noex ;
-static int	vechand_validx(vechand *,int) noex ;
-
-static int	mkoptmask() noex ;
+local int	vechand_ctor(vechand *) noex ;
+local int	vechand_setopts(vechand *,int) noex ;
+local int	vechand_extend(vechand *) noex ;
+local int	vechand_validx(vechand *,int) noex ;
 
 
 /* local subroutines */
@@ -99,31 +94,21 @@ static int	mkoptmask() noex ;
 
 cint			defents = VECHAND_DEFENTS ;
 
-static cint		optmask = mkoptmask() ;
-
 
 /* exported variables */
 
-int vechandms::reuse		= (1 << vechando_reuse) ;
-int vechandms::compact		= (1 << vechando_compact) ;
-int vechandms::swap		= (1 << vechando_swap) ;
-int vechandms::stationary	= (1 << vechando_stationary) ;
-int vechandms::conserve		= (1 << vechando_conserve) ;
-int vechandms::sorted		= (1 << vechando_sorted) ;
-int vechandms::ordered		= (1 << vechando_ordered) ;
-
-const vechandms		vechandm ;
+constexpr vechandms	vechandm ;
 
 
 /* exported subroutines */
 
 int vechand_start(vechand *op,int vn,int vo) noex {
 	int		rs ;
-	if ((rs = vechand_ctor(op)) >= 0) {
+	if ((rs = vechand_ctor(op)) >= 0) ylikely {
 	    if (vn <= 1) vn = defents ;
-	    if ((rs = vechand_setopts(op,vo)) >= 0) {
+	    if ((rs = vechand_setopts(op,vo)) >= 0) ylikely {
 	        cint	sz = (vn + 1) * szof(cvoid **) ;
-	        if (void **va ; (rs = libmem.mall(sz,&va)) >= 0) {
+	        if (void **va ; (rs = libmem.mall(sz,&va)) >= 0) ylikely {
 		    op->va = va ;
 	            op->va[0] = nullptr ;
 	            op->n = vn ;
@@ -138,9 +123,9 @@ int vechand_start(vechand *op,int vn,int vo) noex {
 int vechand_finish(vechand *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        rs1 = libmem.free(op->va) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
@@ -156,8 +141,8 @@ int vechand_finish(vechand *op) noex {
 int vechand_add(vechand *op,cvoid *nep) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && nep) {
-	    if ((rs = vechand_extend(op)) >= 0) {
+	if (op && nep) ylikely {
+	    if ((rs = vechand_extend(op)) >= 0) ylikely {
 	        bool	f_done = false ;
 	        bool	f ;
 	        f = (op->fl.oreuse || op->fl.oconserve) && (! op->fl.oordered) ;
@@ -194,9 +179,9 @@ int vechand_add(vechand *op,cvoid *nep) noex {
 
 int vechand_get(vechand *op,int i,void **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOENT ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		rs = vechand_validx(op,i) ;
 	        if (rpp) {
 	            *rpp = (rs >= 0) ? op->va[i] : nullptr ;
@@ -210,9 +195,9 @@ int vechand_get(vechand *op,int i,void **rpp) noex {
 int vechand_getlast(vechand *op,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOENT ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        if (op->c > 0) {
 		    rs = SR_OK ;
 	            i = (op->i-1) ;
@@ -233,11 +218,11 @@ int vechand_getlast(vechand *op,void **rpp) noex {
 int vechand_search(vechand *op,cv *ep,vechand_vcmp vcf,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && ep && vcf) {
+	if (op && ep && vcf) ylikely {
 	    rs = SR_NOENT ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		csize	nsize = size_t(op->i) ;
-		csize	esize = szof(void *) ;
+		csize	esize = sizeof(void *) ;
 	        if (op->fl.osorted && (! op->fl.issorted)) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
@@ -275,9 +260,9 @@ int vechand_search(vechand *op,cv *ep,vechand_vcmp vcf,void **rpp) noex {
 int vechand_ent(vechand *op,cvoid *vp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && vp) {
+	if (op && vp) ylikely {
 	    rs = SR_NOENT ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        for (i = 0 ; i < op->i ; i += 1) {
 	            if (op->va[i]) {
 	                if (op->va[i] == vp) break ;
@@ -293,10 +278,10 @@ int vechand_ent(vechand *op,cvoid *vp) noex {
 int vechand_del(vechand *op,int i) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->va) {
-		if ((rs = vechand_validx(op,i)) >= 0) {
+	    if (op->va) ylikely {
+		if ((rs = vechand_validx(op,i)) >= 0) ylikely {
 	            bool	f_fi = false ;
 		    op->c -= 1 ;
 		    if (op->fl.ostationary) {
@@ -305,9 +290,8 @@ int vechand_del(vechand *op,int i) noex {
 	    		f_fi = true ;
 		    } else if (op->fl.issorted || op->fl.oordered) {
 	                if (op->fl.ocompact) {
-		            int	j ;
 	                    op->i -= 1 ;
-	                    for (j = i ; j < op->i ; j += 1) {
+	                    for (int j = i ; j < op->i ; j += 1) {
 	                        op->va[j] = op->va[j + 1] ;
 		            }
 	                    op->va[op->i] = nullptr ;
@@ -335,7 +319,10 @@ int vechand_del(vechand *op,int i) noex {
 	                    op->i -= 1 ;
 	                } /* end while */
 	            } /* end if */
-	            if (f_fi && (i < op->fi)) op->fi = i ;
+	            if (f_fi && (i < op->fi)) {
+			op->fi = i ;
+		    }
+		    c = op->c ;
 		} /* end if (valid index) */
 	    } /* end if (popularion) */
 	} /* end if (non-null) */
@@ -345,8 +332,8 @@ int vechand_del(vechand *op,int i) noex {
 
 int vechand_delhand(vechand *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = vechand_ent(op,ep)) >= 0) {
+	if (op) ylikely {
+	    if ((rs = vechand_ent(op,ep)) >= 0) ylikely {
 	        rs = vechand_del(op,rs) ;
 	    }
 	}
@@ -357,9 +344,9 @@ int vechand_delhand(vechand *op,cvoid *ep) noex {
 int vechand_delall(vechand *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        c = op->c ;
 		op->c = 0 ;
 	        op->i = 0 ;
@@ -386,15 +373,15 @@ int vechand_count(vechand *op) noex {
 int vechand_sort(vechand *op,vechand_vcmp vcf) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op && vcf) {
+	if (op && vcf) ylikely {
 	    rs = SR_OK ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 		c = op->c ;
 	        if (! op->fl.issorted) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
 			csize		nsize = size_t(op->i) ;
-			csize		esize = szof(void *) ;
+			csize		esize = sizeof(void *) ;
 			qsort_f		scf = qsort_f(vcf) ;
 	                qsort(op->va,nsize,esize,scf) ;
 		    }
@@ -408,7 +395,7 @@ int vechand_sort(vechand *op,vechand_vcmp vcf) noex {
 int vechand_issorted(vechand *op) noex {
 	int		rs = SR_FAULT ;
 	int		f_issorted = false ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    f_issorted = op->fl.issorted ;
 	} /* end if (non-null) */
@@ -419,7 +406,7 @@ int vechand_issorted(vechand *op) noex {
 int vechand_setsorted(vechand *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->fl.issorted = true ;
 	    c = op->c ;
@@ -431,8 +418,8 @@ int vechand_setsorted(vechand *op) noex {
 int vechand_getvec(vechand *op,void *rp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && rp) {
-	    if ((rs = vechand_extend(op)) >= 0) {
+	if (op && rp) ylikely {
+	    if ((rs = vechand_extend(op)) >= 0) ylikely {
 	        void	**rpp = voidpp(rp) ;
 	        *rpp = voidp(op->va) ;
 	    }
@@ -443,7 +430,7 @@ int vechand_getvec(vechand *op,void *rp) noex {
 
 int vechand_extent(vechand *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->n ;
 	}
 	return rs ;
@@ -453,9 +440,9 @@ int vechand_extent(vechand *op) noex {
 int vechand_audit(vechand *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        for (int i = 0 ; i < op->i ; i += 1) {
 	            if (op->va[i] != nullptr) {
 	                int	*ip = (int *) op->va[i] ;
@@ -473,9 +460,9 @@ int vechand_audit(vechand *op) noex {
 
 /* private subroutines */
 
-static int vechand_ctor(vechand *op) noex {
+local int vechand_ctor(vechand *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->va = nullptr ;
 	    op->c = 0 ;
@@ -487,7 +474,7 @@ static int vechand_ctor(vechand *op) noex {
 }
 /* end subroutine (vechand_ctor) */
 
-static int mkoptmask() noex {
+consteval int mkoptmask() noex {
 	int		m = 0 ;
 	m |= vechandm.reuse ;
 	m |= vechandm.compact ;
@@ -500,24 +487,25 @@ static int mkoptmask() noex {
 }
 /* end subroutine (mkoptmask) */
 
-static int vechand_setopts(vechand *op,int vo) noex {
+local int vechand_setopts(vechand *op,int vo) noex {
+    	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ optmask)) == 0) {
+	if ((vo & (~ optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
-	    if (vo & vechandm.reuse)		op->fl.oreuse = true ;
-	    if (vo & vechandm.swap)		op->fl.oswap = true ;
-	    if (vo & vechandm.stationary)	op->fl.ostationary = true ;
-	    if (vo & vechandm.compact)		op->fl.ocompact = true ;
-	    if (vo & vechandm.sorted)		op->fl.osorted = true ;
-	    if (vo & vechandm.ordered)		op->fl.oordered = true ;
-	    if (vo & vechandm.conserve)		op->fl.oconserve = true ;
+	    if (vo & vechandm.reuse)		op->fl.oreuse		= true ;
+	    if (vo & vechandm.swap)		op->fl.oswap		= true ;
+	    if (vo & vechandm.stationary)	op->fl.ostationary	= true ;
+	    if (vo & vechandm.compact)		op->fl.ocompact		= true ;
+	    if (vo & vechandm.sorted)		op->fl.osorted		= true ;
+	    if (vo & vechandm.ordered)		op->fl.oordered		= true ;
+	    if (vo & vechandm.conserve)		op->fl.oconserve 	= true ;
 	} /* end if (valid options) */
 	return rs ;
 }
 /* end subroutine (vechand_setopts) */
 
-static int vechand_extend(vechand *op) noex {
+local int vechand_extend(vechand *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
 	    int		nn ;
@@ -543,9 +531,8 @@ static int vechand_extend(vechand *op) noex {
 }
 /* end subroutine (vechand_extend) */
 
-static int vechand_validx(vechand *op,int i) noex {
-	cint	rs = ((i >= 0) && (i < op->i)) ? SR_OK : SR_NOENT ;
-	return rs ;
+local int vechand_validx(vechand *op,int i) noex {
+	return ((i >= 0) && (i < op->i)) ? SR_OK : SR_NOENT ;
 }
 /* end subroutine (vechand_validx) */
 
@@ -555,6 +542,14 @@ int vechand::start(int an,int ao) noex {
 
 int vechand::add(cvoid *ep) noex {
 	return vechand_add(this,ep) ;
+}
+
+int vechand::get(int ai,void **rpp) noex {
+	return vechand_get(this,ai,rpp) ;
+}
+
+int vechand::getlast(void **rpp) noex {
+	return vechand_getlast(this,rpp) ;
 }
 
 int vechand::getvec(void *vap) noex {
@@ -582,7 +577,7 @@ void vechand::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vechand",rs,"fini-finish") ;
 	}
-}
+} /* end method (vechand_co::dtor) */
 
 vechand::operator int () noex {
     	int		rs = SR_NOTOPEN ;
@@ -590,11 +585,11 @@ vechand::operator int () noex {
 	    rs = c ;
 	}
 	return rs ;
-}
+} /* end method (vechand::operator) */
 
 vechand_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case vechandmem_count:
 	        rs = vechand_count(op) ;
@@ -620,7 +615,6 @@ vechand_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (vechand_co::operator) */
+} /* end method (vechand_co::operator) */
 
 
