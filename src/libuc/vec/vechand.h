@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	VECHAND		struct vechand_head
@@ -55,13 +52,13 @@ enum vechandos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vechandms {
-    static int	reuse ;
-    static int	compact ;
-    static int	swap ;
-    static int	stationary ;
-    static int	conserve ;
-    static int	sorted ;
-    static int	ordered ;
+    constexpr static int	reuse		= (1 << vechando_reuse) ;
+    constexpr static int	compact		= (1 << vechando_compact) ;
+    constexpr static int	swap		= (1 << vechando_swap) ;
+    constexpr static int	stationary	= (1 << vechando_stationary) ;
+    constexpr static int	conserve	= (1 << vechando_conserve) ;
+    constexpr static int	sorted		= (1 << vechando_sorted) ;
+    constexpr static int	ordered		= (1 << vechando_ordered) ;
 } ; /* end struct (vechandms) */
 
 #endif /* __cplusplus */
@@ -102,6 +99,8 @@ typedef int (*vechand_vcmp)(cvoid **,cvoid **) noex ;
 typedef int (*vechand_f)(cvoid **,cvoid **) noex ;
 
 EXTERNC_end
+
+typedef	VECHAND_FL	vechand_fl ;
 
 #ifdef	__cplusplus
 enum vechandmems {
@@ -144,14 +143,14 @@ struct vechand : vechand_head {
 	    audit	(this,vechandmem_audit) ;
 	    finish	(this,vechandmem_finish) ;
 	    va = nullptr ;
-	} ;
+	} ; /* end tcor */
 	vechand(const vechand &) = delete ;
 	vechand &operator = (const vechand &) = delete ;
 	int start(int = 0,int = 0) noex ;
 	int add(cvoid *) noex ;
 	int sort(int,vechand_f = nullptr) noex ;
 	int get(int,void **) noex ;
-	int getlast(int,void **) noex ;
+	int getlast(void **) noex ;
 	int getvec(void *) noex ;
 	int search(cvoid *,vechand_f,void **) noex ;
 	int del(int = -1) noex ;
@@ -167,34 +166,30 @@ struct vechand : vechand_head {
 typedef VECHAND		vechand ;
 #endif /* __cplusplus */
 
-typedef	VECHAND_FL	vechand_fl ;
-
 EXTERNC_begin
 
-extern int vechand_start(vechand *,int,int) noex ;
-extern int vechand_add(vechand *,cvoid *) noex ;
-extern int vechand_count(vechand *) noex ;
-extern int vechand_sort(vechand *,vechand_vcmp) noex ;
-extern int vechand_setsorted(vechand *) noex ;
-extern int vechand_get(vechand *,int,void **) noex ; 
-extern int vechand_getlast(vechand *,void **) noex ; 
-extern int vechand_search(vechand *,cvoid *,vechand_vcmp,void **) noex ;
-extern int vechand_ent(vechand *,cvoid *) noex ;
-extern int vechand_issorted(vechand *) noex ;
-extern int vechand_del(vechand *,int) noex ;
-extern int vechand_delhand(vechand *,cvoid *) noex ;
-extern int vechand_delall(vechand *) noex ;
-extern int vechand_getvec(vechand *,void *) noex ;
-extern int vechand_extent(vechand *) noex ;
-extern int vechand_audit(vechand *) noex ;
-extern int vechand_finish(vechand *) noex ;
+extern int vechand_start	(vechand *,int,int) noex ;
+extern int vechand_add		(vechand *,cvoid *) noex ;
+extern int vechand_count	(vechand *) noex ;
+extern int vechand_sort		(vechand *,vechand_vcmp) noex ;
+extern int vechand_setsorted	(vechand *) noex ;
+extern int vechand_get		(vechand *,int,void **) noex ; 
+extern int vechand_getlast	(vechand *,void **) noex ; 
+extern int vechand_search	(vechand *,cvoid *,vechand_vcmp,void **) noex ;
+extern int vechand_ent		(vechand *,cvoid *) noex ;
+extern int vechand_issorted	(vechand *) noex ;
+extern int vechand_del		(vechand *,int) noex ;
+extern int vechand_delhand	(vechand *,cvoid *) noex ;
+extern int vechand_delall	(vechand *) noex ;
+extern int vechand_getvec	(vechand *,void *) noex ;
+extern int vechand_extent	(vechand *) noex ;
+extern int vechand_audit	(vechand *) noex ;
+extern int vechand_finish	(vechand *) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 extern const vechandms	vechandm ;
-
 #endif /* __cplusplus */
 
 
