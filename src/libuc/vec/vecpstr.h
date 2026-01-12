@@ -32,10 +32,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 
 
@@ -70,13 +67,13 @@ enum vecpstros {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecpstrms {
-    static int	reuse ;
-    static int	compact ;
-    static int	swap ;
-    static int	stationary ;
-    static int	conserve ;
-    static int	sorted ;
-    static int	ordered ;
+    constexpr static int	reuse		= (1 << vecpstro_reuse) ;
+    constexpr static int	compact		= (1 << vecpstro_compact) ;
+    constexpr static int	swap		= (1 << vecpstro_swap) ;
+    constexpr static int	stationary	= (1 << vecpstro_stationary) ;
+    constexpr static int	conserve	= (1 << vecpstro_conserve) ;
+    constexpr static int	sorted		= (1 << vecpstro_sorted) ;
+    constexpr static int	ordered		= (1 << vecpstro_ordered) ;
 } ; /* end struct (vecpstrms) */
 
 #endif /* __cplusplus */
@@ -270,39 +267,39 @@ typedef VECPSTR_CH	vecpstr_ch ;
 
 EXTERNC_begin
 
-extern int vecpstr_start(vecpstr *,int,int,int) noex ;
-extern int vecpstr_finish(vecpstr *) noex ;
-extern int vecpstr_add(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_adduniq(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_addkeyval(vecpstr *,cchar *,int,cchar *,int) noex ;
-extern int vecpstr_insert(vecpstr *,int,cchar *,int) noex ;
-extern int vecpstr_store(vecpstr *,cchar *,int,cchar **) noex ;
-extern int vecpstr_already(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_get(vecpstr *,int,cchar **) noex ;
-extern int vecpstr_getlast(vecpstr *,cchar **) noex ;
-extern int vecpstr_del(vecpstr *,int) noex ;
-extern int vecpstr_delall(vecpstr *) noex ;
-extern int vecpstr_count(vecpstr *) noex ;
-extern int vecpstr_sort(vecpstr *,vecpstr_vcmp) noex ;
-extern int vecpstr_search(vecpstr *,cchar *,vecpstr_vcmp,cchar **) noex ;
-extern int vecpstr_find(vecpstr *,cchar *) noex ;
-extern int vecpstr_findn(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_finder(vecpstr *,cchar *,vecpstr_vcmp,cchar **) noex ;
-extern int vecpstr_findaddr(vecpstr *,cchar *) noex ;
-extern int vecpstr_getsize(vecpstr *) noex ;
-extern int vecpstr_strsize(vecpstr *) noex ;
-extern int vecpstr_strmk(vecpstr *,char *,int) noex ;
-extern int vecpstr_recsize(vecpstr *) noex ;
-extern int vecpstr_cksize(vecpstr *) noex ;
-extern int vecpstr_recmk(vecpstr *,int *,int) noex ;
-extern int vecpstr_recmkstr(vecpstr *,int *,int,char *,int) noex ;
-extern int vecpstr_avmkstr(vecpstr *,cchar **,int,char *,int) noex ;
-extern int vecpstr_indlen(vecpstr *) noex ;
-extern int vecpstr_indsize(vecpstr *) noex ;
-extern int vecpstr_indmk(vecpstr *,int (*)[3],int,int) noex ;
-extern int vecpstr_audit(vecpstr *) noex ;
-extern int vecpstr_getvec(vecpstr *,mainv *) noex ;
-extern int vecpstr_finish(vecpstr *) noex ;
+extern int vecpstr_start	(vecpstr *,int,int,int) noex ;
+extern int vecpstr_finish	(vecpstr *) noex ;
+extern int vecpstr_add		(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_adduniq	(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_addkeyval	(vecpstr *,cchar *,int,cchar *,int) noex ;
+extern int vecpstr_insert	(vecpstr *,int,cchar *,int) noex ;
+extern int vecpstr_store	(vecpstr *,cchar *,int,cchar **) noex ;
+extern int vecpstr_already	(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_get		(vecpstr *,int,cchar **) noex ;
+extern int vecpstr_getlast	(vecpstr *,cchar **) noex ;
+extern int vecpstr_del		(vecpstr *,int) noex ;
+extern int vecpstr_delall	(vecpstr *) noex ;
+extern int vecpstr_count	(vecpstr *) noex ;
+extern int vecpstr_sort		(vecpstr *,vecpstr_vcmp) noex ;
+extern int vecpstr_search	(vecpstr *,cchar *,vecpstr_vcmp,cchar **) noex ;
+extern int vecpstr_find		(vecpstr *,cchar *) noex ;
+extern int vecpstr_findn	(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_finder	(vecpstr *,cchar *,vecpstr_vcmp,cchar **) noex ;
+extern int vecpstr_findaddr	(vecpstr *,cchar *) noex ;
+extern int vecpstr_getsize	(vecpstr *) noex ;
+extern int vecpstr_strsize	(vecpstr *) noex ;
+extern int vecpstr_strmk	(vecpstr *,char *,int) noex ;
+extern int vecpstr_recsize	(vecpstr *) noex ;
+extern int vecpstr_cksize	(vecpstr *) noex ;
+extern int vecpstr_recmk	(vecpstr *,int *,int) noex ;
+extern int vecpstr_recmkstr	(vecpstr *,int *,int,char *,int) noex ;
+extern int vecpstr_avmkstr	(vecpstr *,cchar **,int,char *,int) noex ;
+extern int vecpstr_indlen	(vecpstr *) noex ;
+extern int vecpstr_indsize	(vecpstr *) noex ;
+extern int vecpstr_indmk	(vecpstr *,int (*)[3],int,int) noex ;
+extern int vecpstr_audit	(vecpstr *) noex ;
+extern int vecpstr_getvec	(vecpstr *,mainv *) noex ;
+extern int vecpstr_finish	(vecpstr *) noex ;
 /* extras (so-called) */
 extern int vecpstr_addpathclean(vecpstr *,cchar *,int) noex ;
 extern int vecpstr_addpath(vecpstr *,cchar *,int) noex ;
