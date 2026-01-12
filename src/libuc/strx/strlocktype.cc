@@ -38,7 +38,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"strlocktype.h"
@@ -58,7 +59,7 @@
 struct locktype {
 	int		t ;
 	cchar		*n ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -75,7 +76,7 @@ constexpr locktype	types[] = {
 	{ F_WTEST, "WTEST" },
 	{ F_RTEST, "RTEST" },
 	{ -1, nullptr }
-} ;
+} ; /* end array */
 
 
 /* exported variables */
