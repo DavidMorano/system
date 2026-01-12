@@ -41,9 +41,10 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
+#include	<uctimeconv.h>
 #include	<estrings.h>
 #include	<snx.h>
 #include	<getmjd.h>
@@ -52,7 +53,9 @@
 
 #include	"timestr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
