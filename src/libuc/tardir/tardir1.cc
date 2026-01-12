@@ -39,6 +39,8 @@ module ;
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/sif.ccm"
+
 module tardir ;
 
 import sif ;
@@ -48,7 +50,6 @@ import sif ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
