@@ -41,22 +41,18 @@ LIBS=
 
 
 # vecstr
-OBJA_VECSTR= vecstr.o vecstr_ext.o
+OBJA_VECSTR= vecstr_prime.o vecstr_ext.o
 OBJB_VECSTR= 
 OBJC_VECSTR= 
 OBJD_VECSTR= 
-OBJE_VECSTR= 
-OBJF_VECSTR= 
 
 OBJ_VECSTR+= obja_vecstr.o
 
 # vecpstr
-OBJA_VECPSTR= vecpstr.o vecpstr_ext.o
+OBJA_VECPSTR= vecpstr_prime.o vecpstr_ext.o
 OBJB_VECPSTR= 
 OBJC_VECPSTR= 
 OBJD_VECPSTR= 
-OBJE_VECPSTR= 
-OBJF_VECPSTR= 
 
 OBJ_VECPSTR+= obja_vecpstr.o
 
@@ -76,17 +72,20 @@ OBJC_VECSTRX= obj4_vecstrx.o obj5_vecstrx.o obj6_vecstrx.o
 OBJ_VECSTRX= obja_vecstrx.o objb_vecstrx.o objc_vecstrx.o
 
 # vecobj
-OBJA_VECOBJ= vecobj.o
+OBJA_VECOBJ= vecobj_prime.o
 OBJB_VECOBJ= vecobj_recip.o vecobj_strsort.o
 
-OBJ_VECOBJ+= obja_vecobj.o objb_vecobj.o
+OBJ_VECOBJ= obja_vecobj.o objb_vecobj.o
+
+# vecelem
+OBJ_VECELEM= vecelem_prime.o vecelem_obj.o
 
 # vecxx
 OBJA_VEC= obj_vecstr.o obj_vecpstr.o obj_vecstrx.o
 OBJB_VEC= vechand.o vecitem.o vecsorthand.o
 OBJC_VEC= vecint.o veclong.o vsetstr.o
 OBJD_VEC= recarr.o raqhand.o obj_vecobj.o
-OBJE_VEC= vecelem.o
+OBJE_VEC= obj_vecelem.o
 
 OBJ_VEC= obja_vec.o objb_vec.o objc_vec.o objd_vec.o obje_vec.o
 
@@ -141,7 +140,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_VEC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_VEC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_VEC)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -223,6 +222,9 @@ objb_vecobj.o:		$(OBJB_VECOBJ)
 obj_vecobj.o:		$(OBJ_VECOBJ)
 	$(LD) -r -o $@ $^
 
+obj_vecelem.o:		$(OBJ_VECELEM)
+	$(LD) -r -o $@ $^
+
 obja_vec.o:		$(OBJA_VEC)
 	$(LD) -r -o $@ $^
 objb_vec.o:		$(OBJB_VEC)
@@ -235,40 +237,47 @@ obje_vec.o:		$(OBJE_VEC)
 	$(LD) -r -o $@ $^
 
 
-vecstr.o:		vecstr.cc		vecstr.h
-vecstr_ext.o:		vecstr_ext.cc		vecstr.h
+# vecstr
+vecstr_prime.o:		vecstr_prime.cc		vecstr.h	$(INCS)
+vecstr_ext.o:		vecstr_ext.cc		vecstr.h	$(INCS)
 
-vecpstr.o:		vecpstr.cc		vecpstr.h
-vecpstr_ext.o:		vecpstr_ext.cc		vecstr.h
+# vecptr
+vecpstr_prime.o:	vecpstr_prime.cc	vecpstr.h	$(INCS)
+vecpstr_ext.o:		vecpstr_ext.cc		vecstr.h	$(INCS)
 
-vecstrx_addpath.o:	vecstrx_addpath.cc	vecstrx.hh
-vecstrx_adds.o:		vecstrx_adds.cc		vecstrx.hh
-vecstrx_addsubdirs.o:	vecstrx_addsubdirs.cc	vecstrx.hh
-vecstrx_addsyms.o:	vecstrx_addsyms.cc	vecstrx.hh
-vecstrx_adduniqs.o:	vecstrx_adduniqs.cc	vecstrx.hh
-vecstrx_env.o:		vecstrx_env.cc		vecstrx.hh
-vecstrx_envfile.o:	vecstrx_envfile.cc	vecstrx.hh
-vecstrx_foilcmp.o:	vecstrx_foilcmp.cc	vecstrx.hh
-vecstrx_loadfile.o:	vecstrx_loadfile.cc	vecstrx.hh
-vecstrx_loadgrusers.o:	vecstrx_loadgrusers.cc	vecstrx.hh
-vecstrx_loadpjusers.o:	vecstrx_loadpjusers.cc	vecstrx.hh
-vecstrx_srvargs.o:	vecstrx_srvargs.cc	vecstrx.hh
-vecstrx_svcargs.o:	vecstrx_svcargs.cc	vecstrx.hh
+# vec*str support
+vecstrx_addpath.o:	vecstrx_addpath.cc	vecstrx.hh	$(INCS)
+vecstrx_adds.o:		vecstrx_adds.cc		vecstrx.hh	$(INCS)
+vecstrx_addsubdirs.o:	vecstrx_addsubdirs.cc	vecstrx.hh	$(INCS)
+vecstrx_addsyms.o:	vecstrx_addsyms.cc	vecstrx.hh	$(INCS)
+vecstrx_adduniqs.o:	vecstrx_adduniqs.cc	vecstrx.hh	$(INCS)
+vecstrx_env.o:		vecstrx_env.cc		vecstrx.hh	$(INCS)
+vecstrx_envfile.o:	vecstrx_envfile.cc	vecstrx.hh	$(INCS)
+vecstrx_foilcmp.o:	vecstrx_foilcmp.cc	vecstrx.hh	$(INCS)
+vecstrx_loadfile.o:	vecstrx_loadfile.cc	vecstrx.hh	$(INCS)
+vecstrx_loadgrusers.o:	vecstrx_loadgrusers.cc	vecstrx.hh	$(INCS)
+vecstrx_loadpjusers.o:	vecstrx_loadpjusers.cc	vecstrx.hh	$(INCS)
+vecstrx_srvargs.o:	vecstrx_srvargs.cc	vecstrx.hh	$(INCS)
+vecstrx_svcargs.o:	vecstrx_svcargs.cc	vecstrx.hh	$(INCS)
 
-vecobj.o:		vecobj.cc		vecobj.h
-vecobj_hsort.o:		vecobj_hsort.cc		vecobj.h
-vecobj_recip.o:		vecobj_recip.cc		vecobj.h
-vecobj_strsort.o:	vecobj_strsort.cc	vecobj.h
+# vecobj
+vecobj_prime.o:		vecobj_prime.cc		vecobj.h	$(INCS)
+vecobj_hsort.o:		vecobj_hsort.cc		vecobj.h	$(INCS)
+vecobj_recip.o:		vecobj_recip.cc		vecobj.h	$(INCS)
+vecobj_strsort.o:	vecobj_strsort.cc	vecobj.h	$(INCS)
 
-vechand.o:		vechand.cc vechand.h
-vecint.o:		vecint.cc vecint.h
-veclong.o:		veclong.cc veclong.h
-vecitem.o:		vecitem.cc vecitem.h
+# vecelem
+vecelem_prime.o:	vecelem_prime.cc	vecelem.h	$(INCS)
+vecelem_obj.o:		vecelem_obj.cc		vecelem.h	$(INCS)
+
+vechand.o:		vechand.cc		vechand.h	$(INCS)
+vecint.o:		vecint.cc		vecint.h	$(INCS)
+veclong.o:		veclong.cc		veclong.h	$(INCS)
+vecitem.o:		vecitem.cc		vecitem.h	$(INCS)
 vecsorthand.o:		vecsorthand.cc		vecsorthand.h	$(INCS)
 vsetstr.o:		vsetstr.cc		vsetstr.h	$(INCS)
-vecelem.o:		vecelem.cc		vecelem.h	$(INCS)
 
-raqhand.o:		raqhand.cc raqhand.h
-recarr.o:		recarr.cc recarr.h
+raqhand.o:		raqhand.cc		raqhand.h	$(INCS)
+recarr.o:		recarr.cc		recarr.h	$(INCS)
 
 
