@@ -47,8 +47,8 @@
 #include	<climits>
 #include	<cstdarg>
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -79,9 +79,9 @@
 /* exported subroutines */
 
 int termconseqa(char *dp,int dl,int name,cchar *is,int na,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
-	if (dp) {
-	    va_list	ap ;
+	if (dp) ylikely {
 	    va_begin(ap,na) ;
 	    rs = termconseqva(dp,dl,name,is,na,ap) ;
 	    va_end(ap) ;
@@ -93,12 +93,12 @@ int termconseqa(char *dp,int dl,int name,cchar *is,int na,...) noex {
 int termconseqva(char *dp,int dl,int name,cchar *is,int na,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (dp) {
+	if (dp) ylikely {
 	    rs = SR_INVALID ;
 	    if (dl < 0) dl = INT_MAX ;
 	    if (name > 0) {
 		rs = SR_OK ;
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            cchar	*sp = "\033[" ;
 	            rs = storebuf_strw(dp,dl,i,sp,2) ;
 	            i += rs ;
@@ -124,7 +124,7 @@ int termconseqva(char *dp,int dl,int name,cchar *is,int na,va_list ap) noex {
 			if (rs < 0) break ;
 	            } /* end for */
 	        } /* end if */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = storebuf_chr(dp,dl,i,name) ;
 	            i += rs ;
 	        }
