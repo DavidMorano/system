@@ -34,8 +34,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"vecobj.h"
@@ -77,9 +77,9 @@ extern "C" {
 
 int vecobj_strsort(vecobj *op,vecobj_vcf vcmp) noex {
 	int		rs = SR_FAULT ;
-	if (op && vcmp) {
+	if (op && vcmp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->va) {
+	    if (op->va) ylikely {
 	        if (! op->fl.issorted) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
