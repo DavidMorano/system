@@ -20,37 +20,56 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdint.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	RECARR		struct recarr_head
 #define	RECARR_FL	struct recarr_flags
 
-/* options */
-#define	RECARR_ODEFAULT		0
-#define	RECARR_OREUSE		(1 << 0)	/* reuse empty slots */
-#define	RECARR_OCOMPACT		(1 << 1)	/* means NOHOLES */
-#define	RECARR_OSWAP		(1 << 2)	/* use swapping */
-#define	RECARR_OSTATIONARY	(1 << 3)	/* entries should not move */
-#define	RECARR_OCONSERVE	(1 << 4)	/* conserve space */
-#define	RECARR_OSORTED		(1 << 5)	/* keep sorted */
-#define	RECARR_OORDERED		(1 << 6)	/* keep ordered */
+/**** options
+reuse		= reuse empty slots
+compact		= do not allow for holes
+swap		= use swapping for empty slot management
+stationary	= entries do not move
+conserve	= conserve space where possible
+sorted		= maintain a sorted list
+ordered		= maintain an ordered list
+****/
 
-enum recarr_os : uint16_t {
-    recarr_odefault 	= RECARR_ODEFAULT,
-    recarr_oreuse 	= RECARR_ODEFAULT,
-    recarr_ocompact	= RECARR_OCOMPACT,
-    recarr_oswap	= RECARR_OSWAP,
-    recarr_ostationary	= RECARR_OSTATIONARY,
-    recarr_oconserve	= RECARR_OCONSERVE,
-    recarr_osorted	= RECARR_OSORTED,
-    recarr_oordered	= RECARR_OORDERED
-} ;
+enum recarros {
+    recarro_reuse,
+    recarro_compact,
+    recarro_swap,
+    recarro_stationary,
+    recarro_conserve,
+    recarro_sorted,
+    recarro_ordered,
+    recarro_overlast
+} ; /* end enum (options) */
+
+#ifdef	__cplusplus	/* C++ only! */
+
+struct recarrms {
+    constexpr static int	reuse		= (1 << recarro_reuse) ;
+    constexpr static int	compact		= (1 << recarro_compact) ;
+    constexpr static int	swap		= (1 << recarro_swap) ;
+    constexpr static int	stationary	= (1 << recarro_stationary) ;
+    constexpr static int	conserve	= (1 << recarro_conserve) ;
+    constexpr static int	sorted		= (1 << recarro_sorted) ;
+    constexpr static int	ordered		= (1 << recarro_ordered) ;
+} ; /* end struct (recarrms) */
+
+#endif /* __cplusplus */
+
+#define	RECARR_ODEFAULT		0
+#define	RECARR_OREUSE		(1 << recarro_reuse)
+#define	RECARR_OCOMPACT		(1 << recarro_compact)
+#define	RECARR_OSWAP		(1 << recarro_swap)
+#define	RECARR_OSTATIONARY	(1 << recarro_stationary)
+#define	RECARR_OCONSERVE	(1 << recarro_conserve)
+#define	RECARR_OSORTED		(1 << recarro_sorted)
+#define	RECARR_OORDERED		(1 << recarro_ordered)
 
 struct recarr_flags {
 	uint		issorted:1 ;
@@ -61,7 +80,7 @@ struct recarr_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-} ;
+} ; /* end struct (recarr_flags) */
 
 struct recarr_head {
 	void		**va ;
@@ -70,7 +89,7 @@ struct recarr_head {
 	int		n ;		/* extent of array */
 	int		fi ;		/* free entry index */
 	RECARR_FL	fl ;
-} ;
+} ; /* end struct (recarr_head) */
 
 typedef	RECARR		recarr ;
 typedef	RECARR_FL	recarr_fl ;
@@ -79,24 +98,28 @@ EXTERNC_begin
 
 typedef int (*recarr_cf)(cvoid **,cvoid **) noex ;
 
-extern int recarr_start(recarr *,int,int) noex ;
-extern int recarr_add(recarr *,cvoid *) noex ;
-extern int recarr_count(recarr *) noex ;
-extern int recarr_sort(recarr *,recarr_cf) noex ;
-extern int recarr_setsorted(recarr *) noex ;
-extern int recarr_get(recarr *,int,cvoid *) noex ; 
-extern int recarr_getlast(recarr *,cvoid *) noex ; 
-extern int recarr_ent(recarr *,cvoid *) noex ;
-extern int recarr_search(recarr *,cvoid *,recarr_cf,void *) noex ;
-extern int recarr_del(recarr *,int) noex ;
-extern int recarr_delhand(recarr *,cvoid *) noex ;
-extern int recarr_delall(recarr *) noex ;
-extern int recarr_getvec(recarr *,void *) noex ;
-extern int recarr_extent(recarr *) noex ;
-extern int recarr_audit(recarr *) noex ;
-extern int recarr_finish(recarr *) noex ;
+extern int recarr_start		(recarr *,int,int) noex ;
+extern int recarr_add		(recarr *,cvoid *) noex ;
+extern int recarr_count		(recarr *) noex ;
+extern int recarr_sort		(recarr *,recarr_cf) noex ;
+extern int recarr_setsorted	(recarr *) noex ;
+extern int recarr_get		(recarr *,int,cvoid *) noex ; 
+extern int recarr_getlast	(recarr *,cvoid *) noex ; 
+extern int recarr_ent		(recarr *,cvoid *) noex ;
+extern int recarr_search	(recarr *,cvoid *,recarr_cf,void *) noex ;
+extern int recarr_del		(recarr *,int) noex ;
+extern int recarr_delhand	(recarr *,cvoid *) noex ;
+extern int recarr_delall	(recarr *) noex ;
+extern int recarr_getvec	(recarr *,void *) noex ;
+extern int recarr_extent	(recarr *) noex ;
+extern int recarr_audit		(recarr *) noex ;
+extern int recarr_finish	(recarr *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const recarrms	recarrm ;
+#endif /* __cplusplus */
 
 
 #endif /* RECARR_INCLUDE */
