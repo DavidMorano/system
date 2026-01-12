@@ -42,11 +42,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strncmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
-#include	<tmpx.h>
 #include	<localmisc.h>
+
+#include	"tmpx.h"
 
 
 /* local defines */
@@ -82,9 +86,8 @@ int tmpx_getuserlines(tmpx *op,vecstr *lp,cchar *un) noex {
 	if (op && lp && un) {
 	    rs = SR_INVALID ;
 	    if (un[0]) {
-	        tmpx_ent	ue ;
-	        tmpx_cur	cur ;
-	        if ((rs = tmpx_curbegin(op,&cur)) >= 0) {
+	        if (tmpx_cur cur ; (rs = tmpx_curbegin(op,&cur)) >= 0) {
+	            tmpx_ent	ue ;
 	            cint	llen = TMPX_LLINE ;
 	            bool	f ;
 	            while (rs >= 0) {
