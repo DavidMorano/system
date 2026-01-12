@@ -1,6 +1,6 @@
 /* ucentua SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UCENTUA object management */
 /* version %I% last-modified %G% */
@@ -28,12 +28,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vecstr.h>
@@ -44,10 +44,13 @@
 #include	<cfdec.h>
 #include	<localmisc.h>
 
+#include	"ucgetua.h"		/* |uc_getua{x}(3uc)| */
 #include	"ucentua.h"
 #include	"ucentxx.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -96,12 +99,12 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (this && uabuf && sp) {
+	if (this && uabuf && sp) ylikely {
 	    USERATTR *uep = this ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = memclear(uep) ;
-	    if ((sl > 0) && (sp[0] != '#')) {
-	        if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) {
+	    if ((sl > 0) && (sp[0] != '#')) ylikely {
+	        if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) ylikely {
 	            int		fi = 0 ;
 	            for (cc *tp ; (tp = strnchr(sp,sl,':')) != np ; ) {
 			cint	tl = intconv(tp - sp) ;
@@ -150,10 +153,10 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (this && uabuf && suap) {
+	if (this && uabuf && suap) ylikely {
 	    USERATTR *uep = this ;
 	    *uep = *suap ; /* shallow copy */
-	    if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) ylikely {
 	        if (suap->attr) {
 	            cint	ksz = szof(kva_t) ;
 	            cint	al = szof(void *) ;
@@ -182,7 +185,7 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	                } /* end if (storeitem_block) */
 	            } /* end if (storeitem_block) */
 	        } /* end if (attr) */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            char *rp{} ;
 		    if ((rs = si_copystr(&si,&rp,suap->name)) >= 0) {
 	                name = rp ;
@@ -200,8 +203,8 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 int ucentua::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (this && rbuf) ylikely {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 5 ; i += 1) {
 	            if (i > 0) rs = b.chr(':') ;
 	            if (rs >= 0) {
@@ -243,13 +246,13 @@ int ucentua::format(char *rbuf,int rlen) noex {
 
 int ucentua::size() noex {
 	int		rs = SR_FAULT ;
-	if (this) {
+	if (this) ylikely {
 	    int		sz = 1 ;
 	    kva_t	*kvap = attr ;
 	    if (name) {
 	        sz += (lenstr(name)+1) ;
 	    }
-	    if (attr) {
+	    if (attr) ylikely {
 	        kv_t	*kvp = kvap->data ;
 	        cint	n = kvap->length ;
 	        sz += szof(kva_t) ;
@@ -284,7 +287,7 @@ static int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (vecstr a ; (rs = a.start(0,0)) >= 0) {
+	if (vecstr a ; (rs = a.start(0,0)) >= 0) ylikely {
 	    cint	sch = ';' ;
 	    cchar	*tp ;
 	    while ((tp = strnchr(sp,sl,sch)) != nullptr) {
@@ -314,11 +317,11 @@ static int userattrent_parseattrload(UA *uap,SI *sip,vecstr *alp,int n) noex {
 	cint		ksz = szof(kva_t) ;
 	cint		al = szof(void *) ;
 	int		rs ;
-	if (void *p ; (rs = sip->block(ksz,al,&p)) >= 0) {
+	if (void *p ; (rs = sip->block(ksz,al,&p)) >= 0) ylikely {
 	    kva_t	*kvap = (kva_t *) p ;
 	    int		dsize = (n*szof(kv_t)) ;
 	    uap->attr = kvap ;
-	    if ((rs = sip->block(dsize,al,&p)) >= 0) {
+	    if ((rs = sip->block(dsize,al,&p)) >= 0) ylikely {
 	        kv_t	*kvp = (kv_t *) p ;
 	        cchar	*ep{} ;
 	        uap->attr->length = n ;
@@ -360,7 +363,7 @@ static int si_attrload(SI *sip,kv_t *kvp,int i,cchar *ep) noex {
 
 static int sbuf_fmtattrs(sbuf *sbp,kva_t *attr) noex {
 	int		rs = SR_FAULT ;
-	if (sbp && attr) {
+	if (sbp && attr) ylikely {
 	    kv_t	*kv = attr->data ;
 	    cint	n = attr->length ;
 	    cint	sch = ';' ;
