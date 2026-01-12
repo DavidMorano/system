@@ -22,9 +22,16 @@
 	Slowlaris we hope that |ttyname_r(3c)| is now working
 	properly!
 
+	= 2025-11-20, David A­D­ Morano
+	I removed the old and unneeded (practically silly) code
+	option of forking the |tty(1)| program to get a TTY-name.
+	If I have to fork a program in order to get a TTY-name in
+	this dat-and-age (it is 2025 now), then f*ck that!  The jig
+	would be up already!
+
 */
 
-/* Copyright © 1998,2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2011,2025 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -53,58 +60,40 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<sys/param.h>
-#include	<sys/wait.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<isnot.h>
-#include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"termdevice.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 #undef	MINBUFLEN
 #define	MINBUFLEN	32
 
-#ifndef	DEVDNAME
-#define	DEVDNAME	"/dev"
-#endif
-
-#ifndef	TTYFNAME
-#define	TTYFNAME	"/dev/tty"
-#endif
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
-#ifndef	PROG_TTY
-#define	PROG_TTY	"/usr/bin/tty"
-#endif
-
 #ifndef	VARTERMDEV
 #define	VARTERMDEV	"TERMDEV"
 #endif
 
-#ifndef	VARAUDIODEV
-#define	VARAUDIODEV	"AUDIODEV"
-#endif
-
-#define	TO_READ		20		/* timeout waiting for sub-process */
-
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_ttyname(int,char *,int) noex ;
+}
 
 
 /* external variables */
@@ -125,7 +114,6 @@ namespace {
 	int finish() noex ;
 	int var() noex ;
 	int ttyname() noex ;
-	int fork() noex ;
     } ; /* end struct (subinfo) */
 } /* end namespace */
 
@@ -140,7 +128,6 @@ typedef int (subinfo::*subinfo_m)() noex ;
 constexpr static subinfo_m	getnames[] = {
 	&subinfo::var,
 	&subinfo::ttyname,
-	&subinfo::fork
 } ; /* end array (subinfo_m) */
 
 cbool		f_comment = false ;
@@ -202,10 +189,10 @@ int subinfo::var() noex {
 	cchar		*vn = VARTERMDEV ;
 	int		rs ;
 	int		len = 0 ; /* return-value */
-	if (ustat st1 ; (rs = u_fstat(fd,&st1)) >= 0) {
+	if (ustat st1 ; (rs = u_fstat(fd,&st1)) >= 0) ylikely {
 	    static cpcchar	valp = getenv(vn) ;
 	    if (valp) {
-		if (ustat st2 ; (rs = u_stat(valp,&st2)) >= 0) {
+		if (ustat st2 ; (rs = u_stat(valp,&st2)) >= 0) ylikely {
 	            rs = SR_NOENT ;
 	            if (st1.st_rdev == st2.st_rdev) {
 	                rs = sncpy1(dbuf,dlen,valp) ;
@@ -223,7 +210,7 @@ int subinfo::var() noex {
 int subinfo::ttyname() noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = uc_ttyname(fd,dbuf,dlen)) >= 0) {
+	if ((rs = uc_ttyname(fd,dbuf,dlen)) >= 0) ylikely {
 	    len = lenstr(dbuf) ;
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
@@ -231,62 +218,5 @@ int subinfo::ttyname() noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getname_ttyname) */
-
-int subinfo::fork() noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		len = 0 ; /* return-value */
-	if_constexpr (f_comment) {
-	    int		pfds[2] ;
-	    if ((rs = u_pipe(pfds)) >= 0) {
-	        cint	tlen = MAXPATHLEN ;
-	        int	cs ;
-	        char	tbuf[tlen + 2] = {} ;
-	        if ((rs = uc_fork()) == 0) {
-	            cchar	*av[3] ;
-	            u_close(pfds[0]) ; /* not used */
-	            for (int i = 0 ; i < 3 ; i += 1) {
-		        u_close(i) ;
-		    }
-	            u_dup(fd) ;
-	            u_close(fd) ;		/* done using it */
-	            u_dup(pfds[1]) ;		/* standard output */
-	            u_close(pfds[1]) ;		/* done using it */
-	            u_open(NULLFNAME,O_WRONLY,0666) ;
-	            av[0] = "tty" ;
-	            av[1] = nullptr ;
-	            u_execv(PROG_TTY,av) ;
-	            uc_exit(EX_NOEXEC) ;
-	        } else if (rs > 0) {
-	            const pid_t	pid_child = rs ;
-	            cint	to = TO_READ ;
-	            cint	opts = FM_TIMED ;
-	            u_close(pfds[1]) ;	/* not used */
-	            pfds[1] = -1 ;
-	            if ((rs = uc_reade(pfds[0],tbuf,tlen,to,opts)) > 0) {
-	                len = rs ;
-		        int i ; /* used-afterwards */
-	                for (i = 0 ; i < len ; i += 1) {
-	                    if (tbuf[i] == '\n') break ;
-	                }
-	                if (i == len) rs = SR_RANGE ;
-	                tbuf[i] = '\0' ;
-	                rs = snwcpy(dbuf,dlen,tbuf,i) ;
-	                len = rs ;
-		    } /* end uc_ucreade) */
-	    	    rs1 = u_waitpid(pid_child,&cs,0) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } else {
-	            rs = SR_BADE ;
-	        }
-	        u_close(pfds[0]) ;
-	        if (pfds[1] >= 0) {
-	            u_close(pfds[1]) ;
-	        }
-	    } /* end if (pipe) */
-	} /* end if_constexpr (f_comment) */
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname_fork) */
 
 
