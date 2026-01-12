@@ -44,18 +44,21 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<ctime>
+#include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
-#include	<tmpx.h>
 #include	<pathadd.h>
 #include	<mkpath.h>
 #include	<localmisc.h>
+
+#include	"tmpx.h"
 
 
 /* local defines */
@@ -64,8 +67,6 @@
 
 
 /* imported namespaces */
-
-using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -146,16 +147,16 @@ int tmpx_getuserterms(tmpx *op,vecstr *lp,cchar *username) noex {
 
 int subinfo::start() noex {
 	int		rs ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if ((rs = lm_mp(&tbuf)) >= 0) {
 	    tlen = rs ;
 	    if ((rs = mkpath(tbuf,devdname)) >= 0) {
 		dnl = rs ;
 	    } /* end if (mkpath) */
 	    if (rs < 0) {
-		malloc_free(tbuf) ;
+		lm_free(tbuf) ;
 		tbuf = nullptr ;
 		tlen = 0 ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-allocation) */
 	return rs ;
 }
@@ -165,7 +166,7 @@ int subinfo::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (tbuf) {
-	    rs1 = malloc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    tbuf = nullptr ;
 	    tlen = 0 ;
@@ -199,11 +200,10 @@ int subinfo::entget() noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = vecobj_start(elp,esz,vne,vo)) >= 0) {
-	    tmpx_ent	ue ;
-	    tmpx_cur	cur ;
 	    bool	f ;
-	    if ((rs = tmpx_curbegin(op,&cur)) >= 0) {
-	    	cint	utl_line = TMPX_LLINE ;
+	    if (tmpx_cur cur ; (rs = tmpx_curbegin(op,&cur)) >= 0) {
+	        tmpx_ent	ue ;
+	    	cint		utl_line = TMPX_LLINE ;
 	        while (rs >= 0) {
 	            rs1 = tmpx_fetchuser(op,&cur,&ue,un) ;
 	            if (rs1 == SR_NOTFOUND) break ;
@@ -294,7 +294,7 @@ static int terment_start(terment *ep,cchar *fp,int fl,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if (ep && fp) {
 	    ep->atime = t ;
-	    if (cchar *cp ; (rs = libmem.strw(fp,fl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(fp,fl,&cp)) >= 0) {
 	        ep->devpath = cp ;
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
@@ -309,7 +309,7 @@ static int terment_finish(terment *ep) noex {
 	    rs = SR_OK ;
 	    if (ep->devpath) {
 		void *vp = voidp(ep->devpath) ;
-	        rs1 = libmem.free(vp) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->devpath = nullptr ;
 	    }
@@ -324,11 +324,10 @@ static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl) noex {
 /* end subroutine (mktermfname) */
 
 static int getatime(cchar *termdev,time_t *rp) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		f = true ;
 	*rp = 0 ;
-	if ((rs = u_stat(termdev,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(termdev,&sb)) >= 0) {
 	    *rp = sb.st_atime ;
 	    if ((sb.st_mode & S_IWGRP) != S_IWGRP) {
 	        f = false ;
