@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<lookaside.h>
 
 
@@ -145,7 +142,7 @@ struct vecobj : vecobj_head {
 	    audit	(this,vecobjmem_audit) ;
 	    finish	(this,vecobjmem_finish) ;
 	    va = nullptr ;
-	} ;
+	} ; /* end ctor */
 	vecobj(const vecobj &) = delete ;
 	vecobj &operator = (const vecobj &) = delete ;
 	int start(int,int = 0,int = 0) noex ;
@@ -175,34 +172,32 @@ EXTERNC_begin
 
 typedef int (*vecobj_vcf)(cvoid **,cvoid **) noex ;
 
-extern int vecobj_start(vecobj *,int,int,int) noex ;
-extern int vecobj_add(vecobj *,cvoid *) noex ;
-extern int vecobj_adduniq(vecobj *,cvoid *) noex ;
-extern int vecobj_store(vecobj *,cvoid *,void **) noex ;
-extern int vecobj_inorder(vecobj *,cvoid *,vecobj_vcf,int) noex ;
-extern int vecobj_del(vecobj *,int) noex ;
-extern int vecobj_delall(vecobj *) noex ;
-extern int vecobj_count(vecobj *) noex ;
-extern int vecobj_sort(vecobj *,vecobj_vcf) noex ;
-extern int vecobj_setsorted(vecobj *) noex ;
-extern int vecobj_find(vecobj *,cvoid *) noex ;
-extern int vecobj_curbegin(vecobj *,vecobj_cur *) noex ;
-extern int vecobj_curfetch(vecobj *,cvoid *,vecobj_cur *,
+extern int vecobj_start		(vecobj *,int,int,int) noex ;
+extern int vecobj_add		(vecobj *,cvoid *) noex ;
+extern int vecobj_adduniq	(vecobj *,cvoid *) noex ;
+extern int vecobj_store		(vecobj *,cvoid *,void **) noex ;
+extern int vecobj_inorder	(vecobj *,cvoid *,vecobj_vcf,int) noex ;
+extern int vecobj_del		(vecobj *,int) noex ;
+extern int vecobj_delall	(vecobj *) noex ;
+extern int vecobj_count		(vecobj *) noex ;
+extern int vecobj_sort		(vecobj *,vecobj_vcf) noex ;
+extern int vecobj_setsorted	(vecobj *) noex ;
+extern int vecobj_find		(vecobj *,cvoid *) noex ;
+extern int vecobj_curbegin	(vecobj *,vecobj_cur *) noex ;
+extern int vecobj_curfetch	(vecobj *,cvoid *,vecobj_cur *,
 		vecobj_vcf,void **) noex ;
-extern int vecobj_curend(vecobj *,vecobj_cur *) noex ;
-extern int vecobj_search(vecobj *,cvoid *,vecobj_vcf,void **) noex ;
-extern int vecobj_get(vecobj *,int,void **) noex ;
-extern int vecobj_getvec(vecobj *,void ***) noex ;
-extern int vecobj_audit(vecobj *) noex ;
-extern int vecobj_finish(vecobj *) noex ;
-extern int vecobj_addnew(vecobj *,void **) noex ;
+extern int vecobj_curend	(vecobj *,vecobj_cur *) noex ;
+extern int vecobj_search	(vecobj *,cvoid *,vecobj_vcf,void **) noex ;
+extern int vecobj_get		(vecobj *,int,void **) noex ;
+extern int vecobj_getvec	(vecobj *,void ***) noex ;
+extern int vecobj_audit		(vecobj *) noex ;
+extern int vecobj_finish	(vecobj *) noex ;
+extern int vecobj_addnew	(vecobj *,void **) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 extern const vecobjms	vecobjm ;
-
 #endif /* __cplusplus */
 
 
