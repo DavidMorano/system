@@ -67,10 +67,12 @@
 
 int strleadcmp(cchar *s1,cchar *s2) noex {
 	int		f = true ;
-	while (*s2) {
-	    f = (*s2++ == *s1++) ;
-	    if (! f) break ;
-	}
+	if (s1 && s2) {
+	    while (*s2) {
+	        f = (*s2++ == *s1++) ;
+	        if (! f) break ;
+	    } /* end while */
+	} /* end if (non-null) */
 	return f ;
 }
 /* end subroutine (strleadcmp) */
