@@ -1,6 +1,6 @@
 /* ucentpw SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UCENTPW object management */
 /* version %I% last-modified %G% */
@@ -27,12 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>
@@ -43,10 +43,13 @@
 #include	<cfdec.h>
 #include	<localmisc.h>
 
+#include	"ucgetpw.h"		/* |uc_getpw{x}(3uc)| */
 #include	"ucentpw.h"
 #include	"ucentxx.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -87,13 +90,13 @@ static int ucentpw_parsedefs(ucentpw *,SI *,int) noex ;
 int ucentpw::parse(char *pwbuf,int pwlen,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && pwbuf && sp) {
+	if (this && pwbuf && sp) ylikely {
 	    PASSWD *pep = this ;
 	    memclear(pep) ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) ylikely {
 	        int		fi = 0 ;
-	        for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
+	        for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) ylikely {
 	            rs = ucentpw_parseone(this,&si,fi++,sp,idx) ;
 	            sl -= (idx +1) ;
 	            sp += (idx +1) ;
@@ -102,11 +105,13 @@ int ucentpw::parse(char *pwbuf,int pwlen,cc *sp,int sl) noex {
 	        if ((rs >= 0) && sl && sp[0]) {
 	            rs = ucentpw_parseone(this,&si,fi++,sp,sl) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = ucentpw_parsedefs(this,&si,fi) ;
 		    fi = rs ;
 	        }
-	        if ((rs >= 0) && (fi < 6)) rs = SR_BADFMT ;
+	        if ((rs >= 0) && (fi < 6)) {
+		    rs = SR_BADFMT ;
+		}
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -118,10 +123,10 @@ int ucentpw::parse(char *pwbuf,int pwlen,cc *sp,int sl) noex {
 int ucentpw::load(char *pwbuf,int pwlen,const ucentpw *spwp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && pwbuf && spwp) {
+	if (this && pwbuf && spwp) ylikely {
 	    PASSWD *pep = this ;
 	    *pep = *spwp ;	/* <- copy over opaque values */
-	    if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(pwbuf,pwlen)) >= 0) ylikely {
 		{
 	            si_copystr(&si,&pw_name,spwp->pw_name) ;
 	            si_copystr(&si,&pw_passwd,spwp->pw_passwd) ;
@@ -140,13 +145,12 @@ int ucentpw::load(char *pwbuf,int pwlen,const ucentpw *spwp) noex {
 int ucentpw::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (this && rbuf) ylikely {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 7 ; i += 1) {
 	            if (i > 0) rs = b.chr(':') ;
 	            if (rs >= 0) {
-	                int		v ;
-	                switch (i) {
+	                switch (int v ; i) {
 	                case 0:
 	                    rs = b.str(pw_name) ;
 	                    break ;
@@ -184,7 +188,7 @@ int ucentpw::format(char *rbuf,int rlen) noex {
 
 int ucentpw::size() noex {
 	int		rs = SR_FAULT ;
-	if (this) {
+	if (this) ylikely {
 	    int		sz = 1 ;
 	    if (pw_name) {
 	        sz += (lenstr(pw_name)+1) ;
@@ -224,9 +228,8 @@ int ucentpw::getuid(char *pwbuf,int pwlen,uid_t uid) noex {
 
 static int ucentpw_parseone(ucentpw *pwp,SI *sip,int fi,cc *vp,int vl) noex {
 	int		rs = SR_OK ;
-	int		v = -1 ;
 	cchar		**vpp = nullptr ;
-	switch (fi) {
+	switch (int v = -1 ; fi) {
 	case 0:
 	    vpp = ccharpp(&pwp->pw_name) ;
 	    break ;
