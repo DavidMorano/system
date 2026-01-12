@@ -1,6 +1,6 @@
 /* ucentxx HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UCENT object management */
 /* version %I% last-modified %G% */
