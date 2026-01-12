@@ -29,10 +29,12 @@
 		char *strpbrk(cchar *s," \t\v\f\r\n")
 
 	Synopsis:
-	char *strwhite(cchar *s) noex
+	char *strwhite(cchar *sp,int sl) noex
+	char *strwhite(cchar *sp) noex
 
 	Arguments:
-	s		string to search in
+	sp		search-string pointer
+	sl		search-string length
 
 	Returns:
 	NULL		if no white space was found
@@ -43,16 +45,17 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strpbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<ascii.h>		/* |CH_{x}| */
+#include	<strn.h>		/* |strnbrk(3uc)| */
 #include	<mkchar.h>
+#include	<char.h>		/* |CHAR_{x}(3uc)| */
 #include	<localmisc.h>
 
-#include	"strx.h"
+#include	"strwhite.h"
 
 
 /* local defines */
@@ -60,6 +63,8 @@
 #ifndef	CF_STRBRK
 #define	CF_STRBRK	0		/* use |strbrk(3c)| */
 #endif
+
+#define	ISW(ch)		CHAR_ISWHITE(ch)
 
 
 /* external subroutines */
@@ -84,19 +89,24 @@ cbool		f_strbrk = CF_STRBRK ;
 
 /* exported subroutines */
 
-char *strwhite(cchar *s) noex {
+char *strwhite(cchar *sp,int sl) noex {
     	char		*rsp = nullptr ;
-	if (s) {
+	if (sp) {
 	    if_constexpr (f_strbrk) {
-		rsp = strpbrk(s," \t\v\f\r\n") ;
+		rsp = strnbrk(sp,sl," \t\v\f\r\n") ;
 	    } else {
-	        for (int ch ; ((ch = mkchar(*s))) ; s += 1) {
-		    if (char_iswhite(ch) || (ch == 'n')) break ;
+	        for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
+		    if (ISW(ch) || (ch == CH_NL)) break ;
 	        }
 	    } /* end if_constexpr (f_strbrk) */
-	    rsp = charp(s) ;
+	    rsp = charp(sp) ;
 	} /* end if (non-null) */
 	return rsp ;
+}
+/* end subroutine (strwhite) */
+
+char *strwhite(cchar *sp) noex {
+    	return strwhite(sp,-1) ;
 }
 /* end subroutine (strwhite) */
 
