@@ -48,13 +48,15 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<strx.h>		/* |strbrk(3u)| */
+#include	<usyscalls.h>		/* |strbrk(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"strxbrk.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
