@@ -38,14 +38,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<tmpx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
+
+#include	"tmpx.h"
 
 
 /* local defines */
@@ -80,7 +79,7 @@
 int tmpx_getboottime(tmpx *op,time_t *rp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	if (op && rp) {
 	    *rp = 0 ;
 	    if (tmpx_cur uc ; (rs = tmpx_curbegin(op,&uc)) >= 0) {
