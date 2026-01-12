@@ -57,7 +57,8 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
 #include	<snx.h>
 #include	<sncpyx.h>
