@@ -31,28 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= timestr.h
+INCS += timestr.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_TIMESTR= timestr_date.o timestr_elapsed.o
@@ -63,7 +48,23 @@ OBJA_TIMESTR= obj0_timestr.o obj1_timestr.o
 OBJ_TIMESTR= $(OBJA_TIMESTR)
 
 
-.SUFFIXES:		.hh .ii
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -77,6 +78,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -89,17 +93,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_TIMESTR)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_TIMESTR)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -111,17 +113,17 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_timestr.o:	$(OBJ0_TIMESTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_TIMESTR)
+obj0_timestr.o:		$(OBJ0_TIMESTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_timestr.o:	$(OBJ1_TIMESTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_TIMESTR)
+obj1_timestr.o:		$(OBJ1_TIMESTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_timestr.o:	$(OBJ2_TIMESTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_TIMESTR)
+obj2_timestr.o:		$(OBJ2_TIMESTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_timestr.o:	$(OBJ3_TIMESTR)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_TIMESTR)
+obj3_timestr.o:		$(OBJ3_TIMESTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 timestr_date.o:		timestr_date.cc		$(INCS)
