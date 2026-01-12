@@ -35,6 +35,7 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |qsort(3c)| */
+#include	<cstring>		/* |memcmp(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -168,10 +169,11 @@ int vecelem_addlist(vecelem *op,cvoid *listp,int listl) noex {
 	    rs = SR_INVALID ;
 	    if (listl >= 0) {
 		caddr_t	sp = caddr_t(listp) ;
+	        cint	esz = op->esz ;
 		rs = SR_OK ;
 	        for (int i = 0 ; i < listl ; i += 1) {
 	            rs = vecelem_add(op,sp) ;
-		    sp += op->esz ;
+		    sp += esz ;
 	            c += 1 ;
 	            if (rs < 0) break ;
 	        } /* end for */
@@ -183,13 +185,13 @@ int vecelem_addlist(vecelem *op,cvoid *listp,int listl) noex {
 int vecelem_adduniq(vecelem *op,cvoid *ep) noex {
 	int		rs ;
 	if ((rs = vecelem_magic(op,ep)) >= 0) ylikely {
-	    cint	esz = op->esz ;
+	    caddr_t	vp = caddr_t(op->va) ;
+	    csize	esize = size_t(op->esz) ;
 	    int	i{} ; /* used-afterwards */
 	    rs = INT_MAX ;
 	    for (i = 0 ; i < op->i ; i += 1) {
-	        caddr_t vp = caddr_t(op->va) ;
-	        vp += (i * esz) ;
-	        if (memcmp(vp,ep,esz) == 0) break ;
+	        if (memcmp(vp,ep,esize) == 0) break ;
+	        vp += esize ;
 	    } /* end for */
 	    if (i >= op->i) {
 	        rs = vecelem_add(op,ep) ;
