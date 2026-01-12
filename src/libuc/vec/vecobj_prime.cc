@@ -898,7 +898,6 @@ vecobj_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (vecobj_co::operator) */
+} /* end method (vecobj_co::operator) */
 
 
