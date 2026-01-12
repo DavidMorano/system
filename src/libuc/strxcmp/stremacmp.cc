@@ -68,7 +68,7 @@
 
 /* forward references */
 
-static int	stremacmp_main(cchar *,cchar *) noex ;
+static int	stremacmp_sub(cchar *,cchar *) noex ;
 
 
 /* local variables */
@@ -84,7 +84,7 @@ int stremacmp(cchar *e1p,cchar *e2p) noex {
 	if (e1p || e2p ) {
 	    if (e1p) {
 		if (e1p) {
-		    rc = stremacmp_main(e1p,e2p) ;
+		    rc = stremacmp_sub(e1p,e2p) ;
 		} else {
 		    rc = -1 ;
 		}
@@ -99,7 +99,7 @@ int stremacmp(cchar *e1p,cchar *e2p) noex {
 
 /* local subroutines */
 
-static int stremacmp_main(cchar *e1p,cchar *e2p) noex {
+static int stremacmp_sub(cchar *e1p,cchar *e2p) noex {
 	int		rc = 0 ;
 	cchar		*t1p = strchr(e1p,CH_AT) ;
 	cchar		*t2p = strchr(e2p,CH_AT) ;
@@ -114,6 +114,6 @@ static int stremacmp_main(cchar *e1p,cchar *e2p) noex {
 	}
 	return rc ;
 }
-/* end subroutine (stremacmp_main) */
+/* end subroutine (stremacmp_sub) */
 
 
