@@ -1,4 +1,5 @@
 /* b_varadm SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to return load averages */
@@ -76,24 +77,25 @@
 #include	<sys/loadavg.h>
 #include	<sys/statvfs.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<climits>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctype.h>
 #include	<utmpx.h>
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<climits>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<getsysmisc.h>
+#include	<estrings.h>
 #include	<sigman.h>
 #include	<baops.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<tmpx.h>
 #include	<kinfo.h>
-#include	<getsysmisc.h>
 #include	<field.h>
 #include	<ctdec.h>
 #include	<exitcodes.h>
@@ -119,7 +121,6 @@
 
 /* external subroutines */
 
-extern int	snfsflags(char *,int,ulong) ;
 extern int	snwcpy(char *,int,const char *,int) ;
 extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
@@ -1524,11 +1525,12 @@ const char	req[] ;
 			rs = ctdecul(cvtbuf,CVTBUFLEN,fi.f_fsid) ;
 			break ;
 		    case qopt_fsflags:
-			rs = snfsflags(cvtbuf,CVTBUFLEN,fi.f_flag) ;
+			rs = snflagsfs(cvtbuf,CVTBUFLEN,fi.f_flag) ;
 			break ;
 		    } /* end switch */
-		    if (v >= 0)
+		    if (v >= 0) {
 	                rs = bufprintf(cvtbuf,CVTBUFLEN,"%llu",v) ;
+		    }
 		}
 	    }
 	    break ;
