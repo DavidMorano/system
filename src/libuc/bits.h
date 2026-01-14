@@ -39,7 +39,7 @@ struct bits_head {
 	int		n ;		/* bits addressed */
 	int		nbits ;		/* allocated */
 	int		nwords ;	/* allocated */
-} ;
+} ; /* end struct (bits_head) */
 
 #ifdef	__cplusplus
 
@@ -82,16 +82,16 @@ struct bits : bits_head {
 	bits_co		extent ;
 	bits_co		count ;
 	bits() noex {
-	    start(this,bitsmem_start) ;
-	    finish(this,bitsmem_finish) ;
-	    set(this,bitsmem_set) ;
-	    clear(this,bitsmem_clear) ;
-	    test(this,bitsmem_test) ;
-	    anyset(this,bitsmem_anyset) ;
-	    ffbs(this,bitsmem_ffbs) ;
-	    extent(this,bitsmem_extent) ;
-	    count(this,bitsmem_count) ;
-	} ;
+	    start	(this,bitsmem_start) ;
+	    finish	(this,bitsmem_finish) ;
+	    set		(this,bitsmem_set) ;
+	    clear	(this,bitsmem_clear) ;
+	    test	(this,bitsmem_test) ;
+	    anyset	(this,bitsmem_anyset) ;
+	    ffbs	(this,bitsmem_ffbs) ;
+	    extent	(this,bitsmem_extent) ;
+	    count	(this,bitsmem_count) ;
+	} ; /* end ctor */
 	operator int () noex {
 	    return count ;
 	} ;
