@@ -46,7 +46,7 @@
 #include	<fcntl.h>
 #include	<unistd.h>
 #include	<cstdlib>
-#include	<time.h>
+#include	<ctime>
 #include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
@@ -158,7 +158,7 @@ BUILTIN		*bip ;
 
 /* pop off the service name */
 
-	if ((len = uc_readlinetimed(ifd,srvspec,BUFLEN,SRVTO)) <= 1) {
+	if ((len = uc_readlnto(ifd,srvspec,BUFLEN,SRVTO)) <= 1) {
 
 	    logfile_printf(&gp->lh,"no service\n") ;
 
