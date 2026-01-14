@@ -37,13 +37,13 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-uint		bitrotate(uint v,int n) noex {
+inline uint		bitrotate(uint v,int n) noex {
     	return bitrotateui(v,n) ;
 }
-ulong		bitrotate(ulong v,int n) noex {
+inline ulong		bitrotate(ulong v,int n) noex {
     	return bitrotateul(v,n) ;
 }
-ulonglong	bitrotate(ulonglong v,int n) noex {
+inline ulonglong	bitrotate(ulonglong v,int n) noex {
     	return bitrotateull(v,n) ;
 }
 
