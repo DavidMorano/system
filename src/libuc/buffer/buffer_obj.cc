@@ -57,10 +57,7 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<stdintx.h>
 #include	<format.h>
@@ -90,7 +87,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -149,7 +145,7 @@ int buffer::vprintf(cchar *fmt,va_list ap) noex {
 int buffer::printf(cchar *fmt,...) noex {
     	va_list		ap ;
 	int		rs = SR_FAULT ;
-	if (fmt) {
+	if (fmt) ylikely {
 	    va_begin(ap,fmt) ;
 	    rs = buffer_vprintf(this,fmt,ap) ;
 	    va_end(ap) ;
