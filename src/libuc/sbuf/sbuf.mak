@@ -31,20 +31,30 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= sbuf.h
+INCS += sbuf.h
 
-LIBS=
+MODS +=
+
+LIBS +=
+
+
+OBJ0_SBUF= sbuf_prime.o sbuf_addquoted.o
+OBJ1_SBUF= sbuf_termconseq.o sbuf_hexp.o
+OBJ2_SBUF=
+OBJ3_SBUF=
+
+OBJA_SBUF= obj0_sbuf.o obj1_sbuf.o
+
+OBJ_SBUF= $(OBJA_SBUF)
 
 
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,15 +65,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_SBUF= sbuf_main.o sbuf_addquoted.o
-OBJ1_SBUF= sbuf_termconseq.o sbuf_hexp.o
-
-OBJA_SBUF= obj0_sbuf.o obj1_sbuf.o
-
-OBJ_SBUF= $(OBJA_SBUF)
-
-
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -77,6 +79,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -89,17 +94,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_SBUF)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SBUF)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_SBUF)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -112,13 +115,19 @@ control:
 
 
 obj0_sbuf.o:	$(OBJ0_SBUF)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SBUF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_sbuf.o:	$(OBJ1_SBUF)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SBUF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj2_sbuf.o:	$(OBJ2_SBUF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3_sbuf.o:	$(OBJ3_SBUF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-sbuf_main.o:		sbuf_main.cc		$(INCS)
+sbuf_prime.o:		sbuf_prime.cc		$(INCS)
 sbuf_addquoted.o:	sbuf_addquoted.cc	$(INCS)
 sbuf_termconseq.o:	sbuf_termconseq.cc	$(INCS)
 sbuf_hexp.o:		sbuf_hexp.cc		$(INCS)
