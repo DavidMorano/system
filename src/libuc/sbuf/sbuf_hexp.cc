@@ -39,12 +39,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdint>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
-#include	<mkquoted.h>
+#include	<cstdint>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<cthex.h>
 #include	<localmisc.h>
 
@@ -55,6 +54,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -93,10 +95,10 @@ int sbuf_hexp(sbuf *op,uint64_t v,int n) noex {
 	        rs = SR_INVALID ;
 	        break ;
 	    } /* end switch */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        cchar	*dp = dbuf ;
-	        if (n == 6) dp += ((8-n)*2) ;
-	        rs = op->strw(dp,(n*2)) ;
+	        if (n == 6) dp += ((8 - n) * 2) ;
+	        rs = op->strw(dp,(n * 2)) ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
