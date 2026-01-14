@@ -43,10 +43,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ascii.h>
@@ -101,7 +98,7 @@ int buffer_strquote(buffer *op,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	    if (strnbrk(sp,sl," \t\r\n\v\f\b\"\\") != np) {
 	        cint	sz = ((2 * sl) + 3) ;
 	        if (char *ap ; (rs = libmem.mall(sz,&ap)) >= 0) {
