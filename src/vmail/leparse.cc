@@ -19,7 +19,7 @@
 #include	<unistd.h>
 #include	<csignal>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 
 #include	<bfile.h>
 
