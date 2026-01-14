@@ -42,8 +42,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<sfx.h>
 #include	<localmisc.h>
@@ -52,7 +52,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;			/* |gelenstr(3u)| */
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -84,7 +84,7 @@ extern "C" {
 int buffer_strcompact(buffer *op,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
-	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	    int		c = 0 ;
 	    cchar	*cp{} ;
 	    rs = SR_OK ;
