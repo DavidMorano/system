@@ -35,16 +35,27 @@ DEFS +=
 
 INCS += buffer.h
 
+MODS +=
+
 LIBS +=
+
+
+OBJ0_BUFFER= buffer_prime.o buffer_obj.o
+OBJ1_BUFFER= buffer_chrs.o
+OBJ2_BUFFER= buffer_strquote.o
+OBJ3_BUFFER= buffer_strcompact.o buffer_stropaque.o
+
+OBJA_BUFFER= obj0_buffer.o obj1_buffer.o
+OBJB_BUFFER= obj2_buffer.o obj3_buffer.o
+
+OBJ_BUFFER= obja.o objb.o
 
 
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,20 +66,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_BUFFER= buffer_main.o buffer_obj.o
-OBJ1_BUFFER= buffer_chrs.o
-OBJ2_BUFFER= buffer_strquote.o
-OBJ3_BUFFER= buffer_strcompact.o buffer_stropaque.o
-
-
-OBJA_BUFFER= obj0_buffer.o obj1_buffer.o
-OBJB_BUFFER= obj2_buffer.o obj3_buffer.o
-
-
-OBJ_BUFFER= obja.o objb.o
-
-
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -82,6 +80,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -94,17 +95,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_BUFFER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_BUFFER)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_BUFFER)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -117,26 +116,26 @@ control:
 
 
 obj0_buffer.o:		$(OBJ0_BUFFER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_BUFFER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_buffer.o:		$(OBJ1_BUFFER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_BUFFER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_buffer.o:		$(OBJ2_BUFFER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_BUFFER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_buffer.o:		$(OBJ3_BUFFER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_BUFFER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA_BUFFER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_BUFFER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB_BUFFER)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_BUFFER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-buffer_main.o:		buffer_main.cc		$(INCS)
+buffer_prime.o:		buffer_prime.cc		$(INCS)
 buffer_obj.o:		buffer_obj.cc		$(INCS)
 buffer_chrs.o:		buffer_chrs.cc		$(INCS)
 buffer_strcompact.o:	buffer_strcompact.cc	$(INCS)
