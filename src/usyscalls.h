@@ -23,27 +23,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/utsname.h>
-#include	<sys/uio.h>
-#include	<sys/time.h>		/* |u_adjtime(2u)| */
-#include	<sys/resource.h>
-#include	<sys/stat.h>
-#include	<sys/statvfs.h>
-#include	<sys/socket.h>
-
-#include	<poll.h>
-#include	<signal.h>
-#include	<limits.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<utime.h>		/* for old UNIX® |u_utime(2)| */
-#include	<pthread.h>
-#include	<termios.h>
-#include	<time.h>
-#include	<errno.h>
-#include	<dirent.h>
+#include	<usysnative.h>
 
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -62,9 +42,12 @@
 #include	<usysutility.hh>
 #include	<usysauxinfo.h>
 #include	<usysdata.h>
+#include	<usysconf.h>
 
 #include	<ustd.h>	/* <- converted system calls */
 
+#include	<uatexit.h>
+#include	<ucomposite.h>
 #include	<ugetloadavg.h>	/* load-average retrieval |u_getloadavg| */
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
@@ -76,12 +59,12 @@
 #include	<uprocess.h>
 #include	<uatfork.h>
 #include	<uexec.h>
+#include	<ulogerror.h>
+#include	<umem.hh>
 #include	<utimeoutdefs.h>
 #include	<utimeout.h>
 #include	<utimeouts.h>
-#include	<ulogerror.h>
-#include	<umem.hh>
-#include	<ucomposite.h>
+#include	<uxti.h>
 
 #include	<varnames.hh>
 #include	<syswords.hh>
@@ -97,7 +80,6 @@
 #include	<itimerval.h>
 #include	<itimerspec.h>
 #include	<stdfnames.h>
-
 #include	<xxtostr.h>
 #include	<strtox.h>
 #include	<baops.h>
