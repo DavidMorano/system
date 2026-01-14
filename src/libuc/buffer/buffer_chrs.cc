@@ -44,17 +44,16 @@
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<ascii.h>
 #include	<localmisc.h>
 
 #include	"buffer.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 import uconstants ;
 
 /* local defines */
@@ -99,25 +98,31 @@ static blanker		bo ;		/* "blank" object */
 /* exported subroutines */
 
 int buffer_chrs(buffer *op,int ch,int n) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	while ((rs >= 0) && (n-- > 0)) {
-	    rs = buffer_chr(op,ch) ;
-	    len += rs ;
-	} /* end while */
+	if (op) ylikely {
+	    rs = SR_OK ;
+	    while ((rs >= 0) && (n-- > 0)) {
+	        rs = buffer_chr(op,ch) ;
+	        len += rs ;
+	    } /* end while */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (buffer_chrs) */
 
 int buffer_blanks(buffer *op,int n) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	while ((rs >= 0) && (n > 0)) {
-	    cint	m = min(n,bo.l) ;
-	    rs = buffer_strw(op,bo.p,m) ;
-	    n -= m ;
-	    len += rs ;
-	} /* end while */
+	if (op) ylikely {
+	    rs = SR_OK ;
+	    while ((rs >= 0) && (n > 0)) {
+	        cint	m = min(n,bo.l) ;
+	        rs = buffer_strw(op,bo.p,m) ;
+	        n -= m ;
+	        len += rs ;
+	    } /* end while */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (buffer_blanks) */
