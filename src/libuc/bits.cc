@@ -95,11 +95,11 @@ namespace {
 
 /* forward references */
 
-static inline void	bits_naclear(bits *) noex ;
-static int		bits_alloc(bits *,int) noex ;
+local inline void	bits_naclear(bits *) noex ;
+local int		bits_alloc(bits *,int) noex ;
 
-static int		nsizecalc(int,int) noex ;
-static int		ffbsarr(digit *,int) noex ;
+local int		nsizecalc(int,int) noex ;
+local int		ffbsarr(digit *,int) noex ;
 
 
 /* local variables */
@@ -302,7 +302,7 @@ static void bits_naclear(bits *op) noex {
 }
 /* end subroutine (bits_naclear) */
 
-static int bits_alloc(bits *op,int nn) noex {
+local int bits_alloc(bits *op,int nn) noex {
 	cint		bpw = BITS_BPW ;
 	cint		asz = ((op->nwords - nawords) * dsz) ;
 	int		rs = SR_OK ;
@@ -387,12 +387,12 @@ int alloc::resize(int nsz) noex {
 		asz = nsz ;
 		rsize = nsz ;
 	    } /* end if (ok) */
-	} /* end if (allocation or reallocation needed) */
+	} /* end if (allocation or re-allocation needed) */
 	return (rs >= 0) ? rsize : rs ;
 }
 /* end method (alloc::resize) */
 
-static int nsizecalc(int obits,int nbits) noex {
+local int nsizecalc(int obits,int nbits) noex {
 	int		nw = iceil((nbits - obits),BITS_BPW) ;
 	int		nsz = 0 ;
 	if (nw > nawords) {
@@ -404,7 +404,7 @@ static int nsizecalc(int obits,int nbits) noex {
 }
 /* end subroutine (nsizecalc) */
 
-static int ffbsarr(digit *a,int an) noex {
+local int ffbsarr(digit *a,int an) noex {
 	int		rs = SR_NOTFOUND ;
 	int		w = 0 ;
 	while ((w < an) && (a[w] == 0)) {
