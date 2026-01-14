@@ -64,20 +64,24 @@ module ;
 #include	<utility>		/* |unreachable()| + |pair(3c++)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<unordered_set>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
+
+#pragma		GCC dependency		"mod/addrset.ccm"
+
+module addrset ;
 
 /* local defines */
 
 #define	ADDRSET_MAGIC	0x65821293
-
-module addrset ;
 
 /* code comments */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::unordered_set ;		/* type */
 using std::pair ;			/* type */
 using std::nothrow ;			/* constant */
