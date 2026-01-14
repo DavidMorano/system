@@ -44,7 +44,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<termconseq.h>
 #include	<localmisc.h>
 
@@ -91,10 +92,11 @@ int sbuf_termconseq(sbuf *op,int name,cchar *is,int na,...) noex {
 	if (op) ylikely {
 	    rs = SR_INVALID ;
 	    if (name > 0) ylikely {
+		cauto tc = termconseqva ;
 	        cint	tlen = TERMCONSEQLEN ;
 	        char	tbuf[TERMCONSEQLEN + 1] ;
 		va_begin(ap,na) ;
-	        if ((rs = termconseqva(tbuf,tlen,name,is,na,ap)) >= 0) {
+	        if ((rs = tc(tbuf,tlen,name,is,na,ap)) >= 0) ylikely {
 	            tl = rs ;
 	            rs = sbuf_strw(op,tbuf,tl) ;
 	        }
