@@ -41,13 +41,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<mkquoted.h>
 #include	<localmisc.h>
 
 #include	"sbuf.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -63,32 +67,28 @@ import libutil ;
 
 /* local variables */
 
-constexpr cauto		mall = lm_mall ;
-constexpr cauto		mfre = lm_free ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int sbuf_addquoted(sbuf *sbp,cchar *sp,int sl) noex {
+int sbuf_addquoted(sbuf *sbp,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
 	if (sbp && sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	        cint	qlen = ((sl * 2) + 3) ;
-	        if (char *qbuf ; (rs = mall((qlen+1),&qbuf)) >= 0) {
-	            if ((rs = mkquoted(qbuf,qlen,sp,sl)) >= 0) {
+	        if (char *qbuf ; (rs = lm_mall((qlen+1),&qbuf)) >= 0) ylikely {
+	            if ((rs = mkquoted(qbuf,qlen,sp,sl)) >= 0) ylikely {
 	                len = rs ;
 	                rs = sbuf_strw(sbp,qbuf,len) ;
 	            }
-	            rs1 = mfre(qbuf) ;
+	            rs1 = lm_free(qbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (allocation) */
-	    } /* end block */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
