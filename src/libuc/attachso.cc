@@ -52,8 +52,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<storebuf.h>
 #include	<mkx.h>
 #include	<ids.h>
@@ -64,7 +66,9 @@
 
 #include	"attachso.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -263,7 +267,7 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	int		rs ;
 	int		rs1 = SR_NOTFOUND ;
 	int		f = false ;
-	if (char *sofname ; (rs = malloc_mp(&sofname)) >= 0) ylikely {
+	if (char *sofname ; (rs = lm_mp(&sofname)) >= 0) ylikely {
 	    ustat	sb ;
 	    cint	soperm = (R_OK | X_OK) ;
 	    mainv	exts = sip->exts ;
@@ -306,7 +310,7 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	    } else {
 	        sip->sop = nullptr ;
 	    }
-	    rs1 = uc_free(sofname) ;
+	    rs1 = lm_free(sofname) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f : rs ;
