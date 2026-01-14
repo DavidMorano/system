@@ -5,7 +5,6 @@
 /* fairly generic (PCS) front-end */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable print-outs */
 #define	CF_DEBUGMALL	1		/* switchable print-outs */
@@ -21,7 +20,6 @@
 #define	CF_DEFLOGSIZE	0		/* use a default log length */
 #define	CF_PROGMSGS	1		/* call 'progmsgs()' */
 #define	CF_LOCSETENT	0		/* |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -106,12 +104,16 @@
 #include	<whitelist.h>
 #include	<recip.h>
 #include	<permx.h>
+#include	<mkui.h>		/* |mkuiname(3dam)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
