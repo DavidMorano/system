@@ -1,18 +1,18 @@
-/* progstampcheck */
+/* progstampcheck SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
-
 
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-        This subroutine was borrowed and modified from previous generic
-        front-end 'main' subroutines!
+	This subroutine was borrowed and modified from previous
+	generic front-end 'main' subroutines!
 
 */
 
@@ -20,24 +20,21 @@
 
 /*******************************************************************************
 
+  	Description:
 	Check our own (program) time-stamp.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<localmisc.h>
@@ -53,34 +50,30 @@
 #define	GETFNAME_TYPEROOT	1	/* search programroot area first */
 #endif
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,char **) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	sfshrink(cchar *,int,char **) ;
 extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	getserial(const char *) ;
-extern int	getfname(const char *,const char *,int,char *) ;
+extern int	getserial(cchar *) ;
+extern int	getfname(cchar *,cchar *,int,char *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -111,7 +104,7 @@ struct proginfo	*pip ;
 	    return SR_FAULT ;
 
 	if (pip->stampfname[0] != '\0') {
-	    const char	*sf = pip->stampfname ;
+	    cchar	*sf = pip->stampfname ;
 	    ustat	sb ;
 	    pip->daytime = time(NULL) ;
 	    f_process = TRUE ;
@@ -141,18 +134,18 @@ struct proginfo	*pip ;
 {
 	bfile	tsfile, *tfp = &tsfile ;
 	int	rs ;
-	const char	*sf = pip->stampfname ;
+	cchar	*sf = pip->stampfname ;
 
 	if ((rs = bopen(tfp,sf,"wct",0666)) >= 0) {
-	    const int	elen = MAXNAMELEN ;
-	    const char	*nn = pip->nodename ;
-	    const char	*un = pip->username ;
+	    cint	elen = MAXNAMELEN ;
+	    cchar	*nn = pip->nodename ;
+	    cchar	*un = pip->username ;
 	    char	timebuf[TIMEBUFLEN+1] ;
 	    char	ebuf[MAXNAMELEN+1] ;
 
 	    if ((rs = sncpy3(ebuf,elen,nn,"!",un)) >= 0) {
-		const char	*name = pip->name ;
-		const char	*fmt = "%s %s\n" ;
+		cchar	*name = pip->name ;
+		cchar	*fmt = "%s %s\n" ;
 	        timestr_logz(pip->daytime,timebuf) ;
 		if ((name != NULL) && (name[0] != '\0'))
 	            fmt = "%s %s (%s)\n" ;
