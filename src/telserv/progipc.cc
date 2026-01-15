@@ -35,7 +35,7 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<sockaddress.h>
