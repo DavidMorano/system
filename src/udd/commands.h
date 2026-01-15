@@ -2,7 +2,7 @@
 
 /* define command option words */
 
-static char *commands[] = {
+static cchar	*commands[] = {
 	"getlen",
 	"gettime",
 	"settime",
@@ -12,8 +12,8 @@ static char *commands[] = {
 	"exit",
 	"getdir",
 	"noop",
-	    NULL,
-} ;
+	nullptr
+} ; /* end array */
 
 
 #define	CMD_GETLEN	0
@@ -25,6 +25,5 @@ static char *commands[] = {
 #define	CMD_EXIT	6
 #define	CMD_GETDIR	7
 #define	CMD_NOOP	8
-
 
 
