@@ -29,7 +29,7 @@
 #include	<unistd.h>
 #include	<cstring>
 #include	<dirent.h>
-#include	<time.h>
+#include	<ctime>
 
 #include	<bfile.h>
 
