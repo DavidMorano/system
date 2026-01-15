@@ -48,7 +48,7 @@
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<time.h>
+#include	<ctime>
 #include	<ftw.h>
 
 #include	<usystem.h>
