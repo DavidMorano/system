@@ -23,7 +23,7 @@
 #include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<csignal>
