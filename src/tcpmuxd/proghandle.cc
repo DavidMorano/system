@@ -178,7 +178,7 @@ CLIENTINFO	*cip ;
 
 	if (ofd < 0) return SR_INVALID ;
 
-	if ((rs = uc_readlinetimed(ifd,svcbuf,svclen,to)) >= 0) {
+	if ((rs = uc_readlnto(ifd,svcbuf,svclen,to)) >= 0) {
 	    len = rs ;
 
 	    if ((len > 0) && ISEOL(svcbuf[len - 1])) len -= 1 ;
@@ -230,7 +230,7 @@ CLIENTINFO	*cip ;
 	    if (pip->open.logprog)
 	        proglog_flush(pip) ;
 
-	} /* end if (uc_readlinetimed) */
+	} /* end if (uc_readlnto) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
