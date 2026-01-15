@@ -1,8 +1,9 @@
-/* main */
+/* main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
@@ -19,12 +20,11 @@
 #define	CF_PROCENVSYS	1		/* call 'procenvsys()' */
 #define	CF_SYSVARENUM	1		/* enumerate sys-vars */
 
-
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-	This subroutine was borrowed and modified from previous generic
-	front-end 'main' subroutines!
+	This subroutine was borrowed and modified from previous
+	generic front-end 'main' subroutines!
 
 */
 
@@ -32,6 +32,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine is the front-end for several a super-server
 	programs.  These server programs have widely differing
 	functions, but they start by initializing in similar ways.
@@ -42,20 +43,24 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/systeminfo.h>
 #include	<sys/stat.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<grp.h>
 #include	<netdb.h>
-#include	<usystem.h>
-#include	<getsystypenum.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<usyscalls.h>
+#include	<gethz.h>
 #include	<getax.h>
+#include	<getsystypenum.h>
+#include	<userinfo.h>
 #include	<sigblocker.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -63,11 +68,12 @@
 #include	<nulstr.h>
 #include	<bfile.h>
 #include	<ids.h>
-#include	<userinfo.h>
 #include	<logfile.h>
 #include	<expcook.h>
 #include	<varsub.h>
 #include	<storebuf.h>
+#include	<snx.h>			/* |snabbrname(3uc)| */
+#include	<mkui.h>		/* |mkuiname(3dam)| */
 #include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -97,14 +103,6 @@
 #define	ARCHBUFLEN	80
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 #ifndef	DEFNXENVS
 #define	DEFNXENVS	40
 #endif
@@ -115,96 +113,51 @@
 
 /* external subroutines */
 
-extern int	snabbr(char *,int,const char *,int) ;
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecl(const char *,int,long *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	ctdecl(char *,int,long) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	gethz(int) ;
-extern int	getarchitecture(char *,int) ;
-extern int	getnprocessors(const char **,int) ;
-extern int	getproviderid(const char *,int) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	getserial(const char *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	isasocket(int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	opendefstds(int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,const char *) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
+extern int	proginfo_rootname(proginfo *) ;
+extern int	proginfo_setpiv(proginfo *,cchar *,const pivars *) ;
+extern int	proginfo_nameidbegin(proginfo *) ;
+extern int	proginfo_nameidend(proginfo *) ;
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	proginfo_rootname(PROGINFO *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	proginfo_nameidbegin(PROGINFO *) ;
-extern int	proginfo_nameidend(PROGINFO *) ;
+extern int	progpidbegin(proginfo *,int) ;
+extern int	progpidcheck(proginfo *) ;
+extern int	progpidend(proginfo *) ;
 
-extern int	progpidbegin(PROGINFO *,int) ;
-extern int	progpidcheck(PROGINFO *) ;
-extern int	progpidend(PROGINFO *) ;
+extern int	progstampcheck(proginfo *) ;
+extern int	progpcsconf(proginfo *) ;
+extern int	progcmd(proginfo *,ARGINFO *) ;
+extern int	progpass(proginfo *,ARGINFO *) ;
+extern int	progprocess(proginfo *,ARGINFO *,USERINFO *) ;
 
-extern int	progstampcheck(PROGINFO *) ;
-extern int	progpcsconf(PROGINFO *) ;
-extern int	progcmd(PROGINFO *,ARGINFO *) ;
-extern int	progpass(PROGINFO *,ARGINFO *) ;
-extern int	progprocess(PROGINFO *,ARGINFO *,USERINFO *) ;
+extern int	progconfigstart(proginfo *,cchar **,cchar *) ;
+extern int	progconfigread(proginfo *) ;
+extern int	progconfigcheck(proginfo *) ;
+extern int	progconfigfinish(proginfo *) ;
 
-extern int	progconfigstart(PROGINFO *,const char **,const char *) ;
-extern int	progconfigread(PROGINFO *) ;
-extern int	progconfigcheck(PROGINFO *) ;
-extern int	progconfigfinish(PROGINFO *) ;
+extern int	proguserlist_begin(proginfo *) ;
+extern int	proguserlist_end(proginfo *) ;
 
-extern int	proguserlist_begin(PROGINFO *) ;
-extern int	proguserlist_end(PROGINFO *) ;
+extern int	defproc(vecstr *,cchar **,expcook *,cchar *) ;
 
-extern int	defproc(vecstr *,const char **,EXPCOOK *,const char *) ;
+extern int	envs_procxe(ENVS *,expcook *,cchar **,VECSTR *,cchar *) ;
+extern int	envs_subs(ENVS *,expcook *,VECSTR *,VECSTR *) ;
 
-extern int	envs_procxe(ENVS *,EXPCOOK *,cchar **,VECSTR *,cchar *) ;
-extern int	envs_subs(ENVS *,EXPCOOK *,VECSTR *,VECSTR *) ;
-
-extern int	securefile(const char *,uid_t,gid_t) ;
-extern int	hasalldig(const char *,int) ;
+extern int	securefile(cchar *,uid_t,gid_t) ;
+extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	strnnlen(const char *,int,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strnnlen(cchar *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -218,44 +171,44 @@ extern char	**environ ;
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+static int	usage(proginfo *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(proginfo *,keyopt *) ;
 
-static int	procschedbegin(PROGINFO *) ;
-static int	procschedend(PROGINFO *) ;
+static int	procschedbegin(proginfo *) ;
+static int	procschedend(proginfo *) ;
 
-static int	loadschedvars(PROGINFO *) ;
-static int	loadgroupname(PROGINFO *) ;
-static int	loadplatform(PROGINFO *) ;
-static int	loadarchitecture(PROGINFO *) ;
-static int	loadhz(PROGINFO *) ;
-static int	loadncpu(PROGINFO *) ;
-static int	loadorg(PROGINFO *) ;
-static int	loadprovider(PROGINFO *) ;
-static int	loadcooks(PROGINFO *) ;
+static int	loadschedvars(proginfo *) ;
+static int	loadgroupname(proginfo *) ;
+static int	loadplatform(proginfo *) ;
+static int	loadarchitecture(proginfo *) ;
+static int	loadhz(proginfo *) ;
+static int	loadncpu(proginfo *) ;
+static int	loadorg(proginfo *) ;
+static int	loadprovider(proginfo *) ;
+static int	loadcooks(proginfo *) ;
 
-static int	loaddefs(PROGINFO *,cchar *,cchar **,cchar **) ;
-static int	loaddefsfile(PROGINFO *,cchar *) ;
-static int	loaddefsfind(PROGINFO *,cchar **) ;
-static int	loadxfile(PROGINFO *,cchar *) ;
-static int	loadxsched(PROGINFO *,cchar **) ;
-static int	loadpvars(PROGINFO *,cchar **,cchar *) ;
-static int	loadpvarsdef(PROGINFO *,cchar **) ;
-static int	loadsysinfo(PROGINFO *) ;
+static int	loaddefs(proginfo *,cchar *,cchar **,cchar **) ;
+static int	loaddefsfile(proginfo *,cchar *) ;
+static int	loaddefsfind(proginfo *,cchar **) ;
+static int	loadxfile(proginfo *,cchar *) ;
+static int	loadxsched(proginfo *,cchar **) ;
+static int	loadpvars(proginfo *,cchar **,cchar *) ;
+static int	loadpvarsdef(proginfo *,cchar **) ;
+static int	loadsysinfo(proginfo *) ;
 
-static int	procenvextra(PROGINFO *) ;
-static int	procenvdef(PROGINFO *) ;
-static int	procenvsysvar(PROGINFO *,const char *) ;
-static int	procenvsort(PROGINFO *) ;
+static int	procenvextra(proginfo *) ;
+static int	procenvdef(proginfo *) ;
+static int	procenvsysvar(proginfo *,cchar *) ;
+static int	procenvsort(proginfo *) ;
 
-static int	pvarsbegin(PROGINFO *,const char **,const char *) ;
-static int	pvarsend(PROGINFO *) ;
+static int	pvarsbegin(proginfo *,cchar **,cchar *) ;
+static int	pvarsend(proginfo *) ;
 
-static int	isenvok(const char **,const char *,int) ;
+static int	isenvok(cchar **,cchar *,int) ;
 
 #if	CF_DEBUG && CF_DEBUGCOOKS
-static int	debugcooks(PROGINFO *,const char *) ;
+static int	debugcooks(proginfo *,cchar *) ;
 #endif
 
 
@@ -282,7 +235,7 @@ static cchar	*argopts[] = {
 	"log",
 	"cmd",
 	"caf",
-	NULL
+	nullptr
 } ;
 
 enum argopts {
@@ -345,7 +298,7 @@ static cchar	*akonames[] = {
 	"uniq",
 	"quiet",
 	"tmptype",
-	NULL
+	nullptr
 } ;
 
 enum akonames {
@@ -393,7 +346,7 @@ static cchar	*cooks[] = {
 	"OO",		/* organization w/ hyphens */
 	"OC",		/* org-code */
 	"V",		/* program version */
-	NULL
+	nullptr
 } ;
 
 enum cooks {
@@ -433,7 +386,7 @@ static cchar	*schedpconf[] = {
 	"%p/etc/%n/%n.%f",
 	"%p/etc/%n/%f",
 	"%p/etc/%n.%f",
-	NULL
+	nullptr
 } ;
 
 static cchar	*schedpfile[] = {
@@ -442,7 +395,7 @@ static cchar	*schedpfile[] = {
 	"%p/etc/%n.%f",
 	"%p/etc/%f",
 	"%p/%n.%f",
-	NULL
+	nullptr
 } ;
 
 static cchar	*schedhfile[] = {
@@ -451,7 +404,7 @@ static cchar	*schedhfile[] = {
 	"%h/etc/%n.%f",
 	"%h/etc/%f",
 	"%h/%n.%f",
-	NULL
+	nullptr
 } ;
 
 static cchar	*pathvars[] = {
@@ -464,7 +417,7 @@ static cchar	*pathvars[] = {
 	"XUSERFILESEARCHPATH",
 	"MAILDIR",
 	"MAILDIRS",
-	NULL
+	nullptr
 } ;
 
 static cchar	*envbads[] = {
@@ -474,7 +427,7 @@ static cchar	*envbads[] = {
 	"A__z",
 	"RANDOM",
 	"TMOUT",
-	NULL
+	nullptr
 } ;
 
 static cchar	*envdefs[] = {
@@ -490,7 +443,7 @@ static cchar	*envdefs[] = {
 	"USERNAME",
 	"GROUPNAME",
 	"DOMAIN",
-	NULL
+	nullptr
 } ;
 
 enum envdefs {
@@ -502,7 +455,7 @@ enum envdefs {
 static cchar	*tmptypes[] = {
 	"system",
 	"user",
-	NULL
+	nullptr
 } ;
 
 
@@ -511,9 +464,9 @@ static cchar	*tmptypes[] = {
 
 int main(int argc,cchar *argv[],cchar *envv[])
 {
-	PROGINFO	pi, *pip = &pi ;
+	proginfo	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	USERINFO	u ;
 	bfile		errfile ;
 
@@ -535,16 +488,16 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	uint		mo_start = 0 ;
 #endif
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*dfname = NULL ;
-	const char	*xfname = NULL ;
-	const char	*pvfname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*dfname = nullptr ;
+	cchar	*xfname = nullptr ;
+	cchar	*pvfname = nullptr ;
+	cchar	*cp ;
 
 	char		buf[BUFLEN + 2] ;
 	char		tmpfname[MAXPATHLEN + 2] ;
@@ -559,7 +512,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	{
 	    uint	a ;
 	    int		ps = getpagesize() ;
-	    for (i = 0 ; envv[i] != NULL ; i += 1) {
+	    for (i = 0 ; envv[i] != nullptr ; i += 1) {
 	        a = (uint) envv[i] ;
 	        if (a < (2 * ps)) {
 		    envv[i] = "*DELETED*=" ;
@@ -571,7 +524,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	opendefstds(3) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -584,7 +537,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	cp = argv[0] ;
 #if	CF_FIXARGZ
-	if (cp != NULL) {
+	if (cp != nullptr) {
 	    uint	uch = cp[0] && 0xff ;
 	    if (uch >= 128) cp = SEARCHNAME ;
 	}
@@ -598,7 +551,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    goto badprogstart ;
 	}
 
-	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
@@ -611,7 +564,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	pip->maxjobs = MAXJOBS ;
 	pip->fd_pass = -1 ;
 	pip->gid_rootname = -1 ;
-	pip->daytime = time(NULL) ;
+	pip->daytime = time(nullptr) ;
 	pip->hostid = (uint) gethostid() ;
 
 	pip->fl.defsvc = TRUE ;
@@ -642,7 +595,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -653,7 +606,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -670,14 +623,14 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -799,7 +752,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        } else
 	                            rs = SR_INVALID ;
 	                    } /* end if */
-	                    if ((rs >= 0) && (cp != NULL)) {
+	                    if ((rs >= 0) && (cp != nullptr)) {
 	                        pip->have.lfname = TRUE ;
 	                        pip->final.lfname = TRUE ;
 	                        pip->fl.lfname = TRUE ;
@@ -944,7 +897,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-	                            KEYOPT	*kop = &pip->cmds ;
+	                            keyopt	*kop = &pip->cmds ;
 	                            pip->fl.cmd = TRUE ;
 	                            rs = keyopt_loads(kop,argp,argl) ;
 	                        }
@@ -967,7 +920,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1084,7 +1037,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 
 	                            }
@@ -1168,8 +1121,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getenv(VAREFNAME) ;
-	if (efname == NULL) efname = BFILE_STDERR ;
+	if (efname == nullptr) efname = getenv(VAREFNAME) ;
+	if (efname == nullptr) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -1221,7 +1174,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* help */
 
 	if (f_help)
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	if (f_version || f_help || f_usage)
 	    goto retearly ;
@@ -1231,7 +1184,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* go */
 
-	if (afname == NULL) afname = getenv(VARAFNAME) ;
+	if (afname == nullptr) afname = getenv(VARAFNAME) ;
 
 #if	CF_DEBUG && 0
 	if (DEBUGLEVEL(2)) {
@@ -1243,7 +1196,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	}
 #endif /* CF_DEBUG */
 
-	if ((rs >= 0) && (pip->intpoll <= 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->intpoll <= 0) && (argval != nullptr)) {
 	    pip->final.intpoll = TRUE ;
 	    pip->have.intpoll = TRUE ;
 	    rs = cfdecti(argval,-1,&v) ;
@@ -1260,7 +1213,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 #if	CF_CHECKONC
 	if (rs >= 0) {
-	    if ((rs = checkonc(pip->pr,NULL,NULL,NULL)) >= 0) {
+	    if ((rs = checkonc(pip->pr,nullptr,nullptr,nullptr)) >= 0) {
 		pip->fl.onckey = TRUE ;
 	    }
 	}
@@ -1270,8 +1223,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if ((rs >= 0) && (pip->linelen < 7)) {
 	    cp = getenv(VARLINELEN) ;
-	    if (cp == NULL) cp = getenv(VARCOLUMNS) ;
-	    if (cp != NULL) {
+	    if (cp == nullptr) cp = getenv(VARCOLUMNS) ;
+	    if (cp != nullptr) {
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (rs > 7) {
 	                pip->have.linelen = TRUE ;
@@ -1297,7 +1250,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    goto badidbegin ;
 	}
 
-	rs = userinfo_start(&u,NULL) ;
+	rs = userinfo_start(&u,nullptr) ;
 	if (rs < 0) {
 	    ex = EX_NOUSER ;
 	    bprintf(pip->efp,
@@ -1360,16 +1313,16 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    debugprintf("main: org=%s\n",pip->org) ;
 #endif
 
-	if ((pip->orgcode == NULL) || (pip->orgcode[0] == '\0')) {
-	    const int	oclen = ORGCODELEN ;
-	    const char	*org = pip->org ;
+	if ((pip->orgcode == nullptr) || (pip->orgcode[0] == '\0')) {
+	    cint	oclen = ORGCODELEN ;
+	    cchar	*org = pip->org ;
 	    rs1 = -1 ;
-	    if ((org != NULL) && (org[0] != '\0')) {
-	        rs1 = snabbr(pip->orgcode,oclen,org,-1) ;
+	    if ((org != nullptr) && (org[0] != '\0')) {
+	        rs1 = snabbrname(pip->orgcode,oclen,org,-1) ;
 	    }
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
-	        debugprintf("main: snabbr() rs1=%d orgcode=%s\n",
+	        debugprintf("main: snabbrname() rs1=%d orgcode=%s\n",
 	            rs1,pip->orgcode) ;
 #endif
 	    if (rs1 < 0)
@@ -1410,7 +1363,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* reset our effect UID if we are: a) SUID and b) sn=poll */
 
 #if	defined(P_PCSPOLL) && (P_PCSPOLL > 0)
-	pip->fl.proglocal = (pip->searchname != NULL) && 
+	pip->fl.proglocal = (pip->searchname != nullptr) && 
 	    (strcmp(pip->searchname,"poll") == 0) ;
 
 	if (pip->fl.proglocal && (pip->uid != pip->euid))
@@ -1476,8 +1429,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* configuration file */
 
-	if (pip->cfname == NULL) pip->cfname = getenv(VARCONF) ;
-	if (pip->cfname == NULL) pip->cfname = CONFFNAME ;
+	if (pip->cfname == nullptr) pip->cfname = getenv(VARCONF) ;
+	if (pip->cfname == nullptr) pip->cfname = CONFFNAME ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1495,7 +1448,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	}
 #endif
 
-	if ((pip->debuglevel > 0) && (pip->cfname != NULL)) {
+	if ((pip->debuglevel > 0) && (pip->cfname != nullptr)) {
 	    bprintf(pip->efp,"%s: cf=%s (%d)\n",
 	        pip->progname,pip->cfname,rs) ;
 	}
@@ -1520,8 +1473,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* end of accessing the configuration file */
 
-	if (pip->tmpdname == NULL) pip->tmpdname = getenv(VARTMPDNAME) ;
-	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = getenv(VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
 
 /* poll interval */
 
@@ -1556,13 +1509,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	    cp = pip->stampdname ;
 	    cl = -1 ;
-	    if ((cp == NULL) || (strcmp(cp,"+") == 0)) {
+	    if ((cp == nullptr) || (strcmp(cp,"+") == 0)) {
 	        cp = STAMPDNAME ;
 	        cl = -1 ;
 	    }
 
 	    if (cp[0] != '/') {
-	        if (strchr(cp,'/') != NULL) {
+	        if (strchr(cp,'/') != nullptr) {
 	            cl = mkpath2(tmpfname,pip->pr,cp) ;
 	        } else {
 	            cl = mkpath3(tmpfname,pip->pr,VARDNAME,cp) ;
@@ -1570,7 +1523,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        cp = tmpfname ;
 	    }
 
-	    if (cp != NULL) {
+	    if (cp != nullptr) {
 	        cchar	**vpp = &pip->stampdname ;
 	        rs = proginfo_setentry(pip,vpp,cp,cl) ;
 	    }
@@ -1590,13 +1543,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	    cp = pip->workdname ;
 	    cl = -1 ;
-	    if ((cp == NULL) || (strcmp(cp,"+") == 0)) {
+	    if ((cp == nullptr) || (strcmp(cp,"+") == 0)) {
 	        cp = WORKDNAME ;
 	        cl = -1 ;
 	    }
 
 	    if (cp[0] != '/') {
-	        if (strchr(cp,'/') != NULL) {
+	        if (strchr(cp,'/') != nullptr) {
 	            cl = mkpath2(tmpfname,pip->pr,cp) ;
 	        } else {
 	            cl = mkpath3(tmpfname,pip->pr,VARDNAME,cp) ;
@@ -1604,7 +1557,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        cp = tmpfname ;
 	    }
 
-	    if (cp != NULL) {
+	    if (cp != nullptr) {
 	        cchar	**vpp = &pip->workdname ;
 	        rs = proginfo_setentry(pip,vpp,cp,cl) ;
 	    }
@@ -1623,13 +1576,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	    cp = pip->rundname ;
 	    cl = -1 ;
-	    if ((cp == NULL) || (strcmp(cp,"+") == 0)) {
+	    if ((cp == nullptr) || (strcmp(cp,"+") == 0)) {
 	        cp = RUNDNAME ;
 	        cl = -1 ;
 	    }
 
 	    if (cp[0] != '/') {
-	        if (strchr(cp,'/') != NULL) {
+	        if (strchr(cp,'/') != nullptr) {
 	            cl = mkpath2(tmpfname,pip->pr,cp) ;
 	        } else {
 	            cl = mkpath3(tmpfname,pip->pr,VARDNAME,cp) ;
@@ -1637,7 +1590,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        cp = tmpfname ;
 	    }
 
-	    if (cp != NULL) {
+	    if (cp != nullptr) {
 	        cchar	**vpp = &pip->rundname ;
 	        rs = proginfo_setentry(pip,vpp,cp,cl) ;
 	    }
@@ -1650,8 +1603,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (rs >= 0) {
 	    cp = pip->stampdname ;
 	    if (rs >= 0) {
-	        const int	am = (R_OK | W_OK | X_OK) ;
-	        rs = perm(cp,-1,-1,NULL,am) ;
+	        cint	am = (R_OK | W_OK | X_OK) ;
+	        rs = perm(cp,-1,-1,nullptr,am) ;
 	        if (rs == SR_NOENT) {
 	            mode_t	oldmask ;
 	            oldmask = umask(0000) ;
@@ -1671,8 +1624,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	    cp = pip->workdname ;
 	    if (rs >= 0) {
-	        const int	am = (R_OK | W_OK | X_OK) ;
-	        rs = perm(cp,-1,-1,NULL,am) ;
+	        cint	am = (R_OK | W_OK | X_OK) ;
+	        rs = perm(cp,-1,-1,nullptr,am) ;
 	    }
 
 #if	CF_DEBUG
@@ -1683,13 +1636,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	} /* end if (workdname) */
 
-	if ((rs >= 0) && (pip->rundname != NULL)) {
+	if ((rs >= 0) && (pip->rundname != nullptr)) {
 
 	    cp = pip->rundname ;
 	    if (rs >= 0) {
-	        const int	am = (R_OK | W_OK | X_OK) ;
+	        cint	am = (R_OK | W_OK | X_OK) ;
 
-	        rs = perm(cp,-1,-1,NULL,am) ;
+	        rs = perm(cp,-1,-1,nullptr,am) ;
 
 	        if (rs == SR_NOENT) {
 	            mode_t	oldmask ;
@@ -1716,10 +1669,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	for (ai = 1 ; ai < argc ; ai += 1) {
 
 	    f = (ai <= ai_max) && (bits_test(&ainfo.pargs,ai) > 0) ;
-	    f = f || ((ai > ai_pos) && (argv[ai] != NULL)) ;
+	    f = f || ((ai > ai_pos) && (argv[ai] != nullptr)) ;
 	    if (f) {
 	        cp = argv[ai] ;
-	        if ((cp != NULL) && (cp[0] != '\0')) {
+	        if ((cp != nullptr) && (cp[0] != '\0')) {
 	            pip->svcpass = cp ;
 	            pip->fl.named = TRUE ;
 	            break ;
@@ -1736,13 +1689,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #if	defined(P_PCSPOLL) && (P_PCSPOLL > 0)
 	cp = pip->stampfname ;
 	cl = -1 ;
-	if ((cp == NULL) || (cp[0] == '+')) {
+	if ((cp == nullptr) || (cp[0] == '+')) {
 	    cp = pip->progname ;
 	    cl = -1 ;
 	}
 
 	if (cp[0] != '/') {
-	    if (strchr(cp,'/') != NULL) {
+	    if (strchr(cp,'/') != nullptr) {
 	        cl = mkpath2(tmpfname,pip->pr,cp) ;
 	    } else {
 	        cl = mkpath2(tmpfname,pip->stampdname,cp) ;
@@ -1750,7 +1703,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    cp = tmpfname ;
 	}
 
-	if (cp != NULL) {
+	if (cp != nullptr) {
 	    cchar	**vpp = &pip->stampfname ;
 	    rs = proginfo_setentry(pip,vpp,cp,cl) ;
 	}
@@ -1815,7 +1768,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if ((pip->fl.defpidlock && (! pip->fl.named)) || pip->fl.daemon) {
 	    if ((rs = progpidbegin(pip,0)) >= 0) {
 
-	        if ((pip->debuglevel > 0) && (pip->pidfname != NULL)) {
+	        if ((pip->debuglevel > 0) && (pip->pidfname != nullptr)) {
 	            bprintf(pip->efp,"%s: pid=%s\n",
 	                pip->progname,pip->pidfname) ;
 		}
@@ -1890,7 +1843,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	}
 #endif
 
-	if ((rs >= 0) && (xfname != NULL) && (xfname[0] != '\0')) {
+	if ((rs >= 0) && (xfname != nullptr) && (xfname[0] != '\0')) {
 	    rs = loadxfile(pip,xfname) ;
 	    if (pip->debuglevel > 0) {
 		cchar	*pn = pip->progname ;
@@ -1959,7 +1912,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    debugprintf("main: procenvsysvar() \n") ;
 #endif
 	if (rs >= 0)
-	    rs = procenvsysvar(pip,NULL) ;
+	    rs = procenvsysvar(pip,nullptr) ;
 #endif /* CF_PROCENVSYS */
 
 	if (rs >= 0) {
@@ -2036,7 +1989,7 @@ badcookload:
 	expcook_finish(&pip->cooks) ;
 
 badcookstart:
-	pip->uip = NULL ;
+	pip->uip = nullptr ;
 	userinfo_finish(&u) ;
 
 baduserstart:
@@ -2083,10 +2036,10 @@ retearly:
 	    debugprintf("main: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = FALSE ;
 	    bclose(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
@@ -2117,8 +2070,8 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
-	        const char	*ids = "main" ;
+	        cint	size = (10*sizeof(uint)) ;
+	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
 	        debugprintf("main: MIoutnummax=%u\n",mi[ucmallreg_outnummax]) ;
@@ -2162,13 +2115,13 @@ badarg:
 
 
 #if	CF_DEBUGS || CF_DEBUG
-int progexports(PROGINFO *pip,cchar *s)
+int progexports(proginfo *pip,cchar *s)
 {
 	int		i ;
-	const char	*cp ;
+	cchar	*cp ;
 	debugprintf("main/progexports: elp={%p}\n",&pip->exports) ;
 	for (i = 0 ; vecstr_get(&pip->exports,i,&cp) >= 0 ; i += 1) {
-	    if (cp == NULL) continue ;
+	    if (cp == nullptr) continue ;
 	    debugprintf("main/progexports: %s e=>%r<\n",
 	        s,cp,strlinelen(cp,-1,40)) ;
 	}
@@ -2180,12 +2133,12 @@ int progexports(PROGINFO *pip,cchar *s)
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+static int usage(proginfo *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<svc(s)> ...]] [-C <conf>] [-d[=<runtime>]]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -2203,19 +2156,17 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
-static int procopts(PROGINFO *pip,KEYOPT *kop)
-{
+static int procopts(proginfo *pip,keyopt *kop) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
-	if ((cp = getenv(VAROPTS)) != NULL) {
+	if ((cp = getenv(VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -2224,7 +2175,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
 	            if ((oi = matostr(akonames,3,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case akoname_cf:
@@ -2340,7 +2291,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procschedbegin(PROGINFO *pip)
+static int procschedbegin(proginfo *pip)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -2370,7 +2321,7 @@ static int procschedbegin(PROGINFO *pip)
 /* end subroutine (procschedbegin) */
 
 
-static int procschedend(PROGINFO *pip)
+static int procschedend(proginfo *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2386,7 +2337,7 @@ static int procschedend(PROGINFO *pip)
 /* end subroutine (procschedend) */
 
 
-static int procenvextra(PROGINFO *pip)
+static int procenvextra(proginfo *pip)
 {
 	NULSTR		ns ;
 	vecstr		*elp = &pip->exports ;
@@ -2394,16 +2345,16 @@ static int procenvextra(PROGINFO *pip)
 	int		i ;
 	int		kl, vl ;
 	int		c = 0 ;
-	const char	*tp, *kp, *vp ;
-	const char	*kname ;
+	cchar	*tp, *kp, *vp ;
+	cchar	*kname ;
 
-	for (i = 0 ; pip->envv[i] != NULL ; i += 1) {
+	for (i = 0 ; pip->envv[i] != nullptr ; i += 1) {
 
 	    kp = pip->envv[i] ;
 	    kl = -1 ;
-	    vp = NULL ;
+	    vp = nullptr ;
 	    vl = 0 ;
-	    if ((tp = strchr(kp,'=')) != NULL) {
+	    if ((tp = strchr(kp,'=')) != nullptr) {
 	        kl = (tp - kp) ;
 	        vp = (tp + 1) ;
 	        vl = -1 ;
@@ -2417,7 +2368,7 @@ static int procenvextra(PROGINFO *pip)
 	    }
 #endif
 
-	    if ((vp != NULL) && isenvok(envbads,kp,kl)) {
+	    if ((vp != nullptr) && isenvok(envbads,kp,kl)) {
 
 	        if ((rs = nulstr_start(&ns,kp,kl,&kname)) >= 0) {
 
@@ -2453,22 +2404,22 @@ static int procenvextra(PROGINFO *pip)
 /* end subroutine (procenvextra) */
 
 
-static int procenvdef(PROGINFO *pip)
+static int procenvdef(proginfo *pip)
 {
 	vecstr		*elp = &pip->exports ;
-	const int	rsn = SR_NOTFOUND ;
-	const int	dlen = DIGBUFLEN ;
+	cint	rsn = SR_NOTFOUND ;
+	cint	dlen = DIGBUFLEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		dbuf[DIGBUFLEN + 1] ;
 
-	for (i = 0 ; envdefs[i] != NULL ; i += 1) {
+	for (i = 0 ; envdefs[i] != nullptr ; i += 1) {
 	    cchar	*ename = envdefs[i] ;
-	    if ((rs = vecstr_search(elp,ename,vstrkeycmp,NULL)) == rsn) {
-	        const int	sc = MKCHAR(ename[0]) ;
+	    if ((rs = vecstr_search(elp,ename,vstrkeycmp,nullptr)) == rsn) {
+	        cint	sc = MKCHAR(ename[0]) ;
 		int		vl = -1 ;
-		cchar		*vp = NULL ;
+		cchar		*vp = nullptr ;
 	        switch (sc) {
 	        case 'S':
 	            vp = pip->usysname ;
@@ -2507,7 +2458,7 @@ static int procenvdef(PROGINFO *pip)
 	            vp = pip->domainname ;
 	            break ;
 	        } /* end switch */
-	        if ((rs >= 0) && (vp != NULL)) {
+	        if ((rs >= 0) && (vp != nullptr)) {
 	            rs = vecstr_envadd(elp,ename,vp,vl) ;
 	            if (rs < INT_MAX) c += 1 ;
 	        }
@@ -2520,17 +2471,17 @@ static int procenvdef(PROGINFO *pip)
 /* end subroutine (procenvdef) */
 
 
-static int procenvsysvar(PROGINFO *pip,cchar sysvardb[])
+static int procenvsysvar(proginfo *pip,cchar sysvardb[])
 {
 	SYSVAR		sv ;
 	SYSVAR_CUR	cur ;
 	vecstr		*elp ;
-	const int	vlen = VBUFLEN ;
+	cint	vlen = VBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		vl ;
 	int		c = 0 ;
-	const char	*varpath = VARPATH ;
+	cchar	*varpath = VARPATH ;
 	char		kbuf[KBUFLEN + 1] ;
 	char		vbuf[VBUFLEN + 1] ;
 
@@ -2573,9 +2524,9 @@ static int procenvsysvar(PROGINFO *pip,cchar sysvardb[])
 	                    "vecstr_envadd() rs=%d\n",rs) ;
 #endif
 
-	            if ((rs >= 0) && (pip->defpath == NULL) &&
+	            if ((rs >= 0) && (pip->defpath == nullptr) &&
 	                (strcmp(varpath,kbuf) == 0)) {
-	                const char	**vpp = &pip->defpath ;
+	                cchar	**vpp = &pip->defpath ;
 
 #if	CF_DEBUG && CF_DEBUGENV
 	                if (DEBUGLEVEL(3))
@@ -2611,27 +2562,27 @@ static int procenvsysvar(PROGINFO *pip,cchar sysvardb[])
 /* end subroutine (procenvsysvar) */
 
 
-static int procenvsort(PROGINFO *pip)
+static int procenvsort(proginfo *pip)
 {
 	int		rs ;
 
-	rs = vecstr_sort(&pip->exports,NULL) ;
+	rs = vecstr_sort(&pip->exports,nullptr) ;
 
 	return rs ;
 }
 /* end subroutine (procenvsort) */
 
 
-static int loadschedvars(PROGINFO *pip)
+static int loadschedvars(proginfo *pip)
 {
 	VECSTR		*svp = &pip->svars ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
-	const char	*keys = "phen" ;
+	cchar	*keys = "phen" ;
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
-	    const int	kc = MKCHAR(keys[i]) ;
-	    const char	*vp = NULL ;
+	    cint	kc = MKCHAR(keys[i]) ;
+	    cchar	*vp = nullptr ;
 	    int		vl = -1 ;
 	    switch (kc) {
 	    case 'p':
@@ -2647,7 +2598,7 @@ static int loadschedvars(PROGINFO *pip)
 	        vp = pip->searchname ;
 	        break ;
 	    } /* end switch */
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        char	kbuf[2] = "x" ;
 	        kbuf[0] = kc ;
 	        rs = vecstr_envadd(svp,kbuf,vp,vl) ;
@@ -2660,7 +2611,7 @@ static int loadschedvars(PROGINFO *pip)
 /* end subroutine (loadschedvars) */
 
 
-static int loadgroupname(PROGINFO *pip)
+static int loadgroupname(proginfo *pip)
 {
 	int		rs ;
 	int		gnlen = GROUPNAMELEN ;
@@ -2676,19 +2627,19 @@ static int loadgroupname(PROGINFO *pip)
 /* end subroutine (loadgroupname) */
 
 
-static int loadplatform(PROGINFO *pip)
+static int loadplatform(proginfo *pip)
 {
 	int		rs = SR_NOSYS ;
 	int		cl ;
-	const char	*vn = envdefs[envdef_platform] ;
-	const char	*cp ;
+	cchar	*vn = envdefs[envdef_platform] ;
+	cchar	*cp ;
 	char		archbuf[ARCHBUFLEN + 1] ;
 
 	cl = -1 ;
 	cp = getenv(vn) ;
 
 #ifdef	SI_PLATFORM
-	if (cp == NULL) {
+	if (cp == nullptr) {
 	    rs = u_sysinfo(SI_PLATFORM,archbuf,ARCHBUFLEN) ;
 	    if (rs >= 0) {
 	        cp = archbuf ;
@@ -2697,7 +2648,7 @@ static int loadplatform(PROGINFO *pip)
 	}
 #endif /* SI_PLATFORM */
 
-	if (cp != NULL) {
+	if (cp != nullptr) {
 	    cchar	**vpp = &pip->platform ;
 	    rs = proginfo_setentry(pip,vpp,cp,cl) ;
 	}
@@ -2707,9 +2658,9 @@ static int loadplatform(PROGINFO *pip)
 /* end subroutine (loadplatform) */
 
 
-static int loadarchitecture(PROGINFO *pip)
+static int loadarchitecture(proginfo *pip)
 {
-	const int	alen = ARCHBUFLEN ;
+	cint	alen = ARCHBUFLEN ;
 	int		rs ;
 	char		abuf[ARCHBUFLEN + 1] ;
 	if ((rs = getarchitecture(abuf,alen)) >= 0) {
@@ -2721,25 +2672,25 @@ static int loadarchitecture(PROGINFO *pip)
 /* end subroutine (loadarchitecture) */
 
 
-static int loadhz(PROGINFO *pip)
+static int loadhz(proginfo *pip)
 {
-	const int	dlen = DIGBUFLEN ;
+	cint	dlen = DIGBUFLEN ;
 	int		rs = SR_OK ;
 	int		cl = -1 ;
 	cchar		*cp ;
 	char		dbuf[DIGBUFLEN + 1] ;
 
-	if ((cp = getenv(VARHZ)) != NULL) {
+	if ((cp = getenv(VARHZ)) != nullptr) {
 	    if (hasalldig(cp,-1)) {
 	        rs = SR_OK ;
 	    } else {
-	        cp = NULL ;
+	        cp = nullptr ;
 	    }
 	}
 
-	if (cp == NULL) {
+	if (cp == nullptr) {
 	    if ((rs = gethz(0)) >= 0) {
-	        const int	v = rs ;
+	        cint	v = rs ;
 	        if ((rs = ctdeci(dbuf,dlen,v)) >= 0) {
 	            cp = dbuf ;
 	            cl = rs ;
@@ -2748,7 +2699,7 @@ static int loadhz(PROGINFO *pip)
 	} /* end if (still needed) */
 
 	if (rs >= 0) {
-	    if (cp != NULL) {
+	    if (cp != nullptr) {
 		cchar	**vpp = &pip->hz ;
 	        rs = proginfo_setentry(pip,vpp,cp,cl) ;
 	    } else {
@@ -2766,7 +2717,7 @@ static int loadhz(PROGINFO *pip)
 /* end subroutine (loadhz) */
 
 
-static int loadncpu(PROGINFO *pip)
+static int loadncpu(proginfo *pip)
 {
 	int		rs ;
 	rs = getnprocessors(pip->envv,0) ;
@@ -2776,15 +2727,15 @@ static int loadncpu(PROGINFO *pip)
 /* end subroutine (loadncpu) */
 
 
-static int loadorg(PROGINFO *pip)
+static int loadorg(proginfo *pip)
 {
-	const int	orglen = MAXNAMELEN ;
+	cint	orglen = MAXNAMELEN ;
 	int		rs = SR_OK ;
-	const char	*orgp = pip->org ;
+	cchar	*orgp = pip->org ;
 
-	if ((orgp == NULL) || (orgp[0] == '\0')) {
+	if ((orgp == nullptr) || (orgp[0] == '\0')) {
 	    char	orgbuf[MAXNAMELEN+1] ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    int		cl = 0 ;
 	    cp = orgbuf ;
 	    if ((rs >= 0) && (cl == 0)) {
@@ -2807,7 +2758,7 @@ static int loadorg(PROGINFO *pip)
 /* end subroutine (loadorg) */
 
 
-static int loadprovider(PROGINFO *pip)
+static int loadprovider(proginfo *pip)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -2841,18 +2792,18 @@ static int loadprovider(PROGINFO *pip)
 /* end subroutine (loadprovider) */
 
 
-static int loadcooks(PROGINFO *pip)
+static int loadcooks(proginfo *pip)
 {
-	EXPCOOK		*cop = &pip->cooks ;
-	const int	dlen = DIGBUFLEN ;
+	expcook		*cop = &pip->cooks ;
+	cint	dlen = DIGBUFLEN ;
 	int		rs = SR_OK ;
 	int		ci ;
 	char		tbuf[USERNAMELEN+1] = { 0 } ;
 	char		nbuf[USERNAMELEN+1] = { 0 } ;
 	char		dbuf[DIGBUFLEN + 1] ;
 
-	for (ci = 0 ; cooks[ci] != NULL ; ci += 1) {
-	    cchar	*vp = NULL ;
+	for (ci = 0 ; cooks[ci] != nullptr ; ci += 1) {
+	    cchar	*vp = nullptr ;
 	    int		vl = -1 ;
 	    switch (ci) {
 	    case cook_sysname:
@@ -2922,7 +2873,7 @@ static int loadcooks(PROGINFO *pip)
 	        break ;
 	    case cook_h:
 	        {
-		    const int	hlen = MAXHOSTNAMELEN ;
+		    cint	hlen = MAXHOSTNAMELEN ;
 	            cchar	*nn = pip->nodename ;
 	            cchar	*dn = pip->domainname ;
 	            char	hbuf[MAXHOSTNAMELEN + 1] ;
@@ -2960,7 +2911,7 @@ static int loadcooks(PROGINFO *pip)
 	        break ;
 	    case cook_oo:
 	        {
-	            const int	oolen = ORGLEN ;
+	            cint	oolen = ORGLEN ;
 	            int		i ;
 	            int		ch ;
 	            cchar	*o = pip->org ;
@@ -2980,7 +2931,7 @@ static int loadcooks(PROGINFO *pip)
 		vp = pip->version ;
 		break ;
 	    } /* end switch */
-	    if ((rs >= 0) && (vp != NULL)) {
+	    if ((rs >= 0) && (vp != nullptr)) {
 #if	CF_DEBUG
 		if (DEBUGLEVEL(3))
 		debugprintf("main/loadcooks: k=%s v=>%r<\n",cooks[ci],vp,vl) ;
@@ -2995,7 +2946,7 @@ static int loadcooks(PROGINFO *pip)
 /* end subroutine (loadcooks) */
 
 
-static int loaddefs(PROGINFO *pip,cchar *dfname,cchar **s1,cchar **s2)
+static int loaddefs(proginfo *pip,cchar *dfname,cchar **s1,cchar **s2)
 {
 	int		rs = SR_OK ;
 
@@ -3006,7 +2957,7 @@ static int loaddefs(PROGINFO *pip,cchar *dfname,cchar **s1,cchar **s2)
 	}
 #endif
 
-	if ((dfname != NULL) && (dfname != '\0')) {
+	if ((dfname != nullptr) && (dfname != '\0')) {
 	    rs = loaddefsfile(pip,dfname) ;
 	}
 
@@ -3026,7 +2977,7 @@ static int loaddefs(PROGINFO *pip,cchar *dfname,cchar **s1,cchar **s2)
 /* end subroutine (loaddefs) */
 
 
-static int loaddefsfile(PROGINFO *pip,cchar *dfname)
+static int loaddefsfile(proginfo *pip,cchar *dfname)
 {
 	ustat	sb ;
 	int		rs ;
@@ -3041,7 +2992,7 @@ static int loaddefsfile(PROGINFO *pip,cchar *dfname)
 	    if (S_ISREG(sb.st_mode)) {
 	        if ((rs = permid(&pip->id,&sb,R_OK)) >= 0) {
 		    VECSTR	*defp = &pip->defs ;
-		    EXPCOOK	*ecp = &pip->cooks ;
+		    expcook	*ecp = &pip->cooks ;
 		    cchar	**envv = pip->envv ;
 		    f = TRUE ;
 	    	    rs = defproc(defp,envv,ecp,dfname) ;
@@ -3063,12 +3014,12 @@ static int loaddefsfile(PROGINFO *pip,cchar *dfname)
 /* end subroutine (loaddefsfile) */
 
 
-static int loaddefsfind(PROGINFO *pip,cchar *sched[])
+static int loaddefsfind(proginfo *pip,cchar *sched[])
 {
-	const int	tlen = MAXPATHLEN ;
+	cint	tlen = MAXPATHLEN ;
 	int		rs ;
 	int		f = FALSE ;
-	const char	*df = DEFSFNAME ;
+	cchar	*df = DEFSFNAME ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
@@ -3078,7 +3029,7 @@ static int loaddefsfind(PROGINFO *pip,cchar *sched[])
 
 	if ((rs = permsched(sched,&pip->svars,tbuf,tlen,df,R_OK)) >= 0) {
 	    VECSTR	*defp = &pip->defs ;
-	    EXPCOOK	*ecp = &pip->cooks ;
+	    expcook	*ecp = &pip->cooks ;
 	    cchar	**envv = pip->envv ;
 	    f = TRUE ;
 	    rs = defproc(defp,envv,ecp,tbuf) ;
@@ -3096,7 +3047,7 @@ static int loaddefsfind(PROGINFO *pip,cchar *sched[])
 /* end subroutine (loaddefsfind) */
 
 
-static int loadxfile(PROGINFO *pip,cchar *xfname)
+static int loadxfile(proginfo *pip,cchar *xfname)
 {
 	ustat	sb ;
 	int		rs ;
@@ -3122,7 +3073,7 @@ static int loadxfile(PROGINFO *pip,cchar *xfname)
 		    }
 		    if (rs >= 0) {
 			ENVS		*envp = &pip->xenvs ;
-	    	        EXPCOOK		*clp = &pip->cooks ;
+	    	        expcook		*clp = &pip->cooks ;
 			VECSTR		*defp = &pip->defs ;
 			cchar		**envv = pip->envv ;
 			f = TRUE ;
@@ -3152,17 +3103,17 @@ static int loadxfile(PROGINFO *pip,cchar *xfname)
 /* end subroutine (loadxfile) */
 
 
-static int loadxsched(PROGINFO *pip,cchar *sched[])
+static int loadxsched(proginfo *pip,cchar *sched[])
 {
-	const int	tlen = MAXPATHLEN ;
+	cint	tlen = MAXPATHLEN ;
 	int		rs ;
 	int		f = FALSE ;
-	const char	*xf = XEFNAME ;
+	cchar	*xf = XEFNAME ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
 	if ((rs = permsched(sched,&pip->svars,tbuf,tlen,xf,R_OK)) >= 0) {
 	    ENVS	*envp = &pip->xenvs ;
-	    EXPCOOK	*clp = &pip->cooks ;
+	    expcook	*clp = &pip->cooks ;
 	    VECSTR	*defp = &pip->defs ;
 	    cchar	**envv = pip->envv ;
 	    f = TRUE ;
@@ -3176,7 +3127,7 @@ static int loadxsched(PROGINFO *pip,cchar *sched[])
 /* end subroutine (loadxsched) */
 
 
-static int pvarsbegin(PROGINFO *pip,cchar **pathvars,cchar *fname)
+static int pvarsbegin(proginfo *pip,cchar **pathvars,cchar *fname)
 {
 	vecstr		*pvp = &pip->pvars ;
 	int		rs ;
@@ -3197,13 +3148,13 @@ static int pvarsbegin(PROGINFO *pip,cchar **pathvars,cchar *fname)
 /* end subroutine (pvarsbegin) */
 
 
-static int pvarsend(PROGINFO *pip)
+static int pvarsend(proginfo *pip)
 {
 	vecstr		*pvp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	pvp = &pip->pvars ;
 	rs1 = vecstr_finish(pvp) ;
@@ -3214,14 +3165,14 @@ static int pvarsend(PROGINFO *pip)
 /* end subroutine (pvarsend) */
 
 
-static int loadpvars(PROGINFO *pip,cchar *sched[],cchar *fname)
+static int loadpvars(proginfo *pip,cchar *sched[],cchar *fname)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
-	if ((fname != NULL) && (fname[0] != '\0')) {
+	if ((fname != nullptr) && (fname[0] != '\0')) {
 	    VECSTR	*svp = &pip->svars ;
-	    const int	tlen = MAXPATHLEN ;
+	    cint	tlen = MAXPATHLEN ;
 	    char	tbuf[MAXPATHLEN + 1] ;
 	    if ((rs = permsched(sched,svp,tbuf,tlen,fname,R_OK)) >= 0) {
 	        VECSTR	*pvp = &pip->pvars ;
@@ -3237,14 +3188,14 @@ static int loadpvars(PROGINFO *pip,cchar *sched[],cchar *fname)
 /* end subroutine (loadpvars) */
 
 
-static int loadpvarsdef(PROGINFO *pip,cchar *pnames[])
+static int loadpvarsdef(proginfo *pip,cchar *pnames[])
 {
 	vecstr		*pvp = &pip->pvars ;
 	int		rs ;
 	int		i = 0 ;
 
 	if ((rs = vecstr_count(pvp)) == 0) {
-	    for (i = 0 ; pnames[i] != NULL ; i += 1) {
+	    for (i = 0 ; pnames[i] != nullptr ; i += 1) {
 	        rs = vecstr_adduniq(pvp,pnames[i],-1) ;
 	        if (rs < 0) break ;
 	    } /* end for */
@@ -3255,7 +3206,7 @@ static int loadpvarsdef(PROGINFO *pip,cchar *pnames[])
 /* end subroutine (loadpvarsdef) */
 
 
-static int loadsysinfo(PROGINFO *pip)
+static int loadsysinfo(proginfo *pip)
 {
 	int		rs ;
 	if ((rs = loadgroupname(pip)) >= 0) {
@@ -3296,13 +3247,12 @@ static int isenvok(cchar *envbads[],cchar *kp,int kl)
 
 #if	(CF_DEBUG || CF_DEBUGS) && CF_DEBUGCOOKS
 
-static int debugcooks(PROGINFO *pip,cchar s[])
-{
-	EXPCOOK_CUR	cur ;
+static int debugcooks(proginfo *pip,cchar s[]) noex {
+	expcook_cur	cur ;
 	int		rs1 ;
 	char		buf[BUFLEN + 1] ;
 	char		*cp ;
-	if (s != NULL)
+	if (s != nullptr)
 	    debugprintf("main/debugcooks: s=%s\n",s) ;
 	expcook_curbegin(&pip->cooks,&cur) ;
 	while (expcook_enum(&pip->cooks,&cur,buf,BUFLEN) >= 0) {
