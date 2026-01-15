@@ -20,8 +20,8 @@
 #include	<csignal>
 #include	<unistd.h>
 #include	<cstring>
-#include	<utime.h>
-#include	<time.h>
+#include	<uctime>
+#include	<ctime>
 #include	<pwd.h>
 
 #include	<bfile.h>
