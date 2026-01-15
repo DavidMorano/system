@@ -66,7 +66,7 @@
 #include	<cstdlib>
 #include	<csignal>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<netdb.h>
 
 #include	<usystem.h>
