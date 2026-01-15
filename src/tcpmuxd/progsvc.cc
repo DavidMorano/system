@@ -1,19 +1,19 @@
-/* progsvc */
+/* progsvc SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle some service processing */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
 #define	CF_DEBUGN	0		/* special (live) debugging */
 
-
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-	This subroutine was borrowed and modified from previous generic
-	front-end 'main' subroutines!
+	This subroutine was borrowed and modified from previous
+	generic front-end 'main' subroutines!
 
 */
 
@@ -21,24 +21,22 @@
 
 /*******************************************************************************
 
-        This module handles initializing, checking, and freeing the service-file
-        object.
-
+  	Description:
+	This module handles initializing, checking, and freeing the
+	service-file object.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
+#include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<logfile.h>
@@ -55,10 +53,6 @@
 #define	VARPATH		"PATH"
 #endif
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 #undef	DEBFNAME
 #define	DEBFNAME	"svcfile.deb"
 
@@ -71,35 +65,35 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,char **) ;
+extern int	snsd(char *,int,ccharg *,uint) ;
+extern int	snsds(char *,int,ccharg *,const char *) ;
+extern int	sncpy1(char *,int,ccharg *) ;
+extern int	sncpy2(char *,int,ccharg *,const char *) ;
+extern int	mkpath1(char *,ccharg *) ;
+extern int	mkpath2(char *,ccharg *,const char *) ;
+extern int	mkpath3(char *,ccharg *,const char *,const char *) ;
+extern int	mkpath1w(char *,ccharg *,int) ;
+extern int	matstr(ccharg **,const char *,int) ;
+extern int	matpstr(ccharg **,int,const char *,int) ;
+extern int	sfshrink(ccharg *,int,char **) ;
 extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	getfname(const char *,const char *,int,char *) ;
+extern int	cfdeci(ccharg *,int,int *) ;
+extern int	cfdecti(ccharg *,int,int *) ;
+extern int	perm(ccharg *,uid_t,gid_t,gid_t *,int) ;
+extern int	permsched(ccharg **,vecstr *,char *,int,const char *,int) ;
+extern int	getfname(ccharg *,const char *,int,char *) ;
 
-extern int	securefile(const char *,uid_t,gid_t) ;
+extern int	securefile(ccharg *,uid_t,gid_t) ;
 
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	debugprintf(ccharg *,...) ;
+extern int	nprintf(ccharg *,const char *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,ccharg *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -115,14 +109,14 @@ int	progsvcopen(PROGINFO *) ;
 int	progsvcclose(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-static int	proclist(PROGINFO *,const char *) ;
+static int	proclist(PROGINFO *,ccharg *) ;
 #endif
 
 
 /* local variables */
 
 /* 'conf' for most regular programs */
-static const char	*sched_system[] = {
+static ccharg	*sched_system[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -130,7 +124,7 @@ static const char	*sched_system[] = {
 	NULL
 } ;
 
-static const char	*sched_user[] = {
+static ccharg	*sched_user[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
@@ -145,12 +139,12 @@ static const char	*sched_user[] = {
 int progsvcopen(pip)
 PROGINFO	*pip ;
 {
-	const int	tlen = MAXPATHLEN ;
+	cint	tlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cl ;
 	int		f_secreq = TRUE ;
-	const char	*cp ;
+	ccharg	*cp ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
@@ -416,10 +410,10 @@ PROGINFO	*pip ;
 #if	CF_DEBUG && CF_DEBUGN && defined(DEBFNAME)
 	if ((rs >= 0) && c) {
 	    SVCFILE_ENT	sv ;
-	    const int	svlen = SVBUFLEN ;
+	    cint	svlen = SVBUFLEN ;
 	    int		rs1 ;
 	    int		i ;
-	    const char	*sn = "helloworld" ;
+	    ccharg	*sn = "helloworld" ;
 	    char	svbuf[SVBUFLEN + 1] ;
 	    rs1 = svcfile_fetch(&pip->stab,sn,NULL,&sv,svbuf,svlen) ;
 	    nprintf(DEBFNAME,"progsvccheck: svcfile_fetch() rs=%d\n",rs1) ;
@@ -447,11 +441,11 @@ ret0:
 
 static int proclist(pip,s)
 PROGINFO	*pip ;
-const char	*s ;
+ccharg	*s ;
 {
 	SVCFILE		*svcp = &pip->stab ;
 	SVCFILE_CUR	cur ;
-	const int	svclen = SVCBUFLEN ;
+	cint	svclen = SVCBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl ;
