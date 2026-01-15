@@ -23,22 +23,21 @@
 
 /*******************************************************************************
 
+  	Description:
 	Prepare to do some servicing.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<vecstr.h>
@@ -73,33 +72,28 @@
 #define	VARPATHLIB	"LD_LIBRARY_PATH"
 #endif
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,char **) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	sfshrink(cchar *,int,char **) ;
 extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getserial(const char *) ;
-extern int	getfname(const char *,const char *,int,char *) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	getserial(cchar *) ;
+extern int	getfname(cchar *,cchar *,int,char *) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	isNotPresent(int) ;
 
 extern int	progsvcopen(PROGINFO *) ;
@@ -114,16 +108,16 @@ extern int	proglog_flush(PROGINFO *) ;
 
 extern int	progwatch(PROGINFO *,vecstr *) ;
 
-extern int	securefile(const char *,uid_t,gid_t) ;
-extern int	mklogidpre(char *,int,const char *,int) ;
+extern int	securefile(cchar *,uid_t,gid_t) ;
+extern int	mklogidpre(char *,int,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG 
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	progexports(PROGINFO *,const char *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	progexports(PROGINFO *,cchar *) ;
 #endif /* CF_DEBUGS */
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -143,31 +137,32 @@ static int	procaa(PROGINFO *,ARGINFO *) ;
 
 static int	loadserial(PROGINFO *) ;
 static int	loadpath(PROGINFO *,vecstr *,cchar *,cchar **,cchar *) ;
-static int	loadpathpr(PROGINFO *,vecstr *,const char **) ;
-static int	loadpathprdir(PROGINFO *,vecstr *,const char *) ;
-static int	loadpathcomp(PROGINFO *,vecstr *,const char *) ;
-static int	loadpather(PROGINFO *,vecstr *,const char *,int) ;
+static int	loadpathpr(PROGINFO *,vecstr *,cchar **) ;
+static int	loadpathprdir(PROGINFO *,vecstr *,cchar *) ;
+static int	loadpathcomp(PROGINFO *,vecstr *,cchar *) ;
+static int	loadpather(PROGINFO *,vecstr *,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*prbins[] = {
+static cchar	*prbins[] = {
 	"bin",
 	"sbin",
 	NULL
 } ;
 
-static const char	*prlibs[] = {
+static cchar	*prlibs[] = {
 	"lib",
 	NULL
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progprocess(PROGINFO *pip,ARGINFO *aip,USERINFO *uip)
-{
+int progprocess(PROGINFO *pip,ARGINFO *aip,USERINFO *uip) noex {
 	int		rs ;
 	int		rs1 ;
 
@@ -224,7 +219,7 @@ int progprocess(PROGINFO *pip,ARGINFO *aip,USERINFO *uip)
 
 static int proglog_extra(PROGINFO *pip)
 {
-	const int	f = (pip->fl.named || pip->fl.passfd) ;
+	cint	f = (pip->fl.named || pip->fl.passfd) ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	    if ((pip->cfname != NULL) && (rs1 >= 0)) {
@@ -285,10 +280,10 @@ static int procaa(PROGINFO *pip,ARGINFO *aip)
 	int		opts ;
 	int		count = 0 ;
 	int		f ;
-	const char	*varpathexec = VARPATHEXEC ;
-	const char	*varpathlib = VARPATHLIB ;
-	const char	*defpath ;
-	const char	*cp ;
+	cchar	*varpathexec = VARPATHEXEC ;
+	cchar	*varpathlib = VARPATHLIB ;
+	cchar	*defpath ;
+	cchar	*cp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -449,7 +444,7 @@ PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		serial = -1 ;
-	const char	*sfn = SERIALFNAME ;
+	cchar	*sfn = SERIALFNAME ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	if (sfn[0] != '/') {
@@ -482,7 +477,7 @@ PROGINFO	*pip ;
 
 #if	CF_LOGID
 	{
-	    const int	llen = LOGIDLEN ;
+	    cint	llen = LOGIDLEN ;
 	    cchar	*nn = pip->nodename ;
 	    int		serial = pip->serial ;
 	    char	lbuf[LOGIDLEN + 1] ;
@@ -501,14 +496,14 @@ PROGINFO	*pip ;
 static int loadpath(pip,plp,varname,prdirs,defpath)
 PROGINFO	*pip ;
 vecstr		*plp ;
-const char	*varname ;
-const char	**prdirs ;
-const char	*defpath ;
+cchar	*varname ;
+cchar	**prdirs ;
+cchar	*defpath ;
 {
 	VECSTR		*elp = &pip->exports ;
 	int		rs ;
 	int		c = 0 ;
-	const char	*pp ;
+	cchar	*pp ;
 
 /* system-administrative environment */
 
@@ -520,7 +515,7 @@ const char	*defpath ;
 #endif
 
 	if ((rs = vecstr_search(elp,varname,vstrkeycmp,&pp)) >= 0) {
-	    const char	*tp ;
+	    cchar	*tp ;
 
 	    if ((tp = strchr(pp,'=')) != NULL) {
 	        rs = loadpathcomp(pip,plp,(tp + 1)) ;
@@ -570,7 +565,7 @@ const char	*defpath ;
 static int loadpathpr(pip,plp,prdirs)
 PROGINFO	*pip ;
 vecstr		*plp ;
-const char	**prdirs ;
+cchar	**prdirs ;
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -590,7 +585,7 @@ const char	**prdirs ;
 static int loadpathprdir(pip,plp,bname)
 PROGINFO	*pip ;
 vecstr		*plp ;
-const char	bname[] ;
+cchar	bname[] ;
 {
 	int		rs ;
 	int		c = 0 ;
@@ -609,11 +604,11 @@ const char	bname[] ;
 static int loadpathcomp(pip,plp,pp)
 PROGINFO	*pip ;
 vecstr		*plp ;
-const char	*pp ;
+cchar	*pp ;
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*tp ;
+	cchar	*tp ;
 
 	while ((tp = strbrk(pp,":;")) != NULL) {
 	    rs = loadpather(pip,plp,pp,(tp - pp)) ;
@@ -633,7 +628,7 @@ const char	*pp ;
 static int loadpather(pip,plp,pbuf,plen)
 PROGINFO	*pip ;
 vecstr		*plp ;
-const char	pbuf[] ;
+cchar	pbuf[] ;
 int		plen ;
 {
 	int		rs ;
