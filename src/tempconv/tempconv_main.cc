@@ -1,14 +1,14 @@
-/* b_temp */
+/* b_temp SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a SHELL built-in version of 'temp(1)' */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_LOCSETENT	0		/* compile |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -22,18 +22,14 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ temp[<temp(s)>] [-af <afile>] [-V]
 
 	Arguments:
-
 	<temp(s)>	form: <v>[c|f]
 	-af <afile>	argument file of <temp(s)>
 	-V		print command version to standard-error and then exit
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -49,15 +45,16 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
+#include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
+#include	<cfdec.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -106,10 +103,6 @@ extern int	sfskipwhite(cchar *,int,cchar **) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdecf(cchar *,int,double *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	hasalldig(cchar *,int) ;
@@ -1057,7 +1050,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	        } /* end switch */
 	        cl -= 1 ;
 	    } /* end if (is-alpha-latin) */
-	    if ((rs >= 0) && ((rs = cfdecf(cp,cl,&v)) >= 0)) {
+	    if ((rs >= 0) && ((rs = cfdecd(cp,cl,&v)) >= 0)) {
 	        double	vk = getkelvin(w,v) ;
 	        double	vf, vc ;
 	        vf = cvt_fahrenheit(vk) ;
