@@ -1,8 +1,9 @@
-/* progwatch */
+/* progwatch SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* progwatch (listen on) the specified socket */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
@@ -13,14 +14,13 @@
 #define	CF_MKSUBLOGID	1		/* use 'mklogidsub(3dam)' */
 #define	CF_LOGCHECK	1		/* call 'proglog_check()' */
 
-
 /* revision history:
 
 	= 2008-06-23, David A­D­ Morano
-        I updated this subroutine to just poll for machine status and write the
-        Machine Status (MS) file. This was a cheap excuse for not writing a
-        whole new daemon program just to poll for machine status. I hope this
-        works out! :-)
+	I updated this subroutine to just poll for machine status
+	and write the Machine Status (MS) file.  This was a cheap
+	excuse for not writing a whole new daemon program just to
+	poll for machine status. I hope this works out! :-)
 
 */
 
@@ -28,34 +28,30 @@
 
 /*******************************************************************************
 
-        This subroutine is responsible for listening on the given socket and
-        spawning off a program to handle any incoming connection. Some of the
-        "internal" messages are handled here (the easy ones -- or the ones that
-        fit here best). The rest (that look like client-sort-of requests) are
-        handled in the 'standing' object module.
+  	Description:
+	This subroutine is responsible for listening on the given
+	socket and spawning off a program to handle any incoming
+	connection. Some of the "internal" messages are handled
+	here (the easy ones -- or the ones that fit here best). The
+	rest (that look like client-sort-of requests) are handled
+	in the 'standing' object module.
 
 	Synopsis:
-
 	int progwatch(pip,nlp)
 	PROGINFO	*pip ;
 	vecstr		*nlp ;
 
 	Arguments:
-
 	pip	program information pointer
 	nlp	name-list pointer
 
 	Returns:
-
 	>=0	good
-	<0	error
-
+	<0	error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -66,15 +62,17 @@
 #include	<fcntl.h>
 #include	<csignal>
 #include	<climits>
+#include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
+#include	<opendefstds.h>
 #include	<bfile.h>
 #include	<varsub.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
 #include	<connection.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -129,19 +127,19 @@
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	snsdd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
+extern int	snsdd(char *,int,cchar *,uint) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
 extern int	ctdeci(char *,int,int) ;
-extern int	bufprintf(const char *,int,...) ;
+extern int	bufprintf(cchar *,int,...) ;
 extern int	dupup(int,int) ;
-extern int	nlspeername(const char *,const char *,char *) ;
-extern int	mklogidsub(char *,int,const char *,int) ;
+extern int	nlspeername(cchar *,cchar *,char *) ;
+extern int	mklogidsub(char *,int,cchar *,int) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
 extern int	varsub_addvec(VARSUB *,VECSTR *) ;
@@ -158,7 +156,7 @@ extern int	progipcbegin(PROGINFO *) ;
 extern int	progipcend(PROGINFO *) ;
 extern int	proghandle(PROGINFO *,
 			STANDING *,BUILTIN *,CLIENTINFO *) ;
-extern int	proglogout(PROGINFO *,const char *,const char *) ;
+extern int	proglogout(PROGINFO *,cchar *,cchar *) ;
 extern int	progsvccheck(PROGINFO *) ;
 extern int	progacccheck(PROGINFO *) ;
 extern int	progpeername(PROGINFO *,CLIENTINFO *,char *) ;
@@ -172,9 +170,7 @@ extern int	strlinelen(cchar *,int,int) ;
 extern int	progexports(PROGINFO *,cchar *) ;
 #endif /* CF_DEBUGS */
 
-extern cchar	*strsigabbr(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
@@ -244,7 +240,7 @@ static int	procwatchpollipc_cmd(PROGINFO *,
 static int	procwatchmaint(PROGINFO *,SUBINFO *) ;
 static int	procwatchmaintout(PROGINFO *,LISTENSPEC_INFO *,int,int) ;
 
-static int	procwatchsubcmd(PROGINFO *,const char *) ;
+static int	procwatchsubcmd(PROGINFO *,cchar *) ;
 
 static int	procwatchsubcmd_clear(PROGINFO *) ;
 
@@ -261,7 +257,7 @@ static volatile int	if_exit ;
 static volatile int	if_int ;
 static volatile int	if_child ;
 
-static const char	*subcmds[] = {
+static cchar	*subcmds[] = {
 	"clear",
 	NULL
 } ;
@@ -321,7 +317,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 /* before we go too far, are we the only one on this PID mutex? */
 
 	if ((pip->fl.defpidlock && (! pip->fl.named)) || pip->fl.daemon) {
-	    const char	*pidmsg ;
+	    cchar	*pidmsg ;
 
 	    rs = progpidbegin(pip,TO_LOCK) ;
 
@@ -354,11 +350,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 /* we want to receive the new socket (from 'accept') above these guys */
 
 	if (pip->fl.daemon) {
-	    for (i = 0 ; i < 3 ; i += 1) {
-	        oflags = (i == 2) ? O_WRONLY : O_RDONLY ;
-	        if (u_fstat(i,&sb) < 0)
-	            u_open(NULLFNAME,oflags,0666) ;
-	    }
+	    rs = opendefstds(3) ;
 	} /* end if (daemon mode) */
 
 	pip->daytime = time(NULL) ;
@@ -437,7 +429,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 #endif /* CF_SIGCHILD */
 
 	if (pip->fl.daemon && pip->open.logprog) {
-	    const char	*ts = timestr_logz(pip->daytime,timebuf) ;
+	    cchar	*ts = timestr_logz(pip->daytime,timebuf) ;
 	    pip->daytime = time(NULL) ;
 	    proglog_printf(pip,"%s ready",ts) ;
 	    proglog_flush(pip) ;
@@ -621,7 +613,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 	        to_broken = TO_BROKEN ;
 		to_maint = 0 ;
 		if ((rs = procwatchsubcmd_clear(pip)) > 0) {
-		    const int	c = rs ;
+		    cint	c = rs ;
 		    if (pip->open.logprog) {
 			cchar	*fmt = "%s broken re-activation (%u)" ;
 			f_logged = TRUE ;
@@ -922,7 +914,7 @@ static int procwatchpoll(PROGINFO *pip,SUBINFO *wip)
 
 		    ns = -1 ;
 	            if (fd == pip->fd_listentcp) {
-			const int	lfd = pip->fd_listentcp ;
+			cint	lfd = pip->fd_listentcp ;
 
 	                salen = sizeof(SOCKADDRESS) ;
 	                if ((rs1 = u_accept(lfd,&cip->sa,&salen)) >= 0) {
@@ -934,7 +926,7 @@ static int procwatchpoll(PROGINFO *pip,SUBINFO *wip)
 
 	            } else if (fd == pip->fd_listenpass) {
 	                STRRECVFD	passer ;
-			const int	lfd = pip->fd_listenpass ;
+			cint	lfd = pip->fd_listenpass ;
 			int		size = sizeof(struct strrecvfd) ;
 			int		to = pip->to_recvfd ;
 
@@ -1011,14 +1003,14 @@ static int procwatchpollipc(PROGINFO *pip,SUBINFO *wip)
 
 	mp = &mip->ipcmsg ;
 	if ((rs = u_recvmsg(ipp->fd_req,mp,0)) > 0) {
-	    const int	rcode = MKCHAR(mip->ipcbuf[0]) ;
+	    cint	rcode = MKCHAR(mip->ipcbuf[0]) ;
 	    mip->ipcmsglen = rs ;
 
 /* check if we were passed a FD */
 
 	if (mp->msg_controllen > 0) {
 	    struct cmsghdr	*cmp = CMSG_FIRSTHDR(mp) ;
-	    const int		fdlen = sizeof(int) ;
+	    cint		fdlen = sizeof(int) ;
 	    while (cmp != NULL) {
 
 	        ip = (int *) CMSG_DATA(cmp) ;
@@ -1398,7 +1390,7 @@ static int procwatchpollipc_gethelp(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	int		rs1 ;
 	int		idx ;
 	int		blen ;
-	const char	*cnp = NULL ;	/* command name-pointer */
+	cchar	*cnp = NULL ;	/* command name-pointer */
 
 	if ((rs1 = muximsg_gethelp(&i13,1,mip->ipcbuf,IPCBUFLEN)) >= 0) {
 
@@ -1455,7 +1447,7 @@ static int procwatchpollipc_mark(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	struct muximsg_mark	i11 ;
 	struct muximsg_response	i0 ;
 	PROGINFO_IPC	*ipp = &pip->ipc ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1541,7 +1533,7 @@ static int procwatchpollipc_default(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	PROGINFO_IPC	*ipp = &pip->ipc ;
 	STANDING	*osp = &wip->ourstand ;
 	time_t		dt = pip->daytime ;
-	const int	rcode = MKCHAR(mip->ipcbuf[0]) ;
+	cint	rcode = MKCHAR(mip->ipcbuf[0]) ;
 	int		rs ;
 	int		len ;
 	char		resbuf[MSGBUFLEN + 1] ;
@@ -1618,11 +1610,11 @@ static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 		}
 
 	    } else if (WIFSIGNALED(cs)) {
-		const int	sig = WTERMSIG(cs) ;
-		const char	*ss ;
+		cint	sig = WTERMSIG(cs) ;
+		cchar	*ss ;
 		char		sigbuf[20+1] ;
 
-		if ((ss = strsigabbr(sig)) == NULL) {
+		if ((ss = strabbrsig(sig)) == NULL) {
 		     ctdeci(sigbuf,20,sig) ;
 		     ss = sigbuf ;
 		}
@@ -1898,7 +1890,7 @@ static int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
 
 	    cip->stime = pip->daytime ;
 	    if (pip->open.logprog) {
-		const int	v = cip->pid ;
+		cint	v = cip->pid ;
 	        proglog_printf(pip,"server pid=%u\n",v) ;
 	    }
 
@@ -2039,7 +2031,7 @@ static int procwatchmaint(PROGINFO *pip,SUBINFO	 *wip)
 	LISTENSPEC_INFO	li ;
 	POLLER_SPEC	ps ;
 	vecobj		*llp = &pip->listens ;
-	const int	events = (POLLIN | POLLPRI) ;
+	cint	events = (POLLIN | POLLPRI) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ac ;
@@ -2232,7 +2224,7 @@ static int procwatchpolling(PROGINFO *pip,SUBINFO *wip,int fd,int re)
 
 #if	CF_DEBUG
 			if (DEBUGLEVEL(5)) {
-			const int	alen = MAXPATHLEN ;
+			cint	alen = MAXPATHLEN ;
 			int		al ;
 			char		abuf[MAXPATHLEN+1] ;
 			rs1 = sockaddress_getaf(&cip->sa) ;
@@ -2351,8 +2343,8 @@ int			ls ;
 {
 	int		rs = SR_OK ;
 	int		f_logged = FALSE ;
-	const char	*statstr ;
-	const char	*broken = "broken" ;
+	cchar	*statstr ;
+	cchar	*broken = "broken" ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 	char		tmpbuf[LOGIDLEN + 1] ;
 
