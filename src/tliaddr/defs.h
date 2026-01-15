@@ -1,4 +1,6 @@
-/* defs */
+/* who_defs HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* version %I% last-modified %G% */
 
@@ -92,6 +94,11 @@
 #else
 #define	LINEBUFLEN	2048
 #endif
+#endif
+
+/* mail address */
+#ifndef	MAILADDRLEN
+#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
 #endif
 
 /* timezone (zoneinfo) name */
