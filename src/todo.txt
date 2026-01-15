@@ -4,20 +4,17 @@ TODO
 
 file		what
 --------------------------------------------------------------------------------
-xcpuspeed
-ufcntl		?? weirdo problem
+ufcntl		?? weirdo problem (LIBU)
 uctim
 libuc		fix to completely compile!
-ucopen
 ucopen		needs dynamic allocation
 fsdirtree	needs pointer implementation and a lot of cleanup
 opendialer	cleanup -- actually an incredible mess
 sdprog		mess
 srv		mess
-sysdialer
+sysdialer	mess
 cm
 mailmsghdrct	mess
-memfile		can we just trash this?
 srv{x}
 libpcs		a lot of junk in there
 convertx	part of the |ctx| group
@@ -26,7 +23,6 @@ msfile
 openqotd
 maintqotd
 utmpaccenum
-spawnproc	block structure; actually this is a huge mess
 termnote	could use some break-down of large subs into smaller ones
 ipasswd
 var
