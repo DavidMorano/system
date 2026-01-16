@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* has a counted c-string some characteristic? */
+/* does a counted c-string some characteristic? */
 /* version %I% last-modified %G% */
 
 
@@ -23,6 +23,27 @@
 	Description:
 	These subroutines check if a specified c-string has any of
 	some characteristic we are looking for.
+
+	Names:
+	hasallalpha
+	hasallalnum
+	hasalldigit
+	hasalldigex
+	hasalloctal
+	hasallwhite
+	hasallblank
+	hasalllc
+	hasalluc
+	hasallbase
+	hasallchr
+	hasallhdrkey
+	
+	Aliases:
+	hasalldig
+	hasalloct
+	hasalldec
+	hasallhex
+	hasallwht
 
 
 	Name:
@@ -92,8 +113,8 @@
 #include	<usysdefs.h>
 #include	<ascii.h>
 #include	<mkchar.h>
-#include	<char.h>
-#include	<ischarx.h>
+#include	<char.h>		/* |CHAR_TOVAL(3uc)| */
+#include	<ischarx.h>		/* |ishdrkey(3uc)| + |iswht(3uc)| */
 #include	<localmisc.h>		/* |UC(3dam)| */
 
 #include	"hasall.h"
@@ -112,6 +133,10 @@ import ulibvals ;			/* |ulibval(3u)| */
 
 /* local typedefs */
 
+extern "C" {
+    typedef bool (*isc_f)(int) noex ;
+}
+
 
 /* external subroutines */
 
@@ -123,6 +148,20 @@ import ulibvals ;			/* |ulibval(3u)| */
 
 
 /* forward references */
+
+local bool hasallx(isc_f isx,cchar *sp,int sl) noex {
+	bool		f = true ;
+	if (sp) ylikely {
+	    while (sl && *sp) {
+		cint ch = mkchar(*sp) ;
+	        f = isx(ch) ;
+	        if (! f) break ;
+	        sp += 1 ;
+	        sl -= 1 ;
+	    } /* end while */
+	} /* end if (non-null) */
+	return f ;
+} /* end subroutine (hasallx) */
 
 
 /* local variables */
@@ -136,94 +175,56 @@ static cint		maxbase = ulibval.maxbase ;
 /* exported subroutines */
 
 bool hasallalpha(cchar *sp,int sl) noex {
-	bool		f = true ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        cint	ch = mkchar(*sp) ;
-	        f = isalphalatin(ch) ;
-	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasallx(isalphalatin,sp,sl) ;
 }
 /* end subroutine (hasallalpha) */
 
 bool hasallalnum(cchar *sp,int sl) noex {
-	bool		f = true ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        cint	ch = mkchar(*sp) ;
-	        f = isalnumlatin(ch) ;
-	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasallx(isalnumlatin,sp,sl) ;
 }
 /* end subroutine (hasallalnum) */
 
+bool hasalldigit(cchar *sp,int sl) noex {
+    	return hasallx(isdigitlatin,sp,sl) ;
+}
+/* end subroutine (hasalldigit) */
+
+bool hasalldigex(cchar *sp,int sl) noex {
+    	return hasallx(isdigexlatin,sp,sl) ;
+}
+/* end subroutine (hasalldigex) */
+
+bool hasalloctal(cchar *sp,int sl) noex {
+    	return hasallx(isoctallatin,sp,sl) ;
+}
+/* end subroutine (hasalloctal) */
+
 bool hasallwhite(cchar *sp,int sl) noex {
-	bool		f = true ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISWHITE(*sp) ;
-	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasallx(iswhitelatin,sp,sl) ;
+}
+/* end subroutine (hasallwhite) */
+
+bool hasallblank(cchar *sp,int sl) noex {
+    	return hasallx(isblanklatin,sp,sl) ;
 }
 /* end subroutine (hasallwhite) */
 
 bool hasalllc(cchar *sp,int sl) noex {
-	bool		f = true ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISLC(*sp) ;
-	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasallx(islowerlatin,sp,sl) ;
 }
 /* end subroutine (hasalllc) */
 
 bool hasalluc(cchar *sp,int sl) noex {
-	bool		f = true ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISUC(*sp) ;
-	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasallx(isupperlatin,sp,sl) ;
 }
 /* end subroutine (hasalluc) */
 
-bool hasalldig(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        cint	ch = mkchar(*sp) ;
-	        f = isdigitlatin(ch) ;
-	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+bool hasallhdrkey(cchar *sp,int sl) noex {
+    	return hasallx(ishdrkey,sp,sl) ;
 }
-/* end subroutine (hasalldig) */
+/* end subroutine (hasallhdrkey) */
 
 bool hasallbase(cchar *sp,int sl,int b) noex {
-    	cauto		iswht = char_iswhite ;
 	bool		f = false ;
 	if (sp && (maxbase >= 0)) ylikely {
 	    if ((b >= 2) && (b <= maxbase)) {
@@ -256,21 +257,6 @@ bool hasallchr(cchar *sp,int sl,int ch_s) noex {
 	return f ;
 }
 /* end subroutine (hasallchr) */
-
-bool hasallhdrkey(cchar *sp,int sl) noex {
-	bool		f = true ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        cint	ch = mkchar(*sp) ;
-	        f = ishdrkey(ch) ;
-	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
-}
-/* end subroutine (hasallhdrkey) */
 
 
 /* local subroutines */
