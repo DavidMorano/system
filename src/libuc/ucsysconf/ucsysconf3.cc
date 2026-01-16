@@ -65,9 +65,16 @@ module ;
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* |{xx}buflen| + |ustd_{x}(3u)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<utimeout.h>		/* |uto_{x}| */
+#include	<usupport.h>		/* |sncpyx(3u)| */
+#include	<ustd.h>		/* |ustd_conf{x}| */
+#include	<intsat.h>
 #include	<sysconfcmds.h>
 #include	<localmisc.h>
+
+#include	"ucsysconf.h"		/* |CS_{x}(3uc)| */
 
 module ucsysconf ;
 
