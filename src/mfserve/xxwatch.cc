@@ -1,8 +1,9 @@
-/* progwatch */
+/* progwatch SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* progwatch (listen on) the specified socket */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
@@ -13,14 +14,13 @@
 #define	CF_MKSUBLOGID	1		/* use 'mklogidsub(3dam)' */
 #define	CF_LOGCHECK	1		/* call 'proglog_check()' */
 
-
 /* revision history:
 
 	= 2008-06-23, David A­D­ Morano
-        I updated this subroutine to just poll for machine status and write the
-        Machine Status (MS) file. This was a cheap excuse for not writing a
-        whole new daemon program just to poll for machine status. I hope this
-        works out! :-)
+	I updated this subroutine to just poll for machine status
+	and write the Machine Status (MS) file. This was a cheap
+	excuse for not writing a whole new daemon program just to
+	poll for machine status. I hope this works out! :-)
 
 */
 
@@ -28,34 +28,28 @@
 
 /*******************************************************************************
 
-        This subroutine is responsible for listening on the given socket and
-        spawning off a program to handle any incoming connection. Some of the
-        "internal" messages are handled here (the easy ones -- or the ones that
-        fit here best). The rest (that look like client-sort-of requests) are
-        handled in the 'standing' object module.
+  	Description:
+	This subroutine is responsible for listening on the given
+	socket and spawning off a program to handle any incoming
+	connection. Some of the "internal" messages are handled
+	here (the easy ones -- or the ones that fit here best). The
+	rest (that look like client-sort-of requests) are handled
+	in the 'standing' object module.
 
 	Synopsis:
-
-	int progwatch(pip,nlp)
-	PROGINFO	*pip ;
-	vecstr		*nlp ;
+	int progwatch(proginfo *pip,vecstr *nlp) noex
 
 	Arguments:
-
 	pip	program information pointer
 	nlp	name-list pointer
 
 	Returns:
-
 	>=0	good
-	<0	error
-
+	<0	error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -66,15 +60,17 @@
 #include	<fcntl.h>
 #include	<csignal>
 #include	<climits>
+#include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
+#include	<opendefstds.h>
 #include	<bfile.h>
 #include	<varsub.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
 #include	<connection.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -171,8 +167,6 @@ extern int	debugprinthexblock(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	progexports(PROGINFO *,cchar *) ;
 #endif /* CF_DEBUGS */
-
-extern cchar	*strsigabbr(int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*timestr_log(time_t,char *) ;
@@ -354,11 +348,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 /* we want to receive the new socket (from 'accept') above these guys */
 
 	if (pip->fl.daemon) {
-	    for (i = 0 ; i < 3 ; i += 1) {
-	        oflags = (i == 2) ? O_WRONLY : O_RDONLY ;
-	        if (u_fstat(i,&sb) < 0)
-	            u_open(NULLFNAME,oflags,0666) ;
-	    }
+	    rs = opendefstds(3) ;
 	} /* end if (daemon mode) */
 
 	pip->daytime = time(NULL) ;
@@ -1622,7 +1612,7 @@ static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 		const char	*ss ;
 		char		sigbuf[20+1] ;
 
-		if ((ss = strsigabbr(sig)) == NULL) {
+		if ((ss = strabbrsig(sig)) == NULL) {
 		     ctdeci(sigbuf,20,sig) ;
 		     ss = sigbuf ;
 		}
