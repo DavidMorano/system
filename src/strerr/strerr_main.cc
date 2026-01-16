@@ -1,4 +1,4 @@
-/* strerr_main SUPPORT (files) */
+/* strerr_main SUPPORT (strerr) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -22,7 +22,8 @@
 	strerr_main
 
 	Description:
-	This program enumerates directories and files.
+	This program prints out the common abbreviated symbolic
+	name of an ERRNO value.
 
 	Synopsis:
 	main(int argc,mainv argv,mainv argv)
@@ -359,6 +360,7 @@ constexpr bool		f_debug		= CF_DEBUG ;
 
 int main(int argc,mainv argv,mainv envv) {
     	constexpr int	dfd = (f_debug) ? FD_STDERR : -1 ;
+	string		spn ;
 	int		ex = EX_OK ;
 	int		rs ;
 	int		rs1 ;
@@ -367,12 +369,14 @@ int main(int argc,mainv argv,mainv envv) {
 	if (proginfo pi(argc,argv,envv) ; (rs = pi.start) >= 0) {
 	    {
                 rs = pi.argproc() ;
+	        spn = pi.pn ;
 	    }
 	    rs1 = pi.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (proginfo) */
 	if ((ex == EX_OK) && (rs < 0)) {
-	    cerr << "files" << ": error (" << rs << ")" << eol ;
+	    cchar *cp = spn.c_str() ;
+            fprintf(stderr,"%s: error (%d)\n",cp,rs) ;
 	    ex = mapex(mapexs,rs) ;
 	}
 	DEBPRINTF("ret ex=%d\n",ex) ;
@@ -552,7 +556,7 @@ int proginfo::args(argmgr *amp) noex {
 	    } else if ((rs >= 0) && ((rs = amp->argoptlong(&sp)) > 0)) {
 		rs = argoptlong(amp,sp,rs) ;
 	    }
-	    if ((rs < 0) || amp->argoptdone) break ;
+	    if ((rs < 0) || amp->fargoptdone) break ;
 	} /* end while */
 	return rs ;
 } /* end method (proginfo::args) */
@@ -650,6 +654,7 @@ int proginfo::argoptchr(argmgr *amp,cchar *sp,int sl) noex {
 		rs = SR_INVALID ;
 		break ;
 	    } /* end switch */
+	    if (rs < 0) break ;
 	} /* end while */
 	return rs ;
 } /* end method (proginfo::argoptchr) */
@@ -1047,14 +1052,14 @@ int proginfo::typeout(cchar *cp,int cl)  noex {
 
 int proginfo::argdebug(argmgr *amp) noex {
     	int		rs = SR_OK ;
-	if (amp->haveargoptval) {
+	if (amp->fargoptval) {
 	    cchar *cp ;
 	    if ((rs = amp->argval(&cp)) > 0) {
 		if ((rs = optval(cp,rs)) >= 0) {
 		    debuglevel = rs ;
 		}
 	    } /* end if (argoptval) */
-	} /* end if (haveargoptval) */
+	} /* end if (fargoptval) */
 	return rs ;
 } /* end method (proginfo::argdebug) */
 
