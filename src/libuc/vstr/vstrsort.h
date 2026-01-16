@@ -28,7 +28,7 @@
 
 EXTERNC_begin
 
-typedef int (*vcmp_f)(cchar **,cchar **) noex ;
+typedef int	(*vcmp_f)(cchar **,cchar **) noex ;
 
 extern void	vstrsort(cchar **,int,vcmp_f) noex ;
 
