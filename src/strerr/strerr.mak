@@ -161,6 +161,8 @@ objb.o:			$(OBJB)
 
 
 strerr_main.o:		strerr_main.cc $(DEPS_MAIN)		$(INCS)
+	sleep 1
+	$(COMPILE.cc) $<
 
 # MODS
 mods.o:			$(DEPS_MAIN)
@@ -227,6 +229,6 @@ strx.dir:
 	makesubdir $@
 
 shortq.o:		shortq.cc	shortq.h		$(INCS)
-ischarx.o:		ischarx.cc	ischarx.h
-
+ischarx.o:		ischarx.cc	ischarx.h		$(INCS)
+strabbrerr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
 
