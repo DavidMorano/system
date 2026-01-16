@@ -105,7 +105,7 @@ void vecelem::dtor() noex {
 
 vecelem::operator int () noex {
     	int		rs = SR_NOTOPEN ;
-	if (n > 0) {
+	if (magic == VECELEM_MAGIC) {
 	    rs = c ;
 	}
 	return rs ;
