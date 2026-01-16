@@ -31,11 +31,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
 #include	<uclibmem.h>
 #include	<fsdirtree.h>
 #include	<localmisc.h>
@@ -71,7 +67,7 @@ using libuc::libmem ;			/* variable */
 
 /* local variables */
 
-static int		maxpathlen = ulibval.maxpathlen ;
+local int		maxpathlen = ulibval.maxpathlen ;
 
 
 /* exported variables */
@@ -83,8 +79,8 @@ int vecstrx::addsubdirs(cchar *newsdname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (newsdname) {
-	    if ((rs = maxpathlen) >= 0) {
+	if (newsdname) ylikely {
+	    if ((rs = maxpathlen) >= 0) ylikely {
 		cint	flen = rs ;
 	        if (char *fbuf ; (rs = libmem.mall((flen +1),&fbuf)) >= 0) {
 	            fsdirtree	dir ;
