@@ -84,7 +84,7 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ugetpid.h>
@@ -101,6 +101,7 @@
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<ascii.h>
+#include	<snx.h>
 #include	<strn.h>
 #include	<spawner.h>
 #include	<timestr.h>
@@ -2131,7 +2132,7 @@ static int procuserinfo_orgcode(PROGINFO *pip)
 	    cchar	*org = pip->org ;
 	    char	obuf[ORGCODELEN+1] ;
 	    if ((org != NULL) && (org[0] != '\0')) {
-	        rs = snabbr(obuf,olen,org,-1) ;
+	        rs = snabbrname(obuf,olen,org,-1) ;
 	        ol = rs ;
 	    }
 	    if (rs >= 0) {
