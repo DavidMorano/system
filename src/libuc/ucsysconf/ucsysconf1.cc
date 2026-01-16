@@ -66,10 +66,16 @@ module ;
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* |ustd_{xx}| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<utimeout.h>		/* |uto_{x}| */
+#include	<ustd.h>		/* |ustd_conf{x}| */
+#include	<intsat.h>
 #include	<sysconfcmds.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
+
+#include	"ucsysconf.h"
 
 module ucsysconf ;
 
