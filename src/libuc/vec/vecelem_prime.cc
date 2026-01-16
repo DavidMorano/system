@@ -391,8 +391,10 @@ int vecelem_audit(vecelem *op) noex {
 	        } /* end if (ok) */
 	    } /* end if (non-nullptr va) */
 	    if (rs >= 0) {
-	        if ((op->i > op->n) || (op->c > op->i)) rs = SR_BADFMT ;
-	    }
+	        if ((op->i > op->n) || (op->c > op->i)) {
+		    rs = SR_BADFMT ;
+		}
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -412,10 +414,10 @@ local int vecelem_ctor(vecelem *op) noex {
 	    op->fi = 0 ;
 	    op->esz = 0 ;
 	    op->magic = 0 ;
+	    op->fl = {} ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecelem_ctor) */
+} /* end subroutine (vecelem_ctor) */
 
 local int vecelem_dtor(vecelem *op) noex {
 	int		rs = SR_FAULT ;
@@ -423,8 +425,7 @@ local int vecelem_dtor(vecelem *op) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (vecelem_dtor) */
+} /* end subroutine (vecelem_dtor) */
 
 consteval int mkoptmask() noex {
 	int		m = 0 ;
@@ -453,8 +454,7 @@ local int vecelem_setopts(vecelem *op,int vo) noex {
 	    if (vo & vecelemm.conserve)		op->fl.oconserve 	= true ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (vecelem_setopts) */
+} /* end subroutine (vecelem_setopts) */
 
 local int vecelem_extend(vecelem *op) noex {
 	int		rs = SR_OK ;
@@ -477,8 +477,7 @@ local int vecelem_extend(vecelem *op) noex {
 	    } /* end if (ok) */
 	} /* end if (extension required) */
 	return rs ;
-}
-/* end subroutine (vecelem_extend) */
+} /* end subroutine (vecelem_extend) */
 
 local int vecelem_validx(vecelem *op,int i) noex {
 	return ((i >= 0) && (i < op->i)) ? SR_OK : SR_NOENT ;
