@@ -1,4 +1,5 @@
 /* mfswatch SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* watch (listen on) the specified service-access-points */
@@ -49,7 +50,6 @@
 		2	"uss"
 		3	"pass"
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -75,8 +75,9 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<varsub.h>
@@ -91,6 +92,7 @@
 #include	<envhelp.h>
 #include	<spawnproc.h>
 #include	<filer.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -189,7 +191,6 @@ extern int	progexports(PROGINFO *,const char *) ;
 #endif /* CF_DEBUGS */
 
 extern cchar	*getourenv(cchar **,cchar *) ;
-extern cchar	*strsigabbr(int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strnchr(cchar *,int,int) ;
@@ -525,7 +526,7 @@ static int mfswatch_poll(PROGINFO *pip,POLLER_SPEC *psp)
 	if (DEBUGLEVEL(4)) {
 	    cint	plen = TIMEBUFLEN ;
 	    char	pbuf[TIMEBUFLEN+1] ;
-	    snpollflags(pbuf,plen,re) ;
+	    snflagspoll(pbuf,plen,re) ;
 	    debugprintf("mfswatch_poll: ent fd=%u re=(%s)\n",fd,pbuf) ;
 	}
 #endif /* CF_DEBUG */
@@ -2415,7 +2416,7 @@ static int mfswatch_logprogres(PROGINFO *pip,int jsn,cchar *lid,
 	    cchar	*ss ;
 	    char	sigbuf[20+1] ;
 
-	    if ((ss = strsigabbr(sig)) == NULL) {
+	    if ((ss = strabbrsig(sig)) == NULL) {
 	        ctdeci(sigbuf,20,sig) ;
 	        ss = sigbuf ;
 	    }
