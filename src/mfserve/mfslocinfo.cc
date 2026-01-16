@@ -732,7 +732,7 @@ int locinfo_rootids(LOCINFO *lip)
 
 	if (lip->gid_rootname < 0) {
 	    if ((rs = proginfo_rootname(pip)) >= 0) {
-		if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+		if ((rs = getbufsize(bufsize_pw)) >= 0) {
 	            struct passwd	pw ;
 	            const int		pwlen = rs ;
 	            char		*pwbuf ;
