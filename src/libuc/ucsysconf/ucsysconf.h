@@ -35,10 +35,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* |_CS_{xx}| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<sysconfcmds.h>
 
 
 enum sysconfstrss {
@@ -47,7 +45,7 @@ enum sysconfstrss {
 	sysconfstr_tmpdir,
 	sysconfstr_cachedir,
 	sysconfstr_overlast
-} ;
+} ; /* end enum (sysconfstrss) */
 
 
 #ifndef	_CS_PUBLICDIR
@@ -99,9 +97,17 @@ namespace libuc {
 	    return operator int () ;
 	} ;
     } ; /* end struct (uxmaxliner) */
-}
+    struct ucmaxgrouper {
+    	int		ng ;
+	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+    } ; /* end struct (ucmaxgrouper) */
+} /* end namespace (libuc) */
 
 extern libuc::ucmaxliner	ucmaxline ;
+extern libuc::ucmaxgrouper	ucmaxgroups ;
 
 #endif /* __cplusplus */
 
