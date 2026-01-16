@@ -1,16 +1,17 @@
-/* ussmux */
+/* ussmux SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SYSDIALER "ussmux" dialer */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
-
 /* revision history:
 
-	= 2003-11-04, David A­D­ Morano
-        This was created as one of the first dialer modules for the SYSDIALER
-        object.
+	= 1998-11-04, David A­D­ Morano
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
 
 */
 
@@ -18,34 +19,28 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is a SYSDIALER module.
 
 	Synopsis:
-
 	ussmux <path>
 
 	Arguments:
-
 	<path>		pathto socket file
-
 
 *******************************************************************************/
 
-
-#define	USSMUX_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<keyopt.h>
 #include	<field.h>
