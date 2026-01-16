@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* has a counted c-string some characteristic? */
+/* does a counted c-string some characteristic? */
 /* version %I% last-modified %G% */
 
 
@@ -27,14 +27,16 @@
 #include	<matstr.h>		/* used below in this header */
 #include	<stdfnames.h>		/* used below in this header */
 
+
 EXTERNC_begin
 
 extern bool hasalpha(cchar *,int) noex ;
 extern bool hasalnum(cchar *,int) noex ;
 extern bool hasdigit(cchar *,int) noex ;
 extern bool hasdigex(cchar *,int) noex ;
-extern bool haswhite(cchar *,int) noex ;
 extern bool hasoctal(cchar *,int) noex ;
+extern bool haswhite(cchar *,int) noex ;
+extern bool hasblank(cchar *,int) noex ;
 
 extern bool haslc(cchar *,int) noex ;
 extern bool hasuc(cchar *,int) noex ;
