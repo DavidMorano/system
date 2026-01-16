@@ -44,17 +44,17 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<vsystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<char.h>
 #include	<field.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -109,7 +109,6 @@ extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
-extern cchar	*strerrabbr(int) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strnrchr(cchar *,int,int) ;
@@ -245,8 +244,10 @@ static const uchar	aterms[] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int b_strerror(int argc,cchar *argv[],void *contextp)
 {
@@ -1143,7 +1144,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar np[],int nl)
 	    int		en ;
 	    if ((rs = cfdeci(np,nl,&en)) >= 0) {
 	        cchar	*se = strerror(en) ;
-	        cchar	*sr = strerrabbr(-en) ;
+	        cchar	*sr = strabbrerr(-en) ;
 	        if (se == NULL) se = "*unknown*" ;
 	        rs = shio_printf(ofp,"%4u %s ­ %s\n",en,sr,se) ;
 	        wlen += rs ;
