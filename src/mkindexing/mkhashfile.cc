@@ -44,7 +44,7 @@
 #include	<sys/stat.h>
 #include	<climits>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
