@@ -1,17 +1,18 @@
-/* tcpnls */
+/* tcpnls SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SYSDIALER "tcpnls" dialer */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SOLARISBUG	1		/* bad bug in Solaris TLI */
 
-
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-        This was created as one of the first dialer modules for the SYSDIALER
-        object.
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
 
 */
 
@@ -19,37 +20,31 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is a SYSDIALER module.
 
 	Synopsis:
-
 	tcpnls [[<host>:]<port>] [-f <af>]
 
 	Arguments:
-
 	host		override hostname
 	port		service port
 	af		address family
 
-
 *******************************************************************************/
 
-
-#define	TCPNLS_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<localmisc.h>
 
