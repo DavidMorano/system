@@ -55,7 +55,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;			/* |resumelife(3u)| + |getlenstr(3u)| */
+import libutil ;			/* |resumelife(3u)| + |getlen(3u)| */
 
 /* local defines */
 
@@ -376,7 +376,7 @@ int shortq_load(shortq *op,short *sp,int µsl) noex {
 		} else {
 		    rs = SR_BUGCHECK ;
 		} /* end if (non-null) */
-	    } /* end if (getlenstr) */
+	    } /* end if (getlen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (shortq_load) */
