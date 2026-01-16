@@ -1,16 +1,17 @@
-/* udp */
+/* udp SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SYSDIALER "udp" dialer */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
-
 /* revision history:
 
-	= 2003-11-04, David A­D­ Morano
-        This was created as one of the first dialer modules for the SYSDIALER
-        object.
+	= 1998-11-04, David A­D­ Morano
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
 
 */
 
@@ -18,36 +19,30 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is a SYSDIALER module.
 
 	Synopsis:
-
 	udp [[<host>:]<port>] [-f af] [-bp <backupport>]
 
 	Arguments:
-
 	+ host		override hostname
 	+ port		service port
 	+ af		address family
 
-
 *******************************************************************************/
 
-
-#define	UDP_MASTER	0
-
-
-#include	<envstandards.h>	/* MUST be first to configure */
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<localmisc.h>
 
