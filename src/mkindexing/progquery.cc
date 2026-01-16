@@ -73,8 +73,8 @@
 /* external subroutines */
 
 #if	CF_DEBUG || CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern int	progexit(PROGINFO *) ;
@@ -177,9 +177,7 @@ int progquery(PROGINFO *pip,ARGINFO *aip,const uchar *terms,
 
 /* local subroutines */
 
-
-static int procdb(PROGINFO *pip,ARGINFO *aip,bfile *ofp,cchar *dbname)
-{
+static int procdb(PROGINFO *pip,ARGINFO *aip,bfile *ofp,cchar *dbname) noex {
 	TEXTLOOK	tl, *tlp = &tl ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -257,7 +255,7 @@ static int procdb(PROGINFO *pip,ARGINFO *aip,bfile *ofp,cchar *dbname)
 	            if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	            if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                int		len ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
@@ -292,7 +290,7 @@ static int procdb(PROGINFO *pip,ARGINFO *aip,bfile *ofp,cchar *dbname)
 	            bfile	infile, *ifp = &infile ;
 
 	            if ((rs = bopen(ifp,BFILE_STDIN,"dr",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                int		len ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
@@ -335,7 +333,7 @@ static int procspecs(pip,ofp,tlp,sp,sl)
 PROGINFO	*pip ;
 bfile		*ofp ;
 TEXTLOOK	*tlp ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	VECSTR		qstr ;
@@ -350,7 +348,7 @@ int		sl ;
 
 	    if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	        const uchar	*at = aterms ;
-	        const int	wlen = WPBUFLEN ;
+	        cint	wlen = WPBUFLEN ;
 	        int		fl ;
 	        cchar		*fp ;
 	        char		wbuf[WPBUFLEN + 1] ;
@@ -405,7 +403,7 @@ vecstr		*qsp ;
 	int		ntags ;
 	int		qopts = 0 ;
 	int		c = 0 ;
-	const char	**qkeya ;
+	cchar	**qkeya ;
 
 	if (qsp == NULL) return SR_FAULT ;
 
@@ -462,12 +460,12 @@ TEXTLOOK_TAG	*tagp ;
 {
 	uint		recoff ;
 	uint		reclen ;
-	const int	olen = OUTBUFLEN ;
+	cint	olen = OUTBUFLEN ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		wlen = 0 ;
-	const char	*fmt ;
-	const char	*fn ;
+	cchar	*fmt ;
+	cchar	*fn ;
 	char		obuf[OUTBUFLEN + 1] ;
 
 	if (pip == NULL) return SR_FAULT ;
