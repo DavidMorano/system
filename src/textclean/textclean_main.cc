@@ -946,7 +946,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 static int procextras(proginfo *pip)
 {
 	struct passwd	pw ;
-	cint	pwlen = getbufsize(getbufsize_pw) ;
+	cint	pwlen = getbufsize(bufsize_pw) ;
 	int		rs ;
 	char		*pwbuf ;
 	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
