@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* has a counted c-string some characteristic? */
+/* does a counted c-string some characteristic? */
 /* version %I% last-modified %G% */
 
 
@@ -25,17 +25,37 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+
 EXTERNC_begin
 
 extern bool hasallalpha(cchar *,int) noex ;
 extern bool hasallalnum(cchar *,int) noex ;
+extern bool hasalldigit(cchar *,int) noex ;
+extern bool hasalldigex(cchar *,int) noex ;
+extern bool hasalloctal(cchar *,int) noex ;
 extern bool hasallwhite(cchar *,int) noex ;
+extern bool hasallblank(cchar *,int) noex ;
 extern bool hasalllc(cchar *,int) noex ;
 extern bool hasalluc(cchar *,int) noex ;
-extern bool hasalldig(cchar *,int) noex ;
-extern bool hasallhdrkey(cchar *,int) noex ;
 extern bool hasallbase(cchar *,int,int) noex ;
 extern bool hasallchr(cchar *,int,int) noex ;
+extern bool hasallhdrkey(cchar *,int) noex ;
+
+static inline bool hasalldig(cchar *sp,int sl) noex {
+    	return hasalldigit(sp,sl) ;
+}
+static inline bool hasalloct(cchar *sp,int sl) noex {
+    	return hasalloctal(sp,sl) ;
+}
+static inline bool hasalldec(cchar *sp,int sl) noex {
+    	return hasalldigit(sp,sl) ;
+}
+static inline bool hasallhex(cchar *sp,int sl) noex {
+    	return hasalldigex(sp,sl) ;
+}
+static inline bool hasallwht(cchar *sp,int sl) noex {
+    	return hasallwhite(sp,sl) ;
+}
 
 EXTERNC_end
 
