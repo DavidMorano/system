@@ -31,7 +31,7 @@ varmk
 varmks
 spellchecks	incredible mess!
 mcmsg		mail-related messages (needs total modern rework)
-cpuspeed	test code -> |xcpuspeed|
+inetping
 
 = Future
 
