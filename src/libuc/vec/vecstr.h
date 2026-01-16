@@ -32,10 +32,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 /* object defines */
@@ -67,14 +64,14 @@ enum vecstros {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecstrms {
-    static int	reuse ;
-    static int	compact ;
-    static int	swap ;
-    static int	stationary ;
-    static int	conserve ;
-    static int	sorted ;
-    static int	ordered ;
-} ;
+    constexpr static int	reuse		= (1 << vecstro_reuse) ;
+    constexpr static int	compact		= (1 << vecstro_compact) ;
+    constexpr static int	swap		= (1 << vecstro_swap) ;
+    constexpr static int	stationary	= (1 << vecstro_stationary) ;
+    constexpr static int	conserve	= (1 << vecstro_conserve) ;
+    constexpr static int	sorted		= (1 << vecstro_sorted) ;
+    constexpr static int	ordered		= (1 << vecstro_ordered) ;
+} ; /* end struct (vecstrms) */
 
 #endif /* __cplusplus */
 
