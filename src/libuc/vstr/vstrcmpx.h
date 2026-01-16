@@ -30,8 +30,8 @@
 
 EXTERNC_begin
 
-extern int vstrcmpo(cchar **,cchar **) noex ;
-extern int vstrcmpr(cchar **,cchar **) noex ;
+extern int	vstrcmpo(cchar **,cchar **) noex ;
+extern int	vstrcmpr(cchar **,cchar **) noex ;
 
 static inline int vstrcmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrcmpo(s1pp,s2pp) ;
