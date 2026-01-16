@@ -1,10 +1,11 @@
-/* ussinfo */
+/* ussinfo SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* USSINFO helper object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -17,33 +18,35 @@
 
 /*******************************************************************************
 
-        This is a helper object for the various USS-type SYSDIALERs. The use of
-        this object allows for common code among all of the USS-type SYSDIALERs.
+  	Name:
+	ussinfo
 
+	Description:
+	This is a helper object for the various USS-type SYSDIALERs.
+	The use of this object allows for common code among all of
+	the USS-type SYSDIALERs.
 
 *******************************************************************************/
 
-
-#define	USSINFO_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<keyopt.h>
 #include	<field.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<userinfo.h>
 #include	<nulstr.h>
+#include	<hasx.h>
+#include	<isx.h>
 #include	<localmisc.h>
 
 #include	"envs.h"
@@ -69,28 +72,23 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
 extern int	permid(IDS *,ustat *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	getaf(const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,const char *) ;
-extern int	vecstr_envadd(VECSTR *,const char *,const char *,int) ;
-extern int	vecstr_envadds(VECSTR *,const char *,int) ;
+extern int	mkpr(char *,int,cchar *,cchar *) ;
+extern int	getaf(cchar *,int) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
+extern int	vecstr_loadfile(vecstr *,int,cchar *) ;
+extern int	vecstr_envadd(VECSTR *,cchar *,cchar *,int) ;
+extern int	vecstr_envadds(VECSTR *,cchar *,int) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
-			const char *,const char *) ;
-extern int	hasleadcolon(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+			cchar *,cchar *) ;
 
 
 /* external variables */
@@ -106,9 +104,9 @@ extern char	**environ ;
 static int	ussinfo_userinfo(USSINFO *) ;
 static int	ussinfo_addrparseunix(USSINFO *,int) ;
 static int	ussinfo_addrparseinet(USSINFO *) ;
-static int	ussinfo_dirok(USSINFO *,const char *,int) ;
-static int	ussinfo_setentry(USSINFO *,const char **,
-			const char *,int) ;
+static int	ussinfo_dirok(USSINFO *,cchar *,int) ;
+static int	ussinfo_setentry(USSINFO *,cchar **,
+			cchar *,int) ;
 
 
 /* external variables (module information) */
@@ -116,7 +114,7 @@ static int	ussinfo_setentry(USSINFO *,const char **,
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"RN",
 	"sn",
@@ -144,7 +142,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char *procopts[] = {
+static cchar *procopts[] = {
 	"log",
 	NULL
 } ;
@@ -163,15 +161,15 @@ USSINFO		*sip ;
 void		*op ;
 SYSDIALER_INFO	*dip ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
+cchar	hostname[] ;
+cchar	svcname[] ;
 {
 	int	rs = SR_OK ;
 
 
 	memset(sip,0,sizeof(USSINFO)) ;
 
-	sip->envv = (const char **) environ ;
+	sip->envv = (cchar **) environ ;
 	sip->op = op ;
 	sip->searchname = dip->name ;
 	sip->version = dip->version ;
@@ -273,16 +271,16 @@ USSINFO		*sip ;
 	int	f_optminus, f_optplus, f_optequal ;
 	int	f_doubledash = FALSE ;
 
-	const char	**argv ;
-	const char	*argval = NULL ;
-	const char	*argp, *aop, *akp, *avp ;
+	cchar	**argv ;
+	cchar	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
 
 
 #if	CF_DEBUGS
 	debugprintf("ussinfo/ussinfo_procargs: arguments\n") ;
 #endif
 
-	argv = (const char **) ap->argv ;
+	argv = (cchar **) ap->argv ;
 
 	for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
 
@@ -607,10 +605,10 @@ USSINFO		*sip ;
 
 		switch (pan) {
 		case 0:
-	            sip->portspec = (const char *) argp ;
+	            sip->portspec = (cchar *) argp ;
 		    break ;
 		case 1:
-	            sip->svcname = (const char *) argp ;
+	            sip->svcname = (cchar *) argp ;
 		    break ;
 		} /* end switch */
 		pan += 1 ;
@@ -681,7 +679,7 @@ KEYOPT		*kop ;
 	if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	    int		oi ;
 	    int		kl, vl ;
-	    const char	*kp, *vp ;
+	    cchar	*kp, *vp ;
 
 	while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
 
@@ -725,7 +723,7 @@ USSINFO		*sip ;
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	const char	*vp ;
+	cchar	*vp ;
 
 
 	ap = sip->ap ;
@@ -810,12 +808,8 @@ USSINFO		*sip ;
 }
 /* end subroutine (ussinfo_defaults) */
 
-
-int ussinfo_addrparse(sip)
-USSINFO		*sip ;
-{
-	int	rs = SR_OK ;
-
+int ussinfo_addrparse(USSINFO *sip) noex {
+	int		rs = SR_OK ;
 
 	if ((sip->portspec != NULL) && (sip->portspec[0] != '\0')) {
 
@@ -850,15 +844,15 @@ USSINFO		*sip ;
 	int	f = sip->init.log ;
 
 	if (sip->fl.log && (! sip->init.log)) {
-	    const char	*lfname = sip->lfname ;
+	    cchar	*lfname = sip->lfname ;
 	    sip->init.log = TRUE ;
 	    f = TRUE ;
 
 	    if (lfname[0] != '/') {
-		const char	*logdname = USSINFO_LOGDNAME ;
+		cchar	*logdname = USSINFO_LOGDNAME ;
 	        char		tbuf[MAXPATHLEN + 1] ;
 	        if ((rs = mkpath3(tbuf,sip->pr,logdname,lfname)) >= 0) {
-		    const char	**vpp = &sip->lfname ;
+		    cchar	**vpp = &sip->lfname ;
 		    rs = ussinfo_setentry(sip,vpp,tbuf,rs) ;
 		}
 	    }
@@ -883,8 +877,8 @@ USSINFO		*sip ;
 
 static int ussinfo_setentry(sip,epp,sp,sl)
 USSINFO		*sip ;
-const char	**epp ;
-const char	sp[] ;
+cchar	**epp ;
+cchar	sp[] ;
 int		sl ;
 {
 	int	rs = SR_OK ;
@@ -958,7 +952,7 @@ USSINFO		*sip ;
 
 static int ussinfo_dirok(sip,d,dlen)
 USSINFO		*sip ;
-const char	d[] ;
+cchar	d[] ;
 int		dlen ;
 {
 	ustat	sb ;
@@ -969,7 +963,7 @@ int		dlen ;
 	int	rs1 ;
 	int	f = FALSE ;
 
-	const char	*dnp ;
+	cchar	*dnp ;
 
 
 	if (! sip->open.ids) {
@@ -1005,7 +999,7 @@ int		f ;
 	int	rs = SR_OK ;
 	int	pslen = -1 ;
 
-	const char	*ps = sip->portspec ;
+	cchar	*ps = sip->portspec ;
 
 	char	tmpfname[MAXPATHLEN + 1] ;
 
@@ -1046,7 +1040,7 @@ USSINFO		*sip ;
 	if ((rs = inetaddrparse_load(&a,sip->portspec,-1)) >= 0) {
 
 	if ((rs >= 0) && (a.af.sp != NULL) && a.af.sl) {
-	    const char	**vpp = &sip->afspec ;
+	    cchar	**vpp = &sip->afspec ;
 
 	    if ((rs = ussinfo_setentry(sip,vpp,a.af.sp,a.af.sl)) >= 0) {
 		if (strcasecmp(sip->afspec,"inet") == 0) {
@@ -1061,12 +1055,12 @@ USSINFO		*sip ;
 	} /* end if */
 
 	if ((rs >= 0) && (a.host.sp != NULL) && a.host.sl) {
-	    const char	**vpp = &sip->hostname ;
+	    cchar	**vpp = &sip->hostname ;
 	    rs = ussinfo_setentry(sip,vpp,a.host.sp,a.host.sl) ;
 	}
 
 	if ((rs >= 0) && (a.port.sp != NULL) && a.port.sl) {
-	    const char	**vpp = &sip->portspec ;
+	    cchar	**vpp = &sip->portspec ;
 	    rs = ussinfo_setentry(sip,vpp,a.port.sp,a.port.sl) ;
 	}
 
