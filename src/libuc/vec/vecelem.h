@@ -137,6 +137,7 @@ struct vecelem : vecelem_head {
 	    extent	(this,vecelemmem_extent) ;
 	    audit	(this,vecelemmem_audit) ;
 	    finish	(this,vecelemmem_finish) ;
+	    magic = 0 ;
 	    va = nullptr ;
 	} ; /* end tcor */
 	vecelem(const vecelem &) = delete ;
@@ -155,7 +156,7 @@ struct vecelem : vecelem_head {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct vecelem() {
-	    if (va) dtor() ;
+	    if (magic && va) dtor() ;
 	} ;
 } ; /* end struct (vecelem) */
 #else	/* __cplusplus */
