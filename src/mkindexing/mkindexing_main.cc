@@ -37,7 +37,7 @@
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<netdb.h>
 
 #include	<usystem.h>
