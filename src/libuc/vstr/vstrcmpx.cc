@@ -94,7 +94,7 @@ static int vstrcmpx(verse_f vx,cchar **s1pp,cchar **s2pp) noex {
 		    rc = vx(s1,s2) ;
 		}
 	    }
-	}
+	} /* end if */
 	return rc ;
 }
 /* end subroutine (vstrcmpx) */
@@ -107,7 +107,7 @@ static int obverse(cc *s1,cc *s2) noex {
 	    rc = strcmp(s1,s2) ;
 	}
 	return rc ;
-}
+} /* end subroutine (obverse) */
 
 static int reverse(cc *s1,cc *s2) noex {
 	cint	ch1 = mkchar(*s1) ;
@@ -117,7 +117,7 @@ static int reverse(cc *s1,cc *s2) noex {
 	    rc = strcmp(s2,s1) ;
 	}
 	return rc ;
-}
+} /* end subroutine (reverse) */
 
 
 /* local variables */
