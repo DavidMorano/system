@@ -31,13 +31,14 @@
 	Synopsis:
 	int vstrkeydictcmp(cchar **,cchar **) noex
 
+	Returns:
+	-		value
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -85,7 +86,7 @@ int vstrkeydictcmp(cchar **s1pp,cchar **s2pp) noex {
 		    rc = strkeydictcmp(s1,s2) ;
 		}
 	    }
-	}
+	} /* end if */
 	return rc ;
 }
 /* end subroutine (vstrkeydictcmp) */
