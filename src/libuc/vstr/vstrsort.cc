@@ -84,18 +84,16 @@
 /* exported subroutines */
 
 void vstrsort(cchar **argv,int n,vcmp_f fn) noex {
-	int 		i ;
 	int 		j ;
-	int 		m ;
 	int		c ;
-	int 		k ;
 	cchar		**ap ;
 	cchar		*s ;
 	/* compute value for 'j' */
 	for (j = 1 ; j <= n ; j *= 2) ;
-	for (m = 2 * j - 1 ; m /= 2 ; /* CSTYLED */ ) {
+	for (int m = 2 * j - 1 ; m /= 2 ; /* CSTYLED */ ) {
+	    int k ;
 	    for ((j = 0, k = n - m) ; j < k ; j += 1) {
-	        for (i = j ; i >= 0 ; i -= m) {
+	        for (int i = j ; i >= 0 ; i -= m) {
 	            ap = (argv + i) ;
 	            c = fn((ap + m),(ap + 0)) ;
 		    if (c >= 0) break ;
