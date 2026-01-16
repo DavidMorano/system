@@ -18,8 +18,12 @@
 
 /*******************************************************************************
 
+  	Name:
+	ismmclass
+
+	Description:
 	These subroutines check a character to see if it is part
-	of a special character class. See the code for details!
+	of a special character class.  See the code for details!
 
 *******************************************************************************/
 
@@ -33,7 +37,14 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#include	<ischarx.h>
+
+EXTERNC_begin
+
+extern bool	ismmclass_7bit(int) noex ;
+extern bool	ismmclass_8bit(int) noex ;
+extern bool	ismmclass_binary(int) noex ;
+
+EXTERNC_end
 
 
 #endif /* ISMMCLASS_INCLUDE */
