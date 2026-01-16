@@ -2,10 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* has a counted c-string some characteristic? */
+/* does a counted c-string some characteristic? */
 /* version %I% last-modified %G% */
 
-#define	CF_HASNOTDOTSWITCH	1	/* switch or not */
 
 /* revision history:
 
@@ -26,8 +25,9 @@
 	hasalnum
 	hasdigit
 	hasdigex
-	haswhite
 	hasoctal
+	haswhite
+	hasblank
 	haslc
 	hasuc
 
@@ -66,6 +66,7 @@
 #include	<usysdefs.h>
 #include	<mkchar.h>
 #include	<char.h>
+#include	<ischarx.h>
 #include	<localmisc.h>		/* |UC(3dam)| */
 
 #include	"hasclass.h"
@@ -82,6 +83,10 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 
 /* local typedefs */
 
+extern "C" {
+    typedef bool (*ischar_f)(int) noex ;
+}
+
 
 /* external subroutines */
 
@@ -94,6 +99,20 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 
 /* forward references */
 
+local bool hasx(ischar_f isx,cchar *sp,int sl) noex {
+	bool		f = false ;
+	if (sp) ylikely {
+	    while (sl && *sp) {
+		cint ch = mkchar(*sp) ;
+	        f = isx(ch) ;
+	        if (f) break ;
+	        sp += 1 ;
+	        sl -= 1 ;
+	    } /* end while */
+	} /* end if (non-null) */
+	return f ;
+} /* end subroutine (hasx) */
+
 
 /* local variables */
 
@@ -104,114 +123,47 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 /* exported subroutines */
 
 bool hasalpha(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISALPHA(*sp) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasx(isalphalatin,sp,sl) ;
 }
 /* end subroutine (hasalpha) */
 
 bool hasalnum(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISALNUM(*sp) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasx(isalnumlatin,sp,sl) ;
 }
 /* end subroutine (hasalnum) */
 
 bool hasdigit(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISDIGIT(*sp) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasx(isdigitlatin,sp,sl) ;
 }
 /* end subroutine (hasdigit) */
 
 bool hasdigex(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISDIGEX(*sp) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasx(isdigexlatin,sp,sl) ;
 }
 /* end subroutine (hasdigex) */
 
-bool haswhite(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISWHITE(*sp) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
-}
-/* end subroutine (haswhite) */
-
 bool hasoctal(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISOCTAL(*sp) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasx(isoctallatin,sp,sl) ;
 }
 /* end subroutine (hasoctal) */
 
+bool haswhite(cchar *sp,int sl) noex {
+    	return hasx(iswhitelatin,sp,sl) ;
+}
+/* end subroutine (haswhite) */
+
+bool hasblank(cchar *sp,int sl) noex {
+    	return hasx(isblanklatin,sp,sl) ;
+}
+/* end subroutine (hasblank) */
+
 bool haslc(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISLC(*sp) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasx(islowerlatin,sp,sl) ;
 }
 /* end subroutine (haslc) */
 
 bool hasuc(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = CHAR_ISUC(*sp) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return f ;
+    	return hasx(isupperlatin,sp,sl) ;
 }
 /* end subroutine (hasuc) */
 
