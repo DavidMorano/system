@@ -33,9 +33,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<netdb.h>		/* <- the money shot */
 
 
@@ -53,9 +51,9 @@ extern SERVENT	*getsvent() noex ;
 extern SERVENT	*getsvnam(cchar *,cchar *) noex ;
 extern SERVENT	*getsvpor(int,cchar *) noex ;
 
-extern int	getsvent_rp(SERVENT *,char *,int) noex ;
-extern int	getsvnam_rp(SERVENT *,char *,int,cchar *,cchar *) noex ;
-extern int	getsvpor_rp(SERVENT *,char *,int,int,cchar *) noex ;
+extern unixret_t	getsvent_rp(SERVENT *,char *,int) noex ;
+extern unixret_t	getsvnam_rp(SERVENT *,char *,int,cchar *,cchar *) noex ;
+extern unixret_t	getsvpor_rp(SERVENT *,char *,int,int,cchar *) noex ;
 
 EXTERNC_end
 
