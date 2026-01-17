@@ -21,9 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<usysrets.h>
 
 
@@ -33,6 +31,8 @@ extern int	uc_nprocessors(int) noex ;
 extern int	uc_gethz(int) noex ;
 extern int	uc_syspages(int) noex ;
 extern int	uc_pagesize() noex ;
+extern int	uc_ftime(TIMEB *) noex ;
+extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
 
 EXTERNC_end
 
