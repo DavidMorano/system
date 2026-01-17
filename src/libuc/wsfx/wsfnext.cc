@@ -53,7 +53,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>		/* |UCHAR_MAX| */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| + |wchar_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -62,6 +62,8 @@
 #include	<usysdefs.h>
 #include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
+
+#include	"wsfx.h"
 
 
 /* local defines */
@@ -72,8 +74,8 @@
 
 /* local typedefs */
 
-#ifndef	CWCHAR_TYPEDEF
-#define	CWCHAR_TYPEDEF
+#ifndef	TYPEDEF_CWCHAR
+#define	TYPEDEF_CWCHAR
 typedef const wchar_t		cwchar ;
 #endif
 
@@ -87,7 +89,8 @@ typedef const wchar_t		cwchar ;
 /* forward references */
 
 static bool iswwhite(cwchar wch) noex {
-	return (((wch) <= UCHAR_MAX) && CHAR_ISWHITE(wch)) ;
+    	cint ch = int(wch) ;
+	return (((ch) <= UCHAR_MAX) && CHAR_ISWHITE(ch)) ;
 }
 
 
@@ -103,9 +106,9 @@ int wsfnext(cwchar *wsp,int wsl,cwchar **rpp) noex {
     	int		rl = -1 ;
 	cwchar		*rp = nullptr ;
 	if (wsp && rpp) {
-	    int		ch ; /* used-multiple */
+	    wchar_t	ch ; /* used-multiple */
 	    while (wsl && *wsp) {
-	        ch = int(*wsp) ;
+	        ch = *wsp ;
 	        if (! iswwhite(ch)) break ;
 	        wsp += 1 ;
 	        wsl -= 1 ;
@@ -113,7 +116,7 @@ int wsfnext(cwchar *wsp,int wsl,cwchar **rpp) noex {
 	    rp = wsp ;
 	    /* skip the non-white space */
 	    while (wsl && *wsp && (*wsp != '\n')) {
-	        ch = int(*wsp) ;
+	        ch = *wsp ;
 	        if  (iswwhite(ch)) break ;
 	        wsp += 1 ;
 	        wsl -= 1 ;
