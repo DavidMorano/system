@@ -1,6 +1,6 @@
 /* ucsyssv SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* additional operaring-system support for SERVENT-DB access */
 /* version %I% last-modified %G% */
@@ -30,9 +30,9 @@
 	which will remain nameless for now (Apple Darwin).
 
 	Synopsis:
-	errno_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex
-	errno_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc*,cc *) noex
-	errno_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int,cc *) noex
+	unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex
+	unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc*,cc *) noex
+	unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int,cc *) noex
 
 	Arguments:
 	svp		NETENT pointer
@@ -42,9 +42,8 @@
 	num		port
 
 	Returns:
-	0	success
-	>0	errno
-	<0	*should not happen*
+	>=0	success
+	<0	error (ERRNO set on error)
 
 	Notes:
 	This coding below is really b*llsh*t tedious, but at least I
@@ -57,20 +56,17 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<cerrno>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"ucsyssv.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -107,64 +103,70 @@ import libutil ;
 #if	defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0)
 
 /* GNU version (like on Linux) */
-errno_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
-	int		ec =EFAULT ;
+unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (svp && svbuf) {
-	    SERVENT	*rp{} ;
+	    SERVENT *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getservent_r(svp,svbuf,svlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-	            errno = ec ;
+		    rc = -1 ;
 	        }
 	    } else if (ec > 0) {
-	        ec = errno ;
+	        rc = -1 ;
 	    } else {
-	    ec = EBUGCHECK ;
-	        errno = ec ;
+	        ec = EBUGCHECK ;
+	        rc = -1 ;
 	    }
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getsvent_np) */
 
-#else
+#else /* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
 
 /* POSIX draft-6 inspired version (like on Solaris®) */
-errno_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
-	int		ec = 0 ;
+unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
+    	cnullptr	np{} ;
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (svp && svbuf) {
-	    SERVENT	*rp ;
+	    CSERVENT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
-	    if ((rp = getservent_r(svp,svbuf,svlen)) == nullptr) {
-	        ec = errno ;
+	    if ((rp = getservent_r(svp,svbuf,svlen)) == np) {
+	        rc = -1 ;
+		void(rp) ;
 	    }
-	    (void) rp ;
 	} else {
-	    errno = ec ;
+	    ec  EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getsvent_np) */
 
 #endif	/* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
 
-#else
+else /* defined(SYSHAS_GETSVXXXR) && (SYSHAS_GETSVXXXR > 0) */
 
 /* NULL version (like on Apple Darwin) */
-errno_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
-	int		ec = EFAULT ;
+unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
+	errno_t		ec = EFAULT ;
 	if (svp && svbuf) {
 	    ec = EINVAL ;
 	    memclear(svp) ;
 	    if (svlen > 0) {
 	        ec = ENOSYS ;
 	    }
-	}
+	} /* end if (non-null) */
 	errno = ec ;
-	return ec ;
-}
+	return -1 ;
+} /* end subroutine (getsvent_np) */
 
 #endif /* defined(SYSHAS_GETSVXXXR) && (SYSHAS_GETSVXXXR > 0) */
 /* GETSVXXXR end */
@@ -175,64 +177,70 @@ errno_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 #if	defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0)
 
 /* GNU version (like on Linux) */
-errno_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
-	int		ec = EFAULT ;
+unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (svp && svbuf) {
-	    SERVENT	*rp{} ;
+	    SERVENT *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getservbyname_r(n,p,svp,svbuf,svlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-	            errno = ec ;
+	            rc = -1 ;
 	        }
 	    } else if (ec > 0) {
-	        ec = errno ;
+	        rc = -1 ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        errno = ec ;
+	        rc = -1 ;
 	    }
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getsvnam_np) */
 
-#else
+#else /* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
 
 /* POSIX draft-6 inspired version */
-errno_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
-	int		ec = EFAULT ;
+unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
+    	cnullptr	np{} ;
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (svp && svbuf) {
-	    SERVENT	*rp ;
+	    CSERVENT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
-	    if ((rp = getservbyname_r(n,p,svp,svbuf,svlen)) == nullptr) {
-	        ec = errno ;
+	    if ((rp = getservbyname_r(n,p,svp,svbuf,svlen)) == np) {
+	        rc = -1 ;
+		void(rp) ;
 	    }
-	    (void) rp ;
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
+	if (ec) errno = ec ;
 	return ec ;
-}
+} /* end subroutine (getsvnam_np) */
 
 #endif	/* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
 
 #else
 
 /* NULL version (like on Apple Darwin) */
-errno_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
-	int		ec = EFAULT ;
+unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
+	errno_t		ec = EFAULT ;
 	if (svp && svbuf && n && p) {
 	    ec = EINVAL ;
 	    memclear(svp) ;
 	    if ((svlen > 0) && n[0] && p[0]) {
 	        ec = ENOSYS ;
 	    }
-	}
+	} /* end if (non-null) */
 	errno = ec ;
-	return ec ;
-}
+	return -1 ;
+} /* end subroutine (getsvnam_np) */
 
 #endif /* defined(SYSHAS_GETPRXXXR) && (SYSHAS_GETPRXXXR > 0) */
 /* HETPRXXXR ent */
@@ -243,64 +251,70 @@ errno_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
 #if	defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0)
 
 /* GNU version (like on Linux) */
-errno_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
-	int		ec = EFAULT ;
+unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (svp && svbuf) {
-	    SERVENT	*rp{} ;
+	    CSERVENT *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getservbyport_r(num,p,svp,svbuf,svlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-	            errno = ec ;
+	            rc = -1 ;
 	        }
 	    } else if (ec > 0) {
-	        ec = errno ;
+	        rc = -1 ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        errno = ec ;
+	        rc = -1 ;
 	    }
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getsvpor_np) */
 
-#else
+#else /* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
 
 /* POSIX draft-6 inspired version */
-errno_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
-	int		ec = EFAULT ;
+unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
+    	cnullptr	np{} ;
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (svp && svbuf) {
-	    SERVENT	*rp ;
+	    CSERVENT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
-	    if ((rp = getservbyport_r(num,p,svp,svbuf,svlen)) == nullptr) {
-	        ec = errno ;
+	    if ((rp = getservbyport_r(num,p,svp,svbuf,svlen)) == np) {
+		rc = -1 ;
+	        void(rp) ;
 	    }
-	    (void) rp ;
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getsvpor_np) */
 
 #endif	/* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
 
-#else
+#else /* defined(SYSHAS_GETSVXXXR) && (SYSHAS_GETSVXXXR > 0) */
 
 /* NULL version (like on Apple Darwin) */
-errno_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cchar *p) noex {
-	int		ec = EFAULT ;
+unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
+	errno_t		ec = EFAULT ;
 	if (svp && svbuf && p) {
 	    ec = EINVAL ;
 	    memclear(svp) ;
 	    if ((svlen > 0) && (num >= 0)) {
 	        ec = ENOSYS ;
 	    }
-	}
+	} /* end if (non-null) */
 	errno = ec ;
-	return ec ;
-}
+	return -1 ;
+} /* end subroutine (getsvpor_np) */
 
 #endif /* defined(SYSHAS_GETSVXXXR) && (SYSHAS_GETSVXXXR > 0) */
 /* GETSVXXXR ent */
@@ -312,28 +326,36 @@ SERVENT *getsvent() noex {
 
 SERVENT *getsvnam(cchar *n,cchar *p) noex {
 	SERVENT		*rp = nullptr ;
-	errno = EFAULT ;
+	errno_t		ec = 0 ;
 	if (n && p) {
-	    errno = EINVAL ;
 	    if (n[0] && p[0]) {
 		errno = 0 ;
 		rp = getservbyname(n,p) ;
+	    } else {
+	        ec = EINVAL ;
 	    }
+	} else {
+	    ec = EFAULT ;
 	}
+	if (ec) errno = ec ;
 	return rp ;
-}
+} /* end subroutine (getsvnam) */
 
 SERVENT *getsvpor(int num,cchar *p) noex {
 	SERVENT		*rp = nullptr ;
-	errno = EFAULT ;
+	errno_t		ec = 0 ;
 	if (p) {
-	    errno = EINVAL ;
 	    if (num >= 0) {
 	        errno = 0 ;
 	        rp = getservbyport(num,p) ;
+	    } else {
+		ec = EINVAL ;
 	    }
+	} else {
+	    ec = EFAULT ;
 	}
+	if (ec) errno = ec ;
 	return rp ;
-}
+} /* end subroutine (getsvpor) */
 
 
