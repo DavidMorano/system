@@ -31,28 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= ucsys.h
+INCS += ucsys.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_UCSYS= ucsys_sup.o
@@ -63,7 +48,22 @@ OBJ3_UCSYS= ucsyspr.o ucsysnw.o ucsysho.o ucsyssv.o
 OBJ_UCSYS= obj0_ucsys.o obj1_ucsys.o obj2_ucsys.o obj3_ucsys.o
 
 
-.SUFFIXES:		.hh .ii
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -77,6 +77,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -89,17 +92,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_UCSYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCSYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -111,17 +112,17 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_ucsys.o:	$(OBJ0_UCSYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCSYS)
+obj0_ucsys.o:		$(OBJ0_UCSYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_ucsys.o:	$(OBJ1_UCSYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_UCSYS)
+obj1_ucsys.o:		$(OBJ1_UCSYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_ucsys.o:	$(OBJ2_UCSYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCSYS)
+obj2_ucsys.o:		$(OBJ2_UCSYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_ucsys.o:	$(OBJ3_UCSYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCSYS)
+obj3_ucsys.o:		$(OBJ3_UCSYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 ucsys_sup.o:	ucsys_sup.cc ucsys.h $(INCS)
