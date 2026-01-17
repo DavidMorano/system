@@ -40,7 +40,8 @@
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 
@@ -72,7 +73,7 @@ template<typename T> constexpr local inline int nbits(T) noex {
 }
 
 template<typename T> constexpr local inline bool bit(T v,int n) noex {
-	return !!((v >> n) & 1) ;
+	return bool((v >> n) & 1) ;
 }
 
 template<typename T> local void strtox(cchar *,char **,int,T *rp) noex {
@@ -99,7 +100,7 @@ template<> void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 		    if (uv || bit(v,((n/2)-1))) {
 			errno = ERANGE ;
 		    }
-		}
+		} /* end if */
 	    } /* end block */
 	} /* end if (no error so far) */
 } /* end subroutine-template (strtox) */
@@ -121,7 +122,7 @@ template<> void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
 	    if (uv) {
 		errno = ERANGE ;
 	    }
-	}
+	} /* end if (not-error) */
 } /* end subroutine-template (strtox) */
 
 template<> void strtox(cchar *sp,char **epp,int b,ulong *rp) noex {
@@ -141,7 +142,7 @@ local int ucstrtox(cchar *sp,cchar **epp,int b,T *rp) noex {
 	    strtox(sp,&endp,b,rp) ;
 	    if (epp) *epp = endp ;
 	    rs = (errno != 0) ? (- errno) : intconv(endp - sp) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine-template (ucstrtox) */
 
