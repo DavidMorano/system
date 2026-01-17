@@ -43,10 +43,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<stddef.h>		/* |size_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #ifndef	SPWD
@@ -59,11 +56,20 @@
 
 
 #if	defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0)
+/******************************************************************************/
 
-#include	<shadow.h>
 
+#include	<shadow.h>		/* standard Solaris® header */
+
+
+/******************************************************************************/
 #else /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
+#ifdef	__cplusplus /* C++ only */
+/******************************************************************************/
 
+
+#ifndef	STRUCT_SPWD
+#define	STRUCT_SPWD
 struct spwd {
 	char		*sp_namp ;
 	char		*sp_pwdp ;
@@ -75,20 +81,20 @@ struct spwd {
 	long		sp_inact ;
 	long		sp_expire ;
 } ; /* end struct (spwd) */
+#endif /* STRUCT_SPWD */
 
-EXTERNC_begin
+namespace gnu {
+    extern void	setspent() noex ;
+    extern void	endspent() noex ;
+    extern SPWD	*getspent() noex ;
+    extern SPWD	*getspnam(cchar *) noex ;
+    extern errno_t getspent_r(SPWD *,char *,size_t,CSPWD **) noex ;
+    extern errno_t getspnam_r(cc *,SPWD *,char *,size_t,CSPWD **) noex ;
+} /* end namespace (gnu) */
 
-extern void	setspent() noex ;
-extern void	endspent() noex ;
 
-extern SPWD	*getspent() noex ;
-extern SPWD	*getspnam(cchar *) noex ;
-
-extern errno_t	getspent_r(SPWD *,char *,size_t,const SPWD **) noex ;
-extern errno_t	getspnam_r(cchar *,SPWD *,char *,size_t,const SPWD **) noex ;
-
-EXTERNC_end
-
+/******************************************************************************/
+#endif /* __cplusplus (C++ only) */
 #endif /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
 
 
