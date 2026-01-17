@@ -45,9 +45,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<grp.h>
 
 
@@ -63,9 +61,9 @@
 
 EXTERNC_begin
 
-extern int	getgrent_rp(GROUP *,char *,int) noex ;
-extern int	getgrnam_rp(GROUP *,char *,int,cchar *) noex ;
-extern int	getgrgid_rp(GROUP *,char *,int,gid_t) noex ;
+extern unixret_t	getgrent_rp(GROUP *,char *,int) noex ;
+extern unixret_t	getgrnam_rp(GROUP *,char *,int,cchar *) noex ;
+extern unixret_t	getgrgid_rp(GROUP *,char *,int,gid_t) noex ;
 
 EXTERNC_end
 
