@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucsyspj
+
+	Description:
 	This file contains the UNIX system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
@@ -33,9 +37,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #ifndef	PROJECT
@@ -61,6 +63,8 @@
 typedef int	projid_t ;
 #endif
 
+#ifndef	STRUCT_PROJECT
+#define	STRUCT_PROJECT
 struct project {
 	char		*pj_name ;
 	char		*pj_comment ;
@@ -69,43 +73,34 @@ struct project {
 	char		**pj_groups ;
 	projid_t	pj_projid ;
 } ; /* end struct (project) */
+#endif /* STRUCT_PROJECT */
 
 #ifndef	SUBROUTINE_GETPROJID
 #define	SUBROUTINE_GETPROJID
-
 EXTERNC_begin
-
 extern projid_t getprojid() noex ;
-
 EXTERNC_end
-
 #endif /* SUBROUTINE_GETPROJID */
 
 #ifndef	SUBROUTINE_GETPJ
 #define	SUBROUTINE_GETPJ
-
 EXTERNC_begin
-
 extern void	setprojent() noex ;
 extern void	endprojent() noex ;
 extern PROJECT	*getpjent() noex ;
 extern PROJECT	*getpjnam(cchar *) noex ;
 extern PROJECT	*getpjpid(projid_t) noex ;
 extern PROJECT	*getpjdef(cchar *) noex ;
-
 EXTERNC_end
-
 #endif /* SUBROUTINE_GETPJ */
 
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 
 EXTERNC_begin
-
-extern int	getpjent_rp(PROJECT *,char *,int) noex ;
-extern int	getpjnam_rp(PROJECT *,char *,int,cchar *) noex ;
-extern int	getpjpid_rp(PROJECT *,char *,int,projid_t) noex ;
-extern int	getpjdef_rp(PROJECT *,char *,int,cchar *) noex ;
-
+extern unixret_t	getpjent_rp(PROJECT *,char *,int) noex ;
+extern unixret_t	getpjnam_rp(PROJECT *,char *,int,cchar *) noex ;
+extern unixret_t	getpjpid_rp(PROJECT *,char *,int,projid_t) noex ;
+extern unixret_t	getpjdef_rp(PROJECT *,char *,int,cchar *) noex ;
 EXTERNC_end
 
 
