@@ -20,11 +20,14 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucgetsp{xx}
+
+	Description:
 	This file contains the UNIX system types that the brain-damaged
 	Apple Darwin operating system does NOT have.  We are trying
 	in a very small way to make up for some of the immense
 	brain-damage within the Apple Darwin operating system.
-
 	The idea here is that each OS needs to supply two types of
 	possibly interfaces.  One interface to be supplied is the
 	normal non-reentrant type interfaces IF your OS is missing
@@ -37,6 +40,11 @@
 	both standard POSIX and non-standard POSIX reentrant
 	interfaces are supplied for some subroutines.
 
+	Notes:
+	1. The whole "shadow" password concept was created by
+	Julianne (Julie) Frances Haugh II (in 1987 originally for
+	SCO Xenix®).
+
 *******************************************************************************/
 
 #ifndef	UCSYSSP_INCLUDE
@@ -45,9 +53,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<spwd.h>		/* <- the money shot */
 
 
@@ -55,9 +61,8 @@
 
 EXTERNC_begin
 
-extern int	getspent_rp(SPWD *,char *,int) noex ;
-extern int	getspnam_rp(SPWD *,char *,int,cchar *) noex ;
-extern int	getspuid_rp(SPWD *,char *,int,uid_t) noex ;
+extern unixret_t	getspent_rp(SPWD *,char *,int) noex ;
+extern unixret_t	getspnam_rp(SPWD *,char *,int,cchar *) noex ;
 
 EXTERNC_end
 
