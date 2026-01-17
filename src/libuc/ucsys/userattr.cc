@@ -35,14 +35,11 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cerrno>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
 
 #include	"userattr.h"
 
@@ -75,12 +72,16 @@
 
 /* USERATTR begin */
 #if	defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0)
+/******************************************************************************/
 
 
-/* NOTHING */
+/* *NOTHING* */
 
 
+/******************************************************************************/
 #else /* defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0) */
+/******************************************************************************/
+
 
 extern void setuserattr() noex { 
 	errno = ENOSYS ;
@@ -109,6 +110,8 @@ extern userattr *getuseruid(uid_t) noex {
 	return nullptr ;
 }
 
+
+/******************************************************************************/
 #endif /* defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0) */
 /* USERATTR end */
 
