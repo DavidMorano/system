@@ -1,6 +1,6 @@
 /* ucsysnw SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* additional operaring-system support for NETENT-DB access */
 /* version %I% last-modified %G% */
@@ -30,9 +30,10 @@
 	which will remain nameless for now (Apple Darwin).
 
 	Synopsis:
-	errno_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex
-	errno_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *) noex
-	errno_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,
+	unixret_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex
+	unixret_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,
+			cchar *) noex
+	unixret_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,
 				int t,uint32_t num) noex
 
 	Arguments:
@@ -44,29 +45,25 @@
 	t		type
 
 	Returns:
-	0	success
-	>0	errno
-	<0	*should not happen*
+	>=0	success
+	<0	error (ERRNO is set on error)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<cerrno>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
 
 #include	"ucsysnw.h"
-#include	"ucsys.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -75,8 +72,6 @@ import libutil ;
 
 
 /* local typedefs */
-
-typedef const void	cv ;
 
 
 /* external variables */
@@ -105,64 +100,69 @@ typedef const void	cv ;
 #if	defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0)
 
 /* GNU version (like on Linux) */
-errno_t getnwent_rp(NETENT *nwp,char *nwbuf,int prlen) noex {
-	int		ec = EFAULT ;
+unixret_t getnwent_rp(NETENT *nwp,char *nwbuf,int prlen) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (nwp && nwbuf) {
 	    NETENT	*rp{} ;
 	    int		herr{} ;
 	    errno = 0 ;
 	    if ((ec = getnetent_r(nwp,nwbuf,prlen,&rp,&herr)) == 0) {
 	        if (rp == nullptr) {
-		    ec = ucsys_getresolvec(herr) ;
-	            errno = ec ;
+		    ec = getresolvec(herr) ;
+		    rc = -1 ;
 	        }
 	    } else if (ec > 0) {
-	        errno = ec ;
+	        rc = -1 ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        errno = ec ;
+	        rc = -1 ;
 	    }
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getnwent_rp) */
 
-#else
+#else /* defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0) */
 
 /* POSIX draft-6 inspired version (like on SunOS) */
-errno_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
-	int		ec = EFAULT ;
+unixret_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (nwp && nwbuf) {
-	    NETENT	*rp ;
+	    CNETENT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
 	    if ((rp = getnetent_r(nwp,nwbuf,nwlen)) == nullptr) {
-	        ec = errno ;
+	        rc = -1 ;
+	        void(rp) ;
 	    }
-	    (void) rp ;
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getnwent_rp) */
 
 #endif	/* defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0) */
 
-#else
+#else /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
 
-errno_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
-	int		ec = EFAULT ;
+unixret_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
+	errno_t		ec = EFAULT ;
 	if (nwp && nwbuf) {
 	    ec = EINVAL ;
 	    memclear(nwp) ;
 	    if (nwlen > 0) {
 	        ec = ENOSYS ;
 	    }
-	}
+	} /* end if (non-null) */
 	errno = ec ;
-	return ec ;
-}
+	return -1 ;
+} /* end subroutine (getnwent_rp) */
 
 #endif /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
 /* GETNWXXXR end */
@@ -173,64 +173,69 @@ errno_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
 #if	defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0)
 
 /* GNU version (like on Linux) */
-errno_t getnwnam_rp(NETENT *nwp,char *nwbuf,int prlen,cchar *n) noex {
-	int		ec = EFAULT ;
+unixret_t getnwnam_rp(NETENT *nwp,char *nwbuf,int prlen,cchar *n) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (nwp && nwbuf) {
-	    NETENT	*rp{} ;
+	    NETENT *rp{} ;
 	    int		herr{} ;
 	    errno = 0 ;
 	    if ((ec = getnetbyname_r(n,nwp,nwbuf,prlen,&rp,&herr)) == 0) {
 	        if (rp == nullptr) {
-		    ec = ucsys_getresolvec(herr) ;
-	            errno = ec ;
+		    ec = getresolvec(herr) ;
+		    rc = -1 ;
 	        }
 	    } else if (ec > 0) {
-	        ec = errno ;
+	        rc = -1 ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        errno = ec ;
+	        rc = -1 ;
 	    }
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getnwnam_rp) */
 
-#else
+#else /* defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0) */
 
 /* POSIX draft-6 inspired version (like on SunOS) */
-errno_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
-	int		ec = EFAULT ;
+unixret_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (nwp && nwbuf) {
-	    NETENT	*rp ;
+	    CNETENT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
 	    if ((rp = getnetbyname_r(n,nwp,nwbuf,nwlen)) == nullptr) {
-	        ec = errno ;
+		rc = -1 ;
+	        void(rp) ;
 	    }
-	    (void) rp ;
         } else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
         }
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getnwnam_rp) */
 
 #endif	/* defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0) */
 
-#else
+#else /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
 
-errno_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
-	int		ec = EFAULT ;
+unixret_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
+	errno_t		ec = EFAULT ;
 	if (nwp && nwbuf && n) {
 	    ec = EINVAL ;
 	    memclear(nwp) ;
 	    if ((nwlen > 0) && n[0]) {
 	        ec = ENOSYS ;
 	    }
-	}
+	} /* end if (non-null) */
 	errno = ec ;
-	return ec ;
-}
+	return -1 ;
+} /* end subroutine (getnwnam_rp) */
 
 #endif /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
 /* GETNWXXXR ent */
@@ -241,63 +246,69 @@ errno_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
 #if	defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0)
 
 /* GNU version (like on Linux) */
-errno_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t n) noex {
-	int		ec = EFAULT ;
+unixret_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t n) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (nwp && nwbuf) {
-	    NETENT	*rp{} ;
+	    NETENT *rp{} ;
 	    int		herr{} ;
 	    errno = 0 ;
 	    if ((ec = getnetbyaddr_r(n,t,nwp,nwbuf,prlen,&rp,&herr)) == 0) {
 	        if (rp == nullptr) {
-		    ec = ucsys_getresolvec(herr) ;
-	            errno = ec ;
+		    ec = getresolvec(herr) ;
+		    rc = -1 ;
 	        }
 	    } else if (ec > 0) {
-	        errno = ec ;
+		rc = -1 ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        errno = ec ;
+	        rc = -1 ;
 	    }
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getnwnum_rp) */
 
 #else /* defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0) */
 
 /* POSIX draft-6 inspired version (like on SunOS) */
-errno_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t n) noex {
-	int		ec = EFAULT ;
+unixret_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t n) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (nwp && nwbuf) {
-	    NETENT	*rp ;
+	    CNETENT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
 	    if ((rp = getnetbyaddr_r(n,t,nwp,nwbuf,nwlen)) == nullptr) {
-	        rc = errno ;
+	        rc = -1 ;
 	    }
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
+	if (ec) errno = ec ;
 	return rc ;
-}
+} /* end subroutine (getnwnum_rp) */
 
 #endif	/* defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0) */
 
 #else /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
 
-errno_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t) noex {
-	int		ec = EFAULT ;
+/* NULL version */
+unixret_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t) noex {
+	errno_t		ec = EFAULT ;
 	if (nwp && nwbuf) {
 	    ec = EINVAL ;
 	    memclear(nwp) ;
 	    if ((nwlen > 0) && (t >= 0)) {
 	        ec = ENOSYS ;
 	    }
-	}
+	} /* end if (non-null) */
 	errno = ec ;
-	return ec ;
-}
+	return -1 ;
+} /* end subroutine (getnwnum_t) */
 
 #endif /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
 /* GETNWXXXR ent */
@@ -309,16 +320,20 @@ NETENT *getnwent() noex {
 
 NETENT *getnwnam(cchar *n) noex {
 	NETENT		*rp = nullptr ;
-	errno = EFAULT ;
+	errno_t		ec = 0 ;
 	if (n) {
-	    errno = EINVAL ;
 	    if (n[0]) {
 		errno = 0 ;
 		rp = getnetbyname(n) ;
+	    } else {
+		ec = EINVAL ;
 	    }
-	}
+	} else {
+	    ec = EFAULT ;
+	} /* end if (non-null) */
+	if (ec) errno = ec ;
 	return rp ;
-}
+} /* end subroutine (getnwnam) */
 
 NETENT *getnwnum(int t,uint32_t num) noex {
 	return getnetbyaddr(num,t) ;
