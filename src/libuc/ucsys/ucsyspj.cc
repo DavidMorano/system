@@ -1,6 +1,6 @@
 /* ucsyspj SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* additional operaring-system support for PEOJECT-DB access */
 /* version %I% last-modified %G% */
@@ -31,35 +31,32 @@
 	which will remain nameless for now (Apple Darwin).
 
 	Synopsis:
-	errno_t getpjent_rp(PROJECT *grp,char *pjbuf,int pjlen) noex
-	errno_t getpjnam_rp(PROJECT *grp,char *pjbuf,int pjlen,cchar *) noex
-	errno_t getpjpid_rp(PROJECT *grp,char *pjbuf,int pjlen,
+	unixret_t getpjent_rp(PROJECT *grp,char *pjbuf,int pjlen) noex
+	unixret_t getpjnam_rp(PROJECT *grp,char *pjbuf,int pjlen,cchar *) noex
+	unixret_t getpjpid_rp(PROJECT *grp,char *pjbuf,int pjlen,
 			projid_t pid) noex
-	errno_t getpjdef_rp(PROJECT *grp,char *pjbuf,int pjlen,cchar *) noex
+	unixret_t getpjdef_rp(PROJECT *grp,char *pjbuf,int pjlen,cchar *) noex
 
 	Returns:
-	0	success
-	>0	errno
-	<0	*should not happen*
+	>=0	success
+	<0	error (ERRNO set on error)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<cerrno>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
 
 #include	"ucsyspj.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -68,8 +65,6 @@ import libutil ;
 
 
 /* local typedefs */
-
-typedef const void	cv ;
 
 
 /* external variables */
@@ -96,141 +91,148 @@ typedef const void	cv ;
 
 #if	defined(SYSHAS_GETPJENTR) && (SYSHAS_GETPJENTR > 0)
 
-errno_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
-	int		ec = EFAULT ;
+unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (pjp && pjbuf) {
-	    PROJECT	*rp ;
+	    CPROJECT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
 	    if ((rp = getprojent(pjp,pjbuf,pjlen)) == nullptr) {
-	        ec = errno ;
+	        rc = -1 ;
+		void(rp) ;
 	    }
-	    void(rp) ;
         } else {
-            errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
         }
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getpjent_rp) */
 
-#else
+#else /* defined(SYSHAS_GETPJENTR) && (SYSHAS_GETPJENTR > 0) */
 
-errno_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
-        int     	ec = EFAULT ;
+unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
+        errno_t		ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
             memclear(pjp) ;
             if (pjlen > 0) {
                 ec = ENOSYS ;
             }
-        }
+	} /* end if (non-null) */
         errno = ec ;
-        return ec ;
-}
+        return -1 ;
+} /* end subroutine (getpjent_rp) */
 
 #endif /* defined(SYSHAS_GETPJENTR) && (SYSHAS_GETPJENTR > 0) */
 
 #if	defined(SYSHAS_GETPJNAMR) && (SYSHAS_GETPJNAMR > 0)
 
-errno_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
-	int		ec = EFAULT ;
+unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (pjp && pjbuf && n) {
-	    PROJECT	*rp ;
+	    CPROJECT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
 	    if ((rp = getprojbyname(n,pjp,pjbuf,pjlen)) == nullptr) {
-	        ec = errno ;
+	        rc = -1 ;
+		void(rp) ;
 	    }
-	    void(rp) ;
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
+	if (ec) errno = ex ;
+	return rc ;
 }
 
-#else
+#else /* defined(SYSHAS_GETPJNAMR) && (SYSHAS_GETPJNAMR > 0) */
 
-errno_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
-        int     	ec = EFAULT ;
+unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+        errno_t     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
             memclear(pjp) ;
             if ((pjlen > 0) && n[0]) {
                 ec = ENOSYS ;
             }
-        }
+	} /* end if (non-null) */
         errno = ec ;
         return ec ;
-}
+} /* end subroutine (getpjent_rp) */
 
 #endif /* defined(SYSHAS_GETPJNAMR) && (SYSHAS_GETPJNAMR > 0) */
 
 #if	defined(SYSHAS_GETPJPIDR) && (SYSHAS_GETPJPIDR > 0)
 
-errno_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t pid) noex {
-	int		ec = EFAULT ;
+unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t pid) noex {
+    	unixret_t	rc = 0 ;
+	errno_t		ec = 0 ;
 	if (pjp && pjbuf) {
-	    PROJECT	*rp ;
+	    CPROJECT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
 	    if ((rp = getprojbyid(pid,pjp,pjbuf,pjlen)) == nullptr) {
-	        ec = errno ;
+	        rc = -1 ;
+		void(rp) ;
 	    }
-	    void(rp) ;
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getpjpid_np) */
 
-#else
+#else /* defined(SYSHAS_GETPJPIDR) && (SYSHAS_GETPJPIDR > 0) */
 
-errno_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
-        int     	ec = EFAULT ;
+unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
+        errno_t     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
             memclear(pjp) ;
             if (pjlen > 0) {
                 ec = ENOSYS ;
             }
-        }
+	} /* end if (non-null) */
         errno = ec ;
-        return ec ;
-}
+        return -1 ;
+} /* end subroutine (getpjpid_np) */
 
 #endif /* defined(SYSHAS_GETPJPIDR) && (SYSHAS_GETPJPIDR > 0) */
 
 #if	defined(SYSHAS_GETPJDEFR) && (SYSHAS_GETPJDEFR > 0)
 
-errno_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
-	int		ec = EFAULT ;
+unixret_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+	errno_t		ec = EFAULT ;
 	if (pjp && pjbuf && n) {
-	    PROJECT	*rp ;
+	    CPROJECT *rp ;
 	    errno = 0 ;
-	    ec = 0 ;
 	    if ((rp = getdefaultproj(n,pjp,pjbuf,pjlen)) == nullptr) {
-	        ec = errno ;
+	        rc = -1 ;
+		void(rp) ;
 	    }
-	    void(rp) ;
 	} else {
-	    errno = ec ;
+	    ec = EFAULT ;
+	    rc = -1 ;
 	}
-	return ec ;
-}
+	if (ec) errno = ec ;
+	return rc ;
+} /* end subroutine (getpjdef_rp) */
 
-#else
+#else /* defined(SYSHAS_GETPJDEFR) && (SYSHAS_GETPJDEFR > 0) */
 
-int getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
-        int     	ec = EFAULT ;
+unixret_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+        errno_t     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
             memclear(pjp) ;
             if ((pjlen > 0) && n[0]) {
                 ec = ENOSYS ;
             }
-        }
+	} /* end if (non-null) */
         errno = ec ;
         return ec ;
-}
+} /* end subroutine (getpjdef_rp) */
 
 #endif /* defined(SYSHAS_GETPJDEFR) && (SYSHAS_GETPJDEFR > 0) */
 
@@ -238,7 +240,7 @@ int getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
 
 #ifndef	SUBROUTINE_GETPROJID
 #define	SUBROUTINE_GETPROJID
-projid_t getprojid() noex  {
+projid_t getprojid() noex {
 	return projid_t(0) ;
 }
 #endif
@@ -264,57 +266,57 @@ PROJECT	*getpjdef(cchar *) noex {
 	return nullptr ;
 }
 
-errno_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
-        int     	ec = EFAULT ;
+unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
+        errno_t     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
             memclear(pjp) ;
             if (pjlen > 0) {
                 ec = ENOSYS ;
             }
-        }
+	} /* end if (non-null) */
         errno = ec ;
-        return ec ;
-}
+        return -1 ;
+} /* end subroutine (getpjent_np) */
 
-errno_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
-        int     	ec = EFAULT ;
+unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+        errno_t     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
             memclear(pjp) ;
             if ((pjlen > 0) && n[0]) {
                 ec = ENOSYS ;
             }
-        }
+	} /* end if (non-null) */
         errno = ec ;
-        return ec ;
-}
+        return -1 ;
+} /* end subroutine (getpjnam_np) */
 
-errno_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
-        int     	ec = EFAULT ;
+unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
+        errno_t		ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
             memclear(pjp) ;
             if (pjlen > 0) {
                 ec = ENOSYS ;
             }
-        }
+	} /* end if (non-null) */
         errno = ec ;
-        return ec ;
-}
+        return -1 ;
+} /* end subroutine (getpjpid_rp) */
 
-errno_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
-        int     	ec = EFAULT ;
+unixret_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+        errno_t     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
             memclear(pjp) ;
             if ((pjlen > 0) && n[0]) {
                 ec = ENOSYS ;
             }
-        }
+	} /* end if (non-null) */
         errno = ec ;
-        return ec ;
-}
+        return -1 ;
+} /* end subroutine (getpjdef_np) */
 
 #endif /*  defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 
