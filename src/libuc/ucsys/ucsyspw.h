@@ -45,9 +45,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<pwd.h>			/* <- the money shot */
 
 
@@ -63,9 +61,10 @@
 
 EXTERNC_begin
 
-extern int	getpwent_rp(PASSWD *,char *,int) noex ;
-extern int	getpwnam_rp(PASSWD *,char *,int,cchar *) noex ;
-extern int	getpwuid_rp(PASSWD *,char *,int,uid_t) noex ;
+extern unixret_t	getpwent_rp(PASSWD *,char *,int) noex ;
+extern unixret_t	getpwnam_rp(PASSWD *,char *,int,cchar *) noex ;
+extern unixret_t	getpwuid_rp(PASSWD *,char *,int,uid_t) noex ;
+
 
 EXTERNC_end
 
