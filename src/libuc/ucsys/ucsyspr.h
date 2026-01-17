@@ -33,9 +33,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<netdb.h>		/* <- the money shot */
 
 
@@ -53,9 +51,9 @@ extern PROTOENT	*getprent() noex ;
 extern PROTOENT	*getprnam(cchar *) noex ;
 extern PROTOENT	*getprnum(int) noex ;
 
-extern int	getprent_rp(PROTOENT *,char *,int) noex ;
-extern int	getprnam_rp(PROTOENT *,char *,int,cchar *) noex ;
-extern int	getprnum_rp(PROTOENT *,char *,int,int) noex ;
+extern unixret_t	getprent_rp(PROTOENT *,char *,int) noex ;
+extern unixret_t	getprnam_rp(PROTOENT *,char *,int,cchar *) noex ;
+extern unixret_t	getprnum_rp(PROTOENT *,char *,int,int) noex ;
 
 EXTERNC_end
 
