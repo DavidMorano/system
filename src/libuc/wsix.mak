@@ -40,6 +40,20 @@ MODS +=
 LIBS +=
 
 
+OBJ0WSIX= wsinul.o wsixchr.o
+OBJ1WSIX= 
+OBJ2WSIX= 
+OBJ3WSIX= 
+OBJ4WSIX= 
+OBJ5WSIX= 
+
+OBJAWSIX= obj0_sfx.o
+OBJBWSIX= obj2_sfx.o obj3_sfx.o
+OBJCWSIX= obj4_sfx.o obj5_sfx.o
+
+OBJWSIX= obja.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
@@ -56,21 +70,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0WSIX= wsinul.o wsixchr.o
-OBJ1WSIX= 
-OBJ2WSIX= 
-OBJ3WSIX= 
-OBJ4WSIX= 
-OBJ5WSIX= 
-
-OBJAWSIX= obj0_sfx.o
-OBJBWSIX= obj2_sfx.o obj3_sfx.o
-OBJCWSIX= obj4_sfx.o obj5_sfx.o
-
-OBJWSIX= obja.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -83,6 +83,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -116,17 +119,17 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_sfx.o:		$(OBJ0WSIX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0WSIX)
+obj0_sfx.o:		$(OBJ0WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_sfx.o:		$(OBJ1WSIX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1WSIX)
+obj1_sfx.o:		$(OBJ1WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_sfx.o:		$(OBJ2WSIX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2WSIX)
+obj2_sfx.o:		$(OBJ2WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_sfx.o:		$(OBJ3WSIX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3WSIX)
+obj3_sfx.o:		$(OBJ3WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4_sfx.o:		$(OBJ4WSIX) $(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4WSIX)
@@ -135,14 +138,14 @@ obj5_sfx.o:		$(OBJ5WSIX) $(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5WSIX)
 
 
-obja.o:			$(OBJAWSIX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJAWSIX)
+obja.o:			$(OBJAWSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb.o:			$(OBJBWSIX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJBWSIX)
+objb.o:			$(OBJBWSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objc.o:			$(OBJCWSIX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJCWSIX)
+objc.o:			$(OBJCWSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 wsinul.o:		wsinul.cc	$(INCS)
