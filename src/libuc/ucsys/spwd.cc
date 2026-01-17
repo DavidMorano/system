@@ -40,12 +40,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
-#include	"ucsupport.h"
 #include	"spwd.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
@@ -81,12 +77,19 @@ import libutil ;			/* |memclear(3u)| */
 #if	defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0)
 
 #if	defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0)
+/******************************************************************************/
 
-/* nothing-needed */
 
+/* *nothing-needed* */
+
+
+/******************************************************************************/
 #else /* defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0) */
+/******************************************************************************/
 
-errno_t getspent_r(SPWD *spp,char *spbuf,size_t splen) noex {
+
+namespace gnu {
+    errno_t getspent_r(SPWD *spp,char *spbuf,size_t splen) noex {
 	errno_t		ec = 0 ;
 	if (spp && spbuf) {
 	    memclear(spp) ;
@@ -100,17 +103,26 @@ errno_t getspent_r(SPWD *spp,char *spbuf,size_t splen) noex {
 	}
 	if (ec) errno = ec ;
 	return ec ;
-} /* end subroutine (getspent_r) */
+    } /* end subroutine (getspent_r) */
+} /* end namespace (gnu) */
 
+
+/******************************************************************************/
 #endif /* defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0) */
-
 #if	defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0)
+/******************************************************************************/
 
-/* niothing-needed */
 
+/* *nothing-needed* */
+
+
+/******************************************************************************/
 #else /* defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0) */
+/******************************************************************************/
 
-errno_t getspnam_r(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
+
+namespace gnu {
+    errno_t getspnam_r(cc *n,SPWD *spp,char *spbuf,int splen,CSPWD **rpp) noex {
 	errno_t		ec = 0 ;
 	if (spp && spbuf && n) {
 	    memclear(spp) ;
@@ -122,28 +134,78 @@ errno_t getspnam_r(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	} else {
 	    ec = EFAULT ;
 	}
-	if (ec) errno = ec ;
+	if (ec) {
+	    errno = ec ;
+	    if (rpp) *rpp = nullptr ;
+	}
 	return ec ;
-} /* end subroutine (getspnam_r) */
+    } /* end subroutine (getspnam_r) */
+} /* end namespace (gnu) */
 
+
+/******************************************************************************/
 #endif /* defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0) */
-
 #else /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
+/******************************************************************************/
 
-void setspent() noex { }
 
-void endspent() noex { }
-
-SPWD *getspent() noex {
+namespace gnu {
+    void setspent() noex { }
+    void endspent() noex { }
+    SPWD *getspent() noex {
 	errno = ENOSYS ;
 	return nullptr ;
-}
-
-SPWD *getspnam(cchar *) noex {
+    }
+    SPWD *getspnam(cchar *) noex {
 	errno = ENOSYS ;
 	return nullptr ;
-}
+    }
+} /* end namespace (gnu) */
 
+namespace gnu {
+    errno_t getspent_r(SPWD *spp,char *spbuf,size_t splen,CSPWD **rpp) noex {
+	errno_t		ec = 0 ;
+	if (spp && spbuf) {
+	    memclear(spp) ;
+	    if (splen > 0) {
+	        ec = ENOSYS ;
+	    } else {
+	        ec = EINVAL ;
+	    }
+	} else {
+	    ec = EFAULT ;
+	}
+	if (ec) {
+	    errno = ec ;
+	    if (rpp) *rpp = nullptr ;
+	}
+	return ec ;
+    } /* end subroutine (getspent_r) */
+} /* end namespace (gnu) */
+
+namespace gnu {
+    errno_t getspnam_r(cc *n,SPWD *spp,char *spbuf,int splen,CSPWD **rpp) noex {
+	errno_t		ec = 0 ;
+	if (spp && spbuf && n) {
+	    memclear(spp) ;
+	    if ((splen > 0) && n[0]) {
+	        ec = ENOSYS ;
+	    } else {
+	        ec = EINVAL ;
+	    }
+	} else {
+	    ec = EFAULT ;
+	}
+	if (ec) {
+	    errno = ec ;
+	    if (rpp) *rpp = nullptr ;
+	}
+	return ec ;
+    } /* end subroutine (getspnam_r) */
+} /* end namespace (gnu) */
+
+
+/******************************************************************************/
 #endif /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
 
 
