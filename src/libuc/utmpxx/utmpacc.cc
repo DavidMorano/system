@@ -59,12 +59,19 @@
 #include	<sys/param.h>
 #include	<unistd.h>		/* for |getsid(3c)| */
 #include	<utmpx.h>
-#include	<climits>
 #include	<csignal>		/* |sig_atomic_t| */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<atomic>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucfork.h>
+#include	<ucatfork.h>
+#include	<ucatexit.h>
+#include	<uctc.h>		/* terminal-control */
 #include	<getbufsize.h>
 #include	<timewatch.hh>
 #include	<syshasutmpx.h>
@@ -82,10 +89,11 @@
 #include	<localmisc.h>
 
 #include	"utmpacc.h"
+#include	"utmpaccent.h"		/* should be redundant */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 #define	UTMPACC_ITEM		struct utmpacc_i
@@ -123,6 +131,10 @@ typedef volatile sig_atomic_t	vint ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_close(int) noex ;
+}
 
 
 /* local structures */
@@ -194,14 +206,14 @@ namespace {
 	aflag		finitdone ;
 	aflag		fcapture ;
 	utmpacc() noex {
-	    init(this,utmpaccmem_init) ;
-	    fini(this,utmpaccmem_fini) ;
-	    capbegin(this,utmpaccmem_capbegin) ;
-	    capend(this,utmpaccmem_capend) ;
-	    begin(this,utmpaccmem_begin) ;
-	    end(this,utmpaccmem_end) ;
-	    runlevel(this,utmpaccmem_runlevel) ;
-	    users(this,utmpaccmem_users) ;
+	    init	(this,utmpaccmem_init) ;
+	    fini	(this,utmpaccmem_fini) ;
+	    capbegin	(this,utmpaccmem_capbegin) ;
+	    capend	(this,utmpaccmem_capend) ;
+	    begin	(this,utmpaccmem_begin) ;
+	    end		(this,utmpaccmem_end) ;
+	    runlevel	(this,utmpaccmem_runlevel) ;
+	    users	(this,utmpaccmem_users) ;
 	} ;
 	int boottime(time_t *) noex ;
 	int irunlevel() noex ;
@@ -322,9 +334,9 @@ struct utmpacc_icur {
 } ;
 
 int utmpacc_curbegin(utmpacc_cur *curp) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (curp) {
-	    cnullptr	np{} ;
 	    cint	csz = szof(utmpacc_icur) ;
 	    curp->icursor = nullptr ;
 	    if (void *vp ; (rs = libmem.mall(csz,&vp)) >= 0) {
@@ -475,13 +487,13 @@ int utmpacc::iinit() noex {
 	            if ((rs = cv.create) >= 0) {
 	                void_f	b = utmpacc_atforkbefore ;
 	                void_f	a = utmpacc_atforkafter ;
-	                if ((rs = uc_atforkrecord(b,a,a)) >= 0) {
+	                if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	                    if ((rs = uc_atexit(utmpacc_exit)) >= 0) {
 	                        f = true ;
 	                        finitdone = true ;
 	                    }
 	                    if (rs < 0) {
-	                        uc_atforkexpunge(b,a,a) ;
+	                        uc_atforkexp(b,a,a) ;
 			    }
 	                } /* end if (uc_atfork) */
 	                if (rs < 0) {
@@ -524,7 +536,7 @@ int utmpacc::ifini() noex {
 	    {
 	        void_f	b = utmpacc_atforkbefore ;
 	        void_f	a = utmpacc_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -1052,7 +1064,7 @@ utmpacc_enter::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	if ((rs = getbufsize(bufsize_nn)) >= 0) {
 	    entbuflen = szof(utmpx) ;
 	}
 	return rs ;
