@@ -34,9 +34,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* |uid_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<secdb.h>		/* <- money shot (at least partly) */
 
 
@@ -70,9 +68,9 @@ typedef userattr_t		userattr ;
 
 EXTERNC_begin
 
-extern void setuserattr() noex ;
-extern void enduserattr() noex ;
-extern void free_userattr(userattr *) noex ;
+extern void	setuserattr() noex ;
+extern void	enduserattr() noex ;
+extern void	free_userattr(userattr *) noex ;
 extern userattr *getuserattr() noex ;
 extern userattr *getusernam(cchar *) noex ;
 extern userattr *getuseruid(uid_t) noex ;
