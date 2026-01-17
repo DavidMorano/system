@@ -27,25 +27,26 @@
 	I define some subroutines that are missing from some systems, who will
 	remain nameless for now (Apple Darwin).
 
+	Notes:
+	1. The whole "shadow" password concept was created by
+	Julianne (Julie) Frances Haugh II (in 1987 originally for
+	SCO Xenix®).
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<cerrno>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
-#include	"ucsupport.h"
 #include	"spwd.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -76,110 +77,135 @@ import libutil ;
 #if	defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0)
 
 #if	defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0)
+/******************************************************************************/
 
-int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
-	CSPWD	*rp{} ;
-	int	rc = 0 ;
-	errno = 0 ;
-	if ((rp = getspent_r(spp,spbuf,splen)) == nullptr) {
-	    rc = errno ;
-	}
-	return rc ;
-}
 
+/* *nothing-needed* */
+
+
+/******************************************************************************/
 #else /* defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0) */
+/******************************************************************************/
 
-int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
-	int	ec = EFAULT ;
+
+namespace gnu {
+    errno_t getspent_r(SPWD *spp,char *spbuf,size_t splen) noex {
+	errno_t		ec = 0 ;
 	if (spp && spbuf) {
-	    ec = EINVAL ;
 	    memclear(spp) ;
 	    if (splen > 0) {
-	        ec = ENOENT ;
-	    }
-	}
-	errno = ec ;
-	return -1 ;
-}
-
-#endif /* defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0) */
-
-#if	defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0)
-
-int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
-	CSPWD	*rp{} ;
-	int	rc ;
-	errno = 0 ;
-	if ((rc = getspnam_r(n,spp,spbuf,splen,&rp)) >= 0) {
-	    if (!rp) {
-		errno = ENOENT :
-		rc = errno ;
+	        ec = ENOSYS ;
+	    } else {
+	        ec = EINVAL ;
 	    }
 	} else {
-	    rc = errno ;
+	    ec = EFAULT ;
 	}
-	return rc ;
-}
+	if (ec) errno = ec ;
+	return ec ;
+    } /* end subroutine (getspent_r) */
+} /* end namespace (gnu) */
 
+
+/******************************************************************************/
+#endif /* defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0) */
+#if	defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0)
+/******************************************************************************/
+
+
+/* *nothing-needed* */
+
+
+/******************************************************************************/
 #else /* defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0) */
+/******************************************************************************/
 
-int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
-	int	ec = EFAULT ;
+
+namespace gnu {
+    errno_t getspnam_r(cc *n,SPWD *spp,char *spbuf,int splen,CSPWD **rpp) noex {
+	errno_t		ec = 0 ;
 	if (spp && spbuf && n) {
-	    ec = EINVAL ;
 	    memclear(spp) ;
 	    if ((splen > 0) && n[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
+	    } else {
+	        ec = EINVAL ;
 	    }
+	} else {
+	    ec = EFAULT ;
 	}
-	errno = ec ;
-	return -1 ;
-}
+	if (ec) {
+	    errno = ec ;
+	    if (rpp) *rpp = nullptr ;
+	}
+	return ec ;
+    } /* end subroutine (getspnam_r) */
+} /* end namespace (gnu) */
 
+
+/******************************************************************************/
 #endif /* defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0) */
-
 #else /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
+/******************************************************************************/
 
-void setspent() noex { }
 
-void endspent() noex { }
-
-SPWD *getspent() noex {
-	errno = ENOENT ;
+namespace gnu {
+    void setspent() noex { }
+    void endspent() noex { }
+    SPWD *getspent() noex {
+	errno = ENOSYS ;
 	return nullptr ;
-}
-
-SPWD *getspnam(cchar *) noex {
-	errno = ENOENT ;
+    }
+    SPWD *getspnam(cchar *) noex {
+	errno = ENOSYS ;
 	return nullptr ;
-}
+    }
+} /* end namespace (gnu) */
 
-int getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
-	int	ec = EFAULT ;
+namespace gnu {
+    errno_t getspent_r(SPWD *spp,char *spbuf,size_t splen,CSPWD **rpp) noex {
+	errno_t		ec = 0 ;
 	if (spp && spbuf) {
-	    ec = EINVAL ;
 	    memclear(spp) ;
 	    if (splen > 0) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
+	    } else {
+	        ec = EINVAL ;
 	    }
+	} else {
+	    ec = EFAULT ;
 	}
-	errno = ec ;
-	return -1 ;
-}
+	if (ec) {
+	    errno = ec ;
+	    if (rpp) *rpp = nullptr ;
+	}
+	return ec ;
+    } /* end subroutine (getspent_r) */
+} /* end namespace (gnu) */
 
-int getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
-	int	ec = EFAULT ;
+namespace gnu {
+    errno_t getspnam_r(cc *n,SPWD *spp,char *spbuf,int splen,CSPWD **rpp) noex {
+	errno_t		ec = 0 ;
 	if (spp && spbuf && n) {
-	    ec = EINVAL ;
 	    memclear(spp) ;
 	    if ((splen > 0) && n[0]) {
-	        ec = ENOENT ;
+	        ec = ENOSYS ;
+	    } else {
+	        ec = EINVAL ;
 	    }
+	} else {
+	    ec = EFAULT ;
 	}
-	errno = ec ;
-	return -1 ;
-}
+	if (ec) {
+	    errno = ec ;
+	    if (rpp) *rpp = nullptr ;
+	}
+	return ec ;
+    } /* end subroutine (getspnam_r) */
+} /* end namespace (gnu) */
 
+
+/******************************************************************************/
 #endif /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
 
 
