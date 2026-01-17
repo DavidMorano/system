@@ -1,6 +1,6 @@
 /* ucsys_sup SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* USYS support */
 /* version %I% last-modified %G% */
@@ -38,17 +38,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<unistd.h>
 #include	<cerrno>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
 
-#include	"ucsys.h"
+#include	"ucsys_sup.h"
 
 
 /* local defines */
@@ -74,8 +72,9 @@
 
 /* exported subroutines */
 
-int ucsys_getresolvec(int herr) noex {
-	int	ec = EBUGCHECK ;
+namespace ucsys {
+    errno_t getresolvec(int herr) noex {
+	errno_t		ec = EBUGCHECK ;
 	switch (herr) {
 	case HOST_NOT_FOUND:
 	    ec = ENOENT ;
@@ -97,7 +96,7 @@ int ucsys_getresolvec(int herr) noex {
 	    break ;
 	} /* end switch */
 	return ec ;
-}
-/* end subroutine (ucsys_getresolvec) */
+    } /* end subroutine (getresolvec) */
+} /* end namespace (ucsys) */
 
 
