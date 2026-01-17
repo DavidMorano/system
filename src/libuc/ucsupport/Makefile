@@ -31,28 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= ucsupport.h
+INCS += ucsupport.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ00= spwd.o
@@ -65,7 +50,22 @@ OBJA= obj00.o
 OBJ_UCSUPPORT= obja.o
 
 
-.SUFFIXES:		.hh .ii
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -79,6 +79,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -91,17 +94,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_UCSUPPORT)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCSUPPORT)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_UCSUPPORT)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -114,20 +115,23 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ00)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj01.o:		$(OBJ01)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ01)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj02.o:		$(OBJ02)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ02)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj03.o:		$(OBJ03)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ03)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 spwd.o:			spwd.cc		$(INCS)
