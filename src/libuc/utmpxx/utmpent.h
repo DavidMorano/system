@@ -23,10 +23,7 @@
 #include	<sys/types.h>		/* |pid_t| */
 #include	<utmpx.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #ifndef	UTMPENT
