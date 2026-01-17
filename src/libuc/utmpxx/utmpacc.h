@@ -40,11 +40,8 @@
 #include	<sys/types.h>
 #include	<utmpx.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<utmpaccent.h>		/* <- the money shot */
+#include	<usysbase.h>
+#include	<utmpaccent.h>		/* pre-processor defines below */
 
 
 #define	UTMPACC_ENT		UTMPACCENT
@@ -89,16 +86,16 @@ enum utxproctypes {
 	utxproctype_init,
 	utxproctype_dead,
 	utxproctype_overlast
-} ;
+} ; /* end enum */
 
 struct utmpacc_statistics {
 	uint		maxusers ;
 	uint		maxents ;
-} ;
+} ; /* end struct */
 
 struct utmpacc_cursor {
 	void		*icursor ;
-} ;
+} ; /* end struct */
 
 typedef	UTMPACC_SB	utmpacc_sb ;
 typedef	UTMPACC_CUR	utmpacc_cur ;
@@ -130,7 +127,7 @@ struct utmpacc_enter {
 	int operator () () noex {
 	    return operator int () ;
 	} ;
-} ;
+} ; /* end struct */
 
 extern utmpacc_enter	utmpacc_entbuflen ;
 
