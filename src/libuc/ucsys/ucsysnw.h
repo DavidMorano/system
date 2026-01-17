@@ -33,11 +33,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<stdint.h>
+#include	<stdint.h>		/* |uint32_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<netdb.h>		/* <- the money shot */
 
 
@@ -55,9 +53,9 @@ extern NETENT	*getnwent() noex ;
 extern NETENT	*getnwnam(cchar *) noex ;
 extern NETENT	*getnwnum(int,uint32_t) noex ;
 
-extern int	getnwent_rp(NETENT *,char *,int) noex ;
-extern int	getnwnam_rp(NETENT *,char *,int,cchar *) noex ;
-extern int	getnwnum_rp(NETENT *,char *,int,int,uint32_t) noex ;
+extern unixret_t	getnwent_rp(NETENT *,char *,int) noex ;
+extern unixret_t	getnwnam_rp(NETENT *,char *,int,cchar *) noex ;
+extern unixret_t	getnwnum_rp(NETENT *,char *,int,int,uint32_t) noex ;
 
 EXTERNC_end
 
