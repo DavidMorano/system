@@ -15,16 +15,35 @@
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Super-Group:
+	ucsys
+
+	Description:
+	These subroutine groups provide access to the UNIX® system
+	databases for UNIX® accounts and network entities.  The
+	following groups are provied:
+		ucsyspw		UNIX® 'passwd'		
+		ucsyssp		UNIX® 'shadow'		
+		ucsysgr		UNIX® 'group'		
+		ucsyspj		UNIX® 'project'		
+		ucsyspr		INET 'protocols'	
+		ucsysnw		INET 'networks'
+		ucsysho		INET 'hosts'		
+		ucsyssv		INET 'services'
+
+*******************************************************************************/
+
 #ifndef	UCSYS_INCLUDE
 #define	UCSYS_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+
+#include	<ucsys_sup.h>
 
 #include	<spwd.h>		/* <- special */
 #include	<userattr.h>		/* <- special */
@@ -38,13 +57,6 @@
 #include	<ucsysnw.h>
 #include	<ucsysho.h>
 #include	<ucsyssv.h>
-
-
-EXTERNC_begin
-
-extern int	ucsys_getresolvec(int) noex ;
-
-EXTERNC_end
 
 
 #endif /* UCSYS_INCLUDE */
