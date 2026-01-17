@@ -33,9 +33,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<netdb.h>		/* <- the money shot */
 
 
@@ -53,9 +51,9 @@ extern HOSTENT	*gethoent() noex ;
 extern HOSTENT	*gethonam(cchar *) noex ;
 extern HOSTENT	*gethoadd(int,cvoid *,int) noex ;
 
-extern int	gethoent_rp(HOSTENT *,char *,int) noex ;
-extern int	gethonam_rp(HOSTENT *,char *,int,cchar *) noex ;
-extern int	gethoadd_rp(HOSTENT *,char *,int,int,cvoid *,int) noex ;
+extern unixret_t	gethoent_rp(HOSTENT *,char *,int) noex ;
+extern unixret_t	gethonam_rp(HOSTENT *,char *,int,cchar *) noex ;
+extern unixret_t	gethoadd_rp(HOSTENT *,char *,int,int,cvoid *,int) noex ;
 
 EXTERNC_end
 
