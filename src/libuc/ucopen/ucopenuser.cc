@@ -31,7 +31,9 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
 #include	<getax.h>
@@ -39,7 +41,6 @@
 #include	<getusername.h>
 #include	<opensysfs.h>
 #include	<opensysdbs.h>
-#include	<libmallocxx.h>
 #include	<snwcpy.h>
 #include	<mkpathx.h>
 #include	<strn.h>
@@ -48,7 +49,9 @@
 #include	<ischarx.h>
 #include	<localmisc.h>
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -105,7 +108,7 @@ int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to) noex {
 	    if (un[0]) {
 		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
-	            if (char *pwbuf ; (rs = libmalloc_pw(&pwbuf)) >= 0) {
+	            if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	                ucentpw		pw ;
 	                cint		pwlen = rs ;
 	                if (un[0] == '-') {
@@ -114,7 +117,7 @@ int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to) noex {
 	                    rs = getpwx_name(&pw,pwbuf,pwlen,un) ;
 	                }
 	                if (rs >= 0) {
-			    if (char *fbuf ; (rs = libmalloc_mp(&fbuf)) >= 0) {
+			    if (char *fbuf ; (rs = lm_mp(&fbuf)) >= 0) {
 			        cchar	*udir = pw.pw_dir ;
 	                        if ((rs = mkpath(fbuf,udir,upath)) >= 0) {
 	                            ucopeninfo	oi{} ;
@@ -125,10 +128,11 @@ int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to) noex {
 	                            rs = uc_openinfo(&oi) ;
 			            fd = rs ;
 	                        } /* end if (mkpath) */
-			        rs = rslibfree(rs,fbuf) ;
+			        rs1 = lm_free(fbuf) ;
+				if (rs >= 0) rs = rs1 ;
 			    } /* end if (m-a-f) */
 	                } /* end if (ok) */
-	                rs1 = uc_free(pwbuf) ;
+	                rs1 = lm_free(pwbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 		        if ((rs < 0) && (fd >= 0)) {
 			    u_close(fd) ;
@@ -185,11 +189,11 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 
 	if (un[0] != '\0') {
 	    cint	sz = ((var.maxpathlen + 1) + (var.usernamelen + 1)) ;
-	    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 	        cint	ulen = USERNAMELEN ;
 	        char	ubuf[USERNAMELEN + 1] ;
 	        if ((rs = snwcpy(ubuf,ulen,un,ul)) >= 0) {
-		    if (char *pwbuf ; (rs = libmalloc_pw(&pwbuf)) >= 0) {
+		    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 		        ucentpw	pw ;
 		        cint	pwlen = rs ;
 	                if ((rs = getpwx_name(&pw,pwbuf,pwlen,ubuf)) >= 0) {
@@ -212,12 +216,13 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 	                        rs = SR_NOENT ;
 			    }
 	                } /* end if (getpw-name) */
-		        rs1 = uc_free(pwbuf) ;
+		        rs1 = lm_free(pwbuf) ;
 			if (rs >= 0) rs = rs1 ;
 			if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 		    } /* end if (m-a-f) */
 	        } /* end if (sncpy) */
-	        rs = rslibfree(rs,a) ;
+	        rs1 = lm_free(a) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
 	    rs = SR_NOENT ;
@@ -229,9 +234,9 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	    if ((rs = getbufsize(bufsize_un)) >= 0) {
 	        usernamelen = rs ;
 	    }
 	}
