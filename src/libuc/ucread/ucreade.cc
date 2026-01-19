@@ -19,8 +19,9 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
 	uc_reade
+	uc_read
 
 	Description:
 	Get some amount of data and time it also so that we can
@@ -28,6 +29,7 @@
 
 	Synopsis:
 	int uc_reade(int fd,void *rbuf,int rlen,int to,int opts) noex
+	int uc_read(int fd,void *vbuf,int ulen) noex
 
 	Arguments:
 	fd		file descriptor
@@ -125,7 +127,6 @@
 #include	<poll.h>
 #include	<climits>
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
