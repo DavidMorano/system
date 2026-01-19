@@ -1,4 +1,4 @@
-/* ucreade HEADER */
+/* ucread HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -21,23 +21,23 @@
 /*******************************************************************************
 
   	Name:
-	ucreade
+	ucread
 
 *******************************************************************************/
 
-#ifndef	UCREADE_INCLUDE
-#define	UCREADE_INCLUDE
+#ifndef	UCREAD_INCLUDE
+#define	UCREAD_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<ucfunctioncodes.h>
+#include	<usysbase.h>
+#include	<ucfuncodes.h>
 
 
 EXTERNC_begin
 
-extern int	uc_read(int fd,void *vbuf,int ulen) noex ;
+extern int	uc_read(int,void *,int) noex ;
 extern int	uc_reade(int,void *,int,int,int) noex ;
 extern int	uc_readlnto(int fd,char *lbuf,int llen,int to) noex ;
 extern int	uc_readln(int fd,char *lbuf,int llen) noex ;
@@ -46,6 +46,6 @@ extern int	uc_readn(int fd,void *abuf,int alen) noex ;
 EXTERNC_end
 
 
-#endif /* UCREADE_INCLUDE */
+#endif /* UCREAD_INCLUDE */
 
 
