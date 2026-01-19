@@ -35,8 +35,9 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
 	uc_readlnto
+	uc_readln
 
 	Description:
 	Get a line code amount of data (data ending in an NL) and
@@ -44,6 +45,7 @@
 
 	Synopsis:
 	int uc_readlnto(kint fd,char *lbuf,int llen,int to) noex
+	int uc_readln(int fd,char *lbuf,int llen) noex
 
 	Arguments:
 	fd		file descriptor
@@ -78,7 +80,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
