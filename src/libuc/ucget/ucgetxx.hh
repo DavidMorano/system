@@ -41,7 +41,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<utimeout.h>		/* |utimeout(3u)| */
 #include	<errtimer.hh>
 
 
@@ -61,7 +63,7 @@ namespace ucget {
 	bool		fexit = false ;
 	int operator () (int) noex ;
     } ; /* end struct (ucgeter) */
-}
+} /* end namespace */
 
 
 #endif /* __cplusplus */
