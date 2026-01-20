@@ -9,7 +9,7 @@
 
 /* revision history:
 
-	= 1998-03-85, David A­D­ Morano
+	= 1998-03-05, David A­D­ Morano
 	This code was originally written.
 
 	= 2001-02-01, David A­D­ Morano
@@ -66,7 +66,7 @@
 	uc_valloc()	analogous to the standard |valloc(3c)|
 	uc_calloc()	analogous to the standard |calloc(3c)|
 	uc_realloc()	analogous to the standard |realloc(3c)|
-	uc_free()	analogous to the standard |free(3c)|
+	um_free()	analogous to the standard |free(3c)|
 	uc_mallpresent(cvoid *a) noex
 	uc_mallout(ulong *rp) noex
 	uc_mallstats(ucmem_stats *statp) noex
@@ -86,8 +86,12 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<functional>		/* |mem_fn(3c++)| */
-#include	<uclibsubs.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<uclibmem.h>
+#include	<ucfork.h>
+#include	<ucatfork.h>
+#include	<ucatexit.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<strwcpy.h>
@@ -132,7 +136,7 @@ namespace {
 	submgrmem_init,
 	submgrmem_fini,
 	submgrmem_overlast
-    } ;
+    } ; /* end enum (submgrmems) */
     struct submgr ;
     struct submgr_co {
 	submgr		*op = nullptr ;
@@ -271,7 +275,7 @@ int uc_realloc(void *cp,int sz,void *vp) noex {
     	return mem.ralloc(cp,sz,vp) ;
 }
 
-int uc_free(void *vp) noex {
+int um_free(void *vp) noex {
     	return mem.free(vp) ;
 }
 
@@ -460,14 +464,14 @@ int submgr::iinit() noex {
 	        if ((rs = mx.create) >= 0) {
 	            void_f	b = submgr_atforkbefore ;
 	            void_f	a = submgr_atforkafter ;
-	            if ((rs = uc_atfork(b,a,a)) >= 0) {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 			void_f	e = submgr_exit ;
 	                if ((rs = uc_atexit(e)) >= 0) {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexpunge(b,a,a) ;
+	                    uc_atforkexp(b,a,a) ;
 			}
 	            } /* end if (uc_atfork) */
 	            if (rs < 0) {
@@ -506,7 +510,7 @@ int submgr::ifini() noex {
 	    {
 	        void_f	b = submgr_atforkbefore ;
 	        void_f	a = submgr_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
