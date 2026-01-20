@@ -33,8 +33,14 @@
 /* Solaris®: system has shadow password DB */
 #define	SYSHAS_SHADOW		1
 
+/* Solaris®: system has user attributes framework */
+#define	SYSHAS_USERATTR		1
+
 /* Solaris®: projects */
 #define	SYSHAS_PROJECT		1
+
+/* Solaris®: tasks */
+#define	SYSHAS_TASK		1
 
 /* Solaris®: system has |statvfs(2)| call and friends */
 #define	SYSHAS_STATVFS		1
@@ -50,9 +56,6 @@
 
 /* Solaris®: system has ACL framework */
 #define	SYSHAS_ACL		1
-
-/* Solaris®: system has user attributes framework */
-#define	SYSHAS_USERATTR		1
 
 /* Solaris®: system has Security-Database framework */
 #define	SYSHAS_SECDB		1
@@ -85,9 +88,6 @@
 
 /* Solaris®: |in6_addr_t| */
 #define	SYSHAS_TYPEIN6ADDRT	1
-
-/* Solaris®: tasks */
-#define	SYSHAS_TASK		1
 
 /* Solaris®: UTMPX */
 #define	SYSHAS_UTMPX		1
@@ -158,6 +158,9 @@
 /* Solaris®: ttyname_r(3c) */
 #define	SYSHAS_TTYNAMER		1
 
+/* Solaris®: ptsname_r(3c) */
+#define	SYSHAS_PTSNAMER		0	/* not until Solaris® version 11.1 */
+
 /* Solaris®: postix_openpt(3c) */
 #define	SYSHAS_OPENPT		0
 
@@ -224,6 +227,9 @@
 /* Solaris®: Memory |memcntl(2)| */
 #define	SYSHAS_MEMCNTL		1
 
+/* Solaris®: Memory |minherit(2)| */
+#define	SYSHAS_MEMEMINHERIT	0
+
 /* Solaris®: Memory |plock(2)| */
 #define	SYSHAS_MEMPLOCK		1
 
@@ -264,8 +270,14 @@
 /* Darwin: system has shadow password DB */
 #define	SYSHAS_SHADOW		0
 
+/* Darwin: system has user attributes framework */
+#define	SYSHAS_USERATTR		0
+
 /* Darwin: projects */
 #define	SYSHAS_PROJECT		0
+
+/* Darwin: tasks */
+#define	SYSHAS_TASK		0
 
 /* Darwin: system has |statvfs(2)| call and friends */
 #if	defined(OSNUM_Darwin) && (OSNUM_Darwin >= 8)
@@ -289,9 +301,6 @@
 
 /* Darwin: system has ACL framework */
 #define	SYSHAS_ACL		0
-
-/* Darwin: system has user attributes framework */
-#define	SYSHAS_USERATTR		0
 
 /* Darwin: system has Security-Database framework */
 #define	SYSHAS_SECDB		0
@@ -329,9 +338,6 @@
 /* Darwin®: |in6_addr_t| */
 #define	SYSHAS_TYPEIN6ADDRT	1
 
-/* Darwin: tasks */
-#define	SYSHAS_TASK		0
-
 /* Darwin: UTMPX */
 #if	defined(OSNUM_Darwin) && (OSNUM_Darwin >= 8)
 #define	SYSHAS_UTMPX		1
@@ -356,8 +362,8 @@
 
 /* Darwin: getpwxxx_r(3c) */
 #define	SYSHAS_GETPWXXXR	1	/* any of the others (logical OR) */
-#define	SYSHAS_GETPWGNUR	0	/* has GNU (GLIBC) interface */
-#define	SYSHAS_GETPWENTR	0
+#define	SYSHAS_GETPWGNUR	1	/* has GNU (GLIBC) interface */
+#define	SYSHAS_GETPWENTR	0	/* <- Darwin doe *not* have */
 #define	SYSHAS_GETPWNAMR	1
 #define	SYSHAS_GETPWUIDR	1
 
@@ -369,8 +375,8 @@
 
 /* Darwin: getgrxxx_r(3c) */
 #define	SYSHAS_GETGRXXXR	1	/* any of the others (logical OR) */
-#define	SYSHAS_GETGRGNUR	0	/* has GNU (GLIBC) interface */
-#define	SYSHAS_GETGRENTR	0	
+#define	SYSHAS_GETGRGNUR	1	/* has GNU (GLIBC) interface */
+#define	SYSHAS_GETGRENTR	0	/* <- Darwin does *not* have */
 #define	SYSHAS_GETGRNAMR	1
 #define	SYSHAS_GETGRGIDR	1
 
@@ -408,6 +414,9 @@
 
 /* Darwin: ttyname_r(3c) */
 #define	SYSHAS_TTYNAMER		1
+
+/* Darwin: ptsname_r(3c) */
+#define	SYSHAS_PTSNAMER		1	/* YES */
 
 /* Darwin: postix_openpt(3c) */
 #define	SYSHAS_OPENPT		1
@@ -475,6 +484,9 @@
 /* Darwin: Memory |memcntl(2)| */
 #define	SYSHAS_MEMCNTL		0
 
+/* Darwin®: Memory |minherit(2)| */
+#define	SYSHAS_MEMINHERIT	1
+
 /* Darwin: Memory |plock(2)| */
 #define	SYSHAS_MEMPLOCK		0
 
@@ -511,8 +523,14 @@
 /* Linux: system has shadow password DB */
 #define	SYSHAS_SHADOW		1
 
+/* Linux: system has user attributes framework */
+#define	SYSHAS_USERATTR		0
+
 /* Linux: projects */
 #define	SYSHAS_PROJECT		0
+
+/* Linux: tasks */
+#define	SYSHAS_TASK		0
 
 /* Linux: system has |statvfs(2)| call and friends */
 #define	SYSHAS_STATVFS		1
@@ -528,9 +546,6 @@
 
 /* Linux: system has ACL framework */
 #define	SYSHAS_ACL		0
-
-/* Linux: system has user attributes framework */
-#define	SYSHAS_USERATTR		0
 
 /* Linux: system has Security-Database framework */
 #define	SYSHAS_SECDB		0
@@ -563,9 +578,6 @@
 
 /* Linux®: |in6_addr_t| */
 #define	SYSHAS_TYPEIN6ADDRT	0
-
-/* Linux: tasks */
-#define	SYSHAS_TASK		1
 
 /* Linux: UTMPX */
 #define	SYSHAS_UTMPX		1
@@ -636,6 +648,9 @@
 /* Linux: ttyname_r(3c) */
 #define	SYSHAS_TTYNAMER		1
 
+/* Linux: ptsname_r(3c) */
+#define	SYSHAS_PTSNAMER		1	/* YES */
+
 /* Linux: postix_openpt(3c) */
 #define	SYSHAS_OPENPT		0
 
@@ -700,7 +715,10 @@
 #define	SYSHAS_RELTIMEDWAIT	0
 
 /* Linux: Memory |memcntl(2)| */
-#define	SYSHAS_MEMCNTL		0
+#define	SYSHAS_MEMCNTL		1
+
+/* Linux: Memory |minherit(2)| */
+#define	SYSHAS_MEMINHERIT	0
 
 /* Linux: Memory |plock(2)| */
 #define	SYSHAS_MEMPLOCK		0
@@ -741,13 +759,14 @@
 struct syshas_mgr {
     	typedef unsigned int	uint ;
         uint    shadow:1 ;
+        uint    userattr:1 ;
         uint    project:1 ;
+        uint    task:1 ;
         uint    statvfs:1 ;
         uint    poll:1 ;
         uint    streams:1 ;
         uint    timer:1 ;
         uint    acl:1 ;
-        uint    userattr:1 ;
         uint    secdb:1 ;
         uint    setenv:1 ;
         uint    unsetenv:1 ;
@@ -760,7 +779,6 @@ struct syshas_mgr {
         uint    typedirentt:1 ;
         uint    typesigt:1 ;
         uint    typein6addrt:1 ;
-        uint    task:1 ;
         uint    utmpx:1 ;
         uint    utmpname:1 ;
         uint    utmpxname:1 ;
@@ -798,6 +816,7 @@ struct syshas_mgr {
         uint    localtimer:1 ;
         uint    gmtimer:1 ;
         uint    ttynamer:1 ;
+        uint    ptsnamer:1 ;
         uint    openpt:1 ;
         uint    ptmx:1 ;
         uint    pshm:1 ;
@@ -817,18 +836,19 @@ struct syshas_mgr {
         uint    sigwaitinfo:1 ;
         uint    pthreadsigsend:1 ;
         uint    ucontext:1 ;
-        uint    getcontext:1 ;
         uint    reltimedwait:1 ;
         uint    memcntl:1 ;
+        uint    meminherit:1 ;
         uint    memplock:1 ;
+        uint    getcontext:1 ;
         uint    gethrtime:1 ;
         uint    getrandom:1 ;
+        uint    getexecname:1 ;
         uint    mkdirp:1 ;
         uint    stime:1 ;
         uint    resolvepath:1 ;
         uint    waitid:1 ;
         uint    pipes:1 ;
-        uint    getexecname:1 ;
         uint    libproc:1 ;
 	constexpr syshas_mgr() noexcept ;
 } ; /* end struct (syshas_mgr) */
