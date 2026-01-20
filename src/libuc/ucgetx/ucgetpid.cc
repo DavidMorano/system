@@ -47,9 +47,14 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucatexit.h>
+#include	<ucatfork.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
+#include	<localmisc.h>
 
 #include	"ucgetpid.h"
 
@@ -165,14 +170,14 @@ int ucgetpid::init() noex {
 	            void_f	b = ucgetpid_atforkbefore ;
 	            void_f	ap = ucgetpid_atforkparent ;
 	            void_f	ac = ucgetpid_atforkchild ;
-	            if ((rs = uc_atforkrecord(b,ap,ac)) >= 0) {
+	            if ((rs = uc_atforkrec(b,ap,ac)) >= 0) {
 			void_f	e = ucgetpid_exit ;
 	                if ((rs = uc_atexit(e)) >= 0) {
 	                    finitdone = true ;
 	                    fr = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexpunge(b,ap,ac) ;
+	                    uc_atforkexp(b,ap,ac) ;
 			}
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
@@ -208,7 +213,7 @@ int ucgetpid::fini() noex {
 	        void_f	b = ucgetpid_atforkbefore ;
 	        void_f	ap = ucgetpid_atforkparent ;
 	        void_f	ac = ucgetpid_atforkchild ;
-	        rs1 = uc_atforkexpunge(b,ap,ac) ;
+	        rs1 = uc_atforkexp(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
