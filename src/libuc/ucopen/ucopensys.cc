@@ -32,7 +32,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strnrchr(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<opensysfs.h>
 #include	<ipasswd.h>
 #include	<strn.h>
@@ -42,7 +44,9 @@
 #include	<strx.h>
 #include	<localmisc.h>
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
