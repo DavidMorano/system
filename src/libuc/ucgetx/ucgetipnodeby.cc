@@ -21,7 +21,7 @@
 	Name:
 	uc_getipnodebyname
 	uc_getipnodebyaddr
-	uc_freehostent
+	lm_freehostent
 	uc_hostentfree
 
 	Description:
@@ -31,7 +31,7 @@
 	Synopsis:
 	int uc_getipnodebyname(HE **rpp,cc *hostname,int af,int fl) noex
 	int uc_getipnodebyaddr(HE **rpp,cvoid *ap,int al,int af) noex
-	int uc_freehostent(HE *hep) noex
+	int lm_freehostent(HE *hep) noex
 	int uc_ehostentfree(HE *hep) noex
 
 	Arguments:
@@ -64,7 +64,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>		/* |msleep(3u)| */
 #include	<localmisc.h>
 
 
