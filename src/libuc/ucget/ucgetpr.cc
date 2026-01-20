@@ -1,6 +1,6 @@
 /* ucgetpr SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX® C-language system database access (UCGET) */
 /* version %I% last-modified %G% */
@@ -78,7 +78,8 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 #include	<ucsyspr.h>
@@ -125,7 +126,7 @@ namespace {
 	int getpr_num(ucentpr *,char *,int) noex ;
 	int operator () (ucentpr *,char *,int) noex ;
     } ; /* end struct (ucgetpr) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -133,11 +134,11 @@ namespace {
 
 /* local variables */
 
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
+constexpr bool		f_sunos		= F_SUNOS ;
+constexpr bool		f_darwin	= F_DARWIN ;
+constexpr bool		f_linux		= F_LINUX ;
 
-constexpr bool		f_getprxxxr = F_GETPRXXXR ;
+constexpr bool		f_getprxxxr	= F_GETPRXXXR ;
 
 
 /* exported variables */
@@ -168,9 +169,9 @@ int uc_getprent(ucentpr *prp,char *prbuf,int prlen) noex {
 
 int uc_getprnam(ucentpr *prp,char *prbuf,int prlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		ucgetpr		pro(name) ;
 		pro.m = &ucgetpr::getpr_nam ;
 		rs = pro(prp,prbuf,prlen) ;
@@ -192,9 +193,9 @@ int uc_getprnum(ucentpr *prp,char *prbuf,int prlen,int num) noex {
 
 int ucgetpr::operator () (ucentpr *prp,char *prbuf,int prlen) noex {
 	int		rs = SR_FAULT ;
-	if (prp && prbuf) {
+	if (prp && prbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (ucgeter err ; prlen > 0) {
+	    if (ucgeter err ; prlen > 0) ylikely {
 	        repeat {
 	            if ((rs = (this->*m)(prp,prbuf,prlen)) < 0) {
 			rs = err(rs) ;
@@ -209,19 +210,11 @@ int ucgetpr::operator () (ucentpr *prp,char *prbuf,int prlen) noex {
 int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	errno = 0 ;
 	if_constexpr (f_getprxxxr) {
-	    cint	ec = getprent_rp(prp,prbuf,prlen) ;
-	    if (ec == 0) {
+	    if ((rs = getprent_rp(prp,prbuf,prlen)) >= 0) {
 	        rs = prp->size() ;
-	    } else if (ec > 0) {
-	        rs = (-ec) ;
 	    } else {
-		if (errno) {
-		    rs = (- errno) ;
-		} else {
-		    rs = SR_IO ;
-		}
+		rs = (- errno) ;
 	    }
 	} else {
 	    SYSDBPR	*ep = getprent() ;
@@ -241,19 +234,11 @@ int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
 int ucgetpr::getpr_nam(ucentpr *prp,char *prbuf,int prlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getprxxxr) {
-            cint    ec = getprnam_rp(prp,prbuf,prlen,name) ;
-            if (ec == 0) {
+            if ((rs = getprnam_rp(prp,prbuf,prlen,name)) >= 0) {
                 rs = prp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (- errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBPR         *ep = getprnam(name) ;
@@ -273,19 +258,11 @@ int ucgetpr::getpr_nam(ucentpr *prp,char *prbuf,int prlen) noex {
 int ucgetpr::getpr_num(ucentpr *prp,char *prbuf,int prlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getprxxxr) {
-            cint    ec = getprnum_rp(prp,prbuf,prlen,num) ;
-            if (ec == 0) {
+            if ((rs = getprnum_rp(prp,prbuf,prlen,num)) >= 0) {
                 rs = prp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (- errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBPR         *ep = getprnum(num) ;
