@@ -28,7 +28,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<ctime>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucsysconf.h>
 #include	<localmisc.h>
 
 #include	"sysval.hh"
@@ -40,6 +44,10 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_sysconfval(int,long *) noex ;
+}
 
 
 /* external variables */
