@@ -1,6 +1,6 @@
 /* ucgetua SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX® C-language system database access (UCGET) */
 /* version %I% last-modified %G% */
@@ -52,9 +52,10 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucuserattr.h>		/* |userattr| */
 #include	<localmisc.h>
-#include	<userattr.h>
 
 #include	"ucgetua.h"
 #include	"ucgetxx.hh"
@@ -103,10 +104,10 @@ int uc_getuaent(ucentua *uap,char *uabuf,int ualen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		sz = 0 ;
-	if (uap && uabuf) {
+	if (uap && uabuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (ualen > 0) {
-		if (userattr *ep{} ; (rs = uc_userattrent(&ep)) >= 0) {
+	    if (ualen > 0) ylikely {
+		if (userattr *ep{} ; (rs = uc_userattrent(&ep)) >= 0) ylikely {
 		    {
 			ucentua	*oep = cast_static<ucentua *>(ep) ;
 			rs = uap->load(uabuf,ualen,oep) ;
@@ -125,9 +126,9 @@ int uc_getuanam(ucentua *uap,char *uabuf,int ualen,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		sz = 0 ;
-	if (uap && uabuf && name) {
+	if (uap && uabuf && name) ylikely {
 	    rs = SR_INVALID ;
-	    if (ualen > 0) {
+	    if (ualen > 0) ylikely {
 		if (userattr *ep{} ; (rs = uc_userattrnam(&ep,name)) >= 0) {
 		    {
 			ucentua	*oep = cast_static<ucentua *>(ep) ;
@@ -147,9 +148,9 @@ int uc_getuauid(ucentua *uap,char *uabuf,int ualen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		sz = 0 ;
-	if (uap && uabuf) {
+	if (uap && uabuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (ualen > 0) {
+	    if (ualen > 0) ylikely {
 		if (userattr *ep{} ; (rs = uc_userattruid(&ep,uid)) >= 0) {
 		    {
 			ucentua	*oep = cast_static<ucentua *>(ep) ;
