@@ -98,9 +98,10 @@
 #include	<dlfcn.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getbufsize.h>
-#include	<libmallocxx.h>
 #include	<ids.h>
 #include	<sncpyx.h>
 #include	<mkx.h>			/* |mksofname(3uc)| */
@@ -109,6 +110,8 @@
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>
+
+#pragma		GCC dependency		"mod/openxsvc.ccm"
 
 import openxsvc ;
 
@@ -242,10 +245,9 @@ int subinfo::start() noex {
 
 int subinfo::starts() noex {
     	int		rs ;
-	if (char *bbuf ; (rs = libmalloc_mn(&bbuf)) >= 0) { /* max-name */
+	if (char *bbuf ; (rs = lm_mn(&bbuf)) >= 0) { /* max-name */
 	    if ((rs = sncpy(bbuf,rs,prefix,"s")) >= 0) {
-		auto malls = lm_strw ;
-	        if (cchar *cp ; (rs = malls(bbuf,rs,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(bbuf,rs,&cp)) >= 0) {
 		    basename = cast_const<charp>(cp) ;
 		    rs = startdir() ;
 		    if (rs < 0) {
@@ -262,14 +264,13 @@ int subinfo::starts() noex {
 
 int subinfo::startdir() noex {
     	int		rs ;
-	if (char *dbuf ; (rs = libmalloc_mp(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = lm_lmp(&dbuf)) >= 0) {
 	    if ((rs = mkpath(dbuf,pr,"lib",basename)) >= 0) {
 	        cint	pl = rs ;
 		cchar	*pp = dbuf ;
 	        if (USTAT sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
-			auto malls = lm_strw ;
-		        if (cc *cp ; (rs = malls(pp,pl,&cp)) >= 0) {
+		        if (cc *cp ; (rs = lm_strw(pp,pl,&cp)) >= 0) {
 			    svcdname = cast_const<charp>(cp) ;
 			    rs = startsym() ;
 			    if (rs < 0) {
@@ -290,10 +291,9 @@ int subinfo::startdir() noex {
 
 int subinfo::startsym() noex {
     	int		rs ;
-	if (char *sbuf ; (rs = libmalloc_sn(&sbuf)) >= 0) {
+	if (char *sbuf ; (rs = lm_sn(&sbuf)) >= 0) {
 	    if ((rs = sncpy(sbuf,rs,prefix,"_",svc)) >= 0) {
-		auto malls = lm_strw ;
-		if (cc *cp ; (rs = malls(sbuf,rs,&cp)) >= 0) {
+		if (cc *cp ; (rs = lm_strw(sbuf,rs,&cp)) >= 0) {
 		    dialsym = cast_const<charp>(cp) ;
 		} /* end if (memory-allocation) */
 	    } /* end if (sncpy) */
@@ -330,7 +330,7 @@ int subinfo::search() noex {
 	int		rs1 ;
 	int		f = false ;
 	if ((rs = id.load) >= 0) {
-	    if (char *fbuf ; (rs = libmalloc_mp(&fbuf)) >= 0) {
+	    if (char *fbuf ; (rs = lm_mp(&fbuf)) >= 0) {
 		{
 		    rs = exts(fbuf) ;
 		    f = rs ;
