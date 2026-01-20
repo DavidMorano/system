@@ -36,11 +36,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<errtimer.hh>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<utimeout.h>		/* |utimeout(3u)| */
+#include	<errtimer.hh>		/* |reterr(3u)| */
 #include	<localmisc.h>
 
-#include	"ucgetxx.h"
+#include	"ucgetxx.hh"
 
 
 /* local defines */
@@ -61,6 +63,9 @@
 /* local structures */
 
 
+/* forward references */
+
+
 /* local variables */
 
 
@@ -69,9 +74,11 @@
 
 /* exported subroutines */
 
-int ucgeter::errhandle(int rs) noex {
+namespace ucget {
+    int ucgeter::operator () (int rs) noex {
+        reterr	r ;
         if (rs < 0) {
-            reterr	r(rs) ; /* <- default causes exit */
+            r(rs) ; /* <- default causes exit */
 	    fexit = false ;
             switch (rs) {
             case SR_AGAIN:
@@ -117,7 +124,7 @@ int ucgeter::errhandle(int rs) noex {
             fexit = r.fexit ;
         } /* end if (error) */
 	return rs ;
-}
-/* end method (ucgeter::errhandle) */
+    } /* end method (ucgeter::errhandle) */
+} /* end namespace (ucget) */
 
 
