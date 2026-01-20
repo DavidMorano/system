@@ -81,9 +81,12 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getnodedomain.h>
 #include	<ids.h>
 #include	<sncpyx.h>
@@ -94,7 +97,9 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
