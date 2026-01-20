@@ -64,7 +64,9 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |msleep(3u)| */
 #include	<upt.h>
 #include	<localmisc.h>
 
