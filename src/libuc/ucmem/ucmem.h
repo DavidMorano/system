@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-03-05, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	UCMEM_STATS	struct ucmem_status
@@ -34,18 +31,18 @@
 
 struct ucmem_cursor {
 	void		*mcp ;		/* Mall-Cursor-Pointer */
-} ;
+} ; /* end struct (ucmem_cursor) */
 
 struct ucmem_entry {
 	caddr_t		addr ;
 	size_t		asize ;
-} ;
+} ; /* end struct (ucmem_entry) */
 
 enum ucmallsets {
 	ucmallset_off,
 	ucmallset_on,
 	ucmallset_overlast
-} ;
+} ; /* end enum (ucmallsets) */
 
 struct ucmem_status {
 	ulong		err_underflow ;
@@ -79,7 +76,8 @@ extern int uc_mallset		(int) noex ;
 extern int uc_mallcount		(ulong *) noex ;
 extern int uc_mallout		(ulong *) noex ;
 extern int uc_mallstats		(ucmem_stats *) noex ;
-extern int uc_mallpresent(cvoid *) noex ;
+extern int uc_mallpresent	(cvoid *) noex ;
+extern int uc_mincoreset	(void *,size_t,char *) noex ;
 extern int ucmem_curbegin	(ucmem_cur *) noex ;
 extern int ucmem_curend		(ucmem_cur *) noex ;
 extern int ucmem_curenum	(ucmem_cur *,ucmem_ent *) noex ;
@@ -89,24 +87,24 @@ EXTERNC_end
 #ifdef	__cplusplus
 namespace libuc {
     struct mems {
-	int malloc(int,void *) noex ;
-	int valloc(int,void *) noex ;
-	int calloc(int,int,void *) noex ;
-	int ralloc(void *,int,void *) noex ;
-	int strw(cchar *,int,void *) noex ;
-	int mall(int,void *) noex ;
-	int vall(int,void *) noex ;
-	int call(int,int,void *) noex ;
-	int rall(void *,int,void *) noex ;
-	int free(void *vp) noex ;
-	int mallset(int) noex ;
-	int mallcount(ulong *) noex ;
-	int mallout(ulong *) noex ;
-	int mallstats(ucmem_stats *) noex ;
-	int mallpresent(cvoid *) noex ;
-        int curbegin(ucmem_cur *curp) noex ;
-        int curend(ucmem_cur *curp) noex ;
-        int curenum(ucmem_cur *curp,ucmem_ent *rp) noex ;
+	int malloc	(int,void *) noex ;
+	int valloc	(int,void *) noex ;
+	int calloc	(int,int,void *) noex ;
+	int ralloc	(void *,int,void *) noex ;
+	int strw	(cchar *,int,void *) noex ;
+	int mall	(int,void *) noex ;
+	int vall	(int,void *) noex ;
+	int call	(int,int,void *) noex ;
+	int rall	(void *,int,void *) noex ;
+	int free	(void *vp) noex ;
+	int mallset	(int) noex ;
+	int mallcount	(ulong *) noex ;
+	int mallout	(ulong *) noex ;
+	int mallstats	(ucmem_stats *) noex ;
+	int mallpresent	(cvoid *) noex ;
+        int curbegin	(ucmem_cur *curp) noex ;
+        int curend	(ucmem_cur *curp) noex ;
+        int curenum	(ucmem_cur *curp,ucmem_ent *rp) noex ;
     } ; /* end struct (mems) */
     extern mems		mem ;
 } /* end namespace (libuc) */
