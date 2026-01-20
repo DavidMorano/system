@@ -34,10 +34,14 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usupport.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/usysbasic.ccm"
 
 import libutil ;
 import usysbasic ;
@@ -124,6 +128,7 @@ ucgetcwd::operator int () noex {
 		    r(false) ;
                     break ;
                 } /* end switch */
+		rs = r ;
             } /* end if (error) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
