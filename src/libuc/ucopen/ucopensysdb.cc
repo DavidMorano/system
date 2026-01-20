@@ -44,10 +44,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<syswords.hh>		/* |sysword(3u)| */
 #include	<sysdbfiles.h>		/* |sysdbfile(uc)| */
-#include	<libmallocxx.h>
 #include	<mknpathx.h>
 #include	<localmisc.h>
 
@@ -88,7 +89,7 @@ int uc_opensysdb(sysdbfiles id,int oflags,mode_t operms) noex {
 	int		rs1 ;
 	int		fd = -1 ;
 	if ((id >= 0) && (id < sysdbfile_overlast)) {
-	    if (char *nbuf ; (rs = libmalloc_mn(&nbuf)) >= 0) {
+	    if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
 		cint	nlen = rs ;
 		cchar	*sysdbname = sysdbfile[id] ;
 		if ((rs = mknpath(nbuf,nlen,prefix,sysdbname)) >= 0) {
