@@ -21,7 +21,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |pid_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 /* object */
@@ -53,7 +54,6 @@ the subroutine when the corresponding disposition is OPEN.
 
 ****/
 
-
 struct spawnproc_control {
 	pid_t		pgrp ;		/* input */
 	int		opts ;		/* input */
@@ -61,7 +61,7 @@ struct spawnproc_control {
 	int		fd[3] ;		/* input or output */
 	int		fd_ctty ;	/* input */
 	int		nice ;		/* input */
-} ;
+} ; /* end struct (spawnproc_control) */
 
 typedef SPAWNPROC_CON	spawnproc_con ;
 
