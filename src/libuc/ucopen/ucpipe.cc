@@ -75,9 +75,12 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
