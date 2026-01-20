@@ -42,7 +42,6 @@
 	   data inside of the |getusershell(3c)| subroutine?
 	A. Yes. Pretty much.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -52,8 +51,12 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
+#include	<ucatexit.h>		/* |uc_atexit(3uc)| */
+#include	<ucatfork.h>		/* |uc_atfork{x}(3uc)| */
+#include	<ucfork.h>		/* |uc_forklock{x}(3uc)| */
 #include	<timewatch.hh>
 #include	<sncpyx.h>
 #include	<ptm.h>
@@ -104,7 +107,7 @@ namespace {
 	    }
 	} ; /* end dtor (ucgetus) */
     } ; /* end struct (ucgetus) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -144,19 +147,19 @@ int uc_getusent(char *rbuf,int rlen) noex {
 int ucgetus::init() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
-	if (!fvoid) {
+	if (! fvoid) {
 	    cint	to = utimeout[uto_busy] ;
-	    if (!finit.testandset) {
-	        if ((rs = mx.create) >= 0) {
+	    if (! finit.testandset) {
+	        if ((rs = mx.create) >= 0) ylikely {
 	            void_f	b = ucgetus_atforkbefore ;
 	            void_f	a = ucgetus_atforkafter ;
-	            if ((rs = uc_atfork(b,a,a)) >= 0) {
-	                if ((rs = uc_atexit(ucgetus_exit)) >= 0) {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	                if ((rs = uc_atexit(ucgetus_exit)) >= 0) ylikely {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexpunge(b,a,a) ;
+	                    uc_atforkexp(b,a,a) ;
 			}
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
@@ -185,7 +188,7 @@ int ucgetus::init() noex {
 int ucgetus::fini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (finitdone && (!fvoid.testandset)) {
+	if (finitdone && (! fvoid.testandset)) {
 	    if (factive) {
 		factive = false ;
 		endusershell() ;
@@ -193,7 +196,7 @@ int ucgetus::fini() noex {
 	    {
 	        void_f	b = ucgetus_atforkbefore ;
 	        void_f	a = ucgetus_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -210,7 +213,7 @@ int ucgetus::fini() noex {
 int ucgetus::getusbegin() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = init()) >= 0) {
+	if ((rs = init()) >= 0) ylikely {
 	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
 	 	if ((rs = mx.lockbegin) >= 0) { /* single */
 		    {
@@ -233,7 +236,7 @@ int ucgetus::getusbegin() noex {
 int ucgetus::getusend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = init()) >= 0) {
+	if ((rs = init()) >= 0) ylikely {
 	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
 	 	if ((rs = mx.lockbegin) >= 0) { /* single */
 		    {
@@ -257,16 +260,16 @@ int ucgetus::getusent(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (rlen > 0) {
-	        if ((rs = init()) >= 0) {
+	    if (rlen > 0) ylikely {
+	        if ((rs = init()) >= 0) ylikely {
 	            if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
 	 	        if ((rs = mx.lockbegin) >= 0) { /* single */
 		            cchar	*rp ;
 		            factive = true ;
 		            errno = 0 ;
-		            if ((rp = (cchar *) getusershell()) != nullptr) {
+		            if ((rp = getusershell()) != nullptr) {
 	    	                rs = sncpy1(rbuf,rlen,rp) ;
 			        len = rs ;
 		            } else { /* this is really extra safety */
@@ -296,8 +299,7 @@ static void ucgetus_atforkafter() noex {
 /* end subroutine (ucgetus_atforkafter) */
 
 static void ucgetus_exit() noex {
-	int	rs = ucgetus_data.fini() ;
-	if (rs < 0) {
+	if (cint rs = ucgetus_data.fini() ; rs < 0) {
 	    ulogerror("ucgetus",rs,"exit-fini") ;
 	}
 }
