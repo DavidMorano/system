@@ -1,6 +1,6 @@
 /* ucgetsv SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX® C-language system database access (UCGET) */
 /* version %I% last-modified %G% */
@@ -63,7 +63,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 #include	<ucsyssv.h>
@@ -112,7 +113,7 @@ namespace {
 	int getsv_num(ucentsv *,char *,int) noex ;
 	int operator () (ucentsv *,char *,int) noex ;
     } ; /* end struct (ucgetsv) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -120,11 +121,11 @@ namespace {
 
 /* local variables */
 
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
+constexpr bool		f_sunos		= F_SUNOS ;
+constexpr bool		f_darwin	= F_DARWIN ;
+constexpr bool		f_linux		= F_LINUX ;
 
-constexpr bool		f_getsvxxxr = F_GETSVXXXR ;
+constexpr bool		f_getsvxxxr	= F_GETSVXXXR ;
 
 
 /* exported variables */
@@ -155,8 +156,8 @@ int uc_getsvent(ucentsv *svp,char *svbuf,int svlen) noex {
 
 int uc_getsvnam(ucentsv *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
     	int		rs = SR_FAULT ;
-	if (n && p) {
-	    if (n[0] && p[0]) {
+	if (n && p) ylikely {
+	    if (n[0] && p[0]) ylikely {
 		ucgetsv		svo(n,p) ;
 		svo.m = &ucgetsv::getsv_nam ;
 		rs = svo(svp,svbuf,svlen) ;
@@ -168,9 +169,9 @@ int uc_getsvnam(ucentsv *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
 
 int uc_getsvnum(ucentsv *svp,char *svbuf,int svlen,int n,cchar *p) noex {
     	int		rs = SR_FAULT ;
-	if (p) {
+	if (p) ylikely {
 	    rs = SR_INVALID ;
-	    if ((n >= 0) && p[0]) {
+	    if ((n >= 0) && p[0]) ylikely {
 		ucgetsv		svo(n,p) ;
 		svo.m = &ucgetsv::getsv_num ;
 		rs = svo(svp,svbuf,svlen) ;
@@ -185,9 +186,9 @@ int uc_getsvnum(ucentsv *svp,char *svbuf,int svlen,int n,cchar *p) noex {
 
 int ucgetsv::operator () (ucentsv *svp,char *svbuf,int svlen) noex {
 	int		rs = SR_FAULT ;
-	if (svp && svbuf) {
+	if (svp && svbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (ucgeter err ; svlen > 0) {
+	    if (ucgeter err ; svlen > 0) ylikely {
 	        repeat {
 	            if ((rs = (this->*m)(svp,svbuf,svlen)) < 0) {
 			rs = err(rs) ;
@@ -202,19 +203,11 @@ int ucgetsv::operator () (ucentsv *svp,char *svbuf,int svlen) noex {
 int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	errno = 0 ;
 	if_constexpr (f_getsvxxxr) {
-	    cint	ec = getsvent_rp(svp,svbuf,svlen) ;
-	    if (ec == 0) {
+	    if ((rs = getsvent_rp(svp,svbuf,svlen)) >= 0) {
 	        rs = svp->size() ;
-	    } else if (ec > 0) {
-	        rs = (-ec) ;
 	    } else {
-		if (errno) {
-		    rs = (-errno) ;
-		} else {
-		    rs = SR_IO ;
-		}
+		rs = (- errno) ;
 	    }
 	} else {
 	    SYSDBSV	*ep = getsvent() ;
@@ -234,19 +227,11 @@ int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
 int ucgetsv::getsv_nam(ucentsv *svp,char *svbuf,int svlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getsvxxxr) {
-            cint    ec = getsvnam_rp(svp,svbuf,svlen,name,proto) ;
-            if (ec == 0) {
+            if ((rs = getsvnam_rp(svp,svbuf,svlen,name,proto)) >= 0) {
                 rs = svp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBSV         *ep = getsvnam(name,proto) ;
@@ -266,19 +251,11 @@ int ucgetsv::getsv_nam(ucentsv *svp,char *svbuf,int svlen) noex {
 int ucgetsv::getsv_num(ucentsv *svp,char *svbuf,int svlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getsvxxxr) {
-            cint        ec = getsvpor_rp(svp,svbuf,svlen,num,proto) ;
-            if (ec == 0) {
+            if ((rs = getsvpor_rp(svp,svbuf,svlen,num,proto)) >= 0) {
                 rs = svp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBSV     *ep = getsvpor(num,proto) ;
