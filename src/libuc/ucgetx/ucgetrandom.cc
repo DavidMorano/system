@@ -32,9 +32,12 @@
 #include	<sys/random.h>		/* |getentropy(2)| */
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
+#include	<usys.h>		/* |getrandom(3u)| */
 #include	<localmisc.h>
 
 #include	"ucgetrandom.h"
