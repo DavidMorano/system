@@ -18,8 +18,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>
 #include	<fcntl.h>		/* |mode_t| */
-#include	<usystem.h>
-#include	<libmallocxx.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<mkx.h>
 #include	<localmisc.h>
 
@@ -56,7 +59,7 @@ int uc_create(cchar *fname,mode_t om) noex {
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
+		if (char *ebuf ; (rs = lm_mp(&ebuf)) >= 0) {
 	            if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		        rs = u_creat(ebuf,om) ;
 			fd = rs ;
