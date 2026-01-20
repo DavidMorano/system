@@ -1,6 +1,6 @@
 /* ucgetsp SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX® C-language system database access (UCGET) */
 /* version %I% last-modified %G% */
@@ -52,7 +52,8 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 #include	<spwd.h>
@@ -78,6 +79,10 @@
 /* imported namespaces */
 
 using ucget::ucgeter ;			/* type */
+using gnu::setspent ;			/* subroutine */
+using gnu::endspent ;			/* subroutine */
+using gnu::getspent ;			/* subroutine */
+using gnu::getspnam ;			/* subroutine */
 
 
 /* local typedefs */
@@ -102,7 +107,7 @@ namespace {
 	int getsp_nam(ucentsp *,char *,int) noex ;
 	int operator () (ucentsp *,char *,int) noex ;
     } ; /* end struct (ucgetsp) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -145,9 +150,9 @@ int uc_getspent(ucentsp *spp,char *spbuf,int splen) noex {
 
 int uc_getspnam(ucentsp *spp,char *spbuf,int splen,cchar *name) noex {
     	int		rs = SR_FAULT ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		ucgetsp		spo(name) ;
 		spo.m = &ucgetsp::getsp_nam ;
 		rs = spo(spp,spbuf,splen) ;
@@ -162,9 +167,9 @@ int uc_getspnam(ucentsp *spp,char *spbuf,int splen,cchar *name) noex {
 
 int ucgetsp::operator () (ucentsp *spp,char *spbuf,int splen) noex {
 	int		rs = SR_FAULT ;
-	if (spp && spbuf) {
+	if (spp && spbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (ucgeter err ; splen > 0) {
+	    if (ucgeter err ; splen > 0) ylikely {
 		repeat {
 	            if ((rs = (this->*m)(spp,spbuf,splen)) < 0) {
 			rs = err(rs) ;
@@ -179,19 +184,11 @@ int ucgetsp::operator () (ucentsp *spp,char *spbuf,int splen) noex {
 int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	errno = 0 ;
 	if_constexpr (f_getspentr) {
-	    cint	ec = getspent_rp(spp,spbuf,splen) ;
-	    if (ec == 0) {
+	    if ((rs = getspent_rp(spp,spbuf,splen)) >= 0) {
 	        rs = spp->size() ;
-	    } else if (ec > 0) {
-	        rs = (-ec) ;
 	    } else {
-		if (errno) {
-		    rs = (-errno) ;
-		} else {
-		    rs = SR_IO ;
-		}
+		rs = (- errno) ;
 	    }
 	} else {
 	    SYSDBSP	*ep = getspent() ;
@@ -211,19 +208,11 @@ int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
 int ucgetsp::getsp_nam(ucentsp *spp,char *spbuf,int splen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getspnamr) {
-            cint    ec = getspnam_rp(spp,spbuf,splen,name) ;
-            if (ec == 0) {
+            if ((rs = getspnam_rp(spp,spbuf,splen,name)) >= 0) {
                 rs = spp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
-            } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+	    } else {
+                rs = (- errno) ;
             }
         } else {
             SYSDBSP         *ep = getspnam(name) ;
