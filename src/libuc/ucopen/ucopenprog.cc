@@ -64,7 +64,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getprogpath.h>
 #include	<estrings.h>
 #include	<ids.h>
@@ -82,6 +84,10 @@
 
 /* external subroutines */
 
+extern "C" {
+    extern int	mkpathuser(char *,cchar *,cchar *,int) noex ;
+}
+
 
 /* external variables */
 
@@ -91,17 +97,17 @@
 
 /* forward reference */
 
-static int	mkepath(char *,cchar *) noex ;
-static int	mkfindpath(char *,cchar *) noex ;
+local int	mkepath(char *,cchar *) noex ;
+local int	mkfindpath(char *,cchar *) noex ;
 
 #if	CF_ENVLOAD
-static int	mkprogenv_load(MKPROGENV *,cchar *,mainv) noex ;
+local int	mkprogenv_load(MKPROGENV *,cchar *,mainv) noex ;
 #endif
 
-static int	openproger(cchar *,int,mainv,mainv,int *) noex ;
-static int	spawnit(cchar *,int,mainv,mainv,int *) noex ;
+local int	openproger(cchar *,int,mainv,mainv,int *) noex ;
+local int	spawnit(cchar *,int,mainv,mainv,int *) noex ;
 
-static int	accmode(int) noex ;
+local int	accmode(int) noex ;
 
 
 /* local variables */
@@ -154,7 +160,7 @@ int uc_openprog(cchar *pfn,int of,mainv argv,mainv envv) noex {
 
 /* local subroutines */
 
-static int mkepath(char *ebuf,cchar *pfn) noex {
+local int mkepath(char *ebuf,cchar *pfn) noex {
 	int		rs ;
 	int		el = 0 ;
 	if ((rs = mkvarpath(ebuf,pfn,-1)) >= 0) {
@@ -164,7 +170,7 @@ static int mkepath(char *ebuf,cchar *pfn) noex {
 	    }
 	    if (strncmp(pfn,"/u/",3) == 0) {
 	        char	tbuf[MAXPATHLEN+1] ;
-	        if ((rs = mkuserpath(tbuf,nullptr,pfn,-1)) > 0) {
+	        if ((rs = mkpathuser(tbuf,nullptr,pfn,-1)) > 0) {
 		    el = rs ;
 	            rs = mkpath1(ebuf,tbuf) ;
 	            pfn = ebuf ;
@@ -188,7 +194,7 @@ static int mkepath(char *ebuf,cchar *pfn) noex {
 }
 /* end subroutine (mkepath) */
 
-static int mkfindpath(char *ebuf,cchar *pfn) noex {
+local int mkfindpath(char *ebuf,cchar *pfn) noex {
 	ids		id ;
 	int		rs ;
 	int		rs1 ;
@@ -209,7 +215,7 @@ static int mkfindpath(char *ebuf,cchar *pfn) noex {
 }
 /* end subroutine (mkfindpath) */
 
-static int openproger(cc *pfn,int of,mainv argv,mainv envv,int *efdp) noex {
+local int openproger(cc *pfn,int of,mainv argv,mainv envv,int *efdp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
@@ -227,7 +233,7 @@ static int openproger(cc *pfn,int of,mainv argv,mainv envv,int *efdp) noex {
 /* end subroutine (openproger) */
 
 #if	CF_ENVLOAD
-static int mkprogenv_load(MKPROGENV *pep,cchar *pfn,mainv argv) noex {
+local int mkprogenv_load(MKPROGENV *pep,cchar *pfn,mainv argv) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mkprogenv_envset(pep,"_EF",pfn,-1)) >= 0) {
@@ -237,14 +243,14 @@ static int mkprogenv_load(MKPROGENV *pep,cchar *pfn,mainv argv) noex {
 	    if (ap == nullptr) al = sfbasename(pfn,-1,&ap) ;
 	    if ((rs = mkprogenv_envset(pep,"_A0",ap,al)) >= 0) {
 		cint	sulen = (lenstr(pfn)+22) ;
-		if (char *subuf ; (rs = uc_malloc((sulen+1),&subuf)) >= 0) {
+		if (char *subuf ; (rs = lm_mall((sulen+1),&subuf)) >= 0) {
 		    if ((rs = ucpid) >= 0 {
 	    	        const pid_t	pid = rs ;
 	    	        if ((rs = snshellunder(subuf,sulen,pid,pfn)) > 0) {
 	        	    rs = mkprogenv_envset(pep,"_",subuf,rs) ;
 	    	        }
 		    } /* end if (ucgetpid) */
-	    	    rs1 = uc_free(subuf) ;
+	    	    rs1 = lm_free(subuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (mkprogenv_envset) */
@@ -305,7 +311,7 @@ int spawnit(cchar *pfn,int of,mainv argv,mainv envv,int *fd2p) noex {
 }
 /* end subroutine (spawnit) */
 
-static int accmode(int of) noex {
+local int accmode(int of) noex {
 	cint		am = (of & O_ACCMODE) ;
 	int		rs = SR_INVALID ;
 	switch (am) {
