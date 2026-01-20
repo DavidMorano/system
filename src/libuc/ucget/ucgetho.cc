@@ -1,6 +1,6 @@
 /* ucgetho SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX® C-language system database access (UCGET) */
 /* version %I% last-modified %G% */
@@ -66,7 +66,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 #include	<ucsysho.h>
@@ -122,7 +123,7 @@ namespace {
 	int getho_add(ucentho *,char *,int) noex ;
 	int operator () (ucentho *,char *,int) noex ;
     } ; /* end struct (ucgetho) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -130,9 +131,9 @@ namespace {
 
 /* local variables */
 
-constexpr bool		f_sunos = F_SUNOS ;
+constexpr bool		f_sunos		= F_SUNOS ;
 
-constexpr bool		f_gethoxxxr = F_GETHOXXXR ;
+constexpr bool		f_gethoxxxr	= F_GETHOXXXR ;
 
 
 /* exported variables */
@@ -163,9 +164,9 @@ int uc_gethoent(ucentho *hop,char *hobuf,int holen) noex {
 
 int uc_gethonam(ucentho *hop,char *hobuf,int holen,cchar *name) noex {
     	int		rs = SR_FAULT ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 	        ucgetho		hoo(name) ;
 	        hoo.m = &ucgetho::getho_nam ;
 	        rs =hoo(hop,hobuf,holen) ;
@@ -177,9 +178,9 @@ int uc_gethonam(ucentho *hop,char *hobuf,int holen,cchar *name) noex {
 
 int uc_gethoadd(ucentho *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
     	int		rs = SR_FAULT ;
-	if (ap) {
+	if (ap) ylikely {
 	    rs = SR_INVALID ;
-	    if ((af >= 0) && (al > 0)) {
+	    if ((af >= 0) && (al > 0)) ylikely {
 		ucgetho		hoo(nullptr,af,ap,al) ;
 		hoo.m = &ucgetho::getho_add ;
 	    	rs = hoo(hop,hobuf,holen) ;
@@ -194,9 +195,9 @@ int uc_gethoadd(ucentho *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
 
 int ucgetho::operator () (ucentho *hop,char *hobuf,int holen) noex {
 	int		rs = SR_FAULT ;
-	if (hop && hobuf) {
+	if (hop && hobuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (ucgeter err ; holen > 0) {
+	    if (ucgeter err ; holen > 0) ylikely {
 	        repeat {
 	            if ((rs = (this->*m)(hop,hobuf,holen)) < 0) {
 			rs = err(rs) ;
@@ -211,19 +212,11 @@ int ucgetho::operator () (ucentho *hop,char *hobuf,int holen) noex {
 int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 	cnullptr	np{} ;
 	int		rs ;
-	errno = 0 ;
 	if_constexpr (f_gethoxxxr) {
-	    cerrno_t ec = gethoent_rp(hop,hobuf,holen) ;
-	    if (ec == 0) {
+	    if ((rs = gethoent_rp(hop,hobuf,holen)) >= 0) {
 	        rs = hop->size() ;
-	    } else if (ec > 0) {
-	        rs = (-ec) ;
 	    } else {
-		if (errno) {
-		    rs = (-errno) ;
-		} else {
-		    rs = SR_IO ;
-		}
+		rs = (- errno) ;
 	    }
 	} else {
 	    SYSDBHO	*ep = gethoent() ;
@@ -243,19 +236,11 @@ int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 int ucgetho::getho_nam(ucentho *hop,char *hobuf,int holen) noex {
 	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_gethoxxxr) {
-            cerrno_t ec = gethonam_rp(hop,hobuf,holen,name) ;
-            if (ec == 0) {
+            if ((rs = gethonam_rp(hop,hobuf,holen,name)) >= 0) {
                 rs = hop->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBHO     *ep = gethonam(name) ;
@@ -275,19 +260,11 @@ int ucgetho::getho_nam(ucentho *hop,char *hobuf,int holen) noex {
 int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
 	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_gethoxxxr) {
-            cerrno_t ec = gethoadd_rp(hop,hobuf,holen,af,ap,al) ;
-            if (ec == 0) {
+            if ((rs = gethoadd_rp(hop,hobuf,holen,af,ap,al)) >= 0) {
                 rs = hop->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBHO     *ep = gethoadd(af,ap,al) ;
