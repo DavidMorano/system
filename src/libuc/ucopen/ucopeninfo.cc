@@ -90,11 +90,12 @@
 #include	<poll.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getax.h>
 #include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
 #include	<getuserhome.h>		/* |getuserhome(3uc)| */
-#include	<libmallocxx.h>
 #include	<vecstr.h>
 #include	<nonpath.h>
 #include	<snwcpy.h>
@@ -111,7 +112,9 @@
 
 #include	"ucopeninfo.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -244,6 +247,7 @@ int uc_openex(cchar *fn,int of,mode_t om,int to,int oo) noex {
 
 int uc_openinfo(ucopeninfo *oip) noex {
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ;
 
 	if (oip == nullptr) return SR_FAULT ;
@@ -255,16 +259,16 @@ int uc_openinfo(ucopeninfo *oip) noex {
 
 	    if (hascdpath(oip->fname,-1)) {
 	        cint	tlen = MAXPATHLEN ;
-	        char	*tbuf ;
-	        if ((rs = lm_mall((tlen+1),&tbuf)) >= 0) {
-	            if ((rs = mkcdpath(tbuf,oip->fname,-1)) > 0) {
+	        if (char *tbuf ; (rs = lm_mall((tlen+1),&tbuf)) >= 0) {
+	            if ((rs = mkpathvar(tbuf,oip->fname,-1)) > 0) {
 			oip->fname = tbuf ;
 	                rs = open_eval(oip) ;
 	                fd = rs ;
 	            } else if (rs == 0) {
 	                rs = SR_NOENT ;
 	            }
-	            lm_free(tbuf) ;
+	            rs1 = lm_free(tbuf) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (memory-allocation) */
 	    } else {
 	        rs = open_eval(oip) ;
@@ -351,7 +355,7 @@ static int open_eval(ucopeninfo *oip) noex {
 	            if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
 	                efname = charp(p) ;
 	                efname[0] = '\0' ;
-	                if ((rs = mkvarpath(efname,oip->fname,-1)) > 0) {
+	                if ((rs = mkpathvar(efname,oip->fname,-1)) > 0) {
 	                    oip->fname = efname ;
 	                } else if (rs <= 0) {
 	                    if (rs == 0) rs = SR_BADFMT ;
@@ -612,7 +616,7 @@ static int open_nonpather(ucopeninfo *oip,int npi,cchar *prn,cchar *sp) noex {
 
 	    if (ev == nullptr) ev = (cchar **) environ ;
 
-	    brkbuf[0] = (char) 0xAD ;
+	    brkbuf[0] = char(0xAD) ;
 	    brkbuf[1] = ':' ;
 	    brkbuf[2] = 0 ;
 	    if ((tp = strbrk(sp,brkbuf)) != nullptr) {
@@ -712,7 +716,7 @@ static int openproger(cchar *fname,int oflags,mainv ev) noex {
 
 	if (ev == nullptr) ev = (cchar **) environ ;
 
-	if ((rs = mkuserpath(expfname,nullptr,fname,-1)) >= 0) {
+	if ((rs = mkpathuser(expfname,nullptr,fname,-1)) >= 0) {
 	    vecstr	args ;
 	    cchar	*fnp = fname ;
 	    cchar	*pfp ;
@@ -753,7 +757,7 @@ static int openproger(cchar *fname,int oflags,mainv ev) noex {
 		}
 	    } /* end if (args) */
 
-	} /* end if (mkuserpath) */
+	} /* end if (mkpathuser) */
 
 	return (rs >= 0) ? fd : rs ;
 }
