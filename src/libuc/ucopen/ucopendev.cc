@@ -32,7 +32,9 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getx.h>
 #include	<opensysfs.h>
 #include	<mkpathx.h>
@@ -41,7 +43,9 @@
 #include	<matstr.h>
 #include	<localmisc.h>
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -60,10 +64,12 @@ using libuc::opensysfs ;
 
 /* external subroutines */
 
-extern int	dialtcp(cchar *,cchar *,int,int,int) noex ;
-extern int	dialtcpnls(cchar *,cchar *,int,cchar *,int,int) noex ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) noex ;
-extern int	dialudp(cchar *,cchar *,int,int,int) noex ;
+extern "C" {
+    extern int	dialtcp(cc *,cchar *,int,int,int) noex ;
+    extern int	dialtcpnls(cc *,cchar *,int,cchar *,int,int) noex ;
+    extern int	dialtcpmux(cc *,cchar *,int,cchar *,cchar **,int,int) noex ;
+    extern int	dialudp(cc *,cchar *,int,int,int) noex ;
+}
 
 
 /* local structures */
