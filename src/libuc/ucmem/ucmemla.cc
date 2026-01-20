@@ -45,7 +45,10 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sysval.hh>
 #include	<intceil.h>
 #include	<localmisc.h>
