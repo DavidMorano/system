@@ -31,8 +31,11 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
+#include	<ucsysconf.h>
+#include	<ucsysauxinfo.h>
 #include	<sncpyx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
