@@ -40,13 +40,27 @@ MODS=
 LIBS +=
 
 
+OBJ0= ucgetarchitecture.o ucgetcwd.o ucgethost.o
+OBJ1= ucgethostname.o ucgetipnodeby.o ucgetloadavg.o
+OBJ2= ucgetlogin.o ucgetnameinfo.o ucgetnisdomain.o
+OBJ3= ucgetpid.o ucgetpuid.o ucgetrandom.o
+OBJ4= ucgetrusage.o ucgetsocktype.o
+OBJ5= 
+OBJ6=
+OBJ7=
+
+OBJA= obj0.o obj1.o obj2.o 
+OBJB= obj3.o obj4.o
+
+OBJ= obja.o objb.o
+
+
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,19 +69,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ0= ucgetarchitecture.o ucgetcwd.o ucgethost.o
-OBJ1= ucgethostname.o ucgetipnodeby.o ucgetloadavg.o
-OBJ2= ucgetlogin.o ucgetnameinfo.o ucgetnisdomain.o
-OBJ3= ucgetpid.o ucgetpuid.o ucgetrandom.o
-OBJ4= ucgetrusage.o ucgetsocktype.o
-OBJ5= 
-
-OBJA= obj0.o obj1.o obj2.o 
-OBJB= obj3.o obj4.o
-
-OBJ= obja.o objb.o
 
 
 .SUFFIXES:		.hh .ii .ccm
@@ -103,13 +104,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -122,29 +118,35 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 ucgetarchitecture.o:	ucgetarchitecture.cc			$(INCS)
