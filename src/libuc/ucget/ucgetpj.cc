@@ -1,6 +1,6 @@
 /* ucgetpj SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX® C-language system database access (UCGET) */
 /* version %I% last-modified %G% */
@@ -52,7 +52,8 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 #include	<ucsyspj.h>
@@ -115,7 +116,7 @@ namespace {
 	int getpj_def(ucentpj *,char *,int) noex ;
 	int operator () (ucentpj *,char *,int) noex ;
     } ; /* end struct (ucgetpj) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -127,13 +128,13 @@ static constexpr bool bit(uint v,int b) noex {
 
 /* local variables */
 
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
-constexpr bool		f_getpjentr = F_GETPJENTR ;
-constexpr bool		f_getpjnamr = F_GETPJNAMR ;
-constexpr bool		f_getpjpidr = F_GETPJPIDR ;
-constexpr bool		f_getpjdefr = F_GETPJDEFR ;
+constexpr bool		f_sunos		= F_SUNOS ;
+constexpr bool		f_darwin	= F_DARWIN ;
+constexpr bool		f_linux		= F_LINUX ;
+constexpr bool		f_getpjentr	= F_GETPJENTR ;
+constexpr bool		f_getpjnamr	= F_GETPJNAMR ;
+constexpr bool		f_getpjpidr	= F_GETPJPIDR ;
+constexpr bool		f_getpjdefr	= F_GETPJDEFR ;
 
 constexpr projid_t	pjidend = projid_t(-1) ;
 
@@ -166,9 +167,9 @@ int uc_getpjent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 
 int uc_getpjnam(ucentpj *pjp,char *pjbuf,int pjlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		ucgetpj		pjo(name) ;
 		pjo.m = &ucgetpj::getpj_nam ;
 		rs =  pjo(pjp,pjbuf,pjlen) ;
@@ -183,7 +184,7 @@ int uc_getpjpid(ucentpj *pjp,char *pjbuf,int pjlen,projid_t pjid) noex {
 	if (bit(pjid,31)) {
 	    pjid = getprojid() ;
 	}
-	if (pjid != pjidend) {
+	if (pjid != pjidend) ylikely {
 	    ucgetpj	pjo(nullptr,pjid) ;
 	    pjo.m = &ucgetpj::getpj_pid ;
 	    rs = pjo(pjp,pjbuf,pjlen) ;
@@ -194,9 +195,9 @@ int uc_getpjpid(ucentpj *pjp,char *pjbuf,int pjlen,projid_t pjid) noex {
 
 int uc_getpjdef(ucentpj *pjp,char *pjbuf,int pjlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		ucgetpj		pjo(name) ;
 		pjo.m = &ucgetpj::getpj_def ;
 		rs = pjo(pjp,pjbuf,pjlen) ;
@@ -211,9 +212,9 @@ int uc_getpjdef(ucentpj *pjp,char *pjbuf,int pjlen,cchar *name) noex {
 
 int ucgetpj::operator () (ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	int		rs = SR_FAULT ;
-	if (pjp && pjbuf) {
+	if (pjp && pjbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (ucgeter err ; pjlen > 0) {
+	    if (ucgeter err ; pjlen > 0) ylikely {
 		repeat {
 	            if ((rs = (this->*m)(pjp,pjbuf,pjlen)) < 0) {
 			rs = err(rs) ;
@@ -228,19 +229,11 @@ int ucgetpj::operator () (ucentpj *pjp,char *pjbuf,int pjlen) noex {
 int ucgetpj::getpj_ent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	errno = 0 ;
 	if_constexpr (f_getpjentr) {
-	    cint	ec = getpjent_rp(pjp,pjbuf,pjlen) ;
-	    if (ec == 0) {
+	    if ((rs = getpjent_rp(pjp,pjbuf,pjlen)) >= 0) {
 	        rs = pjp->size() ;
-	    } else if (ec > 0) {
-	        rs = (-ec) ;
 	    } else {
-		if (errno) {
-		    rs = (-errno) ;
-		} else {
-		    rs = SR_IO ;
-		}
+		rs = (- errno) ;
 	    }
 	} else {
 	    SYSDBPJ	*ep = getpjent() ;
@@ -257,31 +250,23 @@ int ucgetpj::getpj_ent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 int ucgetpj::getpj_nam(ucentpj *pjp,char *pjbuf,int pjlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	    errno = 0 ;
-	    if_constexpr (f_getpjnamr) {
-	        cint	ec = getpjnam_rp(pjp,pjbuf,pjlen,name) ;
-	        if (ec == 0) {
-	            rs = pjp->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (-errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
+	if_constexpr (f_getpjnamr) {
+	    if ((rs = getpjnam_rp(pjp,pjbuf,pjlen,name)) >= 0) {
+	        rs = pjp->size() ;
 	    } else {
-		SYSDBPJ		*ep = getpjnam(name) ;
-	        if (ucentpj *rp = cast_static<ucentpj *>(ep) ; rp != np) {
-	            rs = pjp->load(pjbuf,pjlen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
+	        rs = (- errno) ;
 	    }
+	} else {
+	    SYSDBPJ	*ep = getpjnam(name) ;
+	    if (ucentpj *rp = cast_static<ucentpj *>(ep) ; rp != np) {
+	        rs = pjp->load(pjbuf,pjlen,rp) ;
+	    } else {
+	        rs = (- errno) ;
+	    }
+	} /* end if_constexpr (selection) */
+	if_constexpr (f_sunos) {
+	    if (rs == SR_BADF) rs = SR_NOENT ;
+	}
 	return rs ;
 }
 /* end subroutine (ucgetpj::getpj_nam) */
@@ -289,31 +274,23 @@ int ucgetpj::getpj_nam(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 int ucgetpj::getpj_pid(ucentpj *pjp,char *pjbuf,projid_t pjlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	    errno = 0 ;
-	    if_constexpr (f_getpjpidr) {
-	        cint	ec = getpjpid_rp(pjp,pjbuf,pjlen,pjid) ;
-	        if (ec == 0) {
-	            rs = pjp->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (-errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
+	if_constexpr (f_getpjpidr) {
+	    if ((rs = getpjpid_rp(pjp,pjbuf,pjlen,pjid)) >= 0) {
+	        rs = pjp->size() ;
 	    } else {
-		SYSDBPJ		*ep = getpjpid(pjid) ;
-	        if (ucentpj *rp = cast_static<ucentpj *>(ep) ; rp != np) {
-	            rs = pjp->load(pjbuf,pjlen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
+		rs = (- errno) ;
 	    }
+	} else {
+	    SYSDBPJ	*ep = getpjpid(pjid) ;
+	    if (ucentpj *rp = cast_static<ucentpj *>(ep) ; rp != np) {
+	        rs = pjp->load(pjbuf,pjlen,rp) ;
+	    } else {
+	        rs = (- errno) ;
+	    }
+	} /* end if_constexpr (selection) */
+	if_constexpr (f_sunos) {
+	    if (rs == SR_BADF) rs = SR_NOENT ;
+	}
 	return rs ;
 }
 /* end subroutine (ucgetpj::getpj_pid) */
@@ -321,31 +298,23 @@ int ucgetpj::getpj_pid(ucentpj *pjp,char *pjbuf,projid_t pjlen) noex {
 int ucgetpj::getpj_def(ucentpj *pjp,char *pjbuf,int pjlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	    errno = 0 ;
-	    if_constexpr (f_getpjdefr) {
-	        cint	ec = getpjdef_rp(pjp,pjbuf,pjlen,name) ;
-	        if (ec == 0) {
-	            rs = pjp->size() ;
-	        } else if (ec > 0) {
-	            rs = (-ec) ;
-		} else {
-		    if (errno) {
-			rs = (-errno) ;
-		    } else {
-		        rs = SR_IO ;
-		    }
-	        }
+	if_constexpr (f_getpjdefr) {
+	    if ((rs = getpjdef_rp(pjp,pjbuf,pjlen,name)) >= 0) {
+	        rs = pjp->size() ;
 	    } else {
-		SYSDBPJ		*ep = getpjdef(name) ;
-	        if (ucentpj *rp = cast_static<ucentpj *>(ep) ; rp != np) {
-	            rs = pjp->load(pjbuf,pjlen,rp) ;
-	        } else {
-	            rs = (- errno) ;
-	        }
-	    } /* end if_constexpr (selection) */
-	    if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
+	        rs = (- errno) ;
 	    }
+	} else {
+	    SYSDBPJ	*ep = getpjdef(name) ;
+	    if (ucentpj *rp = cast_static<ucentpj *>(ep) ; rp != np) {
+	        rs = pjp->load(pjbuf,pjlen,rp) ;
+	    } else {
+	        rs = (- errno) ;
+	    }
+	} /* end if_constexpr (selection) */
+	if_constexpr (f_sunos) {
+		if (rs == SR_BADF) rs = SR_NOENT ;
+	}
 	return rs ;
 }
 /* end subroutine (ucgetpj::getpj_def) */
