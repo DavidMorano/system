@@ -91,13 +91,14 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getaf.h>
-#include	<libmallocxx.h>
 #include	<openshm.h>
 #include	<ascii.h>
 #include	<vecstr.h>
@@ -125,15 +126,17 @@
 #include	"ucopen.h"
 #include	"upt.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	SUBINFO		struct subinfo
+#define	SUBINFO		subinfo
 
-#define	TICOTSORDARGS	struct ticotsordargs
+#define	TICOTSORDARGS	ticotsordargs
 
-#define	FINGERARGS	struct fingerargs
+#define	FINGERARGS	fingerargs
 
 #ifndef	AF_INET4
 #define	AF_INET4	AT_INET
@@ -326,10 +329,7 @@ static constexpr cpcchar	protonames[] = {
 	"finger",
 	"http",
 	nullptr
-} ;
-
-constexpr cauto		mall = lm_mall ;
-constexpr cauto		mfre = lm_free ;
+} ; /* end array (protonames) */
 
 
 /* exported variables */
@@ -688,15 +688,13 @@ static int openproto_finger(SI *sip,cchar *sp,int of,int to) noex {
 /* end subroutine (openproto_finger) */
 
 static int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
-	inetargs	a ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		fd = -1 ;
-
-	if (sip == nullptr) return SR_FAULT ;
-
-	if (hasBadOflags(of)) return SR_ROFS ;
-
+	int		fd = -1 ; /* return-value */
+	if (sip) {
+	    rs = SR_ROFS ;
+	    if (! hasBadOflags(of)) {
+	inetargs	a ;
 	if ((rs = inetargs_start(&a,sp)) >= 0) {
 	    if ((rs = getaf(a.afp)) >= 0) {
 	        cint	af = rs ;
@@ -712,8 +710,11 @@ static int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
 	    rs1 = inetargs_finish(&a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (inetargs) */
-	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-
+	if ((rs < 0) && (fd >= 0)) {
+	    u_close(fd) ;
+	}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (openproto_http) */
@@ -796,7 +797,7 @@ static int inetargs_finish(inetargs *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iap->a) {
-	    rs1 = mfre(iap->a) ;
+	    rs1 = lm_free(iap->a) ;
 	    iap->a = nullptr ;
 	    if (rs < 0) rs = rs1 ;
 	}
@@ -830,7 +831,7 @@ static int inetargs_alloc(inetargs *iap) noex {
 	if (iap->svcp != nullptr) {
 	    sz += (lenstr(iap->svcp,iap->svcl) + 1) ;
 	}
-	if (char *bp ; (rs = mall(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
 	    cchar	*cp ;
 	    iap->a = bp ;
 #ifdef	COMMENT
@@ -1053,7 +1054,7 @@ static int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (char *lbuf ; (rs = libmalloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    int		clen = 0 ;
 	    int		sl ;
@@ -1116,7 +1117,7 @@ static int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
 
 	clen = (2*cols) ;
 	sz = (clen+1) ;
-	if (char *cbuf ; (rs = mall(sz,&cbuf)) >= 0) {
+	if (char *cbuf ; (rs = lm_mall(sz,&cbuf)) >= 0) {
 	    int		i = 0 ;
 	    int		ll, cl ;
 	    int		ncols = gcols ;
@@ -1161,7 +1162,7 @@ static int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
 	        ncols = (gcols-ind) ;
 	        if (rs < 0) break ;
 	    } /* end while */
-	    rs1 = mfre(cbuf) ;
+	    rs1 = lm_free(cbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
 	return (rs >= 0) ? wlen : rs ;
@@ -1183,7 +1184,7 @@ static int fingerclean(cint fd) noex {
 	        int		sz = 0 ;
 	        sz += (llen+1) ;
 	        sz += (clen+1) ;
-	        if (char *bp ; (rs = mall(sz,&bp)) >= 0) {
+	        if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
 	            char	*lbuf = bp ;
 	            int		cbuf = (bp+(llen+1)) ;
 	            while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
@@ -1205,7 +1206,7 @@ static int fingerclean(cint fd) noex {
 	                }
 	                if (rs < 0) break ;
 	            } /* end while */
-	            rs1 = mfre(bp) ;
+	            rs1 = lm_free(bp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a) */
 	        rs1 = filer_finish(&b) ;
