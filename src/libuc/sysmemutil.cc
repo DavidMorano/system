@@ -25,7 +25,7 @@
 	Description:
 	We hope that the OS has some |sysconf(3c)| subroutines to
 	help us here.  We really are tired of searching through the
-	kernel for this sort of information. We return SR_NOSYS if
+	kernel for this sort of information.  We return SR_NOSYS if
 	the OS does not provide an easy want to get this stuff.
 
 *******************************************************************************/
@@ -37,11 +37,16 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucsysconf.h>
 #include	<localmisc.h>
 
 #include	"sysmemutil.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -80,10 +85,9 @@ int sysmemutil(sysmemutil_dat *mup) noex {
 	int		rs ;
 	int		percent = 0 ;
 	if_constexpr ((cmd >= 0) && (acmd >= 0)) {
-	    if (long mt{} ; (rs = uc_sysconfval(cmd,&mt)) >= 0) {
-	        if (long ma{} ; (rs = uc_sysconfval(acmd,&ma)) >= 0) {
-	      	    ulong	mu100 ;
-	    	    if (mt > 0) {
+	    if (long mt{} ; (rs = uc_sysconfval(cmd,&mt)) >= 0) ylikely {
+	        if (long ma{} ; (rs = uc_sysconfval(acmd,&ma)) >= 0) ylikely {
+	      	    if (ulong mu100 ; mt > 0) {
 	        	ulong	mu = (mt - ma) ;
 	        	mu100 = (mu * 100) ;
 	        	percent = (mu100 / mt) ;
@@ -93,7 +97,7 @@ int sysmemutil(sysmemutil_dat *mup) noex {
 			    mup->ma = ma ;
 			    mup->mu = percent ;
 			}
-		    }
+		    } /* end if */
 		} /* end if (sysconf) */
 	    } /* end if (sysconf) */
 	} else {
