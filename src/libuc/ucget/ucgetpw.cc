@@ -1,6 +1,6 @@
 /* ucgetpw SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX® C-language system database access (UCGET) */
 /* version %I% last-modified %G% */
@@ -66,7 +66,8 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>		/* |SYSDBPW(3u)| */
 #include	<usysflag.h>
 #include	<localmisc.h>
 #include	<ucsyspw.h>
@@ -123,7 +124,7 @@ namespace {
 	int getpw_uid(ucentpw *,char *,int) noex ;
 	int operator () (ucentpw *,char *,int) noex ;
     } ; /* end struct (ucgetpw) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -135,12 +136,12 @@ static constexpr bool bit(uint v,int b) noex {
 
 /* local variables */
 
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
-constexpr bool		f_getpwentr = F_GETPWENTR ;
-constexpr bool		f_getpwnamr = F_GETPWNAMR ;
-constexpr bool		f_getpwuidr = F_GETPWUIDR ;
+constexpr bool		f_sunos		= F_SUNOS ;
+constexpr bool		f_darwin	= F_DARWIN ;
+constexpr bool		f_linux		= F_LINUX ;
+constexpr bool		f_getpwentr	= F_GETPWENTR ;
+constexpr bool		f_getpwnamr	= F_GETPWNAMR ;
+constexpr bool		f_getpwuidr	= F_GETPWUIDR ;
 
 constexpr uid_t		uidend = uid_t(-1) ;
 
@@ -173,9 +174,9 @@ int uc_getpwent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 
 int uc_getpwnam(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		ucgetpw		pwo(name) ;
 		pwo.m = &ucgetpw::getpw_nam ;
 		rs = pwo(pwp,pwbuf,pwlen) ;
@@ -190,7 +191,7 @@ int uc_getpwuid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	if (bit(uid,31)) {
 	    uid = getuid() ;
 	}
-	if (uid != uidend) {
+	if (uid != uidend) ylikely {
 	    ucgetpw	pwo(nullptr,uid) ;
 	    pwo.m = &ucgetpw::getpw_uid ;
 	    rs = pwo(pwp,pwbuf,pwlen) ;
@@ -204,9 +205,9 @@ int uc_getpwuid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 
 int ucgetpw::operator () (ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_FAULT ;
-	if (pwp && pwbuf) {
+	if (pwp && pwbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (ucgeter err ; pwlen > 0) {
+	    if (ucgeter err ; pwlen > 0) ylikely {
 	        repeat {
 	            if ((rs = (this->*m)(pwp,pwbuf,pwlen)) < 0) {
 			rs = err(rs) ;
@@ -221,19 +222,11 @@ int ucgetpw::operator () (ucentpw *pwp,char *pwbuf,int pwlen) noex {
 int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
     	cnullptr	np{} ;
 	int		rs = SR_NOSYS ;
-	errno = 0 ;
 	if_constexpr (f_getpwentr) {
-	    cint	ec = getpwent_rp(pwp,pwbuf,pwlen) ;
-	    if (ec == 0) {
+	    if ((rs = getpwent_rp(pwp,pwbuf,pwlen)) >= 0) {
 	        rs = pwp->size() ;
-	    } else if (ec > 0) {
-	        rs = (-ec) ;
 	    } else {
-		if (errno) {
-		    rs = (-errno) ;
-		} else {
-		    rs = SR_IO ;
-		}
+		rs = (- errno) ;
 	    }
 	} else {
 	    SYSDBPW	*ep = getpwent() ;
@@ -253,19 +246,11 @@ int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 int ucgetpw::getpw_nam(ucentpw *pwp,char *pwbuf,int pwlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getpwnamr) {
-            cint    ec = getpwnam_rp(pwp,pwbuf,pwlen,name) ;
-            if (ec == 0) {
+            if ((rs = getpwnam_rp(pwp,pwbuf,pwlen,name)) >= 0) {
                 rs = pwp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBPW         *ep = getpwnam(name) ;
@@ -285,19 +270,11 @@ int ucgetpw::getpw_nam(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 int ucgetpw::getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getpwuidr) {
-            cint    ec = getpwuid_rp(pwp,pwbuf,pwlen,uid) ;
-            if (ec == 0) {
+            if ((rs = getpwuid_rp(pwp,pwbuf,pwlen,uid)) >= 0) {
                 rs = pwp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
-            } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+	    } else {
+                rs = (- errno) ;
             }
         } else {
             SYSDBPW         *ep = getpwuid(uid) ;
