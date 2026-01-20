@@ -33,7 +33,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |uloadavgd(3u)| */
+#include	<localmisc.h>
 
 #include	"ucgetloadavg.h"
 
