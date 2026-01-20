@@ -46,7 +46,10 @@
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>		/* |memset(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sysval.hh>
 #include	<intfloor.h>
 #include	<intceil.h>
