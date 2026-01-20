@@ -45,14 +45,18 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<unistd.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<climits>		/* |INT_MAX| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
-#include	<libmallocxx.h>
+#include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -83,7 +87,7 @@ static int	mkpidfname(char *,cchar *,pid_t) noex ;
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
@@ -98,7 +102,7 @@ int uc_getpuid(pid_t pid) noex {
 	if (pid >= 0) {
 	    uid_t	uid = 0 ;
 	    if (pid > 0) {
-	        if (char *pidfname{} ; (rs = libmalloc_mp(&pidfname)) >= 0) {
+	        if (char *pidfname ; (rs = lm_mp(&pidfname)) >= 0) {
 	            cchar	*pd = sysword.w_procdir ;
 	            if ((rs = mkpidfname(pidfname,pd,pid)) >= 0) {
 	                USTAT	sb ;
@@ -115,7 +119,7 @@ int uc_getpuid(pid_t pid) noex {
 	            } /* end if (mkpidfname) */
 		    rs1 = lm_free(pidfname) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (mallocxx) */
+	        } /* end if (m-a-f) */
 	    } else if (pid == 0) {
 	        uid = getuid() ;
 	    }
