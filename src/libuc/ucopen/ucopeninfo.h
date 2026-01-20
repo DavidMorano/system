@@ -54,7 +54,7 @@ struct ucopeninfo_head {
 	int		to ;
 	int		opts ;
 	mode_t		operms ;
-} ;
+} ; /* end struct (ucopeninfo) */
 
 typedef UCOPENINFO	ucopeninfo ;
 
