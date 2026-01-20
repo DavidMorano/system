@@ -90,8 +90,10 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usupport.h>
+#include	<ucgetho.h>
 #include	<storeitem.h>
 #include	<hostent.h>
 #include	<localmisc.h>
