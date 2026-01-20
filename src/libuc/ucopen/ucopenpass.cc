@@ -49,7 +49,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<permx.h>
 #include	<localmisc.h>
 
