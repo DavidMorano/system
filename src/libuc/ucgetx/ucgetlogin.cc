@@ -31,10 +31,14 @@
 #include	<unistd.h>		/* |getlogin(3c)| */
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getbufsize.h>
 #include	<sncpyx.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -79,7 +83,7 @@ constexpr bool		f_getloginr = SYSHAS_GETLOGINR ;
 int uc_getlogin(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	    if ((rs = getbufsize(bufsize_un)) >= 0) {
 		cint	ulen = rs ;
 		rs = SR_OVERFLOW ;
 	        if ((rlen >= 0) && (rlen < ulen)) {
