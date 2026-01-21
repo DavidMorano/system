@@ -22,12 +22,15 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<libmallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<posname.h>		/* create POSIX® entity names */
 #include	<prefixfn.h>
 #include	<mkx.h>
 #include	<localmisc.h>
+
+#include	"ucfileop.h"
 
 
 /* local defines */
