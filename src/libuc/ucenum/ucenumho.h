@@ -32,8 +32,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ucenumxx.h>		/* <- money shot */
 #include	<ucentho.h>		/* <- money shot */
 
@@ -84,13 +84,14 @@ struct ucenumho : ucenumxx {
 	    open(this,ucenumhomem_open) ;
 	    reset(this,ucenumhomem_reset) ;
 	    close(this,ucenumhomem_close) ;
+	    magic = 0 ;
 	} ;
 	ucenumho(const ucenumho &) = delete ;
 	ucenumho &operator = (const ucenumho &) = delete ;
 	int readent(ucenumho_ent *,char *,int) noex ;
 	void dtor() noex ;
-	~ucenumho() {
-	    dtor() ;
+	destruct ucenumho() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (ucenumho) */
 #else	/* __cplusplus */
