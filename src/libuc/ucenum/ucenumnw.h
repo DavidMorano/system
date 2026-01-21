@@ -32,8 +32,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ucenumxx.h>		/* <- money shot */
 #include	<ucentnw.h>		/* <- money shot */
 
@@ -84,13 +84,14 @@ struct ucenumnw : ucenumxx {
 	    open(this,ucenumnwmem_open) ;
 	    reset(this,ucenumnwmem_reset) ;
 	    close(this,ucenumnwmem_close) ;
+	    magic = 0 ;
 	} ;
 	ucenumnw(const ucenumnw &) = delete ;
 	ucenumnw &operator = (const ucenumnw &) = delete ;
 	int readent(ucenumnw_ent *,char *,int) noex ;
 	void dtor() noex ;
-	~ucenumnw() {
-	    dtor() ;
+	destruct ucenumnw() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (ucenumnw) */
 #else	/* __cplusplus */
