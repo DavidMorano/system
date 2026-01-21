@@ -32,8 +32,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ucenumxx.h>		/* <- money shot */
 #include	<ucentpj.h>		/* <- money shot */
 
@@ -84,13 +84,14 @@ struct ucenumpj : ucenumxx {
 	    open(this,ucenumpjmem_open) ;
 	    reset(this,ucenumpjmem_reset) ;
 	    close(this,ucenumpjmem_close) ;
+	    magic = 0 ;
 	} ;
 	ucenumpj(const ucenumpj &) = delete ;
 	ucenumpj &operator = (const ucenumpj &) = delete ;
 	int readent(ucenumpj_ent *,char *,int) noex ;
 	void dtor() noex ;
-	~ucenumpj() {
-	    dtor() ;
+	destruct ucenumpj() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (ucenumpj) */
 #else	/* __cplusplus */
