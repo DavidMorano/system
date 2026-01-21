@@ -92,12 +92,13 @@ import libutil ;			/* |memclear(3u)| */
 #if	defined(SYSHAS_GETPJENTR) && (SYSHAS_GETPJENTR > 0)
 
 unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
+    	cnullptr	np{} ;
     	unixret_t	rc = 0 ;
 	errno_t		ec = 0 ;
 	if (pjp && pjbuf) {
 	    CPROJECT *rp ;
 	    errno = 0 ;
-	    if ((rp = getprojent(pjp,pjbuf,pjlen)) == nullptr) {
+	    if ((rp = getprojent(pjp,pjbuf,pjlen)) == np) {
 	        rc = -1 ;
 		void(rp) ;
 	    }
@@ -129,12 +130,13 @@ unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
 #if	defined(SYSHAS_GETPJNAMR) && (SYSHAS_GETPJNAMR > 0)
 
 unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+    	cnullptr	np{} ;
     	unixret_t	rc = 0 ;
 	errno_t		ec = 0 ;
 	if (pjp && pjbuf && n) {
 	    CPROJECT *rp ;
 	    errno = 0 ;
-	    if ((rp = getprojbyname(n,pjp,pjbuf,pjlen)) == nullptr) {
+	    if ((rp = getprojbyname(n,pjp,pjbuf,pjlen)) == np) {
 	        rc = -1 ;
 		void(rp) ;
 	    }
@@ -166,12 +168,13 @@ unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
 #if	defined(SYSHAS_GETPJPIDR) && (SYSHAS_GETPJPIDR > 0)
 
 unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t pid) noex {
+    	cnullptr	np{} ;
     	unixret_t	rc = 0 ;
 	errno_t		ec = 0 ;
 	if (pjp && pjbuf) {
 	    CPROJECT *rp ;
 	    errno = 0 ;
-	    if ((rp = getprojbyid(pid,pjp,pjbuf,pjlen)) == nullptr) {
+	    if ((rp = getprojbyid(pid,pjp,pjbuf,pjlen)) == np) {
 	        rc = -1 ;
 		void(rp) ;
 	    }
@@ -203,11 +206,12 @@ unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
 #if	defined(SYSHAS_GETPJDEFR) && (SYSHAS_GETPJDEFR > 0)
 
 unixret_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+    	cnullptr	np{} ;
 	errno_t		ec = EFAULT ;
 	if (pjp && pjbuf && n) {
 	    CPROJECT *rp ;
 	    errno = 0 ;
-	    if ((rp = getdefaultproj(n,pjp,pjbuf,pjlen)) == nullptr) {
+	    if ((rp = getdefaultproj(n,pjp,pjbuf,pjlen)) == np) {
 	        rc = -1 ;
 		void(rp) ;
 	    }
