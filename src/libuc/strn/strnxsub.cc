@@ -66,17 +66,16 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strstr(3c)| + |strnstr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<nleadstr.h>
 #include	<toxc.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"strnxsub.h"
 
-import libutil ;			/* |getlenstr(3u)| */
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -175,10 +174,9 @@ char *strnfoldsub(cchar *sp,int sl,cchar *ss) noex {
 
 /* local subroutines */
 
-char *strner::strnxsub(cchar *sp,int sl,cchar *ss,int sslen) noex {
+char *strner::strnxsub(cchar *sp,int µsl,cchar *ss,int sslen) noex {
 	char		*rp = nullptr ;
-        if (sl < 0) sl = lenstr(sp) ;
-        if (sslen <= sl) {
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= sslen) {
             cint        sslead = toxc(ss[0]) ;
             int         i ; /* used-afterwards */
             bool        f = false ;
@@ -190,7 +188,7 @@ char *strner::strnxsub(cchar *sp,int sl,cchar *ss,int sslen) noex {
                 } /* end if */
             } /* end for */
 	    if (f) rp = charp(sp + i) ;
-        } /* end if (valid) */
+        } /* end if (getlenstr) */
 	return rp ;
 }
 /* end method (strner::strnxsub) */
