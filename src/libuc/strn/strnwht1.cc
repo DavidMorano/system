@@ -21,7 +21,6 @@
 /*******************************************************************************
 
 	Name:
-	strnwht
 	strnwht{x}
 
 	Description:
@@ -59,16 +58,15 @@ module ;
 #include	<cstdlib>
 #include	<new>			/* |nullptr_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
+#include	<char.h>		/* |CHAR_ISWHT(3uc)| */
 #include	<mkchar.h>
-#include	<ischarx.h>		/* |iswhite(3uc)| */
+#include	<ischarx.h>		/* |iswht(3uc)| */
 #include	<localmisc.h>
 
-#pragma		GCC dependency	"mod/strnwht.ccm"
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"mod/chrset.ccm"
+#pragma		GCC dependency		"mod/strnwht.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/chrset.ccm"
 
 module strnwht ;
 
@@ -76,6 +74,8 @@ import libutil ;			/* |getlenstr(3u)| */
 import chrset ;
 
 /* local defines */
+
+#define	ISW(c)		CHAR_ISWHT(c)
 
 
 /* local namespaces */
@@ -98,8 +98,6 @@ import chrset ;
 
 /* local variables */
 
-static constexpr cauto		isw = iswhite ;
-
 
 /* exported variables */
 
@@ -110,14 +108,14 @@ extern "C" {
     char *strnwht(cchar *sp,int 탎l) noex {
 	char		*rsp = nullptr ;
 	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
-	        cchar	*lsp = (sp + sl) ;
-		bool	f = false ;
-	        while ((sp < lsp) && *sp && (*sp != '\n')) {
-		    cint	ch = mkchar(*sp) ;
-		    if ((f = isw(ch))) break ;
-		    sp += 1 ;
-		} /* end while */
-	        rsp = (f) ? charp(sp) : nullptr ;
+	    cchar	*lsp = (sp + sl) ;
+	    bool	f = false ;
+	    while ((sp < lsp) && *sp && (*sp != '\n')) {
+		cint	ch = mkchar(*sp) ;
+		if ((f = ISW(ch))) break ;
+		sp += 1 ;
+	    } /* end while */
+	    rsp = (f) ? charp(sp) : nullptr ;
 	} /* end if (non-zero positive) */
 	return rsp ;
     } /* end subroutine (strnwht) */
@@ -141,36 +139,37 @@ extern "C" {
 	} /* end if (non-null) */
 	return rsp ;
     } /* end subroutine (strnwhtchr) */
-} /* end extern */
+} /* end extern (C) */
 
 extern "C++" {
     char *strnwhtbrk(cchar *sp,int 탎l,const chrset &sset) noex {
 	char		*rsp = nullptr ;
 	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
-	        cchar	*lsp = (sp + sl) ;
-	        bool	f = false ;
+	    cchar	*lsp = (sp + sl) ;
+	    bool	fwht = false ;
+	    while ((sp < lsp) && *sp) {
+		cint	ch = mkchar(*sp) ;
+		if (((fwht = ISW(ch))) || sset[ch]) {
+		    rsp = charp(sp) ;
+		    break ;
+		}
+	        sp += 1 ;
+	    } /* end while */
+	    if (fwht) {
+		bool fchr = false ;
 	        while ((sp < lsp) && *sp) {
 		    cint	ch = mkchar(*sp) ;
-		    if (((f = isw(ch))) || sset[ch]) {
-			rsp = charp(sp) ;
-			break ;
-		    }
-	            sp += 1 ;
-	        } /* end while */
-		if (f) {
-	            while ((sp < lsp) && *sp) {
-		        cint	ch = mkchar(*sp) ;
-			if (((f = sset[ch])) || (! isw(ch))) break ;
-			sp += 1 ;
-		    } /* end while */
-		    if (f) rsp = charp(sp) ;
-		} /* end if (had white-space) */
+		    if (((fchr = sset[ch])) || (! ISW(ch))) break ;
+		    sp += 1 ;
+		} /* end while */
+		if (fchr) rsp = charp(sp) ;
+	    } /* end if (had white-space) */
 	} /* end if (non-zero positive) */
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */
     char *strnwhtchr(cchar *sp,int sl,const chrset &sset) noex {
 	return strnwhtbrk(sp,sl,sset) ;
     }
-} /* end extern */
+} /* end extern (C++) */
 
 
