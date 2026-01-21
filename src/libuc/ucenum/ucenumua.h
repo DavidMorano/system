@@ -32,9 +32,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<userattr.h>		/* <- ?? */
-
 #include	<ucenumxx.h>		/* <- money shot */
 #include	<ucentua.h>		/* <- money shot */
 
@@ -85,13 +85,14 @@ struct ucenumua : ucenumxx {
 	    open(this,ucenumuamem_open) ;
 	    reset(this,ucenumuamem_reset) ;
 	    close(this,ucenumuamem_close) ;
+	    magic = 0 ;
 	} ;
 	ucenumua(const ucenumua &) = delete ;
 	ucenumua &operator = (const ucenumua &) = delete ;
 	int readent(ucenumua_ent *,char *,int) noex ;
 	void dtor() noex ;
-	~ucenumua() {
-	    dtor() ;
+	destruct ucenumua() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (ucenumua) */
 #else	/* __cplusplus */
