@@ -82,7 +82,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using ucent::si_loadnames ;		/* local group support subroutine */
