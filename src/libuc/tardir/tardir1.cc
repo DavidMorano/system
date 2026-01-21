@@ -39,10 +39,12 @@ module ;
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/sif.ccm"
 
 module tardir ;
 
+import libutil ;			/* |lenstr(3u)| */
 import sif ;
 
 /* local defines */
@@ -90,7 +92,7 @@ int tardir::istart() noex {
 	    }
 	} /* end if (dirs.start) */
 	return rs ;
-}
+} /* end method (tardir::istart) */
 
 int tardir::ifinish() noex {
     	int		rs = SR_NOTOPEN ;
@@ -108,7 +110,7 @@ int tardir::ifinish() noex {
 	    fl.open = false ;
 	} /* end if (open) */
 	return rs ;
-}
+} /* end method (tardir::ifinish) */
 
 int tardir::icount() noex {
     	int		rs = SR_NOTOPEN ;
@@ -118,7 +120,7 @@ int tardir::icount() noex {
 	    c = rs ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
+} /* end method (tardir::icount) */
 
 int tardir::add(cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
@@ -142,7 +144,7 @@ int tardir::add(cchar *sp,int sl) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
+} /* end method (tardir::add) */
 
 int tardir::get(int idx,ccharpp rpp) noex {
     	int		rs = SR_NOTOPEN ;
@@ -150,7 +152,7 @@ int tardir::get(int idx,ccharpp rpp) noex {
 	    rs = dirs.get(idx,rpp) ;
 	}
 	return (rs >= 0) ? idx : rs ;
-}
+} /* end method (tardir::get) */
 
 int tardir::curbegin(tardir_cur *curp) noex {
     	int		rs = SR_FAULT ;
@@ -177,17 +179,22 @@ int tardir::curend(tardir_cur *curp) noex {
 } /* end method (tardir::curend) */
 
 int tardir::curenum(tardir_cur *curp,ccharpp rpp) noex {
+    cint		rsn = SR_NOTFOUND ;
     	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
 	if (curp && rpp) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (fl.open) ylikely {
 		cint idx = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	        if ((rs = get(idx,rpp)) >= 0) {
 		    curp->i = idx ;
+		    rl = lenstr(*rpp) ;
+		} else if (rs == rsn) {
+		    rs = SR_OK ;
 		}
 	    } /* end if (open) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 } /* end method (tardir::curenum) */
 
 int tardir::iaddone(cchar *sp,int sl,ustat *sbp) noex {
@@ -195,16 +202,16 @@ int tardir::iaddone(cchar *sp,int sl,ustat *sbp) noex {
 	int		c = 0 ;
 	if ((rs = seen.checkin(sbp)) > 0) ylikely {
 	    rs = dirs.add(sp,sl) ;
-	    if (rs < INT_MAX) c += rs ;
+	    c += (rs < INT_MAX) ;
 	} /* end if (ssen.checkin) */
 	return (rs >= 0) ? c : rs ;
-}
+} /* end method (tardir::iaddone) */
 
 void tardir::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("tardir",rs,"fini-finish") ;
 	}
-}
+} /* end method (tardir::dtor) */
 
 tardir::operator int () noex {
 	return icount() ;
