@@ -76,17 +76,17 @@ import fonce ;
 	tardirmem_finish,
 	tardirmem_count,
 	tardirmem_overlast
-    } ;
+    } ; /* end enum (tardirmems) */
 
 export {
     struct tardir_cur {
 	int		i ;
-    } ;
+    } ; /* end struct (tardir_cur) */
     struct tardir ;
     struct tardir_fl {
 	uint		open:1 ;
 	uint		debug:1 ;
-    } ;
+    } ; /* end struct (tardir_fl) */
     struct tardir_co {
 	tardir		*op = nullptr ;
 	int		w = -1 ;
@@ -111,7 +111,7 @@ export {
 	    start	(this,tardirmem_start) ;
 	    finish	(this,tardirmem_finish) ;
 	    count	(this,tardirmem_count) ;
-	} ;
+	} ; /* end ctor */
 	int add		(cchar *,int) noex ;
 	int get		(int,ccharpp) noex ;
 	int curbegin	(tardir_cur *) noex ;
