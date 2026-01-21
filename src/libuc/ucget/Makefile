@@ -31,20 +31,28 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= ucget.h ucgetxx.hh
+INCS += ucget.h ucgetxx.hh
 
-LIBS=
+MODS +=
+
+LIBS +=
+
+
+OBJ0_UCGET= ucgetxx.o
+OBJ1_UCGET= ucgetpw.o ucgetsp.o ucgetgr.o ucgetpj.o
+OBJ2_UCGET= ucgetus.o ucgetua.o
+OBJ3_UCGET= ucgetpr.o ucgetnw.o ucgetho.o ucgetsv.o
+
+OBJ_UCGET= obj0_ucget.o obj1_ucget.o obj2_ucget.o obj3_ucget.o
 
 
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNINFO)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,15 +63,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_UCGET= ucgetpw.o ucgetsp.o ucgetgr.o ucgetpj.o
-OBJ1_UCGET= ucgetus.o
-OBJ2_UCGET= ucuserattr.o ucgetua.o
-OBJ3_UCGET= ucgetpr.o ucgetnw.o ucgetho.o ucgetsv.o
-
-OBJ_UCGET= obj0_ucget.o obj1_ucget.o obj2_ucget.o obj3_ucget.o
-
-
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -77,6 +77,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -89,17 +92,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_UCGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -111,17 +112,17 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_ucget.o:	$(OBJ0_UCGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCGET)
+obj0_ucget.o:		$(OBJ0_UCGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_ucget.o:	$(OBJ1_UCGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_UCGET)
+obj1_ucget.o:		$(OBJ1_UCGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_ucget.o:	$(OBJ2_UCGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCGET)
+obj2_ucget.o:		$(OBJ2_UCGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_ucget.o:	$(OBJ3_UCGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCGET)
+obj3_ucget.o:		$(OBJ3_UCGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 ucgetpw.o:		ucgetpw.cc ucgetpw.h		$(INCS)
@@ -129,7 +130,6 @@ ucgetsp.o:		ucgetsp.cc ucgetsp.h		$(INCS)
 ucgetgr.o:		ucgetgr.cc ucgetgr.h		$(INCS)
 ucgetpj.o:		ucgetpj.cc ucgetpj.h		$(INCS)
 
-ucuserattr.o:		ucuserattr.cc ucuserattr.h	$(INCS)
 ucgetus.o:		ucgetus.cc ucgetus.h		$(INCS)
 
 ucgetpr.o:		ucgetpr.cc ucgetpr.h		$(INCS)
