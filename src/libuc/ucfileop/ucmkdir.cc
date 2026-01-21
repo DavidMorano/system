@@ -40,10 +40,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<libmallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<mkx.h>
 #include	<localmisc.h>
+
+#include	"ucfileop.h"
 
 
 /* local defines */
@@ -82,7 +86,7 @@ int uc_mkdir(cchar *fname,mode_t dm) noex {
 	if (fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        if (char *ebuf ; (rs = libmalloc_mp(&ebuf)) >= 0) {
+	        if (char *ebuf ; (rs = lm_mp(&ebuf)) >= 0) {
 	            if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		        rs = u_mkdir(ebuf,dm) ;
 		        rc = rs ;
@@ -90,7 +94,7 @@ int uc_mkdir(cchar *fname,mode_t dm) noex {
 		        rs = u_mkdir(fname,dm) ;
 		        rc = rs ;
 	            }
-	            rs1 = libmalloc_free(ebuf) ;
+	            rs1 = lm_free(ebuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
