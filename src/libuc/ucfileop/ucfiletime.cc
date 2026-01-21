@@ -47,9 +47,13 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<prefixfn.h>
 #include	<localmisc.h>
+
+#include	"ucfileop.h"
 
 
 /* local defines */
