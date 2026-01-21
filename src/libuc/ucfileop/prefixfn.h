@@ -21,24 +21,21 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	PREFIXFN		struct prefixfn_head
+#define	PREFIXFN	struct prefixfn_head
 
 
 struct prefixfn_head {
 	cchar		*as ;	/* allocated string */
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum prefixfnmems {
 	prefixfnmem_finish,
 	prefixfnmem_overlast
-} ;
+} ; /* end enum */
 struct prefixfn ;
 struct prefixfn_co {
 	prefixfn	*op = nullptr ;
@@ -67,7 +64,7 @@ struct prefixfn : prefixfn_head {
 	} ;
 } ; /* end struct (prefixfn) */
 #else /* __cplusplus */
-typedef PREFIXFN		prefixfn ;
+typedef PREFIXFN	prefixfn ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
