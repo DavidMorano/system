@@ -60,9 +60,11 @@ module ;
 #include	<mkchar.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 module strfilter ;
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 import ureserve ;			/* |vecstr(3u)| */
 import sif ;
 
