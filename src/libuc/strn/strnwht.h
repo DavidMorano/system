@@ -43,9 +43,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
@@ -53,6 +51,10 @@ EXTERNC_begin
 extern char *strnwht(cchar *,int) noex ;
 extern char *strnwhtchr(cchar *,int,int) noex ;
 extern char *strnwhtbrk(cchar *,int,cchar *) noex ;
+
+static inline char *strnwhite(cchar *sp,int sl) noex {
+	return strnwht(sp,sl) ;
+}
 
 EXTERNC_end
 
