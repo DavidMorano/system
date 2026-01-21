@@ -43,11 +43,15 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |realpath(3c)| */
 #include	<cstring>		/* |strcpy(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bufsizevar.hh>
 #include	<mkpathx.h>
 #include	<prefixfn.h>
 #include	<localmisc.h>
+
+#include	"ucfileop.h"
 
 #pragma		GCC dependency	"mod/libutil.ccm"
 
@@ -74,7 +78,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 constexpr bool		f_mkpath = CF_MKPATH ;
 
