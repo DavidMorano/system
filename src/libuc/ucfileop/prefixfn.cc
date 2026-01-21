@@ -30,8 +30,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<libmallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<mkx.h>			/* |mkpathexp(3uc)| */
 #include	<mkchar.h>
 #include	<ascii.h>
@@ -39,7 +41,7 @@
 
 #include	"prefixfn.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
 
@@ -74,10 +76,6 @@ local bool isprefix(int ch) noex {
 
 
 /* local variables */
-
-constexpr cauto		mem_almp = libmalloc_mp ;
-constexpr cauto		mem_alst = lm_strw ;
-constexpr cauto		mem_free = lm_free ;
 
 
 /* exported variables */
@@ -115,7 +113,7 @@ int prefixfn_finish(prefixfn *op) noex {
 	    rs = SR_OK ;
 	    if (op->as) {
 		char *bp = cast_const<charp>(op->as) ;
-	        rs1 = mem_free(bp) ;
+	        rs1 = lm_free(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->as = nullptr ;
 	    }
@@ -130,9 +128,9 @@ int prefixfn_finish(prefixfn *op) noex {
 local int prefixfn_loadexp(prefixfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *pbuf ; (rs = mem_almp(&pbuf)) >= 0) ylikely {
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
 	    if ((rs = mkpathexp(pbuf,sp,sl)) > 0) {
-		if (cchar *cp ; (rs = mem_alst(pbuf,rs,&cp)) >= 0) {
+		if (cchar *cp ; (rs = lm_strw(pbuf,rs,&cp)) >= 0) {
 		    sl = rs ;
 		    op->as = cp ;
 		    *rpp = cp ;
@@ -145,7 +143,7 @@ local int prefixfn_loadexp(prefixfn *op,cchar *sp,int sl,cchar **rpp) noex {
 		    *rpp = sp ;
 		}
 	    } /* end if (mkpathexp) */
-	    rs1 = mem_free(pbuf) ;
+	    rs1 = lm_free(pbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? sl : rs ;
@@ -154,7 +152,7 @@ local int prefixfn_loadexp(prefixfn *op,cchar *sp,int sl,cchar **rpp) noex {
 
 local int prefixfn_loadnul(prefixfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
-	if (cchar *cp ; (rs = mem_alst(sp,sl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) {
 	    sl = rs ;
 	    op->as = cp ;
 	    *rpp = cp ;
