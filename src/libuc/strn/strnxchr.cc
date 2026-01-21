@@ -48,15 +48,15 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| + |strrchr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"strnxchr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -119,7 +119,7 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 	                f = (ch == sch) ;
 		        if (f) break ;
 	                sp += 1 ;
-	            } /* end while */
+	            } /* end for */
 		    if (f) rsp = charp(sp) ;
 		} /* end if_constexpr (f_memchr) */
 	    } else {
