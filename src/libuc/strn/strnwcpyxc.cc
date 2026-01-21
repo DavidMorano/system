@@ -65,16 +65,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<toxc.h>
 #include	<localmisc.h>
 
 #include	"strnwcpyxc.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -107,7 +107,7 @@ static char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
 		dl -= 1 ;
 	    }
 	    if (dl > 0) {
-	        memset(dp,0,dl) ;
+	        memclear(dp,dl) ;
 	    }
 	} /* end if (non-null) */
 	return dp ;
