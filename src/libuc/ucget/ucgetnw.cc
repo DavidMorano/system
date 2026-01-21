@@ -1,6 +1,6 @@
 /* ucgetnw SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX® C-language system database access (UCGET) */
 /* version %I% last-modified %G% */
@@ -79,7 +79,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 #include	<ucsysnw.h>
@@ -129,7 +130,7 @@ namespace {
 	int getnw_num(ucentnw *,char *,int) noex ;
 	int operator () (ucentnw *,char *,int) noex ;
     } ; /* end struct (ucgetnw) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -137,11 +138,11 @@ namespace {
 
 /* local variables */
 
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
+constexpr bool		f_sunos		= F_SUNOS ;
+constexpr bool		f_darwin	= F_DARWIN ;
+constexpr bool		f_linux		= F_LINUX ;
 
-constexpr bool		f_getnwxxxr = F_GETNWXXXR ;
+constexpr bool		f_getnwxxxr	= F_GETNWXXXR ;
 
 
 /* exported variables */
@@ -172,9 +173,9 @@ int uc_getnwent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 
 int uc_getnwnam(ucentnw *nwp,char *nwbuf,int nwlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		ucgetnw		nwo(name) ;
 		nwo.m = &ucgetnw::getnw_nam ;
 		rs = nwo(nwp,nwbuf,nwlen) ;
@@ -186,7 +187,7 @@ int uc_getnwnam(ucentnw *nwp,char *nwbuf,int nwlen,cchar *name) noex {
 
 int uc_getnwnum(ucentnw *nwp,char *nwbuf,int nwlen,int af,uint32_t num) noex {
     	int		rs = SR_INVALID ;
-	if (af >= 0) {
+	if (af >= 0) ylikely {
 	    ucgetnw	nwo(nullptr,af,num) ;
 	    nwo.m = &ucgetnw::getnw_num ;
 	    rs = nwo(nwp,nwbuf,nwlen) ;
@@ -200,9 +201,9 @@ int uc_getnwnum(ucentnw *nwp,char *nwbuf,int nwlen,int af,uint32_t num) noex {
 
 int ucgetnw::operator () (ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	int		rs = SR_FAULT ;
-	if (nwp && nwbuf) {
+	if (nwp && nwbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (ucgeter err ; nwlen > 0) {
+	    if (ucgeter err ; nwlen > 0) ylikely {
 	        repeat {
 	            if ((rs = (this->*m)(nwp,nwbuf,nwlen)) < 0) {
 			rs = err(rs) ;
@@ -217,19 +218,11 @@ int ucgetnw::operator () (ucentnw *nwp,char *nwbuf,int nwlen) noex {
 int ucgetnw::getnw_ent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	errno = 0 ;
 	if_constexpr (f_getnwxxxr) {
-	    cint	ec = getnwent_rp(nwp,nwbuf,nwlen) ;
-	    if (ec == 0) {
+	    if ((rs = getnwent_rp(nwp,nwbuf,nwlen)) >= 0) {
 	        rs = nwp->size() ;
-	    } else if (ec > 0) {
-	        rs = (-ec) ;
 	    } else {
-		if (errno) {
-		    rs = (-errno) ;
-		} else {
-		    rs = SR_IO ;
-		}
+		rs = (- errno) ;
 	    }
 	} else {
 	    SYSDBNW	*ep = getnwent() ;
@@ -249,19 +242,10 @@ int ucgetnw::getnw_ent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 int ucgetnw::getnw_nam(ucentnw *nwp,char *nwbuf,int nwlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getnwxxxr) {
-            cint    ec = getnwnam_rp(nwp,nwbuf,nwlen,name) ;
-            if (ec == 0) {
-                rs = nwp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
+            if ((rs = getnwnam_rp(nwp,nwbuf,nwlen,name)) >= 0) {
             } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBNW         *ep = getnwnam(name) ;
@@ -281,19 +265,11 @@ int ucgetnw::getnw_nam(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 int ucgetnw::getnw_num(ucentnw *nwp,char *nwbuf,int nwlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getnwxxxr) {
-            cint    ec = getnwnum_rp(nwp,nwbuf,nwlen,type,num) ;
-            if (ec == 0) {
+            if ((rs = getnwnum_rp(nwp,nwbuf,nwlen,type,num)) >= 0) {
                 rs = nwp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBNW         *ep = getnwnum(type,num) ;
