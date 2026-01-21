@@ -87,10 +87,12 @@ EXTERNC_end
 EXTERNC_begin
 extern void	setprojent() noex ;
 extern void	endprojent() noex ;
-extern PROJECT	*getpjent() noex ;
-extern PROJECT	*getpjnam(cchar *) noex ;
-extern PROJECT	*getpjpid(projid_t) noex ;
-extern PROJECT	*getpjdef(cchar *) noex ;
+extern CPROJECT *getprojent(PROJECT *,void *,size_t) noex ;
+extern CPROJECT *getprojbyname(cchar *,PROJECT *,void *,size_t) noex ;
+extern CPROJECT *getprojbyid(projid_t,PROJECT *,void *,size_t) noex ;
+extern CPROJECT *getdefaultproj(cchar *,PROJECT *,void *,size_t) noex ;
+extern int inproj(cchar *,cchar *,void *,size_t) noex ;
+extern projid_t getprojidbyname(cchar *) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_GETPJ */
 
