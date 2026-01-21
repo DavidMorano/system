@@ -18,7 +18,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Gorup:
 	strn{xx}
 
 	Description:
@@ -31,7 +31,7 @@
 	char *strn{xx}(cchar *sp,int sl) noex
 
 	Arguments:
-	{xx}		name of character class: alpha, alnum, digit, xdigit
+	{xx}		name of character class: alpha, alnum, digit
 	sp		string to search through
 	sl		maximum number of character to search
 
@@ -44,16 +44,16 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
-#include	<ischarx.h>
+#include	<ischarx.h>		/* <- money shot! */
 #include	<localmisc.h>
 
 #include	"strnchar.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -79,7 +79,7 @@ extern "C" {
 
 /* forward references */
 
-static char *strnxx(xchr_f xchr,cchar *sp,int sl) noex {
+local char *strnxx(xchr_f xchr,cchar *sp,int sl) noex {
 	char		*rsp = nullptr ;
 	if (sp) ylikely {
 	    bool	f = false ;
@@ -115,8 +115,16 @@ char *strndigit(cchar *sp,int sl) noex {
     	return strnxx(isdigitlatin,sp,sl) ;
 }
 
-char *strnxdigit(cchar *sp,int sl) noex {
-    	return strnxx(ishexlatin,sp,sl) ;
+char *strndigex(cchar *sp,int sl) noex {
+    	return strnxx(isdigexlatin,sp,sl) ;
+}
+
+char *strnoctal(cchar *sp,int sl) noex {
+    	return strnxx(isoctallatin,sp,sl) ;
+}
+
+char *strnblank(cchar *sp,int sl) noex {
+    	return strnxx(isblanklatin,sp,sl) ;
 }
 
 
