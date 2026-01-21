@@ -19,9 +19,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<prefixfn.h>
 #include	<localmisc.h>
+
+#include	"ucfileop.h"
 
 
 /* local defines */
@@ -62,7 +66,7 @@ int uc_pathconf(cchar *fname,int name,long *rp) noex {
 		    }
 	            rs1 = pf.finish ;
 		    if (rs >= 0) rs = rs1 ;
-	    } /* end if (prefixfn) */
+	        } /* end if (prefixfn) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
