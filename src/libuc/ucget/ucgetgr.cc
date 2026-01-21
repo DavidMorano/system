@@ -1,6 +1,6 @@
 /* ucgetgr SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX® C-language system database access (UCGET) */
 /* version %I% last-modified %G% */
@@ -52,7 +52,8 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 #include	<ucsysgr.h>
@@ -109,7 +110,7 @@ namespace {
 	int getgr_gid(ucentgr *,char *,int) noex ;
 	int operator () (ucentgr *,char *,int) noex ;
     } ; /* end struct (ucgetgr) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -121,12 +122,12 @@ static constexpr bool bit(uint v,int b) noex {
 
 /* local variables */
 
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
-constexpr bool		f_getgrentr = F_GETGRENTR ;
-constexpr bool		f_getgrnamr = F_GETGRNAMR ;
-constexpr bool		f_getgrgidr = F_GETGRGIDR ;
+constexpr bool		f_sunos		= F_SUNOS ;
+constexpr bool		f_darwin	= F_DARWIN ;
+constexpr bool		f_linux		= F_LINUX ;
+constexpr bool		f_getgrentr	= F_GETGRENTR ;
+constexpr bool		f_getgrnamr	= F_GETGRNAMR ;
+constexpr bool		f_getgrgidr	= F_GETGRGIDR ;
 
 constexpr gid_t		gidend = gid_t(-1) ;
 
@@ -209,17 +210,10 @@ int ucgetgr::getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
 	int		rs ;
 	errno = 0 ;
 	if_constexpr (f_getgrentr) {
-	    cint	ec = getgrent_rp(grp,grbuf,grlen) ;
-	    if (ec == 0) {
+	    if ((rs = getgrent_rp(grp,grbuf,grlen)) >= 0) {
 	        rs = grp->size() ;
-	    } else if (ec > 0) {
-	        rs = (-ec) ;
 	    } else {
-		if (errno) {
-		    rs = (-errno) ;
-		} else {
-		    rs = SR_IO ;
-		}
+		rs = (- errno) ;
 	    }
 	} else {
 	    SYSDBGR	*ep = getgrent() ;
@@ -239,19 +233,11 @@ int ucgetgr::getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
 int ucgetgr::getgr_nam(ucentgr *grp,char *grbuf,int grlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getgrnamr) {
-            cint    ec = getgrnam_rp(grp,grbuf,grlen,name) ;
-            if (ec == 0) {
+            if ((rs = getgrnam_rp(grp,grbuf,grlen,name)) >= 0) {
                 rs = grp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBGR         *ep = getgrnam(name) ;
@@ -271,19 +257,11 @@ int ucgetgr::getgr_nam(ucentgr *grp,char *grbuf,int grlen) noex {
 int ucgetgr::getgr_gid(ucentgr *grp,char *grbuf,int grlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
-        errno = 0 ;
         if_constexpr (f_getgrgidr) {
-            cint    ec = getgrgid_rp(grp,grbuf,grlen,gid) ;
-            if (ec == 0) {
+            if ((rs = getgrgid_rp(grp,grbuf,grlen,gid)) >= 0) {
                 rs = grp->size() ;
-            } else if (ec > 0) {
-                rs = (-ec) ;
             } else {
-                if (errno) {
-                    rs = (-errno) ;
-                } else {
-                    rs = SR_IO ;
-                }
+                rs = (- errno) ;
             }
         } else {
             SYSDBGR         *ep = getgrgid(gid) ;
