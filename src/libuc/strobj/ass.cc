@@ -11,7 +11,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |ulogerror(3u)| */
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"ass.h"
@@ -69,11 +72,11 @@ int ass_addchr(ass *asp,int ch) noex {
 	        asp->rlen = 0 ;
 	        asp->ext = ASS_ADDLEN ;
 	        sz = asp->ext ;
-	        rs = uc_malloc(sz,&p) ;
+	        rs = lm_mall(sz,&p) ;
 	    } else if (asp->ext == asp->rlen) {
 	        asp->ext += ASS_ADDLEN ;
 	        sz = asp->ext ;
-	        rs = uc_realloc(asp->rbuf,sz,&p) ;
+	        rs = lm_rall(asp->rbuf,sz,&p) ;
 	    }
 	    if (rs >= 0) {
 	        asp->rbuf = p ;
@@ -100,7 +103,7 @@ int ass_finish(ass *asp) noex {
 	if (asp) {
 	    rs = SR_OK ;
 	    if (asp->rbuf) {
-	        rs1 = uc_free(asp->rbuf) ;
+	        rs1 = lm_free(asp->rbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        asp->rbuf = nullptr ;
 	    }
