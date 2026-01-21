@@ -9,12 +9,12 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -38,13 +38,17 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucatexit.h>
+#include	<ucgetpid.h>
 #include	<timewatch.hh>
 #include	<sigblocker.h>
 #include	<lockrw.h>
-#include	<ucgetpid.h>
 #include	<localmisc.h>
+
+#include	"ucfork.h"
 
 
 /* local defines */
@@ -86,7 +90,7 @@ namespace {
 	    }
 	} ; /* end dtor (ucfork) */
     } ; /* end struct (ucfork) */
-}
+} /* end namespace */
 
 
 /* forward references */
