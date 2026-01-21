@@ -45,17 +45,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<toxc.h>
 #include	<localmisc.h>
 
 #include	"strcpyxc.h"
 #include	"strncpyxc.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| + |memcopy(3u)| */
 
 /* local defines */
 
@@ -92,7 +92,7 @@ char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 		    n -= 1 ;
 	        } /* end while */
 	        if (n > 0) {
-	            memset(dst,0,n) ;
+	            memclear(dst,n) ;
 		}
 	    } else {
 	        dst = scxc(dst,src) ;
