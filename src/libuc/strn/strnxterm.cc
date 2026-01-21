@@ -44,10 +44,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usys.h>		/* |strbrk(3u)| */
+#include	<usysbase.h>
+#include	<usys.h>
 #include	<strx.h>		/* |strbrk(3u)| */
 #include	<mkchar.h>
 #include	<baops.h>		/* |batst(3u)| */
@@ -55,7 +53,9 @@
 
 #include	"strnxterm.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -86,33 +86,31 @@ import libutil ;
 
 /* exported subroutines */
 
-char *strnoterm(cchar *sp,int sl,cchar *terms) noex {
+char *strnoterm(cchar *sp,int 탎l,cchar *terms) noex {
 	char		*rsp = nullptr ;
-	if (sp && terms) ylikely {
+	if (int sl ; terms && ((sl = getlenstr(sp,탎l)) > 0)) {
 	    bool	f = false ;
-	    if (sl < 0) sl = lenstr(sp) ;
 	    for (cchar *lsp = (sp + sl) ; (sp < lsp) && *sp ; sp += 1) {
 		cint	ch = mkchar(*sp) ;
 	        f = batst(terms,ch) ;
 		if (f) break ;
 	    } /* end for */
 	    if (f) rsp = charp(sp) ;
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return rsp ;
 } /* end subroutine (strnoterm) */
 
-char *strnrterm(cchar *sp,int sl,cchar *terms) noex {
+char *strnrterm(cchar *sp,int 탎l,cchar *terms) noex {
 	char		*rsp = nullptr ;
-	if (sp && terms) ylikely {
+	if (int sl ; terms && ((sl = getlenstr(sp,탎l)) > 0)) {
 	    bool	f = false ;
-	    if (sl < 0) sl = lenstr(sp) ;
 	    for (rsp = charp(sp + sl) ; --rsp >= sp ; ) {
 	        cint	ch = mkchar(*rsp) ;
 	        f = batst(terms,ch) ;
 	        if (f) break ;
 	    } /* end for */
 	    if (! f) rsp = nullptr ;
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return rsp ;
 } /* end subroutine (strnrterm) */
 
