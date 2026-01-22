@@ -30,18 +30,20 @@
 
 #define	LANGPROC_MAGIC		0x13f3c203
 #define	LANGPROC		struct langproc_head
-#define	LANGPROC_CUR		struct langproc_cur
+#define	LANGPROC_CUR		struct langproc_cursor
 
 
 struct langproc_head {
 	langstate	*lsp ;		/* LANGSTATE pointer */
 	void		*lvp ;		/* line-value-pointer */
 	uint		magic ;
-} ;
+} ; /* end struct (langproc_head) */
 
-struct langproc_cur {
+struct langproc_cursor {
     	int		i ;
-} ;
+} ; /* end struct (langproc_cursor) */
+
+typedef LANGPROC_CUR	langproc_cur ;
 
 #ifdef	__cplusplus
 enum langprocmems {
@@ -49,7 +51,7 @@ enum langprocmems {
 	langprocmem_finish,
 	langprocmem_count,
 	langprocmem_overlast
-} ;
+} ; /* end enum (langprocmems) */
 struct langproc ;
 struct langproc_co {
 	langproc	*op = nullptr ;
@@ -88,8 +90,6 @@ struct langproc : langproc_head {
 #else	/* __cplusplus */
 typedef LANGPROC	langproc ;
 #endif /* __cplusplus */
-
-typedef LANGPROC_CUR	langproc_cur ;
 
 EXTERNC_begin
 
