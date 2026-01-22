@@ -52,9 +52,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ucprogdata.h>
-#include	<mallocxx.h>
 #include	<filereadln.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
@@ -63,8 +64,9 @@
 
 #include	"localget.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
-import uconstants ;
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -88,7 +90,7 @@ enum netloadcos {
 	netloaderco_start,
 	netloaderco_finish,
 	netloaderco_overlast
-} ;
+} ; /* end enum */
 
 namespace {
     struct netloader ;
@@ -121,7 +123,7 @@ namespace {
 	    (void) ifinish() ;
 	} ;
     } ; /* end struct (netloader) */
-}
+} /* end namespace */
 
 typedef int (netloader::*netloader_m)() noex ;
 
@@ -206,7 +208,7 @@ int netloader::localconf() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
             if ((rs = mkpath(tbuf,pr,vardname,nlname)) >= 0) {
                 if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) {
                     len = rs ;
@@ -217,7 +219,7 @@ int netloader::localconf() noex {
                     rs = SR_OK ;
                 }
             } /* end if (mkpath) */
-            rs1 = uc_free(tbuf) ;
+            rs1 = lm_free(tbuf) ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
