@@ -46,7 +46,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucprogdata.h>
 #include	<ucpwcache.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
@@ -54,9 +57,7 @@
 #include	<getpwx.h>
 #include	<gecos.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
-#include	<varnames.hh>
-#include	<syswords.hh>
+#include	<aflag.hh>
 #include	<filereadln.h>
 #include	<sfx.h>
 #include	<sncpyx.h>
@@ -69,7 +70,11 @@
 
 #include	"localget.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
 import libutil ;
+import uconstants ;			/* |sysword(3u)| + |varname(3u)| */
 
 /* local defines */
 
@@ -104,7 +109,7 @@ struct subinfo {
 	cchar		*un ;
 	char		*rbuf ;		/* user-supplied buffer */
 	int		rlen ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -208,7 +213,7 @@ static int subinfo_start(SI *sip,cc *pr,cc *ofn,cc *un,
 	    cp = LOCALUSERNAME ;
 	    cl = -1 ;
 	}
-	if (cchar *zp{} ; (rs = uc_mallocstrw(cp,cl,&zp)) >= 0) {
+	if (cchar *zp ; (rs = lm_strw(cp,cl,&zp)) >= 0) {
 	    sip->prn = zp ;
 	}
 	return rs ;
@@ -221,7 +226,8 @@ static int subinfo_finish(SI *sip) noex {
 	if (sip) {
 	    rs = SR_OK ;
 	    if (sip->prn) {
-	        rs1 = uc_free(sip->prn) ;
+		void *vp = voidp(sip->prn) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        sip->prn = nullptr ;
 	    }
@@ -281,7 +287,7 @@ static int localgetorg_pretc(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *obuf{} ; (rs = malloc_mp(&obuf)) >= 0) {
+	if (char *obuf ; (rs = lm_mp(&obuf)) >= 0) {
 	    if ((rs = mkpath(obuf,sip->pr,etcdir,sip->ofn)) >= 0) {
 	        if ((rs = filereadln(obuf,sip->rbuf,sip->rlen)) >= 0) {
 	            len = rs ;
@@ -289,7 +295,7 @@ static int localgetorg_pretc(SI *sip) noex {
 		    rs = SR_OK ;
 	        }
 	    }
-	    rs1 = uc_free(obuf) ;
+	    rs1 = lm_free(obuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -300,7 +306,7 @@ static int localgetorg_sys(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *obuf{} ; (rs = malloc_mp(&obuf)) >= 0) {
+	if (char *obuf ; (rs = lm_mp(&obuf)) >= 0) {
 	    if ((rs = mkpath(obuf,etcdir,sip->ofn)) >= 0) {
 	        if ((rs = filereadln(obuf,sip->rbuf,sip->rlen)) >= 0) {
 	            len = rs ;
@@ -308,7 +314,7 @@ static int localgetorg_sys(SI *sip) noex {
 		    rs = SR_OK ;
 	        }
 	    }
-	    rs1 = uc_free(obuf) ;
+	    rs1 = lm_free(obuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -317,14 +323,15 @@ static int localgetorg_sys(SI *sip) noex {
 
 static int subinfo_homer(SI *sip,cchar *un) noex {
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-	if (char *hbuf{} ; (rs = malloc_mp(&hbuf)) >= 0) {
+	if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) {
 	    cint	hlen = rs ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
-	        if (char *obuf{} ; (rs = malloc_mn(&obuf)) >= 0) {
+	        if (char *obuf ; (rs = lm_mn(&obuf)) >= 0) {
 		    cint	olen = rs ;
 	            if ((rs = sncpy2(obuf,olen,"/.",sip->ofn)) >= 0) {
-		        if (char *fbuf{} ; (rs = malloc_mp(&fbuf)) >= 0) {
+		        if (char *fbuf ; (rs = lm_mp(&fbuf)) >= 0) {
 	                    if ((rs = mkpath(fbuf,hbuf,obuf)) >= 0) {
 		                cint	rlen = sip->rlen ;
 		                char	*rbuf = sip->rbuf ;
@@ -334,13 +341,16 @@ static int subinfo_homer(SI *sip,cchar *un) noex {
 		                    rs = SR_OK ;
 				}
 		            } /* end if (mkpath) */
-			    rs = rsfree(rs,fbuf) ;
+			    rs1 = lm_free(fbuf) ;
+			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (m-a-f) */
 		    } /* end if (sncpy) */
-		    rs = rsfree(rs,obuf) ;
+		    rs1 = lm_free(obuf) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (getuserhome) */
-	    rs = rsfree(rs,hbuf) ;
+	    rs1 = lm_free(hbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -351,7 +361,7 @@ static int subinfo_passwder(SI *sip,cchar *un) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	sip->rbuf[0] = '\0' ;
-	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	    cint	pwlen = rs ;
 	    if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,un)) >= 0) {
 		if (gecos g ; (rs = gecos_start(&g,pw.pw_gecos,-1)) >= 0) {
@@ -365,7 +375,7 @@ static int subinfo_passwder(SI *sip,cchar *un) noex {
 	    	    if (rs >= 0) rs = rs1 ;
 	        } /* end if (gecos) */
 	    } /* end if (get PW entry) */
-	    rs1 = uc_free(pwbuf) ;
+	    rs1 = lm_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? len : rs ;
