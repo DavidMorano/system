@@ -44,7 +44,8 @@
 #include	<cstdlib>
 #include	<vector>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -96,11 +97,11 @@ template<typename ... Args>
 local int linehist_ctor(linehist *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->lvp = nullptr ;
-	    if ((op->lsp = new(nothrow) langstate) != np) {
+	    if ((op->lsp = new(nothrow) langstate) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-langstate) */
 	} /* end if (non-null) */
@@ -110,9 +111,9 @@ local int linehist_ctor(linehist *op,Args ... args) noex {
 
 local int linehist_dtor(linehist *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->lsp) {
+	    if (op->lsp) ylikely {
 		delete op->lsp ;
 		op->lsp = nullptr ;
 	    }
@@ -124,7 +125,7 @@ local int linehist_dtor(linehist *op) noex {
 template<typename ... Args>
 local inline int linehist_magic(linehist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LINEHIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
