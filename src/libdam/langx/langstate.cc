@@ -101,31 +101,28 @@ template<typename ... Args>
 static int langstate_ctor(langstate *op,Args ... args) noex {
     	LANGSTATE	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ; /* dangerous */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (langstate_ctor) */
+} /* end subroutine (langstate_ctor) */
 
 static int langstate_dtor(langstate *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (langstate_dtor) */
+} /* end subroutine (langstate_dtor) */
 
 template<typename ... Args>
 static int langstate_magic(langstate *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LANGSTATE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (langstate_magic) */
+} /* end subroutine (langstate_magic) */
 
 
 /* local variables */
@@ -138,7 +135,7 @@ static int langstate_magic(langstate *op,Args ... args) noex {
 
 int langstate_start(langstate *op) noex {
 	int		rs ;
-	if ((rs = langstate_ctor(op)) >= 0) {
+	if ((rs = langstate_ctor(op)) >= 0) ylikely {
 	    op->fl.clear = true ;
 	    op->magic = LANGSTATE_MAGIC ;
 	    if (rs < 0) {
@@ -146,13 +143,12 @@ int langstate_start(langstate *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (langstate_start) */
+} /* end subroutine (langstate_start) */
 
 int langstate_finish(langstate *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = langstate_magic(op)) >= 0) {
+	if ((rs = langstate_magic(op)) >= 0) ylikely {
 	    {
 		rs1 = langstate_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
@@ -160,13 +156,12 @@ int langstate_finish(langstate *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (langstate_finish) */
+} /* end subroutine (langstate_finish) */
 
 int langstate_proc(langstate *op,int ln,int ch) noex {
 	int		rs ;
 	int		f = false ; /* return-value */
-	if ((rs = langstate_magic(op)) >= 0) {
+	if ((rs = langstate_magic(op)) >= 0) ylikely {
 	    f = op->fl.clear ;
 	    if (op->fl.comment) {
 	        if ((op->pch == CH_STAR) && (ch == CH_SLASH)) {
@@ -235,7 +230,7 @@ int langstate_proc(langstate *op,int ln,int ch) noex {
 int langstate_procln(langstate *op,int ln,cchar *lp,int ll) noex {
 	int		rs ;
 	int		f = false ; /* return-value */
-	if ((rs = langstate_magic(op,lp)) >= 0) {
+	if ((rs = langstate_magic(op,lp)) >= 0) ylikely {
 	    while (ll && *lp) {
 		cint ch = mkchar(*lp) ;
 		if ((rs = langstate_proc(op,ln,ch)) > 0) {
@@ -250,7 +245,7 @@ int langstate_procln(langstate *op,int ln,cchar *lp,int ll) noex {
 int langstate_getstat(langstate *op,langstate_info *sbp) noex {
 	int		rs ;
 	int		type = langstatetype_clear ;
-	if ((rs = langstate_magic(op,sbp)) >= 0) {
+	if ((rs = langstate_magic(op,sbp)) >= 0) ylikely {
 	    memclear(sbp) ; /* dangerous */
 	    sbp->line = op->line ;
 	    if (op->fl.comment) {
@@ -269,7 +264,7 @@ int langstate_getstat(langstate *op,langstate_info *sbp) noex {
 int langstate_code(langstate *op) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = langstate_magic(op)) >= 0) {
+	if ((rs = langstate_magic(op)) >= 0) ylikely {
 	    f = op->fl.clear || op->fl.quote || op->fl.literal ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
@@ -306,7 +301,7 @@ langstate::operator int () noex {
 
 langstate_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case langstatemem_start:
 	        rs = langstate_start(op) ;
