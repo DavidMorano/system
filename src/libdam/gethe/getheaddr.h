@@ -1,4 +1,5 @@
 /* getheaddr HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* get a HOSTENT for a given INET address */
@@ -12,7 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucent.h>		/* |ucentho(3uc)| */
+
 
 EXTERNC_begin
 
