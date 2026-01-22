@@ -47,8 +47,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<endian.h>
 #include	<mkmagic.h>
 #include	<hasx.h>
@@ -56,6 +56,9 @@
 
 #include	"lineindexhdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memcopy(3u)| */
 
 /* local defines */
 
@@ -94,7 +97,7 @@ int lineindexhdr_rd(lineindexhdr *op,char *hbuf,int hlen) noex {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	    	    memcpy(bp,op->vetu,4) ;
+	    	    memcopy(bp,op->vetu,4) ;
 	    	    bp[0] = LINEINDEXHDR_VERSION ;
 	    	    bp[1] = charconv(ENDIAN) ;
 	    	    bp += 4 ;
@@ -131,7 +134,7 @@ int lineindexhdr_wr(lineindexhdr *op,cchar *hbuf,int hlen) noex {
 	        bl -= magicsize ;
 	        /* read out the VETU information */
 	        if (bl >= 4) {
-	            memcpy(op->vetu,bp,4) ;
+	            memcopy(op->vetu,bp,4) ;
 	            if (op->vetu[0] != LINEINDEXHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
