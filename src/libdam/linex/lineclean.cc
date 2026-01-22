@@ -29,15 +29,18 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* placement-new + |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<mkx.h>			/* |mklineclean(3uc)| */
 #include	<localmisc.h>
 
 #include	"lineclean.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -47,7 +50,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -69,7 +71,7 @@ template<typename ... Args>
 static int lineclean_ctor(lineclean *op,Args ... args) noex {
     	LINECLEAN	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -77,7 +79,7 @@ static int lineclean_ctor(lineclean *op,Args ... args) noex {
 
 static int lineclean_dtor(lineclean *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -86,7 +88,7 @@ static int lineclean_dtor(lineclean *op) noex {
 template<typename ... Args>
 static inline int lineclean_magic(lineclean *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LINECLEAN_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -103,11 +105,11 @@ static inline int lineclean_magic(lineclean *op,Args ... args) noex {
 
 int lineclean_start(LC *op,cchar *sp,int sl,int m,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = lineclean_ctor(op,sp,rpp)) >= 0) {
+	if ((rs = lineclean_ctor(op,sp,rpp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl > 0) {
+	    if (sl > 0) ylikely {
 		cint	sz = (sl + 1) ;
-		if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 		    op->cbuf = charp(vp) ;
 		    op->clen = sl ;
 		    if ((rs = mklineclean(op->cbuf,op->clen,m,sp,sl)) >= 0) {
@@ -115,7 +117,7 @@ int lineclean_start(LC *op,cchar *sp,int sl,int m,cchar **rpp) noex {
 		        op->magic = LINECLEAN_MAGIC ;
 		    } /* end if (mklineclean) */
 		    if (rs < 0) {
-			uc_free(op->cbuf) ;
+			lm_free(op->cbuf) ;
 			op->cbuf = nullptr ;
 			op->clen = 0 ;
 		    } /* end if (error) */
@@ -134,9 +136,9 @@ int lineclean_start(LC *op,cchar *sp,int sl,int m,cchar **rpp) noex {
 int lineclean_finish(LC *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = lineclean_magic(op)) >= 0) {
-	    if (op->cbuf) {
-	        rs1 = uc_free(op->cbuf) ;
+	if ((rs = lineclean_magic(op)) >= 0) ylikely {
+	    if (op->cbuf) ylikely {
+	        rs1 = lm_free(op->cbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->cbuf = nullptr ;
 		op->clen = 0 ;
