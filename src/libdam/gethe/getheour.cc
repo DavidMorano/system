@@ -1,4 +1,5 @@
 /* getheour SUPPORT (Get Our Host Entry) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get a host name that has an INET address (of some sort: name or address) */
@@ -55,10 +56,14 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uinet.h>
+#include	<uclibmem.h>
+#include	<ucent.h>		/* |ucentho(3uc)| */
 #include	<getbufsize.h>
 #include	<getnodename.h>		/* |getnodename(3uc)| */
-#include	<mallocxx.h>
 #include	<getxx.h>
 #include	<hostent.h>
 #include	<sncpyx.h>
@@ -163,13 +168,13 @@ int gether::trylocal() noex {
 	int		rs1 ;
 	int		len = 0 ;
 	char		*nbuf{} ;
-	if ((rs = malloc_nn(&nbuf)) >= 0) {
+	if ((rs = lm_nn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
 		rs = tryname(nbuf) ;
 		len = rs ;
 	    } /* end if (getnodename) */
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = lm_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -196,7 +201,7 @@ int gether::tryname(cchar *name) noex {
 int gether::findcanonical() noex {
 	int		rs = SR_OK ;
 	if (hbuf) {
-	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_hn)) >= 0) {
 		cint	hlen = rs ;
 	        hostent	*hop = cast_static<hostentp>(hep) ;
 	        cchar	*canp ;
