@@ -39,6 +39,7 @@ MODS +=
 
 LIBS +=
 
+
 OBJ0_LCOALGET= localgetnetload.o
 OBJ1_LCOALGET= localgetorg.o localgetorgcode.o
 OBJ2_LCOALGET= localgetorgloc.o localgetsystat.o
@@ -47,7 +48,7 @@ OBJ3_LCOALGET=
 OBJA_LCOALGET= obj0_localget.o obj1_localget.o
 OBJB_LCOALGET= obj2_localget.o
 
-OBJ_LCOALGET= $(OBJA_LCOALGET) $(OBJB_LCOALGET)
+OBJ_LCOALGET= obja_localget.o objb_localget.o
 
 
 INCDIRS=
@@ -66,7 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -79,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -113,16 +117,23 @@ control:
 
 
 obj0_localget.o:	$(OBJ0_LCOALGET)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_localget.o:	$(OBJ1_LCOALGET)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_localget.o:	$(OBJ2_LCOALGET)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_localget.o:	$(OBJ3_LCOALGET)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja_localget.o:	$(OBJA_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb_localget.o:	$(OBJB_LCOALGET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 localgetnetload.o:		localgetnetload.cc	$(INCS)
