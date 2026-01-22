@@ -48,7 +48,10 @@
 #include	<arpa/inet.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uinet.h>
+#include	<ucent.h>		/* |ucentho(3uc)| */
 #include	<getxx.h>
 #include	<localmisc.h>
 
