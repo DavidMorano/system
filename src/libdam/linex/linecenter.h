@@ -40,7 +40,7 @@
 struct linecenter_center {
 	uint		linelen ;
 	uint		linebrk ;
-} ;
+} ; /* end struct */
 
 struct linecenter_head {
 	cchar		**lines ;
@@ -51,7 +51,7 @@ struct linecenter_head {
 	int		wc ;		/* word-count */
 	int		ccnt ;		/* character count (w/ blanks) */
 	char		fn[LINECENTER_FNLEN + 1] ;
-} ;
+} ; /* end struct */
 
 typedef	LINECENTER		linecenter ;
 typedef	LINECENTER_CENT		linecenter_cent ;
