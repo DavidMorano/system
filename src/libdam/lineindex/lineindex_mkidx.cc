@@ -35,16 +35,17 @@
 #include	<sys/mman.h>		/* Memory Management */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
 #include	<ctime>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |memchr(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
-#include	<getbufsize.h>
 #include	<opentmp.h>		/* |opentmpfile(3uc)| */
 #include	<endian.h>
 #include	<vecint.h>
@@ -69,9 +70,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -79,6 +77,12 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */
@@ -106,7 +110,7 @@ namespace {
 	int add(void *,cchar *) noex ;
 	int wridx(int) noex ;
     } ; /* end struct (idxer) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -118,7 +122,7 @@ static int	mkpatfn(char *,int,cc *,int,cc *) noex ;
 
 static sysval		pagesize(sysval_ps) ;
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 constexpr int	magicsize = LINEINDEXHDR_MAGICSIZE ;
 constexpr int	headsize = magicsize + 4 + (lineindexhdr_overlast * szof(int)) ;
@@ -176,7 +180,7 @@ int idxer::tmpbegin() noex {
 	    cint	maxpath = rs ;
 	    cint	sz = ((maxpath + 1) * 2) ;
 	    int		ai = 0 ;
-	    if ((rs = uc_malloc(sz,&a)) >= 0) {
+	    if ((rs = lm_mall(sz,&a)) >= 0) {
 		pbuf = (a + ((maxpath + 1) * ai++)) ;
 		tbuf = (a + ((maxpath + 1) * ai++)) ;
 		plen = maxpath ;
@@ -196,7 +200,7 @@ int idxer::tmpbegin() noex {
 		    } /* end if (mkpatfn) */
 	        }
 	        if (rs < 0) {
-	            uc_free(a) ;
+	            lm_free(a) ;
 		    a = nullptr ;
 	        }
 	    } /* end if (memory-allocation) */
@@ -213,7 +217,7 @@ int idxer::tmpend() noex {
 	    tfd = -1 ;
 	}
 	if (a) {
-	    rs1 = uc_free(a) ;
+	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
 	    tbuf = nullptr ;
@@ -248,7 +252,7 @@ int idxer::scanlines(cchar *fn) noex {
 		cint	of = O_RDONLY ;
 		if ((rs = uc_open(fn,of,0)) >= 0) {
 		    cint	fd = rs ;
-		    if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
+		    if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 			csize	fsz = size_t(sb.st_size) ;
 			rs = SR_NOTSUP ;
 		        if (S_ISREG(sb.st_mode)) {
@@ -317,13 +321,16 @@ int idxer::wridx(int lines) noex {
 	custime		dt = getustime ;
 	cint		sz = (headsize + 20) ;
     	int		rs ;
-	hdr.lines = lines ;
-	hdr.rectab = headsize ;
-	hdr.wrtime = uint(dt & UINT_MAX) ;
-	hdr.vetu[0] = LI_VERSION ;
-	hdr.vetu[1] = charconv(ENDIAN) ;
-	hdr.vetu[2] = LI_TYPE ;
-	if (char *hbuf{} ; (rs = uc_malloc(sz,&hbuf)) >= 0) {
+	int		rs1 ;
+	{
+	    hdr.lines = lines ;
+	    hdr.rectab = headsize ;
+	    hdr.wrtime = uint(dt & UINT_MAX) ;
+	    hdr.vetu[0] = LI_VERSION ;
+	    hdr.vetu[1] = charconv(ENDIAN) ;
+	    hdr.vetu[2] = LI_TYPE ;
+	}
+	if (char *hbuf ; (rs = lm_mall(sz,&hbuf)) >= 0) {
 	    if ((rs = hdr.rd(hbuf,rs)) >= 0) {
 		cint	hsz = rs ;
 		if (int *va ; (rs = recs.getvec(&va)) >= 0) {
@@ -335,7 +342,8 @@ int idxer::wridx(int lines) noex {
 		    rs = u_writev(tfd,vec,2) ;
 		} /* end if */
 	    } /* end if (lineindexhdr_rd) */
-	    rs = rsfree(rs,hbuf) ;
+	    rs1 = lm_free(hbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
