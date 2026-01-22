@@ -33,9 +33,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<estrings.h>
-#include	<mallocxx.h>
 #include	<fifostr.h>
 #include	<ascii.h>
 #include	<strn.h>
@@ -45,7 +46,9 @@
 
 #include	"linecenter.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -60,7 +63,6 @@ import libutil ;
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -83,12 +85,12 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int linecenter_ctor(linecenter *op,Args ... args) noex {
     	LINECENTER	*hop = op  ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->sqp = new(nothrow) fifostr) != np) {
+	    if ((op->sqp = new(nothrow) fifostr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-fifostr) */
 	} /* end if (non-null) */
@@ -98,9 +100,9 @@ static int linecenter_ctor(linecenter *op,Args ... args) noex {
 
 static int linecenter_dtor(linecenter *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->sqp) {
+	    if (op->sqp) ylikely {
 		delete op->sqp ;
 		op->sqp = nullptr ;
 	    }
@@ -112,7 +114,7 @@ static int linecenter_dtor(linecenter *op) noex {
 template<typename ... Args>
 static inline int linecenter_magic(linecenter *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LINECENTER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -147,7 +149,7 @@ int linecenter_start(LC *op,cc *fn) noex {
 	    if ((rs = sncpy(op->fn,fnlen,fn)) >= 0) {
 	        if ((rs = fifostr_start(op->sqp)) >= 0) {
 	            cint	sz = (ne + 1) * szof(cchar **) ;
-		    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 			op->lines = ccharpp(vp) ;
 	                op->le = ne ;
 	                op->magic = LINECENTER_MAGIC ;
@@ -168,21 +170,22 @@ int linecenter_start(LC *op,cc *fn) noex {
 int linecenter_finish(LC *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = linecenter_magic(op)) >= 0) {
-	    if (op->lines) {
+	if ((rs = linecenter_magic(op)) >= 0) ylikely {
+	    if (op->lines) ylikely {
 	        for (int i = 0 ; i < op->li ; i += 1) {
 	            if (op->lines[i] != nullptr) {
-	                rs1 = uc_free(op->lines[i]) ;
+			void *vp = voidp(op->lines[i]) ;
+	                rs1 = lm_free(vp) ;
 		        if (rs >= 0) rs = rs1 ;
 		    }
 	        }
 	        {
-	            rs1 = uc_free(op->lines) ;
+	            rs1 = lm_free(op->lines) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->lines = nullptr ;
 	        }
 	    } /* end if */
-	    if (op->sqp) {
+	    if (op->sqp) ylikely {
 	        rs1 = fifostr_finish(op->sqp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -306,7 +309,7 @@ int linecenter_mklines(LC *op,int lwidth,int lbrk) noex {
 	if ((rs = linecenter_magic(op)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (lwidth >= 1) {
-	        if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	        if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 	            cint	llen = rs ;
 	            int		linetmplen ;
 	            if (lbrk <= 0) {
@@ -332,7 +335,7 @@ int linecenter_mklines(LC *op,int lwidth,int lbrk) noex {
 	                }
 	                if (rs == 0) break ;
 	            } /* end while */
-	            rs1 = uc_free(lbuf) ;
+	            rs1 = lm_free(lbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
@@ -353,13 +356,13 @@ static int linecenter_storeline(LC *op,cc *lbuf,int llen) noex {
 	        int	ne = (op->le + 5) ;
 	        void	**nlines = nullptr ;
 	        sz = (ne + 1) * szof(char **) ;
-	        if ((rs = uc_realloc(op->lines,sz,&nlines)) >= 0) {
+	        if ((rs = lm_rall(op->lines,sz,&nlines)) >= 0) {
 	            op->le = ne ;
-	            op->lines = (cchar **) nlines ;
+	            op->lines = ccharpp(nlines) ;
 	        }
 	    } /* end if */
 	    if (rs >= 0) {
-	        if (cchar *cp ; (rs = uc_mallocstrw(lbuf,llen,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(lbuf,llen,&cp)) >= 0) {
 	            op->lines[op->li] = cp ;
 	            op->li += 1 ;
 	        }
