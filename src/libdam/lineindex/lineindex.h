@@ -48,7 +48,7 @@
 
 struct lineindex_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct lineindex_information {
 	time_t		wtime ;		/* time DB written */
@@ -56,7 +56,7 @@ struct lineindex_information {
 	uint		version ;
 	uint		encoding ;
 	uint		type ;
-} ;
+} ; /* end struct */
 
 struct lineindex_flags {
 	uint		remote:1 ;
@@ -64,7 +64,7 @@ struct lineindex_flags {
 	uint		cursorlockbroken:1 ;
 	uint		cursoracc:1 ;
 	uint		wantwrite:1 ;
-} ;
+} ; /* end struct */
 
 struct lineindex_head {
 	cchar		*ifn ;		/* index-file-name */
