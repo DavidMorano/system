@@ -32,13 +32,18 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<linefold.h>
 #include	<localmisc.h>
 
 #include	"logfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -76,7 +81,9 @@ int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n ;
-	n = (LOGFILE_FMTLEN - pl - 2) ;
+	{
+	    n = (LOGFILE_FMTLEN - pl - 2) ;
+	}
 	if (linefold fo ; (rs = fo.start(n,0,sp,sl)) >= 0) {
 	    int		c = 0 ;
 	    cchar	*lp{} ;
