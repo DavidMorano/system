@@ -51,19 +51,24 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<userinfo.h>
 #include	<getostype.h>
+#include	<userinfo.h>
+#include	<mkui.h>		/* |mkuiname(3dam)| */
+#include	<timestr.h>
 #include	<isnot.h>
 #include	<iserror.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"logfile.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
-import uconstants ;
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -75,15 +80,6 @@ import uconstants ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkuibang(char *,int,userinfo *) noex ;
-    extern int	mkuiname(char *,int,userinfo *) noex ;
-}
-
-extern "C" {
-    extern char	*timestr_logz(time_t,char *) noex ;
-}
 
 
 /* external variables */
@@ -106,36 +102,38 @@ namespace {
 	    dt = (t) ? t : time(nullptr) ;
 	    pn = (p) ? p : "" ;
 	    vn = (v) ? v : "" ;
-	} ;
+	} ; /* end ctor */
 	operator int () noex ;
 	int first() noex ;
 	int second() noex ;
 	int third() noex ;
     } ; /* end struct (loguser) */
-}
+} /* end namespace */
 
-struct vars {
-	cchar		*a ;
+namespace {
+    struct vars {
+	cchar		*arch ;
 	int		nodenamelen ;
 	int		usernamelen ;
 	int		bangnamelen ;
-} ;
+    } ; /* end struct */
+} /* end namespace */
 
 
 /* forward references */
 
-static int	mkvars() noex ;
+local int	mkvars() noex ;
 
 
 /* local variables */
 
-static constexpr loguser_m	mems[] = {
+constexpr loguser_m	mems[] = {
 	&loguser::first,
 	&loguser::second,
 	&loguser::third
-} ;
+} ; /* end array (mems) */
 
-static vars			var ;
+static vars		var ;
 
 
 /* exported variables */
@@ -195,17 +193,18 @@ int loguser::first() noex {
 
 int loguser::second() noex {
 	int		rs = SR_OK ;
-	cchar		*a = var.a ;
+	cchar		*a = var.arch ;
 	cchar		*mn = uip->machine ;
 	cchar		*sn = uip->sysname ;
 	cchar		*rn = uip->release ;
 	cchar		*dn = uip->domainname ;
 	int		wlen = 0 ;
+	cchar		fmt[] = "a=%s os=%s(%s) d=%s" ;
 	if (a) {
-	    rs = logfile_printf(op,"a=%s os=%s(%s) d=%s",a,sn,rn,dn) ;
+	    rs = logfile_printf(op,fmt,a,sn,rn,dn) ;
 	    wlen += rs ;
 	} else {
-	    rs = logfile_printf(op,"m=%s os=%s(%s) d=%s",mn,sn,rn,dn) ;
+	    rs = logfile_printf(op,fmt,mn,sn,rn,dn) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
@@ -217,30 +216,29 @@ int loguser::third() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		*nbuf{} ;
-	if ((rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_mall((nlen+1),&nbuf)) >= 0) {
 	    if ((rs = mkuibang(nbuf,nlen,uip)) >= 0) {
 	        rs = logfile_print(op,nbuf,rs) ;
 	        wlen += rs ;
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
 	    }
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = lm_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end method (loguser::third) */
 
-static int mkvars() noex {
+local int mkvars() noex {
 	cchar		*vn = varname.architecture ;
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	if ((rs = getbufsize(bufsize_nn)) >= 0) {
 	    var.nodenamelen = rs ;
-	    if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	    if ((rs = getbufsize(bufsize_un)) >= 0) {
 		var.usernamelen = rs ;
 		var.bangnamelen = (var.nodenamelen + var.usernamelen + 1) ;
-		var.a = getenv(vn) ;
+		var.arch = getenv(vn) ;
 	    }
 	}
 	return rs ;
