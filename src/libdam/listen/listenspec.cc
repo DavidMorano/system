@@ -65,6 +65,9 @@
 
 #include	"listenspec.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -153,7 +156,7 @@ template<typename ... Args>
 static int listenspec_ctor(listenspec *op,Args ... args) noex {
     	LISTENSPEC	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -162,7 +165,7 @@ static int listenspec_ctor(listenspec *op,Args ... args) noex {
 
 static int listenspec_dtor(listenspec *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -172,7 +175,7 @@ static int listenspec_dtor(listenspec *op) noex {
 template<typename ... Args>
 static inline int listenspec_magic(listenspec *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LISTENSPEC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -1591,7 +1594,7 @@ static int arginfo_add(ARGINFO *aip,cchar *sp) noex {
 
 static int arginfo_get(ARGINFO *aip,int i,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (aip && rpp) {
+	if (aip && rpp) ylikely {
 	    vechand	*pap = &aip->pargs ;
 	    void	*vp{} ;
 	    if ((rs = vechand_get(pap,i,&vp)) >= 0) {
