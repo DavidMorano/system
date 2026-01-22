@@ -13,7 +13,7 @@
 	implementation.
 
 	= 2018-09-14, David A-D- Morano
-	I modified this to use |snabbr(3dam)| instead of a local
+	I modified this to use |snabbrname(3uc)| instead of a local
 	custom thing which did the same thing, only not as well.
 	So we go with the library solution instead of the local
 	custom one.  Note for future: might want to refactor a bit
@@ -56,10 +56,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<varnames.hh>
-#include	<syswords.hh>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<strlibval.hh>
 #include	<sncpyx.h>
 #include	<snx.h>
@@ -72,6 +71,9 @@
 
 #include	"localget.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -89,7 +91,7 @@
 enum orgcodercos {
 	orgcoderco_finish,
 	orgcoderco_overlast
-} ;
+} ; /* end enum */
 
 namespace {
     struct orgcoder ;
@@ -169,7 +171,7 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	    rbuf[0] = '\0' ;
 	    if ((un == nullptr) || (un[0] == '\0')) un = "-" ;
 	    if (pr[0]) {
-	        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 		    orgcoder	oo(pr,un,rbuf,rlen) ;
 		    if ((rs = oo.start(tbuf)) >= 0) {
 			{
@@ -179,7 +181,7 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 			rs1 = oo.finish ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (orgcoder) */
-		    rs1 = uc_free(tbuf) ;
+		    rs1 = lm_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -199,13 +201,13 @@ int orgcoder::userenv() noex {
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int orgcoder::userconf() noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *hbuf{} ; (rs = malloc_mp(&hbuf)) >= 0) {
+	if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) {
 	    cint	hlen = rs ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 		if ((rs = mkpath(tfname,hbuf,etcdname,ocfname)) >= 0) {
@@ -216,11 +218,11 @@ int orgcoder::userconf() noex {
 		     }
 	         }
 	    } /* end if (getuserhome) */
-	    rs1 = uc_free(hbuf) ;
+	    rs1 = lm_free(hbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int orgcoder::localconf() noex {
 	int		rs ;
@@ -233,7 +235,7 @@ int orgcoder::localconf() noex {
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 	
 int orgcoder::sysconf() noex {
 	int		rs ;
@@ -246,31 +248,31 @@ int orgcoder::sysconf() noex {
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int orgcoder::orgabbr() noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *obuf{} ; (rs = malloc_mn(&obuf)) >= 0) {
+	if (char *obuf ; (rs = lm_mn(&obuf)) >= 0) {
 	    cint	olen = rs ;
 	    rs = getuserorg(obuf,olen,un) ;
 	    if ((rs == SR_NOENT) || (rs == 0)) {
 	        rs = localgetorg(pr,obuf,olen,un) ;
 	    }
 	    if (rs > 0) {
-		rs = snabbr(rbuf,rlen,obuf,rs) ;
+		rs = snabbrname(rbuf,rlen,obuf,rs) ;
 		len = rs ;
 	    }
-	    rs1 = uc_free(obuf) ;
+	    rs1 = lm_free(obuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int orgcoder::ifinish() noex {
 	return SR_OK ;
-}
+} /* end method */
 
 orgcoder::operator int () noex {
 	int		rs = SR_OK ;
@@ -279,7 +281,7 @@ orgcoder::operator int () noex {
 	    rs = (this->*m)() ;
 	} /* end for */
 	return rs ;
-}
+} /* end method */
 
 orgcoder_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -291,7 +293,6 @@ orgcoder_co::operator int () noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
-/* end method (orgcoder_co::operator) */
+} /* end method (orgcoder_co::operator) */
 
 
