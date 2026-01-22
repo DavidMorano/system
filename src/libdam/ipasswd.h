@@ -53,13 +53,13 @@ struct ipasswd_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct ipasswd_cursor {
 	uint		magic ;
 	int		wi ;
 	int		i[IPASSWD_NINDICES] ;
-} ;
+} ; /* end struct */
 
 struct ipasswd_information {
 	time_t		writetime ;	/* time DB written */
@@ -69,7 +69,7 @@ struct ipasswd_information {
 	uint		encoding ;
 	uint		type ;
 	uint		collisions ;
-} ;
+} ; /* end struct */
 
 struct ipasswd_entry {
 	uint		username ;
@@ -77,7 +77,7 @@ struct ipasswd_entry {
 	uint		first ;
 	uint		m1 ;
 	uint		m2 ;
-} ;
+} ; /* end struct */
 
 struct ipasswd_flags {
 	uint		remote:1 ;
@@ -87,7 +87,7 @@ struct ipasswd_flags {
 	uint		held:1 ;
 	uint		lockedread:1 ;
 	uint		lockedwrite:1 ;
-} ;
+} ; /* end struct */
 
 struct ipasswd_head {
 	cchar		*fname ;
@@ -114,7 +114,7 @@ struct ipasswd_head {
 	int		fd ;
 	int		oflags ;
 	mode_t		operm ;
-} ;
+} ; /* end struct */
 
 typedef IPASSWD			ipasswd ;
 typedef	IPASSWD_FL		ipasswd_fl ;
