@@ -32,14 +32,14 @@ enum lineindexhdrs {
 	lineindexhdr_wrtime,
 	lineindexhdr_lines,
 	lineindexhdr_overlast
-} ;
+} ; /* end enum */
 
 struct lineindexhdr_head {
 	uint		rectab ;
 	uint		wrtime ;
 	uint		lines ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 struct lineindexhdr : lineindexhdr_head {
