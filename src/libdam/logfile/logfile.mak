@@ -31,24 +31,29 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= logfile.h
+INCS += logfile.h
 
-LIBS=
+MODS +=
 
-OBJ0_LOGFILE= logfile_main.o logfile_printfold.o logfile_userinfo.o
+LIBS +=
 
-OBJA_LOGFILE= obj0_logfile.o
 
-OBJ_LOGFILE= $(OBJA_LOGFILE)
+OBJ0= logfile_prime.o 
+OBJ1= logfile_printfold.o 
+OBJ2= logfile_userinfo.o
+OBJ3= logfile_copylock.o
 
+OBJA= obj0.o obj1.o
+OBJB= obj2.o obj3.o
+
+OBJ= obja.o objb.o
 
 
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -61,7 +66,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -74,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -91,8 +99,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_LOGFILE)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LOGFILE)
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -107,12 +115,29 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_logfile.o:	$(OBJ0_LOGFILE)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_LOGFILE)
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-logfile_main.o:		logfile_main.cc		$(INCS)
-logfile_printfold.o:	logfile_printfold.cc	$(INCS)
-logfile_userinfo.o:	logfile_userinfo.cc	$(INCS)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+logfile_prime.o:	logfile_prime.cc		$(INCS)
+logfile_printfold.o:	logfile_printfold.cc		$(INCS)
+logfile_userinfo.o:	logfile_userinfo.cc		$(INCS)
+logfile_copylock.o:	logfile_copylock.cc		$(INCS)
 
 
