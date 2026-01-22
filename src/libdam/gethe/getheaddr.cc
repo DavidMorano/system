@@ -1,4 +1,5 @@
 /* getheaddr SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to get a single host entry by its address */
@@ -46,11 +47,16 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uinet.h>
 #include	<getxx.h>
+#include	<ucent.h>
 #include	<snx.h>
 #include	<localmisc.h>
 
