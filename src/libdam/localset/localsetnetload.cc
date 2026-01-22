@@ -46,9 +46,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ucprogdata.h>
-#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>
@@ -103,7 +104,7 @@ int localsetnetload(cchar *pr,cchar *sbuf,int slen) noex {
 	        cint		ttl = TO_TTL ;
 	        cchar		*vardname = VARDNAME ;
 	        cchar		*netloadname = NETLOADFNAME ;
-	        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	            if ((rs = mkpath(tbuf,pr,vardname,netloadname)) >= 0) {
 	                cmode	om = 0664 ;
 	                if (bfile df ; (rs = bopen(&df,tbuf,"wct",om)) >= 0) {
@@ -118,7 +119,7 @@ int localsetnetload(cchar *pr,cchar *sbuf,int slen) noex {
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (file-write) */
 	            } /* end if (mkpath) */
-		    rs1 = uc_free(tbuf) ;
+		    rs1 = lm_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
