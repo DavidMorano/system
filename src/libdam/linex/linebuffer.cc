@@ -29,8 +29,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"linebuffer.h"
@@ -63,7 +65,7 @@ int linebuffer_start(linebuffer *op) noex {
 	int		rs = SR_FAULT ;
 	int		cl = 0 ;
 	if (op) ylikely {
-	    if (char *cp ; (rs = malloc_ml(&cp)) >= 0) ylikely {
+	    if (char *cp ; (rs = lm_ml(&cp)) >= 0) ylikely {
 		cl = rs ;
 		op->lbuf = cp ;
 		op->llen = rs ;
@@ -80,7 +82,7 @@ int linebuffer_finish(linebuffer *op) noex {
 	    rs = SR_OK ;
 	    if (op->lbuf) {
 		op->lbuf[0] = '\0' ;
-	        rs1 = uc_free(op->lbuf) ;
+	        rs1 = lm_free(op->lbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->lbuf = nullptr ;
 		op->llen = 0 ;
