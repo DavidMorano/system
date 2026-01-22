@@ -33,14 +33,14 @@
 struct linebuffer_head {
 	char		*lbuf ;
 	int		llen ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum linebuffermems {
 	linebuffermem_start,
 	linebuffermem_finish,
 	linebuffermem_overlast
-} ;
+} ; /* end enum */
 struct linebuffer ;
 struct linebuffer_co {
 	linebuffer	*op = nullptr ;
