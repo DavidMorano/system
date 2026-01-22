@@ -45,10 +45,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<vecobj.h>
 #include	<cfdec.h>
-#include	<ncol.h>		/* |charcols(3uc)| */
+#include	<ncol.h>		/* |ncolchar(3uc)| */
 #include	<rmx.h>			/* |rmeol(3uc)| */
 #include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<mkchar.h>
@@ -57,14 +59,17 @@
 
 #include	"linefold.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -83,12 +88,12 @@ struct params {
 	int		cols ;
 	int		ind ;
 	int		nline ;
-} ;
+} ; /* end struct */
 
 struct liner {
 	cchar		*lp ;
 	int		ll ;
-} ;
+} ; /* end struct */
 
 typedef liner *		linerp ;
 
@@ -97,12 +102,12 @@ typedef liner *		linerp ;
 
 template<typename ... Args>
 static int linefold_ctor(linefold *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(op) ;
-	    if ((op->llp = new(nothrow) vecobj) != np) {
+	    if ((op->llp = new(nothrow) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
@@ -112,9 +117,9 @@ static int linefold_ctor(linefold *op,Args ... args) noex {
 
 static int linefold_dtor(linefold *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->llp) {
+	    if (op->llp) ylikely {
 		delete op->llp ;
 		op->llp = nullptr ;
 	    }
@@ -126,7 +131,7 @@ static int linefold_dtor(linefold *op) noex {
 template<typename ... Args>
 static int linefold_magic(linefold *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LINEFOLD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -139,7 +144,7 @@ static int	params_load(params *,int,int) noex ;
 static int	params_nextline(params *,cchar *,int,cchar **) noex ;
 static int	params_nline(params *) noex ;
 
-static int	getcols(int) noex ;
+static int	argcols(int) noex ;
 static int	nextpiece(int,cchar *,int,int *) noex ;
 
 
@@ -157,7 +162,7 @@ int linefold_start(linefold *op,int cols,int ind,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		nlines = 0 ;
 	if ((rs = linefold_ctor(op,lbuf)) >= 0) {
-	    if ((rs = getcols(cols)) >= 0) {
+	    if ((rs = argcols(cols)) >= 0) {
 	        cint	sz = szof(liner) ;
 		cint	ne = 10 ;
 	        cint	vo = (VECOBJ_OCOMPACT) ;
@@ -288,7 +293,7 @@ static int linefold_process(linefold *op,int cols,int ind,
 
 static int params_load(params *pp,int cols,int ind) noex {
 	int		rs = SR_FAULT ;
-	if (pp) {
+	if (pp) ylikely {
 	    rs = memclear(pp) ;		/* dangerous */
 	    pp->cols = cols ;
 	    pp->ind = ind ;
@@ -333,7 +338,7 @@ static int params_nline(params *pp) noex {
 }
 /* end subroutine (params_nline) */
 
-static int getcols(int cols) noex {
+static int argcols(int cols) noex {
 	cchar		*vncols = varname.columns ;
 	int		rs = SR_OK ;
 	if (cols <= 0) {
@@ -347,7 +352,7 @@ static int getcols(int cols) noex {
 	} /* end if (default cols) */
 	return (rs >= 0) ? cols : rs ;
 }
-/* end subroutine (getcols) */
+/* end subroutine (argcols) */
 
 static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	int		pl = 0 ;
@@ -357,7 +362,7 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	cchar		*cp = sp ;
 	/* skip over whitespace */
 	while (cl && ((ch = mkchar(cp[0])),CHAR_ISWHITE(ch))) {
-	    cint	n = charcols(ntabcols,ncol,ch) ;
+	    cint	n = ncolchar(ntabcols,ncol,ch) ;
 	    cp += 1 ;
 	    cl -= 1 ;
 	    ncs += n ;
@@ -365,7 +370,7 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	} /* end while */
 	/* skip over the non-whitespace */
 	while (cl && ((ch = mkchar(cp[0]))) && (! CHAR_ISWHITE(ch))) {
-	    cint	n = charcols(ntabcols,ncol,ch) ;
+	    cint	n = ncolchar(ntabcols,ncol,ch) ;
 	    cp += 1 ;
 	    cl -= 1 ;
 	    ncs += n ;
