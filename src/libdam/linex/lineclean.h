@@ -42,7 +42,7 @@ struct lineclean_head {
 enum linecleanmems {
 	linecleanmem_finish,
 	linecleanmem_overlast
-} ;
+} ; /* end enum (linecleanmems) */
 struct lineclean ;
 struct lineclean_co {
 	lineclean	*op = nullptr ;
