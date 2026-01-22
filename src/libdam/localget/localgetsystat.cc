@@ -50,9 +50,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ucprogdata.h>
-#include	<mallocxx.h>
 #include	<filereadln.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
@@ -61,8 +62,9 @@
 
 #include	"localget.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
-import uconstants ;
+import uconstants ;			/* |sysword(3u)| + |varname(3u)| */
 
 /* local defines */
 
@@ -86,7 +88,7 @@ enum orgloccos {
 	systaterco_start,
 	systaterco_finish,
 	systaterco_overlast
-} ;
+} ; /* end enum */
 
 namespace {
     struct systater ;
@@ -119,7 +121,7 @@ namespace {
 	    (void) ifinish() ;
 	} ;
     } ; /* end struct (systater) */
-}
+} /* end namespace */
 
 typedef int (systater::*systater_m)() noex ;
 
@@ -210,7 +212,7 @@ int systater::localconf() noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+        if (char *tbuf{} ; (rs = lm_mp(&tbuf)) >= 0) {
             if ((rs = mkpath(tbuf,pr,vardname,ssn)) >= 0) {
                 if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) {
                     len = rs ;
@@ -221,7 +223,7 @@ int systater::localconf() noex {
                     rs = SR_OK ;
                 }
             } /* end if (mkpath) */
-            rs1 = uc_free(tbuf) ;
+            rs1 = lm_free(tbuf) ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
