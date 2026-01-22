@@ -5,7 +5,7 @@
 /* computer-language text processor */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -32,9 +32,9 @@
 
 	Description:
 	This object both processes lines and remembers any lines
-	that meet a certain criteria.  I Process characters (a line
+	that meet a certain criteria.  I process characters (a line
 	at a time) for balanced pairs.  I record line numbers so
-	that when we are left with some sort of unbalance, we can
+	that when we are left with some sort of imbalance, we can
 	report the associated line numbers.
 
 	Dependencies:
@@ -75,6 +75,10 @@ import debug ;
 #define	CF_DEBUG	0		/* debugging */
 #endif
 
+#define CDEBPR(FMT, ...) \
+	if_constexpr (f_debug) \
+    	debprintf(__func__, FMT __VA_OPT__(,) __VA_ARGS__)
+
 
 /* imported namespaces */
 
@@ -101,13 +105,13 @@ local int langproc_ctor(langproc *op,Args ... args) noex {
     	cnothrow	nt{} ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->lvp = nullptr ;
-	    if (langstate *lsp ; (lsp = new(nt) langstate) != np) {
+	    if (langstate *lsp ; (lsp = new(nt) langstate) != np) ylikely {
 		op->lsp = lsp ;
-		if (vecstr *lvp ; (lvp = new(nt) vecstr) != np) {
+		if (vecstr *lvp ; (lvp = new(nt) vecstr) != np) ylikely {
 		    op->lvp = lvp ;
 		    rs = SR_OK ;
 		}
@@ -118,36 +122,33 @@ local int langproc_ctor(langproc *op,Args ... args) noex {
 	    } /* end if (new-langstate) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (langproc_ctor) */
+} /* end subroutine (langproc_ctor) */
 
 local int langproc_dtor(langproc *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->lvp) {
+	    if (op->lvp) ylikely {
 		vecstr *lvp = resumelife<vecstr>(op->lvp) ;
 		delete lvp ;
 		op->lvp = nullptr ;
 	    }
-	    if (op->lsp) {
+	    if (op->lsp) ylikely {
 		delete op->lsp ;
 		op->lsp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (langproc_dtor) */
+} /* end subroutine (langproc_dtor) */
 
 template<typename ... Args>
 local inline int langproc_magic(langproc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LANGPROC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (langproc_magic) */
+} /* end subroutine (langproc_magic) */
 
 
 /* local variables */
@@ -162,10 +163,10 @@ cbool		f_debug = CF_DEBUG ;
 
 int langproc_start(langproc *op) noex {
 	int		rs ;
-	if ((rs = langproc_ctor(op)) >= 0) {
-	    if ((rs = langstate_start(op->lsp)) >= 0) {
+	if ((rs = langproc_ctor(op)) >= 0) ylikely {
+	    if ((rs = langstate_start(op->lsp)) >= 0) ylikely {
 		vecstr *lvp = resumelife<vecstr>(op->lvp) ;
-		if ((rs = lvp->start) >= 0) {
+		if ((rs = lvp->start) >= 0) ylikely {
 		    op->magic = LANGPROC_MAGIC ;
 		}
 		if (rs < 0) {
@@ -177,19 +178,18 @@ int langproc_start(langproc *op) noex {
 	    }
 	} /* end if (langproc_ctor) */
 	return rs ;
-}
-/* end subroutine (langproc_start) */
+} /* end subroutine (langproc_start) */
 
 int langproc_finish(langproc *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = langproc_magic(op)) >= 0) {
-	    if (op->lvp) {
+	if ((rs = langproc_magic(op)) >= 0) ylikely {
+	    if (op->lvp) ylikely {
 		vecstr *lvp = resumelife<vecstr>(op->lvp) ;
 	        delete lvp ;
 	        op->lvp = nullptr ;
 	    }
-	    if (op->lsp) {
+	    if (op->lsp) ylikely {
 	        rs1 = langstate_finish(op->lsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -200,25 +200,23 @@ int langproc_finish(langproc *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (langproc_finish) */
+} /* end subroutine (langproc_finish) */
 
 int langproc_proc(langproc *op,int ln,cchar *sp,int sl) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if_constexpr (f_debug) {
+	{
 	    strnul s(sp,sl) ;
-	    debprintf(__func__,"ent ln=%d s=>%s<\n",ln,ccp(s)) ;
+	    CDEBPR("ent ln=%d s=>%s<\n",ln,ccp(s)) ;
 	}
-	if ((rs = langproc_magic(op,sp)) >= 0) {
+	if ((rs = langproc_magic(op,sp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (vecstr *lvp ; (lvp = resumelife<vecstr>(op->lvp)) != np) {
 		langstate *lsp = op->lsp ;
-		string	tmp ;
-		bool	frm = false ;
+		string	tmp ; /* used-multiple */
 		rs = SR_OK ;
-	        while ((rs >= 0) && sl && *sp) {
+		for ( bool frm = false ; (rs >= 0) && sl && *sp ; ) {
 		    cint	ch = mkchar(*sp) ;
 		    if ((rs = lsp->proc(ln,ch)) >= 0) {
 			if ((rs = lsp->code) > 0) {
@@ -247,18 +245,15 @@ int langproc_proc(langproc *op,int ln,cchar *sp,int sl) noex {
 		}
 	    } /* end if (vecstr) */
 	} /* end if (magic) */
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ret rs=%d c=%d\n",rs,c) ;
-	}
+	CDEBPR("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (langproc_proc) */
+} /* end subroutine (langproc_proc) */
 
 int langproc_count(langproc *op) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = langproc_magic(op)) >= 0) {
+	if ((rs = langproc_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (vecstr *lvp ; (lvp = resumelife<vecstr>(op->lvp)) != np) {
 	        rs = lvp->count ;
@@ -266,12 +261,11 @@ int langproc_count(langproc *op) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (langproc_count) */
+} /* end subroutine (langproc_count) */
 
 int langproc_curbegin(langproc *op,langproc_cur *curp) noex {
 	int		rs ;
-	if ((rs = langproc_magic(op,curp)) >= 0) {
+	if ((rs = langproc_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -279,7 +273,7 @@ int langproc_curbegin(langproc *op,langproc_cur *curp) noex {
 
 int langproc_curend(langproc *op,langproc_cur *curp) noex {
 	int		rs ;
-	if ((rs = langproc_magic(op,curp)) >= 0) {
+	if ((rs = langproc_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -289,32 +283,23 @@ int langproc_curenum(langproc *op,langproc_cur *curp,cchar **rpp) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		len = 0 ; /* return-value */
-	if ((rs = langproc_magic(op,curp,rpp)) >= 0) {
+	if ((rs = langproc_magic(op,curp,rpp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if_constexpr (f_debug) {
-	        debprintf(__func__,"check\n") ;
-	    }
+	    CDEBPR("check\n") ;
 	    if (vecstr *lvp ; (lvp = resumelife<vecstr>(op->lvp)) != np) {
 		cint	idx = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-	        if_constexpr (f_debug) {
-	            debprintf(__func__,"-> get()\n") ;
-		}
+		CDEBPR("-> get()\n") ;
 		if (cchar *cp ; (rs = lvp->get(idx,&cp)) >= 0) {
 		    *rpp = cp ;
 		    len = lenstr(cp) ;
 		    curp->i = idx ;
 		}
 	    } /* end if (non-null) */
-	    if_constexpr (f_debug) {
-	        debprintf(__func__,"check rs=%d\n",rs) ;
-	    }
+	    CDEBPR("check rs=%d\n",rs) ;
 	} /* end if (magic) */
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ret rs=%d len=%d\n",rs,len) ;
-	}
+	CDEBPR("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (langproc_curenum) */
+} /* end subroutine (langproc_curenum) */
 
 
 /* local subroutines */
@@ -347,7 +332,7 @@ langproc::operator int () noex {
 
 langproc_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case langprocmem_start:
 	        rs = langproc_start(op) ;
