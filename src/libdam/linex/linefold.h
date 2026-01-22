@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 
 
@@ -32,20 +33,20 @@
 
 struct linefold_flags {
 	uint		dummy:1 ;
-} ;
+} ; /* end struct */
 
 struct linefold_head {
 	vecobj		*llp ;
 	LINEFOLD_FL	fl ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum linefoldmems {
 	linefoldmem_count,
 	linefoldmem_finish,
 	linefoldmem_overlast
-} ;
+} ; /* end enum (linefoldmems) */
 struct linefold ;
 struct linefold_iter {
 	linefold	*op = nullptr ;
