@@ -40,13 +40,22 @@ MODS=
 LIBS=
 
 
+OBJ0_LOCALSET= localsetsystat.o localsetnetload.o
+OBJ1_LOCALSET= 
+OBJ2_LOCALSET= 
+OBJ3_LOCALSET= 
+
+OBJA_LOCALSET= obj0_localset.o
+OBJB_LOCALSET= obj2_localset.o obj3_localset.o
+
+OBJ_LOCALSET= obja_localset.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,19 +66,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_LOCALSET= localsetsystat.o localsetnetload.o
-OBJ1_LOCALSET= 
-OBJ2_LOCALSET= 
-OBJ3_LOCALSET= 
-
-
-OBJA_LOCALSET= obj0_localset.o
-OBJB_LOCALSET= obj2_localset.o obj3_localset.o
-
-OBJ_LOCALSET= $(OBJA_LOCALSET)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -82,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -102,13 +102,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_LOCALSET)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LOCALSET)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -121,16 +116,23 @@ control:
 
 
 obj0_localset.o:	$(OBJ0_LOCALSET)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_LOCALSET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_localset.o:	$(OBJ1_LOCALSET)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_LOCALSET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_localset.o:	$(OBJ2_LOCALSET)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_LOCALSET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_localset.o:	$(OBJ3_LOCALSET)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_LOCALSET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja_localset.o:	$(OBJA_LOCALSET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb_localset.o:	$(OBJB_LOCALSET)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 localsetnetload.o:		localsetnetload.cc	$(INCS)
