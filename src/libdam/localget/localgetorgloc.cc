@@ -57,9 +57,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<syswords.hh>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getuserhome.h>
 #include	<filereadln.h>
 #include	<strlibval.hh>
@@ -70,6 +70,9 @@
 
 #include	"localget.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -93,7 +96,7 @@
 enum orgloccos {
 	orglocerco_finish,
 	orglocerco_overlast
-} ;
+} ; /* end enum */
 
 namespace {
     struct orglocer ;
@@ -154,7 +157,7 @@ constexpr orglocer_m	mems[] = {
 	&orglocer::localconf,
 	&orglocer::sysconf,
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -173,7 +176,7 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 		un = "-" ;
 	    }
 	    if (pr[0]) {
-	        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 		    orglocer	oo(pr,un,rbuf,rlen) ;
 		    if ((rs = oo.start(tbuf)) >= 0) {
 			{
@@ -183,7 +186,7 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 			rs1 = oo.finish ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (orglocer) */
-		    rs1 = uc_free(tbuf) ;
+		    rs1 = lm_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -209,7 +212,7 @@ int orglocer::userconf() noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *hbuf{} ; (rs = malloc_mp(&hbuf)) >= 0) {
+	if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) {
 	    cint	hlen = rs ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 		if ((rs = mkpath(tfname,hbuf,etcdname,oln)) >= 0) {
@@ -220,7 +223,7 @@ int orglocer::userconf() noex {
 		     }
 	         }
 	    } /* end if (getuserhome) */
-	    rs1 = uc_free(hbuf) ;
+	    rs1 = lm_free(hbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
