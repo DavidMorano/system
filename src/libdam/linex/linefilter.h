@@ -13,7 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 
 
@@ -27,20 +28,20 @@
 struct linefilter_flags {
 	uint		sslist:1 ;	/* select */
 	uint		sxlist:1 ;	/* exclude */
-} ;
+} ; /* end struct */
 
 struct linefilter_head {
 	vecstr		*sslp ;	/* select list pointer */
 	vecstr		*sxlp ;	/* exclude list pointer */
 	LINEFILTER_FL	fl ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum linefiltermems {
 	linefiltermem_finish,
 	linefiltermem_overlast
-} ;
+} ; /* end enum (linefiltermems) */
 struct linefilter ;
 struct linefilter_co {
 	linefilter	*op = nullptr ;
