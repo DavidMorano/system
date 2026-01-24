@@ -1,0 +1,18 @@
+extern "C" {
+    extern int uc_getpid() noex ;
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_moveup(int,int) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_lockf(int,int,off_t) noex ;
+    extern int uc_readln(int,void *,int) noex ;
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_writedesc(int,int,int) noex ;
+    extern int uc_rewind(int) noex ;
+    extern int uc_seek(int,off_t,int) noex ;
+    extern int uc_setappend(int,int) noex ;
+    extern int uc_ftruncate(int,off_t) noex ;
+    extern int uc_setappend(int,int) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_close(int) noex ;
+} /* end extern */
