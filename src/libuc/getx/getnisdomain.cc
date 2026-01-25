@@ -47,7 +47,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucgetx.h>		/* |uc_getnisdomain(3uc)| */
 #include	<filereadln.h>
 #include	<sncpyx.h>
 #include	<isnot.h>
@@ -65,7 +68,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using libu::ugetnisdom ;		/* subroutine */
 using std::nothrow ;			/* constant */
 
