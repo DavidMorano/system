@@ -27,7 +27,8 @@
 #include	<usysrets.h>
 
 
-#define	PTA	pthread_attr_t
+#define	PTA		pthread_attr_t
+#define	PTA_MAGIC	0x32412524
 
 
 #ifdef	__cplusplus
@@ -36,7 +37,7 @@ enum ptamems {
 	ptamem_destroy,
 	ptamem_setscope,
 	ptamem_overlast
-} ;
+} ; /* end enum (ptamems) */
 struct pta ;
 struct pta_co {
         pta             *op = nullptr ;
@@ -54,11 +55,13 @@ struct pta : pthread_attr_t {
 	pta_co		create ;
 	pta_co		destroy ;
 	pta_co		setscope ;
+	uint		magic ;
 	constexpr pta() noex {
 	    create(this,ptamem_create) ;
 	    destroy(this,ptamem_destroy) ;
 	    setscope(this,ptamem_setscope) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end ctor */
 	pta(const pta &) = delete ;
 	pta &operator = (const pta &) = delete ;
 	int setguardsize(size_t) noex ;
@@ -66,34 +69,34 @@ struct pta : pthread_attr_t {
 	int setstacksize(size_t) noex ;
 	void dtor() noex ;
 	destruct pta() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ; /* end dtor (pta) */
 } ; /* end class (pta) */
 #else
-typedef PTA	pta ;
+typedef PTA		pta ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
 
-extern int	pta_create(pta *) noex ;
-extern int	pta_destroy(pta *) noex ;
-extern int	pta_setstacksize(pta *,size_t) noex ;
-extern int	pta_getstacksize(pta *,size_t *) noex ;
-extern int	pta_setguardsize(pta *,size_t) noex ;
-extern int	pta_getguardsize(pta *,size_t *) noex ;
-extern int	pta_setstackaddr(pta *,void *) noex ;
-extern int	pta_getstackaddr(pta *,void **) noex ;
-extern int	pta_setdetachstate(pta *,int) noex ;
-extern int	pta_getdetachstate(pta *,int *) noex ;
-extern int	pta_setscope(pta *,int) noex ;
-extern int	pta_getscope(pta *,int *) noex ;
-extern int	pta_setinheritsched(pta *,int) noex ;
-extern int	pta_getinheritsched(pta *,int *) noex ;
-extern int	pta_setschedpolicy(pta *,int) noex ;
-extern int	pta_getschedpolicy(pta *,int *) noex ;
-extern int	pta_setschedparam(pta *,const SCHEDPARAM *) noex ;
-extern int	pta_getschedparam(pta *,SCHEDPARAM *) noex ;
-extern int	pta_setstack(pta *,void *,size_t) noex ;
+extern int	pta_create		(pta *) noex ;
+extern int	pta_destroy		(pta *) noex ;
+extern int	pta_setstacksize	(pta *,size_t) noex ;
+extern int	pta_getstacksize	(pta *,size_t *) noex ;
+extern int	pta_setguardsize	(pta *,size_t) noex ;
+extern int	pta_getguardsize	(pta *,size_t *) noex ;
+extern int	pta_setstackaddr	(pta *,void *) noex ;
+extern int	pta_getstackaddr	(pta *,void **) noex ;
+extern int	pta_setdetachstate	(pta *,int) noex ;
+extern int	pta_getdetachstate	(pta *,int *) noex ;
+extern int	pta_setscope		(pta *,int) noex ;
+extern int	pta_getscope		(pta *,int *) noex ;
+extern int	pta_setinheritsched	(pta *,int) noex ;
+extern int	pta_getinheritsched	(pta *,int *) noex ;
+extern int	pta_setschedpolicy	(pta *,int) noex ;
+extern int	pta_getschedpolicy(	pta *,int *) noex ;
+extern int	pta_setschedparam	(pta *,const SCHEDPARAM *) noex ;
+extern int	pta_getschedparam	(pta *,SCHEDPARAM *) noex ;
+extern int	pta_setstack		(pta *,void *,size_t) noex ;
 
 EXTERNC_end
 
