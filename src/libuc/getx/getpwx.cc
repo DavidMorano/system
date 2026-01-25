@@ -30,9 +30,11 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* |uid_t| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getax.h>
+#include	<localmisc.h>
 
 #include	"getpwx.h"
 
@@ -42,7 +44,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
