@@ -21,7 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<pthread.h>		/* |pthread_cond_t| */
-#include	<time.h>
+#include	<time.h>		/* |CTIMESPEC| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -32,6 +32,8 @@
 
 
 #define	PTC		pthread_cond_t
+#define	PTC_MAGIC	0x32412523
+
 
 #ifdef	__cplusplus
 enum ptcmems {
@@ -39,7 +41,7 @@ enum ptcmems {
 	ptcmem_broadcast,
 	ptcmem_signal,
 	ptcmem_overlast
-} ;
+} ; /* end enum (ptcmems) */
 struct ptc ;
 struct ptc_creater {
 	ptc		*op = nullptr ;
@@ -68,36 +70,38 @@ struct ptc : pthread_cond_t {
 	ptc_co		destroy ;
 	ptc_co		broadcast ;
 	ptc_co		signal ;
+	uint		magic ;
 	constexpr ptc() noex {
 	    create.init(this) ;
 	    destroy(this,ptcmem_destroy) ;
 	    broadcast(this,ptcmem_broadcast) ;
 	    signal(this,ptcmem_signal) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end ctor */
 	ptc(const ptc &) = delete ;
 	ptc &operator = (const ptc &) = delete ;
 	int wait(ptm *,int = -1) noex ;
-	int timedwait(ptm *,CTIMESPEC *) noex ;
+	int waiter(ptm *,CTIMESPEC *) noex ;
 	int reltimedwaitnp(ptm *,CTIMESPEC *) noex ;
 	void dtor() noex ;
 	destruct ptc() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ; /* end dtor (ptc) */
 } ; /* end class (ptc) */
 #else
-typedef PTC	ptc ;
+typedef PTC		ptc ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
 
-extern int	ptc_create(ptc *,ptca *) noex ;
-extern int	ptc_destroy(ptc *) noex ;
-extern int	ptc_broadcast(ptc *) noex ;
-extern int	ptc_signal(ptc *) noex ;
-extern int	ptc_wait(ptc *,ptm *) noex ;
-extern int	ptc_waiter(ptc *,ptm *,int) noex ;
-extern int	ptc_timedwait(ptc *,ptm *,CTIMESPEC *) noex ;
-extern int	ptc_reltimedwaitnp(ptc *,ptm *,CTIMESPEC *) noex ;
+extern int	ptc_create		(ptc *,ptca *) noex ;
+extern int	ptc_destroy		(ptc *) noex ;
+extern int	ptc_broadcast		(ptc *) noex ;
+extern int	ptc_signal		(ptc *) noex ;
+extern int	ptc_wait		(ptc *,ptm *) noex ;
+extern int	ptc_waiting		(ptc *,ptm *,int) noex ;
+extern int	ptc_waiter		(ptc *,ptm *,CTIMESPEC *) noex ;
+extern int	ptc_reltimedwaitnp	(ptc *,ptm *,CTIMESPEC *) noex ;
 
 EXTERNC_end
 
