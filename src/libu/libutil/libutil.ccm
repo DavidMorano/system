@@ -16,6 +16,7 @@ module ;
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* |min(C++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -82,6 +83,22 @@ export {
 	} /* end if (non-null) */
 	return len ;
     } /* end subroutine (getlenstr) */
+} /* end export */
+
+export {
+    template<typename T> 
+    constexpr inline int getlen(const T *ap,int al = -1) noex {
+	int		i = -1 ; /* return-value and multiple */
+	if (ap) {
+	    i = 0 ; 
+	    if (al >= 0) {
+		i = al ;
+	    } else {
+	        while (al-- && ap[i]) i += 1 ;
+	    }
+	} /* end if (non-null) */
+	return i ;
+    } /* end subroutine-template (getlen) */
 } /* end export */
 
 export {
@@ -156,7 +173,7 @@ export {
 	caddr_t		rp = nullptr ; /* return-value */
 	if (dp && sp) {
 	    if (sl < 0) {
-	        cchar *cp = ccharp(sp) ;
+	        cchar *cp = charp(sp) ;
 	        sl = intconv(strlen(cp)) ;
 	    }
 	    {
@@ -169,15 +186,14 @@ export {
 	return voidp(rp) ;
     } /* end subroutine (memcopy) */
     template<typename T>
-    constexpr inline void *memcopy(T *dp,cvoid *sp,int sl = -1) noex {
+    constexpr inline void *memcopy(T *dp,cvoid *sp) noex {
     	caddr_t		rp = nullptr ;
 	if (dp && sp) {
-    	    if (sl < 0) sl = szof(T) ;
 	    rp = caddr_t(dp) ;
 	    {
-		csize srcsize = size_t(sl) ;
-	        memcpy(dp,sp,srcsize) ;
-	        rp += sl ;
+		csize dstsize = sizeof(T) ;
+	        memcpy(dp,sp,dstsize) ;
+	        rp += dstsize ;
 	    } /* end block */
 	} /* end if (non-null) */
 	return voidp(rp) ;
@@ -228,6 +244,13 @@ export {
     constexpr inline T *resumelife(void *vp) noex {
     	T *rp = cast_static<T *>(vp) ;
     	return rp ;
+    }
+} /* end export */
+
+export {
+    template<typename T> constexpr T cvtconst(T val) noex {
+        const T cval = val ;
+        return cval ;
     }
 } /* end export */
 
