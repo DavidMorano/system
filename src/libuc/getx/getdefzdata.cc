@@ -42,7 +42,8 @@
 #include	<ctime>			/* <- for |time(2)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
 #include	<bufsizevar.hh>		/* |zn| */
 #include	<snwcpy.h>
@@ -57,6 +58,10 @@
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_localtime(custime *,TM *) noex ;
+}
+
 
 /* external varaibles */
 
@@ -69,7 +74,7 @@
 
 /* local variables */
 
-static bufsizevar	znlen(getbufsize_zn) ;	/* time-zone-name (abbr) */
+static bufsizevar	znlen(bufsize_zn) ;	/* time-zone-name (abbr) */
 
 constexpr bool		f_darwin = F_DARWIN ;
 
@@ -82,12 +87,12 @@ constexpr bool		f_darwin = F_DARWIN ;
 int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 	int		rs = SR_FAULT ;
 	int		znl = 0 ;
-	if (zip && zbuf) {
+	if (zip && zbuf) ylikely {
 	    cchar	*zp{} ;
 	    if_constexpr (f_darwin) {
 		custime		dt = time(nullptr) ;
 		TM		tmo ;
-	 	if ((rs = uc_localtime(&dt,&tmo)) >= 0) {
+	 	if ((rs = uc_localtime(&dt,&tmo)) >= 0) ylikely {
 	            zip->zoff = intconv(tmo.tm_gmtoff / 60) ;
 	            zp = tmo.tm_zone ;
 		}
@@ -100,8 +105,8 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 	            zp = (f_daylight) ? tzname[1] : tzname[0] ;
 		}
 	    } /* end if_constexpr (f_darwin) */
-	    if ((rs >= 0) && zp) {
-		if ((rs = znlen) >= 0) {
+	    if ((rs >= 0) && zp) ylikely {
+		if ((rs = znlen) >= 0) ylikely {
 	            rs = snwcpy(zbuf,zlen,zp,rs) ;
 		    znl = rs ;
 		}
