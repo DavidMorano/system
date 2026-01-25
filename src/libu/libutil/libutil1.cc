@@ -45,8 +45,6 @@ module ;
 #include	<usysrets.h>
 #include	<localmisc.h>
 
-#pragma		GCC dependency		"mod/libutil.ccm"
-
 module libutil ;
 
 /* local defines */
