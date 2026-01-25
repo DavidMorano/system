@@ -44,9 +44,10 @@
 #include	<sys/socket.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uinet.h>		/* |AF_{x}(3u)| */
 #include	<bufsizevar.hh>
 #include	<nleadstr.h>
 #include	<strwcpy.h>
@@ -90,6 +91,9 @@ struct addrfamily {
 } ;
 
 
+/* forward references */
+
+
 /* local variables */
 
 constexpr addrfamily	addrfamilies[] = {
@@ -101,7 +105,7 @@ constexpr addrfamily	addrfamilies[] = {
 	{ nullptr, 0 }
 } ;
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 cint			afnamelen = AFNAMELEN ;
 
