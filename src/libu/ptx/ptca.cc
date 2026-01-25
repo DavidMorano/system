@@ -32,11 +32,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usupport.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ptca.h"
@@ -67,30 +65,39 @@
 
 int ptca_create(ptca *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    int		to_nomem = utimeout[uto_nomem] ;
-	    bool	f_exit = false ;
+	if (op) ylikely {
+	    errtimer	to_nomem	= utimeout[uto_nomem] ;
+	    errtimer	to_nobufs       = utimeout[uto_nobufs] ;
+	    errtimer	to_again	= utimeout[uto_again] ;
+	    errtimer	to_busy         = utimeout[uto_busy] ;
+	    reterr	r ;
 	    repeat {
 	        if ((rs = pthread_condattr_init(op)) > 0) {
 		    rs = (- rs) ;
-		}
-	        if (rs < 0) {
+		    r(rs) ;
 	            switch (rs) {
 	            case SR_NOMEM:
-	                if (to_nomem-- > 0) {
-		            msleep(1000) ;
-		        } else {
-		            f_exit = true ;
-		        }
+			r = to_nomem(rs) ;
+	                break ;
+		    case SR_NOBUFS:
+			r = to_nobufs(rs) ;
+			break ;
+	            case SR_AGAIN:
+			r = to_again(rs) ;
+	                break ;
+	            case SR_BUSY:
+			r = to_busy(rs) ;
 	                break ;
 		    case SR_INTR:
-		        break ;
-		    default:
-		        f_exit = true ;
+			r(false) ;
 		        break ;
 	            } /* end switch */
+		    rs = r ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
+		    r(true) ;
 	        } /* end if (error) */
-	    } until ((rs >= 0) || f_exit) ;
+	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -98,9 +105,11 @@ int ptca_create(ptca *op) noex {
 
 int ptca_destroy(ptca *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_condattr_destroy(op)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -109,9 +118,11 @@ int ptca_destroy(ptca *op) noex {
 
 int ptca_getpshared(ptca *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_condattr_getpshared(op,oldp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -120,9 +131,11 @@ int ptca_getpshared(ptca *op,int *oldp) noex {
 
 int ptca_setpshared(ptca *op,int fl) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_condattr_setpshared(op,fl)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -136,18 +149,24 @@ void ptca::dtor() noex {
 	if (cint rs = ptca_destroy(this) ; rs < 0) {
 	    ulogerror("ptca",rs,"dtor-destroy") ;
 	}
-} 
-/* end method (ptca::dtor) */
+} /* end method (ptca::dtor) */
+
+int ptca::getpshared(int *rp) noex {
+	return ptca_getpshared(this,rp) ;
+}
 
 int ptca_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ptcamem_create:
-	        rs = ptca_create(op) ;
+	        if ((rs = ptca_create(op)) >= 0) ylikely {
+		    op->magic = PTCA_MAGIC ;
+		}
 	        break ;
 	    case ptcamem_destroy:
 	        rs = ptca_destroy(op) ;
+		op->magic = 0 ;
 	        break ;
 	    case ptcamem_setpshared:
 	        rs = ptca_setpshared(op,a) ;
@@ -155,11 +174,6 @@ int ptca_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ptca_co::operator) */
-
-int ptca::getpshared(int *rp) noex {
-	return ptca_getpshared(this,rp) ;
-}
+} /* end method (ptca_co::operator) */
 
 
