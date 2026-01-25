@@ -27,15 +27,14 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<pthread.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<climits>		/* |INT_MAX| */
+#include	<numeric>		/* |mul_sat(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>
+#include	<usysbase.h>		/* |POLL_INTMULT| */
+#include	<usyscalls.h>		/* |um(3u)| */
+#include	<usupport.h>		/* |msleep(3u)| */
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
@@ -46,17 +45,25 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+using std::mul_sat ;			/* subroutie-template */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
-/* forward references */
+/* external variables */
 
 
 /* local structures */
 
 namespace {
     struct ucptm ;
-    typedef int (ucptm::*mem_m)(ptm *) ;
+    typedef int (ucptm::*mem_m)(ptm *) noex ;
     struct ucptm {
 	mem_m		m ;
 	ptma		*ap ;
@@ -71,6 +78,18 @@ namespace {
 } /* end namespace */
 
 
+/* forward references */
+
+template<typename ... Args>
+local inline int ptm_magic(ptm *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magic == PTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (ptm_magic) */
+
+
 /* local variables */
 
 
@@ -81,12 +100,10 @@ namespace {
 
 int ptm_create(ptm *op,ptma *ap) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    ucptm	pmo(ap) ;
 	    pmo.m = &ucptm::create ;
-	    if ((rs = pmo(op)) >= 0) {
-		op->fl.open = true ;
-	    }
+	    rs = pmo(op) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -94,11 +111,14 @@ int ptm_create(ptm *op,ptma *ap) noex {
 
 int ptm_destroy(ptm *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = pthread_mutex_destroy(op)) > 0) {
-	        rs = (- rs) ;
-	    }
-	    op->fl.open = false ;
+	if (op) ylikely {
+	    repeat {
+	        if ((rs = pthread_mutex_destroy(op)) > 0) {
+	            rs = (- rs) ;
+	        } else if (rs < 0) {
+		    rs = SR_NOANODE ;
+	        }
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -106,10 +126,14 @@ int ptm_destroy(ptm *op) noex {
 
 int ptm_setprioceiling(ptm *op,int npri,int *oldp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = pthread_mutex_setprioceiling(op,npri,oldp)) > 0) {
-	        rs = (- rs) ;
-	    }
+	if (op && oldp) ylikely {
+	    repeat {
+	        if ((rs = pthread_mutex_setprioceiling(op,npri,oldp)) > 0) {
+	            rs = (- rs) ;
+	        } else if (rs < 0) {
+		    rs = SR_NOANODE ;
+	        }
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -117,18 +141,22 @@ int ptm_setprioceiling(ptm *op,int npri,int *oldp) noex {
 
 int ptm_getprioceiling(ptm *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = pthread_mutex_getprioceiling(op,oldp)) > 0) {
-	        rs = (- rs) ;
-	    }
+	if (op && oldp) ylikely {
+	    repeat {
+	        if ((rs = pthread_mutex_getprioceiling(op,oldp)) > 0) {
+	            rs = (- rs) ;
+	        } else if (rs < 0) {
+		    rs = SR_NOANODE ;
+	        }
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptm_getprioceiling) */
 
 int ptm_lockbegin(ptm *op) noex {
-    	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
 	    ucptm	pmo ;
 	    pmo.m = &ucptm::lock ;
 	    rs = pmo(op) ;
@@ -138,38 +166,57 @@ int ptm_lockbegin(ptm *op) noex {
 /* end subroutine (ptm_lockbegin) */
 
 int ptm_lockbeginto(ptm *op,int to) noex {
-    	int		rs = SR_FAULT ;
-	if (op) {
-	    ucptm	pmo ;
-	    if (to >= 0) {
-	        pmo.mto = int((to * 1000) & INT_MAX) ;
-	        pmo.m = &ucptm::locktry ;
+    	cint		rsb = SR_BUSY ;
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    if (to > 0) {
+		int mto = mul_sat(to,POLL_INTMULT) ;
+		rs = SR_OK ;
+		for (int c = 0 ; mto-- ; c += 1) {
+		    if (c) {
+			rs = msleep(1) ;
+		    }
+		    if (rs >= 0) {
+		        rs = ptm_locktry(op) ;
+		    }
+		    if (rs != rsb) break ;
+		} /* end for */
+		if ((rs == rsb) && (mto == 0)) {
+		    rs = SR_TIMEDOUT ;
+		}
+	    } else if (to == 0) {
+		if ((rs = ptm_locktry(op)) == rsb) {
+		    rs = SR_TIMEDOUT ;
+		}
 	    } else {
-	        pmo.m = &ucptm::lock ;
+		rs = ptm_lockbegin(op) ;
 	    }
-	    rs = pmo(op) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptm_lockbeginto) */
 
-int ptm_lockbegintry(ptm *op) noex {
-    	int		rs = SR_FAULT ;
-	if (op) {
+int ptm_locktry(ptm *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
 	    ucptm	pmo ;
 	    pmo.m = &ucptm::locktry ;
 	    rs = pmo(op) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptm_lockbegintry) */
+/* end subroutine (ptm_locktry) */
 
 int ptm_lockend(ptm *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = pthread_mutex_unlock(op)) > 0) {
-	        rs = (- rs) ;
-	    }
+	if (op) ylikely {
+	    repeat {
+	        if ((rs = pthread_mutex_unlock(op)) > 0) {
+	            rs = (- rs) ;
+	        } else if (rs < 0) {
+		    rs = SR_NOANODE ;
+	        }
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -213,54 +260,65 @@ int ucptm::operator () (ptm *op) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (ucptm::operator) */
+} /* end subroutine (ucptm::operator) */
 
 int ucptm::create(ptm *op) noex {
-	int		rs ;
-	if ((rs = pthread_mutex_init(op,ap)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = pthread_mutex_init(op,ap)) > 0) {
+	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucptm::create) */
+} /* end method (ucptm::create) */
 
 int ucptm::lock(ptm *op) noex {
-	int		rs ;
-	if ((rs = pthread_mutex_lock(op)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    if ((rs = pthread_mutex_lock(op)) > 0) {
+	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucptm::lock) */
+} /* end subroutine (ucptm::lock) */
 
 int ucptm::locktry(ptm *op) noex {
-	int		rs ;
-	if ((rs = pthread_mutex_trylock(op)) > 0) {
-	    rs = (- rs) ;
-	}
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    if ((rs = pthread_mutex_trylock(op)) > 0) {
+	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucptm::locktry) */
+} /* end method (ucptm::locktry) */
 
 void ptm::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("ptm",rs,"dtor-destroy") ;
 	}
-} 
-/* end method (ptm::dtor) */
+} /* end method (ptm::dtor) */
 
 int ptm_creater::operator () (ptma *ap) noex {
-	return ptm_create(op,ap) ;
-}
-/* end method (ptm_creater::operator) */
+    	int		rs ;
+	if ((rs = ptm_create(op,ap)) >= 0) ylikely {
+	    op->magic = PTM_MAGIC ;
+	}
+	return rs ;
+} /* end method (ptm_creater::operator) */
 
 int ptm_co::operator () (int to) noex {
-	int	rs = SR_BUGCHECK ;
-	if (op) {
+	int		rs ;
+	if ((rs = ptm_magic(op)) >= 0) ylikely {
 	    switch (w) {
 	    case ptmmem_destroy:
 	        rs = ptm_destroy(op) ;
+	    	op->magic = 0 ;
 	        break ;
 	    case ptmmem_lockbegin:
 	        rs = ptm_lockbeginto(op,to) ;
@@ -269,9 +327,8 @@ int ptm_co::operator () (int to) noex {
 	        rs = ptm_lockend(op) ;
 	        break ;
 	    } /* end switch */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
-}
-/* end method (ptm_co::operator) */
+} /* end method (ptm_co::operator) */
 
 
