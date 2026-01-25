@@ -27,16 +27,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<pthread.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usupport.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"pta.h"
@@ -58,38 +55,39 @@
 
 int pta_create(pta *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    int		to_nomem = utimeout[uto_nomem] ;
-	    int		to_again = utimeout[uto_again] ;
-	    bool	f_exit = false ;
+	if (op) ylikely {
+	    errtimer	to_nomem	= utimeout[uto_nomem] ;
+	    errtimer	to_nobufs       = utimeout[uto_nobufs] ;
+	    errtimer	to_again	= utimeout[uto_again] ;
+	    errtimer	to_busy         = utimeout[uto_busy] ;
+	    reterr	r ;
 	    repeat {
 	        if ((rs = pthread_attr_init(op)) > 0) {
 	            rs = (- rs) ;
-		}
-	        if (rs < 0) {
+		    r(rs) ;
 	            switch (rs) {
 	            case SR_NOMEM:
-	                if (to_nomem-- > 0) {
-		            msleep(1000) ;
-		        } else {
-	                    f_exit = true ;
-		        }
+			r = to_nomem(rs) ;
 	                break ;
+		    case SR_NOBUFS:
+			r = to_nobufs(rs) ;
+			break ;
 	            case SR_AGAIN:
-	                if (to_again-- > 0) {
-		            msleep(1000) ;
-		        } else {
-	                    f_exit = true ;
-		        }
+			r = to_again(rs) ;
+	                break ;
+	            case SR_BUSY:
+			r = to_busy(rs) ;
 	                break ;
 		    case SR_INTR:
-		        break ;
-		    default:
-		        f_exit = true ;
+			r(false) ;
 		        break ;
 	            } /* end switch */
+		    rs = r ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
+		    r(true) ;
 	        } /* end if (error) */
-	    } until ((rs >= 0) || f_exit) ;
+	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -97,7 +95,7 @@ int pta_create(pta *op) noex {
 
 int pta_destroy(pta *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    (void) pthread_attr_destroy(op) ;
 	}
 	return rs ;
@@ -106,9 +104,11 @@ int pta_destroy(pta *op) noex {
 
 int pta_setstacksize(pta *op,size_t v) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_attr_setstacksize(op,v)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -117,9 +117,11 @@ int pta_setstacksize(pta *op,size_t v) noex {
 
 int pta_getstacksize(pta *op,size_t *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op && vp) {
+	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getstacksize(op,vp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -128,9 +130,11 @@ int pta_getstacksize(pta *op,size_t *vp) noex {
 
 int pta_setguardsize(pta *op,size_t v) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_attr_setguardsize(op,v)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -139,9 +143,11 @@ int pta_setguardsize(pta *op,size_t v) noex {
 
 int pta_getguardsize(pta *op,size_t *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op && vp) {
+	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getguardsize(op,vp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -150,9 +156,11 @@ int pta_getguardsize(pta *op,size_t *vp) noex {
 
 int pta_setstackaddr(pta *op,void *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op && vp) {
+	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_setstackaddr(op,vp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -161,9 +169,11 @@ int pta_setstackaddr(pta *op,void *vp) noex {
 
 int pta_getstackaddr(pta *op,void **vpp) noex {
 	int		rs = SR_FAULT ;
-	if (op && vpp) {
+	if (op && vpp) ylikely {
 	    if ((rs = pthread_attr_getstackaddr(op,vpp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -172,9 +182,11 @@ int pta_getstackaddr(pta *op,void **vpp) noex {
 
 int pta_setdetachstate(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_attr_setdetachstate(op,v)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -183,9 +195,11 @@ int pta_setdetachstate(pta *op,int v) noex {
 
 int pta_getdetachstate(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op && vp) {
+	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getdetachstate(op,vp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -194,10 +208,14 @@ int pta_getdetachstate(pta *op,int *vp) noex {
 
 int pta_setscope(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
-	if (v < 0) v = PTHREAD_SCOPE_SYSTEM ; /* usual desired default */
-	if (op) {
+	if (v < 0) {
+	    v = PTHREAD_SCOPE_SYSTEM ; /* usual desired default */
+	}
+	if (op) ylikely {
 	    if ((rs = pthread_attr_setscope(op,v)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -206,9 +224,11 @@ int pta_setscope(pta *op,int v) noex {
 
 int pta_getscope(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_attr_getscope(op,vp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -217,9 +237,11 @@ int pta_getscope(pta *op,int *vp) noex {
 
 int pta_setinheritsched(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_attr_setinheritsched(op,v)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -228,9 +250,11 @@ int pta_setinheritsched(pta *op,int v) noex {
 
 int pta_getinheritsched(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op && vp) {
+	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getinheritsched(op,vp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -239,9 +263,11 @@ int pta_getinheritsched(pta *op,int *vp) noex {
 
 int pta_setschedpolicy(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_attr_setschedpolicy(op,v)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -250,9 +276,11 @@ int pta_setschedpolicy(pta *op,int v) noex {
 
 int pta_getschedpolicy(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_attr_getschedpolicy(op,vp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -261,9 +289,11 @@ int pta_getschedpolicy(pta *op,int *vp) noex {
 
 int pta_setschedparam(pta *op,const SCHEDPARAM *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op && vp) {
+	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_setschedparam(op,vp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -272,9 +302,11 @@ int pta_setschedparam(pta *op,const SCHEDPARAM *vp) noex {
 
 int pta_getschedparam(pta *op,SCHEDPARAM *vp) noex {
 	int		rs = SR_FAULT ;
-	if (op && vp) {
+	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getschedparam(op,vp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -283,7 +315,7 @@ int pta_getschedparam(pta *op,SCHEDPARAM *vp) noex {
 
 int pta_setstack(pta *op,void *saddr,size_t ssize) noex {
 	int		rs = SR_FAULT ;
-	if (op && saddr) {
+	if (op && saddr) ylikely {
 	    if ((rs = pta_setstackaddr(op,saddr)) >= 0) {
 	        rs = pta_setstacksize(op,ssize) ;
 	    }
@@ -305,21 +337,23 @@ int pta::setstacksize(size_t sz) noex {
 }
 
 void pta::dtor() noex {
-	if (cint rs = destroy ; rs < 0) {
+	if (cint rs = pta_destroy(this) ; rs < 0) {
 	    ulogerror("pta",rs,"dtor-destroy") ;
 	}
-} 
-/* end method (pta::dtor) */
+} /* end method (pta::dtor) */
 
 int pta_co::operator () (int a) noex {
-	int	rs = SR_BUGCHECK ;
-	if (op) {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
 	    switch (w) {
 	    case ptamem_create:
-	        rs = pta_create(op) ;
+	        if ((rs = pta_create(op)) >= 0) ylikely {
+		    op->magic = PTA_MAGIC ;
+		}
 	        break ;
 	    case ptamem_destroy:
 	        rs = pta_destroy(op) ;
+	        op->magic = 0 ;
 	        break ;
 	    case ptamem_setscope:
 	        rs = pta_setscope(op,a) ;
@@ -327,7 +361,6 @@ int pta_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (pta_co::operator) */
+} /* end method (pta_co::operator) */
 
 
