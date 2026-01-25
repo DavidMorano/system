@@ -47,9 +47,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<matkeystr.h>
 
