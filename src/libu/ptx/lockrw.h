@@ -44,7 +44,7 @@ enum lockrwmems {
 	lockrwmem_wrlock,
 	lockrwmem_unlock,
 	lockrwmem_overlast
-} ;
+} ; /* end enum (lockrwmems) */
 struct lockrw ;
 struct lockrw_co {
 	lockrw		*op = nullptr ;
@@ -65,18 +65,19 @@ struct lockrw : lockrw_head {
 	lockrw_co	wrlock ;
 	lockrw_co	unlock ;
 	lockrw() noex : lockrw_head{} {
-	    create(this,lockrwmem_create) ;
-	    destroy(this,lockrwmem_destroy) ;
-	    rdlock(this,lockrwmem_rdlock) ;
-	    wrlock(this,lockrwmem_wrlock) ;
-	    unlock(this,lockrwmem_unlock) ;
-	} ;
+	    create	(this,lockrwmem_create) ;
+	    destroy	(this,lockrwmem_destroy) ;
+	    rdlock	(this,lockrwmem_rdlock) ;
+	    wrlock	(this,lockrwmem_wrlock) ;
+	    unlock	(this,lockrwmem_unlock) ;
+	    mxp = nullptr ;
+	} ; /* end ctor */
 	lockrw(const lockrw &) = delete ;
 	lockrw &operator = (const lockrw &) = delete ;
 	void dtor() noex ;
 	destruct lockrw() {
-	    dtor() ;
-	}
+	    if (mxp) dtor() ;
+	} /* end dtor */
 } ; /* end struct (lockrw) */
 #else
 typedef LOCKRW		lockrw ;
@@ -84,12 +85,12 @@ typedef LOCKRW		lockrw ;
 
 EXTERNC_begin
 
-extern int	lockrw_create(lockrw *,int) noex ;
-extern int	lockrw_rdlock(lockrw *,int) noex ;
-extern int	lockrw_wrlock(lockrw *,int) noex ;
-extern int	lockrw_unlock(lockrw *) noex ;
-extern int	lockrw_readers(lockrw *) noex ;
-extern int	lockrw_destroy(lockrw *) noex ;
+extern int	lockrw_create	(lockrw *,int) noex ;
+extern int	lockrw_rdlock	(lockrw *,int) noex ;
+extern int	lockrw_wrlock	(lockrw *,int) noex ;
+extern int	lockrw_unlock	(lockrw *) noex ;
+extern int	lockrw_readers	(lockrw *) noex ;
+extern int	lockrw_destroy	(lockrw *) noex ;
 
 EXTERNC_end
 
