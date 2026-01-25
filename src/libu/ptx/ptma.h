@@ -22,6 +22,8 @@
 
 
 #define	PTMA		pthread_mutexattr_t
+#define	PTMA_MAGIC	0x32412525
+
 
 #ifdef	__cplusplus
 enum ptmamems {
@@ -33,11 +35,8 @@ enum ptmamems {
 	ptmamem_setrobustnp,
 	ptmamem_settype,
 	ptmamem_overlast
-} ;
+} ; /* end enum (ptmamems) */
 struct ptma ;
-struct ptma_fl {
-    	uint		open:1 ;
-} ;
 struct ptma_co {
         ptma		*op = nullptr ;
         int             w = -1 ;
@@ -55,7 +54,7 @@ struct ptma : pthread_mutexattr_t {
 	ptma_co		setpshared ;
 	ptma_co		setrobustnp ;
 	ptma_co		settype ;
-	ptma_fl		fl{} ;
+	uint		magic ;
 	constexpr ptma() noex {
 	    create(this,ptmamem_create) ;
 	    destroy(this,ptmamem_destroy) ;
@@ -64,7 +63,8 @@ struct ptma : pthread_mutexattr_t {
 	    setpshared(this,ptmamem_setpshared) ;
 	    setrobustnp(this,ptmamem_setrobustnp) ;
 	    settype(this,ptmamem_settype) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end ctor */
 	ptma(const ptma &) = delete ;
 	ptma &operator = (const ptma &) = delete ;
 	int	getprioceiling(int *) noex ;
@@ -74,7 +74,7 @@ struct ptma : pthread_mutexattr_t {
 	int	gettype(int *) noex ;
 	void dtor() noex ;
 	destruct ptma() {
-	    if (fl.open) dtor() ;
+	    if (magic) dtor() ;
 	} ; /* end dtor (ptma) */
 } ; /* end class (ptma) */
 #else
@@ -83,18 +83,18 @@ typedef PTMA		ptma ;
 
 EXTERNC_begin
 
-extern int	ptma_create(ptma *) noex ;
-extern int	ptma_destroy(ptma *) noex ;
-extern int	ptma_getprioceiling(ptma *,int *) noex ;
-extern int	ptma_setprioceiling(ptma *,int) noex ;
-extern int	ptma_getprotocol(ptma *,int *) noex ;
-extern int	ptma_setprotocol(ptma *,int) noex ;
-extern int	ptma_getpshared(ptma *,int *) noex ;
-extern int	ptma_setpshared(ptma *,int) noex ;
-extern int	ptma_getrobustnp(ptma *,int *) noex ;
-extern int	ptma_setrobustnp(ptma *,int) noex ;
-extern int	ptma_gettype(ptma *,int *) noex ;
-extern int	ptma_settype(ptma *,int) noex ;
+extern int	ptma_create		(ptma *) noex ;
+extern int	ptma_destroy		(ptma *) noex ;
+extern int	ptma_getprioceiling	(ptma *,int *) noex ;
+extern int	ptma_setprioceiling	(ptma *,int) noex ;
+extern int	ptma_getprotocol	(ptma *,int *) noex ;
+extern int	ptma_setprotocol	(ptma *,int) noex ;
+extern int	ptma_getpshared		(ptma *,int *) noex ;
+extern int	ptma_setpshared		(ptma *,int) noex ;
+extern int	ptma_getrobustnp	(ptma *,int *) noex ;
+extern int	ptma_setrobustnp	(ptma *,int) noex ;
+extern int	ptma_gettype		(ptma *,int *) noex ;
+extern int	ptma_settype		(ptma *,int) noex ;
 
 EXTERNC_end
 
