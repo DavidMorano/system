@@ -41,7 +41,8 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getxid.h>		/* |getgid_group(3uc)| */
 #include	<localmisc.h>
 
