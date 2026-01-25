@@ -30,7 +30,9 @@
 #include	"ptma.h"
 
 
-#define	PTM	pthread_mutex_t
+#define	PTM		pthread_mutex_t
+#define	PTM_MAGIC	0x32412522
+
 
 #ifdef	__cplusplus
 enum ptmmems {
@@ -40,9 +42,6 @@ enum ptmmems {
 	ptmmem_lockend,
 	ptmmem_overlast
 } ; /* end enum (ptmmems) */
-struct ptm_fl {
-    	uint		open:1 ;
-} ;
 struct ptm ;
 struct ptm_creater {
 	ptm		*op = nullptr ;
@@ -73,18 +72,19 @@ struct ptm : pthread_mutex_t {
 	ptm_co		destroy ;
 	ptm_co		lockbegin ;
 	ptm_co		lockend ;
-	ptm_fl		fl{} ;
+	uint		magic ;
 	constexpr ptm() noex {
 	    create(this,ptmmem_create) ;
 	    destroy(this,ptmmem_destroy) ;
 	    lockbegin(this,ptmmem_lockbegin) ;
 	    lockend(this,ptmmem_lockend) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end ctor */
 	ptm(const ptm &) = delete ;
 	ptm &operator = (const ptm &) = delete ;
 	void dtor() noex ;
 	destruct ptm() {
-	    if (fl.open) dtor() ;
+	    if (magic) dtor() ;
 	} ; /* end dtor (ptm) */
 } ; /* end class (ptm) */
 #else
@@ -93,14 +93,14 @@ typedef PTM		ptm ;
 
 EXTERNC_begin
 
-extern int	ptm_create(ptm *,ptma *) noex ;
-extern int	ptm_destroy(ptm *) noex ;
-extern int	ptm_lockbegin(ptm *) noex ;
-extern int	ptm_lockbeginto(ptm *,int) noex ;
-extern int	ptm_locktry(ptm *) noex ;
-extern int	ptm_lockend(ptm *) noex ;
-extern int	ptm_setprioceiling(ptm *,int,int *) noex ;
-extern int	ptm_getprioceiling(ptm *,int *) noex ;
+extern int	ptm_create		(ptm *,ptma *) noex ;
+extern int	ptm_destroy		(ptm *) noex ;
+extern int	ptm_lockbegin		(ptm *) noex ;
+extern int	ptm_lockbeginto		(ptm *,int) noex ;
+extern int	ptm_locktry		(ptm *) noex ;
+extern int	ptm_lockend		(ptm *) noex ;
+extern int	ptm_setprioceiling	(ptm *,int,int *) noex ;
+extern int	ptm_getprioceiling	(ptm *,int *) noex ;
 
 static inline int ptm_lock(ptm *op) noex {
     	return ptm_lockbegin(op) ;
