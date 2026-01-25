@@ -33,16 +33,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<pthread.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usupport.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ptrwa.h"
@@ -67,30 +64,39 @@
 
 int ptrwa_create(ptrwa *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    int		to_nomem = utimeout[uto_nomem] ;
-	    bool	f_exit = FALSE ;
+	if (op) ylikely {
+	    errtimer	to_nomem	= utimeout[uto_nomem] ;
+	    errtimer	to_nobufs       = utimeout[uto_nobufs] ;
+	    errtimer	to_again	= utimeout[uto_again] ;
+	    errtimer	to_busy         = utimeout[uto_busy] ;
+	    reterr	r ;
 	    repeat {
 	        if ((rs = pthread_rwlockattr_init(op)) > 0) {
 		    rs = (- rs) ;
-		}
-	        if (rs < 0) {
+		    r(rs) ;
 	            switch (rs) {
 	            case SR_NOMEM:
-	                if (to_nomem-- > 0) {
-		            msleep(1000) ;
-		        } else {
-	                    f_exit = TRUE ;
-		        }
+			r = to_nomem(rs) ;
+	                break ;
+		    case SR_NOBUFS:
+			r = to_nobufs(rs) ;
+			break ;
+	            case SR_AGAIN:
+			r = to_again(rs) ;
+	                break ;
+	            case SR_BUSY:
+			r = to_busy(rs) ;
 	                break ;
 		    case SR_INTR:
-		        break ;
-		    default:
-		        f_exit = TRUE ;
+			r(false) ;
 		        break ;
 	            } /* end switch */
+		    rs = r ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
+		    r(true) ;
 	        } /* end if (error) */
-	    } until ((rs >= 0) || f_exit) ;
+	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -98,9 +104,11 @@ int ptrwa_create(ptrwa *op) noex {
 
 int ptrwa_destroy(ptrwa *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_rwlockattr_destroy(op)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -109,9 +117,11 @@ int ptrwa_destroy(ptrwa *op) noex {
 
 int ptrwa_getpshared(ptrwa *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_rwlockattr_getpshared(op,oldp)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
@@ -120,13 +130,47 @@ int ptrwa_getpshared(ptrwa *op,int *oldp) noex {
 
 int ptrwa_setpshared(ptrwa *op,int fl) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
+	    if (fl < 0) fl = PTHREAD_PROCESS_SHARED ;
 	    if ((rs = pthread_rwlockattr_setpshared(op,fl)) > 0) {
 	        rs = (- rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
 	    }
 	}
 	return rs ;
 }
 /* end subroutine (ptrwa_setpshared) */
+
+int ptrwa::getpshared(int *rp) noex {
+    	return ptrwa_getpshared(this,rp) ;
+}
+
+void ptrwa::dtor() noex {
+	if (cint rs = ptrwa_destroy(this) ; rs < 0) {
+	    ulogerror("pta",rs,"dtor-destroy") ;
+	}
+} /* end method (ptrwa::dtor) */
+
+int ptrwa_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case ptrwamem_create:
+	        if ((rs = ptrwa_create(op)) >= 0) ylikely {
+		    op->magic = PTRWA_MAGIC ;
+		}
+	        break ;
+	    case ptrwamem_destroy:
+	        rs = ptrwa_destroy(op) ;
+		op->magic = 0 ;
+	        break ;
+	    case ptrwamem_setpshared:
+	        rs = ptrwa_setpshared(op,a) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (ptrwa_co::operator) */
 
 
