@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #ifdef	__cplusplus
@@ -33,18 +30,6 @@ extern "C" {
     extern int getngroups(int) noex ;
     extern int getngroupsx(int = 0) noex ;
 }
-
-namespace libuc {
-    struct ucmaxgrouper {
-    	int		ng ;
-	operator int () noex ;
-	int operator () () noex {
-	    return operator int () ;
-	} ;
-    } ; /* end struct (ucmaxgrouper) */
-}
-
-extern libuc::ucmaxgrouper	ucmaxgroups ;
 
 #else /* __cplusplus */
 
