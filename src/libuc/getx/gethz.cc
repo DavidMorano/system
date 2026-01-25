@@ -55,7 +55,8 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<cfdec.h>
 #include	<isnot.h>		/* |isNotValid(3uc)| */
 #include	<localmisc.h>
@@ -84,6 +85,9 @@ import uconstants ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_sysconfval(int,long *) noex ;
+}
 
 /* external variables */
 
