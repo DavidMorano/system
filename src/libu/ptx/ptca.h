@@ -22,6 +22,8 @@
 
 
 #define	PTCA		pthread_condattr_t
+#define	PTCA_MAGIC	0x32412526
+
 
 #ifdef	__cplusplus
 enum ptcamems {
@@ -29,7 +31,7 @@ enum ptcamems {
 	ptcamem_destroy,
 	ptcamem_setpshared,
 	ptcamem_overlast
-} ;
+} ; /* end enum (ptcamems) */
 struct ptca ;
 struct ptca_co {
         ptca		*op = nullptr ;
@@ -44,29 +46,31 @@ struct ptca : pthread_condattr_t {
 	ptca_co		create ;
 	ptca_co		destroy ;
 	ptca_co		setpshared ;
+	uint		magic ;
 	constexpr ptca() noex {
 	    create(this,ptcamem_create) ;
 	    destroy(this,ptcamem_destroy) ;
 	    setpshared(this,ptcamem_setpshared) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end struct */
 	ptca(const ptca &) = delete ;
 	ptca &operator = (const ptca &) = delete ;
 	int	getpshared(int *) noex ;
 	void dtor() noex ;
 	destruct ptca() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ; /* end dtor (ptca) */
 } ; /* end class (ptca) */
 #else
-typedef PTMA		ptca ;
+typedef PTCA		ptca ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
 
-extern int	ptca_create(ptca *) noex ;
-extern int	ptca_destroy(ptca *) noex ;
-extern int	ptca_setpshared(ptca *,int) noex ;
-extern int	ptca_getpshared(ptca *,int *) noex ;
+extern int	ptca_create	(ptca *) noex ;
+extern int	ptca_destroy	(ptca *) noex ;
+extern int	ptca_setpshared	(ptca *,int) noex ;
+extern int	ptca_getpshared	(ptca *,int *) noex ;
 
 EXTERNC_end
 
