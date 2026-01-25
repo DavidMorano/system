@@ -39,7 +39,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ucsysauxinfo.h>	/* |usysauxinforeq_architecture| */
 #include	<sfx.h>
 #include	<snwcpy.h>
@@ -59,6 +60,10 @@ import uconstants ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_getarchitecture(char *,int) noex ;
+    extern int uc_sysauxinfo(char *,int,int) noex ;
+}
 
 /* external variables */
 
