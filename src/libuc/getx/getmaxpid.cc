@@ -34,7 +34,7 @@
 	<0		error (system-return)
 
 	Notes:
-	+ We try to get a dynamic value if we can, otherwise we let
+	+ I try to get a dynamic value if we can, otherwise we let
 	the system itself guess (w/ PID_MAX), thereafter we guess
 	with our own value.  There is no dynamic value (that we know
 	of) for the maximum "system" PID.
@@ -44,10 +44,12 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>		/* |pid_t| */
 #include	<unistd.h>		/* |sysconf(3c)| */
-#include	<climits>		/* |PID_MAX| */
+#include	<climits>		/* |PID_MAX| (if supplied) */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucsysconf.h>
 #include	<isoneof.h>
 #include	<localmisc.h>
 
@@ -82,7 +84,8 @@ struct pidmgr {
 
 /* forward references */
 
-static int isnosys(int) noex ;
+local int	getsys() noex ;
+local int	isnosys(int) noex ;
 
 
 /* local variables */
@@ -93,7 +96,7 @@ constexpr int		rsnosys[] = {
     	SR_NOSYS,
 	SR_INVALID,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -107,18 +110,7 @@ int getmaxpid(int w) noex {
 	int		rs = SR_INVALID ;
 	switch (w) {
 	case 0:
-	    {
-                pidmgr      *op = &getmaxpid_data ;
-                if ((rs = op->pid) == 0) {
-                    cint    cmd = _SC_MAXPID ;
-                    if ((rs = uc_sysconf(cmd,nullptr)) >= 0) {
-                        op->pid = rs ;
-                    } else if (isnosys(rs)) {
-                        rs = PID_MAX ;
-                        op->pid = rs ;
-                    }
-                }
-            } /* end block */
+	    rs = getsys() ;
 	    break ;
 	case 1:
 	    rs = PID_MAX ;
@@ -131,7 +123,22 @@ int getmaxpid(int w) noex {
 
 /* local subroutines */
 
-static int isnosys(int rs) noex {
+local int getsys() noex {
+	pidmgr		*op = &getmaxpid_data ;
+	int		rs ;
+	if ((rs = op->pid) == 0) {
+            cint    cmd = _SC_MAXPID ;
+            if ((rs = uc_sysconf(cmd,nullptr)) >= 0) {
+                op->pid = rs ;
+            } else if (isnosys(rs)) {
+                rs = PID_MAX ;
+                op->pid = rs ;
+            }
+	} /* end if (test cache) */
+	return rs ;
+} /* end subroutine (getsys) */
+
+local int isnosys(int rs) noex {
     	return isOneOf(rsnosys,rs) ;
 }
 
