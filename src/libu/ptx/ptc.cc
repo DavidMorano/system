@@ -33,10 +33,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usupport.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
@@ -56,10 +53,21 @@
 
 /* forward references */
 
-static sysret_t std_ptcinit(ptc *op,ptca *ap) noex {
+template<typename ... Args>
+local inline int ptc_magic(ptc *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magic == PTC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (ptc_magic) */
+
+local sysret_t std_ptcinit(ptc *op,ptca *ap) noex {
     	int		rs ;
 	if ((rs = pthread_cond_init(op,ap)) > 0) {
 	    rs = (- rs) ;
+	} else if (rs < 0) {
+	    rs = SR_NOANODE ;
 	}
 	return rs ;
 } /* end subroutine (std_ptcinit) */
@@ -75,7 +83,7 @@ static sysret_t std_ptcinit(ptc *op,ptca *ap) noex {
 
 int ptc_create(ptc *op,ptca *ap) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    errtimer	to_nomem	= utimeout[uto_nomem] ;
 	    errtimer	to_nobufs	= utimeout[uto_nobufs] ;
 	    errtimer	to_again	= utimeout[uto_again] ;
@@ -115,10 +123,14 @@ int ptc_create(ptc *op,ptca *ap) noex {
 
 int ptc_destroy(ptc *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = pthread_cond_destroy(op)) > 0) {
-	        rs = (- rs) ;
-	    }
+	if (op) ylikely {
+	    repeat {
+	        if ((rs = pthread_cond_destroy(op)) > 0) {
+	            rs = (- rs) ;
+	        } else if (rs < 0) {
+	            rs = SR_NOANODE ;
+	        }
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -126,10 +138,14 @@ int ptc_destroy(ptc *op) noex {
 
 int ptc_broadcast(ptc *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = pthread_cond_broadcast(op)) > 0) {
-	        rs = (- rs) ;
-	    }
+	if (op) ylikely {
+	    repeat {
+	        if ((rs = pthread_cond_broadcast(op)) > 0) {
+	            rs = (- rs) ;
+	        } else if (rs < 0) {
+	            rs = SR_NOANODE ;
+	        }
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -137,10 +153,14 @@ int ptc_broadcast(ptc *op) noex {
 
 int ptc_signal(ptc *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = pthread_cond_signal(op)) > 0) {
-	        rs = (- rs) ;
-	    }
+	if (op) ylikely {
+	    repeat {
+	        if ((rs = pthread_cond_signal(op)) > 0) {
+	            rs = (- rs) ;
+	        } else if (rs < 0) {
+	            rs = SR_NOANODE ;
+	        }
+	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -148,10 +168,12 @@ int ptc_signal(ptc *op) noex {
 
 int ptc_wait(ptc *op,ptm *mp) noex {
 	int		rs = SR_FAULT ;
-	if (op && mp) {
+	if (op && mp) ylikely {
 	    repeat {
 	        if ((rs = pthread_cond_wait(op,mp)) > 0) {
 	            rs = (- rs) ;
+	        } else if (rs < 0) {
+	            rs = SR_NOANODE ;
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
@@ -159,30 +181,32 @@ int ptc_wait(ptc *op,ptm *mp) noex {
 }
 /* end subroutine (ptc_wait) */
 
-int ptc_waiter(ptc *op,ptm *mp,int to) noex {
+int ptc_waiting(ptc *op,ptm *mp,int to) noex {
 	int		rs = SR_FAULT ;
-	if (op && mp) {
+	if (op && mp) ylikely {
 	    if (to >= 0) {
 	        TIMESPEC	ts ;
 	        const clockid_t	cid = CLOCK_REALTIME ;
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
-	        rs = ptc_timedwait(op,mp,&ts) ;
+	        rs = ptc_waiter(op,mp,&ts) ;
 	    } else {
 	        rs = ptc_wait(op,mp) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptc_waiter) */
+/* end subroutine (ptc_waiting) */
 
-int ptc_timedwait(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
+int ptc_waiter(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if (tp) {
 		repeat {
 	            if ((rs = pthread_cond_timedwait(op,mp,tp)) > 0) {
 	                rs = (- rs) ;
+	            } else if (rs < 0) {
+	                rs = SR_NOANODE ;
 	            }
 		} until (rs != SR_INTR) ;
 	    } else {
@@ -191,17 +215,24 @@ int ptc_timedwait(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptc_timedwait) */
+/* end subroutine (ptc_waiter) */
 
 int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	int		rs = SR_NOSYS ;
-	if (op) {
+	if (op) ylikely {
 	    if (tp) {
 	        if (syshas.reltimedwait) {
-	            if ((rs = pthread_cond_reltimedwait_np(op,mp,tp)) > 0) {
-	                rs = (- rs) ;
-	            }
-	        }
+	            repeat {
+		        cauto pthread_waiter = pthread_cond_reltimedwait_np ;
+	                if ((rs = pthread_waiter(op,mp,tp)) > 0) {
+	                    rs = (- rs) ;
+		        } else if (rs < 0) {
+			    rs = SR_NOANODE ;
+	                }
+	            } until (rs != SR_INTR) ;
+		} else {
+	            rs = ptc_wait(op,mp) ;
+	        } /* end if (sushas_rltimedwait) */
 	    } else {
 	        rs = ptc_wait(op,mp) ;
 	    }
@@ -213,40 +244,51 @@ int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 
 /* local subroutines */
 
-int ptc::wait(ptm *pop,int to) noex {
-	return ptc_waiter(this,pop,to) ;
-}
+int ptc::wait(ptm *mxp,int to) noex {
+	int		rs ;
+	if ((rs = ptc_magic(this)) >= 0) ylikely {
+	    rs = ptc_waiting(this,mxp,to) ;
+	} /* end if (magic) */
+	return rs ;
+} /* end method (ptc::wait) */
 
-int ptc::timedwait(ptm *pop,CTIMESPEC *tsp) noex {
-	return ptc_timedwait(this,pop,tsp) ;
-}
+int ptc::waiter(ptm *mxp,CTIMESPEC *tsp) noex {
+	int		rs ;
+	if ((rs = ptc_magic(this)) >= 0) ylikely {
+	    rs = ptc_waiter(this,mxp,tsp) ;
+	} /* end if (magic) */
+	return rs ;
+} /* end method (ptc::waiter) */
 
-int ptc::reltimedwaitnp(ptm *pop,CTIMESPEC *tsp) noex {
-	return ptc_reltimedwaitnp(this,pop,tsp) ;
-}
+int ptc::reltimedwaitnp(ptm *mxp,CTIMESPEC *tsp) noex {
+	int		rs ;
+	if ((rs = ptc_magic(this)) >= 0) ylikely {
+	    rs = ptc_reltimedwaitnp(this,mxp,tsp) ;
+	} /* end if (magic) */
+	return rs ;
+} /* end method (ptc::reltimedwaitnp) */
 
 void ptc::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("ptc",rs,"dtor-destroy") ;
 	}
-} 
-/* end method (ptc::dtor) */
+} /* end method (ptc::dtor) */
 
 int ptc_creater::operator () (ptca *ap) noex {
-	int	rs = SR_BUGCHECK ;
-	if (op) {
-	    rs = ptc_create(op,ap) ;
+    	int		rs ;
+	if ((rs = ptc_create(op,ap)) >= 0) ylikely {
+	    op->magic = PTC_MAGIC ;
 	}
 	return rs ;
-}
-/* end method (ptc_creater::operator) */
+} /* end method (ptc_creater::operator) */
 
 int ptc_co::operator () (int) noex {
-	int	rs = SR_BUGCHECK ;
-	if (op) {
+	int		rs ;
+	if ((rs = ptc_magic(op)) >= 0) ylikely {
 	    switch (w) {
 	    case ptcmem_destroy:
 	        rs = ptc_destroy(op) ;
+		op->magic = 0 ;
 	        break ;
 	    case ptcmem_broadcast:
 	        rs = ptc_broadcast(op) ;
@@ -255,9 +297,8 @@ int ptc_co::operator () (int) noex {
 	        rs = ptc_signal(op) ;
 	        break ;
 	    } /* end switch */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
-}
-/* end method (ptc_co::operator) */
+} /* end method (ptc_co::operator) */
 
 
