@@ -40,6 +40,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |LONG_MAX| + |LONG_MIN| */
+#include	<cstddef>		/* |unllptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -48,6 +50,8 @@
 #include	<localmisc.h>
 
 #include	"willaddover.h"
+
+#pragma		GCC dependency		"mod/intminmax.ccm"
 
 import intminmax ;
 
