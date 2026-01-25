@@ -11,7 +11,7 @@
 	= 1998-07-01, David A­D­ Morano
 	This code was originally written.
 
-	= 2023-12-11,
+	= 2023-12-11, David A­D­ Morano
 	I switched to using C++11 |atomic|.
 
 */
@@ -44,9 +44,9 @@
 	cmd		command for |getngroupsx| (0=get, 1=invalidate)
 
 	Returns:
-	<0		error (errno)
-	==0		should not happen
 	>0		number of suplemental groups allowed
+	==0		should not happen
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -57,7 +57,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<atomic>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"getngroups.h"
@@ -77,6 +78,10 @@ using std::memory_order_relaxed ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_sysconfval(int,long *) noex ;
+}
+
 
 /* external variables */
 
@@ -89,7 +94,7 @@ namespace {
 	operator int () noex ;
 	int operator () (int) noex ;
     } ; /* end struct (groupinfo) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -101,8 +106,6 @@ static groupinfo	getngroups_data ;
 
 
 /* exported variables */
-
-libuc::ucmaxgrouper	ucmaxgroups ;
 
 
 /* exported subroutines */
@@ -145,16 +148,5 @@ int groupinfo::operator () (int x) noex {
 	return rs ;
 }
 /* end method (groupinfo::operator) */
-
-namespace libuc {
-    ucmaxgrouper::operator int () noex {
-    	int		rs ;
-	if ((rs = ng) == 0) {
-	    rs = getngroups() ;
-	    ng = rs ;
-	}
-	return rs ;
-    } /* end method (ucmaxgrouper::operator) */
-}
 
 
