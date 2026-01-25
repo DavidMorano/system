@@ -76,11 +76,13 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strchr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<uinfo.h>
-#include	<varnames.hh>
+#include	<uclibmem.h>
+#include	<ucgetho.h>
+#include	<getbufsize.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<estrings.h>		/* most all string subroutines */
 #include	<filer.h>
 #include	<strn.h>
@@ -96,8 +98,10 @@
 #include	"getnodedomain.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -128,6 +132,11 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */
@@ -221,8 +230,8 @@ constexpr guess		ga[] = {
 	{ nullptr, nullptr }
 } ; /* end array (ga) */
 
-static bufsizevar	maxnodelen(getbufsize_nn) ;
-static bufsizevar	maxhostlen(getbufsize_hn) ;
+static bufsizevar	maxnodelen(bufsize_nn) ;
+static bufsizevar	maxhostlen(bufsize_hn) ;
 
 constexpr bool		f_guess = CF_GUESS ;
 
@@ -293,13 +302,13 @@ int getuserdomain(char *dbuf,int dlen) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (dbuf) ylikely {
-	    if (char *dn ; (rs = malloc_hn(&dn)) >= 0) ylikely {
+	    if (char *dn ; (rs = lm_hn(&dn)) >= 0) ylikely {
 	        if (dlen < 0) dlen = rs ;
 	        if ((rs = getnodedomain(nullptr,dn)) >= 0) ylikely {
 	            rs = sncpy(dbuf,dlen,dn) ;
 		    len = rs ;
 	        }
-	        rs1 = malloc_free(dn) ;
+	        rs1 = lm_free(dn) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
@@ -323,7 +332,7 @@ static int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 	        tip->nodename = nb ;
 		tip->dlen = (dl < 0) ? hl : dl ;
 	        if (nb == nullptr) {
-	            if (char *bp ; (rs = malloc_nn(&bp)) >= 0) ylikely {
+	            if (char *bp ; (rs = lm_nn(&bp)) >= 0) ylikely {
 		       tip->nbuf = bp ;
 	    	       tip->nodename = bp ;
 		    } /* memory-allocation) */
@@ -347,7 +356,7 @@ static int try_finish(TRY *tip) noex {
 	        tip->sysnodename = nullptr ;
 	    }
 	    if (tip->nbuf) {
-	        rs1 = malloc_free(tip->nbuf) ;
+	        rs1 = lm_free(tip->nbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        tip->nbuf = nullptr ;
 	    }
@@ -533,7 +542,7 @@ static int try_gethost(TRY *tip) noex {
 	    rs = try_initnode(tip) ;
 	}
 	if ((rs >= 0) && tip->fl.node) ylikely {
-	    if (char *hbuf ; (rs = malloc_ho(&hbuf)) >= 0) ylikely {
+	    if (char *hbuf ; (rs = lm_ho(&hbuf)) >= 0) ylikely {
 		cnullptr	np{} ;
 	        ucentho		he, *hep = &he ;
 	        cint		hlen = rs ;
@@ -560,7 +569,7 @@ static int try_gethost(TRY *tip) noex {
 			    if (rs != 0) break ;
 	                } /* end for */
 	            } /* end if (alias names) */
-		    rs1 = malloc_free(hbuf) ;
+		    rs1 = lm_free(hbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } else if (isNotPresent(rs)) {
@@ -585,7 +594,7 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) ylikely {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 	    cint	llen = rs ;
 	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) ylikely {
 		cint	fd = rs ;
@@ -598,7 +607,7 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
 	    }
-	    rs1 = malloc_free(lbuf) ;
+	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs;
