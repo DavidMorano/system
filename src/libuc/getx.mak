@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJ00= getaddr.o getaf.o getarchitecture.o getbufsize.o
-OBJ01= getcols.o getdefzdata.o geteaddrinfo.o
+OBJ01= getdefzdata.o geteaddrinfo.o
 OBJ02= getenver.o getev.o getfdfile.o
 OBJ03= gethz.o getmailgid.o getmjd.o
 OBJ04= getnfile.o getngroups.o getnodedomain.o
@@ -53,13 +53,14 @@ OBJ09= getseed.o getserial.o getserv.o
 OBJ10= getsocktype.o getsyslogx.o getsystypenum.o
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
-OBJ13= getnisdomain.o getpwx.o
+OBJ13= getnisdomain.o 
 OBJ14= getoflags.o
+OBJ15= getpwx.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o 
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
-OBJD= obj12.o obj13.o obj14.o
+OBJD= obj12.o obj13.o obj14.o obj15.o
 
 OBJ= obja.o objb.o objc.o objd.o
 
@@ -173,6 +174,9 @@ obj13.o:		$(OBJ13)
 obj14.o:		$(OBJ14)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj15.o:		$(OBJ15)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -192,7 +196,6 @@ getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
 getaddr.o:		getaddr.cc		getaddr.h		$(INCS)
 getaf.o:		getaf.cc		getaf.h			$(INCS)
 getarchitecture.o:	getarchitecture.cc	getarchitecture.h	$(INCS)
-getcols.o:		getcols.cc		getcols.h		$(INCS)
 getdefzdata.o:		getdefzdata.cc		getdefzdata.h		$(INCS)
 geteaddrinfo.o:		geteaddrinfo.cc		geteaddrinfo.h		$(INCS)
 getenver.o:		getenver.cc		getenver.h		$(INCS)
