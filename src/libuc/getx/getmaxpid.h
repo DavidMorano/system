@@ -34,7 +34,7 @@
 	<0		error (system-return)
 
 	Notes:
-	+ We try to get a dynamic value if we can, otherwise we let
+	+ I try to get a dynamic value if we can, otherwise we let
 	the system itself guess (w/ PID_MAX), thereafter we guess
 	with our own value.  There is no dynamic value (that we know
 	of) for the maximum "system" PID.
@@ -47,10 +47,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
