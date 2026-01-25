@@ -65,9 +65,10 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<getnodedomain.h>
 #include	<snx.h>
 #include	<snwcpy.h>
@@ -114,6 +115,11 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_addrinfoget(cchar *,cchar *,CADDRINFO *,ADDRINFO **) noex ;
+    extern int uc_addrinfofree(ADDRINFO *) noex ;
+}
 
 
 /* local structures */
@@ -166,7 +172,7 @@ static constexpr int	(*tries[])(SI *) = {
 	nullptr
 } ;
 
-static bufsizevar		maxhostlen(getbufsize_hn) ;
+static bufsizevar		maxhostlen(bufsize_hn) ;
 
 
 /* exported variables */
@@ -232,14 +238,14 @@ static int subinfo_domain(SI *mip) noex {
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
 	if (mip->domainname == nullptr) {
-	    if (char *dbuf ; (rs = malloc_hn(&dbuf)) >= 0) {
+	    if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
 	        if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
 	            len = lenstr(dbuf) ;
 	            if (cchar *dp ; (rs = libmem.strw(dbuf,len,&dp)) >= 0) {
 	                mip->domainname = dp ;
 		    } /* end if (memory-allocation) */
 	        } /* end if (getnodedomain) */
-		rs1 = malloc_free(dbuf) ;
+		rs1 = lm_free(dbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
@@ -293,7 +299,7 @@ static int try_add(SI *mip) noex {
 	            if ((rs = subinfo_domain(mip)) >= 0) {
 			cchar	*dn = mip->domainname ;
 			cchar	*hn = aip->hostname ;
-	                if (char *hbuf ; (rs = malloc_hn(&hbuf)) >= 0) {
+	                if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) {
 			    cint	hlen = rs ;
 	                    char	*bp = hbuf ;
 	                    if (mip->ehostname != nullptr) {
@@ -311,7 +317,7 @@ static int try_add(SI *mip) noex {
 				    rs = SR_OK ;
 			        }
 	                    } /* end if (snsds) */
-			    rs1 = malloc_free(hbuf) ;
+			    rs1 = lm_free(hbuf) ;
 			    if (rs >= 0) rs = rs1 ;
 			} /* end if (m-a-f) */
 	            } /* end if (subinfo_domain) */
@@ -336,7 +342,7 @@ static int try_rem(SI *mip) noex {
 	                if (isindomain(aip->hostname,mip->domainname)) {
 	                    int		hl = intconv(tp - aip->hostname) ;
 			    cchar	*hn = aip->hostname ;
-			    if (char *hbuf ; (rs = malloc_hn(&hbuf)) >= 0) {
+			    if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) {
 				cint	hlen = rs ;
 	    		        char	*bp = hbuf ;
 			        if (mip->ehostname != nullptr) {
@@ -354,7 +360,7 @@ static int try_rem(SI *mip) noex {
 				        rs = SR_OK ;
 			            }
 			        } /* end if (snwcpy) */
-				rs1 = malloc_free(&hbuf) ;
+				rs1 = lm_free(&hbuf) ;
 				if (rs >= 0) rs = rs1 ;
 			    } /* end if (m-a-f) */
 			} /* end if (isindomain) */
@@ -378,7 +384,7 @@ static int try_remlocal(SI *mip) noex {
 	            if (isindomain(aip->hostname,LOCALDOMAINNAME)) {
 	                int	hl = intconv(tp - aip->hostname) ;
 			cchar	*hn = aip->hostname ;
-	                if (char *hbuf ; (rs = malloc_hn(&hbuf)) >= 0) {
+	                if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) {
 			    cint	hlen = rs ;
 			    char	*bp = hbuf ;
 	    		    if (mip->ehostname != nullptr) {
@@ -396,7 +402,7 @@ static int try_remlocal(SI *mip) noex {
 				    rs = SR_OK ;
 			        }
 	                    } /* end if (snwcpy) */
-			    rs1 = malloc_free(&hbuf) ;
+			    rs1 = lm_free(&hbuf) ;
 			    if (rs >= 0) rs = rs1 ;
 			} /* end if (m-a-f) */
 	            } /* end if (isindomain) */
