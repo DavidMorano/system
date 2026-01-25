@@ -40,6 +40,17 @@ MODS +=
 LIBS +=
 
 
+OBJ0= pta.o lockrw.o
+OBJ1= ptc.o ptca.o
+OBJ2= ptm.o ptma.o
+OBJ3= ptrwa.o ptrwlock.o
+
+OBJA_UFILEDESC= obj0.o obj1.o
+OBJB_UFILEDESC= obj2.o obj3.o
+
+OBJ_UFILEDESC= obja.o objb.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
@@ -56,18 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= pta.o lockrw.o
-OBJ1= ptc.o ptca.o
-OBJ2= ptm.o ptma.o
-OBJ3= ptrwa.o ptrwlock.o
-
-OBJA_UFILEDESC= obj0.o obj1.o
-OBJB_UFILEDESC= obj2.o obj3.o
-
-OBJ_UFILEDESC= obja.o objb.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -98,7 +101,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_UFILEDESC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_UFILEDESC)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -114,23 +117,23 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA_UFILEDESC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_UFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB_UFILEDESC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_UFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 # POSIX Thread Attribute
