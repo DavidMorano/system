@@ -73,17 +73,23 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strstr(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucsysconf.h>
 #include	<timewatch.hh>
 #include	<vecstr.h>
 #include	<matostr.h>
 #include	<cfdecmf.h>
-#include	<isnot.h>
 #include	<mailvalues.hh>		/* |hostnamemult| + |nodenamemult| */
+#include	<bufsizes.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getbufsize.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import bufsizedata ;
 
 /* local defines */
 
@@ -123,7 +129,7 @@ namespace {
 	int zoneinfo(int) noex ;
 	int mailaddr(int) noex ;
     public:
-	int		bs[getbufsize_overlast] ; /* Buffer-Size */
+	int		bs[bufsize_overlast] ; /* Buffer-Size */
 	int operator [] (int) noex ;
     } ; /* end class (ubufsize) */
 } /* end namespace */
@@ -151,7 +157,7 @@ int getbufsize(int w) noex {
 
 int ubufsize::operator [] (int w) noex {
 	int		rs = SR_INVALID ;
-	if ((w >= 0) && (w < getbufsize_overlast)) {
+	if ((w >= 0) && (w < bufsize_overlast)) {
 	    if ((rs = bs[w]) == 0) {
 	        if ((rs = init()) >= 0) {
 	            rs = retrieve(w) ;
@@ -204,9 +210,9 @@ int ubufsize::load() noex {
 	int		rs1 ;
 	if (! floaded) {
 	    floaded = true ;
-	    if (vecstr cfv ; (rs = cfv.start(1,0)) >= 0) {
+	    if (vecstr cfv ; (rs = cfv.start(1,0)) >= 0) ylikely {
 	        cchar	*fn = GETBUFSIZE_CONF ;
-	        if ((rs = cfv.envfile(fn)) >= 0) {
+	        if ((rs = cfv.envfile(fn)) >= 0) ylikely {
 	            cchar	*kp ;
 	            for (int i = 0 ; cfv.get(i,&kp) >= 0 ; i += 1) {
 	                if (kp) {
@@ -223,14 +229,14 @@ int ubufsize::load() noex {
 	} /* end if (need load) */
 	return rs ;
 }
-/* end subroutine (getbufsize_load) */
+/* end subroutine (bufsize_load) */
 
 int ubufsize::loadent(cchar *kp) noex {
     	int		rs = SR_OK ;
 	int		kl = -1 ;
 	int		vl = 0 ;
 	cchar		*vp = nullptr ;
-	cchar		**vars = bufsizenames ;
+	cchar		**vars = bufsizes ;
 	if (cchar *tp ; (tp = strchr(kp,'=')) != nullptr) {
 	    kl = intconv(tp - kp) ;
 	    vp = (tp+1) ;
@@ -288,10 +294,10 @@ int ubufsize::def(int w) noex {
     	    bs[w] = (defval) ? defval : GETBUFSIZE_DEFVAL ;
 	} else {
 	    switch (w) {
-	    case getbufsize_zi:
+	    case bufsize_zi:
 		rs = zoneinfo(w) ;
 		break ;
-	    case getbufsize_mailaddr:
+	    case bufsize_mailaddr:
 		rs = mailaddr(w) ;
 	        break ;
 	    default:
@@ -306,7 +312,7 @@ int ubufsize::def(int w) noex {
 /* yes; I call myself recursively - repeatedly (deal with it) */
 int ubufsize::zoneinfo(int w) noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
 	    bs[w] = rs ;
 	}
 	return rs ;
@@ -318,14 +324,14 @@ int ubufsize::mailaddr(int w) noex {
     	cint		hostmult = mailvalue.hostnamemult ;
     	cint		nodemult = mailvalue.nodenamemult ;
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	if ((rs = getbufsize(bufsize_hn)) >= 0) ylikely {
 	    cint	hnl = rs ;
-	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_nn)) >= 0) ylikely {
 		cint	nnl = rs ;
 		rs = ((hostmult * hnl) + (nodemult * nnl)) ;
 		bs[w] = rs ;
 	    }
-	}
+	} /* end if (getbufsize) */
 	return rs ;
 }
 /* end method (ubufsize::mailaddr) */
