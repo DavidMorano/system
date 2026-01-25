@@ -1,10 +1,10 @@
 /* ptrwlock SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
-/* ** broken on SOLARIS®! ** */
 
 /* POSIX® Thread Read-Write Lock (PTRWLOCK) */
 /* version %I% last-modified %G% */
+/* ** broken on SOLARIS®! ** */
 
 
 /* revision history:
@@ -25,15 +25,12 @@
 	Description:
 	The supplied reader-writer lock implemetation (used within
 	this source file) on Solaris® (used within this source file)
-	is broken.  See alternative implementations.
-
-	This module provides a sanitized version of the standard
-	POSIX® reader-writer lock facility provided with some new
-	UNIX®i.  Some operating system problems are managed within
-	these routines for the common stuff that happens when a
-	poorly configured OS gets overloaded!
-
-	Enjoy!
+	is broken.  See alternative implementations.  This module
+	provides a sanitized version of the standard POSIX®
+	reader-writer lock facility provided with some new UNIX®i.
+	Some operating system problems are managed within these
+	routines for the common stuff that happens when a poorly
+	configured OS gets overloaded!  Enjoy!
 
 	Important note:
 
@@ -59,19 +56,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<pthread.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usupport.h>
+#include        <errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ptrwlock.h"
@@ -104,7 +96,7 @@
 
 /* local variables */
 
-constexpr int	mint = (1000/NLPS) ;
+constexpr int		mint = (1000 / NLPS) ;
 
 
 /* exported variables */
@@ -114,10 +106,12 @@ constexpr int	mint = (1000/NLPS) ;
 
 int ptrwlock_create(ptrwlock *psp,ptrwa *atp) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_init(psp,atp)) > 0) {
 		    rs = (- rs) ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
@@ -127,10 +121,12 @@ int ptrwlock_create(ptrwlock *psp,ptrwa *atp) noex {
 
 int ptrwlock_destroy(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_destroy(psp)) > 0) {
 		    rs = (- rs) ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
@@ -138,44 +134,46 @@ int ptrwlock_destroy(ptrwlock *psp) noex {
 }
 /* end subroutine (ptrwlock_destroy) */
 
-int ptrwlock_rdlock(ptrwlock *psp) noex {
+int ptrwlock_lockrd(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_rdlock(psp)) > 0) {
 		    rs = (- rs) ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptrwlock_rdlock) */
+/* end subroutine (ptrwlock_lockrd) */
 
-int ptrwlock_tryrdlock(ptrwlock *psp) noex {
+int ptrwlock_lockrdtry(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) {
 		    rs = (- rs) ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptrwlock_tryrdlock) */
+/* end subroutine (ptrwlock_lockrdtry) */
 
-int ptrwlock_rdlockto(ptrwlock *psp,int to) noex {
+int ptrwlock_lockrdto(ptrwlock *psp,int to) noex {
 	int		rs = SR_FAULT ;
-	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
-	if (psp) {
+	if (to < 0) to = (INT_MAX / (2 * NLPS)) ;
+	if (psp) ylikely {
 	    int		cto = (to*NLPS) ;
 	    int		c = 0 ;
 	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) {
 		    rs = (- rs) ;
-		}
-	        if (rs < 0) {
 		    switch (rs) {
 		    case SR_BUSY:
 		        if (++c < cto) {
@@ -190,51 +188,56 @@ int ptrwlock_rdlockto(ptrwlock *psp,int to) noex {
 		        f_exit = true ;
 		        break ;
 	            } /* end siwtch */
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
+		    f_exit = true ;
 	        } /* end if (error) */
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptrwlock_rdlockto) */
+/* end subroutine (ptrwlock_lockrdto) */
 
-int ptrwlock_wrlock(ptrwlock *psp) noex {
+int ptrwlock_lockwr(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_wrlock(psp)) > 0) {
-		   rs = (- rs) ;
+		    rs = (- rs) ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptrwlock_wrlock) */
+/* end subroutine (ptrwlock_lockwr) */
 
-int ptrwlock_trywrlock(ptrwlock *psp) noex {
+int ptrwlock_lockwrtry(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (psp) ylikely{
 	    repeat {
 	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) {
 		    rs = (- rs) ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptrwlock_trywrlock) */
+/* end subroutine (ptrwlock_lockwrtry) */
 
-int ptrwlock_wrlockto(ptrwlock *psp,int to) noex {
+int ptrwlock_lockwrto(ptrwlock *psp,int to) noex {
 	int		rs = SR_FAULT ;
-	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
-	if (psp) {
+	if (to < 0) to = (INT_MAX / (2 * NLPS)) ;
+	if (psp) ylikely{
 	    int		cto = (to*NLPS) ;
 	    int		c = 0 ;
 	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) {
 		    rs = (- rs) ;
-		}
-	        if (rs < 0) {
 		    switch (rs) {
 		    case SR_BUSY:
 		        if (++c < cto) {
@@ -247,24 +250,79 @@ int ptrwlock_wrlockto(ptrwlock *psp,int to) noex {
 		        f_exit = true ;
 		        break ;
 		    } /* end switch */
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
+		    f_exit = true ;
 	        } /* end if (error) */
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptrwlock_wrlockto) */
+/* end subroutine (ptrwlock_lockwrto) */
 
-int ptrwlock_unlock(ptrwlock *psp) noex {
+int ptrwlock_lockend(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
-	if (psp) {
+	if (psp) ylikely{
 	    repeat {
 	        if ((rs = pthread_rwlock_unlock(psp)) > 0) {
 		    rs = (- rs) ;
+		} else if (rs < 0) {
+		    rs = SR_NOANODE ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ptrwlock_unlock) */
+/* end subroutine (ptrwlock_lockend) */
+
+int ptrwlock::lockrdto(int a) noex {
+    	return ptrwlock_lockrdto(this,a) ;
+}
+
+int ptrwlock::lockwrto(int a) noex {
+    	return ptrwlock_lockwrto(this,a) ;
+}
+
+void ptrwlock::dtor() noex {
+	if (cint rs = ptrwlock_destroy(this) ; rs < 0) {
+	    ulogerror("ptrwlock",rs,"dtor-destroy") ;
+	}
+} /* end method (ptrwlock::dtor) */
+
+int ptrwlock_cr::operator () (ptrwa *ap) noex {
+    	int		rs ;
+	if ((rs = ptrwlock_create(op,ap)) >= 0) {
+	    op->magic = PTRWLOCK_MAGIC ;
+	}
+	return rs ;
+} /* end method (ptrwlock_cr::operator) */
+
+ptrwlock_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case ptrwlockmem_destroy:
+	        rs = ptrwlock_destroy(op) ;
+	        op->magic = PTRWLOCK_MAGIC ;
+	        break ;
+	    case ptrwlockmem_lockrd:
+	        rs = ptrwlock_lockrd(op) ;
+	        break ;
+	    case ptrwlockmem_lockrdtry:
+	        rs = ptrwlock_lockrdtry(op) ;
+	        break ;
+	    case ptrwlockmem_lockwr:
+	        rs = ptrwlock_lockwr(op) ;
+	        break ;
+	    case ptrwlockmem_lockwrtry:
+	        rs = ptrwlock_lockwrtry(op) ;
+	        break ;
+	    case ptrwlockmem_lockend:
+	        rs = ptrwlock_lockend(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (ptrwlock_co::operator) */
 
 
