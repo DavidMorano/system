@@ -68,12 +68,12 @@ module umisc ;
 
 /* forward references */
 
-static int cstrlcpy(char *dp,cchar *sp,int sl) noex {
+local int cstrlcpy(char *dp,cchar *sp,int sl) noex {
     	csize	ssize = size_t(sl) ;
 	return int(strlcpy(dp,sp,ssize)) ;
 }
 
-static int getrlen(int plen) noex {
+local int getrlen(int plen) noex {
     	int		rs = SR_INVALID ;
 	if (plen > 0) {
 	    rs = plen ;
