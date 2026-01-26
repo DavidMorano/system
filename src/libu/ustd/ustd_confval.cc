@@ -46,10 +46,9 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<errtimer.hh>
-#include	<sysconfcmds.h>
-#include	<intsat.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |intsat(3u)| */
 #include	<localmisc.h>
 
 #include	"ustd.h"
@@ -84,9 +83,6 @@
 
 /* exported subroutines */
 
-
-/* local subroutines */
-
 namespace ustd {
     int ustd_confval(int req,long *lp) noex {
 	int		rs ;
@@ -100,5 +96,8 @@ namespace ustd {
 	return rs ;
     } /* end subroutine (ustd_confval) */
 } /* end namespace (ustd) */
+
+
+/* local subroutines */
 
 
