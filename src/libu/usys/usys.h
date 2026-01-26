@@ -52,8 +52,12 @@
 #include	<usys_ufstype.h>
 #include	<usys_umaxmsglen.h>
 #include	<usys_pathpid.h>
+#include	<usys_plock.h>		/* defines |usys_plock()| */
 
-/* missing operating system calls */
+/* missing operating system calls or facilities */
+#include	<usys_project.h>
+#include	<usys_task.h>
+#include	<usys_shadow.h>
 #include	<usys_mqueue.h>
 #include	<usys_gethrtime.h>
 #include	<usys_getrandom.h>
@@ -66,6 +70,8 @@
 #include	<usys_pipes.h>
 #include	<usys_stat.h>
 #include	<usys_libstr.h>
+#include	<usys_isaexec.h>
+#include	<usys_fdatasync.h>
 
 
 #endif /* USYS_INCLUDE */
