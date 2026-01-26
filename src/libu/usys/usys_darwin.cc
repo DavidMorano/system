@@ -170,28 +170,13 @@ EXTERNC_end
 errno_t pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
 	errno_t		ec = EFAULT ;
 	if (op && mp) {
-	     ec = ENOSYS ;
+	    ec = ENOSYS ;
 	}
 	return ec ;
 }
 
 #endif /* (!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0) */
 /* RELTIMEDWAIT end */
-/*----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------*/
-/* MEMCNTL begin */
-errno_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
-	errno_t		ec = EFAULT ;
-	if (ma) {
-	    ec = EINVAL ;
-	    if (ms > 0) {
-		ec = ENOSYS ;
-	    }
-	}
-	return ec ;
-}
-/* MEMCNTL end */
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
