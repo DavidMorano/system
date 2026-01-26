@@ -24,7 +24,7 @@
 /*******************************************************************************
 
   	Group:
-	uclbmemalloc
+	um
 
 	Description:
 	This is the low-level component of the MEMALLOC facility.
@@ -96,6 +96,7 @@ namespace {
 /* exported variables */
 
 namespace libu {
+    umems	um ;
     umems	umem ;
 } /* end namespace (libu) */
 
@@ -106,16 +107,16 @@ namespace libu {
     int umems::strw(cchar *sp,int 탎l,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		bl = 0 ; /* return-value */
-	if (sp && rpp) {
-	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
-	        if (char *bp ; (rs = malloc((sl + 1),&bp)) >= 0) {
+	if (sp && rpp) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
+	        if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) ylikely {
 		    bl = sl ;
 	            *rpp = bp ;
 	            strncpy(bp,sp,sl) ;
 	            bp[bl] = '\0' ;
 	        } else {
 		    *rpp = nullptr ;
-	        } /* end if (malloc) */
+	        } /* end if (mall) */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? bl : rs ;
@@ -133,18 +134,18 @@ namespace libu {
     int umems::call(int ne,int esz,void *vp) noex {
 	cint		sz = (ne * esz) ;
 	int		rs ;
-	if ((rs = malloc(sz,vp)) >= 0) {
+	if ((rs = mall(sz,vp)) >= 0) ylikely {
 	    memclear(vp,sz) ;
 	}
 	return (rs >= 0) ? sz : rs ;
     } /* end subroutine (umems::call) */
     int umems::rall(void *cp,int sz,void *vp) noex {
 	int		rs = SR_FAULT ;
-	if (cp) {
+	if (cp) ylikely {
 	    const uintptr_t	am = (szof(uintptr_t) - 1) ;
 	    const uintptr_t	v = uintptr_t(cp) ;
 	    rs = SR_BADFMT ;
-	    if ((v & am) == 0) {
+	    if ((v & am) == 0) ylikely {
 	        umgr	lmo(cp) ;
 	        lmo.m = &umgr::stdrealloc ;
 	        rs = lmo(sz,vp) ;
@@ -154,7 +155,7 @@ namespace libu {
     } /* end subroutine (umems::rall) */
     int umems::free(void *cp) noex {
 	int		rs = SR_FAULT ;
-	if (cp) {
+	if (cp) ylikely {
 	    umgr	lmo ;
 	    lmo.m = &umgr::stdfree ;
 	    rs = lmo(1,cp) ;
@@ -162,33 +163,18 @@ namespace libu {
 	return rs ;
     } /* end subroutine (umems::free) */
     int umems::rsfree(int rs,void *p) noex {
-	if (p) {
-    	    if (cint rs1 = free(p) ; rs >= 0) {
+	if (p) ylikely {
+    	    if (cint rs1 = free(p) ; rs >= 0) ylikely {
 		rs = rs1 ;
 	    }
 	} else {
     	    if (rs >= 0) rs = SR_FAULT ;
 	}
 	return rs ;
-    } /* end subroutine (ursfree) */
-} /* end namespace (libu) */
-
-namespace libu {
-    int umems::mallocstrw(cchar *sp,int 탎l,cchar **rpp) noex {
-    	return strw(sp,탎l,rpp) ;
-    }
+    } /* end subroutine (umems::rsfree) */
     int umems::malloc(int sz,void *vp) noex {
-    	return mall(sz,vp) ;
-    }
-    int umems::valloc(int sz,void *vp) noex {
-    	return vall(sz,vp) ;
-    }
-    int umems::calloc(int ne,int esz,void *vp) noex {
-    	return call(ne,esz,vp) ;
-    }
-    int umems::ralloc(void *cp,int sz,void *vp) noex {
-    	return rall(cp,sz,vp) ;
-    }
+	return mall(sz,vp) ;
+    } /* end subroutine (umems::malloc) */
 } /* end namespace (libu) */
 
 
@@ -200,9 +186,9 @@ int umgr::operator () (int sz,void *vp) noex {
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
 	reterr		r ;
 	int     	rs = SR_FAULT ;
-	if (vp) {
+	if (vp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sz > 0) {
+	    if (sz > 0) ylikely {
 	        repeat {
 	            if ((rs = (this->*m)(sz,vp)) < 0) {
 		        r(rs) ;			/* <- default causes exit */
@@ -233,7 +219,7 @@ int umgr::stdmalloc(int sz,void *vp) noex {
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
-	if (void *rp ; (rp = malloc(msize)) != nullptr) {
+	if (void *rp ; (rp = malloc(msize)) != nullptr) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -248,7 +234,7 @@ int umgr::stdvalloc(int sz,void *vp) noex {
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
-	if (void *rp ; (rp = valloc(msize)) != nullptr) {
+	if (void *rp ; (rp = valloc(msize)) != nullptr) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -264,7 +250,7 @@ int umgr::stdrealloc(int sz,void *vp) noex {
 	void		**rpp = voidpp(vp) ;
 	int		rs ;
 	errno = 0 ;
-	if (void *rp ; (rp = realloc(fvp,msize)) != nullptr) {
+	if (void *rp ; (rp = realloc(fvp,msize)) != nullptr) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -278,7 +264,7 @@ int umgr::stdfree(int,void *vp) noex {
 	const uintptr_t	am = (szof(uintptr_t) - 1) ;
     	const uintptr_t	a = uintptr_t(vp) ;
 	int		rs = SR_BADFMT ;
-	if ((a & am) == 0) {
+	if ((a & am) == 0) ylikely {
 	    rs = SR_OK ;
 	    free(vp) ;
 	}
