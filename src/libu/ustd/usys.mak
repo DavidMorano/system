@@ -45,22 +45,28 @@ OBJ01_USYS= usys_sunos.o
 OBJ02_USYS= usys_darwin.o usys_darwinexec.o usys_darwinargz.o
 OBJ03_USYS= usys_linux.o 
 
-OBJ04_USYS= usys_pathpid.o usysargz.o
-OBJ05_USYS= usys_ttynamerp.o 
+OBJ04_USYS= usys_pathpid.o usys_project.o usys_task.o
+OBJ05_USYS= usys_ttynamerp.o usysargz.o
 OBJ06_USYS= usys_stime.o usys_resolvepath.o usys_waitid.o
 OBJ07_USYS= usys_sigx.o usys_streams.o usys_getexecname.o
 
-OBJ08_USYS= usys_pipes.o usys_umaxmsglen.o
+OBJ08_USYS= usys_pipes.o usys_umaxmsglen.o usys_plock.o
 OBJ09_USYS= usys_ufcntl.o usys_ugetdents.o usys_ugetnisdom.o
 OBJ10_USYS= usys_usendfile.o usys_ufstype.o usys_libstr.o
 OBJ11_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 
+OBJ12_USYS= usys_shadow.o usys_isaexec.o usys_fdatasync.o
+OBJ13_USYS=
+OBJ14_USYS=
+OBJ15_USYS=
+
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
 OBJC= obj06_usys.o obj07_usys.o obj08_usys.o
-OBJD= obj09_usys.o obj10_usys.o obj11_usys.o
+OBJD= obj09_usys.o obj10_usys.o obj11_usys.o 
+OBJE= obj12_usys.o
 
-OBJ_USYS= obja.o objb.o objc.o objd.o
+OBJ_USYS= obja.o objb.o objc.o objd.o obje.o
 
 
 INCDIRS=
@@ -165,6 +171,19 @@ obj11_usys.o:	$(OBJ11_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj12_usys.o:	$(OBJ12_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj13_usys.o:	$(OBJ13_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj14_usys.o:	$(OBJ14_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj15_usys.o:	$(OBJ15_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:		$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -175,6 +194,18 @@ objc.o:		$(OBJC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objd.o:		$(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obje.o:		$(OBJE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objf.o:		$(OBJF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objg.o:		$(OBJG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objh.o:		$(OBJH)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -195,14 +226,17 @@ usys_usendfile.o:	usys_usendfile.cc usys_usendfile.h		$(INCS)
 usys_ufstype.o:		usys_ufstype.cc usys_ufstype.h			$(INCS)
 usys_pathpid.o:		usys_pathpid.cc usys_pathpid.h			$(INCS)
 usys_umaxmsglen.o:	usys_umaxmsglen.cc	usys_umaxmsglen.h	$(INCS)
+usys_plock.o:		usys_plock.cc		usys_plock.h		$(INCS)
 usysargz.o:		usysargz.cc usysargz.hh				$(INCS)
 
-# missing operating system calls
-usys_mqueue.o:		usys_mqueue.cc usys_mqueue.h			$(INCS)
+# missing operating system calls or facilities
+usys_task.o:		usys_task.cc	usys_task.h			$(INCS)
+usys_project.o:		usys_project.cc usys_project.h			$(INCS)
+usys_shadow.o:		usys_shadow.cc	usys_shadow.h			$(INCS)
+usys_mqueue.o:		usys_mqueue.cc	usys_mqueue.h			$(INCS)
 usys_gethrtime.o:	usys_gethrtime.cc usys_gethrtime.h		$(INCS)
 usys_getrandom.o:	usys_getrandom.cc usys_getrandom.h		$(INCS)
 usys_ttynamerp.o:	usys_ttynamerp.cc usys_ttynamerp.h		$(INCS)
-usys_stime.o:		usys_stime.cc usys_stime.h			$(INCS)
 usys_resolvepath.o:	usys_resolvepath.cc usys_resolvepath.h		$(INCS)
 usys_waitid.o:		usys_waitid.cc usys_waitid.h			$(INCS)
 usys_sigx.o:		usys_sigx.cc usys_sigx.h			$(INCS)
@@ -211,5 +245,8 @@ usys_pipes.o:		usys_pipes.cc usys_pipes.h			$(INCS)
 usys_stat.o:		usys_stat.cc usys_stat.h			$(INCS)
 usys_libstr.o:		usys_libstr.cc usys_libstr.h			$(INCS)
 usys_getexecname.o:	usys_getexecname.cc getexecname.h		$(INCS)
+usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
+usys_isaexec.o:		usys_isaexec.cc		usys_isaexec.h		$(INCS)
+usys_datasync.o:	usys_fdatasync.cc	usys_fdatasync.h	$(INCS)
 
 
