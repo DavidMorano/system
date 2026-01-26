@@ -43,12 +43,9 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdarg>		/* |va_list(3c)| + |va_arg(3c)| */
-#include	<cstring>		/* |memset(3c)| + |strlcpy(3c)| */
+#include	<cstring>		/* |strlcpy(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"usupport_sncpyx.h"
@@ -58,9 +55,6 @@
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
