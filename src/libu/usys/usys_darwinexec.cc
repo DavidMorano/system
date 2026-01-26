@@ -112,7 +112,7 @@
 #define	MAXPATH		(4 * 1024)
 
 import libutil ;			/* |lenstr(3u)| */
-import umisc ;				/* |strbasename(3u)| + |mknpath(3u)| */
+import umisc ;				/* |mknpath(3u)| */
 import usysbasic ;
 
 using libu::sncpy ;			/* subroutine (usupport) */
