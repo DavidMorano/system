@@ -40,6 +40,15 @@ MODS +=
 LIBS +=
 
 
+OBJ0= usysconf0.o usysconf1.o
+OBJ1=
+
+OBJA= obj0.o
+OBJB=
+
+OBJ= obja.o
+
+
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
@@ -56,15 +65,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= usysconf0.o usysconf1.o
-OBJ1=
-
-OBJA= obj0.o
-
-OBJ= obja.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -77,6 +78,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
