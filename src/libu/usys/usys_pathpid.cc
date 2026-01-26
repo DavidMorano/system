@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* define various sytem (global) variables */
+/* support for LIBPROC |pathpid()| function */
 /* version %I% last-modified %G% */
 
 
@@ -87,7 +87,7 @@ namespace usys {
     } /* end subroutine (darwin_namepid) */
 } /* end namespace */
 
-#else
+#else /* USTS_PATHPID */
 
 namespace usys {
     sysret_t usys_pathpid(char *obuf,int olen,pid_t) noex {
