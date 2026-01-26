@@ -46,9 +46,9 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<errtimer.hh>
-#include	<sysconfcmds.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |intsat(3u)| */
 #include	<localmisc.h>
 
 #include	"ustd.h"
@@ -85,9 +85,6 @@ constexpr size_t	minusone = -1uz ;
 
 /* exported subroutines */
 
-
-/* local subroutines */
-
 namespace ustd {
     int ustd_confstr(int req,char *rbuf,int rlen) noex {
     	size_t		res ; /* used-multiple */
@@ -99,7 +96,7 @@ namespace ustd {
 	    if (rbuf) {
 	        csize	rsize = size_t(rlen + 1) ;
 		rs = SR_OK ;
-		if ((res = confstr(req,rbuf,rsize)) == 0uz) {
+		if ((res = confstr(req,rbuf,rsize)) > 0uz) {
 	            if (res <= rsize) {
 	                len = intsat(res - 1) ;
 	            } else {
@@ -130,5 +127,8 @@ namespace ustd {
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (ustd_confstr) */
 } /* end namespace (ustd) */
+
+
+/* local subroutines */
 
 
