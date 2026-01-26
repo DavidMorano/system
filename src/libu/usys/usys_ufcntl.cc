@@ -108,6 +108,6 @@ namespace usys {
 	} /* end if (u_fcntl) */
 	return (rs >= 0) ? f_previous : rs ;
     } /* end subroutine (unonblock) */
-}
+} /* end namespace (usys) */
 
 
