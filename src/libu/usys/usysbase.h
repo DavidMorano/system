@@ -25,6 +25,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<ubufdefs.h>
+#include	<usys.h>
 
 
 #endif /* USYSBASE_INCLUDE */
