@@ -48,53 +48,59 @@ module ;
 export module ureserve:isx ;
 
 export {
-    bool	iswhite(int) noex ;
-    bool	isalnumlatin(int) noex ;
     bool	isalphalatin(int) noex ;
-    bool	isdict(int) noex ;
-    bool	ishexlatin(int) noex ;
+    bool	isalnumlatin(int) noex ;
+    bool	isdigexlatin(int) noex ;
+    bool	iswhitelatin(int) noex ;
     bool	islowerlatin(int) noex ;
     bool	isupperlatin(int) noex ;
-    bool	isprintbad(int) noex ;
     bool	isprintlatin(int) noex ;
     bool	isprintterm(int) noex ;
+    bool	isprintbad(int) noex ;
+    bool	isdict(int) noex ;
     bool	iscmdstart(int) noex ;
     bool	ishdrkey(int) noex ;
-    inline bool	isoctlatin(int ch) noex {
-	    return (ch >= '0') && (ch <= '7') ;
-    }
-    inline bool	isdigitlatin(int ch) noex {
+    constexpr inline bool	isdigitlatin(int ch) noex {
 	    return (ch >= '0') && (ch <= '9') ;
     }
-    inline bool	isdeclatin(int ch) noex {
+    constexpr inline bool	isdiglatin(int ch) noex {
+	    return (ch >= '0') && (ch <= '9') ;
+    }
+    constexpr inline bool	isoctlatin(int ch) noex {
+	    return (ch >= '0') && (ch <= '7') ;
+    }
+    constexpr inline bool	isdeclatin(int ch) noex {
     	    return isdigitlatin(ch) ;
     }
-    inline bool	isnumlatin(int ch) noex {
-    	    return ishexlatin(ch) || (ch == '\\') || (ch == 'x') ;
+    constexpr inline bool	ishexlatin(int ch) noex {
+    	    return isdigexlatin(ch) ;
     }
-    inline bool	isnumsign(int ch) noex {
+    constexpr inline bool	isnumlatin(int ch) noex {
+    	    return isdigexlatin(ch) || (ch == '\\') || (ch == 'x') ;
+    }
+    constexpr inline bool	isnumsign(int ch) noex {
 	    return ((ch == '+') || (ch == '-')) ;
     }
-    inline bool	iseol(int ch) noex {
+    constexpr inline bool	iseol(int ch) noex {
 	    return (ch == '\n') || (ch == '\r') ;
     }
-    inline bool	iszero(int ch) noex {
+    constexpr inline bool	iszero(int ch) noex {
 	    return (ch == '0') ;
     }
-    inline bool	isplusminus(int ch) noex {
+    constexpr inline bool	isplusminus(int ch) noex {
 	    return isnumsign(ch) ;
     }
-    inline bool	isabbr(int ch) noex {
+    constexpr inline bool	isabbr(int ch) noex {
 	    ch &= UCHAR_MAX ;
 	    return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
     }
-    inline bool	isblanklatin(int ch) noex {
+    constexpr inline bool	isblanklatin(int ch) noex {
 	    return (ch == ' ') || (ch == '\t') ;
     }
-    inline bool	isspacetab(int ch) noex {
+    constexpr inline bool	isspacetab(int ch) noex {
 	    return isblank(ch) ;
     }
-    inline bool	isAbbr(int ch) noex {
+    constexpr inline bool	isAbbr(int ch) noex {
     	    return isabbr(ch) ;
     }
 } /* end export */
