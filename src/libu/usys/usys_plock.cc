@@ -31,6 +31,7 @@
 
 	Arguments:
 	cmd		one of:
+    				MLOCKP_NON
     				MLOCKP_ALL
     				MLOCKP_TXT
     				MLOCKP_DAT
@@ -41,7 +42,7 @@
 
   	Notes:
 
-	1. This subroutine (below) Emulates the Solaris® |plock(2)|
+	1. This subroutine (below) emulates the Solaris® |plock(2)|
 	system call using the standard POSIX® (and Linux) |mlockall(2)|
 	and |munlockall(2)| system calls.
 
@@ -65,8 +66,18 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usysflag.h>
 #include	<localmisc.h>
+
+#include	"usys_plock.h"
+
 
 /* local defines */
 
@@ -105,12 +116,12 @@ namespace usys {
     	case MLOCKP_ALL:
     	case MLOCKP_TXT:
     	case MLOCKP_DAT:
-            /*
+            /****
     		For locking, calling:
     			mlockall(MCL_CURRENT | MCL_FUTURE) 
     		is the standard way to achieve the comprehensive
     		locking that |plock()| provides.
-	    */
+	    ****/
             flags = (MCL_CURRENT | MCL_FUTURE) ;
             if (mlockall(flags) == -1) {
                 rc = -1 ; /* ERRNO is set by |mlockall()| */
