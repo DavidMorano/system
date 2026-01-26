@@ -8,19 +8,15 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	USUPPOETSNCPYX_INCLUDE
-#define	USUPPOETSNCPYX_INCLUDE
+#ifndef	USUPPORTSNCPYX_INCLUDE
+#define	USUPPORTSNCPYX_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
-
-#ifdef	__cplusplus
 
 namespace libu {
     extern int sncpyx(char *,int,int,...) noex ;
@@ -36,7 +32,8 @@ namespace libu {
     inline int sncpy4(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4) noex {
 	return sncpyx(dp,dl,4,s1,s2,s3,s4) ;
     }
-    inline int sncpy5(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
+    inline int sncpy5(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
+	    cc *s5) noex {
 	return sncpyx(dp,dl,5,s1,s2,s3,s4,s5) ;
     }
     inline int sncpy6(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,
@@ -45,14 +42,13 @@ namespace libu {
     }
     template<typename ... Args>
     inline int sncpy(char *dp,int dl,Args ... args) noex {
-        cint            na = npack(Args) ;
+        cint	na = npack(Args) ;
         return sncpyx(dp,dl,na,args ...) ;
     }
 } /* end namespace (libu) */
 
+
 #endif /* __cplusplus */
-
-
-#endif /* USUPPOETSNCPYX_INCLUDE */
+#endif /* USUPPORTSNCPYX_INCLUDE */
 
 
