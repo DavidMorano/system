@@ -51,7 +51,7 @@ struct usys_mtime {
 	static mtime_t operator () () noex {
 	    return umtime() ;
 	} ;
-} ; /* end struct (getustime) */
+} ; /* end struct (usys_mtime) */
 
 extern usys_mtime	getusmtime ;
 
@@ -71,10 +71,10 @@ namespace libu {
 	static time_t operator () () noex {
 	    return time(nullptr) ;
 	} ;
-   } ; /* end struct (getustime) */
-}
+    } ; /* end struct (getustime) */
+} /* end namespace (libu) */
 
-extern libu::ugetustime	getustime ;
+extern libu::ugetustime		getustime ;
 
 #endif /* __cplusplus */
 #endif /* OBJECT_GETUSTIME */
