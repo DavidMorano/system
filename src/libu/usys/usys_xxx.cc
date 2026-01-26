@@ -44,7 +44,7 @@
 
 /*----------------------------------------------------------------------------*/
 /* USERATTR begin */
-#if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
+#if	(! defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
 
 EXTERNC_begin
 
@@ -81,8 +81,56 @@ userattr *getuseruid(uid_t) noex {
 
 EXTERNC_end
 
-#endif /* (!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
+#endif /* (! defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
 /* USERATTR end */
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+/* MEMCNTL begin */
+#if	(! defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0)
+
+EXTERNC_begin
+
+unixret_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
+	errno_t		ec = EFAULT ;
+	if (ma) {
+	    ec = EINVAL ;
+	    if (ms > 0) {
+		ec = ENOSYS ;
+	    }
+	}
+	errno = ec ;
+	return -1 ;
+} /* end subroutine (memcntl) */
+
+EXTERNC_end
+
+#endif /* (! defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
+/* MEMCNTL end */
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+/* MEMINHERIT begin */
+#if	(! defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0)
+
+EXTERNC_begin
+
+unixret_t minherit(void *ma,size_t ms,int cmd) noex {
+	errno_t		ec = EFAULT ;
+	if (ma) {
+	    ec = EINVAL ;
+	    if ((ms > 0) && (cmd >= 0)) {
+		ec = ENOSYS ;
+	    }
+	}
+	errno = ec ;
+	return -1 ;
+} /* end subroutine (memcntl) */
+
+EXTERNC_end
+
+#endif /* (! defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0) */
+/* MEMINHERIT end */
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
@@ -91,10 +139,14 @@ EXTERNC_end
 
 EXTERNC_begin
 
-int plock(int) noex {
-	errno = ENOSYS ;
+unixret_t plock(int cmd) noex {
+    	errno_t		ec = EINVAL ;
+	if (cmd >= 0) {
+	    ec = ENOSYS ;
+	}
+	errno = ec ;
 	return -1 ;
-}
+} /* end subroutine (plock) */
 
 EXTERNC_end
 
@@ -107,22 +159,23 @@ EXTERNC_end
 #if	(! defined(SYSHAS_LOADAVGINT)) || (SYSHAS_LOADAVGINT == 0)
 #ifdef	__cplusplus /* C++ only! */
 namespace usys {
-    unixret_t kloadavg(int *la,int n) noex {
+    sysret_t kloadavg(int *la,int n) noex {
     	int		rs = SR_FAULT ;
 	if (la) {
 	    rs = SR_INVALID ;
-	    if ((n >= 0) && (n < 3)) {
+	    if ((n >= 0) && (n < 3)) { /* <- max 3 entries */
     	        rs = SR_NOSYS ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
     	return rs ;
-    }
+    } /* end subroutine (kloadavg) */
 } /* end namespec (usys) */
 #endif /* __cplusplus (C++ only) */
 #endif /* (! defined(SYSHAS_LOADAVGINT)) || (SYSHAS_LOADAVGINT == 0) */
 /* LOADAVGINT end */
 /*----------------------------------------------------------------------------*/
 
+/* this ( |strochr(3c)| ) is the companion subroutine of |strrchr(3c)| */
 #ifndef	SUBROUTINE_STROCHR
 #define	SUBROUTINE_STROCHR
 EXTERNC_begin
@@ -131,14 +184,5 @@ extern char *strochr(cchar *sp,int sch) noex {
 }
 EXTERNC_end
 #endif /* SUBROUTINE_STROCHR */
-
-#ifndef	SUBROUTINE_STRBRK
-#define	SUBROUTINE_STRBRK
-EXTERNC_begin
-extern char *strbrk(cchar *sp,cchar *ss) noex {
-    	return strpbrk(sp,ss) ;
-}
-EXTERNC_end
-#endif /* SUBROUTINE_STRBRK */
 
 
