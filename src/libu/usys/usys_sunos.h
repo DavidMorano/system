@@ -84,7 +84,7 @@ typedef userattr_t	userattr ;
 #define	SUBROUTINE_KLOADAVG
 #ifdef	__cplusplus /* C++ only! */
 namespace usys {
-    extern unixret_t kloadavg(int *,int) noex ;
+    extern sysret_t kloadavg(int *,int) noex ;
 }
 #endif /* __cplusplus (C++ only) */
 #endif /* SUBROUTINE_KLOADAVG */
