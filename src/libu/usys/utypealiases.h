@@ -23,46 +23,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/mount.h>		/* for |USTATFS| */
-#include	<sys/utsname.h>
-#include	<sys/uio.h>
-#include	<sys/times.h>		/* for |struct tms| */
-#include	<sys/time.h>		/* for |u_adjtime(3u)| */
-#include	<sys/timeb.h>		/* for |uc_ftime(3uc)| */
-#include	<sys/resource.h>
-#include	<sys/stat.h>
-#include	<sys/statvfs.h>
-#include	<sys/socket.h>
-#include	<sys/shm.h>		/* UNIX® Sys-V IPC - Shared-Memory */
-#include	<sys/msg.h>		/* UNIX® Sys-V IPC - Message-Queues */
-#include	<sys/sem.h>		/* UNIX® Sys-V IPC - Semaphores */
-
-#if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
-#include	<sys/acl.h>
-#endif
-
-#include	<ucontext.h>
-#include	<poll.h>
-#include	<signal.h>
-#include	<limits.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<utime.h>		/* for |u_utime(2)| */
-#include	<pthread.h>
-#include	<termios.h>
-#include	<time.h>
-#include	<errno.h>
-#include	<dirent.h>
-#include	<netdb.h>
-#include	<pwd.h>
-#include	<grp.h>
-
-#include	<stdintx.h>
-#include	<clanguage.h>
-#include	<usysdefs.h>
+#include	<usysnative.h>
+#include	<clanguage.h>		/* <- necessary inclusion */
 
 
 /* UNIX® kernal structures */
@@ -182,6 +144,10 @@
 
 #ifndef	TMS
 #define	TMS		struct tms
+#endif
+
+#ifndef	TIMEZONE
+#define	TIMEZONE	struct timezone
 #endif
 
 #ifndef	TERMIOS
@@ -324,6 +290,10 @@
 
 #ifndef	CTMS
 #define	CTMS		const TMS
+#endif
+
+#ifndef	CTIMEZONE
+#define	CTIMEZONE	const TIMEZONE
 #endif
 
 #ifndef	CTERMIOS
@@ -504,7 +474,7 @@
 #define	CSYSDBSP	const SPWD
 #define	CSYSDBUA	const USERATTR
 #define	CSYSDBGR	const GROUP
-#define	CSYSDBPH	const PROJECT
+#define	CSYSDBPJ	const PROJECT
 #define	CSYSDBPR	const PROTOENT
 #define	CSYSDBNW	const NETENT
 #define	CSYSDBHO	const HOSTENT
