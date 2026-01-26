@@ -26,14 +26,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-/* STIME start */
-#if	defined(SYSHAS_STIME) && (SYSHAS_STIME > 0)
-
-#include	<unistd.h>		/* for SunOS */
-
-#else /* defined(SYSHAS_STIME) && (SYSHAS_STIME > 0) */
-
 #include	<sys/time.h>		/* type |timeval| */
 #include	<cerrno>
 #include	<ctime>
@@ -42,6 +34,19 @@
 #include	<utypealiases.h>
 
 #include	"usys_stime.h"
+
+/* STIME start */
+#if	defined(SYSHAS_STIME) && (SYSHAS_STIME > 0)
+/******************************************************************************/
+
+
+#include	<unistd.h>		/* for SunOS */
+
+
+/******************************************************************************/
+#else /* defined(SYSHAS_STIME) && (SYSHAS_STIME > 0) */
+/******************************************************************************/
+
 
 unixret_t stime(const time_t *tp) noex {
 	unixret_t	rc = -1 ;
@@ -53,8 +58,10 @@ unixret_t stime(const time_t *tp) noex {
 	    errno = EFAULT ;
 	} /* end if (non-null) */
 	return rc ;
-}
+} /* end subroutine (stime) */
 
+
+/******************************************************************************/
 #endif /* (!defined(SYSHAS_STIME)) || (SYSHAS_STIME == 0) */
 /* STIME end */
 
