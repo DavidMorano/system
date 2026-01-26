@@ -35,19 +35,25 @@ module ;
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<vector>
-#include	<string>
-#include	<iostream>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 #include	<localmisc.h>
 
 export module ureserve:charx ;
 
 export {
+    inline bool char_isdigit(int ch) noex {
+	return ((ch >= '0') && (ch <= '9')) ;
+    } ;
+    inline bool char_isdigex(int ch) noex {
+	bool f = false ;
+	f = f || ((ch >= '0') && (ch <= '9')) ;
+	f = f || ((ch >= 'A') && (ch <= 'F')) ;
+	f = f || ((ch >= 'a') && (ch <= 'f')) ;
+	return f ;
+    } ;
     bool char_iswhite(int) noex ;
     bool char_islc(int) noex ;
     bool char_isuc(int) noex ;
@@ -56,7 +62,16 @@ export {
 	return (ch == ' ') || (ch == '\t') ;
     }
     inline bool char_isdig(int ch) noex {
-	return ((ch >= '0') && (ch <= '9')) ;
+	return char_isdigit(ch) ;
+    }
+    inline bool char_isoct(int ch) noex {
+	return ((ch >= '0') && (ch <= '7')) ;
+    }
+    inline bool char_isdec(int ch) noex {
+	return char_isdigit(ch) ;
+    }
+    inline bool char_ishex(int ch) noex {
+	return char_isdigex(ch) ;
     }
 } /* end export */
 
