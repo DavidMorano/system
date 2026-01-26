@@ -20,7 +20,10 @@
 
 /*******************************************************************************
 
-	Name:
+  	Module:
+	digtab
+
+	Names:
 	getdig
     	digtab_enc
 
@@ -96,7 +99,7 @@ struct digtaber {
 	dig[i++] = uchar('ø') ;
     } ; /* end ctor (digtaber) */
     constexpr char operator [] (cint) const noex ;
-} ; /* end struct (digtab) */
+} ; /* end struct (digtaber) */
 
 
 /* forward references */
@@ -108,7 +111,7 @@ struct digtaber {
 /* exported variables */
 
 export {
-    constexpr digtaber	digtab ;
+    constexpr digtaber		digtab ;
 }
 
 
@@ -116,14 +119,22 @@ export {
 
 export {
     constexpr char digtab_enc(int v) noex {
-	return char(digtab.dig[v]) ;
+	cint idx = (v % maxbase) ;
+	return char(digtab.dig[idx]) ;
     } /* end subroutine (digtab_get) */
-    constexpr char getdig(int v) noex {
-	return char(digtab.dig[v]) ;
-    } /* end subroutine (getdig) */
     constexpr char digtaber::operator [] (cint v) const noex {
-	return dig[v] ;
-    }
+	cint idx = (v % maxbase) ;
+	return dig[idx] ;
+    } /* end method (digtaber::operator) */
+} /* end export */
+
+export {
+    extern "C" {
+        char getdig(int v) noex {
+	    cint idx = (v % maxbase) ;
+	    return char(digtab.dig[idx]) ;
+        } /* end subroutine (getdig) */
+    } /* end extern (C) */
 } /* end export */
 
 
