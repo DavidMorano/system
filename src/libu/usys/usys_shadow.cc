@@ -2,18 +2,18 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* define various sytem (global) variables */
+/* support for the UNIX® Shadow-Password facility */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2001-04-11, David A-D- Morano
+	= 1998-03-21, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -21,8 +21,8 @@
 	usys_shadow
 
 	Description:
-	Retrieve the full path-name of the executable file associated
-	with a given process PID.
+	These subroutines offer support for the UNIX® Shadow-Password
+	facility.
 
 	Synopsis:
 	int usys_shadow(char *rbuf,int rlen,pid_t pid) noex
@@ -53,64 +53,59 @@
 
 #include	"usys_shadow.h"
 
-/* USYS_SHADOW start */
-#if	defined(SYSHAS_LIBPROC) && (SYSHAS_LIBPROC > 0)
 
-#include	<libproc.h>		/* |proc_pidpath(3proc)| */
+#if	defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0)
+/******************************************************************************/
 
-namespace usys {
-    sysret_t usys_shadow(char *obuf,int olen,pid_t pid) noex {
-	int		rs = SR_FAULT ;
-	if (obuf) {
-	    rs = SR_INVALID ;
-	    if (olen > 0) {
-		if ((rs = proc_pidpath(pid,obuf,olen)) < 0) {
-		    rs = (- errno) ;
+
+/* *nothing* */
+
+
+/******************************************************************************/
+#else /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
+/******************************************************************************/
+
+
+/* Solaris® implementation */
+namespace solaris {
+    CSPWD *getspent_r(SPWD *sps,char *rbuf,int rlen) noex {
+    	SPWD		*rp = nullptr ;
+	int		ec = 0 ;
+	if (sps && rbuf) {
+	    if (rlen > 0) {
+		    ec = ENOSYS ;
+	    } else {
+		ec = EOVERFLOW ;
+	    }
+	} else {
+	    ec = EFAULT ;
+	}
+	if (ec) errno = ec ;
+	return rp ;
+    } /* end subroutine (getspent_r) */
+    CSPWD *getspnam_r(cchar *nam,SPWD *sps,char *rbuf,int rlen) noex {
+    	SPWD		*rp = nullptr ;
+	int		ec = 0 ;
+	if (nam && sps && rbuf) {
+	    if (rlen > 0) {
+		if (nam[0]) {
+		    ec = ENOSYS ;
+		} else {
+		    ec = EINVAL ;
 		}
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-    } /* end subroutine (darwin_shadow) */
-    sysret_t usys_namepid(char *obuf,int olen,pid_t pid) noex {
-	int		rs = SR_FAULT ;
-	if (obuf) {
-	    rs = SR_INVALID ;
-	    if (olen > 0) {
-		if ((rs = proc_name(pid,obuf,olen)) < 0) {
-		    rs = (- errno) ;
-		}
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-    } /* end subroutine (darwin_namepid) */
-} /* end namespace */
+	    } else {
+		ec = EOVERFLOW ;
+	    }
+	} else {
+	    ec = EFAULT ;
+	}
+	if (ec) errno = ec ;
+	return rp ;
+    } /* end subroutine (getspnam_r) */
+} /* end namespace (solaris) */
 
-#else /* SYSHAS_SHADOW */
 
-namespace usys {
-    sysret_t usys_shadow(char *obuf,int olen,pid_t) noex {
-	int		rs = SR_FAULT ;
-	if (obuf) {
-	    rs = SR_INVALID ;
-	    if (olen > 0) {
-		rs = SR_NOSYS ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-    } /* end subroutine (darwin_shadow) */
-    sysret_t usys_namehpid(char *obuf,int olen,pid_t) noex {
-	int		rs = SR_FAULT ;
-	if (obuf) {
-	    rs = SR_INVALID ;
-	    if (olen > 0) {
-		rs = SR_NOSYS ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-    } /* end subroutine (darwin_namepid) */
-} /* end namespace */
-
-#endif /* defined(SYSHAS_LIBPROC) && (SYSHAS_LIBPROC > 0) */
+#endif /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
 /* SYSHAS_SHADOW finish */
 
 
