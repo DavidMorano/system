@@ -66,7 +66,7 @@ using libu::snwcpy ;
 
 /* forward references */
 
-static int getrlen(int plen) noex {
+local int getrlen(int plen) noex {
     	int		rs = SR_INVALID ;
 	if (plen > 0) {
 	    rs = plen ;
