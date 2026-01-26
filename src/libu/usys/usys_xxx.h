@@ -43,7 +43,6 @@
 #include	<unistd.h>		/* |dup2(2)| + |pipe2(2)| */
 #include	<signal.h>		/* <- |SIGEVENT| */
 #include	<pthread.h>
-#include	<time.h>
 #include	<string.h>		/* |strpbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -62,18 +61,30 @@
 
 /*----------------------------------------------------------------------------*/
 /* USERATTR begin */
-#if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
+#if	defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0)
+
+
+/* these systems should already somehow include 'secdb.h" from LIBSECDB */
+
+/* but it cannot hurt to do it again! */
+#include		<secdb.h>
+
+
+#else /* defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0) */
+
+/* this is placed locally on purpose (to get something moving) */
+#include		<secdb.h>
 
 #ifndef	STRUCT_USERATTR
 #define	STRUCT_USERATTR	
 #define	TYPEDEF_USERATTR
-	typedef struct userattr_s {
-		char   *name;
-		char   *qualifier;
-		char   *res1;
-		char   *res2;
-		kva_t  *attr;
-	} userattr ;
+typedef struct userattr_s {
+	char   *name ;
+	char   *qualifier ;
+	char   *res1 ;
+	char   *res2 ;
+	kva_t  *attr ;
+} userattr ;
 #endif /* STRUCT_USERATTR */
 
 #ifndef	SUBROUTINE_USERATTR
@@ -152,6 +163,23 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
+/* MEMINHERIT begin */
+#if	(!defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0)
+
+#ifndef	SUBROUTINE_MEMINHERIT
+#define	SUBROUTINE_MEMINHERIT
+EXTERNC_begin
+
+extern unixret_t minherit(void *,size_t,int) noex ;
+
+EXTERNC_end
+#endif /* SUBROUTINE_MEMINHERIT */
+
+#endif /* (!defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0) */
+/* MEMINHERIT end */
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
 /* MEMPLOCK begin */
 #if	(! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0)
 
@@ -200,7 +228,7 @@ EXTERNC_end
 #define	SUBROUTINE_KLOADAVG
 #ifdef	__cplusplus /* C++ only! */
 namespace usys {
-    extern unixret_t kloadavg(int *,int) noex ;
+    extern sysret_t kloadavg(int *,int) noex ;
 }
 #endif /* __cplusplus (C++ only) */
 #endif /* SUBROUTINE_KLOADAVG */
@@ -213,7 +241,6 @@ namespace usys {
 #ifndef	SUBROUTINE_STATFILE
 #define	SUBROUTINE_STATFILE
 EXTERNC_begin
-extern int pipe2(int *,int) noex ;
 static inline unixret_t statfile(cchar *fn,USTAT *sbp) noex {
     	return stat(fn,sbp) ;
 }
@@ -238,21 +265,14 @@ static inline unixret_t dupover(int sfd,int dfd) noex {
 EXTERNC_end
 #endif /* SUBROUTINE_DUPOVER */
 
-#ifndef	SUBROUTINE_PIPER
-#define	SUBROUTINE_PIPER
+#ifndef	SUBROUTINE_STRBRK
+#define	SUBROUTINE_STRBRK
 EXTERNC_begin
-static inline unixret_t piper(int *fds,int fl) noex {
-    	return pipe2(fds,fl) ;
+local inline char *strbrk(cchar *sp,cchar *sc) noex {
+    	return strpbrk(sp,sc) ;
 }
 EXTERNC_end
-#endif /* SUBROUTINE_PIPER */
-
-#ifndef	DECLARATION_STRBRK
-#define	DECLARATION_STRBRK
-EXTERNC_begin
-extern char *strbrk(cchar *,cchar *) noex ;
-EXTERNC_end
-#endif /* DECLARATION_STRBRK */
+#endif /* SUBROUTINE_STRBRK */
 
 
 #endif /* USYSXXX_INCLUDE */
