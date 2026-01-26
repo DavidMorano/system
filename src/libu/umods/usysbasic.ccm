@@ -24,12 +24,38 @@
   	Names:
 	uatfork
 	uatæxit
+    	ustatfile
+    	ustatfilefs
+    	ustatfilevfs
+    	ugetcwd
+    	uaccess
+    	udiraccess
+    	ugetstat
+    	ugetstatfs
+    	ugetstatvfs
 
 	Description:
 	I am providing a few basic library calls for use in these
 	other low-level subroutines.  Unlike some other middleware
 	calls to the C-language library system, these are quite
 	straight-forward.
+
+	Synopsis:
+	int uatfork(...) noex
+	int uatæxit(...) noex
+    	int ustatfile(cchar *,ustat *) noex
+    	int ustatfilefs(cchar *,ustatfs *) noex
+    	int ustatfilevfs(cchar *,ustatvfs *) noex
+    	int ugetcwd(char *,int) noex
+    	int uaccess(cchar *,int) noex
+    	int udiraccess(cchar *,int) noex
+    	int ugetstat(cchar *fn,ustat *sp) noex
+    	int ugetstatfs(cchar *fn,ustatfs *sp) noex
+    	int ugetstatvfs(cchar *fn,ustatvfs *sp) noex
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -41,7 +67,7 @@ module ;
 #include	<sys/statvfs.h>		/* |statvfs| */
 #include	<sys/stat.h>		/* |ustat| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
+#include	<utypedefs.h>		/* |void_f| */
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
