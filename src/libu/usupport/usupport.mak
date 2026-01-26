@@ -33,11 +33,22 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += usupport.h
+INCS += usupport.h usupport_sncpyx.h
 
 MODS +=
 
 LIBS +=
+
+
+OBJ0= usupport_prime.o usupport_sncpyx.o
+OBJ1= usupport_itimer.o usupport_hasx.o
+OBJ2= usupport_cfdec.o usupport_ctdec.o
+OBJ3= usupport_snwcpy.o
+
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
+
+OBJ= obja.o
 
 
 INCDIRS +=
@@ -56,16 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= usupport_main.o usupport_sncpyx.o
-OBJ1= usupport_itimer.o usupport_hasx.o
-OBJ2= usupport_cfdec.o usupport_ctdec.o
-
-OBJA= obj0.o obj1.o obj2.o
-
-OBJ= obja.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -78,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -143,12 +148,13 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
-usupport_main.o:	usupport_main.cc			$(INCS)
-usupport_itimer.o:	usupport_itimer.cc			$(INCS)
-usupport_sncpyx.o:	usupport_sncpyx.cc			$(INCS)
-usupport_cfdec.o:	usupport_cfdec.cc			$(INCS)
-usupport_ctdec.o:	usupport_ctdec.cc			$(INCS)
-usupport_hasx.o:	usupport_hasx.cc			$(INCS)
-
+uhupport_prime.o:	usupport_prime.cc	usupport_prime.h	$(INCS)
+usupport_itimer.o:	usupport_itimer.cc	usupport_itimer.h	$(INCS)
+usupport_sncpyx.o:	usupport_sncpyx.cc	usupport_sncpyx.h	$(INCS)
+usupport_cfdec.o:	usupport_cfdec.cc	usupport_cfdec.h	$(INCS)
+usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.h	$(INCS)
+usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.h		$(INCS)
+usupport_ctdec.o:	usupport_ctdec.cc	usupport_ctdec.h	$(INCS)
+usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.h	$(INCS)
 
 
