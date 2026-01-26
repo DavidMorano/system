@@ -36,11 +36,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<dirent.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<dirent.h>
+
 
 #if	(!defined(SYSHAS_TYPEDIRENT)) || (SYSHAS_TYPEDIRENT == 0)
 
