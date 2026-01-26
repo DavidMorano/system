@@ -104,12 +104,12 @@ constexpr inline cbool		f_machsubc = F_SUBC ;
 
 template<typename UT> constexpr inline uint mach_addone(UT &r,UT v) noex {
 	r = v + 1 ;
-	return int((r < v) || (r == 0)) ;
+	return uint((r < v) || (r == 0)) ;
 } /* end subroutine (mach_addone) */
 
 template<typename UT> constexpr inline uint mach_subone(UT &r,UT v) noex {
 	r = v - 1 ;
-	return int((r < v) || (r == 0)) ;
+	return uint((r < v) || (r == 0)) ;
 } /* end subroutine (mach_subone) */
 
 export {
