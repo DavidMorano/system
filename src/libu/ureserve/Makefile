@@ -40,6 +40,26 @@ MODS +=
 LIBS +=
 
 
+OBJPARTA= ureserve-vecstr.o ureserve-charx.o 
+OBJPARTB= ureserve-isx.o ureserve-isnot.o 
+
+OBJPARTS= objparta.o objpartb.o
+
+OBJPART= objpart.o
+
+OBJ00= ureserve0.o 
+OBJ01= ureserve1.o ureserve2.o 
+OBJ02= ureserve3.o ureserve4.o
+OBJ03= 
+
+OBJA= obj00.o obj01.o obj02.o
+OBJB= 
+OBJC= 
+OBJD= 
+
+OBJ= obja.o 
+
+
 INCDIRS=
 
 LIBDIRS=
@@ -56,22 +76,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00= ureserve0.o ureserve1.o 
-OBJ01= ureserve2.o ureserve3.o
-OBJ02= ureserve4.o
-OBJ03= 
-
-OBJA= obj00.o obj01.o obj02.o
-OBJB= 
-OBJC= 
-OBJD= 
-OBJE= 
-OBJF= 
-
-OBJ= obja.o 
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -84,6 +89,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -101,8 +109,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ) Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+$(T).o:			$(OBJ) $(OBJPART) Makefile
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(OBJPART)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -122,26 +130,47 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ00)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj01.o:		$(OBJ01)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ01)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj02.o:		$(OBJ02)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ02)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj03.o:		$(OBJ03)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ03)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 objb.o:			$(OBJB)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+objc.o:			$(OBJC)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+objd.o:			$(OBJD)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
-ureserve0.o:		ureserve.ccm
+objparta.o:		$(OBJPARTA)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+objpartb.o:		$(OBJPARTB)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+objpart.o:		$(OBJPARTS)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+
+ureserve-charx.o:	ureserve-charx.ccm
+ureserve-isnot.o:	ureserve-isnot.ccm
+ureserve-isx.o:		ureserve-isx.ccm
+ureserve-vecstr.o:	ureserve-vecstr.ccm
+
+ureserve0.o:		ureserve.ccm $(OBJPART)
 	makemodule ureserve
 
 ureserve1.o:		ureserve1.cc ureserve.ccm
