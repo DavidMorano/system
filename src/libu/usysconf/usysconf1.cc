@@ -96,7 +96,6 @@ module usysconf ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::atomic_int ;			/* type */
 using libu::umaxmsglen ;		/* subroutine */
 using ustd::ustd_confval ;		/* subroutine */
@@ -177,6 +176,19 @@ constexpr size_t	minusone = -1uz ;
 
 
 /* exported subroutines */
+
+extern "C" {
+    int u_sysconfval(int cmd,long *rp) noex {
+        return usysconfval(cmd,rp) ;
+    }
+}
+
+extern "C" {
+    int u_sysconfstr(int cmd,char *rbuf,int rlen) noex {
+        return usysconfstr(cmd,rbuf,rlen) ;
+    }
+}
+
 
 extern "C++" {
     int usysconfval(int req,long *rp) noex {
