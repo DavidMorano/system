@@ -69,26 +69,26 @@ using std::bitset ;			/* type */
 
 /* local structures */
 
-constexpr int   chtablen = (UCHAR_MAX+1) ;
+constexpr int   chtablen = (UCHAR_MAX + 1) ;
 
 namespace {
     struct ischarinfo {
-	bitset<chtablen>	isprint ;
 	bitset<chtablen>	isalpha ;
 	bitset<chtablen>	isalnum ;
-	bitset<chtablen>	ishex ;
+	bitset<chtablen>	isdigex ;
+	bitset<chtablen>	isprint ;
 	bitset<chtablen>	isterm ;
 	constexpr void mkalpha(bitset<chtablen> &) noex ;
-	constexpr void mkisprint() noex ;
 	constexpr void mkisalpha() noex ;
 	constexpr void mkisalnum() noex ;
-	constexpr void mkishex() noex ;
+	constexpr void mkisdigex() noex ;
+	constexpr void mkisprint() noex ;
 	constexpr void mkisterm() noex ;
 	constexpr ischarinfo() noex {
-	    mkisprint() ;
 	    mkisalpha() ;
 	    mkisalnum() ;
-	    mkishex() ;
+	    mkisdigex() ;
+	    mkisprint() ;
 	    mkisterm() ;
 	} ; /* end ctor */
     } ; /* end struct (ischarinfo) */
@@ -101,25 +101,14 @@ constexpr void ischarinfo::mkalpha(bitset<chtablen> &s) noex {
 	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
 	    s.set(ch,true) ;
 	    s.set((ch + 0x20),true) ;
-	}
+	} /* end for */
 	for (int ch = 0xC0 ; ch < chtablen ; ch += 1) {
 	    s.set(ch,true) ;
-	}
+	} /* end for */
 	s.set(UC('×'),false) ;
 	s.set(UC('÷'),false) ;
 }
 /* end method (ischarinfo::mkalpha) */
-
-constexpr void ischarinfo::mkisprint() noex {
-    	for (int ch = 0 ; ch < chtablen ; ch += 1) {
-	    bool f = ((ch & 0x7f) >= 0x20) && (ch != CH_DEL) ;
-	    f = f || (ch == CH_TAB) ;
-	    if (f) {
-	        isprint.set(ch,true) ;
-	    }
-	}
-}
-/* end method (ischarinfo::mkisprint) */
 
 constexpr void ischarinfo::mkisalpha() noex {
     	mkalpha(isalpha) ;
@@ -130,20 +119,31 @@ constexpr void ischarinfo::mkisalnum() noex {
     	mkalpha(isalnum) ;
 	for (int ch = '0' ; ch <= '9' ; ch += 1) {
 	    isalnum.set(ch,true) ;
-	}
+	} /* end for */
 }
 /* end method (ischarinfo::mkisalnum) */
 
-constexpr void ischarinfo::mkishex() noex {
+constexpr void ischarinfo::mkisdigex() noex {
 	for (int ch = '0' ; ch <= '9' ; ch += 1) {
-	    ishex.set(ch,true) ;
-	}
+	    isdigex.set(ch,true) ;
+	} /* end for */
 	for (int ch = 'A' ; ch <= 'F' ; ch += 1) {
-	    ishex.set(ch,true) ;
-	    ishex.set((ch + 0x20),true) ;
-	}
+	    isdigex.set(ch,true) ;
+	    isdigex.set((ch + 0x20),true) ;
+	} /* end for */
 }
-/* end method (ischarinfo::mkishex) */
+/* end method (ischarinfo::mkisdigex) */
+
+constexpr void ischarinfo::mkisprint() noex {
+    	for (int ch = 0 ; ch < chtablen ; ch += 1) {
+	    bool f = ((ch & 0x7f) >= 0x20) && (ch != CH_DEL) ;
+	    f = f || (ch == CH_TAB) ;
+	    if (f) {
+	        isprint.set(ch,true) ;
+	    }
+	} /* end for */
+}
+/* end method (ischarinfo::mkisprint) */
 
 constexpr void ischarinfo::mkisterm() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
@@ -159,8 +159,10 @@ constexpr void ischarinfo::mkisterm() noex {
 	        f = f || (ch == CH_VT) || (ch == CH_FF) ;
 	        f = f || (ch == CH_SO) || (ch == CH_SI) ;
 	        f = f || (ch == CH_SS2) || (ch == CH_SS3) ;
-		if (f) isterm.set(ch,true) ;
-	    }
+		if (f) {
+		    isterm.set(ch,true) ;
+		}
+	    } /* end if */
 	} /* end for */
 } /* end method (ischarinfo::mkisterm) */
 
@@ -193,14 +195,23 @@ bool isalnumlatin(int ch) noex {
 }
 /* end subroutine (isalnumlatin) */
 
-bool ishexlatin(int ch) noex {
+bool isdigexlatin(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
-	    f = ischarx_data.ishex[ch] ;
+	    f = ischarx_data.isdigex[ch] ;
 	}
 	return f ;
 }
-/* end subroutine (ishexlatin) */
+/* end subroutine (isdigexlatin) */
+
+bool iswhitelatin(int ch) noex {
+	bool		f = false ;
+	if ((ch >= 0) && (ch < chtablen)) {
+	    f = char_iswhite(ch) ;
+	}
+	return f ;
+}
+/* end subroutine (iswhitelatin) */
 
 bool islowerlatin(int ch) noex {
 	bool		f = false ;
@@ -242,15 +253,6 @@ bool isprintbad(int ch) noex {
 	return (! isprintlatin(ch)) ;
 }
 /* end subroutine (isprintbad) */
-
-bool iswhite(int ch) noex {
-	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
-	    f = char_iswhite(ch) ;
-	}
-	return f ;
-}
-/* end subroutine (iswhite) */
 
 bool isdict(int ch) noex {
 	bool		f = false ;
