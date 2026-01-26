@@ -17,6 +17,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	usys_pipes
+
 	Note:
 	This needs to be emulated on Apple Darwin (since that OS
 	does not have this call).  For whatever reason, Apple Darwin
@@ -27,13 +30,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-/* PIPES start */
-#if	(!defined(SYSHAS_PIPES)) || (SYSHAS_PIPES == 0)
-
 #include	<unistd.h>		/* |pipe(2)| */
 #include	<cerrno>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -44,39 +42,67 @@
 #include	"usys.h"
 #include	"usys_pipes.h"
 
+
+/* PIPES start */
+#if	defined(SYSHAS_PIPES) && (SYSHAS_PIPES > 0)
+/******************************************************************************/
+
+
+/* *nothing* */
+
+
+/******************************************************************************/
+#else /* defined(SYSHAS_PIPES) && (SYSHAS_PIPES > 0) */
+/******************************************************************************/
+
+
 using usys::ucloseonexec ;		/* subroutine */
 using usys::unonblock ;			/* subroutine */
 
+local int pipes_closeon(int *pipes,int of) noex {
+    	int		rs = SR_OK ;
+ 	if (of & O_CLOEXEC) {
+	    if ((rs = ucloseonexec(pipes[0],true)) >= 0) {
+		rs = ucloseonexec(pipes[1],true) ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (pipes_closeon) */
+    
+local int pipes_nonblock(int *pipes,int of) noex {
+    	int		rs = SR_OK ;
+	if (of & O_NONBLOCK) {
+	    if ((rs = unonblock(pipes[0],true)) >= 0) {
+		rs = unonblock(pipes[1],true) ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (pipes_nonblock) */
+    
 unixret_t pipe2(int *pipes,int of) noex {
 	unixret_t	rc = 0 ;
-	int		rl = 0 ;
 	if (pipes) {
 	    if ((rc = pipe(pipes)) >= 0) {
-		sysret_t	rs = SR_OK ;
-                if ((rs >= 0) && (of & O_CLOEXEC)) {
-                   if ((rs = ucloseonexec(pipes[0],true)) >= 0) {
-                       rs = ucloseonexec(pipes[1],true) ;
-                   }
-                }
-                if ((rs >= 0) && (of & O_NONBLOCK)) {
-                   if ((rs = unonblock(pipes[0],true)) >= 0) {
-                       rs = unonblock(pipes[1],true) ;
-                   }
-                }
+		int	rs ;
+		if ((rs = pipes_closeon(pipes,of)) >= 0) {
+		    rs = pipes_nonblock(pipes,of) ;
+		} /* end if (pipes_closeone) */
                 if (rs < 0) {
                     close(pipes[0]) ;
                     close(pipes[1]) ;
 		    errno = (- rs) ;
 		    rc = -1 ;
-                }
+                } /* end if (error) */
 	    } /* end if (pipe) */
 	} else {
 	    rc = -1 ;
 	    errno = EFAULT ;
 	} /* end if (non-null) */
-	return (rc >= 0) ? rl : rc ;
-}
+	return rc ;
+} /* end subroutine (pipe2) */
 
+
+/******************************************************************************/
 #endif /* (!defined(SYSHAS_PIPES)) || (SYSHAS_PIPES == 0) */
 /* PIPES end */
 
