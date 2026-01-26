@@ -40,8 +40,11 @@ MODS += umisc.ccm
 LIBS +=
 
 
+OBJPARTS += umisc-mknpathx.o umisc-mknpathxw.o
+OBJPARTS += umisc-pathnadd.o umisc-snadd.o
+
 OBJ00= umisc0.o umisc1.o umisc2.o umisc3.o
-OBJ01= umisc4.o umisc5.o umisc6.o umisc7.o
+OBJ01= umisc4.o umisc5.o umisc6.o
 OBJ02= 
 OBJ03= 
 
@@ -83,6 +86,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -99,8 +105,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ) Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+$(T).o:			$(OBJ) $(OBJPARTS) Makefile
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(OBJPARTS)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -139,7 +145,12 @@ objb.o:			$(OBJB)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
 
 
-umisc0.o:		umisc.ccm
+umisc-mknpathx.o:	umisc-mknpathx.ccm
+umisc-mknpathxw.o:	umisc-mknpathxw.ccm
+umisc-pathnadd.o:	umisc-pathnadd.ccm
+umisc-snadd.o:		umisc-snadd.ccm
+
+umisc0.o:		umisc.ccm $(OBJPARTS)
 	makemodule umisc
 
 umisc1.o:		umisc1.cc umisc.ccm
