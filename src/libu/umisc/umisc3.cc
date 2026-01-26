@@ -79,7 +79,7 @@ module umisc ;
 
 /* forward references */
 
-static int	local_pathadd(char *,int,int,cchar *,int) noex ;
+local int	local_pathadd(char *,int,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -125,7 +125,7 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 
 /* local subroutines */
 
-static int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
+local int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if ((pl > 0) && (pbuf[pl - 1] != '/')) {
 	    rs = snaddslash(pbuf,plen,pl) ;
