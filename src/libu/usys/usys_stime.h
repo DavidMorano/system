@@ -17,11 +17,11 @@
 
 /*******************************************************************************
 
+  	Description:
 	This file contains the UNIX® system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
 	the Apple Darwin operating system.
-
 
 *******************************************************************************/
 
@@ -37,12 +37,18 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-/* GETRANDOM begin */
-#if	defined(SYSHAS_GETRANDOM) && (SYSHAS_GETRANDOM > 0)
+/* STIME begin */
+#if	defined(SYSHAS_STIME) && (SYSHAS_STIME > 0)
+/******************************************************************************/
+
 
 /* SunOS (Solaris®) already has the |stime(2)| system call */
 
-#else /* defined(SYSHAS_GETRANDOM) && (SYSHAS_GETRANDOM > 0) */
+
+/******************************************************************************/
+#else /* defined(SYSHAS_STIME) && (SYSHAS_STIME > 0) */
+/******************************************************************************/
+
 
 #ifndef	SUBROUTINE_STIME
 #define	SUBROUTINE_STIME
@@ -54,8 +60,9 @@ EXTERNC_end
 #endif /* SUBROUTINE_STIME */
 
 
-#endif /* defined(SYSHAS_GETRANDOM) && (SYSHAS_GETRANDOM > 0) */
-/* GETRANDOM end */
+/******************************************************************************/
+#endif /* defined(SYSHAS_STIME) && (SYSHAS_STIME > 0) */
+/* STIME end */
 
 
 #endif /* USYSSTIME_INCLUDE */
