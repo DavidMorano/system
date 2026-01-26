@@ -33,15 +33,23 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-/* PIPES begin */
-#if	(!defined(SYSHAS_PIPES)) || (SYSHAS_PIPES == 0)
-
 #include	<sys/random.h>		/* |getentropy(2)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+
+/* PIPES begin */
+#if	defined(SYSHAS_PIPES) && (SYSHAS_PIPES > 0)
+/******************************************************************************/
+
+
+/* *nothing* */
+
+
+/******************************************************************************/
+#else /* defined(SYSHAS_PIPES) && (SYSHAS_PIPES > 0) */
+/******************************************************************************/
 
 
 /* the call is actually named |pipe2(2)| */
@@ -55,7 +63,8 @@ EXTERNC_end
 #endif /* SUBROUTINE_PIPES */
 
 
-#endif /* (!defined(SYSHAS_PIPES)) || (SYSHAS_PIPES == 0) */
+/******************************************************************************/
+#endif /* defined(SYSHAS_PIPES) && (SYSHAS_PIPES > 0) */
 /* PIPES end */
 
 
