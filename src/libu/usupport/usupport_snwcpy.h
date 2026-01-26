@@ -27,7 +27,7 @@
 
 
 namespace libu {
-    extern int snwcpy(char *dp,int dl,cchar *sp,int sl) noex ;
+    extern int snwcpy(char *,int,cchar *,int = -1) noex ;
 } /* end namespace (libu) */
 
 
