@@ -33,7 +33,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system-types */
+#include	<sys/types.h>		/* system-types + |pid_t| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
