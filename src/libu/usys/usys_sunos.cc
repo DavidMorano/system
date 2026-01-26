@@ -77,10 +77,16 @@ sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 #if	defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0)
 #ifdef	__cplusplus /* C++ only! */
 namespace usys {
-    unixret_t kloadavg(int *la,int n) noex {
-	return __getloadavg(la,n) ;
-    }
-}
+    sysret_t kloadavg(int *la,int n) noex {
+	int		rs = SR_FAULT ;
+	if (la) {
+	    if ((rs = __getloadavg(la,n)) < 0) {
+		rs = (- errno) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+    } /* end subroutine (kloadavg) */
+} /* end namesapce (usys) */
 #endif /* __cplusplus (C++ only) */
 #endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 /* LOADAVGINT end */
