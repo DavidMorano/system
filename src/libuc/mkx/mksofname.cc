@@ -23,8 +23,26 @@
 	mksofname
 
 	Description:
-	This subroutine constructs a filename from various specified
-	components.
+	This subroutine constructs a full-path filename from various
+	specified components.
+
+	Synopsis:
+	int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex
+
+	Arguements:
+	rbuf		result buffer
+	dn		directory name
+	name		base-name
+	ext		extension
+
+	Returns:
+	>=0		result buffer length
+	<0		error (system-return)
+
+	See-also:
+	mksofname
+	mksoname
+	mkshlibname
 
 *******************************************************************************/
 
@@ -32,15 +50,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
-#include	"mkx.h"
+#include	"mksofname.h"
 
 
 /* local defines */
@@ -66,7 +81,7 @@
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
