@@ -2,19 +2,18 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* make the filename for a shared library (shared object) */
+/* make a Shared-Objext Name */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2008-07-01, David A­D­ Morano
-	This subroutine was originally written for Rightcore Network
-	Services (RNS).
+	- 2003-11-04, David A­D­ Morano
+	This subroutine was adopted for use from the DWD program.
 
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -22,26 +21,46 @@
 	mkshlibname
 
 	Description:
-	This subroutine formulates (makes) the file-name for a
-	shared library (shared object).
+	This subroutine creates (makes) a Shared-Object Name from
+	various components.
+
+	Synopsis:
+	int mkshlibname(char *rbuf,cchar *pre,cchar *base,cchar *ext) noex
+
+	Arguments:
+	rbuf		result buffer
+	pre		optional filename prefix
+	base		base-part of final filename
+	ext		optional extension resulting filename
+
+	Returns:
+	>=0		length of resulting buffer
+	<0		erro (system-return)
+
+	See-also:
+	mksofname
+	mksoname
+	mkshlibname
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<usupport.h>		/* |getustime(3u)| */
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
-#include	"mkx.h"
+#include	"mkshlibname.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -56,7 +75,7 @@ import libutil ;
 
 
 /* external variables */
-
+ 
 
 /* local structures */
 
@@ -64,9 +83,10 @@ import libutil ;
 /* forward references */
 
 
+
 /* local variables */
 
-static bufsizevar	maxnamelen(getbufsize_mn) ;
+static bufsizevar		maxnamelen(bufsize_mn) ;
 
 
 /* exported variables */
@@ -74,35 +94,33 @@ static bufsizevar	maxnamelen(getbufsize_mn) ;
 
 /* exported subroutines */
 
-int mkshlibname(char *shlibname,cchar *pnp,int pnl) noex {
-	int		rs = SR_FAULT ;
-	int		rl = 0 ;
-	if (shlibname && pnp) ylikely {
+int mkshlibname(char *rbuf,cchar *pre,cchar *base,cchar *ext) noex {
+    	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
+	if (rbuf && base) {
 	    rs = SR_INVALID ;
-	    if (pnp[0]) ylikely {
-	        cchar	*lc = "lib" ;
-		if (pnl < 0) pnl = lenstr(pnp) ;
-		if ((rs = maxnamelen) >= 0) ylikely {
-		    storebuf	sb(shlibname,rs) ;
-	            bool	f = ((pnl >= 3) && (strncmp(pnp,lc,3) == 0)) ;
-	            if (! f) {
-			rs = sb.strw(lc,3) ;
-	            }
-	            if (rs >= 0) ylikely {
-	                rs = sb.strw(pnp,pnl) ;
-	            }
-	            if (rs >= 0) ylikely {
-	                rs = sb.chr('.') ;
-	            }
-	            if (rs >= 0) ylikely {
-	                rs = sb.strw("so",2) ;
-	            }
-		    rl = sb ;
-		} /* end if (maxnamelen) */
+	    if (base[0]) {
+	        if ((rs = maxnamelen) >= 0) {
+    	            storebuf sb(rbuf,rs) ;
+	            if (pre && pre[0]) {
+		        if ((rs = sb.str(pre)) >= 0) {
+			    rs = sb.str("_") ;
+			}
+	            } /* end if (prefix) */
+	            if (rs >= 0) {
+			if ((rs = sb.str(base)) >= 0) {
+			    if (ext && ext[0]) {
+				if ((rs = sb.chr('.')) >= 0) {
+				    rs = sb.str(ext) ;
+				}
+			    } /* end if (extension) */
+		            rl = sb.idx ;
+			} /* end if (base) */
+		    } /* end if (ok) */
+	        } /* end if (maxnamelen) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mkshlibname) */
+} /* end subroutine (mkshlibname) */
 
 
