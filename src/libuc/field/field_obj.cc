@@ -36,10 +36,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usupport.h>
 #include	<localmisc.h>
 
@@ -115,7 +112,7 @@ void field::dtor() noex {
 
 field_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case fieldmem_rem:
 	        rs = field_remaining(op,nullptr) ;
