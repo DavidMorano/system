@@ -42,7 +42,7 @@ LIBS +=
 
 DEPS_MAIN += ema_asstr.o ema_entry.o ema_parts.o
 
-OBJ0= ema_main.o ema_obj.o
+OBJ0= ema_prime.o ema_obj.o
 OBJ1= ema_parse.o ema_load.o
 OBJ2= ema_haveaddr.o ema_first.o
 OBJ3= $(DEPS_MAIN)
@@ -137,7 +137,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ema_main.o:		ema_main.cc $(DEPS_MAIN)		$(INCS)
+ema_prime.o:		ema_prime.cc $(DEPS_MAIN)		$(INCS)
 ema_parse.o:		ema_parse.cc $(DEPS_MAIN)		$(INCS)
 ema_load.o:		ema_load.cc $(DEPS_MAIN)		$(INCS)
 ema_obj.o:		ema_obj.cc				$(INCS)
