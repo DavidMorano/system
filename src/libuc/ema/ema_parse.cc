@@ -29,9 +29,11 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ascii.h>
-#include	<char.h>
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
 #include	"ema.h"
@@ -87,7 +89,7 @@ namespace ema_ns {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ; /* return-value */
-	if (parts pb ; (rs = pb.start(si_overlast)) >= 0) {
+	if (parts pb ; (rs = pb.start(si_overlast)) >= 0) ylikely {
 	    ema             *nlp = nullptr ;
 	    cchar           *orig ;
 	    int             sz ;
@@ -299,7 +301,7 @@ namespace ema_ns {
 	    if (! f_exit) {
 	        olen = intconv(srcp->sp - orig) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        if ((olen > 0) && ((rs = pb.len) > 0)) {
 	            n += 1 ;
 	            rs = ema_load(op,orig,olen,&pb,nlp) ;
