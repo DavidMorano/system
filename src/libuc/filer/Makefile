@@ -45,7 +45,7 @@ OBJ1_FILER=
 OBJ2_FILER=
 OBJ3_FILER=
 
-OBJA_FILER= filer_main.o filer_writers.o filer_obj.o
+OBJA_FILER= filer_prime.o filer_writers.o filer_obj.o
 
 OBJ_FILER= $(OBJA_FILER)
 
@@ -131,7 +131,14 @@ obj3_filer.o:	$(OBJ3_FILER)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-filer_main.o:		filer_main.cc		$(INCS)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+filer_prime.o:		filer_prime.cc		$(INCS)
 filer_writers.o:	filer_writers.cc	$(INCS)
 filer_obj.o:		filer_obj.cc		$(INCS)
 
