@@ -59,7 +59,7 @@ enum fieldmems {
 	fieldmem_rem,
 	fieldmem_finish,
 	fieldmem_overlast
-} ;
+} ; /* end enum (fieldmems) */
 struct field ;
 struct field_co {
 	field		*op = nullptr ;
@@ -80,7 +80,7 @@ struct field : field_head {
 	    rem(this,fieldmem_rem) ;
 	    finish(this,fieldmem_finish) ;
 	    lp = nullptr ;
-	} ;
+	} ; /* end ctor */
 	field(const field &) = delete ;
 	field &operator = (const field &) = delete ;
 	int start(cchar *,int = -1) noex ;
@@ -102,19 +102,19 @@ typedef FIELD		field ;
 
 EXTERNC_begin
 
-extern int	field_start(field *,cchar *,int) noex ;
-extern int	field_get(field *,cchar *,cchar **) noex ;
-extern int	field_getterm(field *,cchar *,cchar **) noex ;
-extern int	field_sharg(field *,cchar *,char *,int) noex ;
-extern int	field_remaining(field *,cchar **) noex ;
-extern int	field_finish(field *) noex ;
+extern int	field_start	(field *,cchar *,int) noex ;
+extern int	field_get	(field *,cchar *,cchar **) noex ;
+extern int	field_getterm	(field *,cchar *,cchar **) noex ;
+extern int	field_sharg	(field *,cchar *,char *,int) noex ;
+extern int	field_remaining	(field *,cchar **) noex ;
+extern int	field_finish	(field *) noex ;
 
-extern int	field_word(field *,cchar *,cchar **) noex ;
+extern int	field_word	(field *,cchar *,cchar **) noex ;
 extern int	field_wordphrase(field *,cchar *,char *,int) noex ;
-extern int	field_srvarg(field *,cchar *,char *,int) noex ;
-extern int	field_svcargs(field *,vecstr *) noex ;
+extern int	field_srvarg	(field *,cchar *,char *,int) noex ;
+extern int	field_svcargs	(field *,vecstr *) noex ;
 
-static inline int field_term(field *op,cchar *tp,cchar **rpp) noex {
+static inline int field_term	(field *op,cchar *tp,cchar **rpp) noex {
 	return field_getterm(op,tp,rpp) ;
 }
 
