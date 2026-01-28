@@ -40,6 +40,17 @@ MODS +=
 LIBS +=
 
 
+OBJ0_FIELD= field_main.o field_obj.o
+OBJ1_FIELD= field_srvarg.o field_svcargs.o
+OBJ2_FIELD= field_word.o field_wordphrase.o
+OBJ3_FIELD= fieldterms.o
+
+OBJA_FIELD= obj0_field.o obj1_field.o
+OBJB_FIELD= obj2_field.o obj3_field.o
+
+OBJ_FIELD= $(OBJA_FIELD) $(OBJB_FIELD)
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
@@ -56,18 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_FIELD= field_main.o field_obj.o
-OBJ1_FIELD= field_srvarg.o field_svcargs.o
-OBJ2_FIELD= field_word.o field_wordphrase.o
-OBJ3_FIELD= fieldterms.o
-
-OBJA_FIELD= obj0_field.o obj1_field.o
-OBJB_FIELD= obj2_field.o obj3_field.o
-
-OBJ_FIELD= $(OBJA_FIELD) $(OBJB_FIELD)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -114,16 +117,23 @@ control:
 
 
 obj0_field.o:	$(OBJ0_FIELD)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_FIELD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_field.o:	$(OBJ1_FIELD)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_FIELD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_field.o:	$(OBJ2_FIELD)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_FIELD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_field.o:	$(OBJ3_FIELD)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_FIELD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:		$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:		$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 field_main.o:		field_main.cc		$(INCS)
