@@ -129,6 +129,13 @@ obj3_envs.o:	$(OBJ3_ENVS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obja.o:		$(OBJA_ENVS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:		$(OBJB_ENVS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 envs_main.o:		envs_main.cc	$(INCS)
 envs_procxe.o:		envs_procxe.cc	#(INCS)
 envs_subs.o:		envs_subs.cc	#(INCS)
