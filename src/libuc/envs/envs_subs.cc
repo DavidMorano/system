@@ -50,9 +50,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<vecstr.h>
 #include	<buffer.h>
 #include	<sbuf.h>
@@ -79,7 +80,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -123,7 +123,7 @@ static int	vecstr_pathjoin(vecstr *,char *,int) noex ;
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 static vars		var ;
 
@@ -251,7 +251,7 @@ int subinfo::procvarpath(cchar *kp,int kl) noex {
 		    if ((rs = paths.count) >= 0) {
 			cint	npaths = rs ;
 	                cint	bufl = (psz + npaths + 1) ;
-	                if (char *bufp{} ; (rs = uc_malloc(bufl,&bufp)) >= 0) {
+	                if (char *bufp{} ; (rs = lm_mall(bufl,&bufp)) >= 0) {
 			    cchar	*sp = bufp ;
 			    int	sl = 0 ;
 	                    if ((rs = vecstr_pathjoin(&paths,bufp,bufl)) > 0) {
@@ -263,7 +263,7 @@ int subinfo::procvarpath(cchar *kp,int kl) noex {
 			        len = sl ;
 	                        rs = vecstr_envadd(evp,kp,sp,sl) ;
 			    } /* end if (vecstr_pathjoin) */
-	                    rs1 = uc_free(bufp) ;
+	                    rs1 = lm_free(bufp) ;
 			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (allocation) */
 		    } /* end if (vecstr_count) */
@@ -283,7 +283,7 @@ int subinfo::procpathsplit(vecstr *plp,cchar *vp,int vl) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (plp) {
-	    if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+	    if (char *pbuf{} ; (rs = lm_mp(&pbuf)) >= 0) {
 	        int	pl, cl ;
 	        cchar	*tp, *cp ;
 	        while ((tp = strnbrk(vp,vl,":;")) != nullptr) {
@@ -307,7 +307,7 @@ int subinfo::procpathsplit(vecstr *plp,cchar *vp,int vl) noex {
 	                rs = plp->adduniq(pbuf,pl) ;
 	            }
 	        } /* end if */
-		rs1 = uc_free(pbuf) ;
+		rs1 = lm_free(pbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
@@ -323,19 +323,19 @@ int subinfo::procsub(buffer *bp,cchar *vp,int vl) noex {
 	        int	elen = max(var.elen,vl) ;
 	        char	*ebuf{} ;
 	        char	*p{} ;
-	        for (int i = 0 ; (rs = uc_malloc(elen,&p)) >= 0 ; i += 1) {
+	        for (int i = 0 ; (rs = lm_mall(elen,&p)) >= 0 ; i += 1) {
 	            ebuf = p ;
 	            rs1 = expcook_exp(clp,0,ebuf,elen,vp,vl) ;
 	            if (rs1 >= 0) break ;
 	            elen += var.elen ;
-	            uc_free(ebuf) ;
+	            lm_free(ebuf) ;
 	            ebuf = nullptr ;
 	        } /* end while */
 	        if ((rs >= 0) && (rs1 > 0) && ebuf) {
 	            rs = bp->strw(ebuf,rs1) ;
 	        }
 	        if (ebuf) {
-	            uc_free(ebuf) ;
+	            lm_free(ebuf) ;
 	        }
 	    } else {
 	        rs = bp->strw(vp,vl) ;
