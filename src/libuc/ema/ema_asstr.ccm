@@ -97,7 +97,7 @@ export {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct asstr() {
-	    if (sp) dtor() ;
+	    if (magic) dtor() ;
 	} ;
     } ; /* end struct (asstr_head) */
 } /* end export */
