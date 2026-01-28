@@ -30,7 +30,9 @@
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<vechand.h>
 #include	<rmx.h>
 #include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
@@ -83,7 +85,7 @@ namespace {
 	    origl = ogl ;
 	    pbp = dp ;
 	    nlp = lp ;
-	} ;
+	} ; /* end ctor */
 	operator int () noex ;
 	int loads(ema_ent *) noex ;
 	int loadparts(ema_ent *) noex ;
@@ -97,8 +99,8 @@ namespace {
 /* forward references */
 
 local int getlen(cchar *sp,int sl) noex {
-    	int		rs = SR_FAULT ;
-	if (sp) {
+    	int		rs = SR_FAULT ; /* <- stat-ret difference */
+	if (sp) ylikely {
     	    if (sl < 0) sl = lenstr(sp) ;
 	}
     	return (rs >= 0) ? sl : rs ;
@@ -116,7 +118,7 @@ local int getlen(cchar *sp,int sl) noex {
 namespace ema_ns {
     int ema_load(ema *op,cchar *origp,int origl,parts *pbp,ema *nlp) noex {
 	int		rs ;
-	if ((rs = getlen(origp,origl)) >= 0) {
+	if ((rs = getlen(origp,origl)) >= 0) ylikely {
 	    loader ld(op,origp,rs,pbp,nlp) ;
 	    rs = ld ;
 	} /* end if (valid) */
@@ -125,11 +127,11 @@ namespace ema_ns {
 } /* end namespace (ema_ns) */
 
 loader::operator int () noex {
-        cint        sz = szof(ema_ent) ;
+        cint		sz = szof(ema_ent) ;
 	int		rs ;
-        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
             ema_ent         *ep = entp(vp) ;
-            if ((rs = entry_start(ep)) >= 0) {
+            if ((rs = entry_start(ep)) >= 0) ylikely {
                 rs = loads(ep) ;
                 if (rs < 0) {
                     entry_finish(ep) ;
@@ -149,9 +151,9 @@ local bool ispcs(int ch) noex {
 
 int loader::loads(ema_ent *ep) noex {
     	int		rs ;
-	if ((rs = loadparts(ep)) >= 0) {
-	    if ((rs = loadorig(ep)) >= 0) {
-		if ((rs = loadgroup(ep)) >= 0) {
+	if ((rs = loadparts(ep)) >= 0) ylikely {
+	    if ((rs = loadorig(ep)) >= 0) ylikely {
+		if ((rs = loadgroup(ep)) >= 0) ylikely {
 		    rs = loadstore(ep) ;
 		}
 	    }
@@ -197,7 +199,7 @@ int loader::loadparts(ema_ent *ep) noex {
 
 int loader::loadorig(ema_ent *ep) noex {
     	int		rs = SR_OK ;
-        if ((rs >= 0) && (origl > 0)) {
+        if (origl > 0) {
 	    if ((rs = rmwht(origp,origl)) > 0) {
                 if (cc *cp ; (rs = libmem.strw(origp,rs,&cp)) >= 0) {
                     ep->op = cp ;
@@ -210,7 +212,7 @@ int loader::loadorig(ema_ent *ep) noex {
 
 int loader::loadgroup(ema_ent *ep) noex {
     	int		rs = SR_OK ;
-        if (nlp) {
+        if (nlp) ylikely {
             ep->listp = nlp ;
             ep->type = ematype_group ;
         }
@@ -219,7 +221,7 @@ int loader::loadgroup(ema_ent *ep) noex {
 
 int loader::loadstore(ema_ent *ep) noex {
     	int		rs ;
-	if ((rs = vechand_add(op->elp,ep)) >= 0) {
+	if ((rs = vechand_add(op->elp,ep)) >= 0) ylikely {
 	    op->n += 1 ;
 	}
         return rs ;
