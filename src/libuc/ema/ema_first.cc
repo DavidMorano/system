@@ -28,7 +28,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"ema.h"
@@ -60,7 +61,7 @@
 int ema_first(ema *op,cchar **rpp) noex {
 	int		rs ;
 	int		rl = 0 ; /* return-value */
-	if ((rs = ema_magic(op)) >= 0) {
+	if ((rs = ema_magic(op)) >= 0) ylikely {
 	    cchar	*rp = nullptr ;
 	    ema_ent	*ep{} ;
 	    for (int i = 0 ; (rs = ema_get(op,i,&ep)) >= 0 ; i += 1) {
