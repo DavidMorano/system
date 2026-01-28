@@ -98,10 +98,7 @@
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usyscalls.h>		/* |ulogerror(3u)| */
 #include	<ascii.h>
 #include	<baops.h>
 #include	<strop.h>
@@ -111,6 +108,8 @@
 #include	<localmisc.h>
 
 #include	"field.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 
@@ -165,7 +164,7 @@ static inline bool isquoteanddouble(int sl,int ch) noex {
 
 int field_start(field *fsbp,cchar *lp,int ll) noex {
 	int		rs = SR_FAULT ;
-	if (fsbp && lp) {
+	if (fsbp && lp) ylikely {
 	    rs = SR_OK ;
 	    fsbp->fp = nullptr ;
 	    fsbp->fl = 0 ;
@@ -202,13 +201,13 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		rs1 ;
 	int		fl = 0 ; /* return-value */
 	cchar		*fp = nullptr ;
-	if (fsbp && fpp) {
+	if (fsbp && fpp) ylikely {
 	    if (terms == nullptr) terms = dterms.terms ;
-	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
+	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) ylikely {
 		int	chterm = '\0' ;
 		so.white() ;
 		fp = so.sp ;	/* <- first field? */
-	        if (so.sl > 0) {
+	        if (so.sl > 0) ylikely {
 	            int		ch = mkchar(*so.sp) ;
 	            if (batst(quotes.terms,ch)) {
 	                cint	qe = ch ;	/* set default quote end */
@@ -259,9 +258,9 @@ int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		rs1 ;
 	int		fl = 0 ; /* return-value */
 	cchar		*fp = nullptr ;
-	if (fsbp && fpp) {
+	if (fsbp && fpp) ylikely {
 	    if (terms == nullptr) terms = dterms.terms ;
-	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
+	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) ylikely {
 		int	chterm = '\0' ;
 		so.white() ;
 		fp = so.sp ;	/* <- first field? */
@@ -299,12 +298,12 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fl = 0 ; /* return-value */
-	if (fsbp && fbuf) {
+	if (fsbp && fbuf) ylikely {
 	    if (terms == nullptr) terms = dterms.terms ;
 	    if (strop so ; (rs = so.start(fsbp->lp,fsbp->ll)) > 0) {
 		int	chterm = '\0' ;
 		so.white() ;
-	        if (so.sl > 0) {
+	        if (so.sl > 0) ylikely {
 		    int		ch ; /* used in two blocks below */
 		    char	*bp = fbuf ;
 	            while (so.sl > 0) {
@@ -400,9 +399,9 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 int field_remaining(field *fsbp,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
 	int		ll = 0 ; /* return-value */
-	if (fsbp) {
+	if (fsbp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (fsbp->lp) {
+	    if (fsbp->lp) ylikely {
 		rs = SR_OK ;
 		ll = fsbp->ll ;
 	        if (lpp) {
