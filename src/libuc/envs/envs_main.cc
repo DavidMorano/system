@@ -29,7 +29,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<hdb.h>
 #include	<vecstr.h>
 #include	<nulstr.h>
@@ -90,49 +92,47 @@ typedef envs_ent	*entp ;
 
 /* forward references */
 
-static int envs_ctor(envs *op) noex {
+local int envs_ctor(envs *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    if (hdb *p ; (p = new(nothrow) hdb) != nullptr) {
+	    if (hdb *p ; (p = new(nothrow) hdb) != nullptr) ylikely {
 		op->varp = p ;
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (envs_ctor) */
+} /* end subroutine (envs_ctor) */
 
-static int envs_dtor(envs *op) noex {
+local int envs_dtor(envs *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->varp) {
+	    if (op->varp) ylikely {
 		delete op->varp ;
 		op->varp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (envs_dtor) */
+} /* end subroutine (envs_dtor) */
 
 template<typename ... Args>
-static inline int envs_magic(envs *op,Args ... args) noex {
+local inline int envs_magic(envs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == ENVS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (envs_magic) */
 
-static int	entry_start(envs_ent *,cchar *,cchar *,int,cchar **) noex ;
-static int	entry_count(envs_ent *) noex ;
-static int	entry_set(envs_ent *,cchar *,int) noex ;
-static int	entry_append(envs_ent *,cchar *,int) noex ;
-static int	entry_get(envs_ent *,int,cchar **) noex ;
-static int	entry_substr(envs_ent *,cchar *,int) noex ;
-static int	entry_finish(envs_ent *) noex ;
+local int	entry_start(envs_ent *,cchar *,cchar *,int,cchar **) noex ;
+local int	entry_count(envs_ent *) noex ;
+local int	entry_set(envs_ent *,cchar *,int) noex ;
+local int	entry_append(envs_ent *,cchar *,int) noex ;
+local int	entry_get(envs_ent *,int,cchar **) noex ;
+local int	entry_substr(envs_ent *,cchar *,int) noex ;
+local int	entry_finish(envs_ent *) noex ;
 
 
 /* local variables */
@@ -144,10 +144,10 @@ static int	entry_finish(envs_ent *) noex ;
 /* exported subroutines */
 
 int envs_start(envs *op,int ne) noex {
+	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = envs_ctor(op)) >= 0) {
-	    cnullptr	np{} ;
-	    if ((rs = ENVS_DBSTART(op->varp,ne,np,np)) >= 0) {
+	if ((rs = envs_ctor(op)) >= 0) ylikely {
+	    if ((rs = ENVS_DBSTART(op->varp,ne,np,np)) >= 0) ylikely {
 		op->magic = ENVS_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -161,7 +161,7 @@ int envs_start(envs *op,int ne) noex {
 int envs_finish(envs *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = envs_magic(op)) >= 0) {
+	if ((rs = envs_magic(op)) >= 0) ylikely {
 	    ENVS_DBCUR		cur ;
 	    ENVS_DBDAT		key ;
 	    ENVS_DBDAT		val ;
@@ -199,7 +199,7 @@ int envs_finish(envs *op) noex {
 
 int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 	int		rs ;
-	if ((rs = envs_magic(op,kp,vp)) >= 0) {
+	if ((rs = envs_magic(op,kp,vp)) >= 0) ylikely {
 	    ENVS_DBDAT	key ;
 	    ENVS_DBDAT	val{} ;
 	    ENVS_ENT	*ep{} ;
@@ -242,7 +242,7 @@ int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 
 int envs_count(envs *op) noex {
 	int		rs ;
-	if ((rs = envs_magic(op)) >= 0) {
+	if ((rs = envs_magic(op)) >= 0) ylikely {
 	    rs = ENVS_DBCOUNT(op->varp) ;
 	}
 	return rs ;
@@ -251,7 +251,7 @@ int envs_count(envs *op) noex {
 
 int envs_present(envs *op,cchar *kp,int kl) noex {
 	int		rs ;
-	if ((rs = envs_magic(op,kp)) >= 0) {
+	if ((rs = envs_magic(op,kp)) >= 0) ylikely {
 	    ENVS_DBDAT	key ;
 	    ENVS_DBDAT	val{} ;
 	    if (kl < 0) kl = lenstr(kp) ;
@@ -268,7 +268,7 @@ int envs_present(envs *op,cchar *kp,int kl) noex {
 
 int envs_substr(envs *op,cchar *kp,int kl,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = envs_magic(op,kp,sp)) >= 0) {
+	if ((rs = envs_magic(op,kp,sp)) >= 0) ylikely {
 	    hdb		*vlp = op->varp ;
 	    ENVS_DBDAT	key ;
 	    ENVS_DBDAT	val{} ;
@@ -276,7 +276,7 @@ int envs_substr(envs *op,cchar *kp,int kl,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
-	    if ((rs = ENVS_DBFETCH(vlp,key,nullptr,&val)) >= 0) {
+	    if ((rs = ENVS_DBFETCH(vlp,key,nullptr,&val)) >= 0) ylikely {
 	        ENVS_ENT	*ep = (ENVS_ENT *) val.buf ;
 	        rs = entry_substr(ep,sp,sl) ;
 	    }
@@ -287,10 +287,10 @@ int envs_substr(envs *op,cchar *kp,int kl,cchar *sp,int sl) noex {
 
 int envs_curbegin(envs *op,ENVS_CUR *curp) noex {
 	int		rs ;
-	if ((rs = envs_magic(op,curp)) >= 0) {
+	if ((rs = envs_magic(op,curp)) >= 0) ylikely {
 	    cint	osz = szof(hdb_cur) ;
 	    curp->i = -1 ;
-	    if (void *vp ; (rs = libmem.mall(osz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(osz,&vp)) >= 0) ylikely {
 	        hdb_cur		*ocp = (hdb_cur *) vp ;
 		curp->curp = ocp ;
 	        rs = ENVS_DBCURBEGIN(op->varp,ocp) ;
@@ -307,7 +307,7 @@ int envs_curbegin(envs *op,ENVS_CUR *curp) noex {
 int envs_curend(envs *op,ENVS_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = envs_magic(op,curp)) >= 0) {
+	if ((rs = envs_magic(op,curp)) >= 0) ylikely {
 	    {
 	        rs1 = ENVS_DBCUREND(op->varp,curp->curp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -326,11 +326,11 @@ int envs_curend(envs *op,ENVS_CUR *curp) noex {
 int envs_curenumkey(envs *op,ENVS_CUR *curp,cchar **kpp) noex {
 	int		rs ;
 	int		kl = 0 ;
-	if ((rs = envs_magic(op,curp)) >= 0) {
+	if ((rs = envs_magic(op,curp)) >= 0) ylikely {
 	    ENVS_DBDAT	key, val ;
 	    ENVS_DB	*dlp = op->varp ;
 	    if (kpp) *kpp = nullptr ;
-	    if ((rs = ENVS_DBENUM(dlp,curp->curp,&key,&val)) >= 0) {
+	    if ((rs = ENVS_DBENUM(dlp,curp->curp,&key,&val)) >= 0) ylikely {
 	        cchar	*kp = charp(key.buf) ;
 	        kl = lenstr(kp) ;
 	        if (kpp) *kpp = kp ;
@@ -343,7 +343,7 @@ int envs_curenumkey(envs *op,ENVS_CUR *curp,cchar **kpp) noex {
 int envs_curenum(envs *op,ENVS_CUR *curp,cchar **kpp,cchar **vpp) noex {
 	int		rs ;
 	int		kl = 0 ;
-	if ((rs = envs_magic(op,curp)) >= 0) {
+	if ((rs = envs_magic(op,curp)) >= 0) ylikely {
 	    ENVS_DBDAT	key{} ;
 	    ENVS_DBDAT	val{} ;
 	    ENVS_ENT	*ep ;
@@ -381,7 +381,7 @@ int envs_curenum(envs *op,ENVS_CUR *curp,cchar **kpp,cchar **vpp) noex {
 int envs_fetch(envs *op,cc *kp,int kl,ENVS_CUR *curp,cc **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = envs_magic(op,kp,curp)) >= 0) {
+	if ((rs = envs_magic(op,kp,curp)) >= 0) ylikely {
 	    ENVS_DBDAT	key ;
 	    ENVS_DBDAT	val{} ;
 	    ENVS_ENT	*ep ;
@@ -408,7 +408,7 @@ int envs_fetch(envs *op,cc *kp,int kl,ENVS_CUR *curp,cc **rpp) noex {
 
 int envs_delname(envs *op,cchar *kp,int kl) noex {
 	int		rs ;
-	if ((rs = envs_magic(op,kp)) >= 0) {
+	if ((rs = envs_magic(op,kp)) >= 0) ylikely {
 	    ENVS_DBDAT	key ;
 	    ENVS_DBDAT	val{} ;
 	    if (kl < 0) kl = lenstr(kp) ;
@@ -423,13 +423,13 @@ int envs_delname(envs *op,cchar *kp,int kl) noex {
 
 /* private subroutines */
 
-static int entry_start(ENVS_ENT *ep,cc *kp,cc *vnam,int vnlen,cc**rpp) noex {
+local int entry_start(ENVS_ENT *ep,cc *kp,cc *vnam,int vnlen,cc**rpp) noex {
 	int		rs = SR_FAULT ;
 	int		kl = 0 ;
-	if (ep && kp) {
+	if (ep && kp) ylikely {
 	    rs = SR_INVALID ;
-	    if (kp[0]) {
-	        if (cchar *cp ; (rs = libmem.strw(kp,-1,&cp)) >= 0) {
+	    if (kp[0]) ylikely {
+	        if (cchar *cp ; (rs = libmem.strw(kp,-1,&cp)) >= 0) ylikely {
 		    vecstr	*elp = &ep->elist ;
 	            cint	vn = ENVS_DEFENTS ;
 	            int		vo = 0 ;
@@ -459,19 +459,19 @@ static int entry_start(ENVS_ENT *ep,cc *kp,cc *vnam,int vnlen,cc**rpp) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(ENVS_ENT *ep) noex {
+local int entry_finish(ENVS_ENT *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (ep) {
+	if (ep) ylikely {
 	    vecstr	*elp = &ep->elist ;
 	    rs = SR_OK ;
-	    if (ep->kp) {
+	    if (ep->kp) ylikely {
 		void *vp = voidp(ep->kp) ;
 		rs1 = libmem.free(vp) ;
 		if (rs >= 0) rs = rs1 ;
 		ep->kp = nullptr ;
 	    }
-	    if (elp) {
+	    if (elp) ylikely {
 		rs1 = elp->finish ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -480,32 +480,32 @@ static int entry_finish(ENVS_ENT *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int entry_count(ENVS_ENT *ep) noex {
+local int entry_count(ENVS_ENT *ep) noex {
 	vecstr	*elp = &ep->elist ;
 	return elp->count ;
 }
 /* end subroutine (entry_count) */
 
-static int entry_set(ENVS_ENT *ep,cchar *vp,int vl) noex {
+local int entry_set(ENVS_ENT *ep,cchar *vp,int vl) noex {
 	vecstr		*elp = &ep->elist ;
 	int		rs ;
-	if ((rs = elp->delall) >= 0) {
+	if ((rs = elp->delall) >= 0) ylikely {
 	    rs = elp->add(vp,vl) ;
 	}
 	return rs ;
 }
 /* end subroutine (entry_set) */
 
-static int entry_append(ENVS_ENT *ep,cchar *vp,int vl) noex {
+local int entry_append(ENVS_ENT *ep,cchar *vp,int vl) noex {
 	return vecstr_add(&ep->elist,vp,vl) ;
 }
 /* end subroutine (entry_append) */
 
-static int entry_get(ENVS_ENT *ep,int i,cchar **rpp) noex {
+local int entry_get(ENVS_ENT *ep,int i,cchar **rpp) noex {
 	vecstr		*elp = &ep->elist ;
 	int		rs ;
 	int		vl = 0 ;
-	if (cchar *rp{} ; (rs = elp->get(i,&rp)) >= 0) {
+	if (cchar *rp ; (rs = elp->get(i,&rp)) >= 0) ylikely {
 	    vl = lenstr(rp) ;
 	    if (*rpp) *rpp = rp ;
 	}
@@ -513,13 +513,13 @@ static int entry_get(ENVS_ENT *ep,int i,cchar **rpp) noex {
 }
 /* end subroutine (entry_get) */
 
-static int entry_substr(ENVS_ENT *ep,cchar *sp,int sl) noex {
+local int entry_substr(ENVS_ENT *ep,cchar *sp,int sl) noex {
 	vecstr		*elp = &ep->elist ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
 	cchar		*ss{} ;
-	if (nulstr ns ; (rs = ns.start(sp,sl,&ss)) >= 0) {
+	if (nulstr ns ; (rs = ns.start(sp,sl,&ss)) >= 0) ylikely {
 	    cchar	*cp{} ;
 	    for (int i = 0 ; (rs = elp->get(i,&cp)) >= 0 ; i += 1) {
 		if (cp) {
