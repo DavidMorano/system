@@ -118,12 +118,16 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"filer.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 import uconstants ;
 
 /* local defines */
@@ -131,7 +135,6 @@ import uconstants ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
@@ -181,7 +184,7 @@ constexpr zeroer		zo ;
 int filer_writeblanks(filer *op,int n) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = filer_magic(op)) >= 0) {
+	if ((rs = filer_magic(op)) >= 0) ylikely {
 	    while ((rs >= 0) && (wlen < n)) {
 	        cint	ml = min((n - wlen),bo.l) ;
 	        rs = filer_write(op,bo.p,ml) ;
@@ -195,7 +198,7 @@ int filer_writeblanks(filer *op,int n) noex {
 int filer_writefill(filer *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = filer_magic(op,sp)) >= 0) {
+	if ((rs = filer_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = (lenstr(sp) + 1) ;
 	    if ((rs = filer_write(op,sp,sl)) >= 0) {
 	        cint	asize = szof(int) ;
@@ -211,8 +214,8 @@ int filer_writefill(filer *op,cchar *sp,int sl) noex {
 int filer_writealign(filer *op,int asize) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = filer_magic(op)) >= 0) {
-	    if (off_t foff ; (rs = filer_tell(op,&foff)) >= 0) {
+	if ((rs = filer_magic(op)) >= 0) ylikely {
+	    if (off_t foff ; (rs = filer_tell(op,&foff)) >= 0) ylikely {
 	        cint	r = int(foff & (asize - 1)) ;
 	        if (r > 0) {
 	            cint	nzero = (asize - r) ;
@@ -230,7 +233,7 @@ int filer_writealign(filer *op,int asize) noex {
 int filer_writezero(filer *op,int n) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = filer_magic(op)) >= 0) {
+	if ((rs = filer_magic(op)) >= 0) ylikely {
 	    while ((rs >= 0) && (n > 0)) {
 	        cint	ml = min(n,zo.l) ;
 	        rs = filer_write(op,zo.p,ml) ;
@@ -245,7 +248,7 @@ int filer_writezero(filer *op,int n) noex {
 int filer_writefd(filer *op,char *bp,int bl,int mfd,int len) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = filer_magic(op,bp)) >= 0) {
+	if ((rs = filer_magic(op,bp)) >= 0) ylikely {
 	    int		rlen = len ;
 	    auto read = [mfd,bp,bl] (int arlen) noex {
 		int	rsl = SR_OK ;
