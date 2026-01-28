@@ -30,7 +30,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |ulogerror(3u)| */
+#include	<uclibmem.h>
 #include	<strpack.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<strwcpy.h>
@@ -38,7 +41,9 @@
 
 #include	"envlist.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -77,22 +82,22 @@ typedef strpack	*	strpackp ;
 /* forward references */
 
 template<typename ... Args>
-static int envlist_ctor(envlist *op,Args ... args) noex {
+local int envlist_ctor(envlist *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->store = nullptr ;
-	    if ((op->elp = new(nothrow) hdb) != np) {
+	    if ((op->elp = new(nothrow) hdb) != np) ylikely {
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (envlist_ctor) */
 
-static int envlist_dtor(envlist *op) noex {
+local int envlist_dtor(envlist *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->elp) {
 		delete op->elp ;
@@ -102,8 +107,8 @@ static int envlist_dtor(envlist *op) noex {
 	return rs ;
 } /* end subroutine (envlist_dtor) */
 
-static int	envlist_store(envlist *,cchar *,int) noex ;
-static int	envlist_storer(envlist *) noex ;
+local int	envlist_store(envlist *,cchar *,int) noex ;
+local int	envlist_storer(envlist *) noex ;
 
 
 /* local variables */
@@ -116,7 +121,7 @@ static int	envlist_storer(envlist *) noex ;
 
 int envlist_start(envlist *op,int ne) noex {
 	int		rs ;
-	if ((rs = envlist_ctor(op)) >= 0) {
+	if ((rs = envlist_ctor(op)) >= 0) ylikely {
 	    rs = EL_DBINIT(op->elp,ne,0,nullptr,nullptr) ;
 	    if (rs < 0) {
 		envlist_dtor(op) ;
@@ -129,21 +134,21 @@ int envlist_start(envlist *op,int ne) noex {
 int envlist_finish(envlist *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->store) {
+	    if (op->store) ylikely {
 		{
 	            strpack	*spp = cast_static<strpackp>(op->store) ;
 	            rs1 = strpack_finish(spp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(op->store) ;
+	            rs1 = lm_free(op->store) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	        op->store = nullptr ;
 	    } /* end if (store) */
-	    {
+	    if (op->elp) ylikely {
 	        rs1 = EL_DBFREE(op->elp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -160,7 +165,7 @@ int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		ridx = 0 ;
-	if (op && kp) {
+	if (op && kp) ylikely {
 	    int		kl = lenstr(kp) ;
 	    int		sz = 1 ;
 	    sz += (kl + 1) ;
@@ -168,7 +173,7 @@ int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 	        if (vl < 0) vl = lenstr(vp) ;
 	        sz += vl ;
 	    }
-	    if (char *ep{} ; (rs = uc_malloc(sz,&ep)) >= 0) {
+	    if (char *ep ; (rs = lm_mall(sz,&ep)) >= 0) ylikely {
 		{
 	            char	*bp = ep ;
 	            bp = strwcpy(bp,kp,kl) ;
@@ -178,7 +183,7 @@ int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 	            rs = envlist_store(op,ep,el) ;
 		    ridx = rs ;
 		} /* end block */
-	        rs1 = uc_free(ep) ;
+	        rs1 = lm_free(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
@@ -189,7 +194,7 @@ int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 int envlist_add(envlist *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		ridx = 0 ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    EL_DBDATA	key ;
 	    EL_DBDATA	val ;
 	    int			kl ;
@@ -211,7 +216,7 @@ int envlist_add(envlist *op,cchar *sp,int sl) noex {
 
 int envlist_count(envlist *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely  {
 	    rs = EL_DBCOUNT(op->elp) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -221,7 +226,7 @@ int envlist_count(envlist *op) noex {
 int envlist_present(envlist *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    EL_DBDATA	key ;
 	    EL_DBDATA	val{} ;
 	    int			kl = 0 ;
@@ -246,12 +251,12 @@ int envlist_present(envlist *op,cchar *sp,int sl,cchar **rpp) noex {
 
 /* private subroutines */
 
-static int envlist_store(envlist *op,cchar *sp,int sl) noex {
+local int envlist_store(envlist *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = envlist_storer(op)) >= 0) {
+	if ((rs = envlist_storer(op)) >= 0) ylikely {
 	    strpack	*spp = cast_static<strpackp>(op->store) ;
 	    cchar	*ep ;
-	    if ((rs = strpack_store(spp,sp,sl,&ep)) >= 0) {
+	    if ((rs = strpack_store(spp,sp,sl,&ep)) >= 0) ylikely {
 		rs = envlist_add(op,ep,rs) ;
 	    }
 	}
@@ -259,18 +264,17 @@ static int envlist_store(envlist *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (envlist_store) */
 
-static int envlist_storer(envlist *op) noex {
+local int envlist_storer(envlist *op) noex {
 	int		rs = SR_OK ;
 	if (op->store == nullptr) {
 	    cint	osize = szof(strpack) ;
-	    void	*vp{} ;
-	    if ((rs = uc_malloc(osize,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(osize,&vp)) >= 0) ylikely {
 	        strpack		*spp = cast_static<strpackp>(vp) ;
 	        cint		csz = EL_CHUNKSIZE ;
 		op->store = vp ;
 	        rs = strpack_start(spp,csz) ;
 		if (rs < 0) {
-		    uc_free(op->store) ;
+		    lm_free(op->store) ;
 		    op->store = nullptr ;
 		}
 	    } /* end if (m-a) */
@@ -299,7 +303,7 @@ void envlist::dtor() noex {
 
 int envlist_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case envlistmem_start:
 	        rs = envlist_start(op,a) ;
