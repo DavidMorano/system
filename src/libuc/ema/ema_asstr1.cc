@@ -32,15 +32,12 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
-#include	<char.h>
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 module ema_asstr ;
 
@@ -74,8 +71,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 int asstr_start(asstr *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp) {
-	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	if (op && sp) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
 	        rs = SR_OK ;
 	        op->sp = sp ;
 	        op->sl = sl ;
@@ -86,7 +83,7 @@ int asstr_start(asstr *op,cchar *sp,int 탎l) noex {
 
 int asstr_finish(asstr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->sp = nullptr ;
 	    op->sl = 0 ;
@@ -97,9 +94,9 @@ int asstr_finish(asstr *op) noex {
     int asstr_get(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		ch = 0 ; /* return-value */
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->sl > 0) {
+	    if (op->sl > 0) ylikely {
 	        ch = mkchar(op->sp[0]) ;
 	    } else {
 	        rs = SR_EOF ;
@@ -111,9 +108,9 @@ int asstr_finish(asstr *op) noex {
     int asstr_getprev(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		ch = 0 ; /* return-value */
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->sl > 0) {
+	    if (op->sl > 0) ylikely {
 	        ch = mkchar(op->sp[op->sl-1]) ;
 	    } else {
 	        rs = SR_EOF ;
@@ -125,7 +122,7 @@ int asstr_finish(asstr *op) noex {
     int asstr_adv(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		ch = 0 ; /* return-value */
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->sl > 0) {
 	        op->sp += 1 ;
@@ -142,7 +139,7 @@ int asstr_finish(asstr *op) noex {
 
     int asstr_len(asstr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->sl ;
 	} /* end if (non-null) */
 	return rs ;
@@ -151,7 +148,7 @@ int asstr_finish(asstr *op) noex {
     int asstr_skipwhite(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ; /* return-value */
-	if (op->sp) {
+	if (op->sp) ylikely {
 	    rs = SR_OK ;
 	    while ((op->sl != 0) && CHAR_ISWHITE(*(op->sp))) {
 	        op->sp += 1 ;
@@ -165,7 +162,7 @@ int asstr_finish(asstr *op) noex {
     int asstr_backwhite(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ; /* return-value */
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    while (op->sl > 0) {
 	        cint	lch = op->sp[op->sl-1] ;
@@ -177,8 +174,13 @@ int asstr_finish(asstr *op) noex {
 	return (rs >= 0) ? f : rs ;
     } /* end subroutine (asstr_backwhite) */
 
+int asstr::start(cchar *탎p,int 탎l) noex {
+    	return asstr_start(this,탎p,탎l) ;
+
+} /* end method (asstr::start) */
+
 void asstr::dtor() noex {
-    	if (sp) {
+    	if (sp) ylikely {
 	    (void) finish() ;
 	}
 } /* end method (asstr::dtor) */
