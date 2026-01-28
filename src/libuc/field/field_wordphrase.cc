@@ -54,10 +54,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<mkchar.h>
 #include	<char.h>
@@ -127,8 +124,8 @@ constexpr char		shterms[] = {
 int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	int		rs = SR_FAULT ;
 	int		fl = -1 ;
-	if (op && fbuf) {
-	    if (op->lp) {
+	if (op && fbuf) ylikely {
+	    if (op->lp) ylikely {
 	        int	chterm = '\0' ;
 	        int	ll = op->ll ;
 	        cchar	*lp = op->lp ;
@@ -138,7 +135,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	            ll -= 1 ;
 	        }
 	        fl = -1 ;		/* end-of-arguments indicator */
-	        if (ll > 0)  {
+	        if (ll > 0) ylikely {
 	            int		ch = 0 ;
 	            char	*bp = fbuf ;
 	            while (ll > 0) {
