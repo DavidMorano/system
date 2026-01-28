@@ -31,11 +31,13 @@ module ;
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<buffer.h>		/* dynamically allocated buffer */
 #include	<localmisc.h>
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 #define	PARTS_MAGIC	0x92374562
 
@@ -166,7 +168,7 @@ int parts::ifinish() noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
-		    rs1 = uc_free(as) ;
+		    rs1 = lm_free(as) ;
 		    if (rs >= 0) rs = rs1 ;
 		    as = nullptr ;
 		    nbufs = 0 ;
@@ -179,7 +181,7 @@ int parts::ifinish() noex {
 int parts::bufalloc() noex {
     	int		rs ;
 	int		sz = (nbufs * szof(buffer)) ;
-	if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	    as = (buffer *) vp ;
 	    memclear(as,sz) ;
 	} /* end if (memory */
