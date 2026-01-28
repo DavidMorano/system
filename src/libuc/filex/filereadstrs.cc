@@ -21,8 +21,10 @@
 	filereadstrs
 
 	Description:
-	This subroutine reads strings from a file (the string
-	of which means something to someone).
+	This subroutine reads strings from a file (the string of
+	which means something to someone).  Comments and empty lines
+	are ignored.  So the first line that has some content is
+	used as the souce for a line of c-strings.
 
 	Synopsis:
 	int filereadstrs(cchar *fname,char *rbuf,int rlen) noex
@@ -47,7 +49,7 @@
 #include	<usysbase.h>
 #include	<uclibmem.h>
 #include	<filer.h>
-#include	<sfx.h>
+#include	<sfx.h>			/* |sfcontent(3uc)| */
 #include	<strwcpy.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -120,10 +122,9 @@ static int reader(cchar *fname,char *rbuf,int rlen) noex {
                     while ((rs = b.readln(lbuf,llen)) > 0) {
 			cchar   *sp{} ;
                         if (int sl ; (sl = sfcontent(lbuf,rs,&sp)) > 0) {
-			    int		cl ;
 			    cchar	*cp{} ;
-                            while ((cl = sfnext(sp,sl,&cp)) > 0) {
-				bool	fs ;
+                            for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
+				bool	fs ; /* used-afterwards */
                                 if ((fs = ((rlen - rl) >= (cl+1)))) {
                                     if (c++ > 0) {
                                         rbuf[rl++] = ' ' ;
@@ -134,7 +135,7 @@ static int reader(cchar *fname,char *rbuf,int rlen) noex {
 				sl -= intconv((cp + cl) - sp) ;
 				sp = (cp + cl) ;
 				if (! fs) break ;
-                            } /* end while */
+                            } /* end for */
                         } /* end if (sfcontent) */
                         if (rs < 0) break ;
                     } /* end while (reading lines) */
