@@ -60,9 +60,11 @@
 #include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<expcook.h>
 #include	<vecstr.h>
 #include	<nulstr.h>
@@ -81,8 +83,8 @@
 
 #include	"envs.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"mod/ucstream.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ucstream.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 import ucstream ;
@@ -104,7 +106,6 @@ import ucstream ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -157,7 +158,7 @@ namespace {
 template<typename ... Args>
 static inline int envs_magic(envs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == ENVS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -175,7 +176,7 @@ constexpr int		envnamelen = ENVNAMELEN ;
 static char		vterms[termsize] ;
 static char		dterms[termsize] ;
 
-static bufsizevar	maxlinelen(getbufsize_ml) ;
+static bufsizevar	maxlinelen(bufsize_ml) ;
 
 constexpr cchar		ssp[] = {
 	CH_LPAREN, 
@@ -194,11 +195,11 @@ constexpr cchar		strassign[] = "+:;¶µ­Ð=-" ;
 int envs_procxe(envs *op,EC *clp,mainv ev,VS *dlp,cchar *fn) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = envs_magic(op,clp,ev,dlp,fn)) >= 0) {
+	if ((rs = envs_magic(op,clp,ev,dlp,fn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0]) {
+	    if (fn[0]) ylikely {
 		static cint	rst = mkterms() ;
-	        if ((rs = rst) >= 0) {
+	        if ((rs = rst) >= 0) ylikely {
 		    subinfo	si(op,clp,ev,dlp) ;
 		    rs = si.procer(fn) ;
 		    c = rs ;
@@ -217,9 +218,9 @@ int subinfo::procer(cchar *fn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = maxlinelen) >= 0) {
+	if ((rs = maxlinelen) >= 0) ylikely {
 	    cint	sz = ((rs + 1) * NLINES) ;
-	    if (char *lbuf ; (rs = uc_malloc((sz + 1),&lbuf)) > 0) {
+	    if (char *lbuf ; (rs = lm_mall((sz + 1),&lbuf)) > 0) ylikely {
 		cint	llen = sz ;
 	        if (ucstream ef ; (rs = ef.open(fn,"r")) >= 0) {
 	            while ((rs = ef.readlns(lbuf,llen,-1,np)) > 0) {
@@ -233,7 +234,7 @@ int subinfo::procer(cchar *fn) noex {
 	    	    rs1 = ef.close ;
 	    	    if (rs >= 0) rs = rs1 ;
 		} /* end if (file-open) */
-		rs1 = uc_free(lbuf) ;
+		rs1 = lm_free(lbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (maxlinelen) */
@@ -390,10 +391,10 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (buffer b ; (sl >= 0) && ((rs = b.start(sl)) >= 0)) {
-	    if ((rs = vals(&b,ssp,sp,sl)) >= 0) {
+	if (buffer b ; (sl >= 0) && ((rs = b.start(sl)) >= 0)) ylikely {
+	    if ((rs = vals(&b,ssp,sp,sl)) >= 0) ylikely {
 	        bool	f_store = true ;
-	        if (cchar *cp{} ; (rs = b.get(&cp)) >= 0) {
+	        if (cchar *cp{} ; (rs = b.get(&cp)) >= 0) ylikely {
 	            cint	cl = rs ;
 	            if ((rs >= 0) && f_store && atp->uniqstr) {
 	                if ((rs = envs_substr(nlp,enp,enl,sp,sl)) > 0) {
@@ -451,7 +452,7 @@ int subinfo::deps(cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 = 0 ;
 	int		f = true ; /* return-value */
-	if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
+	if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
 	    cchar	*fp{} ;
 	    for (int fl ; (fl = fsb.get(dterms,&fp)) >= 0 ; ) {
 	        if (fl > 0) {
@@ -477,8 +478,8 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *fbuf ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
-	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
+	if (char *fbuf ; (rs = lm_mall((flen+1),&fbuf)) >= 0) ylikely {
+	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
 	        int	c = 0 ;
 	        for (int fl ; (fl = fsb.sharg(vterms,fbuf,flen)) >= 0 ; ) {
 	            if (fl > 0) {
@@ -497,7 +498,7 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	        rs1 = fsb.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (field) */
-	    rs1 = uc_free(fbuf) ;
+	    rs1 = lm_free(fbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? len : rs ;
@@ -557,8 +558,8 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 	        } else if (rs == rsn) {
 		    rs = SR_OK ;
 		}
-/* perform any appropriate substitution */
-		if (rs >= 0) {
+		/* perform any appropriate substitution */
+		if (rs >= 0) ylikely {
 	            if (f_found) {
 	                rs = bp->strw(cp,cl) ;
 	                len += rs ;
@@ -575,7 +576,7 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 
 static int mkterms() noex {
 	int		rs ;
-	if ((rs = fieldterms(vterms,false,'\t',' ','#',':',';')) >= 0) {
+	if ((rs = fieldterms(vterms,false,'\t',' ','#',':',';')) >= 0) ylikely {
 	    rs = fieldterms(dterms,false,'\t',' ',',') ;
 	}
 	return rs ;
