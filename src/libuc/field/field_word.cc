@@ -51,10 +51,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<mkchar.h>
 #include	<char.h>
@@ -106,7 +103,7 @@ constexpr char		wterms[] = {
 int field_word(field *op,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
 	int		fl = -1 ;
-	if (op) {
+	if (op) ylikely {
 	    int		ll = op->ll ;
 	    int		chterm = '\0' ;
 	    cchar	*lp = op->lp ;
@@ -117,7 +114,7 @@ int field_word(field *op,cchar *terms,cchar **fpp) noex {
 	        lp += 1 ;
 	        ll -= 1 ;
 	    } /* end while */
-	    if (ll > 0) {
+	    if (ll > 0) ylikely {
 		int	ch = mkchar(*lp) ;
 	        fl = 0 ;
 	        if (! BATST(terms,ch)) {
