@@ -69,10 +69,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<baops.h>
 #include	<fieldterms.h>
@@ -132,10 +129,10 @@ constexpr bool		f_trailwhite = CF_TRAILWHITE ;
 int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
     	int		rs = SR_FAULT ;
 	int		fl = 0 ;
-	if (fsbp && abuf) {
+	if (fsbp && abuf) ylikely {
     	    static cint		rsf = fieldinit_terms() ;
 	    abuf[0] = '\0' ;
-	    if ((rs = rsf) >= 0) {
+	    if ((rs = rsf) >= 0) ylikely {
 		if (terms == nullptr) terms = dterms ;
 	        rs = field_srvarger(fsbp,terms,abuf,alen) ;
 	        fl = rs ;
@@ -291,7 +288,7 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
                 ll -= 1 ;
             } /* end if */
         } /* end while */
-        if (ll > 0) {
+        if (ll > 0) ylikely {
             chterm = ' ' ;
             ch = mkchar(*lp) ;
             if (batst(terms,ch)) {
@@ -322,7 +319,7 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 static int fieldinit_terms() noex {
     	int		rs ;
 	cbool		f_retain = true ;
-	if ((rs = fieldterms(dterms,f_retain,",")) >= 0) {
+	if ((rs = fieldterms(dterms,f_retain,",")) >= 0) ylikely {
 	    rs = fieldterms(doubles,f_retain,"\"$\\`") ;
 	}
 	return rs ;
