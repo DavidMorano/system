@@ -14,7 +14,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<hdb.h>
 #include	<expcook.h>
 #include	<vecstr.h>
