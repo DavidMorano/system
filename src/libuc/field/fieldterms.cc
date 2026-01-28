@@ -43,18 +43,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdarg>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"fieldterms.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -88,7 +90,7 @@ import libutil ;
 int fieldterms(char *terms,int f_retain,cchar *s) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (terms && s) {
+	if (terms && s) ylikely {
 	    if (! f_retain) {
 		memclear(terms,fieldterms_termsize) ;
 	    } /* end if */
@@ -106,12 +108,12 @@ int fieldtermsx(char *terms,int f,int na,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (terms) {
+	if (terms) ylikely {
 	    rs = SR_OK ;
 	    if (! f) {
 		memclear(terms,fieldterms_termsize) ;
 	    } /* end if */
-	    if (na > 0) {
+	    if (na > 0) ylikely {
 		va_begin(ap,na) ;
 	        for (int i = 0 ; i < na ; i += 1) {
 		    int	ch = (int) va_arg(ap,int) ;
