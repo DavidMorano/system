@@ -30,14 +30,15 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strncmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"ema.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -67,7 +68,7 @@ int ema_haveaddr(ema *op,cchar *ap,int al) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f = false ; /* return-value */
-	if ((rs = ema_magic(op,ap)) >= 0) {
+	if ((rs = ema_magic(op,ap)) >= 0) ylikely {
 	    ema_ent	*ep{} ;
 	    if (al < 0) al = lenstr(ap) ;
 	    rs = SR_OK ;
