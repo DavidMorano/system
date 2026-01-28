@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 #include	<strpack.h>
 
@@ -39,7 +40,7 @@ enum envhelpmems {
 	envhelpmem_count,
 	envhelpmem_finish,
 	envhelpmem_overlast
-} ;
+} ; /* end enum (envhelpmems) */
 struct envhelp ;
 struct envhelp_co {
 	envhelp		*op = nullptr ;
