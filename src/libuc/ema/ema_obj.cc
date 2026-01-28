@@ -29,7 +29,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"ema.h"
@@ -105,7 +108,7 @@ void ema::dtor() noex {
 
 int ema_st::operator () (cchar *sp,int sl) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case emamem_start:
 	        rs = ema_starter(op,sp,sl) ;
@@ -118,7 +121,7 @@ int ema_st::operator () (cchar *sp,int sl) noex {
 
 ema_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case emamem_count:
 	        rs = ema_count(op) ;
