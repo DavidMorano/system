@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= ucmem_main.o ucmem_incore.o
+OBJ0= ucmem_prime.o ucmem_incore.o
 OBJ1= ucmemla.o
 OBJ2=
 OBJ3=
@@ -54,7 +54,6 @@ OBJ= obja.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -136,7 +135,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ucmem_main.o:		ucmem_main.cc		$(INCS)
+ucmem_prime.o:		ucmem_prime.cc		$(INCS)
 ucmem_incore.o:		ucmem_incore.cc		$(INCS)
 
 ucmemla.o:		ucmemla.cc		$(INCS)
