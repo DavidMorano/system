@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	STRMAN		struct strman_head
@@ -26,7 +23,8 @@
 struct strman_head {
 	cchar		*sp ;
 	int		sl ;
-} ;
+} ; /* end struct (strman_head) */
+
 
 typedef	STRMAN		strman ;
 
