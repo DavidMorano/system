@@ -42,6 +42,8 @@ LIBS +=
 
 OBJ0= strfilter0.o 
 OBJ1= strfilter1.o
+OBJ2=
+OBJ3=
 
 OBJA= obj0.o obj1.o
 
@@ -118,6 +120,12 @@ obj0.o:			$(OBJ0)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
