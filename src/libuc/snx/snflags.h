@@ -53,7 +53,7 @@ enum snflagsmems {
     	snflagsmem_len,
 	snflagsmem_finish,
 	snflagsmem_overlast
-} ;
+} ; /* end enum (snflagsmems) */
 struct snflags ;
 struct snflags_co {
 	snflags		*op = nullptr ;
@@ -76,7 +76,7 @@ struct snflags : snflags_head {
 	    len(this,snflagsmem_len) ;
 	    finish(this,snflagsmem_finish) ;
 	    bp = nullptr ;
-	} ;
+	} ; /* end ctor */
 	snflags(const snflags &) = delete ;
 	snflags &operator = (const snflags &) = delete ;
 	int start(char *,int) noex ;
