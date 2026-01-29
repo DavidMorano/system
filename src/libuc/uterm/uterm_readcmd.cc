@@ -45,7 +45,9 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucread.h>
 #include	<ascii.h>		/* |CH_{xx}| */
 #include	<ndigit.h>
 #include	<cfdec.h>
@@ -55,7 +57,9 @@
 #include	"uterm.h"
 #include	"termcmd.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(2u)| */
 
 /* local defines */
 
@@ -148,8 +152,8 @@ int uterm_readcmd(uterm *utp,termcmd *ckp,int to,int ich) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if (utp && ckp) {
-	    if ((rs = termcmd_clear(ckp)) >= 0) {
+	if (utp && ckp) ylikely {
+	    if ((rs = termcmd_clear(ckp)) >= 0) ylikely {
 	        if (sub si ; (rs = sub_start(&si,utp,ckp,to,ich)) >= 0) {
 	            rs = 0 ;
 	            while (rs == 0) {
