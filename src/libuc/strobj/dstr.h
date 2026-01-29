@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	DSTR		struct dstr_head
@@ -26,7 +23,7 @@
 struct dstr_head {
 	char		*sbuf ;
 	int		slen ;
-} ;
+} ; /* end struct (dstr_head) */
 
 typedef DSTR		dstr ;
 
