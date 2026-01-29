@@ -37,9 +37,6 @@
 	<0		error (system-return)
 
 	See-also:
-	snfsflags(3uc)
-	snopenflags(3uc)
-	snpollflags(3uc)
 	snxtilook(3uc)
 	sninetaddr(3uc)
 	snsigabbr(3uc)
@@ -92,8 +89,8 @@
 
 /* local structures */
 
-struct flagstrs {
-	int		f ;
+struct flent {
+	int		fl ;
 	cchar		*s ;
 } ;
 
@@ -103,7 +100,7 @@ struct flagstrs {
 
 /* local variables */
 
-constexpr flagstrs	fileperms[] = {
+constexpr flent		fl_mode[] = {
 	{ S_ISUID, "SUID" },
 	{ S_ISGID, "SGID" },
 	{ S_ISVTX, "SAVETXT" },
@@ -158,9 +155,9 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 	        if (ms) ylikely {
 		    rs = ss.addstr(ms) ;
 	        }
-	        for (int i = 0 ; (rs >= 0) && fileperms[i].f ; i += 1) {
-	            if (fm & fileperms[i].f) {
-	                rs = ss.addstr(fileperms[i].s) ;
+	        for (int i = 0 ; (rs >= 0) && fl_mode[i].s ; i += 1) {
+	            if (fm & fl_mode[i].fl) {
+	                rs = ss.addstr(fl_mode[i].s) ;
 		    }
 	        } /* end for */
 	        if (rs >= 0) ylikely {
