@@ -32,13 +32,10 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ucmem.h>
 #include	<mkchar.h>
-#include	<char.h>
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
 #pragma		GCC dependency		"mod/libutil.ccm"
