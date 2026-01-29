@@ -35,7 +35,17 @@ DEFS +=
 
 INCS += strpack.h
 
+MODS +=
+
 LIBS +=
+
+
+OBJ0= strpack_prime.o strpack_envstore.o strpack_obj.o
+
+OBJA= obj0.o
+OBJB=
+
+OBJ= $(OBJA)
 
 
 INCDIRS +=
@@ -54,14 +64,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= strpack_main.o strpack_envstore.o strpack_obj.o
-
-OBJA= obj0.o
-
-OBJ= $(OBJA)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -74,6 +77,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -92,7 +98,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -108,26 +114,33 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4.o:			$(OBJ4)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5.o:			$(OBJ5)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-strpack_envstore.o:		strpack_envstore.cc	$(INCS)
-strpack_main.o:			strpack_main.cc		$(INCS)
-strpack_obj.o:			strpack_obj.cc		$(INCS)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+strpack_envstore.o:		strpack_envstore.cc		$(INCS)
+strpack_prime.o:		strpack_prime.cc		$(INCS)
+strpack_obj.o:			strpack_obj.cc			$(INCS)
 
 
