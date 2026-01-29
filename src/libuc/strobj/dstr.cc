@@ -28,13 +28,15 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"dstr.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* lenstr(3u)| */
 
@@ -73,7 +75,7 @@ int dstr_start(dstr *sop,cchar *sp,int sl) noex {
 	    sop->sbuf = nullptr ;
 	    sop->slen = 0 ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (cchar *rp ; (rs = uc_mallocstrw(sp,sl,&rp)) >= 0) ylikely {
+	    if (cchar *rp ; (rs = lm_strw(sp,sl,&rp)) >= 0) ylikely {
 		sop->slen = rs ;
 		sop->sbuf = charp(rp) ;
 	    }
@@ -88,7 +90,7 @@ int dstr_finish(dstr *sop) noex {
 	if (sop) ylikely {
 	    rs = SR_OK ;
 	    if (sop->sbuf) {
-	        rs1 = uc_free(sop->sbuf) ;
+	        rs1 = lm_free(sop->sbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        sop->sbuf = nullptr ;
 	    }
