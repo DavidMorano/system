@@ -1,4 +1,4 @@
-/* strfilter MODULE (module-implementation-unit) */
+/* strfilter1 MODULE (module-implementation-unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -49,10 +49,8 @@ module ;
 #include	<bitset>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<ulogerror.h>
 #include	<umem.hh>
 #include	<strn.h>		/* |strnbrk(3uc)| */
@@ -61,6 +59,8 @@ module ;
 #include	<localmisc.h>
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ureserve.ccm"
+#pragma		GCC dependency		"mod/sif.ccm"
 
 module strfilter ;
 
@@ -81,7 +81,7 @@ using std::min ;			/* subroutine */
 using std::max ;			/* subroutine */
 using std::sort ;			/* subroutine (niebloid) */
 using std::binary_search ;		/* subroutine */
-using libu::umem ;			/* variable */
+using libu::um ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -99,7 +99,7 @@ using std::nothrow ;			/* constant */
 
 /* forwards references */
 
-static ulong mksw(cchar *sp,int sl) noex {
+local ulong mksw(cchar *sp,int sl) noex {
     	cint	n = min(sl,szof(ulong)) ;
     	ulong	res = 0 ; /* return-value */
 	for (int i = 0 ; i < n ; i += 1) {
@@ -136,7 +136,7 @@ int strfilter::ifinish() noex {
 	if (magic == STRFILTER_MAGIC) {
 	    rs = SR_OK ;
 	    if (filtarr) {
-		rs1 = umem.free(filtarr) ;
+		rs1 = um.free(filtarr) ;
 		if (rs >= 0) rs = rs1 ;
 		filtarr = nullptr ;
 	    }
@@ -149,11 +149,10 @@ int strfilter::ifinish() noex {
 	return rs ;
 } /* end method (strfilter::ifinsh) */
 
-int strfilter::add(cchar *sp,int sl) noex {
+int strfilter::add(cchar *sp,int 탎l) noex {
     	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sl > 0) ylikely {
     	        rs = SR_NOTOPEN ;
@@ -163,29 +162,28 @@ int strfilter::add(cchar *sp,int sl) noex {
 		        sif sa(sp,sl,',') ;
 		        cc *cp ;
 		        for (int cl ; (cl = sa(&cp)) > 0 ; ) {
-			    c += 1 ;
 		            rs = iaddone(cp,cl) ;
+			    c += rs ;
 			    if (rs < 0) break ;
 		        } /* end for */
 		    } else {
-			c += 1 ;
 		        rs = iaddone(sp,sl) ;
-		    }
+			c += rs ;
+		    } /* end if */
 	        } /* end if (magic) */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (strfilter::add) */
 
-int strfilter::have(cchar *sp,int sl) noex {
+int strfilter::have(cchar *sp,int 탎l) noex {
     	int		rs = SR_FAULT ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sl > 0) ylikely {
 	        rs = ihave(sp,sl) ;
 	    }
-	}
+	} /* end if (getlenstr) */
 	return rs ;
 } /* end method (strfilter::have) */
 
@@ -209,7 +207,8 @@ int strfilter::iready() noex {
 	int		rs = SR_NOTOPEN ;
 	if (magic == STRFILTER_MAGIC) ylikely {
 	    if ((rs = vecstr::sort) >= 0) {
-	        std::sort(filtarr,(filtarr+idx)) ;
+	        std::sort(filtarr,(filtarr + idx)) ;
+		fl.ready = true ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -217,13 +216,15 @@ int strfilter::iready() noex {
 
 int strfilter::iaddone(cchar *cp,int cl) noex {
     	int		rs ;
-	if (cl < 0) cl = lenstr(cp) ;
+	int		f = false ; /* return-value */
 	if ((rs = ihave(cp,cl)) == 0) {
 	    if ((rs = inschrs(cp,cl)) >= 0) {
 		rs = vecstr::add(cp,cl) ;
-	    }
-	}
-	return rs ;
+		fl.ready = false ;
+		f = true ;
+	    } /* end if (inschrs) */
+	} /* end if (ihave) */
+	return (rs >= 0) ? f : rs ;
 } /* end method (strfilter::iaddone) */
 
 int strfilter::ihave(cchar *sp,int sl) noex {
@@ -233,7 +234,7 @@ int strfilter::ihave(cchar *sp,int sl) noex {
 	int		f = false ;
 	if (bool(filtchr[ch])) {
 	    ulong	sw = mksw(sp,sl) ;
-	    cint	rl = (sl - sz) ;
+	    cint	rl = (sl - sz) ; /* remaining-length */
 	    if (fl.ready) {
 		f = binary_search(filtarr,(filtarr + idx),sw) ;
 	    } else {
@@ -276,11 +277,11 @@ int strfilter::extend(int n) noex {
 	    if (filtarr == nullptr) {
 	        ne = max((n + 1),defents) ;
 	        sz = (ne + 1) * szof(ulong) ;
-	        rs = umem.malloc(sz,&na) ;
+	        rs = um.mall(sz,&na) ;
 	    } else {
 	        ne = (ext * 2) ;
 	        sz = (ne + 1) * szof(ulong) ;
-	        rs = umem.ralloc(filtarr,sz,&na) ;
+	        rs = um.rall(filtarr,sz,&na) ;
 	    }
 	    if (rs >= 0) {
 	        filtarr = ulongp(na) ;
@@ -297,11 +298,7 @@ void strfilter::dtor() noex {
 } /* end method (strfilter::dtor) */
 
 strfilter::operator int () const noex {
-	int		rs = SR_NOTOPEN ;
-	if (magic == STRFILTER_MAGIC) ylikely {
-	    rs = icount() ;
-	} /* end if (magic) */
-	return rs ;
+	return icount() ;
 } /* end method (strfilter::operator) */
 
 strfilter_co::operator int () noex {
