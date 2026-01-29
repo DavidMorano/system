@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	ASS		struct ass_head
@@ -35,7 +32,7 @@ enum assmems {
 	assmem_len,
 	assmem_finish,
 	assmem_overlast
-} ;
+} ; /* end enum (assmems) */
 struct ass ;
 struct ass_co {
 	ass		*op = nullptr ;
