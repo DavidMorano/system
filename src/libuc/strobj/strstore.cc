@@ -47,7 +47,9 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<vecobj.h>
 #include	<intceil.h>
 #include	<hash.h>
@@ -58,7 +60,9 @@
 
 #include	"strstore.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -71,7 +75,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -102,7 +105,7 @@ int		strstore_store(strstore *,cchar *,int,cchar **) noex ;
 int		strstore_already(strstore *,cchar *,int) noex ;
 
 template<typename ... Args>
-static inline int strstore_ctor(strstore *op,Args ... args) noex {
+local inline int strstore_ctor(strstore *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    cnullptr	np{} ;
@@ -135,10 +138,9 @@ static inline int strstore_ctor(strstore *op,Args ... args) noex {
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strstore_ctor) */
+} /* end subroutine (strstore_ctor) */
 
-static int strstore_dtor(strstore *op) noex {
+local int strstore_dtor(strstore *op) noex {
 	int		rs = SR_OK ;
 	if (op->hlp) {
 	    delete op->hlp ;
@@ -157,25 +159,24 @@ static int strstore_dtor(strstore *op) noex {
 	    op->clp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (strstore_dtor) */
+} /* end subroutine (strstore_dtor) */
 
 template<typename ... Args>
-static inline int strstore_magic(strstore *op,Args ... args) noex {
+local inline int strstore_magic(strstore *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == STRSTORE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (strstore_magic) */
 
-static int	strstore_chunknew(strstore *,int) noex ;
-static int	strstore_chunkfins(strstore *) noex ;
-static int	strstore_manage(strstore *,cchar *,int,int) noex ;
+local int	strstore_chunknew(strstore *,int) noex ;
+local int	strstore_chunkfins(strstore *) noex ;
+local int	strstore_manage(strstore *,cchar *,int,int) noex ;
 
-static int	chunk_start(strstore_ch *,int) noex ;
-static int	chunk_adv(strstore_ch *) noex ;
-static int	chunk_finish(strstore_ch *) noex ;
+local int	chunk_start(strstore_ch *,int) noex ;
+local int	chunk_adv(strstore_ch *) noex ;
+local int	chunk_finish(strstore_ch *) noex ;
 
 
 /* local variables */
@@ -185,12 +186,12 @@ constexpr bool		f_prealloc = CF_PREALLOC ;
 
 /* local subroutines */
 
-static inline int indexlen(int n) noex {
+local inline int indexlen(int n) noex {
 	return nextpowtwo(n) ;
 }
 /* end subroutine (indexlen) */
 
-static inline int indexsize(int il) noex {
+local inline int indexsize(int il) noex {
 	return ((il + 1) * 3 * szof(int)) ;
 }
 /* end subroutine (indexsize) */
@@ -199,6 +200,7 @@ static inline int indexsize(int il) noex {
 /* exported subroutines */
 
 int strstore_start(strstore *op,int n,int csz) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	if (n < STRSTORE_STARTLEN) n = STRSTORE_STARTLEN ;
 	if (csz < STRSTORE_CHUNKSIZE) csz = STRSTORE_CHUNKSIZE ;
@@ -211,8 +213,7 @@ int strstore_start(strstore *op,int n,int csz) noex {
 	        if ((rs = vechand_start(op->nlp,n,vo)) >= 0) ylikely {
 		    cint	isz = szof(int) ;
 	            if ((rs = lookaside_start(op->lap,isz,n)) >= 0) ylikely {
-		        cnullptr	np{} ;
-		        cint		hn = ((n*3)/2) ;
+		        cint	hn = ((n*3)/2) ;
 	                if ((rs = hdb_start(op->hlp,hn,true,np,np)) >= 0) {
 	                    op->magic = STRSTORE_MAGIC ;
 			    if_constexpr (f_prealloc) {
@@ -601,11 +602,11 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 
 /* private subroutines */
 
-static int strstore_chunknew(strstore *op,int amount) noex {
+local int strstore_chunknew(strstore *op,int amount) noex {
 	cint		csize = szof(strstore_ch) ;
 	int		rs ;
 	if (op->chsize > amount) amount = op->chsize ;
-	if (void *vp ; (rs = uc_malloc(csize,&vp)) >= 0) ylikely {
+	if (void *vp ; (rs = lm_mall(csize,&vp)) >= 0) ylikely {
 	    strstore_ch		*cep = (strstore_ch *) vp ;
 	    if ((rs = chunk_start(cep,(amount + 1))) >= 0) ylikely {
 	        if ((rs = vechand_add(op->clp,cep)) >= 0) ylikely {
@@ -620,14 +621,14 @@ static int strstore_chunknew(strstore *op,int amount) noex {
 		}
 	    }
 	    if (rs < 0) {
-	        uc_free(cep) ;
+	        lm_free(cep) ;
 	    }
 	} /* end if (memory-allocations) */
 	return rs ;
 }
 /* end subroutine (strstore_chunknew) */
 
-static int strstore_chunkfins(strstore *op) noex {
+local int strstore_chunkfins(strstore *op) noex {
 	vechand		*clp = op->clp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -640,7 +641,7 @@ static int strstore_chunkfins(strstore *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(cckp) ;
+	            rs1 = lm_free(cckp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    }
@@ -649,7 +650,7 @@ static int strstore_chunkfins(strstore *op) noex {
 }
 /* end subroutine (strstore_chunkfins) */
 
-static int strstore_manage(strstore *op,cchar *kp,int kl,int si) noex {
+local int strstore_manage(strstore *op,cchar *kp,int kl,int si) noex {
 	int		rs ;
 	if (int *ip{} ; (rs = lookaside_get(op->lap,&ip)) >= 0) ylikely {
 	    hdb_dat	key ;
@@ -668,29 +669,29 @@ static int strstore_manage(strstore *op,cchar *kp,int kl,int si) noex {
 }
 /* end subroutine (strstore_manage) */
 
-static int chunk_start(strstore_ch *cnp,int csz) noex {
+local int chunk_start(strstore_ch *cnp,int csz) noex {
 	int		rs = SR_INVALID ;
 	memclear(cnp) ;
 	if (csz > 0) {
 	    cnp->csz = csz ;
-	    rs = uc_malloc(csz,&cnp->cdata) ;
+	    rs = lm_mall(csz,&cnp->cdata) ;
 	}
 	return rs ;
 }
 /* end subroutine (chunk_start) */
 
-static int chunk_adv(strstore_ch *cnp) noex {
+local int chunk_adv(strstore_ch *cnp) noex {
 	cnp->cdata[0] = '\0' ;
 	cnp->i += 1 ;
 	return SR_OK ;
 }
 /* end subroutine (chunk_adv) */
 
-static int chunk_finish(strstore_ch *cnp) noex {
+local int chunk_finish(strstore_ch *cnp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (cnp->cdata) {
-	    rs1 = uc_free(cnp->cdata) ;
+	    rs1 = lm_free(cnp->cdata) ;
 	    if (rs >= 0) rs = rs1 ;
 	    cnp->cdata = nullptr ;
 	}
