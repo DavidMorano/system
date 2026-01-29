@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	snabbr
+	snabbrname
 
 	Description:
 	Copy an abbreviation of the given string to the destination.
@@ -37,9 +37,6 @@
 	<0		error (system-return)
 
 	See-also:
-	snfsflags(3uc)
-	snopenflags(3uc)
-	snpollflags(3uc)
 	snxtilook(3uc)
 	sninetaddr(3uc)
 	snsigabbr(3uc)
@@ -67,7 +64,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<sfx.h>			/* |sfnext(3uc)| */
-#include	<toxc.h>		/* |chtouc(3uc)| (for GCC b*llsh*t) */
+#include	<toxc.h>		/* |chtouc(3uc)| */
 #include	<localmisc.h>
 
 #include	"snabbr.h"
