@@ -9,10 +9,10 @@
 /* revision history:
 
 	= 1998-02-15, David A­D­ Morano
-	This code was started to make life easier on the outside (outside of
-	Lucent Technologies).  This file largely contains those things
-	(defines) that I have found to be either useful or problematic in the
-	past.
+	This code was started to make life easier on the outside
+	(outside of Lucent Technologies).  This file largely contains
+	those things (defines) that I have found to be either useful
+	or problematic in the past.
 
 */
 
@@ -379,10 +379,6 @@ typedef const char		cc ;
 
 #ifndef	COLUMNS
 #define	COLUMNS		80		/* historical terminal columns */
-#endif
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
 #endif
 
 #ifndef	POLL_INTMULT
