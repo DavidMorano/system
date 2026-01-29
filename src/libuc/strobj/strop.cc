@@ -33,9 +33,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ulogerror.h>
 #include	<six.h>			/* |siwhtbrk(3uc)| */
 #include	<baops.h>
@@ -45,7 +43,7 @@
 
 #include	"strop.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
 
@@ -99,6 +97,7 @@ local bool isterm(strop *sop,cchar *terms) noex {
 int strop_start(strop *sop,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	if (sop && sp) ylikely {
+	    rs = SR_INVALID ;
 	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	        sop->sp = sp ;
 	        sop->sl = sl ;
