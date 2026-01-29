@@ -46,7 +46,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uctc.h>		/* terminal-control */
+#include	<ucsysconf.h>
+#include	<ucread.h>
 #include	<ascii.h>
 #include	<baops.h>
 #include	<charq.h>
@@ -61,7 +66,9 @@
 
 #include	"uterm.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -82,14 +89,14 @@ import libutil ;
 
 /* output priorities */
 
-#define	OPM_WRITE	0x01
-#define	OPM_READ	0x02
-#define	OPM_ECHO	0x04
-#define	OPM_ANY		0x07
-
 #define	OPV_WRITE	0
 #define	OPV_READ	1
 #define	OPV_ECHO	2
+
+#define	OPM_WRITE	(1 << OPV_WRITE)
+#define	OPM_READ	(1 << OPV_READ)
+#define	OPM_ECHO	(1 << OPV_ECHO)
+#define	OPM_ANY		(OPM_WRITE | OPM_READ | OPM_ECHO)
 
 #undef	CH_FILTER
 #define	CH_FILTER	0x100
@@ -112,6 +119,11 @@ import libutil ;
 /* externals subroutines */
 
 extern "C" {
+    extern int uc_fuid(int) noex ;
+    extern int uc_raise(int) noex ;
+}
+
+extern "C" {
     extern int	tcsetmesg(int,int) noex ;
     extern int	tcsetbiff(int,int) noex ;
     extern int	tcgetlines(int) noex ;
@@ -130,7 +142,7 @@ extern "C" {
 template<typename ... Args>
 static inline int uterm_magic(uterm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == UTERM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -188,7 +200,7 @@ int uterm_start(uterm *op,int fd) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if (fd >= 0) {
+	    if (fd >= 0) ylikely {
 	        op->ti_start = getustime ;
 	        op->fd = fd ;
 	        op->uid = -1 ;
@@ -701,7 +713,7 @@ static int uterm_attrbegin(uterm *op) noex {
 	    rs = uc_tcattrset(fd,TCSADRAIN,tp) ;
 	    if (rs < 0) {
 		uc_tcattrset(fd,TCSADRAIN,&op->ts_old) ;
-	    }
+	} /* end if (error) */
 	} /* end if */
 
 	return rs ;
@@ -722,7 +734,7 @@ static int uterm_attrend(uterm *op) noex {
 
 static int uterm_qbegin(uterm *op) noex {
 	int		rs ;
-	if ((rs = charq_start(&op->taq,TA_SIZE)) >= 0) {
+	if ((rs = charq_start(&op->taq,TA_SIZE)) >= 0) ylikely {
 	    rs = charq_start(&op->ecq,EC_SIZE) ;
 	    if (rs < 0) {
 		charq_finish(&op->taq) ;
