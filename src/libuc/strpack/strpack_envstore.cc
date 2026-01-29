@@ -45,13 +45,17 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"strpack.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -91,7 +95,7 @@ int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = strpack_magic(op,kp)) >= 0) {
+	if ((rs = strpack_magic(op,kp)) >= 0) ylikely {
 	    int		sz = 1 ;
 	    if (kl < 0) kl = lenstr(kp) ;
 	    sz += (kl+1) ;
@@ -99,7 +103,7 @@ int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
 	        if (vl < 0) vl = lenstr(vp) ;
 	        sz += vl ;
 	    }
-	    if (char *ep{} ; (rs = uc_malloc(sz,&ep)) >= 0) {
+	    if (char *ep ; (rs = lm_mall(sz,&ep)) >= 0) ylikely {
 		{
 	            char	*bp = ep ;
 	            bp = strwcpy(bp,kp,kl) ;
@@ -111,7 +115,7 @@ int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
 		        len = rs ;
 		    }
 		}
-	        rs1 = uc_free(ep) ;
+	        rs1 = lm_free(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
