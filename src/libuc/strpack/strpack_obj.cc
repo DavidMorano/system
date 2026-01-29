@@ -48,7 +48,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ulogerror.h>
 #include	<localmisc.h>
 
@@ -60,7 +61,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -99,7 +99,7 @@ void strpack::dtor() noex {
 
 int strpack_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case strpackmem_start:
 	        rs = strpack_start(op,a) ;
