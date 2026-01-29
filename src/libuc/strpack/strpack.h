@@ -31,7 +31,7 @@ struct strpack_chunk {
 	int		csz ;		/* allocated buffer length */
 	int		i ;		/* index length */
 	int		c ;		/* item count within chunk */
-} ;
+} ; /* end struct */
 
 struct strpack_head {
 	STRPACK_CH	*chp ;		/* current chunk pointer */
