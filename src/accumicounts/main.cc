@@ -48,14 +48,6 @@
 
 /* external subroutines */
 
-extern int	matstr3(const char **,char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	isdigitlatin(int) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strshrink(char *) ;
-
 
 /* forward references */
 
