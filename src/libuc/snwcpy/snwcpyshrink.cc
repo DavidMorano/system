@@ -60,10 +60,6 @@
 
 /* local defines */
 
-#ifndef	CF_ONEPASS
-#define	CF_ONEPASS	1		/* try one-pass over the string */
-#endif
-
 
 /* local namespaces */
 
