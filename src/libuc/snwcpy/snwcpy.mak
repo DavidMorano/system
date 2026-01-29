@@ -46,6 +46,8 @@ OBJ2_SNWCPYX= snwcpyshrink.o snwcpycompact.o
 OBJ3_SNWCPYX= snwcpyer.o snwcpyrev.o
 OBJ4_SNWCPYX= snwcpyhyphen.o snwcpywidehdr.o
 OBJ5_SNWCPYX= snwcpyexpesc.o
+OBJ6_SNWCPYX=
+OBJ7_SNWCPYX=
 
 OBJA_SNWCPYX= obj0.o obj1.o
 OBJB_SNWCPYX= obj2.o obj3.o
@@ -120,32 +122,32 @@ control:
 
 
 obj0.o:			$(OBJ0_SNWCPYX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1_SNWCPYX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2_SNWCPYX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3_SNWCPYX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4.o:			$(OBJ4_SNWCPYX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5.o:			$(OBJ5_SNWCPYX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA_SNWCPYX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB_SNWCPYX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc.o:			$(OBJC_SNWCPYX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_SNWCPYX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 snwcpyclean.o:		snwcpyclean.cc		$(INCS)
