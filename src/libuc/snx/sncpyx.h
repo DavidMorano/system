@@ -26,6 +26,7 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
+#include	<sncpyxc.h>
 #include	<sncpyxw.h>
 
 
