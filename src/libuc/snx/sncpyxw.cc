@@ -39,9 +39,6 @@
 	any possible modifications.
 
 	See-also:
-	snfsflags(3uc)
-	snopenflags(3uc)
-	snpollflags(3uc)
 	snxtilook(3uc)
 	sninetaddr(3uc)
 	snsigabbr(3uc)
