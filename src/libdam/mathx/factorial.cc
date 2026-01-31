@@ -50,7 +50,7 @@
 
 	Synopsis:
 	double		dfactorial(int n) noex
-	long double	ldfactorial(int n) noex
+	longdouble	ldfactorial(int n) noex
 
 	Arguments:
 	n	number to return factorial value for
@@ -75,7 +75,7 @@
 	imported from the C++ |std| namespace because the C++
 	compiler (whatever it may be) is too stupid to deal with
 	disambiguating which version of the function (|double| or
-	|long double|) to use otherwise (without the namespace
+	|longdouble|) to use otherwise (without the namespace
 	importation).  This should be corrected with the compiler
 	implementation, but who has the time to deal with that?
 
@@ -134,16 +134,16 @@ constexpr long		facts[] = {
 } ; /* end array (facts) */
 
 template<typename T> static T factorialx(int n) noex {
-	T	v = -1.0 ;
+	T	res = -1.0 ;
 	if (n >= 0) {
 	    if (n < nelem(facts)) {
-		v = (T) facts[n] ;
+		res = (T) facts[n] ;
 	    } else {
 		const T x = (T) (n + 1) ;
-		v = tgamma(x) ;
+		res = tgamma(x) ;
 	    } /* end if */
 	}
-	return v ;
+	return res ;
 }
 /* end subroutine-template (factorialx) */
 
@@ -154,13 +154,13 @@ template<typename T> static T factorialx(int n) noex {
 /* exported subroutines */
 
 long factorial(int n) noex {
-	long		v = -1 ;
+	long		res = -1 ;
 	if (n >= 0) {
 	    if (cint ne = nelem(facts) ; n < ne) {
-	        v = facts[n] ;
+	        res = facts[n] ;
 	    }
 	}
-	return v ;
+	return res ;
 }
 /* end subroutine (factorial) */
 
@@ -168,8 +168,8 @@ double		dfactorial(int n) noex {
     	return factorialx<double>(n) ;
 }
 
-long double	ldfactorial(int n) noex {
-    	return factorialx<long double>(n) ;
+longdouble	ldfactorial(int n) noex {
+    	return factorialx<longdouble>(n) ;
 }
 
 
