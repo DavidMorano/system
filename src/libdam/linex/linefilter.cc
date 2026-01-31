@@ -76,7 +76,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int linefilter_ctor(linefilter *op,Args ... args) noex {
+local int linefilter_ctor(linefilter *op,Args ... args) noex {
     	LINEFILTER	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -96,7 +96,7 @@ static int linefilter_ctor(linefilter *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (linefilter_ctor) */
 
-static int linefilter_dtor(linefilter *op) noex {
+local int linefilter_dtor(linefilter *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
