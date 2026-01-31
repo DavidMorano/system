@@ -32,7 +32,7 @@ struct density_head {
 	uint		ovf ;
 	int		nmax ;
 	int		len ;
-} ;
+} ; /* end struct */
 
 struct density_stats {
 	double		mean ;
@@ -41,7 +41,7 @@ struct density_stats {
 	ulong		count ;
 	int		nmax ;
 	int		len ;
-} ;
+} ; /* end struct */
 
 typedef	DENSITY		density ;
 typedef	DENSITY_ST	density_st ;
