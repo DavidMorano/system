@@ -46,7 +46,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<serialbuf.h>
 #include	<endian.h>
@@ -62,6 +61,9 @@
 #include	"densitydb.h"
 #include	"densitydbe.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 import densityx_filehead ;
 import filemagic ;
 
@@ -98,9 +100,6 @@ import filemagic ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -120,7 +119,7 @@ typedef const funmode	cfunmode ;
 struct oldentry {
 	time_t		utime ;
 	int		ei ;
-} ;
+} ; /* end struct */
 
 namespace {
     struct vars {
@@ -139,16 +138,17 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static int densitydb_ctor(densitydb *op,Args ... args) noex {
+local int densitydb_ctor(densitydb *op,Args ... args) noex {
     	DENSITYDB	*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
-	    rs = SR_NOMEMT ;
+	if (op && (args && ...)) ylikely {
+	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if (buffer *buf ; (bup = new(nothrow) buffer) != np) {
+	    if (buffer *buf ; (bup = new(nt) buffer) != np) {ylikely {
 		op->bup = bup ;
-	        if (filehead *fhp ; (fhp = new(nothrow) filehead) != np) {
+	        if (filehead *fhp ; (fhp = new(nt) filehead) != np) ylikely {
 		    op->fhp = fhp ;
 		    rs = SR_OK ;
 		} /* end if (new-filehead) */
@@ -162,16 +162,16 @@ static int densitydb_ctor(densitydb *op,Args ... args) noex {
 }
 /* end subroutine (densitydb_ctor) */
 
-static int densitydb_dtor(densitydb *op) noex {
+local int densitydb_dtor(densitydb *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->fhp) {
+	    if (op->fhp) ylikely {
 		fileheader *fhp = (filehead *) op->fhp ;
 		delete fhp ;
 		op->fhp = nullptr ;
 	    }
-	    if (op->bup) {
+	    if (op->bup) ylikely {
 		buffer *bup = (buffer *) op->bup ;
 		delete bup ;
 		op->bup = nullptr ;
@@ -182,31 +182,31 @@ static int densitydb_dtor(densitydb *op) noex {
 /* end subroutine (densitydb_dtor) */
 
 template<typename ... Args>
-static inline int densitydb_magic(densitydb *op,Args ... args) noex {
+local inline int densitydb_magic(densitydb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DENSITYDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
 /* end subroutine (densitydb_magic) */
 
-static int densitydb_openbegin(DD *,cchar *) noex ;
-static int densitydb_opener(DD *,char *,cchar *,int) noex ;
-static int densitydb_openend(DD *) noex ;
+local int densitydb_openbegin(DD *,cchar *) noex ;
+local int densitydb_opener(DD *,char *,cchar *,int) noex ;
+local int densitydb_openend(DD *) noex ;
 
-static int densitydb_fileopen(DD *,time_t) noex ;
-static int densitydb_fileclose(DD *) noex ;
-static int densitydb_fileinit(DD *,time_t) noex ;
-static int densitydb_filechanged(DD *) noex ;
-static int densitydb_filecheck(DD *,time_t,cfunmode) noex ;
-static int densitydb_lockacq(DD *,time_t,cfunmode) noex ;
-static int densitydb_lockrel(DD *) noex ;
-static int densitydb_buf(DD *,uint,int,char **) noex ;
-static int densitydb_bufupdate(DD *,uint,int,cchar *) noex ;
-static int densitydb_bufbegin(DD *) noex ;
-static int densitydb_bufend(DD *) noex ;
-static int densitydb_writehead(DD *) noex ;
+local int densitydb_fileopen(DD *,time_t) noex ;
+local int densitydb_fileclose(DD *) noex ;
+local int densitydb_fileinit(DD *,time_t) noex ;
+local int densitydb_filechanged(DD *) noex ;
+local int densitydb_filecheck(DD *,time_t,cfunmode) noex ;
+local int densitydb_lockacq(DD *,time_t,cfunmode) noex ;
+local int densitydb_lockrel(DD *) noex ;
+local int densitydb_buf(DD *,uint,int,char **) noex ;
+local int densitydb_bufupdate(DD *,uint,int,cchar *) noex ;
+local int densitydb_bufbegin(DD *) noex ;
+local int densitydb_bufend(DD *) noex ;
+local int densitydb_writehead(DD *) noex ;
 
 
 /* local variables */
@@ -233,7 +233,7 @@ cbool		f_creat 	= CF_CREAT ;
 
 /* exported subroutines */
 
-static int densitydb_opens(DD *,cc *) noex ;
+local int densitydb_opens(DD *,cc *) noex ;
 
 int densitydb_open(DD *op,cc *fname,int oflags,mode_t om,int maxent) noex {
 	int		rs ;
@@ -265,7 +265,7 @@ int densitydb_open(DD *op,cc *fname,int oflags,mode_t om,int maxent) noex {
 }
 /* end subroutine (densitydb_open) */
 
-static int densitydb_opens(DD *op,cc *fname) noex {
+local int densitydb_opens(DD *op,cc *fname) noex {
     	int		rs ;
 	int		fcreate = false ;
         if ((rs = densitydb_bufbegin(op)) >= 0) {
@@ -360,7 +360,7 @@ int densitydb_curend(DD *op,DD_CUR *curp) noex {
 }
 /* end subroutine (densitydb_curend) */
 
-static int densitydb_curenums(DD *,DD_CUR *,DD_ENT *) noex ;
+local int densitydb_curenums(DD *,DD_CUR *,DD_ENT *) noex ;
 
 int densitydb_curenum(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
 	int		rs ;
@@ -379,7 +379,7 @@ int densitydb_curenum(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
 }
 /* end subroutine (densitydb_curenum) */
 
-static int densitydb_curenums(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
+local int densitydb_curenums(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
 	cfunmode	fc = funmode::rd ;
 	custime		dt = getustime ;
 	int		rs ;
@@ -527,7 +527,7 @@ int densitydb_check(DD *op,time_t dt) noex {
 
 /* private subroutines */
 
-static int densitydb_openbegin(DD *op,cchar *fname) noex {
+local int densitydb_openbegin(DD *op,cchar *fname) noex {
 	cint		of = (op->oflags & (~ O_CREAT)) ;
 	int		rs ;
 	int		fcreate = false ;
@@ -547,7 +547,7 @@ static int densitydb_openbegin(DD *op,cchar *fname) noex {
 }
 /* end subroutine (densitydb_openbegin) */
 
-static int densitydb_opener(DD *op,char *tbuf,cchar *fname,int of) noex {
+local int densitydb_opener(DD *op,char *tbuf,cchar *fname,int of) noex {
 	int		rs ;
 	cchar		*suf = DENSITYDB_FS ;
 	cmode		om = op->om ;
@@ -574,7 +574,7 @@ static int densitydb_opener(DD *op,char *tbuf,cchar *fname,int of) noex {
 }
 /* end subroutine (densitydb_opener) */
 
-static int densitydb_openend(DD *op) noex {
+local int densitydb_openend(DD *op) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) {
@@ -586,7 +586,7 @@ static int densitydb_openend(DD *op) noex {
 }
 /* end subroutine (densitydb_openend) */
 
-static int densitydb_filecheck(DD *op,time_t dt,cfunmode fc) noex {
+local int densitydb_filecheck(DD *op,time_t dt,cfunmode fc) noex {
 	int		rs = SR_OK ;
 	int		fch = false ;
 	if (dt == 0) dt = getustime ;
@@ -605,7 +605,7 @@ static int densitydb_filecheck(DD *op,time_t dt,cfunmode fc) noex {
 }
 /* end subroutine (densitydb_filecheck) */
 
-static int densitydb_fileinit(DD *op,time_t dt) noex {
+local int densitydb_fileinit(DD *op,time_t dt) noex {
 	FM	fm ;
 	int		rs ;
 	int		bl ;
@@ -716,7 +716,7 @@ ret0:
 }
 /* end subroutine (densitydb_fileinit) */
 
-static int densitydb_filechanged(DD *op) noex {
+local int densitydb_filechanged(DD *op) noex {
 	int		rs ;
 	int		fch = false ;
 	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
@@ -760,7 +760,7 @@ static int densitydb_filechanged(DD *op) noex {
 }
 /* end subroutine (densitydb_filechanged) */
 
-static int densitydb_lockacq(DD *op,time_t dt,cfunmode fc) noex {
+local int densitydb_lockacq(DD *op,time_t dt,cfunmode fc) noex {
 	int		rs = SR_OK ;
 	bool		falready = false ;
 	if ((rs = densitydb_fileopen(op,dt)) >= 0) {
@@ -785,7 +785,7 @@ static int densitydb_lockacq(DD *op,time_t dt,cfunmode fc) noex {
 }
 /* end subroutine (densitydb_lockacq) */
 
-static int densitydb_lockrel(DD *op) noex {
+local int densitydb_lockrel(DD *op) noex {
 	int		rs = SR_OK ;
 	if ((op->fl.readlocked || op->fl.writelocked)) {
 	    if (op->fd >= 0) {
@@ -798,7 +798,7 @@ static int densitydb_lockrel(DD *op) noex {
 }
 /* end subroutine (densitydb_lockrel) */
 
-static int densitydb_fileopen(DD *op,time_t dt) noex {
+local int densitydb_fileopen(DD *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    if ((rs = u_open(op->fname,op->oflags,op->om)) >= 0) {
@@ -824,7 +824,7 @@ int densitydb_fileclose(DD *op) noex {
 }
 /* end subroutine (densitydb_fileclose) */
 
-static int densitydb_bufbegin(DD *op) noex {
+local int densitydb_bufbegin(DD *op) noex {
 	cint		bsz = DENSITYDB_BUFSIZE ;
 	int		rs ;
 	op->b.off = 0 ;
@@ -839,7 +839,7 @@ static int densitydb_bufbegin(DD *op) noex {
 }
 /* end subroutine (densitydb_bufbegin) */
 
-static int densitydb_bufend(DD *op) noex {
+local int densitydb_bufend(DD *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->b.bup) {
@@ -853,7 +853,7 @@ static int densitydb_bufend(DD *op) noex {
 }
 /* end subroutine (densitydb_bufend) */
 
-static int densitydb_buf(DD *op,uint roff,int rlen,char **rpp) noex {
+local int densitydb_buf(DD *op,uint roff,int rlen,char **rpp) noex {
 	off_t		foff ;
 	uint		bext, bend, fext, fend ;
 	uint		rext = (roff + rlen), ext ;
@@ -921,7 +921,7 @@ static int densitydb_buf(DD *op,uint roff,int rlen,char **rpp) noex {
 }
 /* end subroutine (densitydb_buf) */
 
-static int densitydb_bufupdate(DD *op,uint roff,int rbuflen,cchar *rbuf) noex {
+local int densitydb_bufupdate(DD *op,uint roff,int rbuflen,cchar *rbuf) noex {
 	uint		boff, bext ;
 	uint		rext = roff + rbuflen ;
 	int		buflen, bdiff ;
@@ -960,7 +960,7 @@ static int densitydb_bufupdate(DD *op,uint roff,int rbuflen,cchar *rbuf) noex {
 }
 /* end subroutine (densitydb_bufupdate) */
 
-static int densitydb_writehead(DD *op) noex {
+local int densitydb_writehead(DD *op) noex {
 	int		rs ;
 	char		fbuf[DENSITYDB_FBUFLEN + 1] ;
 	if ((rs = filehead(fbuf,0,&op->h)) >= 0) {
