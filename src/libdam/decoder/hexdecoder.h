@@ -37,7 +37,7 @@ struct hexdecoder_head {
 	uint		magic ;
 	int		rl ;		/* residue length ('0' or '1') */
 	char		rb[HEXDECODER_NSTAGE + 1] ; /* staging buffer */
-} ;
+} ; /* end struct */
 
 typedef HEXDECODER	hexdecoder ;
 
