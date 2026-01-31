@@ -8,9 +8,14 @@ Functions currently provided are:
 function	description			types-supported
 --------------------------------------------------------------------------------
 
-binexp		Binary-Exponentiation		float, double, long-double
+binexp		Binary-Exponentiation		float, double, longdouble
 factorial	Factorial (integer)		long
 fibonacci	Fibonacci (integer)		long
-dfactorial	Factorial (floating-point)	double, long-double
+dfactorial	Factorial (floating-point)	double, longdouble
 dfibonacci	Fibonacci (floating-point)	double
+
+module		description			types-supported
+--------------------------------------------------------------------------------
+fft		FFT				float, double, longdouble
+
 
