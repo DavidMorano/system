@@ -30,14 +30,18 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"density.h"
 #include	"densitystat.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -63,31 +67,29 @@ template<typename ... Args>
 static int density_ctor(density *op,Args ... args) noex {
     	DENSITY		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (density_ctor) */
+} /* end subroutine (density_ctor) */
 
 static int density_dtor(density *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (density_dtor) */
+} /* end subroutine (density_dtor) */
 
 template<typename ... Args>
 static inline int density_magic(density *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DENSITY_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (density_magic) */
+} /* end subroutine (density_magic) */
+
 
 /* local variables */
 
@@ -103,7 +105,7 @@ int density_start(density *op,int len) noex {
 	    rs = SR_INVALID ;
 	    if (len > 0) {
 	        cint	sz = (len + 1) * szof(ulong) ;
-	        if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	        if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
 	            op->a = ulongp(p) ;
 	            memclear(op->a,sz) ;
 	            op->len = len ;
@@ -123,7 +125,7 @@ int density_finish(density *op) noex {
 	int		rs1 ;
 	if ((rs = density_magic(op)) >= 0) {
 	    if (op->a) {
-	        rs1 = uc_free(op->a) ;
+	        rs1 = lm_free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
 	    }
