@@ -33,9 +33,9 @@
 #define	CONFIGVARS_NFILES	(sizeof(int) * 8)
 
 
-struct paramfile_cursor {
+struct configvars_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct configvars_head {
 	vecobj		*fesp ;		/* file entries */
@@ -46,7 +46,7 @@ struct configvars_head {
 	vecobj		*unvp ;		/* "unset" environment variables */
 	time_t		checktime ;
 	uint		magic ;		/* magic number */
-} ;
+} ; /* end struct */
 
 struct configvars_filer {
 	cchar		*filename ;
@@ -55,17 +55,17 @@ struct configvars_filer {
 	vecobj		unsets ;	/* unset ENV variables */
 	time_t		mtime ;
 	int		fi ;
-} ;
+} ; /* end struct */
 
 struct configvars_errline {
 	int		line ;
 	char		filename[MAXPATHLEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct configvars_vflags {
 	uint		varsubed:1 ;	/* variable substituted */
 	uint		expanded:1 ;	/* key expanded */
-} ;
+} ; /* end struct */
 
 struct configvars_variable {
 	char		*ma ;		/* memory allocation (for ARGV) */
@@ -78,7 +78,7 @@ struct configvars_variable {
 	int		fmask ;		/* file mask of dependencies */
 	int		klen ;
 	int		vlen ;
-} ;
+} ; /* end struct */
 
 typedef CONFIGVARS	configvars ;
 typedef CONFIGVARS_VAR	configvars_var ;
