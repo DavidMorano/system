@@ -33,29 +33,26 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |lenstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<usupport.h>
-#include	<mallocstuff.h>
-#include	<bfile.h>
-#include	<strwcpy.h>
-#include	<char.h>
-#include	<field.h>
-#include	<matostr.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"configvarsobj.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine (template) */
 using std::max ;			/* subroutine (template) */
 using std::nothrow ;			/* constant */
@@ -88,22 +85,22 @@ using namespace		configvars_obj ;
 
 namespace configvars_obj {
 
-    int file_start(CV_FILE *cfp,cchar *filename) noex {
+    int file_start(CV_FILE *cfp,cchar *fn) noex {
 	int		rs = SR_FAULT ;
-	if (cfp && filename) {
+	if (cfp && fn) {
 	    memclear(cfp) ;
-	    rs = SR_NOMEM ;
-	    if ((cfp->filename = mallocstr(filename)) != nullptr) {
+	    if (cchar *cp ; (rs = lm_strw(fn,-1,&cp)) >= 0) {
 	        vecobj		*vip = &cfp->defines ;
 		cint		vsz = szof(CV_VAR) ;
 		cint		vn = 0 ;
 		cint		vo = 0 ;
+	        cfp->filename = cp ;
 	        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	            vip = &cfp->exports ;
 	            if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	                vip = &cfp->unsets ;
 		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-			    rs = lenstr(filename) ;
+			    rs = lenstr(fn) ;
 		        }
 		        if (rs < 0) {
 			    vecobj_finish(&cfp->exports) ;
@@ -114,7 +111,8 @@ namespace configvars_obj {
 		    }
 	        } /* end if (defines) */
 	        if (rs < 0) {
-		    uc_free(cfp->filename) ;
+		    void *vp = voidp(cfp->filename) ;
+		    lm_free(vp) ;
 		    cfp->filename = nullptr ;
 	        }
 	    } /* end if (filename) */
@@ -130,7 +128,8 @@ namespace configvars_obj {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end for */
 	if (cfp->filename) {
-	    rs1 = uc_free(cfp->filename) ;
+	    void *vp = voidp(cfp->filename) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    cfp->filename = nullptr ;
 	}
