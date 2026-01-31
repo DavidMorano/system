@@ -39,7 +39,8 @@
 #include	<vector>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -160,7 +161,7 @@ typedef widebuf *	widebufp ;
 template<typename ... Args>
 local inline int utf8decoder_magic(utf8decoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == UTF8DECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -180,7 +181,7 @@ int utf8decoder_start(utf8decoder *op) noex {
     	cnothrow	nt{} ;
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->outbuf = nullptr ;
 	    op->magic = 0 ;
@@ -261,7 +262,6 @@ int utf8decoder_read(utf8decoder *op,wchar_t *rbuf,int rlen) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = utf8decoder_magic(op,rbuf)) >= 0) {
-	    rbuf[0] = '\0' ;
 	    if (rlen > 0) {
 		int	ml ;
 	        if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
@@ -270,12 +270,12 @@ int utf8decoder_read(utf8decoder *op,wchar_t *rbuf,int rlen) noex {
 	            for (i = 0 ; i < ml ; i += 1) {
 		        rbuf[i] = wbp->at(i) ;
 	            }
-	            rbuf[i] = 0 ;
 	            rs = wbp->adv(i) ;
 	        } else {
 	            rs = SR_BUGCHECK ;
 	        }
 	    } /* end if (positive) */
+	    rbuf[i] = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
