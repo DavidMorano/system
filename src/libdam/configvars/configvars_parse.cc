@@ -30,11 +30,13 @@
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<usupport.h>
+#include	<uclibmem.h>
 #include	<bfile.h>
 #include	<bfliner.h>
 #include	<sfx.h>
@@ -42,7 +44,6 @@
 #include	<field.h>
 #include	<fieldterminit.hh>
 #include	<matostr.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"configvarsobj.hh"
@@ -55,7 +56,6 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine (template) */
 using std::max ;			/* subroutine (template) */
 using std::nothrow ;			/* constant */
