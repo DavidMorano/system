@@ -36,26 +36,22 @@
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<usupport.h>
-#include	<mallocstuff.h>
-#include	<bfile.h>
+#include	<uclibmem.h>
 #include	<strwcpy.h>
-#include	<char.h>
-#include	<field.h>
-#include	<matostr.h>
 #include	<localmisc.h>
 
 #include	"configvarsobj.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine (template) */
-using std::max ;			/* subroutine (template) */
 using std::nothrow ;			/* constant */
 
 using namespace		configvars_obj ;
@@ -75,7 +71,7 @@ using namespace		configvars_obj ;
 
 /* forward references */
 
-static void	freeit(char **) noex ;
+local void	freeit(char **) noex ;
 
 
 /* local variables */
@@ -99,7 +95,7 @@ namespace configvars_obj {
 		vl = 0 ;
 	    }
 	    len = (kl + vl + 2) ;
-	    if (char *vb ; (rs = uc_malloc(len,&vb)) >= 0) {
+	    if (char *vb ; (rs = lm_mall(len,&vb)) >= 0) {
 	        char	*cp = (strwcpy(vb,kp,kl) + 1) ;
 	        cep->fi = fi ;
 	        cep->key = vb ;
@@ -131,9 +127,9 @@ namespace configvars_obj {
     } /* end subroutine (var_finish) */
 } /* end namespace (configvars_obj) */
 
-static void freeit(char **vp) noex {
+local void freeit(char **vp) noex {
 	if (*vp) {
-	    uc_free(*vp) ;
+	    lm_free(*vp) ;
 	    *vp = nullptr ;
 	}
 } /* end subroutine (freeit) */
