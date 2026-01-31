@@ -28,10 +28,17 @@
 
 EXTERNC_begin
 
-extern long	fibonacci(int) noex ;
+extern long		fibonacci(int) noex ;
 
-extern double		dfibonacci(int) noex ;
-extern long double	ldfibonacci(int) noex ;
+extern double		fibonaccid(int) noex ;
+extern longdouble	fibonaccil(int) noex ;
+
+static inline double dfibonacci(int v) noex {
+    	return fibonaccid(v) ;
+}
+static inline longdouble lfibonacci(int v) noex {
+    	return fibonaccil(v) ;
+}
 
 EXTERNC_end
 
