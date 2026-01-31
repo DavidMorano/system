@@ -45,7 +45,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"densitystat.h"
@@ -104,8 +105,7 @@ int densitystatx(T *a,int n,double *mp,double *vp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (densitystatx) */
+} /* end subroutine-template (densitystatx) */
 
 
 /* local variables */
