@@ -36,7 +36,7 @@
 struct qpdecoder_flags {
 	uint		esc:1 ;
 	uint		space:1 ;
-} ;
+} ; /* end struct */
 
 struct qpdecoder_head {
 	void		*outbuf ;	/* output-buffer */
@@ -44,7 +44,7 @@ struct qpdecoder_head {
 	uint		magic ;
 	int		rl ;		/* stage length */
 	char		rb[QPDECODER_NSTAGE + 1] ;	/* stage buffer */
-} ;
+} ; /* end struct */
 
 typedef	QPDECODER	qpdecoder ;
 typedef	QPDECODER_FL	qpdecoder_fl ;
