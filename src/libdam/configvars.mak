@@ -15,7 +15,6 @@ CRTDIR		?= $(CGS_CRTDIR)
 VALDIR		?= $(CGS_VALDIR)
 RUNDIR		?= $(CGS_RUNDIR)
 
-
 CPP		?= cpp
 CC		?= gcc
 CXX		?= gpp
@@ -36,16 +35,26 @@ DEFS +=
 
 INCS += configvars.h
 
+MODS +=
+
 LIBS +=
+
+
+OBJ0= configvars_prime.o configvars_parse.o 
+OBJ1= configvars_file.o configvars_var.o
+OBJ2= configvars_sub.o
+OBJ3=
+
+OBJA= obj0.o obj1.o obj2.o
+
+OBJ= $(OBJA)
 
 
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -56,21 +65,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= configvars_main.o configvars_parse.o 
-OBJ1= configvars_file.o configvars_var.o
-OBJ2= configvars_sub.o
-OBJ3=
-OBJ4=
-OBJ5=
-OBJ6=
-OBJ7=
-
-OBJA= obj0.o obj1.o obj2.o
-
-OBJ= $(OBJA)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -83,6 +78,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -103,13 +101,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	$(RM) $(ALL)
@@ -122,19 +115,27 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-configvars_main.o:	configvars_main.cc	$(INCS) configvarsobj.hh
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+
+configvars_prime.o:	configvars_prime.cc	$(INCS) configvarsobj.hh
 configvars_parse.o:	configvars_parse.cc	$(INCS) configvarsobj.hh
 configvars_sub.o:	configvars_sub.cc	$(INCS) configvarsobj.hh
 configvars_file.o:	configvars_file.cc	$(INCS) configvarsobj.hh
