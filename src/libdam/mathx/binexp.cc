@@ -29,7 +29,7 @@
 	Synopsis:
 	float		binexpf(float x,int n) noex
 	double		binexp(double x,int n) noex
-	long double	binexpl(long double x,int n) noex
+	longdouble	binexpl(longdouble x,int n) noex
 
 	Arguments:
 	x	base
@@ -79,36 +79,36 @@
 /* forward references */
 
 template<typename T> static T binexpx(T x,int n) noex {
-	T	v = -1 ;
+	T	res = -1 ; /* return-value */
 	if (n >= 0) {
 	    switch (n) {
 	    case 0:
-	        v = 1.0 ;
+	        res = 1.0 ;
 		break ;
 	    case 1:
-		v = x ;
+		res = x ;
 		break ;
 	    case 2:
-		v = x*x ;
+		res = x*x ;
 		break ;
 	    case 3:
-		v = x*x*x ;
+		res = x*x*x ;
 		break ;
 	    case 4:
 		{
 		    const T t = x*x ;
-		    v = t*t ;
+		    res = t*t ;
 		}
 		break ;
 	    default:
 		{
 		    const T t = binexpx(x,(n/2)) ;
-		    v = (n&1) ? x*t*t : t*t ;
+		    res = (n&1) ? x*t*t : t*t ;
 		}
 		break ;
 	    } /* end switch */
 	}
-	return v ;
+	return res ;
 }
 /* end subroutine-template (binexpx) */
 
@@ -127,7 +127,7 @@ float		binexpf(float x,int n) noex {
 double		binexp(double x,int n) noex {
     	return binexpx(x,n) ;
 }
-long double	binexpl(long double x,int n) noex {
+longdouble	binexpl(longdouble x,int n) noex {
     	return binexpx(x,n) ;
 }
 
