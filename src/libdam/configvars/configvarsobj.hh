@@ -29,7 +29,7 @@ enum configvarsws {
 	configvarsw_unsets,
 	configvarsw_unvars,
 	configvarsw_overlast
-} ;
+} ; /* end enum */
 
 enum keytypes {
 	keytype_define,
@@ -38,7 +38,7 @@ enum keytypes {
 	keytype_unset,
 	keytype_var,
 	keytype_overlast
-} ;
+} ; /* end enum */
 
 #define	CONFIGVARS_WSETS	0
 #define	CONFIGVARS_WVARS	1
