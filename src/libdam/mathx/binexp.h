@@ -31,7 +31,7 @@ EXTERNC_begin
 
 extern float		binexpf(float,int) noex ;
 extern double		binexp(double,int) noex ;
-extern long double	binexpl(long double,int) noex ;
+extern longdouble	binexpl(longdouble,int) noex ;
 
 EXTERNC_end
 
@@ -40,7 +40,7 @@ EXTERNC_end
 inline float		binexp(float x,int n) noex {
     	return binexpf(x,n) ;
 }
-inline long double	binexp(long double x,int n) noex {
+inline longdouble	binexp(longdouble x,int n) noex {
     	return binexpl(x,n) ;
 }
 
