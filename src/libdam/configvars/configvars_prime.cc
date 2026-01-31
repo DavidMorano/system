@@ -68,7 +68,7 @@ using namespace		configvars_obj ;
 /* forward references */
 
 template<typename ... Args>
-static inline int configvars_ctor(configvars *op,Args ... args) noex {
+local inline int configvars_ctor(configvars *op,Args ... args) noex {
 	cnullptr	np{} ;
 	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
@@ -111,10 +111,9 @@ static inline int configvars_ctor(configvars *op,Args ... args) noex {
 	    } /* end if (new-fes) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (configvars_ctor) */
+} /* end subroutine (configvars_ctor) */
 
-static int configvars_dtor(configvars *op) noex {
+local int configvars_dtor(configvars *op) noex {
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	if (op->unvp) {
@@ -142,8 +141,7 @@ static int configvars_dtor(configvars *op) noex {
 	    op->fesp = np ;
 	}
 	return rs ;
-}
-/* end subroutine (configvars_dtor) */
+} /* end subroutine (configvars_dtor) */
 
 
 /* local variables */
