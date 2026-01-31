@@ -42,6 +42,9 @@
 
 #include	"dayofmonth.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -82,10 +85,10 @@ template<typename ... Args>
 static int dayofmonth_ctor(dayofmonth *op,Args ... args) noex {
     	dayofmonth	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    cint	sz = (szof(dayofmonth_mon *) * DAYOFMONTH_NMONS) ;
 	    memclear(hop) ;
-	    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) ylikely {
 		op->months = (dayofmonth_mon **) vp ;
 	    }
 	} /* end if (non-null) */
@@ -96,9 +99,9 @@ static int dayofmonth_ctor(dayofmonth *op,Args ... args) noex {
 static int dayofmonth_dtor(dayofmonth *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->months) {
+	    if (op->months) ylikely {
 		rs1 = uc_free(op->months) ;
 		if (rs >= 0) rs = rs1 ;
 		op->months = nullptr ;
@@ -111,7 +114,7 @@ static int dayofmonth_dtor(dayofmonth *op) noex {
 template<typename ... Args>
 static inline int dayofmonth_magic(dayofmonth *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DAYOFMONTH_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
