@@ -37,7 +37,8 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<digval.h>
 #include	<obuf.hh>
 #include	<mkchar.h>
@@ -80,7 +81,7 @@ template<typename ... Args>
 local int hexdecoder_ctor(hexdecoder *op,Args ... args) noex {
 	HEXDECODER	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -89,7 +90,7 @@ local int hexdecoder_ctor(hexdecoder *op,Args ... args) noex {
 
 local int hexdecoder_dtor(hexdecoder *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -99,7 +100,7 @@ local int hexdecoder_dtor(hexdecoder *op) noex {
 template<typename ... Args>
 local inline int hexdecoder_magic(hexdecoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == HEXDECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -198,23 +199,25 @@ int hexdecoder_load(hexdecoder *op,cchar *sp,int µsl) noex {
 /* end subroutine (hexdecoder_load) */
 
 int hexdecoder_read(hexdecoder *op,char *rbuf,int rlen) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = hexdecoder_magic(op,rbuf)) >= 0) {
-	    int		ml ;
-	    rbuf[0] = '\0' ;
-	    if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
-	        cint	len = obp->len ; /* <- read-coerce */
-	        ml = min(len,rlen) ;
-	        for (i = 0 ; i < ml ; i += 1) {
-		    cint	ch = obp->at(i) ;
-		    rbuf[i] = charconv(ch) ;
-	        } /* end for */
-	        rbuf[i] = '\0' ;
-	        rs = obp->adv(i) ;
-	    } else {
-	        rs = SR_BUGCHECK ;
-	    }
+	    if (rlen > 0) {
+	        int	ml ;
+	        if (obuf *obp ; (obp = obufp(op->outbuf)) != np) {
+	            cint	len = obp->len ; /* <- read-coerce */
+	            ml = min(len,rlen) ;
+	            for (i = 0 ; i < ml ; i += 1) {
+		        cint	ch = obp->at(i) ;
+		        rbuf[i] = charconv(ch) ;
+	            } /* end for */
+	            rs = obp->adv(i) ;
+	        } else {
+	            rs = SR_BUGCHECK ;
+	        }
+	    } /* end if (non-zero positive) */
+	    rbuf[i] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
