@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	B64DECODER_MAGIC	0x13f3c204
@@ -33,7 +34,7 @@ struct b64decoder_head {
 	uint		magic ;
 	int		rl ;		/* stage length */
 	char		rb[B64DECODER_NSTAGE + 1] ;	/* stage buffer */
-} ;
+} ; /* end struct */
 
 typedef B64DECODER	b64decoder ;
 
