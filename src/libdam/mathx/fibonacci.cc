@@ -177,16 +177,16 @@ template<typename T> constexpr T five = T{5.0} ;
 template<typename T> static T fibonaccix(int n) noex {
     	static constexpr T	den = sqrt(five<T>) ;
 	static constexpr T	aphi = std::numbers::phi_v<T> ;
-	T		v = -1.0 ;
+	T		res = -1.0 ; /* return-value */
 	if (n >= 0) {
 	    if (n < nelem(fibotab)) {
-	        v = (T) fibotab[n] ;
+	        res = (T) fibotab[n] ;
 	    } else {
 	        const T num = binexp(aphi,n) - binexp((1.0 - aphi),n) ;
-	        v = floor(num / den) ;
+	        res = floor(num / den) ;
 	    } /* end if */
 	}
-	return v ;
+	return res ;
 }
 /* end subroutine-template (fibonaccix) */
 
@@ -201,21 +201,21 @@ template<typename T> static T fibonaccix(int n) noex {
 
 long fibonacci(int n) noex {
 	cint		ntab = nelem(fibotab) ;
-	long		v = -1 ;
+	long		res = -1 ;
 	if (n < ntab) {
-	    v = fibotab[n] ;
+	    res = fibotab[n] ;
 	} else {
-	    v = fibonacci(n - 1) * fibonacci(n - 2) ;
+	    res = fibonacci(n - 1) * fibonacci(n - 2) ;
 	}
-	return v ;
+	return res ;
 }
 /* end subroutine (fibonacci) */
 
-double dfibonacci(int n) noex {
+double		fibonaccid(int n) noex {
     	return fibonaccix<double>(n) ;
 }
 
-longdouble lfibonacci(int n) noex { 
+longdouble	fibonaccil(int n) noex { 
     	return fibonaccix<longdouble>(n) ;
 }
 
