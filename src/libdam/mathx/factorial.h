@@ -28,10 +28,10 @@
 
 EXTERNC_begin
 
-extern long	factorial(int) noex ;
+extern long		factorial(int) noex ;
 
 extern double		dfactorial(int) noex ;
-extern long double	ldfactorial(int) noex ;
+extern longdouble	ldfactorial(int) noex ;
 
 EXTERNC_end
 
