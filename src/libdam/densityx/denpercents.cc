@@ -47,7 +47,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<concepts>
-#include	<usystem.h>		/* |sysrets| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 
