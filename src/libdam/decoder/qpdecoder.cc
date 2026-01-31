@@ -50,7 +50,8 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<six.h>
 #include	<strwcpy.h>
 #include	<digval.h>		/* |digvalhex(3uc)| */
@@ -96,7 +97,7 @@ template<typename ... Args>
 local int qpdecoder_ctor(qpdecoder *op,Args ... args) noex {
 	QPDECODER	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -105,7 +106,7 @@ local int qpdecoder_ctor(qpdecoder *op,Args ... args) noex {
 
 local int qpdecoder_dtor(qpdecoder *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -115,7 +116,7 @@ local int qpdecoder_dtor(qpdecoder *op) noex {
 template<typename ... Args>
 local inline int qpdecoder_magic(qpdecoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == QPDECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -263,9 +264,7 @@ int qpdecoder_read(qpdecoder *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		i = 0 ; /* return-value */
 	if ((rs = qpdecoder_magic(op,rbuf)) >= 0) {
-	    rs = SR_INVALID ;
-	    rbuf[0] = '\0' ;
-	    if (rlen >= 0) {
+	    if (rlen > 0) {
 	        int	ml ;
 	        if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
 	            cint	len = obp->len ;
@@ -274,12 +273,12 @@ int qpdecoder_read(qpdecoder *op,char *rbuf,int rlen) noex {
 			cint	ch = obp->at(i) ;
 	                rbuf[i] = charconv(ch) ;
 	            } /* end for */
-	            rbuf[i] = '\0' ;
 	            rs = obp->adv(i) ;
 	        } else {
 	            rs = SR_BUGCHECK ;
 	        }
 	    } /* end if (positive) */
+	    rbuf[i] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
@@ -313,7 +312,7 @@ local int qpdecoder_loadspace(qpdecoder *op,cchar *sp,int sl) noex {
 	} /* end while */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (qpdecoder_readspace) */
+/* end subroutine (qpdecoder_loadspace) */
 
 local int qpdecoder_add(qpdecoder *op,cchar *vp,int vl = -1) noex {
 	int		rs = SR_OK ;
