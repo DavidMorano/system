@@ -37,7 +37,8 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sfx.h>
 #include	<intfloor.h>
 #include	<strwcpy.h>
@@ -81,7 +82,7 @@ typedef obuf *		obufp ;
 template<typename ... Args>
 local inline int b64decoder_ctor(b64decoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 	    op->magic = 0 ;
 	    op->rl = 0 ;
@@ -93,7 +94,7 @@ local inline int b64decoder_ctor(b64decoder *op,Args ... args) noex {
 
 local inline int b64decoder_dtor(b64decoder *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -103,7 +104,7 @@ local inline int b64decoder_dtor(b64decoder *op) noex {
 template<typename ... Args>
 local inline int b64decoder_magic(b64decoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == B64DECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -224,7 +225,6 @@ int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		i = 0 ; /* return-value */
 	if ((rs = b64decoder_magic(op,rbuf)) >= 0) {
-	    rbuf[0] = '\0' ;
             rs = SR_INVALID ;
             if (rlen >= 0) {
                 rs = SR_OK ;
@@ -237,13 +237,13 @@ int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
 			    cint	ch = obp->at(i) ;
                             rbuf[i] = charconv(ch) ;
                         } /* end for */
-                        rbuf[i] = '\0' ;
                         rs = obp->adv(i) ;
 		    } else {
                         rs = SR_BUGCHECK ;
                     } /* end if */
-                } /* end if (positive) */
+                } /* end if (non-zero positive) */
             } /* end if (valid) */
+            rbuf[i] = '\0' ;
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
