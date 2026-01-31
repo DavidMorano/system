@@ -38,7 +38,7 @@ struct utf8decoder_head {
 	uint		magic ;
 	int		rem ;		/* remaining bytes */
 	wchar_t		code ;		/* UNICODE® code point */
-} ;
+} ; /* end struct */
 
 typedef UTF8DECODER	utf8decoder ;
 
