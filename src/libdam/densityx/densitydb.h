@@ -51,7 +51,7 @@ struct densitydb_flags {
 	uint		cursorlockbroken:1 ;	/* cursor lock broken */
 	uint		cursoracc:1 ;		/* accessed while cursored? */
 	uint		remote:1 ;		/* remote mounted file */
-} ;
+} ; /* end struct */
 
 struct densitydb_head {
 	char		*fname ;
@@ -70,11 +70,11 @@ struct densitydb_head {
 	int		cursors ;
 	int		ebs ;		/* entry buffer size */
 	mode_t		om ;
-} ;
+} ; /* end struct */
 
 struct densitydb_cursor {
     	int		i ;
-} ;
+} ; /* end struct */
 
 typedef	DENSITYDB		densitydb ;
 typedef	DENSITYDB_FL		densitydb_fl ;
