@@ -29,10 +29,11 @@
 
 #define	DENSITYDBE		struct densitydbe_head
 
+
 struct densitydbe_head {
 	uint		count ;		/* count */
 	uint		utime ;		/* update time */
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum densitydbemems {
@@ -40,7 +41,7 @@ enum densitydbemems {
 	densitydbemem_entsz,
 	densitydbemem_finish,
 	densitydbemem_overlast
-} ;
+} ; /* end enum */
 struct densitydbe ;
 struct densitydbe_co {
 	densitydbe	*op = nullptr ;
