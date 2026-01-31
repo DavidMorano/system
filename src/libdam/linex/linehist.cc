@@ -106,8 +106,7 @@ local int linehist_ctor(linehist *op,Args ... args) noex {
 	    } /* end if (new-langstate) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (linehist_ctor) */
+} /* end subroutine (linehist_ctor) */
 
 local int linehist_dtor(linehist *op) noex {
 	int		rs = SR_FAULT ;
@@ -119,8 +118,7 @@ local int linehist_dtor(linehist *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (linehist_dtor) */
+} /* end subroutine (linehist_dtor) */
 
 template<typename ... Args>
 local inline int linehist_magic(linehist *op,Args ... args) noex {
@@ -129,8 +127,7 @@ local inline int linehist_magic(linehist *op,Args ... args) noex {
 	    rs = (op->magic == LINEHIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (linehist_magic) */
+} /* end subroutine (linehist_magic) */
 
 
 /* local variables */
