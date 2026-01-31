@@ -83,7 +83,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int linecenter_ctor(linecenter *op,Args ... args) noex {
+local int linecenter_ctor(linecenter *op,Args ... args) noex {
     	LINECENTER	*hop = op  ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -95,10 +95,9 @@ static int linecenter_ctor(linecenter *op,Args ... args) noex {
 	    } /* end if (new-fifostr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (linecenter_ctor) */
+} /* end subroutine (linecenter_ctor) */
 
-static int linecenter_dtor(linecenter *op) noex {
+local int linecenter_dtor(linecenter *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -108,24 +107,22 @@ static int linecenter_dtor(linecenter *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (linecenter_dtor) */
+} /* end subroutine (linecenter_dtor) */
 
 template<typename ... Args>
-static inline int linecenter_magic(linecenter *op,Args ... args) noex {
+local inline int linecenter_magic(linecenter *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LINECENTER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (linecenter_magic) */
+} /* end subroutine (linecenter_magic) */
 
-static int	linecenter_mkline(LC *,int,char *,int) noex ;
-static int	linecenter_storeline(LC *,cchar *,int) noex ;
-static int	linecenter_hasbrk(LC *,int,int) noex ;
+local int	linecenter_mkline(LC *,int,char *,int) noex ;
+local int	linecenter_storeline(LC *,cchar *,int) noex ;
+local int	linecenter_hasbrk(LC *,int,int) noex ;
 
-static int	lenpercent(int,double) noex ;
+local int	lenpercent(int,double) noex ;
 
 
 /* local variables */
@@ -347,7 +344,7 @@ int linecenter_mklines(LC *op,int lwidth,int lbrk) noex {
 
 /* private subroutines */
 
-static int linecenter_storeline(LC *op,cc *lbuf,int llen) noex {
+local int linecenter_storeline(LC *op,cc *lbuf,int llen) noex {
 	int		rs = SR_INVALID ;
 	if (llen >= 0) {
 	    rs = SR_OK ;
@@ -372,7 +369,7 @@ static int linecenter_storeline(LC *op,cc *lbuf,int llen) noex {
 }
 /* end subroutine (linecenter_storeline) */
 
-static int linecenter_mkline(LC *op,int f_part,char *lbuf,int llen) noex {
+local int linecenter_mkline(LC *op,int f_part,char *lbuf,int llen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ; /* return-value */
@@ -449,7 +446,7 @@ static int linecenter_mkline(LC *op,int f_part,char *lbuf,int llen) noex {
 }
 /* end subroutine (linecenter_mkline) */
 
-static int linecenter_hasbrk(LC *op,int lwidth,int brklen) noex {
+local int linecenter_hasbrk(LC *op,int lwidth,int brklen) noex {
 	int		rs = SR_OK ;
 	int		curlen = op->ccnt ;
 	int		tmplen = 0 ; /* return-value */
@@ -480,7 +477,7 @@ static int linecenter_hasbrk(LC *op,int lwidth,int brklen) noex {
 }
 /* end subroutine (linecenter_hasbrk) */
 
-static int lenpercent(int len,double percent) noex {
+local int lenpercent(int len,double percent) noex {
 	double		flen = len ;
 	flen *= percent ;
 	return int(flen) ;
