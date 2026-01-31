@@ -13,6 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 #include	<density.h>
 #include	<densitydb.h>
