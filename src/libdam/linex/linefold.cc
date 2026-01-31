@@ -101,7 +101,7 @@ typedef liner *		linerp ;
 /* forward references */
 
 template<typename ... Args>
-static int linefold_ctor(linefold *op,Args ... args) noex {
+local int linefold_ctor(linefold *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
@@ -112,10 +112,9 @@ static int linefold_ctor(linefold *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (linefold_ctor) */
+} /* end subroutine (linefold_ctor) */
 
-static int linefold_dtor(linefold *op) noex {
+local int linefold_dtor(linefold *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -125,27 +124,25 @@ static int linefold_dtor(linefold *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (linefold_dtor) */
+} /* end subroutine (linefold_dtor) */
 
 template<typename ... Args>
-static int linefold_magic(linefold *op,Args ... args) noex {
+local int linefold_magic(linefold *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LINEFOLD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (linefold_magic) */
+} /* end subroutine (linefold_magic) */
 
-static int	linefold_process(linefold *,int,int,cchar *,int) noex ;
+local int	linefold_process(linefold *,int,int,cchar *,int) noex ;
 
-static int	params_load(params *,int,int) noex ;
-static int	params_nextline(params *,cchar *,int,cchar **) noex ;
-static int	params_nline(params *) noex ;
+local int	params_load(params *,int,int) noex ;
+local int	params_nextline(params *,cchar *,int,cchar **) noex ;
+local int	params_nline(params *) noex ;
 
-static int	argcols(int) noex ;
-static int	nextpiece(int,cchar *,int,int *) noex ;
+local int	argcols(int) noex ;
+local int	nextpiece(int,cchar *,int,int *) noex ;
 
 
 /* local variables */
@@ -265,7 +262,7 @@ int linefold_count(linefold *op) noex {
 
 /* private subroutines */
 
-static int linefold_process(linefold *op,int cols,int ind,
+local int linefold_process(linefold *op,int cols,int ind,
 		cc *lbuf,int llen) noex {
 	int		rs ;
 	int		nline = 0 ; /* return-value */
@@ -291,7 +288,7 @@ static int linefold_process(linefold *op,int cols,int ind,
 }
 /* end subroutine (linefold_process) */
 
-static int params_load(params *pp,int cols,int ind) noex {
+local int params_load(params *pp,int cols,int ind) noex {
 	int		rs = SR_FAULT ;
 	if (pp) ylikely {
 	    rs = memclear(pp) ;		/* dangerous */
@@ -302,7 +299,7 @@ static int params_load(params *pp,int cols,int ind) noex {
 }
 /* end subroutine (params_load) */
 
-static int params_nextline(params *pp,cchar *sp,int sl,cchar **rpp) noex {
+local int params_nextline(params *pp,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		ncol ;
 	int		ncs ;
@@ -333,12 +330,12 @@ static int params_nextline(params *pp,cchar *sp,int sl,cchar **rpp) noex {
 }
 /* end subroutine (params_nextline) */
 
-static int params_nline(params *pp) noex {
+local int params_nline(params *pp) noex {
 	return pp->nline ;
 }
 /* end subroutine (params_nline) */
 
-static int argcols(int cols) noex {
+local int argcols(int cols) noex {
 	cchar		*vncols = varname.columns ;
 	int		rs = SR_OK ;
 	if (cols <= 0) {
@@ -354,7 +351,7 @@ static int argcols(int cols) noex {
 }
 /* end subroutine (argcols) */
 
-static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
+local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	int		pl = 0 ;
 	int		ncs = 0 ;
 	int		cl = sl ;
