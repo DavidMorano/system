@@ -43,16 +43,16 @@ LIBS +=
 OBJ0= binexp.o
 OBJ1= factorial.o
 OBJ2= fibonacci.o
-OBJ3= complex.o
+OBJ3= fft.o
 OBJ4= 
 OBJ5= 
 OBJ6= 
 OBJ7= 
 
-OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB=
+OBJA= obj0.o obj1.o obj2.o 
+OBJB= obj3.o
 
-OBJ= obja.o
+OBJ= obja.o objb.o
 
 
 INCDIRS +=
@@ -165,5 +165,7 @@ complex0.o:		complex.ccm			$(INCS)
 complex1.o:		complex1.cc complex.ccm		$(INCS)
 	makemodule complex
 	$(COMPILE.cc) $<
+
+fft.o:			fft.ccm				$(INCS)
 
 
