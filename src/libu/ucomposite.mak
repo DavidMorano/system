@@ -40,12 +40,13 @@ MODS +=
 LIBS +=
 
 
-OBJ00= ucopy.o
+OBJ00= ucopy.o ulinkfile.o
 OBJ01=
 OBJ02=
 OBJ02=
 
 OBJA= obj00.o
+OBJB=
 
 OBJ= obja.o
 
@@ -134,13 +135,8 @@ obja.o:			$(OBJA)
 objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objc.o:			$(OBJC)
-	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objd.o:			$(OBJD)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-
-ucopy.o:		ucopy.cc			$(INCS)
+ucopy.o:		ucopy.cc	ucopy.h		$(INCS)
+ulinkfile.o:		ulinkfile.cc	ulinkfile.h	$(INCS)
 
 
