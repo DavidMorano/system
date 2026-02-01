@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* perform some mudule functions */
 /* version %I% last-modified %G% */
 
 
