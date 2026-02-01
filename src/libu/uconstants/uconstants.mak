@@ -42,7 +42,7 @@ LIBS +=
 
 DEP_UCONST= umods.o
 
-OBJ_UCONSTS= uconstants0.o uconstants1.o
+OBJ_UCONSTS= uconstants0.o uconstants_def.o
 
 
 INCDIRS=
@@ -114,24 +114,11 @@ control:
 	(uname -n ; date) > Control
 
 
-obj00_uconstants.o:		$(OBJ00_UMODS)
-	$(LD) -r -o $@ $(LDFLAGS) $^
-
-obj01_uconstants.o:		$(OBJ01_UMODS)
-	$(LD) -r -o $@ $(LDFLAGS) $^
-
-obj02_uconstants.o:		$(OBJ02_UMODS)
-	$(LD) -r -o $@ $(LDFLAGS) $^
-
-obj03_uconstants.o:		$(OBJ03_UMODS)
-	$(LD) -r -o $@ $(LDFLAGS) $^
-
-
 # UCONSTANTS
 uconstants0.o:		uconstants.ccm $(DEP_UCONST)
 	makemodule uconstants
 
-uconstants1.o:		uconstants1.cc uconstants.ccm $(DEP_UCONST)
+uconstants_def.o:	uconstants_def.cc uconstants.ccm $(DEP_UCONST)
 	makemodule uconstants
 	$(COMPILE.cc) $<
 
