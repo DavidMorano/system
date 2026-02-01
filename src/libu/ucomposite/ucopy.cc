@@ -23,7 +23,7 @@
 	u_copy
 
 	Description:
-	These provide various copy-file operations.
+	These subroutines provide various copy-file operations.
 
 	Synopsis:
 	int u_writefd(int fd,int sfd) noex
@@ -46,20 +46,32 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<numeric>		/* |sat_add(3c++)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<usupport.h>
 #include	<intsat.h>
 #include	<localmisc.h>
 
-#pragma		GCC dependency	"mod/usysconf.ccm"
-
 #include	"ucopy.h"
 
-import usysconf ;			/* |usysconval(3u)| */
+#pragma		GCC dependency		"mod/usysconf.ccm"
+
+import usysconf ;			/* |usysconfval(3u)| */
 
 /* local defines */
 
+#define	PAGEMULT		4	/* page-multiplier */
+#define	ALLOCMIN		128	/* allocation-minimum */
+
 
 /* imported namespaces */
+
+using std::min ;			/* subroutine */
+using std::max ;			/* subroutine */
+using libu::um ;			/* variable */
 
 
 /* local typedefs */
@@ -73,14 +85,24 @@ import usysconf ;			/* |usysconval(3u)| */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int	pagesz ;
+	operator int () noex ;
+    } ; /* end struct */
+} /* end namespace */
+
 
 /* forward references */
 
+local int	getsize(int) noex ;
 local int	copyover(int,int) noex ;
 local int	copyovers(char *,int,int,int) noex ;
 
 
 /* local variables */
+
+static vars		var ;
 
 
 /* exported variables */
@@ -156,27 +178,33 @@ int u_copy(cchar *srcfname,cchar *dstfname) noex {
 /* local subroutines */
 
 local int copyover(int fd,int dfd) noex {
-    	cnothrow	nt{} ;
-    	cnullptr	np{} ;
+	static cint	rsv = var ;
     	int		rs ;
-	int		csz = 0 ;
-    	if (cint cmd = _SC_PAGESIZE ; (rs = usysconfval(cmd)) >= 0) ylikely {
-	    cint	clen = rs ;
-	    rs = SR_NOMEM ;
-	    if (char *cbuf ; (cbuf = new(nt) char[clen + 1]) != np) ylikely {
+	int		rs1 ;
+	int		tlen = 0 ; /* return-value */
+    	if ((rs = rsv) >= 0) ylikely {
+	    if ((rs = getsize(fd)) >= 0) ylikely {
+		cint fsz = rs ;
+	        cint csz = (var.pagesz * PAGEMULT) ;
 		{
-		    rs = copyovers(cbuf,clen,fd,dfd) ;
-		    csz = rs ;
-		}
-		delete [] cbuf ;
-	    } /* end if (new-char) */
-	} /* end if (usysconf) */
-	return (rs >= 0) ? csz : rs ;
+		    cint	clen = min(fsz,csz) ;
+	            if (char *cbuf ; (rs = um.mall(clen,&cbuf)) >= 0) ylikely {
+		        {
+		            rs = copyovers(cbuf,clen,fd,dfd) ;
+		            tlen = rs ;
+		        }
+		        rs1 = um.free(cbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+		} /* end block */
+	    } /* end if (getsize) */
+	} /* end if (vars) */
+	return (rs >= 0) ? tlen : rs ;
 } /* end subroutine (copyover) */
 
 local int copyovers(char *cbuf,int clen,int fd,int dfd) noex {
     	int		rs ;
-	int		csz = 0 ;
+	int		csz = 0 ; /* return-value */
 	size_t		fsize = 0 ;
 	while ((rs = u_read(fd,cbuf,clen)) > 0) {
 	    rs = u_writen(dfd,cbuf,rs) ;
@@ -186,5 +214,30 @@ local int copyovers(char *cbuf,int clen,int fd,int dfd) noex {
 	if (rs >= 0) csz = intsat(fsize) ;
 	return (rs >= 0) ? csz : rs ;
 } /* end subroutine (copyovers) */
+
+local int getsize(int fd) noex {
+    	int		rs ;
+	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
+	    if (S_ISREG(sb.st_mode)) ylikely {
+		if (sb.st_size == 0z) {
+		    rs = min(var.pagesz,ALLOCMIN) ;
+		} else {
+		    clong fsize = long(sb.st_size) ;
+		    rs = intsat(fsize) ;
+		}
+	    } else {
+		rs = var.pagesz ;
+	    }
+	} /* end if (u_fstat) */
+    	return rs ;
+} /* end subroutine (getsize) */
+
+vars::operator int () noex {
+    	int		rs ;
+    	if (cint cmd = _SC_PAGESIZE ; (rs = usysconfval(cmd)) >= 0) ylikely {
+	    pagesz = rs ;
+	}
+    	return rs ;
+} /* end method (vars::operator) */
 
 
