@@ -29,17 +29,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<stddef.h>		/* |size_t| */
-#include	<stdint.h>		/* |uint32_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 #include	<ucopy.h>
+#include	<ulinkfile.h>
 
 
 #endif /* UCOPOSITE_INCLUDE */
