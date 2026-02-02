@@ -15,12 +15,24 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Group:
+	getpwx
+
+	Description:
+	Interface to PASSWORD caching.
+
+*******************************************************************************/
+
 #ifndef	GETPWX_INCLUDE
 #define	GETPWX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucentpw.h>
 
 
 EXTERNC_begin
