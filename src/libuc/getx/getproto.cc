@@ -44,10 +44,10 @@
 #include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<getxx.h>
-#include	<getbufsize.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucgetpr.h>
 #include	<nulstr.h>
 #include	<localmisc.h>
 
@@ -86,14 +86,15 @@ int getproto_name(cchar *pnp,int pnl) noex {
 	    if (pnp[0]) ylikely {
 	        cchar	*pname{} ;
 	        if (nulstr n ; (rs = n.start(pnp,pnl,&pname)) >= 0) {
-	    	    if (char *prbuf{} ; (rs = malloc_pr(&prbuf)) >= 0) {
+	    	    if (char *prbuf ; (rs = lm_pr(&prbuf)) >= 0) {
 	                ucentpr		pr ;
 	                cint		prlen = rs ;
 	                if ((rs = uc_getprnam(&pr,prbuf,prlen,pname)) >= 0) {
 	                    proto = pr.p_proto ;
 	                }
-		        rs = rsfree(rs,prbuf) ;
-	            } /* end if (m-a) */
+		        rs1 = lm_free(prbuf) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (m-a-f) */
 	            rs1 = n.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (nulstr) */
