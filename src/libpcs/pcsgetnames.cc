@@ -1,4 +1,5 @@
 /* pcsgetnames SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get various information elements related to the PCS environment */
@@ -17,7 +18,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Group:
 	pcsgetnames
 
 	Description:
@@ -67,20 +68,25 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<project.h>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<bufsizevar.hh>
-#include	<mallocxx.h>
-#include	<bfile.h>
-#include	<getax.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucentpw.h>
+#include	<ucentpj.h>
+#include	<ucgetpj.h>
 #include	<ucpwcache.h>
-#include	<filereadln.h>
+#include	<getax.h>
+#include	<getpwx.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
+#include	<bufsizevar.hh>
+#include	<bfile.h>
+#include	<filereadln.h>
 #include	<cfdec.h>
 #include	<mkx.h>
 #include	<mkpathx.h>
@@ -94,15 +100,16 @@
 
 #include	"pcsgetnames.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 import uconstants ;
 
 /* local defines */
 
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UCPWCACHE */
+#define	SI		subinfo
+#define	SI_FL		subinfo_fl
 
 #ifndef	nullptrFNAME
 #define	nullptrFNAME	"/dev/null"
@@ -140,9 +147,6 @@ import uconstants ;
 #define	PCSDPIFNAME	"etc/projectinfo"
 #endif
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
-
 
 /* imported namespaces */
 
@@ -162,75 +166,74 @@ extern "C" {
 
 /* local structures */
 
-struct subinfo_flags {
+struct subinfo_fl {
 	uint		uid:1 ;
 	uint		pw:1 ;
-} ;
+} ; /* end struct */
 
 struct subinfo {
 	cchar		*pr ;
 	cchar		*un ;
 	char		*rbuf ;		/* user supplied buffer */
 	char		*pwbuf ;
-	PASSWD		pw ;
-	SUBINFO_FL	init, f ;
+	ucentpw		pw ;
+	subinfo_fl	init, fl ;
 	uid_t		uid ;
 	int		rlen ;
 	int		pwlen ;
-} ;
+} ; /* end struct */
 
 struct pcsnametype {
 	cchar		*var ;
 	cchar		*fname ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *,char *,int,cchar *) noex ;
-static int	subinfo_getuid(SUBINFO *,uid_t *) noex ;
-static int	subinfo_getpw(SUBINFO *) noex ;
-static int	subinfo_finish(SUBINFO *) noex ;
+local int	subinfo_start(SI *,cchar *,char *,int,cchar *) noex ;
+local int	subinfo_getuid(SI *,uid_t *) noex ;
+local int	subinfo_getpw(SI *) noex ;
+local int	subinfo_finish(SI *) noex ;
 
-static int	getname(SUBINFO *,int) noex ;
-static int	getname_var(SUBINFO *,int) noex ;
-static int	getname_userhome(SUBINFO *,int) noex ;
-static int	getname_again(SUBINFO *,int) noex ;
-static int	getname_sysdb(SUBINFO *,int) noex ;
+local int	getname(SI *,int) noex ;
+local int	getname_var(SI *,int) noex ;
+local int	getname_userhome(SI *,int) noex ;
+local int	getname_again(SI *,int) noex ;
+local int	getname_sysdb(SI *,int) noex ;
 
-static int	getprojinfo_userhome(SUBINFO *) noex ;
-static int	getprojinfo_sysdb(SUBINFO *) noex ;
-static int	getprojinfo_pcsdef(SUBINFO *) noex ;
+local int	getprojinfo_userhome(SI *) noex ;
+local int	getprojinfo_sysdb(SI *) noex ;
+local int	getprojinfo_pcsdef(SI *) noex ;
 
 
 /* local variables */
 
-typedef int (*projinfo_f)(SUBINFO *) noex ;
+typedef int (*projinfo_f)(SI *) noex ;
+typedef int (*nameinfo_f)(SI *,int) noex ;
 
-static constexpr projinfo_f	getprojinfos[] = {
+constexpr projinfo_f	getprojinfos[] = {
 	getprojinfo_userhome,
 	getprojinfo_sysdb,
 	getprojinfo_pcsdef,
 	nullptr
-} ;
+} ; /* end array */
 
-static constexpr struct pcsnametype	pcsnametypes[] = {
+constexpr pcsnametype	pcsnametypes[] = {
 	{ VARNAME, NAMEFNAME },
 	{ VARFULLNAME, FULLNAMEFNAME },
 	{ nullptr, nullptr }
-} ;
+} ; /* end array */
 
-typedef int (*nameinfo_f)(SUBINFO *,int) noex ;
-
-static constexpr nameinfo_f	getnames[] = {
+constexpr nameinfo_f	getnames[] = {
 	getname_var,
 	getname_userhome,
 	getname_again,
 	getname_sysdb,
 	nullptr
-} ;
+} ; /* end array */
 
-static bufsizevar		maxpathlen(getbufsize_mp) ;
+static bufsizevar		maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
@@ -239,46 +242,46 @@ static bufsizevar		maxpathlen(getbufsize_mp) ;
 /* exported subroutines */
 
 int pcsgetname(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
-	cint	nt = pcsnametype_name ;
-	return pcsgetnames(pr,rbuf,rlen,username,nt) ;
+	cint	ntype = pcsnametype_name ;
+	return pcsgetnames(pr,rbuf,rlen,username,ntype) ;
 }
 /* end subroutine (pcsgetname) */
 
 int pcsgetfullname(cc *pr,char *rbuf,int rlen,cc *username) noex {
-	cint	nt = pcsnametype_fullname ;
-	return pcsgetnames(pr,rbuf,rlen,username,nt) ;
+	cint	ntype = pcsnametype_fullname ;
+	return pcsgetnames(pr,rbuf,rlen,username,ntype) ;
 }
 /* end subroutine (pcsgetfullname) */
 
 int pcsname(cc *pr,char *rbuf,int rlen,cc *username) noex {
-	cint	nt = pcsnametype_name ;
-	return pcsgetnames(pr,rbuf,rlen,username,nt) ;
+	cint	ntype = pcsnametype_name ;
+	return pcsgetnames(pr,rbuf,rlen,username,ntype) ;
 }
 /* end subroutine (pcsname) */
 
 int pcsfullname(cc *pr,char *rbuf,int rlen,cc *username) noex {
-	cint	nt = pcsnametype_fullname ;
-	return pcsgetnames(pr,rbuf,rlen,username,nt) ;
+	cint	ntype = pcsnametype_fullname ;
+	return pcsgetnames(pr,rbuf,rlen,username,ntype) ;
 }
 /* end subroutine (pcsfullname) */
 
-int pcsnames(cc *pr,char *rbuf,int rlen,cc *un,int nt) noex {
-	return pcsgetnames(pr,rbuf,rlen,un,nt) ;
+int pcsnames(cc *pr,char *rbuf,int rlen,cc *un,int ntype) noex {
+	return pcsgetnames(pr,rbuf,rlen,un,ntype) ;
 }
 /* end subroutine (pcsnames) */
 
-int pcsgetnames(cc *pr,char *rbuf,int rlen,cc *un,int nt) noex {
+int pcsgetnames(cc *pr,char *rbuf,int rlen,cc *un,int ntype) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
 	if (pr && rbuf && un) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (pr[0] && un[0] && (nt < pcsnametype_overlast)) {
-	        SUBINFO		si ;
+	    if (pr[0] && un[0] && (ntype < pcsnametype_overlast)) {
+	        SI	si ;
 	        if ((rs = subinfo_start(&si,pr,rbuf,rlen,un)) >= 0) {
 	            {
-	                rs = getname(&si,nt) ;
+	                rs = getname(&si,ntype) ;
 		        rl = rs ;
 	            }
 	            rs1 = subinfo_finish(&si) ;
@@ -303,7 +306,7 @@ int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (username[0]) {
-	        SUBINFO		mi ;
+	        SI	mi ;
 	        if ((rs = subinfo_start(&mi,pr,rbuf,rlen,username)) >= 0) {
 	            for (int i = 0 ; getprojinfos[i] ; i += 1) {
 			projinfo_f	fn = getprojinfos[i] ;
@@ -323,7 +326,7 @@ int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SUBINFO *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
+local int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
 	int		rs ;
 	memclear(sip) ; /* dangerous */
 	sip->pr = pr ;
@@ -331,8 +334,7 @@ static int subinfo_start(SUBINFO *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
 	sip->rlen = rlen ;
 	sip->un = un ;
 	if ((rs = maxpathlen) >= 0) {
-	    char	*pwbuf{} ;
-	    if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	        sip->pwbuf = pwbuf ;
 	        sip->pwlen = rs ;
 	    } /* end if (memory-allocation) */
@@ -341,11 +343,11 @@ static int subinfo_start(SUBINFO *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sip->pwbuf) {
-	    rs1 = uc_free(sip->pwbuf) ;
+	    rs1 = lm_free(sip->pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->pwbuf = nullptr ;
 	}
@@ -354,7 +356,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
+local int subinfo_getuid(SI *sip,uid_t *uidp) noex {
 	int		rs = SR_OK ;
 	cchar		*vn = varname.username ;
 	if (! sip->init.uid) {
@@ -364,11 +366,12 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 	        sip->fl.uid = true ;
 	        sip->uid = getuid() ;
 	    } else {
-	        rs = subinfo_getpw(sip) ;
-	        if ((rs >= 0) && (! sip->fl.uid)) {
-	            sip->fl.uid = true ;
-	            sip->uid = sip->pw.pw_uid ;
-	        }
+	        if ((rs = subinfo_getpw(sip)) >= 0) {
+	            if (! sip->fl.uid) {
+	                sip->fl.uid = true ;
+	                sip->uid = sip->pw.pw_uid ;
+		    }
+	        } /* end if (subinfo_getpw) */
 	    } /* end if */
 	} /* end if (initializing UID) */
 	if (uidp != nullptr) {
@@ -381,7 +384,7 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 }
 /* end subroutine (subinfo_getuid) */
 
-static int subinfo_getpw(SUBINFO *sip) noex {
+local int subinfo_getpw(SI *sip) noex {
 	int		rs = SR_OK ;
 	cchar		*un = sip->un ;
 	if (! sip->init.pw) {
@@ -390,13 +393,12 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 	    sip->init.pw = true ;
 	    if ((un != nullptr) && (un[0] != '\0') && (un[0] != '-')) {
 	        if (hasalldig(un,-1)) {
-	            uint	uv ;
-	            if ((rs = cfdecui(un,-1,&uv)) >= 0) {
+	            if (uint uv ; (rs = cfdecui(un,-1,&uv)) >= 0) {
 	                const uid_t	uid = uv ;
 	                rs = getpwusername(&sip->pw,pwbuf,pwlen,uid) ;
 	            }
 	        } else {
-	            rs = GETPW_NAME(&sip->pw,pwbuf,pwlen,un) ;
+	            rs = getpwx_name(&sip->pw,pwbuf,pwlen,un) ;
 		}
 	    } else {
 	        rs = getpwusername(&sip->pw,pwbuf,pwlen,-1) ;
@@ -410,14 +412,14 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_getpw) */
 
-static int getname(SUBINFO *sip,int nt) noex {
+local int getname(SI *sip,int ntype) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rl = 0 ;
-	if (nt < pcsnametype_overlast) {
+	if (ntype < pcsnametype_overlast) {
 	    sip->rbuf[0] = '\0' ;
 	    for (int i = 0 ; getnames[i] ; i += 1) {
 	        nameinfo_f	fn = getnames[i] ;
-	        rs = fn(sip,nt) ;
+	        rs = fn(sip,ntype) ;
 		rl = rs ;
 	        if (rs != 0) break ;
 	    } /* end for */
@@ -426,7 +428,7 @@ static int getname(SUBINFO *sip,int nt) noex {
 }
 /* end subroutine (getname) */
 
-static int getname_var(SUBINFO *sip,int nt) noex {
+local int getname_var(SI *sip,int ntype) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar		*vn = varname.username ;
@@ -439,7 +441,7 @@ static int getname_var(SUBINFO *sip,int nt) noex {
 	        f = (strcmp(vun,un) == 0) ;
 	}
 	if (f) {
-	    static cchar	*cp = getenv(pcsnametypes[nt].var) ;
+	    static cchar	*cp = getenv(pcsnametypes[ntype].var) ;
 	    if ((cp != nullptr) && (cp[0] != '\0')) {
 	        rs = sncpy1(sip->rbuf,sip->rlen,cp) ;
 		len = rs ;
@@ -449,44 +451,45 @@ static int getname_var(SUBINFO *sip,int nt) noex {
 }
 /* end subroutine (getname_var) */
 
-static int getname_userhome(SUBINFO *sip ,int nt) noex {
+local int getname_userhome(SI *sip ,int ntype) noex {
         cint            sz = (2 * (maxpathlen + 1)) ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	int		na = 0 ;
-	char		*a{} ;
-        if ((rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
             cint        hlen = maxpathlen ; 
 	    cchar	*un = sip->un ;
             char        *hbuf = (a + (na++ * (maxpathlen + 1))) ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
-	        cchar	*fn = pcsnametypes[nt].fname ;
+	        cchar	*fn = pcsnametypes[ntype].fname ;
                 char    *tbuf = (a + (na++ * (maxpathlen + 1))) ;
 	        if ((rs = mkpath2(tbuf,hbuf,fn)) >= 0) {
 	            rs = filereadln(tbuf,sip->rbuf,sip->rlen) ;
 		    len = rs ;
-		    if (isNotPresent(rs)) rs = SR_OK ;
+		    if (isNotPresent(rs)) {
+			rs = SR_OK ;
+		    }
 	        }
 	    } /* end if (getuserhome) */
-	    rs1 = uc_free(a) ;
+	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getname_userhome) */
 
-static int getname_again(SUBINFO *sip,int nt) noex {
+local int getname_again(SI *sip,int ntype) noex {
 	int		rs = SR_OK ;
-	if (nt == pcsnametype_fullname) {
-	    nt = pcsnametype_name ;
-	    rs = getname(sip,nt) ;
+	if (ntype == pcsnametype_fullname) {
+	    ntype = pcsnametype_name ;
+	    rs = getname(sip,ntype) ;
 	}
 	return rs ;
 }
 /* end subroutine (getname_again) */
 
-static int getname_sysdb(SUBINFO *sip,int) noex {
+local int getname_sysdb(SI *sip,int) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -494,15 +497,14 @@ static int getname_sysdb(SUBINFO *sip,int) noex {
 	    rs = subinfo_getpw(sip) ;
 	}
 	if (rs >= 0) {
-	    cint	nlen = (strlen(sip->pw.pw_gecos)+10) ;
+	    cint	nlen = (lenstr(sip->pw.pw_gecos)+10) ;
 	    cchar	*gecos = sip->pw.pw_gecos ;
-	    char	*nbuf{} ;
-	    if ((rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
+	    if (char *nbuf ; (rs = lm_mall((nlen+1),&nbuf)) >= 0) {
 	        if ((rs = mkgecosname(nbuf,nlen,gecos)) > 0) {
 	            rs = mkrealname(sip->rbuf,sip->rlen,nbuf,rs) ;
 	            len = rs ;
 	        }
-	        rs1 = uc_free(nbuf) ;
+	        rs1 = lm_free(nbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
 	} /* end if */
@@ -510,14 +512,13 @@ static int getname_sysdb(SUBINFO *sip,int) noex {
 }
 /* end subroutine (getname_sysdb) */
 
-static int getprojinfo_userhome(SUBINFO *sip) noex {
+local int getprojinfo_userhome(SI *sip) noex {
 	cint		sz = (2 * (maxpathlen + 1)) ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	int		na = 0 ;
-	char		*a{} ;
-	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 	    cint	hlen = maxpathlen ;
 	    cchar	*un = sip->un ;
 	    cchar	*fname = PROJECTFNAME ;
@@ -534,26 +535,24 @@ static int getprojinfo_userhome(SUBINFO *sip) noex {
 		    }
 	        } /* end if (mkpath) */
 	    } /* end if (gethome) */
-	    rs1 = uc_free(a) ;
+	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getprojinfo_userhome) */
 
-static int getprojinfo_sysdb(SUBINFO *sip) noex {
+local int getprojinfo_sysdb(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*pjbuf{} ;
-	if ((rs = malloc_pj(&pjbuf)) >= 0) {
+	if (char *pjbuf ; (rs = lm_pj(&pjbuf)) >= 0) {
 	    ucentpj	pj ;
 	    cint	pjlen = rs ;
 	    if ((rs = uc_getpjdef(&pj,pjbuf,pjlen,sip->un)) >= 0) {
 	        bool	f = (strcmp(pj.pj_name,DEFPROJNAME) != 0) ;
 	        if (f) {
-	            uid_t	uid ;
-	            if ((rs = subinfo_getuid(sip,&uid)) >= 0) {
+	            if (uid_t uid ; (rs = subinfo_getuid(sip,&uid)) >= 0) {
 		        f = (uid >= NSYSPIDS) ;
 		    }
 	        }
@@ -564,23 +563,21 @@ static int getprojinfo_sysdb(SUBINFO *sip) noex {
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
 	    }
-	    rs1 = uc_free(pjbuf) ;
+	    rs1 = lm_free(pjbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getprojinfo_sysdb) */
 
-static int getprojinfo_pcsdef(SUBINFO *sip) noex {
-	uid_t		uid ;
+local int getprojinfo_pcsdef(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = subinfo_getuid(sip,&uid)) >= 0) {
+	if (uid_t uid ; (rs = subinfo_getuid(sip,&uid)) >= 0) {
 	    if (uid >= NSYSPIDS) {
 	        cchar	*fname = PCSDPIFNAME ;
-	        char	*tbuf{} ;
-		if ((rs = malloc_mp(&tbuf)) >= 0) {
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	            if ((rs = mkpath2(tbuf,sip->pr,fname)) >= 0) {
 		        cint	rlen = sip->rlen ;
 		        char	*rbuf = sip->rbuf ;
@@ -590,11 +587,11 @@ static int getprojinfo_pcsdef(SUBINFO *sip) noex {
 			    rs = SR_OK ;
 		        }
 	            } /* end if (mkpath) */
-		    rs1 = uc_free(tbuf) ;
+		    rs1 = lm_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (system UID) */
-	} /* end if */
+	} /* end if )subinfo_getuid) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getprojinfo_pcsdef) */
