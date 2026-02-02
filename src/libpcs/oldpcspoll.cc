@@ -1,13 +1,14 @@
-/* pcspoll */
+/* pcspoll SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* initiate possible polling of PCS activities */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DAMAGED	0		/* protect against damage */
 #define	CF_ISAEXEC	1		/* use 'isaexec(3c)' */
 #define	CF_SNCPY	1		/* use 'sncpyx(3dam)' */
-
 
 /* revision history:
 
@@ -20,13 +21,17 @@
 
 /*******************************************************************************
 
-        This subroutine is called by PCS programs. This may initiate an
-        invocation of the PCSPOLL program. Some quickie checks are made here
-        first before calling that program in order to reduce the number of times
-        that program needs to be invoked unnecessarily.
+  	Name:
+	pcspoll
+
+  	Description:
+	This subroutine is called by PCS programs. This may initiate
+	an invocation of the PCSPOLL program. Some quickie checks
+	are made here first before calling that program in order
+	to reduce the number of times that program needs to be
+	invoked unnecessarily.
 
 	Synopsis:
-
 	int pcspoll(pr,searchname,csp,sp)
 	const char	pr[] ;
 	const char	searchname[] ;
@@ -34,37 +39,30 @@
 	VECSTR		*sp ;
 
 	Arguments:
-
 	pr		PCS system program root (if available)
 	searchname	name to use as program search-name
 	csp		pointer to a PCSCONF block (if available)
 	sp		pointer to VECSTR object of the 'set's (if available)
 
 	Returns:
-
 	>=0		OK
-	<0		some error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#define	PCSCONF_MASTER		0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<opendefstds.h>
 #include	<bfile.h>
 #include	<sbuf.h>
 #include	<vecstr.h>
@@ -72,12 +70,11 @@
 
 #include	"pcsconf.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
 
 #ifndef	NOFILE
 #define	NOFILE		20
@@ -417,15 +414,11 @@ vecstr		*setp ;
 
 	    f_polled = TRUE ;
 	    if ((rs = uc_fork()) == 0) {
-
 	        vecstr	args ;
 	        vecstr	envs ;
-
 	        char	tmpfname[MAXPATHLEN + 1] ;
 	        char	*execfname ;
 		char	*argz ;
-		char	*nullfname = NULLFNAME ;
-
 
 #if	CF_DEBUGS
 	        debugprintf("pcspoll: child forked\n") ;
@@ -445,23 +438,7 @@ vecstr		*setp ;
 
 		u_setsid() ;
 
-	        for (i = 0 ; i < 3 ; i += 1) {
-
-	            if (i != 0) {
-
-#if	CF_DEBUGS
-	                if (i == 2) {
-	                    u_open("/tmp/pcspoll.err",O_WRONLY,0666) ;
-	                } else
-	                    u_open(nullfname,O_WRONLY,0666) ;
-#else
-	                u_open(nullfname,O_WRONLY,0666) ;
-#endif
-
-	            } else
-	                u_open(nullfname,O_RDONLY,0666) ;
-
-	        } /* end for */
+		rs = opendefstds(3) ;
 
 /* if 'progfname' is empty, then the program was in the PATH!, get it */
 
