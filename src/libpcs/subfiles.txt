@@ -1,0 +1,12 @@
+
+pcsconf
+mkdirlist
+artlist
+article
+dirshown
+
+pcsuserfile
+pcsgetserial
+pcsgetnames
+pcsmsgid
+
