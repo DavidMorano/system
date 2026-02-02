@@ -46,10 +46,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<fcntl.h>		/* open flags */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<utmpacc.h>
 #include	<tmpx.h>
 #include	<localmisc.h>
