@@ -34,13 +34,18 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uctc.h>		/* terminal-conrol */
 #include	<ischarx.h>
-#include	<usystem.h>
+#include	<localmisc.h>
 
 #include	"getpassword.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -54,6 +59,13 @@ import libutil ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_close(int) ;
+    extern int uc_read(int,void *,int) noex ;
+    extern int uc_write(int,cvoid *,int) noex ;
+}
 
 
 /* external variables */
