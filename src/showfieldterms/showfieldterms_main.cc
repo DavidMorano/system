@@ -55,19 +55,9 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfhexi(const char *,int,int *) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,const char *,
 			const struct pivars *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strshrink(char *) ;
 
 
 /* external variables */
