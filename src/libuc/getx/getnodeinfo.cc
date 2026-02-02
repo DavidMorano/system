@@ -64,9 +64,10 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<getnodename.h>
 #include	<vecstr.h>
 #include	<nodedb.h>
@@ -86,7 +87,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -156,7 +156,7 @@ static int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = -1 ;
-	if (char *a ; (rs = uc_malloc(var.sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(var.sz,&a)) >= 0) {
 	    cint	nlen = var.nodenamelen ;	/* "node" length */
 	    cint	clen = var.nodenamelen ;	/* "cluster" length */
 	    cint	slen = var.nodenamelen ;	/* "system" length */
@@ -190,7 +190,7 @@ static int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
                     } /* end if (DB opened) */
                 } /* end if (mkpath) */
 	    } /* end if (getnodename) */
-	    rs1 = uc_free(a) ;
+	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -211,9 +211,9 @@ static int vecload(vecstr *klp,ent *ep) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	if ((rs = getbufsize(bufsize_nn)) >= 0) {
 	    nodenamelen = rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
 		maxpathlen = rs ;
 		entlen = (ENTLENMULT * nodenamelen) ;
 		sz += (nodenamelen + 1) ;
