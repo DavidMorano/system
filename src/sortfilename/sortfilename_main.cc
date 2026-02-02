@@ -43,15 +43,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
+#include	<ctime>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-#include	<netdb.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getx.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<vecstr.h>
@@ -79,20 +80,7 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -104,13 +92,13 @@ extern char	*timestr_elapsed(time_t,char *) ;
 /* forward references */
 
 static int	usage(struct proginfo *) ;
-static int	sfdigits(const char *,int,char **) ;
-static int	sortfunc(const char **,const char **) ;
+static int	sfdigits(cchar *,int,char **) ;
+static int	sortfunc(cchar **,cchar **) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"VERSION",
 	"VERBOSE",
 	"HELP",
@@ -136,8 +124,8 @@ enum argopts {
 
 int main(argc,argv,envv)
 int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 {
 	struct proginfo	pi, *pip = &pi ;
 	VECSTR		names ;
@@ -160,11 +148,11 @@ const char	*envv[] ;
 	int	f_help = FALSE ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*pr = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*sp, *cp, *cp2 ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*pr = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*sp, *cp, *cp2 ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	buf[BUFLEN + 1], *bp ;
 	char	nodename[NODENAMELEN + 1] ;
@@ -504,7 +492,7 @@ const char	*envv[] ;
 #if	CF_GETEXECNAME && defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 	    if ((pr == NULL) && (pip->pr == NULL)) {
 
-	        const char	*pp ;
+	        cchar	*pp ;
 
 
 	        pp = getexecname() ;
@@ -774,7 +762,7 @@ struct proginfo	*pip ;
 
 
 static int sortfunc(e1p,e2p)
-const char	**e1p, **e2p ;
+cchar	**e1p, **e2p ;
 {
 	int	c ;
 	int	cmplen ;
@@ -841,7 +829,7 @@ const char	**e1p, **e2p ;
 
 
 static int sfdigits(s,slen,rpp)
-const char	s[] ;
+cchar	s[] ;
 int		slen ;
 char		**rpp ;
 {
