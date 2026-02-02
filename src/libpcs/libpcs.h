@@ -1,4 +1,5 @@
-/* pcs HEADER */
+/* libpcs HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* PCS utilities */
@@ -14,36 +15,45 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	PCS_INCLUDE
-#define	PCS_INCLUDE
+#ifndef	LIBPCS_INCLUDE
+#define	LIBPCS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<usysnase.h>
 
-#include	<pcsconf.h>
 #include	<pcsconf_config.h>
 #include	<pcsconfs.h>
-#include	<pcsuserfile.h>
 #include	<pcsopendircache.h>
 #include	<pcsngdname.h>
-#include	<pcsgetnames.h>
 #include	<pcsmsg.h>
 #include	<pcsns.h>
 #include	<pcsnsc.h>
 #include	<pcsnso.h>
 #include	<pcsnsreq.h>
-#include	<pcspoll.h>
 #include	<pcsruns.h>
 #include	<pcsunodes.h>
 #include	<pcsunsfh.h>
-#include	<testpcsns.h>
-#include	<testpcsunodes.h>
+
+#include	<pcsconf.h>
+#include	<pcsunodes.h>
+#include	<pcspoll.h>
+
+#include	<pcsuserfile.h>
+#include	<pcsgetserial.h>
+#include	<pcsgetnames.h>
+#include	<pcsmsgid.h>
+#include	<pcsmailhost.h>
+
+#include	<mkdirlist.h>
+#include	<artlist.h>
+#include	<article.h>
+#include	<dirshown.h>
+
+#include	<datestr.h>
 
 
-#endif /* PCS_INCLUDE */
+#endif /* LIBPCS_INCLUDE */
 
 
