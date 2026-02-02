@@ -10,8 +10,8 @@
 
 	= 1999-10-14, David A­D­ Morano
 	This was written to get a roughly standardized subroutine
-	to handle both IPv4 and IPv6. Note that the order of the
-	AF list isn't in the order to the definitions of the defines.
+	to handle both IPv4 and IPv6.  Note that the order of the
+	AF list is not in the order to the definitions of the defines.
 	Rather, since searching is linear (probably the fastest
 	way), the order is such that the most popular AFs are near
 	the top!
@@ -40,8 +40,8 @@
 	int getaf(cchar *np,int nl) neox
 
 	Arguments:
-	np		name of the address family to lookup
-	nl		length of name
+	np		address family string pointer
+	nl		address family string length
 
 	Returns:
 	>=0		resulting address-family index
@@ -63,7 +63,7 @@
 
 	Return:
 	>=0		length of address in address-family
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -72,14 +72,14 @@
 #include	<sys/socket.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<bufsizevar.hh>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>		/* |libu::cfdec(3u)| */
 #include	<uinet.h>
-#include	<cfdec.h>
-#include	<hasx.h>
+#include	<bufsizevar.hh>
 #include	<strdcpy.h>
 #include	<nleadstr.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"getaf.h"
@@ -95,7 +95,18 @@
 #define	CADDRFAM	const ADDRFAM
 
 
+/* imported namespaces */
+
+using libu::cfdec ;			/* subroutine */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -104,6 +115,11 @@ struct addrfam {
 	cchar		*name ;
 	int		af ;
 } ;
+
+
+/* forward references */
+
+local int	getdb(cchar *,int) noex ;
 
 
 /* local variables */
@@ -205,9 +221,9 @@ constexpr addrfam	addrfamilies[] = {
 #endif
 	{ "unspecified", AF_UNSPEC },
 	{ nullptr, 0 }
-} ;
+} ; /* end array (addrfamilies) */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
@@ -217,33 +233,16 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 int getaf(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_INVALID ;
-	    if ((sl > 0) && sp[0]) {
-	        cint	alen = AFNAMELEN ;
-	        char	abuf[AFNAMELEN + 1] ;
+	    if ((sl > 0) && sp[0]) ylikely {
 	        if (hasalldig(sp,sl)) {
-	            if (int v ; (rs = cfdeci(sp,sl,&v)) >= 0) {
+	            if (int v ; (rs = cfdec(sp,sl,&v)) >= 0) {
 		        rs = v ;
 	            }
 	        } else {
-		    cint al = intconv(strdcpy1w(abuf,alen,sp,sl) - abuf) ;
-	            if (al > 0) {
-	                CADDRFAM	*afs = addrfamilies ;
-	                cint		n = 2 ;
-	                int		i{} ; /* used-afterwards */
-	                int		m ;
-	                for (i = 0 ; afs[i].name ; i += 1) {
-	                    cchar	*anp = afs[i].name ;
-			    bool	f = true ;
-	                    m = nleadstr(anp,abuf,al) ;
-	                    f = f && (m == al) ;
-			    f = f && ((m >= n) || (anp[m] == '\0')) ;
-			    if (f) break ;
-	                } /* end for */
-	                rs = (afs[i].name) ? afs[i].af : SR_AFNOSUPPORT ;
-	            } /* end if */
-	        } /* end if (digit or string) */
+		    rs = getdb(sp,sl) ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -277,5 +276,30 @@ cchar *strafname(int af) noex {
 	return (afs[i].name) ? afs[i].name : "unknown" ;
 }
 /* end subroutine (strafname) */
+
+
+/* local subroutines */
+
+local int getdb(cchar *sp,int sl) noex {
+	cint		alen = AFNAMELEN ;
+    	int		rs = SR_INVALID ;
+	char		abuf[AFNAMELEN + 1] ;
+	if (int al = intconv(strdcpy1w(abuf,alen,sp,sl) - abuf) ; al > 0) {
+	    CADDRFAM	*afs = addrfamilies ;
+	    cint	n = 2 ;
+	    int		i{} ; /* used-afterwards */
+	    int		m ;
+	    for (i = 0 ; afs[i].name ; i += 1) {
+	        cchar	*anp = afs[i].name ;
+		bool	f = true ;
+	        m = nleadstr(anp,abuf,al) ;
+	        f = f && (m == al) ;
+		f = f && ((m >= n) || (anp[m] == '\0')) ;
+		if (f) break ;
+	    } /* end for */
+	    rs = (afs[i].name) ? afs[i].af : SR_AFNOSUPPORT ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (getdb) */
 
 
