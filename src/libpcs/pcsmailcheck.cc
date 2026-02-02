@@ -27,7 +27,6 @@
 	mail waiting (unread).
 
 	Synopsis:
-
 	int pcsmailcheck(pr,rbuf,rlen,un)
 	const char	pr[] ;
 	char		rbuf[] ;
@@ -35,16 +34,14 @@
 	const char	un[] ;
 
 	Arguments:
-
 	pr		PCS system program root (if available)
 	rbuf		buffer to hold result
 	rlen		length of supplied result buffer
 	un		username to check
 
 	Returns:
-
 	>=0		OK
-	<0		some error
+	<0		error (system-return)
 
 
 	= The "mail" situation
@@ -71,12 +68,9 @@
 
 	+ enjoy
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -84,13 +78,13 @@
 #include	<cstdlib>		/* for 'getenv(3c)' maybe others */
 #include	<cstddef>		/* for 'wchar_t' */
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecstr.h>
 #include	<dirlist.h>
-#include	<mailbox.h>
 #include	<strn.h>
+#include	<mkx.h>
+#include	<mailbox.h>
 #include	<hdrdecode.h>
 #include	<localmisc.h>
 
@@ -158,8 +152,6 @@ extern int	sfsubstance(const char *,int,const char **) ;
 extern int	matkeystr(const char **,char *,int) ;
 extern int	vstrkeycmp(const char **,const char **) ;
 extern int	pathclean(char *,const char *,int) ;
-extern int	mkaddrfrom(char *,int,const char *,int) ;
-extern int	mkaddrdisp(char *,int,cchar *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuid_name(cchar *,int) ;
 extern int	isNotPresent(int) ;
