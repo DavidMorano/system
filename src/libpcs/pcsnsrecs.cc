@@ -35,6 +35,9 @@
 
 #include	"pcsnsrecs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
