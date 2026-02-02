@@ -1,4 +1,4 @@
-* pcsnso SUPPORT */
+/* pcsnso SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 #define	CF_PCSNSC	1		/* use PCSNSC facility */
 
 /* revision history:
@@ -20,6 +19,10 @@
 
 /*******************************************************************************
 
+  	Object:
+	pcsnso
+
+	Description:
 	This is the main interface to the PCS Name-Server.
 
 *******************************************************************************/
@@ -28,15 +31,18 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<ctime>
 #include	<climits>
-#include	<time.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<pwd.h>
-#include	<project.h>
 #include	<netdb.h>
-#include	<usystem.h>
-#include	<ugetpw.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<getpwx.h>
 #include	<getbufsize.h>
 #include	<getusername.h>
 #include	<getax.h>
@@ -56,19 +62,11 @@
 #include	"pcsnso.h"
 #include	"pcsnsmgr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
-
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
-#undef	COMMENT
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
 
 #ifndef	NSYSPIDS
 #define	NSYSPIDS	100
@@ -167,38 +165,8 @@
 
 /* external subroutines */
 
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	strpcmp(const char *,const char *) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	getgecosname(const char *,int,const char **) ;
-extern int	mkgecosname(char *,int,const char *) ;
-extern int	mkrealname(char *,int,const char *,int) ;
-extern int	hasuc(const char *,int) ;
-extern int	hasalldig(const char *,int) ;
-extern int	isalnumlatin(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isBadSend(int) ;
-extern int	isBadRecv(int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
@@ -207,8 +175,8 @@ extern int	strlinelen(cchar *,int,int) ;
 
 PCSNSO_OBJ	pcsnso = {
 	"pcsnso",
-	sizeof(PCSNSO),
-	sizeof(PCSNSO_CUR)
+	szof(PCSNSO),
+	szof(PCSNSO_CUR)
 } ;
 
 
@@ -231,8 +199,8 @@ struct subinfo {
 } ;
 
 struct pcsnametype {
-	const char	*var ;
-	const char	*fname ;
+	cchar	*var ;
+	cchar	*fname ;
 } ;
 
 
@@ -289,11 +257,12 @@ static int	(*getnames[])(SUBINFO *) = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pcsnso_open(PCSNSO *op,cchar *pr)
-{
+int pcsnso_open(PCSNSO *op,cchar *pr) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -451,7 +420,7 @@ int pcsnso_curend(PCSNSO *op,PCSNSO_CUR *curp)
 	if (op->magic != PCSNSO_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->verses != NULL) {
-	    rs1 = uc_free(curp->verses) ;
+	    rs1 = lm_free(curp->verses) ;
 	    if (rs >= 0) rs = rs1 ;
 	    curp->verses = NULL ;
 	}
@@ -492,13 +461,13 @@ static int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr)
 {
 	int		rs ;
 
-	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	    const int	pwlen = rs ;
+	if ((rs = getbufsize(bufsize_pw)) >= 0) {
+	    cint	pwlen = rs ;
 	    int		size = 0 ;
 	    char	*bp ;
 	    size += (pwlen+1) ;
-	    size += (strlen(pr)+1) ;
-	    if ((rs = uc_malloc(size,&bp)) >= 0) {
+	    size += (lenstr(pr)+1) ;
+	    if ((rs = lm_mall(size,&bp)) >= 0) {
 	        op->a = bp ;
 	        pdp->pwbuf = bp ;
 	        pdp->pwlen = pwlen ;
@@ -525,7 +494,7 @@ static int pcsnso_infoloadend(PCSNSO *op)
 	}
 
 	if (op->a != NULL) {
-	    rs1 = uc_free(op->a) ;
+	    rs1 = lm_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = NULL ;
 	    op->pr = NULL ;
@@ -547,7 +516,7 @@ static int pcsnso_getpw(PCSNSO *op,cchar *un)
 	pun = pdp->pw.pw_name ;
 	if ((pun == NULL) || (strcmp(pun,un) != 0)) {
 	    struct passwd	*pwp = &pdp->pw ;
-	    const int		pwlen = pdp->pwlen ;
+	    cint		pwlen = pdp->pwlen ;
 	    char		*pwbuf = pdp->pwbuf ;
 	    if ((un != NULL) && (un[0] != '\0') && (un[0] != '-')) {
 	        if (hasalldig(un,-1)) {
@@ -557,7 +526,7 @@ static int pcsnso_getpw(PCSNSO *op,cchar *un)
 	                rs = getpwusername(pwp,pwbuf,pwlen,uid) ;
 	            }
 	        } else {
-	            rs = GETPW_NAME(pwp,pwbuf,pwlen,un) ;
+	            rs = getpwx_name(pwp,pwbuf,pwlen,un) ;
 	        }
 	    } else {
 	        rs = getpwusername(pwp,pwbuf,pwlen,-1) ;
@@ -655,7 +624,7 @@ static int pcsnso_clientbegin(PCSNSO *op,time_t dt)
 	int		f = FALSE ;
 	if (! op->open.client) {
 	    PCSNSC	*pcp = &op->client ;
-	    const int	to = PCSNSO_TO ;
+	    cint	to = PCSNSO_TO ;
 	    if (dt == 0) dt = time(NULL) ;
 	    op->ti_lastcheck = dt ;
 	    if ((rs = pcsnsc_open(pcp,op->pr,to)) >= 0) {
@@ -722,7 +691,7 @@ static int subinfo_prfile(SUBINFO *sip,cchar *fn)
 	int		len = 0 ;
 	char		tbuf[MAXPATHLEN + 1] ;
 	if ((rs = mkpath2(tbuf,sip->pr,fn)) >= 0) {
-	    const int	rlen = sip->rlen ;
+	    cint	rlen = sip->rlen ;
 	    char	*rbuf = sip->rbuf ;
 	    if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
 	        len = rs ;
@@ -737,7 +706,7 @@ static int subinfo_prfile(SUBINFO *sip,cchar *fn)
 
 static int getname(SUBINFO *sip)
 {
-	const int	w = sip->w ;
+	cint	w = sip->w ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -779,7 +748,7 @@ static int getname(SUBINFO *sip)
 
 static int getname_var(SUBINFO *sip)
 {
-	const int	w = sip->w ;
+	cint	w = sip->w ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar		*un = sip->un ;
@@ -791,7 +760,7 @@ static int getname_var(SUBINFO *sip)
 	    {
 	        int	f = (un[0] == '-') ;
 	        if (! f) {
-	            const char	*vun = getenv(VARUSERNAME) ;
+	            cchar	*vun = getenv(VARUSERNAME) ;
 	            if ((vun != NULL) && (vun[0] != '\0')) {
 	                f = (strcmp(vun,un) == 0) ;
 	            }
@@ -830,9 +799,9 @@ static int getname_daemon(SUBINFO *sip)
 #endif
 	    if ((rs = pcsnso_client(op)) > 0) {
 	        PCSNSC		*pcp = &op->client ;
-	        const int	rlen = sip->rlen ;
-		const int	w = sip->w ;
-		const char	*un = sip->un ;
+	        cint	rlen = sip->rlen ;
+		cint	w = sip->w ;
+		cchar	*un = sip->un ;
 		char		*rbuf = sip->rbuf ;
 	        if ((rs = pcsnsc_getval(pcp,rbuf,rlen,un,w)) > 0) {
 		    rl = rs ;
@@ -863,10 +832,10 @@ static int getname_daemon(SUBINFO *sip)
 
 static int getname_nsmgr(SUBINFO *sip)
 {
-	const int	rsn = SR_NOTFOUND ;
-	const int	w = sip->w ;
+	cint	rsn = SR_NOTFOUND ;
+	cint	w = sip->w ;
 	int		rs ;
-	const char	*un = sip->un ;
+	cchar	*un = sip->un ;
 
 #if	CF_DEBUGS
 	debugprintf("pcsnso/getname_nsmgr: ent\n") ;
@@ -896,7 +865,7 @@ static int getname_nsmgr(SUBINFO *sip)
 
 static int getname_userhome(SUBINFO *sip)
 {
-	const int	w = sip->w ;
+	cint	w = sip->w ;
 	int		rs = SR_OK ;
 	cchar		*un = sip->un ;
 	cchar		*fn ;
@@ -910,7 +879,7 @@ static int getname_userhome(SUBINFO *sip)
 	debugprintf("pcsgetnames/getname_userhome: fn=%s\n",fn) ;
 #endif
 	if (fn != NULL) {
-	    const int	hlen = MAXPATHLEN ;
+	    cint	hlen = MAXPATHLEN ;
 	    char	hbuf[MAXPATHLEN + 1] ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 	        char	tbuf[MAXPATHLEN + 1] ;
@@ -954,7 +923,7 @@ static int getname_again(SUBINFO *sip)
 static int getname_sysdb(SUBINFO *sip)
 {
 	PCSNSO		*op = sip->op ;
-	const int	w = sip->w ;
+	cint	w = sip->w ;
 	int		rs ;
 	int		len = 0 ;
 
@@ -968,13 +937,13 @@ static int getname_sysdb(SUBINFO *sip)
 	    case pcsnsreq_fullname:
 	        {
 	            cchar	*gecos = pdp->pw.pw_gecos ;
-	            nlen = (strlen(gecos)+10) ;
-	            if ((rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
+	            nlen = (lenstr(gecos)+10) ;
+	            if ((rs = lm_mall((nlen+1),&nbuf)) >= 0) {
 	                if ((rs = mkgecosname(nbuf,nlen,gecos)) > 0) {
 	                    rs = mkrealname(sip->rbuf,sip->rlen,nbuf,rs) ;
 	                    len = rs ;
 	                }
-	                uc_free(nbuf) ;
+	                lm_free(nbuf) ;
 	            } /* end if (memory-allocation) */
 	        } /* end block */
 	        break ;
@@ -988,8 +957,8 @@ static int getname_sysdb(SUBINFO *sip)
 	            cchar	*gecos = pdp->pw.pw_gecos ;
 	            if ((rs = gecos_start(&g,gecos,-1)) >= 0) {
 	                int		vl ;
-	                const int	gi = gecosval_organization ;
-	                const char	*vp ;
+	                cint	gi = gecosval_organization ;
+	                cchar	*vp ;
 	                if ((vl = gecos_getval(&g,gi,&vp)) > 0) {
 	                    rs = sncpy1w(sip->rbuf,sip->rlen,vp,vl) ;
 	                    len = rs ;
@@ -1014,7 +983,7 @@ static int getname_sysdb(SUBINFO *sip)
 static int getname_pcsdef(SUBINFO *sip)
 {
 	PCSNSO		*op = sip->op ;
-	const int	w = sip->w ;
+	cint	w = sip->w ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar		*fn = NULL ;
@@ -1068,11 +1037,11 @@ static int getprojinfo_sysdb(SUBINFO *sip)
 	debugprintf("pcsgetnames/getprojinfo_sysdb: un=%d\n",sip->un) ;
 #endif
 
-	if ((rs = getbufsize(getbufsize_pj)) >= 0) {
+	if ((rs = getbufsize(bufsize_pj)) >= 0) {
 	    struct project	pj ;
-	    const int		pjlen = rs ;
+	    cint		pjlen = rs ;
 	    char		*pjbuf ;
-	    if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
+	    if ((rs = lm_mall((pjlen+1),&pjbuf)) >= 0) {
 	        cchar	*un = sip->un ;
 	        if ((rs = uc_getdefaultproj(un,&pj,pjbuf,pjlen)) >= 0) {
 	            int	f = (strcmp(pj.pj_name,DEFPROJNAME) != 0) ;
@@ -1091,7 +1060,7 @@ static int getprojinfo_sysdb(SUBINFO *sip)
 	        } else if (isNotPresent(rs)) {
 	            rs = SR_OK ;
 	        }
-	        rs1 = uc_free(pjbuf) ;
+	        rs1 = lm_free(pjbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
 	} /* end if (getbufsize) */
