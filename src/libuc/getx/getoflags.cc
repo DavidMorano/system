@@ -39,10 +39,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>		/* |O_{xx}| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
