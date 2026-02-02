@@ -126,7 +126,7 @@ static int procdircacher(vecpstr *,cchar *) noex ;
 
 /* local variables */
 
-static bufsizevar		maxpathlen(getbufsize_mp) ;
+static bufsizevar		maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
