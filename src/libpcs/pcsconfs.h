@@ -27,35 +27,35 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-
-#include	"var.h"
+#include	<var.h>
 
 
 #define	PCSCONFS		struct pcsconfs_head
-#define	PCSCONFS_CUR		struct pcsconfs_cursor
+#define	PCSCONFS_FL		struct pcsconfs_flags
 #define	PCSCONFS_OBJ		struct pcsconfs_object
+#define	PCSCONFS_CUR		struct pcsconfs_cursor
 #define	PCSCONFS_MAGIC		0x99889298
 #define	PCSCONFS_CURMAGIC	0x99889299
 
+
+struct pcsconfs_cursor {
+	var_cur		vcur ;
+	uint		magic ;
+} ; /* end struct */
 
 struct pcsconfs_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
-
-struct pcsconfs_cursor {
-	uint		magic ;
-	var_cur		vcur ;
-} ;
+} ; /* end struct */
 
 struct pcsconfs_flags {
 	uint		prdb:1 ;		/* CONF is global */
 	uint		db:1 ;			/* DB is open */
-} ;
+} ; /* end struct */
 
 struct pcsconfs_head {
-	cchar		**envv ;
+	mainv		envv ;
 	cchar		*pr ;			/* program-root */
 	cchar		*cfname ;		/* DB database name */
 	cchar		*a ;			/* memory allocation */
@@ -64,15 +64,16 @@ struct pcsconfs_head {
 	PCSCONFS_FL	fl ;
 	uint		magic ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	PCSCONFS	pcsconfs ;
+typedef	PCSCONFS_FL	pcsconfs_fl ;
 typedef	PCSCONFS_CUR	pcsconfs_cur ;
 typedef	PCSCONFS_OBJ	pcsconfs_obj ;
 
 EXTERNC_begin
 
-extern int pcsconfs_start(pcsconfs *,cchar *,cchar **,cchar *) noex ;
+extern int pcsconfs_start(pcsconfs *,cchar *,mainv,cchar *) noex ;
 extern int pcsconfs_curbegin(pcsconfs *,pcsconfs_cur *) noex ;
 extern int pcsconfs_fetch(pcsconfs *, cchar *,int,pcsconfs_cur *,
 				char *,int) noex ;
