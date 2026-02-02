@@ -1,16 +1,17 @@
-/* pcsmailhost */
+/* pcsmailhost SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* get the mailhost for the host that we are on */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
@@ -18,29 +19,35 @@
 
 /*******************************************************************************
 
-	This subroutine is used to find the mailhost for a given user.
+  	Name:
+	pcsmailhost
 
+	Description:
+	This subroutine is used to find the mailhost for a given user.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<fcntl.h>
+#include	<netdb.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
-#include	<netdb.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<bfile.h>
-#include	<char.h>
 #include	<vecstr.h>
+#include	<mkpathx.h>
+#include	<strwcpy.h>
+#include	<char.h>
 #include	<localmisc.h>
+
+#include	"pcsmailhost.h"
 
 
 /* local defines */
@@ -60,13 +67,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* external variables */
 
@@ -77,19 +77,14 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pcsmailhost(pcsroot,setp,username,buf)
-const char	pcsroot[] ;
-vecstr		*setp ;
-const char	username[] ;
-char		buf[] ;
-{
+int pcsmailhost(cchar *pcsroot,vecstr *setp,cchar *username,char *buf) noex {
 	ustat	sb ;
-
 	bfile	nfile, *nfp = &nfile ;
-
 	int	rs = SR_OK ;
 	int	len ;
 	int	cl = 0 ;
@@ -98,16 +93,17 @@ char		buf[] ;
 	char	linebuf[LINEBUFLEN + 1] ;
 	char	*cp, *cp2 ;
 
-
-	if (pcsroot == NULL)
+	(void) setp ; /* currentl unused */
+	(void) username ; /* currentl unused */
+	if (pcsroot == nullptr)
 	    return SR_FAULT ;
 
 	buf[0] = '\0' ;
 
 /* try the local environment variable */
 
-	if (((cp = getenv(VARMAILHOST)) != NULL) && (cp[0] != '\0')) {
-	    cl = strwcpy(buf,cp,MAXHOSTNAMELEN) - buf ;
+	if (((cp = getenv(VARMAILHOST)) != nullptr) && (cp[0] != '\0')) {
+	    cl = intconv(strwcpy(buf,cp,MAXHOSTNAMELEN) - buf) ;
 	    goto ret0 ;
 	}
 
@@ -142,7 +138,7 @@ char		buf[] ;
 	            cp += 1 ;
 
 	        *cp = '\0' ;
-	        cl = (cp - cp2) ;
+	        cl = intconv(cp - cp2) ;
 	        if (cl > 0)
 	            break ;
 
@@ -164,6 +160,5 @@ ret0:
 	return (rs >= 0) ? cl : rs ;
 }
 /* end subroutine (pcsmailhost) */
-
 
 
