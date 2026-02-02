@@ -40,7 +40,10 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucsysmisc.h>		/* |uc_gettieofday(3uc)| */
 #include	<cfdec.h>
 #include	<randlc.h>
 #include	<localmisc.h>
