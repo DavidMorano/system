@@ -1,4 +1,5 @@
 /* pcsuserfile HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* PCS user-account-database file management */
@@ -10,7 +11,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
