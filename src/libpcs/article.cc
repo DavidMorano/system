@@ -5,8 +5,6 @@
 /* manage an ARTICLE object */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_SAFE		1		/* safety */
 
 /* revision history:
 
@@ -33,26 +31,35 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucmem.h>
+#include	<sfx.h>			/* |sfshrink(3uc)| */
 #include	<localmisc.h>
 
 #include	"article.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#define	AR		article
+
+
+/* namespaces */
+
+using libuc::mem ;
+
 
 /* external subroutines */
-
-extern int	sfshrink(cchar *,int,cchar **) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -63,419 +70,380 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
+template<typename ... Args>
+local inline int article_ctor(article *op,Args ... args) noex {
+    	ARTICLE		*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->pathp = new(nt) retpath) != np) {
+	        if ((op->ngp = new(nt) ng) != np) {
+	            if ((op->envp = new(nt) vechand) != np) {
+	                if ((op->msgp = new(nt) dater) != np) {
+			    rs = SR_OK ;
+		        } /* end if (new-dater) */
+		        if (rs < 0) {
+		            delete op->envp ;
+		            op->envp = nullptr ;
+		        } /* end if (error) */
+		    } /* end if (new-vechand) */
+		    if (rs < 0) {
+		        delete op->ngp ;
+		        op->ngp = nullptr ;
+		    } /* end if (error) */
+	        } /* end if (new-ng) */
+		if (rs < 0) {
+		    delete op->pathp ;
+		    op->pathp = nullptr ;
+		} /* end if (error) */
+	    } /* end if (new-retpath) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (article_ctor) */
+
+local inline int article_dtor(article *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->pathp) {
+		delete op->pathp ;
+		op->pathp = nullptr ;
+	    }
+	    if (op->ngp) {
+		delete op->ngp ;
+		op->ngp = nullptr ;
+	    }
+	    if (op->envp) {
+		delete op->envp ;
+		op->envp = nullptr ;
+	    }
+	    if (op->msgp) {
+		delete op->msgp ;
+		op->msgp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (article_dtor) */
+
+template<typename ... Args>
+local inline int article_magic(article *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == ARTICLE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (article_magic) */
+
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int article_start(ARTICLE *op)
-{
+int article_start(AR *op) noex {
 	int		rs ;
-
-#if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
-#endif
-
-	memset(op,0,sizeof(ARTICLE)) ;
-	op->clen = -1 ;
-	op->clines = -1 ;
-
-	if ((rs = ng_start(&op->ngs)) >= 0) {
-	    op->fl.ngs = TRUE ;
-	    if ((rs = retpath_start(&op->path)) >= 0) {
-	        op->fl.path = TRUE ;
-		if ((rs = vechand_start(&op->envdates,1,0)) >= 0) {
-	            op->fl.envdates = TRUE ;
-		}
-		if (rs < 0) {
-	            op->fl.path = TRUE ;
-	    	    retpath_finish(&op->path) ;
-		}
-	    }
+	if ((rs = article_ctor(op)) >= 0) {
+	    op->clen = -1 ;
+	    op->clines = -1 ;
+	    if ((rs = ng_start(op->ngp)) >= 0) {
+	        op->fl.ngs = true ;
+	        if ((rs = retpath_start(op->pathp)) >= 0) {
+	            op->fl.path = true ;
+		    if ((rs = vechand_start(op->envp,1,0)) >= 0) {
+	                op->fl.envdates = true ;
+		    }
+		    if (rs < 0) {
+	                op->fl.path = true ;
+	    	        retpath_finish(op->pathp) ;
+		    }
+	        }
+	        if (rs < 0) {
+	            op->fl.ngs = false ;
+		    ng_finish(op->ngp) ;
+	        }
+	    } /* end if (ngs) */
 	    if (rs < 0) {
-	        op->fl.ngs = FALSE ;
-		ng_finish(&op->ngs) ;
-	    }
-	} /* end if (ngs) */
- 
+		article_dtor(op) ;
+	    } /* end if (error) */
+	} /* end if (article_ctor) */
 	return rs ;
 }
 /* end subroutine (article_start) */
 
-
-int article_finish(ARTICLE *op)
-{
-	int		rs = SR_OK ;
+int article_finish(AR *op) noex {
+	int		rs ;
 	int		rs1 ;
-	int		i ;
-
-#if	CF_DEBUGS
-	debugprintf("article_finish: ent\n") ;
-#endif
-
-#if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("article_finish: f_msgdate=%u\n",op->fl.msgdate) ;
-#endif
-
-	if (op->fl.msgdate) {
-	    op->fl.msgdate = FALSE ;
-	    rs1 = dater_finish(&op->msgdate) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("article_finish: f_envdates=%u\n",op->fl.envdates) ;
-#endif
-
-	if (op->fl.envdates) {
-	    DATER	*dp ;
-	    int		i ;
-	    op->fl.envdates = FALSE ;
-	    for (i = 0 ; vechand_get(&op->envdates,i,&dp) >= 0 ; i += 1) {
-		rs1 = dater_finish(dp) ;
-		if (rs >= 0) rs = rs1 ;
-		rs1 = uc_free(dp) ;
-		if (rs >= 0) rs = rs1 ;
+	if ((rs = article_magic(op)) >= 0) {
+	    if (op->fl.msgdate) {
+	        op->fl.msgdate = false ;
+	        rs1 = dater_finish(op->msgp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fl.envdates) {
+	        vechand *envp = op->envp ;
+	        op->fl.envdates = false ;
+	        void *vp ;
+	        for (int i = 0 ; envp->get(i,&vp) >= 0 ; i += 1) {
+	            dater	*dp = (dater *) vp ;
+		    {
+		        rs1 = dater_finish(dp) ;
+		        if (rs >= 0) rs = rs1 ;
+		    }
+		    {
+		        rs1 = mem.free(dp) ;
+		        if (rs >= 0) rs = rs1 ;
+		    }
+	        } /* end for */
+	        rs1 = vechand_finish(op->envp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (envdates) */
+	    if (op->fl.path) {
+	        op->fl.path = false ;
+	        rs1 = retpath_finish(op->pathp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fl.ngs) {
+	        op->fl.ngs = false ;
+	        rs1 = ng_finish(op->ngp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    for (int i = 0 ; i < articleaddr_overlast ; i += 1) {
+	        if (op->af[i]) {
+	            op->af[i] = false ;
+	            rs1 = ema_finish(op->addr + 1) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
 	    } /* end for */
-	    rs1 = vechand_finish(&op->envdates) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (envdates) */
-
-#if	CF_DEBUGS
-	debugprintf("article_finish: f_path=%u\n",op->fl.path) ;
-#endif
-	if (op->fl.path) {
-	    op->fl.path = FALSE ;
-	    rs1 = retpath_finish(&op->path) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("article_finish: f_ngs=%u\n",op->fl.ngs) ;
-#endif
-
-	if (op->fl.ngs) {
-	    op->fl.ngs = FALSE ;
-	    rs1 = ng_finish(&op->ngs) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("article_finish: addrs\n") ;
-#endif
-
-	for (i = 0 ; i < articleaddr_overlast ; i += 1) {
-	    if (op->af[i]) {
-	        op->af[i] = FALSE ;
-	        rs1 = ema_finish(&op->addr[i]) ;
+	    for (int i = 0 ; i < articlestr_overlast ; i += 1) {
+	        if (op->strs[i] != nullptr) {
+	            void *vp = voidp(op->strs[i]) ;
+	            rs1 = mem.free(vp) ;
+	            if (rs >= 0) rs = rs1 ;
+	            op->strs[i] = nullptr ;
+	        }
+	    } /* end for */
+	    {
+	        rs1 = article_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("article_finish: strs\n") ;
-#endif
-
-	for (i = 0 ; i < articlestr_overlast ; i += 1) {
-	    if (op->strs[i] != NULL) {
-	        rs1 = uc_free(op->strs[i]) ;
-	        if (rs >= 0) rs = rs1 ;
-	        op->strs[i] = NULL ;
-	    }
-	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("article_finish: ret rs=%d\n",rs) ;
-#endif
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_finish) */
 
-
-int article_addpath(ARTICLE *op,cchar *sp,int sl)
-{
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (! op->fl.path) {
-	    op->fl.path = TRUE ;
-	    rs = retpath_start(&op->path) ;
-	}
-
-	if (rs >= 0) {
-	    rs = retpath_parse(&op->path,sp,sl) ;
-	}
-
+int article_addpath(AR *op,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = article_magic(op,sp)) >= 0) {
+	    if (! op->fl.path) {
+	        op->fl.path = true ;
+	        rs = retpath_start(op->pathp) ;
+	    }
+	    if (rs >= 0) {
+	        rs = retpath_parse(op->pathp,sp,sl) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_addpath) */
 
-
-int article_addng(ARTICLE *op,cchar *sp,int sl)
-{
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (! op->fl.ngs) {
-	    op->fl.ngs = TRUE ;
-	    rs = ng_start(&op->ngs) ;
-	}
-
-	if (rs >= 0) {
-	    rs = ng_addparse(&op->ngs,sp,sl) ;
-	}
-
+int article_addng(AR *op,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = article_magic(op,sp)) >= 0) {
+	    if (! op->fl.ngs) {
+	        op->fl.ngs = true ;
+	        rs = ng_start(op->ngp) ;
+	    }
+	    if (rs >= 0) {
+	        rs = ng_addparse(op->ngp,sp,sl) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_addng) */
 
-
-int article_addenvdate(ARTICLE *op,DATER *d2p)
-{
-	DATER		*dp ;
-	const int	msize = sizeof(DATER) ;
+int article_addenvdate(AR *op,dater *d2p) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (d2p == NULL) return SR_FAULT ;
-
-	if ((rs = uc_malloc(msize,&dp)) >= 0) {
-	    if ((rs = dater_startcopy(dp,d2p)) >= 0) {
-		rs = vechand_add(&op->envdates,dp) ;
-		if (rs < 0)
-		    dater_finish(dp) ;
-	    }
-	    if (rs < 0)
-		uc_free(dp) ;
-	} /* end if (memory-allocation) */
-
+	if ((rs = article_magic(op,d2p)) >= 0) {
+	    cint	msz = szof(dater) ;
+	    if (dater *dp ; (rs = mem.mall(msz,&dp)) >= 0) {
+	        if ((rs = dater_startcopy(dp,d2p)) >= 0) {
+		    rs = vechand_add(op->envp,dp) ;
+		    if (rs < 0) {
+		        dater_finish(dp) ;
+		    }
+	        }
+	        if (rs < 0) {
+		    mem.free(dp) ;
+	        } /* end if (error) */
+	    } /* end if (memory-allocation) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_addenvdate) */
 
-
-int article_addmsgdate(ARTICLE *op,DATER *dp)
-{
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (dp == NULL) return SR_FAULT ;
-
-	if (! op->fl.msgdate) {
-	    op->fl.msgdate = TRUE ;
-	    rs = dater_start(&op->msgdate,NULL,NULL,0) ;
-	}
-
-	if (rs >= 0) {
-	    rs = dater_setcopy(&op->msgdate,dp) ;
-	}
-
+int article_addmsgdate(AR *op,dater *dp) noex {
+	int		rs ;
+	if ((rs = article_magic(op,dp)) >= 0) {
+	    if (! op->fl.msgdate) {
+	        op->fl.msgdate = true ;
+	        rs = dater_start(op->msgp,nullptr,nullptr,0) ;
+	    }
+	    if (rs >= 0) {
+	        rs = dater_setcopy(op->msgp,dp) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_addmsgdate) */
 
-
-int article_addaddr(ARTICLE *op,int type,cchar *sp,int sl)
-{
-	const int	n = articleaddr_overlast ;
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if ((type < 0) || (type >= n)) return SR_INVALID ;
-
-	if (! op->af[type]) {
-	    op->af[type] = TRUE ;
-	    rs = ema_start(&op->addr[type]) ;
-	}
-
-	if (rs >= 0) {
-	    rs = ema_parse(&op->addr[type],sp,sl) ;
-	}
-
+int article_addaddr(AR *op,int type,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = article_magic(op,sp)) >= 0) {
+	    cint	n = articleaddr_overlast ;
+	    rs = SR_INVALID ;
+	    if ((type >= 0) && (type < n)) {
+		rs = SR_OK ;
+	        if (! op->af[type]) {
+	            op->af[type] = true ;
+	            rs = ema_start(&op->addr[type]) ;
+	        }
+	        if (rs >= 0) {
+	            rs = ema_parse(&op->addr[type],sp,sl) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_addaddr) */
 
-
-int article_addstr(ARTICLE *op,int type,cchar *sp,int sl)
-{
-	const int	n = articlestr_overlast ;
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if ((type < 0) || (type >= n)) return SR_INVALID ;
-
-	if (op->strs[type] != NULL) {
-	    rs = uc_free(op->strs[type]) ;
-	    op->strs[type] = NULL ;
-	}
-
-	if (rs >= 0) {
-	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(sp,sl,&cp)) > 0) {
-		op->strs[type] = cp ;
-		rs = (rs-1) ;
-	    }
-	}
-
+int article_addstr(AR *op,int type,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = article_magic(op,sp)) >= 0) {
+	    cint	n = articlestr_overlast ;
+	    rs = SR_INVALID ;
+	    if ((type >= 0) &&  (type < n)) {
+		rs = SR_OK ;
+	        if (op->strs[type] != nullptr) {
+	            void *vp = voidp(op->strs[type]) ;
+	            rs = mem.free(vp) ;
+	            op->strs[type] = nullptr ;
+	        }
+	        if (rs >= 0) {
+	            if (cchar *cp ; (rs = mem.strw(sp,sl,&cp)) > 0) {
+		        op->strs[type] = cp ;
+	            }
+	        } /* end if (ok) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_addstr) */
 
-
 /* extract newsgroup names from the "newsgroups" header string */
-int article_addparse(ARTICLE *op,cchar *sp,int sl)
-{
-	EMA		aid ;
-	EMA_ENT		*ep ;
+int article_addparse(AR *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	int		n = 0 ;
-
-#if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
-#endif
-
-	if (sl < 0) sl = strlen(sp) ;
-
-#if	CF_DEBUGS
-	debugprintf("article_addparse: ent\n") ;
-	debugprintf("article_addparse: > %r\n",sp,sl) ;
-#endif
-
-	if ((rs = ema_start(&aid)) >= 0) {
-	    if ((rs = ema_parse(&aid,sp,sl)) > 0) {
-		int	i ;
-		int	cl ;
-		cchar	*cp ;
-
-#if	CF_DEBUGS
-	        debugprintf("article_addparse: got some ema\n") ;
-#endif
-
-	        for (i = 0 ; ema_get(&aid,i,&ep) >= 0 ; i += 1) {
-	            if (ep != NULL) {
-
-#if	CF_DEBUGS
-	            debugprintf("article_addparse: ema entry\n") ;
-#endif
-
-	            if ((ep->fl.error) || (ep->al <= 0)) continue ;
-
-	            if ((cl = sfshrink(ep->ap,ep->al,&cp)) > 0) {
-			n += 1 ;
-	                rs = ng_add(&op->ngs,cp,cl,NULL) ;
-		    }
-
-		    }
-	            if (rs < 0) break ;
-	        } /* end for */
-
-	    } /* end if (parse) */
-	    rs1 = ema_finish(&aid) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (ema) */
-
-#if	CF_DEBUGS
-	debugprintf("article_addparse: ret rs=%d n=%u\n",rs,n) ;
-#endif
-
+	int		n = 0 ; /* return-value */
+	if ((rs = article_magic(op,sp)) >= 0) {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    if (ema aid ; (rs = ema_start(&aid)) >= 0) {
+	        if ((rs = ema_parse(&aid,sp,sl)) > 0) {
+		    int	cl ;
+		    cchar	*cp ;
+		    ema_ent *ep ;
+	            for (int i = 0 ; ema_get(&aid,i,&ep) >= 0 ; i += 1) {
+	                if (ep) {
+	                    if ((ep->fl.error) || (ep->al <= 0)) continue ;
+	                    if ((cl = sfshrink(ep->ap,ep->al,&cp)) > 0) {
+			        n += 1 ;
+	                        rs = ng_add(op->ngp,cp,cl,nullptr) ;
+		            }
+		        } /* end if (non-null) */
+	                if (rs < 0) break ;
+	            } /* end for */
+	        } /* end if (parse) */
+	        rs1 = ema_finish(&aid) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (ema) */
+	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (article_addparse) */
 
-
-int article_ao(ARTICLE *op,uint aoff,uint alen)
-{
-
-#if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
-#endif
-
-	op->aoff = aoff ;
-	op->alen = alen ;
-	return SR_OK ;
+int article_ao(AR *op,uint aoff,uint alen) noex {
+    	int		rs ;
+	if ((rs = article_magic(op)) >= 0) {
+	    op->aoff = aoff ;
+	    op->alen = alen ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (article_ao) */
 
-
-int article_countenvdate(ARTICLE *op)
-{
+int article_countenvdate(AR *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	rs = vechand_count(&op->envdates) ;
+	if ((rs = article_magic(op)) >= 0) {
+	    rs = vechand_count(op->envp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_countenvdate) */
 
-
-int article_getenvdate(ARTICLE *op,int i,DATER **epp)
-{
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	rs = vechand_get(&op->envdates,i,epp) ;
+int article_getenvdate(AR *op,int i,dater **epp) noex {
+	int		rs = SR_FAULT ;
+	if (op && epp) {
+	    vechand *envp = op->envp ;
+	    if (void *vp ; (rs = envp->get(i,&vp)) >= 0) {
+		dater *dp = (dater *) vp ;
+		*epp = dp ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (article_getenvdate) */
 
-
-int article_getstr(ARTICLE *op,int type,cchar **rpp)
-{
-	const int	n = articlestr_overlast ;
+int article_getstr(AR *op,int type,cchar **rpp) noex {
 	int		rs = SR_OK ;
-	cchar	*sp ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if ((type < 0) || (type >= n)) return SR_INVALID ;
-
-	sp = op->strs[type] ;
-	if (sp == NULL) rs = SR_NOTFOUND ;
-
-	if (rs >= 0) rs = strlen(sp) ;
-
-	if (rpp != NULL) {
-	    *rpp = (rs >= 0) ? sp : NULL ;
-	}
-
+	if ((rs = article_magic(op)) >= 0) {
+	    cint	n = articlestr_overlast ;
+	    cchar	*sp = nullptr ;
+	    rs = SR_INVALID ;
+	    if ((type >= 0) && (type < n)) {
+		rs = SR_NOTFOUND ;
+	        if ((sp = op->strs[type]) != nullptr) {
+		    rs = lenstr(sp) ;
+		}
+	    } /* end if (valid) */
+	    if (rpp) {
+	        *rpp = (rs >= 0) ? sp : nullptr ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_getstr) */
 
-
-int article_getaddrema(ARTICLE *op,int type,EMA **rpp)
-{
-	const int	n = articleaddr_overlast ;
+int article_getaddrema(AR *op,int type,ema **rpp) noex {
 	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if ((type < 0) || (type >= n)) return SR_INVALID ;
-
-	if (! op->af[type]) {
-	    op->af[type] = TRUE ;
-	    rs = ema_start(&op->addr[type]) ;
-	}
-
-	if (rpp != NULL) {
-	    *rpp = (rs >= 0) ? (op->addr + type) : NULL ;
-	}
-
+	if ((rs = article_magic(op)) >= 0) {
+	    cint	n = articleaddr_overlast ;
+	    rs = SR_INVALID ;
+	    if ((type >= 0) && (type < n)) {
+		rs = SR_OK ;
+	        if (! op->af[type]) {
+	            op->af[type] = true ;
+	            rs = ema_start(&op->addr[type]) ;
+	        }
+	        if (rpp) {
+	            *rpp = (rs >= 0) ? (op->addr + type) : nullptr ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (article_getaddrema) */
