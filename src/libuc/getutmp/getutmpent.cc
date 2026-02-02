@@ -47,9 +47,11 @@
 #include	<unistd.h>		/* |getsid(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucgetpid.h>
 #include	<utmpacc.h>
 #include	<strwcpy.h>
 #include	<sncpyx.h>
@@ -57,6 +59,7 @@
 
 #include	"getutmpent.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -65,7 +68,6 @@ import uconstants ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -98,7 +100,7 @@ namespace {
 	int tryline() noex ;
 	int trystat() noex ;
     } ; /* end struct (ufinder) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -211,15 +213,20 @@ ufinder::operator int () noex {
 /* end method (ufinder::operator) */
 
 int ufinder::start() noex {
-	return uc_malloc(aelen,&aebuf) ;
+	return lm_mall(aelen,&aebuf) ;
 }
 
 int ufinder::finish() noex {
-	int	rs = SR_BUGCHECK ;
+	int		rs = SR_BUGCHECK ;
+	int		rs1 ;
 	if (aebuf) {
-	    rs = uc_free(aebuf) ;
-	    aebuf = nullptr ;
-	}
+	    rs = SR_OK ;
+	    {
+	        rs1 = lm_free(aebuf) ;
+		if (rs >= 0) rs = rs1 ;
+	        aebuf = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 
