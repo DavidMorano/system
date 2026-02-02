@@ -33,14 +33,16 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ucpwcache.h>
+#include	<ucentpw.h>
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<gecos.h>
 #include	<getusername.h>
-#include	<mallocxx.h>
 #include	<storeitem.h>
 #include	<strn.h>
 #include	<snwcpy.h>
@@ -50,7 +52,9 @@
 #include	"pwentry.h"
 #include	"getpwentry.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -111,13 +115,13 @@ int getpwentry_name(pwentry *uep,char *ebuf,int elen,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uep && ebuf && name) {
-	    if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	    if (char *pwbuf{} ; (rs = lm_pw(&pwbuf)) >= 0) {
 	        ucentpw		pw ;
 	        cint		pwlen = rs ;
 	        if ((rs = getpwx_name(&pw,pwbuf,pwlen,name)) >= 0) {
 	            rs = getpwentry_load(uep,ebuf,elen,&pw) ;
 	        }
-	        rs1 = uc_free(pwbuf) ;
+	        rs1 = lm_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
@@ -129,13 +133,13 @@ int getpwentry_uid(pwentry *uep,char *ebuf,int elen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uep && ebuf) {
-	    if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	    if (char *pwbuf{} ; (rs = lm_pw(&pwbuf)) >= 0) {
 	        ucentpw		pw ;
 		cint		pwlen = rs ;
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,uid)) >= 0) {
 	            rs = getpwentry_load(uep,ebuf,elen,&pw) ;
 	        }
-	        rs1 = uc_free(pwbuf) ;
+	        rs1 = lm_free(pwbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
@@ -218,7 +222,7 @@ static int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
 	                vpp = &uep->organization ;
 	                break ;
 	            case gecosval_realname:
-	                if ((rs = uc_malloc((vl+1),&mp)) >= 0) {
+	                if ((rs = lm_mall((vl+1),&mp)) >= 0) {
 	                    char	*nbuf = charp(mp) ;
 	                    if (strnchr(vp,vl,'_') != nullptr) {
 	                        rs = snwcpyhyphen(nbuf,-1,vp,vl) ;
@@ -229,7 +233,7 @@ static int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
 	                        rs = sip->strw(vp,vl,vpp) ;
 				vpp = nullptr ;
 	                    }
-	                    rs1 = uc_free(mp) ;
+	                    rs1 = lm_free(mp) ;
 			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (m-a-f) */
 	                break ;
@@ -269,7 +273,7 @@ static int getpwentry_shadow(pwentry *uep,SI *sip,ucentpw *pep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if_constexpr (f_shadow) {
-	    if (char *spbuf{} ; (rs = malloc_sp(&spbuf)) >= 0) {
+	    if (char *spbuf{} ; (rs = lm_sp(&spbuf)) >= 0) {
 	        ucentsp		sd ;
 		cint		splen = rs ;
 	        cchar		*pn = pep->pw_name ;
@@ -299,7 +303,7 @@ static int getpwentry_shadow(pwentry *uep,SI *sip,ucentpw *pep) noex {
 	                rs = sip->strw(pep->pw_passwd,-1,vpp) ;
 	            }
 	        } /* end if */
-	        rs1 = uc_free(spbuf) ;
+	        rs1 = lm_free(spbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
