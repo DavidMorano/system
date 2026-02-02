@@ -58,12 +58,12 @@
 #include	<sys/stat.h>
 #include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
 #include	<usystem.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<getbufsize.h>
 #include	<getusername.h>
 #include	<getax.h>
@@ -321,7 +321,7 @@ static int subinfo_idun(SUBINFO *sip)
 
 	if (! sip->fl.id_un) {
 	    struct passwd	pw ;
-	    cint		pwlen = getbufsize(getbufsize_pw) ;
+	    cint		pwlen = getbufsize(bufsize_pw) ;
 	    cchar		*un = sip->un ;
 	    char		*pwbuf ;
 	    sip->fl.id_un = TRUE ;
@@ -373,7 +373,7 @@ static int subinfo_prgroup(SUBINFO *sip)
 
 	if ((rs >= 0) && (! f)) {
 	    GROUP	gr ;
-	    cint		grlen = getbufsize(getbufsize_gr) ;
+	    cint		grlen = getbufsize(bufsize_gr) ;
 	    int			rs1 ;
 	    char		*grbuf ;
 	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
