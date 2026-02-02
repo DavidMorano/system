@@ -1,4 +1,5 @@
 /* pcsuserfile SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* update a record in a PCS userfile */
@@ -70,21 +71,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<useraccdb.h>
 #include	<nulstr.h>
 #include	<strn.h>
-#include	<sfx.h>
 #include	<snx.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"pcsuserfile.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+
+/* namespace */
+
+using libuc::libmem ;			/* variable */
 
 
 /* external subroutines */
@@ -111,13 +122,15 @@ int pcsuserfile(cc *pr,cc *ufn,cc *nn,cc *un,cc *name) noex {
 	if (pr && ufn && nn && un) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && ufn[0] && nn[0] && un[0]) {
-	        int	bnl ;
+		cint nnlen = lenstr(nn) ;
+		cint unlen = lenstr(un) ;
 	        cchar	*bnp ;
-	        if ((bnl = sfbasename(ufn,-1,&bnp)) > 0) {
-	            cchar	*tp = strnrchr(bnp,bnl,'.') ;
-	            char	*ubuf{} ;
-	            if (tp) bnl = (tp-bnp) ;
-	            if ((rs = malloc_un(&ubuf)) >= 0) {
+	        if (int bnl ; (bnl = sfbasename(ufn,-1,&bnp)) > 0) {
+		    cint usz = ((nnlen + 1) + 1 + (unlen + 1)) ;
+	            if (cchar *tp = strnrchr(bnp,bnl,'.') ; tp) {
+	                bnl = intconv(tp - bnp) ;
+		    }
+	            if (char *ubuf ; (rs = lm_mall(usz,&ubuf)) >= 0) {
 		        cint	ulen = rs ;
 	                if ((rs = sncpy(ubuf,ulen,nn,"!",un)) >= 0) {
 		            nulstr	dbs ;
@@ -136,7 +149,7 @@ int pcsuserfile(cc *pr,cc *ufn,cc *nn,cc *un,cc *name) noex {
 	                        if (rs >= 0) rs = rs1 ;
 	                    } /* end if (nulstr) */
 	                } /* end if (sncpy) */
-		        rs1 = uc_free(ubuf) ;
+		        rs1 = lm_free(ubuf) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	        } /* end if (sfbasename) */
