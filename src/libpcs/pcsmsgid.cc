@@ -1,6 +1,9 @@
-/* pcsmsgid */
+/* pcsmsgid SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* create a mail message ID (for PCS) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,53 +17,50 @@
 
 /*******************************************************************************
 
-	This subroutine is used to create a mail message ID for PCS programs.
+  	Name:
+	pcsmsgid
+
+  	Description:
+	This subroutine is used to create a mail message ID for PCS
+	programs.
 
 	Synopsis:
-
-	int pcsmsgid(pcsroot,rbuf,rlen)
-	const char	pcsroot[] ;
-	char		rbuf[] ;
-	char		rlen ;
+	int pcsmsgid(cchar *pcsroot,char *rbuf,int rlen) noex
 
 	Arguments:
-
 	pcsroot		PCS program root path
 	rbuf		caller supplied buffer to place result in
 	rlen		length of caller supplied buffer
 
 	Returns:
-
 	>=0		length of returned ID
-	<0		error in process of creating ID
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<time.h>
-#include	<netdb.h>
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>		/* |getustime(3u)| */
+#include	<uclibmem.h>
+#include	<getbufsize.h>
 #include	<getnodedomain.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
+#include	<pcsgetserial.h>
 
+#include	"pcsmsgid.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	getnodedomain(char *,char *) ;
-extern int	pcsgetserial(const char *) ;
 
 
 /* external variables */
@@ -68,81 +68,109 @@ extern int	pcsgetserial(const char *) ;
 
 /* local structures */
 
+namespace {
+    struct variables {
+	int	nodenamelen ;
+	int	hostnamelen ;
+	int	usernamelen ;
+	operator int () noex ;
+    } ; /* end struct (variables) */
+} /* end namespace */
+
 
 /* forward references */
 
-static int mkstr(char *,int,cchar *,cchar *,int) ;
+local int mkstr(char *,int,cchar *,cchar *,int) noex ;
 
 
 /* local variables */
 
+static variables	var ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int pcsmsgid(cchar *pr,char *rbuf,int rlen)
-{
-	int		rs ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	if ((rs = pcsgetserial(pr)) >= 0) {
-	    const int	sn = rs ;
-	    char	nn[NODENAMELEN+1] ;
-	    char	dn[MAXHOSTNAMELEN+1] ;
-	    if ((rs = getnodedomain(nn,dn)) >= 0) {
-	        rs = mkstr(rbuf,rlen,dn,nn,sn) ;
-	    }
-	}
-
-	return rs ;
+int pcsmsgid(cchar *pr,char *rbuf,int rlen) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		rv = 0 ; /* return-value */
+	if (pr && rbuf) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+		static cint	rsv = var ;
+		if ((rs = rsv) >= 0) {
+		   cint nlen = var.nodenamelen ;
+		   cint hlen = var.hostnamelen ;
+	           if ((rs = pcsgetserial(pr)) >= 0) {
+		       cint	sz = ((nlen + 1) + (hlen + 1)) ;
+	               cint	sn = rs ;
+		       if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	                   char	*nn = (a + 0) ;
+	                   char	*dn = (a + (nlen + 1)) ;
+	                   if ((rs = getnodedomain(nn,dn)) >= 0) {
+	                       rs = mkstr(rbuf,rlen,dn,nn,sn) ;
+			       rv = rs;
+	                   } /* end if (getnodedomain) */
+		           rs1 = lm_free(a) ;
+	        	   if (rs >= 0) rs = rs1 ;
+		       } /* end if (m-a-f) */
+	           } /* end if (pcsgetserial) */
+		} /* end if (variables) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (pcsmsgid) */
 
 
 /* local subroutines */
 
-
-static int mkstr(char *rp,int rl,cchar *dn,cchar *nn,int sn)
-{
-	SBUF		ubuf ;
+local int mkstr(char *rp,int rl,cchar *dn,cchar *nn,int sn) noex {
 	int		rs ;
-	if ((rs = sbuf_start(&ubuf,rp,rl)) >= 0) {
-	    const uint	tv = (uint) time(NULL) ;
-	    const int	pid = getpid() ;
-	    const int	nl = strlen(nn) ;
+	if (sbuf sb ; (rs = sb.start(rp,rl)) >= 0) {
+	    cuint	tv = (uint) getustime ;
+	    cint	pid = getpid() ;
+	    cint	nl = lenstr(nn) ;
 	    int		len ;
-
-	    if (nl > USERNAMELEN) {
-	        const int	hid = gethostid() ;
-	        sbuf_hexi(&ubuf,hid) ;
-	        sbuf_chr(&ubuf,'-') ;
-	    } else {
-	        sbuf_strw(&ubuf,nn,nl) ;
-	    }
-
-	    sbuf_deci(&ubuf,pid) ;
-
-	    sbuf_chr(&ubuf,'.') ;
-
-	    sbuf_hexui(&ubuf,tv) ;
-
-	    sbuf_chr(&ubuf,'.') ;
-
-	    sbuf_deci(&ubuf,sn) ;
-
-	    sbuf_chr(&ubuf,'@') ;
-
-	    sbuf_strw(&ubuf,dn,-1) ;
-
-	    len = sbuf_finish(&ubuf) ;
+	    {
+	        clong	hid = gethostid() ;
+	        if (nl > var.usernamelen) {
+	            cint iid = int(hid) ;
+	            sb.hex(iid) ;
+	            sb.chr('-') ;
+	        } else {
+	            sb.strw(nn,nl) ;
+	        }
+	        sb.dec(pid) ;
+	        sb.chr('.') ;
+	        sb.hex(tv) ;
+	        sb.chr('.') ;
+	        sb.dec(sn) ;
+	        sb.chr('@') ;
+	        sb.strw(dn) ;
+	    } /* end block */
+	    len = sb.finish ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return rs ;
 }
 /* end subroutine (pcsmsgid_join) */
+
+variables::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	    nodenamelen = rs ;
+	    if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	        hostnamelen = rs ;
+	        if ((rs = getbufsize(bufsize_un)) >= 0) {
+		    usernamelen = rs ;
+		}
+	    }
+	} /* end if */
+	return rs ;
+} /* end method (variables::operator) */
 
 
