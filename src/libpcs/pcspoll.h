@@ -27,9 +27,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<modload.h>
 #include	<pcsconf.h>
 #include	<localmisc.h>
@@ -46,11 +44,11 @@
 
 struct pcspoll_information {
 	int		dummy ;
-} ;
+} ; /* end struct */
 
 struct pcspoll_flags {
 	uint		loaded:1 ;
-} ;
+} ; /* end struct */
 
 struct pcspoll_head {
 	void		*obj ;		/* object pointer */
@@ -58,7 +56,7 @@ struct pcspoll_head {
 	PCSPOLL_CA	call ;
 	PCSPOLL_FL	fl ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 typedef	PCSPOLL		pcspoll ;
 typedef	PCSPOLL_INFO	pcspoll_info ;
@@ -68,16 +66,16 @@ typedef	PCSPOLL_FL	pcspoll_fl ;
 EXTERNC_begin
 
 struct pcspoll_calls {
-	int	(*start)(void *,PCSCONF *,cchar *) noex ;
+	int	(*start)(void *,pcsconf *,cchar *) noex ;
 	int	(*info)(void *,PCSPOLLS_INFO *) noex ;
 	int	(*cmd)(void *,int) noex ;
 	int	(*finish)(void *) noex ;
 } ;
 
-extern int	pcspoll_start(PCSPOLL *,PCSCONF *,cchar *) noex ;
-extern int	pcspoll_info(PCSPOLL *,pcspoll_info *) noex ;
-extern int	pcspoll_cmd(PCSPOLL *,int) noex ;
-extern int	pcspoll_finish(PCSPOLL *) noex ;
+extern int	pcspoll_start(pcspoll *,pcsconf *,cchar *) noex ;
+extern int	pcspoll_info(pcspoll *,pcspoll_info *) noex ;
+extern int	pcspoll_cmd(pcspoll *,int) noex ;
+extern int	pcspoll_finish(pcspoll *) noex ;
 
 EXTERNC_end
 

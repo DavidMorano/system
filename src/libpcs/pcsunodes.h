@@ -1,53 +1,51 @@
-/* pcsunodes */
+/* pcsunodes HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSUNODES_INCLUDE
-#define	PCSUNODES_INCLUDE	1
+#define	PCSUNODES_INCLUDE
 
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
-#define	PCSUNODES_MAGIC	0x99447245
 #define	PCSUNODES	struct pcsunodes_head
-#define	PCSUNODES_CUR	struct pcsunodes_cur
+#define	PCSUNODES_CUR	struct pcsunodes_cursor
+#define	PCSUNODES_MAGIC	0x99447245
 
 
-struct pcsunodes_cur {
+struct pcsunodes_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct pcsunodes_head {
+	cchar		**unodes ;
 	uint		magic ;
 	int		n ;
-	cchar		**unodes ;
-} ;
+} ; /* end struct */
 
+typedef	PCSUNODES	pcsunodes ;
+typedef	PCSUNODES_CUR	pcsunodes_cur ;
 
-#if	(! defined(PCSUNODES_MASTER)) || (PCSUNODES_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int pcsunodes_start(PCSUNODES *,cchar *) noex ;
+extern int pcsunodes_get(PCSUNODES *,int,cchar **) noex ;
+extern int pcsunodes_mat(PCSUNODES *,cchar *,int) noex ;
+extern int pcsunodes_curbegin(PCSUNODES *,pcsunodes_cur *) noex ;
+extern int pcsunodes_enum(PCSUNODES *,pcsunodes_cur *,char *,int) noex ;
+extern int pcsunodes_curend(PCSUNODES *,pcsunodes_cur *) noex ;
+extern int pcsunodes_audit(PCSUNODES *) noex ;
+extern int pcsunodes_finish(PCSUNODES *) noex ;
 
-extern int pcsunodes_start(PCSUNODES *,cchar *) ;
-extern int pcsunodes_get(PCSUNODES *,int,cchar **) ;
-extern int pcsunodes_mat(PCSUNODES *,cchar *,int) ;
-extern int pcsunodes_curbegin(PCSUNODES *,PCSUNODES_CUR *) ;
-extern int pcsunodes_enum(PCSUNODES *,PCSUNODES_CUR *,char *,int) ;
-extern int pcsunodes_curend(PCSUNODES *,PCSUNODES_CUR *) ;
-extern int pcsunodes_audit(PCSUNODES *) ;
-extern int pcsunodes_finish(PCSUNODES *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PCSUNODES_MASTER */
 
 #endif /* PCSUNODES_INCLUDE */
 

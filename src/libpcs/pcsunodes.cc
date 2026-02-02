@@ -18,8 +18,8 @@
 
 /*******************************************************************************
 
-  	Name:
-	pcsuunames
+  	Object:
+	pcsunodes
 
 	Description:
 	This object manages the list of user-nodes.
@@ -29,39 +29,40 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecpstr.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
+#include	<matstr.h>		/* |matcasestr(3uc)| */
 #include	<localmisc.h>
 
 #include	"pcsunodes.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	PCSUNODES_FNAME		"etc/usernodes"
+#define	PN		pcsunodes
+#define	PN_CUR		PCSUNODES_CUR
+#define	PN_MAGIC	PCSUNODES_MAGIC
+#define	PN_FNAME	"etc/usernodes"
 
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matcasestr(cchar **,cchar *,int) ;
-extern int	strkeycmp(const char *,const char *) ;
-extern int	vecpstr_loadfile(vecpstr *,int,cchar *) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) noex ;
+extern int	strlinelen(cchar *,int,int) noex ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -72,179 +73,177 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	pcsunodes_mktab(PCSUNODES *,VECPSTR *) ;
-static int	pcsunodes_load(PCSUNODES *,vecpstr *,cchar **,char *) ;
+template<typename ... Args>
+static inline int pcsunodes_magic(pcsunodes *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == PN_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (pcsunodes_magic) */
+
+local int	pcsunodes_mktab(PN *,vecpstr *) noex ;
+
+local int	vecpstr_loadnodes(vecpstr *,cchar **,char *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pcsunodes_start(PCSUNODES *op,cchar *pr)
-{
-	int		rs ;
+int pcsunodes_start(PN *op,cchar *pr) noex {
+    	PCSUNODES	*hop = op ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	cchar		*ufn = PCSUNODES_FNAME ;
-	char		ufname[MAXPATHLEN+1] ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-	if (pr[0] == '\0') return SR_INVALID ;
-	memset(op,0,sizeof(PCSUNODES)) ;
-
-	if ((rs = mkpath2(ufname,pr,ufn)) >= 0) {
-	    vecpstr	un ;
-	    const int	f = TRUE ;
-	    if ((rs = vecpstr_start(&un,0,0,0)) >= 0) {
-	        if ((rs = vecpstr_loadfile(&un,f,ufname)) >= 0) {
-		    if ((rs = pcsunodes_mktab(op,&un)) >= 0) {
-			op->magic = PCSUNODES_MAGIC ;
-		    }
-		}
-		rs1 = vecpstr_finish(&un) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (vecpstr) */
-	    if (rs < 0) {
-		pcsunodes_finish(op) ;
-	    }
-	} /* end if (mkpath) */
-
+	if (op && pr) {
+	    rs = SR_INVALID ;
+	    memclear(hop) ;
+	    if (pr[0]) {
+	        cchar	*ufn = PN_FNAME ;
+		if (char *ubuf ; (rs = lm_mp(&ubuf)) >= 0) {
+	            if ((rs = mkpath(ubuf,pr,ufn)) >= 0) {
+	                cint	vsz = 0 ;
+	                cint	vn = 0 ;
+	                cint	vo = 0 ;
+	                cint	f = true ;
+	                if (vecpstr un ; (rs = un.start(vsz,vn,vo)) >= 0) {
+	                    if ((rs = un.loadfile(f,ubuf)) >= 0) {
+		                if ((rs = pcsunodes_mktab(op,&un)) >= 0) {
+			            op->magic = PN_MAGIC ;
+		                }
+		            } /* end if (vecpstr_loadfile) */
+		            rs1 = un.finish ;
+		            if (rs >= 0) rs = rs1 ;
+	                } /* end if (vecpstr) */
+	                if (rs < 0) {
+		            pcsunodes_finish(op) ;
+	                }
+	            } /* end if (mkpath) */
+		    rs1 = lm_free(ubuf) ;
+	            if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pcsunodes_start) */
 
-
-int pcsunodes_finish(PCSUNODES *op)
-{
-	int		rs = SR_OK ;
+int pcsunodes_finish(PN *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != PCSUNODES_MAGIC) return SR_NOTOPEN ;
-
-	if (op->unodes != NULL) {
-	    rs1 = uc_free(op->unodes) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->unodes = NULL ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = pcsunodes_magic(op)) >= 0) {
+	    if (op->unodes != nullptr) {
+	        rs1 = lm_free(op->unodes) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->unodes = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (pcsunodes_magic) */
 	return rs ;
 }
 /* end subroutine (pcsunodes_finish) */
 
-
-int pcsunodes_get(PCSUNODES *op,int i,cchar **rpp)
-{
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != PCSUNODES_MAGIC) return SR_NOTOPEN ;
-	if ((i >= 0) && (i < op->n)) {
-	    if (rpp != NULL) *rpp = op->unodes[i] ;
-	    rs = strlen(op->unodes[i]) ;
-	} else {
-	    if (rpp != NULL) *rpp = NULL ;
-	    rs = SR_INVALID ;
-	}
+int pcsunodes_get(PN *op,int i,cchar **rpp) noex {
+	int		rs ;
+	if ((rs = pcsunodes_magic(op)) >= 0) {
+	    if ((i >= 0) && (i < op->n)) {
+	        if (rpp) {
+		    *rpp = op->unodes[i] ;
+		}
+	        rs = lenstr(op->unodes[i]) ;
+	    } else {
+	        if (rpp != nullptr) *rpp = nullptr ;
+	        rs = SR_INVALID ;
+	    }
+	} /* end if (pcsunodes_magic) */
 	return rs ;
 }
 /* end subroutine (pcsunodes_get) */
 
-
-int pcsunodes_mat(PCSUNODES *op,cchar *mp,int ml)
-{
+int pcsunodes_mat(PN *op,cchar *mp,int ml) noex {
 	int		rs ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != PCSUNODES_MAGIC) return SR_NOTOPEN ;
-	if ((rs = matcasestr(op->unodes,mp,ml)) < 0) {
-	    rs = SR_NOTFOUND ;
-	}
+	if ((rs = pcsunodes_magic(op)) >= 0) {
+	    if ((rs = matcasestr(op->unodes,mp,ml)) < 0) {
+	        rs = SR_NOTFOUND ;
+	    }
+	} /* end if (pcsunodes_magic) */
 	return rs ;
 }
 /* end subroutine (pcsunodes_mat) */
 
-
-int pcsunodes_curbegin(PCSUNODES *op,PCSUNODES_CUR *curp)
-{
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (op->magic != PCSUNODES_MAGIC) return SR_NOTOPEN ;
-	curp->i = -1 ;
-	return SR_OK ;
+int pcsunodes_curbegin(PN *op,PN_CUR *curp) noex {
+    	int		rs ;
+	if ((rs = pcsunodes_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	} /* end if (pcsunodes_magic) */
+	return rs ;
 }
 /* end subroutine (pcsunodes_curbegin) */
 
-
-int pcsunodes_curend(PCSUNODES *op,PCSUNODES_CUR *curp)
-{
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (op->magic != PCSUNODES_MAGIC) return SR_NOTOPEN ;
-	curp->i = -1 ;
-	return SR_OK ;
+int pcsunodes_curend(PN *op,PN_CUR *curp) noex {
+    	int		rs ;
+	if ((rs = pcsunodes_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	} /* end if (pcsunodes_magic) */
+	return rs ;
 }
 /* end subroutine (pcsunodes_curend) */
 
-
-int pcsunodes_enum(PCSUNODES *op,PCSUNODES_CUR *curp,char *rbuf,int rlen)
-{
-	int		rs = SR_OK ;
-	int		rl = 0 ;
-	int		i ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (op->magic != PCSUNODES_MAGIC) return SR_NOTOPEN ;
-	i = (curp->i >= 0) ? (curp->i+1) : 0 ;
-	if (i < op->n) {
-	    if ((rs = sncpy1(rbuf,rlen,op->unodes[i])) >= 0) {
-	        rl = rs ;
-		curp->i = i ;
+int pcsunodes_enum(PN *op,PN_CUR *curp,char *rbuf,int rlen) noex {
+	int		rs ;
+	int		rl = 0 ; /* return-value */
+	if ((rs = pcsunodes_magic(op,curp,rbuf)) >= 0) {
+	    int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
+	    if (i < op->n) {
+	        if ((rs = sncpy1(rbuf,rlen,op->unodes[i])) >= 0) {
+	            rl = rs ;
+		    curp->i = i ;
+	        }
+	    } else {
+	        rbuf[0] = '\0' ;
+	        rs = SR_NOTFOUND ;
 	    }
-	} else {
-	    rbuf[0] = '\0' ;
-	    rs = SR_NOTFOUND ;
-	}
+	} /* end if (pcsunodes_magic) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (pcsunodes_enum) */
 
-
-int pcsunodes_audit(PCSUNODES *op)
-{
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != PCSUNODES_MAGIC) return SR_NOTOPEN ;
-	return SR_OK ;
+int pcsunodes_audit(PN *op) noex {
+    	int		rs ;
+	if ((rs = pcsunodes_magic(op)) >= 0) {
+	    rs = SR_OK ;
+	} /* end if (pcsunodes_magic) */
+	return rs ;
 }
 /* end subroutine (pcsunodes_mat) */
 
 
 /* local subroutines */
 
-
-static int pcsunodes_mktab(PCSUNODES *op,VECPSTR *ulp)
-{
+local int pcsunodes_mktab(PN *op,vecpstr *ulp) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = vecpstr_count(ulp)) >= 0) {
-	    const int	vsize = ((rs+1)*sizeof(cchar *)) ;
+	    cint	vsz = ((rs+1) * szof(cchar *)) ;
 	    if ((rs = vecpstr_strsize(ulp)) >= 0) {
-		const int	ssize = rs ;
-	        int		tsize = (vsize+rs) ;
-		char		*bp ;
-	        if ((rs = uc_malloc(tsize,&bp)) >= 0) {
+		cint	ssz = rs ;
+	        int	tsz = (vsz + rs) ;
+		if (char *bp ; (rs = lm_mall(tsz,&bp)) >= 0) {
 	            cchar	**va = (cchar **) bp ;
-		    char	*st = (bp + vsize) ;
-	            if ((rs = vecpstr_strmk(ulp,st,ssize)) >= 0) {
-			if ((rs = pcsunodes_load(op,ulp,va,st)) >= 0) {
+		    char	*st = (bp + vsz) ;
+	            if ((rs = vecpstr_strmk(ulp,st,ssz)) >= 0) {
+			if ((rs = vecpstr_loadnodes(ulp,va,st)) >= 0) {
 			    op->n = rs ;
 			    op->unodes = va ;
 			}
 	            } /* end if (record-table allocated) */
 		    if (rs < 0) {
-			uc_free(bp) ;
+			lm_free(bp) ;
 		    }
 	        } /* end if (m-a) */
 	    } /* end if (vecpstr_strsize) */
@@ -258,39 +257,35 @@ static int pcsunodes_mktab(PCSUNODES *op,VECPSTR *ulp)
 }
 /* end subroutine (pcsunodes_mktab) */
 
-
-static int pcsunodes_load(PCSUNODES *op,vecpstr *ulp,cchar **va,char *st)
-{
+local int vecpstr_loadnodes(vecpstr *ulp,cchar **va,char *st) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = vecpstr_recsize(ulp)) >= 0) {
-	    const int	rsize = rs ;
-	    int		*rec ;
-	    if ((rs = uc_malloc(rsize,&rec)) >= 0) {
-	        if ((rs = vecpstr_recmk(ulp,rec,rsize)) >= 0) {
-		    const int	n = rs ;
-		    int		i ;
-		    for (i = 0 ; (i < n) && (rec[i] >= 0) ; i += 1) {
+	    cint	rsz = rs ;
+	    if (int *rec ; (rs = lm_mall(rsz,&rec)) >= 0) {
+	        if ((rs = vecpstr_recmk(ulp,rec,rsz)) >= 0) {
+		    cint	n = rs ;
+		    for (int i = 0 ; (i < n) && (rec[i] >= 0) ; i += 1) {
 		        if (rec[i] > 0) {
 #if	CF_DEBUGS
-			    debugprintf("pcsunodes_load: i=%u c=%u v=%s\n",
+			    debugprintf("vecpstr_loadnodes: i=%u c=%u v=%s\n",
 				i,c,(st+rec[i])) ;
 #endif
 			    va[c++] = (st + rec[i]) ;
 		        }
 		    } /* end for */
 	        } /* end if */
-	        va[c] = NULL ;
-	        rs1 = uc_free(rec) ;
+	        va[c] = nullptr ;
+	        rs1 = lm_free(rec) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (vecpstr_recsize) */
 #if	CF_DEBUGS
-	debugprintf("pcsunodes_load: ret rs=%d c=%u\n",rs,c) ;
+	debugprintf("vecpstr_loadnodes: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (pcsunodes_load) */
+/* end subroutine (vecpstr_loadnodes) */
 
 

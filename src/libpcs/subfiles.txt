@@ -1,5 +1,7 @@
 
 pcsconf
+pcsnodes
+
 mkdirlist
 artlist
 article
@@ -9,4 +11,8 @@ pcsuserfile
 pcsgetserial
 pcsgetnames
 pcsmsgid
+pcsmailhost
+
+datestr_envelope
+datestr_header
 

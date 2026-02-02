@@ -22,7 +22,7 @@
 
 /*******************************************************************************
 
-  	Name:
+  	Object:
 	pcspoll
 
 	Description:
@@ -36,13 +36,16 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<dlfcn.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
 #include	<modload.h>
 #include	<pcsconf.h>
@@ -72,8 +75,8 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
+extern int	debugprintf(cchar *,...) noex ;
+extern int	strlinelen(cchar *,int,int) noex ;
 #endif
 
 
@@ -85,26 +88,24 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	pcspoll_objloadbegin(PCSPOLL *,cchar *,cchar *) ;
-static int	pcspoll_objloadend(PCSPOLL *) ;
-static int	pcspoll_modloadopen(PCSPOLL *,cchar *,cchar *) ;
-static int	pcspoll_loadcalls(PCSPOLL *,cchar *) ;
+local int	pcspoll_objloadbegin(PCSPOLL *,cchar *,cchar *) noex ;
+local int	pcspoll_objloadend(PCSPOLL *) noex ;
+local int	pcspoll_modloadopen(PCSPOLL *,cchar *,cchar *) noex ;
+local int	pcspoll_loadcalls(PCSPOLL *,cchar *) noex ;
 
-static int	isrequired(int) ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
 
 
-/* local variables */
+/* local structures */
 
-static cchar	*subs[] = {
-	"start",
-	"info",
-	"cmd",
-	"finish",
-	nullptr
-} ;
+
+/* forward references */
+
+
+/* local variables */
 
 enum subs {
 	sub_start,
@@ -112,14 +113,23 @@ enum subs {
 	sub_cmd,
 	sub_finish,
 	sub_overlast
-} ;
+} ; /* end enum (subs) */
+
+constexpr cpcchar	ubs[] = {
+	"start",
+	"info",
+	"cmd",
+	"finish",
+	nullptr
+} ; /* end array (subs) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn)
-{
+int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn) noex {
 	int		rs ;
 	cchar	*pr ;
 
@@ -150,7 +160,7 @@ int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn)
 		    cchar	*objname = PCSPOLL_OBJNAME ;
 	            if ((rs = pcspoll_objloadbegin(op,pr,objname)) >= 0) {
 	                if ((rs = (*op->call.start)(op->obj,pcp,sn)) >= 0) {
-			    op->fl.loaded = TRUE ;
+			    op->fl.loaded = true ;
 			}
 	                if (rs < 0)
 		            pcspoll_objloadend(op) ;
@@ -168,10 +178,8 @@ int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn)
 }
 /* end subroutine (pcspoll_start) */
 
-
 /* free up the entire vector string data structure object */
-int pcspoll_finish(PCSPOLL *op)
-{
+int pcspoll_finish(PCSPOLL *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -191,9 +199,7 @@ int pcspoll_finish(PCSPOLL *op)
 }
 /* end subroutine (pcspoll_finish) */
 
-
-int pcspoll_info(PCSPOLL *op,PCSPOLL_INFO *ip)
-{
+int pcspoll_info(PCSPOLL *op,PCSPOLL_INFO *ip) noex {
 	int		rs = SR_NOSYS ;
 	int		n = 0 ;
 
@@ -242,9 +248,8 @@ int pcspoll_cmd(PCSPOLL *op,int cmd)
 
 /* private subroutines */
 
-
 /* find and load the DB-access object */
-static int pcspoll_objloadbegin(PCSPOLL *op,cchar *pr,cchar *objname)
+local int pcspoll_objloadbegin(PCSPOLL *op,cchar *pr,cchar *objname)
 {
 	int		rs ;
 
@@ -276,8 +281,7 @@ static int pcspoll_objloadbegin(PCSPOLL *op,cchar *pr,cchar *objname)
 /* end subroutine (pcspoll_objloadbegin) */
 
 
-static int pcspoll_objloadend(PCSPOLL *op)
-{
+local int pcspoll_objloadend(PCSPOLL *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -294,22 +298,18 @@ static int pcspoll_objloadend(PCSPOLL *op)
 }
 /* end subroutine (pcspoll_objloadend) */
 
-
-static int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname)
-{
-	VECSTR		syms ;
-	const int	n = nelem(subs) ;
+local int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname) noex {
+	cint	vn = nelem(subs) ;
 	int		rs ;
 	int		rs1 ;
-	int		opts = VECSTR_OCOMPACT ;
+	int		vo = VECSTR_OCOMPACT ;
 
-	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
-	    MODLOAD	*lp = &op->loader ;
- 	    int		i ;
+	if (vevstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
+	    modload	*lp = &op->loader ;
 	    cchar	*modbname ;
 	    char	symname[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
+	    for (int i = 0 ; (i < n) && subs[i] ; i += 1) {
 	        if (isrequired(i)) {
 	            rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i]) ;
 		    if (rs >= 0)
@@ -319,7 +319,7 @@ static int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname)
 	    } /* end for */
 
 	    if (rs >= 0) {
-	        cchar	**sv ;
+	        mainv sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	            modbname = PCSPOLL_MODBNAME ;
 	            objname = PCSPOLL_OBJNAME ;
@@ -336,16 +336,14 @@ static int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname)
 }
 /* end subroutine (pcspoll_modloadopen) */
 
-
-static int pcspoll_loadcalls(PCSPOLL *op,cchar objname[])
-{
-	MODLOAD		*lp = &op->loader ;
+local int pcspoll_loadcalls(PCSPOLL *op,cchar *objname) noex {
+	modload		*lp = &op->loader ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
 	int		c = 0 ;
 	char		symname[SYMNAMELEN + 1] ;
-	const void	*snp ;
+	cvoid	*snp ;
 
 	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
@@ -394,14 +392,12 @@ static int pcspoll_loadcalls(PCSPOLL *op,cchar objname[])
 }
 /* end subroutine (pcspoll_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int	f = FALSE ;
+local bool isrequired(int i) noex {
+	bool	f = false ;
 	switch (i) {
 	case sub_start:
 	case sub_finish:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
