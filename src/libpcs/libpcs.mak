@@ -2,7 +2,7 @@
 
 T= libpcs
 
-ALL= $(T).o $(T).a
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -37,24 +37,27 @@ INCS += libpcs.h
 
 MODS +=
 
-LIBS +=
+LIBS += -luo -lu
 
 
-OBJ0_LIBPCS= 
-OBJ1_LIBPCS= 
-OBJ2_LIBPCS= 
-OBJ3_LIBPCS= 
+OBJ0= pcsuserfile.o pcsmsgid.o
+OBJ1= pcsgetnames.o pcsgetserial.o
+OBJ2= pcsmailhost.o
+OBJ3= pcsconf.o pcsunodes.o
+OBJ4= mkdirlist.o dirshown.o
+OBJ5= datestr_envelope.o datestr_header.o
+OBJ6= artlist.o article.o
+OBJ7=
 
-OBJA_LIBPCS= obj0_libpcs.o obj1_libpcs.o
-OBJB_LIBPCS= obj2_libpcs.o obj3_libpcs.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o obj5.o obj6.o
 
-OBJ_LIBPCS= $(OBJA_LIBPCS) $(OBJB_LIBPCS)
+OBJ= obja.o objb.o
 
 
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(EUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -70,7 +73,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 .SUFFIXES:		.hh .ii .iim .ccm
 
 
-default:		$(T).a
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -100,10 +103,10 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_LIBPCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBPCS)
+$(T).o:			$(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
 
-$(T).a:			$(OBJ_LIBPCS)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).o
@@ -124,19 +127,54 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_libpcs.o:	$(OBJ0_LIBPCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBPCS)
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_libpcs.o:	$(OBJ1_LIBPCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBPCS)
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_libpcs.o:	$(OBJ2_LIBPCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBPCS)
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_libpcs.o:	$(OBJ3_LIBPCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBPCS)
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-pcsuserfile.o:		pcsuserfile.cc pcsuserfile.h
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# objects
+pcsconf.o:		pcsconf.cc	pcsconf.h		$(INCS)
+pcsunodes.o:		pcsunodes.cc	pcsunodes.h		$(INCS)
+mkdirlist.o:		mkdirlist.cc	mkdirlist.h		$(INCS)
+artlist.o:		artlist.cc	artlist.h		$(INCS)
+article.o:		article.cc	article.h		$(INCS)
+dirshown.o:		dirshown.cc	dirshown.h		$(INCS)
+
+# singles
+pcsuserfile.o:		pcsuserfile.cc	pcsuserfile.h		$(INCS)
+pcsgetserial.o:		pcsgetserial.cc	pcsgetserial.h		$(INCS)
+pcsgetnames.o:		pcsgetnames.cc	pcsgetnames.h		$(INCS)
+pcsmsgid.o:		pcsmsgid.cc	pcsmsgid.h		$(INCS)
+pcsmailhost.o:		pcsmailhost.cc	pcsmailhost.h		$(INCS)
+
+datestr_envelope.o:	datestr_envelope.cc	datestr.h	$(INCS)
+datestr_header.o:	datestr_header.cc	datestr.h	$(INCS)
 
 
