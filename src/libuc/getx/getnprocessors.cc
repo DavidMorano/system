@@ -44,13 +44,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getourenv.h>
 #include	<cfdec.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getnprocessors.h"
+
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -64,6 +67,10 @@ import uconstants ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_nprocessors(int) noex ;
+}
 
 
 /* external variables */
