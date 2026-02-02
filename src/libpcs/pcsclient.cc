@@ -71,6 +71,7 @@
 #include	<fcntl.h>
 #include	<dlfcn.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -82,7 +83,7 @@
 #include	<expcook.h>
 #include	<getax.h>
 #include	<getusername.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<ascii.h>
 #include	<getsysmisc.h>
 #include	<exitcodes.h>
@@ -91,6 +92,9 @@
 #include	"pcsclient.h"
 #include	"sysmiscfh.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -1024,7 +1028,7 @@ static int loadinfo_chown(LOADINFO *lip,int fd,int shmi) noex {
 	int		rs1 ;
 	if (lip) {
 	    ucentpw	pw ;
-	    cint	pwlen = getbufsize(getbufsize_pw) ;
+	    cint	pwlen = getbufsize(bufsize_pw) ;
 	    cchar	*sysuser = "sys" ;
 	    char	*pwbuf{} ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
