@@ -73,8 +73,8 @@
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
-#include	<varnames.hh>		/* |varname(3u)| */
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bufsizevar.hh>
 #include	<sncpyx.h>
 #include	<isnot.h>		/* isNotPresent(3uc)| */
@@ -82,7 +82,7 @@
 
 #include	"getpwd.h"
 
-#pragma		GCC dependency	"mod/uconstants.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;			/* |varname(3u)| */
 
@@ -97,6 +97,11 @@ import uconstants ;			/* |varname(3u)| */
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_stat(int,ustat *) noex ;
+    extern int uc_getcwd(char *,int) noex ;
+}
+
 
 /* external variables */
 
@@ -109,7 +114,7 @@ import uconstants ;			/* |varname(3u)| */
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
