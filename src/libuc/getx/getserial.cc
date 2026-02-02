@@ -53,8 +53,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<lockfile.h>
 #include	<estrings.h>
 #include	<cfnum.h>
@@ -97,12 +99,28 @@
 /* external subroutines */
 
 extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_duper(int,int) noex ;
+    extern int uc_pipe(int *) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_fchown(int,uid_t,gid_t) noex ;
+    extern int uc_fminmod(int,mode_t) noex ;
+    extern int uc_read(int,void *,int) noex ;
+    extern int uc_write(int,cvoid *,int) noex ;
+    extern int uc_iocctl(int,int,...) noex ;
+    extern int uc_rewind(int) noex ;
+    extern int uc_ftruncate(int,off_t ) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_close(int) ;
     extern int uc_fpathconf(int,int,char *) noex ;
-}
+    extern int uc_setsockopt(int,int,int,int *,int) noex ;
+    extern int uc_linger(int,int) noex ;
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_unlink(cchar *) noex ;
+} /* end extern */
 
 
 /* external variables */
-
 
 /* local structures */
 
@@ -172,7 +190,7 @@ static int getserial_open(cchar *sfname) noex {
 	            if ((rs = uc_fpathconf(fd,cmd,nullptr)) == 0) {
 	                cchar	*cp{} ;
 	                if (int cl ; (cl = sfdirname(sfname,-1,&cp)) > 0) {
-	                    if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+	                    if (char *pbuf{} ; (rs = lm_mp(&pbuf)) >= 0) {
 	                        if ((rs = mkpath1w(pbuf,cp,cl)) >= 0) {
 	                	    USTAT	sb ;
 	                            if ((rs = uc_stat(pbuf,&sb)) >= 0) {
@@ -181,7 +199,7 @@ static int getserial_open(cchar *sfname) noex {
 	                                rs = uc_fchown(fd,u,g) ;
 	                            }
 	                        } /* end if (mkpath) */
-				rs1 = uc_free(pbuf) ;
+				rs1 = lm_free(pbuf) ;
 				if (rs >= 0) rs = rs1 ;
 			    } /* end if (m-a-f) */
 	                } /* end if (sfdirname) */
