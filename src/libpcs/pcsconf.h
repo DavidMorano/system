@@ -27,13 +27,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<modload.h>
 #include	<ptm.h>
 
@@ -51,7 +46,7 @@
 EXTERNC_begin
 
 struct pcsconf_calls {
-	int	(*start)(void *,cchar *,cchar **,cchar *) ;
+	int	(*start)(void *,cchar *,mainv,cchar *) ;
 	int	(*curbegin)(void *,void *) ;
 	int	(*fetch)(void *,cchar *,int,void *,char *,int) ;
 	int	(*enumerate)(void *,void *,char *,int,char *,int) ;
@@ -72,13 +67,13 @@ struct pcsconf_flags {
 } ;
 
 struct pcsconf_head {
-	modload		loader ;
-	ptm		mx ;
+	modload		*mlp ;		/* module-loader-pointer */
+	ptm		*mxp ;		/* mutex-pointer */
 	void		*obj ;		/* object pointer */
 	void		*cookmgr ;	/* cookie-manager */
 	cchar		*pr ;		/* supplied program-root */
-	cchar		**envv ;	/* supplied environment */
 	cchar		*pcsusername ;	/* calculated */
+	mainv		envv ;		/* supplied environment */
 	PCSCONF_CA	call ;
 	uid_t		uid_pcs ;
 	gid_t		gid_pcs ;
@@ -95,10 +90,10 @@ typedef	PCSCONF_CA	pcsconf_ca ;
 
 EXTERNC_begin
 
-extern int pcsconf_start(pcsconf *,cchar *,cchar **,cchar *) noex ;
+extern int pcsconf_start(pcsconf *,cchar *,mainv,cchar *) noex ;
 extern int pcsconf_curbegin(pcsconf *,pcsconf_cur *) noex ;
-extern int pcsconf_fetch(pcsconf *,cchar *,int,pcsconf_cur *,char *,int) noex ;
-extern int pcsconf_enum(pcsconf *,pcsconf_cur *,char *,int,char *,int) noex ;
+extern int pcsconf_curfetch(pcsconf *,cc *,int,pcsconf_cur *,char *,int) noex ;
+extern int pcsconf_curenum(pcsconf *,pcsconf_cur *,char *,int,char *,int) noex ;
 extern int pcsconf_curend(pcsconf *,pcsconf_cur *) noex ;
 extern int pcsconf_fetchone(pcsconf *,cchar *,int,char *,int) noex ;
 extern int pcsconf_audit(pcsconf *) noex ;
@@ -106,7 +101,7 @@ extern int pcsconf_getpcsuid(pcsconf *) noex ;
 extern int pcsconf_getpcsgid(pcsconf *) noex ;
 extern int pcsconf_getpcsusername(pcsconf *,char *,int) noex ;
 extern int pcsconf_getpr(pcsconf *,cchar **) noex ;
-extern int pcsconf_getenvv(pcsconf *,cchar ***) noex ;
+extern int pcsconf_getenvv(pcsconf *,mainv **) noex ;
 extern int pcsconf_finish(pcsconf *) noex ;
 
 EXTERNC_end
