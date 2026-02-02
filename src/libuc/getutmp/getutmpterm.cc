@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1999-01-10, David A­D­ Morano
+	= 1998-01-10, David A­D­ Morano
 	This code was originally written.  It was prompted
 	by the failure of other system subroutines from finding the
 	proper controlling terminal (on Solaris®)!  Maybe they fixed
@@ -58,8 +58,8 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<utmpent.h>
 #include	<mknpathx.h>
 #include	<localmisc.h>
