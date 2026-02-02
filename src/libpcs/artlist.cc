@@ -1,17 +1,16 @@
 /* artlist SUPPORT */
 /* charset=ISO8859-1 */
-/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* article list handling */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
 	This code module was completely rewritten to replace any
-	original garbage that was here before, if any.
+	original garbage that came before.
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -19,9 +18,12 @@
 	= 2017-10-24, David A­D­ Morano
 	Some small refactoring.
 
+	= 2026-02-01, David A­D­ Morano
+	More minor refactoring.
+
 */
 
-/* Copyright © 1995,1998,2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1995,1998,2017,2026 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -88,13 +90,15 @@ extern "C" {
     typedef int	(*sortcmp_t)(cvoid *,cvoid *) noex ;
 }
 
+typedef time_t (*enttime_f)(AL_ENT *) noex ;
+
 typedef artlist_ent *	entp ;
 
 
 /* external subroutines */
 
-extern int	mailmsg_loadfile(MAILMSG *,bfile *) noex ;
-extern int	mailmsg_envtimes(MAILMSG *,dater *,time_t *,int) noex ;
+extern int	mailmsg_loadfile(mailmsg *,bfile *) noex ;
+extern int	mailmsg_envtimes(mailmsg *,dater *,time_t *,int) noex ;
 
 
 /* external variables */
@@ -165,6 +169,11 @@ local int	entry_load(AL_ENT *,dater *,cchar *) noex ;
 
 local int	timecmp(time_t *,time_t *) noex ;
 
+local time_t	ent_ctime(AL_ENT *) noex ;
+local time_t	ent_ptime(AL_ENT *) noex ;
+local time_t	ent_atime(AL_ENT *) noex ;
+local time_t	ent_mtime(AL_ENT *) noex ;
+
 
 /* local variables */
 
@@ -187,7 +196,7 @@ int artlist_start(AL *op,TIMEB *nowp,cchar *zname) noex {
 	    if ((rs = datep->start(nowp,zname,-1)) >= 0) {
 		vechand *artp = op->artp ;
 		cint	vn = 20 ;
-	        cint	vo = VECHAND_OSORTED ;
+	        cint	vo = vechandm.sorted ;
 	        if ((rs = artp->start(vn,vo)) >= 0) {
 	            op->magic = ARTLIST_MAGIC ;
 	        }
@@ -434,7 +443,7 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 	int		rs1 ;
 	cmode		om = 0666 ;
 	if (bfile afile ; (rs = bopen(&afile,name,"r",om)) >= 0) {
-	    if (MAILMSG am ; (rs = mailmsg_start(&am)) >= 0) {
+	    if (mailmsg am ; (rs = mailmsg_start(&am)) >= 0) {
 	        if ((rs = mailmsg_loadfile(&am,&afile)) >= 0) {
 	            time_t	ta[AL_NENT] ;
 	            int		hl ;
@@ -442,21 +451,9 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 	            int		v ;
 	            cchar	*hn ;
 	            cchar	*hp ;
-
-/* get the envelope times (post & arrive) if there are any */
-
-#if	CF_DEBUGS
-	            debugprintf("artlist/entry_start: mailmsg_envtimes()\n") ;
-#endif
-
+		    /* get the envelope times (post & arrive) */
 	            ep->ptime = ep->atime = 0 ;
 	            n = mailmsg_envtimes(&am,dp,ta,AL_NENT) ;
-
-#if	CF_DEBUGS
-	            debugprintf("artlist/entry_start: "
-	                "mailmsg_envtimes() n=%d\n",n) ;
-#endif
-
 	            if (n > 1) {
 	                sortcmp_t	scmp = (sortcmp_t) timecmp ;
 	                size_t		sortlen = n ;
@@ -614,263 +611,77 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 }
 /* end subroutine (entry_load) */
 
-local int cmpartforward(AL_ENT **e1pp,AL_ENT **e2pp) noex {
-	AL_ENT	*e1p = (AL_ENT *) *e1pp ;
-	AL_ENT	*e2p = (AL_ENT *) *e2pp ;
-	int		rc = 0 ;
-
-#ifdef	OPTIONAL
-	if ((*e1pp == nullptr) && (*e2pp == nullptr))
-	    return 0 ;
-
-	if (*e1pp == nullptr)
-	    return 1 ;
-
-	if (*e2pp == nullptr)
-	    return -1 ;
-
-	if (e1p->mtime < e2p->mtime)
-	    return -1 ;
-
-	if (e1p->mtime > e2p->mtime)
-	    return 1 ;
-
-#else
-	rc = intconv(e1p->mtime - e2p->mtime) ;
-#endif
-
-	return rc ;
-}
-/* end subroutine (cmpartforward) */
-
-local int cmpartreverse(AL_ENT **e1pp,AL_ENT **e2pp) noex {
-	AL_ENT	*e1p = (AL_ENT *) *e1pp ;
-	AL_ENT	*e2p = (AL_ENT *) *e2pp ;
-	int		rc = 0 ;
-
-#ifdef	OPTIONAL
-	if ((*e1pp == nullptr) && (*e2pp == nullptr))
-	    return 0 ;
-
-	if (*e1pp == nullptr)
-	    return 1 ;
-
-	if (*e2pp == nullptr)
-	    return -1 ;
-
-	if (e1p->mtime > e2p->mtime)
-	    return -1 ;
-
-	if (e1p->mtime < e2p->mtime)
-	    return 1 ;
-
-#else
-	rc = intconv(e2p->mtime - e1p->mtime) ;
-#endif
-	return rc ;
-}
-/* end subroutine (cmpartreverse) */
-
-/* compare article arrival times (forward) */
-local int cmpaf(AL_ENT **e1pp,AL_ENT **e2pp) noex {
-	AL_ENT	*e1p = (AL_ENT *) *e1pp ;
-	AL_ENT	*e2p = (AL_ENT *) *e2pp ;
-	time_t		e1t, e2t ;
-	int		rc = 0 ;
-
-#if	OPTIONAL
-	if ((*e1pp == nullptr) && (*e2pp == nullptr))
-	    return 0 ;
-
-	if (*e1pp == nullptr)
-	    return 1 ;
-
-	if (*e2pp == nullptr)
-	    return -1 ;
-#endif
-
-	e1t = (e1p->atime != 0) ? e1p->atime : e1p->mtime ;
-	e2t = (e2p->atime != 0) ? e2p->atime : e2p->mtime ;
-
-	rc = intconv(e1t - e2t) ;
-	return rc  ;
-}
-/* end subroutine (cmpaf) */
-
-/* compare article arrival times (reverse) */
-local int cmpar(AL_ENT **e1pp,AL_ENT **e2pp) noex {
-	AL_ENT	*e1p = (AL_ENT *) *e1pp ;
-	AL_ENT	*e2p = (AL_ENT *) *e2pp ;
-	time_t		e1t, e2t ;
-	int		rc = 0 ;
-
-#if	OPTIONAL
-	if ((*e1pp == nullptr) && (*e2pp == nullptr))
-	    return 0 ;
-
-	if (*e1pp == nullptr)
-	    return 1 ;
-
-	if (*e2pp == nullptr)
-	    return -1 ;
-#endif
-
-	e1t = (e1p->atime != 0) ? e1p->atime : e1p->mtime ;
-	e2t = (e2p->atime != 0) ? e2p->atime : e2p->mtime ;
-
-	rc = intconv(e2t - e1t) ;
-	return rc ;
-}
-/* end subroutine (cmpar) */
-
-/* compare article post times (forward) */
-local int cmppf(AL_ENT **e1pp,AL_ENT **e2pp) noex {
-	AL_ENT	*e1p = (AL_ENT *) *e1pp ;
-	AL_ENT	*e2p = (AL_ENT *) *e2pp ;
-	time_t		e1t, e2t ;
-	int		rc = 0 ;
-
-#if	OPTIONAL
-	if ((*e1pp == nullptr) && (*e2pp == nullptr))
-	    return 0 ;
-
-	if (*e1pp == nullptr)
-	    return 1 ;
-
-	if (*e2pp == nullptr)
-	    return -1 ;
-#endif
-
-	if ((e1t = e1p->ptime) == 0) {
-	    if ((e1t = e1p->atime) == 0) {
-	        e1t = e1p->mtime ;
-	    }
-	}
-
-	if ((e2t = e2p->ptime) == 0) {
-	    if ((e2t = e2p->atime) == 0) {
-	        e2t = e2p->mtime ;
-	    }
-	}
-
-	rc = intconv(e1t - e2t) ;
-	return rc ;
-}
-/* end subroutine (cmppf) */
-
 /* compare article post times (reverse) */
-local int cmppr(AL_ENT **e1pp,AL_ENT **e2pp) noex {
+local int cmpxy(enttime_f etf,AL_ENT **e1pp,AL_ENT **e2pp,bool f) noex {
 	AL_ENT	*e1p = (AL_ENT *) *e1pp ;
 	AL_ENT	*e2p = (AL_ENT *) *e2pp ;
-	time_t		e1t ;
-	time_t		e2t ;
 	int		rc = 0 ;
-
-#if	OPTIONAL
-	if ((*e1pp == nullptr) && (*e2pp == nullptr))
-	    return 0 ;
-
-	if (*e1pp == nullptr)
-	    return 1 ;
-
-	if (*e2pp == nullptr)
-	    return -1 ;
-#endif
-
-	if ((e1t = e1p->ptime) == 0) {
-	    if ((e1t = e1p->atime) == 0) {
-	        e1t = e1p->mtime ;
+	if (e1p || e2p) {
+	    if (e1p) {
+		if (e2p) {
+		    custime et1 = etf(e1p) ;
+		    custime et2 = etf(e2p) ;
+		    if (f) {
+		        rc = intsat(et1 - et2) ;
+		    } else {
+		        rc = intsat(et2 - et1) ;
+		    }
+		} else {
+		    rc = -1 ;
+		}
+	    } else {
+		rc = +1 ;
 	    }
 	}
-	if ((e2t = e2p->ptime) == 0) {
-	    if ((e2t = e2p->atime) == 0) {
-	        e2t = e2p->mtime ;
-	    }
-	}
-
-	rc = intconv(e2t - e1t) ;
 	return rc ;
 }
-/* end subroutine (cmppr) */
+/* end subroutine (cmpxy) */
 
 /* compare article compose times (forward) */
 local int cmpcf(AL_ENT **e1pp,AL_ENT **e2pp) noex {
-	AL_ENT	*e1p = (AL_ENT *) *e1pp ;
-	AL_ENT	*e2p = (AL_ENT *) *e2pp ;
-	time_t		e1t ;
-	time_t		e2t ;
-	int		rc = 0 ;
-
-#if	OPTIONAL
-	if ((*e1pp == nullptr) && (*e2pp == nullptr))
-	    return 0 ;
-
-	if (*e1pp == nullptr)
-	    return 1 ;
-
-	if (*e2pp == nullptr)
-	    return -1 ;
-#endif
-
-	if ((e1t = e1p->ctime) == 0) {
-	    if ((e1t = e1p->ptime) == 0) {
-	        if ((e1t = e1p->atime) == 0) {
-	            e1t = e1p->mtime ;
-	        }
-	    }
-	}
-
-	if ((e2t = e2p->ctime) == 0) {
-	    if ((e2t = e2p->ptime) == 0) {
-	        if ((e2t = e2p->atime) == 0) {
-	            e2t = e2p->mtime ;
-	        }
-	    }
-	}
-
-	rc = intconv(e1t - e2t) ;
-	return rc ;
+    	return cmpxy(ent_ctime,e1pp,e2pp,true) ;
 }
 /* end subroutine (cmpcf) */
 
 /* compare article compose times (reverse) */
 local int cmpcr(AL_ENT **e1pp,AL_ENT **e2pp) noex {
-	AL_ENT	*e1p = (AL_ENT *) *e1pp ;
-	AL_ENT	*e2p = (AL_ENT *) *e2pp ;
-	time_t		e1t, e2t ;
-	int		rc = 0 ;
-
-#if	OPTIONAL
-	if ((*e1pp == nullptr) && (*e2pp == nullptr))
-	    return 0 ;
-
-	if (*e1pp == nullptr)
-	    return 1 ;
-
-	if (*e2pp == nullptr)
-	    return -1 ;
-#endif
-
-	if ((e1t = e1p->ctime) == 0) {
-	    if ((e1t = e1p->ptime) == 0) {
-	        if ((e1t = e1p->atime) == 0) {
-	            e1t = e1p->mtime ;
-	        }
-	    }
-	}
-
-	if ((e2t = e2p->ctime) == 0) {
-	    if ((e2t = e2p->ptime) == 0) {
-	        if ((e2t = e2p->atime) == 0) {
-	            e2t = e2p->mtime ;
-	        }
-	    }
-	}
-
-	rc = intconv(e2t - e1t) ;
-	return rc ;
+    	return cmpxy(ent_ctime,e1pp,e2pp,false) ;
 }
 /* end subroutine (cmpcr) */
+
+/* compare article post times (forward) */
+local int cmppf(AL_ENT **e1pp,AL_ENT **e2pp) noex {
+    	return cmpxy(ent_ptime,e1pp,e2pp,true) ;
+}
+/* end subroutine (cmppf) */
+
+/* compare article post times (reverse) */
+local int cmppr(AL_ENT **e1pp,AL_ENT **e2pp) noex {
+    	return cmpxy(ent_ptime,e1pp,e2pp,false) ;
+}
+/* end subroutine (cmppr) */
+
+/* compare article post times (forward) */
+local int cmpaf(AL_ENT **e1pp,AL_ENT **e2pp) noex {
+    	return cmpxy(ent_atime,e1pp,e2pp,true) ;
+}
+/* end subroutine (cmpaf) */
+
+/* compare article post times (reverse) */
+local int cmpar(AL_ENT **e1pp,AL_ENT **e2pp) noex {
+    	return cmpxy(ent_atime,e1pp,e2pp,false) ;
+}
+/* end subroutine (cmppf) */
+
+local int cmpartforward(AL_ENT **e1pp,AL_ENT **e2pp) noex {
+    	return cmpxy(ent_mtime,e1pp,e2pp,true) ;
+}
+/* end subroutine (cmpartforward) */
+
+local int cmpartreverse(AL_ENT **e1pp,AL_ENT **e2pp) noex {
+    	return cmpxy(ent_mtime,e1pp,e2pp,false) ;
+}
+/* end subroutine (cmpartreverse) */
 
 /* compare UNIX times */
 local int timecmp(time_t *t1p,time_t *t2p) noex {
@@ -878,5 +689,39 @@ local int timecmp(time_t *t1p,time_t *t2p) noex {
 	return rc ;
 }
 /* env subroutine (timecmp) */
+
+local time_t ent_ctime(AL_ENT *ep) noex {
+    	time_t	t ;
+	if ((t = ep->ctime) == 0z) {
+	    if ((t = ep->ptime) == 0z) {
+	        if ((t = ep->atime) == 0z) {
+	            t = ep->mtime ;
+	        }
+	    }
+	}
+	return t ;
+} /* end subroutine (ent_ctime) */
+
+local time_t ent_ptime(AL_ENT *ep) noex {
+    	time_t	t ;
+	    if ((t = ep->ptime) == 0z) {
+	        if ((t = ep->atime) == 0z) {
+	            t = ep->mtime ;
+	        }
+	    }
+	return t ;
+} /* end subroutine (ent_ptime) */
+
+local time_t ent_atime(AL_ENT *ep) noex {
+    	time_t	t ;
+	        if ((t = ep->atime) == 0z) {
+	            t = ep->mtime ;
+	        }
+	return t ;
+} /* end subroutine (ent_atime) */
+
+local time_t ent_mtime(AL_ENT *ep) noex {
+	return ep->mtime ;
+} /* end subroutine (ent_mtime) */
 
 
