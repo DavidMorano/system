@@ -52,8 +52,13 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<isnot.h>
@@ -62,6 +67,9 @@
 #include	"pcsnsmgr.h"
 #include	"pcsnsrecs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -88,10 +96,10 @@ extern "C" {
 /* local structures */
 
 struct pcsnsmgr_head {
-	ptm		m ;		/* data mutex */
-	ptc		c ;		/* condition variable */
+	ptm		mx ;		/* data mutex */
+	ptc		cn ;		/* condition variable */
 	PCSNSRECS	*recs ;		/* records (allocated) */
-	int		max ;
+	int		nmax ;
 	int		ttl ;
 	volatile int	waiters ;
 	volatile int	f_capture ;	/* capture flag */
@@ -129,27 +137,33 @@ int pcsnsmgr_init() noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (! uip->f_init) {
+	    ptm *mxp = &uip->mx ;
 	    uip->f_init = true ;
-	    if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
-	        if ((rs = ptc_create(&uip->c,nullptr)) >= 0) {
+	    if ((rs = mxp->create) >= 0) {
+	        ptc *cnp = &uip->cn ;
+	        if ((rs = cnp->create) >= 0) {
 	    	    void_f	b = pcsnsmgr_atforkbefore ;
 	    	    void_f	a = pcsnsmgr_atforkafter ;
-	            if ((rs = uc_atfork(b,a,a)) >= 0) {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(pcsnsmgr_exit)) >= 0) {
 	                    uip->f_initdone = true ;
 			    f = true ;
-	                }
-	                if (rs < 0)
-	                    uc_atforkexpunge(b,a,a) ;
+	                } /* end if (uc_atexit) */
+	                if (rs < 0) {
+	                    uc_atforkexp(b,a,a) ;
+			}
 	            } /* end if (uc_atfork) */
-	            if (rs < 0)
-	                ptc_destroy(&uip->c) ;
+	            if (rs < 0) {
+	                cnp->destroy() ;
+		    }
 	        } /* end if (ptc_create) */
-	        if (rs < 0)
-	            ptm_destroy(&uip->m) ;
+	        if (rs < 0) {
+	            mxp->destroy() ;
+		}
 	    } /* end if (ptm_create) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        uip->f_init = false ;
+	    }
 	} else {
 	    while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 		rs = msleep(1) ;
@@ -174,15 +188,17 @@ int pcsnsmgr_fini() noex {
 	    {
 	        void_f	b = pcsnsmgr_atforkbefore ;
 	        void_f	a = pcsnsmgr_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptc_destroy(&uip->c) ;
+	        ptc *cnp = &uip->cn ;
+	        rs1 = cnp->destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(&uip->m) ;
+		ptm *mxp = &uip->mx ;
+	        rs1 = mxp->destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    uip->f_initdone = false ;
@@ -290,19 +306,18 @@ int pcsnsmgr_stats(PCSNSMGR_STATS *usp) noex {
 
 	if (usp == nullptr) return SR_FAULT ;
 
-	memset(usp,0,sizeof(PCSNSMGR_STATS)) ;
-
+	memclear(usp) ;
 	if ((rs = pcsnsmgr_init()) >= 0) {
 	    PCSNSMGR	*uip = &pcsnsmgr_data ;
 	    if ((rs = pcsnsmgr_capbegin(uip,-1)) >= 0) {
-
-	        if (uip->recs == nullptr) rs = pcsnsmgr_begin(uip) ;
-
+	        if (uip->recs == nullptr) {
+		    rs = pcsnsmgr_begin(uip) ;
+		}
 	        if (rs >= 0) {
 	            PCSNSRECS		*recsp = (PCSNSRECS *) uip->recs ;
 	            PCSNSRECS_ST	s ;
 	            if ((rs = pcsnsrecs_stats(recsp,&s)) >= 0) {
-	                usp->max = uip->max ;
+	                usp->max = uip->nmax ;
 	                usp->ttl = uip->ttl ;
 	                usp->nent = s.nentries ;
 	                usp->acc = s.total ;
@@ -313,7 +328,6 @@ int pcsnsmgr_stats(PCSNSMGR_STATS *usp) noex {
 	                n = s.nentries ;
 	            } /* end if (pcsnsrecs-stats) */
 	        } /* end if */
-
 	        rs1 = pcsnsmgr_capend(uip) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (capture-exclusion) */
@@ -327,57 +341,62 @@ int pcsnsmgr_stats(PCSNSMGR_STATS *usp) noex {
 /* local subroutines (or "private"?) */
 
 static int pcsnsmgr_capbegin(PCSNSMGR *uip,int to) noex {
+	ptm *mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
-
-	if ((rs = ptm_lockto(&uip->m,to)) >= 0) {
-	    uip->waiters += 1 ;
-
-	    while ((rs >= 0) && uip->f_capture) { /* busy */
-	        rs = ptc_waiter(&uip->c,&uip->m,to) ;
-	    } /* end while */
-
-	    if (rs >= 0) {
-	        uip->f_capture = true ;
+	if ((rs = mxp->lockbegin(to)) >= 0) {
+	    {
+	        ptc *cnp = &uip->cn ;
+	        uip->waiters += 1 ;
+	        while ((rs >= 0) && uip->f_capture) { /* busy */
+	            rs = cnp->waiter(mxp,to) ;
+	        } /* end while */
+	        if (rs >= 0) {
+	            uip->f_capture = true ;
+	        }
+	        uip->waiters -= 1 ;
 	    }
-
-	    uip->waiters -= 1 ;
-	    rs1 = ptm_unlock(&uip->m) ;
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
-
 	return rs ;
 }
 /* end subroutine (pcsnsmgr_capbegin) */
 
 static int pcsnsmgr_capend(PCSNSMGR *uip) noex {
+	ptm *mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
-
-	if ((rs = ptm_lock(&uip->m)) >= 0) {
-
-	    uip->f_capture = false ;
-	    if (uip->waiters > 0) {
-	        rs = ptc_signal(&uip->c) ;
-	    }
-
-	    rs1 = ptm_unlock(&uip->m) ;
+	if ((rs = mxp->lockbegin) >= 0) {
+	    {
+	        ptc *cnp = &uip->cn ;
+	        uip->f_capture = false ;
+	        if (uip->waiters > 0) {
+	            rs = cnp->signal ;
+	        }
+	    } /* end block */
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
-
 	return rs ;
 }
 /* end subroutine (pcsnsmgr_capend) */
 
 static void pcsnsmgr_atforkbefore() noex {
 	PCSNSMGR		*uip = &pcsnsmgr_data ;
-	ptm_lock(&uip->m) ;
+	{
+	    ptm *mxp = &uip->mx ;
+	    mxp->lockbegin() ;
+	}
 }
 /* end subroutine (pcsnsmgr_atforkbefore) */
 
 static void pcsnsmgr_atforkafter() noex {
 	PCSNSMGR		*uip = &pcsnsmgr_data ;
-	ptm_unlock(&uip->m) ;
+	{
+	    ptm *mxp = &uip->mx ;
+	    mxp->lockend() ;
+	}
 }
 /* end subroutine (pcsnsmgr_atforkafter) */
 
@@ -394,18 +413,18 @@ static int pcsnsmgr_begin(PCSNSMGR *uip) noex {
 
 	if (uip->recs == nullptr) {
 	    cint	size = sizeof(PCSNSRECS) ;
-	    void	*p ;
-	    if ((rs = lm_mall(size,&p)) >= 0) {
-	        cint		max = PCSNSMGR_MAX ;
+	    if (void *p ; (rs = lm_mall(size,&p)) >= 0) {
+	        cint		nmax = PCSNSMGR_MAX ;
 	        cint		ttl = PCSNSMGR_TTL ;
 	        PCSNSRECS	*recsp = (PCSNSRECS *) p ;
 	        if ((rs = pcsnsrecs_start(recsp,max,ttl)) >= 0) {
 	            uip->recs = recsp ;
-	            uip->max = max ;
+	            uip->nmax = nmax ;
 	            uip->ttl = ttl ;
 		}
-	        if (rs < 0)
+	        if (rs < 0) {
 	            lm_free(p) ;
+		}
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
 
