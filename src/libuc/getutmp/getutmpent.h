@@ -23,7 +23,8 @@
 #include	<sys/types.h>		/* |pid_t| */
 #include	<sys/param.h>
 #include	<time.h>		/* |time_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	UTMPENTX	struct utmpentx_head
@@ -60,7 +61,7 @@ struct utmpentx_head {
 	char		user[GETUTMPENT_LUSER + 1] ;
 	char		line[GETUTMPENT_LLINE + 1] ;
 	char		host[GETUTMPENT_LHOST + 1] ;
-} ;
+} ; /* end struct (utmpentx_head) */
 
 #ifdef	__cplusplus
 struct utmpentx : utmpentx_head {
