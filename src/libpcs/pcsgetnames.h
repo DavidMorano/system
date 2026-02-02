@@ -1,4 +1,5 @@
 /* pcsgetnames HEADER */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get various information elements related to the PCS environment */
@@ -13,8 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
+#include	<usysbase.h>
 
 
 enum pcsnametypes {
@@ -23,7 +23,7 @@ enum pcsnametypes {
 	pcsnametype_projinfo,
 	pcsnametype_org,
 	pcsnametype_overlast
-} ;
+} ; /* end enum (pcsnametypes) */
 
 EXTERNC_begin
 
