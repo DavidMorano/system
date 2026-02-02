@@ -52,7 +52,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getserv.h>		/* |getserv_name(3uc)| */
 #include	<cfdec.h>
 #include	<hasx.h>
@@ -60,7 +61,9 @@
 
 #include	"getportnum.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
