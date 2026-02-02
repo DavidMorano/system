@@ -43,8 +43,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<bufsizevar.hh>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getpwd.h>
 #include	<mkpathxw.h>
 #include	<ids.h>
@@ -84,8 +85,6 @@ static int getprogpathrel(ids *,vs *,char *,cc *,int) noex ;
 
 
 /* local variables */
-
-static bufsizevar		maxpathlen(getbufsize_mp) ;
 
 
 /* exported variables */
@@ -127,43 +126,41 @@ static int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = maxpathlen) >= 0) {
+	if (char *pwdp ; (rs = lm_mp(&pwdp)) >= 0) {
 	    cint	pwdl = rs ;
-	    if (char *pwdp{} ; (rs = lm_mall((pwdl+1),&pwdp)) >= 0) {
-	        bool	f = false ;
-	        cchar	*pp{} ;
-		pwdp[0] = '\0' ;
-	        for (int i = 0 ; plp->get(i,&pp) >= 0 ; i += 1) {
-	            if (pp) {
-	                if (pp[0] == '\0') {
-	                    if (pwdp[0] == '\0') {
-				rs = getpwd(pwdp,pwdl) ;
-			    }
-	                    if (rs >= 0) {
-	                        rs1 = mkpath2w(rbuf,pwdp,pnp,pnl) ;
-	                        rl = rs1 ;
-	                    }
-	                } else {
-	                    rs1 = mkpath2w(rbuf,pp,pnp,pnl) ;
+	    bool	f = false ;
+	    cchar	*pp{} ;
+	    pwdp[0] = '\0' ;
+	    for (int i = 0 ; plp->get(i,&pp) >= 0 ; i += 1) {
+	        if (pp) {
+	            if (pp[0] == '\0') {
+	                if (pwdp[0] == '\0') {
+			    rs = getpwd(pwdp,pwdl) ;
+			}
+	                if (rs >= 0) {
+	                    rs1 = mkpath2w(rbuf,pwdp,pnp,pnl) ;
 	                    rl = rs1 ;
 	                }
-	                if ((rs >= 0) && (rl > 0)) {
-	                    if ((rs = xfile(idp,rbuf)) >= 0) {
-	                        f = true ;
-	                    } else if (isNotPresent(rs)) {
-	                        rl = 0 ;
-	                        rs = SR_OK ;
-	                    }
-	                } /* end if */
+	            } else {
+	                rs1 = mkpath2w(rbuf,pp,pnp,pnl) ;
+	                rl = rs1 ;
+	            }
+	            if ((rs >= 0) && (rl > 0)) {
+	                if ((rs = xfile(idp,rbuf)) >= 0) {
+	                    f = true ;
+	                } else if (isNotPresent(rs)) {
+	                    rl = 0 ;
+	                    rs = SR_OK ;
+	                }
 	            } /* end if */
-	            if (f) break ;
-	            if (rs < 0) break ;
-	        } /* end for */
-	        if ((rs >= 0) && (!f)) rs = SR_NOENT ;
-		rs1 = lm_free(pwdp) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
-	} /* end if (maxpathlen) */
+	        } /* end if */
+	        if (f) break ;
+	        if (rs < 0) break ;
+	    } /* end for */
+	    if ((rs >= 0) && (!f)) rs = SR_NOENT ;
+	    rs1 = lm_free(pwdp) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (getprogpathrel) */
