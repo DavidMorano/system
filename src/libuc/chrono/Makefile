@@ -31,34 +31,20 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= chrono.h
+INCS += chrono.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS=
+LIBS +=
 
 
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ0_DATER= dater_main.o dater_setkey.o
+OBJ0_DATER= dater_prime.o dater_setkey.o
 OBJ1_DATER= dater_getbbtime.o dater_getdate.o
+OBJ2_DATER= dater_obj.o
 
-OBJ_DATER= obj0_dater.o obj1_dater.o
+OBJ_DATER= obj0_dater.o obj1_dater.o obj2_dater.o
 
 OBJ0_CHRONO= tmstrs.o zdb.o
 OBJ1_CHRONO= date.o dater.o
@@ -71,12 +57,30 @@ OBJB_CHRONO= obj2.o obj3.o
 OBJ_CHRONO= $(OBJA_CHRONO) $(OBJB_CHRONO)
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS=
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
 
 all:			$(ALL)
+
+so:			$(T).so
 
 
 .c.i:
@@ -84,6 +88,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -102,18 +109,13 @@ all:			$(ALL)
 
 
 $(T).so:		$(OBJ_CHRONO) Makefile
-	$(LD) -G -o $@ $(LDFLAGS) $(OBJ_CHRONO) $(LIBINFO)
+	$(LD) -shared -fpic -o $@ $(LDFLAGS) $(OBJ_CHRONO) $(LIBINFO)
 
 $(T).o:			$(OBJ_CHRONO)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_CHRONO) $(LIBINFO)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -126,22 +128,26 @@ control:
 
 
 obj0.o:			$(OBJ0_CHRONO)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1_CHRONO)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2_CHRONO)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3_CHRONO)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obj0_dater.o:		$(OBJ0_DATER)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_DATER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_dater.o:		$(OBJ1_DATER)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_DATER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj2_dater.o:		$(OBJ2_DATER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 dater.o:		$(OBJ_DATER)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_DATER) $(LIBINFO)
@@ -157,9 +163,10 @@ zoffparts.o:		zoffparts.cc zoffparts.h	$(INCS)
 dayspec.o:		dayspec.cc dayspec.h		$(INCS)
 cvtdater.o:		cvtdater.cc cvtdater.h		$(INCS)
 
-dater_main.o:		dater_main.cc		dater.h	$(INCS)
+dater_prime.o:		dater_prime.cc		dater.h	$(INCS)
 dater_getdate.o:	dater_getdate.cc	dater.h	$(INCS)
 dater_getbbtime.o:	dater_getbbtime.cc	dater.h	$(INCS)
 dater_setkey.o:		dater_setkey.cc		dater.h	$(INCS)
+dater_obj.o:		dater_obj.cc		dater.h	$(INCS)
 
 
