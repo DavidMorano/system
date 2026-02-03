@@ -21,11 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/timeb.h>		/* for 'struct timeb' */
-#include	<usystem.h>
-#include	<snx.h>
-#include	<strwcpy.h>
-#include	<date.h>
-#include	<localmisc.h>		/* |TZABBRLEN| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<date.h>		/* for its object */
 
 
 /* object defines */
@@ -51,13 +49,13 @@ struct timeb {
 	ushort 		millitm ;	/* 1000 msec of additional accuracy */
 	short		timezone ;	/* timezone, minutes west of GMT */
 	short		dstflag ;	/* DST flag */
-} ;
+} ; /* end struct */
 #endif /* COMMENT */
 
 struct dater_zinfo {
 	int		zoff ;		/* minutes west of GMT */
 	int		isdst ;
-} ;
+} ; /* end struct */
 
 struct dater_flags {
 	uint		zname:1 ;	/* we have a timezone name string */
@@ -66,7 +64,7 @@ struct dater_flags {
 	uint		cb:1 ;		/* have current time-offset */
 	uint		czn:1 ;		/* have current zone-name */
 	uint		cyear:1 ;	/* have current year */
-} ;
+} ; /* end struct */
 
 struct dater_head {
 	char		*cname ;
@@ -77,11 +75,80 @@ struct dater_head {
 	uint		magic ;
 	int		znamelen ;	/* public variable */
 	short		cyear ;		/* current */
-} ;
+} ; /* end struct */
 
-typedef DATER		dater ;
 typedef	DATER_FL	dater_fl ;
 typedef	DATER_ZI	dater_zi ;
+
+#ifdef	__cplusplus
+enum datermems {
+	datermem_finish,
+	datermem_overlast
+} ;
+struct dater ;
+struct dater_co {
+	dater		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (dater *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (dater_co) */
+struct dater : dater_head {
+	dater_co	finish ;
+	dater() noex {
+	    finish(this,datermem_finish) ;
+	    magic = 0 ;
+	    zname = nullptr ;
+	    cname = nullptr ;
+	} ; /* end ctor */
+	dater(const dater &) = delete ;
+	dater &operator = (const dater &) = delete ;
+	int start	(TIMEB *,cchar *,int) noex ;
+	int startcopy	(dater *) noex ;
+	int setcopy	(dater *) noex ;
+	int setstd	(cchar *,int) noex ;
+	int setmsg	(cchar *,int) noex ;
+	int setstrdig	(cchar *,int) noex ;
+	int setlogz	(cchar *,int) noex ;
+	int settouch	(cchar *,int) noex ;
+	int settoucht	(cchar *,int) noex ;
+	int settmzon	(TM *,int,cchar *,int) noex ;
+	int settmzo	(TM *,int) noex ;
+	int settmzn	(TM *,cchar *,int) noex ;
+	int settimezn	(time_t,cchar *,int) noex ;
+	int settimezon	(time_t,int,cchar *,int) noex ;
+	int setzinfo	(dater_zi *,cc *,int) noex ;
+	int tzinfo	(dater_zi *) noex ;
+	int mkdatestr	(int,char *,int) noex ;
+	int mkstd	(char *,int) noex ;
+	int mkenv	(char *,int) noex ;
+	int mkmsg	(char *,int) noex ;
+	int mkhdr	(char *,int) noex ;
+	int mkstrdig	(char *,int) noex ;
+	int mklogz	(char *,int) noex ;
+	int mkgmtlogz	(char *,int) noex ;
+	int gettime	(time_t *) noex ;
+	int getzoneoff	(int *) noex ;
+	int getzonename	(char *,int) noex ;
+	int zinfoget	(dater_zi *,char *,int) noex ;
+	int zinfoset	(dater_zi *,cchar *,int) noex ;
+	int diff	(dater *,time_t *) noex ;
+	int getdate	(date *) noex ;
+	int getbbtime	(cchar *,int,time_t *) noex ;
+	int setkey	(cc *,int,TIMEB *,cc *) noex ;
+	void dtor() noex ;
+	destruct dater() {
+	    if (magic) dtor() ;
+	} ;
+} ; /* end struct (dater) */
+#else	/* __cplusplus */
+typedef DATER		dater ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -115,11 +182,10 @@ extern int dater_getzonename(dater *,char *,int) noex ;
 extern int dater_zinfoget(dater *,dater_zi *,char *,int) noex ;
 extern int dater_zinfoset(dater *,dater_zi *,cchar *,int) noex ;
 extern int dater_diff(dater *,dater *,time_t *) noex ;
-extern int dater_finish(dater *) noex ;
-
 extern int dater_getdate(dater *,date *) noex ;
 extern int dater_getbbtime(dater *,cchar *,int,time_t *) noex ;
 extern int dater_setkey(dater *,cc *,int,TIMEB *,cc *) noex ;
+extern int dater_finish(dater *) noex ;
 
 #ifdef	COMMENT
 extern int dater_nzones(dater *) noex ;
@@ -137,7 +203,7 @@ static inline int dater_magic(dater *op,Args ... args) noex {
 	    rs = (op->magic == DATER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (dater_magic) */
 
 #endif /* __cplusplus */
 
