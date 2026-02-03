@@ -52,17 +52,21 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<uctimeconv.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<strn.h>		/* |strnwcpy(3uc)| */
 #include	<strwcpy.h>
 #include	<altzone.h>		/* <- special for bad systems */
 #include	<localmisc.h>
 
 #include	"tmtime.hh"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| */
 
@@ -87,12 +91,12 @@ import libutil ;			/* |memclear(3u)| */
 /* forward references */
 
 template<typename ... Args>
-static int tmtime_ctor(tmtime *op,Args ... args) noex {
+local int tmtime_ctor(tmtime *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
-	    if (op->zname == nullptr) {
-	        if (char *a ; (rs = malloc_zn(&a)) >= 0) {
+	    if (op->zname == nullptr) ylikely {
+	        if (char *a ; (rs = lm_zn(&a)) >= 0) ylikely {
 		    op->zname = a ;
 		    memclear(a,rs) ;
 		    a[rs] = '\0' ;
@@ -103,12 +107,12 @@ static int tmtime_ctor(tmtime *op,Args ... args) noex {
 }
 /* end subroutine (tmtime_ctor) */
 
-static int	tmtime_mktimer(tmtime *,int,time_t *) noex ;
+local int	tmtime_mktimer(tmtime *,int,time_t *) noex ;
 
 
 /* local variables */
 
-static bufsizevar	znlen(getbufsize_zn) ;
+static bufsizevar	znlen(bufsize_zn) ;
 
 constexpr bool		f_darwin = F_DARWIN ;
 
@@ -120,7 +124,7 @@ constexpr bool		f_darwin = F_DARWIN ;
 
 int tmtime_ztime(tmtime *op,bool fz,time_t t) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if (fz) {
 	        rs = tmtime_localtime(op,t) ;
 	    } else {
@@ -133,10 +137,10 @@ int tmtime_ztime(tmtime *op,bool fz,time_t t) noex {
 
 int tmtime_gmtime(tmtime *op,time_t t) noex {
 	int		rs ;
-	if ((rs = tmtime_ctor(op)) >= 0) {
+	if ((rs = tmtime_ctor(op)) >= 0) ylikely {
 	    if (t == 0) t = time(nullptr) ;
-	    if (TM tmd ; (rs = uc_gmtime(&t,&tmd)) >= 0) {
-	        if ((rs = tmtime_insert(op,&tmd)) >= 0) {
+	    if (TM tmd ; (rs = uc_gmtime(&t,&tmd)) >= 0) ylikely {
+	        if ((rs = tmtime_insert(op,&tmd)) >= 0) ylikely {
 	            op->gmtoff = 0 ;
 	            rs = intconv(strwcpy(op->zname,"GMT",znlen) - op->zname) ;
 	        }
@@ -151,9 +155,9 @@ int tmtime_gmtime(tmtime *op,time_t t) noex {
 
 int tmtime_localtime(tmtime *op,time_t t) noex {
 	int		rs ;
-	if ((rs = tmtime_ctor(op)) >= 0) {
+	if ((rs = tmtime_ctor(op)) >= 0) ylikely {
 	    if (t == 0) t = time(nullptr) ;
-	    if (TM tmd ; (rs = uc_localtime(&t,&tmd)) >= 0) {
+	    if (TM tmd ; (rs = uc_localtime(&t,&tmd)) >= 0) ylikely {
 	        rs = tmtime_insert(op,&tmd) ;
 	    }
 	    if (rs < 0) {
@@ -166,7 +170,7 @@ int tmtime_localtime(tmtime *op,time_t t) noex {
 
 int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	int		rs ;
-	if ((rs = tmtime_ctor(op,tmp)) >= 0) {
+	if ((rs = tmtime_ctor(op,tmp)) >= 0) ylikely {
 	    TM		tc = *tmp ;
 	    op->gmtoff = 0 ;
 	    op->sec = tmp->tm_sec ;
@@ -182,7 +186,7 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	        time_t	t ; /* dummy */
 	        rs = uc_mktime(&tc,&t) ;
 	    } /* end if (need DST indicator) */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        cchar	*zp ;
 	        if_constexpr (f_darwin) {
 	            op->gmtoff = intconv(tc.tm_gmtoff) ;
@@ -204,7 +208,7 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 
 int tmtime_extract(tmtime *op,TM *tmp) noex {
 	int		rs ;
-	if ((rs = tmtime_ctor(op,tmp)) >= 0) {
+	if ((rs = tmtime_ctor(op,tmp)) >= 0) ylikely {
 	    tmp->tm_sec = op->sec ;
 	    tmp->tm_min = op->min ;
 	    tmp->tm_hour = op->hour ;
@@ -239,18 +243,18 @@ int tmtime_adjtime(tmtime *op,time_t *tp) noex {
 
 /* local subroutines */
 
-static int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
+local int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
 	int		rs ;
-	if ((rs = tmtime_ctor(op)) >= 0) {
+	if ((rs = tmtime_ctor(op)) >= 0) ylikely {
 	    time_t	t = 0 ;
-	    if (TM tmd ; (tmtime_extract(op,&tmd)) >= 0) {
-	        if ((rs = uc_mktime(&tmd,&t)) >= 0) {
+	    if (TM tmd ; (tmtime_extract(op,&tmd)) >= 0) ylikely {
+	        if ((rs = uc_mktime(&tmd,&t)) >= 0) ylikely {
 	            cint	taroff = op->gmtoff ;
 	            int 	locoff ;
 	            cbool	f_isdst = (tmd.tm_isdst > 0) ;
 	            locoff = intconv((f_isdst) ? altzone : timezone) ;
 	            t += (taroff - locoff) ;
-	            if (fadj) {
+	            if (fadj) ylikely {
 	                op->sec = tmd.tm_sec ;
 	                op->min = tmd.tm_min ;
 	                op->hour = tmd.tm_hour ;
@@ -302,8 +306,8 @@ int tmtime::adjtime(time_t *tp) noex {
 void tmtime::dtor() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-    	if (zname) {
-	    rs1 = uc_free(zname) ;
+    	if (zname) ylikely {
+	    rs1 = lm_free(zname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    zname = nullptr ;
 	}
