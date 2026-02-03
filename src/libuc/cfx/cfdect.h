@@ -21,10 +21,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<stdintx.h>
 #include	<stdintx.h>
 
 
@@ -37,13 +35,13 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 static inline int cfdect(cchar *sp,int sl,int *rp = nullptr) noex {
-	return cfdect(sp,sl,rp) ;
+	return cfdecti(sp,sl,rp) ;
 }
 
 #else /* __cplusplus */
 
 static inline int cfdect(cchar *sp,int sl,int *rp) noex {
-	return cfdect(sp,sl,rp) ;
+	return cfdecti(sp,sl,rp) ;
 }
 
 #endif /* __cplusplus */
