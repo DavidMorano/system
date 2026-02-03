@@ -37,21 +37,17 @@
 		isdigit(3c)
 		islapha(3c)
 
-	The standard subroutines often go crazy when confronted with Latin-1
-	characters with values >= 128.
+	The standard subroutines often go crazy when confronted
+	with Latin-1 characters with values >= 128.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strnlen(3c)| */
 #include	<concepts>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<cfbin.h>
 #include	<cfoct.h>
@@ -90,12 +86,12 @@
 
 /* subroutine-templates */
 
-template<typename T>
-int cfnumx(cchar *sp,int sl,T *rp) noex {
+template<typename UT>
+int cfnumx(cchar *sp,int sl,UT *rp) noex {
 	int		rs = SR_DOM ;
 	cchar		*bp{} ;
 	bool		fneg = false ;
-	if (int bl ; (bl = sfsign(sp,sl,&bp,&fneg)) > 0) {
+	if (int bl ; (bl = sfsign(sp,sl,&bp,&fneg)) > 0) ylikely {
 	    int		ch = mkchar(*bp) ;
 	    if (ch == '\\') {
 	        bp += 1 ;
@@ -169,8 +165,8 @@ int cfnumsx(cchar *bp,int bl,T *rp) noex {
 	int		rs = SR_DOM ;
 	cchar		*sp{} ;
 	bool		fneg{} ;
-	if (int sl ; (sl = sfsign(bp,bl,&sp,&fneg)) > 0) {
-	    if (UT uval{} ; (rs = cfnumx(sp,sl,&uval)) >= 0) {
+	if (int sl ; (sl = sfsign(bp,bl,&sp,&fneg)) > 0) ylikely {
+	    if (UT uval{} ; (rs = cfnumx(sp,sl,&uval)) >= 0) ylikely {
 		if (fneg) uval = (- uval) ;
 		*rp = cast_static<T>(uval) ;
 	    } /* end if (cfnumx) */
