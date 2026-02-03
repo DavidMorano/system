@@ -21,20 +21,19 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 
 
 EXTERNC_begin
 
-extern int	cfdecf(cchar *,int,double *) noex ;
+extern int	cfdecf(cchar *,int,float *) noex ;
+extern int	cfdecd(cchar *,int,double *) noex ;
+extern int	cfdecld(cchar *,int,longdouble *) noex ;
 
 /* historical (from about 1995 or earlier) */
 static inline int cfdouble(cchar *sp,int sl,double *rp) noex {
-    	return cfdecf(sp,sl,rp) ;
+    	return cfdecd(sp,sl,rp) ;
 }
 
 EXTERNC_end
