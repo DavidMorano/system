@@ -13,7 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	ZDB		struct zdb_head
@@ -29,7 +30,7 @@ struct zdb_head {
 enum zdbmems {
 	zdbmem_count,
 	zdbmem_overlast
-} ;
+} ; /* end enum */
 struct zdb ;
 struct zdb_co {
 	zdb		*op = nullptr ;
