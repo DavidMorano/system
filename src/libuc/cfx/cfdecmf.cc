@@ -83,7 +83,8 @@
 #include	<cstdint>		/* |int64_t| */
 #include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
 #include	<utility>		/* |in_range(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<intsat.h>
 #include	<ascii.h>
 #include	<cfdec.h>
@@ -117,9 +118,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local structures */
 
-constexpr char	xfacts[] = " kmgtpe" ;
+constexpr char		xfacts[] = " kmgtpe" ;
 
-constexpr int	nfacts = lenstr(xfacts) ;
+constexpr int		nfacts = lenstr(xfacts) ;
 
 namespace {
     struct efactors {
@@ -157,7 +158,7 @@ template<typename T> local int cfdecmfx(cc *sp,int µsl,T *rp) noex {
 	int		rv = 0 ; /* return-value */
 	if (sp && rp) ylikely {
 	    rs = SR_INVALID ;
-	    if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	        if (int64_t mf{} ; (rs = getmf(sp,sl,&mf)) > 0) ylikely {
 	            cint	ml = rs ;
 	            if ((rs = inrange<T>(mf)) >= 0) ylikely {
@@ -250,20 +251,17 @@ local int getmf(cchar *sbuf,int slen,int64_t *rp) noex {
 		    }
 		    break ;
 		case 2:
-		    {
-		        cint chy = tolc(xp[1]) ;
-		        if (chy == 'b') {
-	                    if (chx == 'k') {
-	                        mf = 1024L * ubsz ;
-	                    } else if (chx == 'm') {
-	                        mf = 1024L * 1024L * ubsz ;
-	                    } else {
-		                rs = SR_NOTSUP ;
-		            } /* end if */
+		    if (cint chy = tolc(xp[1]) ; chy == 'b') {
+	                if (chx == 'k') {
+	                    mf = 1024L * ubsz ;
+	                } else if (chx == 'm') {
+	                    mf = 1024L * 1024L * ubsz ;
 	                } else {
 		            rs = SR_NOTSUP ;
 		        } /* end if */
-		    } /* end block */
+	            } else {
+		        rs = SR_NOTSUP ;
+		    } /* end if */
 		    break ;
 		default:
 		    rs = SR_NOTSUP ;
