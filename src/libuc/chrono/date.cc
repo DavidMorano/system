@@ -48,14 +48,15 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/timeb.h>		/* |TIMEB| */
+#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<bufsizevar.hh>		/* for |za| */
-#include	<mallocxx.h>
 #include	<snwcpy.h>
 #include	<strn.h>		/* |strnwcpy(3uc)| */
 #include	<sncpyx.h>
@@ -64,7 +65,9 @@
 #include	"date.h"
 #include	"tmz.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -89,7 +92,7 @@ import libutil ;
 
 /* local variables */
 
-static bufsizevar		znlen(getbufsize_zn) ;
+static bufsizevar		znlen(bufsize_zn) ;
 
 
 /* exported variables */
@@ -99,10 +102,10 @@ static bufsizevar		znlen(getbufsize_zn) ;
 
 int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    memclear(op) ;
-	    if ((rs = znlen) >= 0) {
-	        if (char *a ; (rs = malloc_zn(&a)) >= 0) {
+	    if ((rs = znlen) >= 0) ylikely {
+	        if (char *a ; (rs = lm_zn(&a)) >= 0) ylikely {
 		    a[znlen] = '\0' ;
 		    op->zname = a ;
 	            op->time = t ;
@@ -113,7 +116,7 @@ int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 	                rs = intconv(strnwcpy(zp,znlen,zbuf,zlen) - zp) ;
 		    }
 		    if (rs < 0) {
-		        uc_free(op->zname) ;
+		        lm_free(op->zname) ;
 		        op->zname = nullptr ;
 		    }
 	        } /* end if (memory-allocation) */
@@ -126,10 +129,10 @@ int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 int date_finish(date *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->zname) {
-		rs1 = uc_free(op->zname) ;
+		rs1 = lm_free(op->zname) ;
 		if (rs >= 0) rs = rs1 ;
 		op->zname = nullptr ;
 	    }
@@ -141,7 +144,7 @@ int date_finish(date *op) noex {
 
 int date_setzname(date *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    char	*zp = op->zname ; /* "write" buffer */
 	    rs = intconv(strnwcpy(zp,znlen,sp,sl) - zp) ;
 	}
@@ -151,7 +154,7 @@ int date_setzname(date *op,cchar *sp,int sl) noex {
 
 int date_copy(date *op,date *d2p) noex {
 	int		rs = SR_FAULT ;
-	if (op && d2p) {
+	if (op && d2p) ylikely {
 	    DATE	*hop = op ;
 	    char	*znp = op->zname ;	/* save */
 	    rs = SR_OK ;
@@ -164,7 +167,7 @@ int date_copy(date *op,date *d2p) noex {
 
 int date_gettime(date *op,time_t *tp) noex {
 	int		rs = SR_FAULT ;
-	if (op && tp) {
+	if (op && tp) ylikely {
 	    rs = SR_OK ;
 	    *tp = op->time ;
 	}
@@ -174,7 +177,7 @@ int date_gettime(date *op,time_t *tp) noex {
 
 int date_getzoff(date *op,int *zop) noex {
 	int		rs = SR_FAULT ;
-	if (op && zop) {
+	if (op && zop) ylikely {
 	    rs = SR_OK ;
 	    *zop = op->zoff ;
 	}
@@ -184,7 +187,7 @@ int date_getzoff(date *op,int *zop) noex {
 
 int date_getisdst(date *op,int *dstp) noex {
 	int		rs = SR_FAULT ;
-	if (op && dstp) {
+	if (op && dstp) ylikely {
 	    rs = SR_OK ;
 	    *dstp = int(op->isdst) ;
 	}
@@ -194,7 +197,7 @@ int date_getisdst(date *op,int *dstp) noex {
 
 int date_getzname(date *op,char *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
-	if (op && zbuf) {
+	if (op && zbuf) ylikely {
 	    rs = sncpy(zbuf,zlen,op->zname) ;
 	}
 	return rs ;
@@ -236,11 +239,11 @@ void date::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("date",rs,"fini-finish") ;
 	}
-}
+} /* end method (date::dtor) */
 
 date_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case datemem_finish:
 	        rs = date_finish(op) ;
@@ -248,7 +251,6 @@ date_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (date_co::operator) */
+} /* end method (date_co::operator) */
 
 
