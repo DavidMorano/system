@@ -73,7 +73,8 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getmjd.h>		/* |getyrd(3uc)| */
 #include	<calstrs.h>
 #include	<estrings.h>
@@ -87,14 +88,15 @@
 
 #include	"dayspec.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -130,7 +132,7 @@ static int	parsemonth(cchar *,int) noex ;
 
 int dayspec_def(dayspec *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->y = -1 ;
 	    op->m = -1 ;
@@ -142,12 +144,12 @@ int dayspec_def(dayspec *op) noex {
 
 int dayspec_load(dayspec *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->y = -1 ;
 	    op->m = -1 ;
 	    op->d = -1 ;
-	    if (sp) {
+	    if (sp) ylikely {
 	        rs = dayspec_parse(op,sp,sl) ;
 	    }
 	} /* end if (non-null) */
@@ -157,9 +159,9 @@ int dayspec_load(dayspec *op,cchar *sp,int sl) noex {
 
 int dayspec_yday(dayspec *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_DOM ;
-	    if ((op->y >= 0) && (op->m >= 0) && (op->d >> 0)) {
+	    if ((op->y >= 0) && (op->m >= 0) && (op->d >> 0)) ylikely {
 		rs = getyrd(op->y,op->m,op->d) ;
 	    } /* end if (valid-domain) */
 	} /* end if (non-null) */
@@ -291,7 +293,7 @@ static int parsemonth(cchar *mp,int ml) noex {
 	int		rs = SR_INVALID ;
 	int		mi = -1 ;
 	cchar		*cp ;
-	if (int cl ; (cl = sfshrink(mp,ml,&cp)) > 0) {
+	if (int cl ; (cl = sfshrink(mp,ml,&cp)) > 0) ylikely {
 	    cint	ch = mkchar(cp[0]) ;
 	    if (isalphalatin(ch)) {
 	        mi = matpcasestr(calstrs_months,2,cp,cl) ;
@@ -329,7 +331,7 @@ int dayspec::load(cchar *sp,int sl) noex {
 
 dayspec_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case dayspecmem_def:
 	        rs = dayspec_def(op) ;
