@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* PCS user-account-database file management */
+/* PCS get mail-host for a given user */
 /* version %I% last-modified %G% */
 
 
@@ -18,7 +18,7 @@
 
 EXTERNC_begin
 
-extern int pcsmailhost(cchar *,vecstr *,cchar *,char *) noex ;
+extern int	pcsmailhost(cchar *,char *,int,cchar *) noex ;
 
 EXTERNC_end
 
