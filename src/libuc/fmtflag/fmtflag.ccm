@@ -53,7 +53,7 @@ export {
 	fmtflag_space,			/* leading space */
 	fmtflag_thousands,		/* group by thousands */
 	fmtflag_overlast
-    } ;
+    } ; /* end enum (fmtflags) */
 } /* end export */
 
 enum fmtflagmems {
@@ -88,15 +88,15 @@ export {
 	fmtflag_co	left ;
 	fmtflag_co	space ;
 	fmtflag_co	thousands ;
-	int		fg{} ;
+	int		fg{} ;		/* flag-group */
 	fmtflag() noex {
-	    alternate(this,fmtflag_alternate) ;
-	    zerofill(this,fmtflag_zerofill) ;
-	    plus(this,fmtflag_plus) ;
-	    left(this,fmtflag_left) ;
-	    space(this,fmtflag_space) ;
-	    thousands(this,fmtflag_thousands) ;
-	} ;
+	    alternate	(this,fmtflag_alternate) ;
+	    zerofill	(this,fmtflag_zerofill) ;
+	    plus	(this,fmtflag_plus) ;
+	    left	(this,fmtflag_left) ;
+	    space	(this,fmtflag_space) ;
+	    thousands	(this,fmtflag_thousands) ;
+	} ; /* end ctor */
 	fmtflag(const int a) noex : fg(a) { } ;
 	operator int () noex {
 	    return fg ;
