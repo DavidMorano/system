@@ -48,8 +48,8 @@
 #include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sfx.h>
 #include	<cfdec.h>
 #include	<localmisc.h>		/* |NYEARS_CENTURY| + |TIMEBUFLEN| */
@@ -82,9 +82,9 @@
 
 int dater_getbbtime(dater *op,cchar *sp,int sl,time_t *tp) noex {
 	int		rs ;
-	if ((rs = dater_magic(op,sp,tp)) >= 0) {
+	if ((rs = dater_magic(op,sp,tp)) >= 0) ylikely {
 	    cchar	*cp{} ;
-	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	        if ((cl == 1) && (cp[0] == '0')) {
 	            *tp = 0 ;
 	        } else if ((rs = dater_setstrdig(op,cp,cl)) >= 0) {
