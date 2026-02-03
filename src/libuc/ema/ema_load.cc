@@ -220,10 +220,13 @@ int loader::loadgroup(ema_ent *ep) noex {
 } /* end method (loader::loadgroup) */
 
 int loader::loadstore(ema_ent *ep) noex {
-    	int		rs ;
-	if ((rs = vechand_add(op->elp,ep)) >= 0) ylikely {
-	    op->n += 1 ;
-	}
+    	int		rs = SR_FAULT ;
+	if (ep) {
+	    vechand *elp = op->elp ;
+	    if ((rs = elp->add(ep)) >= 0) ylikely {
+	        op->n += 1 ;
+	    }
+	} /* end if (non-null) */
         return rs ;
 } /* end method (loader::loadstore) */
 
