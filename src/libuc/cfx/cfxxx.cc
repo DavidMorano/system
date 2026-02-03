@@ -49,7 +49,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* |uc_strto{xx}(3uc)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucstrto.h>		/* |uc_strto{x}(3uc)| */
 #include	<stdintx.h>
 #include	<localmisc.h>
 
