@@ -51,15 +51,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 
 #include	"cfa26.h"
 
+#pragma		GCC dependency		"mod/cfalphax.ccm"
 
 import cfalphax ;
 
