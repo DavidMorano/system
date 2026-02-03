@@ -71,7 +71,6 @@
 #include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
