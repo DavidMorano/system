@@ -121,9 +121,10 @@ local int	ema_addentone(ema *,ema_ent *) noex ;
 int ema_start(ema *op) noex {
 	int		rs ;
 	if ((rs = ema_ctor(op)) >= 0) ylikely {
+	    vechand *elp = op->elp ;
 	    cint	vn = EMA_DEFENTS ;
 	    cint	vo = 0 ;
-	    if ((rs = vechand_start(op->elp,vn,vo)) >= 0) ylikely {
+	    if ((rs = elp->start(vn,vo)) >= 0) ylikely {
 	        op->magic = EMA_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -138,10 +139,11 @@ int ema_finish(ema *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ema_magic(op)) >= 0) ylikely {
+	    vechand *elp = op->elp ;
 	    op->n = -1 ;
 	    if (op->elp) ylikely {
 	        void	*vp{} ;
-	        for (int i = 0 ; vechand_get(op->elp,i,&vp) >= 0 ; i += 1) {
+	        for (int i = 0 ; elp->get(i,&vp) >= 0 ; i += 1) {
 		    ema_ent	*ep = entp(vp) ;
 	            if (vp) {
 		        {
@@ -155,7 +157,7 @@ int ema_finish(ema *op) noex {
 	            } /* end if (non-null) */
 	        } /* end for */
 	        {
-	            rs1 = vechand_finish(op->elp) ;
+	            rs1 = elp->finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	    } /* end if (non-null) */
@@ -201,7 +203,8 @@ int ema_addent(ema *op,ema_ent *ep) noex {
 int ema_get(ema *op,int i,ema_ent **epp) noex {
 	int		rs ;
 	if ((rs = ema_magic(op,epp)) >= 0) ylikely {
-	    if (void *vp ; (rs = vechand_get(op->elp,i,&vp)) >= 0) {
+	    vechand *elp = op->elp ;
+	    if (void *vp ; (rs = elp->get(i,&vp)) >= 0) {
 	        *epp = entp(vp) ;
 	    }
 	} /* end if (magic) */
@@ -213,8 +216,9 @@ int ema_getbestaddr(ema *op,int i,cchar **rpp) noex {
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = ema_magic(op)) >= 0) ylikely {
+	    vechand *elp = op->elp ;
 	    cchar	*rp = nullptr ;
-	    if (void *vp ; (rs = vechand_get(op->elp,i,&vp)) >= 0) ylikely {
+	    if (void *vp ; (rs = elp->get(i,&vp)) >= 0) ylikely {
 		ema_ent		*ep = entp(vp) ;
 	        if (vp) ylikely {
 	    	    if ((rl == 0) && (ep->rp != nullptr) && (ep->rl > 0)) {
@@ -239,7 +243,8 @@ int ema_getbestaddr(ema *op,int i,cchar **rpp) noex {
 int ema_count(ema *op) noex {
 	int		rs ;
 	if ((rs = ema_magic(op)) >= 0) ylikely {
-	    rs = vechand_count(op->elp) ;
+	    vechand *elp = op->elp ;
+	    rs = elp->count ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -282,9 +287,10 @@ local int ema_addentone(ema *op,ema_ent *ep) noex {
 	cint		sz = szof(ema_ent) ;
 	int		rs ;
 	if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
+	    vechand *elp = op->elp ;
 	    ema_ent *nep = entp(vp) ;
 	    if ((rs = entry_startload(nep,ep)) >= 0) ylikely {
-	        if ((rs = vechand_add(op->elp,nep)) >= 0) ylikely {
+	        if ((rs = elp->add(nep)) >= 0) ylikely {
 	            op->n += 1 ;
 	        }
 	        if (rs < 0) {
