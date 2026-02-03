@@ -49,11 +49,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 
 #include	"cfbin.h"
+
+#pragma		GCC dependency		"mod/cfsysx.ccm"
 
 import cfsysx ;				/* |cfsysx(3uc)| */
 
@@ -77,6 +80,9 @@ import cfsysx ;				/* |cfsysx(3uc)| */
 /* local variables */
 
 constexpr int	b = OURBASE ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
