@@ -53,8 +53,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sfx.h>
 #include	<strn.h>
 #include	<matstr.h>
@@ -63,7 +63,9 @@
 
 #include	"dater.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -99,7 +101,7 @@ namespace {
 	int prockey(int,cc *,int) noex ;
 	int procval(cc *,int) noex ;
     } ; /* end struct (datehelp) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -118,7 +120,7 @@ enum datetypes {
 	datetype_logz,
 	datetype_strdig,
 	datetype_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	datetypes[] = {
 	"current",
@@ -131,7 +133,7 @@ constexpr cpcchar	datetypes[] = {
 	"logz",
 	"strdig",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -141,10 +143,10 @@ constexpr cpcchar	datetypes[] = {
 
 int dater_setkey(dater *op,cc *dsp,int dsl,TIMEB *nowp,cc *zn) noex {
 	int		rs  ;
-	if ((rs = dater_magic(op,dsp,nowp,zn)) >= 0) {
+	if ((rs = dater_magic(op,dsp,nowp,zn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (dsl < 0) dsl = lenstr(dsp) ;
-	    if (dsp[0]) {
+	    if (dsp[0]) ylikely {
 		datehelp dh(op,dsp,dsl,nowp,zn) ;
 		rs = dh ;
 	    } /* end if (valid) */
@@ -183,7 +185,7 @@ datehelp::operator int () noex {
 int datehelp::procval(cchar *sp,int sl) noex {
     	int		rs = SR_OK ;
 	cchar		*cp ;
-	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	    cint	ch = tolc(cp[0]) ;
             if ((ch == 'c') || (ch == 'n')) {
 		if (int ti ; (ti = matstr(datetypes,cp,cl)) >= 0) {
