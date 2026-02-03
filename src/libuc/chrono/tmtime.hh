@@ -34,6 +34,7 @@
 
 struct tmtime {
 	char	*zname{} ;	/* time-zone name abbreviation (allocated) */
+	cint	baseyear = TMTIME_BASEYEAR ;
 	int	sec ;		/* 0-61 (for up to two leap-seconds) */
 	int	min ;		/* 0-59 */
 	int	hour ;		/* 0-23 */
@@ -42,9 +43,8 @@ struct tmtime {
 	int	year ;		/* number of years since 1900 */
 	int	wday ;		/* week-day (day-of-week 0-6) */
 	int	yday ;		/* year-day (day-of-year) */
-	int	isdst ;
 	int	gmtoff ;	/* offset from GMT (seconds west of GMT) */
-	cint	baseyear = TMTIME_BASEYEAR ;
+	int	isdst ;
 	tmtime() = default ;
 	tmtime &operator = (const tmtime &) = delete ;
 	tmtime(const tmtime &) = delete ;
