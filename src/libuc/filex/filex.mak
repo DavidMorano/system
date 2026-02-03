@@ -52,7 +52,7 @@ OBJ7=
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB=
 
-OBJ= $(OBJA) $(OBJB)
+OBJ= obja.o
 
 
 INCDIRS +=
@@ -141,6 +141,13 @@ obj6.o:			$(OBJ6)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
