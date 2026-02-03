@@ -35,8 +35,10 @@
 #include	<ctime>			/* |time_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<usupport.h>		/* |getustime(3u)| */
 #include	<dayspec.h>
 #include	<tmz.hh>
 #include	<tmtime.hh>
