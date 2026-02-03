@@ -45,11 +45,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<intsat.h>		/* |intsat(3u)| */
 #include	<strn.h>		/* |strnalpha(3uc)| */
 #include	<sfx.h>			/* |sfshrink(3uc)| */
@@ -75,7 +73,6 @@
 /* forward references */
 
 local int	cfloop(cchar *,int,int *) noex ;
-local int	convert(cchar *,int,int,int *) noex ;
 
 
 /* local variables */
@@ -88,7 +85,7 @@ local int	convert(cchar *,int,int,int *) noex ;
 
 int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	int		rs = SR_FAULT ;
-	int		res = 0 ;
+	int		res = 0 ; /* return-value */
 	if (sbuf) ylikely {
 	    cchar	*sp{} ;
 	    rs = SR_DOM ;
@@ -118,32 +115,11 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 
 /* local subroutines */
 
-local int cfloop(cchar *sp,int sl,int *rp) noex {
-    	cnullptr	np{} ;
-    	int		rs = SR_OK ;
-	int		res = 0 ; /* accumulated-result */
-	int		inc{} ;
-	for (cc *tp ; (rs >= 0) && (tp = strnalpha(sp,sl)) != np ; ) {
-	    cint	mch = mkchar(*tp) ;
-	    cint	tl = intconv(tp - sp) ;
-	    rs = convert(sp,tl,mch,&inc) ;
-	    res += inc ;
-	    sl -= intconv((tp + 1) - sp) ;
-	    sp = (tp + 1) ;
-	} /* end for */
-	if ((rs >= 0) && (sl > 0)) {
-	    rs = convert(sp,sl,0,&inc) ;
-	    res += inc ;
-	}
-	*rp = res ;
-	return rs ;
-} /* end subroutine (cfloop) */
-
-local int convert(cchar *sp,int sl,int mc,int *rp) noex {
+template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 	int		rs = SR_OK ;
 	cchar		*cp ;
 	if (int cl ; (cl = sfshrink(sp,sl,&cp)) == 1) ylikely {
-	    int		mf = 1 ;
+	    T		mf = 1 ;
 	    switch (mc) {
 	    case 'Y':
 	        mf = 365 * 24 * 60 * 60 ;
@@ -172,16 +148,40 @@ local int convert(cchar *sp,int sl,int mc,int *rp) noex {
 		break ;
 	    } /* end switch */
 	    if (rs >= 0) {
-	        if (int v{} ; (rs = cfdeci(cp,cl,&v)) >= 0) {
-	            cint res = (v * mf) ;
-		    *rp = res ;
-		    rs = intsat(res) ;
+	        if (T v{} ; (rs = cfdec(cp,cl,&v)) >= 0) {
+		    if (T res{} ; (! ckd_mul(&res,v,mf))) ylikely {
+		        *rp = res ;
+		        rs = intsat(res) ;
+		    } else {
+			rs = SR_RANGE ;
+		    }
 	        } /* end if (cfdeci) */
 	    } /* end if (ok) */
 	} else {
 	    rs = SR_INVALID ;
 	} /* end if (non-zero) */
 	return rs ;
-} /* end subroutine (convert) */
+} /* end subroutine-template (convert) */
+
+local int cfloop(cchar *sp,int sl,int *rp) noex {
+    	cnullptr	np{} ;
+    	int		rs = SR_OK ;
+	int		res = 0 ; /* accumulated-result */
+	int		inc{} ;
+	for (cc *tp ; (rs >= 0) && (tp = strnalpha(sp,sl)) != np ; ) {
+	    cint	mch = mkchar(*tp) ;
+	    cint	tl = intconv(tp - sp) ;
+	    rs = convert(sp,tl,mch,&inc) ;
+	    res += inc ;
+	    sl -= intconv((tp + 1) - sp) ;
+	    sp = (tp + 1) ;
+	} /* end for */
+	if ((rs >= 0) && (sl > 0)) {
+	    rs = convert(sp,sl,0,&inc) ;
+	    res += inc ;
+	}
+	*rp = res ;
+	return rs ;
+} /* end subroutine (cfloop) */
 
 
