@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0_FIELD= field_main.o field_obj.o
+OBJ0_FIELD= field_prime.o field_obj.o
 OBJ1_FIELD= field_srvarg.o field_svcargs.o
 OBJ2_FIELD= field_word.o field_wordphrase.o
 OBJ3_FIELD= fieldterms.o
@@ -136,7 +136,7 @@ objb.o:		$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-field_main.o:		field_main.cc		$(INCS)
+field_prime.o:		field_prime.cc		$(INCS)
 field_obj.o:		field_obj.cc		$(INCS)
 field_srvarg.o:		field_srvarg.cc		$(INCS)
 field_svcargs.o:	field_svcargs.cc	$(INCS)
