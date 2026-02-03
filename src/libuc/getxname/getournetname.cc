@@ -47,11 +47,12 @@
 #include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getxid.h>		/* |getuid_name(3uc)| */
 #include	<getxname.h>
 #include	<getnisdomain.h>	/* |getnisdomain(3uc)| */
-#include	<mallocxx.h>
 #include	<sncpyx.h>
 #include	<ctdec.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
@@ -68,10 +69,15 @@
 #endif
 
 
-/* exported subroutines */
+/* external subroutines */
+
+extern "C" {
+    extern int uc_getnetname(char *) noex ;
+    extern int uc_procpid(cchar *,uid_t) noex ;
+}
 
 
-/* exported variables */
+/* external variables */
 
 
 /* local structures */
@@ -124,7 +130,7 @@ static int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	int		len = 0 ;
 	cchar		*procname = PROCNAME ;
 	if ((rs = uc_procpid(procname,0)) > 0) {
-	    if (char *dbuf{} ; (rs = malloc_hn(&dbuf)) >= 0) {
+	    if (char *dbuf{} ; (rs = lm_hn(&dbuf)) >= 0) {
 		cint	dlen = rs ;
 	        if ((rs = getnisdomain(dbuf,dlen)) >= 0) {
 	            cint	dl = rs ;
@@ -139,7 +145,7 @@ static int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	                }
 	            } /* end if (getuid_user) */
 	        } /* end if (getnisdomain) */
-		rs1 = uc_free(dbuf) ;
+		rs1 = lm_free(dbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else if (rs == 0) {
