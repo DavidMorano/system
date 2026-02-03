@@ -14,7 +14,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>		/* |time_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	DATE		struct date_head
