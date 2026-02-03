@@ -79,10 +79,12 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
-#include	<estrings.h>
+#include	<estrings.h>		/* |osalpha(3uc)| */
 #include	<field.h>
 #include	<tmstrs.h>
 #include	<cfdec.h>
@@ -94,7 +96,9 @@
 
 #include	"tmz.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -123,16 +127,16 @@ namespace {
 
 /* forward references */
 
-static int	mkvars() noex ;
+local int	mkvars() noex ;
 
 template<typename ... Args>
-static int tmz_ctor(tmz *op,Args ... args) noex {
+local int tmz_ctor(tmz *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
     	    static cint		rsv = mkvars() ;
-	    if ((rs = rsv) >= 0) {
-	        if (op->zname == nullptr) {
-	            if (char *a ; (rs = malloc_zn(&a)) >= 0) {
+	    if ((rs = rsv) >= 0) ylikely {
+	        if (op->zname == nullptr) ylikely {
+	            if (char *a ; (rs = lm_zn(&a)) >= 0) ylikely {
 		        op->zname = a ;
 		        memclear(a,rs) ;
 		        a[rs] = '\0' ;
@@ -144,20 +148,20 @@ static int tmz_ctor(tmz *op,Args ... args) noex {
 }
 /* end subroutine (tmz_ctor) */
 
-static int	tmz_timeparts(tmz *,cchar *,int) noex ;
-static int	tmz_xstdtrailing(tmz *,cchar *,int) noex ;
-static int	tmz_procday(tmz *,cchar *,int) noex ;
-static int	tmz_procmonth(tmz *,cchar *,int) noex ;
-static int	tmz_procyear(tmz *,cchar *,int) noex ;
-static int	tmz_proczoff(tmz *,cchar *,int) noex ;
-static int	tmz_proczname(tmz *,cchar *,int) noex ;
-static int	tmz_yearadj(tmz *,int) noex ;
+local int	tmz_timeparts(tmz *,cchar *,int) noex ;
+local int	tmz_xstdtrailing(tmz *,cchar *,int) noex ;
+local int	tmz_procday(tmz *,cchar *,int) noex ;
+local int	tmz_procmonth(tmz *,cchar *,int) noex ;
+local int	tmz_procyear(tmz *,cchar *,int) noex ;
+local int	tmz_proczoff(tmz *,cchar *,int) noex ;
+local int	tmz_proczname(tmz *,cchar *,int) noex ;
+local int	tmz_yearadj(tmz *,int) noex ;
 
-static int	getzoff(int *,cchar *,int) noex ;
-static int	val(cchar *) noex ;
-static int	silogend(cchar *,int) noex ;
+local int	getzoff(int *,cchar *,int) noex ;
+local int	val(cchar *) noex ;
+local int	silogend(cchar *,int) noex ;
 
-static cchar	*strnzone(cchar *,int) noex ;
+local cchar	*strnzone(cchar *,int) noex ;
 
 
 /* local variables */
@@ -171,7 +175,7 @@ constexpr char		tpterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array (tpterms) */
 
 static vars		var ;
 
@@ -186,7 +190,7 @@ constexpr bool		f_comment = false ;
 
 int tmz_init(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) {
+	if ((rs = tmz_ctor(op)) >= 0) ylikely {
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    if (rs < 0) {
@@ -200,22 +204,22 @@ int tmz_init(tmz *op) noex {
 /* format> [Wed] Nov 14 19:24[:04] [EST] [[19]99] [±0400] */
 int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    op->st.tm_year = -1 ;
 	    op->st.tm_wday = -1 ;
 	    op->st.tm_isdst = -1 ;
-	    if ((rs >= 0) && ((rs = tmz_procmonth(op,sp,sl)) > 0)) {
+	    if ((rs >= 0) && ((rs = tmz_procmonth(op,sp,sl)) > 0)) ylikely {
 	        sp += rs ;
 	        sl -= rs ;
 	    }
-	    if ((rs >= 0) && ((rs = tmz_procday(op,sp,sl)) > 0)) {
+	    if ((rs >= 0) && ((rs = tmz_procday(op,sp,sl)) > 0)) ylikely {
 	        sp += rs ;
 	        sl -= rs ;
 	    }
-	    if ((rs >= 0) && ((rs = tmz_timeparts(op,sp,sl)) > 0)) {
+	    if ((rs >= 0) && ((rs = tmz_timeparts(op,sp,sl)) > 0)) ylikely {
 	        sp += rs ;
 	        sl -= rs ;
 	    }
@@ -241,14 +245,14 @@ int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    op->st.tm_year = -1 ;
 	    op->st.tm_wday = -1 ;
 	    op->st.tm_isdst = -1 ;
-	    if (cchar *tp ; (tp = strnchr(sp,sl,',')) != nullptr) {
+	    if (cchar *tp ; (tp = strnchr(sp,sl,',')) != nullptr) ylikely {
 		cint	tl = intconv(tp - sp) ;
 	        cchar	*cp{} ;
 	        if (int cl ; (cl = sfnext(sp,tl,&cp)) > 0) {
@@ -298,7 +302,7 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 /* convert from a TOUCH (original) format> MMDDhhmm[YY] */
 int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -314,7 +318,7 @@ int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	    while (sl && CHAR_ISWHITE(sp[sl-1])) {
 	        sl -= 1 ;
 	    }
-	    if (hasalldig(sp,sl)) {
+	    if (hasalldig(sp,sl)) ylikely {
 	        cint	n = 5 ;
 	        int	i = 0 ;
 	        while ((sl >= 2) && (i < n)) {
@@ -360,7 +364,7 @@ int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 /* convert from a TOUCH-t (new '-t') format> [[CC]YY]MMDDhhmm[.SS] */
 int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
             TM		*stp = &op->st ;
             if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -376,7 +380,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
             while (sl && CHAR_ISWHITE(sp[sl-1])) {
                 sl -= 1 ;
             }
-            if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) {
+            if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) ylikely {
                 cint        cl = intconv(sl-((tp+1)-sp)) ;
                 cchar       *cp = (tp+1) ;
                 if (cl >= 2) {
@@ -389,8 +393,8 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
                 }
                 sl = intconv(tp - sp) ;
             } /* end if (tried for seconds) */
-            if (rs >= 0) {
-                if (hasalldig(sp,sl)) {
+            if (rs >= 0) ylikely {
+                if (hasalldig(sp,sl)) ylikely {
                     cint    n = 4 ;
                     int     i = 0 ;
                     int     sc = -1 ;
@@ -444,7 +448,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -460,7 +464,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	    while (sl && CHAR_ISWHITE(sp[sl-1])) {
 	        sl -= 1 ;
 	    }
-	    if (cchar *tp ; (tp = strnzone(sp,sl)) != nullptr) {
+	    if (cchar *tp ; (tp = strnzone(sp,sl)) != nullptr) ylikely {
 	        cchar	*cp = tp ;
 	        int	cl = intconv(sl - (tp - sp)) ;
 	        if ((cl >= 1) && isplusminus(*cp)) { /* ok */
@@ -545,7 +549,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
             if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -561,9 +565,9 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
             while (sl && CHAR_ISWHITE(sp[sl-1])) {
                 sl -= 1 ;
             }
-            if (cchar *tp ; (tp = strnchr(sp,sl,'_')) != nullptr) {
+            if (cchar *tp ; (tp = strnchr(sp,sl,'_')) != nullptr) ylikely {
                 int         si = intconv(tp - sp) ;
-                if (hasalldig(sp,si)) {
+                if (hasalldig(sp,si)) ylikely {
                     int     sc = -1 ;
                     int     i = 0 ;
                     if (si >= 8) {
@@ -638,7 +642,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
 /* format> [CC]YYMMDD (like abbreviated variation of "touch") */
 int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) {
+	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -653,7 +657,7 @@ int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	    while (sl && CHAR_ISWHITE(sp[sl-1])) {
 	        sl -= 1 ;
 	    }
-	    if (hasalldig(sp,sl)) {
+	    if (hasalldig(sp,sl)) ylikely {
 	        cint	n = 3 ;
 	        int	i = 0 ;
 	        int	sc = -1 ;
@@ -695,7 +699,7 @@ int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 
 int tmz_isset(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) {
+	if ((rs = tmz_ctor(op)) >= 0) ylikely {
 	    rs = op->st.tm_mday ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -707,7 +711,7 @@ int tmz_isset(tmz *op) noex {
 
 int tmz_hasyear(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) {
+	if ((rs = tmz_ctor(op)) >= 0) ylikely {
 	    rs = op->fl.year ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -719,7 +723,7 @@ int tmz_hasyear(tmz *op) noex {
 
 int tmz_haszoff(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) {
+	if ((rs = tmz_ctor(op)) >= 0) ylikely {
 	    rs = op->fl.zoff ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -731,7 +735,7 @@ int tmz_haszoff(tmz *op) noex {
 
 int tmz_haszone(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) {
+	if ((rs = tmz_ctor(op)) >= 0) ylikely {
 	    rs = (op->zname[0] != '\0') ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -743,7 +747,7 @@ int tmz_haszone(tmz *op) noex {
 
 int tmz_setday(tmz *op,int y,int m,int d) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) {
+	if ((rs = tmz_ctor(op)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
 	    cint	sc = -1 ;
 	    if (y >= TM_YEAR_BASE) {
@@ -763,7 +767,7 @@ int tmz_setday(tmz *op,int y,int m,int d) noex {
 
 int tmz_setyear(tmz *op,int year) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) {
+	if ((rs = tmz_ctor(op)) >= 0) ylikely {
 	    op->st.tm_year = year ;
 	    op->fl.year = true ;
 	    if (rs < 0) {
@@ -776,7 +780,7 @@ int tmz_setyear(tmz *op,int year) noex {
 
 int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,zp)) >= 0) {
+	if ((rs = tmz_ctor(op,zp)) >= 0) ylikely {
 	    cint	znl = var.znlen ;
 	    cchar	*znp = op->zname ;
 	    rs = intconv(strnwcpy(op->zname,znl,zp,zl) - znp) ;
@@ -790,7 +794,7 @@ int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
 
 int tmz_gettm(tmz *op,TM *tmp) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,tmp)) >= 0) {
+	if ((rs = tmz_ctor(op,tmp)) >= 0) ylikely {
 	    *tmp = op->st ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -802,7 +806,7 @@ int tmz_gettm(tmz *op,TM *tmp) noex {
 
 int tmz_getdst(tmz *op) noex {
     	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) {
+	if ((rs = tmz_ctor(op)) >= 0) ylikely {
 	    rs = op->st.tm_isdst ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -814,7 +818,7 @@ int tmz_getdst(tmz *op) noex {
 
 int tmz_getzoff(tmz *op) noex {
     	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) {
+	if ((rs = tmz_ctor(op)) >= 0) ylikely {
 	    rs = op->zoff ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -828,17 +832,17 @@ int tmz_getzoff(tmz *op) noex {
 /* private subroutines */
 
 /* format> hh:mm[:ss] */
-static int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
+local int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		si = 0 ;
-	if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
+	if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
 	    int		v ;
 	    int		fl ;
 	    cchar	*lp = sp ;
 	    cchar	*fp{} ;
 	    /* get hours */
-	    if ((fl = fsb.get(tpterms,&fp)) > 0) {
+	    if ((fl = fsb.get(tpterms,&fp)) > 0) ylikely {
 	        lp = (fp + fl) ;
 	        rs = cfdeci(fp,fl,&v) ;
 	        op->st.tm_hour = v ;
@@ -867,14 +871,14 @@ static int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_timeparts) */
 
-static int tmz_xstdtrailing(tmz *op,cchar *sp,int sl) noex {
+local int tmz_xstdtrailing(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
-	if (int wi ; (wi = siskipwhite(sp,sl)) >= 0) {
+	if (int wi ; (wi = siskipwhite(sp,sl)) >= 0) ylikely {
 	    si += wi ;
 	    sp += wi ;
 	    sl -= wi ;
-	    if (sl > 0) {
+	    if (sl > 0) ylikely {
 	        cint	ch = mkchar(*sp) ;
 	        if (isalphalatin(ch)) {
 	            rs = tmz_proczname(op,sp,sl) ;
@@ -893,14 +897,14 @@ static int tmz_xstdtrailing(tmz *op,cchar *sp,int sl) noex {
 /* end subroutine (tmz_xstdtrailing) */
 
 /* parse out> dd */
-static int tmz_procday(tmz *op,cchar *sp,int sl) noex {
+local int tmz_procday(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	cchar		*cp{} ;
-	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) ylikely {
 	    cint	tch = mkchar(*cp) ;
-	    if (isdigitlatin(tch)) {
-	        if (int v{} ; (rs = cfdeci(cp,cl,&v)) >= 0) {
+	    if (isdigitlatin(tch)) ylikely {
+	        if (int v ; (rs = cfdeci(cp,cl,&v)) >= 0) ylikely {
 		    if (v <= 31) {
 	        	op->st.tm_mday = v ;
 	        	si = intconv((cp + cl) - sp) ;
@@ -919,19 +923,19 @@ static int tmz_procday(tmz *op,cchar *sp,int sl) noex {
 /* end subroutine (tmz_procday) */
 
 /* parse out> [DDD] MMM */
-static int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
+local int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	cchar		*cp{} ;
-	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) ylikely {
 	    int		ch = mkchar(*cp) ;
-	    if (isalphalatin(ch)) {
+	    if (isalphalatin(ch)) ylikely {
 	        int	ml = cl ;
 	        cchar	*mp = cp ;
 	        si += intconv((cp + cl) - sp) ;
 	        sp += si ;
 	        sl -= si ;
-	        if ((cl = sfnext(sp,sl,&cp)) > 0) {
+	        if ((cl = sfnext(sp,sl,&cp)) > 0) ylikely {
 	            ch = mkchar(*cp) ;
 	            if (isalphalatin(ch)) {
 	                rs = tmstrsday(mp,ml) ;
@@ -941,7 +945,7 @@ static int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
 	                si += intconv((cp + cl) - sp) ;
 	            }
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = tmstrsmonth(mp,ml) ;
 	            op->st.tm_mon = rs ;
 	        }
@@ -955,13 +959,13 @@ static int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_procmonth) */
 
-static int tmz_procyear(tmz *op,cchar *sp,int sl) noex {
+local int tmz_procyear(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	cchar		*cp{} ;
-	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) ylikely {
 	    cint	ch = mkchar(*cp) ;
-	    if (isdigitlatin(ch)) {
+	    if (isdigitlatin(ch)) ylikely {
 	        rs = tmstrsyear(cp,cl) ;
 	        op->st.tm_year = rs ;
 	        op->fl.year = true ;
@@ -972,16 +976,16 @@ static int tmz_procyear(tmz *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_procyear) */
 
-static int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
+local int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	cchar		*cp{} ;
-	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) ylikely {
 	    cint	ch = mkchar(*cp) ;
 	    int		f = false ;
 	    f = f || isplusminus(ch) ;
 	    f = f || isdigitlatin(ch) ;
-	    if (f) {
+	    if (f) ylikely {
 	        if (int v ; (rs = getzoff(&v,cp,cl)) >= 0) {
 	            op->zoff = shortconv(v) ;
 	            op->fl.zoff = true ;
@@ -993,13 +997,13 @@ static int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_proczoff) */
 
-static int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
+local int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	cchar		*cp{} ;
-	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) ylikely {
 	    cint	ch = mkchar(*cp) ;
-	    if (isalphalatin(ch)) {
+	    if (isalphalatin(ch)) ylikely {
 	        cint	znl = var.znlen ;
 		cchar	*znp = op->zname ;
 	        rs = intconv(strnwcpy(op->zname,znl,cp,cl)  - znp) ;
@@ -1010,9 +1014,9 @@ static int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_proczname) */
 
-static int tmz_yearadj(tmz *op,int sc) noex {
+local int tmz_yearadj(tmz *op,int sc) noex {
 	TM		*stp = &op->st ;
-	if (stp->tm_year >= 0) {
+	if (stp->tm_year >= 0) ylikely {
 	    op->fl.year = true ;
 	    if (sc >= 0) {
 	        cint	yy = ((sc*nyears)-TM_YEAR_BASE) ;
@@ -1023,20 +1027,20 @@ static int tmz_yearadj(tmz *op,int sc) noex {
 	        } else if (stp->tm_year >= TM_YEAR_BASE) {
 	            stp->tm_year -= TM_YEAR_BASE ;
 		}
-	    }
+	    } /* end if */
 	} /* end if (had a year) */
 	return SR_OK ;
 }
 /* end subroutine (tmz_yearadj) */
 
 /* parse minutes west of GMT */
-static int getzoff(int *zop,cchar *sp,int sl) noex {
+local int getzoff(int *zop,cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
 	int		ch = mkchar(*sp) ;
 	bool		f = false ;
 	f = f || isplusminus(ch) ;
 	f = f || isdigitlatin(ch) ;
-	if ((sl >= 2) && f) {
+	if ((sl >= 2) && f) ylikely {
 	    int		i{} ; /* used-afterwards */
 	    int		zoff ;
 	    int		sign ;
@@ -1100,7 +1104,7 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 }
 /* end subroutine (getzoff) */
 
-static int tmz_clear(tmz *op) noex {
+local int tmz_clear(tmz *op) noex {
 	op->st = {} ;
 	op->fl = {} ;
 	op->zoff = 0 ;
@@ -1155,8 +1159,8 @@ int tmz::gettm(TM *tmp) noex {
 void tmz::dtor() noex {
     int		rs = SR_OK ;
     int		rs1 ;
-    if (zname) {
-	rs1 = uc_free(zname) ;
+    if (zname) ylikely {
+	rs1 = lm_free(zname) ;
 	if (rs >= 0) rs = rs1 ;
 	zname = nullptr ;
     }
@@ -1168,7 +1172,7 @@ void tmz::dtor() noex {
 
 tmz_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case tmzmem_clear:
 	        rs = tmz_clear(op) ;
@@ -1202,17 +1206,17 @@ tmz_co::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_zn)) >= 0) {
+	if ((rs = getbufsize(bufsize_zn)) >= 0) ylikely {
 	    znlen = rs ;
 	}
 	return rs ;
 }
 
-static int mkvars() noex {
+local int mkvars() noex {
     	return var ;
 }
 
-static int val(cchar *sp) noex {
+local int val(cchar *sp) noex {
 	int		v = 0 ;
 	v += (10 * (sp[0] - '0')) ;
 	v += ( 1 * (sp[1] - '0')) ;
@@ -1220,7 +1224,7 @@ static int val(cchar *sp) noex {
 }
 /* end subroutine (val) */
 
-static int silogend(cchar *sp,int sl) noex {
+local int silogend(cchar *sp,int sl) noex {
 	int		i ; /* used-afterwards */
 	bool		f = false ;
 	for (i = 0 ; sl-- && *sp ; i += 1) {
@@ -1233,9 +1237,9 @@ static int silogend(cchar *sp,int sl) noex {
 }
 /* end subroutine (silogend) */
 
-static cchar *strnzone(cchar *sp,int sl) noex {
+local cchar *strnzone(cchar *sp,int sl) noex {
 	bool		f = false ;
-	while (sl && *sp) {
+	while (sl && *sp) ylikely {
 	    cint	ch = mkchar(*sp) ;
 	    f = f || isplusminus(ch) ;
 	    f = f || isalphalatin(ch) ;
@@ -1248,9 +1252,9 @@ static cchar *strnzone(cchar *sp,int sl) noex {
 /* end subroutine (strnzone) */
 
 #ifdef	COMMENT
-static bool	isgoodname(cchar *,int) noex ;
+local bool	isgoodname(cchar *,int) noex ;
 /* do we have a valid time-zone name */
-static bool isgoodname(cchar *sp,int sl) noex {
+local bool isgoodname(cchar *sp,int sl) noex {
 	bool		f = false ;
 	while ((sl != 0) && (sp[0] != '\0')) {
 	    cint	ch = mkchar(*sp) ;
