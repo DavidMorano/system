@@ -46,18 +46,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<charconv>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<charconv>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 
 #include	"cfchars.h"
+
+#pragma		GCC dependency		"mod/cfcharsx.ccm"
 
 import cfcharsx ;
 
@@ -85,10 +84,7 @@ import cfcharsx ;
 /* local variables */
 
 
-/* local subroutines */
-
-
-/* template-subroutines */
+/* exported variables */
 
 
 /* exported subroutines */
