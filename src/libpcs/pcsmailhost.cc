@@ -5,7 +5,6 @@
 /* get the mailhost for the host that we are on */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -28,41 +27,36 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<bfile.h>
-#include	<vecstr.h>
+#include	<sfx.h>
+#include	<sncpyx.h>
+#include	<snwcpy.h>
 #include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<char.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 #include	"pcsmailhost.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
-
 #ifndef	MAILHOSTFNAME
-#define	MAILHOSTFNAME	"etc/mailhost"
+#define	MAILHOSTFNAME		"etc/mailhost"
 #endif
 
-#ifndef	VARMAILHOST
-#define	VARMAILHOST	"MAILHOST"
-#endif
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -73,8 +67,33 @@
 
 /* forward references */
 
+namespace {
+    struct hoster {
+	cchar	*pr ;
+	cchar	*un ;
+	char	*rbuf ;
+	int	rlen ;
+	hoster(cc *p,char *b,int l,cc *u) noex : pr(p), rbuf(b), rlen(l) {
+	    un = u ;
+	} ; /* end ctor */
+	operator int () noex ;
+	int tryvar() noex ;
+	int tryfile() noex ;
+	int trydef() noex ;
+    } ; /* end struct (hoster) */
+    typedef int (hoster::*hoster_m)() noex ;
+} /* end namespace */
+
 
 /* local variables */
+
+constexpr hoster_m	mems[] = {
+    	&hoster::tryvar,
+	&hoster::tryfile,
+	&hoster::trydef
+} ; /* end array */
+
+cchar			fn[] = MAILHOSTFNAME ;
 
 
 /* exported variables */
@@ -82,83 +101,69 @@
 
 /* exported subroutines */
 
-int pcsmailhost(cchar *pcsroot,vecstr *setp,cchar *username,char *buf) noex {
-	ustat	sb ;
-	bfile	nfile, *nfp = &nfile ;
-	int	rs = SR_OK ;
-	int	len ;
-	int	cl = 0 ;
-
-	char	mailhostfname[MAXPATHLEN + 1] ;
-	char	linebuf[LINEBUFLEN + 1] ;
-	char	*cp, *cp2 ;
-
-	(void) setp ; /* currentl unused */
-	(void) username ; /* currentl unused */
-	if (pcsroot == nullptr)
-	    return SR_FAULT ;
-
-	buf[0] = '\0' ;
-
-/* try the local environment variable */
-
-	if (((cp = getenv(VARMAILHOST)) != nullptr) && (cp[0] != '\0')) {
-	    cl = intconv(strwcpy(buf,cp,MAXHOSTNAMELEN) - buf) ;
-	    goto ret0 ;
-	}
-
-/* check if the program root directory exists */
-
-	rs = u_stat(pcsroot,&sb) ;
-
-	if ((rs >= 0) && (! S_ISDIR(sb.st_mode))) rs = SR_NOTFOUND ;
-
-	if (rs >= 0)
-	    rs = mkpath2(mailhostfname, pcsroot ,MAILHOSTFNAME) ;
-
-	if (rs < 0) goto ret0 ;
-
-	if ((rs = bopen(nfp,mailhostfname,"r",0644)) >= 0) {
-
-	    while ((rs = breadln(nfp,linebuf,LINEBUFLEN)) > 0) {
-		len = rs ;
-
-	        if (linebuf[len - 1] == '\n')
-	            len -= 1 ;
-
-	        linebuf[len] = '\0' ;
-	        cp = linebuf ;
-	        while (CHAR_ISWHITE(*cp))
-	            cp += 1 ;
-
-	        if (*cp == '#') continue ;
-
-	        cp2 = cp ;
-	        while (*cp && (! CHAR_ISWHITE(*cp)))
-	            cp += 1 ;
-
-	        *cp = '\0' ;
-	        cl = intconv(cp - cp2) ;
-	        if (cl > 0)
-	            break ;
-
-	    } /* end while (reading lines) */
-
-	    bclose(nfp) ;
-	} /* end if (opened file) */
-
-	if ((rs > 0) && (cl > 0)) {
-
-	    if (cl > MAXHOSTNAMELEN)
-	        cl = MAXHOSTNAMELEN ;
-
-	    strwcpy(buf,cp2,cl) ;
-
-	} /* end if */
-
-ret0:
-	return (rs >= 0) ? cl : rs ;
+int pcsmailhost(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
+    	int		rs = SR_FAULT ;
+	if (pr && rbuf) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+		hoster ho(pr,rbuf,rlen,un) ;
+		rs = ho ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (pcsmailhost) */
+
+
+/* local subroutines */
+
+hoster::operator int () noex {
+	int		rs = SR_OK ;
+	for (cauto &m : mems) {
+	    rs = (this->*m)() ;
+	    if (rs != 0) break ;
+	} /* end for */
+	return rs ;
+} /* end method (hoster::operator) */
+
+int hoster::tryvar() noex {
+    	static cchar	*hostp = getenv(varname.mailhost) ;
+	int		rs = SR_OK ;
+	int		len = 0 ; /* return-value */
+	if (hostp) {
+	    rs = sncpy(rbuf,rlen,hostp) ;
+	    len = rs ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (hoster::tryvar) */
+
+int hoster::tryfile() noex {
+    	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
+	    if ((rs = mkpath(pbuf,pr,fn)) >= 0) {
+	        if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
+	            if ((rs = filereadln(pbuf,lbuf,rs)) > 0) {
+			cchar *cp ;
+			if (int cl ; (cl = sfnext(lbuf,rs,&cp)) > 0) {
+			    rs = snwcpy(rbuf,rlen,cp,cl) ;
+			    len = rs ;
+			} /* end if (sfnext) */
+		    } /* end if (filereadln) */
+	            rs1 = lm_free(lbuf) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (mkpath) */
+	    rs1 = lm_free(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (hoster::tryfile) */
+
+int hoster::trydef() noex {
+    	cchar *mh = sysword.w_mailhost ;
+    	return sncpy(rbuf,rlen,mh) ;
+} /* end method (hoster::trydef) */
 
 
