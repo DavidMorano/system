@@ -41,8 +41,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<date.h>
 #include	<localmisc.h>
 
@@ -74,7 +74,7 @@
 
 int dater_getdate(dater *op,date *dop) noex {
 	int		rs ;
-	if ((rs = dater_magic(op,dop)) >= 0) {
+	if ((rs = dater_magic(op,dop)) >= 0) ylikely {
 	    custime	t = op->b.time ;
 	    cint	zoff = op->b.timezone ;
 	    cint	isdst = op->b.dstflag ;
