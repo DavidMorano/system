@@ -32,10 +32,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	ZOFFPARTS	struct zoffparts_head
@@ -45,7 +42,7 @@ struct zoffparts_head {
 	uint	hours ;
 	uint	mins ;
 	int	zoff ;		/* value */
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 
