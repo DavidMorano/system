@@ -79,7 +79,10 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucstrto.h>
+#include	<uclibmem.h>
 #include	<stdintx.h>		/* extended integer types */
 #include	<snwcpy.h>
 #include	<sfx.h>
