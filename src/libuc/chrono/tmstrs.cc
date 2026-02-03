@@ -53,13 +53,16 @@
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<cfdec.h>
 #include	<localmisc.h>
 
 #include	"tmstrs.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -108,7 +111,7 @@ constexpr bool		f_threeyear = CF_THREEYEAR ;
 int tmstrsday(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
 	if (sl < 0) sl = lenstr(sp) ;
-	if ((sl >= 1) && (sl <= 9)) {
+	if ((sl >= 1) && (sl <= 9)) ylikely {
 	    switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
 	    case TWOCHARS('S', 'u'):
 	        rs = 0 ;
@@ -140,7 +143,7 @@ int tmstrsday(cchar *sp,int sl) noex {
 int tmstrsmonth(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
 	if (sl < 0) sl = lenstr(sp) ;
-	if (sl >= 3) {
+	if (sl >= 3) ylikely {
 	    switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
 	    case TWOCHARS('J', 'a'):
 	        rs = 0 ;
@@ -183,8 +186,8 @@ int tmstrsyear(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
 	int		year = 0 ;
 	if (sl < 0) sl = lenstr(sp) ;
-	if ((sl >= 1) && (sl <= 5)) {
-	    if ((rs = cfdeci(sp,sl,&year)) >= 0) {
+	if ((sl >= 1) && (sl <= 5)) ylikely {
+	    if ((rs = cfdeci(sp,sl,&year)) >= 0) ylikely {
 	        switch (sl) {
 	        case 1:
 	            year += 100 ;
