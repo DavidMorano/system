@@ -36,6 +36,7 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cwchar>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -49,7 +50,7 @@ template<typename T> bool bitn(T v,int n) noex {
 } /* end subroutine-template (bitn) */
 
 void fmtflag_co::operator = (bool a) noex {
-	int	m = (1 << w) ;
+	cint	m = (1 << w) ;
 	if (a) {
 	    op->fg |= m ;
 	} else {
@@ -59,7 +60,7 @@ void fmtflag_co::operator = (bool a) noex {
 
 fmtflag_co::operator bool () noex {
     	bool	f = false ;
-	if (op) {
+	if (op) ylikely {
 	    if ((w >= 0) && (w < fmtflag_overlast)) {
 		f = bitn(op->fg,w) ;
 	    } /* end switch */
