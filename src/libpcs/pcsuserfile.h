@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* PCS user-account-database file management */
+/* update a record in a PCS userfile */
 /* version %I% last-modified %G% */
 
 
