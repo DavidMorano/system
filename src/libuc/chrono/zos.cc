@@ -67,9 +67,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |abs(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sfx.h>
 #include	<hasx.h>
+#include	<localmisc.h>
 
 #include	"zos.h"
 
@@ -86,10 +88,19 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
 
 
-/* external variables */
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -98,9 +109,9 @@
 int zos_set(char *rbuf,int rlen,int zo) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (rlen <= 0) {
+	    if (rlen <= 0) ylikely {
 	        int	hours, mins ;
 	        char	*bp = rbuf ;
 		rs = SR_OK ;
@@ -121,15 +132,15 @@ int zos_set(char *rbuf,int rlen,int zo) noex {
 
 int zos_get(cchar *sp,int sl,int *zop) noex {
 	int		rs = SR_FAULT ;
-	if (sp && zop) {
+	if (sp && zop) ylikely {
 	    rs = SR_INVALID ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 		cchar	*cp{} ;
 		bool	fneg = false ;
-		if (int cl ; (cl = sfsign(sp,sl,&cp,&fneg)) > 0) {
+		if (int cl ; (cl = sfsign(sp,sl,&cp,&fneg)) > 0) ylikely {
 		    cchar	*zp{} ;
-		    if (int zl ; (zl = sfnextchr(cp,cl,',',&zp)) >= 3) {
-			if (hasalldig(zp,zl)) {
+		    if (int zl ; (zl = sfnextchr(cp,cl,',',&zp)) >= 3) ylikely {
+			if (hasalldig(zp,zl)) ylikely {
 	                    int	zoff ;
 	                    int	sign = (fneg) ? 1 : -1 ; /* reverse */
 	                    int	hours ;
