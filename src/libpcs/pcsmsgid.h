@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* PCS user-account-database file management */
+/* PCS create mail message-id */
 /* version %I% last-modified %G% */
 
 
