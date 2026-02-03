@@ -76,11 +76,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclustername.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getnodename.h>
-#include	<mallocxx.h>
-#include	<uclustername.h>
 #include	<nodedb.h>
 #include	<clusterdb.h>
 #include	<sncpyx.h>
@@ -112,7 +113,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::prgetclustername ;		/* subroutine */
@@ -123,6 +123,10 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
 
 namespace libuc {
     int prgetclustername(cchar *,char *,int,cchar *) noex ;
@@ -252,25 +256,26 @@ int searcher::getprs() noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	        if (ids id ; (rs = id.load) >= 0) {
-	            if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
-		        cint	am = R_OK ;
-		        for (cauto &pr : prs) {
-		            if ((rs = mkpath(pbuf,nodefname)) >= 0) {
-			        if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
-			            if ((rs = permid(&id,&sb,am)) >= 0) {
-    				        rs = prgetclustername(pr,rbuf,rlen,nn) ;
-    				        len = rs ;
-				    } /* end if (permid) */
-			        } /* end if (stat) */
-		            } /* end if (mkpath) */
-		            if (rs != 0) break ;
-		        } /* end for */
-		        rs = rsfree(rs,pbuf) ;
-	            } /* end if (m-a-f) */
-	            rs1 = id.release ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (ids) */
+        if (ids id ; (rs = id.load) >= 0) {
+            if (char *pbuf{} ; (rs = lm_mp(&pbuf)) >= 0) {
+                cint    am = R_OK ;
+                for (cauto &pr : prs) {
+                    if ((rs = mkpath(pbuf,nodefname)) >= 0) {
+                        if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
+                            if ((rs = permid(&id,&sb,am)) >= 0) {
+                                rs = prgetclustername(pr,rbuf,rlen,nn) ;
+                                len = rs ;
+                            } /* end if (permid) */
+                        } /* end if (stat) */
+                    } /* end if (mkpath) */
+                    if (rs != 0) break ;
+                } /* end for */
+                rs1 = lm_free(pbuf) ;
+		if (rs >= 0) rs = rs1 ;
+            } /* end if (m-a-f) */
+            rs1 = id.release ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (ids) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end method (searcher::getprs) */
@@ -313,12 +318,12 @@ static int subinfo_ndb(SI *sip) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	cchar		*pr = sip->pr ;
-	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) {
 		rs = subinfo_ndber(sip,tbuf) ;
 		len = rs ;
 	    } /* end if (mkpath) */
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -334,7 +339,7 @@ static int subinfo_ndber(SI *sip,cchar *nfn) noex {
 	char		*rbuf = sip->rbuf ;
         if (nodedb st ; (rs = nodedb_open(&st,nfn)) >= 0) {
 	    cint	elen = st.entbuflen ;
-	    if (char *ebuf{} ; (rs = uc_malloc((elen + 1),&ebuf)) >= 0) {
+	    if (char *ebuf{} ; (rs = lm_mall((elen + 1),&ebuf)) >= 0) {
 		auto curbegin = nodedb_curbegin ;
                 if (nodedb_cur cur ; (rs = curbegin(&st,&cur)) >= 0) {
                     nodedb_ent  ste ;
@@ -355,7 +360,8 @@ static int subinfo_ndber(SI *sip,cchar *nfn) noex {
                     rs1 = nodedb_curend(&st,&cur) ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (nodedb-cursor) */
-	        rs = rsfree(rs,ebuf) ;
+                rs1 = lm_free(ebuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
             rs1 = nodedb_close(&st) ;
             if (rs >= 0) rs = rs1 ;
@@ -374,14 +380,14 @@ static int subinfo_cdb(SI *sip) noex {
 	cchar		*pr = sip->pr ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf{} ; (rs = lm_mp(&tbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
 	    if ((rs = mkpath2(tbuf,pr,clusterfname)) >= 0) {
 		cnullptr	np{} ;
 	        if (clusterdb cdb ; (rs = clusterdb_open(&cdb,tbuf)) >= 0) {
 	            auto	cf = clusterdb_curfetchrev ;
 	            cint	rsn = SR_NOTFOUND ;
-	            if (char *cbuf ; (rs = malloc_nn(&cbuf)) >= 0) {
+	            if (char *cbuf ; (rs = lm_nn(&cbuf)) >= 0) {
 			cint	clen = rs ;
 	                if ((rs = cf(&cdb,nn,np,cbuf,clen)) >= 0) {
 	                    rs = sncpy1(rbuf,rlen,cbuf) ;
@@ -389,7 +395,7 @@ static int subinfo_cdb(SI *sip) noex {
 	                } else if (rs == rsn) {
 	                    rs = SR_OK ;
 		        }
-	    	        rs1 = uc_free(cbuf) ;
+	    	        rs1 = lm_free(cbuf) ;
 	    	        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	            rs1 = clusterdb_close(&cdb) ;
@@ -398,7 +404,7 @@ static int subinfo_cdb(SI *sip) noex {
 	            rs = SR_OK ;
 	        }
 	    } /* end if (mkpath) */
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -408,14 +414,14 @@ static int subinfo_cdb(SI *sip) noex {
 int searcher::start() noex {
     	int		rs = SR_OK ;
 	if (nn == nullptr) {
-	    if ((rs = malloc_nn(&a)) >= 0) {
+	    if ((rs = lm_nn(&a)) >= 0) {
 		cint	nlen = rs ;
 		char	*nbuf = a ;
 		if ((rs = getnodename(nbuf,nlen)) >= 0) {
 		    nn = nbuf ;
 		}
 		if (rs < 0) {
-		    uc_free(a) ;
+		    lm_free(a) ;
 		    a = nullptr ;
 		} /* end if (error handling) */
 	    } /* end if (memory-allocation) */
@@ -428,7 +434,7 @@ int searcher::finish() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	if (a) {
-	    rs1 = uc_free(a) ;
+	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
 	}
@@ -438,7 +444,7 @@ int searcher::finish() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	if ((rs = getbufsize(bufsize_nn)) >= 0) {
 	    entlen = (rs * ENTLENMULT) ;
 	}
 	return rs ;
