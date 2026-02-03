@@ -45,14 +45,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<sfx.h>
-#include	<digval.h>
+#include	<usysbase.h>
+#include	<sfx.h>			/* |sfshrink(3uc)| */
+#include	<digval.h>		/* |digvalhex(3uc)| */
 #include	<mkchar.h>
-#include	<ischarx.h>
+#include	<ischarx.h>		/* |ishexlatin(3uc)| */
 #include	<localmisc.h>
 
 #include	"cfhexstr.h"
@@ -85,17 +82,17 @@ int cfhexstr(cchar *sp,int sl,uchar *rp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	const uchar	*rbuf = (const uchar *) rp ;
-	if (sp && rp) {
+	if (sp && rp) ylikely {
 	    cchar	*cp ;
 	    rs = SR_INVALID ;
-	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	        while ((rs >= 0) && (cl >= 2) && cp[0]) {
 	            cint	ch0 = mkchar(cp[0]) ;
 	            cint	ch1 = mkchar(cp[1]) ;
 	            if (ishexlatin(ch0) && ishexlatin(ch1)) {
 		        int	v = 0 ;
-	                v |= (digvalhex(ch0)<<4) ;
-	                v |= (digvalhex(ch1)<<0) ;
+	                v |= (digvalhex(ch0) << 4) ;
+	                v |= (digvalhex(ch1) << 0) ;
 	                *rp++ = uchar(v) ;
 	            } else {
 		        rs = SR_INVALID ;
