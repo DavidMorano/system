@@ -30,9 +30,9 @@
 #include	<climits>		/* |SHORT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<nulstr.h>
 #include	<strwcpy.h>
@@ -43,7 +43,9 @@
 
 #include	"zdb.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -56,10 +58,6 @@ import libutil ;
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -200,7 +198,7 @@ constexpr zdata		zones[] = {
 	{ "z", 0, 0 },		/* Zulu */
 
 	{ nullptr, 0, 0 }	/* end-sentinal */
-} ;
+} ; /* end array (zdata) */
 
 constexpr int		nzones = ((szof(zones) / szof(zdb)) - 1) ;
 
@@ -211,54 +209,56 @@ constexpr int		nzones = ((szof(zones) / szof(zdb)) - 1) ;
 /* exported subroutines */
 
 /* set from 'name' and 'offset' */
-int zdb_nameoff(zdb *op,cchar *sp,int sl,int zoff) noex {
+int zdb_nameoff(zdb *op,cchar *sp,int 탎l,int zoff) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
-	if (op && sp) {
-	    int		zi = -1 ;
-	    bool	f = false ;
+	int		i = 0 ; /* return-value */
+	if (op && sp) ylikely {
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
-	    if (sl < 0) sl = lenstr(sp) ;
-    	    /* lookup by name and offset (if we have an offset) */
-	    if (zoff != TZO_EMPTY) {
-	        for (i = 0 ; zones[i].name ; i += 1) {
-	            f = (strwcasecmp(zones[i].name,sp,sl) == 0) ;
-		    if (f && (zi < 0)) zi = i ;
-	            f = f && (zones[i].woff == zoff) ;
-		    if (f) break ;
-	        } /* end for */
-	    } /* end if */
-    	    /* if not match yet => lookup by name only */
-	    if ((! f) && (zi >= 0)) {
-	        i = zi ;
-	        f = true ;
-	    } /* end if (looking up name only) */
-	    if (f) {
-		rs = SR_OK ;
-	        op->name = zones[i].name ;
-	        op->woff = zones[i].woff ;
-	        op->isdst = zones[i].isdst ;
-	    }
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        int	zi = -1 ;
+	        bool	f = false ;
+    	        /* lookup by name and offset (if we have an offset) */
+	        if (zoff != TZO_EMPTY) ylikely {
+	            for (i = 0 ; zones[i].name ; i += 1) {
+	                f = (strwcasecmp(zones[i].name,sp,sl) == 0) ;
+		        if (f && (zi < 0)) zi = i ;
+	                f = f && (zones[i].woff == zoff) ;
+		        if (f) break ;
+	            } /* end for */
+	        } /* end if */
+    	        /* if not match yet => lookup by name only */
+	        if ((! f) && (zi >= 0)) {
+	            i = zi ;
+	            f = true ;
+	        } /* end if (looking up name only) */
+	        if (f) ylikely {
+		    rs = SR_OK ;
+	            op->name = zones[i].name ;
+	            op->woff = zones[i].woff ;
+	            op->isdst = zones[i].isdst ;
+	        } /* end if */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (zdb_nameoff) */
 
 /* set from 'name' only */
-int zdb_setname(zdb *op,cchar *sp,int sl) noex {
+int zdb_setname(zdb *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
-	if (op && sp) {
+	int		i = 0 ; /* return-value */
+	if (op && sp) ylikely {
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((i = findname(sp,sl)) >= 0) {
-		rs = SR_OK ;
-	        op->name = zones[i].name ;
-	        op->woff = zones[i].woff ;
-	        op->isdst = zones[i].isdst ;
-	    }
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
+	        if ((i = findname(sp,sl)) >= 0) ylikely {
+		    rs = SR_OK ;
+	            op->name = zones[i].name ;
+	            op->woff = zones[i].woff ;
+	            op->isdst = zones[i].isdst ;
+	        } /* end if (findname) */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
@@ -268,7 +268,7 @@ int zdb_setname(zdb *op,cchar *sp,int sl) noex {
 int zdb_setoff(zdb *op,int zoff) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    bool	f = false ;
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
@@ -291,7 +291,7 @@ int zdb_setoff(zdb *op,int zoff) noex {
 int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    bool	f = false ;
 	    rs = SR_NOTFOUND ;
 	    memclear(op) ;
@@ -321,7 +321,7 @@ int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
 int zdb_count(zdb *op) noex {
 	int		rs = SR_FAULT ;
 	cint		n = nzones ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
@@ -373,7 +373,7 @@ int zdb::offisdst(int zoff,int dst) noex {
 
 zdb_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case zdbmem_count:
 	        rs = zdb_count(op) ;
