@@ -64,7 +64,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* for |abs(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -95,7 +96,7 @@ static int	storebuf_twodig(char *,int,int,int) noex ;
 
 int zoffparts_set(zoffparts *zop,int zo) noex {
 	int		rs = SR_FAULT ;
-	if (zop) {
+	if (zop) ylikely {
 	    cint	v = abs(zo) / 60 ;	/* discard seconds */
 	    zop->zoff = zo ;
 	    rs = SR_OK ;
@@ -109,7 +110,7 @@ int zoffparts_set(zoffparts *zop,int zo) noex {
 int zoffparts_get(zoffparts *zop,int *vp) noex {
 	int		rs = SR_FAULT ;
 	int		v = 0 ;
-	if (zop) {
+	if (zop) ylikely {
 	    rs = SR_OK ;
 	    v = ((zop->hours * 60) + zop->mins) * 60 ; /* create seconds */
 	    if (zop->zoff < 0) v = (-v) ;
@@ -123,18 +124,18 @@ int zoffparts_get(zoffparts *zop,int *vp) noex {
 int zoffparts_mkstr(zoffparts *zop,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (zop) {
+	if (zop) ylikely {
 	    rs = SR_OK ;
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        cint	ch = ((zop->zoff >= 0) ? '-' : '+') ;
 	        rs = storebuf_chr(rbuf,rlen,i,ch) ;
 	        i += rs ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_twodig(rbuf,rlen,i,zop->hours) ;
 	        i += rs ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_twodig(rbuf,rlen,i,zop->mins) ;
 	        i += rs ;
 	    }
@@ -149,7 +150,7 @@ int zoffparts_mkstr(zoffparts *zop,char *rbuf,int rlen) noex {
 static int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
 	cint		n = 2 ;
 	int		rs = SR_OVERFLOW ;
-	if ((i+n) <= rlen) {
+	if ((i+n) <= rlen) ylikely {
 	    rbuf[i++] = charconv((v / 10) + '0') ;
 	    rbuf[i++] = charconv((v % 10) + '0') ;
 	    rs = n ;
