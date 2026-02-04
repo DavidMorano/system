@@ -27,11 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<modload.h>
 #include	<vecstr.h>
 #include	<sncpy.h>
@@ -40,6 +44,9 @@
 #include	"commandment.h"
 #include	"commandments.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -51,9 +58,6 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -100,16 +104,16 @@ typedef commandment_calls *	callsp ;
 /* forward references */
 
 template<typename ... Args>
-static int commandment_ctor(CMD *op,Args ... args) noex {
+local int commandment_ctor(CMD *op,Args ... args) noex {
 	COMMANDMENT	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->mlp = new(nothrow) modload) != np) {
+	    if ((op->mlp = new(nothrow) modload) != np) ylikely {
 		commandment_calls    *callp ;
-                if ((callp = new(nothrow) commandment_calls) != np) {
+                if ((callp = new(nothrow) commandment_calls) != np) ylikely {
                     op->callp = callp ;
                     rs = SR_OK ;
                 } /* end if (new-commandment_calls) */
@@ -120,42 +124,39 @@ static int commandment_ctor(CMD *op,Args ... args) noex {
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (commandment_ctor) */
+} /* end subroutine (commandment_ctor) */
 
-static int commandment_dtor(CMD *op) noex {
+local int commandment_dtor(CMD *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-            if (op->callp) {
+            if (op->callp) ylikely {
                 commandment_calls    *callp = callsp(op->callp) ;
                 delete callp ;
                 op->callp = nullptr ;
             }
-	    if (op->mlp) {
+	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (commandment_dtor) */
+} /* end subroutine (commandment_dtor) */
 
 template<typename ... Args>
-static inline int commandment_magic(CMD *op,Args ... args) noex {
+local inline int commandment_magic(CMD *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == COMMANDMENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (commandment_magic) */
+} /* end subroutine (commandment_magic) */
 
-static int	commandment_objloadbegin(CMD *,cchar *,cchar *) noex ;
-static int	commandment_objloadend(CMD *) noex ;
-static int	commandment_loadcalls(CMD *,vecstr *) noex ;
+local int	commandment_objloadbegin(CMD *,cchar *,cchar *) noex ;
+local int	commandment_objloadend(CMD *) noex ;
+local int	commandment_loadcalls(CMD *,vecstr *) noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
@@ -175,7 +176,7 @@ enum subs {
 	sub_curenum,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum (subs) */
 
 constexpr cpcchar	subs[] = {
 	"open",
@@ -189,7 +190,7 @@ constexpr cpcchar	subs[] = {
 	"curenum",
 	"close",
 	nullptr
-} ;
+} ; /* end array (subs) */
 
 
 /* exported variables */
@@ -435,7 +436,7 @@ int commandment_search(CMD *op,cc *s,cmpfunc,cchar **rpp) noex {
 
 /* private subroutines */
 
-static int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
+local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -484,7 +485,7 @@ static int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 }
 /* end subroutine (commandment_objloadbegin) */
 
-static int commandment_objloadend(CMD *op) noex {
+local int commandment_objloadend(CMD *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
@@ -501,7 +502,7 @@ static int commandment_objloadend(CMD *op) noex {
 }
 /* end subroutine (commandment_objloadend) */
 
-static int commandment_loadcalls(CMD *op,vecstr *slp) noex {
+local int commandment_loadcalls(CMD *op,vecstr *slp) noex {
 	modload		*mlp = op->mlp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -554,7 +555,7 @@ static int commandment_loadcalls(CMD *op,vecstr *slp) noex {
 }
 /* end subroutine (commandment_loadcalls) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
