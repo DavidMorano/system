@@ -25,8 +25,8 @@
 	mostly).  Everyone has their own, right?
 
 	Synopsis:
-	typedef int (*sortcmp_f)(cvoid *,cvoid *) ;
-	void msort(void *base,int nel,int esz,sortcmp_f *cmp)
+	typedef int (*msortcmp_f)(cvoid *,cvoid *) ;
+	void msort(void *base,int nel,int esz,msortcmp_f *cmp)
 
 	Arguments:
 	base		pointer to base of array to sort
@@ -53,7 +53,8 @@
 #include	<array>
 #include	<iostream>
 #include	<iomanip>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"msort.h"
@@ -70,18 +71,13 @@ using std::nothrow ;			/* type */
 /* type-defs */
 
 extern "C" {
-    typedef int	(*sortcmp_f)(cvoid *,cvoid *) ;
-    typedef int	(*partpred_f)(int,int) ;
+    typedef int	(*partpred_f)(int,int) noex ;
 }
 
 
 /* external subroutines */
 
-extern "C" int	msort(void *,int,int,sortcmp_f) ;
-
-extern "C" int	partitionai(int *,int,partpred_f,int) ;
-
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
+extern "C" int	partitionai(int *,int,partpred_f,int) noex ;
 
 
 /* local structures */
@@ -93,16 +89,17 @@ namespace {
 	int		(*cmpfun)(cvoid *,cvoid *) ;
 	char		*tmp = nullptr ;
 	char		*pvp = nullptr ;
-	msort_data(void *baser,int e,sortcmp_f cmp) : esz(e), cmpfun(cmp) { 
+	msort_data(void *baser,int e,msortcmp_f cmp) noex : esz(e) {
 	    base = charp(baser) ;
 	    tmp = new(nothrow) char[esz + 1] ;
 	    pvp = new(nothrow) char[esz + 1] ;
+	    cmpfun = cmp ;
 	} ;
 	destruct msort_data() {
 	    delete [] tmp ;
 	    delete [] pvp ;
 	}
-	void swap(int i1,int i2) {
+	void swap(int i1,int i2) noex {
 	    csize	esize = size_t(esz) ;
 	    void	*i1p = (base + (i1 * esz)) ;
 	    void	*i2p = (base + (i2 * esz)) ;
@@ -110,26 +107,26 @@ namespace {
  	    memcpy(i1p,i2p,esize) ;
  	    memcpy(i2p,tmp,esize) ;
 	} ;
-	int dosort(int,int) ;
-	int docmp(int i1,int i2) const {
+	int dosort(int,int) noex ;
+	int docmp(int i1,int i2) const noex {
 	    cvoid	*i1p = (base + (i1 * esz)) ;
 	    cvoid	*i2p = (base + (i2 * esz)) ;
 	    return (*cmpfun)(i1p,i2p) ;
 	} ;
-	void loadpivot(int i) {
+	void loadpivot(int i) noex {
 	    csize	esize = size_t(esz) ;
 	    cvoid	*ip = (base + (i * esz)) ;
 	    memcpy(pvp,ip,esize) ;
 	} ;
-	int getpivot(int,int) ;
+	int getpivot(int,int) noex ;
     } ; /* end struct (msort_data) */
 } /* end namespace */
 
 
 /* forward references */
 
-static int	partpred1(int,int) ;
-static int	partpred2(int,int) ;
+local int	partpred1(int,int) noex ;
+local int	partpred2(int,int) noex ;
 
 
 /* local variables */
@@ -140,7 +137,7 @@ static int	partpred2(int,int) ;
 
 /* exported subroutines */
 
-int msort(void *base,int ne,int esz,sortcmp_f cmp) {
+int msort(void *base,int ne,int esz,msortcmp_f cmp) noex {
 	msort_data	data(base,esz,cmp) ;
 	int		rs = SR_OK ;
 	data.dosort(0,ne) ;
@@ -151,7 +148,7 @@ int msort(void *base,int ne,int esz,sortcmp_f cmp) {
 
 /* local subroutines */
 
-int msort_data::dosort(int first,int last) {
+int msort_data::dosort(int first,int last) noex {
 	int		ff = false ;
 	if ((last - first) == 2) {
 	    if (docmp(first,last - 1) > 0) {
@@ -173,7 +170,7 @@ int msort_data::dosort(int first,int last) {
 }
 /* end method (msort_data::dosort) */
 
-int msort_data::getpivot(int first,int al) {
+int msort_data::getpivot(int first,int al) noex {
 	int	pvi = (al/2) ;
 	if (pvi == 0) {
 	    if (al > 1) pvi = 1 ;
@@ -183,11 +180,11 @@ int msort_data::getpivot(int first,int al) {
 }
 /* end method (msort_data::getpivot) */
 
-static int partpred1(int e,int pv) {
+local int partpred1(int e,int pv) noex {
 	return (e < pv) ;
 }
 
-static int partpred2(int e,int pv) {
+local int partpred2(int e,int pv) noex {
 	return (e <= pv) ;
 }
 
