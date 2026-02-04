@@ -51,7 +51,8 @@
 #include	<queue>
 #include	<vector>
 #include	<list>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"dijkstra2.hh"
