@@ -57,13 +57,14 @@ module ;
 #include	<list>
 #include	<stack>
 #include	<vector>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
+
+module dfsb ;
 
 /* local defines */
 
-
-module dfsb ;
 
 /* imported modules */
 
