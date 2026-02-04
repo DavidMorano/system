@@ -56,7 +56,8 @@
 #include	<functional>
 #include	<list>
 #include	<vector>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"bfs1.hh"
