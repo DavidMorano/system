@@ -37,12 +37,12 @@
 
 struct commandment_flags {
         uint		modload:1 ;
-} ;
+} ; /* end struct */
 
 struct commandment_cursor {
 	void		*scp ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct commandment_head {
 	modload		*mlp ;		/* module-load-pointer */
@@ -52,7 +52,7 @@ struct commandment_head {
 	uint		magic ;
 	int		objsz ;
 	int		cursz ;
-} ;
+} ; /* end struct */
 
 typedef	COMMANDMENT		commandment ;
 typedef	COMMANDMENT_FL		commandment_fl ;
