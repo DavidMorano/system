@@ -45,28 +45,28 @@ struct commandments_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct commandments_information {
 	time_t		dbtime ;		/* db-time */
 	time_t		citime ;		/* idx-time */
 	uint		maxent ;
 	uint		count ;
-} ;
+} ; /* end struct */
 
 struct commandments_entry {
 	uint		cn ;			/* commandment number */
-} ;
+} ; /* end struct */
 
 struct commandments_cursor {
 	CMI_CUR		vicur ;
-} ;
+} ; /* end struct */
 
 struct commandments_flags {
 	uint		user:1 ;		/* user or system? */
 	uint		idx:1 ;
 	uint		ids:1 ;
-} ;
+} ; /* end struct */
 
 struct commandments_head {
 	CMI		idx ;
@@ -89,7 +89,7 @@ struct commandments_head {
 	int		ncursors ;
 	int		nents ;
 	int		maxent ;
-} ;
+} ; /* end struct */
 
 typedef	COMMANDMENTS		commandments ;
 typedef	COMMANDMENTS_FL		commandments_fl ;
@@ -100,17 +100,17 @@ typedef	COMMANDMENTS_OBJ	commandments_obj ;
 
 EXTERNC_begin
 
-extern int	commandments_open(commandments *,cchar *,cchar *) ;
-extern int	commandments_audit(commandments *) ;
-extern int	commandments_count(commandments *) ;
-extern int	commandments_max(commandments *) ;
-extern int	commandments_read(commandments *,char *,int,int) ;
-extern int	commandments_get(commandments *,int,char *,int) ;
-extern int	commandments_curbegin(commandments *,commandments_cur *) ;
+extern int	commandments_open(commandments *,cchar *,cchar *) noex ;
+extern int	commandments_audit(commandments *) noex ;
+extern int	commandments_count(commandments *) noex ;
+extern int	commandments_max(commandments *) noex ;
+extern int	commandments_read(commandments *,char *,int,int) noex ;
+extern int	commandments_get(commandments *,int,char *,int) noex ;
+extern int	commandments_curbegin(commandments *,commandments_cur *) noex ;
 extern int	commandments_enum(commandments *,commandments_cur *,
-			commandments_ent *,char *,int) ;
-extern int	commandments_curend(commandments *,commandments_cur *) ;
-extern int	commandments_close(commandments *) ;
+			commandments_ent *,char *,int) noex ;
+extern int	commandments_curend(commandments *,commandments_cur *) noex ;
+extern int	commandments_close(commandments *) noex ;
 
 EXTERNC_end
 
