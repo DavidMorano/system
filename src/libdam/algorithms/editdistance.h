@@ -22,7 +22,7 @@
 
 EXTERNC_begin
 
-extern int editdistance(cchar *,cchar *) noex ;
+extern int	editdistance(cchar *,cchar *) noex ;
 
 EXTERNC_end
 
