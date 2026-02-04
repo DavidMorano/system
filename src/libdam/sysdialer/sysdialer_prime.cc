@@ -28,8 +28,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -149,12 +147,12 @@ local int sysdialer_ctor(SD *op,Args ... args) noex {
 		    if (rs < 0) {
 		        delete op->plp ;
 		        op->plp = np ;
-		    }
+		    } /* end if (error) */
 		} /* end if (new-vecstr) */
 		if (rs < 0) {
 		    delete op->elp ;
 		    op->elp = np ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
@@ -287,7 +285,7 @@ local int sysdialer_startdirs(SD *,mainv) noex ;
 local int sysdialer_startents(SD *) noex ;
 
 local int sysdialer_starter(SD *op,mainv prs,mainv dirs) noex {
-    	int		rs = SR_OK ;
+    	int		rs ;
 	if ((rs = sysdialer_startprs(op,prs)) >= 0) {
 	    if ((rs = sysdialer_startdirs(op,dirs)) >= 0) {
 		rs = sysdialer_startents(op) ;
@@ -434,17 +432,17 @@ int sysdialer_loadin(SD *op,cchar *name,ent **depp) noex {
 	if ((rs = sysdialer_magic(op,name,depp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
+		vecobj	*elp = op->elp ;
 	        ent	se{} ;
 	        se.name = name ;
 		void *vp ;
-	        if ((rs = vecobj_search(op->elp,&se,vcmpname,&vp)) == rsn) {
+	        if ((rs = elp->search(&se,vcmpname,&vp)) == rsn) {
 		    if (ent e ; (rs = entry_start(&e,name,np)) >= 0) {
 			cchar *pr = op->pr ;
 			cauto sd_find = sysdialer_sofind ;
 			if ((rs = sd_find(op,pr,name,&e)) >= 0) {
 			    void	*dhp = e.mp->dhp ;
 			    if ((rs = entry_loadcalls(&e,dhp)) >= 0) {
-				vecobj *elp = op->elp ;
 				if ((rs = elp->add(&e)) >= 0) {
 				    cint i = rs ;
 				    if (depp) {
@@ -533,8 +531,9 @@ local int sysdialer_sofind(SD *op,cc *pr,cc *so,ent *ep) noex {
 int sofind::operator () (SD *op,cchar *pr) noex {
 	int		rs ;
 	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = ids_load(&id)) >= 0) {
-	    if ((rs = dirseen_start(&ds)) >= 0) {
+	    if ((rs = ds.start) >= 0) {
     		cint	maxpath = var.maxpathlen ;
 		cint	asz = ((var.maxpathlen + 1) * 2) ;
 		int	ai = 0 ;
@@ -542,21 +541,24 @@ int sofind::operator () (SD *op,cchar *pr) noex {
 	        if (char *a ; (rs = lm_mall(asz,&a)) >= 0) {
 	            lbuf = (a + ((maxpath + 1) * ai++)) ;
 	            pbuf = (a + ((maxpath + 1) * ai++)) ;
-	            if ((rs = sofindpr(op,pr)) == 0) {
-	                if ((rs = sofindprs(op)) == 0) {
-	                    rs = sofindvar(op) ;
-		        }
-		    } /* end if (sofindprs) */
+		    {
+	                if ((rs = sofindpr(op,pr)) == 0) {
+	                    if ((rs = sofindprs(op)) == 0) {
+	                        rs = sofindvar(op) ;
+		            } /* end if (sofindvar) */
+		        } /* end if (sofindprs) */
+		        rv = rs ;
+		    } /* end block */
 		    rs1 = lm_free(a) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
-	        rs1 = dirseen_finish(&ds) ;
+	        rs1 = ds.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (dirseen) */
 	    rs1 = ids_release(&id) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (sofind::operator) */
 
@@ -565,10 +567,10 @@ int sofind::sofindpr(SD *op,cc *pr) noex {
 	int		len = 0 ; /* return-value */
 	if ((rs = mkpath(lbuf,pr,LIBCNAME)) >= 0) {
 	    len = rs ;
-	    if ((rs = dirseen_havename(&ds,lbuf,len)) >= 0) {
+	    if ((rs = ds.havename(lbuf,len)) >= 0) {
 		if (ustat sb ; (rs = u_stat(lbuf,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
-			if ((rs = dirseen_havedevino(&ds,&sb)) >= 0) {
+			if ((rs = ds.havedevino(&sb)) >= 0) {
 			    rs = socheck(op,&sb) ;
 			    len = rs ;
 			} else if (isNotConn(rs)) {
@@ -591,20 +593,6 @@ int sofind::sofindpr(SD *op,cc *pr) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (sysdialer::sofindpr) */
-
-int sofind::socheck(SD *op,ustat *sbp) noex {
-    	int		rs ;
-	int		len = 0 ; /* return-value */
-	if ((rs = sysdialer_sochecklib(op,&id,&ds,lbuf,so,ep)) > 0) {
-	    len = rs ;
-	} else if (rs == 0) {
-	    if ((rs = pathclean(pbuf,lbuf,-1)) >= 0) {
-	        rs = dirseen_add(&ds,pbuf,rs,sbp) ;
-	    }
-	} /* end if */
-	return (rs >= 0) ? len : rs ;
-}
-/* end subriutine (sofind::socheck) */
 
 int sofind::sofindprs(SD *op) noex {
 	int		rs = SR_OK ;
@@ -647,6 +635,20 @@ int sofind::sofindvar(SD *op) noex {
 }
 /* end subroutine (sofind::sofindvar) */
 
+int sofind::socheck(SD *op,ustat *sbp) noex {
+    	int		rs ;
+	int		len = 0 ; /* return-value */
+	if ((rs = sysdialer_sochecklib(op,&id,&ds,lbuf,so,ep)) > 0) {
+	    len = rs ;
+	} else if (rs == 0) {
+	    if ((rs = pathclean(pbuf,lbuf,-1)) >= 0) {
+	        rs = ds.add(pbuf,rs,sbp) ;
+	    }
+	} /* end if */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subriutine (sofind::socheck) */
+
 local int sysdialer_socheckvarc(SD *op,ids *idp,DS *dsp,cc *ldnp,
 		int ldnl,cc *soname,ent *ep) noex {
     	cint		rsn = SR_NOENT ;
@@ -656,16 +658,16 @@ local int sysdialer_socheckvarc(SD *op,ids *idp,DS *dsp,cc *ldnp,
 	    if ((rs = pathclean(pbuf,ldnp,ldnl)) >= 0) {
 		cchar	*pp = pbuf ;
 		cint	pl = rs ;
-		if ((rs = dirseen_havename(dsp,pp,pl)) == rsn) {
+		if ((rs = dsp->havename(pp,pl)) == rsn) {
 		    if (ustat sb ; (rs = u_stat(pp,&sb)) >= 0) {
 			rs = SR_NOTDIR ;
 			if (S_ISDIR(sb.st_mode)) {
-	    		    if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
+	    		    if ((rs = dsp->havedevino(&sb)) == rsn) {
 			    	cc *so = soname ;
 			    	cauto sd_sock = sysdialer_sochecklib ;
 	    			rs = sd_sock(op,idp,dsp,pp,so,ep) ;
 				if (rs == rsn) {
-	     			    dirseen_add(dsp,pp,pl,&sb) ;
+	     			    dsp->add(pp,pl,&sb) ;
 				}
 			    } /* end if (dirseen_havedevino) */
 		        } /* end if (is-directory) */
@@ -698,7 +700,7 @@ local int sysdialer_sochecklib(SD *op,ids *idp,DS *dsp,cc *libdname,
 	        if (rs >= 0) {
 		    if (ustat sb ; (rs = u_stat(ldnp,&sb)) >= 0) {
 		        if (S_ISDIR(sb.st_mode)) {
-		    	    if ((rs = dirseen_add(dsp,ldnp,-1,&sb)) >= 0) {
+		    	    if ((rs = dsp->add(ldnp,-1,&sb)) >= 0) {
 		    		rs = entry_checkdir(ep,ldnp,soname) ;
 		    		len = rs ;
 			    }
