@@ -41,7 +41,6 @@
 #include	<usyscalls.h>
 #include	<usupport.h>		/* |getustime(3u)| */
 #include	<uclibmem.h>
-#include	<getbufsize.h>
 #include	<getnodedomain.h>
 #include	<vecstr.h>
 #include	<fsdir.h>
@@ -51,8 +50,7 @@
 #include	<sncpyx.h>
 #include	<strwcpy.h>
 #include	<mkpathx.h>
-#include	<mkfname.h>
-#include	<pathclean.h>
+#include	<mkshlibname.h>
 #include	<isoneof.h>
 #include	<ischarx.h>
 #include	<isnot.h>		/* |isNotPresent(3uc)| */
@@ -115,6 +113,9 @@ typedef sysdialer_calls *	callptr ;
 
 /* forward references */
 
+
+/* local variables */
+
 enum subs {
 	sub_open,
 	sub_reade,
@@ -144,6 +145,8 @@ constexpr cpcchar	subs[] = {
 	"close",
 	nullptr
 } ; /* end array (subs) */
+
+cchar				soprefix[] = "sd" ;
 
 
 /* exported variables */
@@ -312,13 +315,8 @@ int checkdirer::looper(vecstr *elp) noex {
 	for (int i = 0 ; (rs >= 0) && exts[i] ; i += 1) {
 	    cchar *ext = exts[i] ;
 	    if ((rs = elp->findn(ext)) >= 0) {
-		cchar	*fn = name ;
-		if (ext[0] != '\0') {
-		    fn = fname ;
-	            rs = mkfnamesuf1(fname,name,ext) ;
-		} /* end if (non-empty extension) */
-		if (rs >= 0) {
-		    if ((rs = mkpath(dlfname,dname,fn)) >= 0) {
+		if ((rs = mkshlibname(fname,soprefix,name,ext)) >= 0) {
+		    if ((rs = mkpath(dlfname,dname,fname)) >= 0) {
 	        	fl = rs ;
 	        	if (void *dhp ; (dhp = dlopen(dlfname,dlm)) != np) {
 			    SD_INFO	*dip = (SD_INFO *) dlsym(dhp,name) ;
