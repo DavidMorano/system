@@ -43,7 +43,8 @@
 #include	<algorithm>
 #include	<vector>
 #include	<list>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"dijkstra1.hh"
