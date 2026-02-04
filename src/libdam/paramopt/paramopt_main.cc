@@ -106,8 +106,8 @@ static int	name_vfind(PO_NAME *,cchar *,int,PO_VAL **) noex ;
 int paramopt_start(PO *op) noex {
     	PARAMOPT	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = memclear(hop)) >= 0) {
+	if (op) ylikely {
+	    if ((rs = memclear(hop)) >= 0) ylikely {
 	        op->head = nullptr ;
 	        op->tail = nullptr ;
 	        op->magic = PARAMOPT_MAGIC ;
@@ -121,7 +121,7 @@ int paramopt_start(PO *op) noex {
 int paramopt_finish(PO *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = paramopt_magic(op)) >= 0) {
+	if ((rs = paramopt_magic(op)) >= 0) ylikely {
 	    PO_NAME	*ap, *nnp ;
 	    PO_VAL	*vp, *nvp ;
 	    for (ap = op->head ; ap != nullptr ; ap = nnp) {
@@ -165,7 +165,7 @@ int paramopt_loadu(PO *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(op,sp)) >= 0) {
+	if ((rs = paramopt_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (int si ; (si = sibrk(sp,sl,"=\t")) >= 0) {
 	        cchar	*cp{} ;

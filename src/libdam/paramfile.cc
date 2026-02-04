@@ -33,20 +33,20 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstring>		/* <- for |memcpy(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<new>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
-#include	<usystem.h>
-#include	<ulogerror.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getpwd.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<ascii.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -65,7 +65,9 @@
 
 #include	"paramfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -78,7 +80,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -116,13 +117,13 @@ struct paramfile_file {
 
 /* forward references */
 
-static int	mkterms() noex ;
+local int	mkterms() noex ;
 
 template<typename ... Args>
-static inline int paramfile_ctor(paramfile *op,Args ... args) noex {
+local inline int paramfile_ctor(paramfile *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->envv = nullptr ;
 	    op->a = nullptr ;
@@ -134,10 +135,10 @@ static inline int paramfile_ctor(paramfile *op,Args ... args) noex {
 	    op->llen = 0 ;
 	    op->flen = 0 ;
 	    op->intcheck = 0 ;
-	    if ((op->filep = new(nothrow) vecobj) != np) {
-	        if ((op->entsp = new(nothrow) vecobj) != np) {
-	            if ((op->defp = new(nothrow) varsub) != np) {
-	                if ((op->envp = new(nothrow) varsub) != np) {
+	    if ((op->filep = new(nothrow) vecobj) != np) ylikely {
+	        if ((op->entsp = new(nothrow) vecobj) != np) ylikely {
+	            if ((op->defp = new(nothrow) varsub) != np) ylikely {
+	                if ((op->envp = new(nothrow) varsub) != np) ylikely {
 			    rs = SR_OK ;
 			} /* end if (new-varsub) */
 		        if (rs < 0) {
@@ -157,75 +158,72 @@ static inline int paramfile_ctor(paramfile *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (paramfile_ctor) */
+} /* end subroutine (paramfile_ctor) */
 
-static int paramfile_dtor(paramfile *op) noex {
+local int paramfile_dtor(paramfile *op) noex {
 	int		rs = SR_OK ;
-	if (op->envp) {
+	if (op->envp) ylikely {
 	    delete op->envp ;
 	    op->envp = nullptr ;
 	}
-	if (op->defp) {
+	if (op->defp) ylikely {
 	    delete op->defp ;
 	    op->defp = nullptr ;
 	}
-	if (op->entsp) {
+	if (op->entsp) ylikely {
 	    delete op->entsp ;
 	    op->entsp = nullptr ;
 	}
-	if (op->filep) {
+	if (op->filep) ylikely {
 	    delete op->filep ;
 	    op->filep = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (paramfile_dtor) */
+} /* end subroutine (paramfile_dtor) */
 
 template<typename ... Args>
-static inline int paramfile_magic(paramfile *op,Args ... args) noex {
+local inline int paramfile_magic(paramfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == PARAMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (paramfile_magic) */
+} /* end subroutine (paramfile_magic) */
 
-static int	paramfile_fileadder(PF *,cchar *) noex ;
+local int	paramfile_fileadder(PF *,cchar *) noex ;
 
-static int	paramfile_bufbegin(PF *) noex ;
-static int	paramfile_bufend(PF *) noex ;
+local int	paramfile_bufbegin(PF *) noex ;
+local int	paramfile_bufend(PF *) noex ;
 
-static int	paramfile_filefins(PF *) noex ;
-static int	paramfile_fileparse(PF *,int) noex ;
-static int	paramfile_fileparser(PF *,int,bfile *) noex ;
-static int	paramfile_fileparseline(PF *,int,cchar *,int) noex ;
-static int	paramfile_filedump(PF *,int) noex ;
-static int	paramfile_filedel(PF *,int) noex ;
-static int	paramfile_entadd(PF *,PF_E *) noex ;
-static int	paramfile_entfins(PF *) noex ;
-static int	paramfile_entsub(PF *,PF_E *,cchar **) noex ;
+local int	paramfile_filefins(PF *) noex ;
+local int	paramfile_fileparse(PF *,int) noex ;
+local int	paramfile_fileparser(PF *,int,bfile *) noex ;
+local int	paramfile_fileparseline(PF *,int,cchar *,int) noex ;
+local int	paramfile_filedump(PF *,int) noex ;
+local int	paramfile_filedel(PF *,int) noex ;
+local int	paramfile_entadd(PF *,PF_E *) noex ;
+local int	paramfile_entfins(PF *) noex ;
+local int	paramfile_entsub(PF *,PF_E *,cchar **) noex ;
 
-static int	paramfile_envbegin(PF *) noex ;
-static int	paramfile_envload(PF *) noex ;
-static int	paramfile_envend(PF *) noex ;
+local int	paramfile_envbegin(PF *) noex ;
+local int	paramfile_envload(PF *) noex ;
+local int	paramfile_envend(PF *) noex ;
 
-static int	paramfile_defbegin(PF *,vecstr *) noex ;
-static int	paramfile_defload(PF *,vecstr *) noex ;
-static int	paramfile_defend(PF *) noex ;
+local int	paramfile_defbegin(PF *,vecstr *) noex ;
+local int	paramfile_defload(PF *,vecstr *) noex ;
+local int	paramfile_defend(PF *) noex ;
 
-static int	paramfile_entrels(PF *) noex ;
+local int	paramfile_entrels(PF *) noex ;
 
-static int	file_start(paramfile_file *,cchar *) noex ;
-static int	file_finish(paramfile_file *) noex ;
+local int	file_start(paramfile_file *,cchar *) noex ;
+local int	file_finish(paramfile_file *) noex ;
 
-static int	entry_start(PF_E *,int,cchar *,int,vecstr *,int) noex ;
-static int	entry_release(PF_E *) noex ;
-static int	entry_finish(PF_E *) noex ;
+local int	entry_start(PF_E *,int,cchar *,int,vecstr *,int) noex ;
+local int	entry_release(PF_E *) noex ;
+local int	entry_finish(PF_E *) noex ;
 
 extern "C" {
-    static int	vcmpentry(cvoid **,cvoid **) noex ;
+    local int	vcmpentry(cvoid **,cvoid **) noex ;
 }
 
 
@@ -237,7 +235,7 @@ static char 		kterms[fieldterms_termsize] ;
 /* argument field terminators (pound and all white-space) */
 static char 		aterms[fieldterms_termsize] ;
 
-static bufsizevar	maxlinelen(getbufsize_ml) ;
+static bufsizevar	maxlinelen(bufsize_ml) ;
 
 
 /* exported variables */
@@ -248,15 +246,15 @@ static bufsizevar	maxlinelen(getbufsize_ml) ;
 int paramfile_open(PF *op,mainv envv,cchar *fname) noex {
 	static cint	srs = mkterms() ;
 	int		rs ;
-	if ((rs = srs) >= 0) {
-	    if ((rs = paramfile_ctor(op)) >= 0) {
+	if ((rs = srs) >= 0) ylikely {
+	    if ((rs = paramfile_ctor(op)) >= 0) ylikely {
 		vecobj	*flp = op->filep ;
 	        int	esz = szof(PF_F) ;
 	        int	vo = VECOBJ_OSTATIONARY ;
 	        op->envv = envv ;
 	        op->intcheck = PARAMFILE_INTCHECK ;
 	        op->ti_check = time(nullptr) ;
-	        if ((rs = vecobj_start(flp,esz,10,vo)) >= 0) {
+	        if ((rs = vecobj_start(flp,esz,10,vo)) >= 0) ylikely {
 		    vecobj	*elp = op->entsp ;
 	            vo = (VECOBJ_OCOMPACT | VECOBJ_OORDERED) ;
 	            esz = szof(PF_E) ;
@@ -291,7 +289,7 @@ int paramfile_open(PF *op,mainv envv,cchar *fname) noex {
 int paramfile_close(PF *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = paramfile_magic(op)) >= 0) {
+	if ((rs = paramfile_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = paramfile_entfins(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -300,7 +298,7 @@ int paramfile_close(PF *op) noex {
 	        rs1 = paramfile_filefins(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->fl.definit) {
+	    if (op->fl.definit) ylikely {
 	        op->fl.definit = false ;
 	        rs1 = varsub_finish(op->defp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -309,11 +307,11 @@ int paramfile_close(PF *op) noex {
 	        rs1 = paramfile_envend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->entsp) ylikely {
 	        rs1 = vecobj_finish(op->entsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->filep) ylikely {
 	        rs1 = vecobj_finish(op->filep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -330,7 +328,7 @@ int paramfile_close(PF *op) noex {
 int paramfile_setdefines(PF *op,vecstr *dvp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = paramfile_magic(op,dvp)) >= 0) {
+	if ((rs = paramfile_magic(op,dvp)) >= 0) ylikely {
 	    {
 	        rs1 = paramfile_defend(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -352,17 +350,16 @@ int paramfile_fileadd(PF *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = paramfile_magic(op,fname)) >= 0) {
+	if ((rs = paramfile_magic(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        if (fname[0] != '/') {
-		    char	*tbuf{} ;
-		    if ((rs = malloc_mp(&tbuf)) >= 0) {
+		    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 			if ((rs = mkpathrooted(tbuf,fname)) >= 0) {
 		    	    rs = paramfile_fileadder(op,tbuf) ;
 		    	    rc = rs ;
 			} /* end if (mkpathrooted) */
-			rs1 = uc_free(tbuf) ;
+			rs1 = lm_free(tbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} else {
@@ -377,7 +374,7 @@ int paramfile_fileadd(PF *op,cchar *fname) noex {
 
 int paramfile_curbegin(PF *op,PF_C *curp) noex {
 	int		rs ;
-	if ((rs = paramfile_magic(op,curp)) >= 0) {
+	if ((rs = paramfile_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -386,7 +383,7 @@ int paramfile_curbegin(PF *op,PF_C *curp) noex {
 
 int paramfile_curend(PF *op,PF_C *curp) noex {
 	int		rs ;
-	if ((rs = paramfile_magic(op,curp)) >= 0) {
+	if ((rs = paramfile_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -396,9 +393,9 @@ int paramfile_curend(PF *op,PF_C *curp) noex {
 int paramfile_fetch(PF *op,cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = paramfile_magic(op,ks,curp,vbuf)) >= 0) {
+	if ((rs = paramfile_magic(op,ks,curp,vbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (ks[0]) {
+	    if (ks[0]) ylikely {
 	        vecobj	*slp = op->entsp ;
 	        PF_E	*pep{} ;
 	        PF_E	ke ;
@@ -443,7 +440,7 @@ int paramfile_fetch(PF *op,cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 int paramfile_curenum(PF *op,PF_C *curp,PF_E *ep,char *ebuf,int elen) noex {
 	int		rs ;
 	int		kl = 0 ;
-	if ((rs = paramfile_magic(op,curp,ep,ebuf)) >= 0) {
+	if ((rs = paramfile_magic(op,curp,ep,ebuf)) >= 0) ylikely {
 	    vecobj	*slp = op->entsp ;
 	    int		i = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	    int		j{} ;
@@ -455,15 +452,14 @@ int paramfile_curenum(PF *op,PF_C *curp,PF_E *ep,char *ebuf,int elen) noex {
 	    if ((rs >= 0) && vp) {
 	        PF_E	*pep = entp(vp) ;
 	        char	*bp = ebuf ;
-	        cchar	*cp{} ;
-	        if ((rs = paramfile_entsub(op,pep,&cp)) >= 0) {
+	        if (cchar *cp{} ; (rs = paramfile_entsub(op,pep,&cp)) >= 0) {
 	            cint	cl = rs ;
 	            kl = pep->klen ;
 	            if ((elen < 0) || (elen >= (kl + cl + 2))) {
 	                ep->key = bp ;
 	                ep->klen = pep->klen ;
 	                bp = strwcpy(bp,pep->key,pep->klen) + 1 ;
-	                ep->value = bp ;
+	                ep->val = bp ;
 	                ep->vlen = cl ;
 	                bp = strwcpy(bp,cp,cl) + 1 ;
 	            } else {
@@ -494,7 +490,7 @@ int paramfile_check(PF *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c_changed = 0 ;
-	if ((rs = paramfile_magic(op)) >= 0) {
+	if ((rs = paramfile_magic(op)) >= 0) ylikely {
 	    if (dt == 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_check) > op->intcheck) {
 	        vecobj	*flp = op->filep ;
@@ -525,11 +521,11 @@ int paramfile_check(PF *op,time_t dt) noex {
 
 /* private subroutines */
 
-static int paramfile_fileadder(PF *op,cchar *fpath) noex {
+local int paramfile_fileadder(PF *op,cchar *fpath) noex {
 	int		rs ;
 	PF_F		fe{} ;
-	if ((rs = file_start(&fe,fpath)) >= 0) {
-	    if ((rs = vecobj_add(op->filep,&fe)) >= 0) {
+	if ((rs = file_start(&fe,fpath)) >= 0) ylikely {
+	    if ((rs = vecobj_add(op->filep,&fe)) >= 0) ylikely {
 	        cint	fi = rs ;
 	        rs = paramfile_fileparse(op,fi) ;
 	        if (rs < 0)
@@ -542,15 +538,14 @@ static int paramfile_fileadder(PF *op,cchar *fpath) noex {
 }
 /* end subroutine (paramfile_fileadder) */
 
-static int paramfile_bufbegin(PF *op) noex {
+local int paramfile_bufbegin(PF *op) noex {
 	cint		nlines = 2 ;
 	int		rs ;
 	int		llen = 0 ;
 	if ((rs = maxlinelen) >= 0) {
-	    cint	bsize = (nlines*(rs+1)) ;
-	    void	*vp{} ;
+	    cint	bsize = (nlines * (rs + 1)) ;
 	    llen = rs ;
-	    if ((rs = uc_malloc(bsize,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(bsize,&vp)) >= 0) ylikely {
 		char	*bp = charp(vp) ;
 	        op->a = charp(vp) ;
 	        op->lbuf = bp ;
@@ -564,11 +559,12 @@ static int paramfile_bufbegin(PF *op) noex {
 }
 /* end subroutine (paramfile_bufbegin) */
 
-static int paramfile_bufend(PF *op) noex {
+local int paramfile_bufend(PF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->a) {
-	    rs1 = uc_free(op->a) ;
+	if (op->a) ylikely {
+	    void *vp = voidp(op->a) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = nullptr ;
 	}
@@ -576,12 +572,12 @@ static int paramfile_bufend(PF *op) noex {
 }
 /* end subroutine (paramfile_bufend) */
 
-static int paramfile_fileparse(PF *op,int fi) noex {
+local int paramfile_fileparse(PF *op,int fi) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	void		*vp{} ;
-	if ((rs = vecobj_get(op->filep,fi,&vp)) >= 0) {
+	if ((rs = vecobj_get(op->filep,fi,&vp)) >= 0) ylikely {
 	    if (vp) {
 	        bfile	lfile, *lfp = &lfile ;
 		PF_F	*fep = nullptr ;
@@ -605,17 +601,17 @@ static int paramfile_fileparse(PF *op,int fi) noex {
 	    }
 	} /* end if (vecobj_get) */
 	if (rs < 0) {
-		rs = paramfile_filedump(op,fi) ;
+	    rs = paramfile_filedump(op,fi) ;
 	}
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (paramfile_fileparse) */
 
-static int paramfile_fileparser(PF *op,int fi,bfile *lfp) noex {
+local int paramfile_fileparser(PF *op,int fi,bfile *lfp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = paramfile_bufbegin(op)) >= 0) {
+	if ((rs = paramfile_bufbegin(op)) >= 0) ylikely {
 	    cint	llen = rs ;
 	    int		cl ;
 	    int		f_bol = true ;
@@ -645,17 +641,17 @@ static int paramfile_fileparser(PF *op,int fi,bfile *lfp) noex {
 }
 /* end subroutine (paramfile_fileparser) */
 
-static int paramfile_fileparseline(PF *op,int fi,cchar *lp,int ll) noex {
+local int paramfile_fileparseline(PF *op,int fi,cchar *lp,int ll) noex {
 	field		fsb ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = field_start(&fsb,lp,ll)) >= 0) {
+	if ((rs = field_start(&fsb,lp,ll)) >= 0) ylikely {
 	    int		kl ;
 	    cchar	*kp{} ;
-	    if ((kl = field_get(&fsb,kterms,&kp)) > 0) {
+	    if ((kl = field_get(&fsb,kterms,&kp)) > 0) ylikely {
 	        vecstr	vals ;
-	        if ((rs = vecstr_start(&vals,10,0)) >= 0) {
+	        if ((rs = vecstr_start(&vals,10,0)) >= 0) ylikely {
 	            cint	flen = op->flen ;
 	            int		fl ;
 	            int		vl = 0 ;
@@ -686,22 +682,22 @@ static int paramfile_fileparseline(PF *op,int fi,cchar *lp,int ll) noex {
 }
 /* end subroutine (paramfile_fileparseline) */
 
-static int paramfile_entadd(PF *op,PF_E *pep) noex {
+local int paramfile_entadd(PF *op,PF_E *pep) noex {
 	return vecobj_add(op->entsp,pep) ;
 }
 /* end subroutine (paramfile_entadd) */
 
-static int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
+local int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rvl = 0 ;
 	cchar		*rvalp = nullptr ;
-	if (op && pep) {
+	if (op && pep) ylikely {
 	    rs = SR_OK ;
 	    if (pep->oval) {
 		cint		vallen = PARAMFILE_VALLEN ;
 	        rvl = pep->vlen ;
-	        if (pep->value == nullptr) {
+	        if (pep->val == nullptr) {
 	            buffer	b ;
 	            cint	start = max(pep->vlen,vallen) ;
 	            bool	f_exptry = false ;
@@ -737,17 +733,17 @@ static int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
 	                        f = f || (strncmp(rvp,pep->oval,rvl) != 0) ;
 	                        if (f) {
 	                            void	*vp{} ;
-	                            if ((rs = uc_malloc((rvl+1),&vp)) >= 0) {
+	                            if ((rs = lm_mall((rvl+1),&vp)) >= 0) {
 				        char	*bp = charp(vp) ;
 				        rvalp = bp ;
 	                                strwcpy(bp,rvp,rvl) ;
-	                                pep->value = bp ;
+	                                pep->val = bp ;
 	                                pep->vlen = rvl ;
 	                            }
 	                        } else {
-	                            pep->value = pep->oval ;
+	                            pep->val = pep->oval ;
 	                            pep->vlen = pep->olen ;
-	                            rvalp = pep->value ;
+	                            rvalp = pep->val ;
 	                        }
 	                    } /* end if (buffer_get) */
 	                } else {
@@ -757,7 +753,7 @@ static int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (buffer) */
 	        } else {
-	            rvalp = pep->value ;
+	            rvalp = pep->val ;
 	        }
 	    } /* end if (non-null) */
 	    if ((rs >= 0) && rpp) {
@@ -768,7 +764,7 @@ static int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
 }
 /* end subroutine (paramfile_entsub) */
 
-static int paramfile_filefins(PF *op) noex {
+local int paramfile_filefins(PF *op) noex {
 	vecobj		*flp = op->filep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -784,7 +780,7 @@ static int paramfile_filefins(PF *op) noex {
 }
 /* end subroutine (paramfile_filefins) */
 
-static int paramfile_entfins(PF *op) noex {
+local int paramfile_entfins(PF *op) noex {
 	vecobj		*elp = op->entsp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -800,7 +796,7 @@ static int paramfile_entfins(PF *op) noex {
 }
 /* end subroutine (paramfile_entfins) */
 
-static int paramfile_filedump(PF *op,int fi) noex {
+local int paramfile_filedump(PF *op,int fi) noex {
 	vecobj		*slp = op->entsp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -826,12 +822,11 @@ static int paramfile_filedump(PF *op,int fi) noex {
 }
 /* end subroutine (paramfile_filedump) */
 
-static int paramfile_filedel(PF *op,int fi) noex {
+local int paramfile_filedel(PF *op,int fi) noex {
 	vecobj		*flp = op->filep ;
 	int		rs ;
 	int		rs1 ;
-	void		*vp{} ;
-	if ((rs = vecobj_get(flp,fi,&vp)) >= 0) {
+	if (void *vp ; (rs = vecobj_get(flp,fi,&vp)) >= 0) ylikely {
 	    if (vp) {
 		{
 		    PF_F	*fep = filep(vp) ;
@@ -848,7 +843,7 @@ static int paramfile_filedel(PF *op,int fi) noex {
 }
 /* end subroutine (paramfile_filedel) */
 
-static int paramfile_envbegin(PF *op) noex {
+local int paramfile_envbegin(PF *op) noex {
 	int		rs = SR_OK ;
 	if (! op->fl.envinit) {
 	    cint	vao = 0 ;
@@ -859,7 +854,7 @@ static int paramfile_envbegin(PF *op) noex {
 }
 /* end subroutine (paramfile_envbegin) */
 
-static int paramfile_envend(PF *op) noex {
+local int paramfile_envend(PF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.envinit) {
@@ -871,7 +866,7 @@ static int paramfile_envend(PF *op) noex {
 }
 /* end subroutine (paramfile_envend) */
 
-static int paramfile_envload(PF *op) noex {
+local int paramfile_envload(PF *op) noex {
 	int		rs = SR_OK ;
 	if ((op->envv != nullptr) && (! op->fl.envload)) {
 	    op->fl.envload = true ;
@@ -886,7 +881,7 @@ static int paramfile_envload(PF *op) noex {
 }
 /* end subroutines (paramfile_envload) */
 
-static int paramfile_defbegin(PF *op,vecstr *dvp) noex {
+local int paramfile_defbegin(PF *op,vecstr *dvp) noex {
 	int		rs = SR_OK ;
 	if (! op->fl.definit) {
 	    cint	vao = VARSUB_OBADNOKEY ;
@@ -900,7 +895,7 @@ static int paramfile_defbegin(PF *op,vecstr *dvp) noex {
 }
 /* end subroutines (paramfile_defbegin) */
 
-static int paramfile_defend(PF *op) noex {
+local int paramfile_defend(PF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.definit) {
@@ -912,7 +907,7 @@ static int paramfile_defend(PF *op) noex {
 }
 /* end subroutine (paramfile_defend) */
 
-static int paramfile_defload(PF *op,vecstr *dvp) noex {
+local int paramfile_defload(PF *op,vecstr *dvp) noex {
 	int		rs = SR_OK ;
 	if (dvp != nullptr) {
 	    cchar	*tp, *cp ;
@@ -932,7 +927,7 @@ static int paramfile_defload(PF *op,vecstr *dvp) noex {
 }
 /* end subroutine (paramfile_defload) */
 
-static int paramfile_entrels(PF *op) noex {
+local int paramfile_entrels(PF *op) noex {
 	vecobj		*slp = op->entsp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -976,7 +971,7 @@ void paramfile::dtor() noex {
 
 int paramfile_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case paramfilemem_checkint:
 	        rs = paramfile_checkint(op,a) ;
@@ -990,11 +985,11 @@ int paramfile_co::operator () (int a) noex {
 }
 /* end method (paramfile_co::operator) */
 
-static int file_start(PF_F *fep,cchar *fname) noex {
+local int file_start(PF_F *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fep && fname) {
+	if (fep && fname) ylikely {
 	    memclear(fep) ;
-	    if (cchar *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(fname,-1,&cp)) >= 0) {
 	        fep->fname = cp ;
 	    }
 	} /* end if (non-null) */
@@ -1002,13 +997,14 @@ static int file_start(PF_F *fep,cchar *fname) noex {
 }
 /* end subroutine (file_start) */
 
-static int file_finish(PF_F *fep) noex {
+local int file_finish(PF_F *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (fep) {
+	if (fep) ylikely {
 	    rs = SR_OK ;
-	    if (fep->fname) {
-	        rs1 = uc_free(fep->fname) ;
+	    if (fep->fname) ylikely {
+		void *vp = voidp(fep->fname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->fname = nullptr ;
 	    }
@@ -1017,18 +1013,17 @@ static int file_finish(PF_F *fep) noex {
 }
 /* end subroutine (file_finish) */
 
-static int entry_start(PF_E *pep,int fi,cc *kp,int kl,VS *vsp,int olen) noex {
+local int entry_start(PF_E *pep,int fi,cc *kp,int kl,VS *vsp,int olen) noex {
 	int		rs = SR_FAULT ;
 	int		bsize = 0 ;
-	if (pep && kp) {
-	    void	*vp{} ;
+	if (pep && kp) ylikely {
 	    memclear(pep) ;
 	    pep->fi = fi ;
 	    if (kl < 0) kl = lenstr(kp) ;
 	    pep->klen = kl ;
 	    pep->olen = olen ;
 	    bsize = (kl + 1 + olen + 1) + 10 ;
-	    if ((rs = uc_malloc(bsize,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(bsize,&vp)) >= 0) ylikely {
 	        char	*bp = charp(vp) ;
 	        cchar	*cp{} ;
 	        pep->key = bp ;
@@ -1045,21 +1040,23 @@ static int entry_start(PF_E *pep,int fi,cc *kp,int kl,VS *vsp,int olen) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(PF_E *pep) noex {
+local int entry_finish(PF_E *pep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (pep) {
+	if (pep) ylikely {
 	    rs = SR_OK ;
 	    pep->fi = -1 ;
-	    if (pep->value) {
-	        if (pep->oval != pep->value) {
-	            rs1 = uc_free(pep->value) ;
+	    if (pep->val) ylikely {
+	        if (pep->oval != pep->val) {
+		    void *vp = voidp(pep->val) ;
+	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
-	        pep->value = nullptr ;
+	        pep->val = nullptr ;
 	    }
-	    if (pep->key) {
-	        rs1 = uc_free(pep->key) ;
+	    if (pep->key) ylikely {
+	        void *vp = voidp(pep->key) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        pep->key = nullptr ;
 	    }
@@ -1069,22 +1066,23 @@ static int entry_finish(PF_E *pep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int entry_release(PF_E *pep) noex {
+local int entry_release(PF_E *pep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (pep) {
+	if (pep) ylikely {
 	    rs = SR_OK ;
-	    if ((pep->oval != pep->value) && pep->value) {
-	        rs1 = uc_free(pep->value) ;
+	    if ((pep->oval != pep->val) && pep->val) {
+		void *vp = voidp(pep->val) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        pep->value = nullptr ;
+	        pep->val = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_release) */
 
-static int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	PF_E		*e1p = (PF_E *) *v1pp ;
 	PF_E		*e2p = (PF_E *) *v2pp ;
 	int		rc = 0 ;
@@ -1105,7 +1103,7 @@ static int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 }
 /* end subroutine (vcmpentry) */
 
-static int mkterms() noex {
+local int mkterms() noex {
 	int		rs ;
 	if ((rs = fieldterms(aterms,false,'\b','\t','\v','\f',' ','#')) >= 0) {
 	    rs = fieldterms(kterms,false,'\b','\t','\v','\f',' ','#','=') ;
