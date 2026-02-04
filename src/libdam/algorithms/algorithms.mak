@@ -40,22 +40,6 @@ MODS += dfsa.ccm dfsb.ccm
 LIBS +=
 
 
-INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
 OBJ0= bellmanford1.o bellmanford2.o
 OBJ1= bfs1.o dfsa.o dfsb.o
 OBJ2= dijkstra1.o dijkstra2.o
@@ -68,10 +52,25 @@ OBJ7= fam.o fhm.o fsum.o
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
-OBJ= $(OBJA) $(OBJB)
+OBJ= obja.o objb.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS +=
+
+LIBDIRS += -L$(LIBDIR)
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -84,6 +83,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -118,35 +120,35 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj6.o:			$(OBJ6)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj7.o:			$(OBJ7)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 bellmanford1.o:		bellmanford1.cc	bellmanford1.hh		$(INCS)
