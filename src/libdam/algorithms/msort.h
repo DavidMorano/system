@@ -29,9 +29,9 @@
 
 EXTERNC_begin
 
-typedef int	(*msortcmp_f)(cvoid *,cvoid *) ;
+typedef int	(*msortcmp_f)(cvoid *,cvoid *) noex ;
 
-extern int	msort(void *,int,int,msortcmp_f) ;
+extern int	msort(void *,int,int,msortcmp_f) noex ;
 
 EXTERNC_end
 
