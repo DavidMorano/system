@@ -35,19 +35,21 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"editdistance.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* default name spaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine (template) */
 using std::max ;			/* subroutine (template) */
 using std::nothrow ;			/* constant */
