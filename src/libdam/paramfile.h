@@ -49,7 +49,7 @@ struct paramfile_flags {
 	uint		envload:1 ;
 	uint		definit:1 ;
 	uint		defload:1 ;
-} ;
+} ; /* end struct */
 
 struct paramfile_head {
 	mainv		envv ;		/* program startup environment */
@@ -66,21 +66,21 @@ struct paramfile_head {
 	int		llen ;
 	int		flen ;
 	int		intcheck ;
-} ;
+} ; /* end struct */
 
 struct paramfile_entry {
 	cchar		*key ;
 	cchar		*oval ;
-	cchar		*value ;	/* dynamic variable expansion */
+	cchar		*val ;	/* dynamic variable expansion */
 	int		fi ;
 	int		klen ;
 	int		olen ;
 	int		vlen ;
-} ;
+} ; /* end struct */
 
 struct paramfile_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef PARAMFILE_CUR		paramfile_cur ;
 typedef PARAMFILE_ENT		paramfile_ent ;
