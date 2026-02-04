@@ -27,8 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -43,7 +41,6 @@
 #include	<usyscalls.h>
 #include	<usupport.h>		/* |getustime(3u)| */
 #include	<uclibmem.h>
-#include	<getbufsize.h>
 #include	<getnodedomain.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
@@ -183,7 +180,7 @@ int prcache_lookup(prcache *pcp,int i,cchar **rpp) noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	*rpp = nullptr ;
 	if (i < nprs) {
 	    cint	maxpath = var.maxpathlen ;
