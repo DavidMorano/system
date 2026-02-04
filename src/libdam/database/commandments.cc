@@ -33,12 +33,15 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<nulstr.h>
 #include	<sbuf.h>
 #include	<storebuf.h>
@@ -53,6 +56,9 @@
 #include	"cmimk.h"
 #include	"cmi.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -80,7 +86,7 @@
 struct mkent_line {
 	uint		loff ;
 	uint		llen ;
-} ;
+} ; /* end struct */
 
 struct mkent {
 	MKENT_LINE	*lines ;
@@ -88,60 +94,60 @@ struct mkent {
 	uint		elen ;
 	int		e, i ;
 	ushort		cn ;
-} ;
+} ; /* end struct */
 
 constexpr int		rsold[] = {
 	SR_STALE,
 	0
-} ;
+} ; /* end array */
 
 
 /* forward references */
 
-static int	commandments_argsbegin(CM *,cchar *,cchar *) noex ;
-static int	commandments_argsend(CM *) noex ;
+local int	commandments_argsbegin(CM *,cchar *,cchar *) noex ;
+local int	commandments_argsend(CM *) noex ;
 
-static int	commandments_findbegin(CM *,cchar *,cchar *) noex ;
-static int	commandments_findend(CM *) noex ;
-static int	commandments_tmpcheck(CM *,char *,USTAT *,cchar *) noex ;
-static int	commandments_tmpcopy(CM *,char *,cchar *,char *) noex ;
+local int	commandments_findbegin(CM *,cchar *,cchar *) noex ;
+local int	commandments_findend(CM *) noex ;
+local int	commandments_tmpcheck(CM *,char *,USTAT *,cchar *) noex ;
+local int	commandments_tmpcopy(CM *,char *,cchar *,char *) noex ;
 
-static int	commandments_fileloadbegin(CM *,cchar *) noex ;
-static int	commandments_fileloadend(CM *) noex ;
-static int	commandments_dbmapbegin(CM *,time_t) noex ;
-static int	commandments_dbmapend(CM *) noex ;
-static int	commandments_dbproc(CM *,CMIMK *) noex ;
-static int	commandments_checkupdate(CM *,time_t) noex ;
-static int	commandments_loadbuf(CM *,CMI_ENT *,char *,int rlen) noex ;
+local int	commandments_fileloadbegin(CM *,cchar *) noex ;
+local int	commandments_fileloadend(CM *) noex ;
+local int	commandments_dbmapbegin(CM *,time_t) noex ;
+local int	commandments_dbmapend(CM *) noex ;
+local int	commandments_dbproc(CM *,CMIMK *) noex ;
+local int	commandments_checkupdate(CM *,time_t) noex ;
+local int	commandments_loadbuf(CM *,CMI_ENT *,char *,int rlen) noex ;
 
-static int	commandments_userhome(CM *) noex ;
-static int	commandments_usridname(CM *,char *) noex ;
-static int	commandments_sysidname(CM *,char *) noex ;
+local int	commandments_userhome(CM *) noex ;
+local int	commandments_usridname(CM *,char *) noex ;
+local int	commandments_sysidname(CM *,char *) noex ;
 
-static int	commandments_idxbegin(CM *,cchar *) noex ;
-static int	commandments_idxend(CM *) noex ;
-static int	commandments_idxmkname(CM *,char *,cchar *) noex ;
-static int	commandments_idxopencheck(CM *,cchar *) noex ;
-static int	commandments_idxmk(CM *,cchar *) noex ;
-static int	commandments_idxmapbegin(CM *,cchar *) noex ;
-static int	commandments_idxmapend(CM *) noex ;
-static int	commandments_chownpr(CM *,cchar *) noex ;
-static int	commandments_ids(CM *) noex ;
+local int	commandments_idxbegin(CM *,cchar *) noex ;
+local int	commandments_idxend(CM *) noex ;
+local int	commandments_idxmkname(CM *,char *,cchar *) noex ;
+local int	commandments_idxopencheck(CM *,cchar *) noex ;
+local int	commandments_idxmk(CM *,cchar *) noex ;
+local int	commandments_idxmapbegin(CM *,cchar *) noex ;
+local int	commandments_idxmapend(CM *) noex ;
+local int	commandments_chownpr(CM *,cchar *) noex ;
+local int	commandments_ids(CM *) noex ;
 
-static int	mkent_start(MKENT *,int,uint,uint) noex ;
-static int	mkent_add(MKENT *,uint,uint) noex ;
-static int	mkent_finish(MKENT *) noex ;
+local int	mkent_start(MKENT *,int,uint,uint) noex ;
+local int	mkent_add(MKENT *,uint,uint) noex ;
+local int	mkent_finish(MKENT *) noex ;
 
-static int	cmimkent_start(CMIMK_ENT *,MKENT *) noex ;
-static int	cmimkent_finish(CMIMK_ENT *) noex ;
+local int	cmimkent_start(CMIMK_ENT *,MKENT *) noex ;
+local int	cmimkent_finish(CMIMK_ENT *) noex ;
 
-static bool	hasourdig(cchar *,int) noex ;
+local bool	hasourdig(cchar *,int) noex ;
 
-static bool	isempty(cchar *,int) noex ;
-static bool	isstart(cchar *,int,int *,int *) noex ;
+local bool	isempty(cchar *,int) noex ;
+local bool	isstart(cchar *,int,int *,int *) noex ;
 
-static int	isNotOurAccess(int) noex ;
-static int	isStale(int) noex ;
+local int	isNotOurAccess(int) noex ;
+local int	isStale(int) noex ;
 
 
 /* local variables */
@@ -162,8 +168,8 @@ int commandments_open(CM *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		c = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
@@ -171,7 +177,7 @@ int commandments_open(CM *op,cchar *pr,cchar *dbname) noex {
 	debugprintf("commandments_open: ent pr=%s dbname=%s\n",pr,dbname) ;
 #endif
 
-	if ((dbname == NULL) || (dbname[0] == '\0')) {
+	if ((dbname == nullptr) || (dbname[0] == '\0')) {
 	    dbname = COMMANDMENTS_DBNAME ;
 	}
 
@@ -207,23 +213,23 @@ int commandments_close(CM *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = commandments_fileloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    rs1 = uc_free(op->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 
-	if (op->uhome != NULL) {
+	if (op->uhome != nullptr) {
 	    rs1 = uc_free(op->uhome) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->uhome = NULL ;
+	    op->uhome = nullptr ;
 	}
 
 	rs1 = commandments_argsend(op) ;
@@ -240,7 +246,7 @@ int commandments_audit(CM *op)
 	int		rs = SR_OK ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 #endif
@@ -258,7 +264,7 @@ int commandments_count(CM *op)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 
@@ -277,7 +283,7 @@ int commandments_count(CM *op)
 int commandments_max(CM *op)
 {
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 
@@ -300,7 +306,7 @@ int commandments_read(CM *op,char *vbuf,int vlen,uint cn)
 	int		len = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 #endif
@@ -323,7 +329,7 @@ int commandments_read(CM *op,char *vbuf,int vlen,uint cn)
 	    cint	lsize = ((nlines+1) * szof(CMI_LINE)) ;
 	    char	*lb = (char *) lines ;
 	    if ((rs = cmi_read(&op->idx,&viv,lb,lsize,cn)) >= 0) {
-	        if (vbuf != NULL) {
+	        if (vbuf != nullptr) {
 	            rs = commandments_loadbuf(op,&viv,vbuf,vlen) ;
 		    len = rs ;
 		}
@@ -344,12 +350,12 @@ int commandments_curbegin(CM *op,COMMANDMENTS_CUR *curp)
 	int		rs ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if ((rs = cmi_curbegin(&op->idx,&curp->vicur)) >= 0) {
 	    op->ncursors += 1 ;
@@ -366,12 +372,12 @@ int commandments_curend(CM *op,COMMANDMENTS_CUR *curp)
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	rs1 = cmi_curend(&op->idx,&curp->vicur) ;
 	if (rs >= 0) rs = rs1 ;
@@ -398,16 +404,16 @@ int		vlen ;
 	int		len = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != COMMANDMENTS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
-	if (ep == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 #ifdef	COMMENT
-	if (vbuf == NULL) return SR_FAULT ;
+	if (vbuf == nullptr) return SR_FAULT ;
 #endif
 
 /* check for update */
@@ -422,11 +428,11 @@ int		vlen ;
 	    CMI_LINE	lines[COMMANDMENTS_NLINES + 1] ;
 	    cint	ls = ((COMMANDMENTS_NLINES + 1) * szof(CMI_LINE)) ;
 	    if ((rs = cmi_enum(&op->idx,bcurp,&viv,(char *) lines,ls)) >= 0) {
-	        if (vbuf != NULL) {
+	        if (vbuf != nullptr) {
 	            rs = commandments_loadbuf(op,&viv,vbuf,vlen) ;
 		    len = rs ;
 		}
-	        if ((rs >= 0) && (ep != NULL)) {
+	        if ((rs >= 0) && (ep != nullptr)) {
 		    memclear(ep) ;
 		    ep->cn = viv.cn ;
 	        }
@@ -452,7 +458,7 @@ int commandments_get(CM *op,int cn,char *rbuf,int rlen)
 /* private subroutines */
 
 
-static int commandments_argsbegin(CM *op,cchar *pr,cchar *dbname)
+local int commandments_argsbegin(CM *op,cchar *pr,cchar *dbname)
 {
 	int		rs ;
 	int		size = 0 ;
@@ -471,21 +477,21 @@ static int commandments_argsbegin(CM *op,cchar *pr,cchar *dbname)
 /* end subroutine (commandments_argsbegin) */
 
 
-static int commandments_argsend(CM *op)
+local int commandments_argsend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->a  != NULL) {
+	if (op->a  != nullptr) {
 	    rs1 = uc_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->a = NULL ;
+	    op->a = nullptr ;
 	}
 	return rs ;
 }
 /* end subroutine (commandments_argsend) */
 
 
-static int commandments_findbegin(CM *op,cchar *pr,cchar *dbname)
+local int commandments_findbegin(CM *op,cchar *pr,cchar *dbname)
 {
 	int		rs ;
 #if	CF_DEBUGS
@@ -499,7 +505,7 @@ static int commandments_findbegin(CM *op,cchar *pr,cchar *dbname)
 		int	tl = rs ;
 		if ((rs = uc_stat(tbuf,&sb)) >= 0) {
 		    if (S_ISREG(sb.st_mode)) {
-			op->fl.user = TRUE ;
+			op->fl.user = true ;
 			op->ti_db = sb.st_mtime ;
 			op->size_db = sb.st_size ;
 		    } else {
@@ -537,21 +543,21 @@ static int commandments_findbegin(CM *op,cchar *pr,cchar *dbname)
 /* end subroutine (commandments_findbegin) */
 
 
-static int commandments_findend(CM *op)
+local int commandments_findend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    rs1 = uc_free(op->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 	return rs ;
 }
 /* end subroutine (commandments_findend) */
 
 
-static int commandments_tmpcheck(CM *op,char *tbuf,USTAT *sbp,
+local int commandments_tmpcheck(CM *op,char *tbuf,USTAT *sbp,
 		cchar *dbname)
 {
 	const mode_t	dm = 0777 ;
@@ -594,7 +600,7 @@ static int commandments_tmpcheck(CM *op,char *tbuf,USTAT *sbp,
 /* end subroutine (commandments_tmpcheck) */
 
 
-static int commandments_tmpcopy(CM *op,char *tbuf,
+local int commandments_tmpcopy(CM *op,char *tbuf,
 		cchar *abuf, char *dbuf)
 {
 	cint	xlen = MAXPATHLEN ;
@@ -618,12 +624,12 @@ static int commandments_tmpcopy(CM *op,char *tbuf,
 		        struct utimbuf	ut ;
 			ut.actime = op->ti_db ;
 			ut.modtime = op->ti_db ;
-			if ((rs = uc_utime(xbuf,&ut)) >= 0) {
+			if ((rs = uc_filetime(xbuf,&ut)) >= 0) {
 			    if ((rs = u_rename(xbuf,abuf)) >= 0) {
 			        xbuf[0] = '\0' ;
 			        rs = mkpath1(tbuf,abuf) ;
 			    }
-			} /* end if (uc_utime) */
+			} /* end if (uc_filetime) */
 		} /* end if (ok) */
 		dbuf[dlen] = '\0' ;
 	    } /* end if (pathadd) */
@@ -633,10 +639,8 @@ static int commandments_tmpcopy(CM *op,char *tbuf,
 }
 /* end subroutine (commandments_tmpcopy) */
 
-
-static int commandments_fileloadbegin(CM *op,cchar *dbname)
-{
-	const time_t	dt = time(NULL) ;
+local int commandments_fileloadbegin(CM *op,cchar *dbname) noex {
+	custime		dt = time(nullptr) ;
 	int		rs ;
 	int		c = 0 ;
 
@@ -660,7 +664,7 @@ static int commandments_fileloadbegin(CM *op,cchar *dbname)
 /* end subroutine (commandments_fileloadbegin) */
 
 
-static int commandments_fileloadend(CM *op)
+local int commandments_fileloadend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -676,7 +680,7 @@ static int commandments_fileloadend(CM *op)
 /* end subroutine (commandments_fileloadend) */
 
 
-static int commandments_idxbegin(CM *op,cchar *dbname)
+local int commandments_idxbegin(CM *op,cchar *dbname)
 {
 	int		rs ;
 	char		tbuf[MAXPATHLEN+1] ;
@@ -697,7 +701,7 @@ static int commandments_idxbegin(CM *op,cchar *dbname)
 /* end subroutine (commandments_idxbegin) */
 
 
-static int commandments_idxend(CM *op)
+local int commandments_idxend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -710,7 +714,7 @@ static int commandments_idxend(CM *op)
 /* end subroutine (commandments_idxend) */
 
 
-static int commandments_idxmkname(CM *op,char *tbuf,cchar *dbname)
+local int commandments_idxmkname(CM *op,char *tbuf,cchar *dbname)
 {
 	int		rs = SR_OK ;
 	int		pl = 0 ;
@@ -741,7 +745,7 @@ static int commandments_idxmkname(CM *op,char *tbuf,cchar *dbname)
 /* end subroutine (commandments_idxmkname) */
 
 
-static int commandments_idxopencheck(CM *op,cchar *dbname)
+local int commandments_idxopencheck(CM *op,cchar *dbname)
 {
 	CMI		*cip = &op->idx ;
 	int		rs ;
@@ -759,7 +763,7 @@ static int commandments_idxopencheck(CM *op,cchar *dbname)
 #endif
 
 	    if ((rs = cmi_info(cip,&cinfo)) >= 0) {
-		int	f = TRUE ;
+		int	f = true ;
 #if	CF_DEBUGS
 		{
 		    char	wbuf[TIMEBUFLEN+1] ;
@@ -776,7 +780,7 @@ static int commandments_idxopencheck(CM *op,cchar *dbname)
 	        f = f && (cinfo.idxctime >= op->ti_db) ;
 	        f = f && (cinfo.dbsize == op->size_db) ;
 		if (f) {
-	            op->fl.idx = TRUE ;
+	            op->fl.idx = true ;
 		    op->nents = cinfo.nents ;
 		    op->maxent = cinfo.maxent ;
 		    op->ti_idx = cinfo.idxmtime ;
@@ -800,7 +804,7 @@ static int commandments_idxopencheck(CM *op,cchar *dbname)
 /* end subroutine (commandments_idxopencheck) */
 
 
-static int commandments_idxmk(CM *op,cchar *tbuf)
+local int commandments_idxmk(CM *op,cchar *tbuf)
 {
 	CMIMK		mk ;
 	const mode_t	om = 0664 ;
@@ -825,7 +829,7 @@ static int commandments_idxmk(CM *op,cchar *tbuf)
 /* end subroutine (commandments_idxmk) */
 
 
-static int commandments_idxmapbegin(CM *op,cchar *tbuf)
+local int commandments_idxmapbegin(CM *op,cchar *tbuf)
 {
 	int		rs ;
 #if	CF_DEBUGS
@@ -847,7 +851,7 @@ static int commandments_idxmapbegin(CM *op,cchar *tbuf)
 /* end subroutine (commandments_idxmapbegin) */
 
 
-static int commandments_idxmapend(CM *op)
+local int commandments_idxmapend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -862,7 +866,7 @@ static int commandments_idxmapend(CM *op)
 /* end subroutine (commandments_idxmapend) */
 
 
-static int commandments_usridname(CM *op,char *tbuf)
+local int commandments_usridname(CM *op,char *tbuf)
 {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
@@ -878,7 +882,7 @@ static int commandments_usridname(CM *op,char *tbuf)
 	            if ((rs = mkdirs(tbuf,dm)) >= 0) {
 			if ((rs = uc_minmod(tbuf,dm)) >= 0) {
 	    	                cint	n = _PC_CHOWN_RESTRICTED ;
-	    	                if ((rs = u_pathconf(tbuf,n,NULL)) == 0) {
+	    	                if ((rs = u_pathconf(tbuf,n,nullptr)) == 0) {
 		                    rs = commandments_chownpr(op,tbuf) ;
 		                }
 			} /* end if (uc_chmod) */
@@ -893,7 +897,7 @@ static int commandments_usridname(CM *op,char *tbuf)
 /* end subroutine (commandments_usridname) */
 
 
-static int commandments_sysidname(CM *op,char *tbuf)
+local int commandments_sysidname(CM *op,char *tbuf)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -920,7 +924,7 @@ static int commandments_sysidname(CM *op,char *tbuf)
 	                    if ((rs = mkdirs(tbuf,dm)) >= 0) {
 				if ((rs = uc_chmod(tbuf,dm)) >= 0) {
 	    	                    cint	n = _PC_CHOWN_RESTRICTED ;
-	    	                    if ((rs = u_pathconf(tbuf,n,NULL)) == 0) {
+	    	                    if ((rs = u_pathconf(tbuf,n,nullptr)) == 0) {
 		                        rs = commandments_chownpr(op,tbuf) ;
 				    }
 		                } /* end if (uc_chmod) */
@@ -944,7 +948,7 @@ static int commandments_sysidname(CM *op,char *tbuf)
 /* end subroutine (commandments_sysidname) */
 
 
-static int commandments_dbmapbegin(CM *op,time_t dt)
+local int commandments_dbmapbegin(CM *op,time_t dt)
 {
 	int		rs ;
 
@@ -961,7 +965,7 @@ static int commandments_dbmapbegin(CM *op,time_t dt)
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
 	            void	*md ;
-	            if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
+	            if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                op->data_db = md ;
 	                op->size_db = ms ;
 	                op->ti_map = dt ;
@@ -981,15 +985,15 @@ static int commandments_dbmapbegin(CM *op,time_t dt)
 /* end subroutine (commandments_dbmapbegin) */
 
 
-static int commandments_dbmapend(CM *op)
+local int commandments_dbmapend(CM *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->data_db != NULL) {
+	if (op->data_db != nullptr) {
 	    rs1 = u_munmap(op->data_db,op->size_db) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->data_db = NULL ;
+	    op->data_db = nullptr ;
 	}
 
 	return rs ;
@@ -997,7 +1001,7 @@ static int commandments_dbmapend(CM *op)
 /* end subroutine (commandments_dbmapend) */
 
 
-static int commandments_dbproc(CM *op,CMIMK *cmp)
+local int commandments_dbproc(CM *op,CMIMK *cmp)
 {
 	MKENT		e ;
 	uint		foff = 0 ;
@@ -1016,7 +1020,7 @@ static int commandments_dbproc(CM *op,CMIMK *cmp)
 	debugprintf("commandments_dbproc: ent ml=%d\n",ml) ;
 #endif
 
-	while ((tp = strnchr(mp,ml,'\n')) != NULL) {
+	while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
 
 	    len = ((tp + 1) - mp) ;
 	    lp = mp ;
@@ -1024,7 +1028,7 @@ static int commandments_dbproc(CM *op,CMIMK *cmp)
 
 	    if (! isempty(lp,ll)) {
 
-	        if ((tp = strnchr(lp,ll,'#')) != NULL) {
+	        if ((tp = strnchr(lp,ll,'#')) != nullptr) {
 	            ll = (tp - lp) ;
 		}
 
@@ -1045,7 +1049,7 @@ static int commandments_dbproc(CM *op,CMIMK *cmp)
 			const uint	soff = (foff+si) ;
 			cint	slen = (ll-si) ;
 	                if ((rs = mkent_start(&e,n,soff,slen)) >= 0) {
-	                    f_ent = TRUE ;
+	                    f_ent = true ;
 			}
 	            } /* end if (ok) */
 
@@ -1107,14 +1111,14 @@ static int commandments_dbproc(CM *op,CMIMK *cmp)
 /* end subroutine (commandments_dbproc) */
 
 
-static int commandments_checkupdate(CM *op,time_t dt)
+local int commandments_checkupdate(CM *op,time_t dt)
 {
 	int		rs = SR_OK ;
 	int		f = false ;
 
 	if (op->ncursors == 0) {
 	    ustat	sb ;
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	        op->ti_lastcheck = dt ;
 	        if ((rs = u_stat(op->fname,&sb)) >= 0) {
@@ -1136,7 +1140,7 @@ static int commandments_checkupdate(CM *op,time_t dt)
 /* end subroutine (commandments_checkupdate) */
 
 
-static int commandments_loadbuf(CM *op,CMI_ENT *vivp,
+local int commandments_loadbuf(CM *op,CMI_ENT *vivp,
 		char *rbuf,int rlen)
 {
 	SBUF		b ;
@@ -1176,10 +1180,10 @@ static int commandments_loadbuf(CM *op,CMI_ENT *vivp,
 /* end subroutine (commandments_loadbuf) */
 
 
-static int commandments_userhome(CM *op)
+local int commandments_userhome(CM *op)
 {
 	int		rs ;
-	if (op->uhome == NULL) {
+	if (op->uhome == nullptr) {
 	    cint	hlen = MAXPATHLEN ;
 	    char	*hbuf ;
 	    if ((rs = uc_malloc((hlen+1),&hbuf)) >= 0) {
@@ -1198,7 +1202,7 @@ static int commandments_userhome(CM *op)
 }
 /* end subroutine (commandments_userhome) */
 
-static int commandments_chownpr(CM *op,cchar *tbuf) noex {
+local int commandments_chownpr(CM *op,cchar *tbuf) noex {
 	int		rs ;
 	if (op->uid < 0) op->uid = getuid() ;
 	if ((rs = commandments_ids(op)) >= 0) {
@@ -1210,11 +1214,11 @@ static int commandments_chownpr(CM *op,cchar *tbuf) noex {
 }
 /* end subroutine (commandments_chownpr) */
 
-static int commandments_ids(CM *op) noex {
+local int commandments_ids(CM *op) noex {
 	int		rs = SR_OK ;
 	if (! op->fl.ids) {
 	    USTAT	sb ;
-	    op->fl.ids = TRUE ;
+	    op->fl.ids = true ;
 	    if ((rs = uc_stat(op->pr,&sb)) >= 0) {
 		op->uid_pr = sb.st_uid ;
 		op->gid_pr = sb.st_gid ;
@@ -1224,13 +1228,13 @@ static int commandments_ids(CM *op) noex {
 }
 /* end subroutine (commandments_ids) */
 
-static int mkent_start(MKENT *ep,int cn,uint eoff,uint elen) noex {
+local int mkent_start(MKENT *ep,int cn,uint eoff,uint elen) noex {
 	cint		ne = CMIMK_NE ; /* use their value for starters */
 	int		rs = SR_OK ;
 	int		size ;
 	void		*p ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("mkent_start: ent cn=%u\n",cn) ;
@@ -1261,34 +1265,34 @@ static int mkent_start(MKENT *ep,int cn,uint eoff,uint elen) noex {
 }
 /* end subroutine (mkent_start) */
 
-static int mkent_finish(MKENT *ep) noex {
+local int mkent_finish(MKENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("mkent_finish: ent e=%u i=%u\n",ep->e,ep->i) ;
 	debugprintf("mkent_finish: i=%u\n",ep->i) ;
 #endif
 
-	if (ep->lines != NULL) {
+	if (ep->lines != nullptr) {
 	    rs1 = uc_free(ep->lines) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->lines = NULL ;
+	    ep->lines = nullptr ;
 	}
 
 	return rs ;
 }
 /* end subroutine (mkent_finish) */
 
-static int mkent_add(MKENT *ep,uint eoff,uint elen) noex {
+local int mkent_add(MKENT *ep,uint eoff,uint elen) noex {
 	MKENT_LINE	*elp ;
 	int		rs = SR_OK ;
 	int		ne ;
 	int		size ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("mkent_add: ent e=%u i=%u\n",ep->e,ep->i) ;
@@ -1318,17 +1322,17 @@ static int mkent_add(MKENT *ep,uint eoff,uint elen) noex {
 }
 /* end subroutine (mkent_add) */
 
-static int cmimkent_start(CMIMK_ENT *bvep,MKENT *ep) noex {
+local int cmimkent_start(CMIMK_ENT *bvep,MKENT *ep) noex {
 	uint		nlines = 0 ;
 	int		rs = SR_OK ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	memclear(bvep) ;
 	bvep->cn = ep->cn ;
 	bvep->eoff = ep->eoff ;
 	bvep->elen = ep->elen ;
-	bvep->lines = NULL ;
+	bvep->lines = nullptr ;
 
 	nlines = ep->i ;
 
@@ -1363,23 +1367,23 @@ static int cmimkent_start(CMIMK_ENT *bvep,MKENT *ep) noex {
 }
 /* end subroutine (cmimkent_start) */
 
-static int cmimkent_finish(CMIMK_ENT *bvep) noex {
+local int cmimkent_finish(CMIMK_ENT *bvep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (bvep == NULL) return SR_FAULT ;
+	if (bvep == nullptr) return SR_FAULT ;
 
-	if (bvep->lines != NULL) {
+	if (bvep->lines != nullptr) {
 	    rs1 = uc_free(bvep->lines) ;
 	    if (rs >= 0) rs = rs1 ;
-	    bvep->lines = NULL ;
+	    bvep->lines = nullptr ;
 	}
 
 	return rs ;
 }
 /* end subroutine (cmimkent_finish) */
 
-static bool isempty(cchar *lp,int ll) noex {
+local bool isempty(cchar *lp,int ll) noex {
 	int		cl ;
 	bool		f = false ;
 	cchar	*cp ;
@@ -1394,13 +1398,13 @@ static bool isempty(cchar *lp,int ll) noex {
 }
 /* end subroutine (isempty) */
 
-static int isstart(cchar *lp,int ll,int *np,int *sip) noex {
+local int isstart(cchar *lp,int ll,int *np,int *sip) noex {
 	int		cl ;
 	bool		f = false ;
 	cchar	*tp, *cp ;
 	*np = -1 ;
 	*sip = 0 ;
-	if ((tp = strnchr(lp,ll,'.')) != NULL) {
+	if ((tp = strnchr(lp,ll,'.')) != nullptr) {
 	    cp = lp ;
 	    cl = (tp - lp) ;
 	    f = hasourdig(cp,cl) && (cfdeci(cp,cl,np) >= 0) ;
@@ -1412,12 +1416,12 @@ static int isstart(cchar *lp,int ll,int *np,int *sip) noex {
 }
 /* end subroutine (isstart) */
 
-static bool hasourdig(cchar *sp,int sl) noex {
+local bool hasourdig(cchar *sp,int sl) noex {
 	int		cl ;
 	bool		f = false ;
 	cchar	*cp ;
 	if ((cl = sfshrink(sp,sl,&cp)) > 0) {
-	    f = TRUE ;
+	    f = true ;
 	    while (cl && *cp) {
 	        f = isdigitlatin(*cp) ;
 		if (!f) break ;
@@ -1430,12 +1434,12 @@ static bool hasourdig(cchar *sp,int sl) noex {
 /* end subroutine (hasourdig) */
 
 #if	CF_DEBUGS && CF_DEBUGLINE
-static int linenlen(cchar *lp,int ll,int ml) noex {
+local int linenlen(cchar *lp,int ll,int ml) noex {
 	int		len = INT_MAX ;
-	if (lp == NULL) return 0 ;
+	if (lp == nullptr) return 0 ;
 	if (ll > 0) len = MIN(len,ll) ;
 	if (ml > 0) len = MIN(len,ml) ;
-	if (cchar *tp{} ; (tp = strnchr(lp,len,'\n')) != NULL) {
+	if (cchar *tp{} ; (tp = strnchr(lp,len,'\n')) != nullptr) {
 	    len = (tp - lp) ;
 	}
 	return len ;
@@ -1443,7 +1447,7 @@ static int linenlen(cchar *lp,int ll,int ml) noex {
 /* end subroutine (linenlen) */
 #endif /* CF_DEBUGS */
 
-static bool isNotOurAccess(int rs) noex {
+local bool isNotOurAccess(int rs) noex {
 	bool		f = false ;
 	if (rs < 0) {
 	    f = f || isNotPresent(rs) ;
@@ -1453,7 +1457,7 @@ static bool isNotOurAccess(int rs) noex {
 }
 /* end subroutine (isNotOurAccess) */
 
-static bool isStale(int rs) noex {
+local bool isStale(int rs) noex {
 	bool		f = false ;
 	if (rs < 0) {
 	    f = f || isNotPresent(rs) ;
