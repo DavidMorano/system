@@ -41,6 +41,9 @@
 
 #include	"biblemeta.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -54,7 +57,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -75,11 +77,11 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int biblemeta_ctor(biblemeta *op,Args ... args) noex {
+local int biblemeta_ctor(biblemeta *op,Args ... args) noex {
+	cnullptr	np{} ;
     	BIBLEMETA	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
 	    if ((op->dbp = new(nothrow) vecstr) != np) {
@@ -87,33 +89,30 @@ static int biblemeta_ctor(biblemeta *op,Args ... args) noex {
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (biblemeta_ctor) */
+} /* end subroutine (biblemeta_ctor) */
 
-static int biblemeta_dtor(biblemeta *op) noex {
+local int biblemeta_dtor(biblemeta *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->dbp) {
+	    if (op->dbp) ylikely {
 		delete op->dbp ;
 		op->dbp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (biblemeta_dtor) */
+} /* end subroutine (biblemeta_dtor) */
 
 template<typename ... Args>
-static inline int biblemeta_magic(biblemeta *op,Args ... args) noex {
+local inline int biblemeta_magic(biblemeta *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == BIBLEMETA_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (biblemeta_magic) */
+} /* end subroutine (biblemeta_magic) */
 
-static int	biblemeta_opener(BM *,cc *,cc *) noex ;
+local int	biblemeta_opener(BM *,cc *,cc *) noex ;
 
 
 /* local variables */
@@ -210,7 +209,7 @@ int biblemeta_get(BM *op,int i,char *rbuf,int rlen) noex {
 
 /* local subroutines */
 
-static int biblemeta_opener(BM *op,cc *pr,cc *dbn) noex {
+local int biblemeta_opener(BM *op,cc *pr,cc *dbn) noex {
 	cint		vn = BIBLEMETA_DEFENTS ;
 	cint		vo = 0 ;
 	int		rs ;
