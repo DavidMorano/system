@@ -34,7 +34,6 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -42,7 +41,7 @@ module ;
 #include	<usysrets.h>
 #include	<localmisc.h>
 
-#pragma		GCC dependency	"mod/vecbool.ccm"
+#pragma		GCC dependency		"mod/vecbool.ccm"
 
 export module argmgr ;
 
@@ -67,12 +66,15 @@ import vecbool ;
 /* external variables */
 
 
+/* local structures */
+
+
 /* forwards references */
 
 
 /* local variables */
 
-cbool		f_debug = CF_DEBUG ;
+constexpr bool	f_debug = CF_DEBUG ;	/* <- module-linkage */
 
 
 /* exported variables */
@@ -140,8 +142,8 @@ export {
 	int		ai ;		/* argument-index */
 	int		aie ;		/* argument-index-end - end options */
 	int		cntpos ;
-	bool		argoptdone{} ;	/* internally used flag */
-	bool		haveargoptval ;	/* public flag indicating arg-opt-val */
+	bool		fargoptdone{} ;	/* public flag */
+	bool		fargoptval ;	/* public flag indicating arg-opt-val */
 	argmgr(int ac = 0,mainv av = nullptr) noex : argc(ac), argv(av) {
 	    start	(this,argmgrmem_start) ;
 	    finish	(this,argmgrmem_finish) ;
@@ -164,8 +166,8 @@ export {
 	int present(int) noex ;
 	argmgr_iter begin() noex ;
 	argmgr_iter end() noex ;
-	operator int () noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	destruct argmgr() {
 	    if (magic) dtor() ;
 	} ;
