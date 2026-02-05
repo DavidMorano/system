@@ -44,7 +44,9 @@
 
 #include	"biblecur.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstrw(eu)| */
 
 /* local defines */
 
@@ -68,7 +70,7 @@ template<typename ... Args>
 static int biblecur_ctor(biblecur *op,Args ... args) noex {
     	BIBLECUR	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -77,7 +79,7 @@ static int biblecur_ctor(biblecur *op,Args ... args) noex {
 
 static int biblecur_dtor(biblecur *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -87,7 +89,7 @@ static int biblecur_dtor(biblecur *op) noex {
 template<typename ... Args>
 static inline int biblecur_magic(biblecur *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == BIBLECUR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
