@@ -54,6 +54,9 @@
 #include	"bvi.h"
 #include	"bvimk.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
