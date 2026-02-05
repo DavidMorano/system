@@ -71,13 +71,15 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<endian.h>
+#include	<estrings.h>
 #include	<vecobj.h>
 #include	<filer.h>
 #include	<opentmp.h>
@@ -87,6 +89,9 @@
 #include	"bpimk.h"
 #include	"bpihdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -105,30 +110,8 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy4(char *,int,const char *,const char *,cchar *,cchar *) ;
-extern int	sncpy5(char *,int,cchar *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf3(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,uint *) ;
-extern int	getpwd(char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	filer_writefill(FILER *,const char *,int) ;
-extern int	isNotPresent(int) ;
-
 #if	CF_DEBUGS
-extern int	snopenflags(char *,int,int) ;
-extern int	debugprintf(cchar *,...) ;
+extern int	debugprintf(cchar *,...) noex ;
 #endif
 
 
@@ -456,7 +439,7 @@ static int bpimk_filesbegincreate(BPIMK *op,cchar *tfn,int of,mode_t om)
 #if	CF_DEBUGS
 	{
 	    char	obuf[100+1] ;
-	    snopenflags(obuf,100,of) ;
+	    snflagsopen(obuf,100,of) ;
 	    debugprintf("bpimk_filesbegincreate: ent of=%s\n",obuf) ;
 	    debugprintf("bpimk_filesbegincreate: om=%05o\n",om) ;
 	}
