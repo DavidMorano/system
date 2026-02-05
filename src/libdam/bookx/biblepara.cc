@@ -22,22 +22,15 @@
 	This module implements an interface (a trivial one) that allows access
 	to the BIBLEPARA datbase.
 
-
 *******************************************************************************/
 
-
-#define	BIBLEPARA_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
@@ -45,6 +38,9 @@
 #include	"biblepara.h"
 #include	"bibleparas.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
