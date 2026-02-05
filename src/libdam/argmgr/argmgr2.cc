@@ -40,7 +40,9 @@ module ;
 #include	<usysrets.h>
 #include	<localmisc.h>
 
-#pragma		GCC dependency	"mod/debug.ccm"
+#include	"argmgr.h"
+
+#pragma		GCC dependency		"mod/debug.ccm"
 
 module argmgr ;
 
@@ -58,13 +60,13 @@ import debug ;
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
 /* forward references */
-
-
-/* forward refernces */
 
 
 /* local variables */
@@ -80,14 +82,16 @@ import debug ;
 
 argmgr_iter argmgr::begin() noex {
     	argmgr_iter	res(this,0) ;
-	cchar		*ap = nullptr ;
-	if (cint rs = get(1,&ap) ; rs > 0) {
-	    if_constexpr (f_debug) {
+	int		rs ;
+	DEBPR("ent\n") ;
+	if (cchar *ap = nullptr ; (rs = get(1,&ap)) > 0) {
+	    {
 		cchar *fmt = "rs=%d ap=%s\n" ;
-	        debprintf(__func__,fmt,rs,((ap) ? "ok" : "null")) ;
+	        DEBPR(fmt,rs,((ap) ? "ok" : "null")) ;
 	    }
 	    if (ap) res.ai = rs ;
 	} /* end if (get) */
+	DEBPR("ret rs=%d\n",rs) ;
 	return res ;
 } /* end method (argmgr::begin) */
 
