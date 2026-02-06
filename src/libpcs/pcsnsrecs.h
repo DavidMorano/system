@@ -1,4 +1,5 @@
 /* pcsnsrecs HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* PCS Name-Server Records */
@@ -14,9 +15,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<pq.h>
 
 
