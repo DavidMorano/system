@@ -1,4 +1,5 @@
 /* pcsmsg HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* messages for PCS requests-responses */
@@ -19,12 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<realname.h>
+#include	<usysbase.h>
 #include	<localmisc.h>		/* |USERNAMELEN| */
 
 
