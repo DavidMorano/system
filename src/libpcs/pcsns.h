@@ -1,5 +1,9 @@
 /* pcsns HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
+
+/* PCSNS object-load management */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,11 +20,8 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<modload.h>
 #include	<localmisc.h>
 
@@ -28,11 +29,10 @@
 #include	"pcsnsreq.h"
 
 
-#define	PCSNS_MAGIC	0x99447244
 #define	PCSNS		struct pcsns_head
 #define	PCSNS_CUR	struct pcsns_cursor
 #define	PCSNS_CALLS	struct pcsns_callsubs
-
+#define	PCSNS_MAGIC	0x99447244
 /* query options */
 #define	PCSNS_ONOSERV	PCSNSO_ONOSERV	/* do not call the server */
 #define	PCSNS_OPREFIX	PCSNSO_OPREFIX	/* prefix match */
@@ -41,7 +41,7 @@
 struct pcsns_cursor {
 	void	*scp ;		/* SO-cursor pointer */
 	uint	magic ;
-} ;
+} ; /* end struct (pcsns_cursor) */
 
 EXTERNC_begin
 struct pcsns_callsubs {
@@ -63,7 +63,7 @@ struct pcsns_head {
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
-} ;
+} ; /* end struct (pcsns_head) */
 
 typedef	PCSNS		pcsns ;
 typedef	PCSNS_CUR	pcsns_cur ;
