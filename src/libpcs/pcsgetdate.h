@@ -6,6 +6,16 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1994-02-01, David A­D­ Morano
+	This subroutine parses a date string, of a specified type,
+	into its componenent values.
+
+*/
+
+/* Copyright © 1994 David A­D­ Morano.  All rights reserved. */
+
 #ifndef	PCSGETDATE_INCLUDE
 #define	PCSGETDATE_INCLUDE
 #ifdef	__cplusplus /* C++ only) */
