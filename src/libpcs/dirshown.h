@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services
-	(RNS).
+	= 1995-05-01, David A­D­ Morano
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DIRSHOWN_INCLUDE
 #define	DIRSHOWN_INCLUDE
