@@ -6,6 +6,16 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-01-01, David A­D­ Morano
+	This subroutine was written to replace the previous one.
+	This version simply calls |timestr_edate()|.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
 #ifndef	DATESTR_INCLUDE
 #define	DATESTR_INCLUDE
 
