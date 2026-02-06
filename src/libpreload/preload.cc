@@ -1,4 +1,5 @@
 /* preload SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* set or get some program (process) data */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	preload
+
+	Description:
 	We serve out some (meant to be) preloaded subroutines.
 
 *******************************************************************************/
@@ -28,7 +33,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<atomic>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<ptc.h>
@@ -69,8 +77,8 @@ extern "C" {
 /* local structures */
 
 struct preload_head {
-	ptm		m ;		/* data mutex */
-	ptc		c ;		/* condition variable */
+	ptm		mx ;		/* data mutex */
+	ptc		cn ;		/* condition variable */
 	varray		*ents ;
 	atomic_int	waiters ;
 	volatile int	fvoid ;
@@ -127,26 +135,28 @@ int preload_init() noex {
 	if (! uip->fvoid) {
 	    rs = SR_OK ;
 	    if (! uip->f_init) {
+	    	ptm *mxp = &uip->mx ;
 	        uip->f_init = true ;
-	        if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
-	            if ((rs = ptc_create(&uip->c,nullptr)) >= 0) {
-	    	        void	(*b)() = preload_atforkbefore ;
-	    	        void	(*a)() = preload_atforkafter ;
-	                if ((rs = uc_atfork(b,a,a)) >= 0) {
+	        if ((rs = mxp->create) >= 0) {
+	            ptc *cnp = &uip->cn ;
+	            if ((rs = cnp->create) >= 0) {
+	    	        void_f b = preload_atforkbefore ;
+	    	        void_f a = preload_atforkafter ;
+	                if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	                    if ((rs = uc_atexit(preload_fini)) >= 0) {
 	                        rs = 1 ;
 	                        uip->f_initdone = true ;
 	                    }
 	                    if (rs < 0) {
-	                        uc_atforkexpunge(b,a,a) ;
+	                        uc_atforkexp
 			    }
 	                } /* end if (uc_atfork) */
 	                if (rs < 0) {
-	                    ptc_destroy(&uip->c) ;
+	                    cnp->destroy() ;
 		        }
 	            } /* end if (ptc_create) */
 	            if (rs < 0) {
-	                ptm_destroy(&uip->m) ;
+	                mxp->destroy() ;
 		    }
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
@@ -177,15 +187,17 @@ int preload_fini() noex {
 	    {
 	        void_f	b = preload_atforkbefore ;
 	        void_f	a = preload_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptc_destroy(&uip->c) ;
+	        ptc *cnp = &uip->cn ;
+	        rs1 = cnp->destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(&uip->m) ;
+	    	ptm *mxp = &uip->mx ;
+	        rs1 = mxp->destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    uip->f_init = false ;
@@ -325,18 +337,22 @@ static int preload_entryntfins(preload *uip) noex {
 /* end subroutine (preload_entryntfins) */
 
 static int preload_capbegin(preload *uip,int to) noex {
+	ptm		*mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lockto(&uip->m,to)) >= 0) {
-	    uip->waiters += 1 ;
-	    while ((rs >= 0) && uip->f_capture) { /* busy */
-	        rs = ptc_waiter(&uip->c,&uip->m,to) ;
-	    } /* end while */
-	    if (rs >= 0) {
-	        uip->f_capture = true ;
-	    }
-	    uip->waiters -= 1 ;
-	    rs1 = ptm_unlock(&uip->m) ;
+	if ((rs = mxp->lockbegin) >= 0) {
+	    {
+	        ptc *cnp = &uip->cn ;
+	        uip->waiters += 1 ;
+	        while ((rs >= 0) && uip->f_capture) { /* busy */
+	            rs = cnp->waiter(mxp,to) ;
+	        } /* end while */
+	        if (rs >= 0) {
+	            uip->f_capture = true ;
+	        }
+	        uip->waiters -= 1 ;
+	    } /* end block */
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -344,14 +360,18 @@ static int preload_capbegin(preload *uip,int to) noex {
 /* end subroutine (preload_capbegin) */
 
 static int preload_capend(preload *uip) noex {
+	ptm		*mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lock(&uip->m)) >= 0) {
-	    uip->f_capture = false ;
-	    if (uip->waiters > 0) {
-	        rs = ptc_signal(&uip->c) ;
-	    }
-	    rs1 = ptm_unlock(&uip->m) ;
+	if ((rs = mxp->lockbegin) >= 0) {
+	    {
+	        ptc *cnp = &uip->cn ;
+	        uip->f_capture = false ;
+	        if (uip->waiters > 0) {
+	            rs = cnp->signal ;
+	        }
+	    } /* end block */
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -431,8 +451,10 @@ static int entry_finish(preload_ent *ep) noex {
 
 static int entry_reload(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if (ep->vp != nullptr) {
-	    rs = lm_free(ep->vp) ;
+	    rs1 = lm_free(ep->vp) ;		/* checked ok */
+	    if (rs >= 0) rs = rs1 ;
 	    ep->vp = nullptr ;
 	}
 	if (rs >= 0) {
