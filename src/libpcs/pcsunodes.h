@@ -3,7 +3,14 @@
 /* lang=C++20 (conformance reviewed) */
 
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 2000-09-10, Dave Morano
+	This program was originally written.
+
+*/
+
+/* Copyright © 2000 David A-D- Morano.  All rights reserved. */
 
 #ifndef	PCSUNODES_INCLUDE
 #define	PCSUNODES_INCLUDE
