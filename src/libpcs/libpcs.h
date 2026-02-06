@@ -23,7 +23,6 @@
 #include	<clanguage.h>
 #include	<usysnase.h>
 
-#include	<pcsconf_config.h>
 #include	<pcsconfs.h>
 #include	<pcsopendircache.h>
 #include	<pcsngdname.h>
@@ -43,14 +42,21 @@
 #include	<pcsuserfile.h>
 #include	<pcsgetserial.h>
 #include	<pcsgetnames.h>
+#include	<pcsgetdate.h>
 #include	<pcsmsgid.h>
 #include	<pcsmailhost.h>
+#include	<pcstrustuser.h>
 
 #include	<mkdirlist.h>
 #include	<artlist.h>
 #include	<article.h>
 #include	<dirshown.h>
 
+#include	<monthname.h>
+#include	<mheader.h>
+#include	<hmatch.h>
+
+#include	<errfile.h>
 #include	<datestr.h>
 
 
