@@ -1,4 +1,5 @@
 /* pcsnso HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* PCS-NAME-SERVER query database manager */
@@ -12,25 +13,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<ucentpw.h>
 #include	<ids.h>
 #include	<pcsnsc.h>
-#include	<localmisc.h>
 
 #include	"pcsnsreq.h"
 
 
-#define	PCSNSO_MAGIC	0x99889298
 #define	PCSNSO		struct pcsnso_head
 #define	PCSNSO_CUR	struct pcsnso_cursor
 #define	PCSNSO_OBJ	struct pcsnso_object
 #define	PCSNSO_FL	struct pcsnso_flags
 #define	PCSNSO_PWD	struct pcsnso_pwdir
 #define	PCSNSO_TO	7
+#define	PCSNSO_MAGIC	0x99889298
 
 /* query options */
 #define	PCSNSO_ONOSERV	(1<<0)		/* do not call the server */
@@ -41,30 +39,30 @@ struct pcsnso_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct pcsnso_cursor {
 	uint		*verses ;		/* file-offsets to tags */
 	uint		nverses ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct pcsnso_flags {
 	uint		id:1 ;			/* text-index */
 	uint		client:1 ;		/* client */
 	uint		server:1 ;		/* server */
-} ;
+} ; /* end struct */
 
-struct pcsnso_pwd {
+struct pcsnso_pwdir {
 	char		*pwbuf ;
-	PASSWD		pw ;
+	ucentpw		pw ;
 	int		pwlen ;
-} ;
+} ; /* end struct (pcsnso_pwdir) */
 
 struct pcsnso_head {
 	cchar		*a ;			/* memory allocation */
 	cchar		*pr ;			/* stored argument */
-	PCSNSO_FL	f, open ;
+	PCSNSO_FL	fl, open ;
 	PCSNSO_PWD	pwd ;
 	ids		id ;
 	PCSNSC		client ;		/* the PCS-client object */
@@ -72,7 +70,7 @@ struct pcsnso_head {
 	uint		magic ;
 	int		ncursors ;
 	int		opts ;
-} ;
+} ; /* end struct (pcsnso_head) */
 
 typedef	PCSNSO		pcsnso ;
 typedef	PCSNSO_CUR	pcsnso_cur ;
