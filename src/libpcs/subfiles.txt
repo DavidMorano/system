@@ -12,6 +12,7 @@ pcsgetserial
 pcsgetnames
 pcsmsgid
 pcsmailhost
+pcstrustuser
 
 datestr_envelope
 datestr_header
