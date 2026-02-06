@@ -28,10 +28,10 @@
 
 	Synopsis:
 	int pcsmailcheck(pr,rbuf,rlen,un)
-	const char	pr[] ;
+	cchar	pr[] ;
 	char		rbuf[] ;
 	int		rlen ;
-	const char	un[] ;
+	cchar	un[] ;
 
 	Arguments:
 	pr		PCS system program root (if available)
@@ -78,7 +78,8 @@
 #include	<cstdlib>		/* for 'getenv(3c)' maybe others */
 #include	<cstddef>		/* for 'wchar_t' */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<vecstr.h>
 #include	<dirlist.h>
@@ -87,6 +88,8 @@
 #include	<mailbox.h>
 #include	<hdrdecode.h>
 #include	<localmisc.h>
+
+#include	"pcsmailcheck.h"
 
 
 /* local defines */
@@ -137,32 +140,10 @@
 
 /* external subroutines */
 
-extern int	snwcpywidehdr(char *,int,const wchar_t *,int) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mknpath1(char *,int,const char *) ;
-extern int	mknpath2(char *,int,const char *,const char *) ;
-extern int	pathadd(char *,int,cchar *) ;
-extern int	sfsubstance(const char *,int,const char **) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getuid_name(cchar *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isOneOf(const int *,int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
 /* external variables */
@@ -177,9 +158,9 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	const char	*pr ;
-	const char	*varusername ;
-	const char	*username ;
+	cchar	*pr ;
+	cchar	*varusername ;
+	cchar	*username ;
 	char		*a ;		/* allocation reference point */
 	char		*rbuf ;		/* supplied argument */
 	char		*fbuf ;		/* allocated */
@@ -212,10 +193,10 @@ static int	subinfo_getsysmail(SUBINFO *) ;
 static int	subinfo_mailfile(SUBINFO *) ;
 
 static int	maildirs(SUBINFO *) ;
-static int	maildirs_varmaildirs(SUBINFO *,const char *) ;
-static int	maildirs_varmail(SUBINFO *,const char *) ;
-static int	maildirs_default(SUBINFO *,const char *) ;
-static int	maildirs_add(SUBINFO *,const char *,int) ;
+static int	maildirs_varmaildirs(SUBINFO *,cchar *) ;
+static int	maildirs_varmail(SUBINFO *,cchar *) ;
+static int	maildirs_default(SUBINFO *,cchar *) ;
+static int	maildirs_add(SUBINFO *,cchar *,int) ;
 
 
 /* local variables */
@@ -225,22 +206,22 @@ static int	(*getmails[])(SUBINFO *) = {
 	NULL
 } ;
 
-static const int	rsdirs[] = {
+constexpr int	rsdirs[] = {
 	SR_ACCESS,
 	SR_NOENT,
 	SR_NAMETOOLONG,
 	SR_NOLINK,
 	SR_NOTDIR,
 	0
-} ;
+} ; /* end array (rsdirs) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int pcsmailcheck(cchar *pr,char *dbuf,int dlen,cchar *un)
-{
-	SUBINFO		si ;
+int pcsmailcheck(cchar *pr,char *dbuf,int dlen,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -261,6 +242,7 @@ int pcsmailcheck(cchar *pr,char *dbuf,int dlen,cchar *un)
 	if (pr == NULL) return SR_FAULT ;
 
 	dbuf[0] = '\0' ;
+	SUBINFO si ;
 	if ((rs = subinfo_start(&si,pr,dbuf,dlen,un)) >= 0) {
 	    if ((rs = subinfo_getfrom(&si)) >= 0) {
 		n = rs ;
@@ -380,7 +362,7 @@ static int subinfo_userself(SUBINFO *sip)
 	int		rs = SR_OK ;
 
 	if (! sip->init.userself) {
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    sip->init.userself = TRUE ;
 	    if (((cp = getenv(sip->varusername)) != NULL) &&
@@ -612,7 +594,7 @@ static int maildirs(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((rs >= 0) && ((cp = getenv(VARMAILDNAME)) != NULL)) {
 	    rs = maildirs_varmaildirs(sip,cp) ;
@@ -661,7 +643,7 @@ static int maildirs_varmaildirs(SUBINFO *sip,cchar *sp)
 	int		rs = SR_OK ;
 	int		sl, cl ;
 	int		c = 0 ;
-	const char	*tp, *cp ;
+	cchar	*tp, *cp ;
 
 	if (vlp == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
