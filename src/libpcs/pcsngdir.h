@@ -1,4 +1,5 @@
-/* useraccdb HEADER */
+/* pcsngdir HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* calculate the directory for a PCS Newsgroup */
@@ -10,8 +11,10 @@
 #ifndef	PCSNGDIR_INCLUDE
 #define	PCSNGDIR_INCLUDE
 
+
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
