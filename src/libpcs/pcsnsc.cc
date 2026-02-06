@@ -13,8 +13,9 @@
 	This object module was first written.
 
 	= 2011-01-25, David A­D­ Morano
-	I added the capability to also send the 'mark', 'report', and 'exit'
-	commands to the server.  Previously these were not implemented here.
+	I added the capability to also send the 'mark', 'report',
+	and 'exit' commands to the server.  Previously these were
+	not implemented here.
 
 */
 
@@ -22,8 +23,8 @@
 
 /*******************************************************************************
 
-        This module mediates (as a sort of client) the interactions with the PCS
-        server.
+	This module mediates (as a sort of client) the interactions
+	with the PCS server.
 
 
 *******************************************************************************/
@@ -71,16 +72,8 @@
 #define	TMPDNAME	"/tmp"
 #endif
 
-#ifndef	COLUMNS
-#define	COLUMNS		80
-#endif
-
 #ifndef	MSGBUFLEN
 #define	MSGBUFLEN	2048
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
 #define	OPTBUFLEN	(DIGBUFLEN + 4)
@@ -92,31 +85,10 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isFailConn(int) ;
-extern int	isBadSend(int) ;
-extern int	isBadRecv(int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
 extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -127,22 +99,22 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	pcsnsc_setbegin(PCSNSC *,cchar *) ;
-static int	pcsnsc_setend(PCSNSC *) ;
-static int	pcsnsc_srvdname(PCSNSC *,char *) ;
-static int	pcsnsc_srvfname(PCSNSC *,cchar *) ;
-static int	pcsnsc_bind(PCSNSC *,int,cchar *) ;
-static int	pcsnsc_bufbegin(PCSNSC *) ;
-static int	pcsnsc_bufend(PCSNSC *) ;
-static int	pcsnsc_connect(PCSNSC *) ;
-static int	pcsnsc_istatus(PCSNSC *,PCSNSC_STATUS *) ;
+static int	pcsnsc_setbegin(PCSNSC *,cchar *) noex ;
+static int	pcsnsc_setend(PCSNSC *) noex ;
+static int	pcsnsc_srvdname(PCSNSC *,char *) noex ;
+static int	pcsnsc_srvfname(PCSNSC *,cchar *) noex ;
+static int	pcsnsc_bind(PCSNSC *,int,cchar *) noex ;
+static int	pcsnsc_bufbegin(PCSNSC *) noex ;
+static int	pcsnsc_bufend(PCSNSC *) noex ;
+static int	pcsnsc_connect(PCSNSC *) noex ;
+static int	pcsnsc_istatus(PCSNSC *,PCSNSC_STATUS *) noex ;
 
 #ifdef	COMMENT
-static int	pcsnsc_spawn(PCSNSC *) ;
-static int	pcsnsc_envload(PCSNSC *,ENVMGR *) ;
+static int	pcsnsc_spawn(PCSNSC *) noex ;
+static int	pcsnsc_envload(PCSNSC *,ENVMGR *) noex ;
 #endif
 
-static int	mksrvdname(char *,cchar *,cchar *,cchar *) ;
+static int	mksrvdname(char *,cchar *,cchar *,cchar *) noex ;
 
 
 /* local variables */
@@ -161,14 +133,15 @@ static const char	*prbins[] = {
 PCSNSC_OBJ	pcsnsc = {
 	"pcsnsc",
 	sizeof(PCSNSC)
-} ;
+} ; /* end if (object) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int pcsnsc_open(PCSNSC *op,cchar *pr,int to)
-{
+int pcsnsc_open(PCSNSC *op,cchar *pr,int to) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
