@@ -1,4 +1,5 @@
 /* pcsgetorg SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the PCS organization */
@@ -38,7 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"pcsgetorg.h"
