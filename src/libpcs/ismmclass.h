@@ -1,4 +1,5 @@
 /* ismmclass HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* character classes for mail content purposes */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	ismmclass
+
+	Description:
 	These subroutines check a character to see if it is part
 	of a special character class.  See the code for details!
 
