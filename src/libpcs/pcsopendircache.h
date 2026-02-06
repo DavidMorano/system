@@ -1,4 +1,5 @@
 /* pcsopendircache HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* open a channel (file-descriptor) to the directory-cache of a directory */
