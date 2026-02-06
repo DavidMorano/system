@@ -8,12 +8,14 @@
 
 /* revision history:
 
-	= 1998-04-13, David A-D- Morano
-	Originally written for Rightcore Network Services.
+	= 1994-04-13, David A­D­ Morano
+	This is new so that we can track directory visits for
+	duplicates.
+
 
 */
 
-/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1994 David A­D­ Morano.  All rights reserved. */
 /* Use is subject to license terms. */
 
 #ifndef	MKDIRLIST_INCLUDE
