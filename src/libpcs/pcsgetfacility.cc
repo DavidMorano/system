@@ -1,9 +1,9 @@
-/* pcsgetfacility */
+/* pcsgetfacility SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-/* get the facility name for PCS */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* get the "facility" name of the for the PCS distribution */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,34 +12,32 @@
 	This code was originally written.
 
 	= 2017-11-22, David A­D­ Morano
-        I changed this to use the PCSNS (PCS Name-Server) object. This allows
-        for both system-wide and local process caching.
+	I changed this to use the PCSNS (PCS Name-Server) object.
+	This allows for both system-wide and local process caching.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Name:
+	pcsgetfacility
+
+	Description:
 	This subroutine retrieves the facility string for PCS.
 
 	Synopsis:
-
-	int pcsgetfacility(pr,rbuf,rlen)
-	const char	pr[] ;
-	char		rbuf[] ;
-	int		rlen ;
+	int pcsgetfacility(cchar *pr,char *rbuf,int rlen) noex
 
 	Arguments:
-
 	pr		PCS system program root (if available)
-	rbuf		buffer to hold result
-	rlen		length of supplied result buffer
+	rbuf		result buffer pointer
+	rlen		result buffer length
 
 	Returns:
-
 	>=0		OK
-	<0		some error
+	<0		error (system-return)
 
 	Notes:
 
@@ -50,21 +48,25 @@
 	A. We simply use the "fullname" of the user 'pcs' (or whatever the
 	   PCS username is) as the "facility string."
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<strdcpy.h>
+#include	<strwcpy.h>		/* |strwcpylc(3uc)| */
 #include	<pcsns.h>
+#include	<isoneof.h>
 #include	<localmisc.h>
+
+#include	"pcsgetfacility.h"
 
 
 /* local defines */
@@ -80,35 +82,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mknpath2(char *,int,const char *,const char *) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	getgecosname(const char *,int,const char **) ;
-extern int	mkgecosname(char *,int,const char *) ;
-extern int	mkrealname(char *,int,const char *,int) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	hasalldig(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isOneOf(const int *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-
 
 /* external variables */
 
@@ -121,7 +94,7 @@ extern char	*strdcpy1(char *,int,const char *) ;
 
 /* local variables */
 
-static const int	nots[] = {
+constexpr int		rsnots[] = {
 	SR_DOM,
 	SR_ACCESS,
 	SR_NOTFOUND,
@@ -129,45 +102,45 @@ static const int	nots[] = {
 	SR_NAMETOOLONG,
 	SR_RANGE,
 	0
-} ;
+} ; /* end array (rsnots) */
+
+cchar		prname[]	= VARPRPCS ;
+cchar		facility[]	= PCSFACILITY ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int pcsgetfacility(cchar *pr,char *rbuf,int rlen)
-{
-	PCSNS		ns ;
-	const int	ulen = USERNAMELEN ;
-	int		rs ;
+int pcsgetfacility(cchar *pr,char *rbuf,int rlen) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		rl = 0 ;
-	cchar		*prname = VARPRPCS ;
-	char		ubuf[USERNAMELEN+1] ;
-
-	rbuf[0] = '\0' ;
-	strwcpylc(ubuf,prname,ulen) ; /* get lower-case */
-
-	if ((rs = pcsns_open(&ns,pr)) >= 0) {
-	    const int	w = pcsnsreq_fullname ;
-	    if ((rs = pcsns_get(&ns,rbuf,rlen,ubuf,w)) >= 0) {
-		rl = rs ;
-#if	CF_DEBUGS
-		debugprintf("pcsgetfacility: pcsns_get() rs=%d\n",rs) ;
-#endif
-	    } else if (isOneOf(nots,rs)) {
-		cchar	*facility = PCSFACILITY ;
-		rs = (strdcpy1(rbuf,rlen,facility) - rbuf) ;
-		rl = rs ;
-	    }
-	    rs1 = pcsns_close(&ns) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (pcsns) */
-
-#if	CF_DEBUGS
-	debugprintf("pcsgetfacility: ret rs=%d rl=%u\n",rs,rl) ;
-#endif
-
+	int		rl = 0 ; /* return-value */
+	if (pr && rbuf) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (pr[0]) {
+	        if (char *ubuf ; (rs = lm_un(&ubuf)) >= 0) {
+	            cint ulen = rs ;
+	            strwcpylc(ubuf,prname,ulen) ; /* get lower-case */
+	            if (PCSNS ns ; (rs = pcsns_open(&ns,pr)) >= 0) {
+	                cint	w = pcsnsreq_fullname ;
+	                if ((rs = pcsns_get(&ns,rbuf,rlen,ubuf,w)) >= 0) {
+		            rl = rs ;
+	                } else if (isOneOf(rsnots,rs)) {
+			    cchar *p = strdcpy1(rbuf,rlen,facility) ;
+		            rs = intconv(p - rbuf) ;
+		            rl = rs ;
+	                }
+	                rs1 = pcsns_close(&ns) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (pcsns) */
+		    rs1 = lm_free(ubuf) ;
+	            if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (pcsgetfacility) */
