@@ -8,12 +8,13 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
-	Originally written for Rightcore Network Services.
+	= 1995-05-01, David A­D­ Morano
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ARTICLE_INCLUDE
 #define	ARTICLE_INCLUDE
