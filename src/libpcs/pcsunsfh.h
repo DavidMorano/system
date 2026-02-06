@@ -1,18 +1,19 @@
-/* pcsunsfh */
+/* pcsunsfh HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 
 #ifndef	PCSUNSFH_INCLUDE
-#define	PCSUNSFH_INCLUDE	1
+#define	PCSUNSFH_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	PCSUNSFH		struct pcsunsfh
@@ -51,16 +52,11 @@ struct pcsunsfh {
 	uchar		vetu[4] ;
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int pcsunsfh(PCSUNSFH *,int,char *,int) noex ;
 
-extern int pcsunsfh(PCSUNSFH *,int,char *,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PCSUNSFH_INCLUDE */
