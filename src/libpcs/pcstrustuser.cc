@@ -1,13 +1,10 @@
-/* pcstrustuser */
+/* pcstrustuser SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* is a user a PCS-trusted user */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable */
-#define	CF_PCSGROUP	1		/* include pcs-group check */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -24,13 +21,17 @@
 	subroutine substantially and making it into a more simple
 	process of finding whether a username can be trusted or
 	not.  It is not like this subroutine is used everywhere, so
-	let us not overdue this whole process.
+	let us not overdue this whole process (overly prioritizing
+	performace over simplicity).
 
 */
 
 /* Copyright © 1998,2013 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	pcstrustuser
 
   	Description:
 	This subroutine checks to see if a user is a PCS-trusted user.
@@ -52,49 +53,41 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<csignal>
-#include	<unistd.h>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<getpwx.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>		/* |strcmp(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucentpw.h>
+#include	<ucentgr.h>
 #include	<getbufsize.h>
 #include	<getusername.h>
 #include	<getax.h>
+#include	<getpwx.h>
+#include	<mkpathx.h>
 #include	<strwcpy.h>
 #include	<vecstr.h>
+#include	<matstr.h>
+#include	<permx.h>
+#include	<isnot.h>		/* |isNotPresent(3uc)| */
 #include	<localmisc.h>
 
+#include	"pcstrustuser.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
-
 #define	TRUSTFNAME	"trusted"
 
-#define	SUBINFO		struct subinfo
+#define	SI		subinfo
 
 
 /* external subroutines */
-
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,cchar *) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	isNotPresent(int) ;
 
 
 /* external variables */
@@ -102,19 +95,20 @@ extern int	isNotPresent(int) ;
 
 /* local structures */
 
-struct subinfo_flags {
+struct subinfo_fl {
 	uint		id_pr:1 ;
 	uint		id_un:1 ;
-} ;
+} ; /* end struct (subinfo_fl) */
 
 struct subinfo {
-	cchar	*pr ;		/* passed argument */
-	cchar	*un ;		/* passed argument */
-	struct subinfo_flags	f ;
+	cchar		*pr ;		/* passed argument */
+	cchar		*un ;		/* passed argument */
+	char		*unbuf ;
+	subinfo_fl	fl ;
 	uid_t		uid_pr, uid_un ;
 	gid_t		gid_pr, gid_un ;
-	char		unbuf[USERNAMELEN+1] ;
-} ;
+	int		unlen ;
+} ; /* end struct (subinfo) */
 
 
 /* local typedefs */
@@ -122,20 +116,21 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *,cchar *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_idpr(SUBINFO *) ;
-static int	subinfo_idun(SUBINFO *) ;
-static int	subinfo_listdb(SUBINFO *) ;
-static int	subinfo_filedb(SUBINFO *) ;
+local int	subinfo_start(SI *,cchar *,cchar *) noex ;
+local int	subinfo_finish(SI *) noex ;
+local int	subinfo_idpr(SI *) noex ;
+local int	subinfo_idun(SI *) noex ;
+local int	subinfo_listdb(SI *) noex ;
+local int	subinfo_filedb(SI *) noex ;
+local int	subinfo_filedbx(SI *,vecstr *,char *,int) noex ;
+local int	subinfo_prgroup(SI *) noex ;
 
-#if	CF_PCSGROUP
-static int	subinfo_prgroup(SUBINFO *) ;
-#endif
+typedef int (*subinfo_f)(subinfo *) noex ;
+
 
 /* local variables */
 
-static cchar	*trustedusers[] = {
+constexpr cpcchar	trustedusers[] = {
 	"root",
 	"uucp",
 	"nuucp",
@@ -148,193 +143,182 @@ static cchar	*trustedusers[] = {
 	"genserv",
 	"local",
 	"ncmp",
-	"dam",
-	"morano",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
-static cchar	*sched[] = {
+constexpr cpcchar	sched[] = {
 	"%r/etc/pcs.%f",
 	"%r/etc/%f",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
-static int	(*tries[])(SUBINFO *) = {
+constexpr subinfo_f	tries[] = {
 	subinfo_listdb,
-#if	CF_PCSGROUP
 	subinfo_prgroup,
-#endif
 	subinfo_filedb,
-	NULL
-} ;
+	nullptr
+} ; /* end array (tries) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int pcstrustuser(cchar pr[],cchar un[])
-{
-	SUBINFO		si ;
-	int		rs ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-	if (un[0] == '\0') return SR_INVALID ;
-
-	if ((rs = subinfo_start(&si,pr,un)) >= 0) {
-	    int	i ;
-
-	    for (i = 0 ; (rs >= 0) && (tries[i]) != NULL; i += 1) {
-	        rs = (*tries[i])(&si) ;
-	        if (rs > 0) break ;
-	    }
-
-	    subinfo_finish(&si) ;
-	} /* end if (subinfo) */
-
-	return rs ;
+int pcstrustuser(cchar *pr,cchar *un) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		f = false ; /* return-value */
+	if (pr && un) {
+	    rs = SR_INVALID ;
+	    if (pr[0] && un[0]) {
+	        if (SI si ; (rs = subinfo_start(&si,pr,un)) >= 0) {
+	            for (int i = 0 ; (rs >= 0) && tries[i] ; i += 1) {
+	                rs = (*tries[i])(&si) ;
+			f = rs ;
+	                if (rs != 0) break ;
+	            } /* end for */
+	            rs1 = subinfo_finish(&si) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (pcstrustuser) */
 
 
 /* local subroutines */
 
-
-static int subinfo_start(SUBINFO *sip,cchar *pr,cchar *un)
-{
+local int subinfo_start(SI *sip,cchar *pr,cchar *un) noex {
 	int		rs = SR_OK ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->pr = pr ;
 	sip->un = un ;
 	sip->uid_pr = -1 ;
 	sip->gid_pr = -1 ;
 	sip->uid_un = -1 ;
 	sip->gid_un = -1 ;
-
+	if (char *p ; (rs = lm_un(&p)) >= 0) {
+	    sip->unbuf = p ;
+	    sip->unlen = rs ;
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
-
-	if (sip == NULL) return SR_FAULT ;
-
-	return SR_OK ;
+local int subinfo_finish(SI *sip) noex {
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (sip) {
+	    rs = SR_OK ;
+	    if (sip->unbuf) {
+		rs1 = lm_free(sip->unbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+		sip->unbuf = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_listdb(SUBINFO *sip)
-{
+local int subinfo_listdb(SI *sip) noex {
 	int		rs = SR_OK ;
-	cchar	*un = sip->un ;
-
+	int		f = false ;
+	cchar		*un = sip->un ;
 	if (un[0] == '-') {
 	    rs = subinfo_idun(sip) ;
 	    un = sip->un ;
 	}
-
 	if (rs >= 0) {
-	    int	i = matstr(trustedusers,un,-1) ;
-	    if (i >= 0) rs = 1 ;
-	}
-
-	return rs ;
+	    f = (matstr(trustedusers,un,-1) >= 0) ;
+	} /* end if (ok) */
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (subinfo_listdb) */
 
-
-static int subinfo_filedb(SUBINFO *sip)
-{
-	VECSTR		svs ;
+local int subinfo_filedb(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
-	int		f = FALSE ;
-	cchar	*tfname = TRUSTFNAME ;
+	int		f = false ;
 	cchar	*pr = sip->pr ;
-	cchar	*un = sip->un ;
-
-	if ((rs = vecstr_start(&svs,6,0)) >= 0) {
-	    if ((rs = vecstr_envset(&svs,"r",pr,-1)) >= 0) {
-	        cint	tlen = MAXPATHLEN ;
-	        char		tbuf[MAXPATHLEN + 1] ;
-	        if ((rs1 = permsched(sched,&svs,tbuf,tlen,tfname,R_OK)) >= 0) {
-
-	            if (un[0] == '-') {
-	                rs = subinfo_idun(sip) ;
-	                un = sip->un ;
-	            }
-
-	            if (rs >= 0) {
-			VECSTR		tusers ;
-	                if ((rs = vecstr_start(&tusers,10,0)) >= 0) {
-
-	                    if ((rs = vecstr_loadfile(&tusers,0,tbuf)) >= 0) {
-	                        rs1 = vecstr_find(&tusers,un) ;
-	                        f = (rs1 >= 0) ;
-	                    }
-
-	                    vecstr_finish(&tusers) ;
-	                } /* end if (vecstr) */
-	            } /* end if (ok) */
-
+	if (vecstr svs ; (rs = svs.start(6,0)) >= 0) {
+	    if ((rs = svs.envset("r",pr,-1)) >= 0) {
+		if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+		    cint tlen = rs ;
+		    rs = subinfo_filedbx(sip,&svs,tbuf,tlen) ;
+		    f = rs ;
 	        } /* end if (successful permsched) */
 	    } /* end if (vecstr_envset) */
-	    rs1 = vecstr_finish(&svs) ;
+	    rs1 = svs.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (svs) */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (subinfo_filedb) */
 
+local int subinfo_filedbx(SI *sip,vecstr *svp,char *tbuf,int tlen) noex {
+    	cint		rsn = SR_NOTFOUND ;
+    	int		rs ;
+	int		rs1 ;
+	int		f = false ; /* return-value */
+	cchar		*tfname = TRUSTFNAME ;
+	cchar		*un = sip->un ;
+	if ((rs = permsched(sched,svp,tbuf,tlen,tfname,R_OK)) >= 0) {
+            if (un[0] == '-') {
+                rs = subinfo_idun(sip) ;
+                un = sip->un ;
+            }
+            if (rs >= 0) {
+                if (vecstr tu ; (rs = tu.start(10,0)) >= 0) {
+                    if ((rs = tu.loadfile(0,tbuf)) >= 0) {
+                        rs1 = tu.find(un) ;
+                        f = (rs1 >= 0) ;
+                    }
+                    rs1 = tu.finish ;
+		    if (rs >= 0) rs = rs1 ;
+                } /* end if (vecstr) */
+            } /* end if (ok) */
+	} else if (rs == rsn) {
+	    rs = SR_OK ;
+	} /* end if (permsched) */
+	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (subinfo_filedbx) */
 
-static int subinfo_idpr(SUBINFO *sip)
-{
+local int subinfo_idpr(SI *sip) noex {
 	int		rs = SR_OK ;
-
 	if (! sip->fl.id_pr) {
-	    ustat	sb ;
-	    cchar		*pr = sip->pr ;
-	    sip->fl.id_pr = TRUE ;
-	    if (u_stat(pr,&sb) >= 0) {
+	    cchar	*pr = sip->pr ;
+	    sip->fl.id_pr = true ;
+	    if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) {
 	        sip->uid_pr = sb.st_uid ;
 	        sip->gid_pr = sb.st_gid ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (subinfo_idpr) */
 
-
-static int subinfo_idun(SUBINFO *sip)
-{
+local int subinfo_idun(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-
 	if (! sip->fl.id_un) {
-	    struct passwd	pw ;
-	    cint		pwlen = getbufsize(bufsize_pw) ;
-	    cchar		*un = sip->un ;
-	    char		*pwbuf ;
-	    sip->fl.id_un = TRUE ;
-	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
+	    cchar	*un = sip->un ;
+	    sip->fl.id_un = true ;
+	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
+	        ucentpw		pw ;		/* used-multiple */
+		cint 		pwlen = rs ;	/* used-multiple */
 	        if (un[0] == '-') {
 	            if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
-			cint	ulen = USERNAMELEN ;
-			cchar		*un = pw.pw_name ;
-	                len = (strwcpy(sip->unbuf,un,ulen) - sip->unbuf) ;
+			cint	ulen = sip->unlen ;
+			un = pw.pw_name ;
+	                len = int(strwcpy(sip->unbuf,un,ulen) - sip->unbuf) ;
 	                sip->un = sip->unbuf ;
 		    }
 	        } else {
-	            rs = GETPW_NAME(&pw,pwbuf,pwlen,un) ;
+	            rs = getpwx_name(&pw,pwbuf,pwlen,un) ;
 	        }
 	        if (rs >= 0) {
 	            sip->uid_un = pw.pw_uid ;
@@ -342,55 +326,49 @@ static int subinfo_idun(SUBINFO *sip)
 	        } else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
 		}
-		rs1 = uc_free(pwbuf) ;
+		rs1 = lm_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a) */
-	} else if (sip->un != NULL) {
-	    len = strlen(sip->un) ;
+	} else if (sip->un != nullptr) {
+	    len = lenstr(sip->un) ;
 	} /* end if (needed) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_idun) */
 
-
-#if	CF_PCSGROUP
-
-static int subinfo_prgroup(SUBINFO *sip)
-{
+local int subinfo_prgroup(SI *sip) noex {
+    	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
-
-	if (! sip->fl.id_pr) rs = subinfo_idpr(sip) ;
-
-	if (! sip->fl.id_un) rs = subinfo_idun(sip) ;
-
+	int		rs1 ;
+	int		f = false ;
+	if ((rs >= 0) && (! sip->fl.id_pr)) {
+	    rs = subinfo_idpr(sip) ;
+	}
+	if ((rs >= 0) && (! sip->fl.id_un)) {
+	    rs = subinfo_idun(sip) ;
+	}
 	if ((rs >= 0) && (! f)) {
 	    f = (sip->gid_un == sip->gid_pr) ;
 	}
-
-/* check if username is in the PCS group */
-
+	/* check if username is in the PCS group */
 	if ((rs >= 0) && (! f)) {
-	    GROUP	gr ;
-	    cint		grlen = getbufsize(bufsize_gr) ;
-	    int			rs1 ;
-	    char		*grbuf ;
-	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
-	        if ((rs1 = uc_getgrgid(sip->gid_pr,&gr,grbuf,grlen)) >= 0) {
-	            for (int i = 0 ; gr.gr_mem[i] != NULL ; i += 1) {
+	    if (char *grbuf ; (rs = lm_gr(&grbuf)) >= 0) {
+		const gid_t gid = sip->gid_pr ;
+		cint grlen = rs ;
+	        if (ucentgr gr ; (rs = gr.getgid(grbuf,grlen,gid)) >= 0) {
+	            for (int i = 0 ; gr.gr_mem[i] ; i += 1) {
 	                f = (strcmp(gr.gr_mem[i],sip->un) == 0) ;
 	                if (f) break ;
-	            }
+	            } /* end for */
+		} else if (rs == rsn) {
+		    rs = SR_OK ;
 	        } /* end if (got a group for PR) */
-		uc_free(grbuf) ;
+		rs1 = lm_free(grbuf) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a) */
 	} /* end if */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (pcstrustuser) */
-
-#endif /* CF_PCSGROUP */
 
 
