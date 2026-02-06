@@ -1,4 +1,5 @@
 /* pcsns SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* PCSNS object-load management */
