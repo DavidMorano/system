@@ -1,12 +1,12 @@
-/* uucp */
+/* uucp SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* get a FD to a file from another host using UUCP */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_BDUMP	1		/* dump extraneous output */
-
 
 /* revision history:
 
@@ -19,34 +19,32 @@
 
 /*******************************************************************************
 
-        This subroutine opens a file on a remote machine using UUCP. If then
-        return an FD to the open file to caller.
+  	Name:
+	uucp
+
+	Description:
+	This subroutine opens a file on a remote machine using UUCP.
+	If then return an FD to the open file to caller.
 
 	Synopsis:
-
 	int uucp(rhost,filename,fd2p)
-	const char	rhost[] ;
-	const char	filename[] ;
+	cchar	rhost[] ;
+	cchar	filename[] ;
 	int		*fd2p ;
 
 	Arguments:
-
 	rhost		nodename of UUCP machine to contact
 	filename	filename on remote machine to write
 	fd2p		pointer to an integer to receive an FD to
 			standard error from queuing process
 
 	Returns:
-
 	>=0		FD to remote file
 	<0		error
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -55,10 +53,10 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<strings.h>		/* |strncasecmp(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -77,14 +75,14 @@
 /* external subroutines */
 
 #if	defined(BSD) && (! defined(EXTERN_STRNCASECMP))
-extern int	strncasecmp(const char *,const char *,int) ;
+extern int	strncasecmp(cchar *,cchar *,int) ;
 #endif
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
 extern char	*strshrink(char *) ;
@@ -95,7 +93,7 @@ extern char	*strshrink(char *) ;
 
 /* forward reference */
 
-static int	testuucp(const char *) ;
+local int	testuucp(cchar *) ;
 
 #if	CF_BDUMP
 static void	bdump(bfile *,bfile *) ;
@@ -105,17 +103,18 @@ static void	bdump(bfile *,bfile *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uucp(cchar *rhost,cchar *filename,int *fd2p)
-{
-	const mode_t	omode = (0600 | S_IFIFO) ;
+int uucp(cchar *rhost,cchar *filename,int *fd2p) noex {
+	cmode	omode = (0600 | S_IFIFO) ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		pipes[3][2] ;
 	int		pfd ;
-	const char	*cmd_uucp = PROG_UUCP ;
+	cchar	*cmd_uucp = PROG_UUCP ;
 	char		pfname[MAXPATHLEN + 1] ;
 	char		dst[DSTLEN + 1] ;
 
@@ -302,11 +301,8 @@ badpipes:
 
 /* local subroutines */
 
-
 /* check for UUCP availability */
-static int testuucp(queue_machine)
-const char	queue_machine[] ;
-{
+local int testuucp(cchar *queue_machine) {
 	bfile		file0, file2 ;
 	bfile		procfile, *pfp = &procfile ;
 	bfile		*fpa[3] ;
@@ -314,7 +310,7 @@ const char	queue_machine[] ;
 	int		rs = SR_OK ;
 	int		child_stat ;
 	int		i, j, l ;
-	const char	*cmd_uuname = PROG_UUNAME ;
+	cchar	*cmd_uuname = PROG_UUNAME ;
 	char		buf[NODENAMELEN + 1] ;
 	char		*cp ;
 
