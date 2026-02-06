@@ -1,4 +1,5 @@
 /* pcsngdname HEADER */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* create a directory name when given a newsgroup name */
@@ -13,9 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
