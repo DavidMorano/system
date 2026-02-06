@@ -40,19 +40,30 @@ MODS +=
 LIBS += -luo -lu
 
 
-OBJ0= pcsuserfile.o pcsmsgid.o
-OBJ1= pcsgetnames.o pcsgetserial.o
-OBJ2= pcsmailhost.o
-OBJ3= pcsconf.o pcsunodes.o
-OBJ4= mkdirlist.o dirshown.o
-OBJ5= datestr_envelope.o datestr_header.o
-OBJ6= artlist.o article.o
-OBJ7=
+OBJ00= pcsuserfile.o pcsmsgid.o
+OBJ01= pcsgetnames.o pcsgetserial.o
+OBJ02= pcsmailhost.o pcstrustuser.o
+OBJ03= pcsgetdate.o pcsgetorg.o
+OBJ04= pcsconf.o pcsunodes.o
+OBJ05= mkdirlist.o dirshown.o
+OBJ06= artlist.o article.o monthname.o
+OBJ07= datestr_envelope.o datestr_header.o
 
-OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o obj6.o
+OBJ08= pcsgetfacility.o
+OBJ09= errfile.o hmatch.o mheader.o
+OBJ10= bbhosts.o
+OBJ11=
+OBJ12=
+OBJ13=
+OBJ14=
+OBJ15=
 
-OBJ= obja.o objb.o
+OBJA= obj00.o obj01.o obj02.o obj03.o
+OBJB= obj04.o obj05.o obj06.o obj07.o
+OBJC= obj08.o obj09.o obj10.o
+OBJD=
+
+OBJ= obja.o objb.o objc.o
 
 
 INCDIRS=
@@ -104,7 +115,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
@@ -127,28 +138,53 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0)
+obj00.o:		$(OBJ00)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1.o:			$(OBJ1)
+obj01.o:		$(OBJ01)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2.o:			$(OBJ2)
+obj02.o:		$(OBJ02)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3.o:			$(OBJ3)
+obj03.o:		$(OBJ03)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4.o:			$(OBJ4)
+obj04.o:		$(OBJ04)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj5.o:			$(OBJ5)
+obj05.o:		$(OBJ05)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj6.o:			$(OBJ6)
+obj06.o:		$(OBJ06)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj7.o:			$(OBJ7)
+obj07.o:		$(OBJ07)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj08.o:		$(OBJ08)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj09.o:		$(OBJ09)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj10.o:		$(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj11.o:		$(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj12.o:		$(OBJ12)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj13.o:		$(OBJ13)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj14.o:		$(OBJ14)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj15.o:		$(OBJ15)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -156,6 +192,12 @@ obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc.o:			$(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -166,6 +208,7 @@ mkdirlist.o:		mkdirlist.cc	mkdirlist.h		$(INCS)
 artlist.o:		artlist.cc	artlist.h		$(INCS)
 article.o:		article.cc	article.h		$(INCS)
 dirshown.o:		dirshown.cc	dirshown.h		$(INCS)
+bbhosts.o:		bbhosts.cc	bbhosts.hh		$(INCS)
 
 # singles
 pcsuserfile.o:		pcsuserfile.cc	pcsuserfile.h		$(INCS)
@@ -173,8 +216,18 @@ pcsgetserial.o:		pcsgetserial.cc	pcsgetserial.h		$(INCS)
 pcsgetnames.o:		pcsgetnames.cc	pcsgetnames.h		$(INCS)
 pcsmsgid.o:		pcsmsgid.cc	pcsmsgid.h		$(INCS)
 pcsmailhost.o:		pcsmailhost.cc	pcsmailhost.h		$(INCS)
+pcstrustuser.o:		pcstrustuser.cc	pcstrustuser.h		$(INCS)
+pcsgetdate.o:		pcsgetdate.cc	pcsgetdate.h		$(INCS)
+pcsgetorg.o:		pcsgetorg.cc	pcsgetorg.h		$(INCS)
 
 datestr_envelope.o:	datestr_envelope.cc	datestr.h	$(INCS)
 datestr_header.o:	datestr_header.cc	datestr.h	$(INCS)
+
+pcsgetfacility.o:	pcsgetfacility.cc	pcsgetfacility.h	$(INCS)
+
+monthname.o:		monthname.cc		monthname.h		$(INCS)
+errfile.o:		errfile.cc		errfile.h		$(INCS)
+hmatch.o:		hmatch.cc		hmatch.h		$(INCS)
+mheader.o:		mheader.cc		mheader.h		$(INCS)
 
 
