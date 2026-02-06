@@ -2,8 +2,19 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* article list handling */
+/* version %I% last-modified %G% */
 
-/* Copyright © 1995,1998,2017 David A­D­ Morano.  All rights reserved. */
+
+/* revision history:
+
+	= 1995-05-01, David A­D­ Morano
+	This code module was completely rewritten to replace any
+	original garbage that came before.
+
+*/
+
+/* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ARTLIST_INCLUDE
 #define	ARTLIST_INCLUDE
