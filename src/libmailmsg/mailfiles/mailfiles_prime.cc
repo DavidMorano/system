@@ -1,4 +1,4 @@
-/* mailfiles SUPPORT */
+/* mailfiles_prime SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -33,7 +33,10 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<new>			/* |nothrow(3C++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecobj.h>
 #include	<strwcpy.h>
 #include	<strn.h>
@@ -76,30 +79,28 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int mailfiles_ctor(MF *op,Args ... args) noex {
     	MAILFILES	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->elp = new(nothrow) vecobj) != np) {
+	    if ((op->elp = new(nothrow) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailfiles_ctor) */
+} /* end subroutine (mailfiles_ctor) */
 
 static int mailfiles_dtor(MF *op) noex {
 	int		rs ;
-	if ((rs = mailfiles_magic(op)) >= 0) {
+	if ((rs = mailfiles_magic(op)) >= 0) ylikely {
 	    if (op->elp) {
 		delete op->elp ;
 		op->elp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailfiles_dtor) */
+} /* end subroutine (mailfiles_dtor) */
 
 static int	entry_start(MF_ENT *,cchar *,int) noex ;
 static int	entry_finish(MF_ENT *) noex ;
@@ -115,12 +116,12 @@ static int	entry_finish(MF_ENT *) noex ;
 
 int mailfiles_start(MF *op) noex {
 	int		rs ;
-	if ((rs = mailfiles_ctor(op)) >= 0) {
+	if ((rs = mailfiles_ctor(op)) >= 0) ylikely {
 	    vecobj	*elp = op->elp ;
 	    cint	vsz = szof(MF_ENT) ;
 	    cint	vn = 4 ;
 	    cint	vo = VECOBJ_OCOMPACT ;
-	    if ((rs = elp->start(vsz,vn,vo)) >= 0) {
+	    if ((rs = elp->start(vsz,vn,vo)) >= 0) ylikely {
 		op->magic = MAILFILES_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -134,9 +135,9 @@ int mailfiles_start(MF *op) noex {
 int mailfiles_finish(MF *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mailfiles_magic(op)) >= 0) {
+	if ((rs = mailfiles_magic(op)) >= 0) ylikely {
 	    vecobj	*elp = op->elp ;
-	    if (elp) {
+	    if (elp) ylikely {
 	        void	*vp{} ;
 	        for (int i = 0 ; elp->get(i,&vp) >= 0 ; i += 1) {
 	            MF_ENT	*ep = (MF_ENT *) vp ;
@@ -161,7 +162,7 @@ int mailfiles_finish(MF *op) noex {
 
 int mailfiles_add(MF *op,cchar *sp,int sl) noex {
     	int		rs ;
-	if ((rs = mailfiles_magic(op,sp)) >= 0) {
+	if ((rs = mailfiles_magic(op,sp)) >= 0) ylikely {
 	    cchar	*cp ;
 	    if (cint cl = sfshrink(sp,sl,&cp) ; cl > 0) {
 		if (MF_ENT e ; (rs = entry_start(&e,cp,cl)) >= 0) {
@@ -181,7 +182,7 @@ int mailfiles_addpath(MF *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = mailfiles_magic(op,sp)) >= 0) {
+	if ((rs = mailfiles_magic(op,sp)) >= 0) ylikely {
 	    if (cchar *tp ; (tp = strnrchr(sp,sl,'?')) != np) {
 	        sl -= intconv((sp + sl) - tp) ;
 	    }
@@ -206,7 +207,7 @@ int mailfiles_addpath(MF *op,cchar *sp,int sl) noex {
 
 int mailfiles_get(MF *op,int i,MF_ENT **epp) noex {
 	int		rs ;
-	if ((rs = mailfiles_magic(op,epp)) >= 0) {
+	if ((rs = mailfiles_magic(op,epp)) >= 0) ylikely {
 	    vecobj	*elp = op->elp ;
 	    if (void *vp ; (rs = elp->get(i,&vp)) >= 0) {
 		*epp = (MF_ENT *) vp ;
@@ -218,7 +219,7 @@ int mailfiles_get(MF *op,int i,MF_ENT **epp) noex {
 
 int mailfiles_count(MF *op) noex {
 	int		rs ;
-	if ((rs = mailfiles_magic(op)) >= 0) {
+	if ((rs = mailfiles_magic(op)) >= 0) ylikely {
 	    vecobj	*elp = op->elp ;
 	    rs = elp->count ;
 	} /* end if (magic) */
@@ -229,7 +230,7 @@ int mailfiles_count(MF *op) noex {
 int mailfiles_check(MF *op) noex {
 	int		rs ;
 	int		nchg = 0 ;
-	if ((rs = mailfiles_magic(op)) >= 0) {
+	if ((rs = mailfiles_magic(op)) >= 0) ylikely {
 	    vecobj	*elp = op->elp ;
 	    void	*vp{} ;
 	    for (int i = 0 ; (rs = elp->get(i,&vp)) >= 0 ; i += 1) {
@@ -265,10 +266,10 @@ int mailfiles_check(MF *op) noex {
 
 static int entry_start(MF_ENT *ep,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (ep && sp) {
+	if (ep && sp) ylikely {
 	    memclear(ep) ;
 	    ep->f_changed = false ;
-	    if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) ylikely {
 	        ep->mailfname = cp ;
 		if (ustat sb ; (rs = u_stat(cp,&sb)) >= 0) {
 		    ep->lasttime = sb.st_mtime ;
@@ -288,7 +289,7 @@ static int entry_start(MF_ENT *ep,cchar *sp,int sl) noex {
 static int entry_finish(MF_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ep->mailfname) {
+	if (ep->mailfname) ylikely {
 	    void *vp = voidp(ep->mailfname) ;
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;

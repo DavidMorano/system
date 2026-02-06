@@ -40,10 +40,13 @@ MODS +=
 LIBS +=
 
 
-OBJ0= mailfiles_main.o mailfiles_parse.o
+OBJ0= mailfiles_prime.o mailfiles_parse.o
 OBJ1= 
+OBJ2=
+OBJ3=
 
 OBJA= obj0.o
+OBJB=
 
 OBJ= obja.o
 
@@ -133,7 +136,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-mailfiles_main.o:	mailfiles_main.cc		$(INCS)
+mailfiles_prime.o:	mailfiles_prime.cc		$(INCS)
 mailfiles_parse.o:	mailfiles_parse.cc		$(INCS)
 
 
