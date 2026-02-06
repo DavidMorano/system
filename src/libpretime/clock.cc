@@ -52,13 +52,13 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<dlfcn.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<cerrno>
 #include	<usystem.h>
 #include	<localmisc.h>
-#include	"pretime.h"
+#include	"prectime"
 
 
 /* local defines */
