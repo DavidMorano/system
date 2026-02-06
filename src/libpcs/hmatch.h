@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* dial out to a system on the UUCP network */
+/* determine if a given c-string contains a mail-message header key */
 /* version %I% last-modified %G% */
 
 
