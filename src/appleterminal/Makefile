@@ -5,86 +5,106 @@ T= appleterminal
 ALL= $(T).x
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
+
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+DEFS +=
 
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
+INCS +=
 
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+MODS += libutil.ccm umisc.ccm
+
+LIBS += -luo -lu
 
 
-DEFS=
+DEPS_MAIN += 
 
-LDRPATH= $(EXTRA)/lib
+OBJ_MACUSER= term_main.o
 
-LIBDIRS= -L$(LIBDIR)
 
-LIBS= -lmacuser
+INCDIRS +=
 
+LIBDIRS += -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h
-
-
-OBJ_USERHOME= main.o
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).x
 
 all:			$(ALL)
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
 .c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX)  $(CPPFLAGS) $(CXXFLAGS) -c $<
+	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
-$(T).x:			$(OBJ_USERHOME)
-	$(LD) $(LDFLAGS) -o $@ $(OBJ_USERHOME) $(LIBDIRS) $(LIBS)
+$(T).x:			$(OBJ_MACUSER)
+	$(CXX) -o $@ $(LDFLAGS) $(RUNINFO) $(OBJ_MACUSER) $(LIBINFO)
 
 $(T).nm:		$(T).x
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+	$(NM) $(NMFLAGS) $(T).x > $(T).nm
+
+strip:			$(T).x
+	strip $(T).x
 
 again:
-	rm -f $(TALL)
+	rm -f $(T).x
 
 clean:
 	makeclean $(ALL)
@@ -92,7 +112,16 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+install:		$(T).x
+	makeinstall $(T).x
 
-main.o:			main.cc
+
+term_main.o:		term_main.cc			$(INCS)
+
+libutil.ccm:
+	makemodcurrent $@
+
+umisc.ccm:
+	makemodcurrent $@
 
 
