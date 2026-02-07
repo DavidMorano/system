@@ -42,11 +42,11 @@ struct babycalc_information {
 	time_t		wtime ;
 	time_t		atime ;
 	uint		acount ;
-} ;
+} ; /* end struct */
 
 struct babycalc_flags {
     	uint		modload:1 ;
-} ;
+} ; /* end struct */
 
 struct babycalc_head {
 	modload		*mlp ;		/* module-load-pointer */
@@ -56,7 +56,7 @@ struct babycalc_head {
 	uint		magic ;
 	int		objsz ;
 	int		cursz ;
-} ;
+} ; /* end struct */
 
 typedef	BABYCALC		babycalc ;
 typedef	BABYCALC_FL		babycalc_fl ;
