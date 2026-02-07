@@ -75,8 +75,10 @@
 #include	<cstdlib>
 #include	<cstring>		/* |UINT_MAX| */
 #include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<endian.h>
 #include	<estrings.h>
 #include	<vecobj.h>
@@ -91,6 +93,9 @@
 #include	"cmimk.h"
 #include	"cmihdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -114,9 +119,6 @@
 
 /* local typedefs */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -124,15 +126,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external variables */
-
-
-/* exported variables */
-
-extern const cmimk_obj	cmimk_modinfo = {
-	"cmimk",
-	szof(cmimk),
-	0
-} ;
 
 
 /* local structures */
@@ -143,26 +136,26 @@ struct cmentry {
 	uint		li ;		/* index-number of first line-entry */
 	ushort		nlines ;
 	ushort		cn ;		/* command-number */
-} ;
+} ; /* end struct */
 
 struct blentry {
 	uint		loff ;
 	uint		llen ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int cmimk_ctor(cmimk *op,Args ... args) noex {
+local int cmimk_ctor(cmimk *op,Args ... args) noex {
     	CMIMK		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->elp = new(nothrow) vecobj) != np) {
-	        if ((op->llp = new(nothrow) vecobj) != np) {
+	    if ((op->elp = new(nothrow) vecobj) != np) ylikely {
+	        if ((op->llp = new(nothrow) vecobj) != np) ylikely {
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
@@ -172,12 +165,11 @@ static int cmimk_ctor(cmimk *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cmimk_ctor) */
+} /* end subroutine (cmimk_ctor) */
 
-static int cmimk_dtor(cmimk *op) noex {
+local int cmimk_dtor(cmimk *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->llp) {
 		delete op->llp ;
@@ -189,40 +181,38 @@ static int cmimk_dtor(cmimk *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cmimk_dtor) */
+} /* end subroutine (cmimk_dtor) */
 
 template<typename ... Args>
-static inline int cmimk_magic(cmimk *op,Args ... args) noex {
+local inline int cmimk_magic(cmimk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CMIMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (cmimk_magic) */
+} /* end subroutine (cmimk_magic) */
 
-static int	cmimk_filesbegin(cmimk *) noex ;
-static int	cmimk_filesbeginc(cmimk *) noex ;
-static int	cmimk_filesbeginwait(cmimk *) noex ;
-static int	cmimk_filesbegincreate(cmimk *,cchar *,int,mode_t) noex ;
-static int	cmimk_filesend(cmimk *) noex ;
-static int	cmimk_listbegin(cmimk *,int) noex ;
-static int	cmimk_listend(cmimk *) noex ;
-static int	cmimk_mkidx(cmimk *) noex ;
-static int	cmimk_mkidxwrmain(cmimk *,cmihdr *) noex ;
-static int	cmimk_mkidxwrhdr(cmimk *,cmihdr *,filer *) noex ;
-static int	cmimk_mkidxwrents(cmimk *,cmihdr *,filer *,int) noex ;
-static int	cmimk_mkidxwrlines(cmimk *,cmihdr *,filer *,int) noex ;
-static int	cmimk_nidxopen(cmimk *) noex ;
-static int	cmimk_nidxclose(cmimk *) noex ;
-static int	cmimk_renamefiles(cmimk *) noex ;
+local int	cmimk_filesbegin(cmimk *) noex ;
+local int	cmimk_filesbeginc(cmimk *) noex ;
+local int	cmimk_filesbeginwait(cmimk *) noex ;
+local int	cmimk_filesbegincreate(cmimk *,cchar *,int,mode_t) noex ;
+local int	cmimk_filesend(cmimk *) noex ;
+local int	cmimk_listbegin(cmimk *,int) noex ;
+local int	cmimk_listend(cmimk *) noex ;
+local int	cmimk_mkidx(cmimk *) noex ;
+local int	cmimk_mkidxwrmain(cmimk *,cmihdr *) noex ;
+local int	cmimk_mkidxwrhdr(cmimk *,cmihdr *,filer *) noex ;
+local int	cmimk_mkidxwrents(cmimk *,cmihdr *,filer *,int) noex ;
+local int	cmimk_mkidxwrlines(cmimk *,cmihdr *,filer *,int) noex ;
+local int	cmimk_nidxopen(cmimk *) noex ;
+local int	cmimk_nidxclose(cmimk *) noex ;
+local int	cmimk_renamefiles(cmimk *) noex ;
 
-static int	mknewfname(char *,int,cchar *,cchar *) noex ;
-static int	unlinkstale(cchar *,int) noex ;
+local int	mknewfname(char *,int,cchar *,cchar *) noex ;
+local int	unlinkstale(cchar *,int) noex ;
 
 extern "C" {
-    static int	vvecmp(cvoid **,cvoid **) noex ;
+    local int	vvecmp(cvoid **,cvoid **) noex ;
 }
 
 
@@ -230,6 +220,12 @@ extern "C" {
 
 
 /* exported variables */
+
+extern const cmimk_obj	cmimk_modinfo = {
+	"cmimk",
+	szof(cmimk),
+	0
+} ;
 
 
 /* exported subroutines */
@@ -387,7 +383,7 @@ int cmimk_getinfo(cmimk *op,cmimk_info *bip) noex {
 
 /* private subroutines */
 
-static int cmimk_filesbegin(cmimk *op) noex {
+local int cmimk_filesbegin(cmimk *op) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (op->fl.ofcreat) {
@@ -400,7 +396,7 @@ static int cmimk_filesbegin(cmimk *op) noex {
 }
 /* end subroutine (cmimk_filesbegin) */
 
-static int cmimk_filesbeginc(cmimk *op) noex {
+local int cmimk_filesbeginc(cmimk *op) noex {
 	cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	int		rs ;
 	cchar		*dbn = op->dbname ;
@@ -429,7 +425,7 @@ static int cmimk_filesbeginc(cmimk *op) noex {
 }
 /* end subroutine (cmimk_filesbeginc) */
 
-static int cmimk_filesbeginwait(cmimk *op) noex {
+local int cmimk_filesbeginwait(cmimk *op) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*dbn = op->dbname ;
@@ -457,7 +453,7 @@ static int cmimk_filesbeginwait(cmimk *op) noex {
 }
 /* end subroutine (cmimk_filesbeginwait) */
 
-static int cmimk_filesbegincreate(cmimk *op,cchar *tfn,int of,mode_t om) noex {
+local int cmimk_filesbegincreate(cmimk *op,cchar *tfn,int of,mode_t om) noex {
 	int		rs ;
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
 	    cint	fd = rs ;
@@ -473,7 +469,7 @@ static int cmimk_filesbegincreate(cmimk *op,cchar *tfn,int of,mode_t om) noex {
 }
 /* end subroutine (cmimk_filesbegincreate) */
 
-static int cmimk_filesend(cmimk *op) noex {
+local int cmimk_filesend(cmimk *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -496,7 +492,7 @@ static int cmimk_filesend(cmimk *op) noex {
 }
 /* end subroutine (cmimk_filesend) */
 
-static int cmimk_listbegin(cmimk *op,int n) noex {
+local int cmimk_listbegin(cmimk *op,int n) noex {
 	int		rs ;
 	int		sz ;
 	int		opts ;
@@ -517,7 +513,7 @@ static int cmimk_listbegin(cmimk *op,int n) noex {
 }
 /* end subroutine (cmimk_listbegin) */
 
-static int cmimk_listend(cmimk *op) noex {
+local int cmimk_listend(cmimk *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -532,7 +528,7 @@ static int cmimk_listend(cmimk *op) noex {
 }
 /* end subroutine (cmimk_listend) */
 
-static int cmimk_mkidx(cmimk *op) noex {
+local int cmimk_mkidx(cmimk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -573,7 +569,7 @@ static int cmimk_mkidx(cmimk *op) noex {
 }
 /* end subroutine (cmimk_mkidx) */
 
-static int cmimk_mkidxwrmain(cmimk *op,cmihdr *hdrp) noex {
+local int cmimk_mkidxwrmain(cmimk *op,cmihdr *hdrp) noex {
 	filer		hf, *hfp = &hf ;
 	cint	nfd = op->nfd ;
 	cint	ps = getpagesize() ;
@@ -601,10 +597,10 @@ static int cmimk_mkidxwrmain(cmimk *op,cmihdr *hdrp) noex {
 }
 /* end subroutine (cmimk_mkidxwrmain) */
 
-static int cmimk_mkidxwrhdr(cmimk *op,cmihdr *hdrp,filer *hfp) noex {
+local int cmimk_mkidxwrhdr(cmimk *op,cmihdr *hdrp,filer *hfp) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    cint	hlen = HDRBUFLEN ;
 	    char	hbuf[HDRBUFLEN+1] ;
 	    if ((rs = cmihdr_rd(hdrp,hbuf,hlen)) >= 0) {
@@ -616,7 +612,7 @@ static int cmimk_mkidxwrhdr(cmimk *op,cmihdr *hdrp,filer *hfp) noex {
 }
 /* end subroutine (cmimk_mkidxwrhdr) */
 
-static int cmimk_mkidxwrents(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
+local int cmimk_mkidxwrents(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
 	uint		a[4] ;
 	cint		sz = (4 * szof(uint)) ;
 	int		rs = SR_OK ;
@@ -642,7 +638,7 @@ static int cmimk_mkidxwrents(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
 }
 /* end subroutine (cmimk_mkidxwrents) */
 
-static int cmimk_mkidxwrlines(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
+local int cmimk_mkidxwrlines(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
 	uint		a[4] ;
 	cint		sz = (2 * szof(uint)) ;
 	int		rs = SR_OK ;
@@ -666,7 +662,7 @@ static int cmimk_mkidxwrlines(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
 }
 /* end subroutine (cmimk_mkidxwrlines) */
 
-static int cmimk_nidxopen(cmimk *op) noex {
+local int cmimk_nidxopen(cmimk *op) noex {
 	int		rs ;
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
@@ -706,7 +702,7 @@ static int cmimk_nidxopen(cmimk *op) noex {
 }
 /* end subroutine (cmimk_nidxopen) */
 
-static int cmimk_nidxclose(cmimk *op) noex {
+local int cmimk_nidxclose(cmimk *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nfd >= 0) {
@@ -718,7 +714,7 @@ static int cmimk_nidxclose(cmimk *op) noex {
 }
 /* end subroutine (cmimk_nidxclose) */
 
-static int cmimk_renamefiles(cmimk *op) noex {
+local int cmimk_renamefiles(cmimk *op) noex {
 	int		rs ;
 	cchar		*suf = FSUF_IDX ;
 	cchar		*end = ENDIANSTR ;
@@ -737,14 +733,14 @@ static int cmimk_renamefiles(cmimk *op) noex {
 }
 /* end subroutine (cmimk_renamefiles) */
 
-static int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
+local int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
 	cchar		*end = ENDIANSTR ;
 	cchar		*fin = (type) ? "xXXXX" : "n" ;
 	return mkfnamesuf3(tbuf,dbn,suf,end,fin) ;
 }
 /* end subroutine (mknewfname) */
 
-static int unlinkstale(cchar *fn,int to) noex {
+local int unlinkstale(cchar *fn,int to) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	if (USTAT sb ; (rs = uc_stat(fn,&sb)) >= 0) {
@@ -761,13 +757,13 @@ static int unlinkstale(cchar *fn,int to) noex {
 }
 /* end subroutine (unlinkstale) */
 
-static int entcmp(cmentry *e1p,cmentry *e2p) noex {
+local int entcmp(cmentry *e1p,cmentry *e2p) noex {
 	int	c1 = int(e1p->cn) ;
 	int	c2 = int(e2p->cn) ;
 	return (c1 - c2) ;
 }
 
-static int vvecmp(cvoid **v1p,cvoid **v2p) noex {
+local int vvecmp(cvoid **v1p,cvoid **v2p) noex {
 	cmentry	**e1pp = (cmentry **) v1p ;
 	cmentry	**e2pp = (cmentry **) v2p ;
 	int		rc = 0 ;
