@@ -46,19 +46,19 @@ struct cyi_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct cyi_information {
 	time_t		ctime ;		/* index create-time */
 	time_t		mtime ;		/* index modification-time */
 	uint		count ;
 	uint		year ;		/* year index was made for */
-} ;
+} ; /* end struct */
 
 struct cyi_liner {
 	uint		loff ;
 	uint		llen ;
-} ;
+} ; /* end struct */
 
 struct cyi_entry {
 	CYI_LINE	*lines ;
@@ -67,13 +67,13 @@ struct cyi_entry {
 	uint		hash ;
 	ushort		y ;
 	uchar		nlines, m, d ;	/* maximum 255 lines per entry */
-} ;
+} ; /* end struct */
 
 struct cyi_cursor {
 	uint		magic ;
 	uint		citekey ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct cyi_fmier {
 	void		*mapdata ;	/* file map data pointer */
@@ -82,7 +82,7 @@ struct cyi_fmier {
 	time_t		ti_mod ;	/* time file modication */
 	time_t		ti_map ;	/* time file map */
 	size_t		mapsize ;	/* file map data length */
-} ;
+} ; /* end struct */
 
 struct cyi_head {
 	cchar		*fname ;
@@ -92,7 +92,7 @@ struct cyi_head {
 	uint		magic ;
 	int		ncursors ;
 	int		year ;
-} ;
+} ; /* end struct */
 
 typedef	CYI		cyi ;
 typedef	CYI_OBJ		cyi_obj ;
