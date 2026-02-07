@@ -34,10 +34,15 @@
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getnodename.h>
 #include	<vecstr.h>
 #include	<nulstr.h>
@@ -52,6 +57,9 @@
 #include	"var.h"
 #include	"vars.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -86,30 +94,17 @@
 
 /* forward references */
 
-static int	var_objloadbegin(VAR *,cchar *) noex ;
-static int	var_objloadend(VAR *) noex ;
-static int	var_loadcalls(VAR *,cchar *) noex ;
+local int	var_objloadbegin(VAR *,cchar *) noex ;
+local int	var_objloadend(VAR *) noex ;
+local int	var_loadcalls(VAR *,cchar *) noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
 
 
 /* local variables */
-
-constexpr cpcchar	subs[] = {
-	"open",
-	"count",
-	"curbegin",
-	"curenum",
-	"curend",
-	"fetch",
-	"info",
-	"audit",
-	"close",
-	nullptr
-} ;
 
 enum subs {
 	sub_open,
@@ -122,7 +117,20 @@ enum subs {
 	sub_audit,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum (subs) */
+
+constexpr cpcchar	subs[] = {
+	"open",
+	"count",
+	"curbegin",
+	"curenum",
+	"curend",
+	"fetch",
+	"info",
+	"audit",
+	"close",
+	nullptr
+} ; /* end array (subs) */
 
 
 /* exported variables */
@@ -411,7 +419,7 @@ int varunlink(cchar *dbnp,int dbnl) noex {
 
 /* private subroutines */
 
-static int var_objloadbegin(VAR *op,cchar *objname) noex {
+local int var_objloadbegin(VAR *op,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	int		rs ;
 	char		dn[MAXHOSTNAMELEN+1] ;
@@ -476,7 +484,7 @@ static int var_objloadbegin(VAR *op,cchar *objname) noex {
 }
 /* end subroutine (var_objloadbegin) */
 
-static int var_objloadend(VAR *op) noex {
+local int var_objloadend(VAR *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -493,7 +501,7 @@ static int var_objloadend(VAR *op) noex {
 }
 /* end subroutine (var_objloadend) */
 
-static int var_loadcalls(VAR *op,cchar *objname) noex {
+local int var_loadcalls(VAR *op,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -518,54 +526,43 @@ static int var_loadcalls(VAR *op,cchar *objname) noex {
 		    op->call.open = 
 			(int (*)(void *,cchar *)) snp ;
 		    break ;
-
 		case sub_count:
 		    op->call.count = (int (*)(void *)) snp ;
 		    break ;
-
 		case sub_curbegin:
 		    op->call.curbegin = 
 			(int (*)(void *,void *)) snp ;
 		    break ;
-
 		case sub_fetch:
 		    op->call.fetch = 
 			(int (*)(void *,cchar *,int,void *,char *,int)) 
 				snp ;
 		    break ;
-
 		case sub_curenum:
 		    op->call.enumerate = 
 			(int (*)(void *,void *,char *,int,char *,int)) snp ;
 		    break ;
-
 		case sub_curend:
 		    op->call.curend = (int (*)(void *,void *)) snp ;
 		    break ;
-
 		case sub_info:
 		    op->call.info = (int (*)(void *,VARS_INFO *)) snp ;
 		    break ;
-
 		case sub_audit:
 		    op->call.audit = (int (*)(void *)) snp ;
 		    break ;
-
 		case sub_close:
 		    op->call.close = (int (*)(void *)) snp ;
 		    break ;
-
 		} /* end switch */
-
 	    } /* end if (it had the call) */
-
 	} /* end for (subs) */
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (var_loadcalls) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
