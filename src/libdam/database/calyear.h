@@ -16,7 +16,6 @@
 #include	<usysdefs.h>
 #include	<modload.h>
 #include	<calyears.h>
-#include	<localmisc.h>
 
 
 #define	CALYEAR_MAGIC	0x99447246
@@ -31,12 +30,12 @@
 struct calyear_q {
 	ushort	y ;
 	uchar	m, d ;
-} ;
+} ; /* end struct */
 
 struct calyear_c {
 	uint	magic ;
 	void	*scp ;
-} ;
+} ; /* end struct */
 
 struct calyear_calls {
 	int	(*open)(void *,cchar *,cchar **,cchar **) ;
@@ -48,39 +47,31 @@ struct calyear_calls {
 	int	(*check)(void *,time_t) ;
 	int	(*audit)(void *) ;
 	int	(*close)(void *) ;
-} ;
+} ; /* end struct */
 
 struct calyear_head {
-	uint		magic ;
 	modload		loader ;
 	void		*obj ;		/* object pointer */
+	CALYEAR_CALLS	call ;
+	uint		magic ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
-	CALYEAR_CALLS	call ;
-} ;
+} ; /* end struct */
 
+EXTERNC_begin
 
-#if	(! defined(CALYEAR_MASTER)) || (CALYEAR_MASTER == 0)
+extern int calyear_open(CALYEAR *,cchar *,cchar **,cchar **) noex ;
+extern int calyear_count(CALYEAR *) noex ;
+extern int calyear_curbegin(CALYEAR *,CALYEAR_CUR *) noex ;
+extern int calyear_lookcite(CALYEAR *,CALYEAR_CUR *,CALYEAR_Q *) noex ;
+extern int calyear_read(CALYEAR *,CALYEAR_CUR *,CALYEAR_Q *,char *,int) noex ;
+extern int calyear_curend(CALYEAR *,CALYEAR_CUR *) noex ;
+extern int calyear_check(CALYEAR *,time_t) noex ;
+extern int calyear_audit(CALYEAR *) noex ;
+extern int calyear_close(CALYEAR *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int calyear_open(CALYEAR *,cchar *,cchar **,cchar **) ;
-extern int calyear_count(CALYEAR *) ;
-extern int calyear_curbegin(CALYEAR *,CALYEAR_CUR *) ;
-extern int calyear_lookcite(CALYEAR *,CALYEAR_CUR *,CALYEAR_Q *) ;
-extern int calyear_read(CALYEAR *,CALYEAR_CUR *,CALYEAR_Q *,char *,int) ;
-extern int calyear_curend(CALYEAR *,CALYEAR_CUR *) ;
-extern int calyear_check(CALYEAR *,time_t) ;
-extern int calyear_audit(CALYEAR *) ;
-extern int calyear_close(CALYEAR *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* CALYEAR_MASTER */
 
 #endif /* CALYEAR_INCLUDE */
 
