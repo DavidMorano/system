@@ -28,13 +28,13 @@
 
 struct pwi_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct pwi_head {
 	ipasswd		*dbp ;
 	uint		magic ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef PWI		pwi ;
 typedef PWI_CUR		pwi_cur ;
