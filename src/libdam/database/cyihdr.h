@@ -39,7 +39,7 @@ struct cyihdr_head {
 	uint		nskip ;
 	uint		year ;		/* the year index was made for */
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 typedef	CYIHDR		cyihdr ;
 
