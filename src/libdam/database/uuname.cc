@@ -29,11 +29,16 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<modload.h>
 #include	<vecstr.h>
 #include	<sncpyx.h>
@@ -42,6 +47,9 @@
 #include	"uuname.h"
 #include	"uunames.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -54,7 +62,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -69,7 +76,7 @@ extern "C" {
     typedef int (*socurend_f)(void *,void *) noex ;
     typedef int (*soaudit_f)(void *) noex ;
     typedef int (*soclose_f)(void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -98,15 +105,15 @@ typedef uuname_calls *	callsp ;
 /* forward references */
 
 template<typename ... Args>
-static int uuname_ctor(uuname *op,Args ... args) noex {
+local int uuname_ctor(uuname *op,Args ... args) noex {
     	UUNAME		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->mlp = new(nothrow) modload) != np) {
-		if (calls *p ; (p = new(nothrow) calls) != np) {
+	    if ((op->mlp = new(nothrow) modload) != np) ylikely {
+		if (calls *p ; (p = new(nothrow) calls) != np) ylikely {
 		    op->callp = p ;
 		    rs = memclear(p) ;
 		}
@@ -117,12 +124,11 @@ static int uuname_ctor(uuname *op,Args ... args) noex {
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uuname_ctor) */
+} /* end subroutine (uuname_ctor) */
 
-static int uuname_dtor(uuname *op) noex {
+local int uuname_dtor(uuname *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->callp) {
 		calls	*callp = (calls *) op->callp ;
@@ -135,24 +141,22 @@ static int uuname_dtor(uuname *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uuname_dtor) */
+} /* end subroutine (uuname_dtor) */
 
 template<typename ... Args>
-static inline int uuname_magic(uuname *op,Args ... args) noex {
+local inline int uuname_magic(uuname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == UUNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (uuname_magic) */
+} /* end subroutine (uuname_magic) */
 
-static int	uuname_objloadbegin(UN *,cchar *,cchar *) noex ;
-static int	uuname_objloadend(UN *) noex ;
-static int	uuname_loadcalls(UN *,vecstr *) noex ;
+local int	uuname_objloadbegin(UN *,cchar *,cchar *) noex ;
+local int	uuname_objloadend(UN *) noex ;
+local int	uuname_loadcalls(UN *,vecstr *) noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
@@ -170,7 +174,7 @@ enum subs {
 	sub_audit,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	subs[] = {
 	"open",
@@ -182,7 +186,7 @@ constexpr cpcchar	subs[] = {
 	"audit",
 	"close",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -341,7 +345,7 @@ int uuname_enum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-static int uuname_objloadbegin(UN *op,cchar *pr,cchar *objn) noex {
+local int uuname_objloadbegin(UN *op,cchar *pr,cchar *objn) noex {
 	modload		*mlp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -390,7 +394,7 @@ static int uuname_objloadbegin(UN *op,cchar *pr,cchar *objn) noex {
 }
 /* end subroutine (uuname_objloadbegin) */
 
-static int uuname_objloadend(UN *op) noex {
+local int uuname_objloadend(UN *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
@@ -407,7 +411,7 @@ static int uuname_objloadend(UN *op) noex {
 }
 /* end subroutine (uuname_objloadend) */
 
-static int uuname_loadcalls(UN *op,vecstr *slp) noex {
+local int uuname_loadcalls(UN *op,vecstr *slp) noex {
 	modload		*mlp = op->mlp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -454,7 +458,7 @@ static int uuname_loadcalls(UN *op,vecstr *slp) noex {
 }
 /* end subroutine (uuname_loadcalls) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
