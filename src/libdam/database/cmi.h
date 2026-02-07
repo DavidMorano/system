@@ -44,7 +44,7 @@ struct cmi_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct cmi_information {
 	time_t		idxctime ;	/* IDX creation-time */
@@ -54,12 +54,12 @@ struct cmi_information {
 	size_t		idxsize ;	/* IDX-file size */
 	uint		nents ;
 	uint		maxent ;
-} ;
+} ; /* end struct */
 
 struct cmi_liner {
 	uint		loff ;
 	uint		llen ;
-} ;
+} ; /* end struct */
 
 struct cmi_entry {
 	CMI_LINE	*lines ;
@@ -67,11 +67,11 @@ struct cmi_entry {
 	uint		elen ;
 	ushort		nlines ;
 	ushort		cn ;
-} ;
+} ; /* end struct */
 
 struct cmi_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct cmi_fmidx {
 	char		*mapdata ;	/* file map */
@@ -80,7 +80,7 @@ struct cmi_fmidx {
 	time_t		ti_mod ;	/* time file modication */
 	time_t		ti_map ;	/* time file map */
 	size_t		mapsize ;
-} ;
+} ; /* end struct */
 
 struct cmi_head {
 	cchar 		*dbname ;
@@ -90,7 +90,7 @@ struct cmi_head {
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magic ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	CMI		cmi ;
 typedef	CMI_OBJ		cmi_obj ;
