@@ -40,15 +40,15 @@ struct uunames_object {
 	cchar		*name ;
 	uint		objsz ;
 	uint		cursz ;
-} ;
+} ; /* end struct */
 
 struct uunames_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct uunames_flags {
 	uint		varind:1 ;
-} ;
+} ; /* end struct */
 
 struct uunames_head {
 	cchar		*pr ;
@@ -63,7 +63,7 @@ struct uunames_head {
 	UUNAMES_FL	fl ;
 	uint		magic ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	UUNAMES		uunames ;
 typedef	UUNAMES_FL	uunames_fl ;
