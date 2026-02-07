@@ -46,16 +46,18 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<endian.h>
 #include	<ids.h>
 #include	<mkpathx.h>
@@ -81,6 +83,9 @@
 
 #include	"pwi.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -115,7 +120,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -134,7 +138,7 @@ using std::nothrow ;			/* constant */
 
 struct opener_fl {
 	uint		dbname:1 ;	/* allocated */
-} ;
+} ; /* end struct */
 
 namespace {
     struct opener {
@@ -159,7 +163,7 @@ namespace {
 	int mkspawn(cchar *,mainv,vecstr *) noex ;
 	int mkwait(int) noex ;
     } ; /* end struct (opener) */
-}
+} /* end namespace */
 
 namespace {
     struct pwdesc {
@@ -171,7 +175,7 @@ namespace {
 	    pwlen = pl ;
 	} ; /* end ctor */
     } ; /* end struct (pwdesc) */
-}
+} /* end namespace */
 
 namespace {
     struct vars {
@@ -182,17 +186,17 @@ namespace {
 	int		realnamelen ;
 	int mkvars() noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int pwi_ctor(pwi *op,Args ... args) noex {
+local int pwi_ctor(pwi *op,Args ... args) noex {
     	PWI		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
 	    if ((op->dbp = new(nothrow) ipasswd) != np) {
@@ -200,33 +204,30 @@ static int pwi_ctor(pwi *op,Args ... args) noex {
 	    } /* end if (new-ipasswd) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pwi_ctor) */
+} /* end subroutine (pwi_ctor) */
 
-static int pwi_dtor(pwi *op) noex {
+local int pwi_dtor(pwi *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->dbp) {
+	    if (op->dbp) ylikely {
 		delete op->dbp ;
 		op->dbp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pwi_dtor) */
+} /* end subroutine (pwi_dtor) */
 
 template<typename ... Args>
-static inline int pwi_magic(pwi *op,Args ... args) noex {
+local inline int pwi_magic(pwi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == PWI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (pwi_magic) */
+} /* end subroutine (pwi_magic) */
 
-static int	realname_isextra(realname *,pwdesc *,cchar *) noex ;
+local int	realname_isextra(realname *,pwdesc *,cchar *) noex ;
 
 
 /* local variables */
@@ -239,13 +240,13 @@ constexpr cpcchar	exports[] = {
 	varname.tz,
 	varname.pwd,
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr char		extras[] = "°¹²³" ;
 constexpr char		progmkpwi[] = PROG_MKPWI ;
@@ -447,7 +448,7 @@ int lookuper::proc(cchar *sp,int sl) noex {
 
 int opener::start() noex {
     	int		rs = SR_FAULT ;
-	if (pr && dbname) {
+	if (pr && dbname) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -457,12 +458,12 @@ int opener::start() noex {
 int opener::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (idxdname) {
+	if (idxdname) ylikely {
 	    rs1 = uc_free(idxdname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    idxdname = nullptr ;
 	}
-	if (fl.dbname && dbname) {
+	if (fl.dbname && dbname) ylikely {
 	    rs1 = uc_free(dbname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    dbname = nullptr ;
@@ -478,7 +479,7 @@ int opener::mkidxdname() noex {
 	if ((dbname == nullptr) || (dbname[0] == '\0')) {
 	    int		ai = 0 ;
 	    cint	sz = ((nodelen + 1) * 2) ;
-	    if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) ylikely {
 	        cint	nlen = nodelen ;
 	        cint	clen = nodelen ;
 	        char	*nbuf = (a + (ai++ * (nodelen + 1))) ;
@@ -664,7 +665,7 @@ int opener::mkenv(vecstr *elp) noex {
 }
 /* end method (opener:mkenv) */
 
-static int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
+local int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
 	int		rs ;
 	int		f = false ;
 	if (cchar *lp{} ; (rs = realname_getlast(op,&lp)) >= 0) {
@@ -689,13 +690,13 @@ static int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
 
 int vars::mkvars() noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mn)) >= 0) {
 	        maxnamelen = rs ;
-	        if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	        if ((rs = getbufsize(bufsize_nn)) >= 0) {
 		    nodenamelen = rs ;
-	            if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	            if ((rs = getbufsize(bufsize_un)) >= 0) {
 			usernamelen = rs ;
 			realnamelen = REALNAMELEN ;
 		    }
