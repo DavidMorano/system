@@ -40,19 +40,26 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/mman.h>
+#include	<ctime>
 #include	<climits>		/* |USHORT_MAX| + |UINT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<char.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<endian.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"cmi.h"
 #include	"cmihdr.h"
 #include	"bvcitekey.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -85,7 +92,7 @@ template<typename ... Args>
 static int cmi_ctor(cmi *op,Args ... args) noex {
 	CMI		*hup = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -94,7 +101,7 @@ static int cmi_ctor(cmi *op,Args ... args) noex {
 
 static int cmi_dtor(cmi *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -104,7 +111,7 @@ static int cmi_dtor(cmi *op) noex {
 template<typename ... Args>
 static inline int cmi_magic(cmi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CMI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -466,7 +473,7 @@ static int cmi_verify(cmi *op,time_t dt) noex {
 	cmihdr		*hip = &op->fhi ;
 	int		rs = SR_OK ;
 	int		size ;
-	int		f = TRUE ;
+	int		f = true ;
 
 	f = f && (hip->idxsize == mip->mapsize) ;
 	f = f && (hip->idxtime > 0) ;
