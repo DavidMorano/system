@@ -75,15 +75,19 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<endian.h>
 #include	<estrings.h>
 #include	<ids.h>
@@ -98,6 +102,9 @@
 #include	"cyimk.h"
 #include	"cyihdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -134,12 +141,12 @@ struct bventry {
 	uint		li ;		/* index-number of first line-entry */
 	uint		hash ;
 	uint		citation ;	/* (nlines, m, d) */
-} ;
+} ; /* end struct */
 
 struct blentry {
 	uint		loff ;
 	uint		llen ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -252,7 +259,7 @@ int cyimk_close(CYIMK *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		n = 0 ;
-	int		f_go = FALSE ;
+	int		f_go = false ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -330,7 +337,7 @@ int cyimk_add(CYIMK *op,CYIMK_ENT *bvp)
 	    bve.hash = bvp->hash ;
 	    mkcitation(&bve.citation,bvp) ;
 	    citcmpval = (bve.citation & 0x0000FFFF) ;
-	    if (citcmpval < op->pcitation) op->fl.notsorted = TRUE ;
+	    if (citcmpval < op->pcitation) op->fl.notsorted = true ;
 	    op->pcitation = citcmpval ;
 	    rs = vecobj_add(&op->verses,&bve) ;
 	    op->nentries += 1 ;
@@ -461,7 +468,7 @@ static int cyimk_filesbeginc(CYIMK *op)
 	    char		rbuf[MAXPATHLEN+1] ;
 	    if (type) {
 	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
-	            op->fl.created = TRUE ;
+	            op->fl.created = true ;
 	            tfn = rbuf ;
 	        }
 	    }
@@ -489,7 +496,7 @@ static int cyimk_filesbeginwait(CYIMK *op)
 	if ((rs = mkpath2(dbn,op->idname,op->cname)) >= 0) {
 	cchar		*suf = FSUF_IDX	 ;
 	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,FALSE,dbn,suf)) >= 0) {
+	if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
 	    const mode_t	om = op->om ;
 	    cint		to_stale = CYIMK_INTSTALE ;
 	    cint		nrs = SR_EXISTS ;
@@ -502,7 +509,7 @@ static int cyimk_filesbeginwait(CYIMK *op)
 	        if (to-- == 0) break ;
 	    } /* end while (db exists) */
 	    if (rs == nrs) {
-	        op->fl.ofcreat = FALSE ;
+	        op->fl.ofcreat = false ;
 	        c = 0 ;
 	        rs = cyimk_filesbeginc(op) ;
 	    }
@@ -519,7 +526,7 @@ static int cyimk_filesbegincreate(CYIMK *op,cchar *tfn,int of,mode_t om)
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
 	    cint	fd = rs ;
 	    cchar	*cp ;
-	    op->fl.created = TRUE ;
+	    op->fl.created = true ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
 	        op->nidxfname = (char *) cp ;
 	    }
