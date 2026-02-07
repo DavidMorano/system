@@ -38,7 +38,7 @@ struct cmihdr_head {
 	uint		nents ;
 	uint		maxent ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 typedef	CMIHDR		cmihdr ;
 
