@@ -38,24 +38,24 @@ struct cmimk_object {
 	cchar		*name ;
 	uint		objsz ;
 	uint		cursz ;		/* *unused* */
-} ;
+} ; /* end struct */
 
 struct cmimk_information {
 	uint		maxent ;
 	uint		nents ;
-} ;
+} ; /* end struct */
 
 struct cmimk_liner {
 	uint		loff ;
 	uint		llen ;
-} ;
+} ; /* end struct */
 
 struct cmimk_entry {
 	CMIMK_LINE	*lines ;
 	uint		eoff ;
 	uint		elen ;
 	ushort		nlines, cn ;
-} ;
+} ; /* end struct */
 
 struct cmimk_flags {
 	uint		notsorted:1 ;
@@ -64,7 +64,7 @@ struct cmimk_flags {
 	uint		inprogress:1 ;
 	uint		created:1 ;
 	uint		abort:1 ;
-} ;
+} ; /* end struct */
 
 struct cmimk_head {
 	cchar 		*dbname ;
@@ -81,7 +81,7 @@ struct cmimk_head {
 	uint		nents ;
 	int		nfd ;
 	mode_t		om ;
-} ;
+} ; /* end struct */
 
 typedef CMIMK		cmimk ;
 typedef CMIMK_OBJ	cmimk_obj ;
