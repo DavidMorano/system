@@ -39,7 +39,7 @@ enum babieshdrhs {
 	babieshdrh_btoff,
 	babieshdrh_btlen,
 	babieshdrh_overlast
-} ;
+} ; /* end enum */
 
 struct babieshdr_head {
 	uint		shmsize ;
@@ -53,7 +53,7 @@ struct babieshdr_head {
 	uint		btoff ;
 	uint		btlen ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 typedef	BABIESHDR	babieshdr ;
 
