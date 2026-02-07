@@ -20,13 +20,13 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 #include	<vecobj.h>
 #include	<holidayer.h>
-#include	<localmisc.h>
-#include	"calent.h"
-#include	"calcite.h"
+#include	<calent.h>
+#include	<calcite.h>
 
 
 #define	CALYEARS_MAGIC	0x99447245
@@ -43,24 +43,24 @@ struct calyears_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct calyears_cursor {
-	uint		magic ;
 	void		*results ;
 	uint		nresults ;
+	uint		magic ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct calyears_flags {
 	uint		doms:1 ;		/* day-of-month(s) */
 	uint		hols:1 ;		/* holidays */
-} ;
+} ; /* end struct */
 
 struct calyears_head {
-	cchar		*a ;			/* memory-allocation */
 	cchar		*pr ;
 	cchar		*tmpdname ;
+	char		*a ;			/* memory-allocation */
 	HOLIDAYER	hols ;
 	vechand		doms ;
 	vechand		cals ;			/* calendars */
@@ -72,7 +72,7 @@ struct calyears_head {
 	int		year ;			/* current year */
 	int		isdst ;			/* current is-dst */
 	int		gmtoff ;		/* current offset from GMT */
-} ;
+} ; /* end struct */
 
 typedef	CALYEARS	calyears ;
 typedef	CALYEARS_FL	calyears_fl ;
