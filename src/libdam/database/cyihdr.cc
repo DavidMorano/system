@@ -43,10 +43,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
+#include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |memcpy(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<endian.h>
 #include	<mkmagic.h>
 #include	<hasx.h>
@@ -79,7 +84,7 @@ enum his {
 	hi_nskip,			/* used in hash-collision algorithm */
 	hi_year,			/* the year index was created */
 	hi_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
