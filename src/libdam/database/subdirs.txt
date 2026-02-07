@@ -3,14 +3,13 @@ argmgr
 configvars
 decoder
 densityx
-fileread
 gethe
 ipasswd
 lineindex
 localget
 localset
 logfile
-mathdam
+mathx
 msgidx
 strlistx
 svc
@@ -19,3 +18,5 @@ txtindex
 varsub
 linex
 langx
+ecmsg
+sysdialer
