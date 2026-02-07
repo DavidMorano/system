@@ -46,12 +46,12 @@ struct var_information {
 	time_t		mtime ;
 	uint		nvars ;
 	uint		nskip ;
-} ;
+} ; /* end struct */
 
 struct var_cursor {
 	void		*scp ;		/* SO-cursor pointer */
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 EXTERNC_begin
     struct var_callsubs {
@@ -75,19 +75,19 @@ struct var_head {
 	uint		magic ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
-} ;
+} ; /* end struct */
 
 struct varinfo_data {
 	size_t		sz ;
 	time_t		mtime ;
-} ;
+} ; /* end struct */
 
 typedef	VAR		var ;
 typedef VAR_CUR		var_cur ;
 typedef VAR_INFO	var_info ;
 typedef VAR_CALLS	var_calls ;
 
-typedef VARINFO_DAT		varinfo_dat ;
+typedef VARINFO_DAT	varinfo_dat ;
 
 EXTERNC_begin
 
