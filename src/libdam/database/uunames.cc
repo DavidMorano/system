@@ -31,14 +31,16 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<climits>		/* |INT_MAX| */
 #include	<ctime>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<endian.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
@@ -67,6 +69,9 @@
 
 #include	"uunames.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 import sif ;
 
 /* local defines */
@@ -199,7 +204,6 @@ import sif ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -230,7 +234,7 @@ namespace {
 	cchar		*sub1dname ;
 	cchar		*sub2dname ;
     } ;
-}
+} /* end namespace */
 
 typedef liner *		linerp ;
 
@@ -238,74 +242,71 @@ typedef liner *		linerp ;
 /* forward references */
 
 template<typename ... Args>
-static int uunames_ctor(uunames *op,Args ... args) noex {
+local int uunames_ctor(uunames *op,Args ... args) noex {
     	UUNAMES		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->nlp = new(nothrow) vecobj) != np) {
+	    if ((op->nlp = new(nothrow) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uunames_ctor) */
+} /* end subroutine (uunames_ctor) */
 
-static int uunames_dtor(uunames *op) noex {
+local int uunames_dtor(uunames *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->nlp) {
+	    if (op->nlp) ylikely {
 		delete op->nlp ;
 		op->nlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uunames_dtor) */
+} /* end subroutine (uunames_dtor) */
 
 template<typename ... Args>
-static inline int uunames_magic(uunames *op,Args ... args) noex {
+local inline int uunames_magic(uunames *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == UUNAMES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (uunames_magic) */
+} /* end subroutine (uunames_magic) */
 
-static int	uunames_infoloadbegin(UU *,cchar *,cchar *) noex ;
-static int	uunames_infoloadend(UU *) noex ;
-static int	uunames_indopen(UU *,time_t) noex ;
-static int	uunames_indopenpr(UU *,time_t) noex ;
-static int	uunames_indopentmp(UU *,time_t) noex ;
-static int	uunames_indopendname(UU *,cchar *,time_t) noex ;
-static int	uunames_indclose(UU *) noex ;
-static int	uunames_mkuunamesi(UU *,cchar *) noex ;
-static int	uunames_envpaths(UU *,vecstr *) noex ;
-static int	uunames_indtest(UU *,cchar *,time_t) noex ;
-static int	uunames_indmapcreate(UU *,cchar *,time_t) noex ;
-static int	uunames_indmapdestroy(UU *) noex ;
-static int	uunames_filemapcreate(UU *,time_t) noex ;
-static int	uunames_filemapdestroy(UU *) noex ;
-static int	uunames_indfn(UU *,cchar *,time_t) noex ;
-static int	uunames_indlist(UU *) noex ;
-static int	uunames_indcheck(UU *,time_t) noex ;
+local int	uunames_infoloadbegin(UU *,cchar *,cchar *) noex ;
+local int	uunames_infoloadend(UU *) noex ;
+local int	uunames_indopen(UU *,time_t) noex ;
+local int	uunames_indopenpr(UU *,time_t) noex ;
+local int	uunames_indopentmp(UU *,time_t) noex ;
+local int	uunames_indopendname(UU *,cchar *,time_t) noex ;
+local int	uunames_indclose(UU *) noex ;
+local int	uunames_mkuunamesi(UU *,cchar *) noex ;
+local int	uunames_envpaths(UU *,vecstr *) noex ;
+local int	uunames_indtest(UU *,cchar *,time_t) noex ;
+local int	uunames_indmapcreate(UU *,cchar *,time_t) noex ;
+local int	uunames_indmapdestroy(UU *) noex ;
+local int	uunames_filemapcreate(UU *,time_t) noex ;
+local int	uunames_filemapdestroy(UU *) noex ;
+local int	uunames_indfn(UU *,cchar *,time_t) noex ;
+local int	uunames_indlist(UU *) noex ;
+local int	uunames_indcheck(UU *,time_t) noex ;
 
-static int	checkdname(cchar *) noex ;
+local int	checkdname(cchar *) noex ;
 
-static int	vecstr_defenvs(vecstr *,mainv) noex ;
-static int	vecstr_loadpath(vecstr *,cchar *) noex ;
-static int	mkpathval(vecstr *,char *,int) noex ;
+local int	vecstr_defenvs(vecstr *,mainv) noex ;
+local int	vecstr_loadpath(vecstr *,cchar *) noex ;
+local int	mkpathval(vecstr *,char *,int) noex ;
 
 #ifdef	COMMENT
-static int	mkindfname(char *,cchar *,cchar *,cchar *,cchar *) noex ;
+local int	mkindfname(char *,cchar *,cchar *,cchar *,cchar *) noex ;
 #endif
 
 extern "C" {
-    static int	vesrch(cvoid **,cvoid **) noex ;
+    local int	vesrch(cvoid **,cvoid **) noex ;
 }
 
 
@@ -486,7 +487,7 @@ int uunames_exists(UU *op,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
 	        if ((rs = uunames_indcheck(op,0)) >= 0) {
-		    if (cchar *kp ; (rs = uc_mallocstrw(sp,sl,&kp)) >= 0) {
+		    if (cchar *kp ; (rs = lm_strw(sp,sl,&kp)) >= 0) {
 			cnullptr	np{} ;
 	                kl = rs ;
 			{
@@ -497,7 +498,7 @@ int uunames_exists(UU *op,cchar *sp,int sl) noex {
 				kl = 0 ;
 			    }
 			} /* end block */
-	                rs1 = uc_free(kp) ;
+	                rs1 = lm_free(kp) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (allocation) */
 	        } /* end if (uunames_indcheck) */
@@ -541,7 +542,7 @@ int uunames_count(UU *op) noex {
 
 /* private subroutines */
 
-static int uunames_infoloadbegin(UU *op,cc *pr,cc *dbname) noex {
+local int uunames_infoloadbegin(UU *op,cc *pr,cc *dbname) noex {
 	int		rs = SR_OK ;
 	op->pr = pr ;
 	op->dbname = dbname ;
@@ -549,43 +550,44 @@ static int uunames_infoloadbegin(UU *op,cc *pr,cc *dbname) noex {
 }
 /* end subroutine (uunames_infoloadbegin) */
 
-static int uunames_infoloadend(UU *op) noex {
+local int uunames_infoloadend(UU *op) noex {
 	op->pr = nullptr ;
 	op->dbname = nullptr ;
 	return SR_OK ;
 }
 /* end subroutine (uunames_infoloadend) */
 
-static int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
+local int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
 	op->indfname = nullptr ;
-	if (char *indfname ; (rs = malloc_mp(&indfname)) >= 0) {
+	if (char *indfname ; (rs = lm_mp(&indfname)) >= 0) {
 	    cchar	*suf = INDSUF ;
 	    cchar	*ends = ENDIANSTR ;
 	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) {
 		cint	fl = rs ;
-	        if (cchar *cp ; (rs = uc_mallocstrw(indfname,fl,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(indfname,fl,&cp)) >= 0) {
 		    op->indfname = cp ;
 		    if ((rs = uunames_filemapcreate(op,dt)) >= 0) {
 			rs = uunames_indlist(op) ;
 			rv = rs ;
 		    } /* end if */
 	            if (rs < 0) {
-	                rs1 = uc_free(op->indfname) ;
+	                rs1 = lm_free(op->indfname) ;
 	                if (rs >= 0) rs = rs1 ;
 	                op->dbname = nullptr ;
 	            }
 		} /* end if (memory-allocation) */
 	    } /* end if (mkfnamesuf) */
-	    rs = rsfree(rs,indfname) ;
+	    rs1 = lm_free(indfname) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (uunames_indmapcreate) */
 
-static int uunames_indmapdestroy(UU *op) noex {
+local int uunames_indmapdestroy(UU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -597,7 +599,7 @@ static int uunames_indmapdestroy(UU *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->indfname) {
-	    rs1 = uc_free(op->indfname) ;
+	    rs1 = lm_free(op->indfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dbname = nullptr ;
 	}
@@ -605,7 +607,7 @@ static int uunames_indmapdestroy(UU *op) noex {
 }
 /* end subroutine (uunames_indmapdestroy) */
 
-static int uunames_filemapcreate(UU *op,time_t dt) noex {
+local int uunames_filemapcreate(UU *op,time_t dt) noex {
 	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
@@ -641,7 +643,7 @@ static int uunames_filemapcreate(UU *op,time_t dt) noex {
 }
 /* end subroutine (uunames_filemapcreate) */
 
-static int uunames_filemapdestroy(UU *op) noex {
+local int uunames_filemapdestroy(UU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapdata != nullptr) {
@@ -654,7 +656,7 @@ static int uunames_filemapdestroy(UU *op) noex {
 }
 /* end subroutine (uunames_filemapdestroy) */
 
-static int uunames_indopen(UU *op,time_t dt) noex {
+local int uunames_indopen(UU *op,time_t dt) noex {
 	int		rs = SR_NOENT ;
 	int		f = false ;
 	for (int i = 0 ; indopens[i] != nullptr ; i += 1) {
@@ -669,26 +671,26 @@ static int uunames_indopen(UU *op,time_t dt) noex {
 }
 /* end subroutine (uunames_indopen) */
 
-static int uunames_indopenpr(UU *op,time_t dt) noex {
+local int uunames_indopenpr(UU *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *idname ; (rs = malloc_mp(&idname)) >= 0) {
+	if (char *idname ; (rs = lm_mp(&idname)) >= 0) {
 	    if ((rs = mkpath(idname,op->pr,VARDNAME,INDDNAME)) >= 0) {
 	        rs = uunames_indopendname(op,idname,dt) ;
 	    }
-	    rs1 = uc_free(idname) ;
+	    rs1 = lm_free(idname) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (uunames_indopenpr) */
 
-static int uunames_indopentmp(UU *op,time_t dt) noex {
+local int uunames_indopentmp(UU *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*tmpdname = TMPVARDNAME ;
 	cchar		*inddname = INDDNAME ;
-	if (char *idname ; (rs = malloc_mp(&idname)) >= 0) {
+	if (char *idname ; (rs = lm_mp(&idname)) >= 0) {
 	    cchar	*prname{} ;
 	    if ((rs = sfbasename(op->pr,-1,&prname)) > 0) {
 	        if ((rs = mkpath(idname,tmpdname,prname,inddname)) >= 0) {
@@ -697,17 +699,17 @@ static int uunames_indopentmp(UU *op,time_t dt) noex {
 	    } else {
 	        rs = SR_INVALID ;
 	    }
-	    rs1 = uc_free(idname) ;
+	    rs1 = lm_free(idname) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (uunames_indopentmp) */
 
-static int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
+local int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *indname ; (rs = malloc_mp(&indname)) >= 0) {
+	if (char *indname ; (rs = lm_mp(&indname)) >= 0) {
 	bool	f_mk = false ;
 	if ((rs = mkpath2(indname,dname,op->dbname)) >= 0) {
 	    if ((rs = uunames_indtest(op,indname,dt)) >= 0) {
@@ -740,18 +742,18 @@ static int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 
 		} /* end if (indtest) */
 	    } /* end if (mkpath) */
-	    rs1 = uc_free(indname) ;
+	    rs1 = lm_free(indname) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (uunames_indopendname) */
 
-static int uunames_indtest(UU *op,cchar *indname,time_t dt) noex {
+local int uunames_indtest(UU *op,cchar *indname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if (char *indfname ; (rs = malloc_mp(&indfname)) >= 0) {
+	if (char *indfname ; (rs = lm_mp(&indfname)) >= 0) {
 	    cchar	*suf = INDSUF ;
 	    cchar	*ends = ENDIANSTR ;
 	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) {
@@ -770,18 +772,18 @@ static int uunames_indtest(UU *op,cchar *indname,time_t dt) noex {
 	         }
 	         f = (rs1 >= 0) ;
 	    } /* end if (mkfnamesuf) */
-	    rs1 = uc_free(indfname) ;
+	    rs1 = lm_free(indfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (uunames_indtest) */
 
-static int uunames_indfn(UU *op,cchar *dname,time_t) noex {
+local int uunames_indfn(UU *op,cchar *dname,time_t) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *indname ; (rs = malloc_mp(&indname)) >= 0) {
+	if (char *indname ; (rs = lm_mp(&indname)) >= 0) {
 	    if ((rs = checkdname(dname)) == SR_NOENT) {
 	        rs = mkdirs(dname,TMPDMODE) ;
 	    }
@@ -789,14 +791,14 @@ static int uunames_indfn(UU *op,cchar *dname,time_t) noex {
 	        rs = mkpath2(indname,dname,op->dbname) ;
 		len = rs ;
 	    }
-	    rs1 = uc_free(indname) ;
+	    rs1 = lm_free(indname) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (uunames_indfn) */
 
-static int uunames_indclose(UU *op) noex {
+local int uunames_indclose(UU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.varind) {
@@ -809,7 +811,7 @@ static int uunames_indclose(UU *op) noex {
 /* end subroutine (uunames_indclose) */
 
 /* make the index */
-static int uunames_mkuunamesi(UU *op,cchar *dname) noex {
+local int uunames_mkuunamesi(UU *op,cchar *dname) noex {
 	SPAWNPROC_CON	ps{} ;
 	vecstr		envs ;
 	pid_t	cpid ;
@@ -925,13 +927,13 @@ ret0:
 }
 /* end subroutine (uunames_mkuunamesi) */
 
-static int uunames_envpaths(UU *op,vecstr *elp) noex {
+local int uunames_envpaths(UU *op,vecstr *elp) noex {
 	cnullptr	np{} ;
 	cint		vo = VECSTR_OORDERED ;
 	cint		ne = 40 ;
 	int		rs ;
 	int		rs1 ;
-	if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
 	    if (vecstr pc ; (rs = pc.start(ne,vo)) >= 0) {
 	        int	bl ;
 	        int	pl ;
@@ -960,12 +962,12 @@ static int uunames_envpaths(UU *op,vecstr *elp) noex {
 	                rs = pc.strsize() ;
 		        sz = rs ;
 	            }
-	            if ((rs >= 0) && ((rs = uc_malloc((sz+1),&bp)) >= 0)) {
+	            if ((rs >= 0) && ((rs = lm_mall((sz+1),&bp)) >= 0)) {
 	                if ((rs = mkpathval(&pathcomps,bp,sz)) >= 0) {
 	                    bl = rs ;
 	                    rs = elp->envadd(enp,bp,bl) ;
 		        }
-	                rs1 = uc_free(bp) ;
+	                rs1 = lm_free(bp) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (memory allocation) */
 	            pc.delall ;
@@ -974,14 +976,14 @@ static int uunames_envpaths(UU *op,vecstr *elp) noex {
 	        rs1 = pc.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (vecstr) */
-	    rs1 = uc_free(pbuf) ;
+	    rs1 = lm_free(pbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (uunames_envpaths) */
 
-static int uunames_indlist(UU *op) noex {
+local int uunames_indlist(UU *op) noex {
 	liner		le ;
 	uint		lineoff = 0 ;
 	int		rs = SR_OK ;
@@ -1014,7 +1016,7 @@ static int uunames_indlist(UU *op) noex {
 }
 /* end subroutine (uunames_indlist) */
 
-static int uunames_indcheck(UU *op,time_t) noex {
+local int uunames_indcheck(UU *op,time_t) noex {
 	int		rs = SR_NOTFOUND ;
 	int		f = false ;
 	if (op->mapdata) {
@@ -1024,7 +1026,7 @@ static int uunames_indcheck(UU *op,time_t) noex {
 }
 /* end subroutine (uunames_indcheck) */
 
-static int checkdname(cchar *dname) noex {
+local int checkdname(cchar *dname) noex {
 	int		rs = SR_OK ;
 	if (dname[0] == '/') {
 	    if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
@@ -1043,11 +1045,11 @@ static int checkdname(cchar *dname) noex {
 
 #ifdef	COMMENT
 
-static int mkindfname(char *rbuf,cc *dname,cc *name,cc *suf,cc *end) noex {
+local int mkindfname(char *rbuf,cc *dname,cc *name,cc *suf,cc *end) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    int		dnl = 0 ;
 	    if (sbuf sb ; (rs = sb.start(rbuf,rs)) >= 0) {
 		{
@@ -1073,7 +1075,7 @@ static int mkindfname(char *rbuf,cc *dname,cc *name,cc *suf,cc *end) noex {
 
 #endif /* COMMENT */
 
-static int vecstr_defenvs(vecstr *elp,mainv ea) noex {
+local int vecstr_defenvs(vecstr *elp,mainv ea) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	for (int i = 0 ; ea[i] != nullptr ; i += 1) {
@@ -1087,12 +1089,12 @@ static int vecstr_defenvs(vecstr *elp,mainv ea) noex {
 }
 /* end subroutine (vecstr_defenvs) */
 
-static int vecstr_loadpath(vecstr *clp,cchar *pp) noex {
+local int vecstr_loadpath(vecstr *clp,cchar *pp) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    sif		of(pp,-1,":;") ;
 	    int		cl ;
 	    cchar	*cp ;
@@ -1105,14 +1107,14 @@ static int vecstr_loadpath(vecstr *clp,cchar *pp) noex {
 		} /* end if (pathclean) */
 	        if (rs < 0) break ;
 	    } /* end while */
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (trailing one) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstr_loadpath) */
 
-static int mkpathval(vecstr *clp,char *vbuf,int vbuflen) noex {
+local int mkpathval(vecstr *clp,char *vbuf,int vbuflen) noex {
 	int		rs = SR_OK ;
 	int		rlen = 0 ;
 	if (vbuflen >= 0) {
@@ -1151,7 +1153,7 @@ static int mkpathval(vecstr *clp,char *vbuf,int vbuflen) noex {
 }
 /* end subroutine (mkpathval) */
 
-static int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
+local int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
 	liner		**e1pp = (liner **) v1pp ;
 	liner		**e2pp = (liner **) v2pp ;
 	liner		*l1p ;
