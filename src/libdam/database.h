@@ -50,8 +50,6 @@
 #include	<commandment.h>
 #include	<commandments.h>
 #include	<cyihdr.h>
-#include	<msfile.h>
-#include	<msfilee.h>
 #include	<pwi.h>
 #include	<pwihdr.h>
 #include	<uuname.h>
