@@ -34,12 +34,12 @@
 struct cyimk_object {
 	cchar		*name ;
 	uint		objsize ;
-} ;
+} ; /* end struct */
 
 struct cyimk_liner {
 	uint		loff ;
 	uint		llen ;
-} ;
+} ; /* end struct */
 
 struct cyimk_entry {
 	CYIMK_LN	*lines ;
@@ -47,7 +47,7 @@ struct cyimk_entry {
 	uint		vlen ;
 	uint		hash ;
 	uchar		nlines, m, d ;
-} ;
+} ; /* end struct */
 
 struct cyimk_flags {
 	uint		notsorted:1 ;
@@ -57,7 +57,7 @@ struct cyimk_flags {
 	uint		inprogress:1 ;
 	uint		created:1 ;
 	uint		abort:1 ;
-} ;
+} ; /* end struct */
 
 struct cyimk_head {
 	cchar		*idname ;
@@ -74,7 +74,7 @@ struct cyimk_head {
 	int		nfd ;
 	int		year ;
 	mode_t		om ;
-} ;
+} ; /* end struct */
 
 typedef	CYIMK		cyimk ;
 typedef	CYIMK_FL	cyimk_fl ;
