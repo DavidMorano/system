@@ -41,11 +41,11 @@
 struct uuname_cursor {
 	void		*scp ;		/* SO-cursor pointer */
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct uuname_flags {
     	uint		modload:1 ;
-} ;
+} ; /* end struct */
 
 struct uuname_head {
 	modload		*mlp ;
@@ -55,7 +55,7 @@ struct uuname_head {
 	uint		magic ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
-} ;
+} ; /* end struct */
 
 typedef	UUNAME		uuname ;
 typedef	UUNAME_CUR	uuname_cur ;
