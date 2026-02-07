@@ -29,19 +29,25 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<dlfcn.h>
+#include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
 
 #include	"babycalc.h"
 #include	"babycalcs.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -54,19 +60,18 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
-typedef int (*soopen_f)(void *,cchar *,cchar *) noex ;
-typedef int (*socheck_f)(void *,time_t) noex ;
-typedef int (*solookup_f)(void *,time_t,uint *) noex ;
-typedef int (*soinfo_f)(void *,babycalcs_info *) noex ;
-typedef int (*soclose_f)(void *) noex ;
+extern "C" {
+    typedef int (*soopen_f)(void *,cchar *,cchar *) noex ;
+    typedef int (*socheck_f)(void *,time_t) noex ;
+    typedef int (*solookup_f)(void *,time_t,uint *) noex ;
+    typedef int (*soinfo_f)(void *,babycalcs_info *) noex ;
+    typedef int (*soclose_f)(void *) noex ;
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -83,7 +88,7 @@ struct babycalc_calls {
 	solookup_f	lookup ;
 	soinfo_f	info ;
 	soclose_f	close ;
-} ;
+} ; /* end struct */
 
 typedef babycalc_calls *	callsp ;
 
@@ -91,15 +96,16 @@ typedef babycalc_calls *	callsp ;
 /* forward references */
 
 template<typename ... Args>
-static int babycalc_ctor(babycalc *op,Args ... args) noex {
+local int babycalc_ctor(babycalc *op,Args ... args) noex {
     	BABYCALC	*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->mlp = new(nothrow) modload) != np) {
-	        if (callsp p ; (p = new(nothrow) babycalc_calls) != np) {
+	    if ((op->mlp = new(nt) modload) != np) ylikely {
+	        if (callsp p ; (p = new(nt) babycalc_calls) != np) ylikely {
 		    op->callp = callsp(p) ;
 		    rs = SR_OK ;
 		}
@@ -110,42 +116,39 @@ static int babycalc_ctor(babycalc *op,Args ... args) noex {
 	    } /* end new (modload) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (babycalc_ctor) */
+} /* end subroutine (babycalc_ctor) */
 
-static int babycalc_dtor(babycalc *op) noex {
+local int babycalc_dtor(babycalc *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->callp) {
+	    if (op->callp) ylikely {
 		callsp p = callsp(op->callp) ;
 		delete p ;
 		op->callp = nullptr ;
 	    }
-	    if (op->mlp) {
+	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (babycalc_dtor) */
+} /* end subroutine (babycalc_dtor) */
 
 template<typename ... Args>
-static inline int babycalc_magic(babycalc *op,Args ... args) noex {
+local inline int babycalc_magic(babycalc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == BABYCALC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (babycalc_magic) */
+} /* end subroutine (babycalc_magic) */
 
-static int	babycalc_objloadbegin(BC *,cchar *,cchar *) noex ;
-static int	babycalc_objloadend(BC *) noex ;
-static int	babycalc_loadcalls(BC *,vecstr *) noex ;
+local int	babycalc_objloadbegin(BC *,cchar *,cchar *) noex ;
+local int	babycalc_objloadend(BC *) noex ;
+local int	babycalc_loadcalls(BC *,vecstr *) noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
@@ -160,7 +163,7 @@ enum subs {
 	sub_info,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum (subs) */
 
 constexpr cpcchar	subs[] = {
 	"open",
@@ -169,7 +172,7 @@ constexpr cpcchar	subs[] = {
 	"info",
 	"close",
 	NULL
-} ;
+} ; /* end array (subs) */
 
 
 /* exported variables */
@@ -276,7 +279,7 @@ int babycalc_getinfo(BC *op,BC_INFO *ip) noex {
 
 /* private subroutines */
 
-static int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
+local int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
 	modload		*mlp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -298,11 +301,11 @@ static int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
 			    cint	osz = mv[0] ;
 	                    op->objsz = mv[0] ;
 	                    op->cursz = mv[1] ;
-			    if (void *vp ; (rs = uc_malloc(osz,&vp)) >= 0) {
+			    if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) {
 	                        op->obj = vp ;
 	                        rs = babycalc_loadcalls(op,&syms) ;
 	                        if (rs < 0) {
-	                            uc_free(op->obj) ;
+	                            lm_free(op->obj) ;
 	                            op->obj = nullptr ;
 	                        }
 	                    } /* end if (memory-allocation) */
@@ -325,11 +328,11 @@ static int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
 }
 /* end subroutine (babycalc_objloadbegin) */
 
-static int babycalc_objloadend(BC *op) noex {
+local int babycalc_objloadend(BC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
-	    rs1 = uc_free(op->obj) ;
+	    rs1 = lm_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
@@ -342,7 +345,7 @@ static int babycalc_objloadend(BC *op) noex {
 }
 /* end subroutine (babycalc_objloadend) */
 
-static int babycalc_loadcalls(BC *op,vecstr *slp) noex {
+local int babycalc_loadcalls(BC *op,vecstr *slp) noex {
 	modload		*mlp = op->mlp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -380,7 +383,7 @@ static int babycalc_loadcalls(BC *op,vecstr *slp) noex {
 }
 /* end subroutine (babycalc_loadcalls) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
