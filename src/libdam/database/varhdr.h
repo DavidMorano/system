@@ -41,7 +41,7 @@ struct varhdr_head {
 	uint		nvars ;
 	uint		nskip ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 typedef	VARHDR		varhdr ;
 
