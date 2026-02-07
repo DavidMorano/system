@@ -25,22 +25,20 @@
 	and uses it as a query to calculate the number of events
 	corresponding to that date.  Both past and future dates are
 	possible. Extrapolations are made for future requests.
-
 	Implementation note: We use a heap-sort rather than a
 	quick-sort on the database (which eventually needs to be
 	sorted) since the data is normally or most probably already
 	completely sorted.  This is supposed to give better
-	performance!? (?)
+	performance!? (?) The database is kept in shared memory if
+	at all possible.  Developers should note that the 'table'
+	member of the object is shared alternatively between stages
+	of DB loading or reloading.
 
-	The database is kept in shared memory if at all possible.
-	Developers should note that the 'table' member of the object
-	is shared alternatively between stages of DB loading or
-	reloading.
-
-	Postscript note: This object allows for very robust dynamic
-	creation and update of a shared-memory database.  The cost
-	for this is quite complex and perhaps less capability could
-	have been tolerated for (far) less implementation complexity.
+	Postscript note: 
+	This object allows for very robust dynamic creation and
+	update of a shared-memory database.  The cost for this is
+	quite complex and perhaps less capability could have been
+	tolerated for (far) less implementation complexity.
 
 *******************************************************************************/
 
@@ -50,13 +48,19 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
+#include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsysmisc.h>
+#include	<ucsigset.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<endian.h>
 #include	<sigblocker.h>
 #include	<bfile.h>
@@ -82,7 +86,9 @@
 #include	"babycalcs.h"
 #include	"babieshdr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -144,6 +150,11 @@ typedef BABYCALCS_ENT *	entp ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_openshm(cchar *,int,mode_t) noex ;
+    extern int uc_msync(void *,size_t,int) noex ;
+} /* end extern (C) */
+
 
 /* external variables */
 
@@ -156,74 +167,71 @@ namespace {
 	int		maxpathlen ;
 	operator int () noex ;
     } ;
-}
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int babycalcs_ctor(babycalcs *op,Args ... args) noex {
+local int babycalcs_ctor(babycalcs *op,Args ... args) noex {
     	BABYCALCS	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (babycalcs_ctor) */
+} /* end subroutine (babycalcs_ctor) */
 
-static int babycalcs_dtor(babycalcs *op) noex {
+local int babycalcs_dtor(babycalcs *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (babycalcs_dtor) */
+} /* end subroutine (babycalcs_dtor) */
 
 template<typename ... Args>
-static inline int babycalcs_magic(babycalcs *op,Args ... args) noex {
+local inline int babycalcs_magic(babycalcs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == BABYCALCS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (babycalcs_magic) */
+} /* end subroutine (babycalcs_magic) */
 
-static int	babycalcs_shmload(BC *,mode_t) noex ;
-static int	babycalcs_shmopen(BC *,time_t,cchar *,mode_t) noex ;
-static int	babycalcs_loadtxt(BC *) noex ;
+local int	babycalcs_shmload(BC *,mode_t) noex ;
+local int	babycalcs_shmopen(BC *,time_t,cchar *,mode_t) noex ;
+local int	babycalcs_loadtxt(BC *) noex ;
 
-static int	babycalcs_mapbegin(BC *,time_t,int) noex ;
-static int	babycalcs_mapend(BC *) noex ;
+local int	babycalcs_mapbegin(BC *,time_t,int) noex ;
+local int	babycalcs_mapend(BC *) noex ;
 
-static int	babycalcs_proctxt(BC *,vecobj *) noex ;
-static int	babycalcs_proctxtln(BC *,vecobj *,cvtdater *,cc *,int) noex ;
+local int	babycalcs_proctxt(BC *,vecobj *) noex ;
+local int	babycalcs_proctxtln(BC *,vecobj *,cvtdater *,cc *,int) noex ;
 
-static int	babycalcs_shmwr(BC *,time_t,int,mode_t) noex ;
-static int	babycalcs_shmwrer(BC *,time_t,int,mode_t,HDR *) noex ;
-static int	babycalcs_openshmwait(BC *,cchar *) noex ;
-static int	babycalcs_mutexinit(BC *) noex ;
-static int	babycalcs_procmap(BC *,time_t) noex ;
-static int	babycalcs_verify(BC *,time_t) noex ;
+local int	babycalcs_shmwr(BC *,time_t,int,mode_t) noex ;
+local int	babycalcs_shmwrer(BC *,time_t,int,mode_t,HDR *) noex ;
+local int	babycalcs_openshmwait(BC *,cchar *) noex ;
+local int	babycalcs_mutexinit(BC *) noex ;
+local int	babycalcs_procmap(BC *,time_t) noex ;
+local int	babycalcs_verify(BC *,time_t) noex ;
 
-static int	babycalcs_lookshm(BC *,time_t,time_t,uint *) noex ;
-static int	babycalcs_lookproc(BC *,time_t,uint *) noex ;
-static int	babycalcs_lookinfo(BC *,BC_INFO *) noex ;
-static int	babycalcs_calc(BC *,int,time_t,uint *) noex ;
-static int	babycalcs_dbcheck(BC *,time_t) noex ;
-static int	babycalcs_dbwait(BC *,time_t,USTAT *) noex ;
-static int	babycalcs_reloadshm(BC *,time_t,USTAT *) noex ;
-static int	babycalcs_reloadtxt(BC *,time_t) noex ;
-static int	babycalcs_shmcheck(BC *,USTAT *) noex ;
-static int	babycalcs_shmaccess(BC *,time_t) noex ;
-static int	babycalcs_shmupdate(BC *,time_t,USTAT *,int) noex ;
-static int	babycalcs_shmaddwrite(BC *,int) noex ;
-static int	babycalcs_shminfo(BC *,BC_INFO *) noex ;
+local int	babycalcs_lookshm(BC *,time_t,time_t,uint *) noex ;
+local int	babycalcs_lookproc(BC *,time_t,uint *) noex ;
+local int	babycalcs_lookinfo(BC *,BC_INFO *) noex ;
+local int	babycalcs_calc(BC *,int,time_t,uint *) noex ;
+local int	babycalcs_dbcheck(BC *,time_t) noex ;
+local int	babycalcs_dbwait(BC *,time_t,ustat *) noex ;
+local int	babycalcs_reloadshm(BC *,time_t,ustat *) noex ;
+local int	babycalcs_reloadtxt(BC *,time_t) noex ;
+local int	babycalcs_shmcheck(BC *,ustat *) noex ;
+local int	babycalcs_shmaccess(BC *,time_t) noex ;
+local int	babycalcs_shmupdate(BC *,time_t,ustat *,int) noex ;
+local int	babycalcs_shmaddwrite(BC *,int) noex ;
+local int	babycalcs_shminfo(BC *,BC_INFO *) noex ;
 
 extern "C" {
-    static int	vcmpentry(cvoid **,cvoid **) noex ;
+    local int	vcmpentry(cvoid **,cvoid **) noex ;
 }
 
 
@@ -255,7 +263,7 @@ extern const babycalcs_obj	babycalcs_modinfo = {
 
 /* exported subroutines */
 
-static int	babycalcs_opens(BC *,cchar *) noex ;
+local int	babycalcs_opens(BC *,cchar *) noex ;
 
 int babycalcs_open(BC *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
@@ -268,15 +276,16 @@ int babycalcs_open(BC *op,cchar *pr,cchar *dbname) noex {
 		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
 		    op->pagesize = var.pagesize ;
-	            if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) {
 	                op->pr = cp ;
 			rs = babycalcs_opens(op,dbname) ;
 	                if (rs < 0) {
 	                    if (op->pr) {
-	                        uc_free(op->pr) ;
+	                        void *vp = voidp(op->pr) ;
+	                        lm_free(vp) ;
 	                        op->pr = nullptr ;
 	                    }
-	                }
+	                } /* end if (error) */
 	            } /* end if (memory-allocation) */
 		} /* end if (vars) */
 	    } /* end if (valid) */
@@ -288,19 +297,20 @@ int babycalcs_open(BC *op,cchar *pr,cchar *dbname) noex {
 }
 /* end subroutine (babycalcs_open) */
 
-static int babycalcs_opens(BC *op,cchar *dbname) noex {
+local int babycalcs_opens(BC *op,cchar *dbname) noex {
     	cint		sz = ((var.maxpathlen + 1) * 2) ;
 	cint		maxpath = var.maxpathlen ;
     	int		rs ;
+	int		rs1 ;
 	int		ai = 0 ;
-	if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 	    cchar	*suf = BABYCALCS_DBSUF ;
 	    char	*dbcomp = (a + ((maxpath + 1) * ai++)) ;
 	    if ((rs = snsds(dbcomp,maxpath,dbname,suf)) >= 0) {
 	        cchar	*dbn = BABYCALCS_DBDNAME ;
 		char	*dbfname = (a + ((maxpath + 1) * ai++)) ;
 		if ((rs = mkpath(dbfname,op->pr,dbn,dbcomp)) >= 0) {
-                     if (cc *cp ; (rs = uc_mallocstrw(dbfname,-1,&cp)) >= 0) {
+                     if (cc *cp ; (rs = lm_strw(dbfname,-1,&cp)) >= 0) {
                          cmode	om = BABYCALCS_PERMS ;
                          int	f ;
                          op->dbfname = cp ;
@@ -315,18 +325,20 @@ static int babycalcs_opens(BC *op,cchar *dbname) noex {
                          if (rs < 0) {
                              if (op->fl.txt && (op->table != nullptr)) {
                                  op->fl.txt = false ;
-                                 uc_free(op->table) ;
+                                 lm_free(op->table) ;
                                  op->table = nullptr ;
                              }
                              if (op->dbfname != nullptr) {
-                                 uc_free(op->dbfname) ;
+                                 void *vp = voidp(op->dbfname) ;
+                                 lm_free(vp) ;
                                  op->dbfname = nullptr ;
                              }
                          } /* end if (error handling) */
                      } /* end if (memory-allocation) */
 		} /* end if (mkpath) */
 	    } /* end if (snsds) */
-	    rs = rsfree(rs,a) ;
+	    rs1 = lm_free(a) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
@@ -342,22 +354,25 @@ int babycalcs_close(BC *op) noex {
 	    }
 	    if (op->fl.txt && (op->table != nullptr)) {
 	        op->fl.txt = false ;
-	        rs1 = uc_free(op->table) ;
+	        rs1 = lm_free(op->table) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->table = nullptr ;
 	    }
 	    if (op->shmname != nullptr) {
-	        rs1 = uc_free(op->shmname) ;
+		void *vp = voidp(op->shmname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->shmname = nullptr ;
 	    }
 	    if (op->dbfname != nullptr) {
-	        rs1 = uc_free(op->dbfname) ;
+		void *vp = voidp(op->dbfname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbfname = nullptr ;
 	    }
 	    if (op->pr != nullptr) {
-	        rs1 = uc_free(op->pr) ;
+		void *vp = voidp(op->pr) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->pr = nullptr ;
 	    }
@@ -417,8 +432,9 @@ int babycalcs_getinfo(BC *op,BC_INFO *bip) noex {
 
 /* private subroutines */
 
-static int babycalcs_shmload(BC *op,mode_t om) noex {
+local int babycalcs_shmload(BC *op,mode_t om) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
 	cchar		*cp ;
 	op->mapsize = 0 ;
@@ -428,17 +444,15 @@ static int babycalcs_shmload(BC *op,mode_t om) noex {
 	    char	shmname[MAXNAMELEN + 1] ;
 	    if ((rs = mkshmname(shmname,cp,cl,postfix,-1)) >= 0) {
 	        cl = rs ;
-	        if (cchar *smp ; (rs = uc_mallocstrw(shmname,cl,&smp)) >= 0) {
-	            const time_t	dt = getustime ;
+	        if (cchar *smp ; (rs = lm_strw(shmname,cl,&smp)) >= 0) {
+	            custime	dt = getustime ;
 	            op->shmname = smp ;
 	            if ((rs = babycalcs_shmopen(op,dt,shmname,om)) >= 0) {
 	                cint	fd = rs ;
-
 	                if (op->shmsize == 0) {
-	                    rs = uc_fsize(fd) ;
+	                    rs = u_fsize(fd) ;
 	                    op->shmsize = rs ;
 	                }
-
 	                if (rs >= 0) {
 	                    if ((rs = babycalcs_mapbegin(op,dt,fd)) >= 0) {
 	                        c = rs ;
@@ -456,11 +470,12 @@ static int babycalcs_shmload(BC *op,mode_t om) noex {
 	                        }
 	                    } /* end if (map) */
 	                } /* end if (ok) */
-
-	                u_close(fd) ;
+	                rs1 = u_close(fd) ;
+	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (shm-open) */
 	            if (rs < 0) {
-	                uc_free(op->shmname) ;
+			void *vp = voidp(op->shmname) ;
+	        	lm_free(vp) ;
 	                op->shmname = nullptr ;
 	            }
 	        } /* end if (m-a) */
@@ -471,11 +486,12 @@ static int babycalcs_shmload(BC *op,mode_t om) noex {
 	if (rs < 0) {
 	    if (op->fl.txt && (op->table != nullptr)) {
 	        op->fl.txt = false ;
-	        uc_free(op->table) ;
+	        lm_free(op->table) ;
 	        op->table = nullptr ;
 	    }
 	    if (op->shmname != nullptr) {
-	        uc_free(op->shmname) ;
+	        void *vp = voidp(op->shmname) ;
+	        lm_free(vp) ;
 	        op->shmname = nullptr ;
 	    }
 	} /* end if (error handling) */
@@ -483,7 +499,7 @@ static int babycalcs_shmload(BC *op,mode_t om) noex {
 }
 /* end subroutine (babycalcs_shmload) */
 
-static int babycalcs_shmopen(BC *op,time_t dt,cchar *shmname,mode_t om) noex {
+local int babycalcs_shmopen(BC *op,time_t dt,cchar *shmname,mode_t om) noex {
 	cint	rsn = SR_NOENT ;
 	int		of = O_RDWR ;
 	int		rs ;
@@ -522,7 +538,7 @@ static int babycalcs_shmopen(BC *op,time_t dt,cchar *shmname,mode_t om) noex {
 }
 /* end subroutine (babycalcs_shmopen) */
 
-static int babycalcs_mapbegin(BC *op,time_t dt,int fd) noex {
+local int babycalcs_mapbegin(BC *op,time_t dt,int fd) noex {
     	cnullptr	np{} ;
 	int		rs = SR_BADF ;
 	int		c = 0 ;
@@ -537,7 +553,7 @@ static int babycalcs_mapbegin(BC *op,time_t dt,int fd) noex {
 	        op->ti_map = dt ;
 	        if (op->fl.txt && (op->table != nullptr)) {
 	            op->fl.txt = false ;
-	            uc_free(op->table) ;
+	            lm_free(op->table) ;
 	            op->table = nullptr ;
 	        }
 	        rs = babycalcs_procmap(op,dt) ;
@@ -557,7 +573,7 @@ static int babycalcs_mapbegin(BC *op,time_t dt,int fd) noex {
 /* end subroutine (babycalcs_mapbegin) */
 
 
-static int babycalcs_mapend(BC *op) noex {
+local int babycalcs_mapend(BC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -580,7 +596,7 @@ static int babycalcs_mapend(BC *op) noex {
 }
 /* end subroutine (babycalcs_mapend) */
 
-static int babycalcs_procmap(BC *op,time_t dt) noex {
+local int babycalcs_procmap(BC *op,time_t dt) noex {
 	HDR		*hfp = &op->hf ;
 	cint		hsz = intconv(op->mapsize) ;
 	int		rs ;
@@ -598,7 +614,7 @@ static int babycalcs_procmap(BC *op,time_t dt) noex {
 }
 /* end subroutine (babycalcs_procmap) */
 
-static int babycalcs_loadtxt(BC *op) noex {
+local int babycalcs_loadtxt(BC *op) noex {
 	cint		vsz = szof(BC_ENT) ;
 	int		rs ;
 	int		rs1 ;
@@ -617,7 +633,7 @@ static int babycalcs_loadtxt(BC *op) noex {
 	        if (rs >= 0) {
 	            if ((rs = ents.count) >= 0) {
 	                cint	sz = (rs + 1) * szof(BC_ENT) ;
-	                if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	                if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
 	                    op->table = entp(p) ;
 			    void	*vp{} ;
 	                    for (int i = 0 ; ents.get(i,&vp) >= 0 ; i += 1) {
@@ -639,23 +655,23 @@ static int babycalcs_loadtxt(BC *op) noex {
 	    rs1 = vecobj_finish(&ents) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecobj-entries) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (babycalcs_loadtxt) */
 
-static int babycalcs_proctxt(BC *op,vecobj *tlp) noex {
+local int babycalcs_proctxt(BC *op,vecobj *tlp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	op->fl.sorted = true ;
 	if (cvtdater cd ; (rs = cd.start(0)) >= 0) {
-	    if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 		cint	llen = rs ;
 	        if (bfile tf ; (rs = tf.open(op->dbfname,"r",0666)) >= 0) {
-	            if (USTAT sb ; (rs = tf.control(BC_STAT,&sb)) >= 0) {
+	            if (ustat sb ; (rs = tf.control(BC_STAT,&sb)) >= 0) {
+			csize	fsize = size_t(sb.st_size) ;
 	                op->ti_mdb = sb.st_mtime ;
-	                op->dbsize = intsat(sb.st_size) ;
+	                op->dbsize = intsat(fsize) ;
 	                while ((rs = tf.readln(lbuf,llen)) > 0) {
 			    cchar	*cp ;
 			    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
@@ -673,8 +689,9 @@ static int babycalcs_proctxt(BC *op,vecobj *tlp) noex {
 	            if (c > 1) {
 	                tlp->sort(vcmpentry) ;
 		    }
-	        }
-		rs = rsfree(rs,lbuf) ;
+	        } /* end if (not sorted) */
+		rs1 = lm_free(lbuf) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    rs1 = cd.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -683,7 +700,7 @@ static int babycalcs_proctxt(BC *op,vecobj *tlp) noex {
 }
 /* end subroutine (babycalcs_proctxt) */
 
-static int babycalcs_proctxtln(BC *op,vecobj *tlp,cvtdater *cdp,
+local int babycalcs_proctxtln(BC *op,vecobj *tlp,cvtdater *cdp,
 		cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -721,7 +738,7 @@ static int babycalcs_proctxtln(BC *op,vecobj *tlp,cvtdater *cdp,
 }
 /* end subroutine (babycalcs_proctxtln) */
 
-static int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
+local int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
 	HDR		hf{} ;
 	int		rs ;
 	int		foff = 0 ;
@@ -753,7 +770,7 @@ static int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
 }
 /* end subroutine (babycalcs_shmwr) */
 
-static int babycalcs_shmwrer(BC *op,time_t dt,int fd,mode_t om,HDR *hfp) noex {
+local int babycalcs_shmwrer(BC *op,time_t dt,int fd,mode_t om,HDR *hfp) noex {
 	cint		bsz = op->pagesize ;
 	int		rs ;
 	int		rs1 ;
@@ -812,7 +829,7 @@ static int babycalcs_shmwrer(BC *op,time_t dt,int fd,mode_t om,HDR *hfp) noex {
 }
 /* end subroutine (babycalcs_shmwrer) */
 
-static int babycalcs_mutexinit(BC *op) noex {
+local int babycalcs_mutexinit(BC *op) noex {
 	HDR		*hfp = &op->hf ;
 	ptm		*mxp ;
 	int		rs ;
@@ -821,7 +838,7 @@ static int babycalcs_mutexinit(BC *op) noex {
 	if (ptma ma ; (rs = ptma_create(&ma)) >= 0) {
 	    cint	cmd = PTHREAD_PROCESS_SHARED ;
 	    if ((rs = ptma_setpshared(&ma,cmd)) >= 0) {
-	        rs = ptm_create(mxp,&ma) ;
+	        rs = mxp->create(&ma) ;
 	    }
 	    rs1 = ptma_destroy(&ma) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -830,13 +847,14 @@ static int babycalcs_mutexinit(BC *op) noex {
 }
 /* end subroutine (babycalcs_mutexinit) */
 
-static int babycalcs_openshmwait(BC *op,cchar *shmname) noex {
+local int babycalcs_openshmwait(BC *op,cchar *shmname) noex {
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
 	if (op) {
 	    cint	of = O_RDWR ;
 	    int		to = TO_WAITSHM ;
 	    cmode	om = BABYCALCS_PERMS ;
+	    rs = SR_OK ;
 	    while (to-- > 0) {
 	        rs = uc_openshm(shmname,of,om) ;
 	        fd = rs ;
@@ -852,7 +870,7 @@ static int babycalcs_openshmwait(BC *op,cchar *shmname) noex {
 }
 /* end subroutine (babycalcs_openshmwait) */
 
-static int babycalcs_verify(BC *op,time_t dt) noex {
+local int babycalcs_verify(BC *op,time_t dt) noex {
 	HDR		*hfp = &op->hf ;
 	uint		utime = (uint) dt ;
 	int		rs = SR_OK ;
@@ -887,10 +905,12 @@ static int babycalcs_verify(BC *op,time_t dt) noex {
 }
 /* end subroutine (babycalcs_verify) */
 
-static int babycalcs_lookshm(BC *op,time_t dt,time_t datereq,
+local int babycalcs_lookshm(BC *op,time_t dt,time_t datereq,
 		uint *rp) noex {
 	sigset_t	oldsigmask, newsigmask ;
 	int		rs ;
+	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 
 	if (op->mapdata == nullptr) return SR_BUGCHECK ;
 	if (op->mxp == nullptr) return SR_BUGCHECK ;
@@ -898,24 +918,24 @@ static int babycalcs_lookshm(BC *op,time_t dt,time_t datereq,
 	uc_sigsetfill(&newsigmask) ;
 
 	if ((rs = u_sigprocmask(SIG_BLOCK,&newsigmask,&oldsigmask)) >= 0) {
-
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) {
 	        if ((rs = babycalcs_shmaccess(op,dt)) >= 0) {
 	            rs = babycalcs_lookproc(op,datereq,rp) ;
+		    rv = rs ;
 		}
-
-	        ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex lock) */
-
-	    u_sigprocmask(SIG_SETMASK,&oldsigmask,nullptr) ;
+	    rs1 = u_sigprocmask(SIG_SETMASK,&oldsigmask,nullptr) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (u_sigprocmask) */
 
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (babycalcs_lookshm) */
 
-static int babycalcs_lookproc(BC *op,time_t datereq,uint *rp) noex {
+local int babycalcs_lookproc(BC *op,time_t datereq,uint *rp) noex {
 	int		rs = SR_OK ;
 	int		i ;
 
@@ -935,7 +955,7 @@ static int babycalcs_lookproc(BC *op,time_t datereq,uint *rp) noex {
 }
 /* end subroutine (babycalcs_lookproc) */
 
-static int babycalcs_calc(BC *op,int i,time_t rd,uint *rp) noex {
+local int babycalcs_calc(BC *op,int i,time_t rd,uint *rp) noex {
 	time_t		bd = (i > 0) ? op->table[i-1].date : 0L ;
 	double		x0, x1, dx ;
 	double		y0, y1, dy ;
@@ -962,14 +982,14 @@ static int babycalcs_calc(BC *op,int i,time_t rd,uint *rp) noex {
 }
 /* end subroutine (babycalcs_calc) */
 
-static int babycalcs_dbcheck(BC *op,time_t dt) noex {
+local int babycalcs_dbcheck(BC *op,time_t dt) noex {
     	cint		to = TO_LASTCHECK ;
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (dt == 0) dt = getustime ;
 	if (int tint = int(dt - op->ti_lastcheck) ; tint >= to) {
 	    op->ti_lastcheck = dt ;
-	    if (USTAT sb ; (rs = u_stat(op->dbfname,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(op->dbfname,&sb)) >= 0) {
 	        if (op->fl.shm) {
 	            f = (sb.st_mtime > op->hf.dbtime) ;
 	            f = f || (sb.st_size != op->hf.dbsize) ;
@@ -995,7 +1015,7 @@ static int babycalcs_dbcheck(BC *op,time_t dt) noex {
 }
 /* end subroutine (babycalcs_dbcheck) */
 
-static int babycalcs_shminfo(BC *op,BC_INFO *bip) noex {
+local int babycalcs_shminfo(BC *op,BC_INFO *bip) noex {
 	sigset_t	oldsigmask, newsigmask ;
 	int		rs ;
 	int		rs1 ;
@@ -1007,12 +1027,13 @@ static int babycalcs_shminfo(BC *op,BC_INFO *bip) noex {
 	uc_sigsetfill(&newsigmask) ;
 
 	if ((rs = u_sigprocmask(SIG_BLOCK,&newsigmask,&oldsigmask)) >= 0) {
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) {
 		{
 	            rs = babycalcs_lookinfo(op,bip) ;
 		    rv = rs ;
 		}
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex lock) */
 	    rs1 = u_sigprocmask(SIG_SETMASK,&oldsigmask,nullptr) ;
@@ -1023,7 +1044,7 @@ static int babycalcs_shminfo(BC *op,BC_INFO *bip) noex {
 }
 /* end subroutine (babycalcs_shminfo) */
 
-static int babycalcs_lookinfo(BC *op,BC_INFO *bip) noex {
+local int babycalcs_lookinfo(BC *op,BC_INFO *bip) noex {
 	uint		*hwp ;
 	int		rs = SR_OK ;
 	memclear(bip) ;
@@ -1035,30 +1056,21 @@ static int babycalcs_lookinfo(BC *op,BC_INFO *bip) noex {
 }
 /* end subroutine (babycalcs_lookinfo) */
 
-static int babycalcs_dbwait(BC *op,time_t dt,USTAT *sbp) noex {
-	USTAT		nsb ;
+local int babycalcs_dbwait(BC *op,time_t dt,ustat *sbp) noex {
 	int		rs = SR_OK ;
 	int		f ;
-
 	f = ((dt - sbp->st_mtime) >= TO_DBWAIT) ;
 	if (! f) {
 	    while (rs >= 0) {
-
 	        msleep(TO_DBPOLL) ;
-
-	        if ((rs = u_stat(op->dbfname,&nsb)) >= 0) {
-
+		if (USTAT nsb ; (rs = u_stat(op->dbfname,&nsb)) >= 0) {
 	            f = (sbp->st_size == nsb.st_size) ;
 	            f = f && (sbp->st_mtime == nsb.st_mtime) ;
 	            f = f && ((dt - nsb.st_mtime) >= TO_DBWAIT) ;
-	            if (f)
-	                break ;
-
+	            if (f) break ;
 	            *sbp = nsb ;
 	            dt = getustime ;
-
 	        } /* end if */
-
 	    } /* end while */
 	} /* end if (needed) */
 
@@ -1066,7 +1078,7 @@ static int babycalcs_dbwait(BC *op,time_t dt,USTAT *sbp) noex {
 }
 /* end subroutine (babycalcs_dbwait) */
 
-static int babycalcs_reloadshm(BC *op,time_t dt,USTAT *sbp) noex {
+local int babycalcs_reloadshm(BC *op,time_t dt,ustat *sbp) noex {
 	cint		of = O_RDWR ;
 	int		rs ;
 	int		rs1 ;
@@ -1079,13 +1091,16 @@ static int babycalcs_reloadshm(BC *op,time_t dt,USTAT *sbp) noex {
 	    int		mapextent ;
 	    int		f = false ;
 	    if (sigblocker sb ; (rs = sigblocker_start(&sb,nullptr)) >= 0) {
-	        if ((rs = ptm_lock(op->mxp)) >= 0) {
-	            rs = babycalcs_shmcheck(op,sbp) ;
-	            f = (rs > 0) ;
-	            if ((rs >= 0) && f) {
-	                rs = babycalcs_shmupdate(op,dt,sbp,fd) ;
-	            }
-	            rs1 = ptm_unlock(op->mxp) ;
+	        ptm *mxp = op->mxp ;
+	        if ((rs = mxp->lockbegin) >= 0) {
+		    {
+	                rs = babycalcs_shmcheck(op,sbp) ;
+	                f = (rs > 0) ;
+	                if ((rs >= 0) && f) {
+	                    rs = babycalcs_shmupdate(op,dt,sbp,fd) ;
+	                }
+		    }
+	            rs1 = mxp->lockend ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex lock) */
 	        rs1 = sigblocker_finish(&sb) ;
@@ -1112,7 +1127,7 @@ static int babycalcs_reloadshm(BC *op,time_t dt,USTAT *sbp) noex {
 }
 /* end subroutine (babycalcs_reloadshm) */
 
-static int babycalcs_shmupdate(BC *op,time_t dt,USTAT *sbp,int fd) noex {
+local int babycalcs_shmupdate(BC *op,time_t dt,ustat *sbp,int fd) noex {
 	BC_ENT		*tblp = op->table ;
 	int		rs ;
 	if ((rs = babycalcs_loadtxt(op)) >= 0) {
@@ -1150,7 +1165,7 @@ static int babycalcs_shmupdate(BC *op,time_t dt,USTAT *sbp,int fd) noex {
 	    } /* end if (update needed) */
 	    if (op->table != nullptr) {
 	        op->fl.txt = false ;
-	        uc_free(op->table) ;
+	        lm_free(op->table) ;
 	        op->table = nullptr ;
 	    }
 	} /* end if (babycalcs_loadtxt) */
@@ -1159,7 +1174,7 @@ static int babycalcs_shmupdate(BC *op,time_t dt,USTAT *sbp,int fd) noex {
 }
 /* end subroutine (babycalcs_shmupdate) */
 
-static int babycalcs_shmaddwrite(BC *op,int fd) noex {
+local int babycalcs_shmaddwrite(BC *op,int fd) noex {
 	off_t		tbloff ;
 	uint		*hwp = (uint *) (op->mapdata + BABIESHDR_IDLEN) ;
 	cint		esz = szof(BC_ENT) ;
@@ -1168,26 +1183,29 @@ static int babycalcs_shmaddwrite(BC *op,int fd) noex {
 	{
 	    tbloff = hwp[babieshdrh_btoff] ;
 	}
-	shmsz = intsat(tbloff) ;
+	{
+	    long loff = long(tbloff) ;
+	    shmsz = intsat(loff) ;
+	}
 	if ((rs = u_seek(fd,tbloff,SEEK_SET)) >= 0) {
 	    int		tblsz = ((op->nentries + 1) * esz) ;
 	    if ((rs = u_write(fd,op->table,tblsz)) >= 0) {
 	        tbloff += rs ;
 		shmsz += rs ;
-	        rs = uc_ftruncate(fd,tbloff) ;
+	        rs = u_ftruncate(fd,tbloff) ;
 	    }
-	}
+	} /* end if (u_seek) */
 	return (rs >= 0) ? shmsz : rs ;
 }
 /* end subroutine (babycalcs_shmaddwrite) */
 
-static int babycalcs_reloadtxt(BC *op,time_t dt) noex {
+local int babycalcs_reloadtxt(BC *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	(void) dt ;
 	if (op->fl.txt && (op->table != nullptr)) {
 	    op->fl.txt = false ;
-	    rs1 = uc_free(op->table) ;
+	    rs1 = lm_free(op->table) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->table = nullptr ;
 	}
@@ -1198,7 +1216,7 @@ static int babycalcs_reloadtxt(BC *op,time_t dt) noex {
 }
 /* end subroutine (babycalcs_reloadtxt) */
 
-static int babycalcs_shmcheck(BC *op,USTAT *sbp) noex {
+local int babycalcs_shmcheck(BC *op,ustat *sbp) noex {
 	uint		*hwp = (uint *) (op->mapdata + BABIESHDR_IDLEN) ;
 	cuint		dbtime = uint(sbp->st_mtime) ;
 	cuint		dbsz = uint(sbp->st_size) ;
@@ -1212,7 +1230,7 @@ static int babycalcs_shmcheck(BC *op,USTAT *sbp) noex {
 }
 /* end subroutine (babycalcs_shmcheck) */
 
-static int babycalcs_shmaccess(BC *op,time_t dt) noex {
+local int babycalcs_shmaccess(BC *op,time_t dt) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op->mapdata) {
 	    if (dt == 0) dt = getustime ;
@@ -1228,18 +1246,18 @@ vars::operator int () noex {
     	int		rs ;
 	if ((rs = ucpagesize) >= 0) {
 	    pagesize = rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
 		maxpathlen = rs ;
 	    }
 	}
 	return rs ;
-}
+} /* end method (vars::operator) */
 
-static int entcmp(BC_ENT *e1p,BC_ENT *e2p) noex {
+local int entcmp(BC_ENT *e1p,BC_ENT *e2p) noex {
     	return intconv(e1p->date - e2p->date) ;
 }
 
-static int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	BC_ENT		*e1p = (BC_ENT *) *v1pp ;
 	BC_ENT		*e2p = (BC_ENT *) *v2pp ;
 	int		rc = 0 ;
