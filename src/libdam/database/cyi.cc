@@ -47,14 +47,16 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<climits>		/* |INT_MAX| */
 #include	<ctime>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strncmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<endian.h>
 #include	<ids.h>
 #include	<storebuf.h>
@@ -70,6 +72,9 @@
 #include	"cyi.h"
 #include	"cyihdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -103,19 +108,19 @@ struct bventry {
 	uint	li ;			/* index-number of first line-entry */
 	uint	hash ;
 	uint	citation ;		/* (nlines, m, d) */
-} ;
+} ; /* end struct */
 
 struct blentry {
 	uint	loff ;
 	uint	llen ;
-} ;
+} ; /* end struct */
 
 namespace {
     struct vars {
 	int		maxpathlen ;
 	int mkvars() noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -124,31 +129,28 @@ template<typename ... Args>
 static int cyi_ctor(cyi *op,Args ... args) noex {
     	CYI		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cyi_ctor) */
+} /* end subroutine (cyi_ctor) */
 
 static int cyi_dtor(cyi *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cyi_dtor) */
+} /* end subroutine (cyi_dtor) */
 
 template<typename ... Args>
 static inline int cyi_magic(cyi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CYI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (cyi_magic) */
+} /* end subroutine (cyi_magic) */
 
 static int	cyi_dbfind(cyi *,time_t,cchar *,cchar *,int) noex ;
 static int	cyi_dbfindname(cyi *,ids *,time_t,char *,cc *,cc *,int) noex ;
@@ -667,7 +669,7 @@ static int cyi_auditvt(cyi *op) noex {
 static int cyi_bsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
 	int		rs = SR_FAULT ;
 	int		vi = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    uint	citekey = (vte[3] & 0xffff) ;
 	    uint	(*vtep)[5] ;
 	    int		vtesize = (5 * szof(uint)) ;
@@ -687,7 +689,7 @@ static int cyi_bsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
 static int cyi_lsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
 	int		rs = SR_FAULT ;
 	int		vi = 0 ; /* used-afterwards */
-	if (op) {
+	if (op) ylikely {
 	    uint	citekey = (vte[3] & 0xffff) ;
 	    for (vi = 0 ; vi < vtlen ; vi += 1) {
 	        if ((vt[vi][3] & 0x0000FFFF) == citekey) break ;
@@ -807,7 +809,7 @@ static bool isNotOurFile(int rs) noex {
 
 int vars::mkvars() noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	}
     	return rs ;
