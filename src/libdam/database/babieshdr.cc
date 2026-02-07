@@ -41,11 +41,15 @@
 
 #include	<envstandards.h>	/* must be before others */
 #include	<unistd.h>
+#include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<endian.h>
 #include	<mkmagic.h>
 #include	<hasx.h>
