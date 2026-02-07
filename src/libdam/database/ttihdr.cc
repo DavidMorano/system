@@ -43,11 +43,15 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<endian.h>
 #include	<strn.h>
 #include	<mkmagic.h>
@@ -76,7 +80,7 @@ enum his {
 	hi_ostrtab,			/* overflow-string-table */
 	hi_ostrlen,			/* overflow-string-table length */
 	hi_overlast
-} ;
+} ; /* end enum (his) */
 
 
 /* forward references */
