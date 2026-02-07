@@ -1,29 +1,48 @@
-/* fetchfield */
+/* fetchfield SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* fetch a header field value */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 
-
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+ 
+  	Name:
+	fetchfield
+
+	Description:
+	Tihs subtoueine fetches a value from a mail-message header.
+
+	Returns:
+	0 if header field was found  (fvalue is the value)
+ 	1 if message number is too big or too small
+	2 if that header is not found in the message
+
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<usystem.h>
 #include	<bfile.h>
+#include	<hmatch.h>		/* |hmatch(3pcs)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -32,28 +51,27 @@
 #include	"mb.h"
 
 
+/* external subroutines */
+
+
 /* external varaiables */
 
 extern struct mailbox	mb ;
 
 
+/* local structures */
+
+
 /* forward references */
 
-int	hmatch() ;
+
+/* local variables */
 
 
-
-/****************************************************************************
-
-	get the value of the specified header within specified message
-
-	return 0 if header field was found  (fvalue is the value)
- 	return 1 if message number is too big or too small
-	return 2 if that header is not found in the message
+/* exported variables */
 
 
-****************************************************************************/
-
+/* exported subroutines */
 
 int fetchfield(mn,f,fvalue,buflen)
 int	mn ;
@@ -62,9 +80,7 @@ char	fvalue[] ;
 int	buflen ;
 {
 	int	i, l, ml, flen = 0 ;
-
 	char	field[LINEBUFLEN + 1], *fp = field ;
-
 
 #if	CF_DEBUG
 	if (g.debuglevel > 1)
@@ -75,7 +91,7 @@ int	buflen ;
 	if ((mn < 0) || (mn >= mb.total)) 
 		return 1 ;
 
-	if (curr.fp == NULL)
+	if (curr.fp == nullptr)
 		return SR_FAULT ;
 
 /* assume getting from current mailbox which is already set up */
@@ -181,41 +197,5 @@ int	buflen ;
 	return 2 ; /* not found */
 }
 /* end subroutine (fetchfield) */
-
-
-/***************************************************************************
-
-	Is the initial substring of 'field' the specified 'f' string?  
-	Return 0 if there is no match, else we return the
-	character position of the header value string.
-	The match is case independent.
-
-*/
-
-int hmatch(f,field)
-char	f[], field[] ;
-{
-	char	*fp = field, *hp = f ;
-
-
-	while (*hp && (*hp != ':')) {
-
-	    if (CHAR_TOLC(*fp) != CHAR_TOLC(*hp)) 
-		return 0 ;
-
-	    fp += 1 ;
-	    hp += 1 ;
-	}
-
-	while (CHAR_ISWHITE(*fp)) 
-		fp += 1 ;
-
-	if (*fp != ':') 
-		return 0 ;
-
-	return (fp + 1 - field) ;
-}
-/* end subroutine (hmatch) */
-
 
 
