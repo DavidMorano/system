@@ -35,25 +35,25 @@
 struct babycalcs_object {
 	cchar		*name ;
 	uint		objsize ;
-} ;
+} ; /* end struct */
 
 struct babycalcs_information {
 	time_t		wtime ;
 	time_t		atime ;
 	uint		acount ;
-} ;
+} ; /* end struct */
 
 struct babycalcs_entry {
 	time_t		date ;
 	uint		count ;
-} ;
+} ; /* end struct */
 
 struct babycalcs_flags {
 	uint		shm:1 ;
 	uint		txt:1 ;
 	uint		sorted:1 ;
 	uint		needinit:1 ;
-} ;
+} ; /* end struct */
 
 struct babycalcs_head {
 	BABYCALCS_ENT	*table ;
@@ -73,7 +73,7 @@ struct babycalcs_head {
 	int		dbsize ;
 	int		shmsize ;
 	int		nentries ;	
-} ;
+} ; /* end struct */
 
 typedef	BABYCALCS		babycalcs ;
 typedef	BABYCALCS_FL		babycalcs_fl ;
