@@ -41,7 +41,7 @@ struct ttihdr_head {
 	uint		ostrtab ;	/* overflow-string-table */
 	uint		ostrlen ;	/* overflow-string-table length */
 	uchar		vetu[4] ;	/* VETU */
-} ;
+} ; /* end struct */
 
 typedef	TTIHDR		ttihdr ;
 
