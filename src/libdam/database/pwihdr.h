@@ -45,7 +45,7 @@ enum pwihdrs {
 	pwihdr_idxfl3,
 	pwihdr_idxun,
 	pwihdr_overlast
-} ;
+} ; /* end enum */
 
 struct pwihdr_head {
 	uint		fsize ;
@@ -65,7 +65,7 @@ struct pwihdr_head {
 	uint		idxfl3 ;
 	uint		idxun ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 typedef PWIHDR		pwihdr ;
 
