@@ -75,7 +75,7 @@
 #include	<passwdent.h>
 #include	<getusername.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<localmisc.h>
 
 #include	"opensvc_fshome.h"
@@ -113,18 +113,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	statvfsdir(cchar *,STATVFS *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUGS
 extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
@@ -132,11 +120,6 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 extern int	nprintf(const char *,const char *,...) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
 
 
 /* local structures */
@@ -573,7 +556,7 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
 {
 	PASSWDENT	pw ;
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	const int	pwlen = getbufsize(bufsize_pw) ;
 	int		f_blocks = sip->fl.blocks ;
 	int		rs ;
 	int		ll = 0 ;
