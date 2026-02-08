@@ -1,4 +1,4 @@
-# MAKEFILES (wsnx)
+# MAKEFILE (wsnx)
 
 T= wsnx
 
@@ -40,10 +40,23 @@ MODS +=
 LIBS +=
 
 
+OBJ0_WSNX= wsncols.o wsnwcpynarrow.o
+OBJ1_WSNX= wsnlen.o
+OBJ2_WSNX= 
+OBJ3_WSNX= 
+OBJ4_WSNX= 
+OBJ5_WSNX= 
+
+OBJA_WSNX= obj0_wsnx.o obj1_wsnx.o
+OBJB_WSNX= obj2_wsnx.o obj3_wsnx.o
+OBJC_WSNX= obj4_wsnx.o obj5_wsnx.o
+
+OBJ_WSNX= obja.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -56,21 +69,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_WSNX= wsncols.o wsnwcpynarrow.o
-OBJ1_WSNX= 
-OBJ2_WSNX= 
-OBJ3_WSNX= 
-OBJ4_WSNX= 
-OBJ5_WSNX= 
-
-OBJA_WSNX= obj0_sfx.o
-OBJB_WSNX= obj2_sfx.o obj3_sfx.o
-OBJC_WSNX= obj4_sfx.o obj5_sfx.o
-
-OBJ_WSNX= obja.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -83,6 +82,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -116,36 +118,46 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_sfx.o:		$(OBJ0_WSNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_WSNX)
+obj0_wsnx.o:		$(OBJ0_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_sfx.o:		$(OBJ1_WSNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_WSNX)
+obj1_wsnx.o:		$(OBJ1_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_sfx.o:		$(OBJ2_WSNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_WSNX)
+obj2_wsnx.o:		$(OBJ2_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_sfx.o:		$(OBJ3_WSNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_WSNX)
+obj3_wsnx.o:		$(OBJ3_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4_sfx.o:		$(OBJ4_WSNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_WSNX)
+obj4_wsnx.o:		$(OBJ4_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj5_sfx.o:		$(OBJ5_WSNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_WSNX)
+obj5_wsnx.o:		$(OBJ5_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6_wsnx.o:		$(OBJ6_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7_wsnx.o:		$(OBJ7_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obja.o:			$(OBJA_WSNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_WSNX)
+obja.o:			$(OBJA_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb.o:			$(OBJB_WSNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_WSNX)
+objb.o:			$(OBJB_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objc.o:			$(OBJC_WSNX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_WSNX)
+objc.o:			$(OBJC_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD_WSNX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 wsncols.o:		wsncols.cc		$(INCS)
 wsnwcpynarrow.o:	wsnwcpynarrow.cc	$(INCS)
+wsnlen.o:		wsnlen.cc		$(INCS)
 
 
