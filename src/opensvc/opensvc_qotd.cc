@@ -68,7 +68,7 @@
 #include	<vecstr.h>
 #include	<getusername.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<dayspec.h>
 #include	<tmtime.hh>
 #include	<wordfill.h>
@@ -107,22 +107,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matkeystr(cchar **,cchar *,int) ;
-extern int	statvfsdir(cchar *,STATVFS *) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	getmjd(int,int,int) ;
-extern int	getyrd(int,int,int) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUGS
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
@@ -130,11 +114,6 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strdcpy1(char *,int,cchar *) ;
 
 
 /* local structures */
