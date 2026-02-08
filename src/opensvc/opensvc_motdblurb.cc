@@ -128,22 +128,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpyuc(char *,int,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getnodename(char *,int) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	attachso(cchar **,cchar *,cchar **,cchar **,int,void **) ;
-extern int	nusers(const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	isSpecialObject(void *) ;
-extern int	ndigmax(double *,int,int) ;
-
 #if	CF_DEBUGS || CF_DEBUGN
 extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
@@ -151,10 +135,6 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 extern int	nprintf(const char *,const char *,...) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
