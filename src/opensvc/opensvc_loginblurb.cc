@@ -29,12 +29,12 @@
 	Synopsis:
 
 	int opensvc_loginblurb(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -136,29 +136,13 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpyuc(char *,int,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	attachso(cchar **,cchar *,cchar **,cchar **,int,void **) ;
-extern int	isSpecialObject(void *) ;
-
-extern int	lib_callfunc(int(*)(),int,const char **,const char **,void *) ;
+extern int	lib_callfunc(int(*)(),int,cchar **,cchar **,void *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -172,7 +156,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* local variables */
 
-static const char	*syslibs[] = {
+static cchar	*syslibs[] = {
 	"/usr/extra/lib",
 	"/usr/preroot/lib",
 	NULL
@@ -183,21 +167,21 @@ static const char	*syslibs[] = {
 
 
 int opensvc_loginblurb(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
 	int		argc = 0 ;
 	int		pipes[2] ;
 	int		fd = -1 ;
-	const char	*callsymname = CALLSYMNAME ;
-	const char	*cmdname = CMDNAME ;
-	const char	*strspec = NULL ;
+	cchar	*callsymname = CALLSYMNAME ;
+	cchar	*cmdname = CMDNAME ;
+	cchar	*strspec = NULL ;
 	char		strbuf[STRBUFLEN+1] ;
 	char		cmdsymname[MAXNAMELEN+1] ;
 	const void	*symp = NULL ;
@@ -244,10 +228,10 @@ int		to ;
 /* do we need a default argument? */
 
 	if ((strspec == NULL) || (strspec[0] == '\0')) {
-	    const char	*gn = getourenv(envv,VARMOTDGROUP) ;
+	    cchar	*gn = getourenv(envv,VARMOTDGROUP) ;
 	    char	gbuf[GROUPNAMELEN+1] ;
 	    if ((gn == NULL) || (gn[0] == '\0')) {
-		const char	*gidp = getourenv(envv,VARMOTDGID) ;
+		cchar	*gidp = getourenv(envv,VARMOTDGID) ;
 		if ((gidp != NULL) && (gidp[0] != '\0')) {
 		    int		v ;
 		    if ((rs = cfdeci(gidp,-1,&v)) >= 0) {
@@ -268,8 +252,8 @@ int		to ;
 
 	if (rs >= 0) {
 	if ((rs = sncpy2(cmdsymname,MAXNAMELEN,"p_",cmdname)) >= 0) {
-	    const char	*dnames[10] ; /* careful size is big enough */
-	    const char	*syms[3] ; /* careful size is big enough */
+	    cchar	*dnames[10] ; /* careful size is big enough */
+	    cchar	*syms[3] ; /* careful size is big enough */
 	    int		i, j ;
 	    int		dlmode = RTLD_LAZY ;
 	    char	libdname[MAXPATHLEN+1] ;
@@ -316,8 +300,8 @@ int		to ;
 	    int	wfd = pipes[1] ;
 	    int	ex ;
 	    int (*callfunc)(int(*)(),int,cchar **,cchar **,void *) ;
-	    int	(*cmdfunc)(int,const char **,void *) ;
-	    const char	*nfn = STDFNNULL ;
+	    int	(*cmdfunc)(int,cchar **,void *) ;
+	    cchar	*nfn = STDFNNULL ;
 	    char	ofname[MAXNAMELEN+1] ;
 	    fd = pipes[0] ;
 
@@ -325,11 +309,11 @@ int		to ;
 		(int (*)(int(*)(),int,cchar **,cchar **,void *)) 
 		callsymp ;
 
-	    cmdfunc = (int (*)(int,const char **,void *)) symp ;
+	    cmdfunc = (int (*)(int,cchar **,void *)) symp ;
 
 	    if ((rs = snsd(ofname,MAXNAMELEN,"*",wfd)) >= 0) {
 		    int		ac = 0 ;
-	    	    const char	*av[11] ; /* careful on size */
+	    	    cchar	*av[11] ; /* careful on size */
 
 	            av[ac++] = cmdname ;
 	            av[ac++] = "-ef" ;
