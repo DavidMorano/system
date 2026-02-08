@@ -1,4 +1,4 @@
-# MAKEFILES (wswcpyx)
+# MAKEFILE (wswcpyx)
 
 T= wswcpyx
 
