@@ -57,7 +57,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -67,7 +67,7 @@
 #include	<filereadln.h>
 #include	<localmisc.h>
 
-#include	"opensvc_daytime.h"
+#include	"opensvc_dayctime"
 #include	"defs.h"
 
 
@@ -83,17 +83,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	localgetorgcode(const char *,char *,int,const char *) ;
-extern int	isNotPresent(int) ;
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_nist(time_t,struct nistinfo *,char *) ;
 
 
 /* local structures */
