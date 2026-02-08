@@ -57,7 +57,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
@@ -73,10 +73,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy2(char *,int,const char *,const char *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
 
 
 /* local structures */
