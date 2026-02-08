@@ -84,19 +84,6 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	opentermnote(const char *,const char **,int,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	isdigitlatin(int) ;
-
-extern cchar	*getourenv(const char **,const char *) ;
-
 
 /* local structures */
 
