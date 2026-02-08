@@ -102,23 +102,11 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	attachso(cchar **,cchar *,cchar **,cchar **,int,void **) ;
-extern int	isSpecialObject(void *) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 extern int	nprintf(const char *,const char *,...) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
