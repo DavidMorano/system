@@ -37,9 +37,6 @@
 
 /* external subroutines */
 
-extern int	openweather(const char *,const char *,int,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-
 #if	CF_DEBUGS
 extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
@@ -47,13 +44,14 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern const char 	*getourenv(const char **,const char *) ;
-
-extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
 static int procweather(int,int) ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
