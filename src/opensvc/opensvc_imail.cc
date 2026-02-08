@@ -179,20 +179,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpyuc(char *,int,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isSpecialObject(void *) ;
-
 #if	CF_DEBUGS || CF_DEBUGN
 extern int	nprintf(const char *,const char *,...) ;
 extern int	debugopen(const char *) ;
@@ -200,10 +186,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* local structures */
