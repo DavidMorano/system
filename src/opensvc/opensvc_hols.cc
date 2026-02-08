@@ -23,12 +23,12 @@
 	Synopsis:
 
 	int opensvc_hols(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -91,28 +91,15 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	attachso(cchar **,cchar *,cchar **,cchar **,int,void **) ;
-extern int	hasalldig(const char *,int) ;
-extern int	isSpecialObject(void *) ;
-
-extern int	lib_callfunc(int(*)(),int,const char **,const char **,void *) ;
+extern int	lib_callfunc(int(*)(),int,cchar **,cchar **,void *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 #if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -126,7 +113,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* local variables */
 
-static const char	*syslibs[] = {
+static cchar	*syslibs[] = {
 	"/usr/extra/lib",
 	"/usr/preroot/lib",
 	NULL
@@ -137,19 +124,19 @@ static const char	*syslibs[] = {
 
 
 int opensvc_hols(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
 	int		argc = 0 ;
 	int		fd = -1 ;
-	const char	*callsymname = CALLSYMNAME ;
-	const char	*cmdname = CMDNAME ;
+	cchar	*callsymname = CALLSYMNAME ;
+	cchar	*cmdname = CMDNAME ;
 	char		cmdsymname[MAXNAMELEN+1] ;
 	char		numbuf[NUMBUFLEN+1] ;
 	const void	*symp = NULL ;
@@ -186,8 +173,8 @@ int		to ;
 /* find and load the shared-object we need (LIBLKCMD) */
 
 	if ((rs = sncpy2(cmdsymname,MAXNAMELEN,"p_",cmdname)) >= 0) {
-	    const char	*dnames[10] ; /* careful that the size is big enough */
-	    const char	*syms[3] ; /* careful that the size is big enough */
+	    cchar	*dnames[10] ; /* careful that the size is big enough */
+	    cchar	*syms[3] ; /* careful that the size is big enough */
 	    int		i, j ;
 	    int		dlmode = RTLD_LAZY ;
 	    char	libdname[MAXPATHLEN+1] ;
@@ -230,21 +217,21 @@ int		to ;
 	if (rs >= 0) {
 	if ((rs = opentmp(NULL,0,0664)) >= 0) {
 	    int	ex ;
-	    int (*callfunc)(int(*)(),int,cchar **,const char **,void *) ;
-	    int	(*cmdfunc)(int,const char **,const char **,void *) ;
-	    const char	*ef = STDFNNULL ;
+	    int (*callfunc)(int(*)(),int,cchar **,cchar **,void *) ;
+	    int	(*cmdfunc)(int,cchar **,cchar **,void *) ;
+	    cchar	*ef = STDFNNULL ;
 	    char	ofname[MAXNAMELEN+1] ;
 	    fd = rs ;
 
 	    callfunc = 
-		(int (*)(int(*)(),int,const char **,const char **,void *)) 
+		(int (*)(int(*)(),int,cchar **,cchar **,void *)) 
 		callsymp ;
 
 	    cmdfunc = (int (*)(int,cchar **,cchar **,void *)) symp ;
 
 	    if ((rs = snsd(ofname,MAXNAMELEN,"*",fd)) >= 0) {
 		    int		ac = 0 ;
-	    	    const char	*av[10] ; /* careful */
+	    	    cchar	*av[10] ; /* careful */
 
 	            av[ac++] = cmdname ;
 	            av[ac++] = "-ef" ;
