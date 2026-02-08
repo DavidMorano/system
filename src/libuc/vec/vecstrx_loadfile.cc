@@ -118,10 +118,10 @@ namespace {
 
 /* forward references */
 
-static int	vecstrx_loadfiler(vecstrx *,int,cchar *) noex ;
-static int	vecstrx_loadfd(vecstrx *,int,int) noex ;
-static int	vecstrx_loadline(vecstrx *,int,cchar *,int) noex ;
-static int	mkterms() noex ;
+local int	vecstrx_loadfiler(vecstrx *,int,cchar *) noex ;
+local int	vecstrx_loadfd(vecstrx *,int,int) noex ;
+local int	vecstrx_loadline(vecstrx *,int,cchar *,int) noex ;
+local int	mkterms() noex ;
 
 
 /* local variables */
@@ -161,7 +161,7 @@ int vecstrx::loadfile(int fu,cchar *fname) noex {
 
 /* local subroutines */
 
-static int vecstrx_loadfiler(vecstrx *op,int fu,cchar *fname) noex {
+local int vecstrx_loadfiler(vecstrx *op,int fu,cchar *fname) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -186,7 +186,7 @@ static int vecstrx_loadfiler(vecstrx *op,int fu,cchar *fname) noex {
 }
 /* end subroutine (vecstrx_loadfiler) */
 
-static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
+local int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -225,7 +225,7 @@ static int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 }
 /* end subroutine (vecstrx_loadfd) */
 
-static int vecstrx_loadline(vecstrx *vsp,int fu,cchar *lbuf,int len) noex {
+local int vecstrx_loadline(vecstrx *vsp,int fu,cchar *lbuf,int len) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -251,7 +251,7 @@ static int vecstrx_loadline(vecstrx *vsp,int fu,cchar *lbuf,int len) noex {
 }
 /* end subroutine (vecstrx_loadline) */
 
-static int mkterms() noex {
+local int mkterms() noex {
 	return fieldterms(fterms,false,'\n','#') ;
 }
 /* end subroutine (mkterms) */
