@@ -88,27 +88,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	getnodename(char *,int) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	localgetorgloc(const char *,char *,int,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy2(char *,int,const char *,const char *) ;
-
 
 /* local structures */
 
