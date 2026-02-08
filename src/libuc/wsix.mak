@@ -1,4 +1,4 @@
-# MAKEFILES (wsix)
+# MAKEFILE (wsix)
 
 T= wsix
 
