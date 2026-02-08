@@ -92,23 +92,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	openshmtmp(char *,int,mode_t) ;
-extern int	statvfsdir(const char *,STATVFS *) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUGS
 extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
@@ -116,10 +99,6 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 extern int	nprintf(const char *,const char *,...) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* local structures */
