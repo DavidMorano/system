@@ -76,20 +76,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	isNotPresent(int) ;
-
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* local structures */
 
