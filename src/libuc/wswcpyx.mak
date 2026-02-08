@@ -1,4 +1,4 @@
-# MAKEFILES (wswcpyx)
+# MAKEFILE (wswcpyx)
 
 T= wswcpyx
 
@@ -115,30 +115,24 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:		$(OBJ0) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+obj0.o:		$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1.o:		$(OBJ1) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+obj1.o:		$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2.o:		$(OBJ2) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+obj2.o:		$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3.o:		$(OBJ3) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
-
-obj4.o:		$(OBJ4) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
-
-obj5.o:		$(OBJ5) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
+obj3.o:		$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obja.o:			$(OBJA) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb.o:			$(OBJB) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 wswcpynarrow.o:		wswcpynarrow.cc		$(INCS)
