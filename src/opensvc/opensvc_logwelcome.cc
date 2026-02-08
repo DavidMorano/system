@@ -72,17 +72,17 @@
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>		/* for 'strftime(3c)' */
+#include	<ctime>		/* for 'strftime(3c)' */
 
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<getusername.h>
 #include	<sbuf.h>
-#include	<tmtime.hh>
+#include	<tmctimeh>
 #include	<localmisc.h>
 
 #include	"opensvc_logwelcome.h"
@@ -127,41 +127,11 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	sntmtime(char *,int,TMTIME *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matkeystr(cchar **,cchar *,int) ;
-extern int	getnodename(char *,int) ;
-extern int	getinetdomain(char *,int,cchar *) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	getuserorg(char *,int,cchar *) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	localgetorg(cchar *,char *,int,cchar *) ;
-extern int	localgetorgloc(cchar *,char *,int,cchar *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	nprintf(cchar *,cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strdcpy2(char *,int,cchar *,cchar *) ;
-extern char	*strdcpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
 
 
 /* local structures */
