@@ -68,7 +68,7 @@
 #include	<vecstr.h>
 #include	<getusername.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<localmisc.h>
 
 #include	"opensvc_zoneabbr.h"
@@ -106,17 +106,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	statvfsdir(const char *,STATVFS *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUGS
 extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
@@ -124,11 +113,6 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 extern int	nprintf(const char *,const char *,...) ;
 #endif
-
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
 
 
 /* local structures */
