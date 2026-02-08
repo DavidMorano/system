@@ -33,7 +33,7 @@
 #include	<cstring>
 #include	<ctype.h>
 #include	<cstdarg>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<vecstr.h>
@@ -280,7 +280,7 @@ OW		*sip ;
 	if (sip->wmin < 0) {
 	    struct tm	ts ;
 	    if (sip->daytime == 0) sip->daytime = time(NULL) ;
-	    rs = uc_gmtime(&sip->daytime,&ts) ;
+	    rs = uc_timegm(&sip->daytime,&ts) ;
 	    if (rs >= 0) sip->wmin = ts.tm_min ;
 	}
 
