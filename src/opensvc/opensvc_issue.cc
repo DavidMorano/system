@@ -67,7 +67,7 @@
 #include	<keyopt.h>
 #include	<getusername.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<issue.h>
 #include	<opentmp.h>
 #include	<exitcodes.h>
@@ -96,24 +96,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* local structures */
@@ -563,7 +545,7 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,char *vp,int vl)
 static int subinfo_getuser(SUBINFO *sip,const char *un)
 {
 	struct passwd	pw ;
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	const int	pwlen = getbufsize(bufsize_pw) ;
 	int		rs ;
 	char		*pwbuf ;
 
