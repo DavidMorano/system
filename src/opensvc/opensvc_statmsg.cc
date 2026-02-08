@@ -134,23 +134,6 @@ import libutil ;
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	sncpyuc(char *,int,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	getnodename(char *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	nusers(cchar *) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	isdigitlatin(int) ;
-extern int	isSpecialObject(void *) ;
-
 #if	CF_DEBUGS || CF_DEBUGN
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
@@ -158,10 +141,6 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
