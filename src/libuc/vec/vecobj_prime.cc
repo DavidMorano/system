@@ -68,14 +68,12 @@ extern "C" {
 
 /* forward references */
 
-static int	vecobj_ctor(vecobj *) noex ;
-static int	vecobj_dtor(vecobj *) noex ;
-static int	vecobj_setopts(vecobj *,int) noex ;
-static int	vecobj_extend(vecobj *) noex ;
-static int	vecobj_iget(vecobj *,int,void **) noex ;
-static int	vecobj_sorted(vecobj *,vecobj_vcf) noex ;
-
-static int	mkoptmask() noex ;
+local int	vecobj_ctor(vecobj *) noex ;
+local int	vecobj_dtor(vecobj *) noex ;
+local int	vecobj_setopts(vecobj *,int) noex ;
+local int	vecobj_extend(vecobj *) noex ;
+local int	vecobj_iget(vecobj *,int,void **) noex ;
+local int	vecobj_sorted(vecobj *,vecobj_vcf) noex ;
 
 
 /* local subroutines */
@@ -85,20 +83,10 @@ static int	mkoptmask() noex ;
 
 cint			defents = VECOBJ_DEFENTS ;
 
-static cint		optmask = mkoptmask() ;
-
 
 /* exported variables */
 
-int vecobjms::reuse		= (1 << vecobjo_reuse) ;
-int vecobjms::compact		= (1 << vecobjo_compact) ;
-int vecobjms::swap		= (1 << vecobjo_swap) ;
-int vecobjms::stationary	= (1 << vecobjo_stationary) ;
-int vecobjms::conserve		= (1 << vecobjo_conserve) ;
-int vecobjms::sorted		= (1 << vecobjo_sorted) ;
-int vecobjms::ordered		= (1 << vecobjo_ordered) ;
-
-const vecobjms		vecobjm ;
+constexpr vecobjms	vecobjm ;
 
 
 /* exported subroutines */
@@ -176,12 +164,12 @@ int vecobj_add(vecobj *op,cvoid *s) noex {
 
 int vecobj_adduniq(vecobj *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
 	if (op && ep) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 	        const caddr_t	*vepp ; 
 	        csize		esize = size_t(op->esz) ;
+		int		i ; /* used-afterwards */
 	        rs = INT_MAX ;
 	        for (i = 0 ; i < op->i ; i += 1) {
 	            vepp = (caddr_t *) op->va ;
@@ -652,7 +640,7 @@ int vecobj_audit(vecobj *op) noex {
 
 /* private subroutines */
 
-static int vecobj_ctor(vecobj *op) noex {
+local int vecobj_ctor(vecobj *op) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
@@ -671,7 +659,7 @@ static int vecobj_ctor(vecobj *op) noex {
 }
 /* end subroutine (vecobj_ctor) */
 
-static int vecobj_dtor(vecobj *op) noex {
+local int vecobj_dtor(vecobj *op) noex {
 	int		rs = SR_OK ;
 	if (op->lap) ylikely {
 	    delete op->lap ;
@@ -681,7 +669,7 @@ static int vecobj_dtor(vecobj *op) noex {
 }
 /* end subroutine (vecobj_dtor) */
 
-static int mkoptmask() noex {
+consteval int mkoptmask() noex {
 	int		m = 0 ;
 	m |= vecobjm.reuse ;
 	m |= vecobjm.compact ;
@@ -694,7 +682,8 @@ static int mkoptmask() noex {
 }
 /* end subroutine (mkoptmask) */
 
-static int vecobj_setopts(vecobj *op,int vo) noex {
+local int vecobj_setopts(vecobj *op,int vo) noex {
+	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ optmask)) == 0) ylikely {
 	    rs = SR_OK ;
@@ -711,7 +700,7 @@ static int vecobj_setopts(vecobj *op,int vo) noex {
 }
 /* end subroutine (vecobj_setopts) */
 
-static int vecobj_extend(vecobj *op) noex {
+local int vecobj_extend(vecobj *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
 	    int		nn ;
@@ -737,7 +726,7 @@ static int vecobj_extend(vecobj *op) noex {
 }
 /* end subroutine (vecobj_extend) */
 
-static int vecobj_iget(vecobj *op,int i,void **rpp) noex {
+local int vecobj_iget(vecobj *op,int i,void **rpp) noex {
 	int		rs = SR_NOTFOUND ;
 	if ((i >= 0) && (i < op->i)) {
 	    *rpp = op->va[i] ;
@@ -749,7 +738,7 @@ static int vecobj_iget(vecobj *op,int i,void **rpp) noex {
 }
 /* end subroutine (vecobj_iget) */
 
-static int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
+local int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
 	int		rs = SR_OK ;
 	int		fsorted ;
 	if (op->fl.osorted && (! op->fl.issorted)) {
