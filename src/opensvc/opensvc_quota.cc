@@ -70,7 +70,7 @@
 #include	<getbufsize.h>
 #include	<char.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<getusername.h>
 #include	<localmisc.h>
 
@@ -93,19 +93,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	statvfsdir(const char *,STATVFS *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	cfdeci(const char *,int,int *) ;
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
 
 
 /* local structures */
@@ -214,7 +201,7 @@ static int procuser(char *lbuf,int llen,cchar *un)
 #else
 	{
 	    struct passwd	pw ;
-	    const int		pwlen = getbufsize(getbufsize_pw) ;
+	    const int		pwlen = getbufsize(bufsize_pw) ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
