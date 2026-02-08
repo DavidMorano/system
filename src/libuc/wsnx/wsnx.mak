@@ -1,4 +1,4 @@
-# MAKEFILES (wsnx)
+# MAKEFILE (wsnx)
 
 T= wsnx
 
