@@ -1,4 +1,4 @@
-# MAKEFILES (wsfx)
+# MAKEFILE (wsfx)
 
 T= wsfx
 
