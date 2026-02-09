@@ -1,0 +1,100 @@
+/* pcsutil MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* PCS utilities */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1995-04-01, David A­D­ Morano
+	This is part of my cleanup-compatibility effort.
+
+*/
+
+/* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Name:
+	hdrmatbasic
+
+  	Description:
+	Determine if the first character of two c-strings are
+	both non-zero and case-insensitively equal
+
+	Synopsis:
+	int hdrmatbasic(cchar *header,cchar *str) noex
+
+	Arguments:
+	- header	header string that we are looking for
+	- str		string value to test for header
+
+	Returns:
+	false		did not match
+	true		matched
+
+	Notes:
+	1. Reminder that header-key names MUST start in coloumn
+	zero ('0') with no leading white-space characters (at all).
+	Historically, white-space WAS allowed AFTER the header-key
+	name and before the colon (':') character.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<char.h>
+#include	<localmisc.h>
+
+#include	"hmatch.h"
+
+export module pcsutil ;
+
+/* local defines */
+
+#define	ISWH(ch)	CHAR_ISNLANK(ch)
+#define	TOUC(ch)	CHAR_TOUC(ch)
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+export {
+    inline bool hdrmatbasic(cc *hp,cc *bp) noex {
+    	bool f = hp[0] && bp[0] ;
+	f = f && (TOUC(hp[0]) == TOUC(bp[0])) ;
+    	return f ;
+    } /* end subroutine (hdrmatbasic) */
+} /* end export */
+
+
