@@ -18,9 +18,9 @@
 
 /*******************************************************************************
 
-	This subroutine will form a file name according to some rules.
-
-	We try in order:
+  	Description:
+	This subroutine will form a file name according to some
+	rules.  We try in order:
 
 	programroot/etc/name/name.fname
 	programroot/etc/name/fname
@@ -58,7 +58,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sbuf.h>
 #include	<vecstr.h>
 #include	<outbuf.h>
@@ -89,14 +90,13 @@
 static int	schedexpand(cchar *,VECSTR *,cchar *,char *,int) noex ;
 
 
-/* local global variabes */
-
-
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int bopensched(fp,sched,nsp,fname,outname,mode,permission)
 bfile		*fp ;
