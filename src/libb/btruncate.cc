@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	btruncate
+
+	Description:
 	We truncate a BFILE stream.
 
 *******************************************************************************/
@@ -24,7 +28,11 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -34,6 +42,10 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_ftruncate(int,off_t) noex ;
+}
 
 
 /* external variables */
