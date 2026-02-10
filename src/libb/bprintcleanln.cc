@@ -29,7 +29,8 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<linebuffer.h>
 #include	<rmx.h>
 #include	<mkchar.h>
