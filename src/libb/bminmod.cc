@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	bminmod
+
+	Description:
 	Sset a minimum mode on the opened file.
 
 *******************************************************************************/
@@ -24,7 +28,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -34,6 +40,10 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_fminmod(int,mode_t) noex ;
+}
 
 
 /* external variables */
