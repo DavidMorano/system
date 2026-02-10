@@ -207,7 +207,7 @@ OBJ96= memfile.o langx.o sigman.o sighand.o
 OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
 OBJ98= openportmsg.o varsub.o userattr.o 
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
-OBJ100= rijndael.o expcook.o schedvar.o
+OBJ100= rijndael.o expcook.o
 OBJ101= termnote.o egs.o librandom.o
 OBJ102= loadave.o modload.o userinfo.o
 OBJ103= dw.o fmq.o useraccdb.o csem.o
@@ -253,7 +253,7 @@ OBJ137= isNotValid.o isNotAccess.o isNotLib.o
 OBJ138= isBadSend.o isBadRecv.o isBadMsg.o
 OBJ139= isasocket.o isinteractive.o isfsremote.o isproc.o
 OBJ140= statvfsdir.o
-OBJ141= rmsesfiles.o dircount.o isdirempty.o
+OBJ141= rmsesfiles.o
 OBJ142= prgetprogpath.o prsetfname.o prmktmpdir.o
 OBJ143=
 
@@ -271,8 +271,8 @@ OBJ153= getev.o getaflen.o getprotofamily.o getlogfac.o getlogpri.o getmjd.o
 OBJ154= msghdr.o cmsghdr.o
 OBJ155= mailboxappend.o
 OBJ156= termescseq.o termconseq.o termconseqi.o hdrextid.o hdrextnum.o 
-OBJ157= localgetorg.o localgetorgcode.o localgetorgloc.o 
-OBJ158= localgetnetload.o localsetnetload.o localgetsystat.o localsetsystat.o
+OBJ157= localset.o
+OBJ158= localget.o
 OBJ159= inetpton.o inetntop.o inet_ntoa_r.o inet4int.o
 
 OBJ160= tabcols.o nextfield.o nextfieldterm.o nextqtoken.o 
@@ -671,7 +671,6 @@ sighand.o:		sighand.c sighand.h
 paramfile.o:		paramfile.cc paramfile.h
 srvtab.o:		srvtab.cc srvtab.h
 acctab.o:		acctab.cc acctab.h
-schedvar.o:		schedvar.cc schedvar.h
 
 memfile.o:		memfile.cc memfile.h
 
@@ -699,8 +698,7 @@ userattr.o:		userattr.c userattr.h
 ts.o:			ts.cc ts.h
 envlist.o:		envlist.cc envlist.h
 querystr.o:		querystr.cc querystr.h
-mkdirlist.o:		mkdirlist.cc	mkdirlist.h
-sesmsg.o:		sesmsg.cc sesmsg.h
+sesmsg.o:		sesmsg.cc	sesmsg.hh
 msgdata.o:		msgdata.cc msgdata.h
 msgbuf.o:		msgbuf.cc msgbuf.h
 sysrealname.o:		sysrealname.cc sysrealname.h
@@ -780,11 +778,6 @@ gethe.dir:
 # STRLISTX
 strlistx.o:		strlistx.dir
 strlistx.dir:
-	makesubdir $@
-
-# FILEREAD
-fileread.o:		fileread.dir
-fileread.dir:
 	makesubdir $@
 
 # SYSVARX
@@ -877,6 +870,31 @@ instr.o:		instr.dir
 instr.dir:
 	makesubdir $@
 
+# MKUI
+mkui.o:			mkui.dir
+mkui.dir:
+	makesubdir $@
+
+# MODPROC
+modproc.o:		modproc.dir
+modproc.dir:
+	makesubdir $@
+
+# CMDUTILS
+cmdutils.o:		cmdutils.dir
+cmdutils.dir:
+	makesubdir $@
+
+# EXMSG
+exmsg.o:		ecmsg.dir
+ecmsg.dir:
+	makesubdir $@
+
+# SYSDIALER
+sysdialer.o:		sysdialer.dir
+sysdialer.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
@@ -897,6 +915,8 @@ percache.o:		percache.cc percache.h
 cvttemperature.o:	cvttemperature.cc cvttemperature.h
 mallcompactstr.o:	mallcompactstr.cc	mallcompactstr.h	$(INCS)
 defproc.o:		defproc.cc		defproc.h		$(INCS)
+inittimezone.o:		inittimezone.cc		inittimezone.h		$(INCS)
+schedvar.o:		schedvar.cc		schedvar.h		$(INCS)
 
 # DFSA
 dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
