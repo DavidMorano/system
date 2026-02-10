@@ -40,7 +40,11 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<intsat.h>
 #include	<localmisc.h>
 
@@ -98,12 +102,14 @@ int bseek(bfile *op,off_t wo,int w) noex {
 	            } /* end if */
 	            if (rs >= 0) {
 		        coff	co = (wo + ao) ;
-		        off_t	soff{} ;
+			cint	fd = op->fd ;
 	                op->bp = op->bdata ;
 	                op->len = 0 ;
-			rs = u_seeko(op->fd,co,w,&soff) ;
-			op->offset = soff ;
-			ro = intsat(soff) ;
+		        if (off_t soff ; (rs = u_seeko(fd,co,w,&soff)) >= 0) {
+			    csize	foff = size_t(soff) ;
+			    op->offset = soff ;
+			    ro = intsat(foff) ;
+			} /* end if (u_seeko) */
 	            } /* end if */
 		} /* end if (no shortcuts) */
 	    } /* end if (valid) */
@@ -123,7 +129,7 @@ static int notappend(bfile *op,off_t wo,int w) noex {
 	    f = f || ((w == SEEK_CUR) && (wo == 0)) ;
 	    f = f || ((w == SEEK_SET) && (wo == foff)) ;
 	    if (f) rs = 0 ;
-	}
+	} /* end if (not-append) */
 	return rs ;
 }
 /* end subroutine (notappend) */
