@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	bcontrol
+
+	Description:
 	This subroutine performs various control functions on the
 	file. Some of these are:
 
@@ -30,12 +34,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>		/* USTAT */
+#include	<sys/stat.h>		/* ustat */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>		/* |va_list(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -45,6 +54,15 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_ftruncate(int,off_t) noex ;
+    extern int uc_fminmod(int,mode_t) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_fsyncdata(int) noex ;
+    extern int uc_fsync(int) noex ;
+    extern int uc_nonblock(int,int) noex ;
+} /* end extern (C) */
 
 
 /* external variables */
@@ -114,7 +132,7 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	            break ;
 	        case BC_STAT:
 	            {
-	    	        USTAT	*ssp = (USTAT *) va_arg(ap,void *) ;
+	    	        ustat	*ssp = (ustat *) va_arg(ap,void *) ;
 		        if (ssp != nullptr) {
 	                    rs = u_fstat(op->fd,ssp) ;
 	                } else {
@@ -267,9 +285,9 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 		        if (bsize <= 1024) {
 		            bsize = op->pagesize ;
 		        }
-	                if ((rs = uc_valloc(bsize,&bdata)) >= 0) {
+	                if ((rs = lm_vall(bsize,&bdata)) >= 0) {
 	                    if (op->bdata) {
-	                        uc_free(op->bdata) ;
+	                        lm_free(op->bdata) ;
 		            }
 	                    op->bsize = bsize ;
 	                    op->bdata = bdata ;
@@ -280,7 +298,7 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	            break ;
 	        case BC_DSYNC:
 	            if ((rs = bfile_flush(op)) >= 0) {
-	                rs = uc_fdatasync(op->fd) ;
+	                rs = uc_fsyncdata(op->fd) ;
 	            } /* end if (was able to flush) */
 	            break ;
 	        case BC_SYNC:
@@ -377,7 +395,7 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 /* end subroutine (bcontrol) */
 
 int bsize(bfile *op) noex {
-	USTAT		sb ;
+	ustat		sb ;
 	int		rs ;
 	if ((rs = bcontrol(op,BC_STAT,&sb)) >= 0) {
 	    rs = (sb.st_size & INT_MAX) ;
@@ -386,7 +404,7 @@ int bsize(bfile *op) noex {
 }
 /* end subroutine (bsize) */
 
-int bstat(bfile *op,USTAT *sbp) noex {
+int bstat(bfile *op,ustat *sbp) noex {
 	return bcontrol(op,BC_STAT,sbp) ;
 }
 /* end subroutine (bstat) */
