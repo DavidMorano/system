@@ -24,9 +24,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -90,15 +93,14 @@ static int bwritefmt(bfile *op,cchar *fmt,va_list ap) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		*lbuf{} ;
 	if ((rs = bfile_magic(op,fmt,ap)) > 0) {
-	    if ((rs = malloc_ml(&lbuf)) >= 0) {
+	    if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 	        cint	llen = rs ;
 	        if ((rs = bufvprintf(lbuf,llen,fmt,ap)) >= 0) {
 	            rs = bwriteout(op,lbuf,rs) ;
 	            wlen = rs ;
 	        }
-	        rs1 = uc_free(lbuf) ;
+	        rs1 = lm_free(lbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
