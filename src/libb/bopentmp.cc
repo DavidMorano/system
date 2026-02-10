@@ -25,8 +25,8 @@
 
 	int bopentmp(fp,tname,ostr,om)
 	bfile		*fp ;
-	const char	tname[] ;
-	const char	ostr[] ;
+	cchar	tname[] ;
+	cchar	ostr[] ;
 	mode_t		om ;
 
 	Arguments:
@@ -48,7 +48,8 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sigblocker.h>
 #include	<mkpathx.h>
 #include	<mkdirs.h>
@@ -75,8 +76,8 @@
 
 /* external subroutines */
 
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
 
 
 /* external variables */
@@ -88,7 +89,7 @@ extern int	sfdirname(const char *,int,const char **) ;
 /* forward references */
 
 static int mkxfn(char *,cchar *) ;
-static int mktmpdirs(const char *,mode_t) ;
+static int mktmpdirs(cchar *,mode_t) ;
 
 
 /* local variables */
@@ -150,7 +151,7 @@ static int mkxfn(char *xfname,cchar *tname)
 /* end subroutine (mkxfn) */
 
 
-static int mktmpdirs(const char *xfname,mode_t om)
+static int mktmpdirs(cchar *xfname,mode_t om)
 {
 	int		rs = SR_OK ;
 	int		cl ;
