@@ -5,7 +5,7 @@
 /* "Basic I-O" package */
 /* version %I% last-modified %G% */
 
-#define	CF_MAPPABLE	0	/* allow mapped files */
+#define	CF_MAPABLE	0	/* allow mapped files */
 
 /* revision history:
 
@@ -51,7 +51,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucopen.h>
 #include	<bufsizevar.hh>
 #include	<sysval.hh>
 #include	<stdfnames.h>
@@ -67,7 +71,9 @@
 
 #include	"bfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -76,14 +82,13 @@ import libutil ;
 #define	BOM_APPEND	(1<<2)
 #define	BOM_FILEDESC	(1<<3)
 
-#ifndef	CF_MAPPABLE
-#define	CF_MAPPABLE	0	/* allow mapped files */
+#ifndef	CF_MAPABLE
+#define	CF_MAPABLE	0	/* allow mapped files */
 #endif
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
@@ -94,6 +99,14 @@ typedef bfile_map *	maper ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_fcntl(int,int,...) noex ;
+    extern int uc_tell(int,off_t *) noex ;
+    extern int uc_fminmod(int,mode_t) noex ;
+    extern int uc_close(int) noex ;
+    extern int uc_dupmince(int,int) noex ;
+}
 
 extern "C" {
     extern int	findfilepath(cchar *,char *,cchar *,int) noex ;
@@ -113,7 +126,7 @@ namespace {
 	   sop = p ;
 	} ;
 	operator bool () noex ;
-   } ;
+   } ; /* end struct */
    struct sub_bopen {
 	bfile		*op ;
 	cchar		*fn ;
@@ -140,8 +153,8 @@ namespace {
 	int bufsize() noex ;
 	int openreg() noex ;
 	int iclose() noex ;
-   } ;
-}
+   } ; /* end struct (sub_bopen) */
+} /* end namespace */
 
 
 /* forward references */
@@ -155,10 +168,10 @@ static int	bfile_mapend(bfile *) noex ;
 
 /* local variables */
 
-constexpr bool		f_mappable = CF_MAPPABLE ;
+constexpr bool		f_mapable = CF_MAPABLE ;
 
 static sysval		pagesize(sysval_ps) ;
-static bufsizevar	maxlinelen(getbufsize_ml) ;
+static bufsizevar	maxlinelen(bufsize_ml) ;
 
 
 /* exported variables */
@@ -167,10 +180,11 @@ static bufsizevar	maxlinelen(getbufsize_ml) ;
 /* exported subroutines */
 
 int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
+    	BFILE		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && fn && os) {
-	    cnullptr	np{} ;
-	    memclear(op) ;
+	    memclear(hop) ;
 	    op->fd = -1 ;
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
@@ -326,8 +340,8 @@ int sub_bopen::bufsize() noex {
 	    op->pagesize = rs ;
 	    if ((rs = maxlinelen) >= 0) {
 	        cint	maxline = rs ;
-	        USTAT	sb ;
-	        if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+		    csize	fsize = size_t(sb.st_size) ;
 	            bool	f = false ;
 	            bool	f_notseek = true ;
 	            op->fsize = 0 ;
@@ -340,7 +354,7 @@ int sub_bopen::bufsize() noex {
 	            if (f) {
 	                if (isreadonly) {
 	                    cint	ps = op->pagesize ;
-	                    int		fs = intsat(sb.st_size) ;
+	                    int		fs = intsat(fsize) ;
 	                    int		cs ;
 		            if (fs == 0) fs = 1 ;
 	                    cs = ceil(fs,512) ;
@@ -387,7 +401,7 @@ int sub_bopen::openreg() noex {
 static int bfile_bufbegin(bfile *op,int bsize) noex {
 	int		rs ;
 	if (bsize == 0) bsize = op->pagesize ;
-	if (char *p ; (rs = uc_malloc(bsize,&p)) >= 0) {
+	if (char *p ; (rs = lm_mall(bsize,&p)) >= 0) {
 	    op->bdata = p ;
 	    op->bsize = bsize ;
 	    op->bbp = p ;
@@ -401,7 +415,7 @@ static int bfile_bufend(bfile *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->bdata) {
-	    rs1 = uc_free(op->bdata) ;
+	    rs1 = lm_free(op->bdata) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->bdata = nullptr ;
 	    op->bbp = nullptr ;
@@ -429,9 +443,9 @@ static int bfile_opts(bfile *op) noex {
 static int bfile_mapbegin(bfile *op) noex {
 	cint		nm = BFILE_NMAPS ;
 	int		rs = SR_OK ;
-	if (op->fl.mappable) {
-	    cint	sz = (nm * sizeof(bfile_map)) ;
-	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	if (op->fl.mapable) {
+	    cint	sz = (nm * szof(bfile_map)) ;
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	        op->maps = maper(vp) ;
 	        for (int i = 0 ; i < nm ; i += 1) {
 	            op->maps[i].fl.valid = false ;
@@ -440,7 +454,7 @@ static int bfile_mapbegin(bfile *op) noex {
 	        op->bp = nullptr ;
 	        op->fl.mapinit = true ;
 	    } /* end if (m-a) */
-	} /* end if (f_mappable) */
+	} /* end if (fl.mapable) */
 	return rs ;
 }
 /* end subroutine (bfile_mapbegin) */
@@ -458,7 +472,7 @@ static int bfile_mapend(bfile *op) noex {
 	        }
 	    } /* end for */
 	    {
-	        rs1 = uc_free(op->maps) ;
+	        rs1 = lm_free(op->maps) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->maps = nullptr ;
 	    }
