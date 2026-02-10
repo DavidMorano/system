@@ -1,4 +1,4 @@
-# MAKEFILES (libacl)
+# MAKEFILE (libacl)
 
 T= libacl
 
