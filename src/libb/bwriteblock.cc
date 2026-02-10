@@ -42,8 +42,8 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>
 #include	<usystem.h>
+#include	<algorithm>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -56,7 +56,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -104,7 +103,7 @@ namespace {
 	    return rs ;
 	} ;
     } ; /* end struct (writer) */
-}
+} /* end namespace */
 
 
 /* forward references */
