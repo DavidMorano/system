@@ -43,16 +43,17 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<linefold.h>
 #include	<localmisc.h>		/* |COLUMNS| + |NTABCOLS| */
 
 #include	"bfile.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
