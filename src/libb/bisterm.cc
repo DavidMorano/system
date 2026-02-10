@@ -33,7 +33,10 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<usystem.h>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
 
 #include	"bfile.h"
 
