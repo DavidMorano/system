@@ -30,16 +30,17 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mkfile.h>
 #include	<strx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -190,7 +191,7 @@ char	cmd[] ;
 /* put together the remote command file */
 
 	jobfname[0] = '\0' ;
-	if ((rs = mkjobfile("/tmp",0740,jobfname)) < 0) 
+	if ((rs = mkfilejob("/tmp",0740,jobfname)) < 0) 
 		goto badjobfile ;
 
 	if ((rs = bopen(jfp,jobfname,"wct",0744)) < 0) 
