@@ -22,10 +22,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<usystem.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<intsat.h>
 #include	<localmisc.h>
 
@@ -54,7 +57,10 @@ int btell(bfile *op,off_t *rp) noex {
 	if ((rs = bfile_magic(op)) > 0) {
 	    coff	ro = op->offset ;
 	    if (rp) *rp = ro ;
-	    rs = intsat(ro) ;
+	    {
+		csize foff = size_t(ro) ;
+	        rs = intsat(foff) ;
+	    }
 	} /* end if (magic) */
 	return rs ;
 }
