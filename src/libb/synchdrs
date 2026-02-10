@@ -1,5 +1,6 @@
 #!/usr/extra/bin/ksh
-# SYNCFILES
+# SYNCHDRS
+
   find * -type f -mtime -120 -name '*.h*' -print | while read N ; do
     BN=${N##*/}
     IN=include/${BN}
