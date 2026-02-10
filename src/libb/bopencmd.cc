@@ -39,15 +39,17 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<char.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<strwcpy.h>
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
