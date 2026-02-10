@@ -61,11 +61,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<outbuf.h>
 #include	<localmisc.h>
 
+#include	"bfile.h"
 
 /* local defines */
 
