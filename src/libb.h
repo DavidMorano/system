@@ -20,10 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>		/* |USTAT| */
+#include	<sys/stat.h>		/* |ustat| */
 #include	<unistd.h>
 #include	<stdarg.h>		/* |va_list(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<stdfnames.h>
 
 
@@ -48,47 +49,88 @@
 #define	BFILE_STDERR	STDFNERR	/* from STDFNAMES */
 #define	BFILE_STDLOG	STDFNLOG	/* from STDFNAMES */
 #define	BFILE_STDNULL	STDFNNULL	/* from STDFNAMES */
+
+enum bcs {
+	bc_noop,
+	bc_tell,
+	bc_buf,
+	bc_linebuf,
+	bc_unbuf,
+	bc_fd,
+	bc_stat,
+	bc_truncate,
+	bc_chmod,
+	bc_setlk,
+	bc_setlkw,
+	bc_getlk,
+	bc_unlock,
+	bc_lockread,
+	bc_lockwrite,
+	bc_inpartline,
+	bc_getfl,
+	bc_setfl,
+	bc_getfdfl,
+	bc_setfdfl,
+	bc_closeonexec,
+	bc_bufsiÿe,
+	bc_dsync,
+	bc_sync,
+	bc_islinebuf,
+	bc_isterminal,
+	bc_minmod,
+	bc_setbufall,
+	bc_setbufwhole,
+	bc_setbufline,
+	bc_setbufnone,
+	bc_setbufdef,
+	bc_getbufflags,
+	bc_setbufflags,
+	bc_nonblock,
+	bc_overlast
+} ; /* end enum (bcs) */
+
 /* user commands to 'bcontrol' */
-#define	BC_NOOP		0
-#define	BC_TELL		1
-#define	BC_BUF		2		/* perform buffering */
+#define	BC_NOOP		bc_noop	
+#define	BC_TELL		bc_tell	
+#define	BC_BUF		bc_buf		/* perform buffering */
+#define	BC_LINEBUF	bc_linebuf	/* do line buffering on output */
+#define	BC_UNBUF	bc_unbuf	/* do no buffering */
+#define	BC_FD		bc_fd		/* get the file description */
+#define	BC_STAT		bc_stat	
+#define	BC_TRUNCATE	bc_truncate	
+#define	BC_CHMOD	bc_chmod	
+#define	BC_SETLK	bc_setlk	/* perform custom locking */
+#define	BC_SETLKW	bc_setlkw	
+#define	BC_GETLK	bc_getlk	
+#define	BC_UNLOCK	bc_unlock	/* unlock any locks */
+#define	BC_LOCKREAD	bc_lockread	/* lock whole file for reads */
+#define	BC_LOCKWRITE	bc_lockwrite	/* lock whole file for writes */
+#define	BC_INPARTLINE	bc_inpartline	/* allow partial input on lines */
+#define	BC_GETFL	bc_getfl	/* get file flags */
+#define	BC_SETFL	bc_setfl	/* set file flags */
+#define	BC_GETFDFL	bc_getfdfl	/* get file descriptor flags */
+#define	BC_SETFDFL	bc_setfdfl	/* set file descriptor flags */
+#define	BC_CLOSEONEXEC	bc_closeonexec	/* set CLOSE-on-EXEC flag */
+#define	BC_BUFSIZE	bc_bufsiÿe	/* set buffer size */
+#define	BC_DSYNC	bc_dsync	/* sync data sync */
+#define	BC_SYNC		bc_sync		/* sync data and attributes */
+#define	BC_ISLINEBUF	bc_islinebuf	/* get line-buffer status */
+#define	BC_ISTERMINAL	bc_isterminal	/* get terminal status */
+#define	BC_MINMOD	bc_minmod	/* ensure minimum file mode */
+#define	BC_SETBUFALL	bc_setbufall	/* output buffering */
+#define	BC_SETBUFWHOLE	bc_setbufwhole	/* output buffering */
+#define	BC_SETBUFLINE	bc_setbufline	/* output buffering */
+#define	BC_SETBUFNONE	bc_setbufnone	/* output buffering */
+#define	BC_SETBUFDEF	bc_setbufdef	/* output buffering */
+#define	BC_GETBUFFLAGS	bc_getbufflags	/* output buffering */
+#define	BC_SETBUFFLAGS	bc_setbufflags	/* output buffering */
+#define	BC_NONBLOCK	bc_nonblock	
 #define	BC_FULLBUF	BC_BUF
-#define	BC_LINEBUF	3		/* do line buffering on output */
-#define	BC_UNBUF	4		/* do no buffering */
 #define	BC_NOBUF	BC_UNBUF
-#define	BC_FD		5		/* get the file description */
-#define	BC_STAT		6
-#define	BC_TRUNCATE	7
-#define	BC_CHMOD	8
-#define	BC_SETLK	9		/* perform custom locking */
-#define	BC_SETLKW	10
-#define	BC_GETLK	11
-#define	BC_UNLOCK	12		/* unlock any locks */
-#define	BC_LOCKREAD	13		/* lock whole file for reads */
-#define	BC_LOCKWRITE	14		/* lock whole file for writes */
 #define	BC_LOCK		BC_LOCKWRITE
-#define	BC_INPARTLINE	15		/* allow partial input on lines */
-#define	BC_GETFL	16		/* get file flags */
-#define	BC_SETFL	17		/* set file flags */
-#define	BC_GETFDFL	18		/* get file descriptor flags */
-#define	BC_SETFDFL	19		/* set file descriptor flags */
 #define	BC_GETFD	BC_GETFDFL
 #define	BC_SETFD	BC_SETFDFL
-#define	BC_CLOSEONEXEC	20		/* set CLOSE-on-EXEC flag */
-#define	BC_BUFSIZE	21		/* set buffer size */
-#define	BC_DSYNC	22		/* sync data sync */
-#define	BC_SYNC		23		/* sync data and attributes */
-#define	BC_ISLINEBUF	24		/* get line-buffer status */
-#define	BC_ISTERMINAL	25		/* get terminal status */
-#define	BC_MINMOD	26		/* ensure minimum file mode */
-#define	BC_SETBUFALL	27		/* output buffering */
-#define	BC_SETBUFWHOLE	28		/* output buffering */
-#define	BC_SETBUFLINE	29		/* output buffering */
-#define	BC_SETBUFNONE	30		/* output buffering */
-#define	BC_SETBUFDEF	31		/* output buffering */
-#define	BC_GETBUFFLAGS	32		/* output buffering */
-#define	BC_SETBUFFLAGS	33		/* output buffering */
-#define	BC_NONBLOCK	34
+
 /* flags */
 #define	BFILE_FINPARTLINE	(1<<0)
 #define	BFILE_FTERMINAL 	(1<<1)
@@ -106,23 +148,23 @@ enum bfilebms {
 	bfilebm_line,			/* buffering line */
 	bfilebm_none,			/* buffering none */
 	bfilebm_overlast
-} ;
+} ; /* end enum (bfilems) */
 
 struct bfile_mapflags {
 	uint		valid:1 ;
 	uint		dirty:1 ;
-} ;
+} ; /* end struct */
 
 struct bfile_mapper {
 	char		*bdata ;	/* buffer data */
 	size_t		bsize ;		/* buffer size */
 	size_t		offset ;	/* file offset for page */
 	BFILE_MAPFL	fl ;
-} ;
+} ; /* end struct */
 
 struct bfile_bdflags {
 	uint		dirty:1 ;	/* needs to be written back */
-} ;
+} ; /* end struct */
 
 struct bfile_bufdesc {
 	char		*bdata ;	/* base of buffer */
@@ -130,7 +172,7 @@ struct bfile_bufdesc {
 	BFILE_BDFL	fl ;
 	int		bsize ;		/* size of buffer */
 	int		blen ;		/* length of data (buffer index) */
-} ;
+} ; /* end struct */
 
 struct bfile_flags {
 	uint		created:1 ;
@@ -144,12 +186,12 @@ struct bfile_flags {
 	uint		network:1 ;
 	uint		inpartline:1 ;	/* weirdo mode (should not be used?) */
 	uint		cancelled:1 ;
-	uint		mappable:1 ;
+	uint		mapable:1 ;
 	uint		mapinit:1 ;
 	uint		mapped:1 ;
 	uint		nullfile:1 ;
 	uint		program:1 ;
-} ;
+} ; /* end struct */
 
 struct bfile_head {
 	BFILE_MAP	*maps ;		/* array of map pages */
@@ -172,7 +214,7 @@ struct bfile_head {
 	int		bm ;		/* buffer mode */
 	mode_t		fm ;		/* file mode */
 	mode_t		om ;		/* open-mode (permissions) */
-} ;
+} ; /* end struct */
 
 typedef BFILE_FL	bfile_fl ;
 typedef BFILE_MAP	bfile_map ;
@@ -189,7 +231,7 @@ enum bfilemems {
 	bfilemem_rewind,
 	bfilemem_close,
 	bfilemem_overlast
-} ;
+} ; /* end enum (bfilemems) */
 struct bfile ;
 struct bfile_pr {
 	bfile		*op = nullptr ;
@@ -234,7 +276,8 @@ struct bfile : bfile_head {
 	    flush(this,bfilemem_flush) ;
 	    rewind(this,bfilemem_rewind) ;
 	    close(this,bfilemem_close) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end ctor */
 	bfile(const bfile &) = delete ;
 	bfile &operator = (const bfile &) = delete ;
 	int open(cc *,cc * = nullptr,mode_t = 0) noex ;
@@ -269,11 +312,11 @@ struct bfile : bfile_head {
 	int flushn(int) noex ;
 	int control(int,...) noex ;
 	int controlv(int,va_list) noex ;
-	int stat(USTAT *) noex ;
+	int stat(ustat *) noex ;
 	int dup(bfile *) noex ;
 	void dtor() noex ;
-	~bfile() {
-	    dtor() ;
+	destruct bfile() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (bfile) */
 #else	/* __cplusplus */
@@ -290,7 +333,7 @@ extern int	bopenmod(bfile *,cchar *,cchar *,mode_t) noex ;
 extern int	bopenlock(bfile *,cchar *,int,int) noex ;
 extern int	bcontrol(bfile *,int,...) noex ;
 extern int	bcontrolv(bfile *,int,va_list) noex ;
-extern int	bstat(bfile *,USTAT *) noex ;
+extern int	bstat(bfile *,ustat *) noex ;
 extern int	bsize(bfile *) noex ;
 extern int	bseek(bfile *,off_t,int) noex ;
 extern int	btell(bfile *,off_t *) noex ;
