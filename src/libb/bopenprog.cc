@@ -33,7 +33,8 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bufsizevar.hh>
 #include	<sysval.hh>
 #include	<stdfnames.h>
