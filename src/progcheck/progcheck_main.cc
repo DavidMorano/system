@@ -1,4 +1,4 @@
-/* b_progcheck SUPPORT */
+/* b_progcheck SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -28,6 +28,9 @@
 /* Copyright © 2000,2004,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_progcheck
 
   	Description:
 	This program will check the specified C language files for
@@ -68,9 +71,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getoutenv.h>
-#include	<mallocxx.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -92,8 +97,12 @@
 #include	"shio.h"
 #include	"kshlib.h"
 #include	"b_progcheck.h"
+#include	"progdata_helpdata.h"
 #include	"defs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -631,7 +640,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* specify counts */
 	                case argopt_c:
 	                    lip->fl.counts = true ;
-	                    lip->final.counts = true ;
+	                    lip->fin.counts = true ;
 	                    lip->have.counts = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
@@ -726,7 +735,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                    case 'u':
 	                        pip->have.bufnone = true ;
 	                        pip->fl.bufnone = true ;
-	                        pip->final.bufnone = true ;
+	                        pip->fin.bufnone = true ;
 	                        break ;
 
 /* verbose mode */
@@ -1003,16 +1012,11 @@ local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar	*pn = pip->progname ;
-	cchar	*fmt ;
-
-	fmt = "%s: USAGE> %s <file(s)>\n" ;
-	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
-	wlen += rs ;
-
-	fmt = "%s:  [-Q] [-D] [-v[=<n>]] [-HELP] [-V]\n" ;
-	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn) ;
-	wlen += rs ;
-
+	for (int i = 0 ; (rs >= 0) && helpdata[i] ; i += 1) {
+	    cc *fmt = helpdata[i] ;
+	    rs = shio_printf(pip->efp,fmt,pn,pn) ;
+	    wlen += rs ;
+	} /* end for */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (usage) */
@@ -1046,9 +1050,9 @@ local int procopts(PI *pip,KO *kop) noex {
 	                switch (oi) {
 	                case akoname_bufwhole:
 	                case akoname_whole:
-	                    if (! pip->final.bufwhole) {
+	                    if (! pip->fin.bufwhole) {
 	                        pip->have.bufwhole = true ;
-	                        pip->final.bufwhole = true ;
+	                        pip->fin.bufwhole = true ;
 	                        pip->fl.bufwhole = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1058,9 +1062,9 @@ local int procopts(PI *pip,KO *kop) noex {
 	                    break ;
 	                case akoname_bufline:
 	                case akoname_line:
-	                    if (! pip->final.bufline) {
+	                    if (! pip->fin.bufline) {
 	                        pip->have.bufline = true ;
-	                        pip->final.bufline = true ;
+	                        pip->fin.bufline = true ;
 	                        pip->fl.bufline = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1071,9 +1075,9 @@ local int procopts(PI *pip,KO *kop) noex {
 	                case akoname_bufnone:
 	                case akoname_none:
 	                case akoname_un:
-	                    if (! pip->final.bufnone) {
+	                    if (! pip->fin.bufnone) {
 	                        pip->have.bufnone = true ;
-	                        pip->final.bufnone = true ;
+	                        pip->fin.bufnone = true ;
 	                        pip->fl.bufnone = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1082,9 +1086,9 @@ local int procopts(PI *pip,KO *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_counts:
-	                    if (! lip->final.counts) {
+	                    if (! lip->fin.counts) {
 	                        lip->have.counts = true ;
-	                        lip->final.counts = true ;
+	                        lip->fin.counts = true ;
 	                        lip->fl.counts = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1152,7 +1156,7 @@ local int procargs(PI *pip,AI *aip,BITS *bop,cchar *ofn,cchar *afn) noex {
 	    } /* end if (ok) */
 
 	    if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
-		if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+		if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 	            SHIO	afile, *afp = &afile ;
 		    cint	llen = rs ;
 	            if (strcmp(afn,"-") == 0) afn = STDFNIN ;
@@ -1181,7 +1185,7 @@ local int procargs(PI *pip,AI *aip,BITS *bop,cchar *ofn,cchar *afn) noex {
 	                shio_printf(pip->efp,"%s: afile=%s\n",pn,afn) ;
 	            }
 	        } /* end if */
-		    rs1 = uc_free(lbuf) ;
+		    rs1 = lm_free(lbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	    } /* end if (procesing file argument file list) */
@@ -1206,7 +1210,7 @@ local int procfile(PI *pip,void *ofp,cchar *fn) noex {
 	if (DEBUGLEVEL(4))
 	    debugprintf("progcheck/procfile: ent fn=%s\n",fn) ;
 #endif
-	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 	    if (HIST h ; (rs = hist_start(&h)) >= 0) {
 	        if (LS ls ; (rs = langstate_start(&ls)) >= 0) {
 	            cint	ncca = nelem(cca) ;
@@ -1246,7 +1250,7 @@ local int procfile(PI *pip,void *ofp,cchar *fn) noex {
 	        rs1 = hist_finish(&h) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (hist) */
-	    rs1 = uc_free(lbuf) ;
+	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 #if	CF_DEBUG
