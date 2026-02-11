@@ -43,8 +43,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<localmisc.h>
 
-#include	"vstrkeycmpx.h"
+#include	"vstrkeydictcmp.h"
 
 
 /* local defines */
@@ -76,17 +77,19 @@ extern "C" {
 
 int vstrkeydictcmp(cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
-	cchar		*s1 = charp(*s1pp) ;
-	cchar		*s2 = charp(*s2pp) ;
-	if (s1 || s2) {
-	    rc = +1 ;
-	    if (s1) {
-		rc = -1 ;
-		if (s2) {
-		    rc = strkeydictcmp(s1,s2) ;
-		}
-	    }
-	} /* end if */
+	if (s1pp && s2pp) {
+	    cchar	*s1 = *s1pp ;
+	    cchar	*s2 = *s2pp ;
+	    if (s1 || s2) {
+	        rc = +1 ;
+	        if (s1) {
+		    rc = -1 ;
+		    if (s2) {
+		        rc = strkeydictcmp(s1,s2) ;
+		    }
+	        }
+	    } /* end if */
+	} /* end if (non-null) */
 	return rc ;
 }
 /* end subroutine (vstrkeydictcmp) */
