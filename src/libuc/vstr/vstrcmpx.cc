@@ -18,14 +18,14 @@
 /*******************************************************************************
 
 	Name:
-	vstrcmp
+	vstrcmpo
 
 	Description:
 	This subroutine is suitable for uses such as with |qsort(3c)|
 	or |bsearch(3c)| and |vecstr_finder(3dam)|.
 
 	Arguments:
-	int vstrcmp(cchar **,cchar **) noex
+	int vstrcmpo(cchar **,cchar **) noex
 
 	Returns:
 	-		three-way comparison value
@@ -49,7 +49,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strcmp(3c)| */
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -82,24 +82,26 @@ typedef int (*verse_f)(cc *,cc *) noex ;
 
 /* forward references */
 
-static int vstrcmpx(verse_f vx,cchar **s1pp,cchar **s2pp) noex {
+local int vstrcmpx(verse_f vx,cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
-	cchar		*s1 = *s1pp ;
-	cchar		*s2 = *s2pp ;
-	if (s1 || s2) {
-	    rc = +1 ;
-	    if (s1) {
-		rc = -1 ;
-		if (s2) {
-		    rc = vx(s1,s2) ;
-		}
-	    }
-	} /* end if */
+	if (s1pp && s2pp) {
+	    cchar	*s1 = *s1pp ;
+	    cchar	*s2 = *s2pp ;
+	    if (s1 || s2) {
+	        rc = +1 ;
+	        if (s1) {
+		    rc = -1 ;
+		    if (s2) {
+		        rc = vx(s1,s2) ;
+		    }
+	        }
+	    } /* end if */
+	} /* end if (non-null) */
 	return rc ;
 }
 /* end subroutine (vstrcmpx) */
 
-static int obverse(cc *s1,cc *s2) noex {
+local int obverse(cc *s1,cc *s2) noex {
 	cint	ch1 = mkchar(*s1) ;
 	cint	ch2 = mkchar(*s2) ;
 	int	rc ;
@@ -109,7 +111,7 @@ static int obverse(cc *s1,cc *s2) noex {
 	return rc ;
 } /* end subroutine (obverse) */
 
-static int reverse(cc *s1,cc *s2) noex {
+local int reverse(cc *s1,cc *s2) noex {
 	cint	ch1 = mkchar(*s1) ;
 	cint	ch2 = mkchar(*s2) ;
 	int	rc ;
@@ -128,13 +130,13 @@ static int reverse(cc *s1,cc *s2) noex {
 
 /* exported subroutines */
 
-int vstrcmpo(cchar **e1p,cchar **e2p) noex { /* obverse */
-	return vstrcmpx(obverse,e1p,e2p) ;
+int vstrcmpo(cchar **e1pp,cchar **e2pp) noex { /* obverse */
+	return vstrcmpx(obverse,e1pp,e2pp) ;
 }
 /* end subroutine (vstrcmpo) */
 
-int vstrcmpr(cchar **e1p,cchar **e2p) noex { /* reverse */
-	return vstrcmpx(reverse,e2p,e1p) ;
+int vstrcmpr(cchar **e1pp,cchar **e2pp) noex { /* reverse */
+	return vstrcmpx(reverse,e1pp,e2pp) ;
 }
 /* end subroutine (vstrcmpr) */
 
