@@ -1,4 +1,4 @@
-# MAKEFILES (vstr)
+# MAKEFILE (vstr)
 
 T= vstr
 
@@ -40,8 +40,8 @@ MODS +=
 LIBS +=
 
 
-OBJ0= vstrcmpx.o vstrkeycmpx.o vstrkeydictcmp.o
-OBJ1= vstrsort.o
+OBJ0= vstrcmpx.o vstrkeycmpx.o 
+OBJ1= vstrkeydictcmp.o
 OBJ2= 
 OBJ3= 
 
@@ -54,7 +54,6 @@ OBJ= obja.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -136,9 +135,8 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-vstrcmpx.o:		vstrcmpx.cc		vstrcmpx.h	$(INCS)
-vstrkeycmpx.o:		vstrkeycmpx.cc		vstrkeycmpx.h	$(INCS)
-vstrkeydictcmp.o:	vstrkeydictcmp.cc	vstrkeycmpx.h	$(INCS)
-vstrsort.o:		vstrsort.cc		vstrsort.h	$(INCS)
+vstrcmpx.o:		vstrcmpx.cc		vstrcmpx.h		$(INCS)
+vstrkeycmpx.o:		vstrkeycmpx.cc		vstrkeycmpx.h		$(INCS)
+vstrkeydictcmp.o:	vstrkeydictcmp.cc	vstrkeydictcmp.h	$(INCS)
 
 
