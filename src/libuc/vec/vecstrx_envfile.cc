@@ -61,7 +61,7 @@
 #include	<sfx.h>
 #include	<strcpyx.h>
 #include	<strdcpyxw.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrkeycmpx.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
@@ -116,7 +116,7 @@ namespace {
 	int line(cchar *,int) noex ;
 	int parse(field *,cchar *,int) noex ;
     } ; /* end struct (subinfo) */
-}
+} /* end namespace */
 
 namespace {
     struct eword {
@@ -130,15 +130,15 @@ namespace {
     struct vars {
 	int		linebuflen ;
 	operator int () noex ;
-    } ;
-}
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
 
-static int	vecstrx_envfiler(vecstrx *,cchar *) noex ;
-static int	mkinit() noex ;
-static int	mkterms() noex ;
+local int	vecstrx_envfiler(vecstrx *,cchar *) noex ;
+local int	mkinit() noex ;
+local int	mkterms() noex ;
 
 
 /* local variables */
@@ -296,7 +296,7 @@ int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
 }
 /* end subroutine (subinfo::parse) */
 
-static int mkterms() noex {
+local int mkterms() noex {
 	return fieldterms(fterms,false,'\t',' ','#','=') ;
 }
 /* end subroutine (mkterms) */
@@ -310,7 +310,7 @@ vars::operator int () noex {
 }
 /* end subroutine (vars::operator) */
 
-static int mkinit() noex {
+local int mkinit() noex {
     	int		rs ;
 	if ((rs = mkterms()) >= 0) ylikely {
 	    rs = var ;
