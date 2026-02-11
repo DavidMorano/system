@@ -17,8 +17,8 @@
 
 /*******************************************************************************
 
-	Name:
-	vstrkeycmp
+	Hroup:
+	vstrkeycmp{x}
 
 	Description:
 	This subroutine makes a comparison of the key of a string
@@ -33,6 +33,8 @@
 	int vstrkeycmpr(cchar **s1pp,cchar **s2pp) noex
 
 	Arguments:
+	s1pp		c-string pointer to pointer
+	s2pp		c-string pointer to pointer
 
 	Returns:
 	<0		less than
@@ -77,24 +79,26 @@ typedef int (*verse_f)(cc *,cc *) noex ;
 
 /* forward references */
 
-static int vstrkeycmpx(verse_f vx,cchar **s1pp,cchar **s2pp) noex {
+local int vstrkeycmpx(verse_f vx,cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
-	cchar		*s1 = charp(*s1pp) ;
-	cchar		*s2 = charp(*s2pp) ;
-	if (s1 || s2) {
-	    rc = +1 ;
-	    if (s1) {
-		rc = -1 ;
-	        if (s2) {
-		    rc = vx(s1,s2) ;
-		}
-	    }
-	} /* end if */
+	if (s1pp && s2pp) {
+	    cchar	*s1 = *s1pp ;
+	    cchar	*s2 = *s2pp ;
+	    if (s1 || s2) {
+	        rc = +1 ;
+	        if (s1) {
+		    rc = -1 ;
+	            if (s2) {
+		        rc = vx(s1,s2) ;
+		    }
+	        }
+	    } /* end if */
+	} /* end if (non-null) */
 	return rc ;
 }
 /* end subroutine (vstrkeycmpx) */
 
-static int obverse(cc *s1,cc *s2) noex {
+local int obverse(cc *s1,cc *s2) noex {
 	cint	ch1 = mkchar(*s1) ;
 	cint	ch2 = mkchar(*s2) ;
 	int	rc ;
@@ -104,7 +108,7 @@ static int obverse(cc *s1,cc *s2) noex {
 	return rc ;
 } /* end subroutine (obverse) */
 
-static int reverse(cc *s1,cc *s2) noex {
+local int reverse(cc *s1,cc *s2) noex {
 	cint	ch1 = mkchar(*s1) ;
 	cint	ch2 = mkchar(*s2) ;
 	int	rc ;
@@ -128,7 +132,7 @@ int vstrkeycmpo(cchar **s1pp,cchar **s2pp) noex {
 }
 
 int vstrkeycmpr(cchar **s1pp,cchar **s2pp) noex {
-	return vstrkeycmpx(reverse,s2pp,s1pp) ;
+	return vstrkeycmpx(reverse,s1pp,s2pp) ;
 }
 
 
