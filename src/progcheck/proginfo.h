@@ -14,7 +14,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<ids.h>
 #include	<logfile.h>
@@ -69,14 +70,14 @@ struct proginfo_flags {
 	uint		intdis:1 ;
 	uint		reuseaddr:1 ;
 	uint		to:1 ;
-} ;
+} ; /* end struct (proginfo_flags) */
 
 struct proginfo_hwser {
 	proginfo	*op = nullptr ;
 	uint		val ;
 	void operator () (proginfo *) noex ;
 	operator uint() noex ;
-} ;
+} ; /* end struct (proginfo_hwser) */
 
 struct proginfo_co {
 	proginfo	*op = nullptr ;
@@ -89,7 +90,7 @@ struct proginfo_co {
 	operator int () noex {
 	    return operator () () ;
 	} ;
-} ;
+} ; /* end struct (proginfo_co) */
 
 struct proginfo_vals {
 	cchar		*argz ;		/* raw ARGZ */
