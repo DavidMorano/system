@@ -45,6 +45,7 @@
 #include	<intceil.h>
 #include	<vecstr.h>
 #include	<sigman.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -309,7 +310,7 @@ static int maininfo_sigend(MAININFO *mip) {
 /* ARGSUSED */
 static void main_sighand(int sn,siginfo_t *sip,void *ucp) {
 #if	CF_DEBUGN
-	nprintf(NDF,"main_sighand: sn=%d(%s)\n",sn,strsigabbr(sn)) ;
+	nprintf(NDF,"main_sighand: sn=%d(%s)\n",sn,strabbrsig(sn)) ;
 #endif
 	if (sip != NULL) {
 	    main_sigdump(sip) ;
@@ -323,7 +324,7 @@ static int main_sigdump(siginfo_t *sip) {
 	cint	si_signo = sip->si_signo ;
 	cint	si_code = sip->si_code ;
 	int		wl ;
-	cchar	*sn = strsigabbr(sip->si_signo) ;
+	cchar	*sn = strabbrsig(sip->si_signo) ;
 	cchar	*as = "*na*" ;
 	cchar	*scs = NULL ;
 	cchar	*fmt ;
