@@ -1,4 +1,4 @@
-# MAKEFILES (hasx)
+# MAKEFILE (hasx)
 
 T= hasx
 
@@ -40,15 +40,15 @@ MODS +=
 LIBS +=
 
 
-OBJ0= hasmain.o 
-OBJ1= hasvarprefix.o
-OBJ2= hasmodname.o
-OBJ3= hasuniq.o haslead.o
+OBJ0= hasprime.o hasclass.o hasall.o
+OBJ1= hasvarprefix.o hasnot.o
+OBJ2= hasmodname.o hasprint.o hasonly.o
+OBJ3= hasuniq.o haslead.o hasnon.o
 
-OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB=
+OBJA= obj0.o obj1.o
+OBJB= obj2.o obj3.o
 
-OBJ= obja.o 
+OBJ= obja.o objb.o
 
 
 INCDIRS +=
@@ -136,11 +136,17 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-hasxmain.o:		hasmain.cc				$(INCS)
-hasmodname.o:		hasmodname.cc				$(INCS)
+hasxprime.o:		hasprime.cc	hasprime.h		$(INCS)	
+hasclass.o:		hasclass.cc	hasclass.h		$(INCS)
+hasall.o:		hasall.cc	hasall.h		$(INCS)
+hasnon.o:		hasnon.cc	hasnon.h		$(INCS)
+hasnot.o:		hasnot.cc	hasnot.h		$(INCS)
+hasonly.o:		hasonly.cc	hasonly.h		$(INCS)
 
+hasmodname.o:		hasmodname.cc	hasmodname.h		$(INCS)
 hasuniq.o:		hasuniq.cc	hasuniq.h		$(INCS)
 haslead.o:		haslead.cc	haslead.h		$(INCS)
 hasvarprefix.o:		hasvarprefix.cc	hasvarprefix.h		$(INCS)
+hasprintbad.o:		hasprint.cc	hasprint.h		$(INCS)
 
 
