@@ -21,6 +21,7 @@
 
 
 #include	<envstandards.h>	/* first to configure */
+#include	<climits>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -33,7 +34,8 @@
 
 
 struct tmtime {
-	char	*zname{} ;	/* time-zone name abbreviation (allocated) */
+    	static cint	znlen ;
+	char	*znbuf{} ;	/* time-zone name abbreviation (allocated) */
 	cint	baseyear = TMTIME_BASEYEAR ;
 	int	sec ;		/* 0-61 (for up to two leap-seconds) */
 	int	min ;		/* 0-59 */
@@ -45,37 +47,51 @@ struct tmtime {
 	int	yday ;		/* year-day (day-of-year) */
 	int	gmtoff ;	/* offset from GMT (seconds west of GMT) */
 	int	isdst ;
-	tmtime() = default ;
+	tmtime() noex {
+	    gmtoff = -1 ;
+	    isdst = -1 ;
+	} ; /* end ctor */
 	tmtime &operator = (const tmtime &) = delete ;
 	tmtime(const tmtime &) = delete ;
-	int insert(CTM *) noex ;
-	int ztime(bool,time_t) noex ;
-	int gmtime(time_t) noex ;
-	int localtime(time_t) noex ;
-	int extract(TM *) noex ;
-	int mktime(time_t *) noex ;
-	int adjtime(time_t *) noex ;
+	int insert	(CTM *) noex ;
+	int timex	(bool,time_t) noex ;
+	int timegm	(time_t) noex ;
+	int timelocal	(time_t) noex ;
+	int extract	(TM *) noex ;
+	int mktime	(time_t *) noex ;
+	int adjtime	(time_t *) noex ;
+	int getzn	(char *,int) noex ;
+	int loadzn	(cchar *,int) noex ;
 	void dtor() noex ;
 	destruct tmtime() {
-	    if (zname) dtor() ;
+	    if (znbuf) dtor() ;
 	} ;
 } ; /* end struct (tmtime) */
 
 EXTERNC_begin
 
 extern int	tmtime_insert(tmtime *,CTM *) noex ;
-extern int	tmtime_ztime(tmtime *,bool,time_t) noex ;
-extern int	tmtime_gmtime(tmtime *,time_t) noex ;
-extern int	tmtime_localtime(tmtime *,time_t) noex ;
+extern int	tmtime_timex(tmtime *,bool,time_t) noex ;
+extern int	tmtime_timegm(tmtime *,time_t) noex ;
+extern int	tmtime_timelocal(tmtime *,time_t) noex ;
 extern int	tmtime_extract(tmtime *,TM *) noex ;
 extern int	tmtime_mktime(tmtime *,time_t *) noex ;
 extern int	tmtime_adjtime(tmtime *,time_t *) noex ;
+extern int	tmtime_getzn(tmtime *,char *,int) noex ;
+extern int	tmtime_loadzn(tmtime *,cchar *,int) noex ;
 
 #ifdef	COMMENT
 extern int	tmtime_setznoe(tmtime *,cchar *,int) noex ;
-extern int	mktime_settimez(tmtime *,cchar *,cchar *,time_t) noex ;
-extern int	mktime_gettime(tmtime *,cchar *,time_t *) noex ;
+extern int	tmtime_settimez(tmtime *,cchar *,cchar *,time_t) noex ;
+extern int	tmtime_gettime(tmtime *,cchar *,time_t *) noex ;
 #endif /* COMMENT */
+
+local inline int tmtime_gmtime(tmtime *tmp,time_t t) noex {
+	return tmtime_timegm(tmp,t) ;
+}
+local inline int tmtime_localtime(tmtime *tmp,time_t t) noex {
+	return tmtime_timelocal(tmp,t) ;
+}
 
 EXTERNC_end
 
