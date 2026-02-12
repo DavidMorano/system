@@ -3,7 +3,7 @@
 /* lang=C++20 */
 
 /* time-zone offset string management */
-/* lang=C++20 */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
