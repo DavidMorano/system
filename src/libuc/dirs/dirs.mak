@@ -1,4 +1,4 @@
-# MAKEFILES (dirs)
+# MAKEFILE (dirs)
 
 T= dirs
 
