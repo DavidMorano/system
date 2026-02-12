@@ -1,4 +1,4 @@
-# MAKEFILES (hasx)
+# MAKEFILE (hasx)
 
 T= hasx
 
