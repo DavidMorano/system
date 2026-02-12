@@ -56,6 +56,9 @@ static inline bool hasallhex(cchar *sp,int sl) noex {
 static inline bool hasallwht(cchar *sp,int sl) noex {
     	return hasallwhite(sp,sl) ;
 }
+static inline bool hasallblk(cchar *sp,int sl) noex {
+    	return hasallblank(sp,sl) ;
+}
 
 EXTERNC_end
 
