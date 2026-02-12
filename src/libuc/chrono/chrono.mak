@@ -1,4 +1,4 @@
-# MAKEFILES (chrono)
+# MAKEFILE (chrono)
 
 T= chrono
 
@@ -43,6 +43,7 @@ LIBS +=
 OBJ0_DATER= dater_prime.o dater_setkey.o
 OBJ1_DATER= dater_getbbtime.o dater_getdate.o
 OBJ2_DATER= dater_obj.o
+OBJ3_DATER=
 
 OBJ_DATER= obj0_dater.o obj1_dater.o obj2_dater.o
 
@@ -50,6 +51,10 @@ OBJ0_CHRONO= tmstrs.o zdb.o
 OBJ1_CHRONO= date.o dater.o
 OBJ2_CHRONO= tmz.o zos.o zoffparts.o
 OBJ3_CHRONO= tmtime.o dayspec.o cvtdater.o
+OBJ4_CHRONO= 
+OBJ5_CHRONO= 
+OBJ6_CHRONO= 
+OBJ7_CHRONO= 
 
 OBJA_CHRONO= obj0.o obj1.o
 OBJB_CHRONO= obj2.o obj3.o
@@ -60,7 +65,6 @@ OBJ_CHRONO= $(OBJA_CHRONO) $(OBJB_CHRONO)
 INCDIRS=
 
 LIBDIRS=
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -139,6 +143,18 @@ obj2.o:			$(OBJ2_CHRONO)
 obj3.o:			$(OBJ3_CHRONO)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj4.o:			$(OBJ4_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7_CHRONO)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obj0_dater.o:		$(OBJ0_DATER)
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -147,6 +163,9 @@ obj1_dater.o:		$(OBJ1_DATER)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_dater.o:		$(OBJ2_DATER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3_dater.o:		$(OBJ3_DATER)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 dater.o:		$(OBJ_DATER)
