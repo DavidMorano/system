@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* has a counted c-string contain a module-name ? */
+/* does a counted c-string contain a C++ module-name? */
 /* version %I% last-modified %G% */
 
 
@@ -24,6 +24,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+
 
 EXTERNC_begin
 
