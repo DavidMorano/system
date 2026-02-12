@@ -37,6 +37,7 @@
 	hasdec
 	hashex
 	haswht
+	hasblk
 
 	Description:
 	Does the given counted c-string have any of the characters 
