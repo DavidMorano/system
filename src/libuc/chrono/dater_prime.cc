@@ -1,4 +1,4 @@
-/* dater_main SUPPORT */
+/* dater_prime SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -62,11 +62,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/timeb.h>		/* |TIMEB| */
+#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<ctime>			/* |time_t| */
 #include	<climits>		/* |SHORT_MIN| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -81,12 +81,12 @@
 #include	<comparse.h>		/* CHRONO */
 #include	<tmz.hh>		/* CHRONO */
 #include	<zdb.h>			/* CHRONO */
+#include	<snwcpy.h>
 #include	<sncpyx.h>
 #include	<snwcpyx.h>
 #include	<sntmtime.h>
 #include	<strn.h>		/* |strnwcpyxc(3uc)| */
 #include	<strwcpy.h>
-#include	<snwcpy.h>
 #include	<mkchar.h>
 #include	<hasx.h>		/* |hasalldig(3uc)| */
 #include	<ischarx.h>		/* |isdigitlatin(3uc)| */
@@ -246,6 +246,7 @@ int dater_setcopy(dater *op,dater *d2p) noex {
 
 int dater_setstd(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xstd(&stz,sp,sl)) >= 0) ylikely {
@@ -253,10 +254,11 @@ int dater_setstd(dater *op,cchar *sp,int sl) noex {
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
 	            rs = dater_mktime(op,&dst) ;
+		    rv = rs ;
 	        }
 	    } /* end if (tmz_xstd) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_setstd) */
 
@@ -264,6 +266,7 @@ int dater_setstd(dater *op,cchar *sp,int sl) noex {
 int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (comparse vc ; (rs = comparse_start(&vc,sp,sl)) >= 0) ylikely {
@@ -276,6 +279,7 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 	                dater_ldcomzone(op,&vc) ;
 	                if ((rs = dater_defs(op,&stz)) >= 0) {
 	                    rs = dater_mktime(op,&dst) ;
+			    rv = rs ;
 	                }
 	            } /* end if (tmz_xmsg) */
 	        } /* end if (comparse_getval) */
@@ -283,7 +287,7 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (comparse) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_setmsg) */
 
@@ -291,6 +295,7 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 /* format> [CC]YYMMDDhhmm[ss][±<zoff>][<zname>] */
 int dater_setstrdig(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xstrdig(&stz,sp,sl)) >= 0) ylikely {
@@ -298,10 +303,11 @@ int dater_setstrdig(dater *op,cchar *sp,int sl) noex {
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) ylikely {
 	            rs = dater_mktime(op,&dst) ;
+		    rv = rs ;
 	        }
 	    } /* end if tmz_xstrdig) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_setstrdig) */
 
@@ -315,6 +321,7 @@ to the dater object.
 
 int dater_setlogz(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xlogz(&stz,sp,sl)) >= 0) ylikely {
@@ -322,16 +329,18 @@ int dater_setlogz(dater *op,cchar *sp,int sl) noex {
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) ylikely {
 	            rs = dater_mktime(op,&dst) ;
+		    rv = rs ;
 	        }
 	    } /* end if (tmz_xlogz) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_setlogz) */
 
 /* set from TOUCH (original) time string */
 int dater_settouch(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xtouch(&stz,sp,sl)) >= 0) ylikely {
@@ -339,16 +348,18 @@ int dater_settouch(dater *op,cchar *sp,int sl) noex {
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) ylikely {
 	            rs = dater_mktime(op,&dst) ;
+		    rv = rs ;
 	        }
 	    } /* end if (tmz_xtouch) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_settouch) */
 
 /* set from TOUCH-t (new '-t' version) time string */
 int dater_settoucht(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (tmz stz ; (rs = tmz_xtoucht(&stz,sp,sl)) >= 0) ylikely {
@@ -356,16 +367,18 @@ int dater_settoucht(dater *op,cchar *sp,int sl) noex {
 	        dater_ldtmz(op,&stz) ;
 	        if ((rs = dater_defs(op,&stz)) >= 0) {
 	            rs = dater_mktime(op,&dst) ;
+		    rv = rs ;
 	        }
 	    } /* end if (tmz_xtoucht) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_settoucht) */
 
 /* set from a split-out time, zone offset, and zone-name */
 int dater_settmzon(dater *op,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op,stp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((zoff == TZO_EMPTY) || (abs(zoff) <= TZO_MAXZOFF)) {
@@ -392,39 +405,45 @@ int dater_settmzon(dater *op,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 		/* calculate the time */
 	        if (rs >= 0) ylikely {
 	            rs = dater_mkptime(op,stp,zoff) ;
+		    rv = rs ;
 	        }
 		/* now do something with the name */
 	        if ((rs >= 0) && (op->zname[0] == '\0')) {
 	            rs = dater_mkpzoff(op,stp,zoff) ;
 	        }
-	        if (rs >= 0) op->magic = DATER_MAGIC ;
+	        if (rs >= 0) {
+		    op->magic = DATER_MAGIC ;
+		}
 	    } /* end if (valid) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_settmzon) */
 
 /* set from split-out time and zone offset only (minutes west of GMT) */
 int dater_settmzo(dater *op,TM *stp,int zoff) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op,stp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((zoff == TZO_EMPTY) || (abs(zoff) <= TZO_MAXZOFF)) {
 	        if ((rs = dater_initbase(op)) >= 0) {
 		    /* calculate the time */
 	            if ((rs = dater_mkptime(op,stp,zoff)) >= 0) {
+		        rv = rs ;
 	                op->magic = DATER_MAGIC ;
 		    }
 		}
 	    } /* end if (valid) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_settmzo) */
 
 /* set from a split-out time and zone-name only */
 int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op,stp)) >= 0) ylikely {
 	    int		zoff = TZO_EMPTY ;
 	    /* initialize */
@@ -436,8 +455,12 @@ int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
 	                op->fl.zname = true ;
 	                znwcpy(op->zname,znl,zstr,zlen) ;
 	                if (zdb zr ; (rs = zr.setname(zstr,zlen)) >= 0) {
-	                    if (stp->tm_isdst < 0) stp->tm_isdst = zr.isdst ;
-	                    if (zoff == TZO_EMPTY) zoff = zr.woff ;
+	                    if (stp->tm_isdst < 0) {
+				stp->tm_isdst = zr.isdst ;
+			    }
+	                    if (zoff == TZO_EMPTY) {
+				zoff = zr.woff ;
+			    }
 	                } else if (rs == SR_NOTFOUND) {
 	                    rs = SR_OK ;
 	                } /* end if (zdb_setname) */
@@ -446,18 +469,20 @@ int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
 	        /* calculate the time */
 	        if (rs >= 0) ylikely {
 	            if ((rs = dater_mkptime(op,stp,zoff)) >= 0) {
-	               op->magic = DATER_MAGIC ;
+		        rv = rs ;
+	                op->magic = DATER_MAGIC ;
 		    }
 	        } /* end if */
 	    } /* end if */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_settmzn) */
 
 /* set from ( time, timezone_name, DST_indication ) */
 int dater_settimezn(dater *op,time_t t,cchar *zname,int isdst) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op)) >= 0) ylikely {
 	    if ((rs = dater_initbase(op)) >= 0) ylikely {
 	        op->b.time = t ;
@@ -466,12 +491,12 @@ int dater_settimezn(dater *op,time_t t,cchar *zname,int isdst) noex {
 	            rs = dater_ldname(op,zname,-1) ;
 	        } else {
 	            op->fl.tzset = true ;
-	            if (tmtime tmt ; (rs = tmt.localtime(t)) >= 0) {
-	                zname = tmt.zname ;
+	            if (tmtime tmt ; (rs = tmt.timelocal(t)) >= 0) {
+	                cchar *znp = tmt.znbuf ;
 	                op->fl.zname = true ;
 		        if ((rs = znlen) >= 0) {
 			    cint	znl = rs ;
-	                    znwcpy(op->zname,znl,zname) ;
+	                    znwcpy(op->zname,znl,znp) ;
 		        } /* end if (znlen) */
 	                if (isdst < 0) {
 			    isdst = tmt.isdst ;
@@ -484,16 +509,19 @@ int dater_settimezn(dater *op,time_t t,cchar *zname,int isdst) noex {
 	            op->fl.zoff = true ;
 	            op->b.timezone = 0 ;
 	        } /* end if */
-	        if (rs >= 0) op->magic = DATER_MAGIC ;
+	        if (rs >= 0) {
+		    op->magic = DATER_MAGIC ;
+		}
 	    } /* end if (dater_initbase) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_settimezn) */
 
 /* set from ( time, tz-offset, tz-name, tz-DST_indication ) */
 int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 	int		rs ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = dater_magic(op)) >= 0) ylikely {
 	    if ((rs = znlen) >= 0) ylikely {
 		cint	znl = rs ;
@@ -508,10 +536,10 @@ int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 	            znwcpy(op->zname,znl,zname) ;
 	        } else {
 	            op->fl.tzset = true ;
-	            if (tmtime tmt ; (rs = tmt.localtime(t)) >= 0) {
-	                zname = tmt.zname ;
+	            if (tmtime tmt ; (rs = tmt.timelocal(t)) >= 0) {
+	                cchar *znp = tmt.znbuf ;
 	                op->fl.zname = true ;
-	                znwcpy(op->zname,znl,zname) ;
+	                znwcpy(op->zname,znl,znp) ;
 	                if (isdst < 0) {
 			    isdst = tmt.isdst ;
 			}
@@ -523,87 +551,90 @@ int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 	            op->fl.zoff = true ;
 	            op->b.timezone = 0 ;
 	        } /* end if */
-	        if (rs >= 0) op->magic = DATER_MAGIC ;
+	        if (rs >= 0) {
+		    op->magic = DATER_MAGIC ;
+		}
 	    } /* end if (znlen) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (dater_settimezon) */
 
-int dater_mkdatestr(dater *op,int type,char *dbuf,int dlen) noex {
+int dater_mkdatestr(dater *op,daterdts dt,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = dater_magic(op,dbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if ((type >= 0) && (type < DATER_DTSEND)) ylikely {
-	        time_t	t ;
-	        int	zoff ;
-	        cchar	*znp ;
-	        cchar	*fmt ;
+	    if ((dt >= 0) && (dt < daterdt_overlast)) ylikely {
+	        time_t	t	= op->b.time ;
+	        int	zoff	= op->b.timezone ;
+	        cchar	*znp	= op->zname ;
 	        if (dlen < 0) dlen = TIMEBUFLEN ;
 		/* go */
-	        t = op->b.time ;
-	        zoff = op->b.timezone ;
-	        znp = op->zname ;
 	        if ((op->b.timezone == TZO_EMPTY) || (! op->fl.zoff)) {
 	            zoff = 0 ;
 	            znp = "GMT" ;
 	        }
 		/* selective adjustment */
-	        switch (type) {
-	        case DATER_DTSENV:
-	        case DATER_DTSLOGZ:
+	        switch (dt) {
+		case daterdt_env:
+		case daterdt_logz:
 	            if (op->zname[0] == '\0') {
 	                zoff = 0 ;
 	                znp = "Z" ;
 	            }
 	            break ;
-	        case DATER_DTSGMLOGZ:
+		case daterdt_gmlogz:
 	            zoff = 0 ;
 	            znp = "GMT" ;
 	            break ;
+		default:
+		    break ;
 	        } /* end switch (selective adjustment) */
 		/* conversion */
 	        t -= (zoff * 60) ;
-	        if (tmtime tmt ; (rs = tmt.gmtime(t)) >= 0) ylikely {
+	        if (tmtime tmt ; (rs = tmt.timegm(t)) >= 0) ylikely {
 	            tmt.gmtoff = (zoff * 60) ;
 		    if ((rs = znlen) >= 0) ylikely {
 			cint	znl = rs ;
-	                strwcpyuc(tmt.zname,znp,znl) ;
-	                switch (type) {
+	        	cchar	*fmt = nullptr ;
+	                strwcpyuc(tmt.znbuf,znp,znl) ;
+	                switch (dt) {
 		        /* UNIX® envelope */
-	                case DATER_DTSENV:
+	                case daterdt_env:
 	                    fmt = "%a %b %d %T %Z %Y %O" ;
-	                    rs = sntmtime(dbuf,dlen,&tmt,fmt) ;
-	                    sl = rs ;
 	                    break ;
 		        /* message header */
-	                case DATER_DTSHDR:
+	                case daterdt_msg:
 	                    fmt = "%d %b %Y %T %O (%Z)" ;
-	                    if (tmt.zname[0] == '\0') fmt = "%d %b %Y %T %O" ;
-	                    rs = sntmtime(dbuf,dlen,&tmt,fmt) ;
-	                    sl = rs ;
+	                    if (tmt.znbuf[0] == '\0') {
+				fmt = "%d %b %Y %T %O" ;
+			    }
 	                    break ;
-	                case DATER_DTSSTRDIG:
+	                case daterdt_strdig:
 	                    fmt = "%y%m%d%H%M%S%O%Z" ;
-	                    if (tmt.zname[0] == '\0') fmt = "%y%m%d%H%M%S%O" ;
-	                    rs = sntmtime(dbuf,dlen,&tmt,fmt) ;
-	                    sl = rs ;
+	                    if (tmt.znbuf[0] == '\0') {
+				fmt = "%y%m%d%H%M%S%O" ;
+			    }
 	                    break ;
-	                case DATER_DTSLOGZ:
-	                case DATER_DTSGMLOGZ:
+			case daterdt_logz:
+			case daterdt_gmlogz:
 	                    fmt = "%y%m%d_%H%M:%S_%Z" ;
-	                    if (tmt.zname[0] == '\0') fmt = "%y%m%d_%H%M:%S" ;
-	                    rs = sntmtime(dbuf,dlen,&tmt,fmt) ;
-	                    sl = rs ;
+	                    if (tmt.znbuf[0] == '\0') {
+				fmt = "%y%m%d_%H%M:%S" ;
+			    }
 	                    break ;
 	                default:
 	                    sl = -1 ;
 	                    strwcpy(dbuf,"** invalid type **",dlen) ;
 	                    break ;
 	                } /* end switch */
+			if ((rs >= 0) && fmt) {
+	                    rs = sntmtime(dbuf,dlen,&tmt,fmt) ;
+	                    sl = rs ;
+			} /* end if (sntmtime) */
 		    } /* end if (znlen) */
-	        } /* end if (tmtime_gmtime) */
+	        } /* end if (tmtime_timegm) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
@@ -612,43 +643,43 @@ int dater_mkdatestr(dater *op,int type,char *dbuf,int dlen) noex {
 
 /* make a mail envelope-type dater string */
 int dater_mkstd(dater *op,char *dbuf,int dlen) noex {
-	return dater_mkdatestr(op,DATER_DTSENV,dbuf,dlen) ;
+	return dater_mkdatestr(op,daterdt_std,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkstd) */
 
 /* make a mail envelope-type dater string */
 int dater_mkenv(dater *op,char *dbuf,int dlen) noex {
-	return dater_mkdatestr(op,DATER_DTSENV,dbuf,dlen) ;
+	return dater_mkdatestr(op,daterdt_std,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkenv) */
 
 /* make a mail envelope-type dater string */
 int dater_mkmsg(dater *op,char *dbuf,int dlen) noex {
-	return dater_mkdatestr(op,DATER_DTSMSG,dbuf,dlen) ;
+	return dater_mkdatestr(op,daterdt_msg,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkmsg) */
 
 /* make a mail header dater string */
 int dater_mkhdr(dater *op,char *dbuf,int dlen) noex {
-	return dater_mkdatestr(op,DATER_DTSHDR,dbuf,dlen) ;
+	return dater_mkdatestr(op,daterdt_msg,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkhdr) */
 
 /* make the old STRDIG type of dater string */
 int dater_mkstrdig(dater *op,char *dbuf,int dlen) noex {
-	return dater_mkdatestr(op,DATER_DTSSTRDIG,dbuf,dlen) ;
+	return dater_mkdatestr(op,daterdt_strdig,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkstrdig) */
 
 /* make the familiar LOGZ-type dater string */
 int dater_mklogz(dater *op,char *dbuf,int dlen) noex {
-	return dater_mkdatestr(op,DATER_DTSLOGZ,dbuf,dlen) ;
+	return dater_mkdatestr(op,daterdt_logz,dbuf,dlen) ;
 }
 /* end subroutine (dater_mklogz) */
 
 /* make the familiar LOGZ-type dater string */
 int dater_mkgmtlogz(dater *op,char *dbuf,int dlen) noex {
-	return dater_mkdatestr(op,DATER_DTSGMLOGZ,dbuf,dlen) ;
+	return dater_mkdatestr(op,daterdt_gmlogz,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkgmlogz) */
 
@@ -783,19 +814,19 @@ local int dater_initcur(dater *op) noex {
 	        op->cb.time = time(nullptr) ;
 	    }
 	    op->fl.tzset = true ;
-	    if (tmtime tmt ; (rs = tmt.localtime(op->cb.time)) >= 0) ylikely {
+	    if (tmtime tmt ; (rs = tmt.timelocal(op->cb.time)) >= 0) ylikely {
 		if ((rs = znlen) >= 0) {
 		    cint	znl = rs ;
 	            cint	zo = tmt.gmtoff ; /* seconds west of GMT */
 	            op->cyear = shortconv(tmt.year) ;
 	            op->cb.timezone = shortconv(zo / 60) ;
 	            op->cb.dstflag = shortconv(tmt.isdst) ;
-	            znwcpy(op->cname,znl,tmt.zname) ;
+	            znwcpy(op->cname,znl,tmt.znbuf) ;
 	            op->fl.cb = true ;
 	            op->fl.czn = true ;
 	            op->fl.cyear = true ;
 		} /* end if (znlen) */
-	    } /* end if (tmtime_localtime) */
+	    } /* end if (tmtime_timelocal) */
 	} /* end if (need current time) */
 	return rs ;
 }
@@ -818,17 +849,21 @@ local int dater_mkpzoff(dater *op,TM *stp,int zoff) noex {
 /* end subroutine (dater_mkpzoff) */
 
 local int dater_ldtmz(dater *op,tmz *tp) noex {
-    	int		rs = SR_OK ;
-	op->b.dstflag = shortconv(tmz_getdst(tp)) ;
-	op->b.timezone = shortconv(tmz_getzoff(tp)) ;
-	op->fl.zoff = tp->fl.zoff ;
-	if (tp->zname[0] != '\0') ylikely {
-	    if ((rs = znlen) >= 0) {
-		cint	znl = rs ;
-	        znwcpy(op->zname,znl,tp->zname) ;
-	        op->fl.zname = (op->zname[0] != '\0') ;
-	    } /* end if (znlen) */
-	}
+    	int		rs ;
+	if ((rs = tp->getdst) >= 0) {
+	    op->b.dstflag = shortconv(rs) ;
+	    if (short zoff ; (rs = tp->getzoff(&zoff)) >= 0) {
+	        op->fl.zoff = (rs > 0) ;
+	        op->b.timezone = zoff ;
+	        if (tp->zname[0] != '\0') ylikely {
+	            if ((rs = znlen) >= 0) {
+		        cint	znl = rs ;
+	                znwcpy(op->zname,znl,tp->zname) ;
+	                op->fl.zname = (op->zname[0] != '\0') ;
+	            } /* end if (znlen) */
+	        }
+	    } /* end if (tmz_getzoff) */
+	} /* end if (tmz_getdst) */
 	return rs ;
 }
 /* end subroutine (dater_ldtmz) */
