@@ -24,8 +24,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<matstr.h>		/* used below in this header */
-#include	<stdfnames.h>		/* used below in this header */
 
 
 EXTERNC_begin
@@ -55,6 +53,9 @@ static inline bool hashex(cchar *sp,int sl) noex {
 }
 static inline bool haswht(cchar *sp,int sl) noex {
     	return haswhite(sp,sl) ;
+}
+static inline bool hasblk(cchar *sp,int sl) noex {
+    	return hasblank(sp,sl) ;
 }
 
 EXTERNC_end
