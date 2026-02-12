@@ -78,8 +78,8 @@ extern "C" {
 
 /* forward references */
 
-static int	procdir(ids *,cchar *,mode_t) noex ;
-static int	mkdirer(ids *,cchar *,mode_t) noex ;
+local int	procdir(ids *,cchar *,mode_t) noex ;
+local int	mkdirer(ids *,cchar *,mode_t) noex ;
 
 
 /* local variables */
@@ -117,7 +117,7 @@ int mkdirs(cchar *dname,mode_t dm) noex {
 
 /* local subroutines */
 
-static int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
+local int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
 	int		rs ;
 	if (ustat sb ; (rs = uc_stat(dirbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
@@ -134,7 +134,7 @@ static int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
 }
 /* end subroutine (procdir) */
 
-static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
+local int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
