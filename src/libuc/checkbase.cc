@@ -43,11 +43,14 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* |lenstr(3u)| + ret-status */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"checkbase.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import ulibvals ;			/* |ulibval(3u)| */
 
