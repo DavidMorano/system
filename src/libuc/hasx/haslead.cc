@@ -58,6 +58,25 @@
 	true		the given c-string has a leading pound character
 	false		the given c-string does not have
 
+
+	Name:
+	hasleadcolon
+
+	Description:
+	Does the given c-string have a colon character (':') occur
+	before a slash character ('/')?
+
+	Synopsis:
+	int hasleadcolon(cchar *sp,int sl) noex
+
+	Arguments:
+	sp		test c-string pointer
+	sl		test c-string length
+
+	Returns:
+	false		answer NO
+	true		answer YES
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -114,5 +133,19 @@ bool haslead(cchar *sp,int µsl,int chx) noex {
 	} /* end if (getlenstr) */
     	return f ;
 } /* end subroutine (haslead) */
+
+bool hasleadcolon(cchar *sp,int sl) noex {
+	bool		f = false ;
+	if (sp) ylikely {
+	    while (sl && *sp) {
+	        f = (*sp == ':') ;
+	        if (f) break ;
+	        if (*sp == '/') break ;
+	        sp += 1 ;
+	        sl -= 1 ;
+	    } /* end while */
+	} /* end if (non-null) */
+	return f ;
+} /* end subroutine (hasleadcolon) */
 
 
