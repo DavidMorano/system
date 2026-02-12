@@ -54,7 +54,6 @@
 #include	<usysdefs.h>
 #include	<mkchar.h>
 #include	<char.h>
-#include	<ischarx.h>
 #include	<localmisc.h>		/* |UC(3dam)| */
 
 #include	"hasnon.h"
