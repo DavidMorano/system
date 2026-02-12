@@ -45,6 +45,7 @@
 #include	<usupport.h>
 #include	<localmisc.h>
 
+#include	"uatx.h"
 #include	"ulinkfile.h"
 
 
@@ -81,7 +82,7 @@ int u_linkfile(cchar *sfn,cchar *dfn) noex {
 	    if (sfn[0] && dfn[0]) ylikely {
 		cint	fdcwd = AT_FDCWD ;
 		cint	fl = 0 ;
-		rs = u_linkat(fdcwd,sfn,fdcwd,dfn,fl) ;
+		rs = u_atlink(fdcwd,sfn,fdcwd,dfn,fl) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
