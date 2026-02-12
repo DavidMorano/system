@@ -5,15 +5,16 @@
 /* remove directories recursively */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
-	= 2002-07-13, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	This was originally written.
 
 */
 
-/* Copyright © 2002 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -52,9 +53,9 @@
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdio>
 #include	<usyscalls.h>
 #include	<usupport.h>		/* |hasnotdots(3u)| */
-#include	<umisc.h>
 #include	<posixdirent.hh>
 #include	<localmisc.h>
 
@@ -67,10 +68,21 @@ import ulibvals ;			/* |max{x}| */
 
 /* local defines */
 
+#define DPRINTF(FMT, ...) 						\
+    if_constexpr (f_debug) {						\
+      fprintf(stderr,"%s: ",__func__) ;					\
+      fprintf(stderr,FMT __VA_OPT__(,) __VA_ARGS__) ;			\
+    }
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 
 /* imported namespaces */
 
 using libu::hasnotdots ;		/* subroutine */
+
 using libu::um ;			/* variable */
 
 
@@ -115,14 +127,17 @@ namespace {
 
 static vars	var ;
 
+cbool		f_debug = CF_DEBUG ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-sysret_t u_rmdirs(cchar *tardname) noex {
+int u_rmdirs(cchar *tardname) noex {
 	int		rs = SR_FAULT ;
+	DPRINTF("ent fn=%s\n",tardname) ;
 	if (tardname) {
 	    rs = SR_INVALID ;
 	    if (tardname[0]) {
@@ -133,6 +148,7 @@ sysret_t u_rmdirs(cchar *tardname) noex {
 		} /* end if (vars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (u_rmdirs) */
 
@@ -143,49 +159,62 @@ mgr::operator int () noex {
 	cint		sz = ((var.maxpath + 1) + (var.maxname + 1)) ;
     	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
+	DPRINTF("ent sz=%d\n",sz) ;
 	plen = var.maxpath ;
 	nlen = var.maxname ;
 	if (char *a ; (rs = um.mall(sz,&a)) >= 0) {
 	    pbuf = (a + 0) ;
 	    nbuf = (a + (plen + 1)) ;
 	    if ((rs = mknpath(pbuf,plen,tardname)) >= 0) {
+	        DPRINTF("mknpath() rs=%d pbuf=%s\n",rs,pbuf) ;
 		rs = remover(rs) ;
 		c = rs ;
+	        DPRINTF("remover() rs=%d\n",rs) ;
 	    }
 	    rs1 = um.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end method (mgr::operator) */
 
 int mgr::remover(int pl) noex {
 	int		rs ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
+	DPRINTF("ent pl=%d pbuf=%s\n",pl,pbuf) ;
 	if (ustat sb ; (rs = u_lstat(pbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 		if ((rs = removedents(pl)) >= 0) {
 		    c = (rs + 1) ;
 	            rs = u_rmdir(pbuf) ;
-		}
+		    DPRINTF("u_rmdir rs=%d\n",rs) ;
+		} /* end if (removedents) */
+		    DPRINTF("after removedents rs=%d\n",rs) ;
 	    } else {
 		rs = u_unlink(pbuf) ;
 		c = 1 ;
+		    DPRINTF("u_unlink rs=%d\n",rs) ;
 	    }
 	} /* end if (u_lstat) */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end method (mgr::remover) */
 
 int mgr::removedents(int pl) noex {
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
+	DPRINTF("ent pl=%d pbuf=%s\n",pl,pbuf) ;
 	if (dirents names ; (rs = names.start) >= 0) {
 	    if ((rs = names.load(nbuf,nlen,pbuf)) > 0) {
+	        DPRINTF("names.load() rs=%d\n",rs) ;
 	        cchar	*sp ;
 	        for (int i = 0 ; names.get(i,&sp) >= 0 ; i += 1) {
 	            if (sp) {
+	        DPRINTF("for i=%d sp=%s\n",i,sp) ;
 	                if ((rs = pathnadd(pbuf,plen,pl,sp)) >= 0) {
+	        DPRINTF("pathnadd() pbuf=%s\n",pbuf) ;
 			    rs = remover(rs) ;
 			    c += rs ;
 	                } /* end if (pathnadd) */
@@ -197,13 +226,14 @@ int mgr::removedents(int pl) noex {
 	    rs1 = names.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dirents) */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs > 0) ? c : rs ;
 } /* end method (mgr::removedents) */
 
 int dirents::load(char *nbuf,int nlen,cchar *dname) noex {
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if (posixdirent d ; (rs = d.open(dname)) >= 0) {
 	    for (dirent_t de ; (rs = d.read(&de,nbuf,nlen)) > 0 ; ) {
 	        if ((nbuf[0] != '.') || hasnotdots(nbuf,rs)) {
