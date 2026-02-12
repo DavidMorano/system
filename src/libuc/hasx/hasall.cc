@@ -44,6 +44,7 @@
 	hasalldec
 	hasallhex
 	hasallwht
+	hasallblk
 
 
 	Name:
