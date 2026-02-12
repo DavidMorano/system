@@ -24,13 +24,13 @@ struct zdb_head {
 	cchar		*name ;		/* static-data (not allocated) */
 	short		woff ;		/* minutes west of GMT */
 	short		isdst ;		/* values: -1, 0, +1 */
-} ;
+} ; /* end struct (zdb_head) */
 
 #ifdef	__cplusplus
 enum zdbmems {
 	zdbmem_count,
 	zdbmem_overlast
-} ; /* end enum */
+} ; /* end enum (zdbmems) */
 struct zdb ;
 struct zdb_co {
 	zdb		*op = nullptr ;
@@ -62,11 +62,11 @@ typedef ZDB		zdb ;
 
 EXTERNC_begin
 
-extern int	zdb_nameoff(zdb *,cchar *,int,int) noex ;
-extern int	zdb_setname(zdb *,cchar *,int) noex ;
-extern int	zdb_setoff(zdb *,int) noex ;
-extern int	zdb_offisdst(zdb *,int,int) noex ;
-extern int	zdb_count(zdb *) noex ;
+extern int	zdb_nameoff	(zdb *,cchar *,int,int) noex ;
+extern int	zdb_setname	(zdb *,cchar *,int) noex ;
+extern int	zdb_setoff	(zdb *,int) noex ;
+extern int	zdb_offisdst	(zdb *,int,int) noex ;
+extern int	zdb_count	(zdb *) noex ;
 
 EXTERNC_end
 
