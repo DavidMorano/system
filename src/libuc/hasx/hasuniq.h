@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* has a counted c-string have all unique characters? */
+/* does a counted c-string have all unique characters? */
 /* version %I% last-modified %G% */
 
 
