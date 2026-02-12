@@ -28,7 +28,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/socket.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"conmsghdr.h"
