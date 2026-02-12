@@ -10,7 +10,7 @@
 
 	= 1998-03-01, David A­D­ Morano
 	Although there was probably something that could have been
-	done with the parsing of date specification strins (here
+	done with the parsing of date specification strings (here
 	below) using some existing code (perhaps with a different
 	argument syntax) I wrote this (below) from scratch (sigh).
 	Yes, I try to avoid writing anything new whatever I can.
@@ -56,9 +56,9 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<sfx.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<matstr.h>
-#include	<toxc.h>
+#include	<toxc.h>		/* |tolc(3uc)| */
 #include	<localmisc.h>
 
 #include	"dater.h"
@@ -84,6 +84,19 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local structures */
 
+enum datetypes {
+	datetype_current,
+	datetype_now,
+	datetype_touch,
+	datetype_tt,
+	datetype_ttouch,
+	datetype_toucht,
+	datetype_log,
+	datetype_logz,
+	datetype_strdig,
+	datetype_overlast
+} ; /* end enum (datetypes) */
+
 namespace {
     struct datehelp {
 	dater		*op ;
@@ -96,9 +109,9 @@ namespace {
 	    dsl = asl ;
 	    nowp = tp ;
 	    zn = azn ;
-	} ;
+	} ; /* end ctor */
 	operator int () noex ;
-	int prockey(int,cc *,int) noex ;
+	int prockey(datetypes,cc *,int) noex ;
 	int procval(cc *,int) noex ;
     } ; /* end struct (datehelp) */
 } /* end namespace */
@@ -109,31 +122,18 @@ namespace {
 
 /* local variables */
 
-enum datetypes {
-	datetype_current,
-	datetype_now,
-	datetype_touch,
-	datetype_tt,
-	datetype_ttouch,
-	datetype_toucht,
-	datetype_log,
-	datetype_logz,
-	datetype_strdig,
-	datetype_overlast
-} ; /* end enum */
-
-constexpr cpcchar	datetypes[] = {
-	"current",
-	"now",
-	"touch",
-	"tt",
-	"ttouch",
-	"toucht",
-	"log",
-	"logz",
-	"strdig",
-	nullptr
-} ; /* end array */
+constexpr cpcchar	datenames[] = {
+	[datetype_current]	= "current",
+	[datetype_now]		= "now",
+	[datetype_touch]	= "touch",
+	[datetype_tt]		= "tt",
+	[datetype_ttouch]	= "ttouch",
+	[datetype_toucht]	= "toucht",
+	[datetype_log]		= "log",
+	[datetype_logz]		= "logz",
+	[datetype_strdig]	= "strdig",
+	[datetype_overlast]	=  nullptr
+} ; /* end array (datenames) */
 
 
 /* exported variables */
@@ -167,8 +167,9 @@ datehelp::operator int () noex {
             cc		*valp = (tp + 1) ;
 	    cchar	*kp ;
             if (int kl ; (kl = sfshrink(dsp,tl,&kp)) > 0) {
-                if (int ti ; (ti = matstr(datetypes,kp,kl)) >= 0) {
-		    rs = prockey(ti,valp,vall) ;
+                if (cint ti = matstr(datenames,kp,kl) ; ti >= 0) {
+		    datetypes dt = datetypes(ti) ;
+		    rs = prockey(dt,valp,vall) ;
 		} else {
 		    rs = SR_NOTSUP ;
 		}
@@ -188,14 +189,15 @@ int datehelp::procval(cchar *sp,int sl) noex {
 	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	    cint	ch = tolc(cp[0]) ;
             if ((ch == 'c') || (ch == 'n')) {
-		if (int ti ; (ti = matstr(datetypes,cp,cl)) >= 0) {
-		    rs = prockey(ti,cp,cl) ;
+		if (cint ti = matstr(datenames,cp,cl) ; ti >= 0) {
+		    datetypes dt = datetypes(ti) ;
+		    rs = prockey(dt,cp,cl) ;
 		} else {
 		    rs = SR_BADFMT ;
 		}
             } else {
-		cint	ti = datetype_toucht ;
-		rs = prockey(ti,cp,cl) ;
+		datetypes dt = datetype_toucht ;
+		rs = prockey(dt,cp,cl) ;
 	    }
 	} else {
 	    rs = SR_NOMSG ;
@@ -204,9 +206,9 @@ int datehelp::procval(cchar *sp,int sl) noex {
 }
 /* end method (datehelp::procval) */
 
-int datehelp::prockey(int ti,cc *sp,int sl) noex {
+int datehelp::prockey(datetypes dt,cc *sp,int sl) noex {
     	int		rs = SR_NOTSUP ;
-        switch (ti) {
+        switch (dt) {
         case datetype_touch:
             rs = dater_settouch(op,sp,sl) ;
             break ;
@@ -231,6 +233,9 @@ int datehelp::prockey(int ti,cc *sp,int sl) noex {
                 rs = dater_settimezon(op,t,zoff,zn,isdst) ;
             }
             break ;
+	case datetype_overlast:
+	    rs = SR_BUGCHECK ;
+	    break ;
         } /* end switch */
 	return rs ;
 }
