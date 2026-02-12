@@ -27,21 +27,29 @@
 
 
 /* object defines */
-#define	DATER_MAGIC		0x26213711
 #define	DATER			struct dater_head
 #define	DATER_FL		struct dater_flags
 #define	DATER_ZI		struct dater_zinfo
+#define	DATER_MAGIC		0x26213711
 /* dater-type-strings (DTSes) */
-#define	DATER_DTSSTD		0		/* email envelope */
-#define	DATER_DTSENV		DATER_DTSSTD	/* email envelope */
-#define	DATER_DTSHDR		1		/* email header */
-#define	DATER_DTSMSG		DATER_DTSHDR	/* message header */
-#define	DATER_DTSSTRDIG		2		/* string of digits */
-#define	DATER_DTSLOGZ		3		/* 'logz' type */
-#define	DATER_DTSGMLOGZ		4		/* 'logz' type for GMT */
-#define	DATER_DTSCTIME		DATER_DTSENV	/* same as UNIX 'ctime' */
-#define	DATER_DTSEND		5		/* *end* */
+enum daterdts {
+    	daterdt_std,
+	daterdt_msg,
+	daterdt_strdig,
+	daterdt_logz,
+	daterdt_gmlogz,
+	daterdt_overlast,
+	daterdt_env	= daterdt_std,
+	daterdt_ctime	= daterdt_std
+} ; /* end enum (daterdts) */
 
+#define	DATER_DTSSTD		daterdt_std	/* email envelope */
+#define	DATER_DTSMSG		daterdt_msg	/* message header */
+#define	DATER_DTSSTRDIG		daterdt_strdig	/* string of digits */
+#define	DATER_DTSLOGZ		daterdt_logz	/* 'logz' type */
+#define	DATER_DTSGMLOGZ		daterdt_gmlogz	/* 'logz' type for GMT */
+#define	DATER_DTSENV		daterdt_env	/* email envelope */
+#define	DATER_DTSCTIME		daterdt_std	/* same as UNIX 'ctime' */
 
 #ifdef	COMMENT
 struct timeb {
@@ -123,8 +131,9 @@ struct dater : dater_head {
 	int settimezn	(time_t,cchar *,int) noex ;
 	int settimezon	(time_t,int,cchar *,int) noex ;
 	int setzinfo	(dater_zi *,cc *,int) noex ;
+	int setkey	(cc *,int,TIMEB *,cc *) noex ;
 	int tzinfo	(dater_zi *) noex ;
-	int mkdatestr	(int,char *,int) noex ;
+	int mkdatestr	(daterdts,char *,int) noex ;
 	int mkstd	(char *,int) noex ;
 	int mkenv	(char *,int) noex ;
 	int mkmsg	(char *,int) noex ;
@@ -140,7 +149,6 @@ struct dater : dater_head {
 	int diff	(dater *,time_t *) noex ;
 	int getdate	(date *) noex ;
 	int getbbtime	(cchar *,int,time_t *) noex ;
-	int setkey	(cc *,int,TIMEB *,cc *) noex ;
 	void dtor() noex ;
 	destruct dater() {
 	    if (magic) dtor() ;
@@ -167,8 +175,9 @@ extern int dater_settmzn(dater *,TM *,cchar *,int) noex ;
 extern int dater_settimezn(dater *,time_t,cchar *,int) noex ;
 extern int dater_settimezon(dater *,time_t,int,cchar *,int) noex ;
 extern int dater_setzinfo(dater *,dater_zi *,cc *,int) noex ;
+extern int dater_setkey(dater *,cc *,int,TIMEB *,cc *) noex ;
 extern int dater_tzinfo(dater *,dater_zi *) noex ;
-extern int dater_mkdatestr(dater *,int,char *,int) noex ;
+extern int dater_mkdatestr(dater *,daterdts,char *,int) noex ;
 extern int dater_mkstd(dater *,char *,int) noex ;
 extern int dater_mkenv(dater *,char *,int) noex ;
 extern int dater_mkmsg(dater *,char *,int) noex ;
@@ -184,7 +193,6 @@ extern int dater_zinfoset(dater *,dater_zi *,cchar *,int) noex ;
 extern int dater_diff(dater *,dater *,time_t *) noex ;
 extern int dater_getdate(dater *,date *) noex ;
 extern int dater_getbbtime(dater *,cchar *,int,time_t *) noex ;
-extern int dater_setkey(dater *,cc *,int,TIMEB *,cc *) noex ;
 extern int dater_finish(dater *) noex ;
 
 #ifdef	COMMENT
@@ -197,7 +205,7 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename ... Args>
-static inline int dater_magic(dater *op,Args ... args) noex {
+local inline int dater_magic(dater *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == DATER_MAGIC) ? SR_OK : SR_NOTOPEN ;
