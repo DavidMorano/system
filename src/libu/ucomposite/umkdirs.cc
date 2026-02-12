@@ -57,8 +57,8 @@
 
 #include	"umkdirs.h"
 
-import ulibvals ;			/* |ulibval(3u)|  */
-import umisc ;				/* |mknpath(3u)|  */
+import ulibvals ;			/* |ulibval(3u)| */
+import umisc ;				/* |mknpath(3u)| */
 
 /* local defines */
 
@@ -104,7 +104,7 @@ static cint	maxpathlen = ulibval.maxpathlen ;
 
 /* external subroutines */
 
-sysret_t u_mkdirs(cchar *dname,mode_t dm) noex {
+int u_mkdirs(cchar *dname,mode_t dm) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	dm &= (~ S_IFMT) ;
@@ -126,25 +126,26 @@ sysret_t u_mkdirs(cchar *dname,mode_t dm) noex {
 mker::operator int () noex {
     	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if ((rs = maxpathlen) >= 0) {
 	    maxpath = rs ;
-	        if (uids id ; (rs = id.load) >= 0) ylikely {
-	            if ((rs = procdir(&id,dname)) >= 0) {
-	                c += rs ;
-	            } else if (rs == SR_NOENT) {
-			rs = mkdirer(&id,dname) ;
-			c += rs ;
-	            } /* end if (needed some creations) */
-	            rs1 = id.release ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (ids) */
+	    if (uids id ; (rs = id.load) >= 0) ylikely {
+	        if ((rs = procdir(&id,dname)) >= 0) {
+	            c += rs ;
+	        } else if (rs == SR_NOENT) {
+		    rs = mkdirer(&id,dname) ;
+		    c += rs ;
+	        } /* end if (needed some creations) */
+	        rs1 = id.release ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (ids) */
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (mker::operator) */
 
 int mker::procdir(uids *idp,cchar *dn) noex {
 	int		rs ;
+	int		c = 0 ; /* return-value */
 	if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        if ((rs = idp->perm(&sb,X_OK)) == 0) {
@@ -155,10 +156,10 @@ int mker::procdir(uids *idp,cchar *dn) noex {
 	    }
 	} else if (rs == SR_NOENT) {
 	    if ((rs = u_mkdir(dn,dm)) >= 0) {
-	        rs = 1 ;
+	        c = 1 ;
 	    }
 	} /* end if */
-	return rs ;
+	return (rs >= 0) ? c : rs ;
 } /* end method (mker::procdir) */
 
 int mker::mkdirer(uids *idp,cchar *dn) noex {
@@ -166,7 +167,7 @@ int mker::mkdirer(uids *idp,cchar *dn) noex {
 	cint		dsz = (maxpath + 1) ;
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if (char *dbuf ; (rs = umem.mall(dsz,&dbuf)) >= 0) ylikely {
             if ((rs = mknpath(dbuf,maxpath,dn)) >= 0) ylikely {
                 cchar       *dp = dbuf ;
