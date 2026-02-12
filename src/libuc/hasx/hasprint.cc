@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* has a counted c-string some characteristic? */
+/* does a counted c-string some characteristic? */
 /* version %I% last-modified %G% */
 
 
@@ -30,7 +30,7 @@
 
 	Synopsis:
 	bool hasprintlatin(cchar *sp,int sl) noex
-	bool hasprintbad(cchar *sp,int sl) noex ;
+	bool hasprintbad(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		test c-string pointer
