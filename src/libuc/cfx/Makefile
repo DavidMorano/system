@@ -1,4 +1,4 @@
-# MAKEFILES (cfx)
+# MAKEFILE (cfx)
 
 T= cfx
 
