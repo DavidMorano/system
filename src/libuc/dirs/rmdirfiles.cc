@@ -60,8 +60,8 @@
 #include	<pathadd.h>
 #include	<prefixfn.h>
 #include	<nleadstr.h>
-#include	<hasx.h>
-#include	<isnot.h>
+#include	<hasx.h>		/* |hasNotDots(3uc)| */
+#include	<isnot.h>		/* |isNotPresent(3uc)| */
 #include	<localmisc.h>
 
 #include	"rmdirfiles.h"
