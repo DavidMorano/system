@@ -61,11 +61,11 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/timeb.h>		/* |TIMEB| */
+#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<ctime>			/* |time_t| */
 #include	<climits>		/* |SHORT_MIN| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -190,8 +190,8 @@ int dater::settimezon(time_t t,int zoff,cchar *zn,int isdst) noex {
 	return dater_settimezon(this,t,zoff,zn,isdst) ;
 }
 
-int dater::mkdatestr(int type,char *dbuf,int dlen) noex {
-	return dater_mkdatestr(this,type,dbuf,dlen) ;
+int dater::mkdatestr(daterdts dt,char *dbuf,int dlen) noex {
+	return dater_mkdatestr(this,dt,dbuf,dlen) ;
 }
 
 int dater::mkstd(char *dbuf,int dlen) noex {
