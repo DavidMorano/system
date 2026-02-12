@@ -75,12 +75,12 @@ struct zdata {
     	cchar		*name ;
 	short		woff ;		/* minutes west of GMT */
 	short		isdst ;		/* values: -1, 0, +1 */
-} ;
+} ; /* end struct (zdata) */
 
 
 /* forward references */
 
-static int	findname(cchar *,int) noex ;
+local int	findname(cchar *,int) noex ;
 
 
 /* local variables */
@@ -332,7 +332,7 @@ int zdb_count(zdb *op) noex {
 /* local subroutines */
 
 /* do a little binary search to find the zone-name (if we have it) */
-static int findname(cchar *sp,int sl) noex {
+local int findname(cchar *sp,int sl) noex {
 	int		i = 0 ;
 	int		rc = 1 ;
 	int		first = 0 ;
@@ -381,7 +381,6 @@ zdb_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (zdb_co::operator) */
+} /* end method (zdb_co::operator) */
 
 
