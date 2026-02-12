@@ -200,7 +200,7 @@ int tmstrsyear(cchar *sp,int sl) noex {
 	                year += 100 ;
 		    } else {
 	                if (year < 70) year += 100 ;
-		    }
+		    } /* end if_constexpr (f_threeyear) */
 	            break ;
 	        case 4:
 	        case 5:
