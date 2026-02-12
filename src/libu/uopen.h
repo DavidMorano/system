@@ -28,7 +28,6 @@
 	u_dupminee
 	u_dupover
 	u_dup2
-	u_fcntl
 	u_close
 	u_socketpair
 	u_pipe
@@ -61,7 +60,6 @@ extern int u_dup(int) noex ;
 extern int u_dupmin(int,int) noex ;
 extern int u_dupminer(int,int,int) noex ;
 extern int u_dupover(int,int) noex ;
-extern int u_fcntl(int,int,...) noex ;
 extern int u_close(int) noex ;
 /* special */
 extern int u_socketpair(int,int,int,int *) noex ;
