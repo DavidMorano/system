@@ -37,7 +37,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<ascii.h>
 #include	<buffer.h>
@@ -88,19 +91,19 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static inline int comparse_magic(comparse *op,Args ... args) noex {
+local inline int comparse_magic(comparse *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == COMPARSE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (comparse_(magic) */
 
-static inline int chiswh(int ch) noex {
+local inline int chiswh(int ch) noex {
     	return CHAR_ISWHITE(ch) ;
-}
+} /* end subroutine (chiswh) */
 
-static int	comparse_bake(comparse *,cchar *,int) noex ;
+local int	comparse_bake(comparse *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -118,10 +121,10 @@ int comparse_start(comparse *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
 	if (op && sp) ylikely {
-	    static cint		rsv = var ;
-	    memclear(hop) ;
-	    if ((rs = rsv) >= 0) ylikely {
-		if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
+	        static cint	rsv = var ;
+	        memclear(hop) ;
+	        if ((rs = rsv) >= 0) ylikely {
 		    op->mailaddrlen = var.mailaddrlen ;
 		    op->mailcommlen = var.mailcommlen ;
 	            while ((sl > 0) && chiswh(*sp)) {
@@ -132,9 +135,9 @@ int comparse_start(comparse *op,cchar *sp,int 탎l) noex {
 	                vl = rs ;
 	                op->magic = COMPARSE_MAGIC ;
 	            } /* end if (comparse_bake) */
-		} /* end if (getlenstr) */
-	    } /* end if (vars) */
-	} /* end if (magic) */
+	        } /* end if (vars) */
+	    } /* end if (getlenstr) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (comparse_start) */
