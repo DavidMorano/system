@@ -116,10 +116,10 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int	dayspec_parse(dayspec *,cchar *,int) noex ;
+local int	dayspec_parse(dayspec *,cchar *,int) noex ;
 
-static int	siourbrk(cchar *,int,int) noex ;
-static int	parsemonth(cchar *,int) noex ;
+local int	siourbrk(cchar *,int,int) noex ;
+local int	parsemonth(cchar *,int) noex ;
 
 
 /* local variables */
@@ -172,7 +172,7 @@ int dayspec_yday(dayspec *op) noex {
 
 /* private subroutines */
 
-static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
+local int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		yl = 0 ;
 	int		ml = 0 ;
@@ -289,7 +289,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (dayspec_parse) */
 
-static int parsemonth(cchar *mp,int ml) noex {
+local int parsemonth(cchar *mp,int ml) noex {
 	int		rs = SR_INVALID ;
 	int		mi = -1 ;
 	cchar		*cp ;
@@ -307,7 +307,7 @@ static int parsemonth(cchar *mp,int ml) noex {
 }
 /* end subroutine (parsemonth) */
 
-static int siourbrk(cchar *sp,int sl,int f_dig) noex {
+local int siourbrk(cchar *sp,int sl,int f_dig) noex {
 	int		i = -1 ; /* return-value */
 	bool		f = false ;
 	for (i = 0 ; i < sl ; i += 1) {
