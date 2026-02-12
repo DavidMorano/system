@@ -53,6 +53,9 @@
 
 #include	"hasonly.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -83,28 +86,28 @@
 
 /* exported subroutines */
 
-bool hasonlyminus(cchar *sp,int sl) noex {
+bool hasonlyminus(cchar *sp,int 탎l) noex {
         bool            f = false ;
-	if (sp) ylikely {
+	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
             if (*sp != '\0') {
 		f = true ;
                 f = f && (sp[0] == '-') ;
                 f = f && ((sl == 1) || (sp[1] == '\0')) ;
             }
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
         return f ;
 }
 /* end subroutine (hasonlyminus) */
 
-bool hasonlyplusminus(cchar *sp,int sl) noex {
+bool hasonlyplusminus(cchar *sp,int 탎l) noex {
         bool            f = false ;
-	if (sp) ylikely {
+	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
             if (*sp != '\0') {
 		f = true ;
                 f = f && ((sp[0] == '+') || (sp[0] == '-')) ;
                 f = f && ((sl == 1) || (sp[1] == '\0')) ;
             }
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
         return f ;
 }
 /* end subroutine (hasonlyplusminus) */
