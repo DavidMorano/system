@@ -99,7 +99,7 @@ local int dircounts(cchar *dname) noex {
             cint        nlen = rs ;
             if (fsdir d ; (rs = d.open(dname)) >= 0) {
 		for (fsdir_ent de ; (rs = d.read(&de,nbuf,nlen)) > 0 ; ) {
-                    if (hasNotDots(nbuf,rs) > 0) {
+                    if (hasNotDots(nbuf,rs)) {
                         c += 1 ;
                     } /* end (not dots) */
                 } /* end for */
