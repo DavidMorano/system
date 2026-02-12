@@ -28,12 +28,12 @@
 #include	<usysrets.h>
 
 
-#ifndef	CONMSGHDR_TYPEDEF
-#define	CONMSGHDR_TYPEDEF
+#ifndef	TYPEDEF_CONMSGHDR
+#define	TYPEDEF_CONMSGHDR
 
 typedef CONMSGHDR	conmsghdr ;
 
-#endif /* CONMSGHDR_TYPEDEF */
+#endif /* TYPEDEF_CONMSGHDR */
 
 EXTERNC_begin
 
