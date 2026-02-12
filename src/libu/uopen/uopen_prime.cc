@@ -351,13 +351,6 @@ int u_dupover(int sfd,int tfd) noex {
 }
 /* end subroutine (u_dupover) */
 
-int u_fcntl(int sfd,int cmd,...) noex {
-	stdcaller	oo(sfd,cmd) ;
-	oo.m = &stdcaller::idupover ;
-	return oo ;
-}
-/* end subroutine (u_dupover) */
-
 int u_socketpair(int pf,int st,int pr,int *pipes) noex {
 	stdcaller	oo(pf,st,pr,pipes) ;
 	oo.m = &stdcaller::isocketpair ;
