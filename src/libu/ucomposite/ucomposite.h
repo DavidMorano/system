@@ -34,6 +34,9 @@
 
 #include	<ucopy.h>
 #include	<ulinkfile.h>
+#include	<uperm.h>
+#include	<umkdirs.h>
+#include	<urmdirs.h>
 
 
 #endif /* UCOPOSITE_INCLUDE */
