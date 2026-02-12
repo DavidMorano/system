@@ -62,7 +62,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	cvtdater_daytime(cvtdater *,time_t * = nullptr) noex ;
+local int	cvtdater_daytime(cvtdater *,time_t * = nullptr) noex ;
 
 
 /* local variables */
@@ -102,7 +102,7 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	        tmtime	tmt ;
 	        if (stz.hasyear == 0) {
 	            cvtdater_daytime(op) ;	/* get current date */
-	            if ((rs = tmt.localtime(op->daytime)) >= 0) {
+	            if ((rs = tmt.timelocal(op->daytime)) >= 0) {
 		        rs = stz.setyear(tmt.year) ;
 		    }
 	        } /* end if (getting the current year) */
@@ -131,14 +131,16 @@ int cvtdater_finish(cvtdater *op) noex {
 
 /* private subroutines */
 
-static int cvtdater_daytime(cvtdater *op,time_t *rp) noex {
+local int cvtdater_daytime(cvtdater *op,time_t *rp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->daytime == 0) {
 		op->daytime = getustime ;
 	    }
-	    if (rp) *rp = op->daytime ;
+	    if (rp) {
+		*rp = op->daytime ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -156,7 +158,7 @@ void cvtdater::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("cvtdater",rs,"fini-finish") ;
 	}
-}
+} /* end method (cvtdater::dtor) */
 
 cvtdater_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -168,7 +170,6 @@ cvtdater_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (cvtdater_co::operator) */
+} /* end method (cvtdater_co::operator) */
 
 
