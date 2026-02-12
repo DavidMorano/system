@@ -75,10 +75,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -89,7 +89,7 @@
 #include	<tmstrs.h>
 #include	<cfdec.h>
 #include	<mkchar.h>
-#include	<char.h>
+#include	<char.h>		/* |CHAR_{x}(3uc)| */
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |NYEARS_CENTURY| */
@@ -122,7 +122,7 @@ namespace {
 	int		znlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -130,7 +130,7 @@ namespace {
 local int	mkvars() noex ;
 
 template<typename ... Args>
-local int tmz_ctor(tmz *op,Args ... args) noex {
+local int tmz_zinit(tmz *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
     	    static cint		rsv = mkvars() ;
@@ -145,8 +145,21 @@ local int tmz_ctor(tmz *op,Args ... args) noex {
 	    } /* end if (mkvars) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tmz_ctor) */
+} /* end subroutine (tmz_zinit) */
+
+local int tmz_zfini(tmz *op) noex {
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (op) {
+	     rs = SR_OK ;
+             if (op->zname) ylikely {
+	         rs1 = lm_free(op->zname) ;
+	         if (rs >= 0) rs = rs1 ;
+	         op->zname = nullptr ;
+             }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (tmz_zfini) */
 
 local int	tmz_timeparts(tmz *,cchar *,int) noex ;
 local int	tmz_xstdtrailing(tmz *,cchar *,int) noex ;
@@ -180,6 +193,7 @@ constexpr char		tpterms[] = {
 static vars		var ;
 
 constexpr int		nyears = NYEARS_CENTURY ;
+
 constexpr bool		f_comment = false ;
 
 
@@ -190,13 +204,13 @@ constexpr bool		f_comment = false ;
 
 int tmz_init(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op)) >= 0) ylikely {
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_init) */
@@ -204,7 +218,7 @@ int tmz_init(tmz *op) noex {
 /* format> [Wed] Nov 14 19:24[:04] [EST] [[19]99] [±0400] */
 int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
@@ -236,7 +250,7 @@ int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_xstd) */
@@ -245,7 +259,7 @@ int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
 	    op->zoff = SHORT_MIN ;
@@ -294,7 +308,7 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
 }
 /* end subroutine (tmz_xmsg) */
@@ -302,7 +316,7 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 /* convert from a TOUCH (original) format> MMDDhhmm[YY] */
 int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op,sp)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -356,7 +370,7 @@ int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_xtouch) */
@@ -364,7 +378,7 @@ int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 /* convert from a TOUCH-t (new '-t') format> [[CC]YY]MMDDhhmm[.SS] */
 int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op,sp)) >= 0) ylikely {
             TM		*stp = &op->st ;
             if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -439,7 +453,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (date_toucht) */
@@ -448,7 +462,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op,sp)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -479,8 +493,8 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	                op->fl.zoff = true ;
 	                cp += rs ;
 	                cl -= rs ;
-	            }
-	        }
+	            } /* end if (getzoff) */
+	        } /* end if (plus-minus) */
 	        if ((rs >= 0) && (cl > 0)) {
 	            cint	ch = mkchar(*cp) ;
 	            if (isalphalatin(ch)) {
@@ -491,7 +505,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	            } else {
 	                rs = SR_INVALID ;
 	            }
-	        }
+	        } /* end if */
 	        sl = intconv(tp - sp) ;
 	    } /* end if (tried for ZOFF and ZNAME) */
 	    if (rs >= 0) {
@@ -540,7 +554,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
 }
 /* end subroutine (tmz_xstrdig) */
@@ -549,7 +563,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		zl = 0 ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op,sp)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
             if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -634,7 +648,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
 }
 /* end subroutine (tmz_xlogz) */
@@ -642,7 +656,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
 /* format> [CC]YYMMDD (like abbreviated variation of "touch") */
 int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,sp)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op,sp)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = op->clear() ;
@@ -692,38 +706,38 @@ int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_xday) */
 
 int tmz_isset(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op)) >= 0) ylikely {
 	    rs = op->st.tm_mday ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_isset) */
 
 int tmz_hasyear(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op)) >= 0) ylikely {
 	    rs = op->fl.year ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_hasyear) */
 
 int tmz_haszoff(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op)) >= 0) ylikely {
 	    rs = op->fl.zoff ;
 	    if (rs < 0) {
 		op->dtor() ;
@@ -735,19 +749,19 @@ int tmz_haszoff(tmz *op) noex {
 
 int tmz_haszone(tmz *op) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op)) >= 0) ylikely {
 	    rs = (op->zname[0] != '\0') ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_haszone) */
 
 int tmz_setday(tmz *op,int y,int m,int d) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op)) >= 0) ylikely {
 	    TM		*stp = &op->st ;
 	    cint	sc = -1 ;
 	    if (y >= TM_YEAR_BASE) {
@@ -760,73 +774,94 @@ int tmz_setday(tmz *op,int y,int m,int d) noex {
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_setday) */
 
 int tmz_setyear(tmz *op,int year) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op)) >= 0) ylikely {
 	    op->st.tm_year = year ;
 	    op->fl.year = true ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_setyear) */
 
 int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,zp)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op,zp)) >= 0) ylikely {
 	    cint	znl = var.znlen ;
 	    cchar	*znp = op->zname ;
 	    rs = intconv(strnwcpy(op->zname,znl,zp,zl) - znp) ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_setzone) */
 
 int tmz_gettm(tmz *op,TM *tmp) noex {
 	int		rs ;
-	if ((rs = tmz_ctor(op,tmp)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op,tmp)) >= 0) ylikely {
 	    *tmp = op->st ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_gettm) */
 
 int tmz_getdst(tmz *op) noex {
     	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) ylikely {
+	if ((rs = tmz_zinit(op)) >= 0) ylikely {
 	    rs = op->st.tm_isdst ;
 	    if (rs < 0) {
 		op->dtor() ;
 	    }
-	} /* end if (tmz_ctor) */
+	} /* end if (tmz_zinit) */
 	return rs ;
 }
 /* end subroutine (tmz_getdst) */
 
-int tmz_getzoff(tmz *op) noex {
+int tmz_getzoff(tmz *op,short *rp) noex {
     	int		rs ;
-	if ((rs = tmz_ctor(op)) >= 0) ylikely {
-	    rs = op->zoff ;
-	    if (rs < 0) {
-		op->dtor() ;
-	    }
-	} /* end if (tmz_ctor) */
-	return rs ;
+	int		f = false ; /* return-value */
+	if ((rs = tmz_zinit(op,rp)) >= 0) ylikely {
+	    *rp = op->zoff ; /* |short| */
+	    f = op->fl.zoff ;
+	} /* end if (tmz_zinit) */
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (tmz_getzoff) */
+
+int tmz_getzone(tmz *op,char *rbuf,int rlen) noex {
+    	int		rs ;
+	int		zl = 0 ; /* return-value */
+	if ((rs = tmz_zinit(op,rbuf)) >= 0) ylikely {
+	    rs = sncpy(rbuf,rlen,op->zname) ;
+	    zl = rs ;
+	} /* end if (tmz_zinit) */
+	return (rs >= 0) ? zl : rs ;
+}
+/* end subroutine (tmz_getzone) */
+
+int tmz_fini(tmz *op) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	{
+	    rs1 = tmz_zfini(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	return rs ;
+}
+/* end subroutine (tmz_fini) */
 
 
 /* private subroutines */
@@ -982,7 +1017,7 @@ local int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 	cchar		*cp{} ;
 	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) ylikely {
 	    cint	ch = mkchar(*cp) ;
-	    int		f = false ;
+	    bool	f = false ;
 	    f = f || isplusminus(ch) ;
 	    f = f || isdigitlatin(ch) ;
 	    if (f) ylikely {
@@ -990,8 +1025,8 @@ local int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 	            op->zoff = shortconv(v) ;
 	            op->fl.zoff = true ;
 	            si = intconv((cp + cl) - sp) ;
-		}
-	    }
+		} /* end if (getzoff) */
+	    } /* end if (have) */
 	} /* end if (sfnext) */
 	return (rs >= 0) ? si : rs ;
 }
@@ -1008,7 +1043,7 @@ local int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 		cchar	*znp = op->zname ;
 	        rs = intconv(strnwcpy(op->zname,znl,cp,cl)  - znp) ;
 	        si = intconv((cp + cl) - sp) ;
-	    }
+	    } /* end if (isalpha) */
 	} /* end if (sfnext) */
 	return (rs >= 0) ? si : rs ;
 }
@@ -1105,10 +1140,13 @@ local int getzoff(int *zop,cchar *sp,int sl) noex {
 /* end subroutine (getzoff) */
 
 local int tmz_clear(tmz *op) noex {
-	op->st = {} ;
-	op->fl = {} ;
-	op->zoff = 0 ;
-	return SR_OK ;
+    	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    op->st = {} ;
+	    op->fl = {} ;
+	    op->zoff = 0 ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end method (tmz::clæar) */
 
@@ -1156,19 +1194,19 @@ int tmz::gettm(TM *tmp) noex {
 	return tmz_gettm(this,tmp) ;
 }
 
-void tmz::dtor() noex {
-    int		rs = SR_OK ;
-    int		rs1 ;
-    if (zname) ylikely {
-	rs1 = lm_free(zname) ;
-	if (rs >= 0) rs = rs1 ;
-	zname = nullptr ;
-    }
-    if (rs < 0) {
-	ulogerror("tmx",rs,"dtor-ucfree") ;
-    }
+int tmz::getzoff(short *rp) noex {
+    	return tmz_getzoff(this,rp) ;
 }
-/* end method (tmz::dtor) */
+
+int tmz::getzone(char *rbuf,int rlen) noex {
+    	return tmz_getzone(this,rbuf,rlen) ;
+}
+
+void tmz::dtor() noex {
+    if (cint rs = tmz_zfini(this) ; rs < 0) {
+	ulogerror("tmz",rs,"dtor") ;
+    }
+} /* end method (tmz::dtor) */
 
 tmz_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -1195,14 +1233,14 @@ tmz_co::operator int () noex {
 	    case tmzmem_getdst:
 	        rs = tmz_getdst(op) ;
 	        break ;
-	    case tmzmem_getzoff:
-	        rs = tmz_getzoff(op) ;
+	        break ;
+	    case tmzmem_fini:
+	        rs = tmz_fini(op) ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (tmz_co::operator) */
+} /* end method (tmz_co::operator) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -1210,7 +1248,7 @@ vars::operator int () noex {
 	    znlen = rs ;
 	}
 	return rs ;
-}
+} /* end method (vars::operator) */
 
 local int mkvars() noex {
     	return var ;
@@ -1264,8 +1302,7 @@ local bool isgoodname(cchar *sp,int sl) noex {
 	    sl -= 1 ;
 	} /* end while */
 	return f ;
-}
-/* end subroutine (isgoodname) */
+} /* end subroutine (isgoodname) */
 #endif /* COMMENT */
 
 
