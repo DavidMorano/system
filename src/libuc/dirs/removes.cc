@@ -125,9 +125,8 @@ int removes(cchar *tardname) noex {
 	if (tardname) ylikely {
 	    cchar *fn ;
 	    if (prefixfn pf ; (rs = pf.start(tardname,-1,&fn)) > 0) {
-		{
-		    mgr ro(fn) ;
-		    rs = ro ;
+		if (mgr ro(fn) ; (rs = ro) >= 0) {
+		    rv = rs ;
 		}
 		rs1 = pf.finish ;
 		if (rs >= 0) rs = rs1 ;
