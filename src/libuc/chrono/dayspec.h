@@ -37,7 +37,7 @@ enum dayspecmems {
 	dayspecmem_def,
 	dayspecmem_yday,
 	dayspecmem_overlast
-} ;
+} ; /* end enum (dayspecmems) */
 struct dayspec ;
 struct dayspec_co {
 	dayspec		*op = nullptr ;
