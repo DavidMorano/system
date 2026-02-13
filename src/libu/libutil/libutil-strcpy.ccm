@@ -1,0 +1,39 @@
+/* libutil-strcpy MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* |min(C++)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+
+export module libutil:strcpy ;
+
+export {
+    constexpr inline char *strcpy(char *dp,cchar *ss,int n) noex {
+	char	*rp ;
+	if (n >= 0) {
+	    rp = strncpy(dp,ss,n) ;
+	} else {
+	    rp = strcpy(dp,ss) ;
+	}
+    	return rp ;
+    } /* end subroutine (strcpy) */
+} /* end export */
+
+
