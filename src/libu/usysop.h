@@ -19,6 +19,9 @@
 /*******************************************************************************
 
 	Names:
+	u_adjtime
+	u_stime
+	u_time
 
 	Description:
 	These subroutines mange the operating system itself.
@@ -40,7 +43,6 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 #include	<usupport.h>
-#include	<usysconf.h>
 
 
 EXTERNC_begin
