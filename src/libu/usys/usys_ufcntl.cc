@@ -17,7 +17,8 @@
 
 /*******************************************************************************
 
-	We define some missing operating system utilty functions.
+  	Description:
+	I define some missing operating system utilty functions.
 
 *******************************************************************************/
 
@@ -36,26 +37,25 @@
 
 #include	"usys_ucloseonexec.h"
 
-#define	FCNTL_TO	30		/* general timeout */
+#define	FCNTL_TO	30		/* general timeout (seconds) */
 
-constexpr ustime	onethousand = 1000 ;
+constexpr long		onemillion = (1000 * 1000) ;
 
 namespace usys {
     sysret_t ufcntl(int fd,int cmd,uintptr_t anyarg) noex {
-	TIMESPEC	ts{} ;
-	int		to = FCNTL_TO ;
+	int		mto = (FCNTL_TO  * 1000) ; /* milliseconds */
 	int		rs ;
-	if ((rs = timespec_load(&ts,onethousand,0)) >= 0) {
+	if (TIMESPEC ts{} ; (rs = timespec_load(&ts,0,onemillion)) >= 0) {
 	    bool	fexit = false ;
 	    repeat {
 	        if ((rs = fcntl(fd,cmd,anyarg)) < 0) {
-		    const errno_t	ec = errno ;
+		    const errno_t ec = errno ; /* used-afterwards */
 		    switch (ec) {
 		    case EMFILE:
 		    case ENFILE:
 		    case ENOSPC:
 		    case ENOBUFS:
-		        if (to-- > 0) {
+		        if (mto-- > 0) {
 		            nanosleep(&ts,nullptr) ;
 			} else {
 			    fexit = true ;
@@ -105,7 +105,7 @@ namespace usys {
 		}
 	        rs = ufcntl(fd,F_SETFL,flflags) ;
 	    } /* end if (needed a change) */
-	} /* end if (u_fcntl) */
+	} /* end if (unonblock) */
 	return (rs >= 0) ? f_previous : rs ;
     } /* end subroutine (unonblock) */
 } /* end namespace (usys) */
