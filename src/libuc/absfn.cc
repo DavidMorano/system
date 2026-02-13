@@ -45,11 +45,9 @@
 #include	<cstdlib>
 #include	<functional>		/* |mem_fn(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getpwd.h>
 #include	<strwcpy.h>
 #include	<pathadd.h>
@@ -149,7 +147,7 @@ local int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		nl = 0 ; /* return-value */
 	if ((rs = ulibval.maxpathlen) >= 0) {
 	    cint	plen = rs ;
-	    if (char *pbuf ; (rs = libmem.mall((plen + 1),&pbuf)) >= 0) {
+	    if (char *pbuf ; (rs = lm_mall((plen + 1),&pbuf)) >= 0) {
 	        if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
 	 	    if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) ylikely {
 		        if ((nl = rs) > ABSFN_SHORTLEN) {
