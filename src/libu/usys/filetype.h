@@ -49,8 +49,8 @@ enum filetypes {
 } ; /* end enum (filestypes */
 
 
-#ifndef	DT_UNKNOWN
-#define	DT_UNKNOWN	0
+#ifndef	DT_UA0
+#define	DT_UA0		0
 #endif
 
 #ifndef	DT_FIFO
@@ -104,10 +104,10 @@ enum filetypes {
 
 EXTERNC_begin
 
-static inline int filetype(mode_t m) noex {
+local inline int filetype(mode_t m) noex {
 	cuint	uv = (uint) m ;
 	return ((uv & S_IFMT) >> 12) ;
-}
+} /* end subroutine (filetype) */
 
 EXTERNC_end
 
