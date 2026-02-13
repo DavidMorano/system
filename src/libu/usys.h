@@ -55,9 +55,9 @@
 #include	<usys_plock.h>		/* defines |usys_plock()| */
 
 /* missing operating system calls or facilities */
+#include	<usys_shadow.h>
 #include	<usys_project.h>
 #include	<usys_task.h>
-#include	<usys_shadow.h>
 #include	<usys_mqueue.h>
 #include	<usys_gethrtime.h>
 #include	<usys_getrandom.h>
