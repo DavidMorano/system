@@ -86,6 +86,7 @@ struct varnames {
 	static const char tmpdir[] ;
 	static const char maildir[] ;
 	static const char maildirs[] ;
+	static const char mailhost[] ;
 	static const char uucppublic[] ;
 	static const char lines[] ;
 	static const char columns[] ;
@@ -116,9 +117,6 @@ struct varnames {
 	static const char provider[] ;
 	static const char folder[] ;
 } ; /* end struct (varnames) */
-
-
-extern const varnames	varname ;
 
 
 #endif /* __cplusplus (C++ only) */
