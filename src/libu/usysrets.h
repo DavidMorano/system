@@ -18,6 +18,27 @@
 
 /* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Header:
+	usysret
+
+	Description:
+	This file provides the preprocessor defines for system-return
+	values.  These are derived from the native ERRNO return
+	values that are standard on UNIX-like operating systems.
+	For values that are missing on some operating systems (like
+	the many missing values on the Apple-Darwin operating system)
+	substitute values are provides.  These substitute values
+	(called "missing" values below) start at the integer value
+	of '10000'.  These substitute values have to start this high
+	(rather than perhaps starting at '1000') becase it is known
+	that some values on IBM systems are in the range of '3000' to
+	'3999'.  Of course, we want to avoid any clash with the IBM
+	values if we are ever compiled on an IBM UNIX-like system.
+
+*******************************************************************************/
+
 #ifndef	USYSRETS_INCLUDE
 #define	USYSRETS_INCLUDE
 
@@ -26,8 +47,8 @@
 #include	<errno.h>
 
 
-enum errnomssings {
-	errnomissing_l2nsync = 1000,
+enum errnomissings {
+	errnomissing_l2nsync = 10000,
 	errnomissing_l2hlt,
 	errnomissing_l3hlt,
 	errnomissing_l3rst,
@@ -67,19 +88,20 @@ enum errnomssings {
 	errnomissing_restart,
 	errnomissing_strpipe,
 	errnomissing_overlast
-} ;
+} ; /* end enum (errnomissings) */
+
 
 #ifndef	EL2NSYNC
 #define	EL2NSYNC	errnomissing_l2nsync
+#endif
+#ifndef	EL2HLT
+#define	EL2HLT		errnomissing_l2hlt
 #endif
 #ifndef	EL3HLT
 #define	EL3HLT		errnomissing_l3hlt
 #endif
 #ifndef	EL3RST
 #define	EL3RST		errnomissing_l3rst
-#endif
-#ifndef	EL2HLT
-#define	EL2HLT		errnomissing_l2hlt
 #endif
 #ifndef	ENOANO
 #define	ENOANO		errnomissing_noano
@@ -357,6 +379,7 @@ enum errnomssings {
 #define	SR_TXTBUSY	SR_TXTBSY	/* Text file busy */
 #define	SR_NOPROTO	SR_NOPROTOOPT	/* Protocol not available */
 #define	SR_FAIL		SR_IO		/* operation failed */
+#define	SR_DOMAIN	SR_DOM		/* domain (bad) */
 
 /* missing codes -- backwards */
 
