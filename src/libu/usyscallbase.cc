@@ -51,8 +51,6 @@
 
 using namespace	libu ;			/* namespace */
 
-using std::nullptr_t ;			/* type */
-
 
 /* local typedefs */
 
