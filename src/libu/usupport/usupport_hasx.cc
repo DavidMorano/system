@@ -23,8 +23,8 @@
 	Description:
 	This subroutine determines if the given string has neither of the
 	following:
-	+ one dot character
-	+ two dot characters
+	+ only one dot character
+	+ only two dot characters
 
 	Synopsis:
 	bool hasNotDots(cchar *sp,int sl) noex
@@ -86,14 +86,15 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 namespace libu {
     bool hasnotdots(cchar *sp,int µsl) noex {
 	bool		f = true ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
 	    if (sp[0] == '.') {
-	        if (sl <= 2) {
-	            f = (sl != 1) ;
-		    f = f || ((sl == 2) && (sp[1] != '.')) ;
+	        if (sl == 1) {
+	            f = false ;
+	        } else if (sl == 2) {
+	            f = (sp[1] != '.') ;
 	        }
-	    } /* end if (had a leading dot) */
-	} /* end if (getlenstrmagic) */
+	    } /* end if (possible) */
+	} /* end if (getlenstr) */
 	return f ;
     } /* end subroutine (hasnotdots) */
 } /* end namespace (libu) */
