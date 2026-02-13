@@ -1,4 +1,4 @@
-# MAKEFILES (buffer)
+# MAKEFILE (buffer)
 
 T= buffer
 
