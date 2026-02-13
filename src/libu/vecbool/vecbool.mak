@@ -1,4 +1,4 @@
-# MAKEFILES (vecbool)
+# MAKEFILE (vecbool)
 
 T= vecbool
 
