@@ -1,0 +1,60 @@
+/* libutil-lenstr MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* |min(C++)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+
+export module libutil:lenstr ;
+
+export {
+    constexpr inline int clenstr(cchar *sp,int sl = -1) noex {
+    	cchar		*cp = sp ;
+	while (sl && *cp++) {
+	    sl -= 1 ;
+	}
+	return intconv(cp - sp) ;
+    } /* end subroutine (clenstr) */
+    constexpr inline int lenstr(cchar *sp,int sl = -1) noex {
+    	int		len = -1 ;
+	if (sp) {
+	    if (sl >= 0) {
+    	        csize	ssize = size_t(sl) ;
+	        len = intconv(strnlen(sp,ssize)) ;
+	    } else {
+	        len = intconv(strlen(sp)) ;
+	    }
+	} /* end if (non-null) */
+    	return len ;
+    } /* end subroutine (lenstr) */
+    constexpr inline int getlenstr(cchar *sp,int sl = -1) noex {
+	int		len = -1 ;
+	if (sp) {
+	    if (sl >= 0) {
+		len = sl ;
+	    } else {
+	        len = intconv(strlen(sp)) ;
+	    }
+	} /* end if (non-null) */
+	return len ;
+    } /* end subroutine (getlenstr) */
+} /* end export */
+
+
