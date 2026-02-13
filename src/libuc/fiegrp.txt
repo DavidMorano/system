@@ -1,0 +1,8 @@
+FILEGRP
+
+This object (FILEGRP) is currently not used in any code as of 
+2025-02-11.  What this object ever did and why it was used
+is not quite the mystery.  One really needs actualy use cases
+for code in order to understnd what that code did and why
+it was needed (someplace).
+
