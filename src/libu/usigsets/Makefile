@@ -1,4 +1,4 @@
-# MAKEFILES (usigsets)
+# MAKEFILE (usigsets)
 
 T= usigsets
 
