@@ -1,4 +1,4 @@
-# MAKEFILES (usupport)
+# MAKEFILE (usupport)
 
 T= usupport
 
