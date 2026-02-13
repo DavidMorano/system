@@ -36,10 +36,7 @@ module ;
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 module umisc ;
