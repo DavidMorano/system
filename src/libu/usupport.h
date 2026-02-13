@@ -15,8 +15,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<time.h>		/* |time_t| */
-#include	<string.h>		/* |memset(3c)| + |memcpy(3c)| */
+#include	<stddef.h>
+#include	<stdlib.h>
 #include	<stdint.h>
+#include	<string.h>		/* |memset(3c)| + |memcpy(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usys.h>		/* <- auxillary OS support */
