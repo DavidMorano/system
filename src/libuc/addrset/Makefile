@@ -1,4 +1,4 @@
-# MAKEFILES (addrset)
+# MAKEFILE (addrset)
 
 T= addrset
 
