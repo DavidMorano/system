@@ -1,0 +1,39 @@
+/* libutil-memcpy MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* |min(C++)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+
+export module libutil:memcpy ;
+
+export {
+    template<typename T> constexpr inline void *memcpy(T *dp,cvoid *sp) noex {
+	csize	dsize = sizeof(T) ;
+	return memcpy(dp,sp,dsize) ;
+    }
+    template<typename T>
+    constexpr inline void *cmemcpy(T *dp,cvoid *sp,size_t dsize = -1) noex {
+    	if (dsize > INT_MAX) dsize = sizeof(T) ;
+    	return memcpy(dp,sp,dsize) ;
+    }
+} /* end export */
+
+
