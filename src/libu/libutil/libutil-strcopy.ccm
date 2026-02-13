@@ -1,0 +1,40 @@
+/* libutil-strcopy MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* |min(C++)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+
+export module libutil:strcopy ;
+
+export {
+    constexpr inline char *strcopy(char *dp,cchar *sp,int sl = -1) noex {
+	char	*rp ;
+	if (sl >= 0) {
+	    csize ssize = size_t(sl) ;
+	    rp = stpncpy(dp,sp,ssize) ;
+	} else {
+	    rp = stpcpy(dp,sp) ;
+	}
+	return rp ;
+    }
+} /* end export */
+
+
