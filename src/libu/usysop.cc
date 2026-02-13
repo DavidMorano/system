@@ -21,8 +21,6 @@
 	u_adjtime
 	u_stime
 	u_time
-	u_sysconfval
-	u_sysconfstr
 
 	Description:
 	System functions.
@@ -31,8 +29,6 @@
 	int u_adjtime(CTIMEVAL *tvp,TIMEVAL *ovp) noex ;
 	int u_stime(time_t *tp) noex ;
 	int u_time(time_t *rp) noex ;
-	int u_sysconfval(int cmd,long *rp) noex
-	int u_sysconfstr(int cmd,char *rbuf,int rlen) noex
 
 	Returns:
 	>=0		OK
@@ -121,13 +117,5 @@ int u_time(time_t *rp) noex {
 	return rs ;
 }
 /* end subroutine (u_time) */
-
-int u_sysconfval(int cmd,long *rp) noex {
-    return usysconfval(cmd,rp) ;
-}
-
-int u_sysconfstr(int cmd,char *rbuf,int rlen) noex {
-    return usysconfstr(cmd,rbuf,rlen) ;
-}
 
 
