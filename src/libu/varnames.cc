@@ -81,6 +81,7 @@ const char varnames::pwd[] =		"PWD" ;
 const char varnames::tmpdir[] =		"TMPDIR" ;
 const char varnames::maildir[] =	"MAILDIR" ;
 const char varnames::maildirs[] =	"MAILDIRS" ;
+const char varnames::mailhost[] =	"MAILHOST" ;
 const char varnames::uucppublic[] =	"UUCPPUBLIC" ;
 const char varnames::lines[] =		"LINES" ;
 const char varnames::columns[] =	"COLUMNS" ;
