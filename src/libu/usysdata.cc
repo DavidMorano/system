@@ -100,7 +100,6 @@ import ulibvals ;			/* |ulibval(3u)| */
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using libu::usyscallbase ;		/* type */
 using libu::ugethostid ;		/* subroutine */
 using libu::sncpy ;			/* subroutine */
