@@ -59,15 +59,16 @@ namespace usys {
 	int		len = 0 ;
 	if ((fd >= 0) && (s >= 0) && (fo >= 0)) {
 	    if (ssize_t ret ; (ret = sendfile(fd,s,fo,c)) >= 0) {
+		clong lw = ret ;
 		rs = SR_OK ;
-	        len = intsat(ret) ;
+	        len = intsat(lw) ;
 	    } else {
 		rs = (- errno) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (usendfile) */
-}
+} /* end namespace (usys) */
 
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) 
 
@@ -79,14 +80,15 @@ namespace usys {
 	if ((fd >= 0) && (s >= 0) && (fo >= 0)) {
 	    off_t	res = 0 ;
 	    if ((rs = sendfile(fd,s,fo,&res,nullptr,0)) >= 0) {
-	        len = intsat(res) ;
+		clong lw = res ;
+	        len = intsat(lw) ;
 	    } else {
 		rs = (- errno) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (usendfile) */
-}
+} /* end namespace (usys) */
 
 #elif	defined(OSNAME_Linux) && (SYSHAS_Liunx > 0) 
 
@@ -96,15 +98,16 @@ namespace usys {
 	int		len = 0 ;
 	if ((fd >= 0) && (s >= 0) && (fo >= 0)) {
 	    if (ssize_t ret ; (ret = sendfile(fd,s,fo,c)) >= 0) {
+		clong lw = res ;
 		rs = SR_OK ;
-	        len = intsat(ret) ;
+	        len = intsat(lw) ;
 	    } else {
 		rs = (- errno) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (usendfile) */
-}
+} /* end namespace (usys) */
 
 #else /* any other operating system */
 
@@ -118,7 +121,7 @@ namespace usys {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (usendfile) */
-}
+} /* end namespace (usys) */
 
 #endif /* which OS */
 
