@@ -40,8 +40,8 @@ MODS += umisc.ccm
 LIBS +=
 
 
-OBJPARTS += umisc-mknpathx.o umisc-mknpathxw.o
-OBJPARTS += umisc-pathnadd.o umisc-snadd.o
+OBJPART += umisc-mknpathx.o umisc-mknpathxw.o
+OBJPART += umisc-pathnadd.o umisc-snadd.o
 
 OBJ00= umisc0.o umisc1.o umisc2.o umisc3.o
 OBJ01= umisc4.o umisc5.o umisc6.o
@@ -59,7 +59,6 @@ OBJ= obja.o
 INCDIRS=
 
 LIBDIRS=
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -105,8 +104,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ) $(OBJPARTS) Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(OBJPARTS)
+$(T).o:			$(OBJ) objpart.o Makefile
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) objpart.o
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -126,23 +125,27 @@ control:
 
 
 obj00.o:		$(OBJ00)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ00)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj01.o:		$(OBJ01)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ01)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj02.o:		$(OBJ02)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ02)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj03.o:		$(OBJ03)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ03)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 umisc-mknpathx.o:	umisc-mknpathx.ccm
@@ -150,7 +153,7 @@ umisc-mknpathxw.o:	umisc-mknpathxw.ccm
 umisc-pathnadd.o:	umisc-pathnadd.ccm
 umisc-snadd.o:		umisc-snadd.ccm
 
-umisc0.o:		umisc.ccm $(OBJPARTS)
+umisc0.o:		umisc.ccm $(OBJPART)
 	makemodule umisc
 
 umisc1.o:		umisc1.cc umisc.ccm
