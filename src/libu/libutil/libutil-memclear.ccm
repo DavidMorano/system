@@ -1,0 +1,38 @@
+/* libutil-memclear MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+
+export module libutil:memclear ;
+
+int memclearer(void *,int) noex ;
+
+export {
+    template<typename T> inline int memclear(T *objp,int sz) noex {
+	if (sz < 0) {
+    	    sz = szof(T) ;
+	}
+    	return memclearer(objp,sz) ;
+    }
+    template<typename T> inline int memclear(T *objp) noex {
+	cint	sz = szof(T) ;
+	return memclearer(objp,sz) ;
+    }
+} /* end export */
+
+
