@@ -42,8 +42,6 @@
 #include	<usysdefs.h>
 
 
-
-
 #endif /* USTDTYPEDEFS_INCLUDE */
 
 
