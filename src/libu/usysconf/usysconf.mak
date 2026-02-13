@@ -1,4 +1,4 @@
-# MAKEFILES (usysconf)
+# MAKEFILE (usysconf)
 
 T= usysconf
 
