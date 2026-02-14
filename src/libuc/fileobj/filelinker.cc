@@ -5,6 +5,7 @@
 /* short-word queue */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -37,22 +38,29 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<deque>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<ulogerror.h>
 #include	<uclibmem.h>
-#include	<filerec.h>
-#include	<intsat.h>
+#include	<strnul.hh>
 #include	<localmisc.h>
+#include	<dprintf.h>
 
 #include	"filelinker.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/tardir.ccm"
+#pragma		GCC dependency		"mod/filerec.ccm"
 
 import libutil ;			/* |resumelife(3u)| + |getlen(3u)| */
+import tardir ;
+import filerec ;
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -65,6 +73,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef tardir	*	tardirp ;
 typedef filerec *	filerecp ;
 
 
@@ -79,17 +88,69 @@ typedef filerec *	filerecp ;
 
 /* forward references */
 
+const uint	filelinker_magicval	= 0x83655680 ;
+
 template<typename ... Args>
-local inline int filelinker_magic(filelinker *op,Args ... args) noex {
+local int filelinker_ctor(filelinker *op,Args ... args) noex {
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == FILELINKER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) {
+	    op->dirp = nullptr ;
+	    op->recp = nullptr ;
+	    op->magval = 0 ;
+	    op->tll = 0 ;
+	    rs = SR_NOMEM ;
+	    if (tardir *dlp ; (dlp = new(nt) tardir) != np) ylikely {
+		op->dirp = dlp ;
+	        if (filerec *rlp ; (rlp = new(nt) filerec) != np) ylikely {
+		    op->recp = rlp ;
+		    rs = SR_OK ;
+	        } /* end if (new-filerec) */
+		if (rs < 0) {
+		    delete dlp ;
+		    op->dirp = nullptr ;
+		} /* end if (error) */
+	    } /* end if (new-tardir) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (filelinker_ctor) */
+
+local int filelinker_dtor(filelinker *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->recp) {
+		filerec *rlp = filerecp(op->recp) ;
+		delete rlp ;
+		op->recp = nullptr ;
+	    }
+	    if (op->dirp) {
+		tardir *dlp = tardirp(op->dirp) ;
+		delete dlp ;
+		op->dirp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (filelinker_dtor) */
+
+template<typename ... Args> 
+int filelinker_ma::operator () (Args ... args) noex {
+    	int		rs = SR_FAULT ;
+	if ((... && args)) {
+	    rs = (op->magval == filelinker_magicval) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-} /* end subroutine (filelinker_magic) */
+} /* end method (filelinker_ma::operator) */
+
+inline filelinker_ma::operator int () noex {
+	return (op->magval == filelinker_magicval) ? SR_OK : SR_NOTOPEN ;
+} /* end method (filelinker_ma::operator) */
 
 
 /* local variables */
+
+cbool		f_debug = CF_DEBUG ;
 
 
 /* exported variables */
@@ -97,210 +158,125 @@ local inline int filelinker_magic(filelinker *op,Args ... args) noex {
 
 /* exported subroutines */
 
-int filelinker::start(mainv tlist) noex {
-    	cnothrow	nt{} ;
-    	cnullptr	np{} ;
-	int		rs = SR_FAULT ;
-	if (tlist) {
-	    rs = SR_INVALID ;
-	    tarlist = nullptr ;
-	    frp = nullptr ;
-	    magic = 0 ;
-	    if ((tll = lenstrarr(tlist)) > 0) {
-	        rs = SR_NOMEM ;
-	        tlp = tlist ;
-	        if (filerec *p ; (p = new(nt) filerec) != np) ylikely {
-		    frp = filerecp(p) ;
-		    if ((rs = p->start) >= 0) {
-	                magic = FILELINKER_MAGIC ;
-		    }
-		    if (rs < 0) {
-			delete p ;
-			frp = nullptr ;
-		    } /* end if (error) */
-	        } /* end if (new-filerec) */
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-} /* end subroutine (filelinker_start) */
-
-int filelinker_finish(filelinker *op) noex {
-    	cnullptr	np{} ;
+int filelinker::istart(mainv tlist) noex {
 	int		rs ;
-	if ((rs = filelinker_magic(op)) >= 0) ylikely {
-	    if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) ylikely {
-	        delete qvp ;
-	        op->frp = nullptr ;
-	    } else {
-	        rs = SR_BUGCHECK ;
-	    } /* end if (non-null) */
-	    op->magic = 0 ;
-	} /* end if (magic) */
-	return rs ;
-} /* end subroutine (filelinker_finish) */
-
-int filelinker_ins(filelinker *op,short v) noex {
-    	cnullptr	np{} ;
-	int		rs ;
-	int		c = 0 ; /* return-value */
-	if ((rs = filelinker_magic(op)) >= 0) ylikely {
-	    rs = SR_BUGCHECK ;
-	    if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) ylikely {
-		if ((rs = qvp->ins(v)) >= 0) ylikely {
-		    rs = qvp->count() ;
+	int		c = 0 ;
+	if ((rs = filelinker_ctor(this)) >= 0) {
+	    if ((rs = istarter()) >= 0) {
+		if (tlist) {
+		    rs = load(tlist) ;
 		    c = rs ;
 		}
-	    } /* end if (non-null) */
-	} /* end if (magic) */
+	    } /* end if (istarter) */
+	    if (rs < 0) {
+		filelinker_dtor(this) ;
+	    } /* end if (error) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-} /* end subroutine (filelinker_ins) */
+} /* end method (filelinker::istart) */
 
-int filelinker_rem(filelinker *op,short *rp) noex {
-    	cnullptr	np{} ;
+int filelinker::istarter() noex {
+	tardir		*dlp = tardirp(dirp) ;
 	int		rs ;
+	if ((rs = dlp->start) >= 0) {
+	    filerec *rlp = filerecp(recp) ;
+	    if ((rs = rlp->start) >= 0) {
+		magval = filelinker_magicval ;
+	    }
+	    if (rs < 0) {
+		dlp->finish() ;
+	    } /* end if (error) */
+	} /* end if (tardir_start) */
+	return rs ;
+} /* end method (filelinker::istarter) */
+
+int filelinker::ifinish() noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = magic) >= 0) ylikely {
+	    if (recp) {
+		filerec *rlp = filerecp(recp) ;
+		rs1 = rlp->finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (dirp) {
+		tardir *dlp = tardirp(dirp) ;
+		rs1 = dlp->finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs = filelinker_dtor(this) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (non-null) */
+	    magval = 0 ;
+	} /* end if (magic) */
+	return rs ;
+} /* end method (filelinker::ifinish) */
+
+int filelinker::load(mainv tlist) noex {
+    	int		rs = SR_FAULT ;
 	int		c = 0 ; /* return-value */
-	if ((rs = filelinker_magic(op,rp)) >= 0) ylikely {
-	    rs = SR_BUGCHECK ;
-	    if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) ylikely {
-		if ((rs = qvp->rem(rp)) >= 0) ylikely {
-		    rs = qvp->count() ;
-		    c = rs ;
-		} /* end if (rem) */
-	    } /* end if (non-null) */
-	} /* end if (magic) */
-	return (rs >= 0) ? c : rs ;
-} /* end subroutine (filelinker_rem) */
-
-int filelinker_remread(filelinker *op,short *rbuf,int rlen) noex {
-	cnullptr	np{} ;
-	int		rs ;
-	int		i = 0 ; /* return-value */
-	if ((rs = filelinker_magic(op,rbuf)) >= 0) ylikely {
-	    if (rlen > 0) ylikely {
-		int	ml ;
-	        if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) {
-	            cint	len = qvp->count() ;
-	            ml = min(len,rlen) ;
-	            for (i = 0 ; (rs >= 0) && (i < ml) ; i += 1) {
-			if (short v ; (rs = qvp->rem(&v)) >= 0) {
-			    rbuf[i] = v ;
-			} else if (rs == SR_EMPTY) {
-			    rs = SR_OK ;
-			    break ;
-			}
+	if ((tll = lenstrarr(tlist)) >= 0) {
+	    rs = SR_OK ;
+	    if (tll > 0) {
+	        if ((rs = magic) >= 0) ylikely {
+	            tardir *dlp = tardirp(dirp) ;
+	            for (int i = 0 ; (rs >= 0) && tlist[i] ; i += 1) {
+		        if (cchar *dn = tlist[i] ; dn[0]) {
+		            rs = dlp->add(dn) ;
+			    c += rs ;
+		        }
 	            } /* end for */
-	        } else {
-	            rs = SR_BUGCHECK ;
-	        }
-	    } /* end if (positive) */
-	    rbuf[i] = 0 ;
-	} /* end if (magic) */
-	return (rs >= 0) ? i : rs ;
-} /* end subroutine (filelinker_remread) */
+	        } /* end if (vecent_magic) */
+	    } /* end if (non-zero positive) */
+	} /* end if (lenstrarr) */
+	return (rs >= 0) ? c : rs ;
+} /* end method (filelinker::load) */
 
-int filelinker_remall(filelinker *op) noex {
-    	cnullptr	np{} ;
+int filelinker::add(cchar *sp,int 탎l) noex {
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = filelinker_magic(op)) >= 0) ylikely {
-	    rs = SR_BUGCHECK ;
-	    if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) ylikely {
-		rs = qvp->remall() ;
-	    } /* end if (non-null) */
+	if ((rs = magic(sp)) >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
+	        tardir *dlp = tardirp(dirp) ;
+		rs = dlp->add(sp,sl) ;
+		c = rs ;
+	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-} /* end subroutine (filelinker_remall) */
+} /* end method (filelinker::add) */
 
-int filelinker_get(filelinker *op,int ei) noex {
-    	cnullptr	np{} ;
+int filelinker::icount() noex {
+	int		rs ;
+	int		c = 0 ; /* return-value */
+	if ((rs = magic) >= 0) ylikely {
+	    tardir *dlp = tardirp(dirp) ;
+	    rs = dlp->count ;
+	    c = rs ;
+	} /* end if (magic) */
+	return (rs >= 0) ? c : rs ;
+} /* end method (filelinker::icount) */
+
+int filelinker::link(ustat *sbp,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rv = 0 ; /* return-value */
-	if ((rs = filelinker_magic(op)) >= 0) ylikely {
-	    rs = SR_BUGCHECK ;
-	    if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) ylikely {
-		rs = qvp->get(ei) ;
-		rv = rs ;
-	    } /* end if (non-null) */
+	{
+	    strnul s(sp,sl) ;
+	    DPRINTF("ent s=%s\n",ccp(s)) ;
+        }
+	if ((rs = magic(sbp,sp)) >= 0) ylikely {
+	    tardir *dlp = tardirp(dirp) ;
+	    ustat sb ;
+	    (void) sl ;
+	    cchar *dp ;
+	    for (int i = 0 ; dlp->get(i,&sb,&dp) >= 0 ; i += 1) {
+	        DPRINTF("get() dp=%s\n",dp) ;
+	    } /* end for */
 	} /* end if (magic) */
+	DPRINTF("ret rs=%d rv=%d\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
-} /* end subroutine (filelinker_get) */
-
-int filelinker_readat(filelinker *op,int ei,short *rbuf,int rlen) noex {
-    	cnullptr	np{} ;
-    	int		rs ;
-	int		rl = 0 ; /* return-value */
-	if ((rs = filelinker_magic(op,rbuf)) >= 0) ylikely {
-	    if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) ylikely {
-		if ((rs = qvp->count()) > 0) {
-		    cint cnt = rs ;
-		    if ((ei >= 0) && (ei < cnt)) {
-			while (rlen-- && (rl < (cnt - ei))) {
-			    if ((rs = qvp->get(ei++)) >= 0) {
-				rbuf[rl++] = short(rs) ;
-			    }
-			    if (rs < 0) break ;
-			} /* end while */
-		    } else {
-		        rs = SR_INVALID ;
-		    } /* end if (valid) */
-		} /* end if (count - non-zero positive) */
-	    } else {
-	        rs = SR_BUGCHECK ;
-	    } /* end if (non-null) */
-	    rbuf[rl] = 0 ;
-	} /* end if (magic) */
-	return (rs >= 0) ? rl : rs ;
-} /* end subroutine (filelinker_readat) */
-
-int filelinker_read(filelinker *op,short *rbuf,int rlen) noex {
-    	return filelinker_readat(op,0,rbuf,rlen) ;
-} /* end subroutine (filelinker_read) */
-
-int filelinker_size(filelinker *op) noex {
-    	cnullptr	np{} ;
-	int		rs ;
-	int		c = 0 ; /* return-value */
-	if ((rs = filelinker_magic(op)) >= 0) ylikely {
-	    rs = SR_BUGCHECK ;
-	    if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) ylikely {
-		rs = qvp->size() ;
-		c = rs ;
-	    } /* end if (non-null) */
-	} /* end if (magic) */
-	return (rs >= 0) ? c : rs ;
-} /* end subroutine (filelinker_size) */
-
-int filelinker_count(filelinker *op) noex {
-    	cnullptr	np{} ;
-	int		rs ;
-	int		c = 0 ; /* return-value */
-	if ((rs = filelinker_magic(op)) >= 0) ylikely {
-	    rs = SR_BUGCHECK ;
-	    if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) ylikely {
-		rs = qvp->count() ;
-		c = rs ;
-	    } /* end if (non-null) */
-	} /* end if (magic) */
-	return (rs >= 0) ? c : rs ;
-} /* end subroutine (filelinker_count) */
-
-int filelinker_load(filelinker *op,short *sp,int 탎l) noex {
-	cnullptr	np{} ;
-	int		rs ;
-	int		c = 0 ; /* return-value */
-	if ((rs = filelinker_magic(op,sp)) >= 0) ylikely {
-	    if (int sl ; (sl = getlen(sp,탎l)) >= 0) ylikely {
-	        if (bmgr *qvp ; (qvp = resumelife<bmgr>(op->frp)) != np) {
-	            while ((rs >= 0) && (sl-- > 0)) {
-			rs = qvp->ins(sp[c++]) ;
-	           } /* end while */
-		} else {
-		    rs = SR_BUGCHECK ;
-		} /* end if (non-null) */
-	    } /* end if (getlen) */
-	} /* end if (magic) */
-	return (rs >= 0) ? c : rs ;
-} /* end subroutine (filelinker_load) */
+} /* end subroutine (filelinker::link) */
 
 
 /* private subroutines */
@@ -311,23 +287,27 @@ void filelinker::dtor() noex {
 	}
 } /* end method (filelinker::dtor) */
 
-int filelinker::operator [] (int ei) noex {
-    return filelinker_get(this,ei) ;
-}
-
 filelinker::operator int () noex {
-    	return filelinker_count(this) ;
+    	return icount() ;
 }
 
-int filelinker_co::operator () (int a) noex {
+int filelinker_st::operator () (mainv arr) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+    	    rs = op->istart(arr) ;
+	}
+	return rs ;
+} /* end method (filelinker_st::operator) */
+
+filelinker_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    switch (w) {
 	    case filelinkermem_count:
-	        rs = filelinker_count(op) ;
+	        rs = op->icount() ;
 	        break ;
 	    case filelinkermem_finish:
-	        rs = filelinker_finish(op) ;
+	        rs = op->ifinish() ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
