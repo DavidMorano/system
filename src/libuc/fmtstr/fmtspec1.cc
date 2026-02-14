@@ -41,10 +41,13 @@ module ;
 #include	<cstdlib>
 #include	<cstdint>
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 module fmtspec ;
 
