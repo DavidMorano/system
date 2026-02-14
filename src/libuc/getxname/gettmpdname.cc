@@ -41,12 +41,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* <- |getenv(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getourenv.h>
 #include	<localmisc.h>
 
 #include	"gettmpdname.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
