@@ -42,7 +42,8 @@ module ;
 #include	<cstring>
 #include	<cwchar>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>		/* system-returns + |uc_malloc(3uc)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<ascii.h>		/* |CH_{x}| */
 #include	<strn.h>
@@ -63,7 +64,6 @@ import fmtspec ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
