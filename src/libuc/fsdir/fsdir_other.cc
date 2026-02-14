@@ -56,14 +56,15 @@
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<intsat.h>
 #include	<snwcpy.h>
 #include	<localmisc.h>
 
 #include	"fsdir.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| */
 
@@ -132,14 +133,14 @@ namespace {
 /* forward referecnces */
 
 template<typename ... Args>
-static int fsdir_ctor(fsdir *op,Args ... args) noex {
+local int fsdir_ctor(fsdir *op,Args ... args) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    cint	sz = szof(othermgr) ;
 	    op->magic = 0 ;
 	    op->fl = {} ;
-	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 		rs = SR_NOTCONN ;
 		memclear(vp,sz) ;
 	        if (othermgr *omp ; (omp = new(vp) othermgr(op)) != np) {
@@ -148,7 +149,7 @@ static int fsdir_ctor(fsdir *op,Args ... args) noex {
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
-		    uc_free(op->posixp) ;
+		    lm_free(op->posixp) ;
 		    op->posixp = nullptr ;
 		} /* end if (error) */
 	    } /* end if (memory-allocation) */
@@ -156,19 +157,19 @@ static int fsdir_ctor(fsdir *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (fsdir_ctor) */
 
-static int fsdir_dtor(fsdir *op) noex {
+local int fsdir_dtor(fsdir *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->posixp) {
+	    if (op->posixp) ylikely {
 		othermgr *omp = resumelife<othermgr>(op->posixp) ;
 		rs = SR_OK ;
 		{
 		    destroy_at(omp) ;
 		}
 		{
-		    rs1 = uc_free(op->posixp) ;
+		    rs1 = lm_free(op->posixp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->posixp = nullptr ;
 		}
@@ -176,18 +177,16 @@ static int fsdir_dtor(fsdir *op) noex {
 	    op->magic = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fsdir_dtor) */
+} /* end subroutine (fsdir_dtor) */
 
 template<typename ... Args>
-static inline int fsdir_magic(fsdir *op,Args ... args) noex {
+local inline int fsdir_magic(fsdir *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == FSDIR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (fsdir_magic) */
+} /* end subroutine (fsdir_magic) */
 
 
 /* local variables */
@@ -200,9 +199,9 @@ static inline int fsdir_magic(fsdir *op,Args ... args) noex {
 
 int fsdir_open(fsdir *op,cchar *dname) noex {
 	int		rs ;
-	if ((rs = fsdir_ctor(op,dname)) >= 0) {
+	if ((rs = fsdir_ctor(op,dname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dname[0]) {
+	    if (dname[0]) ylikely {
 		othermgr *omp = resumelife<othermgr>(op->posixp) ;
 		rs = omp->open(dname) ;
 	    } /* end if (valid) */
@@ -217,9 +216,9 @@ int fsdir_open(fsdir *op,cchar *dname) noex {
 int fsdir_close(fsdir *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = fsdir_magic(op)) >= 0) {
+	if ((rs = fsdir_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTCONN ;
-	    if (op->posixp) {
+	    if (op->posixp) ylikely {
 		othermgr *omp = resumelife<othermgr>(op->posixp) ;
 		rs = SR_OK ;
 		{
@@ -248,11 +247,11 @@ typedef struct dirent {
 
 int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 	int		rs ;
-	if ((rs = fsdir_magic(op,dep,nbuf)) >= 0) {
+	if ((rs = fsdir_magic(op,dep,nbuf)) >= 0) ylikely {
 	    nbuf[0] = '\0' ;
 	    dep->name = nbuf ;
 	    rs = SR_NOTCONN ;
-	    if (op->posixp) {
+	    if (op->posixp) ylikely {
 		othermgr *omp = resumelife<othermgr>(op->posixp) ;
 		rs = omp->read(dep,nbuf,nlen) ;
 	    } /* end if (non-null) */
@@ -263,9 +262,9 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 
 int fsdir_tell(fsdir *op,off_t *offp) noex {
 	int		rs ;
-	if ((rs = fsdir_magic(op)) >= 0) {
+	if ((rs = fsdir_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTCONN ;
-	    if (op->posixp) {
+	    if (op->posixp) ylikely {
 		othermgr *omp = resumelife<othermgr>(op->posixp) ;
 	        rs = omp->tell(offp) ;
 	    } /* end if (non-null) */
@@ -276,9 +275,9 @@ int fsdir_tell(fsdir *op,off_t *offp) noex {
 
 int fsdir_seek(fsdir *op,off_t o) noex {
 	int		rs ;
-	if ((rs = fsdir_magic(op)) >= 0) {
+	if ((rs = fsdir_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTCONN ;
-	    if (op->posixp) {
+	    if (op->posixp) ylikely {
 		othermgr *omp = resumelife<othermgr>(op->posixp) ;
 	        rs = omp->seek(o) ;
 	    } /* end if (non-null) */
@@ -289,9 +288,9 @@ int fsdir_seek(fsdir *op,off_t o) noex {
 
 int fsdir_rewind(fsdir *op) noex {
 	int		rs ;
-	if ((rs = fsdir_magic(op)) >= 0) {
+	if ((rs = fsdir_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTCONN ;
-	    if (op->posixp) {
+	    if (op->posixp) ylikely {
 		othermgr *omp = resumelife<othermgr>(op->posixp) ;
 	        rs = omp->rewind() ;
 	    } /* end if (non-null) */
@@ -302,9 +301,9 @@ int fsdir_rewind(fsdir *op) noex {
 
 int fsdir_audit(fsdir *op) noex {
 	int		rs ;
-	if ((rs = fsdir_magic(op)) >= 0) {
+	if ((rs = fsdir_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTCONN ;
-	    if (op->posixp) {
+	    if (op->posixp) ylikely {
 		othermgr *omp = resumelife<othermgr>(op->posixp) ;
 	        rs = omp->audit() ;
 	    } /* end if (non-null) */
@@ -318,74 +317,74 @@ int fsdir_audit(fsdir *op) noex {
 
 int othermgr::open(cchar *dname) noex {
     	int		rs ;
-	        if ((rs = fdbegin(dname)) >= 0) {
-	            if (USTAT sb ; (rs = u_fstat(dfd,&sb)) >= 0) {
-		        rs = SR_NOTDIR ;
-		        if (S_ISDIR(sb.st_mode)) {
-			    if ((rs = ucpagesize) >= 0) {
-	    	                cint	ps = rs ;
-	    	                int	ds = intsat(sb.st_size) ;
-			        int	sz ;
-			        if (ds < FSDIR_MINBUFLEN) {
-				    ds = FSDIR_MINBUFLEN ;
-			        }
-			        sz = min(ps,ds) ;
-	    	                if (char *bp ; (rs = uc_valloc(sz,&bp)) >= 0) {
-		                    bdata = bp ;
-			            bsz = sz ;
-	                            op->magic = FSDIR_MAGIC ;
-	                        } /* end if (memory-allocation) */
-			    } /* end if (pagesize) */
-		        } /* end if (direcyory indicated) */
-	            } /* end if (stat) */
-	            if (rs < 0) {
-	                fdend() ;
-	            }
-		} /* end if (othermgr_begin) */
-		return rs ;
+	if ((rs = fdbegin(dname)) >= 0) {
+	    if (ustat sb ; (rs = u_fstat(dfd,&sb)) >= 0) ylikely {
+		rs = SR_NOTDIR ;
+		if (S_ISDIR(sb.st_mode)) ylikely {
+		    if ((rs = ucpagesize) >= 0) ylikely {
+	    	        cint	ps = rs ;
+	    	        int	ds = intsat(sb.st_size) ;
+			int	sz ;
+			if (ds < FSDIR_MINBUFLEN) {
+			    ds = FSDIR_MINBUFLEN ;
+			}
+			sz = min(ps,ds) ;
+	    	        if (char *bp ; (rs = lm_vall(sz,&bp)) >= 0) ylikely {
+		            bdata = bp ;
+			    bsz = sz ;
+	                    op->magic = FSDIR_MAGIC ;
+	                } /* end if (memory-allocation) */
+		    } /* end if (pagesize) */
+		} /* end if (direcyory indicated) */
+	    } /* end if (stat) */
+	    if (rs < 0) {
+	        fdend() ;
+	    }
+	} /* end if (othermgr_begin) */
+	return rs ;
 } /* end method (othermgr::open) */
 
 int othermgr::close() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	    if (bdata) {
-	        rs1 = uc_free(bdata) ;
-	        if (rs >= 0) rs = rs1 ;
-	        bdata = nullptr ;
-	    }
-	    {
-	        rs1 = fdend() ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    return rs ;
+	if (bdata) {
+	    rs1 = lm_free(bdata) ;
+	    if (rs >= 0) rs = rs1 ;
+	    bdata = nullptr ;
+	}
+	{
+	    rs1 = fdend() ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	return rs ;
 } /* end method (othermgr::close) */
 
 int othermgr::read(fsdir_ent *dep,char *nbuf,int nlen) noex {
 	caddr_t		bufp = caddr_t(bdata) ;
     	int		rs = SR_OK ;
-	        if (ei >= blen) {
-	            dirent_t	*dp = direntp(bdata) ;
-	            rs = u_getdents(dfd,dp,bsz) ;
-	            blen = rs ;
-	            doff += rs ;
-	            ei = 0 ;
-	        }
-	        if ((rs >= 0) && (blen > 0)) { /* greater-than-zero */
-	            dirent_t	*dp = direntp(bufp + ei) ;
-	            int		ml ;
-	            ml = (dp->d_reclen - 18) ;
-	            dep->ino = dp->d_ino ;
-	            dep->nlen = dp->d_namlen ;
-	            dep->type = 0 ;
-	            if ((rs = snwcpy(nbuf,nlen,dp->d_name,ml)) >= 0) {
-		        ei += dp->d_reclen ;
-	            }
-	        } else {
-	            dep->ino = 0 ;
-	            dep->nlen = 0 ;
-	            dep->name = nullptr ;
-	            dep->type = 0 ;
-	        } /* end if */
+	if (ei >= blen) {
+	    dirent_t	*dp = direntp(bdata) ;
+	    rs = u_getdents(dfd,dp,bsz) ;
+	    blen = rs ;
+	    doff += rs ;
+	    ei = 0 ;
+	}
+	if ((rs >= 0) && (blen > 0)) { /* greater-than-zero */
+	    dirent_t	*dp = direntp(bufp + ei) ;
+	    int		ml ;
+	    ml = (dp->d_reclen - 18) ;
+	    dep->ino = dp->d_ino ;
+	    dep->nlen = dp->d_namlen ;
+	    dep->type = 0 ;
+	    if ((rs = snwcpy(nbuf,nlen,dp->d_name,ml)) >= 0) {
+		ei += dp->d_reclen ;
+	    }
+	} else {
+	    dep->ino = 0 ;
+	    dep->nlen = 0 ;
+	    dep->name = nullptr ;
+	    dep->type = 0 ;
+	} /* end if */
 	return rs ;
 } /* end method (othermgr::read) */
 
@@ -398,7 +397,7 @@ int othermgr::tell(off_t *offp) noex {
 
 int othermgr::seek(off_t o) noex {
 	int		rs ;
-	if ((rs = u_seek(dfd,o,SEEK_SET)) >= 0) {
+	if ((rs = u_seek(dfd,o,SEEK_SET)) >= 0) ylikely {
 	    blen = 0 ;
 	    doff = intoff_t(o) ;
 	    eoff = intoff_t(o) ;
@@ -409,13 +408,13 @@ int othermgr::seek(off_t o) noex {
 
 int othermgr::rewind() noex {
     	int		rs = SR_OK ;
-	    if (doff > 0) {
-	        blen = 0 ;
-	        doff = 0 ;
-	        rs = u_rewind(dfd) ;
-	    }
-	    eoff = 0 ;
-	    ei = 0 ;
+	if (doff > 0) {
+	    blen = 0 ;
+	    doff = 0 ;
+	    rs = u_rewind(dfd) ;
+	}
+	eoff = 0 ;
+	ei = 0 ;
 	return rs ;
 } /* end method (othermgr::rewind) */
 
@@ -430,7 +429,7 @@ int othermgr::audit() noex {
 int othermgr::fdbegin(cchar *dname) noex {
 	int		rs ;
 	if (dname[0] == '*') {
-	    if (int v ; (rs = cfdec((dname+1),-1,&v)) >= 0) {
+	    if (int v ; (rs = cfdec((dname+1),-1,&v)) >= 0) ylikely {
 		if ((rs = u_dup(v)) >= 0) {
 		    dfd = rs ;
 		    op->fl.descname = true ;
@@ -440,7 +439,7 @@ int othermgr::fdbegin(cchar *dname) noex {
 	    rs = uc_open(dname,O_RDONLY,0666) ;
 	    dfd = rs ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = uc_closeonexec(dfd,true) ;
 	    if (rs < 0) {
 		u_close(dfd) ;
@@ -453,7 +452,7 @@ int othermgr::fdbegin(cchar *dname) noex {
 int othermgr::fdend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (dfd >= 0) {
+	if (dfd >= 0) ylikely {
 	    rs1 = u_close(dfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    dfd = -1 ;
