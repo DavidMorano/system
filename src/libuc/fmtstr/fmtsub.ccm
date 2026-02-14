@@ -37,8 +37,7 @@ module ;
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<localmisc.h>
 
 export module fmtsub ;
 
@@ -123,10 +122,10 @@ export {
 
 template<typename T> 
 int fmtsub::floater(char *tb,int tl,int fc,int fg,int wi,int pr,T dv) noex {
-    	    int		rs ;
-	    if ((rs = cvtfloat(tb,tl,fc,fg,wi,pr,dv)) >= 0) {
-	        rs = strw(tb,rs) ;
-	    }
-	    return rs ;
+	int		rs ;
+	if ((rs = cvtfloat(tb,tl,fc,fg,wi,pr,dv)) >= 0) {
+	    rs = strw(tb,rs) ;
+	}
+	return rs ;
 } /* end method (floater) */
 
