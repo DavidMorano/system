@@ -41,9 +41,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucgetpj.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<getusername.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
@@ -87,7 +89,7 @@ int getprojname(char *rbuf,int rlen,cchar *un) noex {
 	if (rbuf && un) {
 	    rs = SR_INVALID ;
 	    if (rlen > 0) {
-	        if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	        if ((rs = getbufsize(bufsize_un)) >= 0) {
 	            cint	ulen = rs ;
 		    char	ubuf[rs + 1] ;
 	            if ((un[0] == '-') || (un[0] == '\0')) {
@@ -95,7 +97,7 @@ int getprojname(char *rbuf,int rlen,cchar *un) noex {
 	                rs = getusername(ubuf,ulen,-1) ;
 	            }
 	            if (rs >= 0) {
-	                if (char *pjbuf{} ; (rs = malloc_pj(&pjbuf)) >= 0) {
+	                if (char *pjbuf ; (rs = lm_pj(&pjbuf)) >= 0) {
 			    auto	getpj = uc_getpjdef ;
 	                    ucentpj	pj ;
 	                    cint	pjlen = rs ;
@@ -103,7 +105,7 @@ int getprojname(char *rbuf,int rlen,cchar *un) noex {
 	                        rs = sncpy1(rbuf,rlen,pj.pj_name) ;
 		                rl = rs ;
 		            }
-		            rs1 = uc_free(pjbuf) ;
+		            rs1 = lm_free(pjbuf) ;
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (m-a-f) */
 	            } /* end if (ok) */
