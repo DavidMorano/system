@@ -48,7 +48,7 @@ MOBJ_SUB += fmtsub0.o fmtsub1.o fmtsub2.o fmtsub3.o
 
 MOBJ_SPEC += fmtspec0.o fmtspec1.o
 
-OBJ= fmtstr_main.o mods.o fmtopt.o
+OBJ= fmtstr_prime.o mods.o fmtopt.o
 
 
 INCDIRS=
@@ -138,7 +138,7 @@ DEPS_SPEC	+=
 
 fmtopt.o:		fmtopt.cc fmtopt.h			$(INCS)
 
-fmtstr_main.o:		fmtstr_main.cc $(DEPS_MAIN)		$(INCS)
+fmtstr_prime.o:		fmtstr_prime.cc $(DEPS_MAIN)		$(INCS)
 	makemodule fmtstrdata
 	makemodule fmtutil
 	makemodule fmtsub
@@ -168,7 +168,7 @@ fmtobj1.o:		fmtobj1.cc fmtobj.ccm $(DEPS_OBJ)	$(INCS)
 fmtstrdata.o:		fmtstrdata.ccm				$(INCS)
 fmtutil.o:		fmtutil.ccm				$(INCS)
 
-fmtsub.o:		$(MOBJ_SUB) $				$(INCS)
+fmtsub.o:		$(MOBJ_SUB)				$(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ_SUB)
 
 fmtsub0.o:		fmtsub.ccm $(DEPS_SUB)			$(INCS)
