@@ -25,7 +25,6 @@
 #include	<usysbase.h>
 
 
-#define	FILELINKER		struct filelinker_head
 #define	FILELINKER_MAGIC	0x87625374
 
 
@@ -35,6 +34,24 @@ enum filelinkermems {
 	filelinkermem_overlast
 } ; /* end enum (filelinkermem) */
 struct filelinker ;
+struct filelinker_ma {
+	filelinker	*op = nullptr ;
+	void operator () (filelinker *p,int) noex {
+	    op = p ;
+	} ;
+	template<typename ... Args> int operator () (Args ... ) noex ;
+	operator int () noex ;
+} ; /* end struct (filelinker_ma) */
+struct filelinker_st {
+    	filelinker	*op = nullptr ;
+    	void operator () (filelinker *p,int) noex {
+    	    op = p ;
+    	} ;
+    	int operator () (mainv = nullptr) noex ;
+    	operator int () noex {
+    	    return operator () (nullptr) ;
+    	} ;
+} ; /* end struct (filelinker_st) */
 struct filelinker_co {
 	filelinker	*op = nullptr ;
 	int		w = -1 ;
@@ -42,36 +59,48 @@ struct filelinker_co {
 	    op = p ;
 	    w = m ;
 	} ;
-	int operator () (int = 0) noex ;
-	operator int () noex {
-	    return operator () (0) ;
+	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
 	} ;
 } ; /* end struct (filelinker_co) */
 struct filelinker {
+    	friend		filelinker_ma ;
+    	friend		filelinker_st ;
+    	friend		filelinker_co ;
+	filelinker_st	start ;
 	filelinker_co	count ;
 	filelinker_co	finish ;
-    	void		*tdp ;		/* target-directory-pointer */
-    	void		*frp ;		/* file-record-pointer */
-	uint		magic ;
-	int		tll ;
+	filelinker_ma	magic ;
+    	void		*dirp ;		/* target-directory-pointer */
+    	void		*recp ;		/* file-record-pointer */
+	uint		magval ;
+	int		tll ;		/* ?? */
 	filelinker() noex {
+	    start	(this,0) ;
 	    count	(this,filelinkermem_count) ;
 	    finish	(this,filelinkermem_finish) ;
-	    tlp = nullptr ;
-	    frp = nullptr ;
-	    magic = 0 ;
-	    tlp = 0 ;
+	    magic	(this,0) ;
+	    dirp = nullptr ;
+	    recp = nullptr ;
+	    magval = 0 ;
+	    tll = 0 ;
 	} ; /* end ctor */
 	filelinker(const filelinker &) = delete ;
 	filelinker &operator = (const filelinker &) = delete ;
-	int start	(mainv) noex ;
+	int load	(mainv) noex ;
+	int add		(cchar *,int = -1) noex ;
 	int link	(ustat *,cchar *,int) noex ;
 	void dtor() noex ;
-	int operator [] (int) noex ;
 	operator int () noex ;
 	destruct filelinker() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
+    private:
+	int istart(mainv) noex ;
+	int istarter() noex ;
+	int icount() noex ;
+	int ifinish() noex ;
 } ; /* end struct (filelinker) */
 
 
