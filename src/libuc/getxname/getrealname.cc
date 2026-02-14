@@ -47,12 +47,13 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
-#include	<mallocxx.h>
 #include	<mkx.h>			/* |getgecosname(3uc)| */
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
@@ -100,7 +101,7 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 	int		rl = 0 ;
 	if (rlen < 0) rlen = REALNAMELEN ;
 	if (rbuf) {
-	    if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	        ucentpwx	pw ;
 	        cint		pwlen = rs ;
 	        if ((rs = getpwname(&pw,pwbuf,pwlen,un)) >= 0) {
@@ -110,7 +111,7 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 			rl = rs ;
 	            } /* end if (getgecosname) */
 	        } /* end if (getpwname) */
-	        rs1 = uc_free(pwbuf) ;
+	        rs1 = lm_free(pwbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
