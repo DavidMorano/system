@@ -96,7 +96,9 @@ module ;
 #include	<cstring>		/* |strchr(3c)| */
 #include	<cwchar>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>		/* system-returns | + |xxtostr(3u)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<stdintx.h>		/* extended integer types */
 #include	<snwcpyx.h>		/* |snwcpyexpesc(3uc)| */
 #include	<strdcpy.h>
@@ -122,7 +124,6 @@ import fmtflag ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
