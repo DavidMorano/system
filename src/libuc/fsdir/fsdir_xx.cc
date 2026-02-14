@@ -49,7 +49,9 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<memory>		/* |destroy_at(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<intsat.h>
 #include	<snwcpy.h>
 #include	<cfdec.h>
