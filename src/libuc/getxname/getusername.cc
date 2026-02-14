@@ -126,17 +126,19 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<pwd.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ucgetpid.h>
-#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<ucproguser.h>
+#include	<ucentpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getutmpent.h>		/* <- for |getutmpname(3uc)| */
+#include	<aflag.hh>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<utmpacc.h>
-#include	<varnames.hh>
 #include	<vecstr.h>
 #include	<strlibval.hh>
 #include	<sfx.h>
@@ -166,7 +168,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -176,6 +177,10 @@ typedef int (*getxuser_f)(getxuser *) noex ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_getlogin(char *,int) noex ;
+}
 
 extern "C" {
     int		getxusername(getxuser *) noex ;
@@ -272,7 +277,7 @@ int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	if (pwp && pwbuf) {
 	    rs = SR_INVALID ;
 	    if (pwlen > 0) {
-	        if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	        if ((rs = getbufsize(bufsize_un)) >= 0) {
 		    getxuser	xu{} ;
 		    cint	ulen = rs ;
 		    char	ubuf[rs + 1] ;	/* <- on the stack */
@@ -315,7 +320,7 @@ int getxusername(getxuser *xup) noex {
 	                } /* end for */
 	                pwl = rs ;
 	                if ((rs > 0) && xup->f_self) {
-			    auto	upu = ucproguser_nameset ;
+			    cauto	upu = ucproguser_nameset ;
 		            ucentpw	*pwp = xup->pwp ;
 		            rs = upu(pwp->pw_name,-1,xup->uid,ttl) ;
 	                } /* end if (cache store) */
@@ -338,7 +343,7 @@ int getxusername(getxuser *xup) noex {
 static int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
 	    getxuser	xu{} ;
@@ -358,7 +363,7 @@ static int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	        uint	v = xu.uid ;
 	        rs = snsd(ubuf,ulen,"U",v) ;
 	    }
-	    rs1 = uc_free(pwbuf) ;
+	    rs1 = lm_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -414,11 +419,12 @@ static int getxusername_varenv(getxuser *xup) noex {
 
 static int getxusername_utmp(getxuser *xup) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if_constexpr (f_utmpacc) {
 	    if ((rs = utmpacc_entbuflen) >= 0) {
 	        utmpacc_ent	ue{} ; 
 	        cint		uelen = rs ;
-		if (char *uebuf ; (rs = uc_malloc((uelen+1),&uebuf)) >= 0) {
+		if (char *uebuf ; (rs = lm_mall((uelen+1),&uebuf)) >= 0) {
 	            if ((rs = utmpacc_entsid(&ue,uebuf,uelen,0)) >= 0) {
 		        if (ue.user != nullptr) {
 		            rs = sncpy(xup->ubuf,xup->ulen,ue.user) ;
@@ -427,7 +433,8 @@ static int getxusername_utmp(getxuser *xup) noex {
 		            xup->ubuf[0] = '\0' ;
 		        }
 		    } /* end if (utmpacc_entsid) */
-		    rs = rsfree(rs,uebuf) ;
+		    rs1 = lm_free(uebuf) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (utmpacc_entbuflen) */
 	} else {
