@@ -1,4 +1,4 @@
-# MAKEFILES (getutmp)
+# MAKEFILE (getutmp)
 
 T= getutmp
 
