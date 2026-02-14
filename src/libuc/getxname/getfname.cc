@@ -62,7 +62,8 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mkpathx.h>
 #include	<permx.h>
 #include	<isnot.h>
@@ -86,6 +87,10 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
 
 
 /* external variables */
