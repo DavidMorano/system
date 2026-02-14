@@ -41,7 +41,10 @@ module ;
 #include	<cstdint>
 #include	<cstdarg>
 #include	<cstring>
-#include	<usystem.h>		/* system-returns + |uc_malloc(3uc)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 
