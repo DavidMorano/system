@@ -38,7 +38,8 @@
 #include	<algorithm>
 #include	<string>
 #include	<iostream>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 import fmtspec ;
@@ -59,7 +60,7 @@ using namespace		std ;		/* yes, we want punishment! */
 
 /* forward references */
 
-static int sub(int,mainv,...) ;
+local int sub(int,mainv,...) ;
 
 
 /* local variables */
@@ -88,7 +89,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* local subroutines */
 
-static int sub(int argc,mainv argv,...) {
+local int sub(int argc,mainv argv,...) {
 	va_list		ap ;
 	fmtspec		fo ;
 	int		rs = SR_OK ;
