@@ -1,4 +1,4 @@
-# MAKEFILES (filer)
+# MAKEFILE (filer)
 
 T= filer
 
