@@ -49,9 +49,8 @@
 #include	<usysbase.h>
 #include	<uclibmem.h>
 #include	<filer.h>
-#include	<sfx.h>			/* |sfcontent(3uc)| */
+#include	<sfx.h>			/* |sfcontent(3uc)| + |sfnext(3uc)| */
 #include	<strwcpy.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"filereadstrs.h"
