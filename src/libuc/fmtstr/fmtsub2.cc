@@ -43,7 +43,9 @@ module ;
 #include	<cstring>
 #include	<cwchar>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>		/* system-returns + |uc_malloc(3uc)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<stdintx.h>
 #include	<ascii.h>		/* |CH_{x}| */
 #include	<strn.h>
@@ -73,10 +75,8 @@ import fmtspec ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -212,7 +212,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	            f_eol = true ;
 	        }
 	        if (hasourbad(sp,hl)) {
-	            if (cint sz = (sl + 1) ; (rs = uc_malloc(sz,&abuf)) >= 0) {
+	            if (cint sz = (sl + 1) ; (rs = lm_mall(sz,&abuf)) >= 0) {
 	                int	i ; /* used-afterwards */
 	                for (i = 0 ; (i < hl) && *sp ; i += 1) {
 	                    int	ch = mkchar(sp[i]) ;
@@ -231,7 +231,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	    len = rs ;
 	}
 	if (abuf) {
-	    uc_free(abuf) ;
+	    lm_free(abuf) ;
 	}
 	return (rs >= 0) ? len : rs ;
 }
@@ -272,7 +272,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	    }
 	    if (f_notnull) {
 	        cint 	sz = (i + 1) * szof(char) ;
-	        if (char *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	        if (char *p ; (rs = lm_mall(sz,&p)) >= 0) {
 	            int		j ; /* used-afterwards */
 	            int		ch ;
 	            f_memalloc = true ;
@@ -336,7 +336,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	}
 	if (f_memalloc && sp) {
 	    char *bp = cast_const<charp>(sp) ;
-	    uc_free(bp) ;
+	    lm_free(bp) ;
 	}
 	return (rs >= 0) ? fcode : rs ;
 }
