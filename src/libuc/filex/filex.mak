@@ -1,4 +1,4 @@
-# MAKEFILES (filex)
+# MAKEFILE (filex)
 
 T= filex
 
