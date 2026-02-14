@@ -48,14 +48,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* <- |getenv(3c)| */
-#include	<usystem.h>
-#include	<varnames.hh>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<uinfo.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<rmx.h>			/* <- for |rmchr(3uc)| */
 #include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -85,7 +88,7 @@ namespace {
 	int env() noex ;
 	int uinfo() noex ;
     } ; /* end struct (nodeinfo) */
-}
+} /* end namespace */
 
 
 /* forward references */
