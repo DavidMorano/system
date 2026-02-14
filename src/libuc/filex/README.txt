@@ -1,6 +1,6 @@
 FILEX
 
-Thse subroutines read a file (given as a filename) for various purposes.
+These subroutines read a file (given as a filename) for various purposes.
 
 subroutine	description
 --------------------------------------------------------------------------------
@@ -8,7 +8,7 @@ subroutine	description
 filebinary	determine if a file contains binary data
 fileliner	count the lines in a file w/ option to ignore comments
 filelines	count the number of lines in a file
-fileobject	determine something?
+fileobject	determine if a file is an object file
 fileprintable	determine if a file contains all printable characters
 filereadln	read the first non-commented line of the file and store it
 ilereadstrs	read the first non-commented string from a file
