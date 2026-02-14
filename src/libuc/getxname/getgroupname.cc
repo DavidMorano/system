@@ -47,9 +47,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<grp.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<getax.h>
 #include	<snx.h>
 #include	<sncpyx.h>
@@ -58,6 +59,7 @@
 
 #include	"getgroupname.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -161,7 +163,7 @@ int helper::start(cchar *vgp) noex {
 	int		rs ;
 	if (gid == gidend) gid = ourgid ;
 	vgn = vgp ;
-	if ((rs = malloc_gr(&grbuf)) >= 0) {
+	if ((rs = lm_gr(&grbuf)) >= 0) {
 	    grlen = rs ;
 	}
 	return rs ;
@@ -171,7 +173,7 @@ int helper::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (grbuf) {
-	    rs1 = uc_free(grbuf) ;
+	    rs1 = lm_free(grbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    grbuf = nullptr ;
 	    grlen = 0 ;
