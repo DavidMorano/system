@@ -1,4 +1,4 @@
-# MAKEFILES (isfiledesc)
+# MAKEFILE (isfiledesc)
 
 T= isfiledesc
 
@@ -40,13 +40,22 @@ MODS=
 LIBS=
 
 
+OBJ0_ISFILEDESC= isasocket.o isterminal.o
+OBJ1_ISFILEDESC= isfsremote.o
+OBJ2_ISFILEDESC= isinteractive.o
+
+OBJA_ISFILEDESC= obj0_isfiledesc.o obj1_isfiledesc.o
+OBJB_ISFILEDESC= obj2_isfiledesc.o
+
+OBJ_ISFILEDESC= $(OBJA_ISFILEDESC) $(OBJB_ISFILEDESC)
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,18 +66,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0_ISFILEDESC= isasocket.o isterminal.o
-OBJ1_ISFILEDESC= isfsremote.o
-OBJ2_ISFILEDESC= isinteractive.o
-
-
-OBJA_ISFILEDESC= obj0_isfiledesc.o obj1_isfiledesc.o
-OBJB_ISFILEDESC= obj2_isfiledesc.o
-
-OBJ_ISFILEDESC= $(OBJA_ISFILEDESC) $(OBJB_ISFILEDESC)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -81,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -101,13 +102,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_ISFILEDESC)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_ISFILEDESC)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -120,13 +116,16 @@ control:
 
 
 obj0_isfiledesc.o:	$(OBJ0_ISFILEDESC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_ISFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_isfiledesc.o:	$(OBJ1_ISFILEDESC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_ISFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_isfiledesc.o:	$(OBJ2_ISFILEDESC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_ISFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3_isfiledesc.o:	$(OBJ3_ISFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 isasocket.o:		isasocket.cc		$(INCS)
