@@ -69,9 +69,10 @@
 #include	<arpa/inet.h>		/* |inet_addr(3c)| + |in_addr_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>		/* |cfdec(3u)| */
 #include	<uinet.h>
 #include	<strwcpy.h>
 #include	<inaddrbad.hh>
@@ -84,6 +85,9 @@
 #endif
 
 #include	"inetaddr.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/digtab.ccm"
 
 import libutil ;
 import digtab ;
