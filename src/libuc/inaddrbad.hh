@@ -28,7 +28,7 @@
 #include	<usysdefs.h>
 
 
-consteval in_addr_t mkinaddrbad() noex {
+consteval inline in_addr_t mkinaddrbad() noex {
 	const in_addr_t	a = 0 ;
 	return (~a) ;
 }
