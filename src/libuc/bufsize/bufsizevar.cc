@@ -19,15 +19,20 @@
 
 /*******************************************************************************
 
-	Type:
+	Object:
 	bufsizevar
+
+	Description:
+	This is an object that serves as a variable to retrieve
+	a buffer size of something in the system.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getbufsize.h>
 #include	<localmisc.h>
 
@@ -65,13 +70,13 @@
 
 bufsizevar::operator int () noex {
 	int		rs = SR_OK ;
-	if (val == 0) {
+	if (val == 0) nlikely {
 	    if ((rs = getbufsize(name)) > 0) {
 		val = rs ;
 	    } else if (rs == 0) {
 		val = def ;
 	    }
-	}
+	} /* end if (needed) */
 	return (rs >= 0) ? val : rs ;
 }
 /* end method (bufsizevar::operator) */
