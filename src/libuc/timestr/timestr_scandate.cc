@@ -88,7 +88,7 @@ char *timestr_scandate(time_t t,char *tbuf) noex {
 	if (tbuf) {
 	    rs = SR_DOM ;
 	    if (t >= 0) {
-	        if (TMTIME ts ; (rs = tmtime_localtime(&ts,t)) >= 0) {
+	        if (TMTIME ts ; (rs = tmtime_timelocal(&ts,t)) >= 0) {
 		    cchar	*fmt = "%e %b %R %y" ;
 	            rs = sntmtime(tbuf,tlen,&ts,fmt) ;
 	        }
