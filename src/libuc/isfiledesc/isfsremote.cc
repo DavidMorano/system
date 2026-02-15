@@ -40,7 +40,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getbufsize.h>
 #include	<matxstr.h>		/* |matlocalfs(3uc)| */
 #include	<getfstype.h>
@@ -81,7 +82,7 @@
 int isfsremote(int fd) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	if ((rs = getbufsize(bufsize_un)) >= 0) {
 	    cint	fslen = rs ;
 	    char	fstype[fslen+ 1] ;	/* <- VLA (yeh!) */
 	    if ((rs = getfstype(fstype,fslen,fd)) >= 0) {
