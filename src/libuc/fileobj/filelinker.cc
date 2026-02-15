@@ -258,22 +258,39 @@ int filelinker::icount() noex {
 	return (rs >= 0) ? c : rs ;
 } /* end method (filelinker::icount) */
 
-int filelinker::link(ustat *sbp,cchar *sp,int sl) noex {
-	int		rs ;
+local int filelinker_linker(filelinker *op) noex {
+	tardir *dlp = tardirp(op->dirp) ;
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	DPRINTF("ent\n") ;
+	ustat sb ;
+	cchar *dp ;
+	for (int i = 0 ; (rs1 = dlp->get(i,&sb,&dp)) >= 0 ; i += 1) {
+	    DPRINTF("get() dp=%s\n",dp) ;
+	} /* end for */
+	DPRINTF("for-out rs1=%d\n",rs1) ;
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	DPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (filelinker_linker) */
+
+int filelinker::link(ustat *sbp,cchar *sp,int µsl) noex {
+	int		rs = SR_FAULT ;
 	int		rv = 0 ; /* return-value */
-	{
-	    strnul s(sp,sl) ;
-	    DPRINTF("ent s=%s\n",ccp(s)) ;
-        }
-	if ((rs = magic(sbp,sp)) >= 0) ylikely {
-	    tardir *dlp = tardirp(dirp) ;
-	    ustat sb ;
-	    (void) sl ;
-	    cchar *dp ;
-	    for (int i = 0 ; dlp->get(i,&sb,&dp) >= 0 ; i += 1) {
-	        DPRINTF("get() dp=%s\n",dp) ;
-	    } /* end for */
-	} /* end if (magic) */
+	if (int sl ; sbp && ((sl = getlenstr(sp,µsl)) >= 0)) {
+	    rs = SR_INVALID ;
+	    if (sl > 0) {
+	        {
+	            strnul s(sp,sl) ;
+	            DPRINTF("ent s=%s\n",ccp(s)) ;
+                }
+	        if ((rs = magic) >= 0) ylikely {
+		    rs = filelinker_linker(this) ;
+		    rv = rs ;
+	        } /* end if (magic) */
+	    } /* end if (valid) */
+	} /* end if (getlenstr) */
 	DPRINTF("ret rs=%d rv=%d\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (filelinker::link) */
