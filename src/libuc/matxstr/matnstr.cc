@@ -43,7 +43,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strlen(3c)| + |strncmp(3c)| */
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -54,7 +54,9 @@
 
 #include	"matnstr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -79,14 +81,17 @@ import libutil ;
 
 /* exported subroutines */
 
-int matnstr(mainv a,cchar *sp,int sl) noex {
-	cint		lc = sp[0] ; /* ok: everything promotes the same */
-	int		i{} ; /* used-afterwards */
-	if (sl < 0) sl = lenstr(sp) ;
-	for (i = 0 ; a[i] ; i += 1) {
-	    if ((lc == a[i][0]) && (strncmp(a[i],sp,sl) == 0)) break ;
-	} /* end for */
-	return (a[i] != nullptr) ? i : -1 ;
+int matnstr(mainv a,cchar *sp,int µsl) noex {
+    	int		rc = -1 ;
+	if (int sl ; a && ((sl = getlenstr(sp,µsl)) >= 0)) {
+	    cint	lc = sp[0] ; /* ok: everything promotes the same */
+	    int		i{} ; /* used-afterwards */
+	    for (i = 0 ; a[i] ; i += 1) {
+	        if ((lc == a[i][0]) && (strncmp(a[i],sp,sl) == 0)) break ;
+	    } /* end for */
+	    rc = (a[i] != nullptr) ? i : -1 ;
+	} /* end if (getlenstr) */
+	return rc ;
 }
 /* end subroutine (matnstr) */
 
