@@ -90,7 +90,7 @@ struct filelinker {
 	filelinker &operator = (const filelinker &) = delete ;
 	int load	(mainv) noex ;
 	int add		(cchar *,int = -1) noex ;
-	int link	(ustat *,cchar *,int) noex ;
+	int link	(ustat *,cchar *,int = -1) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct filelinker() {
