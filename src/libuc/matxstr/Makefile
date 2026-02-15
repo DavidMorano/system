@@ -1,4 +1,4 @@
-# MAKEFILES (matxstr)
+# MAKEFILE (matxstr)
 
 T= matxstr
 
@@ -81,6 +81,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
