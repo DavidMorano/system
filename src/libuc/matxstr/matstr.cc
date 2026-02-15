@@ -92,33 +92,36 @@ extern "C" {
 
 /* forward references */
 
+template<toxc_f toxc,nleadxstr_f nleadxstr>
+local int matxstr(mainv a,cchar *sp,int sl) noex {
+    	int		rc = -1 ;
+	if (a && sp) {
+	    cint	lch = toxc(sp[0]) ;
+	    int		i{} ; /* used-afterwards */
+	    if (int m ; sl >= 0) {
+	        for (i = 0 ; a[i] ; i += 1) {
+		    m = ((sl > 0) && (lch == toxc(a[i][0]))) ;
+		    if (m > 0) {
+			m = nleadxstr(a[i],sp,sl) ;
+		    }
+		    if ((m == sl) && (a[i][m] == '\0')) break ;
+	        } /* end for */
+	    } else {
+	        for (i = 0 ; a[i] ; i += 1) {
+		    m = (lch == toxc(a[i][0])) ;
+		    if (m > 0) {
+			m = nleadxstr(a[i],sp,-1) ;
+		    }
+		    if ((a[i][m] == '\0') && (sp[m] == '\0')) break ;
+	        } /* end for */
+	    } /* end if */
+	    rc = (a[i]) ? i : -1 ;
+	} /* end if (non-null) */
+	return rc ;
+} /* end subroutine-template (matxstr) */
+
 
 /* local variables */
-
-
-/* subroutine-templates */
-
-template<toxc_f toxc,nleadxstr_f nleadxstr>
-int matxstr(mainv a,cchar *sp,int sl) noex {
-	cint		lch = toxc(sp[0]) ;
-	int		i{} ; /* used-afterwards */
-	int		m ;
-	if (sl >= 0) {
-	    for (i = 0 ; a[i] ; i += 1) {
-		m = ((sl > 0) && (lch == toxc(a[i][0]))) ;
-		if (m > 0) m = nleadxstr(a[i],sp,sl) ;
-		if ((m == sl) && (a[i][m] == '\0')) break ;
-	    } /* end for */
-	} else {
-	    for (i = 0 ; a[i] ; i += 1) {
-		m = (lch == toxc(a[i][0])) ;
-		if (m > 0) m = nleadxstr(a[i],sp,-1) ;
-		if ((a[i][m] == '\0') && (sp[m] == '\0')) break ;
-	    } /* end for */
-	} /* end if */
-	return (a[i]) ? i : -1 ;
-}
-/* end subroutine-template (matxstr) */
 
 
 /* exported variables */
