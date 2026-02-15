@@ -1,4 +1,4 @@
-# MAKEFILES (paramopt)
+# MAKEFILE (paramopt)
 
 T= paramopt
 
