@@ -22,13 +22,14 @@
 
 	Description:
 	Recommended usage within source code:
+		-------------------------------------------------------
 		#include	<bufsizevar.hh>
 		#define		DEFVAL	(4*104)
-		bufsizevar	maxpathlen(getbufsize_mp,DEFVAL) ;
+		bufsizevar	maxpathlen(bufsize_mp,DEFVAL) ;
 		if ((rs = maxpathlen) >= 0) {
 			* do something w/ value in 'rs' *
 		}
-
+		-------------------------------------------------------
 
 *******************************************************************************/
 
@@ -38,8 +39,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<bufsizenames.h>
 
 
 class bufsizevar {
