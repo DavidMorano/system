@@ -23,11 +23,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	isasocket
+
+	Description:
 	This is my own hack attempt at figuring out if the given
 	FD is a socket or not. Would it not be nice if a |stat(2)|
 	returned a file mode for sockets so that |S_ISSOCK(mode)|
 	was true? Oh, but NOOOOOOOOOOOOOOOOOOOOOO!!!
-
 
 *******************************************************************************/
 
@@ -38,7 +41,9 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<isoneof.h>
 #include	<localmisc.h>
 
@@ -59,17 +64,20 @@
 
 /* forward references */
 
-static bool	isNotSock(int) noex ;
+local bool	isNotSock(int) noex ;
 
 
 /* local variables */
 
-static constexpr int	rsock[] = {
+constexpr int	rsock[] = {
 	SR_NOTSOCK,
 	SR_OPNOTSUPP,
 	SR_NOTSUP,
 	0
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -93,7 +101,7 @@ int isasocket(int fd) noex {
 
 /* local subroutines */
 
-static bool isNotSock(int rs) noex {
+local bool isNotSock(int rs) noex {
 	return isOneOf(rsock,rs) ;
 }
 /* end subroutine (isNotSock) */
