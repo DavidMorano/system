@@ -1,4 +1,4 @@
-# MAKEFILES (memtrack)
+# MAKEFILE (memtrack)
 
 T= memtrack
 
