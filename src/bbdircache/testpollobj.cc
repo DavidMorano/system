@@ -1,4 +1,4 @@
-/* testpollobj */
+/* testpollobj SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -18,6 +18,7 @@
 
 /*******************************************************************************
 
+  	Descripion:
 	This object is a test POLLOBJ for PCSPOLLS.
 
 	Synopsis:
@@ -42,16 +43,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<pcsconf.h>
 #include	<storebuf.h>
 #include	<upt.h>
@@ -75,18 +76,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	pathadd(char *,int,cchar *) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	hasNotDots(cchar *,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
@@ -140,14 +129,14 @@ enum cmds {
 
 /* forward references */
 
-static int workargs_load(WORKARGS *,TESTPOLLOBJ *,
-		cchar *,cchar *,cchar **,PCSCONF *) ;
+local int workargs_load(WORKARGS *,TESTPOLLOBJ *,
+		cchar *,cchar *,cchar **,PCSCONF *) noex ;
 
-static int	worker(THRBASE *) ;
+local int	worker(THRBASE *) noex ;
 
-static int work_start(WORK *,THRBASE *,WORKARGS *) ;
-static int work_term(WORK *) ;
-static int work_finish(WORK *) ;
+local int work_start(WORK *,THRBASE *,WORKARGS *) noex ;
+local int work_term(WORK *) noex ;
+local int work_finish(WORK *) noex ;
 
 
 /* local variables */
@@ -157,26 +146,20 @@ static int work_finish(WORK *) ;
 
 PCSPOLLS_NAME	testpollobj = {
 	"testpollobj",
-	sizeof(TESTPOLLOBJ),
+	szof(TESTPOLLOBJ),
 	0
 } ;
 
 
 /* exported subroutines */
 
-
-int testpollobj_start(op,pr,sn,envv,pcp)
-TESTPOLLOBJ	*op ;
-cchar	*pr ;
-cchar	*sn ;
-cchar	**envv ;
-PCSCONF		*pcp ;
-{
+int testpollobj_start( TESTPOLLOBJ *op,cc *pr,cc *sn,
+		mainv envv,PCSCONF *pcp) noex {
 	WORKARGS	*wap ;
-	const int	wsize = sizeof(WORKARGS) ;
+	cint	wsz = sizeof(WORKARGS) ;
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("testpollobj_start: entered\n") ;
@@ -184,18 +167,18 @@ PCSCONF		*pcp ;
 	debugprintf("testpollobj_start: sn=%s\n",sn) ;
 #endif
 
-	memset(op,0,sizeof(TESTPOLLOBJ)) ;
+	memclear(op) ;
 
-	if ((rs = uc_malloc(wsize,&wap)) >= 0) {
+	if ((rs = uc_malloc(wsz,&wap)) >= 0) {
 	    workargs_load(wap,op,pr,sn,envv,pcp) ;
 	    if ((rs = thrbase_start(&op->t,worker,wap)) >= 0) {
-		op->fl.working = TRUE ;
+		op->fl.working = true ;
 		op->wap = wap ;
 		op->magic = TESTPOLLOBJ_MAGIC ;
 	    }
 	    if (rs < 0) {
 		uc_free(wap) ;
-		op->wap = NULL ;
+		op->wap = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 
@@ -207,14 +190,11 @@ PCSCONF		*pcp ;
 }
 /* end subroutine (testpollobj_start) */
 
-
-int testpollobj_finish(op)
-TESTPOLLOBJ	*op ;
-{
+int testpollobj_finish(TESTPOLLOBJ *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
 
@@ -223,15 +203,15 @@ TESTPOLLOBJ	*op ;
 #endif
 
 	if (op->fl.working) {
-	    op->fl.working = FALSE ;
+	    op->fl.working = false ;
 	    rs1 = thrbase_finish(&op->t) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (op->wap != NULL) {
+	if (op->wap != nullptr) {
 	    rs1 = uyc_free(op->wap) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->wap = NULL ;
+	    op->wap = nullptr ;
 	}
 
 #if	CF_DEBUGS
@@ -243,39 +223,24 @@ TESTPOLLOBJ	*op ;
 }
 /* end subroutine (testpollobj_finish) */
 
-
 #ifdef	COMMENT
 
-int testpollobj_info(op,ip)
-TESTPOLLOBJ	*op ;
-TESTPOLLOBJ_INFO	*ip ;
-{
+int testpollobj_info(TESTPOLLOBJ *op,TESTPOLLOBJ_INFO *ip) noex {
 	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
-
-	if (ip != NULL) {
+	if (ip != nullptr) {
 	    memset(ip,0,sizeof(TESTPOLLOBJ_INFO)) ;
 	    ip->dummy = 1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (testpollobj_info) */
 
-
-int testpollobj_cmd(op,cmd)
-TESTPOLLOBJ	*op ;
-int		cmd ;
-{
+int testpollobj_cmd(TESTPOLLOBJ *op,int cmd) noex {
 	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
-
 	return (rs >= 0) ? cmd : rs ;
 }
 /* end subroutine (testpollobj_cmd) */
@@ -285,16 +250,9 @@ int		cmd ;
 
 /* private subroutines */
 
-
-static int workargs_load(wap,op,pr,sn,envv,pcp)
-WORKARGS	*wap ;
-TESTPOLLOBJ	*op ;
-cchar	*pr ;
-cchar	*sn ;
-cchar	**envv ;
-PCSCONF		*pcp ;
-{
-	memset(wap,0,sizeof(WORKARGS)) ;
+local int workargs_load(WORKARGS *wap, TESTPOLLOBJ *op, cc *pr,cc *sn,
+		mainv envv,PCSCONF *pcp) noex 
+	memclear(wap) ;
 	wap->op = op ;
 	wap->pr = pr ;
 	wap->sn = sn ;
@@ -304,12 +262,10 @@ PCSCONF		*pcp ;
 }
 /* end subroutine (workargs_load) */
 
-
-static int worker(THRBASE *tip)
-{
+local int worker(THRBASE *tip) noex {
 	WORK		w ;
 	WORKARGS	*wap = (WORKARGS *) tip->ap ;
-	const int	to = 1 ;
+	cint	to = 1 ;
 	int		rs ;
 	int		ctime = 0 ;
 
@@ -318,10 +274,10 @@ static int worker(THRBASE *tip)
 #endif
 
 	if ((rs = work_start(&w,tip,wap)) >= 0) {
-	    int		f_exit = FALSE ;
+	    int		f_exit = false ;
 
 	    while ((rs = thrbase_cmdrecv(tip,to)) >= 0) {
-		const int	cmd = rs ;
+		cint	cmd = rs ;
 
 	        switch (cmd) {
 		case cmd_noop:
@@ -331,7 +287,7 @@ static int worker(THRBASE *tip)
 #endif
 		    break ;
 	        case cmd_exit:
-		    f_exit = TRUE ;
+		    f_exit = true ;
 #if	CF_DEBUGS
 	debugprintf("testpollobj/worker: exit\n") ;
 #endif
@@ -354,14 +310,12 @@ static int worker(THRBASE *tip)
 }
 /* end subroutine (worker) */
 
-
-static int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap)
-{
+local int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar	*pr, *sn ;
 
-	if (wp == NULL) return SR_FAULT ;
+	if (wp == nullptr) return SR_FAULT ;
 
 	memset(wp,0,sizeof(WORK)) ;
 	wp->tip = tip ;
@@ -379,13 +333,11 @@ static int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap)
 }
 /* end subroutine (work_start) */
 
-
-static int work_finish(WORK *wp)
-{
+local int work_finish(WORK *wp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (wp == NULL) return SR_FAULT ;
+	if (wp == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("testpollobj/work_finish: ret rs=%d\n",rs) ;
@@ -395,10 +347,8 @@ static int work_finish(WORK *wp)
 }
 /* end subroutine (work_finish) */
 
-
-static int work_term(WORK *wp)
-{
-	if (wp == NULL) return SR_FAULT ;
+local int work_term(WORK *wp) noex {
+	if (wp == nullptr) return SR_FAULT ;
 #if	CF_DEBUGS
 	debugprintf("testpollobj/work_term: entered\n") ;
 #endif
