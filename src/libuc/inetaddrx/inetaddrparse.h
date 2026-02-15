@@ -27,11 +27,11 @@
 struct inetaddrparse_strobj {
 	cchar		*sp ;
 	int		sl ;
-} ;
+} ; /* end struct */
 
 struct inetaddrparse_head {
 	INETADDRPARSE_SO	af, host, port ;
-} ;
+} ; /* end struct */
 
 typedef INETADDRPARSE		inetaddrparse ;
 typedef INETADDRPARSE_SO	inetaddrparse_so ;
