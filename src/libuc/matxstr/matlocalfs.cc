@@ -96,7 +96,7 @@ constexpr cpcchar	localfs[] = {
 	"smbfs",
 	"autofs",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
