@@ -2,10 +2,10 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* Module-Processing */
+/* Module-Processing - C++ module name processing (from C++ source files) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -16,12 +16,23 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	module:
+	modproc
+
+	Description:
+	I parse a C++ source code file and find all of the module
+	names that I can that are being imported to that source file.
+
+*******************************************************************************/
+
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdio>
+#include	<cstdio>		/* |FILE| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -29,6 +40,7 @@ module ;
 #include	<usysrets.h>
 
 #pragma		GCC dependency		"mod/ureserve.ccm"
+#pragma		GCC dependency		"mod/debug.ccm"
 
 export module modproc ;
 
@@ -49,16 +61,20 @@ export {
 
 export {
     enum typeouts {
-    	typeout_file,
     	typeout_name,
+    	typeout_mod,
+    	typeout_gcm,
     	typeout_obj,
+    	typeout_modobj,
     	typeout_overlast,
     } ; /* end enum (typeouts) */
     constexpr cpcchar	typeouts[] = {
-    	"file",
-	"name",
-	"obj",
-	nullptr
+    	[typeout_name]		= "name",
+    	[typeout_mod]		= "mod",
+    	[typeout_gcm]		= "gcm",
+    	[typeout_obj]		= "obj",
+    	[typeout_modobj]	= "modobj",
+    	[typeout_overlast]	= nullptr
     } ; /* end array (typeouts) */
 } /* end export) */
 
@@ -92,7 +108,7 @@ export {
 	    finish	(this,modprocmem_finish) ;
 	} ;
         int	procfile(cchar *) noex ;
-	int	procout(FILE *,uint) noex ;
+	int	procout(FILE *,int) noex ;
 	void dtor() noex ;
 	destruct modproc() {
 	    if (vop) dtor() ;
