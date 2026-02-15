@@ -21,7 +21,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types |gid_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 #include	<cq.h>
 
@@ -41,7 +42,7 @@ struct filegrp_statistics {
 	uint		refreshes ;
 	uint		phits, pmisses ;	/* positive */
 	uint		nhits, nmisses ;	/* negative */
-} ;
+} ; /* end struct (filegrp_statistics) */
 
 struct filegrp_head {
 	cq		*flp ;
@@ -51,7 +52,7 @@ struct filegrp_head {
 	uint		magic ;
 	int		ttl ;		/* time-to-live in seconds */
 	int		nmax ;		/* maximum entries */
-} ;
+} ; /* end struct (filegrp_head) */
 
 typedef FILEGRP		filegrp ;
 typedef FILEGRP_ST	filegrp_st ;
