@@ -25,13 +25,11 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+
 EXTERNC_begin
 
 extern bool	haslead(cchar *,int,int) noex ;
-
-static inline bool hasleadpound(cchar *sp,int sl) noex {
-	return haslead(sp,sl,'#') ;
-}
+extern bool	hasleadcolon(cchar *,int) noex ;
 
 EXTERNC_end
 
