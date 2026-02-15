@@ -1,4 +1,4 @@
-# MAKEFILES (ismisc)
+# MAKEFILE (ismisc)
 
 T= ismisc
 
@@ -40,23 +40,6 @@ MODS=
 LIBS=
 
 
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
 OBJ0_ISMISC= isdotdir.o
 OBJ1_ISMISC= isleapyear.o
 OBJ2_ISMISC= isprime.o
@@ -68,7 +51,23 @@ OBJB_ISMISC= obj2_ismisc.o obj3_ismisc.o
 OBJ_ISMISC= $(OBJA_ISMISC) $(OBJB_ISMISC)
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -81,6 +80,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -101,13 +103,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_ISMISC)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_ISMISC)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -120,16 +117,16 @@ control:
 
 
 obj0_ismisc.o:	$(OBJ0_ISMISC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_ismisc.o:	$(OBJ1_ISMISC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_ismisc.o:	$(OBJ2_ISMISC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_ismisc.o:	$(OBJ3_ISMISC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 isdotdir.o:		isdotdir.cc		$(INCS)
