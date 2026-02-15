@@ -20,6 +20,14 @@
 	Object:
 	modproc
 
+	Notes:
+	1. The current output types are:
+	name		"<name>"
+    	mod		"mod/<name>.ccm"
+    	gcm		"gcm.cache/<name>.gcm"
+	obj		"<name>.o"
+	modobj		"mod/<name>.o"
+
 *******************************************************************************/
 
 module ;
@@ -31,7 +39,7 @@ module ;
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdio>
+#include	<cstdio>		/* |FILE| */
 #include	<new>			/* placement-new + |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -45,7 +53,6 @@ module ;
 #include	<strop.h>
 #include	<strwcmp.h>
 #include	<mkchar.h>
-#include	<ischarx.h>		/* |isalnumlatin(3cu)| */
 #include	<localmisc.h>
 
 #pragma		GCC dependency		"mod/modproc.ccm"
@@ -53,6 +60,10 @@ module ;
 module modproc ;
 
 /* local defines */
+
+#define CDEBPR(FMT, ...) \
+	if_constexpr (f_debug) \
+    	debprintf(__func__, FMT __VA_OPT__(,) __VA_ARGS__)
 
 
 /* imported namespaces */
@@ -88,6 +99,7 @@ typedef vecstr *	vecstrp ;
 int modproc::istart() noex {
     	cnullptr	np{} ;
     	int		rs = SR_NOMEM ;
+	CDEBPR("ent\n") ;
     	if (vecstr *vsp ; (vsp = new(nothrow) vecstr) != np) {
 	    {
 	        vop = vsp ;
@@ -98,7 +110,7 @@ int modproc::istart() noex {
 		vop = nullptr ;
 	    } /* end if (error) */
 	} /* end if (new-vecstr) */
-	debprintf(__func__,"ret rs=%d\n",rs) ;
+	CDEBPR("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (modproc::istart) */
 
@@ -117,38 +129,38 @@ int modproc::ifinish() noex {
 	    }
 	    vop = nullptr ;
 	} /* end if (non-null) */
-	if_constexpr (f_debug) debprintf(__func__,"ret rs=%d\n",rs) ;
+	CDEBPR("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (modproc::ifinish) */
 
 int modproc::procfile(cchar *fn) noex {
     	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if_constexpr (f_debug) debprintf(__func__,"ent fn=%s\n",fn) ;
+	CDEBPR("ent fn=%s\n",fn) ;
 	if (fn) ylikely {
+	    rs = SR_INVALID ;
 	    if (fn[0]) ylikely {
 		vecstr *vsp = vecstrp(vop) ;
 		rs = modprocload(vsp,fn) ;
 		c = rs ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	if_constexpr (f_debug) debprintf(__func__,"ret rs=%d\n",rs) ;
+	CDEBPR("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? c : rs ;
 } /* end method (modproc::procfile) */
 
-int modproc::procout(FILE *osp,uint ot) noex {
+int modproc::procout(FILE *osp,int ot) noex {
         cint		rsn = SR_NOTFOUND ;
     	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		c = 0 ;
-	if_constexpr (f_debug) debprintf(__func__,"ent ot=%u\n",ot) ;
+	int		c = 0 ; /* return-value */
+	CDEBPR("ent ot=%u\n",ot) ;
 	if (osp) {
 	    vecstr *vsp = vecstrp(vop) ;
-	    vecstr_cur cur ;
 	    cchar	*cp ;
 	    rs = SR_OK ;
 	    (void) ot ;
-	    if_constexpr (f_debug) debprintf(__func__,"for-before\n") ;
+	    CDEBPR("for-before\n") ;
 	    for (int i = 0 ; (rs1 = vsp->get(i,&cp)) >= 0 ; i += 1) {
 		if (cp) {
 	            rs = fprintf(osp,"%s\n",cp) ;
@@ -156,12 +168,10 @@ int modproc::procout(FILE *osp,uint ot) noex {
 		}
 		if (rs < 0) break ;
 	    } /* end for */
-	    if_constexpr (f_debug) {
-		debprintf(__func__,"for-after rs=%d rs1=%d\n",rs,rs1) ;
-	    }
+	    CDEBPR("for-after rs=%d rs1=%d\n",rs,rs1) ;
 	    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	} /* end if (non-null) */
-	if_constexpr (f_debug) debprintf(__func__,"ret rs=%d c=%d\n",rs,c) ;
+	CDEBPR("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end method (modproc::procout) */
 
