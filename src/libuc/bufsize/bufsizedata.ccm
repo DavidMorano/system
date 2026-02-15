@@ -58,7 +58,7 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ubufdefs.h>		/* |{xx}BUFLEN| */
-#include	<bufsizenames.h>
+#include	<bufsizes.h>
 #include	<sysconfcmds.h>
 #include	<localmisc.h>
 
@@ -70,113 +70,113 @@ export {
 	int	defval ;
     } ;
     struct bufsizedata {
-	bufsizedata_item	item[getbufsize_overlast] = {} ;
+	bufsizedata_item	item[bufsize_overlast] = {} ;
 	constexpr bufsizedata() noex ;
 	constexpr bufsizedata_item operator [] (int w) const noex {
 	        bufsizedata_item	it = {-1,0} ;
-	        if ((w >= 0) && (w < getbufsize_overlast)) {
+	        if ((w >= 0) && (w < bufsize_overlast)) {
 	            it = item[w] ;
 	        }
 	        return it ;
 	} ; /* end method (operator) */
     } ; /* end class (bufsizedata) */
     constexpr bufsizedata::bufsizedata() noex {
-	for (int i = 0 ; i < getbufsize_overlast ; i += 1) {
+	for (int i = 0 ; i < bufsize_overlast ; i += 1) {
 	    bufsizedata_item	*ip = (item+i) ;
 	    ip->name = -1 ;
 	    switch (i) {
-	    case getbufsize_ps:
+	    case bufsize_ps:
 	        ip->name = _SC_PAGESIZE ;
 		ip->defval = (8 * 1024) ;	/* page-size Solaris® */
 	        break ;
-	    case getbufsize_mi:
+	    case bufsize_mi:
 	        ip->name = _SC_PID_MAX ;
 		ip->defval = PID_MAX ;
 	        break ;
-	    case getbufsize_ma:
+	    case bufsize_ma:
 	        ip->name = _SC_ARG_MAX ;
 		ip->defval = ARBUFLEN ;
 	        break ;
-	    case getbufsize_mn:		/* max-name */
+	    case bufsize_mn:		/* max-name */
 	        ip->name = _SC_NAME_MAX ;
 		ip->defval = MNBUFLEN ;
 	        break ;
-	    case getbufsize_mp:		/* max-path */
+	    case bufsize_mp:		/* max-path */
 	        ip->name = _SC_PATH_MAX ;
 	        ip->defval = MPBUFLEN ;
 	        break ;
-	    case getbufsize_ml:		/* max-line */
+	    case bufsize_ml:		/* max-line */
 	        ip->name = _SC_LINE_MAX ;
 		ip->defval = MLBUFLEN ;
 	        break ;
-	    case getbufsize_mm:		/* max-message */
+	    case bufsize_mm:		/* max-message */
 	        ip->name = _SC_MSG_MAX ;
 		ip->defval = MMBUFLEN ;
 	        break ;
-	    case getbufsize_nn:		/* node-name */
+	    case bufsize_nn:		/* node-name */
 	        ip->name = _SC_NODENAME_MAX ; /* <- really is "nodename" */
 		ip->defval = NNBUFLEN ;
 	        break ;
-	    case getbufsize_hn:		/* host-name */
+	    case bufsize_hn:		/* host-name */
 	        ip->name = _SC_HOSTNAME_MAX ;
 	        ip->defval = HNBUFLEN ;
 	        break ;
-	    case getbufsize_un:		/* user-name */
+	    case bufsize_un:		/* user-name */
 		ip->name = _SC_LOGIN_NAME_MAX ;
 	        ip->defval = UNBUFLEN ;
 	        break ;
-	    case getbufsize_gn:		/* group-name */
+	    case bufsize_gn:		/* group-name */
 	        ip->defval = GNBUFLEN ;
 	        break ;
-	    case getbufsize_pn:		/* project-name */
+	    case bufsize_pn:		/* project-name */
 	        ip->defval = PNBUFLEN ;
 	        break ;
-	    case getbufsize_pw:			/* entry-password */
+	    case bufsize_pw:			/* entry-password */
 	        ip->name = _SC_GETPW_R_SIZE_MAX ;
 		ip->defval = PWBUFLEN ;
 	        break ;
-	    case getbufsize_sp:			/* entry-shadow */
+	    case bufsize_sp:			/* entry-shadow */
 	        ip->defval = SPBUFLEN ;
 	        break ;
-	    case getbufsize_ua:			/* entry-userattr */
+	    case bufsize_ua:			/* entry-userattr */
 	        ip->defval = UABUFLEN ;
 	        break ;
-	    case getbufsize_gr:			/* entry-group */
+	    case bufsize_gr:			/* entry-group */
 		ip->name = _SC_GETGR_R_SIZE_MAX ;
 		ip->defval = GRBUFLEN ;
 	        break ;
-	    case getbufsize_pj:			/* entry-project */
+	    case bufsize_pj:			/* entry-project */
 		ip->defval = PJBUFLEN ;		/* project-buf */
 	        break ;
-	    case getbufsize_pr:			/* entry-protocol */
+	    case bufsize_pr:			/* entry-protocol */
 		ip->defval = PRBUFLEN ;		/* protocol-buf */
 	        break ;
-	    case getbufsize_nw:			/* entry-network */
+	    case bufsize_nw:			/* entry-network */
 		ip->defval = NWBUFLEN ;		/* network-buf */
 	        break ;
-	    case getbufsize_ho:			/* entry-host */
+	    case bufsize_ho:			/* entry-host */
 		ip->defval = HOBUFLEN ;		/* host-buf */
 	        break ;
-	    case getbufsize_sv:			/* entry-service */
+	    case bufsize_sv:			/* entry-service */
 		ip->defval = SVBUFLEN ;		/* service-buf */
 	        break ;
-	    case getbufsize_fs:
+	    case bufsize_fs:
 	        ip->name = _SC_FSTYPE ;
 		ip->defval = FSBUFLEN ;		/* filesystem-name-buf */
 	        break ;
-	    case getbufsize_sn:
+	    case bufsize_sn:
 	        ip->name = _SC_SYMBOL_MAX ;
 		ip->defval = SYMNAMELEN ;	/* symbol-name */
 	        break ;
-	    case getbufsize_zn:
+	    case bufsize_zn:
 	        ip->name = _SC_TZNAME_MAX ;
 		ip->defval = ZNBUFLEN ;		/* time-zone-name */
 	        break ;
-	    case getbufsize_zi:
+	    case bufsize_zi:
 	        ip->name = _SC_ZONEINFO_MAX ;
 		ip->defval = ZIBUFLEN ;		/* zone-info (common value) */
 	        break ;
-	    case getbufsize_mailaddr:
+	    case bufsize_mailaddr:
 		ip->name = _SC_MAILADDR_MAX ;
 		ip->defval = -1 ;		/* no default size */
 	        break ;
