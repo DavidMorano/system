@@ -74,7 +74,7 @@
 
 /* forward references */
 
-static constexpr bool keyend(cint ch) noex {
+constexpr bool keyend(cint ch) noex {
 	return (((ch) == '\0') || ((ch) == '=')) ;
 }
 
@@ -88,29 +88,33 @@ static constexpr bool keyend(cint ch) noex {
 /* exported subroutines */
 
 int matkeystr(mainv a,cchar *sp,int sl) noex {
-	cint		sch = sp[0] ; /* ok: everything promotes the same */
-	int		i{} ; /* used-afterwards */
-	int		f = false ;
-	if (sl >= 0) {
-	    for (i = 0 ; a[i] != nullptr ; i += 1) {
-		int	m = (sch == a[i][0]) ;
-		if (m > 0) {
-		    m = nleadkeystr(a[i],sp,sl) ;
-		}
-		f = (((m == sl) || keyend(sp[m])) && keyend(a[i][m])) ;
-		if (f) break ;
-	    } /* end for */
-	} else {
-	    for (i = 0 ; a[i] != nullptr ; i += 1) {
-	        if (sch == a[i][0]) {
-		    f = (strkeycmp(a[i],sp) == 0) ;
-		} else {
-		    f = (keyend(sp[0]) && keyend(a[i][0])) ;
-		}
-		if (f) break ;
-	    } /* end for */
-	} /* end if */
-	return (f) ? i : -1 ;
+    	int		rc = -1 ;
+	if (a && sp) {
+	    cint	sch = sp[0] ; /* ok: everything promotes the same */
+	    int		i{} ; /* used-afterwards */
+	    bool 	f = false ;
+	    if (sl >= 0) {
+	        for (i = 0 ; a[i] != nullptr ; i += 1) {
+		    int	m = (sch == a[i][0]) ;
+		    if (m > 0) {
+		        m = nleadkeystr(a[i],sp,sl) ;
+		    }
+		    f = (((m == sl) || keyend(sp[m])) && keyend(a[i][m])) ;
+		    if (f) break ;
+	        } /* end for */
+	    } else {
+	        for (i = 0 ; a[i] != nullptr ; i += 1) {
+	            if (sch == a[i][0]) {
+		        f = (strkeycmp(a[i],sp) == 0) ;
+		    } else {
+		        f = (keyend(sp[0]) && keyend(a[i][0])) ;
+		    }
+		    if (f) break ;
+	        } /* end for */
+	    } /* end if */
+	    rc = (f) ? i : -1 ;
+	} /* end if (non-null) */
+	return rc ;
 }
 /* end subroutine (matkeystr) */
 
