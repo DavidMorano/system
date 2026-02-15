@@ -45,11 +45,14 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<strn.h>
 #include	<localmisc.h>
 
 #include	"inetaddrparse.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
