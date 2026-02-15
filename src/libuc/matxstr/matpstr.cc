@@ -69,7 +69,9 @@
 #include	"matstr.h"		/* <- needed for one case */
 #include	"matpstr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -106,7 +108,7 @@ namespace {
 	    matxstr = m ;
 	} ; /* end ctor */
     } ; /* end struct (mater) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -138,27 +140,27 @@ int matpfoldstr(mainv a,int n,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-int mater::matpxstr(mainv a,int n,cchar *sp,int sl) noex {
+int mater::matpxstr(mainv a,int n,cchar *sp,int µsl) noex {
 	int		si = -1 ;
-	if (sl < 0) sl = lenstr(sp) ;
-	if (n >= 0) {
-	    cint	lch = toxc(sp[0]) ;
-	    int		m_max = 0 ;
-	    for (int i = 0 ; a[i] ; i += 1) {
-		int	m ;
-		if ((m = (lch == toxc(a[i][0]))) > 0) {
-		    m = nleadx(a[i],sp,sl) ;
-		}
-		if ((m == sl) && ((m >= n) || (a[i][m] == '\0'))) {
-		    if (m > m_max) {
-			m_max = m ;
-			si = i ;
+	if (int sl ; a && ((sl = getlenstr(sp,µsl)) >= 0)) {
+	    if (n >= 0) {
+	        cint	lch = toxc(sp[0]) ;
+	        int	m_max = 0 ;
+	        for (int m, i = 0 ; a[i] ; i += 1) {
+		    if ((m = (lch == toxc(a[i][0]))) > 0) {
+		        m = nleadx(a[i],sp,sl) ;
 		    }
-		} /* end if */
-	    } /* end for */
-	} else {
-	    si = matxstr(a,sp,sl) ;
-	}
+		    if ((m == sl) && ((m >= n) || (a[i][m] == '\0'))) {
+		        if (m > m_max) {
+			    m_max = m ;
+			    si = i ;
+		        }
+		    } /* end if */
+	        } /* end for */
+	    } else {
+	        si = matxstr(a,sp,sl) ;
+	    }
+	} /* end if (getlenstr) */
 	return si ;
 }
 /* end subroutine (mater::matpxstr) */
