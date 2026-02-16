@@ -45,8 +45,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |strncmp(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -56,7 +55,9 @@
 
 #include	"strnxcmp.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -91,15 +92,14 @@ using std::max ;			/* subroutine-template */
 /* exported subroutines */
 
 int strnncmp(cchar *s1,int n1,cchar *s2,int n2) noex {
-	int		rc ;
-	if (n1 < 0) n1 = lenstr(s1) ;
-	if (n2 < 0) n2 = lenstr(s2) ;
-	{
-	    cint	n = min(n1,n2) ;
-	    if ((rc = strncmp(s1,s2,n)) == 0) {
+	int		rc = 0 ;
+	if (s1 && s2) {
+	    if (n1 < 0) n1 = lenstr(s1) ;
+	    if (n2 < 0) n2 = lenstr(s2) ;
+	    if (cint n = min(n1,n2) ; (rc = strncmp(s1,s2,n)) == 0) {
 	        rc = (n1 - n2) ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rc ;
 }
 /* end subroutine (strnncmp) */
