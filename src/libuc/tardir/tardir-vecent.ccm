@@ -1,0 +1,171 @@
+/* tardir-vecent MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* enumerate filenames */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2017-03-21, David A-D- Morano
+	This subroutine was originally written.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Object:
+	vecent
+
+	Description:
+	This is a container for directories.  Only a single name
+	for each directory is retained (additional path-names for
+	directories) are ignored (the first one is picked).
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<vector>
+#include	<string>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
+
+export module tardir:vecent ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::vector ;
+using std::string ;
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+enum vecent_mems {
+        vecentmem_count,
+        vecentmem_audit,
+        vecentmem_finish,
+        vecentmem_overlast
+} ; /* end enum (vecent_mems) */
+struct vecent ;
+struct vecent_ent {
+        string          dname ;
+        ino_t           ino ;
+        dev_t           dev ;
+        int load(const ustat *,cchar *,int = -1) noex ;
+} ; /* end struct (vecent_ent) */
+struct vecent_ma {
+    	vecent		*op = nullptr ;
+    	void operator () (vecent *p,int) noex {
+    	    op = p ;
+    	} ;
+    	template<typename ... Args> int operator () (Args ... ) noex ;
+    	operator int () noex ;
+} ; /* end struct (vecent_ma) */
+struct vecent_st {
+    	vecent		*op = nullptr ;
+    	void operator () (vecent *p,int) noex {
+    	    op = p ;
+    	} ;
+    	int operator () (mainv = nullptr) noex ;
+    	operator int () noex {
+    	    return operator () (nullptr) ;
+    	} ;
+} ; /* end struct (vecent_st) */
+struct vecent_co {
+        vecent          *op = nullptr ;
+        int             w = -1 ;
+        void operator () (vecent *p,int m) noex {
+            op = p ;
+            w = m ;
+        } ; /* end method */
+        operator int () noex ;
+        int operator () () noex {
+            return operator int () ;
+        } ;
+} ; /* end struct (vecent_co) */
+struct vecent : vector<vecent_ent> {
+        friend          vecent_st ;
+        friend          vecent_co ;
+        friend          vecent_ma ;
+        vecent_st	start ;
+        vecent_co       count ;
+        vecent_co       audit ;
+        vecent_co       finish ;
+        vecent_ma	magic ;
+        uint            magval ;
+        vecent() noex {
+	    start	(this,0) ;
+            count       (this,vecentmem_count) ;
+            audit       (this,vecentmem_audit) ;
+            finish      (this,vecentmem_finish) ;
+            magic	(this,0) ;
+            magval = 0 ;
+        } ; /* end ctor */
+        int load	(mainv) noex ;
+        int add		(cchar *,int = -1) noex ;
+        int add		(const ustat *,cchar *,int = -1) noex ;
+        int get		(int,ustat *,ccharp *) noex ;
+        void dtor() noex ;
+        operator int () noex ;
+        destruct vecent() {
+            if (magval) dtor() ;
+        } ;
+    private:
+        int istart(mainv) noex ;
+        int icount() noex ;
+        int iaudit() noex ;
+        int ifinish() noex ;
+} ; /* end struct vecent) */
+    
+typedef vecent *    vecentp ;
+
+
+/* forward references */
+
+
+/* local variables */
+
+const uint      vecent_magicval = 0x83655680 ;
+	
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+
+/* local subroutines */
+
+template<typename ... Args> int vecent_ma::operator () (Args ... args) noex {
+    	int		rs = SR_FAULT ;
+	if ((... && args)) {
+	    rs = (op->magval == vecent_magicval) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end method (vecent_ma::operator) */
+
+inline vecent_ma::operator int () noex {
+	return (op->magval == vecent_magicval) ? SR_OK : SR_NOTOPEN ;
+} /* end method (vecent_ma::operator) */
+
+
