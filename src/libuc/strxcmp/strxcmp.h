@@ -13,22 +13,28 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<strings.h>		/* |strcasecmp(3c)| + |strcmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#include	<strnxcmp.h>
+#include	<stremacmp.h>
 #include	<strkeycmp.h>
+#include	<strvalcmp.h>
+#include	<strfoldcmp.h>
+#include	<strleadcmp.h>
+#include	<strpcmp.h>
+#include	<strnxcmp.h>		/* |strnndictcmp(3uc)| */
 
 
 EXTERNC_begin
 
-extern int	stremacmp(cchar *,cchar *) noex ;
-extern int	strpcmp(cchar *,cchar *) noex ;
-extern int	strleadcmp(cchar *,cchar *) noex ;
+local inline int strbasecmp(cchar *s1,cchar *s2) noex {
+    	return strcmp(s1,s2) ;
+}
 
-static inline int strdictcmp(cchar *s1,cchar *s2) noex {
+local inline int strdictcmp(cchar *s1,cchar *s2) noex {
 	return strnndictcmp(s1,-1,s2,-1) ;
 }
 
