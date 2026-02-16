@@ -43,16 +43,18 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"strnxcmp.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -81,19 +83,20 @@ import libutil ;
 /* exported variables */
 
 
-/* exported variables */
-
-
 /* exported subroutines */
 
 int strnleadcmp(cchar *s1,cchar *s2,int lr) noex {
-	int		f = true ;
-	if (lr < 0) lr = lenstr(s2) ;
-	while (lr-- > 0) {
-	    f = (*s2++ == *s1++) ;
-	    if (! f) break ;
-	} /* end while */
-	return f ;
+	int		rc = 0 ;
+	if (s1 && s2) {
+	    if (lr < 0) lr = lenstr(s2) ;
+	    while (lr-- > 0) {
+		cint ch1 = mkchar(*s1++) ;
+		cint ch2 = mkchar(*s2++) ;
+	        rc = ch1 - ch2 ;
+	        if (rc || !ch1 || !ch2) break ;
+	    } /* end while */
+	} /* end if (non-null) */
+	return rc ;
 }
 /* end subroutine (strnleadcmp) */
 
