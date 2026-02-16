@@ -1,4 +1,4 @@
-# MAKEFILES (strw)
+# MAKEFILE (strw)
 
 T= strw
 
@@ -124,6 +124,13 @@ obj2.o:			$(OBJ2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
