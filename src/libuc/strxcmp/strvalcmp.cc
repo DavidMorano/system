@@ -1,6 +1,6 @@
 /* strvalcmp SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* string field comparisons */
 /* version %I% last-modified %G% */
@@ -43,6 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<strings.h>		/* |strcasecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| + |strncmp(3c)| */
