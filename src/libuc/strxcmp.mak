@@ -1,4 +1,4 @@
-# MAKEFILES (strxcmp)
+# MAKEFILE (strxcmp)
 
 T= strxcmp
 
@@ -40,21 +40,20 @@ MODS +=
 LIBS +=
 
 
-OBJ0= stremacmp.o strpcmp.o
+OBJ0= stremacmp.o strkeycmp.o strvalcmp.o
 OBJ1= strleadcmp.o
-OBJ2= 
-OBJ3= 
+OBJ2= strpcmp.o strfoldcmp.o
+OBJ3= strkeydictcmp.o
 
 OBJA= obj0.o obj1.o
-OBJB=
+OBJB= obj2.o obj3.o
 
-OBJ= $(OBJA) $(OBJB)
+OBJ= obja.o objb.o
 
 
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -132,8 +131,19 @@ obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-stremacmp.o:		stremacmp.cc 	$(INCS)
-strpcmp.o:		strpcmp.cc	$(INCS)
-strleadcmp.o:		strleadcmp.cc	$(INCS)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+stremacmp.o:		stremacmp.cc		stremacmp.h	$(INCS)
+strkeycmp.o:		strkeycmp.cc		strkeycmp.h	$(INCS)
+strvalcmp.o:		strvalcmp.cc		strvalcmp.h	$(INCS)
+strkeydictcmp.o:	strkeydictcmp.cc	strkeycmp.h	$(INCS)
+strleadcmp.o:		strleadcmp.cc		strleadcmp.h	$(INCS)
+strpcmp.o:		strpcmp.cc		strpcmp.h	$(INCS)
+strfoldcmp.o:		strfoldcmp.cc		strfoldcmp.h	$(INCS)
 
 
