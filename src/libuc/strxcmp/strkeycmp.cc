@@ -1,6 +1,6 @@
 /* strkeycmp SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* string key comparison */
 /* version %I% last-modified %G% */
@@ -29,30 +29,48 @@
 	the value.
 
 	Synopsis:
-	int strkeycmp(cchar *e1p,cchar *e2p) noex
+	int strkeybasecmp(cchar *e1p,cchar *e2p) noex
+	int strkeycasecmp(cchar *e1p,cchar *e2p) noex
+	int strkeyfoldcmp(cchar *e1p,cchar *e2p) noex
 
 	Arguments:
-	e1p		first string
-	e2p		second string
+	e1p		c-string pointer
+	e2p		c-string pointer
 
 	Returns:
-	>0		the second key is greater than the first
+	>0		the first key string is greater than the second
 	0		the keys of the strings are equal
-	<0		the first key is less than the second (shystem-return)
+	<0		the first key is less than the second
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<strings.h>		/* |strcasecmp(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<toxc.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"strkeycmp.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+extern "C" {
+    typedef int (*toxc_f)(int) noex ;
+}
 
 
 /* external subroutines */
@@ -66,6 +84,36 @@
 
 /* forward references */
 
+local inline bool isend(int ch) noex {
+    	return (ch == '=') || (ch == '\0') ;
+}
+
+local int strkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p) noex {
+	int		rc = 0 ;
+	if (e1p && e2p) {
+	    while (*e1p && *e2p) {
+		cint ch1 = mkchar(*e1p) ;
+		cint ch2 = mkchar(*e2p) ;
+	        if ((ch1 == '=') || (ch2 == '=')) break ;
+	        if (tox(ch1) != tox(ch2)) break ;
+	        e1p += 1 ;
+	        e2p += 1 ;
+	    } /* end while */
+	    if (*e1p != *e2p) {
+		cint ch1 = mkchar(*e1p) ;
+		cint ch2 = mkchar(*e2p) ;
+	        if (isend(ch1)) {
+		    rc = isend(ch2) ? 0 : (- ch2) ;
+	        } else if (isend(ch2)) {
+		    rc = (+ ch1) ;
+	        } else {
+		    rc = tox(ch1) - tox(ch2) ;
+		}
+	    } /* end if (resolution) */
+	} /* end if (non-null) */
+	return rc ;
+} /* end subroutine (strkeycmp) */
+
 
 /* local variables */
 
@@ -75,36 +123,16 @@
 
 /* exported subroutines */
 
-int strkeycmp(cchar *e1p,cchar *e2p) noex {
-	int		rc = 0 ;
-	if (e1p || e2p) {
-	    rc = +1 ;
-	    if (e1p) {
-		rc = -1 ;
-	        if (e2p) {
-		    rc = 0 ;
-	            while (*e1p && *e2p) {
-	                if ((*e1p == '=') || (*e2p == '=')) break ;
-	                if (*e1p != *e2p) break ;
-	                e1p += 1 ;
-	                e2p += 1 ;
-	            } /* end while */
-	            if (*e1p != *e2p) {
-	                if (*e1p != '=') {
-	                    if (*e2p != '=') {
-	                        rc = (*e1p - *e2p) ;
-	                    } else {
-	                        rc = (*e1p == '\0') ? 0 : +1 ;
-			    }
-	                } else {
-	                    rc = (*e2p == '\0') ? 0 : -1 ;
-			}
-	            }
-		}
-	    }
-	}
-	return rc ;
+int strkeybasecmp(cchar *e1p,cchar *e2p) noex {
+	return strkeyxcmp(tobc,e1p,e2p) ;
 }
-/* end subroutine (strkeycmp) */
+
+int strkeycasecmp(cchar *e1p,cchar *e2p) noex {
+	return strkeyxcmp(touc,e1p,e2p) ;
+}
+
+int strkeyfoldcmp(cchar *e1p,cchar *e2p) noex {
+	return strkeyxcmp(tofc,e1p,e2p) ;
+}
 
 
