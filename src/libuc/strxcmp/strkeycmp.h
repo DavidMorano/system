@@ -1,6 +1,6 @@
 /* strkeycmp HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* make a character out of an integer */
 /* version %I% last-modified %G% */
@@ -8,13 +8,9 @@
 
 /* revision history:
 
-  = 2000-05-14, David A-D- Morano
+	= 1998-09-10, David A­D­ Morano
 	This was written for Rightcore Network Services (RNS).
  
-  = 2018-11-27, David A-D- Morano
-  I created an inline version for the C language. We will likely do
-  something for C++ at some other time.
-  
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -32,7 +28,14 @@
 
 EXTERNC_begin
 
-extern int strkeycmp(cchar *,cchar *) noex ;
+extern int strkeybasecmp(cchar *,cchar *) noex ;
+extern int strkeycasecmp(cchar *,cchar *) noex ;
+extern int strkeyfoldcmp(cchar *,cchar *) noex ;
+
+local inline int strkeycmp(cchar *s1,cchar *s2) noex {
+    	return strkeybasecmp(s1,s2) ;
+}
+
 extern int strkeydictcmp(cchar *,cchar *) noex ;
 
 EXTERNC_end
