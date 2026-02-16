@@ -1,6 +1,6 @@
 /* strkeydictcmp SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* string key comparison */
 /* version %I% last-modified %G% */
@@ -43,12 +43,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<strings.h>		/* |strcasecmp(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<ischarx.h>
 #include	<dictdiff.h>
+#include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"strkeycmp.h"
@@ -79,33 +84,29 @@
 
 int strkeydictcmp(cchar *s1,cchar *s2) noex {
 	int		rc = 0 ;
-	if (s1 || s2) {
-	    rc = +1 ;
-	    if (s1) {
-		rc = -1 ;
-		if (s2) {
-		    rc = 0 ;
-                    while (*s1 && *s2) {
-                        if ((*s1 == '=') || (*s2 == '=')) break ;
-                        if (! isdict(*s1)) {
-                            s1 += 1 ;
-                            continue ;
-                        }
-                        if (! isdict(*s2)) {
-                            s2 += 1 ;
-                            continue ;
-                        }
-                        rc = dictdiff(*s1,*s2) ;
-                        if (rc != 0) break ;
-                        s1 += 1 ;
-                        s2 += 1 ;
-                    } /* end while */
-                    if (rc == *s2) rc = 0 ;
-                    if (*s1 == '=') rc = (*s2 == '\0') ? 0 : -1 ;
-                    if (*s2 == '=') rc = (*s1 == '\0') ? 0 : +1 ;
-		}
+	if (s1 && s2) {
+            while (*s1 && *s2) {
+                if ((*s1 == '=') || (*s2 == '=')) break ;
+                if (! isdict(*s1)) {
+                    s1 += 1 ;
+                    continue ;
+                }
+                if (! isdict(*s2)) {
+                    s2 += 1 ;
+                    continue ;
+                }
+                rc = dictdiff(*s1,*s2) ;
+                if (rc != 0) break ;
+                s1 += 1 ;
+                s2 += 1 ;
+            } /* end while */
+	    {
+		cint ch = mkchar(*s2) ;
+                if (rc == ch) rc = 0 ;
 	    }
-	}
+            if (*s1 == '=') rc = (*s2 == '\0') ? 0 : -1 ;
+            if (*s2 == '=') rc = (*s1 == '\0') ? 0 : +1 ;
+	} /* end if (non-null) */
 	return rc ;
 }
 /* end subroutine (strkeydictcmp) */
