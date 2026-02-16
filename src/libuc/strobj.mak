@@ -1,4 +1,4 @@
-# MAKEFILES (strobj)
+# MAKEFILE (strobj)
 
 T= strobj
 
