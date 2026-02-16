@@ -1,4 +1,4 @@
-# MAKEFILES (strwcpy)
+# MAKEFILE (strwcpy)
 
 T= strwcpy
 
