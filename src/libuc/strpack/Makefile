@@ -1,4 +1,4 @@
-# MAKEFILES (strpack)
+# MAKEFILE (strpack)
 
 T= strpack
 
