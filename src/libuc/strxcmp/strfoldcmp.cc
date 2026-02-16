@@ -1,6 +1,6 @@
 /* strfoldcmp SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* string comparison w/ folded case */
 /* version %I% last-modified %G% */
@@ -40,9 +40,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<strings.h>		/* |strcasecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -71,9 +72,6 @@
 /* forward references */
 
 
-/* local subroutines */
-
-
 /* local variables */
 
 
@@ -82,15 +80,15 @@
 
 /* exported subroutines */
 
-int strfoldcmp(cchar *e1p,cchar *e2p) noex {
+int strfoldcmp(cchar *s1,cchar *s2) noex {
 	int		rc = 0 ;
-	if (e1p && e2p) {
-	    for (int i = 0 ; *e1p && *e2p ; i += 1) {
-	        cint ch1 = TOFC(*e1p++) ;
-	        cint ch2 = TOFC(*e2p++) ;
+	if (s1 && s2) {
+	    while (rc == 0) {
+	        cint ch1 = TOFC(*s1++) ;
+	        cint ch2 = TOFC(*s2++) ;
 	        rc = ch1 - ch2 ;
-	        if (rc) break ;
-	    } /* end for */
+	        if (!ch1 || !ch2) break ;
+	    } /* end while */
 	} /* end if (non-null) */
 	return rc ;
 }
