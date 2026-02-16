@@ -1,4 +1,4 @@
-# MAKEFILES (strpack)
+# MAKEFILE (strpack)
 
 T= strpack
 
@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= strpack_main.o strpack_envstore.o strpack_obj.o
+OBJ0= strpack_prime.o strpack_envstore.o strpack_obj.o
 
 OBJA= obj0.o
 OBJB=
@@ -139,8 +139,8 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-strpack_envstore.o:		strpack_envstore.cc	$(INCS)
-strpack_main.o:			strpack_main.cc		$(INCS)
-strpack_obj.o:			strpack_obj.cc		$(INCS)
+strpack_envstore.o:		strpack_envstore.cc		$(INCS)
+strpack_prime.o:		strpack_prime.cc		$(INCS)
+strpack_obj.o:			strpack_obj.cc			$(INCS)
 
 
