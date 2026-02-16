@@ -1,0 +1,162 @@
+/* tardir-prime MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* enumerate filenames */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2017-03-21, David A-D- Morano
+	This subroutine was originally written.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Object:
+	tardir
+
+	Description:
+	This is a container for directories.  Only a single name
+	for each directory is retained (additional path-names for
+	directories) are ignored (the first one is picked).
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
+
+export module tardir:prime ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+    enum tardirmems {
+	tardirmem_start,
+	tardirmem_finish,
+	tardirmem_count,
+	tardirmem_overlast
+    } ; /* end enum (tardirmems) */
+
+export {
+    struct tardir_cur {
+	int		i ;
+    } ; /* end struct (tardir_cur) */
+    struct tardir ;
+    struct tardir_fl {
+	uint		open:1 ;
+	uint		debug:1 ;
+    } ; /* end struct (tardir_fl) */
+    struct tardir_ma {
+	tardir		*op = nullptr ;
+	void operator () (tardir *p,int) noex {
+	    op = p ;
+	} ;
+	template<typename ... Args> int operator () (Args ... ) noex ;
+	operator int () noex ;
+    } ; /* end struct (tardir_ma) */
+    struct tardir_co {
+	tardir		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (tardir *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () (0) ;
+	} ;
+    } ; /* end struct (tardir_co) */
+    struct tardir {
+	friend		tardir_co ;
+	tardir_co	start ;
+	tardir_co	finish ;
+	tardir_co	count ;
+	tardir_ma	magic ;
+	tardir_fl	fl{} ;
+	void		*dirp ;		/* tardir-list-pointer */
+	void		*seenp ;	/* seen-list-pointer */
+	uint		magval ;
+	tardir() noex {
+	    start	(this,tardirmem_start) ;
+	    finish	(this,tardirmem_finish) ;
+	    count	(this,tardirmem_count) ;
+	    magic	(this,0) ;
+	    dirp = nullptr ;
+	    seenp = nullptr ;
+	    magval = 0 ;
+	} ; /* end ctor */
+	int add		(cchar *,int = -1) noex ;
+	int get		(int,ccharpp) noex ;
+	int get		(int,ustat *,ccharp *) noex ;
+	int curbegin	(tardir_cur *) noex ;
+	int curenum	(tardir_cur *,ccharp *) noex ;
+	int curenum	(tardir_cur *,ustat *,ccharp *) noex ;
+	int curend	(tardir_cur *) noex ;
+	void dtor() noex ;
+	operator int () noex ;
+	destruct tardir() {
+	    if (magval) dtor() ;
+	}
+    private:
+	int istart() noex ;
+	int ifinish() noex ;
+	int icount() noex ;
+	int iaddone(const ustat *,cchar *,int) noex ;
+    } ; /* end struct (tardir) */
+} /* end export */
+
+
+/* forward references */
+
+
+/* local variables */
+
+const uint	tardir_magicval	= 0x83655680 ;
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+
+/* local subroutines */
+
+template<typename ... Args> int tardir_ma::operator () (Args ... args) noex {
+    	int		rs = SR_FAULT ;
+	if ((... && args)) {
+	    rs = (op->magval == tardir_magicval) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end method (tardir_ma::operator) */
+
+inline tardir_ma::operator int () noex {
+	return (op->magval == tardir_magicval) ? SR_OK : SR_NOTOPEN ;
+} /* end method (tardir_ma::operator) */
+
+
