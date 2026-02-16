@@ -1,4 +1,4 @@
-# MAKEFILES (strx)
+# MAKEFILE (strx)
 
 T= strx
 
