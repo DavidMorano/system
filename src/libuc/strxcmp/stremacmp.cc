@@ -1,6 +1,6 @@
 /* stremacmp SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* string key comparison */
 /* version %I% last-modified %G% */
@@ -31,23 +31,25 @@
 	e2p		second string
 
 	Returns:
-	>0		the second is greater than the first
+	>0		the first is greater than the second
 	0		the strings are equal
 	<0		the first is less than the second
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<strings.h>		/* |strcasecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<strings.h>		/* for |strcasecmp(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<strnxcmp.h>		/* |strnncmp(3uc)| */
 #include	<localmisc.h>
 
-#include	"strxcmp.h"
+#include	"stremacmp.h"
 
 
 /* local defines */
@@ -68,8 +70,6 @@
 
 /* forward references */
 
-static int	stremacmp_sub(cchar *,cchar *) noex ;
-
 
 /* local variables */
 
@@ -81,39 +81,21 @@ static int	stremacmp_sub(cchar *,cchar *) noex ;
 
 int stremacmp(cchar *e1p,cchar *e2p) noex {
 	int		rc = 0 ;
-	if (e1p || e2p ) {
-	    if (e1p) {
-		if (e1p) {
-		    rc = stremacmp_sub(e1p,e2p) ;
-		} else {
-		    rc = -1 ;
-		}
+	if (e1p && e2p) {
+	    cchar *t1p = strchr(e1p,CH_AT) ;
+	    cchar *t2p = strchr(e2p,CH_AT) ;
+	    if (t1p && t2p) {
+	        if ((rc = strcasecmp((t1p+1),(t2p+1))) == 0) {
+	            cint	t1l = intconv(t1p - e1p) ;
+	            cint	t2l = intconv(t2p - e2p) ;
+	            rc = strnncmp(e1p,t1l,e2p,t2l) ;
+	        } /* end if (strcasecmp) */
 	    } else {
-		rc = 1 ;
+	        rc = strcmp(e1p,e2p) ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rc ;
 }
 /* end subroutine (stremacmp) */
-
-
-/* local subroutines */
-
-static int stremacmp_sub(cchar *e1p,cchar *e2p) noex {
-	int		rc = 0 ;
-	cchar		*t1p = strchr(e1p,CH_AT) ;
-	cchar		*t2p = strchr(e2p,CH_AT) ;
-	if (t1p && t2p) {
-	    if ((rc = strcasecmp((t1p+1),(t2p+1))) == 0) {
-	        cint	t1l = intconv(t1p - e1p) ;
-	        cint	t2l = intconv(t2p - e2p) ;
-	        rc = strnncmp(e1p,t1l,e2p,t2l) ;
-	    }
-	} else {
-	    rc = strcmp(e1p,e2p) ;
-	}
-	return rc ;
-}
-/* end subroutine (stremacmp_sub) */
 
 
