@@ -1,6 +1,6 @@
 /* strfoldcmp HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* make a character out of an integer */
 /* version %I% last-modified %G% */
