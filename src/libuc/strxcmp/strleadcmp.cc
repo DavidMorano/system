@@ -1,6 +1,6 @@
 /* strleadcmp SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* check if string 's2' is a leading substring of string 's1' */
 /* version %I% last-modified %G% */
@@ -27,13 +27,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<strings.h>		/* |strcasecmp(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
-#include	"strxcmp.h"
+#include	"strleadcmp.h"
 
 
 /* local defines */
