@@ -71,17 +71,18 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |strncmp(3c)| */
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<char.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<mkchar.h>
+#include	<char.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"strnxcmp.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* lenstr(3u)| */
 
@@ -107,16 +108,16 @@ import libutil ;			/* lenstr(3u)| */
 struct dictchar {
 	const uchar	*sp ;
 	int		sl ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	dch_start(DCH *,cchar *,int) noex ;
-static int	dch_finish(DCH *) noex ;
-static int	dch_get(DCH *) noex ;
+local int	dch_start(DCH *,cchar *,int) noex ;
+local int	dch_finish(DCH *) noex ;
+local int	dch_get(DCH *) noex ;
 
-static int	strdocmp(cchar *,cchar *,int) noex ;
+local int	strdocmp(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -128,46 +129,54 @@ static int	strdocmp(cchar *,cchar *,int) noex ;
 /* exported subroutines */
 
 int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
-	int		rs ;
 	int		rc = 0 ;
-	if (s1len < 0) s1len = lenstr(s1) ;
-	if (s2len < 0) s2len = lenstr(s2) ;
-	if (DCH dc1 ; (rs = dch_start(&dc1,s1,s1len)) >= 0) {
-	    if (DCH dc2 ; (rs = dch_start(&dc2,s2,s2len)) >= 0) {
-		int	fch1 ;
-		int	fch2 ;
-		int	i{} ; /* used-afterwards */
-	        for (i = 0 ; rc == 0 ; i += 1) {
-	            cint	ch1 = dch_get(&dc1) ;
-	            cint	ch2 = dch_get(&dc2) ;
-	            fch1 = CHAR_TOFC(ch1) ;
-	            fch2 = CHAR_TOFC(ch2) ;
-	            rc = (fch1 - fch2) ;
-	            if ((ch1 == 0) && (ch2 == 0)) /* end-of-string for both */
-	                break ;
-	        } /* end while */
-	        if (rc == 0) {
-	            rc = (s1len - s2len) ; /* more determinism */
-		}
-	        if (rc == 0) {
-	            rc = strdocmp(s1,s2,i) ; /* break ties so far */
-		}
-	        if (rc == 0) {
-	            while (s1len && (! isdict(s1[s1len-1]))) {
-			s1len -= 1 ;
+	if (s1 && s2) {
+	    int		rs ; /* used inside here only */
+	    int		rs1 ;
+	    if (s1len < 0) s1len = lenstr(s1) ;
+	    if (s2len < 0) s2len = lenstr(s2) ;
+	    if (DCH dc1 ; (rs = dch_start(&dc1,s1,s1len)) >= 0) {
+	        if (DCH dc2 ; (rs = dch_start(&dc2,s2,s2len)) >= 0) {
+		    int	fch1 ;
+		    int	fch2 ;
+		    int	i{} ; /* used-afterwards */
+	            for (i = 0 ; rc == 0 ; i += 1) {
+	                cint	ch1 = dch_get(&dc1) ;
+	                cint	ch2 = dch_get(&dc2) ;
+	                fch1 = CHAR_TOFC(ch1) ;
+	                fch2 = CHAR_TOFC(ch2) ;
+	                rc = (fch1 - fch2) ;
+	                if ((ch1 == 0) && (ch2 == 0)) /* end-of-str for both */
+	                    break ;
+	            } /* end while */
+	            if (rc == 0) {
+	                rc = (s1len - s2len) ; /* more determinism */
 		    }
-	            while (s2len && (! isdict(s2[s2len-1]))) {
-			s2len -= 1 ;
+	            if (rc == 0) {
+	                rc = strdocmp(s1,s2,i) ; /* break ties so far */
 		    }
-	            rc = (s1len - s2len) ; /* more determinism */
-	        }
-	        if (rc == 0) {
-	            rc = strncmp(s1,s2,s2len) ; /* absolute determinism (?) */
-		}
-	        dch_finish(&dc2) ;
-	    } /* end if (dc2) */
-	    dch_finish(&dc1) ;
-	} /* end if (dc1) */
+	            if (rc == 0) {
+	                while (s1len && (! isdict(s1[s1len-1]))) {
+			    s1len -= 1 ;
+		        }
+	                while (s2len && (! isdict(s2[s2len-1]))) {
+			    s2len -= 1 ;
+		        }
+	                rc = (s1len - s2len) ; /* more determinism */
+	            } /* end if */
+	            if (rc == 0) {
+	                rc = strncmp(s1,s2,s2len) ; /* determinism? */
+		    }
+	            rs1 = dch_finish(&dc2) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (dc2) */
+	        rs1 = dch_finish(&dc1) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (dc1) */
+	    if (rs < 0) {
+		ulogerror("strnndictcmp",rs,"dch") ;
+	    }
+	} /* end if (non-null) */
 	return rc ;
 }
 /* end subroutine (strnndictcmp) */
@@ -175,20 +184,20 @@ int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 
 /* local subroutines */
 
-static int dch_start(DCH *dcp,cchar *sp,int sl) noex {
+local int dch_start(DCH *dcp,cchar *sp,int sl) noex {
 	dcp->sp = (const uchar *) sp ;
 	dcp->sl = sl ;
 	return 0 ;
 }
 /* end subroutine (dch_start) */
 
-static int dch_finish(DCH *dcp) noex {
+local int dch_finish(DCH *dcp) noex {
 	int		sl = dcp->sl ;
 	return sl ;
 }
 /* end subroutine (dch_finish) */
 
-static int dch_get(DCH *dcp) noex {
+local int dch_get(DCH *dcp) noex {
 	int		doch = 0 ;
 	forever {
 	    doch = 0 ;
@@ -203,7 +212,7 @@ static int dch_get(DCH *dcp) noex {
 }
 /* end subroutine (dch_get) */
 
-static int strdocmp(cchar *s1,cchar *s2,int slen) noex {
+local int strdocmp(cchar *s1,cchar *s2,int slen) noex {
 	int		do1 ;
 	int		do2 ;
 	int		rc = 0 ;
