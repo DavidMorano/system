@@ -1,4 +1,4 @@
-# MAKEFILES (strfilter)
+# MAKEFILE (strfilter)
 
 T= strfilter
 
