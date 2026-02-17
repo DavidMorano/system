@@ -39,16 +39,12 @@ module ;
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<new>
-#include	<utility>
-#include	<functional>
-#include	<set>
-#include	<string>
 #include	<stdexcept>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<hdb.h>
 #include	<hash.h>		/* |hash_elf(3uc)| */
+#include	<strnxcmp.h>		/* |strnncmp(3uc)| */
 #include	<localmisc.h>
 
 #define	SETHAND_DEFENTS	10
@@ -56,8 +52,6 @@ module ;
 export module sethand ;
 
 import retstat ;
-
-extern "C" int	strnncmp(cchar *,int,cchar *,int) noex ;
 
 export {
     class sethandent {
@@ -126,12 +120,12 @@ export {
 	typedef sethand_it iterator ;
 	sethand(int an = SETHAND_DEFENTS) : n(an) { } ;
 	sethand(int an,int aat) : n(an), at(aat) { } ;
-	~sethand() {
+	destruct sethand() {
 	    if (f_started) {
 		f_started = false ;
 		hdb_finish(&dlp) ;
 	    }
-	} ;
+	} ; /* end dtor */
 	int begin(int an) {
 	    int		rs ;
 	    n = an ;
@@ -189,7 +183,8 @@ export {
 	    int		kl ;
 	    cvoid	*kp ;
 	    if ((kl = ep->getkey(&kp)) >= 0) {
-		hdb_dat	key, val ;
+		hdb_dat	key ;
+		hdb_dat	val ;
 		cint	rsn = SR_NOTFOUND ;
 		key.buf = kp ;
 		key.len = kl ;
