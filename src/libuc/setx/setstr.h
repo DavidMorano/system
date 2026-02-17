@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<hdb.h>
 
 
@@ -38,7 +39,7 @@ enum setstrmems {
 	setstrmem_count,
 	setstrmem_finish,
 	setstrmem_overlast
-} ;
+} ; /* end enum (setstrmems) */
 struct setstr ;
 struct setstr_co {
 	setstr		*op = nullptr ;
