@@ -1,4 +1,4 @@
-# MAKEFILES (stp)
+# MAKEFILE (stp)
 
 T= stp
 
