@@ -114,7 +114,7 @@ constexpr strvarenv::strvarenv() noex {
 
 constexpr strvarenv	enver ;
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
@@ -174,14 +174,13 @@ strlibval::operator ccharp () noex {
 void strlibval::dtor() noex {
 	strp = nullptr ;
 	if (a) {
-	    if (cint rs = lm_free(a) ; rs >= 0) {
+	    if (cint rsf = lm_free(a) ; rsf >= 0) {
 	        a = nullptr ;
 	    } else {
-		ulogerror("strlibpath::dtor",rs,"dtor-lm_free") ;
+		ulogerror("strlibpath::dtor",rsf,"dtor-lm_free") ;
 	    }
-	}
-}
-/* end method (strlibval::dtor) */
+	} /* end if (non-null) */
+} /* end method (strlibval::dtor) */
 
 ccharp strlibval::cook() noex {
 	cchar	*rp = nullptr ; /* return-value */
@@ -190,8 +189,7 @@ ccharp strlibval::cook() noex {
 	    strp = rp ;
 	}
 	return rp ;
-}
-/* end method (strlibval::cook) */
+} /* end method (strlibval::cook) */
 
 ccharp strlibval::strtmpdir() noex {
 	cchar	*rp = nullptr ; /* return-value */
@@ -214,15 +212,14 @@ ccharp strlibval::strmaildir() noex {
 	    strp = rp ;
 	} /* end if (env-variabiel name) */
 	return rp ;
-}
-/* end method (strlibval::strmaildir) */
+} /* end method (strlibval::strmaildir) */
 
 ccharp strlibval::strpath() noex {
-	cchar	*rp = nullptr ; /* return-value */
+	cchar		*rp = nullptr ; /* return-value */
 	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
 	    if ((rp = getenv(vn)) == nullptr) {
-		int	rs ;
-		int	rs1 ;
+		int		rs ;
+		int		rs1 ;
 		if ((rs = maxpathlen) >= 0) {
 		    cint	tlen = (rs * PLMULT) ;
 		    if (char *tbuf ; (rs = lm_mall((tlen+1),&tbuf)) >= 0) {
@@ -251,7 +248,7 @@ ccharp strlibval::strpath() noex {
 		if (rs < 0) {
 		    rp = nullptr ;
 		    ulogerror("strlibval::strpath",rs,"path construction") ;
-		}
+		} /* end if (error) */
 	    } /* end if (env-variable access) */
 	    strp = rp ;
 	} /* end if (env-variabiel name) */
