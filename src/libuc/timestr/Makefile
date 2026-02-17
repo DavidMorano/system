@@ -1,4 +1,4 @@
-# MAKEFILES (timestr)
+# MAKEFILE (timestr)
 
 T= timestr
 
