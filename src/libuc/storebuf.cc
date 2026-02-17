@@ -125,32 +125,27 @@ int storebuf_xxxx(char *rp,int rl,int i,ctxxx_f<T> ctxxx,T v) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine-template (storebuf_xxxx) */
+} /* end subroutine-template (storebuf_xxxx) */
 
 template<typename T>
 local inline int storebuf_binx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,ctbin,v) ;
-}
-/* end subroutine-template (storebuf_binx) */
+} /* end subroutine-template (storebuf_binx) */
 
 template<typename T>
 local inline int storebuf_octx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,ctoct,v) ;
-}
-/* end subroutine-template (storebuf_octx) */
+} /* end subroutine-template (storebuf_octx) */
 
 template<typename T>
 local inline int storebuf_decx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,ctdec,v) ;
-}
-/* end subroutine-template (storebuf_decx) */
+} /* end subroutine-template (storebuf_decx) */
 
 template<typename T>
 local inline int storebuf_hexx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,cthex,v) ;
-}
-/* end subroutine-template (storebuf_hexx) */
+} /* end subroutine-template (storebuf_hexx) */
 
 
 /* local variables */
