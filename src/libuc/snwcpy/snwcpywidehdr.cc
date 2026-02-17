@@ -23,7 +23,7 @@
 	Description:
 	Similar to |snwcpycompact(3uc)| except that the source
 	consists of wide-characters. This is meant to be used on
-	wide-character strongs taken from mail-msg header values
+	wide-character strings taken from mail-msg header values
 	(consisting of string data).
 
 	Synopsis:
@@ -60,13 +60,12 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* presumably for |wchar_t| type */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<strmgr.h>
 #include	<straltwchar.h>
+#include	<wsfx.h>
+#include	<wsnx.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -78,11 +77,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int		wsfnext(cwchar *,int,cwchar **) noex ;
-    extern int		wsnlen(cwchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -104,45 +98,46 @@ cint		ch_sub = mkchar('¿') ;
 
 /* exported subroutines */
 
-int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int wsl) noex {
-	int		rs ;
+int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int µwsl) noex {
+    	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		dl = 0 ;
-	if (dlen < 0) dlen = INT_MAX ;
-	if (wsl < 0) wsl = wsnlen(wsp,-1) ;
-	if (strmgr m ; (rs = m.start(dbuf,dlen)) >= 0) {
-	    cwchar	*wp ;
-	    for (int wl ; (wl = wsfnext(wsp,wsl,&wp)) > 0 ; ) {
-	        if (dl > 0) {
-	            rs = m.chr(' ') ;
-	            if (rs >= 0) dl += 1 ;
-	        }
-	        if (rs >= 0) {
-		    int		i ; /* used-afterwards */
-	            for (i = 0 ; (rs >= 0) && (i < wl) && wp[i] ; i += 1) {
-	                if (uint wch ; (wch = (uint) wp[i]) > UCHAR_MAX) {
-			    if (cc *ss ; (ss = straltwchar(wch)) != nullptr) {
-	                        rs = m.str(ss) ;
+	int		dl = 0 ; /* return-value */
+	if (int wsl ; (wsl = wsnlen(wsp,µwsl)) >= 0) {
+	    if (strmgr m ; (rs = m.start(dbuf,dlen)) >= 0) {
+	        cwchar	*wp ;
+	        for (int wl ; (wl = wsfnext(wsp,wsl,&wp)) > 0 ; ) {
+	            if (dl > 0) {
+	                rs = m.chr(' ') ;
+	                if (rs >= 0) dl += 1 ;
+	            }
+	            if (rs >= 0) {
+		        int	i ; /* used-afterwards */
+	                for (i = 0 ; (rs >= 0) && (i < wl) && wp[i] ; i += 1) {
+	                    if (uint wch ; (wch = (uint) wp[i]) > UCHAR_MAX) {
+			        if (cc *ss ; (ss = straltwchar(wch)) != np) {
+	                            rs = m.str(ss) ;
+			        } else {
+	                            rs = m.chr(ch_sub) ;
+			        }
 			    } else {
-	                        rs = m.chr(ch_sub) ;
-			    }
-			} else {
-			    if (isprintbad(wch)) {
-				wch = ch_sub ;
-			    }
-	                    rs = m.chr(wch) ;
-			} /* end if */
-	            } /* end for */
-	            if (rs >= 0) dl += i ;
-	        } /* end if (ok) */
-	        wsl -= intconv((wp + wl) - wsp) ;
-	        wsp = (wp + wl) ;
-	        if (rs < 0) break ;
-	    } /* end for */
-	    rs1 = m.finish ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (strmgr) */
-	dbuf[dl] = '\0' ;
+			        if (isprintbad(wch)) {
+				    wch = ch_sub ;
+			        }
+	                        rs = m.chr(wch) ;
+			    } /* end if */
+	                } /* end for */
+	                if (rs >= 0) dl += i ;
+	            } /* end if (ok) */
+	            wsl -= intconv((wp + wl) - wsp) ;
+	            wsp = (wp + wl) ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	        rs1 = m.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (strmgr) */
+	    dbuf[dl] = '\0' ;
+	} /* end if (wsnlen) */
 	return (rs >= 0) ? dl : rs ;
 }
 /* end subroutine (snwcpywidehdr) */
