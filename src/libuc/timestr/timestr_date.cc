@@ -60,7 +60,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
-#include	<snx.h>
+#include	<snx.h>			/* |sntmtime(3uc)| */
 #include	<sncpyx.h>
 #include	<tmtime.hh>
 #include	<zoffparts.h>
@@ -180,9 +180,9 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 	        } /* end switch */
         /* split the time into its component parts */
 	        if (f_gmt) {
-	            rs = tmtime_gmtime(&tmt,t) ;
+	            rs = tmtime_timegm(&tmt,t) ;
 	        } else {
-	            rs = tmtime_localtime(&tmt,t) ;
+	            rs = tmtime_timelocal(&tmt,t) ;
 	        }
         /* create the appropriate string based on the type-code */
 	        if (rs >= 0) {
