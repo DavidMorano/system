@@ -16,6 +16,7 @@ extern "C" {
     extern int uc_fstat(int,ustat *) noex ;
     extern int uc_fsize(int) noex ;
     extern int uc_fchown(int,uid_t,gid_t) noex ;
+    extern int uc_fdatasync(int) noex ;
     extern int uc_fminmod(int,mode_t) noex ;
     extern int uc_connect(int,cvoid *,int) noex ;
     extern int uc_connecte(int,cvoid *,int,int) noex ;
@@ -23,6 +24,7 @@ extern "C" {
     extern int uc_read(int,void *,int) noex ;
     extern int uc_write(int,cvoid *,int) noex ;
     extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_writedesc(int,int,int) noex ;
     extern int uc_iocctl(int,int,...) noex ;
     extern int uc_rewind(int) noex ;
     extern int uc_ftruncate(int,off_t ) noex ;
