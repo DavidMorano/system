@@ -66,9 +66,10 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getfdfile.h>
-#include	<libmallocxx.h>
 #include	<intsat.h>
 #include	<filer.h>
 #include	<field.h>
@@ -94,6 +95,12 @@ using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_close(int) ;
+} /* end extern */
 
 
 /* external variables */
@@ -182,7 +189,7 @@ int suber::fileclose() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	if (fopened && (fd >= 0)) {
-	    rs1 = u_close(fd) ;
+	    rs1 = uc_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    fd = -1 ;
 	    fopened = false ;
@@ -193,14 +200,15 @@ int suber::fileclose() noex {
 int suber::loadfd() noex {
 	int		rs ;
 	int		c = 0 ;
-	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
+	    csize fsize = size_t(sb.st_size) ;
 	    if (! S_ISDIR(sb.st_mode)) {
 		int	to = -1 ;
 	        int	cs ;
 		int	fbsz = 1024 ;
 		int	fbo = 0 ;
 	        if (S_ISREG(sb.st_mode)) {
-	            int	fs = ((sb.st_size == 0) ? 1 : intsat(sb.st_size)) ;
+	            int	fs = ((sb.st_size == 0) ? 1 : intsat(fsize)) ;
 	            cs = BCEIL(fs,512) ;
 	            fbsz = min(cs,1024) ;
 	        } else {
@@ -225,7 +233,7 @@ int suber::loadfds(int fbsz,int fbo,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *lbuf ; (rs = libmalloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    if (filer fb ; (rs = fb.start(fd,0z,fbsz,fbo)) >= 0) {
 	        while ((rs = fb.readln(lbuf,llen,to)) > 0) {
@@ -239,7 +247,7 @@ int suber::loadfds(int fbsz,int fbo,int to) noex {
 	        rs1 = fb.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
-	    rs1 = libmalloc_free(lbuf) ;
+	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
