@@ -38,7 +38,8 @@
 #include	<new>			/* |nothrow(3c++)| */
 #include	<utility>
 #include	<set>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"setoint.h"
