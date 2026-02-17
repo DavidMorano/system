@@ -1,4 +1,4 @@
-# MAKEFILES (tardir)
+# MAKEFILE (tardir)
 
 T= tardir
 
@@ -40,10 +40,19 @@ MODS +=
 LIBS +=
 
 
-OBJ0= tardir0.o tardir1.o
-OBJ1=
+OBJPART0= tardir-prime.o
+OBJPART1= tardir-vecent.o
+OBJPART2=
+OBJPART3=
 
-OBJA= obj0.o
+OBJPART= objpart0.o objpart1.o
+
+OBJ0= tardir0.o 
+OBJ1= tardir1.o tardir2.o
+OBJ2=
+OBJ3=
+
+OBJA= obj0.o obj1.o
 
 OBJ= obja.o
 
@@ -51,7 +60,6 @@ OBJ= obja.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -97,8 +105,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+$(T).o:			$(OBJ) objpart.o
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ) objpart.o
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -133,10 +141,28 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-tardir0.o:		tardir.ccm		$(INCS)
+objpart0.o:		$(OBJPART0) 
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart1.o:		$(OBJPART1) 
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+tardir-prime.o:		tardir-prime.ccm		$(INCS)
+tardir-vecent.o:	tardir-vecent.ccm		$(INCS)
+
+tardir0.o:		tardir.ccm objpart.o		$(INCS)
 	makemodule tardir
 
-tardir1.o:		tardir1.cc tardir.ccm	$(INCS)
+tardir1.o:		tardir1.cc tardir0.o		$(INCS)
+	makemodule tardir
+	$(COMPILE.cc) $<
+
+tardir2.o:		tardir2.cc tardir0.o		$(INCS)
 	makemodule tardir
 	$(COMPILE.cc) $<
 
