@@ -74,13 +74,23 @@ module ;
 #include	<mkchar.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/strnwht.ccm"
+#pragma		GCC dependency		"mod/debug.ccm"
+
 module sif ;
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 import strnwht ;			/* <- STRN module linkage */
 import debug ;
 
 /* local defines */
+
+#define CDEBPR(fmt, ...) \
+	if_constexpr (f_debug) \
+    	debprintf(__func__,fmt __VA_OPT__(,) __VA_ARGS__)
+
+#define	ISW		CHAR_ISWHT
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
@@ -120,17 +130,17 @@ int sif::operator () (cchar **rpp) noex {
 	    } else if (sch) {
 		rl = nextchr(rpp) ;
 	    } else {
-		if (sl < 0) sl = lenstr(sp) ;
-		if ((rl = sfnext(sp,sl,&rp)) > 0) {
-		    sl -= intconv((rp + rl) - sp) ;
-		    sp = (rp + rl) ;
-		}
-	        *rpp = rp ;
-	    }
+		if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+		    if ((rl = sfnext(sp,sl,&rp)) > 0) {
+		        sl -= intconv((rp + rl) - sp) ;
+		        sp = (rp + rl) ;
+		    }
+	            *rpp = rp ;
+		} /* end if (getlenstr) */
+	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (sif::operator) */
+} /* end method (sif::operator) */
 
 int sif::next(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -138,172 +148,174 @@ int sif::next(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && rpp) ylikely {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rl = sfnext(sp,sl,&rp)) > 0) {
-		sl -= intconv((rp + rl) - sp) ;
-		sp = (rp + rl) ;
-	    }
-	    *rpp = rp ;
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        if ((rl = sfnext(sp,sl,&rp)) > 0) {
+		    sl -= intconv((rp + rl) - sp) ;
+		    sp = (rp + rl) ;
+	        }
+	        *rpp = rp ;
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (sif::next) */
+} /* end method (sif::next) */
 
 int sif::nextbrk(cchar **rpp) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if_constexpr (f_debug) debprintf(__func__,"ent sl=%d\n",sl) ;
+	CDEBPR("ent sl=%d\n",탎l) ;
 	if (sp && (sstr || sch) && rpp) ylikely {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((sl > 0) && (rl <= 0)) {
-		if_constexpr (f_debug) {
-		    strnul sr(sp,sl) ;
-		    debprintf(__func__,"rem=>%s<\n",ccp(sr)) ;
-	 	}
-	        if (cchar *tp ; (tp = strnwhtbrk(sp,sl,sset)) != np) {
-		    cint tl = intconv(tp - sp) ;
-		    rl = sfshrink(sp,tl,&rp) ;
-		    sl -= intconv((tp + 1) - sp) ;
-		    sp = (tp + 1) ;
-		} else {
-		    rl = sfshrink(sp,sl,&rp) ;
-		    sp += sl ;
-		    sl = 0 ;
-	        } /* end if */
-	    } /* end while */
-	    *rpp = (rl > 0) ? rp : nullptr ;
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        while ((sl > 0) && (rl <= 0)) {
+		    if_constexpr (f_debug) {
+		        strnul sr(sp,sl) ;
+		        debprintf(__func__,"rem=>%s<\n",ccp(sr)) ;
+	 	    }
+	            if (cchar *tp ; (tp = strnwhtbrk(sp,sl,sset)) != np) {
+		        cint tl = intconv(tp - sp) ;
+		        rl = sfshrink(sp,tl,&rp) ;
+		        sl -= intconv((tp + 1) - sp) ;
+		        sp = (tp + 1) ;
+		    } else {
+		        rl = sfshrink(sp,sl,&rp) ;
+		        sp += sl ;
+		        sl = 0 ;
+	            } /* end if */
+	        } /* end while */
+	        *rpp = (rl > 0) ? rp : nullptr ;
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
-	if_constexpr (f_debug) debprintf(__func__,"ret rs=%d rl=%d\n",rs,rl) ;
+	CDEBPR("ret rs=%d rl=%d\n",rs,rl) ;
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (sif::nextbrk) */
+} /* end method (sif::nextbrk) */
 
 int sif::spchr(cchar **rpp) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
 	if (sp && sch && rpp) ylikely {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((sl > 0) && (rl <= 0)) {
-	        if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
-		    cint tl = intconv(tp - sp) ;
-		    rl = sfshrink(sp,tl,&rp) ;
-		    sl -= intconv((tp + 1) - sp) ;
-		    sp = (tp + 1) ;
-		} else {
-		    rl = sfshrink(sp,sl,&rp) ;
-		    sp += sl ;
-		    sl = 0 ;
-	        } /* end if */
-	    } /* end while */
-	    *rpp = (rl > 0) ? rp : nullptr ;
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        while ((sl > 0) && (rl <= 0)) {
+	            if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != np) {
+		        cint tl = intconv(tp - sp) ;
+		        rl = sfshrink(sp,tl,&rp) ;
+		        sl -= intconv((tp + 1) - sp) ;
+		        sp = (tp + 1) ;
+		    } else {
+		        rl = sfshrink(sp,sl,&rp) ;
+		        sp += sl ;
+		        sl = 0 ;
+	            } /* end if */
+	        } /* end while */
+	        *rpp = (rl > 0) ? rp : nullptr ;
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (sif::spchr) */
+} /* end method (sif::spchr) */
 
 int sif::spbrk(cchar **rpp) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
 	if (sp && sstr && rpp) ylikely {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((sl > 0) && (rl <= 0)) {
-	        if (cchar *tp ; (tp = strnbrk(sp,sl,sstr)) != nullptr) {
-		    cint tl = intconv(tp - sp) ;
-		    rl = sfshrink(sp,tl,&rp) ;
-		    sl -= intconv((tp + 1) - sp) ;
-		    sp = (tp + 1) ;
-		} else {
-		    rl = sfshrink(sp,sl,&rp) ;
-		    sp += sl ;
-		    sl = 0 ;
-	        } /* end if */
-	    } /* end while */
-	    *rpp = (rl > 0) ? rp : nullptr ;
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        while ((sl > 0) && (rl <= 0)) {
+	            if (cchar *tp ; (tp = strnbrk(sp,sl,sstr)) != np) {
+		        cint tl = intconv(tp - sp) ;
+		        rl = sfshrink(sp,tl,&rp) ;
+		        sl -= intconv((tp + 1) - sp) ;
+		        sp = (tp + 1) ;
+		    } else {
+		        rl = sfshrink(sp,sl,&rp) ;
+		        sp += sl ;
+		        sl = 0 ;
+	            } /* end if */
+	        } /* end while */
+	        *rpp = (rl > 0) ? rp : nullptr ;
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (sif::spbrk) */
+} /* end method (sif::spbrk) */
 
 int sif::chr(cchar **rpp) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rl = SR_NOTFOUND ;	/* <- indicate not-found */
 	cchar		*rp = nullptr ;
 	if (sp && sch && rpp) ylikely {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
-		rp = sp ;
-		rl = intconv(tp - sp) ;
-		sl -= intconv((tp + 1) - sp) ;
-		sp = (tp + 1) ;
-	    } else {
-		rp = sp ;
-		rl = sl ;
-		sp += sl ;
-		sl = 0 ;
-	    }
-	    *rpp = (rl > 0) ? rp : nullptr ;
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != np) {
+		    rp = sp ;
+		    rl = intconv(tp - sp) ;
+		    sl -= intconv((tp + 1) - sp) ;
+		    sp = (tp + 1) ;
+	        } else {
+		    rp = sp ;
+		    rl = sl ;
+		    sp += sl ;
+		    sl = 0 ;
+	        } /* end if */
+	        *rpp = (rl > 0) ? rp : nullptr ;
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (sif::chr) */
+} /* end method (sif::chr) */
 
 int sif::brk(cchar **rpp) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	int		rl = SR_NOTFOUND ;	/* <- indicate not-found */
+	int		rl = SR_NOTFOUND ; /* return-value */
 	cchar		*rp = nullptr ;
 	if (sp && sstr && rpp) ylikely {
 	    rs = SR_OK ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (cchar *tp ; (tp = strnbrk(sp,sl,sstr)) != nullptr) {
-		rp = sp ;
-		rl = intconv(tp - sp) ;
-		sl -= intconv((tp + 1) - sp) ;
-		sp = (tp + 1) ;
-	    } else {
-		rp = sp ;
-		rl = sl ;
-		sp += sl ;
-		sl = 0 ;
-	    }
-	    *rpp = (rl > 0) ? rp : nullptr ;
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        if (cchar *tp ; (tp = strnbrk(sp,sl,sstr)) != np) {
+		    rp = sp ;
+		    rl = intconv(tp - sp) ;
+		    sl -= intconv((tp + 1) - sp) ;
+		    sp = (tp + 1) ;
+	        } else {
+		    rp = sp ;
+		    rl = sl ;
+		    sp += sl ;
+		    sl = 0 ;
+	        } /* end if */
+	        *rpp = (rl > 0) ? rp : nullptr ;
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (sif::brk) */
+} /* end method (sif::brk) */
 
 
 /* local subroutines */
 
 sif_co::operator bool () noex {
+	cnullptr	np{} ;
 	bool		f = false ;
 	if (op) ylikely {
-	    cnullptr	np{} ;
-	    cint	ch = mkchar(op->sp[0]) ;
-	    switch (w) {
+	    switch (cint ch = mkchar(op->sp[0]) ; w) {
 	    case sifmem_iswhitechr:
-	        f = CHAR_ISWHITE(ch) && (ch != op->sch) ;
+	        f = ISW(ch) && (ch != op->sch) ;
 	        break ;
 	    case sifmem_iswhitestr:
-	        f = CHAR_ISWHITE(ch) && (strchr(op->sstr,ch) == np) ;
+	        f = ISW(ch) && (strchr(op->sstr,ch) == np) ;
 	        break ;
 	    case sifmem_isspanchr:
-	        f = (! CHAR_ISWHITE(ch)) && (ch != op->sch) ;
+	        f = (! ISW(ch)) && (ch != op->sch) ;
 	        break ;
 	    case sifmem_isspanstr:
-	        f = (! CHAR_ISWHITE(ch)) && (strchr(op->sstr,ch) == np) ;
+	        f = (! ISW(ch)) && (strchr(op->sstr,ch) == np) ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end method (sif_co::operator) */
+} /* end method (sif_co::operator) */
 
 
