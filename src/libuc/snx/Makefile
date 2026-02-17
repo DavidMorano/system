@@ -1,4 +1,4 @@
-# MAKEFILES (snx)
+# MAKEFILE (snx)
 
 T= snx
 
