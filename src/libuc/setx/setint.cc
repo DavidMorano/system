@@ -36,7 +36,8 @@
 #include	<functional>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<unordered_set>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"setint.h"
