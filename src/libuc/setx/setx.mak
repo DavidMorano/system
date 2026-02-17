@@ -1,4 +1,4 @@
-# MAKEFILES (setx)
+# MAKEFILE (setx)
 
 T= setx
 
@@ -41,8 +41,8 @@ LIBS +=
 
 
 OBJ0= setint.o setoint.o
-OBJ1= setstr.o setstr_ext.o
-OBJ2= setostr.o setostr_ext.o
+OBJ1= setstr_prime.o setstr_ext.o
+OBJ2= setostr_prime.o setostr_ext.o
 OBJ3= sethand.o
 
 OBJ4= retstat.o 
@@ -59,7 +59,6 @@ OBJ= obja.o objb.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -158,14 +157,12 @@ retstat.o:		retstat.ccm				$(INCS)
 	makemodule retstat
 
 # set-strings
-setstr.o:		setstr.cc setstr.h			$(INCS)
-setstr_ext.o:		setstr_ext.cc	setstrx.hh		$(INCS)
-setstr_loadfile.o:	setstr_loadfile.cc setstr.h		$(INCS)
+setstr_prime.o:		setstr_prime.cc		setstr.h		$(INCS)
+setstr_ext.o:		setstr_ext.cc		setstrx.hh		$(INCS)
 
 # set-ordered-strings
-setostr.o:		setostr.cc	setostr.h		$(INCS)
-setostr_ext.o:		setostr_ext.cc	setstrx.hh		$(INCS)
-setostr_loadfile.o:	setostr_loadfile.cc setostr.h		$(INCS)
+setostr_rime.o:		setostr_prime.cc	setostr.h		$(INCS)
+setostr_ext.o:		setostr_ext.cc		setstrx.hh		$(INCS)
 
 setint.o:		setint.cc setint.h			$(INCS)
 
