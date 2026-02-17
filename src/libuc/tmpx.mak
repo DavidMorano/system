@@ -1,4 +1,4 @@
-# MAKEFILES (tmpx)
+# MAKEFILE (tmpx)
 
 T= tmpx
 
@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= tmpx_main.o tmpx_obj.o
+OBJ0= tmpx_prime.o tmpx_obj.o
 OBJ1= tmpx_getboottime.o
 OBJ2= tmpx_getrunlevel.o
 OBJ3= tmpx_getuserlines.o tmpx_getuserterms.o
@@ -153,7 +153,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-tmpx_main.o:		tmpx_main.cc		$(INCS)
+tmpx_prime.o:		tmpx_prime.cc		$(INCS)
 tmpx_getboottime.o:	tmpx_getboottime.cc	$(INCS)
 tmpx_getrunlevel.o:	tmpx_getrunlevel.cc	$(INCS)
 tmpx_getuserlines.o:	tmpx_getuserlines.cc	$(INCS)
