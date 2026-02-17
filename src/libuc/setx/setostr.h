@@ -21,25 +21,24 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	SETOSTR_MAGIC	0x97351229
 #define	SETOSTR		struct setostr_head
 #define	SETOSTR_CUR	struct setostr_cursor
+#define	SETOSTR_MAGIC	0x97351229
 
+
+constexpr uint		setostr_magicval = SETOSTR_MAGIC ;
 
 struct setostr_cursor {
 	void		*itp ;
-} ;
+} ; /* end struct */
 
 struct setostr_head {
 	void		*setp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef SETOSTR_CUR	setostr_cur ;
 
@@ -50,8 +49,16 @@ enum setostrmems {
 	setostrmem_count,
 	setostrmem_finish,
 	setostrmem_overlast
-} ;
+} ; /* end enum */
 struct setostr ;
+struct setostr_ma {
+        setostr	*op = nullptr ;
+        void operator () (setostr *p,int) noex {
+            op = p ;
+        } ;
+        template<typename ... Args> int operator () (Args ... ) noex ;
+        operator int () noex ;
+} ; /* end struct (setostr_ma) */
 struct setostr_co {
 	setostr		*op = nullptr ;
 	int		w = -1 ;
@@ -69,25 +76,27 @@ struct setostr : setostr_head {
 	setostr_co	delall ;
 	setostr_co	count ;
 	setostr_co	finish ;
+	setostr_ma	magic ;
 	setostr() noex {
-	    start(this,setostrmem_start) ;
-	    delall(this,setostrmem_delall) ;
-	    count(this,setostrmem_count) ;
-	    finish(this,setostrmem_finish) ;
-	    magic = 0 ;
-	} ;
+	    start	(this,setostrmem_start) ;
+	    delall	(this,setostrmem_delall) ;
+	    count	(this,setostrmem_count) ;
+	    finish	(this,setostrmem_finish) ;
+	    magic	(this,0) ;
+	    magval = 0 ;
+	} ; /* end ctor */
 	setostr(const setostr &) = delete ;
 	setostr &operator = (const setostr &) = delete ;
-	int already(cchar *,int = -1) noex ;
-	int add(cchar *,int = -1) noex ;
-	int del(cchar *,int = -1) noex ;
-	int curbegin(setostr_cur *) noex ;
-	int curenum(setostr_cur *,cchar **) noex ;
-	int curend(setostr_cur *) noex ;
+	int already	(cchar *,int = -1) noex ;
+	int add		(cchar *,int = -1) noex ;
+	int del		(cchar *,int = -1) noex ;
+	int curbegin	(setostr_cur *) noex ;
+	int curenum	(setostr_cur *,cchar **) noex ;
+	int curend	(setostr_cur *) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct setostr() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (setostr) */
 #else	/* __cplusplus */
@@ -114,20 +123,18 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-template<typename ... Args>
-inline int setostr_magic(setostr *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == SETOSTR_MAGIC) {
-		rs = SR_BUGCHECK ;
-		if (op->setp != nullptr) {
-		    rs = SR_OK ;
-		}
-	    }
-	}
-	return rs ;
-}
+template<typename ... Args> 
+int setostr_ma::operator () (Args ... args) noex {
+        int             rs = SR_FAULT ;
+        if ((... && args)) {
+            rs = (op->magval == setostr_magicval) ? SR_OK : SR_NOTOPEN ;
+        }
+        return rs ;
+} /* end method (setostr_ma::operator) */
+
+inline setostr_ma::operator int () noex {
+        return (op->magval == setostr_magicval) ? SR_OK : SR_NOTOPEN ;
+} /* end method (setostr_ma::operator) */
 
 #endif /* __cplusplus */
 
