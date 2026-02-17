@@ -1,4 +1,4 @@
-# MAKEFILES (strdcpy)
+# MAKEFILE (strdcpy)
 
 T= strdcpy
 
