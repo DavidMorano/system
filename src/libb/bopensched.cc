@@ -64,7 +64,7 @@
 #include	<vecstr.h>
 #include	<outbuf.h>
 #include	<permx.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrkeycmp.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
