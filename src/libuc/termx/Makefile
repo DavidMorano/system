@@ -1,4 +1,4 @@
-# MAKEFILES (termx)
+# MAKEFILE (termx)
 
 T= termx
 
