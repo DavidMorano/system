@@ -17,6 +17,7 @@
 
 #ifndef	SNTMTIME_INCLUDE
 #define	SNTMTIME_INCLUDE
+#ifdef	__cplusplus /* C++ only */
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -30,11 +31,12 @@
 
 EXTERNC_begin
 
-extern int sntmtime(char *,int,tmtime *,cchar *) noex ;
+extern int	sntmtime(char *,int,tmtime *,cchar *) noex ;
 
 EXTERNC_end
 
 
+#endif /* __cplusplus (C++ only) */
 #endif /* SNTMTIME_INCLUDE */
 
 
