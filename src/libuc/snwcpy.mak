@@ -1,4 +1,4 @@
-# MAKEFILES (snwcpy)
+# MAKEFILE (snwcpy)
 
 T= snwcpy
 
