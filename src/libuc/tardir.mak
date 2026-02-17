@@ -1,4 +1,4 @@
-# MAKEFILES (tardir)
+# MAKEFILE (tardir)
 
 T= tardir
 
@@ -40,10 +40,26 @@ MODS +=
 LIBS +=
 
 
+OBJPART0= tardir-prime.o
+OBJPART1= tardir-vecent.o
+OBJPART2=
+OBJPART3=
+
+OBJPART= objpart0.o objpart1.o
+
+OBJ0= tardir0.o 
+OBJ1= tardir1.o tardir2.o
+OBJ2=
+OBJ3=
+
+OBJA= obj0.o obj1.o
+
+OBJ= obja.o
+
+
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -56,15 +72,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= tardir0.o tardir1.o
-OBJ1=
-
-OBJA= obj0.o
-
-OBJ= obja.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -77,6 +85,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -94,8 +105,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+$(T).o:			$(OBJ) objpart.o
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ) objpart.o
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -111,41 +122,47 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
-
-obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
-
-obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
-
-obj6.o:			$(OBJ6)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6)
-
-obj7.o:			$(OBJ7)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-tardir0.o:		tardir.ccm		$(INCS)
+objpart0.o:		$(OBJPART0) 
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart1.o:		$(OBJPART1) 
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+tardir-prime.o:		tardir-prime.ccm		$(INCS)
+tardir-vecent.o:	tardir-vecent.ccm		$(INCS)
+
+tardir0.o:		tardir.ccm objpart.o		$(INCS)
 	makemodule tardir
 
-tardir1.o:		tardir1.cc tardir.ccm	$(INCS)
+tardir1.o:		tardir1.cc tardir0.o		$(INCS)
+	makemodule tardir
+	$(COMPILE.cc) $<
+
+tardir2.o:		tardir2.cc tardir0.o		$(INCS)
 	makemodule tardir
 	$(COMPILE.cc) $<
 
