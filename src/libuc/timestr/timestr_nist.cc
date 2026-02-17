@@ -44,6 +44,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
+#include	<ucsysmisc.h>
 #include	<uctimeconv.h>
 #include	<estrings.h>
 #include	<snx.h>
@@ -100,8 +101,8 @@ char *timestr_nist(time_t t,nistinfo *nip,char *tbuf) noex {
 	        TM	tsz, *tszp = &tsz ;
 	        TM	tsl, *tslp = &tsl ;
 	        if (t == 0) t = time(nullptr) ;
-	        if ((rs = uc_gmtime(&t,tszp)) >= 0) {
-	            if ((rs = uc_localtime(&t,tslp)) >= 0) {
+	        if ((rs = uc_timegm(&t,tszp)) >= 0) {
+	            if ((rs = uc_timelocal(&t,tslp)) >= 0) {
 	                cint	y = tszp->tm_year ;
 	                cint	m = tszp->tm_mon ;
 	                cint	d = tszp->tm_mday ;
@@ -140,8 +141,8 @@ char *timestr_nist(time_t t,nistinfo *nip,char *tbuf) noex {
 	                        adv_int,adv_fra,
 	                        nip->org) ;
 	                } /* end if (getmjd) */
-	            } /* end if (uc_getlocaltime) */
-	        } /* end if (uc_gmtime) */
+	            } /* end if (uc_timelocal) */
+	        } /* end if (uc_timegm) */
 	    } /* end if (valid) */
 	    if (rs < 0) tbuf[0] = '\0' ;
 	} /* end if (non-null) */
