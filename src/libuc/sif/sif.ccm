@@ -29,7 +29,7 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#pragma		GCC dependency	"mod/chrset.ccm"
+#pragma		GCC dependency		"mod/chrset.ccm"
 
 export module sif ;
 
@@ -62,9 +62,9 @@ export {
 	chrset		sset ;
 	cchar		*sp ;
 	cchar		*sstr ;
-	int		sl ;
+	int		µsl ;
 	int		sch ;
-	sif(cc *p,int l,cc *ss,int c = 0) noex : sp(p), sl(l), sch(c) { 
+	sif(cc *p,int l,cc *ss,int c = 0) noex : sp(p), µsl(l), sch(c) { 
 	    iswhitechr	(this,sifmem_iswhitechr) ;
 	    iswhitestr	(this,sifmem_iswhitestr) ;
 	    isspanchr	(this,sifmem_isspanchr) ;
@@ -77,13 +77,13 @@ export {
 	    }
 	} ; /* end ctor */
 	sif(cchar *p,int l = -1,int c = 0) noex : sif(p,l,nullptr,c) { } ;
-	int next(cchar **) noex ;
-	int nextchr(cchar **) noex ;
-	int nextbrk(cchar **) noex ;
-	int spchr(cchar **) noex ;
-	int spbrk(cchar **) noex ;
-	int chr(cchar **) noex ;
-	int brk(cchar **) noex ;
+	int next	(cchar **) noex ;
+	int nextchr	(cchar **) noex ;
+	int nextbrk	(cchar **) noex ;
+	int spchr	(cchar **) noex ;
+	int spbrk	(cchar **) noex ;
+	int chr		(cchar **) noex ;
+	int brk		(cchar **) noex ;
 	int operator () (cchar **) noex ;
     } ; /* end struct (sif) */
 } /* end export */
