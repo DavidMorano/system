@@ -37,7 +37,7 @@ enum timestrstypes {
 	timestrtype_logz,	/* "logz" format */
 	timestrtype_gmlogz,	/* "logz" format for GMT */
 	timestrtype_overlast
-} ;
+} ; /* end enum (timestrstypes) */
 
 
 EXTERNC_begin
