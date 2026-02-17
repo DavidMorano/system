@@ -1,0 +1,11 @@
+GETPWLOGNAME
+
+This subroutine retrieves (tries to retrieve) the "logname" of the
+current proces.  It uses a search algorithm:
+
++ LOGNAME environment variable
++ the UTMP entry (if there is one)
++ USERNAME environment variable
++ USER 
++ the process real UID
+
