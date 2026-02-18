@@ -41,6 +41,18 @@
 	==0		no header match
 	<0		error (system-return)
 
+	Notes:
+	1. Reminder that header-key names MUST start in column
+	zero ('0') with no leading white-space characters (at all).
+	Historically, white-space WAS allowed AFTER the header-key
+	name and before the colon (':') character.
+
+	See-also:
+	hmatch(3pcs)
+	mheader(3pcs)
+	headkeymat(3mailmsg)
+	mailmsgmathdr(3mailmsg)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -53,8 +65,14 @@
 
 #include	"hmatch.h"
 
+#pragma		GCC dependency		"mod/pcsutil.ccm"
+
+import pcsutil ;			/* |hdrmatbasic(3pcs)| */
 
 /* local defines */
+
+#define	ISWH(ch)	CHAR_ISBLANK(ch)
+#define	TOUC(ch)	CHAR_TOUC(ch)
 
 
 /* local namespaces */
@@ -85,37 +103,36 @@
 
 int hmatch(cchar *header,cchar *str) noex {
     	int		rs = SR_FAULT ;
-	int		rc = 0 ; /* return-value */
+	int		idx = 0 ; /* return-value */
 	if (header && str) {
-	    cchar	*hp = header ;
-	    cchar	*sp = str ;
-	    bool	fmat = false ;
 	    rs = SR_OK ;
-	    while (CHAR_ISWHT(*sp)) {
-		sp += 1 ;
-	    }
-	    while (*sp && *hp && (*sp != ':') && (! CHAR_ISWHT(*sp))) {
-	        fmat = (CHAR_TOLC(*sp) == CHAR_TOLC(*hp)) ;
-	        if (! fmat) break ;
-	        sp += 1 ;
-	        hp += 1 ;
-	    } /* end while */
-	    if (fmat) {
-		fmat = (hp[0] == '\0') ; /* all of header-key matched */
-	    }
-	    if (fmat) {
-	        while (CHAR_ISWHT(*sp)) {
-		    sp += 1 ;
+	    if (hdrmatbasic(header,str)) {
+	        cchar	*hp = header ;
+	        cchar	*sp = str ;
+	        bool	fmat = false ;
+	        while (*sp && *hp && (*sp != ':') && (! ISWH(*sp))) {
+	            fmat = (TOUC(*sp) == TOUC(*hp)) ;
+	            if (! fmat) break ;
+	            sp += 1 ;
+	            hp += 1 ;
+	        } /* end while */
+	        if (fmat) {
+		    fmat = (hp[0] == '\0') ; /* all of header-key matched */
 	        }
-	        if (*sp++ == ':')  {
-	            while (CHAR_ISWHT(*sp)) {
-			sp += 1 ;
-		    }
-	            rc = intconv(sp - str) ;
-	        } /* end if (have colon) */
-	    } /* end if */
+	        if (fmat) {
+	            while (ISWH(*sp)) {
+		        sp += 1 ;
+	            }
+	            if (*sp++ == ':')  {
+	                while (ISWH(*sp)) {
+			    sp += 1 ;
+		        }
+	                idx = intconv(sp - str) ;
+	            } /* end if (have colon) */
+	        } /* end if */
+	    } /* end if (isbasic) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? rc : rs ;
+	return (rs >= 0) ? idx : rs ;
 }
 /* end subroutine (hmatch) */
 
