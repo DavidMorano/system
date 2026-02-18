@@ -20,7 +20,7 @@
 #define	ARTLIST_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/timeb.h>
 #include	<clanguage.h>
@@ -39,7 +39,7 @@ struct artlist_head {
 	dater		*datep ;
 	vechand		*artp ;
 	TIMEB		now ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct artlist_entry {
@@ -55,7 +55,7 @@ struct artlist_entry {
 	time_t		atime ;		/* arrival time (envelope if any) */
 	time_t		ptime ;		/* posting time (if any) */
 	time_t		ctime ;		/* compose time (if any) */
-	uint		magic ;
+	uint		magval ;
 	int		lines ;		/* lines in article body (if known) */
 	int		clen ;		/* article body (if known) */
 } ; /* end struct */
