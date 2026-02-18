@@ -148,7 +148,7 @@ template<typename ... Args>
 local inline int artlist_magic(artlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == ARTLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == ARTLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (artlist_magic) */
@@ -198,7 +198,7 @@ int artlist_start(AL *op,TIMEB *nowp,cchar *zname) noex {
 		cint	vn = 20 ;
 	        cint	vo = vechandm.sorted ;
 	        if ((rs = artp->start(vn,vo)) >= 0) {
-	            op->magic = ARTLIST_MAGIC ;
+	            op->magval = ARTLIST_MAGIC ;
 	        }
 	        if (rs < 0) {
 	            datep->finish() ;
@@ -245,7 +245,7 @@ int artlist_finish(AL *op) noex {
 		rs1 = artlist_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -368,7 +368,7 @@ local int entry_start(AL_ENT *ep,dater *dp,cc *ngdir,cc *name) noex {
 	                if (cchar *cp ; (rs = mem.strw(name,-1,&cp)) >= 0) {
 	                    ep->name = cp ;
 	                    if ((rs = entry_load(ep,dp,name)) >= 0) {
-	                        ep->magic = ARTLIST_CURMAGIC ;
+	                        ep->magval = ARTLIST_CURMAGIC ;
 	                    }
 	                    if (rs < 0) {
 	                        void *vp = voidp(ep->name) ;
