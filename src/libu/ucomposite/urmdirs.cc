@@ -58,6 +58,7 @@
 #include	<usupport.h>		/* |hasnotdots(3u)| */
 #include	<posixdirent.hh>
 #include	<localmisc.h>
+#include	<dprintf.h>		/* debugging */
 
 #include	"urmdirs.h"
 
@@ -68,12 +69,6 @@ import ulibvals ;			/* |max{x}| */
 
 /* local defines */
 
-#define DPRINTF(FMT, ...) 						\
-    if_constexpr (f_debug) {						\
-      fprintf(stderr,"%s: ",__func__) ;					\
-      fprintf(stderr,FMT __VA_OPT__(,) __VA_ARGS__) ;			\
-    }
-
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
 #endif
@@ -83,7 +78,7 @@ import ulibvals ;			/* |max{x}| */
 
 using libu::hasnotdots ;		/* subroutine */
 
-using libu::um ;			/* variable */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -163,7 +158,7 @@ mgr::operator int () noex {
 	DPRINTF("ent sz=%d\n",sz) ;
 	plen = var.maxpath ;
 	nlen = var.maxname ;
-	if (char *a ; (rs = um.mall(sz,&a)) >= 0) {
+	if (char *a ; (rs = umem.mall(sz,&a)) >= 0) {
 	    pbuf = (a + 0) ;
 	    nbuf = (a + (plen + 1)) ;
 	    if ((rs = mknpath(pbuf,plen,tardname)) >= 0) {
@@ -172,7 +167,7 @@ mgr::operator int () noex {
 		c = rs ;
 	        DPRINTF("remover() rs=%d\n",rs) ;
 	    }
-	    rs1 = um.free(a) ;
+	    rs1 = umem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
