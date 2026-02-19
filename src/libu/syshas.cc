@@ -21,13 +21,14 @@
 
 	constexpr syshas_mgr::syshas_mgr() noexcept {
                 shadow		= SYSHAS_SHADOW ;
+                userattr	= SYSHAS_USERATTR ;
                 project		= SYSHAS_PROJECT ;
+                task		= SYSHAS_TASK ;
                 statvfs		= SYSHAS_STATVFS ;
                 poll		= SYSHAS_POLL ;
                 streams		= SYSHAS_STREAMS ;
                 timer		= SYSHAS_TIMER ;
                 acl		= SYSHAS_ACL ;
-                userattr	= SYSHAS_USERATTR ;
                 secdb		= SYSHAS_SECDB ;
                 setenv		= SYSHAS_SETENV ;
                 unsetenv	= SYSHAS_UNSETENV ;
@@ -40,7 +41,6 @@
                 typedirentt	= SYSHAS_TYPEDIRENT ;
                 typesigt	= SYSHAS_TYPESIGT ;
                 typein6addrt	= SYSHAS_TYPEIN6ADDRT ;
-                task		= SYSHAS_TASK ;
                 utmpx		= SYSHAS_UTMPX ;
                 utmpname	= SYSHAS_UTMPNAME ;
                 utmpxname	= SYSHAS_UTMPXNAME ;
@@ -78,6 +78,7 @@
                 localtimer	= SYSHAS_LOCALTIMER ;
                 gmtimer		= SYSHAS_GMTIMER ;
                 ttynamer	= SYSHAS_TTYNAMER ;
+                ptsnamer	= SYSHAS_PTSNAMER ;
                 openpt		= SYSHAS_OPENPT ;
                 ptmx		= SYSHAS_PTMX ;
                 pshm		= SYSHAS_PSHM ;
@@ -97,19 +98,21 @@
                 sigwaitinfo	= SYSHAS_SIGWAITINFO ;
                 pthreadsigsend	= SYSHAS_PTHREADSIGSEND ;
                 ucontext	= SYSHAS_UCONTEXT ;
-                getcontext	= SYSHAS_GETCONTEXT ;
                 reltimedwait	= SYSHAS_RELTIMEDWAIT ;
                 memcntl		= SYSHAS_MEMCNTL ;
+                meminherit	= SYSHAS_MEMINHERIT ;
                 memplock	= SYSHAS_MEMPLOCK ;
+                getcontext	= SYSHAS_GETCONTEXT ;
                 gethrtime	= SYSHAS_GETHRTIME ;
                 getrandom	= SYSHAS_GETRANDOM ;
+                getexecname	= SYSHAS_GETEXECNAME ;
                 mkdirp		= SYSHAS_MKDIRP ;
                 stime		= SYSHAS_STIME ;
                 resolvepath	= SYSHAS_RESOLVEPATH ;
                 waitid		= SYSHAS_WAITID ;
                 pipes		= SYSHAS_PIPES ;
-                getexecname	= SYSHAS_GETEXECNAME ;
                 libproc		= SYSHAS_LIBPROC ;
+		eaccess		= SYSHAS_EACCESS ;
 	} /* end ctor (syshas_mgr::syshas_mgr) */
 
 constexpr syshas_mgr		syshas ;
