@@ -40,25 +40,40 @@ MODS += libutil.ccm
 LIBS +=
 
 
-DEPMODS += 
+DEPS += 
 
 OBJ00= libutil0.o libutil1.o
 OBJ01=
-OBJ02= 
-OBJ03= 
+OBJ02=
+OBJ03=
+
+OBJPART00= libutil-strlen.o libutil-strxspn.o
+OBJPART01= libutil-cvtconst.o libutil-getlen.o 
+OBJPART02= libutil-lenstr.o libutil-lenstrarr.o
+OBJPART03= libutil-loadstrs.o libutil-memclear.o
+OBJPART04= libutil-memcopy.o libutil-memcpy.o
+OBJPART05= libutil-resumelife.o libutil-stpcpy.o
+OBJPART06= libutil-strcopy.o libutil-strcpy.o
+OBJPART07= 
+
+OBJPARTA= objpart00.o objpart01.o 
+OBJPARTB= objpart02.o objpart03.o 
+OBJPARTC= objpart04.o objpart05.o 
+OBJPARTD= objpart06.o
+
+OBJPART= objparta.o objpartb.o objpartc.o objpartd.o
 
 OBJA= obj00.o
-OBJB= 
+OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= 
 OBJD= 
 
-OBJ= obja.o 
+OBJ= obja.o
 
 
 INCDIRS=
 
 LIBDIRS=
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -104,8 +119,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ) Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+$(T).o:			$(OBJ) objpart.o Makefile
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) objpart.o
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -124,27 +139,87 @@ control:
 	(uname -n ; date) > Control
 
 
+objpart00.o:		$(OBJPART00)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart01.o:		$(OBJPART01)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart02.o:		$(OBJPART02)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart03.o:		$(OBJPART03)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart04.o:		$(OBJPART04)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart05.o:		$(OBJPART05)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart06.o:		$(OBJPART06)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart07.o:		$(OBJPART07)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+objparta.o:		$(OBJPARTA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpartb.o:		$(OBJPARTB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpartc.o:		$(OBJPARTC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpartd.o:		$(OBJPARTD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obj00.o:		$(OBJ00)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ00)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj01.o:		$(OBJ01)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ01)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj02.o:		$(OBJ02)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ02)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj03.o:		$(OBJ03)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ03)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj0.o:			$(OBJ04)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj05.o:		$(OBJ05)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj06.o:		$(OBJ06)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj07.o:		$(OBJ07)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc.o:			$(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-libutil0.o:		libutil.ccm $(DEPMODS) 
+libutil0.o:		libutil.ccm objpart.o
 	makemodule libutil
 
 libutil1.o:		libutil1.cc libutil.ccm
@@ -174,5 +249,20 @@ libutil6.o:		libutil6.cc libutil.ccm
 libutil7.o:		libutil7.cc libutil.ccm
 	makemodule libutil
 	$(COMPILE.cc) $<
+
+libutil-cvtconst.o:	libutil-cvtconst.ccm			$(INCS)
+libutil-getlen.o:	libutil-getlen.ccm			$(INCS)
+libutil-lenstr.o:	libutil-lenstr.ccm			$(INCS)
+libutil-lenstrarr.o:	libutil-lenstrarr.ccm			$(INCS)
+libutil-loadstrs.o:	libutil-loadstrs.ccm			$(INCS)
+libutil-memclear.o:	libutil-memclear.ccm			$(INCS)
+libutil-memcopy.o:	libutil-memcopy.ccm			$(INCS)
+libutil-memcpy.o:	libutil-memcpy.ccm			$(INCS)
+libutil-resumelife.o:	libutil-resumelife.ccm			$(INCS)
+libutil-stpcpy.o:	libutil-stpcpy.ccm			$(INCS)
+libutil-strcopy.o:	libutil-strcopy.ccm			$(INCS)
+libutil-strcpy.o:	libutil-strcpy.ccm			$(INCS)
+libutil-strlen.o:	libutil-strlen.ccm			$(INCS)
+libutil-strxspn.o:	libutil-strxspn.ccm			$(INCS)
 
 
