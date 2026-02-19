@@ -37,9 +37,7 @@
 #include	<stddef.h>		/* |nullptr_t| */
 #include	<stdlib.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 
 
 enum sysconfcmds {
