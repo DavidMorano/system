@@ -1,4 +1,4 @@
-# MAKEFILES (syscontain)
+# MAKEFILE (syscontain)
 
 T= syscontain
 
