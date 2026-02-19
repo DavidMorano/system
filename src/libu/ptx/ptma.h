@@ -56,22 +56,22 @@ struct ptma : pthread_mutexattr_t {
 	ptma_co		settype ;
 	uint		magic ;
 	constexpr ptma() noex {
-	    create(this,ptmamem_create) ;
-	    destroy(this,ptmamem_destroy) ;
+	    create	(this,ptmamem_create) ;
+	    destroy	(this,ptmamem_destroy) ;
 	    setprioceiling(this,ptmamem_setprioceiling) ;
-	    setprotocol(this,ptmamem_setprotocol) ;
-	    setpshared(this,ptmamem_setpshared) ;
-	    setrobustnp(this,ptmamem_setrobustnp) ;
-	    settype(this,ptmamem_settype) ;
+	    setprotocol	(this,ptmamem_setprotocol) ;
+	    setpshared	(this,ptmamem_setpshared) ;
+	    setrobustnp	(this,ptmamem_setrobustnp) ;
+	    settype	(this,ptmamem_settype) ;
 	    magic = 0 ;
 	} ; /* end ctor */
 	ptma(const ptma &) = delete ;
 	ptma &operator = (const ptma &) = delete ;
-	int	getprioceiling(int *) noex ;
-	int	getprotocol(int *) noex ;
-	int	getpshared(int *) noex ;
-	int	getrobustnp(int *) noex ;
-	int	gettype(int *) noex ;
+	int getprioceiling(int *) noex ;
+	int getprotocol	(int *) noex ;
+	int getpshared	(int *) noex ;
+	int getrobustnp	(int *) noex ;
+	int gettype	(int *) noex ;
 	void dtor() noex ;
 	destruct ptma() {
 	    if (magic) dtor() ;
