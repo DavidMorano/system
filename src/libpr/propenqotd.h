@@ -1,4 +1,4 @@
-/* maintqotd HEADER */
+/* prmaintqotd HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,25 +15,22 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	MAINTQOTD_INCLUDE
-#define	MAINTQOTD_INCLUDE
+#ifndef	PRMAINTQOTD_INCLUDE
+#define	PRMAINTQOTD_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
 
-extern int maintqotd(cchar *,int,int,int) noex ;
+extern int	prmaintqotd(cchar *,int,int,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* MAINTQOTD_INCLUDE */
+#endif /* PRMAINTQOTD_INCLUDE */
 
 
