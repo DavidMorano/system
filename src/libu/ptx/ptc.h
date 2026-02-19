@@ -36,6 +36,7 @@
 
 
 #ifdef	__cplusplus
+constexpr uint          ptc_magicval = PTC_MAGIC ;
 enum ptcmems {
 	ptcmem_destroy,
 	ptcmem_broadcast,
@@ -53,6 +54,14 @@ struct ptc_creater {
 	} ;
 	int operator () (ptca * = nullptr) noex ;
 } ; /* end struct (ptc_creater) */
+struct ptc_ma {
+        ptc		*op = nullptr ;
+        void operator () (ptc *p,int) noex {
+            op = p ;
+        } ;
+        template<typename ... Args> int operator () (Args ... ) noex ;
+        operator int () noex ;
+} ; /* end struct (ptc_ma) */
 struct ptc_co {
         ptc             *op = nullptr ;
         int             w = -1 ;
@@ -70,22 +79,24 @@ struct ptc : pthread_cond_t {
 	ptc_co		destroy ;
 	ptc_co		broadcast ;
 	ptc_co		signal ;
-	uint		magic ;
+	ptc_ma		magic ;
+	uint		magval ;
 	constexpr ptc() noex {
-	    create.init(this) ;
-	    destroy(this,ptcmem_destroy) ;
-	    broadcast(this,ptcmem_broadcast) ;
-	    signal(this,ptcmem_signal) ;
-	    magic = 0 ;
+	    create.init	(this) ;
+	    destroy	(this,ptcmem_destroy) ;
+	    broadcast	(this,ptcmem_broadcast) ;
+	    signal	(this,ptcmem_signal) ;
+	    magic	(this,0) ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	ptc(const ptc &) = delete ;
 	ptc &operator = (const ptc &) = delete ;
-	int wait(ptm *,int = -1) noex ;
-	int waiter(ptm *,CTIMESPEC *) noex ;
+	int wait	(ptm *,int = -1) noex ;
+	int waiter	(ptm *,CTIMESPEC *) noex ;
 	int reltimedwaitnp(ptm *,CTIMESPEC *) noex ;
 	void dtor() noex ;
 	destruct ptc() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ; /* end dtor (ptc) */
 } ; /* end class (ptc) */
 #else
