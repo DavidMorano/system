@@ -1,4 +1,4 @@
-/* mkchar HEADER */
+/* mkchar HEADER (LIBU) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
