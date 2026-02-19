@@ -17,21 +17,43 @@ module ;
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<usysrets.h>
 
 export module libutil:memclear ;
 
 int memclearer(void *,int) noex ;
 
 export {
+    inline int memclear(void *objp,int sz) noex {
+	int	rs = SR_FAULT ;
+	if (objp) {
+	    rs = SR_INVALID ;
+	    if (sz >= 0) {
+	        rs = SR_OK ;
+	        if (sz > 0) {
+		    rs = memclearer(objp,sz) ;
+	        }
+	    }
+	} /* end if (non-null) */
+    	return rs ;
+    }
     template<typename T> inline int memclear(T *objp,int sz) noex {
-	if (sz < 0) {
-    	    sz = szof(T) ;
-	}
-    	return memclearer(objp,sz) ;
+	int	rs = SR_FAULT ;
+	if (objp) {
+	    if (sz < 0) {
+    	        sz = szof(T) ;
+	    }
+	    rs = memclearer(objp,sz) ;
+	} /* end if (non-null) */
+    	return rs ;
     }
     template<typename T> inline int memclear(T *objp) noex {
-	cint	sz = szof(T) ;
-	return memclearer(objp,sz) ;
+	int	rs = SR_FAULT ;
+	if (objp) {
+	    cint sz = szof(T) ;
+	    rs = memclearer(objp,sz) ;
+	} /* end if (non-null) */
+	return rs ;
     }
 } /* end export */
 
