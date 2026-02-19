@@ -27,10 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-/* STAT start */
-#if	(!defined(SYSHAS_STAT)) || (SYSHAS_STAT == 0)
-
 #include	<cerrno>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
@@ -42,10 +38,20 @@
 #include	"usys_stat.h"
 
 
+/* STAT start */
+#if	defined(SYSHAS_COMMENT) && (SYSHAS_COMMENT > 0)
+    
+    
+/* good to go! */
+
+
+#else /* defined(SYSHAS_COMMENT) && (SYSHAS_COMMENT > 0) */
+
+
 /* nothing needed at the moment */
 
 
-#endif /* (!defined(SYSHAS_STAT)) || (SYSHAS_STAT == 0) */
+#endif /* defined(SYSHAS_COMMENT) && (SYSHAS_COMMENT > 0) */
 /* STAT end */
 
 
