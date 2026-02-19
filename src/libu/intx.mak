@@ -1,4 +1,4 @@
-# MAKEFILES (intx)
+# MAKEFILE (intx)
 
 T= intx
 
