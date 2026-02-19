@@ -39,6 +39,7 @@
 
 #include	<usys_typedefs.h>	/* should be ordered first */
 
+/* geneal particular OS decisions */
 #include	<usys_xxx.h>
 #include	<usys_sunos.h>
 #include	<usys_darwin.h>
@@ -72,6 +73,7 @@
 #include	<usys_libstr.h>
 #include	<usys_isaexec.h>
 #include	<usys_fdatasync.h>
+#include	<usys_eaccess.h>
 
 
 #endif /* USYS_INCLUDE */
