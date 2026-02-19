@@ -1,4 +1,4 @@
-# MAKEFILES (ucomposite)
+# MAKEFILE (ucomposite)
 
 T= ucomposite
 
@@ -33,19 +33,19 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += ucomposite.h
+INCS += ucomposite.h uids.hh
 
 MODS +=
 
 LIBS +=
 
 
-OBJ00= ucopy.o ulinkfile.o
-OBJ01=
-OBJ02=
-OBJ02=
+OBJ00= uids.o
+OBJ01= uperm.o
+OBJ02= ucopy.o ulinkfile.o
+OBJ03= umkdirs.o urmdirs.o
 
-OBJA= obj00.o
+OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB=
 
 OBJ= obja.o
@@ -54,7 +54,6 @@ OBJ= obja.o
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -136,7 +135,11 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+uids.o:			uids.cc		uids.hh		$(INCS)
+
 ucopy.o:		ucopy.cc	ucopy.h		$(INCS)
 ulinkfile.o:		ulinkfile.cc	ulinkfile.h	$(INCS)
-
+uperm.o:		uperm.cc	uperm.h		$(INCS)
+umkdirs.o:		umkdirs.cc	umkdirs.h	$(INCS)
+urmdirs.o:		urmdirs.cc	urmdirs.h	$(INCS)
 
