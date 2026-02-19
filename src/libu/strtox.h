@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 2005-10-02, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2005 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRTOX_INCLUDE
 #define	STRTOX_INCLUDE
