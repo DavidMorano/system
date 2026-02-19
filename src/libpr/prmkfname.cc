@@ -8,12 +8,46 @@
 
 /* revision history:
 
-	- 2008-10-01, David A­D­ Morano
-	This object module was originally written.
+	= 1989-03-01, David A­D­ Morano
+	This subroutine was originally written.  
+
+	= 1998-06-01, David A­D­ Morano
+	I enhanced the program a little to print out some other
+	information.
+
+	= 1999-03-01, David A­D­ Morano
+	I enhanced the program a little to to do something (I forget
+	what).
+
+	= 2004-01-10, David A­D­ Morano
+	The KSH program switched to using a fakey "large file"
+	(64-bit fake-out mode) compilation mode on Solaris.  This
+	required some checking to see if any references to |u_stat(3u)|
+	had to be updated to work with the new KSH.  Although we
+	call |u_stat(3u)| here, its structure is not passed to other
+	subroutines expecting the regular 32-bit structure.
+
+	= 2005-04-20, David A­D­ Morano
+	I changed the program so that the configuration file is
+	consulted even if the program is not run in daemon-mode.
+	Previously, the configuration file was only consulted when
+	run in daemon-mode.  The thinking was that running the
+	program in regular (non-daemon) mode should be quick.  The
+	problem is that the MS file had to be guessed without the
+	aid of consulting the configuration file.  Although not a
+	problem in most practice, it was not aesthetically appealing.
+	It meant that if the administrator changed the MS file in
+	the configuration file, it also had to be changed by
+	specifying it explicitly at invocation in non-daemon-mode
+	of the program.  This is the source of some confusion (which
+	the world really doesn't need).  So now the configuration
+	is always consulted.  The single one-time invocation is
+	still fast enough for the non-smoker aged under 40! :-)
 
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1989,1998,1999,2004,2005 David A­D­ Morano.  */
+/* All rights reserved. */
 
 /*******************************************************************************
 
@@ -45,10 +79,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<estrings.h>
 #include	<mkpathx.h>
 #include	<mkfnamesuf.h>
@@ -57,24 +95,13 @@
 
 #include	"prmkfname.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
-
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME	"TMPDIR"
-#endif
-
-#ifndef	TMPDNAME
-#define	TMPDNAME	"/tmp"
-#endif
-
-#ifndef	TMPVARDNAME
-#define	TMPVARDNAME	"/var/tmp"
-#endif
-
-#ifndef	VCNAME
-#define	VCNAME		"var"
-#endif
 
 
 /* imported namespaces */
@@ -102,9 +129,8 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*tbuf{} ;
 	if (pr && fname) {
-	    if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 		cint	tlen = rs ;
 	        cchar	*sp ;
 	        if ((f_def && (ebuf[0] == '\0')) || (strcmp(ebuf,"+") == 0)) {
@@ -152,7 +178,7 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 			len = rs ;
 	            }
 	        } /* end if */
-	        rs1 = uc_free(tbuf) ;
+	        rs1 = lm_free(tbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
