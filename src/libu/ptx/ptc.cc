@@ -53,14 +53,17 @@
 
 /* forward references */
 
-template<typename ... Args>
-local inline int ptc_magic(ptc *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == PTC_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (ptc_magic) */
+template<typename ... Args> int ptc_ma::operator () (Args ... args) noex {
+        int             rs = SR_FAULT ;
+        if ((... && args)) {
+            rs = (op->magval == ptc_magicval) ? SR_OK : SR_NOTOPEN ;
+        }
+        return rs ;
+} /* end method (ptc_ma::operator) */
+
+inline ptc_ma::operator int () noex {
+        return (op->magval == ptc_magicval) ? SR_OK : SR_NOTOPEN ;
+} /* end method (ptc_ma::operator) */
 
 local sysret_t std_ptcinit(ptc *op,ptca *ap) noex {
     	int		rs ;
@@ -246,7 +249,7 @@ int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 
 int ptc::wait(ptm *mxp,int to) noex {
 	int		rs ;
-	if ((rs = ptc_magic(this)) >= 0) ylikely {
+	if ((rs = magic) >= 0) ylikely {
 	    rs = ptc_waiting(this,mxp,to) ;
 	} /* end if (magic) */
 	return rs ;
@@ -254,7 +257,7 @@ int ptc::wait(ptm *mxp,int to) noex {
 
 int ptc::waiter(ptm *mxp,CTIMESPEC *tsp) noex {
 	int		rs ;
-	if ((rs = ptc_magic(this)) >= 0) ylikely {
+	if ((rs = magic) >= 0) ylikely {
 	    rs = ptc_waiter(this,mxp,tsp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -262,7 +265,7 @@ int ptc::waiter(ptm *mxp,CTIMESPEC *tsp) noex {
 
 int ptc::reltimedwaitnp(ptm *mxp,CTIMESPEC *tsp) noex {
 	int		rs ;
-	if ((rs = ptc_magic(this)) >= 0) ylikely {
+	if ((rs = magic) >= 0) ylikely {
 	    rs = ptc_reltimedwaitnp(this,mxp,tsp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -277,27 +280,29 @@ void ptc::dtor() noex {
 int ptc_creater::operator () (ptca *ap) noex {
     	int		rs ;
 	if ((rs = ptc_create(op,ap)) >= 0) ylikely {
-	    op->magic = PTC_MAGIC ;
+	    op->magval = PTC_MAGIC ;
 	}
 	return rs ;
 } /* end method (ptc_creater::operator) */
 
 int ptc_co::operator () (int) noex {
-	int		rs ;
-	if ((rs = ptc_magic(op)) >= 0) ylikely {
-	    switch (w) {
-	    case ptcmem_destroy:
-	        rs = ptc_destroy(op) ;
-		op->magic = 0 ;
-	        break ;
-	    case ptcmem_broadcast:
-	        rs = ptc_broadcast(op) ;
-	        break ;
-	    case ptcmem_signal:
-	        rs = ptc_signal(op) ;
-	        break ;
-	    } /* end switch */
-	} /* end if (magic) */
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    if ((rs = op->magic) >= 0) ylikely {
+	        switch (w) {
+	        case ptcmem_destroy:
+	            rs = ptc_destroy(op) ;
+		    op->magval = 0 ;
+	            break ;
+	        case ptcmem_broadcast:
+	            rs = ptc_broadcast(op) ;
+	            break ;
+	        case ptcmem_signal:
+	            rs = ptc_signal(op) ;
+	            break ;
+	        } /* end switch */
+	    } /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end method (ptc_co::operator) */
 
