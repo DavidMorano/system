@@ -1,5 +1,5 @@
 /* sfdirname SUPPORT */
-/* charset=ISO8859-1 */
+/* encoding=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the directory part out of a file name path */
@@ -37,6 +37,7 @@
 	Returns:
 	>0	length of found string
 	==0	not found (no dir-name)
+	<0	error (fault)
 
 
 	Examples:
@@ -64,12 +65,13 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 #include	<localmisc.h>
 
-#include	"sfx.h"
+#include	"sfxname.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -100,29 +102,28 @@ import libutil ;
 
 /* exported subroutines */
 
-int sfdirname(cchar *sp,int sl,cchar **rpp) noex {
-	int		rs = SR_FAULT ;
-	if (sp) ylikely {
+int sfdirname(cchar *sp,int µsl,cchar **rpp) noex {
+	int		rl = -1 ;
+	cchar		*rp = nullptr ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
 	    int		i ; /* used-afterwards */
-	    if (sl < 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && (sp[sl - 1] == '/'))  {
 	        sl -= 1 ;
 	    }
 	    for (i = sl ; i > 0 ; i -= 1) {
 	        if (sp[i - 1] == '/') break ;
 	    }
-	    if (rpp) {
-	        *rpp = sp ;
-	    }
+	    rp = sp ;
 	    if (i == 1) {
-	        rs = 1 ;
+	        rl = 1 ;
 	    } else if (i <= 0) {
-	        rs = 0 ;
+	        rl = 0 ;
 	    } else {
-	        rs = (i - 1) ;
+	        rl = (i - 1) ;
 	    }
-	} /* end if (non-null) */
-	return rs ;
+	} /* end if (getlenstr) */
+	if (rpp) *rpp = rp ;
+	return rl ;
 }
 /* end subroutine (sfdirname) */
 

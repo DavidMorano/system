@@ -56,7 +56,7 @@ OBJ10_USYS= usys_usendfile.o usys_ufstype.o usys_libstr.o
 OBJ11_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 
 OBJ12_USYS= usys_shadow.o usys_isaexec.o usys_fdatasync.o
-OBJ13_USYS=
+OBJ13_USYS= usys_eaccess.o usys_stat.o
 OBJ14_USYS=
 OBJ15_USYS=
 
@@ -64,7 +64,7 @@ OBJA= obj00_usys.o obj01_usys.o obj02_usys.o
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
 OBJC= obj06_usys.o obj07_usys.o obj08_usys.o
 OBJD= obj09_usys.o obj10_usys.o obj11_usys.o 
-OBJE= obj12_usys.o
+OBJE= obj12_usys.o obj13_usys.o
 
 OBJ_USYS= obja.o objb.o objc.o objd.o obje.o
 
@@ -72,7 +72,6 @@ OBJ_USYS= obja.o objb.o objc.o objd.o obje.o
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -247,6 +246,7 @@ usys_libstr.o:		usys_libstr.cc usys_libstr.h			$(INCS)
 usys_getexecname.o:	usys_getexecname.cc getexecname.h		$(INCS)
 usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
 usys_isaexec.o:		usys_isaexec.cc		usys_isaexec.h		$(INCS)
-usys_datasync.o:	usys_fdatasync.cc	usys_fdatasync.h	$(INCS)
+usys_fatasync.o:	usys_fdatasync.cc	usys_fdatasync.h	$(INCS)
+usys_eaccess.o:		usys_eaccess.cc		usys_eaccess.h		$(INCS)
 
 
