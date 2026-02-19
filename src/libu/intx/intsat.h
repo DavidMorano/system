@@ -31,48 +31,38 @@
 
 EXTERNC_begin
 
-static inline int intsati(int v) noex {
+static inline int intsati(cint v) noex {
 	return v ;
 }
 
-extern int intsatl(long) noex ;
-extern int intsato(off_t) noex ;
-extern int intsatll(longlong) noex ;
+extern int intsatl(clong) noex ;
+extern int intsatll(clonglong) noex ;
 
-extern int intsatui(uint) noex ;
-extern int intsatul(ulong) noex ;
-extern int intsats(size_t) noex ;
-extern int intsatull(ulonglong) noex ;
+extern int intsatui(cuint) noex ;
+extern int intsatul(culong) noex ;
+extern int intsatull(culonglong) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int intsat(int v) noex {
+static inline int intsat(cint v) noex {
 	return intsati(v) ;
 }
-static inline int intsat(long v) noex {
+static inline int intsat(clong v) noex {
 	return intsatl(v) ;
 }
-static inline int intsat(off_t v) noex {
-	return intsato(v) ;
-}
-static inline int intsat(longlong v) noex {
+static inline int intsat(clonglong v) noex {
 	return intsatll(v) ;
 }
 
-static inline int intsat(uint v) noex {
+static inline int intsat(cuint v) noex {
 	return intsatui(v) ;
 }
-static inline int intsat(ulong v) noex {
+static inline int intsat(culong v) noex {
 	return intsatul(v) ;
 }
-#ifdef	COMMENT /* GCC says that this is an alias of |ulong| */
-static inline int intsat(size_t v) noex {
-	return intsats(v) ;
-}
-#endif /* COMMENT */
-static inline int intsat(ulonglong v) noex {
+static inline int intsat(culonglong v) noex {
 	return intsatull(v) ;
 }
 
