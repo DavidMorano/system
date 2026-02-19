@@ -47,13 +47,14 @@ struct syswords {
 	static const char w_manpath[] ;
 	static const char w_incpath[] ;
 	static const char w_infopath[] ;
-	static const char w_users[] ;
-	static const char w_help[] ;
+	static const char w_etc[] ;
 	static const char w_lib[] ;
-	static const char w_share[] ;
-	static const char w_main[] ;
-	static const char w_info[] ;
+	static const char w_man[] ;
 	static const char w_var[] ;
+	static const char w_share[] ;
+	static const char w_info[] ;
+	static const char w_help[] ;
+	static const char w_users[] ;
 	static const char w_bindir[] ;
 	static const char w_sbindir[] ;
 	static const char w_usrdir[] ;
@@ -68,17 +69,18 @@ struct syswords {
 	static const char w_devstderr[] ;
 	static const char w_devstdlog[] ;
 	static const char w_devnull[] ;
+	static const char w_devzero[] ;
 	static const char w_devrandom[] ;
 	static const char w_maildir[] ;
 	static const char w_vartmpdir[] ;
 	static const char w_usrlocaldir[] ;
+	static const char w_usrextradir[] ;
 	static const char w_blanks[] ;
 	static const char w_defprovider[] ;
 	static const char w_localhost[] ;
+	static const char w_mailhost[]	;
+	static const char w_loghost[] ;
 } ; /* end struct (syswords) */
-
-
-extern const syswords	sysword ;
 
 
 #endif /* __cplusplus (C++ only) */
