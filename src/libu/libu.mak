@@ -36,7 +36,7 @@ DEFS +=
 INCS += libu.h
 
 MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
-MODS += libutil.ccm chrset.ccm
+MODS += libutil.ccm chrset.ccm bitgrp.ccm
 MODS += digtab.ccm xxtostr.ccm 
 MODS += usigsets.o usigblock.ccm umisc.ccm
 MODS += unixfnames.ccm constdiv.ccm builtin.ccm
@@ -56,21 +56,21 @@ OBJ06= uconstants.o usupport.o
 OBJ07= umem.o usigsets.o usigblock.o umisc.o
 
 OBJ08= usys.o usyscallbase.o usysutility.o 
-OBJ09= uregfork.o uatfork.o ufdlock.o 
+OBJ09= uregfork.o uatfork.o uopen.o 
 OBJ10= usig.o uexec.o uipc.o 
 OBJ11= ustr.o uobjlock.o ureserve.o
 
 OBJ12= usysflag.o usysdata.o usysauxinfo.o 
 OBJ13= ufileop.o ufiledesc.o 
 OBJ14= um.o uprocess.o
-OBJ15= usysop.o vecbool.o
+OBJ15= usysop.o vecbool.o uchartype.o
 
 OBJ16= syswords.o varnames.o
 OBJ17= ptx.o uacceptpass.o 
 OBJ18= timeval.o itimerval.o
 OBJ19= timespec.o itimerspec.o
 
-OBJ20= uinet.o
+OBJ20= uinet.o bitgrp.o
 OBJ21= strnul.o intx.o chrset.o
 OBJ22= ugetloadavg.o uiconv.o
 OBJ23= syscontain.o stdfnames.o
@@ -291,8 +291,9 @@ objg.o:			$(OBJG)
 
 # SUPPORT
 syshas.o:		syshas.cc	syshas.h		$(INCS)
-timewatch.o:		timewatch.cc timewatch.hh		$(INCS)
-aflag.o:		aflag.cc aflag.hh			$(INCS)
+timewatch.o:		timewatch.cc	timewatch.hh		$(INCS)
+timecount.o:		timecount.cc	timecount.hh		$(INCS)
+aflag.o:		aflag.cc	aflag.hh		$(INCS)
 errtimer.o:		errtimer.cc errtimer.hh			$(INCS)
 timeval.o:		timeval.cc timeval.h			$(INCS)
 itimerval.o:		itimerval.cc itimerval.h		$(INCS)
@@ -305,12 +306,13 @@ utimeouts.o:		utimeouts.cc utimeouts.h		$(INCS)
 usyscallbase.o:		usyscallbase.cc usyscallbase.hh		$(INCS)
 usysutility.o:		usysutility.cc usysutility.hh		$(INCS)
 usysdata.o:		usysdata.cc usysdata.h			$(INCS)
-uacceptpass.o:		uacceptpass.cc ufdlock.h		$(INCS)
+uacceptpass.o:		uacceptpass.cc uopen.h		$(INCS)
 
 # requires USYSBASIC
+uatfork.o:		umods.o usigblock.o
 uatfork.o:		uatfork.cc uatfork.h umods.o		$(INCS)
-uobjlock.o:		umods.o uobjlock.cc uobjlock.cc		$(INCS)
 uregfork.o:		umods.o uregfork.cc uregfork.hh		$(INCS)
+uobjlock.o:		umods.o uobjlock.cc uobjlock.cc		$(INCS)
 uprocess.o:		umods.o uprocess.cc uprocess.h		$(INCS)
 
 # UCONSTANTS
@@ -329,8 +331,8 @@ ustd.dir:
 	makesubdir $@
 
 # UFDLOCK
-ufdlock.o:		ufdlock.dir
-ufdlock.dir:
+uopen.o:		uopen.dir
+uopen.dir:
 	makesubdir $@
 
 # UFILEDESC
@@ -435,7 +437,9 @@ usigsets.dir:
 
 usigblock.o:		usigblock.ccm			$(INCS)
 
-chrset.o:		chrset.ccm
+# misc-objects
+chrset.o:		chrset.ccm			$(INCS)
+bitgrp.o:		bitgrp.ccm			$(INCS)
 
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
@@ -448,12 +452,12 @@ uexec.o:		uexec.cc uexec.h		$(INCS)
 uinet.o:		uinet.cc uinet.h		$(INCS)
 uiconv.o:		uiconv.cc uiconv.h		$(INCS)
 ufcntl.o:		ufcntl.cc			$(INCS)
+uchartype.o:		uchartype.cc	uchartype.h	${INCS}
 
 syswords.o:		syswords.cc syswords.hh		$(INCS)
 varnames.o:		varnames.cc varnames.hh		$(INCS)
 endian.o:		endian.cc endian.h		$(INCS)
 
-timecount.o:		timecount.cc timecount.hh	$(INCS)
 
 strtox.o:		strtox.cc strtox.h		$(INCS)
 
