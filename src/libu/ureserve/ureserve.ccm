@@ -49,5 +49,6 @@ export import :vecstr ;
 export import :charx ;
 export import :isnot ;
 export import :isx ;
+export import :sfx ;
 
 
