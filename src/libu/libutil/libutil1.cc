@@ -38,6 +38,7 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>		/* |va_list(3c)| */
+#include	<cstring>		/* |memset(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -75,6 +76,21 @@ module libutil ;
 
 
 /* exported subroutines */
+
+int memclearer(void *op,int sz) noex {
+    	int	rs = SR_FAULT ;
+    	if (op) {
+	    rs = SR_INVALID ;
+	    if (sz >= 0) {
+		rs = sz ;
+	        if (sz > 0) {
+    	            csize osize = size_t(sz) ;
+    	            memset(op,0,osize) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (memclearer) */
 
     int loadstrs(cc **strs,int n,...) noex {
     	va_list		ap ;
