@@ -48,9 +48,9 @@ struct ptca : pthread_condattr_t {
 	ptca_co		setpshared ;
 	uint		magic ;
 	constexpr ptca() noex {
-	    create(this,ptcamem_create) ;
-	    destroy(this,ptcamem_destroy) ;
-	    setpshared(this,ptcamem_setpshared) ;
+	    create	(this,ptcamem_create) ;
+	    destroy	(this,ptcamem_destroy) ;
+	    setpshared	(this,ptcamem_setpshared) ;
 	    magic = 0 ;
 	} ; /* end struct */
 	ptca(const ptca &) = delete ;
