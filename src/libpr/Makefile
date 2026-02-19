@@ -2,7 +2,7 @@
 
 T= libpr
 
-ALL= $(T).o $(T).a
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -40,18 +40,19 @@ MODS +=
 LIBS +=
 
 
-OBJ0_LIBPR= prgetprogpath.o prgetclustername.o
-OBJ1_LIBPR= prmktmpdir.o prmkfname.o
+OBJ0= prgetclustername.o prgetprogpath.o
+OBJ1= prmkfname.o prmktmpdir.o
+OBJ2=
+OBJ3=
 
-OBJA_LIBPR= obj0_libpr.o obj1_libpr.o
+OBJA= obj0.o obj1.o
 
-OBJ_LIBPR= $(OBJA_LIBPR)
+OBJ= $(OBJA)
 
 
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -67,7 +68,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 .SUFFIXES:		.hh .ii .iim .ccm
 
 
-default:		$(T).a
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -97,10 +98,10 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_LIBPR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBPR)
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).a:			$(OBJ_LIBPR)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).o
@@ -121,23 +122,26 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_libpr.o:	$(OBJ0_LIBPR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_LIBPR)
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_libpr.o:	$(OBJ1_LIBPR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_LIBPR)
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_libpr.o:	$(OBJ2_LIBPR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_LIBPR)
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_libpr.o:	$(OBJ3_LIBPR)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_LIBPR)
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-prgetprogpath.o:	prgetprogpath.cc prgetprogpath.h	$(INCS)
-prgetclustername.o:	prgetclustername.cc prgetclustername.h	#(INCS)
-prmktmpdir.o:		prmktmpdir.cc prmktmpdir.h		$(INCS)
-prmkfname.o:		prmkfname.cc prmkfname.h		$(INCS)
-propenqotd.o:		propenqotd.cc propenqotd.h		$(INCS)
+prgetclustername.o:	prgetclustername.cc	prgetclustername.h	$(INCS)
+prgetprogpath.o:	prgetprogpath.cc	prgetprogpath.h		$(INCS)
+prmkfname.o:		prmkfname.cc		prmkfname.h		$(INCS)
+prmktmpdir.o:		prmktmpdir.cc		prmktmpdir.h		$(INCS)
+
+propenqotd.o:		propenqotd.dir				$(INCS)
+propenqotd.dir:
+	makesubdir $@
 
 
