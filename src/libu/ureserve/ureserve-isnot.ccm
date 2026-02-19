@@ -57,14 +57,35 @@ export {
 } /* end export */
 
 export {
-    bool isNotPresent(int) noex ;
-    bool isNotAccess(int) noex ;
-    bool isNotValid(int) noex ;
-    bool isNotLib(int) noex ;
-    bool isNotTerm(int) noex ;
-    bool isNotSupport(int) noex ;
-    inline bool isInvalid(int rs) noex {
-	return isNotValid(rs) ;
+    bool isnotaccess(int) noex ;
+    bool isnotlib(int) noex ;
+    bool isnotpresent(int) noex ;
+    bool isnotsupport(int) noex ;
+    bool isnotterm(int) noex ;
+    bool isnotvalid(int) noex ;
+}
+
+export {
+    inline bool isNotAccess(int rc) noex {
+        return isnotaccess(rc) ;
+    }
+    inline bool isNotLib(int rc) noex {
+        return isnotlib(rc) ;
+    }
+    inline bool isNotPresent(int rc) noex {
+	return isnotpresent(rc) ;
+    }
+    inline bool isNotSupport(int rc) noex {
+    	return isnotsupport(rc) ;
+    }
+    inline bool isNotTerm(int rc) noex {
+    	return isnotterm(rc) ;
+    }
+    inline bool isNotValid(int rc) noex {
+    	return isnotvalid(rc) ;
+    }
+    inline bool isInvalid(int rc) noex {
+    	return isnotvalid(rc) ;
     }
 } /* end export */
 
