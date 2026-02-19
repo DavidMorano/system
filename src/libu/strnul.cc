@@ -43,7 +43,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using libu::strwcpy ;			/* subroutine */
 using std::nothrow ;			/* constant */
 
