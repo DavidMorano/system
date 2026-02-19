@@ -74,10 +74,10 @@ struct ptm : pthread_mutex_t {
 	ptm_co		lockend ;
 	uint		magic ;
 	constexpr ptm() noex {
-	    create(this,ptmmem_create) ;
-	    destroy(this,ptmmem_destroy) ;
-	    lockbegin(this,ptmmem_lockbegin) ;
-	    lockend(this,ptmmem_lockend) ;
+	    create	(this,ptmmem_create) ;
+	    destroy	(this,ptmmem_destroy) ;
+	    lockbegin	(this,ptmmem_lockbegin) ;
+	    lockend	(this,ptmmem_lockend) ;
 	    magic = 0 ;
 	} ; /* end ctor */
 	ptm(const ptm &) = delete ;
