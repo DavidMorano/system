@@ -52,16 +52,17 @@
 #include	<usysrets.h>
 #include	<usysflag.h>
 #include	<usupport.h>
+#include	<ufileop.h>		/* |u_pathconf(3u)| */
 #include	<umem.hh>
-#include	<uclibsubs.h>		/* LIBUC */
 #include	<errtimer.hh>
-#include	<getbufsize.h>
 #include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"posixdirent.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 import ulibvals ;
 
 /* local defines */
@@ -78,7 +79,7 @@ import ulibvals ;
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libu::snwcpy ;			/* subroutine */
-using libu::umem ;			/* variable */
+using libu::um ;			/* variable */
 
 
 /* local typedefs */
@@ -95,16 +96,6 @@ using libu::umem ;			/* variable */
 
 /* forward references */
 
-template<typename ... Args>
-static inline int posixdirent_magic(posixdirent *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == POSIXDIRENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (posixdirent_magic) */
-
 
 /* local variables */
 
@@ -120,14 +111,14 @@ constexpr bool		f_readdirr = F_READDIRR ;
 
 int posixdirent::open(cchar *fn) noex {
 	int		rs = SR_FAULT ;
-	if (fn) {
+	if (fn) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0]) {
-		if ((rs = maxnamelen) >= 0) {
-	            if ((rs = bufbegin(fn)) >= 0) {
+	    if (fn[0]) ylikely {
+		if ((rs = maxnamelen) >= 0) ylikely {
+	            if ((rs = bufbegin(fn)) >= 0) ylikely {
 	                fname = fn ;
 	                if ((rs = callout(&posixdirent::diropen)) >= 0) {
-			    magic = POSIXDIRENT_MAGIC ;
+			    magval = POSIXDIRENT_MAGIC ;
 			}
 			if (rs < 0) {
 			    bufend() ;
@@ -143,7 +134,7 @@ int posixdirent::open(cchar *fn) noex {
 int posixdirent::iclose() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = posixdirent_magic(this)) >= 0) {
+	if ((rs = magic) >= 0) ylikely {
 	    if (dirp) {
 	        rs1 = callout(&posixdirent::dirclose) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -152,7 +143,7 @@ int posixdirent::iclose() noex {
 	        rs1 = bufend() ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    magic = 0 ;
+	    magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -160,9 +151,9 @@ int posixdirent::iclose() noex {
 
 int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
 	int		rs ;
-	if ((rs = posixdirent_magic(this,ep,dbuf)) >= 0) {
+	if ((rs = magic(ep,dbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dlen > 0) {
+	    if (dlen > 0) ylikely {
 		dep = ep ;
 	        nbuf = dbuf ;
 	        nlen = dlen ;
@@ -175,7 +166,7 @@ int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
 
 int posixdirent::itell(off_t *offp) noex {
     	int		rs ;
-	if ((rs = posixdirent_magic(this)) >= 0) {
+	if ((rs = magic) >= 0) ylikely {
 	    sop = offp ;
 	    rs = callout(&posixdirent::dirtell) ;
 	} /* end if (magic) */
@@ -185,7 +176,7 @@ int posixdirent::itell(off_t *offp) noex {
 
 int posixdirent::seek(off_t o) noex {
     	int		rs ;
-	if ((rs = posixdirent_magic(this)) >= 0) {
+	if ((rs = magic) >= 0) ylikely {
 	    so = o ;
 	    rs = callout(&posixdirent::dirseek) ;
 	} /* end if (magic) */
@@ -195,7 +186,7 @@ int posixdirent::seek(off_t o) noex {
 
 int posixdirent::irewind() noex {
     	int		rs ;
-	if ((rs = posixdirent_magic(this)) >= 0) {
+	if ((rs = magic) >= 0) ylikely {
 	    rs = callout(&posixdirent::dirrewind) ;
 	} /* end if (magic) */
 	return rs ;
@@ -211,7 +202,7 @@ int posixdirent::bufbegin(cchar *fn) noex {
 	    cint	req = _PC_NAME_MAX ;
 	    if ((rs = u_pathconf(fn,req,nullptr)) >= 0) {
 	        cint	dsz = (max(maxnamelen,rs) + szof(dirent)) + 1 ;
-		if (void *vp ; (rs = umem.malloc(dsz,&vp)) >= 0) {
+		if (void *vp ; (rs = um.mall(dsz,&vp)) >= 0) {
 		    debuf = (dirent *) vp ;
 		    memclear(vp,dsz) ;
 		}
@@ -226,8 +217,8 @@ int posixdirent::bufbegin(cchar *fn) noex {
 int posixdirent::bufend() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	if (debuf) {
-	    rs1 = umem.free(debuf) ;
+	if (debuf) ylikely {
+	    rs1 = um.free(debuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    debuf = nullptr ;
 	    delen = 0 ;
@@ -277,7 +268,7 @@ int posixdirent::callout(posixdirent_m m) noex {
 int posixdirent::diropen() noex {
 	int		rs = SR_OK ;
 	errno = 0 ;
-	if (DIR *p ; (p = opendir(fname)) != nullptr) {
+	if (DIR *p ; (p = opendir(fname)) != nullptr) ylikely {
 	    dirp = p ;
 	} else {
 	    rs = (- errno) ;
@@ -303,7 +294,7 @@ int posixdirent::dirclose() noex {
 int posixdirent::dirread() noex {
     	cint		desz = szof(dirent) ;
 	int		rs = SR_NOTOPEN ;
-	if (dirp) {
+	if (dirp) ylikely {
 	    dirent *p ; /* used-multiple-times */
 	    errno = 0 ;
 	    if_constexpr (f_readdirr) {
@@ -334,14 +325,14 @@ int posixdirent::dirread() noex {
 
 int posixdirent::dirtell() noex {
 	int		rs = SR_NOTOPEN ;
-	if (dirp) {
+	if (dirp) ylikely {
 	    long	loff{} ;
 	    errno = 0 ;
   	    loff = telldir(dirp) ;
 	    if ((rs = (- errno)) >= 0) {
 	        so = off_t(loff) ;
 	        if (sop) *sop = so ;
-	        rs = intsat(so) ;
+	        rs = intsat(loff) ;	/* |off_t| is weird on Sarwin */
 	    } else {
 	        if (sop) *sop = 0z ;
 	    }
@@ -352,7 +343,7 @@ int posixdirent::dirtell() noex {
 
 int posixdirent::dirseek() noex {
     	int		rs = SR_NOTOPEN ;
-	if (dirp) {
+	if (dirp) ylikely {
 	    long	loff = long(so) ;
 	    errno = 0 ;
 	    seekdir(dirp,loff) ;
@@ -364,7 +355,7 @@ int posixdirent::dirseek() noex {
 
 int posixdirent::dirrewind() noex {
     	int		rs = SR_NOTOPEN ;
-	if (dirp) {
+	if (dirp) ylikely {
 	    errno = 0 ;
 	    rewinddir(dirp) ;
 	    rs = (- errno) ;
@@ -381,7 +372,7 @@ void posixdirent::dtor() noex {
 
 int posixdirent_te::operator () (off_t *offp) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case posixdirentmem_rewind:
 		rs = op->itell(offp) ;
@@ -394,7 +385,7 @@ int posixdirent_te::operator () (off_t *offp) noex {
 
 posixdirent_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case posixdirentmem_rewind:
 	        rs = op->irewind() ;
