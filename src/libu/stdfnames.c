@@ -70,6 +70,7 @@ cchar *const stdfnames[] = {
 	[stdfile_err]		= "*STDERR*",
 	[stdfile_log]		= "*STDLOG*",
 	[stdfile_null]		= "*STDNULL*",
+	[stdfile_zero]		= "*STDZERO*",
 	[stdfile_overlast]	= nullptr
 } ; /* end array (stdfnames) */
 
