@@ -1,4 +1,4 @@
-# MAKEFILES (ptx)
+# MAKEFILE (ptx)
 
 T= ptx
 
@@ -43,7 +43,7 @@ LIBS +=
 OBJ0= pta.o lockrw.o
 OBJ1= ptc.o ptca.o
 OBJ2= ptm.o ptma.o
-OBJ3= ptrwa.o ptrwlock.o
+OBJ3= ptrwlock.o ptrwa.o
 
 OBJA_UFILEDESC= obj0.o obj1.o
 OBJB_UFILEDESC= obj2.o obj3.o
