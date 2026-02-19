@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
@@ -39,6 +36,6 @@ static inline int prsetfname(cc *pr,char *fn,cc *ep,int el,int f,cc *dn,
 EXTERNC_end
 
 
-#endif /* PRMKFNAME_INCLUDE	*/
+#endif /* PRMKFNAME_INCLUDE */
 
 
