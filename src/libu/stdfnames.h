@@ -49,6 +49,10 @@
 #define	STDFNNULL	stdfnames[stdfile_null]
 #endif
 
+#ifndef	STDFNZERO
+#define	STDFNZERO	stdfnames[stdfile_zero]
+#endif
+
 
 enum stdfiles {
 	stdfile_in,
@@ -56,6 +60,7 @@ enum stdfiles {
 	stdfile_err,
 	stdfile_log,
 	stdfile_null,
+	stdfile_zero,
 	stdfile_overlast
 } ; /* end enum (stdfiles) */
 
