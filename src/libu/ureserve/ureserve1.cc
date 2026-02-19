@@ -138,38 +138,33 @@ bool isoneof(cint *a,int rs) noex {
 	    if ((f = (rs == a[i]))) break ;
 	} /* end if */
 	return f ;
-}
-/* end subroutine (isoneof) */
+} /* end subroutine (isoneof) */
 
-bool isNotPresent(int rs) noex {
-	return isOneOf(npresent,rs) ;
-}
-/* end subroutine (isNotPresent) */
-
-bool isNotAccess(int rs) noex {
+bool isnotaccess(int rs) noex {
 	int		f = false ;
-	f = f || isOneOf(naccess,rs) ;
-	f = f || isOneOf(npresent,rs) ;
+	f = f || isoneof(naccess,rs) ;
+	f = f || isoneof(npresent,rs) ;
 	return f ;
-}
-/* end subroutine (isNotAccess) */
+} /* end subroutine (isnotaccess) */
 
-bool isNotValid(int rs) noex {
-	return isOneOf(nvalid,rs) ;
-}
-/* end subroutine (isNotValid) */
-
-bool isNotLib(int rs) noex {
-	return isOneOf(nlib,rs) ;
-}
-/* end subroutine (isNotLib) */
-
-bool isNotTerm(int rs) noex {
-	return isOneOf(rnoterm,rs) ;
+bool isnotlib(int rs) noex {
+	return isoneof(nlib,rs) ;
 }
 
-bool isNotSupport(int rs) noex {
-	return isOneOf(rnosupport,rs) ;
+bool isnotpresent(int rs) noex {
+	return isoneof(npresent,rs) ;
+}
+
+bool isnotsupport(int rs) noex {
+	return isoneof(rnosupport,rs) ;
+}
+
+bool isnotterm(int rs) noex {
+	return isoneof(rnoterm,rs) ;
+}
+
+bool isnotvalid(int rs) noex {
+	return isoneof(nvalid,rs) ;
 }
 
 
