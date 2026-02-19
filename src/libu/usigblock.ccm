@@ -52,7 +52,7 @@ export {
 	usigblockmem_start,
 	usigblockmem_finish,
 	usigblockmem_overlast
-    } ;
+    } ; /* end enum */
     struct usigblock ;
     struct usigblock_co {
 	usigblock	*op = nullptr ;
@@ -69,7 +69,7 @@ export {
 export {
     struct usigblock_fl {
 	uint		open:1 ;
-    } ;
+    } ; /* end struct */
     struct usigblock {
     	friend		usigblock_co ;
 	usigblock_co	start ;
@@ -91,23 +91,22 @@ export {
 } /* end export (usigblock) */
 
     int usigblock::istart(cint *sigs) noex {
-	int		rs = SR_FAULT ;
-	    sigset_t	nsm ;
-	    rs = SR_OK ;
-	    if (sigs) {
-	        if ((rs = usigset.empty(&nsm)) >= 0) {
-	            for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
-	                rs = usigset.add(&nsm,sigs[i]) ;
-	            }
-		}
-	    } else {
-	        rs = usigset.fill(&nsm) ;
+	int		rs = SR_OK ;
+	sigset_t	nsm ;
+	if (sigs) {
+	    if ((rs = usigset.empty(&nsm)) >= 0) {
+	        for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
+	            rs = usigset.add(&nsm,sigs[i]) ;
+	        }
 	    }
-	    if (rs >= 0) {
-	        if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
-		    fl.open = true ;
-		}
-	    } /* end if */
+	} else {
+	    rs = usigset.fill(&nsm) ;
+	}
+	if (rs >= 0) {
+	    if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
+		fl.open = true ;
+	    }
+	} /* end if */
 	return rs ;
     } /* end method (usigblock::istart) */
     int usigblock::ifinish() noex {
