@@ -30,233 +30,242 @@
 /******************************************************************************/
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
-/* Solaris®: system has shadow password DB */
+/* Solaris: system has shadow password DB */
 #define	SYSHAS_SHADOW		1
 
-/* Solaris®: projects */
-#define	SYSHAS_PROJECT		1
-
-/* Solaris®: system has |statvfs(2)| call and friends */
-#define	SYSHAS_STATVFS		1
-
-/* Solaris®: system has |poll(2)| call and friends */
-#define	SYSHAS_POLL		1
-
-/* Solaris®: system has STREAMS® framework */
-#define	SYSHAS_STREAMS		1
-
-/* Solaris®: sustem has POSIX® real-time timers */
-#define	SYSHAS_TIMER		1
-
-/* Solaris®: system has ACL framework */
-#define	SYSHAS_ACL		1
-
-/* Solaris®: system has user attributes framework */
+/* Solaris: system has user attributes framework */
 #define	SYSHAS_USERATTR		1
 
-/* Solaris®: system has Security-Database framework */
+/* Solaris: projects */
+#define	SYSHAS_PROJECT		1
+
+/* Solaris: tasks */
+#define	SYSHAS_TASK		1
+
+/* Solaris: system has |statvfs(2)| call and friends */
+#define	SYSHAS_STATVFS		1
+
+/* Solaris: system has |poll(2)| call and friends */
+#define	SYSHAS_POLL		1
+
+/* Solaris: system has STREAMS® framework */
+#define	SYSHAS_STREAMS		1
+
+/* Solaris: sustem has POSIX® real-time timers */
+#define	SYSHAS_TIMER		1
+
+/* Solaris: system has ACL framework */
+#define	SYSHAS_ACL		1
+
+/* Solaris: system has Security-Database framework */
 #define	SYSHAS_SECDB		1
 
-/* Solaris®: has these two stupid environment manipulation subroutines */
+/* Solaris: has these two stupid environment manipulation subroutines */
 #define	SYSHAS_SETENV		0
 #define	SYSHAS_UNSETENV		0
 
-/* Solaris®: system information header for 'sysinfo(2)' */
+/* Solaris: system information header for 'sysinfo(2)' */
 #define	SYSHAS_SYSINFO		1
 
-/* Solaris®: system has a 'off_t' data type (assumed to be 64 bits) */
+/* Solaris: system has a 'off_t' data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		1
 
-/* Solaris®: getcwd(3c) */
+/* Solaris: getcwd(3c) */
 #define	SYSHAS_GETCWD		1
 
-/* Solaris®: AIO */
+/* Solaris: AIO */
 #define	SYSHAS_AIO		1
 
-/* Solaris®: typedefs */
+/* Solaris: typedefs */
 #define	SYSHAS_TYPEUSHORT	0
 #define	SYSHAS_TYPEUINT		0
 
-/* Solaris®: |dirent_t| */
+/* Solaris: |dirent_t| */
 #define	SYSHAS_TYPEDIRENT	1
 
-/* Solaris®: |sig_t| */
+/* Solaris: |sig_t| */
 #define	SYSHAS_TYPESIGT		0
 
-/* Solaris®: |in6_addr_t| */
+/* Solaris: |in6_addr_t| */
 #define	SYSHAS_TYPEIN6ADDRT	1
 
-/* Solaris®: tasks */
-#define	SYSHAS_TASK		1
-
-/* Solaris®: UTMPX */
+/* Solaris: UTMPX */
 #define	SYSHAS_UTMPX		1
 
-/* Solaris®: UTMP-name */
+/* Solaris: UTMP-name */
 #define	SYSHAS_UTMPNAME		1
 #define	SYSHAS_UTMPXNAME	1
 
-/* Solaris®: loadavg(3c) */
+/* Solaris: loadavg(3c) */
 #define	SYSHAS_LOADAVG		1
 #define	SYSHAS_LOADAVGINT	1
 
-/* Solaris®: readdir_r(3c) */
+/* Solaris: readdir_r(3c) */
 #define	SYSHAS_READDIRR		1
 
-/* Solaris®: getpwxxx_r(3c) */
+/* Solaris: getpwxxx_r(3c) */
 #define	SYSHAS_GETPWXXXR	1	/* any of the others (logical OR) */
 #define	SYSHAS_GETPWGNUR	0	/* has GNU (GLIBC) interface */
 #define	SYSHAS_GETPWENTR	1
 #define	SYSHAS_GETPWNAMR	1
 #define	SYSHAS_GETPWUIDR	1
 
-/* Solaris®: getspxxx_r(3c) */
+/* Solaris: getspxxx_r(3c) */
 #define	SYSHAS_GETSPXXXR	1	/* any of the others (logical OR) */
 #define	SYSHAS_GETSPGNUR	0	/* has GNU (GLIBC) interface */
 #define	SYSHAS_GETSPENTR	1
 #define	SYSHAS_GETSPNANR	1
 
-/* Solaris®: getgrxxx_r(3c) */
+/* Solaris: getgrxxx_r(3c) */
 #define	SYSHAS_GETGRXXXR	1	/* any of the others (logical OR) */
 #define	SYSHAS_GETGRGNUR	0	/* has GNU (GLIBC) interface */
 #define	SYSHAS_GETGRENTR	1
 #define	SYSHAS_GETGRNAMR	1
 #define	SYSHAS_GETGRGIDR	1
 
-/* Solaris®: getpjxxx_r(3c) */
+/* Solaris: getpjxxx_r(3c) */
 #define	SYSHAS_GETPJXXXR	1	/* any of the others (logical OR) */
 #define	SYSHAS_GETPJGNUR	0	/* has GNU (GLIBC) interface */
 #define	SYSHAS_GETPJENTR	1
 #define	SYSHAS_GETPJNAMR	1
 #define	SYSHAS_GETPJPIDR	1
 
-/* Solaris®: getprotobyxxx_r(3c) */
+/* Solaris: getprotobyxxx_r(3c) */
 #define	SYSHAS_GETPRXXXR	1
 #define	SYSHAS_GETPRGNUR	0	/* has GNU (GLIBC) interface */
 
-/* Solaris®: getnetbyxxx_r(3c) */
+/* Solaris: getnetbyxxx_r(3c) */
 #define	SYSHAS_GETNWXXXR	1
 #define	SYSHAS_GETNWGNUR	0	/* has GNU (GLIBC) interface */
 
-/* Solaris®: gethostbyxxx_r(3c) */
+/* Solaris: gethostbyxxx_r(3c) */
 #define	SYSHAS_GETHOXXXR	1
 #define	SYSHAS_GETHOGNUR	0	/* has GNU (GLIBC) interface */
 
-/* Solaris®: getservbyxxx_r(3c) */
+/* Solaris: getservbyxxx_r(3c) */
 #define	SYSHAS_GETSVXXXR	1
 #define	SYSHAS_GETSVGNUR	0	/* has GNU (GLIBC) interface */
 
-/* Solaris®: getlogin__r(3c) */
+/* Solaris: getlogin__r(3c) */
 #define	SYSHAS_GETLOGINR	1
 
-/* Solaris®: localtime_r(3c) */
+/* Solaris: localtime_r(3c) */
 #define	SYSHAS_LOCALTIMER	1
 
-/* Solaris®: gmtime_r(3c) */
+/* Solaris: gmtime_r(3c) */
 #define	SYSHAS_GMTIMER		1
 
-/* Solaris®: ttyname_r(3c) */
+/* Solaris: ttyname_r(3c) */
 #define	SYSHAS_TTYNAMER		1
 
-/* Solaris®: postix_openpt(3c) */
+/* Solaris: ptsname_r(3c) */
+#define	SYSHAS_PTSNAMER		0	/* not until Solaris version 11.1 */
+
+/* Solaris: postix_openpt(3c) */
 #define	SYSHAS_OPENPT		0
 
-/* Solaris®: ptmx(9) */
+/* Solaris: ptmx(9) */
 #define	SYSHAS_PTMX		1
 
-/* Solaris®: POSIX shared memory (|shm(3rt)|) */
+/* Solaris: POSIX shared memory (|shm(3rt)|) */
 #define	SYSHAS_PSHM		1
 
-/* Solaris®: POSIX regular semaphores (|sem(3rt)| */
+/* Solaris: POSIX regular semaphores (|sem(3rt)| */
 #define	SYSHAS_PSEM		1
 
 /* Solaris: POSIX named semaphores (|sem(3rt)|) */
 #define	SYSHAS_NSEM		1
 
-/* Solaris®: POSIX message queues (|mq(3rt)|) */
+/* Solaris: POSIX message queues (|mq(3rt)|) */
 #define	SYSHAS_PMQ		1
 
-/* Solaris®: AUDIT - part of Solaris® Basic-Security-Module (BSM) */
+/* Solaris: AUDIT - part of Solaris Basic-Security-Module (BSM) */
 #define	SYSHAS_AUDIT		1
 
-/* Solaris®: get-directory-entries (|getdents(2)|) */
+/* Solaris: get-directory-entries (|getdents(2)|) */
 #define	SYSHAS_GETDENTS		1
 
-/* Solaris®: XTI */
+/* Solaris: XTI */
 #define	SYSHAS_XTI		1
 
-/* Solaris®: robust mutexes */
+/* Solaris: robust mutexes */
 #define	SYSHAS_MUTEXROBUST	1
 
-/* Solaris®: strnlen(3c) */
+/* Solaris: strnlen(3c) */
 #define	SYSHAS_STRNLEN		1
 
-/* Solaris®: strlcpy(3c) */
+/* Solaris: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1
 
-/* Solaris®: strnstr(3c) */
+/* Solaris: strnstr(3c) */
 #define	SYSHAS_STRNSTR		1
 
-/* Solaris®: sigqueue(3c) */
+/* Solaris: sigqueue(3c) */
 #define	SYSHAS_SIGQUEUE		1
 
-/* Solaris®: sigsend(2) */
+/* Solaris: sigsend(2) */
 #define	SYSHAS_SIGSEND		1
 
-/* Solaris®: sigsendset(2) */
+/* Solaris: sigsendset(2) */
 #define	SYSHAS_SIGSENDSET	1
 
-/* Solaris®: sigwaitinfo(2) */
+/* Solaris: sigwaitinfo(2) */
 #define	SYSHAS_SIGWAITINFO	1
 
-/* Solaris®: pthread_sigsend(2) */
+/* Solaris: pthread_sigsend(2) */
 #define	SYSHAS_PTHREADSIGSEND	1
 
-/* Solaris®: ucontext */
+/* Solaris: ucontext */
 #define	SYSHAS_UCONTEXT		1
 
-/* Solaris®: getcontext(3c) */
+/* Solaris: getcontext(3c) */
 #define	SYSHAS_GETCONTEXT	1
 
-/* Solaris®: Relative-Timed-Wait feature */
+/* Solaris: Relative-Timed-Wait feature */
 #define	SYSHAS_RELTIMEDWAIT	1
 
-/* Solaris®: Memory |memcntl(2)| */
+/* Solaris: Memory |memcntl(2)| */
 #define	SYSHAS_MEMCNTL		1
 
-/* Solaris®: Memory |plock(2)| */
+/* Solaris: Memory |minherit(2)| */
+#define	SYSHAS_MEMEMINHERIT	0
+
+/* Solaris: Memory |plock(2)| */
 #define	SYSHAS_MEMPLOCK		1
 
-/* Solaris®: |gethrtime(3c)| */
+/* Solaris: |gethrtime(3c)| */
 #define	SYSHAS_GETHRTIME	1
 
-/* Solaris®: |getrandom(2)| */
+/* Solaris: |getrandom(2)| */
 #define	SYSHAS_GETRANDOM	1
 
-/* Solaris®: |mkdirp(3gen)| */
+/* Solaris: |mkdirp(3gen)| */
 #define	SYSHAS_MKDIRP		1
 
-/* Solaris®: |stime(2)| */
+/* Solaris: |stime(2)| */
 #define	SYSHAS_STIME		1
 
-/* Solaris®: |resolvepath(2)| */
-#define	SYSHAS_RESOLVEPATH	1	/* thank-you Solaris® */
+/* Solaris: |resolvepath(2)| */
+#define	SYSHAS_RESOLVEPATH	1	/* thank-you Solaris */
 
-/* Solaris®: |waitid(2)| */
+/* Solaris: |waitid(2)| */
 #define	SYSHAS_WAITID		1
 
-/* Solaris®: |pipe2(2)| */
+/* Solaris: |pipe2(2)| */
 #if	defined(OSNUM_Solaris) && (OSNUM_Solaris >= 9)
 #define	SYSHAS_PIPES		1
 #else
 #define	SYSHAS_PIPES		0
 #endif
 
-/* Solaris®: |getexecname| */
+/* Solaris: |getexecname| */
 #define	SYSHAS_GETEXECNAME	1
 
-/* Solaris®: |libproc| */
+/* Solaris: |libproc| */
 #define	SYSHAS_LIBPROC		0
+
+/* Solaris: |eaccess(2)| */
+#define	SYSHAS_EACCESS		1
 
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -264,8 +273,14 @@
 /* Darwin: system has shadow password DB */
 #define	SYSHAS_SHADOW		0
 
+/* Darwin: system has user attributes framework */
+#define	SYSHAS_USERATTR		0
+
 /* Darwin: projects */
 #define	SYSHAS_PROJECT		0
+
+/* Darwin: tasks */
+#define	SYSHAS_TASK		0
 
 /* Darwin: system has |statvfs(2)| call and friends */
 #if	defined(OSNUM_Darwin) && (OSNUM_Darwin >= 8)
@@ -289,9 +304,6 @@
 
 /* Darwin: system has ACL framework */
 #define	SYSHAS_ACL		0
-
-/* Darwin: system has user attributes framework */
-#define	SYSHAS_USERATTR		0
 
 /* Darwin: system has Security-Database framework */
 #define	SYSHAS_SECDB		0
@@ -323,14 +335,11 @@
 /* Darwin: |dirent_t| */
 #define	SYSHAS_TYPEDIRENT	0
 
-/* Darwin®: |sig_t| */
+/* Darwin: |sig_t| */
 #define	SYSHAS_TYPESIGT		1
 
-/* Darwin®: |in6_addr_t| */
+/* Darwin: |in6_addr_t| */
 #define	SYSHAS_TYPEIN6ADDRT	1
-
-/* Darwin: tasks */
-#define	SYSHAS_TASK		0
 
 /* Darwin: UTMPX */
 #if	defined(OSNUM_Darwin) && (OSNUM_Darwin >= 8)
@@ -356,8 +365,8 @@
 
 /* Darwin: getpwxxx_r(3c) */
 #define	SYSHAS_GETPWXXXR	1	/* any of the others (logical OR) */
-#define	SYSHAS_GETPWGNUR	0	/* has GNU (GLIBC) interface */
-#define	SYSHAS_GETPWENTR	0
+#define	SYSHAS_GETPWGNUR	1	/* has GNU (GLIBC) interface */
+#define	SYSHAS_GETPWENTR	0	/* <- Darwin doe *not* have */
 #define	SYSHAS_GETPWNAMR	1
 #define	SYSHAS_GETPWUIDR	1
 
@@ -369,8 +378,8 @@
 
 /* Darwin: getgrxxx_r(3c) */
 #define	SYSHAS_GETGRXXXR	1	/* any of the others (logical OR) */
-#define	SYSHAS_GETGRGNUR	0	/* has GNU (GLIBC) interface */
-#define	SYSHAS_GETGRENTR	0	
+#define	SYSHAS_GETGRGNUR	1	/* has GNU (GLIBC) interface */
+#define	SYSHAS_GETGRENTR	0	/* <- Darwin does *not* have */
 #define	SYSHAS_GETGRNAMR	1
 #define	SYSHAS_GETGRGIDR	1
 
@@ -409,6 +418,9 @@
 /* Darwin: ttyname_r(3c) */
 #define	SYSHAS_TTYNAMER		1
 
+/* Darwin: ptsname_r(3c) */
+#define	SYSHAS_PTSNAMER		1	/* YES */
+
 /* Darwin: postix_openpt(3c) */
 #define	SYSHAS_OPENPT		1
 
@@ -427,7 +439,7 @@
 /* Darwin: POSIX message queues (|mq(3rt)|) */
 #define	SYSHAS_PMQ		0
 
-/* Darwin: AUDIT - part of Solaris® Basic-Security-Module (BSM) */
+/* Darwin: AUDIT */
 #define	SYSHAS_AUDIT		0
 
 /* Darwin: get-directory-entries (|getdents(2)|) */
@@ -445,7 +457,7 @@
 /* Darwin: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1
 
-/* Darwin®: strnstr(3c) */
+/* Darwin: strnstr(3c) */
 #define	SYSHAS_STRNSTR		1
 
 /* Darwin: sigqueue(3c) */
@@ -457,7 +469,7 @@
 /* Darwin: sigsendset(2) */
 #define	SYSHAS_SIGSENDSET	0
 
-/* Darwin®: sigwaitinfo(2) */
+/* Darwin: sigwaitinfo(2) */
 #define	SYSHAS_SIGWAITINFO	0
 
 /* Darwin: pthread_sigsend(2) */
@@ -474,6 +486,9 @@
 
 /* Darwin: Memory |memcntl(2)| */
 #define	SYSHAS_MEMCNTL		0
+
+/* Darwin: Memory |minherit(2)| */
+#define	SYSHAS_MEMINHERIT	1
 
 /* Darwin: Memory |plock(2)| */
 #define	SYSHAS_MEMPLOCK		0
@@ -499,11 +514,14 @@
 /* Darwin: |pipe2(2)| */
 #define	SYSHAS_PIPES		0
 
-/* Darwin®: |getexecname| */
+/* Darwin: |getexecname| */
 #define	SYSHAS_GETEXECNAME	0
 
-/* Darwin®: |libproc| */
+/* Darwin: |libproc| */
 #define	SYSHAS_LIBPROC		1
+
+/* Darwin: |eaccess(2)| */
+#define	SYSHAS_EACCESS		0
 
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
@@ -511,8 +529,14 @@
 /* Linux: system has shadow password DB */
 #define	SYSHAS_SHADOW		1
 
+/* Linux: system has user attributes framework */
+#define	SYSHAS_USERATTR		0
+
 /* Linux: projects */
 #define	SYSHAS_PROJECT		0
+
+/* Linux: tasks */
+#define	SYSHAS_TASK		0
 
 /* Linux: system has |statvfs(2)| call and friends */
 #define	SYSHAS_STATVFS		1
@@ -528,9 +552,6 @@
 
 /* Linux: system has ACL framework */
 #define	SYSHAS_ACL		0
-
-/* Linux: system has user attributes framework */
-#define	SYSHAS_USERATTR		0
 
 /* Linux: system has Security-Database framework */
 #define	SYSHAS_SECDB		0
@@ -561,11 +582,8 @@
 /* Linux: |sig_t| */
 #define	SYSHAS_TYPESIGT		0
 
-/* Linux®: |in6_addr_t| */
+/* Linux: |in6_addr_t| */
 #define	SYSHAS_TYPEIN6ADDRT	0
-
-/* Linux: tasks */
-#define	SYSHAS_TASK		1
 
 /* Linux: UTMPX */
 #define	SYSHAS_UTMPX		1
@@ -636,6 +654,9 @@
 /* Linux: ttyname_r(3c) */
 #define	SYSHAS_TTYNAMER		1
 
+/* Linux: ptsname_r(3c) */
+#define	SYSHAS_PTSNAMER		1	/* YES */
+
 /* Linux: postix_openpt(3c) */
 #define	SYSHAS_OPENPT		0
 
@@ -672,7 +693,7 @@
 /* Linux: strlcpy(3c) */
 #define	SYSHAS_STRLCPY		1	/* finally */
 
-/* Linux®: strnstr(3c) */
+/* Linux: strnstr(3c) */
 #define	SYSHAS_STRNSTR		0
 
 /* Linux: sigqueue(3c) */
@@ -684,7 +705,7 @@
 /* Linux: sigsendset(2) */
 #define	SYSHAS_SIGSENDSET	0
 
-/* Linux®: sigwaitinfo(2) */
+/* Linux: sigwaitinfo(2) */
 #define	SYSHAS_SIGWAITINFO	1
 
 /* Linux: pthread_sigsend(2) */
@@ -700,7 +721,10 @@
 #define	SYSHAS_RELTIMEDWAIT	0
 
 /* Linux: Memory |memcntl(2)| */
-#define	SYSHAS_MEMCNTL		0
+#define	SYSHAS_MEMCNTL		1
+
+/* Linux: Memory |minherit(2)| */
+#define	SYSHAS_MEMINHERIT	0
 
 /* Linux: Memory |plock(2)| */
 #define	SYSHAS_MEMPLOCK		0
@@ -726,11 +750,14 @@
 /* Linux: |pipe2(2)| */
 #define	SYSHAS_PIPES		1
 
-/* Linux®: |getexecname| */
+/* Linux: |getexecname| */
 #define	SYSHAS_GETEXECNAME	0
 
-/* Linux®: |libproc| */
+/* Linux: |libproc| */
 #define	SYSHAS_LIBPROC		0
+
+/* Linux: |eaccess(2)| */
+#define	SYSHAS_EACCESS		1
 
 /******************************************************************************/
 #endif /* OSNAME */
@@ -741,13 +768,14 @@
 struct syshas_mgr {
     	typedef unsigned int	uint ;
         uint    shadow:1 ;
+        uint    userattr:1 ;
         uint    project:1 ;
+        uint    task:1 ;
         uint    statvfs:1 ;
         uint    poll:1 ;
         uint    streams:1 ;
         uint    timer:1 ;
         uint    acl:1 ;
-        uint    userattr:1 ;
         uint    secdb:1 ;
         uint    setenv:1 ;
         uint    unsetenv:1 ;
@@ -760,7 +788,6 @@ struct syshas_mgr {
         uint    typedirentt:1 ;
         uint    typesigt:1 ;
         uint    typein6addrt:1 ;
-        uint    task:1 ;
         uint    utmpx:1 ;
         uint    utmpname:1 ;
         uint    utmpxname:1 ;
@@ -798,6 +825,7 @@ struct syshas_mgr {
         uint    localtimer:1 ;
         uint    gmtimer:1 ;
         uint    ttynamer:1 ;
+        uint    ptsnamer:1 ;
         uint    openpt:1 ;
         uint    ptmx:1 ;
         uint    pshm:1 ;
@@ -817,19 +845,21 @@ struct syshas_mgr {
         uint    sigwaitinfo:1 ;
         uint    pthreadsigsend:1 ;
         uint    ucontext:1 ;
-        uint    getcontext:1 ;
         uint    reltimedwait:1 ;
         uint    memcntl:1 ;
+        uint    meminherit:1 ;
         uint    memplock:1 ;
+        uint    getcontext:1 ;
         uint    gethrtime:1 ;
         uint    getrandom:1 ;
+        uint    getexecname:1 ;
         uint    mkdirp:1 ;
         uint    stime:1 ;
         uint    resolvepath:1 ;
         uint    waitid:1 ;
         uint    pipes:1 ;
-        uint    getexecname:1 ;
         uint    libproc:1 ;
+	uint	eaccess:1 ;
 	constexpr syshas_mgr() noexcept ;
 } ; /* end struct (syshas_mgr) */
 
