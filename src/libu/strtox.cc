@@ -39,12 +39,23 @@
 
 /* revision history:
 
-	= 2023-05-14, David A­D­ Morano
-	I adapted this to serve the |{x}longlong| types.
+	= 2005-10-02, David A­D­ Morano
+	I adapted some existing prior code (from OpenBSD) to provide
+	the |{x}longlong| types versions.  The goal here was to
+	provide versions for 128-bit integers in the same form
+	)function signatures) as the existing UNIX-oriented
+	string-conversion subroutines (which supported smaller sized
+	integers).  But code like this (but with different function
+	signatures) was previously written in assembly language in
+	decades past.
+
+	= 2020-05-24, David A­D­ Morano
+	I added some code to make constant-expression compile-time
+	computations.
 
 */
 
-/* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2005,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -68,7 +79,7 @@
 #include	<climits>		/* |CHAR_BIT| + |strtol(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |strtol(3c)| */
-#include	<cctype>
+#include	<cctype>		/* |isalpha(3c)| + |isupper(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -123,12 +134,12 @@ struct llhelper {
 
 /* forward references */
 
-template<typename T> constexpr static inline int nbits(T) noex {
+template<typename T> constexpr local inline int nbits(T) noex {
     	return (szof(T) * CHAR_BIT) ;
 }
 
 template<typename T>
-constexpr static inline bool bit(T v,int n) noex {
+constexpr local inline bool bit(T v,int n) noex {
 	return !!((v >> n) & 1) ;
 }
 
@@ -161,7 +172,7 @@ inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 		}
 	    } /* end block */
 	} /* end if (no error so far) */
-}
+} /* end subroutine-template (strtox) */
 
 template<>
 inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
@@ -173,8 +184,8 @@ inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
 	    if (uv) {
 		errno = ERANGE ;
 	    }
-	}
-}
+	} /* end if (no-error) */
+} /* end subroutine-template (strtox) */
 
 
 /* local variables */
@@ -257,7 +268,7 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 			cutoff += 1 ;
 		}
 		cutlim = -cutlim ;
-	}
+	} /* end if (negative) */
 	for (acc = 0, vany = 0 ; ; c = (unsigned char) *s++) {
 		if (isdigit(c)) {
 			c -= '0' ;
@@ -290,7 +301,7 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 				acc *= base ;
 				acc += c ;
 			}
-		}
+		} /* end if */
 	} /* end for */
 	if (endptr != nullptr) {
 	    *endptr = (char *) (vany ? (s - 1) : nptr) ;
