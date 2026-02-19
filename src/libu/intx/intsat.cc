@@ -24,9 +24,9 @@
 	I provide some saturated add operations.
 
 	Synopsis:
+	int intsati(int v) noex
 	int intsatl(long v) noex
 	int intsatll(longlong v) noex
-	int intsato(off_t v) noex
 	int intsatui(uint v) noex
 	int intsatul(ulong v) noex
 	int intsatull(ulonglong v) noex
@@ -67,7 +67,7 @@
 /* forward references */
 
 template<typename T>
-int intsatsx(T v) noex {
+local int intsatsx(T v) noex {
 	int	r = int(v) ;
 	if (v > INT_MAX) {
 	    r = INT_MAX ;
@@ -79,7 +79,7 @@ int intsatsx(T v) noex {
 /* end subroutine-template (intsatsx) */
 
 template<typename UT>
-int intsatux(UT v) noex {
+local int intsatux(UT v) noex {
 	UT	im = UT(INT_MAX) ;
 	if (v > im) v = im ;
 	return int(v) ;
@@ -95,11 +95,6 @@ int intsatux(UT v) noex {
 int intsatl(long v) noex {
 	return intsatsx(v) ;
 }
-
-int intsato(off_t v) noex {
-	return intsatsx(v) ;
-}
-
 int intsatll(longlong v) noex {
 	return intsatsx(v) ;
 }
@@ -107,15 +102,9 @@ int intsatll(longlong v) noex {
 int intsatui(uint v) noex {
     	return intsatux(v) ;
 }
-
 int intsatul(ulong v) noex {
     	return intsatux(v) ;
 }
-
-int intsats(size_t v) noex {
-    	return intsatux(v) ;
-}
-
 int intsatull(ulonglong v) noex {
     	return intsatux(v) ;
 }
