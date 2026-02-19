@@ -51,32 +51,31 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<mkpathx.h>
 #include	<sfx.h>
 #include	<mkdirs.h>
+#include	<strlibval.hh>
 #include	<isnot.h>		/* |isNotPresent(3uc)| */
 #include	<localmisc.h>
 
 #include	"prmktmpdir.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
 #define	SI		subinfo
-
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME	"TMPDIR"
-#endif
-
-#ifndef	TMPDNAME
-#define	TMPDNAME	"/tmp"
-#endif
 
 #ifndef	TMPDMODE
 #define	TMPDMODE	S_IAMB
@@ -91,28 +90,53 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local structures */
 
-struct subinfo {
+namespace {
+    struct mker {
+	cchar		*pr ;
+	cchar		*tmpdname ;
+	cchar		*dname ;
+	char		*rbuf ;
+	cmode		dm = TMPDMODE ;
+	mode_t		ªm ;
+	mker(cc *p,char *r,cc *t,cc *d,mode_t µm) noex : pr(p) {
+	    tmpdname = t ;
+	    dname = d ;
+	    rbuf = r ;
+	    ªm = µm ;
+	} ; /* end ctor */
+	operator int () noex ;
+	int wrap	() noex ;
+	int suber	(char *,int) noex ;
+    } ; /* end struct (mker) */
+    struct subinfo {
 	cchar		*pr ;
 	uid_t		euid, puid, tuid ;
 	gid_t		egid, pgid, tgid ;
-} ;
+	mode_t		ªm ;
+	subinfo(cchar *p,mode_t µm) noex : pr(p), ªm(µm) { } ;
+	int start	() noex ;
+	int finish	() noex ;
+	int mkprtmp	(char *,cchar *) noex ;
+	int mkext	(char *,char *,cchar *) noex ;
+	int chown	(cchar *) noex ;
+	int ckmode	(cchar *,ustat *,mode_t) noex ;
+    } ; /* end struct (subinfo) */
+} /* end namespace */
 
 
 /* forward references */
 
-static int	subinfo_start(SI *,cchar *) noex ;
-static int	subinfo_finish(SI *) noex ;
-static int	subinfo_mkprtmp(SI *,char *,cchar *) noex ;
-static int	subinfo_chown(SI *,cchar *) noex ;
-static int	subinfo_ckmode(SI *,cchar *,ustat *,mode_t) noex ;
-
-static int	ensureattr(cchar *,mode_t,uid_t,gid_t) noex ;
+local int	ensureattr(cchar *,mode_t,uid_t,gid_t) noex ;
 
 
 /* local variables */
 
 constexpr uid_t		uidend = -1 ;
 constexpr gid_t		gidend = -1 ;
+
+constexpr mode_t	mmask = 07777 ;
+
+static strlibval	vtmpdir(strlibval_tmpdir) ;
 
 
 /* exported variables */
@@ -121,119 +145,116 @@ constexpr gid_t		gidend = -1 ;
 /* exported subroutines */
 
 int prmktmpdir(cchar *pr,char *rbuf,cc *tmpdname,cc *dname,mode_t m) noex {
-	subinfo		si, *sip = &si ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		len = 0 ;
-	int		f_prtmp = false ;
-	cmode		dm = TMPDMODE ;
-	char		prtmpdname[MAXPATHLEN + 1] ;
-
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (rbuf == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-	prtmpdname[0] = '\0' ;
-
-	if (tmpdname == nullptr) tmpdname = getenv(VARTMPDNAME) ;
-	if (tmpdname == nullptr) tmpdname = TMPDNAME ;
-
-	if ((rs = subinfo_start(sip,pr)) >= 0) {
-
-/* phase one */
-
-	    if ((rs = subinfo_mkprtmp(sip,prtmpdname,tmpdname)) >= 0) {
-	        f_prtmp = (rs > 0) ;
-
-/* phase two */
-
-	        if ((dname != nullptr) && (dname[0] != '\0')) {
-	            ustat	sb ;
-	            if ((rs = mkpath2(rbuf,prtmpdname,dname)) >= 0) {
-	                len = rs ;
-	                if ((rs = u_stat(rbuf,&sb)) >= 0) {
-	                    if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
-	                    if (rs >= 0) rs = subinfo_ckmode(sip,rbuf,&sb,dm) ;
-	                } else if (isNotPresent(rs)) {
-	                    if ((rs = u_mkdir(rbuf,m)) >= 0) {
-	                        uid_t	u = si.puid ;
-	                        gid_t	g = si.pgid ;
-	                        if (u == si.euid) u = uidend ;
-	                        if (g == si.egid) g = gidend ;
-	                        if ((u != uidend) || (g != gidend)) {
-	                            rs = ensureattr(rbuf,m,u,g) ;
-				}
-	                    }
-			} /* end if (stat) */
-	            } /* end if (mkpath) */
-	        } else {
-	            len = lenstr(rbuf) ;
-	 	}
-	        if ((rs >= 0) && (! f_prtmp)) {
-	            rs = subinfo_chown(sip,prtmpdname) ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ; /* return-value */
+	if (pr && rbuf) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (pr[0]) {
+		if (mker mo(pr,rbuf,tmpdname,dname,m) ; (rs = mo) >= 0) {
+		    len = rs ;
 		}
-	    } /* end if (prmktmp) */
-	    rs1 = subinfo_finish(sip) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (prmktmpdir) */
 
-
 /* local subroutines */
 
-static int subinfo_start(SI *sip,cchar *pr) noex {
+mker::operator int () noex {
+	int		rs = SR_INVALID ;
+	if ((ªm & (~ mmask)) == 0) {
+	    if (tmpdname == nullptr) tmpdname = vtmpdir ;
+	    if (tmpdname == nullptr) tmpdname = sysword.w_tmpdir ;
+	    rs = wrap() ;
+	} /* end if (valid) */
+	return rs ;
+} /* end method (mker::operator) */
+
+int mker::wrap() noex {
+    	int		rs ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
+	    cint dlen = rs ;
+	    {
+		dbuf[0] = '\0' ;
+		rs = suber(dbuf,dlen) ;
+		len = rs ;
+	    }
+	    rs1 = lm_free(dbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (mker::wrap) */
+
+int mker::suber(char *dbuf,int) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (subinfo si(pr,ªm) ; (rs = si.start()) >= 0) {
+	    /* phase one */
+	    if ((rs = si.mkprtmp(dbuf,tmpdname)) >= 0) {
+	        cbool f_prtmp = (rs > 0) ;
+		/* phase two */
+	        if ((dname != nullptr) && (dname[0] != '\0')) {
+		    rs = si.mkext(rbuf,dbuf,dname) ;
+		    len = rs ;
+	        } else {
+		    rs = mkpath(rbuf,dbuf) ;
+	            len = rs ;
+	 	} /* end if */
+	        if ((rs >= 0) && (! f_prtmp)) {
+	            rs = si.chown(dbuf) ;
+		}
+	    } /* end if (prmktmp) */
+	    rs1 = si.finish() ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (subinfo) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (mker::suber) */
+
+int subinfo::start() noex {
 	int		rs = SR_FAULT ;
-	if (sip && pr) ylikely {
-	    memclear(sip) ;
-	    sip->pr = pr ;
-	    sip->euid = geteuid() ;
-	    sip->egid = getegid() ;
+	if (pr) ylikely {
+	    euid = geteuid() ;
+	    egid = getegid() ;
 	    if (ustat prsb ; (rs = u_stat(pr,&prsb)) >= 0) ylikely {
-	        sip->puid = prsb.st_uid ;
-	        sip->pgid = prsb.st_gid ;
-	        sip->tuid = -1 ;
-	        sip->tgid = -1 ;
+	        puid = prsb.st_uid ;
+	        pgid = prsb.st_gid ;
+	        tuid = -1 ;
+	        tgid = -1 ;
 	    } /* end if (u_stat) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end method (subinfo::start) */
 
-static int subinfo_finish(SI *sip) noex {
-	int		rs = SR_FAULT ;
-	if (sip) ylikely {
-	    rs = SR_OK ;
-	}
-	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+int subinfo::finish() noex {
+    	return SR_OK ;
+} /* end method (subinfo::finish) */
 
-static int subinfo_mkprtmp(SI *sip,char *prtmpdname,cc *tmpdname) noex {
+int subinfo::mkprtmp(char *dbuf,cc *tmpdname) noex {
 	int		rs ;
-	int		f_create = false ;
+	int		f_create = false ; /* return-value */
 	cchar		*rn{} ;
-	if (int rl ; (rl = sfbasename(sip->pr,-1,&rn)) > 0) ylikely {
-	    if ((rs = mkpath2w(prtmpdname,tmpdname,rn,rl)) >= 0) ylikely {
-		cmode		dm = (TMPDMODE | S_ISVTX) ;
-		if (ustat sb ; (rs = u_stat(prtmpdname,&sb)) >= 0) ylikely {
-	            sip->tuid = sb.st_uid ;
-	            sip->tgid = sb.st_gid ;
+	if (int rl ; (rl = sfbasename(pr,-1,&rn)) > 0) ylikely {
+	    if ((rs = mkpath2w(dbuf,tmpdname,rn,rl)) >= 0) ylikely {
+		cmode	dm = (TMPDMODE | S_ISVTX) ;
+		if (ustat sb ; (rs = u_stat(dbuf,&sb)) >= 0) ylikely {
+	            tuid = sb.st_uid ;
+	            tgid = sb.st_gid ;
 	            if (S_ISDIR(sb.st_mode)) {
-			rs = subinfo_ckmode(sip,prtmpdname,&sb,dm) ;
+			rs = ckmode(dbuf,&sb,dm) ;
 		    } else {
 			rs = SR_NOTDIR ;
 		    }
 	        } else if (isNotPresent(rs)) {
 	            f_create = true ;
-	            if ((rs = mkdirs(prtmpdname,dm)) >= 0) {
-	                sip->tuid = sip->puid ;
-	                sip->tgid = sip->pgid ;
-	                rs = ensureattr(prtmpdname,dm,sip->puid,sip->pgid) ;
+	            if ((rs = mkdirs(dbuf,dm)) >= 0) {
+	                tuid = puid ;
+	                tgid = pgid ;
+	                rs = ensureattr(dbuf,dm,puid,pgid) ;
 	            }
 		} /* end if (stat) */
 	    } /* end if (mkpath2) */
@@ -241,37 +262,60 @@ static int subinfo_mkprtmp(SI *sip,char *prtmpdname,cc *tmpdname) noex {
 	    rs = SR_NOENT ;
 	}
 	return (rs >= 0) ? f_create : rs ;
-}
-/* end subroutine (subinfo_mkprtmp) */
+} /* end method (subinfo::mkprtmp) */
 
-static int subinfo_chown(SI *sip,cchar *prtmpdname) noex {
-	uid_t		u = sip->puid ;
-	gid_t		g = sip->pgid ;
+int subinfo::mkext(char *rbuf,char *dbuf,cchar *dname) noex {
+	int		rs ;
+	int		len = 0 ; /* return-value */
+	cmode		dm = TMPDMODE ;
+        if ((rs = mkpath2(rbuf,dbuf,dname)) >= 0) {
+            len = rs ;
+            if (ustat sb ; (rs = u_stat(rbuf,&sb)) >= 0) {
+                rs = SR_NOTDIR ;
+                if (S_ISDIR(sb.st_mode)) {
+                    rs = ckmode(rbuf,&sb,dm) ;
+                }
+            } else if (isNotPresent(rs)) {
+                if ((rs = u_mkdir(rbuf,ªm)) >= 0) {
+                    uid_t   u = puid ;
+                    gid_t   g = pgid ;
+                    if (u == euid) u = uidend ;
+                    if (g == egid) g = gidend ;
+                    if ((u != uidend) || (g != gidend)) {
+                        rs = ensureattr(rbuf,ªm,u,g) ;
+                    }
+                } /* end if (u_mkdir) */
+            } /* end if (stat) */
+        } /* end if (mkpath) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (subinfo::mkext) */
+
+int subinfo::chown(cchar *dbuf) noex {
+	const uid_t	u = puid ;
+	const gid_t	g = pgid ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (sip->tuid == sip->euid) {
-	    if ((u != sip->euid) || (g != sip->egid)) {
-	        rs1 = u_chown(prtmpdname,u,g) ;
+	if (tuid == euid) {
+	    if ((u != euid) || (g != egid)) {
+	        rs1 = u_chown(dbuf,u,g) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (we own it) */
 	return rs ;
-}
-/* end subroutine (subinfo_chown) */
+} /* end method (subinfo::chown) */
 
-static int subinfo_ckmode(SI *sip,cc *dname,ustat *sbp,mode_t dm) noex {
+int subinfo::ckmode(cc *dname,ustat *sbp,mode_t dm) noex {
 	int		rs = SR_OK ;
-	int		f = false ;
-	if ((sbp->st_uid == sip->euid) && ((sbp->st_mode & dm) != dm)) {
+	int		f = false ; /* return-value */
+	if ((sbp->st_uid == euid) && ((sbp->st_mode & dm) != dm)) {
 	    cmode	ndm = ((sbp->st_mode & (~ S_IFMT)) | dm) ;
 	    f = true ;
 	    rs = u_chmod(dname,ndm) ;
 	} /* end if */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_ckmode) */
+} /* end method (subinfo::ckmode) */
 
-static int ensureattr(cchar *tmpdname,mode_t nm,uid_t puid,gid_t pgid) noex {
+local int ensureattr(cchar *tmpdname,mode_t nm,uid_t puid,gid_t pgid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f = false ;
@@ -308,7 +352,6 @@ static int ensureattr(cchar *tmpdname,mode_t nm,uid_t puid,gid_t pgid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ensureattr) */
+} /* end subroutine (ensureattr) */
 
 
