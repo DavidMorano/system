@@ -1,4 +1,4 @@
-/* mkchar SUPPORT */
+/* mkchar SUPPORT (LIBU) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
