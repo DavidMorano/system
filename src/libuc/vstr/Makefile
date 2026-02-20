@@ -40,12 +40,12 @@ MODS +=
 LIBS +=
 
 
-OBJ0= vstrcmpx.o vstrkeycmpx.o 
+OBJ0= vstrcmp.o vstrkeycmp.o 
 OBJ1= vstrkeydictcmp.o
-OBJ2= 
+OBJ2= vstrsort.o
 OBJ3= 
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 OBJB=
 
 OBJ= obja.o
@@ -135,8 +135,11 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-vstrcmpx.o:		vstrcmpx.cc		vstrcmpx.h		$(INCS)
-vstrkeycmpx.o:		vstrkeycmpx.cc		vstrkeycmpx.h		$(INCS)
+vstrcmp.o:		vstrcmp.cc		vstrcmp.h		$(INCS)
+vstrkeycmp.o:		vstrkeycmp.cc		vstrkeycmp.h		$(INCS)
 vstrkeydictcmp.o:	vstrkeydictcmp.cc	vstrkeydictcmp.h	$(INCS)
+
+vstrsort.o:		vstrsort.cc		vstrsort.h		$(INCS)
+
 
 
