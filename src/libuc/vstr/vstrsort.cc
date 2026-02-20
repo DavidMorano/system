@@ -27,12 +27,12 @@
 
 	Sunopsis:
 	typedef int (*vstrsort_f)(cchar **,cchar **) noex
-	void vstrsort(ccharpp sav,int n,vstrsort_f sfunc) noex
+	void vstrsort(ccharpp sav,int n,vstrsort_f cmpfun) noex
 
 	Arguments:
 	sav		array of pointers to c-strings
 	n		number of pointers in array
-	sfunc		function call to do sort
+	cmpfun		function call to do sort
 
 	Returns:
 	-		no return
@@ -79,7 +79,7 @@
 
 /* forward references */
 
-local void strswap(ccharpp app,int i1,int i2) noex {
+local inline void strswap(ccharpp app,int i1,int i2) noex {
     	cchar *tmp = app[i1] ;
 	app[i1] = app[i2] ;
 	app[i2] = tmp ;
@@ -94,16 +94,15 @@ local void strswap(ccharpp app,int i1,int i2) noex {
 
 /* exported subroutines */
 
-void vstrsort(cchar **sav,int n,vstrsort_f sfunc) noex {
+void vstrsort(cchar **sav,int n,vstrsort_f cmpfun) noex {
 	int 		j ; /* used-throughout */
-	int		rc ; /* return code from called sort function */
 	for (j = 1 ; j <= n ; j *= 2) ;
 	for (int m = 2 * j - 1 ; m /= 2 ; ) {
 	    int k ;
 	    for ((j = 0, k = n - m) ; j < k ; j += 1) {
 	        for (int i = j ; i >= 0 ; i -= m) {
 	            ccharpp app = (sav + i) ;
-	            if ((rc = sfunc((app + m),(app + 0))) >= 0) break ;
+	            if (cmpfun((app + m),(app + 0)) >= 0) break ;
 		    strswap(app,0,m) ;
 	        } /* end for */
 	    } /* end for */
