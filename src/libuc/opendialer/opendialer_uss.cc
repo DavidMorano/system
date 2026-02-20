@@ -174,9 +174,9 @@ int		to ;
 
 /* parse out everything */
 
-/*
+/****
 	uss¥<fname>[:<svc>][,to=<to>][­<arg(s)>]]
-*/
+****/
 
 	if (rs >= 0) {
 	    ARGPARSE	ai ;
