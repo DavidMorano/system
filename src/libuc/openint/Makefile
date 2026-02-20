@@ -1,4 +1,4 @@
-# MAKEFILES (openint)
+# MAKEFILE (openint)
 
 T= openint
 
