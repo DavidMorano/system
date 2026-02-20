@@ -1,4 +1,4 @@
-# MAKEFILES (opendialer)
+# MAKEFILE (opendialer)
 
 T= opendialer
 
