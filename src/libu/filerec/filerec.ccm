@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* (File-Once) implement a map container to track file device-inode values */
+/* (File-Record) implement a map container to track file device-inode values */
 /* version %I% last-modified %G% */
 
 
@@ -23,7 +23,7 @@
 /*******************************************************************************
 
 	Name:
-	filerec
+	filerec (File-Record)
 
 	Description:
 	This object implements a set (an un-ordered set) with a key
@@ -51,10 +51,7 @@ module ;
 #include	<unordered_set>
 #include	<functional>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 export module filerec ;
 
@@ -64,11 +61,15 @@ export {
     struct filerec_ent {
 	cchar		*fname{} ;
 	time_t		timod ;
+	nlink_t		links ;
 	off_t		fsize ;
 	ino_t		ino ;
 	dev_t		dev ;
 	mode_t		fm ;
-	filerec_ent(dev_t d,ino_t i,mode_t m) noex : dev(d), ino(i), fm(m) { } ;
+	filerec_ent(dev_t d,ino_t i,nlink_t l,mode_t m) noex : dev(d), ino(i) {
+	    links = l ;
+	    fm = m ;
+	} ;
 	size_t hashval() const noex {
 	    return size_t(dev + ino) ;
 	} ;
@@ -122,7 +123,7 @@ export {
     } ; /* end struct (filerec_co) */
     struct filerec {
 	friend		filerec_co ;
-	typedef filerec_base	stype ;
+	typedef filerec_base	stype ; /* "set" type */
 	typedef filerec_ent	key_type ;
 	filerec(const filerec &) = delete ;
 	filerec &operator = (const filerec &) = delete ;
@@ -140,18 +141,18 @@ export {
 	destruct filerec() {
 	    if (setp) dtor() ;
 	} ; /* end dtor */
-	int		add(cchar *,int = -1) noex ;
-	int		checkin(custat *,cchar *) noex ;
-	int		curbegin(filerec_cur *) noex ;
-	int		curend(filerec_cur *) noex ;
-	int		curenum(filerec_cur *,filerec_ent *) noex ;
+	int add		(cchar *,int = -1) noex ;
+	int checkin	(custat *,cchar *) noex ;
+	int curbegin	(filerec_cur *) noex ;
+	int curend	(filerec_cur *) noex ;
+	int curenum	(filerec_cur *,const filerec_ent **) noex ;
 	filerec_iter begin() noex ;
 	filerec_iter end() noex ;
     private:
-	int		istart(int) noex ;
-	int		ifinish() noex ;
-	int		icount() noex ;
-	int		finents() noex ;
+	int istart(int) noex ;
+	int ifinish() noex ;
+	int icount() noex ;
+	int finents() noex ;
     } ; /* end class (filerec) */
     struct filerec_cur {
 	filerec_base::iterator	it ;
