@@ -24,6 +24,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<vstrorder.h>
 
 #include	<vstrkeycmp.h>
 
@@ -34,8 +35,39 @@ extern int	vstrbasecmp(cchar **,cchar **) noex ;
 extern int	vstrcasecmp(cchar **,cchar **) noex ;
 extern int	vstrfoldcmp(cchar **,cchar **) noex ;
 
-static inline int vstrcmp(cchar **s1pp,cchar **s2pp) noex {
+extern int	vstrbasecmpx(cchar **,cchar **,vstrorders) noex ;
+extern int	vstrcasecmpx(cchar **,cchar **,vstrorders) noex ;
+extern int	vstrfoldcmpx(cchar **,cchar **,vstrorders) noex ;
+
+local inline int vstrcmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrbasecmp(s1pp,s2pp) ;
+}
+local inline int vstrcmpo(cchar **s1pp,cchar **s2pp) noex {
+	return vstrbasecmpx(s1pp,s2pp,vstrorder_obverse) ;
+}
+local inline int vstrcmpr(cchar **s1pp,cchar **s2pp) noex {
+	return vstrbasecmpx(s1pp,s2pp,vstrorder_reverse) ;
+}
+
+local inline int vstrbasecmpo(cchar **s1pp,cchar **s2pp) noex {
+	return vstrbasecmpx(s1pp,s2pp,vstrorder_obverse) ;
+}
+local inline int vstrbasecmpr(cchar **s1pp,cchar **s2pp) noex {
+	return vstrbasecmpx(s1pp,s2pp,vstrorder_reverse) ;
+}
+
+local inline int vstrcasecmpo(cchar **s1pp,cchar **s2pp) noex {
+	return vstrcasecmpx(s1pp,s2pp,vstrorder_obverse) ;
+}
+local inline int vstrcasecmpr(cchar **s1pp,cchar **s2pp) noex {
+	return vstrcasecmpx(s1pp,s2pp,vstrorder_reverse) ;
+}
+
+local inline int vstrfoldcmpo(cchar **s1pp,cchar **s2pp) noex {
+	return vstrfoldcmpx(s1pp,s2pp,vstrorder_obverse) ;
+}
+local inline int vstrfoldcmpr(cchar **s1pp,cchar **s2pp) noex {
+	return vstrfoldcmpx(s1pp,s2pp,vstrorder_reverse) ;
 }
 
 EXTERNC_end
