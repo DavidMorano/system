@@ -25,9 +25,10 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#include	<vstrcmpx.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrcmp.h>
+#include	<vstrkeycmp.h>
 #include	<vstrkeydictcmp.h>
+#include	<vstrsort.h>
 
 
 #endif /* VSTRKEYCMPX_INCLUDE */
