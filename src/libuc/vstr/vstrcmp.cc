@@ -44,23 +44,33 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<stdclib.hh>		/* |std_strcasecmp(3u)| */
 #include	<toxc.h>
 #include	<mkchar.h>
 #include	<strxcmp.h>
 #include	<localmisc.h>
+#include	<vstrorder.h>
 
 #include	"vstrcmp.h"
 
 
 /* local defines */
 
+#define	strcasecmp	std_strcasecmp
+
 
 /* imported namespaces */
+
+using stdclib::std_strcasecmp ;		/* subroutine */
 
 
 /* local typedefs */
 
-typedef int (*toxc_f)(cc *,cc *) noex ;
+typedef vstrorders	vo ;
+
+extern "C" {
+    typedef int (*strxcmp_f)(cc *,cc *) noex ;
+}
 
 
 /* external subroutines */
@@ -74,7 +84,7 @@ typedef int (*toxc_f)(cc *,cc *) noex ;
 
 /* forward references */
 
-local int vstrxcmp(toxc_f vx,cchar **s1pp,cchar **s2pp) noex {
+local int vstrxcmp(strxcmp_f vx,cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
 	if (s1pp && s2pp) {
 	    cchar	*s1 = *s1pp ;
@@ -92,9 +102,32 @@ local int vstrxcmp(toxc_f vx,cchar **s1pp,cchar **s2pp) noex {
 	return rc ;
 } /* end subroutine (vstrcmpx) */
 
-local inline int strcasecmpº(cchar *s1,cchar *s2) noex {
+extern "C" {
+    local int strbasecmpo(cchar *s1,cchar *s2) noex {
+    	return strbasecmp(s1,s2) ;
+    }
+    local int strbasecmpr(cchar *s1,cchar *s2) noex {
+    	return strbasecmp(s2,s1) ;
+    }
+} /* end extern */
+
+extern "C" {
+    local int strcasecmpo(cchar *s1,cchar *s2) noex {
     	return strcasecmp(s1,s2) ;
-} /* end subroutine */
+    }
+    local int strcasecmpr(cchar *s1,cchar *s2) noex {
+    	return strcasecmp(s2,s1) ;
+    }
+} /* end extern */
+
+extern "C" {
+    local int strfoldcmpo(cchar *s1,cchar *s2) noex {
+    	return strfoldcmp(s1,s2) ;
+    }
+    local int strfoldcmpr(cchar *s1,cchar *s2) noex {
+    	return strfoldcmp(s2,s1) ;
+    }
+} /* end extern */
 
 
 /* local variables */
@@ -107,17 +140,30 @@ local inline int strcasecmpº(cchar *s1,cchar *s2) noex {
 
 int vstrbasecmp(cchar **e1pp,cchar **e2pp) noex { /* base */
 	return vstrxcmp(strbasecmp,e1pp,e2pp) ;
-}
-/* end subroutine (vstrbasecmp) */
+} /* end subroutine (vstrbasecmp) */
 
 int vstrcasecmp(cchar **e1pp,cchar **e2pp) noex { /* case */
-	return vstrxcmp(strcasecmpº,e1pp,e2pp) ;
-}
-/* end subroutine (vstrcasecmp) */
+	return vstrxcmp(strcasecmp,e1pp,e2pp) ;
+} /* end subroutine (vstrcasecmp) */
 
 int vstrfoldcmp(cchar **e1pp,cchar **e2pp) noex { /* fold */
 	return vstrxcmp(strfoldcmp,e1pp,e2pp) ;
-}
-/* end subroutine (vstrfoldcmp) */
+} /* end subroutine (vstrfoldcmp) */
+
+
+int vstrbasecmpx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* base */
+	strxcmp_f cmpfun = (fo) ? strbasecmpr : strbasecmpo ;
+	return vstrxcmp(cmpfun,e1pp,e2pp) ;
+} /* end subroutine (vstrbasecmpx) */
+
+int vstrcasecmpx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* case */
+	strxcmp_f cmpfun = (fo) ? strcasecmpr : strcasecmpo ;
+	return vstrxcmp(cmpfun,e1pp,e2pp) ;
+} /* end subroutine (vstrcasecmpx) */
+
+int vstrfoldcmpx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* fold */
+	strxcmp_f cmpfun = (fo) ? strfoldcmpr : strfoldcmpo ;
+	return vstrxcmp(cmpfun,e1pp,e2pp) ;
+} /* end subroutine (vstrfoldcmpx) */
 
 
