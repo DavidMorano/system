@@ -1,4 +1,4 @@
-/* filerec5 SUPPORT */
+/* filerec5 SUPPORT (Module-Implementation-Unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -20,7 +20,7 @@
 /*******************************************************************************
 
 	Name:
-	filerec
+	filerec (File-Record)
 
 	Description:
 	This object implements a set (an un-ordered set) with a key
@@ -45,6 +45,8 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<strnul.hh>
 #include	<localmisc.h>
@@ -85,19 +87,16 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local subroutines (methods) */
 
-int filerec::add(cchar *sp,int sl) noex {
+int filerec::add(cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    {
-		strnul s(sp,sl) ;
-	        if (ustat sb ; (rs = u_stat(s,&sb)) >= 0) {
-		    rs = checkin(&sb,s) ;
-		    f = rs ;
-		} /* end if (u_stat) */
-	    } /* end block */
-	} /* end if (valid) */
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
+	    strnul s(sp,sl) ;
+	    if (ustat sb ; (rs = u_stat(s,&sb)) >= 0) {
+		rs = checkin(&sb,s) ;
+		f = rs ;
+	    } /* end if (u_stat) */
+	} /* end if (getlenstr) */
 	return (rs >= 0) ? f : rs ;
 } /* end method (filerec::add) */
 
