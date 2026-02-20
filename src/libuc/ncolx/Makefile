@@ -1,4 +1,4 @@
-# MAKEFILES (ncolx)
+# MAKEFILE (ncolx)
 
 T= ncolx
 
@@ -46,6 +46,7 @@ OBJ2= tabcols.o
 OBJ3= 
 
 OBJA= obj0.o obj1.o obj2.o
+OBJB=
 
 OBJ= obja.o
 
