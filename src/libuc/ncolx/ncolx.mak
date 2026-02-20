@@ -1,4 +1,4 @@
-# MAKEFILES (ncolx)
+# MAKEFILE (ncolx)
 
 T= ncolx
 
