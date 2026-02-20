@@ -1,4 +1,4 @@
-/* filerec1 SUPPORT */
+/* filerec1 SUPPORT (Module-Implementation-Unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -20,7 +20,7 @@
 /*******************************************************************************
 
 	Name:
-	filerec
+	filerec (File-Record)
 
 	Description:
 	This object implements a set (an un-ordered set) with a key
@@ -46,6 +46,8 @@ module ;
 #include	<new>
 #include	<utility>		/* |pair(3c++)| */
 #include	<unordered_set>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<ulogerror.h>
 #include	<localmisc.h>
@@ -57,10 +59,9 @@ module filerec ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::unordered_set ;              /* type */
 using std::pair ;                       /* type */
-using libu::umem ;			/* variable */
+using libu::um ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -132,15 +133,17 @@ int filerec::checkin(custat *sbp,cchar *fn) noex {
 	if (sbp && fn) ylikely {
 	    const dev_t		dev = sbp->st_dev ;
 	    const ino_t		ino = sbp->st_ino ;
+	    const nlink_t	links = sbp->st_nlink ;
 	    custime		timod = sbp->st_mtime ;
 	    coff		fsize = sbp->st_size ;
 	    cmode		fmode = sbp->st_mode ;
 	    rs = SR_BUGCHECK ;
 	    if (setp) ylikely {
-	        filerec_ent	k(dev,ino,fmode) ;
+	        filerec_ent	k(dev,ino,links,fmode) ;
 		k.load(timod,fsize) ;
+		rs = SR_OK ;
 		if (! setp->contains(k)) ylikely {
-		    if (cchar *cp ; (rs = umem.mallocstrw(fn,-1,&cp)) >= 0) {
+		    if (cchar *cp ; (rs = um.strw(fn,-1,&cp)) >= 0) {
 			k.fname = cp ;
 		        try {
 	                    pair<setiter,bool>	ret = setp->insert(k) ;
@@ -151,7 +154,7 @@ int filerec::checkin(custat *sbp,cchar *fn) noex {
 		        }
 		        if (rs < 0) {
 			    char *bp = cast_const<charp>(cp) ;
-			    umem.free(bp) ;
+			    um.free(bp) ;
 			    k.fname = nullptr ;
 			} /* end if (error) */
 		    } /* end if (memory-allocation) */
@@ -178,9 +181,11 @@ int filerec::finents() noex {
 	    for (stype::iterator it = setp->begin() ; it != ite ; ++it) {
 		char **fpp = cast_const<charpp>(&it->fname) ;
 		char *bp = cast_const<charp>(it->fname) ;
-		rs1 = umem.free(bp) ;
-		if (rs >= 0) rs = rs1 ;
-		*fpp = nullptr ;
+		{
+		    rs1 = um.free(bp) ;
+		    if (rs >= 0) rs = rs1 ;
+		    *fpp = nullptr ;
+		}
 	    } /* end for */
 	} /* end block */
 	return rs ;
