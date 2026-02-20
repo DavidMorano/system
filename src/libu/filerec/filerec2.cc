@@ -1,4 +1,4 @@
-/* filerec2 SUPPORT */
+/* filerec2 SUPPORT (Module-Implementation-Unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -20,7 +20,7 @@
 /*******************************************************************************
 
 	Name:
-	filerec
+	filerec (File-Record)
 
 	Description:
 	This object implements a set (an un-ordered set) with a key
@@ -46,6 +46,8 @@ module ;
 #include	<new>
 #include	<utility>		/* |pair(3c++)| */
 #include	<unordered_set>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<ulogerror.h>
 #include	<localmisc.h>
@@ -57,7 +59,6 @@ module filerec ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -105,14 +106,18 @@ int filerec::curend(filerec_cur *curp) noex {
 	return rs ;
 } /* end method (filerec::curend) */
 
-int filerec::curenum(filerec_cur *curp,filerec_ent *ep) noex {
-	int		rs = SR_NOTOPEN ;
-	if (setp && curp && ep) ylikely {
+int filerec::curenum(filerec_cur *curp,const filerec_ent **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (setp && curp) ylikely {
 	    stype::iterator ite = setp->end() ;
-	    rs = SR_NOTFOUND ;
+	    rs = 0 ; /* signal "not-found" */
 	    if (curp->it != ite) {
-		*ep = *curp->it++ ;
-	    }
+		rs = 1 ; /* signal "have-somthing" */
+		if (rpp) {
+		    const filerec_ent &rent = *curp->it++ ;
+		    *rpp = &rent ;
+		}
+	    } /* end if (not at end) */
 	} /* end if (valid) */
 	return rs ;
 } /* end method (filerec::curenum) */
