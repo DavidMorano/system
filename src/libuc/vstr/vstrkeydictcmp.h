@@ -28,7 +28,12 @@
 
 EXTERNC_begin
 
-extern int	vstrkeydictcmp(cchar **,cchar **) noex ;
+extern int	vstrkeydictcmpo(cchar **,cchar **) noex ;
+extern int	vstrkeydictcmpr(cchar **,cchar **) noex ;
+
+local inline int vstrkeydictcmp(cchar **s1pp,cchar **s2pp) noex {
+    	return vstrkeydictcmpo(s1pp,s2pp) ;
+}
 
 EXTERNC_end
 
