@@ -54,6 +54,7 @@
 #include	<usysdefs.h>
 #include	<strkeycmp.h>
 #include	<localmisc.h>
+#include	<vstrorder.h>
 
 #include	"vstrkeycmp.h"
 
@@ -66,7 +67,11 @@
 
 /* local typedefs */
 
-typedef int (*strxcmp_f)(cchar *,cchar *) noex ;
+typedef vstrorders	vo ;
+
+extern "C" {
+    typedef int (*strxcmp_f)(cchar *,cchar *) noex ;
+}
 
 
 /* external subroutines */
@@ -98,6 +103,33 @@ local int vstrkeyxcmp(strxcmp_f vx,cchar **s1pp,cchar **s2pp) noex {
 	return rc ;
 } /* end subroutine (vstrkeyxcmp) */
 
+extern "C" {
+    local int strkeybasecmpo(cchar *s1,cchar *s2) noex {
+    	return strkeybasecmp(s1,s2) ;
+    }
+    local int strkeybasecmpr(cchar *s1,cchar *s2) noex {
+    	return strkeybasecmp(s2,s1) ;
+    }
+} /* end extern */
+
+extern "C" {
+    local int strkeycasecmpo(cchar *s1,cchar *s2) noex {
+    	return strkeycasecmp(s1,s2) ;
+    }
+    local int strkeycasecmpr(cchar *s1,cchar *s2) noex {
+    	return strkeycasecmp(s2,s1) ;
+    }
+} /* end extern */
+
+extern "C" {
+    local int strkeyfoldcmpo(cchar *s1,cchar *s2) noex {
+    	return strkeyfoldcmp(s1,s2) ;
+    }
+    local int strkeyfoldcmpr(cchar *s1,cchar *s2) noex {
+    	return strkeyfoldcmp(s2,s1) ;
+    }
+} /* end extern */
+
 
 /* local variables */
 
@@ -118,5 +150,21 @@ int vstrkeycasecmp(cchar **s1pp,cchar **s2pp) noex {
 int vstrkeyfoldcmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeyxcmp(strkeyfoldcmp,s1pp,s2pp) ;
 }
+
+
+int vstrkeybasecmpx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* base */
+	strxcmp_f cmpfun = (fo) ? strkeybasecmpr : strkeybasecmpo ;
+	return vstrkeyxcmp(cmpfun,e1pp,e2pp) ;
+} /* end subroutine (vstrkeybasecmpx) */
+
+int vstrkeycasecmpx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* case */
+	strxcmp_f cmpfun = (fo) ? strkeycasecmpr : strkeycasecmpo ;
+	return vstrkeyxcmp(cmpfun,e1pp,e2pp) ;
+} /* end subroutine (vstrkeycasecmpx) */
+
+int vstrkeyfoldcmpx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* fold */
+	strxcmp_f cmpfun = (fo) ? strkeyfoldcmpr : strkeyfoldcmpo ;
+	return vstrkeyxcmp(cmpfun,e1pp,e2pp) ;
+} /* end subroutine (vstrkeyfoldcmpx) */
 
 
