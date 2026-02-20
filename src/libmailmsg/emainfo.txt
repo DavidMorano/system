@@ -1,0 +1,14 @@
+EMAINFO (E-Mail_information)
+
+For informational purposes, (toughly) modern e-mail addresses
+can be categorized ito four main groups:
+
++ local-only
++ UUCP
++ ARPA basic
++ ARPA routing
+
+Rhere used to be the so-called "percent" address, but these
+fell out of favor a very long time ago (so they are ignored here).
+
+
