@@ -31,6 +31,11 @@
 typedef __int128		int128_t ;
 #endif /* TYPEDEF_INT128 */
 
+#ifndef	TYPEDEF_SINT128
+#define	TYPEDEF_SINT128
+typedef signed __int128		sint128_t ;
+#endif /* TYPEDEF_UINT128 */
+
 #ifndef	TYPEDEF_UINT128
 #define	TYPEDEF_UINT128
 typedef unsigned __int128	uint128_t ;
@@ -40,6 +45,11 @@ typedef unsigned __int128	uint128_t ;
 #define	TYPEDEF_LONGLONG
 typedef __int128		longlong ;
 #endif /* TYPEDEF_LONGLONG */
+
+#ifndef	TYPEDEF_SLONGLONG
+#define	TYPEDEF_SLONGLONG
+typedef signed __int128		slonglong ;
+#endif /* TYPEDEF_ULONGLONG */
 
 #ifndef	TYPEDEF_ULONGLONG
 #define	TYPEDEF_ULONGLONG
@@ -51,6 +61,11 @@ typedef unsigned __int128	ulonglong ;
 #ifndef	TYPEDEF_CLONGLONG
 #define	TYPEDEF_CLONGLONG
 typedef const longlong		clonglong ;
+#endif
+
+#ifndef	TYPEDEF_CSLONGLONG
+#define	TYPEDEF_CSLONGLONG
+typedef const slonglong		cslonglong ;
 #endif
 
 #ifndef	TYPEDEF_CULONGLONG
@@ -65,6 +80,11 @@ typedef const ulonglong		culonglong ;
 typedef __int128 *		longlongp ;
 #endif /* TYPEDEF_LONGLONGP */
 
+#ifndef	TYPEDEF_SLONGLONGP
+#define	TYPEDEF_SLONGLONGP
+typedef signed __int128 *	slonglongp ;
+#endif /* TYPEDEF_ULONGLONGP */
+
 #ifndef	TYPEDEF_ULONGLONGP
 #define	TYPEDEF_ULONGLONGP
 typedef unsigned __int128 *	ulonglongp ;
@@ -75,6 +95,11 @@ typedef unsigned __int128 *	ulonglongp ;
 #ifndef	TYPEDEF_CLONGLONGP
 #define	TYPEDEF_CLONGLONGP
 typedef const longlong *	clonglongp ;
+#endif
+
+#ifndef	TYPEDEF_CSLONGLONGP
+#define	TYPEDEF_CSLONGLONGP
+typedef const slonglong *	cslonglongp ;
 #endif
 
 #ifndef	TYPEDEF_CULONGLONGP
