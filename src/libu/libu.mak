@@ -71,11 +71,11 @@ OBJ18= timeval.o itimerval.o
 OBJ19= timespec.o itimerspec.o
 
 OBJ20= uinet.o bitgrp.o
-OBJ21= strnul.o intx.o chrset.o
+OBJ21= strnul.o intx.o chrset.o stdclib.o
 OBJ22= ugetloadavg.o uiconv.o
 OBJ23= syscontain.o stdfnames.o
 
-OBJ24= posixdirent.o
+OBJ24= posixdirent.o nulstr.o
 OBJ25= fonce.o filerec.o
 OBJ26= ustd.o
 OBJ27= ucomposite.o
@@ -360,11 +360,6 @@ ulock.o:		ulock.dir
 ulock.dir:
 	makesubdir $@
 
-# POSIX® synchronization mechanisms
-ptx.o:			ptx.dir
-ptx.dir:
-	makesubdir $@
-
 # INTX
 intx.o:			intx.dir
 intx.dir:
@@ -437,9 +432,16 @@ usigsets.dir:
 
 usigblock.o:		usigblock.ccm			$(INCS)
 
+# POSIX® synchronization mechanisms
+ptx.o:			ptx.dir
+ptx.dir:
+	makesubdir $@
+
 # misc-objects
 chrset.o:		chrset.ccm			$(INCS)
 bitgrp.o:		bitgrp.ccm			$(INCS)
+nulstr.o:		nulstr.cc	nulstr.h	$(INCS)
+posixdirent.o:		posixdirent.cc posixdirent.hh	$(INCS)
 
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
@@ -458,14 +460,14 @@ syswords.o:		syswords.cc syswords.hh		$(INCS)
 varnames.o:		varnames.cc varnames.hh		$(INCS)
 endian.o:		endian.cc endian.h		$(INCS)
 
-
 strtox.o:		strtox.cc strtox.h		$(INCS)
-
 strnul.o:		strnul.cc strnul.hh		$(INCS)
 mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
 stdfnames.o:		stdfnames.c stdfnames.h		$(INCS)
 
-posixdirent.o:		posixdirent.cc posixdirent.hh	$(INCS)
+# misc-groups
 baops.o:		baops.c baops.h			$(INCS)
+
+stdclib.o:		stdclib.cc	stdclib.hh	$(INCS)
 
 
