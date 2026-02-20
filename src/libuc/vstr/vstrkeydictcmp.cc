@@ -44,11 +44,20 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<localmisc.h>
+#include	<vstrorder.h>
 
 #include	"vstrkeydictcmp.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef vstrorders	vo ;
 
 
 /* external subroutines */
@@ -66,16 +75,7 @@ extern "C" {
 
 /* forward references */
 
-
-/* local variables */
-
-
-/* exported variables */
-
-
-/* exported subroutines */
-
-int vstrkeydictcmp(cchar **s1pp,cchar **s2pp) noex {
+local int vstrkeydictcmpx(cchar **s1pp,cchar **s2pp,vo fo) noex {
 	int		rc = 0 ;
 	if (s1pp && s2pp) {
 	    cchar	*s1 = *s1pp ;
@@ -85,13 +85,33 @@ int vstrkeydictcmp(cchar **s1pp,cchar **s2pp) noex {
 	        if (s1) {
 		    rc = -1 ;
 		    if (s2) {
-		        rc = strkeydictcmp(s1,s2) ;
+			if (fo) {
+		            rc = strkeydictcmp(s2,s1) ;
+			} else {
+		            rc = strkeydictcmp(s1,s2) ;
+			}
 		    }
 	        }
 	    } /* end if */
 	} /* end if (non-null) */
 	return rc ;
+} /* end subroutine (vstrkeydictcmpx) */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int vstrkeydictcmpo(cchar **s1pp,cchar **s2pp) noex {
+    	return vstrkeydictcmpx(s1pp,s2pp,vstrorder_obverse) ;
 }
-/* end subroutine (vstrkeydictcmp) */
+
+int vstrkeydictcmpr(cchar **s1pp,cchar **s2pp) noex {
+    	return vstrkeydictcmpx(s1pp,s2pp,vstrorder_reverse) ;
+}
 
 
