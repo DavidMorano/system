@@ -52,7 +52,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ncol.h>		/* |ncolchar(3uc)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
