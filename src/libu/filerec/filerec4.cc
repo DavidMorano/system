@@ -1,4 +1,4 @@
-/* filerec4 SUPPORT */
+/* filerec4 SUPPORT (Module-Implementation-Unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -20,7 +20,7 @@
 /*******************************************************************************
 
 	Name:
-	filerec
+	filerec (File-Record)
 
 	Description:
 	This object implements a set (an un-ordered set) with a key
@@ -46,6 +46,8 @@ module ;
 #include	<new>
 #include	<utility>		/* |pair(3c++)| */
 #include	<unordered_set>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<ulogerror.h>
 #include	<localmisc.h>
@@ -56,9 +58,6 @@ module filerec ;
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
