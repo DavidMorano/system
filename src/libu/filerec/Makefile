@@ -1,4 +1,4 @@
-# MAKEFILES (filerec)
+# MAKEFILE (filerec)
 
 T= filerec
 
@@ -44,7 +44,6 @@ INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -59,13 +58,15 @@ LDFLAGS		?= $(MAKELDFLAGS)
 OBJ0= filerec0.o filerec1.o 
 OBJ1= filerec2.o filerec3.o
 OBJ2= filerec4.o filerec5.o
+OBJ3=
 
 OBJA= obj0.o obj1.o obj2.o
+OBJB=
 
 OBJ= obja.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -78,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -113,45 +117,45 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 filerec0.o:		filerec.ccm			$(INCS)
 	makemodule filerec
 
-filerec1.o:		filerec1.cc filerec.ccm		$(INCS)
+filerec1.o:		filerec1.cc filerec0.o		$(INCS)
 	makemodule filerec
 	$(COMPILE.cc) $<
 
-filerec2.o:		filerec2.cc filerec.ccm		$(INCS)
+filerec2.o:		filerec2.cc filerec0.o		$(INCS)
 	makemodule filerec
 	$(COMPILE.cc) $<
 
-filerec3.o:		filerec3.cc filerec.ccm		$(INCS)
+filerec3.o:		filerec3.cc filerec0.o		$(INCS)
 	makemodule filerec
 	$(COMPILE.cc) $<
 
-filerec4.o:		filerec4.cc filerec.ccm		$(INCS)
+filerec4.o:		filerec4.cc filerec0.o		$(INCS)
 	makemodule filerec
 	$(COMPILE.cc) $<
 
-filerec5.o:		filerec5.cc filerec.ccm		$(INCS)
+filerec5.o:		filerec5.cc filerec0.o		$(INCS)
 	makemodule filerec
 	$(COMPILE.cc) $<
 
