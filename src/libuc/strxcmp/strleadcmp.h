@@ -23,6 +23,8 @@ EXTERNC_begin
 
 extern int	strleadcmp(cchar *,cchar *) noex ;
 
+extern int	strxleadcmp(cchar *,cchar *) noex ;
+
 EXTERNC_end
 
 
