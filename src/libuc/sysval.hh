@@ -42,7 +42,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 enum sysvals {
@@ -56,7 +57,7 @@ enum sysvals {
 	sysval_pc,		/* ProcessorsConfigured */
 	sysval_po,		/* ProcessorsOnline */
 	sysval_overlast
-} ;
+} ; /* end enum )sysvals) */
 
 struct sysval {
 	cint		name = -1 ;
