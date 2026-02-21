@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= strnfoldcmp.o
+OBJ0= strnxxxxcmp.o
 OBJ1= strnkeycmp.o strnvalcmp.o
 OBJ2= strnleadcmp.o strnncmp.o 
 OBJ3= strnndictcmp.o
@@ -136,11 +136,11 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-strnkeycmp.o:		strnkeycmp.cc	$(INCS)
-strnvalcmp.o:		strnvalcmp.cc	$(INCS)
-strnleadcmp.o:		strnleadcmp.cc	$(INCS)
-strnncmp.o:		strnncmp.cc	$(INCS)
-strnndictcmp.o:		strnndictcmp.cc $(INCS)
-strnfoldcmp.o:		strnfoldcmp.cc	$(INCS)
+strnkeycmp.o:		strnkeycmp.cc				$(INCS)
+strnvalcmp.o:		strnvalcmp.cc				$(INCS)
+strnleadcmp.o:		strnleadcmp.cc				$(INCS)
+strnncmp.o:		strnncmp.cc				$(INCS)
+strnndictcmp.o:		strnndictcmp.cc 			$(INCS)
+strnxxxxcmp.o:		strnxxxxcmp.cc		strnxxxxcmp.h	$(INCS)
 
 
