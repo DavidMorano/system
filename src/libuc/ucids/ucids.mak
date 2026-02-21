@@ -1,4 +1,4 @@
-# MAKEFILES (ucids)
+# MAKEFILE (ucids)
 
 T= ucids
 
