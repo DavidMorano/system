@@ -23,6 +23,8 @@ EXTERNC_begin
 
 extern int	strpcmp(cchar *,cchar *) noex ;
 
+extern int	strxpcmp(cchar *,cchar *) noex ;
+
 EXTERNC_end
 
 
