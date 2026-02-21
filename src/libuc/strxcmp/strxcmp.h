@@ -18,21 +18,17 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<strnxcmp.h>		/* |strnndictcmp(3uc)| */
 
 #include	<stremacmp.h>
 #include	<strkeycmp.h>
 #include	<strvalcmp.h>
-#include	<strfoldcmp.h>
+#include	<strxxxxcmp.h>
 #include	<strleadcmp.h>
 #include	<strpcmp.h>
-#include	<strnxcmp.h>		/* |strnndictcmp(3uc)| */
 
 
 EXTERNC_begin
-
-local inline int strbasecmp(cchar *s1,cchar *s2) noex {
-    	return strcmp(s1,s2) ;
-}
 
 local inline int strdictcmp(cchar *s1,cchar *s2) noex {
 	return strnndictcmp(s1,-1,s2,-1) ;
