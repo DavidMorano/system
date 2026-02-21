@@ -47,7 +47,7 @@
 #include	<usysbase.h>
 #include	<localmisc.h>
 
-#include	"strn.h"
+#include	"strnnlen.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
