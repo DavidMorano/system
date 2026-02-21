@@ -81,4 +81,18 @@ int strleadcmp(cchar *s1,cchar *s2) noex {
 }
 /* end subroutine (strleadcmp) */
 
+int strxleadcmp(cchar *s1,cchar *s2) noex {
+    	int		rc = 0 ;
+	if (s1 || s2) {
+	    rc = +1 ;
+	    if (s1) {
+		rc = -1 ;
+		if (s2) {
+		    rc = strleadcmp(s1,s2) ;
+		}
+	    }
+	}
+	return rc ;
+} /* end subroutine (strxleadcmp) */
+
 
