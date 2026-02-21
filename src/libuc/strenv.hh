@@ -43,35 +43,40 @@
 
 
 enum strenvs {
-	strenv_path,
-	strenv_fpath,
-	strenv_incpath,
-	strenv_libpath,
-	strenv_manpath,
-	strenv_infopath,
 	strenv_cdpath,
-	strenv_tmpdir,
-	strenv_maildir,
-	strenv_node,
 	strenv_domain,
-	strenv_localdomain,
-	strenv_username,
-	strenv_user,
-	strenv_logname,
+	strenv_fpath,
 	strenv_home,
+	strenv_incpath,
+	strenv_infopath,
+	strenv_libpath,
+	strenv_localdomain,
+	strenv_logid,
+	strenv_logline,
+	strenv_logname,
 	strenv_mail,
+	strenv_maildir,
+	strenv_manpath,
+	strenv_node,
 	strenv_organization,
-	strenv_orgloc,
 	strenv_orgcode,
+	strenv_orgloc,
+	strenv_path,
+	strenv_tmpdir,
+	strenv_user,
+	strenv_username,
+	strenv_utmpid,
+	strenv_utmpline,
+	strenv_utmpname,
 	strenv_overlast
 } ; /* end enum (strenvs) */
 
 class strenv {
 	cchar		*strp = nullptr ;
-	cint		w ;
+	const strenvs	w ;
 	int		facc = false ;
-public:
-	strenv(int aw) noex : w(aw) { } ;
+    public:
+	strenv(strenvs aw) noex : w(aw) { } ;
 	strenv() = delete ;
 	strenv &operator = (const strenv &) = delete ;
 	operator ccharp () noex ;
