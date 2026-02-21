@@ -62,9 +62,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<functional>		/* |mem_fn(3c++)| */
-#include	<usystem.h>
-#include	<syswords.hh>
-#include	<libmallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucatexit.h>
+#include	<ucatfork.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<mkpathx.h>
@@ -74,8 +76,10 @@
 #include	"sysdbfn.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -186,13 +190,13 @@ int sysdbmgr::init() noex {
 	        if ((rs = mx.create) >= 0) ylikely {
 	            const void_f	b = sysdbmgr_atforkbefore ;
 	            const void_f	a = sysdbmgr_atforkafter ;
-	            if ((rs = uc_atforkrecord(b,a,a)) >= 0) ylikely {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
 	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) ylikely {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexpunge(b,a,a) ;
+	                    uc_atforkexp(b,a,a) ;
 			}
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
@@ -237,7 +241,7 @@ int sysdbmgr::fini() noex {
 	    {
 	        const void_f	b = sysdbmgr_atforkbefore ;
 	        const void_f	a = sysdbmgr_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -275,7 +279,7 @@ int sysdbmgr::gets(int w,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (char *pbuf ; (rs = libmalloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
 	    cchar	*sysdbdir = sysword.w_sysdbdir ;
 	    cchar	*fn = sysdbfile[w] ;
 	    if ((rs = mkpath(pbuf,sysdbdir,fn)) >= 0) {
@@ -285,7 +289,7 @@ int sysdbmgr::gets(int w,cchar **rpp) noex {
 		    len = lenstr(rp) ;
 		} /* end if (memory-allocation) */
 	    } /* end if (mkpath) */
-	    rs1 = libmalloc_free(pbuf) ;
+	    rs1 = lm_free(pbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
