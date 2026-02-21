@@ -113,8 +113,15 @@ extern int	uc_symlink	(cchar *,cchar *) noex ;
 extern int	uc_unlink	(cchar *) noex ;
 extern int	uc_unlinksem	(cchar *) noex ;
 extern int	uc_unlinkshm	(cchar *) noex ;
-extern int	uc_utime	(cchar *,CUTIMBUF *) noex ;
-extern int	uc_utimes	(cchar *,CTIMEVAL *) noex ;
+extern int	uc_filetime	(cchar *,CUTIMBUF *) noex ;
+extern int	uc_filetimes	(cchar *,CTIMEVAL *) noex ;
+
+local inline int uc_utime(cchar *fn,CUTIMBUF *tbp) noex {
+    	return uc_filetime(fn,tbp) ;
+}
+local inline int uc_utimes(cchar *fn,CTIMEVAL *tvp) noex {
+    	return uc_filetimes(fn,tvp) ;
+}
 
 EXTERNC_end
 
