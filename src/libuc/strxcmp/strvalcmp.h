@@ -30,6 +30,8 @@ EXTERNC_begin
 
 extern int	strvalcmp(cchar *,cchar *) noex ;
 
+extern int	strxvalcmp(cchar *,cchar *) noex ;
+
 EXTERNC_end
 
 
