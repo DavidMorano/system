@@ -1,4 +1,4 @@
-# MAKEFILES (ucmem)
+# MAKEFILE (ucmem)
 
 T= ucmem
 
@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= ucmem_prime.o ucmem_incore.o
+OBJ0= ucmem_prime.o
 OBJ1= ucmemla.o
 OBJ2=
 OBJ3=
@@ -136,7 +136,6 @@ objb.o:			$(OBJB)
 
 
 ucmem_prime.o:		ucmem_prime.cc		$(INCS)
-ucmem_incore.o:		ucmem_incore.cc		$(INCS)
 
 ucmemla.o:		ucmemla.cc		$(INCS)
 
