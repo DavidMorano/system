@@ -35,21 +35,26 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucsysconf.h>
+#include	<ucfork.h>
+#include	<ucatfork.h>
+#include	<ucatexit.h>
 #include	<getbufsize.h>
 #include	<timewatch.hh>
 #include	<bufsizevar.hh>
 #include	<ptm.h>
-#include	<mallocxx.h>
-#include	<mallocstuff.h>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
-#include	<varnames.hh>		/* |varname(3u)| */
 #include	<localmisc.h>
 
 #include	"strenv.hh"
 
-import uconstants ;
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |sysword(3u)| + |varname(3u)| */
 
 /* local defines */
 
@@ -119,11 +124,11 @@ namespace {
 	    monbegin(this,valstoremem_monbegin) ;
 	    monend(this,valstoremem_monend) ;
 	} ; /* end ctor */
-	int valget(int,cchar **) noex ;
-	int valtmpdir(int) noex ;
-	int valmaildir(int) noex ;
-	int valpath(int) noex ;
-	int valenv(int) noex ;
+	int valget	(strenvs,cchar **) noex ;
+	int valtmpdir	(int) noex ;
+	int valmaildir	(int) noex ;
+	int valpath	(int) noex ;
+	int valenv	(int) noex ;
         void atforkbefore() noex {
 	    mx.lockbegin() ;
         }
@@ -151,26 +156,31 @@ namespace {
 } /* end namespace */
 
 constexpr strvarenv::strvarenv() noex {
-	name[strenv_path] 		= varname.path ;
-	name[strenv_fpath] 		= varname.fpath ;
-	name[strenv_incpath] 		= varname.incpath ;
-	name[strenv_libpath] 		= varname.libpath ;
-	name[strenv_manpath] 		= varname.manpath ;
-	name[strenv_infopath] 		= varname.infopath ;
-	name[strenv_cdpath] 		= varname.cdpath ;
-	name[strenv_tmpdir] 		= varname.tmpdir ;
-	name[strenv_maildir] 		= varname.maildir ;
-	name[strenv_node] 		= varname.node ;
-	name[strenv_domain] 		= varname.domain ;
+	name[strenv_cdpath]		= varname.cdpath ;
+	name[strenv_domain]		= varname.domain ;
+	name[strenv_fpath]		= varname.fpath ;
+	name[strenv_home]		= varname.home ;
+	name[strenv_incpath]		= varname.incpath ;
+	name[strenv_infopath]		= varname.infopath ;
+	name[strenv_libpath]		= varname.libpath ;
 	name[strenv_localdomain]	= varname.localdomain ;
-	name[strenv_username] 		= varname.username ;
-	name[strenv_user] 		= varname.user ;
-	name[strenv_logname] 		= varname.logname ;
-	name[strenv_home] 		= varname.home ;
-	name[strenv_mail] 		= varname.mail ;
+	name[strenv_logid]		= varname.logid ;
+	name[strenv_logline]		= varname.logline ;
+	name[strenv_logname]		= varname.logname ;
+	name[strenv_mail]		= varname.mail ;
+	name[strenv_maildir]		= varname.maildir ;
+	name[strenv_manpath]		= varname.manpath ;
+	name[strenv_node]		= varname.node ;
 	name[strenv_organization]	= varname.organization ;
-	name[strenv_orgloc] 		= varname.orgloc ;
-	name[strenv_orgcode] 		= varname.orgcode ;
+	name[strenv_orgcode]		= varname.orgcode ;
+	name[strenv_orgloc]		= varname.orgloc ;
+	name[strenv_path]		= varname.path ;
+	name[strenv_tmpdir]		= varname.tmpdir ;
+	name[strenv_user]		= varname.user ;
+	name[strenv_username]		= varname.username ;
+	name[strenv_utmpid]		= varname.utmpid ;
+	name[strenv_utmpline]		= varname.utmpline ;
+	name[strenv_utmpname]		= varname.utmpname ;
 } /* end method (strvarenv::ctor) */
 
 
@@ -187,7 +197,7 @@ extern "C" {
 
 constexpr strvarenv	enver ;
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 static valstore		data ;
 
@@ -232,13 +242,13 @@ int valstore::iinit() noex {
 	        if ((rs = mx.create) >= 0) ylikely {
 	            void_f	b = valstore_atforkbefore ;
 	            void_f	a = valstore_atforkafter ;
-	            if ((rs = uc_atforkrecord(b,a,a)) >= 0) ylikely {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
 	                if ((rs = uc_atexit(valstore_exit)) >= 0) {
 	                    finitdone = true ;
 	                    fr = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexpunge(b,a,a) ;
+	                    uc_atforkexp(b,a,a) ;
 			}
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
@@ -273,7 +283,7 @@ int valstore::ifini() noex {
 	    {
 		for (int i = 0 ; i < strenv_overlast ; i += 1) {
 		    if (ma[i]) {
-			rs1 = uc_free(ma[i]) ;
+			rs1 = lm_free(ma[i]) ;
 			if (rs >= 0) rs = rs1 ;
 			ma[i] = nullptr ;
 		    }
@@ -282,7 +292,7 @@ int valstore::ifini() noex {
 	    {
 	        void_f	b = valstore_atforkbefore ;
 	        void_f	a = valstore_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -296,7 +306,7 @@ int valstore::ifini() noex {
 }
 /* end method (valstore::ifini) */
 
-int valstore::valget(int aw,cchar **rpp) noex {
+int valstore::valget(strenvs aw,cchar **rpp) noex {
 	int		rs = SR_INVALID ;
 	int		rs1 ;
 	if ((aw >= 0) && (aw < strenv_overlast)) ylikely {
@@ -334,7 +344,7 @@ int valstore::valtmpdir(int aw) noex {
 		rp = sysword.w_tmpdir ;
 	    } /* end if (env-variable access) */
 	    strp[aw] = rp ;
-	} /* end if (env-variabiel name) */
+	} /* end if (env-variable name) */
 	facc[aw] = true ;
 	return rs ;
 }
@@ -348,7 +358,7 @@ int valstore::valmaildir(int aw) noex {
 		rp = sysword.w_maildir ;
 	    } /* end if (env-variable access) */
 	    strp[aw] = rp ;
-	} /* end if (env-variabiel name) */
+	} /* end if (env-variable name) */
 	facc[aw] = true ;
 	return rs ;
 }
@@ -362,7 +372,7 @@ int valstore::valpath(int aw) noex {
 	    if ((rp = getenv(vn)) == nullptr) {
 		if ((rs = maxpathlen) >= 0) ylikely {
 		    cint	tlen = (rs * PLMULT) ;
-		    if (char *tbuf ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+		    if (char *tbuf ; (rs = lm_mall((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;
 		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
 			    int		tl = rs ;
@@ -373,17 +383,20 @@ int valstore::valpath(int aw) noex {
 			        tl += rs ;
 		                if ((rs = uc_sysconfstr(cmd,cbuf,clen)) >= 0) {
 			            tl += rs ;
-			            ma[aw] = mallocstrw(tbuf,tl) ;
+				    cchar *cp ; 
+				    if ((rs = lm_strw(tbuf,tl,&cp)) >= 0) {
+			                ma[aw] = charp(cp) ;
+				    }
 		                } /* end if (uc_sysconfstr) */
 			    } /* end if (sncpy) */
 		        } /* end if (mkpath) */
-		        rs1 = uc_free(tbuf) ;
+		        rs1 = lm_free(tbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
 	    } /* end if (getenv) */
 	    strp[aw] = rp ;
-	} /* end if (env-variabiel name) */
+	} /* end if (env-variable name) */
 	facc[aw] = true ;
 	return rs ;
 }
