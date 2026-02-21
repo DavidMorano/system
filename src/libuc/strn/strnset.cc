@@ -71,7 +71,7 @@
 #include	<usysbase.h>
 #include	<localmisc.h>
 
-#include	"strn.h"
+#include	"strnset.h"
 
 
 /* local defines */
