@@ -1,4 +1,3 @@
-
 addrset
 buffer
 bufsize
@@ -93,3 +92,4 @@ wsfx
 wsix
 wsnx
 wswcpyx
+dirs
