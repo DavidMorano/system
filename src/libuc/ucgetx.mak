@@ -1,4 +1,4 @@
-# MAKEFILES (ucgetx)
+# MAKEFILE (ucgetx)
 
 T= ucgetx
 
