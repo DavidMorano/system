@@ -1,4 +1,4 @@
-# MAKEFILES (uclock)
+# MAKEFILE (uclock)
 
 T= uclock
 
