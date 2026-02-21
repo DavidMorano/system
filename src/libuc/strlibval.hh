@@ -30,69 +30,60 @@
 
 *******************************************************************************/
 
-#ifndef	STRLIBVAL_INCLUDE
-#define	STRLIBVAL_INCLUDE
+#ifndef	STRENV_INCLUDE
+#define	STRENV_INCLUDE
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* must be ordered fist to configure */
 #include	<clanguage.h>
-#include	<usysbase.h>
-#include	<aflag.hh>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 enum strlibvals {
-	strlibval_logid,
-	strlibval_logname,
-	strlibval_logline,
-	strlibval_utmpid,
-	strlibval_utmpname,
-	strlibval_utmpline,
-	strlibval_path,
-	strlibval_fpath,
-	strlibval_incpath,
-	strlibval_libpath,
-	strlibval_manpath,
-	strlibval_infopath,
 	strlibval_cdpath,
-	strlibval_tmpdir,
-	strlibval_maildir,
-	strlibval_node,
 	strlibval_domain,
-	strlibval_localdomain,
-	strlibval_username,
-	strlibval_user,
+	strlibval_fpath,
 	strlibval_home,
+	strlibval_incpath,
+	strlibval_infopath,
+	strlibval_libpath,
+	strlibval_localdomain,
+	strlibval_logid,
+	strlibval_logline,
+	strlibval_logname,
 	strlibval_mail,
+	strlibval_maildir,
+	strlibval_manpath,
+	strlibval_node,
 	strlibval_organization,
-	strlibval_orgloc,
 	strlibval_orgcode,
+	strlibval_orgloc,
+	strlibval_path,
+	strlibval_tmpdir,
+	strlibval_user,
+	strlibval_username,
+	strlibval_utmpid,
+	strlibval_utmpline,
+	strlibval_utmpname,
 	strlibval_overlast
 } ; /* end enum (strlibvals) */
 
 class strlibval {
 	cchar		*strp = nullptr ;
-	char		*a = nullptr ;
-	cint		w = -1 ;
-	aflag		fmx ;
-	aflag		fready ;
-	ccharp cook() noex ;
-	ccharp strtmpdir() noex ;
-	ccharp strmaildir() noex ;
-	ccharp strpath() noex ;
-public:
-	strlibval(int aw) noex : w(aw) { } ;
+	strlibvals	w ;
+	int		facc = false ;
+    public:
+	strlibval(strlibvals aw) noex : w(aw) { } ;
 	strlibval() = delete ;
 	strlibval &operator = (const strlibval &) = delete ;
 	operator ccharp () noex ;
-	void dtor() noex ;
-	destruct strlibval() {
-	    dtor() ;
-	} ;
 } ; /* end class (strlibval) */
 
 
 #endif	/* __cplusplus */
-#endif /* STRLIBVAL_INCLUDE */
+#endif /* STRENV_INCLUDE */
 
 
