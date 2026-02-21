@@ -1,4 +1,4 @@
-# MAKEFILES (ucfileop)
+# MAKEFILE (ucfileop)
 
 T= ucfileop
 
@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJ0= prefixfn.o
-OBJ1= ucchown.o ucfiletime.o
+OBJ1= ucchown.o ucfiletimes.o
 OBJ2= uclink.o uclstat.o ucpathconf.o
 OBJ3= ucreadlink.o ucstat.o
 OBJ4= ucstatvfs.o ucaccess.o
@@ -152,12 +152,12 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-prefixfn.o:		prefixfn.cc prefixfn.h			$(INCS)
+prefixfn.o:		prefixfn.cc	prefixfn.h		$(INCS)
 
 ucaccess.o:		ucaccess.cc				$(INCS)
 ucchown.o:		ucchown.cc				$(INCS)
 ucfilemode.o:		ucfilemode.cc				$(INCS)
-ucfiletime.o:		ucfiletime.cc				$(INCS)
+ucfiletimes.o:		ucfiletimes.cc	ucfiletimes.h		$(INCS)
 uclink.o:		uclink.cc				$(INCS)
 uclstat.o:		uclstat.cc				$(INCS)
 ucpathconf.o:		ucpathconf.cc				$(INCS)
