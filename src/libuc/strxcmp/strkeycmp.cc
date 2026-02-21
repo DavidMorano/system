@@ -70,6 +70,7 @@
 
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
+    typedef int (*strcmp_f)(cchar *,cchar *) noex ;
 }
 
 
@@ -80,6 +81,11 @@ extern "C" {
 
 
 /* local structures */
+
+enum order : uchar {
+    order_obv,
+    order_rev
+} ; /* end enum (order) */
 
 
 /* forward references */
@@ -114,6 +120,24 @@ local int strkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p) noex {
 	return rc ;
 } /* end subroutine (strkeycmp) */
 
+local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,order forder) noex {
+    	int		rc = 0 ;
+	if (s1 || s2) {
+	    rc = +1 ;
+	    if (s1) {
+		rc = -1 ;
+		if (s2) {
+		    if (forder) {
+		        rc = (- fun(s1,s2)) ;
+		    } else {
+		        rc = (+ fun(s1,s2)) ;
+		    }
+		}
+	    }
+	}
+	return rc ;
+} /* end subroutine (strxcmp) */
+
 
 /* local variables */
 
@@ -133,6 +157,50 @@ int strkeycasecmp(cchar *e1p,cchar *e2p) noex {
 
 int strkeyfoldcmp(cchar *e1p,cchar *e2p) noex {
 	return strkeyxcmp(tofc,e1p,e2p) ;
+}
+
+
+int strkeybasecmpo(cchar *s1,cchar *s2) noex {
+	return (+ strkeybasecmp(s1,s2)) ;
+}
+int strkeybasecmpr(cchar *s1,cchar *s2) noex {
+	return (- strkeybasecmp(s1,s2)) ;
+}
+
+int strkeycasecmpo(cchar *s1,cchar *s2) noex {
+    	return (+ strkeycasecmp(s1,s2)) ;
+}
+int strkeycasecmpr(cchar *s1,cchar *s2) noex {
+    	return (- strkeycasecmp(s1,s2)) ;
+}
+
+int strkeyfoldcmpo(cchar *s1,cchar *s2) noex {
+    	return (+ strkeyfoldcmp(s1,s2)) ;
+}
+int strkeyfoldcmpr(cchar *s1,cchar *s2) noex {
+    	return (- strkeyfoldcmp(s1,s2)) ;
+}
+
+
+int strkeyxbasecmpo(cchar *s1,cchar *s2) noex {
+    	return strxcmp(strkeybasecmp,s1,s2,order_obv) ;
+}
+int strkeyxbasecmpr(cchar *s1,cchar *s2) noex {
+    	return strxcmp(strkeybasecmp,s1,s2,order_rev) ;
+}
+
+int strkeyxcasecmpo(cchar *s1,cchar *s2) noex {
+    	return strxcmp(strkeycasecmp,s1,s2,order_obv) ;
+}
+int strkeyxcasecmpr(cchar *s1,cchar *s2) noex {
+    	return strxcmp(strkeycasecmp,s1,s2,order_rev) ;
+}
+
+int strkeyxfoldcmpo(cchar *s1,cchar *s2) noex {
+    	return strxcmp(strkeyfoldcmp,s1,s2,order_obv) ;
+}
+int strkeyxfoldcmpr(cchar *s1,cchar *s2) noex {
+    	return strxcmp(strkeyfoldcmp,s1,s2,order_rev) ;
 }
 
 
