@@ -17,11 +17,9 @@ checkbase
 clusterdb
 conmsghdr
 digval
-dirempty
 dirlist
 dupstr
 expcook
-filegrp
 findfile
 findfilepath
 findinline
@@ -44,7 +42,6 @@ mallocstuff
 mapex
 mapshmtmp
 memfile
-mkdirs
 msghdr
 netgroupcheck
 nodedb
@@ -55,8 +52,6 @@ pmq
 pwentry
 pwfile
 randomvar
-removes
-rmdirfiles
 rsfree
 serialbuf
 shellunder
@@ -94,7 +89,6 @@ uckeepalive
 uckillpg
 uckvamatch
 uclibmem
-uclibmemx
 ucmsgdiscard
 ucnprocs
 ucprogdata
@@ -123,3 +117,5 @@ uptspawn
 userattrdb
 varray
 xfile
+comparse
+matparam
