@@ -69,6 +69,7 @@
 #include	<usysbase.h>
 #include	<nleadstr.h>
 #include	<toxc.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"strnxsub.h"
@@ -176,18 +177,22 @@ char *strnfoldsub(cchar *sp,int sl,cchar *ss) noex {
 
 char *strner::strnxsub(cchar *sp,int µsl,cchar *ss,int sslen) noex {
 	char		*rp = nullptr ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) >= sslen) {
-            cint        sslead = toxc(ss[0]) ;
-            int         i ; /* used-afterwards */
-            bool        f = false ;
-            for (i = 0 ; i <= (sl - sslen) ; i += 1) {
-                if (toxc(sp[i]) == sslead) {
-                    cint        m = nleadxstr((sp + i),ss,sslen) ;
-                    f = (m == sslen) ;
-                    if (f) break ;
-                } /* end if */
-            } /* end for */
-	    if (f) rp = charp(sp + i) ;
+	if (cint sl = getlenstr(sp,µsl) ; sl >= sslen) {
+	    int ch = mkchar(ss[0]) ;
+	    {
+                cint        sslead = toxc(ch) ;
+                int         i ; /* used-afterwards */
+                bool        f = false ;
+                for (i = 0 ; i <= (sl - sslen) ; i += 1) {
+		    ch = mkchar(sp[i]) ;
+                    if (toxc(ch) == sslead) {
+                        cint        m = nleadxstr((sp + i),ss,sslen) ;
+                        f = (m == sslen) ;
+                        if (f) break ;
+                    } /* end if */
+                } /* end for */
+	        if (f) rp = charp(sp + i) ;
+	    } /* end block */
         } /* end if (getlenstr) */
 	return rp ;
 }
