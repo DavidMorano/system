@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 1999-06-08, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This subroutine was written again for Rightcore Network
 	Services (RNS).
 
 */
 
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
