@@ -91,17 +91,18 @@ import libutil ;			/* |lenstr(3u)| */
 /* exported subroutines */
 
 int strnvalcmp(cchar *sp,cchar *vp,int vl) noex {
+    	cnullptr	np{} ;
 	int		rc = 0 ;
 	if (sp && vp) {
 	    if (vl < 0) vl = lenstr(vp) ;
-	    if (cchar *tp ; (tp = strchr(sp,'=')) != nullptr) {
+	    if (cchar *tp ; (tp = strchr(sp,'=')) != np) {
 	        sp = (tp + 1) ;
 	        while (*sp) {
 	            if ((strncmp(sp,vp,vl) == 0) &&
 	                ((sp[vl] == '\0') || (sp[vl] == ':'))) {
 		        rc = 0 ;
 		    }
-	            if ((tp = strchr(sp,':')) == nullptr) break ;
+	            if ((tp = strchr(sp,':')) == np) break ;
 	            sp = (tp + 1) ;
 		    if (rc) break ;
 	        } /* end while */
