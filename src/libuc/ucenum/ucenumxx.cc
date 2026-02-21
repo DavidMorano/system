@@ -59,7 +59,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static inline int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
+local inline int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
@@ -69,10 +69,9 @@ static inline int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
 	    } /* end if (new-filemap) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine ucenumxx_ctor) */
+} /* end subroutine ucenumxx_ctor) */
 
-static inline int ucenumxx_dtor(ucenumxx *op) noex {
+local inline int ucenumxx_dtor(ucenumxx *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -82,8 +81,7 @@ static inline int ucenumxx_dtor(ucenumxx *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine ucenumxx_dtor) */
+} /* end subroutine ucenumxx_dtor) */
 
 
 /* local variables */
