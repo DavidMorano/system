@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1999-06-08, David AÂ­DÂ­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRNXTERM_INCLUDE
 #define	STRNXTERM_INCLUDE
