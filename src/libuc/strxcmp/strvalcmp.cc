@@ -100,4 +100,18 @@ int strvalcmp(cchar *sp,cchar *vp) noex {
 }
 /* end subroutine (strvalcmp) */
 
+int strxvalcmp(cchar *sp,cchar *vp) noex {
+    	int		rc = 0 ;
+	if (sp || vp) {
+	    rc = +1 ;
+	    if (sp) {
+		rc = -1 ;
+		if (vp) {
+		    rc = strvalcmp(sp,vp) ;
+		}
+	    }
+	}
+	return rc ;
+} /* end subroutine (strxvalcmp) */
+
 
