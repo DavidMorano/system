@@ -5,7 +5,9 @@ Special counted c-string comparison subroutines.
 subroutines	description
 --------------------------------------------------------------------------------
 
-strnfoldcmp	compare insensitivelt uysing folded case
+strnbasecmp	compare sensitively
+strncasecmp	compare semi-insensitively using upper case
+strnfoldcmp	compare insensitively using folded case
 strnkeycmp	compare the key parts of the given c-strings
 strnleadcmp	compare the leading part of a c-string
 strnncmp	the famous double counted c-string compare (case sensitive)
