@@ -169,7 +169,7 @@ template<typename ... Args>
 local inline int langparse_magic(langparse *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LANGPARSE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LANGPARSE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (langparse_magic) */
@@ -214,7 +214,7 @@ int langparse_start(langparse *op) noex {
 		if ((rs = obp->start) >= 0) ylikely {
 	            op->outbuf = obp ;
 		    op->fl.clear = true ;	/* initial state */
-	            op->magic = LANGPARSE_MAGIC ;
+	            op->magval = LANGPARSE_MAGIC ;
 		}
 		if (rs < 0) {
 		    delete obp ;
@@ -250,7 +250,7 @@ int langparse_finish(langparse *op) noex {
 		rs1 = langparse_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
@@ -571,11 +571,7 @@ void langparse::dtor() noex {
 } /* end method (langparse::dtor) */
 
 langparse::operator int () noex {
-    	int		rs ;
-	if ((rs = langparse_magic(this)) >= 0) ylikely {
-	    rs = 0 ;
-	}
-	return rs ;
+    	return SR_OK ;
 } /* end method (langparse::operator) */
 
 langparse_co::operator int () noex {
