@@ -90,23 +90,26 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* exported subroutines */
 
-int strnvalcmp(cchar *sp,cchar *vp,int vl) noex {
+int strnvalcmp(cchar *sp,cchar *valp,int µvall) noex {
     	cnullptr	np{} ;
 	int		rc = 0 ;
-	if (sp && vp) {
-	    if (vl < 0) vl = lenstr(vp) ;
-	    if (cchar *tp ; (tp = strchr(sp,'=')) != np) {
-	        sp = (tp + 1) ;
-	        while (*sp) {
-	            if ((strncmp(sp,vp,vl) == 0) &&
-	                ((sp[vl] == '\0') || (sp[vl] == ':'))) {
-		        rc = 0 ;
-		    }
-	            if ((tp = strchr(sp,':')) == np) break ;
+	if (sp) {
+	    if (int vall ; (vall = getlenstr(valp,µvall)) >= 0) {
+	        if (cchar *tp ; (tp = strchr(sp,'=')) != np) {
 	            sp = (tp + 1) ;
-		    if (rc) break ;
-	        } /* end while */
-	    } /* end if */
+	            while (*sp) {
+			if (strncmp(sp,valp,vall) == 0) {
+			    cint ch_end = sp[vall] ;
+			    if ((ch_end == '\0') || (ch_end == ':')) {
+		               rc = 0 ;
+		            }
+			}
+	                if ((tp = strchr(sp,':')) == np) break ;
+	                sp = (tp + 1) ;
+		        if (rc) break ;
+	            } /* end while */
+	        } /* end if */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rc ;
 }
@@ -120,7 +123,7 @@ int strnvalcmp(cchar *sp,cchar *vp,int µvl) noex {
 	    if (cint vl = getlenstr(vp,µvl) ; vl >= 0) {
 	        if (cchar *tp ; (tp = strchr(sp,'=')) != nullptr) {
 	            sp = (tp + 1) ;
-		    rs = strncmp(sp,vp,vl) ;
+		    rc = strncmp(sp,vp,vl) ;
 	        } /* end if */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
