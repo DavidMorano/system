@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* vector object list operations (vstrsort) */
+/* vector object list operations (string-sort) */
 /* version %I% last-modified %G% */
 
 
@@ -36,6 +36,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<vstr.h>		/* |vstrsort(3uc)| */
 #include	<localmisc.h>
 
 #include	"vecobj.h"
@@ -46,16 +47,8 @@
 
 /* local typedefs */
 
-extern "C" {
-    typedef int (*vstrsort_cf)(cchar *,cchar *) noex ;
-}
-
 
 /* external subroutines */
-
-extern "C" {
-    extern int	vstrsort(void **,int,vstrsort_cf) noex ;
-}
 
 
 /* external variables */
@@ -83,8 +76,9 @@ int vecobj_strsort(vecobj *op,vecobj_vcf vcmp) noex {
 	        if (! op->fl.issorted) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
-			vstrsort_cf	scf = vstrsort_cf(vcmp) ;
-	                vstrsort(op->va,op->i,scf) ;
+			ccharpp		va = ccharpp(op->va) ;
+			vstrsort_f	scf = vstrsort_f(vcmp) ;
+	                vstrsort(va,op->i,scf) ;
 	            }
 	        }
 	        rs = op->c ;
