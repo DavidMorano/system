@@ -97,7 +97,7 @@ struct vecpstr_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-	uint		stsize:1 ;
+	uint		stsz:1 ;
 } ; /* end struct (vecpstr_flags) */
 
 struct vecpstr_chunk {
@@ -119,7 +119,7 @@ struct vecpstr_head {
 	int		idx ;		/* index */
 	int		ext ;		/* extent */
 	int		fidx ;		/* first-index */
-	int		stsize ;	/* string table size */
+	int		stsz ;		/* string table size */
 } ; /* end struct (vecpstr_head) */
 
 EXTERNC_begin
@@ -189,6 +189,16 @@ struct vecpstr_st {
 	    return operator () () ;
 	} ;
 } ; /* end struct (vecpstr_st) */
+struct vecpstr_so {
+	vecpstr		*op = nullptr ;
+	void init(vecpstr *p) noex {
+	    op = p ;
+	} ;
+	int operator () (vecpstr_f = nullptr) noex ;
+	operator int () noex {
+	    return operator () (nullptr) ;
+	} ;
+} ; /* end struct (vecpstr_so) */
 struct vecpstr_co {
 	vecpstr		*op = nullptr ;
 	int		w = -1 ;
@@ -203,6 +213,7 @@ struct vecpstr_co {
 } ; /* end struct (vecpstr_co) */
 struct vecpstr : vecpstr_head {
 	vecpstr_st	start ;
+	vecpstr_so	sort ;
 	vecpstr_co	addcspath ;
 	vecpstr_co	count ;
 	vecpstr_co	delall ;
@@ -213,37 +224,38 @@ struct vecpstr : vecpstr_head {
 	vecpstr_co	finish ;
 	vecpstr() noex {
 	    start	(this) ;
+	    sort.init	(this) ;
 	    addcspath	(this,vecpstrmem_addcspath) ;
 	    count	(this,vecpstrmem_count) ;
 	    delall	(this,vecpstrmem_delall) ;
 	    strsize	(this,vecpstrmem_strsize) ;
 	    recsize	(this,vecpstrmem_recsize) ;
-	    recsize	(this,vecpstrmem_recsize) ;
+	    cksize	(this,vecpstrmem_cksize) ;
 	    audit	(this,vecpstrmem_audit) ;
 	    finish	(this,vecpstrmem_finish) ;
 	    magic = 0 ;
 	} ; /* end ctor */
 	vecpstr(const vecpstr &) = delete ;
 	vecpstr &operator = (const vecpstr &) = delete ;
-	int add(cchar *,int = -1) noex ;
-	int adduniq(cchar *,int = -1) noex ;
-	int addsyms(cchar *,mainv) noex ;
-	int addpath(cchar *,int = -1) noex ;
-	int insert(int,cchar *,int = -1) noex ;
-	int store(cchar *,int,cchar **) noex ;
-	int already(cchar *,int) noex ;
-	int get(int,cchar **) noex ;
-	int getlast(cchar **) noex ;
-	int getvec(mainv *) noex ;
-	int envadd(cchar *,cchar *,int = -1) noex ;
-	int envset(cchar *,cchar *,int = -1) noex ;
-	int envfile(cchar *) noex ;
-	int find(cchar *) noex ;
-	int findn(cchar *,int = -1) noex ;
-	int search(cchar *,vecpstr_f,cchar ** = nullptr) noex ;
-	int finder(cchar *,vecpstr_f,cchar ** = nullptr) noex ;
-	int del(int = -1) noex ;
-	int sort(vecpstr_f = nullptr) noex ;
+	int add		(cchar *,int = -1) noex ;
+	int adduniq	(cchar *,int = -1) noex ;
+	int addsyms	(cchar *,mainv) noex ;
+	int addpath	(cchar *,int = -1) noex ;
+	int insert	(int,cchar *,int = -1) noex ;
+	int store	(cchar *,int,cchar **) noex ;
+	int already	(cchar *,int) noex ;
+	int loadfile	(int,cchar *) noex ;
+	int get		(int,cchar **) noex ;
+	int getlast	(cchar **) noex ;
+	int getvec	(mainv *) noex ;
+	int envadd	(cchar *,cchar *,int = -1) noex ;
+	int envset	(cchar *,cchar *,int = -1) noex ;
+	int envfile	(cchar *) noex ;
+	int find	(cchar *) noex ;
+	int findn	(cchar *,int = -1) noex ;
+	int search	(cchar *,vecpstr_f,cchar ** = nullptr) noex ;
+	int finder	(cchar *,vecpstr_f,cchar ** = nullptr) noex ;
+	int del		(int = -1) noex ;
 	operator int () noex ;
 	vecpstr_iter begin() noex {
 	    vecpstr_iter		it(va,0,idx) ;
