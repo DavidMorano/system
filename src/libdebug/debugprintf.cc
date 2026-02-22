@@ -1,4 +1,5 @@
 /* debugprintf SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* special debug printing */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	debugprintf
+
+	Description:
 	This subroutine does a printf-like function but for the
 	special error output facility. It calls |format(3dam)| as
 	might be expected but besides that it tries to be as simple
@@ -88,14 +93,18 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<csignal>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
+#include	<cstring>
 #include	<cstdio>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<ptm.h>
 #include	<hasx.h>
 #include	<cfdec.h>
@@ -104,6 +113,9 @@
 #include	<ischarx.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -149,13 +161,13 @@ extern "C" {
 /* local structures */
 
 struct debugprint_head {
-	ptm		m ;		/* data mutex */
+	ptm		mx ;		/* data mutex */
 	vaflag		f_void ;
 	vaflag		f_init ;
 	vaflag		f_initdone ;
 	int		fd ;
-	int		size ;
-} ;
+	int		sz ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -180,10 +192,10 @@ static char	*convdeci(LONG,char *) noex ;
 
 static DEBUGPRINT	ef ; /* zero-initialized */
 
-static constexpr cchar	cthextable[] = {
+constexpr char	cthextable[] = {
 	'0', '1', '2', '3', '4', '5', '6', '7',
 	'8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -195,48 +207,62 @@ int debugprint_init() noex {
 	DEBUGPRINT	*uip = &ef ;
 	int		rs = 1 ;
 	if (! uip->f_init) {
-	    uip->f_init = TRUE ;
-	    if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
-	        void	(*b)() = debugprint_atforkbefore ;
-	        void	(*a)() = debugprint_atforkafter ;
-	        if ((rs = uc_atfork(b,a,a)) >= 0) {
+	    ptm *mxp = &uip->mx ;
+	    uip->f_init = true ;
+	    if ((rs = mxp->) >= 0) {
+	        void_f b= debugprint_atforkbefore ;
+	        void_f a = debugprint_atforkafter ;
+	        if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	            if ((rs = uc_atexit(debugprint_fini)) >= 0) {
 	                rs = 0 ;
-	                uip->f_initdone = TRUE ;
+	                uip->f_initdone = true ;
 	            }
-	            if (rs < 0)
-	                uc_atforkexpunge(b,a,a) ;
+	            if (rs < 0) {
+	                uc_atforkexp(b,a,a) ;
+		    }
 	        } /* end if (uc_atfork) */
-	        if (rs < 0)
-	            ptm_destroy(&uip->m) ;
+	        if (rs < 0) {
+	            mxp->destroy() ;
+		}
 	    } /* end if (ptm_create) */
-	    if (rs < 0)
-	        uip->f_init = FALSE ;
+	    if (rs < 0) {
+	        uip->f_init = false ;
+	    }
 	} else {
 	    while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	        rs = msleep(1) ;
 	    }
-	    if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKLOST ;
-	}
+	    if ((rs >= 0) && (! uip->f_init)) {
+		rs = SR_LOCKLOST ;
+	    }
+	} /* end if */
 	return rs ;
 }
 /* end subroutine (debugprint_init) */
 
 void debugprint_fini() noex {
 	DEBUGPRINT	*uip = &ef ;
+	int		rs = SR_OK ;
+	int		rs1 ;
 	if (uip->f_initdone) {
-	    uip->f_initdone = FALSE ;
+	    uip->f_initdone = false ;
 	    if (uip->fd > 0) {
-	        u_close(uip->fd) ;
+	        rs1 = u_close(uip->fd) ;
+		if (rs >= 0) rs = rs1 ;
 	        uip->fd = 0 ; /* special case (use zero) */
 	    }
 	    {
-	        void	(*b)() = debugprint_atforkbefore ;
-	        void	(*a)() = debugprint_atforkafter ;
-	        uc_atforkexpunge(b,a,a) ;
+	        void_f	b = debugprint_atforkbefore ;
+	        void_f	a = debugprint_atforkafter ;
+	        rs1 = uc_atforkexp(b,a,a) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
-	    ptm_destroy(&uip->m) ;
-	    memset(uip,0,sizeof(DEBUGPRINT)) ;
+	    {
+	    	ptm *mxp = &uip->mx ;
+	        rs1 = mxp->destroy ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    memclear(uip) ;
 	} /* end if (was initialized) */
 }
 /* end subroutine (debugprint_fini) */
@@ -424,14 +450,13 @@ int debugsetfd(int fd) noex {
 
 	ef.fd = 0 ; /* special case (use zero) */
 	if (fd >= 0) {
-	    ustat	sb ;
-	    if ((fd < FD_MAX) && ((rs = u_fstat(fd,&sb)) >= 0)) {
+	    if (ustat sb ; (fd < FD_MAX) && ((rs = u_fstat(fd,&sb)) >= 0)) {
 	        ef.fd = fd ;
-	        ef.size = sb.st_size ;
+	        ef.sz = intconv(sb.st_size) ;
 	    }
 	}
 
-	if (ef.fd >= 0) {
+	if ((rs >= 0) && (ef.fd >= 0)) {
 	    u_fchmod(ef.fd ,0666) ;
 	}
 
@@ -508,7 +533,7 @@ int debugprint(cchar *sbuf,int slen) noex {
 int debugprinter(cchar *sbuf,int slen) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	int		f_needeol = FALSE ;
+	int		f_needeol = false ;
 	char		*abuf = nullptr ;
 
 #if	CF_LINELEN
@@ -521,7 +546,7 @@ int debugprinter(cchar *sbuf,int slen) noex {
 /* preparation and check if need EOL */
 
 	if ((slen == 0) || (sbuf[slen-1] != '\n')) {
-	    f_needeol = TRUE ;
+	    f_needeol = true ;
 	} else {
 	    slen -= 1 ;
 	}
@@ -564,7 +589,7 @@ int debugprinter(cchar *sbuf,int slen) noex {
 	cint		alen = (LINEBUFLEN+2) ; /* room for added EOL */
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	int		f_needeol = FALSE ;
+	int		f_needeol = false ;
 	char		abuf[LINEBUFLEN+3] ; /* room for added EOL */
 
 #if	CF_LINELEN
@@ -577,7 +602,7 @@ int debugprinter(cchar *sbuf,int slen) noex {
 /* preparation and check if need EOL */
 
 	if ((slen == 0) || (sbuf[slen-1] != '\n')) {
-	    f_needeol = TRUE ;
+	    f_needeol = true ;
 	} else {
 	    slen -= 1 ;
 	}
@@ -608,7 +633,7 @@ int debugprinter(cchar *sbuf,int slen) noex {
 	int		rs = SR_OK ;
 	int		alen ;
 	int		wlen = 0 ;
-	int		f_needeol = FALSE ;
+	int		f_needeol = false ;
 
 #if	CF_LINELEN
 	slen = strlinelen(sbuf,slen,LINEBUFLEN) ; /* some protection */
@@ -620,7 +645,7 @@ int debugprinter(cchar *sbuf,int slen) noex {
 /* preparation and check if need EOL */
 
 	if ((slen == 0) || (sbuf[slen-1] != '\n')) {
-	    f_needeol = TRUE ;
+	    f_needeol = true ;
 	} else {
 	    slen -= 1 ;
 	}
@@ -661,31 +686,31 @@ int debugprinter(cchar *sbuf,int slen) noex {
 
 static int debugprinters(cchar *sbuf,int slen) noex {
 	int		rs ;
+	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = debugprint_init()) >= 0) {
 	    DEBUGPRINT	*uip = &ef ;
-	    if ((rs = ptm_lock(&uip->m)) >= 0) { /* single */
+	    ptm *mxp = &uip->mx ;
+	    if ((rs = mcp->lockbegin) >= 0) { /* single */
 		int	cmd = F_LOCK ;
 		if ((rs = uc_lockf(ef.fd,cmd,0L)) >= 0) {
-		    USTAT	sb ;
-		    if ((rs = u_fstat(ef.fd,&sb)) >= 0) {
-
+		    if (ustat sb ; (rs = u_fstat(ef.fd,&sb)) >= 0) {
 	                if (S_ISREG(sb.st_mode) && (sb.st_size != ef.size)) {
 	                    off_t	uoff = sb.st_size ;
 	                    ef.size = sb.st_size ;
 	                    u_seek(ef.fd,uoff,SEEK_SET) ;
 	                }
-
 	                if ((rs = u_write(ef.fd,sbuf,slen)) >= 0) {
 	                    wlen = rs ;
 	                    ef.size += wlen ;
 	                }
-
 		    } /* end if (u_fstat) */
 		    cmd = F_UNLOCK ;
-		    uc_lockf(ef.fd,cmd,0L) ;
+		    rs1 = uc_lockf(ef.fd,cmd,0L) ;
+		    if (rs >= 0) rs = rs1 ;
 		} /* end if (uc_lockf) */
-	        ptm_unlock(&uip->m) ;
+	        rs1 = mxp->lockend ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (debugprint_init) */
 	return (rs >= 0) ? wlen : rs ;
@@ -694,18 +719,23 @@ static int debugprinters(cchar *sbuf,int slen) noex {
 
 static void debugprint_atforkbefore() noex {
 	DEBUGPRINT	*uip = &ef ;
-	ptm_lock(&uip->m) ;
+	{
+	    ptm *mxp = &uip->mx ;
+	    mxp->lockbegin() ;
+	}
 }
 /* end subroutine (debugprint_atforkbefore) */
 
 static void debugprint_atforkafter() noex {
 	DEBUGPRINT	*uip = &ef ;
-	ptm_unlock(&uip->m) ;
+	{
+	    ptm *mxp = &uip->mx ;
+	    mxp->lockend() ;
+	}
 }
 /* end subroutine (debugprint_atforkafter) */
 
 static char *convdeci(LONG num,char *endptr) noex {
-{
 	ULONG		unum = (ULONG) num ;
 	char		*bp ;
 	if (num < 0) unum = (- unum) ;
@@ -716,7 +746,7 @@ static char *convdeci(LONG num,char *endptr) noex {
 /* end subroutine (convdeci) */
 
 static int cthexi(char *buf,int val) noex {
-	cint		n = (2 * sizeof(int)) ;
+	cint		n = (2 * szof(int)) ;
 	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
 	    buf[i] = cthextable[val & 0x0F] ;
 	    val >>= 4 ;
@@ -750,7 +780,7 @@ static int snwcpyprintclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 /* end subroutine (snwcpyprintclean) */
 
 static int hasprintbad(cchar *sp,int sl) noex {
-	int		f = FALSE ;
+	int		f = false ;
 	while (sl && *sp) {
 	    f = isprintbad(sp[0] & 0xff) ;
 	    if (f) break ;
