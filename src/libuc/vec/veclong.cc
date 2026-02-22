@@ -60,10 +60,6 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-extern "C" {
-    typedef int (*qsortcmp_f)(cvoid *,cvoid *) noex ;
-}
-
 
 /* external subroutines */
 
@@ -352,9 +348,10 @@ int veclong_sort(veclong *op) noex {
 	    if (! op->fl.issorted) {
 	        op->fl.issorted = true ;
 	        if (op->c > 1) {
+		    csize	alen = size_t(op->i) ;
 		    csize	esize = sizeof(VECLONG_TYPE) ;
-		    qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
-	            qsort(op->va,op->i,esize,qcf) ;
+		    qsort_f	qcf = qsort_f(deftypecmp) ;
+	            qsort(op->va,alen,esize,qcf) ;
 	        }
 	    }
 	    rs = op->c ;
@@ -378,11 +375,11 @@ int veclong_find(veclong *op,VECLONG_TYPE v) noex {
 	int		i = 0 ; /* ¥ GCC false complaint */
 	if ((rs = veclong_magic(op)) >= 0) ylikely {
 	    if (op->fl.issorted) {
-	        csize		esize = szof(VECLONG_TYPE) ;
-		csize		elen = size_t(op->i) ;
-	        qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
+		csize	alen = size_t(op->i) ;
+	        csize	esize = sizeof(VECLONG_TYPE) ;
+	        qsort_f	qcf = qsort_f(deftypecmp) ;
 	        VECLONG_TYPE	*rpp ;
-	        rpp = (VECLONG_TYPE *) bsearch(&v,op->va,elen,esize,qcf) ;
+	        rpp = (VECLONG_TYPE *) bsearch(&v,op->va,alen,esize,qcf) ;
 	        rs = SR_NOTFOUND ;
 	        if (rpp) {
 	            i = intconv(rpp - op->va) ;
