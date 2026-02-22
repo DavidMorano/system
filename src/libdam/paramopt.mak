@@ -40,10 +40,19 @@ MODS +=
 LIBS +=
 
 
+OBJ0= paramopt_prime.o paramopt_loadone.o
+OBJ1= paramopt_obj.o
+OBJ2=
+OBJ3=
+
+OBJA= obj0.o obj1.o
+
+OBJ= obja.o
+
+
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -56,17 +65,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= paramopt_main.o paramopt_loadone.o
-OBJ1= paramopt_obj.o
-OBJ2=
-OBJ3=
-
-OBJA= obj0.o obj1.o
-
-OBJ= obja.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -79,6 +78,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -144,7 +146,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
-paramopt_main.o:	paramopt_main.cc			$(INCS)
+paramopt_prime.o:	paramopt_prime.cc			$(INCS)
 paramopt_loadone.o:	paramopt_loadone.cc			$(INCS)
 paramopt_obj.o:		paramopt_obj.cc				$(INCS)
 
