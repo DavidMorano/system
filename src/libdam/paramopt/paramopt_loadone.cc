@@ -30,7 +30,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<nulstr.h>
 #include	<six.h>
 #include	<char.h>
@@ -38,7 +39,9 @@
 
 #include	"paramopt.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -66,16 +69,16 @@ import libutil ;
 int paramopt_loadone(paramopt *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	int		i = 0 ;
+	int		idx = 0 ;
 	if ((rs = paramopt_magic(op,sp)) >= 0) {
 	    if (sl <= 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    }
-	    if (int si ; (si = sibrk(sp,sl," \t=,")) >= 0) {
+	    if (int si ; (si = sibrk(sp,sl," \t=,:")) >= 0) {
 	        cchar	*keyname ;
-	        if (nulstr kn ; (rs = kn.start(sp,i,&keyname)) >= 0) {
+	        if (nulstr kn ; (rs = kn.start(sp,si,&keyname)) >= 0) {
 	            sp += si ;
 	            sl -= si ;
 	            while ((sl > 0) && CHAR_ISWHITE(*sp)) {
@@ -88,7 +91,7 @@ int paramopt_loadone(paramopt *op,cchar *sp,int sl) noex {
 	            }
 		    {
 	                rs = paramopt_load(op,keyname,sp,sl) ;
-		        i = rs ;
+		        idx = rs ;
 		    }
 	            rs1 = kn.finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -97,7 +100,7 @@ int paramopt_loadone(paramopt *op,cchar *sp,int sl) noex {
 	        rs = SR_INVALID ;
 	    }
 	} /* end if (magic) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? idx : rs ;
 }
 /* end subroutine (paramopt_loadone) */
 
