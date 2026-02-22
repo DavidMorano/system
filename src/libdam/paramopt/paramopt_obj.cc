@@ -17,6 +17,9 @@
 
 /*******************************************************************************
 
+  	Object:
+	paramopt
+
 	Description:
 	This is very similar to |paramopt_loadu(3dam)| but it allows
 	for a special separator character between the key and the
@@ -27,7 +30,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<nulstr.h>
 #include	<six.h>
 #include	<char.h>
@@ -35,7 +40,9 @@
 
 #include	"paramopt.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -129,7 +136,7 @@ void paramopt::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("paramopt",rs,"fini-finish") ;
 	}
-}
+} /* end method (paramopt::dtor) */
 
 paramopt::operator int () noex {
     	int		rs = SR_NOTOPEN ;
@@ -137,7 +144,7 @@ paramopt::operator int () noex {
 	    rs = paramopt_count(this) ;
 	}
 	return rs ;
-}
+} /* end method (paramopt::operator) */
 
 paramopt_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -158,7 +165,6 @@ paramopt_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (paramopt_co::operator) */
+} /* end method (paramopt_co::operator) */
 
 
