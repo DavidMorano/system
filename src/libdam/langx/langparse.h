@@ -28,9 +28,9 @@
 #include	<usysrets.h>
 
 
-#define	LANGPARSE_MAGIC		0x13f3c205
 #define	LANGPARSE		struct langparse_head
 #define	LANGPARSE_FL		struct langparse_flags
+#define	LANGPARSE_MAGIC		0x13f3c205
 #define	LANGPARSE_NSTAGE	2
 
 
@@ -66,7 +66,7 @@ struct langparse_head {
 	void		*outbuf ;	/* output-buffer pointer */
 	void		*rstrp ;	/* raw-string pointer */
 	LANGPARSE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		pch ;		/* previous character */
 } ; /* end struct (langparse_head) */
 
@@ -97,7 +97,7 @@ struct langparse : langparse_head {
 	langparse() noex {
 	    start	(this,langparsemem_start) ;
 	    finish	(this,langparsemem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	langparse(const langparse &) = delete ;
 	langparse &operator = (const langparse &) = delete ;
@@ -106,7 +106,7 @@ struct langparse : langparse_head {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct langparse() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (langparse) */
 #else	/* __cplusplus */
