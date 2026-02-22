@@ -204,20 +204,20 @@ struct veclong : veclong_head {
 	} ; /* end ctor */
 	veclong(const veclong &) = delete ;
 	veclong &operator = (const veclong &) = delete ;
-	int add(VECLONG_TYPE) noex ;
-	int addlist(const VECLONG_TYPE *,int) noex ;
-	int adduniq(VECLONG_TYPE) noex ;
-	int insert(int,VECLONG_TYPE) noex ;
-	int assign(int,VECLONG_TYPE) noex ;
-	int del(int) noex ;
-	int find(VECLONG_TYPE) noex ;
-	int match(VECLONG_TYPE) noex ;
-	int getval(int,VECLONG_TYPE *) noex ;
-	int getvec(VECLONG_TYPE **) noex ;
-	int mkvec(VECLONG_TYPE *) noex ;
-	int curbegin(veclong_cur *) noex ;
-	int curend(veclong_cur *) noex ;
-	int curenum(veclong_cur *,VECLONG_TYPE *) noex ;
+	int add		(VECLONG_TYPE) noex ;
+	int addlist	(const VECLONG_TYPE *,int) noex ;
+	int adduniq	(VECLONG_TYPE) noex ;
+	int insert	(int,VECLONG_TYPE) noex ;
+	int assign	(int,VECLONG_TYPE) noex ;
+	int del		(int) noex ;
+	int find	(VECLONG_TYPE) noex ;
+	int match	(VECLONG_TYPE) noex ;
+	int getval	(int,VECLONG_TYPE *) noex ;
+	int getvec	(VECLONG_TYPE **) noex ;
+	int mkvec	(VECLONG_TYPE *) noex ;
+	int curbegin	(veclong_cur *) noex ;
+	int curend	(veclong_cur *) noex ;
+	int curenum	(veclong_cur *,VECLONG_TYPE *) noex ;
 	veclong_iter begin() noex {
 	    veclong_iter		it(va,0,i) ;
 	    return it ;
@@ -237,28 +237,28 @@ typedef VECLONG		veclong ;
 
 EXTERNC_begin
 
-extern int veclong_start(veclong *,int,int) noex ;
-extern int veclong_finish(veclong *) noex ;
-extern int veclong_add(veclong *,VECLONG_TYPE) noex ;
-extern int veclong_addlist(veclong *,const VECLONG_TYPE *,int) noex ;
-extern int veclong_adduniq(veclong *,VECLONG_TYPE) noex ;
-extern int veclong_insert(veclong *,int,VECLONG_TYPE) noex ;
-extern int veclong_assign(veclong *,int,VECLONG_TYPE) noex ;
-extern int veclong_resize(veclong *,int) noex ;
-extern int veclong_del(veclong *,int) noex ;
-extern int veclong_count(veclong *) noex ;
-extern int veclong_sort(veclong *) noex ;
-extern int veclong_setsorted(veclong *) noex ;
-extern int veclong_find(veclong *,VECLONG_TYPE) noex ;
-extern int veclong_match(veclong *,VECLONG_TYPE) noex ;
-extern int veclong_search(veclong *,VECLONG_TYPE) noex ;
-extern int veclong_getval(veclong *,int,VECLONG_TYPE *) noex ;
-extern int veclong_getvec(veclong *,VECLONG_TYPE **) noex ;
-extern int veclong_mkvec(veclong *,VECLONG_TYPE *) noex ;
-extern int veclong_curbegin(veclong *,veclong_cur *) noex ;
-extern int veclong_curenum(veclong *,veclong_cur *,VECLONG_TYPE *) noex ;
-extern int veclong_curend(veclong *,veclong_cur *) noex ;
-extern int veclong_audit(veclong *) noex ;
+extern int veclong_start	(veclong *,int,int) noex ;
+extern int veclong_finish	(veclong *) noex ;
+extern int veclong_add		(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_addlist	(veclong *,const VECLONG_TYPE *,int) noex ;
+extern int veclong_adduniq	(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_insert	(veclong *,int,VECLONG_TYPE) noex ;
+extern int veclong_assign	(veclong *,int,VECLONG_TYPE) noex ;
+extern int veclong_resize	(veclong *,int) noex ;
+extern int veclong_del		(veclong *,int) noex ;
+extern int veclong_count	(veclong *) noex ;
+extern int veclong_sort		(veclong *) noex ;
+extern int veclong_setsorted	(veclong *) noex ;
+extern int veclong_find		(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_match	(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_search	(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_getval	(veclong *,int,VECLONG_TYPE *) noex ;
+extern int veclong_getvec	(veclong *,VECLONG_TYPE **) noex ;
+extern int veclong_mkvec	(veclong *,VECLONG_TYPE *) noex ;
+extern int veclong_curbegin	(veclong *,veclong_cur *) noex ;
+extern int veclong_curenum	(veclong *,veclong_cur *,VECLONG_TYPE *) noex ;
+extern int veclong_curend	(veclong *,veclong_cur *) noex ;
+extern int veclong_audit	(veclong *) noex ;
 
 EXTERNC_end
 
