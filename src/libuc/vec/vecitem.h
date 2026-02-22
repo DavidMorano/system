@@ -181,14 +181,14 @@ struct vecitem : vecitem_head {
 	} ; /* end ctor */
 	vecitem(const vecitem &) = delete ;
 	vecitem &operator = (const vecitem &) = delete ;
-	int start(int = 0,int = 0) noex ;
-	int add(cvoid *,int) noex ;
-	int get(int,void *) noex ;
-	int getvec(void **) noex ;
-	int find(cvoid *,int) noex ;
-	int fetch(cvoid *,vecitem_cur *,vecitem_cmpf,void *) noex ;
-	int search(cvoid *,vecitem_cmpf,void *) noex ;
-	int sort(vecitem_cmpf) noex ;
+	int start	(int = 0,int = 0) noex ;
+	int add		(cvoid *,int) noex ;
+	int get		(int,void *) noex ;
+	int getvec	(void **) noex ;
+	int find	(cvoid *,int) noex ;
+	int fetch	(cvoid *,vecitem_cur *,vecitem_cmpf,void *) noex ;
+	int search	(cvoid *,vecitem_cmpf,void *) noex ;
+	int sort	(vecitem_cmpf) noex ;
 	operator int () noex ;
 	vecitem_iter begin() noex {
 	    vecitem_iter		it(va,0,i) ;
