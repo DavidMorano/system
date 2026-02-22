@@ -57,11 +57,15 @@ using libuc::libmem ;			/* variable */
 /* local typedefs */
 
 extern "C" {
-    typedef int (*qsort_f)(cvoid *,cvoid *) noex ;
     typedef vecitem_cmpf	cmpf ;
 }
 
 typedef vecitem_cur	cur ;
+
+#ifndef	TYPEDEF_CADDRP
+#define	TYPEDEF_CADDRP
+typedef caddr__t *	caddrp ;
+#endif /* TYPEDEF_CADDRP */
 
 
 /* external subroutines */
@@ -304,9 +308,10 @@ int vecitem_sort(vecitem *op,cmpf cf) noex {
 	    if (! op->fl.issorted) {
 	        op->fl.issorted = true ;
 	        if (op->c > 1) {
+		    csize	alen = size_t(op->i) ;
+		    csize	esize = sizeof(void *) ;
 		    qsort_f	scf = qsort_f(cf) ;
-		    cint	ssz = szof(void *) ;
-	            qsort(op->va,op->i,ssz,scf) ;
+	            qsort(op->va,alen,esize,scf) ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -371,21 +376,21 @@ int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if (op && cep && cf) ylikely {
+	    void	**va = op->va ;
+	    csize	alen = size_t(op->i) ;
+	    csize	esize = sizeof(void *) ;
+	    qsort_f	scf = qsort_f(cf) ;
 	    rs = SR_OK ;
 	    if (op->fl.osorted && (! op->fl.issorted)) {
 	        op->fl.issorted = true ;
 	        if (op->c > 1) {
-		    qsort_f	scf = qsort_f(cf) ;
-		    cint	ssz = szof(void *) ;
-	            qsort(op->va,op->i,ssz,scf) ;
+	            qsort(va,alen,esize,scf) ;
 	        }
 	    } /* end if (sorting) */
 	    if (op->fl.issorted) {
-	        qsort_f		scf = qsort_f(cf) ;
-	        cint		ssz = szof(void *) ;
-	        void		**spp ;
+	        voidpp	spp ;
 	        rs = SR_NOTFOUND ;
-	        if ((spp = voidpp(bsearch(&cep,op->va,op->i,ssz,scf))) != np) {
+	        if ((spp = voidpp(bsearch(&cep,va,alen,esize,scf))) != np) {
 	            i = intconv(spp - op->va) ;
 	            rs = SR_OK ;
 	        }
@@ -579,9 +584,10 @@ local int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
             if (! op->fl.issorted) {
                 op->fl.issorted = true ;
                 if (op->c > 1) {
+		    csize	alen = size_t(op->i) ;
+                    csize	esize = sizeof(void *) ;
                     qsort_f     scf = qsort_f(cf) ;
-                    cint        ssz = szof(void *) ;
-                    qsort(op->va,op->i,ssz,scf) ;
+                    qsort(op->va,alen,esize,scf) ;
                 } /* end if (sorting) */
                 if ((rs = vecitem_search(op,cep,cf,rpp)) >= 0) {
                     cint        is = rs ;
