@@ -28,9 +28,9 @@
 #include	<langstate.h>
 
 
-#define	LANGPROC_MAGIC		0x13f3c203
 #define	LANGPROC		struct langproc_head
 #define	LANGPROC_CUR		struct langproc_cursor
+#define	LANGPROC_MAGIC		0x13f3c203
 
 
 struct langproc_head {
