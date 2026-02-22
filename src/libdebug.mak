@@ -35,27 +35,12 @@ DEFS +=
 
 INCS += debug.h
 
+MODS +=
+
 LIBS +=
 
 
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ00= debugprintf.o debug.o 
+OBJ00= debugprintf.o debugprimæ.o 
 OBJ01= nprintf.o fdprintf.o 
 OBJ02= strlinelen.o
 OBJ03= 
@@ -111,7 +96,22 @@ OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE)
 OBJS= obja.o objb.o objc.o objd.o obje.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		all
@@ -124,6 +124,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -251,7 +254,7 @@ cfdec.o:		cfdec.c cfdec.h
 
 X01= testdebugprint
 
-X01OBJa= $(X01).o debugprintf.o debug.o
+X01OBJa= $(X01).o debugprintf.o debugprime.o
 X01OBJb=
 X01OBJc=
 X01OBJd=
@@ -267,7 +270,7 @@ $(X01).x:		$(X01OBJ)
 X02= testnprint
 
 X02OBJa= $(X02).o nprintf.o
-X02OBJb= debugprintf.o debug.o
+X02OBJb= debugprintf.o debugprime.o
 X02OBJc=
 X02OBJd=
 
