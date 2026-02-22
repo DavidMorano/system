@@ -21,7 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<netdb.h>
+#include	<netdb.h>		/* |HOSTENT| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -36,6 +36,8 @@ extern int debugclose(void) noex ;
 extern int debugprint(cchar *,int) noex ;
 extern int debugprintf(cchar *,...) noex ;
 extern int debugprinthexblock(cchar *,int,cvoid *,int) noex ;
+extern int debugprinthex(cchar *,int,cchar *,int) noex ;
+
 extern int nprintf(cchar *,cchar *,...) noex ;
 extern int nprinthexblock(cchar *,cchar *,int,cvoid *,int) noex ;
 extern int strlinelen(cchar *,int,int) noex ;
@@ -45,8 +47,6 @@ extern int d_openfiles() noex ;
 extern int d_ispath(cchar *) noex ;
 extern int mkhexstr(char *,int,cvoid *,int) noex ;
 extern int mkhexnstr(char *,int,int,cchar *,int) noex ;
-extern int debugprinthex(cchar *,int,cchar *,int) noex ;
-extern int debugprinthexblock(cchar *,int,cvoid *,int) noex ;
 extern int hexblock(cchar *,cchar *,int) noex ;
 extern int heaudit(HOSTENT *,cchar *,int) noex ;
 extern char *stroflags(char *,int) noex ;
