@@ -1,16 +1,31 @@
 VSTR (libuc)
 
 These subroutines facilitate sorting and searching those array
-structures that require a double pointer indirection to the
-stored data.  In the presenr case (VSTR), the stored data
-are c-strings.
+structures that require a double pointer indirection to the stored
+data (c-strings).  In the presenr case (VSTR), the stored data are
+c-strings.
 
 subroutine	description
 --------------------------------------------------------------------------------
 
-vstrcmpx	these are the obverse and reverse c-string comparisons
-vstrkeycmpx	this is th very faous key-string comparisons (fwd + rev)
+vstrcmp{x}	these are the obverse and reverse c-string comparisons
+vstrkeycmp{x}	this is th very faous key-string comparisons (fwd + rev)
 vstrkeydictcmp	this is the key-dictionånry comparison (only forward)
+
+
+Usages:
+These subroutines are usedul for those sorting algorithms that
+take indirect pointers to the c-string data.
+Some sorting facilities or containers that take these kind of
+subroutines are:
+
+vecstr
+vecpstr
+vechand		(when the contained data are c-strings)
+vecobj		(when the contained data are c-strings)
+raqelem		(when the contained data are c-strings)
+recarrj		(when the contained data are c-strings)
+raqhand		(when the contained data are c-strings)
 
 
 Notes:
