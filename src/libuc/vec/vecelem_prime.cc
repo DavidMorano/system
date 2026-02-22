@@ -64,7 +64,6 @@ using libuc::libmem ;			/* variable */
 typedef vecelem_vcmp	c_f ;
 
 extern "C" {
-    typedef int (*qsort_f)(cvoid *,cvoid *) noex ;
     typedef int (*rawc_f)(void **,void **) noex ;
     typedef int (*vg_f)(vecelem *,int,void **) noex ;
 }
@@ -331,10 +330,10 @@ int vecelem_sort(vecelem *op,vecelem_vcmp vcf) noex {
 	    if (! op->fl.issorted) {
 	        op->fl.issorted = true ;
 	        if (op->c > 1) {
-		    qsort_f	scf = qsort_f(vcf) ;
+		    csize	alen = size_t(op->i) ;
 		    csize	esize = size_t(op->esz) ;
-		    csize	elen = size_t(op->i) ;
-	            qsort(op->va,elen,esize,scf) ;
+		    qsort_f	scf = qsort_f(vcf) ;
+	            qsort(op->va,alen,esize,scf) ;
 		} /* end if (sorting needed) */
 	    } /* end if (not already sorted) */
 	} /* end if (magic) */
