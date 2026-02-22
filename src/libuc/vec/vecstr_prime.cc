@@ -100,7 +100,7 @@
 #include	<nulstr.h>
 #include	<nleadstr.h>
 #include	<strwcpy.h>
-#include	<vstrcmpx.h>
+#include	<vstrcmp.h>
 #include	<intceil.h>
 #include	<localmisc.h>
 
@@ -120,7 +120,6 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 /* imported namespaces */
 
 using std::string ;			/* type */
-using std::sort ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
 
 
@@ -128,7 +127,6 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     typedef int (*vs_f)(cvoid *,cvoid *) noex ;
-    typedef int (*qsort_f)(cvoid *,cvoid *) noex ;
 }
 
 
@@ -159,8 +157,6 @@ local void	vecstr_arrsort(vecstr *,vecstr_vcmp) noex ;
 
 /* local variables */
 
-constexpr bool		f_qsort = CF_QSORT ;
-
 constexpr int		defents = VECSTR_DEFENTS ;
 constexpr int		rsn = SR_NOTFOUND ;
 constexpr int		resz = szof(int) ;
@@ -183,8 +179,8 @@ int vecstr_start(vecstr *op,int vn,int vo) noex {
 	        if (void *va ; (rs = libmem.mall(sz,&va)) >= 0) ylikely {
 	            op->va = ccharpp(va) ;
 	            op->va[0] = nullptr ;
-	            op->stsize = 1 ;
-		    op->fl.stsize = true ;	/* starts off true */
+	            op->stsz = 1 ;
+		    op->fl.stsz = true ;	/* starts off true */
 	        } /* end if (memory-allocation) */
 	    } /* end if */
 	    if (rs < 0) {
@@ -253,15 +249,16 @@ int vecstr_add(vecstr *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (vecstr_add) */
 
-int vecstr_adduniq(vecstr *op,cchar *sp,int sl) noex {
+int vecstr_adduniq(vecstr *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rs = vecstr_findn(op,sp,sl)) >= 0) {
-	        rs = INT_MAX ;
-	    } else if (rs == SR_NOTFOUND) {
-	        rs = vecstr_add(op,sp,sl) ;
-	    }
+	if (op) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        if ((rs = vecstr_findn(op,sp,sl)) >= 0) {
+	            rs = INT_MAX ;
+	        } else if (rs == SR_NOTFOUND) {
+	            rs = vecstr_add(op,sp,sl) ;
+	        }
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -287,7 +284,7 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	            *bp++ = '=' ;
 	            if (vp) bp = strwcpy(bp,vp,vl) ;
 	            *bp = '\0' ;
-	            op->stsize += sz ;
+	            op->stsz += sz ;
 	            i = vecstr_addsp(op,ap) ;
 	        } /* end if (memory-allocation) */
 	    } /* end if (ok) */
@@ -296,47 +293,49 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 }
 /* end subroutine (vecstr_addkeyval) */
 
-int vecstr_insert(vecstr *op,int ii,cchar *sp,int sl) noex {
+int vecstr_insert(vecstr *op,int ii,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && sp) ylikely {
-	     if ((rs = vecstr_validx(op,ii)) >= 0) ylikely {
-	        if (sl < 0) sl = lenstr(sp) ;
+	if (op) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        if ((rs = vecstr_validx(op,ii)) >= 0) ylikely {
+	             if ((op->i + 1) > op->n) {
+	                 rs = vecstr_extvec(op) ;
+	             }
+	             if (rs >= 0) {
+	                 cint	sz = (sl + 1) ;
+	                 if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
+	                     strwcpy(bp,sp,sl) ;
+	                     op->stsz += sz ;
+	                     i = vecstr_insertsp(op,ii,bp) ;
+	                 } /* end if (memory-allocation) */
+	             } /* end if (OK) */
+	        } /* end if (valid index) */
+	    } /* end if (getlenstr) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (vecstr_insert) */
+
+int vecstr_store(vecstr *op,cchar *sp,int 탎l,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ;
+	if (op) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+		rs = SR_OK ;
 	        if ((op->i + 1) > op->n) {
 	            rs = vecstr_extvec(op) ;
 	        }
 	        if (rs >= 0) {
 	            cint	sz = (sl + 1) ;
 	            if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
-	                strwcpy(bp,sp,sl) ;
-	                op->stsize += sz ;
-	                i = vecstr_insertsp(op,ii,bp) ;
-	            } /* end if (memory-allocation) */
-	        } /* end if (OK) */
-	    } /* end if (valid index) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecstr_insert) */
-
-int vecstr_store(vecstr *op,cchar *sp,int sl,cchar **rpp) noex {
-	int		rs = SR_FAULT ;
-	int		i = 0 ;
-	if (op) ylikely {
-	    rs = SR_OK ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((op->i + 1) > op->n) {
-	        rs = vecstr_extvec(op) ;
-	    }
-	    if (rs >= 0) {
-	        cint	sz = (sl + 1) ;
-	        if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
-	            char *ep = strwcpy(bp,sp,sl) ;
-	            op->stsize += intconv(ep - bp) ;
-	            i = vecstr_addsp(op,bp) ;
-		    if (rpp) *rpp = bp ;
-	        } /* end if (m-a) */
-	    } /* end if (ok) */
+	                char *ep = strwcpy(bp,sp,sl) ;
+	                op->stsz += intconv(ep - bp) ;
+	                i = vecstr_addsp(op,bp) ;
+		        if (rpp) *rpp = bp ;
+	            } /* end if (m-a) */
+	        } /* end if (ok) */
+	    } /* end if (getlenstr) */
 	    if (rpp && (rs < 0)) *rpp = nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
@@ -393,8 +392,8 @@ int vecstr_del(vecstr *op,int i) noex {
 		    bool	f_fi = false ;
 	            if (op->va[i] != nullptr) {
 	                op->c -= 1 ;		/* decrement list count */
-	                if (op->fl.stsize) {
-	                    op->stsize -= (lenstr(op->va[i]) + 1) ;
+	                if (op->fl.stsz) {
+	                    op->stsz -= (lenstr(op->va[i]) + 1) ;
 	                }
 			char *bp = cast_const<charp>(op->va[i]) ;
 	    		libmem.free(bp) ;
@@ -438,8 +437,8 @@ int vecstr_del(vecstr *op,int i) noex {
 		} else if (rs == SR_NOTFOUND) {
 		    rs = vecstr_delall(op) ;
 	        } /* end if (valid index) */
-		op->fl.stsize = false ;
-		op->stsize = 0 ;
+		op->fl.stsz = false ;
+		op->stsz = 0 ;
 		c = op->c ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
@@ -464,7 +463,7 @@ int vecstr_delall(vecstr *op) noex {
 	        op->fi = 0 ;
 	        op->va[0] = nullptr ;
 	        op->c = 0 ;
-	        op->stsize = 1 ;
+	        op->stsz = 1 ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
@@ -513,10 +512,10 @@ int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	            }
 	        } /* end if (sorting) */
 	        if (op->fl.issorted) {
-		    csize	nsize = size_t(op->i) ;
+		    csize	alen = size_t(op->i) ;
 	            csize	esize = sizeof(char *) ;
 	            qsort_f	scf = qsort_f(vcf) ;
-	            spp = (cchar **) bsearch(&sp,op->va,nsize,esize,scf) ;
+	            spp = (cchar **) bsearch(&sp,op->va,alen,esize,scf) ;
 	            rs = SR_NOTFOUND ;
 	            if (spp) {
 	                i = intconv(spp - op->va) ;
@@ -605,23 +604,24 @@ int vecstr_find(vecstr *op,cchar *sp) noex {
 }
 /* end subroutine (vecstr_find) */
 
-int vecstr_findn(vecstr *op,cchar *sp,int sl) noex {
+int vecstr_findn(vecstr *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp) ylikely {
-	    rs = SR_NOTFOUND ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (op->va) ylikely {
-	        cint	sch = sp[0] ; /* ok: since all get promoted similarly */
-	    	int	i{} ;		/* <- used-afterwards */
-	        for (i = 0 ; i < op->i ; i += 1) {
-	            cchar	*ep = op->va[i] ;
-	            if (ep && (sch == ep[0])) {
-		        cint	m = nleadstr(ep,sp,sl) ;
-		        if ((m == sl) && (ep[m] == '\0')) break ;
-		    }
-	        } /* end for */
-	        if (i < op->i) rs = i ;
-	    } /* end if (populated) */
+	if (op) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        rs = SR_NOTFOUND ;
+	        if (op->va) ylikely {
+	            cint	sch = sp[0] ; /* ok: all promoted similarly */
+	    	    int	i{} ;		/* <- used-afterwards */
+	            for (i = 0 ; i < op->i ; i += 1) {
+	                cchar	*ep = op->va[i] ;
+	                if (ep && (sch == ep[0])) {
+		            cint	m = nleadstr(ep,sp,sl) ;
+		            if ((m == sl) && (ep[m] == '\0')) break ;
+		        }
+	            } /* end for */
+	            if (i < op->i) rs = i ;
+	        } /* end if (populated) */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -661,24 +661,24 @@ int vecstr_getvec(vecstr *op,mainv *rppp) noex {
 
 int vecstr_strsize(vecstr *op) noex {
 	int		rs = SR_FAULT ;
-	int		stsize = 1 ;
+	int		stsz = 1 ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
-	        if (! op->fl.stsize) {
+	        if (! op->fl.stsz) {
 	            for (int i = 0 ; i < op->i ; i += 1) {
 			cchar	*ep = op->va[i] ;
 	                if (ep) {
-	                    stsize += (lenstr(ep) + 1) ;
+	                    stsz += (lenstr(ep) + 1) ;
 		        }
 	            } /* end for */
-	            op->stsize = stsize ;
-	            op->fl.stsize = true ;
+	            op->stsz = stsz ;
+	            op->fl.stsz = true ;
 	        } /* end if (calculating size) */
-	        stsize = iceil(op->stsize,szof(int)) ;
+	        stsz = iceil(op->stsz,szof(int)) ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? stsize : rs ;
+	return (rs >= 0) ? stsz : rs ;
 }
 /* end subroutine (vecstr_strsize) */
 
@@ -686,9 +686,9 @@ int vecstr_strmk(vecstr *op,char *tab,int tabs) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op && tab) ylikely {
-	    cint 	stsize = iceil(op->stsize,resz) ;
+	    cint 	stsz = iceil(op->stsz,resz) ;
 	    rs = SR_OVERFLOW ;
-	    if (tabs >= stsize) {
+	    if (tabs >= stsz) {
 	        char	*bp = tab ;
 	        rs = SR_OK ;
 	        *bp++ = '\0' ;	/* <- no chunks: do it ourselves */
@@ -727,7 +727,7 @@ int vecstr_recsize(vecstr *op) noex {
 int vecstr_cksize(vecstr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
-	    if ((rs = op->stsize) == 0) {
+	    if ((rs = op->stsz) == 0) {
 	        rs = vecstr_strsize(op) ;
 	    }
 	} /* end if (non-null) */
@@ -767,13 +767,13 @@ int vecstr_recmkstr(vecstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	int		c = 0 ;
 	if (op && rec && tab) ylikely {
 	    rs = SR_OK ;
-	    if (op->stsize == 0) {
+	    if (op->stsz == 0) {
 		rs = vecstr_strsize(op) ;
 	    }
 	    if (rs >= 0) ylikely {
-		cint 	stsize = iceil(op->stsize,resz) ;
+		cint 	stsz = iceil(op->stsz,resz) ;
 		rs = SR_OVERFLOW ;
-	        if (tabs >= stsize) ylikely {
+	        if (tabs >= stsz) ylikely {
 	            cint	rsz = ((op->c + 2) * resz) ;
 	            if (recs >= rsz) {
 	    		char	*bp = tab ;
@@ -800,7 +800,7 @@ int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	int		c = 0 ;
 	if (op && av && tab) ylikely {
 	    if ((rs = op->cksize) >= 0) ylikely {
-		int	sz = iceil(op->stsize,szof(int)) ;
+		int	sz = iceil(op->stsz,szof(int)) ;
 		rs = SR_OVERFLOW ;
 	        if (tabs >= sz) ylikely {
 	            sz = (op->c + 1) * szof(int) ;
@@ -846,11 +846,10 @@ local int vecstr_ctor(vecstr *op) noex {
 	    op->i = 0 ;
 	    op->n = 0 ;
 	    op->fi = 0 ;
-	    op->stsize = 0 ;
+	    op->stsz = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_ctor) */
+} /* end subroutine (vecstr_ctor) */
 
 local int vecstr_dtor(vecstr *op) noex {
 	int		rs = SR_OK ;
@@ -858,8 +857,7 @@ local int vecstr_dtor(vecstr *op) noex {
 	    op->va = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (vecstr_dtor) */
+} /* end subroutine (vecstr_dtor) */
 
 consteval int mkoptmask() noex {
 	int		m = 0 ;
@@ -973,16 +971,11 @@ local int vecstr_validx(vecstr *op,int i) noex {
 /* end subroutine (vecstr_validx) */
 
 local void vecstr_arrsort(vecstr *op,vecstr_vcmp vcf) noex {
-	qsort_f		scf = qsort_f(vcf) ;
-	if_constexpr (f_qsort) {
-	    csize	nsize = size_t(op->i) ;
-	    csize	esize = sizeof(char *) ;
-	    qsort(op->va,nsize,esize,scf) ;
-	} else {
-	    cint	i = op->i ;
-	    cchar	**va = op->va ;
-	    sort(va,(va+i),scf) ;
-	}
+	cchar	**va = op->va ;
+	csize	alen = size_t(op->i) ;
+	csize	esize = sizeof(char *) ;
+	qsort_f	scf = qsort_f(vcf) ;
+	qsort(va,alen,esize,scf) ;
 }
 /* end subroutine (vecstr_arrsort) */
 
@@ -1012,6 +1005,10 @@ int vecstr::store(cchar *sp,int sl,cchar **rpp) noex {
 
 int vecstr::already(cchar *sp,int sl) noex {
 	return vecstr_already(this,sp,sl) ;
+}
+
+int vecstr::loadfile(int fu,cchar *fname) noex {
+	return vecstr_loadfile(this,fu,fname) ;
 }
 
 int vecstr::get(int ai,cchar **rpp) noex {
@@ -1063,7 +1060,7 @@ void vecstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecstr",rs,"fini-finish") ;
 	}
-}
+} /* end method (vecstr::dtor) */
 
 vecstr::operator int () noex {
     	int		rs = SR_NOTOPEN ;
@@ -1071,7 +1068,7 @@ vecstr::operator int () noex {
 	    rs = c ;
 	}
 	return rs ;
-}
+} /* end method (vecstr::operator) */
 
 int vecstr_st::operator () (int vn,int vo) noex {
 	int		rs = SR_BUGCHECK ;
@@ -1082,11 +1079,7 @@ int vecstr_st::operator () (int vn,int vo) noex {
 } /* end method (vecstr_st::operator) */
 
 int vecstr_so::operator () (vecstr_f cmp) noex  {
-	int		rs = SR_BUGCHECK ;
-	if (op) ylikely {
-	    rs = vecstr_sort(op,cmp) ;
-	} /* end if (non-null) */
-	return rs ;
+	return vecstr_sort(op,cmp) ;
 } /* end method (vecstr_so:operator) */
 
 vecstr_co::operator int () noex {

@@ -61,7 +61,7 @@
 #include	<sfx.h>
 #include	<strcpyx.h>
 #include	<strdcpyxw.h>
-#include	<vstrkeycmpx.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
