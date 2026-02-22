@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	PARAMOPT	struct paramopt_head
@@ -37,7 +34,7 @@
 struct paramopt_value {
 	PARAMOPT_VAL	*next ;
 	cchar		*value ;
-} ;
+} ; /* end struct */
 
 struct paramopt_namer {
 	cchar		*name ;		/* key */
@@ -46,19 +43,19 @@ struct paramopt_namer {
 	PARAMOPT_VAL	*tail ;
 	PARAMOPT_VAL	*current ;	/* used for interation only */
 	int		c ;		/* count of values */
-} ;
+} ; /* end struct */
 
 struct paramopt_head {
 	PARAMOPT_NAME	*head ;
 	PARAMOPT_NAME	*tail ;
-	uint		magic ;
+	uint		magval ;
 	int		f_inited ;
-} ;
+} ; /* end struct */
 
 struct paramopt_cursor {
 	PARAMOPT_NAME	*keyp ;
 	PARAMOPT_VAL	*valp ;
-} ;
+} ; /* end struct */
 
 typedef PARAMOPT_NAME	paramopt_name ;
 typedef PARAMOPT_VAL	paramopt_val ;
@@ -71,7 +68,7 @@ enum paramoptmems {
 	paramoptmem_incr,
 	paramoptmem_finish,
 	paramoptmem_overlast
-} ;
+} ; /* end enum */
 struct paramopt ;
 struct paramopt_co {
 	paramopt	*op = nullptr ;
@@ -123,37 +120,36 @@ typedef PARAMOPT	paramopt ;
 
 EXTERNC_begin
 
-extern int paramopt_start(paramopt *) noex ;
-extern int paramopt_loadu(paramopt *,cchar *,int) noex ;
-extern int paramopt_loads(paramopt *,cchar *,cchar *,int) noex ;
-extern int paramopt_load(paramopt *,cchar *,cchar *,int) noex ;
-extern int paramopt_loaduniq(paramopt *,cchar *,cchar *,int) noex ;
-extern int paramopt_loadone(paramopt *,cchar *,int) noex ;
-extern int paramopt_havekey(paramopt *,cchar *) noex ;
-extern int paramopt_haveval(paramopt *,cchar *,cchar *,int) noex ;
-extern int paramopt_count(paramopt *) noex ;
-extern int paramopt_countvals(paramopt *,cchar *) noex ;
-extern int paramopt_incr(paramopt *) noex ;
-extern int paramopt_curbegin(paramopt *,paramopt_cur *) noex ;
-extern int paramopt_curend(paramopt *,paramopt_cur *) noex ;
-extern int paramopt_curenumkey(paramopt *,paramopt_cur *,cchar **) noex ;
-extern int paramopt_curenumval(paramopt *,cchar *,paramopt_cur *,cc **) noex ;
-extern int paramopt_curfetch(paramopt *,cchar *,paramopt_cur *,cchar **) noex ;
-extern int paramopt_finish(paramopt *) noex ;
+extern int paramopt_start	(paramopt *) noex ;
+extern int paramopt_loadu	(paramopt *,cchar *,int) noex ;
+extern int paramopt_loads	(paramopt *,cchar *,cchar *,int) noex ;
+extern int paramopt_load	(paramopt *,cchar *,cchar *,int) noex ;
+extern int paramopt_loaduniq	(paramopt *,cchar *,cchar *,int) noex ;
+extern int paramopt_loadone	(paramopt *,cchar *,int) noex ;
+extern int paramopt_havekey	(paramopt *,cchar *) noex ;
+extern int paramopt_haveval	(paramopt *,cchar *,cchar *,int) noex ;
+extern int paramopt_count	(paramopt *) noex ;
+extern int paramopt_countvals	(paramopt *,cchar *) noex ;
+extern int paramopt_incr	(paramopt *) noex ;
+extern int paramopt_curbegin	(paramopt *,paramopt_cur *) noex ;
+extern int paramopt_curend	(paramopt *,paramopt_cur *) noex ;
+extern int paramopt_curenumkey	(paramopt *,paramopt_cur *,cchar **) noex ;
+extern int paramopt_curenumval	(paramopt *,cchar *,paramopt_cur *,cc **) noex ;
+extern int paramopt_curfetch	(paramopt *,cc *,paramopt_cur *,cc **) noex ;
+extern int paramopt_finish	(paramopt *) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
 template<typename ... Args>
-static inline int paramopt_magic(paramopt *op,Args ... args) noex {
+local inline int paramopt_magic(paramopt *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == PARAMOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == PARAMOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (paramopt_magic) */
+} /* end subroutine (paramopt_magic) */
 
 #endif /* __cplusplus */
 
