@@ -119,7 +119,7 @@ template<typename ... Args>
 static int langstate_magic(langstate *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LANGSTATE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LANGSTATE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (langstate_magic) */
@@ -137,11 +137,11 @@ int langstate_start(langstate *op) noex {
 	int		rs ;
 	if ((rs = langstate_ctor(op)) >= 0) ylikely {
 	    op->fl.clear = true ;
-	    op->magic = LANGSTATE_MAGIC ;
+	    op->magval = LANGSTATE_MAGIC ;
 	    if (rs < 0) {
 		langstate_dtor(op) ;
 	    }
-	} /* end if (magic) */
+	} /* end if (langstate_ctor) */
 	return rs ;
 } /* end subroutine (langstate_start) */
 
@@ -153,7 +153,7 @@ int langstate_finish(langstate *op) noex {
 		rs1 = langstate_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (langstate_finish) */
@@ -292,8 +292,8 @@ void langstate::dtor() noex {
 } /* end method (langstate::dtor) */
 
 langstate::operator int () noex {
-    	int		rs ;
-	if ((rs = langstate_magic(this)) >= 0) {
+    	int		rs = SR_NOTOPEN ;
+    	if (magval == LANGSTATE_MAGIC) {
 	    rs = line ;
 	}
 	return rs ;
