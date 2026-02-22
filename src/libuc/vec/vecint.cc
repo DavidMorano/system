@@ -60,10 +60,6 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-extern "C" {
-    typedef int (*qsortcmp_f)(cvoid *,cvoid *) noex ;
-}
-
 
 /* external subroutines */
 
@@ -352,9 +348,10 @@ int vecint_sort(vecint *op) noex {
 	    if (! op->fl.issorted) {
 	        op->fl.issorted = true ;
 	        if (op->c > 1) {
+		    csize	alen = size_t(op->i) ;
 		    csize	esize = sizeof(VECINT_TYPE) ;
-		    qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
-	            qsort(op->va,op->i,esize,qcf) ;
+		    qsort_f	qcf = qsort_f(deftypecmp) ;
+	            qsort(op->va,alen,esize,qcf) ;
 	        }
 	    }
 	    rs = op->c ;
@@ -380,7 +377,7 @@ int vecint_find(vecint *op,VECINT_TYPE v) noex {
 	    if (op->fl.issorted) {
 	        csize		esize = szof(VECINT_TYPE) ;
 		csize		elen = size_t(op->i) ;
-	        qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
+	        qsort_f		qcf = qsort_f(deftypecmp) ;
 	        VECINT_TYPE	*rpp ;
 	        rpp = (VECINT_TYPE *) bsearch(&v,op->va,elen,esize,qcf) ;
 	        rs = SR_NOTFOUND ;
