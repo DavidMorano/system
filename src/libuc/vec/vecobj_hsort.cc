@@ -33,7 +33,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |qsort(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>
@@ -45,10 +45,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-   typedef int (*heapsort_cf)(cvoid *,cvoid *) noex ;
-}
 
 
 /* external variables */
@@ -77,9 +73,10 @@ int vecobj_hsort(vecobj *op,vecobj_vcf cmpfunc) noex {
 	        if (! op->fl.issorted) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
-			heapsort_cf	hcf = heapsort_cf(cmpfunc) ;
-			cint		esz = op->esize ;
-	                heapsort(op->va,op->i,esz,hcf) ;
+			csize	alen = size_t(op->i) ;
+			csize	esize = size_t(op->esz) ;
+			qsort_f	hcf = qsort_f(cmpfunc) ;
+	                qsort(op->va,alen,esize,hcf) ;
 	            }
 	        } /* end if (sorting needed) */
 		rs = op->c ;
