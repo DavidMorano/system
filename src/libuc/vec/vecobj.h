@@ -55,14 +55,14 @@ enum vecobjos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecobjms {
-    static int	reuse ;
-    static int	compact ;
-    static int	swap ;
-    static int	stationary ;
-    static int	conserve ;
-    static int	sorted ;
-    static int	ordered ;
-} ;
+    constexpr static int	reuse		= (1 << vecobjo_reuse) ;
+    constexpr static int	compact		= (1 << vecobjo_compact) ;
+    constexpr static int	swap		= (1 << vecobjo_swap) ;
+    constexpr static int	stationary	= (1 << vecobjo_stationary) ;
+    constexpr static int	conserve	= (1 << vecobjo_conserve) ;
+    constexpr static int	sorted		= (1 << vecobjo_sorted) ;
+    constexpr static int	ordered		= (1 << vecobjo_ordered) ;
+} ; /* end struct */
 
 #endif /* __cplusplus */
 
@@ -85,7 +85,7 @@ struct vecobj_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-} ;
+} ; /* end struct */
 
 struct vecobj_head {
 	void		**va ;
@@ -96,11 +96,11 @@ struct vecobj_head {
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
 	int		esz ;		/* object size */
-} ;
+} ; /* end struct */
 
 struct vecobj_cursor {
 	int		i, c ;
-} ;
+} ; /* end struct */
 
 typedef VECOBJ_CUR	vecobj_cur ;
 
@@ -145,19 +145,19 @@ struct vecobj : vecobj_head {
 	} ; /* end ctor */
 	vecobj(const vecobj &) = delete ;
 	vecobj &operator = (const vecobj &) = delete ;
-	int start(int,int = 0,int = 0) noex ;
-	int add(cvoid *) noex ;
-	int adduniq(cvoid *) noex ;
-	int store(cvoid *,void **) noex ;
-	int find(cvoid *) noex ;
-	int get(int,void **) noex ;
-	int getvec(void ***) noex ;
-	int del(int = -1) noex ;
-	int search(cvoid *,vecobj_vcf,void **) noex ;
-	int sort(vecobj_vcf) noex ;
-	int curbegin(vecobj_cur *) noex ;
-	int curfetch(cvoid *,vecobj_cur *,vecobj_vcf,void **) noex ;
-	int curend(vecobj_cur *) noex ;
+	int start	(int,int = 0,int = 0) noex ;
+	int add		(cvoid *) noex ;
+	int adduniq	(cvoid *) noex ;
+	int store	(cvoid *,void **) noex ;
+	int find	(cvoid *) noex ;
+	int get		(int,void **) noex ;
+	int getvec	(void ***) noex ;
+	int del		(int = -1) noex ;
+	int search	(cvoid *,vecobj_vcf,void **) noex ;
+	int sort	(vecobj_vcf) noex ;
+	int curbegin	(vecobj_cur *) noex ;
+	int curfetch	(cvoid *,vecobj_cur *,vecobj_vcf,void **) noex ;
+	int curend	(vecobj_cur *) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct vecobj() {
