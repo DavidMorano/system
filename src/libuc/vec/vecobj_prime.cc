@@ -61,7 +61,6 @@ typedef vecobj_cur	cur ;
 typedef vecobj_vcf	c_f ;
 
 extern "C" {
-    typedef int (*qsort_f)(cvoid *,cvoid *) noex ;
     typedef int (*vg_f)(vecobj *,int,void **) noex ;
 }
 
@@ -245,9 +244,10 @@ int vecobj_inorder(vecobj *op,cvoid *cep,vecobj_vcf vcf,int cn) noex {
 	            if (! op->fl.issorted) {
 	                op->fl.issorted = true ;
 	                if (op->c > 1) {
+			    csize	alen = size_t(op->i) ;
 	                    csize	esize = sizeof(void *) ;
 		            qsort_f	scf = qsort_f(vcf) ;
-	                    qsort(op->va,op->i,esize,scf) ;
+	                    qsort(op->va,alen,esize,scf) ;
 	                }
 	            } /* end if (sorting) */
 	            if (cn != 0) {
@@ -448,9 +448,10 @@ int vecobj_sort(vecobj *op,vecobj_vcf vcf) noex {
 	        if (! op->fl.issorted) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
-	                csize		esize = sizeof(void *) ;
-		        qsort_f		scf = qsort_f(vcf) ;
-	                qsort(op->va,op->i,esize,scf) ;
+			csize	alen = size_t(op->i) ;
+	                csize	esize = sizeof(void *) ;
+		        qsort_f	scf = qsort_f(vcf) ;
+	                qsort(op->va,alen,esize,scf) ;
 	            }
 	        }
 	    } /* end if (open) */
@@ -740,16 +741,17 @@ local int vecobj_iget(vecobj *op,int i,void **rpp) noex {
 
 local int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
 	int		rs = SR_OK ;
-	int		fsorted ;
+	int		fsorted = false ; /* return-value */
 	if (op->fl.osorted && (! op->fl.issorted)) {
 	    op->fl.issorted = true ;
+	    fsorted = true ;
 	    if (op->c > 1) {
+		csize	alen = size_t(op->i) ;
 	        csize	esize = sizeof(void *) ;
 		qsort_f	scf = qsort_f(vcf) ;
-		qsort(op->va,op->i,esize,scf) ;
+		qsort(op->va,alen,esize,scf) ;
 	    }
 	} /* end if (sorting) */
-	fsorted = op->fl.issorted ;
 	return (rs >= 0) ? fsorted : rs ;
 }
 /* end subroutine (vecobj_sorted) */
