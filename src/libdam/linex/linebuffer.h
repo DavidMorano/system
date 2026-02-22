@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	LINEBUFFER	struct linebuffer_head
@@ -61,7 +58,7 @@ struct linebuffer : linebuffer_head {
 	    start(this,linebuffermem_start) ;
 	    finish(this,linebuffermem_finish) ;
 	    lbuf = nullptr ;
-	} ;
+	} ; /* end ctor */
 	linebuffer(const linebuffer &) = delete ;
 	linebuffer &operator = (const linebuffer &) = delete ;
 	void dtor() noex ;
