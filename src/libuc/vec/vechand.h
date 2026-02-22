@@ -146,16 +146,16 @@ struct vechand : vechand_head {
 	} ; /* end tcor */
 	vechand(const vechand &) = delete ;
 	vechand &operator = (const vechand &) = delete ;
-	int start(int = 0,int = 0) noex ;
-	int add(cvoid *) noex ;
-	int sort(int,vechand_f = nullptr) noex ;
-	int get(int,void **) noex ;
-	int getlast(void **) noex ;
-	int getvec(void *) noex ;
-	int search(cvoid *,vechand_f,void **) noex ;
-	int del(int = -1) noex ;
-	int delhand(cvoid *) noex ;
-	int sort(vechand_f) noex ;
+	int start	(int = 0,int = 0) noex ;
+	int add		(cvoid *) noex ;
+	int sort	(int,vechand_f = nullptr) noex ;
+	int get		(int,void **) noex ;
+	int getlast	(void **) noex ;
+	int getvec	(void *) noex ;
+	int search	(cvoid *,vechand_f,void **) noex ;
+	int del		(int = -1) noex ;
+	int delhand	(cvoid *) noex ;
+	int sort	(vechand_f) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct vechand() {
