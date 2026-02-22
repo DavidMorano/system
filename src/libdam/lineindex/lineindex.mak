@@ -1,4 +1,4 @@
-# MAKEFILES (lineindex)
+# MAKEFILE (lineindex)
 
 T= lineindex
 
