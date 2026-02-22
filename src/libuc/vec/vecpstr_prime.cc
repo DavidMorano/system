@@ -78,7 +78,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<vechand.h>
-#include	<vstrcmpx.h>
+#include	<vstrcmp.h>
 #include	<nleadstr.h>
 #include	<strwcpy.h>
 #include	<intceil.h>
@@ -101,7 +101,6 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 /* imported namespaces */
 
 using std::string ;			/* type */
-using std::sort ;			/* subroutine-template */
 using std::min ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
@@ -110,10 +109,6 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 typedef VPS_CH	chunk ;
-
-extern "C" {
-    typedef int (*qsort_f)(cvoid *,cvoid *) noex ;
-}
 
 
 /* external subroutines */
@@ -173,8 +168,6 @@ local int	indexsize(int) noex ;
 
 
 /* local variables */
-
-constexpr bool		f_qsort = CF_QSORT ;
 
 constexpr int		defents = VECPSTR_DEFENTS ;
 constexpr int		resz = szof(int) ;
@@ -265,15 +258,16 @@ int vecpstr_add(vecpstr *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (vecpstr_add) */
 
-int vecpstr_adduniq(vecpstr *op,cchar *sp,int sl) noex {
+int vecpstr_adduniq(vecpstr *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rs = vecpstr_findn(op,sp,sl)) >= 0) {
-	        rs = INT_MAX ;
-	    } else if (rs == SR_NOTFOUND) {
-	        rs = vecpstr_add(op,sp,sl) ;
-	    }
+	if (op) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	        if ((rs = vecpstr_findn(op,sp,sl)) >= 0) {
+	            rs = INT_MAX ;
+	        } else if (rs == SR_NOTFOUND) {
+	            rs = vecpstr_add(op,sp,sl) ;
+	        }
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -295,7 +289,7 @@ int vecpstr_addkeyval(vecpstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
                 if ((rs = chunk_addkeyval(op->chp,kp,kl,vp,vl,&cp)) >= 0) {
                     if ((rs = vecpstr_record(op,cp)) >= 0) {
                         i = rs ;
-                        op->stsize += amount ;
+                        op->stsz += amount ;
                     }
                 }
             } /* end if (vecpstr_extstr) */
@@ -304,47 +298,49 @@ int vecpstr_addkeyval(vecpstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 }
 /* end subroutine (vecpstr_addkeyval) */
 
-int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int sl) noex {
+int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int 탎l) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = vecpstr_validx(op,ii)) >= 0) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((op->idx + 1) > op->ext) {
-	        rs = vecpstr_extvec(op) ;
-	    }
-	    if (rs >= 0) ylikely {
-	        cint	sz = (sl+1) ;
-	        if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
-	            strwcpy(bp,sp,sl) ;
-	            op->stsize += sz ;
-	            i = vecpstr_insertsp(op,ii,bp) ;
-	        } /* end if (memory-allocation) */
-	    } /* end if (OK) */
+	    rs = SR_FAULT ;
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+		rs = SR_OK ;
+	        if ((op->idx + 1) > op->ext) {
+	            rs = vecpstr_extvec(op) ;
+	        }
+	        if (rs >= 0) ylikely {
+	            cint	sz = (sl+1) ;
+	            if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
+	                strwcpy(bp,sp,sl) ;
+	                op->stsz += sz ;
+	                i = vecpstr_insertsp(op,ii,bp) ;
+	            } /* end if (memory-allocation) */
+	        } /* end if (OK) */
+	    } /* end if (getlenstr) */
 	} /* end if (valid index) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (vecpstr_insert) */
 
-int vecpstr_store(vecpstr *op,cchar *sp,int sl,cchar **rpp) noex {
+int vecpstr_store(vecpstr *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = vecpstr_magic(op,sp)) >= 0) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	        cint	amount = (sl + 1) ;
 	        cchar	*cp = nullptr ;
 	        if ((rs = vecpstr_extstr(op,amount)) >= 0) {
 	            if ((rs = chunk_add(op->chp,sp,sl,&cp)) >= 0) {
 	                if ((rs = vecpstr_record(op,cp)) >= 0) {
 	                     i = rs ;
-	                     op->stsize += amount ;
+	                     op->stsz += amount ;
 			}
 	            }
 	        }
 	        if (rpp) {
 	            *rpp = (rs >= 0) ? cp : nullptr ;
 	        }
-	    } /* end block */
+	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
@@ -393,8 +389,8 @@ int vecpstr_del(vecpstr *op,int i) noex {
             bool        f_fi = false ;
             if (op->va[i] != nullptr) {
                 op->cnt -= 1 ;            /* decrement list count */
-                if (op->fl.stsize) {
-                    op->stsize -= (lenstr(op->va[i]) + 1) ;
+                if (op->fl.stsz) {
+                    op->stsz -= (lenstr(op->va[i]) + 1) ;
                 }
             } /* end if (freeing the actual string data) */
             if (op->fl.ostationary) {
@@ -435,7 +431,7 @@ int vecpstr_del(vecpstr *op,int i) noex {
                 op->fidx = i ;
             }
             c = op->cnt ;
-            op->fl.stsize = false ;
+            op->fl.stsz = false ;
 	} else if (rs == SR_NOTFOUND) {
 	    rs = vecpstr_delall(op) ;
 	} /* end if (validx) */
@@ -504,10 +500,10 @@ int vecpstr_search(vecpstr *op,cchar *sp,vecpstr_vcmp vcf,cchar **rpp) noex {
 		cchar	**rpp2 ;
 		if (vcf == nullptr) vcf = vstrcmp ;
 	        if (op->fl.issorted) {
-		    csize	nsize = size_t(op->idx) ;
+		    csize	alen = size_t(op->idx) ;
 	            csize	esize = sizeof(char *) ;
 	            qsort_f	scf = qsort_f(vcf) ;
-	            rpp2 = (cchar **) bsearch(&sp,op->va,nsize,esize,scf) ;
+	            rpp2 = (cchar **) bsearch(&sp,op->va,alen,esize,scf) ;
 	            rs = SR_NOTFOUND ;
 	            if (rpp2) {
 	                i = intconv(rpp2 - op->va) ;
@@ -615,7 +611,7 @@ int vecpstr_getsize(vecpstr *op) noex {
 	int		rs ;
 	int		sz = 0 ;
 	if ((rs = vecpstr_magic(op)) >= 0) ylikely {
-	    if (op->stsize > 0) sz = op->stsize ;
+	    if (op->stsz > 0) sz = op->stsz ;
 	} /* end if (magic) */
 	return (rs >= 0) ? sz : rs ;
 }
@@ -623,21 +619,21 @@ int vecpstr_getsize(vecpstr *op) noex {
 
 int vecpstr_strsize(vecpstr *op) noex {
 	int		rs ;
-	int		stsize = 1 ;
+	int		stsz = 1 ;
 	if ((rs = vecpstr_magic(op)) >= 0) ylikely {
-            if (! op->fl.stsize) {
+            if (! op->fl.stsz) {
                 for (int i = 0 ; i < op->idx ; i += 1) {
                     cchar   *ep = op->va[i] ;
                     if (ep) {
-                        stsize += (lenstr(ep) + 1) ;
+                        stsz += (lenstr(ep) + 1) ;
                     }
                 } /* end for */
-                op->stsize = stsize ;
-                op->fl.stsize = true ;
+                op->stsz = stsz ;
+                op->fl.stsz = true ;
             } /* end if (calculating size) */
-            stsize = uceil(op->stsize,resz) ;
+            stsz = uceil(op->stsz,resz) ;
 	} /* end if (magic) */
-	return (rs >= 0) ? stsize : rs ;
+	return (rs >= 0) ? stsz : rs ;
 }
 /* end subroutine (vecpstr_strsize) */
 
@@ -646,9 +642,9 @@ int vecpstr_strmk(vecpstr *op,char *tab,int tabsize) noex {
 	int		c = 0 ;
 	if ((rs = vecpstr_magic(op,tab)) >= 0) ylikely {
             typedef int (*get_f)(vechand *,int,void **) ;
-            cint        stsize = uceil(op->stsize,szof(int)) ;
+            cint        stsz = uceil(op->stsz,szof(int)) ;
             rs = SR_OVERFLOW ;
-            if (tabsize >= stsize) {
+            if (tabsize >= stsz) {
                 vechand         *clp = op->clp ;
                 char            *bp = tab ;
                 void            *vp{} ;
@@ -688,7 +684,7 @@ int vecpstr_recsize(vecpstr *op) noex {
 int vecpstr_cksize(vecpstr *op) noex {
 	int		rs ;
 	if ((rs = vecpstr_magic(op)) >= 0) ylikely {
-	    if ((rs = op->stsize) == 0) {
+	    if ((rs = op->stsz) == 0) {
 	        rs = vecpstr_strsize(op) ;
 	    }
 	} /* end if (magic) */
@@ -725,13 +721,13 @@ int vecpstr_recmkstr(vecpstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = vecpstr_magic(op,rec,tab)) >= 0) ylikely {
-            if (op->stsize == 0) {
+            if (op->stsz == 0) {
                 rs = vecpstr_strsize(op) ;
             }
 	    if (rs >= 0) ylikely {
-		cint	stsize = iceil(op->stsize,resz) ;
+		cint	stsz = iceil(op->stsz,resz) ;
 		rs = SR_OVERFLOW ;
-	        if (tabs >= stsize) {
+	        if (tabs >= stsz) {
 	            cint	rsz = ((op->idx + 2) * resz) ;
 	            if (recs >= rsz) {
 		        char	*bp = tab ;		/* table pointer */
@@ -758,7 +754,7 @@ int vecpstr_avmkstr(vecpstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	int		c = 0 ;
 	if ((rs = vecpstr_magic(op,av,tab)) >= 0) ylikely {
 	    if ((rs = op->cksize) >= 0) {
-		int	sz = iceil(op->stsize,szof(int)) ;
+		int	sz = iceil(op->stsz,szof(int)) ;
 		rs = SR_OVERFLOW ;
 	        if (tabs >= sz) {
 	            sz = (op->cnt + 1) * szof(int) ;
@@ -839,7 +835,7 @@ local int vecpstr_ctor(vecpstr *op) noex {
 	    op->idx = 0 ;
 	    op->ext = 0 ;
 	    op->fidx = 0 ;
-	    op->stsize = 0 ;
+	    op->stsz = 0 ;
 	    op->chp = nullptr ;
 	    op->magic = 0 ;
 	    op->chsize = 0 ;
@@ -849,8 +845,7 @@ local int vecpstr_ctor(vecpstr *op) noex {
 	    } /* end if (new) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecpstr_ctor) */
+} /* end subroutine (vecpstr_ctor) */
 
 local int vecpstr_dtor(vecpstr *op) noex {
 	int		rs = SR_OK ;
@@ -859,8 +854,7 @@ local int vecpstr_dtor(vecpstr *op) noex {
 	    op->clp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (vecpstr_dtor) */
+} /* end subroutine (vecpstr_dtor) */
 
 consteval int mkoptmask() noex {
 	int		m = 0 ;
@@ -1025,22 +1019,17 @@ local int vecpstr_reset(vecpstr *op) noex {
 	op->idx = 0 ;
 	op->ext = 0 ;
 	op->fidx = 0 ;
-	op->stsize = 0 ;
+	op->stsz = 0 ;
 	return SR_OK ;
 }
 /* end subroutine (vecpstr_reset) */
 
 local void vecpstr_arrsort(vecpstr *op,vecpstr_vcmp vcf) noex {
+	cchar		**va = op->va ;
+	csize		alen = size_t(op->idx) ;
+	csize		esize = sizeof(char *) ;
 	qsort_f		scf = qsort_f(vcf) ;
-	if_constexpr (f_qsort) {
-	    csize	nsize = size_t(op->idx) ;
-	    csize	esize = sizeof(char *) ;
-	    qsort(op->va,nsize,esize,scf) ;
-	} else {
-	    cint	i = op->idx ;
-	    cchar	**va = op->va ;
-	    sort(va,(va+i),scf) ;
-	}
+	qsort(va,alen,esize,scf) ;
 }
 /* end subroutine (vecpstr_arrsort) */
 
@@ -1163,6 +1152,10 @@ int vecpstr::already(cchar *sp,int sl) noex {
 	return vecpstr_already(this,sp,sl) ;
 }
 
+int vecpstr::loadfile(int fu,cchar *fname) noex {
+	return vecpstr_loadfile(this,fu,fname) ;
+}
+
 int vecpstr::get(int ai,cchar **rpp) noex {
 	return vecpstr_get(this,ai,rpp) ;
 }
@@ -1203,10 +1196,6 @@ int vecpstr::finder(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
 	return vecpstr_finder(this,s,vcmp,rpp) ;
 }
 
-int vecpstr::sort(vecpstr_vcmp vcf) noex {
-	return vecpstr_sort(this,vcf) ;
-}
-
 int vecpstr::del(int ai) noex {
 	if (ai < 0) ai = 0 ;
 	return vecpstr_del(this,ai) ;
@@ -1233,6 +1222,10 @@ int vecpstr_st::operator () (int vn,int vsz,int vo) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (vecpstr_st::operator) */
+
+int vecpstr_so::operator () (vecpstr_f cmp) noex  {
+	return vecpstr_sort(op,cmp) ;
+} /* end method (vecpstr_so:operator) */
 
 vecpstr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
