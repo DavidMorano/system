@@ -59,10 +59,6 @@ using libuc::libmem ;			/* variable */
 
 /* local typedefs */
 
-extern "C" {
-    typedef int (*qsort_f)(cvoid *,cvoid *) noex ;
-}
-
 
 /* external subroutines */
 
@@ -103,8 +99,6 @@ static int	recarr_extend(recarr *,int = 0) noex ;
 
 
 /* local variables */
-
-cbool			f_qsort = CF_QSORT ;
 
 
 /* exported variables */
@@ -376,13 +370,10 @@ int recarr_sort(recarr *op,recarr_cf vcmp) noex {
 	        if (! op->fl.issorted) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
-			qsort_f		qcmp = qsort_f(vcmp) ;
-			if_constexpr (f_qsort) {
-			    csize	esize = sizeof(void *) ;
-	                    qsort(op->va,op->i,esize,qcmp) ;
-			} else {
-			    std::sort(op->va,(op->va+op->i),qcmp) ;
-			}
+			csize	alen = size_t(op->i) ;
+			csize	esize = sizeof(void *) ;
+			qsort_f	qcmp = qsort_f(vcmp) ;
+	                qsort(op->va,alen,esize,qcmp) ;
 	            }
 	        } /* end if (sorting needed) */
 	    } /* end if (populated) */
@@ -406,18 +397,18 @@ int recarr_search(recarr *op,cvoid *ep,recarr_cf vcmp,void *vrp) noex {
 	int		i = 0 ;
 	void		**rpp = (void **) vrp ;
 	if (op && ep && vcmp) ylikely {
+	    csize	alen = size_t(op->i) ;
 	    csize	esize = sizeof(void *) ;
-	    void	**spp{} ;
+	    qsort_f	qcmp = qsort_f(vcmp) ;
+	    voidpp	spp{} ;
 	    if (op->fl.osorted && (! op->fl.issorted)) {
 	        op->fl.issorted = true ;
 	        if (op->c > 1) {
-		    qsort_f	qcmp = qsort_f(vcmp) ;
-		    qsort(op->va,op->i,esize,qcmp) ;
+		    qsort(op->va,alen,esize,qcmp) ;
 	        }
 	    }
 	    if (op->fl.issorted) {
-		qsort_f		qcmp = qsort_f(vcmp) ;
-	        spp = (void **) bsearch(&ep,op->va,op->i,esize,qcmp) ;
+	        spp = voidpp(bsearch(&ep,op->va,alen,esize,qcmp)) ;
 	        rs = SR_NOTFOUND ;
 	        if (spp) {
 	            i = intconv(spp - op->va) ;
