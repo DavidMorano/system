@@ -46,7 +46,7 @@
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<netdb.h>
 
 #include	<usystem.h>
@@ -174,7 +174,7 @@ struct clientinfo	*cip ;
 
 /* pop off the service name */
 
-	rs = uc_readlinetimed(ifd,svcbuf,SVCBUFLEN,to) ;
+	rs = uc_readlnto(ifd,svcbuf,SVCBUFLEN,to) ;
 	len = rs ;
 	if (rs < 0)
 	    goto bad0 ;
