@@ -204,20 +204,20 @@ struct vecint : vecint_head {
 	} ; /* end ctor */
 	vecint(const vecint &) = delete ;
 	vecint &operator = (const vecint &) = delete ;
-	int add(VECINT_TYPE) noex ;
-	int addlist(const VECINT_TYPE *,int) noex ;
-	int adduniq(VECINT_TYPE) noex ;
-	int insert(int,VECINT_TYPE) noex ;
-	int assign(int,VECINT_TYPE) noex ;
-	int del(int) noex ;
-	int find(VECINT_TYPE) noex ;
-	int match(VECINT_TYPE) noex ;
-	int getval(int,VECINT_TYPE *) noex ;
-	int getvec(VECINT_TYPE **) noex ;
-	int mkvec(VECINT_TYPE *) noex ;
-	int curbegin(vecint_cur *) noex ;
-	int curend(vecint_cur *) noex ;
-	int curenum(vecint_cur *,VECINT_TYPE *) noex ;
+	int add		(VECINT_TYPE) noex ;
+	int addlist	(const VECINT_TYPE *,int) noex ;
+	int adduniq	(VECINT_TYPE) noex ;
+	int insert	(int,VECINT_TYPE) noex ;
+	int assign	(int,VECINT_TYPE) noex ;
+	int del		(int) noex ;
+	int find	(VECINT_TYPE) noex ;
+	int match	(VECINT_TYPE) noex ;
+	int getval	(int,VECINT_TYPE *) noex ;
+	int getvec	(VECINT_TYPE **) noex ;
+	int mkvec	(VECINT_TYPE *) noex ;
+	int curbegin	(vecint_cur *) noex ;
+	int curend	(vecint_cur *) noex ;
+	int curenum	(vecint_cur *,VECINT_TYPE *) noex ;
 	vecint_iter begin() noex {
 	    vecint_iter		it(va,0,i) ;
 	    return it ;
@@ -237,28 +237,28 @@ typedef VECINT		vecint ;
 
 EXTERNC_begin
 
-extern int vecint_start(vecint *,int,int) noex ;
-extern int vecint_finish(vecint *) noex ;
-extern int vecint_add(vecint *,VECINT_TYPE) noex ;
-extern int vecint_addlist(vecint *,const VECINT_TYPE *,int) noex ;
-extern int vecint_adduniq(vecint *,VECINT_TYPE) noex ;
-extern int vecint_insert(vecint *,int,VECINT_TYPE) noex ;
-extern int vecint_assign(vecint *,int,VECINT_TYPE) noex ;
-extern int vecint_resize(vecint *,int) noex ;
-extern int vecint_del(vecint *,int) noex ;
-extern int vecint_count(vecint *) noex ;
-extern int vecint_extent(vecint *) noex ;
-extern int vecint_sort(vecint *) noex ;
-extern int vecint_setsorted(vecint *) noex ;
-extern int vecint_find(vecint *,VECINT_TYPE) noex ;
-extern int vecint_match(vecint *,VECINT_TYPE) noex ;
-extern int vecint_getval(vecint *,int,VECINT_TYPE *) noex ;
-extern int vecint_getvec(vecint *,VECINT_TYPE **) noex ;
-extern int vecint_mkvec(vecint *,VECINT_TYPE *) noex ;
-extern int vecint_curbegin(vecint *,vecint_cur *) noex ;
-extern int vecint_curenum(vecint *,vecint_cur *,VECINT_TYPE *) noex ;
-extern int vecint_curend(vecint *,vecint_cur *) noex ;
-extern int vecint_audit(vecint *) noex ;
+extern int vecint_start		(vecint *,int,int) noex ;
+extern int vecint_finish	(vecint *) noex ;
+extern int vecint_add		(vecint *,VECINT_TYPE) noex ;
+extern int vecint_addlist	(vecint *,const VECINT_TYPE *,int) noex ;
+extern int vecint_adduniq	(vecint *,VECINT_TYPE) noex ;
+extern int vecint_insert	(vecint *,int,VECINT_TYPE) noex ;
+extern int vecint_assign	(vecint *,int,VECINT_TYPE) noex ;
+extern int vecint_resize	(vecint *,int) noex ;
+extern int vecint_del		(vecint *,int) noex ;
+extern int vecint_count		(vecint *) noex ;
+extern int vecint_extent	(vecint *) noex ;
+extern int vecint_sort		(vecint *) noex ;
+extern int vecint_setsorted	(vecint *) noex ;
+extern int vecint_find		(vecint *,VECINT_TYPE) noex ;
+extern int vecint_match		(vecint *,VECINT_TYPE) noex ;
+extern int vecint_getval	(vecint *,int,VECINT_TYPE *) noex ;
+extern int vecint_getvec	(vecint *,VECINT_TYPE **) noex ;
+extern int vecint_mkvec		(vecint *,VECINT_TYPE *) noex ;
+extern int vecint_curbegin	(vecint *,vecint_cur *) noex ;
+extern int vecint_curenum	(vecint *,vecint_cur *,VECINT_TYPE *) noex ;
+extern int vecint_curend	(vecint *,vecint_cur *) noex ;
+extern int vecint_audit		(vecint *) noex ;
 
 EXTERNC_end
 
