@@ -1,4 +1,4 @@
-# MAKEFILES (langx)
+# MAKEFILE (langx)
 
 T= langx
 
@@ -54,7 +54,6 @@ OBJ= obja.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
