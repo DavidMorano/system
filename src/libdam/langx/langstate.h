@@ -24,16 +24,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	LANGSTATE_MAGIC		0x13f3c204
 #define	LANGSTATE		struct langstate_head
 #define	LANGSTATE_FL		struct langstate_flags
 #define	LANGSTATE_INFO		struct langstate_lineinfo
+#define	LANGSTATE_MAGIC		0x13f3c204
 
 
 enum langstatetypes {
@@ -59,7 +56,7 @@ struct langstate_lineinfo {
 
 struct langstate_head {
 	LANGSTATE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		line ;
 	int		pch ;		/* previous character */
 } ; /* end struct (linestage_head) */
@@ -95,17 +92,17 @@ struct langstate : langstate_head {
 	    start	(this,langstatemem_start) ;
 	    finish	(this,langstatemem_finish) ;
 	    code	(this,langstatemem_code) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	langstate(const langstate &) = delete ;
 	langstate &operator = (const langstate &) = delete ;
-	int proc(int,int = -1) noex ;
-	int procln(int,cchar *,int = -1) noex ;
-	int getstat(langstate_info *) noex ;
+	int proc	(int,int = -1) noex ;
+	int procln	(int,cchar *,int = -1) noex ;
+	int getstat	(langstate_info *) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct langstate() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (langstate) */
 #else	/* __cplusplus */
