@@ -1,4 +1,4 @@
-# MAKEFILES (localget)
+# MAKEFILE (localget)
 
 T= localget
 
