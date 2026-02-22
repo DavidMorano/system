@@ -1,4 +1,4 @@
-# MAKEFILES (linex)
+# MAKEFILE (linex)
 
 T= linex
 
