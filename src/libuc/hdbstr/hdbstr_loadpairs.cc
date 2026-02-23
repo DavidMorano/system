@@ -33,8 +33,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ccfile.hh>
 #include	<field.h>
 #include	<localmisc.h>
@@ -70,7 +71,7 @@ static constexpr char	fterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -85,8 +86,7 @@ int hdbstr_loadpairs(hdbstr *op,cchar *fname) noex {
 	if (op && fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		char	*lbuf{} ;
-	        if ((rs = malloc_ml(&lbuf)) >= 0) {
+		if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 	            ccfile	pf ;
 	            cint	llen = rs ;
 	            if ((rs = pf.open(fname)) >= 0) {
@@ -98,7 +98,7 @@ int hdbstr_loadpairs(hdbstr *op,cchar *fname) noex {
 	                rs1 = pf.close ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (file opened) */
-		    rs1 = uc_free(lbuf) ;
+		    rs1 = lm_free(lbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -111,11 +111,10 @@ int hdbstr_loadpairs(hdbstr *op,cchar *fname) noex {
 /* local subroutines */
 
 static int loadline(hdbstr *op,cchar *lbuf,int ll) noex {
-	field		fsb ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = field_start(&fsb,lbuf,ll)) >= 0) {
+	if (field fsb ; (rs = field_start(&fsb,lbuf,ll)) >= 0) {
 	    cchar	*kp{} ;
 	    if (int kl ; (kl = field_get(&fsb,fterms,&kp)) > 0) {
 		int	vl = 0 ;
