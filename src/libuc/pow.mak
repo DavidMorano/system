@@ -1,4 +1,4 @@
-# MAKEFILES (pow)
+# MAKEFILE (pow)
 
 T= pow
 
@@ -44,7 +44,6 @@ OBJ0_POW= xpow.o nextpowtwo.o
 OBJ1_POW= 
 OBJ2_POW= 
 OBJ3_POW= 
-OBJ4_POW= 
 
 OBJA_POW= obj0_pow.o
 OBJB_POW=
@@ -102,7 +101,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_POW)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_POW)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_POW)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -118,19 +117,16 @@ control:
 
 
 obj0_pow.o:	$(OBJ0_POW)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_POW)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_pow.o:	$(OBJ1_POW)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_POW)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_pow.o:	$(OBJ2_POW)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_POW)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_pow.o:	$(OBJ3_POW)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_POW)
-
-obj4_pow.o:	$(OBJ4_POW)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_POW)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 nextpowertwo.o:		nextpowtwo.cc	powtwo.h	$(INCS)
