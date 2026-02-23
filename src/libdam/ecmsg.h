@@ -18,6 +18,13 @@
 #ifndef	ECMSG_INCLUDE
 #define	ECMSG_INCLUDE
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+
 
 #define	ECMSG			struct ecmsg_head
 #define	ECMSG_MAXBUFLEN		(8 * 1024)
@@ -26,7 +33,7 @@
 struct ecmsg_head {
 	char		*ebuf ;
 	int		elen ;
-} ;
+} ; /* end struct */
 
 typedef	ECMSG		ecmsg ;
 
