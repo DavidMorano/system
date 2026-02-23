@@ -45,7 +45,9 @@
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<bufsizevar.hh>
 #include	<ccfile.hh>
 #include	<field.h>
@@ -60,8 +62,6 @@
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -87,7 +87,7 @@ static int	mkterms() noex ;
 
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 
-static bufsizevar	maxlinelen(getbufsize_ml) ;
+static bufsizevar	maxlinelen(bufsize_ml) ;
 
 static char		fterms[termsize] ;
 
@@ -109,12 +109,12 @@ int hdbstr_loadkeys(hdbstr *op,cchar *fname) noex {
 		    if ((rs = maxlinelen) >= 0) {
 		        cint	llen = (rs * NLINES) ;
 		        char	*lbuf{} ;
-		        if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
+		        if ((rs = lm_mall((llen+1),&lbuf)) >= 0) {
 			    {
 			        rs = hdbstr_load(op,lbuf,llen,fname) ;
 			        c = rs ;
 			    }
-			    rs1 = uc_free(lbuf) ;
+			    rs1 = lm_free(lbuf) ;
 			    if (rs >= 0) rs = rs1 ;
 		        } /* end if (m-a-f) */
 		    } /* end if (maxlinelen) */
