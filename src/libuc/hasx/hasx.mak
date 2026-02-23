@@ -42,11 +42,16 @@ LIBS +=
 
 OBJ0= hasprime.o hasclass.o hasall.o
 OBJ1= hasvarprefix.o hasnot.o
-OBJ2= hasmodname.o hasprint.o hasonly.o
+OBJ2= hasprint.o hasonly.o
 OBJ3= hasuniq.o haslead.o hasnon.o
 
-OBJA= obj0.o obj1.o
-OBJB= obj2.o obj3.o
+OBJ4= hasbasename.o hasmodname.o
+OBJ5=
+OBJ6=
+OBJ7=
+
+OBJA= obj0.o obj1.o obj2.o
+OBJB= obj3.o obj4.o 
 
 OBJ= obja.o objb.o
 
@@ -54,7 +59,6 @@ OBJ= obja.o objb.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -128,6 +132,18 @@ obj2.o:			$(OBJ2)
 obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -144,6 +160,8 @@ hasnot.o:		hasnot.cc	hasnot.h		$(INCS)
 hasonly.o:		hasonly.cc	hasonly.h		$(INCS)
 
 hasmodname.o:		hasmodname.cc	hasmodname.h		$(INCS)
+hasbasename.o:		hasbasename.cc	hasbasename.h		$(INCS)
+
 hasuniq.o:		hasuniq.cc	hasuniq.h		$(INCS)
 haslead.o:		haslead.cc	haslead.h		$(INCS)
 hasvarprefix.o:		hasvarprefix.cc	hasvarprefix.h		$(INCS)
