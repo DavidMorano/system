@@ -2,7 +2,7 @@
 
 T= libdebug
 
-ALL= $(T).o $(T).a
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -33,67 +33,28 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += debug.h
+INCS += libdebug.h
 
 MODS +=
 
-LIBS +=
+LIBS += -luo -lu
 
 
-OBJ00= debugprintf.o debugprimæ.o 
-OBJ01= nprintf.o fdprintf.o 
-OBJ02= strlinelen.o
-OBJ03= 
-OBJ04= bufprintf.o
-OBJ05=
-OBJ06=
-OBJ07=
+OBJ0= debugprime.o 
+OBJ1= debugprint.o
+OBJ2= debugmkhex.o
+OBJ3= debugutil.o
+OBJ4= zprintf.o nprintf.o 
+OBJ5= 
+OBJ6=
+OBJ7=
 
-OBJ08= cfdec.o checkbase.o
-OBJ09= 
-OBJ10= hasprintbad.o hasalldig.o hasallbase.o
-OBJ11= isprintbad.o isprintlatin.o isdigitlatin.o
-OBJ12= 
-OBJ13= 
-OBJ14= 
-OBJ15= 
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o
 
-OBJ16= char.o strmgr.o
-OBJ17=
-OBJ18=
-OBJ19=
-OBJ20=
-OBJ21=
-OBJ22=
-OBJ23=
+OBJ= obja.o objb.o
 
-OBJ24= strlocktype.o
-OBJ25=
-OBJ26=
-OBJ27=
-OBJ28=
-OBJ29=
-OBJ30=
-OBJ31=
-
-OBJ32= strnchr.o strnrchr.o
-OBJ33= strwcpy.o
-OBJ34= strnlen.o
-OBJ35=
-OBJ36=
-OBJ37=
-OBJ38= snwcpy.o sncpy.o
-OBJ39=
-
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
-OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23)
-OBJD= $(OBJ24) $(OBJ25) $(OBJ26) $(OBJ27) $(OBJ28) $(OBJ29) $(OBJ30) $(OBJ31)
-OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
-
-OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE)
-
-OBJS= obja.o objb.o objc.o objd.o obje.o
+OBJS= obja.o objb.o
 
 
 INCDIRS=
@@ -114,7 +75,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 .SUFFIXES:		.hh .ii .iim .ccm
 
 
-default:		all
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -144,9 +105,14 @@ all:			$(ALL)
 	makemodule $(*)
 
 
+.o:			$(T).o
+
 a:			$(T).a
 
 so:			$(T).so
+
+$(T).o:			$(OBJ) Makefile
+	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBDIRS) $(LIBS)
 
 $(T).a:			$(OBJ)
 	$(AR) -cr $@ $?
@@ -190,95 +156,51 @@ control:
 	date >> Control
 
 
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJA)
+	$(LD) -o $(LDFLAGS) $@ -r $^
 
 objb.o:			$(OBJB)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJB)
-
-objc.o:			$(OBJC)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJC)
-
-objd.o:			$(OBJD)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJD)
-
-obje.o:			$(OBJE)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJE)
+	$(LD) -o $(LDFLAGS) $@ -r $^
 
 
-$(T).a(bprintf.o):	bprintf.o
+$(T).a(debugprime.o):	debugprime.o
+$(T).a(debugprint.o):	debugprint.o
+$(T).a(debugmkhex.o):	debugmkhex.o
+$(T).a(debugline.o):	debugline.o
 
+$(T).a(zprintf.o):	zprintf.o
 $(T).a(nprintf.o):	nprintf.o
 
-$(T).a(debugprintf.o):	debugprintf.o
 
+debugprime.o:		debugprime.cc	debugprime.h		$(INCS)
+debugprint.o:		debugprint.cc	debugprint.h		$(INCS)
+debugmkhex.o:		debugmkhex.cc	debugmkhex.h		$(INCS)
+debugutil.o:		debugutil.cc	debugutil.hh		$(INCS)
+debugline.o:		debugline.cc	debugline.h		$(INCS)
 
-# special (very special) processing for NPRINTF
-nprintf_r.o:		nprintf.map Makefile nprintf.o lockfile.o
-	$(LD) -r -o $@ -B reduce -M nprintf.map nprintf.o lockfile.o
-
-nprintf.o:		nprintf.cc nprintf.h Makefile
-
-
-# special (very special) processing for DEBPRINTF
-debugprintf_r.o:	debugprintf.map Makefile debugprintf.o
-	$(LD) -r -o $@ -B reduce -M debugprintf.map debugprintf.o
-
-debugprintf.o:		Makefile debugprintf.c
-
-
-econvert.o:	econvert.obj
-	rm -f econvert.o
-	cp -p econvert.obj econvert.o
-
-
-sbuf.o:			sbuf.c sbuf.h
-strmgr.o:		strmgr.c strmgr.h
-ids.o:			ids.c ids.h
-storebuf.o:		storebuf.c storebuf.h
-strmgr.o:		strmgr.c strmgr.h
-char.o:			char.c char.h
-snflags.o:		snflags.c snflags.h
-
-sfbasename.o:		sfbasename.c
-sfdirname.o:		sfdirname.c
-
-strbasename.o:		strbasename.c
-
-ctdec.o:		ctdec.c ctdec.h
-
-cfdec.o:		cfdec.c cfdec.h
-
-
-# testing
-
-X01= testdebugprint
-
-X01OBJa= $(X01).o debugprintf.o debugprime.o
-X01OBJb=
-X01OBJc=
-X01OBJd=
-
-X01OBJ= $(X01OBJa) $(X01OBJb) $(X01OBJc) $(X01OBJd)
-
-$(X01).o:		$(X01).c
-
-$(X01).x:		$(X01OBJ)
-	$(CC) -o $@ $(X01OBJ) $(XLIBINFO)
-
-
-X02= testnprint
-
-X02OBJa= $(X02).o nprintf.o
-X02OBJb= debugprintf.o debugprime.o
-X02OBJc=
-X02OBJd=
-
-X02OBJ= $(X02OBJa) $(X02OBJb) $(X02OBJc) $(X02OBJd)
-
-$(X02).o:		$(X02).c
-
-$(X02).x:		$(X02OBJ)
-	$(CC) -o $@ $(X02OBJ) $(XLIBINFO)
+zprintf.o:		zprintf.cc	zprintf.h Makefile	$(INCS)
+nprintf.o:		nprintf.cc	nprintf.h Makefile	$(INCS)
 
 
