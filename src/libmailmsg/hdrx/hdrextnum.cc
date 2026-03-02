@@ -45,11 +45,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sbuf.h>
 #include	<ascii.h>
-#include	<six.h>
+#include	<six.h>			/* |sibrk(3uc)| */
 #include	<cfdec.h>
 #include	<char.h>
 #include	<mkchar.h>
@@ -57,7 +59,9 @@
 
 #include	"hdrextnum.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -79,12 +83,12 @@ import libutil ;
 
 /* forward references */
 
-extern int	hdrextnum_ext(char *,cchar *,int) noex ;
+local int	hdrextnum_ext(char *,cchar *,int) noex ;
 
 
 /* local variables */
 
-constexpr int	digbuflen = DIGBUFLEN ;
+cint		digbuflen = DIGBUFLEN ;
 
 
 /* exported variables */
@@ -112,7 +116,7 @@ int hdrextnum(cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
+local int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if (sl < 0) sl = lenstr(sp) ;
@@ -129,9 +133,8 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	    bool	f_wsnew = false ;
 	    bool	f_exit = false ;
 	    while ((sl >= 0) && (*sp != '\0')) {
-	        cint	ch = mkchar(*sp) ;
 	        f_wsnew = false ;
-	        switch (ch) {
+	        switch (cint ch = mkchar(*sp) ; ch) {
 	        case '\\':
 	            if (f_quote) {
 	                sp += 1 ;
@@ -153,7 +156,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                    sp += 1 ;
 	                    sl -= 1 ;
 	                }
-	            }
+	            } /* end if */
 	            break ;
 	        case CH_DQUOTE:
 	            f_quote = (! f_quote) ;
@@ -173,14 +176,15 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                    sp += 1 ;
 	                    sl -= 1 ;
 	                }
-	            }
+	            } /* end if */
 	            break ;
 	        case CH_RPAREN:
 	            if (! f_quote) {
 	                sp += 1 ;
 	                sl -= 1 ;
-	                if (c_comment > 0)
+	                if (c_comment > 0) {
 	                    c_comment -= 1 ;
+			}
 	            } else {
 	                if (c_comment == 0) {
 	                    b.chr(*sp++) ;
@@ -189,7 +193,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                    sp += 1 ;
 	                    sl -= 1 ;
 	                }
-	            }
+	            } /* end if */
 	            break ;
 	        case CH_COMMA:
 	            if (c_comment) {
