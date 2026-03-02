@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	HDRCTYPE	struct hdrctype_head
@@ -35,12 +32,12 @@
 struct hdrctype_type {
 	cchar		*tp ;
 	int		tl ;
-} ;
+} ; /* end struct */
 
 struct hdrctype_head {
 	HDRCTYPE_T	main ;
 	HDRCTYPE_T	sub ;
-} ;
+} ; /* end struct */
 
 typedef HDRCTYPE	hdrctype ;
 typedef	HDRCTYPE_T	hdrctype_t ;
