@@ -1,4 +1,4 @@
-# MAKEFILES (libf)
+# MAKEFILE (libf)
 
 T= libf
 
