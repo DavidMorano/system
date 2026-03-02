@@ -36,24 +36,35 @@
 #include	<cstdarg>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<usupport.h>		/* |strwcpy(3u)| */
 #include	<uclibmem.h>
-#include	<estrings.h>
-#include	<storebuf.h>
+#include	<snflagsx.h>
 #include	<localmisc.h>		/* |COLUMNS| */
 
+#include	"debugutil.hh"
 #include	"libdebug.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 #define	PRINTBUFLEN	(COLUMNS + 2)
+
+#ifndef	HEXBUFLEN
 #define	HEXBUFLEN	100
+#endif
 
 
 /* imported namespaces */
 
 
 /* local typedefs */
+
+using libu::strwcpy ;			/* subroutine */
+using libdebug::checkbasebounds ;	/* subroutine */
 
 
 /* external subroutines */
@@ -71,8 +82,6 @@ struct debug_oflags {
 
 
 /* forward subroutines */
-
-static int	checkbasebounds(cchar *,int,void *) noex ;
 
 
 /* local variables */
@@ -109,7 +118,7 @@ void d_whoopen(int *s) noex {
 	        debugprintf("d_whoopen: open on %d accmod=%08x\n",
 	            i,(rs & O_ACCMODE)) ;
 	    }
-	}
+	} /* end for */
 }
 /* end subroutine (d_whoopen) */
 
@@ -143,38 +152,6 @@ int gdb() noex {
 }
 /* end subroutine (gdb) */
 
-int mkhexstr(char *dbuf,int dlen,cvoid *vp,int vl) noex {
-	int		sl = vl ;
-	int		i ;
-	int		ch ;
-	int		j = 0 ;
-	cchar		*sp = (cchar *) vp ;
-	if (sl < 0) sl = strlen(sp) ;
-	for (i = 0 ; (dlen >= 3) && (i < sl) ; i += 1) {
-	    ch = mkchar(sp[i]) ;
-	    if (i > 0) dbuf[j++] = ' ' ;
-	    dbuf[j++] = getdig((ch>>4)&15) ;
-	    dbuf[j++] = getdig((ch>>0)&15) ;
-	    dlen -= ((i > 0) ? 3 : 2) ;
-	} /* end for */
-	dbuf[j] = '\0' ;
-	return j ;
-}
-/* end subroutine (mkhexstr) */
-
-int mkhexnstr(char *hbuf,int hlen,int maxcols,cchar *sbuf,int slen) noex {
-	int		n = 0 ;
-
-	if (maxcols < 0) maxcols = COLUMNS ;
-
-	if (slen < 0) slen = strlen(sbuf) ;
-	n = MIN((maxcols / 3),slen) ;
-	mkhexstr(hbuf,hlen,sbuf,n) ;
-
-	return n ;
-}
-/* end subroutine (mkhexnstr) */
-
 int debugprinthex(cchar *ids,int maxcols,cchar *sp,int sl) noex {
 	cint		plen = PRINTBUFLEN ;
 	int		rs ;
@@ -182,7 +159,7 @@ int debugprinthex(cchar *ids,int maxcols,cchar *sp,int sl) noex {
 	int		wlen = 0 ;
 	char		pbuf[PRINTBUFLEN + 1] ;
 
-	if (ids != nullptr) idlen = strlen(ids) ;
+	if (ids != nullptr) idlen = lenstr(ids) ;
 
 	if (maxcols < 0) maxcols = COLUMNS ;
 
@@ -209,11 +186,11 @@ int debugprinthexblock(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
 	cchar		*sp = (cchar *) vp ;
 	char		printbuf[PRINTBUFLEN + 1] ;
 
-	if (ids != nullptr) idlen = strlen(ids) ;
+	if (ids != nullptr) idlen = lenstr(ids) ;
 
 	if (maxcols < 0) maxcols = COLUMNS ;
 
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 
 	while ((rs >= 0) && (sl > 0)) {
 	    char	*pbp = printbuf ;
@@ -222,7 +199,7 @@ int debugprinthexblock(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
 
 	    if (ids != nullptr) {
 	        if ((idlen+2) < pbl) {
-		    int	i = strwcpy(pbp,ids,idlen) - pbp ;
+		    int	i = intconv(strwcpy(pbp,ids,idlen) - pbp) ;
 	            pbp[i++] = ':' ;
 	            pbp[i++] = ' ' ;
 	            pbp += i ;
@@ -243,35 +220,13 @@ int debugprinthexblock(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
 	            rs = debugprint(printbuf,-1) ;
 	            wlen += rs ;
 		}
-	    }
+	    } /* end if (ok) */
 
 	} /* end while */
 
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (debugprinthexblock) */
-
-
-int hexblock(cchar *ids,cchar *ap,int n) noex {
-	cint		hexlen = HEXBUFLEN ;
-	int		i, sl ;
-	char		hexbuf[HEXBUFLEN + 3] ;
-
-	if (ids != nullptr) {
-	    debugprint(ids,-1) ;
-	}
-
-	for (i = 0 ; i < n ; i += 1) {
-	    sl = mkhexstr(hexbuf,hexlen,ap,4) ;
-	    hexbuf[sl++] = '\n' ;
-	    hexbuf[sl] = '\0' ;
-	    ap += 4 ;
-	    debugprint(hexbuf,-1) ;
-	} /* end for */
-
-	return n ;
-}
-/* end subroutine (hexblock) */
 
 /* audit a HOSTENT structure */
 int heaudit(HOSTENT *hep,cchar *buf,int buflen) noex {
@@ -294,14 +249,14 @@ int heaudit(HOSTENT *hep,cchar *buf,int buflen) noex {
 	        if ((rs = checkbasebounds(buf,buflen,cpp)) >= 0) {
 	            for (i = 0 ; cpp[i] != nullptr ; i += 1) {
 	                rs = checkbasebounds(buf,buflen,(cpp + i)) ;
-	                if (rs >= 0)
+	                if (rs >= 0) {
 	                    rs = checkbasebounds(buf,buflen,cpp[i]) ;
-	                if (rs < 0)
-	                    break ;
-	            }
-	        }
+			}
+	                if (rs < 0) break ;
+	            } /* end for */
+	        } /* end if (checkbasebounds) */
 	    }
-	}
+	} /* end if (ok) */
 
 	if (rs >= 0) {
 	    cpp = hep->h_aliases ;
@@ -309,14 +264,14 @@ int heaudit(HOSTENT *hep,cchar *buf,int buflen) noex {
 	        if ((rs = checkbasebounds(buf,buflen,cpp)) >= 0) {
 	            for (i = 0 ; cpp[i] != nullptr ; i += 1) {
 	                rs = checkbasebounds(buf,buflen,(cpp + i)) ;
-	                if (rs >= 0)
+	                if (rs >= 0) {
 	                    rs = checkbasebounds(buf,buflen,cpp[i]) ;
-	                if (rs < 0)
-	                    break ;
-	            }
-	        }
+			}
+	                if (rs < 0) break ;
+	            } /* end for */
+	        } /* end if (checkbasebounds) */
 	    }
-	}
+	} /* end if (ok) */
 
 	return rs ;
 }
@@ -331,24 +286,9 @@ char *stroflags(char *buf,int oflags) noex {
 
 /* local subroutines */
 
-static int checkbasebounds(cchar *bbuf,int blen,void *vp) noex {
-	int		rs = SR_OK ;
-	cchar		*tp = (cchar *) vp ;
-
-	if (tp >= bbuf) {
-	    if (tp >= (bbuf + blen)) rs = SR_BADFMT ;
-	} else {
-	    rs = SR_BADFMT ;
-	}
-
-	return rs ;
-}
-/* end subroutine (checkbasebounds) */
-
 int debugprintfsize(cchar *id,int fd) noex {
-	USTAT		sb ;
 	int		rs ;
-	if ((rs = u_fstat(fd,&sb)) >= +0) {
+	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	    ulong	fs = sb.st_size ;
 #if	defined(_I32LPx)
 	    debugprintf("debugprintfsize: I32LPx\n") ;
