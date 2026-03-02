@@ -2,25 +2,41 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* variaous particular debgging utilities */
+/* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<pwd.h>
+#include	<grp.h>
+#include	<ctime>
 #include	<cerrno>
 #include	<csignal>
-#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdio>
 #include	<cstring>
-#include	<pwd.h>
-#include	<grp.h>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<logfile.h>
 #include	<bfile.h>
+#include	<timestr.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -34,16 +50,16 @@
 
 extern int	logfile_printf() ;
 
-extern char	*timestr_log() ;
-
 
 /* external variables */
 
 extern struct global	g ;
 
-extern int	errno ;
+
+/* exported variables */
 
 
+/* exported subroutines */
 
 void fileinfo(cchar *file,cchar *w) noex {
 	bfile		msgfile, *mfp = &msgfile ;
@@ -54,10 +70,10 @@ void fileinfo(cchar *file,cchar *w) noex {
 	char	buf1[LINELEN + 1], buf2[LINELEN + 2] ;
 
 
-	if ((w != NULL) && (w[0] != '\0'))
+	if ((w != nullptr) && (w[0] != '\0'))
 	    logfile_printf(&g.eh,"fileinfo: where=\"%s\"\n",w) ;
 
-	if ((file != NULL) || (file[0] != '\0')) {
+	if ((file != nullptr) || (file[0] != '\0')) {
 
 	    logfile_printf(&g.eh,"fileinfo: file=\"%s\"\n",file) ;
 
@@ -124,8 +140,9 @@ void fileinfo(cchar *file,cchar *w) noex {
 
 	    }
 
-	} else
-	    logfile_printf(&g.eh,"fileinfo: file was NULL\n") ;
+	} else {
+	    logfile_printf(&g.eh,"fileinfo: file was nullptr\n") ;
+	}
 
 }
 /* end subroutine (fileinfo) */
