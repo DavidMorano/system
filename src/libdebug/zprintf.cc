@@ -65,22 +65,35 @@
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstdio>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<usupport.h>		/* |strwcpy(3u)| */
 #include	<mkx.h>
 #include	<rmx.h>
-#include	<strwcpy.h>
 #include	<format.h>
 #include	<localmisc.h>		/* |COLUMNS| */
 
 #include	"zprintf.h"
+#include	"debugmkhex.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	PBUFLEN		512
+#define	PBUFLEN		512		/* Print-Buffer-Length */
 
-#define	SI		struct subinfo
+#define	SI		subinfo
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+using libu::strwcpy ;			/* subroutine */
 
 
 /* external subroutines */
@@ -100,16 +113,16 @@ struct subinfo {
 	int		wl ;
 	int		blen ;
 	int		ilen ;
-} ;
+} ; /* end struct (subinfo) */
 
 
 /* forward references */
 
-static int subinfo_start(SI *,char *,cchar *,cchar *,int) noex ;
-static int subinfo_finish(SI *) noex ;
-static int subinfo_wrline(SI *,cchar *,int) noex ;
-static int subinfo_flushover(SI *,int) noex ;
-static int subinfo_write(SI *,cchar *,int) noex ;
+local int subinfo_start		(SI *,char *,cchar *,cchar *,int) noex ;
+local int subinfo_finish	(SI *) noex ;
+local int subinfo_wrline	(SI *,cchar *,int) noex ;
+local int subinfo_flushover	(SI *,int) noex ;
+local int subinfo_write		(SI *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -120,91 +133,85 @@ static int subinfo_write(SI *,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int zprint(cchar *fn,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		len = 0 ;
-
-	if (fn == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
-	if (fn[0] == '\0') return SR_INVALID ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-	if (sl > 0) {
-	    cint	of = (O_WRONLY | O_APPEND) ;
-	    if ((rs = u_open(fn,of,0666)) >= 0) {
-	        cint	fd = rs ;
-		cint	cmd = F_LOCK ;
-		if ((rs = uc_lockfile(fd,cmd,0L,0L,-1)) >= 0) {
-	            if ((rs = uc_writen(fd,sp,sl)) >= 0) {
-		        len = rs ;
-			if ((sl > 0) && (sp[sl-1] != '\n')) {
-			    char	nbuf[2] = "\n" ;
-			    rs = uc_writen(fd,nbuf,1) ;
-			    len += rs ;
-			}
-		    } /* end if (uc_writen) */
-		} /* end if (uc_lockfile) */
-	        u_close(fd) ;
-	    } /* end if (file) */
-	} /* end if (positive) */
-
+int zprint(cchar *fn,cchar *sp,int µsl) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (fn && sp) {
+	    rs = SR_INVALID ;
+	    if (fn[0]) {
+		rs = SR_OK ;
+		if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
+	            cint	of = (O_WRONLY | O_APPEND) ;
+	            if ((rs = u_open(fn,of,0666)) >= 0) {
+	                cint	fd = rs ;
+		        cint	cmd = F_LOCK ;
+		        if ((rs = u_lockf(fd,cmd,0z)) >= 0) {
+	                    if ((rs = u_write(fd,sp,sl)) >= 0) {
+		                len = rs ;
+			        if ((sl > 0) && (sp[sl-1] != '\n')) {
+			            char	nbuf[2] = "\n" ;
+			            rs = u_write(fd,nbuf,1) ;
+			            len += rs ;
+			        }
+		            } /* end if (uc_writen) */
+		        } /* end if (uc_lockfile) */
+	                rs1 = u_close(fd) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (file) */
+	        } /* end if (non-zero positive) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (zprint) */
 
 int zprintf(cchar *fn,cchar *fmt,...) noex {
-	int		rs = SR_OK ;
-	int		fl = 0 ;
-
-	if (fn == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
-
-	if (fn[0] == '\0') return SR_INVALID ;
-
-	if (fmt[0] != '\0') {
-	    va_list	ap ;
-	    va_begin(ap,fmt) ;
-	    cint	flen = PBUFLEN ;
-	    char	fbuf[PBUFLEN + 1] ;
-	    if ((fl = vsnprintf(fbuf,flen,fmt,ap)) > 0) {
-		rs = zprint(fn,fbuf,fl) ;
-	    }
-	    va_end(ap) ;
-	} /* end if (non-nul) */
-
+	va_list		ap ;
+	int		rs = SR_FAULT ;
+	int		fl = 0 ; /* return-value */
+	if (fn && fmt) {
+	    rs = SR_INVALID ;
+	    if (fn[0]) {
+		rs = SR_OK ;
+	        if (fmt[0]) {
+	            cint	flen = PBUFLEN ;
+	            char	fbuf[PBUFLEN + 1] ;
+	            va_begin(ap,fmt) ;
+	            if ((fl = vsnprintf(fbuf,flen,fmt,ap)) > 0) {
+		        rs = zprint(fn,fbuf,fl) ;
+	            }
+	            va_end(ap) ;
+	        } /* end if (non-nul) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
 }
 /* end subroutine (zprintf) */
 
 int zprinthexblock(cchar *fn,cchar *id,int mc,cvoid *vp,int vl) noex {
-	SI		si ;
-	int		rs ;
-	int		sl = vl ;
-	int		wlen = 0 ;
-	cchar		*sp = (cchar *) vp ;
-	char		b[PBUFLEN + 1] ;
-
-	if (fn == NULL) return SR_FAULT ;
-	if (vp == NULL) return SR_FAULT ;
-
-	if (fn[0] == '\0') return SR_INVALID ;
-
-	if (mc < 0) mc = COLUMNS ;
-	if (sl < 0) sl = strlen(sp) ;
-
-	if ((rs = subinfo_start(&si,b,fn,id,mc)) >= 0) {
-	    while (sl > 0) {
-		rs = subinfo_wrline(&si,sp,sl) ;
-		sp += rs ;
-		sl -= rs ;
-		if (rs < 0) break ;
-	    } /* end while */
-	    wlen = subinfo_finish(&si) ;
-	    if (rs >= 0) rs = wlen ;
-	} /* end if (subinfo) */
-
+	int		rs = SR_FAULT ;
+	int		wlen = 0 ; /* return-value */
+	if (fn && vp) {
+	    rs = SR_INVALID ;
+	    if (fn[0]) {
+	        int		sl = vl ;
+	        cchar		*sp = (cchar *) vp ;
+	        char		b[PBUFLEN + 1] ;
+	        if (mc < 0) mc = COLUMNS ;
+	        if (sl < 0) sl = lenstr(sp) ;
+	        if (SI si ; (rs = subinfo_start(&si,b,fn,id,mc)) >= 0) {
+	            while (sl > 0) {
+		        rs = subinfo_wrline(&si,sp,sl) ;
+		        sp += rs ;
+		        sl -= rs ;
+		        if (rs < 0) break ;
+	            } /* end while */
+	            wlen = subinfo_finish(&si) ;
+	            if (rs >= 0) rs = wlen ;
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (zprinthexblock) */
@@ -212,7 +219,7 @@ int zprinthexblock(cchar *fn,cchar *id,int mc,cvoid *vp,int vl) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SI *sip,char *bp,cchar *fn,cchar *id,int mc) noex {
+local int subinfo_start(SI *sip,char *bp,cchar *fn,cchar *id,int mc) noex {
     	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = memclear(sip) ;
@@ -222,14 +229,14 @@ static int subinfo_start(SI *sip,char *bp,cchar *fn,cchar *id,int mc) noex {
 	    sip->blen = PBUFLEN ;
 	    if (id) {
 	        sip->id = id ;
-	        sip->ilen = strlen(id) ;
+	        sip->ilen = lenstr(id) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subfino_start) */
 
-static int subinfo_finish(SI *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->bl > 0) {
 	    if ((rs = zprint(sip->fn,sip->bp,sip->bl)) >= 0) {
@@ -241,13 +248,13 @@ static int subinfo_finish(SI *sip) noex {
 }
 /* end subroutine (subfino_finish) */
 
-static int subinfo_wrline(SI *sip,cchar *sp,int sl) noex {
+local int subinfo_wrline(SI *sip,cchar *sp,int sl) noex {
 	cint		mlen = MIN((3*sl),(sip->mc-sip->ilen+1)) ;
 	int		rs ;
 	int		ul = 0 ;
 
 	if ((rs = subinfo_flushover(sip,mlen)) >= 0) {
-	    if (sip->id != NULL) {
+	    if (sip->id) {
 		rs = subinfo_write(sip,sip->id,sip->ilen) ;
 	    }
 	    if (rs >= 0) {
@@ -266,7 +273,7 @@ static int subinfo_wrline(SI *sip,cchar *sp,int sl) noex {
 }
 /* end subroutine (subinfo_wrline) */
 
-static int subinfo_flushover(SI *sip,int mlen) noex {
+local int subinfo_flushover(SI *sip,int mlen) noex {
 	int		rs = SR_OK ;
 	if (mlen > (sip->blen-sip->bl)) {
 	    char	*bp = (sip->bp + sip->bl) ;
@@ -279,11 +286,11 @@ static int subinfo_flushover(SI *sip,int mlen) noex {
 }
 /* end subroutine (subfino_flushover) */
 
-static int subinfo_write(SI *sip,cchar *sp,int sl) noex {
+local int subinfo_write(SI *sip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (sl < (sip->blen - sip->bl)) {
 	    char	*bp = (sip->bp + sip->bl) ;
-	    rs = (strwcpy(bp,sp,sl) - sip->bp) ;
+	    rs = intconv(strwcpy(bp,sp,sl) - sip->bp) ;
 	    sip->bl += rs ;
 	} else {
 	    rs = SR_OVERFLOW ;
