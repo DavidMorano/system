@@ -22,10 +22,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |wchar_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<b64decoder.h>
 #include	<qpdecoder.h>
 #include	<chartrans.h>
@@ -40,7 +37,7 @@
 struct hdrdecode_flags {
 	uint		space:1 ;
 	uint		ct:1 ;
-} ;
+} ; /* end struct */
 
 struct hdrdecode_head {
 	b64decoder	*b64p ;
@@ -48,9 +45,9 @@ struct hdrdecode_head {
 	chartrans	*ctp ;
 	cchar		*pr ;
 	HDRDECODE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	char		cs[HDRDECODE_CSLEN+1] ;
-} ;
+} ; /* end struct */
 
 typedef HDRDECODE	hdrdecode ;
 typedef	HDRDECODE_FL	hdrdecode_fl ;
