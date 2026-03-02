@@ -30,8 +30,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<estrings.h>
 #include	<strn.h>
 #include	<sfx.h>
@@ -39,7 +41,9 @@
 
 #include	"hdrctype.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -64,20 +68,19 @@ import libutil ;
 
 /* exported subroutines */
 
-int hdrctype_decode(hdrctype *op,cchar *hp,int hl) noex {
+int hdrctype_decode(hdrctype *op,cchar *hp,int µhl) noex {
     	HDRCTYPE	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && hp) {
+	if (int hl ; op && ((hl = getlenstr(hp,µhl)) >= 0)) {
 	    int		cl ;
 	    cchar	*cp ;
 	    cchar	*tp ;
 	    rs = memclear(hop) ;
-	    if (hl < 0) hl = lenstr(hp) ;
-/* ignore any parameters */
+	    /* ignore any parameters */
 	    if ((tp = strnchr(hp,hl,';')) != nullptr) {
 	        hl = intconv((hp + hl) - tp) ;
-	    }
-/* parse the type and subtype */
+	    } /* end if (strnchr) */
+	    /* parse the type and subtype */
 	    if ((tp = strnchr(hp,hl,'/')) != nullptr) {
 	        cchar	*sp = (tp +1) ;
 	        cint	sl = intconv((hp + hl) - (tp + 1)) ;
@@ -86,12 +89,12 @@ int hdrctype_decode(hdrctype *op,cchar *hp,int hl) noex {
 		    op->sub.tl = cl ;
 	        }
 	        hl = intconv(tp - hp) ;
-	    }
+	    } /* end if (strnchr) */
 	    if ((cl = sfshrink(hp,hl,&cp)) > 0) {
 	        op->main.tp = cp ;
 	        op->main.tl = cl ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return rs ;
 }
 /* end subroutine (hdrctype_decode) */
