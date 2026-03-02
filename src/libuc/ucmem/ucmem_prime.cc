@@ -86,15 +86,17 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<functional>		/* |mem_fn(3c++)| */
+#include	<numeric>		/* |sat_mul(3c++)| */
+#include	<cstdckdint>		/* |ckd_mul(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usupport.h>		/* |strwcpy(3u)| */
 #include	<uclibmem.h>
 #include	<ucfork.h>
 #include	<ucatfork.h>
 #include	<ucatexit.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
-#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"ucmem.h"
@@ -113,8 +115,8 @@ import addrset ;
 /* imported namespaces */
 
 using libuc::libmems ;			/* type */
+using libu::strwcpy ;			/* subroutine */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -170,9 +172,9 @@ namespace {
 	int trackstarter(int) noex ;
 	int trackfinish() noex ;
 	int trackcall(void *,int = 0,void * = nullptr) noex ;
-	int trackmalloc(int,void *) noex ;
-	int trackvalloc(int,void *) noex ;
-	int trackrealloc(void *,int,void *) noex ;
+	int trackmall(int,void *) noex ;
+	int trackvall(int,void *) noex ;
+	int tracrall(void *,int,void *) noex ;
 	int trackfree(void *) noex ;
 	int trackpresent(cvoid *) noex ;	/* track-present */
 	int trackcurenum(ucmem_cur *,ucmem_ent *) noex ;
@@ -220,9 +222,9 @@ extern "C" {
 }
 
 extern "C" {
-    static void	submgr_atforkbefore() noex ;
-    static void	submgr_atforkafter() noex ;
-    static void	submgr_exit() noex ;
+    local void	submgr_atforkbefore() noex ;
+    local void	submgr_atforkafter() noex ;
+    local void	submgr_exit() noex ;
 }
 
 
@@ -233,7 +235,7 @@ extern "C" {
 
 static submgr		submgr_data ;
 
-static int		pagesz = ulibval.pagesz ;
+static cint		pagesz = ulibval.pagesz ;
 
 
 /* exported variables */
@@ -260,19 +262,19 @@ int uc_mallset(int cmd) noex {
 }
 
 int uc_malloc(int sz,void *vp) noex {
-    	return mem.malloc(sz,vp) ;
+    	return mem.mall(sz,vp) ;
 }
 
 int uc_valloc(int sz,void *vp) noex {
-    	return mem.valloc(sz,vp) ;
+    	return mem.vall(sz,vp) ;
 }
 
 int uc_calloc(int ne,int esz,void *vp) noex {
-    	return mem.calloc(ne,esz,vp) ;
+    	return mem.call(ne,esz,vp) ;
 }
 
 int uc_realloc(void *cp,int sz,void *vp) noex {
-    	return mem.ralloc(cp,sz,vp) ;
+    	return mem.rall(cp,sz,vp) ;
 }
 
 int um_free(void *vp) noex {
@@ -311,13 +313,13 @@ int ucmem_curenum(ucmem_cur *curp,ucmem_ent *rp) noex {
 /* local subroutines */
 
 namespace libuc {
-    int mems::strw(cchar *sp,int µsl,void *vp) noex {
+    int mems::strw(cchar *sp,int µsl,void *vpp) noex {
 	int		rs = SR_FAULT ;
 	int		ml = 0 ; /* return-value */
-	if (sp && vp) {
+	if (sp && vpp) {
 	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
-		if (char *bp ; (rs = mem.mall((sl + 1),&bp)) >= 0) {
-		    cchar **rpp = ccharpp(vp) ;
+		if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) {
+		    cchar **rpp = ccharpp(vpp) ;
 		    ml = intconv(strwcpy(bp,sp,sl) - bp) ;
 		    *rpp = bp ;
 		} /* end if (memory-allocation) */
@@ -325,41 +327,47 @@ namespace libuc {
 	} /* end if (non-null) */
 	return (rs >= 0) ? ml : rs ;
     } /* end method (mems::strw) */
-    int mems::mall(int sz,void *vp) noex {
+    int mems::mall(int sz,void *vpp) noex {
 	submgr		*uip = &submgr_data ;
 	int		rs ;
 	if (uip->ftrack) {
-	    rs = uip->trackmalloc(sz,vp) ;
+	    rs = uip->trackmall(sz,vpp) ;
 	} else {
-	    rs = libmem.mall(sz,vp) ;
+	    rs = libmem.mall(sz,vpp) ;
 	}
 	return (rs >= 0) ? sz : rs ;
     } /* end method (mems::mall) */
-    int mems::vall(int sz,void *vp) noex {
+    int mems::vall(int sz,void *vpp) noex {
 	submgr		*uip = &submgr_data ;
 	int		rs ;
 	if (uip->ftrack) {
-	    rs = uip->trackvalloc(sz,vp) ;
+	    rs = uip->trackvall(sz,vpp) ;
 	} else {
-	    rs = libmem.vall(sz,vp) ;
+	    rs = libmem.vall(sz,vpp) ;
 	}
 	return (rs >= 0) ? sz : rs ;
     } /* end method (mems::vall) */
-    int mems::call(int ne,int esz,void *vp) noex {
-	cint		sz = (ne * esz) ;
-	int		rs ;
-	if ((rs = mall(sz,vp)) >= 0) {
-	    memclear(vp,sz) ;
-	}
+    int mems::call(int ne,int esz,void *vpp) noex {
+	int		rs = SR_TOOBIG ;
+	int		sz = 0 ; /* return-value */
+	if (ckd_mul(&sz,ne,esz) == false) {
+	    if ((rs = mall(sz,vpp)) >= 0) {
+		caddr_t	*epp = caddrp(vpp) ;
+		rs = SR_BUGCHECK ;
+		if (caddr_t ca = caddr_t(*epp) ; ca) {
+	            rs = memclear(ca,sz) ;
+		}
+	    } /* end if (mem.mall) */
+	} /* end if (valid) */
 	return (rs >= 0) ? sz : rs ;
     } /* end method (mems::call) */
-    int mems::rall(void *cp,int sz,void *vp) noex {
+    int mems::rall(void *cp,int sz,void *vpp) noex {
 	submgr		*uip = &submgr_data ;
 	int		rs ;
 	if (uip->ftrack) {
-	    rs = uip->trackrealloc(cp,sz,vp) ;
+	    rs = uip->tracrall(cp,sz,vpp) ;
 	} else {
-	    rs = libmem.rall(cp,sz,vp) ;
+	    rs = libmem.rall(cp,sz,vpp) ;
 	}
 	return (rs >= 0) ? sz : rs ;
     } /* end method (mems::rall) */
@@ -439,28 +447,13 @@ namespace libuc {
     } /* end method (mems::curenum) */
 } /* end namespace */
 
-namespace libuc {
-    int mems::malloc(int sz,void *vp) noex {
-	return libuc::mem.mall(sz,vp) ;
-    }
-    int mems::valloc(int sz,void *vp) noex {
-	return libuc::mem.vall(sz,vp) ;
-    }
-    int mems::calloc(int ne,int esz,void *vp) noex {
-	return libuc::mem.call(ne,esz,vp) ;
-    }
-    int mems::ralloc(void *cp,int nsz,void *vp) noex {
-	return libuc::mem.rall(cp,nsz,vp) ;
-    }
-} /* end namespace (libuc) */
-
 int submgr::iinit() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
-	    if (! finit.testandset) {			/* <- the money shot */
+	    if (! finit.testandset) {		/* <- the money shot */
 	        if ((rs = mx.create) >= 0) {
 	            void_f	b = submgr_atforkbefore ;
 	            void_f	a = submgr_atforkafter ;
@@ -620,19 +613,19 @@ int submgr::trackcall(void *cp,int sz,void *vp) noex {
 }
 /* end subroutine (submgr::trackcall) */
 
-int submgr::trackmalloc(int sz,void *vp) noex {
+int submgr::trackmall(int sz,void *vp) noex {
 	m = &submgr::callxalloc ;
 	almem = &libmems::mall ;
 	return trackcall(nullptr,sz,vp) ;
 }
 
-int submgr::trackvalloc(int sz,void *vp) noex {
+int submgr::trackvall(int sz,void *vp) noex {
 	m = &submgr::callxalloc ;
 	almem = &libmems::vall ;
 	return trackcall(nullptr,sz,vp) ;
 }
 
-int submgr::trackrealloc(void *cp,int sz,void *vp) noex {
+int submgr::tracrall(void *cp,int sz,void *vp) noex {
 	m = &submgr::callrealloc ;
 	return trackcall(cp,sz,vp) ;
 }
@@ -689,7 +682,7 @@ int submgr::callxalloc(void *,int sz,void *vp) noex {
 	} /* end if (pagesz) */
 	return (rs >= 0) ? rv : rs ;
 }
-/* end subroutine (submgr::trackmalloc) */
+/* end subroutine (submgr::trackmall) */
 
 int submgr::callrealloc(void *cp,int sz,void *vp) noex {
 	int		rs ;
@@ -798,17 +791,17 @@ int submgr::mallstats(ucmem_stats *statp) noex {
 }
 /* end subroutine (submgr::mallstats) */
 
-static void submgr_atforkbefore() noex {
+local void submgr_atforkbefore() noex {
 	submgr_data.atforkbefore() ;
 }
 /* end subroutine (submgr_atforkbefore) */
 
-static void submgr_atforkafter() noex {
+local void submgr_atforkafter() noex {
 	submgr_data.atforkafter() ;
 }
 /* end subroutine (submgr_atforkafter) */
 
-static void submgr_exit() noex {
+local void submgr_exit() noex {
 	/* submgr_data.fvoid = true ; */
 }
 /* end subroutine (submgr_atforkafter) */
