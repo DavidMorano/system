@@ -34,10 +34,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	UCMEMLA		struct ucmemla_head
@@ -48,7 +45,7 @@ struct ucmemla_head {
 	void		*ma ;
 	size_t		ms ;
 	int		f_large ;
-} ;
+} ; /* end struct (ucmemla_head) */
 
 typedef UCMEMLA		ucmemla ;
 
