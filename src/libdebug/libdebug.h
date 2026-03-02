@@ -20,40 +20,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<netdb.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<strlinelen.h>
 
+#include	<debugprime.h>
+#include	<debugmkhex.h>
+#include	<debugprint.h>
+#include	<debugline.h>
+#include	<debugging.h>
+#include	<debugutil.hh>		/* C++ only */
 
-EXTERNC_begin
-
-extern int debugopen(cchar *) noex ;
-extern int debugclose(void) noex ;
-extern int debugprint(cchar *,int) noex ;
-extern int debugprintf(cchar *,...) noex ;
-extern int debugprinthexblock(cchar *,int,cvoid *,int) noex ;
-extern int nprintf(cchar *,cchar *,...) noex ;
-extern int nprinthexblock(cchar *,cchar *,int,cvoid *,int) noex ;
-extern int strlinelen(cchar *,int,int) noex ;
-extern int strnnlen(cchar *,int,int) noex ;
-
-extern int d_openfiles() noex ;
-extern int d_ispath(cchar *) noex ;
-extern int mkhexstr(char *,int,cvoid *,int) noex ;
-extern int mkhexnstr(char *,int,int,cchar *,int) noex ;
-extern int debugprinthex(cchar *,int,cchar *,int) noex ;
-extern int debugprinthexblock(cchar *,int,cvoid *,int) noex ;
-extern int hexblock(cchar *,cchar *,int) noex ;
-extern int heaudit(HOSTENT *,cchar *,int) noex ;
-extern char *stroflags(char *,int) noex ;
-extern char *d_reventstr(int,char *,int) noex ;
-extern void d_whoopen(int *) noex ;
-
-EXTERNC_end
+#include	<zprintf.h>
+#include	<nprintf.h>
 
 
 #endif /* LIBDEBUG_INCLUDE */
