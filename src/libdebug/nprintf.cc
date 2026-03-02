@@ -1,4 +1,4 @@
-/* nprintf SUPPORT */
+/* nprintf SUPPORT (libdebug) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -66,32 +66,48 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
-#include	<strwcpy.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>	
 #include	<rmx.h>
-#include	<debug.h>
 #include	<fmtstr.h>
 #include	<localmisc.h>
+#include	<debug.h>
 
 #include	"nprintf.h"
+#include	"debugmkhex.h"		/* |mkhexstr(3debug)| */
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
 #define	PRINTBUFLEN	512
 #define	FBUFLEN		512
 
-#define	SI		struct subinfo
+#define	SI		subinfo
 
 
 /* imported namespaces */
 
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
 
 /* local typedefs */
 
+using libu::strwcpy ;			/* subroutine */
+
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_lockfile(int,int,off_t,off_t,int) noex ;
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_close(int) noex ;
+} /* end extern */
 
 
 /* local structures */
@@ -105,7 +121,7 @@ struct subinfo {
 	int		wl ;
 	int		blen ;
 	int		ilen ;
-} ;
+} ; /* end struct (subinfo) */
 
 
 /* forward references */
@@ -125,16 +141,17 @@ static int subinfo_write(SI *,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int nprint(cchar *fn,cchar *sp,int sl) noex {
+int nprint(cchar *fn,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
 	if (fn && sp) {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
-	        if (sl < 0) sl = strlen(sp) ;
-	        if (sl > 0) {
+		rs = SR_OK ;
+		if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
 	            cint	of = (O_WRONLY | O_APPEND) ;
-	            if ((rs = u_open(fn,of,0666)) >= 0) {
+	            if ((rs = uc_open(fn,of,0666)) >= 0) {
 	                cint	fd = rs ;
 		        cint	cmd = F_LOCK ;
 		        if ((rs = uc_lockfile(fd,cmd,0L,0L,-1)) >= 0) {
@@ -146,9 +163,10 @@ int nprint(cchar *fn,cchar *sp,int sl) noex {
 			            len += rs ;
 			        } } /* end if (uc_writen) */
 		        } /* end if (uc_lockfile) */
-	                u_close(fd) ;
+	                rs1 = uc_close(fd) ;
+			if (rs >= 0) rs = rs1 ;
 	            } /* end if (file) */
-	        } /* end if (positive) */
+	        } /* end if (non-zero positive) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -183,12 +201,12 @@ int nprinthexblock(cchar *fn,cchar *id,int mc,cvoid *vp,int vl) noex {
 	int		wlen = 0 ;
 	if (fn && vp) {
 	    int		sl = vl ;
-	    cchar	*sp = (cchar *) vp ;
-	    char	b[PRINTBUFLEN + 1] ;
+	    cchar	*sp = ccharp(vp) ;
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
+	        char	b[PRINTBUFLEN + 1] ;
 	        if (mc < 0) mc = COLUMNS ;
-	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl < 0) sl = lenstr(sp) ;
 	        if (SI si ; (rs = subinfo_start(&si,b,fn,id,mc)) >= 0) {
 	            while (sl > 0) {
 		        rs = subinfo_wrline(&si,sp,sl) ;
@@ -218,7 +236,7 @@ static int subinfo_start(SI *sip,char *bp,cchar *fn,cchar *id,int mc) noex {
 	    sip->blen = PRINTBUFLEN ;
 	    if (id) {
 	        sip->id = id ;
-	        sip->ilen = strlen(id) ;
+	        sip->ilen = lenstr(id) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -242,7 +260,7 @@ static int subinfo_wrline(SI *sip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		ul = 0 ;
 	if ((rs = subinfo_flushover(sip,mlen)) >= 0) {
-	    if (sip->id != nullptr) {
+	    if (sip->id) {
 		rs = subinfo_write(sip,sip->id,sip->ilen) ;
 	    }
 	    if (rs >= 0) {
@@ -277,7 +295,7 @@ static int subinfo_write(SI *sip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (sl < (sip->blen-sip->bl)) {
 	    char	*bp = (sip->bp + sip->bl) ;
-	    rs = (strwcpy(bp,sp,sl) - sip->bp) ;
+	    rs = intconv(strwcpy(bp,sp,sl) - sip->bp) ;
 	    sip->bl += rs ;
 	} else {
 	    rs = SR_OVERFLOW ;
