@@ -1,4 +1,4 @@
-/* l_main SUPPORT (liblkcmd) */
+/* liblkcmd_main SUPPORT (liblkcmd) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -41,10 +41,12 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<intceil.h>
 #include	<sighand.h>
 #include	<mapex.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -67,7 +69,6 @@
 
 /* imported namespaces */
 
-using std:nullptr_t ;			/* type */
 using std:nothrow ;			/* constant */
 
 
@@ -75,21 +76,6 @@ using std:nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy2w(char *,int,cchar *,cchar *,int) ;
-extern int	sncpylc(char *,int,cchar *) ;
-extern int	sncpyuc(char *,int,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	ucontext_rtn(ucontext_t *,long *) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	msleep(int) ;
-extern int	haslc(cchar *,int) ;
-extern int	hasuc(cchar *,int) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-extern cchar	*strsigabbr(int) ;
 
 
 /* external variables */
@@ -105,10 +91,10 @@ struct sigcode {
 
 /* forward references */
 
-static void	main_sighand(int,siginfo_t *,void *) ;
-static int	main_sigdump(siginfo_t *) ;
+static void	main_sighand(int,siginfo_t *,void *) noex ;
+static int	main_sigdump(siginfo_t *) noex ;
 
-static cchar	*strsigcode(const SIGCODE *,int) ;
+static cchar	*strsigcode(const SIGCODE *,int) noex ;
 
 
 /* local variables */
@@ -248,7 +234,7 @@ static int main_sigdump(siginfo_t *sip) noex {
 	cint	si_signo = sip->si_signo ;
 	cint	si_code = sip->si_code ;
 	int		wl ;
-	cchar	*sn = strsigabbr(sip->si_signo) ;
+	cchar	*sn = strabbrsig(sip->si_signo) ;
 	cchar	*as = "*na*" ;
 	cchar	*scs = nullptr ;
 	cchar	*fmt ;
@@ -283,7 +269,7 @@ static int main_sigdump(siginfo_t *sip) noex {
 /* end subroutine (main_sigdump) */
 
 static cchar *strsigcode(const SIGCODE *scp,int code) noex {
-	int		i ;
+	int		i ; /* used-afterwards */
 	bool		f = false ;
 	cchar		*sn = "UNKNOWN" ;
 	for (i = 0 ; scp[i].code != 0 ; i += 1) {
