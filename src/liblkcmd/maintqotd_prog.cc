@@ -1,11 +1,12 @@
-/* maintqotd_prog */
+/* maintqotd_prog SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* PROGRAM dialer for MAINTQOTD */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_BACKGROUND	1		/* put program in background */
-
 
 /* revision history:
 
@@ -19,44 +20,42 @@
 
 /*******************************************************************************
 
+  	Name:
+
+	Description:
 	This subroutine is called for the "prog" dialer for MAINTQOTD.
 
 	Synopsis:
-
-	int maintqotd_prog(MAINTQOTD *sip,cchar *qfname,cchar *sep)
+	int maintqotd_prog(MAINTQOTD *sip,cchar *qfname,cchar *sep) noex
 
 	Arguments:
-
 	sip		pointer to local state
 	qfname		QOTD-file name
 	sep		source entry pointer
 
 	Returns:
-
-	<0		some error
 	>=0		resulting FD
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<ascii.h>
 #include	<spawner.h>
 #include	<filer.h>
 #include	<logfile.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"maintqotd.h"
@@ -66,10 +65,6 @@
 
 #define	CHECKER		struct checker
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 #ifndef	VBUFLEN
 #define	VBUFLEN		(6 * MAXPATHLEN)
 #endif
@@ -77,39 +72,11 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath2w(char *,cchar *,cchar *,int) ;
-extern int	mkpath3w(char *,cchar *,cchar *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	matkeystr(cchar **,char *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optvalue(cchar *,int) ;
-extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
-extern int	isNotPresent(int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 static int	debugoutput(cchar *,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-extern cchar	*strsigabbr(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnwcpy(char *,int,cchar *,int) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -535,7 +502,7 @@ static int checker_proglog(CHECKER *chp,int fd,pid_t pid,int cs)
 		int	sig = WTERMSIG(cs) ;
 		cchar	*ss ;
 		char	sigbuf[20+1] ;
-		if ((ss = strsigabbr(sig)) == NULL) {
+		if ((ss = strabbrsig(sig)) == NULL) {
 		     rs = ctdeci(sigbuf,20,sig) ;
 		     ss = sigbuf ;
 		}
