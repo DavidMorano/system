@@ -37,11 +37,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<utility>
-#include	<usystem.h>
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
 #include	<exitcodes.h>
 
 
@@ -51,7 +53,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	mainprog(int,const char **,const cchar **) noex ;
+    extern int	mainprog(int,mainv,mainv) noex ;
 }
 
 
@@ -60,7 +62,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int main(int argc,char **argv,char **envv) {
+int main(int argc,mainv argv,mainv envv) {
 	int	ex ;
 	try {
 	    ex = mainprog(argc,argv,envv) ;
