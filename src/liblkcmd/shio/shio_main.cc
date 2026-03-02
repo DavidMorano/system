@@ -78,8 +78,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<dlfcn.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
@@ -105,6 +105,9 @@
 
 #include	"shio.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -138,10 +141,6 @@
 #define	TMPDNAME	"/tmp"
 #endif
 
-#ifndef	nullptrDEV
-#define	nullptrDEV		"/dev/null"
-#endif
-
 #define	ISCONT(b,bl)	\
 	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
 
@@ -159,9 +158,9 @@ typedef bfile *		bfilep ;
 /* external subroutines */
 
 #if	CF_SFIO
-extern int	sfreadline(Sfio_t *,char *,int) ;
-extern int	sfreadlinetimed(Sfio_t *,char *,int,int) ;
-extern int	sfisterm(Sfio_t *) ;
+extern int	sfreadline(Sfio_t *,char *,int) noex ;
+extern int	sfreadlinetimed(Sfio_t *,char *,int,int) noex ;
+extern int	sfisterm(Sfio_t *) noex ;
 #endif
 
 
@@ -177,9 +176,9 @@ struct shio_persistent {
 
 template<typename ... Args>
 static int shio_ctor(shio *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 
 	} /* end if (non-null) */
@@ -189,7 +188,7 @@ static int shio_ctor(shio *op,Args ... args) noex {
 
 static int shio_dtor(shio *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -199,7 +198,7 @@ static int shio_dtor(shio *op) noex {
 template<typename ... Args>
 static inline int shio_magic(shio *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SHIO_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -381,8 +380,7 @@ int shio_opene(SHIO *op,cchar *fname,cchar *ms,mode_t om,int to) noex {
 
 #if	CF_STOREFNAME
 	if (rs >= 0) {
-	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(ofname,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = uc_mallocstrw(ofname,-1,&cp)) >= 0) {
 	        op->fname = cp ;
 	    }
 	}
@@ -771,13 +769,9 @@ ret0:
 /* end subroutine (shio_vprintf) */
 
 int shio_putc(SHIO *op,int ch) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
-
-	if (op->fl.nullfile) goto ret0 ;
+	int		rs ;
+	if ((rs = shio_magic(op)) >= 0) ylikely {
+	    if (! op->fl.nullfile) {
 
 #if	CF_SFIO
 	if (op->fl.sfio) {
@@ -798,19 +792,16 @@ int shio_putc(SHIO *op,int ch) noex {
 	}
 #endif /* CF_SFIO */
 
-ret0:
+	    } /* end if (non-null-dev) */
+	} /* end if (magic) */
 	return (rs >= 0) ? 1 : rs ;
 }
 /* end subroutine (shio_putc) */
 
 int shio_seek(SHIO *op,off_t o,int w) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
-
-	if (op->fl.nullfile) goto ret0 ;
+	int		rs ;
+	if ((rs = shio_magic(op)) >= 0) ylikely {
+	    if (! op->fl.nullfile) {
 
 #if	CF_SFIO
 	if (op->fl.sfio) {
@@ -825,18 +816,15 @@ int shio_seek(SHIO *op,off_t o,int w) noex {
 	rs = bseek(op->fp,o,w) ;
 #endif /* CF_SFIO */
 
-ret0:
+	    } /* end if (not-null­dev) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (shio_seek) */
 
 int shio_flush(SHIO *op) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
-
+	int		rs ;
+	if ((rs = shio_magic(op)) >= 0) ylikely {
 	if (! op->fl.nullfile) {
 
 #if	CF_SFIO
@@ -850,21 +838,17 @@ int shio_flush(SHIO *op) noex {
 
 	} /* end if (output enabled) */
 
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (shio_flush) */
 
 int shio_control(SHIO *op,int cmd,...) noex {
-	int		rs = SR_OK ;
-	int		fd ;
-	int		f ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != SHIO_MAGIC) return SR_NOTOPEN ;
-
-	{
-	    va_list	ap ;
+	va_list		ap ;
+	int		rs ;
+	if ((rs = shio_magic(op)) >= 0) ylikely {
+	    int		fd ;
+	    int		f ;
 	    va_begin(ap,cmd) ;
 	    switch (cmd) {
 	    case SHIO_CNOP:
@@ -1024,8 +1008,7 @@ int shio_control(SHIO *op,int cmd,...) noex {
 	        break ;
 	    } /* end switch */
 	    va_end(ap) ;
-	} /* end block */
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (shio_control) */
@@ -1033,7 +1016,7 @@ int shio_control(SHIO *op,int cmd,...) noex {
 int shio_getfd(SHIO *op) noex {
 	int		rs ;
 	int		fd = -1 ;
-	if ((rs = shio_magic(op,fname)) >= 0) {
+	if ((rs = shio_magic(op,fname)) >= 0) ylikely {
 	    if (! op->fl.nullfile) {
 #if	CF_SFIO
 	        if (op->fl.sfio) {
@@ -1070,7 +1053,7 @@ int shio_getlines(SHIO *op) noex {
 int shio_readintr(SHIO *op,void *ubuf,int ulen,int to,volatile int **ipp) noex {
 	int		rs ;
 	if (to < 0) to = INT_MAX ;
-	if ((rs = shio_magic(op)) >= 0) {
+	if ((rs = shio_magic(op)) >= 0) ylikely {
 	    if (! op->fl.nullfile) {
 	        while (rs >= 0) {
 	            cint	rto = (to >= 0) ? MIN(to,1) : to ;
@@ -1092,7 +1075,7 @@ int shio_readintr(SHIO *op,void *ubuf,int ulen,int to,volatile int **ipp) noex {
 
 int shio_reserve(SHIO *op,int amount) noex {
 	int		rs ;
-	if ((rs = shio_magic(op)) >= 0) {
+	if ((rs = shio_magic(op)) >= 0) ylikely {
 #if	CF_SFIO
 	    if (op->fl.sfio) {
 	        rs = SR_OK ;
@@ -1109,7 +1092,7 @@ int shio_reserve(SHIO *op,int amount) noex {
 
 int shio_isterm(SHIO *op) noex {
 	int		rs ;
-	if ((rs = shio_magic(op)) >= 0) {
+	if ((rs = shio_magic(op)) >= 0) ylikely {
 	    if (! op->fl.nullfile) {
 #if	CF_SFIO
 	        if (op->fl.sfio) {
@@ -1130,7 +1113,7 @@ int shio_isterm(SHIO *op) noex {
 int shio_isseekable(SHIO *op) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = shio_magic(op)) >= 0) {
+	if ((rs = shio_magic(op)) >= 0) ylikely {
 	    cint	w = SEEK_CUR ;
 	    if ((rs = shio_seek(op,0L,w)) >= 0) {
 	        f = true ;
@@ -1155,12 +1138,11 @@ int shio_writefile(SHIO *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = shio_magic(op,fname)) >= 0) {
-	    linebuffer	lb ;
-	    if ((rs = lb.start) >= 0) {
+	if ((rs = shio_magic(op,fname)) >= 0) ylikely {
+	    if (linebuffer lb ; (rs = lb.start) >= 0) {
 	        bfile	ifile, *ifp = &ifile ;
 	        cmode	om = 0664 ;
-	        if ((rs = bopen(ifp,fname,"r",om)) >= 0) {
+	        if ((rs = bopen(ifp,fname,"r",om)) >= 0) ylikely {
 	            while ((rs = bread(ifp,lb.lbuf,lb.llen)) > 0) {
 	                rs = shio_write(op,lb.lbuf,rs) ;
 	                wlen += rs ;
@@ -1185,8 +1167,7 @@ static int shio_bopene(SHIO *op,int fni,cc *fname,cc *ms,
 	cint		osz = szof(bfile) ;
 	int		rs ;
 	char		nms[SHIO_MODESTRLEN + 1] ;
-	void		*vp ;
-	if ((rs = uc_malloc(osz,&vp)) >= 0) {
+	if (void *vp ; (rs = uc_malloc(osz,&vp)) >= 0) ylikely {
 	    op->bfp = bfilep(vp) ;
 	    op->fp = vp ;
 	    if (fni >= 0) {
@@ -1208,7 +1189,7 @@ static int shio_bopene(SHIO *op,int fni,cc *fname,cc *ms,
 
 static int shio_bclose(SHIO *op) noex {
 	int		rs = SR_OK ;
-	if (op->fp != nullptr) {
+	if (op->fp != nullptr) ylikely {
 	    rs = bclose(op->fp) ;
 	    if (op->bfp != nullptr) {
 	        uc_free(op->bfp) ;
@@ -1304,7 +1285,7 @@ static int shio_sfcookbegin(SHIO *op) noex {
 static int shio_sfcookend(SHIO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->outstore != nullptr) {
+	if (op->outstore != nullptr) ylikely {
 	    OUTSTORE	*osp = op->outstore ;
 	    {
 	        rs1 = shio_sfcookdump(op) ;
@@ -1408,7 +1389,9 @@ static int shio_sfcookwrite(SHIO *op,cchar *lbuf,int llen) noex {
 #if	CF_SFIO
 static int shio_sfwrite(SHIO *op,cchar *lbuf,int llen) noex {
 	int		rs ;
-	if ((rs = sfwrite(op->fp,lbuf,llen)) < 0) rs = SR_PIPE ;
+	if ((rs = sfwrite(op->fp,lbuf,llen)) < 0) {
+	    rs = SR_PIPE ;
+	}
 	return rs ;
 }
 /* end subroutine (shio_sfwrite) */
@@ -1443,7 +1426,7 @@ static int isNotSeek(int rs) noex {
 
 static bool isInterrupt(volatile int **ipp) noex {
 	bool		f = false ;
-	if (ipp != nullptr) {
+	if (ipp != nullptr) ylikely {
 	    int	i = 0 ;
 	    for (i = 0 ; ipp[i] != nullptr ; i += 1) {
 	        f = (ipp[i][0] != 0) ;
