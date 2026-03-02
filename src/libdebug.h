@@ -1,4 +1,4 @@
-/* libdebug HEADER */
+/* debugprime HEADER */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	LIBDEBUG_INCLUDE
-#define	LIBDEBUG_INCLUDE
+#ifndef	DEBUGPRIME_INCLUDE
+#define	DEBUGPRIME_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -31,31 +31,16 @@
 
 EXTERNC_begin
 
-extern int debugopen(cchar *) noex ;
-extern int debugclose(void) noex ;
-extern int debugprint(cchar *,int) noex ;
-extern int debugprintf(cchar *,...) noex ;
-extern int debugprinthexblock(cchar *,int,cvoid *,int) noex ;
-extern int debugprinthex(cchar *,int,cchar *,int) noex ;
-
-extern int nprintf(cchar *,cchar *,...) noex ;
-extern int nprinthexblock(cchar *,cchar *,int,cvoid *,int) noex ;
-extern int strlinelen(cchar *,int,int) noex ;
-extern int strnnlen(cchar *,int,int) noex ;
-
 extern int d_openfiles() noex ;
 extern int d_ispath(cchar *) noex ;
-extern int mkhexstr(char *,int,cvoid *,int) noex ;
-extern int mkhexnstr(char *,int,int,cchar *,int) noex ;
-extern int hexblock(cchar *,cchar *,int) noex ;
+extern void d_whoopen(int *) noex ;
+extern char *d_reventstr(int,char *,int) noex ;
 extern int heaudit(HOSTENT *,cchar *,int) noex ;
 extern char *stroflags(char *,int) noex ;
-extern char *d_reventstr(int,char *,int) noex ;
-extern void d_whoopen(int *) noex ;
 
 EXTERNC_end
 
 
-#endif /* LIBDEBUG_INCLUDE */
+#endif /* DEBUGPRIME_INCLUDE */
 
 
