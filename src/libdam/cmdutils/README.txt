@@ -1,4 +1,4 @@
 CMDUTILS
 
-This are utility subroutines for various programs.
+Provided are several utility subroutines for various programs.
 
