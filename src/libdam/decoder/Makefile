@@ -1,4 +1,4 @@
-# MAKEFILES (decoder)
+# MAKEFILE (decoder)
 
 T= decoder
 
