@@ -38,6 +38,7 @@ module ;
 #include	<usyscalls.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+#include	<debprintf.h>		/* |DEBPRINTF| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/debug.ccm"
