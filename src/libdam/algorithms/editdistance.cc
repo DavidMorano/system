@@ -21,10 +21,10 @@
 	editdistance
 
 	Description:
-        We find (calculate) the edit-distance to convert one string ('a')
-	into abother ('b').
-	This is the standard formula for getting the edit distance from one
-	string to another, using: change, insert, and delete operations.
+	We find (calculate) the edit-distance to convert one string
+	('a') into abother ('b').  This is the standard formula for
+	getting the edit distance from one string to another, using:
+	change, insert, and delete operations.
 
 	a -> b
 
@@ -35,6 +35,7 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<initializer_list>	/* C++11 */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>
@@ -50,6 +51,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* default name spaces */
 
+using std::initializer_list ;		/* type */
 using std::min ;			/* subroutine (template) */
 using std::max ;			/* subroutine (template) */
 using std::nothrow ;			/* constant */
@@ -76,7 +78,7 @@ template<typename T> static void ourswap(T &a,T &b) noex {
 
 /* forward references */
 
-static int	miner(int,int,int) noex ;
+local int	miner(int,int,int) noex ;
 
 
 /* local variables */
@@ -111,9 +113,9 @@ int editdistance(cchar *as,cchar *bs) noex {
 		        if (as[i-1] == bs[j-1]) {
 			    current[j] = previous[j-1] ;
 		        } else {
-			    cint	a = previous[j-1] ;
+			    cint	a = previous[j - 1] ;
 			    cint	b = previous[j] ;
-			    cint	c = current[j-1] ;
+			    cint	c = current[j - 1] ;
 		 	    {
 			        cint	m = miner(a,b,c) ;
 		                current[j] = (1 + m) ;
@@ -138,9 +140,9 @@ int editdistance(cchar *as,cchar *bs) noex {
 
 /* local subroutines */
 
-static int miner(int a,int b,int c) noex {
-	return min(min(a,b),c) ;
-}
-/* end subroutine (miner) */
+local int miner(int a,int b,int c) noex {
+    	initializer_list vlist{ a, b, c } ;	/* C++11 */
+	return min(vlist) ;
+} /* end subroutine (miner) */
 
 
