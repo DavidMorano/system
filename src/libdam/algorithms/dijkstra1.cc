@@ -81,7 +81,7 @@ typedef list<edge_t>::iterator	edgeit_t ;
 
 /* forward refereces */
 
-static int minvertex(bool *,res_t *,int) ;
+local int minvertex(bool *,res_t *,int) ;
 
 
 /* local variables */
@@ -137,7 +137,7 @@ int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart) {
 
 /* local subroutines */
 
-static int minvertex(bool *visited,res_t *resp,int n) {
+local int minvertex(bool *visited,res_t *resp,int n) {
 	int		vmin = INT_MAX ;
 	int		v = -1 ;
    	for (int i = 0 ; i < n ; i += 1) {
