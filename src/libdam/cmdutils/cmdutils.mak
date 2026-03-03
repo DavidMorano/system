@@ -1,4 +1,4 @@
-# MAKEFILES (cmdutils)
+# MAKEFILE (cmdutils)
 
 T= cmdutils
 
