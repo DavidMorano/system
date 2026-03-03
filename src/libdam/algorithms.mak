@@ -1,4 +1,4 @@
-# MAKEFILES (algorithms)
+# MAKEFILE (algorithms)
 
 T= algorithms
 
