@@ -1,4 +1,4 @@
-# MAKEFILES (configvars)
+# MAKEFILE (configvars)
 
 T= configvars
 
