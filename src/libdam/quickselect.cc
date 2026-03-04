@@ -1,11 +1,11 @@
-/* quickselect */
+/* quickselect SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C99 */
 
-/* quickselect function */
-
+/* quick-select function */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -18,40 +18,47 @@
 
 /*******************************************************************************
 
+  	Name:
+	quickselect
+
+	Description:
 	We create the quickselect order on the given array.
 
 	Synopsis:
-
-	int quickselect(int a[],int low,int high,int k)
+	int quickselect(int *a,int low,int high,int k) noex
 
 	Arguments:
-
-	a	array
+	a	array if inegers
 	low	low
 	hight	high
 	k	k-th smallest element
 
 	Returns:
-
 	-	
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-#include	<climits>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
+
+#include	"quickselect.h"
 
 
 /* external subroutines */
 
-extern void	arrswapi(int *,int,int) ;
+extern "C" {
+    extern void	arrswapi(int *,int,int) noex ;
+}
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -60,14 +67,18 @@ extern int	strlinelen(const char *,int,int) ;
 /* local variables */
 
 
-void quickselect(int *a,int low,int n,int k)
-{
-	int	high = (n-1) ;
+/* exported variables */
+
+
+/* exported subroutines */
+
+void quickselect(int *a,int low,int n,int k) noex {
+	cint		high = (n - 1) ;
 	k += 1 ;
 	if ((high - low) >= k) {
-	    int	mid = (low + ((high - low) / 2)) ;
-	    int	i, j ;
-	    int	pivot ;
+	    cint	mid = (low + ((high - low) / 2)) ;
+	    int		i, j ;
+	    int		pivot ;
 
 	    arrswapi(a,mid,high) ;
 
