@@ -43,7 +43,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
 #include	<snwcpy.h>
 #include	<isnot.h>
@@ -64,7 +67,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -72,6 +74,10 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
 
 
 /* external variables */
@@ -83,43 +89,41 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int defvar_ctor(defvar *op,Args ... args) noex {
+local int defvar_ctor(defvar *op,Args ... args) noex {
     	DEFVAR		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->vlp = new(nothrow) vecstr) != np) {
+	    if ((op->vlp = new(nothrow) vecstr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (defvar_ctor) */
+} /* end subroutine (defvar_ctor) */
 
-static int defvar_dtor(defvar *op) noex {
+local int defvar_dtor(defvar *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely  {
 	    rs = SR_OK ;
-	    if (op->vlp) {
+	    if (op->vlp) ylikely {
 		delete op->vlp ;
 		op->vlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (defvar_dtor) */
+} /* end subroutine (defvar_dtor) */
 
 template<typename ... Args>
-static inline int defvar_magic(defvar *op,Args ... args) noex {
+local inline int defvar_magic(defvar *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DEFVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (defvar_magic) */
+} /* end subroutine (defvar_magic) */
+
 
 /* local variables */
 
@@ -130,11 +134,11 @@ static inline int defvar_magic(defvar *op,Args ... args) noex {
 /* exported subroutines */
 
 int defvar_open(DF *op,cchar *fname) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	if ((rs = defvar_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        if (cchar *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(fname,-1,&cp)) >= 0) {
 	            op->fname = cp ;
 	            if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) {
 		        cint	vn = 10 ;
@@ -150,7 +154,8 @@ int defvar_open(DF *op,cchar *fname) noex {
 	                } /* end if (vecstr_start) */
 	            } /* end if (stat) */
 	            if (rs < 0) {
-	                uc_free(op->fname) ;
+			void *vp = voidp(op->fname) ;
+	                lm_free(vp) ;
 	                op->fname = nullptr ;
 	            }
 	        } /* end if (memory-allocation) */
@@ -172,7 +177,8 @@ int defvar_close(DF *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->fname) {
-	        rs1 = uc_free(op->fname) ;
+		void *vp = voidp(op->fname) ;
+		rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    }
