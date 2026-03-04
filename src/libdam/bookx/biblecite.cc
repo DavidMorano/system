@@ -1,4 +1,4 @@
-/* biblecite */
+/* biblecite SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -37,7 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -45,8 +44,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<strn.h>
 #include	<localmisc.h>
 
@@ -60,20 +59,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* external subroutines */
-
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	siskipwhite(cchar *,int) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	isdigitlatin(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
