@@ -89,7 +89,7 @@ double fhm(double *a,int n) noex {
 	    if (d >= e) {
 	        ans = (fn / d) ;
 	    }
-	}
+	} /* end if (non-zero positive) */
 	return ans ;
 }
 /* end subroutine (fhm) */
