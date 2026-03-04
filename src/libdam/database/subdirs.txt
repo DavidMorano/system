@@ -20,3 +20,4 @@ linex
 langx
 ecmsg
 sysdialer
+paramopt
