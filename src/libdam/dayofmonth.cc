@@ -29,8 +29,13 @@
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<cstdint>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<usupport.h>		/* |geustime(3u)| */
+#include	<uclibmem.h>
+#include	<uctimeconv.h>		/* |uc_mktime(3uc)| */
 #include	<tmtime.hh>
 #include	<calstrs.h>
 #include	<matstr.h>		/* |matcasestr(3uc)| */
@@ -66,7 +71,7 @@ enum wdays {
 	wday_friday,
 	wday_saturday,
 	wday_overlast
-} ;
+} ; /* end enum (wdays) */
 
 enum odays {
 	oday_first,
@@ -76,52 +81,49 @@ enum odays {
 	oday_fifth,
 	oday_last,
 	oday_overlast
-} ;
+} ; /* end enum (odays) */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int dayofmonth_ctor(dayofmonth *op,Args ... args) noex {
+local int dayofmonth_ctor(dayofmonth *op,Args ... args) noex {
     	dayofmonth	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    cint	sz = (szof(dayofmonth_mon *) * DAYOFMONTH_NMONS) ;
 	    memclear(hop) ;
-	    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) ylikely {
+	    if (void *vp{} ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 		op->months = (dayofmonth_mon **) vp ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dayofmonth_ctor) */
+} /* end subroutine (dayofmonth_ctor) */
 
-static int dayofmonth_dtor(dayofmonth *op) noex {
+local int dayofmonth_dtor(dayofmonth *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->months) ylikely {
-		rs1 = uc_free(op->months) ;
+		rs1 = lm_free(op->months) ;
 		if (rs >= 0) rs = rs1 ;
 		op->months = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dayofmonth_dtor) */
+} /* end subroutine (dayofmonth_dtor) */
 
 template<typename ... Args>
-static inline int dayofmonth_magic(dayofmonth *op,Args ... args) noex {
+local inline int dayofmonth_magic(dayofmonth *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == DAYOFMONTH_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DAYOFMONTH_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (dayofmonth_magic) */
+} /* end subroutine (dayofmonth_magic) */
 
-static int	dayofmonth_mkmonth(dayofmonth *,int) noex ;
+local int	dayofmonth_mkmonth(dayofmonth *,int) noex ;
 
 
 /* local structures */
@@ -150,7 +152,7 @@ enum months {
 	month_november,
 	month_december,
 	month_overlast
-} ;
+} ; /* end enum */
 
 constexpr bool		f_braindamaged = false ; /* old ILP32 environments */
 
@@ -172,12 +174,12 @@ int dayofmonth_start(dayofmonth *op,int year) noex {
 	    } /* end if_constexpr (f_braindamaged) */
 	    if (rs >= 0) {
 	        custime		dt = getustime ;
-	        if (tmtime ts{} ; (rs = tmtime_localtime(&ts,dt)) >= 0) {
+	        if (tmtime ts{} ; (rs = tmtime_timelocal(&ts,dt)) >= 0) {
 	            op->isdst = ts.isdst ;
 	            op->gmtoff = ts.gmtoff ;
 	            op->year = (year >= 0) ? year : (ts.year + TM_YEAR_BASE) ;
-	            op->magic = DAYOFMONTH_MAGIC ;
-	        } /* end if (tmtime_localtime) */
+	            op->magval = DAYOFMONTH_MAGIC ;
+	        } /* end if (tmtime_timelocal) */
 	    } /* end if (ok) */
 	    if (rs < 0) {
 		dayofmonth_dtor(op) ;
@@ -191,12 +193,12 @@ int dayofmonth_finish(dayofmonth *op) noex {
 	cint		n = DAYOFMONTH_NMONS ;
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if ((rs = dayofmonth_magic(op)) >= 0) {
 	    for (int i = 0 ; i < n ; i += 1) {
 	        if (op->months[i] != nullptr) {
 	            c += 1 ;
-	            rs1 = uc_free(op->months[i]) ;
+	            rs1 = lm_free(op->months[i]) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->months[i] = nullptr ;
 	        }
@@ -205,7 +207,7 @@ int dayofmonth_finish(dayofmonth *op) noex {
 		rs1 = dayofmonth_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -214,7 +216,7 @@ int dayofmonth_finish(dayofmonth *op) noex {
 int dayofmonth_lookup(dayofmonth *op,int m,int wday,int oday) noex {
 	cint		n = DAYOFMONTH_NMONS ;
 	int		rs ;
-	int		mday = 0 ;
+	int		mday = 0 ; /* return-value */
 	if ((rs = dayofmonth_magic(op)) >= 0) {
 	    bool	fval = true ;
 	    rs = SR_INVALID ;
@@ -252,40 +254,42 @@ int dayofmonth_lookup(dayofmonth *op,int m,int wday,int oday) noex {
 }
 /* end subroutine (dayofmonth_lookup) */
 
-int dayofmonth_mkday(dayofmonth *dmp,int m,cchar *cp,int cl) noex {
-	int		rs = SR_OK ;
-	int		mday = 0 ;
-	if ((cl > 0) && (cp[cl-1] == '*')) {
-	    cl -= 1 ;
-	}
-	if (cl > 0) {
-	    cint	ch = mkchar(cp[0]) ;
-	    if (isdigitlatin(ch)) {
-	        rs = cfdeci(cp,cl,&mday) ;
-	    } else if (cl >= 3) {
-		auto	days = calstrs_days ;
-		if (int wday ; (wday = matcasestr(days,cp,3)) >= 0) {
-	            cp += 3 ;
-	            cl -= 3 ;
-		    if (cl > 0) {
-			auto	daytypes = calstrs_daytypes ;
-			int	oday ;
-	                if ((oday = matocasestr(daytypes,2,cp,cl)) >= 0) {
-	                    rs = dayofmonth_lookup(dmp,m,wday,oday) ;
-	                    mday = rs ;
-	                }
-		    } else {
+int dayofmonth_mkday(dayofmonth *op,int m,cchar *cp,int cl) noex {
+	int		rs ;
+	int		mday = 0 ; /* return-value */
+	if ((rs = dayofmonth_magic(op,cp)) >= 0) {
+	    if ((cl > 0) && (cp[cl-1] == '*')) {
+	        cl -= 1 ;
+	    }
+	    if (cl > 0) {
+	        cint	ch = mkchar(cp[0]) ;
+	        if (isdigitlatin(ch)) {
+	            rs = cfdeci(cp,cl,&mday) ;
+	        } else if (cl >= 3) {
+		    auto	days = calstrs_days ;
+		    if (int wday ; (wday = matcasestr(days,cp,3)) >= 0) {
+	                cp += 3 ;
+	                cl -= 3 ;
+		        if (cl > 0) {
+			    auto	daytypes = calstrs_daytypes ;
+			    int	oday ;
+	                    if ((oday = matocasestr(daytypes,2,cp,cl)) >= 0) {
+	                        rs = dayofmonth_lookup(op,m,wday,oday) ;
+	                        mday = rs ;
+	                    }
+		        } else {
+	                    rs = SR_ILSEQ ;
+		        }
+	            } else {
 	                rs = SR_ILSEQ ;
 		    }
 	        } else {
 	            rs = SR_ILSEQ ;
-		}
+	        }
 	    } else {
-	        rs = SR_ILSEQ ;
+	        rs = SR_NOTFOUND ;
 	    }
-	} else {
-	    rs = SR_NOTFOUND ;
-	}
+	} /* end if (dayofmonth_magic) */
 	return (rs >= 0) ? mday : rs ;
 }
 /* end subroutine (dayofmonth_mkday) */
@@ -293,11 +297,11 @@ int dayofmonth_mkday(dayofmonth *dmp,int m,cchar *cp,int cl) noex {
 
 /* private subroutines */
 
-static int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
+local int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 	int		rs = SR_OK ;
 	if (op->months[m] == nullptr) {
 	    cint	osz = szof(dayofmonth_mon) ;
-	    if (dayofmonth_mon *mp{} ; (rs = uc_malloc(osz,&mp)) >= 0) {
+	    if (dayofmonth_mon *mp ; (rs = lm_mall(osz,&mp)) >= 0) {
 	       	TM	tmo{} ;
 	        int	daymax = daysmonth[m] ;
 	        op->months[m] = mp ;
@@ -309,7 +313,7 @@ static int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 	        tmo.tm_mon = m ;
 	        tmo.tm_mday = 1 ;
 	        if ((rs = uc_mktime(&tmo,nullptr)) >= 0) {
-	            int		day = 1 ;
+	            schar	day = 1 ;
 	            bool	f = false ;
 	            for (int w = 0 ; w < 6 ; w += 1) {
 	                for (int wday = 0 ; wday < 7 ; wday += 1) {
@@ -326,15 +330,14 @@ static int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 	        } /* end if (uc_mktime) */
 	        if (rs < 0) {
 	            if (op->months[m] != nullptr) {
-	                uc_free(op->months[m]) ;
+	                lm_free(op->months[m]) ;
 	                op->months[m] = nullptr ;
 	            }
-	        }
+	        } /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if (work needed) */
 	return rs ;
-}
-/* end subroutine (dayofmonth_mkmonth) */
+} /* end subroutine (dayofmonth_mkmonth) */
 
 int dayofmonth::start(int y) noex {
 	return dayofmonth_start(this,y) ;
@@ -352,7 +355,7 @@ void dayofmonth::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("dayofmonth",rs,"fini-finish") ;
 	}
-}
+} /* end method (dayofmonth::dtor) */
 
 dayofmonth_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -364,7 +367,6 @@ dayofmonth_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (dayofmonth_co::operator) */
+} /* end method (dayofmonth_co::operator) */
 
 
