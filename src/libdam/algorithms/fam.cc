@@ -82,7 +82,7 @@ double fam(double *a,int n) noex {
 	        sum += a[i] ;
 	    }
 	    ans = (sum/d) ;
-	}
+	} /* end if (non-zero positive) */
 	return ans ;
 }
 /* end subroutine (fam) */
