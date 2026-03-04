@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	MODLOAD			struct modload_head
@@ -45,11 +42,11 @@ enum modloados {
 #ifdef	__cplusplus
 
 struct modloadms {
-    	static cint	libvar ;
-    	static cint	libprs ;
-    	static cint	libsdirs ;
-    	static cint	avail ;
-    	static cint	self ;
+    	constexpr static cint	libvar		= (1 << modloado_libvar) ;
+    	constexpr static cint	libprs		= (1 << modloado_libprs) ;
+    	constexpr static cint	libsdirs	= (1 << modloado_libsdirs) ;
+    	constexpr static cint	avail		= (1 << modloado_avail) ;
+    	constexpr static cint	self		= (1 << modloado_self) ;
 } ; /* end structenum (modloadms) */
 
 #endif /* __cplusplus */
@@ -65,20 +62,20 @@ struct modloadms {
 struct modload_mid {
 	cchar		*name ;
 	int		mv[1] ;
-} ;
+} ; /* end struct */
 
 struct modload_head {
 	void		*sop ;		/* shared-object (SO) pointer */
 	cchar		*modname ;
 	MODLOAD_MI	*midp ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum modloadmems {
 	modloadmem_close,
 	modloadmem_overlast
-} ;
+} ; /* end enum */
 struct modload ;
 struct modload_co {
 	modload		*op = nullptr ;
@@ -95,14 +92,14 @@ struct modload_co {
 struct modload : modload_head {
 	modload_co	close ;
 	modload() noex {
-	    close(this,modloadmem_close) ;
+	    close	(this,modloadmem_close) ;
 	} ;
 	modload(const modload &) = delete ;
 	modload &operator = (const modload &) = delete ;
-	int open(cchar *,cchar *,cchar *,int,mainv) noex ;
-	int getmv(int) noex ;
-	int getmva(int *,int) noex ;
-	int getsym(cchar *,cvoid **) noex ;
+	int open	(cchar *,cchar *,cchar *,int,mainv) noex ;
+	int getmv	(int) noex ;
+	int getmva	(int *,int) noex ;
+	int getsym	(cchar *,cvoid **) noex ;
 	void dtor() noex ;
 	destruct modload() {
 	    if (magic) dtor() ;
