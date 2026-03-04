@@ -19,7 +19,7 @@
 #define	CALYEARS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<vechand.h>
@@ -48,7 +48,7 @@ struct calyears_object {
 struct calyears_cursor {
 	void		*results ;
 	uint		nresults ;
-	uint		magic ;
+	uint		magval ;
 	int		i ;
 } ; /* end struct */
 
@@ -66,7 +66,7 @@ struct calyears_head {
 	vechand		cals ;			/* calendars */
 	CALYEARS_FL	fl ;
 	CALYEARS_FL	init, open ;
-	uint		magic ;
+	uint		magval ;
 	int		nentries ;
 	int		ncursors ;
 	int		year ;			/* current year */
