@@ -1,4 +1,4 @@
-# MAKEFILES (cluster)
+# MAKEFILE (cluster)
 
 T= cluster
 
