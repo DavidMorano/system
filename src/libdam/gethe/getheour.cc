@@ -53,9 +53,10 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
+#include	<fcntl.h>
+#include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<netdb.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -119,7 +120,7 @@ namespace {
 	int tryname(cchar *) noex ;
 	int findcanonical() noex ;
     } ; /* end struct (gether) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -167,8 +168,7 @@ int gether::trylocal() noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*nbuf{} ;
-	if ((rs = lm_nn(&nbuf)) >= 0) {
+	if (char *nbuf{} ; (rs = lm_nn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
 		rs = tryname(nbuf) ;
