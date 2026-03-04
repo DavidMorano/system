@@ -21,7 +21,8 @@
 	fsum
 
   	Description:
-	This subroutine computes the sum on a set of numbers.
+	This subroutine computes the sum on a set of numbers
+	contained in an array (array of |double|s).
 
 	Synopsis:
 	double fsum(double *a,int n) noex
@@ -78,7 +79,7 @@ double fsum(double *a,int n) noex {
 	double		fsum = 0.0 ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    fsum += a[i] ;
-	}
+	} /* end for */
 	return fsum ;
 }
 /* end subroutine (fsum) */
