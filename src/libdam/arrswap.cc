@@ -8,29 +8,30 @@
 
 /* revision history:
 
-	= 2001-10-04, David A­D­ Morano
+	= 1998-09-10, David A­D­ Morano
 	This was originally written.
 
 	= 2017-09-15, David A­D­ Morano
-	changed name of this subroutine (never really used much).
+	I changed name of this subroutine (never really used much).
 
 */
 
-/* Copyright © 2001,2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	Name:
-	arrswap
+	arrswap{x}
 
 	Descrption:
 	We swap two elements in an array of integers.
 
 	Synopsis:
-	void arrswapi(int *a,int i1,int i2) noex
+	void arrswap{x}(int *a,int i1,int i2) noex
 
 	Arguments:
-	a	array
+	{x}	one of: 'i' 'l' 'll'
+	a	array of integers
 	i1	element to swap
 	i2	element to swap
 
