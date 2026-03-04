@@ -14,35 +14,32 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	DAYOFMONTH_MAGIC	0x99447245
 #define	DAYOFMONTH		struct dayofmonth_head
 #define	DAYOFMONTH_MON		struct dayofmonth_month
 #define	DAYOFMONTH_NMONS	12	/* very constant! */
+#define	DAYOFMONTH_MAGIC	0x99447245
 
 
 struct dayofmonth_month {
 	signed char	days[6][7] ;
-} ;
+} ; /* end struct */
 
 struct dayofmonth_head {
 	DAYOFMONTH_MON	**months ;
-	uint		magic ;
+	uint		magval ;
 	int		year ;
 	int		isdst ;
 	int		gmtoff ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum dayofmonthmems {
 	dayofmonthmem_finish,
 	dayofmonthmem_overlast
-} ;
+} ; /* end enum */
 struct dayofmonth ;
 struct dayofmonth_co {
 	dayofmonth	*op = nullptr ;
@@ -59,16 +56,17 @@ struct dayofmonth_co {
 struct dayofmonth : dayofmonth_head {
 	dayofmonth_co	finish ;
 	dayofmonth() noex {
-	    finish(this,dayofmonthmem_finish) ;
-	} ;
+	    finish	(this,dayofmonthmem_finish) ;
+	    magval = 0 ;
+	} ; /* end ctor */
 	dayofmonth(const dayofmonth &) = delete ;
 	dayofmonth &operator = (const dayofmonth &) = delete ;
 	int start(int) noex ;
 	int lookup(int,int,int) noex ;
 	int mkday(int,cchar *,int) noex ;
 	void dtor() noex ;
-	~dayofmonth() {
-	    dtor() ;
+	destruct dayofmonth() {
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (dayofmonth) */
 #else	/* __cplusplus */
@@ -79,10 +77,10 @@ typedef	DAYOFMONTH_MON	dayofmonth_mon ;
 
 EXTERNC_begin
 
-extern int dayofmonth_start(dayofmonth *,int) noex ;
-extern int dayofmonth_lookup(dayofmonth *,int,int,int) noex ;
-extern int dayofmonth_mkday(dayofmonth *,int,cchar *,int) noex ;
-extern int dayofmonth_finish(dayofmonth *) noex ;
+extern int dayofmonth_start	(dayofmonth *,int) noex ;
+extern int dayofmonth_lookup	(dayofmonth *,int,int,int) noex ;
+extern int dayofmonth_mkday	(dayofmonth *,int,cchar *,int) noex ;
+extern int dayofmonth_finish	(dayofmonth *) noex ;
 
 EXTERNC_end
 
