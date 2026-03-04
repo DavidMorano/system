@@ -29,9 +29,9 @@
 #include	<vecstr.h>
 
 
-#define	DEFVAR_MAGIC	0x12349872
 #define	DEFVAR		struct defvar_head
 #define	DEFVAR_CUR	struct defvar_cursor
+#define	DEFVAR_MAGIC	0x12349872
 
 
 struct defvar_head {
@@ -41,23 +41,23 @@ struct defvar_head {
 	time_t		ti_filemod ;
 	uint		magic ;
 	int		intcheck ;
-} ;
+} ; /* end struct */
 
 struct defvar_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef	DEFVAR		defvar ;
 typedef	DEFVAR_CUR	defvar_cur ;
 
 EXTERNC_begin
 
-extern int defvar_open(defvar *,cchar *) noex ;
-extern int defvar_curbegin(defvar *,defvar_cur *) noex ;
-extern int defvar_curend(defvar *,defvar_cur *) noex ;
-extern int defvar_curenum(defvar *,defvar_cur *,char *,int,cc **) noex ;
-extern int defvar_fetch(defvar *,cchar *,cchar **) noex ;
-extern int defvar_close(defvar *) noex ;
+extern int defvar_open		(defvar *,cchar *) noex ;
+extern int defvar_curbegin	(defvar *,defvar_cur *) noex ;
+extern int defvar_curend	(defvar *,defvar_cur *) noex ;
+extern int defvar_curenum	(defvar *,defvar_cur *,char *,int,cc **) noex ;
+extern int defvar_fetch		(defvar *,cchar *,cchar **) noex ;
+extern int defvar_close		(defvar *) noex ;
 
 EXTERNC_end
 
