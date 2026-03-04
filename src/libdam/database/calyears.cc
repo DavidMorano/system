@@ -69,7 +69,7 @@
 #include	<six.h>
 #include	<ischarx.h>
 #include	<cfdec.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"calyears.h"
 #include	"calmgr.h"
@@ -90,6 +90,8 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	SI		subinfo
 #define	SI_FL		subinfo_flags
+
+#define	DOM		dayofmonth
 
 #define	IDXDNAME	".calyears"
 #define	IDXSUF		"cyi"
@@ -121,10 +123,6 @@ import libutil ;			/* |memclear(3u)| */
 #define	TO_MKWAIT	(5 * 50)
 #define	TO_CHECK	4
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
@@ -134,8 +132,15 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int		usernamelen ;
+	operator int () noex ;
+    } ; /* end struct */
+} /* end namespace */
+
 struct calyears_domer {
-	DAYOFMONTH	dom ;
+	DOM		dom ;
 	int		year ;
 } ; /* end struct */
 
@@ -146,7 +151,8 @@ struct subinfo_flags {
 	uint		dirs:1 ;	/* VECSTR was initialed */
 } ; /* end struct */
 
-struct subinfo {
+namespace {
+    struct subinfo {
 	idx		id ;
 	vecstr		dirs ;
 	CALYEARS	*op ;
@@ -159,10 +165,20 @@ struct subinfo {
 	int		isdst ;
 	int		gmtoff ;	/* seconds west of GMT */
 	char		username[USERNAMELEN + 1] ;
-} ; /* end struct */
+    } ; /* end struct (subinfo) */
+} /* end namespace */
 
 
 /* forward references */
+
+template<typename ... Args>
+local inline int calyears_magic(calyears *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == CALYEARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (calyears_magic) */
 
 local int	calyears_argbegin(CALYEARS *,cchar *) noex ;
 local int	calyears_argend(CALYEARS *) noex ;
@@ -176,7 +192,7 @@ local int	calyears_domerfins(CALYEARS *) noex ;
 local int	calyears_domerbegin(CALYEARS *,CALYEARS_DOMER *,int) noex ;
 local int	calyears_domerend(CALYEARS *,CALYEARS_DOMER *) noex ;
 local int	calyears_domerget(CALYEARS *,CALYEARS_DOMER *,
-			DAYOFMONTH **) noex ;
+			DOM **) noex ;
 
 #ifdef	COMMENT
 local int	calyears_checkupdate(CALYEARS *,time_t) noex ;
@@ -188,7 +204,7 @@ local int	calyears_lookmgr(CALYEARS *,vecobj *,CALMGR *,CALCITE *) noex ;
 local int	calyears_mkresults(CALYEARS *,vecobj *,CALYEARS_CUR *) noex ;
 local int	calyears_year(CALYEARS *,time_t) noex ;
 local int	calyears_mkday(CALYEARS *,int,int,cchar *,int) noex ;
-local int	calyars_domyear(CALYEARS *,int,DAYOFMONTH **) noex ;
+local int	calyars_domyear(CALYEARS *,int,DOM **) noex ;
 
 local int	calyears_gethash(CALYEARS *,CALENT *,uint *) noex ;
 local int	calyears_getcm(CALYEARS *,int,CALMGR **) noex ;
@@ -229,8 +245,8 @@ local int	mkdname(cchar *,mode_t) noex ;
 
 local int	vrcmp(cvoid *,cvoid *) noex ;
 
-local int	isNotOrIllegalSeq(int) noex ;
-local int	isNotHols(int) noex ;
+local bool	isNotOrIllegalSeq(int) noex ;
+local bool	isNotHols(int) noex ;
 
 
 /* local variables */
@@ -268,6 +284,8 @@ constexpr cint		rsnothols[] = {
 	0
 } ; /* end array */
 
+static vars		var ;
+
 
 /* exported variables */
 
@@ -280,58 +298,67 @@ extern const calyears_obj	calyears_modinfo = {
 
 /* exported subroutines */
 
+local int calyears_opener(calyears *,cc *,cc **,cc **) noex ;
+
 int calyears_open(CALYEARS *op,cchar *pr,cchar **dns,cchar **cns) noex {
-	int		rs ;
+    	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-
-#if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
-#endif
-	if (pr == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	if (op->tmpdname == NULL) op->tmpdname = getenv(VARTMPDNAME) ;
-	if (op->tmpdname == NULL) op->tmpdname = TMPDNAME ;
-
-	if ((rs = calyears_argbegin(op,pr)) >= 0) {
-	    cint	vo = VECHAND_OSTATIONARY ;
-	    if ((rs = vechand_start(&op->cals,20,vo)) >= 0) {
-		if ((rs = vechand_start(&op->doms,1,0)) >= 0) {
-		    const time_t	dt = time(NULL) ;
-		    if ((rs = calyears_year(op,dt)) >= 0) {
-			if ((rs = calyears_opensub(op,dns,cns)) >= 0) {
-	                   op->magic = CALYEARS_MAGIC ;
-			}
-		    }
-		    if (rs < 0) {
-			calyears_domerfins(op) ;
-			vechand_finish(&op->doms) ;
-		    }
-		} /* end if (doms) */
-	            if (rs < 0) {
-	                calyears_calsdestroy(op) ;
-	                vechand_finish(&op->cals) ;
-	            }
-	    } /* end if (cals) */
-	    if (rs < 0)
-	        calyears_argend(op) ;
-	} /* end if (calyears_argbegin) */
-
+	if (op && pr) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+		static cint rsv = var ;
+	        memclear(op) ;
+	        if (op->tmpdname == np) op->tmpdname = getenv(VARTMPDNAME) ;
+	        if (op->tmpdname == np) op->tmpdname = TMPDNAME ;
+		if ((rs = rsv) >= 0) {
+ 		    rs = calyears_opener(op,pr,dns,cns) ;
+		    c = rs ;
+		} /* end if (vars) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (calyears_open) */
+
+local int calyears_opener(calyears *op,cc *pr,cc **dns,cc **) noex {
+    	int		rs ;
+	if ((rs = calyears_argbegin(op,pr)) >= 0) {
+	    cint	vn = 20 ;
+	    cint	vo = VECHAND_OSTATIONARY ;
+	    if ((rs = vechand_start(&op->cals,vn,vo)) >= 0) {
+		if ((rs = vechand_start(&op->doms,1,0)) >= 0) {
+		    custime	dt = time(nullptr) ;
+		    if ((rs = calyears_year(op,dt)) >= 0) {
+			if ((rs = calyears_opensub(op,dns,cns)) >= 0) {
+	                   op->magval = CALYEARS_MAGIC ;
+			}
+		    } /* end if (ok) */
+		    if (rs < 0) {
+			calyears_domerfins(op) ;
+			vechand_finish(&op->doms) ;
+		    } /* end if (error) */
+		} /* end if (doms) */
+	        if (rs < 0) {
+	            calyears_calsdestroy(op) ;
+	            vechand_finish(&op->cals) ;
+	        } /* end if (error) */
+	    } /* end if (cals) */
+	    if (rs < 0) {
+	        calyears_argend(op) ;
+	    } /* end if (error) */
+	} /* end if (calyears_argbegin) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (calyears_opener) */
 
 int calyears_close(CALYEARS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if (op->open.hols) {
@@ -356,7 +383,7 @@ int calyears_close(CALYEARS *op) noex {
 	if (rs >= 0) rs = rs1 ;
 
 	op->nentries = 0 ;
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (calyears_close) */
@@ -365,9 +392,9 @@ int calyears_count(CALYEARS *op) noex {
 	int		rs ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	rs = op->nentries ;
@@ -383,13 +410,13 @@ int calyears_audit(CALYEARS *op) noex {
 	int		c = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	for (i = 0 ; vechand_get(&op->cals,i,&calp) >= 0 ; i += 1) {
-	    if (calp == NULL) continue ;
+	    if (calp == nullptr) continue ;
 	    c += 1 ;
 	    rs = calmgr_audit(calp) ;
 	    if (rs < 0) break ;
@@ -402,16 +429,16 @@ int calyears_audit(CALYEARS *op) noex {
 int calyears_curbegin(CALYEARS *op,CALYEARS_CUR *curp) noex {
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	memclear(curp) ;
 	op->ncursors += 1 ;
-	curp->magic = CALYEARS_MAGIC ;
+	curp->magval = CALYEARS_MAGIC ;
 	return SR_OK ;
 }
 /* end subroutine (calyears_curbegin) */
@@ -421,28 +448,28 @@ int calyears_curend(CALYEARS *op,CALYEARS_CUR *curp) noex {
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-	if (curp->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->results != NULL) {
+	if (curp->results != nullptr) {
 	    rs1 = calyears_resultfins(op,curp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = lm_free(curp->results) ;
 	    if (rs >= 0) rs = rs1 ;
-	    curp->results = NULL ;
+	    curp->results = nullptr ;
 	}
 
 	if (op->ncursors > 0)
 	    op->ncursors -= 1 ;
 
 	curp->i = 0 ;
-	curp->magic = 0 ;
+	curp->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (calyears_curend) */
@@ -452,23 +479,23 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp) noex {
 	int		c = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
-	if (qp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (qp == nullptr) return SR_FAULT ;
 
-	if (curp->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 
 	if (qp->y >= 2038) return SR_DOM ;
 	if ((qp->y < 1970) && (qp->y != 0)) return SR_DOM ;
 
-	if (curp->results != NULL) {
+	if (curp->results != nullptr) {
 	    calyears_resultfins(op,curp) ;
 	    lm_free(curp->results) ;
-	    curp->results = NULL ;
+	    curp->results = nullptr ;
 	}
 
 	if (qp->y == 0) {
@@ -488,7 +515,7 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp) noex {
 	        vechand		*clp = &op->cals ;
 	        int		i ;
 	        for (i = 0 ; vechand_get(clp,i,&calp) >= 0 ; i += 1) {
-	            if (calp != NULL) {
+	            if (calp != nullptr) {
 	                rs = calyears_lookmgr(op,&res,calp,qp) ;
 	                c += rs ;
 		    }
@@ -500,7 +527,7 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp) noex {
 	        if ((rs < 0) || (c > 0)) {
 	            CALENT	*ep ;
 	            for (i = 0 ; vecobj_get(&res,i,&ep) >= 0 ; i += 1) {
-	                if (ep != NULL) {
+	                if (ep != nullptr) {
 	                    calent_finish(ep) ;
 		        }
 	            } /* end for */
@@ -519,17 +546,17 @@ int calyears_read(CALYEARS *op,CALYEARS_CUR *curp,CALYEARS_CITE *qp,
 	int		len = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
-	if (qp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (qp == nullptr) return SR_FAULT ;
 
-	if (curp->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->results != NULL) {
+	if (curp->results != nullptr) {
 	    cint	i = curp->i ;
 	    if ((i >= 0) && (i < curp->nresults)) {
 	        CALENT	*ep, *res = (CALENT *) curp->results ;
@@ -537,7 +564,7 @@ int calyears_read(CALYEARS *op,CALYEARS_CUR *curp,CALYEARS_CITE *qp,
 	        qp->y = ep->q.y ;
 	        qp->m = ep->q.m ;
 	        qp->d = ep->q.d ;
-	        if (rbuf != NULL) {
+	        if (rbuf != nullptr) {
 	            rs = calyears_loadbuf(op,rbuf,rlen,ep) ;
 	            len = rs ;
 	        } /* end if */
@@ -556,8 +583,8 @@ int calyears_check(CALYEARS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != CALYEARS_MAGIC) return SR_NOTOPEN ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 #ifdef	COMMENT
@@ -577,7 +604,7 @@ int calyears_already(CALYEARS *op,vecobj *rlp,CALENT *ep) noex {
 	    CALENT	*oep ;
 	    int	i ;
 	    for (i = 0 ; vecobj_get(rlp,i,&oep) >= 0 ; i += 1) {
-	        if (oep != NULL) {
+	        if (oep != nullptr) {
 	            if ((rs = calyears_gethash(op,oep,&ohash)) >= 0) {
 	    	        if (nhash == ohash) {
 			    if ((rs = calyears_samewords(op,ep,oep)) > 0) {
@@ -605,14 +632,14 @@ int calyears_havestart(CALYEARS *op,CALCITE *qp,int y,cchar *lp,int ll) noex {
 	    if ((si = sibrk(lp,ll," \t")) >= 3) {
 		if (isdigitlatin(ch)) {
 		    cchar	*tp ;
-	    	    if ((tp = strnchr(lp,ll,'/')) != NULL) {
+	    	    if ((tp = strnchr(lp,ll,'/')) != nullptr) {
 		    	int	cl ;
 		    	cchar	*cp ;
 	        	if ((rs = mkmonth(lp,(tp - lp))) >= 0) {
 	        	    qp->m = (rs & UCHAR_MAX) ;
 	            	    cp = (tp + 1) ;
 	            	    cl = ((lp + ll) - cp) ;
-	            	    if ((tp = strnbrk(cp,cl," \t")) != NULL) {
+	            	    if ((tp = strnbrk(cp,cl," \t")) != nullptr) {
 			        cl = (tp - cp) ;
 			    }
 	            	    if ((rs = calyears_mkday(op,y,qp->m,cp,cl)) >= 0) {
@@ -669,10 +696,10 @@ local int calyears_argbegin(CALYEARS *op,cchar *pr) noex {
 local int calyears_argend(CALYEARS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->a != NULL) {
+	if (op->a != nullptr) {
 	   rs1 = lm_free(op->a) ;
 	   if (rs >= 0) rs = rs1 ;
-	   op->a = NULL ;
+	   op->a = nullptr ;
 	}
 	return rs ;
 }
@@ -701,8 +728,8 @@ local int calyears_resultfins(CALYEARS *op,CALYEARS_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp->results != NULL) {
+	if (op == nullptr) return SR_FAULT ;
+	if (curp->results != nullptr) {
 	    CALENT	*ep = (CALENT *) curp->results ;
 	    int		i ;
 	    for (i = 0 ; i < curp->nresults ; i += 1) {
@@ -720,7 +747,7 @@ local int calyears_lookmgr(CALYEARS *op,vecobj *rlp,CALMGR *calp,
 	int		rs ;
 	int		c = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	rs = calmgr_lookup(calp,rlp,qp) ;
 	c = rs ;
 
@@ -733,7 +760,7 @@ local int calyears_mkresults(CALYEARS *op,vecobj *rlp,CALYEARS_CUR *curp) noex {
 	int		n ;
 	int		c = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	vecobj_sort(rlp,vrcmp) ; /* sort results in ascending order */
 
 	if ((n = vecobj_count(rlp)) > 0) {
@@ -743,7 +770,7 @@ local int calyears_mkresults(CALYEARS *op,vecobj *rlp,CALYEARS_CUR *curp) noex {
 	    if ((rs = lm_mall(sz,&rp)) >= 0) {
 	        int	i ;
 		for (i = 0 ; vecobj_get(rlp,i,&ep) >= 0 ; i += 1) {
-	    	    if (ep != NULL) {
+	    	    if (ep != nullptr) {
 	            rp[c++] = *ep ;	 /* copy! */
 	            vecobj_del(rlp,i) ; /* entries are stationary */
 		    }
@@ -766,7 +793,7 @@ local int calyears_calsdestroy(CALYEARS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	for (int i = 0 ; vechand_get(&op->cals,i,&calp) >= 0 ; i += 1) {
-	    if (calp != NULL) {
+	    if (calp != nullptr) {
 		rs1 = calmgr_finish(calp) ;
 		if (rs >= 0) rs = rs1 ;
 		rs1 = lm_free(calp) ;
@@ -780,22 +807,20 @@ local int calyears_calsdestroy(CALYEARS *op) noex {
 
 local int calyears_year(CALYEARS *op,time_t dt) noex {
 	int		rs = SR_OK ;
-
 	if (op->year == 0) {
-	    TMTIME	tm ;
-	    if (dt == 0) dt = time(NULL) ;
-	    rs = tmtime_localtime(&tm,dt) ;
-	    op->year = (tm.year + TM_YEAR_BASE) ;
-	    op->isdst = tm.isdst ;
-	    op->gmtoff = tm.gmtoff ; /* seconds west of GMT */
-	}
-
+	    if (dt == 0) dt = time(nullptr) ;
+	    if (TMTIME ts ; (rs = tmtime_timelocal(&ts,dt)) >= 0) {
+	    op->year = (ts.year + TM_YEAR_BASE) ;
+	    op->isdst = ts.isdst ;
+	    op->gmtoff = ts.gmtoff ; /* seconds west of GMT */
+	    } /* end if (tmtime_timelocal) */
+	} /* end if (year needed) */
 	return rs ;
 }
 /* end subroutine (calyears_year) */
 
 local int calyears_mkday(CALYEARS *op,int y,int m,cchar *cp,int cl) noex {
-	DAYOFMONTH	*dmp ;
+	DOM	*dmp ;
 	int		rs ;
 	if ((rs = calyars_domyear(op,y,&dmp)) >= 0) {
 	    rs = dayofmonth_mkday(dmp,m,cp,cl) ;
@@ -804,19 +829,19 @@ local int calyears_mkday(CALYEARS *op,int y,int m,cchar *cp,int cl) noex {
 }
 /* end subroutine (calyears_mkday) */
 
-local int calyars_domyear(CALYEARS *op,int y,DAYOFMONTH **rpp) noex {
+local int calyars_domyear(CALYEARS *op,int y,DOM **rpp) noex {
 	CALYEARS_DOMER	*dop ;
 	vechand		*dlp = &op->doms ;
 	int		rs ;
 	int		i ;
 	for (i = 0 ; (rs = vechand_get(dlp,i,&dop)) >= 0 ; i += 1) {
-	    if (dop != NULL) {
+	    if (dop != nullptr) {
 		if (dop->year == y) break ;
 	    }
 	} /* end for */
 	if (rs >= 0) {
-	    if (rpp != NULL) {
-		DAYOFMONTH	*dmp ;
+	    if (rpp != nullptr) {
+		DOM	*dmp ;
 		if ((rs = calyears_domerget(op,dop,&dmp)) >= 0) {
 	            *rpp = dmp ;
 		}
@@ -829,8 +854,8 @@ local int calyars_domyear(CALYEARS *op,int y,DAYOFMONTH **rpp) noex {
 		    if ((rs = vechand_add(dlp,dop)) >= 0) {
 			int	di = rs ;
 			f_ent = false ;
-	    	        if (rpp != NULL) {
-			    DAYOFMONTH	*dmp ;
+	    	        if (rpp != nullptr) {
+			    DOM	*dmp ;
 			    f_ent = true ;
 			    if ((rs = calyears_domerget(op,dop,&dmp)) >= 0) {
 				f_ent = false ;
@@ -859,7 +884,7 @@ local int calyears_domerfins(CALYEARS *op) noex {
 	int		i ;
 	int		c = 0 ;
 	for (i = 0 ; vechand_get(dlp,i,&dep) >= 0 ; i += 1) {
-	    if (dep != NULL) {
+	    if (dep != nullptr) {
 		c += 1 ;
 		rs1 = calyears_domerend(op,dep) ;
 		if (rs >= 0) rs = rs1 ;
@@ -873,7 +898,7 @@ local int calyears_domerfins(CALYEARS *op) noex {
 
 local int calyears_domerbegin(CALYEARS *op,CALYEARS_DOMER *dop,int y) noex {
 	int		rs ;
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if ((rs = dayofmonth_start(&dop->dom,y)) >= 0) {
 	    dop->year = y ;
 	}
@@ -884,7 +909,7 @@ local int calyears_domerbegin(CALYEARS *op,CALYEARS_DOMER *dop,int y) noex {
 local int calyears_domerend(CALYEARS *op,CALYEARS_DOMER *dep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	rs1 = dayofmonth_finish(&dep->dom) ;
 	if (rs >= 0) rs = rs1 ;
 	dep->year = 0 ;
@@ -893,10 +918,10 @@ local int calyears_domerend(CALYEARS *op,CALYEARS_DOMER *dep) noex {
 /* end subroutine (calyears_domerend) */
 
 local int calyears_domerget(CALYEARS *op,CALYEARS_DOMER *dop,
-		DAYOFMONTH **rpp) noex {
+		DOM **rpp) noex {
 	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (rpp != NULL) {
+	if (op == nullptr) return SR_FAULT ;
+	if (rpp != nullptr) {
 	    *rpp = &dop->dom ;
 	}
 	return rs ;
@@ -1007,9 +1032,9 @@ local int calyears_transhol(CALYEARS *op,CALCITE *qp,int y,
 	qp->d = 0 ;
 	qp->y = (ushort) y ;
 
-	np = NULL ;
+	np = nullptr ;
 	nl = 0 ;
-	if ((tp = strnbrk(sp,sl,"+-")) != NULL) {
+	if ((tp = strnbrk(sp,sl,"+-")) != nullptr) {
 	    np = (tp + 1) ;
 	    nl = (sl - ((tp + 1) - sp)) ;
 	    sl = (tp - sp) ;
@@ -1021,11 +1046,11 @@ local int calyears_transhol(CALYEARS *op,CALCITE *qp,int y,
 	    if (nl > 0) {
 	        if (int odays{} ; (rs = cfdeci(np,nl,&odays)) >= 0) {
 		    TMTIME	tm ;
-	            time_t	t = time(NULL) ;
+	            time_t	t = time(nullptr) ;
 
 	            if (f_negative) odays = (- odays) ;
 
-		    if ((rs = tmtime_localtime(&tm,t)) >= 0) {
+		    if ((rs = tmtime_timelocal(&tm,t)) >= 0) {
 	                tm.isdst = -1 ;
 	                tm.gmtoff = op->gmtoff ;
 	                tm.year = (y - TM_YEAR_BASE) ;
@@ -1036,7 +1061,7 @@ local int calyears_transhol(CALYEARS *op,CALCITE *qp,int y,
 	                    qp->d = (uchar) tm.mday ;
 			    qp->y = (ushort) (tm.year+TM_YEAR_BASE) ;
 	                }
-		    } /* end if (tmtime_localtime) */
+		    } /* end if (tmtime_timelocal) */
 	        } /* end if (odays) */
 	    } /* end if (positive) */
 	} /* end if (day-offset required) */
@@ -1107,10 +1132,10 @@ local int calyears_checkupdate(CALYEARS *op,time_t dt) noex {
 	int		f = false ;
 
 	if (op->ncursors == 0) {
-	    if (dt <= 0) dt = time(NULL) ;
+	    if (dt <= 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_lastcheck) >= to) {
 	        op->ti_lastcheck = dt ;
-	        if (USTAT db ; (rs1 = u_stat(op->dbfname,&sb)) >= 0) {
+	        if (ustat db ; (rs1 = u_stat(op->dbfname,&sb)) >= 0) {
 	            f = f || (sb.st_mtime > op->ti_db) ;
 		    f = f || (sb.st_mtime > op->ti_map) ;
 		    if (f) {
@@ -1138,7 +1163,7 @@ local int calyears_checkupdate(CALYEARS *op,time_t dt) noex {
 
 local int subinfo_start(SI *sip,CALYEARS *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	if (dt == 0) dt = time(NULL) ;
+	if (dt == 0) dt = time(nullptr) ;
 	memclear(sip) ;
 	sip->op = op ;
 	sip->dt = dt ;
@@ -1154,19 +1179,19 @@ local int subinfo_finish(SI *sip) noex {
 	    sip->fl.dirs = false ;
 	    rs1 = vecstr_finish(&sip->dirs) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->dns = NULL ;
+	    sip->dns = nullptr ;
 	}
 
-	if (sip->tudname != NULL) {
+	if (sip->tudname != nullptr) {
 	    rs1 = lm_free(sip->tudname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->tudname = NULL ;
+	    sip->tudname = nullptr ;
 	}
 
-	if (sip->userhome != NULL) {
+	if (sip->userhome != nullptr) {
 	    rs1 = lm_free(sip->userhome) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->userhome = NULL ;
+	    sip->userhome = nullptr ;
 	}
 
 	if (sip->fl.id) {
@@ -1185,15 +1210,15 @@ local int subinfo_calscreate(SI *sip,cchar **dns,cchar **cns)
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
-	if (dns == NULL) {
+	if (dns == nullptr) {
 	    if ((rs = subinfo_mkdns(sip)) >= 0) {
 	        dns = sip->dns ;
 	    }
 	}
 
-	if ((rs >= 0) && (dns != NULL)) {
+	if ((rs >= 0) && (dns != nullptr)) {
 	    int		i ;
-	    for (i = 0 ; dns[i] != NULL ; i += 1) {
+	    for (i = 0 ; dns[i] != nullptr ; i += 1) {
 		cchar	*dn = dns[i] ;
 	        if (dn[0] != '\0') {
 	            rs = subinfo_calscreater(sip,dn,cns) ;
@@ -1214,9 +1239,9 @@ local int subinfo_calscreater(SI *sip,cchar *dn,cchar *cns[])
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	int		f_search = false ;
-	cchar	**names = NULL ;
+	cchar	**names = nullptr ;
 
-	if (cns == NULL) {
+	if (cns == nullptr) {
 	    if ((rs = vecstr_start(&cals,1,0)) >= 0) {
 	        f_search = true ;
 	        if ((rs = subinfo_loadnames(sip,&cals,dn)) > 0) {
@@ -1232,9 +1257,8 @@ local int subinfo_calscreater(SI *sip,cchar *dn,cchar *cns[])
 
 	if (rs >= 0) {
 	    if ((rs = subinfo_ids(sip)) >= 0) {
-		if (names != NULL) {
-	    	    int		j ;
-	            for (j = 0 ; names[j] != NULL ; j += 1) {
+		if (names != nullptr) {
+	            for (int j = 0 ; names[j] != nullptr ; j += 1) {
 	                if (names[j][0] != '\0') {
 	                    rs = subinfo_calcreate(sip,dn,names[j]) ;
 	                    c += rs ;
@@ -1253,9 +1277,7 @@ local int subinfo_calscreater(SI *sip,cchar *dn,cchar *cns[])
 }
 /* end subroutine (subinfo_calscreater) */
 
-
-local int subinfo_calcreate(SI *sip,cchar *dn,cchar *cn)
-{
+local int subinfo_calcreate(SI *sip,cchar *dn,cchar *cn) noex {
 	CALYEARS	*op = sip->op ;
 	cint	nlen = MAXNAMELEN ;
 	int		rs ;
@@ -1291,23 +1313,18 @@ local int subinfo_calcreate(SI *sip,cchar *dn,cchar *cn)
 }
 /* end subroutine (subinfo_calcreate) */
 
-
-local int subinfo_mkdns(SI *sip)
-{
+local int subinfo_mkdns(SI *sip) noex {
 	CALYEARS	*op = sip->op ;
 	int		rs = SR_OK ;
 	int		tl ;
 	int		c = 0 ;
-
 	if ((rs = subinfo_username(sip)) >= 0) {
 	    vecstr	*dlp = &sip->dirs ;
 	    if ((rs = vecstr_start(dlp,1,0)) >= 0) {
 	        cchar	*sharedname = CALYEARS_DBDIR ;
 	        char	tbuf[MAXPATHLEN + 1] ;
 		sip->fl.dirs = true ;
-
-/* user-home area */
-
+		/* user-home area */
 		if (rs >= 0) {
 	            cchar	*un = sip->username ;
 	            if ((rs = mkpath2(tbuf,un,sharedname)) >= 0) {
@@ -1318,9 +1335,7 @@ local int subinfo_mkdns(SI *sip)
 	                }
 	            }
 		} /* end if (ok) */
-
-/* system area */
-
+		/* system area */
 	        if (rs >= 0) {
 	            if ((rs = mkpath2(tbuf,op->pr,sharedname)) >= 0) {
 	                tl = rs ;
@@ -1330,38 +1345,33 @@ local int subinfo_mkdns(SI *sip)
 	                }
 	            }
 	        } /* end if (ok) */
-
-/* finish */
-
+		/* finish */
 	        if (rs >= 0) {
 	            cchar	**dap ;
 	            if ((rs = vecstr_getvec(dlp,&dap)) >= 0) {
 	                sip->dns = (cchar **) dap ;
 		    }
 	        }
-
 		if (rs < 0) {
 		    vecstr_finish(dlp) ;
 		    sip->fl.dirs = false ;
-		}
+		} /* end if (error) */
 	    } /* end if (vecstr) */
 	} /* end if (username) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (subinfo_mkdns) */
 
 local int subinfo_havedir(SI *sip,cchar *dn) noex {
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		f = false ;
-
-	if (sip == NULL) return SR_FAULT ;
-	if (USTAT sb ; (rs = u_stat(dn,&sb)) >= 0) {
-	    f = S_ISDIR(sb.st_mode) ? 1 : 0 ;
-	} else if (isNotPresent(rs)) {
-	    rs = SR_OK ;
-	}
-
+	if (sip) {
+	    if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
+	        f = !!S_ISDIR(sb.st_mode) ;
+	    } else if (isNotPresent(rs)) {
+	        rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (subinfo_havedir) */
@@ -1377,33 +1387,27 @@ local int subinfo_ids(SI *sip) noex {
 /* end subroutine (subinfo_ids) */
 
 local int subinfo_loadnames(SI *sip,vecstr *nlp,cchar *dirname) noex {
-	FSDIR		dir ;
-	FSDIR_ENT	ds ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
-	if (sip == NULL) return SR_FAULT ;
-	if ((rs = fsdir_open(&dir,dirname)) >= 0) {
-	    ustat	sb ;
-	    int			nl ;
-	    cchar		*calsuf = CALYEARS_DBSUF ;
-	    cchar		*tp ;
-	    cchar		*np ;
-	    char		tbuf[MAXPATHLEN + 1] ;
-
-	    while ((rs = fsdir_read(&dir,&ds)) > 0) {
+	if (sip == nullptr) return SR_FAULT ;
+	if (fsdir dir ; (rs = fsdir_open(&dir,dirname)) >= 0) {
+	    int		naml ;
+	    cchar	*calsuf = CALYEARS_DBSUF ;
+	    cchar	*namp ;
+	    char	tbuf[MAXPATHLEN + 1] ;
+	    for (fsdir_ent ds ; (rs = fsdir_read(&dir,&ds)) > 0 ; ) {
 	        if (ds.name[0] != '.') {
-
-	            if ((tp = strrchr(ds.name,'.')) != NULL) {
+	            cchar *tp ;
+	            if ((tp = strrchr(ds.name,'.')) != nullptr) {
 		        if (strcmp((tp+1),calsuf) == 0) {
 	                    if ((rs = mkpath2(tbuf,dirname,ds.name)) >= 0) {
-	                        if ((rs = u_stat(tbuf,&sb)) >= 0) {
+	    			if (ustat sb ; (rs = u_stat(tbuf,&sb)) >= 0) {
 	            	            if (S_ISREG(sb.st_mode)) {
-	                    	        np = ds.name ;
-	                    	        nl = (tp - ds.name) ;
+	                    	        namp = ds.name ;
+	                    	        naml = intconv(tp - ds.name) ;
 	                                c += 1 ;
-	                                rs = vecstr_add(nlp,np,nl) ;
+	                                rs = vecstr_add(nlp,namp,naml) ;
 	            	            } /* end if (regular file) */
 			        } else if (isNotPresent(rs)) {
 			            rs = SR_OK ;
@@ -1414,34 +1418,33 @@ local int subinfo_loadnames(SI *sip,vecstr *nlp,cchar *dirname) noex {
 	        } /* end if (not invisible) */
 	        if (rs < 0) break ;
 	    } /* end while */
-
 	    rs1 = fsdir_close(&dir) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fsdir) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (subinfo_loadnames) */
 
 local int subinfo_username(SI *sip) noex {
 	int		rs = SR_OK ;
-
+	int		rs1 ;
 	if (sip->username[0] == '\0') {
-	    struct passwd	pw ;
-	    cint		pwlen = getbufsize(bufsize_pw) ;
-	    char		*pwbuf ;
-	    if ((rs = lm_mall((pwlen+1),&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
+	        cint	pwlen = rs ;
+	        ucentpw	pw ;
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
-	            cchar	*cp ;
-	            strwcpy(sip->username,pw.pw_name,USERNAMELEN) ;
-	            if ((rs = lm_strw(pw.pw_dir,-1,&cp)) >= 0) {
+		    cint	unl = var.usernamelen ;
+		    cchar	unp = pw.pw_name ;
+		    cchar	dirp = pw_pw_dir ;
+	            strwcpy(sip->username,unp,unl) ;
+	            if (cchar *cp ; (rs = lm_strw(dirp,-1,&cp)) >= 0) {
 	                sip->userhome = cp ;
-		    }
-		}
-		lm_free(pwbuf) ;
+		    } /* end if (memory-allocation) */
+		} /* end if (getpwusername) */
+		rs1 = lm_free(pwbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a) */
 	} /* end if (needed) */
-
 	return rs ;
 }
 /* end subroutine (subinfo_username) */
@@ -1450,9 +1453,8 @@ local int subinfo_username(SI *sip) noex {
 local int subinfo_tmpuserdir(subinfo *sip) noex {
 	cmode		dmode = 0775 ;
 	int		rs ;
-
 	if ((rs = subinfo_username(sip)) >= 0) {
-	    if (sip->tudname == NULL) {
+	    if (sip->tudname == nullptr) {
 	        cchar	*un = sip->username ;
 	        char	tmpdname[MAXPATHLEN + 1] ;
 	        if ((rs = mktmpuserdir(tmpdname,un,IDXDNAME,dmode)) >= 0) {
@@ -1464,7 +1466,6 @@ local int subinfo_tmpuserdir(subinfo *sip) noex {
 	        }
 	    } /* end if */
 	} /* end if (username) */
-
 	return rs ;
 }
 /* end subroutine (subinfo_tmpuserdir) */
@@ -1473,7 +1474,6 @@ local int subinfo_tmpuserdir(subinfo *sip) noex {
 #if	CF_CHECKDNAME
 local int subinfo_checkdname(SI *sip,cchar *dname) noex {
 	int		rs = SR_OK ;
-
 	if (dname[0] == '/') {
 	    if (ustat sb ; (rs = uc_stat(dname,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
@@ -1484,9 +1484,9 @@ local int subinfo_checkdname(SI *sip,cchar *dname) noex {
 	            rs = SR_NOTDIR ;
 	        }
 	    } /* end if (uc_stat) */
-	} else
+	} else {
 	    rs = SR_INVALID ;
-
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_checkdname) */
@@ -1495,7 +1495,7 @@ local int subinfo_checkdname(SI *sip,cchar *dname) noex {
 local int subinfo_regacc(SI *sip,cchar *fn,int am) noex {
 	int		rs ;
 	int		f = false ;
-	if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(fn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
 	        if ((rs = subinfo_ids(sip)) >= 0) {
 	            if ((rs = permid(&sip->id,&sb,am)) >= 0) {
@@ -1512,6 +1512,14 @@ local int subinfo_regacc(SI *sip,cchar *fn,int am) noex {
 }
 /* end subroutine (subinfo_regacc) */
 
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(bufsize_un)) >= 0) {
+	    usernamelen = rs ;
+	}
+	return rs ;
+} /* end method (vars::operator) */
+
 #if	CF_MKDNAME
 local int mkdname(cchar *dname,mode_t dm) noex {
 	cint		rsn = SR_NOENT ;
@@ -1526,11 +1534,10 @@ local int mkdname(cchar *dname,mode_t dm) noex {
 
 local int mkmonth(cchar *cp,int cl) noex {
 	int		rs ;
-	int		v ;
-
-	rs = cfdeci(cp,cl,&v) ;
-	v -= 1 ;
-
+	int		v = 0 ; /* return-value */
+	if ((rs = cfdeci(cp,cl,&v)) >= 0) {
+	    v -= 1 ;
+	}
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (mkmonth) */
@@ -1540,29 +1547,31 @@ local int vrcmp(cvoid *v1p,cvoid *v2p) noex {
 	CALENT		*e1p, **e1pp = (CALENT **) v1p ;
 	CALENT		*e2p, **e2pp = (CALENT **) v2p ;
 	int		rc = 0 ;
-	if (*e1pp != NULL) {
-	    if (*e2pp != NULL) {
-	        e1p = *e1pp ;
-	        e2p = *e2pp ;
-	        if ((rc = (e1p->q.m - e2p->q.m)) == 0) {
-	            rc = (e1p->q.d - e2p->q.d) ;
+	{
+	    e1p = *e1pp ;
+	    e2p = *e2pp ;
+	    if (e1p || e2p) {
+	        rs = +1 ;
+	        if (e1p) {
+	            rc = -1 ;
+	            if (e2p) {
+	                if ((rc = (e1p->q.m - e2p->q.m)) == 0) {
+	                    rc = (e1p->q.d - e2p->q.d) ;
+	                }
+	            }
 	        }
-	    } else {
-	        rc = -1 ;
 	    }
-	} else {
-	    rc = 1 ;
-	}
+	} /* end block */
 	return rc ;
 }
 /* end subroutine (vrcmp) */
 
-local int isNotOrIllegalSeq(int rs) noex {
+local bool isNotOrIllegalSeq(int rs) noex {
 	return isOneOf(rsnotorils,rs) ;
 }
 /* end subroutine (isNotOrIllegalSeq) */
 
-local int isNotHols(int rs) noex {
+local bool isNotHols(int rs) noex {
 	return isOneOf(rsnothols,rs) ;
 }
 /* end subroutine (isNotHols) */
