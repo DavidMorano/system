@@ -21,7 +21,7 @@
 	nthai
 
 	Description:
-	Find nth element (by index) of an array of numbers.
+	Find the nth element (by index) of an array of numbers.
 
 	Synopsis:
 	int nthai(int *a,int ri,int rl,int n) noex
@@ -81,9 +81,9 @@ namespace {
 
 /* forward references */
 
-static int	partpred1(int,int) noex ;
-static int	partpred2(int,int) noex ;
-static int	getpivot(cint *,int) noex ;
+local int	partpred1(int,int) noex ;
+local int	partpred2(int,int) noex ;
+local int	getpivot(cint *,int) noex ;
 
 
 /* local variables */
@@ -129,15 +129,15 @@ int recurser::nrecurse(int ri,int rl) noex {
 }
 /* end subroutine (recursoer::nrecurse) */
 
-static int partpred1(int e,int pv) noex {
+local int partpred1(int e,int pv) noex {
 	return (e < pv) ;
 }
 
-static int partpred2(int e,int pv) noex {
+local int partpred2(int e,int pv) noex {
 	return (e <= pv) ;
 }
 
-static int getpivot(cint *a,int al) noex {
+local int getpivot(cint *a,int al) noex {
 	int	pvi = (al/2) ;
 	if (pvi == 0) {
 	    if (al > 1) pvi = 1 ;
