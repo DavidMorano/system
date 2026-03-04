@@ -1,4 +1,4 @@
-# MAKEFILES (densityx)
+# MAKEFILE (densityx)
 
 T= densityx
 
