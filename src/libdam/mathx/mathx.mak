@@ -1,4 +1,4 @@
-# MAKEFILES (mathx)
+# MAKEFILE (mathx)
 
 T= mathx
 
