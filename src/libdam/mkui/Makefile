@@ -1,4 +1,4 @@
-# MAKEFILES (mkui)
+# MAKEFILE (mkui)
 
 T= mkui
 
