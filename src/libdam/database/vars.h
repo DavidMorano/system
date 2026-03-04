@@ -47,33 +47,33 @@ struct vars_information {
 	time_t		mtime ;
 	uint		nvars ;
 	uint		nskip ;
-} ;
+} ; /* end struct */
 
 /* this is the shared-object description */
 struct vars_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct vars_cursor {
 	uint		chash ;		/* "check" hash for key */
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct vars_fmap {
 	char		*mdata ;	/* file map */
 	time_t		ti_mod ;
 	time_t		ti_map ;
 	size_t		msize ;
-} ;
+} ; /* end struct */
 
 struct vars_mindex {
 	int		(*rt)[2] ;	/* mapped record table */
 	int		(*it)[3] ;	/* mapped key-index table */
 	char		*kst ;		/* mapped key-string table */
 	char		*vst ;		/* mapped value-string table */
-} ;
+} ; /* end struct */
 
 struct vars_head {
 	cchar 		*dbname ;
@@ -84,7 +84,7 @@ struct vars_head {
 	VARS_FL		fl ;
 	uint		magic ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	VARS		vars ;
 typedef	VARS_FL		vars_fl ;
