@@ -207,7 +207,7 @@ OBJ96= memfile.o langx.o sigman.o sighand.o
 OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
 OBJ98= openportmsg.o varsub.o userattr.o 
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
-OBJ100= rijndael.o expcook.o schedvar.o
+OBJ100= rijndael.o expcook.o
 OBJ101= termnote.o egs.o librandom.o
 OBJ102= loadave.o modload.o userinfo.o
 OBJ103= dw.o fmq.o useraccdb.o csem.o
@@ -245,7 +245,7 @@ OBJ130=
 OBJ131= paramopt.o
 OBJ132= serialbuf.o srvreg.o srvrege.o wordfill.o
 OBJ133= stackaddr.o outstore.o outline.o
-OBJ134= mapstrint.o keyopt.o keyopt_lastvalue.o keyvals.o
+OBJ134= mapstrint.o keyopt.o keyvals.o
 OBJ135= envs.o envs_procxe.o envs_subs.o
 
 OBJ136= isSpecialObject.o isDotDir.o isValidMagic.o isStrEmpty.o
@@ -253,7 +253,7 @@ OBJ137= isNotValid.o isNotAccess.o isNotLib.o
 OBJ138= isBadSend.o isBadRecv.o isBadMsg.o
 OBJ139= isasocket.o isinteractive.o isfsremote.o isproc.o
 OBJ140= statvfsdir.o
-OBJ141= rmsesfiles.o dircount.o isdirempty.o
+OBJ141= rmsesfiles.o
 OBJ142= prgetprogpath.o prsetfname.o prmktmpdir.o
 OBJ143=
 
@@ -271,8 +271,8 @@ OBJ153= getev.o getaflen.o getprotofamily.o getlogfac.o getlogpri.o getmjd.o
 OBJ154= msghdr.o cmsghdr.o
 OBJ155= mailboxappend.o
 OBJ156= termescseq.o termconseq.o termconseqi.o hdrextid.o hdrextnum.o 
-OBJ157= localgetorg.o localgetorgcode.o localgetorgloc.o 
-OBJ158= localgetnetload.o localsetnetload.o localgetsystat.o localsetsystat.o
+OBJ157= localset.o
+OBJ158= localget.o
 OBJ159= inetpton.o inetntop.o inet_ntoa_r.o inet4int.o
 
 OBJ160= tabcols.o nextfield.o nextfieldterm.o nextqtoken.o 
@@ -671,7 +671,6 @@ sighand.o:		sighand.c sighand.h
 paramfile.o:		paramfile.cc paramfile.h
 srvtab.o:		srvtab.cc srvtab.h
 acctab.o:		acctab.cc acctab.h
-schedvar.o:		schedvar.cc schedvar.h
 
 memfile.o:		memfile.cc memfile.h
 
@@ -691,16 +690,13 @@ hostent.o:		hostent.cc hostent.h
 inetaddr.o:		inetaddr.c inetaddr.h
 lfm.o:			lfm.cc lfm.h
 bfliner.o:		bfliner.cc bfliner.h
-keyopt.o:		keyopt.cc keyopt.h
-keyopt_lastvalue.o:	keyopt_lastval.cc keyopt.h
 codebal.o:		codebal.cc codebal.h
 strpack.o:		strpack.cc strpack.h
 userattr.o:		userattr.c userattr.h
 ts.o:			ts.cc ts.h
 envlist.o:		envlist.cc envlist.h
 querystr.o:		querystr.cc querystr.h
-mkdirlist.o:		mkdirlist.cc	mkdirlist.h
-sesmsg.o:		sesmsg.cc sesmsg.h
+sesmsg.o:		sesmsg.cc	sesmsg.hh
 msgdata.o:		msgdata.cc msgdata.h
 msgbuf.o:		msgbuf.cc msgbuf.h
 sysrealname.o:		sysrealname.cc sysrealname.h
@@ -721,16 +717,18 @@ modload.o:		modload.cc modload.h
 shmalloc.o:		shmalloc.cc shmalloc.h
 kbdinfo.o:		kbdinfo.cc kbdinfo.h
 userid.o:		userid.cc userid.hh
-motd.o:			motd.cc		motd.h
-issue.o:		issue.cc	issue.h
-statmsg.o:		statmsg.cc	statmsg.h
-defvar.o:		defvar.cc	defvar.h
+motd.o:			motd.cc		motd.h			$(INCS)
+issue.o:		issue.cc	issue.h			$(INCS)
+statmsg.o:		statmsg.cc	statmsg.h		$(INCS)
+defvar.o:		defvar.cc	defvar.h		$(INCS)
+schedvar.o:		schedvar.cc	schedvar.h		$(INCS)
 
 # TEXT related
-textlook.o:		textlook.cc textlook.h
-searchkeys.o:		searchkeys.cc searchkeys.h
-xwords.o:		xwords.cc xwords.h
-rtags.o:		rtags.cc rtags.h
+textlook.o:		textlook.cc	textlook.h		$(INCS)
+searchkeys.o:		searchkeys.cc	searchkeys.h		$(INCS)
+xwords.o:		xwords.cc	xwords.h		$(INCS)
+rtags.o:		rtags.cc	rtags.h			$(INCS)
+wordfill.o:		wordfill.cc	wordfill.h		$(INCS)
 
 # DATABASE
 database.o:		database.dir
@@ -780,11 +778,6 @@ gethe.dir:
 # STRLISTX
 strlistx.o:		strlistx.dir
 strlistx.dir:
-	makesubdir $@
-
-# FILEREAD
-fileread.o:		fileread.dir
-fileread.dir:
 	makesubdir $@
 
 # SYSVARX
@@ -877,6 +870,36 @@ instr.o:		instr.dir
 instr.dir:
 	makesubdir $@
 
+# MKUI
+mkui.o:			mkui.dir
+mkui.dir:
+	makesubdir $@
+
+# MODPROC
+modproc.o:		modproc.dir
+modproc.dir:
+	makesubdir $@
+
+# CMDUTILS
+cmdutils.o:		cmdutils.dir
+cmdutils.dir:
+	makesubdir $@
+
+# EXMSG
+exmsg.o:		ecmsg.dir
+ecmsg.dir:
+	makesubdir $@
+
+# SYSDIALER
+sysdialer.o:		sysdialer.dir
+sysdialer.dir:
+	makesubdir $@
+
+# KEYOPT
+keyopt.o:		keyopt.dir
+keyopt.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
@@ -884,19 +907,25 @@ ba.o:			ba.cc ba.h
 printhelp.o:		printhelp.cc printhelp.hh
 removename.o:		removename.cc removename.h
 wdt.o:			wdt.cc wdt.h
-getlogx.o:		getlogx.cc getlogx.h
+getlogx.o:		getlogx.cc		getlogx.h
+getostype.o:		getostype.cc		getostype.h
+getclusters.o:		getclusters.cc		getclusters.h
 sockpeername.o:		sockpeername.cc sockpeername.h
 nlspeername.o:		nlspeername.cc nlspeername.h
-conallof.o:		conallof.cc conallof.h
-ismatstar.o:		ismatstar.cc ismatstar.h
-findxfile.o:		findxfile.cc findxfile.h
-getostype.o:		getostype.cc getostype.h
-deprecated.o:		deprecated.cc
-getclusters.o:		getclusters.cc getclusters.h
-percache.o:		percache.cc percache.h
-cvttemperature.o:	cvttemperature.cc cvttemperature.h
+ismatstar.o:		ismatstar.cc		ismatstar.h		$(INCS)
+findxfile.o:		findxfile.cc		findxfile.h		$(INCS)
+deprecated.o:		deprecated.cc		deprecated.h		$(INCS)
+percache.o:		percache.cc		percache.h		$(INCS)
+cvttemperature.o:	cvttemperature.cc	cvttemperature.h	$(INCS)
 mallcompactstr.o:	mallcompactstr.cc	mallcompactstr.h	$(INCS)
 defproc.o:		defproc.cc		defproc.h		$(INCS)
+inittimezone.o:		inittimezone.cc		inittimezone.h		$(INCS)
+prognamevar.o:		prognamevar.cc		prognamevar.hh		$(INCS)
+hostequiv.o:		hostequiv.cc		hostequiv.h		$(INCS)
+satcount.o:		satcount.cc		satcount.h		$(INCS)
+quickselect.o:		quickselect.cc		quickselect.h		$(INCS)
+quickselecti.o:		quickselecti.cc		quickselecti.h		$(INCS)
+fsdirtreestat.o:	fsdirtreestat.cc	fsdirtreestat.h		$(INCS)
 
 # DFSA
 dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
@@ -940,6 +969,5 @@ hascount.o:		hascount.ccm			$(INCS)
 binchar.o:		binchar.ccm
 	makemodule rshiftx
 	makemodule binchar
-
 
 
