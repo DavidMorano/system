@@ -211,7 +211,7 @@ int cyimk_open(CYIMK *op,int year,cc *dname,cc *cname,int of,mode_t om) noex {
 	if (year <= 0) {
 	    TMTIME	tm ;
 	    time_t	dt = time(NULL) ;
-	    rs = tmtime_localtime(&tm,dt) ;
+	    rs = tmtime_timelocal(&tm,dt) ;
 	    year = (tm.year + TM_YEAR_BASE) ;
 	} /* end if */
 
