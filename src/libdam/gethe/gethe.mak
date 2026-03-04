@@ -1,4 +1,4 @@
-# MAKEFILES (gethe)
+# MAKEFILE (gethe)
 
 T= gethe
 
