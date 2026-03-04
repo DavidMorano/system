@@ -1,4 +1,4 @@
-# MAKEFILES (bookx)
+# MAKEFILE (bookx)
 
 T= bookx
 
