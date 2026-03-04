@@ -70,12 +70,13 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<endian.h>
 #include	<estrings.h>
 #include	<vecobj.h>
@@ -90,6 +91,9 @@
 #include	"varmks.h"
 #include	"varhdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -129,46 +133,46 @@ struct varentry {
 	uint	ri ;
 	uint	ki ;
 	uint	hi ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	varmks_filesbegin(VARMKS *) ;
-static int	varmks_filesbeginc(VARMKS *) ;
-static int	varmks_filesbeginwait(VARMKS *) ;
-static int	varmks_filesbegincreate(VARMKS *,cchar *,int,mode_t) ;
-static int	varmks_filesend(VARMKS *) ;
+local int	varmks_filesbegin(VARMKS *) ;
+local int	varmks_filesbeginc(VARMKS *) ;
+local int	varmks_filesbeginwait(VARMKS *) ;
+local int	varmks_filesbegincreate(VARMKS *,cchar *,int,mode_t) ;
+local int	varmks_filesend(VARMKS *) ;
 
-static int	varmks_listbegin(VARMKS *,int) ;
-static int	varmks_listend(VARMKS *) ;
+local int	varmks_listbegin(VARMKS *,int) ;
+local int	varmks_listend(VARMKS *) ;
 
-static int	varmks_mkvarfile(VARMKS *) ;
-static int	varmks_mkvarfiler(VARMKS *) ;
-static int	varmks_mkidxwrmain(VARMKS *,VARHDR *) ;
-static int	varmks_mkidxwrhdr(VARMKS *,VARHDR *,FILER *) ;
-static int	varmks_mkrectab(VARMKS *,VARHDR *,FILER *,int) ;
-static int	varmks_mkind(VARMKS *,cchar *,uint (*)[3],int) ;
-static int	varmks_mkstrtab(VARMKS *,VARHDR *,FILER *,int) ;
-static int	varmks_nidxopen(VARMKS *) ;
-static int	varmks_nidxclose(VARMKS *) ;
-static int	varmks_renamefiles(VARMKS *) ;
+local int	varmks_mkvarfile(VARMKS *) ;
+local int	varmks_mkvarfiler(VARMKS *) ;
+local int	varmks_mkidxwrmain(VARMKS *,VARHDR *) ;
+local int	varmks_mkidxwrhdr(VARMKS *,VARHDR *,FILER *) ;
+local int	varmks_mkrectab(VARMKS *,VARHDR *,FILER *,int) ;
+local int	varmks_mkind(VARMKS *,cchar *,uint (*)[3],int) ;
+local int	varmks_mkstrtab(VARMKS *,VARHDR *,FILER *,int) ;
+local int	varmks_nidxopen(VARMKS *) ;
+local int	varmks_nidxclose(VARMKS *) ;
+local int	varmks_renamefiles(VARMKS *) ;
 
-static int	rectab_start(RECTAB *,int) ;
-static int	rectab_add(RECTAB *,uint,uint) ;
-static int	rectab_done(RECTAB *) ;
-static int	rectab_getvec(RECTAB *,uint (**)[2]) ;
-static int	rectab_extend(RECTAB *) ;
-static int	rectab_finish(RECTAB *) ;
+local int	rectab_start(RECTAB *,int) ;
+local int	rectab_add(RECTAB *,uint,uint) ;
+local int	rectab_done(RECTAB *) ;
+local int	rectab_getvec(RECTAB *,uint (**)[2]) ;
+local int	rectab_extend(RECTAB *) ;
+local int	rectab_finish(RECTAB *) ;
 
 #ifdef	COMMENT
-static int	rectab_count(RECTAB *) ;
+local int	rectab_count(RECTAB *) ;
 #endif
 
-static int	mknewfname(char *,int,cchar *,cchar *) ;
-static int	unlinkstale(cchar *,int) ;
+local int	mknewfname(char *,int,cchar *,cchar *) ;
+local int	unlinkstale(cchar *,int) ;
 
-static int	indinsert(uint (*rt)[2],uint (*it)[3],int,struct varentry *) ;
+local int	indinsert(uint (*rt)[2],uint (*it)[3],int,struct varentry *) ;
 
 
 /* local variables */
@@ -240,7 +244,7 @@ int varmks_close(VARMKS *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		nvars = 0 ;
-	int		f_go = FALSE ;
+	int		f_go = false ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -340,7 +344,7 @@ int varmks_abort(VARMKS *op)
 
 	if (op->magic != VARMKS_MAGIC) return SR_NOTOPEN ;
 
-	op->fl.abort = TRUE ;
+	op->fl.abort = true ;
 	return SR_OK ;
 }
 /* end subroutine (varmks_abort) */
@@ -362,7 +366,7 @@ int varmks_chgrp(VARMKS *op,gid_t gid)
 /* private subroutines */
 
 
-static int varmks_filesbegin(VARMKS *op)
+local int varmks_filesbegin(VARMKS *op)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -380,7 +384,7 @@ static int varmks_filesbegin(VARMKS *op)
 /* end subroutine (varmks_filesbegin) */
 
 
-static int varmks_filesbeginc(VARMKS *op)
+local int varmks_filesbeginc(VARMKS *op)
 {
 	cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	int		rs ;
@@ -393,7 +397,7 @@ static int varmks_filesbeginc(VARMKS *op)
 	    char		rbuf[MAXPATHLEN+1] ;
 	    if (type) {
 	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
-	            op->fl.created = TRUE ;
+	            op->fl.created = true ;
 	            tfn = rbuf ;
 	        }
 	    }
@@ -412,14 +416,14 @@ static int varmks_filesbeginc(VARMKS *op)
 /* end subroutine (varmks_filesbeginc) */
 
 
-static int varmks_filesbeginwait(VARMKS *op)
+local int varmks_filesbeginwait(VARMKS *op)
 {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IDX	 ;
 	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,FALSE,dbn,suf)) >= 0) {
+	if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
 	    const mode_t	om = op->om ;
 	    cint		to_stale = VARMKS_INTSTALE ;
 	    cint		nrs = SR_EXISTS ;
@@ -435,7 +439,7 @@ static int varmks_filesbeginwait(VARMKS *op)
 	        if (to-- == 0) break ;
 	    } /* end while (db exists) */
 	    if (rs == nrs) {
-	        op->fl.ofcreat = FALSE ;
+	        op->fl.ofcreat = false ;
 	        c = 0 ;
 	        rs = varmks_filesbeginc(op) ;
 	    }
@@ -448,13 +452,13 @@ static int varmks_filesbeginwait(VARMKS *op)
 /* end subroutine (varmks_filesbeginwait) */
 
 
-static int varmks_filesbegincreate(VARMKS *op,cchar *tfn,int of,mode_t om)
+local int varmks_filesbegincreate(VARMKS *op,cchar *tfn,int of,mode_t om)
 {
 	int		rs ;
 #if	CF_DEBUGS
 	{
 	    char	obuf[100+1] ;
-	    snopenflags(obuf,100,of) ;
+	    snflagsopen(obuf,100,of) ;
 	    debugprintf("varmks_filesbegincreate: ent of=%s\n",obuf) ;
 	    debugprintf("varmks_filesbegincreate: om=%05o\n",om) ;
 	}
@@ -462,7 +466,7 @@ static int varmks_filesbegincreate(VARMKS *op,cchar *tfn,int of,mode_t om)
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
 	    cint	fd = rs ;
 	    cchar	*cp ;
-	    op->fl.created = TRUE ;
+	    op->fl.created = true ;
 	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
 	        op->nidxfname = (char *) cp ;
 	    }
@@ -478,7 +482,7 @@ static int varmks_filesbegincreate(VARMKS *op,cchar *tfn,int of,mode_t om)
 /* end subroutine (varmks_filesbegincreate) */
 
 
-static int varmks_filesend(VARMKS *op)
+local int varmks_filesend(VARMKS *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -507,7 +511,7 @@ static int varmks_filesend(VARMKS *op)
 /* end subroutine (varmks_filesend) */
 
 
-static int varmks_listbegin(VARMKS *op,int n)
+local int varmks_listbegin(VARMKS *op,int n)
 {
 	cint	size = (n * VARMKS_SIZEMULT) ;
 	int		rs ;
@@ -527,7 +531,7 @@ static int varmks_listbegin(VARMKS *op,int n)
 /* end subroutine (varmks_listbegin) */
 
 
-static int varmks_listend(VARMKS *op)
+local int varmks_listend(VARMKS *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -546,7 +550,7 @@ static int varmks_listend(VARMKS *op)
 /* end subroutine (varmks_listend) */
 
 
-static int varmks_mkvarfile(VARMKS *op)
+local int varmks_mkvarfile(VARMKS *op)
 {
 	int		rs = SR_OK ;
 	int		rtl ;
@@ -563,7 +567,7 @@ static int varmks_mkvarfile(VARMKS *op)
 /* end subroutine (varmks_mkvarfile) */
 
 
-static int varmks_mkvarfiler(VARMKS *op)
+local int varmks_mkvarfiler(VARMKS *op)
 {
 	int		rs ;
 	int		rs1 ;
@@ -612,7 +616,7 @@ static int varmks_mkvarfiler(VARMKS *op)
 /* end subroutine (varmks_mkvarfiler) */
 
 
-static int varmks_mkidxwrmain(VARMKS *op,VARHDR *hdrp)
+local int varmks_mkidxwrmain(VARMKS *op,VARHDR *hdrp)
 {
 	FILER		hf, *hfp = &hf ;
 	cint	nfd = op->nfd ;
@@ -643,7 +647,7 @@ static int varmks_mkidxwrmain(VARMKS *op,VARHDR *hdrp)
 
 
 /* ARGSUSED */
-static int varmks_mkidxwrhdr(VARMKS *op,VARHDR *hdrp,FILER *hfp)
+local int varmks_mkidxwrhdr(VARMKS *op,VARHDR *hdrp,FILER *hfp)
 {
 	cint	hlen = HDRBUFLEN ;
 	int		rs ;
@@ -659,7 +663,7 @@ static int varmks_mkidxwrhdr(VARMKS *op,VARHDR *hdrp,FILER *hfp)
 /* end subroutine (varmks_mkidxwrhdr) */
 
 
-static int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
+local int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
 {
 	int		rs ;
 	int		rtl ;
@@ -821,7 +825,7 @@ int		il ;
 /* end subroutine (varmks_mkind) */
 
 
-static int varmks_mkstrtab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
+local int varmks_mkstrtab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
 {
 	STRTAB		*vsp = &op->vals ;
 	int		rs ;
@@ -844,7 +848,7 @@ static int varmks_mkstrtab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
 /* end subroutine (varmks_mkstrtab) */
 
 
-static int varmks_nidxopen(VARMKS *op)
+local int varmks_nidxopen(VARMKS *op)
 {
 	const mode_t	om = op->om ;
 	int		of = (O_CREAT|O_WRONLY) ;
@@ -893,7 +897,7 @@ static int varmks_nidxopen(VARMKS *op)
 /* end subroutine (varmks_nidxopen) */
 
 
-static int varmks_nidxclose(VARMKS *op)
+local int varmks_nidxclose(VARMKS *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -907,7 +911,7 @@ static int varmks_nidxclose(VARMKS *op)
 /* end subroutine (varmks_nidxclose) */
 
 
-static int varmks_renamefiles(VARMKS *op)
+local int varmks_renamefiles(VARMKS *op)
 {
 	int		rs ;
 	cchar	*suf = FSUF_IDX ;
@@ -928,7 +932,7 @@ static int varmks_renamefiles(VARMKS *op)
 /* end subroutine (varmks_renamefiles) */
 
 
-static int rectab_start(RECTAB *rtp,int n)
+local int rectab_start(RECTAB *rtp,int n)
 {
 	int		rs = SR_OK ;
 	int		size ;
@@ -952,7 +956,7 @@ static int rectab_start(RECTAB *rtp,int n)
 /* end subroutine (rectab_start) */
 
 
-static int rectab_finish(RECTAB *rtp)
+local int rectab_finish(RECTAB *rtp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -968,7 +972,7 @@ static int rectab_finish(RECTAB *rtp)
 /* end subroutine (rectab_finish) */
 
 
-static int rectab_add(RECTAB *rtp,uint ki,uint vi)
+local int rectab_add(RECTAB *rtp,uint ki,uint vi)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -988,7 +992,7 @@ static int rectab_add(RECTAB *rtp,uint ki,uint vi)
 /* end subroutine (rectab_add) */
 
 
-static int rectab_extend(RECTAB *rtp)
+local int rectab_extend(RECTAB *rtp)
 {
 	int		rs = SR_OK ;
 
@@ -1010,7 +1014,7 @@ static int rectab_extend(RECTAB *rtp)
 /* end subroutine (rectab_extend) */
 
 
-static int rectab_done(RECTAB *rtp)
+local int rectab_done(RECTAB *rtp)
 {
 	int		i = rtp->i ;
 	rtp->rectab[i][0] = UINT_MAX ;
@@ -1020,7 +1024,7 @@ static int rectab_done(RECTAB *rtp)
 /* end subroutine (rectab_done) */
 
 
-static int rectab_getvec(RECTAB *rtp,uint (**rpp)[2])
+local int rectab_getvec(RECTAB *rtp,uint (**rpp)[2])
 {
 
 	*rpp = rtp->rectab ;
@@ -1029,7 +1033,7 @@ static int rectab_getvec(RECTAB *rtp,uint (**rpp)[2])
 /* end subroutine (rectab_getvec) */
 
 
-static int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf)
+local int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf)
 {
 	cchar		*end = ENDIANSTR ;
 	cchar		*fin = (type) ? "xXXXX" : "n" ;
@@ -1038,7 +1042,7 @@ static int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf)
 /* end subroutine (mknewfname) */
 
 
-static int unlinkstale(cchar *fn,int to)
+local int unlinkstale(cchar *fn,int to)
 {
 	ustat	sb ;
 	const time_t	dt = time(NULL) ;
@@ -1057,8 +1061,7 @@ static int unlinkstale(cchar *fn,int to)
 }
 /* end subroutine (unlinkstale) */
 
-
-static int indinsert(uint (*rt)[2],uint (*it)[3],int il,struct varentry *vep)
+local int indinsert(uint (*rt)[2],uint (*it)[3],int il,struct varentry *vep)
 {
 	uint		nhash, chash ;
 	uint		ri, ki ;
@@ -1076,7 +1079,7 @@ static int indinsert(uint (*rt)[2],uint (*it)[3],int il,struct varentry *vep)
 #endif
 
 /* CONSTCOND */
-	while (TRUE) {
+	while (true) {
 
 #if	CF_DEBUGS
 	    debugprintf("indinsert: it%u ri=%u nhi=%u\n",
