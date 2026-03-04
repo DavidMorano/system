@@ -78,14 +78,15 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
+#include	<netdb.h>
 #include	<ctime>
+#include	<csignal>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<ascii.h>
 #include	<stdorder.h>
@@ -105,6 +106,8 @@
 #include	<nodedb.h>
 #include	<clusterdb.h>
 #include	<mkcexsync.h>
+#include	<strxcmp.h>		/* |strkeycmp(3uc)| */
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 #include	<debug.h>
 
@@ -113,6 +116,9 @@
 #include	"dialcprogmsg.h"
 #include	"msflag.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -193,20 +199,8 @@
 
 /* external subroutines */
 
-extern int	strkeycmp(cchar *,cchar *) ;
-extern int	vstrkeycmp(cchar **,cchar **) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	permid(IDS *,USTAT	 *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	getnodename(char *,int) ;
-extern int	dialprog(cchar *,int,cchar **,cchar **,int *) ;
-
 extern int	rcmdr(cchar *,cchar *,cchar *,int *) ;
 extern int	mkcexsync(char *,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnrchr(cchar *,int,int) ;
 
 
 /* external variables */
