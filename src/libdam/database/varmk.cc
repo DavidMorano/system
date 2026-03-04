@@ -35,16 +35,24 @@
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
 
 #include	"varmk.h"
 #include	"varmks.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -71,11 +79,11 @@
 
 /* forward references */
 
-static int	varmk_objloadbegin(VARMK *,cchar *,cchar *) noex ;
-static int	varmk_objloadend(VARMK *) noex ;
-static int	varmk_loadcalls(VARMK *,cchar *) noex ;
+local int	varmk_objloadbegin(VARMK *,cchar *,cchar *) noex ;
+local int	varmk_objloadend(VARMK *) noex ;
+local int	varmk_loadcalls(VARMK *,cchar *) noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
@@ -90,7 +98,7 @@ enum subs {
 	sub_chgrp,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum (subs) */
 
 constexpr cpcchar	subs[] = {
 	"open",
@@ -99,7 +107,7 @@ constexpr cpcchar	subs[] = {
 	"chgrp",
 	"close",
 	nullptr
-} ;
+} ; /* end array (subs) */
 
 
 /* exported variables */
@@ -212,7 +220,7 @@ int varmk_chgrp(VARMK *op,gid_t gid)
 
 /* private subroutines */
 
-static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname) noex {
+local int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	vecstr		syms ;
 	cint		ne = sub_overlast ;
@@ -277,7 +285,7 @@ static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname) noex {
 }
 /* end subroutine (varmk_objloadbegin) */
 
-static int varmk_objloadend(VARMK *op) noex {
+local int varmk_objloadend(VARMK *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -294,7 +302,7 @@ static int varmk_objloadend(VARMK *op) noex {
 }
 /* end subroutine (varmk_objloadend) */
 
-static int varmk_loadcalls(VARMK *op,cchar *soname) noex {
+local int varmk_loadcalls(VARMK *op,cchar *soname) noex {
 	modload		*lp = &op->loader ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -349,7 +357,7 @@ static int varmk_loadcalls(VARMK *op,cchar *soname) noex {
 }
 /* end subroutine (varmk_loadcalls) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
