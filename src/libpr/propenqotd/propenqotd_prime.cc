@@ -134,11 +134,6 @@ import uconstants ;			/* |varname(3u)| */
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) noex ;
-extern int	strlinelen(cchar *,int,int) noex ;
-#endif /* CF_DEBUGS */
-
 
 /* external variables */
 
