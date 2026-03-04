@@ -8,31 +8,32 @@
 
 /* revision history:
 
-	= 2003-03-04, David A-D- Morano
+	= 1998-09-10, David A­D­ Morano
 	This was written from scratch.
 
 */
 
-/* Copyright © 2003 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	Name:
-	arrswap
+	arrswap{x}
 
 	Description:
-	This subroutine returns a seed value for use in initializing
-	a true RNG.
+	We swap two elements in an array of integers.
 
 	Synopsis:
-	int arrswap() noex
+	void arrswap{x}(int *a,int i1,int i2) noex
 
 	Arguments:
-	-
+	{x}	one of: 'i' 'l' 'll'
+	a	array of integers
+	i1	element to swap
+	i2	element to swap
 
 	Returns:
-	>=0		0=BSD, 1=SYSV
-	<0		error (system-return)
+	-		none (void)
 
 *******************************************************************************/
 
