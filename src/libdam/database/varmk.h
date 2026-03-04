@@ -44,7 +44,7 @@ struct varmk_head {
 	void		*obj ;		/* object pointer */
 	uint		magic ;
 	int		objsz ;		/* object size */
-} ;
+} ; /* end struct */
 
 typedef VARMK		varmk ;
 typedef VARMK_CALLS	varmk_calls ;
