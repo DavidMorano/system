@@ -50,22 +50,15 @@
         Only after all database files have been indexed and scanned to try to
         satisfy the query (and the request os not found), does the query fail.
 
-
 *******************************************************************************/
 
-
-#define	BDB_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<char.h>
@@ -77,6 +70,9 @@
 
 #include	"bdb.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
