@@ -41,21 +41,33 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<getpwd.h>
 #include	<endian.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
+#include	<mkfnamesuf.h>
 #include	<hash.h>
 #include	<hashindex.h>
+#include	<nleadstr.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"vars.h"
 #include	"varhdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -87,22 +99,22 @@ enum itentries {
 	itentry_info,
 	itentry_nhi,
 	itentry_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
 
-static int	vars_dbloadbegin(VARS *,time_t) ;
-static int	vars_dbloadend(VARS *) ;
-static int	vars_dbmapcreate(VARS *,time_t) ;
-static int	vars_dbmapdestroy(VARS *) ;
-static int	vars_filemapcreate(VARS *,VARS_FM *,cchar *,time_t) ;
-static int	vars_filemapdestroy(VARS *,VARS_FM *) ;
-static int	vars_dbproc(VARS *,time_t) ;
-static int	vars_viverify(VARS *,time_t) ;
-static int	vars_ouraudit(VARS *) ;
+local int	vars_dbloadbegin(VARS *,time_t) noex ;
+local int	vars_dbloadend(VARS *) noex ;
+local int	vars_dbmapcreate(VARS *,time_t) noex ;
+local int	vars_dbmapdestroy(VARS *) noex ;
+local int	vars_filemapcreate(VARS *,VARS_FM *,cchar *,time_t) noex ;
+local int	vars_filemapdestroy(VARS *,VARS_FM *) noex ;
+local int	vars_dbproc(VARS *,time_t) noex ;
+local int	vars_viverify(VARS *,time_t) noex ;
+local int	vars_ouraudit(VARS *) noex ;
 
-static bool	ismatkey(cchar *,cchar *,int) noex ;
+local bool	ismatkey(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -143,14 +155,14 @@ int vars_open(VARS *op,cchar *dbname) noex {
 	    }
 	    if (rs >= 0) {
 	    	cchar	*cp ;
-	        if ((rs = uc_mallocstrw(dbname,pl,&cp)) >= 0) {
+	        if ((rs = lm_strw(dbname,pl,&cp)) >= 0) {
 	            op->dbname = cp ;
 		    if ((rs = vars_dbloadbegin(op,dt)) >= 0) {
 			op->ti_lastcheck = dt ;
 			op->magic = VARS_MAGIC ;
 		    }
 		    if (rs < 0) {
-	    		uc_free(op->dbname) ;
+	    		lm_free(op->dbname) ;
 	    		op->dbname = NULL ;
 		    }
 		} /* end if (memory-allocation) */
@@ -161,9 +173,7 @@ int vars_open(VARS *op,cchar *dbname) noex {
 }
 /* end subroutine (vars_open) */
 
-
-int vars_close(VARS *op)
-{
+int vars_close(VARS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -175,7 +185,7 @@ int vars_close(VARS *op)
 	if (rs >= 0) rs = rs1 ;
 
 	if (op->dbname != NULL) {
-	    rs1 = uc_free(op->dbname) ;
+	    rs1 = lm_free(op->dbname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dbname = NULL ;
 	}
@@ -210,9 +220,7 @@ int vars_getinfo(VARS *op,VARS_INFO *vip) noex {
 }
 /* end subroutine (vars_info) */
 
-
-int vars_audit(VARS *op)
-{
+int vars_audit(VARS *op) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -227,9 +235,7 @@ int vars_audit(VARS *op)
 }
 /* end subroutine (vars_audit) */
 
-
-int vars_count(VARS *op)
-{
+int vars_count(VARS *op) noex {
 	VARHDR		*hip ;
 	int		rs = SR_OK ;
 
@@ -243,9 +249,7 @@ int vars_count(VARS *op)
 }
 /* end subroutine (vars_count) */
 
-
-int vars_curbegin(VARS *op,VARS_CUR *curp)
-{
+int vars_curbegin(VARS *op,VARS_CUR *curp) noex {
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -260,9 +264,7 @@ int vars_curbegin(VARS *op,VARS_CUR *curp)
 }
 /* end subroutine (vars_curbegin) */
 
-
-int vars_curend(VARS *op,VARS_CUR *curp)
-{
+int vars_curend(VARS *op,VARS_CUR *curp) noex {
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -278,9 +280,8 @@ int vars_curend(VARS *op,VARS_CUR *curp)
 }
 /* end subroutine (vars_curend) */
 
-
-int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,char vbuf[],int vlen)
-{
+int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,
+		char *vbuf,int vlen) noex {
 	VARS_CUR	dcur ;
 	VARS_MI		*mip ;
 	VARHDR		*hip ;
@@ -292,7 +293,7 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,char vbuf[],int vlen)
 	int		(*rt)[2] ;
 	int		(*it)[3] ;
 	int		vl = 0 ;
-	int		f_mat = FALSE ;
+	int		f_mat = false ;
 	cchar	*kst, *vst ;
 	cchar	*vp ;
 	cchar	*cp ;
@@ -352,7 +353,7 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,char vbuf[],int vlen)
 	        if (c >= (hip->itlen + hip->nskip))
 	            break ;
 
-	        nhash = hashagain(nhash,c++,hip->nskip) ;
+	        nhash = hash_again(nhash,c++,hip->nskip) ;
 
 	        hi = hashindex(nhash,hip->itlen) ;
 
@@ -406,11 +407,13 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,char vbuf[],int vlen)
 	    if (vbuf != NULL) {
 	        rs = sncpy1(vbuf,vlen,vp) ;
 	        vl = rs ;
-	    } else
+	    } else {
 	        vl = lenstr(vp) ;
+	    }
 
-	    if (rs >= 0)
+	    if (rs >= 0) {
 	        curp->i = hi ;
+	    }
 
 	} /* end if (got one) */
 
@@ -418,9 +421,8 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,char vbuf[],int vlen)
 }
 /* end subroutine (vars_fetch) */
 
-
-int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,char *vbuf,int vlen)
-{
+int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,
+		char *vbuf,int vlen) noex {
 	VARS_MI		*mip ;
 	VARHDR		*hip ;
 	uint		ri, ki, vi ;
@@ -471,9 +473,7 @@ int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,char *vbuf,int vlen)
 
 /* private subroutines */
 
-
-static int vars_dbloadbegin(VARS *op,time_t dt)
-{
+local int vars_dbloadbegin(VARS *op,time_t dt) noex {
 	int		rs ;
 
 	if ((rs = vars_dbmapcreate(op,dt)) >= 0) {
@@ -486,16 +486,14 @@ static int vars_dbloadbegin(VARS *op,time_t dt)
 }
 /* end subroutine (vars_dbloadbegin) */
 
-
-static int vars_dbloadend(VARS *op)
-{
+local int vars_dbloadend(VARS *op) noex {
 	VARS_MI		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
+	{
 	rs1 = vars_dbmapdestroy(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	mip = &op->mi ;
 	mip->rt = NULL ;
 	mip->it = NULL ;
@@ -505,9 +503,7 @@ static int vars_dbloadend(VARS *op)
 }
 /* end subroutine (vars_dbloadend) */
 
-
-static int vars_dbmapcreate(VARS *op,time_t dt)
-{
+local int vars_dbmapcreate(VARS *op,time_t dt) noex {
 	int		rs ;
 	cchar	*end = ENDIANSTR ;
 	char		tmpfname[MAXPATHLEN + 1] ;
@@ -520,9 +516,7 @@ static int vars_dbmapcreate(VARS *op,time_t dt)
 }
 /* end subroutine (vars_dbmapcreate) */
 
-
-static int vars_dbmapdestroy(VARS *op)
-{
+local int vars_dbmapdestroy(VARS *op) noex {
 	int		rs ;
 
 	rs = vars_filemapdestroy(op,&op->vf) ;
@@ -531,17 +525,15 @@ static int vars_dbmapdestroy(VARS *op)
 }
 /* end subroutine (vars_dbmapdestroy) */
 
-
-static int vars_filemapcreate(VARS *op,VARS_FM *fip,cchar *fname,time_t dt)
-{
+local int vars_filemapcreate(VARS *op,VARS_FM *fip,cchar *fname,
+		time_t dt) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    USTAT	sb ;
-	    const int	fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    cint	fd = rs ;
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	  	if (sb.st_size <= MAXMAPSIZE) {
 	            size_t	ms = (size_t) sb.st_size ;
 	            int		mp = PROT_READ ;
@@ -563,9 +555,7 @@ static int vars_filemapcreate(VARS *op,VARS_FM *fip,cchar *fname,time_t dt)
 }
 /* end subroutine (vars_filemapcreate) */
 
-
-static int vars_filemapdestroy(VARS *op,VARS_FM *fip)
-{
+local int vars_filemapdestroy(VARS *op,VARS_FM *fip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -583,7 +573,7 @@ static int vars_filemapdestroy(VARS *op,VARS_FM *fip)
 }
 /* end subroutine (vars_filemapdestroy) */
 
-static int vars_dbproc(VARS *op,time_t dt) noex {
+local int vars_dbproc(VARS *op,time_t dt) noex {
 	VARS_FM		*fip = &op->vf ;
 	VARS_MI		*mip = &op->mi ;
 	VARHDR		*hip = &op->ifi ;
@@ -602,15 +592,13 @@ static int vars_dbproc(VARS *op,time_t dt) noex {
 }
 /* end subroutine (vars_dbproc) */
 
-
-static int vars_viverify(VARS *op,time_t dt)
-{
+local int vars_viverify(VARS *op,time_t dt) noex {
 	VARS_FM		*fip = &op->vf ;
 	VARHDR		*hip = &op->ifi ;
 	uint		utime = (uint) dt ;
 	int		rs = SR_OK ;
 	int		size ;
-	int		f = TRUE ;
+	int		f = true ;
 
 
 	f = f && (hip->fsize == fip->msize) ;
@@ -644,9 +632,7 @@ static int vars_viverify(VARS *op,time_t dt)
 }
 /* end subroutine (vars_viverify) */
 
-
-static int vars_ouraudit(VARS *op)
-{
+local int vars_ouraudit(VARS *op) noex {
 	VARS_MI		*mip = &op->mi ;
 	VARHDR		*hip = &op->ifi ;
 	uint		ri, ki, vi, hi ;
@@ -735,7 +721,7 @@ static int vars_ouraudit(VARS *op)
 }
 /* end subroutine (vars_ouraudit) */
 
-static bool ismatkey(cchar *key,cchar *kp,int kl) noex {
+local bool ismatkey(cchar *key,cchar *kp,int kl) noex {
 	bool		f = (key[0] == kp[0]) ;
 	if (f) {
 	    int	m = nleadstr(key,kp,kl) ;
