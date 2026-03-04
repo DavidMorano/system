@@ -31,7 +31,7 @@
 struct varmks_object {
 	char		*name ;
 	uint		objsize ;
-} ;
+} ; /* end struct */
 
 struct varmks_flags {
 	uint		viopen:1 ;
@@ -40,13 +40,13 @@ struct varmks_flags {
 	uint		ofexcl:1 ;
 	uint		inprogress:1 ;
 	uint		created:1 ;
-} ;
+} ; /* end struct */
 
 struct varmks_rectab {
 	uint		(*rectab)[2] ;
 	int		i ;			/* highest index */
 	int		n ;			/* extent */
-} ;
+} ; /* end struct */
 
 struct varmks_head {
 	cchar 		*dbname ;
@@ -61,7 +61,7 @@ struct varmks_head {
 	int		nvars ;
 	int		nfd ;
 	mode_t		om ;
-} ;
+} ; /* end struct */
 
 typedef	VARMKS		varmks ;
 typedef	VARMKS_FL	varmks_fl ;
