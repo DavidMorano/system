@@ -72,23 +72,28 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<endian.h>
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<filer.h>
 #include	<nulstr.h>
 #include	<opentmp.h>
-#include	<strwcpy.h>
+#include	<cfdec.h>
 #include	<localmisc.h>
 
 #include	"bvsmk.h"
 #include	"bvshdr.h"
 #include	"bvsbook.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -105,23 +110,6 @@
 
 /* external subroutines */
 
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfhexi(cchar *,int,uint *) ;
-extern int	getpwd(char *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	filer_writefill(FILER *,cchar *,int) ;
-extern int	filer_writealign(FILER *,int,uint) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 
 /* external variables */
 
@@ -130,7 +118,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 const bvsmk_obj		bvsmk_modinfo = {
 	"bvsmk",
-	szof(BVSMK),
+	szof(bvsmk),
 	0
 } ;
 
@@ -140,25 +128,25 @@ const bvsmk_obj		bvsmk_modinfo = {
 
 /* forward references */
 
-static int	bvsmk_filesbegin(BVSMK *) ;
-static int	bvsmk_filesbeginc(BVSMK *) ;
-static int	bvsmk_filesbeginwait(BVSMK *) ;
-static int	bvsmk_filesbegincreate(BVSMK *,cchar *,int,mode_t) ;
-static int	bvsmk_filesend(BVSMK *) ;
-static int	bvsmk_listbegin(BVSMK *,int) ;
-static int	bvsmk_listend(BVSMK *) ;
-static int	bvsmk_mkidx(BVSMK *) ;
-static int	bvsmk_mkidxwrmain(BVSMK *,BVSHDR *) ;
-static int	bvsmk_mkidxwrhdr(BVSMK *,BVSHDR *,FILER *) ;
-static int	bvsmk_mkidxchaptab(BVSMK *,BVSHDR *,FILER *,int) ;
-static int	bvsmk_mkidxbooktab(BVSMK *,BVSHDR *,FILER *,int) ;
-static int	bvsmk_nidxopen(BVSMK *) ;
-static int	bvsmk_nidxclose(BVSMK *) ;
-static int	bvsmk_renamefiles(BVSMK *) ;
+local int	bvsmk_filesbegin(BVSMK *) ;
+local int	bvsmk_filesbeginc(BVSMK *) ;
+local int	bvsmk_filesbeginwait(BVSMK *) ;
+local int	bvsmk_filesbegincreate(BVSMK *,cchar *,int,mode_t) ;
+local int	bvsmk_filesend(BVSMK *) ;
+local int	bvsmk_listbegin(BVSMK *,int) ;
+local int	bvsmk_listend(BVSMK *) ;
+local int	bvsmk_mkidx(BVSMK *) ;
+local int	bvsmk_mkidxwrmain(BVSMK *,BVSHDR *) ;
+local int	bvsmk_mkidxwrhdr(BVSMK *,BVSHDR *,FILER *) ;
+local int	bvsmk_mkidxchaptab(BVSMK *,BVSHDR *,FILER *,int) ;
+local int	bvsmk_mkidxbooktab(BVSMK *,BVSHDR *,FILER *,int) ;
+local int	bvsmk_nidxopen(BVSMK *) ;
+local int	bvsmk_nidxclose(BVSMK *) ;
+local int	bvsmk_renamefiles(BVSMK *) ;
 
-static int	mkdname(cchar *,mode_t) ;
-static int	mknifname(char *,int,cchar *,cchar *,cchar *) ;
-static int	unlinkstale(cchar *,int) ;
+local int	mkdname(cchar *,mode_t) ;
+local int	mknifname(char *,int,cchar *,cchar *,cchar *) ;
+local int	unlinkstale(cchar *,int) ;
 
 
 /* local variables */
@@ -357,7 +345,7 @@ int bvsmk_abort(BVSMK *op,int f)
 /* private subroutines */
 
 
-static int bvsmk_filesbegin(BVSMK *op)
+local int bvsmk_filesbegin(BVSMK *op)
 {
 	int		rs ;
 	int		dnl ;
@@ -396,7 +384,7 @@ static int bvsmk_filesbegin(BVSMK *op)
 /* end subroutine (bvsmk_filesbegin) */
 
 
-static int bvsmk_filesbeginc(BVSMK *op)
+local int bvsmk_filesbeginc(BVSMK *op)
 {
 	cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	int		rs ;
@@ -429,7 +417,7 @@ static int bvsmk_filesbeginc(BVSMK *op)
 /* end subroutine (bvsmk_filesbeginc) */
 
 
-static int bvsmk_filesbeginwait(BVSMK *op)
+local int bvsmk_filesbeginwait(BVSMK *op)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -466,13 +454,13 @@ static int bvsmk_filesbeginwait(BVSMK *op)
 /* end subroutine (bvsmk_filesbeginwait) */
 
 
-static int bvsmk_filesbegincreate(BVSMK *op,cchar *tfn,int of,mode_t om)
+local int bvsmk_filesbegincreate(BVSMK *op,cchar *tfn,int of,mode_t om)
 {
 	int		rs ;
 #if	CF_DEBUGS
 	{
 	    char	obuf[100+1] ;
-	    snopenflags(obuf,100,of) ;
+	    snflagsopen(obuf,100,of) ;
 	    debugprintf("bvsmk_filesbegincreate: ent of=%s\n",obuf) ;
 	    debugprintf("bvsmk_filesbegincreate: om=%05o\n",om) ;
 	}
@@ -496,7 +484,7 @@ static int bvsmk_filesbegincreate(BVSMK *op,cchar *tfn,int of,mode_t om)
 /* end subroutine (bvsmk_filesbegincreate) */
 
 
-static int bvsmk_filesend(BVSMK *op)
+local int bvsmk_filesend(BVSMK *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -525,7 +513,7 @@ static int bvsmk_filesend(BVSMK *op)
 /* end subroutine (bvsmk_filesend) */
 
 
-static int bvsmk_listbegin(BVSMK *op,int n)
+local int bvsmk_listbegin(BVSMK *op,int n)
 {
 	int		rs ;
 	int		sz ;
@@ -543,7 +531,7 @@ static int bvsmk_listbegin(BVSMK *op,int n)
 /* end subroutine (bvsmk_listbegin) */
 
 
-static int bvsmk_listend(BVSMK *op)
+local int bvsmk_listend(BVSMK *op)
 {
 	BVSBOOK		*bep ;
 	int		rs = SR_OK ;
@@ -575,7 +563,7 @@ static int bvsmk_listend(BVSMK *op)
 /* end subroutine (bvsmk_listend) */
 
 
-static int bvsmk_mkidx(BVSMK *op)
+local int bvsmk_mkidx(BVSMK *op)
 {
 	int		rs ;
 	int		rs1 ;
@@ -624,7 +612,7 @@ static int bvsmk_mkidx(BVSMK *op)
 /* end subroutine (bvsmk_mkidx) */
 
 
-static int bvsmk_mkidxwrmain(BVSMK *op,BVSHDR *hdrp)
+local int bvsmk_mkidxwrmain(BVSMK *op,BVSHDR *hdrp)
 {
 	FILER		hf, *hfp = &hf ;
 	cint	nfd = op->nfd ;
@@ -656,7 +644,7 @@ static int bvsmk_mkidxwrmain(BVSMK *op,BVSHDR *hdrp)
 
 
 /* ARGSUSED */
-static int bvsmk_mkidxwrhdr(BVSMK *op,BVSHDR *hdrp,FILER *hfp)
+local int bvsmk_mkidxwrhdr(BVSMK *op,BVSHDR *hdrp,FILER *hfp)
 {
 	cint	hlen = HDRBUFLEN ;
 	int		rs ;
@@ -672,7 +660,7 @@ static int bvsmk_mkidxwrhdr(BVSMK *op,BVSHDR *hdrp,FILER *hfp)
 /* end subroutine (bvsmk_mkidxwrhdr) */
 
 
-static int bvsmk_mkidxchaptab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
+local int bvsmk_mkidxchaptab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
 {
 	BVSBOOK		*bep ;
 	vecobj		*blp = &op->books ;
@@ -701,7 +689,7 @@ static int bvsmk_mkidxchaptab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
 /* end subroutine (bvsmk_mkidxchaptab) */
 
 
-static int bvsmk_mkidxbooktab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
+local int bvsmk_mkidxbooktab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
 {
 	cint	n = (op->maxbook + 1) ;
 	int		rs ;
@@ -739,7 +727,7 @@ static int bvsmk_mkidxbooktab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
 }
 /* end subroutine (bvsmk_mkidxbooktab) */
 
-static int bvsmk_nidxopen(BVSMK *op) noex {
+local int bvsmk_nidxopen(BVSMK *op) noex {
 	cmode	om = op->om ;
 	int		rs ;
 	int		fd = -1 ;
@@ -793,7 +781,7 @@ static int bvsmk_nidxopen(BVSMK *op) noex {
 /* end subroutine (bvsmk_nidxopen) */
 
 
-static int bvsmk_nidxclose(BVSMK *op)
+local int bvsmk_nidxclose(BVSMK *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -807,7 +795,7 @@ static int bvsmk_nidxclose(BVSMK *op)
 /* end subroutine (bvsmk_nidxclose) */
 
 
-static int bvsmk_renamefiles(BVSMK *op)
+local int bvsmk_renamefiles(BVSMK *op)
 {
 	cint	clen = MAXNAMELEN ;
 	int		rs ;
@@ -842,7 +830,7 @@ static int bvsmk_renamefiles(BVSMK *op)
 }
 /* end subroutine (bvsmk_renamefiles) */
 
-static int mkdname(cchar *dname,mode_t dm) noex {
+local int mkdname(cchar *dname,mode_t dm) noex {
 	    USTAT	sb ;
 	    cint	nrs = SR_NOENT ;
 	int		rs ;
@@ -861,9 +849,7 @@ static int mkdname(cchar *dname,mode_t dm) noex {
 }
 /* end subroutine (mkdname) */
 
-
-static int mknifname(char *rbuf,int type,cchar *id,cchar *db,cchar *suf)
-{
+local int mknifname(char *rbuf,int type,cchar *id,cchar *db,cchar *suf) noex {
 	int		rs ;
 	cchar		*end = ENDIANSTR ;
 	cchar		*fin = (type) ? "xXXXX" : "n" ;
@@ -875,13 +861,10 @@ static int mknifname(char *rbuf,int type,cchar *id,cchar *db,cchar *suf)
 }
 /* end subroutine (mknifname) */
 
-
-static int unlinkstale(cchar *fn,int to)
-{
-	ustat	sb ;
-	const time_t	dt = time(NULL) ;
+local int unlinkstale(cchar *fn,int to) noex {
+	custime		dt = time(NULL) ;
 	int		rs ;
-	if ((rs = uc_stat(fn,&sb)) >= 0) {
+	if (ustat sv ; (rs = uc_stat(fn,&sb)) >= 0) {
 	    if ((dt-sb.st_mtime) >= to) {
 	        uc_unlink(fn) ;
 	        rs = 1 ;
