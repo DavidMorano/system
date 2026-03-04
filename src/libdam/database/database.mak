@@ -1,4 +1,4 @@
-# MAKEFILES (database)
+# MAKEFILE (database)
 
 T= database
 
