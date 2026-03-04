@@ -60,22 +60,22 @@ export {
 }
 
 export {
-    enum typeouts {
-    	typeout_name,
-    	typeout_mod,
-    	typeout_gcm,
-    	typeout_obj,
-    	typeout_modobj,
-    	typeout_overlast,
-    } ; /* end enum (typeouts) */
-    constexpr cpcchar	typeouts[] = {
-    	[typeout_name]		= "name",
-    	[typeout_mod]		= "mod",
-    	[typeout_gcm]		= "gcm",
-    	[typeout_obj]		= "obj",
-    	[typeout_modobj]	= "modobj",
-    	[typeout_overlast]	= nullptr
-    } ; /* end array (typeouts) */
+    enum modouts {
+    	modout_name,
+    	modout_mod,
+    	modout_gcm,
+    	modout_obj,
+    	modout_modobj,
+    	modout_overlast
+    } ; /* end enum (modouts) */
+    constexpr cpcchar	modoutnames[] = {
+    	[modout_name]		= "name",
+    	[modout_mod]		= "mod",
+    	[modout_gcm]		= "gcm",
+    	[modout_obj]		= "obj",
+    	[modout_modobj]		= "modobj",
+    	[modout_overlast]	= nullptr
+    } ; /* end array (modoutnames) */
 } /* end export) */
 
 enum modprocmems {
