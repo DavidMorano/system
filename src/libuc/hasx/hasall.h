@@ -37,26 +37,27 @@ extern bool hasallwhite(cchar *,int) noex ;
 extern bool hasallblank(cchar *,int) noex ;
 extern bool hasalllc(cchar *,int) noex ;
 extern bool hasalluc(cchar *,int) noex ;
+extern bool hasallhdrkey(cchar *,int) noex ;
 extern bool hasallbase(cchar *,int,int) noex ;
 extern bool hasallchr(cchar *,int,int) noex ;
-extern bool hasallhdrkey(cchar *,int) noex ;
+extern bool hasallset(cchar *,int,cchar *) noex ;
 
-static inline bool hasalldig(cchar *sp,int sl) noex {
+local inline bool hasalldig(cchar *sp,int sl) noex {
     	return hasalldigit(sp,sl) ;
 }
-static inline bool hasalloct(cchar *sp,int sl) noex {
+local inline bool hasalloct(cchar *sp,int sl) noex {
     	return hasalloctal(sp,sl) ;
 }
-static inline bool hasalldec(cchar *sp,int sl) noex {
+local inline bool hasalldec(cchar *sp,int sl) noex {
     	return hasalldigit(sp,sl) ;
 }
-static inline bool hasallhex(cchar *sp,int sl) noex {
+local inline bool hasallhex(cchar *sp,int sl) noex {
     	return hasalldigex(sp,sl) ;
 }
-static inline bool hasallwht(cchar *sp,int sl) noex {
+local inline bool hasallwht(cchar *sp,int sl) noex {
     	return hasallwhite(sp,sl) ;
 }
-static inline bool hasallblk(cchar *sp,int sl) noex {
+local inline bool hasallblk(cchar *sp,int sl) noex {
     	return hasallblank(sp,sl) ;
 }
 
