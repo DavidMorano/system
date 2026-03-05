@@ -109,7 +109,6 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 /* forward references */
 
 local int	twochars(char *,cchar *,int) noex ;
-local bool	hasINET4Num(cchar *,int) noex ;
 
 
 /* local variables */
@@ -222,49 +221,6 @@ bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 }
 /* end subroutine (hasvalidmagic) */
 
-bool hasmealone(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl == 1) {
-		switch (cint ch = mkchar(*sp) ; ch) {
-	        case '+':
-	        case '-':
-	        case '!':
-		    f = true ;
-		    break ;
-	        } /* end switch */
-	    } /* end if */
-	} /* end if (non-null) */
-	return f ;
-}
-/* end subroutine (hasmealone) */
-
-bool hasinet4addrstr(cchar *sp,int sl) noex {
-	bool		f = true ;
-	if (sp) ylikely {
-	    int		c = 0 ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    for (cc *tp ; (tp = strnchr(sp,sl,'.')) != nullptr ; ) {
-	        cint tl = intconv(tp - sp) ;
-	        f = hasINET4Num(sp,tl) ;
-	        if (! f) break ;
-	        sl -= intconv((tp + 1) - sp) ;
-	        sp = (tp + 1) ;
-	        c += 1 ;
-	    } /* end while */
-	    if (f && (sl > 0)) {
-	        c += 1 ;
-	        f = hasINET4Num(sp,sl) ;
-	    } /* end if */
-	    if (f && (c != 4)) {
-	        f = false ;
-	    }
-	} /* end if (non-null) */
-	return f ;
-}
-/* end subroutine (hasINET4AddrStr) */
-
 
 /* local subroutines */
 
@@ -281,10 +237,5 @@ local int twochars(char *tbuf,cchar *sp,int sl) noex {
 	return c ;
 }
 /* end subroutine (twochars) */
-
-local bool hasINET4Num(cchar *sp,int sl) noex {
-	return ((sl <= 3) && hasalldig(sp,sl)) ;
-}
-/* end subroutine (hasINET4Num) */
 
 
