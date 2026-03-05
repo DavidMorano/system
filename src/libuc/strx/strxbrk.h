@@ -13,7 +13,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<string.h>		/* |strchr(3c)| + |strpbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
