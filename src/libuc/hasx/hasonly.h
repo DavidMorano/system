@@ -20,9 +20,15 @@
   	Group:
 	hasonly{x}
 
+	Names:
+	hasonlypl
+	hasonlymi
+	hasonlypm
+	hasonlyme
+
 	Description:
-	These subroutines check if a specified c-string has any of
-	some characteristic we are looking for.
+	These subroutines check if the specified c-string has only
+	the characteristic we are looking for.
 
 *******************************************************************************/
 
@@ -39,8 +45,10 @@
 
 EXTERNC_begin
 
-extern bool hasonlyminus(cchar *,int) noex ;
-extern bool hasonlyplusminus(cchar *,int) noex ;
+extern bool hasonlypl(cchar *,int) noex ;	/* has-plus */
+extern bool hasonlymi(cchar *,int) noex ;	/* has-minus */
+extern bool hasonlypm(cchar *,int) noex ;	/* has-plus-minus */
+extern bool hasonlyme(cchar *,int) noex ;	/* has-me */
 
 EXTERNC_end
 
