@@ -40,7 +40,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	svc		service name
@@ -97,17 +96,17 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* external subroutines */
 
-#if	CF_DEBUGS || CF_DEBUGN
-extern int	debugprintf(cchar *,...) ;
-extern int	nprintf(cchar *,cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
-static int findprog(cchar *,char *,cchar *) noex ;
-static int vecstr_addpr(vecstr *,char *,cchar *) noex ;
+local int findprog(cchar *,char *,cchar *) noex ;
+local int vecstr_addpr(vecstr *,char *,cchar *) noex ;
 
 
 /* local variables */
@@ -167,7 +166,7 @@ int		to ;
 /* local subroutines */
 
 
-static int findprog(cchar *pr,char *progfname,cchar *svc)
+local int findprog(cchar *pr,char *progfname,cchar *svc)
 {
 	ids		id ;
 	int		rs ;
@@ -185,7 +184,7 @@ static int findprog(cchar *pr,char *progfname,cchar *svc)
 		    }
 		}
 		if (rs >= 0) {
-		    const int	rsn = SR_NOENT ;
+		    cint	rsn = SR_NOENT ;
 		    if ((rs = getprogpath(&id,&p,progfname,svc,-1)) == rsn) {
 			if ((rs = vecstr_addpr(&p,progfname,pr)) > 0) {
 		    	    rs = getprogpath(&id,&p,progfname,svc,-1) ;
@@ -207,23 +206,19 @@ static int findprog(cchar *pr,char *progfname,cchar *svc)
 }
 /* end subroutine (findprog) */
 
-
-static int vecstr_addpr(vecstr *plp,char *rbuf,cchar *pr)
-{
-	vecstr		mores ;
+local int vecstr_addpr(vecstr *plp,char *rbuf,cchar *pr) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = vecstr_start(&mores,2,0)) >= 0) {
-	    const int	rsn = SR_NOTFOUND ;
+	if (vecstr m ; (rs = vecstr_start(&m,2,0)) >= 0) {
+	    cint	rsn = SR_NOTFOUND ;
 	    int		rl ;
-	    int		i ;
-	    for (i = 0 ; bins[i] != nullptr ; i += 1) {
+	    for (int i = 0 ; bins[i] != nullptr ; i += 1) {
 		if ((rs = mkpath2(rbuf,pr,bins[i])) > 0) {
 		    rl = rs ;
 		    if ((rs = vecstr_find(plp,rbuf)) == rsn) {
 			n += 1 ;
-			rs = vecstr_add(&mores,rbuf,rl) ;
+			rs = vecstr_add(&m,rbuf,rl) ;
 		    }
 		}
 		if (rs < 0) break ;
@@ -232,8 +227,8 @@ static int vecstr_addpr(vecstr *plp,char *rbuf,cchar *pr)
 		if (n > 0) {
 		    if ((rs = vecstr_delall(plp)) >= 0) {
 		        cchar	*pp ;
-		        for (i = 0 ; vecstr_get(&mores,i,&pp) >= 0 ; i += 1) {
-			    if (pp != nullptr) {
+		        for (int i = 0 ; vecstr_get(&m,i,&pp) >= 0 ; i += 1) {
+			    if (pp) {
 				rs = vecstr_add(plp,pp,-1) ;
 			    }
 			    if (rs < 0) break ;
@@ -241,7 +236,7 @@ static int vecstr_addpr(vecstr *plp,char *rbuf,cchar *pr)
 		    } /* end if (vecstr_delall) */
 		} /* end if (positive) */
 	    } /* end if (ok) */
-	    rs1 = vecstr_finish(&mores) ;
+	    rs1 = vecstr_finish(&m) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	return (rs >= 0) ? n : rs ;
