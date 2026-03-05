@@ -31,30 +31,30 @@ EXTERNC_begin
 extern bool hasalpha(cchar *,int) noex ;
 extern bool hasalnum(cchar *,int) noex ;
 extern bool hasdigit(cchar *,int) noex ;
-extern bool hasdigex(cchar *,int) noex ;
 extern bool hasoctal(cchar *,int) noex ;
+extern bool hasdigex(cchar *,int) noex ;
 extern bool haswhite(cchar *,int) noex ;
 extern bool hasblank(cchar *,int) noex ;
 
 extern bool haslc(cchar *,int) noex ;
 extern bool hasuc(cchar *,int) noex ;
 
-static inline bool hasdig(cchar *sp,int sl) noex {
+local inline bool hasdig(cchar *sp,int sl) noex {
     	return hasdigit(sp,sl) ;
 }
-static inline bool hasoct(cchar *sp,int sl) noex {
+local inline bool hasoct(cchar *sp,int sl) noex {
     	return hasoctal(sp,sl) ;
 }
-static inline bool hasdec(cchar *sp,int sl) noex {
+local inline bool hasdec(cchar *sp,int sl) noex {
     	return hasdigit(sp,sl) ;
 }
-static inline bool hashex(cchar *sp,int sl) noex {
+local inline bool hashex(cchar *sp,int sl) noex {
     	return hasdigex(sp,sl) ;
 }
-static inline bool haswht(cchar *sp,int sl) noex {
+local inline bool haswht(cchar *sp,int sl) noex {
     	return haswhite(sp,sl) ;
 }
-static inline bool hasblk(cchar *sp,int sl) noex {
+local inline bool hasblk(cchar *sp,int sl) noex {
     	return hasblank(sp,sl) ;
 }
 
