@@ -24,8 +24,8 @@
 	hasalpha
 	hasalnum
 	hasdigit
-	hasdigex
 	hasoctal
+	hasdigex
 	haswhite
 	hasblank
 	haslc
