@@ -32,8 +32,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<filer.h>
@@ -45,7 +46,9 @@
 
 #include	"opensys.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -66,6 +69,40 @@ using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_mkdir(cchar *,mode_t) noex ;
+    extern int uc_mkfifo(cchar *,mode_t) noex ;
+    extern int uc_chmod(cchar *,mode_t) noex ;
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_unlink(cchar *) noex ;
+    extern int uc_unlinkshm(cchar *) noex ;
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_socket(int,int,int) noex ;
+    extern int uc_sockjoin(int,SOCKADDR *,int,int,mode_t) noex ;
+    extern int uc_openshm(cchar *,int,mode_t) noex ;
+    extern int uc_duper(int,int) noex ;
+    extern int uc_pipe(int *) noex ;
+    extern int uc_bind(int,cvoid *,int) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_fsize(int) noex ;
+    extern int uc_fchown(int,uid_t,gid_t) noex ;
+    extern int uc_fminmod(int,mode_t) noex ;
+    extern int uc_connect(int,cvoid *,int) noex ;
+    extern int uc_connecte(int,cvoid *,int,int) noex ;
+    extern int uc_lockf(int,int,off_t) noex ;
+    extern int uc_read(int,void *,int) noex ;
+    extern int uc_write(int,cvoid *,int) noex ;
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_iocctl(int,int,...) noex ;
+    extern int uc_rewind(int) noex ;
+    extern int uc_ftruncate(int,off_t ) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_fpathconf(int,int,char *) noex ;
+    extern int uc_setsockopt(int,int,int,int *,int) noex ;
+    extern int uc_linger(int,int) noex ;
+    extern int uc_close(int) ;
+} /* end extern */
 
 
 /* external variables */
@@ -110,14 +147,14 @@ int opensys_banner(cchar *fname,int of,mode_t om) noex {
 	        const time_t	dt = time(nullptr) ;
 	        int		f_top = true ;
 	        cchar		*tspec = "%e %b %T" ;
-	        if (TMTIME tmd ; (rs = tmtime_gmtime(&tmd,dt)) >= 0) {
+	        if (TMTIME tmd ; (rs = tmtime_timegm(&tmd,dt)) >= 0) {
 	            cint	tlen = TIMEBUFLEN ;
 	            char	tbuf[TIMEBUFLEN+1] ;
 	            if ((rs = sntmtime(tbuf,tlen,&tmd,tspec)) >= 0) {
 	                rs = process(tbuf,f_top) ;
 	                fd = rs ;
 	            }
-	        } /* end if (tmtime_gmtime) */
+	        } /* end if (tmtime_timegm) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
@@ -198,7 +235,7 @@ static int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (char *lbuf ; (rs = malloc_mp(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_mp(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    cint	of = O_RDONLY ;
 	    cint	to = -1 ;
@@ -229,7 +266,7 @@ static int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 	        rs1 = uc_close(fd) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (output-file) */
-	    rs1 = uc_free(lbuf) ;
+	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
