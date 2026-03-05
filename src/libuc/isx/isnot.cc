@@ -42,11 +42,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>		/* <- needed */
+#include	<localmisc.h>
 
 #include	"isoneof.h"
 #include	"isnot.h"
@@ -81,13 +84,13 @@ constexpr int	npresent[] = {
 	SR_STALE,
 	SR_PERM,			/* Apple-Darwin from |stat(2)| */
 	0	
-} ;
+} ; /* end array */
 
 constexpr int	naccess[] = {
 	SR_ACCESS,
 	SR_PERM,			
 	0	
-} ;
+} ; /* end array */
 
 constexpr int	nvalid[] = {
 	SR_INVALID,
@@ -96,7 +99,7 @@ constexpr int	nvalid[] = {
 	SR_NOENT,
 	SR_NOTSUP,
 	0	
-} ;
+} ; /* end array */
 
 constexpr int	nlib[] = {
 	SR_NOENT,
@@ -105,7 +108,7 @@ constexpr int	nlib[] = {
 	SR_NOTDIR,
 	SR_STALE,
 	0	
-} ;
+} ; /* end array */
 
 constexpr int	rnoterm[] = {
 	SR_BADF,
@@ -113,7 +116,7 @@ constexpr int	rnoterm[] = {
 	SR_NOTTY,
 	SR_ACCESS,
 	0
-} ;
+} ; /* end array */
 
 constexpr int	rnosupport[] = {
 	SR_NOSYS,
@@ -124,7 +127,7 @@ constexpr int	rnosupport[] = {
 	SR_PFNOSUPPORT,
 	SR_AFNOSUPPORT,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
