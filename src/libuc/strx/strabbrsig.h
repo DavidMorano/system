@@ -30,10 +30,6 @@ EXTERNC_begin
 
 extern cchar	*strabbrsig(int) noex ;
 
-local inline cchar *strsigabbr(int v) noex {
-    return strabbrsig(v) ;
-}
-
 EXTERNC_end
 
 
