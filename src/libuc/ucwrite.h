@@ -57,15 +57,14 @@
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
+#include	<ucwritedesc.h>
+#include	<ucwritefile.h>
 
 EXTERNC_begin
 
 extern int	uc_writeto(int,cvoid *,int,int) noex ;
 extern int	uc_write(int,cvoid *,int) noex ;
 extern int	uc_writen(int,cvoid *,int) noex ;
-extern int	uc_writedesc(int,int,int) noex ;
-extern int	uc_writefile(int,cchar *) noex ;
-extern int	uc_filecopy(cchar *,cchar *) noex ;
 
 EXTERNC_end
 
