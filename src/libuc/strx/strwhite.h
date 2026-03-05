@@ -8,8 +8,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRX_INCLUDE
-#define	STRX_INCLUDE
+#ifndef	STRWHITE_INCLUDE
+#define	STRWHITE_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -24,10 +24,16 @@ extern char	*strwhite(cchar *) noex ; /* <- historical */
 EXTERNC_end
 
 #if	__cpluspls
+
 extern char	*strwhite(cchar *,int) noex ;
+
+local inline char *strwht(cchar *sp,int sl) noex {
+    	return strwhite(sp,sl) ;
+}
+
 #endif /* __cpluspls */
 
 
-#endif /* STRX_INCLUDE */
+#endif /* STRWHITE_INCLUDE */
 
 
