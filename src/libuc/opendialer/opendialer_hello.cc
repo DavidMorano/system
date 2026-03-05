@@ -63,10 +63,11 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ids.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -91,10 +92,17 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(char *,...) ;
-extern int	strlinelen(char *,int,int) ;
-#endif
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
