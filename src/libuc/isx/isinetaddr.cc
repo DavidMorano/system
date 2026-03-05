@@ -45,9 +45,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
 #include	<uinet.h>		/* |INETX_ADDRSTRLEN| */
-#include	<inaddrbad.hh>
+#include	<inaddrbad.hh>		/* |mkinaddrbad(3uc)| */
 #include	<localmisc.h>
 
 #include	"isinetaddr.h"
@@ -97,15 +96,19 @@ constexpr bool		f_inet6 = CF_INET6 ;
 
 bool isinetaddr(cchar *name) noex {
 	bool		f = false ;
-	if_constexpr (f_inet6) {
-	    cint	af = AF_UNSPEC ;
-	    int		rs1 ;
-	    char	addrbuf[addrlen + 1] ;
-	    rs1 = inetpton(addrbuf,addrlen,af,name,-1) ;
-	    f = (rs1 >= 0) ;
-	} else {
-	    f = (inet_addr(name) != inaddrbad) ;
-	} /* end if_constexpr (f_inet6) */
+	if (name) {
+	    if (name[0]) {
+	        if_constexpr (f_inet6) {
+	            cint	af = AF_UNSPEC ;
+	            int		rs1 ;
+	            char	addrbuf[addrlen + 1] ;
+	            rs1 = inetpton(addrbuf,addrlen,af,name,-1) ;
+	            f = (rs1 >= 0) ;
+	        } else {
+	            f = (inet_addr(name) != inaddrbad) ;
+	        } /* end if_constexpr (f_inet6) */
+	    } /* end if (value) */
+	} /* end if (non-null) */
 	return f ;
 }
 /* end subroutine (isinetaddr) */
