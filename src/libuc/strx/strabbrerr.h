@@ -21,11 +21,7 @@
 
 EXTERNC_begin
 
-extern cchar *strabbrerr(int) noex ;
-
-local inline cchar *strerrabbr(int v) noex {
-    return strabbrerr(v) ;
-}
+extern cchar	*strabbrerr(int) noex ;
 
 EXTERNC_end
 
