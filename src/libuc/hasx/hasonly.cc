@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* does a counted c-string some characteristic? */
+/* does the counted c-string have some characteristic? */
 /* version %I% last-modified %G% */
 
 
@@ -21,24 +21,35 @@
 	hasonly{x}
 
 	Names:
-	hasonlyminus
-	hasonlyplusminus
+	hasonlypl
+	hasonlymi
+	hasonlypm
+	hasonlyme
 
 	Description:
-	These subroutines check if a specified c-string has any of
-	some characteristic we are looking for.
+	These subroutines check if the specified counted c-string
+	has only the characteristic we are looking for.
 
 	Synopsis:
-	bool hasonlyminus(cchar *sp,int sl) noex
-	bool hasonlyplusminus(cchar *sp,int sl) noex
+	bool hasonlypl(cchar *sp,int sl) noex
+	bool hasonlymi(cchar *sp,int sl) noex
+	bool hasonlypm(cchar *sp,int sl) noex
+	bool hasonlyme(cchar *sp,int sl) noex
 
 	Arguments:
+	{x}		one of: pl, mi, pm, me
 	sp		given counted c-string pointer
 	sl		given counted c-string length
 
 	Returns:
 	false
 	true
+
+	Usage:
+	hasonlypl	- has-only plus
+	hasonlymi	- has-only minus
+	hasonlypm	- has-only plus-minus
+	hasonlyme	- has-only me
 
 *******************************************************************************/
 
@@ -49,6 +60,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<mkchar.h>
+#include	<ischarx.h>		/* |is{x}(3uc)| */
 #include	<localmisc.h>		/* |UC(3dam)| */
 
 #include	"hasonly.h"
@@ -65,6 +78,10 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local typedefs */
 
+extern "C" {
+    typedef bool (*isx_f)(int) noex ;
+}
+
 
 /* external subroutines */
 
@@ -73,6 +90,14 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* local structures */
+
+namespace {
+    struct owner {
+	isx_f	isx ;
+	owner(isx_f f) noex : isx(f) { } ;
+	bool operator () (cchar *,int) noex ;
+    } ; /* end struct (owner) */
+} /* end namespace */
 
 
 /* forward references */
@@ -86,30 +111,39 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* exported subroutines */
 
-bool hasonlyminus(cchar *sp,int 탎l) noex {
-        bool            f = false ;
-	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
-            if (*sp != '\0') {
-		f = true ;
-                f = f && (sp[0] == '-') ;
-                f = f && ((sl == 1) || (sp[1] == '\0')) ;
-            }
-	} /* end if (getlenstr) */
-        return f ;
+bool hasonlypl(cchar *sp,int 탎l) noex {
+    	owner oo(ispl) ;
+	return oo(sp,탎l) ;
 }
-/* end subroutine (hasonlyminus) */
+/* end subroutine (hasonlypl) */
 
-bool hasonlyplusminus(cchar *sp,int 탎l) noex {
+bool hasonlymi(cchar *sp,int 탎l) noex {
+    	owner oo(ismi) ;
+	return oo(sp,탎l) ;
+}
+/* end subroutine (hasonlymi) */
+
+bool hasonlypm(cchar *sp,int 탎l) noex {
+    	owner oo(ispm) ;
+	return oo(sp,탎l) ;
+}
+/* end subroutine (hasonlypm) */
+
+bool hasonlyme(cchar *sp,int 탎l) noex {
+    	owner oo(isme) ;
+	return oo(sp,탎l) ;
+}
+/* end subroutine (hasonlyme) */
+
+
+/* local subroutines */
+
+bool owner::operator () (cchar *sp,int 탎l) noex {
         bool            f = false ;
-	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
-            if (*sp != '\0') {
-		f = true ;
-                f = f && ((sp[0] == '+') || (sp[0] == '-')) ;
-                f = f && ((sl == 1) || (sp[1] == '\0')) ;
-            }
+	if (int sl ; (sl = getlenstr(sp,탎l)) == 1) {
+	    f = isx(*sp) ;
 	} /* end if (getlenstr) */
         return f ;
-}
-/* end subroutine (hasonlyplusminus) */
+} /* end method (owner::operator) */
 
 
