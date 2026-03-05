@@ -38,9 +38,15 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<strings.h>		/* BSD-header for |strcasecmp(3c)| */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strchr(3c)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 #include	"isindomain.h"
@@ -71,7 +77,7 @@
 
 bool isindomain(cchar *name,cchar *domainname) noex {
 	bool		f = true ;
-	if (cchar *tp{} ; (tp = strchr(name,'.')) != nullptr) {
+	if (cchar *tp ; (tp = strchr(name,'.')) != nullptr) {
 	    f = false ;
 	    if (tp[1]) {
 		f = (strcasecmp((tp + 1),domainname) == 0) ;
