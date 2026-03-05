@@ -40,7 +40,14 @@ MODS +=
 LIBS +=
 
 
-OBJ_STRWCPY= strwcpyx.o strwcpyxc.o strwcpyxx.o strwset.o
+OBJ0= strwcpyx.o strwcpyxc.o
+OBJ1= strwcpyxx.o strwset.o
+OBJ2=
+OBJ3=
+
+OBJA= obj0.o obj1.o
+
+OBJ= obja.o
 
 
 INCDIRS=
@@ -91,8 +98,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_STRWCPY)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_STRWCPY)
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -117,6 +124,13 @@ obj2.o:			$(OBJ2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
