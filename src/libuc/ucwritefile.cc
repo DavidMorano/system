@@ -44,6 +44,8 @@
 #include	<usysbase.h>
 #include	<localmisc.h>
 
+#include	"ucwritefile.h"
+
 
 /* local defines */
 
@@ -56,6 +58,11 @@
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_writedesc(int,int,int) noex ;
+    extern int uc_close(int) ;
+} /* end extern */
 
 /* external variables */
 
@@ -91,7 +98,7 @@ int uc_writefile(int ofd,cchar *fname) noex {
 			    rs = uc_writedesc(ofd,ifd,-1) ;
 			    len = rs ;
  	    	        }
-	    	        rs1 = u_close(ifd) ;
+	    	        rs1 = uc_close(ifd) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (file) */
 	        } /* end if (valid) */
