@@ -1,4 +1,4 @@
-# MAKEFILES (ucstrto)
+# MAKEFILE (ucstrto)
 
 T= ucstrto
 
