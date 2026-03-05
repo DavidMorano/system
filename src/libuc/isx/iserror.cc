@@ -25,9 +25,12 @@
 	isBadMsg
 	isIOError
 
+	Aliases:
+	isFailIO
+
 	Description:
-	This subroutine determines if an operation resulted in a
-	bad message.
+	These subroutines determine if an error code (a system
+	"return-status") is a part of a certain category of errors.
 
 	Synopsis:
 	extern int isFailOpen(int rs) noex
@@ -46,11 +49,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>		/* <- the money shot! */
+#include	<localmisc.h>
 
 #include	"isoneof.h"
 #include	"isnot.h"
@@ -94,7 +100,7 @@ constexpr int		rfailopen[] = {
 	SR_EXIST,
 	SR_DQUOT,
 	0	
-} ;
+} ; /* end array */
 
 constexpr int		rfailconn[] = {
 	SR_NETDOWN,
@@ -108,7 +114,7 @@ constexpr int		rfailconn[] = {
 	SR_PIPE,
 	SR_TIMEDOUT,
 	0	
-} ;
+} ; /* end array */
 
 constexpr int		rbadsend[] = {
 	SR_DESTADDRREQ,
@@ -118,27 +124,27 @@ constexpr int		rbadsend[] = {
 	SR_PIPE,
 	SR_NOTSOCK,
 	0	
-} ;
+} ; /* end array */
 
 constexpr int		rbadrecv[] = {
 	SR_INVALID,
 	SR_TIMEDOUT,
 	0	
-} ;
+} ; /* end array */
 
 constexpr int		rbadmsg[] = {
 	SR_BADMSG,
 	SR_DOM,
 	SR_RANGE,
 	0	
-} ;
+} ; /* end array */
 
 constexpr int		rioerror[] = {
 	SR_IO,
 	SR_NXIO,
 	SR_PIPE,
 	0	
-} ;
+} ; /* end array */
 
 
 /* exported variables */
