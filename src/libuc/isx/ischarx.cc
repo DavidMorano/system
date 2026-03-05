@@ -15,7 +15,7 @@
 	I changed this to use the C++ |bitset| object instead of
 	an array of bytes (holding bits for lookup) for some of the
 	single-bit truth-value observers.  I also changed the
-	|ishexlatin()| subroutine to use a lookup table (implemented
+	|isdigexlatin()| subroutine to use a lookup table (implemented
 	w/ |bitset|) rather than computing the answer on the fly.
 	Oringally, a look-up table was used to implement that
 	subroutine (I used to use that particular subroutine tons).
@@ -54,21 +54,30 @@
 
 	Name:
 	isalphalatin
-	isdigitlatin
 	isalnumlatin
-	ishexlatin
-	islowerlatin
-	isupperlatin
-	isnumsign
+	isdigitlatin
+	isdigexlatin
+	iswhitelatin
+	isalnumlatin
 	isprintlatin
 	isprintterm
+	islowerlatin
+	isupperlatin
 	isprintbad
-	iswhite
+	isnumsign
 	isdict
-	ismmclass_{x}
 	iscmdstart
 	iseol
 	iszero
+	ishdrkey
+
+	Aliases:
+	isdiglatin
+	isoctlatin
+	isdeclatin
+	ishexlatin
+	iswhtlatin
+	iswhite
 
 	Description:
 	These subroutines are sort of like |isalpha(3c)| and their
@@ -140,6 +149,24 @@
 	1		yes
 
 
+	Name:
+	ishdrkey
+
+	Description:
+	Determine if the characters is valid in the context of a
+	mail-message header-key value-string.
+
+	Synopsis:
+	bool ishdrkey(int ch) noex
+
+	Arguments:
+	ch		character to check
+
+	Returns:
+	true		yes, is a mail-message header-key character
+	false		no, is not
+
+
 	Notes:
 	1. It is 2014.  This implemetation has remnants of using the
 	|char(3uc)| facility for some of our functions (determining
@@ -198,19 +225,19 @@ namespace {
 	bitset<chtablen>	isprint ;
 	bitset<chtablen>	isalpha ;
 	bitset<chtablen>	isalnum ;
-	bitset<chtablen>	ishex ;
+	bitset<chtablen>	isdigex ;
 	bitset<chtablen>	isterm ;
 	constexpr void mkalpha(bitset<chtablen> &) noex ;
-	constexpr void mkisprint() noex ;
 	constexpr void mkisalpha() noex ;
 	constexpr void mkisalnum() noex ;
-	constexpr void mkishex() noex ;
+	constexpr void mkisdigex() noex ;
+	constexpr void mkisprint() noex ;
 	constexpr void mkisterm() noex ;
 	constexpr ischarinfo() noex {
-	    mkisprint() ;
 	    mkisalpha() ;
 	    mkisalnum() ;
-	    mkishex() ;
+	    mkisdigex() ;
+	    mkisprint() ;
 	    mkisterm() ;
 	} ; /* end ctor */
     } ; /* end struct (ischarinfo) */
@@ -229,8 +256,28 @@ constexpr void ischarinfo::mkalpha(bitset<chtablen> &s) noex {
 	}
 	s.set(UC('×'),false) ;
 	s.set(UC('÷'),false) ;
-}
-/* end method (ischarinfo::mkalpha) */
+} /* end method (ischarinfo::mkalpha) */
+
+constexpr void ischarinfo::mkisalpha() noex {
+    	mkalpha(isalpha) ;
+} /* end method (ischarinfo::mkisalpha) */
+
+constexpr void ischarinfo::mkisalnum() noex {
+    	mkalpha(isalnum) ;
+	for (int ch = '0' ; ch <= '9' ; ch += 1) {
+	    isalnum.set(ch,true) ;
+	}
+} /* end method (ischarinfo::mkisalnum) */
+
+constexpr void ischarinfo::mkisdigex() noex {
+	for (int ch = '0' ; ch <= '9' ; ch += 1) {
+	    isdigex.set(ch,true) ;
+	}
+	for (int ch = 'A' ; ch <= 'F' ; ch += 1) {
+	    isdigex.set(ch,true) ;
+	    isdigex.set((ch + 0x20),true) ;
+	}
+} /* end method (ischarinfo::mkisdigex) */
 
 constexpr void ischarinfo::mkisprint() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
@@ -240,32 +287,7 @@ constexpr void ischarinfo::mkisprint() noex {
 	        isprint.set(ch,true) ;
 	    }
 	}
-}
-/* end method (ischarinfo::mkisprint) */
-
-constexpr void ischarinfo::mkisalpha() noex {
-    	mkalpha(isalpha) ;
-}
-/* end method (ischarinfo::mkisalpha) */
-
-constexpr void ischarinfo::mkisalnum() noex {
-    	mkalpha(isalnum) ;
-	for (int ch = '0' ; ch <= '9' ; ch += 1) {
-	    isalnum.set(ch,true) ;
-	}
-}
-/* end method (ischarinfo::mkisalnum) */
-
-constexpr void ischarinfo::mkishex() noex {
-	for (int ch = '0' ; ch <= '9' ; ch += 1) {
-	    ishex.set(ch,true) ;
-	}
-	for (int ch = 'A' ; ch <= 'F' ; ch += 1) {
-	    ishex.set(ch,true) ;
-	    ishex.set((ch + 0x20),true) ;
-	}
-}
-/* end method (ischarinfo::mkishex) */
+} /* end method (ischarinfo::mkisprint) */
 
 constexpr void ischarinfo::mkisterm() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
@@ -299,7 +321,7 @@ constexpr ischarinfo	ischarx_data ;
 
 bool isalphalatin(int ch) noex {
 	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
+	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isalpha[ch] ;
 	}
 	return f ;
@@ -308,25 +330,39 @@ bool isalphalatin(int ch) noex {
 
 bool isalnumlatin(int ch) noex {
 	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
+	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isalnum[ch] ;
 	}
 	return f ;
 }
 /* end subroutine (isalnumlatin) */
 
-bool ishexlatin(int ch) noex {
+bool isdigitlatin(int ch) noex {
+    	return ((ch >= '0') && (ch <= '9')) ;
+}
+/* end subroutine (isdigitlatin) */
+
+bool isdigexlatin(int ch) noex {
 	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
-	    f = ischarx_data.ishex[ch] ;
+	if ((ch >= 0) && (ch < chtablen)) ylikely {
+	    f = ischarx_data.isdigex[ch] ;
 	}
 	return f ;
 }
-/* end subroutine (ishexlatin) */
+/* end subroutine (isdigexlatin) */
+
+bool iswhitelatin(int ch) noex {
+	bool		f = false ;
+	if ((ch >= 0) && (ch < chtablen)) ylikely {
+	    f = CHAR_ISWHITE(ch) ;
+	}
+	return f ;
+}
+/* end subroutine (iswhitelatin) */
 
 bool islowerlatin(int ch) noex {
 	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
+	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = CHAR_ISLC(ch) ;
 	}
 	return f ;
@@ -335,7 +371,7 @@ bool islowerlatin(int ch) noex {
 
 bool isupperlatin(int ch) noex {
 	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
+	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = CHAR_ISUC(ch) ;
 	}
 	return f ;
@@ -344,7 +380,7 @@ bool isupperlatin(int ch) noex {
 
 bool isprintlatin(int ch) noex {
 	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
+	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isprint[ch] ;
 	}
 	return f ;
@@ -353,7 +389,7 @@ bool isprintlatin(int ch) noex {
 
 bool isprintterm(int ch) noex {
 	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
+	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isterm[ch] ;
 	}
 	return f ;
@@ -365,18 +401,9 @@ bool isprintbad(int ch) noex {
 }
 /* end subroutine (isprintbad) */
 
-bool iswhite(int ch) noex {
-	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
-	    f = CHAR_ISWHITE(ch) ;
-	}
-	return f ;
-}
-/* end subroutine (iswhite) */
-
 bool isdict(int ch) noex {
 	bool		f = false ;
-	if ((ch >= 0) && (ch < chtablen)) {
+	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isalnum[ch] || (ch == CH_SP) ;
 	}
 	return f ;
@@ -398,50 +425,10 @@ bool ishdrkey(int ch) noex {
 }
 /* end subroutine (ishdrkey) */
 
-/* is it 7-bit text (no controls or other weirdo) */
-bool ismmclass_7bit(int ch) noex {
-	bool		f = false ;
-	ch &= UCHAR_MAX ;
-	if (ch < 0x80) {
-	    f = f || isprintlatin(ch) ;
-	    f = f || (ch == '\n') ;
-	    f = f || (ch == '\r') ;
-	    f = f || (ch == CH_TAB) ;
-	    f = f || (ch == CH_SP) ;
-	}
-	return f ;
-}
-/* end subroutine (ismmclass_7bit) */
-
-/* does it *require* 8-bit but *only* 8-bit */
-bool ismmclass_8bit(int ch) noex {
-	bool		f = false ;
-	ch &= UCHAR_MAX ;
-	if ((ch >= 0x80) && (ch < chtablen)) {
-	    f = ((ch & 0x7f) >= 0x20) ;
-	}
-	return f ;
-}
-/* end subroutine (ismmclass_8bit) */
-
-/* does it *require* binary */
-bool ismmclass_binary(int ch) noex {
-	bool		f = false ;
-	ch &= UCHAR_MAX ;
-	if (((ch & 0x7f) < 0x20) || (ch == CH_DEL)) {
-	    f = true ;
-	    f = f && (ch != CH_TAB) ;
-	    f = f && (ch != '\n') ;
-	    f = f && (ch != '\r') ;
-	}
-	return f ;
-}
-/* end subroutine (ismmclass_binary) */
-
 
 /* COMMENTS */
 
-/* comments: |ishexlatin| */
+/* comments: |isdigexlatin| */
 /* = 2011-08-19, David A­D­ Morano */
 /* for records-keeping reasons, here is the old computed version */
 
@@ -465,14 +452,14 @@ than the |bitset(3c++)| object look-up, but who is counting?
 ****/
 
 #ifdef	COMMENT
-bool ishexlatin(int ch) noex {
+bool isdigexlatin(int ch) noex {
 	bool		f = false ;
 	f = f || ((ch >= '0') && (ch <= '9')) ;
 	f = f || ((ch >= 'a') && (ch <= 'f')) ;
 	f = f || ((ch >= 'A') && (ch <= 'F')) ;
 	return f ;
 }
-/* end subroutine (ishexlatin) */
+/* end subroutine (issigexlatin) */
 #endif /* COMMENT */
 
 
