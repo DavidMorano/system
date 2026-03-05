@@ -1,10 +1,11 @@
-/* openint_copyout */
+/* openint_copyout SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* LOCAL facility open-service (copyout) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -27,16 +28,15 @@
 	This is a facility-open-intercept module.
 
 	Synopsis:
-
 	int openint_copyout(pr,dn,bn,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*dn ;
-	const char	*bn ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*dn ;
+	cchar	*bn ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -63,10 +63,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
-#include	<storebuf.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"openint_copyout.h"
@@ -76,48 +77,40 @@
 /* local defines */
 
 
-/* external variables */
-
-
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
 
-#if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
+/* external variables */
 
 
 /* local structures */
 
 
+/* forward references */
+
+
 /* local variables */
 
 
-/* forward references */
+/* exported variables */
 
 
 /* exported subroutines */
 
-
 int openint_copyout(pr,dn,bn,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*dn ;
-const char	*bn ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*dn ;
+cchar	*bn ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
 	int		fd = -1 ;
-	const char	*inter = "copyout" ;
+	cchar	*inter = "copyout" ;
 	char		fname[MAXPATHLEN+1] ;
 
 #if	CF_DEBUGS
