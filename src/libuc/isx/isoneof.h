@@ -30,7 +30,7 @@ EXTERNC_begin
 
 extern bool isoneof(cint *,int) noex ;
 
-static inline bool isOneOf(cint *rsa,int rs) noex {
+local inline bool isOneOf(cint *rsa,int rs) noex {
 	return isoneof(rsa,rs) ;
 }
 
