@@ -57,10 +57,17 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucsysmisc.h>
+#include	<uclibmem.h>
+#include	<ucread.h>
 #include	<getbufsize.h>
-#include	<filetype.h>		/* |filetype(3u)| */
+#include	<filetypes.h>		/* |filetype(3u)| */
 #include	<localmisc.h>
+
+#include	"ucwritedesc.h"
 
 
 /* local defines */
@@ -77,6 +84,12 @@ using libuc::libmem ;			/* variable */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_tell(int,off_t *) noex ;
+    extern int uc_write(int,cvoid *,int) noex ;
+}
 
 extern "C" {
     int uc_mmapbegin(void *,size_t,int,int,int,off_t,void **) noex ;
@@ -266,12 +279,12 @@ int writer::bufsize(int ft) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = pagesz) == 0) {
-	    if ((rs = ucpagesize) >= 0) {
+	if ((rs = pagesz) == 0) ylikely {
+	    if ((rs = ucpagesize) >= 0) ylikely {
 	        pagesz = rs ;
-		if ((rs = getbufsize(getbufsize_mm)) >= 0) {
+		if ((rs = getbufsize(bufsize_mm)) >= 0) ylikely {
 		    msglen = rs ;
-		    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+		    if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
 			maxnamelen = rs ;
 		    }
 		}
