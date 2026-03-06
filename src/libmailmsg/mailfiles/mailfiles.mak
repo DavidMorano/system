@@ -1,4 +1,4 @@
-# MAKEFILES (mailfiles)
+# MAKEFILE (mailfiles)
 
 T= mailfiles
 
