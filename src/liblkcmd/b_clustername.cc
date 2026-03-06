@@ -1,4 +1,5 @@
-/* b_clustername SUPPORT */
+/* b_clustername SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* this is a SHELL built-in command */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_clustername
+
+	Description:
 	We find and print the clustername for the specified nodes.
 
 	Synopsis:
@@ -99,21 +104,6 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	getnodename(char *,int) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	getclusters(const char *,vecstr *,const char *) ;
@@ -124,14 +114,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
