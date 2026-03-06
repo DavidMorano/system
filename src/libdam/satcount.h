@@ -9,7 +9,9 @@
 /* revision history:
 
 	= 2000-03-15, David A­D­ Morano
-	Originally written for Rightcore Network Services.
+	This subroutine was created for Levo research.  This
+	subroutine is a helper function for several simulated
+	branch predictors.
 
 */
 
