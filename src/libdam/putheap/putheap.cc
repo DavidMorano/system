@@ -26,15 +26,38 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
+#include	"putheap.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define		HEAPSIZE	1024
+#define	HEAPSIZE	1024
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
 
-static int	heap_len = 0 ;
+static int	heap_len ;
 
 static char	*heap_start ;
 static char	*heap_current ;
@@ -46,23 +69,26 @@ static char	*heap_current ;
 /* exported subroutines */
 
 char *putheap(cchar *s) noex {
-	int	l = lenstr(s) + 1 ;
-	/* allocate more space if necessary */
-	if (heap_len < l) {
-	    heap_len = (HEAPSIZE > l) ? HEAPSIZE : l ;
-	    if ((heap_start = (char *) malloc(heap_len)) == nullptr)
-	        return nullptr ;
-
-	    heap_current = heap_start ;
-	}
-
-	/* store the string */
-
-	strcpy(heap_current,s) ;
-
-	heap_len -= l ;
-	heap_current += l ;
-	return (heap_current - l) ;
+    	cnullptr	np{} ;
+    	char		*rp = nullptr ;
+	if (s) {
+	    cint	l = lenstr(s) + 1 ;
+	    /* allocate more space if necessary */
+	    if (heap_len < l) {
+	        heap_len = (HEAPSIZE > l) ? HEAPSIZE : l ;
+	        if ((heap_start = (char *) malloc(heap_len)) != np) {
+	            heap_current = heap_start ;
+	        }
+	    }
+	    if (heap_start) {
+	        /* store the string */
+	        strcpy(heap_current,s) ;
+	        heap_len -= l ;
+	        heap_current += l ;
+	        rp = charp(heap_current - l) ;
+	    } /* end if (non-null) */
+	} /* end if (non-null) */
+	return rp ;
 }
 /* end subroutine (putheap) */
 
