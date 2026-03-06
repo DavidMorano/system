@@ -32,13 +32,13 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<new>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getnodedomain.h>
 #include	<mkpr.h>
@@ -49,7 +49,9 @@
 #include	"txtindexmk.h"
 #include	"txtindexmks.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -67,9 +69,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -96,7 +95,7 @@ extern "C" {
 struct vars {
 	int		maxhostlen ;
 	int		maxpathlen ;
-} ;
+} ; /* end struct */
 
 struct txtindexmk_calls {
     soopen_f		open ;
@@ -105,7 +104,7 @@ struct txtindexmk_calls {
     sonoop_f		noop ;
     soabort_f		abort ;
     soclose_f		close ;
-} ;
+} ; /* end struct */
 
 typedef txtindexmk_calls *	callsp ;
 
@@ -125,21 +124,22 @@ namespace {
 	} ;
 	int operator () (char *ap) noex ;
     } ; /* end struct (opener) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int txtindexmk_ctor(txtindexmk *op,Args ... args) noex {
+local int txtindexmk_ctor(txtindexmk *op,Args ... args) noex {
 	TXTINDEXMK	*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->mlp = new(nothrow) modload) != np) {
-	        if ((op->callp = new(nothrow) txtindexmk_calls) != np) {
+	    if ((op->mlp = new(nt) modload) != np) ylikely {
+	        if ((op->callp = new(nt) txtindexmk_calls) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-txtindexmks_calls) */
 		if (rs < 0) {
@@ -149,44 +149,41 @@ static int txtindexmk_ctor(txtindexmk *op,Args ... args) noex {
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (txtindexmk_ctor) */
+} /* end subroutine (txtindexmk_ctor) */
 
-static int txtindexmk_dtor(txtindexmk *op) noex {
+local int txtindexmk_dtor(txtindexmk *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->callp) {
+	    if (op->callp) ylikely {
 	        txtindexmk_calls	*callp = callsp(op->callp) ;
 		delete callp ;
 		op->callp = nullptr ;
 	    }
-	    if (op->mlp) {
+	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (txtindexmk_dtor) */
+} /* end subroutine (txtindexmk_dtor) */
 
 template<typename ... Args>
-static inline int txtindexmk_magic(txtindexmk *op,Args ... args) noex {
+local inline int txtindexmk_magic(txtindexmk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == TXTINDEXMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (txtindexmk_magic) */
+} /* end subroutine (txtindexmk_magic) */
 
-static int	txtindexmk_objloadbegin(TIM *,cchar *,cchar *) noex ;
-static int	txtindexmk_objloadend(TIM *) noex ;
-static int	txtindexmk_loadcalls(TIM *,vecstr *) noex ;
+local int	txtindexmk_objloadbegin(TIM *,cchar *,cchar *) noex ;
+local int	txtindexmk_objloadend(TIM *) noex ;
+local int	txtindexmk_loadcalls(TIM *,vecstr *) noex ;
 
-static int	mkvars() noex ;
+local int	mkvars() noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* local variables */
@@ -223,17 +220,17 @@ int txtindexmk_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = txtindexmk_ctor(op,pp,db)) >= 0) {
+	if ((rs = txtindexmk_ctor(op,pp,db)) >= 0) ylikely {
 	    static cint		rsv = mkvars() ;
-	    if ((rs = rsv) >= 0) {
+	    if ((rs = rsv) >= 0) ylikely {
 		cint	sz = (var.maxhostlen + 1 + var.maxpathlen + 1) ;
-		if (char *ap{} ; (rs = uc_malloc(sz,&ap)) >= 0) {
+		if (char *ap ; (rs = lm_mall(sz,&ap)) >= 0) ylikely {
 		    opener	oo(op,pp,db,of,om) ;
 		    {
 		        rs = oo(ap) ;
 			rv = rs ;
 		    }
-		    rs1 = uc_free(ap) ;
+		    rs1 = lm_free(ap) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (mkvars) */
@@ -249,11 +246,11 @@ int opener::operator () (char *ap) noex {
 	int		rs ;
 	int		rv = 0 ;
 	char		*dbuf = ap ;
-	if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
+	if ((rs = getnodedomain(nullptr,dbuf)) >= 0) ylikely {
 	    cint	plen = var.maxpathlen ;
 	    cchar	*pn = VARPRNAME ;
 	    char	*pbuf = (ap + (var.maxhostlen + 1)) ;
-	    if ((rs = mkpr(pbuf,plen,pn,dbuf)) >= 0) {
+	    if ((rs = mkpr(pbuf,plen,pn,dbuf)) >= 0) ylikely {
 	        cchar	*objn = TIM_OBJNAME ;
 		cchar	*pr = pbuf ;
 		if ((rs = txtindexmk_objloadbegin(op,pr,objn)) >= 0) {
@@ -275,8 +272,8 @@ int opener::operator () (char *ap) noex {
 int txtindexmk_close(TIM *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = txtindexmk_magic(op)) >= 0) {
-	    if (op->obj) {
+	if ((rs = txtindexmk_magic(op)) >= 0) ylikely {
+	    if (op->obj) ylikely {
 	        txtindexmk_calls	*callp = callsp(op->callp) ;
 	        rs1 = (*callp->close)(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -330,7 +327,7 @@ int txtindexmk_noop(TIM *op) noex {
 
 /* private subroutines */
 
-static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
+local int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -349,11 +346,11 @@ static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 			    cint	sz = op->objsize ;
 			    op->objsize = mv[0] ;
 		            op->cursize = mv[1] ;
-			    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+			    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 		                op->obj = vp ;
 		                rs = txtindexmk_loadcalls(op,&syms) ;
 		                if (rs < 0) {
-			            uc_free(op->obj) ;
+			            lm_free(op->obj) ;
 			            op->obj = nullptr ;
 		                }
 		            } /* end if (memory-allocation) */
@@ -376,11 +373,11 @@ static int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 }
 /* end subroutine (txtindexmk_objloadbegin) */
 
-static int txtindexmk_objloadend(TIM *op) noex {
+local int txtindexmk_objloadend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
-	    rs1 = uc_free(op->obj) ;
+	    rs1 = lm_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
@@ -393,7 +390,7 @@ static int txtindexmk_objloadend(TIM *op) noex {
 }
 /* end subroutine (txtindexmk_objloadend) */
 
-static int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
+local int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
 	callsp		callp = callsp(op->callp) ;
 	cint		rsn = SR_NOTFOUND ;
@@ -434,11 +431,11 @@ static int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
 }
 /* end subroutine (txtindexmk_loadcalls) */
 
-static int mkvars() noex {
+local int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	if ((rs = getbufsize(bufsize_hn)) >= 0) {
 	    var.maxhostlen = rs ;
-	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_hn)) >= 0) {
 		var.maxpathlen = rs ;
 	    }
 	}
@@ -446,7 +443,7 @@ static int mkvars() noex {
 }
 /* end subroutine (mkvars) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
