@@ -40,7 +40,7 @@
 
 struct txtindexmk_flags {
     	uint		modload:1 ;
-} ;
+} ; /* end struct */
 
 struct txtindexmk_head {
 	modload		*mlp ;		/* load-object-pointer */
@@ -51,7 +51,7 @@ struct txtindexmk_head {
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size (not used here) */
 	int		nfd ;
-} ;
+} ; /* end struct */
 
 typedef	TXTINDEXMK	txtindexmk ;
 typedef	TXTINDEXMK_FL	txtindexmk_fl ;
