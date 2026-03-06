@@ -45,13 +45,15 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<estrings.h>
 #include	<dater.h>
 #include	<bfile.h>
-#include	<mailmsg.h>
-#include	<mailmsghdrs.h>
 #include	<mkx.h>
+#include	<mailmsg.h>		/* MAILMSG */
+#include	<mailmsghdrs.h>		/* MAILMSG */
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<iserror.h>
@@ -107,6 +109,13 @@ constexpr int	rsnomsg[] = {
 	SR_NOENT,
 	0
 } ; /* end array (rsnomsg) */
+
+static cpcchar	hnames[] = { /* cannot (currently) be 'constexpr' */
+    	HN_FROM,
+	HN_RETURNPATH,
+	HN_REPLYTO,
+	HN_SENDER
+} ; /* end arraya (hnames) */
 
 
 /* exported variables */
@@ -171,13 +180,6 @@ local int mailbox_proc(mailbox *mbp,dater *dp,MMF *fip,
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailbox_proc) */
-
-static cpcchar	hnames[] = {
-    	HN_FROM,
-	HN_RETURNPATH,
-	HN_REPLYTO,
-	HN_SENDER
-} ; /* end arraya (hnames) */
 
 local int mailmsg_hdrfrom(mailmsg *mmp,cchar **rpp) noex {
     	int		rs ;
