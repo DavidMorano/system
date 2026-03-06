@@ -70,7 +70,7 @@ how this messed-up envronment works on Darwin.
 On (the messed-up) Darwin OS, if we define the preprocessor symbol
 '_XOPEN_SOURCE' to anything at all (rather than a blank definition)
 we get all hell breaking loose with many other declarions being
-missing (for whatever messed-up reaoson). So we instead are
+missing (for whatever messed-up reaoson).  So we instead are
 careful to NOT define with any sort of value.
 Long live the messed-up Darwin OS!
 Oh, and thanks so much for making me take hours to figure out
@@ -82,6 +82,12 @@ how this messed-up system works on Darwin.
 #define	_XOPEN_SOURCE			500
 #endif
 #endif /* COMMENT */
+
+/****
+On Apple-Darwin the following ("_XOPEN_SOURCE") *must* be defined
+in order to get some of the stuff that we want.  Some of these are
+the one-time POSIX 'ucontext' subroutines and the |ucontext_t| type.
+****/
 
 #ifndef	_XOPEN_SOURCE
 #define	_XOPEN_SOURCE
