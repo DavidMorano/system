@@ -28,30 +28,29 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<keyopt.h>
 #include	<bfile.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<strx.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"envs.h"
-
 
 
 /* local defines */
@@ -90,33 +89,9 @@
 #define	DEBUGFNAME	"/tmp/lsh.nd"
 
 
-
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	getprogpath(IDS *,VECSTR *,char *,const char *,int) ;
-
-extern int	progdefprog(struct proginfo *,const char **) ;
-
-extern int	nprintf(const char *,const char *,...) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern int	progdefprog(struct proginfo *,cchar **) ;
 
 
 /* external variables */
@@ -127,31 +102,31 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	procsearch(struct proginfo *,VECSTR *,char *,const char *) ;
+static int	procsearch(struct proginfo *,vecstr *,char *,cchar *) ;
 
-static int	loadpathlist(struct proginfo *,VECSTR *,VECSTR *) ;
-static int	loadpathcomp(struct proginfo *,VECSTR *,const char *) ;
-
-static int	xfile(IDS *,const char *) ;
+static int	loadpathlist(struct proginfo *,vecstr *,vecstr *) ;
+static int	loadpathcomp(struct proginfo *,vecstr *,cchar *) ;
 
 
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int progfindprog(pip,progfname,pn)
 struct proginfo	*pip ;
 char		progfname[] ;
-const char	pn[] ;
+cchar	pn[] ;
 {
 	vecstr		*elp ;
 
 	int	rs = SR_OK ;
 	int	f ;
 
-	const char	*pnp = pn ;
+	cchar	*pnp = pn ;
 
 
 #if	CF_DEBUG
@@ -220,11 +195,11 @@ const char	pn[] ;
 
 static int procsearch(pip,elp,progfname,pn)
 struct proginfo	*pip ;
-VECSTR		*elp ;
+vecstr		*elp ;
 char		progfname[] ;
-const char	pn[] ;
+cchar	pn[] ;
 {
-	VECSTR	pathlist ;
+	vecstr	pathlist ;
 
 	int	rs ;
 
@@ -277,14 +252,14 @@ ret0:
 
 static int loadpathlist(pip,plp,elp)
 struct proginfo	*pip ;
-VECSTR		*plp ;
-VECSTR		*elp ;
+vecstr		*plp ;
+vecstr		*elp ;
 {
 	int	rs = SR_OK ;
 
-	const char	*varpath = VARPATH ;
-	const char	*tp ;
-	const char	*pp ;
+	cchar	*varpath = VARPATH ;
+	cchar	*tp ;
+	cchar	*pp ;
 
 
 	rs = vecstr_search(elp,varpath,vstrkeycmp,&pp) ;
@@ -304,7 +279,7 @@ ret0:
 static int loadpathcomp(pip,lp,pp)
 struct proginfo	*pip ;
 vecstr		*lp ;
-const char	*pp ;
+cchar	*pp ;
 {
 	int	rs = SR_OK, rs1 ;
 	int	c, cl ;
@@ -350,7 +325,7 @@ const char	*pp ;
 
 static int xfile(idp,fname)
 IDS		*idp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	ustat	sb ;
 
@@ -369,6 +344,5 @@ const char	fname[] ;
 	return rs ;
 }
 /* end subroutine (xfile) */
-
 
 
