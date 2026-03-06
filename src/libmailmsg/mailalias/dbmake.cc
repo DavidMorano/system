@@ -52,6 +52,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
@@ -59,8 +60,12 @@
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<bit>			/* |rotl(3c++)| + |rotr(3c++)| */
-#include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
 #include	<endian.h>
@@ -135,8 +140,8 @@ namespace {
 
 /* local variables */
 
-static bufsizevar		maxnamelen(getbufsize_mn) ;
-static bufsizevar		maxpathlen(getbufsize_mp) ;
+static bufsizevar		maxnamelen(bufsize_mn) ;
+static bufsizevar		maxpathlen(bufsize_mp) ;
 static vars			var ;
 
 /* all white space plus colon (':') */
@@ -155,10 +160,10 @@ int dbmake::wrfileproc(cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c_rec = 0 ; /* ¥ GCC false complaint */
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-		if (linebuffer lb ; (rs = lb.start) >= 0) {
+	    if (fname[0]) ylikely {
+		if (linebuffer lb ; (rs = lb.start) >= 0) ylikely {
 		    cint	llen = lb.llen ;
 		    char	*lbuf = lb.lbuf ;
 		    cmode	om = 0666 ;
@@ -192,18 +197,18 @@ int dbmake::wrfileproc(cchar *fname) noex {
 /* write out the cache file */
 int dbmake::wrfile(time_t dt) noex {
 	int		rs ;
-	if ((rs = strtab_count(klp)) >= 0) {
+	if ((rs = strtab_count(klp)) >= 0) ylikely {
 	    ktlen = (rs+1) ;
 	    ktsize = (ktlen + 1) * szof(int) ;
-	    if ((rs = rlp->count) >= 0) {
+	    if ((rs = rlp->count) >= 0) ylikely {
 		reclen = (rs + 1) ;
 		recsize = ((reclen+1) * (2 * szof(int))) ;
 		rilen = nextpowtwo(reclen) ;
 		if (rilen < 4) rilen = 4 ;
 		risize = (rilen * 2 * szof(int)) ;
-		if ((rs = strtab_strsize(klp)) >= 0) {
+		if ((rs = strtab_strsize(klp)) >= 0) ylikely {
 		    sksize = rs ;
-		    if ((rs = strtab_strsize(vlp)) >= 0) {
+		    if ((rs = strtab_strsize(vlp)) >= 0) ylikely {
 			svsize = rs ;
 		        rs = wrfiler(dt) ;
 		    }
@@ -294,7 +299,7 @@ int dbmake::wrfileline(cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c_rec = 0 ;
-	if ((rs = rsv) >= 0) {
+	if ((rs = rsv) >= 0) ylikely {
 	    cint	klen = var.mailaliaslen ;
 	    if (field fsb ; (rs = fsb.start(lbuf,llen)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
@@ -373,7 +378,7 @@ int dbmake::wrfilekeytab() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (int *keytab ; (rs = libmem.mall(ktsize,&keytab)) >= 0) {
+	if (int *keytab ; (rs = libmem.mall(ktsize,&keytab)) >= 0) ylikely {
 	    if ((rs = strtab_recmk(klp,keytab,ktsize)) >= 0) {
 		rs = u_write(fd,keytab,ktsize) ;
 		wlen += rs ;
@@ -390,7 +395,7 @@ int dbmake::wrfilerec() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = libmem.mall(recsize,&rectab)) >= 0) {
+	if ((rs = libmem.mall(recsize,&rectab)) >= 0) ylikely {
 	    {
 	        void	*vp{} ;
 	        int	ri = 0 ;
@@ -448,8 +453,8 @@ int dbmake::wrfilevals() noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (char *vstab ; (rs = libmem.mall(svsize,&vstab)) >= 0) {
-	    if ((rs = strtab_strmk(vlp,vstab,svsize)) >= 0) {
+	if (char *vstab ; (rs = libmem.mall(svsize,&vstab)) >= 0) ylikely {
+	    if ((rs = strtab_strmk(vlp,vstab,svsize)) >= 0) ylikely {
 	        rs = u_write(fd,vstab,svsize) ;
 		wlen += rs ;
 	    }
@@ -465,9 +470,9 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	cint		ns = nshift ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ; /* ¥ GCC false complaint */
-	if (it) {
+	if (it) ylikely {
 	    int		sz ;
-	    if ((rs = rp->count) >= 0) {
+	    if ((rs = rp->count) >= 0) ylikely {
 	        n = nextpowtwo(rs) ;
 	        if (n < 4) n = 4 ;
 	        sz = (n * 2 * szof(uint)) ;
