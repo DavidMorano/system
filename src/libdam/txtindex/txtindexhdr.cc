@@ -44,8 +44,9 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<endian.h>
 #include	<mkmagic.h>
 #include	<hasx.h>
@@ -88,7 +89,7 @@ enum his {
 	hi_minwlen,
 	hi_maxwlen,
 	hi_overlast
-} ;
+} ; /* end enum (his) */
 
 
 /* forward references */
