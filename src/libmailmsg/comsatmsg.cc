@@ -60,7 +60,10 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<sbuf.h>
 #include	<strn.h>
@@ -98,7 +101,7 @@ namespace {
 	int		maxpathlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -128,7 +131,7 @@ int comsatmsg_start(comsatmsg *op) noex {
 	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine */
 
 int comsatmsg_finish(comsatmsg *op) noex {
 	int		rs = SR_FAULT ;
@@ -141,7 +144,7 @@ int comsatmsg_finish(comsatmsg *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine */
 
 int comsatmsg_wr(comsatmsg *op,cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
@@ -183,7 +186,7 @@ int comsatmsg_wr(comsatmsg *op,cchar *mbuf,int mlen) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine (comsatmsg_wr) */
 
 int comsatmsg_rd(comsatmsg *op,char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
@@ -203,23 +206,21 @@ int comsatmsg_rd(comsatmsg *op,char *mbuf,int mlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (comsatmsg_rd) */
+} /* end subroutine (comsatmsg_rd) */
 
 
 /* private subroutines */
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	if ((rs = getbufsize(bufsize_un)) >= 0) {
 	    usernamelen = rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
 		maxpathlen = rs ;
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 int comsatmsg::rd(char *rdbuf,int rdlen) noex {
 	return comsatmsg_rd(this,rdbuf,rdlen) ;
@@ -233,7 +234,7 @@ void comsatmsg::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("comsatmsg",rs,"fini-finish") ;
 	}
-}
+} /* end method (comsatmsg::dtor) */
 
 comsatmsg_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -248,7 +249,6 @@ comsatmsg_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (comsatmsg_co::operator) */
+} /* end method (comsatmsg_co::operator) */
 
 
