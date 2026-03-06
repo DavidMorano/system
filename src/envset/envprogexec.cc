@@ -1,15 +1,14 @@
 /* envprogexec SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* progexec the execution request */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
 #define	CF_DEBUGE	0		/* debug 'u_execve(2)' */
 #define	CF_FANCYSHUN	1		/* put fancy shell-under in environ */
-
 
 /* revision history:
 
@@ -26,22 +25,30 @@
 
 /*******************************************************************************
 
+  	Name:
+  	envprogexec
+
+	Description:
 	This subroutine performs an |exec(2)| on the given program
 	with its environment and arguments.
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<buffer.h>
 #include	<hasx.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
@@ -50,9 +57,7 @@
 
 /* local defines */
 
-#ifndef	elementsof
-#define	elementsof(a)	(sizeof(a) / sizeof((a)[0]))
-#endif
+#define	PI		proginfo
 
 #ifndef	DIGBUFLEN
 #define	DIGBUFLEN	40		/* can hold int128_t in decimal */
@@ -63,26 +68,6 @@
 
 
 /* external subroutines */
-
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snshellunder(char *,int,pid_t,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	ctdecl(char *,int,long) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strnnlen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -104,10 +89,10 @@ struct intprog {
 
 /* exported subroutines */
 
-int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
-	BUFFER		b ;
+int envprogexec(PI *pip,cchar *progfname,mainv argv,int argr) noex {
+	buffer		b ;
 	vecstr		*elp = &pip->exports ;
-	cint	f_shell = pip->fl.shell ;
+	cint		f_shell = pip->fl.shell ;
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	int		ai = 0 ;
@@ -117,14 +102,14 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 	int		start = 10 ;
 	int		f_m = FALSE ;
 	int		f_sa = FALSE ;
-	const char	**av = NULL ;
-	const char	**ev = NULL ;
-	const char	*abuf = NULL ;
-	const char	*cp ;
+	cchar	**av = nullptr ;
+	cchar	**ev = nullptr ;
+	cchar	*abuf = nullptr ;
+	cchar	*cp ;
 
 /* sanity check */
 
-	if (progfname == NULL) return SR_FAULT ;
+	if (progfname == nullptr) return SR_FAULT ;
 	if (progfname[0] == '\0') return SR_INVALID ;
 
 /* continue */
@@ -135,7 +120,7 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 	    debugprintf("progexec: f_shell=%u\n",pip->fl.shell) ;
 	    debugprintf("progexec: f_progdash=%u\n",pip->fl.progdash) ;
 	    debugprintf("progexec: argr=%d\n",argr) ;
-	    for (i = 0 ; argv[i] != NULL ; i += 1)
+	    for (i = 0 ; argv[i] != nullptr ; i += 1)
 	        debugprintf("progexec: arg[%u]=>%s<\n",i,argv[i]) ;
 	}
 #endif /* CF_DEBUG */
@@ -153,7 +138,7 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 #endif /* CF_FANCYSHUN */
 
 	if (rs >= 0) {
-	    size = (argr + 2) * sizeof(const char *) ;
+	    size = (argr + 2) * sizeof(cchar *) ;
 	    if ((rs = uc_malloc(size,&av)) >= 0) {
 
 /* should we prefix the minus thing? */
@@ -164,10 +149,10 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 /* setup the zeroth argument */
 
 	        si = 0 ;
-	        cp = NULL ;
+	        cp = nullptr ;
 	        cl = -1 ;
 	        if (f_shell) {
-	            f_sa = TRUE ;
+	            f_sa = true ;
 	        } else {
 	            if (argr > 0) {
 	                cp = argv[0] ;
@@ -175,14 +160,16 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 	                si = 1 ;
 	                argr -= 1 ;
 	                if (cp[0] != '\0') {
-	                    if (hasonlyplusminus(cp,-1)) {
-	                        f_sa = TRUE ;
-	                        f_m = f_m || hasonlyminus(cp,cl) ;
+	                    if (hasonlypm(cp,-1)) {
+	                        f_sa = true ;
+	                        f_m = f_m || hasonlymi(cp,cl) ;
 	                    }
-	                } else
-	                    f_sa = TRUE ;
-	            } else
-	                f_sa = TRUE ;
+	                } else {
+	                    f_sa = true ;
+			}
+	            } else {
+	                f_sa = true ;
+		    }
 	        } /* end if */
 
 	        if (f_sa) {
@@ -201,7 +188,7 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 	                    buffer_get(&b,&abuf) ;
 	                    av[ai++] = abuf ;
 	                } /* end if */
-	            } else if (cp != NULL) {
+	            } else if (cp != nullptr) {
 	                av[ai++] = cp ;
 	            } /* end if */
 
@@ -209,7 +196,7 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 
 	            if (rs >= 0) {
 	                for (i = si ; argr > 0 ; i += 1) {
-	                    if (argv[i] == NULL) break ;
+	                    if (argv[i] == nullptr) break ;
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(3))
 	                        debugprintf("progexec: arg[%u]=>%s<\n",
@@ -218,11 +205,11 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 	                    argr -= 1 ;
 	                    av[ai++] = argv[i] ;
 	                } /* end for */
-	                av[ai] = NULL ;
+	                av[ai] = nullptr ;
 	            } /* end if (ok) */
 
 	            if (rs >= 0) {
-	                const char	*pfn = progfname ;
+	                cchar	*pfn = progfname ;
 	                char	tmpfname[MAXPATHLEN + 1] ;
 	                if (progfname[0] != '/') {
 	                    if ((rs = proginfo_pwd(pip)) >= 0) {
@@ -244,7 +231,7 @@ int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(3)) {
 	                    int	i ;
-	                    for (i = 0 ; av[i] != NULL ; i += 1) {
+	                    for (i = 0 ; av[i] != nullptr ; i += 1) {
 	                        debugprintf("progexec: av[%u]=>%s<\n",
 	                            i,av[i]) ;
 	                    }
