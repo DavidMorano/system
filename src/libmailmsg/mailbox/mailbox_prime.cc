@@ -272,6 +272,8 @@ constexpr bool		f_readto = CF_READTO ;
 
 /* exported variables */
 
+const mailboxms 	mailboxm ;
+
 
 /* exported subroutines */
 
