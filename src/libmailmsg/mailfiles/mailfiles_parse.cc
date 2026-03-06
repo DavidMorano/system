@@ -49,8 +49,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strbrk(3c)| */
-#include	<usystem.h>
-#include	<cfdec.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<strx.h>
 #include	<localmisc.h>
 
