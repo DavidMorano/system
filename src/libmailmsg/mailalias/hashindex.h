@@ -33,7 +33,7 @@ static inline int hashindex(uint i,int n) noex {
 	int		hi = MODP2(i,n) ;
 	if (hi == 0) hi = 1 ;
 	return hi ;
-}
+} /* end subroutine (hashindex) */
 
 EXTERNC_end
 
