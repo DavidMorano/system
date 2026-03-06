@@ -1,4 +1,4 @@
-# MAKEFILES (mailalias)
+# MAKEFILE (mailalias)
 
 T= mailalias
 
