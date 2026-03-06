@@ -35,14 +35,14 @@ struct comsatmsg_head {
 	char		*username ;
 	char		*fname ;
 	ulong		offset ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum comsatmsgmems {
     	comsatmsgmem_start,
 	comsatmsgmem_finish,
 	comsatmsgmem_overlast
-} ;
+} ; /* end enum (comsatmsgmems) */
 struct comsatmsg ;
 struct comsatmsg_co {
 	comsatmsg	*op = nullptr ;
