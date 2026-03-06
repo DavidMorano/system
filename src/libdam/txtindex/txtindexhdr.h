@@ -49,7 +49,7 @@ struct txtindexhdr_head {
 	uint		minwlen ;	/* minimum word length */
 	uint		maxwlen ;	/* maximum word length */
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 typedef	TXTINDEXHDR	txtindexhdr ;
 
