@@ -36,12 +36,12 @@ struct mxalias_cursor {
 	uint		magic ;
 	int		nvals ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct mxalias_flags {
 	uint		hold:1 ;
 	uint		cursoracc:1 ;
-} ;
+} ; /* end struct */
 
 struct mxalias_head {
 	cchar		*pr ;
@@ -56,7 +56,7 @@ struct mxalias_head {
 	uint		magic ;
 	int		ncursors ;
 	int		count ;
-} ;
+} ; /* end struct */
 
 typedef	MXALIAS		mxalias ;
 typedef	MXALIAS_FL	mxalias_fl ;
