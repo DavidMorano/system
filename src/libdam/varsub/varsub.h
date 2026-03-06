@@ -38,20 +38,21 @@
 #define	VARSUB_MAGIC		0x91827364
 
 enum varsubos {
-    	varsubo_noblank,
-    	varsubo_badnokey,
-    	varsubo_brace,
-    	varsubo_paren,
-    	varsubo_overlast,
-} ;
+    	varsubo_blank,		/* default, substitute blank */
+    	varsubo_noblank,	/* substitute the key on failure */
+    	varsubo_badnokey,	/* fail out on failure */
+	varsubo_brace,		/* substitute on braces */
+    	varsubo_paren,		/* substitute on parentheses */
+    	varsubo_overlast	
+} ; /* end enum (varsubos) */
 
 #ifdef	__cplusplus
 struct varsubms {
-    	static cint	blank ;		/* default, substitute blank */
-    	static cint	noblank ;	/* substitute the key on failure */
-    	static cint	badnokey ;	/* fail out on failure */
-    	static cint	brace ;		/* substitute on braces */
-    	static cint	paren ;		/* substitute on parentheses */
+    	constexpr static cint	blank 		= (1 << varsubo_blank) ;
+    	constexpr static cint	noblank 	= (1 << varsubo_noblank) ;
+    	constexpr static cint	badnokey 	= (1 << varsubo_badnokey) ;
+    	constexpr static cint	brace 		= (1 << varsubo_brace) ;
+    	constexpr static cint	paren 		= (1 << varsubo_paren) ;
 } ;
 #endif /* __cplusplus */
 
@@ -68,11 +69,11 @@ struct varsub_flags {
 	uint		brace:1 ;
 	uint		paren:1 ;
 	uint		sorted:1 ;
-} ;
+} ; /* end struct */
 
 struct varsub_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct varsub_head {
 	vechand		*slp ;
@@ -81,8 +82,7 @@ struct varsub_head {
 	int		n ;		/* current allocated length */
 	int		i ;		/* maximum length used */
 	int		badline ;
-} ;
-
+} ; /* end struct */
 
 typedef VARSUB		varsub ;
 typedef	VARSUB_FL	varsub_fl ;
@@ -110,9 +110,7 @@ extern int	varsub_finish(varsub *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 extern const varsubms	varsubm ;
-
 #endif /* __cplusplus */
 
 
