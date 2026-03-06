@@ -39,17 +39,20 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
-#include	<climits>		/* for |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstdlib>
 #include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<climits>		/* for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<stdfnames.h>		/* |STDFNIN| */
 #include	<bfile.h>
 #include	<field.h>
 #include	<fieldterms.h>
-#include	<char.h>
 #include	<rmx.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"varsub.h"
@@ -82,7 +85,7 @@ namespace {
 	} ;
 	int operator () (cchar *) noex ;
     } ; /* end struct (sub_loadfile) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -112,18 +115,18 @@ int varsub_loadfile(varsub *op,cchar *fn) noex {
 	if (op) {
 	     static cint	rst = mkterms() ;
 	     if ((rs = rst) >= 0) {
-	        if (char *lbuf{} ; (rs = malloc_mp(&lbuf)) >= 0) {
+	        if (char *lbuf ; (rs = lm_mp(&lbuf)) >= 0) {
 	            cint	llen = rs ;
-	            if (char *abuf{} ; (rs = malloc_mp(&abuf)) >= 0) {
+	            if (char *abuf{} ; (rs = lm_mp(&abuf)) >= 0) {
 		        sub_loadfile	lo(op,lbuf,llen,abuf,rs) ;
 		        {
 		            rs = lo(fn) ;
 		            c = rs ;
 		        }
-		        rs1 = uc_free(abuf) ;
+		        rs1 = lm_free(abuf) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
-	            rs1 = uc_free(lbuf) ;
+	            rs1 = lm_free(lbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (mkterms) */
