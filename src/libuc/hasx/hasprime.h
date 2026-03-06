@@ -104,8 +104,6 @@ extern bool hasdoublewhite(cchar *,int) noex ;
 extern bool hascdpath(cchar *,int) noex ;
 extern bool hasmacro(cchar *,int) noex ;
 extern bool hasvalidmagic(cchar *,int,cchar *) noex ;
-extern bool hasmealone(cchar *,int) noex ;
-extern bool hasinet4addrstr(cchar *,int) noex ;
 
 EXTERNC_end
 
