@@ -67,10 +67,14 @@
 #include	<cstdlib>
 #include	<cstring>		/* |memcpy(3c)| */
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uinet.h>
+#include	<uclibmem.h>
+#include	<ucfuncodes.h>		/* |FM_{x}(3uc)| */
 #include	<getbufsize.h>
 #include	<getprotofamily.h>
-#include	<mallocxx.h>
 #include	<dialtcp.h>
 #include	<hostaddr.h>
 #include	<sockaddress.h>
@@ -82,7 +86,9 @@
 
 #include	"nettime.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -117,6 +123,11 @@ import libutil ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_reade(int,void *,int,int,int) noex ;
+    extern int uc_recvfrome(int,void *,int,int,void *,int *,int,int) noex ;
+}
 
 
 /* external variables */
@@ -461,8 +472,9 @@ static int nettime_udptryone(UA *uap,char *tsbuf,AI *aip) noex {
 
 static int nettime_udptryoner(UA *uap,char *tsbuf,AI *aip,int fd) noex {
 	int		rs ;
+	int		rs1 ;
 	int		fret = false ;
-	if (char *nbuf{} ; (rs = malloc_ml(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_ml(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    int		to = uap->to ;
 	    sockaddress	from ;
@@ -507,7 +519,8 @@ static int nettime_udptryoner(UA *uap,char *tsbuf,AI *aip,int fd) noex {
 	        gettimeofday(uap->nep,nullptr) ;
 	        memcpy(tsbuf,nbuf,nlen) ;
 	    }
-	    rs = rsfree(rs,nbuf) ;
+	    rs1 = lm_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? fret : rs ;
 }
@@ -612,7 +625,8 @@ static int isaddrsame(cvoid *addr1,cvoid *addr2) noex {
 	int		af1{} ;
 	int		af2{} ;
 	int		rs = SR_OK ;
-	int		f = false ;
+	int		rs1 ;
+	int		f = false ; /* return-value */
 	if (rs >= 0) {
 	    rs = sockaddress_getaf(sa1p) ;
 	    af1 = rs ;
@@ -634,7 +648,7 @@ static int isaddrsame(cvoid *addr1,cvoid *addr2) noex {
 		int	sz ;
 		cint	abuflen = (var.maxpathlen + ABEXTRA) ;
 		sz = ((abuflen + 1) * 2) ;
-		if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+		if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 		    {
 		        char	*addrbuf1 = (a + ((abuflen + 1) * ai++)) ;
 		        char	*addrbuf2 = (a + ((abuflen + 1) * ai++)) ;
@@ -642,9 +656,10 @@ static int isaddrsame(cvoid *addr1,cvoid *addr2) noex {
 	                sockaddress_getaddr(sa2p,addrbuf2,abuflen) ;
 	                f = (memcmp(addrbuf1,addrbuf2,addrlen) == 0) ;
 		    }
-		    rs = rsfree(rs,a) ;
+		    rs1 = lm_free(a) ;
+	            if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
-	    }
+	    } /* end if (f) */
 	} /* end if (ok) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -657,7 +672,7 @@ static int mkprintaddr(char *printaddr,int printalen,SOCKADDR *ssap) noex {
 	int		rs ;
 	int		rs1 ;
 	int		addrlen = 0 ;
-	if (char *addrbuf{} ; (rs = uc_malloc((abuflen+1),&addrbuf)) >= 0) {
+	if (char *addrbuf ; (rs = lm_mall((abuflen+1),&addrbuf)) >= 0) {
 	    sockaddress	*sap = (sockaddress *) ssap ;
 	    uint	af ;
 	    uint	port ;
@@ -710,7 +725,8 @@ static int mkprintaddr(char *printaddr,int printalen,SOCKADDR *ssap) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
 	    } /* end if (ok) */
-	    rs = rsfree(rs,addrbuf) ;
+	    rs1 = lm_free(addrbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? addrlen : rs ;
 }
@@ -758,7 +774,7 @@ static int mkprintscope(char *printaddr,int printalen,SOCKADDR *ssap) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	}
 	return rs ;
