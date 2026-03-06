@@ -68,32 +68,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isFailOpen(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 extern int	progout_begin(PROGINFO *,cchar *) ;
 extern int	progout_printf(PROGINFO *,cchar *,...) ;
 extern int	progout_end(PROGINFO *) ;
-
-extern int	getournetname(char *,int,cchar *) ;
-extern int	authfile(char *,char *,cchar *) ;
-extern int	onckeyalready(const char *) ;
-extern int	onckeygetset(cchar *,const char *) ;
-extern int	havenis() ;
-extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) ;
@@ -102,12 +82,6 @@ extern int	debugclose() ;
 extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
