@@ -78,11 +78,9 @@
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<mkchar.h>
 #include	<char.h>
-#include	<ischarx.h>
 #include	<localmisc.h>		/* |UC(3dam)| */
 
 #include	"hasprime.h"
-#include	"hasall.h"		/* |hasalldig(3uc)| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -128,7 +126,7 @@ bool hasempty(cchar *sp,int sl) noex {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	    if ((! f) && *sp) {
+	    if ((! f) && sl && *sp) {
 	        f = (*sp == '\n') ;
 	    } /* end if */
 	} /* end if (non-null) */
