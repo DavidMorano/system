@@ -44,25 +44,25 @@ struct txtindexes_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct txtindexes_cursor {
 	uint		*taglist ;
 	uint		taglen ;
 	uint		i ;
-} ;
+} ; /* end struct */
 
 struct txtindexes_tagitem {
 	uint		recoff ;
 	uint		reclen ;
-} ;
+} ; /* end struct */
 
 struct txtindexes_file {
 	char		*mapdata ;
 	time_t		ti_mod ;
 	time_t		ti_map ;
 	size_t		mapsize ;
-} ;
+} ; /* end struct */
 
 struct txtindexes_mile {
 	cchar		*sdn ;
@@ -72,7 +72,7 @@ struct txtindexes_mile {
 	uint		*lists ;	/* mapped lists */
 	uint		*ertab ;	/* eigen-record table */
 	uint		(*eitab)[3] ;	/* eigen-index table */
-} ;
+} ; /* end struct */
 
 /* returned information */
 struct txtindexes_information {
@@ -94,7 +94,7 @@ struct txtindexes_head {
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magic ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	TXTINDEXES		txtindexes ;
 typedef	TXTINDEXES_OBJ		txtindexes_obj ;
