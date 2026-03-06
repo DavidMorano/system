@@ -30,7 +30,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
@@ -62,8 +61,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -116,7 +113,7 @@ typedef txtindex_calls *	callsp ;
 /* forward references */
 
 template<typename ... Args>
-static int txtindex_ctor(txtindex *op,Args ... args) noex {
+local int txtindex_ctor(txtindex *op,Args ... args) noex {
 	TXTINDEX	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -136,10 +133,9 @@ static int txtindex_ctor(txtindex *op,Args ... args) noex {
 	    } /* end new (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (txtindex_ctor) */
+} /* end subroutine (txtindex_ctor) */
 
-static int txtindex_dtor(txtindex *op) noex {
+local int txtindex_dtor(txtindex *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -154,22 +150,20 @@ static int txtindex_dtor(txtindex *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (txtindex_dtor) */
+} /* end subroutine (txtindex_dtor) */
 
 template<typename ... Args>
-static inline int txtindex_magic(txtindex *op,Args ... args) noex {
+local inline int txtindex_magic(txtindex *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == TXTINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (txtindex_magic) */
+} /* end subroutine (txtindex_magic) */
 
-static int	txtindex_objloadbegin(txtindex *,cchar *,cchar *) noex ;
-static int	txtindex_objloadend(txtindex *) noex ;
-static int	txtindex_loadcalls(txtindex *,vecstr *) noex ;
+local int	txtindex_objloadbegin(txtindex *,cchar *,cchar *) noex ;
+local int	txtindex_objloadend(txtindex *) noex ;
+local int	txtindex_loadcalls(txtindex *,vecstr *) noex ;
 
 static bool	isrequired(int) noex ;
 
@@ -435,7 +429,7 @@ int txtindex_curenum(txtindex *op,TI_CUR *curp,TI_TAG *tagp,
 
 /* private subroutines */
 
-static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
+local int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -482,7 +476,7 @@ static int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 }
 /* end subroutine (txtindex_objloadbegin) */
 
-static int txtindex_objloadend(txtindex *op) noex {
+local int txtindex_objloadend(txtindex *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
@@ -499,7 +493,7 @@ static int txtindex_objloadend(txtindex *op) noex {
 }
 /* end subroutine (txtindex_objloadend) */
 
-static int txtindex_loadcalls(txtindex *op,vecstr *slp) noex {
+local int txtindex_loadcalls(txtindex *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
 	txtindex_calls	*callp = callsp(op->callp) ;
 	cint		rsn = SR_NOTFOUND ;
