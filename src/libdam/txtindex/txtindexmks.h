@@ -42,7 +42,7 @@ struct txtindexmks_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		dummy ;
-} ;
+} ; /* end struct */
 
 struct txtindexmks_patient {
 	cchar		*sdn ;
@@ -50,12 +50,12 @@ struct txtindexmks_patient {
 	uint		tablen ;	/* hash-table length */
 	uint		minwlen ;	/* minimum key-word length */
 	uint		maxwlen ;	/* maximum key-word length */
-} ;
+} ; /* end struct */
 
 struct txtindexmks_keyer {
 	cchar		*kp ;
 	int		kl ;
-} ;
+} ; /* end struct */
 
 struct txtindexmks_tagitems {
 	TXTINDEXMKS_KEY	*keys ;
@@ -63,13 +63,13 @@ struct txtindexmks_tagitems {
 	uint		recoff ;
 	uint		reclen ;
 	uint		nkeys ;
-} ;
+} ; /* end struct */
 
 struct txtindexmks_titan {
 	uint		nkeys ;		/* total number of keys */
 	uint		ntags ;		/* total number of tags */
 	uint		maxtags ;	/* maximum tags per list */
-} ;
+} ; /* end struct */
 
 struct txtindexmks_flags {
 	uint		tagopen:1 ;
@@ -78,7 +78,7 @@ struct txtindexmks_flags {
 	uint		inprogress:1 ;
 	uint		created:1 ;
 	uint		abort:1 ;
-} ;
+} ; /* end struct */
 
 struct txtindexmks_head {
 	cchar 		*dbname ;
@@ -98,7 +98,7 @@ struct txtindexmks_head {
 	int		nfd ;
 	int		clists ;
 	mode_t		om ;
-} ;
+} ; /* end struct */
 
 typedef	TXTINDEXMKS		txtindexmks ;
 typedef	TXTINDEXMKS_FL		txtindexmks_fl ;
