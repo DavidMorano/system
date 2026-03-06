@@ -68,7 +68,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -89,12 +88,12 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int mailaddrquote_ctor(MAQ *op,Args ... args) noex {
     	MAQ		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->bsp = new(nothrow) bufstr) != np) {
+	    if ((op->bsp = new(nothrow) bufstr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-bufstr) */
 	} /* end if (non-null) */
@@ -104,9 +103,9 @@ static int mailaddrquote_ctor(MAQ *op,Args ... args) noex {
 
 static int mailaddrquote_dtor(MAQ *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->bsp) {
+	    if (op->bsp) ylikely {
 		delete op->bsp ;
 		op->bsp = nullptr ;
 	    }
@@ -118,7 +117,7 @@ static int mailaddrquote_dtor(MAQ *op) noex {
 template<typename ... Args>
 static inline int mailaddrquote_magic(MAQ *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MAILADDRQUOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
