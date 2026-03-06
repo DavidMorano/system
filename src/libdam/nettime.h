@@ -29,7 +29,7 @@ struct nettime_head {
 	TIMEVAL		off ;		/* offset between net and us */
 	int		proto ;
 	int		pf ;
-} ;
+} ; /* end struct */
 
 typedef	NETTIME		nettime ;
 
