@@ -1,4 +1,4 @@
-# MAKEFILES (txtindex)
+# MAKEFILE (txtindex)
 
 T= txtindex
 
@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= txtindex_main.o txtindexmk.o
+OBJ0= txtindex_prime.o txtindexmk.o
 OBJ1= txtindexes.o txtindexmks.o
 OBJ2= 
 OBJ3= 
@@ -51,7 +51,7 @@ PBJ6=
 OBJ7=
 
 OBJA= obj0.o obj1.o
-#OBJB= obj3.o obj4.o obj5.o
+OBJB=
 
 OBJ= obja.o
 
@@ -59,7 +59,6 @@ OBJ= obja.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -72,7 +71,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -85,6 +84,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -119,25 +121,25 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj6.o:			$(OBJ6)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7)
@@ -150,7 +152,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
-txtindex_main.o:	txtindex_main.cc			$(INCS)
+txtindex_prime.o:	txtindex_prime.cc			$(INCS)
 txtindexes.o:		txtindexes.cc txtindexes.h		$(INCS)
 txtindexmk.o:		txtindexmk.cc txtindexmk.h		$(INCS)
 txtindexmks.o:		txtindexmks.cc txtindexmks.h		$(INCS)
