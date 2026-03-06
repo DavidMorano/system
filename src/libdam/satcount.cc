@@ -9,9 +9,9 @@
 /* revision history:
 
 	= 2000-03-15, David A­D­ Morano
-	This object module was created for Levo research.  It is a
-	value predictor.  This is not coded as hardware.  It is
-	like Atom analysis subroutines!
+	This subroutine was created for Levo research.  This
+	subroutine is a helper function for several simulated
+	branch predictors.
 
 */
 
@@ -23,23 +23,30 @@
 	satcount
 
 	Description:
-	This subroutine performs a saturdated counter operation.
+	This subroutine performs a saturated counter operation.
 	This subroutine is special to the Levo branch-predictor
 	siumlators.  If you find other uses for this, more power
 	to you.
+
+	Synopsis:
+	uint satcount(uint v,uint n,int f_up) noex
+
+	Arguments:
+	v		given value to evaluate
+	n		number of states
+	f_up		boolean indicating directio to operate towards
+
+	Returns:
+	-		the resulting saturated value
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>
-
-#pragma		GCC dependency		"mod/libutil.ccm"
-
-import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
