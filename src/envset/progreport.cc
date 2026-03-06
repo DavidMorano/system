@@ -142,7 +142,7 @@ static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 	const time_t	dt = pip->daytime ;
 	int		rs ;
 
-	if ((rs = tmtime_localtime(&mt,dt)) >= 0) {
+	if ((rs = tmtime_timelocal(&mt,dt)) >= 0) {
 	    const int	tlen = TIMEBUFLEN ;
 	    cchar	*fmt = "r%y%m%d%H%M%S" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
