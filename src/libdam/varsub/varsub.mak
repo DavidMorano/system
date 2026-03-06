@@ -1,4 +1,4 @@
-# MAKEFILES (varsub)
+# MAKEFILE (varsub)
 
 T= varsub
 
@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0_VARSUB= varsub_main.o
+OBJ0_VARSUB= varsub_prime.o
 OBJ1_VARSUB= varsub_loadfile.o
 OBJ2_VARSUB= varsub_addvec.o
 OBJ3_VARSUB=
@@ -67,7 +67,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -81,6 +81,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -92,6 +95,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ_VARSUB)
@@ -111,26 +117,26 @@ control:
 
 
 obj0_varsub.o:		$(OBJ0_VARSUB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_varsub.o:		$(OBJ1_VARSUB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_varsub.o:		$(OBJ2_VARSUB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_varsub.o:		$(OBJ3_VARSUB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja_varsub.o:		$(OBJA_VARSUB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb_varsub.o:		$(OBJB_VARSUB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-varsub_main.o:		varsub_main.cc		$(INCS)
+varsub_prime.o:		varsub_prime.cc		$(INCS)
 varsub_addvec.o:	varsub_addvec.cc	$(INCS)
 varsub_loadfile.o:	varsub_loadfile.cc	$(INCS)
 varsub_extras.o:	varsub_extras.cc	$(INCS)
