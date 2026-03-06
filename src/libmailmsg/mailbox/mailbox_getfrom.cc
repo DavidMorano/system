@@ -44,12 +44,13 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<bfile.h>
+#include	<mkx.h>
 #include	<mailmsg.h>
 #include	<mailmsghdrs.h>
-#include	<mkx.h>
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -81,8 +82,8 @@ extern "C" {
 
 /* forward references */
 
-static int	mailmsg_fromer(mailmsg *,char *,int) noex ;
-static bool	isNoMsg(int) noex ;
+local int	mailmsg_fromer(mailmsg *,char *,int) noex ;
+local bool	isNoMsg(int) noex ;
 
 
 /* local variables */
@@ -145,7 +146,7 @@ int mailbox_getfrom(mailbox *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
 
 /* local subroutines */
 
-static int mailmsg_fromer(mailmsg *mmp,char *rbuf,int rlen) noex {
+local int mailmsg_fromer(mailmsg *mmp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		vl = 0 ;
 	int		len = 0 ; /* return-value */
@@ -180,7 +181,7 @@ static int mailmsg_fromer(mailmsg *mmp,char *rbuf,int rlen) noex {
 }
 /* end subroutine (mailmsg_fromer) */
 
-static bool isNoMsg(int rs) noex {
+local bool isNoMsg(int rs) noex {
 	return isOneOf(rsnomsg,rs) ;
 }
 /* end subroutine (isNoMsg) */
