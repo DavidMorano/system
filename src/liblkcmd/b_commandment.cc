@@ -1,4 +1,4 @@
-/* b_commandment SUPPORT */
+/* b_commandment SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -95,28 +95,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sicasesub(const char *,int,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	vecstr_adds(vecstr *,const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-extern int	isStrEmpty(cchar *,int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -126,10 +104,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -1680,9 +1654,9 @@ static int locinfo_tmtime(LOCINFO *lip)
 	    lip->fl.tmtime = TRUE ;
 	    if (pip->daytime == 0) pip->daytime = time(NULL) ;
 	    if (lip->fl.gmt) {
-	        rs = tmtime_gmtime(&lip->tm,pip->daytime) ;
+	        rs = tmtime_timegm(&lip->tm,pip->daytime) ;
 	    } else {
-	        rs = tmtime_localtime(&lip->tm,pip->daytime) ;
+	        rs = tmtime_timelocal(&lip->tm,pip->daytime) ;
 	    }
 	}
 
