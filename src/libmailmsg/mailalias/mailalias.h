@@ -22,10 +22,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<usystem.h>
+#include	<hmatch.h>
 #include	<vecstr.h>
 #include	<ids.h>
-#include	<localmisc.h>
 
 
 #define	MAILALIAS		struct mailalias_head
@@ -48,7 +47,7 @@
 struct mailalias_cursor {
 	uint		magic ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct mailalias_information {
 	time_t		wtime ;		/* time DB written */
@@ -58,14 +57,14 @@ struct mailalias_information {
 	uint		encoding ;
 	uint		type ;
 	uint		collisions ;
-} ;
+} ; /* end struct */
 
 struct mailalias_finfo {
 	ino_t		ino ;
 	time_t		mtime ;
 	size_t		fsize ;
 	dev_t		dev ;
-} ;
+} ; /* end struct */
 
 struct mailalias_flags {
 	uint		remote:1 ;
@@ -78,7 +77,7 @@ struct mailalias_flags {
 	uint		lockedread:1 ;
 	uint		lockedwrite:1 ;
 	uint		needcreate:1 ;
-} ;
+} ; /* end struct */
 
 struct mailalias_head {
 	mainv		aprofile ;
@@ -115,7 +114,7 @@ struct mailalias_head {
 	int		oflags, otype ;
 	int		ropts ;
 	mode_t		operm ;
-} ;
+} ; /* end struct */
 
 typedef	MAILALIAS	mailalias ;
 typedef	MAILALIAS_INFO	mailalias_info ;
