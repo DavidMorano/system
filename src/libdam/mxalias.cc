@@ -36,17 +36,19 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
-#include	<mallocxx.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
@@ -64,7 +66,9 @@
 
 #include	"mxalias.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -103,7 +107,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -125,7 +128,7 @@ namespace {
 	int		maxlinelen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 struct mxalias_file {
 	cchar		*fname ;
@@ -133,17 +136,17 @@ struct mxalias_file {
 	time_t		timod ;
 	dev_t		dev ;
 	size_t		fsize ;
-} ;
+} ; /* end struct */
 
 struct bufdesc {
-	cchar		*a ;		/* memory allocation */
+	char		*a ;		/* memory allocation */
 	char		*lbuf ;
 	char		*fbuf ;
 	char		*kbuf ;
 	int		llen ;
 	int		flen ;
 	int		klen ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -151,13 +154,13 @@ struct bufdesc {
 template<typename ... Args>
 static int mxalias_ctor(mxalias *op,Args ... args) noex {
     	MXALIAS		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->flp = new(nothrow) vecobj) != np) {
-	        if ((op->elp = new(nothrow) keyvals) != np) {
+	    if ((op->flp = new(nothrow) vecobj) != np) ylikely {
+	        if ((op->elp = new(nothrow) keyvals) != np) ylikely {
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
@@ -172,13 +175,13 @@ static int mxalias_ctor(mxalias *op,Args ... args) noex {
 
 static int mxalias_dtor(mxalias *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->elp) {
+	    if (op->elp) ylikely {
 		delete op->elp ;
 		op->elp = nullptr ;
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
 	    }
@@ -190,7 +193,7 @@ static int mxalias_dtor(mxalias *op) noex {
 template<typename ... Args>
 static inline int mxalias_magic(mxalias *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MXALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -203,7 +206,7 @@ static int	mxalias_mkuserfname(MA *,char *) noex ;
 static int	mxalias_curlooks(MA *,MA_CUR *,cc *,int) noex ;
 static int	mxalias_filesadd(MA *,time_t) noex ;
 static int	mxalias_fileadd(MA *,cchar *) noex ;
-static int	mxalias_filereg(MA *,USTAT *,cchar *) noex ;
+static int	mxalias_filereg(MA *,ustat *,cchar *) noex ;
 static int	mxalias_fileparse(MA *,int) noex ;
 static int	mxalias_fileparser(MA *,int,bfile *) noex ;
 static int	mxalias_fileparseln(MA *,int,BD *,cchar *,int) noex ;
@@ -227,7 +230,7 @@ static int	mxalias_filealready(MA *,dev_t,ino_t) noex ;
 static int	mxalias_filechecks(MA *,time_t) noex ;
 #endif
 
-static int	file_start(MA_FI *,USTAT *,cchar *) noex ;
+static int	file_start(MA_FI *,ustat *,cchar *) noex ;
 static int	file_finish(MA_FI *) noex ;
 
 static int	bufdesc_start(BD *,int) noex ;
@@ -305,7 +308,7 @@ int mxalias_open(MA *op,cchar *pr,cchar *username) noex {
 	if ((rs = mxalias_ctor(op,pr,username)) >= 0) {
 	    static cint		rsv = var ;
 	    if ((rs = rsv) >= 0) {
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) {
 	            op->pr = cp ;
 	            if ((rs = mxalias_username(op,username)) >= 0) {
 		        cint	vn = 5 ;
@@ -425,12 +428,12 @@ int mxalias_curend(MA *op,MA_CUR *curp) noex {
 	    curp->i = -1 ;
 	    curp->nvals = 0 ;
 	    if (curp->vbuf) {
-	        rs1 = uc_free(curp->vbuf) ;
+	        rs1 = lm_free(curp->vbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        curp->vbuf = nullptr ;
 	    }
 	    if (curp->vals) {
-	        rs1 = uc_free(curp->vals) ;
+	        rs1 = lm_free(curp->vals) ;
 	        if (rs >= 0) rs = rs1 ;
 	        curp->vals = nullptr ;
 	    }
@@ -440,7 +443,7 @@ int mxalias_curend(MA *op,MA_CUR *curp) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-	            rs1 = uc_free(curp->kvcp) ;
+	            rs1 = lm_free(curp->kvcp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            curp->kvcp = nullptr ;
 	        }
@@ -463,11 +466,11 @@ int mxalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 		rs = SR_OK ;
 	        if (kvcp == nullptr) {
 	            cint	sz = szof(keyvals_cur) ;
-	            if ((rs = uc_malloc(sz,&kvcp)) >= 0) {
+	            if ((rs = lm_mall(sz,&kvcp)) >= 0) {
 	                curp->kvcp = kvcp ;
 	                rs = keyvals_curbegin(op->elp,kvcp) ;
 	                if (rs < 0) {
-	                    uc_free(kvcp) ;
+	                    lm_free(kvcp) ;
 	                    curp->kvcp = nullptr ;
 	                } /* end if (error-handling) */
 	            } /* end if (memory-allocation) */
@@ -587,7 +590,7 @@ static int mxalias_username(MA *op,cchar *username) noex {
 	if ((username == nullptr) || (username[0] == '\0')) {
 	    username = "-" ;
 	}
-	if (cchar *cp{} ; (rs = uc_mallocstrw(username,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = lm_strw(username,-1,&cp)) >= 0) {
 	    op->username = cp ;
 	}
 	return rs ;
@@ -596,19 +599,20 @@ static int mxalias_username(MA *op,cchar *username) noex {
 
 static int mxalias_userdname(MA *op) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		hl = 0 ;
 	if (op->userdname == nullptr) {
-	    if (char *hbuf{} ; (rs = malloc_mp(&hbuf)) >= 0) {
+	    if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) {
 	        cchar	*un = op->username ;
 		cint	hlen = rs ;
 	        if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
-		    auto mall = uc_mallocstrw ;
 		    hl = rs ;
-	            if (cchar *cp{} ; (rs = mall(hbuf,rs,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = lm_strw(hbuf,rs,&cp)) >= 0) {
 	                op->userdname = cp ;
 		    }
 	        } /* end if (getuserhome) */
-		rs = rsfree(rs,hbuf) ;
+		rs1 = lm_free(hbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
 	    hl = lenstr(op->userdname) ;
@@ -619,10 +623,11 @@ static int mxalias_userdname(MA *op) noex {
 
 static int mxalias_filesadd(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
 	(void) dt ;
 	if_constexpr (f_filesys || f_fileuser) {
-	    if (char *fbuf{} ; (rs = malloc_mp(&fbuf)) >= 0) {
+	    if (char *fbuf ; (rs = lm_mp(&fbuf)) >= 0) {
 	        if_constexpr (f_filesys) {
 	            if (rs >= 0) {
 	                if ((rs = mkpath(fbuf,MXALIAS_SYSDB)) >= 0) {
@@ -639,7 +644,8 @@ static int mxalias_filesadd(MA *op,time_t dt) noex {
 	                }
 	            } /* end if */
 	        } /* end if_constexpr (f_fileuser) */
-	        rs = rsfree(rs,fbuf) ;
+	        rs1 = lm_free(fbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if_constexpr (f_filesys || f_fileuser) */
 	return (rs >= 0) ? c : rs ;
@@ -649,6 +655,7 @@ static int mxalias_filesadd(MA *op,time_t dt) noex {
 /* add a file to the list of files */
 int mxalias_fileadd(MA *op,cchar *atfname) noex {
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = mxalias_magic(op,atfname)) >= 0) {
 	    rs = SR_INVALID ;
@@ -662,7 +669,7 @@ int mxalias_fileadd(MA *op,cchar *atfname) noex {
 	            }
 	        } /* end if (added PWD) */
 	        if (rs >= 0) {
-	            if (USTAT sb ; (rs = u_stat(fn,&sb)) >= 0) {
+	            if (ustat sb ; (rs = u_stat(fn,&sb)) >= 0) {
 		        if (isOurFileType(sb.st_mode)) {
 	                    if ((rs = mxalias_filereg(op,&sb,fn)) >= 0) {
 	                        cint	fi = rs ;
@@ -681,7 +688,8 @@ int mxalias_fileadd(MA *op,cchar *atfname) noex {
 	            } /* end if (our file type) */
 	        } /* end if (ok) */
 		if (tbuf) {
-		    rs = rsfree(rs,tbuf) ;
+		    rs1 = lm_free(tbuf) ;
+		    if (rs >= 0) rs = rs1 ;
 		}
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -689,7 +697,7 @@ int mxalias_fileadd(MA *op,cchar *atfname) noex {
 }
 /* end subroutine (mxalias_fileadd) */
 
-static int mxalias_filereg(MA *op,USTAT *sbp,cchar *fn) noex {
+static int mxalias_filereg(MA *op,ustat *sbp,cchar *fn) noex {
 	int		rs ;
 	int		fi = INT_MAX ;
 	if (MA_FI fe ; (rs = file_start(&fe,sbp,fn)) >= 0) {
@@ -718,7 +726,7 @@ static int mxalias_filechecks(MA *op,time_t dt) noex {
 	for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
 	    MA_FI	*fep = (MA_FI *) vp ;
 	    if (vp) {
-	        if (USTAT sb ; (rs = uc_stat(fep->fname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = uc_stat(fep->fname,&sb)) >= 0) {
 		    if (sb.st_mtime > fep->timod) {
 	        	c_changed += 1 ;
 	        	mxalias_filedump(op,i) ;
@@ -766,7 +774,7 @@ static int mxalias_fileparse(MA *op,int fi) noex {
 	    if (vp) {
 	        bfile	mxfile, *lfp = &mxfile ;
 	        if ((rs = bopen(lfp,fep->fname,"r",0664)) >= 0) {
-	            if (USTAT sb ; (rs = bcontrol(lfp,BC_STAT,&sb)) >= 0) {
+	            if (ustat sb ; (rs = bcontrol(lfp,BC_STAT,&sb)) >= 0) {
 	                if (! S_ISDIR(sb.st_mode)) {
 	                    if (fep->timod < sb.st_mtime) {
 	                        fep->dev = sb.st_dev ;
@@ -963,10 +971,10 @@ static int mxalias_filedels(MA *op) noex {
 
 #if	CF_FILECHECK
 
-static int mxalias_filechanged(MA *op,USTAT *sbp) noex {
+static int mxalias_filechanged(MA *op,ustat *sbp) noex {
     	int		rs = SR_FAULT ;
     	int		f = false ;
-	if (sbp) {
+	if (sbp) ylikely {
 	    f = f || (op->fi.size != sbp->st_size) ;
 	    f = f || (op->fi.timod != sbp->st_mtime) ;
 	    f = f || (op->fi.ino != sbp->st_ino) ;
@@ -981,8 +989,8 @@ static int mxalias_fileold(MA *op,time_t daytime) noex {
 	int		rs1 ;
 	int		f = false ; /* return-value */
 	if ((rs = mxalias_aprofile(op,daytime)) >= 0) {
-	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	        USTAT	sb ;
+	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	        ustat	sb ;
 	        int	i ; /* used-afterwards */
 	        for (i = 0 ; op->aprofile[i] != nullptr ; i += 1) {
 	            cchar	*cp = charp(op->aprofile[i]) ;
@@ -994,7 +1002,8 @@ static int mxalias_fileold(MA *op,time_t daytime) noex {
 	            if ((rs1 >= 0) && (sb.st_mtime > op->fi.timod)) break ;
 	        } /* end for */
 	        f = (op->aprofile[i] != nullptr) ;
-	    	rs = rsfree(rs,tbuf) ;
+	    	rs1 = lm_free(tbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (mxalias_aprofile) */
 	return (rs >= 0) ? f : rs ;
@@ -1058,10 +1067,10 @@ static int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
 static int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ; /* return-value */
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = vlp->count) > 0) {
 	        int	sz = (rs + 1) * szof(char **) ;
-	        if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	        if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
 	            cchar	*cp{} ;
 	            curp->vals = charpp(p) ; /* store allocation here */
 	            sz = 1 ;
@@ -1070,7 +1079,7 @@ static int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	                    sz += (lenstr(cp) + 1) ;
 		        }
 	            } /* end for */
-	            if ((rs = uc_malloc(sz,&p)) >= 0) {
+	            if ((rs = lm_mall(sz,&p)) >= 0) {
 	                char	*bp = charp(p) ;
 	                curp->vbuf = charp(p) ;
 	                *bp++ = '\0' ; /* <- is this an ELF str-tab thing? */
@@ -1084,7 +1093,7 @@ static int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	                curp->nvals = c ;
 	            } /* end if (memory-allocation) */
 	            if (rs < 0) {
-	                uc_free(curp->vals) ;
+	                lm_free(curp->vals) ;
 	                curp->vals = nullptr ;
 	            }
 	        } /* end if (m-a) */
@@ -1098,22 +1107,26 @@ static int mxalias_finallocs(MA *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->pwd) {
-	    rs1 = uc_free(op->pwd) ;
+	    void *vp = voidp(op->pwd) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->pwd = nullptr ;
 	}
 	if (op->userdname) {
-	    rs1 = uc_free(op->userdname) ;
+	    void *vp = voidp(op->userdname) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->userdname = nullptr ;
 	}
 	if (op->username) {
-	    rs1 = uc_free(op->username) ;
+	    void *vp = voidp(op->username) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->username = nullptr ;
 	}
 	if (op->pr) {
-	    rs1 = uc_free(op->pr) ;
+	    void *vp = voidp(op->pr) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->pr = nullptr ;
 	}
@@ -1123,16 +1136,16 @@ static int mxalias_finallocs(MA *op) noex {
 
 static int mxalias_finents(MA *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
 }
 /* end subroutine (mxalias_finents) */
 
-static int file_start(MA_FI *fep,USTAT *sbp,cchar *fname) noex {
+static int file_start(MA_FI *fep,ustat *sbp,cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fep && sbp && fname) {
+	if (fep && sbp && fname) ylikely {
 	    memclear(fep) ;
 	    if_constexpr (f_comment) {
 	        fep->timod = sbp->st_mtime ;
@@ -1140,7 +1153,7 @@ static int file_start(MA_FI *fep,USTAT *sbp,cchar *fname) noex {
 	        fep->dev = sbp->st_dev ;
 	        fep->ino = sbp->st_ino ;
 	    } /* end if_constexpr (f_comment) */
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(fname,-1,&cp)) >= 0) {
 	        fep->fname = cp ;
 	    }
 	} /* end if (non-null) */
@@ -1151,10 +1164,11 @@ static int file_start(MA_FI *fep,USTAT *sbp,cchar *fname) noex {
 static int file_finish(MA_FI *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (fep) {
+	if (fep) ylikely {
 	    rs = SR_OK ;
-	    if (fep->fname) {
-	        rs1 = uc_free(fep->fname) ;
+	    if (fep->fname) ylikely {
+		void *vp = voidp(fep->fname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->fname = nullptr ;
 	    }
@@ -1169,7 +1183,7 @@ static int bufdesc_start(BD *bdp,int llen) noex {
 	int		rs ;
 	if (llen < 0) llen = var.maxlinelen ;
 	sz = ((2*(llen+1))+(klen+1)) ;
-	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
 	    bdp->a = bp ;
 	    bdp->lbuf = bp ;
 	    bdp->llen = llen ;
@@ -1179,7 +1193,7 @@ static int bufdesc_start(BD *bdp,int llen) noex {
 	    bp += (klen+1) ;
 	    bdp->kbuf = bp ;
 	    bdp->klen = klen ;
-	}
+	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (bufdesc_start) */
@@ -1188,7 +1202,7 @@ static int bufdesc_finish(BD *bdp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (bdp->a) {
-	    rs1 = uc_free(bdp->a) ;
+	    rs1 = lm_free(bdp->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    bdp->a = nullptr ;
 	}
@@ -1198,7 +1212,7 @@ static int bufdesc_finish(BD *bdp) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+	if ((rs = getbufsize(bufsize_ml)) >= 0) {
 	    maxlinelen = rs ;
 	}
 	return rs ;
