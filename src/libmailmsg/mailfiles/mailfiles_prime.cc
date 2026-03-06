@@ -77,7 +77,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int mailfiles_ctor(MF *op,Args ... args) noex {
+local int mailfiles_ctor(MF *op,Args ... args) noex {
     	MAILFILES	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -91,7 +91,7 @@ static int mailfiles_ctor(MF *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (mailfiles_ctor) */
 
-static int mailfiles_dtor(MF *op) noex {
+local int mailfiles_dtor(MF *op) noex {
 	int		rs ;
 	if ((rs = mailfiles_magic(op)) >= 0) ylikely {
 	    if (op->elp) {
@@ -102,8 +102,8 @@ static int mailfiles_dtor(MF *op) noex {
 	return rs ;
 } /* end subroutine (mailfiles_dtor) */
 
-static int	entry_start(MF_ENT *,cchar *,int) noex ;
-static int	entry_finish(MF_ENT *) noex ;
+local int	entry_start(MF_ENT *,cchar *,int) noex ;
+local int	entry_finish(MF_ENT *) noex ;
 
 
 /* local variables */
@@ -264,7 +264,7 @@ int mailfiles_check(MF *op) noex {
 
 /* local subroutines */
 
-static int entry_start(MF_ENT *ep,cchar *sp,int sl) noex {
+local int entry_start(MF_ENT *ep,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (ep && sp) ylikely {
 	    memclear(ep) ;
@@ -286,7 +286,7 @@ static int entry_start(MF_ENT *ep,cchar *sp,int sl) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(MF_ENT *ep) noex {
+local int entry_finish(MF_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->mailfname) ylikely {
