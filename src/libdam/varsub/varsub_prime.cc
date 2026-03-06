@@ -52,7 +52,7 @@
 #include	<strwcmp.h>
 #include	<strwcpy.h>
 #include	<strnxchr.h>
-#include	<strnxcmp.h>
+#include	<strnxcmp.h>		/* |strnncmp(3uc)| */
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -97,10 +97,10 @@ struct varsub_sub {
 /* forward references */
 
 typedef VS_SUB	ent ;
-typedef ent		*entp ;
+typedef ent	*entp ;
 
 template<typename ... Args>
-static int varsub_ctor(VS *op,Args ... args) noex {
+local inline int varsub_ctor(VS *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
@@ -111,50 +111,47 @@ static int varsub_ctor(VS *op,Args ... args) noex {
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (varsub_ctor) */
+} /* end subroutine (varsub_ctor) */
 
-static int varsub_dtor(VS *op) noex {
+local int varsub_dtor(VS *op) noex {
 	int		rs = SR_OK ;
 	if (op->slp) ylikely {
 	    delete op->slp ;
 	    op->slp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (varsub_dtor) */
+} /* end subroutine (varsub_dtor) */
 
 template<typename ... Args>
-static inline int varsub_magic(VS *op,Args ... args) noex {
+local inline int varsub_magic(VS *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == VS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (varsin_magic) */
+} /* end subroutine (varsin_magic) */
 
-static int	varsub_setopts(VS *,int) noex ;
-static int	varsub_iadd(VS *,cchar *,int,cchar *,int) noex ;
-static int	varsub_iaddq(VS *,cchar *,int,cchar *,int) noex ;
-static int	varsub_sort(VS *) noex ;
-static int	varsub_procvalue(VS *,buffer *,cchar *,int) noex ;
-static int	varsub_procsub(VS *,buffer *,cchar *,int) noex ;
-static int	varsub_getval(VS *,cchar *,int,cchar **) noex ;
-static int	varsub_expfiler(VS *,bfile *,bfile *) noex ;
-static int	varsub_writebuf(VS *,bfile *,buffer *) noex ;
-static int	varsub_entfins(VS *) noex ;
+local int	varsub_setopts(VS *,int) noex ;
+local int	varsub_iadd(VS *,cchar *,int,cchar *,int) noex ;
+local int	varsub_iaddq(VS *,cchar *,int,cchar *,int) noex ;
+local int	varsub_sort(VS *) noex ;
+local int	varsub_procvalue(VS *,buffer *,cchar *,int) noex ;
+local int	varsub_procsub(VS *,buffer *,cchar *,int) noex ;
+local int	varsub_getval(VS *,cchar *,int,cchar **) noex ;
+local int	varsub_expfiler(VS *,bfile *,bfile *) noex ;
+local int	varsub_writebuf(VS *,bfile *,buffer *) noex ;
+local int	varsub_entfins(VS *) noex ;
 
-static int	entry_start(ent *,cchar *,int,cchar *,int) noex ;
-static int	entry_keycmp(ent *,ent *) noex ;
-static int	entry_finish(ent *) noex ;
-static int	entry_tmp(ent *,cchar *,int,cchar *,int) noex ;
-static int	entry_valcmp(ent *,ent *) noex ;
+local int	entry_start(ent *,cchar *,int,cchar *,int) noex ;
+local int	entry_keycmp(ent *,ent *) noex ;
+local int	entry_finish(ent *) noex ;
+local int	entry_tmp(ent *,cchar *,int,cchar *,int) noex ;
+local int	entry_valcmp(ent *,ent *) noex ;
 
-static int	getkey(cchar *,int,int [][2]) noex ;
+local int	getkey(cchar *,int,int [][2]) noex ;
 
 extern "C" {
-    static int	vcmpent(cvoid **,cvoid **) noex ;
+    local int	vcmpent(cvoid **,cvoid **) noex ;
 }
 
 
@@ -460,7 +457,7 @@ consteval int mkoptmask() noex {
 	return m ;
 } /* end subroutine (mkoptmask) */
 
-static int varsub_setopts(VS *op,int vo) noex {
+local int varsub_setopts(VS *op,int vo) noex {
 	constexpr cint	optmask = mkoptmask() ;
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
@@ -482,7 +479,7 @@ static int varsub_setopts(VS *op,int vo) noex {
 }
 /* end subroutine (varsub_setopts) */
 
-static int varsub_procvalue(VS *op,buffer *bufp,cchar *sp,int sl) noex {
+local int varsub_procvalue(VS *op,buffer *bufp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		sses[3][2] ;
 	int		kl ;
@@ -540,7 +537,7 @@ static int varsub_procvalue(VS *op,buffer *bufp,cchar *sp,int sl) noex {
 }
 /* end subroutine (varsub_procvalue) */
 
-static int varsub_procsub(VS *op,buffer *bufp,cchar *kp,int kl) noex {
+local int varsub_procsub(VS *op,buffer *bufp,cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (kl > 0) {
@@ -579,7 +576,7 @@ static int varsub_procsub(VS *op,buffer *bufp,cchar *kp,int kl) noex {
 }
 /* end subroutine (varsub_procsub) */
 
-static int varsub_iadd(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
+local int varsub_iadd(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs ;
 	if (klen < 0) klen = lenstr(k) ;
 	if (vlen < 0) vlen = (v) ? lenstr(v) : 0 ;
@@ -621,7 +618,7 @@ static int varsub_iadd(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 }
 /* end subroutine (varsub_iadd) */
 
-static int varsub_iaddq(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
+local int varsub_iaddq(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs = SR_INVALID ;
 	if (klen < 0) klen = lenstr(k) ;
 	if (vlen < 0) vlen = (v != nullptr) ? lenstr(v) : 0 ;
@@ -646,7 +643,7 @@ static int varsub_iaddq(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 }
 /* end subroutine (varsub_iaddq) */
 
-static int varsub_sort(VS *op) noex {
+local int varsub_sort(VS *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (! op->fl.sorted) {
@@ -658,7 +655,7 @@ static int varsub_sort(VS *op) noex {
 }
 /* end subroutine (varsub_sort) */
 
-static int varsub_getval(VS *op,cchar *kp,int kl,cchar **vpp) noex {
+local int varsub_getval(VS *op,cchar *kp,int kl,cchar **vpp) noex {
 	ent		*ep{} ;
 	int		rs = SR_DOM ;
 	int		vl = 0 ;
@@ -681,7 +678,7 @@ static int varsub_getval(VS *op,cchar *kp,int kl,cchar **vpp) noex {
 }
 /* end subroutine (varsub_getval) */
 
-static int varsub_expfiler(VS *op,bfile *ifp,bfile *ofp) noex {
+local int varsub_expfiler(VS *op,bfile *ifp,bfile *ofp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -719,7 +716,7 @@ static int varsub_expfiler(VS *op,bfile *ifp,bfile *ofp) noex {
 }
 /* end subroutine (varsub_expfiler) */
 
-static int varsub_writebuf(VS *op,bfile *ofp,buffer *bufp) noex {
+local int varsub_writebuf(VS *op,bfile *ofp,buffer *bufp) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op) ylikely {
@@ -734,7 +731,7 @@ static int varsub_writebuf(VS *op,bfile *ofp,buffer *bufp) noex {
 }
 /* end subroutine (varsub_writebuf) */
 
-static int varsub_entfins(VS *op) noex {
+local int varsub_entfins(VS *op) noex {
 	vechand		*elp = op->slp ; /* loop invariant */
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -756,7 +753,7 @@ static int varsub_entfins(VS *op) noex {
 }
 /* end subroutine (varsub_entfins) */
 
-static int entry_start(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
+local int entry_start(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_DOM ;
 	if (kl < 0) kl = lenstr(kp) ;
 	if (vl < 0) {
@@ -778,7 +775,7 @@ static int entry_start(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(ent *ep) noex {
+local int entry_finish(ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->kp) ylikely {
@@ -792,12 +789,12 @@ static int entry_finish(ent *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int entry_keycmp(ent *ep,ent *eap) noex {
+local int entry_keycmp(ent *ep,ent *eap) noex {
 	return strnncmp(ep->kp,ep->kl,eap->kp,eap->kl) ;
 }
 /* end subroutine (entry_keycmp) */
 
-static int entry_tmp(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
+local int entry_tmp(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_DOM ;
 	if (kl < 0) kl = lenstr(kp) ;
 	if (kl > 0) {
@@ -811,7 +808,7 @@ static int entry_tmp(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
 }
 /* end subroutine (entry_tmp) */
 
-static int entry_valcmp(ent *ep,ent *e2p) noex {
+local int entry_valcmp(ent *ep,ent *e2p) noex {
 	int		rc = 0 ;
 	if (ep && e2p) {
 	    if ((ep->vl > 0) || (e2p->vl > 0)) {
@@ -836,7 +833,7 @@ static int entry_valcmp(ent *ep,ent *e2p) noex {
 }
 /* end subroutine (entry_valcmp) */
 
-static int getkey(cchar *sp,int sl,int sses[][2]) noex {
+local int getkey(cchar *sp,int sl,int sses[][2]) noex {
 	int		kl = -1 ;
 	if (sl > 1) {
 	    int		i = 0 ; /* <- used afterwards */
@@ -858,7 +855,7 @@ static int getkey(cchar *sp,int sl,int sses[][2]) noex {
 }
 /* end subroutine (getkey) */
 
-static int vcmpent(cvoid **ve1pp,cvoid **ve2pp) noex {
+local int vcmpent(cvoid **ve1pp,cvoid **ve2pp) noex {
 	ent		**e1pp = (ent **) ve1pp ;
 	ent		**e2pp = (ent **) ve2pp ;
 	int		rc = 0 ;
