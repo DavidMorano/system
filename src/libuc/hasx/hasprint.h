@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* does a counted c-string some characteristic? */
+/* does a counted c-string have some characteristic? */
 /* version %I% last-modified %G% */
 
 
@@ -28,8 +28,8 @@
 
 EXTERNC_begin
 
-extern bool hasprintlatin(cchar *,int) noex ;
-extern bool hasprintbad(cchar *,int) noex ;
+extern bool hasprintcmd	(cchar *,int) noex ;
+extern bool hasprintbad	(cchar *,int) noex ;
 
 EXTERNC_end
 
