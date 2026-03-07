@@ -35,6 +35,8 @@ extern bool hasoctal(cchar *,int) noex ;
 extern bool hasdigex(cchar *,int) noex ;
 extern bool haswhite(cchar *,int) noex ;
 extern bool hasblank(cchar *,int) noex ;
+extern bool hasprint(cchar *,int) noex ;
+extern bool hasterm(cchar *,int) noex ;
 
 extern bool haslc(cchar *,int) noex ;
 extern bool hasuc(cchar *,int) noex ;
