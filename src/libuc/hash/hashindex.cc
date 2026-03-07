@@ -16,12 +16,28 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************* 
-	This subroutie creates an index (like for use in an index-table)
-	from a hash value (an unsigned integer).
+  	Name:
+	hasindex
+
+	Description:
+	This subroutine creates an index (like for use in an
+	index-table) from a given index value (an unsigned integer).
+
+	Synopsis:
+	int hashindex(uint i,int n) noex
+
+	Arguments:
+	i	given index value
+	n	modulus
+
+	Returns:
+	-	new index
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>
+#include	<cstdlib>
 #include	<bit>			/* |has_single_bit(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -73,7 +89,7 @@ uint hashindex(uint v,int n) noex {
 	}
 	if (rv == 0) rv = 1 ;
 	return rv ;
-}
+} /* end subroutine (hasindex) */
 #endif /* COMMENT */
 
 
