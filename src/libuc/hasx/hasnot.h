@@ -31,10 +31,10 @@ EXTERNC_begin
 extern bool hasnotdots(cchar *,int) noex ;
 extern bool hasnotempty(cchar *,int) noex ;
 
-static inline bool hasNotDots(cchar *sp,int sl) noex {
+local inline bool hasNotDots(cchar *sp,int sl) noex {
 	return hasnotdots(sp,sl) ;
 }
-static inline bool hasNotEmpty(cchar *sp,int sl) noex {
+local inline bool hasNotEmpty(cchar *sp,int sl) noex {
 	return hasnotempty(sp,sl) ;
 }
 
