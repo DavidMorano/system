@@ -34,9 +34,11 @@
 	hasalloctal
 	hasallwhite
 	hasallblank
+	hasallprint
 	hasalllc
 	hasalluc
 	hasallhdrkey
+	hasallterm
 	hasallbase
 	hasallchr
 	hasallset
@@ -204,6 +206,11 @@ bool hasallblank(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasallwhite) */
 
+bool hasallprint(cchar *sp,int sl) noex {
+    	return hasallx(isprintlatin,sp,sl) ;
+}
+/* end subroutine (hasallprint) */
+
 bool hasalllc(cchar *sp,int sl) noex {
     	return hasallx(islowerlatin,sp,sl) ;
 }
@@ -218,6 +225,11 @@ bool hasallhdrkey(cchar *sp,int sl) noex {
     	return hasallx(ishdrkey,sp,sl) ;
 }
 /* end subroutine (hasallhdrkey) */
+
+bool hasallterm(cchar *sp,int sl) noex {
+    	return hasallx(istermlatin,sp,sl) ;
+}
+/* end subroutine (hasallterm) */
 
 bool hasallbase(cchar *sp,int sl,int b) noex {
 	bool		f = false ;
