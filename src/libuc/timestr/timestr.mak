@@ -1,0 +1,134 @@
+# MAKEFILE (timestr)
+
+T= timestr
+
+ALL= $(T).o
+
+
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
+
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
+
+
+DEFS +=
+
+INCS += timestr.h
+
+MODS +=
+
+LIBS +=
+
+
+OBJ0_TIMESTR= timestr_date.o timestr_elapsed.o
+OBJ1_TIMESTR= timestr_nist.o timestr_scandate.o
+
+OBJA_TIMESTR= obj0_timestr.o obj1_timestr.o
+
+OBJ_TIMESTR= $(OBJA_TIMESTR)
+
+
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
+
+
+default:		$(T).o
+
+all:			$(ALL)
+
+
+.c.i:
+	$(CPP) $(CPPFLAGS) $< > $(*).i
+
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
+.c.o:
+	$(COMPILE.c) $<
+
+.cc.o:
+	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
+
+
+$(T).o:			$(OBJ_TIMESTR)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_TIMESTR)
+
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
+
+again:
+	rm -f $(ALL)
+
+clean:
+	makeclean $(ALL)
+
+control:
+	(uname -n ; date) > Control
+
+
+obj0_timestr.o:		$(OBJ0_TIMESTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj1_timestr.o:		$(OBJ1_TIMESTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj2_timestr.o:		$(OBJ2_TIMESTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3_timestr.o:		$(OBJ3_TIMESTR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+timestr_date.o:		timestr_date.cc		$(INCS)
+timestr_elapsed.o:	timestr_elapsed.cc	$(INCS)
+timestr_nist.o:		timestr_nist.cc		$(INCS)
+timestr_scandate.o:	timestr_scandate.cc	$(INCS)
+
+
