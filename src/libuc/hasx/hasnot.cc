@@ -84,6 +84,8 @@ import libutil ;			/* |getlenstr(3u)| */
 
 /* forward references */
 
+local bool	isnotempry(int) noex ;
+
 
 /* local variables */
 
@@ -116,7 +118,7 @@ bool hasnotempty(cchar *sp,int sl) noex {
 	if (sp) ylikely {
 	    while (sl && *sp) {
 	        cint	ch = mkchar(*sp) ;
-	        f = ((! CHAR_ISWHITE(ch)) && (ch != CH_NL)) ;
+	        f = isnotempry(ch) ;
 	        if (f) break ;
 	        sp += 1 ;
 	        sl -= 1 ;
@@ -128,5 +130,12 @@ bool hasnotempty(cchar *sp,int sl) noex {
 
 
 /* local subroutines */
+
+local bool isnotempry(int ch) noex {
+    	bool f = true ;
+	f = f && (! CHAR_ISWHITE(ch)) ;
+	f = f && (ch != CH_NL) ;
+	return f ;
+} /* end subroutine (isnotempry) */
 
 
