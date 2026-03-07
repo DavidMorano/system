@@ -28,6 +28,8 @@
 	hasdigex
 	haswhite
 	hasblank
+	hasprint
+	hasterm
 	haslc
 	hasuc
 
@@ -157,6 +159,16 @@ bool hasblank(cchar *sp,int sl) noex {
     	return hasx(isblanklatin,sp,sl) ;
 }
 /* end subroutine (hasblank) */
+
+bool hasprint(cchar *sp,int sl) noex {
+    	return hasx(isprintlatin,sp,sl) ;
+}
+/* end subroutine (hasprint) */
+
+bool hasterm(cchar *sp,int sl) noex {
+    	return hasx(istermlatin,sp,sl) ;
+}
+/* end subroutine (hasterm) */
 
 bool haslc(cchar *sp,int sl) noex {
     	return hasx(islowerlatin,sp,sl) ;
