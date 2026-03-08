@@ -39,9 +39,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<sysconfcmds.h>		/* commands for |sysconf(3c)| */
 
 
-namespace ustd {
+namespace libu {
     extern int	ustd_confval(int,long *) noex ;
 } /* end namespace (ustd) */
 
