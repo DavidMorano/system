@@ -67,7 +67,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::string ;			/* type */
 using libu::usyscallbase ;		/* type */
 using std::min ;			/* subroutine-template */
@@ -121,7 +120,7 @@ namespace {
 
 /* forward references */
 
-static int std_vsnprintf(char *,int,cc *,va_list) noex ;
+local int std_vsnprintf(char *,int,cc *,va_list) noex ;
 
 
 /* local variables */
@@ -259,7 +258,7 @@ int syscaller::std_getloadavg() noex {
 }		
 /* end method (syscaller::std_getloadavg) */
 
-static int std_vsnprintf(char *rbuf,int rlen,cc *fmt,va_list ap) noex {
+local int std_vsnprintf(char *rbuf,int rlen,cc *fmt,va_list ap) noex {
 	csize		rsize = size_t(rlen + 1) ;
 	int		rs ;
 	if ((rs = vsnprintf(rbuf,rsize,fmt,ap)) >= 0) {
