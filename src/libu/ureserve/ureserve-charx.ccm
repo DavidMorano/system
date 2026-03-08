@@ -58,7 +58,7 @@ export {
     bool char_islc(int) noex ;
     bool char_isuc(int) noex ;
     bool char_isfc(int) noex ;
-    inline bool char_isspacetab(int ch) noex {
+    inline bool char_isblank(int ch) noex {
 	return (ch == ' ') || (ch == '\t') ;
     }
     inline bool char_isdig(int ch) noex {
@@ -72,6 +72,12 @@ export {
     }
     inline bool char_ishex(int ch) noex {
 	return char_isdigex(ch) ;
+    }
+    inline bool char_iswht(int ch) noex {
+	return char_iswhite(ch) ;
+    }
+    inline bool char_isblk(int ch) noex {
+	return char_isblank(ch) ;
     }
 } /* end export */
 
