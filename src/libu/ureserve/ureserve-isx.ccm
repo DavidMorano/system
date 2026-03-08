@@ -37,7 +37,6 @@ module ;
 #include	<cstdlib>
 #include	<vector>
 #include	<string>
-#include	<iostream>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -63,6 +62,9 @@ export {
     constexpr inline bool	isdigitlatin(int ch) noex {
 	    return (ch >= '0') && (ch <= '9') ;
     }
+    constexpr inline bool	isblanklatin(int ch) noex {
+	    return (ch == ' ') || (ch == '\t') ;
+    }
     constexpr inline bool	isdiglatin(int ch) noex {
 	    return (ch >= '0') && (ch <= '9') ;
     }
@@ -78,24 +80,27 @@ export {
     constexpr inline bool	isnumlatin(int ch) noex {
     	    return isdigexlatin(ch) || (ch == '\\') || (ch == 'x') ;
     }
-    constexpr inline bool	isnumsign(int ch) noex {
-	    return ((ch == '+') || (ch == '-')) ;
-    }
     constexpr inline bool	iseol(int ch) noex {
 	    return (ch == '\n') || (ch == '\r') ;
     }
     constexpr inline bool	iszero(int ch) noex {
 	    return (ch == '0') ;
     }
-    constexpr inline bool	isplusminus(int ch) noex {
-	    return isnumsign(ch) ;
+    constexpr inline bool	ispl(int ch) noex {
+	    return (ch == '+') ;
+    }
+    constexpr inline bool	ismi(int ch) noex {
+	    return (ch == '-') ;
+    }
+    constexpr inline bool	ispm(int ch) noex {
+	    return (ch == '+') || (ch == '-') ;
+    }
+    constexpr inline bool	isme(int ch) noex {
+	    return (ch == '+') || (ch == '-') || (ch == '!') ;
     }
     constexpr inline bool	isabbr(int ch) noex {
 	    ch &= UCHAR_MAX ;
 	    return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
-    }
-    constexpr inline bool	isblanklatin(int ch) noex {
-	    return (ch == ' ') || (ch == '\t') ;
     }
     constexpr inline bool	isspacetab(int ch) noex {
 	    return isblank(ch) ;
