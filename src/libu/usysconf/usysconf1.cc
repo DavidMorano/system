@@ -98,8 +98,8 @@ module usysconf ;
 
 using std::atomic_int ;			/* type */
 using libu::umaxmsglen ;		/* subroutine */
-using ustd::ustd_confval ;		/* subroutine */
-using ustd::ustd_confstr ;		/* subroutine */
+using libu::ustd_confval ;		/* subroutine */
+using libu::ustd_confstr ;		/* subroutine */
 using std::nothrow ;			/* constant */
 
 
