@@ -57,7 +57,7 @@ enum extraopenflags {
 	extraopenflag_network,
 	extraopenflag_overlast,
 	extraopenflag_start = extraopenflag_minmode
-} ;
+} ; /* end enum */
 
 /* missing UNIX® signals */
 enum missingsignals {
@@ -66,7 +66,7 @@ enum missingsignals {
 	missingsignal_lost,
 	missingsignal_overlast,
 	missingsignal_start = missingsignal_pwr
-} ;
+} ; /* end enum */
 
 enum missingplocks {
 	missingplock_unlock,
@@ -74,7 +74,7 @@ enum missingplocks {
 	missingplock_datlock,
 	missingplock_proclock,
 	missingplock_overlast
-} ;
+} ; /* end enum */
 
 /* possibly missing aommand-operations for |plock(2solaris)| */
 #ifndef	UNLOCK
