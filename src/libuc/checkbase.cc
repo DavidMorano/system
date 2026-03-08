@@ -30,8 +30,8 @@
 	int checkbase(cchar *sp,int sl,int b) noex
 
 	Arguments:
-	sp		string to test
-	sl		length of strin to test
+	sp		test c-string pointer
+	sl		test c-string length
 	b		base to check against
 
 	Returns:
