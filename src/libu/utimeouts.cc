@@ -53,7 +53,7 @@ namespace {
     struct utimeouts {
 	constexpr utimeouts() noex ;
     } ; /* end class (utimeouts) */
-}
+} /* end namespace */
 
 
 /* forward references */
