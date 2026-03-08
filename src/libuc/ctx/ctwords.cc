@@ -46,10 +46,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<string>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usupport.h>
 
 #include	"ctwords.hh"
@@ -60,7 +57,6 @@
 
 /* local name-spaces */
 
-using std::nullptr_t ;			/* type */
 using std::string ;			/* type */
 
 
@@ -102,7 +98,7 @@ constexpr cpcchar	ones[] = {
 	"Eight",
 	"Nine",
 	nullptr
-} ;
+} ; /* end array (ones) */
 
 constexpr cpcchar	teens[] = {
 	"Ten",
@@ -116,7 +112,7 @@ constexpr cpcchar	teens[] = {
 	"Eighteen",
 	"Nineteen",
 	nullptr
-} ;
+} ; /* end array (teens) */
 
 constexpr cpcchar	tens[] = {
 	"and",
@@ -130,7 +126,7 @@ constexpr cpcchar	tens[] = {
 	"Eighty",
 	"Ninety",
 	nullptr
-} ;
+} ; /* end array (tens) */
 
 
 /* exported variables */
@@ -140,22 +136,22 @@ constexpr cpcchar	tens[] = {
 
 int ctwords(string *sp,int v) noex {
 	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (v >= 0) {
+	    if (v >= 0) ylikely {
 	        rs = SR_OK ;
-	            try {
+	        try {
 	            if (v > 0) {
 	                while (v > 0) {
 		            if (v >= 1000000000) {
 		                speak_billions(sp,v) ;
-		                v = (v%1000000000) ;
+		                v = (v % 1000000000) ;
 		            } else if (v >= 1000000) {
 		                speak_millions(sp,v) ;
-		                v = (v%1000000) ;
+		                v = (v % 1000000) ;
 		            } else if (v >= 1000) {
 		                speak_thousands(sp,v) ;
-		                v = (v%1000) ;
+		                v = (v % 1000) ;
 		            } else {
 		                speak_group(sp,v) ;
 		                v = 0 ;
@@ -175,8 +171,7 @@ int ctwords(string *sp,int v) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ctwords) */
+} /* end subroutine (ctwords) */
 
 
 /* local subroutines */
@@ -194,16 +189,14 @@ static int speak_millions(string *sp,int v) {
 	speak_group(sp,lv) ;
 	sp->append(" Million") ;
 	return 0 ;
-}
-/* end subroutine (speak_millions) */
+} /* end subroutine (speak_millions) */
 
 static int speak_thousands(string *sp,int v) {
 	cint	lv = (v/1000) ;
 	speak_group(sp,lv) ;
 	sp->append(" Thousand") ;
 	return 0 ;
-}
-/* end subroutine (speak_thousands) */
+} /* end subroutine (speak_thousands) */
 
 static int speak_group(string *sp,int v) {
 	while (v > 0) {
@@ -222,25 +215,24 @@ static int speak_group(string *sp,int v) {
 	    }
 	} /* end while */
 	return 0 ;
-}
-/* end subroutine (speak_group) */
+} /* end subroutine (speak_group) */
 
 static int speak_hundreds(string *sp,int v) {
-	cint	h = (v/100) ;
+	cint	h = (v / 100) ;
 	speak_ones(sp,h) ;
 	sp->append(" Hundred") ;
 	return 0 ;
 }
 
 static int speak_tens(string *sp,int v) {
-	cint	t = (v/10) ;
+	cint	t = (v / 10) ;
 	sp->append(" ") ;
 	sp->append(tens[t]) ;
 	return 0 ;
 }
 
 static int speak_teens(string *sp,int v) {
-	cint	t = (v%10) ;
+	cint	t = (v % 10) ;
 	sp->append(" ") ;
 	sp->append(teens[t]) ;
 	return 0 ;
@@ -250,7 +242,6 @@ static int speak_ones(string *sp,int v) {
 	sp->append(" ") ;
 	sp->append(ones[v]) ;
 	return 0 ;
-}
-/* end subroutine (speak_ones) */
+} /* end subroutine (speak_ones) */
 
 
