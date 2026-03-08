@@ -26,7 +26,7 @@
 #include	<ulogerror.h>
 #include	<usysutility.hh>
 #include	<timecount.hh>
-#include	<filetype.h>
+#include	<filetypes.h>
 #include	<aflag.hh>
 #include	<stdintx.h>
 #include	<intx.h>
