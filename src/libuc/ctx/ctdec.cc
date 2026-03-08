@@ -62,18 +62,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |ULONG_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |ULONG_MAX| */
 #include	<bit>			/* |countr_zero(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<sncpyx.h>
 
 #include	"ctdec.h"
+
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;			/* |digbufsize(3u)| */
 
@@ -97,21 +96,21 @@ import uconstants ;			/* |digbufsize(3u)| */
 
 /* forward references */
 
-static inline constexpr int ffbsi(int b) noex {
+local inline constexpr int ffbsi(int b) noex {
 	cuint	n = uint(b) ;
 	return std::countr_zero(n) ;	/* <- first bit set */
-}
+} /* end subroutine (ffbsi) */
 
 
 /* local variables */
 
-static constexpr int	base = 10 ;
+constexpr int		base = 10 ;
 
 
 /* local subroutine-templates */
 
 template<typename UT>
-static constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
+local constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
 	char		*rp = (dbuf + dlen) ;
 	int		rl = 0 ;
 	*rp = '\0' ;
@@ -152,7 +151,7 @@ static constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
 /* end subroutine (ctdecx) */
 
 template<typename UT,typename ST>
-static int sctdecx(char *dp,int dl,const ST &v) noex {
+local int ctdecsx(char *dp,int dl,const ST &v) noex {
 	UT		ulv = (UT) v ;
 	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
@@ -172,10 +171,10 @@ static int sctdecx(char *dp,int dl,const ST &v) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine-template (sctdecx) */
+/* end subroutine-template (ctdecsx) */
 
 template<typename UT>
-static int uctdecx(char *dp,int dl,const UT &uv) noex {
+local int ctdecux(char *dp,int dl,const UT &uv) noex {
 	cint		n = szof(UT) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
@@ -192,7 +191,7 @@ static int uctdecx(char *dp,int dl,const UT &uv) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine-template (uctdecx) */
+/* end subroutine-template (ctdecux) */
 
 
 /* exported variables */
@@ -201,27 +200,27 @@ static int uctdecx(char *dp,int dl,const UT &uv) noex {
 /* exported subroutines */
 
 int ctdeci(char *dp,int dl,int v) noex {
-	return sctdecx<uint>(dp,dl,v) ;
+	return ctdecsx<uint>(dp,dl,v) ;
 }
 
 int ctdecl(char *dp,int dl,long v) noex {
-	return sctdecx<ulong>(dp,dl,v) ;
+	return ctdecsx<ulong>(dp,dl,v) ;
 }
 
 int ctdecll(char *dp,int dl,longlong v) noex {
-	return sctdecx<ulonglong>(dp,dl,v) ;
+	return ctdecsx<ulonglong>(dp,dl,v) ;
 }
 
 int ctdecui(char *dp,int dl,uint v) noex {
-	return uctdecx(dp,dl,v) ;
+	return ctdecux(dp,dl,v) ;
 }
 
 int ctdecul(char *dp,int dl,ulong v) noex {
-	return uctdecx(dp,dl,v) ;
+	return ctdecux(dp,dl,v) ;
 }
 
 int ctdecull(char *dp,int dl,ulonglong v) noex {
-	return uctdecx(dp,dl,v) ;
+	return ctdecux(dp,dl,v) ;
 }
 
 
