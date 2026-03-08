@@ -85,8 +85,9 @@ constexpr size_t	minusone = -1uz ;
 
 /* exported subroutines */
 
-namespace ustd {
+namespace libu {
     int ustd_confstr(int req,char *rbuf,int rlen) noex {
+	cnullptr	np{} ;
     	size_t		res ; /* used-multiple */
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -111,7 +112,6 @@ namespace ustd {
 	        } /* end if */
 	    } /* end if (non-null) */
 	} else if (rlen == 0) {
-	    cnullptr	np{} ;
 	    if ((res = confstr(req,np,0uz)) > 0uz) {
 	        len = intsat(res - 1) ;
 	    } else if (res == 0uz) {
@@ -126,7 +126,7 @@ namespace ustd {
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (ustd_confstr) */
-} /* end namespace (ustd) */
+} /* end namespace (libu) */
 
 
 /* local subroutines */
