@@ -48,7 +48,7 @@
 	Notes:
 	1. Of course this is a quickie hack for handling floating-point.
 	I do not use any of the older custom conversion subroutines that
-	I used to use for coverting from floating types to digig-strings.
+	I used to use for coverting from floating types to digit-strings.
 
 *******************************************************************************/
 
@@ -57,39 +57,37 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| + |stpcpy(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<snx.h>			/* |snwprintf(3uc)| */
 #include	<xxtostr.h>		/* |itostr(3u)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DECBUFLEN| */
 
 export module cvtfloat ;
 
 import fmtflag ;
 
-constexpr cint		wmax = 256 ;
-constexpr cint		pmax = 256 ;
-constexpr cint		fmtlen = 30 ;
-constexpr cint		dlen = DECBUFLEN ;
-constexpr cchar		codes[] = "aefgAEFG" ;
+constexpr int		wmax = 256 ;
+constexpr int		pmax = 256 ;
+constexpr int		fmtlen = 30 ;
+constexpr int		dlen = DECBUFLEN ;
+constexpr char		codes[] = "aefgAEFG" ;
 
 int ctstr(char *dbuf,int dlen,char *fp,int rl,int v) noex {
     	cnullptr	np{} ;
     	int		rs = SR_OK ;
 	int		dl = 0 ; /* return-value */
-	if (cc *dp ; (dp = itostr(v,(dbuf + dlen))) != np) {
+	if (cc *dp ; (dp = itostr(v,(dbuf + dlen))) != np) ylikely {
 	    dl = intconv((dbuf + dlen) - dp) ;
-	    if (dl > rl) {
+	    if (dl > rl) ylikely {
 		fp = stpcpy(fp,dp) ;
 	    } else {
 		rs = SR_OVERFLOW ;
 	    }
-	}
+	} /* end if */
 	return (rs >= 0) ? dl : rs ;
 } /* end subroutine (ctstr) */
 
@@ -99,7 +97,7 @@ int mkflags(char *fbuf,int flen,int fg) noex {
 	int		fl = 0 ; /* return-value */
 	char		*fp = fbuf ;
 	for (int i = 0 ; i < fmtflag_overlast ; i += 1) {
-	    if (ff[i]) {
+	    if (ff[i]) ylikely {
 	        int	ch = 0 ;
 	        switch (i) {
 	        case fmtflag_alternate:
@@ -138,7 +136,7 @@ int mkfmt(char *fbuf,int flen,int fc,int fg,int w,int p,int sz) noex {
 	    *fp++ = '%' ;
 	    fl += 1 ;
 	}
-	if ((rs = mkflags(fp,(flen-fl),fg)) >= 0) {
+	if ((rs = mkflags(fp,(flen-fl),fg)) >= 0) ylikely {
 	    fp += rs ;
 	    fl += rs ;
 	    {
@@ -160,13 +158,13 @@ int mkfmt(char *fbuf,int flen,int fc,int fg,int w,int p,int sz) noex {
 	        } /* end if (precision) */
 	        *fp = '\0' ;
 	    } /* end block */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        if (sz == szof(longdouble)) {
 	            *fp++ = 'l' ;
 	            fl += 1 ;
 	        }
 	    } /* end block */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        *fp++ = char(fc) ;
 	        fl += 1 ;
 	    }
@@ -194,7 +192,7 @@ template<typename T> struct floater {
 template<typename T> int floater<T>::operator () (char *rb,int rl) noex {
     	int		rs ;
 	char		fmtbuf[fmtlen+1] ;
-	if ((rs = mkfmt(fmtbuf,fmtlen,fc,fl,w,p,szof(dv))) >= 0) {
+	if ((rs = mkfmt(fmtbuf,fmtlen,fc,fl,w,p,szof(dv))) >= 0) ylikely {
 	    rs = snwprintf(rb,rl,fmtbuf,dv) ;
 	} /* end if (mkfmt) */
 	return rs ;
@@ -204,11 +202,11 @@ export {
     template<typename T>
     int cvtfloat(char *rbuf,int rlen,int fc,int fl,int wi,int pr,T dv) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if ((rlen > 0) && strchr(codes,fc)) {
+	    if ((rlen > 0) && strchr(codes,fc)) ylikely {
 		rs = SR_TOOBIG ;
-		if ((wi <= wmax) && (pr <= pmax)) {
+		if ((wi <= wmax) && (pr <= pmax)) ylikely {
 		    floater fo(fc,fl,wi,pr,dv) ;
 		    rs = fo(rbuf,rlen) ;
 		}
