@@ -39,15 +39,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
 
@@ -71,7 +66,7 @@ static int	ictroman(char *,int,ulonglong) noex ;
 
 /* local variables */
 
-static constexpr cchar	*hundreds[] = {
+local constexpr cchar	*hundreds[] = {
 	"",
 	"C",
 	"CC",
@@ -82,9 +77,9 @@ static constexpr cchar	*hundreds[] = {
 	"DCC",
 	"DCCC",
 	"CM"
-} ;
+} ; /* end array (hundreds) */
 
-static constexpr cchar	*tens[] = {
+local constexpr cchar	*tens[] = {
 	"",
 	"X",
 	"XX",
@@ -95,9 +90,9 @@ static constexpr cchar	*tens[] = {
 	"LXX",
 	"LXXX",
 	"XC"
-} ;
+} ; /* end array (tens) */
 
-static constexpr cchar	*ones[] = {
+local constexpr cchar	*ones[] = {
 	"",
 	"I",
 	"II",
@@ -108,7 +103,7 @@ static constexpr cchar	*ones[] = {
 	"VII",
 	"VIII",
 	"IX"
-} ;
+} ; /* end array (ons) */
 
 
 /* exported variables */
@@ -136,21 +131,21 @@ int ctromanll(char *dbuf,int dlen,longlong v) noex {
 
 /* unsigned */
 int ctromanui(char *dbuf,int dlen,uint v) noex {
-	ulonglong	ulv = (ulonglong) v ;
+	ulonglong	ulv = ulonglong(v) ;
 	return ictroman(dbuf,dlen,ulv) ;
 }
 /* end subroutine (ctromanui) */
 
 /* unsigned */
 int ctromanul(char *dbuf,int dlen,ulong v) noex {
-	ulonglong	ulv = (ulonglong) v ;
+	ulonglong	ulv = ulonglong(v) ;
 	return ictroman(dbuf,dlen,ulv) ;
 }
 /* end subroutine (ctromanul) */
 
 /* unsigned */
 int ctromanull(char *dbuf,int dlen,ulonglong v) noex {
-	ulonglong	ulv = (longlong) v ;
+	ulonglong	ulv = ulonglong(v) ;
 	return ictroman(dbuf,dlen,ulv) ;
 }
 /* end subroutine (ctromanull) */
@@ -159,28 +154,27 @@ int ctromanull(char *dbuf,int dlen,ulonglong v) noex {
 /* local subroutines */
 
 static int ictroman(char *dbuf,int dlen,ulonglong v) noex {
-	sbuf		b ;
 	int		rs ;
 	int		rs1 ;
 	mainv		tabs[] = { hundreds, tens, ones } ;
-	if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
+	if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) {
 	    cint	ntabs = nelem(tabs) ;
 	    ulonglong	n = 1000 ;
 	    if (v >= n) {
 	        cint		i = intconv(v / n) ;
-	        rs = sbuf_chrs(&b,'M',i) ;
+	        rs = b.chrs('M',i) ;
 	        v = (v%n) ;
 	    }
 	    n /= 10 ;
 	    for (int r = 0 ; (rs >= 0) && (r < ntabs) ; r += 1) {
 	        if (v >= n) {
 	            cint	i = intconv(v / n) ;
-	            rs = sbuf_strw(&b,tabs[r][i],-1) ;
-	            v = (v%n) ;
+	            rs = b.strw(tabs[r][i],-1) ;
+	            v = (v % n) ;
 	        }
 	        n /= 10 ;
 	    } /* end for */
-	    rs1 = sbuf_finish(&b) ;
+	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sbuf) */
 	return rs ;
