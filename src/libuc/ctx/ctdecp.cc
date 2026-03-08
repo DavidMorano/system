@@ -49,10 +49,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<ctdec.h>
 
@@ -95,7 +92,7 @@ template<typename UT,typename T>
 int ctdecpx(int (*ctx)(char *,int,int,UT),char *dp,int dl,int p,T v) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (dp) {
+	if (dp) ylikely {
 	    UT		uv = UT(v) ;
 	    int		rl = dl ;
 	    char	*rp = dp ;
@@ -104,7 +101,7 @@ int ctdecpx(int (*ctx)(char *,int,int,UT),char *dp,int dl,int p,T v) noex {
 	        rp += 1 ;
 	        rl -= 1 ;
 	    }
-	    if ((rs = ctx(rp,rl,p,uv)) >= 0) {
+	    if ((rs = ctx(rp,rl,p,uv)) >= 0) ylikely {
 	        n = rs ;
 	        if (v < 0) {
 	            dp[0] = '-' ;
@@ -152,7 +149,7 @@ int ctdecpll(char *rbuf,int rlen,int prec,longlong v) noex {
 static int zerofill(char *rbuf,int rlen,int prec,int n) noex {
 	int		rs = SR_OVERFLOW ;
 	cint		bi = (prec - n) ;
-	if (prec <= rlen) {
+	if (prec <= rlen) ylikely {
 	    int		i ;
 	    rs = SR_OK ;
 	    for (i = (n-1) ; i >= 0 ; i -= 1) {
