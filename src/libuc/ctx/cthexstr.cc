@@ -53,15 +53,15 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<sbuf.h>
+#include	<localmisc.h>
 
 #include	"cthexstr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -86,25 +86,27 @@ import libutil ;
 
 /* exported subroutines */
 
-int cthexstr(char *dbuf,int dlen,int f,cchar *sp,int sl) noex {
+int cthexstr(char *dbuf,int dlen,int f,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (dbuf && sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) {
-	        const uchar	*up = (const uchar *) sp ;
-	        for (int i = 0 ; (rs >= 0) && (i < sl) ; i += 1) {
-	            cint	ch = up[i] ;
-	            if (f && (i > 0)) {
-		        rs = b.chr(' ') ;
-	            }
-		    if (rs >= 0) {
-			rs = b.hexc(ch) ;
-		    }
-	        } /* end for */
-	        len = b.finish ;
-	        if (rs >= 0) rs = len ;
-	    } /* end if (sbuf) */
+	if (dbuf && sp) ylikely {
+	    rs = SR_INVALID ;
+	    if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
+	        if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) ylikely {
+	            const uchar	*up = ucharp(sp) ;
+	            for (int i = 0 ; (rs >= 0) && (i < sl) ; i += 1) {
+	                cint	ch = up[i] ;
+	                if (f && (i > 0)) {
+		            rs = b.chr(' ') ;
+	                }
+		        if (rs >= 0) {
+			    rs = b.hexc(ch) ;
+		        }
+	            } /* end for */
+	            len = b.finish ;
+	            if (rs >= 0) rs = len ;
+	        } /* end if (sbuf) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
