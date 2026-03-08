@@ -481,7 +481,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	    if (cchar *tp ; (tp = strnzone(sp,sl)) != nullptr) ylikely {
 	        cchar	*cp = tp ;
 	        int	cl = intconv(sl - (tp - sp)) ;
-	        if ((cl >= 1) && isplusminus(*cp)) { /* ok */
+	        if ((cl >= 1) && ispm(*cp)) { /* ok */
 	            int		zol = cl ;
 	            int		zo ;
 	            cchar	*zop = cp ;
@@ -919,7 +919,7 @@ local int tmz_xstdtrailing(tmz *op,cchar *sp,int sl) noex {
 	            rs = tmz_proczname(op,sp,sl) ;
 	        } else if (isdigitlatin(ch) && (! op->fl.year)) {
 	            rs = tmz_procyear(op,sp,sl) ;
-	        } else if (isplusminus(ch) || isdigitlatin(ch)) {
+	        } else if (ispm(ch) || isdigitlatin(ch)) {
 	            rs = tmz_proczoff(op,sp,sl) ;
 	        } else {
 	            rs = SR_INVALID ;
@@ -1018,7 +1018,7 @@ local int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) ylikely {
 	    cint	ch = mkchar(*cp) ;
 	    bool	f = false ;
-	    f = f || isplusminus(ch) ;
+	    f = f || ispm(ch) ;
 	    f = f || isdigitlatin(ch) ;
 	    if (f) ylikely {
 	        if (int v ; (rs = getzoff(&v,cp,cl)) >= 0) {
@@ -1073,7 +1073,7 @@ local int getzoff(int *zop,cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
 	int		ch = mkchar(*sp) ;
 	bool		f = false ;
-	f = f || isplusminus(ch) ;
+	f = f || ispm(ch) ;
 	f = f || isdigitlatin(ch) ;
 	if ((sl >= 2) && f) ylikely {
 	    int		i{} ; /* used-afterwards */
@@ -1279,7 +1279,7 @@ local cchar *strnzone(cchar *sp,int sl) noex {
 	bool		f = false ;
 	while (sl && *sp) ylikely {
 	    cint	ch = mkchar(*sp) ;
-	    f = f || isplusminus(ch) ;
+	    f = f || ispm(ch) ;
 	    f = f || isalphalatin(ch) ;
 	    if (f) break ;
 	    sp += 1 ;
