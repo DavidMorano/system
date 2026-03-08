@@ -64,6 +64,8 @@
 
 /* local defines */
 
+#define	CFBASE		10		/* Convert-From Base */
+
 
 /* imported namespaces */
 
@@ -95,7 +97,7 @@ namespace libu {
     template<typename T>
     static int cfdecx(T (*cfx)(cc *,char **,int),cc *sp,int sl,T *rp) noex {
 	[[maybe_unused]] char	*endp{} ; /* <- unused */
-	cint		b = 10 ;
+	cint		b = CFBASE ;	/* conversion number base */
 	int		rs = SR_FAULT ;
 	if (sp) {
 	    T		v{} ;
