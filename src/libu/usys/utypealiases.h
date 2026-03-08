@@ -142,7 +142,7 @@
 #define	TM		struct tm
 #endif
 
-#ifndef	TMS
+#ifndef	TMS		/* used by |times(2)| (considered obsoleted) */
 #define	TMS		struct tms
 #endif
 
