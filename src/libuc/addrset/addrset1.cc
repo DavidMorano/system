@@ -111,7 +111,7 @@ typedef addrset_cur			cur ;
 
 /* lcaal variables */
 
-constexpr uint		addrset_magic = ADDRSET_MAGIC ;
+constexpr uint		addrset_magval = ADDRSET_MAGIC ;
 
 
 /* exported variables */
@@ -121,7 +121,7 @@ constexpr uint		addrset_magic = ADDRSET_MAGIC ;
 
 int addrset::ins(cvoid *addr,size_t asize) noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == addrset_magic) ylikely {
+	if (magval == addrset_magval) ylikely {
 	    trackp	tp = trackp(setp) ;
 	    rs = SR_INVALID ;
 	    if (addr && (asize > 0)) ylikely {
@@ -144,7 +144,7 @@ int addrset::ins(cvoid *addr,size_t asize) noex {
 
 int addrset::rem(cvoid *addr) noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == addrset_magic) ylikely {
+	if (magval == addrset_magval) ylikely {
 	    trackp	tp = trackp(setp) ;
 	    ent		e = { addr, 0uz } ;
 	    rs = SR_INVALID ;
@@ -159,7 +159,7 @@ int addrset::rem(cvoid *addr) noex {
 
 int addrset::present(cvoid *addr) noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == addrset_magic) ylikely {
+	if (magval == addrset_magval) ylikely {
 	    trackp	tp = trackp(setp) ;
 	    ent		e = { addr, 0uz } ;
 	    rs = SR_INVALID ;
@@ -177,7 +177,7 @@ int addrset::present(cvoid *addr) noex {
 
 int addrset::get(cvoid *addr,addrset_ent *ep) noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == addrset_magic) ylikely {
+	if (magval == addrset_magval) ylikely {
 	    trackp	tp = trackp(setp) ;
 	    ent		e = { addr, 0uz } ;
 	    rs = SR_INVALID ;
@@ -199,7 +199,7 @@ int addrset::get(cvoid *addr,addrset_ent *ep) noex {
 
 int addrset::curbegin(cur *curp) noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == addrset_magic) ylikely {
+	if (magval == addrset_magval) ylikely {
 	    rs = SR_FAULT ;
 	    if (curp) ylikely {
 	        cnullptr	np{} ;
@@ -231,7 +231,7 @@ int addrset::curbegin(cur *curp) noex {
 
 int addrset::curend(cur *curp) noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == addrset_magic) ylikely {
+	if (magval == addrset_magval) ylikely {
 	    rs = SR_FAULT ;
 	    if (curp) ylikely {
 	        setiter		*itcp = setiterp(curp->vitcp) ;
@@ -248,7 +248,7 @@ int addrset::curend(cur *curp) noex {
 
 int addrset::curenum(cur *curp,ent *ep) noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == addrset_magic) ylikely {
+	if (magval == addrset_magval) ylikely {
 	    rs = SR_FAULT ;
 	    if (curp && ep) ylikely {
 		rs = SR_NOTOPEN ;
@@ -282,7 +282,7 @@ int addrset::istart(int n) noex {
 	    try {
 	        if (trackp tp ; (tp = new(nothrow) track) != nullptr) {
 		    setp = tp ;
-		    magic = addrset_magic ;
+		    magval = addrset_magval ;
 		    rs = SR_OK ;
 	        } /* end if (new-track) */
 	    } catch (...) {
@@ -295,14 +295,14 @@ int addrset::istart(int n) noex {
 
 int addrset::ifinish() noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == addrset_magic) ylikely {
+	if (magval == addrset_magval) ylikely {
 	    trackp	tp = trackp(setp) ;
 	    rs = SR_OK ;
 	    {
 		delete tp ;
 	    }
 	    setp = nullptr ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} /* end if (was open) */
 	return rs ;
 }
@@ -310,7 +310,7 @@ int addrset::ifinish() noex {
 
 int addrset::icount() noex {
 	int		rs = SR_NOTOPEN ;
-	if (magic == addrset_magic) ylikely {
+	if (magval == addrset_magval) ylikely {
 	    trackp	tp = trackp(setp) ;
 	    rs = int(tp->size()) ;
 	} /* end if (was open) */
@@ -319,7 +319,7 @@ int addrset::icount() noex {
 /* end method (addrset::icount) */
 
 void addrset::dtor() noex {
-	if (magic) {
+	if (magval) {
 	    if (cint rs = ifinish() ; rs < 0) {
 		ulogerror("addrset",rs,"dtor-finish") ;
 	    }
