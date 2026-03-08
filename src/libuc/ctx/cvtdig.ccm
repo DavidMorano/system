@@ -66,13 +66,12 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<bit>			/* <- for |countr_zero(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<stdintx.h>
+#include	<usysbase.h>
+
+#pragma		GCC dependency		"mod/digtab.ccm"
 
 export module cvtdig ;
 
@@ -83,8 +82,7 @@ inline cint	cvtdig_maxbase = maxbase ; /* <- from |digtab(3u)| */
 constexpr inline int cvtdig_ffbsi(int b) noex {
 	cuint		ub = uint(b) ;
 	return std::countr_zero(ub) ;
-}
-/* end subroutine (cvtdig_ffbsi) */
+} /* end subroutine (cvtdig_ffbsi) */
 
 export {
     template<typename UT>
