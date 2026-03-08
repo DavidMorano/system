@@ -158,7 +158,7 @@ int vecstr::find(cchar *sp,int sl) noex {
 int vecstr::search(cchar *sp,int sl) noex {
     	cint		rsn = SR_NOTFOUND ;
     	int		rs = SR_FAULT ;
-	int		f = false ;
+	int		f = false ; /* return-value (boolean only) */
 	if (sp) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (fl.open) ylikely {
