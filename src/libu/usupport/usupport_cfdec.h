@@ -27,6 +27,9 @@ namespace libu {
     extern int cfdec(cchar *,int,int *) noex ;
     extern int cfdec(cchar *,int,long *) noex ;
     extern int cfdec(cchar *,int,longlong *) noex ;
+    extern int cfdec(cchar *,int,uint *) noex ;
+    extern int cfdec(cchar *,int,ulong *) noex ;
+    extern int cfdec(cchar *,int,ulonglong *) noex ;
 }
 
 #endif /* __cplusplus */
