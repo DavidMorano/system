@@ -41,7 +41,7 @@
 #include	<usysbase.h>
 
 
-namespace ustd {
+namespace libu {
     extern int	ustd_confstr(int,char *,int) noex ;
 } /* end namespace (ustd) */
 
