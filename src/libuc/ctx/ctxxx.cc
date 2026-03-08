@@ -68,12 +68,17 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<bit>			/* |countr_zero(3c++)| */
-#include	<usystem.h>		/* memory-allocation */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<stdintx.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"ctxxx.h"
+
+#pragma		GCC dependency		"mod/digtab.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import digtab ;				/* |getdig(3u)| + |maxbase(3u)| */
 import uconstants ;			/* |digbufsize(3u)| */
@@ -170,13 +175,13 @@ static int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 	        cint	dlen = digbufsize.bufsize[t][b] ;
 		int	len ;
 		if (dlen > maxstack) {
-		    if (char *dbuf ; (rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
+		    if (char *dbuf ; (rs = lm_mall((dlen+1),&dbuf)) >= 0) {
 			{
 		            len = ctxxxx(dbuf,dlen,b,ulv) ;
 		            if (v < 0) dbuf[dlen-(++len)] = '-' ;
 		            rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 			}
-			rs1 = uc_free(dbuf) ;
+			rs1 = lm_free(dbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (memory-allocation-deallocation) */
 		} else {
