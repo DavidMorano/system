@@ -59,13 +59,9 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<charconv>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<sncpyx.h>
 
 #include	"ctchars.h"
@@ -96,7 +92,7 @@ using std::errc ;
 /* forward references */
 
 template<typename T>
-static constexpr int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
+local int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
 	to_chars_result	r ;
 	constexpr errc	ec_ok = errc() ;
 	int		rs = SR_OK ;
