@@ -623,6 +623,14 @@ typedef void (*void_f)() noex ;
 EXTERNC_end
 #endif /* TYPEDEF_VOIDF */
 
+
+#ifndef	TYPEDEF_QSORTF
+#define	TYPEDEF_QSORTF
+EXTERNC_begin
+typedef int (*qsort_f)(const void *,const void *) noex ;
+EXTERNC_end
+#endif	/* TYPEDEF_QSORTF */
+
 #ifndef	TYPEDEF_SORTVCMP
 #define	TYPEDEF_SORTVCMP
 EXTERNC_begin
