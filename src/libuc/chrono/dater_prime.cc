@@ -934,7 +934,7 @@ local int dater_ldname(dater *op,cchar *zstrp,int zstrl) noex {
 	    znwcpy(dnp,znl,zstrp,zstrl) ;
 	    if ((! op->fl.zoff) || (op->b.dstflag < 0)) {
 	        cint	ch = mkchar(dnp[0]) ;
-	        if (isplusminus(ch) || isdigitlatin(ch)) {
+	        if (ispm(ch) || isdigitlatin(ch)) {
 	            rs = dater_pnum(op) ;
 	        } else {
 	            rs = dater_pname(op) ;
