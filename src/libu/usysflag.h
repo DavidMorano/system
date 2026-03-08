@@ -50,7 +50,7 @@ struct usysflags {
     	static const bool	sunos ;
     	static const bool	darwin ;
     	static const bool	linux ;
-} ;
+} ; /* end struct (usysflags) */
 
 extern const usysflags		usysflag ;
 
