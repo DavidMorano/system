@@ -16,28 +16,31 @@
 #include	<netinet/in.h>
 #include	<netdb.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	INETADDR	union inetaddr_head
 
 
+enum inetaddrs {
+    	inetaddr_bin,
+    	inetaddr_str,
+    	inetaddr_dot,
+    	inetaddr_overlast
+} ; /* end enum (inetaddrs) */
+
 struct inetaddr_head {
 	union {
 	    INADDR4	a ;
-	    char	straddr[sizeof(INADDR4)] ;
+	    char	straddr[szof(INADDR4)] ;
 	} ;
-} ;
-
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum inetaddrmems {
 	inetaddrmem_finish,
 	inetaddrmem_overlast
-} ;
+} ; /* end (enum inetaddrmems) */
 struct inetaddr ;
 struct inetaddr_co {
 	inetaddr	*op = nullptr ;
@@ -58,11 +61,7 @@ struct inetaddr : inetaddr_head {
 	} ;
 	inetaddr(const inetaddr &) = delete ;
 	inetaddr &operator = (const inetaddr &) = delete ;
-	int start(cvoid *) noex ;
-#ifdef	COMMENT
-	int startstr(cchar *,int = -1) noex ;
-	int startdot(cchar *,int = -1) noex ;
-#endif /* COMMENT */
+	int start(inetaddrs,cvoid *,int = -1) noex ;
 	int gethexaddr(char *,int) noex ;
 	int getdotaddr(char *,int) noex ;
 } ; /* end struct (inetaddr) */
@@ -72,15 +71,10 @@ typedef INETADDR	inetaddr ;
 
 EXTERNC_begin
 
-extern int inetaddr_start(inetaddr *,cvoid *) noex ;
+extern int inetaddr_start(inetaddr *,inetaddrs,cvoid *,int) noex ;
 extern int inetaddr_gethexaddr(inetaddr *,char *,int) noex ;
 extern int inetaddr_getdotaddr(inetaddr *,char *,int) noex ;
 extern int inetaddr_finish(inetaddr *) noex ;
-
-#ifdef	COMMENT
-extern int inetaddr_startstr(inetaddr *,cchar *,int) noex ;
-extern int inetaddr_startdot(inetaddr *,cchar *,int) noex ;
-#endif /* COMMENT */
 
 EXTERNC_end
 
