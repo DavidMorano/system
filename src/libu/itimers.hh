@@ -45,7 +45,7 @@ struct itimers {
 extern const itimers	itimer ;
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* ITIMERS_INCLUDE */
 
 
