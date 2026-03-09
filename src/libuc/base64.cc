@@ -72,10 +72,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>		/* we have one SR below */
+#include	<usysbase.h>
 #include	<mkchar.h>		/* |mkchar(3uc)| */
 #include	<localmisc.h>
 
@@ -117,10 +114,10 @@ namespace {
     constexpr int	tablen = (UCHAR_MAX + 1) ;
     struct mkdecoder {
 	uchar		tab[tablen] ;
-	constexpr mkdecoder() noex {
+	consteval mkdecoder() noex {
 	    for (int j = 0 ; j < tablen ; j += 1) {
 		tab[j] = uchar(UCHAR_MAX) ;
-	    }
+	    } /* end for */
 	    for (int i = 0 ; i < nelem(base64_et) ; i += 1) {
 	        uchar	uch = base64_et[i] ;
 	        tab[uch] = uchar(i) ;
@@ -133,9 +130,9 @@ namespace {
 
 /* forward references */
 
-static int	base64_dg(cchar *,char *) noex ;
+local int	base64_dg(cchar *,char *) noex ;
 
-static void	base64_eg(cchar *,char *) noex ;
+local void	base64_eg(cchar *,char *) noex ;
 
 
 /* local variables */
@@ -185,9 +182,8 @@ int base64_e(cchar *inbuf,int len,char *outbuf) noex {
 /* decode */
 int base64_d(cchar *inbuf,int len,char *outbuf) noex {
 	int		j = 0 ; /* return-value */
-	int		dlen ;
 	for (int i = 0 ; (j >= 0) && (len >= 4) ; ) {
-	    if ((dlen = base64_dg((inbuf + i),(outbuf + j))) >= 0) {
+	    if (int dlen ; (dlen = base64_dg((inbuf + i),(outbuf + j))) >= 0) {
 	        len -= 4 ;
 	        i += 4 ;
 	        j += dlen ;
@@ -220,12 +216,12 @@ static void base64_eg(cchar *inbuf,char *outbuf) noex {
 	for (int i = 0 ; i < 4 ; i += 1) {
 	    cint	idx = int((hold >> ((3 - i) * 6)) & 0x3F) ;
 	    outbuf[i] = base64_et[idx] ;
-	}
+	} /* end for */
 }
 /* end subroutine (base64_eg) */
 
 /* decode a group */
-static int base64_dg(cchar *inbuf,char *outbuf) noex {
+local int base64_dg(cchar *inbuf,char *outbuf) noex {
 	uint32_t	hold = 0 ;
 	int		rs = SR_OK ;
 	int		dlen = 0 ; /* return-value */
