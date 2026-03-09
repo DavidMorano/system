@@ -5,6 +5,7 @@
 /* String-Filter */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debug */
 
 /* revision history:
 
@@ -57,6 +58,7 @@ module ;
 #include	<strnul.hh>
 #include	<mkchar.h>
 #include	<localmisc.h>
+#include	<debprintf.h>		/* |DEBPRINTF| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/ureserve.ccm"
@@ -67,11 +69,16 @@ module strfilter ;
 import libutil ;			/* |lenstr(3u)| */
 import ureserve ;			/* |vecstr(3u)| */
 import sif ;
+import debug ;				/* |defprintf(3uc)| */
 
 /* local defines */
 
 #define	STRFILTER_DEFENTS	15	/* default entries */
 #define	STRFILTER_MAGIC		0x98865854
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debug */
+#endif
 
 
 /* imported namespaces */
@@ -114,6 +121,8 @@ local ulong mksw(cchar *sp,int sl) noex {
 /* local variables */
 
 constexpr int		defents = STRFILTER_DEFENTS ;	/* defualt entries */
+
+constexpr bool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -160,7 +169,7 @@ int strfilter::add(cchar *sp,int µsl) noex {
 		    rs = SR_OK ;
 		    if (strnbrk(sp,sl," \t,")) {
 		        sif sa(sp,sl,',') ;
-		        cc *cp ;
+		        cchar *cp ;
 		        for (int cl ; (cl = sa(&cp)) > 0 ; ) {
 		            rs = iaddone(cp,cl) ;
 			    c += rs ;
@@ -232,9 +241,15 @@ int strfilter::ihave(cchar *sp,int sl) noex {
     	cint		ch = mkchar(*sp) ;
     	int		rs = SR_OK ;
 	int		f = false ;
+	if_constexpr (f_debug) {
+	    strnul s(sp,sl) ;
+	    DEBPRINTF("ent s=>%s<\n",ccp(s)) ;
+	}
 	if (bool(filtchr[ch])) {
 	    ulong	sw = mksw(sp,sl) ;
-	    cint	rl = (sl - sz) ; /* remaining-length */
+	    if_constexpr (f_debug) {
+	        DEBPRINTF("have-filt-char f_ready=%u\n",fl.ready) ;
+	    }
 	    if (fl.ready) {
 		f = binary_search(filtarr,(filtarr + idx),sw) ;
 	    } else {
@@ -242,11 +257,17 @@ int strfilter::ihave(cchar *sp,int sl) noex {
 		    if ((f = (filtarr[i] == sw))) break ;
 	        }
 	    } /* end if (fl.ready) */
-	    if (f && (rl > 0)) {
+	    if_constexpr (f_debug) {
+	        DEBPRINTF("after rl=%d f=%u\n",(sl - sz),f) ;
+	    }
+	    if (f && ((sl - sz) > 0)) {
 		rs = vecstr::search(sp,sl) ;
 		f = rs ;
 	    }
 	} /* end if (had in character bit-array) */
+	if_constexpr (f_debug) {
+	    DEBPRINTF("ret rs=%d f=%d\n",rs,f) ;
+	}
 	return (rs >= 0) ? f : rs ;
 } /* end method (strfilter::ihave) */
 
