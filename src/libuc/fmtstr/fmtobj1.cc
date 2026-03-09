@@ -104,7 +104,7 @@ module ;
 #include	<strdcpy.h>
 #include	<localmisc.h>
 
-#include	"fmtopt.h"
+#include	"fmtopts.h"
 
 module fmtobj ;
 
