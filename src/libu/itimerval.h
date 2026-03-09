@@ -8,15 +8,19 @@
 
 /* revision history:
 
-	= 2014-04-04, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2014 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Object:
+	itimerval
+
+	Description:
 	Methods for the ITIMERVAL object.
 
 *******************************************************************************/
@@ -26,13 +30,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/time.h>		/* <- interval timers are here */
 #include	<time.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<timespec.h>
+#include	<usysbase.h>
+#include	<timeval.h>
 
 
 EXTERNC_begin
