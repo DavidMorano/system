@@ -1,4 +1,4 @@
-/* filetype HEADER */
+/* filetypes HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -8,8 +8,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	FILETYPE_INCLUDE
-#define	FILETYPE_INCLUDE
+#ifndef	FILETYPES_INCLUDE
+#define	FILETYPES_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -105,13 +105,13 @@ enum filetypes {
 EXTERNC_begin
 
 local inline filetypes filetype(mode_t m) noex {
-	cuint	uv = (uint) m ;
+	cushort	uv = ushort(m) ;
 	return filetypes((uv & S_IFMT) >> 12) ;
 } /* end subroutine (filetype) */
 
 EXTERNC_end
 
 
-#endif /* FILETYPE_INCLUDE */
+#endif /* FILETYPES_INCLUDE */
 
 
