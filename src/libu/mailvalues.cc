@@ -73,3 +73,6 @@ const int	mailvalues::hostnamemult =	HOSTNAMEMULT ;
 const int	mailvalues::mailaliaslen =	MAILALIASLEN ;
 
 
+/* exported subroutines */
+
+
