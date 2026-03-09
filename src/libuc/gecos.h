@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	GECOS		struct gecos_head
@@ -42,16 +39,16 @@ enum gecosvals {
 	gecosval_hphone,
 	gecosval_printer,
 	gecosval_overlast
-} ;
+} ; /* end enum (gecosvals) */
 
 struct gecos_value {
 	cchar		*vp ;
 	int		vl ;
-} ;
+} ; /* end struct (gecos_value) */
 
 struct gecos_head {
 	GECOS_VAL	vals[gecosval_overlast] ;
-} ;
+} ; /* end struct (gecos_head) */
 
 typedef GECOS_VAL	gecos_val ;
 
@@ -59,7 +56,7 @@ typedef GECOS_VAL	gecos_val ;
 enum gecosmems {
 	gecosmem_finish,
 	gecosmem_overlast
-} ;
+} ; /* end enum (gecosmems) */
 struct gecos ;
 struct gecos_co {
 	gecos		*op = nullptr ;
@@ -94,7 +91,6 @@ struct gecos : gecos_head {
 #else	/* __cplusplus */
 typedef GECOS		gecos ;
 #endif /* __cplusplus */
-
 
 EXTERNC_begin
 
