@@ -67,7 +67,7 @@ OBJ15= usysop.o vecbool.o uchartype.o
 
 OBJ16= syswords.o varnames.o
 OBJ17= ptx.o uacceptpass.o 
-OBJ18= timeval.o itimerval.o
+OBJ18= timeval.o itimerval.o clockids.o
 OBJ19= timespec.o itimerspec.o
 
 OBJ20= uinet.o bitgrp.o
@@ -80,6 +80,11 @@ OBJ25= fonce.o filerec.o
 OBJ26= ustd.o
 OBJ27= ucomposite.o
 
+OBJ28= flbs.o
+OBJ29= itimers.o filetypes.o
+OBJ30=
+OBJ31=
+
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
@@ -87,14 +92,14 @@ OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
+OBJH= obj28.o obj29.o
 
-OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
+OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o
 
 
 INCDIRS=
 
 LIBDIRS=
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -240,31 +245,45 @@ obj18.o:		$(OBJ18)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj19.o:		$(OBJ19)
-	$(LD) -r -o $@ $(LDFLAGS) $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj20.o:		$(OBJ20)
-	$(LD) -r -o $@ $(LDFLAGS) $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj21.o:		$(OBJ21)
-	$(LD) -r -o $@ $(LDFLAGS) $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj22.o:		$(OBJ22)
-	$(LD) -r -o $@ $(LDFLAGS) $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj23.o:		$(OBJ23)
-	$(LD) -r -o $@ $(LDFLAGS) $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj24.o:		$(OBJ24)
-	$(LD) -r -o $@ $(LDFLAGS) $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj25.o:		$(OBJ25)
-	$(LD) -r -o $@ $(LDFLAGS) $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj26.o:		$(OBJ26)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ26)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj27.o:		$(OBJ27)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ27)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj28.o:		$(OBJ28)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj29.o:		$(OBJ29)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj30.o:		$(OBJ30)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj31.o:		$(OBJ31)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 
 obja.o:			$(OBJA)
@@ -288,6 +307,12 @@ objf.o:			$(OBJF)
 objg.o:			$(OBJG)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
+objh.o:			$(OBJH)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+obji.o:			$(OBJI)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
 
 # SUPPORT
 syshas.o:		syshas.cc	syshas.h		$(INCS)
@@ -300,13 +325,13 @@ itimerval.o:		itimerval.cc itimerval.h		$(INCS)
 timespec.o:		timespec.cc timespec.h			$(INCS)
 itimerspec.o:		itimerspec.cc itimerspec.h		$(INCS)
 
-usysflag.o:		usysflag.cc usysflag.h			$(INCS)
-utimeout.o:		utimeout.c utimeout.h			$(INCS)
-utimeouts.o:		utimeouts.cc utimeouts.h		$(INCS)
-usyscallbase.o:		usyscallbase.cc usyscallbase.hh		$(INCS)
-usysutility.o:		usysutility.cc usysutility.hh		$(INCS)
-usysdata.o:		usysdata.cc usysdata.h			$(INCS)
-uacceptpass.o:		uacceptpass.cc uopen.h		$(INCS)
+usysflag.o:		usysflag.cc	usysflag.h		$(INCS)
+utimeout.o:		utimeout.c	utimeout.h		$(INCS)
+utimeouts.o:		utimeouts.cc	utimeouts.h		$(INCS)
+usyscallbase.o:		usyscallbase.cc	usyscallbase.hh		$(INCS)
+usysutility.o:		usysutility.cc	usysutility.hh		$(INCS)
+usysdata.o:		usysdata.cc	usysdata.h		$(INCS)
+uacceptpass.o:		uacceptpass.cc	uopen.h			$(INCS)
 
 # requires USYSBASIC
 uatfork.o:		umods.o usigblock.o
@@ -453,7 +478,6 @@ ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
 uexec.o:		uexec.cc uexec.h		$(INCS)
 uinet.o:		uinet.cc uinet.h		$(INCS)
 uiconv.o:		uiconv.cc uiconv.h		$(INCS)
-ufcntl.o:		ufcntl.cc			$(INCS)
 uchartype.o:		uchartype.cc	uchartype.h	${INCS}
 
 syswords.o:		syswords.cc syswords.hh		$(INCS)
@@ -466,8 +490,13 @@ mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
 stdfnames.o:		stdfnames.c stdfnames.h		$(INCS)
 
 # misc-groups
-baops.o:		baops.c baops.h			$(INCS)
+baops.o:		baops.c		baops.h		$(INCS)
 
 stdclib.o:		stdclib.cc	stdclib.hh	$(INCS)
+
+flbs.o:			flbs.ccm
+filetypes.o:		filetypes.cc	filetypes.h	$(INCS)
+itimers.o:		itimers.cc	itimers.hh	$(INCS)
+clockids.o:		clockids.cc	clockids.hh	$(INCS)
 
 
