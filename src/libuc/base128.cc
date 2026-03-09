@@ -58,10 +58,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>		/* we have one SR below */
+#include	<usysbase.h>
 #include	<mkchar.h>		/* |mkchar(3uc)| */
 #include	<localmisc.h>
 
@@ -104,13 +101,13 @@ namespace {
 	        enc[i++] = uchar('a' + j) ;
 	    }
 	    for (int j = 0 ; j < (16+7) ; j += 1) {
-	        enc[i++] = uchar('À' + j) ;
+	        enc[i++] = uchar(UC('À') + j) ;
 	    }
 	    for (int j = 0 ; j < 31 ; j += 1) {
-	        enc[i++] = uchar('Ø' + j) ;
+	        enc[i++] = uchar(UC('Ø') + j) ;
 	    }
 	    for (int j = 0 ; j < 8 ; j += 1) {
-	        enc[i++] = uchar('ø' + j) ;
+	        enc[i++] = uchar(UC('ø') + j) ;
 	    }
 	    enc[i++] = '°' ;
 	    enc[i++] = '¹' ;
@@ -137,9 +134,9 @@ namespace {
 
 /* forward references */
 
-static int	base128_dg(cchar *,char *) noex ;
+local int	base128_dg(cchar *,char *) noex ;
 
-static void	base128_eg(cchar *,char *) noex ;
+local void	base128_eg(cchar *,char *) noex ;
 
 
 /* local variables */
@@ -189,9 +186,8 @@ int base128_e(cchar *inbuf,int len,char *outbuf) noex {
 /* decode */
 int base128_d(cchar *inbuf,int len,char *outbuf) noex {
 	int		j = 0 ; /* return-value */
-	int		dlen ;
 	for (int i = 0 ; (j >= 0) && (len >= 4) ; ) {
-	    if ((dlen = base128_dg((inbuf + i),(outbuf + j))) >= 0) {
+	    if (int dlen ; (dlen = base128_dg((inbuf + i),(outbuf + j))) >= 0) {
 	        len -= 4 ;
 	        i += 4 ;
 	        j += dlen ;
@@ -215,7 +211,7 @@ int base128_dec(int v) noex {
 /* local subroutines */
 
 /* encode a group */
-static void base128_eg(cchar *inbuf,char *outbuf) noex {
+local void base128_eg(cchar *inbuf,char *outbuf) noex {
 	uint		hold = 0 ;
 	for (int i = 0 ; i < 3 ; i += 1) {
 	    hold = (hold << 8) ;
@@ -224,12 +220,12 @@ static void base128_eg(cchar *inbuf,char *outbuf) noex {
 	for (int i = 0 ; i < 4 ; i += 1) {
 	    cint	idx = (hold >> ((3 - i) * 6)) & 0x3F ;
 	    outbuf[i] = base128mgr.enc[idx] ;
-	}
+	} /* end for */
 }
 /* end subroutine (base128_eg) */
 
 /* decode a group */
-static int base128_dg(cchar *inbuf,char *outbuf) noex {
+local int base128_dg(cchar *inbuf,char *outbuf) noex {
 	uint		hold = 0 ;
 	int		rs = SR_OK ;
 	int		dlen = 0 ; /* return-value */
@@ -240,7 +236,7 @@ static int base128_dg(cchar *inbuf,char *outbuf) noex {
 	        if (ch != chx_equal) {
 	            hold |= ch ;
 	            dlen += 1 ;
-	        }
+	        } /* end if */
 	    } else {
 	        rs = SR_INVALID ;
 	    }
@@ -251,7 +247,7 @@ static int base128_dg(cchar *inbuf,char *outbuf) noex {
 	        for (int i = 0 ; i < 3 ; i += 1) {
 	            cint	val = hold >> ((2 - i) * 6) ;
 	            outbuf[i] = char(val) ;
-	        }
+	        } /* end for */
 	        dlen -= 1 ;
 	    } else {
 	        outbuf[0] = char(hold >> 16) ;
