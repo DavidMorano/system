@@ -55,12 +55,13 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>		/* |va_list(3c)| */
-#include	<new>			/* |nullptr_t| */
+#include	<new>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<usupport.h>		/* |sncpy(3u)| */
 #include	<usysutility.hh>	/* |snvprintf(3u)| */
 #include	<getfdfile.h>		/* |FD_STDERR| */
@@ -70,7 +71,6 @@ module debug ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using libu::sncpy ;
 using libu::snprintf ;			/* subroutine */
 using libu::snvprintf ;			/* subroutine */
@@ -114,21 +114,24 @@ int debprintf(cchar *func,cchar *fmt,...) noex {
     	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
 	if (func && fmt) {
-	    va_begin(ap,fmt) ;
-    	    rs = SR_NOMEM ;
-	    if (char *fbuf ; (fbuf = new(nt) char[flen + 1]) != np) {
-		if ((rs = sncpy(fbuf,flen,func,": ")) >= 0) {
-		    cint	bl = (flen - rs) ;
-		    char	*bp = (fbuf + rs) ;
-		    len += rs ;
-	            if ((rs = snvprintf(bp,bl,fmt,ap)) >= 0) {
-			len += rs ;
-		        rs = u_write(dfd,fbuf,len) ;
-	            } /* end if (snvprintf) */
-		} /* end if (sncpy) */
-		delete [] fbuf ;
-	    } /* end if (m-a-f) */
-	    va_end(ap) ;
+	    rs = SR_OK ;
+	    if (dfd >= 0) {
+	        va_begin(ap,fmt) ;
+    	        rs = SR_NOMEM ;
+	        if (char *fbuf ; (fbuf = new(nt) char[flen + 1]) != np) {
+		    if ((rs = sncpy(fbuf,flen,func,": ")) >= 0) {
+		        cint	bl = (flen - rs) ;
+		        char	*bp = (fbuf + rs) ;
+		        len += rs ;
+	                if ((rs = snvprintf(bp,bl,fmt,ap)) >= 0) {
+			    len += rs ;
+		            rs = u_write(dfd,fbuf,len) ;
+	                } /* end if (snvprintf) */
+		    } /* end if (sncpy) */
+		    delete [] fbuf ;
+	        } /* end if (m-a-f) */
+	        va_end(ap) ;
+	    } /* end if (enabled) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (debprintf) */
