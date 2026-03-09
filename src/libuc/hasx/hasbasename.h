@@ -28,7 +28,7 @@
 
 EXTERNC_begin
 
-extern bool	hasmodname(cchar *,int,cchar *) noex ;
+extern bool	hasbasename(cchar *,int,cchar *) noex ;
 
 EXTERNC_end
 
