@@ -53,9 +53,9 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<ascii.h>
-#include	<ischarx.h>		/* |isprintlatin(3uc)| */
 #include	<localmisc.h>
 
+#include	"ischarx.h"		/* |isprintlatin(3uc)| */
 #include	"ismmclass.h"
 
 
