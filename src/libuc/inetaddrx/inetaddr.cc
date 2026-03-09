@@ -5,8 +5,6 @@
 /* object to manipulate INET4 adresses */
 /* version %I% last-modified %G% */
 
-#define	CF_STARTSTR	0		/* start from a number-string */
-#define	CF_STARTDOT	0		/* start from a dot-decimal string */
 
 /* revision history:
 
@@ -14,7 +12,7 @@
 	This little object module was first written.
 
 	= 2020-05-17, David A­D­ Morano
-	I added the |consteval| from C++20 on my little value
+	I added the |constexpr| from C++20 on my little value
 	generator, and |constexpr| on the static variables.  Is
 	everyone doing this sort of maintenance on their old code
 	now (to be "hip" with the times)? Just wondering.  Correct,
@@ -40,16 +38,13 @@
 	come fully into its own).
 
 	Synopsis:
-	int inetaddr_start(inetaddr *ip,cvoid *addr) noex
-	int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex
-	int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex
+	int inetaddr_start(inetaddr *ip,inetaddrs at,cvoid *ap,int al) noex
 
 	Arguments:
 	ip		object pointer
-	addr		INADDR pointer
-	addrp		c-string address pointer
-	addrl		c-string address (raw-bytes) length
-	addrl		c-string address (dot-decimal) length
+	at		address-type
+	ap		c-string address pointer
+	al		c-string address length
 
 	Return:
 	>=0		OK
@@ -67,29 +62,27 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>		/* |inet_addr(3c)| + |in_addr_t| */
+#include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<netdb.h>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>		/* |cfdec(3u)| */
 #include	<uinet.h>
 #include	<strwcpy.h>
 #include	<inaddrbad.hh>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
-
-#if	defined(CF_STARTSTR) && (CF_STARTSTR > 0)
 #include	<cfnum.h>
-#endif
+#include	<mkchar.h>
+#include	<char.h>
+#include	<localmisc.h>
 
 #include	"inetaddr.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/digtab.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 import digtab ;
 
 /* local defines */
@@ -97,6 +90,8 @@ import digtab ;
 
 /* imported namespaces */
 
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using libu::ctdecui ;			/* subroutine (LIBU) */
 
 
@@ -114,11 +109,18 @@ using libu::ctdecui ;			/* subroutine (LIBU) */
 
 /* forward references */
 
+local int inetaddr_startbin(inetaddr *ip,cchar *addrp,int addrl) noex ;
+local int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex ;
+local int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex ;
+
 
 /* local variables */
 
 constexpr int		inet4addrlen = INET4ADDRLEN ;
-constexpr int		alen = (inet4addrlen * 4) ;
+constexpr int		inet6addrlen = INET6ADDRLEN ;
+
+constexpr int		str4len = (INET4ADDRLEN * 4) ;
+constexpr int		str6len = (INET6ADDRLEN * 20) ;
 
 constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
@@ -128,22 +130,48 @@ constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
 /* exported subroutines */
 
-int inetaddr_start(inetaddr *ip,cvoid *addr) noex {
+int inetaddr_start(inetaddr *ip,inetaddrs at,cvoid *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
-	if (ip && addr) ylikely {
-	    char *ep = charp(memcopy(ip->straddr,addr,inet4addrlen)) ;
-	    rs = intconv(ep - ip->straddr) ;
-	}
+	if (ip && abuf) ylikely {
+	    cchar *abufs = charp(abuf) ;
+	    rs = SR_INVALID ;
+	    if ((at >= 0) && (at < inetaddr_overlast)) {
+		switch (at) {
+		case inetaddr_bin:
+		    rs = inetaddr_startbin(ip,abufs,alen) ;
+		    break ;
+		case inetaddr_str:
+		    rs = inetaddr_startstr(ip,abufs,alen) ;
+		    break ;
+		case inetaddr_dot:
+		    rs = inetaddr_startdot(ip,abufs,alen) ;
+		    break ;
+		default:
+		    rs = SR_INVALID ;
+		    break ;
+		} /* end switch */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	(void) alen ;
 	return rs ;
 }
 /* end subroutine (inetaddr_start) */
 
-#if	defined(CF_STARTSTR) && (CF_STARTSTR > 0)
-int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
+local int inetaddr_startbin(inetaddr *ip,cchar *addrp,int addrl) noex {
+    	int		rs = SR_FAULT ;
+	if (ip) {
+	    cint ml = (addrl >= 0) ? min(addrl,inet4addrlen) : inet4addrlen ;
+	    char *ep = charp(memcopy(ip->straddr,addrp,ml)) ;
+	    rs = intconv(ep - ip->straddr) ;
+	}
+	return rs ;
+} /* end subroutine (inetaddr_startbin) */
+
+local int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	int		rs = SR_FAULT ;
 	if (ip && addrp) ylikely {
 	    cchar	*ap = addrp ;
-	    char	abuf[alen + 1] ;
+	    char	abuf[str4len + 1] ;
 	    rs = SR_OK ;
 	    if (addrl < 0) addrl = lenstr(addrp) ;
 	    while (CHAR_ISWHITE(*ap)) {
@@ -151,9 +179,9 @@ int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	        addrl -= 1 ;
 	    }
 	    if (*ap == '\\') {
-	        uint	uiw ;
-	        rs = cfnumui(ap,addrl,&uiw) ;
-	        ip->a.s_addr = htonl(uiw) ;
+	        if (uint uiw ; (rs = cfnumui(ap,addrl,&uiw)) >= 0) {
+	            ip->a.s_addr = htonl(uiw) ;
+		}
 	    } else {
 	        while ((addrl > 0) && CHAR_ISWHITE(ap[addrl - 1])) {
 	            addrl -= 1 ;
@@ -163,7 +191,7 @@ int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	                strwcpy(abuf,ap,addrl) ;
 	                ap = abuf ;
 	            }
-		    if (in_addr_t a ; (a = inet_addr(ap)) != inaddrbad) {
+		    if (in4_addr_t a ; (a = inet_addr(ap)) != inaddrbad) {
 	                ip->a.s_addr = a ;
 		    } else {
 	                rs = SR_INVALID ;
@@ -175,14 +203,12 @@ int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (inetaddr_startstr) */
-#endif /* CF_STARTSTR */
 
-#if	defined(CF_STARTDOT) && (CF_STARTDOT > 0)
-int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
+local int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 	int		rs = SR_FAULT ;
 	if (ip && addrp) ylikely {
 	    cchar	*ap = addrp ;
-	    char	abuf[(inet4addrlen* 4) + 1] ;
+	    char	abuf[(inet4addrlen * szof(in4_addr_t)) + 1] ;
 	    rs = SR_OK ;
 	    if (addrl < 0) addrl = lenstr(addrp) ;
 	    while (CHAR_ISWHITE(*ap)) {
@@ -197,7 +223,7 @@ int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 	            strwcpy(abuf,ap,addrl) ;
 	            ap = abuf ;
 	        }
-		if (in_addr_t a ; (a = inet_addr(ap)) != inaddrbad) {
+		if (in4_addr_t a ; (a = inet_addr(ap)) != inaddrbad) {
 	            ip->a.s_addr = a ;
 		} else {
 	            rs = SR_INVALID ;
@@ -208,7 +234,6 @@ int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (inetaddr_startdot) */
-#endif /* CF_STARTDOT */
 
 int inetaddr_finish(inetaddr *ip) noex {
 	int		rs = SR_FAULT ;
@@ -224,7 +249,7 @@ int inetaddr_gethexaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		j = 0 ;
 	if (ip && rbuf) ylikely {
-	    constexpr int	rlenmin = ((inet4addrlen* 2) + 0) ;
+	    cint	rlenmin = ((inet4addrlen * 2) + 0) ;
 	    rs = SR_OK ;
 	    rbuf[0] = '\0' ;
 	    if ((rlen < 0) || (rlen >= rlenmin)) {
@@ -246,7 +271,7 @@ int inetaddr_getdotaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (ip && rbuf) ylikely {
-	    constexpr int	rlenmin = ((inet4addrlen * 3) + 3) ;
+	    cint	rlenmin = ((inet4addrlen * 3) + 3) ;
 	    char	*bp = rbuf ;
 	    rbuf[0] = '\0' ;
 	    rs = SR_OK ;
@@ -282,21 +307,9 @@ inetaddr_co::operator int () noex {
 }
 /* end method (inetaddr_co::operator) */
 
-int inetaddr::start(cvoid *addr) noex {
-	return inetaddr_start(this,addr) ;
+int inetaddr::start(inetaddrs at,cvoid *addr,int alen) noex {
+	return inetaddr_start(this,at,addr,alen) ;
 }
-
-#if	defined(CF_STARTSTR) && (CF_STARTSTR > 0)
-int inetaddr::startstr(cchar *sp,int sl) noex {
-	return inetaddr_startstr(this,sp,sl) ;
-}
-#endif
-
-#if	defined(CF_STARTDOT) && (CF_STARTDOT > 0)
-int inetaddr::startdot(cchar *sp,int sl) noex {
-	return inetaddr_startdot(this,sp,sl) ;
-}
-#endif
 
 int inetaddr::gethexaddr(char *bp,int bl) noex {
 	return inetaddr_gethexaddr(this,bp,bl) ;
