@@ -37,11 +37,25 @@ extern bool	iswhitelatin(int) noex ;
 extern bool	islowerlatin(int) noex ;
 extern bool	isupperlatin(int) noex ;
 extern bool	isprintlatin(int) noex ;
+extern bool	istermlatin(int) noex ;
 extern bool	isprintterm(int) noex ;
 extern bool	isprintbad(int) noex ;
 extern bool	isdict(int) noex ;
 extern bool	iscmdstart(int) noex ;
 extern bool	ishdrkey(int) noex ;
+
+local inline bool	ispl(int ch) noex {
+	return (ch == '+') ;
+}
+local inline bool	ismi(int ch) noex {
+	return (ch == '-') ;
+}
+local inline bool	ispm(int ch) noex {
+	return (ch == '+') || (ch == '-') ;
+}
+local inline bool	isme(int ch) noex {
+	return (ch == '+') || (ch == '-') || (ch == '!') ;
+}
 
 EXTERNC_end
 
@@ -80,17 +94,11 @@ constexpr inline bool	islclatin(int ch) noex {
 constexpr inline bool	isuclatin(int ch) noex {
 	return isupperlatin(ch) ;
 }
-constexpr inline bool	isnumsign(int ch) noex {
-	return ((ch == '+') || (ch == '-')) ;
-}
 constexpr inline bool	iseol(int ch) noex {
 	return (ch == '\n') || (ch == '\r') ;
 }
 constexpr inline bool	iszero(int ch) noex {
 	return (ch == '0') ;
-}
-constexpr inline bool	isplusminus(int ch) noex {
-	return (ch == '+') || (ch == '-') ;
 }
 constexpr inline bool	isabbr(int ch) noex {
 	ch &= UCHAR_MAX ;
@@ -138,17 +146,11 @@ constexpr inline bool   islclatin(int ch) noex {
 constexpr inline bool   isuclatin(int ch) noex {
         return isupperlatin(ch) ;
 }
-local inline bool	isnumsign(int ch) noex {
-	return ((ch == '+') || (ch == '-')) ;
-}
 local inline bool	iseol(int ch) noex {
 	return (ch == '\n') || (ch == '\r') ;
 }
 local inline bool	iszero(int ch) noex {
 	return (ch == '0') ;
-}
-local inline bool	isplusminus(int ch) noex {
-	return (ch == '+') || (ch == '-') ;
 }
 local inline bool	isabbr(int ch) noex {
 	ch &= UCHAR_MAX ;
