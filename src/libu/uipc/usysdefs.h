@@ -45,6 +45,7 @@
 #include	<unistd.h>		/* |_SC_{x}| + |_PC_{x}| */
 #include	<fcntl.h>		/* |O_{x}| */
 #include	<netdb.h>		/* |NI_MAX{x}| */
+#include	<memord.hh>
 
 #include	<usys_stat.h>		/* |S_{x}| definitions */
 
@@ -56,17 +57,40 @@ enum extraopenflags {
 	extraopenflag_network,
 	extraopenflag_overlast,
 	extraopenflag_start = extraopenflag_minmode
-} ;
+} ; /* end enum */
 
 /* missing UNIX® signals */
-enum signalmissings {
-	signalmissing_pwr = 1000,
-	signalmissing_cancel,
-	signalmissing_lost,
-	signalmissing_overlast,
-	signalmissing_start = signalmissing_pwr
-} ;
+enum missingsignals {
+	missingsignal_pwr = 1000,
+	missingsignal_cancel,
+	missingsignal_lost,
+	missingsignal_overlast,
+	missingsignal_start = missingsignal_pwr
+} ; /* end enum */
 
+enum missingplocks {
+	missingplock_unlock,
+	missingplock_txtlock,
+	missingplock_datlock,
+	missingplock_proclock,
+	missingplock_overlast
+} ; /* end enum */
+
+/* possibly missing aommand-operations for |plock(2solaris)| */
+#ifndef	UNLOCK
+#define	UNLOCK		missingplock_unlock
+#endif
+#ifndef	TXTLOCK
+#define	TXTLOCK		missingplock_txtlock
+#endif
+#ifndef	DATLOCK
+#define	DATLOCK		missingplock_datlock
+#endif
+#ifndef	PROCLOCK
+#define	PROCLOCK	missingplock_proclock
+#endif
+
+/* possibly missing signals */
 #ifndef	SIGCLD
 #define	SIGCLD		SIGCHLD
 #endif
@@ -80,13 +104,13 @@ enum signalmissings {
 #define	SIGPOLL		SIGIO
 #endif
 #ifndef	SIGPWR
-#define	SIGPWR		signalmissing_pwr
+#define	SIGPWR		missingsignal_pwr
 #endif
 #ifndef	SIGCANCEL
-#define	SIGCANCEL	signalmissing_cancel
+#define	SIGCANCEL	missingsignal_cancel
 #endif
 #ifndef	SIGLOST
-#define	SIGLOST		signalmissing_lost
+#define	SIGLOST		missingsignal_lost
 #endif
 
 /* missing file open-flags */
@@ -146,6 +170,25 @@ enum signalmissings {
 /* PATHCONF preprocessor defines */
 #ifndef	_PC_CHOWN_RESTRICTED
 #define	_PC_CHOWN_RESTRICTED	-1
+#endif
+
+/* dynamic linker defines */
+#ifndef	RTLD_PARENT
+#define	RTLD_PARENT	0
+#endif
+
+/* defines for |u_plock(3u)| -- process-lock? */
+#ifndef	MLOCKP_NON
+#define	MLOCKP_NON	UNLOCK		/* for |u_plock(3u)| */
+#endif
+#ifndef	MLOCKP_ALL
+#define	MLOCKP_ALL	PROCLOCK	/* for |u_plock(3u)| */
+#endif
+#ifndef	MLOCKP_TXT
+#define	MLOCKP_TXT	TXTLOCK		/* for |u_plock(3u)| */
+#endif
+#ifndef	MLOCKP_DAT
+#define	MLOCKP_DAT	DATLOCK		/* for |u_plock(3u)| */
 #endif
 
 /* various limits (that might be missing) */
@@ -325,16 +368,6 @@ enum signalmissings {
 #ifndef	MAXBASE
 #define	MAXBASE		64		/* standard (common) value */
 #endif
-
-/* C-C++ memory order */
-#ifndef	memord_relaxed
-#define	memord_relaxed	std::memory_order_relaxed
-#define	memord_consume	std::memory_order_consume
-#define	memord_acquire	std::memory_order_acquire
-#define	memord_release	std::memory_order_release
-#define	memord_acqrel	std::memory_order_acq_rel
-#define	memord_seq	std::memory_order_seq_cst
-#endif /* memord_relaxed */
 
 
 #endif /* USYSDEFS_INCLUDE */
