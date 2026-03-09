@@ -74,6 +74,9 @@ export {
     } ; /* end struct (debon) */
     int debfd(int) noex ;
     int debprintf(cchar *,cchar *,...) noex ;
+} /* end export */
+
+export {
     extern debon_mgr debon ;
 } /* end export */
 
