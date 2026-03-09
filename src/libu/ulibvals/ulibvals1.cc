@@ -41,8 +41,7 @@ module ;
 #include	<cstdlib>
 #include	<bit>			/* |endian(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
+#include	<usysbase.h>
 #include	<usysdefs.h>		/* |MAXBASE| */
 #include	<ulogerror.h>
 #include	<sysconfcmds.h>		/* |_SC_{xx}| */
