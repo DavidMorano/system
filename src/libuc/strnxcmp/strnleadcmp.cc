@@ -49,6 +49,7 @@
 #include	<usysdefs.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"strnxcmp.h"
 
@@ -63,6 +64,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* local typedefs */
+
+typedef cmporders	co ;
 
 
 /* external subroutines */
