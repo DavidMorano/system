@@ -23,36 +23,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/utsname.h>
-#include	<sys/uio.h>
-#include	<sys/time.h>		/* for |u_adjtime(3u)| */
-#include	<sys/timeb.h>		/* for |uc_ftime(3uc)| */
-#include	<sys/resource.h>
-#include	<sys/stat.h>		/* |USTAT| */
-#include	<sys/statvfs.h>
-#include	<sys/socket.h>
-
-#include	<arpa/inet.h>		/* <- |in_addr_t| */
-
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<time.h>		/* for |u_utime(2)| */
-#include	<utime.h>		/* for |u_utime(2)| */
-#include	<pthread.h>
-#include	<errno.h>
-#include	<dirent.h>
-#include	<ucontext.h>
-#include	<netdb.h>
-#include	<limits.h>
-#include	<signal.h>
-#include	<stddef.h>		/* |wchar_t| */
-#include	<stdlib.h>
-#include	<stdint.h>		/* |intptr_t| + |uintptr_t| */
-
+#include	<usysnative.h>		/* useful native system headers */
 #include	<clanguage.h>		/* <- necessary inclusion */
+#include	<stdintx.h>		/* extened integer types */
 
 
 /* for |stat(2)| and its many friends */
@@ -127,6 +100,11 @@
 
 /* types */
 
+#ifndef	TYPEDEF_CADDRP
+#define	TYPEDEF_CADDRP
+typedef caddr_t			* caddrp ;
+#endif /* TYPEDEF_CADDRP */
+
 #ifndef	TYPEDEF_INTOFFT
 #define	TYPEDEF_INTOFFT
 typedef int			intoff_t ;
@@ -150,15 +128,15 @@ typedef int			id_t ;
 #endif
 #endif
 
-#ifndef	TYPEDEF_IN4ADDRTT
-#define	TYPEDEF_IN4ADDRTT
+#ifndef	TYPEDEF_IN4ADDRT
+#define	TYPEDEF_IN4ADDRT
 typedef in_addr_t		in4_addr_t ;		/* scalar type */
 #endif
 
 /* some OSes (which remain nameless but has initials "Linux") do not have */
 #if	defined(SYSHAS_TYPEIN6ADDRT) && (SYSHAS_TYPEIN6ADDRT == 0)
-#ifndef	TYPEDEF_IN6ADDRTT
-#define	TYPEDEF_IN6ADDRTT
+#ifndef	TYPEDEF_IN6ADDRT
+#define	TYPEDEF_IN6ADDRT
 typedef struct in6_addr		in6_addr_t ;
 #endif
 #endif /* defined(SYSHAS_TYPEIN6ADDRT) && (SYSHAS_TYPEIN6ADDRT == 0) */
@@ -645,6 +623,14 @@ typedef void (*void_f)() noex ;
 EXTERNC_end
 #endif /* TYPEDEF_VOIDF */
 
+
+#ifndef	TYPEDEF_QSORTF
+#define	TYPEDEF_QSORTF
+EXTERNC_begin
+typedef int (*qsort_f)(const void *,const void *) noex ;
+EXTERNC_end
+#endif	/* TYPEDEF_QSORTF */
+
 #ifndef	TYPEDEF_SORTVCMP
 #define	TYPEDEF_SORTVCMP
 EXTERNC_begin
@@ -653,15 +639,15 @@ typedef int (*sortvcmp_f)(const void *,const void *) noex ;
 EXTERNC_end
 #endif /* TYPEDEF_SORTVCMP */
 
-#ifndef	TYPEDEF_FPERM
-#define	TYPEDEF_FPERM
+#ifndef	TYPEDEF_FSPERM
+#define	TYPEDEF_FSPERM
 typedef mode_t			fsperm ;
-#endif /* TYPEDEF_FPERM */
+#endif /* TYPEDEF_FSPERM */
 
-#ifndef	TYPEDEF_CFPERM
-#define	TYPEDEF_CFPERM
+#ifndef	TYPEDEF_CFSPERM
+#define	TYPEDEF_CFSPERM
 typedef const mode_t		cfsperm ;
-#endif /* TYPEDEF_CFPERM */
+#endif /* TYPEDEF_CFSPERM */
 
 #ifndef	TYPEDEF_USTIME
 #define	TYPEDEF_USTIME
