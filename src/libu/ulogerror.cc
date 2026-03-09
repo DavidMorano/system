@@ -164,7 +164,7 @@ void ulogerrmgr::fini() noex {
 	cchar		*fmt = "ulogerror: %s (%3d) %s\n" ;
 	if (cchar *vp ; (vp = getenv(var)) != nullptr) {
 	    if (vp[0] && (c > 0)) {
-		auto	snfmt = snprintf ;
+		cauto	snfmt = snprintf ;
 		char	wbuf[wlen+1] ;
 		write(fd,announce,strlen(announce)) ;
 	        for (int i = 0 ; i < c ; i += 1) {
