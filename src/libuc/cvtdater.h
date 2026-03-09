@@ -15,10 +15,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	CVTDATER	struct cvtdater_head
@@ -32,7 +29,7 @@ struct cvtdater_head {
 enum cvtdatermems {
 	cvtdatermem_finish,
 	cvtdatermem_overlast
-} ;
+} ; /* end enum (cvtdatermems) */
 struct cvtdater ;
 struct cvtdater_co {
 	cvtdater	*op = nullptr ;
@@ -51,7 +48,7 @@ struct cvtdater : cvtdater_head {
 	cvtdater() noex {
 	    finish(this,cvtdatermem_finish) ;
 	    daytime = 0 ;
-	} ;
+	} ; /* end ctor */
 	cvtdater(const cvtdater &) = delete ;
 	cvtdater &operator = (const cvtdater &) = delete ;
 	int start(time_t = 0L) noex ;
@@ -67,23 +64,11 @@ typedef CVTDATER	cvtdater ;
 
 EXTERNC_begin
 
+extern int	cvtdater_start(cvtdater *,time_t) noex ;
+extern int	cvtdater_load(cvtdater *,time_t *,cchar *,int) noex ;
 extern int	cvtdater_finish(cvtdater *) noex ;
 
 EXTERNC_end
-
-#ifdef	__cplusplus
-
-extern "C" {
-    extern int	cvtdater_start(cvtdater *,time_t = 0L) noex ;
-    extern int	cvtdater_load(cvtdater *,time_t *,cchar *,int = -1) noex ;
-}
-
-#else	/* __cplusplus */
-
-extern int	cvtdater_start(cvtdater *,time_t) noex ;
-extern int	cvtdater_load(cvtdater *,time_t *,cchar *,int) noex ;
-
-#endif /* __cplusplus */
 
 
 #endif /* CVTDATER_INCLUDE */
