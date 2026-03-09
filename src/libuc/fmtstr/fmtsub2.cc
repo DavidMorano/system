@@ -54,7 +54,7 @@ module ;
 #include	<ischarx.h>
 #include	<localmisc.h>
 
-#include	"fmtopt.h"
+#include	"fmtopts.h"
 
 module fmtsub ;
 
@@ -116,8 +116,8 @@ int fmtsub_start(fmtsub *op,char *ubuf,int ulen,int fm) noex {
 	    op->ubuf = ubuf ;
 	    op->ulen = ulen ;
 	    op->mode = fm ;
-	    op->fl.mclean = !!(fm & fopt.clean) ;
-	    op->fl.mnooverr = !!(fm & fopt.noover) ;
+	    op->fl.mclean	= !!(fm & fopt.clean) ;
+	    op->fl.mnooverr	= !!(fm & fopt.nooverr) ;
 	}
 	return rs ;
 }
