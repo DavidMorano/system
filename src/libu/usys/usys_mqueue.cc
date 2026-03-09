@@ -37,9 +37,9 @@
 consteval mqd_t mkmqdbad() noex {
 	mqd_t	r = 0 ;
 	return (~r) ;
-}
+} /* end subroutine (mkmqdbad) */
 
-static constexpr mqd_t	mqdbad = mkmqdbad() ;
+constexpr mqd_t	mqdbad = mkmqdbad() ;
 
 /* PMQ begin */
 #if	(!defined(SYSHAS_PMQ)) || (SYSHAS_PMQ == 0)
