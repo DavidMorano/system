@@ -54,6 +54,7 @@
 #include	<toxc.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"strnxcmp.h"
 
@@ -77,6 +78,8 @@ extern "C" {
     typedef int (*strncmp_f)(cchar *,cchar *,int) noex ;
 }
 
+typedef cmporders	co ;
+
 
 /* external subroutines */
 
@@ -85,11 +88,6 @@ extern "C" {
 
 
 /* local structures */
-
-enum order : uchar {
-    order_obv,
-    order_rev
-} ; /* end enum (order) */
 
 
 /* forward references */
@@ -136,14 +134,14 @@ local int strnkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p,int n) noex {
 }
 /* end subroutine (strnkeyxcmp) */
 
-local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,order forder) noex {
+local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
     	int		rc = 0 ;
 	if (s1 || s2) {
 	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
 		if (s2) {
-		    if (forder) {
+		    if (fo) {
 		        rc = (- fun(s1,s2,n)) ;
 		    } else {
 		        rc = (+ fun(s1,s2,n)) ;
@@ -199,24 +197,24 @@ int strnkeyfoldcmpr(cchar *s1,cchar *s2,int n) noex {
 
 
 int strnkeyxbasecmpo(cchar *s1,cchar *s2,int n) noex {
-    	return strnxcmp(strnkeybasecmp,s1,s2,n,order_obv) ;
+    	return strnxcmp(strnkeybasecmp,s1,s2,n,cmporder_obverse) ;
 }
 int strnkeyxbasecmpr(cchar *s1,cchar *s2,int n) noex {
-    	return strnxcmp(strnkeybasecmp,s1,s2,n,order_rev) ;
+    	return strnxcmp(strnkeybasecmp,s1,s2,n,cmporder_reverse) ;
 }
 
 int strnkeyxcasecmpo(cchar *s1,cchar *s2,int n) noex {
-    	return strnxcmp(strnkeycasecmp,s1,s2,n,order_obv) ;
+    	return strnxcmp(strnkeycasecmp,s1,s2,n,cmporder_obverse) ;
 }
 int strnkeyxcasecmpr(cchar *s1,cchar *s2,int n) noex {
-    	return strnxcmp(strnkeycasecmp,s1,s2,n,order_rev) ;
+    	return strnxcmp(strnkeycasecmp,s1,s2,n,cmporder_reverse) ;
 }
 
 int strnkeyxfoldcmpo(cchar *s1,cchar *s2,int n) noex {
-    	return strnxcmp(strnkeyfoldcmp,s1,s2,n,order_obv) ;
+    	return strnxcmp(strnkeyfoldcmp,s1,s2,n,cmporder_obverse) ;
 }
 int strnkeyxfoldcmpr(cchar *s1,cchar *s2,int n) noex {
-    	return strnxcmp(strnkeyfoldcmp,s1,s2,n,order_rev) ;
+    	return strnxcmp(strnkeyfoldcmp,s1,s2,n,cmporder_reverse) ;
 }
 
 
