@@ -51,6 +51,12 @@ struct strnul {
 	strnul() noex : strnul(nullptr,0) { } ;
 	strnul(const strnul &) = delete ;
 	strnul &operator = (const strnul &) = delete ;
+	strnul &operator = (const strview &sv) noex {
+	    buf[0] = '\0' ;
+	    sp = sv.data() ;
+	    sl = (int) sv.length() ;
+	    return *this ;
+	} ; /* end operator (assignment from |string_view| */
 	ccharp operator () (cchar *ap,int al) noex {
 	    rp = nullptr ;
 	    if (as) {
