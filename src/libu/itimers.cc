@@ -1,6 +1,6 @@
 /* timers SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* constants used in identifying internal-timers */
 /* version %I% last-modified %G% */
@@ -58,6 +58,8 @@
 
 
 /* exported variables */
+
+const itimers	itimer ;
 
 
 /* exported subroutines */
