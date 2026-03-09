@@ -181,8 +181,9 @@ int fsdir_tell(fsdir *op,off_t *rp) noex {
 	if ((rs = fsdir_magic(op)) >= 0) ylikely {
 	    posixdirent	*objp = posixdirentp(op->posixp) ;
 	    if (off_t o ; (rs = objp->tell(&o)) >= 0) ylikely {
+		csize fo = size_t(o) ;
 		if (rp) *rp = o ;
-		rs = intsat(o) ;
+		rs = intsat(fo) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
