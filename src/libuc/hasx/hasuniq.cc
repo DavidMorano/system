@@ -32,12 +32,13 @@
 	sl		test c-string length
 
 	Returns:
-	>=0		length of given string
-	<0		error (system-return)
+	true		all unique
+	false		all unique not
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<bitset>		/* |bitset(3c++)| */
@@ -50,6 +51,9 @@
 
 #include	"hasuniq.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -84,17 +88,15 @@ cint		nchars = (UCHAR_MAX + 1) ;
 
 /* exported subroutines */
 
-bool hasuniq(cchar *bp,int bl) noex {
+bool hasuniq(cchar *bp,int µbl) noex {
     	bool		f = false ;
-	if (bp) {
-	    if (bl > 1) ylikely {
-	        for (bitset<nchars> seen ; bl-- && *bp ; ) {
-	            cint	ch = mkchar(*bp++) ;
-		    if ((f = seen[ch])) break ;
-		    seen[ch] = true ;
-	        } /* end for */
-	    } /* end if */
-	} /* end if (non-null) */
+	if (int bl ; (bl = getlenstr(bp,µbl)) > 0) ylikely {
+	    for (bitset<nchars> seen ; bl-- && *bp ; ) {
+	        cint	ch = mkchar(*bp++) ;
+		if ((f = seen[ch])) break ;
+		seen[ch] = true ;
+	    } /* end for */
+	} /* end if (getlenstr) */
 	return f ;
 }
 /* end subroutine (hasuniq) */
