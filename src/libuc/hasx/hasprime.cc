@@ -88,6 +88,8 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
+
 
 /* imported namespaces */
 
@@ -121,7 +123,7 @@ bool hasempty(cchar *sp,int sl) noex {
 	bool		f = true ;
 	if (sp) ylikely {
 	    while (sl && *sp) {
-	        f = CHAR_ISWHITE(*sp) ;
+	        f = ISWHT(*sp) ;
 	        if (! f) break ;
 	        sp += 1 ;
 	        sl -= 1 ;
@@ -164,7 +166,7 @@ bool hasdoublewhite(cchar *sp,int sl) noex {
 	if (sp) ylikely {
 	    bool	f_prev = false ;
 	    for (int i = 0 ; sl && sp[i] ; i += 1) {
-	        cbool	f_white = CHAR_ISWHITE(sp[i]) ;
+	        cbool	f_white = ISWHT(sp[i]) ;
 	        if (f_white) {
 		    f = f_prev ;
 	            f = f || (sp[i] != CH_SP) ;	/* to force compaction */
@@ -180,10 +182,10 @@ bool hasdoublewhite(cchar *sp,int sl) noex {
 /* end subroutine (hasdoublewhite) */
 
 bool hascdpath(cchar *sp,int sl) noex {
+    	constexpr int	chx_ec = mkchar('¬') ;
 	bool		f = false ;
 	if (sp) ylikely {
 	    if (sl && sp[0]) {
-	        cint	chx_ec = mkchar('¬') ;
 	        int	ch = mkchar(sp[0]) ;
 	        f = (ch == chx_ec) ;
 	    }
@@ -225,7 +227,7 @@ bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 local int twochars(char *tbuf,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	while (sl && (c < 2)) {
-	    if (! CHAR_ISWHITE(*sp)) {
+	    if (! ISWHT(*sp)) {
 		tbuf[c++] = *sp ;
 	    }
 	    sp += 1 ;
