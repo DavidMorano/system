@@ -112,165 +112,165 @@
 
 #ifdef	__cplusplus
 
-constexpr static inline bool baset(char *ap,int b)  {
+constexpr static inline bool baset(char *ap,int b) {
 	return BASETB(ap,b) ;
 }
-constexpr static inline bool baclr(char *ap,int b)  {
+constexpr static inline bool baclr(char *ap,int b) {
 	return BACLRB(ap,b) ;
 }
-constexpr static inline bool batst(const char *ap,int b)  {
+constexpr static inline bool batst(const char *ap,int b) {
 	return BATSTB(ap,b) ;
 }
 
-constexpr static inline bool baset(uchar *ap,int b)  {
+constexpr static inline bool baset(uchar *ap,int b) {
 	return BASETB(ap,b) ;
 }
-constexpr static inline bool baclr(uchar *ap,int b)  {
+constexpr static inline bool baclr(uchar *ap,int b) {
 	return BACLRB(ap,b) ;
 }
-constexpr static inline bool batst(const uchar *ap,int b)  {
+constexpr static inline bool batst(const uchar *ap,int b) {
 	return BATSTB(ap,b) ;
 }
 
-constexpr static inline bool baset(ushort *ap,int b)  {
+constexpr static inline bool baset(ushort *ap,int b) {
 	return BASETS(ap,b) ;
 }
-constexpr static inline bool baclr(ushort *ap,int b)  {
+constexpr static inline bool baclr(ushort *ap,int b) {
 	return BACLRS(ap,b) ;
 }
-constexpr static inline bool batst(const ushort *ap,int b)  {
+constexpr static inline bool batst(const ushort *ap,int b) {
 	return BATSTS(ap,b) ;
 }
 
-constexpr static inline bool baset(uint *ap,int b)  {
+constexpr static inline bool baset(uint *ap,int b) {
 	return BASETI(ap,b) ;
 }
-constexpr static inline bool baclr(uint *ap,int b)  {
+constexpr static inline bool baclr(uint *ap,int b) {
 	return BACLRI(ap,b) ;
 }
-constexpr static inline bool batst(const uint *ap,int b)  {
+constexpr static inline bool batst(const uint *ap,int b) {
 	return BATSTI(ap,b) ;
 }
 
-constexpr static inline bool baset(ulong *ap,int b)  {
+constexpr static inline bool baset(ulong *ap,int b) {
 	return BASETL(ap,b) ;
 }
-constexpr static inline bool baclr(ulong *ap,int b)  {
+constexpr static inline bool baclr(ulong *ap,int b) {
 	return BACLRL(ap,b) ;
 }
-constexpr static inline bool batst(const ulong *ap,int b)  {
+constexpr static inline bool batst(const ulong *ap,int b) {
 	return BATSTL(ap,b) ;
 }
 
-constexpr static inline bool baset(ulonglong *ap,int b)  {
+constexpr static inline bool baset(ulonglong *ap,int b) {
 	return BASETLL(ap,b) ;
 }
-constexpr static inline bool baclr(ulonglong *ap,int b)  {
+constexpr static inline bool baclr(ulonglong *ap,int b) {
 	return BACLRLL(ap,b) ;
 }
-constexpr static inline bool batst(const ulonglong *ap,int b)  {
+constexpr static inline bool batst(const ulonglong *ap,int b) {
 	return BATSTLL(ap,b) ;
 }
 
-constexpr static inline bool basetb(uchar *ap,int b)  {
+constexpr static inline bool basetb(uchar *ap,int b) {
 	return BASETB(ap,b) ;
 }
-constexpr static inline bool baclrb(uchar *ap,int b)  {
+constexpr static inline bool baclrb(uchar *ap,int b) {
 	return BACLRB(ap,b) ;
 }
-constexpr static inline bool batstb(const uchar *ap,int b)  {
+constexpr static inline bool batstb(const uchar *ap,int b) {
 	return BATSTB(ap,b) ;
 }
 
-constexpr static inline bool basets(ushort *ap,int b)  {
+constexpr static inline bool basets(ushort *ap,int b) {
 	return BASETS(ap,b) ;
 }
-constexpr static inline bool baclrs(ushort *ap,int b)  {
+constexpr static inline bool baclrs(ushort *ap,int b) {
 	return BACLRS(ap,b) ;
 }
-constexpr static inline bool batsts(const ushort *ap,int b)  {
+constexpr static inline bool batsts(const ushort *ap,int b) {
 	return BATSTS(ap,b) ;
 }
 
-constexpr static inline bool baseti(uint *ap,int b)  {
+constexpr static inline bool baseti(uint *ap,int b) {
 	return BASETI(ap,b) ;
 }
-constexpr static inline bool baclri(uint *ap,int b)  {
+constexpr static inline bool baclri(uint *ap,int b) {
 	return BACLRI(ap,b) ;
 }
-constexpr static inline bool batsti(const uint *ap,int b)  {
+constexpr static inline bool batsti(const uint *ap,int b) {
 	return BATSTI(ap,b) ;
 }
 
-constexpr static inline bool basetl(ulong *ap,int b)  {
+constexpr static inline bool basetl(ulong *ap,int b) {
 	return BASETL(ap,b) ;
 }
-constexpr static inline bool baclrl(ulong *ap,int b)  {
+constexpr static inline bool baclrl(ulong *ap,int b) {
 	return BACLRL(ap,b) ;
 }
-constexpr static inline bool batstl(const ulong *ap,int b)  {
+constexpr static inline bool batstl(const ulong *ap,int b) {
 	return BATSTL(ap,b) ;
 }
 
-constexpr static inline bool basetll(ulonglong *ap,int b)  {
+constexpr static inline bool basetll(ulonglong *ap,int b) {
 	return BASETLL(ap,b) ;
 }
-constexpr static inline bool baclrll(ulonglong *ap,int b)  {
+constexpr static inline bool baclrll(ulonglong *ap,int b) {
 	return BACLRLL(ap,b) ;
 }
-constexpr static inline bool batstll(const ulonglong *ap,int b)  {
+constexpr static inline bool batstll(const ulonglong *ap,int b) {
 	return BATSTLL(ap,b) ;
 }
 
 #else /* __cplusplus */
 
-static inline bool basetb(uchar *ap,int b)  {
+static inline bool basetb(uchar *ap,int b) {
 	return BASETB(ap,b) ;
 }
-static inline bool baclrb(uchar *ap,int b)  {
+static inline bool baclrb(uchar *ap,int b) {
 	return BACLRB(ap,b) ;
 }
-static inline bool batstb(const uchar *ap,int b)  {
+static inline bool batstb(const uchar *ap,int b) {
 	return BATSTB(ap,b) ;
 }
 
-static inline bool basets(ushort *ap,int b)  {
+static inline bool basets(ushort *ap,int b) {
 	return BASETS(ap,b) ;
 }
-static inline bool baclrs(ushort *ap,int b)  {
+static inline bool baclrs(ushort *ap,int b) {
 	return BACLRS(ap,b) ;
 }
-static inline bool batsts(const ushort *ap,int b)  {
+static inline bool batsts(const ushort *ap,int b) {
 	return BATSTS(ap,b) ;
 }
 
-static inline bool baseti(uint *ap,int b)  {
+static inline bool baseti(uint *ap,int b) {
 	return BASETI(ap,b) ;
 }
-static inline bool baclri(uint *ap,int b)  {
+static inline bool baclri(uint *ap,int b) {
 	return BACLRI(ap,b) ;
 }
-static inline bool batsti(const uint *ap,int b)  {
+static inline bool batsti(const uint *ap,int b) {
 	return BATSTI(ap,b) ;
 }
 
-static inline bool basetl(ulong *ap,int b)  {
+static inline bool basetl(ulong *ap,int b) {
 	return BASETL(ap,b) ;
 }
-static inline bool baclrl(ulong *ap,int b)  {
+static inline bool baclrl(ulong *ap,int b) {
 	return BACLRL(ap,b) ;
 }
-static inline bool batstl(const ulong *ap,int b)  {
+static inline bool batstl(const ulong *ap,int b) {
 	return BATSTL(ap,b) ;
 }
 
-static inline bool basetll(ulonglong *ap,int b)  {
+static inline bool basetll(ulonglong *ap,int b) {
 	return BASETLL(ap,b) ;
 }
-static inline bool baclrll(ulonglong *ap,int b)  {
+static inline bool baclrll(ulonglong *ap,int b) {
 	return BACLRLL(ap,b) ;
 }
-static inline bool batstll(const ulonglong *ap,int b)  {
+static inline bool batstll(const ulonglong *ap,int b) {
 	return BATSTLL(ap,b) ;
 }
 
