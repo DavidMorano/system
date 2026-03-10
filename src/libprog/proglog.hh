@@ -33,10 +33,7 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<cstdarg>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<userinfo.h>
 
 #include	<proginfo.hh>
