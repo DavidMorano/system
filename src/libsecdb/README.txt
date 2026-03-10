@@ -27,8 +27,9 @@ A. This is not a unique problem associated with the Illumos code
 
 file		description
 -------------------------------------------------------------------------------
+libsecdb.h		library-header
 
-nss_parse.h		Name-Service-Switch public-part (header)
-nss_parse.c		Name-Service-Switch private-part
+secdb.cc		?
+secdb.h			?
 
 
