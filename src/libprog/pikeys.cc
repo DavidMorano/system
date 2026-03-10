@@ -1,4 +1,4 @@
-/* keys SUPPORT */
+/* pikeys SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -30,23 +30,26 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<ptm.h>
 #include	<localmisc.h>
 
-#include	"config.h"
-#include	"defs.h"
+#include	"proginfo.h"
+#include	"pikeys.h"
 
 
 /* local defines */
 
+#ifdef	PI
 #define	PI	proginfo
+#endif
 
 
 /* external subroutines */
@@ -81,31 +84,29 @@ int keys_begin(PI *pip,hdb *dbp,int hashsize) noex {
 /* end subroutine (keys_begin) */
 
 int keys_add(PI *pip,hdb *dbp,cchar *sp,int sl) noex {
-	hdb_dat		key ;
-	hdb_dat		value ;
-	hdb_dat		dumbvalue ;
+    	cnullptr	np{} ;
 	cint		nrs = SR_NOTFOUND ;
-	int		rs = SR_OK ;
-	int		f = false ;
-
-	if (pip == nullptr) return SR_FAULT ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-	key.len = sl ;
-	key.buf = sp ;			/* prepare for check */
-	value.len = 0 ;
-	value.buf = nullptr ;
-	/* if it is already present, we're done, return */
-	if ((rs = hdb_fetch(dbp,key,nullptr,&dumbvalue)) == nrs) {
-	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
-	        f = true ;
-	        key.buf = (void *) cp ;
-	        rs = hdb_store(dbp,key,value) ;
-	    }
-	} /* end if */
-
+	int		rs = SR_FAULT ;
+	int		f = false ; /* return-value */
+	if (pip) {
+	    hdb_dat	key ;
+	    hdb_dat	value ;
+	    hdb_dat	dumbvalue ;
+	    if (sl < 0) sl = lenstr(sp) ;
+	    key.len = sl ;
+	    key.buf = sp ;			/* prepare for check */
+	    value.len = 0 ;
+	    value.buf = nullptr ;
+	    /* if it is already present, we're done, return */
+	    if ((rs = hdb_fetch(dbp,key,np,&dumbvalue)) == nrs) {
+	        cchar	*cp ;
+	        if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	            f = true ;
+	            key.buf = (void *) cp ;
+	            rs = hdb_store(dbp,key,value) ;
+	        }
+	    } /* end if */
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (keys_add) */
@@ -137,22 +138,17 @@ int keys_ender(PI *pip,hdb *dbp,bfile *ofp,ptm omp,cc *fn,
 	int		n = 0 ;
 
 	if (roff <= INT_MAX) {
-	    dhB_cur	keycursor ;
-	    hdb_dat	key ;
-	    hdb_dat	value ;
 	    uint	tagoff = roff ;
 	    uint	taglen = rlen ;
-
+	    dhB_cur	keycursor ;
 	    if ((rs = hdb_curbegin(dbp,&keycursor)) >= 0) {
-
+	        hdb_dat	key ;
+	        hdb_dat	value ;
 	        if (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
-
 	            if (! pip->fl.removelabel) {
 	                bprintf(ofp,"%s:%u,%u\t",fn,tagoff,taglen) ;
 		    }
-
 	            rs = bwrite(ofp,key.buf,key.len) ;
-
 	            n = 1 ;
 	            while ((rs >= 0) && 
 	                ((pip->maxkeys < 0) || (n < pip->maxkeys)) && 
@@ -161,36 +157,33 @@ int keys_ender(PI *pip,hdb *dbp,bfile *ofp,ptm omp,cc *fn,
 	                if ((rs = bputc(ofp,' ')) >= 0) {
 	                    rs = bwrite(ofp, (void *) key.buf,key.len) ;
 			}
-
 	                n += 1 ;
 	            } /* end while */
-
-	            if (rs >= 0)
+	            if (rs >= 0) {
 	                rs = bputc(ofp,'\n') ;
-
+		    }
 	        } /* end if */
-
 	        hdb_curend(dbp,&keycursor) ;
 	    } /* end if (cursor) */
-
-/* delete this whole DB */
-
-	    if ((rs1 = hdb_curbegin(dbp,&keycursor)) >= 0) {
-	        while (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
-	            if (key.buf) {
-	                rs1 = uc_free((void *) key.buf) ;
-			if (rs >= 0) rs = rs1 ;
-	            }
-	        } /* end while */
-	        rs1 = hdb_curend(dbp,&keycursor) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (cursor) */
-	    if (rs >= 0) rs = rs1 ;
-
+	    /* delete this whole DB */
+	    if (rs >= 0) {
+	        if ((rs1 = hdb_curbegin(dbp,&keycursor)) >= 0) {
+	            hdb_dat	key ;
+	            hdb_dat	value ;
+	            while (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
+	                if (key.buf) {
+	                    rs1 = uc_free((void *) key.buf) ;
+			    if (rs >= 0) rs = rs1 ;
+	                }
+	            } /* end while */
+	            rs1 = hdb_curend(dbp,&keycursor) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (cursor) */
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (ok) */
 	    rs1 = hdb_finish(dbp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (within range) */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (keys_ender) */
