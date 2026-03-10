@@ -5,7 +5,6 @@
 /* character-bit-set */
 /* version %I% last-modified %G% */
 
-#define	MODULE		1		/* signal module (if anyone cares) */
 
 /* revision history:
 
@@ -29,6 +28,21 @@
 	Description:
 	Provide operations on a character-bit-set.
 
+	Synopsis:
+	int chrset::load(cchar *ss) noex
+	int chrset::tst(int ch) const noex
+	int chrset::set(int ch) noex
+	int chrset::clr(int ch) noex
+
+	Arguments:
+	ss		c-string of character-set to load
+	ch		character to use for particular operation
+
+	Returns:
+	==1		for test: character was present
+	==0		for test: character was not present
+	<0		error (system-return)
+
 *******************************************************************************/
 
 module ;
@@ -51,7 +65,9 @@ export module chrset ;
 
 typedef ulong	word_t ;
 
-constexpr int	nwords = ((UCHAR_MAX + 1) / (szof(word_t) * CHAR_BIT)) ;
+local cint	nbits = (UCHAR_MAX + 1) ;
+
+local cint	nwords = ((UCHAR_MAX + 1) / (szof(word_t) * CHAR_BIT)) ;
 
 export {
     struct chrset {
@@ -61,11 +77,14 @@ export {
 	chrset(cchar *ss) noex {
 	    load(ss) ;
 	} ;
-	void set(int) noex ;
-	void clr(int) noex ;
-	bool tst(int) const noex ;
-	bool operator [] (int ch) const noex {
-	    return batst(bs,ch) ;
+	chrset(int ch) noex {
+	    baset(bs,ch) ;
+	} ;
+	int set(int) noex ;
+	int clr(int) noex ;
+	int tst(int) const noex ;
+	int operator [] (int ch) const noex {
+	    return tst(ch) ;
 	} ;
     } ; /* end struct (chrset) */
 } /* end export */
@@ -73,23 +92,43 @@ export {
 int chrset::load(cchar *ss) noex {
     	int		rs = SR_FAULT ;
 	if (ss) {
+	    rs = SR_OK ;
 	    for (int ch ; ((ch = (*ss & UCHAR_MAX))) ; ss += 1) {
-		baset(bs,ch) ;
+		if (ch < nbits) {
+		    baset(bs,ch) ;
+		} else {
+		    rs = SR_INVALID ;
+		    break ;
+		}
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (chrset::load) */
 
-bool chrset::tst(int ch) const noex {
-	return bool(batst(bs,ch)) ;
+int chrset::tst(int ch) const noex {
+    	int rs = SR_INVALID ;
+	if ((ch >= 0) && (ch < nbits)) {
+	    rs = bool(batst(bs,ch)) ;
+	}
+	return rs ;
 } /* end method (chrset::tst) */
 
-void chrset::set(int ch) noex {
-	baset(bs,ch) ;
+int chrset::set(int ch) noex {
+    	int rs = SR_INVALID ;
+	if ((ch >= 0) && (ch < nbits)) {
+	    rs = SR_OK ;
+	    baset(bs,ch) ;
+	}
+	return rs ;
 } /* end method (chrset::set) */
 
-void chrset::clr(int ch) noex {
-	baclr(bs,ch) ;
+int chrset::clr(int ch) noex {
+    	int rs = SR_INVALID ;
+	if ((ch >= 0) && (ch < nbits)) {
+	    rs = SR_OK ;
+	    baclr(bs,ch) ;
+	}
+	return rs ;
 } /* end method (chrset::clr) */
 
 
