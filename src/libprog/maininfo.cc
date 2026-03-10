@@ -40,13 +40,18 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<upt.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"maininfo.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -60,15 +65,6 @@ extern "C" {
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
-
 
 /* external variables */
 
@@ -78,7 +74,7 @@ extern int	nprintf(cchar *,cchar *,...) ;
 
 /* forward references */
 
-static int	maininfo_utiler(MAININFO *) noex ;
+local int	maininfo_utiler(MAININFO *) noex ;
 
 
 /* local variables */
@@ -95,8 +91,7 @@ int maininfo_start(MAININFO *mip,int argc,mainv argv) noex {
 	int		rs ;
 	cchar	*argz = NULL ;
 
-	memset(mip,0,sizeof(MAININFO)) ;
-
+	memclear(mip) ;
 	if ((argc > 0) && (argv != NULL)) argz = argv[0] ;
 
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
@@ -109,7 +104,6 @@ int maininfo_start(MAININFO *mip,int argc,mainv argv) noex {
 	    if ((rs = vecstr_start(&mip->stores,2,0)) >= 0) {
 	        int	cl ;
 	        cchar	*cp ;
-
 	        if ((cl = sfbasename(argz,-1,&cp)) > 0) {
 	            cchar	**vpp = &mip->progname ;
 	            if (cp[0] == '-') {
@@ -131,19 +125,16 @@ int maininfo_start(MAININFO *mip,int argc,mainv argv) noex {
 	        } else {
 	            rs = SR_DOM ;
 	        }
-
-	        if (rs < 0)
+	        if (rs < 0) {
 	            vecstr_finish(&mip->stores) ;
+		}
 	    } /* end if (vecstr_start) */
 	} /* end if (u_sigmask) */
-
 	return rs ;
 }
 /* end subroutine (maininfo_start) */
 
-
-int maininfo_finish(MAININFO *mip)
-{
+int maininfo_finish(MAININFO *mip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -159,9 +150,7 @@ int maininfo_finish(MAININFO *mip)
 }
 /* end subroutine (maininfo_finish) */
 
-
-int maininfo_setentry(MAININFO *mip,cchar **epp,cchar *vp,int vl)
-{
+int maininfo_setentry(MAININFO *mip,cchar **epp,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	int		oi = -1 ;
 	int		len = 0 ;
@@ -186,15 +175,14 @@ int maininfo_setentry(MAININFO *mip,cchar **epp,cchar *vp,int vl)
 }
 /* end subroutine (maininfo_setentry) */
 
-
 #if	CF_SIGALTSTACK
-int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,const int *sigcatches)
+int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,cint *sigcatches)
 {
 	size_t		ms ;
-	const int	ps = getpagesize() ;
-	const int	ss = (2*SIGSTKSZ) ;
-	const int	mp = (PROT_READ|PROT_WRITE) ;
-	const int	mf = (MAP_PRIVATE|MAP_NORESERVE|MAP_ANON) ;
+	cint	ps = getpagesize() ;
+	cint	ss = (2*SIGSTKSZ) ;
+	cint	mp = (PROT_READ|PROT_WRITE) ;
+	cint	mf = (MAP_PRIVATE|MAP_NORESERVE|MAP_ANON) ;
 	int		rs ;
 	int		fd = -1 ;
 	void		*md ;
@@ -224,7 +212,7 @@ int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,const int *sigcatches)
 }
 /* end subroutine (maininfo_sigbegin) */
 #else /* CF_SIGALTSTACK */
-int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,const int *sigcatches)
+int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,cint *sigcatches)
 {
 	int		rs = SR_OK ;
 #if	CF_SIGHAND
@@ -303,7 +291,7 @@ int maininfo_srchname(MAININFO *mip,cchar **rpp) noex {
 	if (rpp == NULL) return SR_FAULT ;
 	*rpp = srch ;
 	if (hasuc(srch,-1)) {
-	    const int	slen = MAXNAMELEN ;
+	    cint	slen = MAXNAMELEN ;
 	    char	sbuf[MAXNAMELEN+1] ;
 	    if ((rs = sncpylc(sbuf,slen,srch)) >= 0) {
 	        rs = maininfo_setentry(mip,rpp,sbuf,rs) ;
@@ -318,17 +306,15 @@ int maininfo_srchname(MAININFO *mip,cchar **rpp) noex {
 
 /* private subroutines */
 
-
-static int maininfo_utiler(MAININFO *mip)
-{
-	const int	of = (O_WRONLY|O_APPEND) ;
+local int maininfo_utiler(MAININFO *mip) noex {
+	cint	of = (O_WRONLY|O_APPEND) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*fn = "here.txt" ;
 
 	if ((rs = u_open(fn,of,0664)) >= 0) {
-	    const int	wlen = LINEBUFLEN ;
-	    const int	fd = rs ;
+	    cint	wlen = LINEBUFLEN ;
+	    cint	fd = rs ;
 	    cchar	*fmt = "hello world!\n" ;
 	    char	wbuf[LINEBUFLEN+1] ;
 	    if ((rs = bufprintf(wbuf,wlen,fmt)) >= 0) {
