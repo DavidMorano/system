@@ -1,4 +1,4 @@
-/* conintx HEADER */
+/* conintx HEADER (Concepts-Integer-X) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
