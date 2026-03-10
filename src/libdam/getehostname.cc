@@ -76,8 +76,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<gethe.h>
 #include	<localmisc.h>
 
@@ -112,14 +114,13 @@ int getehostname(char *hbuf,cchar *name) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (hbuf && name) {
-	    if (char *hebuf{} ; (rs = malloc_ho(&hebuf)) >= 0) {
+	    if (char *hebuf ; (rs = lm_ho(&hebuf)) >= 0) {
+		ucentho he ; 
 		cint	helen = rs ;
-		{
-		    ucentho	he ;
-		    rs = getheour(&he,hebuf,helen,hbuf,name) ;
+		if ((rs = getheour(&he,hebuf,helen,hbuf,name)) >= 0) {
 		    len = rs ;
 		}
-		rs1 = uc_free(hebuf) ;
+		rs1 = lm_free(hebuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
