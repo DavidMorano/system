@@ -38,28 +38,28 @@ struct filecounts_iil {
 	cchar		*name ;
 	time_t		utime ;
 	int		value ;
-} ;
+} ; /* end struct */
 
 struct filecounts_cursor {
 	FILECOUNTS_II	*listp ;	/* list-pointer */
 	uint		magic ;
 	int		listn ;		/* list-number */
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct filecounts_information {
 	time_t		utime ;		/* last update time */
 	int		value ;		/* counter previous value */
-} ;
+} ; /* end struct */
 
 struct filecounts_name {
 	cchar		*name ;		/* counter name */
 	int		value ;		/* counter previous value */
-} ;
+} ; /* end struct */
 
 struct filecounts_flags {
 	uint		rdonly:1 ;
-} ;
+} ; /* end struct */
 
 struct filecounts_head {
 	cchar		*fname ;	/* file-name */
@@ -67,7 +67,7 @@ struct filecounts_head {
 	uint		magic ;
 	int		fd ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	FILECOUNTS		filecounts ;
 typedef	FILECOUNTS_N		filecounts_n ;
