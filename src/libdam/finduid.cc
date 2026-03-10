@@ -49,7 +49,6 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<getpwd.h>
 #include	<snx.h>
 #include	<mkpath.h>
@@ -58,7 +57,9 @@
 
 #include	"finduid.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -72,7 +73,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -93,14 +93,14 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int finduid_ctor(finduid *op,Args ... args) noex {
     	FINDUID		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->mxp = new(nothrow) ptm) != np) {
-	        if ((op->utp = new(nothrow) tmpx) != np) {
-	            if ((op->ucp = new(nothrow) pwcache) != np) {
+	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
+	        if ((op->utp = new(nothrow) tmpx) != np) ylikely {
+	            if ((op->ucp = new(nothrow) pwcache) != np) ylikely {
 			rs = SR_OK ;
 		    } /* end if (new-pwcache) */
 		    if (rs < 0) {
@@ -120,17 +120,17 @@ static int finduid_ctor(finduid *op,Args ... args) noex {
 
 static int finduid_dtor(finduid *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->ucp) {
+	    if (op->ucp) ylikely {
 		delete op->ucp ;
 		op->ucp = nullptr ;
 	    }
-	    if (op->utp) {
+	    if (op->utp) ylikely {
 		delete op->utp ;
 		op->utp = nullptr ;
 	    }
-	    if (op->mxp) {
+	    if (op->mxp) ylikely {
 		delete op->mxp ;
 		op->mxp = nullptr ;
 	    }
@@ -142,7 +142,7 @@ static int finduid_dtor(finduid *op) noex {
 template<typename ... Args>
 static int finduid_magic(finduid *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == FINDUID_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -169,9 +169,10 @@ int finduid_start(finduid *op,int nmax,int ttl) noex {
 	int		rs ;
 	if (nmax < FINDUID_DEFMAX) nmax = FINDUID_DEFMAX ;
 	if (ttl < FINDUID_DEFTTL) ttl = FINDUID_DEFTTL ;
-	if ((rs = finduid_ctor(op)) >= 0) {
-	    if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
-		if ((rs = pwcache_start(op->ucp,nmax,ttl)) >= 0) {
+	if ((rs = finduid_ctor(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->create) >= 0) ylikely {
+		if ((rs = pwcache_start(op->ucp,nmax,ttl)) >= 0) ylikely {
 		    if_constexpr (f_tmpxearly) {
 		        rs = finduid_tmpxopen(op) ;
 		    } /* end if_constexpr (f_tmpxearly) */
@@ -182,7 +183,7 @@ int finduid_start(finduid *op,int nmax,int ttl) noex {
 		    }
 		}
 		if (rs < 0) {
-		    ptm_destroy(op->mxp) ;
+		    mxp->destroy() ;
 		}
 	    } /* end if (ptm-create) */
 	    if (rs < 0) {
@@ -196,18 +197,19 @@ int finduid_start(finduid *op,int nmax,int ttl) noex {
 int finduid_finish(finduid *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = finduid_magic(op)) >= 0) {
-	    if (op->open.ut) {
+	if ((rs = finduid_magic(op)) >= 0) ylikely {
+	    if (op->open.ut) ylikely {
 	        op->open.ut = false ;
 	        rs1 = finduid_tmpxclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->ucp) {
+	    if (op->ucp) ylikely {
 	        rs1 = pwcache_finish(op->ucp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->mxp) {
-	        rs1 = ptm_destroy(op->mxp) ;
+	    if (op->mxp) ylikely {
+		ptm *mxp = op->mxp ;
+	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -224,15 +226,16 @@ int finduid_lookup(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ul = 0 ;
-	if ((rs = finduid_magic(op,ubuf)) >= 0) {
+	if ((rs = finduid_magic(op,ubuf)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
 	    op->s.total += 1 ;
 	    ubuf[0] = '\0' ;
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-		if ((rs = finduid_tmpxready(op)) >= 0) {
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+		if ((rs = finduid_tmpxready(op)) >= 0) ylikely {
 		    rs = finduid_lookuper(op,ubuf,ulen,uid) ;
 		    ul = rs ;
 	        } /* end if (ok) */
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -244,9 +247,10 @@ int finduid_check(finduid *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = finduid_magic(op)) >= 0) {
+	if ((rs = finduid_magic(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
 	    if (dt == 0) dt = getustime ;
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        if (op->open.ut) {
 	            if ((dt - op->ti_utopen) >= INTUTOPEN) {
 	                rs = finduid_tmpxclose(op) ;
@@ -259,7 +263,7 @@ int finduid_check(finduid *op,time_t dt) noex {
 	                f = (rs > 0) ;
 	            }
 	        }
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -269,7 +273,7 @@ int finduid_check(finduid *op,time_t dt) noex {
 
 int finduid_getstats(finduid *op,finduid_st *sp) noex {
 	int		rs ;
-	if ((rs = finduid_magic(op,sp)) >= 0) {
+	if ((rs = finduid_magic(op,sp)) >= 0) ylikely {
 	    *sp = op->s ;
 	} /* end if (magic) */
 	return rs ;
@@ -283,11 +287,11 @@ static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
 	int		rs1 = SR_OK ;
 	int		ul = 0 ;
-	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
 	    tmpx	*txp = op->utp ;
 	    cint	utype = TMPX_TPROCUSER ;
 	    cint	pwlen = rs ;
-	    if (tmpx_cur uc ; (rs = txp->curbegin(&uc)) >= 0) {
+	    if (tmpx_cur uc ; (rs = txp->curbegin(&uc)) >= 0) ylikely {
 		pwcache		*pwc = op->ucp ;
 		ucentpw		pw ;
 		time_t		ti_create = 0 ;
@@ -316,7 +320,7 @@ static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 		rs1 = txp->curend(&uc) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (TMPX cursor) */
-	    rs1 = uc_free(pwbuf) ;
+	    rs1 = lm_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? ul : rs ;
