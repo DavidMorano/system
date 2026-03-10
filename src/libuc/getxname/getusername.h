@@ -24,12 +24,9 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<ucentpw.h>
-#include	<vecstr.h>
 
 
-#ifndef	GETXUSER
 #define	GETXUSER	struct getxuser_head
-#endif
 #define	GETXUSER_TTL	(2*3600)	/* for cache */
 
 
@@ -37,7 +34,7 @@ struct getxuser_head {
 	ucentpw		*pwp ;		/* caller supplied */
 	char		*pwbuf ;	/* caller supplied */
 	char		*ubuf ;		/* caller supplied */
-	vecstr		*nlp ;		/* temporary storage */
+	void		*nlp ;		/* temporary storage */
 	uid_t		uid ;		/* caller supplied */
 	int		pwlen ;		/* caller supplied */
 	int		ulen ;		/* caller supplied */
@@ -45,7 +42,7 @@ struct getxuser_head {
 	int		pwl ;		/* result of ucentpw lookup */
 	uint		f_self:1 ;	/* it is us */
 	uint		f_tried:1 ;	/* tried cache already */
-} ;
+} ; /* end struct (getxuser_head) */
 
 typedef GETXUSER	getxuser ;
 
