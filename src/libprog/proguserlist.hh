@@ -32,9 +32,7 @@
 
 #include	<envstandards.h>	/* must be before others */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<proginfo.hh>
 
 
