@@ -69,8 +69,6 @@
 
 /* imported namespaces */
 
-using std:nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -91,10 +89,10 @@ struct sigcode {
 
 /* forward references */
 
-static void	main_sighand(int,siginfo_t *,void *) noex ;
-static int	main_sigdump(siginfo_t *) noex ;
+local void	main_sighand(int,siginfo_t *,void *) noex ;
+local int	main_sigdump(siginfo_t *) noex ;
 
-static cchar	*strsigcode(const SIGCODE *,int) noex ;
+local cchar	*strsigcode(const SIGCODE *,int) noex ;
 
 
 /* local variables */
@@ -201,11 +199,10 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* local subroutines */
 
-/* ARGSUSED */
-static void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
+local void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	if (vcp != nullptr) {
 	    Dl_info	dl ;
-	    long	ra ;
+	    long	ra{} ;
 	    ucontext_t	*ucp = (ucontext_t *) vcp ;
 	    void	*rtn ;
 	    cint	wlen = LINEBUFLEN ;
@@ -221,7 +218,6 @@ static void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	        write(2,wbuf,wl) ;
 	    }
 	}
-
 	if (sip != nullptr) {
 	    main_sigdump(sip) ;
 	}
@@ -229,29 +225,30 @@ static void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 }
 /* end subroutine (main_sighand) */
 
-static int main_sigdump(siginfo_t *sip) noex {
+local int main_sigdump(siginfo_t *sip) noex {
 	cint	wlen = LINEBUFLEN ;
 	cint	si_signo = sip->si_signo ;
 	cint	si_code = sip->si_code ;
+	cint		alen = 16 ;
 	int		wl ;
 	cchar	*sn = strabbrsig(sip->si_signo) ;
 	cchar	*as = "*na*" ;
 	cchar	*scs = nullptr ;
 	cchar	*fmt ;
 	char		wbuf[LINEBUFLEN+1] ;
-	char		abuf[16+1] ;
+	char		abuf[alen +1] ;
 	switch (si_signo) {
 	case SIGILL:
 	    scs = strsigcode(sigcode_ill,si_code) ;
 	    break ;
 	case SIGSEGV:
 	    scs = strsigcode(sigcode_segv,si_code) ;
-	    bufprintf(abuf,16,"%p",sip->si_addr) ;
+	    bufprintf(abuf,alen,"%p",sip->si_addr) ;
 	    as = abuf ;
 	    break ;
 	case SIGBUS:
 	    scs = strsigcode(sigcode_bus,si_code) ;
-	    bufprintf(abuf,16,"%p",sip->si_addr) ;
+	    bufprintf(abuf,alen,"%p",sip->si_addr) ;
 	    as = abuf ;
 	    break ;
 	case SIGQUIT:
@@ -268,7 +265,7 @@ static int main_sigdump(siginfo_t *sip) noex {
 }
 /* end subroutine (main_sigdump) */
 
-static cchar *strsigcode(const SIGCODE *scp,int code) noex {
+local cchar *strsigcode(const SIGCODE *scp,int code) noex {
 	int		i ; /* used-afterwards */
 	bool		f = false ;
 	cchar		*sn = "UNKNOWN" ;
