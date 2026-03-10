@@ -100,8 +100,7 @@ bool aflag_co::operator () () noex {
 	    break ;
 	} /* end switch */
 	return rf ;
-}
-/* end method (aflag_co::operator) */
+} /* end method (aflag_co::operator) */
 
 bool aflag_co::operator () (bool a) noex {
 	bool		rf = false ;
@@ -125,7 +124,7 @@ bool aflag_co::operator () (bool a) noex {
 	    break ;
 	} /* end switch */
 	return rf ;
-}
+} /* end method (aflag_co::operator) */
 
 int aflag_mx::operator () (int to) noex {
 	int		rs = SR_BUGCHECK ;
@@ -138,8 +137,7 @@ int aflag_mx::operator () (int to) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end method (aflag_mx::operator) */
+} /* end method (aflag_mx::operator) */
 
 int aflag::ilockbegin(int to) noex {
 	int		rs = SR_OK ;
