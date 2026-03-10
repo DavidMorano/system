@@ -75,7 +75,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucinetconv.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<sfx.h>			/* |sfshrink(3uc)| */
 #include	<strwcpy.h>
@@ -91,8 +93,8 @@
 
 /* imported namespaces */
 
-using std::min ;
-using std::max ;
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -103,7 +105,7 @@ using std::max ;
 
 /* forward references */
 
-static inline int getaf(cchar *sp,int sl) noex {
+local inline int getaf(cchar *sp,int sl) noex {
 	return (strnchr(sp,sl,':') != nullptr) ? AF_INET6 : AF_INET4 ;
 }
 
