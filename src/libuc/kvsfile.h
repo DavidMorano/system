@@ -22,10 +22,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>		/* <- for |time_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<localmisc.h>		/* |REALNAMELEN| */
@@ -42,7 +39,7 @@
 struct kvsfile_cursor {
 	hdb_cur		*ecp ;
 	int		i ;
-} ;
+} ; /* end struct (kvsfile_cursor) */
 
 struct kvsfile_head {
 	vecobj		*flp ;
@@ -51,7 +48,7 @@ struct kvsfile_head {
 	hdb		*elp ;		/* indexed by key */
 	time_t		ti_check ;
 	uint		magic ;
-} ;
+} ; /* end struct (kvsfile_head) */
 
 typedef KVSFILE		kvsfile ;
 typedef KVSFILE_CUR	kvsfile_cur ;
