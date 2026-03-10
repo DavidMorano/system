@@ -38,6 +38,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdckdint>		/* |ckd_mu(3c++)| */
 #include	<cstring>		/* |strncpy(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -121,25 +122,31 @@ namespace libu {
 	} /* end if (non-null) */
 	return (rs >= 0) ? bl : rs ;
     } /* end method (umems::strw) */
-    int umems::mall(int sz,void *vp) noex {
+    int umems::mall(int sz,void *vpp) noex {
 	umgr	lmo ;
 	lmo.m = &umgr::stdmalloc ;
-	return lmo(sz,vp) ;
+	return lmo(sz,vpp) ;
     } /* end subroutine (umems::mall) */
-    int umems::vall(int sz,void *vp) noex {
+    int umems::vall(int sz,void *vpp) noex {
 	umgr	lmo ;
 	lmo.m = &umgr::stdvalloc ;
-	return lmo(sz,vp) ;
+	return lmo(sz,vpp) ;
     } /* end subroutine (umems::vall) */
-    int umems::call(int ne,int esz,void *vp) noex {
-	cint		sz = (ne * esz) ;
-	int		rs ;
-	if ((rs = mall(sz,vp)) >= 0) ylikely {
-	    memclear(vp,sz) ;
-	}
+    int umems::call(int ne,int esz,void *vpp) noex {
+	int		rs = SR_TOOBIG ;
+	int		sz = 0 ; /* return-value */
+	if (ckd_mul(&sz,ne,esz) == false) {
+	    if ((rs = mall(sz,vpp)) >= 0) ylikely {
+		caddr_t	*epp = caddrp(vpp) ;
+		rs = SR_BUGCHECK ;
+		if (caddr_t ca = caddr_t(*epp) ; ca) {
+	            rs = memclear(ca,sz) ;
+		}
+	    } /* end if (umems::mall) */
+	} /* end if (valid) */
 	return (rs >= 0) ? sz : rs ;
     } /* end subroutine (umems::call) */
-    int umems::rall(void *cp,int sz,void *vp) noex {
+    int umems::rall(void *cp,int sz,void *vpp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) ylikely {
 	    const uintptr_t	am = (szof(uintptr_t) - 1) ;
@@ -148,7 +155,7 @@ namespace libu {
 	    if ((v & am) == 0) ylikely {
 	        umgr	lmo(cp) ;
 	        lmo.m = &umgr::stdrealloc ;
-	        rs = lmo(sz,vp) ;
+	        rs = lmo(sz,vpp) ;
 	    } /* end if (aligned correctly) */
 	} /* end if (non-null) */
 	return rs ;
@@ -172,9 +179,6 @@ namespace libu {
 	}
 	return rs ;
     } /* end subroutine (umems::rsfree) */
-    int umems::malloc(int sz,void *vp) noex {
-	return mall(sz,vp) ;
-    } /* end subroutine (umems::malloc) */
 } /* end namespace (libu) */
 
 
@@ -184,11 +188,11 @@ int umgr::operator () (int sz,void *vp) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
 	errtimer	to_busy		= utimeout[uto_busy] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
-	reterr		r ;
 	int     	rs = SR_FAULT ;
 	if (vp) ylikely {
 	    rs = SR_INVALID ;
 	    if (sz > 0) ylikely {
+	        reterr	r ;
 	        repeat {
 	            if ((rs = (this->*m)(sz,vp)) < 0) {
 		        r(rs) ;			/* <- default causes exit */
