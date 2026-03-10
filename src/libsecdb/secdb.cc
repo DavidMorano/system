@@ -66,7 +66,7 @@
 #include	"secdb.h"
 
 
-/* From libnsl */
+/* From LIBNSL */
 extern "C" {
     extern char *_strdup_null(char *) noex ;
     extern char *_strtok_escape(char *, char *, char **) noex ;
@@ -102,8 +102,8 @@ char * kva_match(kva_t *kva, char *key) noex {
 	int	i;
 	kv_t	*data;
 
-	if (kva == NULL || key == NULL) {
-		return (NULL);
+	if (kva == nullptr || key == nullptr) {
+		return (nullptr);
 	}
 	data = kva->data;
 	for (i = 0; i < kva->length; i++) {
@@ -112,7 +112,7 @@ char * kva_match(kva_t *kva, char *key) noex {
 		}
 	}
 
-	return (NULL);
+	return (nullptr);
 } /* end subroutine (kva_match) */
 
 /*
@@ -122,18 +122,18 @@ void _kva_free(kva_t *kva) noex {
 	int	i;
 	kv_t	*data;
 
-	if (kva == NULL) {
+	if (kva == nullptr) {
 		return;
 	}
 	data = kva->data;
 	for (i = 0; i < kva->length; i++) {
-		if (data[i].key != NULL) {
+		if (data[i].key != nullptr) {
 			free(data[i].key);
-			data[i].key = NULL;
+			data[i].key = nullptr;
 		}
-		if (data[i].value != NULL) {
+		if (data[i].value != nullptr) {
 			free(data[i].value);
-			data[i].value = NULL;
+			data[i].value = nullptr;
 		}
 	}
 	free(kva->data);
@@ -148,7 +148,7 @@ void _kva_free_value(kva_t *kva, char *key) noex {
 	int	ctr;
 	kv_t	*data;
 
-	if (kva == NULL) {
+	if (kva == nullptr) {
 		return;
 	}
 
@@ -156,9 +156,9 @@ void _kva_free_value(kva_t *kva, char *key) noex {
 	data = kva->data;
 
 	while (ctr--) {
-		if (strcmp(data->key, key) == 0 && data->value != NULL) {
+		if (strcmp(data->key, key) == 0 && data->value != nullptr) {
 			free(data->value);
-			data->value = NULL;
+			data->value = nullptr;
 		}
 		data++;
 	}
@@ -168,12 +168,12 @@ void _kva_free_value(kva_t *kva, char *key) noex {
 kva_t  * _new_kva(int size) noex {
 	kva_t	*new_kva;
 
-	if ((new_kva = (kva_t *)calloc(1, sizeof (kva_t))) == NULL) {
-		return (NULL);
+	if ((new_kva = (kva_t *)calloc(1, sizeof (kva_t))) == nullptr) {
+		return (nullptr);
 	}
-	if ((new_kva->data = (kv_t *)calloc(1, (size*sizeof (kv_t)))) == NULL) {
+	if ((new_kva->data = (kv_t *)calloc(1, (size*sizeof (kv_t)))) == nullptr) {
 		free(new_kva);
-		return (NULL);
+		return (nullptr);
 	}
 
 	return (new_kva);
@@ -196,16 +196,16 @@ kva_t  * _str2kva(char *s, char *ass, char *del) noex {
 	kv_t	*data;
 	kva_t	*nkva;
 
-	if (s == NULL ||
-	    ass == NULL ||
-	    del == NULL ||
+	if (s == nullptr ||
+	    ass == nullptr ||
+	    del == nullptr ||
 	    *s == '\0' ||
 	    *s == '\n' ||
 	    (lenstr(s) <= 1)) {
-		return (NULL);
+		return (nullptr);
 	}
 	p = s;
-	while ((p = _strpbrk_escape(p, ass)) != NULL) {
+	while ((p = _strpbrk_escape(p, ass)) != nullptr) {
 		n++;
 		p++;
 	}
@@ -216,23 +216,23 @@ kva_t  * _str2kva(char *s, char *ass, char *del) noex {
 		}
 		size = m * KV_ADD_KEYS;
 	}
-	if ((nkva = _new_kva(size)) == NULL) {
-		return (NULL);
+	if ((nkva = _new_kva(size)) == nullptr) {
+		return (nullptr);
 	}
 	data = nkva->data;
 	nkva->length = 0;
-	if ((buf = strdup(s)) == NULL) {
-		return (NULL);
+	if ((buf = strdup(s)) == nullptr) {
+		return (nullptr);
 	}
 	pair = _strtok_escape(buf, del, &last_pair);
 	do {
 		key = _strtok_escape(pair, ass, &last_key);
-		if (key != NULL) {
+		if (key != nullptr) {
 			data[nkva->length].key = _do_unescape(key);
 			data[nkva->length].value = _do_unescape(last_key);
 			nkva->length++;
 		}
-	} while ((pair = _strtok_escape(NULL, del, &last_pair)) != NULL);
+	} while ((pair = _strtok_escape(nullptr, del, &last_pair)) != nullptr);
 	free(buf);
 	return (nkva);
 } /* end subroutine (_str2kva) */
@@ -250,7 +250,7 @@ int _kva2str(kva_t *kva, char *buf, int buflen, char *ass, char *del) noex {
 	int	off = 0;
 	kv_t	*data;
 
-	if (kva == NULL) {
+	if (kva == nullptr) {
 		return (0);
 	}
 
@@ -258,7 +258,7 @@ int _kva2str(kva_t *kva, char *buf, int buflen, char *ass, char *del) noex {
 	data = kva->data;
 
 	for (i = 0; i < kva->length; i++) {
-		if (data[i].value != NULL) {
+		if (data[i].value != nullptr) {
 			len = snprintf(buf + off, buflen - off, "%s%s%s%s",
 			    data[i].key, ass, data[i].value, del);
 			if (len < 0 || len + off >= buflen) {
@@ -275,13 +275,13 @@ int _insert2kva(kva_t *kva, char *key, char *value) noex {
 	int	i;
 	kv_t	*data;
 
-	if (kva == NULL) {
+	if (kva == nullptr) {
 		return (0);
 	}
 	data = kva->data;
 	for (i = 0; i < kva->length; i++) {
 		if (strcmp(data[i].key, key) == 0) {
-			if (data[i].value != NULL)
+			if (data[i].value != nullptr)
 				free(data[i].value);
 			data[i].value = _strdup_null(value);
 			return (0);
@@ -295,15 +295,15 @@ kva_t  * _kva_dup(kva_t *old_kva) noex {
 	int	size;
 	kv_t	*old_data;
 	kv_t	*new_data;
-	kva_t	*nkva = NULL;
+	kva_t	*nkva = nullptr;
 
-	if (old_kva == NULL) {
-		return (NULL);
+	if (old_kva == nullptr) {
+		return (nullptr);
 	}
 	old_data = old_kva->data;
 	size = old_kva->length;
-	if ((nkva = _new_kva(size)) == NULL) {
-		return (NULL);
+	if ((nkva = _new_kva(size)) == nullptr) {
+		return (nullptr);
 	}
 	new_data = nkva->data;
 	nkva->length = old_kva->length;
@@ -337,10 +337,10 @@ static void strip_spaces(char **valuep) noex {
 } /* end subroutine (strip_spaces) */
 
 char * _do_unescape(char *src) noex {
-	char *tmp = NULL;
-	char *dst = NULL;
+	char *tmp = nullptr;
+	char *dst = nullptr;
 
-	if (src == NULL) {
+	if (src == nullptr) {
 		dst = _strdup_null(src);
 	} else {
 	    cnothrow	nt{} ;
@@ -353,7 +353,7 @@ char * _do_unescape(char *src) noex {
 		    strcpy(tbuf,escs) ;
 		    {
 		        tmp = _unescape(src,tbuf) ;
-		        dst = (tmp == NULL) ? _strdup_null(src) : tmp ;
+		        dst = (tmp == nullptr) ? _strdup_null(src) : tmp ;
 		    }
 		    delete [] tbuf ;
 	        } /* end if (m-a-f) */
@@ -367,48 +367,48 @@ char * _do_unescape(char *src) noex {
 char * _argv_to_csl(char **strings) noex {
 	int len = 0;
 	int i = 0;
-	char *newstr = NULL;
+	char *newstr = nullptr;
 
-	if (strings == NULL)
-		return (NULL);
-	for (i = 0; strings[i] != NULL; i++) {
+	if (strings == nullptr)
+		return (nullptr);
+	for (i = 0; strings[i] != nullptr; i++) {
 		len += lenstr(strings[i]) + 1;
 	}
-	if ((len > 0) && ((newstr = (char *)malloc(len + 1)) != NULL)) {
+	if ((len > 0) && ((newstr = (char *)malloc(len + 1)) != nullptr)) {
 		(void) memset(newstr, 0, len);
-		for (i = 0; strings[i] != NULL; i++) {
+		for (i = 0; strings[i] != nullptr; i++) {
 			(void) strcat(newstr, strings[i]);
 			(void) strcat(newstr, ",");
 		}
 		newstr[len-1] = '\0';
 		return (newstr);
 	} else
-		return (NULL);
+		return (nullptr);
 } /* end subroutine (_argv_to_csl) */
 
 char ** _csl_to_argv(char *csl) noex {
 	int len = 0;
 	int ncommas = 0;
 	int i = 0;
-	char **spc = NULL;
-	char *copy = NULL;
+	char **spc = nullptr;
+	char *copy = nullptr;
 	char *pc;
-	char *lasts = NULL;
+	char *lasts = nullptr;
 
 	len = lenstr(csl);
 	for (i = 0; i < len; i++) {
 		if (csl[i] == ',')
 			ncommas++;
 	}
-	if ((spc = (char **)malloc((ncommas + 2) * sizeof (char *))) == NULL) {
-		return (NULL);
+	if ((spc = (char **)malloc((ncommas + 2) * sizeof (char *))) == nullptr) {
+		return (nullptr);
 	}
 	copy = strdup(csl);
-	for (pc = strtok_r(copy, ",", &lasts), i = 0; pc != NULL;
-	    pc = strtok_r(NULL, ",", &lasts), i++) {
+	for (pc = strtok_r(copy, ",", &lasts), i = 0; pc != nullptr;
+	    pc = strtok_r(nullptr, ",", &lasts), i++) {
 		spc[i] = strdup(pc);
 	}
-	spc[i] = NULL;
+	spc[i] = nullptr;
 	free(copy);
 	return (spc);
 } /* end subroutine (_csl_to_argv) */
@@ -416,7 +416,7 @@ char ** _csl_to_argv(char *csl) noex {
 void _free_argv(char **p_argv) noex {
 	char **p_a;
 
-	for (p_a = p_argv; *p_a != NULL; p_a++)
+	for (p_a = p_argv; *p_a != nullptr; p_a++)
 		free(*p_a);
 	free(p_argv);
 } /* end subroutine (_free_argv) */
@@ -427,15 +427,15 @@ void print_kva(kva_t *kva) noex {
 	int	i;
 	kv_t	*data;
 
-	if (kva == NULL) {
+	if (kva == nullptr) {
 		(void) printf("  (empty)\n");
 		return;
 	}
 	data = kva->data;
 	for (i = 0; i < kva->length; i++) {
 		(void) printf("  %s = %s\n",
-		    data[i].key != NULL ? data[i].key : "NULL",
-		    data[i].value != NULL ? data[i].value : "NULL");
+		    data[i].key != nullptr ? data[i].key : "nullptr",
+		    data[i].value != nullptr ? data[i].value : "nullptr");
 	}
 } /* end subroutine (print_kva) */
 #endif  /* DEBUG */
