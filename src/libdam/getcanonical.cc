@@ -29,19 +29,22 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<sys/utsname.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstringh>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<strwcpy.h>
 #include	<char.h>
 #include	<localmisc.h>
+
+#include	"getcanonical.h"
 
 
 /* local defines */
@@ -56,7 +59,8 @@
 
 /* external subroutines */
 
-extern char	*strwcpy(char *,char *,int) ;
+
+/* external variables */
 
 
 /* forward references */
@@ -76,38 +80,35 @@ extern int	h_errno ;
 /* local structures */
 
 
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int getcanonical(name,hostname,nodename,domainname)
-char	name[] ;
-char	hostname[] ;
-char	nodename[], domainname[] ;
-{
-	struct hostent	he, *hep ;
-
-	struct utsname	uts ;
-
+int getcanonical(cchar *name,char *rhost,char *rnode,char *rdomain) noex {
+	HOSTENT		*hep ;
+	UTSNAME		uts ;
 	int	i ;
 
 #if	GETCANONICAL_SYSV
 	int	h_errno_local ;
 #endif
 
-	char	hostbuf[HOSTBUFLEN + 1] ;
 	char	*cp, *cp1 ;
 
-
 /* are we "doing" ourselves? */
-
-	if (name == NULL) {
-
+	if (name == nullptr) {
 	    if (uname(&uts) >= 0) {
 	        name = uts.nodename ;
-
-	    } else
+	    } else {
 	        name = "localhost" ;
-
+	    }
 	}
 
 #if	GETCANONICAL_SYSV
@@ -115,91 +116,88 @@ char	nodename[], domainname[] ;
 	do {
 	    hep = gethostbyname_r(name,
 	        &he,hostbuf,HOSTBUFLEN,&h_errno_local) ;
-	    if ((hep == NULL) && (h_errno_local == TRY_AGAIN)) sleep(1) ;
-	} while ((hep == NULL) && (h_errno_local == TRY_AGAIN)) ;
+	    if ((hep == nullptr) && (h_errno_local == TRY_AGAIN)) sleep(1) ;
+	} while ((hep == nullptr) && (h_errno_local == TRY_AGAIN)) ;
 #else
 	do {
 	    hep = gethostbyname(name) ;
-	    if ((hep == NULL) && (h_errno == TRY_AGAIN)) sleep(1) ;
-	} while ((hep == NULL) && (h_errno == TRY_AGAIN)) ;
+	    if ((hep == nullptr) && (h_errno == TRY_AGAIN)) sleep(1) ;
+	} while ((hep == nullptr) && (h_errno == TRY_AGAIN)) ;
 #endif /* GETCANONICAL_SYSV */
 
-	if (hep != NULL) {
+	if (hep != nullptr) {
 
-	    if ((cp = strchr(hep->h_name,'.')) != NULL) {
+	    if ((cp = strchr(hep->h_name,'.')) != nullptr) {
 
-	        strcpy(hostname,hep->h_name) ;
+	        strcpy(rhost,hep->h_name) ;
 
 	        *cp++ = '\0' ;
-	        if (nodename != NULL)
-	            strcpy(nodename,hep->h_name) ;
-
-	        if (domainname != NULL)
-	            strcpy(domainname,cp) ;
+	        if (rnode != nullptr) {
+	            strcpy(rnode,hep->h_name) ;
+		}
+	        if (rdomain != nullptr) {
+	            strcpy(rdomain,cp) ;
+		}
 
 	        return OK ;
 
 	    } /* end if */
 
-	    for (i = 0 ; hep->h_aliases[i] != NULL ; i += 1) {
-
-	        if ((cp = strchr(hep->h_aliases[i],'.')) != NULL) {
-
-	            strcpy(hostname,hep->h_aliases[i]) ;
+	    for (i = 0 ; hep->h_aliases[i] != nullptr ; i += 1) {
+	        if ((cp = strchr(hep->h_aliases[i],'.')) != nullptr) {
+	            strcpy(rhost,hep->h_aliases[i]) ;
 
 	            *cp++ = '\0' ;
-	            if (nodename != NULL)
-	                strcpy(nodename,hep->h_aliases[i]) ;
-
-	            if (domainname != NULL)
-	                strcpy(domainname,cp) ;
-
+	            if (rnode != nullptr) {
+	                strcpy(rnode,hep->h_aliases[i]) ;
+		    }
+	            if (rdomain != nullptr) {
+	                strcpy(rdomain,cp) ;
+		    }
 	            return OK ;
 
 	        } /* end if */
-
 	    } /* end for */
-
 	} /* end if */
 
 /* assume that any dots in the original name means that it is fully qualled */
 
-	if ((cp = strchr(name,'.')) != NULL) {
-
-	    strcpy(hostname,name) ;
-
-	    if (nodename != NULL)
-	        strwcpy(nodename,name,cp - name) ;
-
-	    if (domainname != NULL)
-	        strcpy(domainname,cp + 1) ;
-
+	if ((cp = strchr(name,'.')) != nullptr) {
+	    strcpy(rhost,name) ;
+	    if (rnode != nullptr) {
+		cint tl = intconv(cp -name) ;
+	        strwcpy(rnode,name,tl) ;
+	    }
+	    if (rdomain != nullptr) {
+	        strcpy(rdomain,cp + 1) ;
+	    }
 	    return OK ;
 
 	} /* end if */
 
 /* try to attach our local domain to it */
 
-	if ((cp = getenv("LOCALDOMAIN")) != NULL) {
+	if ((cp = getenv("LOCALDOMAIN")) != nullptr) {
 		char	*bp ;
-
-		while (CHAR_ISWHITE(*cp))
+		while (CHAR_ISWHITE(*cp)) {
 			cp += 1 ;
-
+		}
 		cp1 = cp ;
-		while (*cp1 && (! CHAR_ISWHITE(*cp1)))
+		while (*cp1 && (! CHAR_ISWHITE(*cp1))) {
 			cp1 += 1 ;
-
-		bp = strwcpy(hostname,name,-1) ;
+		}
+		bp = strwcpy(rhost,name,-1) ;
 
 		*bp++ = '.' ;
-		strwcpy(bp,cp,(cp1 - cp)) ;
+		cint tl = intconv(cp1 - cp) ;
+		strwcpy(bp,cp,tl) ;
 
-	    if (nodename != NULL)
-	        strcpy(nodename,name) ;
-
-	    if (domainname != NULL)
-	        strcpy(domainname,cp) ;
+	    if (rnode != nullptr) {
+	        strcpy(rnode,name) ;
+	    }
+	    if (rdomain != nullptr) {
+	        strcpy(rdomain,cp) ;
+	    }
 
 	    return OK ;
 	}
