@@ -72,12 +72,7 @@
 
 /* external subroutines */
 
-#if	CF_DEBUG || CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern int	progexit(PROGINFO *) ;
+extern int	progexit(PROGINFO *) noex ;
 
 
 /* external variables */
@@ -88,17 +83,17 @@ extern int	progexit(PROGINFO *) ;
 
 /* forward references */
 
-static int	procdb(PROGINFO *,ARGINFO *,bfile *,cchar *) ;
+local int	procdb(PROGINFO *,ARGINFO *,bfile *,cchar *) ;
 
-static int	procspecs(PROGINFO *,bfile *,TEXTLOOK *,cchar *,int) ;
-static int	procspec(PROGINFO *,bfile *,TEXTLOOK *,vecstr *) ;
+local int	procspecs(PROGINFO *,bfile *,TEXTLOOK *,cchar *,int) ;
+local int	procspec(PROGINFO *,bfile *,TEXTLOOK *,vecstr *) ;
 
-static int	procout(PROGINFO *,bfile *,TEXTLOOK_TAG *) ;
+local int	procout(PROGINFO *,bfile *,TEXTLOOK_TAG *) ;
 
 
 /* local variables */
 
-static const uchar	aterms[] = {
+constexpr char		terms[] = {
 	0x00, 0x3E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -110,13 +105,15 @@ static const uchar	aterms[] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int progquery(pip,aip,terms,dbname,ofname)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-const uchar	terms[] ;
+cchar	terms[] ;
 cchar	dbname[] ;
 cchar	ofname[] ;
 {
@@ -168,7 +165,7 @@ cchar	ofname[] ;
 /* local subroutines */
 
 
-static int procdb(pip,aip,ofp,dbname)
+local int procdb(pip,aip,ofp,dbname)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bfile		*ofp ;
@@ -326,7 +323,7 @@ ret0:
 /* end subroutine (procdb) */
 
 
-static int procspecs(pip,ofp,tlp,sp,sl)
+local int procspecs(pip,ofp,tlp,sp,sl)
 PROGINFO	*pip ;
 bfile		*ofp ;
 TEXTLOOK	*tlp ;
@@ -384,7 +381,7 @@ int		sl ;
 /* end subroutine (procspecs) */
 
 
-static int procspec(pip,ofp,tlp,qsp)
+local int procspec(pip,ofp,tlp,qsp)
 PROGINFO	*pip ;
 bfile		*ofp ;
 TEXTLOOK	*tlp ;
@@ -446,7 +443,7 @@ vecstr		*qsp ;
 }
 /* end subroutine (procspec) */
 
-static int procout(PROGINFO *pip,bfile *ofp,TEXTLOOK_TAG *tagp) noex {
+local int procout(PROGINFO *pip,bfile *ofp,TEXTLOOK_TAG *tagp) noex {
 	uint		recoff ;
 	uint		reclen ;
 	cint	olen = OUTBUFLEN ;
