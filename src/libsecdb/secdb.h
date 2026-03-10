@@ -38,12 +38,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
+#include	<clanguage.h>		/* <- is this safe? */
+#include	<utypedefs.h>		/* <- is this safe? */
 
 #define	DEFAULT_POLICY		"solaris"
 #define	SUSER_POLICY		"suser"		/* fallback: old policy */
