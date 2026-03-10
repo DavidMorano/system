@@ -65,10 +65,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getbufsize.h>
 #include	<sncpyx.h>
 #include	<hostinfo.h>
+#include	<localmisc.h>
 
 #include	"getchostname.h"
 
@@ -106,12 +110,11 @@ int getchostname(char *hbuf,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (name && hbuf) {
-	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
-	        hostinfo	hi ;
+	if (hbuf && name) {
+	    if ((rs = getbufsize(bufsize_hn)) >= 0) {
 	        cint		af = AF_UNSPEC ;
 	        cint		hlen = rs ;
-	        if ((rs = hostinfo_start(&hi,af,name)) >= 0) {
+	        if (hostinfo hi ; (rs = hostinfo_start(&hi,af,name)) >= 0) {
 	            cchar	*cnp{} ;
 	            if ((rs = hostinfo_getcanonical(&hi,&cnp)) >= 0) {
 		        rs = sncpy1(hbuf,hlen,cnp) ;
