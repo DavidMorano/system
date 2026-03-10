@@ -53,10 +53,6 @@
 
 #define	PI		proginfo
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 #ifndef	MAXOUTLEN
 #define	MAXOUTLEN	64
 #endif
