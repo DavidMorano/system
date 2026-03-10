@@ -146,7 +146,7 @@ int progmsgid(proginfo *pip,char *mbuf,int mlen,int serial) noex {
 
 static int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	if ((rs = getbufsize(bufsize_un)) >= 0) {
 	    var.usernamelen = rs ;
 	}
 	return rs ;
