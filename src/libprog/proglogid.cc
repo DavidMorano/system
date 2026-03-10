@@ -1,4 +1,5 @@
 /* proglogid SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process the service names given us */
@@ -48,6 +49,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
@@ -62,10 +64,6 @@
 
 
 /* local defines */
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
 
 
 /* imported namespaces */
