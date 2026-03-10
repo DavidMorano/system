@@ -1,12 +1,12 @@
-/* progloger */
+/* progloger SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* log handling (general-program) */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
-
 
 /* revision history:
 
@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	progloger
+
+	Description
 	Here we do some log-file handling.
 
 *******************************************************************************/
@@ -30,10 +34,12 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<bfile.h>
 #include	<logfile.h>
@@ -54,23 +60,9 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
-
-extern int	proglogfname(PROGINFO *,char *,cchar *,cchar *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
+extern "C" {
+    extern int	proglogfname(PROGINFO *,char *,cchar *,cchar *) noex ;
+}
 
 
 /* external variables */
@@ -85,13 +77,14 @@ extern int	strlinelen(const char *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progloger_begin(PROGINFO *pip,cchar *lfn,USERINFO *uip)
-{
+int progloger_begin(PROGINFO *pip,cchar *lfn,USERINFO *uip) noex {
 	int		rs = SR_OK ;
-	int		f_opened = FALSE ;
+	int		f_opened = false ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -100,27 +93,27 @@ int progloger_begin(PROGINFO *pip,cchar *lfn,USERINFO *uip)
 #endif
 
 	if (pip->fl.logprog) {
-	    const char	*logcname = LOGCNAME ;
+	    cchar	*logcname = LOGCNAME ;
 	    char	lbuf[MAXPATHLEN+1] ;
 	    if ((rs = proglogfname(pip,lbuf,logcname,lfn)) >= 0) {
-	        const char	**vpp = &pip->lfname ;
-	        int		pl = rs ;
+	        cchar	**vpp = &pip->lfname ;
+	        int	pl = rs ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
 	            debugprintf("progloger_begin: logfname=%s\n",lbuf) ;
 #endif
 	        if ((rs = proginfo_setentry(pip,vpp,lbuf,pl)) >= 0) {
 	            lfn = pip->lfname ;
-	            if ((lfn != NULL) && (lfn[0] != '-')) {
+	            if ((lfn != nullptr) && (lfn[0] != '-')) {
 	                LOGFILE		*lhp = &pip->lh ;
-	                const char	*logid = pip->logid ;
+	                cchar		*logid = pip->logid ;
 	                if ((rs = logfile_open(lhp,lfn,0,0666,logid)) >= 0) {
-			    const time_t	dt = pip->daytime ;
-	                    cchar		*pn = pip->progname ;
-			    cchar		*sn = pip->searchname ;
-			    cchar		*vn = pip->version ;
-	                    f_opened = TRUE ;
-	                    pip->open.logprog = TRUE ;
+			    custime	dt = pip->daytime ;
+	                    cchar	*pn = pip->progname ;
+			    cchar	*sn = pip->searchname ;
+			    cchar	*vn = pip->version ;
+	                    f_opened = true ;
+	                    pip->open.logprog = true ;
 
 	                    if (pip->debuglevel > 0)
 	                        bprintf(pip->efp,"%s: lf=%s\n",pn,lfn) ;
@@ -155,7 +148,7 @@ int progloger_end(PROGINFO *pip)
 	int		rs1 ;
 
 	if (pip->open.logprog) {
-	    pip->open.logprog = FALSE ;
+	    pip->open.logprog = false ;
 	    rs1 = logfile_close(&pip->lh) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -168,8 +161,8 @@ int progloger_end(PROGINFO *pip)
 int progloger_print(PROGINFO *pip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
-	if (pip == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 	if (pip->open.logprog) {
 	    rs = logfile_print(&pip->lh,sp,sl) ;
 	}
@@ -184,8 +177,8 @@ int progloger_vprintf(PROGINFO *pip,cchar *fmt,va_list ap)
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
+	if (fmt == nullptr) return SR_FAULT ;
 
 	if (pip->open.logprog) {
 	    cint	flen = LINEBUFLEN ;
@@ -225,7 +218,7 @@ int progloger_printf(PROGINFO *pip,cchar fmt[],...)
 int progloger_flush(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if (pip->open.logprog) {
 	    rs = logfile_flush(&pip->lh) ;
 	}
