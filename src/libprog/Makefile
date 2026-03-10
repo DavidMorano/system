@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += libprog.h proginfo.h
+INCS += libprog.h proginfo.hh
 
 MODS +=
 
@@ -128,7 +128,6 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -175,28 +174,6 @@ so:			$(T).so
 	makemodule $(*)
 
 
-obja.o:			$(OBJA)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA)
-
-objb.o:			$(OBJB)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
-
-objc.o:			$(OBJC)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJC)
-
-objd.o:			$(OBJD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJD)
-
-obje.o:			$(OBJE)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJE)
-
-objf.o:			$(OBJF)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJF)
-
-objg.o:			$(OBJG)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJG)
-
-
 $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
 
@@ -237,10 +214,32 @@ control:
 	(uname -n ; date) > Control
 
 
-proginfo.o:	proginfo.cc			$(INCS)
-progmsgid.o:	progmsgid.cc progmsgid.h	$(INCS)
-proglog.o:	proglog.cc proglog.h		$(INCS)
-proguserlist.o:	proguserlist.cc proguserlist.h	$(INCS)
-progexpand.o:	progexpand.cc			$(INCS)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc.o:			$(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obje.o:			$(OBJE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objf.o:			$(OBJF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objg.o:			$(OBJG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+proginfo.o:	proginfo.cc	proginfo.hh			$(INCS)
+progmsgid.o:	progmsgid.cc	progmsgid.h			$(INCS)
+proglog.o:	proglog.cc	proglog.hh			$(INCS)
+proguserlist.o:	proguserlist.cc	proguserlist.h			$(INCS)
+progexpand.o:	progexpand.cc	progexpand.h			$(INCS)
 
 
