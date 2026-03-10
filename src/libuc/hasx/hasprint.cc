@@ -138,25 +138,19 @@ bool printinfo::create() noex {
 	return finit ;
 } /* end method (printinfo::create) */
 
+constexpr uchar		termchars[] = {
+	CH_ESC,	CH_TAB,	CH_CR,	CH_NL,	CH_BS,	CH_BEL,
+	CH_VT,	CH_FF,	CH_SO,	CH_SI,	CH_SS2,	CH_SS3
+} ; /* end array */
+
 void printinfo::mkiscmd() noex {
     	for (int ch = 0 ; ch < nch ; ch += 1) {
 	    if (iscmdstart(ch)) {
 		iscmd.set(ch,true) ;
-	    } else {
-		bool	f = false ;
-	        f = f || (ch == CH_ESC) ;
-	        f = f || (ch == CH_TAB) ;
-	        f = f || (ch == CH_CR) ;
-	        f = f || (ch == CH_NL) ;
-	        f = f || (ch == CH_BS) ;
-	        f = f || (ch == CH_BEL) ;
-	        f = f || (ch == CH_VT) || (ch == CH_FF) ;
-	        f = f || (ch == CH_SO) || (ch == CH_SI) ;
-	        f = f || (ch == CH_SS2) || (ch == CH_SS3) ;
-		if (f) {
-		    iscmd.set(ch,true) ;
-		}
-	    } /* end if */
+	    }
+	} /* end for */
+	for (cauto &ch : termchars) {
+	    iscmd.set(ch,true) ;
 	} /* end for */
 } /* end method (printinfo::mkiscmd) */
 
@@ -215,7 +209,7 @@ local bool hasx(isx_f isx,cchar *sp,int sl) noex {
 
 printinfo_co::operator bool () noex {
     	bool f = false ;
-    	if (op) {
+    	if (op) ylikely {
  	    f = op->create() ;
 	} /* end if (non-null) */
  	return f ;
