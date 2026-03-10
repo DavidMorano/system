@@ -1,4 +1,5 @@
 /* progexpand SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* expand out some per program parameters */
@@ -59,13 +60,19 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<snx.h>
 #include	<localmisc.h>
 
 #include	"proginfo.hh"
+#include	"progexpand.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -112,31 +119,31 @@ int progexpand(proginfo *pip,char *rbuf,int rlen,cchar *sbuf,int slen) noex {
 	        switch (ch) {
 	        case 'V':
 	            cp = pip->version ;
-	            cl = strlen(cp) ;
+	            cl = lenstr(cp) ;
 	            break ;
 #if	defined(DEFS_ROOTNAME) && (DEFS_ROOTNAME > 0)
 	        case 'B':
 		    if ((cp = pip->rootname) != NULL) {
-	            	cl = strlen(cp) ;
+	            	cl = lenstr(cp) ;
 		    }
 	            break ;
 #endif /* P_RCPMUXD */
 	        case 'P':
 	            cp = pip->progname ;
-	            cl = strlen(cp) ;
+	            cl = lenstr(cp) ;
 	            break ;
 	        case 'S':
 		    if ((cp = pip->searchname) != NULL) {
-	            	cl = strlen(cp) ;
+	            	cl = lenstr(cp) ;
 		    }
 	            break ;
 	        case 'N':
 	            cp = pip->nodename ;
-	            cl = strlen(cp) ;
+	            cl = lenstr(cp) ;
 	            break ;
 	        case 'D':
 	            cp = pip->domainname ;
-	            cl = strlen(cp) ;
+	            cl = lenstr(cp) ;
 	            break ;
 	        case 'H':
 	            cp = hbuf ;
@@ -146,17 +153,17 @@ int progexpand(proginfo *pip,char *rbuf,int rlen,cchar *sbuf,int slen) noex {
 /* handle the expansion of our program root */
 	        case 'R':
 	            if ((cp = pip->pr) != NULL) {
-	                cl = strlen(cp) ;
+	                cl = lenstr(cp) ;
 		    }
 	            break ;
 	        case 'U':
 		    if ((cp = pip->username) != NULL) {
-			cl = strlen(cp) ;
+			cl = lenstr(cp) ;
 		    }
 	            break ;
 	        case 'G':
 		    if ((cp = pip->groupname) != NULL) {
-			cl = strlen(cp) ;
+			cl = lenstr(cp) ;
 		    }
 	            break ;
 	        default:
