@@ -1,4 +1,5 @@
 /* proglog SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* handle program logging */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	proglog
+
+	Description:
 	Manage the general process logging.
 
 *******************************************************************************/
@@ -28,7 +33,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mallocxx.h>
 #include	<bfile.h>
 #include	<logfile.h>
@@ -102,7 +108,6 @@ int proglog_begin(proginfo *pip,userinfo *uip) noex {
 	        } /* end if */
 	    } /* end if (log-file) */
 	} /* end if (enabled) */
-
 	return (rs >= 0) ? f_opened : rs ;
 }
 /* end subroutine (proglog_begin) */
