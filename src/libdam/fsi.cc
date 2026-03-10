@@ -41,7 +41,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -60,10 +59,10 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int fsi_ctor(fsi *op,Args ... args) noex {
+local int fsi_ctor(fsi *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->qsp = nullptr ;
 	    if ((op->mxp = new(nothrow) ptm) != np) {
@@ -77,10 +76,9 @@ static int fsi_ctor(fsi *op,Args ... args) noex {
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fsi_ctor) */
+} /* end subroutine (fsi_ctor) */
 
-static int fsi_dtor(fsi *op) noex {
+local int fsi_dtor(fsi *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -94,8 +92,7 @@ static int fsi_dtor(fsi *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fsi_dtor) */
+} /* end subroutine (fsi_dtor) */
 
 
 /* local variables */
@@ -109,16 +106,17 @@ static int fsi_dtor(fsi *op) noex {
 int fsi_start(fsi *op) noex {
 	int		rs ;
 	if ((rs = fsi_ctor(op)) >= 0) {
-	    if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->create) >= 0) {
 	        rs = fifostr_start(op->qsp) ;
 	        if (rs < 0) {
-	            ptm_destroy(op->mxp) ;
+	            mxp->destroy() ;
 	        }
 	    }
 	    if (rs < 0) {
 		fsi_dtor(op) ;
 	    }
-	} /* end if (ptm_ctor) */
+	} /* end if (fsi_ctor) */
 	return rs ;
 }
 /* end subroutine (fsi_start) */
@@ -133,7 +131,8 @@ int fsi_finish(fsi *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->mxp) {
-	        rs1 = ptm_destroy(op->mxp) ;
+	        ptm *mxp = op->mxp ;
+	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -146,15 +145,16 @@ int fsi_finish(fsi *op) noex {
 /* end subroutine (fsi_finish) */
 
 int fsi_add(fsi *op,cchar *sbuf,int slen) noex {
+	ptm		*mxp = op->mxp ;
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = ptm_lock(op->mxp)) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) {
 	    {
 	        rs = fifostr_add(op->qsp,sbuf,slen) ;
 		rv = rs ;
 	    }
-	    rs1 = ptm_unlock(op->mxp) ;
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return (rs >= 0) ? rv : rs ;
@@ -162,15 +162,16 @@ int fsi_add(fsi *op,cchar *sbuf,int slen) noex {
 /* end subroutine (fsi_add) */
 
 int fsi_remove(fsi *op,char *sbuf,int slen) noex {
+	ptm		*mxp = op->mxp ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = ptm_lock(op->mxp)) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) {
 	    {
 	        rs = fifostr_rem(op->qsp,sbuf,slen) ;
 	        rl = rs ;
 	    }
-	    rs1 = ptm_unlock(op->mxp) ;
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return (rs >= 0) ? rl : rs ;
@@ -183,15 +184,16 @@ int fsi_rem(fsi *op,char *sbuf,int slen) noex {
 /* end subroutine (fsi_rem) */
 
 int fsi_count(fsi *op) noex {
+	ptm		*mxp = op->mxp ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = ptm_lock(op->mxp)) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) {
 	    {
 	        rs = fifostr_count(op->qsp) ;
 	        c = rs ;
 	    }
-	    rs1 = ptm_unlock(op->mxp) ;
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return (rs >= 0) ? c : rs ;
