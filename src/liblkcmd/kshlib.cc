@@ -123,12 +123,8 @@
 	inherit the environment of the caller.
 
 	Synopsis:
-	int lib_caller(func,argc,argv,envv,cxp)
+	int lib_caller(func,int argc,mainv argv,mainv envv,void *cxp) noex
 	int		(*func)(int,cchar **,void *) ;
-	int		argc ;
-	cchar		*argv[] ;
-	cchar		*envv[] ;
-	void		*cxp ;
 
 	Arguments:
 	func		function to call
@@ -213,8 +209,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<lockmemalloc.h>
 #include	<upt.h>
 #include	<ptm.h>
@@ -230,11 +226,15 @@
 #include	<ischarx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| |TIMEBUFLEN| */
+#include	<libdebug.h>		/* LIBDEBUG */
 
-#include	"sesmsg.h"
+#include	"sesmsg.hh"
 #include	"msgdata.h"
 #include	"kshlib.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -268,48 +268,9 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy2w(char *,int,cchar *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	siskipwhite(cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	listenusd(cchar *,mode_t,int) ;
-extern int	rmsesfiles(cchar *) ;
-
 #if	CF_LOCKMEMALLOC
 extern int	lockmemalloc_set(int) ;
 #endif
-
-#if	CF_DEBUGS || CF_DEBUGN
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif /* CF_DEBUGS */
-
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,cchar *,...) ;
-static int	nprintpid(cchar *s) ;
-static int	nprintid(cchar *) ;
-static int	nprintutmp(char *) ;
-#endif /* CF_DEBUGN */
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -339,15 +300,14 @@ struct kshlib_flags {
 	uint		notes:1 ;
 	uint		mq:1 ;
 	uint		initrun:1 ;	/* at initialization time */
-} ;
+} ; /* end struct */
 
 struct kshlib {
 	ptm		mx ;		/* mutex data */
-	ptm		menv ;		/* mutex environment */
 	ptc		cxv ;		/* condition variable */
 	SIGHAND		sm ;
 	SOCKADDRESS	servaddr ;	/* server address */
-	RAQHAND		mq ;		/* message queue */
+	raqhand		mq ;		/* message queue */
 	KSHLIB_FL	f, open ;
 	cchar		*sesdname ;	/* session directory-name */
 	cchar		*reqfname ;	/* request file-name */
@@ -378,12 +338,12 @@ struct kshlib {
 	int		cdefs ;		/* defualt count */
 	int		servlen ;	/* serv-addr length */
 	int		pollcount ;
-} ;
+} ; /* end struct */
 
 struct storenote_flags {
 	uint		displayed:1 ;	/* displayed by KSH itself */
 	uint		read:1 ;	/* marked as read by comment */
-} ;
+} ; /* end struct */
 
 struct storenote {
 	STORENOTE_FL	f ;
@@ -393,114 +353,114 @@ struct storenote {
 	char		*a ;
 	int		type ;
 	int		dlen ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-int		lib_initenviron(void *) ;
-int		lib_callcmd(cchar *,int,cchar **,cchar **,void *) ;
-int 		lib_callfunc(subcmd_t,int,cchar **,cchar **,void *) ;
+int		lib_initenviron(void *) noex ;
+int		lib_callcmd(cchar *,int,cchar **,cchar **,void *) noex ;
+int 		lib_callfunc(subcmd_t,int,cchar **,cchar **,void *) noex ;
 
-static int	kshlib_init(void) ;
-static void	kshlib_fini(void) ;
+local int	kshlib_init(void) noex ;
+local void	kshlib_fini(void) noex ;
 
-static void	kshlib_atforkbefore() ;
-static void	kshlib_atforkparent() ;
-static void	kshlib_atforkchild() ;
-static void	kshlib_sighand(int,siginfo_t *,void *) ;
+local void	kshlib_atforkbefore() noex ;
+local void	kshlib_atforkparent() noex ;
+local void	kshlib_atforkchild() noex ;
+local void	kshlib_sighand(int,siginfo_t *,void *) noex ;
 
-static int	kshlib_begin(KSHLIB *) ;
-static int	kshlib_end(KSHLIB *) ;
+local int	kshlib_begin(KSHLIB *) noex ;
+local int	kshlib_end(KSHLIB *) noex ;
 
-static int	kshlib_autorun(KSHLIB *,cchar **) ;
-static int	kshlib_autorunopt(KSHLIB *,cchar *,int) ;
-static int	kshlib_autorunoptnotes(KSHLIB *,cchar *,int,int) ;
-static int	kshlib_autorunopter(KSHLIB *) ;
+local int	kshlib_autorun(KSHLIB *,cchar **) noex ;
+local int	kshlib_autorunopt(KSHLIB *,cchar *,int) noex ;
+local int	kshlib_autorunoptnotes(KSHLIB *,cchar *,int,int) noex ;
+local int	kshlib_autorunopter(KSHLIB *) noex ;
 
-static int	kshlib_runbegin(KSHLIB *) ;
-static int	kshlib_runner(KSHLIB *) ;
-static int	kshlib_runend(KSHLIB *) ;
+local int	kshlib_runbegin(KSHLIB *) noex ;
+local int	kshlib_runner(KSHLIB *) noex ;
+local int	kshlib_runend(KSHLIB *) noex ;
 
-static int	kshlib_sid(KSHLIB *) ;
-static int	kshlib_sesdname(KSHLIB *) ;
-static int	kshlib_reqfname(KSHLIB *) ;
-static int	kshlib_worker(KSHLIB *) ;
-static int	kshlib_worknoop(KSHLIB *,MSGDATA *) ;
-static int	kshlib_workecho(KSHLIB *,MSGDATA *) ;
-static int	kshlib_workbiff(KSHLIB *,MSGDATA *) ;
-static int	kshlib_workbiffer(KSHLIB *,SESMSG_BIFF *) ;
-static int	kshlib_workgen(KSHLIB *,MSGDATA *) ;
-static int	kshlib_workgener(KSHLIB *,SESMSG_GEN *) ;
-static int	kshlib_workdef(KSHLIB *,MSGDATA *) ;
+local int	kshlib_sid(KSHLIB *) noex ;
+local int	kshlib_sesdname(KSHLIB *) noex ;
+local int	kshlib_reqfname(KSHLIB *) noex ;
+local int	kshlib_worker(KSHLIB *) noex ;
+local int	kshlib_worknoop(KSHLIB *,MSGDATA *) noex ;
+local int	kshlib_workecho(KSHLIB *,MSGDATA *) noex ;
+local int	kshlib_workbiff(KSHLIB *,MSGDATA *) noex ;
+local int	kshlib_workbiffer(KSHLIB *,SESMSG_BIFF *) noex ;
+local int	kshlib_workgen(KSHLIB *,MSGDATA *) noex ;
+local int	kshlib_workgener(KSHLIB *,SESMSG_GEN *) noex ;
+local int	kshlib_workdef(KSHLIB *,MSGDATA *) noex ;
 
-static int	kshlib_msgenter(KSHLIB *,STORENOTE *) ;
-static int	kshlib_reqopen(KSHLIB *) ;
-static int	kshlib_reqopener(KSHLIB *) ;
-static int	kshlib_reqsend(KSHLIB *,MSGDATA *,int,int) ;
-static int	kshlib_reqrecv(KSHLIB *,MSGDATA *) ;
-static int	kshlib_reqclose(KSHLIB *) ;
-static int	kshlib_poll(KSHLIB *) ;
-static int	kshlib_cmdsend(KSHLIB *,int) ;
-static int	kshlib_capbegin(KSHLIB *,int) ;
-static int	kshlib_capend(KSHLIB *) ;
-static int	kshlib_sigbegin(KSHLIB *,const int *) ;
-static int	kshlib_sigend(KSHLIB *) ;
+local int	kshlib_msgenter(KSHLIB *,STORENOTE *) noex ;
+local int	kshlib_reqopen(KSHLIB *) noex ;
+local int	kshlib_reqopener(KSHLIB *) noex ;
+local int	kshlib_reqsend(KSHLIB *,MSGDATA *,int,int) noex ;
+local int	kshlib_reqrecv(KSHLIB *,MSGDATA *) noex ;
+local int	kshlib_reqclose(KSHLIB *) noex ;
+local int	kshlib_poll(KSHLIB *) noex ;
+local int	kshlib_cmdsend(KSHLIB *,int) noex ;
+local int	kshlib_capbegin(KSHLIB *,int) noex ;
+local int	kshlib_capend(KSHLIB *) noex ;
+local int	kshlib_sigbegin(KSHLIB *,cint *) noex ;
+local int	kshlib_sigend(KSHLIB *) noex ;
 
-static int	kshlib_notesbegin(KSHLIB *) ;
-static int	kshlib_notesend(KSHLIB *) ;
-static int	kshlib_notesactive(KSHLIB *) ;
-static int	kshlib_notescount(KSHLIB *) ;
+local int	kshlib_notesbegin(KSHLIB *) noex ;
+local int	kshlib_notesend(KSHLIB *) noex ;
+local int	kshlib_notesactive(KSHLIB *) noex ;
+local int	kshlib_notescount(KSHLIB *) noex ;
 
-static int	kshlib_mqbegin(KSHLIB *) ;
-static int	kshlib_mqend(KSHLIB *) ;
-static int	kshlib_mqfins(KSHLIB *) ;
-static int	kshlib_mqactive(KSHLIB *) ;
-static int	kshlib_mqcount(KSHLIB *) ;
+local int	kshlib_mqbegin(KSHLIB *) noex ;
+local int	kshlib_mqend(KSHLIB *) noex ;
+local int	kshlib_mqfins(KSHLIB *) noex ;
+local int	kshlib_mqactive(KSHLIB *) noex ;
+local int	kshlib_mqcount(KSHLIB *) noex ;
 
-static int	kshlib_sesend(KSHLIB *) ;
+local int	kshlib_sesend(KSHLIB *) noex ;
 
 #if	CF_MQ
-static int	kshlib_mq(KSHLIB *) ;
+local int	kshlib_mq(KSHLIB *) noex ;
 #endif
 
 #if	CF_LOCKMEMALLOC
-int		lib_initmemalloc(int) ;
+int		lib_initmemalloc(int) noex ;
 #endif /* CF_LOCKMEMALLOC */
 
-static int	storenote_start(STORENOTE *,int,time_t,cchar *,cchar *,int) ;
-static int	storenote_finish(STORENOTE *) ;
+local int	storenote_start(STORENOTE *,int,time_t,cc *,cc*,int) noex ;
+local int	storenote_finish(STORENOTE *) noex ;
 
-static int	sdir(cchar *,int) ;
-static int	mksdir(cchar *,mode_t) ;
-static int	mksdname(char *,cchar *,pid_t) ;
+local int	sdir(cchar *,int) noex ;
+local int	mksdir(cchar *,mode_t) noex ;
+local int	mksdname(char *,cchar *,pid_t) noex ;
 
 #if	CF_LOCMALSTRW
-static int	mallocstrw(cchar *,int,cchar **) ;
+local int	mallocstrw(cchar *,int,cchar **) noex ;
 #endif /* CF_LOCMALSTRW */
 
 
 #if	CF_DEBUGENV && CF_DEBUGN
-static int	ndebugenv(cchar *,cchar **) ;
+local int	ndebugenv(cchar *,cchar **) noex ;
 #endif
 
 
 /* local variables */
 
-static const char	*defenviron[] = {
+constexpr cpcchar	defenviron[] = {
 	"_PROCSTATE=screwed",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 static KSHLIB		kshlib_data ; /* zero-initialized */
 
-static const int	sigblocks[] = {
+constexpr cint	sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	0
-} ;
+} ; /* end array */
 
-static const int	sigigns[] = {
+constexpr int	sigigns[] = {
 	SIGHUP,
 	SIGPIPE,
 	SIGPOLL,
@@ -508,9 +468,9 @@ static const int	sigigns[] = {
 	SIGXFSZ,
 #endif
 	0
-} ;
+} ; /* end array */
 
-static const int	sigints[] = {
+constexpr int	sigints[] = {
 	SIGQUIT,
 	SIGTERM,
 	SIGINT,
@@ -518,30 +478,30 @@ static const int	sigints[] = {
 	SIGCHLD,
 	SIGTSTP,
 	0
-} ;
+} ; /* end array */
 
 enum runopts {
 	runopt_notes,
 	runopt_lognotes,
 	runopt_overlast
-} ;
+} ; /* end enum */
 
-static const char	*runopts[] = {
+constexpr cpcchar	runopts[] = {
 	"notes",
 	"lognotes",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-void lib_init(int flags,void *cxp)
-{
+void lib_init(int flags,void *cxp) noex {
 	KSHLIB		*uip = &kshlib_data ;
 	if (! uip->f_initonce) {
-	    uip->f_initonce = TRUE ;
+	    uip->f_initonce = true ;
 
 #if	CF_DEBUGN
 	{
@@ -557,7 +517,7 @@ void lib_init(int flags,void *cxp)
 	    void 	*p = dlsym(RTLD_DEFAULT,"environ") ;
 	    nprintf(NDF,"lib_init: ent pid=%u\n",pid) ;
 	    nprintf(NDF,"lib_init: flags=%16ß (%u)\n",flags,flags) ;
-	    if (p != NULL) {
+	    if (p != nullptr) {
 	        cchar	***evp = (cchar ***) p ;
 	        cchar	**ev ;
 	        ev = *evp ;
@@ -573,7 +533,7 @@ void lib_init(int flags,void *cxp)
 #endif /* CF_DEBUGN */
 
 #if	CF_DEBUGENV && CF_DEBUGN && 0
-	if (environ != NULL) {
+	if (environ != nullptr) {
 	    cchar	**ev = (cchar **) environ ;
 	    ndebugenv("lib_init-l",ev) ;
 	}
@@ -581,7 +541,7 @@ void lib_init(int flags,void *cxp)
 
 #if	CF_LOCKMEMALLOC
 	{
-	    const int	f = KSHLIB_MEMALLOC ;
+	    cint	f = KSHLIB_MEMALLOC ;
 	    (void) lib_initmemalloc(f) ;
 	}
 #endif /* CF_LOCKMEMALLOC */
@@ -621,31 +581,25 @@ void lib_init(int flags,void *cxp)
 }
 /* end subroutine (lib_init) */
 
-
-void lib_fini(void)
-{
+void lib_fini(void) noex {
 	kshlib_fini() ;
 }
 /* end subroutine (lib_fini) */
 
-
 /* is this multi-thread safe or not? */
-/* ARGSUSED */
-int lib_initenviron(void *cxp)
-{
+int lib_initenviron(void *cxp) noex {
 	int		rs = SR_OK ;
-	if (environ == NULL) {
+	(void) cxp ;
+	if (environ == nullptr) {
 	    char ***eppp = dlsym(RTLD_DEFAULT,"environ") ;
-	    if ((eppp != NULL) && (eppp != &environ)) environ = *eppp ;
-	    if (environ == NULL) environ = (char **) defenviron ;
+	    if ((eppp != nullptr) && (eppp != &environ)) environ = *eppp ;
+	    if (environ == nullptr) environ = (char **) defenviron ;
 	} /* end if (environ) */
 	return rs ;
 }
 /* end subroutine (lib_initenviron) */
 
-
-int lib_mainbegin(cchar **envv,const int *catches)
-{
+int lib_mainbegin(cchar **envv,cint *catches) noex {
 	int		rs ;
 
 #if	CF_DEBUGN
@@ -672,9 +626,7 @@ int lib_mainbegin(cchar **envv,const int *catches)
 }
 /* end subroutine (lib_mainbegin) */
 
-
-int lib_mainend(void)
-{
+int lib_mainend(void) noex {
 	KSHLIB		*uip = &kshlib_data ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -703,9 +655,7 @@ int lib_mainend(void)
 }
 /* end subroutine (lib_mainend) */
 
-
-int lib_kshbegin(void *cxp,const int *catches)
-{
+int lib_kshbegin(void *cxp,cint *catches) noex {
 	int		rs ;
 #if	CF_DEBUGN
 	nprintf(NDF,"lib_kshbegin: ent\n") ;
@@ -723,9 +673,7 @@ int lib_kshbegin(void *cxp,const int *catches)
 }
 /* end subroutine (lib_kshbegin) */
 
-
-int lib_kshend(void)
-{
+int lib_kshend(void) noex {
 	KSHLIB		*kip = &kshlib_data ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -740,26 +688,20 @@ int lib_kshend(void)
 }
 /* end subroutine (lib_kshend) */
 
-
-int lib_runmode(void)
-{
+int lib_runmode(void) noex {
 	KSHLIB		*kip = &kshlib_data ;
 	return kip->runmode ;
 }
 /* end subroutine (lib_runmode) */
 
-
-int lib_serial(void)
-{
+int lib_serial(void) noex {
 	KSHLIB		*kip = &kshlib_data ;
 	int		s = kip->serial ;
 	return s ;
 }
 /* end subroutine (lib_serial) */
 
-
-int lib_sigreset(int sn)
-{
+int lib_sigreset(int sn) noex {
 	KSHLIB		*kip = &kshlib_data ;
 	int		rs = SR_OK ;
 	switch (sn) {
@@ -789,9 +731,7 @@ int lib_sigreset(int sn)
 }
 /* end subroutine (lib_sigreset) */
 
-
-int lib_sigquit(void)
-{
+int lib_sigquit(void) noex {
 	KSHLIB		*kip = &kshlib_data ;
 	int		rs = SR_OK ;
 	if (kip->f_sigquit) {
@@ -802,9 +742,7 @@ int lib_sigquit(void)
 }
 /* end subroutine (lib_sigquit) */
 
-
-int lib_sigterm(void)
-{
+int lib_sigterm(void) noex {
 	KSHLIB		*kip = &kshlib_data ;
 	int		rs = SR_OK ;
 	if (kip->f_sigterm) {
@@ -815,9 +753,7 @@ int lib_sigterm(void)
 }
 /* end subroutine (lib_sigterm) */
 
-
-int lib_sigintr(void)
-{
+int lib_sigintr(void) noex {
 	KSHLIB		*kip = &kshlib_data ;
 	int		rs = SR_OK ;
 	if (kip->f_sigintr) {
@@ -828,12 +764,10 @@ int lib_sigintr(void)
 }
 /* end subroutine (lib_sigintr) */
 
-
-int lib_issig(int sn)
-{
+int lib_issig(int sn) noex {
 	KSHLIB		*kip = &kshlib_data ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 	switch (sn) {
 	case SIGQUIT:
 	    f = kip->f_sigquit ;
@@ -867,9 +801,7 @@ int lib_issig(int sn)
 }
 /* end subroutine (lib_issig) */
 
-
-int lib_initmemalloc(int f)
-{
+int lib_initmemalloc(int f) noex {
 	int		rs = SR_OK ;
 #if	CF_DEBUGN
 	nprintf(NDF,"lib_initmemalloc: ent f=%u\n",f) ;
@@ -878,7 +810,7 @@ int lib_initmemalloc(int f)
 	    cchar	*sym = "lockmemalloc_set" ;
 	    void	*sop = RTLD_SELF ;
 	    void	*p ;
-	    if ((p = dlsym(sop,sym)) != NULL) {
+	    if ((p = dlsym(sop,sym)) != nullptr) {
 	        int	(*fun)(int) = (int (*)(int)) p ;
 	        rs = (*fun)(lockmemallocset_begin) ;
 #if	CF_DEBUGN
@@ -893,15 +825,13 @@ int lib_initmemalloc(int f)
 }
 /* end subroutine (lib_initmemalloc) */
 
-
-int lib_progaddr(cchar *name,void *app)
-{
+int lib_progaddr(cchar *name,void *app) noex {
 	int		rs = SR_OK ;
 #if	CF_DEBUGN
 	nprintf(NDF,"lib_progaddr: ent name=>%s<\n",name) ;
 #endif
-	if ((name != NULL) && (name[0] != '\0')) {
-	    const int	symlen = SYMNAMELEN ;
+	if ((name != nullptr) && (name[0] != '\0')) {
+	    cint	symlen = SYMNAMELEN ;
 	    char	symbuf[SYMNAMELEN+1] ;
 	    if ((rs = sncpy2(symbuf,symlen,"p_",name)) >= 0) {
 	        void	*sop = KSHLIB_SYMSEARCH ;
@@ -909,8 +839,8 @@ int lib_progaddr(cchar *name,void *app)
 #if	CF_DEBUGN
 	        nprintf(NDF,"lib_progaddr: sym=%s\n",symbuf) ;
 #endif
-	        if ((p = dlsym(sop,symbuf)) != NULL) {
-	            if (app != NULL) {
+	        if ((p = dlsym(sop,symbuf)) != nullptr) {
+	            if (app != nullptr) {
 	                caddr_t	*sub = (caddr_t *) app ;
 	                *sub = (caddr_t) p ;
 	            }
@@ -928,17 +858,12 @@ int lib_progaddr(cchar *name,void *app)
 }
 /* end subroutine (lib_progaddr) */
 
-
-int lib_proghave(cchar *name)
-{
-	return lib_progaddr(name,NULL) ;
+int lib_proghave(cchar *name) noex {
+	return lib_progaddr(name,nullptr) ;
 }
 /* end subroutine (lib_proghave) */
 
-
-/* ARGSUSED */
-int lib_progcall(cchar *name,int argc,cchar **argv,cchar **envv,void *cxp)
-{
+int lib_progcall(cc *name,int argc,mainv argv,mainv envv,void *cxp) noex {
 	cmdsub_t	addr ;
 	int		rs ;
 	int		ex = EX_OK ;
@@ -949,12 +874,12 @@ int lib_progcall(cchar *name,int argc,cchar **argv,cchar **envv,void *cxp)
 #endif
 
 	if ((rs = lib_progaddr(name,&addr)) >= 0) {
-	    if ((rs = lib_initenviron(NULL)) >= 0) {
+	    if ((rs = lib_initenviron(nullptr)) >= 0) {
 	        if ((rs = kshlib_init()) >= 0) {
 #if	CF_DEBUGN
 	            nprintf(NDF,"lib_progcall: call()\n") ;
 #endif
-	            ex = (*addr)(argc,argv,envv,NULL) ;
+	            ex = (*addr)(argc,argv,envv,nullptr) ;
 #if	CF_DEBUGN
 	            nprintf(NDF,"lib_progcall: call() ex=%u\n",ex) ;
 #endif
@@ -976,18 +901,13 @@ int lib_progcall(cchar *name,int argc,cchar **argv,cchar **envv,void *cxp)
 }
 /* end subroutine (lib_progcall) */
 
-
-int lib_progcalla(const void *func,int argc,cchar **argv,cchar **envv,void *cxp)
-{
+int lib_progcalla(cvoid *func,int argc,mainv argv,mainv envv,void *cxp) noex {
 	subcmd_t	f = (subcmd_t) func ;
 	return lib_callfunc(f,argc,argv,envv,cxp) ;
 }
 /* end subroutine (lib_progcalla) */
 
-
-/* ARGSUSED */
-int lib_caller(const void *fa,int argc,cchar **argv,cchar **envv,void *cxp)
-{
+int lib_caller(cvoid *fa,int argc,cchar **argv,cchar **envv,void *cxp) noex {
 	func_caller	func = (func_caller) fa ;
 	int		rs ;
 	int		ex = EX_OK ;
@@ -999,7 +919,7 @@ int lib_caller(const void *fa,int argc,cchar **argv,cchar **envv,void *cxp)
 #endif
 
 #if	CF_DEBUGENV && CF_DEBUGN
-	if (envv != NULL)
+	if (envv != nullptr)
 	    ndebugenv("lib_caller",envv) ;
 #endif
 
@@ -1009,7 +929,7 @@ int lib_caller(const void *fa,int argc,cchar **argv,cchar **envv,void *cxp)
 	    nprintf(NDF,"lib_caller: func()\n") ;
 #endif
 
-	    if (func != NULL) {
+	    if (func != nullptr) {
 	        ex = (*func)(argc,argv,cxp) ;
 	    } else {
 	        ex = EX_NOPROG ;
@@ -1031,15 +951,12 @@ int lib_caller(const void *fa,int argc,cchar **argv,cchar **envv,void *cxp)
 }
 /* end subroutine (lib_caller) */
 
-
-int lib_callfunc(subcmd_t func,int argc,cchar **argv,cchar **envv,void *cxp)
-{
+int lib_callfunc(subcmd_t func,int argc,mainv argv,mainv envv,void *cxp) noex {
 	int		rs ;
 	int		ex = EX_OK ;
-
 	if ((rs = lib_initenviron(cxp)) >= 0) {
 	    if ((rs = kshlib_init()) >= 0) {
-	        if (func != NULL) {
+	        if (func != nullptr) {
 	            ex = (*func)(argc,argv,envv,cxp) ;
 	        } else {
 	            ex = EX_NOPROG ;
@@ -1049,14 +966,11 @@ int lib_callfunc(subcmd_t func,int argc,cchar **argv,cchar **envv,void *cxp)
 	    }
 	} /* end if (lib_initenviron) */
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_MUTEX ;
-
 	return ex ;
 }
 /* end subroutine (lib_callfunc) */
 
-
-int lib_callcmd(cchar *name,int argc,cchar **argv,cchar **envv,void *cxp)
-{
+int lib_callcmd(cchar *name,int argc,mainv argv,mainv envv,void *cxp) noex {
 	int		rs = SR_OK ;
 	int		ex = EX_OK ;
 
@@ -1065,7 +979,7 @@ int lib_callcmd(cchar *name,int argc,cchar **argv,cchar **envv,void *cxp)
 	nprintf(NDF,"lib_callcmd: from=%s\n",KSHLIB_WHERE) ;
 #endif
 
-	if ((name != NULL) && (name[0] != '\0')) {
+	if ((name != nullptr) && (name[0] != '\0')) {
 	    char	symname[SYMNAMELEN+1] ;
 	    if ((rs = sncpy2(symname,MAXNAMELEN,"p_",name)) >= 0) {
 	        void	*sop = RTLD_SELF ;
@@ -1073,7 +987,7 @@ int lib_callcmd(cchar *name,int argc,cchar **argv,cchar **envv,void *cxp)
 #if	CF_DEBUGN
 		nprintf(NDF,"lib_callcmd: srch-sym=%s\n",symname) ;
 #endif
-	        if ((p = dlsym(sop,symname)) != NULL) {
+	        if ((p = dlsym(sop,symname)) != nullptr) {
 	            int (*cf)(int,cchar **,cchar **,void *) ;
 	            cf = (int (*)(int,cchar **,cchar **,void *)) p ;
 #if	CF_DEBUGN
@@ -1105,9 +1019,7 @@ int lib_callcmd(cchar *name,int argc,cchar **argv,cchar **envv,void *cxp)
 }
 /* end subroutine (lib_callcmd) */
 
-
-int lib_noteadm(int cmd,...)
-{
+int lib_noteadm(int cmd,...) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
@@ -1148,17 +1060,15 @@ int lib_noteadm(int cmd,...)
 }
 /* end subroutine (lib_noteadm) */
 
-
-int lib_noteread(KSHLIB_NOTE *rp,int mi)
-{
+int lib_noteread(KSHLIB_NOTE *rp,int mi) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (rp == NULL) return SR_FAULT ;
+	if (rp == nullptr) return SR_FAULT ;
 #if	CF_DEBUGN
 	nprintf(NDF,"lib_noteread: ent mi=%u\n",mi) ;
 #endif
-	memset(rp,0,sizeof(KSHLIB_NOTE)) ;
+	memclear(rp) ;
 	if (mi < 0) return SR_INVALID ;
 	if ((rs = kshlib_init()) >= 0) {
 	    KSHLIB	*uip = &kshlib_data ;
@@ -1172,7 +1082,7 @@ int lib_noteread(KSHLIB_NOTE *rp,int mi)
 #if	CF_DEBUGN
 	nprintf(NDF,"lib_noteread: raqhand_acc() rs=%d ep{%p}\n",rs,ep) ;
 #endif
-	                if (ep != NULL) {
+	                if (ep != nullptr) {
 	                    rp->stime = ep->stime ;
 	                    rp->type = ep->type ;
 	                    rp->nlen = ep->dlen ;
@@ -1238,7 +1148,7 @@ ulong plugin_version(void) {
 /* local subroutines */
 
 
-static int kshlib_init(void)
+local int kshlib_init(void)
 {
 	KSHLIB		*uip = &kshlib_data ;
 	int		rs = SR_OK ;
@@ -1246,31 +1156,35 @@ static int kshlib_init(void)
 	nprintf(NDF,"kshlib_init: ent f_init=%u\n",uip->f_init) ;
 #endif
 	if (! uip->f_init) {
-	    uip->f_init = TRUE ;
-	    if ((rs = ptm_create(&uip->mx,NULL)) >= 0) {
-	        if ((rs = ptc_create(&uip->cxv,NULL)) >= 0) {
+	    ptm *mxp = &uip->mx ;
+	    uip->f_init = true ;
+	    if ((rs = mxp->create) >= 0) {
+	        ptc *cnp = &uip->cxv ;
+	        if ((rs = cnp->create) >= 0) {
 	            void	(*b)() = kshlib_atforkbefore ;
 	            void	(*ap)() = kshlib_atforkparent ;
 	            void	(*ac)() = kshlib_atforkchild ;
-	            if ((rs = uc_atfork(b,ap,ac)) >= 0) {
+	            if ((rs = uc_atforkrec(b,ap,ac)) >= 0) {
 	                if ((rs = uc_atexit(kshlib_fini)) >= 0) {
 	                    uip->pid = getpid() ;
 	                    uip->sfd = -1 ;
 	                    rs = 1 ;
-	                    uip->f_initdone = TRUE ;
+	                    uip->f_initdone = true ;
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_init: done pid=%d\n",uip->pid) ;
 #endif
 	                }
 	                if (rs < 0)
-	                    uc_atforkexpunge(b,ap,ac) ;
+	                    uc_atforkexp(b,ap,ac) ;
 	            } /* end if (uc_atfork) */
-	            if (rs < 0)
-	                ptc_destroy(&uip->cxv) ;
+	            if (rs < 0) {
+	                cnp->destroy() ;
+		    }
 	        } /* end if (ptc_create) */
 	    } /* end if (ptm_create) */
-	    if (rs < 0)
-	        uip->f_init = FALSE ;
+	    if (rs < 0) {
+	        uip->f_init = false ;
+	    }
 	} else {
 	    while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	        rs = msleep(1) ;
@@ -1285,15 +1199,13 @@ static int kshlib_init(void)
 }
 /* end subroutine (kshlib_init) */
 
-
-static void kshlib_fini(void)
-{
+local void kshlib_fini(void) noex {
 	struct kshlib	*uip = &kshlib_data ;
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_fini: ent\n") ;
 #endif
 	if (uip->f_initdone) {
-	    uip->f_initdone = FALSE ;
+	    uip->f_initdone = false ;
 	    {
 	        kshlib_runend(uip) ;
 	        kshlib_end(uip) ;
@@ -1302,11 +1214,17 @@ static void kshlib_fini(void)
 	        void	(*b)() = kshlib_atforkbefore ;
 	        void	(*ap)() = kshlib_atforkparent ;
 	        void	(*ac)() = kshlib_atforkchild ;
-	        uc_atforkexpunge(b,ap,ac) ;
+	        uc_atforkexp(b,ap,ac) ;
 	    }
-	    ptc_destroy(&uip->cxv) ;
-	    ptm_destroy(&uip->mx) ;
-	    memset(uip,0,sizeof(struct kshlib)) ;
+	    {
+	        ptc *cnp = &uip->cxv ;
+	        cnp->destroy() ;
+	    }
+	    {
+		ptm *mxp = &uip->mx ;
+	        mxp->destroy() ;
+	    }
+	    memclear(uip) ;
 	} /* end if (atexit registered) */
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_fini: ret\n") ;
@@ -1314,10 +1232,8 @@ static void kshlib_fini(void)
 }
 /* end subroutine (kshlib_fini) */
 
-
-static int kshlib_begin(KSHLIB *uip)
-{
-	if (uip == NULL) return SR_FAULT ;
+local int kshlib_begin(KSHLIB *uip) noex {
+	if (uip == nullptr) return SR_FAULT ;
 	uip->ti_sescheck = 0 ;
 	uip->intpoll = KSHLIB_INTPOLL ;
 	uip->intsescheck = KSHLIB_INTSESCHECK ;
@@ -1326,34 +1242,31 @@ static int kshlib_begin(KSHLIB *uip)
 }
 /* end subroutine (kshlib_begin) */
 
-
-static int kshlib_end(KSHLIB *uip)
-{
+local int kshlib_end(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = kshlib_notesend(uip) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = kshlib_mqend(uip) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = kshlib_sesend(uip) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (uip->sesdname != NULL) {
+	{
+	    rs1 = kshlib_notesend(uip) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = kshlib_mqend(uip) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = kshlib_sesend(uip) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	if (uip->sesdname != nullptr) {
 	    rs1 = lm_free(uip->sesdname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    uip->sesdname = NULL ;
+	    uip->sesdname = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (kshlib_end) */
 
-
-static int kshlib_autorun(KSHLIB *uip,cchar **envv)
-{
+local int kshlib_autorun(KSHLIB *uip,mainv envv) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 #if	CF_DEBUGN
@@ -1361,10 +1274,10 @@ static int kshlib_autorun(KSHLIB *uip,cchar **envv)
 #endif
 	if (! uip->f_autorun) {
 	    cchar	*vp ;
-	    uip->f_autorun = TRUE ;
-	    if ((vp = getourenv(envv,VARKSHLIBRUN)) != NULL) {
+	    uip->f_autorun = true ;
+	    if ((vp = getourenv(envv,VARKSHLIBRUN)) != nullptr) {
 		cchar	*tp ;
-		while ((tp = strbrk(vp," ,:")) != NULL) {
+		while ((tp = strbrk(vp," ,:")) != nullptr) {
 		    if ((tp-vp) > 0) {
 		        rs = kshlib_autorunopt(uip,vp,(tp-vp)) ;
 			c += 1 ;
@@ -1386,20 +1299,20 @@ static int kshlib_autorun(KSHLIB *uip,cchar **envv)
 /* end subroutine (kshlib_autorun) */
 
 
-static int kshlib_autorunopt(KSHLIB *uip,cchar *sp,int sl)
+local int kshlib_autorunopt(KSHLIB *uip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		si ;
 	int		oi ;
 	int		vl = 0 ;
 	int		c = 0 ;
-	cchar		*vp = NULL ;
+	cchar		*vp = nullptr ;
 	cchar		*tp ;
 	if ((si = siskipwhite(sp,sl)) > 0) {
 	    sp += si ;
 	    sl -= si ;
 	}
-	if ((tp = strnchr(sp,sl,'=')) != NULL) {
+	if ((tp = strnchr(sp,sl,'=')) != nullptr) {
 	    vl = sfshrink((tp+1),((sp+sl)-(tp+1)),&vp) ;
 	    sl = (tp-sp) ;
 	    while (sl && CHAR_ISWHITE(sp[sl-1])) sl -= 1 ;
@@ -1410,11 +1323,11 @@ static int kshlib_autorunopt(KSHLIB *uip,cchar *sp,int sl)
 	if ((oi = matostr(runopts,2,sp,sl)) >= 0) {
 	    switch (oi) {
 	    case runopt_notes:
-		rs = kshlib_autorunoptnotes(uip,vp,vl,FALSE) ;
+		rs = kshlib_autorunoptnotes(uip,vp,vl,false) ;
 		c += rs ;
 		break ;
 	    case runopt_lognotes:
-		rs = kshlib_autorunoptnotes(uip,vp,vl,TRUE) ;
+		rs = kshlib_autorunoptnotes(uip,vp,vl,true) ;
 		c += rs ;
 		break ;
 	    } /* end switch */
@@ -1425,7 +1338,7 @@ static int kshlib_autorunopt(KSHLIB *uip,cchar *sp,int sl)
 
 
 /* ARGSUSED */
-static int kshlib_autorunoptnotes(KSHLIB *uip,cchar *vp,int vl,int f)
+local int kshlib_autorunoptnotes(KSHLIB *uip,cchar *vp,int vl,int f)
 {
 	int		rs = SR_OK ;
 	int		rv = 0 ;
@@ -1434,21 +1347,21 @@ static int kshlib_autorunoptnotes(KSHLIB *uip,cchar *vp,int vl,int f)
 	nprintutmp("kshlib_autorunoptnotes") ;
 #endif
 	if (! uip->fl.initrun) {
-	    int		f_go = TRUE ;
+	    int		f_go = true ;
 	    if (f) {
 		if ((rs = kshlib_sid(uip)) >= 0) {
 		    UTMPACC_ENT	ue ;
 		    const pid_t	pid = uip->pid ;
-		    const int	rsn = SR_NOTFOUND ;
-		    const int	ulen = UTMPACC_BUFLEN ;
+		    cint	rsn = SR_NOTFOUND ;
+		    cint	ulen = UTMPACC_BUFLEN ;
 		    char	ubuf[UTMPACC_BUFLEN+1] ;
 		    if (uip->sid == pid) {
 		        if ((rs = utmpacc_entsid(&ue,ubuf,ulen,pid)) == rsn) {
 		            rs = SR_OK ;
-		            f_go = FALSE ;
+		            f_go = false ;
 		        }
 		    } else {
-		        f_go = FALSE ;
+		        f_go = false ;
 		    }
 		} /* end if (kshlib_sid) */
 	    }
@@ -1456,7 +1369,7 @@ static int kshlib_autorunoptnotes(KSHLIB *uip,cchar *vp,int vl,int f)
 	nprintf(NDF,"kshlib_autorunoptnotes: mid rs=%d f_go=%u\n",rs,f_go) ;
 #endif
 	    if ((rs >= 0) && f_go) {
-	        uip->fl.initrun = TRUE ;
+	        uip->fl.initrun = true ;
 		rs = kshlib_autorunopter(uip) ;
 		rv = rs ;
 #if	CF_DEBUGN
@@ -1473,7 +1386,7 @@ static int kshlib_autorunoptnotes(KSHLIB *uip,cchar *vp,int vl,int f)
 /* end subroutine (kshlib_autorunoptnotes) */
 
 
-static int kshlib_autorunopter(KSHLIB *uip)
+local int kshlib_autorunopter(KSHLIB *uip)
 {
 	int		rs ;
 	int		rs1 ;
@@ -1481,7 +1394,7 @@ static int kshlib_autorunopter(KSHLIB *uip)
 	if ((rs = kshlib_begin(uip)) >= 0) {
 	    if ((rs = kshlib_capbegin(uip,-1)) >= 0) {
 		if ((rs = kshlib_notesbegin(uip)) >= 0) {
-		    rv = TRUE ;
+		    rv = true ;
 		}
 	        rs1 = kshlib_capend(uip) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -1492,10 +1405,10 @@ static int kshlib_autorunopter(KSHLIB *uip)
 /* end subroutine (kshlib_autorunopter) */
 
 
-static int kshlib_runbegin(KSHLIB *uip)
+local int kshlib_runbegin(KSHLIB *uip)
 {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_runbegin: ent f_running=%u\n",uip->f_running) ;
@@ -1517,26 +1430,26 @@ static int kshlib_runbegin(KSHLIB *uip)
 /* end subroutine (kshlib_runbegin) */
 
 
-static int kshlib_runner(KSHLIB *uip)
+local int kshlib_runner(KSHLIB *uip)
 {
 	PTA		ta ;
 	int		rs ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_runner: ent\n") ;
 #endif
 
 	if ((rs = pta_create(&ta)) >= 0) {
-	    const int	scope = KSHLIB_SCOPE ;
+	    cint	scope = KSHLIB_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 	        pthread_t	tid ;
 	        tworker		wt = (tworker) kshlib_worker ;
 	        if ((rs = uptcreate(&tid,&ta,wt,uip)) >= 0) {
-	            uip->f_running = TRUE ;
+	            uip->f_running = true ;
 	            uip->tid = tid ;
-	            f = TRUE ;
+	            f = true ;
 	        } /* end if (pthread-create) */
 #if	CF_DEBUGN
 	        nprintf(NDF,"kshlib_runner: pt-create rs=%d tid=%u\n",
@@ -1556,7 +1469,7 @@ static int kshlib_runner(KSHLIB *uip)
 /* end subroutine (kshlib_runner) */
 
 
-static int kshlib_runend(KSHLIB *uip)
+local int kshlib_runend(KSHLIB *uip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1568,7 +1481,7 @@ static int kshlib_runend(KSHLIB *uip)
 	if (uip->f_running) {
 	    const pid_t		pid = getpid() ;
 	    if (pid == uip->pid) {
-	        const int	cmd = sesmsgtype_exit ;
+	        cint	cmd = sesmsgtype_exit ;
 	        if ((rs = kshlib_cmdsend(uip,cmd)) >= 0) {
 	            pthread_t	tid = uip->tid ;
 	            int		trs ;
@@ -1578,7 +1491,7 @@ static int kshlib_runend(KSHLIB *uip)
 	            nprintf(NDF,"kshlib_runend: pt-join tid=%u\n",tid) ;
 #endif
 	            if ((rs = uptjoin(tid,&trs)) >= 0) {
-	                uip->f_running = FALSE ;
+	                uip->f_running = false ;
 	                rs = trs ;
 	            } else if (rs == SR_SRCH) { /* should never happen */
 #if	CF_DEBUGN
@@ -1587,7 +1500,7 @@ static int kshlib_runend(KSHLIB *uip)
 	            nprintf(NDF,"kshlib_runend: SRCH uptjoin(%u) rs=%d\n",
 		        tid,rs) ;
 #endif
-	                uip->f_running = FALSE ;
+	                uip->f_running = false ;
 		        rs = SR_OK ;
 		    }
 #if	CF_DEBUGN
@@ -1599,8 +1512,8 @@ static int kshlib_runend(KSHLIB *uip)
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (kshlib_cmdsend) */
 	    } else {
-		uip->f_running = FALSE ;
-		uip->f_exiting = FALSE ;
+		uip->f_running = false ;
+		uip->f_exiting = false ;
 		uip->pid = pid ;
 	    }
 	} /* end if (running) */
@@ -1615,7 +1528,7 @@ static int kshlib_runend(KSHLIB *uip)
 
 
 /* it always takes a good bit of code to make this part look easy! */
-static int kshlib_worker(KSHLIB *uip)
+local int kshlib_worker(KSHLIB *uip)
 {
 	MSGDATA		m ;
 	int		rs ;
@@ -1623,20 +1536,20 @@ static int kshlib_worker(KSHLIB *uip)
 
 #if	CF_DEBUGN
 	{
-	    const uint	tid = uptself(NULL) ;
+	    const uint	tid = uptself(nullptr) ;
 	    nprintf(NDF,"kshlib_worker: ent tid=%u\n",tid) ;
 	}
 #endif
 
 	if ((rs = msgdata_init(&m,0)) >= 0) {
 	    while ((rs = kshlib_reqrecv(uip,&m)) > 0) {
-	        int	f_exit = FALSE ;
+	        int	f_exit = false ;
 #if	CF_DEBUGN
 	        nprintf(NDF,"kshlib_worker: reqrecv mt=%u\n",rs) ;
 #endif
 	        switch (rs) {
 	        case sesmsgtype_exit:
-	            f_exit = TRUE ;
+	            f_exit = true ;
 	            break ;
 	        case sesmsgtype_noop:
 	            rs = kshlib_worknoop(uip,&m) ;
@@ -1666,16 +1579,16 @@ static int kshlib_worker(KSHLIB *uip)
 	nprintf(NDF,"kshlib_worker: ret rs=%d\n",rs) ;
 #endif
 
-	uip->f_exiting = TRUE ;
+	uip->f_exiting = true ;
 	return rs ;
 }
 /* end subroutine (kshlib_worker) */
 
 
-static int kshlib_worknoop(KSHLIB *uip,MSGDATA *mip)
+local int kshlib_worknoop(KSHLIB *uip,MSGDATA *mip)
 {
 	int		rs ;
-	if ((rs = msgdata_conpass(mip,FALSE)) >= 0) {
+	if ((rs = msgdata_conpass(mip,false)) >= 0) {
 	    rs = kshlib_reqsend(uip,mip,-1,0) ;
 	} /* end if (msgdata_conpass) */
 	return rs ;
@@ -1683,10 +1596,10 @@ static int kshlib_worknoop(KSHLIB *uip,MSGDATA *mip)
 /* end subroutine (kshlib_worknoop) */
 
 
-static int kshlib_workecho(KSHLIB *uip,MSGDATA *mip)
+local int kshlib_workecho(KSHLIB *uip,MSGDATA *mip)
 {
 	int		rs ;
-	if ((rs = msgdata_conpass(mip,FALSE)) >= 0) {
+	if ((rs = msgdata_conpass(mip,false)) >= 0) {
 	    rs = kshlib_reqsend(uip,mip,-1,0) ;
 	} /* end if (msgdata_conpass) */
 	return rs ;
@@ -1694,7 +1607,7 @@ static int kshlib_workecho(KSHLIB *uip,MSGDATA *mip)
 /* end subroutine (kshlib_workecho) */
 
 
-static int kshlib_workgen(KSHLIB *uip,MSGDATA *mip)
+local int kshlib_workgen(KSHLIB *uip,MSGDATA *mip)
 {
 	int		rs ;
 	int		rs1 ;
@@ -1724,20 +1637,18 @@ static int kshlib_workgen(KSHLIB *uip,MSGDATA *mip)
 }
 /* end subroutine (kshlib_workgen) */
 
-
-static int kshlib_workgener(KSHLIB *uip,SESMSG_GEN *mp)
-{
+local int kshlib_workgener(KSHLIB *uip,SESMSG_GEN *mp) noex {
 	STORENOTE	*ep ;
-	const int	esize = sizeof(STORENOTE) ;
+	cint	esz = szof(STORENOTE) ;
 	int		rs ;
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_workgener: ent\n") ;
 	nprintf(NDF,"kshlib_workgener: m=>%r<\n",
 	    mp->nbuf,strlinelen(mp->nbuf,-1,50)) ;
 #endif
-	if ((rs = lm_mall(esize,&ep)) >= 0) {
+	if ((rs = lm_mall(esz,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
-	    const int	mt = mp->msgtype ;
+	    cint	mt = mp->msgtype ;
 	    int		nl = rmeol(mp->nbuf,-1) ;
 	    cchar	*nbuf = mp->nbuf ;
 	    cchar	*un = mp->user ;
@@ -1766,7 +1677,7 @@ static int kshlib_workgener(KSHLIB *uip,SESMSG_GEN *mp)
 /* end subroutine (kshlib_workgener) */
 
 
-static int kshlib_workbiff(KSHLIB *uip,MSGDATA *mip)
+local int kshlib_workbiff(KSHLIB *uip,MSGDATA *mip)
 {
 	int		rs ;
 	int		rs1 ;
@@ -1784,19 +1695,17 @@ static int kshlib_workbiff(KSHLIB *uip,MSGDATA *mip)
 }
 /* end subroutine (kshlib_workbiff) */
 
-
-static int kshlib_workbiffer(KSHLIB *uip,SESMSG_BIFF *mp)
-{
+local int kshlib_workbiffer(KSHLIB *uip,SESMSG_BIFF *mp) noex {
 	STORENOTE	*ep ;
-	const int	esize = sizeof(STORENOTE) ;
+	cint	esz = szof(STORENOTE) ;
 	int		rs ;
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_workbiffer: m=>%r<\n",
 	    mp->nbuf,strlinelen(mp->nbuf,-1,50)) ;
 #endif
-	if ((rs = lm_mall(esize,&ep)) >= 0) {
+	if ((rs = lm_mall(esz,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
-	    const int	mt = mp->msgtype ;
+	    cint	mt = mp->msgtype ;
 	    int		nl = rmeol(mp->nbuf,-1) ;
 	    cchar	*un = mp->user ;
 	    cchar	*nbuf = mp->nbuf ;
@@ -1812,24 +1721,21 @@ static int kshlib_workbiffer(KSHLIB *uip,SESMSG_BIFF *mp)
 }
 /* end subroutine (kshlib_workbiffer) */
 
-
-static int kshlib_workdef(KSHLIB *uip,MSGDATA *mip)
-{
+local int kshlib_workdef(KSHLIB *uip,MSGDATA *mip) noex {
+	ptm		*mxp = &uip->mx ;
 	int		rs ;
-	if (mip == NULL) return SR_FAULT ;
-	if ((rs = ptm_lock(&uip->mx)) >= 0) {
+	if (mip == nullptr) return SR_FAULT ;
+	if ((rs = mxp->lockebgin) >= 0) {
 	    uip->cdefs += 1 ;
-	    ptm_unlock(&uip->mx) ;
+	    mxp->lockend() ;
 	} /* end if (mutex) */
 	return rs ;
 }
 /* end subroutine (kshlib_workdef) */
 
-
-static int kshlib_msgenter(KSHLIB *uip,STORENOTE *ep)
-{
-	RAQHAND		*qlp = &uip->mq ;
-	const int	rso = SR_OVERFLOW ;
+local int kshlib_msgenter(KSHLIB *uip,STORENOTE *ep) noex {
+	raqhand		*qlp = &uip->mq ;
+	cint	rso = SR_OVERFLOW ;
 	int		rs ;
 	if ((rs = raqhand_ins(qlp,ep)) == rso) {
 	    void	*dum ;
@@ -1841,20 +1747,18 @@ static int kshlib_msgenter(KSHLIB *uip,STORENOTE *ep)
 }
 /* end subroutine (kshlib_msgenter) */
 
-
-static int kshlib_sid(KSHLIB *uip)
-{
-	if (uip->sid == 0) uip->sid = getsid(0) ;
+local int kshlib_sid(KSHLIB *uip) noex {
+	if (uip->sid == 0) {
+	    uip->sid = getsid(0) ;
+	}
 	return SR_OK ;
 }
 /* end subroutine (kshlib_sid) */
 
-
-static int kshlib_sesdname(KSHLIB *uip)
-{
+local int kshlib_sesdname(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	int		pl = 0 ;
-	if (uip->sesdname == NULL) {
+	if (uip->sesdname == nullptr) {
 	    cchar	*dname = KSHLIB_SESDNAME ;
 	    if ((rs = sdir(dname,(W_OK|X_OK))) >= 0) {
 		if ((rs = kshlib_sid(uip)) >= 0) {
@@ -1875,10 +1779,10 @@ static int kshlib_sesdname(KSHLIB *uip)
 }
 /* end subroutine (kshlib_sesdname) */
 
-static int kshlib_reqfname(KSHLIB *uip) noex {
+local int kshlib_reqfname(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	int		pl = 0 ;
-	if (uip->reqfname == NULL) {
+	if (uip->reqfname == nullptr) {
 	    if ((rs = kshlib_sesdname(uip)) >= 0) {
 	        const uint	uv = (uint) uip->pid ;
 	        cint		dlen = DIGBUFLEN ;
@@ -1902,9 +1806,7 @@ static int kshlib_reqfname(KSHLIB *uip) noex {
 }
 /* end subroutine (kshlib_reqfname) */
 
-
-static int kshlib_reqopen(KSHLIB *uip)
-{
+local int kshlib_reqopen(KSHLIB *uip) noex {
 	int		rs ;
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_reqopen: ent\n") ;
@@ -1919,21 +1821,19 @@ static int kshlib_reqopen(KSHLIB *uip)
 }
 /* end subroutine (kshlib_reqopen) */
 
-
-static int kshlib_reqopener(KSHLIB *uip)
-{
-	const mode_t	om = 0666 ;
-	const int	lo = 0 ; /* listen options */
+local int kshlib_reqopener(KSHLIB *uip) noex {
+	cmode		om = 0666 ;
+	cint	lo = 0 ; /* listen options */
 	int		rs ;
 	cchar		*req = uip->reqfname ;
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_reqopener: ent req=%s\n",req) ;
 #endif
 	if ((rs = listenusd(req,om,lo)) >= 0) {
-	    const int	fd = rs ;
-	    if ((rs = uc_closeonexec(fd,TRUE)) >= 0) {
+	    cint	fd = rs ;
+	    if ((rs = uc_closeonexec(fd,true)) >= 0) {
 	        SOCKADDRESS	*sap = &uip->servaddr ;
-	        const int	af = AF_UNIX ;
+	        cint	af = AF_UNIX ;
 	        if ((rs = sockaddress_start(sap,af,req,0,0)) >= 0) {
 	            uip->servlen = rs ;
 	            uip->sfd = fd ;
@@ -1949,9 +1849,7 @@ static int kshlib_reqopener(KSHLIB *uip)
 }
 /* end subroutine (kshlib_reqopener) */
 
-
-static int kshlib_reqclose(KSHLIB *uip)
-{
+local int kshlib_reqclose(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1968,7 +1866,7 @@ static int kshlib_reqclose(KSHLIB *uip)
 	        rs1 = sockaddress_finish(sap) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (uip->reqfname != NULL) {
+	    if (uip->reqfname != nullptr) {
 #if	CF_DEBUGN
 	        nprintf(NDF,"kshlib_reqclose: reqfname{%p}=¿\n",uip->reqfname) ;
 	        nprintf(NDF,"kshlib_reqclose: reqfname=%s\n",uip->reqfname) ;
@@ -1978,7 +1876,7 @@ static int kshlib_reqclose(KSHLIB *uip)
 	        }
 	        rs1 = lm_free(uip->reqfname) ;
 	        if (rs >= 0) rs = rs1 ;
-	        uip->reqfname = NULL ;
+	        uip->reqfname = nullptr ;
 	    } /* end if (reqfname) */
 	} /* end if (server-open) */
 
@@ -1990,21 +1888,17 @@ static int kshlib_reqclose(KSHLIB *uip)
 }
 /* end subroutine (kshlib_reqclose) */
 
-
-static int kshlib_reqsend(KSHLIB *uip,MSGDATA *mip,int dl,int cl)
-{
-	const int	fd = uip->sfd ;
+local int kshlib_reqsend(KSHLIB *uip,MSGDATA *mip,int dl,int cl) noex {
+	cint	fd = uip->sfd ;
 	return msgdata_send(mip,fd,dl,cl) ;
 }
 /* end subroutine (kshlib_reqsend) */
 
-
-static int kshlib_reqrecv(KSHLIB *uip,MSGDATA *mip)
-{
-	struct pollfd	fds[1] ;
-	const int	fd = uip->sfd ;
-	const int	mto = (uip->intpoll*POLL_INTMULT) ;
-	const int	nfds = 1 ;
+local int kshlib_reqrecv(KSHLIB *uip,MSGDATA *mip) noex {
+	POLLFD		fds[1] = {} ;
+	cint	fd = uip->sfd ;
+	cint	mto = (uip->intpoll*POLL_INTMULT) ;
+	cint	nfds = 1 ;
 	int		size ;
 	int		rs ;
 	int		rc = 0 ;
@@ -2013,19 +1907,17 @@ static int kshlib_reqrecv(KSHLIB *uip,MSGDATA *mip)
 	nprintf(NDF,"kshlib_reqrecv: ent\n") ;
 #endif
 
-	size = (nfds * sizeof(struct pollfd)) ;
-	memset(fds,0,size) ;
 	fds[0].fd = fd ;
 	fds[0].events = (POLLIN | POLLPRI | POLLERR) ;
 	fds[0].revents = 0 ;
 
 	while ((rs = u_poll(fds,nfds,mto)) >= 0) {
-	    int		f = FALSE ;
+	    int		f = false ;
 	    if (rs > 0) {
-	        const int	re = fds[0].revents ;
+	        cint	re = fds[0].revents ;
 	        if (re & (POLLIN|POLLPRI)) {
 	            if ((rs = msgdata_recv(mip,fd)) >= 0) {
-	                f = TRUE ;
+	                f = true ;
 	                if (rs > 0) {
 	                    rc = MKCHAR(mip->mbuf[0]) ;
 	                } else {
@@ -2054,23 +1946,23 @@ static int kshlib_reqrecv(KSHLIB *uip,MSGDATA *mip)
 /* end subroutine (kshlib_reqrecv) */
 
 
-static int kshlib_poll(KSHLIB *uip)
+local int kshlib_poll(KSHLIB *uip)
 {
 	int		rs = SR_OK ;
 
-	if (uip == NULL) return SR_FAULT ;
+	if (uip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_poll: ent\n") ;
 #endif
 
 	if ((uip->pollcount % 5) == 4) {
-	    const time_t	dt = time(NULL) ;
-	    const int		intsescheck = uip->intsescheck ;
+	    const time_t	dt = time(nullptr) ;
+	    cint		intsescheck = uip->intsescheck ;
 	    if ((dt - uip->ti_sescheck) >= intsescheck) {
 	        TMTIME		m ;
 	        uip->ti_sescheck = dt ;
-	        if ((rs = tmtime_localtime(&m,dt)) >= 0) {
+	        if ((rs = tmtime_timelocal(&m,dt)) >= 0) {
 		    if (m.hour >= uip->seshour) {
 		        cchar	*sesdname = KSHLIB_SESDNAME ;
 		        rs = rmsesfiles(sesdname) ;
@@ -2093,27 +1985,26 @@ static int kshlib_poll(KSHLIB *uip)
 /* end subroutine (kshlib_poll) */
 
 
-static int kshlib_cmdsend(KSHLIB *uip,int cmd)
+local int kshlib_cmdsend(KSHLIB *uip,int cmd)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_cmdsend: ent cmd=%u\n",cmd) ;
 	nprintf(NDF,"kshlib_cmdsend: f_running=%u\n",uip->f_running) ;
 #endif
-	if (uip->f_running && (uip->reqfname != NULL)) {
-	    f = TRUE ;
+	if (uip->f_running && (uip->reqfname != nullptr)) {
+	    f = true ;
 	    switch (cmd) {
 	    case sesmsgtype_exit:
 	        {
 	            MSGDATA	m ;
 	            if ((rs = msgdata_init(&m,0)) >= 0) {
-	                SESMSG_EXIT	m0 ;
-	                const int	sal = uip->servlen ;
-	                const void	*sap = &uip->servaddr ;
+	                SESMSG_EXIT	m0{} ;
+	                cint	sal = uip->servlen ;
+	                cvoid	*sap = &uip->servaddr ;
 	                msgdata_setaddr(&m,sap,sal) ;
-	                memset(&m0,0,sizeof(SESMSG_EXIT)) ;
 	                if ((rs = sesmsg_exit(&m0,0,m.mbuf,m.mlen)) >= 0) {
 	                    rs = kshlib_reqsend(uip,&m,rs,0) ;
 #if	CF_DEBUGN
@@ -2142,79 +2033,82 @@ static int kshlib_cmdsend(KSHLIB *uip,int cmd)
 }
 /* end subroutine (kshlib_cmdsend) */
 
-
-static void kshlib_atforkbefore()
-{
+local void kshlib_atforkbefore() noex {
 	KSHLIB		*uip = &kshlib_data ;
-	ptm_lock(&uip->mx) ;
+	{
+	    ptm *mxp = &uip->mx ;
+	    mxp->lockbegin() ;
+	}
 }
 /* end subroutine (kshlib_atforkbefore) */
 
-
-static void kshlib_atforkparent()
-{
+local void kshlib_atforkparent() noex {
 	KSHLIB		*uip = &kshlib_data ;
-	ptm_unlock(&uip->mx) ;
+	{
+	    ptm *mxp = &uip->mx ;
+	    mxp->lockend() ;
+	}
 }
 /* end subroutine (kshlib_atforkafter) */
 
-
-static void kshlib_atforkchild()
-{
+local void kshlib_atforkchild() noex {
 	KSHLIB		*uip = &kshlib_data ;
-	uip->f_running = FALSE ;
-	uip->f_exiting = FALSE ;
+	uip->f_running = false ;
+	uip->f_exiting = false ;
 	uip->pid = getpid() ;
-	ptm_unlock(&uip->mx) ;
+	{
+	    ptm *mxp = &uip->mx ;
+	    mxp->lockend() ;
+	}
 }
 /* end subroutine (kshlib_atforkchild) */
 
-
 /* ARGSUSED */
-static void kshlib_sighand(int sn,siginfo_t *sip,void *vcp)
-{
+local void kshlib_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	KSHLIB		*kip = &kshlib_data ;
 	switch (sn) {
 	case SIGQUIT:
-	    kip->f_sigquit = TRUE ;
+	    kip->f_sigquit = true ;
 	    break ;
 	case SIGTERM:
-	    kip->f_sigterm = TRUE ;
+	    kip->f_sigterm = true ;
 	    break ;
 	case SIGINT:
-	    kip->f_sigintr = TRUE ;
+	    kip->f_sigintr = true ;
 	    break ;
 	case SIGWINCH:
-	    kip->f_sigwich = TRUE ;
+	    kip->f_sigwich = true ;
 	    break ;
 	case SIGCHLD:
-	    kip->f_sigchild = TRUE ;
+	    kip->f_sigchild = true ;
 	    break ;
 	case SIGTSTP:
-	    kip->f_sigsusp = TRUE ;
+	    kip->f_sigsusp = true ;
 	    break ;
 	} /* end switch */
 }
 /* end subroutine (kshlib_sighand) */
 
-
-static int kshlib_capbegin(KSHLIB *uip,int to)
-{
+local int kshlib_capbegin(KSHLIB *uip,int to) noex {
+	ptm		*mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
 #if	CF_DEBUGN && 0
 	nprintf(NDF,"kshlib_capbegin: ent to=%d\n",to) ;
 #endif
-	if ((rs = ptm_lockto(&uip->mx,to)) >= 0) {
-	    uip->waiters += 1 ;
-	    while ((rs >= 0) && uip->f_capture) { /* busy */
-	        rs = ptc_waiter(&uip->cxv,&uip->mx,to) ;
-	    } /* end while */
-	    if (rs >= 0) {
-	        uip->f_capture = TRUE ;
-	    }
-	    uip->waiters -= 1 ;
-	    rs1 = ptm_unlock(&uip->mx) ;
+	if ((rs = mxp->lockbegin(to)) >= 0) {
+	    {
+	        ptc *cnp = &uip->cxv ;
+	        uip->waiters += 1 ;
+	        while ((rs >= 0) && uip->f_capture) { /* busy */
+	            rs = cnp->waiter(mxp,to) ;
+	        } /* end while */
+	        if (rs >= 0) {
+	            uip->f_capture = true ;
+	        }
+	        uip->waiters -= 1 ;
+	    } /* end block */
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 #if	CF_DEBUGN && 0
@@ -2224,20 +2118,22 @@ static int kshlib_capbegin(KSHLIB *uip,int to)
 }
 /* end subroutine (kshlib_capbegin) */
 
-
-static int kshlib_capend(KSHLIB *uip)
-{
+local int kshlib_capend(KSHLIB *uip) noex {
+	ptm		*mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
 #if	CF_DEBUGN && 0
 	nprintf(NDF,"kshlib_capend: ent\n") ;
 #endif
-	if ((rs = ptm_lock(&uip->mx)) >= 0) {
-	    uip->f_capture = FALSE ;
-	    if (uip->waiters > 0) {
-	        rs = ptc_signal(&uip->cxv) ;
-	    }
-	    rs1 = ptm_unlock(&uip->mx) ;
+	if ((rs = mxp->lockbegin) >= 0) {
+	    {
+	        ptc *cnp = &uip->cxv ;
+	        uip->f_capture = false ;
+	        if (uip->waiters > 0) {
+	            rs = cnp->signal ;
+	        }
+	    } /* end block */
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 #if	CF_DEBUGN && 0
@@ -2247,10 +2143,8 @@ static int kshlib_capend(KSHLIB *uip)
 }
 /* end subroutine (kshlib_capend) */
 
-
 /* ARGSUSED */
-static int kshlib_sigbegin(KSHLIB *kip,const int *catches)
-{
+local int kshlib_sigbegin(KSHLIB *kip,cint *catches) noex {
 	int		rs ;
 	sighand_handler	sh = kshlib_sighand ;
 #if	CF_DEBUGN
@@ -2266,9 +2160,7 @@ static int kshlib_sigbegin(KSHLIB *kip,const int *catches)
 }
 /* end subroutine (kshlib_sigbegin) */
 
-
-static int kshlib_sigend(KSHLIB *kip)
-{
+local int kshlib_sigend(KSHLIB *kip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 #if	CF_DEBUGN
@@ -2283,16 +2175,14 @@ static int kshlib_sigend(KSHLIB *kip)
 }
 /* end subroutine (kshlib_sigend) */
 
-
-static int kshlib_notesbegin(KSHLIB *uip)
-{
+local int kshlib_notesbegin(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
-	int		f = TRUE ;
+	int		f = true ;
 	if (! uip->open.notes) {
 	    if ((rs = kshlib_mqbegin(uip)) >= 0) {
 	        if ((rs = kshlib_runbegin(uip)) >= 0) {
-	    	    uip->open.notes = TRUE ;
-		    f = FALSE ;
+	    	    uip->open.notes = true ;
+		    f = false ;
 		}
 	    }
 	}
@@ -2303,32 +2193,26 @@ static int kshlib_notesbegin(KSHLIB *uip)
 }
 /* end subroutine (kshlib_notesbegin) */
 
-
-static int kshlib_notesend(KSHLIB *uip)
-{
+local int kshlib_notesend(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 	if (uip->open.notes) {
 	    rs1 = kshlib_runend(uip) ;
 	    if (rs >= 0) rs = rs1 ;
-	    uip->open.notes = FALSE ;
-	    f = TRUE ;
+	    uip->open.notes = false ;
+	    f = true ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (kshlib_notesend) */
 
-
-static int kshlib_notesactive(KSHLIB *uip)
-{
+local int kshlib_notesactive(KSHLIB *uip) noex {
 	return MKBOOL(uip->open.notes) ;
 }
 /* end subroutine (kshlib_notesactive) */
 
-
-static int kshlib_notescount(KSHLIB *uip)
-{
+local int kshlib_notescount(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->open.notes) {
 	    rs = kshlib_mqcount(uip) ;
@@ -2337,47 +2221,45 @@ static int kshlib_notescount(KSHLIB *uip)
 }
 /* end subroutine (kshlib_notescount) */
 
-
-static int kshlib_mqbegin(KSHLIB *uip)
-{
+local int kshlib_mqbegin(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	if (! uip->open.mq) {
-	    const int	n = KSHLIB_NENTS ;
+	    cint	n = KSHLIB_NENTS ;
 	    if ((rs = raqhand_start(&uip->mq,n,0)) >= 0) {
-	        uip->open.mq = TRUE ;
+	        uip->open.mq = true ;
 	    }
 	}
 	return rs ;
 }
 /* end subroutine (kshlib_mqbegin) */
 
-
-static int kshlib_mqend(KSHLIB *uip)
-{
+local int kshlib_mqend(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->open.mq) {
+	    {
 	    rs1 = kshlib_mqfins(uip) ;
 	    if (rs >= 0) rs = rs1 ;
+	    }
+	    {
 	    rs1 = raqhand_finish(&uip->mq) ;
 	    if (rs >= 0) rs = rs1 ;
-	    uip->open.mq = FALSE ;
+	    uip->open.mq = false ;
+	    }
 	}
 	return rs ;
 }
 /* end subroutine (kshlib_mqend) */
 
-
-static int kshlib_mqfins(KSHLIB *uip)
-{
+local int kshlib_mqfins(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->open.mq) {
-	    RAQHAND	*qlp = &uip->mq ;
+	    raqhand	*qlp = &uip->mq ;
 	    STORENOTE	*ep ;
 	    int		i ;
 	    for (i = 0 ; raqhand_get(qlp,i,&ep) >= 0 ; i += 1) {
-	        if (ep != NULL) {
+	        if (ep != nullptr) {
 	            rs1 = storenote_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 	            rs1 = lm_free(ep) ;
@@ -2389,9 +2271,7 @@ static int kshlib_mqfins(KSHLIB *uip)
 }
 /* end subroutine (kshlib_mqfins) */
 
-
-static int kshlib_mqcount(KSHLIB *uip)
-{
+local int kshlib_mqcount(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->open.mq) {
 	    rs = raqhand_count(&uip->mq) ;
@@ -2403,19 +2283,15 @@ static int kshlib_mqcount(KSHLIB *uip)
 }
 /* end subroutine (kshlib_mqcount) */
 
-
-static int kshlib_mqactive(KSHLIB *uip)
-{
+local int kshlib_mqactive(KSHLIB *uip) noex {
 	int		rs = MKBOOL(uip->open.mq) ;
 	return rs ;
 }
 /* end subroutine (kshlib_mqactive) */
 
-
 #if	CF_MQ
 /* ensure message-queue operations are initialized */
-static int kshlib_mq(KSHLIB *uip)
-{
+local int kshlib_mq(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
 	if (! uip->open.mq) {
 	    rs = kshlib_mqbegin(uip) ;
@@ -2425,9 +2301,9 @@ static int kshlib_mq(KSHLIB *uip)
 /* end subroutine (kshlib_mq) */
 #endif /* CF_MQ */
 
-static int kshlib_sesend(KSHLIB *uip) noex {
+local int kshlib_sesend(KSHLIB *uip) noex {
 	int		rs = SR_OK ;
-	if (uip->sesdname != NULL) {
+	if (uip->sesdname != nullptr) {
 	    if ((rs = kshlib_sid(uip)) >= 0) {
 		if (uip->sid == uip->pid) {
 		    if ((rs = dirempty(uip->sesdname)) > 0) {
@@ -2440,8 +2316,7 @@ static int kshlib_sesend(KSHLIB *uip) noex {
 }
 /* end subroutine (kshlib_sesend) */
 
-
-static int storenote_start(ep,mt,st,un,mdp,mdl)
+local int storenote_start(ep,mt,st,un,mdp,mdl)
 STORENOTE	*ep ;
 int		mt ;
 time_t		st ;
@@ -2452,8 +2327,8 @@ int		mdl ;
 	int		rs ;
 	int		size = 0 ;
 	char		*bp ;
-	if (un == NULL) return SR_FAULT ;
-	if (mdp == NULL) return SR_FAULT ;
+	if (un == nullptr) return SR_FAULT ;
+	if (mdp == nullptr) return SR_FAULT ;
 	ep->stime = st ;
 	ep->type = mt ;
 	if (mdl < 0) mdl = strlen(mdp) ;
@@ -2471,17 +2346,15 @@ int		mdl ;
 }
 /* end subroutine (storenote_start) */
 
-
-static int storenote_finish(STORENOTE *ep)
-{
+local int storenote_finish(STORENOTE *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ep->a != NULL) {
+	if (ep->a != nullptr) {
 	    rs1 = lm_free(ep->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->a = NULL ;
-	    ep->user = NULL ;
-	    ep->dbuf = NULL ;
+	    ep->a = nullptr ;
+	    ep->user = nullptr ;
+	    ep->dbuf = nullptr ;
 	    ep->dlen = 0 ;
 	}
 	ep->stime = 0 ;
@@ -2490,13 +2363,11 @@ static int storenote_finish(STORENOTE *ep)
 }
 /* end subroutine (storenote_finish) */
 
-
 #if	CF_LOCMALSTRW
-static int mallocstrw(cchar *sp,int sl,cchar **rpp)
-{
+local int mallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	char		*bp ;
-	if (rpp == NULL) return SR_FAULT ;
+	if (rpp == nullptr) return SR_FAULT ;
 	if (sl < 0) sl = strlen(sp) ;
 	if ((rs = lm_mall((sl+1),&bp)) >= 0) {
 	    *rpp = bp ;
@@ -2507,29 +2378,24 @@ static int mallocstrw(cchar *sp,int sl,cchar **rpp)
 /* end subroutine (mallocstrw) */
 #endif /* CF_LOCMALSTRW */
 
-
-static int sdir(cchar *dname,int am)
-{
-	ustat	sb ;
-	const mode_t	dm = 0777 ;
-	const int	nrs = SR_NOTFOUND ;
+local int sdir(cchar *dname,int am) noex {
+	cmode		dm = 0777 ;
+	cint	nrs = SR_NOTFOUND ;
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	if ((rs = uc_stat(dname,&sb)) == nrs) {
-	    f = TRUE ;
+	if (ustat sb ; (rs = uc_stat(dname,&sb)) == nrs) {
+	    f = true ;
 	    rs = mksdir(dname,dm) ;
 	} else {
-	    rs = perm(dname,-1,-1,NULL,am) ;
+	    rs = perm(dname,-1,-1,nullptr,am) ;
 	} /* end if (stat) */
 
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (sdir) */
 
-
-static int mksdir(cchar *dname,mode_t dm)
-{
+local int mksdir(cchar *dname,mode_t dm) noex {
 	int		rs ;
 	if ((rs = mkdirs(dname,dm)) >= 0) {
 	    rs = uc_minmod(dname,dm) ;
@@ -2538,11 +2404,9 @@ static int mksdir(cchar *dname,mode_t dm)
 }
 /* end if (mksdir) */
 
-
-static int mksdname(char *rbuf,cchar *dname,pid_t sid)
-{
+local int mksdname(char *rbuf,cchar *dname,pid_t sid) noex {
 	const uint	uv = (uint) sid ;
-	const int	dlen = DIGBUFLEN ;
+	cint	dlen = DIGBUFLEN ;
 	int		rs ;
 	int		rl = 0 ;
 	char		dbuf[DIGBUFLEN+1] = { 's' } ;
@@ -2553,7 +2417,7 @@ static int mksdname(char *rbuf,cchar *dname,pid_t sid)
 
 	if ((rs = ctdecui((dbuf+1),(dlen-1),uv)) >= 0) {
 	    if ((rs = mkpath2(rbuf,dname,dbuf)) >= 0) {
-	        const mode_t	dm = 0777 ;
+	        cmode	dm = 0777 ;
 		rl = rs ;
 	        if ((rs = mkdirs(rbuf,dm)) >= 0) {
 	            rs = uc_minmod(rbuf,dm) ;
@@ -2569,18 +2433,16 @@ static int mksdname(char *rbuf,cchar *dname,pid_t sid)
 }
 /* end subroutine (mksdname) */
 
-
 #if	CF_DEBUGENV && CF_DEBUGN
-static int ndebugenv(cchar *s,cchar *ev[])
-{
-	if (s != NULL) {
-	    if (ev != NULL) {
+local int ndebugenv(cchar *s,mainv ev) noex {
+	if (s != nullptr) {
+	    if (ev != nullptr) {
 	        int	i ;
 	        cchar	*dfn = NDF ;
 		cchar	*ep ;
 	        cchar	*fmt = "%s: e%03u=>%r<\n" ;
 	        nprintf(dfn,"%s: env¬\n", s) ;
-	        for (i = 0 ; ev[i] != NULL ; i += 1) {
+	        for (i = 0 ; ev[i] != nullptr ; i += 1) {
 	            ep = ev[i] ;
 	            nprintf(dfn,fmt,s,i,ep,strlinelen(ep,-1,50)) ;
 	        }
@@ -2594,24 +2456,20 @@ static int ndebugenv(cchar *s,cchar *ev[])
 /* end subroutine (ndebugenv) */
 #endif /* CF_DEBUGENV */
 
-
 #if	CF_DEBUGN
 
-static int nprintpid(cchar *s)
-{
+local int nprintpid(cchar *s) noex {
 	const uint	id = getpid() ;
 	return nprintf(NDF,"%s: ent pid=%u\n",s,id) ;
 }
 
-static int nprintid(cchar *s)
-{
-	const pthread_t	tid = uptself(NULL) ;
+local int nprintid(cchar *s) noex {
+	const pthread_t	tid = uptself(nullptr) ;
 	return nprintf(NDF,"%s: tid=%u\n",s,tid) ;
 }
 /* end subroutine (nprintid) */
 
-static int nprintutmp(char *s)
-{
+local int nprintutmp(char *s) noex {
 	KSHLIB		*uip = &kshlib_data ;
 	int		rs ;
 	nprintf(NDF,"%s: UTMPACC test-begin\n",s) ;
@@ -2619,12 +2477,12 @@ static int nprintutmp(char *s)
 		UTMPACC_ENT	ue ;
 		const pid_t	sid = getsid(0) ;
 		const pid_t	pid = uip->pid ;
-		const int	ulen = UTMPACC_BUFLEN ;
+		cint	ulen = UTMPACC_BUFLEN ;
 		char		ubuf[UTMPACC_BUFLEN+1] ;
 
-	nprintf(NDF,"%s: sid=%d pid=%u\n",s,sid,pid) ;
-	rs = utmpacc_entsid(&ue,ubuf,ulen,pid) ;
-	nprintf(NDF,"%s: utmpacc() rs=%d\n",s,rs) ;
+	    nprintf(NDF,"%s: sid=%d pid=%u\n",s,sid,pid) ;
+	    rs = utmpacc_entsid(&ue,ubuf,ulen,pid) ;
+	    nprintf(NDF,"%s: utmpacc() rs=%d\n",s,rs) ;
 
 	}
 	nprintf(NDF,"%s: UTMPACC test-end\n",s) ;
