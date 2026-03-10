@@ -1,6 +1,6 @@
 /* inaddrbad HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* create an "inaddrbad" constant */
 /* version %I% last-modified %G% */
@@ -31,7 +31,7 @@
 consteval inline in_addr_t mkinaddrbad() noex {
 	const in_addr_t	a = 0 ;
 	return (~a) ;
-}
+} /* end subroutine (mkinaddrbad) */
 
 
 #endif	/* __cplusplus */
