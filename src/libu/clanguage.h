@@ -197,15 +197,22 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
+#ifndef	asconst
+#define	asconst			as_const
+#endif
+#endif /* __cplusplus */
+
+
+#ifdef	__cplusplus
 #ifndef	szof
-#define	szof(T)		int(sizeof(T))
+#define	szof(T)			int(sizeof(T))
 #endif
 #endif /* __cplusplus */
 
 #ifndef	EXTERNC_begin
 #ifdef	__cplusplus
-#define	EXTERNC_begin	extern "C" {
-#define	EXTERNC_end	}
+#define	EXTERNC_begin		extern "C" {
+#define	EXTERNC_end		}
 #else
 #define	EXTERNC_begin	/* externc_begin */
 #define	EXTERNC_end	/* externc_end */
@@ -213,8 +220,18 @@
 #endif /* EXTERNC_begin */
 
 #ifndef	CAST_R
-#define	CAST_R		cast_reinterpret
+#define	CAST_R			cast_reinterpret
 #endif
+
+#ifndef	SAT_SUBROUTINE
+#define	SAT_SUBROUTINE
+#ifdef	__cplusplus
+#define	sat_add			add_sat
+#define	sat_sub			sub_sat
+#define	sat_mul			mul_sat
+#define	sat_div			div_sat
+#endif /* __cplusplus */
+#endif /* SAT_SUBROUTINE */
 
 
 #endif /* CLANGUAGE_INCLUDE */
