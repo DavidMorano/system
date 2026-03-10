@@ -1,4 +1,5 @@
 /* proguseracct SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* handle some login-based stuff */
@@ -46,14 +47,16 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
+#include	<pwd.h>
+#include	<grp.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<pwd.h>
-#include	<grp.h>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getbufsize.h>
 #include	<filer.h>
 #include	<ascii.h>
@@ -66,13 +69,19 @@
 #include	<ischarx.h>
 #include	<isnot.h>
 #include	<localmisc.h>		/* |COLUMNS| */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
 #include	"clientinfo.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	PI		proginfo
 
 #define	LOGBUFLEN	(LOGNAMELEN + 20)
 
@@ -93,10 +102,19 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
 /* external subroutines */
 
-extern int	proglog_printf(PROGINFO *,cchar *,...) noex ;
-extern int	proglog_flush(PROGINFO *) noex ;
+extern int	proglog_printf(PI *,cchar *,...) noex ;
+extern int	proglog_flush(PI *) noex ;
 
 
 /* external variables */
@@ -107,49 +125,49 @@ extern int	proglog_flush(PROGINFO *) noex ;
 
 /* forward references */
 
-static int	proguseracct_usersrv(PROGINFO *,CLIENTINFO *,
+local int	proguseracct_usersrv(PI *,CLIENTINFO *,
 			PASSWDENT *) ;
-static int	proguseracct_pop(PROGINFO *,int,PASSWDENT *,
+local int	proguseracct_pop(PI *,int,PASSWDENT *,
 			cchar *,cchar *) ;
-static int	proguseracct_projinfo(PROGINFO *,int,
+local int	proguseracct_projinfo(PI *,int,
 			PASSWDENT *) ;
-static int	proguseracct_copyover(PROGINFO *,int,int) ;
-static int	proguseracct_prints(PROGINFO *,FILER *,
+local int	proguseracct_copyover(PI *,int,int) ;
+local int	proguseracct_prints(PI *,filer *,
 			char *,int, cchar *,int) ;
-static int	proguseracct_print(PROGINFO *,FILER *,int,int,
+local int	proguseracct_print(PI *,filer *,int,int,
 			cchar *,int) ;
 
-static int	filer_writeblanks(FILER *,int) ;
+local int	filer_writeblanks(filer *,int) ;
 
 #if	CF_LINEFOLD
 #else
-static int	getline(int,cchar *,int) ;
+local int	getline(int,cchar *,int) ;
 #endif
 
 #if	CF_CLEAN && CF_CLEANBEFORE
-static int	mkclean(char *,cchar *,int) ;
-static int	isourbad(int) ;
+local int	mkclean(char *,cchar *,int) ;
+local bool	isourbad(int) noex ;
 #endif /* CF_CLEANBEFORE */
 
 #ifdef	COMMENT
-static int	isend(int) ;
+local bool	isend(int) noex ;
 #endif
 
 
 /* local variables */
 
-static cchar	blanks[NBLANKS] = "        " ;
+constexpr char	blanks[NBLANKS] = "        " ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int proguseracctmat(PROGINFO *pip,PASSWDENT *pep,char *pwbuf,int pwlen,
-		cchar *svcname)
-{
+int proguseracctmat(PI *pip,PASSWDENT *pep,char *pwbuf,int pwlen,
+		cchar *svcname) noex {
 	int		rs ;
-
-	if (svcname == NULL) return SR_FAULT ;
+	if (svcname == nullptr) return SR_FAULT ;
 
 	if (svcname[0] == '\0') return SR_INVALID ;
 
@@ -164,9 +182,7 @@ int proguseracctmat(PROGINFO *pip,PASSWDENT *pep,char *pwbuf,int pwlen,
 }
 /* end subroutine (proguseracctmat) */
 
-
-int proguseracctexec(PROGINFO *pip,CLIENTINFO *cip,PASSWDENT *pep)
-{
+int proguseracctexec(PI *pip,CLIENTINFO *cip,PASSWDENT *pep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ofd ;
@@ -183,7 +199,7 @@ int proguseracctexec(PROGINFO *pip,CLIENTINFO *cip,PASSWDENT *pep)
 	if (ofd < 0)
 	    return SR_INVALID ;
 
-	if ((cip->subservice != NULL) && (cip->subservice[0] != '\0')) {
+	if ((cip->subservice != nullptr) && (cip->subservice[0] != '\0')) {
 
 	    rs = proguseracct_usersrv(pip,cip,pep) ;
 	    if (rs > 0) c = rs ;
@@ -223,7 +239,7 @@ int proguseracctexec(PROGINFO *pip,CLIENTINFO *cip,PASSWDENT *pep)
 /* local subroutines */
 
 
-static int proguseracct_usersrv(PROGINFO *pip,CLIENTINFO *cip,PASSWDENT *pep)
+local int proguseracct_usersrv(PI *pip,CLIENTINFO *cip,PASSWDENT *pep)
 {
 	cint	ofd = cip->fd_output ;
 	int		rs = SR_OK ;
@@ -231,11 +247,11 @@ static int proguseracct_usersrv(PROGINFO *pip,CLIENTINFO *cip,PASSWDENT *pep)
 	int		fd = -1 ;
 	int		to = TO_OPEN ;
 	int		wlen = 0 ;
-	int		f_served = FALSE ;
+	int		f_served = false ;
 	cchar	*usersrv = pip->usersrv ;
 	char		tmpfname[MAXPATHLEN + 1], *ssbuf = tmpfname ;
 
-	if ((usersrv == NULL) || (usersrv[0] == '\0'))
+	if ((usersrv == nullptr) || (usersrv[0] == '\0'))
 	    usersrv = USERSRV ;
 
 	if ((rs1 = mkpath2(tmpfname,pep->pw_dir,usersrv)) >= 0) {
@@ -256,7 +272,7 @@ static int proguseracct_usersrv(PROGINFO *pip,CLIENTINFO *cip,PASSWDENT *pep)
 	    if (rs1 >= 0) rs1 = uc_writen(fd,ssbuf,rs1) ;
 
 	    if (rs1 >= 0) {
-	        f_served = TRUE ;
+	        f_served = true ;
 	        rs = proguseracct_copyover(pip,ofd,fd) ;
 	        wlen = rs ;
 	    }
@@ -283,14 +299,14 @@ static int proguseracct_usersrv(PROGINFO *pip,CLIENTINFO *cip,PASSWDENT *pep)
 /* end subroutine (proguseracct_usersrv) */
 
 
-static int proguseracct_pop(PROGINFO *pip,int ofd,PASSWDENT *pep,
+local int proguseracct_pop(PI *pip,int ofd,PASSWDENT *pep,
 		cchar *fname,cchar *desc)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (fname[0] != '\0') {
 	    cint	to = TO_OPEN ;
@@ -310,7 +326,7 @@ static int proguseracct_pop(PROGINFO *pip,int ofd,PASSWDENT *pep,
 
 	        u_close(fd) ;
 
-	        if ((rs >= 0) && pip->open.logprog && (desc != NULL)) {
+	        if ((rs >= 0) && pip->open.logprog && (desc != nullptr)) {
 	            proglog_printf(pip,"%s=%u",desc,rs) ;
 		}
 
@@ -322,20 +338,17 @@ static int proguseracct_pop(PROGINFO *pip,int ofd,PASSWDENT *pep,
 }
 /* end subroutine (proguseracct_pop) */
 
-
-static int proguseracct_projinfo(PROGINFO *pip,int ofd,PASSWDENT *pep)
-{
-	struct project	pj ;
-	cint	pjlen = getbufsize(getbufsize_pj) ;
+local int proguseracct_projinfo(PI *pip,int ofd,PASSWDENT *pep) noex {
+	PROJECT		pj ;
+	cint		pjlen = getbufsize(bufsize_pj) ;
 	int		rs ;
 	int		c = 0 ;
 	char		*pjbuf ;
-
 	if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
 	    cchar	*n = pep->pw_name ;
-	    if ((rs = uc_getdefaultproj(n,&pj,pjbuf,pjlen)) >= 0) {
+	    if ((rs = uc_getdefproj(n,&pj,pjbuf,pjlen)) >= 0) {
 	        cint	outlen = (pjlen*2) ;
-	        if (pj.pj_comment != NULL) {
+	        if (pj.pj_comment != nullptr) {
 	            int		ol ;
 	            char	outbuf[outlen+1] ;
 
@@ -352,15 +365,12 @@ static int proguseracct_projinfo(PROGINFO *pip,int ofd,PASSWDENT *pep)
 	    }
 	    uc_free(pjbuf) ;
 	} /* end if (memory-allocation) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (proguseracct_projinfo) */
 
-
-static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
-{
-	FILER		local, net ;
+local int proguseracct_copyover(PI *pip,int ofd,int fd) noex {
+	filer		locfile, net ;
 	cint	clen = LINEBUFLEN ;
 	cint	to = TO_READ ;
 	int		rs = SR_OK ;
@@ -368,7 +378,7 @@ static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 	int		size ;
 	int		cbl ;
 	int		wlen = 0 ;
-	char		*cbuf = NULL ;
+	char		*cbuf = nullptr ;
 
 	cbl = ((pip->linelen >= 5) ? pip->linelen : COLUMNS) ;
 
@@ -382,11 +392,11 @@ static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 
 	    if ((rs = filer_start(&net,ofd,0z,0,0)) >= 0) {
 
-	        if ((rs = filer_start(&local,fd,0z,0,0)) >= 0) {
+	        if ((rs = filer_start(&locfile,fd,0z,0,0)) >= 0) {
 	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 2] ;
 
-	            while ((rs = filer_readln(&local,lbuf,llen,to)) > 0) {
+	            while ((rs = filer_readln(&locfile,lbuf,llen,to)) > 0) {
 	                int	len = rs ;
 	                int	cll ;
 	                cchar	*clp ;
@@ -423,8 +433,8 @@ static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 
 	            } /* end while */
 
-	            filer_finish(&local) ;
-	        } /* end if (local) */
+	            filer_finish(&locfile) ;
+	        } /* end if (locfile) */
 
 	        filer_finish(&net) ;
 	    } /* end if (net) */
@@ -450,7 +460,7 @@ static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 /* end subroutine (proguseracct_copyover) */
 
 
-static int proguseracct_prints(PROGINFO *pip,FILER *fbp,char *cbuf,int cbl,
+local int proguseracct_prints(PI *pip,filer *fbp,char *cbuf,int cbl,
 		cchar *lbuf,int llen)
 {
 	int		rs = SR_OK ;
@@ -545,10 +555,8 @@ static int proguseracct_prints(PROGINFO *pip,FILER *fbp,char *cbuf,int cbl,
 }
 /* end subroutine (proguseracct_prints) */
 
-
-static int proguseracct_print(PROGINFO *pip,FILER *fbp,int indent,
-		int ln,cchar *lp,int ll)
-{
+local int proguseracct_print(PI *pip,filer *fbp,int indent,
+		int ln,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		f_eol ;
@@ -579,36 +587,28 @@ static int proguseracct_print(PROGINFO *pip,FILER *fbp,int indent,
 }
 /* end subroutine (proguseracct_print) */
 
-
-static int filer_writeblanks(FILER *fbp,int indent)
-{
+local int filer_writeblanks(filer *fbp,int indent) noex {
 	int		rs = SR_OK ;
 	int		ml ;
 	int		wlen = 0 ;
-
 	while ((rs >= 0) && (wlen < indent)) {
 	    ml = MIN((indent-wlen),NBLANKS) ;
 	    rs = filer_write(fbp,blanks,ml) ;
 	    wlen += rs ;
 	} /* end while */
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (proguseracct_writeblanks) */
 
-
 #if	CF_LINEFOLD
 #else
 
-static int getline(int llen,cchar *sp,int sl)
-{
+local int getline(int llen,cchar *sp,int sl) noex {
 	int		len = 0 ;
 	cchar		*tp ;
-
 	if (sl > 0) {
-
 	    len = MIN(sl,llen) ;
-	    if ((tp = strnbrk(sp,len,"\r\n")) != NULL) {
+	    if ((tp = strnbrk(sp,len,"\r\n")) != nullptr) {
 	        len = ((tp + 1) - sp) ;
 	    }
 
@@ -626,47 +626,40 @@ static int getline(int llen,cchar *sp,int sl)
 
 #endif /* CF_LINEFOLD */
 
-
 #if	CF_CLEAN && CF_CLEANBEFORE
 
-static int mkclean(char *cbuf,cchar *lbuf,int llen)
-{
-	int		i ;
-	int		f_eol = FALSE ;
-
+local int mkclean(char *cbuf,cchar *lbuf,int llen) noex {
+	int		i ; /* used-afterwards */
+	bool		f_eol = false ;
 	for (i = 0 ; (i < llen) ; i += 1) {
 	    cbuf[i] = lbuf[i] ;
 	    if (isourbad(lbuf[i] & UCHAR_MAX)) {
 	        cbuf[i] = '_' ;
 	    }
 	} /* end for */
-
 	if ((i > 0) && (lbuf[i-1] == '\n')) {
-	    f_eol = TRUE ;
+	    f_eol = true ;
 	}
-
 	if ((! f_eol) && (lbuf[i] != '\n')) {
 	    cbuf[i++] = '\n' ;
 	}
-
 	return i ;
 }
 /* end subroutine (mkclean) */
 
-static int isourbad(int ch)
-{
-	int		f = TRUE ;
+local bool isourbad(int ch) noex {
+	bool	f = true ;
 	ch &= UCHAR_MAX ;
 	switch (ch) {
 	case '\n':
 	case '\t':
-	    f = FALSE ;
+	    f = false ;
 	    break ;
 	case CH_SO:
 	case CH_SI:
 	case CH_SS2:
 	case CH_SS3:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	default:
 	    f = (! isprintlatin(ch)) ;
@@ -678,11 +671,9 @@ static int isourbad(int ch)
 
 #endif /* CF_CLEANBEFORE */
 
-
 #ifdef	COMMENT
-static int isend(int ch)
-{
-	int		f = FALSE ;
+local bool isend(int ch) noex {
+	bool	f = false ;
 	f = (ch == '\n') || (ch == '\r') ;
 	return f ;
 }
