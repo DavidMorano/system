@@ -23,10 +23,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<atomic>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 enum aflagmems {
@@ -38,12 +35,12 @@ enum aflagmems {
 	aflagmem_notify,
 	aflagmem_notifyall,
 	aflagmem_overlast
-} ;
+} ; /* end enum */
 enum aflagmxs {
 	aflagmx_lockbegin,
 	aflagmx_lockend,
 	aflagmx_overlast
-} ;
+} ; /* end enum */
 struct aflag ;
 struct aflag_co {
 	aflag		*op = nullptr ;
@@ -92,9 +89,12 @@ struct aflag {
 	    notifyall	(this,aflagmem_notifyall) ;
 	    lockbegin	(this,aflagmx_lockbegin) ;
 	    lockend	(this,aflagmx_lockend) ;
-	} ;
+	} ; /* end ctor */
 	operator bool () const noex {
 	    return af.test() ;
+	} ;
+	operator int () const noex {
+	    return int(af.test()) ;
 	} ;
 	bool operator = (const bool f) noex {
 	    bool	rf = false ;
@@ -105,8 +105,8 @@ struct aflag {
 	        af.clear() ;
 	    }
 	    return rf ;
-	} ;
-private:
+	} ; /* end method (operator-assignment) */
+    private:
 	int ilockbegin(int = -1) noex ;
 	int ilockend() noex ;
 } ; /* end struct (aflag) */
