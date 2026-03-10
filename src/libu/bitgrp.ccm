@@ -67,7 +67,7 @@ export module bitgrp ;
 typedef ulong	word_t ;
 
 template<typename T> constexpr T xceil(T v,int m) noex {
-	const T		n = (v + (m - 1)) / m ;
+	const T n = (v + (m - 1)) / m ;
 	return (n * m) ;
 } /* end subroutine-template (xceil) */
 
