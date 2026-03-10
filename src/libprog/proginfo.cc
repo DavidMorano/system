@@ -1,4 +1,5 @@
 /* proginfo SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* program information */
@@ -56,6 +57,9 @@
 
 #include	"proginfo.hh"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -506,7 +510,6 @@ int proginfo_progename(proginfo *pip) noex {
 	int		rs = SR_OK ;
 
 	if (pip->progename == nullptr) {
-	    shellunder_dat	su ;
 	    cchar		*efn = nullptr ;
 
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) && CF_GETEXECNAME
@@ -520,10 +523,9 @@ int proginfo_progename(proginfo *pip) noex {
 	    }
 
 	    if ((rs >= 0) && (efn == nullptr) && (efn[0] != '\0')) {
-		cchar	*cp ;
-	        if ((cp = getourenv(pip->envv,VARUNDER)) != nullptr) {
-		    if (shellunder_load(&su,cp) >= 0) {
-	                efn = su.progename ;
+		if (cchar *cp = getourenv(pip->envv,VARUNDER) ; cp) {
+	    	    if (shellunder_dat su ; shellunder_load(&su,cp) >= 0) {
+	                efn = su.execname ;
 		    }
 	        }
 	    }
