@@ -88,7 +88,7 @@
 #define	CH_ESA		0x87
 #define	CH_HTS		0x88		/* horizontal tab set */
 #define	CH_HTJ		0x89
-#define	CH_VTS		0x8A
+#define	CH_VTS		0x8A		/* vertical tab set */
 #define	CH_PLD		0x8B
 #define	CH_PLU		0x8C
 #define	CH_RI		0x8D		/* reverse index */
@@ -128,6 +128,7 @@
 #define	CH_APOSTROPHE	CH_SQUOTE	/* apostrophe */
 #define	CH_QUOTE	CH_DQUOTE	/* quote double */
 #define	CH_SLASH	CH_FSLASH	/* slash forward */
+#define	CH_DELETE	CH_DEL		/* delete */
 #define	CH_RIND		CH_RI		/* reverse index */
 
 
