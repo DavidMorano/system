@@ -289,27 +289,20 @@ consteval void charinfo::mkisprint() noex {
 } /* end method (charinfo::mkisprint) */
 
 constexpr uchar		termchars[] = {
-	CH_TAB, CH_CR, CH_NL, CH_BS,
-	CH_BEL, CH_VT, CH_FF, 
-	CH_SO, CH_SI, CH_SS2, CH_SS3,
-	CH_ESC, CH_CSI, CH_DCS
+	CH_TAB,	CH_CR,	CH_NL,	CH_BS,
+	CH_BEL,	CH_VT,	CH_FF, 
+	CH_SO,	CH_SI,	CH_SS2,	CH_SS3,
+	CH_ESC,	CH_CSI,	CH_DCS
 } ; /* end array (termchars) */
-
-consteval bool istermchar(int ch) noex {
-    	bool f = false ;
-	for (cauto &ch_t : termchars) {
-	    if ((f = (ch_t == ch))) break ;
-	} /* end for */
-	return f ;
-} /* end subroutine (istermchar) */
 
 consteval void charinfo::mkisterm() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
 	    if (((ch & 0x7f) >= 0x20) && (ch != CH_DEL)) {
 		isterm.set(ch,true) ;
-	    } else if (istermchar(ch)) {
-		isterm.set(ch,true) ;
 	    }
+	} /* end for */
+	for (cauto &ch : termchars) {
+	    isterm.set(ch,true) ;
 	} /* end for */
 } /* end method (charinfo::mkisterm) */
 
