@@ -104,8 +104,8 @@ import uconstants ;			/* |digbufsize(3u)| */
 /* forward references */
 
 static inline constexpr int ffbsi(int b) noex {
-	cuint	n = uint(b) ;
-	return std::countr_zero(n) ;	/* <- first bit set */
+	cuint	uv = uint(b) ;
+	return std::countr_zero(uv) ;	/* <- first bit set */
 }
 
 
