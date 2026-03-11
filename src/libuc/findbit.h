@@ -22,27 +22,146 @@
 
 EXTERNC_begin
 
-extern int ffbsi(uint) noex ;
-extern int ffbsl(ulong) noex ;
-extern int ffbsll(ulonglong) noex ;
+extern int ffbsi	(uint) noex ;
+extern int ffbsl	(ulong) noex ;
+extern int ffbsll	(ulonglong) noex ;
 
-extern int ffbci(uint) noex ;
-extern int ffbcl(ulong) noex ;
-extern int ffbcll(ulonglong) noex ;
+extern int ffbci	(uint) noex ;
+extern int ffbcl	(ulong) noex ;
+extern int ffbcll	(ulonglong) noex ;
 
-extern int flbsi(uint) noex ;
-extern int flbsl(ulong) ;
-extern int flbsll(ulonglong) ;
+extern int flbsi	(uint) noex ;
+extern int flbsl	(ulong) noex ;
+extern int flbsll	(ulonglong) noex ;
 
-extern int flbci(uint) noex ;
-extern int flbcl(ulong) noex ;
-extern int flbcll(ulonglong) ;
+extern int flbci	(uint) noex ;
+extern int flbcl	(ulong) noex ;
+extern int flbcll	(ulonglong) noex ;
 
-extern int fbscounti(uint) noex ;
-extern int fbscountl(ulong) noex ;
-extern int fbscountll(ulonglong) noex ;
+extern int fbscounti	(uint) noex ;
+extern int fbscountl	(ulong) noex ;
+extern int fbscountll	(ulonglong) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+inline int ffbs		(uint uv) noex {
+	return ffbsi(uv) ;
+}
+inline int ffbs		(ulong uv) noex {
+	return ffbsl(uv) ;
+}
+inline int ffbs		(ulonglong uv) noex {
+	return ffbsll(uv) ;
+}
+
+inline int ffbc		(uint uv) noex {
+	return ffbci(uv) ;
+}
+inline int ffbc		(ulong uv) noex {
+	return ffbcl(uv) ;
+}
+inline int ffbc		(ulonglong uv) noex {
+	return ffbcll(uv) ;
+}
+
+inline int flbs		(uint uv) noex {
+	return flbsi(uv) ;
+}
+inline int flbs		(ulong uv) noex {
+	return flbsl(uv) ;
+}
+inline int flbs		(ulonglong uv) noex {
+	return flbsll(uv) ;
+}
+
+inline int flbc		(uint uv) noex {
+	return flbci(uv) ;
+}
+inline int flbc		(ulong uv) noex {
+	return flbcl(uv) ;
+}
+inline int flbc		(ulonglong uv) noex {
+	return flbcll(uv) ;
+}
+
+inline int fbscount	(uint uv) noex {
+	return fbscounti(uv) ;
+}
+inline int fbscount	(ulong uv) noex {
+	return fbscountl(uv) ;
+}
+inline int fbscount	(ulonglong uv) noex {
+	return fbscountll(uv) ;
+}
+
+inline int ffbs		(int v) noex {
+    	cuint uv = uint(v) ;
+	return ffbsi(uv) ;
+}
+inline int ffbs		(long v) noex {
+    	culong uv = ulong(v) ;
+	return ffbsl(uv) ;
+}
+inline int ffbs		(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return ffbsll(uv) ;
+}
+
+inline int ffbc		(int v) noex {
+    	cuint uv = uint(v) ;
+	return ffbci(uv) ;
+}
+inline int ffbc		(long v) noex {
+    	culong uv = ulong(v) ;
+	return ffbcl(uv) ;
+}
+inline int ffbc		(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return ffbcll(uv) ;
+}
+
+inline int flbs		(int v) noex {
+    	cuint uv = uint(v) ;
+	return flbsi(uv) ;
+}
+inline int flbs		(long v) noex {
+    	culong uv = ulong(v) ;
+	return flbsl(uv) ;
+}
+inline int flbs		(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return flbsll(uv) ;
+}
+
+inline int flbc		(int v) noex {
+    	cuint uv = uint(v) ;
+	return flbci(uv) ;
+}
+inline int flbc		(long v) noex {
+    	culong uv = ulong(v) ;
+	return flbcl(uv) ;
+}
+inline int flbc		(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return flbcll(uv) ;
+}
+
+inline int fbscount	(int v) noex {
+    	cuint uv = uint(v) ;
+	return fbscounti(uv) ;
+}
+inline int fbscount	(long v) noex {
+    	culong uv = ulong(v) ;
+	return fbscountl(uv) ;
+}
+inline int fbscount	(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return fbscountll(uv) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* FINDBIT_INCLUDE */
