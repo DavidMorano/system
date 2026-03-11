@@ -126,7 +126,7 @@ namespace cfx {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        }
-	        if ((sl > 0) && isplusminus(*sp)) {
+	        if ((sl > 0) && ispm(*sp)) {
 	            *fnegp = (*sp == '-') ;
 	            sp += 1 ;
 	            sl -= 1 ;
