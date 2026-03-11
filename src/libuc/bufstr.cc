@@ -36,7 +36,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
+#include	<uclibmem.h>
 #include	<strwcpy.h>
 #include	<ctbin.h>
 #include	<ctoct.h>
@@ -46,20 +49,23 @@
 
 #include	"bufstr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
+
+template<typename T> using ctxxx_f = int (*)(char *,int,T) noex ;
 
 
 /* external subroutines */
@@ -73,10 +79,10 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int	bufstr_extend(bufstr *,int,char ** = nullptr) noex ;
+local int	bufstr_extend(bufstr *,int,char ** = nullptr) noex ;
 
 template<typename T>
-static inline int bufstr_xxxx(bufstr *op,int (*ctxxx)(char *,int,T),T v) noex {
+local inline int bufstr_xxxx(bufstr *op,ctxxx_f<T> ctxxx,T v) noex {
 	cint		dlen = DIGBUFLEN ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -93,25 +99,25 @@ static inline int bufstr_xxxx(bufstr *op,int (*ctxxx)(char *,int,T),T v) noex {
 /* end subroutine-template (bufstr_xxxx) */
 
 template<typename T>
-static inline int bufstr_binx(bufstr *sbp,T v) noex {
+local inline int bufstr_binx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,ctbin,v) ;
 }
 /* end subroutine-template (bufstr_binx) */
 
 template<typename T>
-static inline int bufstr_octx(bufstr *sbp,T v) noex {
+local inline int bufstr_octx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,ctoct,v) ;
 }
 /* end subroutine-template (bufstr_octx) */
 
 template<typename T>
-static inline int bufstr_decx(bufstr *sbp,T v) noex {
+local inline int bufstr_decx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,ctdec,v) ;
 }
 /* end subroutine-template (bufstr_decx) */
 
 template<typename T>
-static inline int bufstr_hexx(bufstr *sbp,T v) noex {
+local inline int bufstr_hexx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,cthex,v) ;
 }
 /* end subroutine-template (bufstr_hexx) */
@@ -133,7 +139,7 @@ int bufstr_start(bufstr *op) noex {
 	    op->dlen = 0 ;
 	    op->dbuf = nullptr ;
 	    op->sbuf[0] = '\0' ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (bufstr_start) */
@@ -144,8 +150,8 @@ int bufstr_finish(bufstr *op) noex {
 	int		len = 0 ;
 	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->dbuf) {
-	        rs1 = uc_free(op->dbuf) ;
+	    if (op->dbuf) ylikely {
+	        rs1 = lm_free(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
 	    }
@@ -177,7 +183,7 @@ int bufstr_chr(bufstr *op,int ch) noex {
 	if (op) ylikely {
 	    char	buf[2] = { char(ch) } ;
 	    rs = bufstr_strw(op,buf,1) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (bufstr_chr) */
@@ -322,7 +328,7 @@ int bufstr_hexull(bufstr *sbp,ulonglong uv) noex {
 
 /* private subroutines */
 
-static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
+local int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 	cint		slen = BUFSTR_LEN ;
 	int		rs = SR_OK ;
 	char		*dp{} ;
@@ -330,7 +336,7 @@ static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 	    cint	rlen = (slen-op->len) ;
 	    if (nlen > rlen) {
 	    	cint	dlen = max((slen + nlen),(slen * 2)) ;
-		if ((rs = uc_malloc((dlen+1),&dp)) >= 0) {
+		if ((rs = lm_mall((dlen+1),&dp)) >= 0) {
 		    op->dlen = dlen ;
 		    op->dbuf = dp ;
 		    dp = strwcpy(dp,op->sbuf,op->len) ;
@@ -342,7 +348,7 @@ static int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 	    cint	rlen = (op->dlen - op->len) ;
 	    if (nlen > rlen) {
 		cint	dlen = (op->dlen + nlen+slen) ;
-		if ((rs = uc_realloc(op->dbuf,(dlen+1),&dp)) >= 0) {
+		if ((rs = lm_rall(op->dbuf,(dlen+1),&dp)) >= 0) ylikely {
 		    op->dbuf = dp ;
 		    op->dlen = dlen ;
 		}
@@ -377,7 +383,7 @@ void bufstr::dtor() noex {
 
 bufstr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case bufstrmem_start:
 	        rs = bufstr_start(op) ;
