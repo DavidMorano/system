@@ -21,20 +21,17 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 
 
 EXTERNC_begin
 
-extern int cthexstring(char *,int,int,cchar *,int) noex ;
+extern int	cthexstr(char *,int,int,cchar *,int) noex ;
 
-static inline int cthexstr(char *dp,int dl,cchar *sp,int sl) noex {
+static inline int cthexstring(char *dp,int dl,cchar *sp,int sl) noex {
 	cint	f = true ;
-	return cthexstring(dp,dl,f,sp,sl) ;
+	return cthexstr(dp,dl,f,sp,sl) ;
 }
 
 EXTERNC_end
