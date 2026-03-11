@@ -27,10 +27,11 @@
 	base128_dec		- access to the decoder table
 
 	Description:
-	We perform both BASE64 encoding and decoding operations
-	with the subroutines |base128_e| and |base128_d| respectively.
-	The |base128_dec| subroutine provides access to the decoder
-	table.
+	These subroutines faciilitate both the encoding and decoding
+	of the so-called 'base128' coding scheme.  This is (currently)
+	not standardized.  Further, unlike the very popular 'base64'
+	coding scheme, this present scheme performs a little-endian
+	approch towards the byte encoding.
 
 	Synopsis:
 	int base128_e(cchar *inbuf,int len,char *outbuf) noex
@@ -54,9 +55,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
+#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdint>		/* |uint64_t| */
+#include	<bit>			/* |countl_zero(3c++)| */
+#include	<concepts>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<mkchar.h>		/* |mkchar(3uc)| */
@@ -64,11 +68,19 @@
 
 #include	"base128.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+
+import findbit ;			/* |ffbs(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using std::integral ;			/* concept */
+using std::countl_zero ;		/* subroutine */
 
 
 /* local typedefs */
@@ -82,12 +94,14 @@
 
 /* local structures */
 
+constexpr int		base = 128 ;
+constexpr int		enclen = 128 ;
 constexpr int		chx_equal = 0xFE ; /* special value in decoder table */
 
 namespace {
     constexpr int	tablen = (UCHAR_MAX + 1) ;
     struct helper {
-	uchar		enc[128] ;
+	uchar		enc[enclen] ;
 	uchar		dec[tablen] ;
 	constexpr void helper_mkenc() noex {
     	    int	i = 0 ;
@@ -134,14 +148,20 @@ namespace {
 
 /* forward references */
 
-local int	base128_dg(cchar *,char *) noex ;
+template <integral T> consteval int nzeros(T v) noex {
+    	return ffbs(v) ;
+} /* end subroutine (nzeros) */
 
-local void	base128_eg(cchar *,char *) noex ;
+local int		base128_dg(cchar *,char *) noex ;
+
+local void		base128_eg(cchar *,char *) noex ;
 
 
 /* local variables */
 
 constexpr helper	base128mgr ;
+
+constexpr int		bits = nzeros(base) ;
 
 constexpr bool		f_comment = false ;
 
@@ -151,35 +171,40 @@ constexpr bool		f_comment = false ;
 
 /* exported subroutines */
 
-int base128_e(cchar *inbuf,int len,char *outbuf) noex {
-	int		i = 0 ;
-	int		j = 0 ; /* return-value */
-	char		altinbuf[4] ;
-	while ((len - i) >= 3) {
-	    base128_eg((inbuf + i),(outbuf + j)) ;
-	    i += 3 ;
-	    j += 4 ;
+int base128_e(cchar *inbuf,int inlen,char *outbuf) noex {
+    	int		i = 0 ;
+	int		ol = 0 ; /* return-value */
+	while ((inlen - i) >= 7) {
+	    base128_eg((inbuf + i),(outbuf + ol)) ;
+	    i += 7 ;
+	    ol += 8 ;
 	} /* end while */
-	switch (len - i) {
-	case 1:
-	    altinbuf[0] = inbuf[i] ;
-	    altinbuf[1] = 0x00 ;
-	    altinbuf[2] = 0x00 ;
-	    base128_eg(altinbuf,(outbuf + j)) ;
-	    outbuf[j + 2] = '=' ;
-	    outbuf[j + 3] = '=' ;
-	    j += 4 ;
-	    break ;
-	case 2:
-	    altinbuf[0] = inbuf[i] ;
-	    altinbuf[1] = inbuf[i + 1] ;
-	    altinbuf[2] = 0x00 ;
-	    base128_eg(altinbuf,outbuf + j) ;
-	    outbuf[j + 3] = '=' ;
-	    j += 4 ;
-	    break ;
-	} /* end switch */
-	return j ;
+	if (cint n = (inlen - i) ; n > 0) {
+	    char abuf[8] ;
+	    memcopy(abuf,inbuf,n) ;
+	    memclear((abuf + n),(8 - n)) ;
+	    base128_enc(abuf,(obuf + ol)) ;
+	    switch (inlen - i) {
+	    case 1:
+	        altinbuf[0] = inbuf[i] ;
+	        altinbuf[1] = 0x00 ;
+	        altinbuf[2] = 0x00 ;
+	        base128_eg(altinbuf,(outbuf + j)) ;
+	        outbuf[ol + 2] = chx_equal ;
+	        outbuf[ol + 3] = '=' ;
+	        ol += 4 ;
+	        break ;
+	    case 2:
+	        altinbuf[0] = inbuf[i] ;
+	        altinbuf[1] = inbuf[i + 1] ;
+	        altinbuf[2] = 0x00 ;
+	        base128_eg(altinbuf,outbuf + ol) ;
+	        outbuf[ol + 3] = '=' ;
+	        ol += 4 ;
+	        break ;
+	    } /* end switch */
+	} /* end block */
+	return ol ;
 }
 /* end subroutine (base128_e) */
 
@@ -187,10 +212,10 @@ int base128_e(cchar *inbuf,int len,char *outbuf) noex {
 int base128_d(cchar *inbuf,int len,char *outbuf) noex {
 	int		j = 0 ; /* return-value */
 	for (int i = 0 ; (j >= 0) && (len >= 4) ; ) {
-	    if (int dlen ; (dlen = base128_dg((inbuf + i),(outbuf + j))) >= 0) {
+	    if (int dl ; (dl = base128_dg((inbuf + i),(outbuf + j))) >= 0) {
 	        len -= 4 ;
 	        i += 4 ;
-	        j += dlen ;
+	        j += dl ;
 	    } else {
 		j = -1 ;
 	    }
@@ -200,7 +225,7 @@ int base128_d(cchar *inbuf,int len,char *outbuf) noex {
 /* end subroutine (base128_d) */
 
 int base128_enc(int v) noex {
-    	return int(base128mgr.enc[v & UCHAR_MAX]) ;
+    	return int(base128mgr.enc[v & (base - 1)]) ;
 }
 
 int base128_dec(int v) noex {
@@ -210,17 +235,26 @@ int base128_dec(int v) noex {
 
 /* local subroutines */
 
+local uint64_t mkhold(cchar *inbuf,int n) noex {
+    	uint64_t	hold = 0 ;
+	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
+	    hold <<= CHAR_BIT ;
+	    hold |= uint64_t(inbuf[i] & UCHAR_MAX) ;
+	} /* end for */
+	return hold ;
+} /* end subroutine (mkhold) */
+
+local void encbuf(char *obuf,int olen,const uint64_t hold) noex {
+	for (int i = 0 ; i < olen ; i += 1) {
+	    cint idx = intconv((hold >> (i * bits)) & (base - 1)) ;
+	    obuf[i] = base128mgr.enc[idx] ;
+	} /* end for */
+} /* end subroutine (encbuf) */
+
 /* encode a group */
-local void base128_eg(cchar *inbuf,char *outbuf) noex {
-	uint		hold = 0 ;
-	for (int i = 0 ; i < 3 ; i += 1) {
-	    hold = (hold << 8) ;
-	    hold |= mkchar(inbuf[i]) ;
-	} /* end for */
-	for (int i = 0 ; i < 4 ; i += 1) {
-	    cint	idx = (hold >> ((3 - i) * 6)) & 0x3F ;
-	    outbuf[i] = base128mgr.enc[idx] ;
-	} /* end for */
+local void base128_eg(cchar *inbuf,char *obuf) noex {
+	const uint64_t	hold = mkhold(inbuf,7) ;
+	encbuf(obuf,8,hold) ;
 }
 /* end subroutine (base128_eg) */
 
