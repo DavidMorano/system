@@ -1,4 +1,4 @@
-/* cfalphax MODULE (primary-module-interface) */
+/* cfalphax HEADER */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -57,7 +57,9 @@
 
 *******************************************************************************/
 
-module ;
+#ifndef	CFALPHAX_INCLUDE
+#define	CFALPHAX_INCLUDE
+
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |CHAR_BIT| */
@@ -74,108 +76,7 @@ module ;
 #include	<ischarx.h>		/* |isplusminus(2uc)| */
 #include	<localmisc.h>
 
-export module cfalphax ;
 
-template<stdintx T> struct cfashelp {
-	cint		nb = (CHAR_BIT * szof(T)) ;
-	T		*rp = nullptr ;
-	T		val = 0 ;	/* value to create */
-	T		cutoff ;
-	T		tmax = 0 ;	/* type-maximum value */
-	T		tmin{} ;	/* type-minimum value */
-	int		cutlim ;
-	int		sl ;
-	int		base ;
-	bool		fneg = false ;
-	cchar		*sp ;
-	cfashelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
-	    const T	one = 1 ;
-	    tmin = (one << (nb - 1)) ;
-	    tmax = (compl tmax) & (compl tmin) ;
-	    base = b ;
-	    rp = arp ;
-	} ; /* end ctor */
-	int getsign() noex {
-    	    cint rs = cfx::getsign(sp,sl,&fneg) ;
-	    sp += (sl - rs) ;
-	    sl = rs ;
-	    return rs ;
-	} ; /* end if (getsign) */
-	void prepare() noex {
-	    cutoff = fneg ? tmin : tmax ;
-	    cutlim = int(cutoff % base) ;
-	    cutoff /= base ;
-	    if (fneg) {
-		if (cutlim > 0) {
-		    cutlim -= base ;
-		    cutoff += 1 ;
-		}
-		cutlim = (- cutlim) ;
-	    }
-	} ; /* end method (prepare) */
-	int getval(int ch) noex {
-	    int		rs = SR_INVALID ;
-	    if ((ch >= 'A') && (ch <= 'Z')) {
-		rs = (ch - 'A') ;
-	    } else if ((ch >= 'a') && (ch <= 'z')) {
-		rs = (ch - 'a') ;
-	    }
-	    if (rs >= base) {
-		rs = SR_DOM ;
-	    }
-	    return rs ;
-	} ; /* end method (getval) */
-	int proc() noex {
-	    int		rs = SR_INVALID ;
-	    if (fneg) {
-	        while (sl && ((rs = getval(*sp)) >= 0)) {
-		    cint	nv = rs ;
-		    if ((val < cutoff) || (val == cutoff && nv > cutlim)) {
-			rs = SR_RANGE ;
-		    } else {
-		        val *= base ;
-		        val -= nv ;
-		    }
-		    sp += 1 ;
-		    sl -= 1 ;
-		    if (rs < 0) break ;
-	        } /* end while */
-	    } else {
-	    	while (sl && ((rs = getval(*sp)) >= 0)) {
-		    cint	nv = rs ;
-		    if ((val > cutoff) || (val == cutoff && nv > cutlim)) {
-			rs = SR_RANGE ;
-		    } else {
-			val *= base ;
-			val += nv ;
-		    }
-		    sp += 1 ;
-		    sl -= 1 ;
-		    if (rs < 0) break ;
-	        } /* end while */
-	    } /* end if (sign) */
-	    *rp = (rs >= 0) ? val : 0 ;
-	    return rs ;
-	} ; /* end method (proc) */
-	operator int () noex {
-	    int		rs ;
-	    if ((rs = getsign()) >= 0) {
-		prepare() ;
-		rs = proc() ;
-	    }
-	    return rs ;
-	} ;
-} ; /* end struct (cfashelp) */
-
-export {
-    template<typename T> inline int cfalphax(cc *sp,int sl,int b,T *rp) noex {
-	int		rs = SR_FAULT ;
-	if (sp && rp) {
-	   cfashelp cfo(sp,sl,b,rp) ;
-	   rs = cfo ;
-	} /* end if (non-null) */
-	return rs ;
-    } /* end subroutine-template (cfalphax) */
-} /* end export */
+#endif /* CFALPHAX_INCLUDE */
 
 
