@@ -90,7 +90,7 @@ namespace {
 	alloc(digit *p,int sz) noex : a(p), asz(sz) { } ;
 	int resize(int nsz) noex ;
     } ; /* end struct (alloc) */
-}
+} /* end namespace */
 
 
 /* forward references */
