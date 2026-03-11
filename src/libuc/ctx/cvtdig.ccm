@@ -70,6 +70,7 @@ module ;
 #include	<bit>			/* <- for |countr_zero(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<localmisc.h>
 
 #pragma		GCC dependency		"mod/digtab.ccm"
 
