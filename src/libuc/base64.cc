@@ -41,10 +41,12 @@
 	base64_dec		- access to the decoder table
 
 	Description:
-	We perform both BASE64 encoding and decoding operations
+	I perform both BASE64 encoding and decoding operations
 	with the subroutines |base64_e| and |base64_d| respectively.
 	The |base64_dec| subroutine provides access to the decoder
-	table.
+	table.  This encoding method is extensively documented
+	elsehere.  So interested readers are encouraged to seek
+	out the standard documentation.
 
 	Synopsis:
 	int base64_e(cchar *inbuf,int len,char *outbuf) noex
@@ -71,6 +73,9 @@
 #include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdint>		/* |uint32_t| */
+#include	<bit>			/* |countl_zero(3c++)| */
+#include	<concepts>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<mkchar.h>		/* |mkchar(3uc)| */
@@ -78,11 +83,19 @@
 
 #include	"base64.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+
+import findbit ;			/* |ffbs(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using std::integral ;			/* concept */
+using std::countl_zero ;		/* subroutine */
 
 
 /* local typedefs */
@@ -96,6 +109,7 @@
 
 /* local structures */
 
+constexpr int		base = 64 ;
 constexpr int		chx_equal = 0xFE ; /* special value in decoder table */
 
 /* encode table */
@@ -130,6 +144,10 @@ namespace {
 
 /* forward references */
 
+template <integral T> constexpr int nzeros(T v) noex {
+    	return ffbs(v) ;
+} /* end subroutine (nzeros) */
+
 local int	base64_dg(cchar *,char *) noex ;
 
 local void	base64_eg(cchar *,char *) noex ;
@@ -139,6 +157,8 @@ local void	base64_eg(cchar *,char *) noex ;
 
 constexpr mkdecoder	base64decode ;
 
+constexpr int		bits = nzeros(base) ;
+
 constexpr bool		f_comment = false ;
 
 
@@ -147,34 +167,36 @@ constexpr bool		f_comment = false ;
 
 /* exported subroutines */
 
-int base64_e(cchar *inbuf,int len,char *outbuf) noex {
-	int		i = 0 ;
+int base64_e(cchar *inbuf,int inlen,char *outbuf) noex {
+    	int		i = 0 ;
 	int		j = 0 ; /* return-value */
-	char		altinbuf[4] ;
-	while ((len - i) >= 3) {
+	while ((inlen - i) >= 3) {
 	    base64_eg((inbuf + i),(outbuf + j)) ;
 	    i += 3 ;
 	    j += 4 ;
 	} /* end while */
-	switch (len - i) {
-	case 1:
-	    altinbuf[0] = inbuf[i] ;
-	    altinbuf[1] = 0x00 ;
-	    altinbuf[2] = 0x00 ;
-	    base64_eg(altinbuf,(outbuf + j)) ;
-	    outbuf[j + 2] = '=' ;
-	    outbuf[j + 3] = '=' ;
-	    j += 4 ;
-	    break ;
-	case 2:
-	    altinbuf[0] = inbuf[i + 0] ;
-	    altinbuf[1] = inbuf[i + 1] ;
-	    altinbuf[2] = 0x00 ;
-	    base64_eg(altinbuf,outbuf + j) ;
-	    outbuf[j + 3] = '=' ;
-	    j += 4 ;
-	    break ;
-	} /* end switch */
+	{
+	    char altinbuf[4] ;
+	    switch (inlen - i) {
+	    case 1:
+	        altinbuf[0] = inbuf[i] ;
+	        altinbuf[1] = 0x00 ;
+	        altinbuf[2] = 0x00 ;
+	        base64_eg(altinbuf,(outbuf + j)) ;
+	        outbuf[j + 2] = '=' ;
+	        outbuf[j + 3] = '=' ;
+	        j += 4 ;
+	        break ;
+	    case 2:
+	        altinbuf[0] = inbuf[i + 0] ;
+	        altinbuf[1] = inbuf[i + 1] ;
+	        altinbuf[2] = 0x00 ;
+	        base64_eg(altinbuf,outbuf + j) ;
+	        outbuf[j + 3] = '=' ;
+	        j += 4 ;
+	        break ;
+	    } /* end switch */
+	} /* end block */
 	return j ;
 }
 /* end subroutine (base64_e) */
@@ -183,10 +205,10 @@ int base64_e(cchar *inbuf,int len,char *outbuf) noex {
 int base64_d(cchar *inbuf,int len,char *outbuf) noex {
 	int		j = 0 ; /* return-value */
 	for (int i = 0 ; (j >= 0) && (len >= 4) ; ) {
-	    if (int dlen ; (dlen = base64_dg((inbuf + i),(outbuf + j))) >= 0) {
+	    if (int dl ; (dl = base64_dg((inbuf + i),(outbuf + j))) >= 0) {
 	        len -= 4 ;
 	        i += 4 ;
-	        j += dlen ;
+	        j += dl ;
 	    } else {
 		j = -1 ;
 	    }
@@ -196,7 +218,7 @@ int base64_d(cchar *inbuf,int len,char *outbuf) noex {
 /* end subroutine (base64_d) */
 
 int base64_enc(int v) noex {
-    	return int(base64_et[v & UCHAR_MAX]) ;
+    	return int(base64_et[v & (base - 1)]) ;
 }
 
 int base64_dec(int v) noex {
@@ -207,14 +229,15 @@ int base64_dec(int v) noex {
 /* local subroutines */
 
 /* encode a group */
-static void base64_eg(cchar *inbuf,char *outbuf) noex {
+local void base64_eg(cchar *inbuf,char *outbuf) noex {
 	uint32_t	hold = 0 ;
-	for (int i = 0 ; i < 3 ; i += 1) {
+	cint		n = 3 ;
+	for (int i = 0 ; i < n ; i += 1) {
 	    hold <<= CHAR_BIT ;
 	    hold |= uint32_t(mkchar(inbuf[i])) ;
 	} /* end for */
 	for (int i = 0 ; i < 4 ; i += 1) {
-	    cint	idx = int((hold >> ((3 - i) * 6)) & 0x3F) ;
+	    cint	idx = int((hold >> ((n - i) * bits)) & (base - 1)) ;
 	    outbuf[i] = base64_et[idx] ;
 	} /* end for */
 }
@@ -228,7 +251,7 @@ local int base64_dg(cchar *inbuf,char *outbuf) noex {
 	for (int i = 0 ; i < 4 ; i += 1) {
 	    cint	ich = mkchar(inbuf[i]) ;
 	    if (int ch ; (ch = mkchar(base64decode.tab[ich])) != UCHAR_MAX) {
-	        hold <<= 6 ;
+	        hold <<= bits ;
 	        if (ch != chx_equal) {
 	            hold |= uint32_t(ch) ;
 	            dlen += 1 ;
@@ -241,7 +264,7 @@ local int base64_dg(cchar *inbuf,char *outbuf) noex {
 	if (rs >= 0) ylikely {
 	    if_constexpr (f_comment) {
 	        for (int i = 0 ; i < 3 ; i += 1) {
-	            outbuf[i] = char(hold >> ((2 - i) * 6)) ;
+	            outbuf[i] = char(hold >> ((2 - i) * bits)) ;
 	        }
 	        dlen -= 1 ;
 	    } else {
