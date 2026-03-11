@@ -1,4 +1,4 @@
-# MAKEFILES (ctx)
+# MAKEFILE (ctx)
 
 T= ctx
 
@@ -40,7 +40,7 @@ MODS += uconstants.ccm digtab.ccm cvtdig.ccm cvtfloat.ccm
 LIBS=
 
 
-OBJ0_CTX= cvtdig.o cvtfloat.o
+OBJ0_CTX= cvtdig.o cvtfloat.o convertx.o
 OBJ1_CTX= ctbin.o 
 OBJ2_CTX= ctoct.o
 OBJ3_CTX= ctdec.o ctdecp.o ctdecf.o
@@ -59,7 +59,6 @@ OBJ_CTX= obja_ctx.o objb_ctx.o
 INCDIRS=
 
 LIBDIRS= -L${LIBDIR}
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -167,15 +166,24 @@ ctxxx.o:		mods.o ctxxx.cc ctxxx.h		$(INCS)
 ctroman.o:		mods.o ctroman.cc ctroman.h	$(INCS)
 ctwords.o:		mods.o ctwords.cc ctwords.hh	$(INCS)
 
-MOBJ += uconstants.o digtab.o cvtdig.o cvtfloat.o
+MOBJ += uconstants.o umods.o cvtdig.o cvtfloat.o
 
 mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
-variables.o:		uconstants.ccm
-digtab.o:		digtab.ccm
-
 cvtdig.o:		cvtdig.ccm 			$(INCS)
 cvtfloat.o:		cvtfloat.ccm 			$(INCS)
+
+convertx.o:		convertx.cc	convertx.h	$(INCS)
+
+# UCONSTANTS
+uconstants.o:		uconstants.dir
+uconstants.dir:
+	makesubdir $@
+
+# UMODS
+umods.o:		umods.dir
+umods.dir:
+	makesubdir $@
 
 
