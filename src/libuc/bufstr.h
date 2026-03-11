@@ -33,10 +33,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 
 
@@ -49,7 +46,7 @@ struct bufstr_head {
 	int		dlen ;		/* extent */
 	int		len ;		/* index (active length) */
 	char		sbuf[BUFSTR_LEN + 1] ; /* static-buffer */
-} ; /* end struct (bufstr) */
+} ; /* end struct (bufstr_head) */
 
 #ifdef	__cplusplus
 enum bufstrmems {
@@ -83,13 +80,13 @@ struct bufstr : bufstr_head {
 	} ; /* end ctor */
 	bufstr(const bufstr &) = delete ;
 	bufstr &operator = (const bufstr &) = delete ;
-	int strw(cchar *,int = -1) noex ;
-	int chr(int) noex ;
-	int get(cchar **) noex ;
-	template<typename Binary> int bin(Binary) noex ;
-	template<typename Octal> int oct(Octal) noex ;
-	template<typename Decimal> int dec(Decimal) noex ;
-	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
+	int strw	(cchar *,int = -1) noex ;
+	int chr		(int) noex ;
+	int get		(cchar **) noex ;
+	template<typename Binary>	int bin(Binary) noex ;
+	template<typename Octal>	int oct(Octal) noex ;
+	template<typename Decimal>	int dec(Decimal) noex ;
+	template<typename Hexadecimal>	int hex(Hexadecimal) noex ;
 	void dtor() noex ;
 	destruct bufstr() {
 	    if (dbuf) dtor() ;
@@ -101,35 +98,40 @@ typedef BUFFER		bufstr ;
 
 EXTERNC_begin
 
-extern int	bufstr_start(bufstr *) noex ;
-extern int	bufstr_strw(bufstr *,cchar *,int) noex ;
-extern int	bufstr_chr(bufstr *,int) noex ;
-extern int	bufstr_bini(bufstr *,int) noex ;
-extern int	bufstr_binl(bufstr *,long) noex ;
-extern int	bufstr_binll(bufstr *,longlong) noex ;
-extern int	bufstr_binui(bufstr *,uint) noex ;
-extern int	bufstr_binul(bufstr *,ulong) noex ;
-extern int	bufstr_binull(bufstr *,ulonglong) noex ;
-extern int	bufstr_octi(bufstr *,int) noex ;
-extern int	bufstr_octl(bufstr *,long) noex ;
-extern int	bufstr_octll(bufstr *,longlong) noex ;
-extern int	bufstr_octui(bufstr *,uint) noex ;
-extern int	bufstr_octul(bufstr *,ulong) noex ;
-extern int	bufstr_octull(bufstr *,ulonglong) noex ;
-extern int	bufstr_deci(bufstr *,int) noex ;
-extern int	bufstr_decl(bufstr *,long) noex ;
-extern int	bufstr_decll(bufstr *,longlong) noex ;
-extern int	bufstr_decui(bufstr *,uint) noex ;
-extern int	bufstr_decul(bufstr *,ulong) noex ;
-extern int	bufstr_decull(bufstr *,ulonglong) noex ;
-extern int	bufstr_hexi(bufstr *,int) noex ;
-extern int	bufstr_hexl(bufstr *,long) noex ;
-extern int	bufstr_hexll(bufstr *,longlong) noex ;
-extern int	bufstr_hexui(bufstr *,uint) noex ;
-extern int	bufstr_hexul(bufstr *,ulong) noex ;
-extern int	bufstr_hexull(bufstr *,ulonglong) noex ;
-extern int	bufstr_get(bufstr *,cchar **) noex ;
-extern int	bufstr_finish(bufstr *) noex ;
+extern int	bufstr_start	(bufstr *) noex ;
+extern int	bufstr_strw	(bufstr *,cchar *,int) noex ;
+extern int	bufstr_chr	(bufstr *,int) noex ;
+
+extern int	bufstr_bini	(bufstr *,int) noex ;
+extern int	bufstr_binl	(bufstr *,long) noex ;
+extern int	bufstr_binll	(bufstr *,longlong) noex ;
+extern int	bufstr_binui	(bufstr *,uint) noex ;
+extern int	bufstr_binul	(bufstr *,ulong) noex ;
+extern int	bufstr_binull	(bufstr *,ulonglong) noex ;
+
+extern int	bufstr_octi	(bufstr *,int) noex ;
+extern int	bufstr_octl	(bufstr *,long) noex ;
+extern int	bufstr_octll	(bufstr *,longlong) noex ;
+extern int	bufstr_octui	(bufstr *,uint) noex ;
+extern int	bufstr_octul	(bufstr *,ulong) noex ;
+extern int	bufstr_octull	(bufstr *,ulonglong) noex ;
+
+extern int	bufstr_deci	(bufstr *,int) noex ;
+extern int	bufstr_decl	(bufstr *,long) noex ;
+extern int	bufstr_decll	(bufstr *,longlong) noex ;
+extern int	bufstr_decui	(bufstr *,uint) noex ;
+extern int	bufstr_decul	(bufstr *,ulong) noex ;
+extern int	bufstr_decull	(bufstr *,ulonglong) noex ;
+
+extern int	bufstr_hexi	(bufstr *,int) noex ;
+extern int	bufstr_hexl	(bufstr *,long) noex ;
+extern int	bufstr_hexll	(bufstr *,longlong) noex ;
+extern int	bufstr_hexui	(bufstr *,uint) noex ;
+extern int	bufstr_hexul	(bufstr *,ulong) noex ;
+extern int	bufstr_hexull	(bufstr *,ulonglong) noex ;
+
+extern int	bufstr_get	(bufstr *,cchar **) noex ;
+extern int	bufstr_finish	(bufstr *) noex ;
 
 EXTERNC_end
 
