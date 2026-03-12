@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	MSGBUF		struct msgbuf_head
@@ -34,7 +35,7 @@ struct msgbuf_head {
 	int		mlen ;
 	int		bl ;
 	int		neof ;
-} ;
+} ; /* end struct (msgbuf_head) */
 
 typedef	MSGBUF		msgbuf ;
 
