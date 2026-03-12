@@ -23,16 +23,13 @@
 #include	<sys/types.h>		/* system types */
 #include	<unistd.h>		/* |off_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	ENTBUF_MAGIC	1092847456
-#define	ENTBUF_NENTS	4
 #define	ENTBUF		struct entbuf_head
 #define	ENTBUF_WAY	struct entbuf_wayer
+#define	ENTBUF_MAGIC	1092847456
+#define	ENTBUF_NENTS	4
 
 
 struct entbuf_wayer {
@@ -41,20 +38,20 @@ struct entbuf_wayer {
 	uint		utime ;		/* usage time */
 	int		wlen ;
 	int		nvalid ;	/* number of valid entries */
-} ;
+} ; /* end struct */
 
 struct entbuf_head {
 	ENTBUF_WAY	*ways ;
-	uint		magic ;
+	uint		magval ;
 	uint		utimer ;	/* usage timer (fake time) */
 	uint		soff ;		/* starting offset */
-	int		esize ;		/* entry size */
+	int		esz ;		/* entry size */
 	int		nways ;		/* maximum number of ways */
 	int		iways ;		/* active number of ways */
 	int		npw ;		/* number entries per way */
 	int		nentries ;	/* number of total entries */
 	int		fd ;
-} ;
+} ; /* end struct */
 
 typedef ENTBUF		entbuf ;
 typedef	ENTBUF_WAY	entbuf_way ;
