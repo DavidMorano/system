@@ -33,7 +33,9 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<hdb.h>
 #include	<vecobj.h>
 #include	<ptm.h>
@@ -42,7 +44,9 @@
 
 #include	"rtags.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -57,7 +61,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -77,23 +80,23 @@ using std::nothrow ;			/* constant */
 struct rtags_fname {
 	cchar		*name ;
 	int		fi ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int rtags_ctor(rtags *op,Args ... args) noex {
+local int rtags_ctor(rtags *op,Args ... args) noex {
     	RTAGS		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->flp = new(nothrow) vecobj) != np) {
-	        if ((op->tlp = new(nothrow) vecobj) != np) {
-	            if ((op->hdp = new(nothrow) hdb) != np) {
-	                if ((op->mxp = new(nothrow) ptm) != np) {
+	    if ((op->flp = new(nothrow) vecobj) != np) ylikely {
+	        if ((op->tlp = new(nothrow) vecobj) != np) ylikely {
+	            if ((op->hdp = new(nothrow) hdb) != np) ylikely {
+	                if ((op->mxp = new(nothrow) ptm) != np) ylikely {
 			    rs = SR_OK ;
 			}
 		        if (rs < 0) {
@@ -113,55 +116,52 @@ static int rtags_ctor(rtags *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (rtags_ctor) */
+} /* end subroutine (rtags_ctor) */
 
-static int rtags_dtor(rtags *op) noex {
+local int rtags_dtor(rtags *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->mxp) {
+	    if (op->mxp) ylikely {
 		delete op->mxp ;
 		op->mxp = nullptr ;
 	    }
-	    if (op->hdp) {
+	    if (op->hdp) ylikely {
 		delete op->hdp ;
 		op->hdp = nullptr ;
 	    }
-	    if (op->tlp) {
+	    if (op->tlp) ylikely {
 		delete op->tlp ;
 		op->tlp = nullptr ;
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (rtags_dtor) */
+} /* end subroutine (rtags_dtor) */
 
 template<typename ... Args>
-static inline int rtags_magic(rtags *op,Args ... args) noex {
+local inline int rtags_magic(rtags *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == RTAGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (rtags_magic) */
+} /* end subroutine (rtags_magic) */
 
-static int	fname_start(FNAME *,cc *,int,int) noex ;
-static int	fname_finish(FNAME *) noex ;
+local int	fname_start(FNAME *,cc *,int,int) noex ;
+local int	fname_finish(FNAME *) noex ;
 
-static int	tagent_start(RT_TAG *,int,int,int) noex ;
-static int	tagent_finish(RT_TAG *) noex ;
+local int	tagent_start(RT_TAG *,int,int,int) noex ;
+local int	tagent_finish(RT_TAG *) noex ;
 
 extern "C" {
-    static int	vcmpdef(cvoid **,cvoid **) noex ;
+    local int	vcmpdef(cvoid **,cvoid **) noex ;
 }
 
-static int	cmpdefe(RT_TAG *,RT_TAG *) noex ;
+local int	cmpdefe(RT_TAG *,RT_TAG *) noex ;
 
 
 /* local variables */
@@ -176,15 +176,16 @@ int rtags_start(rtags *op,int vn) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	if (vn < NDEFS) vn = NDEFS ;
-	if ((rs = rtags_ctor(op)) >= 0) {
-	    if ((rs = hdb_start(op->hdp,vn,1,np,np)) >= 0) {
+	if ((rs = rtags_ctor(op)) >= 0) ylikely {
+	    if ((rs = hdb_start(op->hdp,vn,1,np,np)) >= 0) ylikely {
 	        int	vo = VECOBJ_OSTATIONARY ;
 	        int	vsz = szof(FNAME) ;
-	        if ((rs = vecobj_start(op->flp,vsz,vn,vo)) >= 0) {
+	        if ((rs = vecobj_start(op->flp,vsz,vn,vo)) >= 0) ylikely {
 	            vsz = szof(RT_TAG) ;
 	            vo = 0 ;
-	            if ((rs = vecobj_start(op->tlp,vsz,vn,vo)) >= 0) {
-	                if ((rs = ptm_create(op->mxp,np)) >= 0) {
+	            if ((rs = vecobj_start(op->tlp,vsz,vn,vo)) >= 0) ylikely {
+	    	        ptm *mxp = op->mxp ;
+	                if ((rs = mxp->create) >= 0) ylikely {
 	                    op->magic = RTAGS_MAGIC ;
 	                }
 	                if (rs < 0) {
@@ -210,9 +211,10 @@ int rtags_start(rtags *op,int vn) noex {
 int rtags_finish(rtags *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = rtags_magic(op)) >= 0) {
+	if ((rs = rtags_magic(op)) >= 0) ylikely {
 	    if (op->mxp) {
-	        rs1 = ptm_destroy(op->mxp) ;
+	    	ptm *mxp = op->mxp ;
+	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    /* free up all files */
@@ -225,15 +227,15 @@ int rtags_finish(rtags *op) noex {
 	        }
 	    } /* end for */
 	    /* free up all tags */
-	    if (op->tlp) {
+	    if (op->tlp) ylikely {
 		rs1 = vecobj_finish(op->tlp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 		rs1 = vecobj_finish(op->flp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->hdp) {
+	    if (op->hdp) ylikely {
 		rs1 = hdb_finish(op->hdp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -250,9 +252,9 @@ int rtags_finish(rtags *op) noex {
 int rtags_add(rtags *op,RT_TAG *tip,cchar *fp,int fl) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = rtags_magic(op,tip,fp)) >= 0) {
+	if ((rs = rtags_magic(op,tip,fp)) >= 0) ylikely {
 	    ptm		*mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) {
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        hdb_dat		key ;
 	        hdb_dat		val ;
 	        cint		nrs = SR_NOTFOUND ;
@@ -446,11 +448,11 @@ int rtags_count(rtags *op) noex {
 
 /* private subroutines */
 
-static int fname_start(FNAME *fep,cc *fp,int fl,int fi) noex {
+local int fname_start(FNAME *fep,cc *fp,int fl,int fi) noex {
 	int		rs = SR_FAULT ;
 	if (fep && fp) {
 	    fep->fi = fi ;
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(fp,fl,&cp)) >= 0) {
+	    if (cchar *cp{} ; (rs = lm_strw(fp,fl,&cp)) >= 0) {
 		fep->name = cp ;
 	    }
 	} /* end if (non-null) */
@@ -458,13 +460,14 @@ static int fname_start(FNAME *fep,cc *fp,int fl,int fi) noex {
 }
 /* end subroutine (fname_start) */
 
-static int fname_finish(FNAME *fep) noex {
+local int fname_finish(FNAME *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (fep) {
 	    rs = SR_OK ;
 	    if (fep->name) {
-	        rs1 = uc_free(fep->name) ;
+	        void *vp = voidp(fep->name) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->name = nullptr ;
 	    }
@@ -473,7 +476,7 @@ static int fname_finish(FNAME *fep) noex {
 }
 /* end subroutine (fname_finish) */
 
-static int tagent_start(RT_TAG *tep,int fi,int recoff,int reclen) noex {
+local int tagent_start(RT_TAG *tep,int fi,int recoff,int reclen) noex {
     	int		rs = SR_FAULT ;
 	if (tep) {
 	    tep->fi = fi ;
@@ -485,7 +488,7 @@ static int tagent_start(RT_TAG *tep,int fi,int recoff,int reclen) noex {
 }
 /* end subroutine (tagent_start) */
 
-static int tagent_finish(RT_TAG *tep) noex {
+local int tagent_finish(RT_TAG *tep) noex {
     	int		rs = SR_FAULT ;
 	if (tep) {
 	    tep->fi = -1 ;
@@ -495,7 +498,7 @@ static int tagent_finish(RT_TAG *tep) noex {
 }
 /* end subroutine (tagent_finish) */
 
-static int cmpdefe(RT_TAG *e1p,RT_TAG *e2p) noex {
+local int cmpdefe(RT_TAG *e1p,RT_TAG *e2p) noex {
 	int		rc  = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
@@ -512,7 +515,7 @@ static int cmpdefe(RT_TAG *e1p,RT_TAG *e2p) noex {
 }
 /* end subroutine (cmpdefe) */
 
-static int vcmpdef(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpdef(cvoid **v1pp,cvoid **v2pp) noex {
     	RT_TAG	*e1p = (RT_TAG *) *v1pp ;
     	RT_TAG	*e2p = (RT_TAG *) *v2pp ;
 	return cmpdefe(e1p,e2p) ;
