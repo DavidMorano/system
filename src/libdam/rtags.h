@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<hdb.h>
 #include	<vecobj.h>
 #include	<ptm.h>
@@ -33,7 +30,7 @@ struct rtags_tager {
 	int		fi ;
 	uint		recoff ;
 	uint		reclen ;
-} ;
+} ; /* end struct */
 
 struct rtags_head {
 	vecobj		*flp ;		/* file-list-pointer */
@@ -42,11 +39,11 @@ struct rtags_head {
 	ptm		*mxp ;		/* mutex-pointer */
 	uint		magic ;
 	int		nfiles ;
-} ;
+} ; /* end struct */
 
 struct rtags_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef	RTAGS		rtags ;
 typedef	RTAGS_CUR	rtags_cur ;
