@@ -1062,8 +1062,7 @@ sysdbfn.o:		sysdbfn.cc sysdbfn.h
 opensysdbs.o:		opensysdbs.c opensysdbs.h
 
 # SINGLES
-splitfname.o:		splitfname.cc splitfname.h
-findbit.o:		findbit.cc findbit.h
+findbit.o:		findbit.cc	findbit.h		$(INCS)
 termtypemat.o:		termtypemat.cc termtypemat.h
 termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
@@ -1079,7 +1078,6 @@ findxfile.o:		findxfile.cc findxfile.h
 calstrs.o:		calstrs.cc	calstrs.h		$(INCS)
 ipow.o:			ipow.cc		ipow.h			$(INCS)
 base64.o:		base64.cc	base64.h		$(INCS)
-ffbs.o:			ffbs.cc		ffbs.h			$(INCS)
 shellunder.o:		shellunder.cc	shellunder.h		$(INCS)
 itcontrol.o:		itcontrol.cc	itcontrol.h		$(INCS)
 dictdiff.o:		dictdiff.cc	dictdiff.h		$(INCS)
