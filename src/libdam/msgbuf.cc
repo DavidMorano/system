@@ -31,12 +31,17 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucmem.h>
+#include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
 #include	<localmisc.h>
 
 #include	"msgbuf.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -47,7 +52,19 @@ import libutil ;
 #define	NEOF		3
 
 
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+extern "C" {
+    extern int uc_reade(int,void *,int,int,int) noex ;
+}
 
 
 /* external variables */
@@ -79,7 +96,7 @@ int msgbuf_start(msgbuf *mbp,int fd,int bufsz,int to) noex {
 	            mbp->fd = fd ;
 	            mbp->mlen = bufsz ;
 	            mbp->to = to ;
-	            if (char *bp ; (rs = uc_malloc(bufsz,&bp)) >= 0) {
+	            if (char *bp ; (rs = mem.mall(bufsz,&bp)) >= 0) {
 	                mbp->mbuf = bp ;
 	            }
 		} /* end if (ucpagesize) */
@@ -95,7 +112,7 @@ int msgbuf_finish(msgbuf *mbp) noex {
 	if (mbp) {
 	    rs = SR_OK ;
 	    if (mbp->mbuf) {
-	        rs1 = uc_free(mbp->mbuf) ;
+	        rs1 = mem.free(mbp->mbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        mbp->mbuf = nullptr ;
 	    }
