@@ -21,11 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<usysbase.h>
 
 
 #define	CMBUF_MAGIC	31815926
@@ -36,18 +32,18 @@
 struct cmbuf_space {
 	char		*bp ;
 	int		bl ;
-} ;
+} ; /* end struct */
 
 struct cmbuf_head {
 	char		*buf ;
 	char		*bp ;
-	uint		magic ;
+	uint		magval ;
 	int		buflen ;
 	int		bl ;
-} ;
+} ; /* end struct */
 
 typedef	CMBUF		cmbuf ;
-typedef	CMBUF_SP	sp ;
+typedef	CMBUF_SP	cmbuf_sp ;
 
 EXTERNC_begin
 
