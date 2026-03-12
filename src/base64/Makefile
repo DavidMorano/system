@@ -125,7 +125,7 @@ INCS= config.h defs.h
 
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o
-OBJ01= progencode.o progdecode.o
+OBJ01= base64_enc.o base64_dec.o
 OBJ02=
 OBJ03=
 OBJ04=
@@ -236,7 +236,7 @@ control:
 	date >> Control
 
 
-main.o:			main.c $(INCS)
+base64_main.o:		base64_main.cc $(INCS)
 
 whatinfo.o:		whatinfo.c config.h
 
@@ -244,20 +244,17 @@ proginfo.o:		proginfo.c defs.h
 
 proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
-progencode.o:		progencode.c $(INCS)
+base64_enc.o:		base64_enc.c $(INCS)
 
-progdecode.o:		progdecode.c $(INCS)
+base64_dec.o:		base64_dec.c $(INCS)
 
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
 
 b64decoder.o:		b64decoder.cc b64decoder.h base64.h
 	$(GPP) -c $(CFLAGS) $(CPPFLAGS) b64decoder.cc
 
+b64decoder.o:		b64decoder.cc	b64decoder.h
 
-
-base64.o:		base64.c base64.h
+base64_eno:		base64_enc.cc	base64_config.h
+base64_dec.o:		base64_dec.cc	base64_config.h
 
 
