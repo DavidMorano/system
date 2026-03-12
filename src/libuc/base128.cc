@@ -63,6 +63,7 @@
 #include	<concepts>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<strn.h>		/* |strnset(3uc)| */
 #include	<mkchar.h>		/* |mkchar(3uc)| */
 #include	<localmisc.h>
 
@@ -131,7 +132,7 @@ namespace {
 	constexpr void helper_mkdec() noex {
 	    for (int j = 0 ; j < tablen ; j += 1) {
 		dec[j] = uchar(UCHAR_MAX) ;
-	    }
+	    } /* end for */
 	    for (int i = 0 ; i < nelem(enc) ; i += 1) {
 	        uchar	uch = enc[i] ;
 	        dec[uch] = uchar(i) ;
@@ -171,39 +172,25 @@ constexpr bool		f_comment = false ;
 
 /* exported subroutines */
 
-int base128_e(cchar *inbuf,int inlen,char *outbuf) noex {
+int base128_e(cchar *inbuf,int inlen,char *obuf) noex {
     	int		i = 0 ;
 	int		ol = 0 ; /* return-value */
 	while ((inlen - i) >= 7) {
-	    base128_eg((inbuf + i),(outbuf + ol)) ;
+	    base128_eg((inbuf + i),(obuf + ol)) ;
 	    i += 7 ;
 	    ol += 8 ;
 	} /* end while */
-	if (cint n = (inlen - i) ; n > 0) {
-	    char abuf[8] ;
+	if (cint alen = 8, n = (inlen - i) ; n > 0) {
+	    char abuf[alen] ;
 	    memcopy(abuf,inbuf,n) ;
-	    memclear((abuf + n),(8 - n)) ;
-	    base128_enc(abuf,(obuf + ol)) ;
-	    switch (inlen - i) {
-	    case 1:
-	        altinbuf[0] = inbuf[i] ;
-	        altinbuf[1] = 0x00 ;
-	        altinbuf[2] = 0x00 ;
-	        base128_eg(altinbuf,(outbuf + j)) ;
-	        outbuf[ol + 2] = chx_equal ;
-	        outbuf[ol + 3] = '=' ;
-	        ol += 4 ;
-	        break ;
-	    case 2:
-	        altinbuf[0] = inbuf[i] ;
-	        altinbuf[1] = inbuf[i + 1] ;
-	        altinbuf[2] = 0x00 ;
-	        base128_eg(altinbuf,outbuf + ol) ;
-	        outbuf[ol + 3] = '=' ;
-	        ol += 4 ;
-	        break ;
-	    } /* end switch */
-	} /* end block */
+	    memclear((abuf + n),(alen - n)) ;
+	    base128_eg(abuf,(obuf + ol)) ;
+	    {
+	        ol += (n + 1) ;
+	        strnset((obuf + ol),'=',(8 - (n + 1))) ;
+		ol += (8 - (n + 1)) ;
+	    }
+	} /* end if (residue) */
 	return ol ;
 }
 /* end subroutine (base128_e) */
@@ -259,17 +246,24 @@ local void base128_eg(cchar *inbuf,char *obuf) noex {
 /* end subroutine (base128_eg) */
 
 /* decode a group */
+constexpr int	chx_end = UCHAR_MAX ;
 local int base128_dg(cchar *inbuf,char *outbuf) noex {
-	uint		hold = 0 ;
+	uint64_t	hold = 0 ;
 	int		rs = SR_OK ;
-	int		dlen = 0 ; /* return-value */
-	for (int i = 0 ; i < 4 ; i += 1) {
-	    cint	ich = mkchar(inbuf[i]) ;
-	    if (int ch ; (ch = mkchar(base128mgr.dec[ich])) != UCHAR_MAX) {
-	        hold = (hold << 6) ;
+	int		rl = 0 ; /* return-value */
+	cauto cvt = [inbuf] (int ii) -> int {
+	    int ch = chx_end ;
+	    if (cint ich = mkchar(inbuf[ii]) ; ich) {
+	    	ch = base128mgr.dec[ich] ;
+	    }
+	    return ch ;
+	} ; /* end lambda (cvt) */
+	for (int i = 0 ; i < 8 ; i += 1) {
+	    if (int ch ; (ch = cvt(i)) != chx_end) {
+	        hold <<= bits ;
 	        if (ch != chx_equal) {
 	            hold |= ch ;
-	            dlen += 1 ;
+	            rl += 1 ;
 	        } /* end if */
 	    } else {
 	        rs = SR_INVALID ;
@@ -277,20 +271,13 @@ local int base128_dg(cchar *inbuf,char *outbuf) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	if (rs >= 0) {
-	    if_constexpr (f_comment) {
 	        for (int i = 0 ; i < 3 ; i += 1) {
-	            cint	val = hold >> ((2 - i) * 6) ;
+	            uint64_t val = (hold >> ((2 - i) * 6)) ;
 	            outbuf[i] = char(val) ;
 	        } /* end for */
-	        dlen -= 1 ;
-	    } else {
-	        outbuf[0] = char(hold >> 16) ;
-	        outbuf[1] = char(hold >> 8) ;
-	        outbuf[2] = char(hold >> 0) ;
-	        dlen -= 1 ;
-	    } /* end if_constexpr (f_comment) */
+	        rl -= 1 ;
 	} /* end if (ok) */
-	return (rs >= 0) ? dlen : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (base128_dg) */
 
