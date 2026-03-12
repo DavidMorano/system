@@ -115,7 +115,7 @@ const char	*envv[] ;
 		    const int	rlen = VBUFLEN ;
 		    char	rbuf[VBUFLEN+1] ;
 	    	    int		rl ;
-	            while ((rl = expcook_enum(&ec,&cur,rbuf,rlen)) >= 0) {
+	            while ((rl = expcook_curenum(&ec,&cur,rbuf,rlen)) >= 0) {
 
 			printf("pair> %s\n",rbuf) ;
 
