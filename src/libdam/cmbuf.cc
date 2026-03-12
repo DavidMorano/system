@@ -28,13 +28,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mkpathx.h>
 #include	<ischarx.h>		/* |iseol(3uc)| */
 #include	<localmisc.h>
@@ -44,22 +42,14 @@
 
 /* local defines */
 
-#ifndef	ARGSBUFLEN
-#define	ARGSBUFLEN	((6 * MAXPATHLEN) + 35)
-#endif
-
-#ifndef	ARGBUFLEN
-#define	ARGBUFLEN	((2 * MAXPATHLEN) + 20)
-#endif
-
 #define	CB		cmbuf
 #define	CB_SP		cmbuf_sp
 
 
 /* imported namespaces */
 
-using std:min ;				/* type */
-using std:max ;				/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -76,6 +66,20 @@ using std:max ;				/* type */
 
 /* forward references */
 
+template<typename ... Args>
+local inline int cmbuf_magic(cmbuf *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == CMBUF_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (cmbuf_magic) */
+
+local bool isend(int ch) noex {
+    ch &= UCHAR_MAX ;
+    return iseol(ch) ;
+} /* end subroutine (isend) */
+
 
 /* local variables */
 
@@ -85,155 +89,119 @@ using std:max ;				/* type */
 
 /* exported subroutines */
 
-int cmbuf_start(CB *bdp,cchar *buf,int buflen) noex {
-	if (bdp == nullptr)
-	    return SR_FAULT ;
-
-	if (buf == nullptr)
-	    return SR_FAULT ;
-
-	if (buflen <= 0)
-	    return SR_INVALID ;
-
-	bdp->buf = (char *) buf ;
-	bdp->bp = (char *) buf ;
-	bdp->bl = 0 ;
-	bdp->buflen = buflen ;
-	bdp->magic = CMBUF_MAGIC ;
-	return 0 ;
+int cmbuf_start(CB *op,cchar *sp,int sl) noex {
+    	int		rs = SR_FAULT ;
+	if (op && sp) {
+	    rs = SR_INVALID ;
+	    if (sl > 0) {
+	        op->buf = charp(sp) ;
+	        op->bp = charp(sp) ;
+	        op->bl = 0 ;
+	        op->buflen = sl ;
+	        op->magval = CMBUF_MAGIC ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (cmbuf_start) */
 
-int cmbuf_getspace(CB *bdp,CB_SP *bdrp) noex {
-	if (bdp == nullptr)
-	    return SR_FAULT ;
+int cmbuf_finish(CB *op) noex {
+    	int		rs ;
+	if ((rs = cmbuf_magic(op)) >= 0) {
+	    op->magval = 0 ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (cmbuf_finish) */
 
-	if (bdp->magic != CMBUF_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (bdrp == nullptr)
-	    return SR_FAULT ;
-
-	if (bdp->bl > 0)
-	    memmove(bdp->buf,bdp->bp,bdp->bl) ;
-
-	bdp->bp = bdp->buf ;
-	bdrp->bp = bdp->buf + bdp->bl ;
-	bdrp->bl = bdp->buflen - bdp->bl ;
-
-	return bdrp->bl ;
+int cmbuf_getspace(CB *op,CB_SP *bdrp) noex {
+    	int		rs ;
+	int		len = 0 ;
+	if ((rs = cmbuf_magic(op,bdrp)) >= 0) {
+	    if (op->bl > 0) {
+	        memmove(op->buf,op->bp,op->bl) ;
+	    }
+	    op->bp = op->buf ;
+	    bdrp->bp = op->buf + op->bl ;
+	    bdrp->bl = op->buflen - op->bl ;
+	    len = bdrp->bl ;
+	} /* end if (magic) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (cmbuf_space) */
 
-int cmbuf_added(CB *bdp,int len) noex {
-	if (bdp == nullptr)
-	    return SR_FAULT ;
-
-	if (bdp->magic != CMBUF_MAGIC)
-	    return SR_NOTOPEN ;
-
-	bdp->bl += len ;
-	return bdp->bl ;
+int cmbuf_added(CB *op,int len) noex {
+    	int		rs ;
+	if ((rs = cmbuf_magic(op)) >= 0) {
+	    op->bl += len ;
+	    len = op->bl ;
+	} /* end if (magic) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (cmbuf_added) */
 
-int cmbuf_getline(CB *bdp,int llen,cchar **lpp) noex {
-	int	rs = SR_OK ;
-	int	bl ;
-	int	maxll ;
-	int	len = 0 ;
-	int	f_eol = false ;
-	int	f_again = true ;
-
-	const char	*sbp, *ebp ;
-
-	char	*bp ;
-
-
-	if (bdp == nullptr)
-	    return SR_FAULT ;
-
-	if (bdp->magic != CMBUF_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (lpp == nullptr)
-	    return SR_FAULT ;
-
-	if (llen < 0) return SR_INVALID ;
-
-	maxll = MIN(llen,bdp->buflen) ;
-
-	bp = bdp->bp ;
-	bl = bdp->bl ;
-
-	*lpp = bdp->bp ;
-	sbp = bdp->bp ;
-	ebp = (bdp->bp + bl) ;
-	while ((bp < ebp) && ((bp - sbp) < maxll)) {
-
-	    f_eol = iseol(bp[0]) ;
-	    bp += 1 ;
-	    if (f_eol) break ;
-
-	} /* end while */
-
-	len = (bp - sbp) ;
-	if (f_eol || (len == maxll))
-	    f_again = false ;
-
-	if ((! f_again) && (bp < ebp)) {
-	    if ((! f_eol) && iseol(bp[0])) {
-		bp += 1 ;
-		len += 1 ;
-	    }
-	    if ((len > 0) && (bp[-1] == '\r') && 
-		(bp < ebp) && (bp[0] == '\n')) {
-		    bp += 1 ;
-		    len += 1 ;
-	    }
-	} /* end if */
-
-	if (f_again) {
-	    rs = SR_AGAIN ;
-	} else {
-	    bdp->bl -= len ;
-	    bdp->bp = bp ;
-	}
-
+int cmbuf_getline(CB *op,int llen,cchar **lpp) noex {
+    	int		rs ;
+	int		len = 0 ;
+	if ((rs = cmbuf_magic(op,lpp)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (llen >= 0) {
+	        int	bl ;
+	        int	maxll ;
+	        int	f_eol = false ;
+	        int	f_again = true ;
+	        cchar	*sbp, *ebp ;
+	        char	*bp ;
+	        maxll = min(llen,op->buflen) ;
+	        bp = op->bp ;
+	        bl = op->bl ;
+	        *lpp = op->bp ;
+	        sbp = op->bp ;
+	        ebp = (op->bp + bl) ;
+	        while ((bp < ebp) && ((bp - sbp) < maxll)) {
+	            f_eol = isend(bp[0]) ;
+	            bp += 1 ;
+	            if (f_eol) break ;
+	        } /* end while */
+	        len = intconv(bp - sbp) ;
+	        if (f_eol || (len == maxll)) {
+	            f_again = false ;
+	        }
+	        if ((! f_again) && (bp < ebp)) {
+	            if ((! f_eol) && isend(bp[0])) {
+		        bp += 1 ;
+		        len += 1 ;
+	            }
+	            if ((len > 0) && (bp[-1] == '\r') && 
+		        (bp < ebp) && (bp[0] == '\n')) {
+		            bp += 1 ;
+		            len += 1 ;
+	            }
+	        } /* end if */
+	        if (f_again) {
+	            rs = SR_AGAIN ;
+	        } else {
+	            op->bl -= len ;
+	            op->bp = bp ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (cmbuf_getline) */
 
-int cmbuf_getlastline(CB *bdp,cchar **lpp) noex {
-	int	rs = SR_OK ;
-	int	len = 0 ;
-
-
-	if (bdp == nullptr)
-	    return SR_FAULT ;
-
-	if (bdp->magic != CMBUF_MAGIC)
-	    return SR_NOTOPEN ;
-
-	len = bdp->bl ;
-	if (lpp != nullptr)
-	    *lpp = bdp->bp ;
-
+int cmbuf_getlastline(CB *op,cchar **lpp) noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = cmbuf_magic(op)) >= 0) {
+	    len = op->bl ;
+	    if (lpp) {
+	        *lpp = op->bp ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (cmbuf_getlastline) */
-
-int cmbuf_finish(CB *bdp) noex {
-	if (bdp == nullptr)
-	    return SR_FAULT ;
-
-	if (bdp->magic != CMBUF_MAGIC)
-	    return SR_NOTOPEN ;
-
-	bdp->magic = 0 ;
-	return SR_OK ;
-}
-/* end subroutine (cmbuf_finish) */
 
 
 /* local subroutines */
