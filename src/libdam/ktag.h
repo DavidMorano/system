@@ -14,17 +14,14 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<txtindexmk.h>
 #include	<eigendb.h>
 
 
-#define	KTAG_MAGIC	0x70811238
 #define	KTAG		struct ktag_head
 #define	KTAG_PA		struct ktag_params
+#define	KTAG_MAGIC	0x70811238
 #define	KTAG_KEY	TXTINDEXMK_KEY
 #define	KTAG_TAG	TXTINDEXMK_TAG
 
@@ -34,7 +31,7 @@ struct ktag_params {
 	uchar		*wterms ;
 	int		minwlen ;
 	int		f_eigen ;
-} ;
+} ; /* end struct */
 
 struct ktag_head {
 	KTAG_PA		*kap ;
@@ -42,11 +39,11 @@ struct ktag_head {
 	cchar		*fname ;
 	vecobj		*klp ;		/* key-list-pointer */
 	vecstr		*slp ;		/* string-list-pointer */
-	ulong		recoff ;
-	ulong		reclen ;
+	uint		recoff ;
+	uint		reclen ;
 	uint		magic ;
 	int		f_store ;
-} ;
+} ; /* end struct */
 
 typedef	KTAG		ktag ;
 typedef	KTAG_PA		ktag_pa ;
