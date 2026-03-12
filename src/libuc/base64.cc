@@ -169,35 +169,35 @@ constexpr bool		f_comment = false ;
 
 int base64_e(cchar *inbuf,int inlen,char *outbuf) noex {
     	int		i = 0 ;
-	int		j = 0 ; /* return-value */
+	int		ol = 0 ; /* return-value */
 	while ((inlen - i) >= 3) {
-	    base64_eg((inbuf + i),(outbuf + j)) ;
+	    base64_eg((inbuf + i),(outbuf + ol)) ;
 	    i += 3 ;
-	    j += 4 ;
+	    ol += 4 ;
 	} /* end while */
-	{
+	if ((inlen - i) > 0) {
 	    char altinbuf[4] ;
 	    switch (inlen - i) {
 	    case 1:
 	        altinbuf[0] = inbuf[i] ;
 	        altinbuf[1] = 0x00 ;
 	        altinbuf[2] = 0x00 ;
-	        base64_eg(altinbuf,(outbuf + j)) ;
-	        outbuf[j + 2] = '=' ;
-	        outbuf[j + 3] = '=' ;
-	        j += 4 ;
+	        base64_eg(altinbuf,(outbuf + ol)) ;
+	        outbuf[ol + 2] = '=' ;
+	        outbuf[ol + 3] = '=' ;
+	        ol += 4 ;
 	        break ;
 	    case 2:
 	        altinbuf[0] = inbuf[i + 0] ;
 	        altinbuf[1] = inbuf[i + 1] ;
 	        altinbuf[2] = 0x00 ;
-	        base64_eg(altinbuf,outbuf + j) ;
-	        outbuf[j + 3] = '=' ;
-	        j += 4 ;
+	        base64_eg(altinbuf,outbuf + ol) ;
+	        outbuf[ol + 3] = '=' ;
+	        ol += 4 ;
 	        break ;
 	    } /* end switch */
 	} /* end block */
-	return j ;
+	return ol ;
 }
 /* end subroutine (base64_e) */
 
