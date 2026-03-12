@@ -1,3 +1,5 @@
+PASSFILE
+
 Transport Connections
 
 
@@ -7,10 +9,10 @@ connection.  This data is passed by passing the name of a file that
 contains the additional information.
 
 Additional information that may be in the passed file (specified by the
-passed file name) includes :
+passed file name) includes:
 
 item		description
--------------------------------------------------------
+--------------------------------------------------------------------------------
 
 transport	incoming transport provider
 username	username of passing user (UID is determined elsewhere)
