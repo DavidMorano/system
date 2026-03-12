@@ -27,11 +27,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<txtindexmk.h>
 #include	<eigendb.h>
 #include	<vecstr.h>
@@ -42,12 +42,15 @@
 #include	<sfx.h>
 #include	<strwcpyx.h>
 #include	<hasx.h>
+#include	<xwords.h>
+#include	<naturalwords.h>
 #include	<localmisc.h>		/* |NATURALWORDLEN| */
 
-#include	"xwords.h"
-#include	"naturalwords.h"
 #include	"ktag.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -63,7 +66,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -82,15 +84,15 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int ktag_ctor(ktag *op,Args ... args) noex {
+local int ktag_ctor(ktag *op,Args ... args) noex {
     	KTAG		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
  	    memclear(hop) ;
-	    if ((op->klp = new(nothrow) vecobj) != np) {
-	        if ((op->slp = new(nothrow) vecstr) != np) {
+	    if ((op->klp = new(nothrow) vecobj) != np) ylikely {
+	        if ((op->slp = new(nothrow) vecstr) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-vecobj) */
 		if (rs < 0) {
@@ -100,38 +102,35 @@ static int ktag_ctor(ktag *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ktag_ctor) */
+} /* end subroutine (ktag_ctor) */
 
-static int ktag_dtor(ktag *op) noex {
+local int ktag_dtor(ktag *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->slp) {
+	    if (op->slp) ylikely {
 		delete op->slp ;
 		op->slp = nullptr ;
 	    }
-	    if (op->klp) {
+	    if (op->klp) ylikely {
 		delete op->klp ;
 		op->klp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ktag_dtor) */
+} /* end subroutine (ktag_dtor) */
 
 template<typename ... Args>
-static inline int ktag_magic(ktag *op,Args ... args) noex {
+local inline int ktag_magic(ktag *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == KTAG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (ktag_magic) */
+} /* end subroutine (ktag_magic) */
 
 extern "C" {
-    static int	vesrch(cvoid **,cvoid **) noex ;
+    local int	vesrch(cvoid **,cvoid **) noex ;
 }
 
 
@@ -147,7 +146,7 @@ constexpr bool		f_comment = false ;
 
 int ktag_start(KT *op,KT_PA *kap,uint soff,cchar *lp,int ll) noex {
 	int		rs ;
-	if ((rs = ktag_ctor(op,kap,lp)) >= 0) {
+	if ((rs = ktag_ctor(op,kap,lp)) >= 0) ylikely {
 	    cint	sz = szof(KT_KEY) ;
 	    cint	vn = 0 ;
 	    cint	vo = VECOBJ_OCOMPACT ;
@@ -185,7 +184,7 @@ int ktag_finish(KT *op) noex {
 	int		rs1 ;
 	if ((rs = ktag_magic(op)) >= 0) {
 	    if (op->tkeys) {
-	        rs1 = uc_free(op->tkeys) ;
+	        rs1 = lm_free(op->tkeys) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->tkeys = nullptr ;
 	    }
@@ -228,7 +227,7 @@ int ktag_mktag(KT *op,uint endoff,KT_TAG *tagp) noex {
 		KT_KEY	**va = (KT_KEY **) vpp ;
 	        cint	sz = (tagp->nkeys * szof(KT_KEY)) ;
 	        tagp->nkeys = rs ;
-	        if (KT_KEY *kea ; (rs = uc_malloc(sz,&kea)) >= 0) {
+	        if (KT_KEY *kea ; (rs = lm_mall(sz,&kea)) >= 0) {
 		    cint	n = int(tagp->nkeys) ;
 	            op->tkeys = kea ;		/* kea: save for us */
 	            for (int i = 0 ; i < n ; i += 1) {
@@ -254,17 +253,17 @@ int ktag_procline(KT *op,cchar *lp,int ll) noex {
 	        int	fl, sl, cl ;
 	        cchar	*fp, *sp, *cp ;
 	        while ((fl = fsb.word(wt,&fp)) >= 0) {
-/* remove possible apostrophe (single-quote) from leading edge */
+		    /* remove possible apostrophe from leading edge */
 	            if (fl && (fp[0] == CH_SQUOTE)) {
 	                fp += 1 ;
 	                fl -= 1 ;
 	            }
 	            if (fl < kap->minwlen) continue ;
-/* remove possible trailing apostrophe (single-quote) */
+		    /* remove possible trailing apostrophe */
 	            sl = sfword(fp,fl,&sp) ;
-/* remove short words */
+		    /* remove short words */
 	            if (sl < kap->minwlen) continue ;
-/* be liberal and fabricate extra keys for matching purposes */
+		    /* be liberal and fabricate extra keys */
 	            if ((sl > 0) && ((rs = xwords_start(&w,sp,sl)) >= 0)) {
 	                i = 0 ;
 	                while ((rs >= 0) &&
@@ -302,7 +301,7 @@ int ktag_procword(KT *op,cchar *cp,int cl) noex {
 	        strwcpylc(keybuf,cp,cl) ;
 	        cp = keybuf ;
 	    }
-/* note that the TXTINDEX object filters out eigen keys also */
+	    /* the TXTINDEX object filters out eigen keys */
 	    key.kp = charp(cp) ;
 	    key.kl = cl ;
 	    if ((rs = vecobj_search(op->klp,&key,vesrch,np)) == nrs) {
@@ -348,7 +347,7 @@ int ktag_storelc(KT *op,cchar **rpp,cchar *cp,int cl) noex {
 
 /* private subroutines */
 
-static int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
+local int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
 	KT_KEY		*e1p = (KTAG_KEY *) *v1pp ;
 	KT_KEY		*e2p = (KTAG_KEY *) *v2pp ;
 	int		rc = 0 ;
