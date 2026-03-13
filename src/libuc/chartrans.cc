@@ -30,8 +30,9 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |wchar_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* |libutil(3u)| */
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<storebuf.h>
 #include	<utf8decoder.h>
 #include	<matstr.h>
@@ -41,7 +42,9 @@
 
 #include	"chartrans.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -50,6 +53,8 @@ import libutil ;
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -77,24 +82,24 @@ extern "C"{
 /* forward references */
 
 template<typename ... Args>
-static inline int chartrans_magic(chartrans *op,Args ... args) noex {
+local inline int chartrans_magic(chartrans *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CHARTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
 /* end subroutine (chartrans_magic) */
 
-static int chartrans_setfins(CT *) noex ;
-static int chartrans_sethave(CT *,cchar *,int) noex ;
-static int chartrans_setopen(CT *,time_t,int,cchar *,int) noex ;
-static int chartrans_setclose(CT *,int) noex ;
-static int chartrans_setfind(CT *,time_t) noex ;
-static int chartrans_transutf8(CT *,wchar_t *,int,cchar *,int) noex ;
-static int chartrans_checkdecoder(CT *) noex ;
+local int chartrans_setfins(CT *) noex ;
+local int chartrans_sethave(CT *,cchar *,int) noex ;
+local int chartrans_setopen(CT *,time_t,int,cchar *,int) noex ;
+local int chartrans_setclose(CT *,int) noex ;
+local int chartrans_setfind(CT *,time_t) noex ;
+local int chartrans_transutf8(CT *,wchar_t *,int,cchar *,int) noex ;
+local int chartrans_checkdecoder(CT *) noex ;
 
-static int mktransname(char *,int,cchar *,int) noex ;
+local int mktransname(char *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -133,17 +138,18 @@ int chartrans_open(CT *op ,cchar *pr,int maxtx) noex {
 	    rs = SR_INVALID ;
 	    memclear(hop) ;
 	    if (pr[0]) ylikely {
-	        if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) ylikely {
+	        if (cchar *cp ; (rs = libmem.strw(pr,-1,&cp)) >= 0) ylikely {
 	            cint	asize = (maxtx * szof(chartrans_set)) ;
 	            op->pr = cp ; /* <- store allocation */
-	            if (void *p ; (rs = uc_malloc(asize,&p)) >= 0) {
+	            if (void *p ; (rs = libmem.mall(asize,&p)) >= 0) ylikely {
 	                op->sets = (chartrans_set *) p ;
 	                op->nmax = maxtx ;
 	                op->magic = CHARTRANS_MAGIC ;
 	                memset(p,0,asize) ;
 	            } /* end if (memory-allocation) */
 	            if (rs < 0) {
-	                uc_free(op->pr) ;
+			void *vp = voidp(op->pr) ;
+	                libmem.free(vp) ;
 	                op->pr = nullptr ;
 	            }
 	        } /* end if (memory_allocation) */
@@ -157,29 +163,30 @@ int chartrans_close(CT *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = chartrans_magic(op)) >= 0) ylikely {
-	    if (op->utf8decoder) {
+	    if (op->utf8decoder) ylikely {
 	        {
 	            utf8decoder	*uop = (utf8decoder *) op->utf8decoder ;
 	            rs1 = utf8decoder_finish(uop) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-	            rs1 = uc_free(op->utf8decoder) ;
+	            rs1 = libmem.free(op->utf8decoder) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->utf8decoder = nullptr ;
 	        }
 	    }
-	    if (op->nsets > 0) {
+	    if (op->nsets > 0) ylikely {
 	        rs1 = chartrans_setfins(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->sets) {
-	        rs1 = uc_free(op->sets) ;
+	    if (op->sets) ylikely {
+	        rs1 = libmem.free(op->sets) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->sets = nullptr ;
 	    }
-	    if (op->pr) {
-	        rs1 = uc_free(op->pr) ;
+	    if (op->pr) ylikely {
+		void *vp = voidp(op->pr) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->pr = nullptr ;
 	    }
@@ -194,7 +201,7 @@ int chartrans_transbegin(CT *op,time_t dt,cchar *sp,int sl) noex {
 	int		txid = 0 ;
 	if ((rs = chartrans_magic(op,sp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 	       if (sl < 0) sl = lenstr(sp) ;
 	       if ((rs = chartrans_sethave(op,sp,sl)) >= 0) {
 	           txid = rs ;
@@ -275,7 +282,7 @@ int chartrans_transread(CT *op,int txid,wchr *rcp,int rcl,cc *sp,int sl) noex {
 
 /* private subroutines */
 
-static int chartrans_setfins(CT *op) noex {
+local int chartrans_setfins(CT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((op->sets != nullptr) && (op->nsets > 0)) {
@@ -290,24 +297,24 @@ static int chartrans_setfins(CT *op) noex {
 }
 /* end subroutine (chartrans_setfins) */
 
-static int chartrans_setopen(CT *op,time_t dt,int txid,cc *sp,int sl) noex {
+local int chartrans_setopen(CT *op,time_t dt,int txid,cc *sp,int sl) noex {
 	chartrans_set	*setp = (op->sets + txid) ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*tcsp = CHARTRANS_NCS ;
 	memclear(setp) ; /* dangerous */
-	if (cchar *name ; (rs = uc_mallocstrw(sp,sl,&name)) >= 0) ylikely {
+	if (cchar *name ; (rs = libmem.strw(sp,sl,&name)) >= 0) ylikely {
             setp->name = name ;		/* <- store allocation */
             if (int pc ; (pc = matcasestr(charsets,sp,sl)) >= 0) {
                 setp->pc = pc ;
             } else {
-                if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) ylikely {
+                if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 		    cint	tlen = rs ;
                     setp->pc = -1 ;
                     if ((rs = mktransname(tbuf,tlen,tcsp,-1)) >= 0) {
                         rs = uiconv_open(&setp->id,tbuf,name) ;
                     } /* end if (mktransname) */
-		    rs1 = uc_free(tbuf) ;
+		    rs1 = lm_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
             } /* end if */
@@ -317,7 +324,8 @@ static int chartrans_setopen(CT *op,time_t dt,int txid,cc *sp,int sl) noex {
                 op->nsets += 1 ;
             }
             if (rs < 0) {
-                uc_free(name) ;
+		void *vp = voidp(name) ;
+                libmem.free(vp) ;
                 setp->name = nullptr ;
             }
         } /* end if (memory-allocation) */
@@ -325,7 +333,7 @@ static int chartrans_setopen(CT *op,time_t dt,int txid,cc *sp,int sl) noex {
 }
 /* end subroutine (chartrans_setopen) */
 
-static int chartrans_setclose(CT *op,int txid) noex {
+local int chartrans_setclose(CT *op,int txid) noex {
 	chartrans_set	*setp = (op->sets + txid) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -334,16 +342,19 @@ static int chartrans_setclose(CT *op,int txid) noex {
 	        rs1 = uiconv_close(&setp->id) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    rs1 = uc_free(setp->name) ;
-	    if (rs >= 0) rs = rs1 ;
-	    setp->name = nullptr ;
+	    {
+		void *vp = voidp(setp->name) ;
+	        rs1 = libmem.free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        setp->name = nullptr ;
+	    }
 	    if (op->nsets > 0) op->nsets -= 1 ;
 	}
 	return rs ;
 }
 /* end subroutine (chartrans_setclose) */
 
-static int chartrans_sethave(CT *op,cchar *sp,int sl) noex {
+local int chartrans_sethave(CT *op,cchar *sp,int sl) noex {
 	chartrans_set	*setp ;
 	int		i ; /* used-afterwards */
 	int		f = false ;
@@ -358,7 +369,7 @@ static int chartrans_sethave(CT *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (chartrans_sethave) */
 
-static int chartrans_setfind(CT *op,time_t dt) noex {
+local int chartrans_setfind(CT *op,time_t dt) noex {
 	chartrans_set	*setp ;
 	uint		acount = INT_MAX ;
 	int		rs = SR_OK ;
@@ -381,14 +392,14 @@ static int chartrans_setfind(CT *op,time_t dt) noex {
 }
 /* end subroutine (chartrans_setfind) */
 
-static int chartrans_transutf8(CT *op,wchr *rcp,int rcl,cc *sp,int sl) noex {
+local int chartrans_transutf8(CT *op,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (rcl > 0) {
-	    if ((rs = chartrans_checkdecoder(op)) >= 0) {
+	    if ((rs = chartrans_checkdecoder(op)) >= 0) ylikely {
 	        utf8decoder	*uop = (utf8decoder *) op->utf8decoder ;
-	        if ((rs = utf8decoder_load(uop,sp,sl)) > 0) {
-		    if ((rs = utf8decoder_read(uop,rcp,rcl)) > 0) {
+	        if ((rs = utf8decoder_load(uop,sp,sl)) > 0) ylikely {
+		    if ((rs = utf8decoder_read(uop,rcp,rcl)) > 0) ylikely {
 		        c += rs ;
 			rcp += rs ;
 			rcl -= rs ;
@@ -400,16 +411,16 @@ static int chartrans_transutf8(CT *op,wchr *rcp,int rcl,cc *sp,int sl) noex {
 }
 /* end subroutine (chartrans_transutf8) */
 
-static int chartrans_checkdecoder(CT *op) noex {
+local int chartrans_checkdecoder(CT *op) noex {
 	int		rs = SR_OK ;
         if (op->utf8decoder == nullptr) {
             cint    osz = szof(utf8decoder) ;
-            if (void *p ; (rs = uc_malloc(osz,&p)) >= 0) ylikely {
+            if (void *p ; (rs = libmem.mall(osz,&p)) >= 0) ylikely {
                 utf8decoder *uop = (utf8decoder *) p ;
                 op->utf8decoder = p ;
                 rs = utf8decoder_start(uop) ;
                 if (rs < 0) {
-                    uc_free(p) ;
+                    libmem.free(p) ;
                     op->utf8decoder = nullptr ;
                 }
             } /* end if (a-m) */
@@ -418,7 +429,7 @@ static int chartrans_checkdecoder(CT *op) noex {
 }
 /* end subroutine (chartrans_checkdecoder) */
 
-static int mktransname(char *nbuf,int nlen,cchar *sp,int sl) noex {
+local int mktransname(char *nbuf,int nlen,cchar *sp,int sl) noex {
     	storebuf	sb(nbuf,nlen) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
