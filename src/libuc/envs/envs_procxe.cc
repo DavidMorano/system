@@ -75,7 +75,7 @@
 #include	<snwcpy.h>
 #include	<sfx.h>			/* |sfweirdo(3uc)| */
 #include	<strn.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -150,21 +150,21 @@ namespace {
 	int val(buffer *,cchar *,cchar *,int) noex ;
 	int def(buffer *,cchar *,int) noex ;
     } ; /* end struct (subinfo) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static inline int envs_magic(envs *op,Args ... args) noex {
+local inline int envs_magic(envs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == ENVS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (envs_magic) */
 
-static int	mkterms() noex ;
+local int	mkterms() noex ;
 
 
 /* local variables */
@@ -574,7 +574,7 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 }
 /* end method (subinfo::def) */
 
-static int mkterms() noex {
+local int mkterms() noex {
 	int		rs ;
 	if ((rs = fieldterms(vterms,false,'\t',' ','#',':',';')) >= 0) ylikely {
 	    rs = fieldterms(dterms,false,'\t',' ',',') ;
