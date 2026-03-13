@@ -13,14 +13,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>
+#include	<stddef.h>		/* |wchar_t| */
 #include	<stdlib.h>
 #include	<uiconv.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	CHARTRANS	struct chartrans_head
@@ -32,7 +29,7 @@
 
 struct chartrans_flags {
 	uint		dummy:1 ;
-} ;
+} ; /* end struct (chartrans_flags) */
 
 struct chartrans_seter {
 	cchar		*name ;
@@ -41,7 +38,7 @@ struct chartrans_seter {
 	uint		acount ;		/* access time-stamp */
 	uint		uc ;			/* usage-count */
 	int		pc ;			/* pass-set */
-} ;
+} ; /* end struct (chartrans_seter) */
 
 struct chartrans_head {
 	CHARTRANS_SET	*sets ;
@@ -52,7 +49,7 @@ struct chartrans_head {
 	int		nmax ;
 	int		nsets ;
 	int		acount ;
-} ;
+} ; /* end struct (chartrans_head) */
 
 typedef CHARTRANS	chartrans ;
 typedef	CHARTRANS_FL	chartrans_fl ;
