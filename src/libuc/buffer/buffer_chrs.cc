@@ -46,12 +46,12 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<ascii.h>
 #include	<localmisc.h>
 
 #include	"buffer.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 import uconstants ;
@@ -76,10 +76,12 @@ using std::max ;			/* subroutine-template */
 
 /* local structures */
 
+constexpr char		blanks[] = "        " ;
+
 namespace {
     struct blanker {
-	cint	l = lenstr(sysword.w_blanks) ;
-	cchar	*p = sysword.w_blanks ;
+	cint	l = clenstr(blanks) ;
+	cchar	*p = blanks ;
     } ; /* end struct (blanker) */
 } /* end namespace */
 
@@ -89,7 +91,7 @@ namespace {
 
 /* local variables */
 
-static blanker		bo ;		/* "blank" object */
+constexpr blanker	bo ;		/* "blank" object */
 
 
 /* exported variables */
@@ -118,9 +120,11 @@ int buffer_blanks(buffer *op,int n) noex {
 	    rs = SR_OK ;
 	    while ((rs >= 0) && (n > 0)) {
 	        cint	m = min(n,bo.l) ;
-	        rs = buffer_strw(op,bo.p,m) ;
+		{
+	            rs = buffer_strw(op,bo.p,m) ;
+	            len += rs ;
+		}
 	        n -= m ;
-	        len += rs ;
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
