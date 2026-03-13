@@ -40,15 +40,19 @@ MODS +=
 LIBS +=
 
 
-OBJ0_BUFFER= buffer_prime.o buffer_obj.o
-OBJ1_BUFFER= buffer_chrs.o
-OBJ2_BUFFER= buffer_strquote.o
-OBJ3_BUFFER= buffer_strcompact.o buffer_stropaque.o
+OBJ0= buffer_prime.o buffer_obj.o
+OBJ1= buffer_chrs.o
+OBJ2= buffer_strquote.o
+OBJ3= buffer_strcompact.o buffer_stropaque.o
+OBJ4= buffer_nums.o
+OBJ5= buffer_ext.o
+OBJ6=
+OBJ7=
 
-OBJA_BUFFER= obj0_buffer.o obj1_buffer.o
-OBJB_BUFFER= obj2_buffer.o obj3_buffer.o
+OBJA= obj0.o obj1.o obj2.o
+OBJB= obj3.o obj4.o obj5.o
 
-OBJ_BUFFER= obja.o objb.o
+OBJ= obja.o objb.o
 
 
 INCDIRS=
@@ -99,8 +103,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_BUFFER)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_BUFFER)
+$(T).o:			obj.o
+	$(LD) -r $(LDFLAGS) -o $@ obj.o
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -115,23 +119,39 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_buffer.o:		$(OBJ0_BUFFER)
+obj0.o:		$(OBJ0)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_buffer.o:		$(OBJ1_BUFFER)
+obj1.o:		$(OBJ1)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_buffer.o:		$(OBJ2_BUFFER)
+obj2.o:		$(OBJ2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_buffer.o:		$(OBJ3_BUFFER)
+obj3.o:		$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj4.o:		$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obja.o:			$(OBJA_BUFFER)
+obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb.o:			$(OBJB_BUFFER)
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -141,5 +161,7 @@ buffer_chrs.o:		buffer_chrs.cc		$(INCS)
 buffer_strcompact.o:	buffer_strcompact.cc	$(INCS)
 buffer_stropaque.o:	buffer_stropaque.cc	$(INCS)
 buffer_strquote.o:	buffer_strquote.cc	$(INCS)
+buffer_ext.o:		buffer_ext.cc		$(INCS)
+buffer_nums.o:		buffer_nums.cc		$(INCS)
 
 
