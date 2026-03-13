@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	DUPSTR		struct dupstr_head
@@ -58,13 +55,14 @@ struct dupstr : dupstr_head {
 	dupstr_co	finish ;
 	dupstr() noex {
 	    finish(this,dupstrmem_finish) ;
+	    as = nullptr ;
 	} ;
 	dupstr(const dupstr &) = delete ;
 	dupstr &operator = (const dupstr &) = delete ;
 	int start(cchar *,int,char **) noex ;
 	void dtor() noex ;
-	~dupstr() {
-	    dtor() ;
+	destruct dupstr() {
+	    if (as) dtor() ;
 	} ;
 } ; /* end struct (dupstr) */
 #else	/* __cplusplus */
