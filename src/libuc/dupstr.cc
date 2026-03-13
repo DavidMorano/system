@@ -26,8 +26,8 @@
 	(constant) copy of a string, check out the NULSTR object.
 
 	Synopsis:
-	int dupstr_start(DUPSTR *op,cchar *sp,int sl,char **rpp) noex
-	int dupstr_finish(DUPSTR *op) noex
+	int dupstr_start(dupstr *op,cchar *sp,int sl,char **rpp) noex
+	int dupstr_finish(dupstr *op) noex
 
 	Arguments:
 	op		object pointer
@@ -44,13 +44,18 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"dupstr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -81,23 +86,24 @@
 
 /* exported subroutines */
 
-int dupstr_start(dupstr *op,cchar *sp,int sl,char **rpp) noex {
+int dupstr_start(dupstr *op,cchar *sp,int µsl,char **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		cl = 0 ;
-	if (op && sp && rpp) {
-	    rs = SR_OK ;
-	    op->as = nullptr ;
-	    if (sl < 0) sl = strlen(sp) ;
-	    if (sl > DUPSTR_SHORTLEN) {
-	        if (char *bp{} ; (rs = uc_malloc((sl + 1),&bp)) >= 0) {
-	            cl = strwcpy(bp,sp,sl) - bp ;
-	            *rpp = bp ;
-	            op->as = bp ;
-	        } /* end if (m-a) */
-	    } else {
-	        *rpp = op->buf ;
-	        cl = strwcpy(op->buf,sp,sl) - op->buf ;
-	    } /* end if */
+	if (op && rpp) {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        rs = SR_OK ;
+	        op->as = nullptr ;
+	        if (sl > DUPSTR_SHORTLEN) {
+	            if (char *bp ; (rs = lm_mall((sl + 1),&bp)) >= 0) {
+	                cl = intconv(strwcpy(bp,sp,sl) - bp) ;
+	                *rpp = bp ;
+	                op->as = bp ;
+	            } /* end if (m-a) */
+	        } else {
+	            *rpp = op->buf ;
+	            cl = intconv(strwcpy(op->buf,sp,sl) - op->buf) ;
+	        } /* end if */
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? cl : rs ;
 }
@@ -109,7 +115,7 @@ int dupstr_finish(dupstr *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->as) {
-	        rs1 = uc_free(op->as) ;
+	        rs1 = lm_free(op->as) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->as = nullptr ;
 	    }
@@ -127,11 +133,10 @@ int dupstr::start(cchar *sp,int sl,char **rpp) noex {
 }
 
 void dupstr::dtor() noex {
-	cint	rs = int(finish) ;
-	if (rs < 0) {
+	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("dupstr",rs,"fini-finish") ;
 	}
-}
+} /* end method (dupstr::dtor) */
 
 dupstr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -143,7 +148,6 @@ dupstr_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (dupstr_co::operator) */
+} /* end method (dupstr_co::operator) */
 
 
