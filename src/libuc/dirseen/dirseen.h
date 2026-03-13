@@ -37,13 +37,13 @@
 
 struct dirseen_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct dirseen_head {
 	vecobj		*dlistp ;
 	uint		magic ;
-	int		strsize ;
-} ;
+	int		strsz ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum dirseenmems {
@@ -51,7 +51,7 @@ enum dirseenmems {
 	dirseenmem_count,
 	dirseenmem_finish,
 	dirseenmem_overlast
-} ;
+} ; /* end enum */
 struct dirseen_iter {
 	cchar		**va = nullptr ;
 	int		i = -1 ;
@@ -110,14 +110,14 @@ struct dirseen : dirseen_head {
 	    count(this,dirseenmem_count) ;
 	    finish(this,dirseenmem_finish) ;
 	    magic = 0 ;
-	} ;
+	} ; /* end ctor */
 	dirseen(const dirseen &) = delete ;
 	dirseen &operator = (const dirseen &) = delete ;
-	int add(cchar *,int,USTAT *) noex ;
+	int add(cchar *,int,ustat *) noex ;
 	int havename(cchar *,int) noex ;
-	int havedevino(USTAT *) noex ;
-	int notseen(USTAT *,cchar *,int) noex ;
-	int notadd(USTAT *,cchar *,int) noex ;
+	int havedevino(ustat *) noex ;
+	int notseen(ustat *,cchar *,int) noex ;
+	int notadd(ustat *,cchar *,int) noex ;
 	void dtor() noex ;
 	destruct dirseen() {
 	    if (magic) dtor() ;
@@ -138,23 +138,22 @@ inline int dirseen_magic(dirseen *op,Args ... args) noex {
 	    rs = (op->magic == DIRSEEN_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (dirseen_magic) */
+} /* end subroutine (dirseen_magic) */
 
 #endif /* __cplusplus */
 
 EXTERNC_begin
 
 extern int dirseen_start(dirseen *) noex ;
-extern int dirseen_add(dirseen *,cchar *,int,USTAT *) noex ;
+extern int dirseen_add(dirseen *,cchar *,int,ustat *) noex ;
 extern int dirseen_havename(dirseen *,cchar *,int) noex ;
-extern int dirseen_havedevino(dirseen *,USTAT *) noex ;
+extern int dirseen_havedevino(dirseen *,ustat *) noex ;
 extern int dirseen_count(dirseen *) noex ;
 extern int dirseen_curbegin(dirseen *,dirseen_cur *) noex ;
 extern int dirseen_curend(dirseen *,dirseen_cur *) noex ;
 extern int dirseen_curenum(dirseen *,dirseen_cur *,char *,int) noex ;
-extern int dirseen_notseen(dirseen *,USTAT *,cchar *,int) noex ;
-extern int dirseen_notadd(dirseen *,USTAT *,cchar *,int) noex ;
+extern int dirseen_notseen(dirseen *,ustat *,cchar *,int) noex ;
+extern int dirseen_notadd(dirseen *,ustat *,cchar *,int) noex ;
 extern int dirseen_finish(dirseen *) noex ;
 
 EXTERNC_end
