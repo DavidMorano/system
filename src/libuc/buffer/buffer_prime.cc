@@ -79,8 +79,6 @@ import ulibvals ;			/* |maxlinelen(3u)| */
 
 /* local defines */
 
-#define	BUFFER_STARTLEN	50		/* starting buffer length */
-
 #ifndef	CF_BUFSTART
 #define	CF_BUFSTART	0
 #endif
@@ -94,6 +92,7 @@ import ulibvals ;			/* |maxlinelen(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using buffer_ns::buffer_ext ;		/* subroutine */
 using libuc::libmem ;			/* variable */
 
 
@@ -124,54 +123,12 @@ static inline int buffer_ctor(buffer *op,Args ... args) noex {
 	return rs ;
 } /* end method (buffer_ctor) */
 
-static int	buffer_ext(buffer *,int) noex ;
-
-template<typename T>
-int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
-	cint		dlen = DIGBUFLEN ;
-	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (op) ylikely {
-	    if ((rs = buffer_ext(op,dlen)) >= 0) ylikely {
-	        char	*bp = (op->dbuf + op->clen) ;
-	        rs = ctxxx(bp,dlen,v) ;
-	        op->clen += rs ;
-		len = rs ;
-	    }
-	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine-template (buffer_xxxx) */
-
-template<typename T>
-int buffer_binx(buffer *op,T v) noex {
-	return buffer_xxxx(op,ctbin,v) ;
-} /* end subroutine-template (buffer_binx) */
-
-template<typename T>
-int buffer_octx(buffer *op,T v) noex {
-	return buffer_xxxx(op,ctoct,v) ;
-} /* end subroutine-template (buffer_octx) */
-
-template<typename T>
-int buffer_decx(buffer *op,T v) noex {
-	return buffer_xxxx(op,ctdec,v) ;
-}
-/* end subroutine-template (buffer_decx) */
-
-template<typename T>
-int buffer_hexx(buffer *op,T v) noex {
-	return buffer_xxxx(op,cthex,v) ;
-}
-/* end subroutine-template (buffer_hexx) */
-
 
 /* local variables */
 
 static cint		maxlinelen = ulibval.maxline ;
 
 constexpr bool		f_bufstart = CF_BUFSTART ;
-constexpr bool		f_fastgrow = CF_FASTGROW ;
 
 
 /* exported variables */
@@ -208,7 +165,7 @@ int buffer_finish(buffer *op) noex {
 	    op->dlen = 0 ;
 	    op->startlen = 0 ;
 	    op->clen = 0 ;
-	} /* end if (magic) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (buffer_finish) */
@@ -216,10 +173,10 @@ int buffer_finish(buffer *op) noex {
 int buffer_reset(buffer *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
-	    if ((rs = op->clen) >= 0) ylikely {
+	    if ((rs = op->clen) > 0) ylikely {
 	        op->clen = 0 ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (buffer_reset) */
@@ -354,140 +311,6 @@ int buffer_getprev(buffer *op) noex {
 }
 /* end subroutine (buffer_getprev) */
 
-int buffer_bini(buffer *op,int v) noex {
-	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_bini) */
-
-int buffer_binl(buffer *op,long v) noex {
-	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binl) */
-
-int buffer_binll(buffer *op,longlong v) noex {
-	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binll) */
-
-int buffer_binui(buffer *op,uint v) noex {
-	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binui) */
-
-int buffer_binul(buffer *op,ulong v) noex {
-	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binul) */
-
-int buffer_binull(buffer *op,ulonglong v) noex {
-	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binull) */
-
-int buffer_octi(buffer *op,int v) noex {
-	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octi) */
-
-int buffer_octl(buffer *op,long v) noex {
-	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octl) */
-
-int buffer_octll(buffer *op,longlong v) noex {
-	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octll) */
-
-int buffer_octui(buffer *op,uint v) noex {
-	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octui) */
-
-int buffer_octul(buffer *op,ulong v) noex {
-	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octul) */
-
-int buffer_octull(buffer *op,ulonglong v) noex {
-	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octull) */
-
-int buffer_deci(buffer *op,int v) noex {
-	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_deci) */
-
-int buffer_decl(buffer *op,long v) noex {
-	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decl) */
-
-int buffer_decll(buffer *op,longlong v) noex {
-	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decll) */
-
-int buffer_decui(buffer *op,uint v) noex {
-	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decui) */
-
-int buffer_decul(buffer *op,ulong v) noex {
-	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decul) */
-
-int buffer_decull(buffer *op,ulonglong v) noex {
-	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decull) */
-
-int buffer_hexc(buffer *op,int v) noex {
-	uint		uv = uint(v) ;
-	return buffer_hexuc(op,uv) ;
-}
-/* end subroutine (buffer_hexc) */
-
-int buffer_hexi(buffer *op,int v) noex {
-	uint		uv = uint(v) ;
-	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexi) */
-
-int buffer_hexl(buffer *op,long v) noex {
-	ulong		uv = ulong(v) ;
-	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexl) */
-
-int buffer_hexll(buffer *op,longlong v) noex {
-	ulonglong	uv = ulonglong(v) ;
-	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexll) */
-
-int buffer_hexuc(buffer *op,uint uv) noex {
-	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexc) */
-
-int buffer_hexui(buffer *op,uint uv) noex {
-	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexui) */
-
-int buffer_hexul(buffer *op,ulong uv) noex {
-	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexul) */
-
-int buffer_hexull(buffer *op,ulonglong uv) noex {
-	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexull) */
-
 int buffer_len(buffer *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
@@ -498,43 +321,6 @@ int buffer_len(buffer *op) noex {
 
 
 /* private subroutines */
-
-static int buffer_ext(buffer *op,int req) noex {
-	int		rs = SR_OK ;
-	int		need ; /* used-below */
-	if (req < 0) req = op->startlen ;
-	need = ((op->clen + (req + 1)) - op->dlen) ;
-	if (need > 0) {
-	    int		nlen ; /* used-multiple */
-	    char	*nbuf{} ; /* used-multiple */
-	    if (op->dbuf) {
-	        nlen = max(op->startlen,need) ;
-	        if ((rs = libmem.mall((nlen + 1),&nbuf)) >= 0) {
-	            op->dbuf = nbuf ;
-		    op->dlen = nlen ;
-	        } else {
-	            op->clen = rs ;
-	        }
-	    } else {
-		nlen = op->dlen ;
-	        while ((op->clen + (req + 1)) > nlen) {
-		    if_constexpr (f_fastgrow) {
-	                nlen = ((nlen + 1) * 2) ;
-		    } else {
-	                nlen = (nlen + BUFFER_STARTLEN) ;
-		    }
-	        } /* end while */
-	        if ((rs = libmem.rall(op->dbuf,nlen,&nbuf)) >= 0) {
-	            op->dbuf = nbuf ;
-		    op->dlen = nlen ;
-	        } else {
-	            op->clen = rs ;
-		}
-	    } /* end if */
-	} /* end if (extension needed) */
-	return rs ;
-}
-/* end subroutine (buffer_ext) */
 
 int buffer::adv(int v) noex {
 	return buffer_adv(this,v) ;
