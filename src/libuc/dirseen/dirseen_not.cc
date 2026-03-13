@@ -49,8 +49,10 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<pathclean.h>
 #include	<strnul.hh>
 #include	<isnot.h>
@@ -90,7 +92,7 @@ int dirseen_notseen(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex {
 	    sbp->st_ino = 0 ;
 	    sbp->st_dev = 0 ;
 	    if ((rs = dirseen_havename(op,dbuf,dlen)) == rsn) {
-		if (strnul ns(dbuf,dlen) ; (rs = u_stat(ns,sbp)) >= 0) {
+		if (strnul ns(dbuf,dlen) ; (rs = u_stat(ns,sbp)) >= 0) ylikely {
 	            if (S_ISDIR(sbp->st_mode)) {
 	    	        if ((rs = dirseen_havedevino(op,sbp)) == rsn) {
 			    rs = SR_OK ;
@@ -110,11 +112,11 @@ int dirseen_notadd(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dirseen_magic(op,sbp,dbuf)) >= 0) ylikely {
-	    if (char *cbuf ; (rs = malloc_mp(&cbuf)) >= 0) {
-	        if ((rs = pathclean(cbuf,dbuf,dlen)) > 0) {
+	    if (char *cbuf ; (rs = lm_mp(&cbuf)) >= 0) ylikely {
+	        if ((rs = pathclean(cbuf,dbuf,dlen)) > 0) ylikely {
 	            rs = dirseen_add(op,cbuf,rs,sbp) ;
 	        }
-	        rs1 = malloc_free(cbuf) ;
+	        rs1 = lm_free(cbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
