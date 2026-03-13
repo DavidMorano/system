@@ -21,7 +21,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 
 
@@ -32,13 +33,13 @@
 
 struct dirlist_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct dirlist_head {
 	vecobj		*dbp ;
 	uint		magic ;
 	int		tlen ;
-} ;
+} ; /* end struct */
 
 typedef DIRLIST_CUR	dirlist_cur ;
 
@@ -51,7 +52,7 @@ enum dirlistmems {
 	dirlistmem_join,
 	dirlistmem_finish,
 	dirlistmem_overlast
-} ;
+} ; /* end enum */
 struct dirlist ;
 struct dirlist_co {
 	dirlist		*op = nullptr ;
@@ -80,7 +81,7 @@ struct dirlist : dirlist_head {
 	    join(this,dirlistmem_join) ;
 	    finish(this,dirlistmem_finish) ;
 	    magic = 0 ;
-	} ;
+	} ; /* end ctor */
 	dirlist(const dirlist &) = delete ;
 	dirlist &operator = (const dirlist &) = delete ;
 	int adds(cchar *,int) noex ;
@@ -90,8 +91,8 @@ struct dirlist : dirlist_head {
 	int curenum(dirlist_cur *,char *,int) noex ;
 	int curget(dirlist_cur *,cchar **) noex ;
 	int joinmk(char *,int) noex ;
-	operator int () noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	destruct dirlist() {
 	    if (magic) dtor() ;
 	} ;
@@ -105,8 +106,8 @@ EXTERNC_begin
 
 extern int dirlist_start(dirlist *) noex ;
 extern int dirlist_semi(dirlist *) noex ;
-extern int dirlist_adds(dirlist *,cchar *,int) noex ;
 extern int dirlist_add(dirlist *,cchar *,int) noex ;
+extern int dirlist_adds(dirlist *,cchar *,int) noex ;
 extern int dirlist_count(dirlist *) noex ;
 extern int dirlist_strsize(dirlist *) noex ;
 extern int dirlist_curbegin(dirlist *,dirlist_cur *) noex ;
