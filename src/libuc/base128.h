@@ -14,10 +14,10 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>		/* |base128_d| can return an SR */
+#include	<usysbase.h>
+
+
+#define	BASE128_STAGELEN	7	/* staging buffer length */
 
 
 EXTERNC_begin
