@@ -5,8 +5,6 @@
 /* string buffer object */
 /* version %I% last-modified %G% */
 
-#define	CF_BUFSTART	0		/* allcate buffer from start */
-#define	CF_FASTGROW	1		/* grow (extend) faster */
 
 /* revision history:
 
@@ -54,8 +52,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -74,22 +70,8 @@
 
 /* local defines */
 
-#define	BUFFER_STARTLEN	50		/* starting buffer length */
-
-#ifndef	CF_BUFSTART
-#define	CF_BUFSTART	0
-#endif
-
-#ifndef	CF_FASTGROW
-#define	CF_FASTGROW	0
-#endif
-
 
 /* imported namespaces */
-
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
