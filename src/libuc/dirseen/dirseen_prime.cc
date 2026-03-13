@@ -117,7 +117,7 @@ int dirseen_start(dirseen *op) noex {
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    op->strsize = 0 ;
+	    op->strsz = 0 ;
 	    if ((op->dlistp = new(nt) vecobj) != np) ylikely {
 	        cint	esz = szof(dirseen_ent) ;
 		cint	vn = DIRSEEN_NDEF ;
@@ -184,7 +184,7 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,ustat *sbp) noex {
 	            if (pl < 0) pl = lenstr(pp) ;
 	 	}
 	        if ((rs = entry_start(&e,pp,pl,dev,ino)) >= 0) {
-	            op->strsize += rs ;
+	            op->strsz += rs ;
 	            rs = vecobj_add(op->dlistp,&e) ;
 	            if (rs < 0) {
 		        entry_finish(&e) ;
