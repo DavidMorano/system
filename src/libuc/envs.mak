@@ -1,4 +1,4 @@
-# MAKEFILES (envs)
+# MAKEFILE (envs)
 
 T= envs
 
@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0_ENVS= envs_main.o
+OBJ0_ENVS= envs_prime.o
 OBJ1_ENVS= envs_procxe.o
 OBJ2_ENVS= envs_subs.o
 OBJ3_ENVS= 
@@ -136,7 +136,7 @@ objb.o:		$(OBJB_ENVS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-envs_main.o:		envs_main.cc	$(INCS)
+envs_prime.o:		envs_prime.cc	$(INCS)
 envs_procxe.o:		envs_procxe.cc	#(INCS)
 envs_subs.o:		envs_subs.cc	#(INCS)
 
