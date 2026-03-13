@@ -56,11 +56,13 @@
 extern const short		char_dictorder[] ;
 
 /* test character attribute routines */
-#define	CHARINIT_ISSPACETAB(c)	(((c) == ' ') || ((c) == '\t'))
 #define	CHARINIT_ISWHITE(c)		char_iswhite(c)
+#define	CHARINIT_ISBLANK(c)		char_isblank(c)
+#define	CHARINIT_ISDIG(c)		char_isdig(c)
+#define	CHARINIT_ISWHT(c)		char_iswht(c)
+#define	CHARINIT_ISBLK(c)		char_isblk(c)
 #define	CHARINIT_ISLC(c)		char_islc(c)
 #define	CHARINIT_ISUC(c)		char_isuc(c)
-#define	CHARINIT_ISDIG(c)		char_isdig(c)
 
 /* my super-fast conversions */
 #define	CHARINIT_TOBC(c)		((c) & 0xff)
@@ -78,8 +80,14 @@ extern bool char_iswhite(int) noex ;
 extern bool char_islc(int) noex ;
 extern bool char_isuc(int) noex ;
 
-static inline bool char_isspacetab(int ch) noex {
-	return CHARINIT_ISSPACETAB(ch) ;
+local inline bool char_isblank(int ch) noex {
+	return (ch == ' ') || (ch == '\t') ;
+}
+local inline bool char_iswht(int ch) noex {
+	return char_iswhite(ch) ;
+}
+local inline bool char_isblk(int ch) noex {
+	return char_isblank(ch) ;
 }
 
 extern int char_tolc(int) noex ;
@@ -97,7 +105,7 @@ inline bool char_isdig(int ch) noex {
 
 #else /* __cplusplus */
 
-static inline bool char_isdig(int ch) noex {
+local inline bool char_isdig(int ch) noex {
 	return ((ch >= '0') && (ch <= '9')) ;
 }
 
