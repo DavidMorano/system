@@ -1,4 +1,4 @@
-# MAKEFILES (dirseen)
+# MAKEFILE (dirseen)
 
 T= dirseen
 
@@ -40,10 +40,11 @@ MODS +=
 LIBS +=
 
 
-OBJ0= dirseen_main.o dirseen_not.o
+OBJ0= dirseen_prime.o dirseen_not.o
 OBJ1=
 
 OBJA= obj0.o 
+OBJB=
 
 OBJ= obja.o
 
@@ -77,6 +78,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -130,7 +134,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-dirseen_main.o:		dirseen_main.cc		$(INCS)
-dirseen_not.o:		dirseen_not.cc		$(INCS)
+dirseen_prime.o:	dirseen_prime.cc		$(INCS)
+dirseen_not.o:		dirseen_not.cc			$(INCS)
 
 
