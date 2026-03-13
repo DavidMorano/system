@@ -1,4 +1,4 @@
-# MAKEFILES (ema)
+# MAKEFILE (ema)
 
 T= ema
 
