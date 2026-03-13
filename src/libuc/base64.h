@@ -14,10 +14,10 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>		/* |base64_d| can return an SR */
+#include	<usysbase.h>
+
+
+#define	BASE64_STAGELEN		3	/* staging buffer length */
 
 
 extern cuchar	base64_et[] ;
