@@ -47,8 +47,10 @@
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
 #include	<pathclean.h>
@@ -59,7 +61,9 @@
 
 #include	"dirlist.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -72,7 +76,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -106,48 +109,45 @@ struct dirlist_ent {
 /* forward references */
 
 template<typename ... Args>
-static inline int dirlist_ctor(dirlist *op,Args ... args) noex {
+local inline int dirlist_ctor(dirlist *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->tlen = 0 ;
-	    if ((op->dbp = new(nothrow) vecobj) != np) {
+	    if ((op->dbp = new(nothrow) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dirlist_ctor) */
+} /* end subroutine (dirlist_ctor) */
 
-static int dirlist_dtor(dirlist *op) noex {
+local int dirlist_dtor(dirlist *op) noex {
 	int		rs = SR_OK ;
 	if (op->dbp) ylikely {
 	    delete op->dbp ;
 	    op->dbp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (dirlist_dtor) */
+} /* end subroutine (dirlist_dtor) */
 
 template<typename ... Args>
-static int dirlist_magic(dirlist *op,Args ... args) noex {
+local int dirlist_magic(dirlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DIRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (dirlist_magic) */
+} /* end subroutine (dirlist_magic) */
 
 extern "C" {
-    static int	vcmpname(cvoid **,cvoid **) noex ;
-    static int	vcmpdevino(cvoid **,cvoid **) noex ;
+    local int	vcmpname(cvoid **,cvoid **) noex ;
+    local int	vcmpdevino(cvoid **,cvoid **) noex ;
 }
 
-static int	entry_start(ent *,cchar *,int,dev_t,ino_t) noex ;
-static int	entry_finish(ent *) noex ;
+local int	entry_start(ent *,cchar *,int,dev_t,ino_t) noex ;
+local int	entry_finish(ent *) noex ;
 
 
 /* local variables */
@@ -166,7 +166,7 @@ int dirlist_start(dirlist *op) noex {
 	    cint	esz = szof(ent) ;
 	    cint	ne = DIRLIST_NDEF ;
 	    cint	vo = VECOBJ_OORDERED ;
-	    if ((rs = vecobj_start(op->dbp,esz,ne,vo)) >= 0) {
+	    if ((rs = vecobj_start(op->dbp,esz,ne,vo)) >= 0) ylikely {
 	        op->magic = DIRLIST_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -181,7 +181,7 @@ int dirlist_finish(dirlist *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dirlist_magic(op)) >= 0) ylikely {
-	    if (op->dbp) {
+	    if (op->dbp) ylikely {
 		vecobj	*dbp = op->dbp ;
 	        {
 	            void	*vp{} ;
@@ -211,7 +211,7 @@ int dirlist_finish(dirlist *op) noex {
 int dirlist_semi(dirlist *op) noex { /* add a semicolon as an entry */
 	int		rs ;
 	if ((rs = dirlist_magic(op)) >= 0) ylikely {
-	    if (ent e ; (rs = entry_start(&e,";",1,0L,0L)) >= 0) {
+	    if (ent e ; (rs = entry_start(&e,";",1,0L,0L)) >= 0) ylikely {
 	        op->tlen += (rs+1) ;
 	        rs = vecobj_add(op->dbp,&e) ;
 	        if (rs < 0) {
@@ -258,7 +258,7 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	int		f_added = false ;
 	if ((rs = dirlist_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
+	    if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
 	        int	pl{} ;
 	        if ((sl == 0) || ((sl == 1) && (sp[0] == '.'))) {
 	            pbuf[0] = '.' ;
@@ -287,11 +287,11 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	                if (USTAT sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
 	                        vecobj_vcf	vdf = vecobj_vcf(vcmpdevino) ;
-				auto		vs = vecobj_search ;
+				cauto		vs = vecobj_search ;
 	                        e.dev = sb.st_dev ;
 	                        e.ino = sb.st_ino ;
 	                        if ((rs = vs(op->dbp,&e,vdf,&vp)) == rsn) {
-				    auto	es = entry_start ;
+				    cauto	es = entry_start ;
 	                            dev_t	d = sb.st_dev ;
 	                            ino_t	i = sb.st_ino ;
 	                            f_added = true ;
@@ -311,7 +311,7 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	                } /* end if (stat) */
 	            } /* end if (was not found) */
 	        } /* end if (ok) */
-		rs1 = uc_free(pbuf) ;
+		rs1 = lm_free(pbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
@@ -411,7 +411,7 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 	int		c = 0 ;
 	if ((rs = dirlist_magic(op,jbuf)) >= 0) ylikely {
 	    int		djlen = op->tlen ;
-	    if (jlen >= djlen) {
+	    if (jlen >= djlen) ylikely {
 		vecobj	*dbp = op->dbp ;
 	        char	*bp = jbuf ;
 	        cchar	*dp ;
@@ -499,7 +499,7 @@ dirlist::operator int () noex {
 
 dirlist_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case dirlistmem_start:
 	        rs = dirlist_start(op) ;
@@ -525,13 +525,13 @@ dirlist_co::operator int () noex {
 }
 /* end method (dirlist_co::operator) */
 
-static int entry_start(ent *ep,cc *sp,int sl,dev_t dev,ino_t ino) noex {
+local int entry_start(ent *ep,cc *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs = SR_FAULT ;
 	if (ep && sp) ylikely {
 	    memclear(ep) ;
 	    ep->dev = dev ;
 	    ep->ino = ino ;
-	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) ylikely {
 	        ep->sl = rs ;
 	        ep->sp = cp ;
 	    } /* end if */
@@ -540,11 +540,12 @@ static int entry_start(ent *ep,cc *sp,int sl,dev_t dev,ino_t ino) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(ent *ep) noex {
+local int entry_finish(ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->sp) ylikely {
-	    rs1 = uc_free(ep->sp) ;
+	    void *vp = voidp(ep->sp) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->sp = nullptr ;
 	    ep->sl = 0 ;
@@ -553,7 +554,7 @@ static int entry_finish(ent *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int cmpname(const entp e1p,const entp e2p) noex {
+local int cmpname(const entp e1p,const entp e2p) noex {
 	cint        ml = min(e1p->sl,e2p->sl) ;
 	int         rc ;
 	cchar       *s1 = e1p->sp ;
@@ -568,7 +569,7 @@ static int cmpname(const entp e1p,const entp e2p) noex {
 	return rc ;
 } /* end subroutine (cmpname) */
 
-static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	ent		*e1p = entp(*v1pp) ;
 	ent		*e2p = entp(*v2pp) ;
 	int		rc = 0 ;
@@ -585,7 +586,7 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 }
 /* end subroutine (vcmpname) */
 
-static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
 	ent		*e1p = entp(*v1pp) ;
 	ent		*e2p = entp(*v2pp) ;
 	int		rc = 0 ;
