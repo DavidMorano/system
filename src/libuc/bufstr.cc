@@ -60,7 +60,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -360,8 +359,7 @@ local int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 	    *rpp = (rs >= 0) ? dp : nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (bufstr_extend) */
+} /* end subroutine (bufstr_extend) */
 
 int bufstr::strw(cchar *sp,int sl) noex {
 	return bufstr_strw(this,sp,sl) ;
@@ -379,7 +377,7 @@ void bufstr::dtor() noex {
 	if (cint rs = bufstr_finish(this) ; rs < 0) {
 	    ulogerror("bufstr",rs,"fini-finish") ;
 	}
-}
+} /* end method (bufstr::dtor) */
 
 bufstr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -397,7 +395,6 @@ bufstr_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (bufstr_co::operator) */
+} /* end method (bufstr_co::operator) */
 
 
