@@ -15,16 +15,24 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Group:
+	digval
+
+	Returns:
+	>=0	valid value
+	<0	error (SR_DOM)
+
+*******************************************************************************/
+
 #ifndef	DIGVAL_INCLUDE
 #define	DIGVAL_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
