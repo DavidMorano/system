@@ -1,0 +1,104 @@
+/* findbit HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* find bit patterns (whatever!) */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	FINDBIT_INCLUDE
+#define FINDBIT_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>
+
+
+EXTERNC_begin
+
+extern int ffbsi	(uint) noex ;
+extern int ffbsl	(ulong) noex ;
+extern int ffbsll	(ulonglong) noex ;
+
+extern int ffbci	(uint) noex ;
+extern int ffbcl	(ulong) noex ;
+extern int ffbcll	(ulonglong) noex ;
+
+extern int flbsi	(uint) noex ;
+extern int flbsl	(ulong) noex ;
+extern int flbsll	(ulonglong) noex ;
+
+extern int flbci	(uint) noex ;
+extern int flbcl	(ulong) noex ;
+extern int flbcll	(ulonglong) noex ;
+
+extern int fbscounti	(uint) noex ;
+extern int fbscountl	(ulong) noex ;
+extern int fbscountll	(ulonglong) noex ;
+
+EXTERNC_end
+
+#ifdef	__cplusplus
+
+inline int ffbs		(uint uv) noex {
+	return ffbsi(uv) ;
+}
+inline int ffbs		(ulong uv) noex {
+	return ffbsl(uv) ;
+}
+inline int ffbs		(ulonglong uv) noex {
+	return ffbsll(uv) ;
+}
+
+inline int ffbc		(uint uv) noex {
+	return ffbci(uv) ;
+}
+inline int ffbc		(ulong uv) noex {
+	return ffbcl(uv) ;
+}
+inline int ffbc		(ulonglong uv) noex {
+	return ffbcll(uv) ;
+}
+
+inline int flbs		(uint uv) noex {
+	return flbsi(uv) ;
+}
+inline int flbs		(ulong uv) noex {
+	return flbsl(uv) ;
+}
+inline int flbs		(ulonglong uv) noex {
+	return flbsll(uv) ;
+}
+
+inline int flbc		(uint uv) noex {
+	return flbci(uv) ;
+}
+inline int flbc		(ulong uv) noex {
+	return flbcl(uv) ;
+}
+inline int flbc		(ulonglong uv) noex {
+	return flbcll(uv) ;
+}
+
+inline int fbscount	(uint uv) noex {
+	return fbscounti(uv) ;
+}
+inline int fbscount	(ulong uv) noex {
+	return fbscountl(uv) ;
+}
+inline int fbscount	(ulonglong uv) noex {
+	return fbscountll(uv) ;
+}
+
+#endif /* __cplusplus */
+
+
+#endif /* FINDBIT_INCLUDE */
+
+
