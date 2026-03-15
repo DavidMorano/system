@@ -149,7 +149,7 @@ template<typename ... Args>
 local inline int vecpstr_magic(vecpstr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == VECPSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == VECPSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (vecpstr_magic) */
@@ -190,7 +190,7 @@ int vecpstr_start(vecpstr *op,int vn,int vsz,int vo) noex {
 	    if ((rs = vecpstr_setopts(op,vo)) >= 0) ylikely {
 	        cint	nc = min(((vn * 6) / vsz),1) ;
 	        if ((rs = vechand_start(op->clp,nc,0)) >= 0) ylikely {
-	            op->magic = VECPSTR_MAGIC ;
+	            op->magval = VECPSTR_MAGIC ;
 	        }
 	    }
 	    if (rs < 0) {
@@ -225,7 +225,7 @@ int vecpstr_finish(vecpstr *op) noex {
 	    op->cnt = 0 ;
 	    op->idx = 0 ;
 	    op->ext = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -837,7 +837,7 @@ local int vecpstr_ctor(vecpstr *op) noex {
 	    op->fidx = 0 ;
 	    op->stsz = 0 ;
 	    op->chp = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->chsize = 0 ;
 	    op->addnum = 0 ;
 	    if ((op->clp = new(nothrow) vechand) != np) ylikely {
@@ -1209,7 +1209,7 @@ void vecpstr::dtor() noex {
 
 vecpstr::operator int () noex {
     	int		rs = SR_NOTOPEN ;
-	if (magic == VECPSTR_MAGIC) ylikely {
+	if (magval == VECPSTR_MAGIC) ylikely {
 	    rs = cnt ;
 	}
 	return rs ;
