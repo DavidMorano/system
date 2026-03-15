@@ -168,6 +168,7 @@ haslead.o:		haslead.cc	haslead.h		$(INCS)
 hasvarprefix.o:		hasvarprefix.cc	hasvarprefix.h		$(INCS)
 hasprintbad.o:		hasprint.cc	hasprint.h		$(INCS)
 hasourmjd.o:		hasourmjd.cc	hasourmjd.h		$(INCS)
+haseol.o:		haseol.cc	haseol.h		$(INCS)
 
 hasallof.o:		hasallof.cc	hasallof.h		$(INCS)
 
