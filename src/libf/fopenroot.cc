@@ -1,18 +1,15 @@
-/* frcopenroot */
+/* fopenroot SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* open a file name according to rules */
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-
-
 /* revision history:
 
 	= 2001-04-11, David A­D­ Morano
-
-	This was straightforwardly adapted from 'bopenroot()'.
-
+	This was straightforwardly adapted from |bopenroot(3b)|.
 
 */
 
@@ -20,11 +17,14 @@
 
 /*****************************************************************************
 
+  	Name:
+	fopenroot
+
+	Description:
 	This subroutine will form a file name according to some
 	rules.
 
 	The rules are roughly:
-
 	+ attempt to open it directly if it is already rooted
 	+ open it if it is already in the root area
 	+ attempt to open it as it is if it already exists
@@ -32,59 +32,59 @@
 	+ attempt to open or create it as it is
 
 	Synopsis:
-
-	int frcopenroot(fpp,programroot,fname,outname,mode)
-	FILE	**fpp ;
-	char	programroot[], fname[], outname[] ;
-	char	mode[] ;
+	FILE *fopenroot(cc *pr,cc *fname,char *outname,cc *mstr) noex
 
 	Arguments:
-
-	+ fp		pointer to 'bfile' object
-	+ programroot	path of program root directory
+	+ pr		path of program root directory
 	+ fname		fname to find and open
-	+ outname	user supplied buffer to hold possible resulting name
-	+ mode		file open mode
+	+ outname	user supplied buffer to hold resulting name
+	+ mstr		mode-string
 
 	Returns:
-
-	>=0		success (same as 'bopen()')
-	<0		error (same as 'bopen()')
+	non-null	success (pointer to FILE obect)
+	null		failure
 
 	outname		1. zero length string if no new name was needed
 			2. will contain the path of the file that was opened
 
-	
 *****************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>
 #include	<cstdlib>
-#include	<cstring>
 #include	<cstdio>
-
-#include	<usystem.h>
+#include	<cstring>		/* strcpy(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<umem.hh>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
-#include	"outbuf.h"
+#include	"libf.h"
 
+#pragma		GCC dependency		"mod/ulibvals.ccm"
+#pragma		GCC dependency		"mod/umisc.ccm"
+
+import ulibvals ;
+import umisc ;				/* |mknpath(3u)| */
 
 /* local defines */
 
 
+/* imported namespaces */
+
+using libu::umem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-
-extern char	*strwcpy(char *,char *,int) ;
 
 
 /* external variables */
@@ -92,157 +92,51 @@ extern char	*strwcpy(char *,char *,int) ;
 
 /* forward references */
 
-static int	frcopen(FILE **,char *,char *) ;
-
 
 /* local structures */
 
 
 /* local variables */
 
+cint		maxpathlen = ulibval.maxpathlen ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int frcopenroot(fpp,programroot,fname,outname,mode)
-FILE	**fpp ;
-char	programroot[], fname[], outname[] ;
-char	mode[] ;
-{
-	OUTBUF	ob ;
-
-	FILE	*fp ;
-
-	int	rs ;
-	int	sl ;
-	int	imode ;
-	int	f_outbuf ;
-
-	char	*mp, *onp = NULL ;
-
-
-#if	CF_DEBUGS
-	debugprintf("bopenroot: ent fname=%s\n",fname) ;
-#endif
-
-	if ((fname == NULL) || (fname[0] == '\0'))
-	    return SR_NOEXIST ;
-
-	if (fpp == NULL)
-	    return SR_FAULT ;
-
-	f_outbuf = (outname != NULL) ;
-
-	imode = 0 ;
-	for (mp = mode ; *mp ; mp += 1) {
-
-	    switch ((int) *mp) {
-
-	    case 'r':
-	        imode += R_OK ;
-	        break ;
-
-	    case '+':
-	    case 'w':
-	        imode += W_OK ;
-	        break ;
-
-	    case 'x':
-	        imode += X_OK ;
-	        break ;
-
-	    } /* end switch */
-
-	} /* end for */
-
-	if (fname[0] == '/') {
-
-	    if (f_outbuf)
-	        outname[0] = '\0' ;
-
-	    rs = frcopen(fpp,fname,mode) ;
-
-	    goto ret0 ;
+FILE *fopenroot(cchar *pr,cchar *fn,char *outname,cchar *mstr) noex {
+	FILE	*fp = nullptr ;
+	int	rs = SR_FAULT ;
+	int	rs1 ;
+	if (mstr == nullptr) {
+	    mstr = "r" ;
 	}
-
-	rs = outbuf_start(&ob,outname,-1) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	if (programroot != NULL) {
-
-#if	CF_DEBUGS
-	    debugprintf("bopenroot: about to alloc\n") ;
-#endif
-
-	    rs = outbuf_get(&ob,&onp) ;
-	    if (rs < 0)
-	        goto ret1 ;
-
-	    sl = mkpath2(onp,programroot,fname) ;
-
-	    if (perm(onp,-1,-1,NULL,imode) >= 0) {
-
-	        rs = frcopen(fpp,onp,mode) ;
-	        if (rs >= 0)
-	            goto done ;
-
-	    }
-
-	}
-
-	if (perm(fname,-1,-1,NULL,imode) >= 0) {
-
-	    rs = frcopen(fpp,fname,mode) ;
-	    if (rs >= 0) {
-
-	        if (f_outbuf)
-	            outname[0] = '\0' ;
-
-	        goto done ;
-	    }
-	}
-
-	if ((programroot != NULL) &&
-	    (strchr(fname,'/') != NULL)) {
-
-	    rs = frcopen(fpp,onp,mode) ;
-	    if (rs >= 0)
-	        goto done ;
-
-	}
-
-	if (f_outbuf)
-	    outname[0] = '\0' ;
-
-	rs = frcopen(fpp,fname,mode) ;
-
-done:
-ret1:
-	outbuf_finish(&ob) ;
-
-ret0:
-	return rs ;
+	if (pr && fn) {
+	    rs = SR_INVALID ;
+	    if (fn[0] && mstr[0]) {
+		if ((rs = maxpathlen) >= 0) {
+		    cint plen = rs ;
+		    if (char *pbuf ; (rs = umem.mall((plen + 1),&pbuf)) >= 0) {
+	    	        if ((rs = mknpath(pbuf,plen,pr,fn)) >= 0) {
+			    fp = fopen(pbuf,mstr) ;
+		        }
+		        rs1 = umem.free(pbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		        if (outname) {
+			    strcpy(outname,pbuf) ;
+		        }
+		    } /* end if (m-a-f) */
+		} /* end if (maxpathlen) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	if ((rs < 0) && fp) {
+	    fclose(fp) ;
+	    fp = nullptr ;
+	} /* end if (error) */
+	return fp ;
 }
-/* end subroutine (frcopenroot) */
-
-
-/* local subroutines */
-
-
-/* file open w/ return code */
-static int frcopen(fpp,fname,mode)
-FILE	**fpp ;
-char	fname[] ;
-char	mode[] ;
-{
-
-
-	*fpp = fopen(fname,mode) ;
-
-	return ((*fpp != NULL) ? SR_OK : SR_NOTOPEN) ;
-}
-/* end subroutine (frcopen) */
-
+/* end subroutine (fopenroot) */
 
 
