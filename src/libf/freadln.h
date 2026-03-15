@@ -22,10 +22,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdio.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
