@@ -72,7 +72,7 @@
 #define	PI	proginfo
 #endif
 
-#define	STATE	struct state
+#define	STATE	state
 
 
 /* external subroutines */
@@ -87,16 +87,16 @@ struct state {
 	char		*obuf ;
 	int		olen ;
 	int		cr ;
-} ;
+} ; /* end struct (state) */
 
 
 /* forward references */
 
-local int	procline(PROGINFO *,bfile *,B64DECODER *,STATE *,cchar *,int) ;
+local int	procln(PI *,bfile *,b64decoder *,STATE *,cchar *,int) noex ;
 
-local int	bwritetext(bfile *,int *,cchar *,int) ;
+local int	bwritetext(bfile *,int *,cchar *,int) noex ;
 
-local int	haseol(cchar *,int) ;
+local int	haseol(cchar *,int) noex ;
 
 
 /* local variables */
@@ -107,7 +107,7 @@ local int	haseol(cchar *,int) ;
 
 /* exported subroutines */
 
-int progdecode(PROGINFO *pip,bfile *ofp,cchar *name) noex {
+int progdecode(PI *pip,bfile *ofp,cchar *name) noex {
 	cint	llen = LINEBUFLEN ;
 	cint	olen = LINEBUFLEN ;
 	int		rs ;
@@ -124,7 +124,7 @@ int progdecode(PROGINFO *pip,bfile *ofp,cchar *name) noex {
 	size += (llen+1) ;
 	size += (olen+1) ;
 	if ((rs = uc_malloc(size,&abuf)) >= 0) {
-	    B64DECODER	d ;
+	    b64decoder	d ;
 	    char	*lbuf = (abuf + 0) ;
 	    char	*obuf = (abuf + (llen+1)) ;
 	    if ((rs = b64decoder_start(&d)) >= 0) {
@@ -136,15 +136,13 @@ int progdecode(PROGINFO *pip,bfile *ofp,cchar *name) noex {
 	    	    cb.cr = 0 ;
 	            while ((rs = breadln(ifp,lbuf,llen)) > 0) {
 	                int	len = rs ;
-	                int	el ;
-
-	                if ((el = haseol(lbuf,len)) > 0) len -= el ;
-
+	                if (int el ; (el = haseol(lbuf,len)) > 0) {
+			    len -= el ;
+			}
 	                if (len > 0) {
-			    rs = procline(pip,ofp,&d,&cb,lbuf,len) ;
+			    rs = procln(pip,ofp,&d,&cb,lbuf,len) ;
 			    wlen += rs ;
 			} /* end if (positive) */
-
 	                if (rs < 0) break ;
 	            } /* end while (reading) */
 	            rs1 = bclose(ifp) ;
@@ -169,14 +167,8 @@ int progdecode(PROGINFO *pip,bfile *ofp,cchar *name) noex {
 
 /* local subroutines */
 
-local int procline(pip,ofp,dp,statep,lp,ll)
-PROGINFO	*pip ;
-bfile		*ofp ;
-B64DECODER	*dp ;
-STATE		*statep ;
-cchar		*lp ;
-int		ll ;
-{
+local int procln(PI *pip,bfile *ofp,b64decoder *dp,STATE *statep,
+		cchar *lp,int ll) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = b64decoder_load(dp,lp,ll)) > 0) {
@@ -197,16 +189,10 @@ int		ll ;
 	} /* end if (b64decoder_load) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (procline) */
-
+/* end subroutine (procln) */
 
 /* write out adjusted text */
-local int bwritetext(ofp,crp,sp,sl)
-bfile		*ofp ;
-int		*crp ;
-cchar	*sp ;
-int		sl ;
-{
+local int bwritetext(bfile *ofp,int crp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*cp ;
