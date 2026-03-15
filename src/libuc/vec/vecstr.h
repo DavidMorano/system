@@ -35,7 +35,6 @@
 #include	<usysbase.h>
 
 
-/* object defines */
 #define	VECSTR			struct vecstr_head
 #define	VECSTR_FL		struct vecstr_flags
 #define	VECSTR_DEFENTS		5
@@ -94,7 +93,7 @@ struct vecstr_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-	uint		stsize:1 ;		/* not option (just flag) */
+	uint		stsz:1 ;		/* not option (just flag) */
 } ; /* end struct (vecstr_flags) */
 
 struct vecstr_head {
@@ -104,7 +103,7 @@ struct vecstr_head {
 	int		i ;		/* overlast index */
 	int		n ;		/* current extent of array */
 	int		fi ;		/* free index */
-	int		stsize ;	/* total string-table length */
+	int		stsz ;		/* total string-table length */
 } ; /* end struct (vecstr_head) */
 
 EXTERNC_begin
@@ -125,7 +124,7 @@ enum vecstrmems {
 	vecstrmem_audit,
 	vecstrmem_finish,
 	vecstrmem_overlast
-} ;
+} ; /* end enum (vecstrmems) */
 struct vecstr_iter {
 	cchar		**va = nullptr ;
 	int		i = -1 ;
@@ -208,38 +207,39 @@ struct vecstr : vecstr_head {
 	vecstr_co	audit ;
 	vecstr_co	finish ;
 	vecstr() noex {
-	    start(this) ;
-	    addcspath(this,vecstrmem_addcspath) ;
-	    count(this,vecstrmem_count) ;
-	    delall(this,vecstrmem_delall) ;
-	    strsize(this,vecstrmem_strsize) ;
-	    recsize(this,vecstrmem_recsize) ;
-	    cksize(this,vecstrmem_cksize) ;
-	    audit(this,vecstrmem_audit) ;
-	    finish(this,vecstrmem_finish) ;
-	    sort.init(this) ;
+	    start	(this) ;
+	    sort.init	(this) ;
+	    addcspath	(this,vecstrmem_addcspath) ;
+	    count	(this,vecstrmem_count) ;
+	    delall	(this,vecstrmem_delall) ;
+	    strsize	(this,vecstrmem_strsize) ;
+	    recsize	(this,vecstrmem_recsize) ;
+	    cksize	(this,vecstrmem_cksize) ;
+	    audit	(this,vecstrmem_audit) ;
+	    finish	(this,vecstrmem_finish) ;
 	    va = nullptr ;
 	} ; /* end ctor */
 	vecstr(const vecstr &) = delete ;
 	vecstr &operator = (const vecstr &) = delete ;
-	int add(cchar *,int = -1) noex ;
-	int adduniq(cchar *,int = -1) noex ;
-	int addsyms(cchar *,mainv) noex ;
-	int addpath(cchar *,int = -1) noex ;
-	int insert(int,cchar *,int = -1) noex ;
-	int store(cchar *,int,cchar **) noex ;
-	int already(cchar *,int) noex ;
-	int get(int,cchar **) noex ;
-	int getlast(cchar **) noex ;
-	int getvec(mainv *) noex ;
-	int envadd(cchar *,cchar *,int = -1) noex ;
-	int envset(cchar *,cchar *,int = -1) noex ;
-	int envfile(cchar *) noex ;
-	int find(cchar *) noex ;
-	int findn(cchar *,int = -1) noex ;
-	int search(cchar *,vecstr_f,cchar ** = nullptr) noex ;
-	int finder(cchar *,vecstr_f,cchar ** = nullptr) noex ;
-	int del(int = -1) noex ;
+	int add		(cchar *,int = -1) noex ;
+	int adduniq	(cchar *,int = -1) noex ;
+	int addsyms	(cchar *,mainv) noex ;
+	int addpath	(cchar *,int = -1) noex ;
+	int insert	(int,cchar *,int = -1) noex ;
+	int store	(cchar *,int,cchar **) noex ;
+	int already	(cchar *,int) noex ;
+	int loadfile	(int,cchar *) noex ;
+	int get		(int,cchar **) noex ;
+	int getlast	(cchar **) noex ;
+	int getvec	(mainv *) noex ;
+	int envadd	(cchar *,cchar *,int = -1) noex ;
+	int envset	(cchar *,cchar *,int = -1) noex ;
+	int envfile	(cchar *) noex ;
+	int find	(cchar *) noex ;
+	int findn	(cchar *,int = -1) noex ;
+	int search	(cchar *,vecstr_f,cchar ** = nullptr) noex ;
+	int finder	(cchar *,vecstr_f,cchar ** = nullptr) noex ;
+	int del		(int = -1) noex ;
 	operator int () noex ;
 	vecstr_iter begin() noex {
 	    vecstr_iter		it(va,0,i) ;
@@ -275,8 +275,8 @@ extern int vecstr_del		(vecstr *,int) noex ;
 extern int vecstr_delall	(vecstr *) noex ;
 extern int vecstr_count		(vecstr *) noex ;
 extern int vecstr_sort		(vecstr *,vecstr_vcmp) noex ;
-extern int vecstr_search	(vecstr *,cchar *,vecstr_vcmp,cchar **) noex ;
-extern int vecstr_searchl  (vecstr *,cchar *,int,vecstr_vcmp,cchar **) noex ;
+extern int vecstr_search	(vecstr *,cc *,vecstr_vcmp,cc **) noex ;
+extern int vecstr_searchl	(vecstr *,cc *,int,vecstr_vcmp,cc **) noex ;
 extern int vecstr_find		(vecstr *,cchar *) noex ;
 extern int vecstr_findn		(vecstr *,cchar *,int) noex ;
 extern int vecstr_finder	(vecstr *,cchar *,vecstr_vcmp,cchar **) noex ;
@@ -310,7 +310,7 @@ extern int vecstr_loadgrusers	(vecstr *,gid_t) noex ;
 extern int vecstr_srvargs	(vecstr *,cchar *) noex ;
 extern int vecstr_svcargs	(vecstr *,int *,cchar *) noex ;
 
-static inline int vecstr_loaddirs(vecstr *op,cchar *newsdname) noex {
+local inline int vecstr_loaddirs(vecstr *op,cchar *newsdname) noex {
 	return vecstr_addsubdirs(op,newsdname) ;
 }
 
