@@ -40,7 +40,7 @@
 
 #pragma		GCC dependency		"mod/ulibvals.ccm"
 
-import ulibvals ;
+import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
 
@@ -67,43 +67,40 @@ using libuc::libmem ;			/* variable */
 
 /* local variables */
 
-local int		maxpathlen = ulibval.maxpathlen ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int vecstrx::addsubdirs(cchar *newsdname) noex {
+int vecstrx::addsubdirs(cchar *dname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (newsdname) ylikely {
-	    if ((rs = maxpathlen) >= 0) ylikely {
+	if (dname) ylikely {
+	    cauto &fom = fsdirtreem ;
+	    if (char *fbuf ; (rs = lm_mp(&fbuf)) >= 0) {
 		cint	flen = rs ;
-	        if (char *fbuf ; (rs = libmem.mall((flen +1),&fbuf)) >= 0) {
-	            fsdirtree	dir ;
-	            cint	fo = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;
-	            if ((rs = fsdirtree_open(&dir,newsdname,fo)) >= 0) {
-	                ustat sb ;
-	                while ((rs = fsdirtree_read(&dir,&sb,fbuf,flen)) > 0) {
-	                    if (fbuf[0] != '.') {
-	                        c += 1 ;
-	                        rs = add(fbuf,rs) ;
-	                    }
-	                    if (rs < 0) break ;
-	                } /* end while */
-	                rs1 = fsdirtree_close(&dir) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (fsdirtree) */
-	            if (rs >= 0) {
-	                sort(nullptr) ;
-	            }
-		    rs1 = libmem.free(fbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (m-a-f) */
-	    } /* end if (maxpathlen) */
+	        int	fo = 0 ;
+		fo |= fom.follow ;
+		fo |= fom.dir ;
+	        if (fsdirtree d ; (rs = d.open(dname,fo)) >= 0) {
+		    for (ustat sb ; (rs = d.read(&sb,fbuf,flen)) > 0 ; ) {
+	                if (fbuf[0] != '.') {
+	                    c += 1 ;
+	                    rs = add(fbuf,rs) ;
+	                }
+	                if (rs < 0) break ;
+	            } /* end while */
+	            rs1 = d.close ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (fsdirtree) */
+	        if (rs >= 0) {
+	            sort(nullptr) ;
+	        }
+		rs1 = lm_free(fbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
