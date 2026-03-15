@@ -20,21 +20,25 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stdio.h>		/* |FILE(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 #include	<freadln.h>
 
 EXTERNC_begin
 
 extern int	fprint(FILE *,cchar *,int) noex ;
+extern int	fputch(FILE *,int) noex ;
+extern int	fwriter(FILE *,cvoid *,int) noex ;
+
+extern FILE *fopenroot(cchar *,cchar *,
+			char * = nullptr,cchar * = nullptr) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
+/* the following subroutine are C++ overloaded */
+#ifndef	__cplusplus
 
 extern int	fwrite(FILE *,cvoid *,int) noex ;
 
