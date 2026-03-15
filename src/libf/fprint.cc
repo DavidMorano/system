@@ -26,19 +26,19 @@
 
 ******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdio>
 #include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<intsat.h>
+#include	<ascii.h>
 #include	<localmisc.h>
+
+#include	"libf.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -78,8 +78,8 @@ int fprint(FILE *fp,cchar *lbuf,int µllen) noex {
 	            rs = fwrite(fp,lbuf,llen) ;
 	            wlen += rs ;
 		}
-	        if ((rs >= 0) && ((llen == 0) || (lbuf[llen-1] != '\n'))) {
-	            rs = fwrite(fp,"\n",1) ;
+	        if ((rs >= 0) && ((llen == 0) || (lbuf[llen-1] != CH_NL))) {
+	            rs = fputch(fp,CH_NL) ;
 	            wlen += rs ;
 	        }
 	    } /* end if (valid) */
