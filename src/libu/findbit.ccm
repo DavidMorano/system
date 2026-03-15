@@ -1,0 +1,391 @@
+/* findbit MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* find bits (meeting certain criteria) */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-09, David A­D­ Morano
+	This group of subroutines was originally written here in C
+	language but were inspired by single instructions on the
+	VAX (Digital Equipment 1979) that did roughly the same
+	functions.
+
+	= 2001-02-11, David A­D­ Morano
+	I removed the long (32k-byte) look-up table and instead I
+	am now using an algorithm that uses a 128-byte look-up
+	table.  I felt that wasting 32k bytes for something so
+	relatively unused was not the best use of in-core memory.
+	And yes, these things invariably end up in in-core memory
+	due to use in shared objects or something else that indirectly
+	calls one or more of the subroutines in here.
+
+	= 2026-03-09, David A­D­ Morano
+	I changed this code to use the C++20 bit-manipulation
+	subroutines.  I have used them (C++20 bit-manipulation
+	subroutines) elsewhere but I have only gotten to change
+	these here now.
+
+*/
+
+/* Copyright © 1998,2001,2026 David A­D­ Morano.  All rights reserved. */
+
+/******************************************************************************
+
+  	Group:
+	findbit
+
+	Names:
+	ffbsi
+	ffbsl
+	ffbsll
+	ffbci
+	ffbcl
+	ffbcll
+	flbsi
+	flbsl
+	flbsll
+	flbci
+	flbcl
+	flbcll
+
+	Description:
+	Find bits that meet a certain criteria in an integer (of
+	some type).
+
+	ffbs[il]	find first bit set [integer, long, longlong]
+	flbs[il]	find last bit set [integer, long, longlong]
+
+	ffbc[il]	find first bit clear [integer, long, longlong]
+	flbc[il]	find last bit clear [integer, long, longlong]
+
+	Synopsis:
+	int ffbsi(uint v) noex
+	int ffbsl(ulong v) noex 
+	int ffbsll(ulonglong v) noex 
+	int ffbci(uint v) noex 
+	int ffbcl(ulong v) noex 
+	int ffbcll(ulonglong v) noex 
+	int flbsi(uint v) noex 
+	int flbsl(ulong v) noex 
+	int flbsll(ulonglong v) noex 
+	int flbci(uint v) noex 
+	int flbcl(ulong v) noex 
+	int flbcll(ulonglong v) noex 
+
+	Arguments:
+	v		value to compute result for
+
+	Returns:
+	-		result: -1 or bit-number (0 - (n-1))
+
+	Notes:
+	There are (obviously) a lot of ways to implement these sorts
+	of functions.  Doing these functions in hardware used to be
+	the norm in the olden days.  But the reach for the modern
+	RISC (we no longer count machines like the CDC [67]600
+	variations) screwed that pooch!  For the |ffbsx()| functions
+	we have traditionally done a bit more work since they are
+	more commonly used than the others.  We used to use a
+	relatively larger look-up table for it, but we have now
+	scaled back to using only a 128 byte look-up table.  We now
+	do the same for the |flbsx()| functions since they are also
+	rather commonly used (eg: finding higher powers of two).
+	We feel that we are fast enough for our present needs.  If
+	you need faster performance, you are welcome to do your
+	own!
+
+******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdintx>
+#include	<concepts>		/* |integral(3c++)| */
+#include	<bit>			/* |countl_zero(3c++)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>		/* for type |longlong| */
+#include	<localmisc.h>
+
+export module findbit ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::integral ;			/* concept */
+using std::unsigned_integral ;		/* concept */
+using std::countl_zero ;		/* subroutine-template */
+using std::countr_zero ;		/* subroutine-template */
+using std::countl_one ;			/* subroutine-template */
+using std::countr_one ;			/* subroutine-template */
+using std::popcount ;			/* subroutine-template */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+template<unsigned_integral T> constexpr int ffbsx(T uv) noex {
+	int		bn = -1 ;
+	if (uv) {
+	    bn = countr_zero(uv) ;
+	}
+	return bn ;
+} /* end subroutine-template (ffbsx) */
+
+template<unsigned_integral T> constexpr int ffbcx(T uv) noex {
+    	const T		allones = (compl T(0)) ;
+	int		bn = -1 ;
+	if (uv != allones) {
+	    bn = countr_one(uv) ;
+	}
+	return bn ;
+} /* end subroutine-template (ffbcx) */
+
+template<unsigned_integral T> constexpr int flbsx(T uv) noex {
+	int		bn = -1 ; /* return-value */
+	if (uv) {
+	    cint nbit = (szof(T) * CHAR_BIT) ;
+	    cint nc = countl_zero(uv) ;
+	    bn = (nbit - nc - 1) ;
+	} /* end if (non-zero positive) */
+	return bn ;
+} /* end subroutine-template (flbsx) */
+
+template<unsigned_integral T> constexpr int flbcx(T uv) noex {
+    	const T		allones = (compl T(0)) ;
+	int		bn = -1 ; /* return-value */
+	if (uv != allones) {
+	    cint nbit = (szof(T) * CHAR_BIT) ;
+	    cint nc = countl_one(uv) ;
+	    bn = (nbit - nc - 1) ;
+	} /* end if (non-zero positive) */
+	return bn ;
+} /* end subroutine-template (flbcx) */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+export {
+    constexpr int ffbsi(uint uv) noex {
+	return ffbsx(uv) ;
+    }
+    constexpr int ffbsl(ulong uv) noex {
+	return ffbsx(uv) ;
+    }
+    constexpr int ffbsll(ulonglong uv) noex {
+	return ffbsx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr int ffbci(uint uv) noex {
+	return ffbcx(uv) ;
+    }
+    constexpr int ffbcl(ulong uv) noex {
+	return ffbcx(uv) ;
+    }
+    constexpr int ffbcll(ulonglong uv) noex {
+	return ffbcx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr int flbsi(uint uv) noex {
+	return flbsx(uv) ;
+    }
+    constexpr int flbsl(ulong uv) noex {
+	return flbsx(uv) ;
+    }
+    constexpr int flbsll(ulonglong uv) noex {
+	return flbsx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr int flbci(uint uv) noex {
+	return flbcx(uv) ;
+    }
+    constexpr int flbcl(ulong uv) noex {
+	return flbcx(uv) ;
+    }
+    constexpr int flbcll(ulonglong uv) noex {
+	return flbcx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr int fbscounti(uint uv) noex {
+    	return popcount(uv) ;
+    }
+    constexpr int fbscountl(ulong uv) noex {
+    	return popcount(uv) ;
+    }
+    constexpr int fbscountll(ulonglong uv) noex {
+    	return popcount(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int ffbs		(uint uv) noex {
+	return ffbsx(uv) ;
+    }
+    constexpr inline int ffbs		(ulong uv) noex {
+	return ffbsx(uv) ;
+    }
+    constexpr inline int ffbs		(ulonglong uv) noex {
+	return ffbsx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int ffbc		(uint uv) noex {
+	return ffbcx(uv) ;
+    }
+    constexpr inline int ffbc		(ulong uv) noex {
+	return ffbcx(uv) ;
+    }
+    constexpr inline int ffbc		(ulonglong uv) noex {
+	return ffbcx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int flbs		(uint uv) noex {
+	return flbsx(uv) ;
+    }
+    constexpr inline int flbs		(ulong uv) noex {
+	return flbsx(uv) ;
+    }
+    constexpr inline int flbs		(ulonglong uv) noex {
+	return flbsx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int flbc		(uint uv) noex {
+	return flbcx(uv) ;
+    }
+    constexpr inline int flbc		(ulong uv) noex {
+	return flbcx(uv) ;
+    }
+    constexpr inline int flbc		(ulonglong uv) noex {
+	return flbcx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int fbscount	(uint uv) noex {
+	return popcount(uv) ;
+    }
+    constexpr inline int fbscount	(ulong uv) noex {
+	return popcount(uv) ;
+    }
+    constexpr inline int fbscount	(ulonglong uv) noex {
+	return popcount(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int ffbs		(int v) noex {
+    	cuint uv = uint(v) ;
+	return ffbsx(uv) ;
+    }
+    constexpr inline int ffbs		(long v) noex {
+    	culong uv = ulong(v) ;
+	return ffbsx(uv) ;
+    }
+    constexpr inline int ffbs		(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return ffbsx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int ffbc		(int v) noex {
+    	cuint uv = uint(v) ;
+	return ffbcx(uv) ;
+    }
+    constexpr inline int ffbc		(long v) noex {
+    	culong uv = ulong(v) ;
+	return ffbcx(uv) ;
+    }
+    constexpr inline int ffbc		(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return ffbcx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int flbs		(int v) noex {
+    	cuint uv = uint(v) ;
+	return flbsx(uv) ;
+    }
+    constexpr inline int flbs		(long v) noex {
+    	culong uv = ulong(v) ;
+	return flbsx(uv) ;
+    }
+    constexpr inline int flbs		(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return flbsx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int flbc		(int v) noex {
+    	cuint uv = uint(v) ;
+	return flbcx(uv) ;
+    }
+    constexpr inline int flbc		(long v) noex {
+    	culong uv = ulong(v) ;
+	return flbcx(uv) ;
+    }
+    constexpr inline int flbc		(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return flbcx(uv) ;
+    }
+} /* end export */
+
+export {
+    constexpr inline int fbscount	(int v) noex {
+    	cuint uv = uint(v) ;
+	return popcount(uv) ;
+    }
+    constexpr inline int fbscount	(long v) noex {
+    	culong uv = ulong(v) ;
+	return popcount(uv) ;
+    }
+    constexpr inline int fbscount	(longlong v) noex {
+    	culonglong uv = ulonglong(v) ;
+	return popcount(uv) ;
+    }
+} /* end export */
+
+
