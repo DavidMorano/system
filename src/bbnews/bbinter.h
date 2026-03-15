@@ -1,33 +1,46 @@
-/* bbinter */
+/* bbinter HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* the user bbinterface (command bbinterpreter) for VMAIL */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2009-01-20, David A­D­ Morano
+	This is a complete rewrite of the trash that performed this
+	function previously.
+
+*/
+
+/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BBINTER_INCLUDE
-#define	BBINTER_INCLUDE	1
+#define	BBINTER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<signal.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<uterm.h>
+#include	<mbcache.h>
+#include	<mailbox.h>
+#include	<mailmsgfile.h>
+#include	<mailmsgviewer.h>
+#include	<keysymer.h>
+#include	<kbdinfo.h>
 #include	<localmisc.h>
 
-#include	"mailbox.h"
-#include	"keysymer.h"
-#include	"kbdinfo.h"
 #include	"cmdmap.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"display.h"
-#include	"mbcache.h"
-#include	"mailmsgfile.h"
-#include	"mailmsgviewer.h"
 
 
 #define	BBINTER		struct bbinter_head
-
 #define	BBINTER_NUMLEN	10
 
 
@@ -51,13 +64,11 @@ struct bbinter_flags {
 	uint		viewchange:1 ;
 	uint		info_msg ;		/* info message */
 	uint		info_err ;		/* error-info message */
-} ;
+} ; /* end struct */
 
 struct bbinter_head {
-	uint		magic ;
-	struct proginfo	*pip ;
-	struct bbinter_flags	f ;
-	struct sigaction	*sao ;
+	proginfo	*pip ;
+	SIGACTION	*sao ;
 	sigset_t	oldsigmask ;
 	UTERM		ut ;
 	CMDMAP		cm ;
@@ -68,15 +79,17 @@ struct bbinter_head {
 	MBCACHE		mc ;
 	MAILMSGFILE	msgfiles ;	/* mail-msg file-name DB */
 	MAILMSGVIEWER	mv ;
-	const char	*mbname ;
-	const char	*pathprefix ;
-	const char	*vmdname ;
+	cchar		*mbname ;
+	cchar		*pathprefix ;
+	cchar		*vmdname ;
 	time_t		ti_start ;	/* startup */
 	time_t		ti_poll ;
 	time_t		ti_clock ;
 	time_t		ti_mailcheck ;
 	time_t		ti_mailinfo ;
 	time_t		ti_info ;
+	bbinter_flags	fl ;
+	uint		magic ;
 	int		displines ;	/* total lines */
 	int		scanlines ;	/* scan lines */
 	int		viewlines ;	/* view lines */
@@ -96,24 +109,15 @@ struct bbinter_head {
 	int		delmark ;	/* deletion mark character for scans */
 	int		tfd ;
 	char		numbuf[BBINTER_NUMLEN + 1] ;
-} ;
+} ; /* end struct */
 
+EXTERNC_begin
 
-#if	(! defined(BBINTER_MASTER)) || (BBINTER_MASTER == 0)
+extern int	bbinter_start(BBINTER *,proginfo *) noex ;
+extern int	bbinter_cmd(BBINTER *) noex ;
+extern int	bbinter_finish(BBINTER *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int	bbinter_start(BBINTER *,struct proginfo *) ;
-extern int	bbinter_cmd(BBINTER *) ;
-extern int	bbinter_finish(BBINTER *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BBINTER_MASTER */
+EXTERNC_end
 
 
 #endif /* BBINTER_INCLUDE */
