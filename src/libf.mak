@@ -37,16 +37,16 @@ INCS += libf.h
 
 MODS +=
 
-LIBS += -lu
+LIBS += -luo -lu
 
 
 OBJ0= freadln.o
-OBJ1= fwrite.o fprint.o
-OBJ2=
+OBJ1= fwrite.o fprint.o fputch.o
+OBJ2= fopenroot.o
 OBJ3=
 
-OBJA= obj0.o obj1.o
-OBJB= obj4.o obj5.o obj6.o obj7.o
+OBJA= obj0.o obj1.o obj2.o
+OBJB=
 
 OBJ= obja.o
 
@@ -54,7 +54,6 @@ OBJ= obja.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -73,6 +72,8 @@ LDFLAGS		?= $(MAKELDFLAGS)
 default:		$(T).o
 
 all:			$(ALL)
+
+so:			$(T).so
 
 
 .c.i:
@@ -101,7 +102,7 @@ all:			$(ALL)
 
 
 $(T).so:		$(OBJ)
-	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ)
+	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ) $(RUNINFO) $(LIBINFO)
 
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
@@ -154,5 +155,9 @@ objb.o:			$(OBJB)
 freadln.o:		freadln.cc	freadln.h	$(INCS)
 fwrite.o:		fwrite.cc			$(INCS)
 fprint.o:		fprint.cc			$(INCS)
+fputch.o:		fputch.cc			$(INCS)
+fopenroot.o:		fopenroot.cc			$(INCS)
+
+uclibmem.o:		uclibmem.cc	uclibmem.h
 
 
