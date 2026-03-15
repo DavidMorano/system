@@ -58,7 +58,7 @@
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<char.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"vecstrx.hh"
@@ -85,7 +85,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	vecstrx_addwithin(vecstrx *,cchar *,int) noex ;
+local int	vecstrx_addwithin(vecstrx *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -177,7 +177,7 @@ int vecstrx::envget(cchar *kp,cchar **rpp) noex {
 
 /* private subroutines */
 
-static int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
+local int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		f_added = false ;
