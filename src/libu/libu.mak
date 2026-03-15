@@ -80,7 +80,7 @@ OBJ25= fonce.o filerec.o
 OBJ26= ustd.o
 OBJ27= ucomposite.o
 
-OBJ28= flbs.o
+OBJ28= findbit.o
 OBJ29= itimers.o filetypes.o
 OBJ30=
 OBJ31=
@@ -494,9 +494,12 @@ baops.o:		baops.c		baops.h		$(INCS)
 
 stdclib.o:		stdclib.cc	stdclib.hh	$(INCS)
 
-flbs.o:			flbs.ccm
 filetypes.o:		filetypes.cc	filetypes.h	$(INCS)
 itimers.o:		itimers.cc	itimers.hh	$(INCS)
 clockids.o:		clockids.cc	clockids.hh	$(INCS)
+
+# MODULES
+findbit.o:		findbit.ccm			$(INCS)
+
 
 
