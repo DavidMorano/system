@@ -50,17 +50,15 @@
 #include	<cstdlib>
 #include	<cstdio>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"freadln.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;			/* |lenstr(3uc)| */
+import libutil ;			/* |lenstr(3u)| */
+
 
 /* local defines */
 
