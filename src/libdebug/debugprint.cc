@@ -98,8 +98,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
-#include	<cstring>
 #include	<cstdio>
+#include	<cstring>
+#include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -143,6 +144,7 @@ import ureserve ;			/* |is{x}(3u)| */
 
 using libu::strwcpy ;			/* subroutine */
 using libu::umem ;			/* variable */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -212,6 +214,8 @@ constexpr char	cthextable[] = {
 } ; /* end array */
 
 constexpr fmtoptms	fmtmask ;
+
+constexpr int		llen = LINEBUFLEN ;
 
 
 /* exported variables */
@@ -287,15 +291,15 @@ int debugprint_fini() noex {
 
 int debugprintf(cchar *fmt,...) noex {
 	va_list		ap ;
+	cnullptr	nt{} ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
 	if (fmt) {
 	    rs = SR_NOTOPEN ;
 	    if (ef.fd >= 0) {
-	        cint	fm = fmtmask.noover ; /* Format-Mode-Mask */
-	        int	llen = LINEBUFLEN ;
-	        char	lbuf[LINEBUFLEN + 1] ;
-	        {
+	        cint	fm = fmtmask.nooverr ; /* Format-Mode-Mask */
+		rs = SR_NOMEM ;
+		if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
 	            va_begin(ap,fmt) ;
 	            if ((rs = fmtstr(lbuf,llen,fm,fmt,ap)) >= 0) {
 	                rs = debugprint(lbuf,rs) ;
@@ -304,7 +308,8 @@ int debugprintf(cchar *fmt,...) noex {
 	                rs = SR_TOOBIG ;
 		    }
 	            va_end(ap) ;
-	        }
+		    delete [] lbuf ;
+	        } /* end if (new-char) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
@@ -312,20 +317,23 @@ int debugprintf(cchar *fmt,...) noex {
 /* end subroutine (debugprintf) */
 
 int debugvprintf(cchar *fmt,va_list ap) noex {
-	cint		fm = (fmtmask.clean | fmtmask.noover) ;
+    	cnothrow	nt{} ;
+	cint		fm = (fmtmask.clean | fmtmask.nooverr) ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
 	if (fmt) {
 	    rs = SR_NOTOPEN ;
 	    if (ef.fd >= 0) {
-	        cint	llen = LINEBUFLEN ;
-	        char	lbuf[LINEBUFLEN + 1] ;
-	        if ((rs = fmtstr(lbuf,llen,fm,fmt,ap)) >= 0) {
-	            rs = debugprint(lbuf,rs) ;
-	            wlen += rs ;
-	        } else {
-	            rs = SR_TOOBIG ;
-	        }
+		rs = SR_NOMEM ;
+		if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
+	            if ((rs = fmtstr(lbuf,llen,fm,fmt,ap)) >= 0) {
+	                rs = debugprint(lbuf,rs) ;
+	                wlen += rs ;
+	            } else {
+	                rs = SR_TOOBIG ;
+	            }
+		    delete [] lbuf ;
+	        } /* end if (new-char) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
@@ -333,11 +341,11 @@ int debugvprintf(cchar *fmt,va_list ap) noex {
 /* end subroutine (debugvprintf) */
 
 int debugprintdeci(cchar *s,int v) noex {
-	int		rs = SR_OK ;
-	int		llen = LINEBUFLEN ;
-	char		lbuf[LINEBUFLEN + 1] ;
-
-	if (s != nullptr) {
+    	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (s) {
+	    rs = SR_NOMEM ;
+	    if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
 	    cint	diglen = DIGBUFLEN ;
 	    int		ll = llen ;
 	    int		sl ;
@@ -383,23 +391,24 @@ int debugprintdeci(cchar *s,int v) noex {
 	    rs = debugprint(lbuf,tl) ;
 	} /* end if (ok) */
 
+		delete [] lbuf ;
+	    } /* end if (new-char) */
 	} /* end if (non-null) */
-
 	return rs ;
 }
 /* end subroutine (debugprintdeci) */
 
 int debugprinthexi(cchar *s,int v) noex {
+    	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (s) {
-	    int		ll ;
-	    int		sl ;
-	    cchar	*sp ;
-	    char		digbuf[DIGBUFLEN + 1] ;
-	    char		lbuf[LINEBUFLEN + 1] ;
-	    char		*lp ;
-	    ll = LINEBUFLEN ;
-	    lp = lbuf ;
+	    rs = SR_NOMEM ;
+	    if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
+	        int	ll = llen ;
+	        int	sl ;
+	        char	*lp = lbuf ;
+	        cchar	*sp ;
+	        char	digbuf[DIGBUFLEN + 1] ;
     
 	    if (rs >= 0) {
 	        sp = s ;
@@ -440,6 +449,8 @@ int debugprinthexi(cchar *s,int v) noex {
 	        rs = debugprint(lbuf,tl) ;
 	    } /* end if (ok) */
     
+		delete [] lbuf ;
+	    } /* end if (new-char) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -521,10 +532,13 @@ int debuggetfd() noex {
 
 /* low level debug-print function */
 int debugprint(cchar *sbuf,int slen) noex {
-	int		rs ;
-	if (sbuf == nullptr) return SR_FAULT ;
-	if (ef.fd <= 0) return SR_NOTOPEN ;
-	rs = debugprinter(sbuf,slen) ;
+	int		rs = SR_FAULT ;
+	if (sbuf) {
+	    rs = SR_NOTOPEN ; 
+	    if (ef.fd >= 0) {
+	        rs = debugprinter(sbuf,slen) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (debugprint) */
