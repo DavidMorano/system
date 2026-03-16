@@ -58,7 +58,6 @@ import libutil ;			/* |getlenstr(3u)| */
 using std::vector ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -162,11 +161,10 @@ template<typename ... Args>
 local inline int utf8decoder_magic(utf8decoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == UTF8DECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	    rs = (op->magval == UTF8DECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (utf8decoder_magic) */
+} /* end subroutine (utf8decoder_magic) */
 
 
 /* local variables */
@@ -184,12 +182,12 @@ int utf8decoder_start(utf8decoder *op) noex {
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->outbuf = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->code = 0 ;
 	    op->rem = 0 ;
 	    if (widebuf *wbp ; (wbp = new(nt) widebuf) != np) {
 	        op->outbuf = wbp ;
-	        op->magic = UTF8DECODER_MAGIC ;
+	        op->magval = UTF8DECODER_MAGIC ;
 	        rs = SR_OK ;
 	    } /* end if (new-widebuf) */
 	} /* end if (non-null) */
@@ -207,7 +205,7 @@ int utf8decoder_finish(utf8decoder *op) noex {
 	            op->outbuf = nullptr ;
 		}
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
