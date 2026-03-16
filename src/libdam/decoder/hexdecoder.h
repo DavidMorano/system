@@ -21,20 +21,17 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	HEXDECODER_MAGIC	0x13f3c202
 #define	HEXDECODER		struct hexdecoder_head
+#define	HEXDECODER_MAGIC	0x13f3c202
 #define	HEXDECODER_NSTAGE	2
 
 
 struct hexdecoder_head {
 	void		*outbuf ;	/* output-buffer */
-	uint		magic ;
+	uint		magval ;
 	int		rl ;		/* residue length ('0' or '1') */
 	char		rb[HEXDECODER_NSTAGE + 1] ; /* staging buffer */
 } ; /* end struct */
