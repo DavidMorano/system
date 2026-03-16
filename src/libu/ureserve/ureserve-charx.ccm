@@ -54,13 +54,16 @@ export {
 	f = f || ((ch >= 'a') && (ch <= 'f')) ;
 	return f ;
     } ;
+    inline bool char_isoctal(int ch) noex {
+	return (ch >= '0') && (ch <= '7') ;
+    }
+    inline bool char_isblank(int ch) noex {
+	return (ch == ' ') || (ch == '\t') ;
+    }
     bool char_iswhite(int) noex ;
     bool char_islc(int) noex ;
     bool char_isuc(int) noex ;
     bool char_isfc(int) noex ;
-    inline bool char_isblank(int ch) noex {
-	return (ch == ' ') || (ch == '\t') ;
-    }
     inline bool char_isdig(int ch) noex {
 	return char_isdigit(ch) ;
     }
