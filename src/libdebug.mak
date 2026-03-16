@@ -45,12 +45,12 @@ OBJ1= debugprint.o
 OBJ2= debugmkhex.o
 OBJ3= debugutil.o
 OBJ4= zprintf.o nprintf.o 
-OBJ5= 
+OBJ5= fmtstr.o hasx.o
 OBJ6=
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o
+OBJB= obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
@@ -105,14 +105,14 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-.o:			$(T).o
+o:			$(T).o
 
 a:			$(T).a
 
 so:			$(T).so
 
 $(T).o:			$(OBJ) Makefile
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBDIRS) $(LIBS)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
 $(T).a:			$(OBJ)
 	$(AR) -cr $@ $?
@@ -121,8 +121,8 @@ $(T).a:			$(OBJ)
 $(T).so:		$(OBJS) Makefile $(T).a
 	$(LD) -shared -o $@ $(LDFLAGS) $(OBJS) $(LIBDIRS) $(SLIBS)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order order:	$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order
@@ -179,10 +179,10 @@ obj6.o:			$(OBJ6)
 
 
 obja.o:			$(OBJA)
-	$(LD) -o $(LDFLAGS) $@ -r $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -o $(LDFLAGS) $@ -r $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 $(T).a(debugprime.o):	debugprime.o
@@ -202,5 +202,15 @@ debugline.o:		debugline.cc	debugline.h		$(INCS)
 
 zprintf.o:		zprintf.cc	zprintf.h Makefile	$(INCS)
 nprintf.o:		nprintf.cc	nprintf.h Makefile	$(INCS)
+
+# FMTSTR
+fmtstr.o:		fmtstr.dir
+fmtstr.dir:
+	makesubdir $@
+
+# HASX
+hasx.o:			hasx.dir
+hasx.dir:
+	makesubdir $@
 
 
