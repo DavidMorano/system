@@ -20,7 +20,8 @@
 	Names:
 	rmeol
 	rmwht
-	rmclass
+	rmblk
+	rmtrailclass
 	rmtrailchr
 	rmochr
 	rmrchr
@@ -35,7 +36,8 @@
 	Synopsis:
 	int rmeol(cchar *sp,int sl) noex
 	int rmwht(cchar *sp,int sl) noex
-	int rmclass(cchar *sp,int sl,cchar *ss) noex
+	int rmblk(cchar *sp,int sl) noex
+	int rmtailclass(cchar *sp,int sl,cchar *ss) noex
 	int rmtrailchr(cchar *sp,int sl,int sch) noex
 	int rmochr(cchar *sp,int sl,int sch) noex
 	int rmrchr(cchar *sp,int sl,int sch) noex
@@ -81,6 +83,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local typedefs */
 
+extern "C" {
+    typedef bool (*iscond_f)(int) noex ;
+}
 
 /* external subroutines */
 
@@ -92,6 +97,23 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* forward references */
+
+namespace {
+    struct rmtrailer {
+	iscond_f	ourcond ;
+        cchar		*sp ;
+        int		sl ;
+	rmtrailer(cchar *p,int l) noex : sp(p), sl(l) { } ;
+	bool x() noex ;
+	virtual bool iscond(int ch) const noex {
+	    return ourcond(ch) ;
+	} ;
+	bool operator () (iscond_f cond) noex {
+	    ourcond = cond ;
+	    return x() ;
+	} ;
+    } ; /* end struct (rmtrailer) */
+} /* end namespace */
 
 local bool isclass(cchar *ss,int ch) noex {
     	ch &= UCHAR_MAX ;
@@ -107,81 +129,94 @@ local bool isclass(cchar *ss,int ch) noex {
 
 /* exported subroutines */
 
-int rmeol(cchar *sp,int sl) noex {
+bool rmtrailer::x()  noex {
     	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    while (sl && iseol(sp[sl - 1])) {
+	    while (sl && iscond(sp[sl - 1])) {
 	        sl -= 1 ;
 	    }
 	} else {
 	    sl = -1 ;
 	}
 	return sl ;
+} /* end method (rmtrailer::operator) */
+
+int rmeol(cchar *sp,int sl) noex {
+    	rmtrailer to(sp,sl) ;
+	return to(iseol) ;
 }
 /* end subroutine (rmeol) */
 
 int rmwht(cchar *sp,int sl) noex {
-    	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    while (sl && iswhite(sp[sl - 1])) {
-	        sl -= 1 ;
-	    }
-	} else {
-	    sl = -1 ;
-	}
-	return sl ;
+    	rmtrailer to(sp,sl) ;
+	return to(iswht) ;
 }
 /* end subroutine (rmwht) */
 
-int rmclass(cchar *sp,int sl,cchar *ss) noex {
-    	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    while (sl && isclass(ss,sp[sl - 1])) {
-	        sl -= 1 ;
-	    }
-	} else {
-	    sl = -1 ;
-	}
-	return sl ;
+int rmblk(cchar *sp,int sl) noex {
+    	rmtrailer to(sp,sl) ;
+	return to(isblk) ;
 }
-/* end subroutine (rmclass) */
+/* end subroutine (rmblk) */
+
+namespace {
+    struct rmtrailer_class : rmtrailer {
+	cchar	*ss ;
+	rmtrailer_class(cchar *p,int l,cchar *s) noex : rmtrailer(p,l) {
+	    ss = s ;
+	} ;
+	bool iscond(int ch) const noex override final {
+	    return isclass(ss,ch) ;
+	} ;
+    } ; /* end struct (rmtrailer_class) */
+    struct rmtrailer_chr : rmtrailer {
+	int	chx_s ;
+	rmtrailer_chr(cchar *p,int l,int c) noex : rmtrailer(p,l) {
+	    chx_s = c ;
+	} ;
+	bool iscond(int ch) const noex override final {
+	    ch &= UCHAR_MAX ;
+	    return (ch == chx_s) ;
+	} ;
+    } ; /* end struct (rmtrail_chr) */
+} /* end namespace */
+
+int rmtrailclass(cchar *sp,int sl,cchar *ss) noex {
+    	rmtrailer_class to(sp,sl,ss) ;
+	return to.x() ;
+}
+/* end subroutine (rmtrailclass) */
 
 int rmtrailchr(cchar *sp,int sl,int sch) noex {
-    	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((sl > 1) && (sp[sl - 1] == char(sch))) {
-	       sl -= 1 ;
-	    }
-	} else {
-	    sl = -1 ;
-	}
-	return sl ;
+    	rmtrailer_chr to(sp,sl,sch) ;
+	return to.x() ;
 }
 /* end subroutine (rmtrailchr) */
 
-int rmochr(cchar *sp,int sl,int ch) noex {
+extern "C" {
+    typedef char *(*strnx_f)(cchar *,int,int) noex ;
+}
+
+local int rmxchr(strnx_f sx,cchar *sp,int sl,int ch) noex {
     	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (cchar *tp ; (tp = strnochr(sp,sl,ch)) != nullptr) {
+	    if (cchar *tp ; (tp = sx(sp,sl,ch)) != nullptr) {
 	        sl = intconv(tp - sp) ;
 	    }
 	} else {
 	    sl = -1 ;
 	} /* end if */
 	return sl ;
+}
+/* end subroutine (rmxchr) */
+
+int rmochr(cchar *sp,int sl,int ch) noex {
+    	return rmxchr(strnochr,sp,sl,ch) ;
 }
 /* end subroutine (rmochr) */
 
 int rmrchr(cchar *sp,int sl,int ch) noex {
-    	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (cchar *tp ; (tp = strnrchr(sp,sl,ch)) != nullptr) {
-	        sl = intconv(tp - sp) ;
-	    }
-	} else {
-	    sl = -1 ;
-	} /* end if */
-	return sl ;
+    	return rmxchr(strnrchr,sp,sl,ch) ;
 }
 /* end subroutine (rmrchr) */
 
