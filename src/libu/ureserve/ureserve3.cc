@@ -72,7 +72,7 @@ using std::bitset ;			/* type */
 constexpr int   chtablen = (UCHAR_MAX + 1) ;
 
 namespace {
-    struct ischarinfo {
+    struct charinfo {
 	bitset<chtablen>	isalpha ;
 	bitset<chtablen>	isalnum ;
 	bitset<chtablen>	isdigex ;
@@ -84,20 +84,20 @@ namespace {
 	constexpr void mkisdigex() noex ;
 	constexpr void mkisprint() noex ;
 	constexpr void mkisterm() noex ;
-	constexpr ischarinfo() noex {
+	constexpr charinfo() noex {
 	    mkisalpha() ;
 	    mkisalnum() ;
 	    mkisdigex() ;
 	    mkisprint() ;
 	    mkisterm() ;
 	} ; /* end ctor */
-    } ; /* end struct (ischarinfo) */
+    } ; /* end struct (charinfo) */
 } /* end namespace */
 
 
 /* forward references */
 
-constexpr void ischarinfo::mkalpha(bitset<chtablen> &s) noex {
+constexpr void charinfo::mkalpha(bitset<chtablen> &s) noex {
 	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
 	    s.set(ch,true) ;
 	    s.set((ch + 0x20),true) ;
@@ -108,22 +108,22 @@ constexpr void ischarinfo::mkalpha(bitset<chtablen> &s) noex {
 	s.set(UC('×'),false) ;
 	s.set(UC('÷'),false) ;
 }
-/* end method (ischarinfo::mkalpha) */
+/* end method (charinfo::mkalpha) */
 
-constexpr void ischarinfo::mkisalpha() noex {
+constexpr void charinfo::mkisalpha() noex {
     	mkalpha(isalpha) ;
 }
-/* end method (ischarinfo::mkisalpha) */
+/* end method (charinfo::mkisalpha) */
 
-constexpr void ischarinfo::mkisalnum() noex {
+constexpr void charinfo::mkisalnum() noex {
     	mkalpha(isalnum) ;
 	for (int ch = '0' ; ch <= '9' ; ch += 1) {
 	    isalnum.set(ch,true) ;
 	} /* end for */
 }
-/* end method (ischarinfo::mkisalnum) */
+/* end method (charinfo::mkisalnum) */
 
-constexpr void ischarinfo::mkisdigex() noex {
+constexpr void charinfo::mkisdigex() noex {
 	for (int ch = '0' ; ch <= '9' ; ch += 1) {
 	    isdigex.set(ch,true) ;
 	} /* end for */
@@ -132,9 +132,9 @@ constexpr void ischarinfo::mkisdigex() noex {
 	    isdigex.set((ch + 0x20),true) ;
 	} /* end for */
 }
-/* end method (ischarinfo::mkisdigex) */
+/* end method (charinfo::mkisdigex) */
 
-constexpr void ischarinfo::mkisprint() noex {
+constexpr void charinfo::mkisprint() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
 	    bool f = ((ch & 0x7f) >= 0x20) && (ch != CH_DEL) ;
 	    f = f || (ch == CH_TAB) ;
@@ -143,9 +143,9 @@ constexpr void ischarinfo::mkisprint() noex {
 	    }
 	} /* end for */
 }
-/* end method (ischarinfo::mkisprint) */
+/* end method (charinfo::mkisprint) */
 
-constexpr void ischarinfo::mkisterm() noex {
+constexpr void charinfo::mkisterm() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
 	    if (((ch & 0x7f) >= 0x20) && (ch != CH_DEL)) {
 		isterm.set(ch,true) ;
@@ -164,12 +164,12 @@ constexpr void ischarinfo::mkisterm() noex {
 		}
 	    } /* end if */
 	} /* end for */
-} /* end method (ischarinfo::mkisterm) */
+} /* end method (charinfo::mkisterm) */
 
 
 /* local variables */
 
-constexpr ischarinfo	ischarx_data ;
+constexpr charinfo	ischarx_data ;
 
 
 /* exported variables */
@@ -268,6 +268,7 @@ bool iscmdstart(int ch) noex {
 	f = f || (ch == CH_ESC) ;
 	f = f || (ch == CH_CSI) ;
 	f = f || (ch == CH_DCS) ;
+	f = f || (ch == CH_SS2) ;
 	f = f || (ch == CH_SS3) ;
 	return f ;
 }
