@@ -23,19 +23,16 @@
 #include	<stddef.h>		/* for |wchar_t| */
 #include	<wchar.h>		/* for |wchar_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	UTF8DECODER_MAGIC	0x13f3c205
 #define	UTF8DECODER		struct utf8decoder_head
+#define	UTF8DECODER_MAGIC	0x13f3c205
 
 
 struct utf8decoder_head {
 	void		*outbuf ;	/* output-buffer */
-	uint		magic ;
+	uint		magval ;
 	int		rem ;		/* remaining bytes */
 	wchar_t		code ;		/* UNICODE® code point */
 } ; /* end struct */
