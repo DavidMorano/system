@@ -55,7 +55,9 @@ enum sysconfcmds {
     sysconfcmd_maxgroupname,
     sysconfcmd_maxprojectname,
     sysconfcmd_maxnodename,
+    sysconfcmd_maxprotname,
     sysconfcmd_maxhostname,
+    sysconfcmd_maxservname,
     sysconfcmd_maxmsg,
     sysconfcmd_maxmailaddr,
     sysconfcmd_pwent,
@@ -63,6 +65,12 @@ enum sysconfcmds {
     sysconfcmd_grent,
     sysconfcmd_pjent,
     sysconfcmd_fstype,
+    sysconfcmd_maxaio,		/* no-limit */
+    sysconfcmd_maxatexit,	/* no-limit */
+    sysconfcmd_maxmqopen,	/* no-limit */
+    sysconfcmd_maxthreads,	/* no-limit */
+    sysconfcmd_maxkeys,		/* no-limit */
+    sysconfcmd_maxdestructors,	/* no-limit */
     sysconfcmd_overlast
 } ; /* end enum (sysconfcmds) */
 
@@ -99,6 +107,10 @@ enum sysconfcmds {
 #define	_SC_NODENAME_MAX	sysconfcmd_maxnodename
 #endif /* _SC_NODENAME_MAX */
 
+#ifndef	_SC_PROTNAME_MAX	/* network protocol-name */
+#define	_SC_PROTNAME_MAX	sysconfcmd_maxprotname
+#endif /* _SC_PROTNAME_MAX */
+
 #ifndef	_SC_HOSTNAME_MAX
 #ifdef	_SC_HOST_NAME_MAX	/* really the node-name length */
 #define	_SC_HOSTNAME_MAX	_SC_HOST_NAME_MAX
@@ -110,6 +122,10 @@ enum sysconfcmds {
 #ifndef	_SC_HOST_NAME_MAX	/* really the node-name length */
 #define	_SC_HOST_NAME_MAX	sysconfcmd_maxhostname
 #endif /* _SC_HOST_NAME_MAX */
+
+#ifndef	_SC_SERVNAME_MAX	/* network service-name */
+#define	_SC_SERVNAME_MAX	sysconfcmd_maxservname
+#endif /* _SC_SERVNAME_MAX */
 
 #ifndef	_SC_GETPW_R_SIZE_MAX
 #define	_SC_GETPW_R_SIZE_MAX	sysconfcmd_pwent
@@ -142,9 +158,32 @@ enum sysconfcmds {
 #define	_SC_MAILADDR_MAX	sysconfcmd_maxmailaddr
 #endif
 
-/* an alias (since the real one did not follow the typical convention) */
+/* value requests but with no-limit */
+#ifndef	_SC_AIO_MAX
+#define	_SC_AIO_MAX		 sysconfcmd_maxaio
+#endif
+#ifndef	_SC_ATEXIT_MAX
+#define	_SC_ATEXIT_MAX		sysconfcmd_maxatexit
+#endif
+#ifndef	_SC_MQ_OPEN_MAX
+#define	_SC_MQ_OPEN_MAX		sysconfcmd_maxmqopen
+#endif
+#ifndef	_SC_THREAD_THREADS_MAX
+#define	_SC_THREAD_THREADS_MAX	sysconfcmd_maxthreads
+#endif
+#ifndef	_SC_THREAD_KEYS_MAX
+#define	_SC_THREAD_KEYS_MAX	sysconfcmd_maxkeys
+#endif
+#ifndef	_SC_THREAD_DESTRUCTOR_ITERATIONS
+#define	_SC_THREAD_DESTRUCTOR_ITERATIONS	sysconfcmd_maxdestructors
+#endif
+
+/* aliases (since the real one did not follow the typical convention) */
 #ifndef	_SC_PID_MAX
 #define	_SC_PID_MAX		_SC_MAXPID
+#endif
+#ifndef	_SC_THREAD_DESTRUCTORS
+#define	_SC_THREAD_DESTRUCTORS	_SC_THREAD_DESTRUCTOR_ITERATIONS
 #endif
 
 
