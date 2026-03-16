@@ -125,7 +125,9 @@ enum dataitems {
 	dataitem_maxgroupname,
 	dataitem_maxprojectname,
 	dataitem_maxnode,
+	dataitem_maxprot,
 	dataitem_maxhost,
+	dataitem_maxserv,
 	dataitem_maxmsg,
 	dataitem_maxtzname,
 	dataitem_clk,
@@ -246,7 +248,9 @@ int usysconf::getval(int req) noex {
 	case _SC_GROUPNAME_MAX:
 	case _SC_PROJECTNAME_MAX:
 	case _SC_NODENAME_MAX:
+	case _SC_PROTNAME_MAX:
 	case _SC_HOSTNAME_MAX:
+	case _SC_SERVNAME_MAX:
 	case _SC_MSG_MAX:
 	case _SC_TZNAME_MAX:
 	case _SC_CLK_TCK:
@@ -299,8 +303,14 @@ int usysconf::synthetic(int req) noex {
         case sysconfcmd_maxnodename:
 	    rs = getdefnodename() ;
 	    break ;
+        case sysconfcmd_maxprotname:
+	    val = PRBUFLEN ;
+	    break ;
         case sysconfcmd_maxhostname:
 	    val = HNBUFLEN ;
+	    break ;
+        case sysconfcmd_maxservname:
+	    val = SVBUFLEN ;
 	    break ;
         case sysconfcmd_maxmsg:
 	    val = getdefmsg() ;
