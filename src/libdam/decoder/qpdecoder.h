@@ -21,15 +21,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	QPDECODER_MAGIC		0x13f3c205
 #define	QPDECODER		struct qpdecoder_head
 #define	QPDECODER_FL		struct qpdecoder_flags
+#define	QPDECODER_MAGIC		0x13f3c205
 #define	QPDECODER_NSTAGE	2
 
 
@@ -41,7 +38,7 @@ struct qpdecoder_flags {
 struct qpdecoder_head {
 	void		*outbuf ;	/* output-buffer */
 	QPDECODER_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		rl ;		/* stage length */
 	char		rb[QPDECODER_NSTAGE + 1] ;	/* stage buffer */
 } ; /* end struct */
