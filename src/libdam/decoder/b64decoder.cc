@@ -39,12 +39,12 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<sfx.h>
+#include	<usyscalls.h>		/* |ulogerror(3u)| */
 #include	<intfloor.h>
 #include	<strwcpy.h>
 #include	<sfx.h>
 #include	<base64.h>
-#include	<obuf.hh>
+#include	<bufos.hh>
 #include	<localmisc.h>
 
 #include	"b64decoder.h"
@@ -65,7 +65,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef obuf *		obufp ;
+typedef bufos *		bufosp ;
 
 
 /* external subroutines */
@@ -126,7 +126,7 @@ int b64decoder_start(b64decoder *op) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = b64decoder_ctor(op)) >= 0) {
-	    if (obuf *obp ; (obp = new(nothrow) obuf) != np) {
+	    if (bufos *obp ; (obp = new(nothrow) bufos) != np) {
 		if ((rs = obp->start) >= 0) {
 	            op->outbuf = obp ;
 	            op->magval = B64DECODER_MAGIC ;
@@ -136,7 +136,7 @@ int b64decoder_start(b64decoder *op) noex {
 		}
 	    } else {
 	        rs = SR_NOMEM ;
-	    } /* end if (new-obuf) */
+	    } /* end if (new-bufos) */
 	    if (rs < 0) {
 		b64decoder_dtor(op) ;
 	    }
@@ -150,7 +150,7 @@ int b64decoder_finish(b64decoder *op) noex {
 	int		rs1 ;
 	if ((rs = b64decoder_magic(op)) >= 0) {
 	    if (op->outbuf) {
-	        obuf 	*obp = obufp(op->outbuf) ;
+	        bufos 	*obp = bufosp(op->outbuf) ;
 		{
 		    rs1 = obp->finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -176,7 +176,7 @@ int b64decoder_load(b64decoder *op,cchar *sp,int µsl) noex {
 	int		c = 0 ;
 	if ((rs = b64decoder_magic(op,sp)) >= 0) {
 	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
-                if (obuf *obp ; (obp = obufp(op->outbuf)) != np) {
+                if (bufos *obp ; (obp = bufosp(op->outbuf)) != np) {
                     cchar       *cp ;
                     for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
                         sl -= intconv((cp + cl) - sp) ;
@@ -226,7 +226,7 @@ int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
             if (rlen >= 0) {
                 rs = SR_OK ;
                 if (rlen > 0) {
-                    if (obuf *obp = obufp(op->outbuf) ; obp) {
+                    if (bufos *obp = bufosp(op->outbuf) ; obp) {
                         if (cint len = obp->len ; len > 0) {
 			    cint ml = min(len,rlen) ;
                             for (i = 0 ; i < ml ; i += 1) {
@@ -246,6 +246,16 @@ int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
 }
 /* end subroutine (b64decoder_read) */
 
+int b64decoder_count(b64decoder *op) noex {
+	int		rs ;
+	int		c = 0 ; /* return-value */
+	if ((rs = b64decoder_magic(op)) >= 0) {
+	    rs = obp->len ;
+	} /* end if (magic) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (b64decoder_count) */
+
 
 /* private subroutines */
 
@@ -253,7 +263,7 @@ local int b64decoder_cvt(b64decoder *op,cchar *cp,int cl) noex {
     	cnullptr	np{} ;
 	int		rs = SR_BUGCHECK ;
 	int		c = 0 ;
-	if (obuf *obp = obufp(op->outbuf) ; obp) {
+	if (bufos *obp = bufosp(op->outbuf) ; obp) {
 	    rs = SR_NOMEM ;
 	    if (char *rbuf ; (rbuf = new(nothrow) char [cl + 1]) != np) {
 	        if ((c = base64_d(cp,cl,rbuf)) > 0) {
@@ -268,5 +278,42 @@ local int b64decoder_cvt(b64decoder *op,cchar *cp,int cl) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (b64decoder_cvt) */
+
+
+int b64decoder::load(cchar *sp,int sl) noex {
+	return b64decoder_load(this,sp,sl) ;
+}
+
+int b64decoder::read(char *rbuf,int rlen) noex {
+	return b64decoder_read(this,rbuf,rlen) ;
+}
+
+void b64decoder::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("b64decoder",rs,"fini-finish") ;
+	}
+} /* end method (b64decoder::dtor) */
+
+b64decoder::operator int () noex {
+	return b64decoder_count(this) ;
+} /* end method (b64decoder::operator) */
+
+b64decoder_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case b64decodermem_start:
+	        rs = b64decoder_start(op) ;
+	        break ;
+	    case b64decodermem_finish:
+	        rs = b64decoder_finish(op) ;
+	        break ;
+	    case b64decodermem_count:
+	        rs = b64decoder_count(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (b64decoder_co::operator) */
 
 
