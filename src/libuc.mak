@@ -891,9 +891,9 @@ strfilter.o:		strfilter.dir
 strfilter.dir:
 	makesubdir $@
 
-# OBUF
-obuf.o:			obuf.dir
-obuf.dir:
+# BUFOS
+bufos.o:		bufos.dir
+bufos.dir:
 	makesubdir $@
 
 # PERMX
