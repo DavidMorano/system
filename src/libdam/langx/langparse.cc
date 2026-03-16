@@ -81,7 +81,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef shortq *	obufp ;
+typedef shortq *	bufosp ;
 typedef string *	stringp ;
 
 
@@ -236,7 +236,7 @@ int langparse_finish(langparse *op) noex {
 	int		rs1 ;
 	DEBPRINTF("ent\n") ;
 	if ((rs = langparse_magic(op)) >= 0) ylikely {
-	    if (shortq *obp = obufp(op->outbuf) ; obp) ylikely {
+	    if (shortq *obp = bufosp(op->outbuf) ; obp) ylikely {
 		{
 		    rs1 = obp->finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -293,7 +293,7 @@ int langparse_remread(langparse *op,short *rbuf,int rlen) noex {
 	    if (rlen > 0) ylikely {
 	        int	ml ;
 		rs = SR_BUGCHECK ;
-	        if (shortq *obp ; (obp = obufp(op->outbuf)) != np) ylikely {
+	        if (shortq *obp ; (obp = bufosp(op->outbuf)) != np) ylikely {
 	            cint len = obp->len ;
 		    rs = SR_OK ;
 	            ml = min(len,rlen) ;
@@ -448,7 +448,7 @@ local int langparse_rawers(langparse *op,cchar *bp,int bl) noex {
     	cnullptr	np{} ;
     	int		rs = SR_BUGCHECK ;
 	bool		f = false ; /* return-value */
-	if (shortq *obp = obufp(op->outbuf) ; obp) ylikely {
+	if (shortq *obp = bufosp(op->outbuf) ; obp) ylikely {
 	    if ((rs = obp->len) > bl) {
 		cint ei = (rs - bl) ;
 		cint slen = bl ;
@@ -463,13 +463,13 @@ local int langparse_rawers(langparse *op,cchar *bp,int bl) noex {
 				op->fl.paren = false ;
 				op->fl.strraw = false ;
 			    }
-		        } /* end if (obuf_readat) */
+		        } /* end if (bufos_readat) */
 		        delete [] sbuf ;
 		    } else {
 			rs = SR_NOMEM ;
 	            } /* end if (m-a-f) */
 		} /* end if (shortq_get) */
-	    } /* end if (obuf_len) */
+	    } /* end if (bufos_len) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? int(f) : rs ;
 } /* end subroutine (langparse_rawers) */
@@ -533,7 +533,7 @@ local int langparse_comment(langparse *op,int ch) noex {
 
 local int langparse_store(langparse *op,int v) noex {
     	int		rs = SR_BUGCHECK ;
-	if (shortq *obp = obufp(op->outbuf) ; obp) ylikely {
+	if (shortq *obp = bufosp(op->outbuf) ; obp) ylikely {
 	    {
 		cint ch_d = (uchar(v) == CH_NL) ? '¯' : v ;
 	        DEBPRINTF("v=>%c< %04X\n",(ch_d & UCHAR_MAX),v) ;
