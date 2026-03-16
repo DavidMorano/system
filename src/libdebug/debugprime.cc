@@ -124,7 +124,7 @@ void d_whoopen(int *s) noex {
 
 /* return a count of the number of open files */
 int d_openfiles() noex {
-	USTAT		sb ;
+	ustat		sb ;
 	int		count = 0 ;
 	for (int i = 0 ; i < 2048 ; i += 1) {
 	    if (u_fstat(i,&sb) >= 0) {
