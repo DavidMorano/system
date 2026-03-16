@@ -252,26 +252,26 @@ bool hasallbase(cchar *sp,int sl,int b) noex {
 
 namespace {
     struct haser {
-	virtual bool cond(int) noex = 0 ;
-	bool operator () (cchar *,int) noex ;
+	virtual bool cond(int) const noex = 0 ;
+	bool operator () (cchar *,int) const noex ;
     } ; /* end struct (haser) */
     struct haser_chr : haser {
 	int	chx_s ;
 	haser_chr(int c) noex : chx_s(c) { } ;
-	bool cond(int ch) noex override final {
+	bool cond(int ch) const noex override final {
 	    return (ch == chx_s) ;
 	} ;
     } ; /* end struct */
     struct haser_set : haser {
 	cchar	*sstr ;
 	haser_set(cchar *s) noex : sstr(s) { } ;
-	bool cond(int ch) noex override final {
+	bool cond(int ch) const noex override final {
 	    return (strchr(sstr,ch) != nullptr) ;
 	} ;
     } ; /* end struct */
 } /* end namespace */
 
-bool haser::operator () (cchar *sp,int sl) noex {
+bool haser::operator () (cchar *sp,int sl) const noex {
 	bool		f = false ;
 	if (sp) ylikely {
 	    while (sl && *sp) {
