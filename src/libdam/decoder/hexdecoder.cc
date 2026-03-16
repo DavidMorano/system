@@ -40,7 +40,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<digval.h>
-#include	<obuf.hh>
+#include	<bufos.hh>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -63,7 +63,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef obuf *		obufp ;
+typedef bufos *		bufosp ;
 
 
 /* external subroutines */
@@ -85,8 +85,7 @@ local int hexdecoder_ctor(hexdecoder *op,Args ... args) noex {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hexdecoder_ctor) */
+} /* end subroutine (hexdecoder_ctor) */
 
 local int hexdecoder_dtor(hexdecoder *op) noex {
 	int		rs = SR_FAULT ;
@@ -94,18 +93,16 @@ local int hexdecoder_dtor(hexdecoder *op) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hexdecoder_dtor) */
+} /* end subroutine (hexdecoder_dtor) */
 
 template<typename ... Args>
 local inline int hexdecoder_magic(hexdecoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == HEXDECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == HEXDECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (hexdecoder_magic) */
+} /* end subroutine (hexdecoder_magic) */
 
 local int	hexdecoder_cvt(hexdecoder *) noex ;
 
@@ -123,17 +120,17 @@ int hexdecoder_start(hexdecoder *op) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = hexdecoder_ctor(op)) >= 0) {
-	    if (obuf *obp ; (obp = new(nt) obuf) != np) {
+	    if (bufos *obp ; (obp = new(nt) bufos) != np) {
 		if ((rs = obp->start) >= 0) {
 	            op->outbuf = obp ;
-	            op->magic = HEXDECODER_MAGIC ;
+	            op->magval = HEXDECODER_MAGIC ;
 		}
 		if (rs < 0) {
 		    delete obp ;
 		}
 	    } else {
 	        rs = SR_NOMEM ;
-	    } /* end if (new-obuf) */
+	    } /* end if (new-bufos) */
 	    if (rs < 0) {
 		hexdecoder_dtor(op) ;
 	    }
@@ -147,7 +144,7 @@ int hexdecoder_finish(hexdecoder *op) noex {
 	int		rs1 ;
 	if ((rs = hexdecoder_magic(op)) >= 0) {
 	    if (op->outbuf) {
-	        obuf	*obp = obufp(op->outbuf) ;
+	        bufos	*obp = bufosp(op->outbuf) ;
 		{
 		    rs1 = obp->finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -161,7 +158,7 @@ int hexdecoder_finish(hexdecoder *op) noex {
 		rs1 = hexdecoder_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -172,7 +169,7 @@ int hexdecoder_load(hexdecoder *op,cchar *sp,int µsl) noex {
 	int		c = 0 ;
 	if ((rs = hexdecoder_magic(op,sp)) >= 0) {
 	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
-	        if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
+	        if (bufos *obp ; (obp = bufosp(op->outbuf)) != nullptr) {
 	            while ((rs >= 0) && (sl > 0) && *sp) {
 		        cint	ch = mkchar(*sp) ;
 		        if (ishexlatin(ch)) {
@@ -205,7 +202,7 @@ int hexdecoder_read(hexdecoder *op,char *rbuf,int rlen) noex {
 	if ((rs = hexdecoder_magic(op,rbuf)) >= 0) {
 	    if (rlen > 0) {
 	        int	ml ;
-	        if (obuf *obp ; (obp = obufp(op->outbuf)) != np) {
+	        if (bufos *obp ; (obp = bufosp(op->outbuf)) != np) {
 	            cint	len = obp->len ; /* <- read-coerce */
 	            ml = min(len,rlen) ;
 	            for (i = 0 ; i < ml ; i += 1) {
@@ -227,18 +224,16 @@ int hexdecoder_read(hexdecoder *op,char *rbuf,int rlen) noex {
 /* private subroutines */
 
 local int hexdecoder_cvt(hexdecoder *op) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_BUGCHECK ;
 	cchar		*rb = op->rb ;
-	if (obuf *obp ; (obp = obufp(op->outbuf)) != nullptr) {
+	if (bufos *obp ; (obp = bufosp(op->outbuf)) != nullptr) {
 	    cint	ch0 = mkchar(rb[0]) ;
 	    cint	ch1 = mkchar(rb[1]) ;
 	    int	v = 0 ;
 	    v |= (digvalhex(ch0)<<4) ;
 	    v |= (digvalhex(ch1)<<0) ;
 	    rs = obp->add(v) ;
-	} else {
-	    rs = SR_BUGCHECK ;
-	}
+	} /* end if (outbuf) */
 	return (rs >= 0) ? 1 : rs ;
 }
 /* end subroutine (hexdecoder_cvt) */
