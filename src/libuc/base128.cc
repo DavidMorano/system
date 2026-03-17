@@ -162,9 +162,11 @@ local void		base128_eg(cchar *,char *) noex ;
 
 constexpr helper	base128mgr ;
 
-constexpr int		bits = nzeros(base) ;
-
-constexpr bool		f_comment = false ;
+constexpr int		bits		= nzeros(base) ;
+constexpr int		bmask		= (base - 1) ;
+constexpr int		stagelen	= BASE128_STAGELEN ;
+constexpr int		outlen		= BASE128_OUTLEN ;
+constexpr int		chx_end		= UCHAR_MAX ;
 
 
 /* exported variables */
@@ -175,20 +177,20 @@ constexpr bool		f_comment = false ;
 int base128_e(cchar *inbuf,int inlen,char *obuf) noex {
     	int		i = 0 ;
 	int		ol = 0 ; /* return-value */
-	while ((inlen - i) >= 7) {
+	while ((inlen - i) >= stagelen) {
 	    base128_eg((inbuf + i),(obuf + ol)) ;
-	    i += 7 ;
-	    ol += 8 ;
+	    i += stagelen ;
+	    ol += outlen ;
 	} /* end while */
-	if (cint alen = 8, n = (inlen - i) ; n > 0) {
+	if (cint alen = outlen , n = (inlen - i) ; n > 0) {
 	    char abuf[alen] ;
 	    memcopy(abuf,inbuf,n) ;
 	    memclear((abuf + n),(alen - n)) ;
 	    base128_eg(abuf,(obuf + ol)) ;
 	    {
 	        ol += (n + 1) ;
-	        strnset((obuf + ol),'=',(8 - (n + 1))) ;
-		ol += (8 - (n + 1)) ;
+	        strnset((obuf + ol),'=',(outlen - (n + 1))) ;
+		ol += (outlen - (n + 1)) ;
 	    }
 	} /* end if (residue) */
 	return ol ;
@@ -212,7 +214,7 @@ int base128_d(cchar *inbuf,int len,char *outbuf) noex {
 /* end subroutine (base128_d) */
 
 int base128_enc(int v) noex {
-    	return int(base128mgr.enc[v & (base - 1)]) ;
+    	return int(base128mgr.enc[v & bmask]) ;
 }
 
 int base128_dec(int v) noex {
@@ -233,36 +235,58 @@ local uint64_t mkhold(cchar *inbuf,int n) noex {
 
 local void encbuf(char *obuf,int olen,const uint64_t hold) noex {
 	for (int i = 0 ; i < olen ; i += 1) {
-	    cint idx = intconv((hold >> (i * bits)) & (base - 1)) ;
+	    cint idx = intconv((hold >> (i * bits)) & bmask) ;
 	    obuf[i] = base128mgr.enc[idx] ;
 	} /* end for */
 } /* end subroutine (encbuf) */
 
 /* encode a group */
 local void base128_eg(cchar *inbuf,char *obuf) noex {
-	const uint64_t	hold = mkhold(inbuf,7) ;
-	encbuf(obuf,8,hold) ;
-}
-/* end subroutine (base128_eg) */
+	const uint64_t	hold = mkhold(inbuf,stagelen) ;
+	encbuf(obuf,outlen,hold) ;
+} /* end subroutine (base128_eg) */
+
+namespace {
+    struct dger {
+	uint64_t	hold = 0 ;
+	char		*outbuf ;
+	cchar		*inbuf ;
+	int		rl = 0 ; /* return-value */
+	dger(cchar *ib,char *ob) noex : inbuf(ib), outbuf(ob) { } ;
+	int cvt(int ii) const noex {
+	    int v = chx_end ;
+	    if (cint ich = mkchar(inbuf[ii]) ; ich) {
+	    	v = base128mgr.dec[ich] ;
+	    }
+	    return v ;
+	} ; /* end method */
+	operator int () noex ;
+	int loadhold() noex ;
+	void loadout() noex ;
+    } ; /* end struct (dger) */
+} /* end namespace */
 
 /* decode a group */
-constexpr int	chx_end = UCHAR_MAX ;
 local int base128_dg(cchar *inbuf,char *outbuf) noex {
-	uint64_t	hold = 0 ;
-	int		rs = SR_OK ;
-	int		rl = 0 ; /* return-value */
-	cauto cvt = [inbuf] (int ii) -> int {
-	    int ch = chx_end ;
-	    if (cint ich = mkchar(inbuf[ii]) ; ich) {
-	    	ch = base128mgr.dec[ich] ;
-	    }
-	    return ch ;
-	} ; /* end lambda (cvt) */
-	for (int i = 0 ; i < 8 ; i += 1) {
-	    if (int ch ; (ch = cvt(i)) != chx_end) {
+    	dger dgo(inbuf,outbuf) ;
+	return dgo ;
+} /* end subroutine (base128_dg) */
+
+dger::operator int () noex {
+    	int		rs ;
+	if ((rs = loadhold()) >= 0) {
+	    loadout() ;
+	}
+	return (rs >= 0) ? rl : rs ;
+} /* end method (dger::operator) */
+
+int dger::loadhold() noex {
+    	int		rs = SR_OK ;
+	for (int i = 0 ; i < outlen ; i += 1) {
+	    if (int v ; (v = cvt(i)) != chx_end) {
 	        hold <<= bits ;
-	        if (ch != chx_equal) {
-	            hold |= ch ;
+	        if (v != chx_equal) {
+	            hold |= v ;
 	            rl += 1 ;
 	        } /* end if */
 	    } else {
@@ -270,15 +294,15 @@ local int base128_dg(cchar *inbuf,char *outbuf) noex {
 	    }
 	    if (rs < 0) break ;
 	} /* end for */
-	if (rs >= 0) {
-	        for (int i = 0 ; i < 3 ; i += 1) {
-	            uint64_t val = (hold >> ((2 - i) * 6)) ;
-	            outbuf[i] = char(val) ;
-	        } /* end for */
-	        rl -= 1 ;
-	} /* end if (ok) */
-	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (base128_dg) */
+	return rs ;
+} /* end method (dger:loadhold) */
+
+void dger::loadout() noex {
+	for (int i = 0 ; i < stagelen ; i += 1) {
+	    uint64_t val = (hold >> (i * CHAR_BIT)) ;
+	    outbuf[i] = char(val) ;
+	} /* end for */
+	rl -= 1 ;
+} /* end method (loadout) */
 
 
