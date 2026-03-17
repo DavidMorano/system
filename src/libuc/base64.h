@@ -18,6 +18,7 @@
 
 
 #define	BASE64_STAGELEN		3	/* staging buffer length */
+#define	BASE64_OUTLEN		4	/* output buffer length */
 
 
 extern cuchar	base64_et[] ;
