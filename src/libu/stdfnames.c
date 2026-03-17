@@ -34,6 +34,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<stdfiles.h>
 
 #include	"stdfnames.h"
 
