@@ -1,0 +1,98 @@
+/* nzeros MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* return the number of leading zeros in an integer */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-21, David A­D­ Morano
+	This code was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/******************************************************************************
+
+	Name:
+	flbs{x}
+
+	Description:
+	Find the last bit set in an integer.
+
+	Synopsis:
+	template<integral T> int flbs{x}(T v) noex
+	int flbs{x}(X v) noex
+
+	Arguments:
+	{x}		'int', 'long', 'longlong'
+	v		supplied integer value
+
+	Returns:
+	-               the last bit that was set
+
+******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdintx>
+#include	<concepts>		/* |integral(3c++)| */
+#include	<bit>			/* |countl_zero(3c++)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
+
+#pragma		GCC dependency		"mod/findbit.ccm"
+
+export module nzeros ;
+
+import findbit ;			/* |ffbs(3u)| */
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::integral ;			/* concept */
+using std::countl_zero ;		/* subroutine-template */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+export {
+    template <integral T> consteval int nzeros(T v) noex {
+	return ffbs(v) ;
+    } /* end subroutine (nzeros) */
+} /* end export */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+
