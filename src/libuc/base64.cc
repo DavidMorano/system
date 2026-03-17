@@ -157,7 +157,10 @@ local void	base64_eg(cchar *,char *) noex ;
 
 constexpr mkdecoder	base64decode ;
 
-constexpr int		bits = nzeros(base) ;
+constexpr int		bits		= nzeros(base) ;
+constexpr int		bmask		= (base - 1) ;
+constexpr int		stagelen	= BASE64_STAGELEN ;
+constexpr int		outlen		= BASE64_OUTLEN ;
 
 constexpr bool		f_comment = false ;
 
@@ -218,7 +221,7 @@ int base64_d(cchar *inbuf,int len,char *outbuf) noex {
 /* end subroutine (base64_d) */
 
 int base64_enc(int v) noex {
-    	return int(base64_et[v & (base - 1)]) ;
+    	return int(base64_et[v & bmask]) ;
 }
 
 int base64_dec(int v) noex {
@@ -231,13 +234,13 @@ int base64_dec(int v) noex {
 /* encode a group */
 local void base64_eg(cchar *inbuf,char *outbuf) noex {
 	uint32_t	hold = 0 ;
-	cint		n = 3 ;
+	cint		n = stagelen ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    hold <<= CHAR_BIT ;
-	    hold |= uint32_t(mkchar(inbuf[i])) ;
+	    hold |= uint32_t(inbuf[i] & UCHAR_MAX) ;
 	} /* end for */
-	for (int i = 0 ; i < 4 ; i += 1) {
-	    cint	idx = int((hold >> ((n - i) * bits)) & (base - 1)) ;
+	for (int i = 0 ; i < outlen ; i += 1) {
+	    cint	idx = int((hold >> ((n - i) * bits)) & bmask) ;
 	    outbuf[i] = base64_et[idx] ;
 	} /* end for */
 }
@@ -248,7 +251,7 @@ local int base64_dg(cchar *inbuf,char *outbuf) noex {
 	uint32_t	hold = 0 ;
 	int		rs = SR_OK ;
 	int		dlen = 0 ; /* return-value */
-	for (int i = 0 ; i < 4 ; i += 1) {
+	for (int i = 0 ; i < outlen ; i += 1) {
 	    cint	ich = mkchar(inbuf[i]) ;
 	    if (int ch ; (ch = mkchar(base64decode.tab[ich])) != UCHAR_MAX) {
 	        hold <<= bits ;
@@ -263,8 +266,9 @@ local int base64_dg(cchar *inbuf,char *outbuf) noex {
 	} /* end for */
 	if (rs >= 0) ylikely {
 	    if_constexpr (f_comment) {
-	        for (int i = 0 ; i < 3 ; i += 1) {
-	            outbuf[i] = char(hold >> ((2 - i) * bits)) ;
+		cint nn = (stagelen - 1) ;
+	        for (int i = 0 ; i < stagelen ; i += 1) {
+	            outbuf[i] = char(hold >> ((nn - i) * CHAR_BIT)) ;
 	        }
 	        dlen -= 1 ;
 	    } else {
