@@ -896,6 +896,11 @@ bufos.o:		bufos.dir
 bufos.dir:
 	makesubdir $@
 
+# BUFSLIDE
+bufslide.o:		bufslide.dir
+bufslide.dir:
+	makesubdir $@
+
 # PERMX
 permx.o:		permx.dir
 permx.dir:
