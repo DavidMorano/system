@@ -6,7 +6,24 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998,2014 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Object:
+	timeval
+
+	Description:
+	We manage (a little bit) the TIMEVAL object.
+
+*******************************************************************************/
 
 #ifndef	TIMEVAL_INCLUDE
 #define	TIMEVAL_INCLUDE
@@ -15,10 +32,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/time.h>		/* |TIMEVAL| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
@@ -42,7 +56,7 @@ struct timeval_t : timeval {
 	} ;
 	timeval_t &operator += (const timeval_t &) noex ;
 	timeval_t &operator -= (const timeval_t &) noex ;
-} ;
+} ; /* end struct (timeval_t) */
 
 timeval operator + (const timeval &,const timeval &) noex ;
 timeval operator - (const timeval &,const timeval &) noex ;
