@@ -18,6 +18,7 @@
 
 
 #define	BASE128_STAGELEN	7	/* staging buffer length */
+#define	BASE128_OUTLEN		8	/* output buffer length */
 
 
 EXTERNC_begin
