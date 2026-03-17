@@ -29,6 +29,8 @@
 #include	<ctime>			/* |TIMEVAL| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<localmisc.h>
 
@@ -106,18 +108,6 @@ int timeval_sub(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 }
 /* end subroutine (timeval_sub) */
 
-timeval operator + (const timeval &t1,const timeval &t2) noex {
-	timeval		r ;
-	timeval_add(&r,&t1,&t2) ;
-	return r ;
-}
-
-timeval operator - (const timeval &t1,const timeval &t2) noex {
-	timeval		r ;
-	timeval_sub(&r,&t1,&t2) ;
-	return r ;
-}
-
 timeval_t &timeval_t::operator += (const timeval_t &o) noex {
 	suseconds_t	usec = (tv_usec + o.tv_usec) ;
 	tv_sec += o.tv_sec ;
@@ -127,7 +117,7 @@ timeval_t &timeval_t::operator += (const timeval_t &o) noex {
 	}
 	tv_usec = usec ;
 	return *this ;
-}
+} /* end method (timeval::operator) */
 
 timeval_t &timeval_t::operator -= (const timeval_t &o) noex {
 	suseconds_t	usec = (tv_usec - o.tv_usec) ;
@@ -138,6 +128,18 @@ timeval_t &timeval_t::operator -= (const timeval_t &o) noex {
 	}
 	tv_usec = usec ;
 	return *this ;
-}
+} /* end method (timeval::operator) */
+
+timeval operator + (const timeval &t1,const timeval &t2) noex {
+	timeval	r ;
+	timeval_add(&r,&t1,&t2) ;
+	return r ;
+} /* end method (timeval::operator) */
+
+timeval operator - (const timeval &t1,const timeval &t2) noex {
+	timeval	r ;
+	timeval_sub(&r,&t1,&t2) ;
+	return r ;
+} /* end method (timeval::operator) */
 
 
