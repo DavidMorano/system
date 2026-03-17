@@ -33,20 +33,17 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<new>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |ulogerror(3u)| */
 #include	<sbuf.h>
 #include	<storeitem.h>
 #include	<dstr.h>
 #include	<six.h>
 #include	<snwcpyx.h>
 #include	<toxc.h>
-#include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |REALNAME| */
@@ -58,11 +55,6 @@
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -91,15 +83,27 @@ using std::nothrow ;			/* constant */
 
 /* local subroutines */
 
+int realname::name(char *rbuf,int rlen) noex {
+    	return realname_name(this,rbuf,rlen) ;
+}
+
+int realname::fullname(char *rbuf,int rlen) noex {
+    	return realname_fullname(this,rbuf,rlen) ;
+}
+
+int realname::mailname(char *rbuf,int rlen) noex {
+    	return realname_mailname(this,rbuf,rlen) ;
+}
+
 void realname::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("realname",rs,"fini-finish") ;
 	}
-}
+} /* end method (realname::dtor) */
 
 int realname_esther::operator () () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case 0:
 	        rs = realname_start(op,nullptr,0) ;
@@ -111,7 +115,7 @@ int realname_esther::operator () () noex {
     
 int realname_esther::operator () (cchar *sp,int sl) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case 0:
 	        rs = realname_start(op,sp,sl) ;
@@ -123,7 +127,7 @@ int realname_esther::operator () (cchar *sp,int sl) noex {
 
 int realname_esther::operator () (cchar **sa,int sn) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case 0:
 		rs = SR_FAULT ;
@@ -146,7 +150,7 @@ int realname_esther::operator () (cchar **sa,int sn) noex {
 
 int realname_esther::operator () (dstr *dsp) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case 0:
 		rs = SR_FAULT ;
@@ -166,7 +170,7 @@ int realname_esther::operator () (dstr *dsp) noex {
 
 realname_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case realnamemem_finish:
 	        rs = realname_finish(op) ;
