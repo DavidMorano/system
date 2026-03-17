@@ -200,6 +200,9 @@
 /* Solaris: strnstr(3c) */
 #define	SYSHAS_STRNSTR		1
 
+/* Solaris: strncasestr(3c) */
+#define	SYSHAS_STRNCASESTR	0
+
 /* Solaris: sigqueue(3c) */
 #define	SYSHAS_SIGQUEUE		1
 
@@ -460,6 +463,9 @@
 /* Darwin: strnstr(3c) */
 #define	SYSHAS_STRNSTR		1
 
+/* Darwin: strncasestr(3c) */
+#define	SYSHAS_STRNCASESTR	0
+
 /* Darwin: sigqueue(3c) */
 #define	SYSHAS_SIGQUEUE		0
 
@@ -696,6 +702,9 @@
 /* Linux: strnstr(3c) */
 #define	SYSHAS_STRNSTR		0
 
+/* Linux: strncasestr(3c) */
+#define	SYSHAS_STRNCASESTR	0
+
 /* Linux: sigqueue(3c) */
 #define	SYSHAS_SIGQUEUE		1
 
@@ -839,6 +848,7 @@ struct syshas_mgr {
         uint    strnlen:1 ;
         uint    strlcpy:1 ;
         uint    strnstr:1 ;
+        uint    strncasestr:1 ;
         uint    sigqueue:1 ;
         uint    sigsend:1 ;
         uint    sigsendset:1 ;
