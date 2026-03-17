@@ -92,6 +92,7 @@
                 strnlen		= SYSHAS_STRNLEN ;
                 strlcpy		= SYSHAS_STRLCPY ;
                 strnstr		= SYSHAS_STRNSTR ;
+                strncasestr	= SYSHAS_STRNCASESTR ;
                 sigqueue	= SYSHAS_SIGQUEUE ;
                 sigsend		= SYSHAS_SIGSEND ;
                 sigsendset	= SYSHAS_SIGSENDSET ;
