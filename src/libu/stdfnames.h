@@ -27,6 +27,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<stdfiles.h>
 
 
 #ifndef	STDFNIN
@@ -53,16 +54,6 @@
 #define	STDFNZERO	stdfnames[stdfile_zero]
 #endif
 
-
-enum stdfiles {
-	stdfile_in,
-	stdfile_out,
-	stdfile_err,
-	stdfile_log,
-	stdfile_null,
-	stdfile_zero,
-	stdfile_overlast
-} ; /* end enum (stdfiles) */
 
 extern cchar	*const stdfnames[] ;
 
