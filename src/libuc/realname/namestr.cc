@@ -26,11 +26,11 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<new>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<six.h>
 #include	<snwcpyx.h>
 #include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
@@ -39,15 +39,14 @@
 
 #include	"namestr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported nameopaces */
-
-using std::nullptr_t ;			/* type */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -73,20 +72,20 @@ using std::nothrow ;			/* constant */
 
 /* exported subroutines */
 
-int namestr_start(namestr *op,cchar *sbuf,int slen) noex {
+int namestr_start(namestr *op,cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
-	if (op && sbuf) {
+	if (op && sp) ylikely {
 	    rs = SR_OK ;
-	    op->strp = sbuf ;
-	    op->strl = (slen >= 0) ? slen : lenstr(sbuf) ;
-	}
+	    op->strp = sp ;
+	    op->strl = getlenstr(sp,sl) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (namestr_start) */
 
 int namestr_finish(namestr *op) noex {
     	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->strp = nullptr ;
 	    op->strl = 0 ;
@@ -97,13 +96,19 @@ int namestr_finish(namestr *op) noex {
 
 int namestr_skipwhite(namestr *op) noex {
     	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (op) {
+	int		len = 0 ; /* return-value */
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    while ((op->strl > 0) && op->strp[0] && CHAR_ISWHITE(op->strp[0])) {
+	    cauto iswht = [&op] () noex {
+		bool f = true ;
+	        f = f && (op->strl > 0) ;
+		f = f && CHAR_ISWHITE(op->strp[0]) ;
+		return f ;
+	    } ; /* end lambda (iswht) */
+	    while (iswht()) {
 	        op->strp += 1 ;
 	        op->strl -= 1 ;
-	    }
+	    } /* end while */
 	    len = op->strl ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -113,7 +118,7 @@ int namestr_skipwhite(namestr *op) noex {
 int namestr_brk(namestr *op,cchar *bs,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
 	int		idx = 0 ;
-	if (op && bs) {
+	if (op && bs) ylikely {
 	    cint	si = sibrk(op->strp,op->strl,bs) ;
 	    rs = SR_OK ;
 	    *rpp = (si >= 0) ? (op->strp + si) : nullptr ;
@@ -126,12 +131,12 @@ int namestr_brk(namestr *op,cchar *bs,cchar **rpp) noex {
 int namestr_next(namestr *op,cchar **npp,int *fap,int *flp) noex {
 	int		rs = SR_FAULT ;
 	int		nlen = 0 ;
-	if (op && fap && flp) {
+	if (op && fap && flp) ylikely {
 	    rs = SR_EOF ;
 	    *fap = false ;
 	    *flp = false ;
 	    namestr_skipwhite(op) ;
-	    if (op->strl > 0) {
+	    if (op->strl > 0) ylikely {
 	        cchar	*sxp ;
 	        cchar	*cp ;
 	        rs = SR_OK ;
@@ -161,7 +166,7 @@ int namestr_next(namestr *op,cchar **npp,int *fap,int *flp) noex {
 	            } /* end if */
 	            namestr_skipwhite(op) ;
     		    /* eat any weirdo characters that are here */
-		    auto strok = [&op] () noex {
+		    cauto strok = [&op] () noex {
 			cchar	*sp = op->strp ;
 			bool	fs = true ;
 	                fs = fs && (op->strl > 0) ;
@@ -207,7 +212,7 @@ void namestr::dtor() noex {
 
 namestr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case namestrmem_skipwhite:
 	        rs = namestr_skipwhite(op) ;
