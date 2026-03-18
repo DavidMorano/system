@@ -86,8 +86,8 @@ import uconstants ;			/* |sysword| */
 /* imported namespaces */
 
 using libu::sncpy ;			/* subroutine (template) */
-using ustd::ustd_confstr ;		/* subroutine */
-using ustd::ustd_confstr ;		/* subroutine */
+using libu::ustd_confval ;		/* subroutine */
+using libu::ustd_confstr ;		/* subroutine */
 
 
 /* local typedefs */
@@ -167,6 +167,6 @@ int ucsysconf::getstrsyn(int req) noex {
 
 int ucsysconf::mconfstr(int req) noex {
     	return ustd_confstr(req,rbuf,rlen) ;
-} /* end subroutine (ucsysconf::mconfstr) */
+} /* end method (ucsysconf::mconfstr) */
 
 
