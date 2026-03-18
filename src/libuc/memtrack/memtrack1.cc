@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 2011-04-12, David A­D­ Morano
-	This code was originally written. This is a sort of
+	This code was originally written.  This is a sort of
 	test to replace the previous memory tracking implementation
 	inside of the |ucmem(3uc)| facility (so loved).
 
@@ -93,15 +93,6 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-template<typename ... Args>
-static inline int memtrack_magic(memtrack *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == memtrack_magicval) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (memtrack_magic) */
-
 
 /* lcaal variables */
 
@@ -113,7 +104,7 @@ static inline int memtrack_magic(memtrack *op,Args ... args) noex {
 
 int memtrack::ins(cvoid *addr,int asize) noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) ylikely {
+	if ((rs = magic) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr && (asize > 0)) {
@@ -127,7 +118,7 @@ int memtrack::ins(cvoid *addr,int asize) noex {
 
 int memtrack::rem(cvoid *addr) noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) ylikely {
+	if ((rs = magic) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
@@ -140,7 +131,7 @@ int memtrack::rem(cvoid *addr) noex {
 
 int memtrack::present(cvoid *addr) noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) ylikely {
+	if ((rs = magic) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
@@ -155,7 +146,7 @@ int memtrack::present(cvoid *addr) noex {
 
 int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) ylikely {
+	if ((rs = magic) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
 	    if (addr) {
@@ -178,7 +169,7 @@ int memtrack::istart(int n) noex {
 	    rs = SR_NOMEM ;
 	    if ((tp = new(nothrow) track_t) != nullptr) {
 	        if ((rs = tp->start(n)) >= 0) {
-		    magic = memtrack_magicval ;
+		    magval = memtrack_magicval ;
 	        }
 		if (rs < 0) {
 		    delete tp ;
@@ -193,7 +184,7 @@ int memtrack::istart(int n) noex {
 int memtrack::ifinish() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = memtrack_magic(this)) >= 0) ylikely {
+	if ((rs = magic) >= 0) ylikely {
 	    rs = SR_OK ;
 	    {
 	        rs1 = tp->finish() ;
@@ -203,7 +194,7 @@ int memtrack::ifinish() noex {
 		delete tp ;
 		tp = nullptr ;
 	    }
-	    magic = 0 ;
+	    magval = 0 ;
 	} /* end if (was open) */
 	return rs ;
 }
@@ -211,7 +202,7 @@ int memtrack::ifinish() noex {
 
 int memtrack::icount() noex {
 	int		rs ;
-	if ((rs = memtrack_magic(this)) >= 0) ylikely {
+	if ((rs = magic) >= 0) ylikely {
 	    rs = tp->count() ;
 	} /* end if (was open) */
 	return rs ;
@@ -220,7 +211,7 @@ int memtrack::icount() noex {
 
 void memtrack::dtor() noex {
 	ulogerror("memtrack",SR_BUGCHECK,"dtor called") ;
-	if (int rs = memtrack_magic(this) ; rs >= 0) {
+	if (int rs = magic ; rs >= 0) {
 	    if ((rs = ifinish()) < 0) {
 		ulogerror("memtrack",rs,"dtor-finish") ;
 	    }
