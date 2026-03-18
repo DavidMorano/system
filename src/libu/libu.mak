@@ -82,7 +82,7 @@ OBJ27= ucomposite.o
 
 OBJ28= findbit.o
 OBJ29= itimers.o filetypes.o
-OBJ30=
+OBJ30= binchunk.o
 OBJ31=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -92,7 +92,7 @@ OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
-OBJH= obj28.o obj29.o
+OBJH= obj28.o obj29.o obj30.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o
 
@@ -455,6 +455,11 @@ usigsets.o:		usigsets.dir
 usigsets.dir:
 	makesubdir $@
 
+# USIREAM
+ustream.o:		ustream.dir
+ustream.dir:
+	makesubdir $@
+
 usigblock.o:		usigblock.ccm			$(INCS)
 
 # POSIX® synchronization mechanisms
@@ -466,7 +471,8 @@ ptx.dir:
 chrset.o:		chrset.ccm			$(INCS)
 bitgrp.o:		bitgrp.ccm			$(INCS)
 nulstr.o:		nulstr.cc	nulstr.h	$(INCS)
-posixdirent.o:		posixdirent.cc posixdirent.hh	$(INCS)
+posixdirent.o:		posixdirent.cc	posixdirent.hh	$(INCS)
+binchunk.o:		binchunk.cc	binchunk.hh	$(INCS)
 
 # OTHER
 ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
@@ -500,6 +506,7 @@ clockids.o:		clockids.cc	clockids.hh	$(INCS)
 
 # MODULES
 findbit.o:		findbit.ccm			$(INCS)
+
 
 
 
