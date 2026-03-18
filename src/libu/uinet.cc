@@ -24,10 +24,23 @@
 	These are support subroutines for some Internet-Address
 	(IP) operations.
 
+	Synopsis:
+	bool isin4mapped(ushort *in6addr) noex
+	bool isin6loopback(ushort *in6addr) noex
+
+	Arguments:
+	in6addr		INET v6 address (eight short-words)
+
+	Returns:
+	true		yes
+	false		no
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<arpa/inet.h>		/* |ntohs(3inet)| */
+#include	<cstddef>
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -44,6 +57,9 @@
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
