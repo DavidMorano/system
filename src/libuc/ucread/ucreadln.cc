@@ -77,7 +77,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -130,12 +130,12 @@ extern "C" {
 
 /* forward references */
 
-static int	readln_socket(int,char *,int,int) noex ;
-static int	readln_stream(int,char *,int,int) noex ;
-static int	readln_seekable(int,char *,int,int,off_t) noex ;
-static int	readln_default(int,char *,int,int) noex ;
+local int	readln_socket(int,char *,int,int) noex ;
+local int	readln_stream(int,char *,int,int) noex ;
+local int	readln_seekable(int,char *,int,int,off_t) noex ;
+local int	readln_default(int,char *,int,int) noex ;
 
-static int 	isseekable(int,off_t *) noex ;
+local int 	isseekable(int,off_t *) noex ;
 
 
 /* local variables */
@@ -178,7 +178,7 @@ int uc_readln(int fd,char *lbuf,int llen) noex {
 
 /* private subroutines */
 
-static int readln_socket(int fd,char *lbuf,int llen,int to) noex {
+local int readln_socket(int fd,char *lbuf,int llen,int to) noex {
     	cnullptr	np{} ;
 	cint		mopts = MSG_PEEK ;
 	cint		opts = (FM_TIMED | FM_EXACT) ;
@@ -214,9 +214,7 @@ static int readln_socket(int fd,char *lbuf,int llen,int to) noex {
 }
 /* end subroutine (readln_socket) */
 
-static int readln_stream(int fd,char *lbuf,int llen,int to) noex {
-	POLLFD		fds[2] ;
-	STRPEEK		pd ;
+local int readln_stream(int fd,char *lbuf,int llen,int to) noex {
 	time_t		ti_now = time(nullptr) ;
 	time_t		ti_start ;
 	cnullptr	np{} ;
@@ -238,14 +236,13 @@ static int readln_stream(int fd,char *lbuf,int llen,int to) noex {
 #ifdef	POLLRDBAND
 	events |= POLLRDBAND ;
 #endif
-	{
-	    memclear(fds,szof(fds)) ;
+	POLLFD		fds[2] = {} ; {
 	    fds[0].fd = fd ;
 	    fds[0].events = short(events) ;
 	    fds[1].fd = -1 ;
 	    fds[1].events = 0 ;
 	}
-	{
+	STRPEEK		pd{} ; {
 	    pd = {} ;
 	    pd.flags = 0 ;
 	    pd.ctlbuf.buf = cbuf ;
@@ -292,7 +289,7 @@ static int readln_stream(int fd,char *lbuf,int llen,int to) noex {
 }
 /* end subroutine (readln_stream) */
 
-static int readln_seekable(int fd,char *lbuf,int llen,int to,off_t fo) noex {
+local int readln_seekable(int fd,char *lbuf,int llen,int to,off_t fo) noex {
 	int		rs ;
 	(void) to ;
 	if ((rs = u_pread(fd,lbuf,llen,fo)) > 0) {
@@ -306,7 +303,7 @@ static int readln_seekable(int fd,char *lbuf,int llen,int to,off_t fo) noex {
 }
 /* end subroutine (readln_seekable) */
 
-static int readln_default(int fd,char *lbuf,int llen,int to) noex {
+local int readln_default(int fd,char *lbuf,int llen,int to) noex {
 	cint		opts = (FM_TIMED | FM_EXACT) ;
 	int		rs = SR_OK ;
 	int		tlen = 0 ; /* return-value */
@@ -326,7 +323,7 @@ static int readln_default(int fd,char *lbuf,int llen,int to) noex {
 }
 /* end subroutine (readln_default) */
 
-static int isseekable(int fd,off_t *fop) noex {
+local int isseekable(int fd,off_t *fop) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = u_seeko(fd,0z,SEEK_CUR,fop)) >= 0) {
