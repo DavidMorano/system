@@ -102,7 +102,9 @@ enum dataitems {
 	dataitem_maxlogin,
 	dataitem_ngroups,
 	dataitem_maxnode,
+	dataitem_maxprot,
 	dataitem_maxhost,
+	dataitem_maxserv,
 	dataitem_maxmsg,
 	dataitem_maxtzname,
 	dataitem_clk,
@@ -143,7 +145,7 @@ enum dataitems {
 
 /* local variables */
 
-ucdatamgr		ucdata ;
+ucdatamgr		ucdata ;	/* <- module linkage */
 
 constexpr size_t	minusone = -1uz ;
 
