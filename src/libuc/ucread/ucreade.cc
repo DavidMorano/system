@@ -125,7 +125,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
@@ -236,8 +237,8 @@ int uc_reade(int fd,void *vbuf,int ulen,int to,int opts) noex {
 	if (vbuf) ylikely {
 	    rs = SR_BADF ;
 	    if (fd >= 0) ylikely {
-	        char		*ubuf = (char *) vbuf ;
-	        SI		si, *sip = &si ;
+	        char	*ubuf = (char *) vbuf ;
+	        SI	si, *sip = &si ;
 	        if ((rs = subinfo_start(sip,fd,ubuf,ulen,to,opts)) >= 0) {
 	            bool f = false ;
 	            f = f || sip->fl.isdir || sip->fl.isblock ;
@@ -374,7 +375,6 @@ local int subinfo_readreg(SI *sip) noex {
 /* end subroutine (subinfo_readreg) */
 
 local int subinfo_readslow(SI *sip) noex {
-	POLLFD		fds[2] ;
 	int		rs = SR_OK ;
 	int		events = POLLEVENTS ;
 
@@ -389,19 +389,16 @@ local int subinfo_readslow(SI *sip) noex {
 
 /* initialization for 'u_poll(2u)' */
 
-	{
-	memclear(fds,szof(fds)) ;
-	fds[0].fd = sip->fd ;
-	fds[0].events = short(events) ;
-	fds[1].fd = -1 ;
+	POLLFD		fds[2]  = {} ; {
+	    fds[0].fd = sip->fd ;
+	    fds[0].events = short(events) ;
+	    fds[1].fd = -1 ;
 	}
 	/* go */
 	while ((rs >= 0) && ((sip->ulen - sip->tlen) > 0)) {
 	    int	f_break = false ;
-
 	    if ((rs = u_poll(fds,1,POLL_INTMULT)) > 0) {
 	        cint	re = fds[0].revents ;
-
 	        if ((re & POLLIN) || (re & POLLPRI)) {
 	            rs = subinfo_readpoll(sip) ;
 	            f_break = (rs > 0) ;
@@ -413,7 +410,6 @@ local int subinfo_readslow(SI *sip) noex {
 	            if (sip->tlen == 0) break ;
 	            msleep(1) ;
 	        }
-
 	    } else if (rs == SR_INTR) {
 	        rs = SR_OK ;
 	    } else if (rs == 0) { /* u_poll() returned w/ nothing */
@@ -423,7 +419,6 @@ local int subinfo_readslow(SI *sip) noex {
 	            f_break = true ;
 	        }
 	    } /* end if (otherwise it must be an error) */
-
 	    if (sip->fl.isnonblock) break ;
 	    if (f_break) break ;
 	} /* end while (looping on poll) */
@@ -434,13 +429,10 @@ local int subinfo_readslow(SI *sip) noex {
 local int subinfo_readpoll(SI *sip) noex {
 	int		rs ;
 	int		rlen ;
-	int		len ;
 	int		f_break = false ;
-
 	rlen = (sip->ulen - sip->tlen) ;
 	if ((rs = u_read(sip->fd,sip->bp,rlen)) >= 0) {
-	    len = rs ;
-
+	    cint len = rs ;
 	    if (len == 0) {
 	        sip->neof += 1 ;
 	        if ((! sip->fl.issocket) || (sip->neof >= sip->maxeof)) {
@@ -449,21 +441,17 @@ local int subinfo_readpoll(SI *sip) noex {
 	    } else {
 	        sip->neof = 0 ;		/* reset */
 	    }
-
 	    sip->tlen += len ;
 	    sip->bp += len ;
 	    if ((! f_break) && (len > 0) && (! sip->fl.exact)) {
 	        f_break = true ;
 	    }
-
 	    if ((! f_break) && (len > 0) && sip->fl.timeint) {
 	        sip->to = sip->uto ;	/* reset */
 	    }
-
 	} else if (rs == SR_AGAIN) {
 	    if (! sip->fl.isnonblock) rs = SR_OK ;
 	}
-
 	return (rs >= 0) ? f_break : rs ;
 }
 /* end subroutine (subinfo_readpoll) */
