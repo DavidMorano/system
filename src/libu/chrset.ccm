@@ -53,10 +53,7 @@ module ;
 #include	<cstdlib>
 #include	<concepts>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 #include	<baops.h>
 #include	<localmisc.h>
@@ -72,14 +69,17 @@ local cint	nwords = ((UCHAR_MAX + 1) / (szof(word_t) * CHAR_BIT)) ;
 export {
     struct chrset {
 	word_t		bs[nwords] = {} ;	/* 32 bytes (4 words) */
-	int load(cchar *) noex ;
 	chrset() = default ;
+	chrset(const chrset &) = delete ;
+	chrset &operator = (const chrset &) = delete ;
+	chrset &operator = (chrset &&) = delete ;
 	chrset(cchar *ss) noex {
 	    load(ss) ;
 	} ;
 	chrset(int ch) noex {
 	    baset(bs,ch) ;
 	} ;
+	int load(cchar *) noex ;
 	int set(int) noex ;
 	int clr(int) noex ;
 	int tst(int) const noex ;
