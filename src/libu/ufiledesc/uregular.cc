@@ -17,7 +17,9 @@
 	u_writen
 	u_fchdir
 	u_fchmod
+	u_fchmodmin
 	u_fchown
+	u_ftimes
 	u_poll
 	u_fstat
 	u_fstatfs
@@ -25,6 +27,7 @@
 	u_fpathconf
 	u_fstype
 	u_fsync
+	u_fsyncdata
 	u_fsize
 	u_ftruncate
 	u_ioctl
@@ -136,16 +139,19 @@
 #include	<sys/ioctl.h>		/* for |ioctl(2)| */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<usysflag.h>
 #include	<intsat.h>
 #include	<localmisc.h>
 
-#include	"ufiledesc.h"
+#include	"ufiledescbase.hh"
+#include	"uregular.h"
 
 
 /* local defines */
@@ -183,10 +189,10 @@
 
 /* imported namespaces */
 
-using namespace	ufiledesc ;		/* namespace */
 using namespace usys ;			/* namespace */
 
 using std::nullptr_t ;			/* type */
+using libu::ufiledescbase ;		/* type */
 using libu::ufstype ;			/* subroutine */
 
 
@@ -248,6 +254,7 @@ namespace {
 	} ;
 	int ipoll(int) noex ;
 	int ifsync(int) noex ;
+	int ifsyncdata(int) noex ;
 	int iftruncate(int) noex ;
 	int ilockf(int) noex ;
 	int ipread(int) noex ;
@@ -258,7 +265,7 @@ namespace {
 	int iwritev(int) noex ;
 	int iioctl(int) noex ;
     } ; /* end struct (uregular) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -266,9 +273,9 @@ namespace {
 
 /* local variables */
 
-constexpr cbool		f_acl = F_ACL ;		/* future use */
-constexpr cbool		f_sunos = F_SUNOS ;	/* this is really Solaris® */
-constexpr cbool		f_darwin = F_DARWIN ;
+constexpr cbool		f_acl		= F_ACL ;	/* future use */
+constexpr cbool		f_sunos		= F_SUNOS ;	/* really Solaris® */
+constexpr cbool		f_darwin	= F_DARWIN ;
 
 
 /* exported variables */
@@ -321,11 +328,11 @@ int u_readn(int fd,void *rbuf,int rlen) noex {
 	    caddr_t		cbuf = caddr_t(rbuf) ;
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
-		auto rd = [&] () -> int {
+		cauto rd = [&] () -> int {
 		    cint	remlen = (rlen - rl) ;
 		    char	*rb = (cbuf + rl) ;
 		    return u_read(fd,rb,remlen) ;
-		} ;
+		} ; /* end lambda */
 		rs = SR_OK ;
 		while ((rl < rlen) && ((rs = rd()) > 0)) {
 		    rl += rs ;
@@ -343,11 +350,11 @@ int u_writen(int fd,cvoid *wbuf,int wlen) noex {
 	    const caddr_t	cbuf = caddr_t(wbuf) ;
 	    rs = SR_INVALID ;
 	    if (wlen >= 0) {
-		auto wr = [&] () -> int {
+		cauto wr = [&] () -> int {
 		    cint	remlen = (wlen - wl) ;
 		    cchar	*wb = (cbuf + wl) ;
 		    return u_write(fd,wb,remlen) ;
-		} ;
+		} ; /* end lanbda */
 		rs = SR_OK ;
 	        while ((wl < wlen) && ((rs = wr()) > 0)) {
 		    wl += rs ;
@@ -381,6 +388,23 @@ int u_fchmod(int fd,mode_t m) noex {
 }
 /* end subroutine (u_fchmod) */
 
+int u_fchmodmin(int fd,mode_t m) noex {
+	int		rs = SR_BADFD ;
+	int		fchanged = false ;
+	if (fd >= 0) ylikely {
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
+	        cmode	om = (sb.st_mode & (~ S_IFMT)) ;
+	        cmode	nm = (m & (~ S_IFMT)) ;
+	        if ((om & nm) != nm) {
+		    fchanged = true ;
+		    rs = u_fchmod(fd,(om | nm)) ;
+	        }
+	    } /* end if (u_stat) */
+	} /* end if (valid) */
+	return (rs >= 0) ? fchanged : rs ;
+}
+/* end subroutine (u_fchmodmin) */
+
 int u_fchown(int fd,uid_t uid,gid_t gid) noex {
 	int		rs ;
 	repeat {
@@ -392,7 +416,18 @@ int u_fchown(int fd,uid_t uid,gid_t gid) noex {
 }
 /* end subroutine (u_fchown) */
 
-int u_fstat(int fd,USTAT *ssp) noex {
+int u_ftimes(int fd,CTIMEVAL *tvp) noex {
+	int		rs ;
+	repeat {
+	    if ((rs = futimes(fd,tvp)) < 0) {
+		rs = (- errno) ;
+	    }
+	} until (rs != SR_INTR) ;
+	return rs ;
+}
+/* end subroutine (u_ftimes) */
+
+int u_fstat(int fd,ustat *ssp) noex {
 	int		rs = SR_FAULT ;
 	if (ssp) {
 	    repeat {
@@ -402,13 +437,15 @@ int u_fstat(int fd,USTAT *ssp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	if_constexpr (f_darwin) {
-	    if (rs == SR_NOTTY) rs = SR_ACCESS ;
-	}
+	    if (rs == SR_NOTTY) {
+		rs = SR_ACCESS ;
+	    }
+	} /* end if_constexpr (f_darwin) */
 	return rs ;
 }
 /* end subroutine (u_fstat) */
 
-int u_fstatfs(int fd,USTATFS *ssp) noex {
+int u_fstatfs(int fd,ustatfs *ssp) noex {
 	int		rs = SR_FAULT ;
 	if (ssp) {
 	    repeat {
@@ -421,7 +458,7 @@ int u_fstatfs(int fd,USTATFS *ssp) noex {
 }
 /* end subroutine (u_fstatfs) */
 
-int u_fstatvfs(int fd,USTATVFS *sbp) noex {
+int u_fstatvfs(int fd,ustatvfs *sbp) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
 	    repeat {
@@ -471,10 +508,18 @@ int u_fsync(int fd) noex {
 }
 /* end subroutine (u_fsync) */
 
+int u_fsyncdata(int fd) noex {
+	uregular	ro ;
+	ro.m = &uregular::ifsyncdata ;
+	return ro(fd) ;
+}
+/* end subroutine (u_fsyncdata[) */
+
 int u_fsize(int fd) noex {
     	int		rs ;
 	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
-	    rs = intsat(sb.st_size) ;
+	    clong fsize = long(sb.st_size) ;
+	    rs = intsat(fsize) ;
 	}
 	return rs ;
 } /* end subroutine (u_fsize) */
@@ -489,14 +534,15 @@ int u_ftruncate(int fd,off_t fo) noex {
 int u_ioctl(int fd,int cmd,...) noex {
 	va_list		ap ;
 	int		rs = SR_INVALID ;
-	caddr_t		anyarg ;
 	va_begin(ap,cmd) ;
-	anyarg = va_arg(ap,caddr_t) ;
-	if (cmd >= 0) {
-	    uregular	ro(cmd,anyarg) ;
-	    ro.m = &uregular::iioctl ;
-	    rs = ro(fd) ;
-	}
+	{
+	    caddr_t anyarg = va_arg(ap,caddr_t) ;
+	    if (cmd >= 0) {
+	        uregular ro(cmd,anyarg) ;
+	        ro.m = &uregular::iioctl ;
+	        rs = ro(fd) ;
+	    } /* end id (valid) */
+	} /* end block */
 	va_end(ap) ;
 	return rs ;
 }
@@ -519,7 +565,7 @@ int u_pread(int fd,void *rbuf,int rlen,off_t off) noex {
 int u_pwrite(int fd,cvoid *wbuf,int wlen,off_t off) noex {
 	uregular	ro(wbuf,wlen,off) ;
 	ro.m = &uregular::ipwrite ;
-	ro.f.fwrite = true ;
+	ro.fdfl.fwrite = true ;
 	return ro(fd) ;
 }
 /* end subroutine (u_pwrite) */
@@ -551,7 +597,8 @@ int u_seeko(int fd,off_t wo,int w,off_t *offp) noex {
 	    *offp = (rs >= 0) ? ro : 0z ;
 	}
 	if (rs >= 0) {
-	    rs = intsat(ro) ;
+	    clong lo = ro ;
+	    rs = intsat(lo) ;
 	}
 	return rs ;
 }
@@ -560,7 +607,7 @@ int u_seeko(int fd,off_t wo,int w,off_t *offp) noex {
 int u_write(int fd,cvoid *wbuf,int wlen) noex {
 	uregular	ro(wbuf,wlen) ;
 	ro.m = &uregular::iwrite ;
-	ro.f.fwrite = true ;
+	ro.fdfl.fwrite = true ;
 	return ro(fd) ;
 }
 /* end subroutine (u_write) */
@@ -568,18 +615,18 @@ int u_write(int fd,cvoid *wbuf,int wlen) noex {
 int u_writev(int fd,CIOVEC *iop,int n) noex {
 	uregular	ro(iop,n) ;
 	ro.m = &uregular::iwritev ;
-	ro.f.fwrite = true ;
+	ro.fdfl.fwrite = true ;
 	return ro(fd) ;
 }
 /* end subroutine (u_writev) */
 
 /* this is (sort of) a spæcial case */
-int u_poll(POLLFD *fds,int n,int to) noex {
+int u_poll(POLLFD *fds,int n,int mto) noex {
 	int		rs = SR_FAULT ;
 	if (fds) {
-	    uregular	ro(fds,n,to) ;
+	    uregular	ro(fds,n,mto) ;
 	    ro.m = &uregular::ipoll ;
-	    ro.f.fintr = true ;
+	    ro.fdfl.fintr = true ;
 	    rs = ro(0) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -592,9 +639,8 @@ int u_poll(POLLFD *fds,int n,int to) noex {
 /* this is a special case (could be moved in the future) */
 int uregular::ipoll(int) noex {
 	cnfds		nfd = nfds_t(n) ;
-	cint		mto = (to * POLL_INTMULT) ;
 	int		rs ;
-	if ((rs = poll(fds,nfd,mto)) < 0) {
+	if ((rs = poll(fds,nfd,to)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -609,6 +655,15 @@ int uregular::ifsync(int fd) noex {
 	return rs ;
 }
 /* end method (ufiledesc::ifsync) */
+
+int uregular::ifsyncdata(int fd) noex {
+	int		rs ;
+	if ((rs = fdatasync(fd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (ufiledesc::ifsyncdata) */
 
 int uregular::iftruncate(int fd) noex {
 	int		rs ;
@@ -631,10 +686,10 @@ int uregular::ilockf(int fd) noex {
 int uregular::ipread(int fd) noex {
 	csize		rsz = size_t(rlen) ;
 	int		rs ;
-	if (ssize_t rsize ; (rsize = pread(fd,rbuf,rsz,sz)) < 0) {
-	    rs = (- errno) ;
-	} else {
+	if (ssize_t rsize ; (rsize = pread(fd,rbuf,rsz,sz)) >= 0) {
 	    rs = intsat(rsize) ;
+	} else {
+	    rs = (- errno) ;
 	}
 	return rs ;
 }
@@ -643,10 +698,10 @@ int uregular::ipread(int fd) noex {
 int uregular::ipwrite(int fd) noex {
 	csize		wsz = size_t(wlen) ;
 	int		rs ;
-	if (ssize_t rsize ; (rsize = pwrite(fd,wbuf,wsz,sz)) < 0) {
-	    rs = (- errno) ;
-	} else {
+	if (ssize_t rsize ; (rsize = pwrite(fd,wbuf,wsz,sz)) >= 0) {
 	    rs = intsat(rsize) ;
+	} else {
+	    rs = (- errno) ;
 	}
 	return rs ;
 }
@@ -655,7 +710,9 @@ int uregular::ipwrite(int fd) noex {
 int uregular::iread(int fd) noex {
 	csize		rsz = size_t(rlen) ;
 	int		rs ;
-	if (ssize_t rsize ; (rsize = read(fd,rbuf,rsz)) < 0) {
+	if (ssize_t rsize ; (rsize = read(fd,rbuf,rsz)) >= 0) {
+	    rs = intsat(rsize) ;
+	} else {
 	    rs = (- errno) ;
 	}
 	return rs ;
@@ -665,10 +722,10 @@ int uregular::iread(int fd) noex {
 int uregular::ireadv(int fd) noex {
 	IOVEC		*riop = const_cast<IOVEC *>(iop) ;
 	int		rs ;
-	if (ssize_t rsize ; (rsize = readv(fd,riop,n)) < 0) {
-	    rs = (- errno) ;
-	} else {
+	if (ssize_t rsize ; (rsize = readv(fd,riop,n)) >= 0) {
 	    rs = intsat(rsize) ;
+	} else {
+	    rs = (- errno) ;
 	}
 	return rs ;
 }
@@ -677,10 +734,10 @@ int uregular::ireadv(int fd) noex {
 int uregular::iwrite(int fd) noex {
 	csize		wsz = size_t(wlen) ;
 	int		rs ;
-	if (ssize_t rsize ; (rsize = write(fd,wbuf,wsz)) < 0) {
-	    rs = (- errno) ;
-	} else {
+	if (ssize_t rsize ; (rsize = write(fd,wbuf,wsz)) >= 0) {
 	    rs = intsat(rsize) ;
+	} else {
+	    rs = (- errno) ;
 	}
 	return rs ;
 }
@@ -688,10 +745,10 @@ int uregular::iwrite(int fd) noex {
 
 int uregular::iwritev(int fd) noex {
 	int		rs ;
-	if (ssize_t rsize ; (rsize = writev(fd,iop,n)) < 0) {
-	    rs = (- errno) ;
-	} else {
+	if (ssize_t rsize ; (rsize = writev(fd,iop,n)) >= 0) {
 	    rs = intsat(rsize) ;
+	} else {
+	    rs = (- errno) ;
 	}
 	return rs ;
 }
