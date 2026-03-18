@@ -216,7 +216,9 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	                int	i ; /* used-afterwards */
 	                for (i = 0 ; (i < hl) && *sp ; i += 1) {
 	                    int	ch = mkchar(sp[i]) ;
-	                    if (isourbad(ch)) ch = chx_badsub ;
+	                    if (isourbad(ch)) {
+				ch = chx_badsub ;
+			    }
 	                    abuf[i] = char(ch) ;
 	                }
 	                if (f_eol) abuf[i++] = '\n' ;
@@ -283,7 +285,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	                    if ((ch = (int) lsp[j]) <= UCHAR_MAX) {
 	                        p[j] = char(ch) ;
 	                    } else {
-	                        p[j] = chx_badsub ;
+	                        p[j] = char(chx_badsub) ;
 	                    }
 	                } /* end for */
 	            } else {
@@ -291,7 +293,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	                    if ((ch = (int) wsp[j]) <= UCHAR_MAX) {
 	                        p[j] = char(ch) ;
 	                    } else {
-	                        p[j] = chx_badsub ;
+	                        p[j] = char(chx_badsub) ;
 	                    }
 	                } /* end for */
 	            } /* end if */
