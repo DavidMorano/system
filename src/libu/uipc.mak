@@ -1,4 +1,4 @@
-# MAKEFILES (uipc)
+# MAKEFILE (uipc)
 
 T= uipc
 
