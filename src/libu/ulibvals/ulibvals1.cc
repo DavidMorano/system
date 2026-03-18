@@ -57,7 +57,7 @@ using std::endian ;
 
 static int	rscum ;
 
-static constexpr int mkendian() noex {
+local constexpr int mkendian() noex {
     	using enum	endian ;	/* get the values */
     	int	n ;
 	if_constexpr (native == little) {
@@ -98,8 +98,10 @@ const int	ulibvals::usernamelen	= getval(_SC_USERNAME_MAX) ;
 const int	ulibvals::groupnamelen	= getval(_SC_GROUPNAME_MAX) ;
 const int	ulibvals::projnamelen	= 
 				getval(_SC_PROJECTNAME_MAX) ;
+const int	ulibvals::protnamelen	= getval(_SC_PROTNAME_MAX) ;
 const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
 const int	ulibvals::hostnamelen	= getval(_SC_HOSTNAME_MAX) ;
+const int	ulibvals::servnamelen	= getval(_SC_SERVNAME_MAX) ;
 const int	ulibvals::binbuflen	= BINBUFLEN ;	/* for |int256_t| */
 const int	ulibvals::octbuflen	= OCTBUFLEN ;	/* for |int256_t| */
 const int	ulibvals::decbuflen	= DECBUFLEN ;	/* for |int256_t| */
