@@ -21,6 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdio.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<strlinelen.h>
 
 
 #define DPRINTF(FMT, ...) 						\
