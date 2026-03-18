@@ -1,4 +1,4 @@
-# MAKEFILES (utmpxx)
+# MAKEFILE (utmpxx)
 
 T= utmpxx
 
