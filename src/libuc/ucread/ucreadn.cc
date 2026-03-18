@@ -17,12 +17,6 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<poll.h>
-#include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
@@ -67,13 +61,12 @@ int uc_readn(int fd,void *abuf,int alen) noex {
 	        rs = SR_INVALID ;
 	        if (alen >= 0) ylikely {
 	            int		c = 0 ;
-	            int		len ;
 	            int		alenr = alen ;
 	            char	*abp = (char *) abuf ;
+		    rs = SR_OK ;
 	            while ((rs >= 0) && (alenr > 0)) {
-	                rs = u_read(fd,abp,alenr) ;
-	                len = rs ;
-	                if (rs > 0) {
+	                if ((rs = u_read(fd,abp,alenr)) > 0) {
+	                    cint len = rs ;
 		            abp += len ;
 		            rlen += len ;
 		            alenr -= len ;
