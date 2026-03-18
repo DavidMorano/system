@@ -1,4 +1,4 @@
-# MAKEFILES (ucstream)
+# MAKEFILE (ucstream)
 
 T= ucstream
 
