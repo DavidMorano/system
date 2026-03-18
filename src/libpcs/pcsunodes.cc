@@ -59,11 +59,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) noex ;
-extern int	strlinelen(cchar *,int,int) noex ;
-#endif
-
 
 /* external variables */
 
