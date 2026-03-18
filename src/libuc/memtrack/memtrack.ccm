@@ -63,7 +63,7 @@ import mapblock ;
 
 /* local defines */
 
-#define	MEMTRACK_MAGIC	0x65821293
+#define	MEMTRACK_MAGIC		0x65821293
 
 /* local stuff */
 
@@ -74,7 +74,7 @@ enum memtrackmems {
 	memtrackmem_overlast
 } ; /* end enum (memtrackmems) */
 
-constexpr int	memtrack_magicval = MEMTRACK_MAGIC ;
+constexpr int		memtrack_magicval = MEMTRACK_MAGIC ;
 
 /* exported stuff */
 
@@ -86,6 +86,15 @@ constexpr int	memtrack_magicval = MEMTRACK_MAGIC ;
 export {
     struct memtrack ;
 }
+
+    struct memtrack_ma {
+        memtrack          *op = nullptr ;
+        void operator () (memtrack *p,int) noex {
+            op = p ;
+        } ;
+        template<typename ... Args> int operator () (Args ... ) noex ;
+        operator int () noex ;
+    } ; /* end struct (memtrack_ma) */
 
     struct memtrack_co {
 	memtrack	*op = nullptr ;
@@ -102,6 +111,7 @@ export {
 
 export {
     struct memtrack {
+	friend		memtrack_ma ;
 	friend		memtrack_co ;
 	typedef memtrack_ent	ent ;
 	typedef mapblock<uintptr_t,memtrack_ent> track_t ;
@@ -109,21 +119,23 @@ export {
 	memtrack_co	start ;
 	memtrack_co	count ;
 	memtrack_co	finish ;
-	uint		magic = 0 ;
+	memtrack_ma	magic ;
+	uint		magval{} ;
 	constexpr memtrack() noex {
 	    start	(this,memtrackmem_start) ;
 	    finish	(this,memtrackmem_finish) ;
 	    count	(this,memtrackmem_count) ;
+	    magic	(this,0) ;
 	} ; /* end ctor */
 	memtrack(const memtrack &) = delete ;
 	memtrack &operator = (const memtrack &) = delete ;
-	int	ins(cvoid *,int) noex ;
-	int	rem(cvoid *) noex ;
-	int	present(cvoid *) noex ;
-	int	get(cvoid *,ent *) noex ;
+	int ins		(cvoid *,int) noex ;
+	int rem		(cvoid *) noex ;
+	int present	(cvoid *) noex ;
+	int get		(cvoid *,ent *) noex ;
 	void	dtor() noex ;
 	destruct memtrack() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ; /* end if (dtor) */
     private:
 	int	istart(int = 0) noex ;
@@ -131,5 +143,17 @@ export {
 	int	icount() noex ;
     } ; /* end struct (memtrack) */
 } /* end export */
+
+template<typename ... Args> int memtrack_ma::operator () (Args ... args) noex {
+        int             rs = SR_FAULT ;
+        if ((... && args)) {
+            rs = (op->magval == memtrack_magicval) ? SR_OK : SR_NOTOPEN ;
+        }
+        return rs ;
+} /* end method (memtrack_ma::operator) */
+
+inline memtrack_ma::operator int () noex {
+        return (op->magval == memtrack_magicval) ? SR_OK : SR_NOTOPEN ;
+} /* end method (memtrack_ma::operator) */
 
 
