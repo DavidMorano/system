@@ -97,7 +97,7 @@ static int serialbuf_szok(serialbuf *op,int sz) noex {
 	if (op) ylikely {
 	    if (op->sbuf) ylikely {
 		if ((rs = op->i) >= 0) {
-		    cint	al = (op->slen - op->i) ;
+		    cint al = (op->slen - op->i) ;
 		    rs = SR_TOOBIG ;
 	            if (al >= sz) {
 		        rs = al ;
