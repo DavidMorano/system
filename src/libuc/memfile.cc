@@ -17,6 +17,10 @@
 
 /******************************************************************************
 
+  	Object:
+	memfile
+
+	Description:
 	This little object provides a file writing facility for
 	low-overhead raw writes (no separate user-space buffering).
 
@@ -33,10 +37,12 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<sysval.hh>
 #include	<intsat.h>
 #include	<intceil.h>
@@ -47,7 +53,7 @@
 
 /* local defines */
 
-#define	ZEROBUFLEN	1024
+#define	ZEROBUFLEN	32
 #define	PSZMULT		4
 
 
@@ -59,8 +65,17 @@ using std::max ;			/* subroutine-template */
 
 /* local typedefs */
 
+typedef size_t		sz ;
+
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_fdatasync(int) noex ;
+    extern int uc_close(int) ;
+} /* end extern */
 
 
 /* external variables */
@@ -75,9 +90,9 @@ using std::max ;			/* subroutine-template */
 /* forward references */
 
 template<typename ... Args>
-static inline int memfile_ctor(memfile *op,Args ... args) noex {
+local inline int memfile_ctor(memfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 	    op->magic = 0 ;
 	    op->dbuf = nullptr ;
@@ -91,9 +106,9 @@ static inline int memfile_ctor(memfile *op,Args ... args) noex {
 }
 /* end subroutine (memfile_ctor) */
 
-static int memfile_dtor(memfile *op) noex {
+local inline int memfile_dtor(memfile *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -101,27 +116,27 @@ static int memfile_dtor(memfile *op) noex {
 /* end subroutine (memfile_dtor) */
 
 template<typename ... Args>
-static inline int memfile_magic(memfile *op,Args ... args) noex {
+local inline int memfile_magic(memfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MEMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
 /* end subroutine (memfile_magic) */
 
-static int	memfile_opener(memfile *,cchar *,int,mode_t) noex ;
-static int	memfile_openmap(memfile *,size_t) noex ;
-static int	memfile_mapbegin(memfile *,size_t,size_t) noex ;
-static int	memfile_mapend(memfile *) noex ;
-static int	memfile_extend(memfile *) noex ;
-static int	memfile_mapextend(memfile *,size_t) noex ;
-static int	memfile_ismemfree(memfile *,caddr_t,size_t) noex ;
+local int	memfile_opener(memfile *,cchar *,int,mode_t) noex ;
+local int	memfile_openmap(memfile *,size_t) noex ;
+local int	memfile_mapbegin(memfile *,size_t,size_t) noex ;
+local int	memfile_mapend(memfile *) noex ;
+local int	memfile_extend(memfile *) noex ;
+local int	memfile_mapextend(memfile *,size_t) noex ;
+local int	memfile_memfree(memfile *,caddr_t,size_t) noex ;
 
 
 /* local variables */
 
-static sysval		pagesize(sysval_ps) ;
+static sysval		pagesz(sysval_ps) ;
 
 
 /* exported variables */
@@ -131,16 +146,16 @@ static sysval		pagesize(sysval_ps) ;
 
 int memfile_open(memfile *op,cchar *fname,int of,mode_t om) noex {
 	int		rs ;
-	if ((rs = memfile_ctor(op,fname)) >= 0) {
+	if ((rs = memfile_ctor(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	 	if ((rs = memfile_opener(op,fname,of,om)) >= 0) {
+	    if (fname[0]) ylikely {
+	 	if ((rs = memfile_opener(op,fname,of,om)) >= 0) ylikely {
 		    op->magic = MEMFILE_MAGIC ;
 		}
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		memfile_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memfile_ctor) */
 	return rs ;
 }
@@ -149,12 +164,12 @@ int memfile_open(memfile *op,cchar *fname,int of,mode_t om) noex {
 int memfile_close(memfile *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = memfile_magic(op)) >= 0) {
-            if (op->dbuf) {
+	if ((rs = memfile_magic(op)) >= 0) ylikely {
+            if (op->dbuf) ylikely {
 		rs1 = memfile_mapend(op) ;
                 if (rs >= 0) rs = rs1 ;
             }
-            if (op->fd >= 0) {
+            if (op->fd >= 0) ylikely {
                 rs1 = uc_close(op->fd) ;
                 if (rs >= 0) rs = rs1 ;
                 op->fd = -1 ;
@@ -171,11 +186,11 @@ int memfile_close(memfile *op) noex {
 
 int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 	int		rs ;
-	if ((rs = memfile_magic(op,wbuf)) >= 0) {
-	    csize	fsize = op->fsize ;
-	    cint	ps = op->pagesize ;
+	if ((rs = memfile_magic(op,wbuf)) >= 0) ylikely {
+	    csize	fsize = size_t(op->fsize) ;
+	    cint	ps = op->pagesz ;
 	    rs = SR_NOTOPEN ;
-	    if (op->dbuf) {
+	    if (op->dbuf) ylikely {
 	        csize	psz = (PSZMULT * ps) ;
 		uint	pmo = (ps - 1) ;
 		rs = SR_OK ;
@@ -196,7 +211,7 @@ int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 	                op->fsize += extra ;
 	            }
 	        } /* end if (writing beyond file end) */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            if ((rs = u_pwrite(op->fd,wbuf,wlen,op->off)) >= 0) {
 	                if ((op->off + wlen) > fsize) {
 	                    op->fsize = (op->off + wlen) ;
@@ -212,25 +227,25 @@ int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 
 int memfile_len(memfile *op) noex {
 	int		rs ;
-	if ((rs = memfile_magic(op)) >= 0) {
+	if ((rs = memfile_magic(op)) >= 0) ylikely {
 	    rs = intsat(op->fsize) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (memfile_len) */
 
-int memfile_allocation(memfile *op) noex {
+int memfile_alloc(memfile *op) noex {
 	int		rs ;
-	if ((rs = memfile_magic(op)) >= 0) {
+	if ((rs = memfile_magic(op)) >= 0) ylikely {
 	    rs = intsat(op->dlen) ;
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (memfile_allocation) */
+/* end subroutine (memfile_alloc) */
 
 int memfile_tell(memfile *op,off_t *offp) noex {
 	int		rs ;
-	if ((rs = memfile_magic(op)) >= 0) {
+	if ((rs = memfile_magic(op)) >= 0) ylikely {
 	    rs = intsat(op->off) ;
 	    if (offp) *offp = op->off ;
 	} /* end if (magic) */
@@ -239,9 +254,9 @@ int memfile_tell(memfile *op,off_t *offp) noex {
 /* end subroutine (memfile_tell) */
 
 int memfile_getbuf(memfile *op,void *vp) noex {
-	caddr_t		*rpp = (caddr_t *) vp ;
+	caddr_t		*rpp = caddrp(vp) ;
 	int		rs ;
-	if ((rs = memfile_magic(op,vp)) >= 0) {
+	if ((rs = memfile_magic(op,vp)) >= 0) ylikely {
 	    *rpp = caddr_t(op->dbuf) ;
 	} /* end if (magic) */
 	return rs ;
@@ -251,21 +266,20 @@ int memfile_getbuf(memfile *op,void *vp) noex {
 
 /* private subroutines */
 
-static int memfile_opener(memfile *op,cchar *fname,int of,mode_t om) noex {
+local int memfile_opener(memfile *op,cchar *fname,int of,mode_t om) noex {
 	int		rs ;
 	of &= (~ (O_RDONLY | O_WRONLY)) ;
 	of |= (O_RDWR | O_CLOEXEC) ;
-        if ((rs = uc_open(fname,of,om)) >= 0) {
-            USTAT       sb ;
+        if ((rs = uc_open(fname,of,om)) >= 0) ylikely {
             cint        fd = rs ;
-            if ((rs = uc_fstat(fd,&sb)) >= 0) {
+            if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) ylikely {
                 if (S_ISREG(sb.st_mode)) {
                     csize       fsize = size_t(sb.st_size) ;
 		    op->fd = fd ;
-                    if ((rs = pagesize) >= 0) {
-                        op->pagesize = rs ;
+                    if ((rs = pagesz) >= 0) {
+                        op->pagesz = rs ;
                         rs = memfile_openmap(op,fsize) ;
-                    } /* end if (pagesize) */
+                    } /* end if (pagesz) */
                 } else {
                     rs = SR_PROTO ;
                 }
@@ -273,17 +287,17 @@ static int memfile_opener(memfile *op,cchar *fname,int of,mode_t om) noex {
             if (rs < 0) {
                 uc_close(fd) ;
                 op->fd = -1 ;
-            }
+            } /* end if (error) */
         } /* end if (file-open) */
 	return rs ;
 }
 /* end subroutine (memfile_opener) */
 
-static int memfile_openmap(memfile *op,size_t fsize) noex {
+local int memfile_openmap(memfile *op,size_t fsize) noex {
 	int		rs ;
-	if ((rs = memfile_mapbegin(op,0z,fsize)) >= 0) {
+	if ((rs = memfile_mapbegin(op,0z,fsize)) >= 0) ylikely {
 	    op->fsize = fsize ;
-	    if ((rs = memfile_extend(op)) >= 0) {
+	    if ((rs = memfile_extend(op)) >= 0) ylikely {
 	        op->bp = op->dbuf ;
 	    }
 	    if (rs < 0) {
@@ -294,27 +308,27 @@ static int memfile_openmap(memfile *op,size_t fsize) noex {
 }
 /* end subroutine (memfile_openmap) */
 
-static int memfile_mapbegin(memfile *op,size_t of,size_t sz) noex {
+local int memfile_mapbegin(memfile *op,size_t of,size_t msz) noex {
 	cnullptr	np{} ;
-	csize		ms = szceil((of+sz),op->pagesize) ;
+	csize		ms = szceil((of + msz),op->pagesz) ;
 	cint		mp = (PROT_READ | PROT_WRITE) ;
 	cint		mf = MAP_SHARED ;
 	cint		fd = op->fd ;
 	int		rs ;
 	void		*md{} ;
-	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,of,&md)) >= 0) {
+	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,of,&md)) >= 0) ylikely {
 	    op->dbuf = charp(md) ;
-	    op->dlen = sz ;
+	    op->dlen = msz ;
 	}
 	return rs ;
 }
 /* end subroutine (memfile_mepend) */
 
-static int memfile_mapend(memfile *op) noex {
+local int memfile_mapend(memfile *op) noex {
 	int		rs ;
 	void		*ma = op->dbuf ;
 	csize		ms = op->dlen ;
-	if ((rs = u_mmapend(ma,ms)) >= 0) {
+	if ((rs = u_mmapend(ma,ms)) >= 0) ylikely {
 	    op->dbuf = nullptr ;
 	    op->dlen = 0 ;
 	}
@@ -322,81 +336,110 @@ static int memfile_mapend(memfile *op) noex {
 }
 /* end subroutine (memfile_mapend) */
 
-static int memfile_extend(memfile *op) noex {
-	size_t		off = op->fsize ;
+local size_t mklen(sz soff,sz zsize) noex {
+    	int		zl = intconv(zsize) ;
+    	sz		clen ;
+	if ((soff % zsize) == 0) {
+	    clen = zsize ;
+	} else {
+	    clen = szceil(soff,zl) ;
+	}
+	return clen ;
+} /* end subroutine (mklen) */
+
+local int memfile_extend(memfile *op) noex {
 	cint		zlen = ZEROBUFLEN ;
 	int		rs = SR_OK ;
 	char		zbuf[ZEROBUFLEN + 1] = {} ;
-	while (off < op->dlen) {
+	for (size_t soff = op->fsize ; soff < op->dlen ; ) {
 	    csize	zsize = size_t(zlen) ;
-	    size_t	clen, dlen ;
-	    if ((off % zlen) == 0) {
-	        clen = zsize ;
-	    } else {
-	        clen = szceil(off,zlen) ;
-	    }
-	    dlen = min(zsize,(clen - op->fsize)) ;
-	    rs = u_pwrite(op->fd,zbuf,dlen,off) ;
-	    off += dlen ;
+	    {
+	        csize clen = mklen(soff,zsize) ;
+	        {
+	            csize	dsize = min(zsize,(clen - op->fsize)) ;
+		    {
+		        cint dl = intconv(dsize) ;
+		        coff off = off_t(soff) ;
+	                rs = u_pwrite(op->fd,zbuf,dl,off) ;
+	                soff += dl ;
+		    } /* end block (dsize) */
+	        } /* end block (clen) */
+	    } /* end block (zsize) */
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
 }
 /* end subroutine (memfile_extend) */
 
-static int memfile_mapextend(memfile *op,size_t ext) noex {
+local int memfile_mapextend(memfile *op,size_t ext) noex {
 	cnullptr	np{} ;
-	off_t		mo = 0 ;
-	caddr_t		addr = (op->dbuf + op->dlen) ;
-	size_t		ms ;
+	caddr_t		ma = (op->dbuf + op->dlen) ;
+	size_t		ms ; /* used-multiple */
 	cint		mp = (PROT_READ | PROT_WRITE) ;
 	cint		mf = MAP_SHARED ;
-	int		rs = SR_INVALID ;
-/* first we try to extend our existing map */
-	if (memfile_ismemfree(op,addr,ext) > 0) {
+	int		rs ;
+	/* first we try to extend our existing map */
+	if ((rs = memfile_memfree(op,ma,ext)) > 0) {
+	    coff	mo = off_t(op->dlen) ;
 	    int		fd = op->fd ;
 	    void	*md{} ;
-	    mo = op->dlen ;
 	    ms = ext ;
-	    if ((rs = u_mmapbegin(addr,ms,mp,mf,fd,mo,&md)) >= 0) {
+	    if ((rs = u_mmapbegin(ma,ms,mp,mf,fd,mo,&md)) >= 0) {
 	        op->dbuf = charp(md) ;
 	        op->dlen += ms ;
 	    }
-	} /* end if */
-/* do we need to remap entirely? */
-	if (rs < 0) {
-	    if ((rs = uc_fdatasync(op->fd)) >= 0) {
-		void	*ma = op->dbuf ;
+	} else if (rs == 0) { /* do we need to remap entirely? */
+	    cint	fd = op->fd ;
+	    if ((rs = uc_fdatasync(fd)) >= 0) ylikely {
+		ma = op->dbuf ;
 	        ms = op->dlen ;
 	        rs = u_mmapend(ma,ms) ;
 	        op->dbuf = nullptr ;
 		op->dlen = 0 ;
 	    }
-	    if (rs >= 0) {
-	        cint	fd = op->fd ;
+	    if (rs >= 0) ylikely {
 	        void	*md{} ;
 	        ms = (op->dlen + ext) ;
-	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
+	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	            op->dbuf = charp(md) ;
 	            op->dlen = ms ;
 	        }
 	    } /* end if */
-	} /* end if */
+	} /* end if (remap) */
 	return rs ;
 }
 /* end subroutine (memfile_mapextend) */
 
-static int memfile_ismemfree(memfile *op,caddr_t addr,size_t ext) noex {
-	size_t		tlen = op->pagesize ;
-	cint		ps = op->pagesize ;
+local int memfile_memfree(memfile *op,caddr_t addr,size_t ext) noex {
+	size_t		tsize = size_t(op->pagesz) ;
+	cint		ps = op->pagesz ;
+	int		rs = SR_OK ;
+	int		f = true ; /* return-value */
+	char		va[1] ;
+	for (caddr_t ta = addr ; ta < (addr + ext) ; ta += ps) {
+	    if ((rs = u_mincore(ta,tsize,va)) >= 0) {
+		f = ((va[0] & MINCORE_INCORE) == 0) ;
+		if (f) break ;
+	    } /* end if (u_mincore) */
+	    if (rs < 0) break ;
+	} /* end for */
+	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (memfile_memfree) */
+
+#ifdef	COMMENT
+local int memfile_memfree(memfile *op,caddr_t addr,size_t ext) noex {
+	size_t		tsize = size_t(op->pagesz) ;
+	cint		ps = op->pagesz ;
 	int		rs = SR_NOMEM ;
 	char		vec[10] ;
 	for (caddr_t ta = addr ; ta < (addr + ext) ; ta += ps) {
-	    rs = u_mincore(ta,tlen,vec) ;
+	    rs = u_mincore(ta,tsize,vec) ;
 	    if (rs != SR_NOMEM) break ;
 	} /* end for */
 	return (rs == SR_NOMEM) ? true : SR_EXIST ;
 }
-/* end subroutine (memfile_ismemfree) */
+/* end subroutine (memfile_memfree) */
+#endif /* COMMENT */
 
 
