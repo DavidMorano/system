@@ -297,6 +297,30 @@ int uc_mallstats(ucmem_stats *statp) noex {
     	return mem.mallstats(statp) ;
 }
 
+int mem_strw(cchar *sp,int sl,cchar **rpp) noex {
+    	return mem.strw(sp,sl,rpp) ;
+}
+
+int mem_mall	(int sz,void *rpp) noex {
+    	return mem.mall(sz,rpp) ;
+}
+
+int mem_vall	(int sz,void *rpp) noex {
+    	return mem.vall(sz,rpp) ;
+}
+
+int mem_call	(int n,int esz,void *rpp) noex {
+    	return mem.call(n,esz,rpp) ;
+}
+
+int mem_rall	(void *oldp,int sz,void *rpp) noex {
+    	return mem.rall(oldp,sz,rpp) ;
+}
+
+int mem_free	(void *vp) noex {
+    	return mem.free(vp) ;
+}
+
 int ucmem_curbegin(ucmem_cur *curp) noex {
     	return mem.curbegin(curp) ;
 }
@@ -313,7 +337,7 @@ int ucmem_curenum(ucmem_cur *curp,ucmem_ent *rp) noex {
 /* local subroutines */
 
 namespace libuc {
-    int mems::strw(cchar *sp,int µsl,void *vpp) noex {
+    int mems::strw(cchar *sp,int µsl,cchar **vpp) noex {
 	int		rs = SR_FAULT ;
 	int		ml = 0 ; /* return-value */
 	if (sp && vpp) {
