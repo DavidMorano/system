@@ -38,21 +38,21 @@ struct memfile_head {
 	size_t		dlen ;
 	size_t		fsize ;
 	uint		magic ;
-	int		pagesize ;
+	int		pagesz ;
 	int		fd ;
-} ;
+} ; /* end struct (memfile_head) */
 
 typedef MEMFILE		memfile ;
 
 EXTERNC_begin
 
-extern int	memfile_open(memfile *,cchar *,int,mode_t) noex ;
-extern int	memfile_write(memfile *,cvoid *,int) noex ;
-extern int	memfile_len(memfile *) noex ;
-extern int	memfile_allocation(memfile *) noex ;
-extern int	memfile_tell(memfile *,off_t *) noex ;
-extern int	memfile_getbuf(memfile *,void *) noex ;
-extern int	memfile_close(memfile *) noex ;
+extern int	memfile_open	(memfile *,cchar *,int,mode_t) noex ;
+extern int	memfile_write	(memfile *,cvoid *,int) noex ;
+extern int	memfile_len	(memfile *) noex ;
+extern int	memfile_alloc	(memfile *) noex ;
+extern int	memfile_tell	(memfile *,off_t *) noex ;
+extern int	memfile_getbuf	(memfile *,void *) noex ;
+extern int	memfile_close	(memfile *) noex ;
 
 EXTERNC_end
 
