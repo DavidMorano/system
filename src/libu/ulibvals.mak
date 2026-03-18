@@ -1,4 +1,4 @@
-# MAKEFILES (ulibvals)
+# MAKEFILE (ulibvals)
 
 T= ulibvals
 
@@ -65,7 +65,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
 
 
 .SUFFIXES:		.hh .ii .iim .ccm
