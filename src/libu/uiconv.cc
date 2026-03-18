@@ -37,7 +37,9 @@
 
 #include	"uiconv.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -46,7 +48,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -68,42 +69,39 @@ typedef iconv_t	*	iconvp ;
 /* forward references */
 
 template<typename ... Args>
-static int uiconv_ctor(uiconv *op,Args ... args) noex {
+local int uiconv_ctor(uiconv *op,Args ... args) noex {
 	UICONV		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uiconv_ctor) */
+} /* end subroutine (uiconv_ctor) */
 
-static int uiconv_dtor(uiconv *op) noex {
+local int uiconv_dtor(uiconv *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uiconv_dtor) */
+} /* end subroutine (uiconv_dtor) */
 
 template<typename ... Args>
-static inline int uiconv_magic(uiconv *op,Args ... args) noex {
+local inline int uiconv_magic(uiconv *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == UICONV_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (uiconv_magic) */
+} /* end subroutine (uiconv_magic) */
 
-static int uiconv_libopen(uiconv *,cchar *,cchar *) noex ;
-static int uiconv_libclose(uiconv *) noex ;
+local int uiconv_libopen(uiconv *,cchar *,cchar *) noex ;
+local int uiconv_libclose(uiconv *) noex ;
 
 
 /* local variables */
 
-static const iconv_t	iconvbad = cast_reinterpret<iconv_t>(-1) ;
+local const iconv_t	iconvbad = cast_reinterpret<iconv_t>(-1) ;
 
 constexpr size_t	szbad = size_t(-1) ;
 
@@ -115,21 +113,22 @@ constexpr size_t	szbad = size_t(-1) ;
 
 int uiconv_open(uiconv *op,cchar *tsp,cchar *fsp) noex {
     	cnullptr	np{} ;
+    	cnothrow	nt{} ;
 	int		rs ;
-	if ((rs = uiconv_ctor(op,tsp,fsp)) >= 0) {
+	if ((rs = uiconv_ctor(op,tsp,fsp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (tsp[0] && fsp[0]) {
+	    if (tsp[0] && fsp[0]) ylikely {
 		rs = SR_NOMEM ;
-	        if (ic_t *cdp ; (cdp = new(nothrow) iconv_t) != np) {
+	        if (ic_t *cdp ; (cdp = new(nt) iconv_t) != np) ylikely {
 		    op->cdp = cdp ;
-	            if ((rs = uiconv_libopen(op,tsp,fsp)) >= 0) {
+	            if ((rs = uiconv_libopen(op,tsp,fsp)) >= 0) ylikely {
 	                op->magic = UICONV_MAGIC ;
 	            }
 	            if (rs < 0) {
 			cdp = iconvp(op->cdp) ;
 		        delete cdp ;
 		        op->cdp = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (memory-allocation) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
@@ -143,12 +142,12 @@ int uiconv_open(uiconv *op,cchar *tsp,cchar *fsp) noex {
 int uiconv_close(uiconv *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = uiconv_magic(op)) >= 0) {
+	if ((rs = uiconv_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = uiconv_libclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->cdp) {
+	    if (op->cdp) ylikely {
 		iconv_t *cdp = iconvp(op->cdp) ;
 		delete cdp ;
 	        op->cdp = nullptr ;
@@ -165,7 +164,7 @@ int uiconv_close(uiconv *op) noex {
 
 int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 	int		rs ;
-	if ((rs = uiconv_magic(op,ilp,olp)) >= 0) {
+	if ((rs = uiconv_magic(op,ilp,olp)) >= 0) ylikely {
 	    size_t	isize ;
 	    size_t	ileft = size_t(*ilp) ;
 	    size_t	oleft = size_t(*olp) ;
@@ -195,9 +194,9 @@ int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 
 /* private subroutines */
 
-static int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
+local int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op->cdp) {
+	if (op->cdp) ylikely {
 	    iconv_t	*cdp = iconvp(op->cdp) ;
 	    int		to_mem = UICONV_TOMEM ;
 	    bool	f_exit = false ;
@@ -228,7 +227,7 @@ static int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 }
 /* end subroutine (uiconv_libopen) */
 
-static int uiconv_libclose(uiconv *op) noex {
+local int uiconv_libclose(uiconv *op) noex {
 	iconv_t		*cdp = iconvp(op->cdp) ;
 	int		rs ;
 	repeat {
