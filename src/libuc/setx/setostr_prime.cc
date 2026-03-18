@@ -81,6 +81,7 @@ local inline int setostr_magic(setostr *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (setostr_magic) */
 
+
 /* local variables */
 
 
@@ -302,6 +303,10 @@ setostr::operator int () noex {
 	} /* end if (magic) */
 	return rs ;
 } /* end method (setostr::operator) */
+
+setostr_ma::operator int () noex {
+        return (op->magval == setostr_magicval) ? SR_OK : SR_NOTOPEN ;
+} /* end method (setostr_ma::operator) */
 
 int setostr_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
