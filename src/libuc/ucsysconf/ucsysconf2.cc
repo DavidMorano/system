@@ -82,8 +82,8 @@ module ucsysconf ;
 
 /* imported namespaces */
 
-using ustd::ustd_confval ;		/* subroutine */
-using ustd::ustd_confstr ;		/* subroutine */
+using libu::ustd_confval ;		/* subroutine */
+using libu::ustd_confstr ;		/* subroutine */
 
 
 /* local typedefs */
@@ -121,7 +121,9 @@ int ucsysconf::sysconfval(int req) noex {
 	case _SC_LOGIN_NAME_MAX:
 	case _SC_NGROUPS_MAX:
 	case _SC_NODENAME_MAX:
-	case _SC_HOST_NAME_MAX:
+	case _SC_PROTNAME_MAX:
+	case _SC_HOSTNAME_MAX:
+	case _SC_SERVNAME_MAX:
 	case _SC_MSG_MAX:
 	case _SC_TZNAME_MAX:
 	case _SC_CLK_TCK:
@@ -142,12 +144,11 @@ int ucsysconf::getval(int req) noex {
 	    rs = getstd(req) ;
 	}
 	return rs ;
-}
+} /* end method (ucsysconf::getval) */
 
 int ucsysconf::mconfval(int req) noex {
     	return ustd_confval(req,lp) ;
-}
-/* end subroutine (ucsysconf::mconfval) */
+} /* end method (ucsysconf::mconfval) */
 
 int ucsysconf::getvalcache(int req) noex {
 	int		rs = SR_OK ;
@@ -158,7 +159,9 @@ int ucsysconf::getvalcache(int req) noex {
 	case _SC_LINE_MAX:		ii = dataitem_maxline ; break ;
 	case _SC_LOGIN_NAME_MAX:	ii = dataitem_maxlogin ; break ;
 	case _SC_NODENAME_MAX:		ii = dataitem_maxnode ; break ;
-	case _SC_HOST_NAME_MAX:		ii = dataitem_maxhost ; break ;
+	case _SC_PROTNAME_MAX:		ii = dataitem_maxprot ; break ;
+	case _SC_HOSTNAME_MAX:		ii = dataitem_maxhost ; break ;
+	case _SC_SERVNAME_MAX:		ii = dataitem_maxserv ; break ;
 	case _SC_MSG_MAX:		ii = dataitem_maxmsg ; break ;
 	case _SC_TZNAME_MAX:		ii = dataitem_maxtzname ; break ;
 	case _SC_NGROUPS_MAX:		ii = dataitem_ngroups ; break ;
@@ -178,7 +181,7 @@ int ucsysconf::getvalcache(int req) noex {
 	    }
 	} /* end if */
 	return rs ;
-} /* end subroutine (ucsysconf::getvalcache) */
+} /* end method (ucsysconf::getvalcache) */
 
 int ucsysconf::getvalsyn(int req) noex {
     	long		val = -1 ;
@@ -204,6 +207,6 @@ int ucsysconf::getvalsyn(int req) noex {
 	    rs = intsat(val) ;
 	}
 	return rs ;
-} /* end subroutine (ucsysconf::getvalsyn) */
+} /* end method (ucsysconf::getvalsyn) */
 
 
