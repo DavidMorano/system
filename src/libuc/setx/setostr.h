@@ -103,7 +103,6 @@ struct setostr : setostr_head {
 typedef SETOSTR		setostr ;
 #endif /* __cplusplus */
 
-
 EXTERNC_begin
 
 extern int setostr_start	(setostr *,int) noex ;
@@ -130,10 +129,6 @@ int setostr_ma::operator () (Args ... args) noex {
             rs = (op->magval == setostr_magicval) ? SR_OK : SR_NOTOPEN ;
         }
         return rs ;
-} /* end method (setostr_ma::operator) */
-
-inline setostr_ma::operator int () noex {
-        return (op->magval == setostr_magicval) ? SR_OK : SR_NOTOPEN ;
 } /* end method (setostr_ma::operator) */
 
 #endif /* __cplusplus */
