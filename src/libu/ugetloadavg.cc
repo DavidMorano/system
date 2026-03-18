@@ -99,7 +99,7 @@
 
 /* imported namespaces */
 
-using usys::kloadavg ;
+using usys::kloadavg ;			/* subroutine (LIBU) */
 
 
 /* local typedefs */
@@ -132,7 +132,7 @@ constexpr bool		f_kloadavg = F_KLOADAVG ;
 
 /* exported subroutines */
 
-int u_getloadavg(uint *la,int n) noex {
+sysret_t u_getloadavg(uint *la,int n) noex {
 	int		rs = SR_FAULT ;
 	if (la) {
 	    rs = SR_INVALID ;
