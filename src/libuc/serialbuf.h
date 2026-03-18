@@ -31,7 +31,7 @@ struct serialbuf_head {
 	char		*sbuf ;	/* buffer pointer (does not change) */
 	int		slen ;	/* buffer length  (does not change) */
 	int		i ;	/* buffer index   (changes) */
-} ;
+} ; /* end struct (serialbuf_head) */
 
 #ifdef	__cplusplus
 enum serialbufmems {
@@ -39,7 +39,7 @@ enum serialbufmems {
 	serialbufmem_reset,
 	serialbufmem_finish,
 	serialbufmem_overlast
-} ;
+} ; /* end enum (serialbufmems) */
 struct serialbuf ;
 struct serialbuf_co {
 	serialbuf	*op = nullptr ;
@@ -61,6 +61,7 @@ struct serialbuf : serialbuf_head {
 	    getlen(this,serialbufmem_getlen) ;
 	    reset(this,serialbufmem_reset) ;
 	    finish(this,serialbufmem_finish) ;
+	    sbuf = nullptr ;
 	} ;
 	serialbuf(const serialbuf &) = delete ;
 	serialbuf &operator = (const serialbuf &) = delete ;
