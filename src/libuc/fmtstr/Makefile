@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += fmtstr.h fmtopt.h
+INCS += fmtstr.h fmtopts.h
 
 MODS += fmtutil.ccm fmtstrdata.ccm fmtspec.ccm 
 MODS += fmtsub.ccm fmtobj.ccm
@@ -48,13 +48,12 @@ MOBJ_SUB += fmtsub0.o fmtsub1.o fmtsub2.o fmtsub3.o
 
 MOBJ_SPEC += fmtspec0.o fmtspec1.o
 
-OBJ= fmtstr_prime.o mods.o fmtopt.o
+OBJ= fmtstr_prime.o mods.o fmtopts.o
 
 
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -129,6 +128,13 @@ obj03.o:		$(OBJ03)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 DEPS_MAIN	+= $(MODS) mods.o
 DEPS_OBJ	+= $(MODS)
 DEPS_SUB	+= fmtutil.o fmtstrdata.o fmtspec.o 
@@ -136,7 +142,7 @@ DEPS_SUB	+=
 DEPS_SPEC	+= 
 
 
-fmtopt.o:		fmtopt.cc fmtopt.h			$(INCS)
+fmtopts.o:		fmtopts.cc fmtopts.h			$(INCS)
 
 fmtstr_prime.o:		fmtstr_prime.cc $(DEPS_MAIN)		$(INCS)
 	makemodule fmtstrdata
@@ -157,7 +163,7 @@ fmtobj0.o:		fmtobj.ccm $(DEPS_OBJ)			$(INCS)
 	makemodule fmtsub
 	makemodule fmtobj
 
-fmtobj1.o:		fmtobj1.cc fmtobj.ccm $(DEPS_OBJ)	$(INCS)
+fmtobj1.o:		fmtobj1.cc fmtobj0.o $(DEPS_OBJ)	$(INCS)
 	makemodule fmtutil
 	makemodule fmtstrdata
 	makemodule fmtspec
@@ -177,21 +183,21 @@ fmtsub0.o:		fmtsub.ccm $(DEPS_SUB)			$(INCS)
 	makemodule fmtspec
 	makemodule fmtsub
 
-fmtsub1.o:		fmtsub1.cc fmtsub.ccm $(DEPS_SUB)	$(INCS)
+fmtsub1.o:		fmtsub1.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
 	makemodule fmtutil
 	makemodule fmtstrdata
 	makemodule fmtspec
 	makemodule fmtsub
 	$(COMPILE.cc) $<
 
-fmtsub2.o:		fmtsub2.cc fmtsub.ccm $(DEPS_SUB)	$(INCS)
+fmtsub2.o:		fmtsub2.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
 	makemodule fmtutil
 	makemodule fmtstrdata
 	makemodule fmtspec
 	makemodule fmtsub
 	$(COMPILE.cc) $<
 
-fmtsub3.o:		fmtsub3.cc fmtsub.ccm $(DEPS_SUB)	$(INCS)
+fmtsub3.o:		fmtsub3.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
 	makemodule fmtutil
 	makemodule fmtstrdata
 	makemodule fmtspec
@@ -204,7 +210,7 @@ fmtspec.o:		$(MOBJ_SPEC)				$(INCS)
 fmtspec0.o:		fmtsub.ccm $(DEPS_SPEC)			$(INCS)
 	makemodule fmtspec
 
-fmtspec1.o:		fmtspec1.cc fmtspec.ccm $(DEPS_SPEC)	$(INCS)
+fmtspec1.o:		fmtspec1.cc fmtspec0.o $(DEPS_SPEC)	$(INCS)
 	makemodule fmtspec
 	$(COMPILE.cc) $<
 
