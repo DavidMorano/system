@@ -84,8 +84,8 @@ module ucsysconf ;
 
 /* imported namespaces */
 
-using ustd::ustd_confval ;		/* subroutine */
-using ustd::ustd_confstr ;		/* subroutine */
+using libu::ustd_confval ;		/* subroutine */
+using libu::ustd_confstr ;		/* subroutine */
 
 
 /* local typedefs */
