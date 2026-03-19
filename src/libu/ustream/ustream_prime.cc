@@ -47,8 +47,10 @@
 #include	"ustream.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ulibvals.ccm"
 
 import libutil ;			/* |memcopy(3u)| */
+import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
 
@@ -77,7 +79,6 @@ using ustream_ns::ustream_flush ;
 
 extern "C" {
     extern int u_reade(int,void *,int,int,int) noex ;
-    extern int u_lockfile(int,int,off_t,off_t,int) noex ;
 }
 
 
@@ -121,13 +122,13 @@ local int ustream_dtor(ustream *op) noex {
 local int	ustream_adjbuf(ustream *,int) noex ;
 local int	ustream_bufcpy(ustream *,cchar *,int) noex ;
 
-cint		nfds = 1 ;
-
-static int	pagesz = 0 ;
-static int	maxlinelen = 0 ;
-
 
 /* local variables */
+
+cint		nfds = 1 ;
+
+static cint	pagesz		= ulibval.pagesz ;
+static cint	maxlinelen	= ulibval.maxline ;
 
 
 /* exported variables */
