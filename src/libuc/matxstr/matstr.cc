@@ -100,16 +100,14 @@ local int matxstr(mainv a,cchar *sp,int sl) noex {
 	    int		i{} ; /* used-afterwards */
 	    if (int m ; sl >= 0) {
 	        for (i = 0 ; a[i] ; i += 1) {
-		    m = ((sl > 0) && (lch == toxc(a[i][0]))) ;
-		    if (m > 0) {
+		    if ((m = ((sl > 0) && (lch == toxc(a[i][0])))) > 0) {
 			m = nleadxstr(a[i],sp,sl) ;
 		    }
 		    if ((m == sl) && (a[i][m] == '\0')) break ;
 	        } /* end for */
 	    } else {
 	        for (i = 0 ; a[i] ; i += 1) {
-		    m = (lch == toxc(a[i][0])) ;
-		    if (m > 0) {
+		    if ((m = (lch == toxc(a[i][0]))) > 0) {
 			m = nleadxstr(a[i],sp,-1) ;
 		    }
 		    if ((a[i][m] == '\0') && (sp[m] == '\0')) break ;
