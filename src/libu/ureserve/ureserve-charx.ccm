@@ -68,7 +68,7 @@ export {
 	return char_isdigit(ch) ;
     }
     inline bool char_isoct(int ch) noex {
-	return ((ch >= '0') && (ch <= '7')) ;
+	return char_isoctal(ch) ;
     }
     inline bool char_isdec(int ch) noex {
 	return char_isdigit(ch) ;
