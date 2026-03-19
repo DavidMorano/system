@@ -55,7 +55,9 @@ enum sysconfcmds {
     sysconfcmd_maxgroupname,
     sysconfcmd_maxprojectname,
     sysconfcmd_maxnodename,
+    sysconfcmd_maxprotname,
     sysconfcmd_maxhostname,
+    sysconfcmd_maxservname,
     sysconfcmd_maxmsg,
     sysconfcmd_maxmailaddr,
     sysconfcmd_pwent,
@@ -105,6 +107,10 @@ enum sysconfcmds {
 #define	_SC_NODENAME_MAX	sysconfcmd_maxnodename
 #endif /* _SC_NODENAME_MAX */
 
+#ifndef	_SC_PROTNAME_MAX	/* network protocol-name */
+#define	_SC_PROTNAME_MAX	sysconfcmd_maxprotname
+#endif /* _SC_PROTNAME_MAX */
+
 #ifndef	_SC_HOSTNAME_MAX
 #ifdef	_SC_HOST_NAME_MAX	/* really the node-name length */
 #define	_SC_HOSTNAME_MAX	_SC_HOST_NAME_MAX
@@ -116,6 +122,10 @@ enum sysconfcmds {
 #ifndef	_SC_HOST_NAME_MAX	/* really the node-name length */
 #define	_SC_HOST_NAME_MAX	sysconfcmd_maxhostname
 #endif /* _SC_HOST_NAME_MAX */
+
+#ifndef	_SC_SERVNAME_MAX	/* network service-name */
+#define	_SC_SERVNAME_MAX	sysconfcmd_maxservname
+#endif /* _SC_SERVNAME_MAX */
 
 #ifndef	_SC_GETPW_R_SIZE_MAX
 #define	_SC_GETPW_R_SIZE_MAX	sysconfcmd_pwent
