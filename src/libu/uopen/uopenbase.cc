@@ -328,12 +328,13 @@ int u_dupover(int sfd,int tfd) noex {
 }
 /* end subroutine (u_dupover) */
 
+#ifdef	COMMENT
 int u_fcntl(int sfd,int cmd,...) noex {
 	stdcaller	oo(sfd,cmd) ;
 	oo.m = &stdcaller::idupover ;
 	return oo ;
-}
-/* end subroutine (u_dupover) */
+} /* end subroutine (u_dupover) */
+#endif /* COMMENT */
 
 int u_socketpair(int pf,int st,int pr,int *pipes) noex {
 	stdcaller	oo(pf,st,pr,pipes) ;
