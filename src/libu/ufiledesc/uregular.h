@@ -18,6 +18,7 @@
 /*******************************************************************************
 
 	Names:
+	uregular
 
 	Description:
 	All of the UNIX® system calls that use (operate on) a
@@ -35,14 +36,11 @@
 #include	<unistd.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<usupport.h>
 
 EXTERNC_begin
 
 extern int u_closeonexec(int,int) noex ;
 extern int u_nonblock(int,int) noex ;
-extern int u_readn(int,void *,int) noex ;
-extern int u_writen(int,cvoid *,int) noex ;
 extern int u_fchdir(int) noex ;
 extern int u_fchmod(int,mode_t) noex ;
 extern int u_fchmodmin(int,mode_t) noex ;
@@ -64,24 +62,26 @@ extern int u_pread(int,void *,int,off_t) noex ;
 extern int u_pwrite(int,cvoid *,int,off_t) noex ;
 extern int u_read(int,void *,int) noex ;
 extern int u_readv(int,IOVEC *,int) noex ;
+extern int u_readn(int,void *,int) noex ;
 extern int u_seeko(int,off_t,int,off_t *) noex ;
 extern int u_write(int,cvoid *,int) noex ;
 extern int u_writev(int,CIOVEC *,int) noex ;
+extern int u_writen(int,cvoid *,int) noex ;
 
-static inline int u_seek(int fd,off_t wo,int w) noex {
+local inline int u_seek(int fd,off_t wo,int w) noex {
 	return u_seeko(fd,wo,w,nullptr) ;
 }
-static inline int u_seekoff(int fd,off_t wo,int w,off_t *offp) noex {
+local inline int u_seekoff(int fd,off_t wo,int w,off_t *offp) noex {
 	return u_seeko(fd,wo,w,offp) ;
 }
-static inline int u_tell(int fd,off_t *rp) noex {
-	return u_seeko(fd,0l,SEEK_CUR,rp) ;
+local inline int u_tell(int fd,off_t *rp) noex {
+	return u_seeko(fd,0z,SEEK_CUR,rp) ;
 }
-static inline int u_seekable(int fd) noex {
-	return u_seek(fd,0l,SEEK_CUR) ;
+local inline int u_seekable(int fd) noex {
+	return u_seek(fd,0z,SEEK_CUR) ;
 }
-static inline int u_rewind(int fd) noex {
-	return u_seek(fd,0l,SEEK_SET) ;
+local inline int u_rewind(int fd) noex {
+	return u_seek(fd,0z,SEEK_SET) ;
 }
 
 extern int u_poll(POLLFD *,int,int) noex ;	/* <- special case */
