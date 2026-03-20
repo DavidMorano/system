@@ -35,7 +35,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"strleadcmp.h"
 
@@ -47,6 +49,8 @@
 
 
 /* local typedefs */
+
+typedef cmporders	co ;
 
 
 /* external subroutines */
@@ -70,14 +74,16 @@
 /* exported subroutines */
 
 int strleadcmp(cchar *s1,cchar *s2) noex {
-	int		f = true ;
+	int		rc = 0 ;
 	if (s1 && s2) {
 	    while (*s2) {
-	        f = (*s2++ == *s1++) ;
-	        if (! f) break ;
+		cint ch1 = mkchar(*s1++) ;
+		cint ch2 = mkchar(*s2++) ;
+	        rc = ch1 - ch2 ;
+		if (rc) break ;
 	    } /* end while */
 	} /* end if (non-null) */
-	return f ;
+	return rc ;
 }
 /* end subroutine (strleadcmp) */
 
