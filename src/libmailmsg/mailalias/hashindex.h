@@ -15,6 +15,26 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/******************************************************************************* 
+  	Name:
+	hasindex
+
+	Description:
+	This subroutine creates an index (like for use in an
+	index-table) from a given index value (an unsigned integer).
+
+	Synopsis:
+	int hashindex(uint i,int n) noex
+
+	Arguments:
+	i	given index value
+	n	modulus
+
+	Returns:
+	-	new index
+
+*******************************************************************************/
+
 #ifndef	HASHINDEX_INCLUDE
 #define	HASHINDEX_INCLUDE
 
@@ -29,7 +49,7 @@
 
 EXTERNC_begin
 
-static inline int hashindex(uint i,int n) noex {
+local inline int hashindex(uint i,int n) noex {
 	int		hi = MODP2(i,n) ;
 	if (hi == 0) hi = 1 ;
 	return hi ;
