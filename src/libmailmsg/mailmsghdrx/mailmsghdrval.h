@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	MAILMSGHDRVAL		struct mailmsghdrval_head
@@ -28,7 +25,7 @@ struct mailmsghdrval_head {
 	int		vlen ;
 	int		vl ;
 	int		idx ;
-} ;
+} ; /* end struct */
 
 typedef MAILMSGHDRVAL		mailmsghdrval ;
 
