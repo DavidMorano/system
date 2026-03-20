@@ -81,13 +81,12 @@
 #include	<estrings.h>
 #include	<strpack.h>
 #include	<vecobj.h>
-#include	<vechand.h>
-#include	<mailmsgmatenv.h>	/* MAILMSG */
-#include	<mailmsgmathdr.h>	/* MAILMSG */
 #include	<strwcpy.h>
 #include	<toxc.h>
 #include	<hasx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |COLUMNS| */
+#include	<mailmsgmatenv.h>	/* MAILMSG */
+#include	<mailmsgmathdr.h>	/* MAILMSG */
 
 #include	"mailmsg.h"
 
@@ -103,7 +102,7 @@ import libutil ;			/* |getlenstr(3u)| */
 
 #define	DEFHEADERS	25
 
-#define	HDRNAMELEN	80
+#define	HDRNAMELEN	COLUMNS
 
 #define	ISHDRCONT(c)	(((c) == ' ') || ((c) == '\t'))
 #define	ISEND(c)	(((c) == '\n') || ((c) == '\r'))
@@ -131,14 +130,14 @@ using std::nothrow ;			/* constant */
 struct msghdrval {
 	cchar		*vp ;
 	int		vl ;
-} ;
+} ; /* end struct */
 
 struct msghdrinst {
 	cchar		*vp ;
 	vecobj		vals ;
 	int		vl ;
 	int		f_alloc ;
-} ;
+} ; /* end struct */
 
 struct msghdrname {
 	cchar		*name ;
@@ -148,19 +147,19 @@ struct msghdrname {
 	int		f_alloc ;
 	int		namelen ;
 	int		lastinst ;	/* index of last INST */
-} ;
+} ; /* end struct */
 
 enum msgstates {
 	msgstate_env,
 	msgstate_hdr,
 	msgstate_overlast
-} ;
+} ; /* end enum (msgstates) */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int mailmsg_ctor(mailmsg *op,Args ... args) noex {
+local int mailmsg_ctor(mailmsg *op,Args ... args) noex {
     	MAILMSG		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -187,7 +186,7 @@ static int mailmsg_ctor(mailmsg *op,Args ... args) noex {
 }
 /* end subroutine (mailmsg_ctor) */
 
-static int mailmsg_dtor(mailmsg *op) noex {
+local int mailmsg_dtor(mailmsg *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -208,33 +207,33 @@ static int mailmsg_dtor(mailmsg *op) noex {
 }
 /* end subroutine (mailmsg_dtor) */
 
-static int mailmsg_procline(mailmsg *,cchar *,int) noex ;
+local int mailmsg_procline(mailmsg *,cchar *,int) noex ;
 
-static int mailmsg_envbegin(mailmsg *) noex ;
-static int mailmsg_envadd(mailmsg *,mmenvdat *) noex ;
-static int mailmsg_envend(mailmsg *) noex ;
+local int mailmsg_envbegin(mailmsg *) noex ;
+local int mailmsg_envadd(mailmsg *,mmenvdat *) noex ;
+local int mailmsg_envend(mailmsg *) noex ;
 
-static int mailmsg_hdrbegin(mailmsg *) noex ;
-static int mailmsg_hdrend(mailmsg *) noex ;
-static int mailmsg_hdraddnew(mailmsg *,cchar *,int,cchar *,int) noex ;
-static int mailmsg_hdraddcont(mailmsg *,cchar *,int) noex ;
-static int mailmsg_hdrmatch(mailmsg *,MMHNAME **,cchar *,int) noex ;
+local int mailmsg_hdrbegin(mailmsg *) noex ;
+local int mailmsg_hdrend(mailmsg *) noex ;
+local int mailmsg_hdraddnew(mailmsg *,cchar *,int,cchar *,int) noex ;
+local int mailmsg_hdraddcont(mailmsg *,cchar *,int) noex ;
+local int mailmsg_hdrmatch(mailmsg *,MMHNAME **,cchar *,int) noex ;
 
-static int msghdrname_start(MMHNAME *,cchar *,int,cchar *,int) noex ;
-static int msghdrname_match(MMHNAME *,cchar *,int) noex ;
-static int msghdrname_addnew(MMHNAME *,cchar *,int) noex ;
-static int msghdrname_addcont(MMHNAME *,cchar *,int) noex ;
-static int msghdrname_iline(MMHNAME *,int,int,cchar **) noex ;
-static int msghdrname_ival(MMHNAME *,int,cchar **) noex ;
-static int msghdrname_val(MMHNAME *,cchar **) noex ;
-static int msghdrname_count(MMHNAME *) noex ;
-static int msghdrname_finish(MMHNAME *) noex ;
+local int msghdrname_start(MMHNAME *,cchar *,int,cchar *,int) noex ;
+local int msghdrname_match(MMHNAME *,cchar *,int) noex ;
+local int msghdrname_addnew(MMHNAME *,cchar *,int) noex ;
+local int msghdrname_addcont(MMHNAME *,cchar *,int) noex ;
+local int msghdrname_iline(MMHNAME *,int,int,cchar **) noex ;
+local int msghdrname_ival(MMHNAME *,int,cchar **) noex ;
+local int msghdrname_val(MMHNAME *,cchar **) noex ;
+local int msghdrname_count(MMHNAME *) noex ;
+local int msghdrname_finish(MMHNAME *) noex ;
 
-static int msghdrinst_start(MMHINST *,cchar *,int) noex ;
-static int msghdrinst_add(MMHINST *,cchar *,int) noex ;
-static int msghdrinst_ival(MMHINST *,int,cchar **) noex ;
-static int msghdrinst_val(MMHINST *,cchar **) noex ;
-static int msghdrinst_finish(MMHINST *) noex ;
+local int msghdrinst_start(MMHINST *,cchar *,int) noex ;
+local int msghdrinst_add(MMHINST *,cchar *,int) noex ;
+local int msghdrinst_ival(MMHINST *,int,cchar **) noex ;
+local int msghdrinst_val(MMHINST *,cchar **) noex ;
+local int msghdrinst_finish(MMHINST *) noex ;
 
 
 /* local variables */
@@ -252,7 +251,7 @@ int mailmsg_start(mailmsg *op) noex {
 	    if ((rs = strpack_start(op->slp,deflen)) >= 0) ylikely {
 	        if ((rs = mailmsg_envbegin(op)) >= 0) ylikely {
 		    if ((rs = mailmsg_hdrbegin(op)) >= 0) ylikely {
-		        op->magic = MAILMSG_MAGIC ;
+		        op->magval = MAILMSG_MAGIC ;
 		    }
 		    if (rs < 0) {
 		        mailmsg_envend(op) ;
@@ -290,7 +289,7 @@ int mailmsg_finish(mailmsg *op) noex {
 		rs1 = mailmsg_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -514,7 +513,7 @@ int mailmsg_hdrval(mailmsg *op,cchar *name,cchar **rpp) noex {
 
 /* local subroutines */
 
-static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
+local int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	if (op->msgstate == msgstate_env) {
 	    if (mmenvdat es ; (rs = mailmsgmatenv(&es,lp,ll)) > 0) {
@@ -536,13 +535,13 @@ static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 }
 /* end subroutine (mailmsg_procline) */
 
-static int mailmsg_envbegin(mailmsg *op) noex {
+local int mailmsg_envbegin(mailmsg *op) noex {
 	cint		esz = szof(mmenvdat) ;
 	return vecobj_start(op->elp,esz,4,0) ;
 }
 /* end subroutine (mailmsg_envbegin) */
 
-static int mailmsg_envend(mailmsg *op) noex {
+local int mailmsg_envend(mailmsg *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->elp) ylikely {
@@ -553,7 +552,7 @@ static int mailmsg_envend(mailmsg *op) noex {
 }
 /* end subroutine (mailmsg_envend) */
 
-static int mailmsg_envadd(mailmsg *op,mmenvdat *esp) noex {
+local int mailmsg_envadd(mailmsg *op,mmenvdat *esp) noex {
 	int		rs = SR_FAULT ;
 	if (op && esp) ylikely {
 	    rs = vecobj_add(op->elp,esp) ;
@@ -562,14 +561,14 @@ static int mailmsg_envadd(mailmsg *op,mmenvdat *esp) noex {
 }
 /* end subroutine (mailmsg_envadd) */
 
-static int mailmsg_hdrbegin(mailmsg *op) noex {
+local int mailmsg_hdrbegin(mailmsg *op) noex {
 	cint		hsz = szof(MMHNAME) ;
 	op->lastname = -1 ;
 	return vecobj_start(op->hlp,hsz,10,0) ;
 }
 /* end subroutine (mailmsg_hdrbegin) */
 
-static int mailmsg_hdrend(mailmsg *op) noex {
+local int mailmsg_hdrend(mailmsg *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
@@ -588,7 +587,7 @@ static int mailmsg_hdrend(mailmsg *op) noex {
 }
 /* end subroutine (mailmsg_hdrend) */
 
-static int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *valp,int vall) noex {
+local int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *valp,int vall) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (hl != 0) {
@@ -626,7 +625,7 @@ static int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *valp,int vall) noex {
 }
 /* end subroutine (mailmsg_hdraddnew) */
 
-static int mailmsg_hdraddcont(mailmsg *op,cchar *valp,int vall) noex {
+local int mailmsg_hdraddcont(mailmsg *op,cchar *valp,int vall) noex {
 	int		rs = SR_OK ;
 	if (vall > 0) {
 	    cchar	*cp{} ;
@@ -646,7 +645,7 @@ static int mailmsg_hdraddcont(mailmsg *op,cchar *valp,int vall) noex {
 }
 /* end subroutine (mailmsg_hdraddcont) */
 
-static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
+local int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		i ; /* used-afterwards */
@@ -670,7 +669,7 @@ static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
 }
 /* end subroutine (mailmsg_hdrmatch) */
 
-static int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *valp,int vall) noex {
+local int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *valp,int vall) noex {
 	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
 	int		isz = szof(MMHINST) ;
@@ -701,7 +700,7 @@ static int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *valp,int vall) noex {
 }
 /* end subroutine (msghdrname_start) */
 
-static int msghdrname_finish(MMHNAME *hnp) noex {
+local int msghdrname_finish(MMHNAME *hnp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((hnp->vp != nullptr) && hnp->f_alloc) {
@@ -738,7 +737,7 @@ static int msghdrname_finish(MMHNAME *hnp) noex {
 }
 /* end subroutine (msghdrname_finish) */
 
-static int msghdrname_match(MMHNAME *hnp,cchar *hp,int hl) noex {
+local int msghdrname_match(MMHNAME *hnp,cchar *hp,int hl) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (hnp && hp) ylikely {
@@ -751,7 +750,7 @@ static int msghdrname_match(MMHNAME *hnp,cchar *hp,int hl) noex {
 }
 /* end subroutine (msghdrname_match) */
 
-static int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
+local int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
 	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
 	int		f = false ;
@@ -769,7 +768,7 @@ static int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
 }
 /* end subroutine (msghdrname_addnew) */
 
-static int msghdrname_addcont(MMHNAME *hnp,cchar *valp,int vall) noex {
+local int msghdrname_addcont(MMHNAME *hnp,cchar *valp,int vall) noex {
 	int		rs = SR_OK ;
 	if (vall > 0) {
 	    cchar	*cp{} ;
@@ -790,7 +789,7 @@ static int msghdrname_addcont(MMHNAME *hnp,cchar *valp,int vall) noex {
 }
 /* end subroutine (msghdrname_addcont) */
 
-static int msghdrname_iline(MMHNAME *hnp,int hi,int li,cchar **rpp) noex {
+local int msghdrname_iline(MMHNAME *hnp,int hi,int li,cchar **rpp) noex {
     	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
 	int		len = 0 ;
@@ -805,7 +804,7 @@ static int msghdrname_iline(MMHNAME *hnp,int hi,int li,cchar **rpp) noex {
 }
 /* end subroutine (msghdrname_iline) */
 
-static int msghdrname_ival(MMHNAME *hnp,int hi,cchar **rpp) noex {
+local int msghdrname_ival(MMHNAME *hnp,int hi,cchar **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if (void *vp ; (rs = vecobj_get(&hnp->insts,hi,&vp)) >= 0) ylikely {
@@ -819,7 +818,7 @@ static int msghdrname_ival(MMHNAME *hnp,int hi,cchar **rpp) noex {
 }
 /* end subroutine (msghdrname_ival) */
 
-static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
+local int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		vl = hnp->vl ;
 	if (hnp->vp == nullptr) {
@@ -873,12 +872,12 @@ static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 }
 /* end subroutine (msghdrname_val) */
 
-static int msghdrname_count(MMHNAME *hnp) noex {
+local int msghdrname_count(MMHNAME *hnp) noex {
 	return vecobj_count(&hnp->insts) ;
 }
 /* end subroutine (msghdrname_count) */
 
-static int msghdrinst_start(MMHINST *hip,cchar *vp,int vl) noex {
+local int msghdrinst_start(MMHINST *hip,cchar *vp,int vl) noex {
 	cint		vsz = szof(MMHVAL) ;
 	int		rs ;
 	memclear(hip) ;
@@ -896,7 +895,7 @@ static int msghdrinst_start(MMHINST *hip,cchar *vp,int vl) noex {
 }
 /* end subroutine (msghdrinst_start) */
 
-static int msghdrinst_add(MMHINST *hip,cchar *vp,int vl) noex {
+local int msghdrinst_add(MMHINST *hip,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	if (vl > 0) {
 	    vecobj	*vlp = &hip->vals ;
@@ -910,7 +909,7 @@ static int msghdrinst_add(MMHINST *hip,cchar *vp,int vl) noex {
 }
 /* end subroutine (msghdrinst_add) */
 
-static int msghdrinst_ival(MMHINST *hip,int li,cchar **rpp) noex {
+local int msghdrinst_ival(MMHINST *hip,int li,cchar **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	cchar		*rp = nullptr ;
@@ -926,7 +925,7 @@ static int msghdrinst_ival(MMHINST *hip,int li,cchar **rpp) noex {
 }
 /* end subroutine (msghdrinst_ival) */
 
-static int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
+local int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		vl = hip->vl ;
 	if (hip->vp == nullptr) {
@@ -970,7 +969,7 @@ static int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 }
 /* end subroutine (msghdrinst_val) */
 
-static int msghdrinst_finish(MMHINST *hip) noex {
+local int msghdrinst_finish(MMHINST *hip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((hip->vp != nullptr) && hip->f_alloc) {
