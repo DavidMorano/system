@@ -39,7 +39,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usyscalls.h>
-#include	<ucfuncodes.h>		/* |FM_{x}(3uc)| */
+#include	<funcodes.h>		/* |FM_{x}(3uc)| */
 #include	<intfloor.h>
 #include	<fmtstr.h>
 #include	<localmisc.h>
