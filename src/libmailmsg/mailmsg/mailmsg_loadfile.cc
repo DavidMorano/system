@@ -45,7 +45,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<bfile.h>
 #include	<rmx.h>
@@ -90,7 +93,7 @@ int mailmsg_loadfile(mailmsg *op,bfile *fp) noex {
 	int		rs1 ;
 	int		tlen = 0 ; /* return-value */
 	if ((rs = mailmsg_magic(op,fp)) >= 0) {
-	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+	    if ((rs = getbufsize(bufsize_ml)) >= 0) {
 		cint	llen = (rs * MAILMSG_MF) ;
 		if (char *lbuf ; (rs = libmem.mall((llen + 1),&lbuf)) >= 0) {
 	    	    int		ln = 0 ;
