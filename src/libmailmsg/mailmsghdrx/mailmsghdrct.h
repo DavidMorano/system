@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	MAILMSGHDRCT		struct mailmsghdrct_head
@@ -31,7 +28,7 @@ struct mailmsghdrct_param {
 	cchar		*vp ;
 	int		kl ;
 	int		vl ;
-} ;
+} ; /* end struct */
 
 struct mailmsghdrct_head {
 	cchar		*mtp ;		/* type-main */
@@ -40,7 +37,7 @@ struct mailmsghdrct_head {
 	int		mtl ;		/* type-main */
 	int		stl ;		/* type-sub */
 	MAILMSGHDRCT_PAR	p[MAILMSGHDRCT_NPARAMS] ;
-} ;
+} ; /* end struct */
 
 typedef	MAILMSGHDRCT		mailmsghdrct ;
 typedef	MAILMSGHDRCT_PAR	mailmsghdrct_par ;
