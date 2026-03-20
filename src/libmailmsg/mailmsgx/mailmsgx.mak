@@ -1,4 +1,4 @@
-# MAKEFILES (mailmsgx)
+# MAKEFILE (mailmsgx)
 
 T= mailmsgx
 
@@ -54,7 +54,6 @@ OBJ_MAILMSGX= obja.o objb.o
 LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
