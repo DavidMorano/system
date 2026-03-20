@@ -40,7 +40,7 @@ struct mailmsg_head {
 	strpack		*slp ;		/* String-List-Pointer */
 	vecobj		*elp ;		/* Envelope-List-Pointer */
 	vecobj		*hlp ;		/* Header-List-Pointer */
-	uint		magic ;
+	uint		magval ;
 	int		msgstate ;
 	int		lastname ;	/* index of last HDR-name */
 } ; /* end if (mailmsg_head) */
@@ -72,7 +72,7 @@ template<typename ... Args>
 inline int mailmsg_magic(mailmsg *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MAILMSG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILMSG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
