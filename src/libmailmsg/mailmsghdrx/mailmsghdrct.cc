@@ -30,12 +30,15 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"mailmsghdrct.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -55,34 +58,31 @@ import libutil ;
 /* forward references */
 
 template<typename ... Args>
-static int mailmsghdrct_ctor(mailmsghdrct *op,Args ... args) noex {
+local int mailmsghdrct_ctor(mailmsghdrct *op,Args ... args) noex {
     	MAILMSGHDRCT	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrct_ctor) */
+} /* end subroutine (mailmsghdrct_ctor) */
 
-static int mailmsghdrct_dtor(mailmsghdrct *op) noex {
+local int mailmsghdrct_dtor(mailmsghdrct *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrct_dtor) */
+} /* end subroutine (mailmsghdrct_dtor) */
 
 template<typename ... Args>
-static inline int mailmsghdrct_magic(mailmsghdrct *op,Args ... args) noex {
+local inline int mailmsghdrct_magic(mailmsghdrct *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MAILMSGHDRCT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsghdrct_magic) */
+} /* end subroutine (mailmsghdrct_magic) */
 
 
 /* local variables */
@@ -96,7 +96,7 @@ static inline int mailmsghdrct_magic(mailmsghdrct *op,Args ... args) noex {
 int mailmsghdrct_start(MMHCT *op,cchar *hp,int hl) noex {
 	int		rs ;
 	int		nparams = 0 ;
-	if ((rs = mailmsghdrct_ctor(op,hp)) >= 0) {
+	if ((rs = mailmsghdrct_ctor(op,hp)) >= 0) ylikely {
 	    (void) hl ;
 	    rs = SR_NOSYS ;
 	    if (rs < 0) {
@@ -110,7 +110,7 @@ int mailmsghdrct_start(MMHCT *op,cchar *hp,int hl) noex {
 int mailmsghdrct_finish(MMHCT *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mailmsghdrct_magic(op)) >= 0) {
+	if ((rs = mailmsghdrct_magic(op)) >= 0) ylikely {
 	    op->mtp = nullptr ;
 	    op->stp = nullptr ;
 	    op->mtl = 0 ;
@@ -127,7 +127,7 @@ int mailmsghdrct_finish(MMHCT *op) noex {
 
 int mailmsghdrct_paramget(MMHCT *op,int i,MMHCT_PAR *rp) noex {
 	int		rs ;
-	if ((rs = mailmsghdrct_magic(op,rp)) >= 0) {
+	if ((rs = mailmsghdrct_magic(op,rp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((i >= 0) && (i < MAILMSGHDRCT_NPARAMS)) {
 		rs = op->p[i].kl ;
@@ -140,7 +140,7 @@ int mailmsghdrct_paramget(MMHCT *op,int i,MMHCT_PAR *rp) noex {
 
 int mailmsghdrct_paramfind(MMHCT *op,cchar *key,MMHCT *rp) noex {
 	int		rs ;
-	if ((rs = mailmsghdrct_magic(op,key,rp)) >= 0) {
+	if ((rs = mailmsghdrct_magic(op,key,rp)) >= 0) ylikely {
 	    rs = SR_NOSYS ;
 	} /* end if (magic) */
 	return rs ;
