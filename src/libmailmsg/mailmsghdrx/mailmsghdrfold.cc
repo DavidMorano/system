@@ -63,22 +63,23 @@
 #include	<climits>		/* |UINT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
-#include	<vecobj.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<strn.h>
 #include	<sfx.h>
 #include	<six.h>
-#include	<char.h>
-#include	<mkchar.h>
 #include	<ncol.h>
+#include	<mkchar.h>
+#include	<char.h>
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"mailmsghdrfold.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -108,27 +109,26 @@ import libutil ;
 /* forward references */
 
 template<typename ... Args>
-static inline int mailmsghdrfold_magic(mailmsghdrfold *op,Args ... args) noex {
+local inline int mailmsghdrfold_magic(mailmsghdrfold *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MAILMSGHDRFOLD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsghdrfold_magic) */
+} /* end subroutine (mailmsghdrfold_magic) */
 
-static int	findpieces(MF *,int,cchar **) noex ;
-static int	findbreaks(MF *,int,cchar **) noex ;
-static int	findbreakers(MF *,int,int,cchar **) noex ;
-static int	findslices(MF *,int,cchar **) noex ;
-static int	findall(MF *,cchar **) noex ;
+local int	findpieces(MF *,int,cchar **) noex ;
+local int	findbreaks(MF *,int,cchar **) noex ;
+local int	findbreakers(MF *,int,int,cchar **) noex ;
+local int	findslices(MF *,int,cchar **) noex ;
+local int	findall(MF *,cchar **) noex ;
 
-static int	nextpiece(int,cchar *,int,int *) noex ;
-static int	nextbreak(int,int,cchar *,int,int *) noex ;
+local int	nextpiece(int,cchar *,int,int *) noex ;
+local int	nextbreak(int,int,cchar *,int,int *) noex ;
 
-static cchar	*strnbreak(cchar *,int,int) noex ;
+local cchar	*strnbreak(cchar *,int,int) noex ;
 
-static bool	isskip(int) noex ;
+local bool	isskip(int) noex ;
 
 
 /* local variables */
@@ -147,9 +147,9 @@ cbool			f_strnbreak = CF_STRNBREAK ;
 int mailmsghdrfold_start(MF *op,int mcols,int ln,cchar *sp,int sl) noex {
     	MAILMSGHDRFOLD	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if ((mcols >= 1) && (ln >= 0)) {
+	    if ((mcols >= 1) && (ln >= 0)) ylikely {
 		if (sl < 0) sl = lenstr(sp) ;
 	        rs = memclear(hop) ;
 	        op->mcols = mcols ;
@@ -172,7 +172,7 @@ int mailmsghdrfold_start(MF *op,int mcols,int ln,cchar *sp,int sl) noex {
 
 int mailmsghdrfold_finish(MF *op) noex {
 	int		rs = SR_FAULT ;
-	if ((rs = mailmsghdrfold_magic(op)) >= 0) {
+	if ((rs = mailmsghdrfold_magic(op)) >= 0) ylikely {
 	    op->sp = nullptr ;
 	    op->magic = 0 ;
 	} /* end if (non-null) */
@@ -184,10 +184,10 @@ int mailmsghdrfold_finish(MF *op) noex {
 int mailmsghdrfold_get(MF *op,int ncol,cchar **rpp) noex {
 	int		rs ;
 	int		ll = 0 ;
-	if ((rs = mailmsghdrfold_magic(op,rpp)) >= 0) {
+	if ((rs = mailmsghdrfold_magic(op,rpp)) >= 0) ylikely {
 	    cint	ntab = NTABCOLS ;
 	    rs = SR_INVALID ;
-	    if (ncol >= 0) {
+	    if (ncol >= 0) ylikely {
 		rs = SR_OK ;
 	        if (op->sl > 0) {
 	            cint	ncols = ncolstr(ntab,ncol,op->sp,op->sl) ;
@@ -215,12 +215,11 @@ int mailmsghdrfold_get(MF *op,int ncol,cchar **rpp) noex {
 
 /* private subroutines */
 
-static int findpieces(MF *op,int ncol,cchar **rpp) noex {
+local int findpieces(MF *op,int ncol,cchar **rpp) noex {
 	cint		mcols = op->mcols ;
-	int		sl = op->sl ;
-	int		ll = 0 ;
+	int		ll = 0 ; /* return-value */
 	cchar		*sp = op->sp ;
-	if (sl > 0) {
+	if (int sl = op->sl ; sl > 0) {
 	    int		nc = ncol ;
 	    int		pl ;
 	    int		ncs ;
@@ -259,7 +258,7 @@ static int findpieces(MF *op,int ncol,cchar **rpp) noex {
 }
 /* end subroutine (findpieces) */
 
-static int findbreaks(MF *op,int ncol,cchar **rpp) noex {
+local int findbreaks(MF *op,int ncol,cchar **rpp) noex {
 	int		ll = 0 ;
 	for (int i = 0 ; (ll == 0) && breaks[i] ; i += 1) {
 	    ll = findbreakers(op,breaks[i],ncol,rpp) ;
@@ -268,12 +267,11 @@ static int findbreaks(MF *op,int ncol,cchar **rpp) noex {
 }
 /* end subroutine (findbreaks) */
 
-static int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
+local int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
 	cint		mcols = op->mcols ;
-	int		sl = op->sl ;
-	int		ll = 0 ;
+	int		ll = 0 ; /* return-value */
 	cchar		*sp = op->sp ;
-	if (sl > 0) {
+	if (int sl = op->sl ; sl > 0) {
 	    int		nc = ncol ;
 	    int		pl ;
 	    int		ncs ;
@@ -306,13 +304,12 @@ static int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
 }
 /* end subroutine (findbreakers) */
 
-static int findslices(MF *op,int ncol,cchar **rpp) noex {
+local int findslices(MF *op,int ncol,cchar **rpp) noex {
 	cint		ntab = NTABCOLS ;
 	cint		mcols = op->mcols ;
-	int		sl = op->sl ;
-	int		ll = 0 ;
+	int		ll = 0 ; /* return-value */
 	cchar		*sp = op->sp ;
-	if (sl > 0) {
+	if (int sl = op->sl ; sl > 0) {
 	    int		si ;
 	    int		nc = ncol ;
 	    int		n ;
@@ -355,10 +352,9 @@ static int findslices(MF *op,int ncol,cchar **rpp) noex {
 }
 /* end subroutine (findslices) */
 
-static int findall(MF *op,cchar **rpp) noex {
-	int		cl ;
-	cchar		*cp ;
-	if ((cl = sfshrink(op->sp,op->sl,&cp)) >= 0) {
+local int findall(MF *op,cchar **rpp) noex {
+	int		cl ; /* return-value */
+	if (cchar *cp ; (cl = sfshrink(op->sp,op->sl,&cp)) >= 0) {
 	    *rpp = cp ;
 	}
 	op->sp += op->sl ;
@@ -367,7 +363,7 @@ static int findall(MF *op,cchar **rpp) noex {
 }
 /* end subroutine (findall) */
 
-static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
+local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	cint		ntab = NTABCOLS ;
 	int		ncs = 0 ;
 	int		cl = sl ;
@@ -410,12 +406,12 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 }
 /* end subroutine (nextpiece) */
 
-static int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
+local int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 	cint		ntab = NTABCOLS ;
 	int		ncs = 0 ;
 	int		cl = sl ;
 	int		n ;
-	int		pl = 0 ;
+	int		pl = 0 ; /* return-value */
 	cchar		*tp ;
 	cchar		*cp = sp ;
 	*ncp = 0 ;
@@ -451,11 +447,10 @@ static int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 }
 /* end subroutine (nextbreak) */
 
-static cchar *strnbreak(cchar *sp,int sl,int bch) noex {
-	int		si ;
+local cchar *strnbreak(cchar *sp,int sl,int bch) noex {
 	bool		f = false ;
 	bch &= UCHAR_MAX ;
-	while (sl && *sp) {
+	for (int si ; sl && *sp ; ) {
 	    cint	ch = mkchar(sp[0]) ;
 	    if (ch == CH_DQUOTE) {
 	        sp += 1 ;
@@ -465,15 +460,15 @@ static cchar *strnbreak(cchar *sp,int sl,int bch) noex {
 	        si = 1 ;
 	        f = (ch == bch) ;
 	        if (f) break ;
-	    }
+	    } /* end if */
 	    sp += si ;
 	    sl -= si ;
-	} /* end while */
+	} /* end for */
 	return (f) ? sp : nullptr ;
 }
 /* end subroutine (strnbreak) */
 
-static bool isskip(int ch) noex {
+local bool isskip(int ch) noex {
 	return (CHAR_ISWHITE(ch) || iseol(ch)) ;
 }
 /* end subrouine (isskip) */
