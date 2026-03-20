@@ -13,21 +13,21 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-#include	<vecobj.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 /* object defines */
-#define	MAILMSGHDRFOLD_MAGIC	0x88431773
 #define	MAILMSGHDRFOLD		struct mailmsghdrfold_head
 #define	MAILMSGHDRFOLD_FL	struct mailmsghdrfold_flags
+#define	MAILMSGHDRFOLD_MAGIC	0x88431773
 /* options */
 #define	MAILMSGHDRFOLD_MCARRIAGE	0x0001
 
 
 struct mailmsghdrfold_flags {
 	uint		dummy:1 ;
-} ;
+} ; /* end struct */
 
 struct mailmsghdrfold_head {
 	cchar		*sp ;
@@ -36,7 +36,7 @@ struct mailmsghdrfold_head {
 	int		sl ;
 	int		mcols ;		/* message columns (usually 76) */
 	int		ln ;		/* line within header instance */
-} ;
+} ; /* end struct */
 
 typedef MAILMSGHDRFOLD		mailmsghdrfold ;
 typedef MAILMSGHDRFOLD_FL	mailmsghdrfold_fl ;
