@@ -35,6 +35,60 @@
 #include	<usysbase.h>
 
 
+/* operations on TIMEVALs */
+#ifndef	timerclear
+#define timerclear(tvp)         (tvp)->tv_sec = (tvp)->tv_usec = 0
+#endif
+
+#ifndef	timerisset
+#define timerisset(tvp)         ((tvp)->tv_sec || (tvp)->tv_usec)
+#endif
+
+#ifndef	timercmp
+#define timercmp(tvp, uvp, cmp)                                         \
+        (((tvp)->tv_sec == (uvp)->tv_sec) ?                             \
+            ((tvp)->tv_usec cmp (uvp)->tv_usec) :                       \
+            ((tvp)->tv_sec cmp (uvp)->tv_sec))
+#endif
+
+#ifndef	timeradd
+#define timeradd(tvp, uvp, vvp)                                         \
+        do {                                                            \
+                (vvp)->tv_sec = (tvp)->tv_sec + (uvp)->tv_sec;          \
+                (vvp)->tv_usec = (tvp)->tv_usec + (uvp)->tv_usec;       \
+                if ((vvp)->tv_usec >= 1000000) {                        \
+                        (vvp)->tv_sec++;                                \
+                        (vvp)->tv_usec -= 1000000;                      \
+                }                                                       \
+        } while (0)
+#endif
+
+#ifndef	timersub
+#define timersub(tvp, uvp, vvp)                                         \
+        do {                                                            \
+                (vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;          \
+                (vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec;       \
+                if ((vvp)->tv_usec < 0) {                               \
+                        (vvp)->tv_sec--;                                \
+                        (vvp)->tv_usec += 1000000;                      \
+                }                                                       \
+        } while (0)
+#endif
+
+/* more operations on TIMEVALs (I guess from a different origin) */
+#ifndef	timevalclear
+#define timevalclear(tvp)	((tvp)->tv_sec = (tvp)->tv_usec = 0)
+#endif
+
+#ifndef	timevalisset
+#define timevalisset(tvp)	((tvp)->tv_sec || (tvp)->tv_usec)
+#endif
+
+#ifndef	timevalcmp
+#define timevalcmp(l,r,cmp)   timercmp(l,r,cmp) /* freebsd */
+#endif
+
+
 EXTERNC_begin
 
 extern int timeval_load(TIMEVAL *,time_t,int) noex ;
@@ -46,16 +100,26 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 struct timeval_t : timeval {
+    	timeval_t(time_t ªsec = 0,suseconds_t ªusec = 0) noex {
+	    tv_sec = ªsec ;
+	    tv_usec = ªusec ;
+	} ;
+    	timeval_t(const timeval_t &o) noex {
+	    tv_sec = o.tv_sec ;
+	    tv_usec = o.tv_usec ;
+	} ;
+    	timeval_t &operator = (const timeval_t &o) noex {
+	    tv_sec = o.tv_sec ;
+	    tv_usec = o.tv_usec ;
+	    return *this ;
+	} ;
 	timeval_t &operator += (int v) noex {
 	    tv_sec += v ;
 	    return *this ;
 	} ;
-	timeval_t(time_t s,int us) noex {
-	    tv_sec = s ;
-	    tv_usec = us ;
-	} ;
 	timeval_t &operator += (const timeval_t &) noex ;
 	timeval_t &operator -= (const timeval_t &) noex ;
+	auto operator <=> (const timeval_t &) const = default ;
 } ; /* end struct (timeval_t) */
 
 timeval operator + (const timeval &,const timeval &) noex ;
