@@ -1,8 +1,8 @@
-/* hdrx HEADER */
+/* mailmsghdrx HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* hdrx handling object */
+/* mail-message header handling */
 /* version %I% last-modified %G% */
 
 
@@ -16,23 +16,20 @@
 
 /* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	HDRX_INCLUDE
-#define	HDRX_INCLUDE
+#ifndef	MAILMSGHDRX_INCLUDE
+#define	MAILMSGHDRX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
-#include	<hdrctype.h>
-#include	<hdrdecode.h>
-#include	<hdrextid.h>
-#include	<hdrextnum.h>
+#include	<mailmsghdrct.h>
+#include	<mailmsghdrfold.h>
+#include	<mailmsghdrs.h>
+#include	<mailmsghdrval.h>
 
 
-#endif /* HDRX_INCLUDE */
+#endif /* MAILMSGHDRX_INCLUDE */
 
 
