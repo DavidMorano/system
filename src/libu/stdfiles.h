@@ -36,6 +36,7 @@ enum stdfiles {
 	stdfile_log,
 	stdfile_null,
 	stdfile_zero,
+	stdfile_minus,
 	stdfile_overlast
 } ; /* end enum (stdfiles) */
 
