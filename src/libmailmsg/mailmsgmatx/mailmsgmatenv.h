@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	MMENVDAT		struct mmenvdat_head
@@ -34,12 +31,12 @@
 
 struct mmenvdat_flags {
 	uint		start:1 ;	/* starting envelope? (most are) */
-} ;
+} ; /* end struct */
 
 struct mmenvdat_elemement {
 	cchar		*ep ;
 	int		el ;
-} ;
+} ; /* end struct */
 
 struct mmenvdat_head {
 	MMENVDAT_ELEM	a ;	/* address (EMA) */
@@ -47,7 +44,7 @@ struct mmenvdat_head {
 	MMENVDAT_ELEM	r ;	/* remove-from (EMA) */
 	MMENVDAT_FL	fl ;	/* flags */
 	int		rt ;	/* remote type */
-} ;
+} ; /* end struct */
 
 typedef MMENVDAT	mmenvdat ;
 typedef MMENVDAT_FL	mmenvdat_fl ;
