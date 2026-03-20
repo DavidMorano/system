@@ -44,14 +44,15 @@
 #include	<unistd.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<sysval.hh>
-#include	<mallocxx.h>
 #include	<opentmp.h>
 #include	<hdb.h>
 #include	<filer.h>
@@ -75,8 +76,10 @@
 #include	"mailmsgfile.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |getlenstr(3u) */
+import uconstants ;			/* |varname(3u) */
 
 /* local defines */
 
@@ -103,6 +106,11 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_unlink(cchar *) noex ;
+    extern int uc_close(int) noex ;
+}
+
 
 /* external variables */
 
@@ -121,73 +129,70 @@ namespace {
 	int		cols ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int mailmsgfile_ctor(mailmsgfile *op,Args ... args) noex {
+local int mailmsgfile_ctor(mailmsgfile *op,Args ... args) noex {
     	MAILMSGFILE	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->flp = new(nothrow) hdb) != np) {
+	    if ((op->flp = new(nothrow) hdb) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgfile_ctor) */
+} /* end subroutine (mailmsgfile_ctor) */
 
-static int mailmsgfile_dtor(mailmsgfile *op) noex {
+local int mailmsgfile_dtor(mailmsgfile *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgfile_dtor) */
+} /* end subroutine (mailmsgfile_dtor) */
 
 template<typename ... Args>
-static int mailmsgfile_magic(mailmsgfile *op,Args ... args) noex {
+local int mailmsgfile_magic(mailmsgfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == MAILMSGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgfile_magic) */
+} /* end subroutine (mailmsgfile_magic) */
 
-static int mailmsgfile_starter(MMF *,cc *) noex ;
-static int mailmsgfile_newx(MMF *,cc *,int,off_t,int) noex ;
-static int mailmsgfile_mk(MMF *,cchar *,cchar *,int,off_t,int) noex ;
-static int mailmsgfile_mkdis(MMF *,MMF_MI *,int,int,off_t) noex ;
-static int mailmsgfile_proclines(MMF *,MMF_MI *,filer *,cchar *,int) noex ;
+local int mailmsgfile_starter(MMF *,cc *) noex ;
+local int mailmsgfile_newx(MMF *,cc *,int,off_t,int) noex ;
+local int mailmsgfile_mk(MMF *,cchar *,cchar *,int,off_t,int) noex ;
+local int mailmsgfile_mkdis(MMF *,MMF_MI *,int,int,off_t) noex ;
+local int mailmsgfile_proclines(MMF *,MMF_MI *,filer *,cchar *,int) noex ;
 
-static int mailmsgfile_procout(MMF *,filer *,int,cchar *,int,int) noex ;
-static int mailmsgfile_store(MMF *,MMF_MI *) noex ;
-static int mailmsgfile_filefins(MMF *) noex ;
+local int mailmsgfile_procout(MMF *,filer *,int,cchar *,int,int) noex ;
+local int mailmsgfile_store(MMF *,MMF_MI *) noex ;
+local int mailmsgfile_filefins(MMF *) noex ;
 
-static int mailmsgfile_checkbegin(MMF *) noex ;
-static int mailmsgfile_checkend(MMF *) noex ;
-static int mailmsgfile_checkout(MMF *) noex ;
-static int mailmsgfile_checker(MMF *) noex ;
-static int mailmsgfile_checkerx(MMF *) noex ;
-static int mailmsgfile_checkerxx(MMF *,MMF_CD *) noex ;
-static int mailmsgfile_checkerxxx(MMF *,vecpstr *,char *,int) noex ;
+local int mailmsgfile_checkbegin(MMF *) noex ;
+local int mailmsgfile_checkend(MMF *) noex ;
+local int mailmsgfile_checkout(MMF *) noex ;
+local int mailmsgfile_checker(MMF *) noex ;
+local int mailmsgfile_checkerx(MMF *) noex ;
+local int mailmsgfile_checkerxx(MMF *,MMF_CD *) noex ;
+local int mailmsgfile_checkerxxx(MMF *,vecpstr *,char *,int) noex ;
 
-static int mi_start(MMF_MI *,cchar *,cchar *,int) noex ;
-static int mi_finish(MMF_MI *) noex ;
-static int mi_newlines(MMF_MI *,int) noex ;
+local int mi_start(MMF_MI *,cchar *,cchar *,int) noex ;
+local int mi_finish(MMF_MI *) noex ;
+local int mi_newlines(MMF_MI *,int) noex ;
 
-static int mkcols(int) noex ;
+local int mkcols(int) noex ;
 
 
 /* local variables */
@@ -205,10 +210,10 @@ static vars		var ;
 int mailmsgfile_start(MMF *op,cc *tmpdname,int cols,int ind) noex {
 	int		rs ;
 	int		rv = 0 ;
-	if ((rs = mailmsgfile_magic(op,tmpdname)) >= 0) {
+	if ((rs = mailmsgfile_magic(op,tmpdname)) >= 0) ylikely {
 	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) {
-	        if ((rs = pagesize) >= 0) {
+	    if ((rs = rsv) >= 0) ylikely {
+	        if ((rs = pagesize) >= 0) ylikely {
 		    op->pagesize = rs ;
 		    op->to = MAILMSGFILE_FILEINT ;
 	            if (ind < 0) {
@@ -231,7 +236,7 @@ int mailmsgfile_start(MMF *op,cc *tmpdname,int cols,int ind) noex {
 int mailmsgfile_finish(MMF *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mailmsgfile_magic(op)) >= 0) {
+	if ((rs = mailmsgfile_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = mailmsgfile_checkend(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -245,7 +250,7 @@ int mailmsgfile_finish(MMF *op) noex {
 	        rs1 = hdb_finish(op->flp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->tmpdname) {
+	    if (op->tmpdname) ylikely {
 		void *vp = voidp(op->tmpdname) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -265,7 +270,7 @@ int mailmsgfile_new(MMF *op,int type,cc *msgid,int mfd,
 		off_t boff,int blen) noex {
 	int		rs ;
 	int		vlines = 0 ;
-	if ((rs = mailmsgfile_magic(op,msgid)) >= 0) {
+	if ((rs = mailmsgfile_magic(op,msgid)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((type >= 0) && msgid[0] && (boff >= 0)) {
 		rs = SR_BADF ;
@@ -280,13 +285,13 @@ int mailmsgfile_new(MMF *op,int type,cc *msgid,int mfd,
 /* end subroutine (mailmsgfile_new) */
 
 int mailmsgfile_msginfo(MMF *op,MMF_MI **mipp,cc *msgid) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		vlines = 0 ;
-	if ((rs = mailmsgfile_magic(op,mipp,msgid)) >= 0) {
+	if ((rs = mailmsgfile_magic(op,mipp,msgid)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (msgid[0]) {
-	        if ((rs = mailmsgfile_checkout(op)) >= 0) {
-		    cnullptr	np{} ;
+	    if (msgid[0]) ylikely {
+	        if ((rs = mailmsgfile_checkout(op)) >= 0) ylikely {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            key.buf = msgid ;
@@ -305,11 +310,11 @@ int mailmsgfile_msginfo(MMF *op,MMF_MI **mipp,cc *msgid) noex {
 int mailmsgfile_get(MMF *op,cc *msgid,cc **rpp) noex {
 	int		rs ;
 	int		vlines = 0 ;
-	if ((rs = mailmsgfile_magic(op,msgid)) >= 0) {
+	if ((rs = mailmsgfile_magic(op,msgid)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (msgid[0]) {
+	    if (msgid[0]) ylikely {
 	        MMF_MI	*mip{} ;
-	        if ((rs = mailmsgfile_msginfo(op,&mip,msgid)) >= 0) {
+	        if ((rs = mailmsgfile_msginfo(op,&mip,msgid)) >= 0) ylikely {
 	            vlines = mip->vlines ;
 	            if (rpp) {
 	                *rpp = charp(mip->mfname) ;
@@ -324,15 +329,15 @@ int mailmsgfile_get(MMF *op,cc *msgid,cc **rpp) noex {
 
 /* private subroutines */
 
-static int mailmsgfile_starter(MMF *op,cc *tmpdname) noex {
+local int mailmsgfile_starter(MMF *op,cc *tmpdname) noex {
 	cnullptr	np{} ;
 	cint		ne = MAILMSGFILE_NE ;
 	int		rs ;
-	if (cchar *cp ; (rs = libmem.strw(tmpdname,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(tmpdname,-1,&cp)) >= 0) ylikely {
 	    op->tmpdname = cp ;
-	    if ((rs = hdb_start(op->flp,ne,true,np,np)) >= 0) {
+	    if ((rs = hdb_start(op->flp,ne,true,np,np)) >= 0) ylikely {
 		op->fl.files = true ;
-		if ((rs = mailmsgfile_checkbegin(op)) >= 0) {
+		if ((rs = mailmsgfile_checkbegin(op)) >= 0) ylikely {
 		    op->magic = MAILMSGFILE_MAGIC ;
 		}
 	    }
@@ -346,7 +351,7 @@ static int mailmsgfile_starter(MMF *op,cc *tmpdname) noex {
 }
 /* end subroutine (mailmsgfile_starter) */
 
-static int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
+local int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vlines = 0 ;
@@ -359,12 +364,12 @@ static int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
 	    vlines = mip->vlines ;
 	} else if (rs == SR_NOTFOUND) {
 	    cchar	tpat[] = "msgXXXXXXXXXXX" ;
-	    if (char *ibuf ; (rs = malloc_mp(&ibuf)) >= 0) {
+	    if (char *ibuf ; (rs = lm_mp(&ibuf)) >= 0) {
 		if ((rs = mkpath2(ibuf,op->tmpdname,tpat)) >= 0) {
 		    rs = mailmsgfile_mk(op,mid,ibuf,mfd,bo,bl) ;
 		    vlines = rs ;
 		}
-		rs1 = malloc_free(ibuf) ;
+		rs1 = lm_free(ibuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (found or not) */
@@ -372,20 +377,20 @@ static int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
 }
 /* end if (mailmsgfile_newx) */
 
-static int mailmsgfile_mk(MMF *op,cc *mid,cc *fn,int mfd,off_t bo,int bl) noex {
+local int mailmsgfile_mk(MMF *op,cc *mid,cc *fn,int mfd,off_t bo,int bl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vlines = 0 ;
-	if (char *mfbuf ; (rs = malloc_mp(&mfbuf)) >= 0) {
+	if (char *mfbuf ; (rs = lm_mp(&mfbuf)) >= 0) ylikely {
 	    cint	of = (O_WRONLY | O_CREAT) ;
 	    cmode	om = 0666 ;
 	    mfbuf[0] = '\0' ;
-	    if ((rs = opentmpfile(fn,of,om,mfbuf)) >= 0) {
+	    if ((rs = opentmpfile(fn,of,om,mfbuf)) >= 0) ylikely {
 	        cint	tfd = rs ;
 	        cint	w = SEEK_SET ;
-	        if ((rs = u_seek(mfd,bo,w)) >= 0) {
+	        if ((rs = u_seek(mfd,bo,w)) >= 0) ylikely {
 		    MMF_MI		mi ;
-	            if ((rs = mi_start(&mi,mid,mfbuf,bl)) >= 0) {
+	            if ((rs = mi_start(&mi,mid,mfbuf,bl)) >= 0) ylikely {
 	                if ((rs = mailmsgfile_mkdis(op,&mi,tfd,mfd,bo)) >= 0) {
 	                    vlines = rs ;
 	                    rs = mailmsgfile_store(op,&mi) ; /* <- obj stored */
@@ -402,21 +407,21 @@ static int mailmsgfile_mk(MMF *op,cc *mid,cc *fn,int mfd,off_t bo,int bl) noex {
 		    mfbuf[0] = '\0' ;
 	        }
 	    } /* end if (tmpfile) */
-	    rs1 = malloc_free(&mfbuf) ;
+	    rs1 = lm_free(&mfbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? vlines : rs ;
 }
 /* end subroutine (mailmsgfile_mk) */
 
-static int mailmsgfile_filefins(MMF *op) noex {
+local int mailmsgfile_filefins(MMF *op) noex {
 	hdb		*mp = op->flp ;
 	hdb_dat		key ;
 	hdb_dat		val ;
 	hdb_cur		cur ;
 	int		rs = SR_OK ;
-	int		rs1{} ;
-	if ((rs1 = hdb_curbegin(mp,&cur)) >= 0) {
+	int		rs1 ;
+	if ((rs1 = hdb_curbegin(mp,&cur)) >= 0) ylikely {
 	    MMF_MI	*mip ;
 	    while (hdb_curenum(mp,&cur,&key,&val) >= 0) {
 	        mip = (MMF_MI *) val.buf ;
@@ -439,14 +444,14 @@ static int mailmsgfile_filefins(MMF *op) noex {
 }
 /* end subroutine (mailmsgfile_filefins) */
 
-static int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
+local int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 		int tfd,int mfd,off_t bo) noex {
 	cint		ntab = NTABCOLS ;
 	cint		blen = mip->nsize ;
 	int		rs ;
 	int		rs1 ;
 	int		vlines = 0 ;
-	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 	    cint	llen = rs ;
 	    cint	ibsize = min(blen,(op->pagesize*8)) ;
 	    int		inlen ;
@@ -493,14 +498,14 @@ static int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 	        rs1 = filer_finish(&in) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
-	    rs1 = malloc_free(lbuf) ;
+	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? vlines : rs ;
 }
 /* end subroutine (mailmsgfile_mkdis) */
 
-static int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filer *fbp,
+local int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filer *fbp,
 		cchar *lbuf,int llen) noex {
 	linefold	ff ;
 	cint		c = op->cols ;
@@ -508,7 +513,7 @@ static int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filer *fbp,
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = linefold_start(&ff,c,ind,lbuf,llen)) >= 0) {
+	if ((rs = linefold_start(&ff,c,ind,lbuf,llen)) >= 0) ylikely {
 	    int		li = 0 ;
 	    bool	f{} ;
 	    cchar	*sp ;
@@ -538,7 +543,7 @@ static int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filer *fbp,
 }
 /* end subroutine (mailmsgfile_proclines) */
 
-static int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
+local int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
 		int f_cont) noex {
 	cint		ind = op->ind ;
 	int		rs = SR_OK ;
@@ -548,9 +553,9 @@ static int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
 	    rs = filer_writeblanks(fbp,ind) ;
 	    wlen += rs ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    cint	olen = var.outbuflen ;
-	    if (char *obuf ; (rs = libmem.mall((olen+1),&obuf)) >= 0) {
+	    if (char *obuf ; (rs = libmem.mall((olen+1),&obuf)) >= 0) ylikely {
 		bool	f_eol = ((ll > 0) && (lp[ll-1] == '\n')) ;
 	        if ((rs = mkdisplayable(obuf,olen,lp,ll)) >= 0) {
 	            cint	ol = rmeol(obuf,rs) ;
@@ -582,11 +587,11 @@ static int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
 }
 /* end subroutine (mailmsgfile_procout) */
 
-static int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
+local int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
 	int		rs = SR_FAULT ;
 	if (op && mip) {
 	    cint	sz = szof(MMF_MI) ;
-	    if (MMF_MI	*ep ; (rs = libmem.mall(sz,&ep)) >= 0) {
+	    if (MMF_MI	*ep ; (rs = libmem.mall(sz,&ep)) >= 0) ylikely {
 	        hdb_dat	key ;
 	        hdb_dat	val ;
 	        *ep = *mip ; /* copy */
@@ -604,11 +609,11 @@ static int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
 }
 /* end subroutine (mailmsgfile_store) */
 
-static int mailmsgfile_checkbegin(MMF *op) noex {
+local int mailmsgfile_checkbegin(MMF *op) noex {
 	pthread_t	tid ;
 	int		rs ;
 	uptsub_f	sub = uptsub_f(mailmsgfile_checker) ;
-	if ((rs = uptcreate(&tid,nullptr,sub,op)) >= 0) {
+	if ((rs = uptcreate(&tid,nullptr,sub,op)) >= 0) ylikely {
 	    op->tid = tid ;
 	    op->fl.checkout = true ;
 	}
@@ -616,7 +621,7 @@ static int mailmsgfile_checkbegin(MMF *op) noex {
 }
 /* end subroutine (mailmsgfile_checkbegin) */
 
-static int mailmsgfile_checkend(MMF *op) noex {
+local int mailmsgfile_checkend(MMF *op) noex {
 	int		rs = SR_OK ;
 	if (op->fl.checkout) {
 	    int	trs = SR_OK ;
@@ -629,7 +634,7 @@ static int mailmsgfile_checkend(MMF *op) noex {
 }
 /* end subroutine (mailmsgfile_checkend) */
 
-static int mailmsgfile_checkout(MMF *op) noex {
+local int mailmsgfile_checkout(MMF *op) noex {
 	int		rs = SR_OK ;
 	if (op->fl.checkout && op->f_checkdone) {
 	    int		trs = SR_OK ;
@@ -642,7 +647,7 @@ static int mailmsgfile_checkout(MMF *op) noex {
 }
 /* end subroutine (mailmsgfile_checkout) */
 
-static int mailmsgfile_checker(MMF *op) noex {
+local int mailmsgfile_checker(MMF *op) noex {
 	int		rs = SR_OK ;
 	int		rv = 0 ;
 	if (op->tmpdname != nullptr) {
@@ -660,32 +665,32 @@ static int mailmsgfile_checker(MMF *op) noex {
 }
 /* end subroutine (mailmsgfile_checker) */
 
-static int mailmsgfile_checkerx(MMF *op) noex {
+local int mailmsgfile_checkerx(MMF *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
 	    cint	plen = rs ;
-	    if ((rs = mkpath1(pbuf,op->tmpdname)) >= 0) {
+	    if ((rs = mkpath1(pbuf,op->tmpdname)) >= 0) ylikely {
 		MMF_CD	cd(pbuf,plen) ;
 		rs = mailmsgfile_checkerxx(op,&cd) ;
 		rv = rs ;
 	    } /* end if (mkpath) */
-	    rs1 = malloc_free(pbuf) ;
+	    rs1 = lm_free(pbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (mailmsgfile_checkerx) */
 
-static int mailmsgfile_checkerxx(MMF *op,MMF_CD *cdp) noex {
+local int mailmsgfile_checkerxx(MMF *op,MMF_CD *cdp) noex {
 	vecpstr		files, *flp = &files ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = vecpstr_start(flp,10,100,0)) >= 0) {
+	if ((rs = vecpstr_start(flp,10,100,0)) >= 0) ylikely {
 	    cint	plen = cdp->plen ;
 	    char	*pbuf = cdp->pbuf ;
-	    if ((rs = mailmsgfile_checkerxxx(op,flp,pbuf,plen)) >= 0) {
+	    if ((rs = mailmsgfile_checkerxxx(op,flp,pbuf,plen)) >= 0) ylikely {
 		cchar	*fp{} ;
 		for (int i = 0 ; vecpstr_get(flp,i,&fp) >= 0 ; i += 1) {
 		    if (fp) {
@@ -702,17 +707,17 @@ static int mailmsgfile_checkerxx(MMF *op,MMF_CD *cdp) noex {
 }
 /* end subroutine (mailmsgfile_checkerxx) */
 
-static int mailmsgfile_checkerxxx(MMF *op,vecpstr *flp,
+local int mailmsgfile_checkerxxx(MMF *op,vecpstr *flp,
 		char *pbuf,int plen) noex {
 	const time_t	dt = time(nullptr) ;
 	cint		to = op->to ;	/* timeout */
 	int		rs ;
 	int		rs1 ;
-	if (char *ebuf ; (rs = malloc_mn(&ebuf)) >= 0) {
+	if (char *ebuf ; (rs = lm_mn(&ebuf)) >= 0) ylikely {
 	    fsdir	dir ;
 	    fsdir_ent	de ;
 	    cint	elen = rs ;
-	    if ((rs = fsdir_open(&dir,op->tmpdname)) >= 0) {
+	    if ((rs = fsdir_open(&dir,op->tmpdname)) >= 0) ylikely {
 	        ustat sb ;
 	        while ((rs = fsdir_read(&dir,&de,ebuf,elen)) > 0) {
 	            if (de.name[0] != '.') {
@@ -730,16 +735,16 @@ static int mailmsgfile_checkerxxx(MMF *op,vecpstr *flp,
 	        rs1 = fsdir_close(&dir) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdir) */
-	    rs1 = malloc_free(ebuf) ;
+	    rs1 = lm_free(ebuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (mailmsgfile_checkerxxx) */
 
-static int mi_start(MMF_MI *mip,cc *msgid,cc *mfname,int blen) noex {
+local int mi_start(MMF_MI *mip,cc *msgid,cc *mfname,int blen) noex {
 	int		rs = SR_FAULT ;
-	if (mip) {
+	if (mip) ylikely {
 	    cint	milen = lenstr(msgid) ;
 	    cint	mflen = lenstr(mfname) ;
 	    int		sz = 0 ;
@@ -758,10 +763,10 @@ static int mi_start(MMF_MI *mip,cc *msgid,cc *mfname,int blen) noex {
 }
 /* end subroutine (mi_start) */
 
-static int mi_finish(MMF_MI *mip) noex {
+local int mi_finish(MMF_MI *mip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (mip) {
+	if (mip) ylikely {
 	    rs = SR_OK ;
 	    if ((mip->mfname != nullptr) && (mip->mfname[0] != '\0')) {
 	        rs1 = u_unlink(mip->mfname) ;
@@ -782,7 +787,7 @@ static int mi_finish(MMF_MI *mip) noex {
 }
 /* end subroutine (mi_finish) */
 
-static int mi_newlines(MMF_MI *mip,int n) noex {
+local int mi_newlines(MMF_MI *mip,int n) noex {
 	mip->vlines += n ;
 	return SR_OK ;
 }
@@ -790,7 +795,7 @@ static int mi_newlines(MMF_MI *mip,int n) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+	if ((rs = getbufsize(bufsize_ml)) >= 0) ylikely {
 	    var.linebuflen = rs ;
 	    var.outbuflen = (rs * 2) ;
 	} /* end if (getbufsize) */
@@ -798,7 +803,7 @@ vars::operator int () noex {
 }
 /* end method (vars::operator) */
 
-static int mkcols(int cols) noex {
+local int mkcols(int cols) noex {
 	static cchar	*vn = varname.columns ;
 	if (cols < MAILMSGFILE_MINCOLS) {
 	    static cchar	*cval = getenv(vn) ;
