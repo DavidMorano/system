@@ -31,18 +31,19 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 
 
-#define	MAILMSGVIEWER_MAGIC	0x54837492
 #define	MAILMSGVIEWER		struct mailmsgviewer_head
 #define	MAILMSGVIEWER_FL	struct mailmsgviewer_flags
+#define	MAILMSGVIEWER_MAGIC	0x54837492
 
 
 struct mailmsgviewer_flags {
 	uint		eof:1 ;
-} ;
+} ; /* end struct */
 
 struct mailmsgviewer_head {
 	vecobj		*llp ;		/* Line-List-Pointer */
@@ -53,7 +54,7 @@ struct mailmsgviewer_head {
 	MAILMSGVIEWER_FL fl ;
 	uint		magic ;
 	int		ln ;
-} ;
+} ; /* end struct */
 
 typedef	MAILMSGVIEWER		mailmsgviewer ;
 typedef	MAILMSGVIEWER_FL	mailmsgviewer_fl ;
