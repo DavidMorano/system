@@ -1,4 +1,4 @@
-# MAKEFILES (mailmsgmatx)
+# MAKEFILE (mailmsgmatx)
 
 T= mailmsgmatx
 
@@ -40,10 +40,20 @@ MPDS +=
 LIBS=
 
 
+OBJ0_MAILMSGMATX= mailmsgmatenv.o
+OBJ1_MAILMSGMATX= mailmsgmathdr.o
+OBJ2_MAILMSGMATX=
+OBJ3_MAILMSGMATX=
+
+OBJA= obj0_mailmsgmatx.o obj1_mailmsgmatx.o
+OBJB=
+
+OBJ_MAILMSGMATX= obja.o
+
+
 LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -54,16 +64,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ0_MAILMSGMATX= mailmsgmatenv.o
-OBJ1_MAILMSGMATX= mailmsgmathdr.o
-OBJ2_MAILMSGMATX=
-OBJ3_MAILMSGMATX=
-
-OBJA_MAILMSGMATX= obj0_mailmsgmatx.o obj1_mailmsgmatx.o
-
-OBJ_MAILMSGMATX= $(OBJA_MAILMSGMATX)
 
 
 .SUFFIXES:		.hh .ii .iim .ccm
@@ -125,6 +125,13 @@ obj2_mailmsgmatx.o:	$(OBJ2_MAILMSGMATX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_mailmsgmatx.o:	$(OBJ3_MAILMSGMATX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objv.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
