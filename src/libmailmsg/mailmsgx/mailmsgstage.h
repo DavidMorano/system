@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 
 
@@ -48,7 +45,7 @@
 struct mailmsgstage_flags {
 	uint		useclen:1 ;
 	uint		useclines:1 ;
-} ;
+} ; /* end struct */
 
 struct mailmsgstage_head {
 	cchar		*tmpfname ;
@@ -61,7 +58,7 @@ struct mailmsgstage_head {
 	int		nmsgs ;
 	int		tfd ;
 	int		to ;
-} ;
+} ; /* end struct */
 
 typedef MAILMSGSTAGE		mailmsgstage ;
 typedef MAILMSGSTAGE_FL		mailmsgstage_fl ;
