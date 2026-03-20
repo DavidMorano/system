@@ -1,0 +1,14 @@
+TIMEVAL
+
+
+timerclear
+timerisset
+timercmp
+timeradd
+timersub
+
+
+timevalcmp
+
+
+
