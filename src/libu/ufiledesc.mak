@@ -1,4 +1,4 @@
-# MAKEFILES (ufiledesc)
+# MAKEFILE (ufiledesc)
 
 T= ufiledesc
 
@@ -33,17 +33,31 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += ufiledesc.h
+INCS += ufiledesc.h ufiledescbase.hh
 
 MODS +=
 
 LIBS +=
 
 
+OBJ0= ufiledescbase.o 
+OBJ1= uconnect.o uregular.o 
+OBJ2= usocket.o usockaddr.o
+OBJ3= ugetdents.o ureadext.o
+OBJ4= uatx.o ufcntl.o
+OBJ5= ulockfile.o uselect.o
+OBJ6=
+OBJ7=
+
+OBJA_UFILEDESC= obj0.o obj1.o obj2.o
+OBJB_UFILEDESC= obj3.o obj4.o obj5.o
+
+OBJ_UFILEDESC= obja.o objb.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -56,18 +70,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= ufiledescbase.o 
-OBJ1= uconnect.o uregular.o 
-OBJ2= usocket.o 
-OBJ3= ugetdents.o
-
-OBJA_UFILEDESC= obj0.o obj1.o
-OBJB_UFILEDESC= obj2.o obj3.o
-
-OBJ_UFILEDESC= obja.o objb.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +83,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -114,31 +120,48 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA_UFILEDESC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_UFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB_UFILEDESC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_UFILEDESC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ufiledescbase.o:	ufiledescbase.cc	$(INCS)
+ufiledescbase.o:	ufiledescbase.cc	ufiledescbase.hh	$(INCS)
 
-usocket.o:		usocket.cc		$(INCS)
-uconnect.o:		uconnect.cc		$(INCS)
-uregular.o:		uregular.cc		$(INCS)
-ugetdents.o:		ugetdents.cc		$(INCS)
-usockaddr.o:		usockaddr.cc		$(INCS)
+usocket.o:		usocket.cc		usocket.h		$(INCS)
+usockaddr.o:		usockaddr.cc		usockaddr.h		$(INCS)
+uconnect.o:		uconnect.cc					$(INCS)
+uregular.o:		uregular.cc		uregular.h		$(INCS)
+ugetdents.o:		ugetdents.cc		ugetdents.h		$(INCS)
+ureadext.o:		ureadext.cc		ureadext.h		$(INCS)
+uatx.o:			uatx.cc			uatx.h			$(INCS)
+ufcntl.o:		ufcntl.cc		ufcntl.h		$(INCS)
+ulockfile.o:		ulockfile.cc		ulockfile.h		$(INCS)
+uselect.o:		uselect.cc		uselect.h		$(INCS)
 
 
