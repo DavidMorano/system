@@ -72,11 +72,12 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<cstring>		/* |strncmp(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<tmstrs.h>
 #include	<strn.h>
-#include	<sfx.h>
+#include	<sfx.h>			/* |sfnext(3uc)| */
 #include	<six.h>
 #include	<char.h>
 #include	<hasx.h>
@@ -85,7 +86,9 @@
 
 #include	"mailmsgmatenv.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -107,10 +110,10 @@ import libutil ;
 
 /* forward references */
 
-static int	mmenvdat_ema(mmenvdat *,cchar *,int) noex ;
-static int	mmenvdat_date(mmenvdat *,cchar *,int) noex ;
-static int	mmenvdat_datefin(mmenvdat *,cchar *,int) noex ;
-static int	mmenvdat_remote(mmenvdat *,cchar *,int) noex ;
+local int	mmenvdat_ema	(mmenvdat *,cchar *,int) noex ;
+local int	mmenvdat_date	(mmenvdat *,cchar *,int) noex ;
+local int	mmenvdat_datefin(mmenvdat *,cchar *,int) noex ;
+local int	mmenvdat_remote	(mmenvdat *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -119,7 +122,7 @@ constexpr cpcchar	exts[] = {
 	"remote from",
 	"forwarded by",
 	nullptr
-} ;
+} ; /* end array (exts) */
 
 
 /* exported variables */
@@ -133,7 +136,7 @@ int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		len = 0 ;
 	if (mep && sp) {
 	    bool	f_start = true ;
-	    rs = memclear(hop) ;		/* dangerous */
+	    rs = memclear(hop) ; /* dangerous */
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while (sl && iseol(sp[sl-1])) sl -= 1 ;
 	    if ((sl > 0) && (*sp == '>')) {
@@ -169,7 +172,7 @@ int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int mmenvdat_ema(mmenvdat *mep,cchar *sp,int sl) noex {
+local int mmenvdat_ema(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		skip = 0 ;
 	cchar		*cp ;
 	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
@@ -182,8 +185,8 @@ static int mmenvdat_ema(mmenvdat *mep,cchar *sp,int sl) noex {
 /* end subroutine (mmenvdat_ema) */
 
 /* > From rightcore.com!dam Wed Dec 8 11:44:30 EDT 1993 -0400 */
-static int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
-	int		skip = 0 ;
+local int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
+	int		skip = 0 ; /* return-value */
 	cchar		*cp ;
 	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 	    int		rl ;
@@ -191,8 +194,8 @@ static int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
 	    cchar	*rp ;
 	    if (tmstrsday(cp,cl) >= 0) {
 		int	si = intconv((cp + cl) - sp) ;
-		rl = (sl-si) ;
-		rp = (sp+si) ;
+		rl = (sl - si) ;
+		rp = (sp + si) ;
 	        mep->d.ep = beginp ;
 		mep->d.el = intconv((sp + sl) - beginp) ;
 	        if ((cl = sfnext(rp,rl,&cp)) > 0) {
@@ -214,18 +217,18 @@ static int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
 					skip = intconv(rp + si - beginp) ;
 					mep->d.el = intconv(rp + si - beginp) ;
 				    }
-				}
-			    }
-			}
+				} /* end if (sichr) */
+			    } /* end if (hasalldig) */
+			} /* end if (sfnext) */
 		    }
-		}
+		} /* end if (sfnext) */
 	    }
 	} /* end if (sfnext) */
 	return skip ;
 }
 /* end subroutine (mmenvdat_date) */
 
-static int mmenvdat_datefin(mmenvdat *mep,cchar *rp,int rl) noex {
+local int mmenvdat_datefin(mmenvdat *mep,cchar *rp,int rl) noex {
 	int		i ; /* used afterwards */
 	int		si = -1 ;
 	for (i = 0 ; exts[i] != nullptr ; i += 1) {
@@ -238,7 +241,7 @@ static int mmenvdat_datefin(mmenvdat *mep,cchar *rp,int rl) noex {
 }
 /* end subroutine (mmenvdat_datefin) */
 
-static int mmenvdat_remote(mmenvdat *mep,cchar *sp,int sl) noex {
+local int mmenvdat_remote(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		skip = 0 ;
 	if ((sl > 0) && (mep->rt >= 0)) {
 	    cint	el = lenstr(exts[mep->rt]) ;
