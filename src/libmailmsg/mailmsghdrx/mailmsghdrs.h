@@ -21,16 +21,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<mailmsg.h>
+#include	<usysbase.h>
+#include	<mailmsg.h>		/* used as argument */
 
-
-/* object defines */
-#define	MAILMSGHDRS_MAGIC	0x87987598
 #define	MAILMSGHDRS		struct mailmsghdrs_head
+#define	MAILMSGHDRS_MAGIC	0x87987598
 
 enum his {
 	hi_from,
@@ -147,7 +142,7 @@ enum his {
 
 #define	HI_EXPIRES	hi_expires
 #define	HN_EXPIRES	mailmsghdrs_names[HI_EXPIRES]
-#define	HL_EXPIRES	sizeof(HN_EXPIRES)
+#define	HL_EXPIRES	(szof(HN_EXPIRES) - 1)
 
 #define	HI_KEYWORDS	hi_keywords
 #define	HN_KEYWORDS	mailmsghdrs_names[HI_KEYWORDS]
@@ -231,39 +226,39 @@ enum his {
 
 #define	HI_DELIVEREDTO	hi_deliveredto
 #define	HN_DELIVEREDTO	mailmsghdrs_names[HI_DELIVEREDTO]
-#define	HL_DELIVEREDTO	sizeof(HN_DELIVEREDTO)
+#define	HL_DELIVEREDTO	(szof(HN_DELIVEREDTO) - 1)
 
 #define	HI_XORIGINALTO	hi_xoriginalto
 #define	HN_XORIGINALTO	mailmsghdrs_names[HI_XORIGINALTO]
-#define	HL_XORIGINALTO	sizeof(HN_XORIGINALTO)
+#define	HL_XORIGINALTO	(szof(HN_XORIGINALTO) - 1)
 
 #define	HI_XPRIORITY	hi_xpriority
 #define	HN_XPRIORITY	mailmsghdrs_names[HI_XPRIORITY]
-#define	HL_XPRIORITY	sizeof(HN_XPRIORITY)
+#define	HL_XPRIORITY	(szof(HN_XPRIORITY) - 1)
 
 #define	HI_PRIORITY	hi_priority
 #define	HN_PRIORITY	mailmsghdrs_names[HI_PRIORITY]
-#define	HL_PRIORITY	sizeof(HN_PRIORITY)
+#define	HL_PRIORITY	(szof(HN_PRIORITY) - 1)
 
 #define	HI_XFACE	hi_xface
 #define	HN_XFACE	mailmsghdrs_names[HI_XFACE]
-#define	HL_XFACE	sizeof(HN_XFACE)
+#define	HL_XFACE	(szof(HN_XFACE) - 1)
 
 #define	HI_XBBNEWS	hi_xbbnews
 #define	HN_XBBNEWS	mailmsghdrs_names[HI_XBBNEWS]
-#define	HL_XBBNEWS	sizeof(HN_XBBNEWS)
+#define	HL_XBBNEWS	(szof(HN_XBBNEWS) - 1)
 
 #define	HI_XUUID	hi_xuuid
 #define	HN_XUUID	mailmsghdrs_names[HI_XUUID]
-#define	HL_XUUID	sizeof(HN_XUUID)
+#define	HL_XUUID	(szof(HN_XUUID) - 1)
 
 #define	HI_XUTI		hi_xuti
 #define	HN_XUTI		mailmsghdrs_names[HI_XUTI]
-#define	HL_XUTI		sizeof(HN_XUTI)
+#define	HL_XUTI		(szof(HN_XUTI) - 1)
 
 #define	HI_XMCDATE	hi_xmcdate
 #define	HN_XMCDATE	mailmsghdrs_names[HI_XMCDATE]
-#define	HL_XMCDATE	sizeof(HN_XMXDATE)
+#define	HL_XMCDATE	(szof(HN_XMXDATE) - 1)
 
 #define	HI_XMAILER	hi_xmailer
 #define	HN_XMAILER	mailmsghdrs_names[HI_XMAILER]
@@ -279,14 +274,14 @@ enum his {
 
 /* put all new entries before this last (fake) one */
 #define	HI_OVERLAST	hi_overlast
-#define	HN_OVERLAST	NULL
+#define	HN_OVERLAST	nullptr
 #define	HL_OVERLAST	-1
 
 
 struct mailmsghdrs_head {
 	cchar		**v ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 extern cpcchar		mailmsghdrs_names[] ;
 
