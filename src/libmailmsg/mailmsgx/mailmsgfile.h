@@ -20,14 +20,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<hdb.h>
 
 
-#define	MAILMSGFILE_MAGIC	0x24182132
 #define	MAILMSGFILE		struct mailmsgfile_head
 #define	MAILMSGFILE_FL		struct mailmsgfile_flags
 #define	MAILMSGFILE_MI		struct mailmsgfile_minfo
+#define	MAILMSGFILE_MAGIC	0x24182132
 
 #define	MAILMSGFILE_STRLEN	100
 #define	MAILMSGFILE_TZNAMELEN	10
@@ -44,13 +45,13 @@ struct mailmsgfile_minfo {
 	uint		vsize ;
 	uint		nlines ;
 	uint		vlines ;
-} ;
+} ; /* end struct */
 
 struct mailmsgfile_flags {
 	uint		mailnew:1 ;	/* new mail arrived */
 	uint		files:1 ;	/* container initialized */
 	uint		checkout:1 ;	/* thread is running */
-} ;
+} ; /* end struct */
 
 struct mailmsgfile_head {
 	hdb		*flp ;		/* File-List-Pointer */
@@ -63,7 +64,7 @@ struct mailmsgfile_head {
 	int		ind ;
 	int		to ;
 	volatile int	f_checkdone ;	/* thread has completed */
-} ;
+} ; /* end struct */
 
 typedef MAILMSGFILE	mailmsgfile ;
 typedef MAILMSGFILE_FL	mailmsgfile_fl ;
