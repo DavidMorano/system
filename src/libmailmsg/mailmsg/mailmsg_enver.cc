@@ -29,7 +29,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mailmsgmatenv.h>
 #include	<isoneof.h>
 #include	<localmisc.h>
@@ -37,7 +38,9 @@
 #include	"mailmsg.h"
 #include	"mailmsg_envget.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -63,7 +66,7 @@ import libutil ;
 
 /* forward references */
 
-static inline bool	isNotField(int) noex ;
+local inline bool	isNotField(int) noex ;
 
 
 /* local variables */
@@ -72,7 +75,7 @@ constexpr int		rsnofield[] = {
 	SR_NOENT,
 	SR_NOMSG,
 	0
-} ;
+} ; /* end array (rsnofield) */
 
 cbool			f_direct = CF_DIRECT ;
 
@@ -121,7 +124,7 @@ int mailmsg_envget(mailmsg *op,int ei,mailmsg_envdat *mep) noex {
 
 /* provate subroutines */
 
-static bool isNotField(int rs) noex {
+local bool isNotField(int rs) noex {
 	return isOneOf(rsnofield,rs) ;
 }
 /* end subroutine (isNotField) */
