@@ -18,6 +18,7 @@
 /*******************************************************************************
 
 	Names:
+	ufiledesc
 
 	Description:
 	All of the UNIX® system calls that use (operate on) a
@@ -30,107 +31,26 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>
-#include	<unistd.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>
+#include	<usysbase.h>
+
+#include	<uatx.h>
+#include	<uconnect.h>
+#include	<ufcntl.h>
+#include	<ugetdents.h>
+#include	<ulockfile.h>
+#include	<ureade.h>
+#include	<ureadext.h>
+#include	<uregular.h>
+#include	<uselect.h>
+#include	<usocket.h>
+#include	<usockaddr.h>
 
 
-#ifdef	__cplusplus
-
-namespace ufiledesc {
-    struct ufiledescflags {
-	uint		fclose:1 ;
-	uint		fwrite:1 ;
-	uint		fintr:1 ;	/* request interrupts to return */
-    } ; /* end struct (ufiledescflags) */
-    struct ufiledescbase {
-	cvoid		*wbuf ;
-	void		*rbuf ;
-	int		wlen ;
-	int		rlen ;
-	ufiledescflags	f{} ;
-	ufiledescbase() noex { } ;
-	int operator () (int) noex ;
-	virtual int callstd(int) noex = 0 ;
-    } ; /* end struct (ufiledescbase) */
-}
-
-#endif /* __cplusplus */
-
-EXTERNC_begin
-
-extern int u_bind(int,cvoid *,int) noex ;
-extern int u_listen(int,int) noex ;
-extern int u_setsockopt(int,int,int,cvoid *,int) noex ;
-extern int u_getsockopt(int,int,int,void *,int *) noex ;
-extern int u_connect(int,cvoid *,int) noex ;
-extern int u_getpeername(int,void *,int *) noex ;
-extern int u_getsockname(int,void *,int *) noex ;
-extern int u_send(int,cvoid *,int,int) noex ;
-extern int u_sendmsg(int,CMSGHDR *,int) noex ;
-extern int u_sendto(int,cvoid *,int,int,cvoid *,int) noex ;
-extern int u_sendfiler(int,int,off_t,size_t) noex ;
-extern int u_recv(int,void *,int,int) noex ;
-extern int u_recvmsg(int,MSGHDR *,int) noex ;
-extern int u_recvfrom(int,void *,int,int,void *,int *) noex ;
-extern int u_shutdown(int,int) noex ;
-
-extern int u_closeonexec(int,int) noex ;
-extern int u_nonblock(int,int) noex ;
-extern int u_readn(int,void *,int) noex ;
-extern int u_writen(int,cvoid *,int) noex ;
-extern int u_fchdir(int) noex ;
-extern int u_fchmod(int,mode_t) noex ;
-extern int u_fchown(int,uid_t,gid_t) noex ;
-extern int u_close(int) noex ;
-extern int u_fstat(int,USTAT *) noex ;
-extern int u_fstatfs(int,USTATFS *) noex ;
-extern int u_fstatvfs(int,USTATVFS *) noex ;
-extern int u_fpathconf(int,int,long *) noex ;
-extern int u_fstype(int,char *,int) noex ;
-extern int u_fsync(int) noex ;
-extern int u_fsize(int) noex ;
-extern int u_ftruncate(int,off_t) noex ;
-extern int u_ioctl(int,int,...) noex ;
-extern int u_lockf(int,int,off_t) noex ;
-extern int u_pread(int,void *,int,off_t) noex ;
-extern int u_pwrite(int,cvoid *,int,off_t) noex ;
-extern int u_read(int,void *,int) noex ;
-extern int u_readv(int,IOVEC *,int) noex ;
-extern int u_seeko(int,off_t,int,off_t *) noex ;
-extern int u_write(int,cvoid *,int) noex ;
-extern int u_writev(int,CIOVEC *,int) noex ;
-extern int u_getdents(int,void *,int) noex ;
-
-/* special aliases */
-extern int u_sockaddrrem(int,void *,int *) noex ;
-extern int u_sockaddrloc(int,void *,int *) noex ;
-
-static inline int u_seek(int fd,off_t wo,int w) noex {
-	return u_seeko(fd,wo,w,nullptr) ;
-}
-static inline int u_seekoff(int fd,off_t wo,int w,off_t *offp) noex {
-	return u_seeko(fd,wo,w,offp) ;
-}
-static inline int u_tell(int fd,off_t *rp) noex {
-	return u_seeko(fd,0l,SEEK_CUR,rp) ;
-}
-static inline int u_seekable(int fd) noex {
-	return u_seek(fd,0l,SEEK_CUR) ;
-}
-static inline int u_rewind(int fd) noex {
-	return u_seek(fd,0l,SEEK_SET) ;
-}
-
-extern int u_poll(POLLFD *,int,int) noex ;	/* <- special case */
-
-EXTERNC_end
+namespace libu {
+    int upoll(POLLFD *,int,int) noex ;
+    int uselect(int,fdset *,fdset *,fdset *,TIMEVAL *) noex ;
+} /* end namespace (libu) */
 
 
 #endif /* UFILEDESC_INCLUDE */
