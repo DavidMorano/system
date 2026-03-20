@@ -55,7 +55,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<strn.h>
 #include	<sfx.h>
 #include	<hasx.h>
@@ -92,7 +93,7 @@
 
 /* local variables */
 
-constexpr bool		f_progressive = CF_PROGRESSIVE ;
+cbool		f_progressive = CF_PROGRESSIVE ;
 
 
 /* exported variables */
