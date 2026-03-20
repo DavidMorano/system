@@ -33,7 +33,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<mailmsg.h>
 #include	<localmisc.h>
 
@@ -65,14 +68,13 @@ using libuc::libmem ;			/* variable */
 /* forward references */
 
 template<typename ... Args>
-static inline int mailmsghdrs_magic(mailmsghdrs *op,Args ... args) noex {
+local inline int mailmsghdrs_magic(mailmsghdrs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MAILMSGHDRS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsghdrs_magic) */
+} /* end subroutine (mailmsghdrs_magic) */
 
 
 /* local variables */
@@ -140,9 +142,9 @@ int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (op && msgp) {
+	if (op && msgp) ylikely {
 	    cint	sz = (n + 1) * szof(char **) ;
-	    if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
+	    if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) ylikely {
 	        int	i ; /* used-afterwards */
 	        mainv	mhnames = mailmsghdrs_names ;
 	        cchar	*hp{} ;
@@ -175,8 +177,8 @@ int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 int mailmsghdrs_finish(mailmsghdrs *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mailmsghdrs_magic(op)) >= 0) {
-	    if (op->v) {
+	if ((rs = mailmsghdrs_magic(op)) >= 0) ylikely {
+	    if (op->v) ylikely {
 	        rs1 = libmem.free(op->v) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->v = nullptr ;
