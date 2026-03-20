@@ -1,4 +1,4 @@
-# MAKEFILES (mailmsghdrx)
+# MAKEFILE (mailmsghdrx)
 
 T= mailmsghdrx
 
@@ -31,17 +31,16 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= mailmsghdrx.h
+INCS += mailmsghdrx.h
 
-MPDS +=
+MODS +=
 
-LIBS=
+LIBS +=
 
 
-#OBJ0_MAILMSGHDRX= mailmsghdrct.o mailmsghdrfold.o
-OBJ0_MAILMSGHDRX= mailmsghdrfold.o
+OBJ0_MAILMSGHDRX= mailmsghdrct.o mailmsghdrfold.o
 OBJ1_MAILMSGHDRX= mailmsghdrs.o mailmsghdrval.o
 OBJ2_MAILMSGHDRX=
 OBJ3_MAILMSGHDRX=
@@ -54,7 +53,6 @@ OBJ_MAILMSGHDRX= $(OBJA_MAILMSGHDRX)
 LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -123,6 +121,13 @@ obj2_mailmsghdrx.o:	$(OBJ2_MAILMSGHDRX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_mailmsghdrx.o:	$(OBJ3_MAILMSGHDRX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
