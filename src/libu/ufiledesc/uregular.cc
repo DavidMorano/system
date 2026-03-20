@@ -273,9 +273,9 @@ namespace {
 
 /* local variables */
 
-constexpr cbool		f_acl		= F_ACL ;	/* future use */
-constexpr cbool		f_sunos		= F_SUNOS ;	/* really Solaris® */
-constexpr cbool		f_darwin	= F_DARWIN ;
+constexpr bool		f_acl		= F_ACL ;	/* future use */
+constexpr bool		f_sunos		= F_SUNOS ;	/* really Solaris® */
+constexpr bool		f_darwin	= F_DARWIN ;
 
 
 /* exported variables */
@@ -288,7 +288,7 @@ int u_closeonexec(int fd,int f) noex {
 	int		f_previous = false ;
 	if ((rs = u_fcntl(fd,F_GETFD,0)) >= 0) {
 	    int		fdflags = rs ;
-	    f_previous = (fdflags & FD_CLOEXEC) ? 1 : 0 ;
+	    f_previous = !!(fdflags & FD_CLOEXEC) ;
 	    if (! LEQUIV(f_previous,f)) {
 	        if (f) {
 	            fdflags |= FD_CLOEXEC ;
@@ -307,7 +307,7 @@ int u_nonblock(int fd,int f) noex {
 	int		f_previous = false ;
 	if ((rs = u_fcntl(fd,F_GETFL,0)) >= 0) {
 	    int		flflags = rs ;
-	    f_previous = (flflags & O_NONBLOCK) ? 1 : 0 ;
+	    f_previous = !!(flflags & O_NONBLOCK) ;
 	    if (! LEQUIV(f_previous,f)) {
 	        if (f) {
 	            flflags |= O_NONBLOCK ;
@@ -325,7 +325,7 @@ int u_readn(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (rbuf) {
-	    caddr_t		cbuf = caddr_t(rbuf) ;
+	    caddr_t cbuf = caddr_t(rbuf) ;
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
 		cauto rd = [&] () -> int {
@@ -490,7 +490,7 @@ int u_fpathconf(int fd,int name,long *rp) noex {
 	    } /* end if (ok) */
 	} /* end if (valid) */
 	if (rp) {
-	    *rp = (rs >= 0) ? lw : 0l ;
+	    *rp = (rs >= 0) ? lw : 0L ;
 	}
 	return rs ;
 }
@@ -620,14 +620,21 @@ int u_writev(int fd,CIOVEC *iop,int n) noex {
 }
 /* end subroutine (u_writev) */
 
+namespace libu {
+    int upoll(POLLFD *fds,int n,int mto) noex {
+	uregular	ro(fds,n,mto) ;
+	ro.m = &uregular::ipoll ;
+	ro.fdfl.fintr = true ;
+	return ro(0) ;
+    } /* end subroutine (upoll) */
+} /* end namespace (libu) */
+
 /* this is (sort of) a spæcial case */
 int u_poll(POLLFD *fds,int n,int mto) noex {
+    	using		libu::upoll ;
 	int		rs = SR_FAULT ;
 	if (fds) {
-	    uregular	ro(fds,n,mto) ;
-	    ro.m = &uregular::ipoll ;
-	    ro.fdfl.fintr = true ;
-	    rs = ro(0) ;
+	    rs = upoll(fds,n,mto) ;
 	} /* end if (non-null) */
 	return rs ;
 }
