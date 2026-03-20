@@ -41,9 +41,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<getbufsize.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<emainfo.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
@@ -75,7 +75,7 @@ typedef mailmsg_envdat		dat ;
 
 /* forward references */
 
-static int mailmsg_ema(mm *,dat *,char *,int,sbuf *) noex ;
+local int mailmsg_ema(mm *,dat *,char *,int,sbuf *) noex ;
 
 
 /* local variables */
@@ -90,10 +90,10 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mailmsg_magic(op,rbuf)) >= 0) {
-	    if (char *abuf ; (rs = malloc_mailaddr(&abuf)) >= 0) {
+	if ((rs = mailmsg_magic(op,rbuf)) >= 0) ylikely {
+	    if (char *abuf ; (rs = lm_ad(&abuf)) >= 0) ylikely {
 		cint	alen = rs ;
-	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	            mailmsg_envdat	me, *mep = &me ;
 		    cauto		mef = mailmsg_envget ;
 	            int			cl ;
@@ -117,7 +117,7 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	            rs1 = b.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
-	        rs1 = malloc_free(abuf) ;
+	        rs1 = lm_free(abuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
 	} /* end if (magic) */
@@ -128,14 +128,14 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 
 /* local subroutines */
 
-static int mailmsg_ema(mm *op,dat *mep,char *abuf,int alen,sbuf *sbp) noex {
+local int mailmsg_ema(mm *op,dat *mep,char *abuf,int alen,sbuf *sbp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op && mep && abuf && sbp) {
+	if (op && mep && abuf && sbp) ylikely {
 	    cint	cl = mep->a.el ;
 	    cchar	*cp = mep->a.ep ;
-	    if (emainfo ai ; (rs = emainfo_load(&ai,cp,cl)) >= 0) {
-	        cint	at = rs ;
+	    if (emainfo ai ; (rs = emainfo_load(&ai,cp,cl)) >= 0) ylikely {
+	        ematypes at = ematypes(rs) ;
 	        if ((rs = emainfo_mktype(&ai,at,abuf,alen)) > 0) {
 		    cint	al = rs ;
 		    if (c > 0) rs = sbp->chr('!') ;
