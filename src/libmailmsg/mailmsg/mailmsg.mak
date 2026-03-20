@@ -1,4 +1,4 @@
-# MAKEFILES (mailmsg)
+# MAKEFILE (mailmsg)
 
 T= mailmsg
 
@@ -40,7 +40,7 @@ MODS +=
 LIBS=
 
 
-OBJ0_MAILMSG= mailmsg_main.o 
+OBJ0_MAILMSG= mailmsg_prime.o 
 OBJ1_MAILMSG= mailmsg_envaddrfold.o mailmsg_envget.o
 OBJ2_MAILMSG= mailmsg_envdates.o mailmsg_envtimes.o
 OBJ3_MAILMSG= mailmsg_loadfile.o
@@ -160,7 +160,7 @@ objd.o:			$(OBJD_MAILMSG)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-mailmsg_main.o:			mailmsg_main.cc			$(INCS)
+mailmsg_prime.o:		mailmsg_prime.cc		$(INCS)
 mailmsg_loadfd.o:		mailmsg_loadfd.cc		$(INCS)
 mailmsg_loadmb.o:		mailmsg_loadmb.cc		$(INCS)
 mailmsg_loadfile.o:		mailmsg_loadfile.cc		$(INCS)
