@@ -80,7 +80,7 @@ OBJ25= fonce.o filerec.o
 OBJ26= ustd.o
 OBJ27= ucomposite.o
 
-OBJ28= findbit.o
+OBJ28= findbit.o ccfile.o readln.o
 OBJ29= itimers.o filetypes.o
 OBJ30= binchunk.o
 OBJ31=
@@ -314,24 +314,24 @@ obji.o:			$(OBJI)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
-# SUPPORT
+# SUPPORT objects
 syshas.o:		syshas.cc	syshas.h		$(INCS)
 timewatch.o:		timewatch.cc	timewatch.hh		$(INCS)
 timecount.o:		timecount.cc	timecount.hh		$(INCS)
 aflag.o:		aflag.cc	aflag.hh		$(INCS)
-errtimer.o:		errtimer.cc errtimer.hh			$(INCS)
-timeval.o:		timeval.cc timeval.h			$(INCS)
-itimerval.o:		itimerval.cc itimerval.h		$(INCS)
+errtimer.o:		errtimer.cc	errtimer.hh		$(INCS)
+timeval.o:		timeval.cc	timeval.h		$(INCS)
+itimerval.o:		itimerval.cc	itimerval.h		$(INCS)
 timespec.o:		timespec.cc timespec.h			$(INCS)
 itimerspec.o:		itimerspec.cc itimerspec.h		$(INCS)
 
+# SUPPORT helpers
 usysflag.o:		usysflag.cc	usysflag.h		$(INCS)
 utimeout.o:		utimeout.c	utimeout.h		$(INCS)
 utimeouts.o:		utimeouts.cc	utimeouts.h		$(INCS)
 usyscallbase.o:		usyscallbase.cc	usyscallbase.hh		$(INCS)
 usysutility.o:		usysutility.cc	usysutility.hh		$(INCS)
 usysdata.o:		usysdata.cc	usysdata.h		$(INCS)
-uacceptpass.o:		uacceptpass.cc	uopen.h			$(INCS)
 
 # requires USYSBASIC
 uatfork.o:		umods.o usigblock.o
@@ -474,39 +474,45 @@ nulstr.o:		nulstr.cc	nulstr.h	$(INCS)
 posixdirent.o:		posixdirent.cc	posixdirent.hh	$(INCS)
 binchunk.o:		binchunk.cc	binchunk.hh	$(INCS)
 
-# OTHER
-ulogerror.o:		ulogerror.cc ulogerror.h	$(INCS)
+# OTHER subroutine-groups
+uacceptpass.o:		uacceptpass.cc	uopen.h		$(INCS)
+ulogerror.o:		ulogerror.cc	ulogerror.h	$(INCS)
 umem.o:			umem.cc		umem.hh		$(INCS)
-um.o:			um.cc um.h			$(INCS)
-usig.o:			usig.cc usig.h			$(INCS)
-usysop.o:		usysop.cc usysop.h		$(INCS)
-ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h	$(INCS)
-uexec.o:		uexec.cc uexec.h		$(INCS)
-uinet.o:		uinet.cc uinet.h		$(INCS)
-uiconv.o:		uiconv.cc uiconv.h		$(INCS)
+um.o:			um.cc		um.h		$(INCS)
+usig.o:			usig.cc		usig.h		$(INCS)
+usysop.o:		usysop.cc	usysop.h	$(INCS)
+ugetloadavg.o:		ugetloadavg.cc	ugetloadavg.h	$(INCS)
+uexec.o:		uexec.cc	uexec.h		$(INCS)
+uinet.o:		uinet.cc	uinet.h		$(INCS)
+uiconv.o:		uiconv.cc	uiconv.h	$(INCS)
 uchartype.o:		uchartype.cc	uchartype.h	${INCS}
 
-syswords.o:		syswords.cc syswords.hh		$(INCS)
-varnames.o:		varnames.cc varnames.hh		$(INCS)
-endian.o:		endian.cc endian.h		$(INCS)
+# CONSTANTS
+endian.o:		endian.cc	endian.h	$(INCS)
+syswords.o:		syswords.cc	syswords.hh	$(INCS)
+varnames.o:		varnames.cc	varnames.hh	$(INCS)
+stdfnames.o:		stdfnames.c stdfnames.h		$(INCS)
+mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
 
+# IDS of-various-sorts
+filetypes.o:		filetypes.cc	filetypes.h	$(INCS)
+clockids.o:		clockids.cc	clockids.hh	$(INCS)
+itimers.o:		itimers.cc	itimers.hh	$(INCS)
+
+# STRING handling
 strtox.o:		strtox.cc strtox.h		$(INCS)
 strnul.o:		strnul.cc strnul.hh		$(INCS)
-mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
-stdfnames.o:		stdfnames.c stdfnames.h		$(INCS)
 
 # misc-groups
 baops.o:		baops.c		baops.h		$(INCS)
 
 stdclib.o:		stdclib.cc	stdclib.hh	$(INCS)
 
-filetypes.o:		filetypes.cc	filetypes.h	$(INCS)
-itimers.o:		itimers.cc	itimers.hh	$(INCS)
-clockids.o:		clockids.cc	clockids.hh	$(INCS)
-
 # MODULES
 findbit.o:		findbit.ccm			$(INCS)
 
-
+# MISC
+ccfile.o:		ccfile.cc	ccfile.hh	$(INCS)
+readln.o:		readln.cc	readln.hh	$(INCS)
 
 
