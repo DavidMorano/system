@@ -54,6 +54,10 @@
 #define	STDFNZERO	stdfnames[stdfile_zero]
 #endif
 
+#ifndef	STDFNMINUX
+#define	STDFNMINUS	stdfnames[stdfile_minus]
+#endif
+
 
 extern cchar	*const stdfnames[] ;
 
