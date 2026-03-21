@@ -36,7 +36,8 @@
 #include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
@@ -54,29 +55,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	sfshrink(cchar *,int,char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	getserial(cchar *) ;
-extern int	getfname(cchar *,cchar *,int,char *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* external variables */
 
@@ -86,18 +64,18 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	procupdate(struct proginfo *) ;
+local int	procupdate(struct proginfo *) ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progstampcheck(pip)
-struct proginfo	*pip ;
-{
+int progstampcheck(proginfo *pip) noex {
 	int	rs = SR_OK ;
 	int	f_process = FALSE ;
 
@@ -129,10 +107,7 @@ struct proginfo	*pip ;
 
 /* local subroutines */
 
-
-static int procupdate(pip)
-struct proginfo	*pip ;
-{
+local int procupdate(proginfo *pip) noex {
 	bfile	tsfile, *tfp = &tsfile ;
 	int	rs ;
 	cchar	*sf = pip->stampfname ;
