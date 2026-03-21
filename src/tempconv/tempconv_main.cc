@@ -96,21 +96,6 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isalphalatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
 
@@ -121,10 +106,6 @@ extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
