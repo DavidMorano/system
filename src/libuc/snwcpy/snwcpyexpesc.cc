@@ -118,7 +118,7 @@ namespace {
 
 /* forwards references */
 
-static int siourx(sinonx_f sio,cchar *sp,int sl) noex {
+local int siourx(sinonx_f sio,cchar *sp,int sl) noex {
     	int		rs ;
 	int		si = 0 ; /* return-value */
 	if ((rs = sio(sp,sl)) >= 0) {
