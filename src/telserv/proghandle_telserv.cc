@@ -1,7 +1,9 @@
-/* proghandle_telserv */
+/* proghandle_telserv SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
+/* version %I% last-modified %G% */
 /* handle this service request */
-
 
 #define	P_TELSERV	1		/* which basic function */
 
@@ -115,7 +117,10 @@
 #include <cerrno>
 #include <cstdio>
 
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -202,15 +207,6 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	mkutmpid(char *,int,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	audit_settid(int);	/* set terminal ID */
-
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,vecstr *,
 			const char *,const char **) ;
@@ -218,9 +214,6 @@ extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdomain(char *) ;
 
 
 /* external variables */
