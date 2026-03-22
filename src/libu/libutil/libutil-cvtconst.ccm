@@ -21,6 +21,7 @@ module ;
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<localmisc.h>
 
 export module libutil:cvtconst  ;
 
