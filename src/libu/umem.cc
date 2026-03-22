@@ -52,8 +52,10 @@
 #include	"umem.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ulibvals.ccm"
 
 import libutil ;			/* |getlenstr(3u)| + |memclear(3u)| */
+import ulibvals ;			/* |getlenstr(3u)| + |memclear(3u)| */
 
 /* local defines */
 
@@ -92,6 +94,10 @@ namespace {
 
 
 /* local vaiables */
+
+static cint		maxlinelen = ulibval.maxline ;
+static cint		maxnamelen = ulibval.maxnamelen ;
+static cint		maxpathlen = ulibval.maxpathlen ;
 
 
 /* exported variables */
@@ -179,6 +185,39 @@ namespace libu {
 	}
 	return rs ;
     } /* end subroutine (umems::rsfree) */
+    int umems::ml(cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rpp) ylikely {
+	    if ((rs = maxlinelen) >= 0) {
+	        len = rs ;
+	        rs = mall((len + 1),rpp) ;
+	    }
+	}
+	return (rs >= 0) ? len : rs ;
+    } /* end method (umems::ml) */
+    int umems::mn(cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rpp) ylikely {
+	    if ((rs = maxnamelen) >= 0) {
+	        len = rs ;
+	        rs = mall((len + 1),rpp) ;
+	    }
+	}
+	return (rs >= 0) ? len : rs ;
+    } /* end method (umems::mn) */
+    int umems::mp(cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rpp) ylikely {
+	    if ((rs = maxnamelen) >= 0) {
+	        len = rs ;
+	        rs = mall((len + 1),rpp) ;
+	    }
+	}
+	return (rs >= 0) ? len : rs ;
+    } /* end method (umems::mp) */
 } /* end namespace (libu) */
 
 
