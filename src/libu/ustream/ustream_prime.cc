@@ -5,6 +5,7 @@
 /* support low-overhead file bufferring requirements */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -43,6 +44,7 @@
 #include	<intfloor.h>
 #include	<fmtstr.h>
 #include	<localmisc.h>
+#include	<dprintf.hh>		/* debugging */
 
 #include	"ustream.hh"
 
@@ -62,11 +64,17 @@ import ulibvals ;			/* |ulibval(3u)| */
 #define	ISCONT(b,bl)	\
 	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0	/* debugging */
+#endif
+
 
 /* imported namespaces */
 
 using std::min ;		/* subroutine-template */
 using std::max ;		/* subroutine-template */
+using libu::uread ;		/* subroutine */
+using libu::ureade ;		/* subroutine */
 using libu::umem ;		/* variable */
 using ustream_ns::ustream_reserve ;
 using ustream_ns::ustream_flush ;
@@ -76,10 +84,6 @@ using ustream_ns::ustream_flush ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int u_reade(int,void *,int,int,int) noex ;
-}
 
 
 /* external variables */
@@ -127,6 +131,8 @@ local int	ustream_bufcpy(ustream *,cchar *,int) noex ;
 
 cint		nfds = 1 ;
 
+cbool		f_debug		= CF_DEBUG ;
+
 static cint	pagesz		= ulibval.pagesz ;
 static cint	maxlinelen	= ulibval.maxline ;
 
@@ -140,12 +146,13 @@ local int ustream_opener(ustream *) noex ;
 
 int ustream::open(cchar *fn,int of,mode_t om) noex {
     	int		rs ;
+	DPRINTF("ent fn=%s\n",fn) ;
 	if ((rs = ustream_ctor(this,fn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
 		rs = SR_OK ;
-		oflags = of ;
-		if ((rs = u_open(fn,of,om)) >= 0) {
+		oflags = (of) ? of : O_RDONLY ;
+		if ((rs = u_open(fn,oflags,om)) >= 0) {
 		    fd = rs ;
 		    rs = ustream_opener(this) ;
 		    if (rs < 0) {
@@ -158,28 +165,34 @@ int ustream::open(cchar *fn,int of,mode_t om) noex {
 		ustream_dtor(this) ;
 	    }
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d \n",rs) ;
     	return rs ;
 } /* end method (ustream::open) */
 
 local int ustream_opener(ustream *op) noex {
     	cint		bsz = 0 ;
 	int		rs ;
-		if ((rs = ustream_adjbuf(op,bsz)) >= 0) ylikely {
-	            if (char *p ; (rs = umem.vall(bsz,&p)) >= 0) ylikely {
-	                op->dbuf = p ;
-	                op->bptr = p ;
-	                if (rs >= 0) {
-		            if (op->oflags & O_NETWORK) {
-				op->fl.net = true ;
-			    }
-			    op->magval = ustream_magicval ;
-	                } /* end if (ok) */
-	                if (rs < 0) {
-		            umem.free(op->dbuf) ;
-		            op->dbuf = nullptr ;
-	                }	
-	            } /* end if (memory-allocation) */
-		} /* end if (ustream_adjbuf) */
+	DPRINTF("ent\n") ;
+        if ((rs = ustream_adjbuf(op,bsz)) >= 0) ylikely {
+	    cint dsz = (op->dlen + 1) ;
+	    DPRINTF("adjbuf() rs=%d\n",rs) ;
+            if (char *p ; (rs = umem.vall(dsz,&p)) >= 0) ylikely {
+	        DPRINTF("vall() rs=%d\n",rs) ;
+                op->dbuf = p ;
+                op->bptr = p ;
+                if (rs >= 0) {
+                    if (op->oflags & O_NETWORK) {
+                        op->fl.net = true ;
+                    }
+                    op->magval = ustream_magicval ;
+                } /* end if (ok) */
+                if (rs < 0) {
+                    umem.free(op->dbuf) ;
+                    op->dbuf = nullptr ;
+                }       
+            } /* end if (memory-allocation) */
+        } /* end if (ustream_adjbuf) */
+	DPRINTF("ret rs=%d \n",rs) ;
 	return rs ;
 }
 /* end subroutine (ustream_opener) */
@@ -230,9 +243,9 @@ namespace ustream_ns {
 		    char	*buf = op->dbuf ;
 	            op->bptr = op->dbuf ;
 		    if (to >= 0) {
-	                rs = u_reade(fd,buf,bsz,to,fmo) ;
+	                rs = ureade(fd,buf,bsz,to,fmo) ;
 		    } else {
-	                rs = u_read(fd,buf,bsz) ;
+	                rs = uread(fd,buf,bsz) ;
 		    }
 	            if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
 	                f_timedout = true ;
@@ -290,9 +303,9 @@ namespace ustream_ns {
 		    char	*buf = op->dbuf ;
 	            op->bptr = op->dbuf ;
 		    if (to >= 0) {
-	                rs = u_reade(fd,buf,bsz,to,fmo) ;
+	                rs = ureade(fd,buf,bsz,to,fmo) ;
 		    } else {
-	                rs = u_read(fd,buf,bsz) ;
+	                rs = uread(fd,buf,bsz) ;
 		    }
 	            if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
 	                f_timedout = true ;
@@ -409,26 +422,6 @@ namespace ustream_ns {
 	    }
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_println) */
-} /* end nameapce (ustream_ns) */
-
-namespace ustream_ns {
-    int ustream_vprintf(ustream *op,cchar *fmt,va_list ap) noex {
-	int		rs ;
-	int		rs1 ;
-	int		wlen = 0 ;
-	    if ((rs = maxlinelen) >= 0) ylikely {
-		cint	llen = rs ;
-		if (char *lbuf ; (rs = umem.mall((llen + 1),&lbuf)) >= 0) {
-	    	    if ((rs = fmtstr(lbuf,llen,0,fmt,ap)) >= 0) {
-	    	        rs = ustream_write(op,lbuf,rs) ;
-			wlen = rs ;
-		    }
-		    rs1 = umem.free(lbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (m-a-f) */
-	    } /* end if (maxlinelen) */
-	return (rs >= 0) ? wlen : rs ;
-    } /* end subroutine (ustream_vprintf) */
 } /* end nameapce (ustream_ns) */
 
 namespace ustream_ns {
