@@ -5,9 +5,9 @@
 /* interface component for UNIX® library-3c */
 /* extended read */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_REVENTS	0
-#define	CF_NONBLOCK	1		/* use nonblocking mode */
+#define	CF_NONBLOCK	0		/* use nonblocking mode */
 
 /* revision history:
 
@@ -120,7 +120,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cerrno>
+#include	<termios.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>
 #include	<cstdlib>
@@ -128,8 +128,11 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<funcodes.h>
+#include	<filetypes.h>
+#include	<timeval.h>
+#include	<ascii.h>
 #include	<localmisc.h>
-#include	<dprintf.h>		/* debugging */
+#include	<dprintf.hh>		/* debugging */
 
 #include	"ureade.h"
 
@@ -142,6 +145,9 @@ import libutil ;			/* |memclear(3u)| */
 #ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000		/* poll-time multiplier */
 #endif
+
+#define	TERMIOS_MINCHARS	0	/* minimum characters to get */
+#define	TERMIOS_MINTIME		5	/* minimum time (x100 milliseconds) */
 
 #define	MAXEOF		3
 
@@ -158,6 +164,10 @@ import libutil ;			/* |memclear(3u)| */
 
 using libu::upoll ;			/* subroutine */
 using libu::uselect ;			/* subroutine */
+using libu::uterminal ;			/* subroutine */
+using libu::utermattrget ;		/* subroutine */
+using libu::utermattrset ;		/* subroutine */
+using libu::uread ;			/* subroutine */
 
 
 /* local typedefs */
@@ -194,6 +204,7 @@ namespace {
     struct subinfo {
 	char		*ubuf ;		/* caller argument */
 	char		*bp ;
+	TERMIOS		attrs ;
 	subinfo_fl	fl ;
 	int		fd ;		/* caller argument */
 	int		ulen ;		/* caller argument */
@@ -217,7 +228,10 @@ namespace {
 	int readreg	() noex ;
 	int readslow	() noex ;
 	int readchr	() noex ;
+	int readterm	() noex ;
 	int readafter	() noex ;
+	int attrbegin	() noex ;
+	int attrend	() noex ;
     } ; /* end struct (subinfo) */
 } /* end nameapace */
 
@@ -241,34 +255,44 @@ cbool		f_nonblock	= CF_NONBLOCK ;
 
 /* exported subroutines */
 
+namespace libu {
+    int ureade(int fd,void *vbuf,int ulen,int to,int opts) noex {
+	int		rs = SR_OK ;
+	int		tlen = 0 ; /* return-value */
+	char		*ubuf = charp(vbuf) ;
+	if (SI si ; (rs = si.start(fd,ubuf,ulen,to,opts)) >= 0) {
+	    {
+		rs = si.choose() ;
+	    }
+	    tlen = si.finish() ;
+	    if (rs >= 0) rs = tlen ;
+	} /* end if (subinfo) */
+	return (rs >= 0) ? tlen : rs ;
+    } /* end subroutine (ureade) */
+} /* end namespace (libu) */
+
 int u_reade(int fd,void *vbuf,int ulen,int to,int opts) noex {
+    	using		libu::ureade ;
 	int		rs = SR_FAULT ;
 	int		tlen = 0 ; /* return-value */
-	if (to < 0) to = INT_MAX ;
 	DPRINTF("ent fd=%d to=%d\n",fd,to) ;
 	if (vbuf) ylikely {
 	    rs = SR_BADFD ;
 	    if (fd >= 0) ylikely {
-	        char	*ubuf = charp(vbuf) ;
-	        if (SI si ; (rs = si.start(fd,ubuf,ulen,to,opts)) >= 0) {
-		    {
-		        rs = si.choose() ;
-		    }
-	            tlen = si.finish() ;
-	            if (rs >= 0) rs = tlen ;
-	        } /* end if (subinfo) */
+		rs = ureade(fd,vbuf,ulen,to,opts) ;
+		tlen = rs ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (u_reade) */
+} /* end subroutine (u_reade) */
 
 
 /* local subroutines */
 
 int subinfo::start(int ªfd,char *ªubuf,int ªulen,int ªto,int ªro) noex {
 	int		rs ;
+	if (ªto < 0) ªto = INT_MAX ;
 	{
 	    fd		= ªfd ;
 	    ubuf	= ªubuf ;
@@ -295,7 +319,7 @@ int subinfo::start(int ªfd,char *ªubuf,int ªulen,int ªto,int ªro) noex {
 	                        fl.isnonblock = true ;
 			    } else if (rs == SR_NOSYS) {
 				rs = SR_OK ;
-	                        fl.isnonblock = true ;
+	                        fl.isnonblock = false ;
 	                    }
 			} /* end if (isreg) */
 	    	    } /* end if_constexpr (f_nonblock) */
@@ -339,16 +363,27 @@ int subinfo::choose() noex {
 	DPRINTF("strategy f=%u\n",f) ;
 	if (f) {
 	    rs = readreg() ;
-	} else if (fl.ischr) {
-	    rs = readchr() ;
-	} else {
-	    rs = readslow() ;
+	} else if (fl.ischr && ((rs = uterminal(fd)) > 0)) {
+	    rs = readterm() ;
+	} else if (rs >= 0) {
+	    if (fl.ischr) {
+	        rs = readchr() ;
+	    } else {
+	        rs = readslow() ;
+	    }
 	} /* end if */
 	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
 	return rs ;
 } /* end method (subinfo::choose) */
 
 int subinfo::setmode(mode_t fm) noex {
+    	if_constexpr (f_debug) {
+	    filetypes dt = filetype(fm) ;
+	    {
+		cc *ftn = filetypes_names[dt] ;
+	        DPRINTF("ftn=%s\n",ftn) ;
+	    }
+	} /* end if_constexpr (f_debug) */
 	if (S_ISFIFO(fm)) {
 	    fl.isfifo = true ;
 	} else if (S_ISCHR(fm)) {
@@ -371,7 +406,7 @@ int subinfo::readreg() noex {
 	int		rs ;
 	int		wlen = 0 ; /* return-value */
 	maxeof = 0 ;
-	if ((rs = u_read(fd,ubuf,ulen)) >= 0) ylikely {
+	if ((rs = uread(fd,ubuf,ulen)) >= 0) ylikely {
 	    wlen = rs ;
 	    if (wlen > 0) {
 	        tlen += wlen ;
@@ -379,20 +414,37 @@ int subinfo::readreg() noex {
 	    } else {
 	        neof += 1 ;
 	    }
-	} /* end if (u_read) */
+	} /* end if (uread) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (subinfo::readreg) */
 
+int subinfo::readterm() noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	DPRINTF("ent fd=%d\n",fd) ;
+	if ((rs = attrbegin()) >= 0) {
+	    {
+	        rs = readchr() ;
+	    }
+	    rs1 = attrend() ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (terminal-attributes) */
+	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
+	return rs ;
+} /* end subroutine (subinfo::readterm) */
+
 int subinfo::readchr() noex {
-    	TIMEVAL		tv{} ;
+    	timeval_t	tv(to) ;
     	cnullptr	np{} ;
     	cint		n = (fd + 1) ;
 	int		rs ;
 	fdset		ifds{} ;
+	DPRINTF("ent fd=%d\n",fd) ;
 	FD_SET(fd,&ifds) ;
 	if ((rs = uselect(n,&ifds,np,np,&tv)) > 0) {
 	    rs = readafter() ;
 	}
+	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
 	return rs ;
 } /* end subroutine (subinfo::readchr) */
 
@@ -450,9 +502,10 @@ int subinfo::readafter() noex {
 	int		rlen = (ulen - tlen) ;
 	int		fbreak = false ;
 	DPRINTF("ent\n") ;
-	if ((rs = u_read(fd,bp,rlen)) >= 0) {
+	if ((rs = uread(fd,bp,rlen)) >= 0) {
 	    cint len = rs ;
-	    DPRINTF("u_read rs=%d\n",rs) ;
+	    DPRINTF("uread rs=%d\n",rs) ;
+	    DPRINTLINE(bp,rs) ;
 	    if (len == 0) {
 	        neof += 1 ;
 	        if ((! fl.issocket) || (neof >= maxeof)) {
@@ -475,5 +528,50 @@ int subinfo::readafter() noex {
 	DPRINTF("ret rs=%d fbreak=%u\n",rs,fbreak) ;
 	return (rs >= 0) ? fbreak : rs ;
 } /* end subroutine (subinfo::readafter) */
+
+int subinfo::attrbegin() noex {
+	int		rs ;
+	if ((rs = utermattrget(fd,&attrs)) >= 0) {
+	    TERMIOS	attrnew = attrs ;
+	    TERMIOS	*tp = &attrnew ;
+	    tp->c_iflag &= 
+	        (~ (INLCR | ICRNL | IXANY | ISTRIP | INPCK | PARMRK)) ;
+	    tp->c_iflag |= IXON ;
+	    tp->c_cflag &= (~ (CSIZE)) ;
+	    tp->c_cflag |= CS8 ;
+	    tp->c_lflag &= (~ (ICANON | ECHO | ECHOE | ECHOK | ECHONL)) ;
+#if	CF_SIGNAL
+	    tp->c_lflag &= (~ (ISIG)) ;
+#endif
+	    tp->c_oflag &= (~ (OCRNL | ONOCR | ONLRET)) ;
+	    tp->c_cc[VMIN]	= TERMIOS_MINCHARS ;
+	    tp->c_cc[VTIME]	= TERMIOS_MINTIME ;
+	    tp->c_cc[VINTR]	= CH_ETX ;	/* Control-C */
+	    tp->c_cc[VQUIT]	= CH_EM ;	/* Control-Y */
+	    tp->c_cc[VERASE]	= CH_DEL ;	/* Delete */
+	    tp->c_cc[VKILL]	= CH_NAK ;	/* Control-U */
+	    tp->c_cc[VSTART]	= CH_DC1 ;	/* Control-Q */
+	    tp->c_cc[VSTOP]	= CH_DC3 ;	/* Control-S */
+	    tp->c_cc[VSUSP]	= CH_SUB ;	/* Control-Z */
+	    tp->c_cc[VREPRINT]	= CH_DC2 ;	/* Control-R */
+	    tp->c_cc[VDISCARD]	= CH_SO ;	/* Control-O */
+	    /* set the new attributes */
+	    rs = utermattrset(fd,TCSADRAIN,tp) ;
+	    if (rs < 0) {
+	    	utermattrset(fd,TCSADRAIN,&attrs) ;
+	    } /* end if (error) */
+	} /* end if */
+	return rs ;
+} /* end method (subinfo::attrbegin) */
+
+int subinfo::attrend() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	{
+	    rs1 = utermattrset(fd,TCSADRAIN,&attrs) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	return rs ;
+} /* end method (subinfo::attrend) */
 
 
