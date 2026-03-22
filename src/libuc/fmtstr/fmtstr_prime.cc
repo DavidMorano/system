@@ -112,8 +112,6 @@ import fmtobj ;
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -147,7 +145,7 @@ int fmtstr(char *ubuf,int ulen,int fm,cchar *fmt,va_list ap) noex {
 		fmtobj	fo(ubuf,ulen,fm,fmt) ;
 		rs = fo(ap) ;
 		len = rs ;
-	    }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
