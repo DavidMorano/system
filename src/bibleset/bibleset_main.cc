@@ -36,13 +36,14 @@
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
 #include	<ascii.h>
+#include	<cfdec.h>
 #include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -77,10 +78,6 @@ extern int	sfskipwhite(cchar *,int,cchar **) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecf(cchar *,int,double *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
@@ -1676,7 +1673,7 @@ static int loadvzlw(PI *pip,cchar *ap,int al)
 	        cp = (tp + 1) ;
 	        cl = ((sp + sl) - (tp + 1)) ;
 	        if (cl > 0) {
-	            rs = cfdecf(cp,cl,&percent) ;
+	            rs = cfdecd(cp,cl,&percent) ;
 		}
 
 	        sl = (tp - sp) ;
