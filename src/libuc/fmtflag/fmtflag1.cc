@@ -45,7 +45,7 @@ module ;
 
 module fmtflag ;
 
-template<typename T> bool bitn(T v,int n) noex {
+template<typename T> local bool bitn(T v,int n) noex {
     	return bool((v >> n) & 1) ;
 } /* end subroutine-template (bitn) */
 
