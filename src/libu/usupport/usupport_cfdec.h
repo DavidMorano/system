@@ -1,6 +1,6 @@
 /* usupport_cfdec HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
@@ -10,6 +10,7 @@
 
 #ifndef	USUPPORTCFEC_INCLUDE
 #define	USUPPORTCFEC_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -21,8 +22,6 @@
 #include	<stdintx.h>
 
 
-#ifdef	__cplusplus
-
 namespace libu {
     extern int cfdec(cchar *,int,int *) noex ;
     extern int cfdec(cchar *,int,long *) noex ;
@@ -30,11 +29,10 @@ namespace libu {
     extern int cfdec(cchar *,int,uint *) noex ;
     extern int cfdec(cchar *,int,ulong *) noex ;
     extern int cfdec(cchar *,int,ulonglong *) noex ;
-}
+} /* end namespace (libu) */
+
 
 #endif /* __cplusplus */
-
-
 #endif /* USUPPORTCFEC_INCLUDE */
 
 
