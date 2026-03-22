@@ -44,7 +44,7 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |COLUMNS| */
 
 module libutil ;
 
@@ -106,5 +106,18 @@ int memclearer(void *op,int sz) noex {
 	}
 	return i ;
     } /* end subroutine (loadstrs) */
+
+int lenstrline(cchar *sp,int sl,int ll) noex {
+    	int	rl = -1 ; /* return-value */
+	if (sp) {
+	    rl = 0 ;
+	    if (ll < 0) ll = COLUMNS ;
+	    if (sl < 0) sl = INT_MAX ;
+	    while ((rl < sl) && (rl < ll) && *sp) {
+		rl += 1 ;
+	    } /* end while */
+	} /* end if (non-null) */
+	return rl ;
+} /* end subroutine (lenstrline) */
 
 
