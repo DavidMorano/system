@@ -1,4 +1,4 @@
-/* uatx SUPPORT */
+/* uatx SUPPORT (UNIX®-At-Xntthing) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -73,8 +73,10 @@ namespace {
     struct uatxer : ufiledescbase {
 	uatxer_m	m ;
 	cchar		*fn ;
+	cchar		*dfn ;
 	int		am ;
 	int		fl ;
+	int		dfd ;
 	uatxer(uatxer_m µm,cchar *n,int a,int f = -1) noex : m(µm), fn(n) { 
 	    am = a ;
 	    fl = f ;
@@ -87,6 +89,7 @@ namespace {
 	    return rs ;
 	} ; /* end method */
 	sysret_t iataccess(int) noex ;
+	sysret_t iatlink(int) noex ;
     } ; /* end struct (uatxer) */
 } /* end namespace */
 
@@ -124,6 +127,22 @@ int u_atperm(int fd,cchar *fn,int am) noex {
     	return u_ataccess(fd,fn,am,fl) ;
 } /* end subroutine (u_atperm) */
 
+int u_atlink(int fd,cchar *fn,int dfd,cchar *dfn,int fl) noex {
+	int		rs = SR_FAULT ;
+	if (fn && dfn) ylikely {
+	    rs = SR_INVALID ;
+	    if (fn[0] && dfn[0]) ylikely {
+		    uatxer fo(&uatxer::iatlink,fn,0,fl) ;
+		    fo.dfd = dfd ;
+		    fo.dfn = dfn ;
+		    fo.fl = fl ;
+		    fo.fdfl.fatcwd = true ;
+		    rs = fo(fd) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (u_atlink) */
+
 
 /* local subroutines */
 
@@ -134,5 +153,13 @@ sysret_t uatxer::iataccess(int fd) noex {
 	}
 	return rs ;
 } /* end method (uatxer::iataccess) */
+
+sysret_t uatxer::iatlink(int fd) noex {
+    	int		rs ;
+	if ((rs = linkat(fd,fn,dfd,dfn,fl)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+} /* end method (uatxer::iatlink) */
 
 
