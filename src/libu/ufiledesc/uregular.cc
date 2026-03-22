@@ -32,8 +32,8 @@
 	u_ftruncate
 	u_ioctl
 	u_lockf
-	u_pread
-	u_pwrite
+	u_readp
+	u_writep
 	u_read
 	u_readv
 	u_tell
@@ -257,8 +257,8 @@ namespace {
 	int ifsyncdata(int) noex ;
 	int iftruncate(int) noex ;
 	int ilockf(int) noex ;
-	int ipread(int) noex ;
-	int ipwrite(int) noex ;
+	int ireadp(int) noex ;
+	int iwritep(int) noex ;
 	int iread(int) noex ;
 	int ireadv(int) noex ;
 	int iwrite(int) noex ;
@@ -321,50 +321,6 @@ int u_nonblock(int fd,int f) noex {
 }
 /* end subroutine (u_nonblock) */
 
-int u_readn(int fd,void *rbuf,int rlen) noex {
-	int		rs = SR_FAULT ;
-	int		rl = 0 ;
-	if (rbuf) {
-	    caddr_t cbuf = caddr_t(rbuf) ;
-	    rs = SR_INVALID ;
-	    if (rlen >= 0) {
-		cauto rd = [&] () -> int {
-		    cint	remlen = (rlen - rl) ;
-		    char	*rb = (cbuf + rl) ;
-		    return u_read(fd,rb,remlen) ;
-		} ; /* end lambda */
-		rs = SR_OK ;
-		while ((rl < rlen) && ((rs = rd()) > 0)) {
-		    rl += rs ;
-		} /* end while */
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (u_readn) */
-
-int u_writen(int fd,cvoid *wbuf,int wlen) noex {
-	int		rs = SR_FAULT ;
-	int		wl = 0 ;
-	if (wbuf) {
-	    const caddr_t	cbuf = caddr_t(wbuf) ;
-	    rs = SR_INVALID ;
-	    if (wlen >= 0) {
-		cauto wr = [&] () -> int {
-		    cint	remlen = (wlen - wl) ;
-		    cchar	*wb = (cbuf + wl) ;
-		    return u_write(fd,wb,remlen) ;
-		} ; /* end lanbda */
-		rs = SR_OK ;
-	        while ((wl < wlen) && ((rs = wr()) > 0)) {
-		    wl += rs ;
-		} /* end while */
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (u_writen) */
-
 int u_fchdir(int fd) noex {
 	int		rs ;
 	repeat {
@@ -417,12 +373,14 @@ int u_fchown(int fd,uid_t uid,gid_t gid) noex {
 /* end subroutine (u_fchown) */
 
 int u_ftimes(int fd,CTIMEVAL *tvp) noex {
-	int		rs ;
-	repeat {
-	    if ((rs = futimes(fd,tvp)) < 0) {
-		rs = (- errno) ;
-	    }
-	} until (rs != SR_INTR) ;
+	int		rs = SR_FAULT ;
+	if (tvp) {
+	    repeat {
+	        if ((rs = futimes(fd,tvp)) < 0) {
+		    rs = (- errno) ;
+	        }
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (u_ftimes) */
@@ -497,7 +455,11 @@ int u_fpathconf(int fd,int name,long *rp) noex {
 /* end subroutine (u_fpathconf) */
 
 int u_fstype(int fd,char *rbuf,int rlen) noex {
-	return ufstype(rbuf,rlen,fd) ;
+    	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    rs = ufstype(rbuf,rlen,fd) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (u_fstype) */
 
@@ -548,43 +510,34 @@ int u_ioctl(int fd,int cmd,...) noex {
 }
 /* end subroutine (u_ioctl) */
 
-int u_lockf(int fd,int cmd,off_t sz) noex {
+namespace libu {
+    int ulockf(int fd,int cmd,off_t sz) noex {
 	uregular	ro(cmd,sz) ;
 	ro.m = &uregular::ilockf ;
 	return ro(fd) ;
-}
-/* end subroutine (u_lockf) */
-
-int u_pread(int fd,void *rbuf,int rlen,off_t off) noex {
+    } /* end subroutine (ulockf) */
+    int ureadp(int fd,void *rbuf,int rlen,off_t off) noex {
 	uregular	ro(rbuf,rlen,off) ;
-	ro.m = &uregular::ipread ;
+	ro.m = &uregular::ireadp ;
 	return ro(fd) ;
-}
-/* end subroutine (u_pread) */
-
-int u_pwrite(int fd,cvoid *wbuf,int wlen,off_t off) noex {
+    } /* end subroutine (ureadp) */
+    int uwritep(int fd,cvoid *wbuf,int wlen,off_t off) noex {
 	uregular	ro(wbuf,wlen,off) ;
-	ro.m = &uregular::ipwrite ;
+	ro.m = &uregular::iwritep ;
 	ro.fdfl.fwrite = true ;
 	return ro(fd) ;
-}
-/* end subroutine (u_pwrite) */
-
-int u_read(int fd,void *rbuf,int rlen) noex {
+    } /* end subroutine (uwritep) */
+    int uread(int fd,void *rbuf,int rlen) noex {
 	uregular	ro(rbuf,rlen) ;
 	ro.m = &uregular::iread ;
 	return ro(fd) ;
-}
-/* end subroutine (u_read) */
-
-int u_readv(int fd,IOVEC *iop,int n) noex {
+    } /* end subroutine (uread) */
+    int ureadv(int fd,IOVEC *iop,int n) noex {
 	uregular	ro(iop,n) ;
 	ro.m = &uregular::ireadv ;
 	return ro(fd) ;
-}
-/* end subroutine (u_readv) */
-
-int u_seeko(int fd,off_t wo,int w,off_t *offp) noex {
+    } /* end subroutine (ureadv) */
+    int useeko(int fd,off_t wo,int w,off_t *offp) noex {
 	off_t		ro ;
 	int		rs ;
 	repeat {
@@ -601,26 +554,19 @@ int u_seeko(int fd,off_t wo,int w,off_t *offp) noex {
 	    rs = intsat(lo) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_seeko) */
-
-int u_write(int fd,cvoid *wbuf,int wlen) noex {
+    } /* end subroutine (useeko) */
+    int uwrite(int fd,cvoid *wbuf,int wlen) noex {
 	uregular	ro(wbuf,wlen) ;
 	ro.m = &uregular::iwrite ;
 	ro.fdfl.fwrite = true ;
 	return ro(fd) ;
-}
-/* end subroutine (u_write) */
-
-int u_writev(int fd,CIOVEC *iop,int n) noex {
+    } /* end subroutine (uwrite) */
+    int uwritev(int fd,CIOVEC *iop,int n) noex {
 	uregular	ro(iop,n) ;
 	ro.m = &uregular::iwritev ;
 	ro.fdfl.fwrite = true ;
 	return ro(fd) ;
-}
-/* end subroutine (u_writev) */
-
-namespace libu {
+    } /* end subroutine (uwritev) */
     int upoll(POLLFD *fds,int n,int mto) noex {
 	uregular	ro(fds,n,mto) ;
 	ro.m = &uregular::ipoll ;
@@ -629,7 +575,62 @@ namespace libu {
     } /* end subroutine (upoll) */
 } /* end namespace (libu) */
 
-/* this is (sort of) a spæcial case */
+int u_lockf(int fd,int cmd,off_t sz) noex {
+    	using libu::ulockf ;
+    	return ulockf(fd,cmd,sz) ;
+}
+int u_readp(int fd,void *rbuf,int rlen,off_t off) noex {
+    	using libu::ureadp ;
+    	int		rs = SR_FAULT ;
+	if (rbuf) {
+    	    rs = ureadp(fd,rbuf,rlen,off) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+int u_writep(int fd,cvoid *wbuf,int wlen,off_t off) noex {
+    	using libu::uwritep ;
+    	int		rs = SR_FAULT ;
+	if (wbuf) {
+    	    rs = uwritep(fd,wbuf,wlen,off) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+int u_read(int fd,void *rbuf,int rlen) noex {
+    	using libu::uread ;
+    	int		rs = SR_FAULT ;
+	if (rbuf) {
+    	    rs = uread(fd,rbuf,rlen) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+int u_readv(int fd,IOVEC *iop,int n) noex {
+    	using libu::ureadv ;
+	int		rs = SR_FAULT ;
+	if (iop) {
+    	    rs = ureadv(fd,iop,n) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+int u_seeko(int fd,off_t wo,int w,off_t *offp) noex {
+    	using libu::useeko ;
+	return useeko(fd,wo,w,offp) ;
+}
+int u_write(int fd,cvoid *wbuf,int wlen) noex {
+    	using libu::uwrite ;
+	int		rs = SR_FAULT ;
+	if (wbuf) {
+    	    rs = uwrite(fd,wbuf,wlen) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+int u_writev(int fd,CIOVEC *iop,int n) noex {
+    	using libu::uwritev ;
+	int		rs = SR_FAULT ;
+	if (iop) {
+	    rs = uwritev(fd,iop,n) ;
+	} /* end if (non-null) */
+	return rs ;
+}
 int u_poll(POLLFD *fds,int n,int mto) noex {
     	using		libu::upoll ;
 	int		rs = SR_FAULT ;
@@ -637,8 +638,53 @@ int u_poll(POLLFD *fds,int n,int mto) noex {
 	    rs = upoll(fds,n,mto) ;
 	} /* end if (non-null) */
 	return rs ;
+} /* end subroutine (u_poll) */
+
+int u_readn(int fd,void *rbuf,int rlen) noex {
+    	using		libu::uread ;
+	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	if (rbuf) {
+	    caddr_t cbuf = caddr_t(rbuf) ;
+	    rs = SR_INVALID ;
+	    if (rlen >= 0) {
+		cauto rd = [&] () -> int {
+		    cint	remlen = (rlen - rl) ;
+		    char	*rb = (cbuf + rl) ;
+		    return uread(fd,rb,remlen) ;
+		} ; /* end lambda */
+		rs = SR_OK ;
+		while ((rl < rlen) && ((rs = rd()) > 0)) {
+		    rl += rs ;
+		} /* end while */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (u_poll) */
+/* end subroutine (u_readn) */
+
+int u_writen(int fd,cvoid *wbuf,int wlen) noex {
+    	using		libu::uwrite ;
+	int		rs = SR_FAULT ;
+	int		wl = 0 ;
+	if (wbuf) {
+	    const caddr_t	cbuf = caddr_t(wbuf) ;
+	    rs = SR_INVALID ;
+	    if (wlen >= 0) {
+		cauto wr = [&] () -> int {
+		    cint	remlen = (wlen - wl) ;
+		    cchar	*wb = (cbuf + wl) ;
+		    return uwrite(fd,wb,remlen) ;
+		} ; /* end lanbda */
+		rs = SR_OK ;
+	        while ((wl < wlen) && ((rs = wr()) > 0)) {
+		    wl += rs ;
+		} /* end while */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? wl : rs ;
+}
+/* end subroutine (u_writen) */
 
 
 /* local subroutines */
@@ -690,7 +736,7 @@ int uregular::ilockf(int fd) noex {
 }
 /* end method (uregular::ilockf) */
 
-int uregular::ipread(int fd) noex {
+int uregular::ireadp(int fd) noex {
 	csize		rsz = size_t(rlen) ;
 	int		rs ;
 	if (ssize_t rsize ; (rsize = pread(fd,rbuf,rsz,sz)) >= 0) {
@@ -700,9 +746,9 @@ int uregular::ipread(int fd) noex {
 	}
 	return rs ;
 }
-/* end method (uregular::ipread) */
+/* end method (uregular::ireadp) */
 
-int uregular::ipwrite(int fd) noex {
+int uregular::iwritep(int fd) noex {
 	csize		wsz = size_t(wlen) ;
 	int		rs ;
 	if (ssize_t rsize ; (rsize = pwrite(fd,wbuf,wsz,sz)) >= 0) {
@@ -712,7 +758,7 @@ int uregular::ipwrite(int fd) noex {
 	}
 	return rs ;
 }
-/* end method (uregular::ipwrite) */
+/* end method (uregular::iwritep) */
 
 int uregular::iread(int fd) noex {
 	csize		rsz = size_t(rlen) ;
