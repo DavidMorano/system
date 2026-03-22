@@ -111,7 +111,7 @@ struct digtaber {
 /* exported variables */
 
 export {
-    constexpr digtaber		digtab ;
+    constexpr digtaber	digtab ;
 }
 
 
