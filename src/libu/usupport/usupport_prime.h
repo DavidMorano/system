@@ -81,9 +81,6 @@ extern libu::ugetustime		getustime ;
 
 #ifdef	__cplusplus
 namespace libu {
-    extern char *strwcpy(char *,cchar *,int = -1) noex ;
-}
-namespace libu {
     extern int ustrftime(char *,int,cchar *,CTM *) noex ;
 }
 #endif /* __cplusplus */
