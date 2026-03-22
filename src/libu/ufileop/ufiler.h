@@ -39,22 +39,6 @@
 #include	<usysbase.h>
 
 
-#ifdef	__cplusplus
-
-namespace ufileop {
-    struct ufileopflags {
-	uint		fintr:1 ;	/* request interrupts to return */
-    } ; /* end struct (ufileopflags) */
-    struct ufileopbase {
-	ufileopflags	f{} ;
-	ufileopbase() noex { } ;
-	int operator () (cchar *) noex ;
-	virtual int callstd(cchar *) noex = 0 ;
-    } ; /* end struct (ufileopbase) */
-}
-
-#endif /* __cplusplus */
-
 EXTERNC_begin
 
 extern int u_access(cchar *,int) noex ;
@@ -65,10 +49,9 @@ extern int u_minmod(cchar *,mode_t) noex ;
 extern int u_chown(cchar *,uid_t,gid_t) noex ;
 extern int u_lchown(cchar *,uid_t,gid_t) noex ;
 extern int u_link(cchar *,cchar *) noex ;
-extern int u_linkat(int,cchar *,int,cchar *,int) noex ;
 extern int u_lstat(cchar *,ustat *) noex ;
-extern int u_mknod(cchar *,mode_t,dev_t) noex ;
 extern int u_mkdir(cchar *,mode_t) noex ;
+extern int u_mknod(cchar *,mode_t,dev_t) noex ;
 extern int u_pathconf(cchar *,int,long *) noex ;
 extern int u_readlink(cchar *,char *,int) noex ;
 extern int u_rename(cchar *,cchar *) noex ;
