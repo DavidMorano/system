@@ -1,6 +1,6 @@
 /* usupport_ctdec HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
@@ -10,6 +10,7 @@
 
 #ifndef	USUPPORTCTDEC_INCLUDE
 #define	USUPPORTCTDEC_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -20,8 +21,6 @@
 #include	<usysbase.h>
 #include	<stdintx.h>
 
-
-#ifdef	__cplusplus
 
 namespace libu {
     extern int ctdecui(char *,int,uint) noex ;
@@ -39,11 +38,10 @@ namespace libu {
     template<> inline int ctdec(char *dp,int dl,ulonglong v) noex {
 	return ctdecull(dp,dl,v) ;
     }
-}
+} /* end namespace (libu) */
+
 
 #endif /* __cplusplus */
-
-
 #endif /* USUPPORTCTDEC_INCLUDE */
 
 
