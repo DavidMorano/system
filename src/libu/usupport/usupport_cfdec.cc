@@ -19,29 +19,10 @@
 /*******************************************************************************
 
 	Name:
-	msleep
+	cfdec
 
 	Description:
-	This subroutine sleeps for some number of milliseconds.
-
-	Synopsis:
-	int msleep(int msec) noex
-
-	Arguments:
-	msec		number of millisecond to sleep
-
-	Returns:
-	>=0		amount of data returned
-	<0		error (system-return)
-
-
-	Name:
-	umtime
-
-	Description:
-	This is sort of like |time(2)| but returns milliseconds
-	rather than seconds.  Unlike |time(2)|, this subroutine
-	takes no arguments.
+	Convert from a decimal representation to its binary integer.
 
 *******************************************************************************/
 
@@ -95,7 +76,7 @@
 
 namespace libu {
     template<typename T>
-    static int cfdecx(T (*cfx)(cc *,char **,int),cc *sp,int sl,T *rp) noex {
+    local int cfdecx(T (*cfx)(cc *,char **,int),cc *sp,int sl,T *rp) noex {
 	[[maybe_unused]] char	*endp{} ; /* <- unused */
 	cint		b = CFBASE ;	/* conversion number base */
 	int		rs = SR_FAULT ;
