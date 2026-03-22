@@ -19,29 +19,10 @@
 /*******************************************************************************
 
 	Name:
-	msleep
+	ctdec
 
 	Description:
-	This subroutine sleeps for some number of milliseconds.
-
-	Synopsis:
-	int msleep(int msec) noex
-
-	Arguments:
-	msec		number of millisecond to sleep
-
-	Returns:
-	>=0		amount of data returned
-	<0		error (system-return)
-
-
-	Name:
-	umtime
-
-	Description:
-	This is sort of like |time(2)| but returns milliseconds
-	rather than seconds.  Unlike |time(2)|, this subroutine
-	takes no arguments.
+	Convert a binary integer to its decimal representation.
 
 *******************************************************************************/
 
@@ -95,7 +76,7 @@ using libu::sncpy ;
 
 namespace libu {
     template<typename T>
-    static int ctdecx(charp (*ctx)(T,char *),char *dp,int dl,T uv) noex {
+    local int ctdecx(charp (*ctx)(T,char *),char *dp,int dl,T uv) noex {
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    cint	dlen = DECBUFLEN ;
@@ -104,7 +85,7 @@ namespace libu {
 	    rs = sncpy(dp,dl,bp) ;
 	}
 	return rs ;
-    }
+    } /* end subroutine-template (ctdecx) */
     int ctdecui(char *dp,int dl,uint uv) noex {
 	return ctdecx(uitostr,dp,dl,uv) ;
     }
