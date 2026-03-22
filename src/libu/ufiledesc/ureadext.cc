@@ -48,6 +48,7 @@
 #include	<intsat.h>
 #include	<localmisc.h>
 
+#include	"ufiledescbase.hh"
 #include	"ureadext.h"
 
 
@@ -59,6 +60,7 @@
 
 /* imported namespaces */
 
+using libu::ufiledescbase ;		/* type */
 using std::min ;			/* subroutine */
 using std::max ;			/* subroutine */
 using std::sat_add ;			/* subroutine */
