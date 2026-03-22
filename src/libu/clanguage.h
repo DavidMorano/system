@@ -184,6 +184,14 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
+#ifndef	ordering_strong
+#define	ordering_strong		strong_ordering
+#define	ordering_weak		weak_ordering
+#define	ordering_partial	partial_ordering
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 #ifndef	assert_contract
 #define	assert_contract		contract_assert
 #define	assert_static		static_assert
