@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= ustream_prime.o 
+OBJ0= ustream_prime.o ustream_printf.o
 OBJ1= ustream_writers.o 
 OBJ2= ustream_obj.o
 OBJ3=
@@ -143,6 +143,7 @@ obj.o:			$(OBJ)
 
 
 ustream_prime.o:	ustream_prime.cc		$(INCS)
+ustream_printf.o:	ustream_printf.cc		$(INCS)
 ustream_writers.o:	ustream_writers.cc		$(INCS)
 ustream_obj.o:		ustream_obj.cc			$(INCS)
 
