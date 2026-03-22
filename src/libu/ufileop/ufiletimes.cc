@@ -41,10 +41,13 @@
 #include	<sys/time.h>		/* |utimes(2)| */
 #include	<utime.h>		/* |utime(2)| */
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>
 
+#include	"ufileopbase.hh"
 #include	"ufiletimes.h"
 
 
@@ -52,6 +55,8 @@
 
 
 /* local namespaces */
+
+using libu::ufileopbase ;		/* type */
 
 
 /* local typedefs */
@@ -64,6 +69,28 @@
 
 
 /* local structures */
+
+namespace {
+    struct ufiletimer ;
+    typedef int (ufiletimer::*ufiletimer_m)(cchar *) noex ;
+    struct ufiletimer : ufileopbase {
+	CUTIMBUF *utp ;
+	CTIMEVAL *tvp ;
+	ufiletimer_m	m = nullptr ;
+	ufiletimer() noex { } ;
+	ufiletimer(CTIMEVAL *v) noex : tvp(v) { } ;
+	ufiletimer(CUTIMBUF *u) noex : utp(u) { } ;
+	int callstd(cchar *fn) noex override {
+	    int		rs = SR_BUGCHECK ;
+	    if (m) {
+		rs = (this->*m)(fn) ;
+	    }
+	    return rs ;
+	} ;
+	sysret_t i_filetime(cchar *) noex ;
+	sysret_t i_filetimes(cchar *) noex ;
+    } ; /* end struct (ufiletimer) */
+} /* end namespace */
 
 
 /* forward references */
@@ -78,31 +105,38 @@
 /* exported subroutines */
 
 int u_filetime(cchar *fname,CUTIMBUF *utp) noex {
-	int		rs = SR_FAULT ;
-	if (fname && utp) {
-	    rs = SR_OK ;
-	    repeat {
-	        if (utime(fname,utp) < 0) {
-		    rs = (- errno) ;
-		}
-	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (u_filetime) */
+    	ufiletimer fo(utp) ;
+	fo.m = &ufiletimer::i_filetime ;
+	return fo(fname) ;
+} /* end subroutine (u_filetime) */
 
 int u_filetimes(cchar *fname,CTIMEVAL *tvp) noex {
+    	ufiletimer fo(tvp) ;
+	fo.m = &ufiletimer::i_filetimes ;
+	return fo(fname) ;
+} /* end subroutine (u_filetimes) */
+
+
+/* local subroutines */
+
+sysret_t ufiletimer::i_filetime(cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fname && tvp) {
-	    rs = SR_OK ;
-	    repeat {
-	        if (utimes(fname,tvp) < 0) {
-		    rs = (- errno) ;
-		}
-	    } until (rs != SR_INTR) ;
+	if (utp) {
+	    if ((rs = utime(fname,utp)) < 0) {
+		rs = (- errno) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_filetimes) */
+} /* end method (ufiletimer::i_filetime) */
+
+sysret_t ufiletimer::i_filetimes(cchar *fname) noex {
+	int		rs = SR_FAULT ;
+	if (tvp) {
+	    if ((rs = utimes(fname,tvp)) < 0) {
+		rs = (- errno) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (ufiletimer::i_filetimes) */
 
 
