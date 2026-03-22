@@ -85,6 +85,9 @@
 #include	<strtox.h>
 #include	<baops.h>
 
+#include	<ccfile.hh>
+#include	<readln.hh>
+
 
 #endif /* USYSCALLS_INCLUDE */
 
