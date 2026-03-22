@@ -88,13 +88,13 @@ namespace {
 
 /* local variables */
 
-constexpr fmtproc_m	mems[] = {
+constexpr fmtproc_m	fmtmems[] = {
 	&fmtproc::leader,
 	&fmtproc::widther,
 	&fmtproc::precer,
 	&fmtproc::moder,
 	&fmtproc::coder
-} ;
+} ; /* end array */
 
 constexpr cshort	ten = short(10) ;
 
@@ -127,7 +127,7 @@ int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
 
 int fmtproc::operator () (va_list ap) noex {
 	int		rs = SR_OK ;
-	for (auto m : mems) {
+	for (auto m : fmtmems) {
 	    rs = (this->*m)(ap) ;
 	    if (rs < 0) break ;
 	} /* end for */
