@@ -68,6 +68,15 @@ export {
     constexpr inline bool	isdiglatin(int ch) noex {
 	    return (ch >= '0') && (ch <= '9') ;
     }
+    constexpr inline bool	isoctallatin(int ch) noex {
+	    return (ch >= '0') && (ch <= '7') ;
+    }
+    constexpr inline bool	isbinarlatin(int ch) noex {
+	    return (ch >= '0') && (ch <= '7') ;
+    }
+    constexpr inline bool	isbinlatin(int ch) noex {
+	    return (ch >= '0') && (ch <= '1') ;
+    }
     constexpr inline bool	isoctlatin(int ch) noex {
 	    return (ch >= '0') && (ch <= '7') ;
     }
@@ -79,6 +88,18 @@ export {
     }
     constexpr inline bool	isnumlatin(int ch) noex {
     	    return isdigexlatin(ch) || (ch == '\\') || (ch == 'x') ;
+    }
+    constexpr inline bool	iswhtlatin(int ch) noex {
+    	    return iswhitelatin(ch) ;
+    }
+    constexpr inline bool	isblklatin(int ch) noex {
+    	    return isblanklatin(ch) ;
+    }
+    constexpr inline bool	iswht(int ch) noex {
+    	    return iswhitelatin(ch) ;
+    }
+    constexpr inline bool	isblk(int ch) noex {
+    	    return isblanklatin(ch) ;
     }
     constexpr inline bool	iseol(int ch) noex {
 	    return (ch == '\n') || (ch == '\r') ;
