@@ -118,6 +118,13 @@ typedef decltype(std::nothrow)	nothrow_t ;
 #endif /* __cplusplus */
 #endif /* TYPEDEF_NOTHROWT */
 
+/* aliases for sysem types */
+
+#ifndef	TYPEDEF_FDSET
+#define	TYPEDEF_FDSET
+typedef fd_set			fdset ;
+#endif
+
 /* handle some really brain-damaged systems -- like MacOS-X Darwin®! */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 #if	defined(OSNUM) && (OSNUM <= 7)
@@ -614,6 +621,11 @@ typedef const dev_t		cdev ;
 #ifndef	TYPEDEF_CINO
 #define	TYPEDEF_CINO
 typedef const ino_t		cino ;
+#endif
+
+#ifndef	TYPEDEF_CFDSET
+#define	TYPEDEF_CFDSET
+typedef const fd_set		cfdset ;
 #endif
 
 #ifndef	TYPEDEF_VOIDF
