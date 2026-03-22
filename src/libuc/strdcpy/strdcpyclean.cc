@@ -69,7 +69,7 @@
 
 /* forward references */
 
-static bool	isour(int) noex ;
+local bool	isour(int) noex ;
 
 
 /* exported variables */
@@ -81,15 +81,14 @@ char *strdcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 	char		*rp = nullptr ; /* return-value */
 	if (dbuf && sp) {
 	    int		dl = 0 ; /* used-afterwards */
-	    while (dlen-- && sl-- && *sp) {
-	        cint ch = mkchar(*sp) ;
+	    for (int ch ; dlen-- && sl-- && ((ch = mkchar(*sp))) ; ) {
 	        if (isour(ch)) {
 		    dbuf[dl++] = char(ch) ;
-	        } else if (sch != 0) {
+	        } else if (sch) {
 		    dbuf[dl++] = char(sch) ;
 	        }
 	        sp += 1 ;
-	    } /* end while */
+	    } /* end for */
 	    dbuf[dl] = '\0' ;
 	    rp = (dbuf + dl) ;
 	} /* end if (non-null) */
@@ -100,7 +99,7 @@ char *strdcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static bool isour(int ch) noex {
+local bool isour(int ch) noex {
 	bool		f = false ;
 	f = f || isprintlatin(ch) ;
 	f = f || (ch == CH_NL) ;
