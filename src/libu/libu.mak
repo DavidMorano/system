@@ -70,9 +70,9 @@ OBJ17= ptx.o uacceptpass.o
 OBJ18= timeval.o itimerval.o clockids.o
 OBJ19= timespec.o itimerspec.o
 
-OBJ20= uinet.o bitgrp.o
+OBJ20= uinet.o ustream.o
 OBJ21= strnul.o intx.o chrset.o stdclib.o
-OBJ22= ugetloadavg.o uiconv.o
+OBJ22= ugetloadavg.o uiconv.o bitgrp.o
 OBJ23= syscontain.o stdfnames.o
 
 OBJ24= posixdirent.o nulstr.o
@@ -83,7 +83,7 @@ OBJ27= ucomposite.o
 OBJ28= findbit.o ccfile.o readln.o
 OBJ29= itimers.o filetypes.o
 OBJ30= binchunk.o
-OBJ31=
+OBJ31= dprintf.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -92,7 +92,7 @@ OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
-OBJH= obj28.o obj29.o obj30.o
+OBJH= obj28.o obj29.o obj30.o obj31.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o
 
@@ -506,13 +506,13 @@ strnul.o:		strnul.cc strnul.hh		$(INCS)
 # misc-groups
 baops.o:		baops.c		baops.h		$(INCS)
 
-stdclib.o:		stdclib.cc	stdclib.hh	$(INCS)
-
 # MODULES
 findbit.o:		findbit.ccm			$(INCS)
 
 # MISC
+stdclib.o:		stdclib.cc	stdclib.hh	$(INCS)
 ccfile.o:		ccfile.cc	ccfile.hh	$(INCS)
 readln.o:		readln.cc	readln.hh	$(INCS)
+dprintf.o:		dprintf.cc	dprintf.hh	$(INCS)
 
 
