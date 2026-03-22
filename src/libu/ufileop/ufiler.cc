@@ -31,6 +31,7 @@
 	u_access
 	u_chdir
 	u_chmod
+	u_chmodmin
 	u_minmod
 	u_chown
 	u_lchown
@@ -105,18 +106,18 @@
 #include	<intsat.h>
 #include	<localmisc.h>
 
-#include	"ufileop.h"
+#include	"ufiler.h"
 
-import ulibvals ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import ulibvals ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using namespace	ufileop ;		/* namespace */
-
-using std::nullptr_t ;			/* type */
+using libu::ufileopbase ;		/* type */
 
 
 /* local typedefs */
@@ -125,7 +126,7 @@ using std::nullptr_t ;			/* type */
 /* external subroutines */
 
 extern "C" {
-    extern int	rename(cchar *,cchar *) noex ;
+    extern unixret_t rename(cchar *,cchar *) noex ;
 }
 
 
@@ -184,7 +185,7 @@ namespace {
 
 /* forward references */
 
-static int getrlen(int rlen) noex {
+local int getrlen(int rlen) noex {
 	int		rs ;
 	if ((rs = rlen) < 0) {
 	    rs = ulibval.maxpathlen ;
@@ -192,7 +193,7 @@ static int getrlen(int rlen) noex {
 	return rs ;
 } /* end subroutine (getrlen) */
 
-static sysret_t	std_resolvepath(cchar *,char *,int) noex ;
+local sysret_t	std_resolvepath(cchar *,char *,int) noex ;
 
 
 /* local variables */
@@ -207,9 +208,9 @@ constexpr bool		f_sunos = F_SUNOS ;
 
 int u_access(cchar *fname,int am) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = access(fname,am)) < 0) {
 		        rs = (- errno) ;
@@ -223,9 +224,9 @@ int u_access(cchar *fname,int am) noex {
 
 int u_chdir(cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = chdir(fname)) < 0) {
 		        rs = (- errno) ;
@@ -239,9 +240,9 @@ int u_chdir(cchar *fname) noex {
 
 int u_chmod(cchar *fname,mode_t m) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        m &= (~ S_IFMT) ;
 	        repeat {
 	            if ((rs = chmod(fname,m)) < 0) {
@@ -254,13 +255,13 @@ int u_chmod(cchar *fname,mode_t m) noex {
 }
 /* end subroutine (u_chmod) */
 
-int u_minmod(cchar *name,mode_t m) noex {
+int u_chmodmin(cchar *name,mode_t m) noex {
 	int		rs = SR_FAULT ;
 	int		fchanged = false ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
-	        if (ustat sb ; (rs = u_stat(name,&sb)) >= 0) {
+	    if (name[0]) ylikely {
+	        if (ustat sb ; (rs = u_stat(name,&sb)) >= 0) ylikely {
 	            cmode	om = (sb.st_mode & (~ S_IFMT)) ;
 	            cmode	nm = (m & (~ S_IFMT)) ;
 	            if ((om & nm) != nm) {
@@ -272,13 +273,18 @@ int u_minmod(cchar *name,mode_t m) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? fchanged : rs ;
 }
+/* end subroutine (u_chmodmin) */
+
+int u_minmod(cchar *name,mode_t m) noex {
+    	return u_chmodmin(name,m) ;
+}
 /* end subroutine (u_minmod) */
 
 int u_chown(cchar *fname,uid_t uid,gid_t gid) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = chown(fname,uid,gid)) < 0) {
 		        rs = (- errno) ;
@@ -303,9 +309,9 @@ int u_lchown(cchar *fname,uid_t uid,gid_t gid) noex {
 
 int u_link(cchar *fname,cchar *dst) noex {
 	int		rs = SR_FAULT ;
-	if (fname && dst) {
+	if (fname && dst) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0] && dst[0]) {
+	    if (fname[0] && dst[0]) ylikely {
 	        repeat {
 	            if ((rs = link(fname,dst)) < 0) {
 		        rs = (- errno) ;
@@ -319,9 +325,9 @@ int u_link(cchar *fname,cchar *dst) noex {
 
 int u_lstat(cchar *fname,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
-	if (fname && sbp) {
+	if (fname && sbp) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = lstat(fname,sbp)) < 0) {
 		        rs = (- errno) ;
@@ -350,9 +356,9 @@ int u_mknod(cchar *fn,mode_t fm,dev_t dev) noex {
 int u_pathconf(cchar *fn,int name,long *rp) noex {
 	int		rs = SR_FAULT ;
         long            lw = 0 ;
-	if (fn) {
+	if (fn) ylikely {
             rs = SR_INVALID ;
-            if (fn[0] && (name >= 0)) {
+            if (fn[0] && (name >= 0)) ylikely {
                 rs = SR_OK ;
                 errno = 0 ;
                 if ((lw = pathconf(fn,name)) < 0) {
@@ -377,10 +383,10 @@ int u_pathconf(cchar *fn,int name,long *rp) noex {
 
 int u_readlink(cchar *fname,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (fname && rbuf) {
+	if (fname && rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	        if ((rs = getrlen(rlen)) >= 0) {
+	    if (fname[0]) ylikely {
+	        if ((rs = getrlen(rlen)) >= 0) ylikely {
 		    cauto rl = readlink ;
 	            repeat {
 	                if (ssize_t rsize ; (rsize = rl(fname,rbuf,rlen)) < 0) {
@@ -410,10 +416,10 @@ int u_rename(cchar *fn,cchar *dfn) noex {
 
 int u_resolvepath(cchar *fname,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (fname && rbuf) {
+	if (fname && rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	        if ((rs = getrlen(rlen)) >= 0) {
+	    if (fname[0]) ylikely {
+	        if ((rs = getrlen(rlen)) >= 0) ylikely {
 	            ufiler	fo(rbuf,rs) ;
 	            fo.m = &ufiler::iresolvepath ;
 	            rs = fo(fname) ;
@@ -433,9 +439,9 @@ int u_rmdir(cchar *fn) noex {
 
 int u_stat(cchar *fname,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = statfile(fname,sbp)) < 0) {
 		        rs = (- errno) ;
@@ -449,9 +455,9 @@ int u_stat(cchar *fname,ustat *sbp) noex {
 
 int u_statfs(cchar *fname,ustatfs *sbp) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = statfilefs(fname,sbp)) < 0) {
 		        rs = (- errno) ;
@@ -465,9 +471,9 @@ int u_statfs(cchar *fname,ustatfs *sbp) noex {
 
 int u_statvfs(cchar *fname,ustatvfs *sbp) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = statfilevfs(fname,sbp)) < 0) {
 		        rs = (- errno) ;
@@ -504,9 +510,9 @@ int u_truncate(cchar *fname,off_t fo) noex {
 
 int u_unlink(cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = unlink(fname)) < 0) {
 		        rs = (- errno) ;
@@ -522,22 +528,22 @@ int u_xattrget(cc *fn,cc *n,void *v,size_t sz,uint32_t foff,int o) noex {
 	ufiler		fo(n,v,sz,foff,o) ;
 	fo.m = &ufiler::ixattrget ;
 	return fo(fn) ;
-}
+} /* end subroutine (u_xattrget) */
 
 int u_xattrset(cc *fn,cc *n,cvoid *v,size_t sz,uint32_t foff,int o) noex {
 	ufiler		fo(n,v,sz,foff,o) ;
 	fo.m = &ufiler::ixattrset ;
 	return fo(fn) ;
-}
+} /* end subroutine (u_xattrset) */
 
 
 /* local subroutines */
 
 int ufiler::imkdir(cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        if ((rs = mkdir(fname,fm)) < 0) {
 	            rs = (- errno) ;
 	        }
@@ -609,12 +615,12 @@ int ufiler::ixattrset(cchar *fn) noex {
 }
 /* end method (ufiler::ixattrset) */
 
-static sysret_t std_resolvepath(cchar *fn,char *rbuf,int rlen) noex {
+local sysret_t std_resolvepath(cchar *fn,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (fn && rbuf) {
+	if (fn && rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (fn[0]) {
+	    if (fn[0]) ylikely {
 		csize	rsize = size_t(rlen) ;
 	        repeat {
 	            if ((rs = resolvepath(fn,rbuf,rsize)) >= 0) {
