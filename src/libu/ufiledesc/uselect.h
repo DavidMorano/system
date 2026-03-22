@@ -31,13 +31,12 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/select.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
 
 EXTERNC_begin
 
-extern int u_select	(int,fd_set *,fd_set *,fd_set *) noex ;
+extern int u_select	(int,fdset *,fdset *,fdset *) noex ;
 
 EXTERNC_end
 
