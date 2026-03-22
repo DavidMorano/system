@@ -80,7 +80,7 @@ OBJ07_INIT=
 
 OBJ00= debug.o matxstr.o toxc.o char.o 
 OBJ01= strn.o strnxcmp.o
-OBJ02= snwcpy.o strdcpy.o
+OBJ02= snwcpy.o strcpyx.o strdcpy.o
 OBJ03= strw.o strx.o mnw.o
 
 OBJ04= isx.o
@@ -103,7 +103,7 @@ OBJ17 = wsix.o wsnx.o wsfx.o
 OBJ18 = 
 OBJ19 = 
 
-OBJ20= hdb.o hdbstr.o ccfile.o
+OBJ20= hdb.o hdbstr.o
 OBJ21=
 OBJ22=
 OBJ23=
@@ -636,6 +636,11 @@ strxcmp.o:		strxcmp.dir
 strxcmp.dir:
 	makesubdir $@
 
+# STRCPYX
+strcpyx.o:		strcpyx.dir
+strcpyx.dir:
+	makesubdir $@
+
 # STRX
 strx.o:			strx.dir
 strx.dir:
@@ -951,7 +956,6 @@ csem.o:			csem.cc		csem.h			$(INCS)
 pwcache.o:		pwcache.cc	pwcache.h		$(INCS)
 lockrw.o:		lockrw.cc	lockrw.h		$(INCS)
 nodedb.o:		nodedb.cc	nodedb.h		$(INCS)
-ccfile.o:		ccfile.cc	ccfile.hh		$(INCS)
 thrcomm.o:		thrcomm.cc	thrcomm.h		$(INCS)
 thrbase.o:		thrbase.cc	thrbase.h thrcomm.h	$(INCS)
 pwentry.o:		pwentry.cc	pwentry.h		$(INCS)
@@ -1074,7 +1078,6 @@ matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 digval.o:		digval.cc digval.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
-readln.o:		readln.cc readln.hh
 strwcmp.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 sysnoise.o:		sysnoise.cc sysnoise.h
