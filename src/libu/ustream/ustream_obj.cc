@@ -92,8 +92,8 @@ using ustream_ns::ustream_writezero ;
 
 /* exported subroutines */
 
-int ustream::iwrite(cvoid *abuf,int alen,int to) noex {
-	return ustream_write(this,abuf,alen,to) ;
+int ustream::iwrite(cvoid *abuf,int alen) noex {
+	return ustream_write(this,abuf,alen) ;
 } /* end method (ustream::iwrite) */
 
 int ustream::iclose() noex {
@@ -136,10 +136,10 @@ int ustream::readlns(char *lbuf,int llen,int to,int *lcp) noex {
 	return rs ;
 } /* end method (ustream::readlns) */
 
-int ustream::write(cvoid *abuf,int alen,int to) noex {
+int ustream::write(cvoid *abuf,int alen) noex {
 	int		rs ;
 	if ((rs = magic(abuf)) >= 0) ylikely {
-	    rs = ustream_write(this,abuf,alen,to) ;
+	    rs = ustream_write(this,abuf,alen) ;
 	}
 	return rs ;
 } /* end method (ustream::write) */
