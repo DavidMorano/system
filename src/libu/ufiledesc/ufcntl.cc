@@ -64,7 +64,7 @@
 
 #include	<usys.h>
 
-#include	"ufiledesebase.hh"
+#include	"ufiledescbase.hh"
 #include	"ufcntl.h"
 
 
@@ -124,8 +124,7 @@ local sysret_t	try_fcntl(int,int,uintptr_t) noex ;
 
 /* exported subroutines */
 
-namespace libu {
-    int ufcntl(int fd,int cmd,...) noex {
+int u_fcntl(int fd,int cmd,...) noex {
 	va_list		ap ;
 	int		rs = SR_BADF ;
 	if (fd >= 0) {
@@ -144,8 +143,7 @@ namespace libu {
 	    } /* end if (plausible-command) */
 	} /* end if (good-FD) */
 	return rs ;
-    } /* end subroutine (ufcntl) */
-} /* end namespace (libu) */
+} /* end subroutine (ufcntl) */
 
 
 /* local subroutines */
