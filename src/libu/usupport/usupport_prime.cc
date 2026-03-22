@@ -129,18 +129,6 @@ int msleep(int msec) noex {
 /* end subroutine (msleep) */
 
 namespace libu {
-    char *strwcpy(char *dp,cchar *sp,int sl) noex {
-	if (sl >= 0) {
-	    while (sl-- && *sp) *dp++ = *sp++ ;
-	    *dp = '\0' ;
-	} else {
-	    dp = stpcpy(dp,sp) ;
-	} /* end if */
-	return dp ;
-    }
-} /* end namespace (libu) */
-
-namespace libu {
     sysret_t ustrftime(char *dbuf,int dlen,cchar *fmt,CTM *tmp) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && fmt && tmp) {
