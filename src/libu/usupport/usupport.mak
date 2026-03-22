@@ -43,18 +43,21 @@ LIBS +=
 OBJ0= usupport_prime.o usupport_sncpyx.o
 OBJ1= usupport_itimer.o usupport_hasx.o
 OBJ2= usupport_cfdec.o usupport_ctdec.o
-OBJ3= usupport_snwcpy.o
+OBJ3= usupport_snwcpy.o usupport_strwcpy.o
+OBJ4= usupport_toxc.o usupport_nleadstr.o
+OBJ5= usupport_matstr.o usupport_rmx.o
+OBJ6=
+OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB=
+OBJB= obj4.o obj5.o
 
-OBJ= obja.o
+OBJ= obja.o objb.o
 
 
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -156,5 +159,10 @@ usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.h	$(INCS)
 usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.h		$(INCS)
 usupport_ctdec.o:	usupport_ctdec.cc	usupport_ctdec.h	$(INCS)
 usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.h	$(INCS)
+usupport_matstr.o:	usupport_matstr.cc	usupport_matstr.h	$(INCS)
+usupport_nleadstr.o:	usupport_nleadstr.cc	usupport_nleadstr.h	$(INCS)
+usupport_toxc.o:	usupport_toxc.cc	usupport_toxc.h		$(INCS)
+usupport_rmx.o:		usupport_rmx.cc		usupport_rmx.h		$(INCS)
+usupport_strwcpy.o:	usupport_strwcpy.cc	usupport_strwcpy.h	$(INCS)
 
 
