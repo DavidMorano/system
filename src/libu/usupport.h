@@ -39,6 +39,9 @@
 #include	<usupport_cfdec.h>
 #include	<usupport_snwcpy.h>
 #include	<usupport_project.h>
+#include	<usupport_matstr.h>
+#include	<usupport_rmx.h>
+#include	<usupport_strwcpy.h>
 
 
 #endif /* USUPPORT_INCLUDE */
