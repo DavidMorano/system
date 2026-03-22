@@ -33,7 +33,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usysnative.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
 
