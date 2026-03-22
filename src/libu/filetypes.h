@@ -111,6 +111,8 @@ local inline filetypes filetype(mode_t m) noex {
 
 EXTERNC_end
 
+extern cpcchar		filetypes_names[] ;
+
 
 #endif /* FILETYPES_INCLUDE */
 
