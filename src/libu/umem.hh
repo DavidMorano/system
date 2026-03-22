@@ -36,6 +36,9 @@ namespace libu {
         int call(int,int,void *) noex ;
         int rall(void *,int,void *) noex ;
         int free(void *) noex ;
+	int ml(cchar **) noex ;
+	int mn(cchar **) noex ;
+	int mp(cchar **) noex ;
         int rsfree(int,void *) noex ;
         int malloc(int,void *) noex ;
     } ; /* end struct (umems) */
