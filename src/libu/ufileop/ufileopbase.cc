@@ -18,7 +18,8 @@
 
 /*******************************************************************************
 
-	Names:
+	Object:
+	ufileopbase
 
 	Description:
 	UNIX® File-Descriptor system calls.
@@ -29,15 +30,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<usupport.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
-#include	"ufileop.h"
+#include	"ufileopbase.hh"
 
 
 /* local defines */
@@ -45,7 +44,7 @@
 
 /* imported namespaces */
 
-using namespace	ufileop ;		/* namespace */
+using libu::ufileopbase ;		/* type */
 
 
 /* local typedefs */
@@ -71,7 +70,7 @@ using namespace	ufileop ;		/* namespace */
 
 /* exported subroutines */
 
-namespace ufileop {
+namespace libu {
     int ufileopbase::operator () (cchar *fname) noex {
 	int		rs = SR_BADF ;
 	if (fname) ylikely {
@@ -130,7 +129,7 @@ namespace ufileop {
 			    r(false) ;
 		            break ;
                         case SR_INTR:
-			    if (! f.fintr) {
+			    if (! fl.fintr) {
 			        r(false) ;
 		            }
                             break ;
@@ -142,6 +141,6 @@ namespace ufileop {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (ufileopbase::operator) */
-} /* end namespace (ufileop) */
+} /* end namespace (libu) */
 
 
