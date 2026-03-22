@@ -70,11 +70,10 @@ how this messed-up envronment works on Darwin.
 On (the messed-up) Darwin OS, if we define the preprocessor symbol
 '_XOPEN_SOURCE' to anything at all (rather than a blank definition)
 we get all hell breaking loose with many other declarions being
-missing (for whatever messed-up reaoson).  So we instead are
-careful to NOT define with any sort of value.
-Long live the messed-up Darwin OS!
-Oh, and thanks so much for making me take hours to figure out
-how this messed-up system works on Darwin.
+missing (for whatever messed-up reaoson).  So we instead are careful
+to NOT define with any sort of value.  Long live the messed-up
+Darwin OS!  Oh, and thanks so much for making me take hours to
+figure out how this messed-up system works on Darwin.
 ****/
 
 #ifdef	COMMENT /* messed-up brain-damaged Darwin */
@@ -85,20 +84,26 @@ how this messed-up system works on Darwin.
 
 /****
 On Apple-Darwin the following ("_XOPEN_SOURCE") *must* be defined
-in order to get some of the stuff that we want.  Some of these are
-the one-time POSIX 'ucontext' subroutines and the |ucontext_t| type.
+in order to get some of the stuff that we want.  But there are
+severe problems if a value is given to this variable.  Any value
+seems to exclude some (or many) subroutines that we want.  So do
+*not* give a value to the definition!
 ****/
 
 #ifndef	_XOPEN_SOURCE
-#define	_XOPEN_SOURCE
+#define	_XOPEN_SOURCE			/* per requirement -- no value */
 #endif
 
 #ifndef	_DARWIN_C_SOURCE
-#define	_DARWIN_C_SOURCE
+#define	_DARWIN_C_SOURCE		1
 #endif
 
 #ifndef	_DARWIN_UNLIMITED_GETGROUPS
-#define	_DARWIN_UNLIMITED_GETGROUPS
+#define	_DARWIN_UNLIMITED_GETGROUPS	1
+#endif
+
+#ifndef	_DARWIN_UNLIMITED_SELECT
+#define	_DARWIN_UNLIMITED_SELECT	1
 #endif
 
 #ifndef	_REENTRANT
