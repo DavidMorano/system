@@ -54,7 +54,7 @@ OBJPART03= libutil-loadstrs.o libutil-memclear.o
 OBJPART04= libutil-memcopy.o libutil-memcpy.o
 OBJPART05= libutil-resumelife.o libutil-stpcpy.o
 OBJPART06= libutil-strcopy.o libutil-strcpy.o
-OBJPART07= 
+OBJPART07=
 
 OBJPARTA= objpart00.o objpart01.o 
 OBJPARTB= objpart02.o objpart03.o 
@@ -259,10 +259,10 @@ libutil-memclear.o:	libutil-memclear.ccm			$(INCS)
 libutil-memcopy.o:	libutil-memcopy.ccm			$(INCS)
 libutil-memcpy.o:	libutil-memcpy.ccm			$(INCS)
 libutil-resumelife.o:	libutil-resumelife.ccm			$(INCS)
-libutil-stpcpy.o:	libutil-stpcpy.ccm			$(INCS)
-libutil-strcopy.o:	libutil-strcopy.ccm			$(INCS)
-libutil-strcpy.o:	libutil-strcpy.ccm			$(INCS)
 libutil-strlen.o:	libutil-strlen.ccm			$(INCS)
 libutil-strxspn.o:	libutil-strxspn.ccm			$(INCS)
+libutil-stpcpy.o:	libutil-stpcpy.ccm			$(INCS)
+libutil-strcpy.o:	libutil-strcpy.ccm			$(INCS)
+libutil-strcopy.o:	libutil-strcopy.ccm			$(INCS)
 
 
