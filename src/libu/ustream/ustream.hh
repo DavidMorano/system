@@ -131,12 +131,12 @@ struct ustream {
 	} ; /* end ctor */
 	ustream(const ustream &) = delete ;
 	ustream &operator = (const ustream &) = delete ;
-	int open	(cchar *,int,mode_t = 0) noex ;
+	int open	(cchar *,int = 0,mode_t = 0) noex ;
 	int read	(void *,int,int = -1) noex ;
 	int readp	(void *,int,off_t,int = -1) noex ;
 	int readln	(char *,int,int = -1) noex ;
 	int readlns	(char *,int,int = -1,int * = nullptr) noex ;
-	int write	(cvoid *,int,int = -1) noex ;
+	int write	(cvoid *,int) noex ;
 	int println	(cchar *,int) noex ;
 	int printf	(cchar *,...) noex ;
 	int vprintf	(cchar *,va_list) noex ;
@@ -150,7 +150,7 @@ struct ustream {
 	destruct ustream() {
 	    if (magval) dtor() ;
 	} ;
-	int iwrite(cvoid *,int,int = -1) noex ;
+	int iwrite(cvoid *,int) noex ;
     private:
 	int iclose() noex ;
 	void dtor() noex ;
@@ -180,7 +180,7 @@ namespace ustream_ns {
     extern int	ustream_readp		(ustream *,void *,int,off_t,int) noex ;
     extern int	ustream_readln		(ustream *,char *,int,int) noex ;
     extern int	ustream_readlns		(ustream *,char *,int,int,int *) noex ;
-    extern int	ustream_write		(ustream *,cvoid *,int,int) noex ;
+    extern int	ustream_write		(ustream *,cvoid *,int) noex ;
     extern int	ustream_println		(ustream *,cchar *,int) noex ;
     extern int	ustream_vprintf		(ustream *,cchar *,va_list) noex ;
     extern int	ustream_reserve		(ustream *,int) noex ;
