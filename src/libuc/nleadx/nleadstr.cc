@@ -17,12 +17,8 @@
 
 /*******************************************************************************
 
-  	Name:
-	nleadstr
-
-	Description:
-	This subroutine is the same as |nleadbasestr(3uc)|, noted
-	below, but with a different name.
+  	Group:
+	nlead{x}str
 
 	Names:
 	nleadbasestr
@@ -40,6 +36,7 @@
 	int nlead{x}str(cchar **bs,cchar *sp,int sl) noex
 
 	Arguments:
+	{x}		'base', 'case', 'fold'
 	bs		base string to compare against
 	sp		test-string to test against the base string
 	sl		length of test-string
@@ -54,8 +51,8 @@
 	The thinking is that I want the template instantiation to
 	"see" any inlined subroutine and optimize it all out rather
 	than being forced to actually call a subroutine (if only a
-	pointer was supplied). Anywat, that was the thinking, even
-	if misguided. Also note that this goes against one of the
+	pointer was supplied).  Anywat, that was the thinking, even
+	if misguided.  Also note that this goes against one of the
 	major coding standard rules which is: to optimize for space
 	rather than time (without the compiler doing that operation
 	itself).
@@ -70,8 +67,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<syshas.h>
 #include	<toxc.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"nleadstr.h"
@@ -102,17 +99,18 @@ extern "C" {
 /* forward references */
 
 template <toxc_f toxc>
-static int nleadxxxxstr(cchar *bs,cchar *sp,int sl) noex {
+local int nleadxxxxstr(cchar *bs,cchar *sp,int sl) noex {
 	int		i = -1 ; /* return-value */
-	if (bs) ylikely {
+	if (bs && sp) ylikely {
 	    if (sl < 0) sl = INT_MAX ;
 	    for (i = 0 ; (i < sl) && bs[i] && sp[i] ; i += 1) {
-	        if (toxc(bs[i]) != toxc(sp[i])) break ;
+		cint ch1 = mkchar(bs[i]) ;
+		cint ch2 = mkchar(sp[i]) ;
+	        if (toxc(ch1) != toxc(ch2)) break ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return i ;
-}
-/* end subroutine-template (nleadxxxxstr) */
+} /* end subroutine-template (nleadxxxxstr) */
 
 
 /* local variables */
