@@ -44,18 +44,19 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |realpath(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<utimeout.h>
-#include	<errtimer.hh>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
-#include	"ufileop.h"
+#include	"ufileopbase.hh"
+#include	"urealpath.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libu::ufileopbase ;		/* type */
 
 
 /* external subroutines */
@@ -66,8 +67,42 @@
 
 /* local structures */
 
+namespace {
+    struct urealer ;
+    typedef int (urealer::*urealer_m)(cchar *) noex ;
+    struct urealer : ufileopbase {
+	char		*rbuf ;
+	char		**rpp ;
+	urealer_m	m = nullptr ;
+	urealer() noex { } ;
+	urealer(char *b,char **r) noex : rbuf(b), rpp(r) { } ;
+	int callstd(cchar *fn) noex override {
+	    int		rs = SR_BUGCHECK ;
+	    if (m) {
+		rs = (this->*m)(fn) ;
+	    }
+	    return rs ;
+	} ;
+	sysret_t i_realpath(cchar *) noex ;
+    } ; /* end struct (urealer) */
+} /* end namespace */
+
 
 /* forward references */
+
+local sysret_t std_realpath(cchar *fn,char *rbuf,char **rpp) noex {
+	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    rs = SR_OK ;
+	    if (char *rp ; (rp = realpath(fn,rbuf)) != np) ylikely {
+	        if (rpp) *rpp = rp ;
+	    } else {
+	        rs = (- errno) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (std_realpath) */
 
 
 /* local variables */
@@ -78,55 +113,17 @@
 
 /* external subroutines */
 
-static sysret_t sr_realpath(cchar *fn,char *rbuf,char **rpp) noex {
-	cnullptr	np{} ;
-	int		rs = SR_OK ;
-	if (char *rp ; (rp = realpath(fn,rbuf)) != np) ylikely {
-	    *rpp = rp ;
-	} else {
-	    rs = (- errno) ;
-	}
-	return rs ;
-} /* end subroutine (sr_realpath) */
+int u_realpath(cchar *fname,char *rbuf,char **rpp) noex {
+    	urealer fo(rbuf,rpp) ;
+	fo.m = &urealer::i_realpath ;
+	return fo(fname) ;
+} /* end subroutine (u_realpath) */
 
-sysret_t u_realpath(cchar *fname,char *rbuf,char **rpp) noex {
-	errtimer	to_mfile = utimeout[uto_mfile] ;
-	errtimer	to_nfile = utimeout[uto_nfile] ;
-	errtimer	to_nomem = utimeout[uto_nomem] ;
-	errtimer	to_nospc = utimeout[uto_nospc] ;
-	errtimer	to_again = utimeout[uto_again] ;
-        reterr          r ;
-	int		rs ;
-	char		*rp = nullptr ;
-	repeat {
-	    if ((rs = sr_realpath(fname,rbuf,&rp)) < 0) nlikely {
-                r(rs) ;                 /* <- default causes exit */
-	        switch (rs) {
-	        case SR_MFILE:
-                    r = to_mfile(rs) ;
-		    break ;
-	        case SR_NFILE:
-                    r = to_nfile(rs) ;
-		    break ;
-		case SR_NOMEM:
-                    r = to_nomem(rs) ;
-		    break ;
-	        case SR_NOSPC:
-                    r = to_nospc(rs) ;
-		    break ;
-	        case SR_AGAIN:
-                    r = to_again(rs) ;
-		    break ;
-	        case SR_INTR:
-		    r(false) ;
-	            break ;
-	        } /* end switch */
-		rs = r ;
-	    } /* end if (ok) */
-	} until ((rs >= 0) || r.fexit) ;
-	if (rpp) *rpp = (rs >= 0) ? rp : nullptr ;
-	return rs ;
-}
-/* end method (u_realpath) */
+
+/* local subroutines */
+
+sysret_t urealer::i_realpath(cchar *fn) noex {
+	return std_realpath(fn,rbuf,rpp) ;
+} /* end method (urealer::u_realpath) */
 
 
