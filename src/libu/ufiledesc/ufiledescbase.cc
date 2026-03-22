@@ -35,15 +35,13 @@
 #include	<cstdint>		/* |intptr_t| */
 #include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<usupport.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
-#include	"ufiledesc.h"
+#include	"ufiledescbase.hh"
 
 
 /* local defines */
@@ -51,9 +49,7 @@
 
 /* imported namespaces */
 
-using namespace	ufiledesc ;		/* namespace */
-
-using std::nullptr_t ;			/* type */
+using libu::ufiledescbase ;		/* type */
 
 
 /* local typedefs */
@@ -70,7 +66,7 @@ using std::nullptr_t ;			/* type */
 
 /* forward references */
 
-static int	uwrcheck(int) noex ;
+local int	uwrcheck(int) noex ;
 
 
 /* local variables */
@@ -81,9 +77,10 @@ static int	uwrcheck(int) noex ;
 
 /* exported subroutines */
 
-int ufiledescbase::operator () (int fd) noex {
+namespace libu {
+    int ufiledescbase::operator () (int fd) noex {
 	int		rs = SR_BADF ;
-	if (fd >= 0) {
+	if ((fd >= 0) || (fdfl.fatcwd && (fd == AT_FDCWD))) {
 	    int		to_closewait	= utimeout[uto_closewait] ;
 	    errtimer	to_again	= utimeout[uto_again] ;
 	    errtimer	to_busy		= utimeout[uto_busy] ;
@@ -135,18 +132,18 @@ int ufiledescbase::operator () (int fd) noex {
                         r = to_io(rs) ;
 		        break ;
 		    case SR_INPROGRESS: /* who thought up this? */
-		        if (f.fclose) {
+		        if (fdfl.fclose) {
 		            rs = msleep(to_closewait * 1000) ;
 		        }
 		        break ;
                     case SR_INTR:
-			if (f.fwrite) {
+			if (fdfl.fwrite) {
 			    if ((rs = uwrcheck(fd)) >= 0) {
 				r(false) ;
 			    } else {
 				r(rs) ;
 			    }
-			} else if (! f.fintr) {
+			} else if (! fdfl.fintr) {
 			    r(false) ;
 		        }
                         break ;
@@ -156,10 +153,10 @@ int ufiledescbase::operator () (int fd) noex {
 	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (ufiledescbase::operator) */
+    } /* end method (ufiledescbase::operator) */
+} /* end namespace (libu) */
 
-static int uwrcheck(int fd) noex {
+local int uwrcheck(int fd) noex {
 	POLLFD		fds[1] = {} ;
 	int		rs ;
 	int		n = 0 ;
