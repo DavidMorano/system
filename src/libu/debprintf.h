@@ -15,6 +15,22 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Name:
+	debprintf
+
+	Description:
+	This header file is associated with the DEBUG module.
+	Access of the DEBUG module is gained with the importation
+	of the module; like:
+	{
+		import debug ;
+	}
+	Enjoy.
+
+*******************************************************************************/
+
 #ifndef	DEBPRINTF_INCLUDE
 #define	DEBPRINTF_INCLUDE
 
