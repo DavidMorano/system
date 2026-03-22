@@ -37,6 +37,11 @@ EXTERNC_begin
 
 extern int u_ataccess	(int,cchar *,int,int) noex ;
 extern int u_atperm	(int,cchar *,int) noex ;
+extern int u_atlink	(int,cchar *,int,cchar *,int) noex ;
+
+local inline int u_linkat(int fd,cc *fn,int dfd,cc *dfn,int fl) noex {
+    	return u_atlink(fd,fn,dfd,dfn,fl) ;
+}
 
 EXTERNC_end
 
