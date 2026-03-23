@@ -57,6 +57,8 @@
 #include	<usyscalls.h>
 #include	<localmisc.h>
 
+#include	"ucgetx.h"
+
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
