@@ -36,6 +36,8 @@
 #include	<usyscalls.h>
 #include	<localmisc.h>
 
+#include	"ucgetx.h"
+
 
 /* local defines */
 
