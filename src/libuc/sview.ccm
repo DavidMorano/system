@@ -18,6 +18,30 @@
 
 /* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Object:
+	sview
+
+	Description:
+	This is a handly object to store both the pointer and the
+	length of a c-string.  This isued to pass around a counted
+	c-string without passing two parameters (the pointer and
+	the lenth) but rather only one parameter (this object
+	itself).
+
+	Synopsis:
+	sview	<obj>(cchar *sp,int sl) noex
+
+	Arguments:
+	sp	counted c-string pinter
+	sl	counted c-string length
+
+	Returns:
+	-
+
+*******************************************************************************/
+
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -27,9 +51,11 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 export module sview ;
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 export {
     struct sview {
@@ -38,13 +64,19 @@ export {
 	constexpr sview() noex : sp(nullptr), sl(0) { } ;
 	constexpr sview(cchar *p,int l) noex : sp(p), sl(l) { 
 	   if (l < 0) {
-	       sl = intconv(strlen(p)) ;
+	       sl = lenstr(p) ;
 	   }
 	} ;
 	constexpr sview(const sview &o) noex {
 	    sp = o.sp ;
 	    sl = o.sl ;
 	} ;
+	constexpr sview(sview &&o) noex {
+	    sp = o.sp ;
+	    sl = o.sl ;
+	    o.sp = nullptr ;
+	    o.sl = 0 ;
+	} ; /* end ctor (move-constructor) */
 	constexpr sview(const sview *op) noex {
 	    sp = op->sp ;
 	    sl = op->sl ;
@@ -56,7 +88,7 @@ export {
 	} ;
 	constexpr const sview &operator = (cchar *osp) noex {
 	    sp = osp  ;
-	    sl = intconv(strlen(osp)) ;
+	    sl = lenstr(osp) ;
 	    return *this ;
 	} ;
     } ; /* end struct (sview) */
