@@ -83,8 +83,7 @@ namespace {
 
 /* forward references */
 
-
-static int	pwentparse(cchar *,int,gid_t *) noex ;
+local int	pwentparse(cchar *,int,gid_t *) noex ;
 
 
 /* local template-subroutines */
@@ -222,7 +221,7 @@ int subinfo::pwmapend() noex {
 /* end subroutine (subinfo::pwmapend) */
 
 /* PASSWD entry parsing */
-static int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
+local int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
 	int		rs = SR_OK ;
 	int		fi{} ;		/* <- used afterwards */
 	int		ll = llen ;
