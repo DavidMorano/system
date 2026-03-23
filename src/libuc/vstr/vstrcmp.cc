@@ -33,7 +33,6 @@
 	Returns:
 	-		three-way comparison value
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -49,7 +48,7 @@
 #include	<mkchar.h>
 #include	<strxcmp.h>
 #include	<localmisc.h>
-#include	<vstrorder.h>
+#include	<vstrorders.h>
 
 #include	"vstrcmp.h"
 
@@ -101,33 +100,6 @@ local int vstrxcmp(strxcmp_f vx,cchar **s1pp,cchar **s2pp) noex {
 	} /* end if (non-null) */
 	return rc ;
 } /* end subroutine (vstrcmpx) */
-
-extern "C" {
-    local int strbasecmpo(cchar *s1,cchar *s2) noex {
-    	return strbasecmp(s1,s2) ;
-    }
-    local int strbasecmpr(cchar *s1,cchar *s2) noex {
-    	return strbasecmp(s2,s1) ;
-    }
-} /* end extern */
-
-extern "C" {
-    local int strcasecmpo(cchar *s1,cchar *s2) noex {
-    	return strcasecmp(s1,s2) ;
-    }
-    local int strcasecmpr(cchar *s1,cchar *s2) noex {
-    	return strcasecmp(s2,s1) ;
-    }
-} /* end extern */
-
-extern "C" {
-    local int strfoldcmpo(cchar *s1,cchar *s2) noex {
-    	return strfoldcmp(s1,s2) ;
-    }
-    local int strfoldcmpr(cchar *s1,cchar *s2) noex {
-    	return strfoldcmp(s2,s1) ;
-    }
-} /* end extern */
 
 
 /* local variables */
