@@ -44,7 +44,7 @@
 #include	<strwcpy.h>
 #include	<sfx.h>
 #include	<base64.h>
-#include	<bufos.hh>
+#include	<bufslide.hh>
 #include	<localmisc.h>
 
 #include	"b64decoder.h"
@@ -65,7 +65,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef bufos *		bufosp ;
+typedef bufslide *	bufslidep ;
 
 
 /* external subroutines */
@@ -123,11 +123,10 @@ cint		nstage = B64DECODER_NSTAGE ;
 /* exported subroutines */
 
 int b64decoder_start(b64decoder *op) noex {
-	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = b64decoder_ctor(op)) >= 0) {
-	    if (bufos *obp ; (obp = new(nothrow) bufos) != np) {
-		if ((rs = obp->start) >= 0) {
+	if ((rs = b64decoder_ctor(op)) >= 0) ylikely {
+	    if (bufslide *obp = new(nothrow) bufslide ; obp) ylikely {
+		if ((rs = obp->start) >= 0) ylikely {
 	            op->outbuf = obp ;
 	            op->magval = B64DECODER_MAGIC ;
 		}
@@ -136,7 +135,7 @@ int b64decoder_start(b64decoder *op) noex {
 		}
 	    } else {
 	        rs = SR_NOMEM ;
-	    } /* end if (new-bufos) */
+	    } /* end if (new-bufslide) */
 	    if (rs < 0) {
 		b64decoder_dtor(op) ;
 	    }
@@ -148,9 +147,8 @@ int b64decoder_start(b64decoder *op) noex {
 int b64decoder_finish(b64decoder *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = b64decoder_magic(op)) >= 0) {
-	    if (op->outbuf) {
-	        bufos 	*obp = bufosp(op->outbuf) ;
+	if ((rs = b64decoder_magic(op)) >= 0) ylikely {
+	    if (bufslide *obp = bufslidep(op->outbuf) ; obp) ylikely {
 		{
 		    rs1 = obp->finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -171,12 +169,11 @@ int b64decoder_finish(b64decoder *op) noex {
 /* end subroutine (b64decoder_finish) */
 
 int b64decoder_load(b64decoder *op,cchar *sp,int 탎l) noex {
-    	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = b64decoder_magic(op,sp)) >= 0) {
-	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
-                if (bufos *obp ; (obp = bufosp(op->outbuf)) != np) {
+	if ((rs = b64decoder_magic(op,sp)) >= 0) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
+                if (bufslide *obp = bufslidep(op->outbuf) ; obp) ylikely {
                     cchar       *cp ;
                     for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
                         sl -= intconv((cp + cl) - sp) ;
@@ -221,13 +218,13 @@ int b64decoder_load(b64decoder *op,cchar *sp,int 탎l) noex {
 int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		i = 0 ; /* return-value */
-	if ((rs = b64decoder_magic(op,rbuf)) >= 0) {
+	if ((rs = b64decoder_magic(op,rbuf)) >= 0) ylikely {
             rs = SR_INVALID ;
-            if (rlen >= 0) {
+            if (rlen >= 0) ylikely {
                 rs = SR_OK ;
-                if (rlen > 0) {
-                    if (bufos *obp = bufosp(op->outbuf) ; obp) {
-                        if (cint len = obp->len ; len > 0) {
+                if (rlen > 0) ylikely {
+                    if (bufslide *obp = bufslidep(op->outbuf) ; obp) ylikely {
+                        if (cint len = obp->len ; len > 0) ylikely {
 			    cint ml = min(len,rlen) ;
                             for (i = 0 ; i < ml ; i += 1) {
 			        cint	ch = obp->at(i) ;
@@ -249,8 +246,11 @@ int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
 int b64decoder_count(b64decoder *op) noex {
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = b64decoder_magic(op)) >= 0) {
-	    rs = obp->len ;
+	if ((rs = b64decoder_magic(op)) >= 0) ylikely {
+	    if (bufslide *obp = bufslidep(op->outbuf) ; obp) ylikely {
+	        rs = obp->len ;
+		c = rs ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -260,13 +260,12 @@ int b64decoder_count(b64decoder *op) noex {
 /* private subroutines */
 
 local int b64decoder_cvt(b64decoder *op,cchar *cp,int cl) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_BUGCHECK ;
 	int		c = 0 ;
-	if (bufos *obp = bufosp(op->outbuf) ; obp) {
+	if (bufslide *obp = bufslidep(op->outbuf) ; obp) ylikely {
 	    rs = SR_NOMEM ;
-	    if (char *rbuf ; (rbuf = new(nothrow) char [cl + 1]) != np) {
-	        if ((c = base64_d(cp,cl,rbuf)) > 0) {
+	    if (char *rbuf = new(nothrow) char [cl + 1] ; rbuf) ylikely {
+	        if ((c = base64_d(cp,cl,rbuf)) > 0) ylikely {
 	            rbuf[c] = '\0' ;
 	            rs = obp->add(rbuf,c) ;
 	        } else {
