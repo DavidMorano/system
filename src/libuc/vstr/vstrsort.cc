@@ -98,8 +98,8 @@ void vstrsort(cchar **sav,int n,vstrsort_f cmpfun) noex {
 	int 		j ; /* used-throughout */
 	for (j = 1 ; j <= n ; j *= 2) ;
 	for (int m = 2 * j - 1 ; m /= 2 ; ) {
-	    int k ;
-	    for ((j = 0, k = n - m) ; j < k ; j += 1) {
+	    j = 0 ;
+	    for (int k = n - m ; j < k ; j += 1) {
 	        for (int i = j ; i >= 0 ; i -= m) {
 	            ccharpp app = (sav + i) ;
 	            if (cmpfun((app + m),(app + 0)) >= 0) break ;
