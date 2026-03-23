@@ -71,7 +71,7 @@ typedef ucentua		ent ;
 
 /* forward references */
 
-static int	vecstrx_loadpjnent(vecstrx *,ent *,cchar *) noex ;
+local int	vecstrx_loadpjnent(vecstrx *,ent *,cchar *) noex ;
 
 
 /* local variables */
@@ -113,7 +113,7 @@ int vecstrx::loadpjusers(cchar *pjn) noex {
 
 /* local subroutines */
 
-static int vecstrx_loadpjnent(vecstrx *vsp,ent *uap,cchar *pjn) noex {
+local int vecstrx_loadpjnent(vecstrx *vsp,ent *uap,cchar *pjn) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*k = "project" ;
