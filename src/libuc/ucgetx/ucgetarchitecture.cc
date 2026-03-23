@@ -40,6 +40,8 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
+#include	"ucgetx.h"
+
 
 /* local defines */
 
