@@ -17,15 +17,20 @@
 
 /*******************************************************************************
 
+  	Name:
+	tabexpand
+
+	Description:
 	This subroutine expands TAB characters in the given string
 	into SPACE characters, as appropriate.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sbuf.h>
 #include	<tabcols.h>
 #include	<char.h>
@@ -55,7 +60,7 @@ struct dstore {
 	char		*dp ;
 	int		dl ;
 	int		dlen ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -77,8 +82,7 @@ int tabexpand(char *dbuf,int dlen,int ntabcols,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	int		dcol = 0 ;
 	if (dbuf && sbuf) {
-	    dstore	d ;
-	    if ((rs = dstore_start(&d,dbuf,dlen)) >= 0) {
+	    if (dstore d ; (rs = dstore_start(&d,dbuf,dlen)) >= 0) {
 	        int	sl = slen ;
 	        cchar	*sp = sbuf ;
 	        while ((dcol >= 0) && sl && sp[0]) {
@@ -116,10 +120,10 @@ static int dstore_start(dstore *dp,char *dbuf,int dlen) noex {
 }
 /* end subroutine (dstore_start) */
 
-static int dstore_add(dstore *dp,int c) noex {
+static int dstore_add(dstore *dp,int ch) noex {
 	int		rs = SR_OVERFLOW ;
 	if (dp->dl < dp->dlen) {
-	    *(dp->dp)++ = c ;
+	    *(dp->dp)++ = charconv(ch) ;
 	    dp->dl += 1 ;
 	    rs = dp->dl ;
 	}
