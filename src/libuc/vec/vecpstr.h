@@ -36,11 +36,10 @@
 #include	<vechand.h>
 
 
-/* object defines */
-#define	VECPSTR_MAGIC		0x88776215
 #define	VECPSTR			struct vecpstr_head
 #define	VECPSTR_FL		struct vecpstr_flags
 #define	VECPSTR_CH		struct vecpstr_chunk
+#define	VECPSTR_MAGIC		0x88776215
 #define	VECPSTR_DEFENTS		10
 
 /**** options
@@ -67,13 +66,13 @@ enum vecpstros {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecpstrms {
-    constexpr static int	reuse		= (1 << vecpstro_reuse) ;
-    constexpr static int	compact		= (1 << vecpstro_compact) ;
-    constexpr static int	swap		= (1 << vecpstro_swap) ;
-    constexpr static int	stationary	= (1 << vecpstro_stationary) ;
-    constexpr static int	conserve	= (1 << vecpstro_conserve) ;
-    constexpr static int	sorted		= (1 << vecpstro_sorted) ;
-    constexpr static int	ordered		= (1 << vecpstro_ordered) ;
+    inline static cint	reuse		= (1 << vecpstro_reuse) ;
+    inline static cint	compact		= (1 << vecpstro_compact) ;
+    inline static cint	swap		= (1 << vecpstro_swap) ;
+    inline static cint	stationary	= (1 << vecpstro_stationary) ;
+    inline static cint	conserve	= (1 << vecpstro_conserve) ;
+    inline static cint	sorted		= (1 << vecpstro_sorted) ;
+    inline static cint	ordered		= (1 << vecpstro_ordered) ;
 } ; /* end struct (vecpstrms) */
 
 #endif /* __cplusplus */
@@ -112,7 +111,7 @@ struct vecpstr_head {
 	vechand		*clp ;		/* chunk-list-pointer */
 	VECPSTR_CH	*chp ;		/* chunk (current) pointer */
 	VECPSTR_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		chsize ;
 	int		addnum ;	/* suggested add-number */
 	int		cnt ;		/* total item count */
@@ -233,7 +232,7 @@ struct vecpstr : vecpstr_head {
 	    cksize	(this,vecpstrmem_cksize) ;
 	    audit	(this,vecpstrmem_audit) ;
 	    finish	(this,vecpstrmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	vecpstr(const vecpstr &) = delete ;
 	vecpstr &operator = (const vecpstr &) = delete ;
@@ -267,7 +266,7 @@ struct vecpstr : vecpstr_head {
 	} ;
 	void dtor() noex ;
 	destruct vecpstr() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (vecpstr) */
 #else	/* __cplusplus */
@@ -313,25 +312,25 @@ extern int vecpstr_audit	(vecpstr *) noex ;
 extern int vecpstr_getvec	(vecpstr *,mainv *) noex ;
 extern int vecpstr_finish	(vecpstr *) noex ;
 /* extras (so-called) */
-extern int vecpstr_addpathclean(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_addpath(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_addcspath(vecpstr *) noex ;
-extern int vecpstr_adds(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_addsyms(vecpstr *,cchar *,mainv) noex ;
-extern int vecpstr_addsubdirs(vecpstr *,cchar *) noex ;
-extern int vecpstr_adduniqs(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_envadd(vecpstr *,cchar *,cchar *,int) noex ;
-extern int vecpstr_envadds(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_envset(vecpstr *,cchar *,cchar *,int) noex ;
-extern int vecpstr_envget(vecpstr *,cchar *,cchar **) noex ;
-extern int vecpstr_envfile(vecpstr *,cchar *) noex ;
-extern int vecpstr_foilcmp(vecpstr *,vecpstr *) noex ;
-extern int vecpstr_loadfile(vecpstr *,int,cchar *) noex ;
-extern int vecpstr_loadgrusers(vecpstr *,gid_t) noex ;
-extern int vecpstr_srvargs(vecpstr *,cchar *) noex ;
-extern int vecpstr_svcargs(vecpstr *,int *,cchar *) noex ;
+extern int vecpstr_addpathclean	(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_addpath	(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_addcspath	(vecpstr *) noex ;
+extern int vecpstr_adds		(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_addsyms	(vecpstr *,cchar *,mainv) noex ;
+extern int vecpstr_addsubdirs	(vecpstr *,cchar *) noex ;
+extern int vecpstr_adduniqs	(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_envadd	(vecpstr *,cchar *,cchar *,int) noex ;
+extern int vecpstr_envadds	(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_envset	(vecpstr *,cchar *,cchar *,int) noex ;
+extern int vecpstr_envget	(vecpstr *,cchar *,cchar **) noex ;
+extern int vecpstr_envfile	(vecpstr *,cchar *) noex ;
+extern int vecpstr_foilcmp	(vecpstr *,vecpstr *) noex ;
+extern int vecpstr_loadfile	(vecpstr *,int,cchar *) noex ;
+extern int vecpstr_loadgrusers	(vecpstr *,gid_t) noex ;
+extern int vecpstr_srvargs	(vecpstr *,cchar *) noex ;
+extern int vecpstr_svcargs	(vecpstr *,int *,cchar *) noex ;
 
-static inline int vecpstr_loaddirs(vecpstr *op,cchar *newsdname) noex {
+local inline int vecpstr_loaddirs(vecpstr *op,cchar *newsdname) noex {
 	return vecpstr_addsubdirs(op,newsdname) ;
 }
 
