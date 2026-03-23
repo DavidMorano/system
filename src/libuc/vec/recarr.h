@@ -51,13 +51,13 @@ enum recarros {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct recarrms {
-    constexpr static int	reuse		= (1 << recarro_reuse) ;
-    constexpr static int	compact		= (1 << recarro_compact) ;
-    constexpr static int	swap		= (1 << recarro_swap) ;
-    constexpr static int	stationary	= (1 << recarro_stationary) ;
-    constexpr static int	conserve	= (1 << recarro_conserve) ;
-    constexpr static int	sorted		= (1 << recarro_sorted) ;
-    constexpr static int	ordered		= (1 << recarro_ordered) ;
+    inline static cint	reuse		= (1 << recarro_reuse) ;
+    inline static cint	compact		= (1 << recarro_compact) ;
+    inline static cint	swap		= (1 << recarro_swap) ;
+    inline static cint	stationary	= (1 << recarro_stationary) ;
+    inline static cint	conserve	= (1 << recarro_conserve) ;
+    inline static cint	sorted		= (1 << recarro_sorted) ;
+    inline static cint	ordered		= (1 << recarro_ordered) ;
 } ; /* end struct (recarrms) */
 
 #endif /* __cplusplus */
