@@ -24,12 +24,11 @@
 #include	<usysbase.h>
 
 
-/* object defines */
-#define	VECLONG_MAGIC		0x73625199
-#define	VECLONG_DEFENTS		2
 #define	VECLONG			struct veclong_head
 #define	VECLONG_FL		struct veclong_flags
 #define	VECLONG_CUR		struct veclong_cursor
+#define	VECLONG_MAGIC		0x73625199
+#define	VECLONG_DEFENTS		2
 #define	VECLONG_TYPE		long
 #define	VECLONG_MIN		LONG_MIN
 #define	VECLONG_MAX		LONG_MAX
@@ -58,13 +57,13 @@ enum veclongos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct veclongms {
-    constexpr static int	reuse		= (1 << veclongo_reuse) ;
-    constexpr static int	compact		= (1 << veclongo_compact) ;
-    constexpr static int	swap		= (1 << veclongo_swap) ;
-    constexpr static int	stationary	= (1 << veclongo_stationary) ;
-    constexpr static int	conserve	= (1 << veclongo_conserve) ;
-    constexpr static int	sorted		= (1 << veclongo_sorted) ;
-    constexpr static int	ordered		= (1 << veclongo_ordered) ;
+    inline static cint	reuse		= (1 << veclongo_reuse) ;
+    inline static cint	compact		= (1 << veclongo_compact) ;
+    inline static cint	swap		= (1 << veclongo_swap) ;
+    inline static cint	stationary	= (1 << veclongo_stationary) ;
+    inline static cint	conserve	= (1 << veclongo_conserve) ;
+    inline static cint	sorted		= (1 << veclongo_sorted) ;
+    inline static cint	ordered		= (1 << veclongo_ordered) ;
 } ; /* end struct (veclongms) */
 
 #endif /* __cplusplus */
@@ -97,7 +96,7 @@ struct veclong_flags {
 struct veclong_head {
 	VECLONG_TYPE	*va ;
 	VECLONG_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
@@ -200,7 +199,7 @@ struct veclong : veclong_head {
 	    resize	(this,veclongmem_resize) ;
 	    audit	(this,veclongmem_audit) ;
 	    finish	(this,veclongmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	veclong(const veclong &) = delete ;
 	veclong &operator = (const veclong &) = delete ;
@@ -228,7 +227,7 @@ struct veclong : veclong_head {
 	} ;
 	void dtor() noex ;
 	destruct veclong() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (veclong) */
 #else	/* __cplusplus */
