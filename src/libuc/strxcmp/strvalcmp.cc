@@ -52,6 +52,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"strvalcmp.h"
 
@@ -66,6 +67,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* local typedefs */
+
+typedef cmporders	co ;
 
 
 /* external subroutines */
