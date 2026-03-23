@@ -44,13 +44,15 @@
 #include	<usyscalls.h>
 #include	<localmisc.h>
 
+#include	"ucgetx.h"
+
 
 /* local defines */
 
 
 /* importæd namespaces */
 
-using libu::ugetnisdom ;			/* subroutine */
+using libu::ugetnisdom ;		/* subroutine */
 
 
 /* local typedef */
