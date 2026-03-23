@@ -52,13 +52,13 @@ enum vechandos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vechandms {
-    constexpr static int	reuse		= (1 << vechando_reuse) ;
-    constexpr static int	compact		= (1 << vechando_compact) ;
-    constexpr static int	swap		= (1 << vechando_swap) ;
-    constexpr static int	stationary	= (1 << vechando_stationary) ;
-    constexpr static int	conserve	= (1 << vechando_conserve) ;
-    constexpr static int	sorted		= (1 << vechando_sorted) ;
-    constexpr static int	ordered		= (1 << vechando_ordered) ;
+    inline static cint	reuse		= (1 << vechando_reuse) ;
+    inline static cint	compact		= (1 << vechando_compact) ;
+    inline static cint	swap		= (1 << vechando_swap) ;
+    inline static cint	stationary	= (1 << vechando_stationary) ;
+    inline static cint	conserve	= (1 << vechando_conserve) ;
+    inline static cint	sorted		= (1 << vechando_sorted) ;
+    inline static cint	ordered		= (1 << vechando_ordered) ;
 } ; /* end struct (vechandms) */
 
 #endif /* __cplusplus */
