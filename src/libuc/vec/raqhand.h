@@ -24,9 +24,9 @@
 #include	<usysbase.h>
 
 
-#define	RAQHAND_DEFENTS	10
 #define	RAQHAND		struct raqhand_head
 #define	RAQHAND_FL	struct raqhand_flags
+#define	RAQHAND_DEFENTS	10
 
 /**** options
 reuse		= reuse empty slots
@@ -52,13 +52,13 @@ enum raqhandos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct raqhandms {
-    constexpr static int	reuse		= (1 << raqhando_reuse) ;
-    constexpr static int	compact		= (1 << raqhando_compact) ;
-    constexpr static int	swap		= (1 << raqhando_swap) ;
-    constexpr static int	stationary	= (1 << raqhando_stationary) ;
-    constexpr static int	conserve	= (1 << raqhando_conserve) ;
-    constexpr static int	sorted		= (1 << raqhando_sorted) ;
-    constexpr static int	ordered		= (1 << raqhando_ordered) ;
+    inline static cint	reuse		= (1 << raqhando_reuse) ;
+    inline static cint	compact		= (1 << raqhando_compact) ;
+    inline static cint	swap		= (1 << raqhando_swap) ;
+    inline static cint	stationary	= (1 << raqhando_stationary) ;
+    inline static cint	conserve	= (1 << raqhando_conserve) ;
+    inline static cint	sorted		= (1 << raqhando_sorted) ;
+    inline static cint	ordered		= (1 << raqhando_ordered) ;
 } ; /* end struct (raqhandms) */
 
 #endif /* __cplusplus */
