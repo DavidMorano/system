@@ -25,7 +25,6 @@
 #include	<lookaside.h>
 
 
-/* object defines */
 #define	VECOBJ			struct vecobj_head
 #define	VECOBJ_FL		struct vecobj_flags
 #define	VECOBJ_CUR		struct vecobj_cursor
@@ -55,13 +54,13 @@ enum vecobjos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecobjms {
-    constexpr static int	reuse		= (1 << vecobjo_reuse) ;
-    constexpr static int	compact		= (1 << vecobjo_compact) ;
-    constexpr static int	swap		= (1 << vecobjo_swap) ;
-    constexpr static int	stationary	= (1 << vecobjo_stationary) ;
-    constexpr static int	conserve	= (1 << vecobjo_conserve) ;
-    constexpr static int	sorted		= (1 << vecobjo_sorted) ;
-    constexpr static int	ordered		= (1 << vecobjo_ordered) ;
+    inline static cint	reuse		= (1 << vecobjo_reuse) ;
+    inline static cint	compact		= (1 << vecobjo_compact) ;
+    inline static cint	swap		= (1 << vecobjo_swap) ;
+    inline static cint	stationary	= (1 << vecobjo_stationary) ;
+    inline static cint	conserve	= (1 << vecobjo_conserve) ;
+    inline static cint	sorted		= (1 << vecobjo_sorted) ;
+    inline static cint	ordered		= (1 << vecobjo_ordered) ;
 } ; /* end struct */
 
 #endif /* __cplusplus */
