@@ -24,11 +24,10 @@
 #include	<usysbase.h>
 
 
-/* object defines */
-#define	VECINT_MAGIC		0x73625198
 #define	VECINT			struct vecint_head
 #define	VECINT_FL		struct vecint_flags
 #define	VECINT_CUR		struct vecint_cursor
+#define	VECINT_MAGIC		0x73625198
 #define	VECINT_DEFENTS		2
 #define	VECINT_TYPE		int
 #define	VECINT_MIN		INT_MIN
@@ -58,13 +57,13 @@ enum vecintos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecintms {
-    constexpr static int	reuse		= (1 << vecinto_reuse) ;
-    constexpr static int	compact		= (1 << vecinto_compact) ;
-    constexpr static int	swap		= (1 << vecinto_swap) ;
-    constexpr static int	stationary	= (1 << vecinto_stationary) ;
-    constexpr static int	conserve	= (1 << vecinto_conserve) ;
-    constexpr static int	sorted		= (1 << vecinto_sorted) ;
-    constexpr static int	ordered		= (1 << vecinto_ordered) ;
+    inline static cint	reuse		= (1 << vecinto_reuse) ;
+    inline static cint	compact		= (1 << vecinto_compact) ;
+    inline static cint	swap		= (1 << vecinto_swap) ;
+    inline static cint	stationary	= (1 << vecinto_stationary) ;
+    inline static cint	conserve	= (1 << vecinto_conserve) ;
+    inline static cint	sorted		= (1 << vecinto_sorted) ;
+    inline static cint	ordered		= (1 << vecinto_ordered) ;
 } ; /* end struct (vecintms) */
 
 #endif /* __cplusplus */
@@ -97,7 +96,7 @@ struct vecint_flags {
 struct vecint_head {
 	VECINT_TYPE	*va ;
 	VECINT_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
@@ -200,7 +199,7 @@ struct vecint : vecint_head {
 	    resize	(this,vecintmem_resize) ;
 	    audit	(this,vecintmem_audit) ;
 	    finish	(this,vecintmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	vecint(const vecint &) = delete ;
 	vecint &operator = (const vecint &) = delete ;
@@ -228,7 +227,7 @@ struct vecint : vecint_head {
 	} ;
 	void dtor() noex ;
 	destruct vecint() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (vecint) */
 #else	/* __cplusplus */
