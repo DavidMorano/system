@@ -69,6 +69,8 @@
 #include	<usupport.h>		/* |msleep(3u)| */
 #include	<localmisc.h>
 
+#include	"ucgetx.h"
+
 
 /* local defines */
 
