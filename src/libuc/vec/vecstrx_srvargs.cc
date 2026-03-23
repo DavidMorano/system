@@ -69,8 +69,8 @@ using libuc::libmem ;			/* variable */
 
 /* forward references */
 
-static int	vecstrx_arger(vecstrx *,cchar *) noex ;
-static int	mkterms() noex ;
+local int	vecstrx_arger(vecstrx *,cchar *) noex ;
+local int	mkterms() noex ;
 
 
 /* local structures */
@@ -106,7 +106,7 @@ int vecstrx::srvargs(cchar *abuf) noex {
 
 /* local subroutines */
 
-static int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
+local int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
 	cint		alen = lenstr(abuf) ;
 	int		rs ;
 	int		rs1 ;
@@ -130,7 +130,7 @@ static int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
 }
 /* end subroutine (vecstrx_arger) */
 
-static int mkterms() noex {
+local int mkterms() noex {
 	return fieldterms(terms,false,'\t',' ') ;
 }
 /* end subroutine (mkterms) */
