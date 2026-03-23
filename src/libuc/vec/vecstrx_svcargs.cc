@@ -68,9 +68,9 @@ using libuc::libmem ;			/* variable */
 
 /* forward references */
 
-static int	vecstrx_arger(vecstrx *,int *,cchar *) noex ;
-static int	mkterms() noex ;
-static int	hasLong(cchar *,int) noex ;
+local int	vecstrx_arger(vecstrx *,int *,cchar *) noex ;
+local int	mkterms() noex ;
+local int	hasLong(cchar *,int) noex ;
 
 
 /* local structures */
@@ -106,7 +106,7 @@ int vecstrx::svcargs(int *fp,cchar *abuf) noex {
 
 /* local subroutines */
 
-static int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
+local int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
     	cnullptr	np{} ;
 	cint		alen = lenstr(abuf) ;
 	int		rs ;
@@ -149,12 +149,12 @@ static int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
 }
 /* end subroutine (vecstrx_arger) */
 
-static int mkterms() noex {
+local int mkterms() noex {
 	return fieldterms(terms,false,'\t',' ') ;
 }
 /* end subroutine (mkterms) */
 
-static int hasLong(cchar *sp,int µsl) noex {
+local int hasLong(cchar *sp,int µsl) noex {
 	int		f = false ;
 	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	    if (sp[0] == '/') {
