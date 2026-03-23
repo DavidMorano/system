@@ -132,13 +132,13 @@ static cint		maxdig = ndigit(TERMCMD_MAXPVAL,10) ;
 constexpr bool		f_comment = false ;
 
 #ifdef	COMMENT
-static cint	alts[] = {
-	    CH_DEL,		/* reg */
-	    CH_DEL,		/* ESC */
-	    '[',		/* CSI */
-	    'P',		/* DCS */
-	    'O',		/* PF (also SS3) */
-	    0
+constexpr uchar		alts[] = {
+	CH_DEL,		/* reg */
+	CH_DEL,		/* ESC */
+	'[',		/* CSI */
+	'P',		/* DCS */
+	'O',		/* PF (also SS3) */
+	0
 } ;
 #endif /* COMMENT */
 
