@@ -52,6 +52,7 @@
 #include	<mkchar.h>
 #include	<char.h>
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"strxxxxcmp.h"
 
@@ -70,6 +71,8 @@ using stdclib::std_strcasecmp ;		/* subroutine */
 
 /* local typedefs */
 
+typedef cmporders	co ;
+
 extern "C" {
     typedef int (*strcmp_f)(cchar *,cchar *) noex ;
 }
@@ -83,22 +86,17 @@ extern "C" {
 
 /* local structures */
 
-enum order : uchar {
-    order_obv,
-    order_rev
-} ; /* end enum (order) */
-
 
 /* forward references */
 
-local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,order forder) noex {
+local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
     	int		rc = 0 ;
 	if (s1 || s2) {
 	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
 		if (s2) {
-		    if (forder) {
+		    if (fo) {
 		        rc = (- fun(s1,s2)) ;
 		    } else {
 		        rc = (+ fun(s1,s2)) ;
@@ -163,24 +161,24 @@ int strfoldcmpr(cchar *s1,cchar *s2) noex {
 
 
 int strxbasecmpo(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strbasecmp,s1,s2,order_obv) ;
+    	return strxcmp(strbasecmp,s1,s2,cmporder_obverse) ;
 }
 int strxbasecmpr(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strbasecmp,s1,s2,order_rev) ;
+    	return strxcmp(strbasecmp,s1,s2,cmporder_reverse) ;
 }
 
 int strxcasecmpo(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strcasecmp,s1,s2,order_obv) ;
+    	return strxcmp(strcasecmp,s1,s2,cmporder_obverse) ;
 }
 int strxcasecmpr(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strcasecmp,s1,s2,order_rev) ;
+    	return strxcmp(strcasecmp,s1,s2,cmporder_reverse) ;
 }
 
 int strxfoldcmpo(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strfoldcmp,s1,s2,order_obv) ;
+    	return strxcmp(strfoldcmp,s1,s2,cmporder_obverse) ;
 }
 int strxfoldcmpr(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strfoldcmp,s1,s2,order_rev) ;
+    	return strxcmp(strfoldcmp,s1,s2,cmporder_reverse) ;
 }
 
 
