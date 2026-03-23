@@ -44,7 +44,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<localmisc.h>
-#include	<vstrorder.h>
+#include	<vstrorders.h>
 
 #include	"vstrkeydictcmp.h"
 
