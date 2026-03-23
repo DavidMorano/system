@@ -54,7 +54,7 @@
 #include	<usysdefs.h>
 #include	<strkeycmp.h>
 #include	<localmisc.h>
-#include	<vstrorder.h>
+#include	<vstrorders.h>
 
 #include	"vstrkeycmp.h"
 
@@ -102,33 +102,6 @@ local int vstrkeyxcmp(strxcmp_f vx,cchar **s1pp,cchar **s2pp) noex {
 	} /* end if (non-null) */
 	return rc ;
 } /* end subroutine (vstrkeyxcmp) */
-
-extern "C" {
-    local int strkeybasecmpo(cchar *s1,cchar *s2) noex {
-    	return strkeybasecmp(s1,s2) ;
-    }
-    local int strkeybasecmpr(cchar *s1,cchar *s2) noex {
-    	return strkeybasecmp(s2,s1) ;
-    }
-} /* end extern */
-
-extern "C" {
-    local int strkeycasecmpo(cchar *s1,cchar *s2) noex {
-    	return strkeycasecmp(s1,s2) ;
-    }
-    local int strkeycasecmpr(cchar *s1,cchar *s2) noex {
-    	return strkeycasecmp(s2,s1) ;
-    }
-} /* end extern */
-
-extern "C" {
-    local int strkeyfoldcmpo(cchar *s1,cchar *s2) noex {
-    	return strkeyfoldcmp(s1,s2) ;
-    }
-    local int strkeyfoldcmpr(cchar *s1,cchar *s2) noex {
-    	return strkeyfoldcmp(s2,s1) ;
-    }
-} /* end extern */
 
 
 /* local variables */
