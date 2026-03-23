@@ -36,6 +36,8 @@
 #include	<usyscalls.h>		/* |u_gethostid(3u)| */
 #include	<localmisc.h>
 
+#include	"ucgetx.h"
+
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
