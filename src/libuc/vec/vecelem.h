@@ -25,10 +25,9 @@
 #include	<usysbase.h>
 
 
-/* object defines */
-#define	VECELEM_MAGIC		0x73625198
 #define	VECELEM			struct vecelem_head
 #define	VECELEM_FL		struct vecelem_flags
+#define	VECELEM_MAGIC		0x73625198
 #define	VECELEM_DEFENTS		2
 
 /**** options
@@ -55,13 +54,13 @@ enum vecelemos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecelemms {
-    constexpr static int	reuse		= (1 << vecelemo_reuse) ;
-    constexpr static int	compact		= (1 << vecelemo_compact) ;
-    constexpr static int	swap		= (1 << vecelemo_swap) ;
-    constexpr static int	stationary	= (1 << vecelemo_stationary) ;
-    constexpr static int	conserve	= (1 << vecelemo_conserve) ;
-    constexpr static int	sorted		= (1 << vecelemo_sorted) ;
-    constexpr static int	ordered		= (1 << vecelemo_ordered) ;
+    inline static cint	reuse		= (1 << vecelemo_reuse) ;
+    inline static cint	compact		= (1 << vecelemo_compact) ;
+    inline static cint	swap		= (1 << vecelemo_swap) ;
+    inline static cint	stationary	= (1 << vecelemo_stationary) ;
+    inline static cint	conserve	= (1 << vecelemo_conserve) ;
+    inline static cint	sorted		= (1 << vecelemo_sorted) ;
+    inline static cint	ordered		= (1 << vecelemo_ordered) ;
 } ; /* end struct (vecelemms) */
 
 #endif /* __cplusplus */
@@ -91,7 +90,7 @@ struct vecelem_flags {
 struct vecelem_head {
 	voidp		va ;		/* value-aray */
 	VECELEM_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
@@ -137,7 +136,7 @@ struct vecelem : vecelem_head {
 	    extent	(this,vecelemmem_extent) ;
 	    audit	(this,vecelemmem_audit) ;
 	    finish	(this,vecelemmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	    va = nullptr ;
 	} ; /* end tcor */
 	vecelem(const vecelem &) = delete ;
@@ -156,7 +155,7 @@ struct vecelem : vecelem_head {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct vecelem() {
-	    if (magic && va) dtor() ;
+	    if (magval && va) dtor() ;
 	} ;
 } ; /* end struct (vecelem) */
 #else	/* __cplusplus */
