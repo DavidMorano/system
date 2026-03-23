@@ -55,11 +55,20 @@
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"strkeycmp.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef cmporders	co ;
 
 
 /* external subroutines */
