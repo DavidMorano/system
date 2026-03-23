@@ -36,7 +36,7 @@ module ;
 #include	<six.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
-#include	<dprintf.h>		/* debugging */
+#include	<dprintf.hh>		/* debugging */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/sif.ccm"
