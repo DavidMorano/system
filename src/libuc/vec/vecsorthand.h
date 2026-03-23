@@ -42,7 +42,7 @@ struct vecsorthand_head {
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		e ;		/* extent of array */
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum vecsorthandmems {
@@ -50,7 +50,7 @@ enum vecsorthandmems {
 	vecsorthandmem_del,
 	vecsorthandmem_finish,
 	vecsorthandmem_overlast
-} ;
+} ; /* end enum */
 struct vecsorthand_iter {
 	void		**va = nullptr ;
 	int		i = -1 ;
