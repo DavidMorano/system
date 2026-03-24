@@ -30,7 +30,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |TIMESPEC| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 
