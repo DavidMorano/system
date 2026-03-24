@@ -1,4 +1,4 @@
-/* usupport_primet HEADER */
+/* usupport_prime HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -78,12 +78,6 @@ extern libu::ugetustime		getustime ;
 
 #endif /* __cplusplus */
 #endif /* OBJECT_GETUSTIME */
-
-#ifdef	__cplusplus
-namespace libu {
-    extern int ustrftime(char *,int,cchar *,CTM *) noex ;
-}
-#endif /* __cplusplus */
 
 
 #endif /* USUPPORTPRIME_INCLUDE */
