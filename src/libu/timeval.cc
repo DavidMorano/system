@@ -29,12 +29,14 @@
 #include	<ctime>			/* |TIMEVAL| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<compare>
+#include	<numeric>		/* |sat_mul(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<localmisc.h>
 
-#include	"timeval.h"
+#include	"timeval.hh"
 
 
 /* local defines */
@@ -42,6 +44,16 @@
 #ifndef	INTMILLION
 #define	INTMILLION	1000000
 #endif
+
+
+/* imported namespaces */
+
+using std::sat_mul ;			/* subroutine */
+
+
+/* local typedefs */
+
+using ord = std::ordering_strong ;	/* type */
 
 
 /* external subroutines */
@@ -72,7 +84,7 @@ int timeval_load(TIMEVAL *dst,time_t sec,int usec) noex {
 	    while (usec >= onemillion) {
 	        sec += 1 ;
 	        usec -= onemillion ;
-	    }
+	    } /* end while */
 	    dst->tv_sec = sec ;
 	    dst->tv_usec = usec ;
 	} /* end if (non-null) */
@@ -108,6 +120,20 @@ int timeval_sub(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 }
 /* end subroutine (timeval_sub) */
 
+timeval_t &timeval_t::operator *= (int m) noex {
+    	const time_t		vs = m ;
+	const suseconds_t	vu = m ;
+	suseconds_t		usec ;
+	tv_sec	= sat_mul(tv_sec,vs) ;
+	usec	= sat_mul(tv_usec,vu) ;
+	while (usec >= onemillion) {
+	    usec -= onemillion ;
+	    tv_sec += 1 ;
+	} /* end while */
+	tv_usec = usec ;
+	return *this ;
+} /* end method (timeval::operator) */
+
 timeval_t &timeval_t::operator += (const timeval_t &o) noex {
 	suseconds_t	usec = (tv_usec + o.tv_usec) ;
 	tv_sec += o.tv_sec ;
@@ -129,6 +155,18 @@ timeval_t &timeval_t::operator -= (const timeval_t &o) noex {
 	tv_usec = usec ;
 	return *this ;
 } /* end method (timeval::operator) */
+
+ord timeval_t::operator <=> (const timeval_t &o) const {
+    	ord res = ord::equal ;
+	int rc = 0 ;
+	if ((rc = intconv(tv_sec - o.tv_sec)) == 0) {
+	    rc = intconv(tv_usec - o.tv_usec) ;
+	}
+	if (rc) {
+	    res = (rc > 0) ? ord::greater : ord::less ;
+	}
+	return res ;
+} /* end smethod (timeval_t) */
 
 timeval operator + (const timeval &t1,const timeval &t2) noex {
 	timeval	r ;
