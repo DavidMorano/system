@@ -44,17 +44,21 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<getusername.h>
-#include	<syswords.hh>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<strlibval.hh>
 #include	<mkpathx.h>
-#include	<dirs.h>
-#include	<isnot.h>
+#include	<removes.h>
+#include	<isnot.h>		/* |isNotPresent(3uc)| */
 #include	<localmisc.h>
 
 #include	"mktmp.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -70,6 +74,11 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_minmod(cchar *,mode_t) noex ;
+}
 
 
 /* external variables */
@@ -96,16 +105,16 @@ static strlibval	strtmpdir(strlibval_tmpdir) ;
 int mktmpusers(char *rbuf) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
             static cchar    *tmpdir = strtmpdir ;
             rs = SR_NOMEM ;
-            if (tmpdir != nullptr) {
+            if (tmpdir != nullptr) ylikely {
                 cchar       *users = sysword.w_users ;
-                if ((rs = mkpath(rbuf,tmpdir,users)) >= 0) {
+                if ((rs = mkpath(rbuf,tmpdir,users)) >= 0) ylikely {
                     rl = rs ;
-                    if (USTAT sb ; (rs = uc_stat(rbuf,&sb)) >= 0) {
+                    if (ustat sb ; (rs = uc_stat(rbuf,&sb)) >= 0) {
                         if (! S_ISDIR(sb.st_mode)) {
-                            if ((rs = rmdirs(rbuf)) >= 0) {
+                            if ((rs = removes(rbuf)) >= 0) {
                                 rs = tmpusers(rbuf) ;
                             } /* end if (rmdirs) */
                         } /* end if */
@@ -125,7 +134,7 @@ int mktmpusers(char *rbuf) noex {
 static int tmpusers(char *rbuf) noex {
 	cmode		dm = TMPUSERDMODE ;
 	int		rs ;
-	if ((rs = u_mkdir(rbuf,dm)) >= 0) {
+	if ((rs = u_mkdir(rbuf,dm)) >= 0) ylikely {
 	    rs = uc_minmod(rbuf,dm) ;
 	} /* end if (ok) */
 	return rs ;
