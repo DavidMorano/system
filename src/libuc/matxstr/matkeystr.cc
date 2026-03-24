@@ -94,9 +94,9 @@ int matkeystr(mainv a,cchar *sp,int sl) noex {
 	    int		i{} ; /* used-afterwards */
 	    bool 	f = false ;
 	    if (sl >= 0) {
+		int m ;
 	        for (i = 0 ; a[i] != nullptr ; i += 1) {
-		    int	m = (sch == a[i][0]) ;
-		    if (m > 0) {
+		    if ((m = (sch == a[i][0])) > 0) {
 		        m = nleadkeystr(a[i],sp,sl) ;
 		    }
 		    f = (((m == sl) || keyend(sp[m])) && keyend(a[i][m])) ;
