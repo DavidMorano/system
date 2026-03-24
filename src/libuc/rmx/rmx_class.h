@@ -28,11 +28,11 @@
 
 EXTERNC_begin
 
-extern int	rmeol(cchar *,int) noex ;
-extern int	rmwht(cchar *,int) noex ;
-extern int	rmblk(cchar *,int) noex ;
-extern int	rmtrailclass(cchar *,int,cchar *) noex ;
-extern int	rmtrailchr(cchar *,int,int) noex ;
+extern int	rmeol		(cchar *,int) noex ;
+extern int	rmwht		(cchar *,int) noex ;
+extern int	rmblk		(cchar *,int) noex ;
+extern int	rmtrailclass	(cchar *,int,cchar *) noex ;
+extern int	rmtrailchr	(cchar *,int,int) noex ;
 
 EXTERNC_end
 
