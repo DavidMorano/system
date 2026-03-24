@@ -1,4 +1,4 @@
-# MAKEFILES (sysdialer)
+# MAKEFILE (sysdialer)
 
 T= sysdialer
 
