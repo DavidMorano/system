@@ -46,11 +46,11 @@ OBJ2= usupport_cfdec.o usupport_ctdec.o
 OBJ3= usupport_snwcpy.o usupport_strwcpy.o
 OBJ4= usupport_toxc.o usupport_nleadstr.o
 OBJ5= usupport_matstr.o usupport_rmx.o
-OBJ6=
+OBJ6= usupport_ustrftime.o usupport_sixchr.o
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o
+OBJB= obj4.o obj5.o obj6.o
 
 OBJ= obja.o objb.o
 
@@ -164,5 +164,7 @@ usupport_nleadstr.o:	usupport_nleadstr.cc	usupport_nleadstr.h	$(INCS)
 usupport_toxc.o:	usupport_toxc.cc	usupport_toxc.h		$(INCS)
 usupport_rmx.o:		usupport_rmx.cc		usupport_rmx.h		$(INCS)
 usupport_strwcpy.o:	usupport_strwcpy.cc	usupport_strwcpy.h	$(INCS)
+usupport_ustrftime.o:	usupport_ustrftime.cc	usupport_ustrftime.h	$(INCS)
+usupport_sixchr.o:	usupport_sixchr.cc	usupport_sixchr.h	$(INCS)
 
 
