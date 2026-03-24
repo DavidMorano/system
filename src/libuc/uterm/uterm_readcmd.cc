@@ -125,7 +125,7 @@ termcmdtype_pf,			/* 'O' */
 termcmdtype_overlast
 #endif /* COMMENT */
 
-constexpr const uchar	cans[] = "\030\032\033" ;
+constexpr uchar		cans[] = "\030\032\033" ;
 
 static cint		maxdig = ndigit(TERMCMD_MAXPVAL,10) ;
 
@@ -139,7 +139,7 @@ constexpr uchar		alts[] = {
 	'P',		/* DCS */
 	'O',		/* PF (also SS3) */
 	0
-} ;
+} ; /* end array */
 #endif /* COMMENT */
 
 
