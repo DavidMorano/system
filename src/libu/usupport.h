@@ -42,6 +42,8 @@
 #include	<usupport_matstr.h>
 #include	<usupport_rmx.h>
 #include	<usupport_strwcpy.h>
+#include	<usupport_ustrftime.h>
+#include	<usupport_sixchr.h>
 
 
 #endif /* USUPPORT_INCLUDE */
