@@ -63,6 +63,9 @@ import libutil ;			/* |memclear(3u)| */
 /* local structures */
 
 
+/* forward references */
+
+
 /* local variables */
 
 
