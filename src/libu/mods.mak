@@ -45,6 +45,23 @@ MODS += usysbasic.ccm
 LIBS +=
 
 
+OBJ00_UMODS = valuelims.o digbufsizes.o 
+OBJ01_UMODS = builtin.o
+OBJ02_UMODS = digtab.o xxtostr.o
+OBJ03_UMODS = bitop.o
+OBJ04_UMODS = unixfnames.o 
+OBJ05_UMODS = constdiv.o 
+OBJ06_UMODS = usysbasic.o
+OBJ07_UMODS = 
+
+OBJA_UMODS= obj00_umods.o obj01_umods.o 
+OBJB_UMODS= obj02_umods.o obj03_umods.o
+OBJC_UMODS= obj04_umods.o obj05_umods.o 
+OBJD_UMODS= obj06_umods.o
+
+OBJ_UMODS= obja_umods.o objb_umods.o objc_umods.o objd_umods.o
+
+
 INCDIRS=
 
 LIBDIRS=
@@ -63,23 +80,6 @@ LDFLAGS		?= $(MAKELDFLAGS)
 #SOFL= -shared -Xlinker -flat_namespace -Xlinker -undefined -Xlinker suppress
 #SOFL= -shared -Xlinker -undefined -Xlinker dynamic_lookup
 SOFL= -shared
-
-
-OBJ00_UMODS = valuelims.o digbufsizes.o 
-OBJ01_UMODS = builtin.o
-OBJ02_UMODS = digtab.o xxtostr.o
-OBJ03_UMODS = bitop.o
-OBJ04_UMODS = unixfnames.o 
-OBJ05_UMODS = constdiv.o 
-OBJ06_UMODS = usysbasic.o
-OBJ07_UMODS = 
-
-OBJA_UMODS= obj00_umods.o obj01_umods.o 
-OBJB_UMODS= obj02_umods.o obj03_umods.o
-OBJC_UMODS= obj04_umods.o obj05_umods.o 
-OBJD_UMODS= obj06_umods.o
-
-OBJ_UMODS= obja_umods.o objb_umods.o objc_umods.o objd_umods.o
 
 
 .SUFFIXES:		.hh .ii .iim .ccm
@@ -210,10 +210,12 @@ objf_umods.o:		$(OBJF_UMODS)
 
 # VARIOUS (module)
 digtab.o:		digtab.ccm
-xxtostr.o:		xxtostr.ccm
 constdiv.o:		constdiv.ccm
 builtin.o:		builtin.ccm
 bitop.o:		bitop.ccm
+
+xxtostr.o:		xxtostr.ccm digtab.o
+	makemodule xxtostr
 
 # VALUELIMS (module)
 valuelims.o:		valuelims.ccm			$(INCS)
