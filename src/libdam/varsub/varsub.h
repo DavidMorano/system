@@ -48,12 +48,12 @@ enum varsubos {
 
 #ifdef	__cplusplus
 struct varsubms {
-    	constexpr static cint	blank 		= (1 << varsubo_blank) ;
-    	constexpr static cint	noblank 	= (1 << varsubo_noblank) ;
-    	constexpr static cint	badnokey 	= (1 << varsubo_badnokey) ;
-    	constexpr static cint	brace 		= (1 << varsubo_brace) ;
-    	constexpr static cint	paren 		= (1 << varsubo_paren) ;
-} ;
+    	inline static cint	blank 		= (1 << varsubo_blank) ;
+    	inline static cint	noblank 	= (1 << varsubo_noblank) ;
+    	inline static cint	badnokey 	= (1 << varsubo_badnokey) ;
+    	inline static cint	brace 		= (1 << varsubo_brace) ;
+    	inline static cint	paren 		= (1 << varsubo_paren) ;
+} ; /* end struct (varsubms) */
 #endif /* __cplusplus */
 
 /* initialization options */
