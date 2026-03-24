@@ -1,0 +1,124 @@
+/* varithmetic MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* Vector-Arithmetic */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2017-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+/*******************************************************************************
+
+  	Family:
+	varithmetic
+
+	Description:
+	These subroutines are used in performing extended precision
+	integer arithmetic.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>
+
+export module varithmetic ;
+
+export {
+    template<typename Digit>
+    constexpr int addone(Digit &r,Digit v) noex {
+	r = v + 1 ;
+	return int((r < v) || (r == 0)) ; /* carry-out */
+    }
+} /* end export */
+
+export {
+    template<typename Digit>
+    constexpr int addc(Digit &r,Digit v0,Digit v1,int ci) noex {
+	Digit		co{} ;
+	Digit		dci = cast_static<Digit>(ci) ;
+	r = mach_addc(v0,v1,dci,&co) ;
+	return int(co) ;
+    }
+} /* end export */
+
+export {
+    template<typename Digit>
+    constexpr void vcopy(int n,Digit *r,Digit *o) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    r[i] = o[i] ;
+	}
+    } /* end subroutine (vcopy) */
+} /* end export */
+
+export {
+    template<typename Digit>
+    constexpr int vadd(int n,Digit *r,Digit *v0,Digit *v1,int ci) noex {
+    	int		co = ci ;
+	for (int i = 0 ; i < n ; i += 1) {
+	    co = addc(r[i],v0[i],v1[i],co) ;
+	}
+	return co ;
+    }
+} /* end export */
+
+export {
+template<typename Digit>
+constexpr int vaddone(int n,Digit *r,Digit *v) noex {
+    	int		co = 1 ;
+	for (int i = 0 ; i < n ; i += 1) {
+	    co = addc(r[i],v[i],0u,co) ;
+	}
+	return co ;
+}
+} /* end export */
+
+export {
+    template<typename Digit>
+    constexpr void vcomp(int n,Digit *r,Digit *v1) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    r[i] = (compl v1[i]) ;
+	}
+    } /* end subroutine (vcomp) */
+} /* end export */
+
+export {
+    template<typename Digit>
+    constexpr void vneg(int n,Digit *r,Digit *v) noex {
+    	Digit t[n] ;
+	vcomp(n,t,v) ;
+	vaddone(n,r,t) ;
+    } /* end subroutine (vneg) */
+} /* end export */
+
+export {
+    template<typename Digit>
+    constexpr int vcmp(int n,Digit *v1,Digit *v2) noex {
+	int		rc = 0 ;
+	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
+	    if ((rc = (v1[i] != v2[i]))) {
+		rc = (v1[i] > v2[i]) ? +1 : -1 ;
+		break ;
+	    }
+	} /* end for */
+	return rc ;
+    } /* end subroutine (vcmp) */
+} /* end export */
+
+
