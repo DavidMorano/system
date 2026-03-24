@@ -76,19 +76,35 @@
 
 namespace stdclib {
     int std_strbasecmp(cchar *s1,cchar *s2) noex {
-	return strcmp(s1,s2) ;
+	int rc = 0 ;
+	if (s1 && s2) {
+	    rc = strcmp(s1,s2) ;
+	} /* end if (non-null) */
+	return rc ;
     }
     int std_strcasecmp(cchar *s1,cchar *s2) noex {
-	return strcasecmp(s1,s2) ;
+	int rc = 0 ;
+	if (s1 && s2) {
+	    rc = strcasecmp(s1,s2) ;
+	} /* end if (non-null) */
+	return rc ;
     }
 } /* end namespace (stdclib) */
 
 namespace stdclib {
     int std_strnbasecmp(cchar *s1,cchar *s2,int n) noex {
-	return strncmp(s1,s2,n) ;
+	int rc = 0 ;
+	if (s1 && s2) {
+	    rc = strncmp(s1,s2,n) ;
+	} /* end if (non-null) */
+	return rc ;
     }
     int std_strncasecmp(cchar *s1,cchar *s2,int n) noex {
-	return strncasecmp(s1,s2,n) ;
+	int rc = 0 ;
+	if (s1 && s2) {
+	    rc = strncasecmp(s1,s2,n) ;
+	} /* end if (non-null) */
+	return rc ;
     }
 } /* end namespace (stdclib) */
 
