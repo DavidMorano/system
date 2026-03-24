@@ -78,7 +78,7 @@
 #define	UTO_NOBUFS	(5 * 60)
 #define	UTO_BUSY	5
 #define	UTO_GET		3
-#define	UTO_DEADLOCK	50
+#define	UTO_DEADLOCK	10
 #define	UTO_IO		60
 #define	UTO_DQUOT	(5 * 60)
 #define	UTO_NOSPC	(5 * 60)
