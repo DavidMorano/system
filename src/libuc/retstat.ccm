@@ -40,12 +40,10 @@ export {
 	void set(int a) { 
 	    rs = a ; 
 	} ;
-	operator int () noex ;
+	operator int () noex {
+    	    return rs ;
+	} ;
     } ; /* end struct (retstat) */
-}
-
-retstat::operator int () noex {
-    	return rs ;
-}
+} /* end export */
 
 
