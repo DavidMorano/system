@@ -128,25 +128,6 @@ int msleep(int msec) noex {
 }
 /* end subroutine (msleep) */
 
-namespace libu {
-    sysret_t ustrftime(char *dbuf,int dlen,cchar *fmt,CTM *tmp) noex {
-	int		rs = SR_FAULT ;
-	if (dbuf && fmt && tmp) {
-	    rs = SR_INVALID ;
-	    if (dlen >= 0) {
-	        csize	dsize = size_t(dlen + 1) ;
-	        if (size_t rsize ; (rsize = strftime(dbuf,dsize,fmt,tmp)) > 0) {
-	            rs = intsat(rsize) ;
-	        } else if (rsize == 0) {
-	            dbuf[0] = '\0' ;
-	            rs = SR_OVERFLOW ;
-	        }
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-    }
-} /* end namespace (libu) */
-
 
 /* local subroutines */
 
