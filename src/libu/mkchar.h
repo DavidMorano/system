@@ -76,7 +76,7 @@ constexpr inline int mkchar(int ch) noex {
 #else /* __cplusplus */
 #define	MKCHAR_STATICINLINE
 
-static inline int mkchar(int ch) noex {
+local inline int mkchar(int ch) noex {
 	return (ch & UCHAR_MAX) ;
 }
 
