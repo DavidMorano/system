@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* copy a c-string to a maximum extent */
+/* copy a counted c-string to a destination buffer w/ cone manipulation */
 /* version %I% last-modified %G% */
 
 
@@ -21,18 +21,19 @@
 	strwcpy{xx}
 
 	Name:
-	strwcpyblanks
+	strwcpychrs
 
 	Description:
-	Copy blank characters to a destination for the number of
-	characters specified.  The resulting string is NUL-terminated.
+	Copy a number of a given specified character to a destination
+	buffer.  The resulting string is NUL-terminated.
 
 	Synopsis:
-	char *strwcpyblanks(char *dp,int w) noex
+	char *strwcpychrs(char *dp,int ch,int w) noex
 
 	Arguments:
-	dp	string buffer that receives the copy
-	w	the maximum length to be copied
+	dp	destiantion buffer pointer
+	ch	chacter to copy over (fill)
+	w	the maximum length to be filled
 
 	Returns:
 	-	the character pointer to the end of the destination
@@ -132,25 +133,34 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usupport.h>		/* |libu::strwcpy(3u)| */
-#include	<sfx.h>
-#include	<char.h>
+#include	<sfx.h>			/* |sfnext(3cu)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"strwcpyxx.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* imported namespaces */
 
-using libu::strwcpy ;			/* subroutine */
-
 
 /* local typedefs */
+
+
+/* external subroutines */
+
+extern char * strwcpy(char *,cchar *,int = -1) noex ;
+
+
+/* external variables */
 
 
 /* local structues */
@@ -168,74 +178,90 @@ using libu::strwcpy ;			/* subroutine */
 /* exported subroutines */
 
 char *strwcpychrs(char *dp,int ch,int n) noex {
-	while (n-- > 0) {
-	    *dp++ = char(ch) ;
-	}
-	*dp = '\0' ;
+    	if (dp) ylikely {
+	    while (n-- > 0) {
+	        *dp++ = char(ch) ;
+	    }
+	    *dp = '\0' ;
+	} /* end if (non-null) */
 	return dp ;
 }
 /* end subroutine (strwcpychrs) */
 
 char *strwcpycompact(char *dp,cchar *sp,int sl) noex {
-	int		c = 0 ;
-	int		cl ;
-	cchar		*cp ;
-	if (sl < 0) sl = lenstr(sp) ;
-	while ((cl = sfnext(sp,sl,&cp)) > 0) {
-	    if (c++ > 0) {
-	        *dp++ =  ' ' ;
-	    }
-	    dp = strwcpy(dp,cp,cl) ;
-	    sl -= intconv((cp + cl) - sp) ;
-	    sp = (cp + cl) ;
-	} /* end while (looping through string pieces) */
-	*dp = '\0' ;
+    	if (dp && sp) ylikely {
+	    cchar	*cp ;
+	    if (sl < 0) sl = lenstr(sp) ;
+	    for (int cl, c = 0 ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
+	        if (c++ > 0) {
+	            *dp++ =  ' ' ;
+	        }
+	        dp = strwcpy(dp,cp,cl) ;
+	        sl -= intconv((cp + cl) - sp) ;
+	        sp = (cp + cl) ;
+	    } /* end for (looping through string pieces) */
+	    *dp = '\0' ;
+	} else {
+	    dp = nullptr ;
+	} /* end if (non-null) */
 	return dp ;
 }
 /* end subroutine (strwcpycompact) */
 
 char *strwcpyopaque(char *dp,cchar *sp,int sl) noex {
-	if (sl >= 0) {
-	    while (sl && (*sp != '\0')) {
-		if (! CHAR_ISWHITE(*sp)) *dp++ = *sp ;
-		sp += 1 ;
-		sl -= 1 ;
-	    }
+    	if (dp && sp) ylikely {
+	    if (sl >= 0) {
+	        while (sl && (*sp != '\0')) {
+		    if (! ISWHT(*sp)) *dp++ = *sp ;
+		    sp += 1 ;
+		    sl -= 1 ;
+	        }
+	    } else {
+	        while (*sp != '\0') {
+		    if (! ISWHT(*sp)) *dp++ = *sp ;
+		    sp += 1 ;
+	        }
+	    } /* end if */
+	    *dp = '\0' ;
 	} else {
-	    while (*sp != '\0') {
-		if (! CHAR_ISWHITE(*sp)) *dp++ = *sp ;
-		sp += 1 ;
-	    }
-	} /* end if */
-	*dp = '\0' ;
+	    dp = nullptr ;
+	}
 	return dp ;
 }
 /* end subroutine (strwcpyopaque) */
 
 char *strwcpyrev(char *dp,cchar *sp,int sl) noex {
-	if (sl < 0) sl = lenstr(sp) ;
-	for (int i = (sl-1) ; i >= 0 ; i += 1) {
-	    *dp++ = sp[i] ;
-	} /* end for */
-	*dp = '\0' ;
+    	if (dp && sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    for (int i = (sl-1) ; i >= 0 ; i += 1) {
+	        *dp++ = sp[i] ;
+	    } /* end for */
+	    *dp = '\0' ;
+	} else {
+	    dp = nullptr ;
+	}
 	return dp ;
 }
 /* end subroutine (strwcpyrev) */
 
 char *strwcpywide(char *dp,const wchar_t *sp,int sl) noex {
-	int		ch ;
-	if (sl >= 0) {
-	    while (sl-- && *sp) {
-		if ((ch = mkchar(*sp++)) >= UCHAR_MAX) ch = '¿' ;
-	        *dp++ = char(ch) ;
-	    }
+    	if (dp && sp) ylikely {
+	    wchar_t ch ;
+	    if (sl >= 0) {
+	        while (sl-- && *sp) {
+		    if ((ch = *sp++) > UCHAR_MAX) ch = '¿' ;
+	            *dp++ = char(ch) ;
+	        }
+	    } else {
+	        while (*sp) {
+		    if ((ch = *sp++) > UCHAR_MAX) ch = '¿' ;
+	            *dp++ = char(ch) ;
+	        }
+	    } /* end if */
+	    *dp = '\0' ;
 	} else {
-	    while (*sp) {
-		if ((ch = mkchar(*sp++)) >= UCHAR_MAX) ch = '¿' ;
-	        *dp++ = char(ch) ;
-	    }
-	} /* end if */
-	*dp = '\0' ;
+	    dp = nullptr ;
+	}
 	return dp ;
 }
 /* end subroutine (strwcpywide) */
