@@ -50,13 +50,14 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getusername.h>
-#include	<dirs.h>
 #include	<mkpathx.h>
 #include	<pathadd.h>
+#include	<removes.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -73,6 +74,11 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_minmod(cchar *,mode_t) noex ;
+}
 
 
 /* external variables */
@@ -98,15 +104,15 @@ int mktmpuser(char *rbuf) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rbuf[0] = '\0' ;
-	    if (char *ubuf ; (rs = malloc_un(&ubuf)) >= 0) {
+	    if (char *ubuf ; (rs = lm_un(&ubuf)) >= 0) ylikely {
 		cint	ulen = rs ;
-	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
+	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) ylikely {
 		    rs = mktmpuserx(rbuf,ubuf) ;
 		    rl = rs ;
 		} /* end if (getusername) */
-		rs1 = uc_free(ubuf) ;
+		rs1 = lm_free(ubuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
@@ -117,16 +123,16 @@ int mktmpuser(char *rbuf) noex {
 int mktmpuserx(char *rbuf,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rbuf[0] = '\0' ;
-	    if ((rs = mktmpusers(rbuf)) >= 0) {
+	    if ((rs = mktmpusers(rbuf)) >= 0) ylikely {
 		cint	tl = rs ;
-		if ((rs = pathadd(rbuf,tl,un)) >= 0) {
+		if ((rs = pathadd(rbuf,tl,un)) >= 0) ylikely {
 		    cmode	dm = 0775 ;
 		    rl = rs ;
-		    if (USTAT sb ; (rs = uc_stat(rbuf,&sb)) >= 0) {
+		    if (ustat sb ; (rs = uc_stat(rbuf,&sb)) >= 0) {
 			if (! S_ISDIR(sb.st_mode)) {
-			    if ((rs = rmdirs(rbuf)) >= 0) {
+			    if ((rs = removes(rbuf)) >= 0) {
 				rs = mkourdir(rbuf,dm) ;
 			    }
 			}
@@ -143,13 +149,13 @@ int mktmpuserx(char *rbuf,cchar *un) noex {
 int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t dm) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf && un && dname) {
+	if (rbuf && un && dname) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (un[0] && dname[0]) {
-		if ((rs = mktmpuserx(rbuf,un)) >= 0) {
+	    if (un[0] && dname[0]) ylikely {
+		if ((rs = mktmpuserx(rbuf,un)) >= 0) ylikely {
 		    cint	rl = rs ;
-		    if ((rs = pathadd(rbuf,rl,dname)) >= 0) {
+		    if ((rs = pathadd(rbuf,rl,dname)) >= 0) ylikely {
 			len = rs ;
 		        rs = mkourdir(rbuf,dm) ;
 		    } /* end if (pathadd) */
@@ -165,7 +171,7 @@ int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t dm) noex {
 
 static int mkourdir(cchar *rbuf,cmode dm) noex {
 	int		rs ;
-	if ((rs = u_mkdir(rbuf,dm)) >= 0) {
+	if ((rs = u_mkdir(rbuf,dm)) >= 0) ylikely {
 	    rs = uc_minmod(rbuf,dm) ;
 	}
 	return rs ;
