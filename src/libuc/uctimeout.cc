@@ -51,12 +51,20 @@
 #include	<sys/stat.h>
 #include	<pthread.h>		/* |PTHREAD_SCOPE_SYSTEM| */
 #include	<ucontext.h>
-#include	<csignal>
 #include	<ctime>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<numeric>		/* |cast_saturate(3c++)| */
 #include	<queue>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
+#include	<ucatexit.h>
+#include	<ucatfork.h>
+#include	<uctimer.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<ptc.h>
@@ -95,6 +103,7 @@ import libutil ;			/* |resumelife(3c++)| */
 
 /* imported namespaces */
 
+using std::cast_saturate ;		/* subroutine */
 using libuc::libmem ;			/* variable */
 
 
@@ -128,8 +137,8 @@ namespace {
 	uint		running_disper:1 ;
     } ; /* end struct (uctimeout_flags) */
     struct uctimeout {
-	ptm		mx ;		/* data mutex */
-	ptc		cv ;		/* condition variable */
+	ptm		mtx ;		/* data mutex */
+	ptc		cnv ;		/* condition variable */
 	vechand		ents ;
 	ciq		pass ;
 	vecsorthand	*pqp ;
@@ -203,16 +212,16 @@ enum dispcmds {
 /* forward references */
 
 extern "C" {
-    static int	uctimeout_sigerworker(uctimeout *) noex ;
-    static int	uctimeout_dispworker(uctimeout *) noex ;
-    static void	uctimeout_atforkbefore() noex ;
-    static void	uctimeout_atforkparent() noex ;
-    static void	uctimeout_atforkchild() noex ;
-    static void	uctimeout_exit() noex ;
-    static int	ventcmp(cvoid *,cvoid *) noex ;
+    local int	uctimeout_sigerworker(uctimeout *) noex ;
+    local int	uctimeout_dispworker(uctimeout *) noex ;
+    local void	uctimeout_atforkbefore() noex ;
+    local void	uctimeout_atforkparent() noex ;
+    local void	uctimeout_atforkchild() noex ;
+    local void	uctimeout_exit() noex ;
+    local int	ventcmp(cvoid *,cvoid *) noex ;
 }
 
-static int mkopts() noex {
+local int mkopts() noex {
 	int	vo = 0 ;
 	vo |= vechandm.stationary ;
 	vo |= vechandm.reuse ;
@@ -285,27 +294,27 @@ int uctimeout::init() noex {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
-	        if ((rs = mx.create) >= 0) {
-	            if ((rs = cv.create) >= 0) {
+	        if ((rs = mtx.create) >= 0) ylikely {
+	            if ((rs = cnv.create) >= 0) ylikely {
 	                void_f	b = uctimeout_atforkbefore ;
 	                void_f	ap = uctimeout_atforkparent ;
 	                void_f	ac = uctimeout_atforkchild ;
-	                if ((rs = uc_atfork(b,ap,ac)) >= 0) {
+	                if ((rs = uc_atforkrec(b,ap,ac)) >= 0) {
 			    void_f	e = uctimeout_exit ;
 	                    if ((rs = uc_atexit(e)) >= 0) {
 	                        finitdone = true ;
 	                        f = true ;
 	                    }
 	                    if (rs < 0) {
-	                        uc_atforkexpunge(b,ap,ac) ;
+	                        uc_atforkexp(b,ap,ac) ;
 			    }
 	                } /* end if (uc_atfork) */
 	                if (rs < 0) {
-	                    cv.destroy() ;
+	                    cnv.destroy() ;
 			}
 	            } /* end if (ptc::create) */
 	            if (rs < 0) {
-	                mx.destroy() ;
+	                mtx.destroy() ;
 		    }
 	        } /* end if (ptm::create) */
 	        if (rs < 0) {
@@ -341,15 +350,15 @@ int uctimeout::fini() noex {
 	        void_f	b = uctimeout_atforkbefore ;
 	        void_f	ap = uctimeout_atforkparent ;
 	        void_f	ac = uctimeout_atforkchild ;
-	        rs1 = uc_atforkexpunge(b,ap,ac) ;
+	        rs1 = uc_atforkexp(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = cv.destroy ;
+	        rs1 = cnv.destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = mx.destroy ;
+	        rs1 = mtx.destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    finit = false ;
@@ -364,8 +373,8 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	int		rs1 ;
 	if (valp->metf) {
 	    cint	esize = szof(TIMEOUT) ;
-	    if (TIMEOUT *ep ; (rs = libmem.mall(esize,&ep)) >= 0) {
-	        if ((rs = mx.lockbegin) >= 0) {
+	    if (TIMEOUT *ep ; (rs = libmem.mall(esize,&ep)) >= 0) ylikely {
+	        if ((rs = mtx.lockbegin) >= 0) {
 	            if ((rs = ents.add(ep)) >= 0) {
 	                cint	ei = rs ;
 	                *ep = *valp ;
@@ -377,7 +386,7 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	                    ents.del(ei) ;
 			}
 	            } /* end if (vechand_add) */
-	            rs1 = mx.lockend ;
+	            rs1 = mtx.lockend ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ptm) */
 	        if (rs < 0) {
@@ -392,7 +401,7 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin) >= 0) {
+	if ((rs = mtx.lockbegin) >= 0) ylikely {
 	    vechand	*elp = &ents ;
 	    cint	id = valp->id ;
 	    if (void *vp ; (rs = vechand_get(elp,id,&vp)) >= 0) {
@@ -416,7 +425,7 @@ int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 		    }
 	        } /* end if (vechand_del) */
 	    } /* end if (vechand_get) */
-	    rs1 = mx.lockend ;
+	    rs1 = mtx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -426,7 +435,7 @@ int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 int uctimeout::enterpri(TIMEOUT *ep) noex {
 	int		rs ;
 	int		pi = 0 ;
-	if ((rs = vecsorthand_count(pqp)) > 0) {
+	if ((rs = vecsorthand_count(pqp)) > 0) ylikely {
 	    TIMEOUT	*tep ;
 	    if ((rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
 	        if (ep->val < tep->val) {
@@ -458,7 +467,7 @@ int uctimeout::enterpri(TIMEOUT *ep) noex {
 int uctimeout::timerset(time_t val) noex {
 	TIMESPEC	ts ;
 	int		rs ;
-	if ((rs = timespec_load(&ts,val,0)) >= 0) {
+	if ((rs = timespec_load(&ts,val,0)) >= 0) ylikely {
 	    ITIMERSPEC	it ;
 	    if ((rs = itimerspec_load(&it,&ts,nullptr)) >= 0) {
 	        cint	tf = TIMER_ABSTIME ;
@@ -472,16 +481,16 @@ int uctimeout::timerset(time_t val) noex {
 int uctimeout::capbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin(to)) >= 0) {
+	if ((rs = mtx.lockbegin(to)) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
-	        rs = cv.wait(&mx,to) ;
+	        rs = cnv.wait(&mtx,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
 	        fcapture = true ;
 	    }
 	    waiters -= 1 ;
-	    rs1 = mx.lockend ;
+	    rs1 = mtx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -491,12 +500,12 @@ int uctimeout::capbegin(int to) noex {
 int uctimeout::capend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin) >= 0) {
+	if ((rs = mtx.lockbegin) >= 0) ylikely {
 	    fcapture = false ;
 	    if (waiters > 0) {
-	        rs = cv.signal ;
+	        rs = cnv.signal ;
 	    }
-	    rs1 = mx.lockend ;
+	    rs1 = mtx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -555,7 +564,7 @@ int uctimeout::workbegin() noex {
 int uctimeout::workend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (fl.workready) {
+	if (fl.workready) ylikely {
 	    {
 	        rs1 = thrsend() ;
 	        if (rs >= 0) rs = rs1 ;
@@ -736,14 +745,14 @@ int uctimeout::timerend() noex {
 int uctimeout::thrsbegin() noex {
 	int		rs = SR_OK ;
 	if ((! fl.thrs) && (! freqexit)) {
-	    if ((rs = sigerbegin()) >= 0) {
+	    if ((rs = sigerbegin()) >= 0) ylikely {
 	        if ((rs = dispbegin()) >= 0) {
 	            fl.thrs = true ;
 	        }
 	        if (rs < 0) {
 	            sigerend() ;
 	        }
-	    }
+	    } /* end if (sigerbegin) */
 	} /* end if (needed) */
 	return rs ;
 }
@@ -772,7 +781,7 @@ int uctimeout::sigerbegin() noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if (pta ta ; (rs = pta_create(&ta)) >= 0) {
+	if (pta ta ; (rs = pta_create(&ta)) >= 0) ylikely {
 	    cint	scope = UCTIMEOUT_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 	        pthread_t	tid ;
@@ -871,7 +880,7 @@ int uctimeout::sigerserve() noex {
 	cint		to = TO_CAPTURE ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = capbegin(to)) >= 0) {
+	if ((rs = capbegin(to)) >= 0) ylikely {
 	    const time_t	dt = time(nullptr) ;
 	    while ((rs = vecsorthand_count(pqp)) > 0) {
 	        if (TIMEOUT *tep{} ; (rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
@@ -880,7 +889,7 @@ int uctimeout::sigerserve() noex {
 	            if ((rs = vecsorthand_del(pqp,ei)) >= 0) {
 	                if ((rs = ciq_ins(&pass,tep)) >= 0) {
 	                    fcmd = true ;
-	                    rs = cv.signal ;
+	                    rs = cnv.signal ;
 	                }
 	            }
 	        }
@@ -908,9 +917,9 @@ int uctimeout::dispbegin() noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if (pta ta ; (rs = pta_create(&ta)) >= 0) {
+	if (pta ta ; (rs = pta_create(&ta)) >= 0) ylikely {
 	    cint	scope = UCTIMEOUT_SCOPE ;
-	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
+	    if ((rs = pta_setscope(&ta,scope)) >= 0) ylikely {
 	        pthread_t	tid ;
 	        tworker		wt = (tworker) uctimeout_dispworker ;
 	        if ((rs = uptcreate(&tid,&ta,wt,this)) >= 0) {
@@ -965,16 +974,16 @@ int uctimeout::disprecv() noex {
 	int		rs1 ;
 	int		to = TO_DISPRECV ;
 	int		cmd = dispcmd_exit ;
-	if ((rs = mx.lockbegin) >= 0) {
+	if ((rs = mtx.lockbegin) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && (! fcmd)) {
-	        rs = cv.wait(&mx,to) ;
+	        rs = cnv.wait(&mtx,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
 	        fcmd = false ;
 	        if (! freqexit) cmd = dispcmd_handle ;
 	        if (waiters > 1) {
-	            rs = cv.signal ;
+	            rs = cnv.signal ;
 	        }
 	    } else if (rs == SR_TIMEDOUT) {
 	        if (! freqexit) cmd = dispcmd_timeout ;
@@ -983,7 +992,7 @@ int uctimeout::disprecv() noex {
 	        cmd = dispcmd_exit ;
 	    }
 	    waiters -= 1 ;
-	    rs1 = mx.lockend ;
+	    rs1 = mtx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (mutex-section) */
 	return (rs >= 0) ? cmd : rs ;
@@ -1025,25 +1034,25 @@ int uctimeout::dispjobdel(TIMEOUT *tep) noex {
 }
 /* end subroutine (uctimeout::dispjobdel) */
 
-static int uctimeout_sigerworker(uctimeout *uip) noex {
+local int uctimeout_sigerworker(uctimeout *uip) noex {
 	return uip->sigerworker() ;
 }
 
-static int uctimeout_dispworker(uctimeout *uip) noex {
+local int uctimeout_dispworker(uctimeout *uip) noex {
 	return uip->dispworker() ;
 }
 
-static void uctimeout_atforkbefore() noex {
-	uctimeout_data.mx.lockbegin() ;
+local void uctimeout_atforkbefore() noex {
+	uctimeout_data.mtx.lockbegin() ;
 }
 /* end subroutine (uctimeout_atforkbefore) */
 
-static void uctimeout_atforkparent() noex {
-	uctimeout_data.mx.lockend() ;
+local void uctimeout_atforkparent() noex {
+	uctimeout_data.mtx.lockend() ;
 }
 /* end subroutine (uctimeout_atforkparent) */
 
-static void uctimeout_atforkchild() noex {
+local void uctimeout_atforkchild() noex {
         uctimeout       *uip = &uctimeout_data ;
         if (uip->fl.workready) {
             uip->fl.running_siger = false ;
@@ -1062,21 +1071,21 @@ static void uctimeout_atforkchild() noex {
 }
 /* end subroutine (uctimeout_atforkchild) */
 
-static void uctimeout_exit() noex {
+local void uctimeout_exit() noex {
 	uctimeout_data.fvoid = true ;
 }
 /* end subroutine (uctimeout_atforkparent) */
 
-static int ventcmp(cvoid *v1p,cvoid *v2p) noex {
+local int ventcmp(cvoid *v1p,cvoid *v2p) noex {
 	const TIMEOUT	*e1p = ctimeoutp(v1p) ;
 	const TIMEOUT	*e2p = ctimeoutp(v2p) ;
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-	            rc = intsat(e1p->val - e2p->val) ;
+	            rc = cast_saturate<int>(e1p->val - e2p->val) ;
 	        }
 	    }
 	}
