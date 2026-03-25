@@ -41,13 +41,14 @@ LIBS +=
 
 
 OBJ0= strwcmp.o
-OBJ1=
+OBJ1= strwset.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
+OBJB=
 
-OBJ= $(OBJA)
+OBJ= obja.o
 
 
 INCDIRS +=
@@ -99,7 +100,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -134,6 +135,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-strwcmp.o:		strwcmp.cc strwcmp.h		$(INCS)
+strwcmp.o:		strwcmp.cc	strwcmp.h		$(INCS)
+strwset.o:		strwset.cc	strwset.h		$(INCS)
 
 
