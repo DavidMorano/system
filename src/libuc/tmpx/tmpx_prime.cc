@@ -164,7 +164,7 @@ int tmpx_open(tmpx *op,cchar *dbfn,int oflags) noex {
 	    op->fsize = 0 ;
 	    op->fl = {} ;
 	    op->mapoff = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->oflags = oflags ;
 	    op->operms = 0 ;
 	    op->fd = -1 ;
@@ -194,7 +194,7 @@ int tmpx_close(tmpx *op) noex {
 		rs1 = tmpx_openend(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -468,9 +468,9 @@ static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 	    if ((rs = tmpx_fileopen(op,dt)) >= 0) {
 		op->ti_check = dt ;
 		if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
-	    	    op->fsize = size_t(sb.st_size & SIZE_MAX) ;
+	    	    op->fsize = size_t(sb.st_size) ;
 	    	    op->ti_mod = sb.st_mtime ;
-		    op->magic = TMPX_MAGIC ;
+		    op->magval = TMPX_MAGIC ;
 		} /* end if (stat) */
 		if (rs < 0) {
 		    tmpx_fileclose(op) ;
