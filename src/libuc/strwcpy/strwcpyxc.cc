@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* copy a c-string to "x" case */
+/* copy a counted c-string to a destination buffer w/ case conversion */
 /* version %I% last-modified %G% */
 
 
@@ -78,8 +78,8 @@ extern "C" {
 /* forward references */
 
 template<toxc_f toxc>
-char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
-    	if (dp && sp) {
+local char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
+    	if (dp && sp) ylikely {
 	    if (sl >= 0) {
 	        while (sl-- && *sp) {
 	            *dp++ = char(toxc(*sp++)) ;
