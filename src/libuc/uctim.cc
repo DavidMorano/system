@@ -41,14 +41,14 @@
 	Synopsis:
 	typedef ITIMEVAL	itim
 	typedef CITIMEVAL	citim
-	int uc_timcreate	(uctim *itcp) noex
+	int uc_timcreate	(uctim *entp) noex
 	int uc_timdestroy	(int id) noex
 	int uc_timset		(int id,int,citim *ntvp,itim *otvp) noex
 	int uc_timget		(int id,itim *otvp) noex
 	int uc_timover		(int id) noex
 
 	Arguments:
-	itcp		UCTIM object pointer
+	entp		UCTIM object pointer
 	id		timer identification
 	ntvp		new timer-value-pointer
 	otvp		old timer-value-pointer
@@ -155,10 +155,10 @@ namespace {
     } /* end enum (timemgrmems) */
     struct timemgr ;
     struct timemgr_arg {
-	uctim		*itcp ;
+	uctim		*entp ;
 	CITIMERVAL	*ntcp ;
 	ITIMERVAL	*otcp ;
-	timemgr_arg(uctim *c) noex : itcp(c) { } ;
+	timemgr_arg(uctim *c) noex : entp(c) { } ;
 	timemgr_arg(ITIMERVAL *o,CITIMERVAL *n) noex : ntvp(n), otvp(o) { } ;
 	int operator () (cmdsubs,int) noex ;
     } ; /* end struct (timemgr_arg) */
@@ -247,7 +247,7 @@ namespace {
 	int disphandle() noex ;
 	int dispjobdel(uctim *) noex ;
 	destruct timemgr() noex {
-	    if (cint rs = fini() ; rs < 0) {
+	    if (cint rs = fini ; rs < 0) {
 		ulogerror("timemgr",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (timemgr) */
@@ -286,8 +286,8 @@ cbool			f_childthrs = CF_CHILDTHRS ;
 
 /* exported subroutines */
 
-int uc_timcreate(uctim *itcp) noex {
-	timemgr_arg	ao(itcp) ;
+int uc_timcreate(uctim_ent *entp) noex {
+	timemgr_arg	ao(entp) ;
 	return ao(cmdsub_create,0) ;
 }
 
@@ -326,7 +326,7 @@ int uctim::cmdsub(cmdsubs cmd,int id,timemgr_arg *uap) noex {
 	if (uap) {
 	    rs = SR_INVALID ;
 	    if (cmd >= 0) {
-	        if ((rs = init()) >= 0) {
+	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin()) >= 0) {
 	                if ((rs = workready()) >= 0) {
 	                    switch (cmd) {
@@ -445,23 +445,18 @@ int uctim::pfini() noex {
 int uctim::cmd_create(int id,timemgr_arg *argp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	    cint	esz = szof(uctim) ;
+	if (argp->entp) {
+	    cint	esz = szof(uctim_ent) ;
 	    if (uctim *ep ; (rs = lm_mall(esz,&ep)) >= 0) {
-		*ep = *argp->itcp ;
+		*ep = *argp->entp ;
 	        if ((rs = ents.add(ep)) >= 0) {
-	            cint	ei = rs ;
-	            {
-	                ep->id = ei ;
-	                rs = enterpri(ep) ;
-	            }
-	            if (rs < 0) {
-	                ents.del(ei) ;
-		    }
+	            ep->id = rs ;
 	        } /* end if (vechand_add) */
 	        if (rs < 0) {
 	            lm_free(ep) ;
 		}
 	    } /* end if (m-a) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uctim::cmd_create) */
@@ -469,8 +464,6 @@ int uctim::cmd_create(int id,timemgr_arg *argp) noex {
 int uctim::cmd_set(int id,timemgr_arg *argp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	    cint	esz = szof(uctim) ;
-	    if (uctim *ep ; (rs = lm_mall(esz,&ep)) >= 0) {
 	        if ((rs = mtx.lockbegin) >= 0) {
 	            if ((rs = ents.add(ep)) >= 0) {
 	                cint	ei = rs ;
@@ -639,7 +632,7 @@ int uctim::workbegin() noex {
 	                        if (rs < 0) {
 	                            ciq_finish(&pass) ;
 	                        }
-	                    }
+	                    } /* end if (ciq_start) */
 	                    if (rs < 0) {
 	                        timerend() ;
 	                    }
@@ -979,7 +972,7 @@ int uctim::sigerserve() noex {
 	if ((rs = capbegin(to)) >= 0) {
 	    custime	dt = time(nullptr) ;
 	    while ((rs = pqp->count) > 0) {
-	        if (uctim *tep ; (rs = pqp->get(0,&tep)) >= 0) {
+	        if (uctim_ent *tep ; (rs = pqp->get(0,&tep)) >= 0) {
 	            cint	ei = rs ;
 	            if (tep->val > dt) break ;
 	            if ((rs = pqp->del(ei)) >= 0) {
@@ -1096,7 +1089,7 @@ int uctim::disprecv() noex {
 int uctim::disphandle() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	for (uctim *tep ; (rs1 = ciq_rem(&pass,&tep)) >= 0 ; ) {
+	for (uctim_ent *tep ; (rs1 = ciq_rem(&pass,&tep)) >= 0 ; ) {
 	    if ((rs = dispjobdel(tep)) > 0) {
 	        timeout_f	met = (timeout_f) tep->metf ;
 	        rs = (*met)(tep->objp,tep->tag,tep->arg) ;
@@ -1109,7 +1102,7 @@ int uctim::disphandle() noex {
 }
 /* end subroutine (uctim::disphandle) */
 
-int uctim::dispjobdel(uctim *tep) noex {
+int uctim::dispjobdel(uctim_ent *tep) noex {
         cint       	to = TO_CAPTURE ;
 	int		rs ;
 	int		rs1 ;
