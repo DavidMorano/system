@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* set a string to a number of characters */
+/* set a string to a number of characters (exactly - not-NUL-terminated) */
 /* version %I% last-modified %G% */
 
 
@@ -61,7 +61,6 @@
 	Returns:
 	-	the character pointer to the end of the destination
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -104,7 +103,7 @@
 /* exported subroutines */
 
 char *strnset(char *bp,int ch,int n) noex {
-    	if (bp) {
+    	if (bp) ylikely {
 	    while (n-- > 0) {
 	        *bp++ = char(ch) ;
 	    }
