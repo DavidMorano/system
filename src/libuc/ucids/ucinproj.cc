@@ -72,6 +72,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 #if	defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0)
