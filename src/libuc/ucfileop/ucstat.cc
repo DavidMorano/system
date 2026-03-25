@@ -40,6 +40,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<intsat.h>
 #include	<prefixfn.h>
 #include	<localmisc.h>
 
@@ -77,7 +78,8 @@ int uc_stat(cchar *fname,ustat *sbp) noex {
 	    cchar	*fn ;
 	    if (prefixfn pf ; (rs = pf.start(fname,-1,&fn)) > 0) {
 	        if ((rs = u_stat(fn,sbp)) >= 0) {
-		    flen = intsat(sbp->st_size) ;
+		    csize fsize = size_t(sbp->st_size) ;
+		    flen = intsat(fsize) ;
 	        }
 		rs1 = pf.finish ;
 		if (rs >= 0) rs = rs1 ;
