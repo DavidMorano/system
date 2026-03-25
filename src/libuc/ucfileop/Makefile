@@ -46,7 +46,7 @@ OBJ2= uclink.o uclstat.o ucpathconf.o
 OBJ3= ucreadlink.o ucstat.o
 OBJ4= ucstatvfs.o ucaccess.o
 OBJ5= ucresolvepath.o ucrealpath.o
-OBJ6= ucunlink.o ucremove.o
+OBJ6= ucunlink.o ucremove.o uctruncate.o
 OBJ7= ucmkdir.o ucrmdir.o ucfilemode.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o 
@@ -58,7 +58,6 @@ OBJ= obja.o objb.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -169,5 +168,6 @@ ucstat.o:		ucstat.cc				$(INCS)
 ucstatvfs.o:		ucstatvfs.cc				$(INCS)
 ucsymlink.o:		ucsymlink.cc				$(INCS)
 ucunlink.o:		ucunlink.cc				$(INCS)
+uctruncate.o:		uctruncate.cc	uctruncate.h		#(INCS)
 
 
