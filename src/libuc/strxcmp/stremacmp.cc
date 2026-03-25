@@ -48,15 +48,24 @@
 #include	<usysdefs.h>
 #include	<strnxcmp.h>		/* |strnncmp(3uc)| */
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"stremacmp.h"
 
 
 /* local defines */
 
-#ifndef	CH_AT
-#define	CH_AT	'@'
+#ifndef	CHX_AT
+#define	CHX_AT	'@'
 #endif
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef cmporders	co ;
 
 
 /* external subroutines */
@@ -82,12 +91,12 @@
 int stremacmp(cchar *e1p,cchar *e2p) noex {
 	int		rc = 0 ;
 	if (e1p && e2p) {
-	    cchar *t1p = strchr(e1p,CH_AT) ;
-	    cchar *t2p = strchr(e2p,CH_AT) ;
+	    cchar *t1p = strchr(e1p,CHX_AT) ;
+	    cchar *t2p = strchr(e2p,CHX_AT) ;
 	    if (t1p && t2p) {
 	        if ((rc = strcasecmp((t1p+1),(t2p+1))) == 0) {
-	            cint	t1l = intconv(t1p - e1p) ;
-	            cint	t2l = intconv(t2p - e2p) ;
+	            cint t1l = intconv(t1p - e1p) ;
+	            cint t2l = intconv(t2p - e2p) ;
 	            rc = strnncmp(e1p,t1l,e2p,t2l) ;
 	        } /* end if (strcasecmp) */
 	    } else {
