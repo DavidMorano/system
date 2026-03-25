@@ -33,19 +33,19 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += vstr.h
+INCS += vstr.h vstrorders.h
 
 MODS +=
 
 LIBS +=
 
 
-OBJ0= vstrcmp.o vstrkeycmp.o 
-OBJ1= vstrkeydictcmp.o
-OBJ2= vstrsort.o
-OBJ3= 
+OBJ0= vstrorders.o
+OBJ1= vstrcmp.o vstrkeycmp.o 
+OBJ2= vstrkeydictcmp.o
+OBJ3= vstrsort.o
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB=
 
 OBJ= obja.o
@@ -135,6 +135,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+vstrorders.o:		vstrorders.cc		vstrorders.h		$(INCS)
 vstrcmp.o:		vstrcmp.cc		vstrcmp.h		$(INCS)
 vstrkeycmp.o:		vstrkeycmp.cc		vstrkeycmp.h		$(INCS)
 vstrkeydictcmp.o:	vstrkeydictcmp.cc	vstrkeydictcmp.h	$(INCS)
