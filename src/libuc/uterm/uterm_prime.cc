@@ -137,7 +137,7 @@ extern "C" {
 /* forward references */
 
 template<typename ... Args>
-static inline int uterm_magic(uterm *op,Args ... args) noex {
+local inline int uterm_magic(uterm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == UTERM_MAGIC) ? SR_OK : SR_NOTOPEN ;
