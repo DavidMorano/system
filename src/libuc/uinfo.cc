@@ -61,8 +61,14 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<memory>		/* |destroy_a(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<ucsysauxinfo.h>	/* |SAI_{xx}| */
+#include	<ucfork.h>
+#include	<ucatfork.h>
+#include	<ucatexit.h>
 #include	<getbufsize.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
@@ -72,7 +78,9 @@
 
 #include	"uinfo.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -117,7 +125,7 @@ namespace {
 	        libmem.free(strp) ;
 	        strp = nullptr ;
 	    }
-	}
+	} ; /* end dtor */
     } ; /* end struct (setname) */
     struct setaux {
 	uinfo_infoaux	tmpaux ;
@@ -127,7 +135,7 @@ namespace {
 	        libmem.free(strp) ;
 	        strp = nullptr ;
 	    }
-	}
+	} ; /* end dtor */
     } ; /* end struct (setaux) */
     struct uinfo_alloc {
 	char		*name ;	/* string allocation for "name" */
@@ -169,9 +177,9 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void	uinfo_atforkbefore() noex ;
-    static void	uinfo_atforkafter() noex ;
-    static void	uinfo_exit() noex ;
+    local void	uinfo_atforkbefore() noex ;
+    local void	uinfo_atforkafter() noex ;
+    local void	uinfo_exit() noex ;
 }
 
 
@@ -185,7 +193,7 @@ constexpr int		sais[] = {
 	SAI_HWPROVIDER,
 	SAI_HWSERIAL,
 	SAI_RPCDOMAIN
-} ;
+} ; /* end array (sais) */
 
 
 /* exported variables */
@@ -222,13 +230,13 @@ int uinfo::init() noex {
 	        if ((rs = mx.create) >= 0) {
 	            void_f	b = uinfo_atforkbefore ;
 	            void_f	a = uinfo_atforkafter ;
-	            if ((rs = uc_atfork(b,a,a)) >= 0) {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(uinfo_exit)) >= 0) {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexpunge(b,a,a) ;
+	                    uc_atforkexp(b,a,a) ;
 			}
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
@@ -276,7 +284,7 @@ int uinfo::fini() noex {
 	    {
 	        void_f	b = uinfo_atforkbefore ;
 	        void_f	a = uinfo_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -496,7 +504,7 @@ int auxinfo::start() noex {
     	int		rs ;
 	a = nullptr ;
 	flen = 0 ;
-	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	if ((rs = getbufsize(bufsize_nn)) >= 0) {
 	    cint	sz = (nfields * (rs + 1)) ;
 	    flen = rs ;
 	    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
@@ -576,18 +584,18 @@ int auxinfo::load() noex {
 }
 /* end method (auxinfo::load) */
 
-static void uinfo_atforkbefore() noex {
+local void uinfo_atforkbefore() noex {
 	uinfo_data.atforkbefore() ;
 }
 
-static void uinfo_atforkafter() noex {
+local void uinfo_atforkafter() noex {
 	uinfo_data.atforkafter() ;
 }
 
-static void uinfo_exit() noex {
+local void uinfo_exit() noex {
 	if (cint rs = uinfo_data.fini() ; rs < 0) {
 	    ulogerror("uinfo",rs,"exit-fini") ;
 	}
-}
+} /* end subroutine (uinfo_exit) */
 
 
