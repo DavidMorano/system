@@ -71,7 +71,7 @@
 #include	<storebuf.h>
 #include	<localmisc.h>
 
-#include	"snx.h"
+#include	"snshellunder.h"
 
 
 /* local defines */
