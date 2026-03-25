@@ -1,4 +1,4 @@
-# MAKEFILES (uterm)
+# MAKEFILE (uterm)
 
 T= uterm
 
@@ -40,8 +40,10 @@ MODS +=
 LIBS +=
 
 
-OBJ0= uterm_main.o uterm_readcmd.o
+OBJ0= uterm_prime.o uterm_readcmd.o
 OBJ1=
+OBJ2=
+OBJ3=
 
 OBJA= obj0.o
 OBJB=
@@ -52,7 +54,6 @@ OBJ= obja.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -134,7 +135,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-uterm_main.o:		uterm_main.cc 		$(INCS)
+uterm_prime.o:		uterm_prime.cc 		$(INCS)
 uterm_readcmd.o:	uterm_readcmd.cc	$(INCS)
 
 
