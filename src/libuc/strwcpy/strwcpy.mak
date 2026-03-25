@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJ0= strwcpyx.o strwcpyxc.o
-OBJ1= strwcpyxx.o strwset.o
+OBJ1= strwcpyxx.o
 OBJ2=
 OBJ3=
 
@@ -137,7 +137,5 @@ objb.o:			$(OBJB)
 strwcpyx.o:		strwcpyx.cc	strwcpyx.h	$(INCS)
 strwcpyxc.o:		strwcpyxc.cc	strwcpyxc.h	$(INCS)
 strwcpyxx.o:		strwcpyxx.cc	strwcpyxx.h	$(INCS)
-
-strwset.o:		strwset.cc	strwset.h	$(INCS)
 
 
