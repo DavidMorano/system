@@ -38,6 +38,8 @@
 	Arguments:
 
 	Returns:
+	>=0		ok
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -48,9 +50,12 @@
 #include	<ctime>			/* |{x}itimer(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<numeric>		/* |cast_saturate(3c++)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>
 #include	<utimeout.h>
-#include	<utypealiases.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"uctimer.h"
@@ -60,6 +65,14 @@
 
 #define	ITS	itimerspec
 #define	CITS	const itimerspec
+
+
+/* imported namespaces */
+
+using std::cast_saturate ;		/* subroutine */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -98,7 +111,7 @@ namespace {
 	int get(timer_t) noex ;
 	int over(timer_t) noex ;
     } ; /* end struct (uctimer) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -120,7 +133,7 @@ int uc_timercreate(clockid_t cid,sigevent *sep,timer_t *tmp) noex {
 	    uctimer	uco(cid,sep,tmp) ;
 	    uco.m = &uctimer::create ;
 	    rs = uco(tnull) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uc_timercreate) */
@@ -157,27 +170,31 @@ int uc_timerover(timer_t tid) noex {
 /* local subroutines */
 
 int uctimer::operator () (timer_t tid) noex {
-	int		to_again = utimeout[uto_again] ;
+	errtimer	to_again	= utimeout[uto_again] ;
+	errtimer        to_busy         = utimeout[uto_busy] ;
+	errtimer        to_nomem        = utimeout[uto_nomem] ;
+	reterr		r ;
 	int		rs ;
-	bool		f_exit = false ;
 	repeat {
 	    if ((rs = (this->*m)(tid)) < 0) {
+		r(rs) ;
 		switch (rs) {
 		case SR_AGAIN:
-		    if (to_again-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
+		    r = to_again(rs) ;
+		    break ;
+		case SR_BUSY:
+		    r = to_busy(rs) ;
+		    break ;
+		case SR_NOMEM:
+		    r = to_nomem(rs) ;
 		    break ;
 		case SR_INTR:
-		    break ;
-		default:
-		    f_exit = true ;
+		    r(false) ;
 		    break ;
 		} /* end switch */
+		rs = r ;
 	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
 /* end subroutine (uctimer::operator) */
