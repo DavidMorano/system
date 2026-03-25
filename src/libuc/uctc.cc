@@ -70,7 +70,7 @@ namespace {
 	int attrset(int) noex ;
 	int setpgrp(int) noex ;
     } ; /* end struct (uctc) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -102,16 +102,6 @@ int uc_tcflush(int fd,int cmd) noex {
 	return to(fd) ;
 }
 
-int uc_tcattrget(int fd,TERMIOS *tip) noex {
-	int		rs = SR_FAULT ;
-	if (tip) {
-	    uctc	to(tip) ;
-	    to.m = &uctc::attrget ;
-	    rs = to(fd) ;
-	} /* end if (non-null) */
-	return rs ;
-}
-
 int uc_tcgetpgrp(int fd) noex {
 	uctc		to ;
 	to.m = &uctc::getpgrp ;
@@ -122,6 +112,16 @@ int uc_tcgetsid(int fd) noex {
 	uctc		to ;
 	to.m = &uctc::getsid ;
 	return to(fd) ;
+}
+
+int uc_tcattrget(int fd,TERMIOS *tip) noex {
+	int		rs = SR_FAULT ;
+	if (tip) {
+	    uctc	to(tip) ;
+	    to.m = &uctc::attrget ;
+	    rs = to(fd) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 
 int uc_tcattrset(int fd,int cmd,const TERMIOS *tip) noex {
