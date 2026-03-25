@@ -104,14 +104,13 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename ... Args>
-static inline int strpack_magic(strpack *op,Args ... args) noex {
+local inline int strpack_magic(strpack *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == STRPACK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (strpack_magic) */
+} /* end subroutine (strpack_magic) */
 
 #endif /* __cplusplus */
 
