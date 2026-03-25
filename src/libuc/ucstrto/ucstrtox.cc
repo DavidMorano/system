@@ -43,9 +43,10 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
+#include	<strtox.h>		/* LINU */
 #include	<localmisc.h>
 
-#include	"strtox.h"		/* <- the money shot */
+#include	"ucstrtox.h"		/* <- the money shot */
 
 
 /* local defines */
