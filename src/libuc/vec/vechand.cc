@@ -65,10 +65,6 @@ using libuc::libmem ;			/* variable */
 typedef const void	cv ;
 #endif
 
-extern "C" {
-    typedef int (*qsort_f)(cvoid *,cvoid *) noex ;
-}
-
 
 /* external subroutines */
 
@@ -221,19 +217,18 @@ int vechand_search(vechand *op,cv *ep,vechand_vcmp vcf,void **rpp) noex {
 	if (op && ep && vcf) ylikely {
 	    rs = SR_NOENT ;
 	    if (op->va) ylikely {
-		csize	nsize = size_t(op->i) ;
-		csize	esize = sizeof(void *) ;
+		csize		alen = size_t(op->i) ;
+		csize		esize = sizeof(void *) ;
+		qsort_f		scf = qsort_f(vcf) ;
 	        if (op->fl.osorted && (! op->fl.issorted)) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
-			qsort_f		scf = qsort_f(vcf) ;
-		        qsort(op->va,nsize,esize,scf) ;
+		        qsort(op->va,alen,esize,scf) ;
 	            }
 	        }
 	        if (op->fl.issorted) {
-		    qsort_f	scf = qsort_f(vcf) ;
 	            void	**spp ;
-	            spp = (void **) bsearch(&ep,op->va,nsize,esize,scf) ;
+	            spp = (void **) bsearch(&ep,op->va,alen,esize,scf) ;
 	            rs = SR_NOTFOUND ;
 	            if (spp) {
 	                i = intconv(spp - op->va) ;
@@ -380,10 +375,10 @@ int vechand_sort(vechand *op,vechand_vcmp vcf) noex {
 	        if (! op->fl.issorted) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
-			csize		nsize = size_t(op->i) ;
-			csize		esize = sizeof(void *) ;
-			qsort_f		scf = qsort_f(vcf) ;
-	                qsort(op->va,nsize,esize,scf) ;
+			csize	alen = size_t(op->i) ;
+			csize	esize = sizeof(void *) ;
+			qsort_f	scf = qsort_f(vcf) ;
+	                qsort(op->va,alen,esize,scf) ;
 		    }
 	        } /* end if (not sorted) */
 	    } /* end if (had entries) */
