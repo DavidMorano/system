@@ -65,6 +65,7 @@
 #include	<usysdefs.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"strxcmp.h"
 
@@ -76,6 +77,8 @@
 
 
 /* local typedefs */
+
+typedef cmporders	co ;
 
 
 /* external subroutines */
