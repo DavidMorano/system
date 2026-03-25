@@ -43,6 +43,7 @@
 	uc_unlinkshm	
 	uc_utime	
 	uc_utimes	
+	uc_truncate
 
   	Description:
 	Additional (or supplemental) support for UNIX® limits.
@@ -70,13 +71,15 @@
 	int uc_unlinkshm	(cchar *) noex ;
 	int uc_utime		(cchar *,CUTIMBUF *) noex
 	int uc_utimes		(cchar *,CTIMEVAL *) noex
+	int uc_uctruncate	(cchar *fn,off_t len) noex
 
 	Arguments:
+	fn		file-name
 	sfd		srouce file-descriptor
 	dfd		destination file-descriptor
 	sfname		source file-name
 	dfname		destination file-name
-	len		number of byte to copy
+	len		number of byte to copy or file-offset
 
 *******************************************************************************/
 
@@ -85,10 +88,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+
+#include	<uctruncate.h>
 
 
 EXTERNC_begin
