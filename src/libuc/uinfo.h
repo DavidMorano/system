@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	UINFO_NAMES	struct uinfo_infoname
@@ -37,7 +34,7 @@ struct uinfo_infoname {
 	cchar		*release ;
 	cchar		*version ;
 	cchar		*machine ;
-} ;
+} ; /* end struct (uinfo_infoname) */
 
 struct uinfo_infoaux {
 	cchar		*architecture ;
@@ -45,7 +42,7 @@ struct uinfo_infoaux {
 	cchar		*hwprovider ;
 	cchar		*hwserial ;
 	cchar		*nisdomain ;
-} ;
+} ; /* end struct (uinfo_infoaux) */
 
 typedef UINFO_NAMES	uinfo_names ;
 typedef UINFO_AUXS	uinfo_auxs ;
