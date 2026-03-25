@@ -52,6 +52,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<stdclib.hh>		/* |std_strncasecmp(3u)| */
 #include	<nleadstr.h>
 #include	<strnxcmp.h>		/* |strnfoldcmp(3uc)| */
 #include	<toxc.h>
@@ -65,8 +66,12 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#define	strncasecmp	std_strncasecmp		
+
 
 /* imported namespaces */
+
+using stdclib::std_strncasecmp ;	/* subroutine */
 
 
 /* local typedefs */
@@ -82,45 +87,42 @@ import libutil ;			/* |lenstr(3u)| */
 
 namespace {
    struct cmpx {
-	int x(cchar *,cchar *,int) noex ;
-	virtual int tox(int ch) 			noex = 0 ;
-	virtual int strnxcmp(cchar *,cchar *,int) 	noex = 0 ;
-	virtual int nleadxstr(cchar *,cchar *,int) 	noex = 0 ;
+	int x(cc *,cc *,int)			const noex ;
+	virtual int tox(int ch) 		const noex = 0 ;
+	virtual int strnxcmp(cc *,cc *,int) 	const noex = 0 ;
+	virtual int nleadxstr(cc *,cc *,int)	const noex = 0 ;
    } ; /* end struct (cmpx) */
    struct basecmpx : cmpx {
-	int tox(int ch)					noex override final {
-	    ch &= UCHAR_MAX ;
-	    return ch ;
+	int tox(int ch)				const noex override final {
+	    return (ch & UCHAR_MAX) ;
 	} ;
-	int strnxcmp(cchar *bs,cchar *sp,int sl)	noex override final {
+	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strncmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cchar *s1,cchar *s2,int s2len)	noex override final {
-	    return nleadstr(s1,s2,s2len) ;
+	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
+	    return nleadstr(s1,s2,sl) ;
 	} ;
    } ; /* end struct */
    struct casecmpx : cmpx {
-	int tox(int ch)					noex override final {
-	    ch &= UCHAR_MAX ;
-	    return tolc(ch) ;
+	int tox(int ch)				const noex override final {
+	    return tolc(ch & UCHAR_MAX) ;
 	} ;
-	int strnxcmp(cchar *bs,cchar *sp,int sl)	noex override final {
+	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strncasecmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cchar *s1,cchar *s2,int s2len)	noex override final {
-	    return nleadcasestr(s1,s2,s2len) ;
+	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
+	    return nleadcasestr(s1,s2,sl) ;
 	} ;
    } ; /* end struct */
    struct foldcmpx : cmpx {
-	int tox(int ch)					noex override final {
-	    ch &= UCHAR_MAX ;
-	    return tofc(ch) ;
+	int tox(int ch)				const noex override final {
+	    return tofc(ch & UCHAR_MAX) ;
 	} ;
-	int strnxcmp(cchar *bs,cchar *sp,int sl)	noex override final {
+	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strnfoldcmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cchar *s1,cchar *s2,int s2len)	noex override final {
-	    return nleadfoldstr(s1,s2,s2len) ;
+	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
+	    return nleadfoldstr(s1,s2,sl) ;
 	} ;
    } ; /* end struct */
 } /* end namespace */
@@ -138,19 +140,19 @@ namespace {
 /* exported subroutines */
 
 int strwbasecmp(cchar *s1,cchar *s2,int s2len) noex {
-	basecmpx	co ;
+	basecmpx co ;
 	return co.x(s1,s2,s2len) ;
 }
 /* end subroutine (strwbasecmpx) */
 
 int strwcasecmp(cchar *s1,cchar *s2,int s2len) noex {
-	casecmpx	co ;
+	casecmpx co ;
 	return co.x(s1,s2,s2len) ;
 }
 /* end subroutine (strwcasecmpx) */
 
 int strwfoldcmp(cchar *s1,cchar *s2,int s2len) noex {
-	foldcmpx	co ;
+	foldcmpx co ;
 	return co.x(s1,s2,s2len) ;
 }
 /* end subroutine (strwfoldcmpx) */
@@ -158,7 +160,7 @@ int strwfoldcmp(cchar *s1,cchar *s2,int s2len) noex {
 
 /* local subroutines */
 
-int cmpx::x(cchar *s1,cchar *s2,int µs2len) noex {
+int cmpx::x(cchar *s1,cchar *s2,int µs2len) const noex {
 	int		rc = 0 ;
 	if (s1 && s2) {
 	    rc = tox(s1[0]) ;
@@ -175,11 +177,10 @@ int cmpx::x(cchar *s1,cchar *s2,int µs2len) noex {
 		            rc = tox(s1[m]) ;
 		        }
 		    } /* end if (strnxcmp) */
-	        }
+	        } /* end if (first characters were equal) */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end method (cmpx::x) */
+} /* end method (cmpx::x) */
 
 
