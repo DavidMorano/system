@@ -46,13 +46,14 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |COLUMNS| */
 
 #include	"strlinelen.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
 
@@ -61,7 +62,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
@@ -78,6 +78,8 @@ using std::nothrow ;			/* constant */
 
 /* local variables */
 
+static cint		maxline = ulibval.maxline ;
+
 
 /* exported variables */
 
@@ -85,19 +87,25 @@ using std::nothrow ;			/* constant */
 /* exported subroutines */
 
 int strlinelen(cchar *sp,int sl,int mlen) noex {
-	int		len = 0 ;
-	if (mlen < 0) mlen = 0 ;
-	if ((sp != nullptr) && (sl != 0) && (mlen > 0)) {
-	    if (sl < 0) sl = lenstr(sp) ;
+	int		len = 0 ; /* return-value */
+	if (mlen < 0) mlen = COLUMNS ;
+	if (sp && (sl != 0) && (mlen > 0)) {
+	    if (sl < 0) sl = lenstr(sp,maxline) ;
 	    len = min(sl,mlen) ;
-	    if (cchar *tp ; (tp = strnchr(sp,len,'\n')) != nullptr) {
+	    if (cchar *tp = strnchr(sp,len,'\n') ; tp) {
 	        len = intconv(tp - sp) ;
   	        while ((len > 0) && (sp[len-1] == '\r')) {
 		    len -= 1 ;
 		}
-	    }
+	    } /* end if (strnchr) */
 	} /* end if (have stuff) */
 	return len ;
+}
+/* end subroutine (strlinelen) */
+
+int strlinelen(cchar *sp,int sl) noex {
+    	cint mcols = (COLUMNS - 30) ;
+    	return strlinelen(sp,sl,mcols) ;
 }
 /* end subroutine (strlinelen) */
 
