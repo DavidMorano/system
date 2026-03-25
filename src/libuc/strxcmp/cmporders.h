@@ -1,8 +1,8 @@
-/* cmporders HEADER */
+/* cmporders HEADER (Compare-Orders) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* convert a character string to a given case */
+/* these are values (constants) for specifying comparison order */
 /* version %I% last-modified %G% */
 
 
