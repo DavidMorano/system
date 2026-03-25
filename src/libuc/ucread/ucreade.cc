@@ -1,10 +1,11 @@
-/* uc_reade SUPPORT */
+/* ucreade SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* extended read */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_NONBLOCK	1		/* use nonblocking mode */
 
 /* revision history:
@@ -44,27 +45,27 @@
 
 	= The question:
 
-	What do we want to return on a timeout? This is the big
-	unanswered question of the ages? Do we want to treat the
+	What do we want to return on a timeout?  This is the big
+	unanswered question of the ages?  Do we want to treat the
 	input FD like a STREAM or a SOCKET (returning SR_AGAIN) or
 	do we want to treat it like a FIFO or TERMINAL (returning
-	SR_OK == 0)? We will let this be determined by the caller
+	SR_OK == 0)?  We will let this be determined by the caller
 	by setting (or not setting) 'FM_AGAIN' in the options!
 
 	If the caller sets 'FM_AGAIN' in the options, we return
-	SR_AGAIN if there is no data (it timed out). If the caller
+	SR_AGAIN if there is no data (it timed out).  If the caller
 	sets 'FM_TIMED', then we return SR_TIMEDOUT if it times
-	out. Finally, if the caller doesn't set that, we will return
-	the amount of data received at the time of the timeout
+	out.  Finally, if the caller does not set that, we will
+	return the amount of data received at the time of the timeout
 	(which can inlucde the value ZERO).
 
 	An explicit read of 0 bytes (EOF) always return 0 (EOF).
 	If FM_EXACT was specified and the requested number of bytes
 	has not yet arrived an EOF will be ignored and an attempt
-	will be made to read more data in. Also if FM_EXACT is
+	will be made to read more data in.  Also if FM_EXACT is
 	specified and the required number of bytes has not arrived
 	(but some have), we continue reading until the required
-	number of bytes arrives of if a time-out occurs.
+	number of bytes arrives or a time-out occurs.
 
 	Read sematics are as follow:
 
@@ -97,25 +98,25 @@
 
 	= Some notes:
 
-	Watch out for receiving hang-ups! This can happen when the
+	Watch out for receiving hang-ups!  This can happen when the
 	file-descriptor used for these reads is also used for some
-	writes elsewhere. How should we handle a hang-up? That is
-	a good question.  Since input is not supposed to be affected
-	by a hang-up, we just continue on a hang-up unless there
-	was data read. If we get a hang-up and no data was read,
-	then it is an EOF condition and we will return as if we
-	received an EOF (like we assume that we must have).
+	writes elsewhere.  How should we handle a hang-up?  That
+	is a good question.  Since input is not supposed to be
+	affected by a hang-up, we just continue on a hang-up unless
+	there was data read.  If we get a hang-up and no data was
+	read, then it is an EOF condition and we will return as if
+	we received an EOF (like we assume that we must have).
 
 	= The observation:
 
 	Is it poossible to receive an EOF condition on the input
-	*without* receiving a POLLIN? Amazingly, the answer is YES!
-	If a hang-up is present on the input, then a hang-up condition
-	will be received (POLLHUP) *rather* than a usual EOF
-	condition. Amazing as it is, this is possible. In my opinion,
-	this should not be possible (an EOF should always create a
-	POLLIN) but believe it or not that is not what happens in
-	real life.
+	*without* receiving a POLLIN?  Amazingly, the answer is
+	YES!  If a hang-up is present on the input, then a hang-up
+	condition will be received (POLLHUP) *rather* than a usual
+	EOF condition.  Amazing as it is, this is possible.  In my
+	opinion, this should not be possible (an EOF should always
+	create a POLLIN) but believe it or not that is not what
+	happens in real life.
 
 *******************************************************************************/
 
@@ -141,15 +142,13 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0
+#endif
+
 #ifndef	POLL_INTMULT
 #define	POLL_INTMULT	1000		/* poll-time multiplier */
 #endif
-
-#ifndef	POLLTIMEINT
-#define	POLLTIMEINT	10		/* seconds */
-#endif
-
-#define	EBUFLEN		100
 
 #define	MAXEOF		3
 
