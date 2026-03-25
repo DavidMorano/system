@@ -1,9 +1,9 @@
-/* makedate_get */
+/* makedate_get SPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* get the name on the MAKEDATE string */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,71 +13,49 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	We get the date out of the ID string.
+  	Name:
+	makedate_get
+
+  	Description:
+	We get the date out of the "makedate" ID string.
 
 	Synopsis:
-
-	int makedate_get(makedate,rpp)
+	int makedate_get(cchar *,cchar **) noex
 
 	Arguments:
-
 	makedate	pointer to the MAKEDATE string
 	rpp		pointer to pointer to hold result
 
 	Returns:
-
 	<0		error
 	>=		length of result
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ascii.h>
-#include	<char.h>
+#include	<mkchar.h>
+#include	<char.h>		/* |CHAR_ISWHUTE(3cu)| */
+#include	<ischarx.h>		/* |isdigitlatin(3uc)| */
 #include	<localmisc.h>
+
+#include	"makedate_get.h"
 
 
 /* local defines */
 
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
+
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpylc(char *,int,const char *) ;
-extern int	sncpyuc(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	snwcpyuc(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	isdigitlatin(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
 /* external variables */
@@ -92,39 +70,47 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int makedate_get(cchar *md,cchar **rpp)
-{
-	int		ch ;
-	const char	*sp ;
-	const char	*cp ;
-
-	if (rpp != NULL)
-	    *rpp = NULL ;
-
-	if ((cp = strchr(md,CH_RPAREN)) == NULL)
-	    return SR_NOENT ;
-
-	while (CHAR_ISWHITE(*cp))
-	    cp += 1 ;
-
-	ch = MKCHAR(*cp) ;
-	if (! isdigitlatin(ch)) {
-
-	    while (*cp && (! CHAR_ISWHITE(*cp))) cp += 1 ;
-
-	    while (CHAR_ISWHITE(*cp)) cp += 1 ;
-
-	} /* end if (skip over the name) */
-
-	sp = cp ;
-	if (rpp != NULL) *rpp = cp ;
-
-	while (*cp && (! CHAR_ISWHITE(*cp))) cp += 1 ;
-
-	return (cp - sp) ;
+int makedate_get(cchar *md,cchar **rpp) noex {
+    	cnullptr	np{} ;
+    	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
+	if (md) {
+	    rs = SR_NOTFOUND ;
+	    if (cchar *cp ; (cp = strchr(md,CH_RPAREN)) != np) {
+		rs = SR_OK ;
+	        if (rpp) {
+	            *rpp = nullptr ;
+	        }
+	        while (ISWHT(*cp)) {
+	            cp += 1 ;
+	        }
+		{
+	            cint ch = mkchar(*cp) ;
+	            if (! isdigitlatin(ch)) {
+	                while (*cp && (! ISWHT(*cp))) {
+		            cp += 1 ;
+	                }
+	                while (ISWHT(*cp)) {
+		            cp += 1 ;
+	                }
+	            } /* end if (skip over the name) */
+		} /* end block */
+		{ 
+		    cchar *sp = cp ;
+	            if (rpp) *rpp = cp ;
+	            while (*cp && (! ISWHT(*cp))) {
+	                cp += 1 ;
+	            }
+	            rl = intconv(cp - sp) ;
+		} /* end block */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (makedate_get) */
 
