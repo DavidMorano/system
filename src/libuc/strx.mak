@@ -45,7 +45,7 @@ OBJ1= strabbrsig.o strabbrerr.o
 OBJ2= strsub.o strwhite.o 
 OBJ3= strbasename.o strdirname.o
 
-OBJ4= strcpyxc.o strlinelen.o strlocktype.o
+OBJ4= strlinelen.o strlocktype.o
 OBJ5=
 OBJ6=
 OBJ7=
@@ -59,7 +59,6 @@ OBJ= $(OBJA) $(OBJB)
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -153,13 +152,12 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-strxbrk.o:		strxbrk.cc				$(INCS)
-strwhite.o:		strwhite.cc				$(INCS)
+strxbrk.o:		strxbrk.cc	strxbrk.h		$(INCS)
+strwhite.o:		strwhite.cc	strwhite.h		$(INCS)
 strsub.o:		strsub.cc	strsub.h		$(INCS)
-strerrabbr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
-strsigabbr.o:		strabbrsig.cc	strabbrsig.h		$(INCS)
+strabbrerr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
+strabbrsig.o:		strabbrsig.cc	strabbrsig.h		$(INCS)
 straltwchar.o:		straltwchar.cc	straltwchar.h		$(INCS)
-strcpyxc.o:		strcpyxc.cc	strcpyxc.h		$(INCS)
 strlinelen.o:		strlinelen.cc	strlinelen.h		$(INCS)
 strlocktype.o:		strlocktype.cc	strlocktype.h		$(INCS)
 
