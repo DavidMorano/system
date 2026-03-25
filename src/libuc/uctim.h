@@ -42,7 +42,7 @@
 #include	<psen.h>		/* POSIX® semaphore */
 
 
-#define	UCTIM		struct uctim_head
+#define	UCTIM_ENT	struct uctim_entry
 
 
 EXTERNC_begin
@@ -51,7 +51,7 @@ typedef int (*uctim_f)(void *objp,int timid,int arg) noex ;
 
 EXTERNC_end
 
-struct uctim_head {
+struct uctim_entry {
 	void		*objp ;		/* fcuntion argument (object pointer) */
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
 	uctim_f		notf ;		/* notify function (C-linkage) */
@@ -60,13 +60,13 @@ struct uctim_head {
 	int		arg ;		/* function argument */
 } ; /* end struct (uctim) */
 
-typedef	UCTIM		uctim ;
+typedef	UCTIM_ENT		uctim_ent ;
 
 EXTERNC_begin
 
-extern int uctim_load		(uctim *,void *,psem *,uctim_f,int) noex ;
+extern int uctim_load		(uctim_ent *,void *,psem *,uctim_f,int) noex ;
 
-extern int uc_timcreate		(uctim *) noex ;
+extern int uc_timcreate		(uctim_ent *) noex ;
 extern int uc_timdestroy	(int) noex ;
 extern int uc_timset		(int,CITIMERVAL *,ITIMERVAL *) noex ;
 extern int uc_timget		(int,ITIMERVAL *) noex ;
