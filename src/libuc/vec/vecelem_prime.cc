@@ -81,7 +81,7 @@ template<typename ... Args>
 local inline int vecelem_magic(vecelem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == VECELEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == VECELEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (vecelem_magic) */
@@ -109,7 +109,7 @@ int vecelem_start(vecelem *op,int esz,int vn,int vo) noex {
 	            if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
 	                op->va = p ;
 	    	        op->n = vn ;
-		    	op->magic = VECELEM_MAGIC ;
+		    	op->magval = VECELEM_MAGIC ;
 	            } /* end if (memory-allocation) */
 	        } /* end if */
 	    } /* end if (valid) */
@@ -137,7 +137,7 @@ int vecelem_finish(vecelem *op) noex {
 	    op->c = 0 ;
 	    op->i = 0 ;
 	    op->n = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -412,7 +412,7 @@ local int vecelem_ctor(vecelem *op) noex {
 	    op->n = 0 ;
 	    op->fi = 0 ;
 	    op->esz = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->fl = {} ;
 	} /* end if (non-null) */
 	return rs ;
