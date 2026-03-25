@@ -123,7 +123,7 @@ namespace {
 
 char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
-	if (sp && ss) {
+	if (sp && ss) ylikely {
 	    if (sl >= 0) {
 		if (syshas.strnstr) {
 		    csize n = size_t(sl) ;
@@ -146,7 +146,7 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 
 char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
-	if (sp && ss) {
+	if (sp && ss) ylikely {
 	    if (cint sslen = lenstr(ss) ; sslen > 0) {
 		strner	so(tolc,nleadcasestr) ;
 		rp = so.strnxsub(sp,sl,ss,sslen) ;
@@ -160,7 +160,7 @@ char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 
 char *strnfoldsub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
-	if (sp && ss) {
+	if (sp && ss) ylikely {
 	    if (cint sslen = lenstr(ss) ; sslen > 0) {
 	        strner	so(tofc,nleadfoldstr) ;
 	        rp = so.strnxsub(sp,sl,ss,sslen) ;
@@ -177,7 +177,7 @@ char *strnfoldsub(cchar *sp,int sl,cchar *ss) noex {
 
 char *strner::strnxsub(cchar *sp,int µsl,cchar *ss,int sslen) noex {
 	char		*rp = nullptr ;
-	if (cint sl = getlenstr(sp,µsl) ; sl >= sslen) {
+	if (cint sl = getlenstr(sp,µsl) ; sl >= sslen) ylikely {
 	    int ch = mkchar(ss[0]) ;
 	    {
                 cint        sslead = toxc(ch) ;
