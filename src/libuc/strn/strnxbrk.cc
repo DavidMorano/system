@@ -95,7 +95,7 @@ extern "C++" {
 
 char *strnobrk(cchar *sp,int 탎l,const chrset &sset) noex {
 	char		*rsp = nullptr ;
-	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
+	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 	    bool	f = false ;
 	    for (cchar *lsp = (sp + sl) ; (sp < lsp) && *sp ; sp += 1) {
 		cint	ch = mkchar(*sp) ;
@@ -122,7 +122,7 @@ char *strnobrk(cchar *sp,int sl,cchar *ss) noex {
 
 char *strnrbrk(cchar *sp,int 탎l,const chrset &sset) noex {
 	char		*rsp = nullptr ;
-	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
+	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 	    bool	f = false ;
 	    for (rsp = charp(sp + sl) ; --rsp >= sp ; ) {
 	        cint	ch = mkchar(*rsp) ;
