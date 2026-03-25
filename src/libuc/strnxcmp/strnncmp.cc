@@ -52,6 +52,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"strnxcmp.h"
 
@@ -69,6 +70,8 @@ using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
+
+typedef cmporders	co ;
 
 
 /* external subroutines */
