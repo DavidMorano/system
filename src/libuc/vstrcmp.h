@@ -24,7 +24,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<vstrorder.h>
+#include	<vstrorders.h>
 
 #include	<vstrkeycmp.h>
 
