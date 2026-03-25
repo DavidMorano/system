@@ -29,6 +29,19 @@
 #include	<strwcpyxx.h>
 
 
+#ifdef	__cplusplus
+
+extern char *strwcpy(char *dp,cchar *sp,int sl = -1) noex ;
+
+#else /* __cplusplus */
+
+local inline char *strwcpy(char *dp,cchar *sp,int sl) noex {
+	return strwcpybc(dp,sp,sl) ;
+}
+
+#endif /* __cplusplus */
+
+
 #endif /* STRWCPYX_INCLUDE */
 
 
