@@ -25,10 +25,7 @@
 #include	<termios.h>
 #include	<limits.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<charq.h>
 
 
@@ -36,6 +33,7 @@
 #define	UTERM_FL	struct uterm_flags
 #define	UTERM_LD	struct uterm_loader
 #define	UTERM_PR	struct uterm_prompter
+#define	UTERM_MAGIC	0x33442281
 
 
 enum utermcmds {
@@ -57,7 +55,7 @@ enum utermcmds {
 	utermcmd_getpop,
 	utermcmd_setpop,
 	utermcmd_overlast
-} ;
+} ; /* end enum */
 
 struct uterm_flags {
 	uint		cntl_o:1 ;	/* control-O */
@@ -72,19 +70,19 @@ struct uterm_flags {
 	uint		nosigecho:1 ;	/* no echo for signals */
 	uint		noctty:1 ;	/* the terminal is not controlling */
 	uint		noflow:1 ;	/* no output flow control */
-} ;
+} ; /* end struct */
 
 /* prompt-output before input */
 struct uterm_prompter {
 	cchar		*pbuf ;
 	int		plen ;
-} ;
+} ; /* end struct */
 
 /* pre-loading the input buffer */
 struct uterm_loader {
 	cchar		*lbuf ;
 	int		llen ;
-} ;
+} ; /* end struct */
 
 struct uterm_head {
 	TERMIOS		ts_old ;
@@ -101,10 +99,11 @@ struct uterm_head {
 	int		mode ;
 	int		ch_read, ch_write ;
 	int		status ;
-	char		rterms[32] ;
+	uchar		rterms[32] ;
 } ; /* end struct (uterm_head) */
 
 typedef UTERM		uterm ;
+typedef	UTERM_FL	uterm_fl ;
 typedef	UTERM_LD	uterm_ld ;
 typedef	UTERM_PR	uterm_pr ;
 
