@@ -56,6 +56,7 @@
 #include	<toxc.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+#include	<cmporders.h>
 
 #include	"strkeycmp.h"
 
@@ -67,6 +68,8 @@
 
 
 /* local typedefs */
+
+typedef cmporders	co ;
 
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
@@ -81,11 +84,6 @@ extern "C" {
 
 
 /* local structures */
-
-enum order : uchar {
-    order_obv,
-    order_rev
-} ; /* end enum (order) */
 
 
 /* forward references */
@@ -120,14 +118,14 @@ local int strkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p) noex {
 	return rc ;
 } /* end subroutine (strkeycmp) */
 
-local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,order forder) noex {
+local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
     	int		rc = 0 ;
 	if (s1 || s2) {
 	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
 		if (s2) {
-		    if (forder) {
+		    if (fo) {
 		        rc = (- fun(s1,s2)) ;
 		    } else {
 		        rc = (+ fun(s1,s2)) ;
@@ -183,24 +181,24 @@ int strkeyfoldcmpr(cchar *s1,cchar *s2) noex {
 
 
 int strkeyxbasecmpo(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strkeybasecmp,s1,s2,order_obv) ;
+    	return strxcmp(strkeybasecmp,s1,s2,cmporder_obverse) ;
 }
 int strkeyxbasecmpr(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strkeybasecmp,s1,s2,order_rev) ;
+    	return strxcmp(strkeybasecmp,s1,s2,cmporder_reverse) ;
 }
 
 int strkeyxcasecmpo(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strkeycasecmp,s1,s2,order_obv) ;
+    	return strxcmp(strkeycasecmp,s1,s2,cmporder_obverse) ;
 }
 int strkeyxcasecmpr(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strkeycasecmp,s1,s2,order_rev) ;
+    	return strxcmp(strkeycasecmp,s1,s2,cmporder_reverse) ;
 }
 
 int strkeyxfoldcmpo(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strkeyfoldcmp,s1,s2,order_obv) ;
+    	return strxcmp(strkeyfoldcmp,s1,s2,cmporder_obverse) ;
 }
 int strkeyxfoldcmpr(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strkeyfoldcmp,s1,s2,order_rev) ;
+    	return strxcmp(strkeyfoldcmp,s1,s2,cmporder_reverse) ;
 }
 
 
