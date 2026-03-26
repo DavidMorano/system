@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* does a counted c-string contain a C++ module-name? */
+/* does the counted c-string contain a C++ module-name? */
 /* version %I% last-modified %G% */
 
 
