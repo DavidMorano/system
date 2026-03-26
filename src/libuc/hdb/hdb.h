@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<lookaside.h>
 
 
@@ -47,7 +44,7 @@ EXTERNC_end
 struct hdb_datum {
 	cvoid		*buf ;
 	int		len ;
-} ;
+} ; /* end struct */
 
 struct hdb_entry {
 	HDB_ENT		*next ;		/* next in hash chain */
@@ -55,18 +52,18 @@ struct hdb_entry {
 	HDB_DATUM	key ;
 	HDB_DATUM	val ;
 	uint		hv ;		/* hash-value of key */
-} ;
+} ; /* end struct */
 
 struct hdb_cursor {
 	int		i, j, k ;
-} ;
+} ; /* end struct */
 
 struct hdb_head {
 	HDB_ENT		**htaddr ;	/* array HDB_ENT pointers */
 	hdbhash_f	hashfunc ;
 	hdbcmp_f	cmpfunc ;
 	lookaside	*esp ;		/* key-entries */
-	uint		magic ;
+	uint		magval ;
 	int		htlen ;
 	int		count ;
 	int		at ;		/* allocation-type */
@@ -82,7 +79,7 @@ enum hdbmems {
 	hdbmem_audit,
 	hdbmem_finish,
 	hdbmem_overlast
-} ;
+} ; /* end enum */
 struct hdb ;
 struct hdb_co {
 	hdb		*op = nullptr ;
@@ -105,7 +102,8 @@ struct hdb : hdb_head {
 	    audit	(this,hdbmem_audit) ;
 	    finish	(this,hdbmem_finish) ;
 	    htaddr = nullptr ;
-	} ;
+	    magval = 0 ;
+	} ; /* end ctor */
 	hdb(const hdb &) = delete ;
 	hdb &operator = (const hdb &) = delete ;
 	int start	(int,int,hdbhash_f,hdbcmp_f) noex ;
