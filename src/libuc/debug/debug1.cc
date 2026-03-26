@@ -48,19 +48,13 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>		/* |MAXPATHLEN| */
-#include	<unistd.h>		/* |write(2)| */
-#include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>		/* |va_list(3c)| */
 #include	<new>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<usupport.h>		/* |sncpy(3u)| */
 #include	<usysutility.hh>	/* |snvprintf(3u)| */
