@@ -49,6 +49,9 @@
 #ifndef	longconv
 #define	longconv		long
 #endif
+#ifndef	longlongconv
+#define	longlongconv		longlong
+#endif
 
 #ifndef	ucharconv
 #define	ucharconv		uchar
@@ -59,8 +62,11 @@
 #ifndef	uintconv
 #define	uintconv		uint
 #endif
-#ifndef	uintlongconv
+#ifndef	ulongconv
 #define	ulongconv		ulong
+#endif
+#ifndef	ulonglongconv
+#define	ulonglongconv		ulonglong
 #endif
 
 #ifndef	floatconv
@@ -114,6 +120,30 @@
 #ifdef	__cplusplus
 #ifndef	destruct		
 #define	destruct		compl
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	bitxor
+#define	bitxor			xor
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	logand
+#define	logand			and
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	logor
+#define	logor			or
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	lognot
+#define	lognot			not
 #endif
 #endif /* __cplusplus */
 
@@ -179,6 +209,7 @@
 #define	cast_reinterpret	reinterpret_cast
 #define	cast_bit		bit_cast
 #define	cast_saturate		saturate_cast
+#define	cast_sat		saturate_cast
 #define	cast_any		any_cast
 #endif
 #endif /* __cplusplus */
@@ -188,6 +219,13 @@
 #define	ordering_strong		strong_ordering
 #define	ordering_weak		weak_ordering
 #define	ordering_partial	partial_ordering
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	integral_signed
+#define	integral_signed		signed_integral
+#define	integral_unsigned	unsigned_integral
 #endif
 #endif /* __cplusplus */
 
