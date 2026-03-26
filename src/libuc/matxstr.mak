@@ -55,9 +55,7 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -137,12 +135,12 @@ objb.o:			$(OBJB_MATXSTR)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-matstr.o:		matstr.cc matstr.h		$(INCS)
-matostr.o:		matostr.cc matostr.h		$(INCS)
-matpstr.o:		matpstr.cc matpstr.h		$(INCS)
-matkeystr.o:		matkeystr.cc matkeystr.h	$(INCS)
-matsubstr.o:		matsubstr.cc			$(INCS)
-matnstr.o:		matnstr.cc			$(INCS)
-matlocalfs.o:		matlocalfs.cc			$(INCS)
+matstr.o:		matstr.cc	matstr.h		$(INCS)
+matostr.o:		matostr.cc	matostr.h		$(INCS)
+matpstr.o:		matpstr.cc	matpstr.h		$(INCS)
+matkeystr.o:		matkeystr.cc	matkeystr.h		$(INCS)
+matsubstr.o:		matsubstr.cc				$(INCS)
+matnstr.o:		matnstr.cc				$(INCS)
+matlocalfs.o:		matlocalfs.cc	matlocalfs.h		$(INCS)
 
 
