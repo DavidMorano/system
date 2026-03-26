@@ -36,7 +36,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucgetpw.h>
+#include	<ucgetua.h>
+#include	<ucgetsp.h>
+#include	<ucgetgr.h>
+#include	<ucgetpj.h>
+#include	<localmisc.h>
 
 #include	"getax.h"
 
