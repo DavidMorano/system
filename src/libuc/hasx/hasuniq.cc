@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++11 */
 
-/* test whether a string consists of all unique characters */
+/* test whether the counted c-string consists of all unique characters */
 /* version %I% last-modified %G% */
 
 
