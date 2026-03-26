@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* does the counted c-string have some characteristic? */
+/* does the given counted c-string have some characteristic? */
 /* version %I% last-modified %G% */
 
 
