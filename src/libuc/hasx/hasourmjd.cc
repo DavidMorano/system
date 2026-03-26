@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* does the given counted c-string contains a Modified-Juluan-Day (MJD) */
+/* does the given counted c-string contains a Modified-Julian-Day (MJD) */
 /* version %I% last-modified %G% */
 
 
