@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* does the given string have all of the given characters */
+/* does the given counted c-string have all of the given characters */
 /* version %I% last-modified %G% */
 
 
