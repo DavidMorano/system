@@ -26,9 +26,9 @@
 
 EXTERNC_begin
 
-extern int inetnetpton(void *,int,int,cchar *,int) noex ;
-extern int inetpton(void *,int,int,cchar *,int) noex ;
-extern int inetntop(char *,int,int,cvoid *) noex ;
+extern int inetnetpton	(void *,int,int,cchar *,int) noex ;
+extern int inetpton	(void *,int,int,cchar *,int) noex ;
+extern int inetntop	(char *,int,int,cvoid *) noex ;
 
 EXTERNC_end
 
