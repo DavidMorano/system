@@ -89,13 +89,17 @@ ADDRINFO {
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<netdb.h>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucaddrinfo.h>
 #include	<localmisc.h>
 
 #include	"hostaddr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -175,13 +179,13 @@ int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hostaddr_ctor(op,hn,svc)) >= 0) ylikely {
-	    if (char *ehostname{} ; (rs = malloc_hn(&ehostname)) >= 0) {
+	    if (char *ehostname{} ; (rs = lm_hn(&ehostname)) >= 0) ylikely {
 	        ADDRINFO	*aip{} ;
 	        if ((rs = geteaddrinfo(hn,svc,hintp,ehostname,&aip)) >= 0) {
 	            op->aip = aip ;
 	            if ((rs = hostaddr_resultbegin(op)) >= 0) ylikely {
 	                cchar	*cp{} ;
-	                if ((rs = uc_mallocstrw(ehostname,-1,&cp)) >= 0) {
+	                if ((rs = lm_strw(ehostname,-1,&cp)) >= 0) {
 		            op->ehostname = cp ;
 		            op->magic = HOSTADDR_MAGIC ;
 	                }
@@ -194,7 +198,7 @@ int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 		        op->aip = nullptr ;
 	            }
 	        } /* end if (geteaddrinfo) */
-		rs1 = uc_free(ehostname) ;
+		rs1 = lm_free(ehostname) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    if (rs < 0) {
@@ -209,8 +213,9 @@ int hostaddr_finish(hostaddr *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hostaddr_magic(op)) >= 0) ylikely {
-	    if (op->ehostname) {
-	        rs1 = uc_free(op->ehostname) ;
+	    if (op->ehostname) ylikely {
+		void *vp = voidp(op->ehostname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->ehostname = nullptr ;
 	   }
@@ -218,7 +223,7 @@ int hostaddr_finish(hostaddr *op) noex {
 	        rs1 = hostaddr_resultend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->aip) {
+	    if (op->aip) ylikely {
 	        rs1 = uc_addrinfofree(op->aip) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->aip = nullptr ;
@@ -294,7 +299,7 @@ static int hostaddr_resultbegin(hostaddr *op) noex {
 	    n += 1 ;
 	} /* end while */
 	sz = ((n + 1) * esz) ;
-	if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) ylikely {
+	if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 	    ADDRINFO **resarr = (ADDRINFO **) vp ;
 	    int		i = 0 ; /* used-afterwards */
 	    op->resarr = resarr ;
@@ -319,7 +324,7 @@ static int hostaddr_resultend(hostaddr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->resarr) ylikely {
-	    rs1 = uc_free(op->resarr) ;
+	    rs1 = lm_free(op->resarr) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->resarr = nullptr ;
 	    op->n = 0 ;
