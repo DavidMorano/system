@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* does a counted c-string have a varoable-prefix? */
+/* does the given counted c-string have a variable-prefix? */
 /* version %I% last-modified %G% */
 
 
