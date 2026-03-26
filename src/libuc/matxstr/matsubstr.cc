@@ -21,8 +21,8 @@
 	matsub{x}str
 
 	Description:
-	Check is the given substring is amoung the array of strings
-	given (case insensitively).
+	Determine if the given substring is amoung the array of
+	strings given (case insensitively).
 
 	Synopsis:
 	int mat{x}substr(mainv a,cchar *sp,int sl) noex
@@ -51,6 +51,9 @@
 
 #include	"matxstr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -77,12 +80,16 @@ extern "C" {
 /* forward references */
 
 template<sixsub_f sixsub>
-int matxsubstr(mainv a,cchar *sp,int sl) noex {
-	int		i{} ; /* used-afterwards */
-	for (i = 0 ; a[i] ; i += 1) {
-	    if (sixsub(sp,sl,a[i]) >= 0) break ;
-	} /* end for */
-	return (a[i] != nullptr) ? i : -1 ;
+local int matxsubstr(mainv a,cchar *sp,int µsl) noex {
+    	int		rc = -1 ;
+	if (int sl ; a && ((sl = getlenstr(sp,µsl)) >= 0)) {
+	    int		i{} ; /* used-afterwards */
+	    for (i = 0 ; a[i] ; i += 1) {
+	        if (sixsub(sp,sl,a[i]) >= 0) break ;
+	    } /* end for */
+	    rc = (a[i] != nullptr) ? i : -1 ;
+	} /* end if (getlenstr) */
+	return rc ;
 }
 /* end subroutine (matxsubstr) */
 
