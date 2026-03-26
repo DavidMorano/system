@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 
 
@@ -64,7 +61,7 @@ class bits_co {
 	    op = p ;
 	    w = m ;
 	} ;
-public:
+    public:
 	int operator () (int = 0) noex ;
 	int operator [] (int = 0) noex ;
 	operator int () noex {
@@ -91,6 +88,7 @@ struct bits : bits_head {
 	    ffbs	(this,bitsmem_ffbs) ;
 	    extent	(this,bitsmem_extent) ;
 	    count	(this,bitsmem_count) ;
+	    a =  nullptr ;
 	} ; /* end ctor */
 	operator int () noex {
 	    return count ;
@@ -109,15 +107,15 @@ typedef	BITS		bits ;
 
 EXTERNC_begin
 
-extern int	bits_start(bits *,int) noex ;
-extern int	bits_set(bits *,int) noex ;
-extern int	bits_clear(bits *,int) noex ;
-extern int	bits_test(bits *,int) noex ;
-extern int	bits_anyset(bits *) noex ;
-extern int	bits_ffbs(bits *) noex ;
-extern int	bits_extent(bits *) noex ;
-extern int	bits_count(bits *) noex ;
-extern int	bits_finish(bits *) noex ;
+extern int	bits_start	(bits *,int) noex ;
+extern int	bits_set	(bits *,int) noex ;
+extern int	bits_clear	(bits *,int) noex ;
+extern int	bits_test	(bits *,int) noex ;
+extern int	bits_anyset	(bits *) noex ;
+extern int	bits_ffbs	(bits *) noex ;
+extern int	bits_extent	(bits *) noex ;
+extern int	bits_count	(bits *) noex ;
+extern int	bits_finish	(bits *) noex ;
 
 EXTERNC_end
 
