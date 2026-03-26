@@ -197,13 +197,13 @@ struct hdb_ke {
 	HDB_KE		*next ;		/* next in hash chain */
 	HDB_VE		*same ;		/* next w/ same key */
 	uint		hv ;		/* hash-value of key */
-} ;
+} ; /* end struct */
 
 struct hdb_ve {
 	HDB_VE		*same ;		/* next w/ same key */
 	DAT		key ;
 	DAT		val ;
-} ;
+} ; /* end struct */
 
 #endif /* COMMENT */
 
@@ -214,13 +214,13 @@ struct fetchcur {
 	int		htl ;
 	uint		f_ikeyed:1 ;
 	uint		f_jkeyed:1 ;
-} ;
+} ; /* end struct */
 
 struct entryinfo {
 	ENT		*pjep ;
 	ENT		*pkep ;
 	ENT		*ep ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -230,7 +230,7 @@ local inline int hdb_ctor(hdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->htaddr = nullptr ;
 	    op->htlen = 0 ;
 	    op->count = 0 ;
@@ -258,7 +258,7 @@ template<typename ... Args>
 local inline int hdb_magic(hdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == HDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == HDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (hdb_magic) */
@@ -292,23 +292,23 @@ local inline int defcmpfun(cvoid *s1,cvoid *s2,int sl) noex {
 local inline int voidlen(cvoid *buf) noex {
 	cchar	*s = charp(buf) ;
 	return lenstr(s) ;
-}
+} /* end subroutine */
 
 consteval CUR mkcurnull() noex {
 	CUR	c{} ;
 	c.i = -1 ;
 	return c ;
-}
+} /* end subroutine */
 
 consteval DAT mkdatnull() noex {
 	DAT	d{} ;
 	return d ;
-}
+} /* end subroutine */
 
 local uint defhashfun(cvoid *vp,int vl) noex {
 	cchar		*cp = charp(vp) ;
 	return hash_elf(cp,vl) ;
-}
+} /* end subroutine */
 
 
 /* local variables */
@@ -343,7 +343,7 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	            op->cmpfunc = (c) ? c : defcmpfun ;
 	            op->htaddr = hepp ;
 	            op->count = 0 ;
-	            op->magic = HDB_MAGIC ;
+	            op->magval = HDB_MAGIC ;
 	        } /* end if (memory-allocation) */
 	        if (rs < 0) {
 	            if (op->at > 0) lookaside_finish(op->esp) ;
@@ -378,7 +378,7 @@ int hdb_finish(hdb *op) noex {
 	        rs1 = hdb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -390,8 +390,8 @@ int hdb_delall(hdb *op) noex {
 	if ((rs = hdb_magic(op)) >= 0) ylikely {
 	    ENT		**hepp = op->htaddr ;
 	    for (int idx = 0 ; idx < op->htlen ; idx += 1) {
-	        ENT	*hp, *next, *nhp, *nnhp ;
-	        for (hp = hepp[idx] ; hp ; hp = next) {
+	        ENT	*next, *nhp, *nnhp ;
+	        for (ENT *hp = hepp[idx] ; hp ; hp = next) {
 	            if (hp->same != nullptr) {
 	                nhp = hp->same ;
 	                while (nhp->same != nullptr) {
@@ -813,12 +813,11 @@ int hdb_hashtabcounts(hdb *op,int *rp,int n) noex {
             rs = SR_INVALID ;
             if (n >= op->htlen) ylikely {
                 ENT         **hepp ;
-                ENT         *hp ;
                 rs = SR_OK ;
                 for (int hi = 0 ; hi < op->htlen ; hi += 1) {
                     int     c = 0 ;
                     hepp = (op->htaddr + hi) ;
-                    for (hp = *hepp ; hp ; hp = hp->next) {
+                    for (ENT *hp = *hepp ; hp ; hp = hp->next) {
                         c += 1 ;
                         if (hp->same) {
                             ENT     *sep ;
@@ -934,7 +933,7 @@ local int hdb_findkeye(hdb *op,FETCUR *fcp,HDB_D *kp,ENT **epp) noex {
 local int hdb_get(hdb *op,int f,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp,keyp)) >= 0) ylikely {
-	        if ((!f) || key.buf) {
+	        if ((! f) || key.buf) {
 	            ENTRYINFO	ei{} ;
 	            cursor_stabilize(curp) ;
 	            if ((rs = hdb_getentry(op,&ei,curp)) >= 0) ylikely {
@@ -971,7 +970,7 @@ local int hdb_ext(hdb *op) noex {
 	int		sz ;
 	sz = nhtlen * szof(ENT *) ;
 	if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
-	    int		i = 0 ; /* <- used later */
+	    int		i = 0 ; /* <- used-afterwards */
 	    ENT		*hep, *nhep ;
 	    ENT		**nhtaddr = (ENT **) vp ;
 	    memclear(nhtaddr,sz) ;
@@ -987,7 +986,7 @@ local int hdb_ext(hdb *op) noex {
 	                    nhep = hep->next ;
 	                    hdb_entdel(op,hep) ;
 	                } /* end for */
-	            }
+	            } /* end if (ok) */
 	            if (rs < 0) break ;
 		} /* end if (non-null) */
 	    } /* end for */
@@ -996,7 +995,7 @@ local int hdb_ext(hdb *op) noex {
 	        op->htaddr = nhtaddr ;
 	        op->htlen = nhtlen ;
 	    } else {
-	        cint	n = min(i,nhtlen) ;
+	        cint	n = min(i,nhtlen) ; /* <- variable 'i' used here */
 	        for (i = 0 ; i < n ; i += 1) {
 	            if (nhtaddr[i] != nullptr) {
 	                for (hep = nhtaddr[i] ; hep ; hep = nhep) {
@@ -1021,7 +1020,7 @@ local int hdb_extinsert(hdb *op,ENT **htaddr,int htlen,ENT *hep) noex {
 	    int		hi ;
 	    /* copy existing to new */
 	    *nhep = *hep ;		/* memberwise copy */
-	    nhep->next = nullptr ;		/* this is newly determined */
+	    nhep->next = nullptr ;	/* this is newly determined */
 	    /* determine how to insert the new entry */
 	    hi = (hv % htlen) ;
 	    if (htaddr[hi] != nullptr) {
@@ -1037,9 +1036,8 @@ local int hdb_extinsert(hdb *op,ENT **htaddr,int htlen,ENT *hep) noex {
 /* end subroutine (hdb_extinsert) */
 
 local int hdb_extkeyfree(hdb *op,ENT *shep) noex {
-	ENT		*nhep{} ;
 	int		rs = SR_OK ;
-	for (ENT *hep = shep ; hep ; hep = nhep) {
+	for (ENT *nhep, *hep = shep ; hep ; hep = nhep) {
 	    nhep = hep->same ;
 	    hdb_entdel(op,hep) ;
 	} /* end for */
@@ -1095,7 +1093,7 @@ local int hdb_getentry(hdb *op,ENTRYINFO *eip,CUR *curp) noex {
 	                    eip->pjep = pjep ;
 	                    eip->pkep = pkep ;
 	                    eip->ep = ep ;
-	                }
+	                } /* end if (ok) */
 	            } /* end if (ok) */
 	        } else {
 	            rs = SR_NOTFOUND ;
@@ -1200,7 +1198,7 @@ local int fetchcur_load(FETCUR *fcp,fc_f hfp,int htl,CUR *curp,DAT *kp) noex {
 	    } else {
 	        curp->k += 1 ;
 	    }
-	}
+	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (fetchcur_load) */
@@ -1240,14 +1238,13 @@ local int fetchcur_adv(FETCUR *fcp) noex {
 ****/
 
 local ENT **getpoint(hdb *op,uint hv,HDB_D *keyp) noex {
-	ENT		*ep ;
-	ENT		**hepp ;
+	ENT		**hepp{} ; /* used-afterwards */
 	ENT		*pep = nullptr ;
 	cint		hi = (hv % op->htlen) ;
 	cint		keylen = keyp->len ;
 	cchar		*keydat = charp(keyp->buf) ;
 	hepp = (op->htaddr + hi) ;
-	for (ep = *hepp ; ep ; ep = ep->next) {
+	for (ENT *ep = *hepp ; ep ; ep = ep->next) {
 	    cchar	*hpkeydat = charp(ep->key.buf) ;
 	    bool	f = true ;
 	    if (hpkeydat) {
