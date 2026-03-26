@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* does a counted c-string some characteristic? */
+/* does the given counted c-string have some characteristic? */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* debugging */
@@ -52,7 +52,7 @@
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |UC(3dam)| */
 #include	<strnul.hh>
-#include	<dprintf.h>		/* |DPRINTF(3dam)| */
+#include	<dprintf.hh>		/* |DPRINTF(3dam)| */
 
 #include	"hasinet.h"
 #include	"hasall.h"		/* |hasalldig(3uc)| */
