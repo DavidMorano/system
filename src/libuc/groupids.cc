@@ -39,10 +39,9 @@
 
 	Example-usage:
 	{
-	    groupids	g ;
 	    int		rs ;
 	    int		rs1 ;
-	    if ((rs = g.start) >= 0) {
+	    if (groupids g ; (rs = g.start) >= 0) {
 	        {
 		    gid_t	*gids = g.gids ;
 
@@ -59,7 +58,10 @@
 #include	<unistd.h>		/* for |getgroups(2)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"groupids.hh"
@@ -88,7 +90,7 @@
 
 /* local variables */
 
-static constexpr gid_t	gidend = gid_t(-1) ;
+constexpr gid_t		gidend = gid_t(-1) ;
 
 
 /* exported variables */
