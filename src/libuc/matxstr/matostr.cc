@@ -56,7 +56,9 @@
 #include	"matstr.h"		/* <- needed for default case */
 #include	"matostr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -128,25 +130,25 @@ int matofoldstr(mainv a,int n,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-int mater::matoxstr(mainv a,int n,cchar *sp,int sl) noex {
+int mater::matoxstr(mainv a,int n,cchar *sp,int µsl) noex {
 	int		si = -1 ;
-	if (sl < 0) sl = lenstr(sp) ;
-	if (n >= 0) {
-	    cint	lch = toxc(sp[0]) ;
-	    for (int i = 0 ; a[i] ; i += 1) {
-	        int	m ;
-	        cchar	*ap = a[i] ;
-	        if ((m = (lch == toxc(ap[0]))) > 0) {
-	            m = nleadx(ap,sp,sl) ;
-	        }
-	        if ((m == sl) && ((m >= n) || (ap[m] == '\0'))) {
-		    si = i ;
-		    break ; 
-	        }
-	    } /* end for */
-	} else {
-	    si = matxstr(a,sp,sl) ;
-	}
+	if (int sl ; a && ((sl = getlenstr(sp,µsl)) >= 0)) {
+	    if (n >= 0) {
+	        cint	lch = toxc(sp[0]) ;
+	        for (int m, i = 0 ; a[i] ; i += 1) {
+	            cchar	*ap = a[i] ;
+	            if ((m = (lch == toxc(ap[0]))) > 0) {
+	                m = nleadx(ap,sp,sl) ;
+	            }
+	            if ((m == sl) && ((m >= n) || (ap[m] == '\0'))) {
+		        si = i ;
+		        break ; 
+	            }
+	        } /* end for */
+	    } else {
+	        si = matxstr(a,sp,sl) ;
+	    }
+	} /* end if (getlenstr) */
 	return si ;
 }
 /* end method (mater::matoxstr) */
