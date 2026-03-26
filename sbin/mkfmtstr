@@ -1,0 +1,8 @@
+#!/usr/local/bin/ksh
+# SUB
+
+ca oo | while read A B C J ; do
+  printf "%s\t%s\t%s\n" ${A} ${C} ${B}
+done
+
+
