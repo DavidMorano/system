@@ -1097,6 +1097,7 @@ nonpath.o:		nonpath.cc	nonpath.h		$(INCS)
 conallof.o:		conallof.cc	conallof.h		$(INCS)
 nchr.o:			nchr.cc		nchr.h			$(INCS)
 inaddrbad.o:		inaddrbad.cc	inaddrbad.hh		$(INCS)
+retstat.o:		retstat.cc	retstat.h		$(INCS)
 
 # integer-conversion-to-string-digits
 strval.o:		strval.cc strval.h uconstants.o
