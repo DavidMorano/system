@@ -55,7 +55,7 @@
 #include	<baops.h>
 #include	<sbuf.h>
 #include	<strn.h>
-#include	<sfx.h>
+#include	<sfx.h>			/* |sfbasename(3uc)| */
 #include	<snx.h>
 #include	<snwcpy.h>
 #include	<mkx.h>
@@ -216,6 +216,12 @@ typedef uunames_cur	cur ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_close(int) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+}
+
 
 /* external variables */
 
@@ -327,7 +333,7 @@ constexpr cpcchar	envsys[] = {
 	VARTZ,
 	VARPWD,
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	prnames[] = {
 	"LOCAL",
@@ -340,7 +346,7 @@ constexpr cpcchar	prnames[] = {
 	"XDIR",
 	"AST",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	envdefs[] = {
 	"LOCALDOMAIN",
@@ -358,7 +364,7 @@ constexpr cpcchar	envdefs[] = {
 	"PATH",
 	"LD_LIBRARY_PATH",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr envpop	envpops[] = {
 	{ VARPATH, "bin", "sbin" },
@@ -371,7 +377,9 @@ constexpr uunames_f	indopens[] = {
 	uunames_indopenpr,
 	uunames_indopentmp,
 	nullptr
-} ;
+} ; /* end array */
+
+constexpr char		filemagic[] = UUNAMES_DBMAGICSTR ;
 
 
 /* exported variables */
@@ -380,7 +388,7 @@ extern const uunames_obj	uunames_modinfo = {
     	"uunames",
 	szof(uunames),
 	szof(uunames_cur)
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -498,7 +506,8 @@ int uunames_exists(UU *op,cchar *sp,int sl) noex {
 				kl = 0 ;
 			    }
 			} /* end block */
-	                rs1 = lm_free(kp) ;
+			void *vp = voidp(kp) ;
+	                rs1 = lm_free(vp) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (allocation) */
 	        } /* end if (uunames_indcheck) */
@@ -574,7 +583,8 @@ local int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 			rv = rs ;
 		    } /* end if */
 	            if (rs < 0) {
-	                rs1 = lm_free(op->indfname) ;
+	                void *vp = voidp(op->indfname) ;
+	                rs1 = lm_free(vp) ;
 	                if (rs >= 0) rs = rs1 ;
 	                op->dbname = nullptr ;
 	            }
@@ -593,15 +603,16 @@ local int uunames_indmapdestroy(UU *op) noex {
 	int		c = 0 ;
 	for (int i = 0 ; vecobj_del(op->nlp,i) >= 0 ; i += 1) {
 	    c += 1 ;
-	}
+	} /* end for */
 	{
 	    rs1 = uunames_filemapdestroy(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->indfname) {
-	    rs1 = lm_free(op->indfname) ;
+	    void *vp = voidp(op->indfname) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = nullptr ;
+	    op->indfname = nullptr ;
 	}
 	return (rs >= 0) ? c : rs ;
 }
@@ -615,7 +626,7 @@ local int uunames_filemapcreate(UU *op,time_t dt) noex {
 	if (dt == 0) dt = getustime ;
 	if ((rs = uc_open(op->indfname,of,om)) >= 0) {
 	    cint	fd = rs ;
-	    if (USTAT sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 		rs = SR_NOTSUP ;
 	        if (S_ISREG(sb.st_mode)) {
 		    cnullptr	np{} ;
@@ -691,8 +702,7 @@ local int uunames_indopentmp(UU *op,time_t dt) noex {
 	cchar		*tmpdname = TMPVARDNAME ;
 	cchar		*inddname = INDDNAME ;
 	if (char *idname ; (rs = lm_mp(&idname)) >= 0) {
-	    cchar	*prname{} ;
-	    if ((rs = sfbasename(op->pr,-1,&prname)) > 0) {
+	    if (cchar *prname ; (rs = sfbasename(op->pr,-1,&prname)) > 0) {
 	        if ((rs = mkpath(idname,tmpdname,prname,inddname)) >= 0) {
 	            rs = uunames_indopendname(op,idname,dt) ;
 	        }
@@ -956,21 +966,21 @@ local int uunames_envpaths(UU *op,vecstr *elp) noex {
 		        }
 	            } /* end if */
 	            if (cchar *vp ; (rs >= 0) && ((vp = getenv(enp)) != np)) {
-	                rs = pc.loadpath(vp) ;
+	                rs = vecstr_loadpath(&pc,vp) ;
 	            }
 	            if (rs >= 0) {
 	                rs = pc.strsize() ;
 		        sz = rs ;
 	            }
 	            if ((rs >= 0) && ((rs = lm_mall((sz+1),&bp)) >= 0)) {
-	                if ((rs = mkpathval(&pathcomps,bp,sz)) >= 0) {
+	                if ((rs = mkpathval(&pc,bp,sz)) >= 0) {
 	                    bl = rs ;
 	                    rs = elp->envadd(enp,bp,bl) ;
 		        }
 	                rs1 = lm_free(bp) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (memory allocation) */
-	            pc.delall ;
+	            pc.delall() ;
 	            if (rs < 0) break ;
 	        } /* end for */
 	        rs1 = pc.finish ;
@@ -984,21 +994,18 @@ local int uunames_envpaths(UU *op,vecstr *elp) noex {
 /* end subroutine (uunames_envpaths) */
 
 local int uunames_indlist(UU *op) noex {
-	liner		le ;
 	uint		lineoff = 0 ;
 	int		rs = SR_OK ;
-	int		ml = op->mapsize ;
-	int		n = 0 ;
+	int		ml = intsat(op->mapsize) ;
+	int		n = 0 ; /* return-value */
 	cchar		*mp = charp(op->mapdata) ;
-	cchar		*tp ;
-	cchar		*filemagic = UUNAMES_DBMAGICSTR ;
-	lineoff = 0 ;
-	while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
-	    cint	len = ((tp + 1) - mp) ;
+	for (cchar *tp ; (tp = strnchr(mp,ml,'\n')) != nullptr ; ) {
+	    liner	le ;
+	    cint	len = intconv((tp + 1) - mp) ;
 	    le.lp = mp ;
-	    le.ll = (len - 1) ;
+	    le.ll = (len - 1) ; /* subtrace off NL */
 	    if (lineoff > 0) {
-		if ((le.ll > 0) && (le.lp[0] != '#')) {
+		if (cchar *cp ; sfcontent(le.lp,le.ll,&cp) > 0) {
 		    n += 1 ;
 		    rs = vecobj_add(op->nlp,&le) ;
 		}
@@ -1006,7 +1013,7 @@ local int uunames_indlist(UU *op) noex {
 		if ((le.ll == 0) || (strncmp(le.lp,filemagic,le.ll) != 0)) {
 		    rs = SR_LIBBAD ;
 		}
-	    }
+	    } /* end if */
 	    if (rs < 0) break ;
 	    lineoff += len ;
 	    mp += len ;
