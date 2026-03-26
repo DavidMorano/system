@@ -51,9 +51,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getnodename.h>
+#include	<ucgetho.h>
+#include	<localmisc.h>
 
 #include	"getho.h"
 
@@ -107,7 +110,7 @@ int getho_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
 	int		rs1 ;
 	int		rv = 0 ;
 	char		*nbuf{} ;
-	if ((rs = malloc_nn(&nbuf)) >= 0) {
+	if ((rs = lm_nn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if ((name == nullptr) || (name[0] == '\0')) {
 	        rs = getnodename(nbuf,nlen) ;
@@ -117,7 +120,7 @@ int getho_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
 	        rs = uc_gethonam(hep,hebuf,helen,name) ;
 		rv = rs ;
 	    }
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = lm_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
