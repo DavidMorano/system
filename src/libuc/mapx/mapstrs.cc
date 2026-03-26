@@ -34,7 +34,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<hdb.h>
 #include	<strpack.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
@@ -69,7 +70,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int mapstrs_ctor(mapstrs *op,Args ... args) noex {
+local int mapstrs_ctor(mapstrs *op,Args ... args) noex {
     	MAPSTRS		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -90,7 +91,7 @@ static int mapstrs_ctor(mapstrs *op,Args ... args) noex {
 }
 /* end subroutine (mapstrs_ctor) */
 
-static int mapstrs_dtor(mapstrs *op) noex {
+local int mapstrs_dtor(mapstrs *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -108,7 +109,7 @@ static int mapstrs_dtor(mapstrs *op) noex {
 /* end subroutine (mapstrs_dtor) */
 
 template<typename ... Args>
-static inline int mapstrs_magic(mapstrs *op,Args ... args) noex {
+local inline int mapstrs_magic(mapstrs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MAPSTRS_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -172,7 +173,7 @@ int mapstrs_add(mapstrs *op,cchar *kp,int µkl,cchar *vp,int vl) noex {
 	int		rs ;
 	if ((rs = mapstrs_magic(op,kp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (int kl ; (kl = getlenstr(kp,µkl)) > 0) {
+	    if (int kl ; (kl = getlenstr(kp,µkl)) > 0) ylikely {
 	        hdb_dat		key ;
 	        hdb_dat		val{} ;
 	        hdb		*hlp = op->dbp ;
