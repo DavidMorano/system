@@ -317,7 +317,7 @@ constexpr charinfo	ischarx_data ;
 
 /* exported subroutines */
 
-bool isalphalatin(int ch) noex {
+bool isalphalatin(int ch) noex attrpure {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isalpha[ch] ;
@@ -326,7 +326,7 @@ bool isalphalatin(int ch) noex {
 }
 /* end subroutine (isalphalatin) */
 
-bool isalnumlatin(int ch) noex {
+bool isalnumlatin(int ch) noex attrpure {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isalnum[ch] ;
@@ -335,12 +335,12 @@ bool isalnumlatin(int ch) noex {
 }
 /* end subroutine (isalnumlatin) */
 
-bool isdigitlatin(int ch) noex {
+bool isdigitlatin(int ch) noex attrpure {
     	return ((ch >= '0') && (ch <= '9')) ;
 }
 /* end subroutine (isdigitlatin) */
 
-bool isdigexlatin(int ch) noex {
+bool isdigexlatin(int ch) noex attrpure {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isdigex[ch] ;
@@ -349,7 +349,7 @@ bool isdigexlatin(int ch) noex {
 }
 /* end subroutine (isdigexlatin) */
 
-bool iswhitelatin(int ch) noex {
+bool iswhitelatin(int ch) noex attrpure {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = CHAR_ISWHITE(ch) ;
@@ -358,7 +358,7 @@ bool iswhitelatin(int ch) noex {
 }
 /* end subroutine (iswhitelatin) */
 
-bool islowerlatin(int ch) noex {
+bool islowerlatin(int ch) noex attrpure {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = CHAR_ISLC(ch) ;
@@ -367,7 +367,7 @@ bool islowerlatin(int ch) noex {
 }
 /* end subroutine (islowerlatin) */
 
-bool isupperlatin(int ch) noex {
+bool isupperlatin(int ch) noex attrpure {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = CHAR_ISUC(ch) ;
@@ -376,7 +376,7 @@ bool isupperlatin(int ch) noex {
 }
 /* end subroutine (isupperlatin) */
 
-bool isprintlatin(int ch) noex {
+bool isprintlatin(int ch) noex attrpure {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isprint[ch] ;
@@ -385,11 +385,11 @@ bool isprintlatin(int ch) noex {
 }
 /* end subroutine (isprintlatin) */
 
-bool istermlatin(int ch) noex {
+bool istermlatin(int ch) noex attrpure {
     	return isprintterm(ch) ;
 }
 
-bool isprintterm(int ch) noex {
+bool isprintterm(int ch) noex attrpure {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isterm[ch] ;
@@ -398,12 +398,12 @@ bool isprintterm(int ch) noex {
 }
 /* end subroutine (isprintterm) */
 
-bool isprintbad(int ch) noex {
+bool isprintbad(int ch) noex attrpure {
 	return (! isprintlatin(ch)) ;
 }
 /* end subroutine (isprintbad) */
 
-bool isdict(int ch) noex {
+bool isdict(int ch) noex attrpure {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) ylikely {
 	    f = ischarx_data.isalnum[ch] || (ch == CH_SP) ;
@@ -443,12 +443,12 @@ consteval void cmdstarter::mktab() noex {
 
 constexpr cmdstarter	cmd_data ;
 
-bool iscmdstart(int ch) noex {
+bool iscmdstart(int ch) noex attrpure {
     	return cmd_data[ch] ;
 }
 /* end subroutine (iscmdstart) */
 
-bool ishdrkey(int ch) noex {
+bool ishdrkey(int ch) noex attrpure {
 	return (isalnumlatin(ch) || (ch == '-') || (ch == '_')) ;
 }
 /* end subroutine (ishdrkey) */
