@@ -17,11 +17,11 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	bits
 
 	Description:
-	This object-module does some bit-array type [of] stuff.
+	This object-module provides operations on a bit-array type [of].
 
 	Implemention-node:
 	I switch between "short-bit-optimization" and regular
@@ -39,10 +39,7 @@
 #include	<cstdlib>
 #include	<bit>			/* <- |countr_zero(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<stdintx.h>
