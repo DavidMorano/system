@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -46,11 +46,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>		/* |SR_FAULT| */
-#include	<matstr.h>
 #include	<localmisc.h>
 
-#include	"matxstr.h"
+#include	"matstr.h"		/* <- |matstr(3uc)| */
 
 
 /* local defines */
@@ -105,11 +103,11 @@ constexpr cpcchar	localfs[] = {
 /* exported subroutines */
 
 int matlocalfs(cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
+	int		idx = -1 ;
 	if (sp) {
- 	    rs = (matstr(localfs,sp,sl) >= 0) ;
+ 	    idx = (matstr(localfs,sp,sl) >= 0) ;
 	}
-	return rs ;
+	return idx ;
 }
 /* end subroutine (matlocalfs) */
 
