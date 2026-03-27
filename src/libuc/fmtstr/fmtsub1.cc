@@ -44,7 +44,6 @@ module ;
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<uclibmem.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
 
@@ -122,11 +121,11 @@ void fmtsub::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("fmtsub",rs,"fini-finish") ;
 	}
-}
+} /* end method (fmtsub::dtor) */
 
 fmtsub_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case fmtsubmem_audit:
 	        rs = fmtsub_audit(op) ;
@@ -137,6 +136,6 @@ fmtsub_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method (fmtsub_co::operator) */
 
 
