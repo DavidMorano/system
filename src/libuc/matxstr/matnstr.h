@@ -28,7 +28,13 @@
 
 EXTERNC_begin
 
-extern int	matnstr(mainv,cchar *,int) noex ;
+extern int	matnbasestr(mainv,cchar *,int) noex ;
+extern int	matncasestr(mainv,cchar *,int) noex ;
+extern int	matnfoldstr(mainv,cchar *,int) noex ;
+
+local inline int matnstr(mainv a,cchar *sp,int sl) noex {
+    	return matnbasestr(a,sp,sl) ;
+}
 
 EXTERNC_end
 
