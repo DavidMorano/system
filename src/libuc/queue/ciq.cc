@@ -37,11 +37,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<ptm.h>
 #include	<pq.h>
@@ -78,14 +75,14 @@ struct ciq_ent : pq_ent {
 /* forward references */
 
 template<typename ... Args>
-static inline int ciq_ctor(ciq *op,Args ... args) noex {
+local inline int ciq_ctor(ciq *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((op->mxp = new(nothrow) ptm) != np) {
-	        if ((op->fifop = new(nothrow) pq) != np) {
-	            if ((op->freep = new(nothrow) pq) != np) {
+	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
+	        if ((op->fifop = new(nothrow) pq) != np) ylikely {
+	            if ((op->freep = new(nothrow) pq) != np) ylikely {
 		        rs = SR_OK ;
 	            } /* end if (new-pq) */
 		    if (rs < 0) {
@@ -100,42 +97,40 @@ static inline int ciq_ctor(ciq *op,Args ... args) noex {
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ciq_ctor) */
+} /* end subroutine (ciq_ctor) */
 
-static inline int ciq_dtor(ciq *op) noex {
+local inline int ciq_dtor(ciq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->freep) {
+	    if (op->freep) ylikely {
 		delete op->freep ;
 		op->freep = nullptr ;
 	    }
-	    if (op->fifop) {
+	    if (op->fifop) ylikely {
 		delete op->fifop ;
 		op->fifop = nullptr ;
 	    }
-	    if (op->mxp) {
+	    if (op->mxp) ylikely {
 		delete op->mxp ;
 		op->mxp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ciq_dtor) */
+} /* end subroutine (ciq_dtor) */
 
 template<typename ... Args>
-static int ciq_magic(ciq *op,Args ... args) noex {
+local int ciq_magic(ciq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == CIQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == CIQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (ciq_magic) */
 
-static int	ciq_findent(ciq *,pq_ent **,cvoid *) noex ;
+local int	ciq_findent(ciq *,pq_ent **,cvoid *) noex ;
 
-static int	pq_finishup(pq *) noex ;
+local int	pq_finishup(pq *) noex ;
 
 
 /* exported variables */
@@ -148,18 +143,19 @@ static int	pq_finishup(pq *) noex ;
 
 int ciq_start(ciq *op) noex {
 	int		rs ;
-	if ((rs = ciq_ctor(op)) >= 0) {
-	    if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
-		if ((rs = pq_start(op->fifop)) >= 0) {
-	            if ((rs = pq_start(op->freep)) >= 0) {
-		        op->magic = CIQ_MAGIC ;
+	if ((rs = ciq_ctor(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->create) >= 0) ylikely {
+		if ((rs = pq_start(op->fifop)) >= 0) ylikely {
+	            if ((rs = pq_start(op->freep)) >= 0) ylikely {
+		        op->magval = CIQ_MAGIC ;
 		    }
 		    if (rs < 0) {
 		        pq_finish(op->fifop) ;
 		    }
 	        } /* end if (pq_start) */
 	        if (rs < 0) {
-		    ptm_destroy(op->mxp) ;
+		    mxp->destroy() ;
 		}
 	    } /* end if (ptm_create) */
 	    if (rs < 0) {
@@ -173,20 +169,25 @@ int ciq_start(ciq *op) noex {
 int ciq_finish(ciq *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ciq_magic(op)) >= 0) {
-	    {
+	if ((rs = ciq_magic(op)) >= 0) ylikely {
+	    if (op->freep) ylikely {
 	        rs1 = pq_finishup(op->freep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->fifop) ylikely {
 	        rs1 = pq_finishup(op->fifop) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(op->mxp) ;
+	        ptm *mxp = op->mxp ;
+	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    {
+		rs1 = ciq_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -196,21 +197,22 @@ int ciq_ins(ciq *op,void *vp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = ciq_magic(op,vp)) >= 0) {
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	if ((rs = ciq_magic(op,vp)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        pq_ent	*pep{} ; /* used-afterwards */
 	        cint	rse = SR_EMPTY ;
 	        if ((rs = pq_remtail(op->freep,&pep)) == rse) {
 		    cint	esz = szof(ciq_ent) ;
 	            rs = libmem.mall(esz,&pep) ;
 	        } /* end if (memory-allocation) */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            ciq_ent	*cep = (ciq_ent *) pep ;
 	            cep->vp = vp ;
 	            rs = pq_ins(op->fifop,pep) ;
 	            c = rs ;
 	        } /* end if */
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -222,9 +224,10 @@ int ciq_rem(ciq *op,void *vrp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = ciq_magic(op,vrp)) >= 0) {
+	if ((rs = ciq_magic(op,vrp)) >= 0) ylikely {
 	    void	**vpp = voidpp(vrp) ;
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        if (pq_ent *pep{} ; (rs = pq_rem(op->fifop,&pep)) >= 0) {
 	            c = rs ;
 	            if (vpp) {
@@ -236,7 +239,7 @@ int ciq_rem(ciq *op,void *vrp) noex {
 		        libmem.free(pep) ;
 		    }
 	        } /* end if (pq_rem) */
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -248,9 +251,10 @@ int ciq_gettail(ciq *op,void *vrp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = ciq_magic(op)) >= 0) {
+	if ((rs = ciq_magic(op)) >= 0) ylikely {
 	    void	**rpp = (void **) vrp ;
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        if (pq_ent *pep{} ; (rs = pq_gettail(op->fifop,&pep)) >= 0) {
 	            c = rs ;
 	            if (rpp) {
@@ -258,7 +262,7 @@ int ciq_gettail(ciq *op,void *vrp) noex {
 	                *rpp = cep->vp ;
 	            }
 	        } /* end if (pq_gettail) */
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -270,9 +274,10 @@ int ciq_remtail(ciq *op,void *vrp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = ciq_magic(op)) >= 0) {
+	if ((rs = ciq_magic(op)) >= 0) ylikely {
 	    void	**rpp = (void **) vrp ;
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        if (pq_ent *pep{} ; (rs = pq_remtail(op->fifop,&pep)) >= 0) {
 	            c = rs ;
 	            if (rpp) {
@@ -284,7 +289,7 @@ int ciq_remtail(ciq *op,void *vrp) noex {
 		        libmem.free(pep) ;
 		    }
 	        } /* end if (pq_remtail) */
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -296,10 +301,11 @@ int ciq_rement(ciq *op,void *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = ciq_magic(op)) >= 0) {
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	if ((rs = ciq_magic(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        if (pq_ent *pep{} ; (rs = ciq_findent(op,&pep,ep)) > 0) {
-	            if ((rs = pq_unlink(op->fifop,pep)) >= 0) {
+	            if ((rs = pq_unlink(op->fifop,pep)) >= 0) ylikely {
 	                c = rs ;
 		        rs = pq_ins(op->freep,pep) ;
 		        if (rs < 0) {
@@ -309,7 +315,7 @@ int ciq_rement(ciq *op,void *ep) noex {
 	        } else if (rs == 0) {
 		    rs = SR_NOTFOUND ;
 	        }
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -321,13 +327,14 @@ int ciq_count(ciq *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = ciq_magic(op)) >= 0) {
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	if ((rs = ciq_magic(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        {
 	            rs = pq_count(op->fifop) ;
 	            c = rs ;
 	        }
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -339,13 +346,14 @@ int ciq_audit(ciq *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if ((rs = ciq_magic(op)) >= 0) {
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
-	        if ((rs = pq_audit(op->freep)) >= 0) {
+	if ((rs = ciq_magic(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	        if ((rs = pq_audit(op->freep)) >= 0) ylikely {
 	            rs = pq_audit(op->fifop) ;
 		    rv = rs ;
 	        }
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -356,12 +364,12 @@ int ciq_audit(ciq *op) noex {
 
 /* private subroutines */
 
-static int ciq_findent(ciq *op,pq_ent **rpp,cvoid *vrp) noex {
+local int ciq_findent(ciq *op,pq_ent **rpp,cvoid *vrp) noex {
 	pq		*pqp = op->fifop ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if (pq_cur cur ; (rs = pq_curbegin(pqp,&cur)) >= 0) {
+	if (pq_cur cur ; (rs = pq_curbegin(pqp,&cur)) >= 0) ylikely {
 	    pq_ent *pep{} ; /* used-afterwards */
 	    while ((rs1 = pq_curenum(pqp,&cur,&pep)) >= 0) {
 		ciq_ent	*cep = (ciq_ent *) pep ;
@@ -379,7 +387,7 @@ static int ciq_findent(ciq *op,pq_ent **rpp,cvoid *vrp) noex {
 }
 /* end subroutine (ciq_findent) */
 
-static int pq_finishup(pq *qp) noex {
+local int pq_finishup(pq *qp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -396,5 +404,62 @@ static int pq_finishup(pq *qp) noex {
 	return rs ;
 }
 /* end subroutine (pq_finishup) */
+
+int ciq::ins(void *ep) noex {
+	return ciq_ins(this,ep) ;
+}
+
+int ciq::rem(void *rpp) noex {
+	return ciq_rem(this,rpp) ;
+}
+
+int ciq::remtail(void *rpp) noex {
+	return ciq_remtail(this,rpp) ;
+}
+
+int ciq::rement(void *rpp) noex {
+	return ciq_rement(this,rpp) ;
+}
+
+int ciq::gettail(void *rpp) noex {
+	return ciq_gettail(this,rpp) ;
+}
+
+void ciq::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("ciq",rs,"fini-finish") ;
+	}
+} /* end method (ciq::dtor) */
+
+ciq::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (this) ylikely {
+	    rs = ciq_count(this) ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (ciq::operator) */
+
+ciq_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case ciqmem_start:
+	        rs = ciq_start(op) ;
+	        break ;
+	    case ciqmem_count:
+	        rs = ciq_count(op) ;
+	        break ;
+	    case ciqmem_audit:
+	        rs = ciq_audit(op) ;
+	        break ;
+	    case ciqmem_finish:
+	        rs = ciq_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (ciq_co::operator) */
+
 
 
