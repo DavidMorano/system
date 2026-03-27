@@ -36,18 +36,19 @@
 
 	Returns:
 	>=0		match found and it matched up to this length
-	<0		no match (system-return)
+	<0		no match or error
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |INT_MAX| */
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<mkchar.h>		/* **currently unused** */
 #include	<localmisc.h>
 
 #include	"nleadkeystr.h"
@@ -78,7 +79,7 @@
 
 int nleadkeystr(cchar *bs,cchar *sp,int sl) noex {
 	int		i = -1 ; /* return-value */
-	if (bs) ylikely {
+	if (bs && sp) ylikely {
 	    if (sl < 0) sl = INT_MAX ;
 	    for (i = 0 ; (i < sl) && bs[i] && sp[i] ; i += 1) {
 	        if (bs[i] != sp[i]) break ;
