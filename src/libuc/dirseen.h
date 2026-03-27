@@ -41,7 +41,7 @@ struct dirseen_cursor {
 
 struct dirseen_head {
 	vecobj		*dlistp ;
-	uint		magic ;
+	uint		magval ;
 	int		strsz ;
 } ; /* end struct */
 
@@ -109,7 +109,7 @@ struct dirseen : dirseen_head {
 	    start(this,dirseenmem_start) ;
 	    count(this,dirseenmem_count) ;
 	    finish(this,dirseenmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	dirseen(const dirseen &) = delete ;
 	dirseen &operator = (const dirseen &) = delete ;
@@ -120,7 +120,7 @@ struct dirseen : dirseen_head {
 	int notadd(ustat *,cchar *,int) noex ;
 	void dtor() noex ;
 	destruct dirseen() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (dirseen) */
 typedef DIRSEEN_CUR	dirseen_cur ;
@@ -135,7 +135,7 @@ template<typename ... Args>
 inline int dirseen_magic(dirseen *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DIRSEEN_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DIRSEEN_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (dirseen_magic) */
