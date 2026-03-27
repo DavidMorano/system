@@ -40,7 +40,7 @@
 #include	<clanguage.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<ucfuncodes.h>	/* |FM_{x}(3uc)| */
+#include	<funcodes.h>	/* |FM_{x}(3uc)| */
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
 #include	<intfloor.h>
@@ -97,7 +97,7 @@ local int filer_ctor(filer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->off = 0 ;
 	    op->dbuf = nullptr ;
 	    op->bp = nullptr ;
@@ -152,7 +152,7 @@ int filer_start(filer *op,int fd,off_t foff,int bsz,int of) noex {
 	                if (rs >= 0) {
 		            op->off = foff ;
 		            if (of & FILER_ONET) op->fl.net = true ;
-			    op->magic = FILER_MAGIC ;
+			    op->magval = FILER_MAGIC ;
 	                } /* end if (ok) */
 	                if (rs < 0) {
 		            libmem.free(op->dbuf) ;
@@ -187,7 +187,7 @@ int filer_finish(filer *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->len = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
