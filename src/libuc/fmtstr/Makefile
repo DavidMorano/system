@@ -172,7 +172,6 @@ fmtobj1.o:		fmtobj1.cc fmtobj0.o $(DEPS_OBJ)	$(INCS)
 	$(COMPILE.cc) $<
 
 fmtstrdata.o:		fmtstrdata.ccm				$(INCS)
-fmtutil.o:		fmtutil.ccm				$(INCS)
 
 fmtsub.o:		$(MOBJ_SUB)				$(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ_SUB)
@@ -211,6 +210,17 @@ fmtspec0.o:		fmtsub.ccm $(DEPS_SPEC)			$(INCS)
 	makemodule fmtspec
 
 fmtspec1.o:		fmtspec1.cc fmtspec0.o $(DEPS_SPEC)	$(INCS)
+	makemodule fmtspec
+	$(COMPILE.cc) $<
+
+# FMTUTIL
+fmrutil.o:		fmtutil0.o fmtutil1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+fmtutil0.o:		fmtutil.ccm				$(INCS)
+	makemodule fmtspec
+
+fmtutil1.o:		fmtutil1.cc fmtutil0.o
 	makemodule fmtspec
 	$(COMPILE.cc) $<
 
