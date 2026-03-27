@@ -118,7 +118,7 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 	int		rs = SR_OK ;
 	cchar		*cp ;
-	if (int cl ; (cl = sfshrink(sp,sl,&cp)) == 1) ylikely {
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	    T		mf = 1 ;
 	    switch (mc) {
 	    case 'Y':
@@ -142,6 +142,7 @@ template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 	        mf = 60 ;
 	        break ;
 	    case 's':
+	    case 0:			/* <- indicates no multiply character */
 	        break ;
 	    default:
 		rs = SR_NOMSG ;
@@ -157,8 +158,6 @@ template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 		    }
 	        } /* end if (cfdeci) */
 	    } /* end if (ok) */
-	} else {
-	    rs = SR_INVALID ;
 	} /* end if (non-zero) */
 	return rs ;
 } /* end subroutine-template (convert) */
@@ -169,10 +168,11 @@ local int cfloop(cchar *sp,int sl,int *rp) noex {
 	int		res = 0 ; /* accumulated-result */
 	int		inc{} ;
 	for (cc *tp ; (rs >= 0) && (tp = strnalpha(sp,sl)) != np ; ) {
-	    cint	mch = mkchar(*tp) ;
-	    cint	tl = intconv(tp - sp) ;
-	    rs = convert(sp,tl,mch,&inc) ;
-	    res += inc ;
+	    if (cint tl = intconv(tp - sp) ; tl > 0) {
+	        cint mch = mkchar(*tp) ;
+	        rs = convert(sp,tl,mch,&inc) ;
+	        res += inc ;
+	    }
 	    sl -= intconv((tp + 1) - sp) ;
 	    sp = (tp + 1) ;
 	} /* end for */
