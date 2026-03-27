@@ -1,4 +1,4 @@
-/* mnwcpy SUPPORT */
+/* mnwcpy SUPPORT (counted-memory-write-copy) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -18,11 +18,11 @@
 /*******************************************************************************
 
   	Name:
-	mnwcpy
+	mnwcpy (counted-memory-write-copy)
 
 	Description:
 	Ths subroutine is a cross between |sncpy1(3dam)| and
-	|memcpy(3c)| but it takes a counted string for the source
+	|memcopy(3c)| but it takes a counted string for the source
 	rather than only a NUL-terminated string.
 
 	Synopsis:
@@ -39,7 +39,7 @@
 	<0		error (system-return)
 
 	Notes:
-	This subroutine just calls either |memcpy(3c)|, |sncpy1(3dam)|,
+	This subroutine just calls either |memcopy(3c)|, |sncpy1(3dam)|,
 	or |strwcpy(3dam)| based on the arguments.  The advantage
 	of this subroutine over the others is that the logic needed
 	to figure out just what subroutine to call is coded into
@@ -52,18 +52,20 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<sncpyx.h>		/* |snwcpy1(3uc)| */
+#include	<sncpyx.h>		/* |sncpy1(3uc)| */
 #include	<strwcpy.h>		/* |strwcpy(3uc)| */
 #include	<localmisc.h>
 
 #include	"mnwcpy.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memcopy(3u)| */
 
 /* local defines */
 
@@ -96,11 +98,11 @@
 
 int mnwcpy(char *dp,int dl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ; /* return-value */
-	if (dp && sp) {
+	if (dp && sp) ylikely {
 	    if (dl >= 0) {
 	        if (sl >= 0) {
 	            if (sl <= dl) {
-		        memcpy(dp,sp,sl) ;
+		        memcopy(dp,sp,sl) ;
 		        rs = sl ;
 	            } else {
 	                rs = SR_OVERFLOW ;
@@ -110,7 +112,7 @@ int mnwcpy(char *dp,int dl,cchar *sp,int sl) noex {
 	        }
 	    } else {
 	        if (sl >= 0) {
-		    memcpy(dp,sp,sl) ;
+		    memcopy(dp,sp,sl) ;
 		    rs = sl ;
 	        } else {
 	            rs = intconv(strwcpy(dp,sp,-1) - dp) ;
