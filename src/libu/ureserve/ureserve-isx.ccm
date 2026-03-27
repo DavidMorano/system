@@ -35,8 +35,6 @@ module ;
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<vector>
-#include	<string>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
