@@ -48,8 +48,6 @@ module ;
 #include	<ascii.h>		/* |CH_{x}| */
 #include	<strn.h>
 #include	<mkchar.h>
-#include	<hasx.h>
-#include	<ischarx.h>
 #include	<localmisc.h>
 
 module fmtsub ;
@@ -61,12 +59,10 @@ import fmtspec ;
 /* local defines */
 
 
-
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
