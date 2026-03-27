@@ -32,17 +32,14 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"fifoelem.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |memcopy(3u)| */
 
@@ -72,17 +69,16 @@ typedef const void	cv ;
 /* forward referecens */
 
 template<typename ... Args>
-static inline int fifoelem_magic(fifoelem *op,Args ... args) noex {
+local inline int fifoelem_magic(fifoelem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == FIFOELEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == FIFOELEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (fifoelem_magic) */
+} /* end subroutine (fifoelem_magic) */
 
-static int	entry_start(FE_ENT *,cvoid *,int) noex ;
-static int	entry_finish(FE_ENT *) noex ;
+local int	entry_start(FE_ENT *,cvoid *,int) noex ;
+local int	entry_finish(FE_ENT *) noex ;
 
 
 /* local variables */
@@ -93,14 +89,18 @@ static int	entry_finish(FE_ENT *) noex ;
 
 /* exported subroutines */
 
-int fifoelem_start(FE *op) noex {
+int fifoelem_start(FE *op,int esz) noex {
     	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_OK ;
-	    op->head = nullptr ;
-	    op->tail = nullptr ;
-	    op->n = 0 ;
-	    op->magic = FIFOELEM_MAGIC ;
+	if (op) ylikely {
+	    rs = SR_INVALID ;
+	    if (esz > 0) {
+	        rs = SR_OK ;
+	        op->head = nullptr ;
+	        op->tail = nullptr ;
+	        op->n = 0 ;
+	        op->esz = esz ;
+	        op->magval = FIFOELEM_MAGIC ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -108,24 +108,25 @@ int fifoelem_start(FE *op) noex {
 
 int fifoelem_finish(FE *op) noex {
 	int		rs ;
-	if ((rs = fifoelem_magic(op)) >= 0) {
+	if ((rs = fifoelem_magic(op)) >= 0) ylikely {
 	    while ((rs = fifoelem_del(op)) >= 0) ;
 	    if (rs == SR_NOTFOUND) rs = SR_OK ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifoelem_finish) */
 
-int fifoelem_add(FE *op,void *usp,int usl) noex {
+int fifoelem_ins(FE *op,void *usp) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		n = 0 ; /* return-value */
-	if ((rs = fifoelem_magic(op,usp)) >= 0) {
+	if ((rs = fifoelem_magic(op,usp)) >= 0) ylikely {
+	    cint	usl = op->esz ;
 	    cint	rsz = szof(FE_ENT) ;
-	    if (void *vp ; (rs = libmem.mall(rsz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(rsz,&vp)) >= 0) ylikely {
 	        FE_ENT	*ep = (FE_ENT *) vp ;
-	        if ((rs = entry_start(ep,usp,usl)) >= 0) {
+	        if ((rs = entry_start(ep,usp,usl)) >= 0) ylikely {
 	            if (op->head && op->tail) {
 	                ep->prev = op->tail ;
 	                (op->tail)->next = ep ;
@@ -150,18 +151,18 @@ int fifoelem_add(FE *op,void *usp,int usl) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (fifoelem_add) */
+/* end subroutine (fifoelem_ins) */
 
 int fifoelem_rem(FE *op,void *ebuf,int elen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		slen ; /* return-value */
-	if ((rs = fifoelem_magic(op,ebuf)) >= 0) {
+	if ((rs = fifoelem_magic(op,ebuf)) >= 0) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (op->head) {
 		FE_ENT	*ep = op->head ;
 		rs = SR_TOOBIG ;
-	        if ((elen < 0) || (ep->dl <= elen)) {
+	        if ((elen < 0) || (ep->dl <= elen)) ylikely {
 	            memcopy(ebuf,ep->dp,ep->dl) ;
 		    slen = ep->dl ;
 		    op->head = ep->next ;
@@ -190,7 +191,7 @@ int fifoelem_get(FE *op,FE_ENT **epp) noex {
     	cnullptr	np{} ;
     	int		rs ;
 	int		dl = 0 ; /* return-value */
-	if ((rs = fifoelem_magic(op)) >= 0) {
+	if ((rs = fifoelem_magic(op)) >= 0) ylikely {
 	    FE_ENT	*ep = nullptr ;
 	    if (op->head && op->tail) {
 		ep = op->head ;
@@ -211,7 +212,7 @@ int fifoelem_del(FE *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ; /* return-value */
-	if ((rs = fifoelem_magic(op)) >= 0) {
+	if ((rs = fifoelem_magic(op)) >= 0) ylikely {
 	    if (op->head && op->tail) {
 	        FE_ENT	*ep = op->head ;
 	        op->head = ep->next ;
@@ -243,16 +244,49 @@ int fifoelem_del(FE *op) noex {
 int fifoelem_count(FE *op) noex {
     	int		rs ;
 	int		n = 0 ; /* return-value */
-	if ((rs = fifoelem_magic(op)) >= 0) {
+	if ((rs = fifoelem_magic(op)) >= 0) ylikely {
 	    n = op->n ;
 	}
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (fifoelem_count) */
 
+int fifoelem_present(FE *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
+	int		rs ;
+	int		rs1 ;
+	int		dl = 0 ; /* return-value */
+	if ((rs = fifoelem_magic(op,vsp)) >= 0) ylikely {
+	    int		sl = vsl ;
+	    cchar	*sp = charp(vsp) ;
+	    if (vsl < 0) {
+		sl = lenstr(sp) ;
+	    }
+	    if (scmp == nullptr) scmp = fifoelem_cmp(strcmp) ;
+	    auto entcmp = [&sp,&sl,scmp] (FE_ENT *ep) {
+		bool f = true ;
+		f = f && (sl == ep->dl) ;
+		f = f && scmp(sp,ep->dp) ;
+		return f ;
+	    } ; /* end lambda */
+	    if (FE_CUR cur ; (rs = fifoelem_curbegin(op,&cur)) >= 0) ylikely {
+	        FE_ENT	*ep ;
+	        while ((rs = fifoelem_curenum(op,&cur,&ep)) >= 0) {
+		    if (entcmp(ep)) {
+	                dl = ep->dl ;
+	                break ;
+	            }
+	        } /* end while */
+	        rs1 = fifoelem_curend(op,&cur) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (cursor) */
+	} /* end if (magic) */
+	return (rs >= 0) ? dl : rs ;
+}
+/* end subroutine (fifoelem_present) */
+
 int fifoelem_curbegin(FE *op,FE_CUR *curp) noex {
     	int		rs ;
-	if ((rs = fifoelem_magic(op,curp)) >= 0) {
+	if ((rs = fifoelem_magic(op,curp)) >= 0) ylikely {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
@@ -261,44 +295,19 @@ int fifoelem_curbegin(FE *op,FE_CUR *curp) noex {
 
 int fifoelem_curend(FE *op,FE_CUR *curp) noex {
     	int		rs ;
-	if ((rs = fifoelem_magic(op,curp)) >= 0) {
+	if ((rs = fifoelem_magic(op,curp)) >= 0) ylikely {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifoelem_curend) */
 
-int fifoelem_curfetch(FE *op,FE_CUR *curp,FE_ENT **epp) noex {
-    	cnullptr	np{} ;
-    	int		rs ;
-	int		dl = 0 ; /* return-value */
-	if ((rs = fifoelem_magic(op,curp)) >= 0) {
-	    FE_ENT	*ep = nullptr ;
-	    if (op->head && op->tail) {
-	        if (curp->current == np) {
-	            ep = op->head ;
-	        } else {
-	            ep = (curp->current)->next ;
-	        }
-	        curp->current = ep ;
-		dl = ep->dl ;
-	    } else if ((op->head == np) && (op->tail == np)) {
-		rs = SR_NOTFOUND ;
-	    } else {
-		rs = SR_BADFMT ;
-	    }
-	    if (epp) *epp = ep ;
-	} /* end if (magic) */
-	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (fifoelem_curfetch) */
-
 int fifoelem_curdel(FE *op,FE_CUR *curp) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ; /* return-value */
-	if ((rs = fifoelem_magic(op,curp)) >= 0) {
+	if ((rs = fifoelem_magic(op,curp)) >= 0) ylikely {
 	    FE_ENT	*ep = nullptr ;
 	    if (op->head && op->tail) {
 	        if (curp->current == nullptr) {
@@ -337,43 +346,35 @@ int fifoelem_curdel(FE *op,FE_CUR *curp) noex {
 }
 /* end subroutine (fifoelem_curdel) */
 
-int fifoelem_present(FE *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
-	int		rs ;
-	int		rs1 ;
+int fifoelem_curenum(FE *op,FE_CUR *curp,FE_ENT **epp) noex {
+    	cnullptr	np{} ;
+    	int		rs ;
 	int		dl = 0 ; /* return-value */
-	if ((rs = fifoelem_magic(op,vsp)) >= 0) {
-	    int		sl = vsl ;
-	    cchar	*sp = charp(vsp) ;
-	    if (vsl < 0) {
-		sl = lenstr(sp) ;
+	if ((rs = fifoelem_magic(op,curp)) >= 0) ylikely {
+	    FE_ENT	*ep = nullptr ;
+	    if (op->head && op->tail) {
+	        if (curp->current == np) {
+	            ep = op->head ;
+	        } else {
+	            ep = (curp->current)->next ;
+	        }
+	        curp->current = ep ;
+		dl = ep->dl ;
+	    } else if ((op->head == np) && (op->tail == np)) {
+		rs = SR_NOTFOUND ;
+	    } else {
+		rs = SR_BADFMT ;
 	    }
-	    if (scmp == nullptr) scmp = fifoelem_cmp(strcmp) ;
-	    auto entcmp = [&sp,&sl,scmp] (FE_ENT *ep) {
-		bool f = true ;
-		f = f && (sl == ep->dl) ;
-		f = f && scmp(sp,ep->dp) ;
-		return f ;
-	    } ; /* end lambda */
-	    if (FE_CUR cur ; (rs = fifoelem_curbegin(op,&cur)) >= 0) {
-	        FE_ENT	*ep ;
-	        while ((rs = fifoelem_curfetch(op,&cur,&ep)) >= 0) {
-		    if (entcmp(ep)) {
-	                dl = ep->dl ;
-	                break ;
-	            }
-	        } /* end while */
-	        rs1 = fifoelem_curend(op,&cur) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (cursor) */
+	    if (epp) *epp = ep ;
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
 }
-/* end subroutine (fifoelem_present) */
+/* end subroutine (fifoelem_curenum) */
 
 
 /* privatesubroutines */
 
-static int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
+local int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
 	int		rs ;
 	if (vsl < 0) {
 	    cchar	*cp = charp(vsp) ;
@@ -381,7 +382,7 @@ static int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
 	}
 	ep->prev = ep->next = nullptr ;
 	cchar	*sp = charp(vsp) ;
-	if (cchar *cp ; (rs = libmem.strw(sp,vsl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(sp,vsl,&cp)) >= 0) ylikely {
 	    ep->dl = vsl ;
 	    ep->dp = voidp(cp) ;
 	}
@@ -389,10 +390,10 @@ static int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(FE_ENT *ep) noex {
+local int entry_finish(FE_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ep->dp) {
+	if (ep->dp) ylikely {
 	    rs1 = libmem.free(ep->dp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->dp = nullptr ;
@@ -401,5 +402,65 @@ static int entry_finish(FE_ENT *ep) noex {
 	return rs ;
 }
 /* end subroutine (entry_finish) */
+
+int fifoelem::start(int a) noex {
+	return fifoelem_start(this,a) ;
+}
+
+int fifoelem::ins(void *ep) noex {
+	return fifoelem_ins(this,ep) ;
+}
+
+int fifoelem::get(fifoelem_ent **rpp) noex {
+	return fifoelem_get(this,rpp) ;
+}
+
+int fifoelem::rem(void *rbuf,int rlen) noex {
+	return fifoelem_rem(this,rbuf,rlen) ;
+}
+
+int fifoelem::curbegin(fifoelem_cur *curp) noex {
+	return fifoelem_curbegin(this,curp) ;
+}
+
+int fifoelem::curend(fifoelem_cur *curp) noex {
+	return fifoelem_curend(this,curp) ;
+}
+
+int fifoelem::curdel(fifoelem_cur *curp) noex {
+	return fifoelem_curdel(this,curp) ;
+}
+
+int fifoelem::curenum(fifoelem_cur *curp,fifoelem_ent **rpp) noex {
+	return fifoelem_curenum(this,curp,rpp) ;
+}
+
+int fifoelem::present(cvoid *crp,int rl,fifoelem_cmp cmp) noex {
+	return fifoelem_present(this,crp,rl,cmp) ;
+}
+
+void fifoelem::dtor() noex {
+	if (cint rs = int(finish) ; rs < 0) {
+	    ulogerror("fifoelem",rs,"fini-finish") ;
+	}
+} /* end method (dtor) */
+
+fifoelem_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case fifoelemmem_del:
+	        rs = fifoelem_del(op) ;
+	        break ;
+	    case fifoelemmem_count:
+	        rs = fifoelem_count(op) ;
+	        break ;
+	    case fifoelemmem_finish:
+	        rs = fifoelem_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (fifoelem_co::operator) */
 
 
