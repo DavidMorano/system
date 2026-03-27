@@ -28,8 +28,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucread.h>
 #include	<sbuf.h>
 #include	<snwcpy.h>
 #include	<strn.h>
@@ -90,9 +93,9 @@ int mknlsreq(char *nlsbuf,int nlslen,cchar *svcbuf,int svclen) noex {
 int readnlsresp(int fd,char *tbuf,int tlen,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *rbuf ; (rs = malloc_mn(&rbuf)) >= 0) {
+	if (char *rbuf ; (rs = lm_mn(&rbuf)) >= 0) {
 	    cint	rlen = rs ;
-	    if ((rs = uc_readlinetimed(fd,rbuf,rlen,to)) >= 0) {
+	    if ((rs = uc_readlnto(fd,rbuf,rlen,to)) >= 0) {
 	        if ((rs = nlsresponse(tbuf,tlen,rbuf,rs)) >= 0) {
 	            cint	code = rs ;
 	            switch (code) {
@@ -111,7 +114,7 @@ int readnlsresp(int fd,char *tbuf,int tlen,int to) noex {
 	            } /* end switch */
 	        } /* end if (parsing response) */
 	    } /* end if (reading response) */
-	    rs1 = uc_free(rbuf) ;
+	    rs1 = lm_free(rbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
