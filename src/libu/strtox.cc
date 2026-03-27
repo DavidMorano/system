@@ -121,7 +121,7 @@ struct llhelper {
 	constexpr llhelper() noex {
 	    const longlong	one = 1 ;
 	    const int		n = (CHAR_BIT * szof(longlong)) ;
-	    ullmax = (~ ullmax) ;
+	    ullmax = (compl ullmax) ;
 	    llmin = (one << (n - 1)) ;
 	    llmax = longlong(ullmax >> 1) ;
 	    for (uint b = 2 ; b <= maxbase ; b += 1) {
