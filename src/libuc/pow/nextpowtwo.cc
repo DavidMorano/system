@@ -49,6 +49,7 @@
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<concepts>
 #include	<bit>			/* |countl_zero(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -58,6 +59,9 @@
 
 #include	"nextpowtwo.h"
 
+#pragma		GCC dependency		"mod/flbs.ccm"
+
+import flbs ;				/* |flbsi(3u)| */
 
 /* local defines */
 
@@ -68,6 +72,7 @@
 
 /* imported namespaces */
 
+using std::integral ;			/* concept */
 using std::countl_zero ;		/* subroutine-template */
 using std::countl_one ;			/* subroutine-template */
 using std::bit_ceil ;			/* subroutine-template */
@@ -91,21 +96,10 @@ extern "C" {
 
 /* forward references */
 
-static inline int flbsi(int v) noex {
-	cint		nbit = (szof(int) * CHAR_BIT) ;
-	uint		uv = uint(v) ;
-	int		bn = -1 ;
-	if (v) {
-	    cint	nc = countl_zero(uv) ;
-	    bn = (nbit - nc - 1) ;
-	}
-	return bn ;
-}
-/* end subroutine-template (flbsi) */
-
 
 /* local variables */
 
+constexpr int		nbits = (szof(int) * CHAR_BIT) ;
 constexpr bool		f_powceil = CF_POWCEIL ;
 
 
@@ -120,10 +114,10 @@ int nextpowtwo(int v) noex {
 	    uint	uv = uint(v) ;
 	    nn = bit_ceil(uv) ;
 	} else {
-	    if (int lb ; (lb = flbsi(v)) >= 0) {
-	        uint	mask = ((1 << lb) - 1) ;
-	        if ((v & mask) && (lb < 31)) lb += 1 ;
-	        nn = (1 << lb) ;
+	    if (int lbit ; (lbit = flbsi(v)) >= 0) {
+	        uint	mask = ((1 << lbit) - 1) ;
+	        if ((v & mask) && (lbit < (nbits - 1))) lbit += 1 ;
+	        nn = (1 << lbit) ;
 	    } /* end if */
 	} /* end if_constexpr (f_powceil) */
 	return nn ;
