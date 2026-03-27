@@ -45,7 +45,7 @@ module ;
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<uclibmem.h>
+#include	<umem.hh>
 #include	<stdintx.h>
 #include	<ascii.h>		/* |CH_{x}| */
 #include	<strn.h>
@@ -77,6 +77,7 @@ import fmtspec ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -118,7 +119,7 @@ int fmtsub_start(fmtsub *op,char *ubuf,int ulen,int fm) noex {
 	    op->mode = fm ;
 	    op->fl.mclean	= !!(fm & fopt.clean) ;
 	    op->fl.mnooverr	= !!(fm & fopt.nooverr) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (fmtsub_start) */
@@ -212,7 +213,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	            f_eol = true ;
 	        }
 	        if (hasourbad(sp,hl)) {
-	            if (cint sz = (sl + 1) ; (rs = lm_mall(sz,&abuf)) >= 0) {
+	            if (cint sz = (sl + 1) ; (rs = umem.mall(sz,&abuf)) >= 0) {
 	                int	i ; /* used-afterwards */
 	                for (i = 0 ; (i < hl) && *sp ; i += 1) {
 	                    int	ch = mkchar(sp[i]) ;
@@ -233,7 +234,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	    len = rs ;
 	}
 	if (abuf) {
-	    lm_free(abuf) ;
+	    umem.free(abuf) ;
 	}
 	return (rs >= 0) ? len : rs ;
 }
@@ -274,7 +275,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	    }
 	    if (f_notnull) {
 	        cint 	sz = (i + 1) * szof(char) ;
-	        if (char *p ; (rs = lm_mall(sz,&p)) >= 0) {
+	        if (char *p ; (rs = umem.mall(sz,&p)) >= 0) {
 	            int		j ; /* used-afterwards */
 	            int		ch ;
 	            f_memalloc = true ;
@@ -338,7 +339,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	}
 	if (f_memalloc && sp) {
 	    char *bp = cast_const<charp>(sp) ;
-	    lm_free(bp) ;
+	    umem.free(bp) ;
 	}
 	return (rs >= 0) ? fcode : rs ;
 }
