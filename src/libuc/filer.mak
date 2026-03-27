@@ -1,4 +1,4 @@
-# MAKEFILES (filer)
+# MAKEFILE (filer)
 
 T= filer
 
@@ -53,7 +53,6 @@ OBJ_FILER= $(OBJA_FILER)
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
