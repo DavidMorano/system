@@ -58,7 +58,7 @@
 #include	<usupport.h>		/* |hasnotdots(3u)| */
 #include	<posixdirent.hh>
 #include	<localmisc.h>
-#include	<dprintf.h>		/* debugging */
+#include	<dprintf.hh>		/* debugging */
 
 #include	"urmdirs.h"
 
