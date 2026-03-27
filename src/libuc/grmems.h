@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 2004-08-27, David A­D­ Morano
+	= 2004-01-10, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
@@ -22,10 +22,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<recarr.h>
 #include	<pq.h>
 
@@ -41,7 +38,7 @@ struct grmems_cursor {
 	uint		magic ;
 	int		ri ;		/* record index */
 	int		i ;		/* index through members */
-} ;
+} ; /* end struct (grmems_cursor) */
 
 struct grmems_statdata {
 	uint		nentries ;		/* number of current entries */
@@ -49,7 +46,7 @@ struct grmems_statdata {
 	uint		refreshes ;		/* refreshes */
 	uint		phits, pmisses ;	/* positive */
 	uint		nhits, nmisses ;	/* negative */
-} ;
+} ; /* end struct (grmems_statdata) */
 
 struct grmems_head {
 	recarr		*recs ;		/* linear array (of recs) */
@@ -71,7 +68,7 @@ struct grmems_head {
 	int		fd ;
 	int		fsize ;
 	int		nusergids ;
-} ;
+} ; /* end struct (grmems_head) */
 
 typedef GRMEMS		grmems ;
 typedef GRMEMS_CUR	grmems_cur ;
