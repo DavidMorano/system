@@ -23,7 +23,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
-#include	<stdintx.h>
 
 
 EXTERNC_begin
@@ -34,13 +33,13 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int cfdect(cchar *sp,int sl,int *rp = nullptr) noex {
+local inline int cfdect(cchar *sp,int sl,int *rp = nullptr) noex {
 	return cfdecti(sp,sl,rp) ;
 }
 
 #else /* __cplusplus */
 
-static inline int cfdect(cchar *sp,int sl,int *rp) noex {
+local inline int cfdect(cchar *sp,int sl,int *rp) noex {
 	return cfdecti(sp,sl,rp) ;
 }
 
