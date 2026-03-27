@@ -32,11 +32,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<vechand.h>
 #include	<localmisc.h>
@@ -62,38 +59,36 @@ using std::nothrow ;			/* constant */
 /* forward referenes */
 
 template<typename ... Args>
-static inline int cq_ctor(cq *op,Args ... args) noex {
+local inline int cq_ctor(cq *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
-	    if ((op->qp = new(nothrow) vechand) != np) {
+	    op->magval = 0 ;
+	    if ((op->qp = new(nothrow) vechand) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-pq) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cq_ctor) */
+} /* end subroutine (cq_ctor) */
 
-static inline int cq_dtor(cq *op) noex {
+local inline int cq_dtor(cq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->qp) {
+	    if (op->qp) ylikely {
 		delete op->qp ;
 		op->qp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cq_dtor) */
+} /* end subroutine (cq_dtor) */
 
 template<typename ... Args>
-static int cq_magic(cq *op,Args ... args) noex {
+local int cq_magic(cq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == CQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == CQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (cq_magic) */
@@ -109,11 +104,11 @@ static int cq_magic(cq *op,Args ... args) noex {
 
 int cq_start(cq *op) noex {
 	int		rs ;
-	if ((rs = cq_ctor(op)) >= 0) {
+	if ((rs = cq_ctor(op)) >= 0) ylikely {
 	    cint	vo = (vechandm.ordered | vechandm.compact) ;
 	    cint	de = CQ_DEFENTS ;
-	    if ((rs = vechand_start(op->qp,de,vo)) >= 0) {
-	        op->magic = CQ_MAGIC ;
+	    if ((rs = vechand_start(op->qp,de,vo)) >= 0) ylikely {
+	        op->magval = CQ_MAGIC ;
 	    }
 	    if (rs < 0) {
 		cq_dtor(op) ;
@@ -126,8 +121,8 @@ int cq_start(cq *op) noex {
 int cq_finish(cq *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = cq_magic(op)) >= 0) {
-	    {
+	if ((rs = cq_magic(op)) >= 0) ylikely {
+	    if (op->qp) ylikely {
 		rs1 = vechand_finish(op->qp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -135,7 +130,7 @@ int cq_finish(cq *op) noex {
 		rs1 = cq_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -143,7 +138,7 @@ int cq_finish(cq *op) noex {
 
 int cq_ins(cq *op,void *ep) noex {
 	int		rs ;
-	if ((rs = cq_magic(op,ep)) >= 0) {
+	if ((rs = cq_magic(op,ep)) >= 0) ylikely {
 	    rs = vechand_add(op->qp,ep) ;
 	} /* end if (magic) */
 	return rs ;
@@ -153,8 +148,8 @@ int cq_ins(cq *op,void *ep) noex {
 int cq_rem(cq *op,void *vrp) noex {
 	int		rs ;
 	int		count = 0 ;
-	if ((rs = cq_magic(op)) >= 0) {
-	    if (void *vp ; (rs = vechand_get(op->qp,0,&vp)) >= 0) {
+	if ((rs = cq_magic(op)) >= 0) ylikely {
+	    if (void *vp ; (rs = vechand_get(op->qp,0,&vp)) >= 0) ylikely {
 		void	**rpp = voidpp(vrp) ;
 		if (rpp) *rpp = vp ;
 	    	vechand_del(op->qp,0) ;
@@ -168,8 +163,8 @@ int cq_rem(cq *op,void *vrp) noex {
 int cq_unlink(cq *op,void *ep) noex {
 	int		rs ;
 	int		count = 0 ;
-	if ((rs = cq_magic(op,ep)) >= 0) {
-	    if ((rs = vechand_ent(op->qp,ep)) >= 0) {
+	if ((rs = cq_magic(op,ep)) >= 0) ylikely {
+	    if ((rs = vechand_ent(op->qp,ep)) >= 0) ylikely {
 		vechand_del(op->qp,0) ;
 		count = vechand_count(op->qp) ;
 	    }
@@ -180,7 +175,7 @@ int cq_unlink(cq *op,void *ep) noex {
 
 int cq_count(cq *op) noex {
 	int		rs ;
-	if ((rs = cq_magic(op)) >= 0) {
+	if ((rs = cq_magic(op)) >= 0) ylikely {
 	    rs = vechand_count(op->qp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -189,7 +184,7 @@ int cq_count(cq *op) noex {
 
 int cq_curbegin(cq *op,cq_cur *curp) noex {
 	int		rs ;
-	if ((rs = cq_magic(op,curp)) >= 0) {
+	if ((rs = cq_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -198,7 +193,7 @@ int cq_curbegin(cq *op,cq_cur *curp) noex {
 
 int cq_curend(cq *op,cq_cur *curp) noex {
 	int		rs ;
-	if ((rs = cq_magic(op,curp)) >= 0) {
+	if ((rs = cq_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -207,9 +202,9 @@ int cq_curend(cq *op,cq_cur *curp) noex {
 
 int cq_curenum(cq *op,cq_cur *curp,void *vrp) noex {
 	int		rs ;
-	if ((rs = cq_magic(op,curp,vrp)) >= 0) {
+	if ((rs = cq_magic(op,curp,vrp)) >= 0) ylikely {
 	    int	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-	    if (void *vp ; (rs = vechand_get(op->qp,i,&vp)) >= 0) {
+	    if (void *vp ; (rs = vechand_get(op->qp,i,&vp)) >= 0) ylikely {
 		void	**rpp = voidpp(vrp) ;
 		*rpp = vp ;
 	    	curp->i = i ;
@@ -218,5 +213,64 @@ int cq_curenum(cq *op,cq_cur *curp,void *vrp) noex {
 	return rs ;
 }
 /* end subroutine (cq_curenum) */
+
+int cq::ins(void *ep) noex {
+	return cq_ins(this,ep) ;
+}
+
+int cq::rem(void *rpp) noex {
+	return cq_rem(this,rpp) ;
+}
+
+int cq::unlink(void *rpp) noex {
+	return cq_unlink(this,rpp) ;
+}
+
+int cq::curbegin(cq_cur *curp) noex {
+	return cq_curbegin(this,curp) ;
+}
+
+int cq::curend(cq_cur *curp) noex {
+	return cq_curend(this,curp) ;
+}
+
+int cq::curenum(cq_cur *curp,void *rpp) noex {
+	return cq_curenum(this,curp,rpp) ;
+}
+
+void cq::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("cq",rs,"fini-finish") ;
+	}
+} /* end method (cq::dtor) */
+
+cq::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (this) ylikely {
+	    rs = cq_count(this) ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (cq::operator) */
+
+cq_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case cqmem_start:
+	        rs = cq_start(op) ;
+	        break ;
+	    case cqmem_count:
+	        rs = cq_count(op) ;
+	        break ;
+	    case cqmem_finish:
+	        rs = cq_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (cq_co::operator) */
+
+
 
 
