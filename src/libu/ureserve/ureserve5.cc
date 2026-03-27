@@ -88,6 +88,31 @@ cbool		f_strchr = CF_STRCHR ;
 
 /* exported subroutines */
 
+int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
+    	if (sp) ylikely {
+	    if (sl >= 0) {
+	        while ((sl > 0) && char_iswht(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        } /* end while */
+	        if (sp[0] == '\0') sl = 0 ;
+	    } else {
+	        while (char_iswht(*sp)) {
+	            sp += 1 ;
+	        }
+	        sl = lenstr(sp) ;
+	    } /* end if */
+	    while ((sl > 0) && char_iswht(sp[sl - 1])) {
+	        sl -= 1 ;
+	    }
+	} else {
+	    sl = -1 ;
+	}
+	if (rpp) *rpp = sp ;
+	return sl ;
+}
+/* end subroutine (sfshrink) */
+
 int sfbasename(cchar *sp,int µsl,cchar **rpp) noex {
 	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
