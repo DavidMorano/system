@@ -32,11 +32,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<usupport.h>		/* |libu::snwcpy(3u)| */
 #include	<uclibmem.h>
 #include	<strwcpy.h>
@@ -74,19 +71,19 @@ typedef fifostr_ent *	entp ;
 /* forward references */
 
 template<typename ... Args>
-static inline int fifostr_magic(fifostr *op,Args ... args) noex {
+local inline int fifostr_magic(fifostr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == FIFOSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == FIFOSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
 /* end subroutine (fifostr_magic) */
 
-static int	fifostr_mat(fifostr *,fifostr_ent *) noex ;
+local int	fifostr_mat(fifostr *,fifostr_ent *) noex ;
 
 #ifdef	COMMENT
-static int	cmpdefault() ;
+local int	cmpdefault() ;
 #endif
 
 
@@ -100,13 +97,13 @@ static int	cmpdefault() ;
 
 int fifostr_start(fifostr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->head = nullptr ;
 	    op->tail = nullptr ;
 	    op->ic = 0 ;
 	    op->cnt = 0 ;
-	    op->magic = FIFOSTR_MAGIC ;
+	    op->magval = FIFOSTR_MAGIC ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -114,10 +111,10 @@ int fifostr_start(fifostr *op) noex {
 
 int fifostr_finish(fifostr *op) noex {
 	int		rs ;
-	if ((rs = fifostr_magic(op)) >= 0) {
+	if ((rs = fifostr_magic(op)) >= 0) ylikely {
 	    while ((rs = fifostr_curdel(op,nullptr)) >= 0) ;
 	    if (rs == SR_NOTFOUND) rs = SR_OK ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -126,10 +123,10 @@ int fifostr_finish(fifostr *op) noex {
 int fifostr_add(fifostr *op,cchar *sp,int 탎l) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = fifostr_magic(op,sp)) >= 0) {
-	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	if ((rs = fifostr_magic(op,sp)) >= 0) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
 	        cint	sz = szof(fifostr_ent) + (sl + 1) ;
-		if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+		if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 	    	    fifostr_ent		*ep = entp(vp) ;
 	            ep->slen = sl ;
 	            {
@@ -159,7 +156,7 @@ int fifostr_add(fifostr *op,cchar *sp,int 탎l) noex {
 int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		sl = 0 ;
-	if ((rs = fifostr_magic(op)) >= 0) {
+	if ((rs = fifostr_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTFOUND ;
             if (op->head) {
                 fifostr_ent	*ep = op->head ;
@@ -177,7 +174,7 @@ int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
 
 int fifostr_headlen(fifostr *op) noex {
 	int		rs ;
-	if ((rs = fifostr_magic(op)) >= 0) {
+	if ((rs = fifostr_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (op->head) {
 	        fifostr_ent	*ep = op->head ;
@@ -191,9 +188,9 @@ int fifostr_headlen(fifostr *op) noex {
 int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
 	int		rs ;
 	int		sl = 0 ;
-	if ((rs = fifostr_magic(op)) >= 0) {
+	if ((rs = fifostr_magic(op)) >= 0) ylikely {
             rs = SR_INVALID ;
-            if (n >= 0) {
+            if (n >= 0) ylikely {
                 rs = SR_NOTFOUND ;
                 if (op->head) {
                     fifostr_ent     *ep = op->head ;
@@ -220,9 +217,9 @@ int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
 int fifostr_entlen(fifostr *op,int n) noex {
 	int		rs ;
 	int		sl = 0 ;
-	if ((rs = fifostr_magic(op)) >= 0) {
+	if ((rs = fifostr_magic(op)) >= 0) ylikely {
             rs = SR_INVALID ;
-            if (n >= 0) {
+            if (n >= 0) ylikely {
                 rs = SR_NOTFOUND ;
                 if (op->head) {
                     fifostr_ent     *ep = op->head ;
@@ -243,7 +240,7 @@ int fifostr_entlen(fifostr *op,int n) noex {
 int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		sl = 0 ;
-	if ((rs = fifostr_magic(op)) >= 0) {
+	if ((rs = fifostr_magic(op)) >= 0) ylikely {
             if (op->head != nullptr) {
                 fifostr_ent *ep = op->head ;
                 sl = ep->slen ;
@@ -252,7 +249,7 @@ int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
                     sp += szof(fifostr_ent) ;
                     rs = snwcpy(rbuf,rlen,sp,sl) ;
                 }
-                if (rs >= 0) {
+                if (rs >= 0) ylikely {
                     op->head = ep->next ;
                     if (op->head == nullptr) {
                         op->tail = nullptr ;
@@ -273,7 +270,7 @@ int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
 
 int fifostr_curbegin(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
-	if ((rs = fifostr_magic(op,curp)) >= 0) {
+	if ((rs = fifostr_magic(op,curp)) >= 0) ylikely {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
@@ -282,7 +279,7 @@ int fifostr_curbegin(fifostr *op,fifostr_cur *curp) noex {
 
 int fifostr_curend(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
-	if ((rs = fifostr_magic(op,curp)) >= 0) {
+	if ((rs = fifostr_magic(op,curp)) >= 0) ylikely {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
@@ -292,7 +289,7 @@ int fifostr_curend(fifostr *op,fifostr_cur *curp) noex {
 int fifostr_curenum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		sl = 0 ;
-	if ((rs = fifostr_magic(op,curp)) >= 0) {
+	if ((rs = fifostr_magic(op,curp)) >= 0) ylikely {
             fifostr_ent     *ep ;
             if ((curp == nullptr) || (curp->current == nullptr)) {
                 ep = op->head ;
@@ -301,7 +298,7 @@ int fifostr_curenum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
                     ep = (curp->current)->next ;
                 }
             } /* end if */
-            if (rs >= 0) {
+            if (rs >= 0) ylikely {
                 if (curp != nullptr) {
                     curp->current = ep ;
                 }
@@ -326,14 +323,14 @@ int fifostr_curdel(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = fifostr_magic(op,curp)) >= 0) {
+	if ((rs = fifostr_magic(op,curp)) >= 0) ylikely {
             fifostr_ent     *ep ;
             if ((curp == nullptr) || (curp->current == nullptr)) {
                 ep = op->head ;
             } else {
                 ep = curp->current ;
             }
-            if (ep != nullptr) {
+            if (ep != nullptr) ylikely {
                 int         sl = ep->slen ;
                 if (curp != nullptr) {
                     if (ep->prev == nullptr) {
@@ -369,7 +366,7 @@ int fifostr_curdel(fifostr *op,fifostr_cur *curp) noex {
 
 int fifostr_count(fifostr *op) noex {
 	int		rs ;
-	if ((rs = fifostr_magic(op)) >= 0) {
+	if ((rs = fifostr_magic(op)) >= 0) ylikely {
 	    rs = op->ic ;
 	} /* end if (magic) */
 	return rs ;
@@ -381,9 +378,9 @@ int fifostr_count(fifostr *op) noex {
 int fifostr_finder(fifostr *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
 	int		rs ;
 	if (cmpfunc == nullptr) cmpfunc = cmpdefault ;
-	if ((rs = fifostr_magic(op)) >= 0) {
+	if ((rs = fifostr_magic(op)) >= 0) ylikely {
 	    fifostr_cur	cur{} ;
-	    if ((rs = fifostr_curbegin(op,&cur)) >= 0) {
+	    if ((rs = fifostr_curbegin(op,&cur)) >= 0) ylikely {
 	        cchar	*rp{} ;
 	        while ((rs = fifostr_curenum(op,&cur,&rp)) >= 0) {
 	            if ((*cmpfunc)(s,rp) == 0) break ;
@@ -400,7 +397,7 @@ int fifostr_finder(fifostr *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
 
 /* private subroutines */
 
-static int fifostr_mat(fifostr *op,fifostr_ent *mep) noex {
+local int fifostr_mat(fifostr *op,fifostr_ent *mep) noex {
 	fifostr_ent	*ep = op->head ;
 	int		rs = SR_NOTFOUND ;
 	while (ep != nullptr) {
@@ -458,7 +455,7 @@ void fifostr::dtor() noex {
 
 fifostr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case fifostrmem_start:
 	        rs = fifostr_start(op) ;
