@@ -1,6 +1,6 @@
 /* usupport_ustrftime HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
