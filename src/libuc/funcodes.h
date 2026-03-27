@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* additional UNIX® limits support */
+/* function-codes (constants) fpr various services */
 /* version %I% last-modified %G% */
 
 
@@ -21,7 +21,7 @@
 /*******************************************************************************
 
   	Name:
-	ucfunctioncodes
+	functioncodes
 
 	Description:
 	Function codes for extended Input-Output operations.
