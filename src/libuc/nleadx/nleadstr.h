@@ -39,7 +39,7 @@ inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
 	return nleadbasestr(bs,sp,sl) ;
 }
 #else
-static inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
+local inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
 	return nleadbasestr(bs,sp,sl) ;
 }
 #endif /* __cplusplus */
