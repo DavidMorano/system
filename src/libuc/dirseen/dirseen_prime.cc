@@ -116,14 +116,14 @@ int dirseen_start(dirseen *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->strsz = 0 ;
 	    if ((op->dlistp = new(nt) vecobj) != np) ylikely {
 	        cint	esz = szof(dirseen_ent) ;
 		cint	vn = DIRSEEN_NDEF ;
 	        cint	vo = 0 ;
 	        if ((rs = vecobj_start(op->dlistp,esz,vn,vo)) >= 0) ylikely {
-	            op->magic = DIRSEEN_MAGIC ;
+	            op->magval = DIRSEEN_MAGIC ;
 	        } /* end if  */
 		if (rs < 0) {
 		    delete op->dlistp ;
@@ -159,7 +159,7 @@ int dirseen_finish(dirseen *op) noex {
 		    op->dlistp = nullptr ;
 	        }
 	    } /* end if (bugcheck) */
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
