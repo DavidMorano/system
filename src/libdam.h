@@ -143,7 +143,6 @@
 #include	<muximsg.h>
 #include	<mxalias.h>
 #include	<naturalwords.h>
-#include	<nchr.h>
 #include	<netfile.h>
 #include	<nettime.h>
 #include	<newobj.h>
