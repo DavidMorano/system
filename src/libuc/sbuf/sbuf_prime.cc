@@ -105,7 +105,7 @@ template<typename T> using ctxxx_f = int (*)(char *,int,T) noex ;
 
 namespace {
     struct blanker {
-	cint	l = lenstr(sysword.w_blanks) ;
+	cint	l = clenstr(sysword.w_blanks) ;
 	cchar	*p = sysword.w_blanks ;
     } ; /* end struct (blanker) */
 } /* end namespace */
