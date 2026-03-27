@@ -14,9 +14,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* |nullptr_t| */
-#include	<stdlib.h>
-#include	<stdint.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |abs(3c)| */
+#include	<cstdint>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
@@ -29,6 +29,15 @@ namespace libu {
     extern int cfdec(cchar *,int,uint *) noex ;
     extern int cfdec(cchar *,int,ulong *) noex ;
     extern int cfdec(cchar *,int,ulonglong *) noex ;
+    inline int cfdeci(cchar *sp,int sl,int *vp = nullptr) noex {
+    	int		rs ;
+	if (int v ; (rs = cfdec(sp,sl,&v)) >= 0) {
+	    cint va = abs(v) ;
+	    rs = va ;
+	    if (vp) *vp = v ;
+	}
+	return rs ;
+    } /* end subroutine (cfdeci) */
 } /* end namespace (libu) */
 
 
