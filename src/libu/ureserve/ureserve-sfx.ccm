@@ -43,6 +43,7 @@ module ;
 export module ureserve:sfx ;
 
 export {
+	int sfshrink		(cchar *,int,cchar **) noex ;
 	int sfbasename		(cchar *,int,cchar **) noex ;
 	int sfdirname		(cchar *,int,cchar **) noex ;
 	int sfprogname		(cchar *,int,cchar **) noex ;
