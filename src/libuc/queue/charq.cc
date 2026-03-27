@@ -28,12 +28,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
 
@@ -73,13 +72,13 @@ using libuc::libmem ;			/* variable */
 
 int charq_start(charq *op,int sz) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if (sz > 1) {
-		if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+	    if (sz > 1) ylikely {
+		if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 		    op->qbuf = charp(vp) ;
 	            op->qlen = sz ;
-	            op->count = 0 ;
+	            op->cnt = 0 ;
 	            op->ri = 0 ;
 	            op->wi = 0 ;
 	        } /* end if (memory-allocation) */
@@ -92,15 +91,15 @@ int charq_start(charq *op,int sz) noex {
 int charq_finish(charq *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->qbuf) {
+	    if (op->qbuf) ylikely {
 	        rs1 = libmem.free(op->qbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->qbuf = nullptr ;
 	    }
 	    op->qlen = 0 ;
-	    op->count = 0 ;
+	    op->cnt = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -108,14 +107,14 @@ int charq_finish(charq *op) noex {
 
 int charq_ins(charq *op,int ch) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (op->count < op->qlen) {
-	        op->qbuf[op->wi] = charconv(ch) ;
+	    if (op->cnt < op->qlen) ylikely {
+	        op->qbuf[op->wi] = char(ch) ;
 	        op->wi = ((op->wi + 1) % op->qlen) ;
-	        op->count += 1 ;
-	        rs = op->count ;
-	    }
+	        op->cnt += 1 ;
+	        rs = op->cnt ;
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -123,14 +122,14 @@ int charq_ins(charq *op,int ch) noex {
 
 int charq_rem(charq *op,char *cp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_EMPTY ;
-	    if (op->count > 0) {
+	    if (op->cnt > 0) ylikely {
 	        if (cp) *cp = op->qbuf[op->ri] ;
 	        op->ri = ((op->ri + 1) % op->qlen) ;
-	        op->count -= 1 ;
-	        rs = op->count ;
-	    }
+	        op->cnt -= 1 ;
+	        rs = op->cnt ;
+	    } /* end if (not-empty) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -138,11 +137,11 @@ int charq_rem(charq *op,char *cp) noex {
 
 int charq_remall(charq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->ri = 0 ;
 	    op->wi = 0 ;
-	    op->count = 0 ;
+	    op->cnt = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -150,7 +149,7 @@ int charq_remall(charq *op) noex {
 
 int charq_size(charq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->qlen ;
 	}
 	return rs ;
@@ -159,11 +158,61 @@ int charq_size(charq *op) noex {
 
 int charq_count(charq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = op->count ;
+	if (op) ylikely {
+	    rs = op->cnt ;
 	}
 	return rs ;
 }
 /* end subroutine (charq_count) */
+
+int charq::ins(int ch) noex {
+	return charq_ins(this,ch) ;
+}
+
+int charq::rem(char *rp) noex {
+	return charq_rem(this,rp) ;
+}
+
+void charq::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("charq",rs,"fini-finish") ;
+	}
+} /* end method (charq::dtor) */
+
+charq::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (qbuf) ylikely {
+	    rs = cnt ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (charq::operator) */
+
+int charq_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case charqmem_start:
+	        rs = charq_start(op,a) ;
+	        break ;
+	    case charqmem_remall:
+	        rs = charq_remall(op) ;
+	        break ;
+	    case charqmem_size:
+	        rs = charq_size(op) ;
+	        break ;
+	    case charqmem_count:
+	        rs = charq_count(op) ;
+	        break ;
+	    case charqmem_len:
+	        rs = charq_count(op) ;
+	        break ;
+	    case charqmem_finish:
+	        rs = charq_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (charq_co::operator) */
 
 
