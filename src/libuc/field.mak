@@ -1,4 +1,4 @@
-# MAKEFILES (field)
+# MAKEFILE (field)
 
 T= field
 
