@@ -15,12 +15,13 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
+#include	<cstring>		/* |strncpy(3c)| + |strcpy(3c)| */
 #include	<algorithm>		/* |min(C++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<localmisc.h>
 
 export module libutil:strcpy ;
 
