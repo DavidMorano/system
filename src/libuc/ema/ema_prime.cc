@@ -125,7 +125,7 @@ int ema_start(ema *op) noex {
 	    cint	vn = EMA_DEFENTS ;
 	    cint	vo = 0 ;
 	    if ((rs = elp->start(vn,vo)) >= 0) ylikely {
-	        op->magic = EMA_MAGIC ;
+	        op->magval = EMA_MAGIC ;
 	    }
 	    if (rs < 0) {
 		ema_dtor(op) ;
@@ -165,7 +165,7 @@ int ema_finish(ema *op) noex {
 	        rs1 = ema_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
