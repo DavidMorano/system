@@ -20,7 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucentpw.h>
+#include	<ucentua.h>
+#include	<ucentsp.h>
+#include	<ucentgr.h>
+#include	<ucentpj.h>
 
 
 EXTERNC_begin
