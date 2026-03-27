@@ -1,0 +1,497 @@
+/* intext MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* integer-extended */
+/* version %I% last-modified %G% */
+
+#define	CF_DEBUG	0		/* debugging */
+
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Object:
+	intext
+
+	Description:
+	We manage (a little bit) the UINTX object.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<cstdio>
+#include	<concepts>
+#include	<compare>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<stdintx.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
+#include	<dprintf.hh>		/* debugging */
+
+export module intext ;
+
+import varithmetic ;
+
+/* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	1		/* debugging */
+#endif
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+using ord = std::ordering_strong ;	/* type */
+
+
+/* local constants */
+
+template<int bits,typename Digit> 
+constexpr int ndig = ((bits / szof(Digit)) / CHAR_BIT) ;
+
+constexpr bool		f_debug		= CF_DEBUG ;
+
+
+/* exported stuff */
+
+export {
+    template<int Nbits,typename Digit = ulonglong> struct uintx {
+	inline static cint n = ndig<Nbits,Digit> ;
+	Digit		v[ndig<Nbits,Digit>] ;
+	uintx() = default ;
+	uintx(const uintx &o) noex {
+	    vcopy(n,v,o.v) ;
+	} ;
+	uintx &operator = (const uintx &o) noex {
+	    vcopy(n,v,o.v) ;
+	    return *this ;
+	} ;
+	uintx(int)		noex ;
+	uintx(long)		noex ;
+	uintx(longlong)		noex ;
+        uintx(uint)		noex ;
+	uintx(ulong)		noex ;
+	uintx(ulonglong)	noex ;
+	void load(int)		noex ;
+	void load(long)		noex ;
+	void load(longlong)	noex ;
+        void load(uint)		noex ;
+	void load(ulong)	noex ;
+	void load(ulonglong)	noex ;
+	uintx operator compl () noex {
+	    for (int i = 0 ; i < n ; i += 1) {
+		v[i] = (compl v[i]) ;
+	    }
+	    return *this ;
+	} ; /* end ctor */
+	uintx operator - () noex {
+	    Digit vt[n] ;
+	    vneg(n,vt,v) ;
+	    vcopy(n,v,vt) ;
+	    return *this ;
+	} ; /* end ctor */
+	uintx &operator *=	(int m) noex {
+	    Digit	s(m) ;
+	    Digit	r[n] ;
+	    vmul(n,r,v,s) ;
+	    vcopy(n,v,r) ;
+	    return *this ;
+	} /* end method (timeval::operator) */
+	uintx &operator *=	(const uintx &o) noex {
+	    Digit	r[n] ;
+	    vmul(n,r,v,o.v) ;
+	    vcopy(n,v,r) ;
+	    return *this ;
+	} /* end method (timeval::operator) */
+	uintx &operator +=	(const uintx &o) noex {
+	    Digit	r[n] ;
+	    vadd(n,r,v,o.v) ;
+	    vcopy(n,v,r) ;
+	    return *this ;
+	} /* end method (timeval::operator) */
+	uintx &operator -=	(const uintx &o) noex {
+	    Digit	r[n] ;
+	    vsub(n,r,v,o.v) ;
+	    vcopy(n,v,r) ;
+	    return *this ;
+        } /* end method (timeval::operator) */
+	uintx &operator and_eq	(const uintx &o) noex {
+	    veq_and(n,v,o.v) ;
+	    return *this ;
+        } /* end method (timeval::operator) */
+	uintx &operator or_eq	(const uintx &o) noex {
+	    veq_or(n,v,o.v) ;
+        } /* end method (timeval::operator) */
+	uintx &operator xor_eq	(const uintx &o) noex {
+	    veq_xor(n,v,o.v) ;
+	    return *this ;
+        } /* end method (timeval::operator) */
+	uintx &operator >>= (int nb) noex {
+	    Digit	r[n] ;
+	    vashr(n,r,v,nb) ;
+	    vcopy(n,v,r) ;
+	    return *this ;
+	} ;
+	uintx &operator <<= (int nb) noex {
+	    Digit	r[n] ;
+	    vlshl(n,r,v,nb) ;
+	    vcopy(n,v,r) ;
+	    return *this ;
+	} ;
+	ord operator <=> (const uintx &o) const noex {
+    	    ord res = ord::equal ;
+	    cint rc = vcmp(n,v,o.v) ;
+	    if (rc) {
+	        res = (rc > 0) ? ord::greater : ord::less ;
+	    }
+	    return res ;
+	} /* end smethod (uintx) */
+	void clear() noex {
+	    vclear(n,v) ;
+	} ;
+	uintx add	(const uintx &o) const noex {
+	    uintx res ;
+	    vadd(n,res.v,v,o.v) ;
+	    return res ;
+	} ;
+	uintx sub	(const uintx &o) const noex {
+	    uintx res ;
+	    vsub(n,res.v,v,o.v) ;
+	    return res ;
+	} ;
+	uintx mul	(const uintx &o) const noex {
+	    uintx res ;
+	    vmul(n,res.v,v,o.v) ;
+	    return res ;
+	} ;
+	uintx band	(const uintx &o) const noex {
+	    uintx res ;
+	    vand(n,res.v,v,o.v) ;
+	    return res ;
+	} ;
+	uintx bor	(const uintx &o) const noex {
+	    uintx res ;
+	    vor(n,res.v,v,o.v) ;
+	    return res ;
+	} ;
+	uintx bxor	(const uintx &o) const noex {
+	    uintx res ;
+	    vxor(n,res.v,v,o.v) ;
+	    return res ;
+	} ;
+	uintx rotr(int nb) const noex {
+	    uintx res ;
+	    vrotr(n,res.v,v,nb) ;
+	    return res ;
+	} ;
+	uintx rotl(int nb) const noex {
+	    uintx res ;
+	    vrotl(n,res.v,v,nb) ;
+	    return res ;
+	} ;
+	uintx rotx(int nb) const noex {
+	    uintx res ;
+	    if (nb >= 0) {
+		res = rotr(nb) ;
+	    } else {
+		res = rotl(nb) ;
+	    }
+	    return res ;
+	} ;
+	uintx lshr(int nb) const noex {
+	    uintx res ;
+	    vlshr(n,res.v,v,nb) ;
+	    return res ;
+	} ; /* end method (lshr) */
+	uintx lshl(int nb) const noex {
+	    uintx res ;
+	    vlshl(n,res.v,v,nb) ;
+	    return res ;
+	} ; /* end method (lshl) */
+	uintx lshx(int nb) const noex {
+	    uintx res ;
+	    if (nb >= 0) {
+		res = lshr(nb) ;
+	    } else {
+		res = lshl(nb) ;
+	    }
+	    return res ;
+	} ; /* end method (lshx) */
+	uintx ashr(int nb) const noex {
+	    uintx res ;
+	    vashr(n,res.v,v,nb) ;
+	    return res ;
+	} ; /* end method (ashr) */
+	uintx ashl(int nb) const noex {
+	    uintx res ;
+	    vashl(n,res.v,v,nb) ;
+	    return res ;
+	} ; /* end method (ashl) */
+	uintx ashx(int nb) const noex {
+	    uintx res ;
+	    if (nb >= 0) {
+		res = ashr(nb) ;
+	    } else {
+		res = ashl(nb) ;
+	    }
+	    return res ;
+	} ; /* end method (ashx) */
+	uintx operator +	(const uintx &o) const noex {
+	    return add(o) ;
+	} ;
+	uintx operator -	(const uintx &o) const noex {
+	    return sub(o) ;
+	} ;
+	uintx operator *	(const uintx &o) const noex {
+	    return mul(o) ;
+	} ;
+	uintx operator bitand	(const uintx &o) const noex {
+	    return band(o) ;
+	} ;
+	uintx operator bitor	(const uintx &o) const noex {
+	    return bor(o) ;
+	} ;
+	uintx operator bitxor	(const uintx &o) const noex {
+	    return bxor(o) ;
+	} ;
+	uintx operator >>	(const uintx &o) const noex {
+	    return ashr(o) ;
+	} ;
+	uintx operator <<	(const uintx &o) const noex {
+	    return lshl(o) ;
+	} ;
+	operator uint		() const noex {
+	    return uintconv(v[0]) ;
+	} ;
+	operator ulong 		() const noex {
+	    return ulongconv(v[0]) ;
+	} ;
+	operator ulonglong 	() const noex {
+	    return v[0] ;
+	} ;
+	operator int		() const noex {
+	    return intconv(v[0]) ;
+	} ;
+	operator long		() const noex {
+	    return longconv(v[0]) ;
+	} ;
+	operator longlong	() const noex {
+	    return longlongconv(v[0]) ;
+	} ;
+    } ; /* end struct-template (uintx) */
+} /* end export */
+
+export {
+    template<int Nbits,typename Digit>
+	void uintx<Nbits,Digit>::load(uint a) noex {
+	    vclear(n,v) ;
+            v[0] = a ;
+	} ;
+    template<int Nbits,typename Digit>
+	void uintx<Nbits,Digit>::load(ulong a) noex {
+	    vclear(n,v) ;
+            v[0] = a ;
+	} ;
+    template<int Nbits,typename Digit>
+	void uintx<Nbits,Digit>::load(ulonglong a) noex {
+	    vclear(n,v) ;
+            v[0] = a ;
+	} ;
+} /* end export */
+
+export {
+    template<int Nbits,typename Digit>
+	void uintx<Nbits,Digit>::load(int a) noexcept {
+            if (a >= 0) {
+		vclear(n,v) ;
+                v[0] = uint(a) ;
+            } else {
+                longlong aa = longlong(a) ;
+		vopaque(n,v) ;
+                v[0] = longlongconv(aa) ;
+            }
+        } ; /* end ctor */
+    template<int Nbits,typename Digit>
+	void uintx<Nbits,Digit>::load(long a) noexcept {
+            if (a >= 0) {
+		vclear(n,v) ;
+                v[0] = ulong(a) ;
+            } else {
+                longlong aa = longlong(a) ;
+		vopaque(n,v) ;
+                v[0] = ulonglongconv(aa) ;
+            }
+        } ; /* end ctor */
+    template<int Nbits,typename Digit>
+	void uintx<Nbits,Digit>::load(longlong a) noexcept {
+            if (a >= 0) {
+		vclear(n,v) ;
+                v[0] = ulonglong(a) ;
+            } else {
+                longlong aa = longlong(a) ;
+		vopaque(n,v) ;
+                v[0] = ulonglongconv(aa) ;
+            }
+        } ; /* end ctor */
+} /* end export */
+
+export {
+    template<int Nbits,typename Digit>
+	uintx<Nbits,Digit>::uintx(int a) noexcept {
+	    load(a) ;
+	} ;
+    template<int Nbits,typename Digit>
+	uintx<Nbits,Digit>::uintx(long a) noexcept {
+	    load(a) ;
+	} ;
+    template<int Nbits,typename Digit>
+	uintx<Nbits,Digit>::uintx(longlong a) noexcept {
+	    load(a) ;
+	} ;
+} /* end export */
+
+export {
+    template<int Nbits,typename Digit>
+        uintx<Nbits,Digit>::uintx(uint a) noexcept {
+	    load(a) ;
+        } ; /* end ctor */
+    template<int Nbits,typename Digit>
+        uintx<Nbits,Digit>::uintx(ulong a) noexcept {
+	    load(a) ;
+        } ; /* end ctor */
+    template<int Nbits,typename Digit>
+        uintx<Nbits,Digit>::uintx(ulonglong a) noexcept {
+	    load(a) ;
+        } ; /* end ctor */
+} /* end export */
+
+export {
+    struct uint256_t : uintx<256> {
+	inline static cint	n = (256 / (szof(ulonglong) * CHAR_BIT)) ;
+	uint256_t() = default ;
+	uint256_t(int a)	noex : uintx(a) { } ;
+	uint256_t(long a)	noex : uintx(a) { } ;
+	uint256_t(longlong a)	noex : uintx(a) { } ;
+	uint256_t(uint a)	noex : uintx(a) { } ;
+	uint256_t(ulong a)	noex : uintx(a) { } ;
+	uint256_t(ulonglong a)	noex : uintx(a) { } ;
+	uint256_t(const uint256_t &a) noex {
+	    vcopy(n,v,a.v) ;
+	} ; /* ctor (direct initialization) */
+	uint256_t &operator = (const uint256_t &a) noex {
+	    vcopy(n,v,a.v) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint256_t &operator = (const uintx<256> &a) noex {
+	    vcopy(n,v,a.v) ;
+	    return *this ;
+	} ;
+	uint256_t &operator = (int a)		noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint256_t &operator = (long a)		noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint256_t &operator = (longlong a)	noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint256_t &operator = (uint a)		noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint256_t &operator = (ulong a)		noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint256_t &operator = (ulonglong a)	noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+    } ; /* end struct (uint256_t) */
+} /* end export */
+
+export {
+    struct uint512_t : uintx<512> {
+	inline static cint	n = (512 / (szof(ulonglong) * CHAR_BIT)) ;
+	uint512_t() = default ;
+	uint512_t(int a)	noex : uintx(a) { } ;
+	uint512_t(long a)	noex : uintx(a) { } ;
+	uint512_t(longlong a)	noex : uintx(a) { } ;
+	uint512_t(uint a)	noex : uintx(a) { } ;
+	uint512_t(ulong a)	noex : uintx(a) { } ;
+	uint512_t(ulonglong a)	noex : uintx(a) { } ;
+	uint512_t(const uint256_t &a)	noex {
+	    cint nh = (n / 2) ;
+	    vcopy(nh,v,a.v) ;
+	    vclear(nh,(v + nh)) ;
+	} ; /* ctor (direct initialization) */
+	uint512_t(const uint512_t &a)	noex {
+	    vcopy(n,v,a.v) ;
+	} ; /* ctor (direct initialization) */
+	uint512_t &operator = (const uintx<256> &a) noex {
+	    cint nh = (n / 2) ;
+	    vcopy(nh,v,a.v) ;
+	    vclear(nh,(v + nh)) ;
+	    return *this ;
+	} ;
+	uint512_t &operator = (const uintx<512> &a) noex {
+	    vcopy(n,v,a.v) ;
+	    return *this ;
+	} ;
+	uint512_t &operator = (int a)		noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint512_t &operator = (long a)		noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint512_t &operator = (longlong a)	noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint512_t &operator = (uint a)		noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint512_t &operator = (ulong a)		noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint512_t &operator = (ulonglong a)	noex {
+	    load(a) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint512_t &operator = (const uint256_t &a) noex {
+	    cint nh = (n / 2) ;
+	    vcopy(nh,v,a.v) ;
+	    vclear(nh,(v + nh)) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+	uint512_t &operator = (const uint512_t &a) noex {
+	    vcopy(n,v,a.v) ;
+	    return *this ;
+	} ; /* end method (assignment) */
+    } ; /* end struct (uint512_t) */
+} /* end export */
+
+
