@@ -37,6 +37,7 @@
 #include	<usupport_sncpyx.h>
 #include	<usupport_ctdec.h>
 #include	<usupport_cfdec.h>
+#include	<usupport_cfdect.h>
 #include	<usupport_snwcpy.h>
 #include	<usupport_project.h>
 #include	<usupport_matstr.h>
@@ -44,6 +45,7 @@
 #include	<usupport_strwcpy.h>
 #include	<usupport_ustrftime.h>
 #include	<usupport_sixchr.h>
+#include	<usupport_sichar.h>
 
 
 #endif /* USUPPORT_INCLUDE */
