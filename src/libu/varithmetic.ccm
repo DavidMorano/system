@@ -77,12 +77,12 @@ constexpr inline bool bit(T v,int n) noex {
 
 export {
     template<typename Digit>
-    constexpr int addone(Digit &r,Digit v) noex {
+    constexpr int addone(Digit &r,const Digit v) noex {
 	r = v + 1 ;
 	return int(r < v) ; /* carry-out */
     }
     template<typename Digit>
-    constexpr int subone(Digit &r,Digit v) noex {
+    constexpr int subone(Digit &r,const Digit v) noex {
 	r = v - 1 ;
 	return int(r > v) ; /* carry-out */
     }
@@ -90,14 +90,16 @@ export {
 
 export {
     template<typename Digit>
-    constexpr int addc(Digit &r,Digit v0,Digit v1,int ci = 0) noex {
+    constexpr int addc(Digit &r,const Digit v0,const Digit v1,
+	    int ci = 0) noex {
 	Digit		co{} ;
 	Digit		dci = cast_static<Digit>(ci) ;
 	r = mach_addc(v0,v1,dci,&co) ;
 	return int(co) ;
     }
     template<typename Digit>
-    constexpr int subc(Digit &r,Digit v0,Digit v1,int ci = 0) noex {
+    constexpr int subc(Digit &r,const Digit v0,const  Digit v1,
+	    int ci = 0) noex {
 	Digit		co{} ;
 	Digit		dci = cast_static<Digit>(ci) ;
 	r = mach_subc(v0,v1,dci,&co) ;
@@ -189,38 +191,60 @@ export {
 } /* end export */
 
 export {
-    template<typename Digit>
-    constexpr void vmuler(int n,Digit *r,const Digit *v0,const Digit *v1) noex {
-	(void) n ;
-	(void) r ;
-	(void) v0 ;
-	(void) v1 ;
+    void vmuler(int n,ulong *r,const ulong *v0,const ulong *v1) noex ;
+}
+
+#ifdef	COMMENT
+export {
+    void vmuler(int n,ulong *r,const ulong *v0,const ulong *v1) noex {
+	cint nb = (szof(ulong) * CHAR_BIT) ;
+	cint nh = (n << 1) ;
+	ulonglong a ;
+	ulonglong b ;
+	ulonglong res ;
+	vclear(n,r) ;
+	for (int i = 0 ; i < nh ; i += 1) {
+	    a = v0[i] ;
+	    for (int j = i ; j < nh ; j += 1) {
+	        b = v1[ji] ;
+	        res = a * b ;
+	        r[i]		+= ulongconv(res >> 0) ;
+	        t[i + 1]	+= ulongconv(res >> nb) ;
+	    } /* end for */
+	} /* end for */
     } /* end subroutine (vmuler) */
+} /* end export */
+#endif /* COMMENT */
+
+export {
     template<typename Digit>
     constexpr void vmul(int n,Digit *r,const Digit *v0,const Digit *v1) noex {
+	cint n2 = (n << 1) ;
 	if (n == 1) {
 	    *r = *v0 * *v1 ;
 	} else {
-	    vmuller(n,r,v0,v1) ;
+    	    Digit res[n2] ;
+	    vmuler(n2,res,v0,v1) ;
+	    vcopy(n,r,res) ; /* total truncation */
 	}
     } /* end subroutine (vmul) */
 } /* end export */
 
 export {
     template<typename Digit>
-    constexpr void vand(int n,Digit *r,const Digit *v1,Digit *v2) noex {
+    constexpr void vand(int n,Digit *r,const Digit *v1,const Digit *v2) noex {
 	for (int i = 0 ; i < n ; i += 1) {
 	    r[i] = v1[i] & v2[i] ;
 	}
     } /* end subroutine (vand) */
     template<typename Digit>
-    constexpr void vor(int n,Digit *r,const Digit *v1,Digit *v2) noex {
+    constexpr void vor(int n,Digit *r,const Digit *v1,const Digit *v2) noex {
 	for (int i = 0 ; i < n ; i += 1) {
 	    r[i] = v1[i] | v2[i] ;
 	}
     } /* end subroutine (vor) */
     template<typename Digit>
-    constexpr void vxor(int n,Digit *r,const Digit *v1,Digit *v2) noex {
+    constexpr void vxor(int n,Digit *r,const Digit *v1,const Digit *v2) noex {
 	for (int i = 0 ; i < n ; i += 1) {
 	    r[i] = v1[i] ^ v2[i] ;
 	}
@@ -242,8 +266,8 @@ export {
 	        for (int i = 0 ; i < n ; i += 1) {
 		    cint ilo = ((i + nb_hi) % n) ;
 		    cint ihi = ((i + nb_hi + 1) % n) ;
-		    Digit vlo = ((v[ilo] >> nb_lo) & lomask) ;
-		    Digit vhi =  (v[ihi] << (nbits - nb_lo)) ;
+		    vlo = ((v[ilo] >> nb_lo) & lomask) ;
+		    vhi =  (v[ihi] << (nbits - nb_lo)) ;
 	            r[i] = vhi | vlo ;
 	        } /* end for */
 	    } else {
@@ -255,7 +279,6 @@ export {
     } /* end subroutine (vrotr) */
     template<typename Digit>
     constexpr void vrotl(int n,Digit *r,const Digit *v,int nb) noex {
-	cint nbits	= (szof(Digit) * CHAR_BIT) ;
 	cint nbitstotal = (szof(Digit) * CHAR_BIT * n) ;
 	if ((nb >= 0) && (nb < nbitstotal)) {
 	    if (nb) {
@@ -435,6 +458,27 @@ export {
 	} /* end for */
 	return rc ;
     } /* end subroutine (vcmp) */
+} /* end export */
+
+export {
+    template<typename Digit>
+    constexpr void veq_and(int n,Digit *v,const Digit *o) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    v[i] &= o[i] ;
+	}
+    } /* end subroutine (veq_and) */
+    template<typename Digit>
+    constexpr void veq_or(int n,Digit *v,const Digit *o) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    v[i] |= o[i] ;
+	}
+    } /* end subroutine (veq_or) */
+    template<typename Digit>
+    constexpr void veq_xor(int n,Digit *v,const Digit *o) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    v[i] ^= o[i] ;
+	}
+    } /* end subroutine (veq_xor) */
 } /* end export */
 
 
