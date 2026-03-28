@@ -13,7 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<eigendb.h>
 #include	<txtindex.h>
 #include	<rtags.h>
@@ -37,18 +38,18 @@ struct textlook_information {
 	uint		neigen ;
 	uint		minwlen ;	/* minimum word length */
 	uint		maxwlen ;	/* maximum word length */
-} ;
+} ; /* end struct */
 
 struct textlook_taget {
 	uint		recoff ;
 	uint		reclen ;
-} ;
+} ; /* end struct */
 
 struct textlook_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct textlook_cursor {
     	char		*tbuf ;
@@ -57,14 +58,14 @@ struct textlook_cursor {
 	uint		magic ;
 	int		tlen ;
 	int		ntags ;
-} ;
+} ; /* end struct */
 
 struct textlook_flags {
 	uint		ind:1 ;			/* text-index */
 	uint		edb:1 ;
 	uint		edbinit:1 ;
 	uint		prefix:1 ;		/* prefix key-matches */
-} ;
+} ; /* end struct */
 
 struct textlook_head {
 	cchar		*pr ;
@@ -79,11 +80,11 @@ struct textlook_head {
 	time_t		ti_tind ;		/* text-index */
 	TEXTLOOK_FL	fl ;
 	uint		magic ;
-	int		pagesize ;
+	int		pagesz ;
 	int		dbfsize ;		/* DB file-size */
 	int		minwlen ;		/* minimum key-word length */
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	TEXTLOOK	textlook ;
 typedef	TEXTLOOK_FL	textlook_fl ;
