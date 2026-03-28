@@ -52,41 +52,48 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
+#include	<climits>		/* |PTHREAD_STACK_MIN| */
+#include	<cstddef>		/* |nullptrptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<sysconfcmds.h>		/* |_SC_THREAD_STACK_MIN| */
 #include	<localmisc.h>
+#include	<stacktypes.h>
+
+#include	"getstacksize.h"
 
 
 /* local defines */
 
-#if	_LP64
-#define	DEFSTACKSIZE	(2*1024)
-#else
-#define	DEFSTACKSIZE	(1*1024)
-#endif
+#define	GETSTACKSIZE	getstacksize_head
 
-#define	GETSTACKSIZE	struct getstacksize
+
+/* external subroutines */
+
+extern "C" {
+    extern int uc_sysconf(int,long *) noex ;
+}
+
+
+/* external variables */
 
 
 /* local structures */
 
-struct getstacksize {
-	int		ss[2] ;
-} ;
+struct getstacksize_head {
+	int		ss[stacktype_overlast] ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	getval(int) ;
+local int	getval(stacktypes) noex ;
 
 
 /* local variables */
 
-static GETSTACKSIZE	getstacksize_data ; /* zero-initialized */
+static GETSTACKSIZE	getstacksize_data ;
 
 
 /* exported variables */
@@ -94,16 +101,18 @@ static GETSTACKSIZE	getstacksize_data ; /* zero-initialized */
 
 /* exported subroutines */
 
-int getstacksize(int w) noex {
+int getstacksize(stacktypes w) noex {
 	GETSTACKSIZE	*op = &getstacksize_data ;
-	int		rs ;
-	if (op->ss[w] == 0) {
-	    if ((rs = getval(w)) >= 0) {
-	        op->ss[w] = rs ;
+	int		rs = SR_INVALID ;
+	if ((w >= 0) && (w < stacktype_overlast)) {
+	    if (op->ss[w] == 0) {
+	        if ((rs = getval(w)) >= 0) {
+	            op->ss[w] = rs ;
+	        }
+	    } else {
+	        rs = op->ss[w] ;
 	    }
-	} else {
-	    rs = op->ss[w] ;
-	}
+	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (getstacksize) */
@@ -111,17 +120,17 @@ int getstacksize(int w) noex {
 
 /* local subroutines */
 
-static int getval(int w) noex {
+local int getval(stacktypes w) noex {
 	int		rs = SR_INVALID ;
 	switch (w) {
-	case 0:
+	case stacktype_thread:
 	    {
 		cint	cmd = _SC_THREAD_STACK_MIN ;
-	        rs = uc_sysconf(cmd,NULL) ;
+	        rs = uc_sysconf(cmd,nullptr) ;
 	    }
 	    break ;
-	case 1:
-	    rs = DEFSTACKSIZE ;
+	case stacktype_default:
+	    rs = PTHREAD_STACK_MIN ;
 	    break ;
 	default:
 	    rs = SR_INVALID ;
