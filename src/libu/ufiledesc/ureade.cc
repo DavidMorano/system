@@ -124,12 +124,15 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>
 #include	<cstdlib>
+#include	<string>
+#include	<string_view>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<funcodes.h>
 #include	<filetypes.h>
-#include	<timeval.h>
+#include	<timeval.hh>
+#include	<strnul.hh>
 #include	<ascii.h>
 #include	<localmisc.h>
 #include	<dprintf.hh>		/* debugging */
@@ -162,15 +165,19 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
+using std::string_view ;		/* type */
 using libu::upoll ;			/* subroutine */
 using libu::uselect ;			/* subroutine */
 using libu::uterminal ;			/* subroutine */
 using libu::utermattrget ;		/* subroutine */
 using libu::utermattrset ;		/* subroutine */
 using libu::uread ;			/* subroutine */
+using libu::sichr ;			/* subroutine */
 
 
 /* local typedefs */
+
+typedef string_view	strview ;
 
 
 /* external subroutines */
@@ -186,36 +193,42 @@ extern "C" {
 /* local structures */
 
 namespace {
+   struct subinfo_ft {
+	uint		fifo:1 ;
+	uint		chr:1 ;
+	uint		dir:1 ;
+	uint		block:1 ;
+	uint		reg:1 ;
+	uint		socket:1 ;
+	uint		other:1 ;
+   } ; /* end struct (subinfi_dt) */
    struct subinfo_fl {
 	uint		again:1 ;
 	uint		timed:1 ;
 	uint		exact:1 ;
 	uint		timeint:1 ;
+	uint		terminal:1 ;	/* operating on a terminal */
 	uint		nonblock:1 ;
-	uint		isfifo:1 ;
-	uint		ischr:1 ;
-	uint		isdir:1 ;
-	uint		isblock:1 ;
-	uint		isreg:1 ;
-	uint		issocket:1 ;
-	uint		isother:1 ;
 	uint		isnonblock:1 ;	/* was non-blocking */
+	uint		done:1 ;
     } ; /* end struct (subinfo_flags) */
     struct subinfo {
 	char		*ubuf ;		/* caller argument */
 	char		*bp ;
 	TERMIOS		attrs ;
 	subinfo_fl	fl ;
+	subinfo_ft	ft ;
 	int		fd ;		/* caller argument */
 	int		ulen ;		/* caller argument */
 	int		uto ;		/* caller argument */
 	int		tlen ;
-	int		to ;		/* down-counter */
+	int		toc ;		/* down-counter */
 	int		opts ;		/* caller argument */
 	int		neof ;
 	int		maxeof ;
 	subinfo() noex {
 	    fl = {} ;
+	    ft = {} ;
 	    ubuf = nullptr ;
 	    bp = nullptr ;
 	    ulen = 0 ;
@@ -225,6 +238,7 @@ namespace {
 	int finish	() noex ;
 	int choose	() noex ;
 	int setmode	(mode_t) noex ;
+	int readwait	() noex ;
 	int readreg	() noex ;
 	int readslow	() noex ;
 	int readchr	() noex ;
@@ -232,6 +246,7 @@ namespace {
 	int readafter	() noex ;
 	int attrbegin	() noex ;
 	int attrend	() noex ;
+	int mkret	() noex ;
     } ; /* end struct (subinfo) */
 } /* end nameapace */
 
@@ -258,14 +273,16 @@ cbool		f_nonblock	= CF_NONBLOCK ;
 namespace libu {
     int ureade(int fd,void *vbuf,int ulen,int to,int opts) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		tlen = 0 ; /* return-value */
 	char		*ubuf = charp(vbuf) ;
 	if (SI si ; (rs = si.start(fd,ubuf,ulen,to,opts)) >= 0) {
 	    {
 		rs = si.choose() ;
+		tlen = rs ;
 	    }
-	    tlen = si.finish() ;
-	    if (rs >= 0) rs = tlen ;
+	    rs1 = si.finish() ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (subinfo) */
 	return (rs >= 0) ? tlen : rs ;
     } /* end subroutine (ureade) */
@@ -299,7 +316,7 @@ int subinfo::start(int ªfd,char *ªubuf,int ªulen,int ªto,int ªro) noex {
 	    bp		= ªubuf ;
 	    ulen	= ªulen ;
 	    uto		= ªto ;
-	    to		= ªto ;
+	    toc		= ªto ;
 	    opts	= ªro ;
 	}
 	{
@@ -310,10 +327,10 @@ int subinfo::start(int ªfd,char *ªubuf,int ªulen,int ªto,int ªro) noex {
 	}
 	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
 	    if ((rs = setmode(sb.st_mode)) >= 0) {
-		if (fl.isother) {
+		if (ft.other) {
 		    /* yes! some files do *not* support non-blocking mode */
 		    if_constexpr (f_nonblock) {
-	                if (! fl.isreg) {
+	                if (! ft.reg) {
 	                    fl.nonblock = true ;
 	                    if ((rs = u_nonblock(fd,true)) >= 0) {
 	                        fl.isnonblock = true ;
@@ -336,45 +353,43 @@ int subinfo::finish() noex {
 	        rs = u_nonblock(fd,false) ;
 	    }
 	} /* end if_constexpr (f_debug) */
-	if ((rs >= 0) && (tlen == 0) && (to == 0) && (ulen > 0)) {
-	    bool f = false ;
-	    if (fl.issocket) {
-	        f = (neof < maxeof) ;
-	    } else {
-	        f = (neof == 0) ;
-	    }
-	    if (f) {
-	        if (opts & FM_AGAIN) {
-	            rs = SR_AGAIN ;
-	        } else if (opts & FM_TIMED) {
-	            rs = SR_TIMEDOUT ;
-	        }
-	    }
-	} /* end if (had a timeout) */
-	return (rs >= 0) ? tlen : rs ;
+	return rs ;
 } /* end subroutine (subinfo::finish) */
 
 int subinfo::choose() noex {
     	int		rs = SR_OK ;
 	bool f = false ;
 	DPRINTF("ent fd=%d\n",fd) ;
-	f = f || fl.isdir || fl.isblock ;
-	f = f || fl.isreg || fl.isnonblock ;
+	f = f || ft.dir || ft.block ;
+	f = f || ft.reg || fl.nonblock ;
 	DPRINTF("strategy f=%u\n",f) ;
 	if (f) {
 	    rs = readreg() ;
-	} else if (fl.ischr && ((rs = uterminal(fd)) > 0)) {
+	} else if (ft.chr && ((rs = uterminal(fd)) > 0)) {
 	    rs = readterm() ;
 	} else if (rs >= 0) {
-	    if (fl.ischr) {
+	    if (ft.chr) {
 	        rs = readchr() ;
 	    } else {
 	        rs = readslow() ;
 	    }
 	} /* end if */
+	if (rs >= 0) {
+	    rs = mkret() ;
+	}
 	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
-	return rs ;
+	return (rs >= 0) ? tlen : rs ;
 } /* end method (subinfo::choose) */
+
+int subinfo::mkret() noex {
+    	int		rs = SR_OK ;
+	if (tlen == 0) {
+	    if (fl.timed) {
+		rs = SR_TIMEDOUT ;
+	    }
+	}
+	return rs ;
+} /* end method (subinfo::mkret) */
 
 int subinfo::setmode(mode_t fm) noex {
     	if_constexpr (f_debug) {
@@ -385,19 +400,19 @@ int subinfo::setmode(mode_t fm) noex {
 	    }
 	} /* end if_constexpr (f_debug) */
 	if (S_ISFIFO(fm)) {
-	    fl.isfifo = true ;
+	    ft.fifo = true ;
 	} else if (S_ISCHR(fm)) {
-	    fl.ischr = true ;
+	    ft.chr = true ;
 	} else if (S_ISDIR(fm)) {
-	    fl.isdir = true ;
+	    ft.dir = true ;
 	} else if (S_ISBLK(fm)) {
-	    fl.isblock = true ;
+	    ft.block = true ;
 	} else if (S_ISREG(fm)) {
-	    fl.isreg = true ;
+	    ft.reg = true ;
 	} else if (S_ISSOCK(fm)) {
-	    fl.issocket = true ;
+	    ft.socket = true ;
 	} else {
-	    fl.isother = true ;
+	    ft.other = true ;
 	}
 	return SR_OK ;
 } /* end subroutine (subinfo::setmode) */
@@ -422,10 +437,20 @@ int subinfo::readterm() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	DPRINTF("ent fd=%d\n",fd) ;
+	fl.terminal = true ;
 	if ((rs = attrbegin()) >= 0) {
-	    {
-	        rs = readchr() ;
-	    }
+	    while ((rs >= 0) && ((ulen - tlen) > 0)) {
+		if ((rs = readwait()) > 0) {
+	            rs = readafter() ;
+	        } else if (rs == SR_INTR) {
+	            DPRINTF("select intr\n") ;
+	            rs = SR_OK ;
+	        } else if (rs == 0) { /* u_poll() returned w/ nothing */
+	            DPRINTF("select zero\n") ;
+		    if (--toc == 0) break ;
+		} /* end if (readwait) */
+		if (fl.done) break ;
+	    } /* end while */
 	    rs1 = attrend() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (terminal-attributes) */
@@ -434,16 +459,20 @@ int subinfo::readterm() noex {
 } /* end subroutine (subinfo::readterm) */
 
 int subinfo::readchr() noex {
-    	timeval_t	tv(to) ;
-    	cnullptr	np{} ;
-    	cint		n = (fd + 1) ;
-	int		rs ;
-	fdset		ifds{} ;
+    	int		rs = SR_OK ;
 	DPRINTF("ent fd=%d\n",fd) ;
-	FD_SET(fd,&ifds) ;
-	if ((rs = uselect(n,&ifds,np,np,&tv)) > 0) {
-	    rs = readafter() ;
-	}
+	    while ((rs >= 0) && ((ulen - tlen) > 0)) {
+		if ((rs = readwait()) > 0) {
+	            rs = readafter() ;
+	        } else if (rs == SR_INTR) {
+	            DPRINTF("select intr\n") ;
+	            rs = SR_OK ;
+	        } else if (rs == 0) { /* u_poll() returned w/ nothing */
+	            DPRINTF("select zero\n") ;
+		    if (--toc == 0) break ;
+		} /* end if (readwait) */
+		if (fl.done) break ;
+	    } /* end while */
 	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
 	return rs ;
 } /* end subroutine (subinfo::readchr) */
@@ -463,13 +492,11 @@ int subinfo::readslow() noex {
 	}
 	/* go */
 	while ((rs >= 0) && ((ulen - tlen) > 0)) {
-	    bool f_break = false ;
 	    if ((rs = upoll(fds,nfds,POLL_INTMULT)) > 0) {
 	        cint	re = fds[0].revents ;
 	        DPRINTF("poll got rs=%d re=%08X\n",rs,re) ;
 	        if ((re & POLLIN) || (re & POLLPRI)) {
 	            rs = readafter() ;
-	            f_break = (rs > 0) ;
 	        } else if (re & POLLNVAL) {
 	            rs = SR_NOTOPEN ;
 	        } else if (re & POLLERR) {
@@ -483,50 +510,63 @@ int subinfo::readslow() noex {
 	        rs = SR_OK ;
 	    } else if (rs == 0) { /* u_poll() returned w/ nothing */
 	        DPRINTF("poll zero\n") ;
-	        if (to > 0) {
-	            to -= 1 ;
-	        } else {
-	            f_break = true ;
-	        }
+		if (--toc == 0) break ;
 	    } /* end if (otherwise it must be an error) */
 	    DPRINTF("poll-out rs=%d\n",rs) ;
-	    if (fl.isnonblock) break ;
-	    if (f_break) break ;
+	    if (fl.done) break ;
 	} /* end while (looping on poll) */
 	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
 	return rs ;
 } /* end subroutine (subinfo::readslow) */
 
+int subinfo::readwait() noex {
+    	timeval_t	tv(1) ;
+    	cnullptr	np{} ;
+    	cint		n = (fd + 1) ;
+	int		rs = SR_OK ;
+	fdset		ifds{} ;
+	DPRINTF("ent fd=%d uto=%d\n",fd,uto) ;
+	FD_SET(fd,&ifds) ;
+	{
+	    rs = uselect(n,&ifds,np,np,&tv) ;
+	}
+	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
+	return rs ;
+} /* end subroutine (subinfo::readwait) */
+
 int subinfo::readafter() noex {
 	int		rs ;
-	int		rlen = (ulen - tlen) ;
-	int		fbreak = false ;
+	int		len = 0 ; /* return-value */
+	bool		fdone = false ;
 	DPRINTF("ent\n") ;
-	if ((rs = uread(fd,bp,rlen)) >= 0) {
-	    cint len = rs ;
-	    DPRINTF("uread rs=%d\n",rs) ;
-	    DPRINTLINE(bp,rs) ;
-	    if (len == 0) {
+	neof = 0 ;		/* reset */
+	while ((! fdone) && (rs >= 0)) {
+	    cint bl = (ulen - tlen) ;
+	    if ((rs = uread(fd,bp,bl)) > 0) {
+	       len = rs ;
+	       {
+		   strnul ps(bp,len) ;
+	           DPRINTF("uead() rs=%d data=>%s<\n",rs,ccp(ps)) ;
+	       }
+	       if (int si = sichr(bp,len,CH_CR) ; si >= 0) {
+		   bp[si] = CH_NL ;
+		   fl.done = true ;
+		   fdone = true ;
+	       }
+	       tlen += len ;
+	       bp += len ;
+	       fdone = true ;
+	    } else if (rs == 0) {
 	        neof += 1 ;
-	        if ((! fl.issocket) || (neof >= maxeof)) {
-	            fbreak = true ;
+	        if ((! ft.socket) || (neof >= maxeof)) {
+	            fdone = true ;
 	        }
-	    } else {
-	        neof = 0 ;		/* reset */
+	    } else if (rs == SR_AGAIN) {
+	        if (! fl.isnonblock) rs = SR_OK ;
 	    }
-	    tlen += len ;
-	    bp += len ;
-	    if ((! fbreak) && (len > 0) && (! fl.exact)) {
-	        fbreak = true ;
-	    }
-	    if ((! fbreak) && (len > 0) && fl.timeint) {
-	        to = uto ;	/* reset */
-	    }
-	} else if (rs == SR_AGAIN) {
-	    if (! fl.isnonblock) rs = SR_OK ;
-	}
-	DPRINTF("ret rs=%d fbreak=%u\n",rs,fbreak) ;
-	return (rs >= 0) ? fbreak : rs ;
+	} /* end while */
+	DPRINTF("ret rs=%d fdone=%u\n",rs,fdone) ;
+	return (rs >= 0) ? len : rs ;
 } /* end subroutine (subinfo::readafter) */
 
 int subinfo::attrbegin() noex {
