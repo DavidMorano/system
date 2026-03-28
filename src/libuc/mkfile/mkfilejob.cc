@@ -50,7 +50,10 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getnodename.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
@@ -80,7 +83,7 @@
 
 /* forward references */
 
-static int mkform(char *,cchar *,mode_t) noex ;
+local int mkform(char *,cchar *,mode_t) noex ;
 
 
 /* local variables */
@@ -114,7 +117,7 @@ int mkfilejob(char *rbuf,cchar *dname,mode_t fm) noex {
 
 /* local subroutines */
 
-static int mkform(char *rbuf,cchar *dname,mode_t fm) noex {
+local int mkform(char *rbuf,cchar *dname,mode_t fm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
