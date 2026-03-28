@@ -1,4 +1,4 @@
-# MAKEFILES (hdrx)
+# MAKEFILE (hdrx)
 
 T= hdrx
 
@@ -51,7 +51,6 @@ OBJ_HDRX= $(OBJA_HDRX)
 LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
