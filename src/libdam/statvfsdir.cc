@@ -29,7 +29,7 @@
 	second attempt will succeed.
 
 	Synopsis:
-	int statvfsdir(cchar *fname,USTATVFS *sbp) noex
+	int statvfsdir(cchar *fname,ustatvfs *sbp) noex
 
 	Arguments:
 	fname		source string
@@ -50,9 +50,9 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<fsdir.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>
@@ -68,14 +68,19 @@
 
 /* external variables */
 
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_statvfs(cchar *,ustatvfs *) noex ;
+}
+
 
 /* local structures */
 
 
 /* forward references */
 
-static int	trydive(cchar *,USTATVFS *) noex ;
-static int	trytouch(cchar *) noex ;
+local int	trydive(cchar *,ustatvfs *) noex ;
+local int	trytouch(cchar *) noex ;
 
 
 /* local variables */
@@ -86,7 +91,7 @@ static int	trytouch(cchar *) noex ;
 
 /* exported subroutines */
 
-int statvfsdir(cchar *fname,USTATVFS *sbp) noex {
+int statvfsdir(cchar *fname,ustatvfs *sbp) noex {
 	int		rs = SR_FAULT ;
 	if (fname && sbp) {
 	    if ((rs = uc_statvfs(fname,sbp)) >= 0) {
@@ -102,15 +107,15 @@ int statvfsdir(cchar *fname,USTATVFS *sbp) noex {
 
 /* local subroutines */
 
-static int trydive(cchar *fname,USTATVFS *sbp) noex {
+local int trydive(cchar *fname,ustatvfs *sbp) noex {
 	int		rs ;
 	int		rs1 ;
-        if (USTAT sb ; (rs = uc_stat(fname,&sb)) >= 0) {
+        if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) {
             if (S_ISDIR(sb.st_mode)) {
-                 if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+                 if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
                      rs1 = SR_NOENT ;
                      if ((rs = mkpath2(tbuf,fname,".")) >= 0) {
-                         if ((rs1 = u_stat(tbuf,&sb)) >= 0) {
+                         if ((rs1 = uc_stat(tbuf,&sb)) >= 0) {
                              rs = uc_statvfs(fname,sbp) ;
                          }
                      }
@@ -124,7 +129,7 @@ static int trydive(cchar *fname,USTATVFS *sbp) noex {
                              }
                          }
                      } /* end if (ok) */
-                     rs1 = uc_free(tbuf) ;
+                     rs1 = lm_free(tbuf) ;
                      if (rs >= 0) rs = rs1 ;
                  } /* end if (m-a-f) */
             } /* end if (is-dir) */
@@ -133,10 +138,10 @@ static int trydive(cchar *fname,USTATVFS *sbp) noex {
 }
 /* end subroutine (trydive) */
 
-static int trytouch(cchar *fname) noex {
+local int trytouch(cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if (fsdir dir ; (rs = fsdir_open(&dir,fname)) >= 0) {
 		fsdir_ent	ds ;
@@ -148,7 +153,7 @@ static int trytouch(cchar *fname) noex {
 	        rs1 = fsdir_close(&dir) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdir) */
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = lm_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
