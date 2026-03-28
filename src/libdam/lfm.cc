@@ -62,7 +62,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<ucgetpid.h>
 #include	<estrings.h>
@@ -97,9 +96,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -132,7 +128,7 @@ template<typename ... Args>
 static int lfm_ctor(lfm *op,Args ... args) noex {
     	LFM		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	    op->lfd = -1 ;
 	    op->pid_lock = -1 ;
@@ -144,7 +140,7 @@ static int lfm_ctor(lfm *op,Args ... args) noex {
 
 static int lfm_dtor(lfm *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -154,7 +150,7 @@ static int lfm_dtor(lfm *op) noex {
 template<typename ... Args>
 static inline int lfm_magic(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LFM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
