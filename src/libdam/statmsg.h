@@ -39,7 +39,7 @@ struct statmsg_ident {
 	cchar		*username ;
 	uid_t		uid ;
 	gid_t		gid ;
-} ;
+} ; /* end struct */
 
 struct statmsg_mapper {
 	lockrw		rwm ;
@@ -51,32 +51,32 @@ struct statmsg_mapper {
 	time_t		ti_mtime ;
 	time_t		ti_check ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct statmsg_flags {
 	uint		sorted:1 ;
-} ;
+} ; /* end struct */
 
 struct statmsg_checkdata {
 	ptm		mx ;
 	time_t		ti_lastcheck ;	/* needs mutex protection */
 	int		nmaps ;
-} ;
+} ; /* end struct */
 
 struct statmsg_head {
 	STATMSG_MAP	mapper ;
-	ptm		mx ;		/* this is for all of the data */
-	cchar		**envv ;
-	cchar		*useralloc ;
+	ptm		*mxp ;		/* this is for all of the data */
+	ccharpp		envv ;
 	cchar		*username ;
 	cchar		*userhome ;
 	cchar		*fe ;		/* file-ending */
+	char		*useralloc ;
 	time_t		ti_lastcheck ;
 	STATMSG_FL	fl ;
 	uint		magic ;
 	int		nmaps ;
 	int		nenv ;
-} ;
+} ; /* end struct */
 
 typedef	STATMSG		statmsg ;
 typedef	STATMSG_FL	statmsg_fl ;
