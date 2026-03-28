@@ -14,7 +14,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>		/* |time_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ptm.h>
 #include	<lockrw.h>
 #include	<paramfile.h>
@@ -36,15 +37,15 @@ struct issue_mapper {
 	time_t		ti_mtime ;
 	time_t		ti_check ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct issue_flags {
 	uint		sorted:1 ;
-} ;
+} ; /* end struct */
 
 struct issue_head {
 	ISSUE_MAP	mapper ;
-	ptm		mx ;		/* this is for all of the data */
+	ptm		*mxp ;		/* this is for all of the data */
 	mainv		envv ;
 	cchar		*pr ;
 	cchar		*fe ;
@@ -53,7 +54,7 @@ struct issue_head {
 	uint		magic ;
 	int		nmaps ;
 	int		nenv ;
-} ;
+} ; /* end struct */
 
 typedef	ISSUE		issue ;
 typedef	ISSUE_FL	issue_fl ;
