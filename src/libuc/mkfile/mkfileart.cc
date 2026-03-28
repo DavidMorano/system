@@ -61,7 +61,11 @@
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>		/* |getustime(3u)| */
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<bufsizevar.hh>
 #include	<base64.h>		/* |base64_enc(3uc)| */
 #include	<snx.h>
@@ -69,6 +73,8 @@
 #include	<pathadd.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
+
+#include	"mkfile.h"
 
 
 /* local defines */
@@ -113,13 +119,13 @@ namespace {
 
 /* forward reference */
 
-static uint64_t		mkbits(uint,int,int) noex ;
-static int		mkoutname(char *,int,cc *,uint,int,int) noex ;
+local uint64_t		mkbits(uint,int,int) noex ;
+local int		mkoutname(char *,int,cc *,uint,int,int) noex ;
 
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 cint			outnamelen = 14 ; /* (7 + 7) */
 
@@ -193,7 +199,7 @@ int trier::mktry(uint ts,int ss,int es) noex {
 
 /* load up to 7 prefix characters into output buffer */
 /* encode the 'bits' above into the output buffer using BASE-64 encoding */
-static int mkoutname(char *obuf,int olen,cc *pre,uint ts,int ss,int es) noex {
+local int mkoutname(char *obuf,int olen,cc *pre,uint ts,int ss,int es) noex {
 	int		rs = SR_NAMETOOLONG ;
 	int		rl = 0 ; /* return-value */
 	if (olen >= outnamelen) ylikely {
@@ -205,8 +211,7 @@ static int mkoutname(char *obuf,int olen,cc *pre,uint ts,int ss,int es) noex {
 	    }
 	    {
 	        cint	n = 7 ; /* number of chars (7x6=42 bits) */
-	        int	ch ;
-	        for (int i = (n - 1) ; i >= 0 ; i -= 1) {
+	        for (int ch, i = (n - 1) ; i >= 0 ; i -= 1) {
 	            cint	bi = int(bits & 63) ; /* grab six bits */
 	            ch = base64_enc(bi) ;
 	            if (ch == '+') {
@@ -227,7 +232,7 @@ static int mkoutname(char *obuf,int olen,cc *pre,uint ts,int ss,int es) noex {
 /* end subroutine (mkoutname) */
 
 /* load the 42 bits into the 'bits' variable (of type |uint64_t|) */
-static uint64_t mkbits(uint ts,int ss,int es) noex {
+local uint64_t mkbits(uint ts,int ss,int es) noex {
 	uint64_t	bits = uint64_t(ts) ;	/* load in 32 bits */
 	{
 	    bits <<= 8 ;
