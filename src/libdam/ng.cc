@@ -1,4 +1,4 @@
-/* ng SUPPORT */
+/* ng SUPPORT (news-Group) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -22,7 +22,8 @@
 	ng
 
 	Description:
-	This little object just keeps track of a list of newsgroup names.
+	This little object just keeps track of a list of newsgroup
+	names.
 
 *******************************************************************************/
 
@@ -31,7 +32,9 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<vecitem.h>
 #include	<ema.h>
 #include	<sfx.h>
@@ -39,7 +42,9 @@
 
 #include	"ng.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -83,12 +88,14 @@ int ng_finish(NG *ngp) noex {
 	        ng_ent	*ep = (ng_ent *) vp ;
 	        if (vp) {
 	            if (ep->name) {
-	                rs1 = uc_free(ep->name) ;
+			vp = voidp(ep->name) ;
+	                rs1 = lm_free(vp) ;
 		        if (rs >= 0) rs = rs1 ;
 		        ep->name = nullptr ;
 	            }
 	            if (ep->dir) {
-	                rs1 = uc_free(ep->dir) ;
+			vp = voidp(ep->dir) ;
+	                rs1 = lm_free(vp) ;
 		        if (rs >= 0) rs = rs1 ;
 		        ep->dir = nullptr ;
 	            }
@@ -127,13 +134,13 @@ int ng_search(NG *ngp,cchar *name,ng_ent **rpp) noex {
 int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname) noex {
 	int		rs = SR_FAULT ;
 	if (ngp && ngbuf) {
-	    if (cchar *cp ; (rs = uc_mallocstrw(ngbuf,nglen,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(ngbuf,nglen,&cp)) >= 0) {
 	        ng_ent	ne{} ;
 	        ne.dir = nullptr ;
 	        ne.len = rs ;
 	        ne.name = cp ;
 	        if (ngdname != nullptr) {
-		    if (cchar *dp ; (rs = uc_mallocstrw(ngdname,-1,&dp)) >= 0) {
+		    if (cchar *dp ; (rs = lm_strw(ngdname,-1,&dp)) >= 0) {
 		        ne.dir = dp ;
 		    }
 	        } /* end if (had directory) */
@@ -143,9 +150,13 @@ int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname) noex {
 	        }
 	        if (rs < 0) {
 		    if (ne.dir != nullptr) {
-			uc_free(ne.dir) ;
+			void *vp = voidp(ne.dir) ;
+	                lm_free(vp) ;
 		    }
-		    uc_free(cp) ;
+		    {
+			void *vp = voidp(cp) ;
+		        lm_free(vp) ;
+		    }
 	        } /* end if (error handling) */
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
