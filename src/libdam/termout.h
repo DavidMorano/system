@@ -40,7 +40,7 @@ struct termout_head {
 	void		*cvp ;		/* character-vector-pointer */
 	void		*lvp ;		/* line-vector-pointer */
 	TERMOUT_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	uint		termattr ;	/* mask of terminal attributes */
 	int		ncols ;		/* terminal columns */
 	int		ncol ;
