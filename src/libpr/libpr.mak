@@ -144,4 +144,6 @@ propenqotd.o:		propenqotd.dir				$(INCS)
 propenqotd.dir:
 	makesubdir $@
 
+prenvfile.o:		prenvfile.cc		prenvfile.h		$(INCS)
+
 
