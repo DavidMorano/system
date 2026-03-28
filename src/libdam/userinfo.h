@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>		/* |MAXHOSTNAMELEN| */
 
 
@@ -60,19 +61,19 @@ struct userinfo_head {
 	cchar		*md ;		/* mail-spool directory */
 	cchar		*wstation ;	/* user weather-station */
 	cchar		*logid ;	/* suggested ID for logging */
-	cchar		*a ;		/* memory allocation */
+	char		*a ;		/* memory allocation */
 	pid_t		pid ;
 	uid_t		uid, euid ;
 	gid_t		gid, egid ;
 	uint		magic ;
 	int		ostype ;
-} ;
+} ; /* end struct (userinfo_head) */
 
 #ifdef	__cplusplus
 enum userinfomems {
 	userinfomem_finish,
 	userinfomem_overlast
-} ;
+} ; /* end enum */
 struct userinfo ;
 struct userinfo_cos {
 	userinfo	*op = nullptr ;
@@ -100,12 +101,13 @@ struct userinfo : userinfo_head {
 	userinfo() noex {
 	    start(this) ;
 	    finish(this,userinfomem_finish) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end ctor */
 	userinfo(const userinfo &) = delete ;
 	userinfo &operator = (const userinfo &) = delete ;
 	void dtor() noex ;
-	~userinfo() {
-	    dtor() ;
+	destruct userinfo() {
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (userinfo) */
 #else	/* __cplusplus */
