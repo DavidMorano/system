@@ -30,20 +30,21 @@
 	u_mlockend
 	u_mlockallbegin
 	u_mlockallend
-	u_mcntl
 	u_mincore
 	u_mprotect
 	u_madvise
 	u_msync
-	u_mlockp
+	u_mcntl
+	u_minherit
+	u_mlockp		(process-lock? -- partly synthetic)
 
 	Aliases:
 	u_mapfile		-> u_mmapbegin
 	u_mmap			-> u_mmapbegin
 	u_munmap		-> u_mmapend
 
+	Description:
 	More Solaris® bugs!
-
 	Stupid Solaris tries to prevent developers from mapping
 	files while simultaneously using record locks on that file.
 	There are even some reports that (stupid) Solaris also
@@ -55,8 +56,22 @@
 	exactly the size of that file, Solaris prevents it (or
 	allows it, I forget). But if someone maps a file beyond the
 	end of it, then (stupid) Solaris denies (or allows) it.
-
 	Developer beware!
+
+	Notes:
+	1. The pseudo system-call subroutine |u_mlockp(3u)| is a
+	partially synthetic system-call.  What is this ("partially
+	synthetic") thing?  It is a created (synthetic) system-call
+	that is based on an existing system-call included w/ the
+	Solaris® operating system.  But it uses its own 
+	pre-processor defines as "commands" to the call.  These 
+	commands are enumerated below.
+
+	Commands for |u_lockp(3u)|:
+	MLOCKP_NON		unlock everything
+	MLOCKP_ALL		lock-all
+	MLOCKP_TXT		lock-text-segment
+	MLOCKP_DAT		lock_data-segment
 
 *******************************************************************************/
 
@@ -87,7 +102,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -102,9 +116,9 @@ using std::nullptr_t ;			/* type */
 /* local structures */
 
 namespace {
-    struct um ;
-    typedef int (um::*um_m)(void *,size_t) noex ;
-    struct um {
+    struct umemop ;
+    typedef int (umemop::*um_m)(void *,size_t) noex ;
+    struct umemop {
 	um_m		m ;
 	char		*vec ;
 	void		*vp ;
@@ -115,35 +129,36 @@ namespace {
 	int		fd ;
 	int		attr ;
 	int		mask ;
-	um() noex { } ;
-	um(int p,int f,int d,off_t o,void *v) noex {
+	umemop() noex { } ;
+	umemop(int p,int f,int d,off_t o,void *v) noex {
 	    pr = p ;
 	    fl = f ;
 	    fd = d ;
 	    off = o ;
 	    vp = v ;
 	} ;
-	um(int f) noex : fl(f) { } ;
-	um(char *v) noex : vec(v) { } ;
-	um(int c,void *a,int t,int om) noex {
+	umemop(int f) noex : fl(f) { } ;
+	umemop(char *v) noex : vec(v) { } ;
+	umemop(int c,void *a,int t,int om) noex {
 	    fl = c ;
 	    arg = a ;
 	    attr = t ;
 	    mask = om ;
 	} ;
 	int operator () (void *,size_t) noex ;
-	int mapbegin(void *,size_t) noex ;
-	int mapend(void *,size_t) noex ;
-	int lockbegin(void *,size_t) noex ;
-	int lockend(void *,size_t) noex ;
+	int mapbegin	(void *,size_t) noex ;
+	int mapend	(void *,size_t) noex ;
+	int lockbegin	(void *,size_t) noex ;
+	int lockend	(void *,size_t) noex ;
 	int lockallbegin(void *,size_t) noex ;
-	int lockallend(void *,size_t) noex ;
-	int cntl(void *,size_t) noex ;
-	int incore(void *,size_t) noex ;
-	int protect(void *,size_t) noex ;
-	int advise(void *,size_t) noex ;
-	int sync(void *,size_t) noex ;
-	int lockp(void *,size_t) noex ;
+	int lockallend	(void *,size_t) noex ;
+	int incore	(void *,size_t) noex ;
+	int protect	(void *,size_t) noex ;
+	int advise	(void *,size_t) noex ;
+	int sync	(void *,size_t) noex ;
+	int cntl	(void *,size_t) noex ;
+	int inherit	(void *,size_t) noex ;
+	int lockp	(void *,size_t) noex ;
     private:
 	int callstd(void *,size_t) noex ;
     } ; /* end struct (um) */
@@ -255,88 +270,95 @@ int u_sbrk(int incr,void **rpp) noex {
 
 int u_mmapbegin(void *ma,size_t ms,int pr,int fl,int fd,
 		off_t off,void *vp) noex {
-	um		umo(pr,fl,fd,off,vp) ;
-	umo.m = &um::mapbegin ;
+	umemop	umo(pr,fl,fd,off,vp) ;
+	umo.m = &umemop::mapbegin ;
 	return umo(ma,ms) ;
 }
 /* end subroutine (u_mmapbegin) */
 
 int u_mmapend(void *ma,size_t ms) noex {
-	um		umo ;
-	umo.m = &um::mapend ;
+	umemop	umo ;
+	umo.m = &umemop::mapend ;
 	return umo(ma,ms) ;
 }
 /* end subroutine (u_mmapend) */
 
 int u_mlockbegin(void *ma,size_t ms) noex {
-	um		umo ;
-	umo.m = &um::lockbegin ;
+	umemop	umo ;
+	umo.m = &umemop::lockbegin ;
 	return umo(ma,ms) ;
 }
 /* end subroutine (u_mlockbegin) */
 
 int u_mlockend(void *ma,size_t ms) noex {
-	um		umo ;
-	umo.m = &um::lockend ;
+	umemop	umo ;
+	umo.m = &umemop::lockend ;
 	return umo(ma,ms) ;
 }
 /* end subroutine (u_mlockend) */
 
 int u_mlockallbegin(int flags) noex {
-	const nullptr_t	np{} ;
-	um		umo(flags) ;
-	umo.m = &um::lockallbegin ;
+	cnullptr	np{} ;
+	umemop	umo(flags) ;
+	umo.m = &umemop::lockallbegin ;
 	return umo(np,0z) ;
 }
 /* end subroutine (u_mlockallbegin) */
 
 int u_mlockallend() noex {
-	const nullptr_t	np{} ;
-	um		umo ;
-	umo.m = &um::lockallend ;
+	cnullptr	np{} ;
+	umemop	umo ;
+	umo.m = &umemop::lockallend ;
 	return umo(np,0z) ;
 }
 /* end subroutine (u_mlockallend) */
 
-int u_mcntl(void *ma,size_t ms,int cmd,void *arg,int attr,int mask) noex {
-	um		umo(cmd,arg,attr,mask) ;
-	umo.m = &um::cntl ;
-	return umo(ma,ms) ;
-}
-/* end subroutine (u_mcntl) */
-
 int u_mincore(void *ma,size_t ms,char *vec) noex {
-	um		umo(vec) ;
-	umo.m = &um::incore ;
+	umemop	umo(vec) ;
+	umo.m = &umemop::incore ;
 	return umo(ma,ms) ;
 }
 /* end subroutine (u_mincore) */
 
 int u_mprotect(void *ma,size_t ms,int cmd) noex {
-	um		umo(cmd) ;
-	umo.m = &um::protect ;
+	umemop	umo(cmd) ;
+	umo.m = &umemop::protect ;
 	return umo(ma,ms) ;
 }
 /* end subroutine (u_mprotect) */
 
 int u_madvise(void *ma,size_t ms,int cmd) noex {
-	um		umo(cmd) ;
-	umo.m = &um::advise ;
+	umemop	umo(cmd) ;
+	umo.m = &umemop::advise ;
 	return umo(ma,ms) ;
 }
 /* end subroutine (u_madvise) */
 
 int u_msync(void *ma,size_t ms,int cmd) noex {
-	um		umo(cmd) ;
-	umo.m = &um::sync ;
+	umemop	umo(cmd) ;
+	umo.m = &umemop::sync ;
 	return umo(ma,ms) ;
 }
 /* end subroutine (u_msync) */
 
-int u_mlockp(int cmd) noex {
-	const nullptr_t	np{} ;
-	um		umo(cmd) ;
-	umo.m = &um::lockp ;
+int u_mcntl(void *ma,size_t ms,int cmd,void *arg,int attr,int mask) noex {
+	umemop	umo(cmd,arg,attr,mask) ;
+	umo.m = &umemop::cntl ;
+	return umo(ma,ms) ;
+}
+/* end subroutine (u_mcntl) */
+
+int u_minherit(void *ma,size_t ms,int cmd) noex {
+	umemop	umo(cmd) ;
+	umo.m = &umemop::inherit ;
+	return umo(ma,ms) ;
+}
+/* end subroutine (u_minherit) */
+
+int u_mlockp(int cmd) noex { /* process-lock? */
+	cnullptr	np{} ;
+	umemop	umo(cmd) ;
+	umo.m = &umemop::lockp ;
 	return umo(np,0z) ;
 }
 /* end subroutine (u_mlockp) */
@@ -363,11 +385,11 @@ int u_munmap(void *ma,size_t ms) noex {
 
 /* local subroutines */
 
-int um::callstd(void *ma,size_t ms) noex {
+int umemop::callstd(void *ma,size_t ms) noex {
     	return (this->*m)(ma,ms) ;
 }
 
-int um::operator () (void *ma,size_t ms) noex {
+int umemop::operator () (void *ma,size_t ms) noex {
         errtimer        to_again        = utimeout[uto_again] ;
         errtimer        to_busy         = utimeout[uto_busy] ;
         errtimer        to_nomem        = utimeout[uto_nomem] ;
@@ -426,9 +448,9 @@ int um::operator () (void *ma,size_t ms) noex {
             } /* end if (error) */
         } until ((rs >= 0) || r.fexit) ;
 	return rs ;
-} /* end method (um::operator) */
+} /* end method (umemop::operator) */
 
-int um::mapbegin(void *ma,size_t ms) noex {
+int umemop::mapbegin(void *ma,size_t ms) noex {
 	void		**rpp = (void **) vp ;
 	int		rs = SR_FAULT ;
 	if (rpp) {
@@ -444,9 +466,9 @@ int um::mapbegin(void *ma,size_t ms) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (um::mapbegin) */
+/* end method (umemop::mapbegin) */
 
-int um::mapend(void *ma,size_t ms) noex {
+int umemop::mapend(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
 	if (ma) {
 	    rs = SR_INVALID ;
@@ -458,9 +480,9 @@ int um::mapend(void *ma,size_t ms) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (um::mapend) */
+/* end method (umemop::mapend) */
 
-int um::lockbegin(void *ma,size_t ms) noex {
+int umemop::lockbegin(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
 	if (ma) {
 	    rs = SR_INVALID ;
@@ -472,9 +494,9 @@ int um::lockbegin(void *ma,size_t ms) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (um::lockbegin) */
+/* end method (umemop::lockbegin) */
 
-int um::lockend(void *ma,size_t ms) noex {
+int umemop::lockend(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
 	if (ma) {
 	    rs = SR_INVALID ;
@@ -486,41 +508,27 @@ int um::lockend(void *ma,size_t ms) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (um::lockend) */
+/* end method (umemop::lockend) */
 
-int um::lockallbegin(void *,size_t) noex {
+int umemop::lockallbegin(void *,size_t) noex {
 	int		rs ;
 	if ((rs = mlockall(fl)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
 }
-/* end method (um::lockallbegin) */
+/* end method (umemop::lockallbegin) */
 
-int um::lockallend(void *,size_t) noex {
+int umemop::lockallend(void *,size_t) noex {
 	int		rs ;
 	if ((rs = munlockall()) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
 }
-/* end method (um::lockallend) */
+/* end method (umemop::lockallend) */
 
-int um::cntl(void *ma,size_t ms) noex {
-	int		rs = SR_FAULT ;
-	if (ma) {
-	    rs = SR_INVALID ;
-	    if (ms > 0) {
-	        if ((rs = memcntl(ma,ms,fl,arg,attr,mask)) < 0) {
-		    rs = (- errno) ;
-	        }
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end method (um::cntl) */
-
-int um::incore(void *ma,size_t ms) noex {
+int umemop::incore(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
 	if (ma && vec) {
 	    rs = SR_INVALID ;
@@ -532,9 +540,9 @@ int um::incore(void *ma,size_t ms) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (um::incore) */
+/* end method (umemop::incore) */
 
-int um::protect(void *ma,size_t ms) noex {
+int umemop::protect(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
 	if (ma) {
 	    rs = SR_INVALID ;
@@ -546,9 +554,9 @@ int um::protect(void *ma,size_t ms) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (um::protect) */
+/* end method (umemop::protect) */
 
-int um::advise(void *ma,size_t ms) noex {
+int umemop::advise(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
 	if (ma) {
 	    rs = SR_INVALID ;
@@ -560,9 +568,9 @@ int um::advise(void *ma,size_t ms) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (um::advise) */
+/* end method (umemop::advise) */
 
-int um::sync(void *ma,size_t ms) noex {
+int umemop::sync(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
 	if (ma) {
 	    rs = SR_INVALID ;
@@ -574,15 +582,44 @@ int um::sync(void *ma,size_t ms) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (um::sync) */
+/* end method (umemop::sync) */
 
-int um::lockp(void *,size_t) noex {
+int umemop::cntl(void *ma,size_t ms) noex {
+	int		rs = SR_FAULT ;
+	if (ma) {
+	    rs = SR_INVALID ;
+	    if (ms > 0) {
+	        if ((rs = memcntl(ma,ms,fl,arg,attr,mask)) < 0) {
+		    rs = (- errno) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (umemop::cntl) */
+
+int umemop::inherit(void *ma,size_t ms) noex {
+	int		rs = SR_FAULT ;
+	if (ma) {
+	    rs = SR_INVALID ;
+	    if ((ms > 0) && (fl >= 0)) {
+		caddr_t ca = caddr_t(ma) ;
+	        if ((rs = minherit(ca,ms,fl)) < 0) {
+		    rs = (- errno) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (umemop::inherit) */
+
+int umemop::lockp(void *,size_t) noex {
 	int		rs ;
 	if ((rs = plock(fl)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
 }
-/* end method (um::lockp) */
+/* end method (umemop::lockp) */
 
 
