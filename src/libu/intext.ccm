@@ -35,9 +35,10 @@ module ;
 #include	<concepts>
 #include	<compare>
 #include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<stdintx.h>
 #include	<localmisc.h>
 #include	<dprintf.hh>		/* debugging */
 
@@ -109,13 +110,13 @@ export {
 	uintx &operator *=	(int m) noex {
 	    Digit	s(m) ;
 	    Digit	r[n] ;
-	    vmul(n,r,v,s) ;
+	    vmultrunc(n,r,v,s.v) ;
 	    vcopy(n,v,r) ;
 	    return *this ;
 	} /* end method (timeval::operator) */
 	uintx &operator *=	(const uintx &o) noex {
 	    Digit	r[n] ;
-	    vmul(n,r,v,o.v) ;
+	    vmultrunc(n,r,v,o.v) ;
 	    vcopy(n,v,r) ;
 	    return *this ;
 	} /* end method (timeval::operator) */
@@ -144,7 +145,7 @@ export {
         } /* end method (timeval::operator) */
 	uintx &operator >>= (int nb) noex {
 	    Digit	r[n] ;
-	    vashr(n,r,v,nb) ;
+	    vlshr(n,r,v,nb) ;
 	    vcopy(n,v,r) ;
 	    return *this ;
 	} ;
@@ -177,7 +178,7 @@ export {
 	} ;
 	uintx mul	(const uintx &o) const noex {
 	    uintx res ;
-	    vmul(n,res.v,v,o.v) ;
+	    vmultrunc(n,res.v,v,o.v) ;
 	    return res ;
 	} ;
 	uintx band	(const uintx &o) const noex {
