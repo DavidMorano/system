@@ -48,18 +48,18 @@
 
 struct nodesearch_flags {
 	uint		loaded:1 ;
-} ;
+} ; /* end struct */
 
 struct nodesearch_cursor {
 	nodesfile_cur	*nfcp ;
-} ;
+} ; /* end struct */
 
 struct nodesearch_file {
 	cchar		*fn ;
 	time_t		mtime ;
 	ino_t		ino ;
 	dev_t		dev ;
-} ;
+} ; /* end struct */
 
 struct nodesearch_head {
 	nodesfile	*nfp ;		/* nodes-file-pointer */
@@ -68,7 +68,7 @@ struct nodesearch_head {
 	time_t		ti_check ;	/* last check time */
 	time_t		ti_load ;	/* last load time */
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 typedef NODESEARCH	nodesearch ;
 typedef	NODESEARCH_FL	nodesearch_fl ;
