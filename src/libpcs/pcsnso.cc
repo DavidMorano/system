@@ -31,13 +31,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<netdb.h>
+#include	<pwd.h>
 #include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<pwd.h>
-#include	<netdb.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -58,6 +58,7 @@
 #include	<strwcpy.h>
 #include	<char.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"pcsnso.h"
 #include	"pcsnsmgr.h"
@@ -71,16 +72,6 @@ import libutil ;			/* |lenstr(3u)| */
 #ifndef	NSYSPIDS
 #define	NSYSPIDS	100
 #endif
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#define	BUFLEN		(MAXPATHLEN + MAXHOSTNAMELEN + LINEBUFLEN)
 
 #ifndef	VARPRPCS
 #define	VARPRPCS	"PCS"
@@ -159,24 +150,19 @@ import libutil ;			/* |lenstr(3u)| */
 #define	TO_FILEMOD	(60 * 24 * 3600)
 #define	TO_LASTCHECK	(4*60)
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
+#define	SI		subinfo
+#define	SI_FL		subinfo_flags
 
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 
 /* exported variables */
 
-PCSNSO_OBJ	pcsnso = {
+const pcsno_obj		pcsnso_mod = {
 	"pcsnso",
-	szof(PCSNSO),
-	szof(PCSNSO_CUR)
+	szof(pcsnso),
+	szof(pcsnos_cur)
 } ;
 
 
@@ -192,7 +178,7 @@ struct subinfo {
 	cchar		*varusername ;
 	cchar		*un ;		/* passed argument */
 	char		*rbuf ;		/* passed argument */
-	SUBINFO_FL	init, f ;
+	SI_FL	init, f ;
 	uid_t		uid ;
 	int		rlen ;		/* passed argument */
 	int		w ;		/* passed argument */
@@ -206,32 +192,32 @@ struct pcsnametype {
 
 /* forward references */
 
-static int	pcsnso_infoloadbegin(PCSNSO *,cchar *) ;
-static int	pcsnso_infoloadend(PCSNSO *) ;
-static int	pcsnso_getpw(PCSNSO *,cchar *) ;
+local int	pcsnso_infoloadbegin(PCSNSO *,cchar *) ;
+local int	pcsnso_infoloadend(PCSNSO *) ;
+local int	pcsnso_getpw(PCSNSO *,cchar *) ;
 
-static int	pcsnso_getrealname(PCSNSO *,SUBINFO *) ;
-static int	pcsnso_getpcsname(PCSNSO *,SUBINFO *) ;
-static int	pcsnso_getfullname(PCSNSO *,SUBINFO *) ;
-static int	pcsnso_getprojinfo(PCSNSO *,SUBINFO *) ;
-static int	pcsnso_client(PCSNSO *) ;
-static int	pcsnso_clientbegin(PCSNSO *,time_t) ;
-static int	pcsnso_clientend(PCSNSO *) ;
+local int	pcsnso_getrealname(PCSNSO *,SI *) ;
+local int	pcsnso_getpcsname(PCSNSO *,SI *) ;
+local int	pcsnso_getfullname(PCSNSO *,SI *) ;
+local int	pcsnso_getprojinfo(PCSNSO *,SI *) ;
+local int	pcsnso_client(PCSNSO *) ;
+local int	pcsnso_clientbegin(PCSNSO *,time_t) ;
+local int	pcsnso_clientend(PCSNSO *) ;
 
-static int	subinfo_start(SUBINFO *,PCSNSO *,char *,int,cchar *,int) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_prfile(SUBINFO *,cchar *) ;
+local int	subinfo_start(SI *,PCSNSO *,char *,int,cchar *,int) ;
+local int	subinfo_finish(SI *) ;
+local int	subinfo_prfile(SI *,cchar *) ;
 
-static int	getname(SUBINFO *) ;
-static int	getname_var(SUBINFO *) ;
-static int	getname_daemon(SUBINFO *) ;
-static int	getname_nsmgr(SUBINFO *) ;
-static int	getname_userhome(SUBINFO *) ;
-static int	getname_again(SUBINFO *) ;
-static int	getname_sysdb(SUBINFO *) ;
-static int	getname_pcsdef(SUBINFO *) ;
+local int	getname(SI *) ;
+local int	getname_var(SI *) ;
+local int	getname_daemon(SI *) ;
+local int	getname_nsmgr(SI *) ;
+local int	getname_userhome(SI *) ;
+local int	getname_again(SI *) ;
+local int	getname_sysdb(SI *) ;
+local int	getname_pcsdef(SI *) ;
 
-static int	getprojinfo_sysdb(SUBINFO *) ;
+local int	getprojinfo_sysdb(SI *) ;
 
 
 /* local variables */
@@ -245,7 +231,7 @@ static const struct pcsnametype	pcsnametypes[] = {
 	{ NULL, NULL }
 } ;
 
-static int	(*getnames[])(SUBINFO *) = {
+local int	(*getnames[])(SI *) = {
 	getname_var,
 	getname_nsmgr,
 	getname_daemon,
@@ -274,8 +260,7 @@ int pcsnso_open(PCSNSO *op,cchar *pr) noex {
 	debugprintf("pcsnso_open: pr=%s\n",pr) ;
 #endif
 
-	memset(op,0,sizeof(PCSNSO)) ;
-
+	memclear(op) ;
 	if ((rs = pcsnso_infoloadbegin(op,pr)) >= 0) {
 	    op->magic = PCSNSO_MAGIC ;
 	} /* end if (pcsnso_infoloadbegin) */
@@ -327,7 +312,7 @@ int pcsnso_setopts(PCSNSO *op,int opts)
 
 int pcsnso_get(PCSNSO *op,char *rbuf,int rlen,cchar *un,int w)
 {
-	SUBINFO		si, *sip = &si ;
+	SI		si, *sip = &si ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -401,7 +386,7 @@ int pcsnso_curbegin(PCSNSO *op,PCSNSO_CUR *curp)
 
 	if (op->magic != PCSNSO_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(PCSNSO_CUR)) ;
+	memclear(curp) ;
 	op->ncursors += 1 ;
 
 	return rs ;
@@ -457,7 +442,7 @@ int pcsnso_enum(PCSNSO *op,PCSNSO_CUR *curp,char *vbuf,int vlen,int w)
 /* private subroutines */
 
 
-static int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr)
+local int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr)
 {
 	int		rs ;
 
@@ -482,7 +467,7 @@ static int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr)
 /* end subroutine (pcsnso_infoloadbegin) */
 
 
-static int pcsnso_infoloadend(PCSNSO *op)
+local int pcsnso_infoloadend(PCSNSO *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -507,7 +492,7 @@ static int pcsnso_infoloadend(PCSNSO *op)
 /* end subroutine (pcsnso_infoloadend) */
 
 
-static int pcsnso_getpw(PCSNSO *op,cchar *un)
+local int pcsnso_getpw(PCSNSO *op,cchar *un)
 {
 	PCSNSO_PWD	*pdp = &op->pwd ;
 	int		rs = SR_OK ;
@@ -543,7 +528,7 @@ static int pcsnso_getpw(PCSNSO *op,cchar *un)
 
 
 /* ARGSUSED */
-static int pcsnso_getrealname(PCSNSO *op,SUBINFO *sip)
+local int pcsnso_getrealname(PCSNSO *op,SI *sip)
 {
 	int		rs ;
 
@@ -555,7 +540,7 @@ static int pcsnso_getrealname(PCSNSO *op,SUBINFO *sip)
 
 
 /* ARGSUSED */
-static int pcsnso_getpcsname(PCSNSO *op,SUBINFO *sip)
+local int pcsnso_getpcsname(PCSNSO *op,SI *sip)
 {
 	int		rs ;
 
@@ -567,7 +552,7 @@ static int pcsnso_getpcsname(PCSNSO *op,SUBINFO *sip)
 
 
 /* ARGSUSED */
-static int pcsnso_getfullname(PCSNSO *op,SUBINFO *sip)
+local int pcsnso_getfullname(PCSNSO *op,SI *sip)
 {
 	int		rs ;
 
@@ -579,7 +564,7 @@ static int pcsnso_getfullname(PCSNSO *op,SUBINFO *sip)
 
 
 /* ARGSUSED */
-static int pcsnso_getprojinfo(PCSNSO *op,SUBINFO *sip)
+local int pcsnso_getprojinfo(PCSNSO *op,SI *sip)
 {
 	int		rs ;
 
@@ -598,7 +583,7 @@ static int pcsnso_getprojinfo(PCSNSO *op,SUBINFO *sip)
 /* end subrouine (pcsnso_getprojinfo) */
 
 
-static int pcsnso_client(PCSNSO *op)
+local int pcsnso_client(PCSNSO *op)
 {
 	int		rs = MKBOOL(op->open.client) ;
 	if (! op->fl.client) {
@@ -618,7 +603,7 @@ static int pcsnso_client(PCSNSO *op)
 /* end subroiutine (pcsnso_client) */
 
 
-static int pcsnso_clientbegin(PCSNSO *op,time_t dt)
+local int pcsnso_clientbegin(PCSNSO *op,time_t dt)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
@@ -643,7 +628,7 @@ static int pcsnso_clientbegin(PCSNSO *op,time_t dt)
 /* end subroiutine (pcsnso_clientbegin) */
 
 
-static int pcsnso_clientend(PCSNSO *op)
+local int pcsnso_clientend(PCSNSO *op)
 {
 	int		rs = SR_OK ;
 	if (op->open.client) {
@@ -656,13 +641,11 @@ static int pcsnso_clientend(PCSNSO *op)
 /* end subroiutine (pcsnso_clientend) */
 
 
-static int subinfo_start(SUBINFO *sip,PCSNSO *op,char *rbuf,int rlen,
-			cchar *un,int w)
-{
+local int subinfo_start(SI *sip,PCSNSO *op,char *rbuf,int rlen,
+			cchar *un,int w) noex {
 	int		rs = SR_OK ;
-
 	rbuf[0] = '\0' ;
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->op = op ;
 	sip->pr = op->pr ;
 	sip->rbuf = rbuf ;
@@ -670,13 +653,12 @@ static int subinfo_start(SUBINFO *sip,PCSNSO *op,char *rbuf,int rlen,
 	sip->un = un ;
 	sip->w = w ;
 	sip->varusername = VARUSERNAME ;
-
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SI *sip)
 {
 	int		rs = SR_OK ;
 	if (sip == NULL) return SR_FAULT ;
@@ -685,7 +667,7 @@ static int subinfo_finish(SUBINFO *sip)
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_prfile(SUBINFO *sip,cchar *fn)
+local int subinfo_prfile(SI *sip,cchar *fn)
 {
 	int		rs ;
 	int		len = 0 ;
@@ -704,7 +686,7 @@ static int subinfo_prfile(SUBINFO *sip,cchar *fn)
 /* end subroutine (subinfo_prfile) */
 
 
-static int getname(SUBINFO *sip)
+local int getname(SI *sip)
 {
 	cint	w = sip->w ;
 	int		rs = SR_OK ;
@@ -746,7 +728,7 @@ static int getname(SUBINFO *sip)
 /* end subroutine (getname) */
 
 
-static int getname_var(SUBINFO *sip)
+local int getname_var(SI *sip)
 {
 	cint	w = sip->w ;
 	int		rs = SR_OK ;
@@ -784,7 +766,7 @@ static int getname_var(SUBINFO *sip)
 /* end subroutine (getname_var) */
 
 
-static int getname_daemon(SUBINFO *sip)
+local int getname_daemon(SI *sip)
 {
 	PCSNSO		*op = sip->op ;
 	int		rs = SR_OK ;
@@ -830,7 +812,7 @@ static int getname_daemon(SUBINFO *sip)
 /* end subroutine (getname_daemon) */
 
 
-static int getname_nsmgr(SUBINFO *sip)
+local int getname_nsmgr(SI *sip)
 {
 	cint	rsn = SR_NOTFOUND ;
 	cint	w = sip->w ;
@@ -863,7 +845,7 @@ static int getname_nsmgr(SUBINFO *sip)
 /* end subroutine (getname_nsmgr) */
 
 
-static int getname_userhome(SUBINFO *sip)
+local int getname_userhome(SI *sip)
 {
 	cint	w = sip->w ;
 	int		rs = SR_OK ;
@@ -906,7 +888,7 @@ static int getname_userhome(SUBINFO *sip)
 /* end subroutine (getname_userhome) */
 
 
-static int getname_again(SUBINFO *sip)
+local int getname_again(SI *sip)
 {
 	int		rs = SR_OK ;
 
@@ -920,7 +902,7 @@ static int getname_again(SUBINFO *sip)
 /* end subroutine (getname_again) */
 
 
-static int getname_sysdb(SUBINFO *sip)
+local int getname_sysdb(SI *sip)
 {
 	PCSNSO		*op = sip->op ;
 	cint	w = sip->w ;
@@ -980,7 +962,7 @@ static int getname_sysdb(SUBINFO *sip)
 /* end subroutine (getname_sysdb) */
 
 
-static int getname_pcsdef(SUBINFO *sip)
+local int getname_pcsdef(SI *sip)
 {
 	PCSNSO		*op = sip->op ;
 	cint	w = sip->w ;
@@ -1025,9 +1007,7 @@ static int getname_pcsdef(SUBINFO *sip)
 }
 /* end subroutine (getname_pcsdef) */
 
-
-static int getprojinfo_sysdb(SUBINFO *sip)
-{
+local int getprojinfo_sysdb(SI *sip) noex {
 	PCSNSO		*op = sip->op ;
 	int		rs ;
 	int		rs1 ;
@@ -1038,12 +1018,12 @@ static int getprojinfo_sysdb(SUBINFO *sip)
 #endif
 
 	if ((rs = getbufsize(bufsize_pj)) >= 0) {
-	    struct project	pj ;
-	    cint		pjlen = rs ;
-	    char		*pjbuf ;
+	    PROJECT	pj ;
+	    cint	pjlen = rs ;
+	    char	*pjbuf ;
 	    if ((rs = lm_mall((pjlen+1),&pjbuf)) >= 0) {
 	        cchar	*un = sip->un ;
-	        if ((rs = uc_getdefaultproj(un,&pj,pjbuf,pjlen)) >= 0) {
+	        if ((rs = uc_getdefproj(un,&pj,pjbuf,pjlen)) >= 0) {
 	            int	f = (strcmp(pj.pj_name,DEFPROJNAME) != 0) ;
 	            if (f) {
 	                PCSNSO_PWD	*pdp = &op->pwd ;
