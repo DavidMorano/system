@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	useraccdb
 
 	Description:
@@ -55,11 +55,12 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<linebuffer.h>
 #include	<estrings.h>
 #include	<ascii.h>
@@ -79,7 +80,9 @@
 
 #include	"useraccdb.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 #define	USERACCDB_LOGDNAME	"var/log"
@@ -111,7 +114,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -121,6 +123,25 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_getpid() noex ;
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_moveup(int,int) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_lockf(int,int,off_t) noex ;
+    extern int uc_readln(int,void *,int) noex ;
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_writedesc(int,int,int) noex ;
+    extern int uc_rewind(int) noex ;
+    extern int uc_seek(int,off_t,int) noex ;
+    extern int uc_setappend(int,int) noex ;
+    extern int uc_ftruncate(int,off_t) noex ;
+    extern int uc_setappend(int,int) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_close(int) noex ;
+} /* end extern */
 
 
 /* external variables */
@@ -132,7 +153,7 @@ struct upinfo_rec {
 	off_t		ro ;		/* record offset */
 	uint		count ;
 	uint		found:1 ;
-} ;
+} ; /* end struct */
 
 struct upinfo {
 	UPI_REC		user ;
@@ -142,12 +163,12 @@ struct upinfo {
 	cchar		*argname ;
 	time_t		utime ;
 	char		tbuf[UAFILE_LDATE+1] ;
-} ;
+} ; /* end struct */
 
 struct useraccdb_item {
 	cchar		*sp ;
 	int		sl ;
-} ;
+} ; /* end struct */
 
 struct useraccdb_rec {
 	UAD_ITEM	countstr ;
@@ -156,76 +177,73 @@ struct useraccdb_rec {
 	UAD_ITEM	namestr ;
 	time_t		atime ;
 	uint		count ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int useraccdb_ctor(UAD *op,Args ... args) noex {
+local int useraccdb_ctor(UAD *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->eo = -1 ;
 	    op->fd = -1 ;
-	    if ((op->dmp = new(nothrow) dater) != np) {
+	    if ((op->dmp = new(nothrow) dater) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-dater) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (useraccdb_ctor) */
+} /* end subroutine (useraccdb_ctor) */
 
-static int useraccdb_dtor(UAD *op) noex {
+local int useraccdb_dtor(UAD *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->dmp) {
+	    if (op->dmp) ylikely {
 		delete op->dmp ;
 		op->dmp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (useraccdb_dtor) */
+} /* end subroutine (useraccdb_dtor) */
 
 template<typename ... Args>
-static int useraccdb_magic(UAD *op,Args ... args) noex {
+local int useraccdb_magic(UAD *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == USERACCDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (useraccdb_magic) */
+} /* end subroutine (useraccdb_magic) */
 
-static int	useraccdb_fileopen(UAD *) noex ;
-static int	useraccdb_openlock(UAD *) noex ;
-static int	useraccdb_fileclose(UAD *) noex ;
-static int	useraccdb_lock(UAD *,int) noex ;
-static int	useraccdb_recproc(UAD *,UAD_REC *) noex ;
-static int	useraccdb_doit(UAD *,time_t *,cchar *,int) noex ;
-static int	useraccdb_updater(UAD *,UPI *) noex ;
+local int	useraccdb_fileopen(UAD *) noex ;
+local int	useraccdb_openlock(UAD *) noex ;
+local int	useraccdb_fileclose(UAD *) noex ;
+local int	useraccdb_lock(UAD *,int) noex ;
+local int	useraccdb_recproc(UAD *,UAD_REC *) noex ;
+local int	useraccdb_doit(UAD *,time_t *,cchar *,int) noex ;
+local int	useraccdb_updater(UAD *,UPI *) noex ;
 
-static int	upinfo_start(UPI *,UAD *,cchar *,cchar *) noex ;
-static int	upinfo_match(UPI *,off_t,UAD_REC *) noex ;
-static int	upinfo_update(UPI *) noex ;
-static int	upinfo_finish(UPI *) noex ;
-static int	upinfo_upone(UPI *,UPI_REC *,int) noex ;
-static int	upinfo_mkrec(UPI *,UPI_REC *,char *,int,int) noex ;
+local int	upinfo_start(UPI *,UAD *,cchar *,cchar *) noex ;
+local int	upinfo_match(UPI *,off_t,UAD_REC *) noex ;
+local int	upinfo_update(UPI *) noex ;
+local int	upinfo_finish(UPI *) noex ;
+local int	upinfo_upone(UPI *,UPI_REC *,int) noex ;
+local int	upinfo_mkrec(UPI *,UPI_REC *,char *,int,int) noex ;
 
-static int	rec_parse(UAD_REC *,cc *,int) noex ;
+local int	rec_parse(UAD_REC *,cc *,int) noex ;
 
-static int	entry_load(UAD_ENT *,char *,int,UAD_REC *) noex ;
+local int	entry_load(UAD_ENT *,char *,int,UAD_REC *) noex ;
 
-static int	mkts(char *,int,time_t) noex ;
+local int	mkts(char *,int,time_t) noex ;
 
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 constexpr int		diglen = DIGBUFLEN ;
 
@@ -242,34 +260,36 @@ cbool			f_comment = false ;
 int useraccdb_open(UAD *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = useraccdb_ctor(op,pr,dbname)) >= 0) {
+	if ((rs = useraccdb_ctor(op,pr,dbname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0] && dbname[0]) {
-		if ((rs = maxpathlen) >= 0) {
+	    if (pr[0] && dbname[0]) ylikely {
+		if ((rs = maxpathlen) >= 0) ylikely {
 		    cint	sz = (2 * (rs + 1)) ;
 		    cint	maxpath = rs ;
-		    if (caddr_t a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+		    int		ai = 0 ;
+		    if (caddr_t a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 		        cchar	*suf = UAFILE_SUF ;
 	                cchar	*logdname = USERACCDB_LOGDNAME ;
-	                char	*cname = (a + (0 * (maxpath + 1))) ;
+	                char	*cname = (a + ((maxpath + 1) * ai++)) ;
+	                char	*fname = (a + ((maxpath + 1) * ai++)) ;
 	                if ((rs = snsds(cname,maxpath,dbname,suf)) >= 0) {
-	                    char	*fname = (a + (1 * (maxpath + 1))) ;
 	                    if ((rs = mkpath(fname,pr,logdname,cname)) >= 0) {
 		                cint	pl = rs ;
 		                cchar	*cp ;
-		                if ((rs = uc_mallocstrw(fname,pl,&cp)) >= 0) {
+		                if ((rs = lm_strw(fname,pl,&cp)) >= 0) {
 		                    op->fname = cp ;
 		                    if ((rs = useraccdb_fileopen(op)) >= 0) {
 			                op->magic = USERACCDB_MAGIC ;
 		                    }
 		                    if (rs < 0) {
-	    		                uc_free(op->fname) ;
+					void *vp = voidp(op->fname) ;
+	    		                lm_free(vp) ;
 	    		                op->fname = nullptr ;
-		                    }
+		                    } /* end if (error) */
 		                } /* end if (memory-allocation) */
 	                    } /* end if (mkpath) */
 	                } /* end if (make-component) */
-		        rs1 = uc_free(a) ;
+		        rs1 = lm_free(a) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
@@ -285,8 +305,8 @@ int useraccdb_open(UAD *op,cchar *pr,cchar *dbname) noex {
 int useraccdb_close(UAD *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = useraccdb_magic(op)) >= 0) {
-	    if (op->fl.dater) {
+	if ((rs = useraccdb_magic(op)) >= 0) ylikely {
+	    if (op->fl.dater) ylikely {
 	        op->fl.dater = false ;
 	        rs1 = dater_finish(op->dmp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -295,8 +315,9 @@ int useraccdb_close(UAD *op) noex {
 	        rs1 = useraccdb_fileclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->fname) {
-	        rs1 = uc_free(op->fname) ;
+	    if (op->fname) ylikely {
+		void *vp = voidp(op->fname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    }
@@ -313,11 +334,11 @@ int useraccdb_close(UAD *op) noex {
 int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,cc *user) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = useraccdb_magic(op,ep,ebuf,user)) >= 0) {
+	if ((rs = useraccdb_magic(op,ep,ebuf,user)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (op->eo < 0) {
-	        if ((rs = useraccdb_openlock(op)) >= 0) {
-		    if (linebuffer lb ; (rs = lb.start) >= 0) {
+	        if ((rs = useraccdb_openlock(op)) >= 0) ylikely {
+		    if (linebuffer lb ; (rs = lb.start) >= 0) ylikely {
 			cint	fd = op->fd ;
 	                if (filer b ; (rs = b.start(fd,0z,0,0)) >= 0) {
 	                    UAD_REC	rec ;
@@ -360,7 +381,7 @@ int useraccdb_update(UAD *op,cchar *user,cchar *name) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = useraccdb_magic(op,user)) >= 0) {
+	if ((rs = useraccdb_magic(op,user)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (op->eo < 0) {
 		if (UPI ui ; (rs = upinfo_start(&ui,op,user,name)) >= 0) {
@@ -384,15 +405,15 @@ int useraccdb_update(UAD *op,cchar *user,cchar *name) noex {
 
 int useraccdb_curbegin(UAD *op,UAD_CUR *curp) noex {
 	int		rs ;
-	if ((rs = useraccdb_magic(op,curp)) >= 0) {
+	if ((rs = useraccdb_magic(op,curp)) >= 0) ylikely {
 	    cint	osz = szof(filer) ;
 	    curp->fbp = nullptr ;
 	    curp->eo = -1 ;
-	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) {
 		curp->fbp = (filer *) vp ;
 	        rs = useraccdb_openlock(op) ;
 		if (rs < 0) {
-		    uc_free(curp->fbp) ;
+		    lm_free(curp->fbp) ;
 		    curp->fbp = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
@@ -404,7 +425,7 @@ int useraccdb_curbegin(UAD *op,UAD_CUR *curp) noex {
 int useraccdb_curend(UAD *op,UAD_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = useraccdb_magic(op,curp)) >= 0) {
+	if ((rs = useraccdb_magic(op,curp)) >= 0) ylikely {
 	    if (curp->eo >= 0) {
 	        curp->eo = -1 ;
 	    }
@@ -418,7 +439,7 @@ int useraccdb_curend(UAD *op,UAD_CUR *curp) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(curp->fbp) ;
+	            rs1 = lm_free(curp->fbp) ;
 	            if (rs >= 0) rs = rs1 ;
 		    curp->fbp = nullptr ;
 		}
@@ -461,9 +482,9 @@ namespace {
 	    off_t	eo = curp->eo ;
 	    int		rs ;
 	    int		rs1 ;
-	    if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	    if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 		cint	llen = rs ;
-	        if ((rs = filer_readln(curp->fbp,lbuf,llen,-1)) >= 0) {
+	        if ((rs = filer_readln(curp->fbp,lbuf,llen,-1)) >= 0) ylikely {
 		    cint	ll = rs ;
 	            if (ll > 0) {
 	                if (UAD_REC rec ; (rs = rec_parse(&rec,lbuf,ll)) >= 0) {
@@ -478,20 +499,20 @@ namespace {
 	                curp->eo = (eo + ll) ;
 		    }
 	        } /* end if (filer_readln) */
-		rs1 = uc_free(lbuf) ;
+		rs1 = lm_free(lbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    return rs ;
 	} ; /* end method (read) */
     } ; /* end struct (enumerator) */
-}
+} /* end namespace */
 
 int useraccdb_curenum(UAD *op,UAD_CUR *curp,UAD_ENT *ep,
 		char *ebuf,int elen) noex {
 	int		rs ;
-	if ((rs = useraccdb_magic(op,curp,ep,ebuf)) >= 0) {
+	if ((rs = useraccdb_magic(op,curp,ep,ebuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (op->fd >= 0) {
+	    if (op->fd >= 0) ylikely {
 		enumerator	so(op,curp,ep,ebuf,elen) ;
 		rs = so ;
 	    }
@@ -503,7 +524,7 @@ int useraccdb_curenum(UAD *op,UAD_CUR *curp,UAD_ENT *ep,
 int useraccdb_check(UAD *op,time_t ti_now) noex {
 	int		rs ;
 	int		f_changed = false ;
-	if ((rs = useraccdb_magic(op)) >= 0) {
+	if ((rs = useraccdb_magic(op)) >= 0) ylikely {
 	    if (ti_now == 0) ti_now = time(nullptr) ;
 	    if (ti_now == 1) f_changed = true ; /* fake out LINT */
 	} /* end if (magic) */
@@ -514,27 +535,27 @@ int useraccdb_check(UAD *op,time_t ti_now) noex {
 
 /* private subroutines */
 
-static int useraccdb_openlock(UAD *op) noex {
+local int useraccdb_openlock(UAD *op) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    rs = useraccdb_fileopen(op) ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = useraccdb_lock(op,true) ;
 	}
 	return rs ;
 }
 /* end subroutine (useraccdb_openlock) */
 
-static int useraccdb_fileopen(UAD *op) noex {
+local int useraccdb_fileopen(UAD *op) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    cint	of = (O_RDWR | O_CREAT) ;
 	    cmode	om = 0666 ;
-	    if ((rs = uc_open(op->fname,of,om)) >= 0) {
+	    if ((rs = uc_open(op->fname,of,om)) >= 0) ylikely {
 	        op->fd = rs ;
-	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
-		    if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) ylikely {
+		    if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 		        op->dev = sb.st_dev ;
 		        op->ino = sb.st_ino ;
 		        op->ti_mod = sb.st_mtime ;
@@ -550,9 +571,9 @@ static int useraccdb_fileopen(UAD *op) noex {
 }
 /* end subroutine (useraccdb_fileopen) */
 
-static int useraccdb_fileclose(UAD *op) noex {
+local int useraccdb_fileclose(UAD *op) noex {
 	int		rs = SR_OK ;
-	if (op->fd >= 0) {
+	if (op->fd >= 0) ylikely {
 	    rs = u_close(op->fd) ;
 	    op->fd = -1 ;
 	}
@@ -560,7 +581,7 @@ static int useraccdb_fileclose(UAD *op) noex {
 }
 /* end subroutine (useraccdb_fileclose) */
 
-static int useraccdb_lock(UAD *op,int f) noex {
+local int useraccdb_lock(UAD *op,int f) noex {
 	int		rs = SR_OK ;
 	if (f) {
 	    if (! op->fl.locked) {
@@ -583,7 +604,7 @@ static int useraccdb_lock(UAD *op,int f) noex {
 }
 /* end subroutine (useraccdb_lock) */
 
-static int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
+local int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 	int		rs = SR_OK ;
 	int		sl = recp->datestr.sl ;
 	cchar		*sp = recp->datestr.sp ;
@@ -606,16 +627,18 @@ static int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 }
 /* end subroutine (useraccdb_recproc) */
 
-static int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
+local int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if (! op->fl.dater) {
-	    if (char *znbuf ; (rs = malloc_zn(&znbuf)) >= 0) {
+	    if (char *znbuf ; (rs = lm_zn(&znbuf)) >= 0) {
 		cint	znlen = rs ;
 	        if (TIMEB now ; (rs = initnow(&now,znbuf,znlen)) >= 0) {
 	            rs = dater_start(op->dmp,&now,znbuf,rs) ;
 	            op->fl.dater = (rs >= 0) ;
 	        } /* end if (initnow) */
-		rs = rsfree(rs,znbuf) ;
+		rs1 = lm_free(znbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	}
 	if (rs >= 0) {
@@ -628,12 +651,12 @@ static int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
 }
 /* end subroutine (useraccdb_doit) */
 
-static int useraccdb_updater(UAD *op,UPI *uip) noex {
+local int useraccdb_updater(UAD *op,UPI *uip) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 	    cint	llen = rs ;
-	    if (filer b ; (rs = b.start(op->fd,0z,0,0)) >= 0) {
+	    if (filer b ; (rs = b.start(op->fd,0z,0,0)) >= 0) ylikely {
 		off_t		ro = 0z ;
 		while ((rs = b.readln(lbuf,llen,-1)) > 0) {
 		    cint	ll = rs ;
@@ -647,16 +670,16 @@ static int useraccdb_updater(UAD *op,UPI *uip) noex {
 		rs1 = b.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
-	    rs1 = uc_free(lbuf) ;
+	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (useraccdb_updater) */
 
-static int upinfo_start(UPI *uip,UAD *op,cc *au,cc *an) noex {
+local int upinfo_start(UPI *uip,UAD *op,cc *au,cc *an) noex {
     	int		rs = SR_BUGCHECK ;
-	if (uip && op) {
+	if (uip && op) ylikely {
 	    custime	dt = getustime ;
 	    memclear(uip) ;
 	    uip->op = op ;
@@ -670,22 +693,22 @@ static int upinfo_start(UPI *uip,UAD *op,cc *au,cc *an) noex {
 }
 /* end subroutine (upinfo_start) */
 
-static int upinfo_finish(UPI *uip) noex {
+local int upinfo_finish(UPI *uip) noex {
 	int		rs = SR_FAULT ;
-	if (uip) {
+	if (uip) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (upinfo_finish) */
 
-static int upinfo_match(UPI *uip,off_t ro,UAD_REC *recp) noex {
+local int upinfo_match(UPI *uip,off_t ro,UAD_REC *recp) noex {
 	UPI_REC		*urp = nullptr ;
 	int		rs = SR_OK ;
 	int		sl = recp->userstr.sl ;
 	int		rc = 0 ;
 	cchar		*sp = recp->userstr.sp ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (strwcmp(uip->arguser,sp,sl) == 0) {
 	        urp = &uip->user ;
 	    } else if (strwcmp(totaluser,sp,sl) == 0) {
@@ -711,14 +734,14 @@ static int upinfo_match(UPI *uip,off_t ro,UAD_REC *recp) noex {
 }
 /* end subroutine (upinfo_match) */
 
-static int upinfo_update(UPI *uip) noex {
+local int upinfo_update(UPI *uip) noex {
 	UPI_REC		*urp ;
 	int		rs = SR_OK ;
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    urp = &uip->total ;
 	    rs = upinfo_upone(uip,urp,0) ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    urp = &uip->user ;
 	    rs = upinfo_upone(uip,urp,1) ;
 	}
@@ -726,11 +749,11 @@ static int upinfo_update(UPI *uip) noex {
 }
 /* end subroutine (upinfo_update) */
 
-static int upinfo_upone(UPI *uip,UPI_REC *urp,int type) noex {
+local int upinfo_upone(UPI *uip,UPI_REC *urp,int type) noex {
 	cint		rlen = UAFILE_RECLEN ;
 	int		rs ;
 	char		rbuf[UAFILE_RECLEN+1] ;
-	if ((rs = upinfo_mkrec(uip,urp,rbuf,rlen,type)) >= 0) {
+	if ((rs = upinfo_mkrec(uip,urp,rbuf,rlen,type)) >= 0) ylikely {
 	    useraccdb	*op = uip->op ;
 	    int		rl = rs ;
 	    if (urp->found) {
@@ -745,7 +768,7 @@ static int upinfo_upone(UPI *uip,UPI_REC *urp,int type) noex {
 }
 /* end subroutine (upinfo_upone) */
 
-static int upinfo_mkrec(UPI *uip,UPI_REC *urp,char *rbuf,int rlen,
+local int upinfo_mkrec(UPI *uip,UPI_REC *urp,char *rbuf,int rlen,
 		int type) noex {
 	int		rs = SR_OVERFLOW ;
 	int		rl = 0 ;
@@ -784,13 +807,13 @@ static int upinfo_mkrec(UPI *uip,UPI_REC *urp,char *rbuf,int rlen,
 	        }
 	        *rbp++ = '\n' ;
 	        rl = intconv(rbp - rbuf) ;
-	    }
+	    } /* end if */
 	} /* end if (valid) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (upinfo_mkrec) */
 
-static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
+local int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*cp ;
@@ -821,7 +844,7 @@ static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	recp->userstr.sl = min(cl,UAFILE_MAXUSERLEN) ;
 	ll = intconv((lp + ll) - (cp + cl)) ;
 	lp = (cp + cl) ;
-	if (cchar *tp{} ; (tp = strnchr(lp,ll,CH_LPAREN)) != nullptr) {
+	if (cchar *tp ; (tp = strnchr(lp,ll,CH_LPAREN)) != nullptr) {
 	    ll = intconv((lp + ll) - (tp + 1)) ;
 	    lp = (tp + 1) ;
 	    cp = lp ;
@@ -830,16 +853,16 @@ static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	        recp->namestr.sp = cp ;
 	        recp->namestr.sl = min(cl,UAFILE_MAXNAMELEN) ;
 	    }
-	}
+	} /* end if (strnchr) */
 	return rs ;
 }
 /* end subroutine (rec_parse) */
 
-static int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
+local int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
 	int		rs ;
 	int		rs1 ;
 	memclear(ep) ;
-	if (storeitem s ; (rs = s.start(ebuf,elen)) >= 0) {
+	if (storeitem s ; (rs = s.start(ebuf,elen)) >= 0) ylikely {
 	    UAD_ITEM	*ip = &recp->userstr ;
 	    ep->atime = recp->atime ;
 	    ep->count = recp->count ;
@@ -857,7 +880,7 @@ static int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
 }
 /* end subroutine (entry_load) */
 
-static int mkts(char *tbuf,int tlen,time_t t) noex {
+local int mkts(char *tbuf,int tlen,time_t t) noex {
 	int		tl = 0 ;
 	timestr_logz(t,tbuf) ;
 	if ((tl = lenstr(tbuf)) < tlen) {
