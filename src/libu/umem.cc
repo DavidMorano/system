@@ -12,14 +12,9 @@
 	= 1998-03-85, David A­D­ Morano
 	This code was originally written.
 
-	= 2018-09-26, David A-D- Morano
-	I brought |ucalloc(3uc)| in line w/ the standard for
-	|calloc(3c)|.  I never used this myself in 40 years, so I
-	never missed it!
-
 */
 
-/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -41,12 +36,11 @@
 #include	<cstdckdint>		/* |ckd_mu(3c++)| */
 #include	<cstring>		/* |strncpy(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<utimeout.h>
 #include	<errtimer.hh>
+#include	<sysconfcmds.h>
 #include	<localmisc.h>
 
 #include	"umem.hh"
@@ -75,6 +69,32 @@ import ulibvals ;			/* |getlenstr(3u)| + |memclear(3u)| */
 /* local structures */
 
 namespace {
+    struct valcmds {
+	inline static cint	maxargs		= _SC_ARG_MAX ;
+	inline static cint	maxline		= _SC_LINE_MAX ;
+	inline static cint	maxname		= _SC_NAME_MAX ;
+	inline static cint	maxpath		= _SC_PATH_MAX ;
+	inline static cint	maxnode		= _SC_NODENAME_MAX ;
+    } ; /* end struct (valcmds) */
+} /* end namespace */
+
+namespace {
+    struct valmgr ;
+    struct valmgr_vals {
+	int	maxargslen ;
+	int	maxlinelen ;
+	int	maxnamelen ;
+	int	maxpathlen ;
+	int	maxnodelen ;
+    } ; /* end struct (valmgr_vals) */
+    struct valmgr {
+	valmgr_vals	v ;
+	int operator () (int) noex ;
+	int get(int) noex ;
+    } ; /* end struct (valmgr) */
+} /* end namespace */
+
+namespace {
     struct umgr ;
     typedef int (umgr::*umgr_m)(int,void *) noex ;
     struct umgr {
@@ -82,10 +102,10 @@ namespace {
 	void		*cp ;		/* constant-void-pointer */
 	umgr(void *op = nullptr) noex : cp(op) { } ;
 	int operator () (int,void *) noex ;
-	int stdmalloc(int,void *) noex ;
-	int stdvalloc(int,void *) noex ;
-	int stdrealloc(int,void *) noex ;
-	int stdfree(int,void *) noex ;
+	sysret_t stdmalloc	(int,void *) noex ;
+	sysret_t stdvalloc	(int,void *) noex ;
+	sysret_t stdrealloc	(int,void *) noex ;
+	sysret_t stdfree	(int,void *) noex ;
     } ; /* end struct (umgr) */
 } /* end namespace */
 
@@ -95,9 +115,11 @@ namespace {
 
 /* local vaiables */
 
-static cint		maxlinelen = ulibval.maxline ;
-static cint		maxnamelen = ulibval.maxnamelen ;
-static cint		maxpathlen = ulibval.maxpathlen ;
+constexpr valcmds	valcmd ;
+
+static valmgr		valer ;
+
+static cint		pagesz		= ulibval.pagesz ;
 
 
 /* exported variables */
@@ -156,9 +178,9 @@ namespace libu {
 	int		rs = SR_FAULT ;
 	if (cp) ylikely {
 	    const uintptr_t	am = (szof(uintptr_t) - 1) ;
-	    const uintptr_t	v = uintptr_t(cp) ;
+	    const uintptr_t	a = uintptr_t(cp) ;
 	    rs = SR_BADFMT ;
-	    if ((v & am) == 0) ylikely {
+	    if (a && ((a & am) == 0)) ylikely {
 	        umgr	lmo(cp) ;
 	        lmo.m = &umgr::stdrealloc ;
 	        rs = lmo(sz,vpp) ;
@@ -169,9 +191,14 @@ namespace libu {
     int umems::free(void *cp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) ylikely {
-	    umgr	lmo ;
-	    lmo.m = &umgr::stdfree ;
-	    rs = lmo(1,cp) ;
+	    const uintptr_t	am = (szof(uintptr_t) - 1) ;
+	    const uintptr_t	a = uintptr_t(cp) ;
+	    rs = SR_BADFMT ;
+	    if (a && ((a & am) == 0)) ylikely {
+	        umgr	lmo(cp) ;
+	        lmo.m = &umgr::stdfree ;
+	        rs = lmo(1,cp) ;
+	    } /* end if (aligned correctly) */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (umems::free) */
@@ -185,39 +212,52 @@ namespace libu {
 	}
 	return rs ;
     } /* end subroutine (umems::rsfree) */
-    int umems::ml(cchar **rpp) noex {
+} /* end namespace (libu) */
+
+namespace libu {
+    int umems::ps(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rpp) ylikely {
-	    if ((rs = maxlinelen) >= 0) {
+	    if ((rs = pagesz) >= 0) {
 	        len = rs ;
-	        rs = mall((len + 1),rpp) ;
+	        rs = vall(len,rpp) ;
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
+    } /* end method (umems::ps) */
+} /* end namespace (libu) */
+
+namespace libu {
+    local int bufx(cint cmd,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rpp) ylikely {
+	    if ((rs = valer(cmd)) >= 0) {
+	        len = rs ;
+	        rs = umem.mall((len + 1),rpp) ;
+	    }
+	}
+	return (rs >= 0) ? len : rs ;
+    } /* end subroutine (bufx) */
+} /* end namespace (libu) */
+
+namespace libu {
+    int umems::ma(cchar **rpp) noex {
+	return bufx(valcmd.maxargs,rpp) ;
+    } /* end method (umems::ma) */
+    int umems::ml(cchar **rpp) noex {
+	return bufx(valcmd.maxline,rpp) ;
     } /* end method (umems::ml) */
     int umems::mn(cchar **rpp) noex {
-	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (rpp) ylikely {
-	    if ((rs = maxnamelen) >= 0) {
-	        len = rs ;
-	        rs = mall((len + 1),rpp) ;
-	    }
-	}
-	return (rs >= 0) ? len : rs ;
+	return bufx(valcmd.maxname,rpp) ;
     } /* end method (umems::mn) */
     int umems::mp(cchar **rpp) noex {
-	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (rpp) ylikely {
-	    if ((rs = maxnamelen) >= 0) {
-	        len = rs ;
-	        rs = mall((len + 1),rpp) ;
-	    }
-	}
-	return (rs >= 0) ? len : rs ;
+	return bufx(valcmd.maxname,rpp) ;
     } /* end method (umems::mp) */
+    int umems::nn(cchar **rpp) noex {
+	return bufx(valcmd.maxnode,rpp) ;
+    } /* end method (umems::nn) */
 } /* end namespace (libu) */
 
 
@@ -257,12 +297,13 @@ int umgr::operator () (int sz,void *vp) noex {
 	return rs ;
 } /* end subroutine (umgr::operator) */
 
-int umgr::stdmalloc(int sz,void *vp) noex {
+sysret_t umgr::stdmalloc(int sz,void *vp) noex {
+    	cnullptr	np{} ;
 	csize		msize = size_t(sz) ;
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
-	if (void *rp ; (rp = malloc(msize)) != nullptr) ylikely {
+	if (void *rp ; (rp = malloc(msize)) != np) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -272,12 +313,13 @@ int umgr::stdmalloc(int sz,void *vp) noex {
 	return rs ;
 } /* end method (umgr::stdmalloc) */
 
-int umgr::stdvalloc(int sz,void *vp) noex {
+sysret_t umgr::stdvalloc(int sz,void *vp) noex {
+    	cnullptr	np{} ;
 	csize		msize = size_t(sz) ;
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
-	if (void *rp ; (rp = valloc(msize)) != nullptr) ylikely {
+	if (void *rp ; (rp = valloc(msize)) != np) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -287,13 +329,13 @@ int umgr::stdvalloc(int sz,void *vp) noex {
 	return rs ;
 } /* end method (umgr::stdvalloc) */
 
-int umgr::stdrealloc(int sz,void *vp) noex {
+sysret_t umgr::stdrealloc(int sz,void *vp) noex {
+    	cnullptr	np{} ;
 	csize		msize = size_t(sz) ;
-	void		*fvp = cast_const<voidp>(cp) ;
 	void		**rpp = voidpp(vp) ;
 	int		rs ;
 	errno = 0 ;
-	if (void *rp ; (rp = realloc(fvp,msize)) != nullptr) ylikely {
+	if (void *rp ; (rp = realloc(cp,msize)) != np) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -303,15 +345,49 @@ int umgr::stdrealloc(int sz,void *vp) noex {
 	return rs ;
 } /* end method (umgr::stdrealloc) */
 
-int umgr::stdfree(int,void *vp) noex {
-	const uintptr_t	am = (szof(uintptr_t) - 1) ;
-    	const uintptr_t	a = uintptr_t(vp) ;
-	int		rs = SR_BADFMT ;
-	if ((a & am) == 0) ylikely {
-	    rs = SR_OK ;
-	    free(vp) ;
+sysret_t umgr::stdfree(int,void *) noex {
+    	int		rs = SR_OK ;
+	errno = 0 ;
+	free(cp) ;
+	if (errno) {
+	    rs = (- errno) ;
 	}
 	return rs ;
 } /* end method (umgr::stdfree) */
+
+#define	RETVAL(name,cmd) 			\
+	({					\
+	    int rsl ;				\
+	    if ((rsl = name) == 0) {		\
+		rsl = get(cmd) ;		\
+	        name = rsl ;			\
+	    } ; rsl ;				\
+	})
+
+int valmgr::operator () (int cmd) noex {
+    	int		rs = SR_BUGCHECK;
+	switch (cmd) {
+	case valcmd.maxargs:
+	    rs = RETVAL(v.maxargslen,cmd) ;
+	    break ;
+	case valcmd.maxline:
+	    rs = RETVAL(v.maxlinelen,cmd) ;
+	    break ;
+	case valcmd.maxname:
+	    rs = RETVAL(v.maxnamelen,cmd) ;
+	    break ;
+	case valcmd.maxpath:
+	    rs = RETVAL(v.maxpathlen,cmd) ;
+	    break ;
+	case valcmd.maxnode:
+	    rs = RETVAL(v.maxnodelen,cmd) ;
+	    break ;
+	} /* end switch */
+	return rs ;
+} /* end method (valmgr::operator) */
+
+int valmgr::get(int cmd) noex {
+	return u_sysconfval(cmd,nullptr) ;
+} /* end method (valmgr::get) */
 
 
