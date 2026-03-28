@@ -49,25 +49,29 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
 #include	<new>
 #include	<initializer_list>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<vector>
 #include	<string>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<ascii.h>
 #include	<ansigr.h>
 #include	<buffer.h>
 #include	<termconseq.h>
-#include	<findbit.h>		/* for |flbsi(3dam)| */
 #include	<mkchar.h>
 #include	<strwcmp.h>
 #include	<localmisc.h>
 
 #include	"termout.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/flbs.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import flbs ;
 
 /* local defines */
 
@@ -134,7 +138,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::initializer_list ;		/* type */
 using std::basic_string ;		/* type */
 using std::string ;			/* type */
@@ -227,55 +230,52 @@ namespace {
 class termout_line {
 	cchar		*lbuf ;
 	int		llen ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int termout_ctor(termout *op,Args ... args) noex {
+local inline int termout_ctor(termout *op,Args ... args) noex {
     	TERMOUT		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termout_ctor) */
+} /* end subroutine (termout_ctor) */
 
-static int termout_dtor(termout *op) noex {
+local int termout_dtor(termout *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termout_dtor) */
+} /* end subroutine (termout_dtor) */
 
 template<typename ... Args>
-static int termout_magic(termout *op,Args ... args) noex {
+local int termout_magic(termout *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == TERMOUT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == TERMOUT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (termout_magic) */
+} /* end subroutine (termout_magic) */
 
-static int	termout_process(termout *,cchar *,int) noex ;
-static int	termout_loadline(termout *,int,int) noex ;
+local int	termout_process(termout *,cchar *,int) noex ;
+local int	termout_loadline(termout *,int,int) noex ;
 
-static int	termout_loadgr(termout *,ustring &,int,int) noex ;
-static int	termout_loadch(termout *,ustring &,int,int) noex ;
-static int	termout_loadcs(termout *,ustring &,int,cchar *,int) noex ;
+local int	termout_loadgr(termout *,ustring &,int,int) noex ;
+local int	termout_loadch(termout *,ustring &,int,int) noex ;
+local int	termout_loadcs(termout *,ustring &,int,cchar *,int) noex ;
 
-static int	gettermattr(cchar *,int) noex ;
-static bool	isspecial(SCH *,uchar,uchar) noex ;
+local int	gettermattr(cchar *,int) noex ;
+local bool	isspecial(SCH *,uchar,uchar) noex ;
 
 
 /* local variables */
 
-constexpr static termout_terminfo	terms[] = {
+constexpr termout_terminfo	terms[] = {
 	{ "sun", 0 },
 	{ "ansi", 0 },
 	{ "xterm", TA_MBASE },
@@ -299,7 +299,7 @@ constexpr static termout_terminfo	terms[] = {
 	{ nullptr, 0 }
 } ; /* end struct (termout_terminfo) */
 
-constexpr static termout_sch		specials[] = {
+constexpr termout_sch		specials[] = {
 	{ '1', '4', 0, UC('¼') },
 	{ '1', '2', 0, UC('½') },
 	{ '3', '4', 0, UC('¾') },
@@ -409,7 +409,7 @@ constexpr static termout_sch		specials[] = {
 
 /* exported subroutines */
 
-static int termout_starts(termout *) noex ;
+local int termout_starts(termout *) noex ;
 
 int termout_start(termout *op,cchar *tstr,int tlen,int ncols) noex {
 	int		rs ;
@@ -429,7 +429,7 @@ int termout_start(termout *op,cchar *tstr,int tlen,int ncols) noex {
 }
 /* end subroutine (termout_start) */
 
-static int termout_starts(termout *op) noex {
+local int termout_starts(termout *op) noex {
     	typedef		vector<ustring>	vecus ;
 	cnullptr	np{} ;
     	int		rs = SR_NOMEM ;
@@ -440,7 +440,7 @@ static int termout_starts(termout *op) noex {
 	    	if ((lvp = new(nothrow) vecus) != np) {
 		    rs = SR_OK ;
 		    op->lvp = voidp(lvp) ;
-	            op->magic = TERMOUT_MAGIC ;
+	            op->magval = TERMOUT_MAGIC ;
 	        } /* end if (new-vector<ustring>) */
 		if (rs < 0) {
 		    delete lvp ;
@@ -473,7 +473,7 @@ int termout_finish(termout *op) noex {
 		rs1 = termout_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -493,10 +493,10 @@ int termout_load(termout *op,cchar *sbuf,int slen) noex {
 
 int termout_getline(termout *op,int i,cchar **lpp) noex {
     	typedef		vector<ustring>	vecus ;
+	cnullptr	np{} ;
 	int		rs ;
 	int		ll = 0 ;
 	if ((rs = termout_magic(op,lpp)) >= 0) {
-	    cnullptr	np{} ;
 	    rs = SR_BUGCHECK ;
 	    if (vecus *lvp = (vecus *) op->lvp ; lvp != np) {
 	        csize	ui = size_t(i) ;
@@ -516,7 +516,7 @@ int termout_getline(termout *op,int i,cchar **lpp) noex {
 
 /* private subroutines */
 
-static int termout_process(termout *op,cchar *sbuf,int slen) noex {
+local int termout_process(termout *op,cchar *sbuf,int slen) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	int		rs = SR_OK ;
 	int		ch ;
@@ -629,7 +629,7 @@ static int termout_process(termout *op,cchar *sbuf,int slen) noex {
 }
 /* end subroutine (termout_process) */
 
-static int termout_loadline(termout *op,int ln,int nmax) noex {
+local int termout_loadline(termout *op,int ln,int nmax) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	vector<ustring>	*lvp = (vector<ustring> *) op->lvp ;
 	int		rs = SR_OK ;
@@ -667,7 +667,7 @@ static int termout_loadline(termout *op,int ln,int nmax) noex {
 }
 /* end subroutine (termout_loadline) */
 
-static int termout_loadgr(termout *op,ustring &line,int pgr,int gr) noex {
+local int termout_loadgr(termout *op,ustring &line,int pgr,int gr) noex {
 	cint		grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
 	int		rs = SR_OK ;
 	int		n ;
@@ -749,7 +749,7 @@ static int termout_loadgr(termout *op,ustring &line,int pgr,int gr) noex {
 }
 /* end subroutine (termout_loadgr) */
 
-static int termout_loadcs(termout *op,ustring &line,int n,cc *pp,int pl) noex {
+local int termout_loadcs(termout *op,ustring &line,int n,cc *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (op) {
@@ -796,7 +796,7 @@ static int termout_loadcs(termout *op,ustring &line,int n,cc *pp,int pl) noex {
 }
 /* end subroutine (termout_loadcs) */
 
-static int termout_loadch(termout *op,ustring &line,int ft,int ch) noex {
+local int termout_loadch(termout *op,ustring &line,int ft,int ch) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (op) {
@@ -833,7 +833,7 @@ static int termout_loadch(termout *op,ustring &line,int ft,int ch) noex {
 }
 /* end subroutine (termout_loadch) */
 
-static int gettermattr(cchar *tstr,int tlen) noex {
+local int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
 	if (tstr != nullptr) {
 	    if (tlen < 0) tlen = lenstr(tstr) ;
@@ -849,7 +849,7 @@ static int gettermattr(cchar *tstr,int tlen) noex {
 }
 /* end subroutine (gettermattr) */
 
-static bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
+local bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
 	int		i ; /* used-afterwards */
 	bool		f = false ; /* return-value */
 	for (i = 0 ; specials[i].ch1 > 0 ; i += 1) {
