@@ -35,18 +35,18 @@
 
 struct querystr_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct querystr_flags {
 	uint		packer:1 ;
-} ;
+} ; /* end struct */
 
 struct querystr_head {
 	strpack		*spp ;
 	cchar		*(*kv)[2] ;
 	QUERYSTR_FL	open ;
 	int		n ;
-} ;
+} ; /* end struct */
 
 typedef QUERYSTR	querystr ;
 typedef QUERYSTR_FL	querystr_fl ;
