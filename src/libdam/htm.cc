@@ -26,13 +26,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
 #include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<shio.h>
 #include	<sbuf.h>
 #include	<buffer.h>
@@ -44,6 +46,9 @@
 
 #include	"htm.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -60,19 +65,19 @@
 /* forward references */
 
 template<typename ... Args>
-static int htm_ctor(htm *op,Args ... args) noex {
+local int htm_ctor(htm *op,Args ... args) noex {
     	HTM		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (htm_ctor) */
 
-static int htm_dtor(htm *op) noex {
+local int htm_dtor(htm *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -82,16 +87,16 @@ static int htm_dtor(htm *op) noex {
 template<typename ... Args>
 static inline int htm_magic(htm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == HTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
 /* end subroutine (htm_magic) */
 
-static int	htm_tagalone(htm *,cchar *,cchar *,cchar *) noex ;
-static int	htm_printout(htm *,int,cchar *,int) noex ;
-static int	htm_wrfile(htm *,cchar *) noex ;
+local int	htm_tagalone(htm *,cchar *,cchar *,cchar *) noex ;
+local int	htm_printout(htm *,int,cchar *,int) noex ;
+local int	htm_wrfile(htm *,cchar *) noex ;
 
 
 /* local variables */
@@ -110,7 +115,7 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 	    op->ofp = ofp ;
 	    if ((rs = shio_print(op->ofp,"<!doctype html>",-1)) >= 0) {
 	        wlen += rs ;
-	        if (char *lp{} ; (rs = malloc_ml(&lp)) >= 0) {
+	        if (char *lp{} ; (rs = lm_ml(&lp)) >= 0) {
 		    cint	ll = rs ;
 		    cchar	*fmt ;
 		    op->lbuf = lp ;
@@ -129,7 +134,7 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 		        }
 	            }
 		    if (rs < 0) {
-		        rs1 = uc_free(op->lbuf) ;
+		        rs1 = lm_free(op->lbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 			op->lbuf = nullptr ;
 			op->llen = 0 ;
@@ -157,7 +162,7 @@ int htm_finish(htm *op) noex {
 		op->wlen += wlen ;
 	    }
 	    if (op->lbuf) {
-		rs1 = uc_free(op->lbuf) ;
+		rs1 = lm_free(op->lbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -332,7 +337,7 @@ int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 	    kvsize += (6*(2*szof(cchar *))) ;
 	    bsz += kvsize ;
 	    bsz += ((dlen+1)*2) ;
-	    if (void *vp{} ; (rs = uc_malloc(bsz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(bsz,&vp)) >= 0) {
 	        cchar	*(*kv)[2] ;
 	        char	*bp = charp(vp) ;
 	        char	*d0, *d1 ;
@@ -368,7 +373,7 @@ int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 	                rs = htm_tagbegin(op,tag,eclass,id,kv) ;
 	            } /* end if (ctdeci) */
 	        } /* end if (ctdeci) */
-	        rs1 = uc_free(vp) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
@@ -624,7 +629,7 @@ int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
                             rs = shio_print(op->ofp,op->lbuf,rs) ;
                             wlen += rs ;
                         }
-                    }
+                    } /* end if (ok) */
                     rs1 = b.finish ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (sbuf) */
@@ -634,7 +639,7 @@ int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
 }
 /* end subroutine (htm_tagalone) */
 
-static int htm_printout(htm *op,int c,cchar *bp,int bl) noex {
+local int htm_printout(htm *op,int c,cchar *bp,int bl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -659,7 +664,7 @@ static int htm_printout(htm *op,int c,cchar *bp,int bl) noex {
 }
 /* end subroutine (htm_printout) */
 
-static int htm_wrfile(htm *op,cchar *cfname) noex {
+local int htm_wrfile(htm *op,cchar *cfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
