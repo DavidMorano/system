@@ -49,11 +49,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
-#include	<mallocstuff.h>
 #include	<svcfile.h>
 #include	<vecstr.h>
 #include	<mkpathx.h>
@@ -64,7 +64,9 @@
 
 #include	"pdb.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -78,9 +80,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -88,6 +87,10 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
 
 
 /* external variables */
@@ -100,7 +103,7 @@ namespace {
 	int	maxpathlen ;
 	int mkvars() noex ;
     } ; /* end if (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -109,7 +112,7 @@ template<typename ... Args>
 static int pdb_ctor(pdb *op,Args ... args) noex {
     	PDB		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -118,7 +121,7 @@ static int pdb_ctor(pdb *op,Args ... args) noex {
 
 static int pdb_dtor(pdb *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -128,7 +131,7 @@ static int pdb_dtor(pdb *op) noex {
 template<typename ... Args>
 static inline int pdb_magic(pdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == PDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -154,7 +157,7 @@ constexpr cpcchar	dbsched[] = {
 	"%n.%f",
 	"%f",
 	nullptr
-} ;
+} ; /* end array */
 
 static vars		var ;
 
@@ -166,17 +169,17 @@ static vars		var ;
 
 int pdb_open(pdb *op,cchar *pr,cchar *ur,cchar *uname,cchar *fname) noex {
 	int		rs ;
-	if ((rs = pdb_ctor(op,pr,ur,uname,fname)) >= 0) {
+	if ((rs = pdb_ctor(op,pr,ur,uname,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 		static cint	rsv = var.mkvars() ;
-		if ((rs = rsv) >= 0) {
+		if ((rs = rsv) >= 0) ylikely {
 	            int		sz = 0 ;
 	            sz += (lenstr(pr)+1) ;
 	            sz += (lenstr(ur)+1) ;
 	            sz += (lenstr(uname)+1) ;
 	            sz += (lenstr(fname)+1) ;
-	            if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	            if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
 	                op->a = bp ;
 	                op->pr = bp ;
 	                bp = (strwcpy(bp,pr,-1)+1) ;
@@ -201,15 +204,15 @@ int pdb_open(pdb *op,cchar *pr,cchar *ur,cchar *uname,cchar *fname) noex {
 int pdb_close(pdb *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pdb_magic(op)) >= 0) {
+	if ((rs = pdb_magic(op)) >= 0) ylikely {
 	    /* close out the DBs */
 	    for (int w = 0 ; w < pdb_overlast ; w += 1) {
 	       rs1 = pdb_dbclose(op,w) ;
 	       if (rs >= 0) rs = rs1 ;
 	    }
 	    /* free everything else */
-	    if (op->a) {
-	        rs1 = uc_free(op->a) ;
+	    if (op->a) ylikely {
+	        rs1 = lm_free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
 	    }
@@ -226,7 +229,7 @@ int pdb_close(pdb *op) noex {
 int pdb_fetch(pdb *op,char *vbuf,int vlen,cchar *printer,cchar *key) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	if ((rs = pdb_magic(op,vbuf,printer,key)) >= 0) {
+	if ((rs = pdb_magic(op,vbuf,printer,key)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (printer[0] && key[0]) {
 	        int	w = pdb_local ;
@@ -265,7 +268,7 @@ int pdb_fetcher(pdb *op,char *vbuf,int vlen,cchar *printer,
     	cint		rso = SR_OVERFLOW ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pdb_magic(op,vbuf,printer,key)) >= 0) {
+	if ((rs = pdb_magic(op,vbuf,printer,key)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (w < pdb_overlast) {
 	        pdb_db	*dbp = (op->dbs + w) ;
@@ -275,7 +278,7 @@ int pdb_fetcher(pdb *op,char *vbuf,int vlen,cchar *printer,
 	        if (rs >= 0) {
 		    cint	slen = (NBUF * var.maxpathlen) ;
 		    char	*sbuf{} ; 
-		    if ((rs = uc_malloc((slen + 1),&sbuf)) >= 0) {
+		    if ((rs = lm_mall((slen + 1),&sbuf)) >= 0) {
 	                svcfile		*sfp = dbp->sfp ;
 	                auto		sv_cb = svcfile_curbegin ;
 	                if (svcfile_cur cur ; (rs = sv_cb(sfp,&cur)) >= 0) {
@@ -297,7 +300,8 @@ int pdb_fetcher(pdb *op,char *vbuf,int vlen,cchar *printer,
 	                    rs1 = svcfile_curend(dbp->sfp,&cur) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (DB is open) */
-		    	rs = rsfree(rs,sbuf) ;
+		    	rs1 = lm_free(sbuf) ;
+			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	        } /* end if (ok) */
 	    } /* end if (valid) */
@@ -308,20 +312,22 @@ int pdb_fetcher(pdb *op,char *vbuf,int vlen,cchar *printer,
 
 static int pdb_dbopen(pdb *op,int w) noex {
     	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	pdb_db		*dbp = (op->dbs + w) ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if (op->dt == 0) op->dt = getustime ;
 	if (! dbp->f_open) {
 	    cint	intfind = intsat(op->dt - dbp->ti_find) ;
 	    /* do not try to open if already tried */
 	    if (intfind >= PDB_TOFIND) {
-	        if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
+	        if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
 	            dbp->ti_find = op->dt ;
 	            /* try to open the DB file */
 	            dbuf[0] = '\0' ;
 	            if ((rs = pdb_findfile(op,dbuf,w)) >= 0) {
 	                if (dbuf[0] != '\0') {
-			    if ((dbp->sfp = new(nothrow) svcfile) != np) {
+			    if ((dbp->sfp = new(nt) svcfile) != np) {
 	                        if ((rs = svcfile_open(dbp->sfp,dbuf)) >= 0) {
 	    	                    dbp->f_open = true ;
 	                            dbp->ti_open = op->dt ;
@@ -333,10 +339,11 @@ static int pdb_dbopen(pdb *op,int w) noex {
 			    } /* end if (new-svcfile) */
 			} /* end if (have filename) */
 	            } /* end if (trying to open) */
-	    	    rs = rsfree(rs,dbuf) ;
+	    	    rs1 = lm_free(dbuf) ;
+		    if (rs >= 0) rs = rs1 ;
 		    if (rs < 0) {	
 			pdb_dbclose(op,w) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (m-a-f) */
 	    } else {
 	        rs = SR_NOENT ;
@@ -436,7 +443,7 @@ static int pdb_dbcheck(pdb *op,int w) noex {
 
 int vars::mkvars() noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	} /* end if (getbufsize) */
     	return rs ;
