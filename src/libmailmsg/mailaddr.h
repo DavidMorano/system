@@ -21,30 +21,20 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<ematypes.h>
 
 
 /* mail-address types */
 #define	MAILADDRTYPE_NOHOST	-1
-#define	MAILADDRTYPE_LOCAL	0
-#define	MAILADDRTYPE_UUCP	1
-#define	MAILADDRTYPE_ARPA	2
-#define	MAILADDRTYPE_ARPAROUTE	3
+#define	MAILADDRTYPE_LOCAL	ematype_local
+#define	MAILADDRTYPE_UUCP	ematype_uucp
+#define	MAILADDRTYPE_ARPA	ematype_arpa
+#define	MAILADDRTYPE_ARPAROUTE	ematype_arparoute
 /* special token to indicate a local address */
 #define	MAILADDR_LOCALHOST	"*LOCAL*"
 #define	LOCALHOSTPART		"*LOCAL*"
 
-
-enum mailaddrs {
-	mailaddrtype_local,
-	mailaddrtype_uucp,
-	mailaddrtype_arpa,
-	mailaddrtype_arparoute,
-	mailaddrtype_overlast
-} ;
 
 EXTERNC_begin
 
