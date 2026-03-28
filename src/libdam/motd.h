@@ -16,10 +16,7 @@
 #include	<sys/types.h>		/* system types */
 #include	<sys/param.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ptm.h>
 #include	<lockrw.h>
 #include	<paramfile.h>
@@ -40,7 +37,7 @@ struct motd_ident {
 	cchar		*username ;
 	uid_t		uid ;
 	gid_t		gid ;
-} ;
+} ; /* end struct */
 
 struct motd_mapper {
 	lockrw		rwm ;
@@ -50,17 +47,17 @@ struct motd_mapper {
 	time_t		ti_mtime ;
 	time_t		ti_check ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct motd_flags {
 	uint		ufind:1 ;
-} ;
+} ; /* end struct */
 
 struct motd_head {
 	MOTD_MR		mapper ;
 	ptm		*mxp ;		/* this is for all of the data */
 	finduid		*ufp ;
-	mainv		envv ;
+	ccharpp		envv ;
 	cchar		*pr ;
 	cchar		*fe ;		/* file-ending */
 	time_t		ti_lastcheck ;
@@ -68,7 +65,7 @@ struct motd_head {
 	uint		magic ;
 	int		nmaps ;
 	int		nenv ;
-} ;
+} ; /* end struct */
 
 typedef	MOTD		motd ;
 typedef	MOTD_FL		motd_fl ;
