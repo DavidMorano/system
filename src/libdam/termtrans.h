@@ -38,7 +38,7 @@
 
 struct termtrans_flags {
 	uint		dummy:1 ;
-} ;
+} ; /* end struct */
 
 struct termtrans_head {
     	cchar		*pr ;
@@ -49,7 +49,7 @@ struct termtrans_head {
 	uint		magic ;
 	uint		termattr ;	/* mask of terminal attributes */
 	int		ncols ;		/* terminal columns */
-} ;
+} ; /* end struct */
 
 typedef TERMTRANS	termtrans ;
 typedef TERMTRANS_FL	termtrans_fl ;
