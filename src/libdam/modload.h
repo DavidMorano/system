@@ -42,11 +42,11 @@ enum modloados {
 #ifdef	__cplusplus
 
 struct modloadms {
-    	constexpr static cint	libvar		= (1 << modloado_libvar) ;
-    	constexpr static cint	libprs		= (1 << modloado_libprs) ;
-    	constexpr static cint	libsdirs	= (1 << modloado_libsdirs) ;
-    	constexpr static cint	avail		= (1 << modloado_avail) ;
-    	constexpr static cint	self		= (1 << modloado_self) ;
+    	inline static cint	libvar		= (1 << modloado_libvar) ;
+    	inline static cint	libprs		= (1 << modloado_libprs) ;
+    	inline static cint	libsdirs	= (1 << modloado_libsdirs) ;
+    	inline static cint	avail		= (1 << modloado_avail) ;
+    	inline static cint	self		= (1 << modloado_self) ;
 } ; /* end structenum (modloadms) */
 
 #endif /* __cplusplus */
