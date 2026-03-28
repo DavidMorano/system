@@ -15,7 +15,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>		/* system types */
-#include	<usystem.h>		/* for |ino_t| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<filer.h>
 #include	<dater.h>
 
@@ -32,17 +33,17 @@ struct useraccdb_entry {
 	cchar		*name ;
 	time_t		atime ;
 	uint		count ;
-} ;
+} ; /* end struct */
 
 struct useraccdb_cursor {
 	filer		*fbp ;		/* file-buffer-pointer */
 	off_t		eo ;		/* enumeration offset */
-} ;
+} ; /* end struct */
 
 struct useraccdb_flags {
 	uint		locked:1 ;
 	uint		dater:1 ;
-} ;
+} ; /* end struct */
 
 struct useraccdb_head {
 	dater		*dmp ;		/* dater-manager-pointer */
@@ -55,7 +56,7 @@ struct useraccdb_head {
 	USERACCDB_FL	fl ;
 	uint		magic ;
 	int		fd ;
-} ;
+} ; /* end struct */
 
 typedef	USERACCDB	useraccdb ;
 typedef	USERACCDB_FL	useraccdb_fl ;
