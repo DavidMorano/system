@@ -138,7 +138,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -161,7 +160,7 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static inline int logzones_magic(logzones *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LOGZONES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -202,10 +201,10 @@ constexpr bool		f_creat = CF_CREAT ;
 int logzones_open(LZ *op,cchar *fname,int of,mode_t om) noex {
     	LOGZONES	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && fname) {
+	if (op && fname) ylikely {
 	    rs = SR_INVALID ;
 	    memclear(hop) ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        op->fd = -1 ;
 	        if_constexpr (f_creat) {
 	            of |= O_CREAT ;
@@ -685,7 +684,7 @@ static int logzones_enteropen(LZ *op,time_t dt) noex {
 
 static int entry_start(LZ_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
 	int		rs = SR_FAULT ;
-	if (ep && znb) {
+	if (ep && znb) ylikely {
 	    cint	ml = min(znl,LOGZONES_ZNAMESIZE) ;
 	    rs = SR_OK ;
 	    ep->count = 0 ;
@@ -704,7 +703,7 @@ static int entry_start(LZ_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
 
 static int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 	int		rs = SR_FAULT ;
-	if (ep && ebuf) {
+	if (ep && ebuf) ylikely {
 	    rs = SR_INVALID ;
 	    if (elen < 0) elen = INT_MAX ;
 	    if (elen >= (EFO_OVERLAST - 1)) {
@@ -750,7 +749,7 @@ static int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 
 static int entry_update(LZ_ENT *ep,cchar *st) noex {
 	int		rs = SR_FAULT ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
 	    ep->count += 1 ;
 	    if (st) {
@@ -765,7 +764,7 @@ static int entry_update(LZ_ENT *ep,cchar *st) noex {
 
 static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
 	int		rs = SR_FAULT ;
-	if (ep && ebuf) {
+	if (ep && ebuf) ylikely {
 	    cint	clen = EFL_COUNT ;
 	    char	cbuf[EFL_COUNT + 1] ;
 	    rs = SR_OVERFLOW ;
@@ -835,7 +834,7 @@ static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
 
 static int entry_finish(LZ_ENT *ep) noex {
 	int		rs = SR_FAULT ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
