@@ -39,7 +39,7 @@ enum pdbs {
 	pdb_local,
 	pdb_system,
 	pdb_overlast
-} ;
+} ; /* end enum */
 
 struct pdb_dbase {
 	svcfile		*sfp ;
@@ -48,18 +48,18 @@ struct pdb_dbase {
 	time_t		ti_open ;
 	time_t		ti_mtime ;
 	uint		f_open:1 ;
-} ;
+} ; /* end struct */
 
 struct pdb_head {
-	cchar		*a ;		/* memory allocation */
 	cchar		*pr ;		/* root program */
 	cchar		*ur ;		/* root root */
 	cchar		*uname ;	/* username */
 	cchar		*fname ;
+	char		*a ;		/* memory allocation */
 	PDB_DB		dbs[pdb_overlast] ;
 	time_t		dt ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 typedef	PDB		pdb ;
 typedef	PDB_DB		pdb_db ;
