@@ -34,6 +34,9 @@
 #include	<usyscalls.h>
 #include	<usupport.h>
 #include	<ulogerror.h>
+#include	<six.h>			/* LIBUC */
+#include	<getourenv.h>		/* LIBUC */
+#include	<shellunder.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"prognamevar.hh"
@@ -50,7 +53,6 @@ import ureserve ;			/* |sfbasename(3u)| */
 /* imported namespaces */
 
 using libu::strwcpy ;			/* subroutine */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -76,9 +78,34 @@ using std::nothrow ;			/* constant */
 
 /* exported subroutines */
 
-void prognamevar::proc(cchar *pp,int pl) noex {
-    sl = sfbasename(pp,pl,&sp) ;
+bool prognamevar::proc(cchar *pp,int pl) noex {
+    	bool		f = false ;
+        if ((sl = sfbasename(pp,pl,&sp)) > 0) {
+            if (cint si = sirchr(sp,sl,'.') ; si > 0) {
+	        sl = si ;
+		f = true ;
+	    } else if (si < 0) {
+		sl = pl ;
+		f = true ;
+	    }
+        } /* end if (sfbasename) */
+	return f ;
 } /* end method (prognamevar::proc) */
+
+bool prognamevar::procenv(mainv envv) noex {
+    	bool		f = false ;
+	if (envv) {
+	    if (cchar *valp = getourenv(envv,"_") ; valp) {
+		int rs{} ;
+		if (shellunder_dat d ; (rs = shellunder_load(&d,valp)) >= 0) {
+		    f = proc(d.execname) ;
+		} else if (rs < 0) {
+		    ulogerror("prognamevar",rs,"shellunder") ;
+		}
+	    } /* end if (getourenv) */
+	} /* end if (non-null) */
+	return f ;
+} /* end method (prognamevar::procenv) */
 
 prognamevar::operator ccharp () noex {
     	cnullptr	np{} ;
@@ -91,7 +118,8 @@ prognamevar::operator ccharp () noex {
 			strwcpy(as,sp,sl) ;
 			rp = as ;
 		    } else {
-			ulogerror("prognamevar",SR_NOMEM,"mem-alloc failure") ;
+			cint rsnomem = SR_NOMEM ;
+			ulogerror("prognamevar",rsnomem,"mem-alloc failure") ;
 			rp = "«mem-alloc-failure»" ;
 		    }
 	        } else {
