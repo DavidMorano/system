@@ -42,9 +42,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocstuff.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<absfn.h>
 #include	<hdbstr.h>
 #include	<strwcpy.h>
@@ -53,7 +54,9 @@
 
 #include	"nodesearch.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -66,9 +69,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -91,10 +91,10 @@ static int nodesearch_ctor(NS *op,Args ... args) noex {
     	NODESEARCH	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->nfp = new(nothrow) nodesfile) != np) {
+	    if ((op->nfp = new(nothrow) nodesfile) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-nodesfile) */
 	} /* end if (non-null) */
@@ -104,9 +104,9 @@ static int nodesearch_ctor(NS *op,Args ... args) noex {
 
 static int nodesearch_dtor(NS *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->nfp) {
+	    if (op->nfp) ylikely {
 		delete op->nfp ;
 		op->nfp = nullptr ;
 	    }
@@ -118,7 +118,7 @@ static int nodesearch_dtor(NS *op) noex {
 template<typename ... Args>
 static inline int nodesearch_magic(NS *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == NODESEARCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -139,7 +139,6 @@ static int	nodesearch_filechanged(NS *,time_t) noex ;
 /* exported subroutines */
 
 int nodesearch_open(NS *op,cc *fname,int fsz) noex {
-    	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = nodesearch_ctor(op,fname)) >= 0) {
@@ -147,8 +146,10 @@ int nodesearch_open(NS *op,cc *fname,int fsz) noex {
 	    if (fname[0]) {
 		cchar	*fn{} ;
 		if (absfn af ; (rs = af.start(fname,-1,&fn)) >= 0) {
-		    if (rs = SR_NOMEM ; (op->fi.fn = mallocstr(fn)) != np) {
-		        if (USTAT sb ; (rs = u_stat(op->fi.fn,&sb)) >= 0) {
+		    rs = SR_NOMEM ;
+		    if (cc *cp ; (rs = lm_strw(fn,-1,&cp)) >= 0) {
+		        op->fi.fn = cp ;
+		        if (ustat sb ; (rs = u_stat(op->fi.fn,&sb)) >= 0) {
 	    		    rs = SR_ISDIR ;
 			    if (! S_ISDIR(sb.st_mode)) {
 			        nodesfile	*nfp = op->nfp ;
@@ -159,7 +160,8 @@ int nodesearch_open(NS *op,cc *fname,int fsz) noex {
 		        } /* end if (stat) */
 		        if (rs < 0) {
 			    if (op->fi.fn) {
-	    		        uc_free(op->fi.fn) ;
+				void *vp = voidp(op->fi.fn) ;
+	    		        lm_free(vp) ;
 	    		        op->fi.fn = nullptr ;
 			    }
 		        } /* end if (error-handling) */
@@ -185,7 +187,8 @@ int nodesearch_close(NS *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->fi.fn) {
-	        rs1 = uc_free(op->fi.fn) ;
+		void *vp = voidp(op->fi.fn) ;
+		rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fi.fn = nullptr ;
 	    }
@@ -229,11 +232,11 @@ int nodesearch_curbegin(NS *op,NS_CUR *curp) noex {
 	int		rs ;
 	if ((rs = nodesearch_magic(op,curp)) >= 0) {
 	    cint	osz = szof(nodesfile_cur) ;
-	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) {
 		curp->nfcp = (nodesfile_cur *) vp ;
 	        rs = nodesfile_curbegin(op->nfp,curp->nfcp) ;
 	        if (rs < 0) {
-		    uc_free(curp->nfcp) ;
+		    lm_free(curp->nfcp) ;
 		    curp->nfcp = nullptr ;
 		}
 	    } /* end if (memory-allocatiob) */
@@ -254,7 +257,7 @@ int nodesearch_curend(NS *op,NS_CUR *curp) noex {
 		    if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-		    rs1 = uc_free(curp->nfcp) ;
+		    rs1 = lm_free(curp->nfcp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    curp->nfcp = nullptr ;
 	        }
@@ -283,7 +286,7 @@ int nodesearch_curenum(NS *op,NS_CUR *curp,char *rbuf,int rlen) noex {
 static int nodesearch_filechanged(NS *op,time_t daytime) noex {
 	int		rs ;
 	int		f = false ;
-	if (USTAT sb ; (rs = u_stat(op->fi.fn,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(op->fi.fn,&sb)) >= 0) {
 	    f = (op->fi.mtime > sb.st_mtime) ;
 	    f = f || (op->fi.ino != sb.st_ino) ;
 	    f = f || (op->fi.dev != sb.st_dev) ;
