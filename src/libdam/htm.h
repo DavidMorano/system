@@ -35,7 +35,7 @@
 
 struct htm_flags {
 	uint		dummy:1 ;
-} ;
+} ; /* end struct */
 
 struct htm_head {
 	shio		*ofp ;
@@ -44,7 +44,7 @@ struct htm_head {
 	uint		magic ;
 	int		llen ;
 	int		wlen ;
-} ;
+} ; /* end struct */
 
 typedef	HTM		htm ;
 typedef	HTM_FL		htm_fl ;
