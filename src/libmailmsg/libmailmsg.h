@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 #include	<mailmsghdrx.h>		/* composite group */
 #include	<mailmsgmatx.h>		/* composite group */
@@ -43,7 +40,6 @@
 #include	<hdrx.h>		/* composite group */
 #include	<contentencodings.h>
 #include	<contypevals.h>
-#include	<headkeymat.h>
 #include	<whitelist.h>
 #include	<splitaddr.h>
 #include	<stackaddr.h>
@@ -55,6 +51,8 @@
 #include	<lkcmail.hh>
 
 #include	<envmat.h>
+#include	<headkeymat.h>
+#include	<mailaddr.h>
 
 
 EXTERNC_begin
