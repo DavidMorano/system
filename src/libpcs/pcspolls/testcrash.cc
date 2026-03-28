@@ -26,9 +26,9 @@
 	Synopsis:
 	int testcrash_start(op,pr,sn,envv,pcp)
 	PCSPOLLS	*op ;
-	const char	*pr ;
-	const char	*sn ;
-	const char	**envv ;
+	cchar	*pr ;
+	cchar	*sn ;
+	cchar	**envv ;
 	PCSCONF		*pcp ;
 
 	Arguments:
@@ -45,15 +45,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<pcsconf.h>
 #include	<storebuf.h>
@@ -65,6 +65,9 @@
 #include	"pcspolls.h"
 #include	"thrbase.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -80,21 +83,6 @@
 
 
 /* external subroutines */
-
-extern int	pathadd(char *,int,cchar *) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
-extern int	hasNotDots(cchar *,int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -116,9 +104,9 @@ struct testcrash_head {
 
 struct work_args {
 	TESTCRASH	*op ;
-	const char	*pr ;
-	const char	*sn ;
-	const char	**envv ;
+	cchar	*pr ;
+	cchar	*sn ;
+	cchar	**envv ;
 	PCSCONF		*pcp ;
 } ;
 
@@ -143,16 +131,16 @@ enum cmds {
 
 /* forward references */
 
-static int workargs_load(WORKARGS *,TESTCRASH *,
-		cchar *,cchar *,cchar **,PCSCONF *) ;
+local int workargs_load(WORKARGS *,TESTCRASH *,
+		cchar *,cchar *,cchar **,PCSCONF *) noex ;
 
-static int	worker(THRBASE *,WORKARGS *) ;
+local int	worker(THRBASE *,WORKARGS *) noex ;
 
-static int work_start(WORK *,THRBASE *,WORKARGS *) ;
-static int work_term(WORK *) ;
-static int work_finish(WORK *) ;
+local int work_start(WORK *,THRBASE *,WORKARGS *) noex ;
+local int work_term(WORK *) noex ;
+local int work_finish(WORK *) noex ;
 
-static int mklogentry(cchar *,cchar *,cchar **,PCSCONF *) ;
+local int mklogentry(cchar *,cchar *,cchar **,PCSCONF *) noex ;
 
 
 /* local variables */
@@ -162,22 +150,20 @@ static int mklogentry(cchar *,cchar *,cchar **,PCSCONF *) ;
 
 PCSPOLLS_NAME	testcrash = {
 	"testcrash",
-	sizeof(TESTCRASH),
+	szof(TESTCRASH),
 	0
 } ;
 
 
 /* exported subroutines */
 
-
-int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,cchar **envv,
-		PCSCONF *pcp)
-{
+int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,mainv envv,
+		PCSCONF *pcp) noex {
 	WORKARGS	*wap ;
-	const int	wsize = sizeof(WORKARGS) ;
+	cint	wsz = szof(WORKARGS) ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("testcrash_start: entered\n") ;
@@ -185,9 +171,9 @@ int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,cchar **envv,
 	debugprintf("testcrash_start: sn=%s\n",sn) ;
 #endif
 
-	memset(op,0,sizeof(TESTCRASH)) ;
+	memclear(op) ;
 
-	if ((rs = uc_malloc(wsize,&wap)) >= 0) {
+	if ((rs = uc_malloc(wsz,&wap)) >= 0) {
 	    int	(*thr)(THRBASE *,void *) = (int (*)(THRBASE *,void *)) worker ;
 	    workargs_load(wap,op,pr,sn,envv,pcp) ;
 	    if ((rs = thrbase_start(&op->t,thr,wap)) >= 0) {
@@ -197,7 +183,7 @@ int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,cchar **envv,
 	    }
 	    if (rs < 0) {
 	        uc_free(wap) ;
-		op->wap = NULL ;
+		op->wap = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 
@@ -209,13 +195,11 @@ int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,cchar **envv,
 }
 /* end subroutine (testcrash_start) */
 
-
-int testcrash_finish(TESTCRASH *op)
-{
+int testcrash_finish(TESTCRASH *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != TESTCRASH_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
@@ -227,11 +211,10 @@ int testcrash_finish(TESTCRASH *op)
 	    rs1 = thrbase_finish(&op->t) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-	if (op->wap != NULL) {
+	if (op->wap) {
 	    rs1 = uc_free(op->wap) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->wap = NULL ;
+	    op->wap = nullptr ;
 	}
 
 #if	CF_DEBUGS
@@ -246,11 +229,9 @@ int testcrash_finish(TESTCRASH *op)
 
 /* private subroutines */
 
-
-static int workargs_load(WORKARGS *wap,TESTCRASH *op,cchar *pr,cchar *sn,
-		cchar **envv,PCSCONF *pcp)
-{
-	memset(wap,0,sizeof(WORKARGS)) ;
+local int workargs_load(WORKARGS *wap,TESTCRASH *op,cchar *pr,cchar *sn,
+		mainv envv,PCSCONF *pcp) noex {
+	memclear(wap) ;
 	wap->op = op ;
 	wap->pr = pr ;
 	wap->sn = sn ;
@@ -260,11 +241,9 @@ static int workargs_load(WORKARGS *wap,TESTCRASH *op,cchar *pr,cchar *sn,
 }
 /* end subroutine (workargs_load) */
 
-
-static int worker(THRBASE *tip,WORKARGS *wap)
-{
+local int worker(THRBASE *tip,WORKARGS *wap) noex {
 	WORK		w ;
-	const int	to = 1 ;
+	cint	to = 1 ;
 	int		rs ;
 	int		ctime = 0 ;
 	int		f_exit = FALSE ;
@@ -277,7 +256,7 @@ static int worker(THRBASE *tip,WORKARGS *wap)
 	if ((rs = work_start(&w,tip,wap)) >= 0) {
 
 	    while ((rs = thrbase_cmdrecv(tip,to)) >= 0) {
-		const int	cmd = rs ;
+		cint	cmd = rs ;
 
 	        switch (cmd) {
 		case cmd_noop:
@@ -310,17 +289,15 @@ static int worker(THRBASE *tip,WORKARGS *wap)
 }
 /* end subroutine (worker) */
 
-
-static int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap)
-{
+local int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*pr ;
 	cchar		*sn ;
 
-	if (wp == NULL) return SR_FAULT ;
+	if (wp == nullptr) return SR_FAULT ;
 
-	memset(wp,0,sizeof(WORK)) ;
+	memclear(wp) ;
 	wp->tip = tip ;
 	wp->wap = wap ;
 
@@ -333,9 +310,9 @@ static int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap)
 #endif
 
 #if	CF_ENABLED
-	if (pr != NULL) {
+	if (pr != nullptr) {
 	    PCSCONF	*pcp = wap->pcp ;
-	    const char	**envv = wap->envv ;
+	    cchar	**envv = wap->envv ;
 	    rs = mklogentry(pr,sn,envv,pcp) ;
 	    c = rs ;
 	}
@@ -349,25 +326,18 @@ static int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap)
 }
 /* end subroutine (work_start) */
 
-
-static int work_finish(WORK *wp)
-{
+local int work_finish(WORK *wp) noex {
 	int	rs = SR_OK ;
-
-	if (wp == NULL) return SR_FAULT ;
-
+	if (wp == nullptr) return SR_FAULT ;
 #if	CF_DEBUGS
 	debugprintf("testcrash/work_finish: ret rs=%d\n",rs) ;
 #endif
-
 	return rs ;
 }
 /* end subroutine (work_finish) */
 
-
-static int work_term(WORK *wp)
-{
-	if (wp == NULL) return SR_FAULT ;
+local int work_term(WORK *wp) noex {
+	if (wp == nullptr) return SR_FAULT ;
 #if	CF_DEBUGS
 	debugprintf("testcrash/work_term: entered\n") ;
 #endif
@@ -375,24 +345,21 @@ static int work_term(WORK *wp)
 }
 /* end subroutine (work_term) */
 
-
-static int mklogentry(cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp)
-{
+local int mklogentry(cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	const char	*lcname = TESTCRASH_LCNAME ;
-	const char	*lbname = TESTCRASH_LBNAME ;
+	cchar	*lcname = TESTCRASH_LCNAME ;
+	cchar	*lbname = TESTCRASH_LBNAME ;
 	char		lfname[MAXPATHLEN+1] ;
 
 	if ((rs = mkpath3(lfname,pr,lcname,lbname)) >= 0) {
-	    USTAT	sb ;
-	    if (u_stat(lfname,&sb) >= 0) {
-		USERINFO	u ;
-		if ((rs = userinfo_start(&u,NULL)) >= 0) {
-		    LOGFILE	lh, *lhp = &lh ;
+	    if (ustat sb ; (rs = u_stat(lfname,&sb) >= 0) {
+		userinfo	u ;
+		if ((rs = userinfo_start(&u,nullptr)) >= 0) {
+		    logfile	lh, *lhp = &lh ;
 		    cchar	*logid = u.logid ;
 		    if ((rs1 = logfile_open(lhp,lfname,0,0666,logid)) >= 0) {
-		        time_t	daytime = time(NULL) ;
+		        time_t	daytime = time(nullptr) ;
 			cchar	*pv = "¥" ;
 	                logfile_userinfo(lhp,&u,daytime,sn,pv) ;
 		        logfile_close(lhp) ;
