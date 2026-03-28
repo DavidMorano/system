@@ -32,7 +32,10 @@
 #include	<cstdlib>
 #include	<vector>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<strn.h>
 #include	<sfx.h>
@@ -53,7 +56,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::vector ;			/* type */
 using std::min ;			/* subroutine (template) */
 using std::max ;			/* subroutine (template) */
@@ -95,7 +97,7 @@ namespace {
 	subinfo(querystr *aop) noex : op(aop) { } ;
 	destruct subinfo() {
 	    if (tbuf != nullptr) {
-		uc_free(tbuf) ;
+		lm_free(tbuf) ;
 		tbuf = nullptr ;
 		tlen = 0 ;
 	    }
@@ -105,11 +107,11 @@ namespace {
 	     int	rs = 0 ;
 	     if (nlen > tlen) {
 	        if (tbuf != nullptr) {
-		    uc_free(tbuf) ;
+		    lm_free(tbuf) ;
 		    tbuf = nullptr ;
 	        }
 		tlen = nlen ;
-		rs = uc_malloc((tlen + 1),&tbuf) ;
+		rs = lm_mall((tlen + 1),&tbuf) ;
 	     }
 	     return rs ;
 	} ; /* end if (tsize) */
@@ -127,9 +129,9 @@ namespace {
 template<typename ... Args>
 static int querystr_ctor(querystr *op,Args ... args) noex {
     	QUERYSTR	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ; /* dangerous */
 	    if ((op->spp = new(nothrow) strpack) != np) {
@@ -168,7 +170,7 @@ int querystr_start(querystr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = querystr_ctor(op,sp)) >= 0) {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mn)) >= 0) {
 	        if ((rs = strpack_start(op->spp,rs)) >= 0) {
 	            op->open.packer = true ;
 	            if (subinfo si(op) ; (rs = si.split(sp,sl)) >= 0) {
@@ -194,7 +196,7 @@ int querystr_finish(querystr *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->kv) {
-	        rs1 = uc_free(op->kv) ;
+	        rs1 = lm_free(op->kv) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->kv = nullptr ;
 	    }
@@ -460,7 +462,7 @@ int subinfo::load() noex {
 	int		rs ;
 	int		sz ;
 	sz = ((n + 1) * esz) ;
-	if (void *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
 	    op->kv = (cchar *(*)[2]) p ;
 	    op->n = n ;
 	    for (int i = 0 ; i < n ; i += 1) {
