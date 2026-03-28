@@ -30,11 +30,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/time.h>		/* <- interval timers are here */
-#include	<time.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<timeval.h>
+#include	<timeval.hh>
 
 
 EXTERNC_begin
