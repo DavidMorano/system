@@ -36,14 +36,14 @@ struct procse_arguments {
 	cchar		*options ;
 	cchar		*access ;
 	cchar		*failcont ;
-} ;
+} ; /* end struct */
 
 struct procse_head {
 	cchar		**envv ;
 	varsub		*vsp ;
 	PROCSE_ARGS	*ap ;
 	PROCSE_ARGS	a ;
-} ;
+} ; /* end struct */
 
 typedef	PROCSE		procse ;
 typedef	PROCSE_ARGS	procse_args ;
