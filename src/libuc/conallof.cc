@@ -111,7 +111,7 @@ int conallof(cchar *sp,int sl,cchar *tstr) noex {
 	            while (sl && *sp) {
 		        if (cint ch = mkchar(*sp) ; bs[ch]) {
 			    bs.reset(ch) ;
-			    f = (bs.count() == 0) ;
+			    f = bs.none() ;
 	                    if (f) break ;
 		        } /* end if */
 	                sp += 1 ;
@@ -145,9 +145,9 @@ int conallof(cchar *sp,int sl,cchar *tstr) noex {
 	if (sp && tstr) {
 	    rs = SR_INVALID ;
 	    if (tstr[0]) {
-	        dupstr	sd ;
+		char	*bp{} ;
 	        f = false ;
-	        if (char *bp{} ; (rs = sd.start(tstr,-1,&bp)) >= 0) {
+	        if (dupstr sd ; (rs = sd.start(tstr,-1,&bp)) >= 0) {
 	            int	bl = rs ;
 	            while (sl && *sp) {
 		        if (int si ; (si = sichr(bp,bl,sp[0])) >= 0) {
