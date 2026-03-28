@@ -27,9 +27,9 @@
 	Synopsis:
 	int loguser_start(op,pr,sn,envv,pcp)
 	PCSPOLLS	*op ;
-	const char	*pr ;
-	const char	*sn ;
-	const char	**envv ;
+	cchar	*pr ;
+	cchar	*sn ;
+	cchar	**envv ;
 	PCSCONF		*pcp ;
 
 	Arguments:
@@ -46,15 +46,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<pcsconf.h>
 #include	<upt.h>
 #include	<userinfo.h>
@@ -64,6 +64,9 @@
 
 #include	"pcspolls.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -76,29 +79,12 @@
 
 /* typedefs */
 
-typedef int	(*thrsub_t)(void *) ;
+extern "C" {
+    typedef int	(*thrsub_t)(void *) noex ;
+}
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	pathadd(char *,int,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
-extern int	hasNotDots(const char *,int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -117,10 +103,10 @@ struct loguser_head {
 	LOGUSER_FL	f ;
 	pid_t		pid ;
 	pthread_t	tid ;
-	const char	*a ;		/* memory allocation */
-	const char	*pr ;
-	const char	*sn ;
-	const char	**envv ;
+	cchar	*a ;		/* memory allocation */
+	cchar	*pr ;
+	cchar	*sn ;
+	cchar	**envv ;
 	PCSCONF		*pcp ;
 	volatile int	f_exiting ;
 } ;
@@ -128,11 +114,11 @@ struct loguser_head {
 
 /* forward references */
 
-static int loguser_argsbegin(LOGUSER *,cchar *,cchar *) ;
-static int loguser_argsend(LOGUSER *) ;
-static int loguser_worker(LOGUSER *) ;
+local int loguser_argsbegin(LOGUSER *,cchar *,cchar *) noex ;
+local int loguser_argsend(LOGUSER *) noex ;
+local int loguser_worker(LOGUSER *) noex ;
 
-static int mklogentry(cchar *,cchar *,cchar **,PCSCONF *) ;
+local int mklogentry(cchar *,cchar *,mainv,PCSCONF *) noex ;
 
 
 /* local variables */
@@ -142,19 +128,17 @@ static int mklogentry(cchar *,cchar *,cchar **,PCSCONF *) ;
 
 PCSPOLLS_NAME	loguser = {
 	"loguser",
-	sizeof(LOGUSER),
+	szof(LOGUSER),
 	0
 } ;
 
 
 /* exported subroutines */
 
-
-int loguser_start(LOGUSER *op,cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp)
-{
+int loguser_start(LOGUSER *op,cc *pr,cc *sn,mainv envv,PCSCONF *pcp) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("loguser_start: ent\n") ;
@@ -162,19 +146,19 @@ int loguser_start(LOGUSER *op,cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp)
 	debugprintf("loguser_start: sn=%s\n",sn) ;
 #endif
 
-	if (envv == NULL) envv = environ ;
+	if (envv == nullptr) envv = environ ;
 
-	memset(op,0,sizeof(LOGUSER)) ;
+	memclear(op) ;
 	op->envv = envv ;
 	op->pcp = pcp ;
 	op->pid = getpid() ;
 
 	if ((rs = loguser_argsbegin(op,pr,sn)) >= 0) {
-	    if ((pr != NULL) && (sn != NULL)) {
+	    if ((pr != nullptr) && (sn != nullptr)) {
 	        pthread_t	tid ;
 	        thrsub_t	thr = (thrsub_t) loguser_worker ;
-	        if ((rs = uptcreate(&tid,NULL,thr,op)) >= 0) {
-	            op->fl.working = TRUE ;
+	        if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) {
+	            op->fl.working = true ;
 		    op->tid = tid ;
 	        }
 	    } /* end if (non-null) */
@@ -193,15 +177,11 @@ int loguser_start(LOGUSER *op,cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp)
 }
 /* end subroutine (loguser_start) */
 
-
-int loguser_check(LOGUSER *op)
-{
+int loguser_check(LOGUSER *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
-
-	if (op == NULL) return SR_FAULT ;
-
+	int		f = false ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != LOGUSER_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.working) {
@@ -209,14 +189,14 @@ int loguser_check(LOGUSER *op)
 	    if (pid == op->pid) {
 	        if (op->f_exiting) {
 	            int		trs = 0 ;
-	            op->fl.working = FALSE ;
+	            op->fl.working = false ;
 	            rs1 = uptjoin(op->tid,&trs) ;
 	            if (rs >= 0) rs = rs1 ;
 	            if (rs >= 0) rs = trs ;
-	            f = TRUE ;
+	            f = true ;
 		}
 	    } else {
-		op->fl.working = FALSE ;
+		op->fl.working = false ;
 	    }
 	}
 
@@ -224,13 +204,11 @@ int loguser_check(LOGUSER *op)
 }
 /* end subroutine (loguser_check) */
 
-
-int loguser_finish(LOGUSER *op)
-{
+int loguser_finish(LOGUSER *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != LOGUSER_MAGIC) return SR_NOTOPEN ;
 
@@ -242,19 +220,19 @@ int loguser_finish(LOGUSER *op)
 	    const pid_t	pid = getpid() ;
 	    if (pid == op->pid) {
 	        int	trs = 0 ;
-	        op->fl.working = FALSE ;
+	        op->fl.working = false ;
 	        rs1 = uptjoin(op->tid,&trs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        if (rs >= 0) rs = trs ;
 	    } else {
-		op->fl.working = FALSE ;
+		op->fl.working = false ;
 		op->tid = 0 ;
 	    }
 	}
-
-	rs1 = loguser_argsend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = loguser_argsend(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 #if	CF_DEBUGS
 	debugprintf("loguser_finish: ret rs=%d\n",rs) ;
 #endif
@@ -267,21 +245,19 @@ int loguser_finish(LOGUSER *op)
 
 /* provate subroutines */
 
-
-static int loguser_argsbegin(LOGUSER *op,cchar *pr,cchar *sn)
-{
+local int loguser_argsbegin(LOGUSER *op,cchar *pr,cchar *sn) noex {
 	int		rs ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	char		*bp ;
-	size += (((pr !=NULL)?strlen(pr):0)+1) ;
-	size += (((sn !=NULL)?strlen(sn):0)+1) ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	sz += (((pr !=nullptr)?strlen(pr):0)+1) ;
+	sz += (((sn !=nullptr)?strlen(sn):0)+1) ;
+	if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
-	    if (pr != NULL) {
+	    if (pr != nullptr) {
 	        op->pr = bp ;
 	        bp = (strwcpy(bp,pr,-1)+1) ;
 	    }
-	    if (sn != NULL) {
+	    if (sn != nullptr) {
 	        op->sn = bp ;
 	        bp = (strwcpy(bp,sn,-1)+1) ;
 	    }
@@ -290,23 +266,19 @@ static int loguser_argsbegin(LOGUSER *op,cchar *pr,cchar *sn)
 }
 /* end subroutine (loguser_argsbegin) */
 
-
-static int loguser_argsend(LOGUSER *op)
-{
+local int loguser_argsend(LOGUSER *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->a != NULL) {
+	if (op->a) {
 	    rs1 = uc_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->a = NULL ;
+	    op->a = nullptr ;
 	}
 	return rs ;
 }
 /* end subroutine (loguser_argsend) */
 
-
-static int loguser_worker(LOGUSER *op)
-{
+local int loguser_worker(LOGUSER *op) noex {
 	PCSCONF		*pcp = op->pcp ;
 	int		rs ;
 	cchar		*pr = op->pr ;
@@ -323,30 +295,27 @@ static int loguser_worker(LOGUSER *op)
 	debugprintf("loguser/work_start: ret rs=%d\n",rs) ;
 #endif
 
-	op->f_exiting = TRUE ;
+	op->f_exiting = true ;
 	return rs ;
 }
 /* end subroutine (loguser_worker) */
 
-
 /* ARGSUSED */
-static int mklogentry(cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp)
-{
+local int mklogentry(cchar *pr,cchar *sn,mainv envv,PCSCONF *pcp) noex {
 	int		rs ;
 	int		rs1 ;
-	const char	*lcname = LOGUSER_LCNAME ;
-	const char	*lbname = LOGUSER_LBNAME ;
+	cchar	*lcname = LOGUSER_LCNAME ;
+	cchar	*lbname = LOGUSER_LBNAME ;
 	char		lfname[MAXPATHLEN+1] ;
 
 	if ((rs = mkpath3(lfname,pr,lcname,lbname)) >= 0) {
-	    ustat	sb ;
-	    if ((rs = u_stat(lfname,&sb)) >= 0) {
-		USERINFO	u ;
-		if ((rs = userinfo_start(&u,NULL)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(lfname,&sb)) >= 0) {
+		userinfo	u ;
+		if ((rs = userinfo_start(&u,nullptr)) >= 0) {
 		    LOGFILE	lh, *lhp = &lh ;
 		    cchar	*logid = u.logid ;
 		    if ((rs1 = logfile_open(lhp,lfname,0,0666,logid)) >= 0) {
-		        time_t	daytime = time(NULL) ;
+		        time_t	daytime = time(nullptr) ;
 			cchar	*pv = "¥" ;
 	                logfile_userinfo(lhp,&u,daytime,sn,pv) ;
 		        logfile_close(lhp) ;
