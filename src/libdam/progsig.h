@@ -22,14 +22,11 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<time.h>			/* |time_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	PROGSIG_NENTS	30
 #define	PROGSIG_NOTE	struct progsig_noter
+#define	PROGSIG_NENTS	30
 /* options */
 #define	PROGSIG_RMKSH	(1<<0)
 #define	PROGSIG_RMMAIN	(1<<1)
@@ -44,7 +41,7 @@ struct progsig_noter {
 	int		dlen ;
 	char		dbuf[PROGSIG_NBUFLEN+1] ;
 	char		user[PROGSIG_USERLEN+1] ;
-} ;
+} ; /* end struct */
 
 typedef	PROGSIG_NOTE	progsig_note ;
 
