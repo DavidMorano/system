@@ -1,6 +1,6 @@
 /* nodesfile HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* UNIX "nodes" file support */
 /* version %I% last-modified %G% */
@@ -31,7 +31,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<time.h>		/* |time_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 #include	<hdb.h>
 
@@ -44,16 +45,16 @@
 
 struct nodesfile_cursor {
 	hdb_cur		*hcp ;
-} ;
+} ; /* end struct */
 
 struct nodesfile_head {
     	vechand		*flp ;			/* file-list-pointer */
 	hdb		*elp ;			/* entry-list-pointer */
 	time_t		ti_check ;
 	time_t		ti_load ;
-	uint		magic ;
+	uint		magval ;
 	int		maxsz ;
-} ;
+} ; /* end struct */
 
 typedef NODESFILE	nodesfile ;
 typedef NODESFILE_CUR	nodesfile_cur ;
