@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-03-85, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -36,9 +36,12 @@ namespace libu {
         int call(int,int,void *) noex ;
         int rall(void *,int,void *) noex ;
         int free(void *) noex ;
+	int ps(cchar **) noex ;
+	int ma(cchar **) noex ;
 	int ml(cchar **) noex ;
 	int mn(cchar **) noex ;
 	int mp(cchar **) noex ;
+	int nn(cchar **) noex ;
         int rsfree(int,void *) noex ;
         int malloc(int,void *) noex ;
     } ; /* end struct (umems) */
