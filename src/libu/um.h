@@ -32,12 +32,13 @@
 	u_mlockend
 	u_mlockallbegin
 	u_mlockallend
-	u_mcntl
 	u_mincore
 	u_mprotect
 	u_madvise
 	u_msync
-	u_mlockp
+	u_mcntl
+	u_minherit
+	u_mlockp		(process-lock? -- partly synthetic)
 
 	Aliases:
 	u_mapfile		-> u_mmapbegin
@@ -63,23 +64,6 @@
 #include	<usys.h>
 
 
-#ifndef	MLOCKP_LOCKNON
-#define	MLOCKP_LOCKNON	UNLOCK		/* for |u_mlockp(3u)| */
-#endif
-
-#ifndef	MLOCKP_LOCKALL
-#define	MLOCKP_LOCKALL	PROCLOCK	/* for |u_mlockp(3u)| */
-#endif
-
-#ifndef	MLOCKP_LOCKTXT
-#define	MLOCKP_LOCKTXT	TXTLOCK		/* for |u_mlockp(3u)| */
-#endif
-
-#ifndef	MLOCKP_LOCKDAT
-#define	MLOCKP_LOCKDAT	DATLOCK		/* for |u_mlockp(3u)| */
-#endif
-
-
 EXTERNC_begin
 
 extern int u_brk(cvoid *,void **) noex ;
@@ -90,11 +74,12 @@ extern int u_mlockbegin(void *,size_t) noex ;
 extern int u_mlockend(void *,size_t) noex ;
 extern int u_mlockallbegin(int) noex ;
 extern int u_mlockallend() noex ;
-extern int u_mcntl(void *,size_t,int,void *,int,int) noex ;
 extern int u_mincore(void *,size_t,char *) noex ;
 extern int u_mprotect(void *,size_t,int) noex ;
 extern int u_madvise(void *,size_t,int) noex ;
 extern int u_msync(void *,size_t,int) noex ;
+extern int u_mcntl(void *,size_t,int,void *,int,int) noex ;
+extern int u_minherit(void *,size_t,int) noex ;
 extern int u_mlockp(int) noex ;
 
 /* legacy */
