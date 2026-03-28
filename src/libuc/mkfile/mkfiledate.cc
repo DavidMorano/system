@@ -46,7 +46,10 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uctimeconv.h>
 #include	<gettmpdname.h>
 #include	<bufsizevar.hh>
 #include	<mkpathx.h>
@@ -105,18 +108,17 @@ namespace {
 
 /* forward references */
 
-static int	sntmymd(char *,int,TM *) noex ;
+local int	sntmymd(char *,int,TM *) noex ;
 
-static int mker(char *rbuf,cc *dname,cc *fs,mode_t fm) noex {
+local int mker(char *rbuf,cc *dname,cc *fs,mode_t fm) noex {
 	tryer	to(rbuf,dname,fs,fm) ;
 	return to ;
-}
-/* end subroutine (mker) */
+} /* end subroutine (mker) */
 
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 static cchar		*defdname ;	/* <- thread-safe */
 
@@ -154,7 +156,7 @@ tryer::operator int () noex {
 	if ((rs = maxpathlen) >= 0) ylikely {
 	    custime	dt = getustime ;
 	    rlen = rs ;
-	    if (TM tmdat ; (rs = uc_localtime(&dt,&tmdat)) >= 0) ylikely {
+	    if (TM tmdat ; (rs = uc_timelocal(&dt,&tmdat)) >= 0) ylikely {
 	        if ((rs = mkpath(rbuf,dname)) >= 0) ylikely {
 		    rl = rs ;
 		    if ((rs = snaddw(rbuf,rlen,rl,"/d",-1)) >= 0) ylikely {
@@ -176,7 +178,7 @@ int tryer::looper() noex {
 	cint		nalpha = 26 ;
 	cint		ml = MAXNLOOP ;
 	int		rs = SR_OK ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	cmode		om = (fm & 0777) ;
 	for (int loop = 0 ; (loop < ml) && (rs == 0) ; loop += 1) {
 	    char	*bp = (rbuf + rl) ;
@@ -210,7 +212,7 @@ int tryer::looper() noex {
 }
 /* end method (tryer::looper) */
 
-static int sntmymd(char *rbuf,int rlen,TM *tmp) noex {
+local int sntmymd(char *rbuf,int rlen,TM *tmp) noex {
 	cint		yr = tmp->tm_year ;
 	cint		mo = (tmp->tm_mon + 1) ;
 	cint		da = tmp->tm_mday ;
