@@ -32,7 +32,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<vecstr.h>
 #include	<varsub.h>
@@ -44,7 +46,9 @@
 
 #include	"procse.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -64,11 +68,25 @@ namespace {
 	int		maxpathlen ;	/* set but not currently used */
 	int		ebuflen ;
 	operator int () noex ;
-    } ;
+    } ; /* end struct (vars) */
 } /* end namespace */
 
 
 /* forward references */
+
+local int our_free(cvoid *cvp) noex {
+    	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (cvp) {
+	    rs = SR_OK ;
+	    {
+	        void *vp = const_cast<void *>(cvp) ;
+	        rs1 = lm_free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
+    	return rs ;
+} /* end subroutine (our_free) */
 
 
 /* local variables */
@@ -103,39 +121,39 @@ int procse_finish(procse *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->a.passfile != nullptr) {
-	        rs1 = uc_free(op->a.passfile) ;
+	        rs1 = our_free(op->a.passfile) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->a.sharedobj != nullptr) {
-	        rs1 = uc_free(op->a.sharedobj) ;
+	        rs1 = our_free(op->a.sharedobj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->a.program != nullptr) {
-	        rs1 = uc_free(op->a.program) ;
+	        rs1 = our_free(op->a.program) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->a.srvargs != nullptr) {
-	        rs1 = uc_free(op->a.srvargs) ;
+	        rs1 = our_free(op->a.srvargs) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->a.username != nullptr) {
-	        rs1 = uc_free(op->a.username) ;
+	        rs1 = our_free(op->a.username) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->a.groupname != nullptr) {
-	        rs1 = uc_free(op->a.groupname) ;
+	        rs1 = our_free(op->a.groupname) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->a.options != nullptr) {
-	        rs1 = uc_free(op->a.options) ;
+	        rs1 = our_free(op->a.options) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->a.access != nullptr) {
-	        rs1 = uc_free(op->a.access) ;
+	        rs1 = our_free(op->a.access) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->a.failcont != nullptr) {
-	        rs1 = uc_free(op->a.failcont) ;
+	        rs1 = our_free(op->a.failcont) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->a = {} ;
@@ -163,15 +181,15 @@ namespace {
 	int stageone(cc *) noex ;
 	int stagetwo(int,cchar **) noex ;
     } ; /* end struct (subproc) */
-}
+} /* end namespace */
 
 int subproc::start() noex {
 	cint		sz = (vlen+1) + (elen+1) ;
 	int		rs ;
-	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	if ((rs = lm_mall(sz,&a)) >= 0) {
 	    vbuf = a ;
 	    ebuf = (a + (vlen+1)) ;
-	} /* end if (malloc-{x}buf) */
+	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end method (subproc::start) */
@@ -180,7 +198,7 @@ int subproc::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (a) {
-	    rs1 = uc_free(a) ;
+	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
 	    vbuf = nullptr ;
@@ -220,7 +238,7 @@ int subproc::stagetwo(int vl,cchar **opp) noex {
 	if (rs >= 0) {
 	    cchar	*fp ;
 	    fl = sfshrink(ebuf,el,&fp) ;
-	    if (cc *cp ; (rs = uc_mallocstrw(fp,fl,&cp)) >= 0) {
+	    if (cc *cp ; (rs = lm_strw(fp,fl,&cp)) >= 0) {
 		*opp = cp ;
 	    }
 	}
@@ -283,7 +301,7 @@ int procse_process(procse *op,expcook *ecp) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
 	    var.ebuflen = (rs * BUFMULT) ;
 	}
