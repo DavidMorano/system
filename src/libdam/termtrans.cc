@@ -33,16 +33,17 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<vector>
 #include	<string>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<ascii.h>
 #include	<ansigr.h>
 #include	<buffer.h>
-#include	<findbit.h>
 #include	<endian.h>
 #include	<sncpyx.h>
 #include	<strwcmp.h>
@@ -52,7 +53,11 @@
 
 #include	"termtrans.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/flbs.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import flbs ;
 
 /* local defines */
 
@@ -132,7 +137,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::basic_string ;		/* type */
 using std::string ;			/* type */
 using std::vector ;			/* type */
@@ -190,68 +194,67 @@ namespace {
 		return (*this) ;
 	} ;
     } ; /* end struct (termstrans) */
-}
+} /* end namespace */
 
-struct vars {
+namespace {
+    struct vars {
 	int		csnlen ;
 	int		outlinelen ;
 	operator int () noex ;
-} ;
+    } ; /* end struct */
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int termtrans_ctor(termtrans *op,Args ... args) noex {
+local inline int termtrans_ctor(termtrans *op,Args ... args) noex {
     	TERMTRANS	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->idp = new(nothrow) UICONV) != np) {
+	    if ((op->idp = new(nothrow) UICONV) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-UICONV) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termtrans_ctor) */
+} /* end subroutine (termtrans_ctor) */
 
-static int termtrans_dtor(termtrans *op) noex {
+local int termtrans_dtor(termtrans *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->idp) {
+	    if (op->idp) ylikely {
 		delete op->idp ;
 		op->idp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termtrans_dtor) */
+} /* end subroutine (termtrans_dtor) */
 
 template<typename ... Args>
-static inline int termtrans_magic(termtrans *op,Args ... args) noex {
+local inline int termtrans_magic(termtrans *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == TERMTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (termtrans_magic) */
+} /* end subroutine (termtrans_magic) */
 
-static int	termtrans_process(TT *,const wchar_t *,int) noex ;
-static int	termtrans_procline(TT *,char *,int,const wchar_t *,int) noex ;
-static int	termtrans_proclinepost(TT *,cchar *,int) noex ;
-static int	termtrans_loadline(TT *,int,int) noex ;
+local int	termtrans_process(TT *,const wchar_t *,int) noex ;
+local int	termtrans_procline(TT *,char *,int,const wchar_t *,int) noex ;
+local int	termtrans_proclinepost(TT *,cchar *,int) noex ;
+local int	termtrans_loadline(TT *,int,int) noex ;
 
-static int	termtrans_loadgr(TT *,string &,int,int) noex ;
-static int	termtrans_loadch(TT *,string &,int,int) noex ;
-static int	termtrans_loadcs(TT *,string &,int,cchar *,int) noex ;
+local int	termtrans_loadgr(TT *,string &,int,int) noex ;
+local int	termtrans_loadch(TT *,string &,int,int) noex ;
+local int	termtrans_loadcs(TT *,string &,int,cchar *,int) noex ;
 
-static int	gettermattr(cchar *,int) noex ;
-static int	wsgetline(const wchar_t *,int) noex ;
-static bool	isspecial(SCH *,uchar,uchar) noex ;
+local int	gettermattr(cchar *,int) noex ;
+local int	wsgetline(const wchar_t *,int) noex ;
+local bool	isspecial(SCH *,uchar,uchar) noex ;
 
 
 /* local variables */
@@ -320,15 +323,15 @@ static vars		var ;
 
 /* exported subroutines */
 
-static int termtrans_starts(TT *) noex ;
+local int termtrans_starts(TT *) noex ;
 
 int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 	int		rs ;
-	if ((rs = termtrans_ctor(op,pr,tstr)) >= 0) {
+	if ((rs = termtrans_ctor(op,pr,tstr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (ncols > 0) {
+	    if (ncols > 0) ylikely {
 		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if ((rs = rsv) >= 0) ylikely {
 	            op->ncols = ncols ;
 	            op->termattr = gettermattr(tstr,tlen) ;
 		    op->pr = pr ;
@@ -343,23 +346,24 @@ int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 }
 /* end subroutine (termtrans_start) */
 
-static int termtrans_starts(TT *op) noex {
+local int termtrans_starts(TT *op) noex {
     	cnullptr	np{} ;
+	cnothrow	nt{} ;
     	int		rs ;
 	try {
 	    rs = SR_NOMEM ;
-	    if (vector<GCH>*cvp ; (cvp = new(nothrow) vector<GCH>) != np) {
+	    if (vector<GCH>*cvp ; (cvp = new(nt) vector<GCH>) != np) ylikely {
 	        cint	fcslen = var.csnlen ;
 	        cchar	*fcs = TERMTRANS_FCS ;
 	        cchar	*suf = TERMTRANS_SUF ;
 	        char	fcsbuf[var.csnlen + 1] ;
 	        op->cvp = voidp(cvp) ;
-	        if ((rs = sncpy(fcsbuf,fcslen,fcs,suf)) >= 0) {
+	        if ((rs = sncpy(fcsbuf,fcslen,fcs,suf)) >= 0) ylikely {
 		    cchar	*tcsp = TERMTRANS_TCS ;
-		    if ((rs = uiconv_open(op->idp,tcsp,fcsbuf)) >= 0) {
+		    if ((rs = uiconv_open(op->idp,tcsp,fcsbuf)) >= 0) ylikely {
 			op->magic = TERMTRANS_MAGIC ;
 		    }
-		}
+		} /* end if (sncpy) */
 		if (rs < 0) {
 		    delete cvp ;
 		    op->cvp = nullptr ;
@@ -375,7 +379,7 @@ static int termtrans_starts(TT *op) noex {
 int termtrans_finish(TT *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = termtrans_magic(op)) >= 0) {
+	if ((rs = termtrans_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = uiconv_close(op->idp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -404,7 +408,7 @@ int termtrans_load(TT *op,const wchar_t *wbuf,int wlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		ln = 0 ;
-	if ((rs = termtrans_magic(op,wbuf)) >= 0) {
+	if ((rs = termtrans_magic(op,wbuf)) >= 0) ylikely {
 	    vector<string>	*lvp = (vector<string> *) op->lvp ;
 	    if (lvp == nullptr) {
 		try {
@@ -418,10 +422,10 @@ int termtrans_load(TT *op,const wchar_t *wbuf,int wlen) noex {
 		}
 	    }
 	    /* process given string into the staging area */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = termtrans_process(op,wbuf,wlen) ;
 	        ln = rs ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ln : rs ;
 }
@@ -430,7 +434,7 @@ int termtrans_load(TT *op,const wchar_t *wbuf,int wlen) noex {
 int termtrans_getline(TT *op,int li,cchar **lpp) noex {
 	int		rs ;
 	int		ll = 0 ;
-	if ((rs = termtrans_magic(op)) >= 0) {
+	if ((rs = termtrans_magic(op)) >= 0) ylikely {
 	    vector<string>	*lvp = (vector<string> *) op->lvp ;
 	    {
 		cint	vlen = int(lvp->size()) ;
@@ -448,12 +452,12 @@ int termtrans_getline(TT *op,int li,cchar **lpp) noex {
 
 /* private subroutines */
 
-static int termtrans_process(TT *op,const wchar_t *wbuf,int wlen) noex {
+local int termtrans_process(TT *op,const wchar_t *wbuf,int wlen) noex {
 	cint		olen = var.outlinelen ;
 	int		rs ;
 	int		rs1 ;
-	int		ln = 0 ;
-	if (char *obuf ; (rs = uc_malloc((olen + 1),&obuf)) >= 0) {
+	int		ln = 0 ; /* return-value */
+	if (char *obuf ; (rs = lm_mall((olen + 1),&obuf)) >= 0) ylikely {
 	    int		wl ;
 	    while ((rs = wsgetline(wbuf,wlen)) > 0) {
 		wl = rs ;
@@ -467,14 +471,14 @@ static int termtrans_process(TT *op,const wchar_t *wbuf,int wlen) noex {
 		rs = termtrans_procline(op,obuf,olen,wbuf,wlen) ;
 		ln += rs ;
 	    }
-	    rs1 = uc_free(obuf) ;
+	    rs1 = lm_free(obuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
 	return (rs >= 0) ? ln : rs ;
 }
 /* end subroutine (termtrans_process) */
 
-static int termtrans_procline(TT *op,char *obuf,int olen,
+local int termtrans_procline(TT *op,char *obuf,int olen,
 		const wchar_t *wbuf,int wlen) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	int		rs = SR_OK ;
@@ -499,7 +503,7 @@ static int termtrans_procline(TT *op,char *obuf,int olen,
 }
 /* end subroutine (termtrans_procline) */
 
-static int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
+local int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	int		rs = SR_OK ;
 	int		j = 0 ;
@@ -599,7 +603,7 @@ static int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
 }
 /* end subroutine (termtrans_proclinepost) */
 
-static int termtrans_loadline(TT *op,int ln,int nmax) noex {
+local int termtrans_loadline(TT *op,int ln,int nmax) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	vector<string>	*lvp = (vector<string> *) op->lvp ;
 	int		rs = SR_OK ;
@@ -637,7 +641,7 @@ static int termtrans_loadline(TT *op,int ln,int nmax) noex {
 }
 /* end subroutine (termtrans_loadline) */
 
-static int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
+local int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 	cint		grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
 	int		rs = SR_OK ;
 	int		ogr = pgr ;
@@ -650,7 +654,7 @@ static int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 	char		*grbuf ;
 	n = flbsi(grmask) + 1 ;
 	sz = ((2*n)+1+1) ; /* size according to algorithm below */
-	if ((grbuf = new(nothrow) char[sz]) != nullptr) {
+	if ((grbuf = new(nothrow) char[sz]) != nullptr) ylikely {
 	    bgr &= grmask ;
 	    ogr = (bgr & (~ gr) & grmask) ;
 	    if (ogr != (bgr & grmask)) { /* partial gr-off */
@@ -720,56 +724,61 @@ static int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 }
 /* end subroutine (termtrans_loadgr) */
 
-static int termtrans_loadcs(TT *op,string &line,int n,cc *pp,int pl) noex {
-	cint		dlen = DBUFLEN ;
-	int		rs = SR_OK ;
-	int		ml ;
-	int		dl ;
-	int		i = 0 ;
-	int		len = 0 ;
-	char		dbuf[DBUFLEN+1] ;
-	if (op == nullptr) return SR_FAULT ;
-	while ((rs >= 0) && (i < pl)) {
-	    int	a1 = -1 ;
-	    int	a2 = -1 ;
-	    int	a3 = -1 ;
-	    int	a4 = -1 ;
-	    ml = min(4,(pl-i)) ;
-	    switch (ml) {
-	    case 4:
-		a4 = pp[i+3] ;
-		fallthrough ;
-	        /* FALLTHROUGH */
-	    case 3:
-		a3 = pp[i+2] ;
-		fallthrough ;
-                /* FALLTHROUGH */
-	    case 2:
-		a2 = pp[i+1] ;
-		fallthrough ;
-                /* FALLTHROUGH */
-	    case 1:
-		a1 = pp[i+0] ;
-		fallthrough ;
-                /* FALLTHROUGH */
-	    case 0:
-		break ;
-	    } /* end switch */
-	    if (ml > 0) {
-		rs = termconseq(dbuf,dlen,n,a1,a2,a3,a4) ;
-		dl = rs ;
-		i += ml ;
-		if (rs >= 0) {
-		    len += dl ;
-		    line.append(dbuf,dl) ;
-		}
-	    }
-	} /* end while */
+local int termtrans_loadcs(TT *op,string &line,int n,cc *pp,int pl) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (op) {
+	    cint	dlen = DBUFLEN ;
+	    if (char *dbuf ; (rs = lm_mall((dlen+1),&dbuf)) >= 0) {
+	        int	ml ;
+	        int	dl ;
+	        int	i = 0 ;
+	        while ((rs >= 0) && (i < pl)) {
+	            int	a1 = -1 ;
+	            int	a2 = -1 ;
+	            int	a3 = -1 ;
+	            int	a4 = -1 ;
+	            ml = min(4,(pl-i)) ;
+	            switch (ml) {
+	            case 4:
+		        a4 = pp[i+3] ;
+		        fallthrough ;
+	                /* FALLTHROUGH */
+	            case 3:
+		        a3 = pp[i+2] ;
+		        fallthrough ;
+                        /* FALLTHROUGH */
+	            case 2:
+		        a2 = pp[i+1] ;
+		        fallthrough ;
+                        /* FALLTHROUGH */
+	            case 1:
+		        a1 = pp[i+0] ;
+		        fallthrough ;
+                        /* FALLTHROUGH */
+	            case 0:
+		        break ;
+	            } /* end switch */
+	            if (ml > 0) {
+		        rs = termconseq(dbuf,dlen,n,a1,a2,a3,a4) ;
+		        dl = rs ;
+		        i += ml ;
+		        if (rs >= 0) {
+		            len += dl ;
+		            line.append(dbuf,dl) ;
+		        } /* end if (ok) */
+	            } /* end if (non-zero positive) */
+	        } /* end while */
+	        rs1 = lm_free(dbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termtrans_loadcs) */
 
-static int termtrans_loadch(TT *op,string &line,int ft,int ach) noex {
+local int termtrans_loadch(TT *op,string &line,int ft,int ach) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	uchar		ch = uchar(ach) ;
@@ -802,7 +811,7 @@ static int termtrans_loadch(TT *op,string &line,int ft,int ach) noex {
 }
 /* end subroutine (termtrans_loadch) */
 
-static int gettermattr(cchar *tstr,int tlen) noex {
+local int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
 	if (tstr != nullptr) {
 	    if (tlen < 0) tlen = lenstr(tstr) ;
@@ -818,7 +827,7 @@ static int gettermattr(cchar *tstr,int tlen) noex {
 }
 /* end subroutine (gettermattr) */
 
-static int wsgetline(const wchar_t *wbuf,int wlen) noex {
+local int wsgetline(const wchar_t *wbuf,int wlen) noex {
 	int		wl ; /* used afterwards */
 	int		f = false ;
 	for (wl = 0 ; wl < wlen ; wl += 1) {
@@ -830,7 +839,7 @@ static int wsgetline(const wchar_t *wbuf,int wlen) noex {
 }
 /* end subroutine (wsgetline) */
 
-static bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
+local bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
 	int		i ; /* used afterwards */
 	int		f = false ;
 	for (i = 0 ; specials[i].ch1 > 0 ; i += 1) {
@@ -847,10 +856,10 @@ static bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
-	    var.csnlen = rs ;
-	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
-	        var.outlinelen = (NLINEMULT * rs) ;
+	if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
+	    csnlen = rs ;
+	    if ((rs = getbufsize(bufsize_ml)) >= 0) ylikely {
+	        outlinelen = (NLINEMULT * rs) ;
 	    }
 	} /* end if (getbufsize) */
 	return rs ;
