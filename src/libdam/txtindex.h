@@ -40,12 +40,12 @@
 
 struct txtindex_flags {
         uint		modload:1 ;
-} ;
+} ; /* end struct */
 
 struct txtindex_cursor {
 	void		*scp ;		/* SO-cursor pointer */
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct txtindex_head {
 	modload		*mlp ;
@@ -55,7 +55,7 @@ struct txtindex_head {
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
-} ;
+} ; /* end struct */
 
 typedef	TXTINDEX	txtindex ;
 typedef	TXTINDEX_FL	txtindex_fl ;
