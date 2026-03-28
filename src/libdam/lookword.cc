@@ -47,6 +47,9 @@
 
 #include	"lookword.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -84,7 +87,7 @@
 template<typename ... Args>
 static inline int lookword_magic(lookword *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LOOKWORD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -113,16 +116,16 @@ static cchar    *linear_search(LW *,cchar *,cchar *,cchar *) noex ;
 /* exported subroutines */
 
 int lookword_open(LW *op,cchar *dfname,int opts) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && dfname) {
+	if (op && dfname) ylikely {
 	    memclear(op) ;
 	    op->fl.dict = LOGICVAL(opts&LOOKWORD_ODICT) ;
 	    op->fl.fold = LOGICVAL(opts&LOOKWORD_OFOLD) ;
 	    op->fl.word = LOGICVAL(opts&LOOKWORD_OWORD) ;
-	    if ((rs = uc_open(dfname,O_RDONLY,0666)) >= 0) {
-	        cnullptr	np{} ;
+	    if ((rs = uc_open(dfname,O_RDONLY,0666)) >= 0) ylikely {
 	        cint		fd = rs ;
-	        if ((rs = uc_fsize(fd)) >= 0) {
+	        if ((rs = uc_fsize(fd)) >= 0) ylikely {
 	            size_t	ms = rs ;
 	            cint	mp = PROT_READ ;
 	            cint	mf = MAP_SHARED ;
