@@ -34,7 +34,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<hdb.h>
@@ -58,9 +57,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -98,14 +94,14 @@ typedef keyvals_entry *	entp ;
 
 template<typename ... Args>
 static int keyvals_ctor(keyvals *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    if ((op->keyp = new(nothrow) vecobj) != np) {
-		if ((op->bykeyp = new(nothrow) hdb) != np) {
-		    if ((op->bykeyvalp = new(nothrow) hdb) != np) {
+	    if ((op->keyp = new(nothrow) vecobj) != np) ylikely {
+		if ((op->bykeyp = new(nothrow) hdb) != np) ylikely {
+		    if ((op->bykeyvalp = new(nothrow) hdb) != np) ylikely {
 			rs = SR_OK ;
 		    } /* end if (new-hdb) */
 		    if (rs < 0) {
@@ -125,17 +121,17 @@ static int keyvals_ctor(keyvals *op,Args ... args) noex {
 
 static int keyvals_dtor(keyvals *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->bykeyvalp) {
+	    if (op->bykeyvalp) ylikely {
 		delete op->bykeyvalp ;
 		op->bykeyvalp = nullptr ;
 	    }
-	    if (op->bykeyp) {
+	    if (op->bykeyp) ylikely {
 		delete op->bykeyp ;
 		op->bykeyp = nullptr ;
 	    }
-	    if (op->keyp) {
+	    if (op->keyp) ylikely {
 		delete op->keyp ;
 		op->keyp = nullptr ;
 	    }
@@ -147,7 +143,7 @@ static int keyvals_dtor(keyvals *op) noex {
 template<typename ... Args>
 static inline int keyvals_magic(keyvals *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == KEYVALS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -330,15 +326,16 @@ int keyvals_curbegin(keyvals *op,keyvals_cur *curp) noex {
 int keyvals_curend(keyvals *op,keyvals_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = keyvals_magic(op,curp)) >= 0) {
+	if ((rs = keyvals_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_FAULT ;
-	    if (curp->ecp) {
+	    if (curp->ecp) ylikely {
+		rs = SR_OK ;
 	        curp->i = -1 ;
-		{
+		if (op->bykeyp) ylikely {
 	            rs1 = hdb_curend(op->bykeyp,curp->ecp) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
-		{
+		if (curp->ecp) ylikely {
 		    rs1 = uc_free(curp->ecp) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
@@ -352,7 +349,7 @@ int keyvals_curend(keyvals *op,keyvals_cur *curp) noex {
 int keyvals_curenumkey(keyvals *op,CUR *curp,cchar **kpp) noex {
 	int		rs ;
 	int		kl = 0 ;
-	if ((rs = keyvals_magic(op,curp)) >= 0) {
+	if ((rs = keyvals_magic(op,curp)) >= 0) ylikely {
 	    KEY		*kep = nullptr ;
 	    int		oi = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	    cchar	*kp = nullptr ;
@@ -731,9 +728,9 @@ int keyvals_co::operator () (int a) noex {
 static int key_start(KEY *kep,cchar *ksp,int ksl) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (kep && ksp) {
+	if (kep && ksp) ylikely {
 	    rs = memclear(kep) ;
-	    if (ksp[0]) {
+	    if (ksp[0]) ylikely {
 	        if (ksl < 0) ksl = lenstr(ksp) ;
 	        if (cchar *sp{} ; (rs = uc_mallocstrw(ksp,ksl,&sp)) >= 0) {
 		    kep->kp = sp ;
@@ -748,7 +745,7 @@ static int key_start(KEY *kep,cchar *ksp,int ksl) noex {
 
 static int key_increment(KEY *kep) noex {
 	int		rs = SR_FAULT ;
-	if (kep) {
+	if (kep) ylikely {
 	    rs = SR_OK ;
 	    kep->count += 1 ;
 	} /* end if (non-null) */
@@ -759,7 +756,7 @@ static int key_increment(KEY *kep) noex {
 static int key_decrement(KEY *kep) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (kep) {
+	if (kep) ylikely {
 	    rs = SR_OK ;
 	    if (kep->count > 0) {
 	        kep->count -= 1 ;
@@ -808,7 +805,7 @@ static int key_mat(KEY *kep,cchar *kp,int kl) noex {
 static int entry_start(ENT *ep,int fi,int ki,KEY *kep,cc *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		kl = 0 ;
-	if (ep && kep && vp) {
+	if (ep && kep && vp) ylikely {
 	    memclear(ep) ;
 	    kl = kep->kl ;
 	    ep->fi = fi ;
@@ -828,7 +825,7 @@ static int entry_finish(ENT *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (ep->vname && ep->kep) {
 		if ((rs = key_decrement(ep->kep)) >= 0) {
