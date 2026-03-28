@@ -52,16 +52,20 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<getbufsize.h>		/* for |getbufsize_mailaddr| */
-#include	<bufsizevar.hh>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
+#include	<getbufsize.h>		/* for |bufsize_mailaddr| */
 #include	<storebuf.h>
-#include	<strn.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
 #include	<sncpyx.h>
 #include	<snwcpy.h>
+#include	<ematypes.h>
 #include	<localmisc.h>
 
 #include	"mailaddr.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 
@@ -98,7 +102,7 @@ namespace {
 
 static vars		var ;
 
-constexpr char		localhostpart[] = MAILADDR_LOCALHOST ;
+cchar			localhostpart[] = MAILADDR_LOCALHOST ;
 
 
 /* exported variables */
@@ -204,25 +208,17 @@ int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 		    }
 	            break ;
 	        case MAILADDRTYPE_UUCP:
-		    {
-	                rs = b.str(mahost) ;
-		    }
-	            if (rs >= 0) {
-	                rs = b.strw("!",1) ;
-		    }
-	            if (rs >= 0) {
-	                rs = b.str(malocal) ;
+	            if ((rs = b.str(mahost)) >= 0) {
+	                if ((rs = b.chr('!')) >= 0) {
+	                    rs = b.str(malocal) ;
+			}
 		    }
 	            break ;
 	        case MAILADDRTYPE_ARPA:
-		    {
-	                rs = b.str(malocal) ;
-		    }
-	            if (rs >= 0) {
-	                rs = b.strw("@",1) ;
-		    }
-	            if (rs >= 0) {
-	                rs = b.str(mahost) ;
+	            if ((rs = b.str(malocal)) >= 0) {
+	                if ((rs = b.chr('@')) >= 0) {
+	                    rs = b.str(mahost) ;
+			}
 		    }
 	            break ;
 	        case MAILADDRTYPE_ARPAROUTE:
@@ -234,15 +230,18 @@ int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 		    }
 	            if (rs >= 0) {
 	                if (strchr(malocal,':') != nullptr) {
-	                    rs = b.strw(",",1) ;
+	                    rs = b.chr(',') ;
 	                } else {
-	                    rs = b.strw(":",1) ;
+	                    rs = b.chr(':') ;
 		        }
 	            }
 	            if (rs >= 0) {
 	                rs = b.str(malocal) ;
 		    }
 	            break ;
+		default:
+		    rs = SR_NOTSUP ;
+		    break ;
 	        } /* end switch */
 		len = b.idx ;
 	    } /* end if (valid) */
@@ -282,7 +281,7 @@ int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 	                rs = b.str(malocal) ;
 		    }
 	            if (rs >= 0) {
-	                rs = b.strw("@",1) ;
+	                rs = b.chr('@') ;
 		    }
 	            if (rs >= 0) {
 	                rs = b.str(mahost) ;
@@ -297,15 +296,18 @@ int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 		    }
 	            if (rs >= 0) {
 	                if (strchr(malocal,':') != nullptr) {
-	                    rs = b.strw(",",1) ;
+	                    rs = b.chr(',') ;
 	                } else {
-	                    rs = b.strw(":",1) ;
+	                    rs = b.chr(':') ;
 			}
 	            }
 	            if (rs >= 0) {
 	                rs = b.str(malocal) ;
 		    }
 	            break ;
+		default:
+		    rs = SR_NOTSUP ;
+		    break ;
 	        } /* end switch */
 		len = b.idx ;
 	    } /* end if (valid) */
@@ -316,9 +318,9 @@ int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	if ((rs = getbufsize(bufsize_hn)) >= 0) {
 	    hostnamelen = rs ;
-	    if ((rs = getbufsize(getbufsize_mailaddr)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mailaddr)) >= 0) {
 	        mailaddrlen = rs ;
 	    }
 	}
