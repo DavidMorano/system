@@ -40,6 +40,14 @@ struct prognamevar {
 	char		*as = nullptr ;	/* allocated memory */
 	int		sl = 0 ;
 	char		buf[PROGNAMEVAR_SHORTLEN + 1] ;
+	prognamevar(int argc,mainv argv,mainv envv = nullptr) noex {
+	    buf[0] = '\0' ;
+	    if ((argc > 0) && argv[0]) {
+	        if (proc(argv[0]) == false) {
+		    procenv(envv) ;
+		}
+	    }
+	} ; /* end ctor */
 	prognamevar(cchar *ap,int al = -1) noex {
 	    buf[0] = '\0' ;
 	    proc(ap,al) ;
@@ -86,7 +94,8 @@ struct prognamevar {
 	    }
 	} ; /* end dtor */
     private:
-	void proc(cchar *,int) noex ;
+	bool proc(cchar *,int = -1) noex ;
+	bool procenv(mainv = nullptr) noex ;
 } ; /* end struct (prognamevar) */
 
 
