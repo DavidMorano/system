@@ -42,16 +42,17 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>			/* |time(2)| */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
-#include	<ctime>			/* |time(2)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<memory>		/* |destroy_at(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<estrings.h>
 #include	<sfx.h>
 #include	<hdb.h>
@@ -63,7 +64,9 @@
 
 #include	"nodesfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 import sif ;
 
 /* local defines */
@@ -80,9 +83,6 @@ import sif ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::destroy_at ;			/* subroutine */
 using std::nothrow ;			/* constant */
 
@@ -121,8 +121,8 @@ int nodesfile_fi::start(cc *sp,dev_t d,ino_t i,time_t t) noex {
 	ino = i ;
 	timod = t ;
 	fname = nullptr ;
-	if (sp) {
-	    if (cchar *cp ; (rs = uc_mallocstrw(sp,-1,&cp)) >= 0) {
+	if (sp) ylikely {
+	    if (cchar *cp ; (rs = lm_strw(sp,-1,&cp)) >= 0) {
 	        fname = cp ;
 	    }
 	}
@@ -135,8 +135,9 @@ int nodesfile_fi::finish() noex {
 	dev = 0 ;
 	ino = 0 ;
 	timod = 0 ;
-	if (fname) {
-	    rs1 = uc_free(fname) ;
+	if (fname) ylikely {
+	    void *vp = voidp(fname) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    fname = nullptr ;
 	}
@@ -145,9 +146,9 @@ int nodesfile_fi::finish() noex {
 
 int nodesfile_ent::start(cc *sp,int sl,int idx) noex {
     	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp) ylikely {
 	    fi = idx ;
-	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) ylikely {
 	        name = cp ;
 	    }
 	}
@@ -155,10 +156,11 @@ int nodesfile_ent::start(cc *sp,int sl,int idx) noex {
 }
 
 int nodesfile_ent::finish() noex {
-    	int		rs = SR_FAULT ;
+    	int		rs = SR_OK ;
 	int		rs1 ;
-	if (name) {
-	    rs1 = uc_free(name) ;
+	if (name) ylikely {
+	    void *vp = voidp(name) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    name = nullptr ;
 	}
@@ -172,11 +174,11 @@ template<typename ... Args>
 static inline int nodesfile_ctor(nodesfile *op,Args ... args) noex {
     	NODESFILE	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->flp = new(nothrow) vechand) != nullptr) {
-	        if ((op->elp = new(nothrow) hdb) != nullptr) {
+	    if ((op->flp = new(nothrow) vechand) != nullptr) ylikely {
+	        if ((op->elp = new(nothrow) hdb) != nullptr) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-hdb) */
 		if (rs < 0) {
@@ -191,13 +193,13 @@ static inline int nodesfile_ctor(nodesfile *op,Args ... args) noex {
 
 static int nodesfile_dtor(nodesfile *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->elp) {
+	    if (op->elp) ylikely {
 		delete op->elp ;
 		op->elp = nullptr ;
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
 	    }
@@ -209,8 +211,8 @@ static int nodesfile_dtor(nodesfile *op) noex {
 template<typename ... Args>
 static inline int nodesfile_magic(nodesfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == NODESFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == NODESFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -248,25 +250,25 @@ extern "C" {
 
 int nodesfile_open(NF *op,cchar *fname,int maxsz) noex {
 	int		rs ;
-	if ((rs = nodesfile_ctor(op)) >= 0) {
+	if ((rs = nodesfile_ctor(op)) >= 0) ylikely {
 	    vechand	*flp = op->flp ;
 	    hdb		*nlp = op->elp ;
 	    rs = SR_INVALID ;
-	    if (maxsz >= 0) {
+	    if (maxsz >= 0) ylikely {
 		cint	vn = 1 ;
 		cint	vo = 0 ;
 		op->maxsz = maxsz ;
-		if ((rs = flp->start(vn,vo)) >= 0) {
+		if ((rs = flp->start(vn,vo)) >= 0) ylikely {
 		    cint	hn = 1 ;
 		    cint	at = 0 ;
-		    if ((rs = nlp->start(hn,at,enthash,entmat)) >= 0) {
-			op->magic = NODESFILE_MAGIC ;
+		    if ((rs = nlp->start(hn,at,enthash,entmat)) >= 0) ylikely {
+			op->magval = NODESFILE_MAGIC ;
 			if (fname) {
 		            rs = nodesfile_fnparse(op,fname) ;
 			}
 			if (rs < 0) {
 			    nlp->finish() ;
-			    op->magic = 0 ;
+			    op->magval = 0 ;
 			}
 	            } /* end if (hdb_start) */
 		    if (rs < 0) {
@@ -285,17 +287,17 @@ int nodesfile_open(NF *op,cchar *fname,int maxsz) noex {
 int nodesfile_close(NF *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    {
 		rs1 = nodesfile_fins(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->elp) {
+	    if (op->elp) ylikely {
 		rs1 = hdb_finish(op->elp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 		rs1 = vechand_finish(op->flp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -303,7 +305,7 @@ int nodesfile_close(NF *op) noex {
 		rs1 = nodesfile_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -343,7 +345,7 @@ static int nodesfile_finents(NF *op) noex {
 		    }
 		    destroy_at(ep) ;
 		    {
-			rs1 = uc_free(vp) ;
+			rs1 = lm_free(vp) ;
 		        if (rs >= 0) rs = rs1 ;
 		    }
 		} /* end if (non-null) */
@@ -372,7 +374,7 @@ static int nodesfile_finfis(NF *op) noex {
 		}
 		destroy_at(fep) ;
 		{
-		    rs1 = uc_free(vp) ;
+		    rs1 = lm_free(vp) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
 	    } /* end if (non-null) */
@@ -434,7 +436,7 @@ int nodesfile_curbegin(NF *op,NF_CUR *curp) noex {
 	int		rs ;
 	if ((rs = nodesfile_magic(op,curp)) >= 0) {
 	    cint	sz = szof(hdb_cur) ;
-	    if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 		rs = SR_BUGCHECK ;
 		if ((curp->hcp = new(vp) hdb_cur) != np) {
 		    {
@@ -445,9 +447,9 @@ int nodesfile_curbegin(NF *op,NF_CUR *curp) noex {
 		    }
 		} /* end if (new-hdb_cur) */
 		if (rs < 0) {
-		    uc_free(vp) ;
+		    lm_free(vp) ;
 		    curp->hcp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (magic) */
 	return rs ;
@@ -466,7 +468,7 @@ int nodesfile_curend(NF *op,NF_CUR *curp) noex {
 	        }
 		destroy_at(curp->hcp) ;
 		{
-		    rs1 = uc_free(vp) ;
+		    rs1 = lm_free(vp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    curp->hcp = nullptr ;
 	        }
@@ -548,7 +550,7 @@ static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
 	if (USTAT sb ; (rs = fp->stat(&sb)) >= 0) {
 	    if ((rs = nodesfile_fnalready(op,&sb)) == 0) {
 		cint	sz = szof(NF_FI) ;
-		if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 		    rs = SR_BUGCHECK ;
 		    if (NF_FI *fep ; (fep = new(vp) NF_FI) != np) {
 		        const dev_t	d = sb.st_dev ;
@@ -568,8 +570,8 @@ static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
 			}
 		    } /* end if (new-file) */
 		    if (rs < 0) {
-			uc_free(vp) ;
-		    }
+			lm_free(vp) ;
+		    } /* end if (error) */
 		} /* end if (memory-allocation) */
 	    } /* end if (nodesfile_fnalready) */
 	} /* end if (bfile_stat) */
@@ -580,13 +582,15 @@ static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
 static int nodesfile_fnloadend(NF *op,int fi) noex {
     	vechand		*flp = op->flp ;
     	int		rs ;
+	int		rs1 ;
 	if (void *vp ; (rs = flp->get(fi,&vp)) >= 0) {
 	    if (vp) {
 	        NF_FI	*fep = resumelife<NF_FI>(vp) ;
 		if ((rs = flp->del(fi)) >= 0) {
 	            if ((rs = fep->finish()) >= 0) {
 			destroy_at(fep) ;
-		        rs = uc_free(vp) ;
+		        rs1 = lm_free(vp) ;	/* checked ok */
+			if (rs >= 0) rs = rs1 ;
 	            }
 		}
 	    } /* end if (non-null) */
@@ -617,7 +621,7 @@ static int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
     	cint		esz = szof(NF_ENT) ;
 	int		rs ;
-	if (char *vp ; (rs = uc_malloc(esz,&vp)) >= 0) {
+	if (char *vp ; (rs = lm_mall(esz,&vp)) >= 0) {
 	    hdb		*elp = op->elp ;
 	    rs = SR_BUGCHECK ;
 	    if (NF_ENT *ep ; (ep = new(vp) NF_ENT) != np) {
@@ -638,8 +642,8 @@ static int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
 		}
 	    } /* end if (new-entry) */
 	    if (rs < 0) {
-		uc_free(vp) ;
-	    }
+		lm_free(vp) ;
+	    } /* end if (error) */
 	} /* end if (memory-allocation) */
 	return rs ;
 }
