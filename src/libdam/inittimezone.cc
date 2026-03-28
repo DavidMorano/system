@@ -1,10 +1,10 @@
-/* inittimezone */
-/* lang=C20 */
+/* inittimezone SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
-/* get the default timezone ('TZ') that 'init(1m)' uses */
+/* get the default timezone ('TZ') that |init(1m)| uses */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -22,7 +22,7 @@
 
 	Description:
 	This subroutine retrieves (if it exists) the timezone
-	variable value (value name is 'TZ') that the 'init(1m)'
+	variable value (value name is 'TZ') that the |init(1m)|
 	program sets for its children.
 
 	Synopsis:
@@ -40,18 +40,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<sncpyx.h>
 #include	<localmisc.h>
 
+#include	"inittimezone.h"
+
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -66,23 +69,6 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-
-extern int	vecstr_envfile(vecstr *,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* external variables */
 
@@ -96,46 +82,45 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int inittimezone(char *rbuf,int rlen,cchar *fname)
-{
-	vecstr		defs ;
-	int		rs ;
+int inittimezone(char *rbuf,int rlen,cchar *fname) noex {
+    	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		len = 0 ;
-
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if ((rlen >= 0) && (rlen < 1))
-	    return SR_OVERFLOW ;
-
-	if (fname == NULL)
-	    fname = DEFINITFNAME ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = vecstr_start(&defs,20,0)) >= 0) {
-	    if ((rs = vecstr_envfile(&defs,fname)) >= 0) {
-		cchar	*var = VARTZ ;
-		cchar	*sp ;
-
-	        if ((rs = vecstr_finder(&defs,var,vstrkeycmp,&sp)) >= 0) {
-	            if ((sp != NULL) && (sp[0] != '\0')) {
-			cchar	*tp ;
-	                if ((tp = strchr(sp,'=')) != NULL) {
-	                    rs = sncpy1(rbuf,rlen,(tp+1)) ;
-			    len = rs ;
-			}
-	            } else
-	                rs = SR_NOTFOUND ;
-	        } /* end if (found our key-name) */
-
-	    } /* end if (got some variables) */
-	    rs1 = vecstr_finish(&defs) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (vecstr) */
-
+	int		len = 0 ; /* return-value */
+	if (rbuf) {
+	    rs = SR_OVERFLOW ;
+	    rbuf[0] = '\0' ;
+	    if (rs > 0) {
+		cint vn = 4 ;
+		cint vo = 0 ;
+	        if (fname == nullptr) {
+	    	    fname = DEFINITFNAME ;
+	        }
+	        if (vecstr defs ; (rs = defs.start(vn,vo)) >= 0) {
+	            if ((rs = defs.envfile(fname)) >= 0) {
+			cchar	*var = varname.tz ;
+			cchar	*sp ;
+	        	if ((rs = defs.finder(var,vstrkeycmp,&sp)) >= 0) {
+	                    if (sp && sp[0]) {
+			        if (cchar *tp ; (tp = strchr(sp,'=')) != np) {
+	                           rs = sncpy(rbuf,rlen,(tp+1)) ;
+			           len = rs ;
+			       }
+	                    } else {
+	                	rs = SR_NOTFOUND ;
+			    }
+	        	} /* end if (found our key-name) */
+	    	    } /* end if (got some variables) */
+	            rs1 = vecstr_finish(&defs) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (vecstr) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (inittimezone) */
