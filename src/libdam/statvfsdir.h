@@ -20,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -30,7 +29,7 @@
 
 EXTERNC_begin
 
-extern int	statvfsdir(cchar *,USTATVFS *) noex ;
+extern int	statvfsdir(cchar *,ustatvfs *) noex ;
 
 EXTERNC_end
 
