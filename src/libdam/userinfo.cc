@@ -62,24 +62,29 @@
 #include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
+#include	<fcntl.h>
+#include	<netdb.h>
+#include	<pwd.h>
+#include	<grp.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<pwd.h>
-#include	<grp.h>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucgetpid.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getbufsize.h>
-#include	<mallocxx.h>
-#include	<uinfo.h>
 #include	<getnodename.h>
 #include	<getusername.h>
 #include	<getprojname.h>		/* |getprojname(3uc)| */
 #include	<getostype.h>
-#include	<userattrdb.h>
+#include	<getbufsize.h>
+#include	<getnodedomain.h>
 #include	<getax.h>
+#include	<uinfo.h>
+#include	<userattrdb.h>
 #include	<gecos.h>
 #include	<bits.h>
 #include	<strstore.h>
@@ -98,7 +103,11 @@
 
 #include	"userinfo.h"
 
-import uconstants ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |memclear(3u)| */
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -172,7 +181,6 @@ import uconstants ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -220,7 +228,7 @@ enum uits {
 	uit_wstation,
 	uit_logid,
 	uit_overlast
-} ;
+} ; /* end enum (uits) */
 
 struct procinfo_flags {
 	uint		altuser:1 ;
@@ -228,15 +236,14 @@ struct procinfo_flags {
 	uint		ua:1 ;
 	uint		uainit:1 ;
 	uint		allocua:1 ;
-} ;
+} ; /* end struct */
 
 struct procinfo_tmps {
 	cchar		*gecosname ;
 	cchar		*realname ;
-} ;
+} ; /* end struct */
 
 struct procinfo {
-	PROCINFO_FL	f ;
 	PROCINFO_TMPS	tstrs ;
 	PASSWD		pw ;
 	bits		have ;
@@ -245,16 +252,17 @@ struct procinfo {
 	strstore	*stp ;		/* supplied argument */
 	int		*sis ;		/* supplied argument */
 	cchar		*username ;	/* supplied argument */
-	cchar		*a ;		/* the memory allocation */
+	char		*a ;		/* the memory allocation */
 	userattrdb	*uap ;
-	cchar		*pwbuf ;	/* specially allocated */
+	char		*pwbuf ;	/* specially allocated */
 	char		*nodename ;	/* allocated */
 	char		*domainname ;	/* allocated */
 	char		*pr ;		/* allocated */
 	char		*tbuf ;
+	PROCINFO_FL	fl ;
 	int		pwlen ;
 	int		tlen ;
-} ;
+} ; /* end struct */
 
 namespace {
     struct vars {
@@ -266,7 +274,7 @@ namespace {
 	int		pwlen ;
 	int mkvars() noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -275,7 +283,7 @@ template<typename ... Args>
 static int userinfo_ctor(userinfo *op,Args ... args) noex {
     	USERINFO	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -284,7 +292,7 @@ static int userinfo_ctor(userinfo *op,Args ... args) noex {
 
 static int userinfo_dtor(userinfo *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -294,7 +302,7 @@ static int userinfo_dtor(userinfo *op) noex {
 template<typename ... Args>
 static inline int userinfo_magic(userinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == USERINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -346,7 +354,7 @@ static int	procinfo_logid(PROCINFO *) noex ;
 /* local variables */
 
 /* order here is generally (quite) important */
-static constexpr int	(*components[])(PROCINFO *) = {
+constexpr int		(*components[])(PROCINFO *) = {
 	procinfo_homedname,
 	procinfo_shell,
 	procinfo_org,
@@ -368,7 +376,7 @@ static constexpr int	(*components[])(PROCINFO *) = {
 	procinfo_wstation,
 	procinfo_logid,
 	nullptr
-} ;
+} ; /* end array */
 
 static vars		var ;
 
@@ -383,14 +391,14 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = userinfo_ctor(uip)) >= 0) {
+	if ((rs = userinfo_ctor(uip)) >= 0) ylikely {
 	    static cint		rsv = var.mkvars() ;
-	    if ((rs = rsv) >= 0) {
+	    if ((rs = rsv) >= 0) ylikely {
 		static cchar	*nn = getenv(varname.node) ;
 	        uip->nodename = nn ;
-	        if ((rs = userinfo_id(uip)) >= 0) {
+	        if ((rs = userinfo_id(uip)) >= 0) ylikely {
 	            cint	sz = (uit_overlast * szof(cchar *)) ;
-	            if (void *vp{} ; (rs = uc_calloc(1,sz,&vp)) >= 0) {
+	            if (void *vp ; (rs = lm_call(1,sz,&vp)) >= 0) ylikely {
 	                strstore	st ;
 	                int		*sis = cast_static<int *>(vp) ;
 	                if ((rs = strstore_start(&st,10,startsize)) >= 0) {
@@ -401,7 +409,7 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	                    rs1 = strstore_finish(&st) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (strstore) */
-	                rs1 = uc_free(vp) ;
+	                rs1 = lm_free(vp) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (memory_allocation) */
 	            if (rs >= 0) uip->magic = USERINFO_MAGIC ;
@@ -418,9 +426,9 @@ int userinfo_start(UI *uip,cchar *un) noex {
 int userinfo_finish(UI *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = userinfo_magic(op)) >= 0) {
-	    if (op->a) {
-	        rs1 = uc_free(op->a) ;
+	if ((rs = userinfo_magic(op)) >= 0) ylikely {
+	    if (op->a) ylikely {
+	        rs1 = lm_free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
 	    }
@@ -442,7 +450,7 @@ static int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = procinfo_start(&pi,uip,stp,sis)) >= 0) {
+	if ((rs = procinfo_start(&pi,uip,stp,sis)) >= 0) ylikely {
 	    {
 	        rs = procinfo_find(&pi,un) ;
 		rv = rs ;
@@ -473,11 +481,10 @@ static int userinfo_id(UI *uip) noex {
 static int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	int		rs ;
 	int		sz = 0 ;
-	if ((rs = strstore_strsize(stp)) >= 0) {
-	    char	*a{} ;
+	if ((rs = strstore_strsize(stp)) >= 0) ylikely {
 	    sz = rs ;
-	    if ((rs = uc_malloc(sz,&a)) >= 0) {
-	        if ((rs = strstore_strmk(stp,a,sz)) >= 0) {
+	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
+	        if ((rs = strstore_strmk(stp,a,sz)) >= 0) ylikely {
 		    for (int i = 0 ; i < uit_overlast ; i += 1) {
 	                cchar	**vpp = nullptr ;
 	                switch (i) {
@@ -580,7 +587,7 @@ static int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	        if (rs >= 0) {
 	            uip->a = a ;
 	        } else {
-	            uc_free(a) ;
+	            lm_free(a) ;
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if */
@@ -592,18 +599,19 @@ static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	cint		pwlen = var.pwlen ;
 	int		rs ;
 	int		sz = 0 ;
-	char		*bp{} ;
-	memclear(pip) ;			/* <- noted */
-	pip->uip = uip ;
-	pip->stp = stp ;
-	pip->sis = sis ;
-	pip->tlen = max(pwlen,var.maxpathlen) ;
+	{
+	    memclear(pip) ;		/* <- noted */
+	    pip->uip = uip ;
+	    pip->stp = stp ;
+	    pip->sis = sis ;
+	    pip->tlen = max(pwlen,var.maxpathlen) ;
+	}
 	sz += szof(userattrdb) ;
 	sz += var.nodenamelen ;
 	sz += var.hostnamelen ;
 	sz += var.maxpathlen ;
 	sz += pip->tlen ;
-	if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
 	    int		bl = 0 ;
 	    pip->a = bp ;
 	    pip->uap = (userattrdb *) (bp+bl) ;
@@ -616,13 +624,13 @@ static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	    bl += var.maxpathlen ;
 	    pip->tbuf = (bp+bl) ;
 	    bl += pip->tlen ;
-	    if ((rs = bits_start(&pip->have,uit_overlast)) >= 0) {
+	    if ((rs = bits_start(&pip->have,uit_overlast)) >= 0) ylikely {
 	        pip->nodename[0] = '\0' ;
 	        pip->domainname[0] = '\0' ;
 	        pip->pr[0] = '\0' ;
 	        pip->tbuf[0] = '\0' ;
 	    } else {
-	        uc_free(bp) ;
+	        lm_free(bp) ;
 	        pip->a = nullptr ;
 	    }
 	} /* end if */
@@ -637,8 +645,8 @@ static int procinfo_finish(PROCINFO *pip) noex {
 	    rs1 = procinfo_uaend(pip) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	if (pip->pwbuf) {
-	    rs1 = uc_free(pip->pwbuf) ;
+	if (pip->pwbuf) ylikely {
+	    rs1 = lm_free(pip->pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    pip->pwbuf = nullptr ;
 	    pip->pwlen = 0 ;
@@ -648,7 +656,7 @@ static int procinfo_finish(PROCINFO *pip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (pip->a) {
-	    rs1 = uc_free(pip->a) ;
+	    rs1 = lm_free(pip->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    pip->a = nullptr ;
 	}
@@ -683,8 +691,7 @@ static int procinfo_uabegin(PROCINFO *pip) noex {
 	    pip->fl.uainit = true ;
 	    if (pip->uap == nullptr) {
 	        cint	sz = szof(userattrdb) ;
-	        void	*vp{} ;
-	        if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	            pip->uap = (userattrdb *) vp ;
 	            pip->fl.allocua = true ;
 	        }
@@ -695,7 +702,7 @@ static int procinfo_uabegin(PROCINFO *pip) noex {
 	            pip->fl.ua = true ;
 		} else {
 		    {
-	                uc_free(pip->uap) ;
+	                lm_free(pip->uap) ;
 	                pip->uap = nullptr ;
 	                pip->fl.allocua = false ;
 		    }
@@ -710,13 +717,13 @@ static int procinfo_uabegin(PROCINFO *pip) noex {
 static int procinfo_uaend(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->fl.ua) {
+	if (pip->fl.ua) ylikely {
 	    pip->fl.ua = false ;
 	    rs1 = userattrdb_close(pip->uap) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (pip->fl.allocua && (pip->uap != nullptr)) {
-	    rs1 = uc_free(pip->uap) ;
+	    rs1 = lm_free(pip->uap) ;
 	    pip->uap = nullptr ;
 	    pip->fl.allocua = false ;
 	    if (rs >= 0) rs = rs1 ;
@@ -727,11 +734,14 @@ static int procinfo_uaend(PROCINFO *pip) noex {
 
 static int procinfo_ualookup(PROCINFO *pip,char *rbuf,int rlen,cc *kn) noex {
 	int		rs = SR_FAULT ;
-	if (pip && rbuf && kn) {
+	if (pip && rbuf && kn) ylikely {
 	    rbuf[0] = '\0' ;
+	    rs = SR_OK ;
 	    if (pip->fl.pw) {
-	        if (! pip->fl.ua) rs = procinfo_uabegin(pip) ;
-	        if (rs >= 0) {
+	        if (! pip->fl.ua) {
+		    rs = procinfo_uabegin(pip) ;
+		}
+	        if (rs >= 0) ylikely {
 	            rs = userattrdb_lookup(pip->uap,rbuf,rlen,kn) ;
 	        }
 	    }
@@ -743,7 +753,7 @@ static int procinfo_ualookup(PROCINFO *pip,char *rbuf,int rlen,cc *kn) noex {
 static int procinfo_find(PROCINFO *pip,cchar *un) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs ;
-	if ((rs = procinfo_pwentry(pip,un)) >= 0) {
+	if ((rs = procinfo_pwentry(pip,un)) >= 0) ylikely {
 	    cint	dlen = DIGBUFLEN ;
 	    int		cl = -1 ;
 	    int		uit ;
@@ -800,8 +810,7 @@ static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
 	    pip->fl.pw = true ;
 	    if ((rs = pwp->size()) >= 0) {
 	        int	pwsz = rs ;
-	        char	*p{} ;
-	        if ((rs = uc_malloc((pwsz+1),&p)) >= 0) {
+	        if (char *p ; (rs = lm_mall((pwsz+1),&p)) >= 0) {
 	            ucentpw	*tpwp = cast_static<ucentpw *>(&pip->pw) ;
 	            if ((rs = tpwp->load(p,pwsz,pwp)) >= 0) {
 	                pip->pwbuf = p ;
@@ -809,7 +818,7 @@ static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
 	                f = true ;
 	            }
 	            if (rs < 0) {
-	                uc_free(p) ;
+	                lm_free(p) ;
 		    }
 	        } /* end if (memory-allocation) */
 	    } /* end if (passwdent_size) */
@@ -891,8 +900,7 @@ static int procinfo_org(PROCINFO *pip) noex {
 	    cchar	*orgcname = ORGCNAME ;
 	    cchar	*vp = nullptr ;
 	    char	rbuf[orglen+1] ;
-	    char	*orgfname{} ;
-	    if ((rs = malloc_mp(&orgfname)) >= 0) {
+	    if (char *orgfname ; (rs = lm_mp(&orgfname)) >= 0) ylikely {
 	        if ((vp == nullptr) || (vp[0] == '\0')) {
 	            if (! pip->fl.altuser) {
 	                vp = getenv(varname.organization) ;
@@ -921,7 +929,7 @@ static int procinfo_org(PROCINFO *pip) noex {
 	                rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
 		    }
 	        } /* end if (ok) */
-		rs1 = uc_free(orgfname) ;
+		rs1 = lm_free(orgfname) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if */
@@ -1013,8 +1021,8 @@ static int procinfo_gecos(PROCINFO *pip) noex {
 	                    uit = uit_gecosname ;
 	                    up = uip->gecosname ;
 	                    if ((bits_test(bip,uit) == 0) && (up == nullptr)) {
-	                        char	*nbuf{} ;
-	                        if ((rs = uc_malloc((vl+1),&nbuf)) >= 0) {
+	                        char	*nbuf ;
+	                        if ((rs = lm_mall((vl+1),&nbuf)) >= 0) {
 	                            if (strnchr(vp,vl,'_') != nullptr) {
 	                                rs = snwcpyhyphen(nbuf,-1,vp,vl) ;
 	                                vp = nbuf ;
@@ -1029,7 +1037,7 @@ static int procinfo_gecos(PROCINFO *pip) noex {
 	                                }
 	                                vp = nullptr ;
 	                            } /* end if (ok) */
-	                            rs1 = uc_free(nbuf) ;
+	                            rs1 = lm_free(nbuf) ;
 				    if (rs >= 0) rs = rs1 ;
 	                        } /* end if (memory-allocation) */
 	                    } else {
@@ -1412,8 +1420,7 @@ static int procinfo_md(PROCINFO *pip) noex {
 	    }
 	    if (uip->md == nullptr) {
 	        int	dl = -1 ;
-	        char	*dbuf{} ;
-		if ((rs = malloc_hn(&dbuf)) >= 0) {
+	        if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
 		    cint	dlen = rs ;
 	            if ((rs >= 0) && (dbuf[0] == '\0')) {
 	                if (pip->fl.pw) {
@@ -1429,7 +1436,7 @@ static int procinfo_md(PROCINFO *pip) noex {
 	            if ((rs >= 0) && (dbuf[0] != '\0')) {
 	                rs = procinfo_store(pip,uit,dbuf,dl,nullptr) ;
 	            }
-		    rs1 = uc_free(dbuf) ;
+		    rs1 = lm_free(dbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    }
@@ -1546,12 +1553,12 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		sz = 0 ;
-	if (oup && ubuf) {
+	if (oup && ubuf) ylikely {
 	    rs = SR_TOOBIG ;
 	    if (ulen >= var.nodenamelen) {
 	        userinfo	u ;
 	        memset(ubuf,0,ulen) ;
-	        if ((rs = userinfo_start(&u,un)) >= 0) {
+	        if ((rs = userinfo_start(&u,un)) >= 0) ylikely {
 	            if (storeitem si ; (rs = si.start(ubuf,ulen)) >= 0) {
 	                cchar	*sp ;
 	                cchar	**rpp ;
@@ -1705,17 +1712,17 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 
 int vars::mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	if ((rs = getbufsize(bufsize_mn)) >= 0) {
 	    maxnamelen = rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
-	        if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	        if ((rs = getbufsize(bufsize_nn)) >= 0) {
 	            nodenamelen = rs ;
-	            if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	            if ((rs = getbufsize(bufsize_hn)) >= 0) {
 	                hostnamelen = rs ;
-	                if ((rs = getbufsize(getbufsize_pn)) >= 0) {
+	                if ((rs = getbufsize(bufsize_pn)) >= 0) {
 	                    projnamelen = rs ;
-	                    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+	                    if ((rs = getbufsize(bufsize_pw)) >= 0) {
 				pwlen = rs ;
 			    }
 			}
