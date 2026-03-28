@@ -1,6 +1,9 @@
-/* keysym */
+/* keysym HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
 
 /* KeySym character defines */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,33 +17,35 @@
 
 /******************************************************************************
 
+  	NameL
+	keysym
+
 	Notes:
 
 	= Gaps
 
-        There are gaps in the KEYSYM record here. Not all key-codes have
-        associated KEYSYMs, at least not KEYSYMs that are listed here. It does
-        not mean that those missing key-codes do not exist. They exist but just
-        have not had a KEYSYM name assigned here. A KEYSYM may be assigned
-        someplace else.
+	There are gaps in the KEYSYM record here. Not all key-codes
+	have associated KEYSYMs, at least not KEYSYMs that are
+	listed here. It does not mean that those missing key-codes
+	do not exist. They exist but just have not had a KEYSYM
+	name assigned here. A KEYSYM may be assigned someplace else.
 
 	= Schema
 
-        KEYSYMs that have values between 0 and 255 represent the ISO-Latin-1
-        characters that are associated with those values. For other KEYSYMs,
-        they have relatively pseudo-random values.
+	KEYSYMs that have values between 0 and 255 represent the
+	ISO-Latin-1 characters that are associated with those values.
+	For other KEYSYMs, they have relatively pseudo-random values.
 
 	= Aliases
 
-        Some KEYSYM names are aliases of others. So it is not a one-to-one
-        mapping. Several KEYSYMs may map to the same values.
-
+	Some KEYSYM names are aliases of others. So it is not a
+	one-to-one mapping. Several KEYSYMs may map to the same
+	values.
 
 ******************************************************************************/
 
-
 #ifndef	KEYSYM_INCLUDE
-#define	KEYSYM_INCLUDE	1
+#define	KEYSYM_INCLUDE
 
 
 #define	KEYSYM_SOH		0x01
