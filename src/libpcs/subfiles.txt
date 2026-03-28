@@ -13,6 +13,7 @@ pcsgetnames
 pcsmsgid
 pcsmailhost
 pcstrustuser
+pcsmailcheck
 
 datestr_envelope
 datestr_header
