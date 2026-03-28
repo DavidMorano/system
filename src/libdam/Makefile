@@ -192,7 +192,7 @@ OBJ83= tmstrs.o shellunder.o udomain.o
 OBJ84= mktmpuserdir.o mkcaselower.o mkfmtphone.o
 OBJ85=
 OBJ86= mktmpfile.o mktmplock.o mkjobfile.o mkdatefile.o mkuuid.o mkchar.o
-OBJ87= nchr.o
+OBJ87=
 
 OBJ88= tcgetlines.o tcsetlines.o tcpeek.o tcsetmesg.o tcsetbiff.o tcsetown.o
 OBJ89= tcgetws.o tcsetws.o
@@ -926,6 +926,8 @@ satcount.o:		satcount.cc		satcount.h		$(INCS)
 quickselect.o:		quickselect.cc		quickselect.h		$(INCS)
 quickselecti.o:		quickselecti.cc		quickselecti.h		$(INCS)
 fsdirtreestat.o:	fsdirtreestat.cc	fsdirtreestat.h		$(INCS)
+makedirs.o:		makedirs.cc		makedirs.h		$(INCS)
+naturalwords.o:		naturalwords.cc		naturalwords.h		$(INCS)
 
 # DFSA
 dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
