@@ -66,7 +66,6 @@ import libutil ;
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -89,12 +88,12 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int keysymer_ctor(keysymer *op,Args ... args) noex {
 	KEYSYMER	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->mlp = new(nothrow) mapstrint) != np) {
+	    if ((op->mlp = new(nothrow) mapstrint) != np) ylikely {
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
@@ -104,9 +103,9 @@ static int keysymer_ctor(keysymer *op,Args ... args) noex {
 
 static int keysymer_dtor(keysymer *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->mlp) {
+	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
 	    }
@@ -118,7 +117,7 @@ static int keysymer_dtor(keysymer *op) noex {
 template<typename ... Args>
 static inline int keysymer_magic(keysymer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == KEYSYMER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -278,10 +277,10 @@ static int keysymer_parse(keysymer *op,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (fname) {
+	if (fname) ylikely {
 	    bfile	dfile, *dfp = &dfile ;
-	    if ((rs = bopen(dfp,fname,"r",0666)) >= 0) {
-		if (bfliner bl ; (rs = bl.start(dfp)) >= 0) {
+	    if ((rs = bopen(dfp,fname,"r",0666)) >= 0) ylikely {
+		if (bfliner bl ; (rs = bl.start(dfp)) >= 0) ylikely {
 		    cchar	*lp ;
 	            while ((rs = bl.getlns(&lp)) > 0) {
 	                cint	len = rmeol(lp,rs) ;
@@ -382,7 +381,7 @@ static int keysymer_process(keysymer *op,cchar *kp,int kl,int kn) noex {
 
 static int keysymer_finishthem(keysymer *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
