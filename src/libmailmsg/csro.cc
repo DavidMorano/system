@@ -41,12 +41,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<netdb.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<hdb.h>
 #include	<vecstr.h>
 #include	<strwcpy.h>
@@ -81,15 +84,15 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int csro_ctor(csro *op,Args ... args) noex {
+local int csro_ctor(csro *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    op->magic = 0 ;
 	    op->elp = nullptr ;
 	    rs = SR_NOMEM ;
-	    if ((op->nlp = new(nothrow) vecstr) != np) {
-	        if ((op->elp = new(nothrow) vecobj) != np) {
+	    if ((op->nlp = new(nothrow) vecstr) != np) ylikely {
+	        if ((op->elp = new(nothrow) vecobj) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-vecobj) */
 		if (rs < 0) {
@@ -102,15 +105,15 @@ static int csro_ctor(csro *op,Args ... args) noex {
 }
 /* end subroutine (csro_ctor) */
 
-static int csro_dtor(csro *op) noex {
+local int csro_dtor(csro *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->elp) {
+	    if (op->elp) ylikely {
 		delete op->elp ;
 		op->elp = nullptr ;
 	    }
-	    if (op->nlp) {
+	    if (op->nlp) ylikely {
 		delete op->nlp ;
 		op->nlp = nullptr ;
 	    }
@@ -120,21 +123,21 @@ static int csro_dtor(csro *op) noex {
 /* end subroutine (csro_dtor) */
 
 template<typename ... Args>
-static inline int csro_magic(csro *op,Args ... args) noex {
+local inline int csro_magic(csro *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CSRO_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
 /* end subroutine (csro_magic) */
 
-static int	value_start(VALUE *,cchar *,cchar *,off_t) noex ;
-static int	value_finish(VALUE *) noex ;
+local int	value_start(VALUE *,cchar *,cchar *,off_t) noex ;
+local int	value_finish(VALUE *) noex ;
 
 extern "C" {
-    static int	vcmpname(cvoid **,cvoid **) noex ;
-    static int	vcmpentry(cvoid **,cvoid **) noex ;
+    local int	vcmpname(cvoid **,cvoid **) noex ;
+    local int	vcmpentry(cvoid **,cvoid **) noex ;
 }
 
 
@@ -148,13 +151,13 @@ extern "C" {
 
 int csro_start(csro *op,int n) noex {
 	int		rs ;
-	if ((rs = csro_ctor(op)) >= 0) {
+	if ((rs = csro_ctor(op)) >= 0) ylikely {
 	    int		vo = VECSTR_OCONSERVE ;
 	    int		sz = szof(csro_val) ;
 	    if (n <= 1) n = CSRO_DEFENTS ;
-	    if ((rs = vecstr_start(op->nlp,n,vo)) >= 0) {
+	    if ((rs = vecstr_start(op->nlp,n,vo)) >= 0) ylikely {
 		vo = 0 ;
-	    	if ((rs = vecobj_start(op->elp,sz,n,vo)) >= 0) {
+	    	if ((rs = vecobj_start(op->elp,sz,n,vo)) >= 0) ylikely {
 	            op->magic = CSRO_MAGIC ;
 	        } /* end if (vecobj_start) */
 	        if (rs < 0) {
@@ -172,7 +175,7 @@ int csro_start(csro *op,int n) noex {
 int csro_finish(csro *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = csro_magic(op)) >= 0) {
+	if ((rs = csro_magic(op)) >= 0) ylikely {
 	    vecobj	*elp = op->elp ;
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(elp,i,&vp) >= 0 ; i += 1) {
@@ -186,7 +189,7 @@ int csro_finish(csro *op) noex {
 	        rs1 = vecobj_finish(elp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->nlp) ylikely {
 	        rs1 = vecstr_finish(op->nlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -204,9 +207,9 @@ int csro_add(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = csro_magic(op,mailname,fname)) >= 0) {
+	if ((rs = csro_magic(op,mailname,fname)) >= 0) ylikely {
 	    csro_val	ve ;
-	    if ((rs = value_start(&ve,mailname,fname,moff)) >= 0) {
+	    if ((rs = value_start(&ve,mailname,fname,moff)) >= 0) ylikely {
 	        vecstr	*nlp = op->nlp ;
 	        vecobj	*vlp = op->elp ;
 	        cint	nlen = lenstr(mailname) ;
@@ -240,9 +243,9 @@ int csro_already(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = csro_magic(op,mailname,fname)) >= 0) {
+	if ((rs = csro_magic(op,mailname,fname)) >= 0) ylikely {
 	    csro_val	ve ;
-	    if ((rs = value_start(&ve,mailname,fname,moff)) >= 0) {
+	    if ((rs = value_start(&ve,mailname,fname,moff)) >= 0) ylikely {
 	        cint	rsn = SR_NOTFOUND ;
 	        if ((rs = vecobj_search(op->elp,&ve,vcmpentry,np)) >= 0) {
 	            f = true ;
@@ -260,7 +263,7 @@ int csro_already(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 /* return the number of hosts seen so far */
 int csro_countnames(csro *op) noex {
 	int		rs ;
-	if ((rs = csro_magic(op)) >= 0) {
+	if ((rs = csro_magic(op)) >= 0) ylikely {
 	    rs = vecstr_count(op->nlp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -270,7 +273,7 @@ int csro_countnames(csro *op) noex {
 /* return the count of the number of items in this list */
 int csro_count(csro *op) noex {
 	int		rs ;
-	if ((rs = csro_magic(op)) >= 0) {
+	if ((rs = csro_magic(op)) >= 0) ylikely {
 	    rs = vecobj_count(op->elp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -280,7 +283,7 @@ int csro_count(csro *op) noex {
 /* sort the strings in the vector list */
 int csro_sort(csro *op) noex {
 	int		rs ;
-	if ((rs = csro_magic(op)) >= 0) {
+	if ((rs = csro_magic(op)) >= 0) ylikely {
 	    rs = vecobj_sort(op->elp,vcmpname) ;
 	} /* end if (magic) */
 	return rs ;
@@ -289,7 +292,7 @@ int csro_sort(csro *op) noex {
 
 int csro_ncurbegin(csro *op,csro_ncur *hcp) noex {
 	int		rs ;
-	if ((rs = csro_magic(op,hcp)) >= 0) {
+	if ((rs = csro_magic(op,hcp)) >= 0) ylikely {
 	    *hcp = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -298,7 +301,7 @@ int csro_ncurbegin(csro *op,csro_ncur *hcp) noex {
 
 int csro_ncurend(csro *op,csro_ncur *hcp) noex {
 	int		rs ;
-	if ((rs = csro_magic(op,hcp)) >= 0) {
+	if ((rs = csro_magic(op,hcp)) >= 0) ylikely {
 	    *hcp = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -307,7 +310,7 @@ int csro_ncurend(csro *op,csro_ncur *hcp) noex {
 
 int csro_vcurbegin(csro *op,csro_vcur *vcp) noex {
 	int		rs ;
-	if ((rs = csro_magic(op,vcp)) >= 0) {
+	if ((rs = csro_magic(op,vcp)) >= 0) ylikely {
 	    *vcp = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -325,7 +328,7 @@ int csro_vcurend(csro *op,csro_vcur *vcp) noex {
 
 int csro_getname(csro *op,csro_ncur *hcp,cchar **hnpp) noex {
 	int		rs ;
-	if ((rs = csro_magic(op,hcp)) >= 0) {
+	if ((rs = csro_magic(op,hcp)) >= 0) ylikely {
 	    cchar	*dump ;
 	    int		i = (*hcp >= 0) ? (*hcp + 1) : 0 ;
 	    if (hnpp == nullptr) hnpp = &dump ;
@@ -342,7 +345,7 @@ int csro_getname(csro *op,csro_ncur *hcp,cchar **hnpp) noex {
 /* fetch the next entry value that matches the given host name */
 int csro_getvalue(csro *op,cc *mailname,csro_vcur *vcp,csro_val **vepp) noex {
 	int		rs ;
-	if ((rs = csro_magic(op,mailname,vcp,vepp)) >= 0) {
+	if ((rs = csro_magic(op,mailname,vcp,vepp)) >= 0) ylikely {
 	    int		i = (*vcp < 0) ? 0 : (*vcp + 1) ;
 	    csro_val	*valp = nullptr ;
 	    void	*vp{} ;
@@ -365,7 +368,7 @@ int csro_getvalue(csro *op,cc *mailname,csro_vcur *vcp,csro_val **vepp) noex {
 
 /* private subroutines */
 
-static int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
+local int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
 	int		rs ;
 	int		sz = 1 ;
 	memclear(ep) ;
@@ -374,7 +377,7 @@ static int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
 	if (fname != nullptr) {
 	   sz += (lenstr(fname)+1) ;
 	}
-	if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) ylikely {
 	    ep->mailname = bp ;
 	    bp = (strwcpy(bp,fname,-1)+1) ;
 	    ep->fname = bp ;
@@ -388,12 +391,12 @@ static int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
 }
 /* end subroutine (value_start) */
 
-static int value_finish(VALUE *ep) noex {
+local int value_finish(VALUE *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
-	    {
+	    if (ep->mailname) ylikely {
 		void *vp = voidp(ep->mailname) ;
 		rs1 = libmem.free(vp) ;
 		if (rs >= 0) rs = rs1 ;
@@ -404,7 +407,7 @@ static int value_finish(VALUE *ep) noex {
 }
 /* end subroutine (value_finish) */
 
-static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	csro_val	**e1pp = (csro_val **) v1pp ;
 	csro_val	**e2pp = (csro_val **) v2pp ;
 	int		rc = 0 ;
@@ -431,7 +434,7 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 }
 /* end subroutine (vcmpname) */
 
-static int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	csro_val	**e1pp = (csro_val **) v1pp ;
 	csro_val	**e2pp = (csro_val **) v2pp ;
 	int		rc = 0 ;
