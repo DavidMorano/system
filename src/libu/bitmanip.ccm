@@ -1,0 +1,51 @@
+/* bitmanip MODULE (primary-module-interface)*/
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* bit manipultatio operations */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-85, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<localmisc.h>
+
+export module bitmanip ;
+
+/* local defines */
+
+
+/* exported subroutines */
+
+export {
+    template<typename T> constexpr inline bool bit(T v,int n) noex {
+	return !!((v >> n) & 1) ;
+    } /* end subroutine (bit) */
+} /* end export */
+
+export {
+    template<typename T> constexpr inline bool bitsign(T v) noex {
+	cint nb = (szof(T) * CHAR_BIT) ;
+	return !!((v >> (nb-1)) & 1) ;
+    } /* end subroutine (bitsign) */
+} /* end export */
+
+
