@@ -27,7 +27,7 @@
 
 *******************************************************************************/
 
-
+#include	<envstandards.h>	/* must be ordered first to configure */
 #include	<sys/types.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -39,6 +39,9 @@
 
 #include	"sysgroup.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
