@@ -5,7 +5,6 @@
 /* record-array management */
 /* version %I% last-modified %G% */
 
-#define	CF_QSORT	0		/* use |qsort(3c)| */
 
 /* revision history:
 
@@ -47,10 +46,6 @@
 
 #define	RECARR_DEFENTS	10
 
-#ifdef	CF_QSORT
-#define	CF_QSORT	0		/* use |qsort(3c)| */
-#endif
-
 
 /* imported namespaces */
 
@@ -72,7 +67,7 @@ using libuc::libmem ;			/* variable */
 /* forward references */
 
 template<typename ... Args>
-static inline int recarr_ctor(recarr *op,Args ... args) noex {
+local inline int recarr_ctor(recarr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
@@ -82,11 +77,11 @@ static inline int recarr_ctor(recarr *op,Args ... args) noex {
 	    op->n = 0 ;
 	    op->fi = 0 ;
 	    op->fl = {} ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (recarr_ctor) */
 
-static int recarr_dtor(recarr *op) noex {
+local int recarr_dtor(recarr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -94,8 +89,8 @@ static int recarr_dtor(recarr *op) noex {
 	return rs ;
 } /* end subroutine (recarr_dtor) */
 
-static int	recarr_setopts(recarr *,int) noex ;
-static int	recarr_extend(recarr *,int = 0) noex ;
+local int	recarr_setopts(recarr *,int) noex ;
+local int	recarr_extend(recarr *,int = 0) noex ;
 
 
 /* local variables */
@@ -469,7 +464,7 @@ constexpr int mkoptmask() noex {
 }
 /* end subroutine (mkoptmask) */
 
-static int recarr_setopts(recarr *op,int vo) noex {
+local int recarr_setopts(recarr *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	if ((vo & (~ optmask)) == 0) {
@@ -487,7 +482,7 @@ static int recarr_setopts(recarr *op,int vo) noex {
 }
 /* end subroutine (recarr_setopts) */
 
-static int recarr_extend(recarr *op,int n) noex {
+local int recarr_extend(recarr *op,int n) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
 	    int		nn ;
