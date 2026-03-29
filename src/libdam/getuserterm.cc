@@ -48,8 +48,10 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<tmpx.h>
 #include	<snx.h>
 #include	<mkx.h>
@@ -113,8 +115,7 @@ int getuserterm(char *rbuf,int rlen,cchar *un) noex {
 	    rbuf[0] = '\0' ;
 	    if (un[0]) {
 		if (suber so(rbuf,rlen,un) ; (rs = so.start()) >= 0) {
-		    {
-			rs = so.tmpenum() ;
+		    if ((rs = so.tmpenum()) >= 0) {
 			len = rs ;
 		    }
 		    rs1 = so.finish() ;
@@ -131,7 +132,7 @@ int getuserterm(char *rbuf,int rlen,cchar *un) noex {
 
 int suber::start() noex {
 	int		rs ;
-	if (char *p{} ; (rs = malloc_mp(&p)) >= 0) {
+	if (char *p ; (rs = lm_mp(&p)) >= 0) {
 	    tbuf = p ;
 	    tlen = rs ;
 	} /* end if (memory-allocation) */
@@ -143,7 +144,7 @@ int suber::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (tbuf) {
-	    rs1 = malloc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    tbuf = nullptr ;
 	    tlen = 0 ;
