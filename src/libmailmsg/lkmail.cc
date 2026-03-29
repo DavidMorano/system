@@ -35,9 +35,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<sbuf.h>
 #include	<sfx.h>
 #include	<mkpathx.h>
@@ -46,7 +48,9 @@
 
 #include	"lkmail.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -71,46 +75,43 @@ import libutil ;
 /* forward references */
 
 template<typename ... Args>
-static int lkmail_ctor(lkmail *op,Args ... args) noex {
+local int lkmail_ctor(lkmail *op,Args ... args) noex {
     	LKMAIL		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    op->lfd = -1 ;
-	    if (char *cp ; (rs = malloc_mp(&cp)) >= 0) {
+	    if (char *cp ; (rs = lm_mp(&cp)) >= 0) ylikely {
 	        op->lockfname = cp ;
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lkmail_ctor) */
+} /* end subroutine (lkmail_ctor) */
 
-static int lkmail_dtor(lkmail *op) noex {
+local int lkmail_dtor(lkmail *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->lockfname) {
-		rs1 = malloc_free(op->lockfname) ;
+	    if (op->lockfname) ylikely {
+		rs1 = lm_free(op->lockfname) ;
 		if (rs >= 0) rs = rs1 ;
 		op->lockfname = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lkmail_dtor) */
+} /* end subroutine (lkmail_dtor) */
 
 template<typename ... Args>
-static inline int lkmail_magic(lkmail *op,Args ... args) noex {
+local inline int lkmail_magic(lkmail *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LKMAIL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (lkmail_magic) */
+} /* end subroutine (lkmail_magic) */
 
-static int	lkmail_starter(lkmail *) noex ;
+local int	lkmail_starter(lkmail *) noex ;
 
 
 /* local variables */
@@ -127,9 +128,9 @@ cbool		f_sgidgroups = CF_SGIDGROUPS ;
 
 int lkmail_start(lkmail *op,lkmail_ids *idp,cchar *mfname) noex {
 	int		rs ;
-	if ((rs = lkmail_ctor(op,idp,mfname)) >= 0) {
+	if ((rs = lkmail_ctor(op,idp,mfname)) >= 0) ylikely {
 	    cchar	*suf = ".lock" ;
-	    if ((rs = mkfnamesuf1(op->lockfname,mfname,suf)) >= 0) {
+	    if ((rs = mkfnamesuf1(op->lockfname,mfname,suf)) >= 0) ylikely {
 	        op->id = *idp ;
 	        if (op->id.gid_maildir <= 0) {
 		    if ((rs = lkmail_starter(op)) >= 0) {
@@ -148,8 +149,8 @@ int lkmail_start(lkmail *op,lkmail_ids *idp,cchar *mfname) noex {
 int lkmail_finish(lkmail *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = lkmail_magic(op)) >= 0) {
-	    if (op->lfd >= 0) {
+	if ((rs = lkmail_magic(op)) >= 0) ylikely {
+	    if (op->lfd >= 0) ylikely {
 	        rs1 = u_close(op->lfd) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->lfd = -1 ;
@@ -168,13 +169,13 @@ int lkmail_create(lkmail *op) noex {
 	cint		nrs = SR_NOENT ;
 	int		rs ;
 	int		lfd = -1 ;
-	if ((rs = lkmail_magic(op)) >= 0) {
+	if ((rs = lkmail_magic(op)) >= 0) ylikely {
 	    if (op->lfd >= 0) {
 	        u_close(op->lfd) ;
 	        op->lfd = -1 ;
 	    }
 	    /* blow out if the lock file is already there! */
-	    if (USTAT sb ; (rs = u_stat(op->lockfname,&sb)) == nrs) {
+	    if (ustat sb ; (rs = u_stat(op->lockfname,&sb)) == nrs) {
 	        /* go ahead and try to create the lock file */
 		if_constexpr (f_comment) {
 	            rs = u_creat(op->lockfname,0444) ;
@@ -229,7 +230,7 @@ int lkmail_create(lkmail *op) noex {
 
 int lkmail_unlink(lkmail *op) noex {
 	int		rs ;
-	if ((rs = lkmail_magic(op)) >= 0) {
+	if ((rs = lkmail_magic(op)) >= 0) ylikely {
 	    rs = SR_ACCESS ;
 	    if (op->id.egid != op->id.gid) {
 	        u_setegid(op->id.egid) ;
@@ -259,9 +260,9 @@ int lkmail_unlink(lkmail *op) noex {
 int lkmail_old(lkmail *op,time_t dt,int age) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = lkmail_magic(op)) >= 0) {
+	if ((rs = lkmail_magic(op)) >= 0) ylikely {
 	    if (age < 0) age = LKMAIL_AGE ;
-	    if (USTAT sb ; (rs = u_stat(op->lockfname,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(op->lockfname,&sb)) >= 0) {
 	        f = ((dt - sb.st_mtime) > age) ;
 	    }
 	} /* end if (magic) */
@@ -272,10 +273,10 @@ int lkmail_old(lkmail *op,time_t dt,int age) noex {
 
 /* private subrouties */
 
-static int lkmail_starter(lkmail *op) noex {
+local int lkmail_starter(lkmail *op) noex {
     	int		rs ;
 	int		rs1 ;
-	if (char *mbuf ; (rs = malloc_mp(&mbuf)) >= 0) {
+	if (char *mbuf ; (rs = lm_mp(&mbuf)) >= 0) ylikely {
 	    cchar	*fn = op->lockfname ;
 	    cchar	*cp ;
 	    if (int cl ; (cl = sfdirname(fn,-1,&cp)) > 0) {
@@ -286,7 +287,7 @@ static int lkmail_starter(lkmail *op) noex {
 		    }
 		}
 	    } /* end if (sfdirname) */
-	    rs1 = malloc_free(mbuf) ;
+	    rs1 = lm_free(mbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
