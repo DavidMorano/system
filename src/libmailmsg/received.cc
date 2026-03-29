@@ -46,10 +46,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<strings.h>		/* |strlen(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<strings.h>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |ulogerror(3u)| */
+#include	<uclibmem.h>
 #include	<field.h>
 #include	<sbuf.h>
 #include	<matstr.h>
@@ -61,7 +64,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;			/* |gelenstr(3u)| */
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -94,16 +97,15 @@ using libuc::libmem ;			/* variable */
 /* forward references */
 
 template<typename ... Args>
-static inline int received_magic(received *op,Args ... args) noex {
+local inline int received_magic(received *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == RECEIVED_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (received_magic) */
+} /* end subroutine (received_magic) */
 
-static int received_bake(received *,int,cchar *,int) noex ;
+local int received_bake(received *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -129,7 +131,7 @@ constexpr char		fterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array (fterms) */
 
 constexpr bool		f_emptyvalue = CF_EMPTYVALUE ;
 constexpr bool		f_fieldword = CF_FIELDWORD ;
@@ -146,7 +148,7 @@ cpcchar	received_keys[] = {
 	"date",
 	"via",
 	nullptr
-} ;
+} ; /* end array (received_keys) */
 
 
 /* exported subroutines */
@@ -156,15 +158,15 @@ int received_start(received *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    memclear(hop) ;
 	    if (hlen < 0) hlen = lenstr(hbuf) ;
 	    /* prepare a MHCOM object for comment parsing */
-	    if (mhcom com ; (rs = com.start(hbuf,hlen)) >= 0) {
-	        if (cchar *sp ; (rs = com.getval(&sp)) > 0) {
+	    if (mhcom com ; (rs = com.start(hbuf,hlen)) >= 0) ylikely {
+	        if (cchar *sp ; (rs = com.getval(&sp)) > 0) ylikely {
 		    cint	sl = rs ;
 	            cint	sz = (rs + 1) ;
-	            if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
+	            if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) ylikely {
 	                op->a = charp(p) ;
 	                if ((rs = received_bake(op,sz,sp,sl)) >= 0) {
 	                    c = rs ;
@@ -187,8 +189,8 @@ int received_start(received *op,cchar *hbuf,int hlen) noex {
 int received_finish(received *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = received_magic(op)) >= 0) {
-	    if (op->a) {
+	if ((rs = received_magic(op)) >= 0) ylikely {
+	    if (op->a) ylikely {
 	        rs1 = libmem.free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
@@ -202,11 +204,11 @@ int received_finish(received *op) noex {
 int received_getkey(received *op,int ki,cchar **rpp) noex {
     	int		rs ;
 	int		cl = 0 ;
-	if ((rs = received_magic(op)) >= 0) {
+	if ((rs = received_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (ki >= 0) {
+	    if (ki >= 0) ylikely {
 	        rs = SR_NOENT ;
-	        if ((ki >= 0) && (ki < received_keyoverlast)) {
+	        if ((ki >= 0) && (ki < received_keyoverlast)) ylikely {
 		    rs = SR_OK  ;
 		    cl = (op->key[ki]) ? lenstr(op->key[ki]) : 0 ;
 		    if (rpp) {
@@ -227,12 +229,12 @@ int received_getitem(received *op,int ki,cchar **rpp) noex {
 
 /* private subroutines */
 
-static int received_bake(received *op,int sz,cchar *sp,int sl) noex {
+local int received_bake(received *op,int sz,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (sbuf sb ; (rs = sb.start(op->a,sz)) >= 0) {
-	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
+	if (sbuf sb ; (rs = sb.start(op->a,sz)) >= 0) ylikely {
+	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
 	        int	ki = -1 ;
 	        int	wi = 0 ;
 	        bool	f_prevmatch = false ;
@@ -314,11 +316,11 @@ void received::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("received",rs,"fini-finish") ;
 	}
-}
+} /* end method (received::dtor) */
 
 received_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case receivedmem_finish:
 	        rs = received_finish(op) ;
@@ -326,7 +328,6 @@ received_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (received_co::operator) */
+} /* end method (received_co::operator) */
 
 
