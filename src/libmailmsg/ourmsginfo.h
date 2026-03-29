@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<dater.h>
 
@@ -40,14 +37,14 @@ enum ourmsginfo_heads {
 	ourmsginfohead_replyto,
 	ourmsginfohead_to,
 	ourmsginfohead_overlast
-} ;
+} ; /* end enum (ourmsginfo_heads) */
 
 struct ourmsginfo_head {
 	char	*efrom ;		/* envelope FROM */
 	char	*mid ;			/* message-id */
 	char	*h_returnpath ;
 	char	*h_subject ;
-	DATER	edate ;			/* envelope date */
+	dater	edate ;			/* envelope date */
 	vecstr	head[ourmsginfohead_overlast] ;
 	time_t	etime ;			/* envelope time */
 	time_t	mtime ;			/* message time */
@@ -57,7 +54,7 @@ struct ourmsginfo_head {
 	int	clen ;			/* content length */
 	int	f_messageid ;		/* had a message-id */
 	int	f_spam ;		/* was a spam */
-} ;
+} ; /* end struct */
 
 typedef	OURMSGINFO	ourmsginfo ;
 
