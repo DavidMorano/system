@@ -29,7 +29,8 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<fifostr.h>
 #include	<strn.h>
@@ -38,7 +39,10 @@
 
 #include	"wordfill.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/sif.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 import sif ;
 
 /* local defines */
@@ -46,7 +50,6 @@ import sif ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -65,45 +68,42 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int wordfill_ctor(wordfill *op,Args ... args) noex {
+local inline int wordfill_ctor(wordfill *op,Args ... args) noex {
     	WORDFILL	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->sqp = new(nothrow) fifostr) != np) {
+	    if ((op->sqp = new(nothrow) fifostr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-fifostr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (wordfill_ctor) */
+} /* end subroutine (wordfill_ctor) */
 
-static int wordfill_dtor(wordfill *op) noex {
+local int wordfill_dtor(wordfill *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->sqp) {
+	    if (op->sqp) ylikely {
 		delete op->sqp ;
 		op->sqp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (wordfill_dtor) */
+} /* end subroutine (wordfill_dtor) */
 
 template<typename ... Args>
-static int wordfill_magic(wordfill *op,Args ... args) noex {
+local int wordfill_magic(wordfill *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == WORDFILL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (wordfill_magic) */
+} /* end subroutine (wordfill_magic) */
 
-static int	wordfill_mkline(wordfill *,int,char *,int) noex ;
+local int	wordfill_mkline(wordfill *,int,char *,int) noex ;
 
 
 /* local variables */
@@ -116,8 +116,8 @@ static int	wordfill_mkline(wordfill *,int,char *,int) noex ;
 
 int wordfill_start(wordfill *op,cchar *lp,int ll) noex {
 	int		rs ;
-	if ((rs = wordfill_ctor(op)) >= 0) {
-	    if ((rs = fifostr_start(op->sqp)) >= 0) {
+	if ((rs = wordfill_ctor(op)) >= 0) ylikely {
+	    if ((rs = fifostr_start(op->sqp)) >= 0) ylikely {
 	        op->magic = WORDFILL_MAGIC ;
 	        if (lp) {
 	            rs = wordfill_addlines(op,lp,ll) ;
@@ -138,8 +138,8 @@ int wordfill_start(wordfill *op,cchar *lp,int ll) noex {
 int wordfill_finish(wordfill *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = wordfill_magic(op)) >= 0) {
-	    if (op->sqp) {
+	if ((rs = wordfill_magic(op)) >= 0) ylikely {
+	    if (op->sqp) ylikely {
 	        rs1 = fifostr_finish(op->sqp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -156,11 +156,11 @@ int wordfill_finish(wordfill *op) noex {
 int wordfill_addword(wordfill *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
+	if ((rs = wordfill_magic(op,lbuf)) >= 0) ylikely {
 	    if (llen < 0) llen = lenstr(lbuf) ;
 	    if (llen > 0) {
 	        c += 1 ;
-	        if ((rs = fifostr_add(op->sqp,lbuf,llen)) >= 0) {
+	        if ((rs = fifostr_add(op->sqp,lbuf,llen)) >= 0) ylikely {
 	            op->wc += 1 ;
 	            op->chrc += llen ;
 	        }
@@ -173,7 +173,7 @@ int wordfill_addword(wordfill *op,cchar *lbuf,int llen) noex {
 int wordfill_addline(wordfill *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
+	if ((rs = wordfill_magic(op,lbuf)) >= 0) ylikely {
 	    if (llen < 0) llen = lenstr(lbuf) ;
 	    if (llen > 0) {
 		sif	so(lbuf,llen) ;
@@ -194,7 +194,7 @@ int wordfill_addline(wordfill *op,cchar *lbuf,int llen) noex {
 int wordfill_addlines(wordfill *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
+	if ((rs = wordfill_magic(op,lbuf)) >= 0) ylikely {
 	    int		ll = (llen < 0) ? int(lenstr(lbuf)) : llen ;
 	    cchar	*lp = lbuf ;
 	    for (cchar *tp ; (tp = strnchr(lp,ll,'\n')) != nullptr ; ) {
@@ -233,13 +233,13 @@ int wordfill_mklinepart(wordfill *op,char *lbuf,int llen) noex {
 
 /* private subroutines */
 
-static int wordfill_mkline(wordfill *op,int f_part,char *lbuf,int llen) noex {
+local int wordfill_mkline(wordfill *op,int f_part,char *lbuf,int llen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
-	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
+	if ((rs = wordfill_magic(op,lbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (llen >= 1) {
+	    if (llen >= 1) ylikely {
 	        int		ll ;
 	        int		wl, nl ;
 	        int		ql ;
