@@ -1,4 +1,4 @@
-/* evmat SUPPORT (Environment-Match) */
+/* envmat SUPPORT (Environment-Match) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1995-04-01, David A­D­ Morano
-	This is part of our cleanup-compatibility effort.
+	This is part of my cleanup-compatibility effort.
 
 */
 
@@ -37,21 +37,27 @@
 	==0		the string did not contain an evelope
 	<0		error (system-return)
 
+	Notes:
+	1. Mail envelopes are not like message headers.  There is
+	no white-space in envelopes other than space characters.
+	So there is not need to check for "blanks" (otherwise known
+	as space-tabs).
+
 ****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| + |strlen(3c)| */
-#include	<usystem.h>		/* |lenstr(3u)| */
-#include	<matstr.h>
-#include	<char.h>
-#include	<ischarx.h>
+#include	<cstring>		/* |strncmp(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"envmat.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -82,11 +88,10 @@ import libutil ;
 
 /* exported subroutines */
 
-int envmat(cchar *sp,int sl) noex {
+int envmat(cchar *sp,int µsl) noex {
     	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	    rs = SR_OK ;
 	    if ((sl > 5) && (sp[0] == 'F') && (sp[1] == 'r')) {
 		f = (strncmp((sp+2),"om ",3) == 0) ;
