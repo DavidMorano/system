@@ -40,9 +40,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
@@ -94,19 +96,19 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static inline int mimetypes_magic(mimetypes *op,Args ... args) noex {
+local inline int mimetypes_magic(mimetypes *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MIMETYPES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
 /* end subroutine (mimetypes_magic) */
 
-static int	mimetypes_fileln(mt *,cchar *,int) noex ;
+local int	mimetypes_fileln(mt *,cchar *,int) noex ;
 
-static int	mkterms() noex ;
-static int	exttypespec(cchar *,int,cchar **) noex ;
+local int	mkterms() noex ;
+local int	exttypespec(cchar *,int,cchar **) noex ;
 
 
 /* local variables */
@@ -123,12 +125,12 @@ static char		terms[fieldterms_termsize] ;
 
 int mimetypes_start(mt *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) {
+	    if ((rs = rsv) >= 0) ylikely {
 		cint	hsz = szof(hdb) ;
 		op->typelen = var.typelen ;
-		if (void *vp ; (rs = libmem.mall(hsz,&vp)) >= 0) {
+		if (void *vp ; (rs = libmem.mall(hsz,&vp)) >= 0) ylikely {
 	            cint	ne = MIMETYPES_NUMKEYS ;
 		    op->dbp = (hdb *) vp ;
 	            if ((rs = hdb_start(op->dbp,ne,1,nullptr,nullptr)) >= 0) {
@@ -149,11 +151,11 @@ int mimetypes_finish(mt *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rs2 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->dbp) {
+	    if (op->dbp) ylikely {
 	        hdb	*dbp = op->dbp ;
-	        if (mt_cur cur ; (rs = hdb_curbegin(dbp,&cur)) >= 0) {
+	        if (mt_cur cur ; (rs = hdb_curbegin(dbp,&cur)) >= 0) ylikely {
 	            mt_dat	key ;
 	            mt_dat	data ;
 	            while ((rs2 = hdb_curenum(dbp,&cur,&key,&data)) >= 0) {
@@ -188,10 +190,10 @@ int mimetypes_file(mt *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
         int             c = 0 ;
-	if ((rs = mimetypes_magic(op,fname)) >= 0) {
-	    if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if ((rs = mimetypes_magic(op,fname)) >= 0) ylikely {
+	    if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 		cint	llen = rs ;
-                if (bfile mf ; (rs = mf.open(fname,"r",0666)) >= 0) {
+                if (bfile mf ; (rs = mf.open(fname,"r",0666)) >= 0) ylikely {
                     while ((rs = mf.readln(lbuf,llen)) > 0) {
 			cchar	*cp ;
 			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
@@ -203,7 +205,7 @@ int mimetypes_file(mt *op,cchar *fname) noex {
                     rs1 = mf.close ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (bfile) */
-		rs1 = malloc_free(lbuf) ;
+		rs1 = lm_free(lbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
@@ -211,7 +213,7 @@ int mimetypes_file(mt *op,cchar *fname) noex {
 }
 /* end subroutine (mimetypes_file) */
 
-static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
+local int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
 	cnullptr	np{} ;
 	cint		rsn = SR_NOTFOUND ;
     	int		rs = SR_OK ;
@@ -268,7 +270,7 @@ static int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
 int mimetypes_find(mt *op,char *typespec,cchar *ext) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = mimetypes_magic(op,ext)) >= 0) {
+	if ((rs = mimetypes_magic(op,ext)) >= 0) ylikely {
 	    cchar	*tp ;
 	    rs = SR_NOTFOUND ;
 	    if (typespec) typespec[0] = '\0' ;
@@ -298,7 +300,7 @@ int mimetypes_find(mt *op,char *typespec,cchar *ext) noex {
 
 int mimetypes_curbegin(mt *op,mt_cur *curp) noex {
     	int		rs ;
-	if ((rs = mimetypes_magic(op,curp)) >= 0) {
+	if ((rs = mimetypes_magic(op,curp)) >= 0) ylikely {
 	    rs = hdb_curbegin(op->dbp,curp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -317,7 +319,7 @@ int mimetypes_curend(mt *op,mt_cur *curp) noex {
 /* enumerate all of the key-val pairs */
 int mimetypes_enum(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 	int		rs ;
-	if ((rs = mimetypes_magic(op,curp,ext)) >= 0) {
+	if ((rs = mimetypes_magic(op,curp,ext)) >= 0) ylikely {
 	    mt_dat	key{} ;
 	    mt_dat	val{} ;
 	    ext[0] = '\0' ;
@@ -331,7 +333,7 @@ int mimetypes_enum(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 		    cchar	*valp = charp(val.buf) ;
 		    strwcpy(ts,valp,rs) ;
 	        }
-	    }
+	    } /* end if (hdb_curenum) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -340,7 +342,7 @@ int mimetypes_enum(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 /* fetch the next val by extension and a possible cursor */
 int mimetypes_fetch(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 	int		rs ;
-	if ((rs = mimetypes_magic(op,curp,ext,ts)) >= 0) {
+	if ((rs = mimetypes_magic(op,curp,ext,ts)) >= 0) ylikely {
 	    mt_dat	key ;
 	    mt_dat	val{} ;
 	    key.buf = ext ;
@@ -366,7 +368,7 @@ int mimetypes_get(mt *op,char *typespec,cchar *ext) noex {
 /* private subroutines */
 
 /* extract the typespec from this buffer */
-static int exttypespec(cchar *tbuf,int tlen,cchar **rpp) noex {
+local int exttypespec(cchar *tbuf,int tlen,cchar **rpp) noex {
 	int		spec = -1 ;
 	int		cl = tlen ;
 	cchar		*cp = tbuf ;
@@ -387,13 +389,13 @@ static int exttypespec(cchar *tbuf,int tlen,cchar **rpp) noex {
 }
 /* end subroutine (exttypespec) */
 
-static int mkterms() noex {
+local int mkterms() noex {
     	return fieldterms(terms,false," \t#") ;
 }
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
 	    typelen = rs ;	/* "TYPELEN" is set to MAXNAMELEN */
 	    rs = mkterms() ;
 	}
