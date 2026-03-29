@@ -40,19 +40,19 @@ enum received_keys {
 	received_keydate,
 	received_keyvia,
 	received_keyoverlast
-} ;
+} ; /* end enum (received_keys) */
 
 struct received_head {
 	char		*a ;
 	cchar		*key[received_keyoverlast] ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum receivedmems {
 	receivedmem_finish,
 	receivedmem_overlast
-} ;
+} ; /* end enum (receivedmems) */
 struct received ;
 struct received_co {
 	received	*op = nullptr ;
