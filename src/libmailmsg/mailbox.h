@@ -34,14 +34,20 @@
 
 
 /* object defines */
-#define	MAILBOX_MAGIC		0x31415926
 #define	MAILBOX			struct mailbox_head
 #define	MAILBOX_INFO		struct mailbox_information
 #define	MAILBOX_MI		struct mailbox_msginfo
 #define	MAILBOX_READ		struct mailbox_reader
 #define	MAILBOX_FL		struct mailbox_flags
 #define	MAILBOX_MFL		struct mailbox_msgflags
+#define	MAILBOX_MAGIC		0x31415926
 /* options */
+struct mailboxms {
+	constexpr static int rdonly	= O_RDONLY ; 	/* open read-only */
+	constexpr static int rdwr	= O_RDWR ;	/* open read-write */
+	constexpr static int noclen	= O_NOCTTY ;	/* !"content-length" */
+	constexpr static int useclines	= O_NDELAY ;	/* !!'content-clines" */
+} ; /* end struct (mailboxoms) */
 #define	MAILBOX_ORDONLY		O_RDONLY	/* open read-only */
 #define	MAILBOX_ORDWR		O_RDWR		/* open read-write */
 #define	MAILBOX_ONOCLEN		O_NOCTTY	/* !use "content-length" */
@@ -197,8 +203,9 @@ inline int mailbox_magic(mailbox *op,Args ... args) noex {
 	    rs = (op->magic == MAILBOX_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailbox_magic) */
+} /* end subroutine (mailbox_magic) */
+
+extern const mailboxms 	mailboxm ;
 
 #endif /* __cplusplus */
 
