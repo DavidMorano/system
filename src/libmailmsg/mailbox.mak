@@ -1,4 +1,4 @@
-# MAKEFILES (mailbox)
+# MAKEFILE (mailbox)
 
 T= mailbox
 
@@ -40,7 +40,7 @@ MPDS +=
 LIBS=
 
 
-OBJ0_MAILBOX= mailbox_main.o
+OBJ0_MAILBOX= mailbox_prime.o
 OBJ1_MAILBOX= mailbox_fromaddr.o
 OBJ2_MAILBOX= mailbox_getfrom.o
 OBJ3_MAILBOX=
@@ -129,7 +129,7 @@ obj3_mailbox.o:		$(OBJ3_MAILBOX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-mailbox_main.o:		mailbox_main.cc		$(INCS)
+mailbox_prime.o:	mailbox_prime.cc	$(INCS)
 mailbox_fromaddr.o:	mailbox_fromaddr.cc	$(INCS)
 mailbox_getfrom.o:	mailbox_getfrom.cc	$(INCS)
 
