@@ -13,7 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 enum providerids {
@@ -54,7 +55,7 @@ namespace libdam {
 	    return operator int () ;
 	} ;
     } ; /* end struct (provider) */
-}
+} /* end namespace */
 
 extern libdam::provider		providerid ;
 
