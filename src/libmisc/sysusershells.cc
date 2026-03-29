@@ -32,7 +32,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<getax.h>
 #include	<snwcpy.h>
@@ -65,10 +64,10 @@ using std::nothrow ;			/* constant */
 
 static inline int sysusershells_ctor(sysusershells *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    if ((op->fmp = new(nothrow) filemap) != nullptr) {
+	    if ((op->fmp = new(nothrow) filemap) != nullptr) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-filemap) */
 	} /* end if (non-null) */
@@ -78,9 +77,9 @@ static inline int sysusershells_ctor(sysusershells *op) noex {
 
 static inline int sysusershells_dtor(sysusershells *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->fmp) {
+	    if (op->fmp) ylikely {
 		delete op->fmp ;
 		op->fmp = nullptr ;
 	    }
@@ -92,7 +91,7 @@ static inline int sysusershells_dtor(sysusershells *op) noex {
 template<typename ... Args>
 static int sysusershells_magic(sysusershells *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SYSUSERSHELLS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -112,11 +111,11 @@ int sysusershells_open(sysusershells *op,cchar *sufname) noex {
 	csize		nmax = INT_MAX ;
 	int		rs ;
 	cchar		*defufname = SYSUSERSHELLS_FNAME ;
-	if ((rs = sysusershells_ctor(op)) >= 0) {
+	if ((rs = sysusershells_ctor(op)) >= 0) ylikely {
 	    if (sufname == nullptr) {
 		sufname = defufname ; /* default */
 	    }
-	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) {
+	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) ylikely {
 	        op->magic = SYSUSERSHELLS_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -130,8 +129,8 @@ int sysusershells_open(sysusershells *op,cchar *sufname) noex {
 int sysusershells_close(sysusershells *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sysusershells_magic(op)) >= 0) {
-	    {
+	if ((rs = sysusershells_magic(op)) >= 0) ylikely {
+	    if (op->fmp) ylikely {
 	        rs1 = filemap_close(op->fmp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -147,7 +146,7 @@ int sysusershells_close(sysusershells *op) noex {
 
 int sysusershells_readent(sysusershells *op,char *ubuf,int ulen) noex {
 	int		rs ;
-	if ((rs = sysusershells_magic(op,ubuf)) >= 0) {
+	if ((rs = sysusershells_magic(op,ubuf)) >= 0) ylikely {
 	    cchar	*lp ;
 	    ubuf[0] = '\0' ;
 	    while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
@@ -164,7 +163,7 @@ int sysusershells_readent(sysusershells *op,char *ubuf,int ulen) noex {
 
 int sysusershells_reset(sysusershells *op) noex {
 	int		rs ;
-	if ((rs = sysusershells_magic(op)) >= 0) {
+	if ((rs = sysusershells_magic(op)) >= 0) ylikely {
 	    rs = filemap_rewind(op->fmp) ;
 	} /* end if (magic) */
 	return rs ;
