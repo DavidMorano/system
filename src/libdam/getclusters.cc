@@ -53,14 +53,17 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<vecstr.h>
 #include	<mkpathx.h>
 #include	<isnot.h>
-#include	<localmisc.h>
 #include	<nodedb.h>
 #include	<clusterdb.h>
+#include	<localmisc.h>
 
 #include	"getclusters.h"
 
@@ -111,7 +114,7 @@ namespace {
 	int ndb() noex ;
 	int cdb() noex ;
     } ; /* end struct (geter) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -151,19 +154,21 @@ int getclusters(cchar *pr,vecstr *slp,cchar *nn) noex {
 geter::operator int () noex {
     	cint		sz = (var.maxpathlen + 2 + var.elen) ;
     	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	if (caddr_t p ; (rs = lm_mall(sz,&p)) >= 0) {
 	    tlen = var.maxpathlen ;
-	    tbuf = a ;
+	    tbuf = p ;
 	    elen = var.elen ;
-	    ebuf = (a + (var.maxpathlen + 1)) ;
+	    ebuf = (p + (var.maxpathlen + 1)) ;
 	    if ((rs = ndb()) >= 0) {
 		c += rs ;
 		if ((rs = cdb()) >= 0) {
 		    c += rs ;
 		}
 	    }
-	    rs = rsfree(rs,a) ;
+	    rs1 = lm_free(p) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -238,9 +243,9 @@ int geter::cdb() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_nn)) >= 0) {
 		nodenamelen = rs ;
 		elen = (rs * EBUFMULT) ;
 	    }
