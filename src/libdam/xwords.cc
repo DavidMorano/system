@@ -31,7 +31,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecobj.h>
 #include	<six.h>
 #include	<ischarx.h>
@@ -39,6 +42,9 @@
 
 #include	"xwords.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -59,17 +65,19 @@ typedef xwords_word *	wordp ;
 
 /* local structures */
 
-struct xwords_wi {
+namespace {
+    struct xwords_wi {
 	cchar		*wp ;
 	int		wl ;
-} ;
+    } ; /* end struct */
+} /* end namespace */
 
 typedef xwords_wi *	wip ;
 
 
 /* forward references */
 
-static int	xwords_more(xwords *,cchar *,int,int) noex ;
+local int	xwords_more(xwords *,cchar *,int,int) noex ;
 
 
 /* local variables */
@@ -149,7 +157,7 @@ int xwords_finish(xwords *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->xa) {
-	        rs1 = uc_free(op->xa) ;
+	        rs1 = lm_free(op->xa) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->xa = nullptr ;
 	    }
@@ -162,18 +170,15 @@ int xwords_finish(xwords *op) noex {
 
 /* private subroutines */
 
-static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
+local int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	cint		esz = szof(xwords_wi) ;
 	cint		vn = 2 ;
 	cint		vo = 0 ;
 	int		rs ;
 	int		rs1 ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	if (vecobj wil ; (rs = wil.start(esz,vn,vo)) >= 0) {
-	    xwords_wi	wi ;
-	    wi.wp = wbuf ;
-	    wi.wl = si ;
-	    if ((rs = wil.add(&wi)) >= 0) {
+	    if (xwords_wi wi(wbuf,si) ; (rs = wil.add(&wi)) >= 0) {
 		int	wl = (wlen - (si + 1)) ;
 		cchar	*wp = (wbuf + (si + 1)) ;
 		while ((si = sichr(wp,wl,'-')) >= 0) {
@@ -196,7 +201,7 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 		    n = (op->nwords + rs) ;
 		    if (n > XWORDS_MAX) {
 		        cint	sz = (n * esz) ;
-		        if (void *vp ; (rs = uc_malloc(sz,&vp)) >= 0) {
+		        if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 			    op->xa = wordp(vp) ;
 			    for (j = 0 ; j < op->nwords ; j += 1) {
 			        op->xa[j].wp = op->words[j].wp ;
@@ -225,18 +230,17 @@ static int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecobj) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (xwords_more) */
+} /* end subroutine (xwords_more) */
 
 int xwords::start(cchar *wbuf,int wlen) noex {
 	return xwords_start(this,wbuf,wlen) ;
-}
+} /* end method (xwords::start) */
 
 void xwords::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("xwords",rs,"fini-finish") ;
 	}
-}
+} /* end method (xwords::dtor) */
 
 xwords_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -248,8 +252,7 @@ xwords_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (xwords_co::operator) */
+} /* end method (xwords_co::operator) */
 
 
 
