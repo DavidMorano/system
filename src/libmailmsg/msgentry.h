@@ -34,7 +34,8 @@
 #include	<sys/types.h>		/* |off_t| */
 #include	<stdlib.h>
 #include	<string.h>		/* |memcpy(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mailmsg.h>
 #include	<fdliner.h>
 
