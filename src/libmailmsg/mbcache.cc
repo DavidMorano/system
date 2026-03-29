@@ -53,14 +53,16 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<bfile.h>
 #include	<sbuf.h>
-#include	<char.h>
-#include	<mailmsg.h>
-#include	<mailmsg_envget.h>
-#include	<mailmsghdrs.h>
+#include	<mailmsg.h>		/* MAILMSG */
+#include	<mailmsg_envget.h>	/* MAILMSG */
+#include	<mailmsghdrs.h>		/* MAILMSG */
 #include	<ema.h>
 #include	<vecobj.h>
 #include	<tmtime.hh>
@@ -70,6 +72,7 @@
 #include	<strwcpy.h>
 #include	<timestr.h>
 #include	<intsat.h>
+#include	<char.h>
 #include	<isoneof.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
@@ -129,14 +132,14 @@ typedef mbcache_scan **		mepp ;
 struct scantitle {
 	char		*name ;
 	int		col ;
-} ;
+} ; /* end struct */
 
 namespace {
     struct vars {
 	int		hdrbuflen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -146,12 +149,12 @@ local int mbcache_ctor(mbcache *op,Args ... args) noex {
     	MBCACHE		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->mip = new(nothrow) mailbox_info) != np) {
-	        if ((op->spp = new(nothrow) strpack) != np) {
-	            if ((op->dmp = new(nothrow) dater) != np) {
+	    if ((op->mip = new(nothrow) mailbox_info) != np) ylikely {
+	        if ((op->spp = new(nothrow) strpack) != np) ylikely {
+	            if ((op->dmp = new(nothrow) dater) != np) ylikely {
 			rs = SR_OK ;
 		    }
 		    if (rs < 0) {
@@ -166,39 +169,36 @@ local int mbcache_ctor(mbcache *op,Args ... args) noex {
 	    } /* end if (new-mailbox_info) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mbcache_ctor) */
+} /* end subroutine (mbcache_ctor) */
 
 local int mbcache_dtor(mbcache *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->dmp) {
+	    if (op->dmp) ylikely {
 		delete op->dmp ;
 		op->dmp = nullptr ;
 	    }
-	    if (op->spp) {
+	    if (op->spp) ylikely {
 		delete op->spp ;
 		op->spp = nullptr ;
 	    }
-	    if (op->mip) {
+	    if (op->mip) ylikely {
 		delete op->mip ;
 		op->mip = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mbcache_dtor) */
+} /* end subroutine (mbcache_dtor) */
 
 template<typename ... Args>
 local int mbcache_magic(mbcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MBCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mbcache_magic) */
+} /* end subroutine (mbcache_magic) */
 
 local int mbcache_starter(mbcache *,cc *) noex ;
 local int mbcache_msgfins(mbcache *) noex ;
@@ -233,8 +233,8 @@ local int msgent_loadenvaddr(ME *,mbcache *,mailmsg *,cchar **) noex ;
 local int	headappend(char **,char *,int) noex ;
 #endif
 
-static bool	isNoMsg(int) noex ;
-static bool	isBadDate(int) noex ;
+local bool	isNoMsg(int) noex ;
+local bool	isBadDate(int) noex ;
 
 extern "C" {
     local int	vcmpmsgentry(cvoid *,cvoid *) noex ;
@@ -248,14 +248,13 @@ constexpr int	rsdatebad[] = {
 	SR_DOM,
 	SR_NOMSG,
 	0
-} ;
+} ; /* end array */
 
 constexpr int	rsnomsg[] = {
 	SR_NOMSG,
 	SR_NOENT,
 	0
-} ;
-
+} ; /* end array */
 
 #ifdef	COMMENT
 constexpr scantitle	scantitles[] = {
@@ -278,14 +277,14 @@ static vars		var ;
 int mbcache_start(mbcache *op,cchar *mbfname,int mflags,mailbox *mbp) noex {
 	int		rs ;
 	int		nmsgs = 0 ;
-	if ((rs = mbcache_ctor(op,mbfname,mbp)) >= 0) {
+	if ((rs = mbcache_ctor(op,mbfname,mbp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (mbfname[0]) {
+	    if (mbfname[0]) ylikely {
 		static cint	rsv = var ;
 	        op->mflags = mflags ;
 	        op->mbp = mbp ;
 	        op->fl.readonly = (! (mflags & MBCACHE_ORDWR)) ;
-		if ((rs = rsv) >= 0) {
+		if ((rs = rsv) >= 0) ylikely {
 		    rs = mbcache_starter(op,mbfname) ;
 		    nmsgs = rs ;
 		}
@@ -304,10 +303,10 @@ local int mbcache_starter(mbcache *op,cc *mbfname) noex {
 	strpack		*psp = op->spp ;
 	int		rs ;
 	int		nmsgs = 0 ;
-	if (cchar *cp ; (rs = libmem.strw(mbfname,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(mbfname,-1,&cp)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    op->mbfname = cp ;
-	    if ((rs = mailbox_getinfo(mbp,mip)) >= 0) {
+	    if ((rs = mailbox_getinfo(mbp,mip)) >= 0) ylikely {
 	        cint	mssize = szof(ME **) ;
 	        if (mip->nmsgs >= 0) {
 	            cint	sz = ((mip->nmsgs + 1) * mssize) ;
@@ -347,25 +346,25 @@ local int mbcache_starter(mbcache *op,cc *mbfname) noex {
 int mbcache_finish(mbcache *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mbcache_magic(op)) >= 0) {
+	if ((rs = mbcache_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = mbcache_msgfins(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->dmp) ylikely {
 	        rs1 = dater_finish(op->dmp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->spp) ylikely {
 	        rs1 = strpack_finish(op->spp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->msgs) {
+	    if (op->msgs) ylikely {
 	        rs1 = libmem.free(op->msgs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->msgs = nullptr ;
 	    }
-	    if (op->mbfname) {
+	    if (op->mbfname) ylikely {
 		void *vp = voidp(op->mbfname) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -384,7 +383,7 @@ int mbcache_finish(mbcache *op) noex {
 
 int mbcache_mbfile(mbcache *op,char *dbuf,int dlen) noex {
 	int		rs ;
-	if ((rs = mbcache_magic(op,dbuf)) >= 0) {
+	if ((rs = mbcache_magic(op,dbuf)) >= 0) ylikely {
 	    rs = sncpy1(dbuf,dlen,op->mbfname) ;
 	} /* end if (magic) */
 	return rs ;
@@ -394,7 +393,7 @@ int mbcache_mbfile(mbcache *op,char *dbuf,int dlen) noex {
 int mbcache_mbinfo(mbcache *op,MBCACHE_INFO *mep) noex {
 	int		rs ;
 	int		nmsgs = 0 ;
-	if ((rs = mbcache_magic(op,mep)) >= 0) {
+	if ((rs = mbcache_magic(op,mep)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    memclear(mep) ;
 	    rs = mailbox_countdel(op->mbp) ;
@@ -409,7 +408,7 @@ int mbcache_mbinfo(mbcache *op,MBCACHE_INFO *mep) noex {
 int mbcache_count(mbcache *op) noex {
 	int		rs ;
 	int		nmsgs = 0 ;
-	if ((rs = mbcache_magic(op)) >= 0) {
+	if ((rs = mbcache_magic(op)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	} /* end if (magic) */
@@ -420,7 +419,7 @@ int mbcache_count(mbcache *op) noex {
 int mbcache_sort(mbcache *op) noex {
 	int		rs ;
 	int		nmsgs = 0 ;
-	if ((rs = mbcache_magic(op)) >= 0) {
+	if ((rs = mbcache_magic(op)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	    for (int mi = 0 ; (rs >= 0) && (mi < nmsgs) ; mi += 1) {
@@ -439,7 +438,7 @@ int mbcache_sort(mbcache *op) noex {
 #ifdef	COMMENT
 int mbcache_check(mbcache *op,TIMEB *nowp,cchar *zname) noex {
 	int		rs ;
-	if ((rs = mbcache_magic(op,nowp,zname)) >= 0) {
+	if ((rs = mbcache_magic(op,nowp,zname)) >= 0) ylikely {
 	    op->now = *nowp ;
 	    strncpy(op->zname,zname,DATER_ZNAMELEN) ;
 	    op->fl.now = true ;
@@ -461,7 +460,7 @@ int mbcache_msgdel(mbcache *op,int mi,int delcmd) noex {
     	int		nmsgs ;
 	int		rs ;
 	int		f_delprev = false ;
-	if ((rs = mbcache_magic(op)) >= 0) {
+	if ((rs = mbcache_magic(op)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	    rs = SR_NOMSG ;
@@ -492,7 +491,7 @@ int mbcache_msgdeldup(mbcache *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mbcache_magic(op)) >= 0) {
+	if ((rs = mbcache_magic(op)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	    if (mapstrint mm ; (rs = mapstrint_start(&mm,nmsgs)) >= 0) {
@@ -529,7 +528,7 @@ int mbcache_msgflags(mbcache *op,int mi) noex {
     	int		nmsgs ;
 	int		rs ;
 	int		mf = 0 ;
-	if ((rs = mbcache_magic(op)) >= 0) {
+	if ((rs = mbcache_magic(op)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	    rs = SR_NOMSG ;
@@ -551,7 +550,7 @@ int mbcache_msgsetflag(mbcache *op,int mi,int w,int v) noex {
     	int		nmsgs ;
 	int		rs ;
 	int		mf = 0 ;
-	if ((rs = mbcache_magic(op)) >= 0) {
+	if ((rs = mbcache_magic(op)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	    rs = SR_NOMSG ;
@@ -584,7 +583,7 @@ int mbcache_msgsetflag(mbcache *op,int mi,int w,int v) noex {
 
 int mbcache_countdel(mbcache *op) noex {
 	int		rs ;
-	if ((rs = mbcache_magic(op)) >= 0) {
+	if ((rs = mbcache_magic(op)) >= 0) ylikely {
 	    rs = mailbox_countdel(op->mbp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -595,7 +594,7 @@ int mbcache_msgsetlines(mbcache *op,int mi,int vlines) noex {
     	int		nmsgs ;
 	int		rs ;
 	int		rlines = 0 ;
-	if ((rs = mbcache_magic(op)) >= 0) {
+	if ((rs = mbcache_magic(op)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	    rs = SR_NOMSG ;
@@ -624,7 +623,7 @@ int mbcache_msgsetlines(mbcache *op,int mi,int vlines) noex {
 int mbcache_msgoff(mbcache *op,int mi,off_t *rp) noex {
     	int		nmsgs ;
 	int		rs ;
-	if ((rs = mbcache_magic(op,rp)) >= 0) {
+	if ((rs = mbcache_magic(op,rp)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	    rs = SR_NOMSG ;
@@ -648,7 +647,7 @@ int mbcache_msgoff(mbcache *op,int mi,off_t *rp) noex {
 int mbcache_msglines(mbcache *op,int mi,int *rp) noex {
     	int		nmsgs ;
 	int		rs ;
-	if ((rs = mbcache_magic(op,rp)) >= 0) {
+	if ((rs = mbcache_magic(op,rp)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	    rs = SR_NOMSG ;
@@ -677,7 +676,7 @@ int mbcache_msglines(mbcache *op,int mi,int *rp) noex {
 int mbcache_msginfo(mbcache *op,int mi,ME **mpp) noex {
     	int		nmsgs ;
 	int		rs ;
-	if ((rs = mbcache_magic(op,mpp)) >= 0) {
+	if ((rs = mbcache_magic(op,mpp)) >= 0) ylikely {
 	    mailbox_info	*mip = op->mip ;
 	    nmsgs = mip->nmsgs ;
 	    *mpp = nullptr ;
@@ -702,9 +701,9 @@ int mbcache_msginfo(mbcache *op,int mi,ME **mpp) noex {
 /* get the scan information for a message */
 int mbcache_msgscan(mbcache *op,int mi,ME **mpp) noex {
 	int		rs ;
-	if ((rs = mbcache_msginfo(op,mi,mpp)) >= 0) {
+	if ((rs = mbcache_msginfo(op,mi,mpp)) >= 0) ylikely {
 	    ME	*mep = *mpp ;
-	    if ((rs = msgent_procscanfrom(mep,op)) >= 0) {
+	    if ((rs = msgent_procscanfrom(mep,op)) >= 0) ylikely {
 	        rs = msgent_procscandate(mep,op) ;
 	    }
 	}
@@ -716,9 +715,9 @@ int mbcache_msgenvtime(mbcache *op,int mi,time_t *timep) noex {
 	time_t		t = 0 ;
 	int		rs ;
 	int		f = false ;
-	if ((rs = mbcache_magic(op,timep)) >= 0) {
-	    if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
-	        if ((rs = msgent_procenvdate(mep,op)) >= 0) {
+	if ((rs = mbcache_magic(op,timep)) >= 0) ylikely {
+	    if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) ylikely {
+	        if ((rs = msgent_procenvdate(mep,op)) >= 0) ylikely {
 	            t = mep->etime ;
 	            f = true ;
 	        }
@@ -733,9 +732,9 @@ int mbcache_msghdrtime(mbcache *op,int mi,time_t *timep) noex {
 	time_t		t = 0 ;
 	int		rs ;
 	int		f = false ;
-	if ((rs = mbcache_magic(op,timep)) >= 0) {
-	    if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
-	        if ((rs = msgent_prochdrdate(mep,op)) >= 0) {
+	if ((rs = mbcache_magic(op,timep)) >= 0) ylikely {
+	    if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) ylikely {
+	        if ((rs = msgent_prochdrdate(mep,op)) >= 0) ylikely {
 	            f = true ;
 	            t = mep->htime ;
 	        }
@@ -748,9 +747,9 @@ int mbcache_msghdrtime(mbcache *op,int mi,time_t *timep) noex {
 
 int mbcache_msgtimes(mbcache *op,int mi,time_t *timep) noex {
 	int		rs ;
-	if ((rs = mbcache_magic(op,timep)) >= 0) {
-	    if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
-	        if ((rs = msgent_msgtimes(mep,op)) >= 0) {
+	if ((rs = mbcache_magic(op,timep)) >= 0) ylikely {
+	    if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) ylikely {
+	        if ((rs = msgent_msgtimes(mep,op)) >= 0) ylikely {
 	            timep[0] = mep->etime ;
 	            timep[1] = mep->htime ;
 	        }
@@ -791,11 +790,11 @@ local int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
 	int		rs = SR_OK ;
 	if (op->msgs[mi] == nullptr) {
 	    mailbox_mi	*mip{} ;
-	    if ((rs = mailbox_msgret(op->mbp,mi,&mip)) >= 0) {
+	    if ((rs = mailbox_msgret(op->mbp,mi,&mip)) >= 0) ylikely {
 	        cint	sz = szof(ME) ;
-	        if (ME *mep ; (rs = libmem.mall(sz,&mep)) >= 0) {
-	            if ((rs = msgent_start(mep,mi)) >= 0) {
-	                if ((rs = msgent_frame(mep,mip)) >= 0) {
+	        if (ME *mep ; (rs = libmem.mall(sz,&mep)) >= 0) ylikely {
+	            if ((rs = msgent_start(mep,mi)) >= 0) ylikely {
+	                if ((rs = msgent_frame(mep,mip)) >= 0) ylikely {
 	                    op->msgs[mi] = mep ;
 	                }
 	                if (rs < 0) {
@@ -817,8 +816,8 @@ local int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
 
 local int mbcache_msgtimers(mbcache *op,int mi,time_t *timep) noex {
 	int		rs ;
-	if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
-	    if ((rs = msgent_msgtimes(mep,op)) >= 0) {
+	if (ME *mep ; (rs = mbcache_msginfo(op,mi,&mep)) >= 0) ylikely {
+	    if ((rs = msgent_msgtimes(mep,op)) >= 0) ylikely {
 	        if (timep != nullptr) {
 	            timep[0] = mep->etime ;
 	            timep[1] = mep->htime ;
@@ -865,7 +864,7 @@ local int mbcache_setnow(mbcache *op) noex {
 	if (! op->fl.now) {
 	    TIMEB	*tbp = &op->now ;
 	    if ((rs = uc_ftime(tbp)) >= 0) {
-	        if (TMTIME tmt ; (rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
+	        if (TMTIME tmt ; (rs = tmtime_timelocal(&tmt,tbp->time)) >= 0) {
 	            tbp->timezone = (tmt.gmtoff / 60) ;
 	            tbp->dstflag = tmt.isdst ;
 	            strncpy(op->zname,tmt.zname,DATER_ZNAMELEN) ;
@@ -881,7 +880,7 @@ local int mbcache_setnow(mbcache *op) noex {
 
 local int msgent_start(ME *mep,int mi) noex {
 	int		rs = SR_FAULT ;
-	if (mep) {
+	if (mep) ylikely {
 	    rs = memclear(mep) ;
 	    mep->msgi = mi ;
 	    mep->nlines = -1 ;
@@ -898,14 +897,14 @@ local int msgent_start(ME *mep,int mi) noex {
 local int msgent_finish(ME *mep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (mep) {
+	if (mep) ylikely {
 	    rs = SR_OK ;
-	    if (mep->fl.lineoffs) {
+	    if (mep->fl.lineoffs) ylikely {
 	        mep->fl.lineoffs = false ;
 	        rs1 = vecint_finish(&mep->lineoffs) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (mep->fname != nullptr) {
+	    if (mep->fname != nullptr) ylikely {
 		void *vp = voidp(mep->fname) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -918,7 +917,7 @@ local int msgent_finish(ME *mep) noex {
 
 local int msgent_frame(ME *mep,mailbox_mi *mip) noex {
 	int		rs = SR_FAULT ;
-	if (mep && mip) {
+	if (mep && mip) ylikely {
 	    rs = SR_OK ;
 	    mep->moff = mip->moff ;
 	    mep->hoff = mip->hoff ;
@@ -956,24 +955,24 @@ typedef int (*msgent_f)(ME *,mbcache *,mailmsg *) noex ;
 /* SUBJECT:	extract the mailmsg information that we want */
 /* DATE:	extract the mailmsg information that we want */
 /* STATUS:	extract the mailmsg information that we want */
-static msgent_f		msgents[] = {
+constexpr msgent_f		msgents[] = {
 	msgent_loadenv,
 	msgent_loadhdrmid,
 	msgent_loadhdrfrom,
 	msgent_loadhdrsubj,
 	msgent_loadhdrdate,
 	msgent_loadhdrstatus
-} ;
+} ; /* end array (msgent_f) */
 
 local int msgent_load(ME *mep,mbcache *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (! mep->fl.info) {
 	    mep->fl.info = true ;
-	    if (mailmsg m ; (rs = mailmsg_start(&m)) >= 0) {
+	    if (mailmsg m ; (rs = mailmsg_start(&m)) >= 0) ylikely {
 	        mailbox		*mbp = op->mbp ;
 	        coff		mbo = mep->moff ;
-	        if ((rs = mailmsg_loadmb(&m,mbp,mbo)) >= 0) {
+	        if ((rs = mailmsg_loadmb(&m,mbp,mbo)) >= 0) ylikely {
 		    for (cauto f : msgents) {
 			rs = f(mep,op,&m) ;
 			if (rs < 0) break ;
@@ -993,11 +992,11 @@ local int msgent_load(ME *mep,mbcache *op) noex {
 
 local int msgent_loadenv(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
-	if ((rs = mailmsg_envcount(mmp)) >= 0) {
+	if ((rs = mailmsg_envcount(mmp)) >= 0) ylikely {
 	    strpack		*psp = op->spp ;
 	    cint		n = rs ;
 	    mailmsg_envdat	e ;
-	    if ((rs = mailmsg_envget(mmp,(n-1),&e)) >= 0) {
+	    if ((rs = mailmsg_envget(mmp,(n-1),&e)) >= 0) ylikely {
 	        for (int i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
 	            int		vl = -1 ;
 	            int		*vlp ;
@@ -1057,9 +1056,10 @@ local int msgent_loadenvaddr(ME *mep,MC *op,mailmsg *mmp,cchar **rpp) noex {
 
 local int msgent_loadhdrmid(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
-	int		sl = 0 ;
+	int		rs1 ;
+	int		sl = 0 ; /* return-value */
 	cchar		*hdr = HN_MESSAGEID ;
-	if (cchar *sp ; (rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
+	if (cchar *sp ; (rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) ylikely {
 	    cint	hlen = var.hdrbuflen ;
 	    strpack	*psp = op->spp ;
 	    if (char *hbuf ; (rs = libmem.mall((hlen+1),&hbuf)) >= 0) {
@@ -1071,7 +1071,8 @@ local int msgent_loadhdrmid(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	            mep->vl[vi] = sl ;
 	            rs = strpack_store(psp,hbuf,sl,rpp) ;
 	        } /* end if (mkaddrbest) */
-		rs = rsfree(rs,hbuf) ;
+		rs1 = libmem.free(hbuf) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else if (isNoMsg(rs)) {
 	    rs = SR_OK ;
@@ -1111,7 +1112,7 @@ local int msgent_loadhdrsubj(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
 	int		sl = 0 ;
 	cchar		*hdr = HN_SUBJECT ;
-	if (cchar *sp ; (rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
+	if (cchar *sp ; (rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) ylikely {
 	    strpack	*psp = op->spp ;
 	    cint	vi = mbcachemf_hdrsubject ;
 	    cchar	**rpp ;
@@ -1130,7 +1131,7 @@ local int msgent_loadhdrdate(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
 	int		sl = 0 ;
 	cchar		*hdr = HN_DATE ;
-	if (cchar *sp ; (rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
+	if (cchar *sp ; (rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) ylikely {
 	    strpack	*psp = op->spp ;
 	    cint	vi = mbcachemf_hdrdate ;
 	    cchar	**rpp ;
@@ -1222,7 +1223,8 @@ local int msgent_prochdrdate(ME *mep,mbcache *op) noex {
 
 local int msgent_procscanfrom(ME *mep,mbcache *op) noex {
 	int		rs = SR_OK ;
-	int		len = 0 ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
 	if (! mep->proc.scanfrom) {
 	    int		sl = mep->vl[mbcachemf_hdrfrom] ;
 	    cchar	*sp = mep->vs[mbcachemf_hdrfrom] ;
@@ -1245,7 +1247,8 @@ local int msgent_procscanfrom(ME *mep,mbcache *op) noex {
 	                    mep->fl.scanfrom = true ;
 	                }
 	            } /* end if (mkaddrname) */
-		    rs = rsfree(rs,hbuf) ;
+		    rs1 = libmem.free(hbuf) ;
+	            if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (positive) */
 	} else if (mep->vs[mbcachemf_scanfrom] != nullptr) {
@@ -1291,9 +1294,9 @@ local int msgent_procscandate(ME *mep,mbcache *op) noex {
 local int msgent_msgtimes(ME *mep,mbcache *op) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = msgent_procenvdate(mep,op)) >= 0) {
+	if ((rs = msgent_procenvdate(mep,op)) >= 0) ylikely {
 	    c += rs ;
-	    if ((rs = msgent_prochdrdate(mep,op)) >= 0) {
+	    if ((rs = msgent_prochdrdate(mep,op)) >= 0) ylikely {
 	        c += rs ;
 	    }
 	}
@@ -1303,18 +1306,18 @@ local int msgent_msgtimes(ME *mep,mbcache *op) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mailaddr)) >= 0) {
+	if ((rs = getbufsize(bufsize_mailaddr)) >= 0) ylikely {
 	    hdrbuflen = (rs * HDRBUFMULT) ;
 	}
 	return rs ;
 }
 
-static bool isBadDate(int rs) noex {
+local bool isBadDate(int rs) noex {
 	return isOneOf(rsdatebad,rs) ;
 }
 /* end subroutine (isBadDate) */
 
-static bool isNoMsg(int rs) noex {
+local bool isNoMsg(int rs) noex {
 	return isOneOf(rsnomsg,rs) ;
 }
 /* end subroutine (isNoMsg) */
