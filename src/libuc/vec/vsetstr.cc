@@ -21,13 +21,13 @@
 	vsetstr
 
 	Description:
-	This module provides operations and management on a static
+	This module provides operations and management on a
 	set of strings.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* placement-new + |nothrow| */
@@ -67,7 +67,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int vsetstr_ctor(vsetstr *op,Args ... args) noex {
+local int vsetstr_ctor(vsetstr *op,Args ... args) noex {
     	VSETSTR		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -80,10 +80,9 @@ static int vsetstr_ctor(vsetstr *op,Args ... args) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vsetstr_ctor) */
+} /* end subroutine (vsetstr_ctor) */
 
-static int vsetstr_dtor(vsetstr *op) noex {
+local int vsetstr_dtor(vsetstr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    vecpstr	*elp = op->elp ;
@@ -94,18 +93,16 @@ static int vsetstr_dtor(vsetstr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vsetstr_dtor) */
+} /* end subroutine (vsetstr_dtor) */
 
 template<typename ... Args>
-static inline int vsetstr_magic(vsetstr *op,Args ... args) noex {
+local inline int vsetstr_magic(vsetstr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == VSETSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == VSETSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (vsetstr_magic) */
+} /* end subroutine (vsetstr_magic) */
 
 
 /* local variables */
@@ -122,7 +119,7 @@ int vsetstr_start(VS *op,int vn) noex {
 	    vecpstr	*elp = op->elp ;
 	    cint	vsz = (vn > 0) ? (vn * 6) : 0 ;
 	    if ((rs = elp->start(vn,vsz,0)) >= 0) ylikely {
-	        op->magic = VSETSTR_MAGIC ;
+	        op->magval = VSETSTR_MAGIC ;
 	    }
 	    if (rs < 0) {
 		vsetstr_dtor(op) ;
@@ -145,7 +142,7 @@ int vsetstr_finish(VS *op) noex {
 		rs1 = vsetstr_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -162,17 +159,18 @@ int vsetstr_look(VS *op,cchar *sbuf,int slen) noex {
 /* end subroutine (vsetstr_look) */
 
 /* add a string to the database */
-int vsetstr_add(VS *op,cchar *sbuf,int slen) noex {
+int vsetstr_add(VS *op,cchar *sp,int µsl) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	if ((rs = vsetstr_magic(op,sbuf)) >= 0) ylikely {
-	    vecpstr	*elp = op->elp ;
-	    if (slen < 0) slen = lenstr(sbuf) ;
-	    if ((rs = elp->findn(sbuf,slen)) == rsn) {
-	        rs = elp->add(sbuf,slen) ;
-	    } else if (rs >= 0) {
-	        rs = INT_MAX ;
-	    }
+	if ((rs = vsetstr_magic(op,sp)) >= 0) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        vecpstr	*elp = op->elp ;
+	        if ((rs = elp->findn(sp,sl)) == rsn) {
+	            rs = elp->add(sp,sl) ;
+	        } else if (rs >= 0) {
+	            rs = INT_MAX ;
+	        }
+	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -206,20 +204,6 @@ int vsetstr_curdel(VS *op,VS_CUR *curp) noex {
 	return rs ;
 }
 /* end subroutine (vsetstr_curdel) */
-
-int vsetstr_already(VS *op,cchar *sp,int sl) noex {
-	int		rs ;
-	if ((rs = vsetstr_magic(op)) >= 0) ylikely {
-	    vecpstr *elp = op->elp ;
-	    if ((rs = elp->findn(sp,sl)) >= 0) {
-	        rs = true ;
-	    } else if (rs == SR_NOTFOUND) {
-	        rs = SR_OK ;
-	    }
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (vsetstr_already) */
 
 /* enumerate all of the entries */
 int vsetstr_curenum(VS *op,VS_CUR *curp,cchar **vpp) noex {
@@ -255,6 +239,20 @@ int vsetstr_curnext(VS *op,VS_CUR *curp) noex {
 	return rs ;
 }
 /* end subroutine (vsetstr_curnext) */
+
+int vsetstr_already(VS *op,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = vsetstr_magic(op)) >= 0) ylikely {
+	    vecpstr *elp = op->elp ;
+	    if ((rs = elp->findn(sp,sl)) >= 0) {
+	        rs = true ;
+	    } else if (rs == SR_NOTFOUND) {
+	        rs = SR_OK ;
+	    }
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (vsetstr_already) */
 
 int vsetstr_count(VS *op) noex {
 	int		rs ;
