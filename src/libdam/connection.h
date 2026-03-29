@@ -24,7 +24,6 @@
 #include	<usysrets.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
-#include	<localmisc.h>		/* various constants (see below) */
 
 
 #define	CONNECTION		struct connection_head
@@ -37,7 +36,7 @@ struct connection_flags {
 	uint		sa:1 ;
 	uint		addr:1 ;
 	uint		inetdomain:1 ;	/* allocated */
-} ;
+} ; /* end struct */
 
 struct connection_head {
 	cchar		*inetdomain ;	/* local domain name */
@@ -48,13 +47,13 @@ struct connection_head {
 	CONNECTION_FL	fl ;
 	int		sal ;
 	int		sock ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum connectionmems {
 	connectionmem_finish,
 	connectionmem_overlast
-} ;
+} ; /* end enum */
 struct connection ;
 struct connection_co {
 	connection	*op = nullptr ;
