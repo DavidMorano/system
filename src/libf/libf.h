@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdio.h>		/* |FILE(3c)| */
+#include	<stdio.h>		/* |FILE(3stdio)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 
