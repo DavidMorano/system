@@ -38,13 +38,15 @@
 
 #include	"syspasswd.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -67,12 +69,12 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int syspasswd_ctor(syspasswd *op,Args ... args) noex {
     	SYSPASSWD	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->fmp = new(nothrow) filemap) != np) {
+	    if ((op->fmp = new(nothrow) filemap) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-filemap) */
 	} /* end if (non-null) */
@@ -82,9 +84,9 @@ static int syspasswd_ctor(syspasswd *op,Args ... args) noex {
 
 static int syspasswd_dtor(syspasswd *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->fmp) {
+	    if (op->fmp) ylikely {
 		delete op->fmp ;
 		op->fmp = nullptr ;
 	    }
@@ -96,7 +98,7 @@ static int syspasswd_dtor(syspasswd *op) noex {
 template<typename ... Args>
 static inline int syspasswd_magic(syspasswd *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SYSPASSWD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -118,9 +120,9 @@ int syspasswd_open(syspasswd *op,cchar *sufname) noex {
 	csize		nmax = INT_MAX ;
 	int		rs ;
 	if (sufname == nullptr) sufname = defufname ; /* default */
-	if ((rs = syspasswd_ctor(op)) >= 0) {
+	if ((rs = syspasswd_ctor(op)) >= 0) ylikely {
 	    filemap	*fmp = op->fmp ;
-	    if ((rs = fmp->open(sufname,nmax)) >= 0) {
+	    if ((rs = fmp->open(sufname,nmax)) >= 0) ylikely {
 	        op->magic = SYSPASSWD_MAGIC ;
 	    }
 	} /* end if (magic) */
@@ -131,8 +133,8 @@ int syspasswd_open(syspasswd *op,cchar *sufname) noex {
 int syspasswd_close(syspasswd *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = syspasswd_magic(op)) >= 0) {
-	    if (op->fmp) {
+	if ((rs = syspasswd_magic(op)) >= 0) ylikely {
+	    if (op->fmp) ylikely {
 		filemap		*fmp = op->fmp ;
 		rs1 = fmp->close ;
 		if (rs >= 0) rs = rs1 ;
@@ -149,7 +151,7 @@ int syspasswd_close(syspasswd *op) noex {
 
 int syspasswd_readent(syspasswd *op,ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	int		rs ;
-	if ((rs = syspasswd_magic(op,pwp,pwbuf)) >= 0) {
+	if ((rs = syspasswd_magic(op,pwp,pwbuf)) >= 0) ylikely {
 	    filemap	*fmp = op->fmp ;
 	    cchar	*lp{} ;
 	    while ((rs = fmp->getln(&lp)) > 0) {
@@ -164,7 +166,7 @@ int syspasswd_readent(syspasswd *op,ucentpw *pwp,char *pwbuf,int pwlen) noex {
 
 int syspasswd_reset(syspasswd *op) noex {
 	int		rs ;
-	if ((rs = syspasswd_magic(op)) >= 0) {
+	if ((rs = syspasswd_magic(op)) >= 0) ylikely {
 	    filemap	*fmp = op->fmp ;
 	    rs = fmp->rewind ;
 	} /* end if (magic) */
