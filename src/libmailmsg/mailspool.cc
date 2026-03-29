@@ -53,12 +53,15 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<uclock.h>
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<estrings.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
@@ -90,6 +93,13 @@ typedef	mode_t		om_t ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_unlink(cchar *) noex ;
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_fminmod(int,mode_t) noex ;
+    extern int uc_close(int) noex ;
+} /* end extern */
+
 
 /* external variables */
 
@@ -106,41 +116,40 @@ struct si {
 	int		of ;
 	int		to ;
 	bool		f_create ;
-} ;
+} ; /* end struct (si) */
 
 
 /* forward references */
 
 template<typename ... Args>
-static inline int mailspool_magic(mailspool *op,Args ... args) noex {
+local inline int mailspool_magic(mailspool *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MAILSPOOL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailspool_magic) */
+} /* end subroutine (mailspool_magic) */
 
-static int	mailspool_lfbegin(MS *,cchar *,cchar *) noex ;
-static int	mailspool_lfend(MS *) noex ;
+local int	mailspool_lfbegin(MS *,cchar *,cchar *) noex ;
+local int	mailspool_lfend(MS *) noex ;
 
-static int	si_start(si *,MS *,cchar *,cchar *,int,mode_t,int) noex ;
-static int	si_finish(si *) noex ;
-static int	si_checkcreate(si *) noex ;
-static int	si_trying(si *) noex ;
-static int	si_lockoutbegin(si *,time_t) noex ;
-static int	si_lockoutend(si *,int) noex ;
-static int	si_lockcreate(si *) noex ;
-static int	si_lockin(si *) noex ;
-static int	si_minmod(si *,int,mode_t) noex ;
-static int	si_chown(si *) noex ;
+local int	si_start(si *,MS *,cchar *,cchar *,int,mode_t,int) noex ;
+local int	si_finish(si *) noex ;
+local int	si_checkcreate(si *) noex ;
+local int	si_trying(si *) noex ;
+local int	si_lockoutbegin(si *,time_t) noex ;
+local int	si_lockoutend(si *,int) noex ;
+local int	si_lockcreate(si *) noex ;
+local int	si_lockin(si *) noex ;
+local int	si_minmod(si *,int,mode_t) noex ;
+local int	si_chown(si *) noex ;
 
-static int	getlockcmd(int) noex ;
+local int	getlockcmd(int) noex ;
 
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
@@ -151,13 +160,13 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 int mailspool_open(MS *op,cchar *md,cchar *un,int of,mode_t om,int to) noex {
 	int		rs = SR_FAULT ;
 	int		mfd = -1 ;
-	if (op && md && un) {
+	if (op && md && un) ylikely {
 	    of |= O_LARGEFILE ;
 	    si	sub, *sip = &sub ;
-	    if ((rs = si_start(sip,op,md,un,of,om,to)) >= 0) {
-	        if ((rs = mailspool_lfbegin(op,md,un)) >= 0) {
-	            if ((rs = si_checkcreate(sip)) >= 0) {
-	                if ((rs = si_trying(sip)) >= 0) {
+	    if ((rs = si_start(sip,op,md,un,of,om,to)) >= 0) ylikely {
+	        if ((rs = mailspool_lfbegin(op,md,un)) >= 0) ylikely {
+	            if ((rs = si_checkcreate(sip)) >= 0) ylikely {
+	                if ((rs = si_trying(sip)) >= 0) ylikely {
 		            op->magic = MAILSPOOL_MAGIC ;
 		        }
 	            }
@@ -179,13 +188,13 @@ int mailspool_open(MS *op,cchar *md,cchar *un,int of,mode_t om,int to) noex {
 int mailspool_close(MS *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mailspool_magic(op)) >= 0) {
-	    if (op->mfd >= 0) {
+	if ((rs = mailspool_magic(op)) >= 0) ylikely {
+	    if (op->mfd >= 0) ylikely {
 	        rs1 = u_close(op->mfd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->mfd = -1 ;
 	    } 
-	    if (op->lfname) {
+	    if (op->lfname) ylikely {
 	        if ((op->lfname[0] != '\0') && op->f_created) {
 	            rs1 = uc_unlink(op->lfname) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -199,34 +208,36 @@ int mailspool_close(MS *op) noex {
 }
 /* end subroutine (mailspool_close) */
 
-static int mailspool_lfbegin(MS *op,cchar *md,cchar *un) noex {
+local int mailspool_lfbegin(MS *op,cchar *md,cchar *un) noex {
 	int		rs ;
-	if ((rs = maxpathlen) >= 0) {
+	int		rs1 ;
+	if ((rs = maxpathlen) >= 0) ylikely {
 	    cint	maxpath = rs ;
 	    cint	sz = ((rs + 1) * 2) ;
 	    int		ai = 0 ;
-	    if (char *a ; (rs = libmem.mall(sz,&a)) >= 0) {
+	    if (char *a ; (rs = libmem.mall(sz,&a)) >= 0) ylikely {
 		cint	nlen = maxpath ;
 		char	*nbuf = (a + ((maxpath + 1) * ai++)) ;
-	        if ((rs = sncpy(nbuf,nlen,un,".lock")) >= 0) {
+	        if ((rs = sncpy(nbuf,nlen,un,".lock")) >= 0) ylikely {
 	    	    char	*lfn = (a + ((maxpath + 1) * ai++)) ;
-	            if ((rs = mkpath(lfn,md,nbuf)) >= 0) {
+	            if ((rs = mkpath(lfn,md,nbuf)) >= 0) ylikely {
 		        if (cchar *cp ; (rs = libmem.strw(lfn,rs,&cp)) >= 0) {
 		            op->lfname = cp ;
 		        }
 	            }
 	        }
-	        rs = rsfree(rs,a) ;
+	        rs1 = libmem.free(a) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (maxpathlen) */
 	return rs ;
 }
 /* end subroutine (mailspool_lfbegin) */
 
-static int mailspool_lfend(MS *op) noex {
+local int mailspool_lfend(MS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->lfname) {
+	if (op->lfname) ylikely {
 	    void *vp = voidp(op->lfname) ;
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -240,11 +251,11 @@ int mailspool_setlockinfo(MS *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wl = 0 ;
-	if ((rs = mailspool_magic(op,wbuf)) >= 0) {
+	if ((rs = mailspool_magic(op,wbuf)) >= 0) ylikely {
 	    cint	of = O_WRONLY ;
 	    cmode	om = 0666 ;
 	    if (wlen < 0) wlen = lenstr(wbuf) ;
-	    if ((rs = u_open(op->lfname,of,om)) >= 0) {
+	    if ((rs = u_open(op->lfname,of,om)) >= 0) ylikely {
 	        cint	fd = rs ;
 		{
 	            rs = u_write(fd,wbuf,wlen) ;
@@ -261,10 +272,10 @@ int mailspool_setlockinfo(MS *op,cchar *wbuf,int wlen) noex {
 
 /* private subroutines */
 
-static int si_start(si *sip,MS *op,cc *md,cc *un,int of,om_t om,int to) noex {
+local int si_start(si *sip,MS *op,cc *md,cc *un,int of,om_t om,int to) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sip) {
+	if (sip) ylikely {
 	    memclear(sip) ;
 	    sip->op = op ;
 	    sip->md = md ;
@@ -273,13 +284,13 @@ static int si_start(si *sip,MS *op,cc *md,cc *un,int of,om_t om,int to) noex {
 	    sip->om = om ;
 	    sip->to = to ;
 	    sip->egid = getegid() ;
-	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
-	        if ((rs = mkpath(tbuf,md,un)) >= 0) {
+	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
+	        if ((rs = mkpath(tbuf,md,un)) >= 0) ylikely {
 	            if (cchar *cp ; (rs = libmem.strw(tbuf,rs,&cp)) >= 0) {
 		        sip->mfname = cp ;
 		    } /* end if (memory-allocation) */
 		}
-		rs1 = malloc_free(tbuf) ;
+		rs1 = lm_free(tbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
@@ -287,14 +298,14 @@ static int si_start(si *sip,MS *op,cc *md,cc *un,int of,om_t om,int to) noex {
 }
 /* end subroutine (si_start) */
 
-static int si_finish(si *sip) noex {
+local int si_finish(si *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		mfd = -1 ;
-	if (sip) {
+	if (sip) ylikely {
 	    mailspool	*op = sip->op ;
 	    rs = SR_OK ;
-	    if (sip->mfname) {
+	    if (sip->mfname) ylikely {
 		void *vp = voidp(sip->mfname) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -306,10 +317,10 @@ static int si_finish(si *sip) noex {
 }
 /* end subroutine (si_finish) */
 
-static int si_checkcreate(si *sip) noex {
+local int si_checkcreate(si *sip) noex {
 	int		rs ;
 	cchar		*mfname = sip->mfname ;
-	if (USTAT sb ; (rs = u_stat(mfname,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(mfname,&sb)) >= 0) {
 	    if (! S_ISREG(sb.st_mode)) {
 		rs = SR_ISDIR ;
 	    }
@@ -324,7 +335,7 @@ static int si_checkcreate(si *sip) noex {
 }
 /* end subroutine (si_checkcreate) */
 
-static int si_trying(si *sip) noex {
+local int si_trying(si *sip) noex {
 	time_t		ti_start = getustime ;
 	time_t		ti_now ;
 	int		rs = SR_OK ;
@@ -350,7 +361,7 @@ static int si_trying(si *sip) noex {
 }
 /* end subroutine (si_trying) */
 
-static int si_lockoutbegin(si *sip,time_t dt) noex {
+local int si_lockoutbegin(si *sip,time_t dt) noex {
 	mailspool	*op = sip->op ;
 	int		rs ;
 	int		f = false ;
@@ -371,7 +382,7 @@ static int si_lockoutbegin(si *sip,time_t dt) noex {
 }
 /* end subroutine (si_lockoutbegin) */
 
-static int si_lockoutend(si *sip,int prs) noex {
+local int si_lockoutend(si *sip,int prs) noex {
 	mailspool	*op = sip->op ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -385,7 +396,7 @@ static int si_lockoutend(si *sip,int prs) noex {
 }
 /* end subroutine (si_lockoutend) */
 
-static int si_lockcreate(si *sip) noex {
+local int si_lockcreate(si *sip) noex {
 	mailspool	*op = sip->op ;
 	cint		of = (O_RDWR|O_CREAT|O_EXCL) ;
 	cmode		om = 0664 ;
@@ -401,20 +412,20 @@ static int si_lockcreate(si *sip) noex {
 }
 /* end subroutine (si_lockcreate) */
 
-static int si_lockin(si *sip) noex {
+local int si_lockin(si *sip) noex {
 	mailspool	*op = sip->op ;
 	cmode		om = sip->om ;
 	cint		of = sip->of ;
 	int		rs ;
 	int		mfd = -1 ;
 	cchar		*mfname = sip->mfname ;
-	if ((rs = u_open(mfname,of,om)) >= 0) {
+	if ((rs = u_open(mfname,of,om)) >= 0) ylikely {
 	    mfd = rs ;
-	    if ((rs = getlockcmd(of)) >= 0) {
+	    if ((rs = getlockcmd(of)) >= 0) ylikely {
 		cint	cmd = rs ;
-	        if ((rs = uc_lockfile(mfd,cmd,0L,0,1)) >= 0) {
-		    if ((rs = si_minmod(sip,mfd,om)) >= 0) {
-		        if ((rs = si_chown(sip)) >= 0) {
+	        if ((rs = uc_lockfile(mfd,cmd,0L,0,1)) >= 0) ylikely {
+		    if ((rs = si_minmod(sip,mfd,om)) >= 0) ylikely {
+		        if ((rs = si_chown(sip)) >= 0) ylikely {
 		            op->mfd = mfd ;
 		        }
 		    }
@@ -429,7 +440,7 @@ static int si_lockin(si *sip) noex {
 }
 /* end subroutine (si_lockin) */
 
-static int si_minmod(si *sip,int mfd,mode_t om) noex {
+local int si_minmod(si *sip,int mfd,mode_t om) noex {
 	int		rs = SR_OK ;
 	if (sip->f_create) {
 	    rs = uc_fminmod(mfd,om) ;
@@ -438,16 +449,16 @@ static int si_minmod(si *sip,int mfd,mode_t om) noex {
 }
 /* end subroutine (si_minmod) */
 
-static int si_chown(si *sip) noex {
+local int si_chown(si *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = false ;
-	if (sip->f_create) {
+	if (sip->f_create) ylikely {
 	    const gid_t		egid = sip->egid ;
 	    cchar		*md = sip->md ;
-	    if (USTAT sb ; (rs = u_stat(md,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(md,&sb)) >= 0) ylikely {
 		const gid_t	gid = sb.st_gid ;
-	        if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	        if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
 	            cint	pwlen = rs ;
 	            if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,sip->un)) >= 0) {
 			const uid_t	euid = geteuid() ;
@@ -465,7 +476,7 @@ static int si_chown(si *sip) noex {
 		    } else if (isNotPresent(rs)) {
 		        rs = SR_OK ;
 		    }
-		    rs1 = malloc_free(pwbuf) ;
+		    rs1 = lm_free(pwbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (stat) */
@@ -474,7 +485,7 @@ static int si_chown(si *sip) noex {
 }
 /* end subroutine (si_chown) */
 
-static int getlockcmd(int of) noex {
+local int getlockcmd(int of) noex {
 	cint		am = (of & O_ACCMODE) ;
 	int		cmd = SR_INVALID ;
 	switch (am) {
