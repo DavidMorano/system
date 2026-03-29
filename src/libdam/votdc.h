@@ -54,19 +54,19 @@ struct votdc_object {
 	cchar		*name ;
 	uint		objsz ;
 	uint		cursz ;
-} ;
+} ; /* end struct */
 
 struct votdc_vcursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct votdc_titlecache {
 	cchar		**titles ;
-	cchar		*a ;
+	char		*a ;
 	int		wmark ;
 	int		amark ;
 	char		lang[VOTDC_LANGLEN+1] ;
-} ;
+} ; /* end struct */
 
 struct votdc_booker {
 	time_t		ctime ;
@@ -75,7 +75,7 @@ struct votdc_booker {
 	int		amark ;
 	int		b[VOTDC_NTITLES+1] ;
 	char		lang[VOTDC_LANGLEN+1] ;
-} ;
+} ; /* end struct */
 
 struct votdc_verser {
 	time_t		ctime ;
@@ -86,30 +86,30 @@ struct votdc_verser {
 	int		wmark ;		/* write mark */
 	int		amark ;		/* access mark */
 	uchar		book, chapter, verse, lang ;
-} ;
+} ; /* end struct */
 
 struct votdc_citation {
 	uchar		b, c, v, l ;
-} ;
+} ; /* end struct */
 
 struct votdc_information {
 	time_t		wtime ;
 	time_t		atime ;
 	int		nbooks ;
 	int		nverses ;
-} ;
+} ; /* end struct */
 
 struct votdc_flags {
 	uint		shm:1 ;
 	uint		txt:1 ;
 	uint		sorted:1 ;
-} ;
+} ; /* end struct */
 
 struct votdc_head {
-	cchar		*a ;		/* object string allocations */
 	cchar		*pr ;
 	cchar		*lang ;
 	cchar		*shmname ;
+	char		*a ;		/* object string allocations */
 	caddr_t		mapdata ;	/* SHM data */
 	ptm		*mxp ;		/* pointer to SHM mutex */
 	VOTDC_BOOK	*books ;	/* book-records */
@@ -129,7 +129,7 @@ struct votdc_head {
 	int		shmsize ;
 	int		nents ;	
 	int		fd ;
-} ;
+} ; /* end struct */
 
 typedef	VOTDC			votdc ;
 typedef	VOTDC_FL		votdc_fl ;
