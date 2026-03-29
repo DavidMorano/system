@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 
 
@@ -32,17 +33,17 @@ struct splitaddr_head {
 	vechand		*comp ;		/* pointer to VECHAND object */
 	cchar		*lpart ;
 	cchar		*mailaddr ;
-	uint		magic ;
+	uint		magval ;
 	int		nd ;
-} ;
+} ; /* end struct */
 
 typedef	SPLITADDR	splitaddr ;
 
 EXTERNC_begin
 
-extern int splitaddr_start(splitaddr *,cchar *) noex ;
-extern int splitaddr_prematch(splitaddr *,splitaddr *) noex ;
-extern int splitaddr_finish(splitaddr *) noex ;
+extern int splitaddr_start	(splitaddr *,cchar *) noex ;
+extern int splitaddr_prematch	(splitaddr *,splitaddr *) noex ;
+extern int splitaddr_finish	(splitaddr *) noex ;
 
 EXTERNC_end
 
