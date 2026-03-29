@@ -42,7 +42,9 @@
 
 #include	"codebal.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -65,7 +67,7 @@ template<typename ... Args>
 static int codebal_ctor(codebal *op,Args ... args) noex {
 	CODEBAL		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -74,7 +76,7 @@ static int codebal_ctor(codebal *op,Args ... args) noex {
 
 static int codebal_dtor(codebal *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -84,7 +86,7 @@ static int codebal_dtor(codebal *op) noex {
 template<typename ... Args>
 static inline int codebal_magic(codebal *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CODEBAL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
