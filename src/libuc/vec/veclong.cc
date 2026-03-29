@@ -73,7 +73,7 @@ template<typename ... Args>
 local inline int veclong_magic(veclong *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == VECLONG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == VECLONG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (veclong_magic) */
@@ -113,7 +113,7 @@ int veclong_start(veclong *op,int vn,int vo) noex {
 		    }
 	        } /* end if (wanted pre-allocation) */
 	        if (rs >= 0) {
-		    op->magic = VECLONG_MAGIC ;
+		    op->magval = VECLONG_MAGIC ;
 	        }
 	    } /* end if */
 	} /* end if (non-null) */
@@ -133,7 +133,7 @@ int veclong_finish(veclong *op) noex {
 	    op->c = 0 ;
 	    op->i = 0 ;
 	    op->n = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
