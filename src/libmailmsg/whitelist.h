@@ -20,38 +20,39 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 
 
-#define	WHITELIST_MAGIC		0x65437296
-#define	WHITELIST_DEFENTS	10
 #define	WHITELIST		struct whitelist_head
 #define	WHITELIST_CUR		struct whitelist_cursor
+#define	WHITELIST_MAGIC		0x65437296
+#define	WHITELIST_DEFENTS	10
 
 
 struct whitelist_head {
 	vecstr		*wlp ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct whitelist_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef	WHITELIST	whitelist ;
 typedef	WHITELIST_CUR	whitelist_cur ;
 
 EXTERNC_begin
 
-extern int whitelist_open(whitelist *,cchar *) noex ;
-extern int whitelist_fileadd(whitelist *,cchar *) noex ;
-extern int whitelist_count(whitelist *) noex ;
-extern int whitelist_get(whitelist *,int,cchar **) noex ;
-extern int whitelist_read(whitelist *,char *,int,int) noex ;
-extern int whitelist_prematch(whitelist *,cchar *) noex ;
-extern int whitelist_audit(whitelist *) noex ;
-extern int whitelist_close(whitelist *) noex ;
+extern int whitelist_open	(whitelist *,cchar *) noex ;
+extern int whitelist_fileadd	(whitelist *,cchar *) noex ;
+extern int whitelist_count	(whitelist *) noex ;
+extern int whitelist_get	(whitelist *,int,cchar **) noex ;
+extern int whitelist_read	(whitelist *,char *,int,int) noex ;
+extern int whitelist_prematch	(whitelist *,cchar *) noex ;
+extern int whitelist_audit	(whitelist *) noex ;
+extern int whitelist_close	(whitelist *) noex ;
 
 EXTERNC_end
 
