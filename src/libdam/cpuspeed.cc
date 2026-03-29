@@ -5,15 +5,21 @@
 /* load a CPUSPEED module and call it */
 /* version %I% last-modified %G% */
 
+#define	CF_PARENT	0		/* emable searching parent */
 
 /* revision history:
 
 	= 2003-08-13, David A­D­ Morano
-	This is an original write.
+	This is an original write, but was inspired by previous similar
+	subroutines.
+
+	= 2025-11-12, David A­D­ Morano
+	I modified this to dynamically search for a program-root.
+	We all live in a more complicated world now.
 
 */
 
-/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2003,2025 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -21,7 +27,21 @@
 	cpuspeed
 
   	Description:
-	This subroutine loads up a CPUSPEED module.
+	This subroutine finds and loads up a CPUSPEED module, and
+	then executes it.  The resulting "speed" is returned by the
+	called module and then is returned by this subroutine.
+
+	Synopsis:
+	int cpuspeed(cchar *pr,cchar *name,int nruns) noex
+
+	Arguments:
+	pr	program-root
+	name	module name to load
+	nruns	number of runs to execute
+
+	Returns:
+	>=0	completed OK
+	<0	error (system-return)
 
 *******************************************************************************/
 
@@ -32,13 +52,16 @@
 #include	<dlfcn.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
 #include	<mkpr.h>
 #include	<mkpathx.h>
 #include	<mkfnamesuf.h>
 #include	<sncpyx.h>
-#include	<exitcodes.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"cpuspeed.h"
@@ -46,12 +69,12 @@
 
 /* local defines */
 
-#ifdef	PRDOMAIN
-#define	PRDOMAIN	"LOCAL"
+#ifndef	CF_PARENT
+#define	CF_PARENT	0		/* emable searching parent */
 #endif
 
-#ifndef	PROGRAMEOOT
-#define	PROGRAMROOT	"/usr/add-on/local"
+#ifndef	PRNAME
+#define	PRNAME		"LOCAL"
 #endif
 
 #ifndef	OFD
@@ -70,7 +93,7 @@
 /* local typedefs */
 
 extern "C" {
-    typedef int (*sub_f)(int) noex ;
+    typedef int (*mod_f)(int) noex ;
 }
 
 
@@ -84,17 +107,31 @@ extern "C" {
 
 namespace {
     struct loadmgr {
-	void		*dhp ;
+	void		*dhp{} ;
+	char		*tbuf{} ;
+	char		*pbuf{} ;
+	char		*fname{} ;	/* loadable-module file-name */
+	cchar		*prn ;		/* derived */
+	int		tlen ;
+	int		plen ;
+	int		flen ;
 	int		dlmode ;
-	char		*fname ;
-	int operator () (cchar *,cchar *,cchar **) noex ;
+	int		nruns ;
+	loadmgr(int s) noex : nruns(s) { } ;
+	int operator () (cchar *,cchar *) noex ;
+	int defs(cc *,cc *) noex ;
+	int defvals() noex ;
+	int defpr(cchar *) noex ;
+	int defname(cchar *) noex ;
+	int modbegin(cchar *) noex ;
+	int modend() noex ;
+	int mkfname(cchar *) noex ;
+	int speedrun() noex ;
     } ; /* end struct (loadmgr) */
 } /* end namespace */
 
 
 /* forward references */
-
-static int	lfile(loadmgr *,cchar *,cchar *) noex ;
 
 
 /* local variables */
@@ -117,8 +154,11 @@ constexpr cpcchar	exts[] = {
 	"",
 	"so",
 	"o",
+	"dyld",
 	nullptr
 } ; /* end array (exts) */
+
+cbool			f_parent = CF_PARENT ;
 
 
 /* exported variables */
@@ -127,100 +167,167 @@ constexpr cpcchar	exts[] = {
 /* exported suroutines */
 
 int cpuspeed(cchar *pr,cchar *name,int nruns) noex {
-    	cnullptr	np{} ;
-	loadmgr		lf{} ;
-	int		rs ;
-	int		i ;
-	int		speed ;
-	void		*dhp ;
-
-/* program root */
-
-	if (pr == nullptr)
-	    pr = PROGRAMROOT ;
-
-	if (nruns <= 0)
-	    nruns = NRUNS ;
-
-#if	CF_PARENT
-	lf.dlmode = RTLD_LAZY | RTLD_LOCAL | RTLD_PARENT ;
-#else
-	lf.dlmode = RTLD_LAZY | RTLD_LOCAL ;
-#endif
-
-	rs = SR_NOTFOUND ;
-	if ((name == nullptr) || (name[0] == '\0')) {
-	    for (i = 0 ; names[i] != nullptr ; i += 1) {
-	        rs = lfile(&lf,pr,names[i]) ;
-	        if (rs > 0) break ;
-	    } /* end for */
-	} else {
-	    rs = lfile(&lf,pr,name) ;
-	}
-
-	if (rs >= 0) {
-	    dhp = lf.dhp ;
-	    if (dhp != nullptr) {
-	        cchar	*en = ENTRYNAME ;
-	        sub_f fp ;
-	        if ((fp = (sub_f)  dlsym(dhp,en)) != np) {
-	            speed = (*fp)(nruns) ;
-	        } else {
-	            rs = SR_LIBBAD ;
-	        }
-	        dlclose(dhp) ;
-	    } else {
-	        rs = SR_LIBACC ;
-	    }
-	} /* end if (ok) */
-
-	return (rs >= 0) ? speed : rs ;
-}
-/* end subroutine (cpuspeed) */
+	loadmgr		lf(nruns) ;
+	return lf(pr,name) ;
+} /* end subroutine (cpuspeed) */
 
 
 /* local subroutines */
 
-static int lfile(loadmgr *lfp,cc *pr,cc *name) noex {
-	ustat	sb ;
-	int		i, j, k ;
-	int		fl = 0 ;
-	cchar	*lp = nullptr ;
-	char		tmpfname[MAXPATHLEN + 1] ;
+int loadmgr::operator () (cc *pr,cc *name) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		speed = 0 ; /* return-value */
+	if ((rs = lm_mp(&tbuf)) >= 0) ylikely {
+	    tlen = rs ;
+	    if ((rs = lm_mp(&pbuf)) >= 0) ylikely {
+	        plen = rs ;
+	        if ((rs = lm_mp(&fname)) >= 0) ylikely {
+		    flen = rs ;
+	            if ((rs = defs(pr,name)) >= 0) ylikely {
+			{
+		            rs = speedrun() ;
+			    speed = rs ;
+			}
+			rs1 = modend() ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (defs) */
+	            rs1 = lm_free(fname) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	        rs1 = lm_free(pbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	    rs1 = lm_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? speed : rs ;
+} /* end method (loadmgr::operator) */
 
-	if (lfp == nullptr)
-	    return SR_FAULT ;
+int loadmgr::defs(cc *pr,cc *name) noex {
+    	int		rs ;
+	if ((rs = defvals()) >= 0) ylikely {
+	    if ((rs = defpr(pr)) >= 0) ylikely {
+	        rs = defname(name) ;
+	    }
+	}
+	return rs ;
+} /* end method (loadmgr::defs) */
 
-	for (i = 0 ; i < 2 ; i += 1) {
+int loadmgr::defvals() noex {
+    	int		rs = SR_OK ;
+	if (nruns <= 0) {
+	    nruns = NRUNS ;
+	}
+	{
+	    dlmode = (RTLD_LAZY | RTLD_LOCAL) ;
+	    if_constexpr (f_parent) {
+	        dlmode |= RTLD_PARENT ;
+	    }
+	}
+	return rs ;
+} /* end method (loadmgr::defvals) */
 
-	    lp = (i == 0) ? OFD : "" ;
-	    for (j = 0 ; subdirs[j] != nullptr ; j += 1) {
-
-	        mkpath5(tmpfname,pr,LIBDNAME,lp,subdirs[j],name) ;
-
-	        for (k = 0 ; exts[k] != nullptr ; k += 1) {
-
-	            if (exts[k][0] != '\0') {
-	                fl = mkfnamesuf1(lfp->fname,tmpfname,exts[k]) ;
-	            } else {
-	                fl = sncpy1(lfp->fname,MAXPATHLEN,tmpfname) ;
+int loadmgr::defpr(cc *pr) noex {
+    	int		rs ;
+	int		rs1 ;
+	if (pr && pr[0]) {
+	    prn = pr ;
+	} else {
+	    if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) ylikely {
+	        cint dlen = rs ;
+	        if ((rs = getinetdomain(dbuf,dlen)) >= 0) ylikely {
+	            if ((rs = mkpr(pbuf,plen,dbuf,PRNAME)) >= 0) ylikely {
+		        prn = pbuf ;
 		    }
+	        } /* end if (getinetdomain) */
+	        rs1 = lm_free(dbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (pr) */
+	return rs ;
+} /* end method (loadmgr::defpr) */
 
-	            lfp->dhp = nullptr ;
-	            if ((u_stat(lfp->fname,&sb) >= 0) && (S_ISREG(sb.st_mode)))
-	                lfp->dhp = dlopen(lfp->fname,lfp->dlmode) ;
+int loadmgr::defname(cc *name) noex {
+    	int		rs = SR_NOENT ;
+	if (name && name[0]) {
+	    rs = modbegin(name) ;
+	} else {
+	    for (int i = 0 ; names[i] != nullptr ; i += 1) {
+		cchar *n = names[i] ;
+	        rs = modbegin(n) ;
+	        if (rs != 0) break ;
+	    } /* end for */
+	} /* end if (have or search) */
+	return rs ;
+} /* end method (loadmgr::defname) */
 
-	            if (lfp->dhp != nullptr) break ;
-	        } /* end for (extensions) */
-
-	        if (lfp->dhp != nullptr) break ;
+int loadmgr::modbegin(cc *name) noex {
+    	int		rs = SR_OK ;
+	int		fl = 0 ; /* return-value */
+	cchar		*ldn = LIBDNAME ;
+	dhp = nullptr ;
+	for (int i = 0 ; i < 2 ; i += 1) {
+	    cchar	*lp = (i == 0) ? OFD : "" ;
+	    for (int j = 0 ; subdirs[j] != nullptr ; j += 1) {
+		cchar *sd = subdirs[j] ;
+	        if ((rs = mkpath(tbuf,prn,ldn,lp,sd,name)) >= 0) {
+	            for (int k = 0 ; exts[k] != nullptr ; k += 1) {
+			if ((rs = mkfname(exts[k])) >= 0) ylikely {
+			    fl = rs ;
+	                    if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
+			        if (S_ISREG(sb.st_mode)) {
+	                            dhp = dlopen(fname,dlmode) ;
+			        }
+		            } else if (isNotPresent(rs)) {
+			        rs = SR_OK ;
+			        fl = 0 ;
+		            } /* end if (u_stat) */
+			} /* end if (mkfname) */
+	                if (dhp != nullptr) break ;
+	            } /* end for (extensions) */
+		} /* end if (mkpath) */
+	        if (dhp != nullptr) break ;
 	    } /* end for (subdirs) */
-
-	    if (lfp->dhp != nullptr) break ;
+	    if (dhp != nullptr) break ;
 	} /* end for (major machine designator) */
+	if (dhp == nullptr) fl = 0 ;
+	return (rs >= 0) ? fl : rs ;
+} /* end method (loadmgr::modbegin) */
 
-	return (lfp->dhp != nullptr) ? fl : SR_NOENT ;
-}
-/* end subroutine (lfile) */
+int loadmgr::modend() noex {
+    	int		rs = SR_OK ;
+	if (dhp) {
+	    dlclose(dhp) ;
+	    dhp = nullptr ;
+	}
+	return rs ;
+} /* end method (loadmgr::modend) */
+
+int loadmgr::mkfname(cchar *ext) noex {
+    	int		rs ;
+	if (ext[0]) {
+	    rs = mkfnamesuf1(fname,tbuf,ext) ;
+	} else {
+	    rs = mkpath(fname,tbuf) ;
+	}
+	return rs ;
+} /* end method (loadmgr::mkfname) */
+
+int loadmgr::speedrun() noex {
+    	cnullptr	np{} ;
+	int		rs = SR_LIBACC ;
+	int		speed = 0 ; /* return-value */
+	if (dhp) {
+	    cchar	*en = ENTRYNAME ;
+	    if (mod_f fp ; (fp = (mod_f) dlsym(dhp,en)) != np) {
+	        rs = (*fp)(nruns) ;
+		speed = rs ;
+	    } else {
+	        rs = SR_LIBBAD ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? speed : rs ;
+} /* end method (loadmgr::speedrun) */
 
 
