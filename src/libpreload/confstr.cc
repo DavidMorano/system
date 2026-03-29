@@ -1,4 +1,5 @@
 /* confstr SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* Configuration-String UNIX® System interposer */
@@ -37,7 +38,6 @@
 	Q. Why are you so smart?
 	A. I do not know.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -49,11 +49,12 @@
 #include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<buffer.h>
 #include	<vecstr.h>
 #include	<sfx.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -104,7 +105,7 @@ static int	(*confstrs[])(buffer *) = {
 	nullptr
 } ;
 
-static cchar	*comps[] = {
+constexpr cpcchar	comps[] = {
 	"/usr/preroot/bin",
 	"/usr/xpg4/bin",
 	"/usr/ccs/bin",
