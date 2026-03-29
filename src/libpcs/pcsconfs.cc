@@ -31,11 +31,15 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<fcntl.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<mktmp.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
@@ -50,6 +54,9 @@
 #include	"var.h"
 #include	"varmk.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -181,41 +188,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	sncpy4(char *,int, cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	pathadd(char *,int,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	permid(ids *,USTAT *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isalnumlatin(int) ;
-extern int	strpcmp(cchar *,cchar *) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
-extern int	hasdots(cchar *,int) ;
-extern int	hasNotDots(cchar *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isOneOf(cint *,int) ;
-
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* external variables */
 
@@ -229,7 +201,7 @@ struct confvars_flags {
 	uint		id:1 ;
 	uint		cfname:1 ;	/* memory-allocated */
 	uint		rstchown:1 ;
-} ;
+} ; /* end struct */
 
 struct confvars {
 	ids		id ;
@@ -237,7 +209,7 @@ struct confvars {
 	varmk		v ;
 	CONFVARS_FL	fl ;
 	PCSCONFS	*op ;
-	cchar		**envv ;
+	mainv		envv ;
 	cchar		*prconf ;
 	cchar		*pr ;
 	cchar		*cfname ;
@@ -245,7 +217,7 @@ struct confvars {
 	gid_t		gid_pcs ;
 	time_t		daytime ;
 	time_t		cmtime ;	/* conf-file mtime */
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -272,28 +244,28 @@ static int	confvars_ids(CONFVARS *) noex ;
 
 /* local variables */
 
-static constexpr cpcchar	schedconf[] = {
+constexpr cpcchar	schedconf[] = {
 	"%p/etc/%n.%f",
 	"%p/etc/%f",
 	"%p/%n.%f",
 	nullptr
-} ;
+} ; /* end array */
 
-static constexpr int		stales[] = {
+constexpr int		stales[] = {
 	SR_STALE,
 	SR_NOENT,
 	SR_ACCESS,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
 
 PCSCONFS_OBJ	pcsconfs = {
 	"pcsconfs",
-	sizeof(PCSCONFS),
-	sizeof(PCSCONFS_CUR)
-} ;
+	szof(PCSCONFS),
+	szof(PCSCONFS_CUR)
+} ; /* end object */
 
 
 /* exported subroutines */
@@ -308,7 +280,7 @@ int pcsconfs_start(PCSCONFS *op,cchar *pr,cchar **envv,cchar *cfname) noex {
 
 	if ((cfname != nullptr) && (cfname[0] == '\0')) return SR_INVALID ;
 
-	memset(op,0,sizeof(PCSCONFS)) ;
+	memclear(op) ; /* dangerous */
 	op->envv = (envv != nullptr) ? envv : (cchar **) environ ;
 	op->fl.prdb = (cfname == nullptr) ;
 
@@ -331,10 +303,10 @@ int pcsconfs_finish(PCSCONFS *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = pcsconfs_finout(op) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = pcsconfs_finout(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	op->magic = 0 ;
 	return rs ;
 }
@@ -363,7 +335,7 @@ int pcsconfs_curbegin(PCSCONFS *op,PCSCONFS_CUR *curp) noex {
 
 	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(PCSCONFS_CUR)) ;
+	memclear(curp) ;
 
 	if (op->fl.db) {
 	    rs = var_curbegin(&op->db,&curp->vcur) ;
@@ -464,11 +436,12 @@ int pcsconfs_count(PCSCONFS *op) noex {
 
 static int pcsconfs_valsbegin(PCSCONFS *op,cchar *pr,cchar *cfname) noex {
 	int		rs ;
-	int		size = 0 ;
-	char		*bp{} ;
-	size += (strlen(pr)+1) ;
-	if (cfname != nullptr) size += (strlen(cfname)+1) ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	int		sz = 0 ;
+	sz += (lenstr(pr)+1) ;
+	if (cfname) {
+	    sz += (lenstr(cfname)+1) ;
+	}
+	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->pr = bp ;
 	    bp = (strwcpy(bp,pr,-1)+1) ;
@@ -486,7 +459,7 @@ static int pcsconfs_valsend(PCSCONFS *op) noex {
 	int		rs1 ;
 
 	if (op->a != nullptr) {
-	    rs1 = uc_free(op->a) ;
+	    rs1 = lm_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = nullptr ;
 	}
@@ -575,7 +548,7 @@ static int confvars_start(CONFVARS *sip,PCSCONFS *op) noex {
 	            rs1 = permsched(schedconf,&subs,pbuf,plen,cn,m) ;
 		    if (rs1 >= 0) {
 			cchar	*cp ;
-			if ((rs = uc_mallocstrw(pbuf,rs1,&cp)) >= 0) {
+			if ((rs = lm_mallstrw(pbuf,rs1,&cp)) >= 0) {
 			    sip->fl.cfname = true ;
 			    sip->cfname = cp ;
 			}
@@ -588,7 +561,7 @@ static int confvars_start(CONFVARS *sip,PCSCONFS *op) noex {
 
 	if (rs >= 0) {
 	    if (rs1 >= 0) {
-	        USTAT	sb ;
+	        ustat	sb ;
 	        rs1 = u_stat(cfname,&sb) ;
 	        if ((rs1 >= 0) && S_ISREG(sb.st_mode)) {
 	            sip->fl.conf = true ;
@@ -607,7 +580,7 @@ static int confvars_finish(CONFVARS *sip) noex {
 
 	if (sip->fl.cfname && (sip->cfname != nullptr)) {
 	    sip->fl.cfname = false ;
-	    rs1 = uc_free(sip->cfname) ;
+	    rs1 = lm_free(sip->cfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->cfname = nullptr ;
 	}
@@ -804,7 +777,7 @@ static int confvars_dbmake(CONFVARS *sip,cchar *dbname) noex {
 /* end subroutine (confvars_dbmake) */
 
 static int confvars_proc(CONFVARS *sip) noex {
-	USTAT		sb ;
+	ustat		sb ;
 	int		rs ;
 	int		rs1 ;
 
@@ -849,19 +822,18 @@ static int confvars_chown(CONFVARS *sip,char *dname,int dl) noex {
 	if ((rs = u_pathconf(dname,req,nullptr)) == 0) {
 	    if ((rs = confvars_ids(sip)) >= 0) {
 		ids		*idp = &sip->id ;
-	        fsdir		d ;
-	        fsdir_ent	e ;
 		uid_t		u = sip->uid_pcs ;
 		gid_t		g = sip->gid_pcs ;
-	        if ((rs = fsdir_open(&d,dname)) >= 0) {
-		    USTAT	sb ;
-		    int		nl ;
-		    cchar	*np ;
+	        if (fsdir d ; (rs = fsdir_open(&d,dname)) >= 0) {
+	            fsdir_ent	e ;
+		    int		naml ;
+		    cchar	*namp ;
 		    while ((rs = fsdir_read(&d,&e)) > 0) {
-			np = e.name ;
-			nl = rs ;
-			if (hasNotDots(np,nl)) {
-			    if ((rs = pathadd(dname,dl,np)) >= 0) {
+			namp = e.name ;
+			naml = rs ;
+			if (hasNotDots(namp,naml)) {
+			    if ((rs = pathadd(dname,dl,namp)) >= 0) {
+		    	        ustat sb ;
 		                if (u_stat(dname,&sb) >= 0) {
 				    if (sb.st_uid == idp->euid) {
 					int	f = false ;
@@ -899,7 +871,7 @@ static int confvars_ids(CONFVARS *sip) noex {
 	        if (rs < 0) {
 	            sip->fl.id = false ;
 	            ids_release(&sip->id) ;
-		}
+		} /* end if (error) */
 	    } /* end if (loaded IDs) */
 	} /* end if (needed IDs) */
 	return rs ;
