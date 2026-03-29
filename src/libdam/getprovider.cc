@@ -83,18 +83,22 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<uinfo.h>
-#include	<mallocxx.h>
 #include	<estrings.h>		/* |sf{x}(3uc)| + |snwcpy(3uc)| */
 #include	<nleadstr.h>
 #include	<localmisc.h>
 
 #include	"getprovider.h"
 
-import libutil ;
-import uconstants ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -111,7 +115,7 @@ struct provider {
 	uint		id ;
 	cchar		*codename ;
 	cchar		*realname ;
-} ;
+} ; /* end struct */
 
 namespace {
     struct trier ;
@@ -150,7 +154,7 @@ constexpr trier_m	tries[] = {
     	&trier::tryenv,
 	&trier::tryinfo,
 	&trier::trydef
-} ;
+} ; /* end array (tries) */
 
 
 /* exported variables */
@@ -160,11 +164,11 @@ libdam::provider		providerid ;
 
 /* exported subroutines */
 
-int getproviderid(cchar *sp,int sl) noex {
+int getproviderid(cchar *sp,int µsl) noex {
     	int		rs = SR_FAULT ;
 	int		id = 0 ;
-	if (sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	    rs = SR_OK ;
 	    for (int m, i = 0 ; providers[i].codename ; i += 1) {
 	        cchar	*bs = providers[i].codename ;
 	        m = nleadstr(bs,sp,sl) ;
@@ -173,7 +177,7 @@ int getproviderid(cchar *sp,int sl) noex {
 		    break ;
 		}
 	    } /* end for */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return (rs >= 0) ? id : rs ;
 }
 /* end subroutine (getproviderid) */
@@ -193,12 +197,13 @@ int getprovider(char *rbuf,int rlen) noex {
 
 int getvendor(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		rl = 0 ;
 	if (rbuf) {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
-	        if (char *pbuf ; (rs = malloc_mn(&pbuf)) >= 0) {
+	        if (char *pbuf ; (rs = lm_mn(&pbuf)) >= 0) {
 	            if ((rs = getprovider(pbuf,rs)) >= 0) {
 	                cint	pl = rs ;
 	                int	i ; /* used-afterwards */
@@ -220,7 +225,8 @@ int getvendor(char *rbuf,int rlen) noex {
 			    rl = rs ;
 	                }
 	            } /* end if (getprovider) */
-		    rs = rsfree(rs,pbuf) ;
+		    rs1 = lm_free(pbuf) ;
+	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -276,16 +282,18 @@ int trier::trydef() noex {
 namespace libdam {
     provider::operator int () noex {
 	int		rs ;
+	int		rs1 ;
 	int		id = 0 ;
-	if (char *pbuf ; (rs = malloc_mn(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = lm_mn(&pbuf)) >= 0) {
 	    if ((rs = getprovider(pbuf,rs)) >= 0) {
 		rs = getproviderid(pbuf,rs) ;
 		id = rs ;
 	    }
-	    rs = rsfree(rs,pbuf) ;
+	    rs1 = lm_free(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? id : rs ;
-    }
+    } /* end method (provider::operator) */
 } /* end namespace (libdam) */
 
 
