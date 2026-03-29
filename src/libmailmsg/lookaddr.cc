@@ -53,8 +53,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
 #include	<permx.h>
@@ -68,7 +70,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;			/* |gelenstr(eu)| */
+import libutil ;			/* |getlenstr(eu)| */
 
 /* local defines */
 
@@ -93,6 +95,10 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
+
 
 /* external variables */
 
@@ -103,49 +109,46 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int lookaddr_ctor(lookaddr *op,Args ... args) noex {
+local int lookaddr_ctor(lookaddr *op,Args ... args) noex {
     	LOOKADDR	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->svp = new(nothrow) vecstr) != np) {
+	    if ((op->svp = new(nothrow) vecstr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookaddr_ctor) */
+} /* end subroutine (lookaddr_ctor) */
 
-static int lookaddr_dtor(lookaddr *op) noex {
+local int lookaddr_dtor(lookaddr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->svp) {
+	    if (op->svp) ylikely {
 		delete op->svp ;
 		op->svp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookaddr_dtor) */
+} /* end subroutine (lookaddr_dtor) */
 
 template<typename ... Args>
-static inline int lookaddr_magic(lookaddr *op,Args ... args) noex {
+local inline int lookaddr_magic(lookaddr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == LOOKADDR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == LOOKADDR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (lookaddr_magic) */
+} /* end subroutine (lookaddr_magic) */
 
-static int lookaddr_loadvars(LA *,cchar *,cchar *) noex ;
-static int lookaddr_swl(LA *,cchar *) noex ;
-static int lookaddr_sbl(LA *,cchar *) noex ;
-static int lookaddr_uwl(LA *,LA_US *,cchar *) noex ;
-static int lookaddr_ubl(LA *,LA_US *,cchar *) noex ;
+local int lookaddr_loadvars(LA *,cchar *,cchar *) noex ;
+local int lookaddr_swl(LA *,cchar *) noex ;
+local int lookaddr_sbl(LA *,cchar *) noex ;
+local int lookaddr_uwl(LA *,LA_US *,cchar *) noex ;
+local int lookaddr_ubl(LA *,LA_US *,cchar *) noex ;
 
 
 /* local variables */
@@ -160,7 +163,7 @@ constexpr cpcchar	sched2[] = {
 	"%p/etc/mail.%f",
 	"%p/etc/%f",
 	nullptr
-} ;
+} ; /* end array (sched2) */
 
 /* addrlist file search (for local-user lists) */
 constexpr cpcchar	sched3[] = {
@@ -172,7 +175,7 @@ constexpr cpcchar	sched3[] = {
 	"%h/etc/mail.%f",
 	"%h/etc/%f",
 	nullptr
-} ;
+} ; /* end array (sched3) */
 
 
 /* exported variables */
@@ -182,15 +185,15 @@ constexpr cpcchar	sched3[] = {
 
 int lookaddr_start(LA *op,cchar *pr,cchar *sn) noex {
 	int		rs ;
-	if ((rs = lookaddr_ctor(op,pr,sn)) >= 0) {
-	    if (char *pb ; (rs = malloc_mp(&pb)) >= 0) {
+	if ((rs = lookaddr_ctor(op,pr,sn)) >= 0) ylikely {
+	    if (char *pb ; (rs = lm_mp(&pb)) >= 0) ylikely {
 	        cint	vn = 2 ;
 	        cint	vo = 0 ;
 	    	op->pbuf = pb ;
 		op->plen = rs ;
-	        if ((rs = vecstr_start(op->svp,vn,vo)) >= 0) {
-	            if ((rs = lookaddr_loadvars(op,pr,sn)) >= 0) {
-	                op->magic = LOOKADDR_MAGIC ;
+	        if ((rs = vecstr_start(op->svp,vn,vo)) >= 0) ylikely {
+	            if ((rs = lookaddr_loadvars(op,pr,sn)) >= 0) ylikely {
+	                op->magval = LOOKADDR_MAGIC ;
 	            }
 	            if (rs < 0) {
 	                vecstr_finish(op->svp) ;
@@ -198,9 +201,9 @@ int lookaddr_start(LA *op,cchar *pr,cchar *sn) noex {
 	        } /* end if (vecstr_start) */
 	        if (rs < 0) {
 		    void *vp = voidp(op->pbuf) ;
-		    malloc_free(vp) ;
+		    lm_free(vp) ;
 		    op->pbuf = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 	    if (rs < 0) {
 		lookaddr_dtor(op) ;
@@ -213,23 +216,23 @@ int lookaddr_start(LA *op,cchar *pr,cchar *sn) noex {
 int lookaddr_finish(LA *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = lookaddr_magic(op)) >= 0) {
-	    if (op->open.swl) {
+	if ((rs = lookaddr_magic(op)) >= 0) ylikely {
+	    if (op->open.swl) ylikely {
 	        rs1 = whitelist_close(&op->swl) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->open.swl = false ;
 	    }
-	    if (op->open.sbl) {
+	    if (op->open.sbl) ylikely {
 	        rs1 = whitelist_close(&op->sbl) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->open.sbl = false ;
 	    }
-	    if (op->svp) {
+	    if (op->svp) ylikely {
 	        rs1 = vecstr_finish(op->svp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->pbuf) {
-		rs1 = malloc_free(op->pbuf) ;
+	    if (op->pbuf) ylikely {
+		rs1 = lm_free(op->pbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->pbuf = nullptr ;
 		op->plen = 0 ;
@@ -238,7 +241,7 @@ int lookaddr_finish(LA *op) noex {
 		rs1 = lookaddr_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (lookaddr_magic) */
 	return rs ;
 }
@@ -246,17 +249,16 @@ int lookaddr_finish(LA *op) noex {
 
 int lookaddr_userbegin(LA *op,LA_US *up,cchar *un) noex {
 	int		rs ;
-	if ((rs = lookaddr_magic(op,up,un)) >= 0) {
+	if ((rs = lookaddr_magic(op,up,un)) >= 0) ylikely {
 	    cint	hlen = op->plen ;
 	    char	*hbuf = op->pbuf ;
 	    memclear(up) ;
-	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
+	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) ylikely {
 	        cint	hl = rs ;
-	        if (ustat sb ; (rs = uc_stat(hbuf,&sb)) >= 0) {
-	            if (S_ISDIR(sb.st_mode)) {
+	        if (ustat sb ; (rs = uc_stat(hbuf,&sb)) >= 0) ylikely {
+	            if (S_ISDIR(sb.st_mode)) ylikely {
 	                if ((rs = perm(hbuf,-1,-1,nullptr,X_OK)) >= 0) {
-	                    cchar	*cp ;
-	                    if ((rs = libmem.strw(hbuf,hl,&cp)) >= 0) {
+	                    if (cc *cp ; (rs = lm_strw(hbuf,hl,&cp)) >= 0) {
 	                        up->dname = cp ;
 	                    }
 	                } else if (isNotPresent(rs)) {
@@ -272,7 +274,7 @@ int lookaddr_userbegin(LA *op,LA_US *up,cchar *un) noex {
 	        rs = SR_OK ;
 	    }
 	    if (rs >= 0) {
-	        up->magic = LOOKADDR_MAGIC ;
+	        up->magval = LOOKADDR_MAGIC ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -282,29 +284,28 @@ int lookaddr_userbegin(LA *op,LA_US *up,cchar *un) noex {
 int lookaddr_userend(LA *op,LA_US *up) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = lookaddr_magic(op,up)) >= 0) {
+	if ((rs = lookaddr_magic(op,up)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (up->magic == LOOKADDR_MAGIC) {
-	        rs = SR_OK ;
-	        if (up->open.uwl) {
+	    if (up->magval == LOOKADDR_MAGIC) {
+		rs = SR_OK ;
+	        if (up->open.uwl) ylikely {
 	            rs1 = whitelist_close(&up->uwl) ;
 	            if (rs >= 0) rs = rs1 ;
 	            up->open.uwl = false ;
 	        }
-	        if (up->open.ubl) {
+	        if (up->open.ubl) ylikely {
 	            rs1 = whitelist_close(&up->ubl) ;
 	            if (rs >= 0) rs = rs1 ;
 	            up->open.ubl = false ;
 	        }
-	        if (up->dname) {
+	        if (up->dname) ylikely {
 		    void *vp = voidp(up->dname) ;
 	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            up->dname = nullptr ;
 	        }
-	        up->magic = 0 ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
+	    } /* end if (user-magic) */
+	} /* end if (object-magic) */
 	return rs ;
 }
 /* end subroutine (lookaddr_userend) */
@@ -312,7 +313,7 @@ int lookaddr_userend(LA *op,LA_US *up) noex {
 /* result: 0=ok, 1=bad */
 int lookaddr_usercheck(LA *op,LA_US *up,cchar *ema,int f) noex {
 	int		rs ;
-	if ((rs = lookaddr_magic(op,up,ema)) >= 0) {
+	if ((rs = lookaddr_magic(op,up,ema)) >= 0) ylikely {
 	    if (f) {
 	        if ((rs = lookaddr_swl(op,ema)) == 0) {
 	            if ((rs = lookaddr_uwl(op,up,ema)) > 0) {
@@ -348,16 +349,16 @@ int lookaddr_usercheck(LA *op,LA_US *up,cchar *ema,int f) noex {
 
 /* private subroutines */
 
-static int lookaddr_loadvars(LA *op,cchar *pr,cchar *sn) noex {
+local int lookaddr_loadvars(LA *op,cchar *pr,cchar *sn) noex {
 	int		rs ;
-	if ((rs = vecstr_envset(op->svp,"p",pr,-1)) >= 0) {
+	if ((rs = vecstr_envset(op->svp,"p",pr,-1)) >= 0) ylikely {
 	    rs = vecstr_envset(op->svp,"n",sn,-1) ;
 	}
 	return rs ;
 }
 /* end subroutine (lookaddr_loadvars) */
 
-static int lookaddr_swl(LA *op,cchar *ema) noex {
+local int lookaddr_swl(LA *op,cchar *ema) noex {
 	int		rs = SR_OK ;
 	if (! op->init.swl) {
 	    vecstr	*svp = op->svp ;
@@ -383,7 +384,7 @@ static int lookaddr_swl(LA *op,cchar *ema) noex {
 }
 /* end subroutine (lookaddr_swl) */
 
-static int lookaddr_sbl(LA *op,cchar *ema) noex {
+local int lookaddr_sbl(LA *op,cchar *ema) noex {
 	int		rs = SR_OK ;
 	if (! op->init.sbl) {
 	    vecstr	*svp = op->svp ;
@@ -409,7 +410,7 @@ static int lookaddr_sbl(LA *op,cchar *ema) noex {
 }
 /* end subroutine (lookaddr_sbl) */
 
-static int lookaddr_uwl(LA *op,LA_US *up,cchar *ema) noex {
+local int lookaddr_uwl(LA *op,LA_US *up,cchar *ema) noex {
 	int		rs = SR_OK ;
 	if (up->dname != nullptr) {
 	    if (! up->init.uwl) {
@@ -439,7 +440,7 @@ static int lookaddr_uwl(LA *op,LA_US *up,cchar *ema) noex {
 }
 /* end subroutine (lookaddr_uwl) */
 
-static int lookaddr_ubl(LA *op,LA_US *up,cchar *ema) noex {
+local int lookaddr_ubl(LA *op,LA_US *up,cchar *ema) noex {
 	int		rs = SR_OK ;
 	if (up->dname != nullptr) {
 	    if (! up->init.ubl) {
