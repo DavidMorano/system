@@ -49,6 +49,9 @@
 #ifndef	longconv
 #define	longconv		long
 #endif
+#ifndef	longlongconv
+#define	longlongconv		longlong
+#endif
 
 #ifndef	ucharconv
 #define	ucharconv		uchar
@@ -59,8 +62,11 @@
 #ifndef	uintconv
 #define	uintconv		uint
 #endif
-#ifndef	uintlongconv
+#ifndef	ulongconv
 #define	ulongconv		ulong
+#endif
+#ifndef	ulonglongconv
+#define	ulonglongconv		ulonglong
 #endif
 
 #ifndef	floatconv
@@ -114,6 +120,46 @@
 #ifdef	__cplusplus
 #ifndef	destruct		
 #define	destruct		compl
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	bitxor
+#define	bitxor			xor
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	bitand_eq
+#define	bitand_eq		&=
+#define	bitor_eq		|=
+#define	bitxor_eq		^
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	logand
+#define	logand			and
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	logor
+#define	logor			or
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	lognot
+#define	lognot			not
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	logand_eq
+#define	logand_eq		&&=
+#define	logor_eq		||=
+#define	logxor_eq		^^=
 #endif
 #endif /* __cplusplus */
 
@@ -179,7 +225,23 @@
 #define	cast_reinterpret	reinterpret_cast
 #define	cast_bit		bit_cast
 #define	cast_saturate		saturate_cast
+#define	cast_sat		saturate_cast
 #define	cast_any		any_cast
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	ordering_strong
+#define	ordering_strong		strong_ordering
+#define	ordering_weak		weak_ordering
+#define	ordering_partial	partial_ordering
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	integral_signed
+#define	integral_signed		signed_integral
+#define	integral_unsigned	unsigned_integral
 #endif
 #endif /* __cplusplus */
 
@@ -197,15 +259,22 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
+#ifndef	asconst
+#define	asconst			as_const
+#endif
+#endif /* __cplusplus */
+
+
+#ifdef	__cplusplus
 #ifndef	szof
-#define	szof(T)		int(sizeof(T))
+#define	szof(T)			int(sizeof(T))
 #endif
 #endif /* __cplusplus */
 
 #ifndef	EXTERNC_begin
 #ifdef	__cplusplus
-#define	EXTERNC_begin	extern "C" {
-#define	EXTERNC_end	}
+#define	EXTERNC_begin		extern "C" {
+#define	EXTERNC_end		}
 #else
 #define	EXTERNC_begin	/* externc_begin */
 #define	EXTERNC_end	/* externc_end */
@@ -213,8 +282,18 @@
 #endif /* EXTERNC_begin */
 
 #ifndef	CAST_R
-#define	CAST_R		cast_reinterpret
+#define	CAST_R			cast_reinterpret
 #endif
+
+#ifndef	SAT_SUBROUTINE
+#define	SAT_SUBROUTINE
+#ifdef	__cplusplus
+#define	sat_add			add_sat
+#define	sat_sub			sub_sat
+#define	sat_mul			mul_sat
+#define	sat_div			div_sat
+#endif /* __cplusplus */
+#endif /* SAT_SUBROUTINE */
 
 
 #endif /* CLANGUAGE_INCLUDE */
