@@ -1,0 +1,161 @@
+/* muldigs MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* Muliply-Digs */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2017-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+/*******************************************************************************
+
+  	Module:
+	muldigs
+
+	Description:
+	These subroutine-templates are used for multiplying
+	digits.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<concepts>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>
+#include	<localmisc.h>
+
+export module muldigs ;
+
+import builtin ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::integral_unsigned ;		/* concept */
+
+
+/* local typedefs */
+
+typedef ulonglong	ull ;
+typedef uchar		int1 ;
+typedef ushort		int2 ;
+typedef uint		int4 ;
+typedef ulong		int8 ;
+
+
+/* local variables */
+
+
+/* module subroutines */
+
+template<typename Dig>
+constexpr int addc(Dig *r,const Dig v0,const Dig v1,int ci = 0) noex {
+	Dig		co{} ;
+	Dig		dci = cast_static<Dig>(ci) ;
+	*r = mach_addc(v0,v1,dci,&co) ;
+	return int(co) ;
+} /* end subroutine (addc) */
+
+    template<typename Dig>
+    constexpr void vclear(int n,Dig *v) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    v[i] = 0 ;
+	}
+    } /* end subroutine (vclear) */
+
+constexpr void vmuler(int n,ulong *r,const ulong *v0,const ulong *v1) noex {
+	cint nb = (szof(ulong) * CHAR_BIT) ;
+	cint nh = (n / 2) ;
+	ulonglong vl0 ;
+	ulonglong vl1 ;
+	ulonglong res ;
+	vclear(n,r) ;
+	for (int i = 0 ; i < nh ; i += 1) {
+	    vl0 = v0[i] ;
+	    for (int j = 0 ; j < nh ; j += 1) {
+		ulong	tmp ;
+		cint	ri = (i + j) ;
+		int	co = 0 ;
+	        vl1 = v1[j] ;
+	        res = vl0 * vl1 ;
+		tmp = ulongconv(res >> 0) ;
+    		co = addc((r + ri + 0),r[ri + 0],tmp,co) ;
+		tmp = ulongconv(res >> nb) ;
+    		co = addc((r + ri + 1),r[ri + 1],tmp,co) ;
+	    } /* end for */
+	} /* end for */
+} /* end subroutine (vmuler) */
+
+template<integral_unsigned T2,integral_unsigned T1>
+    constexpr inline void muldigx(T1 *r,const T1 v0,const T1 v1) noex {
+	cint nb = (szof(T1) * CHAR_BIT) ;
+	const T2 vi0 = v0 ;
+	const T2 vi1 = v1 ;
+	{
+	    const T2 res = vi0 * vi1 ;
+	    r[0] = T1(res >> 00) ;
+	    r[1] = T1(res >> nb) ;
+	}
+    } /* end subroutine (muldigx) */
+
+export {
+    constexpr void muldig(int1 *r,const int1 v0,const int1 v1) noex {
+	return muldigx<uint>(r,v0,v1) ;
+    } /* end subroutine (muldig) */
+    constexpr void muldig(int2 *r,const int2 v0,const int2 v1) noex {
+	return muldigx<uint>(r,v0,v1) ;
+    } /* end subroutine (muldig) */
+    constexpr void muldig(int4 *r,const int4 v0,const int4 v1) noex {
+	return muldigx<ulong>(r,v0,v1) ;
+    } /* end subroutine (muldig) */
+    constexpr void muldig(int8 *r,const int8 v0,const int8 v1) noex {
+	return muldigx<ulonglong>(r,v0,v1) ;
+    } /* end subroutine (muldig) */
+} /* end export */
+
+constexpr inline void split(ulong *va,const ulonglong v) noex {
+	cint nb = (szof(ulong) * CHAR_BIT) ;
+    	va[0] = ulong(v >> 00) ;
+    	va[1] = ulong(v >> nb) ;
+} /* end subroutine */
+
+constexpr inline ulonglong join(ulong *va) noex {
+	cint nb = (szof(ulong) * CHAR_BIT) ;
+    	ulonglong lo = va[0] ;
+    	ulonglong hi = va[1] ;
+	return (hi << nb) | lo ;
+} /* end subroutine */
+
+export {
+    constexpr void muldig(ull *r,const ull v0,const ull v1) noex {
+	ulong v0a[2] ;
+	ulong v1a[2] ;
+	ulong res[4] ;
+	split(v0a,v0) ;
+	split(v1a,v1) ;
+    	vmuler(4,res,v0a,v1a) ;
+	r[0] = join(res + 0) ;
+	r[1] = join(res + 2) ;
+    } /* end subroutine (muldig) */
+} /* end export */
+
+
