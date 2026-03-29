@@ -42,6 +42,9 @@
 
 #include	"cgi.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -72,7 +75,7 @@ template<typename ... Args>
 static int cgi_ctor(cgi *op,Args ... args) noex {
     	CGI		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -81,7 +84,7 @@ static int cgi_ctor(cgi *op,Args ... args) noex {
 
 static int cgi_dtor(cgi *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -91,7 +94,7 @@ static int cgi_dtor(cgi *op) noex {
 template<typename ... Args>
 static inline int cgi_magic(cgi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CGI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
