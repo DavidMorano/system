@@ -30,20 +30,20 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<filer.h>
 #include	<ema.h>
-#include	<localmisc.h>
 
 
-#define	OUTEMA_MAGIC	0x37261595
 #define	OUTEMA		struct outema_head
 #define	OUTEMA_FL	struct outema_flags
+#define	OUTEMA_MAGIC	0x37261595
 
 
 struct outema_flags {
 	uint		comma:1 ;
-} ;
+} ; /* end struct */
 
 struct outema_head {
 	filer		*ofp ;
@@ -55,21 +55,21 @@ struct outema_head {
 	int		wlen ;
 	int		c_values ;
 	int		c_items ;
-} ;
+} ; /* end struct */
 
 typedef	OUTEMA		outema ;
 typedef	OUTEMA_FL	outema_fl ;
 
 EXTERNC_begin
 
-extern int	outema_start(outema *,filer *,int) noex ;
-extern int	outema_ent(outema *,ema_ent *) noex ;
-extern int	outema_write(outema *,cchar *,int) noex ;
-extern int	outema_hdrkey(outema *,cchar *) noex ;
-extern int	outema_item(outema *,cchar *,int) noex ;
-extern int	outema_value(outema *,cchar *,int) noex ;
+extern int	outema_start	(outema *,filer *,int) noex ;
+extern int	outema_ent	(outema *,ema_ent *) noex ;
+extern int	outema_write	(outema *,cchar *,int) noex ;
+extern int	outema_hdrkey	(outema *,cchar *) noex ;
+extern int	outema_item	(outema *,cchar *,int) noex ;
+extern int	outema_value	(outema *,cchar *,int) noex ;
 extern int	outema_needlength(outema *,int) noex ;
-extern int	outema_finish(outema *) noex ;
+extern int	outema_finish	(outema *) noex ;
 
 #ifdef	COMMENT
 extern int	outema_printf(outema *,cchar *,...) noex ;
