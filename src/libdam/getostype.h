@@ -46,10 +46,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 enum ostypes {
@@ -58,7 +55,7 @@ enum ostypes {
 	ostype_linux,
 	ostype_darwin,
 	ostype_overlast
-} ;
+} ; /* end enum (ostypes) */
 
 EXTERNC_begin
 
@@ -73,7 +70,7 @@ namespace libdam {
         operator int () noex ;
         int operator () () noex ;
     } ; /* end struct (ostyper) */
-}
+} /* end namespace (libdam) */
 
 extern libdam::ostyper	ostype ;
 
