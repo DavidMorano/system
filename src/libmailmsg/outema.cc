@@ -29,9 +29,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<ascii.h>
 #include	<estrings.h>
 #include	<buffer.h>
@@ -68,16 +69,15 @@ using libuc::libmem ;			/* variable */
 /* forward references */
 
 template<typename ... Args>
-static inline int outema_magic(outema *op,Args ... args) noex {
+local inline int outema_magic(outema *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == OUTEMA_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (outema_magic) */
+} /* end subroutine (outema_magic) */
 
-static int	filer_outpart(filer *,int,cchar *,int) noex ;
+local int	filer_outpart(filer *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -91,7 +91,7 @@ static int	filer_outpart(filer *,int,cchar *,int) noex ;
 int outema_start(outema *op,filer *ofp,int maxlen) noex {
     	OUTEMA		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && ofp) {
+	if (op && ofp) ylikely {
 	    rs = memclear(hop) ;
 	    op->maxlen = maxlen ;
 	    op->rlen = maxlen ;
@@ -105,9 +105,9 @@ int outema_start(outema *op,filer *ofp,int maxlen) noex {
 int outema_finish(outema *op) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = outema_magic(op)) >= 0) {
+	if ((rs = outema_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (op->ofp) {
+	    if (op->ofp) ylikely {
 		rs = SR_OK ;
 	        if (op->llen > 0) {
 	            rs = filer_println(op->ofp,nullptr,0) ;
@@ -128,8 +128,8 @@ int outema_ent(outema *op,EMA_ENT *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = outema_magic(op)) >= 0) {
-	    if (buffer b ; (rs = b.start(COLUMNS)) >= 0) {
+	if ((rs = outema_magic(op)) >= 0) ylikely {
+	    if (buffer b ; (rs = b.start(COLUMNS)) >= 0) ylikely {
 	        int	bl ;
 	        int	c = 0 ;
 	        if ((rs >= 0) && (ep->ap != nullptr) && (ep->al > 0)) {
@@ -185,7 +185,7 @@ int outema_ent(outema *op,EMA_ENT *ep) noex {
 int outema_item(outema *op,cchar *vp,int vl) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = outema_magic(op)) >= 0) {
+	if ((rs = outema_magic(op)) >= 0) ylikely {
 	    if (vl < 0) vl = lenstr(vp) ;
 	    if (vl > 0) {
 	        bool	f_prevcomma = op->fl.comma ;
@@ -203,7 +203,7 @@ int outema_item(outema *op,cchar *vp,int vl) noex {
 int outema_value(outema *op,cchar *vp,int vl) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = outema_magic(op,vp)) >= 0) {
+	if ((rs = outema_magic(op,vp)) >= 0) ylikely {
 	    if (vp && vp[0]) {		/* <- not an error to be empty */
 	        int	nlen ;
 	        int	cl, cl2 ;
@@ -231,7 +231,7 @@ int outema_value(outema *op,cchar *vp,int vl) noex {
 	                    op->llen = 0 ;
 	                    op->c_values = 0 ;
 	                } /* end if (overflow) */
-	                if (rs >= 0) {
+	                if (rs >= 0) ylikely {
 	                    if (f_comma) {
 	                        op->fl.comma = false ;
 	                    }
@@ -262,7 +262,7 @@ int outema_value(outema *op,cchar *vp,int vl) noex {
 int outema_write(outema *op,cchar *v,int vlen) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = outema_magic(op)) >= 0) {
+	if ((rs = outema_magic(op)) >= 0) ylikely {
 	    if (vlen < 0) vlen = lenstr(v) ;
 	    if (vlen > 0) {
 	        rs = filer_write(op->ofp,v,vlen) ;
@@ -283,11 +283,11 @@ int outema_printf(outema *op,cchar *fmt,...) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = outema_magic(op,fmt)) >= 0) {
-	    if (char *fbuf ; (rs = malloc_mailaddr(&fbuf)) >= 0) {
+	if ((rs = outema_magic(op,fmt)) >= 0) ylikely {
+	    if (char *fbuf ; (rs = lm_mailaddr(&fbuf)) >= 0) ylikely {
 	        va_begin(ap,fmt) ;
 	        cint	flen = rs ;
-	        if ((rs = bufvprintf(fbuf,flen,fmt,ap)) >= 0) {
+	        if ((rs = bufvprintf(fbuf,flen,fmt,ap)) >= 0) ylikely {
 	    	    cint	len = rs ;
 	            if ((rs = filer_write(op->ofp,fbuf,len)) >= 0) {
 	                wlen += rs ;
@@ -297,7 +297,7 @@ int outema_printf(outema *op,cchar *fmt,...) noex {
 		    } /* end if (filer_write) */
 	        } /* end if (bufvprintf) */
 	        va_end(ap) ;
-		rs1 = malloc_free(fbuf) ;
+		rs1 = lm_free(fbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
@@ -311,9 +311,9 @@ int outema_hdrkey(outema *op,cchar *kname) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	int		nlen = 0 ;
-	if ((rs = outema_magic(op,kname)) >= 0) {
+	if ((rs = outema_magic(op,kname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (kname[0]) {
+	    if (kname[0]) ylikely {
 		filer	*ofp = op->ofp ;
 		rs = SR_OK ;
 	        if ((rs >= 0) && (op->llen > 0)) {
@@ -349,7 +349,7 @@ int outema_hdrkey(outema *op,cchar *kname) noex {
 int outema_needlength(outema *op,int cl) noex {
 	int		rs ;
 	int		nlen = (cl + 1) ;
-	if ((rs = outema_magic(op)) >= 0) {
+	if ((rs = outema_magic(op)) >= 0) ylikely {
 	    if (op->llen == 0) {
 	        nlen += 1 ;
 	    }
@@ -364,7 +364,7 @@ int outema_needlength(outema *op,int cl) noex {
 
 /* private subroutines */
 
-static int filer_outpart(filer *fbp,int f_comma,cchar *cp,int cl) noex {
+local int filer_outpart(filer *fbp,int f_comma,cchar *cp,int cl) noex {
 	int		rs = SR_BUGCHECK ;
 	int		wlen = 0 ;
 	if (fbp) {
@@ -375,7 +375,7 @@ static int filer_outpart(filer *fbp,int f_comma,cchar *cp,int cl) noex {
 	    }
 	    buf[i++] = ' ' ;
 	    buf[i] = '\0' ;
-	    if ((rs = fbp->write(buf,i)) >= 0) {
+	    if ((rs = fbp->write(buf,i)) >= 0) ylikely {
 	        wlen += rs ;
 	        rs = fbp->write(cp,cl) ;
 	        wlen += rs ;
