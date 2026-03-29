@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	XWORDS		struct xwords_head
@@ -28,13 +25,13 @@
 struct xwords_worditem {
 	cchar		*wp ;
 	int		wl ;
-} ;
+} ; /* end struct */
 
 struct xwords_head {
 	XWORDS_WORD	words[XWORDS_MAX] ;
 	XWORDS_WORD	*xa ;
 	int		nwords ;
-} ;
+} ; /* end struct */
 
 typedef	XWORDS_WORD	xwords_word ;
 
@@ -42,7 +39,7 @@ typedef	XWORDS_WORD	xwords_word ;
 enum xwordsmems {
 	xwordsmem_finish,
 	xwordsmem_overlast
-} ;
+} ; /* end enum */
 struct xwords ;
 struct xwords_co {
 	xwords		*op = nullptr ;
@@ -60,6 +57,7 @@ struct xwords : xwords_head {
 	xwords_co	finish ;
 	xwords() noex {
 	    finish(this,xwordsmem_finish) ;
+	    xa = nullptr ;
 	} ;
 	xwords(const xwords &) = delete ;
 	xwords &operator = (const xwords &) = delete ;
@@ -67,8 +65,8 @@ struct xwords : xwords_head {
 	int get(int,cchar **) noex ;
 	int del(int = -1) noex ;
 	void dtor() noex ;
-	~xwords() {
-	    dtor() ;
+	destruct xwords() {
+	    if (xa) dtor() ;
 	} ;
 } ; /* end struct (xwords) */
 #else	/* __cplusplus */
@@ -77,9 +75,9 @@ typedef XWORDS		xwords ;
 
 EXTERNC_begin
 
-extern int	xwords_start(xwords *,cchar *,int) noex ;
-extern int	xwords_get(xwords *,int,cchar **) noex ;
-extern int	xwords_finish(xwords *) noex ;
+extern int	xwords_start	(xwords *,cchar *,int) noex ;
+extern int	xwords_get	(xwords *,int,cchar **) noex ;
+extern int	xwords_finish	(xwords *) noex ;
 
 EXTERNC_end
 
