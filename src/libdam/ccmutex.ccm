@@ -52,20 +52,20 @@ export module ccmutex ;
 
 export {
     class ccmutex {
-	ptm		m ;
+	ptm		mx ;
     public:
 	ccmutex() {
-	    ptm_create(&m,nullptr) ;
+	    mx.create(nullptr) ;
 	} ;
-	~ccmutex() {
-	    ptm_destroy(&m) ;
+	destruct ccmutex() {
+	    mx.destroy() ;
 	} ;
 	ccmutex &operator = (const ccmutex &) = delete ;
 	int lock() {
-	    return ptm_lock(&m) ;
+	    return mx.lockbegin ;
 	} ;
 	int unlock() {
-	    return ptm_unlock(&m) ;
+	    return mx.lockend ;
 	} ;
     } ; /* end class (ccmutex) */
     class guardmutex {
