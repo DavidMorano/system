@@ -42,7 +42,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -60,12 +59,12 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static inline int sysusernames_ctor(sysusernames *op) noex {
+local inline int sysusernames_ctor(sysusernames *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    if ((op->fmp = new(nothrow) filemap) != nullptr) {
+	    if ((op->fmp = new(nothrow) filemap) != nullptr) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-filemap) */
 	} /* end if (non-null) */
@@ -73,11 +72,11 @@ static inline int sysusernames_ctor(sysusernames *op) noex {
 }
 /* end subroutine sysusernames_ctor) */
 
-static inline int sysusernames_dtor(sysusernames *op) noex {
+local inline int sysusernames_dtor(sysusernames *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->fmp) {
+	    if (op->fmp) ylikely {
 		delete op->fmp ;
 		op->fmp = nullptr ;
 	    }
@@ -87,9 +86,9 @@ static inline int sysusernames_dtor(sysusernames *op) noex {
 /* end subroutine sysusernames_dtor) */
 
 template<typename ... Args>
-static int sysusernames_magic(sysusernames *op,Args ... args) noex {
+local int sysusernames_magic(sysusernames *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SYSUSERNAMES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -109,10 +108,10 @@ constexpr cchar		*defufname = SYSUSERNAMES_FNAME ;
 
 int sysusernames_open(sysusernames *op,cchar *sufname) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    csize	nmax = INT_MAX ;
 	    if (sufname == nullptr) sufname = defufname ;
-	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) {
+	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) ylikely {
 	    	op->magic = SYSUSERNAMES_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -126,8 +125,8 @@ int sysusernames_open(sysusernames *op,cchar *sufname) noex {
 int sysusernames_close(sysusernames *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sysusernames_magic(op)) >= 0) {
-	    {
+	if ((rs = sysusernames_magic(op)) >= 0) ylikely {
+	    if (op->fmp) ylikely {
 		rs1 = filemap_close(op->fmp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -143,7 +142,7 @@ int sysusernames_close(sysusernames *op) noex {
 
 int sysusernames_readent(sysusernames *op,char *ubuf,int ulen) noex {
 	int		rs ;
-	if ((rs = sysusernames_magic(op,ubuf)) >= 0) {
+	if ((rs = sysusernames_magic(op,ubuf)) >= 0) ylikely {
 	    cchar	*lp ;
 	    ubuf[0] = '\0' ;
 	    while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
@@ -160,7 +159,7 @@ int sysusernames_readent(sysusernames *op,char *ubuf,int ulen) noex {
 
 int sysusernames_reset(sysusernames *op) noex {
 	int		rs ;
-	if ((rs = sysusernames_magic(op)) >= 0) {
+	if ((rs = sysusernames_magic(op)) >= 0) ylikely {
 	    rs = filemap_rewind(op->fmp) ;
 	} /* end if (magic) */
 	return rs ;
