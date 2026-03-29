@@ -39,12 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<getnodename.h>		/* |getinetdomain(3uc)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
 #include	<connection.h>
 #include	<localmisc.h>
 
@@ -83,7 +84,7 @@ int getsrcname(char *rbuf,int rlen,int s) noex {
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if ((rlen > 0) && (s >= 0)) {
-		if (char *dbuf{} ; (rs = malloc_hn(&dbuf)) >= 0) {
+		if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
 		    cint	dlen = rs ;
 	            if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
 	                if (conn cn ; (rs = connection_start(&cn,dbuf)) >= 0) {
@@ -95,7 +96,7 @@ int getsrcname(char *rbuf,int rlen,int s) noex {
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (connection) */
 	            } /* end if (getinetdomain) */
-		    rs1 = uc_free(dbuf) ;
+		    rs1 = lm_free(dbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
