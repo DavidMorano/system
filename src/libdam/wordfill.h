@@ -21,15 +21,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<fifostr.h>
 
 
-#define	WORDFILL_MAGIC	0x88442239
 #define	WORDFILL	struct wordfill_head
+#define	WORDFILL_MAGIC	0x88442239
 
 
 struct wordfill_head {
@@ -37,19 +34,19 @@ struct wordfill_head {
 	uint		magic ;
 	int		wc ;		/* word-count */
 	int		chrc ;		/* character count (w/ blanks) */
-} ;
+} ; /* end struct */
 
 typedef	WORDFILL	wordfill ;
 
 EXTERNC_begin
 
-extern int	wordfill_start(wordfill *,cchar *,int) noex ;
-extern int	wordfill_addword(wordfill *,cchar *,int) noex ;
-extern int	wordfill_addline(wordfill *,cchar *,int) noex ;
-extern int	wordfill_addlines(wordfill *,cchar *,int) noex ;
-extern int	wordfill_mklinefull(wordfill *,char *,int) noex ;
-extern int	wordfill_mklinepart(wordfill *,char *,int) noex ;
-extern int	wordfill_finish(wordfill *) noex ;
+extern int	wordfill_start		(wordfill *,cchar *,int) noex ;
+extern int	wordfill_addword	(wordfill *,cchar *,int) noex ;
+extern int	wordfill_addline	(wordfill *,cchar *,int) noex ;
+extern int	wordfill_addlines	(wordfill *,cchar *,int) noex ;
+extern int	wordfill_mklinefull	(wordfill *,char *,int) noex ;
+extern int	wordfill_mklinepart	(wordfill *,char *,int) noex ;
+extern int	wordfill_finish		(wordfill *) noex ;
 
 EXTERNC_end
 
