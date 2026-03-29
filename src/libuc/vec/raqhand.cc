@@ -132,7 +132,7 @@ int raqhand_ins(raqhand *op,cvoid *ep) noex {
 	            op->va[i] = ep ;
 	            op->ti = ((op->ti+1)%op->n) ;
 	            op->c += 1 ;
-	        }
+	        } /* end if (available) */
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
@@ -337,32 +337,5 @@ local int raqhand_valid(raqhand *op,int i) noex {
 	return rs ;
 }
 /* end subroutine (raqhand_valid) */
-
-#ifdef	COMMENT
-local int raqhand_extend(raqhand *op) noex {
-	int		rs = SR_OK ;
-	if ((op->i + 1) > op->n) {
-	    int		nn ;
-	    int		sz ;
-	    void	*na ;
-	    if (op->va == nullptr) {
-	        nn = RAQHAND_DEFENTS ;
-	        sz = (nn + 1) * szof(void **) ;
-	        rs = libmem.mall(sz,&na) ;
-	    } else {
-	        nn = (op->n + 1) * 2 ;
-	        sz = (nn + 1) * szof(void **) ;
-	        rs = libmem.rall(op->va,sz,&na) ;
-	        op->va = nullptr ;
-	    }
-	    if (rs >= 0) {
-	        op->va = (cvoid **) na ;
-	        op->n = nn ;
-	    }
-	} /* end if */
-	return rs ;
-}
-/* end subroutine (raqhand_extend) */
-#endif /* COMMENT */
 
 
