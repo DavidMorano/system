@@ -38,7 +38,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<sbuf.h>
 #include	<strn.h>
@@ -64,7 +65,7 @@ import libutil ;
 
 /* forward references */
 
-static int	retpath_iadd(retpath *,cchar *,int) noex ;
+local int	retpath_iadd(retpath *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -191,7 +192,7 @@ int retpath_mk(retpath *plp,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-static int retpath_iadd(retpath *plp,cchar *sp,int sl) noex {
+local int retpath_iadd(retpath *plp,cchar *sp,int sl) noex {
 	int		rs ;
 	if (cchar *lp ; (rs = plp->getlast(&lp)) >= 0) {
 	    if (strwcmp(lp,sp,sl) != 0) {
