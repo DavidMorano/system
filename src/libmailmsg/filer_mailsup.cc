@@ -41,7 +41,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<mailmsghdrfold.h>
 #include	<strn.h>
 #include	<char.h>
@@ -50,7 +53,9 @@
 #include	"filer.h"
 #include	"filer_mailsup.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -73,7 +78,7 @@ import libutil ;
 
 /* forward references */
 
-static int filer_writehdrval(filer *,cchar *,int) noex ;
+local int filer_writehdrval(filer *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -170,7 +175,7 @@ int filer_printlncont(filer *fbp,int leader,cchar *sp,int sl) noex {
 
 /* private subroutines */
 
-static int filer_writehdrval(filer *fbp,cchar *vp,int vl) noex {
+local int filer_writehdrval(filer *fbp,cchar *vp,int vl) noex {
 	static cint	ln = 0 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
