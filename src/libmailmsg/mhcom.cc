@@ -33,7 +33,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |ulogerror(3u)| */
+#include	<uclibmem.h>
 #include	<sbuf.h>
 #include	<ascii.h>
 #include	<char.h>
@@ -73,14 +76,13 @@ using libuc::libmem ;			/* variable */
 /* forward references */
 
 template<typename ... Args>
-static inline int mhcom_magic(mhcom *op,Args ... args) noex {
+local inline int mhcom_magic(mhcom *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == MHCOM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mhcom_magic) */
+} /* end subroutine (mhcom_magic) */
 
 local int	mhcom_bake(mhcom *,int,cchar *,int) noex ;
 
@@ -96,7 +98,7 @@ local int	mhcom_bake(mhcom *,int,cchar *,int) noex ;
 int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
     	MHCOM		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    int		sz ;
 	    int		buflen ;
 	    memclear(hop) ;
@@ -107,11 +109,11 @@ int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
 	    }
 	    buflen = (sl + 2) ;
 	    sz = ( 2* buflen) ;
-	    if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) {
+	    if (void *p ; (rs = libmem.mall(sz,&p)) >= 0) ylikely {
 	        op->a = charp(p) ;
 	        op->value = (op->a + (0*buflen)) ;
 	        op->comment = (op->a + (1*buflen)) ;
-	        if ((rs = mhcom_bake(op,buflen,sp,sl)) >= 0) {
+	        if ((rs = mhcom_bake(op,buflen,sp,sl)) >= 0) ylikely {
 	            op->magic = MHCOM_MAGIC ;
 	        }
 	        if (rs < 0) {
@@ -127,8 +129,8 @@ int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
 int mhcom_finish(mhcom *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mhcom_magic(op)) >= 0) {
-	    if (op->a) {
+	if ((rs = mhcom_magic(op)) >= 0) ylikely {
+	    if (op->a) ylikely {
 	        rs1 = libmem.free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
@@ -143,7 +145,7 @@ int mhcom_finish(mhcom *op) noex {
 
 int mhcom_getval(mhcom *op,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = mhcom_magic(op)) >= 0) {
+	if ((rs = mhcom_magic(op)) >= 0) ylikely {
 	    if (rpp) *rpp = op->value ;
 	    rs = (op->value) ? op->vlen : SR_NOENT ;
 	} /* end if (magic) */
@@ -153,7 +155,7 @@ int mhcom_getval(mhcom *op,cchar **rpp) noex {
 
 int mhcom_getcom(mhcom *op,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = mhcom_magic(op)) >= 0) {
+	if ((rs = mhcom_magic(op)) >= 0) ylikely {
 	    if (rpp) *rpp = op->comment ;
 	    rs = (op->comment) ? op->clen : SR_NOENT ;
 	} /* end if (magic) */
@@ -169,8 +171,10 @@ local int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ;
-	if ((rs = sbuf_start((as+MHCOM_SVALUE),op->value,bl)) >= 0) {
-	    if ((rs = sbuf_start((as+MHCOM_SCOMMENT),op->comment,bl)) >= 0) {
+	sbuf *as0p = (as + MHCOM_SVALUE) ;
+	sbuf *as1p = (as + MHCOM_SCOMMENT) ;
+	if ((rs = as1p->start(op->value,bl)) >= 0) ylikely {
+	    if ((rs = as1p->start(op->comment,bl)) >= 0) {
 	        int	state = MHCOM_SVALUE ;
 		int	cl ;
 		int	pstate = MHCOM_SVALUE ;
@@ -258,11 +262,11 @@ local int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 	            } /* end switch */
 	            if (sl > 0) sl -= 1 ;
 	        } /* end while (scanning characters) */
-	        rs1 = sbuf_finish(&as[MHCOM_SCOMMENT]) ;
+	        rs1 = as1p->finish ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->clen = rs1 ;
 	    } /* end if (sbuf) */
-	    vl = sbuf_finish(&as[MHCOM_SVALUE]) ;
+	    vl = as0p->finish ;
 	    if (rs >= 0) rs = vl ;
 	    op->vlen = vl ;
 	} /* end if (sbuf) */
@@ -290,7 +294,7 @@ void mhcom::dtor() noex {
 
 mhcom_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case mhcommem_finish:
 	        rs = mhcom_finish(op) ;
