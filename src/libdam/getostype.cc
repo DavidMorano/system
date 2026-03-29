@@ -43,9 +43,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<usysflag.h>
-#include	<mallocxx.h>
+#include	<uclibmem.h>
 #include	<getsysname.h>
 #include	<sfx.h>
 #include	<matstr.h>
@@ -53,6 +55,8 @@
 #include	<localmisc.h>
 
 #include	"getostype.h"
+
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -87,29 +91,29 @@ namespace {
 	int other() noex ;
 	int matguess(cchar *,int) noex ;
     } ; /* end struct (typer) */
-}
+} /* end namespace */
 
 struct osguess {
 	cchar		*name ;
 	ostypes		type ;
-} ;
+} ; /* end struct (osguess) */
 
 
 /* forward references */
 
-static int	mktype() noex ;
-static int	findtype() noex ;
+local int	mktype() noex ;
+local int	findtype() noex ;
 
 
 /* local variables */
 
 constexpr osguess	guesses[] = {
-	{ "sunos", ostype_sysv },
-	{ "darwin", ostype_darwin },
-	{ "linux", ostype_linux },
-	{ "sysv", ostype_sysv },
-	{ "unix", ostype_sysv },	/* <- original AT&T "system" name */
-	{ "bsd", ostype_bsd }		/* some BSD systems */
+	{ "sunos",	ostype_sysv },
+	{ "darwin",	ostype_darwin },
+	{ "linux",	ostype_linux },
+	{ "sysv",	ostype_sysv },
+	{ "unix",	ostype_sysv },	/* <- original AT&T "system" name */
+	{ "bsd",	ostype_bsd }	/* some BSD systems */
 } ;
 
 constexpr bool		f_darwin	= F_DARWIN ;
@@ -122,7 +126,7 @@ constexpr typer_m	mems[] = {
 	&typer::envsysname,
 	&typer::trysysname,
 	&typer::other
-} ;
+} ; /* end array (mems) */
 
 
 /* exported variables */
@@ -135,7 +139,7 @@ cpcchar			ostypenames[] = {
 	"linux",
 	"darwin",
 	nullptr
-} ;
+} ; /* end array (ostypenames) */
 
 
 /* exported subroutines */
@@ -149,7 +153,7 @@ int getostype() noex {
 
 /* local subroutines */
 
-static int mktype() noex {
+local int mktype() noex {
 	int		rs ;
 	if_constexpr (f_sunos) {
 	    rs = ostype_sysv ;
@@ -164,8 +168,8 @@ static int mktype() noex {
 }
 /* end subroutine (mktype) */
 
-static int findtype() noex {
-	typer		to ;
+local int findtype() noex {
+	typer to ;
 	return to ;
 }
 /* end subroutine (findtype) */
@@ -222,12 +226,12 @@ int typer::trysysname() noex {
 	int		rs ;
 	int		rs1 ;
 	int		rtype = 0 ;
-	if (char *sbuf{} ; (rs = malloc_mn(&sbuf)) >= 0) {
+	if (char *sbuf ; (rs = lm_mn(&sbuf)) >= 0) {
 	    if ((rs = getsysname(sbuf,rs)) >= 0) {
 		rs = matguess(sbuf,rs) ;
 		rtype = rs ;
 	    } /* end if (getsysname) */
-	    rs1 = uc_free(sbuf) ;
+	    rs1 = lm_free(sbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rtype : rs ;
@@ -261,6 +265,6 @@ namespace libdam {
     int ostyper::operator () () noex {
 	return getostype() ;
     }
-}
+} /* end namespace (libdam) */
 
 
