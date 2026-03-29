@@ -52,12 +52,13 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getnodename.h>
 #include	<getnodedomain.h>
 #include	<bufsizevar.hh>
-#include	<varnames.hh>
-#include	<mallocxx.h>
 #include	<ids.h>
 #include	<storebuf.h>
 #include	<dirseen.h>
@@ -73,7 +74,11 @@
 
 #include	"getprogroot.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -99,30 +104,30 @@ struct subinfo {
 	dirseen		dirs ;
 	int		prlen ;
 	uint		f_dirs:1 ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	subinfo_start(subinfo *) noex ;
-static int	subinfo_local(subinfo *,char *,cchar *,int) noex ;
-static int	subinfo_prs(subinfo *,mainv,char *,cchar *,int) noex ;
-static int	subinfo_pr(subinfo *,cchar *,char *,cchar *,int) noex ;
-static int	subinfo_other(subinfo *,char *,cchar *,int) noex ;
-static int	subinfo_check(subinfo *,cchar *,int,char *,cchar *,int) noex ;
-static int	subinfo_dirstat(subinfo *,USTAT *,cchar *,int) noex ;
-static int	subinfo_record(subinfo *,USTAT *,cchar *,int) noex ;
-static int	subinfo_xfile(subinfo *,cchar *) noex ;
-static int	subinfo_finish(subinfo *) noex ;
+local int	subinfo_start(SI *) noex ;
+local int	subinfo_local(SI *,char *,cchar *,int) noex ;
+local int	subinfo_pr(SI *,cchar *,char *,cchar *,int) noex ;
+local int	subinfo_prs(SI *,mainv,char *,cchar *,int) noex ;
+local int	subinfo_other(SI *,char *,cchar *,int) noex ;
+local int	subinfo_check(SI *,cchar *,int,char *,cchar *,int) noex ;
+local int	subinfo_dirstat(SI *,ustat *,cchar *,int) noex ;
+local int	subinfo_record(SI *,ustat *,cchar *,int) noex ;
+local int	subinfo_xfile(SI *,cchar *) noex ;
+local int	subinfo_finish(SI *) noex ;
 
-static int	mkdfname(char *,cchar *,int,cchar *,int) noex ;
+local int	mkdfname(char *,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
 
 constexpr cchar		*varpath = varname.path ;
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
@@ -130,47 +135,46 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 /* exported subroutines */
 
-int getprogroot(cc *pr,mainv prnames,int *prlenp,char *obuf,cc *name) noex {
+int getprogroot(cc *pr,mainv prnames,int *prlenp,char *obuf,cc *namep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		outlen = 0 ;
-	if (name && obuf) {
+	if (namep && obuf) {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
-	        subinfo		si, *sip = &si ;
-	        int		namelen = lenstr(name) ;
+	    if (namep[0]) {
+	        int		namel = lenstr(namep) ;
 	        bool		f_changed = false ;
 	        obuf[0] = '\0' ;
-	        while ((namelen > 0) && (name[namelen - 1] == '/')) {
+	        while ((namel > 0) && (namep[namel - 1] == '/')) {
 	            f_changed = true ;
-	            namelen -= 1 ;
+	            namel -= 1 ;
 	        }
-	        if ((rs = subinfo_start(sip)) >= 0) {
+	        if (subinfo si ; (rs = subinfo_start(&si)) >= 0) {
 	            rs = SR_NOENT ;
-	            if (strnchr(name,namelen,'/') == nullptr) {
+	            if (strnchr(namep,namel,'/') == nullptr) {
 			/* check if the PCS root directory exists */
 	                if ((rs < 0) && (rs != SR_NOMEM) && pr) {
-	                    rs = subinfo_pr(sip,pr,obuf,name,namelen) ;
+	                    rs = subinfo_pr(&si,pr,obuf,namep,namel) ;
 	                    outlen = rs ;
 	                }
 			/* check other program roots */
 	                if ((rs < 0) && (rs != SR_NOMEM) && prnames) {
-	                    rs = subinfo_prs(sip,prnames,obuf,name,namelen) ;
+	                    rs = subinfo_prs(&si,prnames,obuf,namep,namel) ;
 	                    outlen = rs ;
 	                }
 			/* search the rest of the execution path */
 	                if ((rs < 0) && (rs != SR_NOMEM)) {
-	                    rs = subinfo_other(sip,obuf,name,namelen) ;
+	                    rs = subinfo_other(&si,obuf,namep,namel) ;
 	                    outlen = rs ;
 	                }
 	            } else {
-	                rs = subinfo_local(sip,obuf,name,namelen) ;
-	                outlen = (f_changed) ? namelen : 0 ;
+	                rs = subinfo_local(&si,obuf,namep,namel) ;
+	                outlen = (f_changed) ? namel : 0 ;
 	            }
 	            if (prlenp) {
-	                *prlenp = sip->prlen ;
+	                *prlenp = si.prlen ;
 	            }
-	            rs1 = subinfo_finish(sip) ;
+	            rs1 = subinfo_finish(&si) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (subinfo) */
 	    } /* end if (valid) */
@@ -182,7 +186,7 @@ int getprogroot(cc *pr,mainv prnames,int *prlenp,char *obuf,cc *name) noex {
 
 /* local subroutines */
 
-static int subinfo_start(subinfo *sip) noex {
+local int subinfo_start(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    memclear(sip) ;
@@ -192,7 +196,7 @@ static int subinfo_start(subinfo *sip) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(subinfo *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sip->f_dirs) {
@@ -208,35 +212,11 @@ static int subinfo_finish(subinfo *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_other(SI *sip,char *obuf,cc *sp,int sl) noex {
-	int		rs = SR_NOENT ;
-	int		outlen = 0 ;
-	static cchar	*valp = getenv(varpath) ;
-	sip->prlen = 0 ;
-	if (valp) {
-	    for (cc *tp ; (tp = strbrk(valp,":;")) != nullptr ; ) {
-	        {
-		    cint tl = intconv(tp - valp) ;
-	            rs = subinfo_check(sip,valp,tl,obuf,sp,sl) ;
-	            outlen = rs ;
-	        }
-	        valp = (tp + 1) ;
-	        if ((rs >= 0) || (rs == SR_NOMEM)) break ;
-	    } /* end for */
-	    if ((rs < 0) && (rs != SR_NOMEM) && (valp[0] != '\0')) {
-	        rs = subinfo_check(sip,valp,-1,obuf,sp,sl) ;
-	        outlen = rs ;
-	    }
-	} /* end if (non-null) */
-	return (rs >= 0) ? outlen : rs ;
-}
-/* end subroutine (subinfo_other) */
-
-static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *sp,int sl) noex {
+local int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *sp,int sl) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		outlen = 0 ;
+	int		outlen = 0 ; /* return-value */
 	if (sip->f_dirs) {
 	    if ((rs = dirseen_havename(&sip->dirs,d,dlen)) >= 0) {
 	        rs = SR_NOENT ;
@@ -245,7 +225,7 @@ static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *sp,int sl) noex {
 	    }
 	} /* end if (f_dirs) */
 	if (rs >= 0) {
-	    USTAT	sb ;
+	    ustat sb ;
 	    if ((rs = subinfo_dirstat(sip,&sb,d,dlen)) >= 0) {
 	        if ((rs1 = dirseen_havedevino(&sip->dirs,&sb)) >= 0) {
 	            rs = SR_NOENT ;
@@ -263,7 +243,7 @@ static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *sp,int sl) noex {
 }
 /* end subroutine (subinfo_check) */
 
-static int subinfo_local(SI *sip,char *obuf,cc *sp,int sl) noex {
+local int subinfo_local(SI *sip,char *obuf,cc *sp,int sl) noex {
 	int		rs ;
 	int		outlen = 0 ;
 	if ((rs = mkpath1w(obuf,sp,sl)) >= 0) {
@@ -274,36 +254,11 @@ static int subinfo_local(SI *sip,char *obuf,cc *sp,int sl) noex {
 }
 /* end subroutine (subinfo_local) */
 
-static int subinfo_prs(SI *sip,mainv prnames,char *obuf,cc *sp,int sl) noex {
-	int		rs ;
-	int		rs1 ;
-	if (char *dn{} ; (rs = malloc_hn(&dn)) >= 0) {
-	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-	        if (char *pr{} ; (rs = malloc_mp(&pr)) >= 0) {
-		    cint	maxlen = rs ;
-	            rs = SR_NOENT ;
-	            for (int i = 0 ; prnames[i] ; i += 1) {
-	                if ((rs1 = mkpr(pr,maxlen,prnames[i],dn)) >= 0) {
-	                    rs = subinfo_pr(sip,pr,obuf,sp,sl) ;
-	                }
-	                if ((rs >= 0) || (rs == SR_NOMEM)) break ;
-	            } /* end for */
-	            rs1 = uc_free(pr) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (m-a-f) */
-	    } /* end if (getnodedomain) */
-	    rs1 = uc_free(dn) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-	return rs ;
-}
-/* end subroutine (subinfo_prs) */
-
-static int subinfo_pr(SI *sip,cc *pr,char *obuf,cc *sp,int sl) noex {
+local int subinfo_pr(SI *sip,cc *pr,char *obuf,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		outlen = 0 ;
-	if (char *dbuf{} ; (rs = malloc_mp(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
 	    if ((rs = mkpath2(dbuf,pr,"bin")) >= 0) {
 	        rs = subinfo_check(sip,dbuf,-1,obuf,sp,sl) ;
 	        outlen = rs ;
@@ -317,22 +272,71 @@ static int subinfo_pr(SI *sip,cc *pr,char *obuf,cc *sp,int sl) noex {
 	    if (rs >= 0) {
 	        sip->prlen = lenstr(pr) ;
 	    }
-	    rs1 = uc_free(dbuf) ;
+	    rs1 = lm_free(dbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? outlen : rs ;
 }
 /* end subroutine (subinfo_pr) */
 
-static int subinfo_dirstat(SI *sip,USTAT *sbp,cc *d,int dlen) noex {
+local int subinfo_prs(SI *sip,mainv prnames,char *obuf,cc *sp,int sl) noex {
+	int		rs ;
+	int		rs1 ;
+	if (char *dn ; (rs = lm_hn(&dn)) >= 0) {
+	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
+	        if (char *pr ; (rs = lm_mp(&pr)) >= 0) {
+		    cint	maxlen = rs ;
+	            rs = SR_NOENT ;
+	            for (int i = 0 ; prnames[i] ; i += 1) {
+	                if ((rs1 = mkpr(pr,maxlen,prnames[i],dn)) >= 0) {
+	                    rs = subinfo_pr(sip,pr,obuf,sp,sl) ;
+	                }
+	                if ((rs >= 0) || (rs == SR_NOMEM)) break ;
+	            } /* end for */
+	            rs1 = lm_free(pr) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (getnodedomain) */
+	    rs1 = lm_free(dn) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return rs ;
+}
+/* end subroutine (subinfo_prs) */
+
+local int subinfo_other(SI *sip,char *obuf,cc *sp,int sl) noex {
+	int		rs = SR_NOENT ;
+	int		outlen = 0 ; /* return-value */
+	static cchar	*valp = getenv(varpath) ;
+	sip->prlen = 0 ;
+	if (valp) {
+	    for (cc *tp ; (tp = strbrk(valp,":;")) != nullptr ; ) {
+	        if (cint tl = intconv(tp - valp) ; tl > 0) {
+	            rs = subinfo_check(sip,valp,tl,obuf,sp,sl) ;
+	            outlen = rs ;
+	        }
+	        valp = (tp + 1) ;
+	        if ((rs >= 0) || (rs == SR_NOMEM)) break ;
+	    } /* end for */
+	    if ((rs < 0) && (rs != SR_NOMEM) && (valp[0] != '\0')) {
+	        rs = subinfo_check(sip,valp,-1,obuf,sp,sl) ;
+	        outlen = rs ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? outlen : rs ;
+}
+/* end subroutine (subinfo_other) */
+
+local int subinfo_dirstat(SI *sip,ustat *sbp,cc *d,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*dnp{} ;
 	if (nulstr ns ; (rs = ns.start(d,dlen,&dnp)) >= 0) {
 	    if ((rs = u_stat(dnp,sbp)) >= 0) {
 	        rs = SR_NOTFOUND ;
-	        if (S_ISDIR(sbp->st_mode))
+	        if (S_ISDIR(sbp->st_mode)) {
 	            rs = permid(&sip->id,sbp,X_OK) ;
+		}
 	    }
 	    rs1 = ns.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -341,7 +345,7 @@ static int subinfo_dirstat(SI *sip,USTAT *sbp,cc *d,int dlen) noex {
 }
 /* end subroutine (subinfo_dirstat) */
 
-static int subinfo_record(SI *sip,USTAT *sbp,cc *d,int dlen) noex {
+local int subinfo_record(SI *sip,ustat *sbp,cc *d,int dlen) noex {
 	int		rs = SR_OK ;
 	if (! sip->f_dirs) {
 	    rs = dirseen_start(&sip->dirs) ;
@@ -354,37 +358,34 @@ static int subinfo_record(SI *sip,USTAT *sbp,cc *d,int dlen) noex {
 }
 /* end subroutine (subinfo_record) */
 
-static int subinfo_xfile(SI *sip,cc *name) noex {
+local int subinfo_xfile(SI *sip,cc *name) noex {
 	int		rs ;
-	if (USTAT sb ; (rs = u_stat(name,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(name,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode)) {
 	        rs = permid(&sip->id,&sb,X_OK) ;
 	    }
-	}
+	} /* end if (u_stat) */
 	return rs ;
 }
 /* end subroutine (subinfo_xfile) */
 
-static int mkdfname(char *rbuf,cc *d,int dlen,cc *sp,int sl) noex {
+local int mkdfname(char *rbuf,cc *dnp,int dnl,cc *sp,int sl) noex {
 	int		rs ;
-	int		i = 0 ;
+	int		len = 0 ;
 	if ((rs = maxpathlen) >= 0) {
-	    cint	rlen = rs ;
-	    if (rs >= 0) {
-	        rs = storebuf_strw(rbuf,rlen,i,d,dlen) ;
-	        i += rs ;
-	    }
-	    if ((rs >= 0) && (i > 0) && (rbuf[i - 1] != '/')) {
-	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
-	        i += rs ;
-	    }
-	    if (rs >= 0) {
-	        rs = storebuf_strw(rbuf,rlen,i,sp,sl) ;
-	        i += rs ;
-	    }
+	    if (storebuf buf(rbuf,rs) ; (rs = buf.strw(dnp,dnl)) >= 0) {
+	        cint dl = rs ;
+	        if ((rs >= 0) && (dl > 0) && (rbuf[dl - 1] != '/')) {
+	            rs = buf.chr('/') ;
+	        }
+	        if (rs >= 0) {
+	            rs = buf.strw(sp,sl) ;
+	        }
+	        len = buf.idx ;
+	    } /* end if (storebuf) */
 	} /* end if (maxpathlen) */
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mkdfname) */
 
