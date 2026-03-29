@@ -31,9 +31,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
 #include	<bfile.h>
 #include	<bfliner.h>
@@ -47,6 +48,8 @@
 #include	"splitaddr.h"
 #include	"whitelist.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */
@@ -58,9 +61,6 @@ import libutil ;
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -79,54 +79,51 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int whitelist_ctor(whitelist *op,Args ... args) noex {
+local int whitelist_ctor(whitelist *op,Args ... args) noex {
 	WHITELIST	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->wlp = new(nothrow) vecstr) != np) {
+	    if ((op->wlp = new(nothrow) vecstr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (whitelist_ctor) */
+} /* end subroutine (whitelist_ctor) */
 
-static int whitelist_dtor(whitelist *op) noex {
+local int whitelist_dtor(whitelist *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->wlp) {
+	    if (op->wlp) ylikely {
 		delete op->wlp ;
 		op->wlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (whitelist_dtor) */
+} /* end subroutine (whitelist_dtor) */
 
 template<typename ... Args>
-static inline int whitelist_magic(whitelist *op,Args ... args) noex {
+local inline int whitelist_magic(whitelist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == WHITELIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (whitelist_magic) */
+} /* end subroutine (whitelist_magic) */
 
-static int	mkaddr(char *,int,cchar *,int) noex ;
+local int	mkaddr(char *,int,cchar *,int) noex ;
 
 extern "C" {
-    static int	vcmpaddr(cchar **,cchar **) noex ;
+    local int	vcmpaddr(cchar **,cchar **) noex ;
 }
 
 
 /* local variables */
 
-constexpr bool		f_partial = CF_PARTIAL ;
+cbool		f_partial = CF_PARTIAL ;
 
 
 /* exported variables */
@@ -138,8 +135,8 @@ int whitelist_open(whitelist *op,cchar *fname) noex {
 	cint		vn = WHITELIST_DEFENTS ;
 	cint		vo = 0 ;
 	int		rs ;
-	if ((rs = whitelist_ctor(op)) >= 0) {
-	    if ((rs = vecstr_start(op->wlp,vn,vo)) >= 0) {
+	if ((rs = whitelist_ctor(op)) >= 0) ylikely {
+	    if ((rs = vecstr_start(op->wlp,vn,vo)) >= 0) ylikely {
 	        op->magic = WHITELIST_MAGIC ;
 	        if (fname) {
 	            rs = whitelist_fileadd(op,fname) ;
@@ -160,8 +157,8 @@ int whitelist_open(whitelist *op,cchar *fname) noex {
 int whitelist_close(whitelist *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = whitelist_magic(op)) >= 0) {
-	    {
+	if ((rs = whitelist_magic(op)) >= 0) ylikely {
+	    if (op->wlp) ylikely {
 	        rs1 = vecstr_finish(op->wlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -179,13 +176,13 @@ int whitelist_fileadd(whitelist *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = whitelist_magic(op,fname)) >= 0) {
+	if ((rs = whitelist_magic(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-		if (char *mbuf ; (rs = malloc_mailaddr(&mbuf)) >= 0) {
+		if (char *mbuf ; (rs = lm_ad(&mbuf)) >= 0) ylikely {
 		    cint	mlen = rs ;
-		    if (bfile lf ; (rs = lf.open(fname,"r",0)) >= 0) {
-			if (bfliner bl ; (rs = bl.start(&lf)) >= 0) {
+		    if (bfile lf ; (rs = lf.open(fname,"r",0)) >= 0) ylikely {
+			if (bfliner bl ; (rs = bl.start(&lf)) >= 0) ylikely {
 			    cchar	*lp ;
 	    		    while ((rs = bl.getln(&lp)) > 0) {
 				cchar	*cp ;
@@ -205,7 +202,7 @@ int whitelist_fileadd(whitelist *op,cchar *fname) noex {
 	                rs1 = lf.close ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (bfile) */
-		    rs1 = malloc_free(mbuf) ;
+		    rs1 = lm_free(mbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -216,7 +213,7 @@ int whitelist_fileadd(whitelist *op,cchar *fname) noex {
 
 int whitelist_get(whitelist *op,int i,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = whitelist_magic(op)) >= 0) {
+	if ((rs = whitelist_magic(op)) >= 0) ylikely {
 	    cchar	*cp ;
 	    rs = vecstr_get(op->wlp,i,&cp) ;
 	    if (rpp) {
@@ -229,11 +226,11 @@ int whitelist_get(whitelist *op,int i,cchar **rpp) noex {
 
 int whitelist_read(whitelist *op,char *rbuf,int rlen,int idx) noex {
 	int		rs ;
-	if ((rs = whitelist_magic(op,rbuf)) >= 0) {
+	if ((rs = whitelist_magic(op,rbuf)) >= 0) ylikely {
 	    cchar	*cp ;
-	    if ((rs = vecstr_get(op->wlp,idx,&cp)) >= 0) {
+	    if ((rs = vecstr_get(op->wlp,idx,&cp)) >= 0) ylikely {
 	        rs = sncpy1(rbuf,rlen,cp) ;
-	}
+	    }
 	} /* end if (magic) */
 	return rs ;
 }
@@ -241,7 +238,7 @@ int whitelist_read(whitelist *op,char *rbuf,int rlen,int idx) noex {
 
 int whitelist_count(whitelist *op) noex {
 	int		rs ;
-	if ((rs = whitelist_magic(op)) >= 0) {
+	if ((rs = whitelist_magic(op)) >= 0) ylikely {
 	    rs = vecstr_count(op->wlp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -253,7 +250,7 @@ int whitelist_prematch(whitelist *op,cchar *ta) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = whitelist_magic(op,ta)) >= 0) {
+	if ((rs = whitelist_magic(op,ta)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (ta[0]) {
 	        vecstr	*lp = op->wlp ;
@@ -293,7 +290,7 @@ int whitelist_prematch(whitelist *op,cchar *ta) noex {
 
 int whitelist_audit(whitelist *op) noex {
 	int		rs ;
-	if ((rs = whitelist_magic(op)) >= 0) {
+	if ((rs = whitelist_magic(op)) >= 0) ylikely {
 	    rs = vecstr_audit(op->wlp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -303,7 +300,7 @@ int whitelist_audit(whitelist *op) noex {
 
 /* private subroutines */
 
-static int mkaddr(char *mbuf,int mlen,cchar *lp,int ll) noex {
+local int mkaddr(char *mbuf,int mlen,cchar *lp,int ll) noex {
 	if (cchar *tp ; (tp = strnchr(lp,ll,'#')) != nullptr) {
 	    ll = intconv(tp - lp) ;
 	}
@@ -311,7 +308,7 @@ static int mkaddr(char *mbuf,int mlen,cchar *lp,int ll) noex {
 }
 /* end subroutine (mkaddr) */
 
-static int vcmpaddr(cchar **e1pp,cchar **e2pp) noex {
+local int vcmpaddr(cchar **e1pp,cchar **e2pp) noex {
 	cchar		*e1p = *e1pp ;
 	cchar		*e2p = *e2pp ;
 	int		rc = 0 ;
