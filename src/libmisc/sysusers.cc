@@ -29,7 +29,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<getax.h>
@@ -68,10 +67,10 @@ using std::nothrow ;			/* constant */
 
 static inline int sysusers_ctor(sysusers *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    if ((op->fmp = new(nothrow) filemap) != nullptr) {
+	    if ((op->fmp = new(nothrow) filemap) != nullptr) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-filemap) */
 	} /* end if (non-null) */
@@ -81,9 +80,9 @@ static inline int sysusers_ctor(sysusers *op) noex {
 
 static inline int sysusers_dtor(sysusers *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->fmp) {
+	    if (op->fmp) ylikely {
 		delete op->fmp ;
 		op->fmp = nullptr ;
 	    }
@@ -115,10 +114,10 @@ constexpr cchar		*defufname = SYSUSERS_FNAME ;
 
 int sysusers_open(sysusers *op,cchar *sufname) noex {
 	int		rs ;
-	if ((rs = sysusers_ctor(op)) >= 0) {
+	if ((rs = sysusers_ctor(op)) >= 0) ylikely {
 	    csize	nmax = INT_MAX ;
 	    if (sufname == nullptr) sufname = defufname ;
-	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) {
+	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) ylikely {
 	        op->magic = SYSUSERS_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -132,7 +131,7 @@ int sysusers_open(sysusers *op,cchar *sufname) noex {
 int sysusers_close(sysusers *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sysusers_magic(op)) >= 0) {
+	if ((rs = sysusers_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = filemap_close(op->fmp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -150,11 +149,11 @@ int sysusers_close(sysusers *op) noex {
 int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sysusers_magic(op,pwp,pwbuf)) >= 0) {
-            if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	if ((rs = sysusers_magic(op,pwp,pwbuf)) >= 0) ylikely {
+            if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
                 cint        ulen = rs ;
                 char        *ubuf ;
-                if ((rs = lm_mall((ulen+1),&ubuf)) >= 0) {
+                if ((rs = lm_mall((ulen+1),&ubuf)) >= 0) ylikely {
                     cchar   *lp{} ;
                     while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
                         int         ll = rs ;
@@ -177,7 +176,7 @@ int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
 
 int sysusers_reset(sysusers *op) noex {
 	int		rs ;
-	if ((rs = sysusers_magic(op)) >= 0) {
+	if ((rs = sysusers_magic(op)) >= 0) ylikely {
 	    rs = filemap_rewind(op->fmp) ;
 	} /* end if (magic) */
 	return rs ;
