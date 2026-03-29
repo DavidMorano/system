@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<whitelist.h>
 
@@ -39,13 +36,13 @@
 struct lookaddr_sysflags {
 	uint		swl:1 ;
 	uint		sbl:1 ;
-} ;
+} ; /* end struct */
 
 struct lookaddr_userflags {
 	uint		dname:1 ;
 	uint		uwl:1 ;
 	uint		ubl:1 ;
-} ;
+} ; /* end struct */
 
 struct lookaddr_user {
 	cchar		*dname ;
@@ -53,8 +50,8 @@ struct lookaddr_user {
 	LOOKADDR_UF	open ;
 	whitelist	uwl ;
 	whitelist	ubl ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 struct lookaddr_head {
     	char		*pbuf ;
@@ -63,10 +60,10 @@ struct lookaddr_head {
 	whitelist	sbl ;
 	LOOKADDR_SL	init ;
 	LOOKADDR_SL	open ;
-	uint		magic ;
+	uint		magval ;
 	int		plen ;
 	int		users ;
-} ;
+} ; /* end struct */
 
 typedef	LOOKADDR	lookaddr ;
 typedef	LOOKADDR_SL	lookaddr_sf ;
