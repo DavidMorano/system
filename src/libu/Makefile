@@ -516,8 +516,9 @@ ccfile.o:		ccfile.cc	ccfile.hh	$(INCS)
 readln.o:		readln.cc	readln.hh	$(INCS)
 dprintf.o:		dprintf.cc	dprintf.hh	$(INCS)
 
-# VARITHMETIC
-varithmetic.o:		varithmetic.ccm
-	makemodule $^
+# ARITHMETIC
+intext.o:		intext.ccm	varithmetic.o
+varithmetic.o:		varithmetic.ccm	muldigs.o
+muldigs.o:		muldigs.ccm
 
 
