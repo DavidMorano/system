@@ -445,15 +445,14 @@ local int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 /* end subroutine (mkdirlist_pdc) */
 
 local int mkdirlist_pdn(MKDIRLIST *op,cchar *ndn) noex {
-	cint		dot = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;
+	cint		fdm = (fsdirtreem.follow | fsdirtreem.dir) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (char *nbuf ; (rs = lm_mp(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
-	    if (fsdirtree dir ; (rs = fsdirtree_open(&dir,ndn,dot)) >= 0) {
-	        ustat	sb ;
-	        while ((rs = fsdirtree_read(&dir,&sb,nbuf,nlen)) > 0) {
+	    if (fsdirtree d ; (rs = d.open(ndn,fdm)) >= 0) {
+	        for (ustat sb ; (rs = d.read(&sb,nbuf,nlen)) > 0 ; ) {
 	            cint	ngl = rs ;
 	            if (nbuf[0] != '.') {
 	                rs = mkdirlist_newent(op,&sb,nbuf,ngl) ;
@@ -461,7 +460,7 @@ local int mkdirlist_pdn(MKDIRLIST *op,cchar *ndn) noex {
 	            }
 	            if (rs < 0) break ;
 	        } /* end while */
-	        rs1 = fsdirtree_close(&dir) ;
+	        rs1 = d.close ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdirtree) */
 	    rs1 = lm_free(nbuf) ;
