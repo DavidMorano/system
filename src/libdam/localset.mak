@@ -1,4 +1,4 @@
-# MAKEFILES (localset)
+# MAKEFILE (localset)
 
 T= localset
 
