@@ -43,18 +43,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<strings.h>		/* |strcasecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<new>			/* |nothrow(3c++)| */
-#include	<strings.h>		/* |strcasecmp(3c)| + |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vechand.h>
 #include	<strn.h>		/* |strnrbrk(3uc)| */
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
-#include	"mailaddr.h"
 #include	"splitaddr.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
@@ -89,43 +91,40 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int splitaddr_ctor(splitaddr *op,Args ... args) noex {
+local int splitaddr_ctor(splitaddr *op,Args ... args) noex {
 	SPLITADDR	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->comp = new(nothrow) vechand) != np) {
+	    if ((op->comp = new(nothrow) vechand) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (splitaddr_ctor) */
+} /* end subroutine (splitaddr_ctor) */
 
-static int splitaddr_dtor(splitaddr *op) noex {
+local int splitaddr_dtor(splitaddr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->comp) {
+	    if (op->comp) ylikely {
 		delete op->comp ;
 		op->comp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (splitaddr_dtor) */
+} /* end subroutine (splitaddr_dtor) */
 
 template<typename ... Args>
-static inline int splitaddr_magic(splitaddr *op,Args ... args) noex {
+local inline int splitaddr_magic(splitaddr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == SPLITADDR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == SPLITADDR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (splitaddr_magic) */
+} /* end subroutine (splitaddr_magic) */
 
 
 /* local variables */
@@ -141,13 +140,13 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	cint		nents = SPLITADDR_DEFENTS ;
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = splitaddr_ctor(op,ap)) >= 0) {
-	    if ((rs = vechand_start(op->comp,nents,0)) >= 0) {
+	if ((rs = splitaddr_ctor(op,ap)) >= 0) ylikely {
+	    if ((rs = vechand_start(op->comp,nents,0)) >= 0) ylikely {
 	        int	al = lenstr(ap) ;
 	        while (al && (ap[al - 1] == '.')) {
 		    al -= 1 ;
 	        }
-	        if (char *bp ; (rs = libmem.mall((al+1),&bp)) >= 0) {
+	        if (char *bp ; (rs = libmem.mall((al+1),&bp)) >= 0) ylikely {
 	            int		bl = al ;
 	            bool	f = false ;
 	            op->mailaddr = charp(bp) ;
@@ -171,7 +170,7 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	            } /* end if */
 	            if (rs >= 0) {
 		        op->nd = n ;
-			op->magic = SPLITADDR_MAGIC ;
+			op->magval = SPLITADDR_MAGIC ;
 		    }
 		    if (rs < 0) {
 			libmem.free(bp) ;
@@ -193,14 +192,14 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 int splitaddr_finish(splitaddr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((rs = splitaddr_magic(op)) >= 0) {
-	    if (op->mailaddr) {
+	if ((rs = splitaddr_magic(op)) >= 0) ylikely {
+	    if (op->mailaddr) ylikely {
 		void *vp = voidp(op->mailaddr) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->mailaddr = nullptr ;
 	    }
-	    if (op->comp) {
+	    if (op->comp) ylikely {
 	        rs1 = vechand_finish(op->comp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -208,7 +207,7 @@ int splitaddr_finish(splitaddr *op) noex {
 	        rs1 = splitaddr_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -216,7 +215,7 @@ int splitaddr_finish(splitaddr *op) noex {
 
 int splitaddr_count(splitaddr *op) noex {
 	int		rs ;
-	if ((rs = splitaddr_magic(op)) >= 0) {
+	if ((rs = splitaddr_magic(op)) >= 0) ylikely {
 	    rs = vechand_count(op->comp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -227,7 +226,7 @@ int splitaddr_prematch(splitaddr *op,splitaddr *sap) noex {
     	int		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		f = false ;
-	if ((rs = splitaddr_magic(op,sap)) >= 0) {
+	if ((rs = splitaddr_magic(op,sap)) >= 0) ylikely {
 	    int		rs1 ;
 	    int		rs2 ;
 	    int		f_so = false ;
@@ -276,7 +275,7 @@ int splitaddr_prematch(splitaddr *op,splitaddr *sap) noex {
 
 int splitaddr_audit(splitaddr *op) noex {
 	int		rs ;
-	if ((rs = splitaddr_magic(op)) >= 0) {
+	if ((rs = splitaddr_magic(op)) >= 0) ylikely {
 	    rs = vechand_audit(op->comp) ;
 	} /* end if (magic) */
 	return rs ;
