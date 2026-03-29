@@ -21,15 +21,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
 
-extern int	getprogroot(cc *,mainv,int *,char *,cc *) noex ;
+extern int	getprogroot(cchar *,mainv,int *,char *,cchar *) noex ;
 
 EXTERNC_end
 
