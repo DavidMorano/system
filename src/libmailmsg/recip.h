@@ -38,11 +38,11 @@
 struct recip_entry {
 	int		moff ;
 	int		mlen ;
-} ;
+} ; /* end struct */
 
 struct recip_flags {
 	uint		user:1 ;	/* is an actual user */
-} ;
+} ; /* end struct */
 
 struct recip_head {
 	vecitem		*mdp ;		/* message delivery entries */
@@ -55,7 +55,7 @@ struct recip_head {
 	int		mbo ;		/* mailbox-message offset */
 	int		n ;		/* number of deliveries */
 	int		ds ;		/* delivery status */
-} ;
+} ; /* end struct */
 
 typedef RECIP		recip ;
 typedef RECIP_FL	recip_fl ;
