@@ -1,4 +1,5 @@
 /* sysinfo SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* System-Information UNIX® System interposer */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	sysinfo
+
+	Description:
 	This is a version of |sysinfo(2)| that is preloaded to over-ride the
 	standard UNIX® system version.
 
@@ -50,12 +55,14 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<buffer.h>
 #include	<vecstr.h>
 #include	<filer.h>
 #include	<ctdec.h>
 #include	<cthex.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"preload.h"
@@ -142,7 +149,7 @@ static int	uload_hwserial(char *,cchar *,long) noex ;
 
 static SYSINFO	sysinfo_data ; /* zero-initialized */
 
-static int	(*sysinfos[])(BUFFER *) = {
+constexpr int	(*sysinfos[])(BUFFER *) = {
 	sysinfo_varhwserial,
 	sysinfo_varhostid,
 	sysinfo_file,
