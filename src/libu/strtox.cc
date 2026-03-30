@@ -41,9 +41,9 @@
 
 	= 2005-10-02, David A­D­ Morano
 	I adapted some existing prior code (from OpenBSD) to provide
-	the |{x}longlong| types versions.  The goal here was to
+	the |{x}longlong| type versions.  The goal here was to
 	provide versions for 128-bit integers in the same form
-	)function signatures) as the existing UNIX-oriented
+	(function signatures) as the existing UNIX-oriented
 	string-conversion subroutines (which supported smaller sized
 	integers).  But code like this (but with different function
 	signatures) was previously written in assembly language in
@@ -105,12 +105,9 @@
 /* external variables */
 
 
-/* local variables */
+/* local structures */
 
 constexpr uint	maxbase = 36 ;		/* must be classic value */
-
-
-/* local structures */
 
 struct llhelper {
 	longlong	llmin = 0 ;
@@ -128,7 +125,7 @@ struct llhelper {
 		cutoff[b] = (ullmax / b) ;
 		cutlim[b] = int(ullmax % b) ;
 	    } /* end for */
-	} ; /* end constructor */
+	} ; /* end ctor */
 } ; /* end subroutine (llhelper) */
 
 
@@ -155,21 +152,21 @@ inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 	if (errno == 0) {
 	    cint	n = nbits(v) ;
 	    {
-	        cbool	f_neg = bit(v,(n-1)) ;
+	        cbool	f_neg = bit(v,(n - 1)) ;
 		if (f_neg) {	/* test negative value */
 	    	    ulong	uv = ulong(v) ;
 		    uv = (~ uv) ;
-	            uv >>= (n/2) ;
-		    if (uv || (! bit(v,((n/2)-1)))) {
+	            uv >>= (n / 2) ;
+		    if (uv || (! bit(v,((n / 2) - 1)))) {
 			errno = ERANGE ;
 		    }
 		} else {	/* test poitive value */
-	    	    ulong	uv = ulong(v) ;
-	            uv >>= (n/2) ;
-		    if (uv || bit(v,((n/2)-1))) {
+		    ulong	uv = ulong(v) ;
+	            uv >>= (n / 2) ;
+		    if (uv || bit(v,((n / 2) - 1))) {
 			errno = ERANGE ;
 		    }
-		}
+		} /* end if */
 	    } /* end block */
 	} /* end if (no error so far) */
 } /* end subroutine-template (strtox) */
@@ -180,7 +177,7 @@ inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
 	*rp = uint(uv) ;
 	if (errno == 0) {
 	    cint	n = nbits(uv) ;
-	    uv >>= (n/2) ;
+	    uv >>= (n / 2) ;
 	    if (uv) {
 		errno = ERANGE ;
 	    }
@@ -189,6 +186,10 @@ inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
 
 
 /* local variables */
+
+local bool ischx(int ch) noex {
+    	return (ch == 'x') || (ch == 'X') ;
+}
 
 constexpr llhelper	llhelp ;
 
@@ -199,7 +200,7 @@ constexpr llhelper	llhelp ;
 /* exported subroutines */
 
 int strtoxi(cchar *sp,char **epp,int b) noex {
-    	int	v{} ;
+	int	v{} ;
 	strtox(sp,epp,b,&v) ;
 	return v ;
 }
@@ -220,27 +221,27 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	 * If base is 0, allow 0x for hex and 0 for octal, else
 	 * assume decimal; if base is already 16, allow 0x.
 	 */
-	s = nptr;
+	s = nptr ;
 	do {
-		c = (unsigned char) *s++;
-	} while (isspace(c));
+	    c = uchar(*s++) ;
+	} while (isspace(c)) ;
 	if (c == '-') {
-		neg = 1;
-		c = *s++;
+	    neg = 1 ;
+	    c = *s++ ;
 	} else {
-		neg = 0;
-		if (c == '+') {
-			c = *s++;
-		}
+	    neg = 0 ;
+	    if (c == '+') {
+		c = *s++ ;
+	    }
 	}
 	if ((base == 0 || base == 16) &&
-	    c == '0' && (*s == 'x' || *s == 'X')) {
-		c = s[1];
-		s += 2;
-		base = 16;
+	c == '0' && (*s == 'x' || *s == 'X')) {
+		c = s[1] ;
+		s += 2 ;
+		base = 16 ;
 	}
 	if (base == 0) {
-		base = ((c == '0') ? 8 : 10) ;
+	    base = ((c == '0') ? 8 : 10) ;
 	}
 	/*
 	 * Compute the cutoff value between legal numbers and illegal
@@ -261,64 +262,62 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	 */
 	cutoff = neg ? llhelp.llmin : llhelp.llmax ;
 	cutlim = int(cutoff % base) ;
-	cutoff /= base;
+	cutoff /= base ;
 	if (neg) {
-		if (cutlim > 0) {
-			cutlim -= base ;
-			cutoff += 1 ;
-		}
-		cutlim = -cutlim ;
+	    if (cutlim > 0) {
+		cutlim -= base ;
+		cutoff += 1 ;
+	    }
+	    cutlim = -cutlim ;
 	} /* end if (negative) */
-	for (acc = 0, vany = 0 ; ; c = (unsigned char) *s++) {
-		if (isdigit(c)) {
-			c -= '0' ;
-		} else if (isalpha(c)) {
-			c -= isupper(c) ? ('A' - 10) : ('a' - 10) ;
-		} else {
-			break;
-		}
-		if (c >= base)
-			break;
-		if (vany < 0)
-			continue;
-		if (neg) {
-			if (acc < cutoff || (acc == cutoff && c > cutlim)) {
-				vany = -1 ;
-				acc = llhelp.llmin ;
-				errno = ERANGE ;
-			} else {
-				vany = 1 ;
-				acc *= base ;
-				acc -= c ;
-			}
-		} else {
-			if (acc > cutoff || (acc == cutoff && c > cutlim)) {
-				vany = -1 ;
-				acc = llhelp.llmax ;
-				errno = ERANGE ;
-			} else {
-				vany = 1 ;
-				acc *= base ;
-				acc += c ;
-			}
-		} /* end if */
+	for (acc = 0, vany = 0 ; ; c = uchar(*s++)) {
+            if (isdigit(c)) {
+                c -= '0' ;
+            } else if (isalpha(c)) {
+                c -= isupper(c) ? ('A' - 10) : ('a' - 10) ;
+            } else {
+                break ;
+            }
+            if (c >= base) break ;
+            if (vany < 0) continue ;
+            if (neg) {
+                if (acc < cutoff || (acc == cutoff && c > cutlim)) {
+		    vany = -1 ;
+		    acc = llhelp.llmin ;
+		    errno = ERANGE ;
+                } else {
+		    vany = 1 ;
+		    acc *= base ;
+		    acc -= c ;
+                }
+            } else {
+                if (acc > cutoff || (acc == cutoff && c > cutlim)) {
+		    vany = -1 ;
+		    acc = llhelp.llmax ;
+		    errno = ERANGE ;
+                } else {
+		    vany = 1 ;
+		    acc *= base ;
+		    acc += c ;
+                }
+            } /* end if */
 	} /* end for */
-	if (endptr != nullptr) {
-	    *endptr = (char *) (vany ? (s - 1) : nptr) ;
+	if (endptr) {
+	    *endptr = charp(vany ? (s - 1) : nptr) ;
 	}
 	return acc ;
 }
 /* end subroutine (strtoxll) */
 
 uint strtoxui(cchar *sp,char **epp,int b) noex {
-    	uint	uv{} ;
+	uint	uv{} ;
 	strtox(sp,epp,b,&uv) ;
 	return uv ;
 }
 /* end subroutine (strtoxui) */
 
 ulong strtoxul(cchar *sp,char **epp,int b) noex {
-    	return strtoul(sp,epp,b) ;
+	return strtoul(sp,epp,b) ;
 }
 /* end subroutine (strtouxl) */
 
@@ -332,62 +331,58 @@ ulong strtoxul(cchar *sp,char **epp,int b) noex {
 ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 	ulonglong	cutoff = llhelp.cutoff[base] ;
 	ulonglong	acc ;
-	const char	*s;
+	cchar		*s = nptr ;
 	int		cutlim = llhelp.cutlim[base] ;
 	int		c;
 	int		neg, vany ;
 	/*
 	 * See strtoq for comments as to the logic used.
 	 */
-	s = nptr;
 	do {
-		c = (unsigned char) *s++;
-	} while (isspace(c));
+	    c = uchar(*s++) ;
+	} while (isspace(c)) ;
 	if (c == '-') {
-		neg = 1;
-		c = *s++;
+	    neg = 1 ;
+	    c = *s++ ;
 	} else { 
-		neg = 0;
-		if (c == '+') {
-			c = *s++;
-		}
+	    neg = 0 ;
+	    if (c == '+') {
+	        c = *s++ ;
+	    }
 	}
-	if ((base == 0 || base == 16) &&
-	    c == '0' && (*s == 'x' || *s == 'X')) {
-		c = s[1] ;
-		s += 2 ;
-		base = 16 ;
+	if ((base == 0 || base == 16) && c == '0' && ischx(*s)) {
+	    c = s[1] ;
+	    s += 2 ;
+	    base = 16 ;
 	}
 	if (base == 0) {
-		base = ((c == '0') ? 8 : 10) ;
+	    base = ((c == '0') ? 8 : 10) ;
 	}
-
-	for (acc = 0, vany = 0 ; ; c = (unsigned char) *s++) {
-		if (isdigit(c)) {
-			c -= '0';
-		} else if (isalpha(c)) {
-			c -= isupper(c) ? ('A' - 10) : ('a' - 10) ;
-		} else
-			break;
-		if (c >= base)
-			break;
-		if (vany < 0)
-			continue;
-		if (acc > cutoff || (acc == cutoff && c > cutlim)) {
-			vany = -1 ;
-			acc = llhelp.ullmax ;
-			errno = ERANGE ;
-		} else {
-			vany = 1 ;
-			acc *= base ;
-			acc += c ;
-		}
+	for (acc = 0, vany = 0 ; ; c = uchar(*s++)) {
+            if (isdigit(c)) {
+                c -= '0';
+            } else if (isalpha(c)) {
+                c -= isupper(c) ? ('A' - 10) : ('a' - 10) ;
+            } else {
+                break ;
+            }
+            if (c >= base) break ;
+            if (vany < 0) continue ;
+            if (acc > cutoff || (acc == cutoff && c > cutlim)) {
+                vany = -1 ;
+                acc = llhelp.ullmax ;
+                errno = ERANGE ;
+            } else {
+                vany = 1 ;
+                acc *= base ;
+                acc += c ;
+            }
 	} /* end for */
 	if (neg && vany > 0) {
 	    acc = (-acc) ;
 	}
-	if (endptr != nullptr) {
-	    *endptr = (char *) (vany ? (s - 1) : nptr) ;
+	if (endptr) {
+	    *endptr = charp(vany ? (s - 1) : nptr) ;
 	}
 	return acc ;
 }
