@@ -20,23 +20,21 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysbase.h>
 
 
-#define	PCSCLIENT_MAGIC		0x58261227
 #define	PCSCLIENT		struct pcsclient_head
-#define	PCSCLIENT_OBJ		struct pcsclient_obj
-#define	PCSCLIENT_DATA		struct pcsclient_d
 #define	PCSCLIENT_FL		struct pcsclient_flags
+#define	PCSCLIENT_OBJ		struct pcsclient_object
+#define	PCSCLIENT_DATA		struct pcsclient_d
+#define	PCSCLIENT_MAGIC		0x58261227
 
 
-struct pcsclient_obj {
+struct pcsclient_object {
 	char		*name ;
-	uint		objsize ;
-} ;
+	uint		objsz ;
+} ; /* end struct */
 
 struct pcsclient_d {
 	uint		intstale ;
@@ -45,11 +43,11 @@ struct pcsclient_d {
 	uint		ncpu ;
 	uint		nproc ;
 	uint		la[3] ;
-} ;
+} ; /* end struct */
 
 struct pcsclient_flags {
 	uint		shm:1 ;			/* initialized */
-} ;
+} ; /* end struct */
 
 struct pcsclient_head {
 	cchar		*pr ;
@@ -66,9 +64,11 @@ struct pcsclient_head {
 	int		pagesize ;
 	int		mapsize ;
 	int		shmsize ;
-} ;
+} ; /* end struct */
 
 typedef PCSCLIENT	pcsclient ;
+typedef PCSCLIENT_FL	pcsclient_fl ;
+typedef PCSCLIENT_OBJ	pcsclient_obj ;
 typedef PCSCLIENT_DATA	pcsclient_data ;
 
 EXTERNC_begin
