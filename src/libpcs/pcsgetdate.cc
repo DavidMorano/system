@@ -23,7 +23,7 @@
 
 	Description:
 	This subroutine parses a date-string of some sort into its
-	parsed out coponment values (stored in a TMTIME object).
+	parsed out componment values (stored in a TMTIME object).
 
 	Synopsis:
 	int pcsgetdate(cc *pr,tmtime *tmp,cc *sp,int sl,pcsdatætypes dt) noex
