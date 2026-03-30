@@ -27,14 +27,16 @@
 
 #include	<envstandards.h>	/* must be before others */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
+#include	<progexpand.h>
 #include	<proginfo.hh>
 #include	<proglog.hh>
 #include	<proguserlist.hh>
 #include	<progmsgid.hh>
+#include	<progchecklock.h>
+#include	<proglogzone.h>
+#include	<progpeername.hh>
 
 
 #endif /* LIBPROG_INCLUDE */
