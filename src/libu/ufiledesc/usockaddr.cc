@@ -18,32 +18,19 @@
 
 /*******************************************************************************
 
-	Name:
-	u_fcntl
+	Group:
+	u_sockaddr{x}
 
 	Description:
 	This provides special control for devices.
 
 	Synopsis:
-	int uc_fcntl(int fd,int cmd,...) noex
+	int u_sockaddr{x}(int fd,int cmd,...) noex
 
 	Arguments:
 	fd		file-descriptor
 	cmd		command (request)
 	...		any-argument
-
-	Notes:
-	1. Because of the subroutine signature of |u_fcntl(3u)|
-	allowing for a variable number of arguments and also
-	importantly allowing for arguments with any types, passing
-	those arguments down to another subroutine is potentially
-	problematic.  For little-ending machines, this is not a
-	problem as it is such a superior machine byte ordering
-	convention over the stupid and idiotic big-endian (idiotic)
-	convention.  See the code below for how I handle this
-	problem for big-endian machines.
-	2. Note the intentional spelling of the structure below
-	("ufuncter").
 
 *******************************************************************************/
 
@@ -56,12 +43,15 @@
 #include	<cstdlib>
 #include	<cstdint>		/* |uintptr_t| */
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<usysflag.h>
 #include	<endian.h>
 #include	<localmisc.h>
 
-#include	"ufiledesc.h"
+#include	"ufiledescbase.hh"
+#include	"usockaddr.h"
 
 
 /* local defines */
@@ -69,7 +59,7 @@
 
 /* imported namespaces */
 
-using namespace	ufiledesc ;		/* namespace */
+using libu::ufiledescbase ;		/* type */
 
 
 /* local typedefs */
