@@ -45,6 +45,7 @@ module ;
 export module intext ;
 
 import varithmetic ;
+import loadval ;
 
 /* local defines */
 
@@ -272,7 +273,7 @@ export {
 	    return bxor(o) ;
 	} ;
 	uintx operator >>	(const uintx &o) const noex {
-	    return ashr(o) ;
+	    return lshr(o) ;
 	} ;
 	uintx operator <<	(const uintx &o) const noex {
 	    return lshl(o) ;
@@ -319,36 +320,15 @@ export {
 export {
     template<int Nbits,typename Digit>
 	void uintx<Nbits,Digit>::load(int a) noexcept {
-            if (a >= 0) {
-		vclear(n,v) ;
-                v[0] = uint(a) ;
-            } else {
-                longlong aa = longlong(a) ;
-		vopaque(n,v) ;
-                v[0] = longlongconv(aa) ;
-            }
+	    loadval(n,v,a) ;
         } ; /* end ctor */
     template<int Nbits,typename Digit>
 	void uintx<Nbits,Digit>::load(long a) noexcept {
-            if (a >= 0) {
-		vclear(n,v) ;
-                v[0] = ulong(a) ;
-            } else {
-                longlong aa = longlong(a) ;
-		vopaque(n,v) ;
-                v[0] = ulonglongconv(aa) ;
-            }
+	    loadval(n,v,a) ;
         } ; /* end ctor */
     template<int Nbits,typename Digit>
 	void uintx<Nbits,Digit>::load(longlong a) noexcept {
-            if (a >= 0) {
-		vclear(n,v) ;
-                v[0] = ulonglong(a) ;
-            } else {
-                longlong aa = longlong(a) ;
-		vopaque(n,v) ;
-                v[0] = ulonglongconv(aa) ;
-            }
+	    loadval(n,v,a) ;
         } ; /* end ctor */
 } /* end export */
 
