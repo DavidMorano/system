@@ -33,7 +33,9 @@ enum filelinkermems {
 	filelinkermem_finish,
 	filelinkermem_overlast
 } ; /* end enum (filelinkermem) */
+
 struct filelinker ;
+
 struct filelinker_ma {
 	filelinker	*op = nullptr ;
 	void operator () (filelinker *p,int) noex {
@@ -42,6 +44,7 @@ struct filelinker_ma {
 	template<typename ... Args> int operator () (Args ... ) noex ;
 	operator int () noex ;
 } ; /* end struct (filelinker_ma) */
+
 struct filelinker_st {
     	filelinker	*op = nullptr ;
     	void operator () (filelinker *p,int) noex {
@@ -52,6 +55,7 @@ struct filelinker_st {
     	    return operator () (nullptr) ;
     	} ;
 } ; /* end struct (filelinker_st) */
+
 struct filelinker_co {
 	filelinker	*op = nullptr ;
 	int		w = -1 ;
@@ -64,6 +68,7 @@ struct filelinker_co {
 	    return operator int () ;
 	} ;
 } ; /* end struct (filelinker_co) */
+
 struct filelinker {
     	friend		filelinker_ma ;
     	friend		filelinker_st ;
@@ -73,8 +78,11 @@ struct filelinker {
 	filelinker_co	finish ;
 	filelinker_ma	magic ;
     	void		*dirp ;		/* target-directory-pointer */
-    	void		*recp ;		/* file-record-pointer */
+	char		*pbuf ;
+	char		*dbuf ;
 	uint		magval ;
+	int		plen ;
+	int		dlen ;
 	int		tll ;		/* ?? */
 	filelinker() noex {
 	    start	(this,0) ;
@@ -82,25 +90,30 @@ struct filelinker {
 	    finish	(this,filelinkermem_finish) ;
 	    magic	(this,0) ;
 	    dirp = nullptr ;
-	    recp = nullptr ;
 	    magval = 0 ;
 	    tll = 0 ;
+	    a = nullptr ;
 	} ; /* end ctor */
 	filelinker(const filelinker &) = delete ;
 	filelinker &operator = (const filelinker &) = delete ;
 	int load	(mainv) noex ;
 	int add		(cchar *,int = -1) noex ;
-	int link	(ustat *,cchar *,int = -1) noex ;
+	int link	(custat *,cchar *,int = -1) noex ;
+	int linktar	(cchar *,custat *,cchar *,int = -1) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct filelinker() {
 	    if (magval) dtor() ;
 	} ;
+	int ione(custat *,cc *,custat *,cc *,int) noex ;
     private:
+	char *a ;
 	int istart(mainv) noex ;
+	int ifinish() noex ;
 	int istarter() noex ;
 	int icount() noex ;
-	int ifinish() noex ;
+	int idir(custat *,custat *,cchar *,int) noex ;
+	int mkpdirs(cchar *,mode_t) noex ;
 } ; /* end struct (filelinker) */
 
 
