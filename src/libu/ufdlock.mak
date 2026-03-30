@@ -1,6 +1,6 @@
-# MAKEFILES (ufdlock)
+# MAKEFILE (uopen)
 
-T= ufdlock
+T= uopen
 
 ALL= $(T).o
 
@@ -33,17 +33,27 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += ufdlock.h
+INCS += uopen.h
 
 MODS +=
 
 LIBS +=
 
 
+OBJ0= uopen_prime.o
+OBJ1=
+OBJ2=
+OBJ3=
+
+OBJA= obj0.o
+OBJB=
+
+OBJ= obja.o
+
+
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -56,18 +66,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= ufdlock_main.o ufdlock_fcntl.o
-OBJ1=
-OBJ2=
-OBJ3=
-
-OBJA_UFILEDESC= obj0.o obj1.o
-OBJB_UFILEDESC= obj2.o obj3.o
-
-OBJ_UFILEDESC= obj0.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -97,8 +99,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_UFILEDESC) Makefile
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_UFILEDESC)
+$(T).o:			$(OBJ) Makefile
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -126,14 +128,13 @@ obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
 
 
-obja.o:			$(OBJA_UFILEDESC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_UFILEDESC)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
 
-objb.o:			$(OBJB_UFILEDESC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_UFILEDESC)
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
-ufdlock_main.o:		ufdlock_main.cc		$(INCS)
-ufdlock_fcntl.o:	ufdlock_fcntl.cc	$(INCS)
+uopen_prime.o:	uopen_prime.cc		$(INCS)
 
 
