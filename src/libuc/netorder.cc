@@ -71,16 +71,9 @@
 
 /* forward references */
 
-
-/* local variables */
-
 cint	nb = CHAR_BIT ;
 
-
-/* subroutine-templates */
-
-template<typename T>
-static int netorder_rxx(cchar *buf,T *wp) noex {
+template<typename T> local int netorder_rxx(cchar *buf,T *wp) noex {
 	cint		n = szof(T) ;
 	T		stage = 0 ;
 	const uchar	*ubuf = ucharp(buf) ;
@@ -93,8 +86,7 @@ static int netorder_rxx(cchar *buf,T *wp) noex {
 }
 /* end subroutine-template (netorder_rxx) */
 
-template<typename T>
-static int netorder_wxx(char *buf,T w) noex {
+template<typename T> local int netorder_wxx(char *buf,T w) noex {
 	cint		n = szof(T) ;
 	uchar		*ubuf = ucharp(buf) ;
 	for (int i = (n-1) ; i >= 0 ; i -= 1) {
@@ -104,6 +96,9 @@ static int netorder_wxx(char *buf,T w) noex {
 	return n ;
 }
 /* end subroutine-template (netorder_wxx) */
+
+
+/* local variables */
 
 
 /* exported variables */
