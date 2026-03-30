@@ -9,12 +9,12 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 1998-06-08, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -34,12 +34,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |atexit(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usupport.h>
 #include	<localmisc.h>
+
+#include	"uatexit.h"
 
 
 /* local defines */
@@ -49,10 +48,6 @@
 
 
 /* local typedefs */
-
-extern "C" {
-    typedef void	(*atexit_f)(void) noex ;
-}
 
 
 /* external subroutines */
@@ -73,7 +68,7 @@ namespace {
 	int stdatexit() noex ;
 	int operator () () noex ;
     } ; /* end struct (ucatexit) */
-}
+} /* end namespace */
 
 
 /* local variables */
@@ -84,7 +79,7 @@ namespace {
 
 /* exported subroutines */
 
-int uc_atexit(atexit_f f) noex {
+int u_atexit(atexit_f f) noex {
 	ucatexit	aeo(f) ;
 	aeo.m = &ucatexit::stdatexit ;
 	return aeo() ;
