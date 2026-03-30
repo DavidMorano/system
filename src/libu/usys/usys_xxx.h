@@ -274,6 +274,24 @@ local inline char *strbrk(cchar *sp,cchar *sc) noex {
 EXTERNC_end
 #endif /* SUBROUTINE_STRBRK */
 
+/* this ( |strochr(3c)| ) is the companion subroutine of |strrchr(3c)| */
+#ifndef	SUBROUTINE_STROCHR
+#define	SUBROUTINE_STROCHR
+EXTERNC_begin
+extern char *strochr(cchar *sp,int sch) noex {
+    	return strchr(sp,sch) ;
+}
+EXTERNC_end
+#endif /* SUBROUTINE_STROCHR */
+
+#ifndef	SUBROUTINE_STRTOI
+#define	SUBROUTINE_STRTOI
+EXTERNC_begin
+extern int	strtoi(cchar *,char **,int) noex ;
+extern uint	strtoui(cchar *,char **,int) noex ;
+EXTERNC_end
+#endif /* SUBROUTINE_STRTOI */
+
 
 #endif /* USYSXXX_INCLUDE */
 
