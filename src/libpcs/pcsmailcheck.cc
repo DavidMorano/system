@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_CVTFROM	0		/* convert FROM address */
 
 /* revision history:
 
@@ -27,11 +26,7 @@
 	mail waiting (unread).
 
 	Synopsis:
-	int pcsmailcheck(pr,rbuf,rlen,un)
-	cchar	pr[] ;
-	char		rbuf[] ;
-	int		rlen ;
-	cchar	un[] ;
+	int pcsmailcheck(cc *pr,char *rbuf,int rlen,cc *un) noex
 
 	Arguments:
 	pr		PCS system program root (if available)
@@ -75,75 +70,48 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<climits>
-#include	<cstdlib>		/* for 'getenv(3c)' maybe others */
-#include	<cstddef>		/* for 'wchar_t' */
+#include	<cstddef>		/* |wchar_t| */
+#include	<cstdlib>		/* |getenv(3c)| others */
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<getbufsize.h>
+#include	<getusername.h>
 #include	<estrings.h>
 #include	<vecstr.h>
 #include	<dirlist.h>
 #include	<strn.h>
 #include	<mkx.h>
-#include	<mailbox.h>
+#include	<pathadd.h>
+#include	<mailbox.h>		/* MAILMSG */
 #include	<hdrdecode.h>
+#include	<isoneof.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"pcsmailcheck.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import uconstants ;			/* |varname(3u)| + |sysword(3u)|  */
 
 /* local defines */
-
-#ifndef	TIME_MAX
-#define	TIME_MAX	INT_MAX
-#endif
-
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
-
-#define	FBUFLEN		MAILADDRLEN
 
 #ifndef	VARPRPCS
 #define	VARPRPCS	"PCS"
 #endif
 
-#ifndef	VARHOME
-#define	VARHOME		"HOME"
-#endif
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
-#endif
-
-#ifndef	VARMAIL
-#define	VARMAIL		"MAIL"
-#endif
-
-#ifndef	VARMAILDNAME
-#define	VARMAILDNAME	"MAILDIR"
-#endif
-
-#ifndef	VARMAILDNAMES
-#define	VARMAILDNAMES	"MAILDIRS"
-#endif
-
-#ifndef	SYSMAILDNAME
-#define	SYSMAILDNAME	"/var/mail"
-#endif
-
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
+#define	SI		subinfo
+#define	SI_FL		subinfo_fl
 
 #define	ISEND(c)	(((c) == '\n') || ((c) == '\r'))
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -151,62 +119,85 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* local structures */
 
-struct subinfo_flags {
+namespace {
+    struct vars {
+	int	maxpathlen ;
+	int	mailaddrlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
+namespace {
+    struct checker {
+	cchar		*pr ;
+	cchar		*un ;
+	char		*dbuf ;
+	int		dlen ;
+	checker(cc *p,char *b,int l,cc *u) noex :  pr(p), dbuf(b), dlen(l) {
+	    un = u ;
+	} ;
+	operator int () noex ;
+    } ; /* end struct (checker) */
+} /* end namespace */
+
+struct subinfo_fl {
 	uint		userself:1 ;
 	uint		uid:1 ;
 	uint		allocusername:1 ;
-} ;
+} ; /* end struct */
 
 struct subinfo {
-	cchar	*pr ;
-	cchar	*varusername ;
-	cchar	*username ;
+	cchar		*pr ;
+	cchar		*username ;
 	char		*a ;		/* allocation reference point */
 	char		*rbuf ;		/* supplied argument */
 	char		*fbuf ;		/* allocated */
 	char		*tbuf ;
-	SUBINFO_FL	init, f ;
-	DIRLIST		maildirs ;
+	subinfo_fl	init, fl ;
+	dirlist		*mlp ;
 	time_t		ti_first ;
 	uid_t		uid ;
 	int		rlen ;		/* supplied argument */
 	int		tlen ;
 	int		flen ;		/* allocated amount */
-	int		fl ;		/* actual used amount */
-} ;
+	int		froml ;		/* from-address len (given us) */
+} ; /* end struct */
+
+typedef int (*subinfo_f)(SI *) noex ;
 
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *,char *,int,cchar *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_username(SUBINFO *,cchar *) ;
-static int	subinfo_getfrom(SUBINFO *) ;
-static int	subinfo_cvtfrom(SUBINFO *) ;
+local int	subinfo_start(SI *,cchar *,char *,int,cchar *) noex ;
+local int	subinfo_finish(SI *) noex ;
+local int	subinfo_username(SI *,cchar *) noex ;
+local int	subinfo_getfrom(SI *) noex ;
+local int	subinfo_cvtfrom(SI *) noex ;
 
 #ifdef	COMMENT
-static int	subinfo_userself(SUBINFO *) ;
-static int	subinfo_getuid(SUBINFO *,uid_t *) ;
+local int	subinfo_userself(SI *) noex ;
+local int	subinfo_getuid(SI *,uid_t *) noex ;
 #endif
 
-static int	subinfo_getsysmail(SUBINFO *) ;
-static int	subinfo_mailfile(SUBINFO *) ;
+local int	subinfo_getsysmail(SI *) noex ;
+local int	subinfo_mailfile(SI *) noex ;
 
-static int	maildirs(SUBINFO *) ;
-static int	maildirs_varmaildirs(SUBINFO *,cchar *) ;
-static int	maildirs_varmail(SUBINFO *,cchar *) ;
-static int	maildirs_default(SUBINFO *,cchar *) ;
-static int	maildirs_add(SUBINFO *,cchar *,int) ;
+local int	maildirs_begin(SI *) noex ;
+local int	maildirs_varmaildirs(SI *,cchar *) noex ;
+local int	maildirs_varmail(SI *,cchar *) noex ;
+local int	maildirs_default(SI *,cchar *) noex ;
+local int	maildirs_add(SI *,cchar *,int) noex ;
+local int	maildirs_end(SI *) noex ;
 
 
 /* local variables */
 
-static int	(*getmails[])(SUBINFO *) = {
+constexpr subinfo_f	getmails[] = {
 	subinfo_getsysmail,
-	NULL
-} ;
+	nullptr
+} ; /* end array (subinfo_f) */
 
-constexpr int	rsdirs[] = {
+constexpr int		rsdirs[] = {
 	SR_ACCESS,
 	SR_NOENT,
 	SR_NAMETOOLONG,
@@ -215,6 +206,8 @@ constexpr int	rsdirs[] = {
 	0
 } ; /* end array (rsdirs) */
 
+static vars		var ;
+
 
 /* exported variables */
 
@@ -222,42 +215,23 @@ constexpr int	rsdirs[] = {
 /* exported subroutines */
 
 int pcsmailcheck(cchar *pr,char *dbuf,int dlen,cchar *un) noex {
-	int		rs ;
-	int		rs1 ;
-	int		n = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("pcsmailcheck: ent un=%s\n",un) ;
-#endif
-
-	if (dbuf == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
-
-#ifdef	COMMENT
-	if (username[0] == '\0') return SR_INVALID ;
-#endif
-
-	if (pr == NULL) pr = getenv(VARPRPCS) ;
-
-	if (pr == NULL) return SR_FAULT ;
-
-	dbuf[0] = '\0' ;
-	SUBINFO si ;
-	if ((rs = subinfo_start(&si,pr,dbuf,dlen,un)) >= 0) {
-	    if ((rs = subinfo_getfrom(&si)) >= 0) {
-		n = rs ;
-		rs = subinfo_cvtfrom(&si) ;
+	int		rs = SR_FAULT ;
+	int		n = 0 ; /* return-value */
+	if (dbuf && un) {
+	    if (pr == nullptr) {
+		static cchar *vpr = getenv(VARPRPCS) ;
+		pr = vpr ;
 	    }
-	    rs1 = subinfo_finish(&si) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
-
-#if	CF_DEBUGS
-	debugprintf("pcsmailcheck: ret rs=%d n=%u\n",rs,n) ;
-	debugprintf("pcsmailcheck: ret f=>%s<\n",
-		dbuf,strlinelen(dbuf,-1,50)) ;
-#endif
-
+	    if (pr) {
+		static cint	rsv = var ;
+	        dbuf[0] = '\0' ;
+		if ((rs = rsv) >= 0) {
+		    if (checker co(pr,dbuf,dlen,un) ; (rs = co) >= 0) {
+		        n = rs ;
+		    }
+		} /* end if (vars) */
+	    } /* end if (non-null) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (pcsmailcheck) */
@@ -265,182 +239,203 @@ int pcsmailcheck(cchar *pr,char *dbuf,int dlen,cchar *un) noex {
 
 /* local subroutines */
 
-
-static int subinfo_start(SUBINFO *sip,cchar *pr,char *rbuf,int rlen,cchar *un)
-{
-	int		rs ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
-	sip->varusername = VARUSERNAME ;
-	sip->pr = pr ;
-	sip->rbuf = rbuf ;
-	sip->rlen = rlen ;
-	sip->ti_first = TIME_MAX ;
-
-	if ((rs = dirlist_start(&sip->maildirs)) >= 0) {
-	    if ((rs = subinfo_username(sip,un)) >= 0) {
-		const int	tlen = MAXPATHLEN ;
-		const int	flen = MAILADDRLEN ;
-		int		size = 0 ;
-	        char		*bp ;
-		size += (tlen+1) ;
-		size += (flen+1) ;
-		if ((rs = uc_malloc(size,&bp)) >= 0) {
-		    sip->a = bp ;
-		    sip->tbuf = bp ;
-		    sip->tlen = tlen ;
-		    sip->fbuf = (bp + (tlen+1)) ;
-		    sip->flen = flen ;
-		}
+template<typename ... Args>
+local inline int subinfo_ctor(SI *op,Args ... args) noex {
+    	subinfo		*hop = op ;
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
+    	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->mlp = new(nt) dirlist) != np) {
+		rs = SR_OK ;
 	    }
-	    if (rs < 0)
-	        dirlist_finish(&sip->maildirs) ;
-	} /* end if (dirlist_start) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (subinfo_ctor) */
 
+local int subinfo_dtor(SI *op) noex {
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (subinfo_dtor) */
+
+local int subinfo_start(SI *sip,cchar *pr,char *rbuf,int rlen,cchar *un) noex {
+	int		rs ;
+	if ((rs = subinfo_ctor(sip,pr,rbuf,un)) >= 0) {
+	    sip->pr = pr ;
+	    sip->rbuf = rbuf ;
+	    sip->rlen = rlen ;
+	    sip->ti_first = TIME_MAX ;
+	    if ((rs = dirlist_start(sip->mlp)) >= 0) {
+	        if ((rs = subinfo_username(sip,un)) >= 0) {
+		    cint	tlen = var.maxpathlen ;
+		    cint	flen = var.mailaddrlen ;
+		    int	sz = 0 ;
+		    sz += (tlen + 1) ;
+		    sz += (flen + 1) ;
+		    if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
+		        sip->a = bp ;
+		        sip->tbuf = bp ;
+		        sip->tlen = tlen ;
+		        sip->fbuf = (bp + (tlen + 1)) ;
+		        sip->flen = flen ;
+		    } /* end if (memory-allocation) */
+	        } /* end if (subinfo_username) */
+	        if (rs < 0) {
+	            dirlist_finish(sip->mlp) ;
+	        }
+	    } /* end if (dirlist_start) */
+	    if (rs < 0) {
+		subinfo_dtor(sip) ;
+	    }
+	} /* end if (subinfo_ctor) */
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
-	int		rs = SR_OK ;
+local int subinfo_finish(SI *sip) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (sip->fl.allocusername && (sip->username != NULL)) {
-	    rs1 = uc_free(sip->username) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sip->username = NULL ;
-	}
-
-	if (sip->a != NULL) {
-	    rs1 = uc_free(sip->a) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sip->a = NULL ;
-	    sip->tbuf = NULL ;
-	    sip->tlen = 0 ;
-	    sip->fbuf = NULL ;
-	    sip->flen = 0 ;
-	}
-
-	rs1 = dirlist_finish(&sip->maildirs) ;
-	if (rs >= 0) rs = rs1 ;
-
-	sip->pr = NULL ;
+	if (sip) {
+	    rs = SR_OK ;
+	    if (sip->fl.allocusername && sip->username) {
+	        void *vp = voidp(sip->username) ;
+	        rs1 = lm_free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sip->username = nullptr ;
+	    }
+	    if (sip->a) {
+	        rs1 = lm_free(sip->a) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sip->a = nullptr ;
+	        sip->tbuf = nullptr ;
+	        sip->tlen = 0 ;
+	        sip->fbuf = nullptr ;
+	        sip->flen = 0 ;
+	    }
+	    if (sip->mlp) {
+	        rs1 = dirlist_finish(sip->mlp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = subinfo_dtor(sip) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    sip->pr = nullptr ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_username(SUBINFO *sip,cchar *un)
-{
+local int subinfo_username(SI *sip,cchar *un) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	sip->username = un ;
-	if ((un == NULL) || (un[0] == '\0') || (un[0] == '-')) {
-	    cchar	*cp ;
-	    if ((cp = getenv(sip->varusername)) != NULL) {
-	        sip->username = cp ;
+	if ((un == nullptr) || (un[0] == '\0') || (un[0] == '-')) {
+	    static cchar *vusername = getenv(varname.username) ;
+	    if (vusername && vusername[0]) {
+	        sip->username = vusername ;
 	    } else {
-	        int	ulen = USERNAMELEN ;
-	        char	ubuf[USERNAMELEN + 1] ;
-	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
-	            if ((rs = uc_mallocstrw(ubuf,rs,&cp)) >= 0) {
-	                sip->fl.allocusername = TRUE ;
-	                sip->username = cp ;
-	            }
-	        } /* end if */
+		if (char *ubuf ; (rs = lm_un(&ubuf)) >= 0) {
+		    cint ulen = rs ;
+	            if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
+	                if (cchar *cp ; (rs = lm_strw(ubuf,rs,&cp)) >= 0) {
+	                    sip->fl.allocusername = true ;
+	                    sip->username = cp ;
+	                }
+	            } /* end if (getusername) */
+		    rs1 = lm_free(ubuf) ;
+	            if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
 	    } /* end if */
 	} /* end if (getting username) */
 	return rs ;
 }
 /* end subroutine (subinfo_username) */
 
-
 #ifdef	COMMENT
-static int subinfo_userself(SUBINFO *sip)
-{
+local int subinfo_userself(SI *sip) noex {
 	int		rs = SR_OK ;
-
 	if (! sip->init.userself) {
 	    cchar	*cp ;
-
-	    sip->init.userself = TRUE ;
-	    if (((cp = getenv(sip->varusername)) != NULL) &&
+	    sip->init.userself = true ;
+	    if (((cp = getenv(varname.username)) != nullptr) &&
 	        (strcmp(cp,sip->username) == 0)) {
 
-	        sip->fl.userself = TRUE ;
+	        sip->fl.userself = true ;
 
 	    } /* end if */
 
 	} /* end if (initializing UID) */
-
-	if ((rs >= 0) && (! sip->fl.userself))
+	if ((rs >= 0) && (! sip->fl.userself)) {
 	    rs = SR_SRCH ;
-
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_userself) */
 #endif /* COMMENT */
 
-
 #ifdef	COMMENT
-static int subinfo_getuid(SUBINFO *sip,uid_t *uidp)
-{
+local int subinfo_getuid(SI *sip,uid_t *uidp) noex {
 	int		rs = SR_OK ;
-
 	if (! sip->init.uid) {
-	    cchar	*var = sip-.varusername ;
+	    cchar	*var = varname.username ;
 	    cchar	*un = sip->username ;
 	    cchar	*cp ;
-	    sip->init.uid = TRUE ;
-	    if (((cp = getenv(var)) != NULL) && (strcmp(cp,un) == 0)) {
-	        sip->fl.uid = TRUE ;
+	    sip->init.uid = true ;
+	    if (((cp = getenv(var)) != nullptr) && (strcmp(cp,un) == 0)) {
+	        sip->fl.uid = true ;
 	        sip->uid = getuid() ;
 	    } else {
 		if ((rs = getuid_name(un,-1)) >= 0) {
-	            sip->fl.uid = TRUE ;
+	            sip->fl.uid = true ;
 	            sip->uid = rs ;
 	        }
 	    } /* end if */
 	} /* end if (initializing UID) */
-
-	if (uidp != NULL)
+	if (uidp != nullptr) {
 	    *uidp = sip->uid ;
-
-	if ((rs >= 0) && (! sip->fl.uid))
+	}
+	if ((rs >= 0) && (! sip->fl.uid)) {
 	    rs = SR_NOTFOUND ;
-
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_getuid) */
 #endif /* COMMENT */
 
-
-static int subinfo_getsysmail(SUBINFO *sip)
-{
+local int subinfo_getsysmail(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 
 #if	CF_DEBUGS
 	debugprintf("pcsmailcheck/subinfo_getsysmail: ent\n") ;
 #endif
 
-	if ((rs = maildirs(sip)) >= 0) {
-	    DIRLIST	*dlp = &sip->maildirs ;
-	    DIRLIST_CUR	cur ;
+	if ((rs = maildirs_begin(sip)) >= 0) {
+	    dirlist	*dlp = sip->mlp ;
+	    dirlist_cur	cur ;
 	    if ((rs = dirlist_curbegin(dlp,&cur)) >= 0) {
-	        const int	tlen = sip->tlen ;
+	        cint	tlen = sip->tlen ;
 	        int		dl ;
 		cchar		*un = sip->username ;
 	        char		*tbuf = sip->tbuf ;
 	        while (rs >= 0) {
-	            dl = dirlist_enum(dlp,&cur,tbuf,tlen) ;
+	            dl = dirlist_curenum(dlp,&cur,tbuf,tlen) ;
 	            if (dl == SR_NOTFOUND) break ;
 		    rs = dl ;
 #if	CF_DEBUGS
 		    debugprintf("pcsmailcheck/subinfo_getsysmail: "
-			    "dirlist_enum() rs=%d\n",rs) ;
+			    "dirlist_curenum() rs=%d\n",rs) ;
 		    debugprintf("pcsmailcheck/subinfo_getsysmail: "
 			    "md=%r\n",tbuf,dl) ;
 #endif
@@ -454,6 +449,9 @@ static int subinfo_getsysmail(SUBINFO *sip)
 	        rs1 = dirlist_curend(dlp,&cur) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (dirlist-cursor) */
+	    rs1 = maildirs_end(sip) ;
+	    if (rs >= 0) rs = rs1 ;
+
 	} /* end if (maildirs) */
 
 #if	CF_DEBUGS
@@ -464,10 +462,7 @@ static int subinfo_getsysmail(SUBINFO *sip)
 }
 /* end subroutine (subinfo_getsysmail) */
 
-
-static int subinfo_mailfile(SUBINFO *sip)
-{
-	ustat	sb ;
+local int subinfo_mailfile(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -477,20 +472,19 @@ static int subinfo_mailfile(SUBINFO *sip)
 	debugprintf("pcsmailcheck/subinfo_mailfile: ent mfn=%s\n",mfn) ;
 #endif
 
-	if ((rs = u_stat(mfn,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(mfn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode) && (sb.st_size > 0)) {
-		MAILBOX		mb ;
-		MAILBOX_INFO	mbinfo ;
-		const int	mo = (MAILBOX_ORDONLY | MAILBOX_ONOCLEN) ;
+		mailbox		mb ;
+		mailbox_info	mbinfo ;
+		cint	mo = (mailboxm.rdonly | mailboxm.noclen) ;
 		if ((rs = mailbox_open(&mb,mfn,mo)) >= 0) {
 	    	    if ((rs = mailbox_getinfo(&mb,&mbinfo)) >= 0) {
-	                c = mbinfo.nmsgs ;
-	        	if (c > 0) {
-			    const int	mi = (c-1) ;
-			    const int	tl = sip->flen ;
+	                if ((c = mbinfo.nmsgs) > 0) {
+			    cint	mi = (c-1) ;
+			    cint	tl = sip->flen ;
 			    char	*tb = sip->fbuf ;
 	            	    if ((rs = mailbox_getfrom(&mb,tb,tl,mfn,mi)) >= 0) {
-				sip->fl = rs ; /* returned length */
+				sip->froml = rs ; /* returned length */
 
 #if	CF_DEBUGS
 	        	    debugprintf("pcsmailcheck/subinfo_mailfile: "
@@ -521,39 +515,30 @@ static int subinfo_mailfile(SUBINFO *sip)
 }
 /* end subroutine (subinfo_mailfile) */
 
-
-static int subinfo_getfrom(SUBINFO *sip)
-{
+local int subinfo_getfrom(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		n = 0 ;
-	int		i ;
-	for (i = 0 ; (rs >= 0) && (getmails[i] != NULL) ; i += 1) {
+	for (int i = 0 ; (rs >= 0) && getmails[i] ; i += 1) {
 	    rs = (*getmails[i])(sip) ;
 	    n += rs ;
 	} /* end for */
-#if	CF_DEBUGS
-	debugprintf("pcsmailcheck/subinfo_getfrom: ret rs=%d n=%u\n",rs,n) ;
-#endif
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (subinfo_getfrom) */
 
-
-static int subinfo_cvtfrom(SUBINFO *sip)
-{
+local int subinfo_cvtfrom(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
-	int		fl = sip->fl ;
-	int		wlen = sip->fl ;
-	int		size ;
-	int		len = 0 ;
-	wchar_t		*wbuf ;
+	int		froml = sip->froml ;
+	int		wlen = sip->froml ;
+	int		sz ;
+	int		len = 0 ; /* return-value */
 #if	CF_DEBUGS
 	debugprintf("pcsmailcheck/subinfo_cvtfrom: ent\n") ;
 #endif
-	size = ((wlen+1)*sizeof(wchar_t)) ;
-	if ((rs = uc_malloc(size,&wbuf)) >= 0) {
-	    HDRDECODE	d ;
+	sz = ((wlen + 1) * szof(wchar_t)) ;
+	if (wchar_t *wbuf ; (rs = lm_mall(sz,&wbuf)) >= 0) {
+	    hdrdecode	d ;
 #if	CF_DEBUGS
 	debugprintf("pcsmailcheck/subinfo_cvtfrom: hdrdecode\n") ;
 #endif
@@ -562,161 +547,135 @@ static int subinfo_cvtfrom(SUBINFO *sip)
 #if	CF_DEBUGS
 	debugprintf("pcsmailcheck/subinfo_cvtfrom: mid1\n") ;
 #endif
-		if ((rs = hdrdecode_proc(&d,wbuf,wlen,fbuf,fl)) >= 0) {
-		    const int	dlen = (2*rs) ;
+		if ((rs = hdrdecode_proc(&d,wbuf,wlen,fbuf,froml)) >= 0) {
+		    cint	dlen = (2 * rs) ;
 		    int		wl = rs ;
-		    char	*dbuf ;
-		    if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
+		    if (char *dbuf ; (rs = lm_mall((dlen+1),&dbuf)) >= 0) {
 			if (wl > sip->rlen) wl = sip->rlen ;
 		        if ((rs = snwcpywidehdr(dbuf,dlen,wbuf,wl)) >= 0) {
 			    rs = mkaddrdisp(sip->rbuf,sip->rlen,dbuf,rs) ;
 		            len = rs ;
 		        }
-			rs1 = uc_free(dbuf) ;
+			rs1 = lm_free(dbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		}
 		rs1 = hdrdecode_finish(&d) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (hdrdecode) */
-	    rs1 = uc_free(wbuf) ;
+	    rs1 = lm_free(wbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-#if	CF_DEBUGS
-	debugprintf("pcsmailcheck/subinfo_cvtfrom: ret rs=%d len=%u\n",rs,len) ;
-#endif
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_cvtfrom) */
 
-
-static int maildirs(SUBINFO *sip)
-{
+local int maildirs_begin(SI *sip) noex {
 	int		rs = SR_OK ;
-	int		c = 0 ;
-	cchar	*cp ;
-
-	if ((rs >= 0) && ((cp = getenv(VARMAILDNAME)) != NULL)) {
-	    rs = maildirs_varmaildirs(sip,cp) ;
-	    c += rs ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("pcsmailcheck/maildirs: maildirs1 rs=%d\n",rs) ;
-#endif
-
-	if ((rs >= 0) && ((cp = getenv(VARMAILDNAMES)) != NULL)) {
-	    rs = maildirs_varmaildirs(sip,cp) ;
-	    c += rs ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("pcsmailcheck/maildirs: maildirs2 rs=%d\n",rs) ;
-#endif
-
-	if ((rs >= 0) && ((cp = getenv(VARMAIL)) != NULL)) {
-	    rs = maildirs_varmail(sip,cp) ;
-	    c += rs ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("pcsmailcheck/maildirs: maildirs3 rs=%d\n",rs) ;
-#endif
-
+	int		c = 0 ; /* return-value */
 	if (rs >= 0) {
-	    rs = maildirs_default(sip,SYSMAILDNAME) ;
+	    static cchar *vmaildir = getenv(varname.maildir) ;
+	    if (vmaildir) {
+	        rs = maildirs_varmaildirs(sip,vmaildir) ;
+	        c += rs ;
+	    }
+	}
+	if (rs >= 0) {
+	    static cchar *vmaildirs = getenv(varname.maildirs) ;
+	    if (vmaildirs) {
+	        rs = maildirs_varmaildirs(sip,vmaildirs) ;
+	        c += rs ;
+	    }
+	}
+	if (rs >= 0) {
+	    static cchar *vmail = getenv(varname.mail) ;
+	    if (vmail) {
+	        rs = maildirs_varmail(sip,vmail) ;
+	        c += rs ;
+	    }
+	}
+	if (rs >= 0) {
+	    rs = maildirs_default(sip,sysword.w_maildir) ;
 	    c += rs ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("pcsmailcheck/maildirs: maildirs4 rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (maildirs) */
+/* end subroutine (maildirs_begin) */
 
+local int maildirs_end(SI *sip) noex {
+    	int		rs = SR_FAULT ;
+	if (sip) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+/* end subroutine (maildirs_end) */
 
-static int maildirs_varmaildirs(SUBINFO *sip,cchar *sp)
-{
-	DIRLIST		*vlp = &sip->maildirs ;
-	int		rs = SR_OK ;
-	int		sl, cl ;
+local int maildirs_varmaildirs(SI *sip,cchar *sp) noex {
+	dirlist		*vlp = sip->mlp ;
+	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	cchar	*tp, *cp ;
-
-	if (vlp == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
-	sl = strlen(sp) ;
-
-	while ((tp = strnbrk(sp,sl," \t,:;")) != NULL) {
-	    if ((cl = sfshrink(sp,(tp - sp),&cp)) > 0) {
-	        rs = maildirs_add(sip,cp,cl) ;
-	        c += rs ;
+	if (vlp && sp) {
+	    int		sl = lenstr(sp) ;
+	    int		cl ;
+	    cchar	*cp ;
+	    for (cchar *tp ; (tp = strnbrk(sp,sl," \t,:;")) != np ; ) {
+		cint tl = intconv(tp - sp) ;
+	        if ((cl = sfshrink(sp,tl,&cp)) > 0) {
+	            rs = maildirs_add(sip,cp,cl) ;
+	            c += rs ;
+	        } /* end if */
+	        sl -= intconv((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
+	        if (rs < 0) break ;
+	    } /* end while */
+	    if ((rs >= 0) && (sl > 0)) {
+	        if ((cl = sfshrink(sp,sl,&cp)) > 0) {
+	            rs = maildirs_add(sip,cp,cl) ;
+	            c += rs ;
+	        } /* end if */
 	    } /* end if */
-	    sl -= ((tp + 1) - sp) ;
-	    sp = (tp + 1) ;
-	    if (rs < 0) break ;
-	} /* end while */
-
-	if ((rs >= 0) && (sl > 0)) {
-	    if ((cl = sfshrink(sp,sl,&cp)) > 0) {
-	        rs = maildirs_add(sip,cp,cl) ;
-	        c += rs ;
-	    } /* end if */
-	} /* end if */
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (maildirs_varmaildirs) */
 
-
-static int maildirs_varmail(SUBINFO *sip,cchar *mvfn)
-{
-	DIRLIST		*vlp = &sip->maildirs ;
-	int		rs = SR_OK ;
+local int maildirs_varmail(SI *sip,cchar *mvfn) noex {
+	dirlist		*vlp = sip->mlp ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-
-	if (vlp == NULL) return SR_FAULT ;
-
-	if ((mvfn != NULL) && (mvfn[0] != '\0')) {
-	    int		cl ;
-	    cchar	*cp ;
-	    if ((cl = sfdirname(mvfn,-1,&cp)) > 0) {
-	        rs = maildirs_add(sip,cp,cl) ;
-	        c += rs ;
+	if (vlp) {
+	    if ((mvfn != nullptr) && (mvfn[0] != '\0')) {
+	        cchar	*cp ;
+	        if (int cl ; (cl = sfdirname(mvfn,-1,&cp)) > 0) {
+	            rs = maildirs_add(sip,cp,cl) ;
+	            c += rs ;
+	        } /* end if */
 	    } /* end if */
-	} /* end if */
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (maildirs_varmail) */
 
-
-static int maildirs_default(SUBINFO *sip,cchar *sp)
-{
-	int		rs = SR_INVALID ;
+local int maildirs_default(SI *sip,cchar *sp) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-
-	if (sp != NULL) {
+	if (sp) {
 	    rs = SR_OK ;
 	    if (sp[0] != '\0') {
 	        rs = maildirs_add(sip,sp,-1) ;
 	        c += rs ;
 	    } /* end if */
 	} /* end if (non-null) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (maildirs_default) */
 
-
-static int maildirs_add(SUBINFO *sip,cchar *cp,int cl)
-{
-	DIRLIST		*vlp = &sip->maildirs ;
+local int maildirs_add(SI *sip,cchar *cp,int cl) noex {
+	dirlist		*vlp = sip->mlp ;
 	int		rs ;
-	int		f_added = FALSE ;
+	int		f_added = false ;
 	if ((rs = dirlist_add(vlp,cp,cl)) >= 0) {
 	    f_added = (rs > 0) ;
 	} else if (isOneOf(rsdirs,rs)) {
@@ -725,5 +684,31 @@ static int maildirs_add(SUBINFO *sip,cchar *cp,int cl)
 	return (rs >= 0) ? f_added : rs ;
 }
 /* end subroutine (maildirs_add) */
+
+checker::operator int () noex {
+    	int		rs ;
+	int		rs1 ;
+	int		n = 0 ; /* return-value */
+	if (SI si ; (rs = subinfo_start(&si,pr,dbuf,dlen,un)) >= 0) {
+	    if ((rs = subinfo_getfrom(&si)) >= 0) {
+		n = rs ;
+		rs = subinfo_cvtfrom(&si) ;
+	    } /* end if (subinfo_getfrom) */
+	    rs1 = subinfo_finish(&si) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (subinfo) */
+	return (rs >= 0) ? n : rs ;
+} /* end method (checker::operator) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    maxpathlen = rs ;
+	    if ((rs = getbufsize(bufsize_mailaddr)) >= 0) {
+		mailaddrlen = rs ;
+	    }
+	}
+	return rs ;
+} /* end method (vars::operator) */
 
 
