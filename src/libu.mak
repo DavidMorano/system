@@ -503,6 +503,7 @@ funcodes.o:		funcodes.cc	funcodes.h	$(INCS)
 # STRING handling
 strtox.o:		strtox.cc	strtox.h	$(INCS)
 strnul.o:		strnul.cc	strnul.hh	$(INCS)
+ischx.o:		ischx.cc	ischx.hh	$(INCS)
 
 # misc-groups
 baops.o:		baops.c		baops.h		$(INCS)
