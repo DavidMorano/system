@@ -225,7 +225,6 @@ export {
 export {
     template<typename Dig>
     constexpr void vmuler(int n,Dig *r,const Dig *v0,const Dig *v1) noex {
-	cint nb = (szof(Dig) * CHAR_BIT) ;
 	cint nh = (n / 2) ;
 	vclear(n,r) ;
 	for (int i = 0 ; i < nh ; i += 1) {
@@ -239,6 +238,8 @@ export {
 	} /* end for */
     } /* end subroutine (vmuler) */
 } /* end export */
+
+#ifdef	COMMENT
 
 constexpr void vsplit(int n,ulong *r,const ulonglong *v) noex {
     	cint	nb = (szof(ulong) * CHAR_BIT) ;
@@ -277,6 +278,8 @@ export {
     } /* end subroutine (vmultrunc) */
 } /* end export */
 
+#endif /* COMMENT */
+
 export {
     template<typename Dig>
     constexpr void vmultrunc(int n,Dig *r,const Dig *v0,const Dig *v1) noex {
@@ -284,10 +287,46 @@ export {
 	{
     	    Dig res[n2] ;
 	    vmuler(n2,res,v0,v1) ;
-	    vjoin(n,r,res) ; /* <- truncation */
+	    vcopy(n,r,res) ; /* <- truncation */
 	}
     } /* end subroutine (vmultrunc) */
 } /* end export */
+
+#ifdef	COMMENT
+export {
+    template<typename Dig>
+    constexpr Dig vdigstep(Dig *qr,const Dig *v0,const Dig d) noex {
+	cint nb = (szof(Dig) & CHAR_BIT) ;
+	Dig rem = 0 ;
+	if (d) {
+	    Dig dividend ;
+	    for (int i = (n - 1) ; i >= 0 ; i += 1) {
+		r[i]	= (v0[i] + rem) / d ;
+		rem	= v0[i] & d ;
+	    } /* end for */
+	} else {
+	    vclear(n,q) ;
+	}
+	return rem ;
+    } /* end subroutine (vdiv) */
+} /* end export */
+export {
+    template<typename Dig>
+    constexpr Dig vdigshort(int n,Dig *q,const Dig *v0,const Dig d) noex {
+	cint nb = (szof(Dig) & CHAR_BIT) ;
+	Dig rem = 0 ;
+	if (d) {
+	    for (int i = (n - 1) ; i >= 0 ; i += 1) {
+		r[i]	= (v0[i] + rem) / d ;
+		rem	= v0[i] & d ;
+	    } /* end for */
+	} else {
+	    vclear(n,q) ;
+	}
+	return rem ;
+    } /* end subroutine (vdiv) */
+} /* end export */
+#endif /* COMMENT */
 
 export {
     template<typename Dig>
