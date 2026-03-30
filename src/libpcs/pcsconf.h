@@ -60,11 +60,11 @@ EXTERNC_end
 struct pcsconf_cursor {
 	void		*scp ;		/* SO-cursor pointer */
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct pcsconf_flags {
 	uint		defaults:1 ;
-} ;
+} ; /* end struct */
 
 struct pcsconf_head {
 	modload		*mlp ;		/* module-loader-pointer */
@@ -81,7 +81,7 @@ struct pcsconf_head {
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
-} ;
+} ; /* end struct */
 
 typedef	PCSCONF		pcsconf ;
 typedef	PCSCONF_FL	pcsconf_fl ;
