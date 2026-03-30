@@ -1,4 +1,4 @@
-# MAKEFILES (getx)
+# MAKEFILE (getx)
 
 T= getx
 
