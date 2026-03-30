@@ -1,11 +1,11 @@
-/* pcsdialuucp */
+/* pcsdialuucp SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* send a FD over to another host using UUCP */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -21,48 +21,47 @@
 
 /*******************************************************************************
 
-	Synopsis:
+  	Name:
+	pcsdialuucp
 
-	int pcsdialuucp(pr,nodename,filepath)
-	char	pr[] ;
-	char	nodename[]
-	char	filepath[] ;
+	Description:
+
+	Synopsis:
+	int pcsdialuucp(cchar *pr,cchar *nodename,cchar *filepath) noex
 
 	Arguments:
-
 	pr		programroot (if available)
 	nodename	nodename of target machine
 	filepath	filepath on the target machine
 
 	Returns:
-
 	>=0		file descriptor to write to target machine
 	<0		error
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<sys/wait.h>
 #include	<netinet/in.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<netdb.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<sbuf.h>
 #include	<vecstr.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
+
+#include	"pcsdialuucp.h"
 
 
 /* local defines */
@@ -89,22 +88,9 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
-
-extern char	*strshrink(char *) ;
-extern char	*strbasename(char *) ;
 
 
 /* external variables */
@@ -117,14 +103,14 @@ extern char	**environ ;
 
 /* forward reference */
 
-static int	findprogname(const char *,char *,const char *) ;
-static int	testuucp(const char *,const char *) ;
+static int	findprogname(cchar *,char *,cchar *) ;
+static int	testuucp(cchar *,cchar *) ;
 static int	waitpidtimed(pid_t,int *) ;
 
 
 /* local variablies */
 
-static const char	*goodenvs[] = {
+constexpr cpcchar	goodenvs[] = {
 	"MAIL",
 	"NAME",
 	"FULLNAME",
@@ -138,18 +124,16 @@ static const char	*goodenvs[] = {
 	"LOCAL",
 	"NCMP",
 	"PCS",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int pcsdialuucp(pr,uuhost,filename)
-const char	pr[] ;
-const char	uuhost[] ;
-const char	filename[] ;
-{
+int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	pid_t		pid ;
 	mode_t		mkmode ;
 	int		rs = SR_OK ;
@@ -157,8 +141,8 @@ const char	filename[] ;
 	int		i ;
 	int		child_stat = 0 ;
 	int		pfd = -1 ;
-	const char	*varpcs = VARPRPCS ;
-	const char	*proguucp = PROG_UUCP ;
+	cchar	*varpcs = VARPRPCS ;
+	cchar	*proguucp = PROG_UUCP ;
 	char		progfname[MAXPATHLEN + 2] ;
 	char		pfname[MAXPATHLEN + 2] ;
 	char		dst[DSTLEN + 2] ;
@@ -169,7 +153,7 @@ const char	filename[] ;
 
 /* check for bad input */
 
-	if ((uuhost == NULL) || (filename == NULL))
+	if ((uuhost == nullptr) || (filename == nullptr))
 	    return SR_FAULT ;
 
 	pfname[0] = '\0' ;
@@ -181,13 +165,13 @@ const char	filename[] ;
 
 /* try to get a program root if we do not already have one */
 
-	if ((pr == NULL) || (pr[0] == '\0'))
+	if ((pr == nullptr) || (pr[0] == '\0'))
 	    pr = getenv(varpcs) ;
 
-	if ((pr == NULL) || (pr[0] == '\0'))
+	if ((pr == nullptr) || (pr[0] == '\0'))
 	    pr = PCS ;
 
-	if (perm(pr,-1,-1,NULL,X_OK | R_OK) < 0) {
+	if (perm(pr,-1,-1,nullptr,X_OK | R_OK) < 0) {
 
 	    rs = SR_PROTO ;
 	    goto bad0 ;
@@ -252,13 +236,9 @@ const char	filename[] ;
 	    goto badfork ;
 
 	if (rs == 0) {
-
 	    vecstr	args, envs ;
-
 	    int		fd ;
-
 	    char	*arg0 ;
-
 
 #if	CF_DEBUGS
 	    debugprintf("uucp: inside fork\n") ;
@@ -304,13 +284,13 @@ const char	filename[] ;
 	    debugprintf("pcsdialuucp: environment\n") ;
 #endif
 
-	    if (environ != NULL) {
+	    if (environ != nullptr) {
 
 #if	CF_DEBUGS
 	        debugprintf("pcsdialuucp: got some\n") ;
 #endif
 
-	        for (i = 0 ; environ[i] != NULL ; i += 1) {
+	        for (i = 0 ; environ[i] != nullptr ; i += 1) {
 
 #if	CF_DEBUGS && 0
 	            debugprintf("pcsdialuucp: E> %s\n",environ[i]) ;
@@ -321,7 +301,7 @@ const char	filename[] ;
 
 	        } /* end for */
 
-	        if (vecstr_finder(&envs,varpcs,vstrkeycmp,NULL) < 0)
+	        if (vecstr_finder(&envs,varpcs,vstrkeycmp,nullptr) < 0)
 	            vecstr_envadd(&envs,varpcs,pr,-1) ;
 
 	    } else
@@ -330,8 +310,8 @@ const char	filename[] ;
 /* do the exec */
 
 	    {
-		const char	**eav = (const char **) args.va ;
-		const char	**eev = (const char **) envs.va ;
+		cchar	**eav = (cchar **) args.va ;
+		cchar	**eev = (cchar **) envs.va ;
 	        u_execve(progfname,eav,eev) ;
 	    }
 
@@ -396,8 +376,8 @@ bad0:
 
 /* check for UUCP availability */
 static int testuucp(pr,uunode)
-const char	pr[] ;
-const char	uunode[] ;
+cchar	pr[] ;
+cchar	uunode[] ;
 {
 	bfile	file0, file2 ;
 	bfile	procfile, *pfp = &procfile ;
@@ -410,7 +390,7 @@ const char	uunode[] ;
 	int	len, sl ;
 	int	child_stat ;
 
-	const char	*progname = PROG_UUNAME ;
+	cchar	*progname = PROG_UUNAME ;
 
 	char	progfname[MAXPATHLEN + 2] ;
 	char	buf[NODENAMELEN + 1] ;
@@ -421,7 +401,7 @@ const char	uunode[] ;
 	debugprintf("testuucp: ent\n") ;
 #endif
 
-	if ((uunode == NULL) || (uunode[0] == '\0'))
+	if ((uunode == nullptr) || (uunode[0] == '\0'))
 	    return SR_HOSTUNREACH ;
 
 #if	CF_DEBUGS
@@ -454,7 +434,7 @@ const char	uunode[] ;
 
 	    i = strlen(uunode) ;
 
-	    if ((cp = strchr(uunode,'.')) != NULL)
+	    if ((cp = strchr(uunode,'.')) != nullptr)
 	        i = cp - uunode ;
 
 	    rs = SR_HOSTUNREACH ;
@@ -501,9 +481,9 @@ ret0:
 
 
 static int findprogname(pr,progfname,pn)
-const char	pr[] ;
+cchar	pr[] ;
 char		progfname[] ;
-const char	pn[] ;
+cchar	pn[] ;
 {
 	int	rs ;
 	int	len = 0 ;
@@ -518,14 +498,14 @@ const char	pn[] ;
 	}
 
 	if (rs >= 0) 
-	    rs = perm(progfname,-1,-1,NULL,X_OK) ;
+	    rs = perm(progfname,-1,-1,nullptr,X_OK) ;
 
 	if ((rs == SR_NOENT) || (rs == SR_ACCESS)) {
 
 	    rs = mkpath3(progfname,pr,"bin",pn) ;
 	    len = rs ;
 	    if (rs >= 0)
-	        rs = perm(progfname,-1,-1,NULL,X_OK) ;
+	        rs = perm(progfname,-1,-1,nullptr,X_OK) ;
 
 	} /* end if */
 
