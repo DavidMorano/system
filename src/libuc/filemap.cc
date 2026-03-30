@@ -36,20 +36,23 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<sysval.hh>
 #include	<localmisc.h>
 
 #include	"filemap.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -59,6 +62,12 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */
@@ -70,22 +79,21 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int filemap_ctor(filemap *op,Args ... args) noex {
+local int filemap_ctor(filemap *op,Args ... args) noex {
     	FILEMAP		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->stbp = new(nothrow) ustat) != np) {
+	    if ((op->stbp = new(nothrow) ustat) != np) ylikely {
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filemap_ctor) */
+} /* end subroutine (filemap_ctor) */
 
-static int filemap_dtor(filemap *op) noex {
+local int filemap_dtor(filemap *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -95,16 +103,15 @@ static int filemap_dtor(filemap *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filemap_dtor) */
+} /* end subroutine (filemap_dtor) */
 
-static int filemap_opener(filemap *,cchar *) noex ;
-static int filemap_openmap(filemap *,int,size_t) noex ;
+local int filemap_opener(filemap *,cchar *) noex ;
+local int filemap_openmap(filemap *,int,size_t) noex ;
 
 
 /* local variables */
 
-static sysval		pagesize(sysval_ps) ;
+static sysval		pagesz(sysval_ps) ;
 
 
 /* exported variables */
@@ -241,7 +248,7 @@ int filemap_seek(filemap *op,off_t off,int w) noex {
 	            if (noff < 0) {
 	                rs = SR_INVALID ;
 	            } else {
-			off_t	moff = off_t(op->mapsize) ;
+			coff	moff = off_t(op->mapsize) ;
 			if (noff > moff) {
 	                    noff = moff ;
 			}
@@ -284,7 +291,7 @@ int filemap_rewind(filemap *op) noex {
 
 /* local subroutines */
 
-static int filemap_opener(filemap *op,cchar *fn) noex {
+local int filemap_opener(filemap *op,cchar *fn) noex {
 	csize		nmax = op->maxsize ;
 	cint		of = (O_RDONLY | O_CLOEXEC) ;
 	int		rs ;
@@ -309,11 +316,11 @@ static int filemap_opener(filemap *op,cchar *fn) noex {
 }
 /* end subroutine (filemap_opener) */
 
-static int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
+local int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 	cnullptr	np{} ;
 	size_t		ms ;
 	int		rs ;
-	if ((rs = pagesize) >= 0) ylikely {
+	if ((rs = pagesz) >= 0) ylikely {
 	    csize	ps = size_t(rs) ;
 	    cint	mp = PROT_READ ;
 	    cint	mf = MAP_SHARED ;
@@ -330,7 +337,7 @@ static int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 	            u_mmapend(md,ms) ;
 	        }
 	    } /* end if (mmap) */
-	} /* end if (pagesize) */
+	} /* end if (pagesz) */
 	return rs ;
 }
 /* end subroutine (filemap_openmap) */
