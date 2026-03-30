@@ -1,4 +1,4 @@
-# MAKEFILES (hdb)
+# MAKEFILE (hdb)
 
 T= hdb
 
@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= hdb_main.o hdb_obj.o
+OBJ0= hdb_prime.o hdb_obj.o
 OBJ1=
 
 OBJA= obj0.o
@@ -78,6 +78,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -89,6 +92,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	makemodule $(*)
 
 
 $(T).o:			$(OBJ)
@@ -127,7 +133,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-hdb_main.o:		hdb_main.cc		$(INCS)
+hdb_prime.o:		hdb_prime.cc		$(INCS)
 hdb_obj.o:		hdb_obj.cc		$(INCS)
 
 
