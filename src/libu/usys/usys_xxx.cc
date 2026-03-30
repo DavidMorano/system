@@ -32,7 +32,7 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
-#include	<climits>
+#include	<climits>		/* |CHAR_BIT| */
 #include	<cstring>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -175,14 +175,35 @@ namespace usys {
 /* LOADAVGINT end */
 /*----------------------------------------------------------------------------*/
 
-/* this ( |strochr(3c)| ) is the companion subroutine of |strrchr(3c)| */
-#ifndef	SUBROUTINE_STROCHR
-#define	SUBROUTINE_STROCHR
-EXTERNC_begin
-extern char *strochr(cchar *sp,int sch) noex {
-    	return strchr(sp,sch) ;
-}
-EXTERNC_end
-#endif /* SUBROUTINE_STROCHR */
+#ifdef	SUBROUTINE_STRTOI
+extern int	strtoi	(cchar *sp,char **endp,int b) noex { 
+    	int		res = 0 ;
+    	cint nb = (szof(int) * CHAR_BIT) ;
+	if (sp) {
+    	    const long	r = strtol(sp,endp,b) ;
+	    res = intconv(r) ;
+	    if (abs(r) >> nb) {
+	        errno = ERANGE ;
+	    }
+	} else {
+	    errno = EFAULT ;
+	}
+	return res ;
+} /* end subroutine */
+extern uint	strtoui	(cchar *sp,char **endp,int b) noex {
+    	uint		res = 0 ;
+    	cint nb = (szof(uint) * CHAR_BIT) ;
+	if (sp) {
+    	    const ulong	r = strtoul(sp,endp,b) ;
+	    res = uintconv(r) ;
+	    if (r >> nb) {
+	        errno = ERANGE ;
+	    }
+	} else {
+	    errno = EFAULT ;
+	}
+	return res ;
+} /* end subroutine */
+#endif /* SUBROUTINE_STRTOI */
 
 
