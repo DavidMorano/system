@@ -26,7 +26,7 @@
 
 EXTERNC_begin
 
-extern int	pcsmailcheck(cchar *,char *,int,cchar *) noex 
+extern int	pcsmailcheck(cchar *,char *,int,cchar *) noex ;
 
 EXTERNC_end
 
