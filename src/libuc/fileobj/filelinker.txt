@@ -1,6 +1,6 @@
 FILELINKER
 
 This object is used to link files from the current working directory
-(or elsewhere if absolute file-paths are given) to one or more tar
+(or elsewhere if absolute file-paths are given) to one or more target
 directroies.
 
