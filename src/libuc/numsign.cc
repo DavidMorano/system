@@ -20,7 +20,20 @@
 	numsign
 
 	Description:
-	Retrieve the numeric sign of a variable.
+	Retrieve the numeric sign of an integer variable (of various
+	sizes).
+
+	Synopsis:
+	bool numsign(int v) noex
+	bool numsign(long v) noex
+	bool numsign(longlong int v) noex
+
+	Arguments:
+	v	variable to examine
+
+	Returns:
+	false 	sign bit was '0'
+	true	sign but was '1'
 
 *******************************************************************************/
 
