@@ -76,7 +76,7 @@
 #include	<intx.h>
 #include	<timewatch.hh>
 #include	<timecount.hh>
-#include	<timeval.h>
+#include	<timeval.hh>
 #include	<timespec.h>
 #include	<itimerval.h>
 #include	<itimerspec.h>
