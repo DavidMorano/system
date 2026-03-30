@@ -53,21 +53,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<cerrno>
-#include	<ctime>
+#include	<usysnative.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ufcntl.h>		/* for |u_fcntl(3u)| */
 #include	<localmisc.h>
 
-#include	"ufiledesc.h"
+#include	"ufiledescbase.hh"
+#include	"uconnect.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| */
 
@@ -76,17 +74,26 @@ import libutil ;			/* |memclear(3u)| */
 #define	CS		struct connsub
 #define	CS_FL		struct connsub_flags
 
-#define	TO_NOBUFS	(5 * 60)		/* seconds */
-#define	TO_NOSR		(5 * 60)		/* seconds */
-#define	TO_CONNECT	(5 * 60)		/* seconds */
-#define	POLLTIMEOUT	(1 * 1000)		/* milliseconds */
+#define	TO_NOBUFS	(5 * 60)	/* seconds */
+#define	TO_NOSR		(5 * 60)	/* seconds */
+#define	TO_CONNECT	(5 * 60)	/* seconds */
+#define	POLLTIMEOUT	(1 * 1000)	/* milliseconds */
 
 #ifndef	CF_ISCONN
 #define	CF_ISCONN	0		/* change the meaning of ISCONN? */
 #endif
 
 
+/* imported namespaces */
+
+using libu::ufiledescbase ;		/* type */
+
+
 /* external subroutines */
+
+extern "C" {
+    extern int u_poll(POLLFD *,int,int) noex ;
+}
 
 
 /* external variables */
@@ -95,27 +102,27 @@ import libutil ;			/* |memclear(3u)| */
 /* local structures */
 
 struct connsub_flags {
-	unsigned int	checkblock:1 ;
-	unsigned int	nonblock:1 ;
-	unsigned int	ndelay:1 ;
-	unsigned int	blocking:1 ;
-} ;
+	uint	checkblock:1 ;
+	uint	nonblock:1 ;
+	uint	ndelay:1 ;
+	uint	blocking:1 ;
+} ; /* end struct (connsub_flags) */
 
 struct connsub {
 	SOCKADDR	*sap ;
 	CS_FL		fl ;
 	int		sal ;
 	int		fd ;
-} ;
+} ; /* end struct (connsub) */
 
 
 /* forward references */
 
-static int	connsub_start(CS *,int,SOCKADDR *,int) noex ;
-static int	connsub_finish(CS *) noex ;
-static int	connsub_checkblock(CS *) noex ;
-static int	connsub_proc(CS *) noex ;
-static int	connsub_wait(CS *,int) noex ;
+local int	connsub_start(CS *,int,SOCKADDR *,int) noex ;
+local int	connsub_finish(CS *) noex ;
+local int	connsub_checkblock(CS *) noex ;
+local int	connsub_proc(CS *) noex ;
+local int	connsub_wait(CS *,int) noex ;
 
 
 /* local variables */
@@ -149,7 +156,7 @@ int u_connect(int s,cvoid *vsap,int sal) noex {
 
 /* local subroutines */
 
-static int connsub_start(CS *cip,int fd,SOCKADDR *sap,int sal) noex {
+local int connsub_start(CS *cip,int fd,SOCKADDR *sap,int sal) noex {
 	int		rs = SR_FAULT ;
 	if (cip) {
 	    rs = memclear(cip) ;
@@ -161,7 +168,7 @@ static int connsub_start(CS *cip,int fd,SOCKADDR *sap,int sal) noex {
 }
 /* end subroutine (connsub_start) */
 
-static int connsub_finish(CS *cip) noex {
+local int connsub_finish(CS *cip) noex {
 	int		rs = SR_FAULT ;
 	if (cip) {
 	    rs = SR_OK ;
@@ -170,7 +177,7 @@ static int connsub_finish(CS *cip) noex {
 }
 /* end subroutine (connsub_finish) */
 
-static int connsub_checkblock(CS *cip) noex {
+local int connsub_checkblock(CS *cip) noex {
 	int		rs = SR_OK ;
 	if (! cip->fl.checkblock) {
 	    cip->fl.checkblock = true ;
@@ -184,7 +191,7 @@ static int connsub_checkblock(CS *cip) noex {
 }
 /* end subroutine (connsub_checkblock) */
 
-static int connsub_proc(CS *cip) noex {
+local int connsub_proc(CS *cip) noex {
 	cint		sal = cip->sal ;
 	cint		s = cip->fd ;
 	int		rs ;
@@ -264,7 +271,7 @@ static int connsub_proc(CS *cip) noex {
 }
 /* end subroutine (connsub_proc) */
 
-static int connsub_wait(CS *cip,int to) noex {
+local int connsub_wait(CS *cip,int to) noex {
 	POLLFD		fds[2] = {} ;
 	time_t		ti_now = 0 ;
 	time_t		ti_start = time(nullptr) ;
