@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<hdbstr.h>
 #include	<buffer.h>
 
@@ -36,12 +33,12 @@
 
 struct expcook_cursor {
 	hdbstr_cur	*clp ;
-} ;
+} ; /* end struct (expcook_cursor) */
 
 struct expcook_head {
 	hdbstr		*hlp ;
 	uint		magic ;
-} ;
+} ; /* end struct (expcook_head) */
 
 typedef EXPCOOK		expcook ;
 typedef EXPCOOK_CUR	expcook_cur ;
@@ -52,7 +49,7 @@ extern int expcook_start(expcook *) noex ;
 extern int expcook_add(expcook *,cchar *,cchar *,int) noex ;
 extern int expcook_curbegin(expcook *,expcook_cur *) noex ;
 extern int expcook_curend(expcook *,expcook_cur *) noex ;
-extern int expcook_enum(expcook *,expcook_cur *,char *,int) noex ;
+extern int expcook_curenum(expcook *,expcook_cur *,char *,int) noex ;
 extern int expcook_findkey(expcook *,cchar *,int,cchar **) noex ;
 extern int expcook_delkey(expcook *,cchar *) noex ;
 extern int expcook_exp(expcook *,int,char *,int,cchar *,int) noex ;
