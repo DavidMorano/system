@@ -130,6 +130,14 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
+#ifndef	bitand_eq
+#define	bitand_eq		&=
+#define	bitor_eq		|=
+#define	bitxor_eq		^
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 #ifndef	logand
 #define	logand			and
 #endif
@@ -144,6 +152,14 @@
 #ifdef	__cplusplus
 #ifndef	lognot
 #define	lognot			not
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	logand_eq
+#define	logand_eq		&&=
+#define	logor_eq		||=
+#define	logxor_eq		^^=
 #endif
 #endif /* __cplusplus */
 
