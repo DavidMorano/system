@@ -177,7 +177,7 @@ int filegrp_start(FG *op,int nmax,int ttl) noex {
 		        op->ttl = ttl ;
 		        op->ti_check = time(nullptr) ;
 		        op->magic = FILEGRP_MAGIC ;
-	            }
+	            } /* end if (vechand-start) */
 	            if (rs < 0) {
 		        cq_finish(op->flp) ;
 		    }
