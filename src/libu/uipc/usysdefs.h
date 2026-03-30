@@ -193,6 +193,30 @@ enum missingplocks {
 
 /* various limits (that might be missing) */
 
+/* strange ones */
+
+#ifndef	UCHAR_MIN
+#define	UCHAR_MIN	0
+#endif
+
+#ifndef	USHORT_MIN
+#define	USHORT_MIN	0
+#endif
+
+#ifndef	UINT_MIN
+#define	UINT_MIN	0
+#endif
+
+#ifndef	ULONG_MIN
+#define	ULONG_MIN	0
+#endif
+
+#ifndef	ULONGLONG_MIN
+#define	ULONGLONG_MIN	0
+#endif
+
+/* regular ones */
+
 #ifndef	SHORT_MIN
 #ifdef	SHRT_MIN
 #define	SHORT_MIN	SHRT_MIN
