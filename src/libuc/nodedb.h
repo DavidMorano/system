@@ -22,6 +22,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<time.h>		/* |time_t| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 #include	<hdb.h>
 
@@ -38,7 +40,7 @@
 struct nodedb_cursor {
 	hdb_cur		*ecp ;
 	int		i ;
-} ;
+} ; /* end struct (nodedb_cursor) */
 
 struct nodedb_head {
 	vecobj		*filep ;		/* files-pointer */
@@ -47,7 +49,7 @@ struct nodedb_head {
 	uint		magic ;
 	int		cursors ;
 	int		entbuflen ;		/* <- public member */
-} ;
+} ; /* end struct (nodedb_head) */
 
 struct nodedb_entry {
 	cchar		*(*keys)[2] ;
@@ -57,7 +59,7 @@ struct nodedb_entry {
 	int		nkeys ;
 	int		esize ;		/* entry-size */
 	int		fi ;		/* file index */
-} ;
+} ; /* end struct (nodedb_entry) */
 
 typedef NODEDB		nodedb ;
 typedef NODEDB_CUR	nodedb_cur ;
