@@ -1,11 +1,11 @@
-/* pcsinfoset */
+/* pcsinfoset SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* PCS set-information */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -18,10 +18,12 @@
 
 /*******************************************************************************
 
-	Description:
+  	Name:
+	pcsinfoset
 
-	This subroutine sets the PCS names of a user.
-	Two different types of PCS names can be set, along with some other user
+	Description:
+	This subroutine sets the PCS names of a user.  Two different
+	types of PCS names can be set, along with some other user
 	information.  These are:
 
 	0. regular name
@@ -30,16 +32,14 @@
 	3. organization
 
 	Synopsis:
-
 	int pcsinfoset(pr,nbuf,nlen,un,type)
-	const char	*pr ;
-	const char	*nbuf ;
+	cchar	*pr ;
+	cchar	*nbuf ;
 	int		nlen ;
-	const char	*un ;
+	cchar	*un ;
 	int		type ;
 
 	Arguments:
-
 	pr		program root
 	nbuf		caller-supplied name buffer
 	nlen		caller-supplied name buffer length
@@ -47,25 +47,22 @@
 	type		type of name to set: 0=regular, 1=full
 
 	Returns:
-
-	0		OK
+	>=0		OK
 	<0		error
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 
@@ -73,28 +70,6 @@
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	removes(cchar *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -105,34 +80,35 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	rmnames(const char *,const char *) ;
-static int	setnames(const char *,const char *,const char *,int) ;
+local int	rmnames(cchar *,cchar *) noex ;
+local int	setnames(cchar *,cchar *,cchar *,int) noex ;
 
 
 /* local variables */
 
-static const char	*nfnames[] = {
+constexpr cpcchar	nfnames[] = {
 	".name",
 	".fullname",
 	".project",
 	".organization",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int pcsinfoset(cchar *pr,cchar *nbuf,int nlen,cchar *un,int nt)
-{
-	const int	nnt = (nelem(nfnames)-1) ;
+int pcsinfoset(cchar *pr,cchar *nbuf,int nlen,cchar *un,int nt) noex {
+	cint	nnt = (nelem(nfnames)-1) ;
 	int		rs = SR_OK ;
 	int		f_set ;
 	char		uh[MAXPATHLEN+1] ;
 	char		nfname[MAXPATHLEN + 1] ;
 
-	if (pr == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
+	if (un == nullptr) return SR_FAULT ;
 
 	if (un[0] == '\0') return SR_INVALID ;
 	if ((nt < 0) || (nt > nnt)) return SR_DOM ;
@@ -143,7 +119,7 @@ int pcsinfoset(cchar *pr,cchar *nbuf,int nlen,cchar *un,int nt)
 
 	if (rs >= 0) {
 
-	    f_set = ((nbuf != NULL) && (nbuf[0] != '*')) ;
+	    f_set = ((nbuf != nullptr) && (nbuf[0] != '*')) ;
 	    if (f_set) {
 	        rs = setnames(pr,nfname,nbuf,nlen) ;
 	    } else
@@ -159,13 +135,13 @@ int pcsinfoset(cchar *pr,cchar *nbuf,int nlen,cchar *un,int nt)
 /* local subroutines */
 
 
-static int rmnames(cchar *pr,cchar *nfname)
+local int rmnames(cchar *pr,cchar *nfname)
 {
 	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pr == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	rs1 = u_stat(nfname,&sb) ;
 
@@ -181,29 +157,27 @@ static int rmnames(cchar *pr,cchar *nfname)
 }
 /* end subroutine (rmnames) */
 
-
-static int setnames(cchar *pr,cchar *nfname,cchar *nbuf,int nlen)
-{
-	const mode_t	om = 0664 ;
-	const int	of = (O_CREAT|O_TRUNC|O_WRONLY) ;
-	const int	to = -1 ;
+local int setnames(cchar *pr,cchar *nfname,cchar *nbuf,int nlen) noex {
+	cmode	om = 0664 ;
+	cint	of = (O_CREAT|O_TRUNC|O_WRONLY) ;
+	cint	to = -1 ;
 	int		rs ;
 	int		size ;
 	char		*p ;
 
-	if (pr == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (nlen < 0) nlen = strlen(nbuf) ;
 
 	size = (nlen+2) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    const char	*np = (const char *) p ;
+	    cchar	*np = (cchar *) p ;
 	    char	*bp = (char *) p ;
 
 	    if ((rs = sncpy2(bp,(size-1),nbuf,"\n")) >= 0) {
 	        int	nl = rs ;
 	        if ((rs = uc_opene(nfname,of,om,to)) >= 0) {
-	            const int	fd = rs ;
+	            cint	fd = rs ;
 	            if ((rs = u_write(fd,np,nl)) >= 0) {
 	                rs = uc_fminmod(fd,0644) ;
 		    }
