@@ -55,8 +55,6 @@
 
 using namespace	uipc ;			/* namespace */
 
-using std::nullptr_t ;			/* type */
-
 
 /* local typedefs */
 
