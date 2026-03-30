@@ -228,7 +228,6 @@ local int lockto(int fd,FLOCK *flp,int to) noex {
 	    rs = msleep(1) ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (lockto) */
+} /* end subroutine (lockto) */
 
 
