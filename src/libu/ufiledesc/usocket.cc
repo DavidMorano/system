@@ -93,14 +93,13 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<intsat.h>
 #include	<localmisc.h>
 
-#include	"ufiledesc.h"
+#include	"ufiledescbase.hh"
+#include	"usocket.h"
 
 
 /* local defines */
@@ -110,10 +109,10 @@
 
 /* imported namespaces */
 
-using namespace	ufiledesc ;		/* namespace */
 using namespace	usys ;			/* namespace */
 
 using std::nullptr_t ;			/* type */
+using libu::ufiledescbase ;		/* type */
 
 
 /* local typedefs */
@@ -127,7 +126,7 @@ using std::nullptr_t ;			/* type */
 
 /* local structures */
 
-constexpr nullptr_t		np{} ;
+const nullptr_t		np{} ;		/* needed file-scope */
 
 namespace {
     struct usocket ;
