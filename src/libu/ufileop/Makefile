@@ -1,4 +1,4 @@
-# MAKEFILES (ufileop)
+# MAKEFILE (ufileop)
 
 T= ufileop
 
@@ -33,24 +33,27 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += ufileop.h
+INCS += ufileop.h ufileopbase.hh
 
 MODS += libutil.ccm
 
 LIBS +=
 
 
-OBJA_UFILEOP= ufileopbase.o ufiler.o
-OBJB_UFILEOP= uutime.o uutimes.o
-OBJC_UFILEOP= urmdirs.o urealpath.o
+OBJ0= ufileopbase.o
+OBJ1= ufiler.o urealpath.o
+OBJ2= ufiletimes.o
+OBJ3= 
 
-OBJ_UFILEOP= obja_ufileop.o objb_ufileop.o objc_ufileop.o
+OBJA= obj0.o obj1.o obj2.o
+OBJB=
+
+OBJ= obja.o
 
 
 INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,8 +99,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_UFILEOP)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_UFILEOP)
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -112,21 +115,29 @@ control:
 	(uname -n ; date) > Control
 
 
-obja_ufileop.o:		$(OBJA_UFILEOP)
+obj0.o:			$(OBJ0)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb_ufileop.o:		$(OBJB_UFILEOP)
+obj1.o:			$(OBJ1)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objc_ufileop.o:		$(OBJC_UFILEOP)
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ufileopbase.o:		ufileopbase.cc			$(INCS)
-ufiler.o:		ufiler.cc			$(INCS)
-uutime.o:		uutime.cc 			$(INCS)
-uutimes.o:		uutimes.cc 			$(INCS)
-urmdirs.o:		urmdirs.cc urmdirs.h		$(INCS)
-urealpath.o:		urealpath.cc			$(INCS)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+ufileopbase.o:		ufileopbase.cc	ufileopbase.hh	$(INCS)
+ufiler.o:		ufiler.cc	ufiler.h	$(INCS)
+urealpath.o:		urealpath.cc	urealpath.h	$(INCS)
+ufiletimes.o:		ufiletimes.cc	ufiletimes.h	$(INCS)
 
 
