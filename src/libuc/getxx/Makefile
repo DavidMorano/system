@@ -1,4 +1,4 @@
-# MAKEFILES (getxx)
+# MAKEFILE (getxx)
 
 T= getxx
 
@@ -31,30 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= getxx.h
+INCS += getxx.h
 
 MODS +=
 
-LIBS=
-
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_GETXX= getho.o getax.o
@@ -68,7 +51,22 @@ OBJB_GETXX= obj2_getxx.o obj3_getxx.o
 OBJ_GETXX= $(OBJA_GETXX) $(OBJB_GETXX)
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -81,6 +79,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -101,13 +102,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_GETXX)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_GETXX)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -119,16 +115,16 @@ control:
 	(uname -n ; date) > Control
 
 obj0_getxx.o:	$(OBJ0_GETXX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_getxx.o:	$(OBJ1_GETXX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_getxx.o:	$(OBJ2_GETXX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_getxx.o:	$(OBJ3_GETXX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 getax.o:		getax.cc getax.h $(INCS)
