@@ -42,11 +42,16 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<dirent.h>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 
-#include	"ufiledesc.h"
+#include	"ufiledescbase.hh"
+#include	"ugetdents.h"
 
 
 /* local defines */
@@ -54,10 +59,9 @@
 
 /* imported namespaces */
 
-using namespace	ufiledesc ;		/* namespace */
 using namespace usys ;			/* namespace */
 
-using std::nullptr_t ;			/* type */
+using libu::ufiledescbase ;		/* type */
 
 
 /* local typedefs */
@@ -78,7 +82,7 @@ namespace {
 	udirop_m	m ;
 	void		*dbuf ;
 	int		dlen ;
-	udirop(udirop_m mem,void *b,int l) noex : m(mem) { 
+	udirop(udirop_m µm,void *b,int l) noex : m(µm) { 
 	    dbuf = b ;
 	    dlen = l ;
 	} ;
@@ -89,9 +93,9 @@ namespace {
 	    }
 	    return rs ;
 	} ;
-	int igetdents(int) noex ;
+	sysret_t igetdents(int) noex ;
     } ; /* end struct (udirop) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -121,7 +125,7 @@ int u_getdents(int fd,void *dbuf,int dlen) noex {
 
 /* local subroutines */
 
-int udirop::igetdents(int fd) noex {
+sysret_t udirop::igetdents(int fd) noex {
 	return ugetdents(fd,dbuf,dlen) ;
 }
 
