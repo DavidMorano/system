@@ -44,7 +44,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<hdbstr.h>
 #include	<sbuf.h>
 #include	<buffer.h>
@@ -55,9 +56,9 @@
 
 #include	"expcook.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;		/* |lenstr(3u)| */
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -80,13 +81,13 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static inline int expcook_ctor(EX *op) noex {
+local inline int expcook_ctor(EX *op) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    if ((op->hlp = new(nothrow) hdbstr) != np) {
+	    if ((op->hlp = new(nothrow) hdbstr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-hdbstr) */
 	} /* end if (non-null) */
@@ -94,31 +95,29 @@ static inline int expcook_ctor(EX *op) noex {
 }
 /* end subroutine (expcook_ctor) */
 
-static int expcook_dtor(EX *op) noex {
+local int expcook_dtor(EX *op) noex {
 	int		rs = SR_OK ;
-	if (op->hlp) {
+	if (op->hlp) ylikely {
 	    delete op->hlp ;
 	    op->hlp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (expcook_dtor) */
+} /* end subroutine (expcook_dtor) */
 
 template<typename ... Args>
-static inline int expcook_magic(EX *op,Args ... args) noex {
+local inline int expcook_magic(EX *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == EXPCOOK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (expcook_magic) */
+} /* end subroutine (expcook_magic) */
 
-static int	expcook_prockey(EX *,int,buffer *,cchar *,int) noex ;
+local int	expcook_prockey(EX *,int,buffer *,cchar *,int) noex ;
 
-static int	buffer_keydef(buffer *,int,cchar *,int) noex ;
+local int	buffer_keydef(buffer *,int,cchar *,int) noex ;
 
-static int	mkcomp(char *,int,cchar *,int,cchar *,int) noex ;
+local int	mkcomp(char *,int,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -131,11 +130,11 @@ static int	mkcomp(char *,int,cchar *,int,cchar *,int) noex ;
 
 int expcook_start(EX *op) noex {
 	int		rs ;
-	if ((rs = expcook_ctor(op)) >= 0) {
+	if ((rs = expcook_ctor(op)) >= 0) ylikely {
 	    hdbstr	*slp = op->hlp ;
 	    cint	ne = 10 ;
 	    op->magic = 0 ;
-	    if ((rs = slp->start(ne)) >= 0) {
+	    if ((rs = slp->start(ne)) >= 0) ylikely {
 	        op->magic = EXPCOOK_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -149,9 +148,8 @@ int expcook_start(EX *op) noex {
 int expcook_finish(EX *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = expcook_magic(op)) >= 0) {
-	    {
-	        hdbstr	*slp = op->hlp ;
+	if ((rs = expcook_magic(op)) >= 0) ylikely {
+	    if (hdbstr	*slp = op->hlp ; op->hlp) ylikely {
 		rs1 = slp->finish ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -168,7 +166,7 @@ int expcook_finish(EX *op) noex {
 int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = expcook_magic(op,kbuf)) >= 0) {
+	if ((rs = expcook_magic(op,kbuf)) >= 0) ylikely {
 	    hdbstr	*slp = op->hlp ;
 	    cint	kl = lenstr(kbuf) ;
 	    if ((rs = slp->fetch(kbuf,kl,np,np)) >= 0) {
@@ -187,9 +185,9 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = expcook_magic(op,curp)) >= 0) {
+	if ((rs = expcook_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((curp->clp = new(nothrow) hdbstr_cur) != np) {
+	    if ((curp->clp = new(nothrow) hdbstr_cur) != np) ylikely {
 	        hdbstr	*slp = op->hlp ;
 	        rs = slp->curbegin(curp->clp) ;
 		if (rs < 0) {
@@ -205,7 +203,7 @@ int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 int expcook_curend(EX *op,expcook_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = expcook_magic(op,curp)) >= 0) {
+	if ((rs = expcook_magic(op,curp)) >= 0) ylikely {
 	    {
 	        hdbstr	*slp = op->hlp ;
 	        rs1 = slp->curend(curp->clp) ;
@@ -220,15 +218,15 @@ int expcook_curend(EX *op,expcook_cur *curp) noex {
 }
 /* end subroutine (expcook_curend) */
 
-int expcook_enum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
+int expcook_curenum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		bl = 0 ;
-	if ((rs = expcook_magic(op,curp,rbuf)) >= 0) {
+	if ((rs = expcook_magic(op,curp,rbuf)) >= 0) ylikely {
 	    hdbstr	*slp = op->hlp ;
 	    int		vl{} ;
 	    cchar	*kp{} ;
 	    cchar	*vp{} ;
-	    if ((rs = slp->curenum(curp->clp,&kp,&vp,&vl)) >= 0) {
+	    if ((rs = slp->curenum(curp->clp,&kp,&vp,&vl)) >= 0) ylikely {
 	        cint	kl = rs ;
 	        rs = mkcomp(rbuf,rlen,kp,kl,vp,vl) ;
 	        bl = rs ;
@@ -236,11 +234,11 @@ int expcook_enum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? bl : rs ;
 }
-/* end subroutine (expcook_enum) */
+/* end subroutine (expcook_curenum) */
 
 int expcook_findkey(EX *op,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = expcook_magic(op,kp,rpp)) >= 0) {
+	if ((rs = expcook_magic(op,kp,rpp)) >= 0) ylikely {
 	    hdbstr	*slp = op->hlp ;
 	    rs = slp->fetch(kp,kl,nullptr,rpp) ;
 	} /* end if (magic) */
@@ -262,12 +260,12 @@ int expcook_exp(EX *op,int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		bl = 0 ;
-	if ((rs = expcook_magic(op,rbuf,sp)) >= 0) {
+	if ((rs = expcook_magic(op,rbuf,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rbuf[0] = '\0' ;
 	    if (rlen > 0) {
-	        if (buffer bo ; (rs = bo.start(rlen)) >= 0) {
-	            if ((rs = expcook_expbuf(op,wch,&bo,sp,sl)) >= 0) {
+	        if (buffer bo ; (rs = bo.start(rlen)) >= 0) ylikely {
+	            if ((rs = expcook_expbuf(op,wch,&bo,sp,sl)) >= 0) ylikely {
 	                bl = rs ;
 		        if (cchar *bp{} ; (rs = bo.get(&bp)) >= 0) {
 	                    if (bp) {
@@ -287,13 +285,14 @@ int expcook_exp(EX *op,int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 /* end subroutine (expcook_exp) */
 
 int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = expcook_magic(op,bufp,sp)) >= 0) {
+	if ((rs = expcook_magic(op,bufp,sp)) >= 0) ylikely {
 	    cint	sch = '%' ;
 	    cchar	*ss = "{}" ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    for (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr ; ) {
+	    for (cchar *tp ; (tp = strnchr(sp,sl,sch)) != np ; ) ylikely {
 		cint tl = intconv(tp - sp) ;
 	        if ((rs = bufp->strw(sp,tl)) >= 0) {
 	            int		kl = -1 ;
@@ -310,7 +309,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	                } else if (sp[0] == ss[0]) {
 	                    sl -= 1 ;
 	                    sp += 1 ;
-	                    if ((tp = strnchr(sp,sl,ss[1])) != nullptr) {
+	                    if ((tp = strnchr(sp,sl,ss[1])) != np) {
 	                        kp = sp ;
 	                        kl = intconv(tp - sp) ;
 	                        sl -= intconv((tp + 1) - sp) ;
@@ -351,13 +350,14 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 
 /* private subroutines */
 
-static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
+local int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_NOTFOUND ;
 	int		len = 0 ;
 	if (kl < 0) kl = lenstr(kp) ;
-	if (kl > 0) {
+	if (kl > 0) ylikely {
 	    hdbstr	*slp = op->hlp ;
-	    if (cchar *vp{} ; (rs = slp->fetch(kp,kl,nullptr,&vp)) >= 0) {
+	    if (cchar *vp{} ; (rs = slp->fetch(kp,kl,np,&vp)) >= 0) {
 	        cint	vl = rs ;
 	        if (vl > 0) {
 	            rs = bufp->strw(vp,vl) ;
@@ -376,12 +376,12 @@ static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
 }
 /* end subroutine (expcook_prockey) */
 
-static int buffer_keydef(buffer *bufp,int wch,cchar *kp,int kl) noex {
+local int buffer_keydef(buffer *bufp,int wch,cchar *kp,int kl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = bufp->chr(wch)) >= 0) {
+	if ((rs = bufp->chr(wch)) >= 0) ylikely {
 	    len = rs ;
-	    if ((rs = bufp->strw(kp,kl)) >= 0) {
+	    if ((rs = bufp->strw(kp,kl)) >= 0) ylikely {
 		len += rs ;
 	        rs = bufp->chr(wch) ;
 		len += rs ;
@@ -391,11 +391,11 @@ static int buffer_keydef(buffer *bufp,int wch,cchar *kp,int kl) noex {
 }
 /* end subroutine (buffer_keydef) */
 
-static int mkcomp(char *rp,int rl,cchar *kp,int kl,cchar *vp,int vl) noex {
+local int mkcomp(char *rp,int rl,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (rp && kp) {
-	    if (sbuf b ; (rs = b.start(rp,rl)) >= 0) {
+	if (rp && kp) ylikely {
+	    if (sbuf b ; (rs = b.start(rp,rl)) >= 0) ylikely {
 	        {
 	            if (rs >= 0) rs = b.strw(kp,kl) ;
 	            if (rs >= 0) rs = b.chr('=') ;
