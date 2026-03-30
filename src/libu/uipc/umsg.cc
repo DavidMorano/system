@@ -33,7 +33,12 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
@@ -44,8 +49,6 @@
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
