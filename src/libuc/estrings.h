@@ -21,24 +21,23 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
+#include	<snx.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 
 #include	<strcpyx.h>
-#include	<strwcpyx.h>
-#include	<strdcpyx.h>
+#include	<strwcpy.h>
+#include	<strdcpy.h>
 #include	<strn.h>
+#include	<strx.h>
 
-#include	<stpcpyxc.h>
-#include	<stpncpyxc.h>
-
+#include	<stp.h>
 #include	<sfx.h>
 #include	<six.h>
+
+#include	<mkx.h>
 #include	<mkpathx.h>
 #include	<mknpathx.h>
 #include	<mkfnamesuf.h>
