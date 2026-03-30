@@ -67,7 +67,7 @@ OBJ15= usysop.o vecbool.o uchartype.o
 
 OBJ16= syswords.o varnames.o
 OBJ17= ptx.o uacceptpass.o 
-OBJ18= timeval.o itimerval.o clockids.o
+OBJ18= timeval.o itimerval.o 
 OBJ19= timespec.o itimerspec.o
 
 OBJ20= uinet.o ustream.o
@@ -81,7 +81,7 @@ OBJ26= ustd.o
 OBJ27= ucomposite.o
 
 OBJ28= findbit.o ccfile.o readln.o
-OBJ29= itimers.o filetypes.o
+OBJ29= clockids.o itimers.o filetypes.o funcodes.o 
 OBJ30= binchunk.o
 OBJ31= dprintf.o
 
@@ -320,10 +320,10 @@ timewatch.o:		timewatch.cc	timewatch.hh		$(INCS)
 timecount.o:		timecount.cc	timecount.hh		$(INCS)
 aflag.o:		aflag.cc	aflag.hh		$(INCS)
 errtimer.o:		errtimer.cc	errtimer.hh		$(INCS)
-timeval.o:		timeval.cc	timeval.h		$(INCS)
+timeval.o:		timeval.cc	timeval.hh		$(INCS)
 itimerval.o:		itimerval.cc	itimerval.h		$(INCS)
-timespec.o:		timespec.cc timespec.h			$(INCS)
-itimerspec.o:		itimerspec.cc itimerspec.h		$(INCS)
+timespec.o:		timespec.cc	timespec.h		$(INCS)
+itimerspec.o:		itimerspec.cc	itimerspec.h		$(INCS)
 
 # SUPPORT helpers
 usysflag.o:		usysflag.cc	usysflag.h		$(INCS)
@@ -495,13 +495,15 @@ stdfnames.o:		stdfnames.c stdfnames.h		$(INCS)
 mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
 
 # IDS of-various-sorts
-filetypes.o:		filetypes.cc	filetypes.h	$(INCS)
 clockids.o:		clockids.cc	clockids.hh	$(INCS)
 itimers.o:		itimers.cc	itimers.hh	$(INCS)
+filetypes.o:		filetypes.cc	filetypes.h	$(INCS)
+funcodes.o:		funcodes.cc	funcodes.h	$(INCS)
 
 # STRING handling
-strtox.o:		strtox.cc strtox.h		$(INCS)
-strnul.o:		strnul.cc strnul.hh		$(INCS)
+strtox.o:		strtox.cc	strtox.h	$(INCS)
+strnul.o:		strnul.cc	strnul.hh	$(INCS)
+ischx.o:		ischx.cc	ischx.hh	$(INCS)
 
 # misc-groups
 baops.o:		baops.c		baops.h		$(INCS)
@@ -514,5 +516,10 @@ stdclib.o:		stdclib.cc	stdclib.hh	$(INCS)
 ccfile.o:		ccfile.cc	ccfile.hh	$(INCS)
 readln.o:		readln.cc	readln.hh	$(INCS)
 dprintf.o:		dprintf.cc	dprintf.hh	$(INCS)
+
+# ARITHMETIC
+intext.o:		intext.ccm	varithmetic.o
+varithmetic.o:		varithmetic.ccm	muldigs.o
+muldigs.o:		muldigs.ccm
 
 
