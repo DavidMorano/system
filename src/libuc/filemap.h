@@ -31,8 +31,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* |off_t| */
-#include	<usystem.h>		/* for |ustat| */
+#include	<clanguage.h>
+#include	<usysbase.h>		/* |ustat| */
 
 
 #define	FILEMAP		struct filemap_head
@@ -41,7 +41,7 @@
 struct filemap_head {
 	cchar		*bp ;
 	void		*mapdata ;
-	ustat		*stbp ;		/* requires 'usystem.h' */
+	ustat		*stbp ;
 	size_t		mapsize ;
 	size_t		maxsize ;
 } ;
