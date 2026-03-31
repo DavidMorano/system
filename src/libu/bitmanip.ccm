@@ -21,16 +21,25 @@ module ;
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>
 #include	<cstdlib>
+#include	<cstdint>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<stdintx.h>
 #include	<localmisc.h>
 
 export module bitmanip ;
 
 /* local defines */
+
+
+/* exported variables */
+
+export {
+    template<typename T>
+    constexpr int nbits = (szof(T) * CHAR_BIT)  ;
+} /* end export */
 
 
 /* exported subroutines */
