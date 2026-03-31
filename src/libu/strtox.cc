@@ -5,49 +5,21 @@
 /* conversion of a decimal c-string to the type |longlong| */
 /* version %I% last-modified %G% */
 
-
-/*	$OpenBSD: strtol.c,v 1.7 2005/08/08 08:05:37 espie Exp $ */
-
-/*-
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
+#define	CF_DEBUG	0		/* debuging */
 
 /* revision history:
 
-	= 2005-10-02, David A­D­ Morano
-	I adapted some existing prior code (from OpenBSD) to provide
-	the |{x}longlong| type versions.  The goal here was to
-	provide versions for 128-bit integers in the same form
-	(function signatures) as the existing UNIX-oriented
-	string-conversion subroutines (which supported smaller sized
-	integers).  But code like this (but with different function
-	signatures) was previously written in assembly language in
-	decades past.
+	= 1998-09-03, David A­D­ Morano
+	This code was written to provide string-to-integer conversions
+	in the style (similar function signatiures and semantics)
+	of the existing UNIX® standard-C library subroutines like
+	|strtol(3c)| and |strtoul(3c)|.  But the idea was to provide
+	subroutines that can perform 128-bit (and larger) conversions
+	for the types |{x}longlong| (signed and unsigned).  This
+	code is partially modeled after some very old previous
+	subroutines that I wrote first in assembly and then in C
+	language.  See my description below for more on why I wrote
+	these subroutines here.
 
 	= 2020-05-24, David A­D­ Morano
 	I added some code to make constant-expression compile-time
@@ -55,22 +27,121 @@
 
 */
 
-/* Copyright © 2005,2020 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
   	Group:
 	strto{x}
 
+	Names:
+	strtoxi
+	strtoxui
+	strtoxl
+	strtoxul
+	strtoxll
+	strtoxull
+
+	Synopsis:
+	{x} strtox{x}(cchar *sp,char **endp,int base) noex
+
+	Arguments:
+	{x}		one of: i, l, ll
+	sp		c-string to convert
+	endp		returned pointer last character considered
+	base		base to convert, 2-36
+
+	Returns:
+	typeof({x})	resulting value in destired integer type
+	errno		set on error (UNIX® error number)
+
 	Description:
 	This code converts a c-string of decimal digits into the
-	integer type |longlong|.  It is obviously a derivative work
-	of the original |strtol(3c)| from the Berkley BSD edition
-	of its UNIX® variant.  Ant locale information is ignored.
+	integer types |longlong| and |ulonglong|.  The API and
+	semantics of this code is intentionally moduled after the
+	API and semantics of the existing UNIX® conversion subroutines
+	|strtol(3c)| and |strtoul(3c)|.  See the notes below for
+	more information on the necessity for these.
 
 	Notes:
 	1. This code is limited (by the coding used) to a maximum
 	base of 36.
+
+	Question-Answers:
+
+	Q. Why are you using these old weirdo UNIX® standard
+	C-language library subroutine function signatures?
+
+	A. Because before the CTX subroutines (in the LIBUC) lobrary
+	are available, I need some local subroutines (here within
+	the LIBU library) to perform some of these conversions.
+	Although |strtol(3c)| and |strtoul(3c)| are generally
+	available across all UNIXi implementation (and are called
+	directly below for much of the provided interfaces), the
+	standard C-language library does not supply any of: |strtoi|,
+	|strtoui|, |strtoll|, |strtoull|, |strtoim| or |strtouim|.
+	I leverage the fact that |strtol| and |strtou| were already
+	written to provide conversion for types smaller than a
+	|long| and |ulong|.  But for the integers sized larger than
+	that (128-bit and larger), I had to write compatible (similar
+	function signature and semantic) subroutines from scratch,
+	since there are no simple standard lirbary calls that are
+	avilable in regular C-language that could be used.
+
+	Q. Are subroutine converters availble now for 256-bit and
+	512-bit integers?
+
+	A. No.  I kind-of think they are not needed here (in LIBU)
+	because there are currently no required use cases for
+	integers larger than 128-bit.  Larger integers are used
+	after LIBUC is loaded and there the CTX and CFX subroutines
+	provide for the larger integer types (also up to 128-bit
+	but beyond also).
+
+	Q. Why are the names of these subroutine prefixed with |strtox|
+	rather than simply |strto| like the standard C-language
+	subroutine are?  
+	
+	A. Because the standard C-language library aready provdes
+	subroutines named |strtoll| and |strtoull|, but they do the
+	wrong thing.  The 'll' postfix in the subroutine name
+	indicates (or is suppoed to indicate) that the 'long long'
+	type is being used.  But the 'long long' type on most systems
+	today is still only 64 bits, where I wanted the 'll' postfix
+	to mean conversion to a 128-bit integer.  Further, I want
+	the postix 'im' or 'imax' to indicate a conversion to a
+	256-bit integer (not yet implemented).
+
+	Q. What is the basic alforithm used below for conversions 
+	(signed and unsigned)?
+
+	A. I use the "cutoff-curlim" alforithm; the same as almost all
+	(known) UNIXi (or POSIXi) uses.
+
+	Q. Do you optimize even-power-of-two bases for faster
+	conversions.
+
+	A. No.  Often (usually), the fastest algorithms (for anything)
+	is not in this library (LIBU) but rather in higher-level
+	libraries (LIBUC and higher).
+
+	Q. Do you provide conversions for intger types smaller than
+	a 32-bit integer?
+
+	A. No.  Use a conversion foe a 32-bit integer and cast the
+	result as you like.
+
+	Q. What number bases are supported?
+
+	A. Bases 2 through 36 are supported (the old standard).
+
+	Q. Have you written enough of thse "number conversion"
+	functions?
+
+	A. Apparently not.  It does seem like writing these are a
+	major part of getting onto a new platorm.  Especially when
+	you have total bare metal and you need to write a new ROM
+	monitor.
 
 *******************************************************************************/
 
@@ -79,21 +150,30 @@
 #include	<climits>		/* |CHAR_BIT| + |strtol(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |strtol(3c)| */
-#include	<cctype>		/* |isalpha(3c)| + |isupper(3c)| */
+#include	<bitset>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
+#include	<dprintf.hh>		/* debugging */
 
 #include	"strtox.h"
 
+import bitmanip ;			/* LIBU bit-manipulations */
+import ischx ;				/* LIBU character classes */
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	1		/* debuging */
+#endif
+
 
 /* imported namespaces */
+
+using std::bitset ;			/* type */
 
 
 /* local typedefs */
@@ -107,41 +187,81 @@
 
 /* local structures */
 
-constexpr uint	maxbase = 36 ;		/* must be classic value */
+constexpr int	maxbase = 36 ;		/* must be classic value */
+constexpr int   chtablen = (UCHAR_MAX + 1) ;
 
-struct llhelper {
+namespace {
+    struct llhelper {
 	longlong	llmin = 0 ;
 	longlong	llmax = 0 ;
 	ulonglong	ullmax = 0 ;
 	ulonglong	cutoff[maxbase+1] = {} ;
 	int		cutlim[maxbase+1] = {} ;
 	constexpr llhelper() noex {
-	    const longlong	one = 1 ;
-	    const int		n = (CHAR_BIT * szof(longlong)) ;
+	    clonglong	one = 1 ;
+	    cint	nb = nbits<longlong> ;
 	    ullmax = (compl ullmax) ;
-	    llmin = (one << (n - 1)) ;
+	    llmin = (one << (nb - 1)) ;
 	    llmax = longlong(ullmax >> 1) ;
-	    for (uint b = 2 ; b <= maxbase ; b += 1) {
+	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
 		cutoff[b] = (ullmax / b) ;
 		cutlim[b] = int(ullmax % b) ;
 	    } /* end for */
 	} ; /* end ctor */
-} ; /* end subroutine (llhelper) */
+    } ; /* end subroutine (llhelper) */
+} /* end namespace */
+
+namespace {
+    struct basepairs {
+	uchar	ch ;
+	uchar	num ;
+    } ; /* end struct */
+}
+
+constexpr basepairs	pairs[] = {
+	{ 'B', 2 },
+	{ 'O', 8 },
+	{ 'D', 10 },
+	{ 'X', 16 },
+	{ 0, 0 }
+} ; /* end array */
+
+namespace {
+    struct charbase {
+	uchar		num[chtablen] = {} ;
+	uchar		val[chtablen] ;
+	consteval void mknums() noex {
+	    for (int i = 0 ; pairs[i].ch ; ++i) {
+		cint ch = pairs[i].ch ;
+		num[ch] = pairs[i].num ;
+		num[ch + 0x20] = pairs[i].num ;
+	    } /* end for */
+	} ; /* end ctor (mknums) */
+	consteval void mkvals() noex {
+	    for (int i = 0 ; i < chtablen ; i += 1) {
+	        if ((i >= '0') && (i <= '9')) {
+		    val[i] = uchar(i - '0' + 0) ;
+		} else if ((i >= 'A') && (i <= 'Z')) {
+		    val[i] = uchar(i - 'A' + 10) ;
+		} else if ((i >= 'a') && (i <= 'z')) {
+		    val[i] = uchar(i - 'a' + 10) ;
+		} else {
+		    val[i] = uchar(0xFF) ;
+		}
+	    } /* end for */
+	} ; /* end method (mkvals) */
+	consteval charbase() noex {
+	    mknums() ;
+	    mkvals() ;
+	} ; /* end ctor */
+    } ; /* end struct (charbase) */
+} /* end namespace */
 
 
 /* forward references */
 
-template<typename T> constexpr local inline int nbits(T) noex {
-    	return (szof(T) * CHAR_BIT) ;
-}
-
 template<typename T>
-constexpr local inline bool bit(T v,int n) noex {
-	return !!((v >> n) & 1) ;
-}
-
-template<typename T>
-inline void strtox(cchar *,char **,int,T *rp) noex {
+local inline void strtox(cchar *,char **,int,T *rp) noex {
 	*rp = 0 ;
 }
 
@@ -150,20 +270,20 @@ inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 	clong	v = strtol(sp,epp,b) ;
 	*rp = int(v) ;
 	if (errno == 0) {
-	    cint	n = nbits(v) ;
+	    cint nb = nbits<long> ;
 	    {
-	        cbool	f_neg = bit(v,(n - 1)) ;
-		if (f_neg) {	/* test negative value */
+	        cbool	fneg = bit(v,(nb - 1)) ;
+		if (fneg) {	/* test negative value */
 	    	    ulong	uv = ulong(v) ;
 		    uv = (~ uv) ;
-	            uv >>= (n / 2) ;
-		    if (uv || (! bit(v,((n / 2) - 1)))) {
+	            uv >>= (nb / 2) ;
+		    if (uv || (! bit(v,((nb / 2) - 1)))) {
 			errno = ERANGE ;
 		    }
 		} else {	/* test poitive value */
 		    ulong	uv = ulong(v) ;
-	            uv >>= (n / 2) ;
-		    if (uv || bit(v,((n / 2) - 1))) {
+	            uv >>= (nb / 2) ;
+		    if (uv || bit(v,((nb / 2) - 1))) {
 			errno = ERANGE ;
 		    }
 		} /* end if */
@@ -176,22 +296,54 @@ inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
 	ulong	uv = strtoul(sp,epp,b) ;
 	*rp = uint(uv) ;
 	if (errno == 0) {
-	    cint	n = nbits(uv) ;
-	    uv >>= (n / 2) ;
+	    cint nb = nbits<ulong> ;
+	    uv >>= (nb / 2) ;
 	    if (uv) {
 		errno = ERANGE ;
 	    }
 	} /* end if (no-error) */
 } /* end subroutine-template (strtox) */
 
+local inline bool ischbase(int ch_bl,int ch) noex {
+    	cint ch_bu = (ch_bl - 0x20) ;
+    	return (ch == ch_bl) || (ch == ch_bu) ;
+}
+
+local inline int conbase(int) noex ;
+ 
+local inline bool isbaseval(int b) noex {
+    return ((b >= 2) && (b <= maxbase)) ;
+}
+
+local bool iserrneg(longlong co,int cl,longlong res,int val) noex {
+	bool f = false ;
+	f = f || (res < co) ;
+	f = f || (res == co && val > cl) ;
+	return f ;
+} /* end subroutine */
+
+local bool iserrpos(longlong co,int cl,longlong res,int val) noex {
+	bool f = false ;
+	f = f || (res > co) ;
+	f = f || (res == co && val > cl) ;
+	return f ;
+} /* end subroutine */
+
+local bool iserr(ulonglong co,int cl,ulonglong ures,int val) noex {
+	bool f = false ;
+	f = f || (ures > co) ;
+	f = f || (ures == co && val > cl) ;
+	return f ;
+} /* end subroutine (iserr) */
+
 
 /* local variables */
 
-local bool ischx(int ch) noex {
-    	return (ch == 'x') || (ch == 'X') ;
-}
-
 constexpr llhelper	llhelp ;
+
+constexpr charbase	chbase ;
+
+cbool			f_debug = CF_DEBUG ;
 
 
 /* exported variables */
@@ -200,192 +352,209 @@ constexpr llhelper	llhelp ;
 /* exported subroutines */
 
 int strtoxi(cchar *sp,char **epp,int b) noex {
-	int	v{} ;
-	strtox(sp,epp,b,&v) ;
-	return v ;
+	int		res{} ;
+	if (sp) {
+	    strtox(sp,epp,b,&res) ;
+	} else {
+	    errno = ERANGE ;
+	}
+	return res ;
 }
 /* end subroutine (strtoxi) */
 
 long strtoxl(cchar *sp,char **epp,int b) noex {
-	return strtol(sp,epp,b) ;
+    	long		res{} ;
+	if (sp) {
+	    res = strtol(sp,epp,b) ;
+	} else {
+	    errno = ERANGE ;
+	}
+	return res ;
 }
 /* end subroutine (strtoxl) */
 
-longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
-	longlong acc, cutoff;
-	const char *s;
-	int c;
-	int neg, vany, cutlim;
-	/*
-	 * Skip white space and pick up leading +/- sign if any.
-	 * If base is 0, allow 0x for hex and 0 for octal, else
-	 * assume decimal; if base is already 16, allow 0x.
-	 */
-	s = nptr ;
-	do {
-	    c = uchar(*s++) ;
-	} while (isspace(c)) ;
-	if (c == '-') {
-	    neg = 1 ;
-	    c = *s++ ;
-	} else {
-	    neg = 0 ;
-	    if (c == '+') {
-		c = *s++ ;
-	    }
-	}
-	if ((base == 0 || base == 16) &&
-	c == '0' && (*s == 'x' || *s == 'X')) {
-		c = s[1] ;
-		s += 2 ;
-		base = 16 ;
-	}
-	if (base == 0) {
-	    base = ((c == '0') ? 8 : 10) ;
-	}
-	/*
-	 * Compute the cutoff value between legal numbers and illegal
-	 * numbers.  That is the largest legal value, divided by the
-	 * base.  An input number that is greater than this value, if
-	 * followed by a legal input character, is too big.  One that
-	 * is equal to this value may be valid or not; the limit
-	 * between valid and invalid numbers is then based on the last
-	 * digit.  For instance, if the range for longs is
-	 * [-2147483648..2147483647] and the input base is 10,
-	 * cutoff will be set to 214748364 and cutlim to either
-	 * 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
-	 * a value > 214748364, or equal but the next digit is > 7 (or 8),
-	 * the number is too big, and we will return a range error.
-	 *
-	 * Set 'vany' if vany `digits' consumed; make it negative to indicate
-	 * overflow.
-	 */
-	cutoff = neg ? llhelp.llmin : llhelp.llmax ;
-	cutlim = int(cutoff % base) ;
-	cutoff /= base ;
-	if (neg) {
-	    if (cutlim > 0) {
-		cutlim -= base ;
-		cutoff += 1 ;
-	    }
-	    cutlim = -cutlim ;
-	} /* end if (negative) */
-	for (acc = 0, vany = 0 ; ; c = uchar(*s++)) {
-            if (isdigit(c)) {
-                c -= '0' ;
-            } else if (isalpha(c)) {
-                c -= isupper(c) ? ('A' - 10) : ('a' - 10) ;
+longlong strtoxll(cchar *startp,char **endpp,int base) noex {
+	longlong	res = 0 ; /* return-value (result) */
+	DPRINTF("ent b=%d\n",base) ;
+	if (startp) {
+            int		verr = 0 ;
+            int		cutlim ;
+            int		ch ;
+            cchar	*sp = startp ;
+            bool	fneg = false ;
+	    DPRINTF("str=>%s<\n",startp) ;
+            while (ischwhite(ch = uchar(*sp))) {
+		sp += 1 ;
+            } /* end while */
+            if (ch == '-') {
+                fneg = true ;
+                ch = *++sp ;
             } else {
-                break ;
-            }
-            if (c >= base) break ;
-            if (vany < 0) continue ;
-            if (neg) {
-                if (acc < cutoff || (acc == cutoff && c > cutlim)) {
-		    vany = -1 ;
-		    acc = llhelp.llmin ;
-		    errno = ERANGE ;
-                } else {
-		    vany = 1 ;
-		    acc *= base ;
-		    acc -= c ;
-                }
-            } else {
-                if (acc > cutoff || (acc == cutoff && c > cutlim)) {
-		    vany = -1 ;
-		    acc = llhelp.llmax ;
-		    errno = ERANGE ;
-                } else {
-		    vany = 1 ;
-		    acc *= base ;
-		    acc += c ;
+                if (ch == '+') {
+                    ch = *++sp ;
                 }
             } /* end if */
-	} /* end for */
-	if (endptr) {
-	    *endptr = charp(vany ? (s - 1) : nptr) ;
+	    DPRINTF("fneg=%u\n",uint(fneg)) ;
+	    DPRINTF("ch=%c (%02X)\n",uchar(ch),ch) ;
+            if ((base == 0 || base == 16) && ch == '0') {
+	        DPRINTF("possible base adjustment\n") ;
+		if (cint b = conbase(sp[1]) ; b > 0) {
+                    base = b ;
+                    ch = sp[2] ;
+                    sp += 2 ;
+		} /* end if (conbase) */
+            } /* end if */
+	    DPRINTF("ch=%c (%02X)\n",uchar(ch),ch) ;
+            if (base == 0) {
+                base = ((ch == '0') ? 8 : 10) ;
+            }
+	    DPRINTF("adjusted-base=%d\n",base) ;
+	    DPRINTF("ch=%c (%02X)\n",uchar(ch),ch) ;
+            if (isbaseval(base)) {
+                longlong    cutoff = fneg ? llhelp.llmin : llhelp.llmax ;
+                cutlim = int(cutoff % base) ;
+                cutoff /= base ;
+                if (fneg) {
+                    if (cutlim > 0) {
+                        cutlim -= base ;
+                        cutoff += 1 ;
+                    }
+                    cutlim = (- cutlim) ;
+                } /* end if (negative) */
+                while ((ch = uchar(*sp++)) != '\0') {
+		    cint val = chbase.val[ch] ;
+	    	    DPRINTF("ch=%c (%02X)\n",uchar(ch),ch) ;
+	    	    DPRINTF("val=%d\n",val) ;
+                    if (val >= base) break ;
+                    if (verr < 0) continue ;
+                    if (fneg) {
+                        if (iserrneg(cutoff,cutlim,res,val)) {
+                            verr = -1 ;
+                            res = llhelp.llmin ;
+                            errno = ERANGE ;
+                        } else {
+                            verr = +1 ;
+                            res *= base ;
+                            res -= val ;
+                        } /* end if */
+                    } else {
+                        if (iserrpos(cutoff,cutlim,res,val)) {
+                            verr = -1 ;
+                            res = llhelp.llmax ;
+                            errno = ERANGE ;
+                        } else {
+                            verr = +1 ;
+                            res *= base ;
+                            res += val ;
+                        } /* end if */
+                    } /* end if */
+                } /* end while */
+            } else {
+                errno = ENOTSUP ;
+            } /* end if (valid base) */
+            if (endpp) {
+                *endpp = charp(verr ? (sp - 1) : startp) ;
+            }
+	} else {
+	    errno = EFAULT ;
 	}
-	return acc ;
+	DPRINTF("ret errno=%d\n",errno) ;
+	return res ;
 }
 /* end subroutine (strtoxll) */
 
 uint strtoxui(cchar *sp,char **epp,int b) noex {
-	uint	uv{} ;
-	strtox(sp,epp,b,&uv) ;
-	return uv ;
+	uint		ures{} ;
+	if (sp) {
+	    strtox(sp,epp,b,&ures) ;
+	} else {
+	    errno = ERANGE ;
+	}
+	return ures ;
 }
 /* end subroutine (strtoxui) */
 
 ulong strtoxul(cchar *sp,char **epp,int b) noex {
-	return strtoul(sp,epp,b) ;
+    	ulong		ures{} ;
+	if (sp) {
+	    ures = strtoul(sp,epp,b) ;
+	} else {
+	    errno = ERANGE ;
+	}
+	return ures ;
 }
 /* end subroutine (strtouxl) */
 
-/*
- * Convert a string to a |ulonglong|.
- *
- * Ignores 'locale' stuff.  Assumes that the upper and lower case
- * alphabets and digits are each contiguous.
- */
-
-ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
-	ulonglong	cutoff = llhelp.cutoff[base] ;
-	ulonglong	acc ;
-	cchar		*s = nptr ;
-	int		cutlim = llhelp.cutlim[base] ;
-	int		c;
-	int		neg, vany ;
-	/*
-	 * See strtoq for comments as to the logic used.
-	 */
-	do {
-	    c = uchar(*s++) ;
-	} while (isspace(c)) ;
-	if (c == '-') {
-	    neg = 1 ;
-	    c = *s++ ;
-	} else { 
-	    neg = 0 ;
-	    if (c == '+') {
-	        c = *s++ ;
-	    }
-	}
-	if ((base == 0 || base == 16) && c == '0' && ischx(*s)) {
-	    c = s[1] ;
-	    s += 2 ;
-	    base = 16 ;
-	}
-	if (base == 0) {
-	    base = ((c == '0') ? 8 : 10) ;
-	}
-	for (acc = 0, vany = 0 ; ; c = uchar(*s++)) {
-            if (isdigit(c)) {
-                c -= '0';
-            } else if (isalpha(c)) {
-                c -= isupper(c) ? ('A' - 10) : ('a' - 10) ;
-            } else {
-                break ;
+ulonglong strtoxull(cchar *startp,char **endpp,int base) noex {
+	ulonglong	ures = 0 ; /* return-value (result) */
+	DPRINTF("ent b=%d\n",base) ;
+	if (startp) {
+            int		verr = 0 ;
+            int		cutlim ;
+            int		ch ;
+            cchar	*sp = startp ;
+            bool	fneg = false ;
+            while (ischwhite(ch = uchar(*sp))) {
+		sp += 1 ;
+            } /* end while */
+            if (ch == '-') {
+                fneg = true ;
+                ch = *++sp ;
+            } else { 
+                if (ch == '+') {
+                    ch = *++sp ;
+                }
             }
-            if (c >= base) break ;
-            if (vany < 0) continue ;
-            if (acc > cutoff || (acc == cutoff && c > cutlim)) {
-                vany = -1 ;
-                acc = llhelp.ullmax ;
-                errno = ERANGE ;
-            } else {
-                vany = 1 ;
-                acc *= base ;
-                acc += c ;
+            if ((base == 0 || base == 16) && ch == '0') {
+		if (cint b = conbase(sp[1]) ; b > 0) {
+                    base = b ;
+                    ch = sp[2] ;
+                    sp += 2 ;
+		} /* end if (conbase) */
+            } /* end if */
+            if (base == 0) {
+                base = ((ch == '0') ? 8 : 10) ;
             }
-	} /* end for */
-	if (neg && vany > 0) {
-	    acc = (-acc) ;
+	    DPRINTF("adjusted-base=%d\n",base) ;
+            if (isbaseval(base)) {
+                ulonglong   cutoff = llhelp.cutoff[base] ;
+                cutlim = llhelp.cutlim[base] ;
+                while ((ch = uchar(*sp++)) != '\0') {
+		    cint val = chbase.val[ch] ;
+                    if (val >= base) break ;
+                    if (verr < 0) continue ;
+                    if (iserr(cutoff,cutlim,ures,val)) {
+                        verr = -1 ;
+                        ures = llhelp.ullmax ;
+                        errno = ERANGE ;
+                    } else {
+                        verr = +1 ;
+                        ures *= base ;
+                        ures += val ;
+                    } /* end if */
+                } /* end while */
+                if (fneg && verr > 0) {
+                    ures = (- ures) ;
+                }
+            } else {
+                errno = ENOTSUP ;
+            } /* end if (valid base) */
+            if (endpp) {
+                *endpp = charp(verr ? (sp - 1) : startp) ;
+            }
+	} else {
+	    errno = EFAULT ;
 	}
-	if (endptr) {
-	    *endptr = charp(vany ? (s - 1) : nptr) ;
-	}
-	return acc ;
+	DPRINTF("ret errno=%d\n",errno) ;
+	return ures ;
 }
 /* end subroutine (strtoxull) */
 
+
+/* local subroutines */
+
+local inline int conbase(int ch) noex {
+	return chbase.num[ch & UCHAR_MAX] ;
+} /* end subroutine (conbase) */
+ 
 
