@@ -59,11 +59,11 @@ import ureserve ;			/* |is{x}(3u)| */
 
 /* exported subroutines */
 
-bool isdigex(int ch) noex {
+bool isdigex(int ch) noex attrpure {
     	return isdigexlatin(ch) ;
 } /* end subroutine (isdigex) */
 
-bool iswhite(int ch) noex {
+bool iswhite(int ch) noex attrpure {
     	return iswhitelatin(ch) ;
 } /* end subroutine (iswhite) */
 
