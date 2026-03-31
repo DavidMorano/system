@@ -278,7 +278,7 @@ EXTERNC_end
 #ifndef	SUBROUTINE_STROCHR
 #define	SUBROUTINE_STROCHR
 EXTERNC_begin
-extern char *strochr(cchar *sp,int sch) noex {
+local inline char *strochr(cchar *sp,int sch) noex {
     	return strchr(sp,sch) ;
 }
 EXTERNC_end
