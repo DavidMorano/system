@@ -18,6 +18,7 @@
 #ifndef UCHARTYPE_INCLUDE
 #define	UCHARTYPE_INCLUDE
 
+
 #include	<envstandards.h>	/* order first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -26,8 +27,8 @@
 
 EXTERNC_begin
 
-extern bool	isdigex(int) noex ;
-extern bool	iswhite(int) noex ;
+extern bool	isdigex(int) noex attrpure ;
+extern bool	iswhite(int) noex attrpure ;
 
 EXTERNC_end
 
