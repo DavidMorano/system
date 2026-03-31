@@ -30,6 +30,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	uregfork
+
+	Description:
 	We are attempting to add an "unregister" feature to the
 	|pthread_atfork(3pthread)| facility.  We need to create a
 	whole new interface for this.  This new interface will consist
@@ -71,6 +75,9 @@
 
 #include	"uregfork.hh"
 
+#pragma		GCC dependency		"mod/usigblock.ccm"
+#pragma		GCC dependency		"mod/usysbasic.ccm"
+
 import usigblock ;			/* |usigblock(3u)| */
 import usysbasic ;
 
@@ -83,7 +90,7 @@ import usysbasic ;
 
 /* imported namespaces */
 
-using libu::umem ;			/* variable */
+using libu::um ;			/* variable */
 
 
 /* local typedefs */
@@ -250,19 +257,19 @@ int uregfork::record(void_f sb,void_f sp,void_f sc) noex {
 	int		rs1 ;
 	if (usigblock b ; (rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
-	            if ((rs = mx.lockbegin) >= 0) { /* single */
-			uregfork_ent	*ep{} ;
-	                if ((rs = trackbegin()) >= 0) {
-	                    cint	esz = szof(URF_ENT) ;
-	                    if ((rs = umem.malloc(esz,&ep)) >= 0) {
-				uregfork_list	*lp = &hlist ;
-				entry_load(ep,sb,sp,sc) ;
-				list_add(lp,ep) ;
-	                    } /* end if (memory-allocation) */
-	                } /* end if (track-begin) */
-	                rs1 = mx.lockend ;
-			if (rs >= 0) rs = rs1 ;
-	            } /* end if (mutex) */
+	        if ((rs = mx.lockbegin) >= 0) { /* single */
+		    uregfork_ent	*ep{} ;
+	            if ((rs = trackbegin()) >= 0) {
+	                cint	esz = szof(URF_ENT) ;
+	                if ((rs = um.mall(esz,&ep)) >= 0) {
+			    uregfork_list	*lp = &hlist ;
+			    entry_load(ep,sb,sp,sc) ;
+			    list_add(lp,ep) ;
+	                } /* end if (memory-allocation) */
+	            } /* end if (track-begin) */
+	            rs1 = mx.lockend ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (mutex) */
 	    } /* end if (init) */
 	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -287,7 +294,7 @@ int uregfork::expunge(void_f sb,void_f sp,void_f sc) noex {
                             if (entry_match(ep,sb,sp,sc)) {
                                 c += 1 ;
                                 list_rem(lp,ep) ;
-                                umem.free(ep) ;
+                                um.free(ep) ;
                             } /* end if (match) */
                             ep = nep ;
                         } /* end while (deleting matches) */
@@ -318,7 +325,7 @@ int uregfork::trackend() noex {
 	    ftrack = false ;
 	    while (ep) {
 	        nep = ep->next ;
-	        rs1 = umem.free(ep) ;
+	        rs1 = um.free(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	        ep = nep ;
 	    } /* end while */
