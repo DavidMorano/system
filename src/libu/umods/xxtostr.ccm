@@ -155,7 +155,7 @@ export {
 	        if (v != 0) {
                     int		di ;
 	            if_constexpr (szof(UT) > szof(ulong)) {
-	                const UT	vmask(~ LONG_MAX) ;
+	                const UT	vmask(compl LONG_MAX) ;
 		        UT		utnv ;
 	                while ((v & vmask) != 0L) {
 	                    utnv = v / ub ;
