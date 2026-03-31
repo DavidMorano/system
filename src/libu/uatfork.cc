@@ -9,7 +9,7 @@
 
 /* revision history:
 
-	= 2014-05-09, David A­D­ Morano
+	= 1998-06-08, David A­D­ Morano
 	This is being written to add an "unregister" feature to the
 	'atfork' capability that came with POSIX threads.  In the
 	past we always had pure reentrant subroutines without hidden
@@ -26,10 +26,14 @@
 	
 */
 
-/* Copyright © 2014,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Name:
+	uatfork
+
+	Description:
 	We are attempting to add an "unregister" feature to the
 	|pthread_atfork(3pthread)| facility.  We need to create a
 	whole new interface for this.  This new interface will consist
@@ -59,10 +63,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usupport.h>
 #include	<umem.hh>
 #include	<timewatch.hh>
@@ -72,7 +73,7 @@
 #include	"uatfork.h"
 
 import usigblock ;			/* |usigblock(3u)| */
-import usysbasic ;
+import usysbasic ;			/* |uatexit(3u)| + |uatfork(3u)| */
 
 /* local defines */
 
@@ -83,7 +84,7 @@ import usysbasic ;
 
 /* imported namespaces */
 
-using libu::umem ;			/* variable */
+using libu::um ;			/* variable */
 
 
 /* local typedefs */
@@ -207,7 +208,7 @@ int uatfork_head::init() noex {
 	        	    finitdone = true ;
 	        	    f = true ;
 	                } /* end if (u_atexit) */
-	            } /* end if (u_atfork) */
+	            } /* end if (uatfork) */
 		    if (rs < 0) {
 		        mx.destroy() ;
 		    }
@@ -262,7 +263,7 @@ int uatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 			uatfork_ent	*ep{} ;
 	                if ((rs = uatfork_trackbegin()) >= 0) {
 	                    cint	esz = szof(UAF_ENT) ;
-	                    if ((rs = umem.malloc(esz,&ep)) >= 0) {
+	                    if ((rs = um.mall(esz,&ep)) >= 0) {
 				uatfork_list	*lp = &hlist ;
 				entry_load(ep,sb,sp,sc) ;
 				list_add(lp,ep) ;
@@ -295,7 +296,7 @@ int uatfork_head::expunge(void_f sb,void_f sp,void_f sc) noex {
                             if (entry_match(ep,sb,sp,sc)) {
                                 c += 1 ;
                                 list_rem(lp,ep) ;
-                                umem.free(ep) ;
+                                um.free(ep) ;
                             } /* end if (match) */
                             ep = nep ;
                         } /* end while (deleting matches) */
@@ -326,7 +327,7 @@ int uatfork_head::trackend() noex {
 	    ftrack = false ;
 	    while (ep) {
 	        nep = ep->next ;
-	        rs1 = umem.free(ep) ;
+	        rs1 = um.free(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	        ep = nep ;
 	    } /* end while */
