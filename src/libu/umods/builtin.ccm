@@ -25,6 +25,7 @@ module ;
 #include	<climits>		/* |UINT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdint>
 #include	<concepts>
 #include	<clanguage.h>
 #include	<utypedefs.h>
