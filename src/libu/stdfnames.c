@@ -24,7 +24,7 @@
 	stdfnames
 
 	Description:
-	This modeule provides that c-strings for the standard file
+	This module provides that c-strings for the standard file
 	names.
 
 *******************************************************************************/
