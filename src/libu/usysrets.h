@@ -387,6 +387,10 @@ enum errnomissings {
 #define	ETOOBIG		E2BIG
 #endif
 
+#ifndef	EDOMAIN
+#define	EDOMAIN		EDOM
+#endif
+
 #ifndef	EBADFMT
 #define	EBADFMT		(- SR_BADFMT)		/* bad-format */
 #endif
