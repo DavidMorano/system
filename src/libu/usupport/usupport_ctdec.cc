@@ -48,7 +48,7 @@
 
 /* imported namespaces */
 
-using libu::sncpy ;
+using libu::sncpy ;			/* subroutine */
 
 
 /* local typedefs */
