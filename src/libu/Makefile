@@ -51,7 +51,7 @@ OBJ02= timewatch.o timecount.o
 OBJ03= libutil.o usysconf.o umods.o 
 
 OBJ04= ulibvals.o utimeout.o utimeouts.o 
-OBJ05= ulogerror.o strtox.o 
+OBJ05= ulogerror.o ischx.o strtox.o
 OBJ06= uconstants.o usupport.o
 OBJ07= umem.o usigsets.o usigblock.o umisc.o
 
@@ -73,17 +73,17 @@ OBJ19= timespec.o itimerspec.o
 OBJ20= uinet.o ustream.o
 OBJ21= strnul.o intx.o chrset.o stdclib.o
 OBJ22= ugetloadavg.o uiconv.o bitgrp.o
-OBJ23= syscontain.o stdfnames.o
+OBJ23= syscontain.o stdfnames.o stdfiles.o
 
 OBJ24= posixdirent.o nulstr.o
 OBJ25= fonce.o filerec.o
 OBJ26= ustd.o
 OBJ27= ucomposite.o
 
-OBJ28= findbit.o ccfile.o readln.o
+OBJ28= bitmanip.o findbit.o baops.o
 OBJ29= clockids.o itimers.o filetypes.o funcodes.o 
 OBJ30= binchunk.o
-OBJ31= dprintf.o
+OBJ31= ccfile.o readln.o dprintf.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -488,38 +488,45 @@ uiconv.o:		uiconv.cc	uiconv.h	$(INCS)
 uchartype.o:		uchartype.cc	uchartype.h	${INCS}
 
 # CONSTANTS
-endian.o:		endian.cc	endian.h	$(INCS)
-syswords.o:		syswords.cc	syswords.hh	$(INCS)
-varnames.o:		varnames.cc	varnames.hh	$(INCS)
-stdfnames.o:		stdfnames.c stdfnames.h		$(INCS)
-mailvalues.o:		mailvalues.cc mailvalues.hh	$(INCS)
+endian.o:		endian.cc	endian.h			$(INCS)
+syswords.o:		syswords.cc	syswords.hh			$(INCS)
+varnames.o:		varnames.cc	varnames.hh			$(INCS)
+stdfiles.o:		stdfiles.cc	stdfiles.h			$(INCS)
+stdfnames.o:		stdfnames.c	stdfnames.h			$(INCS)
+mailvalues.o:		mailvalues.cc	mailvalues.hh			$(INCS)
 
 # IDS of-various-sorts
-clockids.o:		clockids.cc	clockids.hh	$(INCS)
-itimers.o:		itimers.cc	itimers.hh	$(INCS)
-filetypes.o:		filetypes.cc	filetypes.h	$(INCS)
-funcodes.o:		funcodes.cc	funcodes.h	$(INCS)
+clockids.o:		clockids.cc	clockids.hh			$(INCS)
+itimers.o:		itimers.cc	itimers.hh			$(INCS)
+filetypes.o:		filetypes.cc	filetypes.h			$(INCS)
+funcodes.o:		funcodes.cc	funcodes.h			$(INCS)
+
+# BITS
+bitmanip.o:		bitmanip.ccm					$(INCS)
+baops.o:		baops.c		baops.h				$(INCS)
+findbit.o:		findbit.ccm					$(INCS)
 
 # STRING handling
-strtox.o:		strtox.cc	strtox.h	$(INCS)
-strnul.o:		strnul.cc	strnul.hh	$(INCS)
-ischx.o:		ischx.cc	ischx.hh	$(INCS)
-
-# misc-groups
-baops.o:		baops.c		baops.h		$(INCS)
-
-# MODULES
-findbit.o:		findbit.ccm			$(INCS)
+strtox.o:		strtox.cc	strtox.h ischx.o bitmanip.o	$(INCS)
+strnul.o:		strnul.cc	strnul.hh			$(INCS)
 
 # MISC
-stdclib.o:		stdclib.cc	stdclib.hh	$(INCS)
-ccfile.o:		ccfile.cc	ccfile.hh	$(INCS)
-readln.o:		readln.cc	readln.hh	$(INCS)
-dprintf.o:		dprintf.cc	dprintf.hh	$(INCS)
+stdclib.o:		stdclib.cc	stdclib.hh			$(INCS)
+ccfile.o:		ccfile.cc	ccfile.hh			$(INCS)
+readln.o:		readln.cc	readln.hh			$(INCS)
+dprintf.o:		dprintf.cc	dprintf.hh			$(INCS)
 
 # ARITHMETIC
 intext.o:		intext.ccm	varithmetic.o
 varithmetic.o:		varithmetic.ccm	muldigs.o
 muldigs.o:		muldigs.ccm
+
+ischx.o:		ischx0.o ischx1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+ischx0.o:		ischx.ccm					$(INCS)
+	makemodule $<
+
+ischx1.o:		ischx1.cc	ischx0.o			$(INCS)
 
 
