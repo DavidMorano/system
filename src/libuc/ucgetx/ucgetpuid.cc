@@ -56,6 +56,8 @@
 #include	<storebuf.h>
 #include	<localmisc.h>
 
+#include	"ucgetx.h"
+
 #pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
