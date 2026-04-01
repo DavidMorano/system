@@ -2,7 +2,6 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* interface components for UNIX® library-3c */
 /* get the username of this login session */
 /* version %I% last-modified %G% */
 
@@ -18,10 +17,6 @@
 
 /*******************************************************************************
 
-  	Name:
-	uc_getlogin
-
-	Description:
 	This is just the wrapper for the standard system |getlogin(3c)|,
 	but it is reentrant where available.
 
@@ -32,13 +27,16 @@
 #include	<cerrno>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getbufsize.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
+
+#include	"ucgetx.h"
 
 
 /* local defines */
@@ -61,18 +59,9 @@
 /* external subroutines */
 
 
-/* external variables */
-
-
 /* local variables */
 
 constexpr bool		f_getloginr = SYSHAS_GETLOGINR ;
-
-
-/* forward references */
-
-
-/* local variables */
 
 
 /* exported variables */
