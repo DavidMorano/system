@@ -43,9 +43,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getxx.h>
-#include	<mallocxx.h>
 #include	<localmisc.h>
 
 #include	"getserv.h"
@@ -82,16 +83,18 @@
 
 int getserv_name(cchar *svc,cchar *pn) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		port = 0 ;
 	if (svc && pn) ylikely {
 	    rs = SR_INVALID ;
 	    if (pn[0] && svc[0]) ylikely {
-	        if (char *svbuf ; (rs = malloc_sv(&svbuf)) >= 0) ylikely {
+	        if (char *svbuf ; (rs = lm_sv(&svbuf)) >= 0) ylikely {
 	            if (ucentsv sv ; (rs = sv.getnam(svbuf,rs,svc,pn)) >= 0) {
 			uint16_t	sport = uint16_t(sv.s_port) ;
 	                port = int(ntohs(sport)) ;
 	            }
-		    rs = rsfree(rs,svbuf) ;
+		    rs1 = lm_free(svbuf) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
