@@ -87,7 +87,7 @@ template<typename ... Args>
 static int termenq_ctor(termenq *op,Args ... args) noex {
     	TERMENQ		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -96,7 +96,7 @@ static int termenq_ctor(termenq *op,Args ... args) noex {
 
 static int termenq_dtor(termenq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -106,7 +106,7 @@ static int termenq_dtor(termenq *op) noex {
 template<typename ... Args>
 static inline int termenq_magic(termenq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == TERMENQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -141,12 +141,12 @@ constexpr int		proctypes[] = {
 int termenq_open(TE *op,cchar *dbfn,int oflags) noex {
 	custime		dt = getustime ;
 	int		rs ;
-	if ((rs = termenq_ctor(op,dbfn)) >= 0) {
-	    if ((rs = ucpagesize) >= 0) {
+	if ((rs = termenq_ctor(op,dbfn)) >= 0) ylikely {
+	    if ((rs = ucpagesize) >= 0) ylikely {
 	        op->pagesz = rs ;
 	        op->fd = -1 ;
 	        op->fname = nullptr ;
-		if ((rs = termenq_initstuff(op,oflags)) >= 0) {
+		if ((rs = termenq_initstuff(op,oflags)) >= 0) ylikely {
                     if (cchar *cp ; (rs = libmem.strw(dbfn,-1,&cp)) >= 0) {
                         op->fname = cp ;
                         if ((rs = termenq_fileopen(op,dt)) >= 0) {
@@ -179,16 +179,16 @@ int termenq_open(TE *op,cchar *dbfn,int oflags) noex {
 int termenq_close(TE *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = termenq_magic(op)) >= 0) {
-	    if ((op->mapdata != nullptr) && (op->mapsize > 0)) {
+	if ((rs = termenq_magic(op)) >= 0) ylikely {
+	    if ((op->mapdata != nullptr) && (op->mapsize > 0)) ylikely {
 	        rs1 = u_mmapend(op->mapdata,op->mapsize) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->fd >= 0) {
+	    if (op->fd >= 0) ylikely {
 	        rs1 = termenq_fileclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->fname) {
+	    if (op->fname) ylikely {
 		void *vp = voidp(op->fname) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -202,7 +202,7 @@ int termenq_close(TE *op) noex {
 
 int termenq_write(TE *op,int ei,TE_ENT *ep) noex {
 	int		rs ;
-	if ((rs = termenq_magic(op,ep)) >= 0) {
+	if ((rs = termenq_magic(op,ep)) >= 0) ylikely {
 	    cint	am = (op->oflags & O_ACCMODE) ;
 	    if ((am == SR_WRONLY) || (am == O_RDWR)) {
 	        cint	esz = szof(TE_ENT) ;
@@ -224,7 +224,7 @@ int termenq_write(TE *op,int ei,TE_ENT *ep) noex {
 int termenq_check(TE *op,time_t dt) noex {
 	int		rs ;
 	int		fch = false ;
-	if ((rs = termenq_magic(op)) >= 0) {
+	if ((rs = termenq_magic(op)) >= 0) ylikely {
 	    cint	intcheck = TERMENQ_INTCHECK ;
 	    cint	intopen = TERMENQ_INTOPEN ;
 	    if (dt == 0) dt = getustime ;
@@ -259,7 +259,7 @@ int termenq_check(TE *op,time_t dt) noex {
 
 int termenq_curbegin(TE *op,TE_CUR *curp) noex {
 	int		rs ;
-	if ((rs = termenq_magic(op,curp)) >= 0) {
+	if ((rs = termenq_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	    if (op->ncursors == 0) {
 	        if (op->fd < 0) {
@@ -277,7 +277,7 @@ int termenq_curbegin(TE *op,TE_CUR *curp) noex {
 
 int termenq_curend(TE *op,TE_CUR *curp) noex {
     	int		rs ;
-	if ((rs = termenq_magic(op,curp)) >= 0) {
+	if ((rs = termenq_magic(op,curp)) >= 0) ylikely {
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
 	    }
@@ -290,7 +290,7 @@ int termenq_curend(TE *op,TE_CUR *curp) noex {
 int termenq_curenum(TE *op,TE_CUR *curp,TE_ENT *ep) noex {
 	int		rs ;
 	int		ei = 0 ;
-	if ((rs = termenq_magic(op,curp)) >= 0) {
+	if ((rs = termenq_magic(op,curp)) >= 0) ylikely {
 	    ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	    if (TE_ENT *bp ; (rs = termenq_mapents(op,ei,&bp)) >= 0) {
 		cint	n = rs ;
@@ -311,11 +311,11 @@ int termenq_curenum(TE *op,TE_CUR *curp,TE_ENT *ep) noex {
 int termenq_fetchsid(TE *op,TE_ENT *ep,pid_t pid) noex {
 	int		rs ;
 	int		ei = 0 ;
-	if ((rs = termenq_magic(op)) >= 0) {
+	if ((rs = termenq_magic(op)) >= 0) ylikely {
 	    if (op->ncursors == 0) {
 	        rs = termenq_filesz(op,0L) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        TE_ENT	*up = nullptr ;
 	        bool	f = false ;
 	        while ((rs = termenq_mapents(op,ei,&up)) > 0) {
@@ -344,12 +344,12 @@ int termenq_fetchsid(TE *op,TE_ENT *ep,pid_t pid) noex {
 int termenq_curfetchln(TE *op,TE_CUR *curp,TE_ENT *ep,cchar *name) noex {
 	int		rs ;
 	int		ei = 0 ;
-	if ((rs = termenq_magic(op,curp,name)) >= 0) {
+	if ((rs = termenq_magic(op,curp,name)) >= 0) ylikely {
 	    ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	    if (op->ncursors == 0) {
 	        rs = termenq_filesz(op,0L) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        TE_ENT		*up ;
 	        cint		esz = szof(TE_ENT) ;
 	        bool		f = false ;
@@ -415,11 +415,11 @@ int termenq_read(TE *op,int ei,TE_ENT *ep) noex {
 int termenq_nactive(TE *op) noex {
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = termenq_magic(op)) >= 0) {
+	if ((rs = termenq_magic(op)) >= 0) ylikely {
 	    if (op->ncursors == 0) {
 	        rs = termenq_filesz(op,0L) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        TE_ENT	*ep ;
 	        int	ei = 0 ;
 		int	i ; /* used-afterwards */
