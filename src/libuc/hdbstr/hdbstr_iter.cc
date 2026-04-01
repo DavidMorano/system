@@ -28,8 +28,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<hdb.h>
 #include	<strwcpy.h>
 #include	<strdcpyx.h>
@@ -46,7 +48,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -89,11 +90,11 @@ hdbstr_iter::hdbstr_iter(const hdbstr_iter &oit) noex {
 	        }
 	    } else {
 	        cint csz = szof(hdbstr_cur) ;
-	        if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = lm_mall(csz,&vp)) >= 0) {
 		    curp = (hdb_cur *) vp ;
 		    rs = hdbstr_curcopy(op,curp,oit.curp) ;
 		    if (rs < 0) {
-			uc_free(curp) ;
+			lm_free(curp) ;
 			curp = nullptr ;
 		    } /* end if (error handling) */
 	        }
@@ -115,11 +116,11 @@ hdbstr_iter &hdbstr_iter::operator = (const hdbstr_iter &oit) noex {
 	        }
 	    } else {
 	        cint csz = szof(hdbstr_cur) ;
-	        if (void *vp{} ; (rs = uc_malloc(csz,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = lm_mall(csz,&vp)) >= 0) {
 		    curp = (hdb_cur *) vp ;
 		    rs = hdbstr_curcopy(op,curp,oit.curp) ;
 		    if (rs < 0) {
-			uc_free(curp) ;
+			lm_free(curp) ;
 			curp = nullptr ;
 		    } /* end if (error handling) */
 	        } /* end if (memory-allocation) */
@@ -220,7 +221,7 @@ static int hdbstriter_finish(hdbstr_iter *itp) noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-		rs1 = uc_free(itp->curp) ;
+		rs1 = lm_free(itp->curp) ;
 		if (rs >= 0) rs = rs1 ;
 		itp->curp = nullptr ;
 	    }
