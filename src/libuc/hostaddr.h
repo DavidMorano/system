@@ -17,7 +17,8 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	HOSTADDR_MAGIC		0x73625196
@@ -31,11 +32,11 @@ struct hostaddr_head {
 	cchar		*ehostname ;
 	uint		magic ;
 	int		n ;
-} ;
+} ; /* end struct (hostaddr_head) */
 
 struct hostaddr_cursor {
 	int		i ;
-} ;
+} ; /* end struct (hostaddr_cursor) */
 
 typedef HOSTADDR		hostaddr ;
 typedef HOSTADDR_CUR		hostaddr_cur ;
