@@ -75,21 +75,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| + |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<stdintx.h>		/* extended integer types */
-#include	<conintx.hh>		/* concept |stdintx| */
-#include	<checkbase.h>
-#include	<cfutil.hh>		/* namespace |cfx| */
-#include	<char.h>		/* |CHAR_TOVAL(3uc)| */
-#include	<ischarx.h>		/* |isplusminus(3uc)| */
-#include	<localmisc.h>
+#include	<usysbase.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 
 
 #endif /* CFDIGX_INCLUDE */
