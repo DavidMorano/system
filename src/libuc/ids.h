@@ -22,10 +22,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	IDS		struct ids_head
