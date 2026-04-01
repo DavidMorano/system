@@ -61,20 +61,9 @@
 #define	CFALPHAX_INCLUDE
 
 
-#include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<stdintx.h>		/* extended integer types */
-#include	<cfutil.hh>		/* namespace |cfx| */
-#include	<char.h>
-#include	<ischarx.h>		/* |isplusminus(2uc)| */
-#include	<localmisc.h>
+#include	<usysbase.h>
 
 
 #endif /* CFALPHAX_INCLUDE */
