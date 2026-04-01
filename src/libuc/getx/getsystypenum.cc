@@ -44,7 +44,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getbufsize.h>
 #include	<matstr.h>
 #include	<snwcpy.h>
@@ -52,7 +54,9 @@
 
 #include	"getsystypenum.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -100,7 +104,7 @@ int getsystypenum(char *tbuf,char *nbuf,cchar *sysname,cchar *release) noex {
 	    tbuf[0] = '\0' ;
 	    nbuf[0] = '\0' ;
 	    if (sysname[0] && release[0]) {
-		if ((rs = getbufsize(getbufsize_un)) >= 0) {
+		if ((rs = getbufsize(bufsize_un)) >= 0) {
 		    cint	olen = rs ;
 	            if (int si ; (si = matstr(sysnames,sysname,-1)) >= 0) {
 	                int	cl ;
