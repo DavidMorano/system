@@ -45,6 +45,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usysflag.h>
+#include	<uctimeconv.h>		/* uc_time{xx}(3uc)| */
 #include	<bufsizevar.hh>		/* |zn| */
 #include	<snwcpy.h>
 #include	<altzone.h>
@@ -57,10 +58,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_localtime(custime *,TM *) noex ;
-}
 
 
 /* external varaibles */
@@ -91,8 +88,7 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 	    cchar	*zp{} ;
 	    if_constexpr (f_darwin) {
 		custime		dt = time(nullptr) ;
-		TM		tmo ;
-	 	if ((rs = uc_localtime(&dt,&tmo)) >= 0) ylikely {
+		if (TM tmo ; (rs = uc_timelocal(&dt,&tmo)) >= 0) ylikely {
 	            zip->zoff = intconv(tmo.tm_gmtoff / 60) ;
 	            zp = tmo.tm_zone ;
 		}
