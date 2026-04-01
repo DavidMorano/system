@@ -164,23 +164,23 @@ objd_cfx.o:		$(OBJD_CFX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-cfutil.o:		cfutil.cc cfutil.hh			$(INCS)
+cfutil.o:		cfutil.cc	cfutil.hh			$(INCS)
 
-cfchars.o:		mods.o cfchars.cc cfchars.h		$(INCS)
-cfbin.o:		mods.o cfbin.cc cfbin.h			$(INCS)
-cfoct.o:		mods.o cfoct.cc cfoct.h			$(INCS)
-cfdec.o:		mods.o cfdec.cc cfdec.h			$(INCS)
-cfdecf.o:		mods.o cfdecf.cc cfdecf.h		$(INCS)
-cfdecmf.o:		mods.o cfdecmf.cc cfdecmf.h		$(INCS)
-cfdect.o:		mods.o cfdect.cc cfdect.h		$(INCS)
-cfhex.o:		mods.o cfhex.cc cfhex.h			$(INCS)
-cfxxx.o:		mods.o cfxxx.cc cfxxx.h			$(INCS)
-cfnum.o:		mods.o cfnum.cc cfnum.h			$(INCS)
-cfa26.o:		mods.o cfa26.cc cfa26.h			$(INCS)
-cfroman.o:		cfroman.cc cfroman.h			$(INCS)
+cfchars.o:		cfchars.cc	cfchars.h	mods.o		$(INCS)
+cfbin.o:		cfbin.cc	cfbin.h		mods.o		$(INCS)
+cfoct.o:		cfoct.cc	cfoct.h		mods.o		$(INCS)
+cfdec.o:		cfdec.cc	cfdec.h		mods.o		$(INCS)
+cfdecf.o:		cfdecf.cc	cfdecf.h	mods.o		$(INCS)
+cfdecmf.o:		cfdecmf.cc	cfdecmf.h	mods.o		$(INCS)
+cfdect.o:		cfdect.cc	cfdect.h	mods.o		$(INCS)
+cfhex.o:		cfhex.cc	cfhex.h		mods.o		$(INCS)
+cfxxx.o:		cfxxx.cc	cfxxx.h		mods.o		$(INCS)
+cfnum.o:		cfnum.cc	cfnum.h		mods.o		$(INCS)
+cfa26.o:		cfa26.cc	cfa26.h		mods.o		$(INCS)
+cfroman.o:		cfroman.cc	cfroman.h			$(INCS)
 
 # algorithms
-cfhexstr.o:		cfhexstr.cc cfhexstr.h			$(INCS)
+cfhexstr.o:		cfhexstr.cc	cfhexstr.h			$(INCS)
 
 MOBJ= cfalphax.o cfcharsx.o cfdigx.o cfpowx.o cfsysx.o
 
