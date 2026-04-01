@@ -18,7 +18,8 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 #include	<uinet.h>
 
@@ -35,20 +36,20 @@ struct hostinfo_flags {
 	uint		inet4:1 ;
 	uint		inet6:1 ;
 	uint		addr:1 ;	/* was given an address */
-} ;
+} ; /* end struct (hostinfo_flags) */
 
 struct hostinfo_address {
 	cchar		*addr ;
 	int		addrlen ;
 	int		af ;
-} ;
+} ; /* end struct (hostinfo_address) */
 
 struct hostinfo_arguments {
 	cchar		*hostname ;	/* might be allocated */
 	int		af ;		/* caller-supplied argument */
 	int		hostnamelen ;
 	int		f_alloc ;
-} ;
+} ; /* end struct (hostinfo_arguments) */
 
 struct hostinfo_head {
 	HOSTINFO_ARGS	arg ;
@@ -62,11 +63,11 @@ struct hostinfo_head {
 	HOSTINFO_FL	init ;
 	HOSTINFO_FL	fl ;
 	uint		magic ;
-} ;
+} ; /* end struct (hostinfo_head) */
 
 struct hostinfo_cursor {
 	int		i ;
-} ;
+} ; /* end struct (hostinfo_cursor) */
 
 typedef HOSTINFO		hostinfo ;
 typedef HOSTINFO_FL		hostinfo_fl ;
