@@ -20,7 +20,10 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -52,7 +55,7 @@
 
 /* exported subroutines */
 
-int uc_initgroups(cchar *name,gid_t gid) {
+int uc_initgroups(cchar *name,gid_t gid) noex {
 	int		rs = SR_FAULT ;
 	if (name) {
 	    rs = SR_INVALID ;
