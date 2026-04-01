@@ -40,6 +40,8 @@
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
+#include	"ucgetx.h"
+
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/usysbasic.ccm"
 
