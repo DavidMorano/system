@@ -33,6 +33,7 @@
 
 EXTERNC_begin
 
+extern int	uc_getdefproj(PROJECT *,char *,int,cchar *) noex ;
 extern int	uc_gethostid(ulong *) noex ;
 extern int	uc_gethostname(char *,int) noex ;
 extern int	uc_getarchitecture(char *,int) noex ;
@@ -58,7 +59,7 @@ extern int	uc_getnameinfo(CSOCKADDR *,int,char *,int,char *,int,int) noex ;
 /* why was this missing? */
 extern int	uc_getlogin(char *,int) noex ;
 
-static inline int uc_getarch(char *rb,int rl) noex {
+local inline int uc_getarch(char *rb,int rl) noex {
     	return uc_getarchitecture(rb,rl) ;
 }
 
