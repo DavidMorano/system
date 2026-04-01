@@ -21,11 +21,12 @@
 	lookaside
 
 	Description:
-	This object provides a fix-sized pool of memory blocks for
-	fast allocation and deallocation.  However, memory is never
-	released back to |malloc(3c)| (the origin from which all
-	memory comes) once it is allocated.  Freed blocks are,
-	however, available for new allocation requests.
+	This object provides a fixed-sized pool of memory blocks
+	for fast allocation and deallocation.  However, memory is
+	never released back to |libmam| (the origin from which all
+	memory comes in system libraries) once it is allocated.
+	Freed blocks are, however, available for new allocation
+	requests.
 
 *******************************************************************************/
 
@@ -35,11 +36,8 @@
 #include	<cstdint>
 #include	<new>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<pq.h>
 #include	<intceil.h>
 #include	<localmisc.h>
@@ -79,10 +77,10 @@ struct lookaside_ch {
 /* forward references */
 
 template<typename ... Args>
-static int lookaside_ctor(lookaside *op,Args ... args) noex {
+local int lookaside_ctor(lookaside *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->eap = nullptr ;
 	    op->nchunks = 0 ;
@@ -92,8 +90,8 @@ static int lookaside_ctor(lookaside *op,Args ... args) noex {
 	    op->i = 0 ;
 	    op->nfree = 0 ;
 	    op->nused = 0 ;
-	    if ((op->cqp = new(nothrow) pq) != np) {
-	        if ((op->esp = new(nothrow) pq) != np) {
+	    if ((op->cqp = new(nothrow) pq) != np) ylikely {
+	        if ((op->esp = new(nothrow) pq) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-pq) */
 		if (rs < 0) {
@@ -103,24 +101,22 @@ static int lookaside_ctor(lookaside *op,Args ... args) noex {
 	    } /* end if (new-pq) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookaside_ctor) */
+} /* end subroutine (lookaside_ctor) */
 
-static int lookaside_dtor(lookaside *op) noex {
+local int lookaside_dtor(lookaside *op) noex {
 	int		rs = SR_OK ;
-	if (op->esp) {
+	if (op->esp) ylikely {
 	    delete op->esp ;
 	    op->esp = nullptr ;
 	}
-	if (op->cqp) {
+	if (op->cqp) ylikely {
 	    delete op->cqp ;
 	    op->cqp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (lookaside_dtor) */
+} /* end subroutine (lookaside_dtor) */
 
-static int	lookaside_newchunk(lookaside *) noex ;
+local int	lookaside_newchunk(lookaside *) noex ;
 
 
 /* local variables */
@@ -135,9 +131,9 @@ constexpr int	qalign = int(2 * szof(void *)) ;
 
 int lookaside_start(lookaside *op,int esize,int n) noex {
 	int		rs ;
-	if ((rs = lookaside_ctor(op)) >= 0) {
+	if ((rs = lookaside_ctor(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (esize > 0) {
+	    if (esize > 0) ylikely {
 		cint	csz = szof(lookaside_ch) ;
 		if (esize < qalign) esize = qalign ;
 		if (n < 0) n = LOOKASIDE_MINENTS ;
@@ -164,7 +160,7 @@ int lookaside_finish(lookaside *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-	if (op) {
+	if (op) ylikely {
 	    pq		*cqp = op->cqp ; /* loop invariant */
 	    pq_ent	*rep = nullptr ;
 	    rs = SR_OK ;
@@ -195,7 +191,7 @@ int lookaside_finish(lookaside *op) noex {
 
 int lookaside_get(lookaside *op,void *p) noex {
 	int		rs = SR_FAULT ;
-	if (op && p) {
+	if (op && p) ylikely {
 	    rs = SR_OK ;
 	    if (op->nfree > 0) {
 	        pq_ent	**epp = (pq_ent **) p ;
@@ -220,9 +216,9 @@ int lookaside_get(lookaside *op,void *p) noex {
 
 int lookaside_release(lookaside *op,void *p) noex {
 	int		rs = SR_FAULT ;
-	if (op && p) {
+	if (op && p) ylikely {
 	    pq_ent	*ep = (pq_ent *) p ;
-	    if ((rs = pq_ins(op->esp,ep)) >= 0) {
+	    if ((rs = pq_ins(op->esp,ep)) >= 0) ylikely {
 	        op->nfree += 1 ;
 	        op->nused -= 1 ;
 	    }
@@ -233,7 +229,7 @@ int lookaside_release(lookaside *op,void *p) noex {
 
 int lookaside_count(lookaside *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->nused ;
 	} /* end if (non-null) */
 	return rs ;
@@ -242,8 +238,8 @@ int lookaside_count(lookaside *op) noex {
 
 int lookaside_audit(lookaside *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = pq_audit(op->cqp)) >= 0) {
+	if (op) ylikely {
+	    if ((rs = pq_audit(op->cqp)) >= 0) ylikely {
 	        rs = pq_audit(op->esp) ;
 	    }
 	} /* end if (non-null) */
@@ -254,11 +250,11 @@ int lookaside_audit(lookaside *op) noex {
 
 /* private subroutines */
 
-static int lookaside_newchunk(lookaside *op) noex {
+local int lookaside_newchunk(lookaside *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    int		sz = op->eaoff + (op->n * op->esize) ;
-	    if (caddr_t a ; (rs = libmem.mall(sz,&a)) >= 0) {
+	    if (caddr_t a ; (rs = libmem.mall(sz,&a)) >= 0) ylikely {
 		pq_ent	*nep = (pq_ent *) a ;
 	        if ((rs = pq_ins(op->cqp,nep)) >= 0) {
 	            op->eap = caddr_t(a + op->eaoff) ;
