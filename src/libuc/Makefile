@@ -47,30 +47,26 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
+CFLAGS		?= $(MAKECFLAGS) 
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00_MOD += valuelims.o
-OBJ01_MOD += uconstants.o ulibvals.o
-OBJ02_MOD +=
-OBJ03_MOD += bstree.o sview.o
-OBJ04_MOD += mapblock.o memtrack.o addrset.o
-OBJ05_MOD += strfilter.o
-OBJ06_MOD +=
+OBJ00_MOD += bstree.o sview.o
+OBJ01_MOD += mapblock.o memtrack.o addrset.o
+OBJ02_MOD += strfilter.o
+OBJ03_MOD +=
 
-OBJA_MOD= obj00_mod.o obj01_mod.o obj02_mod.o obj03_mod.o
-OBJB_MOD= obj04_mod.o
+OBJA_MOD= obj00_mod.o obj01_mod.o obj02_mod.o
+OBJB_MOD=
 
-OBJ_MOD= obja_mod.o objb_mod.o
+OBJ_MOD= obja_mod.o
 
 OBJ00_INIT=
 OBJ01_INIT=
@@ -82,9 +78,9 @@ OBJ05_INIT=
 OBJ06_INIT=
 OBJ07_INIT=
 
-OBJ00= matxstr.o toxc.o char.o 
+OBJ00= debug.o matxstr.o toxc.o char.o 
 OBJ01= strn.o strnxcmp.o
-OBJ02= snwcpy.o strdcpy.o
+OBJ02= snwcpy.o strcpyx.o strdcpy.o
 OBJ03= strw.o strx.o mnw.o
 
 OBJ04= isx.o
@@ -92,9 +88,9 @@ OBJ05= nleadx.o
 OBJ06= mapex.o
 OBJ07=
 
-OBJ08= strkeyx.o
+OBJ08=
 OBJ09= strobj.o
-OBJ10= cfx.o memtrack.o mapblock.o
+OBJ10= ctx.o cfx.o mapblock.o memtrack.o
 OBJ11= field.o termx.o
 
 OBJ12=
@@ -107,7 +103,7 @@ OBJ17 = wsix.o wsnx.o wsfx.o
 OBJ18 = 
 OBJ19 = 
 
-OBJ20= hdb.o hdbstr.o ccfile.o
+OBJ20= hdb.o hdbstr.o
 OBJ21=
 OBJ22=
 OBJ23=
@@ -118,8 +114,8 @@ OBJ26=
 OBJ27=
 
 OBJ28= ucttyname.o uctc.o ucsysconf.o
-OBJ29= uclibmem.o
-OBJ30= ucsys.o
+OBJ29= uclibmem.o ucyserattr.o
+OBJ30= ucsys.o ucatexit.o ucatfork.o
 OBJ31= tcx.o
 
 OBJ=
@@ -148,6 +144,9 @@ a:			$(T).a
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -168,7 +167,7 @@ $(T).so:		$(OBJ) Makefile
 	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(RUNINFO) $(LIBINFO)
 
 $(T).o:			$(OBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
@@ -366,24 +365,22 @@ ucsysmisc.o:		ucsysmisc.cc
 ucnprocs.o:		ucnprocs.cc
 ucpathconf.o:		ucpathconf.cc
 ucmain.o:		ucmain.cc
-ucatfork.o:		ucatfork.cc
-ucatexit.o:		ucatexit.cc
+ucatfork.o:		ucatfork.cc	ucatfork.h		$(INCS)
+ucatexit.o:		ucatexit.cc	ucatexit.h		$(INCS)
 ucfork.o:		ucfork.cc
 ucgetipnodeby.o:	ucgetipnodeby.cc
 ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
-ucproguser.o:		ucproguser.cc ucproguser.h
-ucprogdata.o:		ucprogdata.cc ucprogdata.h
+ucproguser.o:		ucproguser.cc	ucproguser.h		$(INCS)
+ucprogdata.o:		ucprogdata.cc	ucprogdata.h		$(INCS)
 ucclustername.o:	ucclustername.cc ucclustername.h
-uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
 ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
 ucobjmode.o:		ucobjmode.cc
 ucunlink.o:		ucunlink.cc
 uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
-
-# UNIX C-language system library string-to-integer interface
-# string-to-x
-ucstrtox.o:		ucstrtox.cc ucstrtox.h
-ucstrtod.o:		ucstrtod.cc ucstrtod.h
+ucuserattr.o:		ucuserattr.cc	ucuserattr.h		$(INCS)
+ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
+ucprochave.o:		ucprochave.cc	ucprochave.h		$(INCS)
+ucmincode.o:		ucmincode.cc	ucmincode.h		$(INCS)
 
 # uctimeout (time-out call-backs)
 uctimeout.o:		uctimeout.cc
@@ -395,6 +392,8 @@ uc_safesleep.o:		uc_safesleep.cc
 
 uc_openinfo.o:		uc_openinfo.c opensysfs.h
 uc_openuser.o:		uc_openuser.c opensysfs.h
+
+uckvamatch.o:		uckvamatch.cc	uckvamatch.h		$(INCS)
 
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
@@ -411,7 +410,6 @@ lookaside.o:		lookaside.cc lookaside.h
 
 spawner.o:		spawner.cc spawner.h
 
-nulstr.o:		nulstr.cc nulstr.h
 csem.o:			csem.cc csem.h
 dirlist.o:		dirlist.cc dirlist.h
 randomvar.o:		randomvar.cc randomvar.h
@@ -430,6 +428,7 @@ filemap.o:		filemap.cc filemap.h
 
 numsign.o:		numsign.cc numsign.h
 
+# the following "ent" type modules are transferred to the OBSOLETE repository
 passwdent.o:		passwdent.cc passwdent.h
 spwdent.o:		spwdent.cc spwdent.h
 groupent.o:		groupent.cc groupent.h
@@ -447,14 +446,13 @@ mkquoted.o:		mkquoted.cc mkquoted.h
 
 tmtime.o:		tmtime.cc tmtime.h
 
-strshrink.o:		strshrink.c
+strshrink.o:		strshrink.cc
  
 # digit-character management
 ndigit.o:		ndigit.cc ndigit.h
 checkbase.o:		mods.o checkbase.cc checkbase.h
 
 # malloc
-mallocxx.o:		mallocxx.cc mallocxx.h
 mallocstuff.o:		mallocstuff.cc mallocstuff.h
 
 # UNIX C-language system library data-base interface (support)
@@ -464,26 +462,17 @@ ucpasswd.o:		ucpasswd.cc ucpasswd.h
 ucgroup.o:		ucgroup.cc ucgroup.h
 ucproject.o:		ucproject.cc ucproject.h
 
-# UNIX C-language system library support
-libmallocxx.o:		libmallocxx.cc libmallocxx.h
-
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.ccm
 	makemodule mapblock
 
 # MEMTRACK
-memtrack.o:		memtrack0.o memtrack1.o
-	$(LD) -r -o $@ $(LDFLAGS) memtrack0.o memtrack1.o
-memtrack0.o:		memtrack.ccm mapblock.ccm
-	makemodule mapblock
-	makemodule memtrack
-memtrack1.o:		memtrack.ccm memtrack1.cc
-	makemodule mapblock memtrack
-	$(COMPILE.cc) memtrack1.cc
+memtrack.o:		memtrack.dir
+memtrack.dir:
+	makesubdir $@
 
 ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h
 ucmemalloc.o:		addrset.o
-ucmallocx.o:		ucmallocx.cc ucmallocx.h
 
 # UNIX C-language system library timer management
 uctim.o:		uctim.cc uctim.h itcontrol.h
@@ -493,6 +482,12 @@ uctimer.o:		uctimer.cc uctimer.h
 toxc.o:			toxc.cc toxc.h
 char.o:			char.cc char.h
 
+# UNIX C-language system library string-to-integer interface
+# string-to-x
+ucstrto.o:		ucstrto.dir
+ucstrto.dir:
+	makesubdir $@
+
 # UCSUPPORT
 ucsupport.o:		ucsupport.dir
 ucsupport.dir:
@@ -501,6 +496,21 @@ ucsupport.dir:
 # UCSYSCONF
 ucsysconf.o:		ucsysconf.dir
 ucsysconf.dir:
+	makesubdir $@
+
+# UCREAD
+ucread.o:		ucread.dir
+ucread.dir:
+	makesubdir $@
+
+# UCREAD
+ucwrite.o:		ucwrite.dir
+ucwrite.dir:
+	makesubdir $@
+
+# UCIDS
+ucids.o:		ucids.dir
+ucids.dir:
 	makesubdir $@
 
 # ADDRSET
@@ -545,6 +555,10 @@ snx.dir:
 
 snwcpy.o:		snwcpy.dir
 snwcpy.dir:
+	makesubdir $@
+
+stp.o:			stp.dir
+stp.dir:
 	makesubdir $@
 
 # WSNX (Wide-String-NX)
@@ -622,14 +636,14 @@ strxcmp.o:		strxcmp.dir
 strxcmp.dir:
 	makesubdir $@
 
+# STRCPYX
+strcpyx.o:		strcpyx.dir
+strcpyx.dir:
+	makesubdir $@
+
 # STRX
 strx.o:			strx.dir
 strx.dir:
-	makesubdir $@
-
-# STRKEYX
-strkeyx.o:		strkeyx.dir
-strkeyx.dir:
 	makesubdir $@
 
 # VEC
@@ -842,6 +856,11 @@ fmtflag.o:		fmtflag.dir
 fmtflag.dir:
 	makesubdir $@
 
+# FMTSTR		(in-order from FMTFLAG)
+fmtstr.o:		fmtstr.dir
+fmtstr.dir:
+	makesubdir $@
+
 # CTX			(in-order from FMTFLAG)
 ctx.o:			ctx.dir
 ctx.dir:
@@ -850,11 +869,6 @@ ctx.dir:
 # CFX			(in-order from FMTFLAG)
 cfx.o:			cfx.dir
 cfx.dir:
-	makesubdir $@
-
-# FMTSTR		(in-order from FMTFLAG)
-fmtstr.o:		fmtstr.dir
-fmtstr.dir:
 	makesubdir $@
 
 # INETADDRX
@@ -882,9 +896,14 @@ strfilter.o:		strfilter.dir
 strfilter.dir:
 	makesubdir $@
 
-# OBUF
-obuf.o:			obuf.dir
-obuf.dir:
+# BUFOS
+bufos.o:		bufos.dir
+bufos.dir:
+	makesubdir $@
+
+# BUFSLIDE
+bufslide.o:		bufslide.dir
+bufslide.dir:
 	makesubdir $@
 
 # PERMX
@@ -892,25 +911,28 @@ permx.o:		permx.dir
 permx.dir:
 	makesubdir $@
 
+# UCMEM
+ucmem.o:		ucmem.dir
+ucmem.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
 # tab and character column handling
-tabcols.o:		tabcols.cc tabcols.h
-ncol.o:			ncol.cc ncol.h tabcols.h
 tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
 
 # INET
 inetconv.o:		inetconv.cc inetconv.h
 
 # LIBUC
-ucmemla.o:		ucmemla.cc ucmemla.h
-ucpts.o:		ucpts.cc ucpts.h
+ucpts.o:		ucpts.cc	ucpts.h
+tcx.o:			tcx.cc		tcx.h			$(INCS)
 
-# other
-expcook.o:		expcook.cc	expcook.h
-keyopt.o:		keyopt.cc	keyopt.h
-utf8decoder.o:		utf8decoder.cc	utf8decoder.h
+# other objects
+expcook.o:		expcook.cc	expcook.h		$(INCS)
+keyopt.o:		keyopt.cc	keyopt.h		$(INCS)
+utf8decoder.o:		utf8decoder.cc	utf8decoder.h		$(INCS)
 td.o:			td.cc		td.h termstr.h
 recip.o:		recip.cc	recip.h
 querystr.o:		querystr.cc	querystr.h
@@ -927,7 +949,6 @@ unameo.o:		unameo.cc	unameo.h
 hostaddr.o:		hostaddr.cc	hostaddr.h
 hostinfo.o:		hostinfo.cc	hostinfo.h
 lookaside.o:		lookaside.cc	lookaside.h
-expcook.o:		expcook.cc	expcook.h
 memfile.o:		memfile.cc	memfile.h		$(INCS)
 dirlist.o:		dirlist.cc	dirlist.h		$(INCS)
 varray.o:		varray.cc	varray.h		$(INCS)
@@ -935,7 +956,6 @@ csem.o:			csem.cc		csem.h			$(INCS)
 pwcache.o:		pwcache.cc	pwcache.h		$(INCS)
 lockrw.o:		lockrw.cc	lockrw.h		$(INCS)
 nodedb.o:		nodedb.cc	nodedb.h		$(INCS)
-ccfile.o:		ccfile.cc	ccfile.hh		$(INCS)
 thrcomm.o:		thrcomm.cc	thrcomm.h		$(INCS)
 thrbase.o:		thrbase.cc	thrbase.h thrcomm.h	$(INCS)
 pwentry.o:		pwentry.cc	pwentry.h		$(INCS)
@@ -946,6 +966,9 @@ absfn.o:		absfn.cc	absfn.h			$(INCS)
 outbuf.o:		outbuf.cc	outbuf.h		$(INCS)
 kvsfile.o:		kvsfile.cc	kvsfile.h		$(ICNS)
 clusterdb.o:		clusterdb.cc	clusterdb.h		$(ICNS)
+comparse.o:		comparse.cc	comparse.h		$(INCS)
+fsdirtree.o:		fsdirtree.cc	fsdirtree.h		$(INCS)
+dupstr.o:		dupstr.cc	dupstr.h		$(INCS)
 
 # sring-comparisons
 vstr.o:			vstr.dir
@@ -987,6 +1010,11 @@ ucfileop.o:		ucfileop.dir
 ucfileop.dir:
 	makesubdir $@
 
+# UCSOCK
+ucsock.o:		ucsock.dir
+ucsock.dir:
+	makesubdir $@
+
 # UCSTREAM
 ucstream.o:		ucstream.dir
 ucstream.dir:
@@ -1002,56 +1030,86 @@ debug.o:		debug.dir
 debug.dir:
 	makesubdir $@
 
+# RECIP
+recip.o:	recip.dir
+recip.dir:
+	makesubdir $@
+
+# NCOLX
+ncolx.o:	ncolx.dir
+ncolx.dir:
+	makesubdir $@
+
+# FILEX
+filex.o:		filex.dir
+filex.dir:
+	makesubdir $@
+
+# FILEOBJ
+fileobj.o:		fileobj.dir
+fileobj.dir:
+	makesubdir $@
+
+# UCONSTANTS
+uconstants.o:		uconstants.dir
+uconstants.dir:
+	makesubdir $@
+
+# DIRS
+dirs.o:			dirs.dir
+dirs.dir:
+	makesubdir $@
+
+# OPENDIALER
+opendialer.o:		opendialer.dir
+opendialer.dir:
+	makesubdir $@
+
 # string-constants
 syhsdbfiles.o:		sysdbfiles.c sysdbfiles.h
 sysdbfn.o:		sysdbfn.cc sysdbfn.h
 opensysdbs.o:		opensysdbs.c opensysdbs.h
 
-# UTILITY
-splitfname.o:		splitfname.cc splitfname.h
-findbit.o:		findbit.cc findbit.h
+# SINGLES
+findbit.o:		findbit.cc	findbit.h		$(INCS)
 termtypemat.o:		termtypemat.cc termtypemat.h
 termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 digval.o:		digval.cc digval.h
-mkdirs.o:		mkdirs.cc mkdirs.h
-strcpyxc.o:		strcpyxc.cc strcpyxc.h
-stpcpyxc.o:		stpcpyxc.cc stpcpyxc.h
-
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
-readln.o:		readln.cc readln.hh
 strwcmp.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
 findxfile.o:		findxfile.cc findxfile.h
-calstrs.o:		calstrs.cc calstrs.h
-ipow.o:			ipow.cc ipow.h
-base64.o:		base64.cc base64.h
-ffbs.o:			ffbs.cc ffbs.h
-shellunder.o:		shellunder.cc shellunder.h
-itcontrol.o:		itcontrol.cc itcontrol.h
-dictdiff.o:		dictdiff.cc dictdiff.h
-rsfree.o:		rsfree.cc rsfree.h
-xfile.o:		xfile.cc xfile.h
-sysmemutil.o:		sysmemutil.cc sysmemutil.h
-bitrotate.o:		bitrotate.cc bitrotate.h
+calstrs.o:		calstrs.cc	calstrs.h		$(INCS)
+ipow.o:			ipow.cc		ipow.h			$(INCS)
+base64.o:		base64.cc	base64.h		$(INCS)
+shellunder.o:		shellunder.cc	shellunder.h		$(INCS)
+itcontrol.o:		itcontrol.cc	itcontrol.h		$(INCS)
+dictdiff.o:		dictdiff.cc	dictdiff.h		$(INCS)
+rsfree.o:		rsfree.cc	rsfree.h		$(INCS)
+xfile.o:		xfile.cc	xfile.h			$(INCS)
+sysmemutil.o:		sysmemutil.cc	sysmemutil.h		$(INCS)
+bitrotate.o:		bitrotate.cc	bitrotate.h		$(INCS)
 nonpath.o:		nonpath.cc	nonpath.h		$(INCS)
+conallof.o:		conallof.cc	conallof.h		$(INCS)
+nchr.o:			nchr.cc		nchr.h			$(INCS)
+inaddrbad.o:		inaddrbad.cc	inaddrbad.hh		$(INCS)
+retstat.o:		retstat.cc	retstat.h		$(INCS)
 
 # integer-conversion-to-string-digits
-strval.o:		uconstants.o strval.cc strval.h
+strval.o:		strval.cc strval.h uconstants.o
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h
 umask.o:		umask.cc umask.h
 unameo.o:		unameo.cc unameo.h
-ucrand.o:		ucrand.cc ucrand.h
-ucprochave.o:		ucprochave.cc ucprochave.h
 
 # environment related string values
-strlibval.o:		strlibval.cc strlibval.hh
-strenv.o:		strenv.cc strenv.hh
+strlibval.o:		strlibval.cc	strlibval.hh	$(INCS)
+strenv.o:		strenv.cc	strenv.hh	$(INCS)
 
 # BSTREE
 bstree.o:		bstree.ccm			$(INCS)
@@ -1062,47 +1120,52 @@ sview.o:		sview.ccm			$(INCS)
 # BUFSIZEDATA
 bufsizedata.o:		bufsizedata.ccm			$(INCS)
 
-# UCONSTABTS
-uconstants.o:		valuelims.o uconstants.ccm
-
-
-valuelims.o:		valuelims.ccm
-ulibvals.o:		ulibvals.ccm
-
 
 obj00_mod.o:		$(OBJ00_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ00_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj01_mod.o:		$(OBJ01_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ01_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj02_mod.o:		$(OBJ02_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ02_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj03_mod.o:		$(OBJ03_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ03_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj04_mod.o:		$(OBJ04_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ04_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj05_mod.o:		$(OBJ05_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ05_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj06_mod.o:		$(OBJ06_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ06_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj07_mod.o:		$(OBJ07_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja_mod.o:		$(OBJA_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJA_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb_mod.o:		$(OBJB_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJB_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc_mod.o:		$(OBJC_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd_mod.o:		$(OBJD_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obj_mod.o:		$(OBJ_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 mods.o:			$(OBJ_MOD)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_MOD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+uccontext.o:		uccontext.cc	uccontext.h		$(INCS)
+	$(COMPILE.cc) -Wno-deprecated-declarations $<
 
 
