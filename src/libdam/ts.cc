@@ -125,18 +125,20 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| + |strnlen(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<usysflag.h>
-#include	<sysval.hh>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
+#include	<getfstype.h>
+#include	<sysval.hh>
 #include	<endian.h>
 #include	<vecstr.h>
 #include	<mapstrint.h>
@@ -148,7 +150,6 @@
 #include	<lockfile.h>
 #include	<sncpyx.h>		/* |sncpy(3uc)| */
 #include	<mkx.h>			/* |mkmagic(3uc)| */
-#include	<getfstype.h>
 #include	<entbuf.h>
 #include	<funmode.hh>
 #include	<isnot.h>
@@ -157,7 +158,9 @@
 #include	"ts.h"
 #include	"tse.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -193,7 +196,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -205,6 +207,11 @@ typedef ts_ent		tsent ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_lockf(int,int,off_t) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+}
 
 
 /* external variables */
@@ -218,28 +225,28 @@ enum vetus {
     vetu_type,
     vetu_unused,
     vetu_overlast
-} ;
+} ; /* end enum (vetus) */
 
 namespace {
     struct vars {
 	int	entsz ;
 	operator int () noex ;
-    } ;
-}
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int ts_ctor(ts *op,Args ... args) noex {
+local int ts_ctor(ts *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    ts_head	*hop = op ;
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->ebmp = new(nothrow) entbuf) != np) {
-	        if ((op->nip = new(nothrow) mapstrint) != np) {
+	    if ((op->ebmp = new(nothrow) entbuf) != np) ylikely {
+	        if ((op->nip = new(nothrow) mapstrint) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-mapstrint) */
 		if (rs < 0) {
@@ -249,63 +256,60 @@ static int ts_ctor(ts *op,Args ... args) noex {
 	    } /* end if (new-entbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ts_ctor) */
+} /* end subroutine (ts_ctor) */
 
-static int ts_dtor(ts *op) noex {
+local int ts_dtor(ts *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->nip) {
+	    if (op->nip) ylikely {
 		delete op->nip ;
 		op->nip = nullptr ;
 	    }
-	    if (op->ebmp) {
+	    if (op->ebmp) ylikely {
 		delete op->ebmp ;
 		op->ebmp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ts_dtor) */
+} /* end subroutine (ts_dtor) */
 
 template<typename ... Args>
 static inline int ts_magic(ts *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == TS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (ts_magic) */
+} /* end subroutine (ts_magic) */
 
-static int	ts_fileopen(ts *,time_t) noex ;
-static int	ts_fileclose(ts *) noex ;
-static int	ts_filesetinfo(ts *,time_t) noex ;
-static int	ts_lockacq(ts *,time_t,int) noex ;
-static int	ts_lockrel(ts *) noex ;
-static int	ts_filebegin(ts *,time_t) noex ;
-static int	ts_acquire(ts *,time_t,int) noex ;
-static int	ts_filecheck(ts *,time_t) noex ;
-static int	ts_ebufstart(ts *) noex ;
-static int	ts_ebuffinish(ts *) noex ;
+local int	ts_fileopen(ts *,time_t) noex ;
+local int	ts_fileclose(ts *) noex ;
+local int	ts_filesetinfo(ts *,time_t) noex ;
+local int	ts_lockacq(ts *,time_t,int) noex ;
+local int	ts_lockrel(ts *) noex ;
+local int	ts_filebegin(ts *,time_t) noex ;
+local int	ts_acquire(ts *,time_t,int) noex ;
+local int	ts_filecheck(ts *,time_t) noex ;
+local int	ts_ebufstart(ts *) noex ;
+local int	ts_ebuffinish(ts *) noex ;
 
-static int	ts_filetopwrite(ts *,time_t) noex ;
-static int	ts_filetopread(ts *) noex ;
-static int	ts_fileverify(ts *) noex ;
-static int	ts_headtab(ts *,funmode) noex ;
+local int	ts_filetopwrite(ts *,time_t) noex ;
+local int	ts_filetopread(ts *) noex ;
+local int	ts_fileverify(ts *) noex ;
+local int	ts_headtab(ts *,funmode) noex ;
 
-static int	ts_updater(ts *,time_t,ts_ent *,cc *,int) noex ;
-static int	ts_findname(ts *,cchar *,int,char **) noex ;
-static int	ts_search(ts *,cchar *,int,char **) noex ;
-static int	ts_readentry(ts *,int,char **) noex ;
-static int	ts_index(ts *,cchar *,int,int) noex ;
-static int	ts_headwrite(ts *) noex ;
+local int	ts_updater(ts *,time_t,ts_ent *,cc *,int) noex ;
+local int	ts_findname(ts *,cchar *,int,char **) noex ;
+local int	ts_search(ts *,cchar *,int,char **) noex ;
+local int	ts_readentry(ts *,int,char **) noex ;
+local int	ts_index(ts *,cchar *,int,int) noex ;
+local int	ts_headwrite(ts *) noex ;
 
-static int	tsent_load(tsent *,cchar *,char * = nullptr,int = -1) noex ;
-static int	tsent_trans(tsent *,tse *) noex ;
+local int	tsent_load(tsent *,cchar *,char * = nullptr,int = -1) noex ;
+local int	tsent_trans(tsent *,tse *) noex ;
 
-static bool	namematch(cchar *,cchar *,int) noex ;
+local bool	namematch(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -331,16 +335,16 @@ constexpr bool		f_solarisbug = CF_SOLARISBUG ;
 
 /* exported subroutines */
 
-static int ts_opens(ts *) noex ;
+local int ts_opens(ts *) noex ;
 
 int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 	int		rs ;
 	int		f_created = false ;
-	if ((rs = ts_ctor(op,fname)) >= 0) {
+	if ((rs = ts_ctor(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if ((rs = rsv) >= 0) ylikely {
 	            op->fd = -1 ;
 	            op->oflags = oflags ;
 	            op->operm = operm ;
@@ -348,12 +352,13 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 	                oflags |= O_CREAT ;
 		    } /* end if_constexpr (f_creat) */
 	            oflags = (oflags & (~ O_TRUNC)) ;
-	            if (cchar *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = lm_strw(fname,-1,&cp)) >= 0) {
         	        op->fname = cp ;
 		        rs = ts_opens(op) ;
 		        f_created = (rs > 0) ;
 			if (rs < 0) {
-			    uc_free(op->fname) ;
+			    void *vp = voidp(op->fname) ;
+			    lm_free(vp) ;
 			    op->fname = nullptr ;
 			}
 	            } /* end if (memory-allocation) */
@@ -367,11 +372,11 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 }
 /* end subroutine (ts_open) */
 
-static int ts_opens(ts *op) noex {
+local int ts_opens(ts *op) noex {
     	int		rs ;
 	int		fcreated = false ;
         custime     dt = getustime ;
-        if ((rs = ts_fileopen(op,dt)) >= 0) {
+        if ((rs = ts_fileopen(op,dt)) >= 0) ylikely {
             fcreated = (rs > 0) ;
             if ((rs = ts_filebegin(op,dt)) >= 0) {
                 if ((rs = mapstrint_start(op->nip,nidxent)) >= 0) {
@@ -389,8 +394,8 @@ static int ts_opens(ts *op) noex {
 int ts_close(ts *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ts_magic(op)) >= 0) {
-	    if (op->nip) {
+	if ((rs = ts_magic(op)) >= 0) ylikely {
+	    if (op->nip) ylikely {
 	        rs1 = mapstrint_finish(op->nip) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -398,8 +403,9 @@ int ts_close(ts *op) noex {
 	        rs1 = ts_fileclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->fname) {
-	        rs1 = uc_free(op->fname) ;
+	    if (op->fname) ylikely {
+		void *vp = voidp(op->fname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    }
@@ -644,7 +650,7 @@ int ts_check(ts *op,time_t dt) noex {
 
 /* private subroutines */
 
-static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
+local int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
     	int		rs ;
 	int		rs1 ;
 	int		ei = 0 ; /* return-value */
@@ -703,7 +709,7 @@ static int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
 }
 /* end subroutine (rs_updater) */
 
-static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
+local int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
@@ -736,7 +742,7 @@ static int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 /* end subroutine (ts_findname) */
 
 /* search for an entry */
-static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
+local int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ne = 0 ; /* used-throughout */
@@ -775,7 +781,7 @@ static int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 }
 /* end subroutine (ts_search) */
 
-static int ts_acquire(ts *op,time_t dt,int f_read) noex {
+local int ts_acquire(ts *op,time_t dt,int f_read) noex {
 	int		rs ;
 	int		f_changed = false ;
 	if (dt == 0) dt = getustime ;
@@ -804,7 +810,7 @@ static int ts_acquire(ts *op,time_t dt,int f_read) noex {
 /* end subroutine (ts_acquire) */
 
 /* initialize the file header (either read it only or write it) */
-static int ts_filebegin(ts *op,time_t dt) noex {
+local int ts_filebegin(ts *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	bool		f_locked = false ;
 	if (op->filesize == 0) {
@@ -848,7 +854,7 @@ static int ts_filebegin(ts *op,time_t dt) noex {
 }
 /* end subroutine (ts_filebegin) */
 
-static int ts_filecheck(ts *op,time_t dt) noex {
+local int ts_filecheck(ts *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 	if (op->filesize < taboff) {
@@ -870,7 +876,7 @@ static int ts_filecheck(ts *op,time_t dt) noex {
 }
 /* end subroutine (ts_filecheck) */
 
-static int ts_filetopwrite(ts *op,time_t dt) noex {
+local int ts_filetopwrite(ts *op,time_t dt) noex {
 	char		*bp = op->topbuf ;
 	int		rs ;
 	(void) dt ;
@@ -886,7 +892,7 @@ static int ts_filetopwrite(ts *op,time_t dt) noex {
 	    }
             /* next is the header (we just write zeros here) */
 	    {
-	        memset(bp,0,TS_HEADTABLEN) ;
+	        memclear(bp,TS_HEADTABLEN) ;
 	        bp += TS_HEADTABLEN ;
 	    }
 	    {
@@ -905,7 +911,7 @@ static int ts_filetopwrite(ts *op,time_t dt) noex {
 }
 /* end subroutine (ts_filetopwrite) */
 
-static int ts_filetopread(ts *op) noex {
+local int ts_filetopread(ts *op) noex {
 	coff		poff = 0z ;
 	int		rs ;
 	if ((rs = u_pread(op->fd,op->topbuf,toplen,poff)) >= 0) {
@@ -915,7 +921,7 @@ static int ts_filetopread(ts *op) noex {
 }
 /* end subroutine (ts_filetopread) */
 
-static int ts_fileverify(ts *op) noex {
+local int ts_fileverify(ts *op) noex {
 	static cint	magl = lenstr(magstr) ;
 	cchar		*magp = magstr ;
 	int		rs = SR_INVALID ;
@@ -942,7 +948,7 @@ static int ts_fileverify(ts *op) noex {
 /* end subroutine (ts_fileverify) */
 
 /* read or write the file header */
-static int ts_headtab(ts *op,funmode fc) noex {
+local int ts_headtab(ts *op,funmode fc) noex {
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 	char		*bp = (op->topbuf + TS_HEADTABOFF) ;
@@ -980,7 +986,7 @@ static int ts_headtab(ts *op,funmode fc) noex {
 /* end subroutine (ts_headtab) */
 
 /* acquire access to the file */
-static int ts_lockacq(ts *op,time_t dt,int f_read) noex {
+local int ts_lockacq(ts *op,time_t dt,int f_read) noex {
 	int		rs ;
 	int		f_changed = false ;
 	if ((rs = ts_fileopen(op,dt)) >= 0) {
@@ -1014,13 +1020,14 @@ static int ts_lockacq(ts *op,time_t dt,int f_read) noex {
 		if (rs >= 0) {
 		    /* has the file changed at all? */
 	            if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+			csize fsize = size_t(sb.st_size) ;
 			f_changed = f_changed || (sb.st_size != op->filesize) ;
 			f_changed = f_changed || (sb.st_mtime != op->timod) ;
 		        if (f_changed) {
 	    		    if (op->fl.bufvalid) {
 				op->fl.bufvalid = false ;
 			    }
-	    		    op->filesize = intsat(sb.st_size) ;
+	    		    op->filesize = intsat(fsize) ;
 	    		    op->timod = sb.st_mtime ;
 			} /* end if */
 	                if (op->filesize < taboff) {
@@ -1048,7 +1055,7 @@ static int ts_lockacq(ts *op,time_t dt,int f_read) noex {
 }
 /* end subroutine (ts_lockacq) */
 
-static int ts_lockrel(ts *op) noex {
+local int ts_lockrel(ts *op) noex {
 	int		rs = SR_OK ;
 	if ((op->fl.lockedread || op->fl.lockedwrite)) {
 	    if (op->fd >= 0) {
@@ -1071,7 +1078,7 @@ static int ts_lockrel(ts *op) noex {
 }
 /* end subroutine (ts_lockrel) */
 
-static int ts_fileopen(ts *op,time_t dt) noex {
+local int ts_fileopen(ts *op,time_t dt) noex {
 	int	rs = SR_OK ;
 	int	f_created = false ;
 	if (op->fd < 0) {
@@ -1101,7 +1108,7 @@ static int ts_fileopen(ts *op,time_t dt) noex {
 }
 /* end subroutine (ts_fileopen) */
 
-static int ts_fileclose(ts *op) noex {
+local int ts_fileclose(ts *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	if (op->fl.entbuf) {
@@ -1119,22 +1126,23 @@ static int ts_fileclose(ts *op) noex {
 }
 /* end subroutine (ts_fileclose) */
 
-static int ts_filesetinfo(ts *op,time_t dt) noex {
+local int ts_filesetinfo(ts *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		am = (op->oflags & O_ACCMODE) ;
 	(void) dt ;
 	op->fl.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
 	if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+	    csize fsize = size_t(sb.st_size) ;
 	    op->timod = sb.st_mtime ;
-	    op->filesize = intsat(sb.st_size) ;
-	    if (char *fsbuf ; (rs = malloc_fs(&fsbuf)) >= 0) {
+	    op->filesize = intsat(fsize) ;
+	    if (char *fsbuf ; (rs = lm_fs(&fsbuf)) >= 0) {
 		cint	fslen = rs ;
 	        if ((rs = getfstype(fsbuf,fslen,op->fd)) >= 0) {
 		    cbool	f = (matlocalfs(fsbuf,rs) >= 0) ;
 	            op->fl.remote = (! f) ; /* remote if not local! */
 	        } /* end if (getfstype) */
-		rs1 = uc_free(fsbuf) ;
+		rs1 = lm_free(fsbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (u_fstat) */
@@ -1142,7 +1150,7 @@ static int ts_filesetinfo(ts *op,time_t dt) noex {
 }
 /* end subroutine (ts_filesetinfo) */
 
-static int ts_ebufstart(ts *op) noex {
+local int ts_ebufstart(ts *op) noex {
 	int		rs = SR_OK ;
 	if (! op->fl.entbuf) {
 	    if (op->fd >= 0) {
@@ -1160,7 +1168,7 @@ static int ts_ebufstart(ts *op) noex {
 }
 /* end subroutine (ts_ebufstart) */
 
-static int ts_ebuffinish(ts *op) noex {
+local int ts_ebuffinish(ts *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.entbuf) {
@@ -1172,7 +1180,7 @@ static int ts_ebuffinish(ts *op) noex {
 }
 /* end subroutine (ts_ebuffinish) */
 
-static int ts_readentry(ts *op,int ei,char **rpp) noex {
+local int ts_readentry(ts *op,int ei,char **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	char		*bp = nullptr ; /* used-afterwards */
@@ -1201,7 +1209,7 @@ static int ts_readentry(ts *op,int ei,char **rpp) noex {
 /* end subroutine (ts_readentry) */
 
 /* add to the name-index if necessary */
-static int ts_index(ts *op,cchar *sp,int sl,int ei) noex {
+local int ts_index(ts *op,cchar *sp,int sl,int ei) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs  ;
 	int		ei2 ;
@@ -1221,7 +1229,7 @@ static int ts_index(ts *op,cchar *sp,int sl,int ei) noex {
 }
 /* end subroutine (ts_index) */
 
-static int ts_headwrite(ts *op) noex {
+local int ts_headwrite(ts *op) noex {
 	int		rs ;
 	int		headtaboff = TS_HEADTABOFF ;
 	if ((rs = ts_headtab(op,funmode::rd)) >= 0) {
@@ -1248,7 +1256,7 @@ vars::operator int () noex {
 }
 /* end method (vars::operator) */
 
-static int tsent_load(tsent *ep,cc *bp,char *rb,int rl) noex {
+local int tsent_load(tsent *ep,cc *bp,char *rb,int rl) noex {
     	int		rs ;
 	int		rs1 ;
 	if (tse e ; (rs = e.start) >= 0) {
@@ -1267,9 +1275,9 @@ static int tsent_load(tsent *ep,cc *bp,char *rb,int rl) noex {
 }
 /* end subroutine (tsent_load) */
 
-static int tsent_trans(tsent *ep,tse *tep) noex {
+local int tsent_trans(tsent *ep,tse *tep) noex {
     	int		rs = SR_FAULT ;
-	if (tep) {
+	if (tep) ylikely {
 	    rs = SR_OK ;
 	    tep->count = ep->count ;
 	    tep->utime = ep->utime ;
@@ -1279,7 +1287,7 @@ static int tsent_trans(tsent *ep,tse *tep) noex {
 }
 /* end subroutine (tsent_trans) */
 
-static bool namematch(cc *sp,cc *nnp,int nnl) noex {
+local bool namematch(cc *sp,cc *nnp,int nnl) noex {
 	bool		f = false ;
 	if (nnl <= TSE_LKEYNAME) {
 	    f = (strncmp(sp,nnp,nnl) == 0) ;
