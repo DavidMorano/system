@@ -79,6 +79,21 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_lockf(int fd,int cmd,off_t lsize) noex {
@@ -92,8 +107,6 @@ int uc_lockf(int fd,int cmd,off_t lsize) noex {
 	            errno = 0 ;
 	            if ((rs = lockf(fd,cmd,lsize)) < 0) {
 			rs = (- errno) ;
-		    }
-	            if (rs < 0) {
 	                switch (rs) {
 	                case SR_DEADLK:
 	                    if (to-- > 0) {
