@@ -8,12 +8,34 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-03-05, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Group:
+	lm
+
+	Synopsis:
+	inline int lm_strw	(cchar *sp,int sl,cchar **rpp) noex
+	inline int lm_item	(cvoid *sp,int sl,void **rpp) noex
+	inline int lm_mall	(int sz,void *vp) noex
+	inline int lm_vall	(int sz,void *vp) noex
+	inline int lm_call	(int ne,int esz,void *vp) noex
+	inline int lm_rall	(void *cp,int nsz,void *vp) noex
+	inline int lm_free	(void *vp) oex
+	inline int lm_rsfree	(int rs,void *vp) noex
+
+	Description:
+	This is the low-level component of the MEMALLOC facility.
+	These subroutines need to be able to be interposed upon,
+	so they have to be in their own compilation (object) image.
+
+*******************************************************************************/
 
 #ifndef	UCLIBMEM_INCLUDE
 #define	UCLIBMEM_INCLUDE
@@ -21,10 +43,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
@@ -44,12 +63,6 @@ EXTERNC_end
 
 namespace libuc {
     struct libmems {
-	int mallocstrw	(cchar *,int,cchar **) noex ;
-	int mallocitem	(cvoid *,int,voidpp) noex ;
-	int malloc	(int,void *) noex ;
-	int valloc	(int,void *) noex ;
-	int calloc	(int,int,void *) noex ;
-	int ralloc	(void *,int,void *) noex ;
 	int strw	(cchar *,int,cchar **) noex ;
 	int item	(cvoid *,int,voidpp) noex ;
 	int mall	(int,void *) noex ;
@@ -88,6 +101,36 @@ inline int lm_rsfree	(int rs,void *vp) noex {
 }
 
 #endif /* __cplusplus */
+
+EXTERNC_begin
+
+extern int lm_ps(char **) noex ;	/* PS pagesize */
+extern int lm_ma(char **) noex ;	/* MA max-args */
+extern int lm_mn(char **) noex ;	/* MN max-name */
+extern int lm_mp(char **) noex ;	/* MP max-path */
+extern int lm_ml(char **) noex ;	/* ML max-line */
+extern int lm_mm(char **) noex ;	/* ML max-message */
+extern int lm_nn(char **) noex ;	/* NN node-name */
+extern int lm_hn(char **) noex ;	/* HN host-name */
+extern int lm_un(char **) noex ;	/* UN user-name */
+extern int lm_gn(char **) noex ;	/* GN group-name */
+extern int lm_pn(char **) noex ;	/* PN project-name */
+extern int lm_pw(char **) noex ;	/* PW object */
+extern int lm_sp(char **) noex ;	/* SP object */
+extern int lm_ua(char **) noex ;	/* UA object */
+extern int lm_gr(char **) noex ;	/* GR object */
+extern int lm_pj(char **) noex ;	/* PJ object */
+extern int lm_pr(char **) noex ;	/* PR object */
+extern int lm_nw(char **) noex ;	/* NW object */
+extern int lm_ho(char **) noex ;	/* HO object */
+extern int lm_sv(char **) noex ;	/* SV object */
+extern int lm_fs(char **) noex ;	/* FS type */
+extern int lm_sn(char **) noex ;	/* SN symbol-name */
+extern int lm_zn(char **) noex ;	/* ZN time-zone-name abbreviation */
+extern int lm_zi(char **) noex ;	/* ZI zone-info-name (Zone-Info) */
+extern int lm_ad(char **) noex ;	/* AD mail-addr */
+
+EXTERNC_end
 
 
 #endif /* UCLIBMEM_INCLUDE */
