@@ -75,12 +75,12 @@
 #include	<estrings.h>
 #include	<exitcodes.h>
 #include	<expcook.h>
-#include	<ffbs.h>
 #include	<fibonacci.h>
 #include	<field.h>
 #include	<filegrp.h>
 #include	<filemap.h>
 #include	<filer.h>
+#include	<findbit.h>
 #include	<findfilepath.h>
 #include	<findinline.h>
 #include	<findxfile.h>
@@ -148,6 +148,7 @@
 #include	<mkx.h>
 #include	<modload.h>
 #include	<namecache.h>
+#include	<nchr.h>
 #include	<ncol.h>
 #include	<ndig.h>
 #include	<ndigit.h>
@@ -259,7 +260,7 @@
 #include	<ucfiledesc.h>
 #include	<ucfileop.h>
 #include	<ucfork.h>
-#include	<ucfuncodes.h>
+#include	<funcodes.h>
 #include	<ucget.h>
 #include	<ucgethost.h>
 #include	<ucgetloadavg.h>
@@ -298,7 +299,6 @@
 #include	<ucsysmisc.h>
 #include	<uctc.h>
 #include	<uctc.h>		/* terminal interface */
-#include	<uctim.h>
 #include	<uctimeconv.h>
 #include	<uctimer.h>
 #include	<ucuserattr.h>
@@ -320,8 +320,8 @@
 #include	<varray.h>
 #include	<vars.h>
 #include	<vec.h>
-#include	<vstrcmpx.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrcmp.h>
+#include	<vstrkeycmp.h>
 #include	<willaddover.h>
 #include	<xfile.h>
 
@@ -330,11 +330,6 @@ EXTERNC_begin
 
 /* system group */
 extern int	uc_nprocs(int) noex ;
-
-/* time group */
-extern int	uc_clockset(clockid_t,const TIMESPEC *) noex ;
-extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
-extern int	uc_clockres(clockid_t,TIMESPEC *) noex ;
 
 /* process group */
 extern int	uc_atfork(void_f,void_f,void_f) noex ;
@@ -392,21 +387,8 @@ extern int	uc_seek(int,off_t,int) noex ;
 extern int	uc_tell(int,off_t *) noex ;
 extern int	uc_rewind(int) noex ;
 
-extern int	uc_bind(int,cvoid *,int) noex ;
-extern int	uc_connect(int,cvoid *,int) noex ;
-extern int	uc_connecte(int,cvoid *,int,int) noex ;
-extern int	uc_setsockopt(int,int,int,int *,int) noex ;
-extern int	uc_linger(int,int) noex ;
-
 extern int	uc_copy(int,int,int) noex ;
-
-extern int	uc_recve(int,void *,int,int,int,int) noex ;
-extern int	uc_recvfrome(int,void *,int,int,void *,int *,int,int) noex ;
-extern int	uc_recvmsge(int,MSGHDR *,int,int,int) noex ;
-extern int	uc_sockatmark(int) noex ;
 extern int	uc_peek(int,void *,int) noex ;
-extern int	uc_getsocktype(int) noex ;
-
 extern int	uc_keepalive(int,int) noex ;
 extern int	uc_moveup(int,int) noex ;
 extern int	uc_ndelay(int,int) noex ;
