@@ -1,4 +1,4 @@
-# MAKEFILES (hdbstr)
+# MAKEFILE (hdbstr)
 
 T= hdbstr
 
@@ -40,10 +40,13 @@ MODS +=
 LIBS +=
 
 
-OBJ0= hdbstr_main.o hdbstr_obj.o hdbstr_iter.o
+OBJ0= hdbstr_prime.o hdbstr_obj.o hdbstr_iter.o
 OBJ1= hdbstr_loadkeys.o hdbstr_loadpairs.o
+OBJ2=
+OBJ3=
 
 OBJA= obj0.o obj1.o
+OBJB=
 
 OBJ= $(OBJA)
 
@@ -145,7 +148,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-hdbstr_main.o:		hdbstr_main.cc		$(INCS)
+hdbstr_prime.o:		hdbstr_prime.cc		$(INCS)
 hdbstr_obj.o:		hdbstr_obj.cc		$(INCS)
 hdbstr_iter.o:		hdbstr_iter.cc		$(INCS)
 hdbstr_loadkeys.o:	hdbstr_loadkeys.cc	$(INCS)
