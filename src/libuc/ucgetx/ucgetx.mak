@@ -44,13 +44,13 @@ OBJ0= ucgetarchitecture.o ucgetcwd.o ucgethost.o
 OBJ1= ucgethostname.o ucgetipnodeby.o ucgetloadavg.o
 OBJ2= ucgetlogin.o ucgetnameinfo.o ucgetnisdomain.o
 OBJ3= ucgetpid.o ucgetpuid.o ucgetrandom.o
-OBJ4= ucgetrusage.o ucgetsocktype.o
-OBJ5= 
+OBJ4= ucgetrusage.o ucgetsocktype.o ucgetnetname.o
+OBJ5= ucgetauid.o ucgetdefproj.o ucgetpriority.o
 OBJ6=
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o 
-OBJB= obj3.o obj4.o
+OBJB= obj3.o obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
@@ -58,7 +58,6 @@ OBJ= obja.o objb.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -71,7 +70,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -150,17 +149,21 @@ objb.o:			$(OBJB)
 
 
 ucgetarchitecture.o:	ucgetarchitecture.cc			$(INCS)
+ucgetauid.o:		ucgetauid.cc				$(INCS)
 ucgetcwd.o:		ucgetcwd.cc				$(INCS)
-ucgethost.o:		ucgethost.cc ucgethost.h		$(INCS)
+ucgetdefproj.o:		ucgetdefproj.cc				$(INCS)
+ucgethost.o:		ucgethost.cc		ucgethost.h	$(INCS)
 ucgethostname.o:	ucgethostname.cc			$(INCS)
 ucgetipnodeby.o:	ucgetipnodeby.cc			$(INCS)
-ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h		$(INCS)
+ucgetloadavg.o:		ucgetloadavg.cc		ucgetloadavg.h	$(INCS)
 ucgetlogin.o:		ucgetlogin.cc				$(INCS)
 ucgetnameinfo.o:	ucgetnameinfo.cc			$(INCS)
+ucgetnetname.o:		ucgetnetname.cc				$(INCS)
 ucgetnisdomain.o:	ucgetnisdomain.cc			$(INCS)
-ucgetpid.o:		ucgetpid.cc ucgetpid.h			$(INCS)
+ucgetpid.o:		ucgetpid.cc		ucgetpid.h	$(INCS)
+ucgetpriority.o:	ucgetpriority.cc			$(INCS)
 ucgetpuid.o:		ucgetpuid.cc				$(INCS)
-ucgetrandom.o:		ucgetrandom.cc ucgetrandom.h		$(INCS)
+ucgetrandom.o:		ucgetrandom.cc		ucgetrandom.h	$(INCS)
 ucgetrusage.o:		ucgetrusage.cc				$(INCS)
 ucgetsocktype.o:	ucgetsocktype.cc			$(INCS)
 
