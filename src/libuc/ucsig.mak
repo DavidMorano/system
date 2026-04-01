@@ -1,4 +1,4 @@
-# MAKEFILES (ucsig)
+# MAKEFILE (ucsig)
 
 T= ucsig
 
