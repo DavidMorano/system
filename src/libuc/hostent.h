@@ -18,7 +18,8 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	HOSTENT		struct hostent
@@ -27,7 +28,7 @@
 
 struct hostent_cursor {
 	int		i ;
-} ;
+} ; /* end struct (hostent_cursor) */
 
 typedef HOSTENT_CUR	hostent_cur ;
 
