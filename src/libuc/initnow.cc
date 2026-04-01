@@ -58,14 +58,17 @@
 #include	<ctime>			/* structure |TIMEB| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |memset(3c)| */
-#include	<usystem.h>		/* UNIX® structure aliases */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<tmtime.hh>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"initnow.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -82,6 +85,11 @@
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_ftime(TIMEB *) noex ;
+    extern int uc_gettimeofday(TIMEVAL *,void *) noex ;
+}
+
 
 /* external variables */
 
@@ -91,8 +99,8 @@
 
 /* forward references */
 
-static int initnow_ftime(TIMEB *,char *,int) noex ;
-static int initnow_gettime(TIMEB *,char *,int) noex ;
+local int initnow_ftime(TIMEB *,char *,int) noex ;
+local int initnow_gettime(TIMEB *,char *,int) noex ;
 
 
 /* local variables */
@@ -108,9 +116,8 @@ constexpr bool		f_ftime = CF_FTIME ;
 int initnow(TIMEB *tbp,char *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (tbp) {
+	if (tbp) ylikely {
 	    memclear(tbp) ;
-	    if (zbuf) zbuf[0] = '\0' ;
 	    if_constexpr (f_ftime) {
 		rs = initnow_ftime(tbp,zbuf,zlen) ;
 		len = rs ;
@@ -118,6 +125,9 @@ int initnow(TIMEB *tbp,char *zbuf,int zlen) noex {
 		rs = initnow_gettime(tbp,zbuf,zlen) ;
 		len = rs ;
 	    } /* end if_constexpr (f_ftime) */
+	    if (rs < 0) {
+	        if (zbuf) zbuf[0] = '\0' ;
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -126,35 +136,36 @@ int initnow(TIMEB *tbp,char *zbuf,int zlen) noex {
 
 /* local subroutines */
 
-static int initnow_ftime(TIMEB *tbp,char *zbuf,int zlen) noex {
+local int initnow_ftime(TIMEB *tbp,char *zbuf,int zlen) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = uc_ftime(tbp)) >= 0) {
+	if ((rs = uc_ftime(tbp)) >= 0) ylikely {
 	    if (zbuf) {
-	        if (tmtime tmt ; (rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
-	            rs = sncpy1(zbuf,zlen,tmt.zname) ;
+	        if (tmtime tmt ; (rs = tmt.timelocal(tbp->time)) >= 0) {
+	            rs = sncpy(zbuf,zlen,tmt.znbuf) ;
 	            len = rs ;
-	        } /* end if (tmtime_localtime) */
+	        } /* end if (tmtime_timelocal) */
 	    } /* end if (zbuf) */
 	} /* end if (uc_ftime) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (initnow_ftime) */
 
-static int initnow_gettime(TIMEB *tbp,char *zbuf,int zlen) noex {
+local int initnow_gettime(TIMEB *tbp,char *zbuf,int zlen) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		len = 0 ;
-	if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
+	if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) ylikely {
             tbp->time = tv.tv_sec ;
-            tbp->millitm = (tv.tv_usec / 1000) ;
-            if (tmtime tmt ; (rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
-                tbp->timezone = (tmt.gmtoff / 60) ;
-                tbp->dstflag = tmt.isdst ;
+            tbp->millitm = ushortconv(tv.tv_usec / 1000) ;
+            if (tmtime tmt ; (rs = tmt.timelocal(tbp->time)) >= 0) {
+                tbp->timezone = shortconv(tmt.gmtoff / 60) ;
+                tbp->dstflag = shortconv(tmt.isdst) ;
                 if (zbuf) {
-                    rs = sncpy1(zbuf,zlen,tmt.zname) ;
+                    rs = sncpy(zbuf,zlen,tmt.znbuf) ;
                     len = rs ;
                 }
-            } /* end if (tmtime_localtime) */
+            } /* end if (tmtime_timelocal) */
 	} /* end if (uc_gettimeofday) */
 	return (rs >= 0) ? len : rs ;
 }
