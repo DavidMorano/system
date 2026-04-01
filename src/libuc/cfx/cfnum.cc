@@ -83,9 +83,6 @@
 
 /* forward references */
 
-
-/* subroutine-templates */
-
 template<typename UT>
 int cfnumx(cchar *sp,int sl,UT *rp) noex {
 	int		rs = SR_DOM ;
