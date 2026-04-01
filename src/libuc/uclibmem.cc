@@ -9,13 +9,14 @@
 
 /* revision history:
 
-	= 1998-03-85, David A­D­ Morano
+	= 1998-03-05, David A­D­ Morano
 	This code was originally written.
 
 	= 2018-09-26, David A-D- Morano
-	I brought |uc_libmem.mall(3uc)| in line w/ the standard for
-	|calloc(3c)|.  I never used this myself in 40 years, so I
-	never missed it!
+	I added the |lm_rsfree(3uc)| variant.  This was first
+	introduced w/ |ucmem(3uc)|.  This has some real use, but
+	has not caught on in any great way.  But it is now here
+	in case any facility wants to use this in the future.
 
 */
 
@@ -54,9 +55,13 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdckdint>		/* |ckd_mul(3c)| */
 #include	<cstring>		/* |stpncpy(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<utimeout.h>		/* |uto{x}(3u)| */
 #include	<getbufsize.h>
+#include	<sysval.hh>
 #include	<errtimer.hh>
 #include	<localmisc.h>
 
@@ -77,6 +82,10 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 /* external subroutines */
 
+extern "C" {
+    int lm_mallsys(int w,charpp rpp) noex ;
+}
+
 
 /* external variables */
 
@@ -91,10 +100,10 @@ namespace {
 	void		*cp ;		/* constant-void-pointer */
 	mgr(void *op = nullptr) noex : cp(op) { } ;
 	int operator () (int,void *) noex ;
-	int stdmalloc(int,void *) noex ;
-	int stdvalloc(int,void *) noex ;
-	int stdrealloc(int,void *) noex ;
-	int stdfree(int,void *) noex ;
+	int stdmalloc	(int,void *) noex ;
+	int stdvalloc	(int,void *) noex ;
+	int stdrealloc	(int,void *) noex ;
+	int stdfree	(int,void *) noex ;
     } ; /* end struct (mgr) */
 } /* end namespace */
 
@@ -103,6 +112,8 @@ namespace {
 
 
 /* local vaiables */
+
+local sysval		pagesz(sysval_ps) ;
 
 
 /* exported variables */
@@ -148,6 +159,121 @@ int uc_libmemrsfree(int rs,void *p) noex {
     	return libmem.rsfree(rs,p) ;
 }
 
+int lm_ma(char **rpp) noex {
+	cint	w = bufsize_ma ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_mn(char **rpp) noex {
+	cint	w = bufsize_mn ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_mp(char **rpp) noex {
+	cint	w = bufsize_mp ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_ml(char **rpp) noex {
+	cint	w = bufsize_ml ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_mm(char **rpp) noex {
+	cint	w = bufsize_mm ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_nn(char **rpp) noex {
+	cint	w = bufsize_nn ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_hn(char **rpp) noex {
+	cint	w = bufsize_hn ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_un(char **rpp) noex {
+	cint	w = bufsize_un ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_gn(char **rpp) noex {
+	cint	w = bufsize_gn ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_pn(char **rpp) noex {
+	cint	w = bufsize_pn ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_pw(char **rpp) noex {
+	cint	w = bufsize_pw ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_sp(char **rpp) noex {
+	cint	w = bufsize_sp ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_ua(char **rpp) noex {
+	cint	w = bufsize_ua ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_gr(char **rpp) noex {
+	cint	w = bufsize_gr ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_pj(char **rpp) noex {
+	cint	w = bufsize_pj ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_pr(char **rpp) noex {
+	cint	w = bufsize_pr ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_nw(char **rpp) noex {
+	cint	w = bufsize_nw ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_ho(char **rpp) noex {
+	cint	w = bufsize_ho ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_sv(char **rpp) noex {
+	cint	w = bufsize_sv ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_fs(char **rpp) noex {
+	cint	w = bufsize_fs ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_sn(char **rpp) noex {
+	cint	w = bufsize_sn ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_zn(char **rpp) noex {
+	cint	w = bufsize_zn ;
+	return lm_mallsys(w,rpp) ;
+}
+int lm_zi(char **rpp) noex {
+	cint	w = bufsize_zi ;
+	return lm_mallsys(w,rpp) ;
+}
+
+int lm_ad(char **rpp) noex {
+	cint	w = bufsize_mailaddr ;
+	return lm_mallsys(w,rpp) ;
+}
+
+int lm_ps(char **rpp) noex {
+	int             rs ;
+        if ((rs = pagesz) >= 0) ylikely {
+            cint        sz = (rs + 1) ;
+            rs = libmem.vall(sz,rpp) ;
+        }
+        return rs ;
+} /* end subroutine (lm_ps) */
+
+int lm_mallsys(int w,charpp rpp) noex {
+    	int		rs ;
+	if ((rs = getbufsize(w)) >= 0) ylikely {
+	    rs = libmem.mall(rs,rpp) ;
+	}
+	return rs ;
+} /* end subroutine (ln_mallsys) */
+
 
 /* local subroutines */
 
@@ -155,9 +281,9 @@ namespace libuc {
     int libmems::strw(cchar *sp,int µsl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (sp && rpp) {
-	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
-	        if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) {
+	if (sp && rpp) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
+	        if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) ylikely {
 	            *rpp = bp ;
 		    {
 	                char *ep = stpncpy(bp,sp,sl) ;
@@ -174,10 +300,10 @@ namespace libuc {
     int libmems::item(cvoid *sp,int sl,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (sp && rpp) {
+	if (sp && rpp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sl > 0) {
-	        if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) {
+	    if (sl > 0) ylikely {
+	        if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) ylikely {
 	            *rpp = bp ;
 		    {
 	                char *ep = charp(memcopy(bp,sp,sl)) ;
@@ -191,25 +317,31 @@ namespace libuc {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
     } /* end method (libmems::item) */
-    int libmems::mall(int sz,void *vp) noex {
+    int libmems::mall(int sz,void *vpp) noex {
 	mgr		lmo ;
 	lmo.m = &mgr::stdmalloc ;
-	return lmo(sz,vp) ;
+	return lmo(sz,vpp) ;
     } /* end method (libmems::mall) */
-    int libmems::call(int ne,int esz,void *vp) noex {
-	cint		sz = (ne * esz) ;
-	int		rs ;
-	if ((rs = mall(sz,vp)) >= 0) {
-	    memclear(vp,sz) ;
-	}
+    int libmems::call(int ne,int esz,void *vpp) noex {
+	int		rs = SR_TOOBIG ;
+	int		sz = 0 ; /* return-value */
+	if (ckd_mul(&sz,ne,esz) == false) {
+	    if ((rs = mall(sz,vpp)) >= 0) ylikely {
+		caddr_t	*epp = caddrp(vpp) ;
+		rs = SR_BUGCHECK ;
+		if (caddr_t ca = caddr_t(*epp) ; ca) {
+	            rs = memclear(ca,sz) ;
+		}
+	    } /* end if (mem.mall) */
+	} /* end if (valid) */
 	return (rs >= 0) ? sz : rs ;
     } /* end method (libmems::call) */
-    int libmems::vall(int sz,void *vp) noex {
+    int libmems::vall(int sz,void *vpp) noex {
 	mgr		lmo ;
 	lmo.m = &mgr::stdvalloc ;
-	return lmo(sz,vp) ;
+	return lmo(sz,vpp) ;
     } /* end method (libmems::vall) */
-    int libmems::rall(void *cp,int sz,void *vp) noex {
+    int libmems::rall(void *cp,int sz,void *vpp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
 	    const uintptr_t	am = (szof(uintptr_t) - 1) ;
@@ -218,7 +350,7 @@ namespace libuc {
 	    if ((v & am) == 0) {
 	        mgr	lmo(cp) ;
 	        lmo.m = &mgr::stdrealloc ;
-	        rs = lmo(sz,vp) ;
+	        rs = lmo(sz,vpp) ;
 	    } /* end if (aligned correctly) */
 	} /* end if (non-null) */
 	return rs ;
@@ -249,33 +381,15 @@ namespace libuc {
     } /* end method (libmems::rsfree) */
 } /* end namespace (libuc) */
 
-namespace libuc {
-    int libmems::mallocstrw(cchar *sp,int µsl,cchar **rpp) noex {
-	return strw(sp,µsl,rpp) ;
-    }
-    int libmems::mallocitem(cvoid *sp,int µsl,void **rpp) noex {
-	return item(sp,µsl,rpp) ;
-    }
-    int libmems::malloc(int sz,void *vp) noex {
-	return vall(sz,vp) ;
-    }
-    int libmems::calloc(int ne,int esz,void *vp) noex {
-	return call(ne,esz,vp) ;
-    }
-    int libmems::ralloc(void *cp,int sz,void *vp) noex {
-	return rall(cp,sz,vp) ;
-    }
-} /* end namespace (libuc) */
-
 int mgr::operator () (int sz,void *vp) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
 	errtimer	to_busy		= utimeout[uto_busy] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
 	reterr		r ;
 	int     	rs = SR_FAULT ;
-	if (vp) {
+	if (vp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sz > 0) {
+	    if (sz > 0) ylikely {
 	        repeat {
 	            if ((rs = (this->*m)(sz,vp)) < 0) {
 		        r(rs) ;			/* <- default causes exit */
@@ -307,7 +421,7 @@ int mgr::stdmalloc(int sz,void *vp) noex {
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
-	if (void *rp ; (rp = malloc(msize)) != nullptr) {
+	if (void *rp ; (rp = malloc(msize)) != nullptr) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -323,7 +437,7 @@ int mgr::stdvalloc(int sz,void *vp) noex {
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
-	if (void *rp ; (rp = valloc(msize)) != nullptr) {
+	if (void *rp ; (rp = valloc(msize)) != nullptr) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -340,7 +454,7 @@ int mgr::stdrealloc(int sz,void *vp) noex {
 	void		**rpp = voidpp(vp) ;
 	int		rs ;
 	errno = 0 ;
-	if (void *rp ; (rp = realloc(fvp,msize)) != nullptr) {
+	if (void *rp ; (rp = realloc(fvp,msize)) != nullptr) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
