@@ -151,7 +151,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-filegrp.o:		filegrp.cc	filegrp.h	$(INCS)
-filelinker.o:		filelinker.cc	filelinker.hh	$(INCS)
+filegrp.o:		filegrp.cc	filegrp.h		$(INCS)
+filelinker.o:		filelinker.cc	filelinker.hh		$(INCS)
+
+filesyncer.o:		filesyncer.cc	filesyncer.hh		$(INCS)
 
 
