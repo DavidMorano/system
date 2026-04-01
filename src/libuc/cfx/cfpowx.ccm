@@ -62,7 +62,7 @@ module ;
 export module cfpowx ;
 
 template<typename T> struct cfpowshelp {
-	cint		nb = (CHAR_BIT * szof(T)) ;
+	cint		nb = (szof(T) * CHAR_BIT) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
 	T		cutoff ;
