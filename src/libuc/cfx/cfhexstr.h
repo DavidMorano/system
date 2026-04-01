@@ -24,6 +24,7 @@
 #include	<usysbase.h>
 #include	<stdintx.h>
 
+
 EXTERNC_begin
 
 extern int cfhexstr(cchar *,int,uchar *) noex ;
