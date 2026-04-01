@@ -45,7 +45,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<uclibsubs.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsysconf.h>
 #include	<localmisc.h>
 
 #include	"ids.h"
@@ -79,16 +83,16 @@ namespace {
 
 /* forward references */
 
-static int	ids_ctor(ids *) noex ;
-static int	ids_dtor(ids *) noex ;
-static int	ids_ngids(const ids *) noex ;
+local int	ids_ctor(ids *) noex ;
+local int	ids_dtor(ids *) noex ;
+local int	ids_ngids(const ids *) noex ;
 
 
 /* local variables */
 
 static vars		var ;
 
-static constexpr gid_t	gidend = gid_t(-1) ;
+constexpr gid_t		gidend = gid_t(-1) ;
 
 
 /* exported variables */
@@ -201,7 +205,7 @@ int ids_copy(ids *op,const ids *otherp) noex {
 
 /* private subroutines */
 
-static int ids_ctor(ids *op) noex {
+local int ids_ctor(ids *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -215,7 +219,7 @@ static int ids_ctor(ids *op) noex {
 }
 /* end subroutine (ids_ctor) */
 
-static int ids_dtor(ids *op) noex {
+local int ids_dtor(ids *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -225,7 +229,7 @@ static int ids_dtor(ids *op) noex {
 }
 /* end subroutine (ids_dtor) */
 
-static int ids_ngids(const ids *op) noex {
+local int ids_ngids(const ids *op) noex {
 	int		n = 0 ;
 	if (op->gids) ylikely {
 	    for (n = 0 ; op->gids[n] != gidend ; n += 1) ;
@@ -270,7 +274,7 @@ vars::operator int () noex {
     	int		rs ;
 	if ((rs = maxgroups) == 0) ylikely {
 	    cint	cmd = _SC_NGROUPS_MAX ;
-	    if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
+	    if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) ylikely {
 		gid_t	gids[1] ;
 		cint max1 = rs ;
 		if ((rs = u_getgroups(0,gids)) >= 0) ylikely {
