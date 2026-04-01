@@ -61,15 +61,15 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
-#include	<netdb.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<bufsizevar.hh>
 #include	<getnodedomain.h>
+#include	<bufsizevar.hh>
 #include	<snx.h>
 #include	<snwcpy.h>
 #include	<isnot.h>
@@ -133,7 +133,7 @@ struct arginfo {
 
 struct subinfo_flags {
 	uint		inetaddr:1 ;
-	uint		inetaddr_start:1 ;
+	uint		inetaddr_init:1 ;
 } ;
 
 struct subinfo {
@@ -147,16 +147,16 @@ struct subinfo {
 
 /* forward references */
 
-static int	arginfo_load(ARI *,cc *,cc *,AI *,AI **) noex ;
+local int	arginfo_load(ARI *,cc *,cc *,AI *,AI **) noex ;
 
-static int	subinfo_start(SI *,char *,ARI *) noex ;
-static int	subinfo_domain(SI *) noex ;
-static int	subinfo_finish(SI *) noex ;
+local int	subinfo_start(SI *,char *,ARI *) noex ;
+local int	subinfo_domain(SI *) noex ;
+local int	subinfo_finish(SI *) noex ;
 
-static int	try_straight(SI *) noex ;
-static int	try_add(SI *) noex ;
-static int	try_rem(SI *) noex ;
-static int	try_remlocal(SI *) noex ;
+local int	try_straight(SI *) noex ;
+local int	try_add(SI *) noex ;
+local int	try_rem(SI *) noex ;
+local int	try_remlocal(SI *) noex ;
 
 
 /* external variables */
@@ -207,7 +207,7 @@ int geteaddrinfo(cc *hn,cc *svc,AI *hintp,char *ehostname,AI **rpp) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SI *mip,char *ehostname,ARI *aip) noex {
+local int subinfo_start(SI *mip,char *ehostname,ARI *aip) noex {
 	int		rs = SR_FAULT ;
 	if (mip && aip) {
 	    rs = memclear(mip) ;
@@ -220,7 +220,7 @@ static int subinfo_start(SI *mip,char *ehostname,ARI *aip) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SI *mip) noex {
+local int subinfo_finish(SI *mip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (mip->domainname) {
@@ -233,7 +233,7 @@ static int subinfo_finish(SI *mip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_domain(SI *mip) noex {
+local int subinfo_domain(SI *mip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
@@ -255,7 +255,7 @@ static int subinfo_domain(SI *mip) noex {
 }
 /* end subroutine (subinfo_domain) */
 
-static int try_straight(SI *mip) noex {
+local int try_straight(SI *mip) noex {
 	arginfo		*aip = mip->aip ;
 	int		rs ;
 	int		c = 0 ;
@@ -288,7 +288,7 @@ static int try_straight(SI *mip) noex {
 }
 /* end subroutine (try_straight) */
 
-static int try_add(SI *mip) noex {
+local int try_add(SI *mip) noex {
 	arginfo		*aip = mip->aip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -328,7 +328,7 @@ static int try_add(SI *mip) noex {
 }
 /* end subroutine (try_add) */
 
-static int try_rem(SI *mip) noex {
+local int try_rem(SI *mip) noex {
 	arginfo		*aip = mip->aip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -372,7 +372,7 @@ static int try_rem(SI *mip) noex {
 }
 /* end subroutine (try_rem) */
 
-static int try_remlocal(SI *mip) noex {
+local int try_remlocal(SI *mip) noex {
 	arginfo		*aip = mip->aip ;
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
@@ -413,7 +413,7 @@ static int try_remlocal(SI *mip) noex {
 }
 /* end subroutine (try_remlocal) */
 
-static int arginfo_load(ARI *aip,cc *hn,cc *svc,AI *hintp,AI **rpp) noex {
+local int arginfo_load(ARI *aip,cc *hn,cc *svc,AI *hintp,AI **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (aip) {
 	    rs = SR_OK ;
