@@ -87,7 +87,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclock.h>
 #include	<localmisc.h>
 
 #include	"lockfile.h"
