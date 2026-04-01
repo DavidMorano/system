@@ -41,11 +41,14 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<linebuffer.h>
 #include	<filer.h>
 #include	<vecstr.h>
@@ -126,12 +129,12 @@ constexpr cpcchar	wstrs[] = {
 	"UMASK",
 	"PATH",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	pstrs[] = {
 	"LC_",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
