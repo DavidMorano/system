@@ -69,19 +69,19 @@ extern "C" {
 
 /* local variables */
 
-static constexpr getpwxname_f	subnames[] = {
+constexpr getpwxname_f	subnames[] = {
 	ucpwcache_name,
 	getpw_name
-} ;
+} ; /* end array */
 
-static constexpr getpwxuid_f	subuids[] = {
+constexpr getpwxuid_f	subuids[] = {
 	ucpwcache_uid,
 	getpw_uid
-} ;
+} ; /* end array */
 
 constexpr uid_t		uidend(-1) ;
 
-static int		getpwx_state = 1 ;
+static int		getpwx_state = 1 ; /* <- writable */
 
 
 /* exported variables */
@@ -97,6 +97,7 @@ int getpwx_control(int ns) noex {
 	}
 	return rs ;
 }
+/* end subroutine (getpwx_control) */
 
 int getpwx_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
 	int		rs = SR_FAULT ;
