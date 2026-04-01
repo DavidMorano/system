@@ -1,4 +1,4 @@
-/* td SUPPORT */
+/* td SUPPORT (Terminal-Display) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -42,8 +42,11 @@
 #include	<cstdlib>		/* |abs(3c)| */
 #include	<cstdarg>
 #include	<algorithm>		/* |min(3c++)| * |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<uctc.h>		/* Terminal-Control */
 #include	<vecitem.h>
 #include	<buffer.h>
 #include	<ascii.h>
@@ -57,6 +60,8 @@
 #include	<localmisc.h>		/* |HEXBUFLEN| + |NTABCOLS| */
 
 #include	"td.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
@@ -78,10 +83,6 @@ import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 #define	TD_GRMASK	(TD_GRBOLD|TD_GRUNDER|TD_GRBLINK|TD_GRREV)
 
 #define	TERMTYPE	struct termtype
-
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
 
 #ifndef	TERMCONSEQLEN
 #define	TERMCONSEQLEN	84
@@ -140,15 +141,15 @@ struct termtype {
 /* forward references */
 
 template<typename ... Args>
-static int td_ctor(td *op,Args ... args) noex {
+local int td_ctor(td *op,Args ... args) noex {
     	TD		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ; /* dangerous */
-	    if ((op->tsp = new(nothrow) termstr) != np) {
-	        if ((op->wlp = new(nothrow) vecitem) != np) {
+	    if ((op->tsp = new(nothrow) termstr) != np) ylikely {
+	        if ((op->wlp = new(nothrow) vecitem) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-vecitem) */
 		if (rs < 0) {
@@ -158,53 +159,50 @@ static int td_ctor(td *op,Args ... args) noex {
 	    } /* end if (new-termstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (td_ctor) */
+} /* end subroutine (td_ctor) */
 
-static int td_dtor(td *op) noex {
+local int td_dtor(td *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->wlp) {
+	    if (op->wlp) ylikely {
 		delete op->wlp ;
 		op->wlp = nullptr ;
 	    }
-	    if (op->tsp) {
+	    if (op->tsp) ylikely {
 		delete op->tsp;
 		op->tsp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (td_dtor) */
+} /* end subroutine (td_dtor) */
 
 template<typename ... Args>
-static int td_magic(td *op,Args ... args) noex {
+local int td_magic(td *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == TD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (td_magic) */
+} /* end subroutine (td_magic) */
 
-static int	td_starter	(td *,int,cchar *,int,int) noex ;
-static int	td_startwin	(td *,int,int,int,int) noex ;
-static int	td_flushmove	(td *,td_win *,int,int) noex ;
-static int	td_iflush	(td *) noex ;
-static int	td_procstr	(td *,td_win *,int,cchar *,int) noex ;
-static int	td_termstrbegin	(td *) noex ;
-static int	td_termstrend	(td *) noex ;
-static int	td_store	(td *,cchar *,int) noex ;
-static int	td_erase	(td *,int,int,int) noex ;
+local int	td_starter	(td *,int,cchar *,int,int) noex ;
+local int	td_startwin	(td *,int,int,int,int) noex ;
+local int	td_flushmove	(td *,td_win *,int,int) noex ;
+local int	td_iflush	(td *) noex ;
+local int	td_procstr	(td *,td_win *,int,cchar *,int) noex ;
+local int	td_termstrbegin	(td *) noex ;
+local int	td_termstrend	(td *) noex ;
+local int	td_store	(td *,cchar *,int) noex ;
+local int	td_erase	(td *,int,int,int) noex ;
 
 #if	CF_SAVERESTORE
-static int	td_isave(td *) noex ;
-static int	td_irestore(td *) noex ;
+local int	td_isave(td *) noex ;
+local int	td_irestore(td *) noex ;
 #endif /* CF_SAVERESTORE */
 
 #ifdef	COMMENT
-static int	termmatch(const TERMTYPE *,cchar *) noex ;
+local int	termmatch(const TERMTYPE *,cchar *) noex ;
 #endif
 
 
@@ -212,7 +210,7 @@ static int	termmatch(const TERMTYPE *,cchar *) noex ;
 
 #ifdef	COMMENT
 /* 	TYPE		CAPABILITY	*/
-static const TERMTYPE	terms[] = {
+constexpr TERMTYPE	terms[] = {
 	{ "vt100",	(TD_TCSCROLL) },
 	{ "ansi",	(TD_TCSCROLL | TD_TCIL) },
 	{ "xterm",	(TD_TCSCROLL | TD_TCIL | TD_TCCOLOR) },
@@ -239,9 +237,9 @@ static const TERMTYPE	terms[] = {
 
 int td_start(td *op,int tfd,cchar *termname,int r,int c) noex {
 	int		rs ;
-	if ((rs = td_ctor(op,termname)) >= 0) {
+	if ((rs = td_ctor(op,termname)) >= 0) ylikely {
 	    rs = SR_BADF ;
-	    if (tfd >= 0) {
+	    if (tfd >= 0) ylikely {
 		rs = SR_INVALID ;
 	        if (termname[0] && (r >= 0) && (c >= 0)) {
 	            if (ustat sb ; (rs = u_fstat(tfd,&sb)) >= 0) {
@@ -264,7 +262,7 @@ int td_start(td *op,int tfd,cchar *termname,int r,int c) noex {
 int td_finish(td *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    /* reset the scroll region if necessary */
 	    {
 	        rs1 = td_suspend(op,-1,-1) ;
@@ -276,20 +274,20 @@ int td_finish(td *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    /* free the internal stuff */
-	    {
+	    if (op->wlp) ylikely {
 	        rs1 = vecitem_finish(op->wlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->tsp) ylikely {
 	        rs1 = termstr_finish(op->tsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->buf) {
+	    if (op->buf) ylikely {
 	        rs1 = libmem.free(op->buf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->buf = nullptr ;
 	    }
-	    if (op->termname) {
+	    if (op->termname) ylikely {
 		void *vp = voidp(op->termname) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -309,18 +307,18 @@ int td_finish(td *op) noex {
 int td_suspend(td *op,int r,int c) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    td_win	*wp ;
-	    if ((rs = vecitem_get(op->wlp,0,&wp)) >= 0) {
-	        if ((rs = td_termstrbegin(op)) >= 0) {
+	    if ((rs = vecitem_get(op->wlp,0,&wp)) >= 0) ylikely {
+	        if ((rs = td_termstrbegin(op)) >= 0) ylikely {
 	            if ((rs >= 0) && op->fl.smallscroll) {
 	                op->fl.smallscroll = false ;
 	                rs = termstr_ssr(op->tsp,0,op->rows) ;
 	            }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                rs = td_flushmove(op,wp,r,c) ;
 		    }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                rs = td_termstrend(op) ;
 	                len = rs ;
 	            }
@@ -335,7 +333,7 @@ int td_suspend(td *op,int r,int c) noex {
 /* create a new subwindow */
 int td_subnew(td *op,int srow,int scol,int rows,int cols) noex {
 	int		rs ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    bool	f = true ;
 	    rs = SR_INVALID ;
 	    f = f && (srow >= 0) && (scol >= 0) ;
@@ -351,10 +349,10 @@ int td_subnew(td *op,int srow,int scol,int rows,int cols) noex {
 /* delete a subwindow */
 int td_subdel(td *op,int wn) noex {
 	int		rs ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;	/* cannot delete win==0 */
 	    if (wn != 0) {
-	        if ((rs = td_iflush(op)) >= 0) {
+	        if ((rs = td_iflush(op)) >= 0) ylikely {
 	            if (wn < 0) {
 			vecitem	*wlp = op->wlp ;
 			auto	vg = vecitem_get ;
@@ -378,9 +376,9 @@ int td_subdel(td *op,int wn) noex {
 int td_getlines(td *op,int w) noex {
 	int		rs ;
 	int		lines = 0 ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    td_win	*wp ;
-	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) {
+	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) ylikely {
 	        lines = wp->rows ;
 	    }
 	} /* end if (magic) */
@@ -391,9 +389,9 @@ int td_getlines(td *op,int w) noex {
 int td_setlines(td *op,int w,int nlines) noex {
 	int		rs ;
 	int		olines = 0 ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    td_win	*wp ;
-	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) {
+	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) ylikely {
 	        olines = wp->rows ;
 	        wp->rows = nlines ;
 	    }
@@ -405,7 +403,7 @@ int td_setlines(td *op,int w,int nlines) noex {
 /* execute a control action */
 int td_control(td *op,int cmd,...) noex {
 	int		rs ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    switch (cmd) {
 	    case TD_CCURSOR:
 	    case TD_CEOL:
@@ -423,10 +421,10 @@ int td_control(td *op,int cmd,...) noex {
 int td_move(td *op,int wn,int r,int c) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    if ((r >= 0) || (c >= 0)) {
 	        td_win	*wp ;
-	        if ((rs = vecitem_get(op->wlp,wn,&wp)) >= 0) {
+	        if ((rs = vecitem_get(op->wlp,wn,&wp)) >= 0) ylikely {
 	            if ((r < wp->rows) && (c < wp->cols)) {
 	                if (r >= 0) {
 	                    f = true ;
@@ -450,23 +448,23 @@ int td_move(td *op,int wn,int r,int c) noex {
 /* scroll a window ( (n>0)==UP, (n<0)==DOWN ) */
 int td_scroll(td *op,int wn,int n) noex {
 	int		rs ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    if (n != 0) {
 	        td_win	*wp ;
-	        if ((rs = vecitem_get(op->wlp,wn,&wp)) >= 0) {
+	        if ((rs = vecitem_get(op->wlp,wn,&wp)) >= 0) ylikely {
 	            int		na = abs(n) ;
 	            char	index_chars[8] ;
-/* prepare a move for after the entire scroll operation -- do it */
+		    /* prepare a move for after the scroll */
 	            op->cur.row = -1 ; /* unknown cursor location */
 	            op->cur.col = -1 ; /* unknown cursor location */
 	            if (na > wp->rows) {
 	                na = wp->rows ;
 		    }
-	            if ((rs = td_termstrbegin(op)) >= 0) {
+	            if ((rs = td_termstrbegin(op)) >= 0) ylikely {
 	                termstr	*tsp = op->tsp ;
 	                int	index_line ;
 	                if ((rs = termstr_ssr(tsp,wp->srow,wp->rows)) >= 0) {
-/* move to the boundary of the scroll region for the proper direction */
+			    /* move to the boundary of the scroll region */
 	                    if (n >= 0) {
 				cchar	*ts_ind = "\033D" ; /* index */
 	                        index_line = (wp->srow + wp->rows - 1) ;
@@ -477,7 +475,7 @@ int td_scroll(td *op,int wn,int n) noex {
 	                        strcpy(index_chars,ts_ri) ;	/* DOWN */
 	                    }
 	                } /* end if */
-	                if (rs >= 0) {
+	                if (rs >= 0) ylikely {
 	                    if ((rs = termstr_curh(tsp,index_line,-1)) >= 0) {
 	                        for (int i = 0 ; (i < na) ; i += 1) {
 	                            rs = termstr_write(tsp,index_chars,-1) ;
@@ -504,7 +502,7 @@ int td_pprintf(td *op,int wn,int r,int c,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = td_magic(op,fmt)) >= 0) {
+	if ((rs = td_magic(op,fmt)) >= 0) ylikely {
 	    va_begin(ap,fmt) ;
 	    rs = td_vpprintf(op,wn,r,c,fmt,ap) ;
 	    len = rs ;
@@ -519,7 +517,7 @@ int td_printf(td *op,int wn,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = td_magic(op,fmt)) >= 0) {
+	if ((rs = td_magic(op,fmt)) >= 0) ylikely {
 	    va_begin(ap,fmt) ;
 	    rs = td_vpprintf(op,wn,-1,-1,fmt,ap) ;
 	    len = rs ;
@@ -539,14 +537,14 @@ int td_vpprintf(td *op,int wn,int r,int c,cchar *fmt,va_list ap) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = td_magic(op,fmt)) >= 0) {
-	    if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if ((rs = td_magic(op,fmt)) >= 0) ylikely {
+	    if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 		cint	llen = rs ;
-	        if ((rs = bufvprintf(lbuf,llen,fmt,ap)) > 0) {
+	        if ((rs = bufvprintf(lbuf,llen,fmt,ap)) > 0) ylikely {
 	            rs = td_pwrite(op,wn,r,c,lbuf,rs) ;
 		    len = rs ;
 	        }
-		rs1 = malloc_free(lbuf) ;
+		rs1 = lm_free(lbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
@@ -569,12 +567,12 @@ int td_pwrite(td *op,int wn,int r,int c,cchar *wbuf,int wlen) noex {
 int td_pwritegr(td *op,int wn,int r,int c,int gr,cchar *wbuf,int wlen) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = td_magic(op,wbuf)) >= 0) {
+	if ((rs = td_magic(op,wbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (wlen < 0) wlen = lenstr(wbuf) ;
 	    if (wn >= 0) {
 	        td_win	*wp ;
-	        if ((rs = vecitem_get(op->wlp,wn,&wp)) >= 0) {
+	        if ((rs = vecitem_get(op->wlp,wn,&wp)) >= 0) ylikely {
 	            cint	nrow = (r >= 0) ? r : wp->move.row ;
 	            cint	ncol = (c >= 0) ? c : wp->move.col ;
 	            if ((nrow < wp->rows) && (ncol < wp->cols)) {
@@ -599,11 +597,11 @@ int td_pwritegr(td *op,int wn,int r,int c,int gr,cchar *wbuf,int wlen) noex {
 int td_clear(td *op,int w) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    td_win	*wp ;
-	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) {
-	        if ((rs = td_termstrbegin(op)) >= 0) {
-	            if ((rs = td_flushmove(op,wp,-1,-1)) >= 0) {
+	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) ylikely {
+	        if ((rs = td_termstrbegin(op)) >= 0) ylikely {
+	            if ((rs = td_flushmove(op,wp,-1,-1)) >= 0) ylikely {
 	                if (w == 0) {
 	                    rs = termstr_ed(op->tsp,2) ;
 	                } else {
@@ -630,14 +628,14 @@ int td_clear(td *op,int w) noex {
 int td_ew(td *op,int w,int r,int type) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    td_win	*wp ;
-	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) {
+	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) ylikely {
 	        if ((rs = td_termstrbegin(op)) >= 0) {
 	            if ((rs = td_flushmove(op,wp,r,-1)) >= 0) {
 			rs = termstr_ed(op->tsp,type) ;
 		    } /* end if */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                rs = td_termstrend(op) ;
 	                len = rs ;
 	            }
@@ -665,7 +663,7 @@ int td_ec(td *op,int w,int n) noex {
 /* flush buffer */
 int td_flush(td *op) noex {
 	int		rs ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    rs = td_iflush(op) ;
 	} /* end if (magic) */
 	return rs ;
@@ -675,11 +673,11 @@ int td_flush(td *op) noex {
 /* terminal window size change */
 int td_setsize(td *op,int rows,int cols) noex {
 	int		rs ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((rows >= 0) && (cols >= 0)) {
 	        td_win	*wp ;
-	        if ((rs = vecitem_get(op->wlp,0,&wp)) >= 0) {
+	        if ((rs = vecitem_get(op->wlp,0,&wp)) >= 0) ylikely {
 	            wp->rows = rows ;
 	            wp->cols = cols ;
 	        } /* end if (get-window-pointer) */
@@ -692,8 +690,8 @@ int td_setsize(td *op,int rows,int cols) noex {
 /* check */
 int td_check(td *op) noex {
 	int		rs ;
-	if ((rs = td_magic(op)) >= 0) {
-	    if ((rs = td_flushmove(op,0,-1,-1)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
+	    if ((rs = td_flushmove(op,0,-1,-1)) >= 0) ylikely {
 	        rs = td_iflush(op) ;
 	    }
 	} /* end if (magic) */
@@ -703,10 +701,10 @@ int td_check(td *op) noex {
 
 int td_getpos(td *op,int wn,td_pos *pp) noex {
 	int		rs ;
-	if ((rs = td_magic(op,pp)) >= 0) {
+	if ((rs = td_magic(op,pp)) >= 0) ylikely {
 	    td_win	*wp ;
 	    memclear(pp) ;
-	    if ((rs = vecitem_get(op->wlp,wn,&wp)) >= 0) {
+	    if ((rs = vecitem_get(op->wlp,wn,&wp)) >= 0) ylikely {
 	        pp->timecount = wp->cur.timecount ;
 	        pp->row = wp->cur.row ;
 	        pp->col = wp->cur.col ;
@@ -719,7 +717,7 @@ int td_getpos(td *op,int wn,td_pos *pp) noex {
 
 /* private subroutines */
 
-static int td_starter(td *op,int tfd,cchar *termname,int r,int c) noex {
+local int td_starter(td *op,int tfd,cchar *termname,int r,int c) noex {
         TERMIOS         termconf{} ;
         int             rs ;
         op->tfd = tfd ;
@@ -731,19 +729,19 @@ static int td_starter(td *op,int tfd,cchar *termname,int r,int c) noex {
         op->fl.statusdisplay = false ;
         op->fl.meol = false ;
         op->fl.linebuf = false ;
-        if ((rs = uc_tcattrget(tfd,&termconf)) >= 0) {
+        if ((rs = uc_tcattrget(tfd,&termconf)) >= 0) ylikely {
             cchar       *cp ;
             op->fl.nlcr = !!(termconf.c_oflag & ONLCR) ;
-            if ((rs = libmem.strw(termname,-1,&cp)) >= 0) {
+            if ((rs = libmem.strw(termname,-1,&cp)) >= 0) ylikely {
                 char    *bp ;
                 op->termname = cp ;
-                if ((rs = libmem.mall(op->buflen,&bp)) >= 0) {
+                if ((rs = libmem.mall(op->buflen,&bp)) >= 0) ylikely {
                     cchar       *tt = termname ;
                     op->buf = bp ;
-                    if ((rs = termstr_start(op->tsp,tt)) >= 0) {
+                    if ((rs = termstr_start(op->tsp,tt)) >= 0) ylikely {
                         vecitem *wlp = op->wlp ;
                         cint    vo = 0 ;
-                        if ((rs = vecitem_start(wlp,5,vo)) >= 0) {
+                        if ((rs = vecitem_start(wlp,5,vo)) >= 0) ylikely {
                             if ((rs = td_startwin(op,0,0,r,c)) >= 0) {
                                 op->cur.row = -1 ;
                                 op->cur.col = -1 ;
@@ -774,7 +772,7 @@ static int td_starter(td *op,int tfd,cchar *termname,int r,int c) noex {
 /* end subroutine (td_starter) */
 
 /* create and initialize a new sub-window */
-static int td_startwin(td *op,int srow,int scol,int rows,int cols) noex {
+local int td_startwin(td *op,int srow,int scol,int rows,int cols) noex {
 	int		rs = SR_OK ;
 	bool		f = false ;
 	f = f || (srow >= op->rows) ;
@@ -799,7 +797,7 @@ static int td_startwin(td *op,int srow,int scol,int rows,int cols) noex {
 /* end subroutine (td_startwin) */
 
 /* flush buffer */
-static int td_iflush(td *op) noex {
+local int td_iflush(td *op) noex {
 	td_win		*wp ;
 	td_win		*mwp = nullptr ;
 	uint		mtimecount = 0 ;
@@ -828,7 +826,7 @@ static int td_iflush(td *op) noex {
 #if	CF_SAVERESTORE
 
 /* set the save-cursor stuff in the buffer */
-static int td_isave(td *op) noex {
+local int td_isave(td *op) noex {
 	int		rs ;
 	int		len = 0 ;
 	int		rv = 0 ;
@@ -848,7 +846,7 @@ static int td_isave(td *op) noex {
 /* end subroutine (td_isave) */
 
 /* set the restore-cursor stuff in the buffer */
-static int td_irestore(td *op) noex {
+local int td_irestore(td *op) noex {
 	cchar		*cp = strwcpy(op->buf,TERMSTR_RESTORE,-1) ;
 	op->curlen = (cp - op->buf) ;
 	return op->curlen ;
@@ -858,7 +856,7 @@ static int td_irestore(td *op) noex {
 #endif /* CF_SAVERESTORE */
 
 /* flush out any accumulated moves */
-static int td_flushmove(td *op,td_win *wp,int r,int c) noex {
+local int td_flushmove(td *op,td_win *wp,int r,int c) noex {
 	int		rs = SR_OK ;
 	int		nrow = (r >= 0) ? r : wp->move.row ;
 	int		ncol = (c >= 0) ? c : wp->move.col ;
@@ -869,8 +867,8 @@ static int td_flushmove(td *op,td_win *wp,int r,int c) noex {
 	        int	arow = wrow + wp->srow ;
 	        int	acol = wcol + wp->scol ;
 	        bool	f_chosen = false ;
-/* relocate to absolute coordinates */
-/* search for optimizations */
+		/* relocate to absolute coordinates */
+		/* search for optimizations */
 	        if ((op->cur.row >= 0) && (op->cur.col >= 0)) {
 	            if ((arow == op->cur.row) && (acol == op->cur.col)) {
 	                f_chosen = true ;
@@ -916,7 +914,7 @@ static int td_flushmove(td *op,td_win *wp,int r,int c) noex {
 /* end subroutine (td_flushmove) */
 
 /* process the special C-language string-escape characters */
-static int td_procstr(td *op,td_win *wp,int gr,cchar *sbuf,int slen) noex {
+local int td_procstr(td *op,td_win *wp,int gr,cchar *sbuf,int slen) noex {
 	cint		grmask = TD_GRMASK ;
 	cint		clen = CBUFLEN ;
 	int		rs = SR_OK ;
@@ -1078,17 +1076,17 @@ static int td_procstr(td *op,td_win *wp,int gr,cchar *sbuf,int slen) noex {
 }
 /* end subroutine (td_procstr) */
 
-static int td_termstrbegin(td *op) noex {
+local int td_termstrbegin(td *op) noex {
 	int		rs ;
 	rs = termstr_clean(op->tsp) ; /* clear any buffered actions */
 	return rs ;
 }
 /* end subroutine (td_termstrbegin) */
 
-static int td_termstrend(td *op) noex {
+local int td_termstrend(td *op) noex {
 	int		rs ;
 	int		len = 0 ;
-	if (cchar *bp ; (rs = termstr_get(op->tsp,&bp)) >= 0) {
+	if (cchar *bp ; (rs = termstr_get(op->tsp,&bp)) >= 0) ylikely {
 	    cint	bl = rs ;
 	    rs = td_store(op,bp,bl) ;
 	    len = rs ;
@@ -1097,7 +1095,7 @@ static int td_termstrend(td *op) noex {
 }
 /* end subroutine (td_termstrend) */
 
-static int td_store(td *op,cchar *bp,int µbl) noex {
+local int td_store(td *op,cchar *bp,int µbl) noex {
 	int		rlen = (op->buflen - op->curlen) ;
 	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
@@ -1122,14 +1120,14 @@ static int td_store(td *op,cchar *bp,int µbl) noex {
 }
 /* end subroutine (td_store) */
 
-static int td_erase(td *op,int w,int item,int type) noex {
+local int td_erase(td *op,int w,int item,int type) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = td_magic(op)) >= 0) {
+	if ((rs = td_magic(op)) >= 0) ylikely {
 	    td_win	*wp ;
-	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) {
-	        if ((rs = td_termstrbegin(op)) >= 0) {
-	            if ((rs = td_flushmove(op,wp,-1,-1)) >= 0) {
+	    if ((rs = vecitem_get(op->wlp,w,&wp)) >= 0) ylikely {
+	        if ((rs = td_termstrbegin(op)) >= 0) ylikely {
+	            if ((rs = td_flushmove(op,wp,-1,-1)) >= 0) ylikely {
 			switch (item) {
 			case erase_disp:
 	                    rs = termstr_ed(op->tsp,type) ;
@@ -1156,7 +1154,7 @@ static int td_erase(td *op,int w,int item,int type) noex {
 #ifdef	COMMENT
 
 /* match a terminal name with our list */
-static int termmatch(const TERMTYPE *tlist,cchar *term) noex {
+local int termmatch(const TERMTYPE *tlist,cchar *term) noex {
 	int	i ; /* used-afterwards */
 	for (i = 0 ; tlist[i].term != nullptr ; i += 1) {
 	    if (strcmp(term,tlist[i].term) == 0) break ;
