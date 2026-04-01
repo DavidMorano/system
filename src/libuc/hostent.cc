@@ -54,7 +54,9 @@
 #include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<string>		/* |memcpy(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usupport.h>
 #include	<storeitem.h>
 #include	<intceil.h>
@@ -62,7 +64,9 @@
 
 #include	"hostent.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
