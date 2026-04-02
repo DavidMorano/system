@@ -57,7 +57,7 @@
 #include	<ast.h>			/* configures other stuff also */
 
 #include	<sys/types.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstring>
 
 #include	<sfio.h>
