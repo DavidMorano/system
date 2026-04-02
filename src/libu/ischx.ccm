@@ -51,6 +51,21 @@ export {
     inline bool	ischblank	(int ch) noex attrconst {
 	return (ch == CH_SP) || (ch == CH_TAB) ;
     }
+    inline bool	ischzero	(int ch) noex attrconst {
+	return (ch == '0') ;
+    }
+    inline bool	ischpl		(int ch) noex attrconst {
+	return (ch == '+') ;
+    }
+    inline bool	ischmi		(int ch) noex attrconst {
+	return (ch == '-') ;
+    }
+    inline bool	ischpm		(int ch) noex attrconst {
+	return (ch == '+') || (ch == '-') ;
+    }
+    inline bool	ischme		(int ch) noex attrconst {
+	return (ch == '+') || (ch == '-') || (ch == '!') ;
+    }
 } /* end export */
 
 
