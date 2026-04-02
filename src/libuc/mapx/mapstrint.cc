@@ -31,7 +31,9 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<hdb.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
@@ -179,7 +181,7 @@ int mapstrint_curenum(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    if (kpp) *kpp = nullptr ;
-	    if ((rs = hdb_curenum(dbp,curp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(dbp,curp,&key,&val)) >= 0) ylikely {
 	        klen = key.len ;
 	        if (kpp) {
 	            *kpp = charp(key.buf) ;
