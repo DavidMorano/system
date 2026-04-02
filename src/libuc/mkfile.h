@@ -22,19 +22,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
-#include	<mktmp.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
 
-extern int mkjobfile(char *,cchar *,mode_t) noex ;
-extern int mkartfile(char *,cchar *,cchar *,int,mode_t) noex ;
-extern int mkdatefile(char *,cchar *,cchar *,mode_t) noex ;
+extern int	mkfiledate(char *,cchar *,cchar *,mode_t) noex ;
+extern int	mkfilejob(char *,cchar *,mode_t) noex ;
+extern int	mkfileart(char *,cchar *,cchar *,int,mode_t) noex ;
 
 EXTERNC_end
 
