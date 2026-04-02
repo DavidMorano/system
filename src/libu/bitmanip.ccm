@@ -21,7 +21,6 @@ module ;
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>
 #include	<cstdlib>
-#include	<cstdint>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
