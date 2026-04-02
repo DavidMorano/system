@@ -1,4 +1,4 @@
-# MAKEFILES (mapx)
+# MAKEFILE (mapx)
 
 T= mapx
 
@@ -46,6 +46,7 @@ OBJ2=
 OBJ3=
 
 OBJA= obj0.o
+OBJB=
 
 OBJ= obja.o
 
