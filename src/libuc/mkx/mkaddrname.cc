@@ -57,18 +57,18 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<estrings.h>
+#include	<usysbase.h>
+#include	<sfx.h>			/* |shshrink(3uc)| */
+#include	<snwcpy.h>
 #include	<ema.h>
 #include	<isoneof.h>
 #include	<localmisc.h>
 
 #include	"mkx.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
