@@ -1,4 +1,4 @@
-# MAKEFILES (mktmp)
+# MAKEFILE (mktmp)
 
 T= mktmp
 
@@ -31,13 +31,20 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= mktmp.h
+INCS += mktmp.h
 
 MODS +=
 
-LIBS=
+LIBS +=
+
+OBJA_MKTMP= mktmpdir.o 
+OBJB_MKTMP= mktmpusers.o mktmpuserdir.o
+OBJC_MKTMP= mktmpfile.o mktmplock.o
+OBJD_MKTMP=
+
+OBJ_MKTMP= obja_mktmp.o objb_mktmp.o objc_mktmp.o
 
 
 INCDIRS=
@@ -46,7 +53,6 @@ LIBDIRS= -L$(LIBDIR)
 
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -57,14 +63,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJA_MKTMP= mktmpdir.o 
-OBJB_MKTMP= mktmpusers.o mktmpuserdir.o
-OBJC_MKTMP= mktmpfile.o mktmplock.o
-
-OBJ_MKTMP= obja_mktmp.o objb_mktmp.o objc_mktmp.o
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -77,6 +76,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -97,13 +99,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ_MKTMP)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MKTMP)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -116,13 +113,16 @@ control:
 
 
 obja_mktmp.o:		$(OBJA_MKTMP) 
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_MKTMP)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb_mktmp.o:		$(OBJB_MKTMP) 
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_MKTMP)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc_mktmp.o:		$(OBJC_MKTMP)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_MKTMP)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd_mktmp.o:		$(OBJD_MKTMP)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 # directories
