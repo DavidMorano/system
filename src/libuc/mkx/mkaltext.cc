@@ -21,7 +21,7 @@
 	mkaltext
 
 	Description:
-	We take a file-name and create a new file-name replacing
+	I take a file-name and create a new file-name replacing
 	the existing extension with the new (alternative) extension
 	supplied.
 
@@ -44,10 +44,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strrchr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<bufsizevar.hh>
 #include	<sbuf.h>
@@ -73,7 +70,7 @@
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
@@ -82,12 +79,13 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 /* exported subroutines */
 
 int mkaltext(char *dbuf,cchar *name,cchar *ext) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dbuf && name && ext) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
-	        if (cchar *tp ; (tp = strrchr(name,'.')) != nullptr) ylikely {
+	    if (name[0]) ylikely {
+	        if (cchar *tp ; (tp = strrchr(name,'.')) != np) ylikely {
 	            if (tp[1] != '\0') ylikely {
 			if ((rs = maxpathlen) >= 0) ylikely {
 	                    cint	dlen = rs ;
