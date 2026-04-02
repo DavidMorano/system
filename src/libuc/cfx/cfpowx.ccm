@@ -89,7 +89,7 @@ template<typename T> struct cfpowshelp {
 		    cutlim -= base ;
 		    cutoff += 1 ;
 		}
-		cutlim = (-cutlim) ;
+		cutlim = (- cutlim) ;
 	    }
 	} ; /* end method (prepare) */
 	int getval(int ch) noex {
@@ -100,9 +100,11 @@ template<typename T> struct cfpowshelp {
 	    return rs ;
 	} ; /* end method (getval) */
 	int getsign() noex {
-    	    cint rs = cfx::getsign(sp,sl,&fneg) ;
-	    sp += (sl - rs) ;
-	    sl = rs ;
+    	    int rs ;
+	    if ((rs = cfx::getsign(sp,sl,&fneg)) > 0) {
+	        sp += rs ;
+	        sl -= rs ;
+	    }
 	    return rs ;
 	} ; /* end if (getsign) */
 	int proc() noex {
