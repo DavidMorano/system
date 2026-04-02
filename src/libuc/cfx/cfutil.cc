@@ -119,9 +119,10 @@ namespace cfx {
 namespace cfx {
     int getsign(cchar *sp,int µsl,bool *fnegp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ; /* return-value */
-	if (sp && fnegp) ylikely {
-	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
+	int		skiplen = 0 ; /* return-value */
+	if (int sl ; fnegp && ((sl = getlenstr(sp,µsl)) >= 0)) ylikely {
+	    cint slen = sl ;
+		rs = SR_OK ;
 	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
@@ -143,10 +144,9 @@ namespace cfx {
 	        } else if (sl == 0) {
 		    rs = SR_INVALID ;
 	        } /* end if */
-		rl = sl ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? rl : rs ;
+		skiplen = (slen - sl) ;
+	} /* end if (valid) */
+	return (rs >= 0) ? skiplen : rs ;
     } ; /* end if (getsign) */
 } /* end namespace (cfx) */
 
