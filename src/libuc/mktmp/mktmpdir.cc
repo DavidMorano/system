@@ -44,7 +44,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mkfile.h>
 #include	<localmisc.h>
 
@@ -54,10 +55,32 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+extern "C" {
+    extern int uc_minmod(cchar *,mode_t) noex ;
+}
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -65,9 +88,9 @@
 int mktmpdir(char *rbuf,cchar *dname,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf && dname) {
+	if (rbuf && dname) ylikely {
 	    om |= S_IFDIR ;
-	    if ((rs = mktmpfile(rbuf,dname,om)) >= 0) {
+	    if ((rs = mktmpfile(rbuf,dname,om)) >= 0) ylikely {
 		rl = rs ;
 		rs = uc_minmod(rbuf,om) ;
 	    }
