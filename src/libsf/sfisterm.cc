@@ -1,5 +1,6 @@
-/* sfisterm */
-/* lang=C20 */
+/* sfisterm SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=++C20 */
 
 /* Safe-Fast Is-a-Terminal */
 /* version %I% last-modified %G% */
@@ -36,26 +37,54 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<ast.h>			/* configures other stuff also */
 #include	<sys/types.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |isatty(3c)| */
 #include	<sfio_s.h>
 #include	<sfio.h>
+#include	<localmisc.h>
 
 
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-int sfisterm(Sfio_t *f) noex {
-	int		f_isterm ;
-	if (f == NULL) return -1 ;
-	f_isterm = (! (f->_flags & SF_STRING)) ;
-	f_isterm = f_isterm && (f->_file >= 0) ;
-	if (f_isterm) f_isterm = isatty(f->_file) ;
-	return f_isterm ;
+int sfisterm(Sfio_t *fp) noex {
+	int		fisterm = -1 ;
+	if (fp) {
+	    fisterm = (! (fp->_flags & SF_STRING)) ;
+	    fisterm = fisterm && (fp->_file >= 0) ;
+	    if (fisterm) {
+		fisterm = isatty(fp->_file) ;
+	    }
+	} /* end if (non-null) */
+	return fisterm ;
 }
 /* end subroutine (sfisterm) */
 
