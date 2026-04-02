@@ -31,13 +31,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
-#include	<ctime>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<storeitem.h>
@@ -129,39 +131,36 @@ template<typename ... Args>
 local int clusterdb_ctor(clusterdb *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    if ((op->ctp = new(nothrow) kvsfile) != np) {
+	    if ((op->ctp = new(nothrow) kvsfile) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new_kvsfile) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (clusterdb_ctor) */
+} /* end subroutine (clusterdb_ctor) */
 
 local int clusterdb_dtor(clusterdb *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->ctp) {
+	    if (op->ctp) ylikely {
 		delete op->ctp ;
 		op->ctp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (clusterdb_dtor) */
+} /* end subroutine (clusterdb_dtor) */
 
 template<typename ... Args>
 local int clusterdb_magic(clusterdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (clusterdb_magic) */
+} /* end subroutine (clusterdb_magic) */
 
 
 /* local variables */
@@ -174,10 +173,10 @@ local int clusterdb_magic(clusterdb *op,Args ... args) noex {
 
 int clusterdb_open(clusterdb *op,cchar *fname) noex {
 	int		rs ;
-	if ((rs = clusterdb_ctor(op,fname)) >= 0) {
+	if ((rs = clusterdb_ctor(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	        if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	    if (fname[0]) ylikely {
+	        if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) ylikely {
 		    csize	fsz = size_t(sb.st_size) ;
 		    int		ne ;
 		    {
@@ -200,8 +199,8 @@ int clusterdb_open(clusterdb *op,cchar *fname) noex {
 int clusterdb_close(clusterdb *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = clusterdb_magic(op)) >= 0) {
-	    if (op->ctp) {
+	if ((rs = clusterdb_magic(op)) >= 0) ylikely {
+	    if (op->ctp) ylikely {
 		rs1 = kvsfile_close(op->ctp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -217,9 +216,9 @@ int clusterdb_close(clusterdb *op) noex {
 
 int clusterdb_fileadd(clusterdb *op,cchar *fname) noex {
 	int		rs ;
-	if ((rs = clusterdb_magic(op,fname)) >= 0) {
+	if ((rs = clusterdb_magic(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 		rs = kvsfile_fileadd(op->ctp,fname) ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -230,16 +229,16 @@ int clusterdb_fileadd(clusterdb *op,cchar *fname) noex {
 int clusterdb_curbegin(CD *op,CD_CUR *curp) noex {
 	int		rs ;
 	int		rsc = 0 ;
-	if ((rs = clusterdb_magic(op,curp)) >= 0) {
+	if ((rs = clusterdb_magic(op,curp)) >= 0) ylikely {
 	    cint	kcurlen = szof(kvsfile_cur) ;
 	    void	*vp{} ;
-	    if ((rs = uc_malloc(kcurlen,&vp)) >= 0) {
+	    if ((rs = lm_mall(kcurlen,&vp)) >= 0) ylikely {
 		curp->kcurp = (kvsfile_cur *) vp ;
 		{
 	            rs = kvsfile_curbegin(op->ctp,curp->kcurp) ;
 		    rsc = rs ;
 		    if (rs < 0) {
-		        uc_free(vp) ;
+		        lm_free(vp) ;
 		        curp->kcurp = nullptr ;
 		    }
 		} /* end block */
@@ -252,13 +251,13 @@ int clusterdb_curbegin(CD *op,CD_CUR *curp) noex {
 int clusterdb_curend(CD *op,CD_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = clusterdb_magic(op,curp)) >= 0) {
-	    {
+	if ((rs = clusterdb_magic(op,curp)) >= 0) ylikely {
+	    if (op->ctp) ylikely {
 	        rs1 = kvsfile_curend(op->ctp,curp->kcurp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-		rs1 = uc_free(curp->kcurp) ;
+		rs1 = lm_free(curp->kcurp) ;
 		if (rs >= 0) rs = rs1 ;
 		curp->kcurp = nullptr ;
 	    }
@@ -269,7 +268,7 @@ int clusterdb_curend(CD *op,CD_CUR *curp) noex {
 
 int clusterdb_curenumcluster(CD *op,CD_CUR *curp,char *kbuf,int klen) noex {
 	int		rs ;
-	if ((rs = clusterdb_magic(op,curp,kbuf)) >= 0) {
+	if ((rs = clusterdb_magic(op,curp,kbuf)) >= 0) ylikely {
 	    kvsfile_cur	*kcp = (curp) ? curp->kcurp : nullptr ;
 	    rs = kvsfile_curenumkey(op->ctp,kcp,kbuf,klen) ;
 	} /* end if (magic) */
@@ -280,7 +279,7 @@ int clusterdb_curenumcluster(CD *op,CD_CUR *curp,char *kbuf,int klen) noex {
 int clusterdb_curenum(CD *op,CD_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
-	if ((rs = clusterdb_magic(op,curp,kbuf,vbuf)) >= 0) {
+	if ((rs = clusterdb_magic(op,curp,kbuf,vbuf)) >= 0) ylikely {
 	    kvsfile_cur	*kcp = (curp) ? curp->kcurp : nullptr ;
 	    rs = kvsfile_curenum(op->ctp,kcp,kbuf,klen,vbuf,vlen) ;
 	} /* end if (magic) */
@@ -290,9 +289,9 @@ int clusterdb_curenum(CD *op,CD_CUR *curp,char *kbuf,int klen,
 
 int clusterdb_curfetch(CD *op,cc *cn,CD_CUR *curp,char *vbuf,int vlen) noex {
 	int		rs ;
-	if ((rs = clusterdb_magic(op,cn,curp,vbuf)) >= 0) {
+	if ((rs = clusterdb_magic(op,cn,curp,vbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (cn[0]) {
+	    if (cn[0]) ylikely {
 	        kvsfile_cur	*kcp = (curp) ? curp->kcurp : nullptr ;
 	        rs = kvsfile_fetch(op->ctp,cn,kcp,vbuf,vlen) ;
 	    } /* end if (valid) */
@@ -319,7 +318,7 @@ namespace {
 	} ; /* end ctor */
 	int start() noex {
 	    int		rs ;
-	    if ((rs = malloc_mn(&nbuf)) >= 0) {
+	    if ((rs = lm_mn(&nbuf)) >= 0) {
 		nlen = rs ;
 	    } /* end if */
 	    return rs ;
@@ -328,7 +327,7 @@ namespace {
 	    int		rs = SR_OK ;
 	    int		rs1 ;
 	    if (nbuf) {
-		rs1 = uc_free(nbuf) ;
+		rs1 = lm_free(nbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    return rs ;
@@ -341,9 +340,9 @@ int clusterdb_curfetchrev(CD *op,cc *nn,CD_CUR *curp,char *kbuf,int klen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		kl = 0 ;
-	if ((rs = clusterdb_magic(op,nn,kbuf)) >= 0) {
+	if ((rs = clusterdb_magic(op,nn,kbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (nn[0]) {
+	    if (nn[0]) ylikely {
 		if (fetcher fo(op,curp,nn,kbuf,klen) ; (rs = fo.start()) >= 0) {
 		    {
 		        rs = fo ;
@@ -400,7 +399,7 @@ fetcher::operator int () noex {
 
 int clusterdb_check(CD *op,time_t daytime) noex {
 	int		rs ;
-	if ((rs = clusterdb_magic(op)) >= 0) {
+	if ((rs = clusterdb_magic(op)) >= 0) ylikely {
 	    rs = kvsfile_check(op->ctp,daytime) ;
 	} /* end if (magic) */
 	return rs ;
