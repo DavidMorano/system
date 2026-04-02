@@ -43,12 +43,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<getpwd.h>
-#include	<libmallocxx.h>
 #include	<mkpath.h>
 #include	<nonpath.h>
 #include	<localmisc.h>
