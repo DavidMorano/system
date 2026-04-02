@@ -45,7 +45,9 @@
 #include	<sys/types.h>		/* |pid_t| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>		/* |getustime(3u)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
 
