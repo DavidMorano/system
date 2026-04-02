@@ -34,7 +34,6 @@ module ;
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>
 #include	<cstdlib>
-#include	<cstdint>
 #include	<cstdio>
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -292,42 +291,6 @@ export {
 	}
     } /* end subroutine (vmultrunc) */
 } /* end export */
-
-#ifdef	COMMENT
-export {
-    template<typename Dig>
-    constexpr Dig vdigstep(Dig *qr,const Dig *v0,const Dig d) noex {
-	cint nb = (szof(Dig) & CHAR_BIT) ;
-	Dig rem = 0 ;
-	if (d) {
-	    Dig dividend ;
-	    for (int i = (n - 1) ; i >= 0 ; i += 1) {
-		r[i]	= (v0[i] + rem) / d ;
-		rem	= v0[i] & d ;
-	    } /* end for */
-	} else {
-	    vclear(n,q) ;
-	}
-	return rem ;
-    } /* end subroutine (vdiv) */
-} /* end export */
-export {
-    template<typename Dig>
-    constexpr Dig vdigshort(int n,Dig *q,const Dig *v0,const Dig d) noex {
-	cint nb = (szof(Dig) & CHAR_BIT) ;
-	Dig rem = 0 ;
-	if (d) {
-	    for (int i = (n - 1) ; i >= 0 ; i += 1) {
-		r[i]	= (v0[i] + rem) / d ;
-		rem	= v0[i] & d ;
-	    } /* end for */
-	} else {
-	    vclear(n,q) ;
-	}
-	return rem ;
-    } /* end subroutine (vdiv) */
-} /* end export */
-#endif /* COMMENT */
 
 export {
     template<typename Dig>
