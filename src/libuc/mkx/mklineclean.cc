@@ -39,8 +39,8 @@
 	rbuf		result buffer pointer
 	rlen		result buffer length
 	m		mode parameter (see above on use of mode)
-	lp		line-buffer to get operated on
-	ll		length of line-buffer on input
+	lp		source counted c-string pointer
+	ll		source counted c-string length
 
 	Returns:
 	-		length of resulting line (not NL terminated)
@@ -55,20 +55,19 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ascii.h>		/* |CH_{xx}| */
 #include	<strmgr.h>
 #include	<mkchar.h>
 #include	<ischarx.h>		/* |iseol(3uc)| + |isprintlatin(3uc)| */
 #include	<localmisc.h>		/* |UC(3dam)| */
-#include	<linecleanopt.h>	/* cleanint options */
+#include	<linecleanopt.h>	/* cleaning options */
 
 #include	"mklineclean.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
