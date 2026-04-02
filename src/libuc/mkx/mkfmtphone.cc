@@ -42,10 +42,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ascii.h>
 #include	<sbuf.h>
 #include	<strn.h>
@@ -89,7 +87,7 @@ int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex {
 	    if (int sl ; (sl = sfshrink(pp,pl,&sp)) > 0) ylikely {
 	        if (strnbrk(sp,sl,"-()") == nullptr) {
 	            cint	tlen = sl ;
-	            if (char *tbuf ; (rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+	            if (char *tbuf ; (rs = lm_mall((tlen+1),&tbuf)) >= 0) {
 	                if ((rs = snwcpyopaque(tbuf,tlen,sp,sl)) >= 0) {
 		            cint	tl = rs ;
 			    if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) {
@@ -119,7 +117,7 @@ int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex {
 			        if (rs >= 0) rs = dl ;
 			    } /* end if (sbuf) */
 	                } /* end if (snwcpyopaque) */
-	                rs1 = uc_free(tbuf) ;
+	                rs1 = lm_free(tbuf) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
 	        } else {
