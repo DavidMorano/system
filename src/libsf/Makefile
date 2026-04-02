@@ -1,4 +1,4 @@
-# MAKEFILES (libsf)
+# MAKEFILE (libsf)
 
 T= libsf
 
