@@ -47,12 +47,16 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"mktmp.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -84,8 +88,8 @@ extern "C" {
 int mktmpfile(char *rbuf,cchar *inname,mode_t om) noex {
 	cint		of = (O_WRONLY|O_CLOEXEC) ;
 	int		rs ;
-	if ((rs = opentmpfile(inname,of,om,rbuf)) >= 0) {
-	    if ((rs = uc_close(rs)) >= 0) {
+	if ((rs = opentmpfile(inname,of,om,rbuf)) >= 0) ylikely {
+	    if ((rs = uc_close(rs)) >= 0) ylikely {
 	        rs = lenstr(rbuf) ;
 	    }
 	} /* end if (opentmpfile) */
