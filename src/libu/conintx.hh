@@ -21,7 +21,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdint.h>
 #include	<type_traits>
 #include	<concepts>
 #include	<clanguage.h>
