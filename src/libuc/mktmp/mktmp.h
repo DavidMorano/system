@@ -20,12 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<fcntl.h>		/* |mode_t| */
+#include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
