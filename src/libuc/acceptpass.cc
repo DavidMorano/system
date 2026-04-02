@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
+	= 1998-03-21, David A­D­ Morano
 	This code was originally written.
 
 */
@@ -46,9 +46,12 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>			/* |time(2)| */
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"acceptpass.h"
