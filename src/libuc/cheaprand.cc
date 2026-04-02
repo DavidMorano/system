@@ -22,28 +22,39 @@
 
 /*******************************************************************************
 
+  	Name:
+	cheaprand
+
+	Description:
 	This is a cheapy random number generator. There is no theory
 	or proofs that this is a "good" RNG. Although this RNG is
 	part of a cryptographically strong messages system, this
-	RNG in itself is never used as the main component.
-
-	The |randmac()| subroutine below is a 32 bit RNG that is
-	based loosely on the well-performing Multiphy With Carry
-	type generators. However, and note carefully, the '|andmac()|
+	RNG in itself is never used as the main component.  The
+	|randmac()| subroutine below is a 32 bit RNG that is based
+	loosely on the well-performing Multiphy With Carry type
+	generators. However, and note carefully, the '|andmac()|
 	subroutine is NOT of that type. A MWC adds in the carry
 	from the PREVIOUS multiply where the subroutine below adds
 	in the carry from the CURRENT multiply. It appears to perform
-	well in RNG tests.
+	well in RNG tests.  The |cheaprand()| subroutine is a
+	combination of two of the |randmac()| RNGs. Again, there
+	is no theory or proof that this is a good RNG either.
 
-	The |cheaprand()| subroutine is a combination of two of the
-	|randmac()| RNGs. Again, there is no theory or proof that
-	this is a good RNG either.
+	Synopsis:
+	ulong cheaprand(ulong v) noex
+
+	Arguments:
+	v		seed-value
+
+	Returns:
+	-		random number
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
 
 #include	"cheaprand.h"
 
