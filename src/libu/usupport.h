@@ -46,6 +46,7 @@
 #include	<usupport_ustrftime.h>
 #include	<usupport_sixchr.h>
 #include	<usupport_sichar.h>
+#include	<usupport_getsign.h>
 
 
 #endif /* USUPPORT_INCLUDE */
