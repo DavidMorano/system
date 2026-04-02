@@ -25,10 +25,7 @@
 #include	<limits.h>
 #include	<netdb.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<kvsfile.h>
 
 
@@ -38,12 +35,12 @@
 
 struct clusterdb_cursor {
 	kvsfile_cur	*kcurp ;
-} ;
+} ; /* end struct (clusterdb_cursor) */
 
 struct clusterdb_head {
 	kvsfile		*ctp ;
 	uint		magic ;
-} ;
+} ; /* end struct (clusterdb_head) */
 
 typedef CLUSTERDB	clusterdb ;
 typedef CLUSTERDB_CUR	clusterdb_cur ;
