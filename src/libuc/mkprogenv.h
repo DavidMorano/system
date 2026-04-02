@@ -13,7 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 #include	<strpack.h>
 
@@ -35,10 +36,10 @@ typedef MKPROGENV	mkprogenv ;
 
 EXTERNC_begin
 
-extern int mkprogenv_start(mkprogenv *,mainv) noex ;
-extern int mkprogenv_envset(mkprogenv *,cchar *,cchar *,int) noex ;
-extern int mkprogenv_getvec(mkprogenv *,mainv *) noex ;
-extern int mkprogenv_finish(mkprogenv *) noex ;
+extern int mkprogenv_start	(mkprogenv *,mainv) noex ;
+extern int mkprogenv_envset	(mkprogenv *,cchar *,cchar *,int) noex ;
+extern int mkprogenv_getvec	(mkprogenv *,mainv *) noex ;
+extern int mkprogenv_finish	(mkprogenv *) noex ;
 
 EXTERNC_end
 
