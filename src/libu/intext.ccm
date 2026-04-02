@@ -31,7 +31,6 @@ module ;
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>
 #include	<cstdlib>
-#include	<cstdint>
 #include	<cstdio>
 #include	<concepts>
 #include	<compare>
@@ -46,7 +45,7 @@ module ;
 export module intext ;
 
 import varithmetic ;
-import loadval ;
+import loadvals ;
 
 /* local defines */
 
