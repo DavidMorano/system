@@ -49,7 +49,9 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<strwcpy.h>
 #include	<mkpathx.h>
 #include	<dirseen.h>
@@ -69,6 +71,16 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_lockf(int,int,off_t) noex ;
+}
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -104,9 +116,9 @@ static constexpr int	rslock[] = {
 int mktmplock(char *rbuf,cchar *fn,mode_t fm) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf && fn) {
+	if (rbuf && fn) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0]) {
+	    if (fn[0]) ylikely {
 		for (int i = 0 ; (rs == 0) && tmpdirs[i] ; i += 1) {
 		    cchar	*tmpdir = tmpdirs[i] ;
 		    rs = mktmptry(rbuf,tmpdir,fn,fm) ;
@@ -124,9 +136,9 @@ int mktmplock(char *rbuf,cchar *fn,mode_t fm) noex {
 static int mktmptry(char *rbuf,cchar *tmpdir,cchar *fn,mode_t fm) noex {
 	int		rs ;
 	int		rl = 0 ;
-	if ((rs = mkpath(rbuf,tmpdir,fn)) >= 0) {
+	if ((rs = mkpath(rbuf,tmpdir,fn)) >= 0) ylikely {
 	    rl = rs ;
-	    if ((rs = lockable(rbuf,fm)) == 0) {
+	    if ((rs = lockable(rbuf,fm)) == 0) ylikely {
 	        rl = 0 ;
 	    }
 	    u_unlink(rbuf) ;
@@ -138,9 +150,9 @@ static int mktmptry(char *rbuf,cchar *tmpdir,cchar *fn,mode_t fm) noex {
 static int lockable(cchar *fname,mode_t fm) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = u_open(fname,O_RDWR,fm)) >= 0) {
+	if ((rs = u_open(fname,O_RDWR,fm)) >= 0) ylikely {
 	    cint	fd = rs ;
-	    if ((rs = uc_lockf(fd,F_TLOCK,0z)) >= 0) {
+	    if ((rs = uc_lockf(fd,F_TLOCK,0z)) >= 0) ylikely {
 		f = true ;
 	    } else if (isOneOf(rslock,rs)) {
 		rs = SR_OK ;
