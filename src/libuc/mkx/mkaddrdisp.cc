@@ -44,14 +44,18 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<field.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
 
 #include	"mkx.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -62,7 +66,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -101,7 +104,7 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sbuf b ; (rs = b.start(abuf,alen)) >= 0) ylikely {
 	        cint	flen = sl ;
-	        if (char *fbuf ; (rs = uc_malloc((flen+1),&fbuf)) >= 0) {
+	        if (char *fbuf ; (rs = lm_mall((flen+1),&fbuf)) >= 0) {
 	            if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
 			cnullptr	np{} ;
 	                int		c = 0 ;
@@ -122,7 +125,7 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 	                rs1 = fsb.finish ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (field) */
-	            rs1 = uc_free(fbuf) ;
+	            rs1 = lm_free(fbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	        len = b.finish ;
