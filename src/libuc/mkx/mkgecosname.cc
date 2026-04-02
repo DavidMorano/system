@@ -131,10 +131,7 @@
 #include	<cstddef>
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<snwcpy.h>
 #include	<ascii.h>
@@ -142,7 +139,7 @@
 
 #include	"mkgecosname.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
