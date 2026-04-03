@@ -49,6 +49,7 @@
 #include	<csro.h>
 #include	<mcmsg.hh>
 #include	<lkcmail.hh>
+#include	<ourmsginfo.h>
 
 #include	<envmat.h>
 #include	<headkeymat.h>
