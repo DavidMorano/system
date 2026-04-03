@@ -411,7 +411,7 @@ ureserve.dir:
 	makesubdir $@
 
 # USUPPORT
-usupport.o:		usupport.dir
+usupport.o:		usupport.dir ischx.o
 usupport.dir:
 	makesubdir $@
 
@@ -507,7 +507,7 @@ baops.o:		baops.c		baops.h				$(INCS)
 findbit.o:		findbit.ccm					$(INCS)
 
 # STRING handling
-strtox.o:		strtox.cc	strtox.h ischx.o bitmanip.o	$(INCS)
+strtox.o:		strtox.cc	strtox.h bitmanip.o		$(INCS)
 strnul.o:		strnul.cc	strnul.hh			$(INCS)
 
 # MISC
