@@ -43,7 +43,11 @@
 #include	<usysdefs.h>
 
 
-#if	(!defined(SYSHAS_TYPEDIRENT)) || (SYSHAS_TYPEDIRENT == 0)
+#if	defined(SYSHAS_TYPEDIRENT) && (SYSHAS_TYPEDIRENT > 0)
+
+
+#else  /* defined(SYSHAS_TYPEDIRENT) && (SYSHAS_TYPEDIRENT > 0) */
+
 
 #ifndef	TYPEDEF_DIRENT
 #define	TYPEDEF_DIRENT
