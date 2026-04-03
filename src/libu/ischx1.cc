@@ -1,4 +1,4 @@
-/* ischx MODULE (module-implementation-unit) */
+/* ischx1 MODULE (module-implementation-unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
