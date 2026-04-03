@@ -266,5 +266,6 @@ filer_mailsup.o:	filer_mailsup.cc			$(INCS)
 envmat.o:		envmat.cc	envmat.h		$(INCS)
 headkeymat.o:		headkeymat.cc	headkeymat.h		$(INCS)
 mailaddr.o:		mailaddr.cc	mailaddr.h		$(INCS)
+ourmsginfo.o:		ourmsginfo.cc	ourmsginfo.h		$(INCS)
 
 
