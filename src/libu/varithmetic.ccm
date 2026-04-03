@@ -220,9 +220,6 @@ export {
 	    } /* end for */
 	} /* end for */
     } /* end subroutine (vmuler) */
-} /* end export */
-
-export {
     template<typename Dig>
     constexpr void vmuler(int n,Dig *r,const Dig *v0,const Dig *v1) noex {
 	cint nh = (n / 2) ;
@@ -231,12 +228,27 @@ export {
 	    for (int j = 0 ; j < nh ; j += 1) {
 		cint	ri = (i + j) ;
 		int	co = 0 ;
-		Dig	res[2] ; muldig(res,v0[i],v1[j]) ;
+		Dig	res[2] ; muldig(res,v0[j],v1[i]) ;
     		co = addc((r + ri + 0),r[ri + 0],res[0],co) ;
     		co = addc((r + ri + 1),r[ri + 1],res[1],co) ;
 	    } /* end for */
 	} /* end for */
     } /* end subroutine (vmuler) */
+} /* end export */
+
+export {
+    template<typename Dig>
+    constexpr void vmulone(int n,Dig *r,const Dig *v0,const Dig one) noex {
+	cint nh = (n / 2) ;
+	vclear(n,r) ;
+	for (int i = 0 ; i < nh ; i += 1) {
+		cint	ri = i ;
+		int	co = 0 ;
+		Dig	res[2] ; muldig(res,v0[i],one) ;
+    		co = addc((r + ri + 0),r[ri + 0],res[0],co) ;
+    		co = addc((r + ri + 1),r[ri + 1],res[1],co) ;
+	} /* end for */
+    } /* end subroutine (vmulone) */
 } /* end export */
 
 #ifdef	COMMENT
