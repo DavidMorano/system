@@ -1,11 +1,11 @@
-/* strtox SUPPORT */
+/* strtox SUPPORT (String-To-X-integer) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* conversion of a decimal c-string to the type |longlong| */
+/* convert a decimal c-string to the type |longlong| */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* debuging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -48,20 +48,21 @@
 	Arguments:
 	{x}		one of: i, l, ll, ui, ul, ull
 	sp		c-string to convert
-	endp		returned pointer last character considered
+	endp		returned pointer to last character considered
 	base		base to convert, 2-36
 
 	Returns:
-	typeof({x})	resulting value in destired integer type
+	typeof({x})	resulting value in desired integer type
 	errno		set on error (UNIX® error number)
 
 	Description:
 	This code converts a c-string of decimal digits into the
 	integer types |longlong| and |ulonglong|.  The API and
 	semantics of this code is intentionally modeled after the
-	API and semantics of the existing UNIX® conversion subroutines
-	|strtol(3c)| and |strtoul(3c)|.  See the notes below for
-	more information on the necessity for these.
+	API and semantics of the existing UNIX® standard C-language
+	library conversion subroutines |strtol(3c)| and |strtoul(3c)|.
+	See the notes below for more information on the necessity
+	for these.
 
 	Acknowledgements:
 	1. Thanks are due to P.J. Plauger for his origial creation
@@ -78,9 +79,9 @@
 	know, is widely used now-a-days).
 
 	Notes:
-	1. This code is limited (by the coding used) to a maximum
-	base of 36.  This is the standard for the standard library
-	subroutines.
+	1. This code is limited (for standards compliance) to a
+	maximum base of 36.  This is the standard for the standard
+	C-language library subroutines.
 
 	Questions-Answers:
 
@@ -185,7 +186,7 @@ import bitmanip ;			/* LIBU bit-manipulations */
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debuging */
+#define	CF_DEBUG	1		/* debugging */
 #endif
 
 
@@ -229,21 +230,21 @@ namespace {
 	consteval void mkcuts() noex {
 	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
 		cutoff[b] = (ullmax / b) ;
-		cutlim[b] = int(ullmax % b) ;
+		cutlim[b] = intconv(ullmax % b) ;
 	    } /* end for */
 	} ; /* end method (mkcuts) */
 	consteval void mkpos() noex {
 	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
                 pcutoff[b] = (llmax / b) ;
-                pcutlim[b] = cutlim[b] ;
+                pcutlim[b] = intconv(llmax % b) ;
 	    } /* end for */
 	} ; /* end method (mkpos) */
 	consteval void mkneg() noex {
 	    longlong	nco ;
 	    int		ncl ;
 	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
-                nco = llmin / b ;
-                ncl = cutlim[b] ;
+                nco = (llmin / b) ;
+                ncl = intconv(llmin % b) ;
                 if (ncl > 0) {
                     ncl -= b ;
                     nco += 1 ;
@@ -325,6 +326,7 @@ namespace {
 	strer(cc *s,char **e,int b) noex : startp(s), endpp(e), base(b) { 
 	    sp = startp ;
 	} ;
+	void suber() noex ;
 	void signer() noex {
 	    if (cint si = getsign(sp,-1,&fneg) ; si > 0) {
 		sp += si ;
@@ -337,8 +339,9 @@ namespace {
                 *endpp = charp(verr ? sp : startp) ;
             }
 	} ; /* end method */
-	virtual void cookprep() noex = 0 ;
-	virtual void cvt(int) noex = 0 ;
+	virtual void cookprep()	noex = 0 ;
+	virtual void cvt(int)	noex = 0 ;
+	virtual void negator()	noex { } ;
     } ; /* end struct */
 } /* end namespace */
 
@@ -360,6 +363,7 @@ namespace {
 	operator ulonglong ()	noex ;
 	void cookprep()		noex override final ;
 	void cvt(int)		noex override final ;
+	void negator()		noex override final ;
     } ; /* end struct */
 } /* end namespace */
 
@@ -415,7 +419,7 @@ local inline int getbase(int) noex attrpure ;
  
 local inline bool isbaseval(int b) noex attrconst {
     return ((b >= 2) && (b <= maxbase)) ;
-}
+} /* end subroutine (isbaseval) */
 
 template<typename TS>
 local bool iserrneg(TS co,int cl,TS res,int val) noex attrconst {
@@ -449,6 +453,7 @@ constexpr llhelper	llhelp ;
 constexpr charbase	chbase ;
 
 cbool			f_debug = CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -516,9 +521,21 @@ local inline int getbase(int ch) noex attrpure {
 	return chbase.num[ch & UCHAR_MAX] ;
 } /* end subroutine (getbase) */
  
+void strer::suber() noex {
+    	if (startp) {
+    	    signer() ;
+	    baser() ;
+	    cooker() ;
+	    negator() ;
+	    ender() ;
+	} else {
+	    errno = EFAULT ;
+	}
+} /* end method (strer::suber) */
+
 void strer::baser() noex {
     	int ch = *sp ;
-	if ((base == 0 || base == 16) && ch == '0') {
+	if ((ch == '0') && (base == 0 || base == 16)) {
 	    if (cint b = getbase(sp[1]) ; b > 0) {
 		base = b ;
 		sp += 2 ;
@@ -530,14 +547,23 @@ void strer::baser() noex {
 	}
 } /* end method (strer::baser) */
 
+local inline int getval(int b,cchar *sp) noex {
+    	int val = -1 ;
+	if (cint ch = uchar(*sp) ; ch > 0) {
+	    if (cint v = chbase.val[ch] ; v < b) {
+		val = v ;
+	    }
+	}
+	return val ;
+} /* end subroutine (getval) */
+
 void strer::cooker() noex {
 	if (isbaseval(base)) {
 	    cookprep() ;
-	    for (int ch ; ((ch = uchar(*sp))) ; sp += 1) {
-		cint val = chbase.val[ch] ;
-                if (val >= base) break ;
-                if (verr < 0) continue ;
-		cvt(val) ;
+	    for (int val ; (val = getval(base,sp)) >= 0 ; sp += 1) {
+                if (verr >= 0) {
+		    cvt(val) ;
+		}
             } /* end for */
 	} else {
 	    errno = ENOTSUP ;
@@ -545,21 +571,14 @@ void strer::cooker() noex {
 } /* end method (strer::cooker) */
 
 strer_sig::operator longlong () noex {
-    	if (startp) {
-    	    signer() ;
-	    baser() ;
-	    cooker() ;
-	    ender() ;
-	} else {
-	    errno = EFAULT ;
-	}
+    	suber() ;
     	return res ;
 } /* end method (strer_sig::operator) */
 
 void strer_sig::cookprep() noex {
 	cutoff = llhelp.getcutoff(base,fneg) ;
 	cutlim = llhelp.getcutlim(base,fneg) ;
-}
+} /* end method */
 
 void strer_sig::cvt(int val) noex {
 	if (fneg) {
@@ -594,24 +613,14 @@ void strer_sig::cvtpos(int val) noex {
 } /* end method */
 
 strer_uns::operator ulonglong () noex {
-    	if (startp) {
-    	    signer() ;
-	    baser() ;
-	    cooker() ;
-	    if (fneg && verr > 0) {
-	        ures = (- ures) ;
-	    }
-	    ender() ;
-	} else {
-	    errno = EFAULT ;
-	}
+    	suber() ;
     	return ures ;
 } /* end method */
 
 void strer_uns::cookprep() noex {
 	cutoff = llhelp.cutoff[base] ;
 	cutlim = llhelp.cutlim[base] ;
-}
+} /* end method */
 
 void strer_uns::cvt(int val) noex {
 	if (iserr(cutoff,cutlim,ures,val)) {
@@ -624,5 +633,11 @@ void strer_uns::cvt(int val) noex {
 	    ures += val ;
 	} /* end if */
 } /* end method */
+
+void strer_uns::negator() noex {
+	if (fneg && verr > 0) {
+	    ures = (- ures) ;
+	}
+} /* end method (strer_uns::negator) */
 
 
