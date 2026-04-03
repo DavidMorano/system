@@ -36,12 +36,13 @@
 	b			1
 	z			25
 	A			0
+	B			1
 	Z			25
 
 	Questions:
 	Q. What was this ever used for?
-	A. This represetnation was used for file-names that had a large
-	amount of information in its alphæmeric name.
+	A. This represetnation was used for file-names that had a
+	large amount of information in its alphæmeric name.
 	Q. When was this invented?
 	A. Somewhere in the early to middle 1990s (back at AT&T).
 
