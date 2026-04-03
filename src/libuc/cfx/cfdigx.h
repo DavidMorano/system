@@ -77,7 +77,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<envstandards.h>	/* MUST be first to configure */
 
 
 #endif /* CFDIGX_INCLUDE */
