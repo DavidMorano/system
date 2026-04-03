@@ -248,22 +248,22 @@ export {
 } /* end export */
 
 export extern "C" {
-    char *itostr(int v,char *endp) noex {
+    char *itostr	(int v,char *endp)		noex {
 	return stostr<uint>(v,endp) ;
     }
-    char *ltostr(long v,char *endp) noex {
+    char *ltostr	(long v,char *endp)		noex {
 	return stostr<ulong>(v,endp) ;
     }
-    char *lltostr(longlong v,char *endp) noex {
+    char *lltostr	(longlong v,char *endp)		noex {
 	return stostr<ulonglong>(v,endp) ;
     }
-    char *uitostr(uint uv,char *endp) noex {
+    char *uitostr	(uint uv,char *endp)		noex {
 	return utostr(uv,endp) ;
     }
-    char *ultostr(ulong uv,char *endp) noex {
+    char *ultostr	(ulong uv,char *endp)		noex {
 	return utostr(uv,endp) ;
     }
-    char *ulltostr(ulonglong uv,char *endp) noex {
+    char *ulltostr	(ulonglong uv,char *endp)	noex {
 	return utostr(uv,endp) ;
     }
 } /* end export (extern) */
