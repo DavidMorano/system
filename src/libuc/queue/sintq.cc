@@ -32,11 +32,8 @@
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>		/* |umem| */
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |um(3u)| */
 #include	<localmisc.h>
 #include	<debprintf.h>		/* |DEBPRINTF(3uc)| */
 
@@ -53,7 +50,7 @@ import debug ;				/* |debprintf(3uc)| */
 
 /* imported namespaces */
 
-using libu::umem ;			/* variable */
+using libu::um ;			/* variable */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
@@ -92,7 +89,7 @@ int sintq_start(sintq *op,int ne) noex {
 	    cint sz = (ne * esz) ;
 	    rs = SR_INVALID ;
 	    if (sz > 1) ylikely {
-		if (void *vp ; (rs = umem.mall(sz,&vp)) >= 0) ylikely {
+		if (void *vp ; (rs = um.mall(sz,&vp)) >= 0) ylikely {
 		    op->qbuf = shortp(vp) ;
 	            op->qlen = ne ;
 	            op->cnt = 0 ;
@@ -111,7 +108,7 @@ int sintq_finish(sintq *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->qbuf) ylikely {
-	        rs1 = umem.free(op->qbuf) ;
+	        rs1 = um.free(op->qbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->qbuf = nullptr ;
 	    } /* end if (memory-deallocation) */
@@ -166,16 +163,16 @@ int sintq_remread(sintq *op,short *rbuf,int rlen) noex {
 	if (op && rbuf) ylikely {
 	    rs = SR_OK ;
 	    if (int ml ; rlen > 0) ylikely {
-	            cint len = op->cnt ;
-	            ml = min(len,rlen) ;
-	            for (i = 0 ; (rs >= 0) && (i < ml) ; i += 1) {
-			if (short v ; (rs = sintq_rem(op,&v)) >= 0) {
-			    rbuf[i] = v ;
-			} else if (rs == SR_EMPTY) {
-			    rs = SR_OK ;
-			    break ;
-			}
-	            } /* end for */
+                cint len = op->cnt ;
+                ml = min(len,rlen) ;
+                for (i = 0 ; (rs >= 0) && (i < ml) ; i += 1) {
+                    if (short v ; (rs = sintq_rem(op,&v)) >= 0) {
+                        rbuf[i] = v ;
+                    } else if (rs == SR_EMPTY) {
+                        rs = SR_OK ;
+                        break ;
+                    }
+                } /* end for */
 	    } /* end if (non-zero positive) */
 	    rbuf[i] = 0 ;
 	} /* end if (magic) */
@@ -273,7 +270,7 @@ local int sinq_ext(sintq *op) noex {
 	    DEBPRINTF(fmt,op->qlen,op->cnt,op->ri,op->wi) ;
 	}
 	if (op->cnt == op->qlen) ylikely {
-	    if (short *na ; (rs = umem.mall((nlen * esz),&na)) >= 0) {
+	    if (short *na ; (rs = um.mall((nlen * esz),&na)) >= 0) {
 		short *dp ; /* used-muliple */
 		int ni ; /* used-afterwards */
 		if ((ni = (op->qlen - op->ri)) > 0) {
@@ -288,13 +285,13 @@ local int sinq_ext(sintq *op) noex {
 		    dp = (na + ni) ;
 		    memcopy(dp,sp,sz) ;
 		} /* end if (write-index) */
-		if ((rs = umem.free(op->qbuf)) >= 0) {
+		if ((rs = um.free(op->qbuf)) >= 0) {
 		    op->ri = 0 ;
 		    op->wi = op->qlen ;
 		    op->qbuf = na ;
 		    op->qlen = nlen ;
 		} /* end if (memory-deallocation) */
-	    } /* end if (umem.mall) */
+	    } /* end if (memory-allocation) */
 	} /* end if (bug-check) */
 	DEBPRINTF("ret rs=%d nlen=%d\n",rs,nlen) ;
 	return rs ;
