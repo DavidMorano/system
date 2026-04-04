@@ -33,7 +33,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<time.h>		/* |time_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<stdintx.h>
 
 
@@ -125,17 +126,17 @@ typedef RANDOMVAR_FL	randomvar_fl ;
 
 EXTERNC_begin
 
-extern int randomvar_start(randomvar *,int,uint) noex ;
-extern int randomvar_stateload(randomvar *,cchar *,int) noex ;
-extern int randomvar_statesave(randomvar *,char *,int) noex ;
-extern int randomvar_setpoly(randomvar *,int,int) noex ;
-extern int randomvar_addnoise(randomvar *,cvoid *,int) noex ;
-extern int randomvar_getlong(randomvar *,long *) noex ;
-extern int randomvar_getulong(randomvar *,ulong *) noex ;
-extern int randomvar_getint(randomvar *,int *) noex ;
-extern int randomvar_getuint(randomvar *,uint *) noex ;
-extern int randomvar_get(randomvar *,void *,int) noex ;
-extern int randomvar_finish(randomvar *) noex ;
+extern int randomvar_start	(randomvar *,int,uint) noex ;
+extern int randomvar_stateload	(randomvar *,cchar *,int) noex ;
+extern int randomvar_statesave	(randomvar *,char *,int) noex ;
+extern int randomvar_setpoly	(randomvar *,int,int) noex ;
+extern int randomvar_addnoise	(randomvar *,cvoid *,int) noex ;
+extern int randomvar_getlong	(randomvar *,long *) noex ;
+extern int randomvar_getulong	(randomvar *,ulong *) noex ;
+extern int randomvar_getint	(randomvar *,int *) noex ;
+extern int randomvar_getuint	(randomvar *,uint *) noex ;
+extern int randomvar_get	(randomvar *,void *,int) noex ;
+extern int randomvar_finish	(randomvar *) noex ;
 
 EXTERNC_end
 
