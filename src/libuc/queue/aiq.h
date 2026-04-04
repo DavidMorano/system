@@ -23,9 +23,9 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<stddef.h>		/* <- for |ptrdiff_t| */
 #include	<pthread.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<q.h>
 
 
@@ -37,15 +37,60 @@
 struct aiq_entry {
 	ptrdiff_t	next ;
 	ptrdiff_t	prev ;
-} ;
+} ; /* end struct (aiq_entry) */
 
 struct aiq_head {
 	q		*qp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct (aiq_head) */
 
-typedef	AIQ		aiq ;
 typedef	AIQ_ENT		aiq_ent ;
+
+#ifdef	__cplusplus
+enum aiqmems {
+	aiqmem_start,
+	aiqmem_count,
+	aiqmem_finish,
+	aiqmem_overlast
+} ; /* end enum (aiqmems) */
+struct aiq ;
+struct aiq_co {
+        aiq		*op = nullptr ;
+        int             w = -1 ;
+        constexpr void operator () (aiq *p,int m) noex {
+            op = p ;
+            w = m ;
+        } ;
+	int operator () (int = 0) noex ;
+        operator int () noex {
+	    return operator () (0) ;
+	} ;
+} ; /* end struct (aiq_co) */
+struct aiq : aiq_head {
+	aiq_co		start ;
+	aiq_co		count ;
+	aiq_co		finish ;
+	constexpr aiq() noex {
+	    start	(this,aiqmem_start) ;
+	    count	(this,aiqmem_count) ;
+	    finish	(this,aiqmem_finish) ;
+	    magval = 0 ;
+	} ; /* end ctor */
+	aiq(const aiq &) = delete ;
+	aiq &operator = (const aiq &) = delete ;
+	int ins		(aiq_ent *) noex ;
+	int inshead	(aiq_ent *) noex ;
+	int rem		(aiq_ent **) noex ;
+	int remtail	(aiq_ent **) noex ;
+	void dtor() noex ;
+	operator int () noex ;
+	destruct aiq() {
+	    if (magval) dtor() ;
+	} ; /* end dtor (aiq) */
+} ; /* end class (aiq) */
+#else
+typedef AIQ		aiq ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
