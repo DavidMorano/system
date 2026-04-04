@@ -86,7 +86,7 @@
 	Returns:
 	>0		length of found field
 	==0		no field found or a NL character was encountered
-	<0		does not happen
+	<0		address-fault
 
 *******************************************************************************/
 
@@ -96,14 +96,11 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<baops.h>		/* |batst(2uc)| */
-#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
-#include	"sfx.h"
 #include	"sfnext.h"
 
 
@@ -201,7 +198,7 @@ int sfnextterm(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
 	struct esfx : sfnextx {
 	    cchar	*terms ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
-	    bool termx (int ch) const noex override final {
+	    bool termx(int ch) const noex override final {
 		return batst(terms,ch) ;
 	    } ;
 	} ; /* end struct */
@@ -211,8 +208,7 @@ int sfnextterm(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
 	    rl = sf ;
 	} /* end if (non-null) */
 	return rl ;
-}
-/* end subroutine (sfnextterm) */
+} /* end subroutine (sfnextterm) */
 
 
 /* local subroutines */
@@ -234,7 +230,6 @@ sfnextx::operator int () noex {
 	    *rpp = rp ;
 	} /* end if (non-null) */
 	return rl ;
-}
-/* end subroutine (sfnextx::operator) */
+} /* end subroutine (sfnextx::operator) */
 
 
