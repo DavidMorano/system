@@ -13,17 +13,16 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>
+#include	<stdlib.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	FIFOITEM_MAGIC	0x12345678
 #define	FIFOITEM	struct fifoitem_head
 #define	FIFOITEM_ENT	struct fifoitem_entry
 #define	FIFOITEM_CUR	struct fifoitem_cursor
+#define	FIFOITEM_MAGIC	0x12345678
 
 
 struct fifoitem_entry {
@@ -31,18 +30,18 @@ struct fifoitem_entry {
 	FIFOITEM_ENT	*prev ;
 	cvoid		*dp ;
 	int		dl ;
-} ;
+} ; /* end struct (fifoitem_entry) */
 
 struct fifoitem_head {
 	FIFOITEM_ENT	*head ;
 	FIFOITEM_ENT	*tail ;
-	int		magic ;
+	int		magval ;
 	int		n ;
-} ;
+} ; /* end struct (fifoitem_head) */
 
 struct fifoitem_cursor {
 	FIFOITEM_ENT	*current ;
-} ;
+} ; /* end struct (fifoitem_cursor) */
 
 typedef FIFOITEM	fifoitem ;
 typedef FIFOITEM_ENT	fifoitem_ent ;
@@ -52,18 +51,17 @@ EXTERNC_begin
 
 typedef int (*fifoitem_cmp)(cvoid *,cvoid *) noex ;
 
-extern int fifoitem_start(fifoitem *) noex ;
-extern int fifoitem_finish(fifoitem *) noex ;
-extern int fifoitem_ins(fifoitem *,cvoid *,int) noex ;
-extern int fifoitem_rem(fifoitem *,void *,int) noex ;
-extern int fifoitem_del(fifoitem *) noex ;
-extern int fifoitem_count(fifoitem *) noex ;
-extern int fifoitem_curbegin(fifoitem *,fifoitem_cur *) noex ;
-extern int fifoitem_curend(fifoitem *,fifoitem_cur *) noex ;
-extern int fifoitem_curdel(fifoitem *,fifoitem_cur *) noex ;
-extern int fifoitem_curfetch(fifoitem *,fifoitem_cur *,fifoitem_ent **) noex ;
-extern int fifoitem_curenum(fifoitem *,fifoitem_cur *,cvoid **) noex ;
-extern int fifoitem_present(fifoitem *,cvoid *,int,fifoitem_cmp) noex ;
+extern int fifoitem_start	(fifoitem *) noex ;
+extern int fifoitem_finish	(fifoitem *) noex ;
+extern int fifoitem_ins		(fifoitem *,cvoid *,int) noex ;
+extern int fifoitem_rem		(fifoitem *,void *,int) noex ;
+extern int fifoitem_del		(fifoitem *) noex ;
+extern int fifoitem_count	(fifoitem *) noex ;
+extern int fifoitem_curbegin	(fifoitem *,fifoitem_cur *) noex ;
+extern int fifoitem_curend	(fifoitem *,fifoitem_cur *) noex ;
+extern int fifoitem_curdel	(fifoitem *,fifoitem_cur *) noex ;
+extern int fifoitem_curenum	(fifoitem *,fifoitem_cur *,cvoid **) noex ;
+extern int fifoitem_present	(fifoitem *,cvoid *,int,fifoitem_cmp) noex ;
 
 EXTERNC_end
 
