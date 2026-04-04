@@ -158,12 +158,9 @@
 	from 2 through 128, go check out my CFX family of subroutines.
 
 	Q. Have you written enough of these "number conversion"
-	functions?
+	functions yet?
 
-	A. Apparently not.  It does seem like writing these are a
-	major part of getting onto a new platform.  Especially when
-	you have total bare metal and you need to write a new ROM
-	monitor.
+	A. Apparently not.  This may be my last one.
 
 *******************************************************************************/
 
@@ -325,7 +322,7 @@ namespace {
 	bool	fneg{} ;
 	strer(cc *s,char **e,int b) noex : startp(s), endpp(e), base(b) { 
 	    sp = startp ;
-	} ;
+	} ; /* end ctor */
 	void suber() noex ;
 	void signer() noex {
 	    if (cint si = getsign(sp,-1,&fneg) ; si > 0) {
@@ -346,20 +343,20 @@ namespace {
 } /* end namespace */
 
 namespace {
-    struct strer_sig : strer {
+    struct strer_sigll : strer { /* "signed-longlong" */
 	longlong	res{} ;
 	longlong	cutoff ;
-	strer_sig(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
+	strer_sigll(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
 	operator longlong ()	noex ;
 	void cookprep()		noex override final ;
 	void cvt(int)		noex override final ;
 	void cvtpos(int)	noex ;
 	void cvtneg(int)	noex ;
     } ; /* end struct */
-    struct strer_uns : strer {
+    struct strer_unsll : strer { /* "unsigned-longlong" */
 	ulonglong	ures{} ;
 	ulonglong	cutoff ;
-	strer_uns(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
+	strer_unsll(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
 	operator ulonglong ()	noex ;
 	void cookprep()		noex override final ;
 	void cvt(int)		noex override final ;
@@ -449,10 +446,8 @@ local bool iserr(TU co,int cl,TU ures,int val) noex attrconst {
 /* local variables */
 
 constexpr llhelper	llhelp ;
-
 constexpr charbase	chbase ;
-
-cbool			f_debug = CF_DEBUG ;
+constexpr bool		f_debug = CF_DEBUG ;
 
 
 /* exported variables */
@@ -483,7 +478,7 @@ long strtoxl(cchar *sp,char **epp,int b) noex {
 /* end subroutine (strtoxl) */
 
 longlong strtoxll(cchar *startp,char **endpp,int base) noex {
-    	strer_sig so(startp,endpp,base) ;
+    	strer_sigll so(startp,endpp,base) ;
 	return so ;
 } /* end subroutine (strtoxoll) */
 
@@ -510,7 +505,7 @@ ulong strtoxul(cchar *sp,char **epp,int b) noex {
 /* end subroutine (strtouxl) */
 
 ulonglong strtoxull(cchar *startp,char **endpp,int base) noex {
-    	strer_uns so(startp,endpp,base) ;
+    	strer_unsll so(startp,endpp,base) ;
 	return so ;
 } /* end subroutine (strtoxoll) */
 
@@ -570,17 +565,17 @@ void strer::cooker() noex {
 	} /* end if (valid base) */
 } /* end method (strer::cooker) */
 
-strer_sig::operator longlong () noex {
+strer_sigll::operator longlong () noex {
     	suber() ;
     	return res ;
-} /* end method (strer_sig::operator) */
+} /* end method (strer_sigll::operator) */
 
-void strer_sig::cookprep() noex {
+void strer_sigll::cookprep() noex {
 	cutoff = llhelp.getcutoff(base,fneg) ;
 	cutlim = llhelp.getcutlim(base,fneg) ;
 } /* end method */
 
-void strer_sig::cvt(int val) noex {
+void strer_sigll::cvt(int val) noex {
 	if (fneg) {
 	    cvtneg(val) ;
 	} else {
@@ -588,7 +583,7 @@ void strer_sig::cvt(int val) noex {
 	}
 } /* end method */
 
-void strer_sig::cvtneg(int val) noex {
+void strer_sigll::cvtneg(int val) noex {
 	if (iserrneg(cutoff,cutlim,res,val)) {
 	    verr = -1 ;
 	    res = llhelp.llmin ;
@@ -600,7 +595,7 @@ void strer_sig::cvtneg(int val) noex {
 	} /* end if */
 } /* end method */
 
-void strer_sig::cvtpos(int val) noex {
+void strer_sigll::cvtpos(int val) noex {
 	if (iserrpos(cutoff,cutlim,res,val)) {
 	    verr = -1 ;
 	    res = llhelp.llmax ;
@@ -612,17 +607,17 @@ void strer_sig::cvtpos(int val) noex {
 	} /* end if */
 } /* end method */
 
-strer_uns::operator ulonglong () noex {
+strer_unsll::operator ulonglong () noex {
     	suber() ;
     	return ures ;
 } /* end method */
 
-void strer_uns::cookprep() noex {
+void strer_unsll::cookprep() noex {
 	cutoff = llhelp.cutoff[base] ;
 	cutlim = llhelp.cutlim[base] ;
 } /* end method */
 
-void strer_uns::cvt(int val) noex {
+void strer_unsll::cvt(int val) noex {
 	if (iserr(cutoff,cutlim,ures,val)) {
 	    verr = -1 ;
 	    ures = llhelp.ullmax ;
@@ -634,10 +629,10 @@ void strer_uns::cvt(int val) noex {
 	} /* end if */
 } /* end method */
 
-void strer_uns::negator() noex {
+void strer_unsll::negator() noex {
 	if (fneg && verr > 0) {
 	    ures = (- ures) ;
 	}
-} /* end method (strer_uns::negator) */
+} /* end method (strer_unsll::negator) */
 
 
