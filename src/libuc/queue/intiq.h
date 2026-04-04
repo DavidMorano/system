@@ -30,11 +30,10 @@
 
 
 #include	<envstandards.h>	/* must be before others */
+#include	<stddef.h>
+#include	<stdlib.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ptm.h>
 #include	<fifoitem.h>
 
@@ -46,10 +45,49 @@
 struct intiq_head {
 	ptm		*mxp ;
 	fifoitem	*fqp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct (intiq_head) */
 
+#ifdef	__cplusplus
+enum intiqmems {
+	intiqmem_start,
+	intiqmem_count,
+	intiqmem_finish,
+	intiqmem_overlast
+} ; /* end enum (intiqmems) */
+struct intiq ;
+struct intiq_co {
+        intiq		*op = nullptr ;
+        int             w = -1 ;
+        constexpr void operator () (intiq *p,int m) noex {
+            op = p ;
+            w = m ;
+        } ;
+        operator int () noex ;
+} ; /* end struct (intiq_co) */
+struct intiq : intiq_head {
+	intiq_co	start ;
+	intiq_co	count ;
+	intiq_co	finish ;
+	constexpr intiq() noex {
+	    start	(this,intiqmem_start) ;
+	    count	(this,intiqmem_count) ;
+	    finish	(this,intiqmem_finish) ;
+	    magval = 0 ;
+	} ; /* end ctor */
+	intiq(const intiq &) = delete ;
+	intiq &operator = (const intiq &) = delete ;
+	int	ins(int) noex ;
+	int	rem(int *) noex ;
+	void	dtor() noex ;
+	operator int () noex ;
+	destruct intiq() {
+	    if (magval) dtor() ;
+	} ; /* end dtor (intiq) */
+} ; /* end class (intiq) */
+#else
 typedef INTIQ		intiq ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
