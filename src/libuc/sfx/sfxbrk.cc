@@ -47,19 +47,21 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<strn.h>		/* |strnxbrk(3uc)| */
-#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 #include	"sfxbrk.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* local typedefs */
@@ -79,7 +81,7 @@ extern "C" {
 
 namespace {
     struct sfxbrk {
-	xbrk_f	xbrk ;
+	xbrk_f xbrk ;
 	sfxbrk(xbrk_f x) noex : xbrk(x) { } ;
 	int operator () (cc *,int,cc *,cc **) noex ;
     } ; /* end struct (xtrxbrk) */
@@ -98,13 +100,13 @@ namespace {
 /* exported subroutines */
 
 int sfobrk(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
-    	sfxbrk		sx(strnobrk) ;
+    	sfxbrk sx(strnobrk) ;
 	return sx(sp,sl,sb,rpp) ;
 }
 /* end subroutine (sfobrk) */
 
 int sfrbrk(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
-    	sfxbrk		sx(strnrbrk) ;
+    	sfxbrk sx(strnrbrk) ;
 	return sx(sp,sl,sb,rpp) ;
 }
 /* end subroutine (sfrbrk) */
@@ -112,25 +114,22 @@ int sfrbrk(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
 
 /* local subroutines */
 
-int sfxbrk::operator () (cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
+int sfxbrk::operator () (cchar *sp,int µsl,cchar *sb,cchar **rpp) noex {
 	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl > 0) ylikely {
-	        while (sl && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
+	if (int sl = getlenstr(sp,µsl) ; sb && (sl > 0)) ylikely {
+	    while (sl && ISWHT(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    if ((rp = xbrk(sp,sl,sb)) != nullptr) {
+		rl = intconv(rp - sp) ;
+		rp = sp ;
+	        while (rl && ISWHT(rp[rl - 1])) {
+	            rl -= 1 ;
 	        }
-	        if ((rp = xbrk(sp,sl,sb)) != nullptr) {
-		    rl = intconv(rp - sp) ;
-		    rp = sp ;
-	            while (rl && CHAR_ISWHITE(rp[rl - 1])) {
-	                rl -= 1 ;
-	            }
-	        } /* end if (hit) */
-	    } /* end if (non-zero positive) */
-	} /* end if (non-null) */
+	    } /* end if (hit) */
+	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
 	return rl ;
 } /* end method (sfxbrk:operator) */
