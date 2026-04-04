@@ -1,4 +1,4 @@
-# MAKEFILES (queue)
+# MAKEFILE (queue)
 
 T= queue
 
@@ -46,7 +46,7 @@ OBJ2_QUEUE= cq.o fifoitem.o fifoelem.o
 OBJ3_QUEUE= charq.o chariq.o
 OBJ4_QUEUE= slq.o fifostr.o
 OBJ5_QUEUE= slist.o
-OBJ6_QUEUE= shortq.o
+OBJ6_QUEUE= shortq.o sintq.o
 OBJ7_QUEUE=
 
 OBJA_QUEUE= obj0_queue.o obj1_queue.o obj2_queue.o 
@@ -177,7 +177,8 @@ charq.o:		charq.cc charq.h			$(INCS)
 chariq.o:		chariq.cc chariq.h charq.h		$(INCS)
 
 # short
-shortq.o:		shortq.cc shortq.h			$(INCS)
+shortq.o:		shortq.cc	shortq.h		$(INCS)
+sintq.o:		sintq.cc	sintq.h			$(INCS)
 
 # FIFOs (variable element size and fixed element size)
 fifoitem.o:		fifoitem.cc fifoitem.h			$(INCS)
