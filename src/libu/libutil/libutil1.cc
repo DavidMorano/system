@@ -35,6 +35,7 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>		/* |va_list(3c)| */
