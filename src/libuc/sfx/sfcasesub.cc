@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* match a substring within a larger string */
+/* find a substring within a larger conted c-string */
 /* version %I% last-modified %G% */
 
 
@@ -49,17 +49,16 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<nleadstr.h>		/* |nleadcasestr(3uc)| */
 #include	<toxc.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"sfcasesub.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -105,17 +104,17 @@ namespace {
 /* exported subroutines */
 
 int sfbasesub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
-    sfxsub	sx(tobc,nleadbasestr) ;
+    sfxsub sx(tobc,nleadbasestr) ;
     return sx(sp,sl,ss,rpp) ;
 }
 
 int sfcasesub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
-    sfxsub	sx(touc,nleadcasestr) ;
+    sfxsub sx(touc,nleadcasestr) ;
     return sx(sp,sl,ss,rpp) ;
 }
 
 int sffoldsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
-    sfxsub	sx(tofc,nleadfoldstr) ;
+    sfxsub sx(tofc,nleadfoldstr) ;
     return sx(sp,sl,ss,rpp) ;
 }
 
@@ -126,7 +125,7 @@ int sfxsub::operator () (cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		sslen = 0 ; /* return-value */
 	bool		f = false ;
 	if (sp && ss) ylikely {
-	    int		i = 0 ; /* used-below */
+	    int		i = 0 ; /* used-afterwards */
 	    f = true ;
 	    if ((sslen = lenstr(ss)) > 0) ylikely {
 	        f = false ;
