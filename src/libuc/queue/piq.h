@@ -20,33 +20,78 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stddef.h>
+#include	<stdlib.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
 #include	<ptm.h>
 #include	<pq.h>
 
 
 #define	PIQ		struct piq_head
-#define	PIQ_ENT		struct piq_ent
+#define	PIQ_ENT		struct piq_entry
 #define	PIQ_MAGIC	0x9635230
 
 
-struct piq_ent {
+struct piq_entry {
 	PIQ_ENT		*next ;
 	PIQ_ENT		*prev ;
-} ;
+} ; /* end struct (piq_entry) */
 
 struct piq_head {
 	ptm		*mxp ;
 	pq		*qlp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct (piq_head) */
 
-typedef	PIQ		piq ;
+#ifdef	__cplusplus
+enum piqmems {
+	piqmem_start,
+	piqmem_count,
+	piqmem_audit,
+	piqmem_finish,
+	piqmem_overlast
+} ; /* end enum (piqmems) */
+struct piq ;
+struct piq_co {
+        piq		*op = nullptr ;
+        int             w = -1 ;
+        constexpr void operator () (piq *p,int m) noex {
+            op = p ;
+            w = m ;
+        } ;
+        operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+} ; /* end struct (piq_co) */
+struct piq : piq_head {
+	piq_co		start ;
+	piq_co		count ;
+	piq_co		audit ;
+	piq_co		finish ;
+	constexpr piq() noex {
+	    start	(this,piqmem_start) ;
+	    count	(this,piqmem_count) ;
+	    audit	(this,piqmem_audit) ;
+	    finish	(this,piqmem_finish) ;
+	    magval = 0 ;
+	} ; /* end ctor */
+	piq(const piq &) = delete ;
+	piq &operator = (const piq &) = delete ;
+	int ins		(void *) noex ;
+	int rem		(void *) noex ;
+	void dtor() noex ;
+	operator int () noex ;
+	destruct piq() {
+	    if (magval) dtor() ;
+	} ; /* end dtor (piq) */
+} ; /* end class (piq) */
+#else
+typedef PIQ		piq ;
+#endif /* __cplusplus */
+
+typedef PIQ_ENT		piq_ent ;
 
 EXTERNC_begin
 
