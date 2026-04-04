@@ -47,6 +47,7 @@ export module varithmetic ;
 
 import builtin ;
 import muldigs ;
+import bitmanip ;
 
 /* local defines */
 
@@ -76,11 +77,6 @@ template<typename Dig> void prdig(cc *s,const Dig v) noex {
 	    }
 	} /* end if_constexpr (f_debug) */
 } /* end subroutine (prdig) */
-
-template<typename T>
-constexpr inline bool bit(T v,int n) noex {
-	return !!((v >> n) & 1) ;
-} /* end subroutine (bit) */
 
 export {
     template<typename Dig>
