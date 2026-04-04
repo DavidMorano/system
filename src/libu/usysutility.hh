@@ -26,6 +26,7 @@
 #include	<cstdarg>		/* |va_list(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<udiv.hh>
 
 
 namespace libu {
