@@ -37,7 +37,7 @@
 
 	= Implementation notes:
 	The "shell-under" string takes the form:
-		[*<ppid>*]<progename>
+		[*<ppid>*]<execname>
 	where:
 	ppid		PID of parent (shell) process
 	progename	program exec-name of child process
@@ -51,16 +51,29 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
-#include	<usystem.h>		/* |lenstr(3u)| */
-#include	<cfdec.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>
 #include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"shellunder.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
+
+
+/* imported namespaces */
+
+using libu::cfdec ;			/* subroutine */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -89,16 +102,16 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	if (op && under) ylikely {
 	    rs = SR_OK ;
 	    op->pid = -1 ;
-	    op->progename = nullptr ;
+	    op->execname = nullptr ;
 	    if (under[0] != '\0') ylikely {
 	        if (under[0] == '*') {
 	            int		dl = -1 ;
-	            cchar	*dp = (under+1) ;
+	            cchar	*dp = (under + 1) ;
 	            cchar	*tp = strchr(under,'*') ;
 	            if (tp) {
 	                dl = intconv(tp - dp) ;
 	                under = (tp+1) ;
-	                if (int v ; (rs = cfdeci(dp,dl,&v)) >= 0) {
+	                if (int v ; (rs = cfdec(dp,dl,&v)) >= 0) {
 	                    op->pid = pid_t(v) ;
 	                }
 	            } else {
@@ -106,10 +119,10 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 		    }
 	        } /* end if */
 	        if ((rs >= 0) && (under[0] != '\0')) {
-	            while (CHAR_ISWHITE(*under)) {
+	            while (ISWHT(*under)) {
 			under += 1 ;
 		    }
-	            op->progename = under ;
+	            op->execname = under ;
 	            pl = lenstr(under) ;
 	        }
 	    } /* end if (non-zero) */
