@@ -30,7 +30,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	SINTQ		struct sintq_head
