@@ -52,11 +52,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
 
@@ -80,13 +77,13 @@ typedef plainq_ent	*entp ;
 /* forward references */
 
 template<typename ... Args>
-static int plainq_magic(plainq *op,Args ... args) noex {
+local int plainq_magic(plainq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == PLAINQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == PLAINQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (plainq_magic) */
 
 
 /* local variables */
@@ -97,60 +94,60 @@ static int plainq_magic(plainq *op,Args ... args) noex {
 
 /* exported subroutines */
 
-int plainq_start(plainq *qhp) noex {
+int plainq_start(plainq *op) noex {
 	int		rs = SR_FAULT ;
-	if (qhp) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    qhp->head = 0 ;
-	    qhp->tail = 0 ;
-	    qhp->count = 0 ;
-	    qhp->magic = PLAINQ_MAGIC ;
+	    op->head = 0 ;
+	    op->tail = 0 ;
+	    op->cnt = 0 ;
+	    op->magval = PLAINQ_MAGIC ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (plainq_start) */
 
-int plainq_finish(plainq *qhp) noex {
+int plainq_finish(plainq *op) noex {
 	int		rs ;
-	if ((rs = plainq_magic(qhp)) >= 0) {
-	        qhp->head = 0 ;
-	        qhp->tail = 0 ;
-	        qhp->count = 0 ;
-	        qhp->magic = 0 ;
+	if ((rs = plainq_magic(op)) >= 0) ylikely {
+	    op->head = 0 ;
+	    op->tail = 0 ;
+	    op->cnt = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (plainq_finish) */
 
-int plainq_ins(plainq *qhp,plainq_ent *ep) noex {
+int plainq_ins(plainq *op,plainq_ent *ep) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = plainq_magic(qhp,ep)) >= 0) {
-		const ca	qha = ca(qhp) ;
-		if (qhp->head && qhp->tail) {
-		    plainq_ent	*tep = entp(qhp->tail + qha) ;
-	            tep->next = (ca(ep) - qha) ;
-	            ep->prev = (ca(tep) - qha) ;
-		} else if (qhp->head || qhp->tail) {
-		    rs = SR_BADFMT ;
-		} else {
-	            qhp->head = (ca(ep) - qha) ;
-	            ep->prev = 0 ;
-	        } /* end if */
-		if (rs >= 0) {
-	            ep->next = 0 ;
-	            qhp->tail = (ca(ep) - qha) ;
-	            rc = ++qhp->count ;
-		}
+	if ((rs = plainq_magic(op,ep)) >= 0) ylikely {
+	    const ca	qha = ca(op) ;
+	    if (op->head && op->tail) {
+		plainq_ent	*tep = entp(op->tail + qha) ;
+	        tep->next = (ca(ep) - qha) ;
+	        ep->prev = (ca(tep) - qha) ;
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
+	    } else {
+	        op->head = (ca(ep) - qha) ;
+	        ep->prev = 0 ;
+	    } /* end if */
+	    if (rs >= 0) ylikely {
+	        ep->next = 0 ;
+	        op->tail = (ca(ep) - qha) ;
+	        rc = ++op->cnt ;
+	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (plainq_ins) */
 
-int plainq_insgroup(plainq *qhp,plainq_ent *gp,int esize,int n) noex {
+int plainq_insgroup(plainq *op,plainq_ent *gp,int esize,int n) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = plainq_magic(qhp,gp)) >= 0) {
+	if ((rs = plainq_magic(op,gp)) >= 0) ylikely {
 		rs = SR_INVALID ;
 		if ((n > 0) && (esize > 0)) {
 	            plainq_ent	*ep ;
@@ -158,10 +155,10 @@ int plainq_insgroup(plainq *qhp,plainq_ent *gp,int esize,int n) noex {
 		    rs = SR_OK ;
 	            for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	                ep = (plainq_ent *) p ;
-	                rs = plainq_ins(qhp,ep) ;
+	                rs = plainq_ins(op,ep) ;
 	                p += esize ;
 	            } /* end for */
-	            rc = qhp->count ;
+	            rc = op->cnt ;
 		} else if (n == 0) {
 		    rs = SR_OK ;
 		}
@@ -170,40 +167,40 @@ int plainq_insgroup(plainq *qhp,plainq_ent *gp,int esize,int n) noex {
 }
 /* end subroutine (plainq_insgroup) */
 
-int plainq_inshead(plainq *qhp,plainq_ent *ep) noex {
+int plainq_inshead(plainq *op,plainq_ent *ep) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = plainq_magic(qhp,ep)) >= 0) {
-		const ca	qha = ca(qhp) ;
-		if (qhp->head && qhp->tail) {
-		    plainq_ent	*hep = entp(qhp->head + qha) ;
-	            qhp->head = (ca(ep) - qha) ;
+	if ((rs = plainq_magic(op,ep)) >= 0) ylikely {
+		const ca	qha = ca(op) ;
+		if (op->head && op->tail) {
+		    plainq_ent	*hep = entp(op->head + qha) ;
+	            op->head = (ca(ep) - qha) ;
 	            hep->prev = (ca(ep) - qha) ;
 	            ep->next = (ca(hep) - qha) ;
 	            ep->prev = 0 ;
-		} else if (qhp->head || qhp->tail) {
+		} else if (op->head || op->tail) {
 		    rs = SR_BADFMT ;
 		} else {
-	            qhp->head = (ca(ep) - qha) ;
-	            qhp->tail = (ca(ep) - qha) ;
+	            op->head = (ca(ep) - qha) ;
+	            op->tail = (ca(ep) - qha) ;
 	            ep->next = 0 ;
 	            ep->prev = 0 ;
 	        } /* end if */
-		if (rs >= 0) {
-	            rc = ++qhp->count ;
+		if (rs >= 0) ylikely {
+	            rc = ++op->cnt ;
 		}
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (plainq_inshead) */
 
-int plainq_unlink(plainq *qhp,plainq_ent *ep) noex {
+int plainq_unlink(plainq *op,plainq_ent *ep) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = plainq_magic(qhp,ep)) >= 0) {
-		const ca	qha = ca(qhp) ;
+	if ((rs = plainq_magic(op,ep)) >= 0) ylikely {
+		const ca	qha = ca(op) ;
 		rs = SR_EMPTY ;
-		if (qhp->head && qhp->tail) {
+		if (op->head && op->tail) {
 		    plainq_ent	*nep, *pep ;
 		    rs = SR_OK ;
 	            if (ep->next != 0) {
@@ -214,9 +211,9 @@ int plainq_unlink(plainq *qhp,plainq_ent *ep) noex {
 		            pep->next = ep->next ;
 	                } else {
 		            ptrdiff_t	eo = (ca(ep) - qha) ;
-		            if (qhp->head == eo) {
+		            if (op->head == eo) {
 	                        nep->prev = ep->prev ;
-	                        qhp->head = (ca(nep) - qha) ;
+	                        op->head = (ca(nep) - qha) ;
 		            } else {
 		                rs = SR_BADFMT ;
 		            }
@@ -225,56 +222,56 @@ int plainq_unlink(plainq *qhp,plainq_ent *ep) noex {
 	                ptrdiff_t	eo = (ca(ep) - qha) ;
 	                if (ep->prev != 0) {
 		            pep = entp(qha + ep->prev) ;
-		            if (qhp->tail == eo) {
+		            if (op->tail == eo) {
 		                pep->next = 0 ;
-	                        qhp->tail =  (ca(pep) - qha) ;
+	                        op->tail =  (ca(pep) - qha) ;
 		            } else {
 		                rs = SR_BADFMT ;
 		            }
 	                } else {
-		            if ((qhp->head == eo) && (qhp->tail == eo)) {
-	                        qhp->head =  0 ;
-	                        qhp->tail =  0 ;
+		            if ((op->head == eo) && (op->tail == eo)) {
+	                        op->head =  0 ;
+	                        op->tail =  0 ;
 		            } else {
 		                rs = SR_BADFMT ;
 		            }
 	                }
 	            } /* end if */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                ep->next = 0 ;
 	                ep->prev = 0 ;
-	                rc = --qhp->count ;
+	                rc = --op->cnt ;
 	            }
 		} else {
-		    if (qhp->head || qhp->tail) rs = SR_BADFMT ;
+		    if (op->head || op->tail) rs = SR_BADFMT ;
 		}
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (plainq_unlink) */
 
-int plainq_rem(plainq *qhp,plainq_ent **epp) noex {
+int plainq_rem(plainq *op,plainq_ent **epp) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = plainq_magic(qhp)) >= 0) {
-		const ca	qha = ca(qhp) ;
+	if ((rs = plainq_magic(op)) >= 0) ylikely {
+		const ca	qha = ca(op) ;
 		rs = SR_EMPTY ;
-	        if (qhp->head && qhp->tail) {
-                    plainq_ent       *ep = entp(qhp->head + qha) ;
-                    if (qhp->head != qhp->tail) {
+	        if (op->head && op->tail) {
+                    plainq_ent       *ep = entp(op->head + qha) ;
+                    if (op->head != op->tail) {
 			rs = SR_BADFMT ;
 			if (ep->next && (ep->prev == 0)) {
                             plainq_ent   *nep = entp(ep->next + qha) ;
 			    rs = SR_OK ;
                             nep->prev = 0 ;
-                            qhp->head = ep->next ;
-                            rc = --qhp->count ;
+                            op->head = ep->next ;
+                            rc = --op->cnt ;
 			}
                     } else {
 			rs = SR_OK ;
-                        qhp->head = 0 ;
-                        qhp->tail = 0 ;
-                        rc = --qhp->count ;
+                        op->head = 0 ;
+                        op->tail = 0 ;
+                        rc = --op->cnt ;
                     }
                     if (epp && (rs >= 0)) {
                         ep->prev = 0 ;
@@ -282,7 +279,7 @@ int plainq_rem(plainq *qhp,plainq_ent **epp) noex {
                         *epp = ep ;
                     }
 		} else {
-		    if (qhp->head || qhp->tail) rs = SR_BADFMT ;
+		    if (op->head || op->tail) rs = SR_BADFMT ;
 		} /* end if (not-empty) */
 		if (epp && (rs < 0)) *epp = nullptr ;
 	} /* end if (magic) */
@@ -290,53 +287,53 @@ int plainq_rem(plainq *qhp,plainq_ent **epp) noex {
 }
 /* end subroutine (plainq_rem) */
 
-int plainq_gethead(plainq *qhp,plainq_ent **epp) noex {
+int plainq_gethead(plainq *op,plainq_ent **epp) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = plainq_magic(qhp,epp)) >= 0) {
-		const ca	qha = ca(qhp) ;
+	if ((rs = plainq_magic(op,epp)) >= 0) ylikely {
+		const ca	qha = ca(op) ;
 		rs = SR_EMPTY ;
 	        *epp = nullptr ;
-	        if (qhp->head && qhp->tail) {
-	            plainq_ent	*ep = entp(qha + qhp->head) ;
+	        if (op->head && op->tail) {
+	            plainq_ent	*ep = entp(qha + op->head) ;
 	            if (ep->prev == 0) {
 			rs = SR_OK ;
 	                *epp = ep ;
-		        rc = qhp->count ;
+		        rc = op->cnt ;
 	            } else {
 		        rs = SR_BADFMT ;
 	            }
 		} else {
-		    if (qhp->head || qhp->tail) rs = SR_BADFMT ;
+		    if (op->head || op->tail) rs = SR_BADFMT ;
 		} /* end if (not-empty) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (plainq_gethead) */
 
-int plainq_remtail(plainq *qhp,plainq_ent **epp) noex {
+int plainq_remtail(plainq *op,plainq_ent **epp) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = plainq_magic(qhp)) >= 0) {
-		const ca	qha = ca(qhp) ;
+	if ((rs = plainq_magic(op)) >= 0) ylikely {
+		const ca	qha = ca(op) ;
 		rs = SR_EMPTY ;
-	        if (qhp->head && qhp->tail) {
-	            plainq_ent	*ep = entp(qha + qhp->tail) ;
-		    if (qhp->head != qhp->tail) {
+	        if (op->head && op->tail) {
+	            plainq_ent	*ep = entp(qha + op->tail) ;
+		    if (op->head != op->tail) {
 		        rs = SR_BADFMT ;
 	                if ((ep->next == 0) && ep->prev) {
 	                    plainq_ent	*pep = entp(qha + ep->prev) ;
 			    rs = SR_OK ;
-	                    qhp->tail = ep->prev ;
-	                    if (qhp->tail == 0) qhp->head = 0 ;
+	                    op->tail = ep->prev ;
+	                    if (op->tail == 0) op->head = 0 ;
 			    pep->next = 0 ;
-		            rc = --qhp->count ;
+		            rc = --op->cnt ;
 			}
 		    } else {
 			rs = SR_OK ;
-			qhp->head = 0 ;
-			qhp->tail = 0 ;
-			rc = --qhp->count ;
+			op->head = 0 ;
+			op->tail = 0 ;
+			rc = --op->cnt ;
 		    }
 	            if (epp) {
 			ep->next = 0 ;
@@ -344,7 +341,7 @@ int plainq_remtail(plainq *qhp,plainq_ent **epp) noex {
 			*epp = ep ;
 		    }
 		} else {
-		    if (qhp->head || qhp->tail) rs = SR_BADFMT ;
+		    if (op->head || op->tail) rs = SR_BADFMT ;
 		} /* end if (not-empty) */
 		if (epp && (rs < 0)) *epp = nullptr ;
 	} /* end if (magic) */
@@ -352,60 +349,60 @@ int plainq_remtail(plainq *qhp,plainq_ent **epp) noex {
 }
 /* end subroutine (plainq_remtail) */
 
-int plainq_gettail(plainq *qhp,plainq_ent **epp) noex {
+int plainq_gettail(plainq *op,plainq_ent **epp) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = plainq_magic(qhp,epp)) >= 0) {
-		const ca	qha = ca(qhp) ;
+	if ((rs = plainq_magic(op,epp)) >= 0) ylikely {
+		const ca	qha = ca(op) ;
 		rs = SR_EMPTY ;
 	        *epp = nullptr ;
-	        if (qhp->head && qhp->tail) {
-	            plainq_ent	*ep = entp(qha + qhp->tail) ;
+	        if (op->head && op->tail) {
+	            plainq_ent	*ep = entp(qha + op->tail) ;
 	            if (ep->next == 0) {
 			rs = SR_OK ;
 		        *epp = ep ;
-		        rc = qhp->count ;
+		        rc = op->cnt ;
 	            } else {
 		        rs = SR_BADFMT ;
 	            }
 		} else {
-		    if (qhp->head || qhp->tail) rs = SR_BADFMT ;
+		    if (op->head || op->tail) rs = SR_BADFMT ;
 		} /* end if (not-empty) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (plainq_gettail) */
 
-int plainq_count(plainq *qhp) noex {
+int plainq_count(plainq *op) noex {
 	int		rs ;
-	if ((rs = plainq_magic(qhp)) >= 0) {
-		rs = qhp->count ;
+	if ((rs = plainq_magic(op)) >= 0) ylikely {
+		rs = op->cnt ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (plainq_count) */
 
-int plainq_audit(plainq *qhp) noex {
+int plainq_audit(plainq *op) noex {
 	int		rs ;
 	int		rc = 0 ;
-	if ((rs = plainq_magic(qhp)) >= 0) {
-		const ca	qha = ca(qhp) ;
-	        if (qhp->head && qhp->tail) {
+	if ((rs = plainq_magic(op)) >= 0) ylikely {
+		const ca	qha = ca(op) ;
+	        if (op->head && op->tail) {
 	            int		n = 0 ;
-	            ptrdiff_t	next = qhp->head ;
+	            ptrdiff_t	next = op->head ;
 	            while (next != 0) {
 		        plainq_ent	*ep = entp(qha + next) ;
 		        n += 1 ;
 	                next = ep->next ;
 	            } /* end while */
-		    rc = qhp->count ;
-	            if (qhp->count != n) {
+		    rc = op->cnt ;
+	            if (op->cnt != n) {
 	                rs = SR_BADFMT ;
 	            }
 		} else {
-		    if (qhp->head || qhp->tail) {
+		    if (op->head || op->tail) {
 			rs = SR_BADFMT ;
-		    } else if (qhp->count != 0) {
+		    } else if (op->cnt != 0) {
 			rs = SR_BADFMT ;
 		    }
 	        }
@@ -413,5 +410,69 @@ int plainq_audit(plainq *qhp) noex {
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (plainq_audit) */
+
+int plainq::ins(plainq_ent *ep) noex {
+	return plainq_ins(this,ep) ;
+}
+
+int plainq::insgroup(plainq_ent *ep,int esz,int n) noex {
+	return plainq_insgroup(this,ep,esz,n) ;
+}
+
+int plainq::inshead(plainq_ent *ep) noex {
+	return plainq_inshead(this,ep) ;
+}
+
+int plainq::gethead(plainq_ent **rpp) noex {
+	return plainq_gethead(this,rpp) ;
+}
+
+int plainq::gettail(plainq_ent **rpp) noex {
+	return plainq_gettail(this,rpp) ;
+}
+
+int plainq::rem(plainq_ent **rpp) noex {
+	return plainq_rem(this,rpp) ;
+}
+
+int plainq::remtail(plainq_ent **rpp) noex {
+	return plainq_remtail(this,rpp) ;
+}
+
+int plainq::unlink(plainq_ent *ep) noex {
+	return plainq_unlink(this,ep) ;
+}
+
+void plainq::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("plainq",rs,"fini-finish") ;
+	}
+} /* end method (plainq::dtor) */
+
+plainq::operator int () noex {
+	return plainq_count(this) ;
+} /* end method (plainq::operator) */
+
+plainq_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case plainqmem_start:
+	        rs = plainq_start(op) ;
+	        break ;
+	    case plainqmem_count:
+	        rs = plainq_count(op) ;
+	        break ;
+	    case plainqmem_audit:
+	        rs = plainq_audit(op) ;
+	        break ;
+	    case plainqmem_finish:
+	        rs = plainq_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (plainq_co::operator) */
+
 
 
