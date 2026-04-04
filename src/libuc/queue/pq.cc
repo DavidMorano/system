@@ -34,10 +34,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
 
@@ -77,11 +75,11 @@ using libuc::libmem ;			/* variable */
 
 int pq_start(pq *qhp) noex {
 	int		rs = SR_FAULT ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    rs = SR_OK ;
 	    qhp->head = nullptr ;
 	    qhp->tail = nullptr ;
-	    qhp->count = 0 ;
+	    qhp->cnt = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -89,7 +87,7 @@ int pq_start(pq *qhp) noex {
 
 int pq_finish(pq *qhp) noex {
 	int		rs = SR_FAULT ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    rs = SR_OK ;
 	    if (qhp->head && qhp->tail) {
 	        qhp->head = nullptr ;
@@ -105,9 +103,9 @@ int pq_finish(pq *qhp) noex {
 int pq_ins(pq *qhp,pq_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    rs = SR_OK ;
-	    if (qhp->head && qhp->tail) {
+	    if (qhp->head && qhp->tail) ylikely {
 	        if (qhp->head != qhp->tail) {
 	            pq_ent	*pep = qhp->tail ;
 	            ep->next = nullptr ;
@@ -121,7 +119,7 @@ int pq_ins(pq *qhp,pq_ent *ep) noex {
 	            qhp->tail = ep ;
 	        } /* end if */
 	        if (rs >= 0) {
-	            rc = ++qhp->count ;
+	            rc = ++qhp->cnt ;
 	        }
 	    } else if (qhp->head || qhp->tail) {
 	        rs = SR_BADFMT ;
@@ -132,13 +130,13 @@ int pq_ins(pq *qhp,pq_ent *ep) noex {
 /* end subroutine (pq_ins) */
 
 /* insert a group into queue (at the tail) */
-int pq_insgroup(pq *qhp,pq_ent *gp,int esize,int n) noex {
+int pq_insgroup(pq *qhp,pq_ent *gp,int esz,int n) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (qhp && gp) {
+	if (qhp && gp) ylikely {
 	    caddr_t	p = caddr_t(gp) ;
 	    rs = SR_INVALID ;
-	    if ((n > 0) && (esize > 0)) {
+	    if ((n > 0) && (esz > 0)) ylikely {
 	        pq_ent	*ep = (pq_ent *) p ;
 	        pq_ent	*pep ;
 		rs = SR_OK ;
@@ -154,20 +152,20 @@ int pq_insgroup(pq *qhp,pq_ent *gp,int esize,int n) noex {
 	        } else {
 		    if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	        } /* end if */
-		if (rs >= 0) {
+		if (rs >= 0) ylikely {
 	            pep = ep ;
-	            p += esize ;
+	            p += esz ;
 	            for (int i = 1 ; i < n ; i += 1) {
 	                ep = (pq_ent *) p ;
 	                pep->next = ep ;
 	                ep->prev = pep ;
-	                p += esize ;
+	                p += esz ;
 	                pep = ep ;
 	            } /* end for */
 	            pep->next = nullptr ;
 	            qhp->tail = pep ;
-	            qhp->count += n ;
-	            c = qhp->count ;
+	            qhp->cnt += n ;
+	            c = qhp->cnt ;
 		} /* end if (ok) */
 	    } else if (n == 0) {
 		rs = SR_OK ;
@@ -180,13 +178,13 @@ int pq_insgroup(pq *qhp,pq_ent *gp,int esize,int n) noex {
 int pq_gethead(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    pq_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
 		rs = SR_OK ;
 		ep = qhp->head ;
-	        rc = qhp->count ;
+	        rc = qhp->cnt ;
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (not empty) */
@@ -201,7 +199,7 @@ int pq_gethead(pq *qhp,pq_ent **epp) noex {
 int pq_gettail(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    pq_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
@@ -210,7 +208,7 @@ int pq_gettail(pq *qhp,pq_ent **epp) noex {
 	        if (ep->next) {
 		    rs = SR_BADFMT ;
 		} else {
-	            rc = qhp->count ;
+	            rc = qhp->cnt ;
 		}
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
@@ -226,7 +224,7 @@ int pq_gettail(pq *qhp,pq_ent **epp) noex {
 int pq_rem(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    pq_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
@@ -247,7 +245,7 @@ int pq_rem(pq *qhp,pq_ent **epp) noex {
 	        if (rs >= 0) {
 		    ep->next = nullptr ;
 		    ep->prev = nullptr ;
-		    rc = --qhp->count ;
+		    rc = --qhp->cnt ;
 	        }
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
@@ -264,7 +262,7 @@ int pq_rem(pq *qhp,pq_ent **epp) noex {
 int pq_remtail(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    pq_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
@@ -286,7 +284,7 @@ int pq_remtail(pq *qhp,pq_ent **epp) noex {
 	        if (rs >= 0) {
 		    ep->next = nullptr ;
 		    ep->prev = nullptr ;
-		    rc = --qhp->count ;
+		    rc = --qhp->cnt ;
 		}
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
@@ -303,7 +301,7 @@ int pq_remtail(pq *qhp,pq_ent **epp) noex {
 int pq_unlink(pq *qhp,pq_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
-	if (qhp && ep) {
+	if (qhp && ep) ylikely {
 	     rs = SR_EMPTY ;
 	     if (qhp->head && qhp->tail) {
 	         pq_ent		*nep, *pep ;
@@ -342,7 +340,7 @@ int pq_unlink(pq *qhp,pq_ent *ep) noex {
 	             }
 	        } /* end if */
 	        if (rs >= 0) {
-		    rc = --qhp->count ;
+		    rc = --qhp->cnt ;
 	        }
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
@@ -355,9 +353,9 @@ int pq_unlink(pq *qhp,pq_ent *ep) noex {
 int pq_count(pq *qhp) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    if (qhp->head && qhp->tail) {
-	        rc = qhp->count ;
+	        rc = qhp->cnt ;
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    }
@@ -368,7 +366,7 @@ int pq_count(pq *qhp) noex {
 
 int pq_audit(pq *qhp) noex {
 	int		rs = SR_FAULT ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    rs = SR_OK ;
 	    if (qhp->head && qhp->tail) {
 	        pq_ent		*ep = qhp->head ;
@@ -399,7 +397,7 @@ int pq_audit(pq *qhp) noex {
 
 int pq_curbegin(pq *qhp,pq_cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (qhp && curp) {
+	if (qhp && curp) ylikely {
 	    rs = SR_OK ;
 	    curp->entp = nullptr ;
 	} /* end if (non-null) */
@@ -409,7 +407,7 @@ int pq_curbegin(pq *qhp,pq_cur *curp) noex {
 
 int pq_curend(pq *qhp,pq_cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (qhp && curp) {
+	if (qhp && curp) ylikely {
 	    rs = SR_OK ;
 	    curp->entp = nullptr ;
 	} /* end if (non-null) */
@@ -419,7 +417,7 @@ int pq_curend(pq *qhp,pq_cur *curp) noex {
 
 int pq_curenum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (qhp && curp) {
+	if (qhp && curp) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (qhp->head && qhp->tail) {
 	        pq_ent	*nep ;
@@ -441,5 +439,77 @@ int pq_curenum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 	return rs ;
 }
 /* end subroutine (pq_curenum) */
+
+int pq::ins(pq_ent *ep) noex {
+	return pq_ins(this,ep) ;
+}
+
+int pq::insgroup(pq_ent *ep,int esz,int n) noex {
+	return pq_insgroup(this,ep,esz,n) ;
+}
+
+int pq::gethead(pq_ent **rpp) noex {
+	return pq_gethead(this,rpp) ;
+}
+
+int pq::gettail(pq_ent **rpp) noex {
+	return pq_gettail(this,rpp) ;
+}
+
+int pq::rem(pq_ent **rpp) noex {
+	return pq_rem(this,rpp) ;
+}
+
+int pq::remtail(pq_ent **rpp) noex {
+	return pq_remtail(this,rpp) ;
+}
+
+int pq::unlink(pq_ent *ep) noex {
+	return pq_unlink(this,ep) ;
+}
+
+int pq::curbegin(pq_cur *curp) noex {
+	return pq_curbegin(this,curp) ;
+}
+
+int pq::curend(pq_cur *curp) noex {
+	return pq_curend(this,curp) ;
+}
+
+int pq::curenum(pq_cur *curp,pq_ent **rpp) noex {
+	return pq_curenum(this,curp,rpp) ;
+}
+
+void pq::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("pq",rs,"fini-finish") ;
+	}
+} /* end method (pq::dtor) */
+
+pq::operator int () noex {
+	return pq_count(this) ;
+} /* end method (pq::operator) */
+
+pq_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case pqmem_start:
+	        rs = pq_start(op) ;
+	        break ;
+	    case pqmem_count:
+	        rs = pq_count(op) ;
+	        break ;
+	    case pqmem_audit:
+	        rs = pq_audit(op) ;
+	        break ;
+	    case pqmem_finish:
+	        rs = pq_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (pq_co::operator) */
 
 
