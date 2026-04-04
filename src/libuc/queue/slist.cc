@@ -34,11 +34,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
 
@@ -78,11 +75,11 @@ using libuc::libmem ;			/* variable */
 
 int slist_start(slist *qhp) noex {
 	int		rs = SR_FAULT ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    rs = SR_OK ;
 	    qhp->head = nullptr ;
 	    qhp->tail = nullptr ;
-	    qhp->count = 0 ;
+	    qhp->cnt = 0 ;
 	}
 	return rs ;
 }
@@ -90,11 +87,11 @@ int slist_start(slist *qhp) noex {
 
 int slist_finish(slist *qhp) noex {
 	int		rs = SR_FAULT ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    rs = SR_OK ;
 	    qhp->head = nullptr ;
 	    qhp->tail = nullptr ;
-	    qhp->count = 0 ;
+	    qhp->cnt = 0 ;
 	}
 	return rs ;
 }
@@ -103,7 +100,7 @@ int slist_finish(slist *qhp) noex {
 int slist_ins(slist *qhp,slist_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (qhp && ep) {
+	if (qhp && ep) ylikely {
 	    rs = SR_OK ;
 	    ep->next = nullptr ;
 	    if (qhp->head) {
@@ -122,9 +119,9 @@ int slist_ins(slist *qhp,slist_ent *ep) noex {
 	            qhp->tail = ep ;
 		}
 	    } /* end if */
-	    if (rs >= 0) {
-	        qhp->count += 1 ;
-	        c = qhp->count ;
+	    if (rs >= 0) ylikely {
+	        qhp->cnt += 1 ;
+	        c = qhp->cnt ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -134,9 +131,9 @@ int slist_ins(slist *qhp,slist_ent *ep) noex {
 int slist_insgroup(slist *qhp,slist_ent *gp,int esz,int n) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (qhp && gp) {
+	if (qhp && gp) ylikely {
 	    rs = SR_INVALID ;
-	    if ((esz > 0) && (n >= 0)) {
+	    if ((esz > 0) && (n >= 0)) ylikely {
 		caddr_t		p = (caddr_t) gp ;
 	        rs = SR_OK ;
 	        if (n > 0) {
@@ -158,8 +155,8 @@ int slist_insgroup(slist *qhp,slist_ent *gp,int esz,int n) noex {
 	            } /* end for */
 	            pep->next = nullptr ;
 	            qhp->tail = pep ;
-	            qhp->count += n ;
-	            c = qhp->count ;
+	            qhp->cnt += n ;
+	            c = qhp->cnt ;
 	        } /* end if (no action needed) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -170,7 +167,7 @@ int slist_insgroup(slist *qhp,slist_ent *gp,int esz,int n) noex {
 int slist_present(slist *qhp,slist_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (qhp && ep) {
+	if (qhp && ep) ylikely {
 	    slist_ent	*nep = qhp->head ;
 	    rs = SR_OK ;
 	    while (nep && (!f)) {
@@ -185,7 +182,7 @@ int slist_present(slist *qhp,slist_ent *ep) noex {
 int slist_unlink(slist *qhp,slist_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		f = 0 ;
-	if (qhp && ep) {
+	if (qhp && ep) ylikely {
 	    slist_ent	*nep = qhp->head ;
 	    slist_ent	*pep = nullptr ;
 	    rs = SR_OK ;
@@ -211,7 +208,7 @@ int slist_unlink(slist *qhp,slist_ent *ep) noex {
 		    }
 		}
 		ep->next = nullptr ;
-		qhp->count -= 1 ;
+		qhp->cnt -= 1 ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
@@ -221,7 +218,7 @@ int slist_unlink(slist *qhp,slist_ent *ep) noex {
 int slist_rem(slist *qhp,slist_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (qhp && epp) {
+	if (qhp && epp) ylikely {
 	    slist_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
@@ -233,8 +230,8 @@ int slist_rem(slist *qhp,slist_ent **epp) noex {
 		    qhp->tail = nullptr ;
 		}
 		ep->next = nullptr ;
-		qhp->count -= 1 ;
-	        c = qhp->count ;
+		qhp->cnt -= 1 ;
+	        c = qhp->cnt ;
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (was not empty) */
@@ -247,12 +244,12 @@ int slist_rem(slist *qhp,slist_ent **epp) noex {
 int slist_gethead(slist *qhp,slist_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (qhp && epp) {
+	if (qhp && epp) ylikely {
 	    slist_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
 	        ep = qhp->head ;
-	        c = qhp->count ;
+	        c = qhp->cnt ;
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    }
@@ -265,12 +262,12 @@ int slist_gethead(slist *qhp,slist_ent **epp) noex {
 int slist_gettail(slist *qhp,slist_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (qhp && epp) {
+	if (qhp && epp) ylikely {
 	    slist_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
 	        ep = qhp->tail ;
-	        c = qhp->count ;
+	        c = qhp->cnt ;
 		if (ep->next) {
 		    rs = SR_BADFMT ;
 		}
@@ -286,8 +283,8 @@ int slist_gettail(slist *qhp,slist_ent **epp) noex {
 int slist_count(slist *qhp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (qhp) {
-	    c = qhp->count ;
+	if (qhp) ylikely {
+	    c = qhp->cnt ;
 	}
 	return (rs >= 0) ? c : rs ;
 }
@@ -296,14 +293,14 @@ int slist_count(slist *qhp) noex {
 int slist_audit(slist *qhp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (qhp) {
+	if (qhp) ylikely {
 	    if (qhp->head && qhp->tail) {
 	        slist_ent	*ep = qhp->head ;
 		for (c = 0 ; ep && (c < INT_MAX) ; c += 1) {
 		    ep = ep->next ;
 	        } /* end for */
 		if (c == INT_MAX) rs = SR_BADFMT ;
-		if ((rs >= 0) && (c != qhp->count)) rs = SR_BADFMT ;
+		if ((rs >= 0) && (c != qhp->cnt)) rs = SR_BADFMT ;
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    }
@@ -319,14 +316,17 @@ void slist::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("slist",rs,"fini-finish") ;
 	}
-}
+} /* end subroutine (slist::dtor) */
 
 slist_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case slistmem_start:
 	        rs = slist_start(op) ;
+	        break ;
+	    case slistmem_count:
+	        rs = slist_count(op) ;
 	        break ;
 	    case slistmem_audit:
 	        rs = slist_audit(op) ;
