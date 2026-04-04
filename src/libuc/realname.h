@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<dstr.h>
 
 
@@ -43,7 +40,7 @@ struct realname_len {
 	uchar		m3 ;
 	uchar		last ;
 	uchar		store ;
-} ;
+} ; /* end struct (realname_len) */
 
 struct realname_abv {
 	uint		first:1 ;
@@ -51,7 +48,7 @@ struct realname_abv {
 	uint		m2:1 ;
 	uint		m3:1 ;
 	uint		last:1 ;
-} ;
+} ; /* end struct (realname_adv) */
 
 struct realname_head {
     	char		*stbuf ;	/* allocated */
@@ -64,13 +61,13 @@ struct realname_head {
 	REALNAME_ABV	abv ;
 	int		stlen ;
 	uint		magic ;
-} ;
+} ; /* end struct (realname_head) */
 
 #ifdef	__cplusplus
 enum realnamemems {
 	realnamemem_finish,
 	realnamemem_overlast
-} ;
+} ; /* end enum (realnamemems) */
 struct realname ;
 struct realname_esther {
 	realname	*op = nullptr ;
@@ -117,8 +114,8 @@ struct realname : realname_head {
 	int getm2(cchar **) noex ;
 	int getm3(cchar **) noex ;
 	int getpieces(cchar **) noex ;
-	int fullname(char *,int) noex ;
 	int name(char *,int) noex ;
+	int fullname(char *,int) noex ;
 	int mailname(char *,int) noex ;
 	int mat(realname *) noex ;
 	void dtor() noex ;
@@ -132,30 +129,30 @@ typedef REALNAME	realname ;
 
 EXTERNC_begin
 
-extern int	realname_start(realname *,cchar *,int) noex ;
-extern int	realname_loadparts(realname *,dstr *) noex ;
-extern int	realname_loadpieces(realname *,cchar **,int) noex ;
-extern int	realname_getlast(realname *,cchar **) noex ;
-extern int	realname_getfirst(realname *,cchar **) noex ;
-extern int	realname_getm1(realname *,cchar **) noex ;
-extern int	realname_getm2(realname *,cchar **) noex ;
-extern int	realname_getm3(realname *,cchar **) noex ;
-extern int	realname_getpieces(realname *,cchar **) noex ;
-extern int	realname_fullname(realname *,char *,int) noex ;
-extern int	realname_name(realname *,char *,int) noex ;
-extern int	realname_mailname(realname *,char *,int) noex ;
-extern int	realname_finish(realname *) noex ;
+extern int	realname_start		(realname *,cchar *,int) noex ;
+extern int	realname_loadparts	(realname *,dstr *) noex ;
+extern int	realname_loadpieces	(realname *,cchar **,int) noex ;
+extern int	realname_getlast	(realname *,cchar **) noex ;
+extern int	realname_getfirst	(realname *,cchar **) noex ;
+extern int	realname_getm1		(realname *,cchar **) noex ;
+extern int	realname_getm2		(realname *,cchar **) noex ;
+extern int	realname_getm3		(realname *,cchar **) noex ;
+extern int	realname_getpieces	(realname *,cchar **) noex ;
+extern int	realname_name		(realname *,char *,int) noex ;
+extern int	realname_fullname	(realname *,char *,int) noex ;
+extern int	realname_mailname	(realname *,char *,int) noex ;
+extern int	realname_finish		(realname *) noex ;
 
 EXTERNC_end
 
 #ifdef	COMMENT
 EXTERNC_begin
 
-extern int	realname_mat(realname *,realname *) noex ;
-extern int	realname_matlast(realname *,char *,int) noex ;
-extern int	realname_matfirst(realname *,char *,int) noex ;
-extern int	realname_matm1(realname *,char *,int) noex ;
-extern int	realname_matm2(realname *,char *,int) noex ;
+extern int	realname_mat		(realname *,realname *) noex ;
+extern int	realname_matlast	(realname *,char *,int) noex ;
+extern int	realname_matfirst	(realname *,char *,int) noex ;
+extern int	realname_matm1		(realname *,char *,int) noex ;
+extern int	realname_matm2		(realname *,char *,int) noex ;
 
 EXTERNC_end
 #endif /* COMMENT */
