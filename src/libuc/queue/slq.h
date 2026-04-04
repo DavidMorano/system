@@ -20,25 +20,24 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stddef.h>
+#include	<stdlib.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	SLQ		struct slq_head
-#define	SLQ_ENT		struct slq_ent
+#define	SLQ_ENT		struct slq_entry
 
 
-struct slq_ent {
+struct slq_entry {
 	SLQ_ENT		*next ;
-} ;
+} ; /* end struct (slp_entry) */
 
 struct slq_head {
 	SLQ_ENT		*head ;
 	SLQ_ENT		*tail ;
-} ;
+} ; /* end struct (slp_head) */
 
 typedef SLQ_ENT		slq_ent ;
 
@@ -48,7 +47,7 @@ enum slqmems {
 	slqmem_audit,
 	slqmem_finish,
 	slqmem_overlast
-} ;
+} ; /* end enum (slqmems) */
 struct slq ;
 struct slq_co {
 	slq		*op = nullptr ;
