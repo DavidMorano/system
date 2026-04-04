@@ -35,6 +35,7 @@
 	Returns:
 	>0	length of found string
 	==0	not found (no base-name)
+	<0	error (fault)
 
 *******************************************************************************/
 
@@ -47,11 +48,11 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
-#include	"sfx.h"
+#include	"sfxname.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -82,11 +83,10 @@ import libutil ;
 
 /* exported subroutines */
 
-int sfbasename(cchar *sp,int sl,cchar **rpp) noex {
+int sfbasename(cchar *sp,int µsl,cchar **rpp) noex {
 	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
 	    while ((sl > 1) && (sp[sl - 1] == '/')) {
 	        sl -= 1 ;
 	    }
@@ -101,7 +101,7 @@ int sfbasename(cchar *sp,int sl,cchar **rpp) noex {
 	        rp = (sp + si) ;
 	        rl = (sl - si) ;
 	    } /* end block */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
 	return rl ;
 }
