@@ -82,7 +82,7 @@ OBJ27= ucomposite.o
 
 OBJ28= bitmanip.o findbit.o baops.o
 OBJ29= clockids.o itimers.o filetypes.o funcodes.o 
-OBJ30= binchunk.o
+OBJ30= binchunk.o conintx.o udiv.o
 OBJ31= ccfile.o readln.o dprintf.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -528,5 +528,7 @@ ischx0.o:		ischx.ccm					$(INCS)
 	makemodule $<
 
 ischx1.o:		ischx1.cc	ischx0.o			$(INCS)
+conintx.o:		conintx.cc	conintx.hh			$(INCS)
+udiv.o:			udiv.cc		udiv.hh				$(INCS)
 
 
