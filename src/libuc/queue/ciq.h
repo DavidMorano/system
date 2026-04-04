@@ -13,30 +13,78 @@
 
 */
 
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CIQ_INCLUDE
 #define	CIQ_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ptm.h>
 #include	<pq.h>
 
 
-#define	CIQ_MAGIC	0x9635230
 #define	CIQ		struct ciq_head
+#define	CIQ_MAGIC	0x9635230
 
 
 struct ciq_head {
 	ptm		*mxp ;
 	pq		*fifop ;
 	pq		*freep ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct (ciq_head) */
 
+#ifdef	__cplusplus
+enum ciqmems {
+	ciqmem_start,
+	ciqmem_count,
+	ciqmem_audit,
+	ciqmem_finish,
+	ciqmem_overlast
+} ; /* end enum (ciqmems) */
+struct ciq ;
+struct ciq_co {
+        ciq		*op = nullptr ;
+        int             w = -1 ;
+        constexpr void operator () (ciq *p,int m) noex {
+            op = p ;
+            w = m ;
+        } ;
+        operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+} ; /* end struct (ciq_co) */
+struct ciq : ciq_head {
+	ciq_co		start ;
+	ciq_co		count ;
+	ciq_co		finish ;
+	constexpr ciq() noex {
+	    start	(this,ciqmem_start) ;
+	    count	(this,ciqmem_count) ;
+	    audit	(this,ciqmem_audit) ;
+	    finish	(this,ciqmem_finish) ;
+	    magval = 0 ;
+	} ; /* end ctor */
+	ciq(const ciq &) = delete ;
+	ciq &operator = (const ciq &) = delete ;
+	int	ins	(void *) noex ;
+	int	rem	(void *) noex ;
+	int	gettail	(void *) noex ;
+	int	remtail	(void *) noex ;
+	int	rement	(void *) noex ;
+	void	dtor() noex ;
+	operator int () noex ;
+	destruct ciq() {
+	    if (magval) dtor() ;
+	} ; /* end dtor (ciq) */
+} ; /* end class (ciq) */
+#else
 typedef CIQ		ciq ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
