@@ -38,11 +38,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<ptma.h>
 #include	<localmisc.h>
@@ -76,13 +73,13 @@ typedef plainq_ent	*entp ;
 /* forward references */
 
 template<typename ... Args>
-static inline int q_ctor(q *op,Args ... args) noex {
+local inline int q_ctor(q *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((op->mxp = new(nothrow) ptm) != np) {
-	        if ((op->pqp = new(nothrow) plainq) != np) {
+	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
+	        if ((op->pqp = new(nothrow) plainq) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-plainq) */
 		if (rs < 0) {
@@ -92,25 +89,23 @@ static inline int q_ctor(q *op,Args ... args) noex {
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (q_ctor) */
+} /* end subroutine (q_ctor) */
 
-static inline int q_dtor(q *op) noex {
+local inline int q_dtor(q *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->pqp) {
+	    if (op->pqp) ylikely {
 		delete op->pqp ;
 		op->pqp = nullptr ;
 	    }
-	    if (op->mxp) {
+	    if (op->mxp) ylikely {
 		delete op->mxp ;
 		op->mxp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (q_dtor) */
+} /* end subroutine (q_dtor) */
 
 
 /* local variables */
@@ -121,19 +116,19 @@ static inline int q_dtor(q *op) noex {
 
 /* exported subroutines */
 
-int q_start(Q *op,int type) noex {
+int q_start(q *op,int type) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = q_ctor(op)) >= 0) {
+	if ((rs = q_ctor(op)) >= 0) ylikely {
 	    bool	f_mutex = false ;
 	    bool	f_plainq = false ;
-	    if (ptma ma ; (rs = ptma_create(&ma)) >= 0) {
+	    if (ptma ma ; (rs = ptma_create(&ma)) >= 0) ylikely {
 	        int	matype = PTHREAD_PROCESS_PRIVATE ;
 	        if (type > 0) matype = PTHREAD_PROCESS_SHARED ;
-	        if ((rs = ptma_setpshared(&ma,matype)) >= 0) {
-	            if ((rs = op->mxp->create(&ma)) >= 0) {
+	        if ((rs = ptma_setpshared(&ma,matype)) >= 0) ylikely {
+	            if ((rs = op->mxp->create(&ma)) >= 0) ylikely {
 			f_mutex = true ;
-			if ((rs = plainq_start(op->pqp)) >= 0) {
+			if ((rs = plainq_start(op->pqp)) >= 0) ylikely {
 			    f_plainq = true ;
 			}
 		    }
@@ -143,7 +138,10 @@ int q_start(Q *op,int type) noex {
 	    } /* end if (mutex-attributes) */
 	    if (rs < 0) {
 		if (f_plainq) plainq_finish(op->pqp) ;
-		if (f_mutex) op->mxp->destroy() ;
+		if (f_mutex) {
+		    ptm *mxp = op->mxp ;
+		    mxp->destroy() ;
+		}
 	    }
 	    if (rs < 0) {
 		q_dtor(op) ;
@@ -153,19 +151,20 @@ int q_start(Q *op,int type) noex {
 }
 /* end subroutine (q_start) */
 
-int q_finish(Q *op) noex {
+int q_finish(q *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    {
+	    if (op->pqp) ylikely {
 	        rs1 = plainq_finish(op->pqp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        rc = rs1 ;
 	    }
-	    {
-	        rs1 = op->mxp->destroy ;
+	    if (op->mxp) ylikely {
+		ptm *mxp = op->mxp ;
+	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -177,12 +176,12 @@ int q_finish(Q *op) noex {
 }
 /* end subroutine (q_finish) */
 
-int q_ins(Q *op,Q_ENT *ep) noex {
+int q_ins(q *op,Q_ENT *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (op && ep) {
-	    if ((rs = op->mxp->lockbegin) >= 0) {
+	if (op && ep) ylikely {
+	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
 		{
 		    entp	qep = entp(ep) ;
 		    rs = plainq_ins(op->pqp,qep) ;
@@ -196,12 +195,12 @@ int q_ins(Q *op,Q_ENT *ep) noex {
 }
 /* end subroutine (q_ins) */
 
-int q_inshead(Q *op,Q_ENT *ep) noex {
+int q_inshead(q *op,Q_ENT *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (op && ep) {
-	    if ((rs = op->mxp->lockbegin) >= 0) {
+	if (op && ep) ylikely {
+	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
 		{
 		    entp	qep = entp(ep) ;
 		    rs = plainq_inshead(op->pqp,qep) ;
@@ -215,12 +214,12 @@ int q_inshead(Q *op,Q_ENT *ep) noex {
 }
 /* end subroutine (q_inshead) */
 
-int q_rem(Q *op,Q_ENT **epp) noex {
+int q_rem(q *op,Q_ENT **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (op) {
-	    if ((rs = op->mxp->lockbegin) >= 0) {
+	if (op) ylikely {
+	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
 		{
 		    entp	*qepp = (entp *) epp ;
 		    rs = plainq_rem(op->pqp,qepp) ;
@@ -235,12 +234,12 @@ int q_rem(Q *op,Q_ENT **epp) noex {
 }
 /* end subroutine (q_rem) */
 
-int q_remtail(Q *op,Q_ENT **epp) noex {
+int q_remtail(q *op,Q_ENT **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (op) {
-	    if ((rs = op->mxp->lockbegin) >= 0) {
+	if (op) ylikely {
+	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
 		{
 		    entp	*qepp = (entp *) epp ;
 		    rs = plainq_remtail(op->pqp,qepp) ;
@@ -255,12 +254,12 @@ int q_remtail(Q *op,Q_ENT **epp) noex {
 }
 /* end subroutine (q_remtail) */
 
-int q_count(Q *op) noex {
+int q_count(q *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (op) {
-	    if ((rs = op->mxp->lockbegin) >= 0) {
+	if (op) ylikely {
+	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
 		{
 		    rs = plainq_count(op->pqp) ;
 		    rc = rs ;
@@ -272,5 +271,55 @@ int q_count(Q *op) noex {
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (q_count) */
+
+int q::ins(q_ent *ep) noex {
+	return q_ins(this,ep) ;
+}
+
+int q::inshead(q_ent *ep) noex {
+	return q_inshead(this,ep) ;
+}
+
+int q::rem(q_ent **rpp) noex {
+	return q_rem(this,rpp) ;
+}
+
+int q::remtail(q_ent **rpp) noex {
+	return q_remtail(this,rpp) ;
+}
+
+void q::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("q",rs,"fini-finish") ;
+	}
+} /* end method (q::dtor) */
+
+q::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (mxp) ylikely {
+	    rs = q_count(this) ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (q::operator) */
+
+int q_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case qmem_start:
+	        rs = q_start(op,a) ;
+	        break ;
+	    case qmem_count:
+	        rs = q_count(op) ;
+	        break ;
+	    case qmem_finish:
+	        rs = q_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (q_co::operator) */
+
 
 
