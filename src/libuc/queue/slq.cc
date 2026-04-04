@@ -29,11 +29,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
 
@@ -73,7 +70,7 @@ using libuc::libmem ;			/* variable */
 
 int slq_start(slq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->head = nullptr ;
 	    op->tail = nullptr ;
@@ -84,7 +81,7 @@ int slq_start(slq *op) noex {
 
 int slq_finish(slq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->head = nullptr ;
 	    op->tail = nullptr ;
@@ -95,7 +92,7 @@ int slq_finish(slq *op) noex {
 
 int slq_ins(slq *op,slq_ent *ep) noex {
 	int		rs = SR_FAULT ;
-	if (op && ep) {
+	if (op && ep) ylikely {
 	    ep->next = nullptr ;
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
@@ -118,9 +115,9 @@ int slq_ins(slq *op,slq_ent *ep) noex {
 int slq_insgroup(slq *op,void *vp,int esz,int n) noex {
 	caddr_t		ca = caddr_t(vp) ;
 	int		rs = SR_FAULT ;
-	if (op && ca) {
+	if (op && ca) ylikely {
 	    rs = SR_INVALID ;
-	    if (esz > 0) {
+	    if (esz > 0) ylikely {
 	        rs = SR_OK ;
 	        for (int i = 0 ; (rs == SR_OK) && (i < n) ; i += 1) {
 		    slq_ent	*ep = (slq_ent *) ca ;
@@ -135,7 +132,7 @@ int slq_insgroup(slq *op,void *vp,int esz,int n) noex {
 
 int slq_rem(slq *op,slq_ent **epp) noex {
 	int		rs = SR_FAULT ;
-	if (op && epp) {
+	if (op && epp) ylikely {
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
 	        slq_ent		*hep = op->head ;
@@ -155,7 +152,7 @@ int slq_rem(slq *op,slq_ent **epp) noex {
 
 int slq_gethead(slq *op,slq_ent **epp) noex {
 	int		rs = SR_FAULT ;
-	if (op && epp) {
+	if (op && epp) ylikely {
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
 	        *epp = op->head ;
@@ -173,7 +170,7 @@ int slq_gethead(slq *op,slq_ent **epp) noex {
 
 int slq_gettail(slq *op,slq_ent **epp) noex {
 	int		rs = SR_FAULT ;
-	if (op && epp) {
+	if (op && epp) ylikely {
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
 	        *epp = op->tail ;
@@ -191,7 +188,7 @@ int slq_gettail(slq *op,slq_ent **epp) noex {
 
 int slq_audit(slq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
 	        rs = SR_OK ;
@@ -214,7 +211,7 @@ void slq::dtor() noex {
 
 slq_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case slqmem_start:
 	        rs = slq_start(op) ;
