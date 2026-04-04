@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	PQ		struct pq_head
@@ -30,22 +31,76 @@
 
 struct pq_cursor {
 	PQ_ENT		*entp ;
-} ;
+} ; /* end struct (pq_cursor) */
 
 struct pq_entry {
 	PQ_ENT		*next ;
 	PQ_ENT		*prev ;
-} ;
+} ; /* end struct (pq_entry) */
 
 struct pq_head {
 	PQ_ENT		*head ;
 	PQ_ENT		*tail ;
-	int		count ;
-} ;
+	int		cnt ;
+} ; /* end struct (pq_head) */
 
-typedef PQ		pq ;
 typedef PQ_ENT		pq_ent ;
 typedef PQ_CUR		pq_cur ;
+
+#ifdef	__cplusplus
+enum pqmems {
+	pqmem_start,
+	pqmem_count,
+	pqmem_audit,
+	pqmem_finish,
+	pqmem_overlast
+} ; /* end enum (pqmems) */
+struct pq ;
+struct pq_co {
+        pq		*op = nullptr ;
+        int             w = -1 ;
+        constexpr void operator () (pq *p,int m) noex {
+            op = p ;
+            w = m ;
+        } ;
+        operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ;
+} ; /* end struct (pq_co) */
+struct pq : pq_head {
+	pq_co		start ;
+	pq_co		count ;
+	pq_co		audit ;
+	pq_co		finish ;
+	constexpr pq() noex {
+	    start	(this,pqmem_start) ;
+	    count	(this,pqmem_count) ;
+	    audit	(this,pqmem_audit) ;
+	    finish	(this,pqmem_finish) ;
+	    head = nullptr ;
+	} ; /* end ctor */
+	pq(const pq &) = delete ;
+	pq &operator = (const pq &) = delete ;
+	int ins		(pq_ent *) noex ;
+	int insgroup	(pq_ent *,int,int) noex ;
+	int gethead	(pq_ent **) noex ;
+	int gettail	(pq_ent **) noex ;
+	int rem		(pq_ent **) noex ;
+	int remtail	(pq_ent **) noex ;
+	int unlink	(pq_ent *) noex ;
+	int curbegin	(pq_cur *) noex ;
+	int curend	(pq_cur *) noex ;
+	int curenum	(pq_cur *,pq_ent **) noex ;
+	void dtor() noex ;
+	operator int () noex ;
+	destruct pq() {
+	    if (head) dtor() ;
+	} ; /* end dtor (pq) */
+} ; /* end class (pq) */
+#else
+typedef PQ		pq ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
