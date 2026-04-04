@@ -20,11 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stddef.h>
+#include	<stdlib.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	SLIST		struct slist_head
@@ -34,17 +33,17 @@
 
 struct slist_cursor {
 	SLIST_ENT	*entp ;
-} ;
+} ; /* end struct (slist_cursor) */
 
 struct slist_entry {
 	SLIST_ENT	*next ;
-} ;
+} ; /* end struct (slist_entry) */
 
 struct slist_head {
 	SLIST_ENT	*head ;
 	SLIST_ENT	*tail ;
-	int		count ;
-} ;
+	int		cnt ;
+} ; /* end struct (slist_head) */
 
 typedef	SLIST_ENT	slist_ent ;
 typedef	SLIST_CUR	slist_cur ;
@@ -52,10 +51,11 @@ typedef	SLIST_CUR	slist_cur ;
 #ifdef	__cplusplus
 enum slistmems {
     	slistmem_start,
+	slistmem_count,
 	slistmem_audit,
 	slistmem_finish,
 	slistmem_overlast
-} ;
+} ; /* end enum (slistmems) */
 struct slist ;
 struct slist_co {
 	slist		*op = nullptr ;
@@ -71,10 +71,12 @@ struct slist_co {
 } ; /* end struct (slist_co) */
 struct slist : slist_head {
 	slist_co	start ;
+	slist_co	count ;
 	slist_co	audit ;
 	slist_co	finish ;
 	slist() noex {
 	    start	(this,slistmem_start) ;
+	    count	(this,slistmem_count) ;
 	    audit	(this,slistmem_audit) ;
 	    finish	(this,slistmem_finish) ;
 	    head = nullptr ;
