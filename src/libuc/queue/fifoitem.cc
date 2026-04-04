@@ -31,18 +31,17 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<strwcmp.h>
 #include	<localmisc.h>
 
 #include	"fifoitem.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| + |getlenstr(3u)| */
 
 /* local defines */
 
@@ -74,17 +73,19 @@ typedef fifoitem_ent *	entp ;
 /* forward references */
 
 template<typename ... Args>
-static inline int fifoitem_magic(fifoitem *op,Args ... args) noex {
+local inline int fifoitem_magic(fifoitem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == FIFOITEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == FIFOITEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
 /* end subroutine (fifoitem_magic) */
 
-static int	entry_start(fifoitem_ent *,cvoid *,int) noex ;
-static int	entry_finish(fifoitem_ent *) noex ;
+local int fifoitem_curfetch(fifoitem *,fifoitem_cur *,fifoitem_ent **) noex ;
+
+local int entry_start(fifoitem_ent *,cvoid *,int) noex ;
+local int entry_finish(fifoitem_ent *) noex ;
 
 
 /* local variables */
@@ -97,11 +98,11 @@ static int	entry_finish(fifoitem_ent *) noex ;
 
 int fifoitem_start(fifoitem *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    op->head = nullptr ;
 	    op->tail = nullptr ;
 	    op->n = 0 ;
-	    op->magic = FIFOITEM_MAGIC ;
+	    op->magval = FIFOITEM_MAGIC ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -109,14 +110,14 @@ int fifoitem_start(fifoitem *op) noex {
 
 int fifoitem_finish(fifoitem *op) noex {
 	int		rs ;
-	if ((rs = fifoitem_magic(op)) >= 0) {
+	if ((rs = fifoitem_magic(op)) >= 0) ylikely {
 	    if (op->head && op->tail) {
 	        while ((rs = fifoitem_del(op)) >= 0) ;
 		if (rs == SR_NOENT) rs = SR_OK ;
 	    } else if (op->head || op->tail) {
 		rs = SR_BADFMT ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -124,11 +125,11 @@ int fifoitem_finish(fifoitem *op) noex {
 
 int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	int		rs ;
-	if ((rs = fifoitem_magic(op,sp)) >= 0) {
+	if ((rs = fifoitem_magic(op,sp)) >= 0) ylikely {
 	    cint	esz = szof(fifoitem_ent) ;
-	    if (void *vp ; (rs = libmem.mall(esz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(esz,&vp)) >= 0) ylikely {
 	        fifoitem_ent	*ep = entp(vp) ;
-	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
+	        if ((rs = entry_start(ep,sp,sl)) >= 0) ylikely {
 		    if (op->head && op->tail) {
 	                ep->prev = op->tail ;
 	                (op->tail)->next = ep ;
@@ -155,7 +156,7 @@ int fifoitem_rem(fifoitem *op,void *vbuf,int vlen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		dl = 0 ;
-	if ((rs = fifoitem_magic(op,vbuf)) >= 0) {
+	if ((rs = fifoitem_magic(op,vbuf)) >= 0) ylikely {
 	    rs = SR_NOENT ;
 	    if (op->head && op->tail) {
 	        fifoitem_ent	*ep = op->head ;
@@ -188,9 +189,78 @@ int fifoitem_rem(fifoitem *op,void *vbuf,int vlen) noex {
 }
 /* end subroutine (fifoitem_rem) */
 
+int fifoitem_count(fifoitem *op) noex {
+	int		rs ;
+	if ((rs = fifoitem_magic(op)) >= 0) ylikely {
+	    rs = op->n ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (fifoitem_count) */
+
+int fifoitem_del(fifoitem *op) noex {
+	int		rs ;
+	int		rs1 ;
+	int		n = 0 ;
+	if ((rs = fifoitem_magic(op)) >= 0) ylikely {
+	    rs = SR_NOTFOUND ;
+	    if (op->head && op->tail) {
+	        fifoitem_ent	*ep = op->head ;
+		rs = SR_OK ;
+	        op->head = ep->next ;
+	        {
+	            rs1 = entry_finish(ep) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = libmem.free(ep) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        op->n -= 1 ;
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
+	    } /* end if (had entry) */
+	    n = op->n ;
+	} /* end if (magic) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (fifoitem_del) */
+
+int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
+	int		rs ;
+	int		rs1 ;
+	int		dl = 0 ;
+	if ((rs = fifoitem_magic(op,sp)) >= 0) ylikely {
+	    if (sl < 0) {
+		cchar	*cp = charp(sp) ;
+		sl = lenstr(cp) ;
+	    }
+	    if (scmp == nullptr) scmp = fifoitem_cmp(strcmp) ;
+	    auto entcmp = [&sp,&sl,scmp] (FI_ENT *ep) {
+		bool f = true ;
+		f = f && (sl == ep->dl) ;
+		f = f && scmp(sp,ep->dp) ;
+		return f ;
+	    } ; /* end lambda */
+	    if (FI_CUR cur ; (rs = fifoitem_curbegin(op,&cur)) >= 0) ylikely {
+	        FI_ENT	*ep ;
+	        while ((rs = fifoitem_curfetch(op,&cur,&ep)) >= 0) {
+		    if (entcmp(ep)) {
+	                dl = ep->dl ;
+	                break ;
+	            }
+	        } /* end while */
+	        rs1 = fifoitem_curend(op,&cur) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (cursor) */
+	} /* end if (magic) */
+	return (rs >= 0) ? dl : rs ;
+}
+/* end subroutine (fifoitem_present) */
+
 int fifoitem_curbegin(fifoitem *op,fifoitem_cur *curp) noex {
 	int		rs ;
-	if ((rs = fifoitem_magic(op,curp)) >= 0) {
+	if ((rs = fifoitem_magic(op,curp)) >= 0) ylikely {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
@@ -199,37 +269,18 @@ int fifoitem_curbegin(fifoitem *op,fifoitem_cur *curp) noex {
 
 int fifoitem_curend(fifoitem *op,fifoitem_cur *curp) noex {
 	int		rs ;
-	if ((rs = fifoitem_magic(op,curp)) >= 0) {
+	if ((rs = fifoitem_magic(op,curp)) >= 0) ylikely {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifoitem_curend) */
 
-int fifoitem_curfetch(fifoitem *op,fifoitem_cur *curp,fifoitem_ent **epp) noex {
-	int		rs ;
-	if ((rs = fifoitem_magic(op,curp)) >= 0) {
-	    fifoitem_ent	*ep ;
-	    if (curp->current == nullptr) {
-	        ep = op->head ;
-	    } else {
-	        ep = (curp->current)->next ;
-	    }
-	    curp->current = ep ;
-	    if (epp) {
-	        *epp = ep ;
-	    }
-	    rs = (ep) ? ep->dl : SR_NOTFOUND ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (fifoitem_curfetch) */
-
 int fifoitem_curdel(fifoitem *op,fifoitem_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = fifoitem_magic(op)) >= 0) {
+	if ((rs = fifoitem_magic(op)) >= 0) ylikely {
 	    fifoitem_ent	*ep ;
 	    if ((curp == nullptr) || (curp->current == nullptr)) {
 	        ep = op->head ;
@@ -275,85 +326,54 @@ int fifoitem_curdel(fifoitem *op,fifoitem_cur *curp) noex {
 }
 /* end subroutine (fifoitem_curdel) */
 
-int fifoitem_count(fifoitem *op) noex {
+int fifoitem_curenum(fifoitem *op,fifoitem_cur *curp,void *rvp) noex {
 	int		rs ;
-	if ((rs = fifoitem_magic(op)) >= 0) {
-	    rs = op->n ;
+	if ((rs = fifoitem_magic(op,curp)) >= 0) ylikely {
+	    fifoitem_ent	*ep ;
+	    if (curp->current == nullptr) {
+	        ep = op->head ;
+	    } else {
+	        ep = (curp->current)->next ;
+	    }
+	    curp->current = ep ;
+	    if (rvp && ep) {
+		memcopy(rvp,ep->dp,ep->dl) ;
+	    }
+	    rs = (ep) ? ep->dl : SR_NOTFOUND ;
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (fifoitem_count) */
-
-int fifoitem_del(fifoitem *op) noex {
-	int		rs ;
-	int		rs1 ;
-	int		n = 0 ;
-	if ((rs = fifoitem_magic(op)) >= 0) {
-	    rs = SR_NOTFOUND ;
-	    if (op->head && op->tail) {
-	        fifoitem_ent	*ep = op->head ;
-		rs = SR_OK ;
-	        op->head = ep->next ;
-	        {
-	            rs1 = entry_finish(ep) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	        {
-	            rs1 = libmem.free(ep) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	        op->n -= 1 ;
-	    } else if (op->head || op->tail) {
-		rs = SR_BADFMT ;
-	    } /* end if (had entry) */
-	    n = op->n ;
-	} /* end if (magic) */
-	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (fifoitem_del) */
-
-int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
-	int		rs ;
-	int		rs1 ;
-	int		dl = 0 ;
-	if ((rs = fifoitem_magic(op,sp)) >= 0) {
-	    if (sl < 0) {
-		cchar	*cp = charp(sp) ;
-		sl = lenstr(cp) ;
-	    }
-	    if (scmp == nullptr) scmp = fifoitem_cmp(strcmp) ;
-	    auto entcmp = [&sp,&sl,scmp] (FI_ENT *ep) {
-		bool f = true ;
-		f = f && (sl == ep->dl) ;
-		f = f && scmp(sp,ep->dp) ;
-		return f ;
-	    } ; /* end lambda */
-	    if (FI_CUR cur ; (rs = fifoitem_curbegin(op,&cur)) >= 0) {
-	        FI_ENT	*ep ;
-	        while ((rs = fifoitem_curfetch(op,&cur,&ep)) >= 0) {
-		    if (entcmp(ep)) {
-	                dl = ep->dl ;
-	                break ;
-	            }
-	        } /* end while */
-	        rs1 = fifoitem_curend(op,&cur) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (cursor) */
-	} /* end if (magic) */
-	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (fifoitem_present) */
+/* end subroutine (fifoitem_curenum) */
 
 
 /* private subroutines */
 
-static int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
+local int fifoitem_curfetch(fifoitem *op,fifoitem_cur *curp,
+		fifoitem_ent **rpp) noex {
+	int		rs ;
+	if ((rs = fifoitem_magic(op,curp)) >= 0) ylikely {
+	    fifoitem_ent	*ep ;
+	    if (curp->current == nullptr) {
+	        ep = op->head ;
+	    } else {
+	        ep = (curp->current)->next ;
+	    }
+	    curp->current = ep ;
+	    if (rpp) {
+	        *rpp = ep ;
+	    }
+	    rs = (ep) ? ep->dl : SR_NOTFOUND ;
+	} /* end if (magic) */
+	return rs ;
+} /* end subroutine (fifoitem_curfetch) */
+
+local int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
 	int		rs ;
 	cchar		*sp = ccharp(vp) ;
 	if (sl < 0) sl = lenstr(sp) ;
 	ep->next = nullptr ;
 	ep->prev = nullptr ;
-	if (void *dp ; (rs = libmem.item(sp,sl,&dp)) >= 0) {
+	if (void *dp ; (rs = libmem.item(sp,sl,&dp)) >= 0) ylikely {
 	    ep->dp = cvoidp(dp) ;
 	    ep->dl = sl ;
 	}
@@ -361,10 +381,10 @@ static int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(fifoitem_ent *ep) noex {
+local int entry_finish(fifoitem_ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (void *vp = cast_const<voidp>(ep->dp) ; vp) {
+	if (void *vp = cast_const<voidp>(ep->dp) ; vp) ylikely {
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->dp = nullptr ;
