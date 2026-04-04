@@ -59,12 +59,10 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strncmp(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<ascii.h>		/* |CH_{xx}| */
 #include	<strn.h>		/* |strnrchr(3uc)| */
-#include	<char.h>		/* |char_iswhite(3uc)| + ... */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"			/* |sfshrink(3uc)| */
