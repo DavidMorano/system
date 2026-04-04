@@ -41,12 +41,11 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<sigblocker.h>
 #include	<localmisc.h>
@@ -71,41 +70,39 @@ typedef q_ent		*entp ;
 /* forward references */
 
 template<typename ... Args>
-static inline int aiq_ctor(aiq *op,Args ... args) noex {
+local inline int aiq_ctor(aiq *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
-	    if ((op->qp = new(nothrow) q) != np) {
+	    op->magval = 0 ;
+	    if ((op->qp = new(nothrow) q) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-pq) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (aiq_ctor) */
+} /* end subroutine (aiq_ctor) */
 
-static inline int aiq_dtor(aiq *op) noex {
+local inline int aiq_dtor(aiq *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->qp) {
+	    if (op->qp) ylikely {
 		delete op->qp ;
 		op->qp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (aiq_dtor) */
+} /* end subroutine (aiq_dtor) */
 
 template<typename ... Args>
-static int aiq_magic(aiq *op,Args ... args) noex {
+local int aiq_magic(aiq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == AIQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == AIQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (aiq_magic) */
 
 
 /* local variables */
@@ -118,9 +115,9 @@ static int aiq_magic(aiq *op,Args ... args) noex {
 
 int aiq_start(aiq *op,int type) noex {
 	int		rs ;
-	if ((rs = aiq_ctor(op)) >= 0) {
-	    if ((rs = q_start(op->qp,type)) >= 0) {
-		op->magic = AIQ_MAGIC ;
+	if ((rs = aiq_ctor(op)) >= 0) ylikely {
+	    if ((rs = q_start(op->qp,type)) >= 0) ylikely {
+		op->magval = AIQ_MAGIC ;
 	    } /* end if (q-start) */
 	    if (rs < 0) {
 		aiq_dtor(op) ;
@@ -133,8 +130,8 @@ int aiq_start(aiq *op,int type) noex {
 int aiq_finish(aiq *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = aiq_magic(op)) >= 0) {
-	    {
+	if ((rs = aiq_magic(op)) >= 0) ylikely {
+	    if (op->qp) ylikely {
 		rs1 = q_finish(op->qp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -142,7 +139,7 @@ int aiq_finish(aiq *op) noex {
 		rs1 = aiq_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -152,17 +149,16 @@ int aiq_ins(aiq *op,aiq_ent *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = aiq_magic(op,ep)) >= 0) {
-	        sigblocker	b ;
-	        if ((rs = b.start) >= 0) {
-		    {
-		        entp	qep = entp(ep) ;
-		        rs = q_ins(op->qp,qep) ;
-		        rc = rs ;
-		    }
-	            rs1 = b.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (sigblock) */
+	if ((rs = aiq_magic(op,ep)) >= 0) ylikely {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+		{
+		    entp	qep = entp(ep) ;
+		    rs = q_ins(op->qp,qep) ;
+		    rc = rs ;
+		}
+	        rs1 = b.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sigblock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 }
@@ -172,17 +168,16 @@ int aiq_inshead(aiq *op,aiq_ent *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = aiq_magic(op,ep)) >= 0) {
-	        sigblocker	b ;
-	        if ((rs = b.start) >= 0) {
-		    {
-		        entp	qep = entp(ep) ;
-		        rs = q_inshead(op->qp,qep) ;
-		        rc = rs ;
-		    }
-	            rs1 = b.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (sigblock) */
+	if ((rs = aiq_magic(op,ep)) >= 0) ylikely {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+		{
+		    entp	qep = entp(ep) ;
+		    rs = q_inshead(op->qp,qep) ;
+		    rc = rs ;
+		}
+	        rs1 = b.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sigblock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 }
@@ -192,17 +187,16 @@ int aiq_rem(aiq *op,aiq_ent **epp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = aiq_magic(op)) >= 0) {
-	        sigblocker	b ;
-	        if ((rs = b.start) >= 0) {
-		    {
-		        entp	*qepp = (entp *) epp ;
-		        rs = q_rem(op->qp,qepp) ;
-		        rc = rs ;
-		    }
-	            rs1 = b.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (sigblock) */
+	if ((rs = aiq_magic(op)) >= 0) ylikely {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+		{
+		    entp	*qepp = (entp *) epp ;
+		    rs = q_rem(op->qp,qepp) ;
+		    rc = rs ;
+		}
+	        rs1 = b.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sigblock) */
 	} /* end if (magic) */
 	if (epp && (rs < 0)) *epp = nullptr ;
 	return (rs >= 0) ? rc : rs ;
@@ -213,17 +207,16 @@ int aiq_remtail(aiq *op,aiq_ent **epp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = aiq_magic(op)) >= 0) {
-	        sigblocker	b ;
-	        if ((rs = b.start) >= 0) {
-		    {
-		        entp	*qepp = (entp *) epp ;
-		        rs = q_remtail(op->qp,qepp) ;
-		        rc = rs ;
-		    }
-	            rs1 = b.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (sigblock) */
+	if ((rs = aiq_magic(op)) >= 0) ylikely {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+		{
+		    entp	*qepp = (entp *) epp ;
+		    rs = q_remtail(op->qp,qepp) ;
+		    rc = rs ;
+		}
+	        rs1 = b.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sigblock) */
 	} /* end if (magic) */
 	if (epp && (rs < 0)) *epp = nullptr ;
 	return (rs >= 0) ? rc : rs ;
@@ -232,11 +225,57 @@ int aiq_remtail(aiq *op,aiq_ent **epp) noex {
 
 int aiq_count(aiq *op) noex {
 	int		rs ;
-	if ((rs = aiq_magic(op)) >= 0) {
+	if ((rs = aiq_magic(op)) >= 0) ylikely {
 	    rs = q_count(op->qp) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (aiq_count) */
+
+int aiq::ins(aiq_ent *ep) noex {
+	return aiq_ins(this,ep) ;
+}
+
+int aiq::inshead(aiq_ent *ep) noex {
+	return aiq_inshead(this,ep) ;
+}
+
+int aiq::rem(aiq_ent **rpp) noex {
+	return aiq_rem(this,rpp) ;
+}
+
+int aiq::remtail(aiq_ent **rpp) noex {
+	return aiq_remtail(this,rpp) ;
+}
+
+void aiq::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("aiq",rs,"fini-finish") ;
+	}
+} /* end method (aiq::dtor) */
+
+aiq::operator int () noex {
+	return aiq_count(this) ;
+} /* end method (aiq::operator) */
+
+int aiq_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case aiqmem_start:
+	        rs = aiq_start(op,a) ;
+	        break ;
+	    case aiqmem_count:
+	        rs = aiq_count(op) ;
+	        break ;
+	    case aiqmem_finish:
+	        rs = aiq_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (aiq_co::operator) */
+
 
 
