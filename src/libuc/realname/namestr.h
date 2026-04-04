@@ -21,26 +21,23 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	NAMESTR			struct namestr_head
+#define	NAMESTR		struct namestr_head
 
 
 struct namestr_head {
 	cchar		*strp ;
 	int		strl ;
-} ;
+} ; /* end struct (namestr_head) */
 
 #ifdef	__cplusplus
 enum namestrmems {
 	namestrmem_skipwhite,
 	namestrmem_finish,
 	namestrmem_overlast
-} ;
+} ; /* end enum (namestrmems) */
 struct namestr ;
 struct namestr_co {
 	namestr		*op = nullptr ;
@@ -78,11 +75,11 @@ typedef NAMESTR		namestr ;
 
 EXTERNC_begin
 
-extern int	namestr_start(namestr *,cchar *,int) noex ;
-extern int	namestr_next(namestr *,cchar **,int *,int *) noex ;
-extern int	namestr_skipwhite(namestr *) noex ;
-extern int	namestr_brk(namestr *,cchar *,cchar **) noex ;
-extern int	namestr_finish(namestr *) noex ;
+extern int	namestr_start		(namestr *,cchar *,int) noex ;
+extern int	namestr_next		(namestr *,cchar **,int *,int *) noex ;
+extern int	namestr_skipwhite	(namestr *) noex ;
+extern int	namestr_brk		(namestr *,cchar *,cchar **) noex ;
+extern int	namestr_finish		(namestr *) noex ;
 
 EXTERNC_end
 
