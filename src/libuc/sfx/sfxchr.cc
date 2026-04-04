@@ -59,19 +59,20 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<strn.h>		/* |strnxchr(3uc)| */
-#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
-#include	"sfxchr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* imported namespaces */
@@ -79,7 +80,9 @@ import libutil ;
 
 /* local typedefs */
 
-typedef charp (*strxchr_f)(cchar *,int,int) noex ;
+extern "C" {
+    typedef charp (*strxchr_f)(cchar *,int,int) noex ;
+}
 
 
 /* external subroutines */
@@ -92,7 +95,7 @@ typedef charp (*strxchr_f)(cchar *,int,int) noex ;
 
 namespace {
     struct sub_sfxchr {
-	strxchr_f	fun ;
+	strxchr_f fun ;
 	sub_sfxchr(strxchr_f f) noex : fun(f) { } ;
 	int operator () (cchar *,int,int,cchar **) noex ;
     } ; /* end struct (sub_sfxchr) */
@@ -111,45 +114,40 @@ namespace {
 /* exported subroutines */
 
 int sfochr(cchar *sp,int sl,int sch,cchar **rpp) noex {
-	sub_sfxchr	so(strnochr) ;
+	sub_sfxchr so(strnochr) ;
 	return so(sp,sl,sch,rpp) ;
 }
 
 int sfrchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
-	sub_sfxchr	so(strnrchr) ;
+	sub_sfxchr so(strnrchr) ;
 	return so(sp,sl,sch,rpp) ;
 }
 
 int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
 	return sfochr(sp,sl,'.',rpp) ;
-}
-/* end subroutine (sfwhitedot) */
+} /* end subroutine (sfwhitedot) */
 
 
 /* local subroutines */
 
-int sub_sfxchr::operator () (cchar *sp,int sl,int sch,cchar **rpp) noex {
+int sub_sfxchr::operator () (cchar *sp,int µsl,int sch,cchar **rpp) noex {
 	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl > 0) ylikely {
-	        while (sl && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
+	if (int sl = getlenstr(sp,µsl) ; sl > 0) ylikely {
+	    while (sl && ISWHT(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    if (cchar *tp ; (tp = fun(sp,sl,sch)) != nullptr) {
+	        rl = intconv(tp - sp) ;
+		rp = sp ;
+	        while (rl && ISWHT(rp[rl - 1])) {
+	            rl -= 1 ;
 	        }
-	        if (cchar *tp ; (tp = fun(sp,sl,sch)) != nullptr) {
-	            rl = intconv(tp - sp) ;
-		    rp = sp ;
-	            while (rl && CHAR_ISWHITE(rp[rl - 1])) {
-	                rl -= 1 ;
-	            }
-		} /* end if (hit) */
-	    } /* end if (non-zero positive) */
-	} /* end if (non-null) */
+	    } /* end if (hit) */
+	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
 	return rl ;
-}
-/* end method (sub_sfxchr::operator) */
+} /* end method (sub_sfxchr::operator) */
 
 
