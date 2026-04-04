@@ -29,6 +29,7 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>
 #include	<cstddef>
 #include	<cstdlib>
 #include	<cstdio>
@@ -74,8 +75,9 @@ constexpr bool		f_debug		= CF_DEBUG ;
 
 export {
     template<int Nbits,typename Digit = ulonglong> struct uintx {
-	inline static cint n = ndig<Nbits,Digit> ;
-	Digit		v[ndig<Nbits,Digit>] ;
+	typedef Digit		digtype ;
+	inline static cint	n = ndig<Nbits,Digit> ;
+	Digit			v[ndig<Nbits,Digit>] ;
 	uintx() = default ;
 	uintx(const uintx &o) noex {
 	    vcopy(n,v,o.v) ;
@@ -362,9 +364,11 @@ export {
         } ; /* end ctor */
 } /* end export */
 
+constexpr int	uint256_nbits = 256 ;
+
 export {
-    struct uint256_t : uintx<256> {
-	inline static cint	n = (256 / (szof(ulonglong) * CHAR_BIT)) ;
+    struct uint256_t : uintx<uint256_nbits> {
+	inline static cint	n = ndig<uint256_nbits,uintx::digtype> ;
 	uint256_t() = default ;
 	uint256_t(int a)	noex : uintx(a) { } ;
 	uint256_t(long a)	noex : uintx(a) { } ;
@@ -379,7 +383,7 @@ export {
 	    vcopy(n,v,a.v) ;
 	    return *this ;
 	} ; /* end method (assignment) */
-	uint256_t &operator = (const uintx<256> &a) noex {
+	uint256_t &operator = (const uintx<uint256_nbits> &a) noex {
 	    vcopy(n,v,a.v) ;
 	    return *this ;
 	} ;
@@ -410,9 +414,11 @@ export {
     } ; /* end struct (uint256_t) */
 } /* end export */
 
+constexpr int	uint512_nbits = 512 ;
+
 export {
-    struct uint512_t : uintx<512> {
-	inline static cint	n = (512 / (szof(ulonglong) * CHAR_BIT)) ;
+    struct uint512_t : uintx<uint512_nbits> {
+	inline static cint	n = ndig<uint512_nbits,uintx::digtype> ;
 	uint512_t() = default ;
 	uint512_t(int a)	noex : uintx(a) { } ;
 	uint512_t(long a)	noex : uintx(a) { } ;
