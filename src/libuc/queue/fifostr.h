@@ -23,36 +23,35 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>
+#include	<stdlib.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	FIFOSTR_MAGIC	0x12345678
 #define	FIFOSTR		struct fifostr_head
 #define	FIFOSTR_CUR	struct fifostr_cursor
 #define	FIFOSTR_ENT	struct fifostr_entry
+#define	FIFOSTR_MAGIC	0x12345678
 
 
 struct fifostr_entry {
 	FIFOSTR_ENT	*next ;
 	FIFOSTR_ENT	*prev ;
 	int		slen ;
-} ;
+} ; /* end struct (fifostr_entry) */
 
 struct fifostr_head {
 	FIFOSTR_ENT	*head ;
 	FIFOSTR_ENT	*tail ;
-	uint		magic ;
+	uint		magval ;
 	int		ic ;		/* item count */
 	int		cnt ;		/* character count */
-} ;
+} ; /* end struct (fifostr_head) */
 
 struct fifostr_cursor {
 	FIFOSTR_ENT	*current ;
-} ;
+} ; /* end struct (fifostr_cursor) */
 
 typedef FIFOSTR_CUR	fifostr_cur ;
 typedef FIFOSTR_ENT	fifostr_ent ;
@@ -88,7 +87,7 @@ struct fifostr : fifostr_head {
 	    headlen	(this,fifostrmem_headlen) ;
 	    count	(this,fifostrmem_count) ;
 	    finish	(this,fifostrmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	fifostr(const fifostr &) = delete ;
 	fifostr &operator = (const fifostr &) = delete ;
@@ -103,7 +102,7 @@ struct fifostr : fifostr_head {
 	int curdel	(fifostr_cur *) noex ;
 	void dtor() noex ;
 	destruct fifostr() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (fifostr) */
 #else	/* __cplusplus */
