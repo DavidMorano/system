@@ -21,8 +21,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stddef.h>		/* |ptrdiff_t| */
+#include	<stdlib.h>
 #include	<stdint.h>		/* |intptr_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<plainq.h>
 #include	<ptm.h>
 
@@ -30,22 +32,67 @@
 #define	Q		struct q_head
 #define	Q_ENT		struct q_entry
 
-#define	Q_TPRIVATE	0		/* q-type: private to a process */
-#define	Q_TSHARED	1		/* q-type: shared among processes */
+#define	Q_TPRIVATE	0		/* q-type: sharing-type - private */
+#define	Q_TSHARED	1		/* q-type: sharing-type - shared */
 
 
 struct q_entry {
 	ptrdiff_t	next ;
 	ptrdiff_t	prev ;
-} ;
+} ; /* end class (q_entry) */
 
 struct q_head {
 	ptm		*mxp ;
 	plainq		*pqp ;
-} ;
+} ; /* end class (q_head) */
 
-typedef	Q		q ;
 typedef	Q_ENT		q_ent ;
+
+#ifdef	__cplusplus
+enum qmems {
+	qmem_start,
+	qmem_count,
+	qmem_finish,
+	qmem_overlast
+} ; /* end enum (qmems) */
+struct q ;
+struct q_co {
+        q		*op = nullptr ;
+        int             w = -1 ;
+        constexpr void operator () (q *p,int m) noex {
+            op = p ;
+            w = m ;
+        } ;
+	int operator () (int = 0) noex ;
+        operator int () noex {
+	    return operator () (0) ;
+	} ;
+} ; /* end struct (q_co) */
+struct q : q_head {
+	q_co		start ;
+	q_co		count ;
+	q_co		finish ;
+	constexpr q() noex {
+	    start	(this,qmem_start) ;
+	    count	(this,qmem_count) ;
+	    finish	(this,qmem_finish) ;
+	    mxp = nullptr ;
+	} ; /* end ctor */
+	q(const q &) = delete ;
+	q &operator = (const q &) = delete ;
+	int	ins	(q_ent *) noex ;
+	int	inshead	(q_ent *) noex ;
+	int	rem	(q_ent **) noex ;
+	int	remtail	(q_ent **) noex ;
+	void	dtor() noex ;
+	operator int () noex ;
+	destruct q() {
+	    if (mxp) dtor() ;
+	} ; /* end dtor (q) */
+} ; /* end class (q) */
+#else
+typedef Q		q ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
