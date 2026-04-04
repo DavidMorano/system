@@ -79,19 +79,26 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/time.h>		/* |gettimeofday(3c)| */
 #include	<unistd.h>
-#include	<climits>		/* |CHAR_BIT| */
 #include	<ctime>
+#include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* UNIX® system subroutines */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usupport.h>		/* |libu::cfdec(3u)| */
+#include	<uclibmem.h>
+#include	<ucgetx.h>
 #include	<randlc.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"randomvar.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 import uconstants ;
 
 /* local defines */
@@ -109,7 +116,6 @@ import uconstants ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libu::cfdec ;			/* subroutine (overloaded) */
@@ -149,32 +155,45 @@ namespace {
 	        }
 	    } /* end if */
 	} ;
+	int addtime() noex {
+	    cnullptr	np{} ;
+	    int		rs ;
+	    if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) {
+		int		val ;
+		int		dum ;
+		dum = intconv(tv.tv_usec) ;
+	        val = randlc(dum) ; add(val) ;
+		dum = intconv(tv.tv_sec) ;
+	        val = randlc(dum) ; add(val) ;
+	    } /* end if (uc_gettimeofday) */
+	    return rs ;
+        } ; /* end method (addtime) */
     } ; /* end struct (arrlongs) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static inline int randomvar_magic(randomvar *op,Args ... args) noex {
+local inline int randomvar_magic(randomvar *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == RANDOMVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (randomvar_magic) */
 
-static int	randomvar_initpseudo(randomvar *,uint) noex ;
-static int	randomvar_initreal(randomvar *,uint) noex ;
-static int	randomvar_maint(randomvar *) noex ;
-static int	randomvar_swapone(randomvar *) noex ;
+local int	randomvar_initpseudo(randomvar *,uint) noex ;
+local int	randomvar_initreal(randomvar *,uint) noex ;
+local int	randomvar_maint(randomvar *) noex ;
+local int	randomvar_swapone(randomvar *) noex ;
 
 static void	addtime(ulong *,TIMEVAL *tvp) noex ;
 
-static int	rdulong(cchar *,int,ulong *) noex ;
-static int	wrulong(char *,int,ulong) noex ;
+local int	rdulong(cchar *,int,ulong *) noex ;
+local int	wrulong(char *,int,ulong) noex ;
 
-static int	mkprocrand() noex ;
+local int	mkprocrand() noex ;
 
 
 /* local variables */
@@ -191,7 +210,7 @@ constexpr ulong	randtbl[] = {
 	0xc3db71be39b44e1cUL, 0xf8a44ef94c8b80b1UL,
 	0x19edc32887bf4bddUL, 0xc9b240e5e9ee4b1bUL, 
 	0x4382aee7535b6b41UL, 0xf3bec5da31415926UL
-} ;
+} ; /* end array (randtbl) */
 
 static procrand<NINITS>	initrv ;
 
@@ -204,13 +223,13 @@ static procrand<NINITS>	initrv ;
 int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	int		rs = SR_FAULT ;
 	if (seed == 0) seed = 31415926 ;
-	if (op) {
+	if (op) ylikely {
 	    csize	sz = (slen * szof(ulong)) ;
 	    memclear(op) ;
-	    if (void *vp{} ; (rs = lm_mall(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 		op->state = ulongp(vp) ;
 	        op->fl.flipper = false ;
-	        op->fl.pseudo = f_pseudo ;
+	        op->fl.pseudo = !!f_pseudo ;
 	        op->laststir = 0 ;
 	        op->maintcount = 0 ;
 	        if (op->fl.pseudo) {
@@ -219,7 +238,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 		    rs = randomvar_initreal(op,seed) ;
 	        } /* end if (initializing state) */
     		/* our polynomial --  x**127 + x**67 + x**23 + 1  */
-		if (rs >= 0) {
+		if (rs >= 0) ylikely {
 		    cint	n = (slen * LOOPMULT) ;
 	            op->a = COF(67) ;
 	            op->b = COF(23) ;
@@ -234,7 +253,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 		    lm_free(op->state) ;
 		    op->state = nullptr ;
 		    op->magic = 0 ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
@@ -244,8 +263,8 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 int randomvar_finish(randomvar *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = randomvar_magic(op)) >= 0) {
-	    if (op->state) {
+	if ((rs = randomvar_magic(op)) >= 0) ylikely {
+	    if (op->state) ylikely {
 		rs1 = lm_free(op->state) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -257,7 +276,7 @@ int randomvar_finish(randomvar *op) noex {
 
 int randomvar_stateload(randomvar *op,cchar *nstate,int sl) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(op,nstate)) >= 0) {
+	if ((rs = randomvar_magic(op,nstate)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (sl >= slen) {
 	        cchar	*sp = charp(nstate) ;
@@ -280,7 +299,7 @@ int randomvar_stateload(randomvar *op,cchar *nstate,int sl) noex {
 
 int randomvar_statesave(randomvar *op,char *state,int bl) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(op,state)) >= 0) {
+	if ((rs = randomvar_magic(op,state)) >= 0) ylikely {
 	    char	*bp = charp(state) ;
 	    rs = SR_INVALID ;
 	    if (bl >= slen) {
@@ -302,7 +321,7 @@ int randomvar_statesave(randomvar *op,char *state,int bl) noex {
 
 int randomvar_addnoise(randomvar *op,cvoid *noise,int sl) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(op,noise)) >= 0) {
+	if ((rs = randomvar_magic(op,noise)) >= 0) ylikely {
 	    cint	nmax = (sl / digsize) ;
 	    cchar	*sp = charp(noise) ;
 	    for (int i = 0 ; i < nmax ; i += 1) {
@@ -339,7 +358,7 @@ int randomvar_setpoly(randomvar *op,int a,int b) noex {
 
 int randomvar_getlong(randomvar *op,long *rp) noex {
 	int		rs ;
-	if (ulong res ; (rs = randomvar_getulong(op,&res)) >= 0) {
+	if (ulong res ; (rs = randomvar_getulong(op,&res)) >= 0) ylikely {
 	    if (rp) *rp = long(res >> 1) ;
 	} /* end if (randomvar_getulong) */
 	return rs ;
@@ -348,7 +367,7 @@ int randomvar_getlong(randomvar *op,long *rp) noex {
 
 int randomvar_getulong(randomvar *op,ulong *rp) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(op,rp)) >= 0) {
+	if ((rs = randomvar_magic(op,rp)) >= 0) ylikely {
 	    op->state[op->a] += op->state[op->b] ;
 	    op->state[op->a] += op->state[op->c] ;
 	    *rp = op->state[op->a] ;
@@ -366,7 +385,7 @@ int randomvar_getulong(randomvar *op,ulong *rp) noex {
 int randomvar_getint(randomvar *op,int *rp) noex {
 	uint		res ;
 	int		rs ;
-	if ((rs = randomvar_getuint(op,&res)) >= 0) {
+	if ((rs = randomvar_getuint(op,&res)) >= 0) ylikely {
 	    if (rp) *rp = (res >> 1) ;
 	} /* end if (randomvar_getuint) */
 	return rs ;
@@ -375,8 +394,8 @@ int randomvar_getint(randomvar *op,int *rp) noex {
 
 int randomvar_getuint(randomvar *op,uint *rp) noex {
 	int		rs ;
-	if ((rs = randomvar_magic(op,rp)) >= 0) {
-	    ulong	rv ;
+	if ((rs = randomvar_magic(op,rp)) >= 0) ylikely {
+	    ulong	rv ; /* used-multiple */
 	    if (op->fl.flipper) {
 		rv = op->state[op->a] ;
 		*rp = uint(rv >> 32) ;
@@ -393,10 +412,10 @@ int randomvar_getuint(randomvar *op,uint *rp) noex {
 /* end subroutine (randomvar_getuint) */
 
 int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
-	int		rs = SR_FAULT ;
-	if (rbuf) {
+	int		rs ;
+	if ((rs = randomvar_magic(op,rbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen >= 0) {
+	    if (rlen >= 0) ylikely {
 	        cint	wl = szof(ulong) ;
 	        char	*rp = charp(rbuf) ;
 		rs = SR_OK ;
@@ -411,7 +430,7 @@ int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
 		    } /* end if (randomvar_getulong) */
 	        } /* end while */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (randomvar_getuint) */
@@ -419,7 +438,7 @@ int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-static int randomvar_initpseudo(randomvar *op,uint seed) noex {
+local int randomvar_initpseudo(randomvar *op,uint seed) noex {
 	const ulong	tv = ulong(randlc(seed)) ;
 	ulong		lseed = ulong(seed) ;
 	cint		tl = nelem(randtbl) ;
@@ -434,36 +453,32 @@ static int randomvar_initpseudo(randomvar *op,uint seed) noex {
 }
 /* end subroutine (randomvar_initpseudo) */
 
-static int randomvar_initreal(randomvar *op,uint seed) noex {
-	static int	rsr = mkprocrand() ;
+local int randomvar_initreal(randomvar *op,uint seed) noex {
 	arrlongs<NLS>	al ;
+	local int	rsr = mkprocrand() ;
 	int		rs ;
-	if ((rs = rsr) >= 0) {
+	if ((rs = rsr) >= 0) ylikely {
 	    cint	ninit = rs ;
-	    uint	v ;
-	    {
-	        TIMEVAL		tv ;
-	        gettimeofday(&tv,nullptr) ;
-	        v = randlc(tv.tv_usec) ; al.add(v) ;
-	        v = randlc(tv.tv_sec) ; al.add(v) ;
-	    }
-	    for (int i = 0 ; i < ninit ; i += 1) {
-	        v = initrv.v[i] ;
-		al.add(v) ;
-	    }
-	    v = randlc(seed) ;
-	    al.add(v) ;
-	    for (int i = 0 ; i < min(al.c,slen) ; i += 1) {
-	        op->state[i] += al.v[i] ;
-	    }
+	    uint	v ; /* used-multiple */
+	    if ((rs = al.addtime()) >= 0) {
+	        for (int i = 0 ; i < ninit ; i += 1) {
+	            v = initrv.v[i] ;
+		    al.add(v) ;
+	        } /* end for */
+	        v = randlc(seed) ;
+	        al.add(v) ;
+	        for (int i = 0 ; i < min(al.c,slen) ; i += 1) {
+	            op->state[i] += al.v[i] ;
+	        } /* end for */
+	    } /* emd if (addtime) */
 	} /* end if (mkprocrand) */
 	return rs ;
 }
 /* end subroutine (randomvar_initreal) */
 
-static int randomvar_maint(randomvar *op) noex {
+local int randomvar_maint(randomvar *op) noex {
 	int		rs ;
-	if ((rs = randomvar_swapone(op)) >= 0) {
+	if ((rs = randomvar_swapone(op)) >= 0) ylikely {
 	    op->maintcount = 0 ;
 	    if (! op->fl.pseudo) {
 	        TIMEVAL		tv ;
@@ -478,7 +493,7 @@ static int randomvar_maint(randomvar *op) noex {
 }
 /* end subroutine (randomvar_maint) */
 
-static int randomvar_swapone(randomvar *op) noex {
+local int randomvar_swapone(randomvar *op) noex {
 	const ulong	one = op->state[0] ;
 	uint		s0, s1 ;
 	uint		t0, t1 ;
@@ -501,8 +516,8 @@ static void addtime(ulong *lp,TIMEVAL *tvp) noex {
 	const uint	t0 = uint(tvp->tv_sec) ;
 	const uint	t1 = uint(tvp->tv_usec) ;
 	uint		c0, c1, n0, n1 ;
-	c0 = (cur >> 0) ;
-	c1 = (cur >> 32) ;
+	c0 = uint(cur >> 0) ;
+	c1 = uint(cur >> 32) ;
 	n0 = c0 ^ randlc(c0 ^ t0) ;
 	n1 = c1 ^ randlc(c1 ^ t1) ;
 	{
@@ -515,7 +530,7 @@ static void addtime(ulong *lp,TIMEVAL *tvp) noex {
 }
 /* end subroutine (addtime) */
 
-static int rdulong(cchar *sp,int sl,ulong *lp) noex {
+local int rdulong(cchar *sp,int sl,ulong *lp) noex {
 	int		r = 0 ;
 	if (sl > 0) {
 	    cint	mlen = min(sl,digsize) ;
@@ -533,7 +548,7 @@ static int rdulong(cchar *sp,int sl,ulong *lp) noex {
 }
 /* end subroutine (rdulong) */
 
-static int wrulong(char *bp,int bl,ulong ulw) noex {
+local int wrulong(char *bp,int bl,ulong ulw) noex {
 	cint		n = digsize ;
 	int		i = 0 ; /* used afterwards */
 	for (i = 0 ; (i < n) && (i < bl) ; i += 1) {
@@ -544,7 +559,7 @@ static int wrulong(char *bp,int bl,ulong ulw) noex {
 /* end subroutine (wrulong) */
 
 /* this extracts process-constant randoness (done only once) */
-static int mkprocrand() noex {
+local int mkprocrand() noex {
 	uint		uv ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -567,7 +582,7 @@ static int mkprocrand() noex {
 
 int randomvar_st::operator () (int fpseudo,uint seed) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case 0:
 	        rs = randomvar_start(op,fpseudo,seed) ;
@@ -599,8 +614,8 @@ int randomvar::statesave(char *msp,int msl) noex {
     	return randomvar_statesave(this,msp,msl) ;
 }
 
-int randomvar::setpoly(int a,int b) noex {
-    	return randomvar_setpoly(this,a,b) ;
+int randomvar::setpoly(int µa,int µb) noex {
+    	return randomvar_setpoly(this,µa,µb) ;
 }
 
 int randomvar::addnoise(cvoid *nbuf,int nlen) noex {
