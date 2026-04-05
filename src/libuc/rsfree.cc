@@ -38,7 +38,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucmem.h>
 #include	<localmisc.h>
 
 #include	"rsfree.h"
@@ -48,6 +50,8 @@
 
 
 /* imported namespaces */
+
+using libuc::mem ;			/* standard memory-management */
 
 
 /* local typedefs */
@@ -73,9 +77,15 @@
 
 /* exported subroutines */
 
-int rsfree(int rs,cvoid *vp) noex {
-	cint	rs1 = uc_free(vp) ;
-	if (rs >= 0) rs = rs1 ;
+int rsfree(int rs,cvoid *cvp) noex {
+	int		rs1 ;
+	if (cvp) {
+	    void *vp = cast_const<void *>(cvp) ;
+	    rs1 = mem.free(vp) ;
+	    if (rs >= 0) rs = rs1 ;
+	} else {
+	    rs = SR_FAULT ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (rsfree) */
