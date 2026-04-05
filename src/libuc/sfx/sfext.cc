@@ -45,10 +45,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<six.h>			/* |sirchr(3uc)| */
 #include	<ascii.h>		/* |CH_DOT| + |CH_SLASH| */
 #include	<localmisc.h>
@@ -56,8 +53,8 @@
 #include	"sfx.h"
 #include	"sfext.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"mod/chrset.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/chrset.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
 import chrset ;
@@ -124,7 +121,7 @@ int sfext(cchar *sp,int µsl,cchar **rpp) noex {
 		            ep = (sp + si) ;
                         } /* end if (got) */
                     } /* end if (hit something) */
-		} /* end if (gelenstr) */
+		} /* end if (getlenstr) */
 	    } else {
 	        cchar	*bp ;
 	        if (int bl ; (bl = sfbasename(sp,µsl,&bp)) > 0) {
