@@ -43,20 +43,21 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<ascii.h>		/* |CH_{xx}| */
 #include	<six.h>			/* |sidquote(3uc)| */
-#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
-#include	"sfx.h"
 #include	"sfnext.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* imported namespaces */
@@ -85,20 +86,19 @@ import libutil ;
 
 /* exported subroutines */
 
-int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex {
+int sfnextqtok(cchar *sp,int µsl,cchar **rpp) noex {
 	int		len = -1 ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    /* skip over whitespace */
-	    while (sl && CHAR_ISWHITE(sp[0])) {
+	    while (sl && ISWHT(sp[0])) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
 	    if (rpp) *rpp = sp ;
 	    /* skip over the non-whitespace */
 	    len = sl ;
-	    while (sl && sp[0] && (! CHAR_ISWHITE(sp[0]))) {
-	        int		si ;
+	    while (sl && sp[0] && (! ISWHT(sp[0]))) {
+	        int	si ; /* used-multiple */
 	        if (sp[0] == CH_DQUOTE) {
 	            sp += 1 ;
 	            sl -= 1 ;
@@ -110,7 +110,7 @@ int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex {
 	        sl -= si ;
 	    } /* end while */
 	    len -= sl ;
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return len ;
 }
 /* end subroutine (sfnextqtok) */
