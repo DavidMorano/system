@@ -45,9 +45,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<localmisc.h>
 
@@ -57,7 +55,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/chrset.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 import chrset ;
 
 /* local defines */
@@ -100,10 +98,9 @@ local brkinit		bi ;
 
 /* exported subroutines */
 
-int siext(cchar *fp,int fl) noex {
+int siext(cchar *fp,int µfl) noex {
 	int		si = -1 ;
-	if (fp) ylikely {
-	    if (fl < 0) fl = lenstr(fp) ;
+	if (int fl ; (fl = getlenstr(fp,µfl)) >= 0) {
 	    while ((fl > 0) && (fp[fl - 1] == CH_SLASH)) {
 	        fl -= 1 ;
 	    }
@@ -114,7 +111,7 @@ int siext(cchar *fp,int fl) noex {
 		    si = -1 ;
 		}
 	    } /* end if (hit something) */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return si ;
 }
 /* end subroutine (siext) */
