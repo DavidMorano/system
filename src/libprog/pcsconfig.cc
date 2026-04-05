@@ -345,7 +345,7 @@ int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 	        case param_pidfile:
 	            if (! pip->fin.pidfname) {
 	                pip->have.pidfname = true ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,true,
 	                    RUNDNAME,pip->nodename,PIDFNAME) ;
 	                ccp = pip->pidfname ;
 	                if ((ccp == nullptr) ||
@@ -359,7 +359,7 @@ int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 	        case param_msfile:
 	            if (! lip->final.msfname) {
 	                lip->have.msfname = true ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,true,
 	                    MSDNAME,MSFNAME,"") ;
 	                ccp = lip->msfname ;
 	                if ((ccp == nullptr) ||
@@ -373,7 +373,7 @@ int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 	        case param_logfile:
 	            if (! pip->fin.logprog) {
 	                pip->have.logprog = true ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,true,
 	                    LOGDNAME,pip->searchname,"") ;
 	                ccp = pip->lfname ;
 	                if ((ccp == nullptr) ||
@@ -388,7 +388,7 @@ int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 	            if (! lip->final.reqfname) {
 	                lip->have.reqfname = true ;
 #ifdef	COMMENT
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,true,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,true,
 	                    LOGDNAME,pip->searchname,"") ;
 #else			    
 	                rs1 = mkpath1w(tbuf,ebuf,el) ;
