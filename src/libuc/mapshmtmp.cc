@@ -50,9 +50,11 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sysval.hh>
-#include	<mallocxx.h>
 #include	<localmisc.h>
 
 #include	"mapshmtmp.h"
@@ -63,13 +65,16 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;
-
 
 /* local typedefs */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_close(int) noex ;
+    extern int uc_unlinkshm(cchar *) noex ;
+}
 
 extern "C" {
     extern int	openshmtmp(char *,int,int) noex ;
@@ -89,7 +94,7 @@ static int	shmalloc(int,int) noex ;
 
 /* local variables */
 
-static sysval		pagesize(sysval_ps) ;
+static sysval		pagesz(sysval_ps) ;
 
 
 /* exported variables */
@@ -106,7 +111,7 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp) noex {
 		bool	f_bufalloc = false ;
 		rs = SR_OK ;
                 if (rbuf == nullptr) {
-                    if ((rs = malloc_mn(&rbuf)) >= 0) {
+                    if ((rs = lm_mn(&rbuf)) >= 0) {
                         rlen = rs ;
                         f_bufalloc = true ;
                     }
@@ -126,7 +131,7 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp) noex {
                         uc_close(fd) ;
                     } /* end if (openshmtmp) */
                     if (f_bufalloc && rbuf) {
-                        uc_free(rbuf) ;
+                        lm_free(rbuf) ;
                     }
                 } /* end if (ok) */
 	    } /* end if (valid) */
@@ -140,7 +145,7 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp) noex {
 
 static int shmalloc(int fd,int shmlen) noex {
 	int		rs ;
-	if ((rs = pagesize) >= 0) ylikely {
+	if ((rs = pagesz) >= 0) ylikely {
 	    cint	ps = rs ;
 	    off_t	off = 0 ;
 	    cint	wlen = szof(int) ;
@@ -149,7 +154,7 @@ static int shmalloc(int fd,int shmlen) noex {
 	        rs = u_pwrite(fd,wbuf,wlen,off) ;
 	        off += ps ;
 	    } /* end while */
-	} /* end if (pagesize) */
+	} /* end if (pagesz) */
 	return rs ;
 }
 /* end subroutine (shmalloc) */
