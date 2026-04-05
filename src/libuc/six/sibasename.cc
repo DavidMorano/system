@@ -41,16 +41,16 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"six.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -81,17 +81,16 @@ import libutil ;
 
 /* exported subroutines */
 
-int sibasename(cchar *sp,int sl) noex {
+int sibasename(cchar *sp,int µsl) noex {
 	int		si = -1 ; /* return-value */
-	if (sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	    while ((sl > 0) && (sp[sl - 1] == '/'))  {
 	        sl -= 1 ;
 	    }
 	    for (si = sl ; si > 0 ; si -= 1) {
 	        if (sp[si - 1] == '/') break ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return si ;
 }
 /* end subroutine (sibasename) */
