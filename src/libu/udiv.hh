@@ -40,6 +40,11 @@ struct udiv {
     udiv(TU n,TU d) noex {
 	div(n,d) ;
     } ;
+    udiv &operator = (const udiv &o) noex {
+	quo = o.quo ;
+	rem = o.rem ;
+	return *this ;
+    } ;
     void operator () (TU n,TU d) noex {
 	div(n,d) ;
     } ;
