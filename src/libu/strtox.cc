@@ -246,7 +246,7 @@ namespace {
                     ncl -= b ;
                     nco += 1 ;
                 }
-                ncl = (- ncl) ;
+                ncl = (neg ncl) ;
                 ncutoff[b] = nco ;
                 ncutlim[b] = ncl ;
 	    } /* end for */
