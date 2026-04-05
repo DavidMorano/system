@@ -49,7 +49,7 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
-#include	"sfx.h"			/* |sfbasename(3uc)| */
+#include	"sfxname.h"		/* |sfbasename(3uc)| */
 
 
 /* local defines */
@@ -76,11 +76,11 @@
 /* exported subroutines */
 
 int sfrootname(cchar *sp,int sl,cchar **rpp) noex {
-	int		cl = -1 ;
+	int		rl = -1 ;
 	if (sp && rpp) {
-	    cl = sfbasename(sp,sl,rpp) ;
+	    rl = sfbasename(sp,sl,rpp) ;
 	}
-	return cl ;
+	return rl ;
 }
 /* end subroutine (sfrootname) */
 
