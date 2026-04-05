@@ -46,10 +46,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern cchar	*getourenv(cchar **,cchar *) ;
-}
-
 
 /* external variables */
 
