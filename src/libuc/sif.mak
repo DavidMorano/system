@@ -55,7 +55,6 @@ INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -140,7 +139,7 @@ objb.o:			$(OBJB)
 sif0.o:			sif.ccm			$(INCS)
 	makemodule sif
 
-sif1.o:			sif1.cc sif.ccm		$(INCS)
+sif1.o:			sif1.cc sif0.o		$(INCS)
 	makemodule sif
 	$(COMPILE.cc) $<
 
