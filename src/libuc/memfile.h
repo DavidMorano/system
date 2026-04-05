@@ -27,8 +27,8 @@
 #include	<usysrets.h>
 
 
-#define	MEMFILE_MAGIC	0x54728822
 #define	MEMFILE		struct memfile_head
+#define	MEMFILE_MAGIC	0x54728822
 
 
 struct memfile_head {
