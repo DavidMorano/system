@@ -41,13 +41,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<ascii.h>
-#include	<toxc.h>
 #include	<mkchar.h>
-#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"six.h"
@@ -90,11 +86,11 @@ int sidquote(cchar *sp,int sl) noex {
 	    for (i = 0 ; sl && sp[i] && (! f_done) ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;
 	        switch (ch) {
-	        case '\\':
+	        case CH_BSLASH:
 		    f_skip = (! f_skip) ;
 		    break ;
 	        case CH_DQUOTE:
-		    if (! f_skip) f_done = TRUE ;
+		    if (! f_skip) f_done = true ;
 		    fallthrough ;
 	            /* FALLTHROUGH */
 	        default:
