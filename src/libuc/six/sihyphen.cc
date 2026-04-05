@@ -42,9 +42,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<localmisc.h>
 
@@ -52,7 +50,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -92,12 +90,11 @@ cbool		f_strnchr = CF_STRNCHR ;
 
 /* exported subroutines */
 
-int sihyphen(cchar *sp,int sl) noex {
+int sihyphen(cchar *sp,int µsl) noex {
     	cnullptr	np{} ;
 	int		si = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	    if_constexpr (f_strnchr) {
 	        cchar	*tp ;
 	        while ((sl >= 2) && ((tp = strnchr(sp,sl,'-')) != np)) {
@@ -114,7 +111,7 @@ int sihyphen(cchar *sp,int sl) noex {
 	            if (f) break ;
 	        } /* end for */
 	    } /* end if_constexpr (f_strnchr) */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return (f) ? si : -1 ;
 }
 /* end subroutine (sihyphen) */
