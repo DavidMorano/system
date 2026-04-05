@@ -45,13 +45,13 @@ OBJ1= setstr_prime.o setstr_ext.o
 OBJ2= setostr_prime.o setostr_ext.o
 OBJ3= sethand.o
 
-OBJ4= retstat.o 
-OBJ5= setstrx_loadfile.o
+OBJ4= setstrx_loadfile.o
+OBJ5= 
 OBJ6=
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o 
-OBJB= obj3.o obj4.o obj5.o
+OBJB= obj3.o obj4.o
 
 OBJ= obja.o objb.o
 
@@ -152,24 +152,19 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-# RETSTAT
-retstat.o:		retstat.ccm				$(INCS)
-	makemodule retstat
-
 # set-strings
-setstr_prime.o:		setstr_prime.cc		setstr.h		$(INCS)
-setstr_ext.o:		setstr_ext.cc		setstrx.hh		$(INCS)
+setstr_prime.o:		setstr_prime.cc		setstr.h	$(INCS)
+setstr_ext.o:		setstr_ext.cc		setstrx.hh	$(INCS)
 
 # set-ordered-strings
-setostr_rime.o:		setostr_prime.cc	setostr.h		$(INCS)
-setostr_ext.o:		setostr_ext.cc		setstrx.hh		$(INCS)
+setostr_rime.o:		setostr_prime.cc	setostr.h	$(INCS)
+setostr_ext.o:		setostr_ext.cc		setstrx.hh	$(INCS)
 
 setint.o:		setint.cc setint.h			$(INCS)
 
 setoint.o:		setoint.cc setoint.h			$(INCS)
 
-sethand.o:		sethand.ccm retstat.ccm			$(INCS)
-	makemodule retstat
+sethand.o:		sethand.ccm				$(INCS)
 	makemodule sethand
 
 # SETSTRX
