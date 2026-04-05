@@ -165,11 +165,6 @@ extern int	mailmsg_loadline(MAILMSG *,cchar *,int) ;
 
 extern int	hdrextid(char *,int,cchar *,int) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 
 /* external variables */
 
@@ -1172,7 +1167,7 @@ static int procmsghdr_received(PROGINFO *pip,PROCDATA *pdp)
 	                } else if (j == received_keyfor) {
 
 			    sp = sabuf ;
-	                    rs = mkbestaddr(sabuf,salen,rp,rl) ;
+	                    rs = mkaddrbest(sabuf,salen,rp,rl) ;
 
 	                } /* end if (special handling cases) */
 
