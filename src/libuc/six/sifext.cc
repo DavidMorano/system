@@ -44,9 +44,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<strn.h>		/* |strnrchr(3uc)| */
 #include	<matstr.h>
 #include	<localmisc.h>
@@ -55,7 +53,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -80,10 +78,9 @@ import libutil ;
 
 /* exported subroutines */
 
-int sifext(cchar *fp,int fl,mainv exts) noex {
+int sifext(cchar *fp,int µfl,mainv exts) noex {
 	int		si = -1 ;
-	if (fp && exts) ylikely {
-	    if (fl < 0) fl = lenstr(fp) ;
+	if (int fl ; exts && ((fl = getlenstr(fp,µfl)) >= 0)) {
 	    if (cchar *tp ; (tp = strnrchr(fp,fl,'.')) != nullptr) {
 	        cint	el = intconv((fp + fl) - (tp + 1)) ;
 	        cchar	*ep = (tp + 1) ;
@@ -91,7 +88,7 @@ int sifext(cchar *fp,int fl,mainv exts) noex {
 	    	    si = intconv(tp - fp) ;
 	        }
 	    } /* end if (had extension) */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return si ;
 }
 /* end subroutine (sifext) */
