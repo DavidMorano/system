@@ -196,7 +196,7 @@ export {
 	    count	(this,mapblockmem_count) ;
 	} ; /* end ctor) */
 	destruct mapblock() {
-	    if (mp) {
+	    if (mp) ylikely {
 	        delete mp ;
 		mp = nullptr ;
 	    }
@@ -208,7 +208,7 @@ export {
     template<typename K,typename B> int mapblock<K,B>::istart(int n) noex {
 	typedef decltype(std::nothrow)	nothrow_t ;
 	int		rs = SR_INVALID ;
-	if (n >= 0) {
+	if (n >= 0) ylikely {
 	    rs = SR_NOMEM ;
 	    try {
 		const nothrow_t		nt = std::nothrow ;
@@ -219,23 +219,25 @@ export {
 	    } catch (...) {
 		rs = SR_NOMEM ;
 	    }
-	}
+	} /* end if (valid) */
 	return rs ;
     } /* end method (mapblock::istart) */
+
     template<typename K,typename B> int mapblock<K,B>::ifinish() noex {
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
+	if (mp) ylikely {
 	    delete mp ;
 	    mp = nullptr ;
 	    rs = SR_OK ;
 	}
 	return rs ;
-    } /* end method */
+    } /* end method (mapblock::ifinish) */
+
     template<typename K,typename B>
     int mapblock<K,B>::ins(K k,const B &v) noex {
 	typedef	typename maptype::iterator	mit_t ;
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
+	if (mp) ylikely {
 	    rs = SR_OK ;
 	    try {
 	        std::pair<mit_t,bool>	r = mp->insert({k,v}) ;
@@ -245,11 +247,12 @@ export {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-    } /* end method (mapblock::ifinish) */
+    } /* end method (mapblock::ins) */
+
     template<typename K,typename B> int mapblock<K,B>::rem(K k) noex {
 	typedef typename maptype::size_type	mitsize_t ;
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
+	if (mp) ylikely {
 	    rs = SR_OK ;
 	    try {
 	        mitsize_t	r = mp->erase(k) ;
@@ -259,23 +262,25 @@ export {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-    } /* end method */
+    } /* end method (mapblock::rem) */
+
     template<typename K,typename B> int mapblock<K,B>::present(K &k) noex {
 	typedef typename maptype::iterator	mit_t ;
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
+	if (mp) ylikely {
 	    const mit_t	itend = mp->end() ;
 	    mit_t	it = mp->find(k) ;
 	    rs = (it != itend) ? SR_OK : SR_NOENT ;
 	} /* end if (non-null) */
 	return rs ;
-    } /* end method */
+    } /* end method (mapblock::present) */
+
     template<typename K,typename B> int mapblock<K,B>::get(K k,B *vp) noex {
 	typedef typename maptype::iterator	mit_t ;
 	int		rs = SR_FAULT ;
-	if (vp) {
+	if (vp) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (mp) {
+	    if (mp) ylikely {
 	        typedef typename maptype::value_type	v_t ;
 	        const mit_t		it_end = mp->end() ;
 	        const mit_t		it = mp->find(k) ;
@@ -288,14 +293,16 @@ export {
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return rs ;
-    }
+    } /* end method (mapblock<K,B>::get) */
+
     template<typename K,typename B> int mapblock<K,B>::icount() noex {
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
+	if (mp) ylikely {
 	    rs = intconv(mp->size()) ;
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (mapblock::icount) */
+
     template<typename K,typename B>
     int mapblock_co<K,B>::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
