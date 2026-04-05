@@ -197,7 +197,7 @@ int envlist_add(envlist *op,cchar *sp,int sl) noex {
 	if (op && sp) ylikely {
 	    EL_DBDATA	key ;
 	    EL_DBDATA	val ;
-	    int			kl ;
+	    int		kl ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    kl = sl ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
@@ -229,7 +229,7 @@ int envlist_present(envlist *op,cchar *sp,int sl,cchar **rpp) noex {
 	if (op && sp) ylikely {
 	    EL_DBDATA	key ;
 	    EL_DBDATA	val{} ;
-	    int			kl = 0 ;
+	    int		kl = 0 ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    kl += sl ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
@@ -276,7 +276,7 @@ local int envlist_storer(envlist *op) noex {
 		if (rs < 0) {
 		    lm_free(op->store) ;
 		    op->store = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
