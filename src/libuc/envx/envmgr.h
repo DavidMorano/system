@@ -26,14 +26,14 @@
 #include	<vechand.h>
 
 
-#define	ENVMGR_MAGIC	0x58261222
 #define	ENVMGR		struct envmgr_head
+#define	ENVMGR_MAGIC	0x58261222
 
 
 struct envmgr_head {
 	vechand		*listp ;
 	vecstr		*strp ;
-} ;
+} ; /* end struct (envmgr_head) */
 
 typedef ENVMGR		envmgr ;
 
