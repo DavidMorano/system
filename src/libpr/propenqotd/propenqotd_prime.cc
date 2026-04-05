@@ -57,6 +57,7 @@
 #include	<fcntl.h>
 #include	<netdb.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
