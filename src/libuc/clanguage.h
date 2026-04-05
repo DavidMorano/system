@@ -118,6 +118,12 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
+#ifndef	neg
+#define	neg			-
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 #ifndef	destruct		
 #define	destruct		compl
 #endif
