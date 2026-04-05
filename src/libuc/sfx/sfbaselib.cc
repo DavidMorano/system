@@ -43,15 +43,15 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strncmp(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<estrings.h>
+#include	<usysbase.h>
+#include	<strn.h>		/* |strnrchr(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
