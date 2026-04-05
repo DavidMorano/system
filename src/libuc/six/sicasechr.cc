@@ -44,13 +44,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<nleadstr.h>
 #include	<toxc.h>		/* |tobc(3u)| + |tolc(3u)| + ... */
 #include	<mkchar.h>
-#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"sicasechr.h"
@@ -90,7 +87,7 @@ extern "C" {
 /* forward references */
 
 template<toxc_f toxc>
-static int sixchr(cchar *sp,int sl,int sch) noex {
+local int sixchr(cchar *sp,int sl,int sch) noex {
 	int		i = 0 ; /* used-afterwards */
 	bool		f = false ;
 	if (sp) ylikely {
