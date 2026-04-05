@@ -32,7 +32,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<sfx.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"envmgr.h"
