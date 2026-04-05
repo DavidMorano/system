@@ -50,6 +50,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
@@ -60,7 +61,7 @@
 #include	<nulstr.h>
 #include	<strwcpy.h>
 #include	<matkeystr.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -149,18 +150,18 @@ int envhelp_start(envhelp *op,mainv envbads,mainv envv) noex {
 	if ((rs = envhelp_ctor(op)) >= 0) ylikely {
 	    cint	vn = NENVS ;
 	    if ((rs = vechand_start(op->elp,vn,vo)) >= 0) ylikely {
-	        cint	size = DEFENVSTORESIZE ;
-	        if ((rs = strpack_start(op->spp,size)) >= 0) ylikely {
-		    if (envv != nullptr) {
+	        cint	sz = DEFENVSTORESIZE ;
+	        if ((rs = strpack_start(op->spp,sz)) >= 0) ylikely {
+		    if (envv) {
 	    	        rs = envhelp_copy(op,envbads,envv) ;
 		    }
 	            if (rs < 0) {
 		        strpack_finish(op->spp) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (strpack_start) */
 	        if (rs < 0) {
 		    vechand_finish(op->elp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (vechand_start) */
 	    if (rs < 0) {
 		envhelp_dtor(op) ;
@@ -348,7 +349,7 @@ int envhelp::getvec(mainv *rp) noex {
 }
 
 void envhelp::dtor() noex {
-	if (cint rs = int(finish) ; rs < 0) {
+	if (cint rs = finish ; rs < 0) {
 	    ulogerror("envhelp",rs,"fini-finish") ;
 	}
 }
