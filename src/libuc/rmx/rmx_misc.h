@@ -28,8 +28,8 @@
 
 EXTERNC_begin
 
-extern int	rmext(cchar *,int) noex ;
-extern int	rmcomment(cchar *,int) noex ;
+extern int	rmext		(cchar *,int) noex ;
+extern int	rmcomment	(cchar *,int) noex ;
 
 EXTERNC_end
 
