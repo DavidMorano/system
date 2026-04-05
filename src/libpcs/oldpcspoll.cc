@@ -33,8 +33,8 @@
 
 	Synopsis:
 	int pcspoll(pr,searchname,csp,sp)
-	const char	pr[] ;
-	const char	searchname[] ;
+	cchar	pr[] ;
+	cchar	searchname[] ;
 	PCSCONF		*csp ;
 	VECSTR		*sp ;
 
@@ -66,6 +66,7 @@
 #include	<bfile.h>
 #include	<sbuf.h>
 #include	<vecstr.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"pcsconf.h"
@@ -109,38 +110,12 @@ import uconstants ;			/* |sysword(3u)| */
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	findfilepath(const char *,char *,const char *,int) ;
-extern int	bopenroot(bfile *,const char *,const char *,char *,
-			const char *,int) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strbasename(char *) ;
-
-#if	CF_DEBUGS
-extern char	*timestr_log(time_t,char *) ;
-#endif
+extern int	prgetprogpath(cchar *,char *,cchar *,int) noex;
 
 
 /* external variables */
 
-extern const char	**environ ;
+extern cchar	**environ ;
 
 
 /* local structures */
@@ -148,18 +123,11 @@ extern const char	**environ ;
 
 /* forward references */
 
-static int	matme(const char *,const char *,const char **,const char **) ;
-static int	checkstamp(const char *,const char *,int) ;
+local int	matme(cchar *,cchar *,cchar **,cchar **) noex;
+local int	checkstamp(cchar *,cchar *,int) noex;
 
 
 /* local variables */
-
-static const char *configkeys[] = {
-	"timestamp",
-	"mincheck",
-	"pidmutex",
-	NULL
-} ;
 
 enum configukeys {
 	configkey_timestamp,
@@ -168,7 +136,14 @@ enum configukeys {
 	configkey_overlast
 } ;
 
-static const char *envok[] = {
+constexpr cpcchar	configkeys[] = {
+	"timestamp",
+	"mincheck",
+	"pidmutex",
+	NULL
+} ;
+
+constexpr cpcchar	envok[] = {
 	"HZ",
 	"TZ",
 	"USERNAME",
@@ -188,12 +163,14 @@ static const char *envok[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
 int pcspoll(pr,searchname,csp,setp)
-const char	pr[] ;
-const char	searchname[] ;
+cchar	pr[] ;
+cchar	searchname[] ;
 PCSCONF		*csp ;
 vecstr		*setp ;
 {
@@ -211,7 +188,7 @@ vecstr		*setp ;
 	int	f_pr ;
 	int	f_polled = FALSE ;
 
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 	char	pcsconfbuf[PCSCONF_LEN + 2] ;
 	char	stampfname[MAXPATHLEN + 2] ;
@@ -303,7 +280,7 @@ vecstr		*setp ;
 	    int		kl ;
 	    int		val ;
 
-	    const char	*kp, *vp ;
+	    cchar	*kp, *vp ;
 
 
 	    for (i = 0 ; vecstr_get(setp,i,&sp) >= 0 ; i += 1) {
@@ -516,8 +493,8 @@ vecstr		*setp ;
 #endif /* CF_DEBUGS */
 
 		if (rs >= 0) {
-		    const char	**av = (const char **) args.va ;
-		    const char	**av = (const char **) envs.va ;
+		    cchar	**av = (cchar **) args.va ;
+		    cchar	**av = (cchar **) envs.va ;
 
 #if	CF_ISAEXEC && defined(SOLARIS) && (SOLARIS >= 8)
 	        rs = uc_isaexecve(execfname,av,ev) ;
@@ -560,10 +537,10 @@ ret0:
 
 
 /* does a key match my search name? */
-static int matme(key,ts,kpp,vpp)
-const char	key[] ;
-const char	ts[] ;
-const char	**kpp, **vpp ;
+local int matme(key,ts,kpp,vpp)
+cchar	key[] ;
+cchar	ts[] ;
+cchar	**kpp, **vpp ;
 {
 	char	*cp2, *cp3 ;
 
@@ -592,9 +569,9 @@ const char	**kpp, **vpp ;
 
 
 /* check the program time stamp file for need of processing or not */
-static int checkstamp(pr,stampfname,mintime)
-const char	pr[] ;
-const char	stampfname[] ;
+local int checkstamp(pr,stampfname,mintime)
+cchar	pr[] ;
+cchar	stampfname[] ;
 int		mintime ;
 {
 	ustat	sb ;
