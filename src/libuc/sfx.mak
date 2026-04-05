@@ -1,4 +1,4 @@
-# MAKEFILES (sfx)
+# MAKEFILE (sfx)
 
 T= sfx
 
@@ -188,5 +188,10 @@ sfnext.o:		sfnext.cc	sfnext.h		$(INCS)
 sfnextqtok.o:		sfnextqtok.cc	sfnext.h		$(INCS)
 sfweirdo:		sfweirdo.cc	sfweirdo.h		$(INCS)
 sfcasesub.o:		sfcasesub.cc	sfcasesub.h		$(INCS)
+
+sfbasename.o:		sfbasename.cc	sfxname.h		$(INCS)
+sfdirname.o:		sfdirname.cc	sfxname.h		$(INCS)
+sfprogname.o:		sfprogname.cc	sfxname.h		$(INCS)
+sfrootname.o:		sfrootname.cc	sfxname.h		$(INCS)
 
 
