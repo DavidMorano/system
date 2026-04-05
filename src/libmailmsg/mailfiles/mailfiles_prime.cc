@@ -28,6 +28,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |memset(3c)| */
