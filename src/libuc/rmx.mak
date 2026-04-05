@@ -40,12 +40,12 @@ MODS +=
 LIBS +=
 
 
-OBJ0= rmx_prime.o
-OBJ1=
+OBJ0= rmx_chr.o rmx_class.o rmx_misc.o
+OBJ1= rmleadzero.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 
 OBJ= obja.o
 
@@ -146,6 +146,10 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-rmx_prime.o:		rmx_prime.cc				$(INCS)
+rmx_chr.o:		rmx_chr.cc	rmx_chr.h		$(INCS)
+rmx_class.o:		rmx_class.cc	rmx_class.h		$(INCS)
+rmx_misc.o:		rmx_misc.cc	rmx_misc.h		$(INCS)
+
+rmleadzero.o:		rmleadzero.cc	rmleadzero.h		$(INCS)
 
 
