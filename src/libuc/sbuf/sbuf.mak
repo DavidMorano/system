@@ -1,4 +1,4 @@
-# MAKEFILES (sbuf)
+# MAKEFILE (sbuf)
 
 T= sbuf
 
