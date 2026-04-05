@@ -28,7 +28,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/uio.h>		/* |IOVEC| */
 #include	<sys/socket.h>		/* |MSHGDR| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -54,13 +55,16 @@
 /* exported subroutines */
 
 int msghdr_size(MSGHDR *mhp) noex {
-	IOVEC		*vlp = mhp->msg_iov ;
-	int		vll = mhp->msg_iovlen ;
+    	int		rs = SR_FAULT ;
 	int		sz = 0 ;
-	for (int i = 0 ; i < vll ; i += 1) {
-	   sz += vlp->iov_len ;
-	}
-	return sz ;
+	if (mhp) {
+	    IOVEC	*vlp = mhp->msg_iov ;
+	    int		vll = mhp->msg_iovlen ;
+	    for (int i = 0 ; i < vll ; i += 1) {
+	       sz += intconv(vlp->iov_len) ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (msghdr_size) */
 
