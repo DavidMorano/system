@@ -46,17 +46,17 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<ascii.h>		/* |CH_{xx}| */
-#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -72,7 +72,7 @@ import libutil ;
 
 /* forward references */
 
-static bool	isnotours(int) noex ;
+local bool	isnotours(int) noex ;
 
 
 /* local variables */
@@ -92,12 +92,12 @@ int sfsubstance(cchar *sp,int sl,cchar **rpp) noex {
 	        if (isnotours(ch)) break ;
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    while (sl > 0) {
-	        ch = mkchar(sp[sl-1]) ;
+	        ch = mkchar(sp[sl - 1]) ;
 	        if (isnotours(ch)) break ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	} else {
 	    sl = -1 ;
 	} /* end if (non-null) */
@@ -109,7 +109,7 @@ int sfsubstance(cchar *sp,int sl,cchar **rpp) noex {
 
 /* local subroutines */
 
-static bool isnotours(int ch) noex {
+local bool isnotours(int ch) noex {
 	bool		f = false ;
 	f = f || CHAR_ISWHITE(ch) ;
 	f = f || (ch == CH_DQUOTE) ;
