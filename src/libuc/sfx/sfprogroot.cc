@@ -59,9 +59,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strncmp(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"			/* |sf{x}name(3uc)| */
