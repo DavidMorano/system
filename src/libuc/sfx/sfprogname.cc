@@ -49,7 +49,7 @@
 #include	<six.h>			/* |sirchr(3uc)| */
 #include	<localmisc.h>
 
-#include	"sfx.h"			/* |sfbasename(3cu)| */
+#include	"sfxname.h"		/* |sfbasename(3uc)| */
 
 
 /* local defines */
