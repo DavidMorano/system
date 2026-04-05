@@ -47,16 +47,15 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
+#include	<usysbase.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
