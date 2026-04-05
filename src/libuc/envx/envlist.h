@@ -32,7 +32,7 @@
 struct envlist_head {
 	hdb		*elp ;
 	void		*store ;	/* <- this is a STRPACK object */
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum envlistmems {
@@ -40,7 +40,7 @@ enum envlistmems {
 	envlistmem_count,
 	envlistmem_finish,
 	envlistmem_overlast
-} ;
+} ; /* end enum */
 struct envlist ;
 struct envlist_co {
 	envlist		*op = nullptr ;
