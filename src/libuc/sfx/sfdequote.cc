@@ -42,18 +42,20 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<ascii.h>		/* |CH_{xx}| */
-#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<char.h>		/* |CHAR_ISHWITE(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	ISWHT(c)	CHAR_ISWHITE(c)
 
 
 /* external subroutines */
