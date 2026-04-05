@@ -21,7 +21,17 @@
 	sialpha
 	sialnum
 	sidigit
-	sixdigit
+	sidigex
+	sioctal
+	siwhite
+	siblank
+
+	Aliases:
+	sidig
+	sioct
+	sidec
+	sihex
+	siwht
 
 	Description:
 	This subroutine searchs for a character belonging to a
@@ -33,7 +43,10 @@
 	int sialpha(cchar *sp,int sl) noex
 	int sialnum(cchar *sp,int sl) noex
 	int sidigit(cchar *sp,int sl) noex
-	int sixdigit(cchar *sp,int sl) noex
+	int sidigex(cchar *sp,int sl) noex
+	int sioctal(cchar *sp,int sl) noex
+	int siwhite(cchar *sp,int sl) noex
+	int siblank(cchar *sp,int sl) noex
 
 	Arguments:
 	sp	string to be examined
@@ -49,9 +62,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<ischarx.h>		/* |is{x}latin(3u)| */
 #include	<localmisc.h>
@@ -83,14 +94,13 @@ extern "C" {
 
 /* forward references */
 
-static int sichar(ischr_f ischr,cchar *sp,int sl) noex {
+local int sichar(ischr_f ischr,cchar *sp,int sl) noex {
 	int		i = 0 ; /* used-afterwards */
 	bool		f = false ;
 	if (sp) ylikely {
 	    for (i = 0 ; sl && sp[i] ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;
-	        f = ischr(ch) ;
-	        if (f) break ;
+	        if ((f = ischr(ch))) break ;
 	        sl -= 1 ;
 	    } /* end for */
 	} /* end if (non-null) */
@@ -118,8 +128,20 @@ int sidigit(cchar *sp,int sl) noex {
     	return sichar(isdigitlatin,sp,sl) ;
 } /* end subroutine (sidigit) */
 
-int sixdigit(cchar *sp,int sl) noex {
-    	return sichar(ishexlatin,sp,sl) ;
-} /* end subroutine (sixdigit) */
+int sidigex(cchar *sp,int sl) noex {
+    	return sichar(isdigexlatin,sp,sl) ;
+} /* end subroutine (sidigex) */
+
+int sioctal(cchar *sp,int sl) noex {
+    	return sichar(isoctallatin,sp,sl) ;
+} /* end subroutine (sioctal) */
+
+int siwhite(cchar *sp,int sl) noex {
+    	return sichar(iswhitelatin,sp,sl) ;
+} /* end subroutine (siwhite) */
+
+int siblank(cchar *sp,int sl) noex {
+    	return sichar(isblanklatin,sp,sl) ;
+} /* end subroutine (siblank) */
 
 
