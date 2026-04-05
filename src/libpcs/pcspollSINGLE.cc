@@ -21,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	pcspoll
+
+  	Description:
 	This subroutine is called by PCS programs. This may initiate
 	an invocation of the PCSPOLL program. Some quickie checks
 	are made here first before calling that program in order
@@ -28,22 +32,19 @@
 	invoked unnecessarily.
 
 	Synopsis:
-
 	int pcspoll(pr,searchname,csp,sp)
-	const char	pr[] ;
-	const char	searchname[] ;
+	cchar	pr[] ;
+	cchar	searchname[] ;
 	PCSCONF		*csp ;
 	VECSTR		*sp ;
 
 	Arguments:
-
 	pr		PCS system program root (if available)
 	searchname	name to use as program search-name
 	csp		pointer to a PCSCONF block (if available)
 	sp		pointer to VECSTR object of the 'set's (if available)
 
 	Returns:
-
 	>=0		OK
 	<0		error (system-return)
 
@@ -65,6 +66,7 @@
 #include	<bfile.h>
 #include	<sbuf.h>
 #include	<vecstr.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"pcsconf.h"
@@ -108,38 +110,10 @@ import uconstants ;			/* |sysword(3u)| */
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	findfilepath(const char *,char *,const char *,int) ;
-extern int	bopenroot(bfile *,const char *,const char *,char *,
-			const char *,int) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strbasename(char *) ;
-
-#if	CF_DEBUGS
-extern char	*timestr_log(time_t,char *) ;
-#endif
-
 
 /* external variables */
 
-extern const char	**environ ;
+extern cchar	**environ ;
 
 
 /* local structures */
@@ -147,18 +121,11 @@ extern const char	**environ ;
 
 /* forward references */
 
-static int	matme(const char *,const char *,const char **,const char **) ;
-static int	checkstamp(const char *,const char *,int) ;
+local int	matme(cchar *,cchar *,cchar **,cchar **) noex ;
+local int	checkstamp(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
-
-static const char *configkeys[] = {
-	"timestamp",
-	"mincheck",
-	"pidmutex",
-	NULL
-} ;
 
 enum configukeys {
 	configkey_timestamp,
@@ -167,7 +134,14 @@ enum configukeys {
 	configkey_overlast
 } ;
 
-static const char *envok[] = {
+constexpr cpcchar	configkeys[] = {
+	"timestamp",
+	"mincheck",
+	"pidmutex",
+	nullptr
+} ;
+
+constexpr cpcchar	envok[] = {
 	"HZ",
 	"TZ",
 	"USERNAME",
@@ -183,16 +157,18 @@ static const char *envok[] = {
 	"MAILNAME",
 	"ORGANIZATION",
 	"PCS",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
 int pcspoll(pr,searchname,csp,setp)
-const char	pr[] ;
-const char	searchname[] ;
+cchar	pr[] ;
+cchar	searchname[] ;
 PCSCONF		*csp ;
 vecstr		*setp ;
 {
@@ -210,7 +186,7 @@ vecstr		*setp ;
 	int	f_pr ;
 	int	f_polled = FALSE ;
 
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 	char	pcsconfbuf[PCSCONF_LEN + 2] ;
 	char	stampfname[MAXPATHLEN + 2] ;
@@ -225,16 +201,16 @@ vecstr		*setp ;
 /* our program (PCS) root */
 
 	f_pr = TRUE ;
-	if (pr == NULL) {
+	if (pr == nullptr) {
 
 	    f_pr = FALSE ;
-	    if (csp != NULL)
+	    if (csp != nullptr)
 	        pr = csp->pr ;
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = getenv(VARPRPCS) ;
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = PCSCONF_PCS ;
 
 	} /* end if */
@@ -244,15 +220,15 @@ vecstr		*setp ;
 #endif
 
 #if	CF_DAMAGED
-	if (searchname != NULL) {
+	if (searchname != nullptr) {
 	    uint	uch = searchname[0] ;
 	    if (uch >= 128)
-		searchname = NULL ;
+		searchname = nullptr ;
 	}
 #endif /* CF_DAMAGED */
 
 	f_searchname = TRUE ;
-	if ((searchname == NULL) || (searchname[0] == '\0')) {
+	if ((searchname == nullptr) || (searchname[0] == '\0')) {
 		f_searchname = FALSE ;
 		searchname = PCSPOLL_SEARCHNAME ;
 	}
@@ -278,35 +254,35 @@ vecstr		*setp ;
 /* we really need that list of 'set' variables in PCSCONF! */
 
 	f_localsets = FALSE ;
-	if (setp == NULL) {
+	if (setp == nullptr) {
 
 	    rs = vecstr_start(&sets,10,0) ;
 	    if (rs < 0)
 	        goto ret0 ;
 
 	    f_localsets = TRUE ;
-	    rs = pcsconf(pr,NULL,&pc,&sets,NULL,pcsconfbuf,PCSCONF_LEN) ;
+	    rs = pcsconf(pr,nullptr,&pc,&sets,nullptr,pcsconfbuf,PCSCONF_LEN) ;
 	    if (rs < 0)
 	        goto ret1 ;
 
 	    setp = &sets ;
 
-	} /* end if (given NULL sets) */
+	} /* end if (given nullptr sets) */
 
 /* get the values we want from the PCSCONF sets */
 
 	pidfname[0] = '\0' ;
 	stampfname[0] = '\0' ;
-	if (setp != NULL) {
+	if (setp != nullptr) {
 
 	    int		kl ;
 	    int		val ;
 
-	    const char	*kp, *vp ;
+	    cchar	*kp, *vp ;
 
 
 	    for (i = 0 ; vecstr_get(setp,i,&sp) >= 0 ; i += 1) {
-	        if (sp == NULL) continue ;
+	        if (sp == nullptr) continue ;
 
 #if	CF_DEBUGS
 	        debugprintf("pcspoll: PCSCONF set=>%s<\n",sp) ;
@@ -447,7 +423,7 @@ vecstr		*setp ;
 	        if (progfname[0] == '\0') {
 
 	            execfname = tmpfname ;
-	            rs = findfilepath(NULL,tmpfname,PCSPOLL_PROGRAM,X_OK) ;
+	            rs = findfilepath(nullptr,tmpfname,PCSPOLL_PROGRAM,X_OK) ;
 
 	        } /* end if */
 
@@ -481,9 +457,9 @@ vecstr		*setp ;
 #endif
 
 		cp = VARPRPCS ;
-	        if (environ != NULL) {
+	        if (environ != nullptr) {
 
-	            for (i = 0 ; environ[i] != NULL ; i += 1) {
+	            for (i = 0 ; environ[i] != nullptr ; i += 1) {
 
 	                if (matkeystr(envok,environ[i],-1) >= 0)
 	                    rs = vecstr_add(&envs,environ[i],-1) ;
@@ -493,7 +469,7 @@ vecstr		*setp ;
 
 	            } /* end for */
 
-	            if (vecstr_finder(&envs,cp,vstrkeycmp,NULL) < 0)
+	            if (vecstr_finder(&envs,cp,vstrkeycmp,nullptr) < 0)
 	                vecstr_envadd(&envs,cp,pr,-1) ;
 
 	        } else
@@ -512,13 +488,13 @@ vecstr		*setp ;
 #if	CF_DEBUGS
 	        debugprintf("pcspoll: u_execve()\n") ;
 	        debugprintf("pcspoll: execfname=%s\n",execfname) ;
-		for (i = 0 ; envs.va[i] != NULL ; i += 1)
+		for (i = 0 ; envs.va[i] != nullptr ; i += 1)
 	        	debugprintf("pcspoll: env[%02u] %s\n",i,envs.va[i]) ;
 #endif /* CF_DEBUGS */
 
 		if (rs >= 0) {
-		    const char	**av = (const char **) args.va ;
-		    const char	**av = (const char **) envs.va ;
+		    cchar	**av = (cchar **) args.va ;
+		    cchar	**av = (cchar **) envs.va ;
 
 #if	CF_ISAEXEC && defined(SOLARIS) && (SOLARIS >= 8)
 	        rs = uc_isaexecve(execfname,av,ev) ;
@@ -561,27 +537,27 @@ ret0:
 
 
 /* does a key match my search name? */
-static int matme(key,ts,kpp,vpp)
-const char	key[] ;
-const char	ts[] ;
-const char	**kpp, **vpp ;
+local int matme(key,ts,kpp,vpp)
+cchar	key[] ;
+cchar	ts[] ;
+cchar	**kpp, **vpp ;
 {
 	char	*cp2, *cp3 ;
 
 
-	if ((cp2 = strchr(ts,'=')) == NULL)
+	if ((cp2 = strchr(ts,'=')) == nullptr)
 	    return -1 ;
 
-	if (vpp != NULL)
+	if (vpp != nullptr)
 	    *vpp = cp2 + 1 ;
 
-	if ((cp3 = strchr(ts,':')) == NULL)
+	if ((cp3 = strchr(ts,':')) == nullptr)
 	    return -1 ;
 
 	if (cp3 > cp2)
 	    return -1 ;
 
-	if (kpp != NULL)
+	if (kpp != nullptr)
 	    *kpp = cp3 + 1 ;
 
 	if (strncmp(ts,key,(cp3 - ts)) != 0)
@@ -591,24 +567,18 @@ const char	**kpp, **vpp ;
 }
 /* end subroutine (matme) */
 
-
 /* check the program time stamp file for need of processing or not */
-static int checkstamp(pr,stampfname,mintime)
-const char	pr[] ;
-const char	stampfname[] ;
+local int checkstamp(pr,stampfname,mintime)
+cchar	pr[] ;
+cchar	stampfname[] ;
 int		mintime ;
 {
 	ustat	sb ;
-
 	bfile	tsfile ;
-
 	time_t	daytime ;
-
 	int	rs ;
 	int	f_process = TRUE ;
-
 	char	outfname[MAXPATHLEN + 2] ;
-
 
 #if	CF_DEBUGS
 	debugprintf("checkstamp: ent mintime=%d\n",mintime) ;
@@ -616,7 +586,7 @@ int		mintime ;
 
 	if ((rs = bopenroot(&tsfile,pr,stampfname,outfname, "r",0666)) >= 0) {
 	    f_process = FALSE ;
-	    daytime = time(NULL) ;
+	    daytime = time(nullptr) ;
 
 	    bcontrol(&tsfile,BC_STAT,&sb) ;
 
