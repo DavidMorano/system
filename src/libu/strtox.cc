@@ -88,21 +88,22 @@
 	Q. Why are you using these old weirdo UNIX® standard
 	C-language library subroutine function signatures?
 
-	A. Because before the CTX subroutines (in the LIBUC) lobrary
-	are available, I need some local subroutines (here within
-	the LIBU library) to perform some of these conversions.
-	Although |strtol(3c)| and |strtoul(3c)| are generally
-	available across all UNIXi implementations (and are called
-	directly below for much of the provided interfaces), the
-	standard C-language library does not supply any of: |strtoi|,
-	|strtoui|, |strtoll|, |strtoull|, |strtoim| or |strtouim|.
-	I leverage the fact that |strtol| and |strtoul| were already
-	written to provide conversion for types smaller than a
-	|long| and |ulong|.  But for the integers sized larger than
-	that (128-bit and larger), I had to write compatible (similar
-	function signature and semantic) subroutines from scratch,
-	since there are no simple standard lirbary calls that are
-	avilable in regular C-language that could be used.
+	A. Because before the CTX subroutines (in the LIBUC) library
+	are available (in a code load sequence), I need some local
+	subroutines (here within the LIBU library) to perform some
+	of these conversions.  Although |strtol(3c)| and |strtoul(3c)|
+	are generally available across all UNIXi implementations
+	(and are called directly below for much of the provided
+	interfaces), the standard C-language library does not supply
+	any of: |strtoi|, |strtoui|, |strtoll|, |strtoull|, |strtoim|
+	or |strtouim|.  I leverage the fact that |strtol| and
+	|strtoul| were already written to provide conversion for
+	types smaller than a |long| and |ulong|.  But for the
+	integers sized larger than that (128-bit and larger), I had
+	to write compatible (similar function signature and semantic)
+	subroutines from scratch, since there are no simple standard
+	lirbary calls that are avilable in regular C-language that
+	could be used.
 
 	Q. Are subroutine converters availble now for 256-bit and
 	512-bit integers?
@@ -135,19 +136,19 @@
 	(signed and unsigned)?
 
 	A. I use the "cutoff-curlim" algorithm; the same is used
-	almost in all (known) UNIXi (or POSIXi) uses.
+	in all (known) current UNIXi (or POSIXi) implementations.
 
 	Q. Do you optimize even-power-of-two bases for faster
 	conversions.
 
 	A. No.  Often (usually), the fastest algorithms (for anything)
-	is not in this library (LIBU) but rather in higher-level
+	are not in this library (LIBU) but rather in higher-level
 	libraries (LIBUC and higher).
 
 	Q. Do you provide conversions for integer types smaller than
 	a 32-bit integer?
 
-	A. No.  Use a conversion foe a 32-bit integer and cast the
+	A. No.  Use a conversion for a 32-bit integer and cast the
 	result as you like.
 
 	Q. What number bases are supported?
@@ -160,7 +161,7 @@
 	Q. Have you written enough of these "number conversion"
 	functions yet?
 
-	A. Apparently not.  This may be my last one.
+	A. Apparently not.  But this may be my last one.
 
 *******************************************************************************/
 
@@ -171,7 +172,7 @@
 #include	<cstdlib>		/* |strtol(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<usupport.h>
+#include	<usupport.h>		/* |getsign(3u)| */
 #include	<stdintx.h>
 #include	<localmisc.h>
 #include	<dprintf.hh>		/* debugging */
@@ -339,6 +340,7 @@ namespace {
 	virtual void cookprep()	noex = 0 ;
 	virtual void cvt(int)	noex = 0 ;
 	virtual void negator()	noex { } ;
+	virtual void reterr()	noex = 0 ;
     } ; /* end struct */
 } /* end namespace */
 
@@ -352,6 +354,7 @@ namespace {
 	void cvt(int)		noex override final ;
 	void cvtpos(int)	noex ;
 	void cvtneg(int)	noex ;
+	void reterr()		noex override final ;
     } ; /* end struct */
     struct strer_unsll : strer { /* "unsigned-longlong" */
 	ulonglong	ures{} ;
@@ -361,6 +364,7 @@ namespace {
 	void cookprep()		noex override final ;
 	void cvt(int)		noex override final ;
 	void negator()		noex override final ;
+	void reterr()		noex override final ;
     } ; /* end struct */
 } /* end namespace */
 
@@ -480,7 +484,7 @@ long strtoxl(cchar *sp,char **epp,int b) noex {
 longlong strtoxll(cchar *startp,char **endpp,int base) noex {
     	strer_sigll so(startp,endpp,base) ;
 	return so ;
-} /* end subroutine (strtoxoll) */
+} /* end subroutine (strtoxll) */
 
 uint strtoxui(cchar *sp,char **epp,int b) noex {
 	uint		ures{} ;
@@ -502,12 +506,12 @@ ulong strtoxul(cchar *sp,char **epp,int b) noex {
 	}
 	return ures ;
 }
-/* end subroutine (strtouxl) */
+/* end subroutine (strtoxul) */
 
 ulonglong strtoxull(cchar *startp,char **endpp,int base) noex {
     	strer_unsll so(startp,endpp,base) ;
 	return so ;
-} /* end subroutine (strtoxoll) */
+} /* end subroutine (strtoxull) */
 
 
 /* local subroutines */
@@ -523,6 +527,7 @@ void strer::suber() noex {
 	    cooker() ;
 	    negator() ;
 	    ender() ;
+	    reterr() ;
 	} else {
 	    errno = EFAULT ;
 	}
@@ -586,8 +591,6 @@ void strer_sigll::cvt(int val) noex {
 void strer_sigll::cvtneg(int val) noex {
 	if (iserrneg(cutoff,cutlim,res,val)) {
 	    verr = -1 ;
-	    res = llhelp.llmin ;
-	    errno = ERANGE ;
 	} else {
 	    verr = +1 ;
 	    res *= base ;
@@ -598,14 +601,19 @@ void strer_sigll::cvtneg(int val) noex {
 void strer_sigll::cvtpos(int val) noex {
 	if (iserrpos(cutoff,cutlim,res,val)) {
 	    verr = -1 ;
-	    res = llhelp.llmax ;
-	    errno = ERANGE ;
 	} else {
 	    verr = +1 ;
 	    res *= base ;
 	    res += val ;
 	} /* end if */
 } /* end method */
+
+void strer_sigll::reterr() noex {
+    	if (verr < 0) {
+	    res = (fneg) ? llhelp.llmin : llhelp.llmax ;
+	    errno = ERANGE ;
+	}
+} /* end method (strer_sigll::reterr) */
 
 strer_unsll::operator ulonglong () noex {
     	suber() ;
@@ -620,8 +628,6 @@ void strer_unsll::cookprep() noex {
 void strer_unsll::cvt(int val) noex {
 	if (iserr(cutoff,cutlim,ures,val)) {
 	    verr = -1 ;
-	    ures = llhelp.ullmax ;
-	    errno = ERANGE ;
 	} else {
 	    verr = +1 ;
 	    ures *= base ;
@@ -631,8 +637,15 @@ void strer_unsll::cvt(int val) noex {
 
 void strer_unsll::negator() noex {
 	if (fneg && verr > 0) {
-	    ures = (- ures) ;
+	    ures = (neg ures) ;
 	}
 } /* end method (strer_unsll::negator) */
+
+void strer_unsll::reterr() noex {
+    	if (verr < 0) {
+	    ures = llhelp.ullmax ;
+	    errno = ERANGE ;
+	}
+} /* end method (strer_unsll::reterr) */
 
 
