@@ -43,6 +43,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>			/* |time_t| */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
