@@ -59,7 +59,8 @@
 #include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sbuf.h>
 #include	<snwcpy.h>
 #include	<ascii.h>
@@ -71,7 +72,9 @@
 
 #include	"mkquoted.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
