@@ -20,12 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>		/* |UCHAR_MAX| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
