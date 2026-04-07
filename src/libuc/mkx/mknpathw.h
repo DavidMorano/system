@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mknpathxw.h>
 
 #ifdef	__cplusplus
