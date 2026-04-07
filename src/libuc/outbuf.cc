@@ -34,7 +34,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<bufsizevar.hh>
 #include	<localmisc.h>
 
@@ -52,7 +55,7 @@
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* forward references */
@@ -71,9 +74,9 @@ int outbuf_start(outbuf *op,char *obuf,int olen) noex {
 	if (op && obuf) ylikely {
 	    op->obuf = nullptr ;
 	    op->olen = 0 ;
-	    op->f_alloc = false ;
+	    op->falloc = false ;
 	    rs = SR_INVALID ;
-	    if (olen != 0) {
+	    if (olen != 0) ylikely {
 	        rs = SR_OK ;
 	        op->obuf = obuf ;
 	        if (olen >= 0) {
@@ -82,7 +85,7 @@ int outbuf_start(outbuf *op,char *obuf,int olen) noex {
 		    if ((rs = maxpathlen) >= 0) {
 	               op->olen = rs ;
 		    }
-	        }
+	        } /* end if */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -94,12 +97,12 @@ int outbuf_finish(outbuf *op) noex {
 	int		rs1 ;
 	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->f_alloc && op->obuf) {
-	        rs1 = uc_free(op->obuf) ;
+	    if (op->falloc && op->obuf) ylikely {
+	        rs1 = lm_free(op->obuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->obuf = nullptr ;
 	    }
-	    op->f_alloc = false ;
+	    op->falloc = false ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -109,15 +112,15 @@ int outbuf_get(outbuf *op,cchar **onpp) noex {
 	int		rs = SR_FAULT ;
 	if (op && onpp) ylikely {
 	    rs = SR_OK ;
-	    if (op->f_alloc) {
+	    if (op->falloc) {
 	        op->obuf[0] = '\0' ;
 	        *onpp = op->obuf ;
 	    } else {
 	        if (op->obuf == nullptr) {
 		    cint	sz = (op->olen + 1) ;
-	            if (char *vp{} ; (rs = uc_valloc(sz,&vp)) >= 0) {
+	            if (char *vp ; (rs = lm_vall(sz,&vp)) >= 0) {
 	                op->obuf = vp ;
-	                op->f_alloc = true ;
+	                op->falloc = true ;
 	                op->obuf[0] = '\0' ;
 	                *onpp = op->obuf ;
 	            }
@@ -132,6 +135,10 @@ int outbuf_get(outbuf *op,cchar **onpp) noex {
 }
 /* end subroutine (outbuf_get) */
 
+int outbuf::start(char *ob,int ol) noex {
+	return outbuf_start(this,ob,ol) ;
+}
+
 int outbuf::get(cchar **rpp) noex {
 	return outbuf_get(this,rpp) ;
 }
@@ -140,11 +147,11 @@ void outbuf::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("outbuf",rs,"dtor-finish") ;
 	}
-}
+} /* end method (outbuf::dtor) */
 
 outbuf::operator int () noex {
     	return olen ;
-}
+} /* end method (outbuf::operator) */
 
 outbuf_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -156,8 +163,6 @@ outbuf_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (outbuf_co::operator) */
-
+} /* end method (outbuf_co::operator) */
 
 
