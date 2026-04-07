@@ -66,6 +66,8 @@
 #include	<utimeout.h>
 #include	<utimeouts.h>
 #include	<uxti.h>
+#include	<uchartype.h>
+#include	<ustream.hh>
 
 #include	<varnames.hh>
 #include	<syswords.hh>
@@ -78,15 +80,23 @@
 #include	<timecount.hh>
 #include	<timeval.hh>
 #include	<timespec.h>
+#include	<itimers.hh>
 #include	<itimerval.h>
 #include	<itimerspec.h>
+#include	<stdfiles.h>
 #include	<stdfnames.h>
 #include	<xxtostr.h>
 #include	<strtox.h>
 #include	<baops.h>
+#include	<mkchar.h>
+#include	<funcodes.h>
 
+#include	<stdintx.h>
 #include	<ccfile.hh>
 #include	<readln.hh>
+#include	<conintx.hh>
+#include	<udiv.hh>
+#include	<binchunk.hh>
 
 
 #endif /* USYSCALLS_INCLUDE */
