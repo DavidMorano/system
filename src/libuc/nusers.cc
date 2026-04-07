@@ -41,7 +41,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<utmpacc.h>
 #include	<localmisc.h>
 
@@ -67,7 +68,7 @@
 /* exported subroutines */
 
 int nusers() noex {
-	return utmpacc_nusers() ;
+	return utmpacc_users(0) ;
 }
 /* end subroutine (nusers) */
 
