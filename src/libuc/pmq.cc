@@ -38,13 +38,14 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<usysflag.h>
+#include	<utimeout.h>		/* |uto_{x}(3u)| */
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
-#include	<libmallocxx.h>
-#include	<mallocxx.h>
 #include        <errtimer.hh>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
@@ -52,6 +53,8 @@
 #include	<localmisc.h>
 
 #include	"pmq.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 
@@ -216,7 +219,7 @@ int pmq_open(pmq *op,cchar *name,int of,mode_t om,const pmq_attr *attr) noex {
 	int		rc = 0 ;
 	if ((rs = pmq_ctor(op,name)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		if ((rs = pmq_nameload(op,name)) >= 0) ylikely {
 		    posixhelp	po(of,om,attr) ;
 		    po.m = &posixhelp::open ;
@@ -334,7 +337,7 @@ int uc_unlinkpmq(cchar *name) noex {
 	if (name) ylikely {
 	    rs = SR_INVALID ;
 	    if (name[0]) ylikely {
-	        if (char *altname ; (rs = libmalloc_mn(&altname)) >= 0) {
+	        if (char *altname ; (rs = lm_mn(&altname)) >= 0) {
 		    cint	maxnamelen = rs ;
 	            if (name[0] != '/') {
 	                rs = sncpy(altname,maxnamelen,"/",name) ;
@@ -357,7 +360,7 @@ int uc_unlinkpmq(cchar *name) noex {
 	                    } /* end if (error) */
 	                } until ((rs >= 0) || f_exit) ;
 		    } /* end if (ok) */
-		    rs1 = libmalloc_free(altname) ;
+		    rs1 = lm_free(altname) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -395,8 +398,10 @@ static int pmq_nameload(pmq *op,cchar *name) noex {
 
 static int pmq_nameclean(pmq *op) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if (op->name) ylikely {
-	    rs = lm_free(op->name) ;
+	    rs1 = lm_free(op->name) ;
+	    if (rs >= 0) rs = rs1 ;
 	    op->name = nullptr ;
 	}
 	return rs ;
@@ -531,7 +536,7 @@ static int pmqdiradd(cchar *name,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pp = PMQ_PATHPREFIX ;
-	if (char *tbuf ; (rs = libmalloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pp,name)) >= 0) {
 	        if ((rs = u_creat(tbuf,om)) == SR_NOENT) {
 	            if ((rs = pmqdircheck(pp)) >= 0) {
@@ -540,7 +545,7 @@ static int pmqdiradd(cchar *name,mode_t om) noex {
 	        } /* end if (u_creat) */
 	        if (rs >= 0) u_close(rs) ;
 	    } /* end if (mkpath) */
-	    rs1 = libmalloc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -551,11 +556,11 @@ static int pmqdirrm(cchar *name) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pp = PMQ_PATHPREFIX ;
-	if (char *tbuf ; (rs = libmalloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath2(tbuf,pp,name)) >= 0) {
 	        rs = u_unlink(tbuf) ;
 	    }
-	    rs1 = libmalloc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -597,7 +602,7 @@ static int getpmquid(void) noex {
 	int		rs ;
 	int		rs1 ;
 	int		uid = -1 ;
-	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	    cint	pwlen = rs ;
 	    cchar	*un = PMQ_USERNAME1 ;
 	    if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,un)) >= 0) {
@@ -611,7 +616,7 @@ static int getpmquid(void) noex {
 		    uid = PMQ_UID ;
 		}
 	    } /* end if */
-	    rs1 = libmalloc_free(pwbuf) ;
+	    rs1 = lm_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? uid : rs ;
