@@ -42,13 +42,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"mkx.h"
 #include	"mkpathxx.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lensr(3u)| + |getlenstr(3u)| */
 
@@ -65,7 +66,7 @@ import libutil ;			/* |lensr(3u)| + |getlenstr(3u)| */
 
 extern "C" {
     extern int	mkpathuser(char *,cchar *,cchar *,int) noex ;
-    extern int	mkpathcd(char *,cchar *,int) noex ;
+    extern int	mkpathvar(char *,cchar *,int) noex ;
 }
 
 
@@ -93,7 +94,7 @@ int mkpathexp(char *rbuf,cchar *pp,int µpl) noex {
 	    rbuf[0] = '\0' ;
 	    if (int pl ; (pl = getlenstr(pp,µpl)) > 0) ylikely {
 	        if ((rs = mkpathuser(rbuf,nullptr,pp,pl)) == 0) ylikely {
-	            rs = mkpathcd(rbuf,pp,pl) ;
+	            rs = mkpathvar(rbuf,pp,pl) ;
 		    rl = rs ;
 		}
 	    } /* end if (getlenstr) */
