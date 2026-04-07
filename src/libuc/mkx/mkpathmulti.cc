@@ -50,11 +50,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<getbufsize.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
 #include	<bufsizevar.hh>
-#include	<getbufsize.h>
 #include	<hasx.h>
 #include	<strn.h>
 #include	<strwcpy.h>
@@ -64,7 +67,7 @@
 #include	"mkx.h"
 #include	"mkpathxx.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 
@@ -104,7 +107,7 @@ static int	mkpathmulti_join(char *,cchar *,int,cchar *) noex ;
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp,MKVARPATH_MP) ;
+static bufsizevar	maxpathlen(bufsize_mp,MKVARPATH_MP) ;
 
 
 /* exported variables */
@@ -139,7 +142,7 @@ int mkpathmulti(char *rbuf,cchar *fp,int fl) noex {
                     char    *vbuf = nullptr ; /* writable (will be) */
                     if ((cp = getenver(vp,vl)) == nullptr) {
                         if (haslc(vp,vl)) {
-                            if (char *p ; (rs = uc_malloc((vl+1),&p)) >= 0) {
+                            if (char *p ; (rs = lm_mall((vl+1),&p)) >= 0) {
                                 vbuf = p ;
                                 strwcpyuc(vbuf,vp,vl) ;
                                 cp = getenver(vbuf,vl) ;
@@ -161,7 +164,7 @@ int mkpathmulti(char *rbuf,cchar *fp,int fl) noex {
                         }
                     } /* end if */
                     if (vbuf) {
-                        uc_free(vbuf) ;
+                        lm_free(vbuf) ;
                     }
                 } else {
                     rs = SR_NOTDIR ;
