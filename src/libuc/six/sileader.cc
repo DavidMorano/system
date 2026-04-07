@@ -24,7 +24,8 @@
 	sileader
 
 	Description:
-	We retrieve the string-index into a "leader."
+	We retrieve the string-index into a 'leader' (whatever the
+	___ that is).
 
 	Synopsis:
 	int sileader(cchar *sp,int sl) noex
@@ -38,15 +39,15 @@
 	<0	call-usage-error (should not normally happen)
 
 	Notes:
-	1. 2025-06-18 -- After reviewing, Yes, this is an obscure
-	subroutine (function).  I found where it was sometimes used.
-	It is no longer used there.  Yes, as far as I know there
-	were only two places where this was used that I found (I
-	will not name names here).  Upon examining the code (a
-	little bit) it looks like this function returns a leading
-	index of the first non-white-space after skipping over a
-	string sequence started by a digit character, possibly
-	itself surrounded by white-space (which is skipped).
+	1. 2025-06-18 -- After reviewing, yes, this is an obscure
+	subroutine (function).  I found where it was sometimes used
+	(in long archived code).  It is no longer used there.  Yes,
+	as far as I know there were only two places where this was
+	used that I found (I will not name names here).  Upon
+	examining the code (a little bit) it looks like this function
+	returns a leading index of the first non-white-space after
+	skipping over a string sequence started by a digit character,
+	possibly itself surrounded by white-space (which is skipped).
 	(2025-06-18, David A­D­ Morano)
 
 *******************************************************************************/
@@ -55,9 +56,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<ischarx.h>		/* |isdigitlatin(3uc)| */
 #include	<localmisc.h>
@@ -112,11 +111,15 @@ int sileader(cchar *sp,int sl) noex {
 	                        si += siskipwhite(cp,cl) ;
 			    } /* end block */
 	                } else {
-	                    si = 0 ;
+	                    si = -1 ;
 		        }
+		    } else {
+			si = -1 ;
 	            } /* end if (is-digit) */
+	        } else {
+		    si = -1 ;
 		} /* end if (non-zero positive) */
-	    } /* end if (positive) */
+	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	return si ;
 }
