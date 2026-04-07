@@ -46,10 +46,7 @@
 #include	<cstdlib>
 #include	<bitset>		/* |bitset(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<strmgr.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
@@ -68,7 +65,6 @@ import libutil ;
 
 /* local typedefs */
 
-using std::nullptr_t ;			/* type */
 using std::bitset ;			/* type */
 
 
