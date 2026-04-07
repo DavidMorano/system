@@ -1,4 +1,4 @@
-# MAKEFILES (six)
+# MAKEFILE (six)
 
 T= six
 
@@ -58,7 +58,6 @@ OBJ= obja.o objb.o
 INCDIRS +=
 
 LIBDIRS += -L$(LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
