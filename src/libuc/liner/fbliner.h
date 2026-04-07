@@ -34,9 +34,7 @@
 #include	<sys/types.h>		/* |off_t| */
 #include	<unistd.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<filer.h>
 
 
@@ -50,7 +48,7 @@ struct fbliner_head {
 	off_t		foff ;		/* file-offset current */
 	int		to ;		/* read time-out */
 	int		llen ;
-} ;
+} ; /* end struct (fbliner_head) */
 
 #ifdef	__cplusplus
 enum fblinermems {
@@ -58,7 +56,7 @@ enum fblinermems {
 	fblinermem_adv,
 	fblinermem_finish,
 	fblinermem_overlast
-} ;
+} ; /* end enum (fblinermems) */
 struct fbliner ;
 struct fbliner_co {
 	fbliner		*op = nullptr ;
@@ -80,14 +78,15 @@ struct fbliner : fbliner_head {
 	    done(this,fblinermem_done) ;
 	    adv(this,fblinermem_adv) ;
 	    finish(this,fblinermem_finish) ;
-	} ;
+	    fbp = nullptr ;
+	} ; /* end ctor */
 	fbliner(const fbliner &) = delete ;
 	fbliner &operator = (const fbliner &) = delete ;
 	int start(filer *,off_t = 0z,int = -1) noex ;
 	int getln(cchar **) noex ;
 	void dtor() noex ;
-	~fbliner() {
-	    dtor() ;
+	destruct fbliner() {
+	    if (fbp) dtor() ;
 	} ;
 } ; /* end struct (fbliner) */
 #else	/* __cplusplus */
