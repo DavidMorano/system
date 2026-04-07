@@ -43,11 +43,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
-#include	<char.h>
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
 #include	"sileadchr.h"
@@ -57,6 +55,8 @@
 import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
+
+#define	ISW		CHAR_ISWHITE
 
 
 /* local namespaces */
@@ -79,8 +79,6 @@ import libutil ;			/* |getlenstr(3u)| */
 
 /* local variables */
 
-cauto		iswht = char_iswhite ;
-
 
 /* exported variables */
 
@@ -90,15 +88,13 @@ cauto		iswht = char_iswhite ;
 int sileadchr(cchar *sp,int µsl,int chx) noex {
 	int		i = -1 ; /* used afterwards */
 	bool		f = false ;
-	if (sp) ylikely {
-	    if (int ch, sl ; (sl = getlenstr(sp,µsl)) > 0) {
-	        for (i = 0 ; i < sl ; i += 1) {
-		    ch = mkchar(sp[i]) ;
-	            if (! iswht(ch)) break ;
-	        } /* end for */
-		f = (i < sl) && (ch == chx) ;
-	    } /* end if (getlenstr) */
-	} /* end if (non-null) */
+	if (int ch, sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
+	    for (i = 0 ; i < sl ; i += 1) {
+		ch = mkchar(sp[i]) ;
+	        if (! ISW(ch)) break ;
+	    } /* end for */
+	    f = (i < sl) && (ch == chx) ;
+	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
 }
 /* end subroutine (sileadchr) */
