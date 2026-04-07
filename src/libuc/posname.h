@@ -15,6 +15,18 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	Name:
+	posname
+	
+	Description:
+	This object module (POSNAME) creates a POSIX® entity name
+	when needed.  It does this by possibly prepending a slash
+	('/') character before the given name.
+
+*******************************************************************************/
+
 #ifndef	POSNAME_INCLUDE
 #define	POSNAME_INCLUDE
 
