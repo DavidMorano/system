@@ -43,12 +43,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getpwd.h>
-#include	<libmallocxx.h>
 #include	<mkpath.h>
 #include	<localmisc.h>
 
@@ -95,13 +92,13 @@ int mkpathrooted(char *rbuf,cchar *fn) noex {
 	    rs = SR_INVALID ;
 	    if (fn[0]) ylikely {
 	        if (fn[0] != '/') {
-	            if (char *pbuf ; (rs = libmalloc_mp(&pbuf)) >= 0) ylikely {
+	            if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
 	                cint	plen = rs ;
 	                if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
 	                    rs = mkpath(rbuf,pbuf,fn) ;
 		            rl = rs ;
 	                } /* end if (getpwd) */
-	                rs1 = libmalloc_free(pbuf) ;
+	                rs1 = lm_free(pbuf) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (rooting file) */
 	        } else {
