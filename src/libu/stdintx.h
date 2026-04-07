@@ -108,6 +108,13 @@ typedef const ulonglong *	culonglongp ;
 #endif
 
 
+#ifdef	__cplusplus
+
+extern longlong		llabs	(longlong) noex attrconst ;
+
+#endif /* __cplusplus */
+
+
 #endif /* STDINTX_INCLUDE */
 
 
