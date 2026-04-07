@@ -33,9 +33,7 @@
 #include	<sys/types.h>		/* |off_t| */
 #include	<unistd.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<filer.h>
 
 
@@ -48,7 +46,7 @@
 
 struct fdliner_flags {
 	bool		fnet ;
-} ;
+} ; /* end struct (fdliner_flags) */
 
 struct fdliner_head {
 	filer		*fbp ;		/* allocated */
@@ -59,7 +57,7 @@ struct fdliner_head {
 	int		llen ;
 	int		fbo ;
 	int		to ;		/* read time-out */
-} ;
+} ; /* end struct (fdliner_head) */
 
 #ifdef	__cplusplus
 enum fdlinermems {
@@ -67,7 +65,7 @@ enum fdlinermems {
 	fdlinermem_adv,
 	fdlinermem_finish,
 	fdlinermem_overlast
-} ;
+} ; /* end enum (fdlinermems) */
 struct fdliner ;
 struct fdliner_co {
 	fdliner		*op = nullptr ;
@@ -89,14 +87,15 @@ struct fdliner : fdliner_head {
 	    done(this,fdlinermem_done) ;
 	    adv(this,fdlinermem_adv) ;
 	    finish(this,fdlinermem_finish) ;
-	} ;
+	    fbp = nullptr ;
+	} ; /* end ctor */
 	fdliner(const fdliner &) = delete ;
 	fdliner &operator = (const fdliner &) = delete ;
 	int start(int,off_t = 0z,int = -1) noex ;
 	int getln(cchar **) noex ;
 	void dtor() noex ;
-	~fdliner() {
-	    dtor() ;
+	destruct fdliner() {
+	    if (fbp) dtor() ;
 	} ;
 } ; /* end struct (fdliner) */
 #else	/* __cplusplus */
