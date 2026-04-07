@@ -47,10 +47,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<bufsizevar.hh>		/* |maxnamelen(3uc)| */
 #include	<storebuf.h>
 #include	<strn.h>		/* |strnnlen(3uc)| */
@@ -90,7 +87,7 @@ import libutil ;
 
 /* local variables */
 
-static bufsizevar	maxnamelen(getbufsize_mn) ;
+static bufsizevar	maxnamelen(bufsize_mn) ;
 
 
 /* exported variables */
