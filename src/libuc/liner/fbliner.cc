@@ -32,8 +32,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<filer.h>
 #include	<localmisc.h>
 
@@ -45,7 +47,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -77,7 +78,7 @@ using std::nothrow ;			/* constant */
 int fbliner_start(fbliner *lsp,filer *fbp,off_t foff,int to) noex {
 	int		rs = SR_FAULT ;
 	if (lsp && fbp) {
-	    if (char *lp{} ; (rs = malloc_ml(&lp)) >= 0) {
+	    if (char *lp ; (rs = lm_ml(&lp)) >= 0) {
 		lp[0] = '\0' ;
 	        lsp->llen = rs ;
 	        lsp->lbuf = lp ;
@@ -99,7 +100,7 @@ int fbliner_finish(fbliner *lsp) noex {
 	    lsp->llen = 0 ;
 	    lsp->lbuf[0] = '\0' ;
 	    {
-	        rs1 = uc_free(lsp->lbuf) ;
+	        rs1 = lm_free(lsp->lbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	        lsp->lbuf = nullptr ;
 	    }
