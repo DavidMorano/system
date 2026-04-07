@@ -34,7 +34,8 @@
 #include	<cstdlib>
 #include	<cstdarg>		/* |va_list(3c)| */
 #include	<cstring>		/* |strlcpy(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bufsizevar.hh>
 #include	<localmisc.h>
 
@@ -77,7 +78,7 @@ static int cstrlcpy(char *dp,cchar *sp,int sl) noex {
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp,MKNPATH_MAXPATHLEN) ;
+static bufsizevar	maxpathlen(bufsize_mp,MKNPATH_MAXPATHLEN) ;
 static maxpather	getrlen ;
 
 
