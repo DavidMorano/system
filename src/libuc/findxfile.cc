@@ -42,8 +42,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strbrk(3c)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getprogpath.h>
 #include	<ids.h>
 #include	<vecstr.h>
@@ -54,6 +56,8 @@
 #include	<localmisc.h>
 
 #include	"findxfile.h"
+
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -127,7 +131,7 @@ static int filexfile_path(ids *idp,char *rbuf,cc *pn,cc *path) noex {
         bool        f_pwd = false ;
         if (vecstr plist ; (rs = plist.start(vn,vo)) >= 0) ylikely {
             cchar   *sp = path ;
-            if (char *cbuf ; (rs = malloc_mp(&cbuf)) >= 0) ylikely {
+            if (char *cbuf ; (rs = lm_mp(&cbuf)) >= 0) ylikely {
                 for (cc *tp ; (tp = strbrk(sp,":;")) != np ; ) {
                     cint tl = intconv(tp - sp) ;
                     if ((tp - sp) == 0) {
@@ -139,7 +143,8 @@ static int filexfile_path(ids *idp,char *rbuf,cc *pn,cc *path) noex {
                     sp = (tp + 1) ;
                     if (rs < 0) break ;
                 } /* end while */
-                rs = rsfree(rs,cbuf) ;
+                rs1 = lm_free(cbuf) ;
+		if (rs >= 0) rs = rs1 ;
             } /* end if (m-a-f) */
             if ((rs >= 0) && (sp[0] != '\0')) {
                 rs = plist.adduniq(sp,-1) ;
