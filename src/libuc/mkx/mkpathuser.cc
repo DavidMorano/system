@@ -22,7 +22,10 @@
 
 	Description:
 	This subroutine creates a resolved filename path from the
-	coded username-prefix form.
+	coded username-prefix form.  The following forms are
+	recognized:
+		~<user>/<remainder>
+		µ/<user>/<remainder>
 
 	Synopsis:
 	int mkpathuser(char *rbuf,cchar *un,cchar *pp,int pl) noex
@@ -44,13 +47,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
 #include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
-#include	<mallocxx.h>
 #include	<mkpathx.h>
 #include	<strwcpy.h>
 #include	<strn.h>
@@ -60,7 +63,7 @@
 #include	"mkx.h"
 #include	"mkpathxx.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 
@@ -94,21 +97,17 @@ static int	mkpathusername(char *,cchar *,int,cchar *,int) noex ;
 
 /* local variables */
 
-constexpr cauto		mall = lm_mall ;
-constexpr cauto		mfre = lm_free ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int mkpathuser(char *rbuf,cchar *un,cchar *pp,int pl) noex {
+int mkpathuser(char *rbuf,cchar *un,cchar *pp,int µpl) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf && pp) ylikely {
+	if (int pl ; rbuf && ((pl = getlenstr(pp,µpl)) >= 0)) {
 	    rbuf[0] = '\0' ;
 	    rs = SR_OK ;
-	    if (pl < 0) pl = lenstr(pp) ;
 	    while ((pl > 0) && (pp[0] == '/')) {
 	        pp += 1 ;
 	        pl -= 1 ;
@@ -122,7 +121,7 @@ int mkpathuser(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 	            rs = mkpathuserfs(rbuf,pp,pl) ;
 	        }
 	    } /* end if */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return rs ;
 }
 /* end subroutine (mkpathuser) */
@@ -131,11 +130,11 @@ int mkpathuser(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 /* local subroutines */
 
 static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		ul = pl ;
 	cchar		*up = pp ;
 	if (pl < 0) pl = lenstr(pp) ;
-	if (cchar *tp{} ; (tp = strnchr(pp,pl,'/')) != nullptr) {
+	if (cchar *tp ; (tp = strnchr(pp,pl,'/')) != nullptr) {
 	    ul = intconv(tp - pp) ;
 	    pl -= intconv((tp + 1) - pp) ;
 	    pp = (tp + 1) ;
@@ -155,7 +154,7 @@ static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 static int mkpathuserfs(char *rbuf,cchar *pp,int pl) noex {
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	if ((pl >= 2) && (strncmp("µ/",pp,2) == 0)) ylikely {
+	if ((pl >= 2) && (strncmp("µ/",pp,2) == 0)) {
 	    pp += 2 ;
 	    pl -= 2 ;
 	    if (pl > 0) ylikely {
@@ -186,7 +185,7 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = getbufsize(getbufsize_un)) >= 0) ylikely {
+	if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
 	    cint	ulen = rs ;
 	    cchar	*un = up ;
 	    char	ubuf[ulen+1] ;		/* <- VLA */
@@ -196,7 +195,7 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	        un = ubuf ;
 	    }
 	    if (rs >= 0) ylikely {
-	        if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	        if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	            ucentpwx	pw ;
 	            cint	pwlen = rs ;
 	            if ((un[0] == '\0') || (un[0] == '-')) {
@@ -214,7 +213,7 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 			    rl = rs ;
 	                }
 	            } /* end if (ok) */
-	            rs1 = mfre(pwbuf) ;
+	            rs1 = lm_free(pwbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (ok) */
