@@ -58,8 +58,10 @@
 #include	<climits>		/* |UINT_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucsysmisc.h>		/* |uc_gettimeofday(3uc)| */
 #include	<getnodename.h>
 #include	<getrand.h>
 #include	<mkuuid.h>
@@ -68,7 +70,9 @@
 
 #include	"mkuuid.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -181,7 +185,8 @@ int mkuu::mkuuclk() noex {
 /* contributes six bytes */
 int mkuu::mkuunode() noex {
     	int		rs ;
-	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) ylikely {
+	int		rs1 ;
+	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) ylikely {
 	    if ((rs = getnodename(nbuf,rs)) >= 0) ylikely {
 	        uint64_t	nv = loadbytes(nbuf,rs) ;
 	        uint64_t	v ;
@@ -196,7 +201,8 @@ int mkuu::mkuunode() noex {
 	        }
 	        up->node = nv ;
 	    } /* end if (getnodename) */
-	    rs = rsfree(rs,nbuf) ;
+	    rs1 = lm_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
