@@ -54,19 +54,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<estrings.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<sfx.h>			/* |sfshrink(3uc)| */
+#include	<snwcpy.h>
 #include	<ema.h>
 #include	<localmisc.h>
 
 #include	"mkx.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
