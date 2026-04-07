@@ -68,10 +68,8 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<new>			/* |nothrow(3c++) */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<sfx.h>
@@ -85,10 +83,10 @@
 #include	"mkx.h"
 #include	"mkpathxx.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"mod/uconstants.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
-import libutil ;			/* |gelenstr(3u)| */
+import libutil ;			/* |getlenstr(3u)| */
 import uconstants ;
 
 /* local defines */
@@ -176,7 +174,7 @@ namespace {
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp,MKPATHVAR_MP) ;
+static bufsizevar	maxpathlen(bufsize_mp,MKPATHVAR_MP) ;
 
 static const mksub_m	mems[] = {
     &mksub::getvarname,
@@ -199,12 +197,15 @@ int mkpathvar(char *ebuf,cchar *fp,int µfl) noex {
 	int		el = 0 ;
 	if (ebuf && fp) ylikely {
 	    ebuf[0] = '\0' ;
+	    rs = SR_INVALID ;
 	    if (int fl ; (fl = getlenstr(fp,µfl)) > 0) {
 	        cint	chx_ec = CHX_EXP ;
 		cint	ch = mkchar(fp[0]) ;
+		rs = SR_OK ;
 	        if (ch == chx_ec) ylikely {
 		    cint	sl = (fl + 1) ;
 		    cchar	*sp = (fp + 1) ;
+		    rs = SR_NOMEM ;
 	            if (mksub *sip ; (sip = new(nt) mksub(ebuf,sp,sl)) != np) {
 		        for (cauto &m : mems) {
 			    rs = (sip->*m)() ;
