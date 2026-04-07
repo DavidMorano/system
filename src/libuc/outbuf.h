@@ -26,14 +26,14 @@
 struct outbuf_head {
 	char		*obuf ;
 	int		olen ;
-	int		f_alloc ;
-} ;
+	int		falloc ;
+} ; /* end (outbuf_head) */
 
 #ifdef	__cplusplus
 enum outbufmems {
 	outbufmem_finish,
 	outbufmem_overlast
-} ;
+} ; /* end enum (outbufmems) */
 struct outbuf ;
 struct outbuf_co {
 	outbuf		*op = nullptr ;
@@ -52,16 +52,16 @@ struct outbuf : outbuf_head {
 	outbuf() noex {
 	    finish(this,outbufmem_finish) ;
 	    obuf = nullptr ;
-	    f_alloc = false ;
-	} ;
+	    falloc = false ;
+	} ; /* end ctor */
 	outbuf(const outbuf &) = delete ;
 	outbuf &operator = (const outbuf &) = delete ;
-	int start(cchar *,int = -1) noex ;
+	int start(char *,int = -1) noex ;
 	int get(cchar **) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct outbuf() {
-	    if (obuf || f_alloc) dtor() ;
+	    if (obuf || falloc) dtor() ;
 	} ;
 } ; /* end struct (outbuf) */
 #else	/* __cplusplus */
