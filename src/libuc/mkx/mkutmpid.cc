@@ -111,22 +111,21 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<strnxchr.h>
 #include	<localmisc.h>
 
 #include	"mkutmpid.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
-
-using std::min ;			/* type */
-using std::max ;			/* type */
 
 
 /* local typedefs */
