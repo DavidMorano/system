@@ -52,10 +52,11 @@
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<varnames.hh>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<aflag.hh>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<strlibval.hh>
 #include	<storebuf.h>
 #include	<mkpathx.h>
@@ -67,7 +68,9 @@
 
 #include	"findfilepath.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -98,7 +101,7 @@ static bool	isendslash(cc *,int) noex ;
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 static strlibval	pathval(strlibval_path) ;
 
