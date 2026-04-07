@@ -39,7 +39,8 @@
 #include	<cstdlib>
 #include	<cstdarg>		/* |va_list(3c)| */
 #include	<cstring>		/* |strlcpy(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bufsizevar.hh>
 #include	<snwcpy.h>
 #include	<localmisc.h>
@@ -72,7 +73,7 @@ namespace {
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp,MKNPATHW_MAXPATHLEN) ;
+static bufsizevar	maxpathlen(bufsize_mp,MKNPATHW_MAXPATHLEN) ;
 static maxpather	getrlen ;
 
 
