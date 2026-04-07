@@ -38,11 +38,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<char.h>
+#include	<usysbase.h>
+#include	<ascii.h>		/* |CH_{x}(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<ischarx.h>
 #include	<localmisc.h>
 
