@@ -25,6 +25,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+
 EXTERNC_begin
 
 extern bool	isdigex(int) noex attrpure ;
