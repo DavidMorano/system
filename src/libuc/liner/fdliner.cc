@@ -33,8 +33,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<filer.h>
 #include	<intsat.h>
 #include	<char.h>
@@ -87,20 +89,20 @@ int fdliner_start(fdliner *op,int mfd,off_t foff,int to) noex {
 	        op->to = to ;
 	        op->llen = 0 ;
 	        op->lbuf = nullptr ;
-		if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+		if (void *vp{} ; (rs = lm_mall(osz,&vp)) >= 0) {
 		    op->fbp = (filer *) vp ;
-		    if (char *lp{} ; (rs = malloc_ml(&lp)) >= 0) {
+		    if (char *lp ; (rs = lm_ml(&lp)) >= 0) {
 			op->lbuf = lp ;
 			op->llen = rs ;
 			rs = fdliner_starter(op,mfd) ;
 			if (rs < 0) {
-			    uc_free(op->lbuf) ;
+			    lm_free(op->lbuf) ;
 			    op->lbuf = nullptr ;
 			    op->llen = 0 ;
 			}
 		    } /* end if (m-a) */
 		    if (rs < 0) {
-			uc_free(op->fbp) ;
+			lm_free(op->fbp) ;
 			op->fbp = nullptr ;
 		    }
 		} /* end if (m-a) */
@@ -117,7 +119,7 @@ int fdliner_finish(fdliner *op) noex {
 	    rs = SR_OK ;
 	    if (op->lbuf) {
 	        op->lbuf[0] = '\0' ;
-	        rs1 = uc_free(op->lbuf) ;
+	        rs1 = lm_free(op->lbuf) ;
 		if (rs >= 0) rs = rs1 ;
 		op->lbuf = nullptr ;
 	        op->llen = 0 ;
@@ -128,7 +130,7 @@ int fdliner_finish(fdliner *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(op->fbp) ;
+	            rs1 = lm_free(op->fbp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->fbp = nullptr ;
 		}
