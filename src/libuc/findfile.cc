@@ -47,7 +47,9 @@
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getbufsize.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<mkpathx.h>
@@ -60,7 +62,9 @@
 
 #include	"findfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -184,7 +188,7 @@ static int fileperm(ids *idp,cchar *fname,int am) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) ylikely {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	}
 	return rs ;
