@@ -41,8 +41,8 @@
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
-#include	<gecos.h>
 #include	<getusername.h>
+#include	<gecos.h>
 #include	<storeitem.h>
 #include	<strn.h>
 #include	<snwcpy.h>
