@@ -43,6 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -106,9 +107,9 @@ int		strstore_already(strstore *,cchar *,int) noex ;
 
 template<typename ... Args>
 local inline int strstore_ctor(strstore *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->csp = nullptr ;
