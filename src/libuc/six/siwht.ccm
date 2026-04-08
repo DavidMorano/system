@@ -1,6 +1,6 @@
 /* siwht MODULE (primary-module-interfae) */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find a character or white-space */
 /* version %I% last-modified %G% */
@@ -42,7 +42,7 @@ module ;
 #include	<usysdefs.h>
 #include	<usysrets.h>
 
-#pragma		GCC dependency	"mod/chrset.ccm"
+#pragma		GCC dependency		"mod/chrset.ccm"
 
 export module siwht ;
 
