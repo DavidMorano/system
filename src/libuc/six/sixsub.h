@@ -1,4 +1,4 @@
-/* sisub HEADER */
+/* sixsub HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-03-23, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
@@ -32,6 +29,10 @@ EXTERNC_begin
 extern int sibasesub(cchar *sp,int sl,cchar *ss) noex ;
 extern int sicasesub(cchar *sp,int sl,cchar *ss) noex ;
 extern int sifoldsub(cchar *sp,int sl,cchar *ss) noex ;
+
+local inline int sisub(cchar *sp,int sl,cchar *ss) noex {
+	return sibasesub(sp,sl,ss) ;
+}
 
 EXTERNC_end
 
