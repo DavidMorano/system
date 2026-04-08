@@ -56,9 +56,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| + |strcspn(3n)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -102,17 +100,16 @@ constexpr bool		f_strchr = CF_STRCHR ;
 
 /* exported subroutines */
 
-int siobrk(cchar *sp,int sl,const chrset &sset) noex {
+int siobrk(cchar *sp,int 탎l,const chrset &sset) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	    for (i = 0 ; sl && sp[i] ; i += 1) {
 		cint	ch = mkchar(sp[i]) ;
 		if ((f = sset.tst(ch))) break ;
 	        sl -= 1 ;
 	    } /* end for */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
 } /* end subroutine (siobrk) */
 
@@ -144,30 +141,28 @@ int siobrk(cchar *sp,int sl,cchar *ss) noex {
 	return (f) ? i : -1 ;
 } /* end subroutine (siobrk) */
 
-int sirbrk(cchar *sp,int sl,const chrset &sset) noex {
+int sirbrk(cchar *sp,int 탎l,const chrset &sset) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
 		cint	ch = mkchar(sp[i]) ;
 		if ((f = sset.tst(ch))) break ;
 	    } /* end for */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
 } /* end subroutine (sirbrk) */
 
-int sirbrk(cchar *sp,int sl,cchar *ss) noex {
+int sirbrk(cchar *sp,int 탎l,cchar *ss) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp && ss) ylikely {
+	if (int sl ; ss && ((sl = getlenstr(sp,탎l)) >= 0)) {
 	    chrset	sset(ss) ;
-	    if (sl < 0) sl = lenstr(sp) ;
 	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
 		cint	ch = mkchar(sp[i]) ;
 		if ((f = sset.tst(ch))) break ;
 	    } /* end for */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
 } /* end subroutine (sirbrk) */
 
