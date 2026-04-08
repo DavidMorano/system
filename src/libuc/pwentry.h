@@ -26,10 +26,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system IDs */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #ifndef	PWENTRY
@@ -64,7 +61,7 @@ struct pwentry_head {
 	uint		flag ;		/* currently not being used */
 	uid_t		uid ;
 	gid_t		gid ;
-} ;
+} ; /* end struct (pwentry_head) */
 
 #ifdef	__cplusplus
 enum pwentrymems {
@@ -72,7 +69,7 @@ enum pwentrymems {
 	pwentrymem_mkextras,
 	pwentrymem_finish,
 	pwentrymem_overlast
-} ;
+} ; /* end enum (pwentrymems) */
 struct pwentry ;
 struct pwentry_co {
 	pwentry		*op = nullptr ;
