@@ -60,7 +60,7 @@
 	The |pathaddw| subroutine is almost equivalent to:
 	    int pathaddw(char *rbuf,int rl,cc *sp,int sl) noex {
 	        int	rs ;
-	        if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	        if ((rs = getbufsize(bufsize_mp)) >= 0) {
 		    cint	rlen = rs ;
 	            rs = storebuf_strw(rbuf,rlen,rl,sp,sl) ;
 		    rl += rs ;
@@ -72,15 +72,19 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
 #include	"pathadd.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* ?? */
 
 /* local defines */
 
@@ -107,7 +111,7 @@ static int		local_pathadd(char *,int,int,cchar *,int) noex ;
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
