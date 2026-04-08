@@ -26,7 +26,9 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
+
 #include	<snwcpyxc.h>
+#include	<snwcpyexpesc.h>
 
 
 EXTERNC_begin
@@ -39,7 +41,6 @@ extern int snwcpyopaque(char *,int,cchar *,int) noex ;
 extern int snwcpyshrink(char *,int,cchar *,int) noex ;
 extern int snwcpyrev(char *,int,cchar *,int) noex ;
 extern int snwcpywidehdr(char *,int,const wchar_t *,int) noex ;
-extern int snwcpyexpesc(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
