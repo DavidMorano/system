@@ -52,16 +52,15 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
-#include	<mallocxx.h>
-#include	<varnames.hh>
-#include	<syswords.hh>
 #include	<gecos.h>
 #include	<filereadln.h>
 #include	<sncpyx.h>
@@ -72,7 +71,11 @@
 
 #include	"getuserorg.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
 import libutil ;
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -168,10 +171,10 @@ int gethomeorg(char *rbuf,int rlen,cchar *hd) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (hd[0]) {
-	        if (char *cbuf{} ; (rs = malloc_mn(&cbuf)) >= 0) {
+	        if (char *cbuf ; (rs = lm_mn(&cbuf)) >= 0) {
 		    cint	clen = rs ;
 	            if ((rs = sncpy2(cbuf,clen,".",orgname)) >= 0) {
-	                if (char *obuf{} ; (rs = malloc_mp(&obuf)) >= 0) {
+	                if (char *obuf ; (rs = lm_mp(&obuf)) >= 0) {
 	                    if ((rs = mkpath(obuf,hd,cbuf)) >= 0) {
 	                        if ((rs = filereadln(obuf,rbuf,rlen)) >= 0) {
 	                            len = rs ;
@@ -179,11 +182,11 @@ int gethomeorg(char *rbuf,int rlen,cchar *hd) noex {
 		                    rs = SR_OK ;
 		                }
 	                    }
-		            rs1 = uc_free(obuf) ;
+		            rs1 = lm_free(obuf) ;
 		            if (rs >= 0) rs = rs1 ;
 		        } /* end if (m-a-f) */
 	            } /* end if (sncpy) */
-		    rs1 = uc_free(cbuf) ;
+		    rs1 = lm_free(cbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -245,14 +248,14 @@ static int getuserorg_home(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *hbuf{} ; (rs = malloc_mp(&hbuf)) >= 0) {
+	if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) {
 	    cint	hlen = rs ;
 	    if ((rs = getuserhome(hbuf,hlen,sip->un)) >= 0) {
 	        if ((rs = gethomeorg(sip->rbuf,sip->rlen,hbuf)) >= 0) {
 		    len = rs ;
 	        }
 	    } /* end if (getuserhome) */
-	    rs1 = uc_free(hbuf) ;
+	    rs1 = lm_free(hbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -264,7 +267,7 @@ static int getuserorg_passwd(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
 	    if (sip->un[0] == '-') {
@@ -284,7 +287,7 @@ static int getuserorg_passwd(SI *sip) noex {
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (gecos) */
 	    } /* end if (get PW entry) */
-	    rs1 = uc_free(pwbuf) ;
+	    rs1 = lm_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -297,12 +300,12 @@ static int getuserorg_sys(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *ofname{} ; (rs = malloc_mp(&ofname)) >= 0) {
+	if (char *ofname ; (rs = lm_mp(&ofname)) >= 0) {
 	    if ((rs = mkpath(ofname,etcdir,sip->ofp)) >= 0) {
 	        rs = filereadln(ofname,sip->rbuf,sip->rlen) ;
 	        len = rs ;
 	    }
-	    rs1 = uc_free(ofname) ;
+	    rs1 = lm_free(ofname) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
