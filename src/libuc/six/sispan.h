@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-03-23, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -21,15 +21,41 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
 
 extern int	sispan(cchar *,int,cchar *) noex ;
+extern int	sispanalpha(cchar *,int) noex ;
+extern int	sispanalnum(cchar *,int) noex ;
+extern int	sispandigit(cchar *,int) noex ;
+extern int	sispandigex(cchar *,int) noex ;
+extern int	sispanoctal(cchar *,int) noex ;
+extern int	sispanwhite(cchar *,int) noex ;
+extern int	sispanblank(cchar *,int) noex ;
+
+local inline int sispandig(cchar *sp,int sl) noex {
+    	return sispandigit(sp,sl) ;
+}
+local inline int sispanoct(cchar *sp,int sl) noex {
+    	return sispanoctal(sp,sl) ;
+}
+local inline int sispandec(cchar *sp,int sl) noex {
+    	return sispandigit(sp,sl) ;
+}
+local inline int sispanhex(cchar *sp,int sl) noex {
+    	return sispandigex(sp,sl) ;
+}
+local inline int sispanwht(cchar *sp,int sl) noex {
+    	return sispanwhite(sp,sl) ;
+}
+local inline int sispanblk(cchar *sp,int sl) noex {
+    	return sispanblank(sp,sl) ;
+}
+local inline int siskipwhite(cchar *sp,int sl) noex {
+    	return sispanwhite(sp,sl) ;
+}
 
 EXTERNC_end
 
