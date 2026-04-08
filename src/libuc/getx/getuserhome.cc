@@ -69,13 +69,15 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strcmp(3c)| */
 #include	<pwd.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
+#include	<aflag.hh>
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
-#include	<mallocxx.h>
 #include	<fsdir.h>
 #include	<sfx.h>
 #include	<mkpathx.h>
@@ -88,7 +90,9 @@
 
 #include	"getuserhome.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |emclear(3u)| */
 
 /* local defines */
 
@@ -103,6 +107,10 @@ import libutil ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
 
 extern "C" {
     int		getuserhome(char *,int,cchar *) noex ;
@@ -199,9 +207,9 @@ static int subinfo_start(subinfo *sip,cchar *un) noex {
 	memclear(sip) ;			/* <- noted (dangerous?) */
 	sip->un = un ;
 	sip->uid = -1 ;
-	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+	if ((rs = getbufsize(bufsize_pw)) >= 0) {
 	    cint	pwlen = rs ;
-	    if (char *pwbuf ; (rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = lm_mall((pwlen+1),&pwbuf)) >= 0) {
 	        sip->pwbuf = pwbuf ;
 	        sip->pwlen = pwlen ;
 	    }
@@ -216,7 +224,7 @@ static int subinfo_finish(subinfo *sip) noex {
 	if (sip) {
 	    rs = SR_OK ;
 	    if (sip->pwbuf) {
-	        rs1 = uc_free(sip->pwbuf) ;
+	        rs1 = lm_free(sip->pwbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        sip->pwbuf = nullptr ;
 	    }
@@ -325,7 +333,7 @@ static int dirsearch(cchar *basedname,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_found = false ;
-	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if (fsdir dir ; (rs = fsdir_open(&dir,basedname)) >= 0) {
 	        fsdir_ent	ds ;
@@ -339,7 +347,7 @@ static int dirsearch(cchar *basedname,cchar *un) noex {
 	        rs1 = fsdir_close(&dir) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdir) */
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = lm_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f_found : rs ;
