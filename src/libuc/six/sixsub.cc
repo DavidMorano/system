@@ -60,9 +60,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strnstr(3c)| + |strstr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<nleadstr.h>
 #include	<toxc.h>		/* |tobc(3u)| + |touc(3u)| + ... */
 #include	<localmisc.h>
@@ -71,7 +69,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -99,26 +97,26 @@ extern "C" {
 /* forward references */
 
 template<toxc_f toxc,nleadxstr_f nleadxstr>
-int sixsub(cchar *sp,int sl,cchar *ss) noex {
-	cint		sslen = lenstr(ss) ;
+local int sixsub(cchar *sp,int µsl,cchar *ss) noex {
 	int		i{} ; /* used-afterwards */
 	bool		f = false ;
-	if (sl < 0) sl = lenstr(sp) ;
-	if (sslen <= sl) ylikely {
-	    cint	sslead = toxc(ss[0]) ;
-	    int		m ;
-	    for (i = 0 ; i <= (sl - sslen) ; i += 1) {
-		f = ((sslen == 0) || (toxc(sp[i]) == sslead)) ;
-		if (f) {
-	            m = nleadxstr((sp + i),ss,sslen) ;
-	            f = (m == sslen) ;
-		}
-	        if (f) break ;
-	    } /* end for */
-	} /* end if (possible) */
+	if (int sl ; ss && ((sl = getlenstr(sp,µsl)) > 0)) {
+	    cint	sslen = lenstr(ss) ;
+	    if (sslen <= sl) ylikely {
+	        cint	sslead = toxc(ss[0]) ;
+	        int	m ;
+	        for (i = 0 ; i < (sl - sslen) ; i += 1) {
+		    f = ((sslen == 0) || (toxc(sp[i]) == sslead)) ;
+		    if (f) {
+	                m = nleadxstr((sp + i),ss,sslen) ;
+	                f = (m == sslen) ;
+		    }
+	            if (f) break ;
+	        } /* end for */
+	    } /* end if (possible) */
+	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine-template (sixsub) */
+} /* end subroutine-template (sixsub) */
 
 
 /* local variables */
@@ -145,7 +143,7 @@ int sibasesub(cchar *sp,int sl,cchar *ss) noex {
 	        if (cc *tp ; (tp = strstr(sp,ss)) != nullptr) {
 		    si = intconv(tp - sp) ;
 	        }
-	    }
+	    } /* end if (length given or not) */
 	} /* end if (non-null) */
 	return si ;
 }
