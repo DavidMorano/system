@@ -29,7 +29,7 @@ EXTERNC_begin
 extern char *strnochr(cchar *,int,int) noex ;
 extern char *strnrchr(cchar *,int,int) noex ;
 
-static inline char *strnchr(cchar *sp,int sl,int sch) noex {
+local inline char *strnchr(cchar *sp,int sl,int sch) noex {
 	return strnochr(sp,sl,sch) ;
 }
 
