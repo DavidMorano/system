@@ -54,7 +54,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<snx.h>
@@ -62,16 +65,21 @@
 #include	<storeitem.h>
 #include	<gecos.h>
 #include	<cfdec.h>
-#include	<mallocstuff.h>
 #include	<localmisc.h>
 
 #include	"pwentry.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
 #define	PE	pwentry
+
+#ifndef	F_OPTIONAL
+#define	F_OPTIONAL	0		/* <- why this choice? */
+#endif
 
 
 /* external subroutines */
@@ -87,18 +95,29 @@ namespace {
 	int		pwlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int	pwentry_loadname(PE *,cc *,int) noex ;
-static int	loaditem(cchar **,cchar *,int) noex ;
+local int	pwentry_loadname(PE *,cc *,int) noex ;
+local int	loaditem(cchar **,cchar *,int) noex ;
 
+#ifdef	COMMENT
+local int rscfree(int rs,cchar *sp) noex {
+    	int rs1 ;
+    	void *vp = voidp(sp) ;
+    	rs1 = lm_free(vp) ;
+	if (rs >= 0) rs = rs1 ;
+    	return rs ;
+}
+#endif /* COMNENT */
 
 /* local variables */
 
 static vars	var ;
+
+cbool		f_optional = F_OPTIONAL ;
 
 
 /* exported variables */
@@ -120,83 +139,95 @@ int pwentry_start(pwentry *op) noex {
 int pwentry_fieldpw(pwentry *op,int fn,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) ylikely {
+	    long	lv ;
 	    int		v ;
-	    cchar	*mp = nullptr ;
+	    cchar	**cpp = nullptr ;
 	    rs = SR_OK ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    switch (fn) {
 	    case 0:
-	        op->username = mp = mallocstrw(sp,sl) ;
+	        cpp = &op->username ;
 	        break ;
 	    case 1:
-	        op->password = mp = mallocstrw(sp,sl) ;
+	        cpp = &op->password ;
 	        break ;
 	    case 2:
-	        mp = sp ;
 	        op->uid = -1 ;
 	        if ((sl > 0) && (cfdeci(sp,sl,&v) >= 0)) {
 		    op->uid = v ;
 		}
 	        break ;
 	    case 3:
-	        mp = sp ;
 	        op->gid = -1 ;
 	        if ((sl > 0) && (cfdeci(sp,sl,&v) >= 0)) {
 		    op->gid = v ;
 		}
 	        break ;
 	    case 4:
-	        op->gecos = mp = mallocstrw(sp,sl) ;
+	        cpp = &op->gecos ;
 	        break ;
 	    case 5:
-	        op->dir = mp = mallocstrw(sp,sl) ;
+	        cpp = &op->dir ;
 	        break ;
 	    case 6:
-	        op->shell = mp = mallocstrw(sp,sl) ;
+	        cpp = &op->shell ;
 	        break ;
 	    case 7:
-	        mp = sp ;
 	        op->lstchg = -1 ;
-	        if (sl > 0) cfdecl(sp,sl,&op->lstchg) ;
+	        if (sl > 0) {
+		    cfdecl(sp,sl,&lv) ;
+		    op->lstchg = lv ;
+		}
 	        break ;
 	    case 8:
-	        mp = sp ;
 	        op->daymin = -1 ;
-	        if (sl > 0) cfdecl(sp,sl,&op->daymin) ;
+	        if (sl > 0) {
+		    cfdecl(sp,sl,&lv) ;
+		    op->daymin = lv ;
+		}
 	        break ;
 	    case 9:
-	        mp = sp ;
 	        op->daymax = -1 ;
-	        if (sl > 0) cfdecl(sp,sl,&op->daymax) ;
+	        if (sl > 0) {
+		    cfdecl(sp,sl,&lv) ;
+		    op->daymax = lv ;
+		}
 	        break ;
 	    case 10:
-	        mp = sp ;
 	        op->warn = -1 ;
-	        if (sl > 0) cfdecl(sp,sl,&op->warn) ;
+	        if (sl > 0) {
+		    cfdecl(sp,sl,&lv) ;
+		    op->warn = lv ;
+		}
 	        break ;
 	    case 11:
-	        mp = sp ;
 	        op->inact = -1 ;
-	        if (sl > 0) cfdecl(sp,sl,&op->inact) ;
+	        if (sl > 0) {
+		    cfdecl(sp,sl,&lv) ;
+		    op->inact = lv ;
+		}
 	        break ;
 	    case 12:
-	        mp = sp ;
 	        op->expire = -1 ;
-	        if (sl > 0) cfdecl(sp,sl,&op->expire) ;
+	        if (sl > 0) {
+		    cfdecl(sp,sl,&lv) ;
+		    op->expire = lv ;
+		}
 	        break ;
 	    case 13:
-	        mp = sp ;
 	        if (sl > 0) {
-		    if (cfdec(sp,sl,&v)) {
-	                op->flag = v ;
+		    if (uint uv ; cfdec(sp,sl,&uv)) {
+	                op->flag = uv ;
 		    }
 		}
 	        break ;
 	    default:
-	        mp = sp ;
-	        break ;
+		rs = SR_BUGCHECK ;
+		break ;
 	    } /* end switch */
-	    rs = ((mp == nullptr) ? SR_NOMEM : SR_OK) ;
+	    if ((rs >= 0) && cpp) {
+		rs = lm_strw(sp,sl,cpp) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -264,10 +295,10 @@ int pwentry_mkcopy(pwentry *op,pwentry *uop,char *rbuf,int rlen) noex {
 	        if (op->password != nullptr) {
 	            ub.strw(op->password,-1,&uop->password) ;
 	        }
-#ifdef	OPTIONAL
-	        uop->uid = op->uid ;
-	        uop->gid = op->gid ;
-#endif
+		if_constexpr (f_optional) {
+	            uop->uid = op->uid ;
+	            uop->gid = op->gid ;
+		}
 	        if (op->gecos != nullptr) {
 	            ub.strw(op->gecos,-1,&uop->gecos) ;
 	        }
@@ -320,57 +351,70 @@ int pwentry_finish(pwentry *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->username != nullptr) {
-	        rs1 = uc_free(op->username) ;
+		void *vp = voidp(op->username) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->password != nullptr) {
-	        rs1 = uc_free(op->password) ;
+		void *vp = voidp(op->password) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->gecos != nullptr) {
-	        rs1 = uc_free(op->gecos) ;
+		void *vp = voidp(op->gecos) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->dir != nullptr) {
-	        rs1 = uc_free(op->dir) ;
+		void *vp = voidp(op->dir) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->shell != nullptr) {
-	        rs1 = uc_free(op->shell) ;
+	        void *vp = voidp(op->shell) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    /* the AT&T standard extras */
 	    if (op->organization != nullptr) {
-	        rs1 = uc_free(op->organization) ;
+	        void *vp = voidp(op->organization) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->realname != nullptr) {
-	        rs1 = uc_free(op->realname) ;
+	        void *vp = voidp(op->realname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->account != nullptr) {
-	        rs1 = uc_free(op->account) ;
+	        void *vp = voidp(op->account) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->bin != nullptr) {
-	        rs1 = uc_free(op->bin) ;
+	        void *vp = voidp(op->bin) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    /* the sometimes pseudo-standard finger information fields */
 	    if (op->office != nullptr) {
-	        rs1 = uc_free(op->office) ;
+	        void *vp = voidp(op->office) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->wphone != nullptr) {
-	        rs1 = uc_free(op->wphone) ;
+	        void *vp = voidp(op->wphone) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->hphone != nullptr) {
-	        rs1 = uc_free(op->hphone) ;
+	        void *vp = voidp(op->hphone) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->printer != nullptr) {
-	        rs1 = uc_free(op->printer) ;
+	        void *vp = voidp(op->printer) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    memclear(hop) ;
@@ -388,11 +432,11 @@ int pwentrybufsize() noex {
 
 /* local subroutines */
 
-static int pwentry_loadname(PE *op,cc *vp,int vl) noex {
+local int pwentry_loadname(PE *op,cc *vp,int vl) noex {
     	int		rs ;
 	int		rs1 ;
 	int		tl = 0 ;
-	if (char *tbuf ; (rs = uc_malloc((vl + 1),&tbuf)) >= 0) ylikely {
+	if (char *tbuf ; (rs = lm_mall((vl + 1),&tbuf)) >= 0) ylikely {
 	    cint	tlen = rs ;
 	    if (strnchr(vp,vl,'_') != nullptr) {
 		rs = snwcpyhyphen(tbuf,tlen,vp,vl) ;
@@ -402,7 +446,7 @@ static int pwentry_loadname(PE *op,cc *vp,int vl) noex {
 		rs = loaditem(&op->realname,vp,vl) ;
 		tl = rs ;
 	    }
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? tl : rs ;
@@ -442,10 +486,10 @@ pwentry_co::operator int () noex {
 }
 /* end method (pwentry_co::operator) */
 
-static int loaditem(cchar **rpp,cchar *vp,int vl) noex {
+local int loaditem(cchar **rpp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	if (vp) ylikely {
-	    rs = uc_mallocstrw(vp,vl,rpp) ;
+	    rs = lm_strw(vp,vl,rpp) ;
 	}
 	return rs ;
 }
@@ -453,9 +497,9 @@ static int loaditem(cchar **rpp,cchar *vp,int vl) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_pw)) >= 0) ylikely {
+	if ((rs = getbufsize(bufsize_pw)) >= 0) ylikely {
 	    pwlen += rs ;
-	    if ((rs = getbufsize(getbufsize_mn)) >= 0) ylikely {
+	    if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
 	        pwlen += rs ; /* additional size for some extra stuff */
 	    }
 	}
