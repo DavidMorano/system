@@ -50,10 +50,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* UNIX® system types */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
+#include	<sys/stat.h>		/* |S_{x}| */
+#include	<unistd.h>		/* |get{x}{y}id(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
@@ -75,7 +73,7 @@
 
 /* local typedefs */
 
-typedef const gid_t		cgid ;
+typedef const gid_t	cgid ;
 
 
 /* external subroutines */
@@ -91,41 +89,76 @@ extern "C" {
 
 /* local structures */
 
+enum pfields {
+	pfield_oth,
+	pfield_grp,
+	pfield_usr,
+	pfield_overlast
+} ; /* end enum (pfields) */
+
+/* permissoin bits per field */
+constexpr int		pbits = pfield_overlast ;	
+constexpr int		pmask = S_IRWXO ;
+
+constexpr local int	mkperms(int) noex ;
+
+namespace {
+    constexpr int	tablen = (1 << pbits) ;
+    struct permtab {
+	uchar	tab[tablen] = {} ;
+	constexpr permtab() noex {
+	    for (int i = 0 ; i < tablen ; i += 1) {
+		if (i & R_OK) tab[i] |= S_IROTH ;
+		if (i & W_OK) tab[i] |= S_IWOTH ;
+		if (i & X_OK) tab[i] |= S_IXOTH ;
+	    } /* end for */
+	} ; /* end ctor */
+	constexpr int operator [] (int a) const noex {
+	    return tab[a] ;
+	} ;
+    } ; /* end struct (permtab) */
+} /* end namespace */
+
 namespace {
     struct tryer ;
-    typedef int (tryer::*tryer_m)(ustat *,int) noex ;
+    typedef int (tryer::*tryer_m)(const ustat *) noex ;
     struct tryer {
 	gid_t		*gids ; /* <- possibly allocated */
 	uid_t		euid ;
 	gid_t		egid ;
+	int		pm ;		/* permissions-mask */
 	bool		f_gidalloc = false ;
-	int start() noex ;
-	int root(ustat *,int) noex ;
-	int user(ustat *,int) noex ;
-	int grp(ustat *,int) noex ;
-	int other(ustat *,int) noex ;
-	int finish() noex ;
-	tryer(uid_t,gid_t,const gid_t *) noex ;
+	bool		fdone = false ;
+	int start	() noex ;
+	int checkpm	(const ustat *,int) const noex ;
+	int root	(const ustat *) noex ;
+	int usr		(const ustat *) noex ;
+	int grp		(const ustat *) noex ;
+	int oth		(const ustat *) noex ;
+	int finish	() noex ;
+	tryer(uid_t,gid_t,const gid_t *,int) noex ;
     } ; /* end struct (tryer) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int permer(ustat *,uid_t,gid_t,const gid_t *,int) noex ;
+local int permer(ustat *,uid_t,gid_t,const gid_t *,int) noex ;
 
 
 /* local variables */
 
 constexpr tryer_m	tries[] = {
 	&tryer::root,
-	&tryer::user,
+	&tryer::usr,
 	&tryer::grp,
-	&tryer::other
-} ;
+	&tryer::oth
+} ; /* end array (tries) */
 
 constexpr uid_t		uidend = (-1) ;
 constexpr gid_t		gidend = (-1) ;
+
+constexpr permtab	perms ;
 
 
 /* exported variables */
@@ -173,45 +206,45 @@ int permid(ids *idp,ustat *sbp,int am) noex {
 
 /* local subroutines */
 
-static int permer(ustat *sbp,uid_t euid,gid_t egid,cgid *gids,int am) noex {
+local int permer(ustat *sbp,uid_t euid,gid_t egid,cgid *gids,int am) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sbp) {
 	    rs = SR_OK ;
-	    if (am != 0) {
-	        tryer	t(euid,egid,gids) ;
-	        am &= 007 ;
-	        if ((rs = t.start()) >= 0) {
-	            for (const auto m : tries) {
-	                rs = (t.*m)(sbp,am) ;
-	                if (rs != 0) break ;
-	            } /* end for */
-	            if (rs == 0) rs = SR_ACCESS ;
+	    if (am) {
+	        if (tryer t(euid,egid,gids,am) ; (rs = t.start()) >= 0) {
+		    {
+	                for (cauto &m : tries) {
+	                    rs = (t.*m)(sbp) ;
+	                    if (rs || t.fdone) break ;
+	                } /* end for */
+	                if (rs == 0) rs = SR_ACCESS ;
+		    }
 	            rs1 = t.finish() ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (try) */
-	    } /* end if (access mode) */
+	        } /* end if (tryer) */
+	    } /* end if (non-zero postive access-mode) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (permer) */
 
-tryer::tryer(uid_t eu,gid_t eg,const gid_t *gs) noex {
+tryer::tryer(uid_t eu,gid_t eg,const gid_t *gs,int am) noex {
 	if (eu == uidend) eu = geteuid() ;
 	if (eg == gidend) eg = getegid() ;
 	gids = cast_const<gid_t *>(gs) ;
 	euid = eu ;
 	egid = eg ;
-}
-/* end ctor (tryer::ctor) */
+	pm = mkperms(am) ;
+} /* end ctor (tryer::ctor) */
 
 int tryer::start() noex {
 	int		rs  ;
 	if ((rs = ucmaxgroups) >= 0) {
 	    cint	ng = rs ;
 	    if (gids == nullptr) {
-	        cint	gsize = ((ng + 1) * szof(gid_t)) ;
-	        if (void *vp{} ; (rs = lm_mall(gsize,&vp)) >= 0) {
+	        cint	gsz = ((ng + 1) * szof(gid_t)) ;
+	        if (void *vp ; (rs = lm_mall(gsz,&vp)) >= 0) {
 		    gids = (gid_t *) vp ;
 		    f_gidalloc = true ;
 	            if ((rs = u_getgroups(ng,gids)) >= 0) {
@@ -221,13 +254,12 @@ int tryer::start() noex {
 		        lm_free(gids) ;
 		        gids = nullptr ;
 		        f_gidalloc = false ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (memory-allocation) */
 	    } /* end if (empty GIDs) */
 	} /* end if (getngroups) */
 	return rs ;
-}
-/* end method (tryer::start) */
+} /* end method (tryer::start) */
 
 int tryer::finish() noex {
 	int		rs = SR_OK ;
@@ -239,30 +271,31 @@ int tryer::finish() noex {
 	    gids = nullptr ;
 	}
 	return rs ;
-}
-/* end method (tryer::finish) */
+} /* end method (tryer::finish) */
 
-int tryer::root(ustat *,int) noex {
+int tryer::checkpm(const ustat *sbp,int pfield) const noex {
+	return (((sbp->st_mode >> (pfield * pbits)) & pm) == pm) ;
+} /* end method (tryer::checkpm) */
+
+int tryer::root(const ustat *) noex {
 	return (euid == 0) ;
-}
-/* end method (tryer::root) */
+} /* end method (tryer::root) */
 
-int tryer::user(ustat *sbp,int am) noex {
+int tryer::usr(const ustat *sbp) noex {
 	int		rs = SR_OK ;
 	if (euid == sbp->st_uid) {
-	    cint	um = (sbp->st_mode >> 6) ;
-	    rs = ((um & am) == am) ? 1 : SR_ACCES ;
+	    cint	f = checkpm(sbp,pfield_usr) ;
+	    rs = (f) ? 1 : SR_ACCES ;
+	    fdone = true ;
 	}
 	return rs ;
-}
-/* end method (tryer::user) */
+} /* end method (tryer::usr) */
 
-int tryer::grp(ustat *sbp,int am) noex {
+int tryer::grp(const ustat *sbp) noex {
 	int		rs = SR_OK ;
-	int		gm ;
-	gm = (sbp->st_mode >> 3) ;
 	if (egid == sbp->st_gid) {
-	    rs = ((gm & am) == am) ? 1 : SR_ACCES ;
+	    rs = checkpm(sbp,pfield_grp) ? 1 : SR_ACCES ;
+	    fdone = true ;
 	} else if (gids != nullptr) {
 	    bool	f = false ;
 	    for (int i = 0 ; gids[i] != gidend ; i += 1) {
@@ -270,17 +303,21 @@ int tryer::grp(ustat *sbp,int am) noex {
 		if (f) break ;
 	    } /* end for */
 	    if (f) {
-	        rs = ((gm & am) == am) ? 1 : SR_ACCES ;
+	        rs = checkpm(sbp,pfield_grp) ? 1 : SR_ACCES ;
+		fdone = true ;
 	    }
-	}
+	} /* end if */
 	return rs ;
-}
-/* end method (tryer::grp) */
+} /* end method (tryer::grp) */
 
-int tryer::other(ustat *sbp,int am) noex {
-	cint		om = sbp->st_mode ;
-	return ((om & am) == am) ;
-}
-/* end method (tryer::other) */
+int tryer::oth(const ustat *sbp) noex {
+	cint f = checkpm(sbp,pfield_oth) ;
+	return (f) ? 1 : SR_ACCESS ;
+} /* end method (tryer::oth) */
+
+constexpr local int mkperms(int am) noex {
+    	am &= pmask ;
+    	return perms[am] ;
+} /* end subroutine (mkperms) */
 
 
