@@ -39,9 +39,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<new>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"isort.h"
@@ -82,6 +84,8 @@ extern "C" int	isort(void *,int,int,sortcmp_f) noex ;
 /* exported subroutines */
 
 int isort(void *base,int ne,int esz,sortcmp_f cmp) noex {
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
     	csize		esize = size_t(esz) ;
 	int		rs = SR_FAULT ;
 	if (base && cmp) {
@@ -89,7 +93,7 @@ int isort(void *base,int ne,int esz,sortcmp_f cmp) noex {
 	    if ((esz > 0) && (ne > 0)) {
 	        char	*arr = charp(base) ;
 	        rs = SR_NOMEM ;
-	        if (char *key ; (key = new(nothrow) char[esz]) != nullptr) {
+	        if (char *key ; (key = new(nt) char[esz]) != np) {
 	            rs = SR_OK ;
    	            for (int i = 1 ; i < ne ; i += 1) {
 		        int	j = (i-1) ;
