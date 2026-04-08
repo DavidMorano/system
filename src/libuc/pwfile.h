@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vecitem.h>
 #include	<hdb.h>
 #include	<pwentry.h>
@@ -40,13 +37,13 @@
 struct pwfile_cursor {
 	hdb_cur		*hcp ;
 	int		i ;
-} ;
+} ; /* end struct (pwfile_cursor) */
 
 struct pwfile_flags {
 	uint		locked:1 ;	/* locked */
 	uint		locked_cur:1 ;	/* locked for cursor operations */
 	uint		locked_explicit:1 ;	/* locked explicitly by user */
-} ;
+} ; /* end struct (pwfile_flags) */
 
 struct pwfile_head {
 	cchar		*fname ;
@@ -56,7 +53,7 @@ struct pwfile_head {
 	PWFILE_FL	fl ;
 	uint		magic ;
 	int		lfd ;
-} ;
+} ; /* end struct (pwfile_head) */
 
 typedef PWFILE		pwfile ;
 typedef	PWFILE_FL	pwfile_fl ;
