@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* perform variable counted c-string operations */
+/* set a string to a number of characters (exactly - not-NUL-terminated) */
 /* version %I% last-modified %G% */
 
 
@@ -26,7 +26,11 @@
 
 EXTERNC_begin
 
-extern char *strnset(char *dp,int ch,int n) noex ;
+extern char	*strnset(char *dp,int ch,int n) noex ;
+
+local inline char *strnblanks(char *dp,int n) noex {
+	return strnset(dp,' ',n) ;
+}
 
 EXTERNC_end
 
