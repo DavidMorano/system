@@ -1,6 +1,6 @@
 /* strnwht MODULE (primary-module-interface) */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* search for a possible break-point among possible white-space */
 /* version %I% last-modified %G% */
