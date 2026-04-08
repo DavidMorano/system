@@ -80,7 +80,9 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strncpy(3c)| + |stpncpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>		/* INET stuff */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uinet.h>		/* |AF_{x}| */
 #include	<endian.h>		/* |htoni(3u)| + |ntohi(3u)| */
 #include	<sncpyx.h>		/* |sncpy(3uc)| */
 #include	<strn.h>		/* |strncpybc(3uc)| */
@@ -646,6 +648,10 @@ int sa::portput(int port) noex {
 
 int sockaddress::start(int af,cvoid *va,int port,uint flow) noex {
 	return sockaddress_start(this,af,va,port,flow) ;
+}
+
+int sockaddress::getaddr(void *valp,int vall) noex {
+    	return sockaddress_getaddr(this,valp,vall) ;
 }
 
 sockaddress::operator int () noex {
