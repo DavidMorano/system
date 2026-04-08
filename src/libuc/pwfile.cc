@@ -34,11 +34,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<pwd.h>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<hdb.h>
 #include	<storeitem.h>
-#include	<mallocstuff.h>
 #include	<strn.h>
 #include	<snwcpy.h>
 #include	<rmx.h>
@@ -49,11 +50,11 @@
 
 #include	"pwfile.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"mod/ucstream.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ucstream.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
-import ucstream ;			/* |lenstr(3u)| */
+import ucstream ;
 
 /* local defines */
 
@@ -77,6 +78,11 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+}
+
 
 /* external variables */
 
@@ -87,7 +93,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int pwfile_ctor(PF *op,Args ... args) noex {
+local int pwfile_ctor(PF *op,Args ... args) noex {
 	PWFILE		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -105,10 +111,9 @@ static int pwfile_ctor(PF *op,Args ... args) noex {
 	    } /* end if (new-vecitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pwfile_ctor) */
+} /* end subroutine (pwfile_ctor) */
 
-static int pwfile_dtor(PF *op) noex {
+local int pwfile_dtor(PF *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -122,26 +127,24 @@ static int pwfile_dtor(PF *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pwfile_dtor) */
+} /* end subroutine (pwfile_dtor) */
 
 template<typename ... Args>
-static int pwfile_magic(PF *op,Args ... args) noex {
+local int pwfile_magic(PF *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == PWFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (pwfile_magic) */
+} /* end subroutine (pwfile_magic) */
 
-static int	pwfile_loadbegin(PF *) noex ;
-static int	pwfile_loadend(PF *) noex ;
-static int	pwfile_filefront(PF *) noex ;
-static int	pwfile_filefronter(PF *) noex ;
-static int	pwfile_fileln(PF *,cchar *,int) noex ;
-static int	pwfile_fileback(PF *) noex ;
-static int	pwfile_checkopen(PF *) noex ;
+local int	pwfile_loadbegin(PF *) noex ;
+local int	pwfile_loadend(PF *) noex ;
+local int	pwfile_filefront(PF *) noex ;
+local int	pwfile_filefronter(PF *) noex ;
+local int	pwfile_fileln(PF *,cchar *,int) noex ;
+local int	pwfile_fileback(PF *) noex ;
+local int	pwfile_checkopen(PF *) noex ;
 
 
 /* local variables */
@@ -157,7 +160,7 @@ int pwfile_open(PF *op,cchar *pwfname) noex {
 	if ((rs = pwfile_ctor(op,pwfname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pwfname[0]) ylikely {
-	        if (cchar *cp ; (rs = uc_mallocstrw(pwfname,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(pwfname,-1,&cp)) >= 0) {
 	            op->fname = cp ;
 	            op->lfd = -1 ;
 	            if ((rs = pwfile_loadbegin(op)) >= 0) ylikely {
@@ -165,7 +168,8 @@ int pwfile_open(PF *op,cchar *pwfname) noex {
 	                op->magic = PWFILE_MAGIC ;
 	            }
 	            if (rs < 0) {
-	                uc_free(op->fname) ;
+			void *vp = voidp(op->fname) ;
+	                lm_free(vp) ;
 	                op->fname = nullptr ;
 	            }
 	        } /* end if (m-a) */
@@ -192,7 +196,8 @@ int pwfile_close(PF *op) noex {
 	        op->lfd = -1 ;
 	    }
 	    if (op->fname) ylikely {
-	        rs1 = uc_free(op->fname) ;
+		void *vp = voidp(op->fname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    }
@@ -375,7 +380,7 @@ int pwfile_lock(PF *op,int type,int to_lock) noex {
 
 /* private subroutines */
 
-static int pwfile_loadbegin(PF *op) noex {
+local int pwfile_loadbegin(PF *op) noex {
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = pwfile_filefront(op)) >= 0) ylikely {
@@ -409,7 +414,7 @@ static int pwfile_loadbegin(PF *op) noex {
 }
 /* end subroutine (pwfile_loadbegin) */
 
-static int pwfile_loadend(PF *op) noex {
+local int pwfile_loadend(PF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->ulp) ylikely {
@@ -424,7 +429,7 @@ static int pwfile_loadend(PF *op) noex {
 }
 /* end subroutine (pwfile_loadend) */
 
-static int pwfile_filefront(PF *op) noex {
+local int pwfile_filefront(PF *op) noex {
 	int		rs = SR_NOENTRY ;
 	if (op->fname[0]) ylikely {
 	    if (ustat sb ; (rs = uc_stat(op->fname,&sb)) >= 0) ylikely {
@@ -445,11 +450,11 @@ static int pwfile_filefront(PF *op) noex {
 }
 /* end subroutine (pwfile_filefront) */
 
-static int pwfile_filefronter(PF *op) noex {
+local int pwfile_filefronter(PF *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) ylikely {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 	    cint	llen = rs ;
 	    if (ucstream pf ; (rs = pf.open(op->fname,"rc")) >= 0) ylikely {
 	        if (! op->fl.locked) {
@@ -469,14 +474,14 @@ static int pwfile_filefronter(PF *op) noex {
 	        rs1 = pf.close ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ucstream) */
-	    rs1 = uc_free(lbuf) ;
+	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (pwfile_filefronter) */
 
-static int pwfile_fileln(PF *op,cchar *lbuf,int ll) noex {
+local int pwfile_fileln(PF *op,cchar *lbuf,int ll) noex {
     	cnullptr	np{} ;
     	int		rs ;
     	int		n = 0 ;
@@ -513,7 +518,7 @@ static int pwfile_fileln(PF *op,cchar *lbuf,int ll) noex {
 }
 /* end subroutine (pwfile_fileln) */
 
-static int pwfile_fileback(PF *op) noex {
+local int pwfile_fileback(PF *op) noex {
 	vecitem		*alp = op->alp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -533,7 +538,7 @@ static int pwfile_fileback(PF *op) noex {
 }
 /* end subroutine (pwfile_fileback) */
 
-static int pwfile_checkopen(PF *op) noex {
+local int pwfile_checkopen(PF *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (op->lfd < 0) {
