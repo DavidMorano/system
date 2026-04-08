@@ -51,6 +51,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 #include	"stdorder.h"
@@ -82,7 +83,7 @@ cint	nb = CHAR_BIT ;
 /* subroutine templates */
 
 template<typename T>
-static int stdorder_rxx(cchar *buf,T *wp) noex {
+local int stdorder_rxx(cchar *buf,T *wp) noex {
 	cint		n = szof(T) ;
 	T		stage = 0 ;
 	const uchar	*ubuf = ucharp(buf) ;
@@ -96,7 +97,7 @@ static int stdorder_rxx(cchar *buf,T *wp) noex {
 /* end subroutine-template (stdorder_rxx) */
 
 template<typename T>
-static int stdorder_wxx(char *buf,T w) noex {
+local int stdorder_wxx(char *buf,T w) noex {
 	cint		n = szof(T) ;
 	uchar		*ubuf = ucharp(buf) ;
 	for (int i = 0 ; i < n ; i += 1) {
