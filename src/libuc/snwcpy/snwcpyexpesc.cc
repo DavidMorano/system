@@ -30,9 +30,9 @@
 	int wnwcpyexpesc(char *dp,int dl,cchar *sp,int sl) noex
 
 	Arguments:
-	dp		destination string buffer
+	dp		destination string buffer pointer
 	dl		destination string buffer length
-	sp		source string
+	sp		source string pointer
 	sl		source string length
 
 	Returns:
@@ -50,13 +50,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<storebuf.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
@@ -66,11 +64,11 @@
 #include	<ischarx.h>
 #include	<localmisc.h>
 
-#include	"snwcpyx.h"
+#include	"snwcpyexpesc.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -140,14 +138,13 @@ constexpr cint		chx_sub = mkchar('¿') ;
 
 /* exported subroutines */
 
-int snwcpyexpesc(char *dbuf,int dlen,cchar *sp,int sl) noex {
+int snwcpyexpesc(char *dbuf,int dlen,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
-	    {
+	    if (int sl = getlenstr(sp,µsl) ; sl >= 0) {
 	        expmgr eo(dbuf,dlen,sp,sl) ;
 	        rs = eo ;
-	    }
+	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -163,12 +160,17 @@ expmgr::operator int () noex {
 	for (cc *tp ; (rs >= 0) && ((tp = strnchr(sp,sl,chx)) != np) ; ) {
 	    cint tl = intconv(tp - sp) ;
 	    if ((rs = sb.strw(sp,tl)) >= 0) {
+		rs = handle() ;
 		sl -= (tl + 1) ;
 		sp += (tl + 1) ;
-		rs = handle() ;
-	    }
+	    } /* end if (storebuf_strw) */
 	} /* end for */
-	if (rs >= 0) rs = sb.idx ;
+	if ((rs >= 0) && (sl > 0)) {
+	    rs = sb.strw(sp,sl) ;
+	}
+	if (rs >= 0) {
+	    rs = sb.idx ;
+	}
     	return rs ;
 } /* end method (expmgr::operator) */
 
