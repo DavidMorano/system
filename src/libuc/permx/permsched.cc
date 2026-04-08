@@ -72,29 +72,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<cstring>		/* |strchr(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sbuf.h>
 #include	<ids.h>
 #include	<vecstr.h>
-#include	<vstrkeycmpx.h>
+#include	<permx.h>		/* |permid(3uc)| */
+#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
-#include	"permx.h"
+#include	"permsched.h"
 
 
 /* local defines */
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -104,6 +103,11 @@ typedef mode_t		pm ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+}
 
 
 /* external variables */
