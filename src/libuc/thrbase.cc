@@ -44,20 +44,25 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
 #include	<upt.h>
 #include	<localmisc.h>
 
 #include	"thrbase.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -76,10 +81,10 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int thrbase_ctor(thrbase *op,Args ... args) noex {
+local int thrbase_ctor(thrbase *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->ap = np ;
 	    op->sip = np ;
@@ -93,21 +98,19 @@ static int thrbase_ctor(thrbase *op,Args ... args) noex {
 	    } /* end if (new-thrcomm) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (thrbase_ctor) */
+} /* end subroutine (thrbase_ctor) */
 
-static int thrbase_dtor(thrbase *op) noex {
+local int thrbase_dtor(thrbase *op) noex {
 	int		rs = SR_OK ;
 	if (op->tcp) {
 	    delete op->tcp ;
 	    op->tcp = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (thrbase_dtor) */
+} /* end subroutine (thrbase_dtor) */
 
 extern "C" {
-    static int	startworker(THRBASE_SI *) noex ;
+    local int	startworker(THRBASE_SI *) noex ;
 }
 
 
@@ -131,7 +134,7 @@ int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 		    if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 	                THRBASE_SI	*sip ;
 	                cint		sz = szof(THRBASE_SI) ;
-	                if ((rs = uc_malloc(sz,&sip)) >= 0) {
+	                if ((rs = lm_mall(sz,&sip)) >= 0) {
 	                    uptsub_f	thrsub = uptsub_f(startworker) ;
 	                    pthread_t	tid ;
 		            {
@@ -143,8 +146,8 @@ int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 	                        op->tid = tid ;
 			    }
 		            if (rs < 0) {
-		                uc_free(sip) ;
-			    }
+		                lm_free(sip) ;
+			    } /* end if (error) */
 	                } /* end if (memory-allocation) */
 		        rs1 = u_sigmask(SIG_SETMASK,&osm,np) ;
 		        if (rs >= 0) rs = rs1 ;
@@ -250,7 +253,7 @@ int thrbase_waitexit(thrbase *op) noex {
 /* end subroutine (thrbase_waitexit) */
 
 #ifdef	COMMENT
-static int thrbase_cmddone(thrbase *op) noex {
+local int thrbase_cmddone(thrbase *op) noex {
 	int		rs = SR_FAULT ;
 	if (yip) {
 	    cint	rrs = 1 ;
@@ -264,13 +267,14 @@ static int thrbase_cmddone(thrbase *op) noex {
 
 /* private subroutines */
 
-static int startworker(THRBASE_SI *sip) noex {
+local int startworker(THRBASE_SI *sip) noex {
 	thrbase		*op = sip->op ;
 	int		(*worker)(thrbase *,void *) = sip->worker ;
-	int		rs ;
+	int		rs = SR_OK ;
 	int		rs1 ;
-	int		rsw = 0 ;
-	if ((rs = uc_free(sip)) >= 0) {
+	int		rsf ; /* <- gyration for auditing */
+	int		rsw = 0 ; /* return-value */
+	if ((rsf = lm_free(sip)) >= 0) {
 	    {
 	        rs = (*worker)(op,op->ap) ;
 		rsw = rs ;
@@ -278,6 +282,7 @@ static int startworker(THRBASE_SI *sip) noex {
 	    rs1 = thrbase_exiting(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
+	if (rs >= 0) rs = rsf ;
 	return (rs >= 0) ? rsw : rs ;
 }
 /* end subroutine (startworker) */
