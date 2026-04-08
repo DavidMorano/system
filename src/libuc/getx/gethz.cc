@@ -107,7 +107,7 @@ namespace {
 	int trytck(int) noex ;
 	int tryguess(int) noex ;
     } ; /* end struct (hzmgr) */
-}
+} /* end namespace */
 
 constexpr hzmgr_m	mems[] = {
 	&hzmgr::tryenv,
@@ -115,12 +115,12 @@ constexpr hzmgr_m	mems[] = {
 	&hzmgr::tryconst,
 	&hzmgr::trytck,
 	&hzmgr::tryguess
-} ;
+} ; /* end array */
 
 
 /* forward references */
 
-static int	decval(cchar *) noex ;
+local int	decval(cchar *) noex ;
 
 
 /* local variables */
@@ -175,7 +175,7 @@ int hzmgr::tryenv(int w) noex {
 		} else if (isNotValid(rs)) {
 		    rs = SR_OK ;
 		}
-	    }
+	    } /* end if (HZ environment) */
 	}
 	return rs ;
 }
@@ -225,7 +225,7 @@ int hzmgr::tryguess(int w) noex {
 }
 /* end method (hzmgr::tryguess) */
 
-static int decval(cchar *s) noex {
+local int decval(cchar *s) noex {
 	int		rs ;
 	int		rv = 0 ;
 	if ((rs = cfdeci(s,-1,&rv)) >= 0) {
