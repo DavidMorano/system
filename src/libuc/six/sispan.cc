@@ -17,16 +17,28 @@
 
 /*******************************************************************************
 
-	Name:
+	Group:
 	sispan
+	sispanalpha
+	sispanalnum
+	sispandigit
+	sispandigex
+	sispanwhite
+	sispanblank
 
 	Description:
-	This subroutine returns the number of characters skipped
+	These subroutines return the number of characters skipped
 	in the string due to belonging to the specified character
 	class.
 
 	Synopsis:
 	int sispan(cchar *sp,int sl,cchar *class) noex
+	int sispanalpha(cchar *sp,int sl) noex
+	int sispanalnum(cchar *sp,int sl) noex
+	int sispandigit(cchar *sp,int sl) noex
+	int sispandigex(cchar *sp,int sl) noex
+	int sispanwhite(cchar *sp,int sl) noex
+	int sispanblank(cchar *sp,int sl) noex
 
 	Arguments:
 	sp	c-string to be examined pointer
@@ -38,6 +50,26 @@
 	==0	no characters were skipped
 	<0	call-usage-error (should not normally happen)
 
+
+	Name:
+	sispanwht
+
+	Description:
+	This subroutine returns the number of leading white-space
+	characters skipped in the given c-string.
+
+	Synopsis:
+	int sispanwht(cchar *sp,int sl) noex
+
+	Arguments:
+	sp	c-string pointer
+	sl	c-string length
+
+	Returns:
+	>0	number of characters skipped
+	==0	no characters were skipped (no whitespace)
+	<0	error (null-pointer)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -45,16 +77,25 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
+#include	<ischarx.h>		/* |is{x}(3uc)| */
 #include	<localmisc.h>
 
 #include	"sispan.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* typedefs */
+
+extern "C" {
+    typedef bool (*isclass_f)(int) noex ;
+}
 
 
 /* external subroutines */
@@ -68,6 +109,17 @@
 
 /* forward references */
 
+local int sispanclass(isclass_f isclass,cchar *sp,int sl) noex {
+	int		i = -1 ; /* used afterwards */
+	if (sp) ylikely {
+	    for (i = 0 ; sl-- && sp[i] ; i += 1) {
+		cint ch = mkchar(sp[i]) ;
+	        if (! isclass(ch)) break ;
+	    } /* end for */
+	} /* end if (non-null) */
+	return i ;
+} /* end subroutine (sispanclass) */
+	
 
 /* local variables */
 
@@ -86,7 +138,34 @@ int sispan(cchar *sp,int sl,cchar *strclass) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return i ;
-}
-/* end subroutine (sispan) */
+} /* end subroutine (sispan) */
+
+int sispanalpha(cchar *sp,int sl) noex {
+    	return sispanclass(isalphalatin,sp,sl) ;
+} /* end subroutine (sispanalpha) */
+
+int sispanalnum(cchar *sp,int sl) noex {
+    	return sispanclass(isalnumlatin,sp,sl) ;
+} /* end subroutine (sispanalnum) */
+
+int sispandigit(cchar *sp,int sl) noex {
+    	return sispanclass(isdigitlatin,sp,sl) ;
+} /* end subroutine (sispandigit) */
+
+int sispandigex(cchar *sp,int sl) noex {
+    	return sispanclass(isdigexlatin,sp,sl) ;
+} /* end subroutine (sispandigex) */
+
+int sispanoctal(cchar *sp,int sl) noex {
+    	return sispanclass(isoctallatin,sp,sl) ;
+} /* end subroutine (sispanoctal) */
+
+int sispanwhite(cchar *sp,int sl) noex {
+    	return sispanclass(iswhitelatin,sp,sl) ;
+} /* end subroutine (sispanwhite) */
+
+int sispanblank(cchar *sp,int sl) noex {
+    	return sispanclass(isblanklatin,sp,sl) ;
+} /* end subroutine (sispanblank) */
 
 
