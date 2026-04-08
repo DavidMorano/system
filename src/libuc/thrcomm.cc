@@ -28,13 +28,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
+#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"thrcomm.h"
@@ -45,7 +44,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -58,18 +56,18 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int thrcomm_ctor(thrcomm *op,Args ... args) noex {
+local int thrcomm_ctor(thrcomm *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->cmd = 0 ;
 	    op->rrs = 0 ;
 	    op->f_cmd = {} ;
 	    op->f_exiting = {} ;
-	    if ((op->mxp = new(nothrow) ptm) != np) {
-	        if ((op->cvp = new(nothrow) ptc) != np) {
+	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
+	        if ((op->cvp = new(nothrow) ptc) != np) ylikely {
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
@@ -79,35 +77,32 @@ static int thrcomm_ctor(thrcomm *op,Args ... args) noex {
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (thrcomm_ctor) */
+} /* end subroutine (thrcomm_ctor) */
 
-static int thrcomm_dtor(thrcomm *op) noex {
+local int thrcomm_dtor(thrcomm *op) noex {
 	int		rs = SR_OK ;
-	if (op->cvp) {
+	if (op->cvp) ylikely {
 	    delete op->cvp ;
 	    op->cvp = nullptr ;
 	}
-	if (op->mxp) {
+	if (op->mxp) ylikely {
 	    delete op->mxp ;
 	    op->mxp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (thrcomm_dtor) */
+} /* end subroutine (thrcomm_dtor) */
 
 template<typename ... Args>
-static int thrcomm_magic(thrcomm *op,Args ... args) noex {
+local inline int thrcomm_magic(thrcomm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == THRCOMM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (thrcomm_magic) */
+} /* end subroutine (thrcomm_magic) */
 
-static int	thrcomm_ptminit(thrcomm *,int) noex ;
-static int	thrcomm_ptcinit(thrcomm *,int) noex ;
+local int	thrcomm_ptminit(thrcomm *,int) noex ;
+local int	thrcomm_ptcinit(thrcomm *,int) noex ;
 
 
 /* local variables */
@@ -122,14 +117,15 @@ constexpr clockid_t	cid = CLOCK_REALTIME ;
 
 int thrcomm_start(thrcomm *op,int f_shared) noex {
 	int		rs ;
-	if ((rs = thrcomm_ctor(op)) >= 0) {
-	    if ((rs = thrcomm_ptminit(op,f_shared)) >= 0) {
-	        if ((rs = thrcomm_ptcinit(op,f_shared)) >= 0) {
+	if ((rs = thrcomm_ctor(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = thrcomm_ptminit(op,f_shared)) >= 0) ylikely {
+	        if ((rs = thrcomm_ptcinit(op,f_shared)) >= 0) ylikely {
 		    op->magic = THRCOMM_MAGIC ;
 		}
 	        if (rs < 0) {
-		    ptm_destroy(op->mxp) ;
-		}
+		    mxp->destroy() ;
+		} /* end if (error) */
 	    } /* end if (PTM created) */
 	    if (rs < 0) {
 		thrcomm_dtor(op) ;
@@ -142,13 +138,15 @@ int thrcomm_start(thrcomm *op,int f_shared) noex {
 int thrcomm_finish(thrcomm *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = thrcomm_magic(op)) >= 0) {
-	    {
-	        rs1 = ptc_destroy(op->cvp) ;
+	if ((rs = thrcomm_magic(op)) >= 0) ylikely {
+	    if (op->cvp) ylikely {
+		ptc *cnp = op->cvp ;
+	        rs1 = cnp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
-	        rs1 = ptm_destroy(op->mxp) ;
+	    if (op->mxp) ylikely {
+		ptm *mxp = op->mxp ;
+	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -164,32 +162,34 @@ int thrcomm_finish(thrcomm *op) noex {
 int thrcomm_cmdsend(thrcomm *op,int cmd,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = thrcomm_magic(op)) >= 0) {
-	    TIMESPEC	ts{} ;
+	if ((rs = thrcomm_magic(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    TIMESPEC	ts{} ; /* used-afterwards */
 	    if (to >= 0) {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
-	    }
-	    if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
+	    } /* end if (time-out requested) */
+	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+		ptc *cnp = op->cvp ;
 	        op->f_cmd = true ;
 	        while ((rs >= 0) && (op->cmd != 0) && (! op->f_exiting)) {
 		    if (to >= 0) {
-	                rs = ptc_timedwait(op->cvp,op->mxp,&ts) ;
+	                rs = cnp->waiter(op->mxp,&ts) ;
 		    } else {
-	                rs = ptc_wait(op->cvp,op->mxp) ;
+	                rs = cnp->wait(op->mxp) ;
 		    }
 	        } /* end while */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            if (! op->f_exiting) {
 	                op->cmd = cmd ;
 	                op->rrs = SR_INPROGRESS ;
-                        rs = ptc_broadcast(op->cvp) ;
+                        rs = cnp->broadcast ;
 		    } else {
 		        cmd = 0 ;
 		    }
 	        } /* end if (ok) */
 	        op->f_cmd = false ;
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -201,25 +201,27 @@ int thrcomm_cmdrecv(thrcomm *op,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		cmd = 0 ;
-	if ((rs = thrcomm_magic(op)) >= 0) {
-	    TIMESPEC	ts{} ;
+	if ((rs = thrcomm_magic(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    TIMESPEC	ts{} ; /* used-afterwards */
 	    if (to >= 0) {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    }
-	    if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
+	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+		ptc *cnp = op->cvp ;
 	        while ((rs >= 0) && (op->cmd == 0)) {
 		    if (to >= 0) {
-	                rs = ptc_timedwait(op->cvp,op->mxp,&ts) ;
+	                rs = cnp->waiter(op->mxp,&ts) ;
 		    } else {
-	                rs = ptc_wait(op->cvp,op->mxp) ;
+	                rs = cnp->wait(op->mxp) ;
 		    }
 	        } /* end while */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    cmd = op->cmd ;
 		    op->cmd = 0 ;
 	        }
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -230,25 +232,27 @@ int thrcomm_cmdrecv(thrcomm *op,int to) noex {
 int thrcomm_rspsend(thrcomm *op,int rrs,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = thrcomm_magic(op)) >= 0) {
-	    TIMESPEC	ts{} ;
+	if ((rs = thrcomm_magic(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    TIMESPEC	ts{} ; /* used-afterwards */
 	    if (to >= 0) {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    }
-	    if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
+	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+		ptc *cnp = op->cvp ;
 	        while ((rs >= 0) && (op->rrs != SR_INPROGRESS)) {
 		    if (to >= 0) {
-	                rs = ptc_timedwait(op->cvp,op->mxp,&ts) ;
+	                rs = cnp->waiter(op->mxp,&ts) ;
 		    } else {
-	                rs = ptc_wait(op->cvp,op->mxp) ;
+	                rs = cnp->wait(op->mxp) ;
 		    }
 	        } /* end while */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    op->rrs = rrs ;
-                    rs = ptc_broadcast(op->cvp) ;
-	        }
-	        rs1 = ptm_unlock(op->mxp) ;
+                    rs = cnp->broadcast ;
+	        } /* end if (ok) */
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -260,25 +264,27 @@ int thrcomm_rsprecv(thrcomm *op,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rrs = 0 ;
-	if ((rs = thrcomm_magic(op)) >= 0) {
-	    TIMESPEC	ts{} ;
+	if ((rs = thrcomm_magic(op)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    TIMESPEC	ts{} ; /* used-afterwards */
 	    if (to >= 0) {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
-	    }
-	    if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
+	    } /* end if (time-out requested) */
+	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+		ptc *cnp = op->cvp ;
 	        while ((rs >= 0) && (op->rrs == SR_INPROGRESS)) {
 		    if (to >= 0) {
-	                rs = ptc_timedwait(op->cvp,op->mxp,&ts) ;
+	                rs = cnp->waiter(op->mxp,&ts) ;
 		    } else {
-	                rs = ptc_wait(op->cvp,op->mxp) ;
+	                rs = cnp->wait(op->mxp) ;
 		    }
 	        } /* end while */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    rrs = op->rrs ;
 		    op->rrs = SR_INPROGRESS ;
 	        }
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
@@ -288,11 +294,12 @@ int thrcomm_rsprecv(thrcomm *op,int to) noex {
 
 int thrcomm_exiting(thrcomm *op) noex {
 	int		rs ;
-	if ((rs = thrcomm_magic(op)) >= 0) {
+	if ((rs = thrcomm_magic(op)) >= 0) ylikely {
+	    ptc *cnp = op->cvp ;
 	    op->f_exiting = true ;
 	    op->cmd = 0 ;
 	    if (op->f_cmd) {
-    	        rs = ptc_broadcast(op->cvp) ;
+    	        rs = cnp->broadcast ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -302,43 +309,53 @@ int thrcomm_exiting(thrcomm *op) noex {
 
 /* private subroutines */
 
-static int thrcomm_ptminit(thrcomm *op,int f_shared) noex {
+local int thrcomm_ptminit(thrcomm *op,int f_shared) noex {
 	int		rs ;
 	int		rs1 ;
-	if (ptma a ; (rs = ptma_create(&a)) >= 0) {
+	if (ptma a ; (rs = ptma_create(&a)) >= 0) ylikely {
+	    ptm		*mxp = op->mxp ;
 	    int		f_ptm = false ;
-	    if (f_shared) {
-		cint	v = PTHREAD_PROCESS_SHARED ;
-		rs = ptma_setpshared(&a,v) ;
-	    }
-	    if (rs >= 0) {
-	        rs = ptm_create(op->mxp,&a) ;
-		f_ptm = (rs >= 0) ;
-	    }
+	    {
+	        if (f_shared) {
+		    cint	v = PTHREAD_PROCESS_SHARED ;
+		    rs = ptma_setpshared(&a,v) ;
+	        }
+	        if (rs >= 0) ylikely {
+	            rs = mxp->create(&a) ;
+		    f_ptm = (rs >= 0) ;
+	        }
+	    } /* end block */
 	    rs1 = ptma_destroy(&a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_ptm) ptm_destroy(op->mxp) ;
+	    if ((rs < 0) && f_ptm) {
+		mxp->destroy() ;
+	    }
 	} /* end if (ptma) */
 	return rs ;
 }
 /* end subroutine (thrcomm_ptminit) */
 
-static int thrcomm_ptcinit(thrcomm *op,int f_shared) noex {
+local int thrcomm_ptcinit(thrcomm *op,int f_shared) noex {
 	int		rs ;
 	int		rs1 ;
 	if (ptca a ; (rs = ptca_create(&a)) >= 0) {
+	    ptc		*cnp = op->cvp ;
 	    int		f_ptc = false ;
-	    if (f_shared) {
-		cint	v = PTHREAD_PROCESS_SHARED ;
-		rs = ptca_setpshared(&a,v) ;
-	    }
-	    if (rs >= 0) {
-	        rs = ptc_create(op->cvp,&a) ;
-		f_ptc = (rs >= 0) ;
-	    }
+	    {
+	        if (f_shared) {
+		    cint	v = PTHREAD_PROCESS_SHARED ;
+		    rs = ptca_setpshared(&a,v) ;
+	        }
+	        if (rs >= 0) {
+	            rs = cnp->create(&a) ;
+		    f_ptc = (rs >= 0) ;
+	        }
+	    } /* end block */
 	    rs1 = ptca_destroy(&a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_ptc) ptc_destroy(op->cvp) ;
+	    if ((rs < 0) && f_ptc) {
+		cnp->destroy() ;
+	    }
 	} /* end if (ptca) */
 	return rs ;
 }
