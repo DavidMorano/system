@@ -46,9 +46,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<baops.h>		/* |batst(3u)| */
 #include	<mkchar.h>
 #include	<localmisc.h>
@@ -57,7 +55,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -79,32 +77,30 @@ import libutil ;
 
 /* exported subroutines */
 
-int sioterm(cchar *sp,int sl,cchar *terms) noex {
+int sioterm(cchar *sp,int 탎l,cchar *terms) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp && terms) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; terms && ((sl = getlenstr(sp,탎l)) >= 0)) {
 	    for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;
 	        f = batst(terms,ch) ;
 	        if (f) break ;
 	    } /* end for */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
 }
 /* end subroutine (sioterm) */
 
-int sirterm(cchar *sp,int sl,cchar *terms) noex {
+int sirterm(cchar *sp,int 탎l,cchar *terms) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (sp && terms) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; terms && ((sl = getlenstr(sp,탎l)) >= 0)) {
 	    for (i = (sl - 1) ; (i >= 0) ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;
 	        f = batst(terms,ch) ;
 	        if (f) break ;
 	    } /* end for */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
 }
 /* end subroutine (sirterm) */
