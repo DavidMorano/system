@@ -100,11 +100,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usys.h>		/* |projid_t| */
+#include	<uclibmem.h>
 #include	<getax.h>
 #include	<getpwx.h>
-#include	<mallocxx.h>
 #include	<nulstr.h>
 #include	<cfdec.h>
 #include	<hasx.h>
@@ -152,14 +153,14 @@ int getuid_name(cchar *sp,int sl) noex {
 	    if (sp[0]) ylikely {
 	        cchar	*nn{} ;
 	        if (nulstr ns ; (rs = ns.start(sp,sl,&nn)) >= 0) ylikely {
-	            if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) ylikely {
+	            if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
 	                ucentpw	pw{} ; 
 	                cint	pwlen = rs ;
 			cauto	getpw = getpwx_name ;
 			if ((rs = getpw(&pw,pwbuf,pwlen,nn)) >= 0) {
 	                    uid = pw.pw_uid ;
 		        }
-	                rs1 = uc_free(pwbuf) ;
+	                rs1 = lm_free(pwbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
 	            rs1 = ns.finish ;
@@ -198,13 +199,13 @@ int getgid_name(cchar *sp,int sl) noex {
 	    if (sp[0]) ylikely {
 	        cchar	*name{} ;
 	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) ylikely {
-	            if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) ylikely {
+	            if (char *grbuf ; (rs = lm_gr(&grbuf)) >= 0) ylikely {
 	                cint	grlen = rs ;
 	                ucentgr	gr{} ;
 			if ((rs = getgr_name(&gr,grbuf,grlen,name)) >= 0) {
 	                    gid = gr.gr_gid ;
 		        }
-	                rs1 = uc_free(grbuf) ;
+	                rs1 = lm_free(grbuf) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
 	            rs1 = ns.finish ;
@@ -259,13 +260,13 @@ int getpjid_name(cchar *sp,int sl) noex {
 	    if (sp[0]) ylikely {
 	        cchar	*name{} ;
 	        if (nulstr ns ; (rs = ns.start(sp,sl,&name)) >= 0) ylikely {
-	            if (char *pjbuf ; (rs = malloc_pj(&pjbuf)) >= 0) ylikely {
+	            if (char *pjbuf ; (rs = lm_pj(&pjbuf)) >= 0) ylikely {
 	                cint	pjlen = rs ;
 		        ucentpj pj ;
 		        if ((rs = getpj_name(&pj,pjbuf,pjlen,name)) >= 0) {
 	                    pjid = pj.pj_projid ;
 		        }
-	                rs1 = uc_free(pjbuf) ;
+	                rs1 = lm_free(pjbuf) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
 	            rs1 = ns.finish ;
