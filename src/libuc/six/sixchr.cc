@@ -49,9 +49,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -116,7 +114,7 @@ int siochr(cchar *sp,int sl,int sch) noex {
 			f = true ;
 			i = intconv(tp - sp) ;
 		    }
-	        }
+	        } /* end if */
 	    } else {
 	        for (i = 0 ; sl-- && sp[i] ; i += 1) {
 	            cint	ch = mkchar(sp[i]) ;
@@ -128,17 +126,16 @@ int siochr(cchar *sp,int sl,int sch) noex {
 }
 /* end subroutine (siochr) */
 
-int sirchr(cchar *sp,int sl,int sch) noex {
+int sirchr(cchar *sp,int µsl,int sch) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	sch &= UCHAR_MAX ;
-	if (sp) ylikely {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
 	        cint	ch = mkchar(sp[i]) ;
 	        if ((f = (ch == sch))) break ;
 	    } /* end for */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
 }
 /* end subroutine (sirchr) */
