@@ -73,10 +73,14 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<ucgetpid.h>		/* |uc_getpid(3uc)| */
+#include	<ucsysconf.h>
+#include	<ucsig.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<sigignores.h>
 #include	<sigign.h>
 #include	<ids.h>
@@ -95,6 +99,9 @@
 
 #include	"spawner.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 import uconstants ;
 
 /* local defines */
@@ -108,7 +115,6 @@ import uconstants ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -122,7 +128,22 @@ typedef mainv		mv ;
 /* external subroutines */
 
 extern "C" {
+    extern int uc_piper(int *,int,int) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_tcsetpgrp(int,pid_t) noex ;
+    extern int uc_isaexecve(cchar *,mainv,mainv) noex ;
+    extern int uc_execve(cchar *,mainv,mainv) noex ;
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_fork() noex ;
+    extern int uc_exit(int) noex ;
+}
+
+extern "C" {
+}
+
+extern "C" {
     extern int	sigdefaults(cint *) noex ;
+    extern int	dupup(int,int) noex ;
 }
 
 
@@ -142,7 +163,7 @@ enum cmds {
 	cmd_fdclose,
 	cmd_fdnull,
 	cmd_fddup,
-	cmd_fddup2,
+	cmd_fddupover,
 	cmd_fdcreate,
 	cmd_overlast
 } ;
@@ -165,78 +186,75 @@ namespace {
 	int		maxpathlen ;
 	int mkvars() noex {
 	    int		rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
 		maxpathlen = rs ;
 	    }
 	    return rs ;
 	} ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int spawner_ctor(spawner *op,Args ... args) noex {
+local int spawner_ctor(spawner *op,Args ... args) noex {
     	SPAWNER		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->cmdp = new(nothrow) vecobj) != np) {
-		if ((op->envp = new(nothrow) envhelp) != np) {
+	    if ((op->cmdp = new(nothrow) vecobj) != np) ylikely {
+		if ((op->envp = new(nothrow) envhelp) != np) ylikely {
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
 		    delete op->cmdp ;
 		    op->cmdp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (spawner_ctor) */
+} /* end subroutine (spawner_ctor) */
 
-static int spawner_dtor(spawner *op) noex {
+local int spawner_dtor(spawner *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->envp) {
+	    if (op->envp) ylikely {
 		delete op->envp ;
 		op->envp = nullptr ;
 	    }
-	    if (op->cmdp) {
+	    if (op->cmdp) ylikely {
 		delete op->cmdp ;
 		op->cmdp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (spawner_dtor) */
+} /* end subroutine (spawner_dtor) */
 
 template<typename ... Args>
-static inline int spawner_magic(spawner *op,Args ... args) noex {
+local inline int spawner_magic(spawner *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SPAWNER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (spawner_magic) */
+} /* end subroutine (spawner_magic) */
 
-static int	spawner_runer(spawner *) noex ;
-static int	spawner_child(spawner *,scmd **,mainv,mainv) noex ;
+local int	spawner_runer(spawner *) noex ;
+local int	spawner_child(spawner *,scmd **,mainv,mainv) noex ;
 
-static int	procparent(scmd **) noex ;
-static int	defaultfds(scmd **) noex ;
-static int	closefds(scmd **) noex ;
+local int	procparent(scmd **) noex ;
+local int	defaultfds(scmd **) noex ;
+local int	closefds(scmd **) noex ;
 
-static int	envhelp_load(envhelp *,char *,cchar *,mainv) noex ;
+local int	envhelp_load(envhelp *,char *,cchar *,mainv) noex ;
 
-static int	findprog(char *,char *,cchar *) noex ;
-static bool	isUsed(scmd **,int) noex ;
-static bool	isChildFD(int) noex ;
+local int	findprog(char *,char *,cchar *) noex ;
+local bool	isUsed(scmd **,int) noex ;
+local bool	isChildFD(int) noex ;
 
 
 /* local variables */
@@ -249,7 +267,7 @@ constexpr cpcchar	envbads[] = {
 	"RANDOM",
 	"SECONDS",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr int		sigigns[] = {
 	SIGTERM,
@@ -259,7 +277,7 @@ constexpr int		sigigns[] = {
 	SIGPOLL,
 	SIGXFSZ,
 	0
-} ;
+} ; /* end array */
 
 constexpr int		sigdefs[] = {
 	SIGQUIT,
@@ -267,12 +285,12 @@ constexpr int		sigdefs[] = {
 	SIGINT,
 	SIGPOLL,
 	0
-} ;
+} ; /* end array */
 
 constexpr int		sigouts[] = {
 	SIGTTOU,
 	0
-} ;
+} ; /* end array */
 
 constexpr mapex_map	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -292,7 +310,7 @@ constexpr mapex_map	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
 static vars		var ;
 
@@ -315,25 +333,25 @@ namespace {
 	char		*a{} ;
 	char		*pwd ;
 	char		*pbuf ;
-	starter(spawner *o,cc *f,mv a,mv e) noex : op(o), fn(f) {
-	    av = a ;
+	starter(spawner *o,cc *f,mv µa,mv e) noex : op(o), fn(f) {
+	    av = µa ;
 	    ev = e ;
 	} ; /* end ctor */
 	operator int () noex ;
 	int starts(cchar *) noex ;
     } ; /* end struct (starter) */
-}
+} /* end namespace */
 
 int spawner_start(spawner *op,cchar *fn,mainv av,mainv ev) noex {
 	int		rs ;
-	if ((rs = spawner_ctor(op,fn)) >= 0) {
+	if ((rs = spawner_ctor(op,fn)) >= 0) ylikely {
 	    rs = SR_INVAL ;
 	    if (fn[0]) {
 		static cint	rsv = var.mkvars() ;
-		if ((rs = rsv) >= 0) {
+		if ((rs = rsv) >= 0) ylikely {
 		    op->argv = av ;
 		    op->pid = -1 ;
-		    if (starter so(op,fn,av,ev) ; (rs = so) >= 0) {
+		    if (starter so(op,fn,av,ev) ; (rs = so) >= 0) ylikely {
 			op->magic = SPAWNER_MAGIC ;
 		    }
 		} /* end if (mkvars) */
@@ -351,7 +369,7 @@ starter::operator int () noex {
 	cint		sz = ((var.maxpathlen + 1) * 2) ;
     	int		rs ;
 	int		ai = 0 ;
-	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	if ((rs = lm_mall(sz,&a)) >= 0) ylikely {
 	    cchar	*efname = fn ;
 	    pwd = (a + ((maxpath + 1) * ai++)) ;
 	    pbuf = (a + ((maxpath + 1) * ai++)) ;
@@ -366,7 +384,7 @@ starter::operator int () noex {
 	    if (rs >= 0) {
 	        rs = starts(efname) ;
 	    }
-	    rs = rsfree(rs,a) ;
+	    rs = lm_rsfree(rs,a) ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
@@ -374,12 +392,12 @@ starter::operator int () noex {
 
 int starter::starts(cc *efname) noex {
     	int		rs ;
-        if (cchar *cp{} ; (rs = uc_mallocstrw(efname,-1,&cp)) >= 0) {
+        if (cchar *cp ; (rs = lm_strw(efname,-1,&cp)) >= 0) ylikely {
             cint            sz = szof(scmd) ;
             op->execfname = cp ;
-            if ((rs = vecobj_start(op->cmdp,sz,2,0)) >= 0) {
+            if ((rs = vecobj_start(op->cmdp,sz,2,0)) >= 0) ylikely {
                 envhelp     *ehp = op->envp ;
-                if ((rs = envhelp_start(ehp,envbads,ev)) >= 0) {
+                if ((rs = envhelp_start(ehp,envbads,ev)) >= 0) ylikely {
                     rs = envhelp_load(ehp,pwd,efname,av) ;
                     if (rs < 0) {
                         envhelp_finish(ehp) ;
@@ -390,7 +408,8 @@ int starter::starts(cc *efname) noex {
                 }
             } /* end if (vecobj_start) */
             if (rs < 0) {
-                uc_free(op->execfname) ;
+		void *vp = voidp(op->execfname) ;
+                lm_free(vp) ;
                 op->execfname = nullptr ;
             }
         } /* end if (memory-allocation) */
@@ -402,11 +421,11 @@ int spawner_finish(spawner *op) noex {
     	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    if (void **vpp{} ; (rs1 = vecobj_getvec(op->cmdp,&vpp)) >= 0) {
-	        scmd	**cv = scmdpp(vpp) ;
-	        for (int i = 0 ; cv[i] != nullptr ; i += 1) {
-	            scmd	*cmdp = cv[i] ;
+	        scmd	**cva = scmdpp(vpp) ;
+	        for (int i = 0 ; cva[i] != nullptr ; i += 1) {
+	            scmd	*cmdp = cva[i] ;
 	            switch (cmdp->cmd) {
 	            case cmd_fdcreate:
 	                if (cmdp->pfd >= 0) {
@@ -417,16 +436,17 @@ int spawner_finish(spawner *op) noex {
 	        } /* end for */
 	    }
 	    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-	    if (op->execfname) {
-	        rs1 = uc_free(op->execfname) ;
+	    if (op->execfname) ylikely {
+		void *vp = voidp(op->execfname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->execfname = nullptr ;
 	    }
-	    {
+	    if (op->envp) ylikely {
 	        rs1 = envhelp_finish(op->envp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->cmdp) ylikely {
 	        rs1 = vecobj_finish(op->cmdp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -441,7 +461,7 @@ int spawner_finish(spawner *op) noex {
 
 int spawner_setsid(spawner *op) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    op->opts |= SPAWNER_OSETSID ;
 	} /* end if (magic) */
 	return rs ;
@@ -450,7 +470,7 @@ int spawner_setsid(spawner *op) noex {
 
 int spawner_setpgrp(spawner *op,pid_t pgrp) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pgrp >= 0) {
 	        op->opts |= SPAWNER_OSETPGRP ;
@@ -463,7 +483,7 @@ int spawner_setpgrp(spawner *op,pid_t pgrp) noex {
 
 int spawner_setctty(spawner *op,int fdterm,pid_t pgrp) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((fdterm >= 0) && (pgrp >= 0)) {
 	        op->pgrp = pgrp ;
@@ -476,7 +496,7 @@ int spawner_setctty(spawner *op,int fdterm,pid_t pgrp) noex {
 	            rs = vecobj_add(op->cmdp,&sc) ;
 	            if (rs < 0) {
 	                u_close(nfd) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (dupup) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -486,7 +506,7 @@ int spawner_setctty(spawner *op,int fdterm,pid_t pgrp) noex {
 
 int spawner_seteuid(spawner *op,uid_t uid) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    scmd	sc{} ;
 	    sc.cmd = cmd_seteuid ;
 	    sc.pfd = -1 ;
@@ -500,7 +520,7 @@ int spawner_seteuid(spawner *op,uid_t uid) noex {
 
 int spawner_setegid(spawner *op,gid_t gid) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    scmd	sc{} ;
 	    sc.cmd = cmd_setegid ;
 	    sc.pfd = -1 ;
@@ -514,7 +534,7 @@ int spawner_setegid(spawner *op,gid_t gid) noex {
 
 int spawner_sigignores(spawner *op) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    op->opts |= SPAWNER_OIGNINTR ;
 	} /* end if (magic) */
 	return rs ;
@@ -523,7 +543,7 @@ int spawner_sigignores(spawner *op) noex {
 
 int spawner_sigignore(spawner *op,int sn) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    scmd	sc{} ;
 	    sc.cmd = cmd_sigign ;
 	    sc.pfd = -1 ;
@@ -536,7 +556,7 @@ int spawner_sigignore(spawner *op,int sn) noex {
 
 int spawner_sigdefault(spawner *op,int sn) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    scmd	sc{} ;
 	    sc.cmd = cmd_sigdfl ;
 	    sc.pfd = -1 ;
@@ -549,7 +569,7 @@ int spawner_sigdefault(spawner *op,int sn) noex {
 
 int spawner_sighold(spawner *op,int sn) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    scmd	sc{} ;
 	    sc.cmd = cmd_sighold ;
 	    sc.pfd = -1 ;
@@ -562,7 +582,7 @@ int spawner_sighold(spawner *op,int sn) noex {
 
 int spawner_sigrelease(spawner *op,int sn) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    scmd	sc{} ;
 	    sc.cmd = cmd_sigrlse ;
 	    sc.pfd = -1 ;
@@ -575,7 +595,7 @@ int spawner_sigrelease(spawner *op,int sn) noex {
 
 int spawner_fdclose(spawner *op,int cfd) noex {
 	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    scmd	sc{} ;
 	    sc.cmd = cmd_fdclose ;
 	    sc.pfd = -1 ;
@@ -588,7 +608,7 @@ int spawner_fdclose(spawner *op,int cfd) noex {
 
 int spawner_fdnull(spawner *op,int of) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    scmd	sc{} ;
 	    sc.cmd = cmd_fdnull ;
 	    sc.pfd = of ; /* open-flags */
@@ -601,8 +621,8 @@ int spawner_fdnull(spawner *op,int of) noex {
 
 int spawner_fddup(spawner *op,int pfd) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
-	    if ((rs = dupup(pfd,3)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
+	    if ((rs = dupup(pfd,3)) >= 0) ylikely {
 	        scmd	sc{} ;
 	        cint	nfd = rs ;
 	        sc.cmd = cmd_fddup ;
@@ -611,49 +631,49 @@ int spawner_fddup(spawner *op,int pfd) noex {
 	        rs = vecobj_add(op->cmdp,&sc) ;
 	        if (rs < 0) {
 	            u_close(nfd) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (dupup) */
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (spawner_fddup) */
 
-int spawner_fddup2(spawner *op,int pfd,int tfd) noex {
+int spawner_fddupover(spawner *op,int pfd,int tfd) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
-	    if ((rs = dupup(pfd,3)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
+	    if ((rs = dupup(pfd,3)) >= 0) ylikely {
 	        scmd	sc{} ;
 	        int	nfd = rs ;
-	        sc.cmd = cmd_fddup2 ;
+	        sc.cmd = cmd_fddupover ;
 	        sc.pfd = nfd ;
 	        sc.cfd = tfd ;
 	        rs = vecobj_add(op->cmdp,&sc) ;
 	        if (rs < 0) {
 	            u_close(nfd) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (dupup) */
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (spawner_fddup2) */
+/* end subroutine (spawner_fddupover) */
 
 int spawner_fddupto(spawner *op,int pfd,int tfd) noex {
-	return spawner_fddup2(op,pfd,tfd) ;
+	return spawner_fddupover(op,pfd,tfd) ;
 }
 /* end subroutine (spawner_fddupto) */
 
 int spawner_fdcreate(spawner *op,int cfd) noex {
     	int		rs ;
 	int		fd = 0 ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    int		pipes[2] ;
-	    if ((rs = uc_piper(pipes,0,3)) >= 0) {
+	    if ((rs = uc_piper(pipes,0,3)) >= 0) ylikely {
 	        scmd	sc{} ;
 	        sc.cmd = cmd_fdcreate ;
 	        sc.pfdend = pipes[0] ;
 	        sc.pfd = pipes[1] ;
 	        sc.cfd = cfd ;
-	        if ((rs = vecobj_add(op->cmdp,&sc)) >= 0) {
+	        if ((rs = vecobj_add(op->cmdp,&sc)) >= 0) ylikely {
 		    fd = pipes[0] ;
 		}
 	        if (rs < 0) {
@@ -669,7 +689,7 @@ int spawner_fdcreate(spawner *op,int cfd) noex {
 
 int spawner_envset(spawner *op,cchar *kp,cchar *vp,int vl) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op,kp,vp)) >= 0) {
+	if ((rs = spawner_magic(op,kp,vp)) >= 0) ylikely {
 	    rs = envhelp_envset(op->envp,kp,vp,vl) ;
 	} /* end if (magic) */
 	return rs ;
@@ -678,14 +698,14 @@ int spawner_envset(spawner *op,cchar *kp,cchar *vp,int vl) noex {
 
 int spawner_run(spawner *op) noex {
 	int		rs ;
-	if ((rs = spawner_magic(op)) >= 0) {
+	if ((rs = spawner_magic(op)) >= 0) ylikely {
 	    rs = spawner_runer(op) ;
 	}
 	return rs ;
 }
 /* end subroutine (spawner_run) */
 
-static int spawner_runer(spawner *op) noex {
+local int spawner_runer(spawner *op) noex {
     	int		rs = SR_OK ;
 	cchar		*args[2] ;
 	mainv		av = op->argv ;
@@ -694,22 +714,19 @@ static int spawner_runer(spawner *op) noex {
 	    args[0] = op->execfname ;
 	    args[1] = nullptr ;
 	}
-
-/* sort all environment variables */
-
+	/* sort all environment variables */
 	if_constexpr (f_envsort) {
 	    if (rs >= 0) {
 	        rs = envhelp_sort(op->envp) ;
 	    }
 	} /* end if_constexpr (f_envsort) */
-
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    if (void **vpp{} ; (rs = vecobj_getvec(op->cmdp,&vpp)) >= 0) {
-	        scmd	**cv = scmdpp(vpp) ;
+	        scmd	**cva = scmdpp(vpp) ;
 		if (mainv ev{} ; (rs = envhelp_getvec(op->envp,&ev)) >= 0) {
 	    	    if ((rs = uc_fork()) == 0) {
 	        	int	ex ;
-	                if ((rs = spawner_child(op,cv,av,ev)) >= 0) {
+	                if ((rs = spawner_child(op,cva,av,ev)) >= 0) {
 	                    ex = EX_UNKNOWN ;
 			} else if (isNotPresent(rs)) {
 	                    ex = EX_CANTCREAT ;
@@ -721,20 +738,19 @@ static int spawner_runer(spawner *op) noex {
 	                u_exit(ex) ; /* no STDIO flush, no exit-handlers */
 		    } else if (rs >= 0) {
 	                op->pid = pid_t(rs) ;
-	                rs = procparent(cv) ;
+	                rs = procparent(cva) ;
 	            }
 		} /* end if (envhelp_getvec) */
 		if (rs >= 0) rs = op->pid ;
 	    } /* end if (vecobj_getvec) */
 	} /* end if (ok) */
-
 	return rs ;
 }
 /* end subroutine (spawner_runer) */
 
 int spawner_wait(spawner *op,int *csp,int opts) noex {
     	int		rs ;
-	if ((rs = spawner_magic(op,csp)) >= 0) {
+	if ((rs = spawner_magic(op,csp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (op->pid >= 0) {
 	        rs = u_waitpid(op->pid,csp,opts) ;
@@ -747,29 +763,26 @@ int spawner_wait(spawner *op,int *csp,int opts) noex {
 
 /* local subroutines */
 
-static int spawner_child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
+local int spawner_child(spawner *op,scmd **cva,mainv av,mainv ev) noex {
 	cint		opts = op->opts ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*efname = op->execfname ;
-
 	if ((rs >= 0) && (opts & SPAWNER_OIGNINTR)) {
 	    rs = sigignores(sigigns) ;
 	}
 	if ((rs >= 0) && (op->opts & SPAWNER_OSIGDEFS)) {
 	    rs = sigdefaults(sigdefs) ;
 	}
-
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    if (opts & SPAWNER_OSETSID) {
 	        rs = u_setsid() ;
 	    } else if (opts & SPAWNER_OSETPGRP) {
 	        rs = u_setpgid(0,op->pgrp) ;
 	    }
-	}
-
-	for (int i = 0 ; (rs >= 0) && (cv[i] != nullptr) ; i += 1) {
-	    scmd	*cmdp = cv[i] ;
+	} /* end if (ok) */
+	for (int i = 0 ; (rs >= 0) && (cva[i] != nullptr) ; i += 1) {
+	    scmd	*cmdp = cva[i] ;
 	    switch (cmdp->cmd) {
 	    case cmd_setctty:
 	        {
@@ -818,16 +831,16 @@ static int spawner_child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 	        u_close(cmdp->pfd) ;
 	        cmdp->pfd = -1 ;
 	        break ;
-	    case cmd_fddup2:
+	    case cmd_fddupover:
 	        if (cmdp->pfd != cmdp->cfd) {
-	            rs = u_dup2(cmdp->pfd,cmdp->cfd) ;
+	            rs = u_dupover(cmdp->pfd,cmdp->cfd) ;
 	            u_close(cmdp->pfd) ;
 	        }
 	        cmdp->pfd = -1 ;
 	        break ;
 	    case cmd_fdcreate:
 	        if (cmdp->pfd != cmdp->cfd) {
-	            rs = u_dup2(cmdp->pfd,cmdp->cfd) ;
+	            rs = u_dupover(cmdp->pfd,cmdp->cfd) ;
 	            u_close(cmdp->pfd) ;
 	        }
 	        cmdp->pfd = -1 ;
@@ -836,24 +849,22 @@ static int spawner_child(spawner *op,scmd **cv,mainv av,mainv ev) noex {
 	        break ;
 	    } /* end switch */
 	} /* end for */
-
-	if (rs >= 0) {
-	    if ((rs = closefds(cv)) >= 0) {
-	        if ((rs = defaultfds(cv)) >= 0) {
+	if (rs >= 0) ylikely {
+	    if ((rs = closefds(cva)) >= 0) {
+	        if ((rs = defaultfds(cva)) >= 0) {
 	            rs = uc_execve(efname,av,ev) ;
 	        }
 	    }
-	}
-
+	} /* end if (ok) */
 	return rs ;
 }
 /* end subroutine (spawner_child) */
 
-static int defaultfds(scmd **cv) noex {
+local int defaultfds(scmd **cva) noex {
 	cint		rsbadf = SR_BADF ;
 	int		rs = SR_OK ;
 	for (int i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
-	    if (! isUsed(cv,i)) {
+	    if (! isUsed(cva,i)) {
 	        if ((rs = u_fcntl(i,F_GETFD,0)) == rsbadf) {
 	            cint of = (i == 0) ? O_RDONLY : O_WRONLY ;
 	            rs = u_open(nullfname,of,0666) ;
@@ -864,23 +875,25 @@ static int defaultfds(scmd **cv) noex {
 }
 /* end subroutine (defaultfds) */
 
-static int closefds(scmd **cv) noex {
+local int closefds(scmd **cva) noex {
 	for (int i = 3 ; i < NOFILE ; i += 1) {
-	    if (! isUsed(cv,i)) u_close(i) ;
-	}
+	    if (! isUsed(cva,i)) {
+		u_close(i) ;
+	    }
+	} /* end for */
 	return SR_OK ;
 }
 /* end subroutine (closefds) */
 
-static int procparent(scmd **cv) noex {
+local int procparent(scmd **cva) noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; cv[i] != nullptr ; i += 1) {
-	    scmd	*cmdp = cv[i] ;
+	for (int i = 0 ; cva[i] != nullptr ; i += 1) {
+	    scmd	*cmdp = cva[i] ;
 	    switch (cmdp->cmd) {
 	    case cmd_setctty:
 	    case cmd_fdcreate:
 	    case cmd_fddup:
-	    case cmd_fddup2:
+	    case cmd_fddupover:
 	        rs = u_close(cmdp->pfd) ;
 	        cmdp->pfd = -1 ;
 	        break ;
@@ -891,11 +904,11 @@ static int procparent(scmd **cv) noex {
 }
 /* end subroutine (procparent) */
 
-static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,mainv argv) noex {
+local int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,mainv argv) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = envhelp_envset(ehp,"_EF",efname,-1)) >= 0) {
+	if ((rs = envhelp_envset(ehp,"_EF",efname,-1)) >= 0) ylikely {
 	    int		al = -1 ;
 	    cchar	*ap = nullptr ;
 	    if (argv != nullptr) {
@@ -904,20 +917,20 @@ static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,mainv argv) noex {
 	    if (ap == nullptr) {
 		al = sfbasename(efname,-1,&ap) ;
 	    }
-	    if ((rs = envhelp_envset(ehp,"_A0",ap,al)) >= 0) {
+	    if ((rs = envhelp_envset(ehp,"_A0",ap,al)) >= 0) ylikely {
 	        cint	sulen = (var.maxpathlen + 22) ;
-	        if (char *subuf{} ; (rs = uc_malloc((sulen+1),&subuf)) >= 0) {
+	        if (char *subuf ; (rs = lm_mall((sulen+1),&subuf)) >= 0) {
 		    if ((rs = ucpid) >= 0) {
 			const pid_t	pid = pid_t(rs) ;
 	                if ((rs = snshellunder(subuf,sulen,pid,efname)) > 0) {
 	                    rs = envhelp_envset(ehp,"_",subuf,rs) ;
 	                }
 		    } /* end if (ucpid) */
-	            rs = rsfree(rs,subuf) ;
+	            rs = lm_rsfree(rs,subuf) ;
 	        } /* end if (m-a-f) */
 	    } /* end if (envhelp_envset) */
 	} /* end if (envhelp_envset) */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    cchar	*vname = varname.pwd ;
 	    if ((rs = envhelp_present(ehp,vname,-1,nullptr)) == rsn) {
 	        int	pwdl = -1 ;
@@ -931,16 +944,16 @@ static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,mainv argv) noex {
 	        }
 	    } /* end if (envhelp_present) */
 	} /* end if (ok) */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    cchar	*vname = varname.pwd ;
 	    if ((rs = envhelp_present(ehp,vname,-1,nullptr)) == rsn) {
 	        cint	plen = (4 * var.maxpathlen) ;
-	        if (char *pbuf{} ; (rs = uc_malloc((plen+1),&pbuf)) >= 0) {
+	        if (char *pbuf ; (rs = lm_mall((plen+1),&pbuf)) >= 0) ylikely {
 		    cint	req = _CS_PATH ;
 	            if ((rs = uc_sysconfstr(req,pbuf,plen)) >= 0) {
 		        rs = envhelp_envset(ehp,vname,pbuf,rs) ;
 	            } /* end if */
-	            rs1 = uc_free(pbuf) ;
+	            rs1 = lm_free(pbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (envhelp_present) */
@@ -949,19 +962,19 @@ static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,mainv argv) noex {
 }
 /* end subroutine (envhelp_load) */
 
-static int findprog(char *pwd,char *pbuf,cchar *fname) noex {
+local int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
-	if (ids id ; (rs = id.load) >= 0) {
+	if (ids id ; (rs = id.load) >= 0) ylikely {
 	    if (strchr(fname,'/') != nullptr) {
 	        if (pwd[0] == '\0') {
 	            rs = getpwd(pwd,var.maxpathlen) ;
 	        }
-	        if (rs >= 0) {
-	            if ((rs = mkpath2(pbuf,pwd,fname)) >= 0) {
+	        if (rs >= 0) ylikely {
+	            if ((rs = mkpath2(pbuf,pwd,fname)) >= 0) ylikely {
 	                pl = rs ;
-			if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
+			if (ustat sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
 			    cint	am = X_OK ;
 			    rs = permid(&id,&sb,am) ;
 		        }
@@ -978,10 +991,10 @@ static int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 }
 /* end subroutine (findprog) */
 
-static bool isUsed(scmd **cv,int fd) noex {
+local bool isUsed(scmd **cva,int fd) noex {
 	bool		f = false ;
-	for (int i = 0 ; cv[i] != nullptr ; i += 1) {
-	    scmd	*cmdp = cv[i] ;
+	for (int i = 0 ; cva[i] != nullptr ; i += 1) {
+	    scmd	*cmdp = cva[i] ;
 	    if (isChildFD(cmdp->cmd)) {
 	        f = (cmdp->cfd == fd) ;
 	        if (f) break ;
@@ -991,10 +1004,10 @@ static bool isUsed(scmd **cv,int fd) noex {
 }
 /* end subroutine (isUsed) */
 
-static bool isChildFD(int cmd) noex {
+local bool isChildFD(int cmd) noex {
 	bool		f = false ;
 	switch (cmd) {
-	case cmd_fddup2:
+	case cmd_fddupover:
 	case cmd_fdcreate:
 	    f = true ;
 	    break ;
