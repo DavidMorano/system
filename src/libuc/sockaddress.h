@@ -55,7 +55,8 @@
 #include	<sys/un.h>		/* |sockaddr_un| */
 #include	<netinet/in.h>		/* |sockaddr_in| + |sockaddr_in6| */
 #include	<arpa/inet.h>		/* the INET utility subroutines */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>		/* |MAXPATHLEN| */
 
 
@@ -63,7 +64,7 @@
 #define	SOCKADDRESS_LEN		szof(union sockaddress_head)
 #define	SOCKADDRESS_NAMELEN	szof(union sockaddress_head)
 #define	SOCKADDRESS_MAXPATH	MAXPATHLEN
-#define	SOCKADDRESS_STRSIZE	(2 * SOCKADDRESS_MAXPATH + 1)
+#define	SOCKADDRESS_STRSIZE	(SOCKADDRESS_MAXPATH + 1)
 
 
 struct sockaddress_head {
@@ -111,7 +112,8 @@ struct sockaddress : sockaddress_head {
 	sockaddress(const void *,int = -1) noex ;
 	sockaddress(const sockaddress &) noex ;
 	sockaddress &operator = (const sockaddress &) noex ;
-	int start(int,cvoid * = nullptr,int = 0,uint = 0) noex ;
+	int start	(int,cvoid * = nullptr,int = 0,uint = 0) noex ;
+	int getaddr	(void *,int) noex ;
 	int operator () (const void *,int = -1) noex ;
 	operator int () noex ;
 } ; /* end struct (sockaddress) */
