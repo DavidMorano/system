@@ -42,9 +42,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -76,7 +74,7 @@ extern "C" {
 
 /* forward references */
 
-static int sinon(isnon_f isx,cchar *sp,int sl) noex {
+local int sinon(isnon_f isx,cchar *sp,int sl) noex {
 	int		i = 0 ; /* used-afterwards */
 	bool		f = false ;
 	if (sp) ylikely {
@@ -110,6 +108,10 @@ int sinondec(cchar *sp,int sl) noex {
 
 int sinonhex(cchar *sp,int sl) noex {
     	return sinon(ishexlatin,sp,sl) ;
+}
+
+int sinonwht(cchar *sp,int sl) noex {
+    	return sinon(iswhtlatin,sp,sl) ;
 }
 
 
