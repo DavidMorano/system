@@ -33,7 +33,7 @@
 
 	Returns:
 	>=0	index of beginning of next field
-	<0	substring not found
+	<0	address-fault or substring not-found
 
 *******************************************************************************/
 
@@ -41,20 +41,19 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<char.h>		/* |char_iswhite(3uc)| */
-#include	<ischarx.h>
+#include	<usysbase.h>
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
-#include	"six.h"
+#include	"sinext.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* local namespaces */
@@ -83,19 +82,23 @@ import libutil ;
 
 /* exported subroutines */
 
-int sinext(cchar *sp,int sl) noex {
-	int		i = -1 ; /* return-value */
-	if (sp) ylikely {
-	    i = 0 ; 
-	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((i < sl) && iswht(sp[i])) {
+int sinext(cchar *sp,int µsl) noex {
+	int		si = -1 ; /* return-value */
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	    bool	f = false ;
+	    int		i = 0 ;
+	    while ((i < sl) && ISWHT(sp[i])) {
 	        i += 1 ;
 	    }
-	    while ((i < sl) && sp[i] && (! iswht(sp[i]))) {
+	    while ((i < sl) && sp[i] && (! ISWHT(sp[i]))) {
+		f = true ;
 	        i += 1 ;
 	    }
-	} /* end if (non-null) */
-	return i ;
+	    if (f) {
+		si = i ;
+	    }
+	} /* end if (getlenstr) */
+	return si ;
 }
 /* end subroutine (sinext) */
 
