@@ -22,10 +22,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 #include	<envhelp.h>
 
@@ -81,7 +78,7 @@ extern int spawner_sigrelease(spawner *,int) noex ;
 extern int spawner_fdclose(spawner *,int) noex ;
 extern int spawner_fdnull(spawner *,int) noex ;
 extern int spawner_fddup(spawner *,int) noex ;
-extern int spawner_fddup2(spawner *,int,int) noex ;
+extern int spawner_fddupover(spawner *,int,int) noex ;
 extern int spawner_fddupto(spawner *,int,int) noex ;
 extern int spawner_envset(spawner *,cchar *,cchar *,int) noex ;
 extern int spawner_run(spawner *) noex ;
