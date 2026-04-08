@@ -31,10 +31,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	SNFLAGS		struct snflags_head
@@ -45,7 +42,7 @@ struct snflags_head {
 	int		c ;
 	int		bl ;
 	int		bi ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum snflagsmems {
@@ -93,12 +90,12 @@ typedef SNFLAGS		snflags ;
 
 EXTERNC_begin
 
-extern int snflags_start(snflags *,char *,int) noex ;
-extern int snflags_addstr(snflags *,cchar *) noex ;
-extern int snflags_addstrw(snflags *,cchar *,int) noex ;
-extern int snflags_count(snflags *) noex ;
-extern int snflags_len(snflags *) noex ;
-extern int snflags_finish(snflags *) noex ;
+extern int snflags_start	(snflags *,char *,int) noex ;
+extern int snflags_addstr	(snflags *,cchar *) noex ;
+extern int snflags_addstrw	(snflags *,cchar *,int) noex ;
+extern int snflags_count	(snflags *) noex ;
+extern int snflags_len		(snflags *) noex ;
+extern int snflags_finish	(snflags *) noex ;
 
 EXTERNC_end
 
