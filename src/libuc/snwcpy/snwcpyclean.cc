@@ -62,10 +62,7 @@
 #include	<cstdlib>
 #include	<bitset>		/* |bitset(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
