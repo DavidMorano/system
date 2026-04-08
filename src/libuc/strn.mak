@@ -55,7 +55,6 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
@@ -152,7 +151,7 @@ strnwht.o:		strnwht0.o strnwht1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 strnwht0.o:		strnwht.ccm
-strnwht1.o:		strnwht1.cc strnwht.ccm		$(INCS)
+strnwht1.o:		strnwht1.cc strnwht0.o		$(INCS)
 	makemodule strnwht
 	$(COMPILE.cc) $<
 
