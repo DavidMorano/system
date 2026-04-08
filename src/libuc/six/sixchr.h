@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-03-23, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
@@ -32,7 +29,17 @@ EXTERNC_begin
 extern int	siochr(cchar *,int,int) noex ;
 extern int	sirchr(cchar *,int,int) noex ;
 
+local inline int sichr(cchar *sp,int sl,int sch) noex {
+	return siochr(sp,sl,sch) ;
+}
+
 EXTERNC_end
+
+#ifdef	__cplusplus
+inline int sichr(cchar *sp,int sch) noex {
+	return siochr(sp,-1,sch) ;
+}
+#endif /* __cplusplus */
 
 
 #endif /* SIXCHR_INCLUDE */
