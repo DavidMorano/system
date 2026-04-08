@@ -48,8 +48,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
 #include	<tmpx.h>
@@ -167,7 +169,7 @@ int userterms::start() noex {
 	cint		vo = VECOBJ_OSORTED ;
 	int		rs ;
 	if ((rs = vecobj_start(&el,osz,vn,vo)) >= 0) {
-	    if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if ((rs = lm_mp(&tbuf)) >= 0) {
 		tlen = rs ;
 		tl = intconv(strwcpy(tbuf,DEVDNAME) - tbuf) ;
 	    } /* end if (memory-allocation) */
@@ -182,7 +184,7 @@ int userterms::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (tbuf) {
-	    rs1 = malloc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	{
