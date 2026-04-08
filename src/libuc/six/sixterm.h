@@ -21,16 +21,17 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
 
 extern int	sioterm(cchar *,int,cchar *) noex ;
 extern int	sirterm(cchar *,int,cchar *) noex ;
+
+local inline int siterm(cchar *sp,int sl,cchar *ss) noex {
+    	return sioterm(sp,sl,ss) ;
+}
 
 EXTERNC_end
 
