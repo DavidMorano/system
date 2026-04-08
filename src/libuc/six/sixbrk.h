@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-03-23, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -21,16 +21,17 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
 
 extern int	siobrk(cchar *,int,cchar *) noex ;
 extern int	sirbrk(cchar *,int,cchar *) noex ;
+
+local inline int sibrk(cchar *sp,int sl,cchar *ss) noex {
+    	return siobrk(sp,sl,ss) ;
+}
 
 EXTERNC_end
 
