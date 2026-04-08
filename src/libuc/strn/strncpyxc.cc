@@ -83,7 +83,7 @@ extern "C" {
 /* forward references */
 
 template<chtoxc_f chtoxc>
-char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
+local char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 	if (dst && src) ylikely {
 	    dst[0] = '\0' ;
 	    if (n >= 0) {
