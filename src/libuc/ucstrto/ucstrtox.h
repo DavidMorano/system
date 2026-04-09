@@ -28,12 +28,12 @@
 
 EXTERNC_begin
 
-extern int uc_strtoi(cchar *,cchar **,int,int *) noex ;
-extern int uc_strtol(cchar *,cchar **,int,long *) noex ;
-extern int uc_strtoll(cchar *,cchar **,int,longlong *) noex ;
-extern int uc_strtoui(cchar *,cchar **,int,uint *) noex ;
-extern int uc_strtoul(cchar *,cchar **,int,ulong *) noex ;
-extern int uc_strtoull(cchar *,cchar **,int,ulonglong *) noex ;
+extern int uc_strtoi	(cchar *,cchar **,int,int *) noex ;
+extern int uc_strtol	(cchar *,cchar **,int,long *) noex ;
+extern int uc_strtoll	(cchar *,cchar **,int,longlong *) noex ;
+extern int uc_strtoui	(cchar *,cchar **,int,uint *) noex ;
+extern int uc_strtoul	(cchar *,cchar **,int,ulong *) noex ;
+extern int uc_strtoull	(cchar *,cchar **,int,ulonglong *) noex ;
 
 EXTERNC_end
 
