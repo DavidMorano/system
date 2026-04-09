@@ -22,15 +22,15 @@
 #include	<usysrets.h>
 
 
-#define	NAMESEM_MAGIC	0x31419877
 #define	NAMESEM		struct namesem_head
+#define	NAMESEM_MAGIC	0x31419877
 
 
 struct namesem_head {
 	sem_t		*sp ;
 	char		*name ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum namesemmems {
@@ -42,7 +42,7 @@ enum namesemmems {
 	namesemmem_post,
 	namesemmem_unlink,
 	namesemmem_count
-} ;
+} ; /* end enum */
 struct namesem ;
 struct namesem_co {
 	namesem		*op = nullptr ;
@@ -74,14 +74,15 @@ struct namesem : namesem_head {
 	    post(this,namesemmem_post) ;
 	    unlink(this,namesemmem_unlink) ;
 	    count(this,namesemmem_count) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end ctor */
 	namesem(const namesem &) = delete ;
 	namesem &operator = (const namesem &) = delete ;
 	int open(cchar *,int,mode_t,uint) noex ;
 	operator int () noex ;
 	void dtor() noex ;
 	destruct namesem() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (namesem) */
 #else	/* __cplusplus */
