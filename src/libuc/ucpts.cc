@@ -17,9 +17,17 @@
 	I modernized this by replacing custom path creation crap
 	with a call to the |snsd(3uc)| subroutine.
 
+	= 2025-11-09, David A-D- Morano
+	I (finally) replaced the STREAMS® weirdo implementation
+	with calling the (I think non-standard) |ptsname_t(3c)| 
+	standard-library subroutine.  I find it amazing how long
+	the original implementation of that lasted through the
+	prior decades.  This shows how long any single -- properly
+	working -- implmentation can survive!
+
 */
 
-/* Copyright © 1998,2018 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1998,2018,2025 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -73,35 +81,52 @@
 	+ HPUX
 	+ OSF1
 	+ Tru64
+	+ Solaris (support is limited to OS versions from 11.1 onwards)
+
 	Q. What are the return values?
 	A. On all operating systems that support the |ptsname_r(3c)|
-	subroutine except for Linux, on error a '-1' is returned
-	and 'errno' is set to the error code.  But on Linux, on
-	error the subroutine returns 'not-zero' and sets the 'errno'
-	variable to the error code.  Linux sucks cock meat.
+	subroutine except for Linux and Solaris®, on error a '-1'
+	is returned and |errno| is set to the error code.  But on
+	Linux, on error the subroutine returns 'not-zero' and sets
+	the |errno| variable to the error code.  Linux sucks cock
+	meat.  Also, on Solaris (version 11.1 and onwards that support it)
+	on error it returns an ERRNO value directly.
+
 	Q. What operating systems DO-NOT support the |ptsname_r(3c)|
 	subroutine?
-	A. SunOS Solaris!
+	A. Versions of Solaris before 11.1 did NOT support the 
+	|ptsname_r(3c)| subroutine call.
+
+	Q. What other problems does the version on (the latest) Solaris®
+	have?
+	A. On Solaris® dating from version 11.1, on error it returns
+	an ERRNO value directly rather than -1 and setting the
+	|errno| variable.
+
+	Error-return-summary:
+	Solaris		returns the ERRNO number directory, otherwise 0
+	Linux		returns a non-zero on error and sets |errno|
+	Darwin		-1 and sets |errno|
+	SysV		I have no idea what it does
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |ptsname_r(3c)| */
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usysflag.h>
-#include	<snx.h>
+#include	<sncpyx.h>
+#include	<localmisc.h>
 
 #include	"ucpts.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
-
-#define	PTSPREFIX	"/dev/pts/"	/* slave name */
-#define	PTSMA-D-VS	1000000000	/* rather arbitrary */
 
 
 /* imported namespaces */
@@ -113,14 +138,21 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
 /* forward references */
+
+local int	mkname(int,char *,int) noex ;
 
 
 /* local variables */
 
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
-constexpr bool		f_linux = F_LINUX ;
+cbool		f_linux		= F_LINUX ;
+cbool		f_sunos		= F_SUNOS ;
 
 
 /* exported variables */
@@ -130,36 +162,31 @@ constexpr bool		f_linux = F_LINUX ;
 
 int uc_ptsname(int fd,char *nbuf,int nlen) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (nbuf) {
-	    if_constexpr (f_sunos) {
-	        STRIOCTL	istr{} ;
-		cint		req = I_STR ;
-	        istr.ic_cmd = ISPTM ;
-	        istr.ic_len = 0 ;
-	        istr.ic_timout = 0 ;
-	        istr.ic_dp = nullptr ;
-	        if ((rs = u_ioctl(fd,req,&istr)) >= 0) {
-	            USTAT	sb ;
-	            if ((rs = u_fstat(fd,&sb)) >= 0) {
-		        cint	mdev = minor(sb.st_rdev) ;
-	    	        rs = SR_INVALID ;
-		        if (mdev < PTSMA-D-VS) {
-			    cchar	*prefix = PTSPREFIX ;
-		            if ((rs = snsd(nbuf,nlen,prefix,mdev)) >= 0) {
-			        len = rs ;
-		                rs = u_access(nbuf,0) ;
-		            }
-		        } /* end if (valid) */
-	            } /* end if (u_fstat) */
-	        } /* end if (u_ioctl) */
-	    } else if_constexpr (f_darwin || f_linux) {
-		if ((rs = ptsname_r(fd,nbuf,nlen)) != 0) {
-		    rs = (- errno) ;
+	if (nbuf) ylikely {
+	    rs = SR_INVALID ;
+	    if (nlen >= 0) ylikely {
+		if (syshas.ptsnamer) {
+    	            csize	nsize = size_t(nlen) ;
+	            errno = 0 ;
+	            if ((rs = ptsname_r(fd,nbuf,nsize)) != 0) {
+		        if_constexpr (f_linux) {
+	                    rs = (- errno) ;
+		        } else if_constexpr (! f_sunos) {
+			    if (rs < 0) {
+	                        rs = (- errno) ;
+			    } else {
+		                rs = lenstr(nbuf) ;
+			    }
+		        } /* end if_constexpr (f_linux) */
+	            } else {
+		        rs = lenstr(nbuf) ;
+		    }
+		} else {
+		    rs = mkname(fd,nbuf,nlen) ;
 		}
-	    } /* end if_constexpr (f_farwin || f_linux) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+	return rs ;
 }
 /* end subroutine (uc_ptsname) */
 
@@ -182,5 +209,18 @@ int uc_ptsunlock(int fd) noex {
 	return rs ;
 }
 /* end subroutine (uc_ptsunlock) */
+
+
+/* local subroutines */
+
+local int mkname(int fd,char *nbuf,int nlen) noex {
+    	int		rs ;
+	if (cchar *rp = ptsname(fd) ; rp) { /* <- thread-safe! */
+	    rs = sncpy(nbuf,nlen,rp) ;
+	} else {
+	    rs = (- errno) ;
+	}
+	return rs ;
+} /* end subroutine (mkname) */
 
 
