@@ -73,7 +73,7 @@ template<typename ... Args>
 local inline int vecint_magic(vecint *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == VECINT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == VECINT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (vecint_magic) */
@@ -113,7 +113,7 @@ int vecint_start(vecint *op,int vn,int vo) noex {
 		    }
 	        } /* end if (wanted pre-allocation) */
 	        if (rs >= 0) {
-		    op->magic = VECINT_MAGIC ;
+		    op->magval = VECINT_MAGIC ;
 	        }
 	    } /* end if */
 	} /* end if (non-null) */
@@ -133,7 +133,7 @@ int vecint_finish(vecint *op) noex {
 	    op->c = 0 ;
 	    op->i = 0 ;
 	    op->n = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
