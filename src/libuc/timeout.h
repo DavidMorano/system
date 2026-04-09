@@ -49,7 +49,7 @@ enum timeoutcmds {
 	timeoutcmd_set,
 	timeoutcmd_cancel,
 	timeoutcmd_overlast
-} ;
+} ; /* end enum (timeoutcmds) */
 
 struct timeout_entry {
 	timeout_f	metf ;		/* method function (C-linkage) */
@@ -58,7 +58,7 @@ struct timeout_entry {
 	uint		tag ;
 	int		arg ;
 	int		id ;		/* created by the system */
-} ;
+} ; /* end (struct timeout_entry) */
 
 typedef TIMEOUT		timeout ;
 
