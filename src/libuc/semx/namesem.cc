@@ -45,10 +45,11 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<getbufsize.h>
-#include	<libmallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucgetpw.h>
 #include	<getxid.h>
 #include	<errtimer.hh>
 #include	<posname.h>
@@ -60,7 +61,9 @@
 
 #include	"namesem.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -86,6 +89,10 @@ import libutil ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_unlink(cchar *) noex ;
+}
+
 
 /* external variables */
 
@@ -96,28 +103,27 @@ import libutil ;
 /* forward references */
 
 template<typename ... Args>
-static inline int namesem_magic(namesem *op,Args ... args) noex {
+local inline int namesem_magic(namesem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == NAMESEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (namesem_magic) */
+} /* end subroutine (namesem_magic) */
 
-static int	namesemopen(namesem *,cc *,int,mode_t,int) noex ;
-static int	namesemclose(namesem *) noex ;
+local int	namesemopen(namesem *,cc *,int,mode_t,int) noex ;
+local int	namesemclose(namesem *) noex ;
 
-static int	namesemdircheck(cchar *) noex ;
-static int	namesemdiradd(cchar *,mode_t) noex ;
-static int	namesemdirrm(cchar *) noex ;
+local int	namesemdircheck(cchar *) noex ;
+local int	namesemdiradd(cchar *,mode_t) noex ;
+local int	namesemdirrm(cchar *) noex ;
 
-static int	getnamesemgid(void) noex ;
+local int	getnamesemgid(void) noex ;
 
 
 /* local variables */
 
-constexpr bool		f_condunlink = CF_CONDUNLINK ;
+cbool		f_condunlink = CF_CONDUNLINK ;
 
 
 /* exported variables */
@@ -129,14 +135,14 @@ int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint c) noex {
     	NAMESEM		*hop = op ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op && name) {
+	if (op && name) ylikely {
 	    memclear(hop) ;
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		cchar	*nn ;
-		if (posname pn ; (rs = pn.start(name,-1,&nn)) >= 0) {
-		    if ((rs = namesemopen(op,nn,of,om,c)) >= 0) {
-			if (char *bp ; (rs = libmalloc_mn(&bp)) >= 0) {
+		if (posname pn ; (rs = pn.start(name,-1,&nn)) >= 0) ylikely {
+		    if ((rs = namesemopen(op,nn,of,om,c)) >= 0) ylikely {
+			if (char *bp ; (rs = lm_mn(&bp)) >= 0) ylikely {
 			    cint	mnlen = rs ;
 			    op->name = bp ;
 	                    strwcpy(bp,nn,mnlen) ;
@@ -149,7 +155,7 @@ int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint c) noex {
 			    if (rs < 0) {
 				lm_free(op->name) ;
 				op->name = nullptr ;
-			    }
+			    } /* end if (error) */
 			} /* end if (memory-allocation) */
 	            } /* end if (opened) */
 		    rs1 = pn.finish ;
@@ -164,12 +170,12 @@ int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint c) noex {
 int namesem_close(namesem *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = namesem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = namesemclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->name) {
+	    if (op->name) ylikely {
 		rs1 = lm_free(op->name) ;
 		if (rs >= 0) rs = rs1 ;
 		op->name = nullptr ;
@@ -182,7 +188,7 @@ int namesem_close(namesem *op) noex {
 
 int namesem_wait(namesem *op) noex {
 	int		rs ;
-	if ((rs = namesem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_wait(op->sp)) < 0) {
 		    rs = (- errno) ;
@@ -196,7 +202,7 @@ int namesem_wait(namesem *op) noex {
 /* wait and wakeup on interrupt */
 int namesem_waiti(namesem *op) noex {
 	int		rs ;
-	if ((rs = namesem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	   if ((rs = sem_wait(op->sp)) < 0) {
 	       rs = (- errno) ;
 	   }
@@ -209,7 +215,7 @@ int namesem_waiter(namesem *op,int to) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (to < 0) to = (INT_MAX / (2 * NLPS)) ;
-	if (op) {
+	if (op) ylikely {
 	    cint	mint = (1000 / NLPS) ;
 	    cint	cto = (to * NLPS) ;
 	    bool	f_exit = false ;
@@ -240,7 +246,7 @@ int namesem_waiter(namesem *op,int to) noex {
 
 int namesem_trywait(namesem *op) noex {
 	int		rs ;
-	if ((rs = namesem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_trywait(op->sp)) < 0) {
 		    rs = (- errno) ;
@@ -253,7 +259,7 @@ int namesem_trywait(namesem *op) noex {
 
 int namesem_post(namesem *op) noex {
 	int		rs ;
-	if ((rs = namesem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_post(op->sp)) < 0) {
 		    rs = (- errno) ;
@@ -266,8 +272,8 @@ int namesem_post(namesem *op) noex {
 
 int namesem_unlink(namesem *op) noex {
 	int		rs ;
-	if ((rs = namesem_magic(op)) >= 0) {
-	    if (op->name[0] != '\0') {
+	if ((rs = namesem_magic(op)) >= 0) ylikely {
+	    if (op->name[0]) ylikely {
 		rs = unlinknamesem(op->name) ;
 		if_constexpr (f_condunlink) {
 		    if (rs >= 0) {
@@ -285,7 +291,7 @@ int namesem_unlink(namesem *op) noex {
 int namesem_count(namesem *op) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = namesem_magic(op)) >= 0) {
+	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	    while ((rs = namesem_trywait(op)) >= 0) {
 		c += 1 ;
 	    } /* end while */
@@ -306,9 +312,9 @@ int namesem_count(namesem *op) noex {
 int namesemunlink(cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		cchar	*nn ;
 		if (posname pn ; (rs = pn.start(name,-1,&nn)) >= 0) {
 	            repeat {
@@ -340,7 +346,7 @@ int unlinknamesem(cchar *name) noex {
 
 /* local subroutines */
 
-static int namesemopen(namesem *op,cc *name,int of,mode_t om,int c) noex {
+local int namesemopen(namesem *op,cc *name,int of,mode_t om,int c) noex {
 	errtimer	to_mfile = utimeout[uto_mfile] ;
 	errtimer	to_nfile = utimeout[uto_nfile] ;
 	errtimer	to_nomem = utimeout[uto_nomem] ;
@@ -376,9 +382,9 @@ static int namesemopen(namesem *op,cc *name,int of,mode_t om,int c) noex {
 }
 /* end subroutine (namesemopen) */
 
-static int namesemclose(namesem *op) noex {
+local int namesemclose(namesem *op) noex {
     	int		rs = SR_BUGCHECK ;
-	if (op->sp) {
+	if (op->sp) ylikely {
 	    repeat {
 	        if ((rs = sem_close(op->sp)) < 0) {
 		    rs = (- errno) ;
@@ -390,13 +396,13 @@ static int namesemclose(namesem *op) noex {
 }
 /* end subroutine (namesemclose) */
 
-static int namesemdiradd(cchar *name,mode_t om) noex {
+local int namesemdiradd(cchar *name,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (name) {
-	    if (char *tmpfname ; (rs = libmalloc_mp(&tmpfname)) >= 0) {
+	if (name) ylikely {
+	    if (char *tmpfname ; (rs = lm_mp(&tmpfname)) >= 0) ylikely {
 		cchar	*pp = NAMESEM_PATHPREFIX ;
-		if ((rs = mkpath2(tmpfname,pp,name)) >= 0) {
+		if ((rs = mkpath2(tmpfname,pp,name)) >= 0) ylikely {
 		    cint	rsn = SR_NOENT ;
 	            if ((rs = u_creat(tmpfname,om)) == rsn) {
 	                if ((rs = namesemdircheck(pp)) >= 0) {
@@ -407,38 +413,38 @@ static int namesemdiradd(cchar *name,mode_t om) noex {
 		} /* end if (mkpath2) */
 		rs1 = lm_free(tmpfname) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (mallocxx-tmpfname) */
+	    } /* end if (lm-tmpfname) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (namesemdiradd) */
 
-static int namesemdirrm(cchar *name) noex {
+local int namesemdirrm(cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (name) {
-	    if (char *tmpfname ; (rs = libmalloc_mp(&tmpfname)) >= 0) {
+	if (name) ylikely {
+	    if (char *tmpfname ; (rs = lm_mp(&tmpfname)) >= 0) ylikely {
 	        cchar	*pp = NAMESEM_PATHPREFIX ;
-	        if ((rs = mkpath2(tmpfname,pp,name)) >= 0) {
+	        if ((rs = mkpath2(tmpfname,pp,name)) >= 0) ylikely {
 		    rs = u_unlink(tmpfname) ;
 	        } /* end if (mkpath2) */
 	        rs1 = lm_free(tmpfname) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (mallocxx-tmpfnam) */
+	    } /* end if (lm-tmpfnam) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (namesemdirrm) */
  
-static int namesemdirchecker(char *pwbuf,int pwlen,cchar *pp) noex ;
-static int namesemdircheckers(char *pwbuf,int pwlen,cchar *pp) noex ;
+local int namesemdirchecker(char *pwbuf,int pwlen,cchar *pp) noex ;
+local int namesemdircheckers(char *pwbuf,int pwlen,cchar *pp) noex ;
 
-static int namesemdircheck(cchar *pp) noex {
+local int namesemdircheck(cchar *pp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *pwbuf ; (rs = libmalloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
 	    cint	pwlen = rs ;
-	    if (USTAT sb ; (rs = u_stat(pp,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(pp,&sb)) >= 0) ylikely {
 		if (! S_ISDIR(sb.st_mode)) {
 		    if ((rs = uc_unlink(pp)) >= 0) {
 		        rs = namesemdirchecker(pwbuf,pwlen,pp) ;
@@ -454,11 +460,11 @@ static int namesemdircheck(cchar *pp) noex {
 }
 /* end subroutine (namesemdircheck) */
 
-static int namesemdirchecker(char *pwbuf,int pwlen,cchar *pp) noex {
+local int namesemdirchecker(char *pwbuf,int pwlen,cchar *pp) noex {
     	int		rs ;
 	cmode		dm = 0777 ;
-	if ((rs = u_mkdir(pp,dm)) >= 0) {
-	    if ((rs = u_chmod(pp,(dm | S_ISVTX))) >= 0) {
+	if ((rs = u_mkdir(pp,dm)) >= 0) ylikely {
+	    if ((rs = u_chmod(pp,(dm | S_ISVTX))) >= 0) ylikely {
 		cint	cmd = NAMESEM_CHOWNVAR ;
 	    	if (long cv ; (rs = u_pathconf(pp,cmd,&cv)) >= 0) {
 		    if (cv) {
@@ -473,8 +479,8 @@ static int namesemdirchecker(char *pwbuf,int pwlen,cchar *pp) noex {
 }
 /* end subroutine (namesemdirchecker) */
 
-static int namesemdircheckers(char *pwbuf,int pwlen,cchar *pp) noex {
-	auto		getpw = uc_getpwnam ;
+local int namesemdircheckers(char *pwbuf,int pwlen,cchar *pp) noex {
+	cauto		getpw = uc_getpwnam ;
 	const uid_t	euid = geteuid() ;
 	uid_t		uid = NAMESEM_UID ;
 	cchar		*un = NAMESEM_USERNAME1 ;
@@ -500,7 +506,7 @@ static int namesemdircheckers(char *pwbuf,int pwlen,cchar *pp) noex {
 }
 /* end subroutine (namesemdircheckers) */
 
-static int getnamesemgid(void) noex {
+local int getnamesemgid(void) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	cchar		*gn = NAMESEM_GROUPNAME1 ;
@@ -522,15 +528,15 @@ void namesem::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("namesem",rs,"fini-finish") ;
 	}
-}
+} /* end method (namesem::dtor) */
 
 namesem::operator int () noex {
     	return namesem_count(this) ;
-}
+} /* end method (namesem::operator) */
 
 int namesem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case namesemmem_close:
 	        rs = namesem_close(op) ;
@@ -559,7 +565,6 @@ int namesem_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (namesem_co::operator) */
+} /* end method (namesem_co::operator) */
 
 
