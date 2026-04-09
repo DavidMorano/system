@@ -32,7 +32,9 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucwrite.h>
 #include	<localmisc.h>
 
 #include	"recip.h"
@@ -42,6 +44,10 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_seek(int,off_t,int) noex ;
+}
 
 
 /* external variables */
