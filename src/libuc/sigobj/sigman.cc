@@ -75,7 +75,7 @@ typedef	sigman_ha *	handp ;
 template<typename ... Args>
 static int sigman_ctor(sigman *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    sigman_head	 *hp = cast_static<sigman_head *>(op) ;
 	    rs = memclear(hp) ;
 	} /* end if (non-null) */
@@ -85,7 +85,7 @@ static int sigman_ctor(sigman *op,Args ... args) noex {
 
 static int sigman_dtor(sigman *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -95,7 +95,7 @@ static int sigman_dtor(sigman *op) noex {
 template<typename ... Args>
 static inline int sigman_magic(sigman *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SIGMAN_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -114,7 +114,7 @@ static inline int sigman_magic(sigman *op,Args ... args) noex {
 int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 		sigmanhand_f handle) noex {
 	int		rs ;
-	if ((rs = sigman_ctor(op)) >= 0) {
+	if ((rs = sigman_ctor(op)) >= 0) ylikely {
 	    sigset_t	nsm ;
 	    int		i ;
 	    int		nhs = 0 ;
@@ -191,7 +191,7 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 	            op->handles = nullptr ;
 	        } /* end if (error) */
 	    } /* end if (memory allocations) */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        op->magic = SIGMAN_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -205,7 +205,7 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 int sigman_finish(sigman *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sigman_magic(op)) >= 0) {
+	if ((rs = sigman_magic(op)) >= 0) ylikely {
 	    if (op->handles) {
 	        SIGACTION	*sap ;
 	        for (int i = (op->nhs-1)  ; i >= 0 ; i -= 1) {
