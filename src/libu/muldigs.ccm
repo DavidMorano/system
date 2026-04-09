@@ -55,11 +55,11 @@ using std::integral_unsigned ;		/* concept */
 
 /* local typedefs */
 
-typedef ulonglong	ull ;
 typedef uchar		int1 ;
 typedef ushort		int2 ;
 typedef uint		int4 ;
 typedef ulong		int8 ;
+typedef ulonglong	ull ;
 
 
 /* local variables */
@@ -68,7 +68,7 @@ typedef ulong		int8 ;
 /* module subroutines */
 
 template<typename Dig>
-constexpr int addc(Dig *r,const Dig v0,const Dig v1,int ci = 0) noex {
+constexpr inline int addc(Dig *r,const Dig v0,const Dig v1,int ci = 0) noex {
 	Dig		co{} ;
 	Dig		dci = cast_static<Dig>(ci) ;
 	*r = mach_addc(v0,v1,dci,&co) ;
@@ -82,6 +82,7 @@ constexpr int addc(Dig *r,const Dig v0,const Dig v1,int ci = 0) noex {
 	}
     } /* end subroutine (vclear) */
 
+/* n= number-product-result digits */
 constexpr void vmuler(int n,ulong *r,const ulong *v0,const ulong *v1) noex {
 	cint nb = (szof(ulong) * CHAR_BIT) ;
 	cint nh = (n / 2) ;
