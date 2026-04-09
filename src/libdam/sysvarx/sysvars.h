@@ -33,18 +33,18 @@ struct sysvars_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct sysvars_cursor {
 	var_cur		*vcurp ;
-} ;
+} ; /* end struct */
 
 struct sysvars_flags {
 	uint		var:1 ;		/* index DB is open */
-} ;
+} ; /* end struct */
 
 struct sysvars_head {
-	cvoid		*a ;		/* memory-allocation */
+	void		*a ;		/* memory-allocation */
 	char		*pr ;
 	char		*dbname ;	/* DB name (allocated) */
 	var		*vindp ;	/* variable-index-pointer */
@@ -52,7 +52,7 @@ struct sysvars_head {
 	SYSVARS_FL	fl ;
 	uint		magic ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef SYSVARS		sysvars ;
 typedef SYSVARS_FL	sysvars_fl ;
