@@ -32,7 +32,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<ucfuncodes.h>
+#include	<funcodes.h>
 
 
 EXTERNC_begin
