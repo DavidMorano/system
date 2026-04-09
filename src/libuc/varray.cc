@@ -67,7 +67,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static inline int varray_ctor(varray *op,Args ... args) noex {
+local inline int varray_ctor(varray *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
@@ -81,10 +81,9 @@ static inline int varray_ctor(varray *op,Args ... args) noex {
 	    } /* end if (new-lookaside) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (varray_ctor) */
+} /* end subroutine (varray_ctor) */
 
-static inline int varray_dtor(varray *op) noex {
+local inline int varray_dtor(varray *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -94,10 +93,9 @@ static inline int varray_dtor(varray *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (varray_dtor) */
+} /* end subroutine (varray_dtor) */
 
-static int	varray_extend(varray *,int) noex ;
+local int	varray_extend(varray *,int) noex ;
 
 
 /* local variables */
@@ -367,7 +365,7 @@ int varray_audit(varray *op) noex {
 
 /* local subroutines */
 
-static int varray_extend(varray *op,int ni) noex {
+local int varray_extend(varray *op,int ni) noex {
 	int		rs = SR_OK ;
 	if (ni >= op->n) ylikely {
 	    cint	ninc = VARRAY_DEFENTS ;
