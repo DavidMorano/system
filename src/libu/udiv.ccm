@@ -38,6 +38,11 @@ struct udiv {
     udiv() = default ;
     udiv(TU n,TU d) noex {
 	div(n,d) ;
+    } ; /* end ctor */
+    udiv &operator = (const udiv &o) noex {
+	quo = o.quo ;
+	rem = o.rem ;
+	return *this ;
     } ;
     void operator () (TU n,TU d) noex {
 	div(n,d) ;
