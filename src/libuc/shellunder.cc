@@ -53,7 +53,7 @@
 #include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<usupport.h>
+#include	<usupport.h>		/* |cfdec(3u)| */
 #include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
@@ -105,11 +105,9 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	    op->execname = nullptr ;
 	    if (under[0] != '\0') ylikely {
 	        if (under[0] == '*') {
-	            int		dl = -1 ;
 	            cchar	*dp = (under + 1) ;
-	            cchar	*tp = strchr(under,'*') ;
-	            if (tp) {
-	                dl = intconv(tp - dp) ;
+	            if (cchar *tp = strchr(under,'*') ; tp) {
+	                cint dl = intconv(tp - dp) ;
 	                under = (tp+1) ;
 	                if (int v ; (rs = cfdec(dp,dl,&v)) >= 0) {
 	                    op->pid = pid_t(v) ;
@@ -117,7 +115,7 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	            } else {
 	                rs = SR_INVALID ;
 		    }
-	        } /* end if */
+	        } /* end if (bad a '*') */
 	        if ((rs >= 0) && (under[0] != '\0')) {
 	            while (ISWHT(*under)) {
 			under += 1 ;
