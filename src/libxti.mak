@@ -1,4 +1,4 @@
-# MAKEFILES (libxti)
+# MAKEFILE (libxti)
 
 T= libxti
 
