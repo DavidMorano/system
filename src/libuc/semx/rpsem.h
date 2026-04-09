@@ -39,10 +39,13 @@
 
 
 #define	RPSEM		struct rpsem_head
+#define	RPSEM_MAGIC	0x31419880
+
 
 struct rpsem_head {
 	sem_t		ps ;
-} ;
+	uint		magic ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum rpsemmems {
@@ -53,7 +56,7 @@ enum rpsemmems {
 	rpsemmem_count,
     	rpsemmem_destroy,
 	rpsemmem_overlast
-} ;
+} ; /* end enum */
 struct rpsem ;
 struct rpsem_co {
 	rpsem		*op = nullptr ;
@@ -81,14 +84,15 @@ struct rpsem : rpsem_head {
 	    post(this,rpsemmem_post) ;
 	    count(this,rpsemmem_count) ;
 	    destroy(this,rpsemmem_destroy) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end ctor */
 	rpsem(const rpsem &) = delete ;
 	rpsem &operator = (const rpsem &) = delete ;
 	int create(int = 0,int = -1) noex ;
 	operator int () noex ;
 	void dtor() noex ;
 	destruct rpsem() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (rpsem) */
 #else	/* __cplusplus */
