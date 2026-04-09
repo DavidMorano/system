@@ -37,16 +37,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<new>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<strlibval.hh>
 #include	<vecobj.h>
 #include	<vecstr.h>
@@ -62,15 +63,17 @@
 #include	<mkdirs.h>
 #include	<permx.h>
 #include	<strwcpy.h>
-#include	<char.h>
 #include	<mkchar.h>
+#include	<char.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"sysvars.h"
 #include	"var.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -190,9 +193,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -214,13 +214,13 @@ extern "C" {
 
 struct subinfo_flags {
 	uint		id:1 ;
-} ;
+} ; /* end struct */
 
 struct subinfo {
 	ids		id ;
-	SUBINFO_FL	f ;
+	SUBINFO_FL	fl ;
 	time_t		daytime ;
-} ;
+} ; /* end struct */
 
 
 /* local structures */
@@ -229,69 +229,66 @@ struct subinfo {
 /* forward references */
 
 template<typename ... Args>
-static int sysvars_ctor(sysvars *op,Args ... args) noex {
+local int sysvars_ctor(sysvars *op,Args ... args) noex {
     	SYSVARS		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->vindp = new(nothrow) var) != np) {
+	    if ((op->vindp = new(nothrow) var) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-var) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysvars_ctor) */
+} /* end subroutine (sysvars_ctor) */
 
-static int sysvars_dtor(sysvars *op) noex {
+local int sysvars_dtor(sysvars *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->vindp) {
+	    if (op->vindp) ylikely {
 		delete op->vindp ;
 		op->vindp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysvars_dtor) */
+} /* end subroutine (sysvars_dtor) */
 
 template<typename ... Args>
-static inline int sysvars_magic(sysvars *op,Args ... args) noex {
+local inline int sysvars_magic(sysvars *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SYSVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (sysvars_magic) */
+} /* end subroutine (sysvars_magic) */
 
-static int	sysvars_infoloadbegin(SVS *,cchar *,cchar *) noex ;
-static int	sysvars_infoloadend(SVS *) noex ;
-static int	sysvars_indopen(SVS *,SUBINFO *) noex ;
+local int	sysvars_infoloadbegin(SVS *,cchar *,cchar *) noex ;
+local int	sysvars_infoloadend(SVS *) noex ;
+local int	sysvars_indopen(SVS *,SUBINFO *) noex ;
 
-static int	sysvars_indclose(SVS *) noex ;
-static int	sysvars_indmk(SVS *,cchar *) noex ;
-static int	sysvars_indmkdata(SVS *,cchar *,mode_t) noex ;
-static int	sysvars_indopenseq(SVS *,SUBINFO *) noex ;
-static int	sysvars_indopenseqer(SVS *,SUBINFO *,dirseen *,
+local int	sysvars_indclose(SVS *) noex ;
+local int	sysvars_indmk(SVS *,cchar *) noex ;
+local int	sysvars_indmkdata(SVS *,cchar *,mode_t) noex ;
+local int	sysvars_indopenseq(SVS *,SUBINFO *) noex ;
+local int	sysvars_indopenseqer(SVS *,SUBINFO *,dirseen *,
 			vecstr *,expcook *) noex ;
-static int	sysvars_loadcooks(SVS *,expcook *) noex ;
-static int	sysvars_indopenalt(SVS *,SUBINFO *,dirseen *) noex ;
+local int	sysvars_loadcooks(SVS *,expcook *) noex ;
+local int	sysvars_indopenalt(SVS *,SUBINFO *,dirseen *) noex ;
 
 #if	CF_MKSYSVARS
-static int	sysvars_mksysvarsi(SVS *,SUBINFO *,cchar *) noex ;
+local int	sysvars_mksysvarsi(SVS *,SUBINFO *,cchar *) noex ;
 #endif
 
-static int	subinfo_start(SUBINFO *) noex ;
-static int	subinfo_ids(SUBINFO *) noex ;
-static int	subinfo_finish(SUBINFO *) noex ;
+local int	subinfo_start(SUBINFO *) noex ;
+local int	subinfo_ids(SUBINFO *) noex ;
+local int	subinfo_finish(SUBINFO *) noex ;
 
-static int	checkdname(cchar *) noex ;
+local int	checkdname(cchar *) noex ;
 
 #ifdef	COMMENT
-static int	mkindfname(char *,cchar *,cchar *,cchar *,cchar *) noex ;
+local int	mkindfname(char *,cchar *,cchar *,cchar *,cchar *) noex ;
 #endif
 
 
@@ -363,10 +360,10 @@ int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if ((dbname == nullptr) || (dbname[0] == '\0')) dbname = INDNAME ;
-	if ((rs = sysvars_ctor(op,pr)) >= 0) {
+	if ((rs = sysvars_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
-	        if (SUBINFO si ; (rs = subinfo_start(&si)) >= 0) {
+	    if (pr[0]) ylikely {
+	        if (SUBINFO si ; (rs = subinfo_start(&si)) >= 0) ylikely {
 	            if ((rs = sysvars_infoloadbegin(op,pr,dbname)) >= 0) {
 	                if ((rs = sysvars_indopen(op,&si)) >= 0) {
 	            	    op->magic = SYSVARS_MAGIC ;
@@ -390,7 +387,7 @@ int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 int sysvars_close(SVS *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sysvars_magic(op)) >= 0) {
+	if ((rs = sysvars_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = sysvars_indclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -411,7 +408,7 @@ int sysvars_close(SVS *op) noex {
 
 int sysvars_audit(SVS *op) noex {
 	int		rs ;
-	if ((rs = sysvars_magic(op)) >= 0) {
+	if ((rs = sysvars_magic(op)) >= 0) ylikely {
 	    rs = var_audit(op->vindp) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -420,10 +417,10 @@ int sysvars_audit(SVS *op) noex {
 
 int sysvars_curbegin(SVS *op,SVS_C *curp) noex {
 	int		rs ;
-	if ((rs = sysvars_magic(op,curp)) >= 0) {
+	if ((rs = sysvars_magic(op,curp)) >= 0) ylikely {
 	    cint	osz = szof(var) ;
 	    memclear(curp) ;
-	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) ylikely {
 		var_cur		*vcp = (var_cur *) vp ;
 	        if ((rs = var_curbegin(op->vindp,vcp)) >= 0) {
 		    curp->vcurp = vcp ;
@@ -437,9 +434,9 @@ int sysvars_curbegin(SVS *op,SVS_C *curp) noex {
 
 int sysvars_curend(SVS *op,SVS_C *curp) noex {
 	int		rs ;
-	if ((rs = sysvars_magic(op,curp)) >= 0) {
+	if ((rs = sysvars_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (curp->vcurp) {
+	    if (curp->vcurp) ylikely {
 	        var_cur		*vcp = (var_cur *) curp->vcurp ;
 	        if ((rs = var_curend(op->vindp,vcp)) >= 0) {
 	            op->ncursors -= 1 ;
@@ -452,9 +449,9 @@ int sysvars_curend(SVS *op,SVS_C *curp) noex {
 
 int sysvars_fetch(SVS *op,cc *kp,int kl,SVS_C *curp,char *vbuf,int vlen) noex {
 	int		rs ;
-	if ((rs = sysvars_magic(op,kp,curp)) >= 0) {
+	if ((rs = sysvars_magic(op,kp,curp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (curp->vcurp) {
+	    if (curp->vcurp) ylikely {
 	        var_cur		*vcp = (var_cur *) curp->vcurp ;
 		rs = var_fetch(op->vindp,kp,kl,vcp,vbuf,vlen) ;
 	    }
@@ -468,9 +465,9 @@ int sysvars_fetch(SVS *op,cc *kp,int kl,SVS_C *curp,char *vbuf,int vlen) noex {
 
 int sysvars_curenum(SVS *op,SVS_C *curp,char *kp,int kl,char *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	if ((rs = sysvars_magic(op,curp,kp)) >= 0) {
+	if ((rs = sysvars_magic(op,curp,kp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (curp->vcurp) {
+	    if (curp->vcurp) ylikely {
 	        var_cur		*vcp = (var_cur *) curp->vcurp ;
 		rs = var_enum(op->vindp,vcp,kp,kl,vp,vl) ;
 	    } /* end if (open) */
@@ -484,7 +481,7 @@ int sysvars_curenum(SVS *op,SVS_C *curp,char *kp,int kl,char *vp,int vl) noex {
 
 int sysvars_count(SVS *op) noex {
 	int		rs = SR_FAULT ;
-	if ((rs = sysvars_magic(op)) >= 0) {
+	if ((rs = sysvars_magic(op)) >= 0) ylikely {
 	    rs = var_count(op->vindp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -494,27 +491,27 @@ int sysvars_count(SVS *op) noex {
 
 /* private subroutines */
 
-static int sysvars_infoloadbegin(SVS *op,cchar *pr,cchar *dbname) noex {
+local int sysvars_infoloadbegin(SVS *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		sz = 0 ;
 	sz += (lenstr(pr) + 1) ;
 	sz += (lenstr(dbname) + 1) ;
-	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
 	    op->a = bp ;
 	    op->pr = bp ;
 	    bp = (strwcpy(bp,pr,-1)+1) ;
 	    op->dbname = bp ;
 	    bp = (strwcpy(bp,dbname,-1)+1) ;
-	}
+	} /* emd if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (sysvars_infoloadbegin) */
 
-static int sysvars_infoloadend(SVS *op) noex {
+local int sysvars_infoloadend(SVS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->a) {
-	    rs1 = uc_free(op->a) ;
+	if (op->a) ylikely {
+	    rs1 = lm_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = nullptr ;
 	}
@@ -524,15 +521,15 @@ static int sysvars_infoloadend(SVS *op) noex {
 }
 /* end subroutine (sysvars_infoloadend) */
 
-static int sysvars_indopen(SVS *op,SUBINFO *sip) noex {
+local int sysvars_indopen(SVS *op,SUBINFO *sip) noex {
 	return sysvars_indopenseq(op,sip) ;
 }
 /* end subroutine (sysvars_indopen) */
 
-static int sysvars_indopenseq(SVS *op,SUBINFO *sip) noex {
+local int sysvars_indopenseq(SVS *op,SUBINFO *sip) noex {
 	int		rs ;
 	int		rs1 ;
-	if (dirseen ds ; (rs = dirseen_start(&ds)) >= 0) {
+	if (dirseen ds ; (rs = dirseen_start(&ds)) >= 0) ylikely {
 	    expcook	cooks ;
 	    cint	vn = 6 ;
 	    cint	vo = VECSTR_OCOMPACT ;
@@ -554,7 +551,7 @@ static int sysvars_indopenseq(SVS *op,SUBINFO *sip) noex {
 }
 /* end subroutines (sysvars_indopenseq) */
 
-static int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
+local int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
 		vecstr *sdp,expcook *ecp) noex {
 	cint	elen = MAXPATHLEN ;
 	int		rs = SR_OK ;
@@ -626,7 +623,7 @@ static int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
 }
 /* end subroutine (sysvars_indopenseqer) */
 
-static int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
+local int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 	int		rs = SR_OK ;
 	cchar		*ks = "RST" ;
 	char		kbuf[2] = {} ;
@@ -662,7 +659,7 @@ static int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 }
 /* end subroutines (sysvars_loadcooks) */
 
-static int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
+local int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
 	int		rs ;
 	int		rs1 ;
 	if (dirseen_cur cur ; (rs = dirseen_curbegin(dsp,&cur)) >= 0) {
@@ -709,30 +706,32 @@ static int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
 }
 /* end subroutines (sysvars_indopenalt) */
 
-static int sysvars_indmk(SVS *op,cchar *dname) noex {
+local int sysvars_indmk(SVS *op,cchar *dname) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-/* check the given directory for writability */
+	/* check the given directory for writability */
 	if ((rs = checkdname(dname)) == rsn) {
 	    rs = mkdirs(dname,0775) ;
 	}
-/* create the index-name */
+	/* create the index-name */
 	if (rs >= 0) {
-	    if (char *ibuf{} ; (rs = malloc_mp(&ibuf)) >= 0) {
+	    if (char *ibuf{} ; (rs = lm_mp(&ibuf)) >= 0) {
 	        cmode	om = 0664 ;
 	        if ((rs = mkpath(ibuf,dname,op->dbname)) >= 0) {
 	            rs = sysvars_indmkdata(op,ibuf,om) ;
 	      	    c += rs ;
 	    	}
-		rs = rsfree(rs,ibuf) ;
+		rs1 = lm_free(ibuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (ok) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (sysvars_indmk) */
 
-static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
+local int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -760,7 +759,7 @@ static int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 }
 /* end subroutine (sysvars_indmkdata) */
 
-static int sysvars_indclose(SVS *op) noex {
+local int sysvars_indclose(SVS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.var) {
@@ -774,7 +773,7 @@ static int sysvars_indclose(SVS *op) noex {
 
 /* make the index */
 #if	CF_MKSYSVARS
-static int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
+local int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
@@ -891,7 +890,7 @@ static int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
 /* end subroutine (sysvars_mksysvarsi) */
 #endif /* CF_MKSYSVARS */
 
-static int subinfo_start(SUBINFO *sip) noex {
+local int subinfo_start(SUBINFO *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = memclear(sip) ;
@@ -901,7 +900,7 @@ static int subinfo_start(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_ids(SUBINFO *sip) noex {
+local int subinfo_ids(SUBINFO *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = SR_OK ;
@@ -914,7 +913,7 @@ static int subinfo_ids(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_ids) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+local int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sip) {
@@ -929,7 +928,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int checkdname(cchar *dname) noex {
+local int checkdname(cchar *dname) noex {
 	int		rs = SR_OK ;
 	if (dname[0] != '/') {
 	    if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
