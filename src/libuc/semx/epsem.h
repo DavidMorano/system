@@ -45,6 +45,8 @@
 
 
 #define	EPSEM		csem		/* <- the "money" shot */
+#define	EPSEM_MAGIC	0x31419878
+
 
 #ifdef	__cplusplus
 enum epsemmems {
@@ -55,7 +57,7 @@ enum epsemmems {
 	epsemmem_count,
     	epsemmem_destroy,
 	epsemmem_overlast
-} ;
+} ; /* end enum */
 struct epsem ;
 struct epsem_co {
 	epsem		*op = nullptr ;
@@ -83,14 +85,15 @@ struct epsem : csem {
 	    post(this,epsemmem_post) ;
 	    count(this,epsemmem_count) ;
 	    destroy(this,epsemmem_destroy) ;
-	} ;
+	    magic = 0 ;
+	} ; /* end ctor */
 	epsem(const epsem &) = delete ;
 	epsem &operator = (const epsem &) = delete ;
 	int create(int = 0,int = -1) noex ;
-	operator int () noex ;
 	void dtor() noex ;
+	operator int () noex ;
 	destruct epsem() {
-	    dtor() ;
+	    if (magic) dtor() ;
 	} ;
 } ; /* end struct (epsem) */
 #else	/* __cplusplus */
