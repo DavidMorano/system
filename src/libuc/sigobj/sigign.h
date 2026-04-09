@@ -22,7 +22,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types? */
 #include	<signal.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	SIGIGN_MAGIC	0x66938271
@@ -33,7 +34,7 @@
 struct sigign_handle {
 	SIGACTION	action ;
 	int		sig ;
-} ;
+} ; /* end struct (sigign_handle) */
 
 struct sigign_head {
 	SIGIGN_HA	*handles ;
@@ -41,7 +42,7 @@ struct sigign_head {
 	uint		magic ;
 	int		nhandles ;
 	int		nblocks ;
-} ;
+} ; /* end struct (sigign_head) */
 
 typedef	SIGIGN		sigign ;
 typedef	SIGIGN_HA	sigign_ha ;
