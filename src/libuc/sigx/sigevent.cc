@@ -42,12 +42,15 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"sigevent.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -85,7 +88,7 @@ int sigevent_load(SIGEVENT *sep,int notify,int signo,int val) noex {
 	    sep->sigev_notify = notify ;
 	    sep->sigev_signo = signo ;
 	    sep->sigev_value.sival_int = val ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sigevent_load) */
