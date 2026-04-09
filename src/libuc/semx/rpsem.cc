@@ -55,7 +55,9 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"rpsem.h"
@@ -98,6 +100,15 @@ do the following.
 
 /* forward references */
 
+template<typename ... Args>
+local inline int rpsem_magic(rpsem *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == RPSEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (rpsem_magic) */
+
 
 /* local variables */
 
@@ -109,7 +120,7 @@ do the following.
 
 int rpsem_create(rpsem *op,int pshared,int acnt) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_INVALID ;
 	    if (acnt > 0) {
 	        repeat {
@@ -117,6 +128,9 @@ int rpsem_create(rpsem *op,int pshared,int acnt) noex {
 		        rs = (- errno) ;
 	            }
 	        } until (rs != SR_INTR) ;
+		if (rs >= 0) {
+		    op->magic = RPSEM_MAGIC ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -124,49 +138,52 @@ int rpsem_create(rpsem *op,int pshared,int acnt) noex {
 /* end subroutine (rpsem_create) */
 
 int rpsem_destroy(rpsem *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_destroy(&op->ps)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (rpsem_destroy) */
 
 int rpsem_wait(rpsem *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_wait(&op->ps)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (rpsem_wait) */
 
 int rpsem_trywait(rpsem *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_trywait(&op->ps)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (rpsem_trywait) */
 
 int rpsem_waiter(rpsem *op,int to) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		c = 0 ;
-	if (to < 0) to = (INT_MAX / (2 * NLPS)) ;
-	if (op) {
+	if (to < 0) {
+	    to = (INT_MAX / (2 * NLPS)) ;
+	}
+	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    cint	mint = (1000 / NLPS) ;
 	    cint	cto = (to * NLPS) ;
 	    bool	f_exit = false ;
@@ -190,20 +207,20 @@ int rpsem_waiter(rpsem *op,int to) noex {
 		    } /* end switch */
 	        } /* end if (error) */
 	    } until ((rs >= 0) || f_exit) ;
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (rpsem_waiter) */
 
 int rpsem_post(rpsem *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_post(&op->ps)) < 0) {
 		    rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (rpsem_post) */
@@ -211,7 +228,7 @@ int rpsem_post(rpsem *op) noex {
 int rpsem_count(rpsem *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    while ((rs = rpsem_trywait(op)) >= 0) {
 		c += 1 ;
 	    } /* end while */
@@ -221,7 +238,7 @@ int rpsem_count(rpsem *op) noex {
 		    rs = rpsem_post(op) ;
 		} /* end for */
 	    } /* end if */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (rpsem_count) */
@@ -241,11 +258,11 @@ void rpsem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("rpsem",rs,"fini-destroy") ;
 	}
-}
+} /* end method (rpsem::dtor) */
 
 int rpsem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case rpsemmem_wait:
 	        rs = rpsem_wait(op) ;
@@ -268,7 +285,6 @@ int rpsem_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (rpsem_co::operator) */
+} /* end method (rpsem_co::operator) */
 
 
