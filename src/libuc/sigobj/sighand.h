@@ -31,12 +31,12 @@
 #define	SIGHAND_HA	struct sighand_handle
 
 
-#ifndef	SIGHANDF_TYPEDEF
-#define	SIGHANDF_TYPEDEF
+#ifndef	TYPEDEF_SIGHANDF
+#define	TYPEDEF_SIGHANDF
 EXTERNC_begin
 typedef void (*sighand_f)(int,siginfo_t *,void *) noex ;
 EXTERNC_end
-#endif /* SIGHANDF_TYPEDEF */
+#endif /* TYPEDEF_SIGHANDF */
 
 
 struct sighand_handle {
