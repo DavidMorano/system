@@ -51,7 +51,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	<rpsem.h>		/* POSIX® semaphore -- real */
@@ -71,7 +73,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -103,7 +104,7 @@ cbool		f_psem = F_PSEM ;
 int psem_create(psem *op,int pshared,int acnt) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    if_constexpr (f_psem) {
 		if (rpsem *semp ; (semp = new(nothrow) rpsem) != np) {
@@ -134,9 +135,9 @@ int psem_create(psem *op,int pshared,int acnt) noex {
 int psem_destroy(psem *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->subobj) {
+	    if (op->subobj) ylikely {
 		rs = SR_OK ;
 	        if_constexpr (f_psem) {
 		    rpsem *semp = (rpsem *) op->subobj ;
@@ -167,9 +168,9 @@ int psem_destroy(psem *op) noex {
 
 int psem_wait(psem *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->subobj) {
+	    if (op->subobj) ylikely {
 	        if_constexpr (f_psem) {
 		    rpsem *semp = (rpsem *) op->subobj ;
 		    rs = rpsem_wait(semp) ;
@@ -185,9 +186,9 @@ int psem_wait(psem *op) noex {
 
 int psem_trywait(psem *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->subobj) {
+	    if (op->subobj) ylikely {
 	        if_constexpr (f_psem) {
 		    rpsem *semp = (rpsem *) op->subobj ;
 		    rs = rpsem_trywait(semp) ;
@@ -203,9 +204,9 @@ int psem_trywait(psem *op) noex {
 
 int psem_waiter(psem *op,int to) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->subobj) {
+	    if (op->subobj) ylikely {
 	        if_constexpr (f_psem) {
 		    rpsem *semp = (rpsem *) op->subobj ;
 		    rs = rpsem_waiter(semp,to) ;
@@ -221,9 +222,9 @@ int psem_waiter(psem *op,int to) noex {
 
 int psem_post(psem *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->subobj) {
+	    if (op->subobj) ylikely {
 	        if_constexpr (f_psem) {
 		    rpsem *semp = (rpsem *) op->subobj ;
 		    rs = rpsem_post(semp) ;
@@ -240,9 +241,9 @@ int psem_post(psem *op) noex {
 int psem_count(psem *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->subobj) {
+	    if (op->subobj) ylikely {
 	        if_constexpr (f_psem) {
 		    rpsem *semp = (rpsem *) op->subobj ;
 		    rs = rpsem_count(semp) ;
@@ -266,17 +267,17 @@ int psem::create(int pshared,int acnt) noex {
 
 psem::operator int () noex {
 	return psem_count(this) ;
-}
+} /* end method (psem::operator) */
 
 void psem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("psem",rs,"fini-destroy") ;
 	}
-}
+} /* end method (psem::dtor) */
 
 int psem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case psemmem_wait:
 	        rs = psem_wait(op) ;
@@ -299,7 +300,6 @@ int psem_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (psem_co::operator) */
+} /* end method (psem_co::operator) */
 
 
