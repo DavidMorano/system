@@ -67,7 +67,7 @@
 
 int sigblocker_start(sigblocker *op,cint *sigs) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    sigset_t	nsm ;
 	    rs = SR_OK ;
 	    if (sigs) {
@@ -79,7 +79,7 @@ int sigblocker_start(sigblocker *op,cint *sigs) noex {
 	    } else {
 	        rs = uc_sigsetfill(&nsm) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = u_sigmask(SIG_BLOCK,&nsm,&op->osm) ;
 	    } /* end if */
 	} /* end if (non-null) */
@@ -89,7 +89,7 @@ int sigblocker_start(sigblocker *op,cint *sigs) noex {
 
 int sigblocker_finish(sigblocker *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = u_sigmask(SIG_SETMASK,&op->osm,nullptr) ;
 	}
 	return rs ;
@@ -101,7 +101,7 @@ int sigblocker_finish(sigblocker *op) noex {
 
 int sigblocker_co::operator () (cint *sigs) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    rs = sigblocker_start(op,sigs) ;
 	}
 	return rs ;
@@ -110,7 +110,7 @@ int sigblocker_co::operator () (cint *sigs) noex {
 
 sigblocker_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case sigblockermem_start:
 	        rs = sigblocker_start(op,nullptr) ;
