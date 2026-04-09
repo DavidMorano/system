@@ -78,7 +78,7 @@ using libuc::libmem ;
 template<typename ... Args>
 static inline int sighand_magic(SH *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SIGHAND_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -96,7 +96,7 @@ static inline int sighand_magic(SH *op,Args ... args) noex {
 
 int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
 	int		rs = SR_FAULT ;
-	if (iap) {
+	if (iap) ylikely {
             sigset_t        nsm ;
             int             nhandles = 0 ;
             int             sz ;
@@ -186,7 +186,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
 int sighand_finish(SH *iap) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sighand_magic(iap)) >= 0) {
+	if ((rs = sighand_magic(iap)) >= 0) ylikely {
 	    if (iap->handles != nullptr) {
 	        SIGACTION	*sap ;
 	        int		hsig ;
