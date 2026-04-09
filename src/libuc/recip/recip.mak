@@ -1,4 +1,4 @@
-# MAKEFILES (recip)
+# MAKEFILE (recip)
 
 T= recip
 
@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= recip_main.o recip_copyparts.o
+OBJ0= recip_prime.o recip_copyparts.o
 OBJ1=
 OBJ2=
 OBJ3=
@@ -136,7 +136,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-recip_main.o:		recip_main.cc		$(INCS)
+recip_prime.o:		recip_prime.cc		$(INCS)
 recip_copyparts.o:	recip_copyparts.cc	$(INCS)
 
 
