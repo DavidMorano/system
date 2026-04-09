@@ -38,16 +38,18 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<endian.h>
 #include	<hash.h>
 #include	<sfx.h>
@@ -64,7 +66,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -97,12 +98,11 @@ using std::nothrow ;			/* constant */
 int srectab_start(srectab *rtp,int n) noex {
 	int		rs = SR_OK ;
 	int		sz ;
-	void		*vp ;
 	if (n < 10) n = 10 ;
 	rtp->i = 0 ;
 	rtp->n = n ;
 	sz = (n + 1) * szof(int) ;
-	if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	    rtp->rt = uintp(vp) ;
 	    rtp->rt[0] = 0 ;
 	    rtp->i = 1 ;
@@ -115,7 +115,7 @@ int srectab_finish(srectab *rtp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (rtp->rt) {
-	    rs1 = uc_free(rtp->rt) ;
+	    rs1 = lm_free(rtp->rt) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rtp->rt = nullptr ;
 	}
@@ -141,12 +141,11 @@ int srectab_extend(srectab *rtp) noex {
 	int		nn = (rtp->n * 2) ;
 	int		rs = SR_OK ;
 	if ((rtp->i + 1) > rtp->n) {
-	    uint	*va{} ;
 	    int		sz = (nn + 1) * szof(int) ;
-	    if ((rs = uc_realloc(rtp->rt,sz,&va)) >= 0) {
+	    if (uint *va ; (rs = lm_rall(rtp->rt,sz,&va)) >= 0) {
 	        rtp->rt = va ;
 	        rtp->n = nn ;
-	    }
+	    } /* end if (memory-reallocation) */
 	} /* end if */
 	return rs ;
 }
