@@ -1,11 +1,11 @@
-/* uc_cfsetospeed */
+/* uccfsetospeed */
 /* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -24,25 +24,27 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<cstdlib>
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
 
-#include	<usystem.h>
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int uc_cfsetospeed(tp,speed)
-struct termios	*tp ;
-speed_t		speed ;
-{
-	int	rs ;
-
-
-again:
-	if ((rs = cfsetospeed(tp,speed)) < 0) rs = (- errno) ;
-
+int uc_cfsetospeed(TERMIOS *tp,speed_t speed) noex {
+	int		rs = SR_FAULT ;
+	if (tp) {
+	    if ((rs = cfsetospeed(tp,speed)) < 0) {
+	        rs = (- errno) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uc_cfsetospeed) */
