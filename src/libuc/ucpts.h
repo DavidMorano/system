@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucpts
+
+	Description:
 	This file contains the UNIX® system subroutines for
 	pseudo-terminal slave management.  These subroutines
 	first appeared in UNIX® System V Release 3 (SVR3).
@@ -32,9 +36,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usyscalls.h>		/* |ulogerror(3u)| */
 
 
 EXTERNC_begin
