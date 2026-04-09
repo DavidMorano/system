@@ -1,12 +1,11 @@
-/* uc_chmodsuid */
+/* ucchmodsuid */
 /* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
 /* set or clear the SUID bit on the file permissions mode */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,17 +16,18 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/uio.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
@@ -43,37 +43,27 @@
 
 /* exported subroutines */
 
-
-int uc_chmodsuid(fname,f)
-const char	fname[] ;
-int		f ;
-{
-	ustat	sb ;
-
-	int	rs ;
-	int	fperm ;
-	int	f_previous = FALSE ;
-
-
-	if (fname == NULL)
-	    return SR_FAULT ;
-
-	if (fname[0] == '\0')
-	    return SR_INVALID ;
-
-	if ((rs = u_stat(fname,&sb)) >= 0) {
-	    fperm = sb.st_mode ;
-	    f_previous = ((fperm & S_IXSUID) == S_IXSUID) ? 1 : 0 ;
-	    if (! LEQUIV(f_previous,f)) {
-	        if (f) {
-	            fperm |= S_IXSUID ;
-	        } else
-	            fperm &= (~ S_ISUID) ;
-	        rs = u_chmod(fname,fperm) ;
-	    } /* end if (needed a change) */
-	} /* end if (stat) */
-
-	return (rs >= 0) ? f_previous : rs ;
+int uc_chmodsuid(cchar *fname,int f) noex {
+	int		rs = SR_FAULT ;
+	int		fprev = false ;
+	if (fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+	        if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	            mode_t mperm = sb.st_mode ;
+	            fprev = ((mperm & S_IXSUID) == S_IXSUID) ;
+	            if (! LEQUIV(fprev,f)) {
+	                if (f) {
+	                    mperm |= S_IXSUID ;
+	                } else {
+	                    mperm &= (~ S_ISUID) ;
+		        }
+	                rs = u_chmod(fname,mperm) ;
+	            } /* end if (needed a change) */
+	        } /* end if (stat) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fprev : rs ;
 }
 /* end subroutine (uc_chmodsuid) */
 
