@@ -31,7 +31,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<signal.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #ifndef	TYPEDEF_SIGINFOHAND
