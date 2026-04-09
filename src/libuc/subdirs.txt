@@ -93,3 +93,5 @@ wsix
 wsnx
 wswcpyx
 dirs
+bufos
+bufslide
