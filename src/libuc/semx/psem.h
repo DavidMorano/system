@@ -45,10 +45,12 @@
 
 
 #define	PSEM		struct psem_head
+#define	PSEM_MAGIC	0x31419879
+
 
 struct psem_head {
     	void		*subobj ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum psemmems {
@@ -87,14 +89,15 @@ struct psem : psem_head {
 	    post(this,psemmem_post) ;
 	    count(this,psemmem_count) ;
 	    destroy(this,psemmem_destroy) ;
-	} ;
+	    subobj = nullptr ;
+	} ; /* end ctor */
 	psem(const psem &) = delete ;
 	psem &operator = (const psem &) = delete ;
 	int create(int = 0,int = -1) noex ;
 	operator int () noex ;
 	void dtor() noex ;
 	destruct psem() {
-	    dtor() ;
+	    if (subobj) dtor() ;
 	} ;
 } ; /* end struct (psem) */
 #else	/* __cplusplus */
