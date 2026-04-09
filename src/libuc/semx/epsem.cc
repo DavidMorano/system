@@ -34,7 +34,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"epsem.h"
@@ -128,7 +130,7 @@ void epsem::dtor() noex {
 
 int epsem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case epsemmem_wait:
 	        rs = epsem_wait(op) ;
