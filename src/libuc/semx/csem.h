@@ -40,7 +40,7 @@ struct csem_head {
 	uint		magic ;
 	int		cnt ;		/* this is the real data! */
 	int		nwaiting ;	/* number waiting */
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum csemmems {
@@ -50,7 +50,7 @@ enum csemmems {
 	csemmem_waiters,
 	csemmem_destroy,
 	csemmem_overlast
-} ;
+} ; /* end enum */
 struct csem ;
 struct csem_co {
 	csem		*op = nullptr ;
@@ -76,7 +76,8 @@ struct csem : csem_head {
 	    count(this,csemmem_count) ;
 	    waiters(this,csemmem_waiters) ;
 	    destroy(this,csemmem_destroy) ;
-	} ;
+	    mxp = nullptr ;
+	} ; /* end ctor */
 	csem(const csem &) = delete ;
 	csem &operator = (const csem &) = delete ;
 	int create(int = 0,int = 0) noex ;
@@ -84,7 +85,7 @@ struct csem : csem_head {
 	operator int () noex ;
 	void dtor() noex ;
 	destruct csem() {
-	    dtor() ;
+	    if (mxp) dtor() ;
 	} ;
 } ; /* end struct (csem) */
 #else	/* __cplusplus */
