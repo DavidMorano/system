@@ -1,4 +1,4 @@
-# MAKEFILES (strlistx)
+# MAKEFILE (strlistx)
 
 T= strlistx
 
@@ -31,28 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= strlist.h strlisthdr.h
+INCS += strlist.h strlisthdr.h
 
-LIBS=
+MODS +=
 
-
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
+LIBS +=
 
 
 OBJ0_STRLIST= strlist.o
@@ -66,7 +51,22 @@ OBJB_STRLIST= obj2.o obj3.o
 OBJ_STRLIST= obja.o objb.o
 
 
-.SUFFIXES:		.hh .ii
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +80,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -92,17 +95,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	makemodule $(*)
+
 
 $(T).o:			$(OBJ_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_STRLIST)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
 	rm -f $(ALL)
@@ -115,23 +116,23 @@ control:
 
 
 obj0.o:			$(OBJ0_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB_STRLIST)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_STRLIST)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 strlist.o:		strlist.cc				$(INCS)
