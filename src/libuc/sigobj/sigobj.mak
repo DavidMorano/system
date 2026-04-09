@@ -1,4 +1,4 @@
-# MAKEFILES (sigobj)
+# MAKEFILE (sigobj)
 
 T= sigobj
 
@@ -42,6 +42,8 @@ LIBS +=
 
 OBJ0= sigblocker.o sigman.o
 OBJ1= sighand.o sigign.o
+OBJ2=
+OBJ3=
 
 OBJA= obj0.o obj1.o
 
@@ -98,7 +100,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -125,10 +127,11 @@ obj2.o:			$(OBJ2)
 obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4.o:			$(OBJ4)
+
+obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj5.o:			$(OBJ5)
+objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
