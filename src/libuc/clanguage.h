@@ -33,12 +33,12 @@
 #endif
 #endif /* noex */
 
-#ifndef	scharconv
-#define	scharconv		schar
-#endif
-
 #ifndef	charconv
 #define	charconv		char
+#endif
+
+#ifndef	scharconv
+#define	scharconv		schar
 #endif
 #ifndef	shortconv
 #define	shortconv		short
