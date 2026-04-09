@@ -238,11 +238,11 @@ export {
 	cint nh = (n / 2) ;
 	vclear(n,r) ;
 	for (int i = 0 ; i < nh ; i += 1) {
-		cint	ri = i ;
-		int	co = 0 ;
-		Dig	res[2] ; muldig(res,v0[i],one) ;
-    		co = addc((r + ri + 0),r[ri + 0],res[0],co) ;
-    		co = addc((r + ri + 1),r[ri + 1],res[1],co) ;
+	    cint	ri = i ;
+	    int		co = 0 ;
+	    Dig		res[2] ; muldig(res,v0[i],one) ;
+	    co = addc((r + ri + 0),r[ri + 0],res[0],co) ;
+	    co = addc((r + ri + 1),r[ri + 1],res[1],co) ;
 	} /* end for */
     } /* end subroutine (vmulone) */
 } /* end export */
