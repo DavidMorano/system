@@ -135,14 +135,14 @@ template<> void strtox(cchar *sp,char **epp,int b,ulonglong *rp) noex {
 }
 
 template<typename T>
-local int ucstrtox(cchar *sp,cchar **epp,int b,T *rp) noex {
+local sysret_t ucstrtox(cchar *sp,cchar **epp,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    char	*endp = nullptr ;
 	    errno = 0 ;
 	    strtox(sp,&endp,b,rp) ;
 	    if (epp) *epp = endp ;
-	    rs = (errno != 0) ? (- errno) : intconv(endp - sp) ;
+	    rs = (errno) ? (- errno) : intconv(endp - sp) ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine-template (ucstrtox) */
