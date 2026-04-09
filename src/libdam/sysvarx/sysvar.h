@@ -35,12 +35,12 @@
 struct sysvar_cursor {
 	void		*scp ;		/* SO-cursor pointer */
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct sysvar_flags {
     	uint		modload:1 ;
 	uint		defaults:1 ;
-} ;
+} ; /* end struct */
 
 struct sysvar_head {
 	modload		*mlp ;			/* mod-load-pointer */
@@ -51,7 +51,7 @@ struct sysvar_head {
 	uint		magic ;
 	int		objsize ;		/* object size */
 	int		cursize ;		/* cursor size */
-} ;
+} ; /* end struct */
 
 typedef SYSVAR		sysvar ;
 typedef SYSVAR_FL	sysvar_fl ;
