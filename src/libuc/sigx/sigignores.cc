@@ -31,7 +31,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucsigx.h>		/* |uc_sigignore(3uc)| */
+#include	<localmisc.h>
 
 #include	"sigignores.h"
 
