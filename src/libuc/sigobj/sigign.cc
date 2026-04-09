@@ -89,7 +89,7 @@ int sigign_start(sigign *iap,cint *ignores) noex {
     	SIGIGN		*hop = iap ;
 	int		rs = SR_FAULT ;
 	int		nhandles = 0 ;
-	if (iap) {
+	if (iap) ylikely {
 	    if (ignores == nullptr) {
 		ignores = sigouts ;
 	    }
@@ -142,9 +142,9 @@ int sigign_start(sigign *iap,cint *ignores) noex {
 int sigign_finish(sigign *iap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (iap) {
+	if (iap) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (iap->magic == SIGIGN_MAGIC) {
+	    if (iap->magic == SIGIGN_MAGIC) ylikely {
 	        if (iap->handles) {
 	            SIGACTION	*sap ;
 	            for (int j = (iap->nhandles-1)  ; j >= 0 ; j -= 1) {
@@ -169,7 +169,7 @@ int sigign_finish(sigign *iap) noex {
 
 static int getnhandles(cint *ignores) noex {
     	int		i = 0 ; /* used-afterwards */
-	if (ignores) {
+	if (ignores) ylikely {
 	    while (ignores[i] > 0) {
 	        i += 1 ;
 	    }
