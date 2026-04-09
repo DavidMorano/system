@@ -42,6 +42,11 @@ extern ulonglong	strtoxull(cchar *,char **,int) noex ;	/* 128-bits */
 #ifdef	__cplusplus
 extern intmax		strtoxim(cchar *,char **,int) noex ;	/* 256-bits */
 extern uintmax		strtoxuim(cchar *,char **,int) noex ;	/* 256-bits */
+#endif /* __cplusplus */
+#endif /* COMMENT */
+
+#ifdef	COMMENT /* this is a 512-bit integer; but it does not yet exist */
+#ifdef	__cplusplus
 extern int512_t		strtos256(cchar *,char **,int) noex ;	/* 512-bits */
 extern uint512_t	strtou256(cchar *,char **,int) noex ;	/* 512-bits */
 #endif /* __cplusplus */
