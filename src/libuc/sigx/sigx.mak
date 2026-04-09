@@ -1,4 +1,4 @@
-# MAKEFILES (sigx)
+# MAKEFILE (sigx)
 
 T= sigx
 
