@@ -33,14 +33,16 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getusername.h>
-#include	<mallocxx.h>
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
@@ -54,6 +56,7 @@
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<char.h>
+#include	<isx.h>
 #include	<localmisc.h>		/* |COLUMNS| */
 
 #include	"calmgr.h"
@@ -61,7 +64,9 @@
 #include	"cyi.h"
 #include	"cyimk.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -75,7 +80,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -96,37 +100,36 @@ struct calmgr_idx {
 	cyi		cy ;
 	int		year ;
 	uint		f_open:1 ;
-} ;
+} ; /* end struct */
 
 namespace {
     struct vars {
 	int		maxpathlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end enum */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int calmgr_ctor(calmgr *op,Args ... args) noex {
+local int calmgr_ctor(calmgr *op,Args ... args) noex {
+	cnullptr	np{} ;
     	CALMGR		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->idxp = new(nothrow) vechand) != np) {
+	    if ((op->idxp = new(nothrow) vechand) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (calmgr_ctor) */
+} /* end subroutine (calmgr_ctor) */
 
-static int calmgr_dtor(calmgr *op) noex {
+local int calmgr_dtor(calmgr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->idxp) {
 		delete op->idxp ;
@@ -134,53 +137,51 @@ static int calmgr_dtor(calmgr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (calmgr_dtor) */
+} /* end subroutine (calmgr_dtor) */
 
 template<typename ... Args>
 static inline int calmgr_magic(calmgr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == CALMGR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == CALMGR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (calmgr_magic) */
+} /* end subroutine (calmgr_magic) */
 
-static int	calmgr_argbegin(calmgr *,cchar *,cchar *) noex ;
-static int	calmgr_argend(calmgr *) noex ;
-static int	calmgr_dbloadbegin(calmgr *,time_t) noex ;
-static int	calmgr_dbloadend(calmgr *) noex ;
-static int	calmgr_dbmapcreate(calmgr *,time_t) noex ;
-static int	calmgr_dbmapdestroy(calmgr *) noex ;
-static int	calmgr_dbmaper(calmgr *,cc *,time_t) noex ;
-static int	calmgr_idxdir(calmgr *) noex ;
+local int	calmgr_argbegin(calmgr *,cchar *,cchar *) noex ;
+local int	calmgr_argend(calmgr *) noex ;
+local int	calmgr_dbloadbegin(calmgr *,time_t) noex ;
+local int	calmgr_dbloadend(calmgr *) noex ;
+local int	calmgr_dbmapcreate(calmgr *,time_t) noex ;
+local int	calmgr_dbmapdestroy(calmgr *) noex ;
+local int	calmgr_dbmaper(calmgr *,cc *,time_t) noex ;
+local int	calmgr_idxdir(calmgr *) noex ;
 
-static int	calmgr_lookyear(calmgr *,calmgr_q *,cyi **) noex ;
-static int	calmgr_lookone(calmgr *,vecobj *,cyi *,calmgr_q *) noex ;
+local int	calmgr_lookyear(calmgr *,calmgr_q *,cyi **) noex ;
+local int	calmgr_lookone(calmgr *,vecobj *,cyi *,calmgr_q *) noex ;
 
-static int	calmgr_mkidx(calmgr *,int) noex ;
+local int	calmgr_mkidx(calmgr *,int) noex ;
 
-static int	calmgr_idxbegin(calmgr *,calmgr_idx *,int) noex ;
-static int	calmgr_idxend(calmgr *,calmgr_idx *) noex ;
-static int	calmgr_idxends(calmgr *) noex ;
-static int	calmgr_idxaudit(calmgr *,calmgr_idx *) noex ;
+local int	calmgr_idxbegin(calmgr *,calmgr_idx *,int) noex ;
+local int	calmgr_idxend(calmgr *,calmgr_idx *) noex ;
+local int	calmgr_idxends(calmgr *) noex ;
+local int	calmgr_idxaudit(calmgr *,calmgr_idx *) noex ;
 
-static int	calmgr_cyiopen(calmgr *,calmgr_idx *,int) noex ;
-static int	calmgr_cyiclose(calmgr *,calmgr_idx *) noex ;
+local int	calmgr_cyiopen(calmgr *,calmgr_idx *,int) noex ;
+local int	calmgr_cyiclose(calmgr *,calmgr_idx *) noex ;
 
-static int	calmgr_mkcyi(calmgr *,int) noex ;
+local int	calmgr_mkcyi(calmgr *,int) noex ;
 
-static int	calmgr_mapdata(calmgr *,cchar **) noex ;
+local int	calmgr_mapdata(calmgr *,cchar **) noex ;
 
 #if	CF_MKDIRS
-static int	calmgr_mkdirs(calmgr *,cchar *,mode_t) noex ;
+local int	calmgr_mkdirs(calmgr *,cchar *,mode_t) noex ;
 #endif /* CF_MKDIRS */
 
-static int	mkbve_start(cyimk_ent *,cchar *,calent *) noex ;
-static int	mkbve_finish(cyimk_ent *) noex ;
+local int	mkbve_start(cyimk_ent *,cchar *,calent *) noex ;
+local int	mkbve_finish(cyimk_ent *) noex ;
 
-static bool	isempty(cchar *,int) noex ;
+local bool	isempty(cchar *,int) noex ;
 
 
 /* exported variables */
@@ -210,7 +211,7 @@ int calmgr_start(calmgr *op,calyears *cyp,int cidx,cchar *dn,cchar *cn) noex {
 	                    cint	vo = VECHAND_OSTATIONARY ;
 	                    if ((rs = vechand_start(op->idxp,1,vo)) >= 0) {
 	                        op->fl.idxes = true ;
-				op->magic = CALMGR_MAGIC ;
+				op->magval = CALMGR_MAGIC ;
 	                    }
 	                } /* end if (calmgr_idxdir) */
 	                if (rs < 0) {
@@ -250,7 +251,8 @@ int calmgr_finish(calmgr *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }	
 	    if (op->idxdname) {
-	        rs1 = uc_free(op->idxdname) ;
+		void *vp = voidp(op->idxdname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->idxdname = nullptr ;
 	    }
@@ -262,7 +264,7 @@ int calmgr_finish(calmgr *op) noex {
 		rs1 = calmgr_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -349,12 +351,12 @@ int calmgr_audit(calmgr *op) noex {
 
 /* private subroutines */
 
-static int calmgr_argbegin(calmgr *op,cchar *dn,cchar *cn) noex {
+local int calmgr_argbegin(calmgr *op,cchar *dn,cchar *cn) noex {
 	int		rs ;
 	int		sz = 0 ;
 	sz += (lenstr(dn)+1) ;
 	sz += (lenstr(cn)+1) ;
-	if (char *bp{} ; (rs = uc_malloc(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
 	    op->a = bp ;
 	    op->dn = bp ;
 	    bp = (strwcpy(bp,dn,-1)+1) ;
@@ -365,11 +367,11 @@ static int calmgr_argbegin(calmgr *op,cchar *dn,cchar *cn) noex {
 }
 /* end subroutine (calmgr_argbegin) */
 
-static int calmgr_argend(calmgr *op) noex {
+local int calmgr_argend(calmgr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->a != nullptr) {
-	    rs1 = uc_free(op->a) ;
+	    rs1 = lm_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = nullptr ;
 	}
@@ -377,7 +379,7 @@ static int calmgr_argend(calmgr *op) noex {
 }
 /* end subroutine (calmgr_argend) */
 
-static int calmgr_dbloadbegin(calmgr *op,time_t dt) noex {
+local int calmgr_dbloadbegin(calmgr *op,time_t dt) noex {
 	int		rs ;
 	{
 	    rs = calmgr_dbmapcreate(op,dt) ;
@@ -386,7 +388,7 @@ static int calmgr_dbloadbegin(calmgr *op,time_t dt) noex {
 }
 /* end subroutine (calmgr_dbloadbegin) */
 
-static int calmgr_dbloadend(calmgr *op) noex {
+local int calmgr_dbloadend(calmgr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -397,12 +399,13 @@ static int calmgr_dbloadend(calmgr *op) noex {
 }
 /* end subroutine (calmgr_dbloadend) */
 
-static int calmgr_dbmapcreate(calmgr *op,time_t dt) noex {
+local int calmgr_dbmapcreate(calmgr *op,time_t dt) noex {
     	cint		maxpath = var.maxpathlen ;
 	cint		sz = ((var.maxpathlen + 1) * 2) ;
 	int		rs ;
+	int		rs1 ;
 	int		ai = 0 ;
-	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 	    cint	nlen = maxpath ;
 	    cchar	*suf = CALMGR_DBSUF ;
 	    char	*nbuf = (a + ((maxpath + 1) * ai++)) ;
@@ -412,13 +415,14 @@ static int calmgr_dbmapcreate(calmgr *op,time_t dt) noex {
 		    rs = calmgr_dbmaper(op,dbuf,dt) ;
 	        } /* end if (mkpath) */
 	    } /* end if (snsds) */
-	    rs = rsfree(rs,a) ;
+	    rs1 = lm_free(a) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (calmgr_dbmapcreate) */
 
-static int calmgr_dbmaper(calmgr *op,cc *dbuf,time_t dt) noex {
+local int calmgr_dbmaper(calmgr *op,cc *dbuf,time_t dt) noex {
 	cnullptr	np{} ;
 	cint		of = O_RDONLY ;
 	int		rs ;
@@ -457,7 +461,7 @@ static int calmgr_dbmaper(calmgr *op,cc *dbuf,time_t dt) noex {
 }
 /* end subroutine (calmgr_dbmaper) */
 
-static int calmgr_dbmapdestroy(calmgr *op) noex {
+local int calmgr_dbmapdestroy(calmgr *op) noex {
 	int		rs = SR_OK ;
 	if (op->mapdata) {
 	    csize	ms = op->mapsize ;
@@ -470,22 +474,24 @@ static int calmgr_dbmapdestroy(calmgr *op) noex {
 }
 /* end subroutine (calmgr_dbmapdestroy) */
 
-static int calmgr_idxdir(calmgr *op) noex {
+local int calmgr_idxdir(calmgr *op) noex {
 	int		rs ;
-	if (char *ibuf ; (rs = malloc_mp(&ibuf)) >= 0) {
+	int		rs1 ;
+	if (char *ibuf ; (rs = lm_mp(&ibuf)) >= 0) {
 	    cchar	*idc = IDXDNAME ;
 	    if ((rs = mkpath(ibuf,op->dn,idc)) >= 0) {
-	        if (cchar *cp{} ; (rs = uc_mallocstrw(ibuf,rs,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(ibuf,rs,&cp)) >= 0) {
 	            op->idxdname = cp ;
 	        }
 	    }
-	    rs = rsfree(rs,ibuf) ;
+	    rs1 = lm_free(ibuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (calmgr_idxdir) */
 
-static int calmgr_lookyear(calmgr *op,calmgr_q *qp,cyi **cypp) noex {
+local int calmgr_lookyear(calmgr *op,calmgr_q *qp,cyi **cypp) noex {
 	cyi		*yip = nullptr ;
 	vechand		*ilp = op->idxp ;
 	int		rs ;
@@ -515,7 +521,7 @@ static int calmgr_lookyear(calmgr *op,calmgr_q *qp,cyi **cypp) noex {
 }
 /* end subroutine (calmgr_lookyear) */
 
-static int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
+local int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
 	cint		cidx = op->cidx ;
 	int		rs ;
 	int		rs1 ;
@@ -523,7 +529,7 @@ static int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
 	if (cyi_cur ccur ; (rs = cyi_curbegin(cip,&ccur)) >= 0) {
 	    if ((rs = cyi_curcite(cip,&ccur,qp)) >= 0) {
 	        cint		celen = CEBUFLEN ;
-		if (char *cebuf ; (rs = uc_malloc((celen+1),&cebuf)) >= 0) {
+		if (char *cebuf ; (rs = lm_mall((celen+1),&cebuf)) >= 0) {
 		cyi_ent		ce ;
 	        calent		e ;
 	        uint		loff ;
@@ -573,7 +579,8 @@ static int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
 	            f_ent = false ;
 	            calent_finish(&e) ;
 	        }
-		    rs = rsfree(rs,cebuf) ;
+		    rs1 = lm_free(cebuf) ;
+		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } else if (rs == SR_NOTFOUND) {
 	        rs = SR_OK ;
@@ -585,10 +592,10 @@ static int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
 }
 /* end subroutine (calmgr_lookone) */
 
-static int calmgr_mkidx(calmgr *op,int y) noex {
+local int calmgr_mkidx(calmgr *op,int y) noex {
 	cint		csz = szof(calmgr_idx) ;
 	int		rs ;
-	if (void *vp ; (rs = uc_malloc(csz,&vp)) >= 0) {
+	if (void *vp ; (rs = lm_mall(csz,&vp)) >= 0) {
 	    calmgr_idx *cip = (calmgr_idx *) vp ;
 	    if ((rs = calmgr_idxbegin(op,cip,y)) >= 0) {
 	        vechand		*ilp = op->idxp ;
@@ -598,14 +605,14 @@ static int calmgr_mkidx(calmgr *op,int y) noex {
 		}
 	    } /* end if (calmgr_idxbegin) */
 	    if (rs < 0) {
-	        uc_free(cip) ;
+	        lm_free(cip) ;
 	    }
 	} /* end if (m-a) */
 	return rs ;
 }
 /* end subroutine (calmgr_mkidx) */
 
-static int calmgr_idxbegin(calmgr *op,calmgr_idx *cip,int y) noex {
+local int calmgr_idxbegin(calmgr *op,calmgr_idx *cip,int y) noex {
 	int		rs ;
 	cip->year = y ;
 	rs = calmgr_cyiopen(op,cip,y) ;
@@ -613,7 +620,7 @@ static int calmgr_idxbegin(calmgr *op,calmgr_idx *cip,int y) noex {
 }
 /* end subroutine (calmgr_idxbegin) */
 
-static int calmgr_idxend(calmgr *op,calmgr_idx *cip) noex {
+local int calmgr_idxend(calmgr *op,calmgr_idx *cip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -625,15 +632,15 @@ static int calmgr_idxend(calmgr *op,calmgr_idx *cip) noex {
 }
 /* end subroutine (calmgr_idxend) */
 
-static int calmgr_cyiopen(calmgr *op,calmgr_idx *cip,int y) noex {
+local int calmgr_cyiopen(calmgr *op,calmgr_idx *cip,int y) noex {
 	cyi		*cyp = &cip->cy ;
 	custime		ti_db = op->ti_db ;
 	int		rs ;
 	cchar		*dn = op->idxdname ;
 	cchar		*cn = op->cn ;
-	if ((rs = cyi_open(cyp,y,dn,cn)) >= 0) {
+	if ((rs = cyi_open(cyp,y,dn,cn)) >= 0) ylikely {
 	    bool	f_open = true ;
-	    if (cyi_info ci ; (rs = cyi_getinfo(cyp,&ci)) >= 0) {
+	    if (cyi_info ci ; (rs = cyi_getinfo(cyp,&ci)) >= 0) ylikely {
 	        if ((ti_db > ci.ctime) || (ti_db > ci.mtime)) {
 	            cyi_close(cyp) ;
 	            f_open = false ;
@@ -656,12 +663,13 @@ static int calmgr_cyiopen(calmgr *op,calmgr_idx *cip,int y) noex {
 }
 /* end subroutine (calent_cyiopen) */
 
-static int calmgr_cyiclose(calmgr *op,calmgr_idx *cip) noex {
+local int calmgr_cyiclose(calmgr *op,calmgr_idx *cip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    cyi		*cyp = &cip->cy ;
-	    {
+	    rs = SR_OK ;
+	    if (cyp) ylikely {
 	        rs1 = cyi_close(cyp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -670,7 +678,7 @@ static int calmgr_cyiclose(calmgr *op,calmgr_idx *cip) noex {
 }
 /* end subroutine (calmgr_cyiclose) */
 
-static int calmgr_mkcyi(calmgr *op,int y) noex {
+local int calmgr_mkcyi(calmgr *op,int y) noex {
 	cyimk		cyind ;
 	cyimk_ent	bve ;
 	int		rs ;
@@ -681,7 +689,7 @@ static int calmgr_mkcyi(calmgr *op,int y) noex {
 	cmode		om = 0664 ;
 	cchar	*dn = op->idxdname ;
 	cchar	*cn = op->cn ;
-	if ((rs = cyimk_open(&cyind,y,dn,cn,of,om)) >= 0) {
+	if ((rs = cyimk_open(&cyind,y,dn,cn,of,om)) >= 0) ylikely {
 	    calent	e ;
 	    calcite	q ;
 	    uint	foff = 0 ;
@@ -781,7 +789,7 @@ static int calmgr_mkcyi(calmgr *op,int y) noex {
 /* end subroutine (calmgr_mkcyi) */
 
 #if	CF_MKDIRS
-static int calmgr_mkdirs(calmgr *op,cchar *dname,mode_t dm) noex {
+local int calmgr_mkdirs(calmgr *op,cchar *dname,mode_t dm) noex {
 	int		rs ;
 	dm &= S_IAMB ;
 	if ((rs = mkdirs(dname,dm)) >= 0) {
@@ -796,7 +804,7 @@ static int calmgr_mkdirs(calmgr *op,cchar *dname,mode_t dm) noex {
 /* end subroutine (calmgr_mkdirs) */
 #endif /* CF_MKDIRS */
 
-static int calmgr_mapdata(calmgr *op,cchar **rpp) noex {
+local int calmgr_mapdata(calmgr *op,cchar **rpp) noex {
 	int		rs = SR_INVALID ;
 	if (op->mapdata) {
 	    if (rpp) {
@@ -808,7 +816,7 @@ static int calmgr_mapdata(calmgr *op,cchar **rpp) noex {
 }
 /* end subroutine (calmgr_mapdata) */
 
-static int calmgr_idxends(calmgr *op) noex {
+local int calmgr_idxends(calmgr *op) noex {
 	vechand		*ilp = op->idxp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -825,7 +833,7 @@ static int calmgr_idxends(calmgr *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(cip) ;
+	            rs1 = lm_free(cip) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    }
@@ -834,9 +842,9 @@ static int calmgr_idxends(calmgr *op) noex {
 }
 /* end subroutine (calmgr_idxends) */
 
-static int calmgr_idxaudit(calmgr *op,calmgr_idx *cip) noex {
+local int calmgr_idxaudit(calmgr *op,calmgr_idx *cip) noex {
 	int		rs = SR_FAULT ;
-	if (op && cip) {
+	if (op && cip) ylikely {
 	    cyi		*cyp = &cip->cy ;
 	    rs = cyi_audit(cyp) ;
 	} /* end if (non-null) */
@@ -844,11 +852,11 @@ static int calmgr_idxaudit(calmgr *op,calmgr_idx *cip) noex {
 }
 /* end subroutine (calmgr_idxaudit) */
 
-static int mkbve_start(cyimk_ent *bvep,cchar *md,calent *ep) noex {
+local int mkbve_start(cyimk_ent *bvep,cchar *md,calent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		nlines = 0 ;
-	if (bvep && md && ep) {
-	    if ((rs = calent_mkhash(ep,md)) >= 0) {
+	if (bvep && md && ep) ylikely {
+	    if ((rs = calent_mkhash(ep,md)) >= 0) ylikely {
 	        bvep->m = ep->q.m ;
 	        bvep->d = ep->q.d ;
 	        bvep->voff = ep->voff ;
@@ -860,7 +868,7 @@ static int mkbve_start(cyimk_ent *bvep,cchar *md,calent *ep) noex {
 	            cyimk_ln	*lines ;
 	            cint	lsz = (nlines + 1) * szof(cyimk_ln) ;
 	            bvep->nlines = uchar(nlines) ;
-	            if ((rs = uc_malloc(lsz,&lines)) >= 0) {
+	            if ((rs = lm_mall(lsz,&lines)) >= 0) {
 	                int	i ; /* used-afterwards */
 	                bvep->lines = lines ;
 	                for (i = 0 ; i < nlines ; i += 1) {
@@ -879,13 +887,13 @@ static int mkbve_start(cyimk_ent *bvep,cchar *md,calent *ep) noex {
 }
 /* end subroutine (mkbve_start) */
 
-static int mkbve_finish(cyimk_ent *bvep) noex {
+local int mkbve_finish(cyimk_ent *bvep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (bvep) {
+	if (bvep) ylikely {
 	    rs = SR_OK ;
-	    if (bvep->lines) {
-	        rs1 = uc_free(bvep->lines) ;
+	    if (bvep->lines) ylikely {
+	        rs1 = lm_free(bvep->lines) ;
 	        if (rs >= 0) rs = rs1 ;
 	        bvep->lines = nullptr ;
 	    }
@@ -896,14 +904,14 @@ static int mkbve_finish(cyimk_ent *bvep) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	}
     	return rs ;
 }
 /* end method (vars::operator) */
 
-static bool isempty(cchar *lp,int ll) noex {
+local bool isempty(cchar *lp,int ll) noex {
 	int		f = false ;
 	f = f || (ll == 0) ;
 	f = f || (lp[0] == '#') ;
