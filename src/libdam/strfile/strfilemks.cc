@@ -95,6 +95,9 @@
 #include	"strfilemks.h"
 #include	"strlisthdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -127,17 +130,6 @@
 
 
 /* external subroutines */
-
-extern uint	nextpowtwo(uint) ;
-
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf3(char *,cchar *,cchar *,cchar *,
-			cchar *) ;
-extern int	getpwd(char *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	vstrkeycmp(cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
 
 
 /* external variables */
@@ -187,53 +179,53 @@ struct strentry {
 
 /* forward references */
 
-static int	strfilemks_recbegin(STRFILEMKS *) ;
-static int	strfilemks_recend(STRFILEMKS *) ;
+local int	strfilemks_recbegin(STRFILEMKS *) ;
+local int	strfilemks_recend(STRFILEMKS *) ;
 
-static int	strfilemks_idxbegin(STRFILEMKS *,cchar *) ;
-static int	strfilemks_idxend(STRFILEMKS *) ;
+local int	strfilemks_idxbegin(STRFILEMKS *,cchar *) ;
+local int	strfilemks_idxend(STRFILEMKS *) ;
 
-static int	strfilemks_filesbegin(STRFILEMKS *) ;
-static int	strfilemks_filesend(STRFILEMKS *,int) ;
+local int	strfilemks_filesbegin(STRFILEMKS *) ;
+local int	strfilemks_filesend(STRFILEMKS *,int) ;
 
-static int	strfilemks_listbegin(STRFILEMKS *,int) ;
-static int	strfilemks_listend(STRFILEMKS *) ;
+local int	strfilemks_listbegin(STRFILEMKS *,int) ;
+local int	strfilemks_listend(STRFILEMKS *) ;
 
-static int	strfilemks_nfcreate(STRFILEMKS *,cchar *) ;
-static int	strfilemks_nfcreatecheck(STRFILEMKS *,
+local int	strfilemks_nfcreate(STRFILEMKS *,cchar *) ;
+local int	strfilemks_nfcreatecheck(STRFILEMKS *,
 			cchar *,cchar *) ;
-static int	strfilemks_nfdestroy(STRFILEMKS *) ;
-static int	strfilemks_nfstore(STRFILEMKS *,cchar *) ;
-static int	strfilemks_fexists(STRFILEMKS *) ;
+local int	strfilemks_nfdestroy(STRFILEMKS *) ;
+local int	strfilemks_nfstore(STRFILEMKS *,cchar *) ;
+local int	strfilemks_fexists(STRFILEMKS *) ;
 
-static int	strfilemks_addfiler(STRFILEMKS *,MAPFILE *) ;
+local int	strfilemks_addfiler(STRFILEMKS *,MAPFILE *) ;
 
-static int	strfilemks_mkvarfile(STRFILEMKS *) ;
-static int	strfilemks_wrvarfile(STRFILEMKS *) ;
-static int	strfilemks_mkind(STRFILEMKS *,cchar *,uint (*)[3],int) ;
-static int	strfilemks_renamefiles(STRFILEMKS *) ;
+local int	strfilemks_mkvarfile(STRFILEMKS *) ;
+local int	strfilemks_wrvarfile(STRFILEMKS *) ;
+local int	strfilemks_mkind(STRFILEMKS *,cchar *,uint (*)[3],int) ;
+local int	strfilemks_renamefiles(STRFILEMKS *) ;
 
-static int	rectab_start(RECTAB *,int) ;
-static int	rectab_add(RECTAB *,uint,uint) ;
-static int	rectab_done(RECTAB *) ;
-static int	rectab_getvec(RECTAB *,uint (**)[2]) ;
-static int	rectab_extend(RECTAB *) ;
-static int	rectab_finish(RECTAB *) ;
+local int	rectab_start(RECTAB *,int) ;
+local int	rectab_add(RECTAB *,uint,uint) ;
+local int	rectab_done(RECTAB *) ;
+local int	rectab_getvec(RECTAB *,uint (**)[2]) ;
+local int	rectab_extend(RECTAB *) ;
+local int	rectab_finish(RECTAB *) ;
 
 #ifdef	COMMENT
-static int	rectab_count(RECTAB *) ;
+local int	rectab_count(RECTAB *) ;
 #endif
 
-static int	mapfile_start(MAPFILE *,int,cchar *,int) noex ;
-static int	mapfile_end(MAPFILE *) noex ;
+local int	mapfile_start(MAPFILE *,int,cchar *,int) noex ;
+local int	mapfile_end(MAPFILE *) noex ;
 
-static int	indinsert(uint (*rt)[2],uint (*it)[3],int,strentry *) noex ;
-static int	hashindex(uint,int) noex ;
+local int	indinsert(uint (*rt)[2],uint (*it)[3],int,strentry *) noex ;
+local int	hashindex(uint,int) noex ;
 
 
 /* local variables */
 
-static cchar	zerobuf[4] = {
+constexpr char		zerobuf[4] = {
 	0, 0, 0, 0 
 } ;
 
@@ -245,6 +237,9 @@ const SFM_OBJ	strfilemks_mod = {
 	szof(STRFILEMKS),
 	0
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -381,7 +376,7 @@ int		sl ;
 /* end subroutine (strfilemks_addfile) */
 
 
-static int strfilemks_addfiler(STRFILEMKS *op,MAPFILE *mfp) noex {
+local int strfilemks_addfiler(STRFILEMKS *op,MAPFILE *mfp) noex {
 	RECMGR		*rmp = op->recorder ;
 	int		rs ;
 	int		c = 0 ;
@@ -423,7 +418,7 @@ static int strfilemks_addfiler(STRFILEMKS *op,MAPFILE *mfp) noex {
 }
 /* end subroutine (strfilemks_addfiler) */
 
-static int recmgr_start(RECMGR *rmp) noex {
+local int recmgr_start(RECMGR *rmp) noex {
 	cint	esz = szof(RECMGR_ENT) ;
 	cint	vn = 100 ;
 	cint	vo = 0 ;
@@ -433,14 +428,14 @@ static int recmgr_start(RECMGR *rmp) noex {
 /* end subroutine (strfilemks_start) */
 
 
-static int recmgr_finish(RECMGR *rmp)
+local int recmgr_finish(RECMGR *rmp)
 {
 	return vecobj_finish(&rmp->recs) ;
 }
 /* end subroutine (strfilemks_finish) */
 
 
-static int recmgr_grpbegin(RECMGR *rmp)
+local int recmgr_grpbegin(RECMGR *rmp)
 {
 	rmp->bso = rmp->so ;
 	return SR_OK ;
@@ -449,7 +444,7 @@ static int recmgr_grpbegin(RECMGR *rmp)
 
 
 /* nothing to do */
-static int recmgr_grpend(RECMGR *rmp)
+local int recmgr_grpend(RECMGR *rmp)
 {
 	if (rmp == nullptr) return SR_FAULT ;
 	return SR_OK ;
@@ -457,7 +452,7 @@ static int recmgr_grpend(RECMGR *rmp)
 /* end subroutine (strfilemks_grpend) */
 
 
-static int recmgr_grpadd(RECMGR *rmp,int si,int sl)
+local int recmgr_grpadd(RECMGR *rmp,int si,int sl)
 {
 	RECMGR_ENT	e ;
 	e.si = (si + rmp->bso) ;
@@ -505,7 +500,7 @@ gid_t		gid ;
 
 /* private subroutines */
 
-static int strfilemks_recbegin(STRFILEMKS *op) noex {
+local int strfilemks_recbegin(STRFILEMKS *op) noex {
 	cint	rsz = szof(RECMGR) ;
 	int	rs ;
 	if (void *p ; (rs = uc_malloc(rsz,&p)) >= 0) {
@@ -521,7 +516,7 @@ static int strfilemks_recbegin(STRFILEMKS *op) noex {
 }
 /* end subroutine (strfilemks_recbegin) */
 
-static int strfilemks_recend(STRFILEMKS *op) noex {
+local int strfilemks_recend(STRFILEMKS *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	{
@@ -537,7 +532,7 @@ static int strfilemks_recend(STRFILEMKS *op) noex {
 }
 /* end subroutine (strfilemks_recend) */
 
-static int strfilemks_idxbegin(STRFILEMKS *op,cchar *dbname) noex {
+local int strfilemks_idxbegin(STRFILEMKS *op,cchar *dbname) noex {
 	cint	isz = szof(idx) ;
 	int	rs ;
 	if (void *p ; (rs = uc_malloc(isz,&p)) >= 0) {
@@ -553,7 +548,7 @@ static int strfilemks_idxbegin(STRFILEMKS *op,cchar *dbname) noex {
 }
 /* end subroutine (strfilemks_idxbegin) */
 
-static int strfilemks_idxend(STRFILEMKS *op) noex {
+local int strfilemks_idxend(STRFILEMKS *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 
@@ -569,7 +564,7 @@ static int strfilemks_idxend(STRFILEMKS *op) noex {
 }
 /* end subroutine (strfilemks_idxend) */
 
-static int idx_start(idx *ixp,cchar *dbname) noex {
+local int idx_start(idx *ixp,cchar *dbname) noex {
 	int	rs = SR_OK ;
 	int	dnl ;
 
@@ -614,7 +609,7 @@ static int idx_start(idx *ixp,cchar *dbname) noex {
 /* end subroutine (idx_start) */
 
 
-static int idx_finish(idx *ixp)
+local int idx_finish(idx *ixp)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -638,7 +633,7 @@ static int idx_finish(idx *ixp)
 /* end subroutine (idx_finish) */
 
 
-static int idx_dirwritable(idx *ixp)
+local int idx_dirwritable(idx *ixp)
 {
 	cint	am = (X_OK|W_OK) ;
 	int	rs ;
@@ -653,7 +648,7 @@ static int idx_dirwritable(idx *ixp)
 /* end subroutine (idx_dirwritable) */
 
 
-static int idx_create(idx *ixp,cchar *fsuf)
+local int idx_create(idx *ixp,cchar *fsuf)
 {
 	time_t		dt = time(nullptr) ;
 	cint	clen = MAXNAMELEN ;
@@ -694,7 +689,7 @@ static int idx_create(idx *ixp,cchar *fsuf)
 /* end subroutine (idx_create) */
 
 
-static int idx_creator(idx *ixp)
+local int idx_creator(idx *ixp)
 {
 	int	rs ;
 
@@ -707,7 +702,7 @@ static int idx_creator(idx *ixp)
 /* end subroutine (idx_creator) */
 
 
-static int idx_destroy(idx *ixp)
+local int idx_destroy(idx *ixp)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -730,7 +725,7 @@ static int idx_destroy(idx *ixp)
 /* end subroutine (idx_destroy) */
 
 
-static int idx_nfopen(idx *ixp,cchar *nfname)
+local int idx_nfopen(idx *ixp,cchar *nfname)
 {
 	cint	of = (O_CREAT | O_EXCL | O_WRONLY) ;
 	int	rs ;
@@ -744,7 +739,7 @@ static int idx_nfopen(idx *ixp,cchar *nfname)
 /* end subroutine (idx_nfopen) */
 
 
-static int idx_nfclose(idx *ixp)
+local int idx_nfclose(idx *ixp)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -758,7 +753,7 @@ static int idx_nfclose(idx *ixp)
 /* end subroutine (idx_nfclose) */
 
 
-static int idx_nfold(idx *ixp,time_t dt,cchar *nfname)
+local int idx_nfold(idx *ixp,time_t dt,cchar *nfname)
 {
 	ustat	sb ;
 	int	rs ;
@@ -775,7 +770,7 @@ static int idx_nfold(idx *ixp,time_t dt,cchar *nfname)
 }
 /* end subroutine (idx_nfold) */
 
-static int idx_nfopentmp(idx *ixp,cchar *fsuf) noex {
+local int idx_nfopentmp(idx *ixp,cchar *fsuf) noex {
 	cint	of = (O_WRONLY | O_CREAT) ;
 	cint	clen = MAXNAMELEN ;
 	int		rs = SR_OK ;
@@ -807,7 +802,7 @@ static int idx_nfopentmp(idx *ixp,cchar *fsuf) noex {
 }
 /* end subroutine (idx_nfopentmp) */
 
-static int idx_nfstore(idx *op,cchar *nf) noex {
+local int idx_nfstore(idx *op,cchar *nf) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nfname) {
@@ -824,7 +819,7 @@ static int idx_nfstore(idx *op,cchar *nf) noex {
 }
 /* end subroutine (idx_nfstore) */
 
-static int idx_bufbegin(idx *ixp) noex {
+local int idx_bufbegin(idx *ixp) noex {
 	int	rs ;
 	if ((rs = filer_start(&ixp->fb,ixp->fd,0z,0,0)) >= 0) {
 	    ixp->fl.fb = true ;
@@ -833,7 +828,7 @@ static int idx_bufbegin(idx *ixp) noex {
 }
 /* end subroutine (idx_bufbegin) */
 
-static int idx_bufend(idx *ixp) noex {
+local int idx_bufend(idx *ixp) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	if (ixp->fl.fb) {
@@ -845,14 +840,14 @@ static int idx_bufend(idx *ixp) noex {
 }
 /* end subroutine (idx_bufend) */
 
-static int idx_bufwrite(idx *ixp,cvoid *wbuf,int wlen) noex {
+local int idx_bufwrite(idx *ixp,cvoid *wbuf,int wlen) noex {
 	int	rs = filer_write(&ixp->db,wbuf,wlen) ;
 	ixp->fo += rs ;
 	return rs ;
 }
 /* end subroutine (idx_bufwrite) */
 
-static int idx_bufhdr(idx *ixp) noex {
+local int idx_bufhdr(idx *ixp) noex {
 	cint	hlen = szof(STRLISTHDR) ;
 	int	rs ;
 	rs = filer_write(&ixp->db,&ixp->hdr,hlen) ;
@@ -862,7 +857,7 @@ static int idx_bufhdr(idx *ixp) noex {
 }
 /* end subroutine (idx_bufhdr) */
 
-static int idx_bufstr(idx *ixp,cchar *lp,int ll) noex {
+local int idx_bufstr(idx *ixp,cchar *lp,int ll) noex {
 	filer	*fbp = &ixp->fb ;
 	int	rs ;
 	rs = filer_println(fbp,lp,ll) ;
@@ -870,7 +865,7 @@ static int idx_bufstr(idx *ixp,cchar *lp,int ll) noex {
 }
 /* end subroutine (idx_bufstr) */
 
-static int strfilemks_filesbegin(STRFILEMKS *op) noex {
+local int strfilemks_filesbegin(STRFILEMKS *op) noex {
 	int		rs = SR_INVALID ;
 	int		dnl ;
 	cchar		*dnp ;
@@ -912,7 +907,7 @@ static int strfilemks_filesbegin(STRFILEMKS *op) noex {
 /* end subroutine (strfilemks_filesbegin) */
 
 
-static int strfilemks_filesend(op,f)
+local int strfilemks_filesend(op,f)
 STRFILEMKS	*op ;
 {
 	int	rs = SR_OK ;
@@ -940,7 +935,7 @@ STRFILEMKS	*op ;
 
 
 /* exclusively create this new file */
-static int strfilemks_nfcreate(op,fsuf)
+local int strfilemks_nfcreate(op,fsuf)
 STRFILEMKS	*op ;
 cchar	fsuf[] ;
 {
@@ -1008,7 +1003,7 @@ ret0:
 /* end subroutine (txindexmks_nfcreate) */
 
 
-static int strfilemks_nfcreatecheck(op,fpre,fsuf)
+local int strfilemks_nfcreatecheck(op,fpre,fsuf)
 STRFILEMKS	*op ;
 cchar	fpre[] ;
 cchar	fsuf[] ;
@@ -1070,7 +1065,7 @@ cchar	fsuf[] ;
 /* end subroutine (strfilemks_nfcreatecheck) */
 
 
-static int strfilemks_nfdestroy(op)
+local int strfilemks_nfdestroy(op)
 STRFILEMKS	*op ;
 {
 	int	rs = SR_OK ;
@@ -1098,7 +1093,7 @@ STRFILEMKS	*op ;
 /* end subroutine (strfilemks_nfdestroy) */
 
 
-static int strfilemks_nfstore(op,outfname)
+local int strfilemks_nfstore(op,outfname)
 STRFILEMKS	*op ;
 cchar	outfname[] ;
 {
@@ -1120,7 +1115,7 @@ cchar	outfname[] ;
 /* end subroutine (strfilemks_nfstore) */
 
 
-static int strfilemks_fexists(op)
+local int strfilemks_fexists(op)
 STRFILEMKS	*op ;
 {
 	int	rs = SR_OK ;
@@ -1140,7 +1135,7 @@ STRFILEMKS	*op ;
 }
 /* end subroutine (strfilemks_fexists) */
 
-static int strfilemks_listbegin(STRFILEMKS *op,int n) noex {
+local int strfilemks_listbegin(STRFILEMKS *op,int n) noex {
 	cint		sz = (n * SFM_SIZEMULT) ;
 	int		rs ;
 	if ((rs = strtab_start(&op->strs,size)) >= 0) {
@@ -1153,7 +1148,7 @@ static int strfilemks_listbegin(STRFILEMKS *op,int n) noex {
 }
 /* end subroutine (strfilemks_listbegin) */
 
-static int strfilemks_listend(STRFILEMKS *op) noex {
+local int strfilemks_listend(STRFILEMKS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -1168,7 +1163,7 @@ static int strfilemks_listend(STRFILEMKS *op) noex {
 }
 /* end subroutine (strfilemks_listend) */
 
-static int strfilemks_mkvarfile(STRFILEMKS *op) noex {
+local int strfilemks_mkvarfile(STRFILEMKS *op) noex {
 	int		rs ;
 	int		nv = 0 ; /* return-value */
 	if ((rs =rectab_done(&op->rectab)) >= 0) {
@@ -1184,7 +1179,7 @@ static int strfilemks_mkvarfile(STRFILEMKS *op) noex {
 }
 /* end subroutine (strfilemks_mkvarfile) */
 
-static int strfilemks_wrvarfile(STRFILEMKS *op) noex {
+local int strfilemks_wrvarfile(STRFILEMKS *op) noex {
 	STRLISTGDR	hf ;
 
 	filer	varfile ;
@@ -1456,7 +1451,7 @@ int		il ;
 /* end subroutine (strfilemks_mkind) */
 
 
-static int strfilemks_renamefiles(op)
+local int strfilemks_renamefiles(op)
 STRFILEMKS	*op ;
 {
 	int	rs ;
@@ -1480,7 +1475,7 @@ STRFILEMKS	*op ;
 /* end subroutine (strfilemks_renamefiles) */
 
 
-static int rectab_start(rtp,n)
+local int rectab_start(rtp,n)
 RECTAB		*rtp ;
 int		n ;
 {
@@ -1508,7 +1503,7 @@ int		n ;
 /* end subroutine (rectab_start) */
 
 
-static int rectab_finish(rtp)
+local int rectab_finish(rtp)
 RECTAB		*rtp ;
 {
 	int	rs = SR_OK ;
@@ -1526,7 +1521,7 @@ RECTAB		*rtp ;
 /* end subroutine (rectab_finish) */
 
 
-static int rectab_add(rtp,ki,vi)
+local int rectab_add(rtp,ki,vi)
 RECTAB		*rtp ;
 uint		ki, vi ;
 {
@@ -1548,7 +1543,7 @@ uint		ki, vi ;
 }
 /* end subroutine (rectab_add) */
 
-static int rectab_extend(RECTAB *rtp) noex {
+local int rectab_extend(RECTAB *rtp) noex {
 	int	rs = SR_OK ;
 	if ((rtp->i + 1) > rtp->n) {
 	    uint	(*va)[2] ;
@@ -1566,7 +1561,7 @@ static int rectab_extend(RECTAB *rtp) noex {
 /* end subroutine (rectab_extend) */
 
 
-static int rectab_done(RECTAB *rtp) noex {
+local int rectab_done(RECTAB *rtp) noex {
 	int	i = rtp->i ;
 	rtp->rectab[i][0] = UINT_MAX ;
 	rtp->rectab[i][1] = 0 ;
@@ -1575,13 +1570,13 @@ static int rectab_done(RECTAB *rtp) noex {
 /* end subroutine (rectab_done) */
 
 #ifdef	COMMENT
-static int rectab_count(RECTAB *rtp) noex {
+local int rectab_count(RECTAB *rtp) noex {
 	return rtp->i ;
 }
 /* end subroutine (rectab_count) */
 #endif /* COMMENT */
 
-static int rectab_getvec(RECTAB *rtp,uint (**rpp)[2]) noex {
+local int rectab_getvec(RECTAB *rtp,uint (**rpp)[2]) noex {
     	int		rs = SR_OK ;
 	*rpp = rtp->rectab ;
 	rs = rtp->i ;
@@ -1589,7 +1584,7 @@ static int rectab_getvec(RECTAB *rtp,uint (**rpp)[2]) noex {
 }
 /* end subroutine (rectab_getvec) */
 
-static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl) noex {
+local int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl) noex {
 	nulstr	fn ;
 	int	rs ;
 	cchar	*fname ;
@@ -1634,7 +1629,7 @@ static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl) noex {
 }
 /* end subroutine (mapfile_begin) */
 
-static int mapfile_end(MAPFILE *mfp) noex {
+local int mapfile_end(MAPFILE *mfp) noex {
 	int		rs = SR_OK ;
 	if (mfp->mapdata != nullptr) {
 	    csize	ms = fmp->mapsize ;
@@ -1648,7 +1643,7 @@ static int mapfile_end(MAPFILE *mfp) noex {
 /* end subroutine (mapfile_end) */
 
 
-static int filer_writefill(filer *bp,cchar *wbuf,iknt elen) noex {
+local int filer_writefill(filer *bp,cchar *wbuf,iknt elen) noex {
 	int		rs ;
 	int		r, nzero ;
 	int		len ;
@@ -1674,7 +1669,7 @@ static int filer_writefill(filer *bp,cchar *wbuf,iknt elen) noex {
 /* end subroutine (filer_writefill) */
 
 
-static int indinsert(rt,it,il,vep)
+local int indinsert(rt,it,il,vep)
 uint		(*rt)[2] ;
 uint		(*it)[3] ;
 int		il ;
@@ -1731,7 +1726,7 @@ struct strentry	*vep ;
 }
 /* end subroutine (indinsert) */
 
-static int hashindex(uint i,int n) noex {
+local int hashindex(uint i,int n) noex {
 	int		hi = MODP2(i,n) ;
 	if (hi == 0) hi = 1 ;
 	return hi ;
