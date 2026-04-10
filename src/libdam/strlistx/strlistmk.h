@@ -33,7 +33,7 @@
 
 struct strlistmk_flags {
     	uint		modload:1 ;
-} ;
+} ; /* end struct */
 
 struct strlistmk_head {
 	modload		*mlp ;		/* module-load-pointer */
@@ -42,7 +42,7 @@ struct strlistmk_head {
 	STRLISTMK_FL	fl ;
 	uint		magic ;
 	int		objsize ;	/* object size */
-} ;
+} ; /* end struct */
 
 typedef	STRLISTMK	strlistmk ;
 typedef	STRLISTMK_FL	strlistmk_fl ;
