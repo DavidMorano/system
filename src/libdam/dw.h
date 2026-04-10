@@ -17,6 +17,8 @@
 #include	<sys/stat.h>
 #include	<time.h>		/* |time_t| */
 #include	<stdlib.h>		/* |size_t| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
 
@@ -39,7 +41,7 @@ enum dwstates {
     	dwstate_retry,
     	dwstate_user,
 	dwstate_overlast
-} ;
+} ; /* end enum */
 
 struct dw_entry {
 	cchar		*name ;
@@ -47,11 +49,11 @@ struct dw_entry {
 	time_t		timod ;
 	size_t		fsize ;
 	int		state ;
-} ;
+} ; /* end struct */
 
 struct dw_flags {
 	uint		subdirs:1 ;
-} ;
+} ; /* end struct */
 
 EXTERNC_begin
 struct dw_head {
@@ -73,7 +75,7 @@ EXTERNC_end
 
 struct dw_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef	DW		dw ;
 typedef	DW_FL		dw_fl ;
