@@ -38,11 +38,14 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getpwd.h>
 #include	<absfn.h>
@@ -56,6 +59,9 @@
 
 #include	"systems.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -71,7 +77,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -96,7 +101,7 @@ namespace {
 	int		fileargslen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 struct systems_file {
 	cchar		*fname ;
@@ -104,7 +109,7 @@ struct systems_file {
 	size_t		fsize ;
 	dev_t		dev ;
 	ino_t		ino ;
-} ;
+} ; /* end struct */
 
 typedef systems_file *	filep ;
 
@@ -112,13 +117,13 @@ typedef systems_file *	filep ;
 /* forward references */
 
 template<typename ... Args>
-static int systems_ctor(systems *op,Args ... args) noex {
+local int systems_ctor(systems *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((op->flp = new(nothrow) vecobj) != np) {
-	        if ((op->flp = new(nothrow) vecobj) != np) {
+	    if ((op->flp = new(nothrow) vecobj) != np) ylikely {
+	        if ((op->flp = new(nothrow) vecobj) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-vecobj) */
 		if (rs < 0) {
@@ -128,46 +133,43 @@ static int systems_ctor(systems *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (systems_ctor) */
+} /* end subroutine (systems_ctor) */
 
-static int systems_dtor(systems *op) noex {
+local int systems_dtor(systems *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->elp) {
+	    if (op->elp) ylikely {
 		delete op->elp ;
 		op->elp = nullptr ;
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (systems_dtor) */
+} /* end subroutine (systems_dtor) */
 
 template<typename ... Args>
-static inline int systems_magic(systems *op,Args ... args) noex {
+local inline int systems_magic(systems *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SYSTEMS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (systems_magic) */
+} /* end subroutine (systems_magic) */
 
-static int systems_fileparse(systems *,int,SYS_FILE *) noex ;
-static int systems_delfes(systems *,int) noex ;
+local int systems_fileparse(systems *,int,SYS_FILE *) noex ;
+local int systems_delfes(systems *,int) noex ;
 
-static int file_start(SYS_FILE *,cchar *) noex ;
-static int file_finish(SYS_FILE *) noex ;
+local int file_start(SYS_FILE *,cchar *) noex ;
+local int file_finish(SYS_FILE *) noex ;
 
-static int entry_start(ENT *,int,cchar *,int) noex ;
-static int entry_dialer(ENT *,cchar *,int) noex ;
-static int entry_args(ENT *,cchar *,int) noex ;
-static int entry_finish(ENT *) noex ;
+local int entry_start(ENT *,int,cchar *,int) noex ;
+local int entry_dialer(ENT *,cchar *,int) noex ;
+local int entry_args(ENT *,cchar *,int) noex ;
+local int entry_finish(ENT *) noex ;
 
 
 /* local variables */
@@ -206,17 +208,17 @@ constexpr cchar		remterms[32] = {
 
 int systems_open(systems *op,cchar *sysfname) noex {
 	int		rs ;
-	if ((rs = systems_ctor(op)) >= 0) {
+	if ((rs = systems_ctor(op)) >= 0) ylikely {
 	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) {
+	    if ((rs = rsv) >= 0) ylikely {
 	        int	sz = szof(SYS_FILE) ;
 	        int	vn = 10 ;
 	        int	vo = VECOBJ_OREUSE ;
-	        if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) {
+	        if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) ylikely {
 	            sz = szof(ENT) ;
 		    vn = 20 ;
 	            vo = 0 ;
-	            if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) {
+	            if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) ylikely {
 	                op->magic = SYSTEMS_MAGIC ;
 	                if (sysfname) {
 	                    rs = systems_fileadd(op,sysfname) ;
@@ -242,7 +244,7 @@ int systems_open(systems *op,cchar *sysfname) noex {
 int systems_close(systems *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = systems_magic(op)) >= 0) {
+	if ((rs = systems_magic(op)) >= 0) ylikely {
 	    vecobj	*elp = op->elp ;
 	    vecobj	*flp = op->flp ;
 	    void	*vp{} ;
@@ -262,7 +264,8 @@ int systems_close(systems *op) noex {
 	        SYS_FILE	*fep = filep(vp) ;
 	        if (vp) {
 	            if (fep->fname) {
-	                rs1 = uc_free(fep->fname) ;
+	                vp = voidp(fep->fname) ;
+	                rs1 = lm_free(vp) ;
 		        if (rs >= 0) rs = rs1 ;
 		        fep->fname = nullptr ;
 	            }
@@ -285,12 +288,12 @@ int systems_close(systems *op) noex {
 int systems_fileadd(systems *op,cchar *sysfname) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = systems_magic(op,sysfname)) >= 0) {
+	if ((rs = systems_magic(op,sysfname)) >= 0) ylikely {
 	    cchar	*sp ;
-	    if (absfn sfn ; (rs = sfn.start(sysfname,-1,&sp)) >= 0) {
-	        if (SYS_FILE fe ; (rs = file_start(&fe,sp)) >= 0) {
+	    if (absfn sfn ; (rs = sfn.start(sysfname,-1,&sp)) >= 0) ylikely {
+	        if (SYS_FILE fe ; (rs = file_start(&fe,sp)) >= 0) ylikely {
 		    vecobj	*flp = op->flp ;
-	            if ((rs = flp->add(&fe)) >= 0) {
+	            if ((rs = flp->add(&fe)) >= 0) ylikely {
 	                cint	fi = rs ;
 		        if (void *vp{} ; (rs = flp->get(fi,&vp)) >= 0) {
 			    SYS_FILE	*fep = filep(vp) ;
@@ -319,7 +322,7 @@ int systems_fileadd(systems *op,cchar *sysfname) noex {
 
 int systems_curbegin(systems *op,CUR *curp) noex {
     	int		rs ;
-	if ((rs = systems_magic(op,curp)) >= 0) {
+	if ((rs = systems_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -328,7 +331,7 @@ int systems_curbegin(systems *op,CUR *curp) noex {
 
 int systems_curend(systems *op,CUR *curp) noex {
     	int		rs ;
-	if ((rs = systems_magic(op)) >= 0) {
+	if ((rs = systems_magic(op)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -338,7 +341,7 @@ int systems_curend(systems *op,CUR *curp) noex {
 int systems_curenum(systems *op,CUR *curp,ENT **depp) noex {
 	int		rs ;
 	int		ei = 0 ;
-	if ((rs = systems_magic(op,curp,depp)) >= 0) {
+	if ((rs = systems_magic(op,curp,depp)) >= 0) ylikely {
 	    vecobj	*elp = op->elp ;
 	    ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	    if (void *vp{} ; (rs = elp->get(ei,&vp)) >= 0) {
@@ -353,7 +356,7 @@ int systems_curenum(systems *op,CUR *curp,ENT **depp) noex {
 int systems_fetch(systems *op,cchar *name,CUR *curp,ENT **depp) noex {
 	int		rs ;
 	int		ei = 0 ;
-	if ((rs = systems_magic(op,name,curp,depp)) >= 0) {
+	if ((rs = systems_magic(op,name,curp,depp)) >= 0) ylikely {
 	    vecobj	*elp = op->elp ;
 	    void	*vp{} ;
 	    ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
@@ -378,7 +381,7 @@ int systems_check(systems *op,time_t dt) noex {
 	int		rs ;
 	int		c = 0 ;
 	if (dt <= 0) dt = getustime ;
-	if ((rs = systems_magic(op)) >= 0) {
+	if ((rs = systems_magic(op)) >= 0) ylikely {
 	    /* should we even check? */
 	    if ((dt - op->checktime) > TI_FILECHECK) {
 		vecobj	*flp = op->flp ;
@@ -430,13 +433,14 @@ namespace {
 	int parsealready(dev_t,ino_t) noex ;
 	int parseln(field *) noex ;
     } ; /* end struct (parser) */
-}
+} /* end namespace */
 
 int parser::operator () (SYS_FILE *fep) noex {
 	cint		sz = (var.filelinelen + var.fileargslen + 2) ;
     	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-	if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	    lbuf = a ;
 	    llen = var.filelinelen ;
 	    abuf = (a + (var.filelinelen + 1)) ;
@@ -445,12 +449,13 @@ int parser::operator () (SYS_FILE *fep) noex {
 		rs = parse(fep) ;
 		c = rs ;
 	    }
-	    rs = rsfree(rs,a) ;
+	    rs1 = lm_free(a) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
 
-static int systems_fileparse(systems *op,int fi,SYS_FILE *fep) noex {
+local int systems_fileparse(systems *op,int fi,SYS_FILE *fep) noex {
 	parser	po(op,fi) ;
        	return po(fep) ;
 }
@@ -461,8 +466,8 @@ int parser::parse(SYS_FILE *fep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = bopen(sfp,fep->fname,"r",0664)) >= 0) {
-	    if (USTAT sb ; (rs = bcontrol(sfp,BC_STAT,&sb)) >= 0) {
+	if ((rs = bopen(sfp,fep->fname,"r",0664)) >= 0) ylikely {
+	    if (ustat sb ; (rs = bcontrol(sfp,BC_STAT,&sb)) >= 0) ylikely {
 		const dev_t	dev = sb.st_dev ;
 		const ino_t	ino = sb.st_ino ;
 		if ((rs = parsealready(dev,ino)) == 0) {
@@ -521,7 +526,7 @@ int parser::parseln(field *fsp) noex {
 	if ((fsp->fl > 0) && (fsp->term != '#')) {
 	    int		fl = fsp->fl ;
 	    cchar	*fp = fsp->fp ;
-	    if (ENT e ; (rs = entry_start(&e,fi,fp,fl)) >= 0) {
+	    if (ENT e ; (rs = entry_start(&e,fi,fp,fl)) >= 0) ylikely {
 		bool	f_fin = true ;
 	        if ((fl = fsp->get(fterms,&fp)) > 0) {
 	            if ((rs = entry_dialer(&e,fp,fl)) >= 0) {
@@ -549,7 +554,7 @@ int parser::parseln(field *fsp) noex {
 }
 /* end method (parser::parseln) */
 
-static int systems_delfes(systems *op,int fi) noex {
+local int systems_delfes(systems *op,int fi) noex {
 	vecobj		*elp = op->elp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -573,11 +578,11 @@ static int systems_delfes(systems *op,int fi) noex {
 }
 /* end subroutine (systems_delfes) */
 
-static int file_start(SYS_FILE *fep,cchar *fname) noex {
+local int file_start(SYS_FILE *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fep && fname) {
+	if (fep && fname) ylikely {
 	    memclear(fep) ;
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(fname,-1,&cp)) >= 0) ylikely {
 	        fep->fname = cp ;
 	    }
 	} /* end if (non-null) */
@@ -585,13 +590,14 @@ static int file_start(SYS_FILE *fep,cchar *fname) noex {
 }
 /* end subroutine (file_start) */
 
-static int file_finish(SYS_FILE *fep) noex {
+local int file_finish(SYS_FILE *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (fep) {
+	if (fep) ylikely {
 	    rs = SR_OK ;
-	    if (fep->fname) {
-	        rs1 = uc_free(fep->fname) ;
+	    if (fep->fname) ylikely {
+		void *vp = voidp(fep->fname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->fname = nullptr ;
 	    }
@@ -600,12 +606,12 @@ static int file_finish(SYS_FILE *fep) noex {
 }
 /* end subroutine (file_finish) */
 
-static int entry_start(ENT *ep,int fi,cchar *sp,int sl) noex {
+local int entry_start(ENT *ep,int fi,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (ep) {
+	if (ep) ylikely {
 	    memclear(ep) ;
 	    ep->fi = fi ;
-	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) ylikely {
 	        ep->sysnamelen = sl ;
 	        ep->sysname = cp ;
 	    }
@@ -614,9 +620,9 @@ static int entry_start(ENT *ep,int fi,cchar *sp,int sl) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
+local int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
 	int		rs ;
-	if (cchar *cp ; (rs = uc_mallocstrw(dp,dl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = lm_strw(dp,dl,&cp)) >= 0) ylikely {
 	    ep->dialernamelen = dl ;
 	    ep->dialername = cp ;
 	}
@@ -624,11 +630,11 @@ static int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
 }
 /* end subroutine (entry_dialer) */
 
-static int entry_args(ENT *ep,cchar *argp,int argl) noex {
+local int entry_args(ENT *ep,cchar *argp,int argl) noex {
 	int		rs = SR_OK ;
 	if (argl > 0) {
 	    ep->dialerargslen = argl ;
-	    if (cchar *cp ; (rs = uc_mallocstrw(argp,argl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(argp,argl,&cp)) >= 0) ylikely {
 		ep->dialerargs = cp ;
 	    }
 	} /* end if */
@@ -636,24 +642,28 @@ static int entry_args(ENT *ep,cchar *argp,int argl) noex {
 }
 /* end subroutine (entry_args) */
 
-static int entry_finish(ENT *ep) noex {
+local int entry_finish(ENT *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
-	    if (ep->sysnamelen > 0) {
-	        if (ep->dialerargs) {
-	            rs1 = uc_free(ep->dialerargs) ;
+	    if (ep->sysnamelen > 0) ylikely {
+		void *vp ;
+	        if (ep->dialerargs) ylikely {
+	            vp = voidp(ep->dialerargs) ;
+	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 		    ep->dialerargs = nullptr ;
 	        }
-	        if (ep->dialername) {
-	            rs1 = uc_free(ep->dialername) ;
+	        if (ep->dialername) ylikely {
+	            vp = voidp(ep->dialername) ;
+	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            ep->dialername = nullptr ;
 	        }
-	        if (ep->sysname) {
-	            rs1 = uc_free(ep->sysname) ;
+	        if (ep->sysname) ylikely {
+	            vp = voidp(ep->sysname) ;
+	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            ep->sysname = nullptr ;
 	        }
@@ -666,9 +676,9 @@ static int entry_finish(ENT *ep) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+	    if ((rs = getbufsize(bufsize_ml)) >= 0) ylikely {
 		maxlinelen = rs ;
 		filelinelen = (maxlinelen * FILELINEMULT) ;
 		fileargslen = (maxpathlen * FILEARGSMULT) ;
