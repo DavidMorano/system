@@ -39,9 +39,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
+#include	<usupport.h>		/* |ctdec(3u)| */
 #include	<localmisc.h>
 
 #include	"strabbrerr.h"
@@ -51,6 +50,8 @@
 
 
 /* local namespaces */
+
+using libu::ctdec ;			/* subroutine */
 
 
 /* local typedefs */
@@ -67,7 +68,7 @@
 struct sysret {
 	int		n ;
 	cchar		*s ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -235,6 +236,9 @@ constexpr sysret		cvts[] = {
 	{ SR_OK,		"OK" }
 } ; /* end array (cvts) */
 
+cint		oklen = DIGBUFLEN ;
+char		okbuf[DIGBUFLEN+1] ;
+
 
 /* exported variables */
 
@@ -242,14 +246,19 @@ constexpr sysret		cvts[] = {
 /* exported subroutines */
 
 cchar *strabbrerr(int rs) noex {
-	int		i ; /* used-afterwards */
-	int		f = false ;
-	cchar		*s ;
-	for (i = 0 ; cvts[i].s != 0 ; i += 1) {
-	    f = (cvts[i].n == rs) ;
-	    if (f) break ;
-	} /* end for */
-	s = (f) ? cvts[i].s : "*UNK*" ;
+	cchar		*s = nullptr ;
+	if (rs >= 0) {
+	    ctdec(okbuf,oklen,rs) ;
+	    s = okbuf ;
+	} else {
+	    int		i ; /* used-afterwards */
+	    bool	f = false ;
+	    for (i = 0 ; cvts[i].s != 0 ; i += 1) {
+	        f = (cvts[i].n == rs) ;
+	        if (f) break ;
+	    } /* end for */
+	    s = (f) ? cvts[i].s : "*UNK*" ;
+	} /* end if */
 	return s ;
 }
 /* end subroutine (strabbrerr) */
