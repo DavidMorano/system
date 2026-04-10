@@ -284,7 +284,7 @@ static int procpwfile(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
 
 	if ((rs = pwfile_open(&pf,pip->pwfname)) >= 0) {
 	    if ((rs = pwfile_curbegin(&pf,&cur)) >= 0) {
-	        cint	pwlen = getbufsize(getbufsize_pw) ;
+	        cint	pwlen = getbufsize(bufsize_pw) ;
 	        char	*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	            while ((rs = pwfile_curenum(&pf,&cur,&pw,pwbuf,pwlen)) > 0) {
@@ -400,7 +400,7 @@ static int procpwsys(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
 
 	if ((rs = setstr_start(&u,n)) >= 0) {
 	    PASSWD	pw ;
-	    cint	pwlen = getbufsize(getbufsize_pw) ;
+	    cint	pwlen = getbufsize(bufsize_pw) ;
 	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = getpw_begin()) >= 0) {
