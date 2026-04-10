@@ -18,8 +18,11 @@
 
 /*******************************************************************************
 
-	This subroutine will form a file name according to some rules.
+  	Name:
+	bopenroot
 
+	Description:
+	This subroutine will form a file name according to some rules.
 	The rules are roughly:
 
 	+ attempt to open it directly if it is already rooted
@@ -29,27 +32,22 @@
 	+ attempt to open or create it as it is
 
 	Synopsis:
-
-	int bopenroot(fp,pr,fname,outfname,mode,operms)
-	bfile		*fp ;
-	const char	pr[], fname[] ;
-	const char	mode[] ;
-	char		outfname[] ;
-	mode_t		operms ;
+	int bopenroot(bfile *fp,cc *pr,cc *fn,char *rbuf,
+		int of,mode_t om) noex
 
 	Arguments:
 	fp		pointer to 'bfile' object
 	pr		path of program root directory
-	fname		fname to find and open
-	mode		file open mode
-	outfname	user supplied buffer to hold possible resulting name
-	operms		file opermss to use in the open 
+	fn		file-name to find and open
+	rbuf		supplied buffer to hold possible resulting name
+	of		file open flags
+	om		file ooms to use in the open 
 
 	Returns:
 	>=0		success (same as 'bopen()')
 	<0		error (same as 'bopen()')
 
-	outfname	1. zero length string if no new name was needed
+	rbuf		1. zero length string if no new name was needed
 			2. will contain the path of the file that was opened
 
 *******************************************************************************/
@@ -64,6 +62,8 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<outbuf.h>
+#include	<mkpathx.h>
+#include	<permx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -72,9 +72,6 @@
 
 
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 
 
 /* external variables */
@@ -89,32 +86,25 @@ extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bopenroot(fp,pr,fname,outfname,mode,operms)
-bfile		*fp ;
-const char	pr[] ;
-const char	fname[] ;
-const char	mode[] ;
-char		outfname[] ;
-mode_t		operms ;
-{
-	OUTBUF		ob ;
+int bopenroot(bfile *fp,cc *pr,cc *fn,char *rbuf,cc *of,mode_t om) noex {
+	outbuf		ob ;
 	int		rs = SR_OK ;
 	int		imode ;
 	int		f_outbuf = FALSE ;
-	const char	*mp ;
+	cchar	*mp ;
 	char		*onp = NULL ;
 
 	if (fp == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
-	if (mode == NULL) return SR_FAULT ;
+	if (fn == NULL) return SR_FAULT ;
 
-	if (fname[0] == '\0') return SR_INVALID ;
-	if (mode[0] == '\0') return SR_INVALID ;
+	if (fn[0] == '\0') return SR_INVALID ;
 
-	f_outbuf = (outfname != NULL) ;
+	f_outbuf = (rbuf != NULL) ;
 
 	imode = 0 ;
 	for (mp = mode ; *mp ; mp += 1) {
@@ -132,18 +122,18 @@ mode_t		operms ;
 	    } /* end switch */
 
 
-	if (fname[0] == '/') {
+	if (fn[0] == '/') {
 
 	    if (f_outbuf)
-	        outfname[0] = '\0' ;
+	        rbuf[0] = '\0' ;
 
-	    rs = bopen(fp,fname,mode,operms) ;
+	    rs = bopen(fp,fn,mode,oom) ;
 
 	    goto ret0 ;
 
 	} /* end if */
 
-	rs = outbuf_start(&ob,outfname,-1) ;
+	rs = outbuf_start(&ob,rbuf,-1) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -153,32 +143,32 @@ mode_t		operms ;
 	    if (rs < 0)
 	        goto done ;
 
-	    rs = mkpath2(onp, pr,fname) ;
+	    rs = mkpath2(onp, pr,fn) ;
 
 	    if (rs >= 0)
 	        rs = perm(onp,-1,-1,NULL,imode) ;
 
 	    if (rs >= 0)
-	        rs = bopen(fp,onp,mode,operms) ;
+	        rs = bopen(fp,onp,mode,oom) ;
 
 	    if (rs >= 0)
 	        goto done ;
 
 	} /* end if (we had a pr) */
 
-	if ((perm(fname,-1,-1,NULL,imode) >= 0) &&
-	    ((rs = bopen(fp,fname,mode,operms)) >= 0)) {
+	if ((perm(fn,-1,-1,NULL,imode) >= 0) &&
+	    ((rs = bopen(fp,fn,mode,oom)) >= 0)) {
 
 	    if (f_outbuf)
-	        outfname[0] = '\0' ;
+	        rbuf[0] = '\0' ;
 
 	    goto done ;
 	}
 
 	if ((pr != NULL) &&
-	    (strchr(fname,'/') != NULL)) {
+	    (strchr(fn,'/') != NULL)) {
 
-	    rs = bopen(fp,onp,mode,operms) ;
+	    rs = bopen(fp,onp,mode,oom) ;
 
 	    if (rs >= 0)
 	        goto done ;
@@ -186,9 +176,9 @@ mode_t		operms ;
 	}
 
 	if (f_outbuf)
-	    outfname[0] = '\0' ;
+	    rbuf[0] = '\0' ;
 
-	rs = bopen(fp,fname,mode,operms) ;
+	rs = bopen(fp,fn,mode,oom) ;
 
 done:
 	outbuf_finish(&ob) ;
