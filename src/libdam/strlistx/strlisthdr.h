@@ -39,7 +39,7 @@ struct strlisthdr_head {
 	uint		nstrs ;		/* total number of strings */
 	uint		nskip ;		/* a hash-lookup parameter */
 	uchar		vetu[4] ;	/* relatively standard (V-E-T-U) ID */
-} ;
+} ; /* end struct */
 
 typedef STRLISTHDR	strlisthdr ;
 
