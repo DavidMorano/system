@@ -46,8 +46,8 @@ module ;
 export module varithmetic ;
 
 import builtin ;
-import muldigs ;
 import bitmanip ;
+import muldigs ;
 
 /* local defines */
 
@@ -77,6 +77,20 @@ template<typename Dig> void prdig(cc *s,const Dig v) noex {
 	    }
 	} /* end if_constexpr (f_debug) */
 } /* end subroutine (prdig) */
+
+/* how many digits are in a divisor-array, on the low end */
+export {
+    template<typename TA> constexpr int nsigdig(int n,con TA *d) noex {
+    	int c = 0 ;
+    	for (int i = (n - 1) ; i >= 0 ; --i) {
+	    if (d[i]) {
+		c = (i + 1) ;
+		break ;
+	    }
+	} /* end for */
+    	return c ;
+    } /* end subroutine-template (nsigdig) */
+} /* end export */
 
 export {
     template<typename Dig>
@@ -233,6 +247,7 @@ export {
 } /* end export */
 
 export {
+    /* n= quotient-reminder-digits */
     template<typename Dig>
     constexpr void vmulone(int n,Dig *r,const Dig *v0,const Dig one) noex {
 	cint nh = (n / 2) ;
@@ -245,6 +260,13 @@ export {
 	    co = addc((r + ri + 1),r[ri + 1],res[1],co) ;
 	} /* end for */
     } /* end subroutine (vmulone) */
+} /* end export */
+
+export {
+    template<typename Dig>
+    constexpr void vmul(int n,Dig *r,const Dig *v0,const Dig *v1) noex {
+	vmuler(n,r,v0,v1) ;
+    } /* end subroutine (vmul) */
 } /* end export */
 
 #ifdef	COMMENT
