@@ -85,7 +85,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::ostream ;			/* type */
 
 
@@ -176,7 +175,7 @@ constexpr cpcchar	expkeys[] = {
 	nullptr
 } ;
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 static vars		var ;
 
 constexpr helper_m	mems[] = {
@@ -483,9 +482,9 @@ static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 
 static int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	if ((rs = getbufsize(bufsize_hn)) >= 0) {
 	    var.maxhostlen = rs ;
-	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_nn)) >= 0) {
 	        var.maxnodelen = rs ;
 		var.maxcombolen = ((var.maxhostlen + 1) + rs) ;
 	    }
