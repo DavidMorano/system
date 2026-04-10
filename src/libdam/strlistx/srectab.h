@@ -27,7 +27,7 @@ struct srectab_head {
 	uint		*rt ;
 	int		i ;		/* highest index */
 	int		n ;		/* extent */
-} ;
+} ; /* end struct */
 
 typedef	SRECTAB		srectab ;
 
