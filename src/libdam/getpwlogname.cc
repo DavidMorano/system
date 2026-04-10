@@ -2,13 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* get the user PASSWD entry based on logname (not UID) */
+/* get the user PASSWD entry based on |LOGNAME| */
 /* version %I% last-modified %G% */
 
-#define	CF_GETUTMPNAME	1		/* use 'getutmpname()' */
-#define	CF_USERNAME	0		/* use USERNAME environment */
-#define	CF_UID		0		/* use UID */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -28,12 +24,12 @@
 	Get the PASSWD database structure for the logged in user.
 
 	Synopsis:
-	int getpwlogname(PASSWD *pwp,char *pwbuf,int pwbuflen) noex
+	int getpwlogname(ucentpw *pwp,char *pwbuf,int pwlen) noex
 
 	Arguments:
-	pwp		'passwd' entry pointer (struct passwd *)
-	buf		buffer to hold resulting logname
-	buflen		length of user supplied buffer
+	pwp		|ucentpw| entry pointer
+	pwbuf		PW-entry buffer pointer
+	pwlen		PW-entry buffer length
 
 	Returns:
 	>=0		OK
@@ -42,213 +38,150 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<pwd.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucentpw.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>		/* |getpwx_name(3uc)| */
+#include	<getutmpent.h>		/* |getutmpname(3uc)| */
+#include	<bufsizevar.hh>		/* <- currently unused */
 #include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#define	GETPW_UID	ugetpw_uid
-#else
-#define	GETPW_NAME	getpw_name
-#define	GETPW_UID	getpw_uid
-#endif /* CF_UGETPW */
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
-#endif
-
-#ifndef	VARUSER
-#define	VARUSER		"USER"
-#endif
-
-#ifndef	VARLOGNAME
-#define	VARLOGNAME	"LOGNAME"
-#endif
-
-#ifndef	USERNAMELEN
-#ifdef	LOGNAMELEN
-#define	USERNAMELEN	LOGNAMELEN
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	SR_OK
-#define	SR_OK		0
-#endif
-
-#ifndef	SR_FAULT
-#define	SR_FAULT	(- EFAULT)
-#endif
-
-#ifndef	SR_INVALID
-#define	SR_INVALID	(- EINVAL)
-#endif
-
-#ifndef	SR_NOENT
-#define	SR_NOENT	(- ENOENT)
-#endif
+#define	PWBUF_MIN		40
 
 
 /* external subroutines */
-
-#if	CF_GETUTMPNAME
-extern int	getutmpname(char *,int,pid_t) ;
-#endif
 
 
 /* external variables */
 
 
+/* local structures */
+
+namespace {
+    struct tryer {
+	ucentpw		*pwp ;
+	char		*pwbuf ;
+	uid_t		uid ;
+	uid_t		sid ;
+	int		pwlen ;
+	tryer(ucentpw *p,char *b,int l) noex : pwp(p), pwbuf(b), pwlen(l) { 
+	    uid = getuid() ;
+	    sid = getsid(0) ;
+	} ; /* end ctor */
+	operator int () noex ;
+	int try_logname() noex ;
+	int try_utmp() noex ;
+	int try_username() noex ;
+	int try_user() noex ;
+	int try_uid() noex ;
+	int check(cchar *) noex ;
+    } ; /* end struct (tryer) */
+    typedef int (tryer::*tryer_m)() noex ;
+} /* end namespace */
+
+
 /* forward references */
+
+
+/* local variables */
+
+constexpr tryer_m	tries[] = {
+    	&tryer::try_logname,
+    	&tryer::try_utmp,
+    	&tryer::try_username,
+    	&tryer::try_user,
+    	&tryer::try_uid
+} ; /* end array (tries) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int getpwlogname(pwp,pwbuf,pwbuflen)
-struct passwd	*pwp ;
-char		pwbuf[] ;
-int		pwbuflen ;
-{
-	uid_t	uid = getuid() ;
-
-	int	rs = SR_NOTFOUND ;
-	int	pwlen = 0 ;
-
-	const char	*np ;
-	const char	*lognamep ;
-
-	char	namebuf[LOGNAMELEN + 1] ;
+int getpwlogname(ucentpw *pwp,char *pwbuf,int pwlen) noex {
+    	int		rs = SR_FAULT ;
+	int		pwl = 0 ; /* return-value */
+	if (pwp && pwbuf) {
+	    rs = SR_OVERFLOW ;
+	    if (pwlen >= PWBUF_MIN) {
+		if (tryer to(pwp,pwbuf,pwlen) ; (rs = to) >= 0) {
+		    pwl = rs ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? pwl : rs ;
+} /* end subroutine (getpwlogname) */
 
 
-	if ((pwp == NULL) || (pwbuf == NULL))
-	    return SR_FAULT ;
+/* local subroutines */
 
-	if (pwbuflen <= 0)
-	    return SR_INVALID ;
+tryer::operator int () noex {
+    	int		rs = SR_OK ;
+	for (cauto &m : tries) {
+	    rs = (this->*m)() ;
+	    if (rs != 0) break ;
+	} /* end for */
+	return rs ;
+} /* end method (tryer::operator) */
 
-/* check the 'LOGNAME' environment variable */
+int tryer::try_logname() noex {
+	static cchar  *vnp = getenv(varname.logname) ;
+	return check(vnp) ;
+} /* end method (tryer::try_logname) */
 
-	lognamep = NULL ;
-	if (rs == SR_NOTFOUND) {
+int tryer::try_username() noex {
+	static cchar  *vnp = getenv(varname.username) ;
+	return check(vnp) ;
+} /* end method (tryer::try_username) */
 
-	    lognamep = getenv(VARLOGNAME) ;
+int tryer::try_user() noex {
+	static cchar  *vnp = getenv(varname.user) ;
+	return check(vnp) ;
+} /* end method (tryer::try_user) */
 
-	    np = lognamep ;
-	    if ((np != NULL) && (np[0] != '\0')) {
+int tryer::try_utmp() noex {
+    	int		rs ;
+	int		rs1 ;
+	int		pwl = 0 ; /* return-value */
+	if (char *nbuf ; (rs = lm_un(&nbuf)) >= 0) {
+	    cint nlen = rs ;
+	    if ((rs = getutmpname(nbuf,nlen,sid)) >= 0) {
+		rs = check(nbuf) ;
+		pwl = rs ;
+	    } /* end if (getpwx_uid) */
+	    rs1 = lm_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? pwl : rs ;
+} /* end method (tryer::try_ujtmp) */
 
-	        rs = GETPW_NAME(pwp,pwbuf,pwbuflen,np) ;
-		pwlen = rs ;
-	        if ((rs >= 0) && (pwp->pw_uid != uid))
-	            rs = SR_NOTFOUND ;
+int tryer::try_uid() noex {
+	return getpwx_uid(pwp,pwbuf,pwlen,uid) ;
+} /* end method (tryer::try_uid) */
 
-	    } /* end if */
-
-	} /* end if (LOGNAME environment) */
-
-/* check the 'UTMP' database */
-
-	if (rs == SR_NOTFOUND) {
-
-#if	CF_GETUTMPNAME
-	    rs = getutmpname(namebuf,LOGNAMELEN,0) ;
-#else /* CF_GETUTMPNAME */
-	    rs = uc_getlogin(namebuf,LOGNAMELEN) ;
-#endif /* CF_GETUTMPNAME */
-
-	    if (rs >= 0) {
-
-	        rs = GETPW_NAME(pwp,pwbuf,pwbuflen,namebuf) ;
-		pwlen = rs ;
-	        if ((rs >= 0) && (pwp->pw_uid != uid))
-	            rs = SR_NOTFOUND ;
-
-	    } /* end if */
-
-	} /* end if (trying UTMP) */
-
-#if	CF_USERNAME
-
-/* check the 'USERNAME' environment variable */
-
-	usernamep = NULL ;
-	if (rs == SR_NOTFOUND) {
-
-	    usernamep = getenv(VARUSERNAME) ;
-
-	    np = usernamep ;
-	    if ((np != NULL) && (np[0] != '\0') &&
-		((lognamep != NULL) || (strcmp(lognamep,np) != 0))) {
-
-	        rs = GETPW_NAME(pwp,pwbuf,pwbuflen,np) ;
-		pwlen = rs ;
-	        if ((rs >= 0) && (pwp->pw_uid != uid))
-	            rs = SR_NOTFOUND ;
-
-	    } /* end if */
-
-	} /* end if (USERNAME environment) */
-
-/* check the 'USER' environment variable */
-
-	userp = NULL ;
-	if (rs == SR_NOTFOUND) {
-
-	    userp = getenv(VARUSER) ;
-
-	    np = userp ;
-	    if ((np != NULL) && (np[0] != '\0') &&
-		((lognamep != NULL) || (strcmp(lognamep,np) != 0)) &&
-		((usernamep != NULL) || (strcmp(usernamep,np) != 0))) {
-
-	        rs = GETPW_NAME(pwp,pwbuf,pwbuflen,np) ;
-		pwlen = rs ;
-	        if ((rs >= 0) && (pwp->pw_uid != uid))
-	            rs = SR_NOTFOUND ;
-
-	    } /* end if */
-
-	} /* end if (USER environment) */
-
-#endif /* CF_USERNAME */
-
-#if	CF_UID
-
-/* use the UID */
-
-	if (rs == SR_NOTFOUND) {
-
-	    rs = GETPW_UID(pwp,pwbuf,pwbuflen,uid) ;
-	    pwlen = rs ;
-	    if ((rs >= 0) && (pwp->pw_uid != uid))
-	        rs = SR_NOTFOUND ;
-
-	} /* end if (PASSWD attempt) */
-
-#endif /* CF_UID */
-
-/* return with whatever we have */
-
-	return (rs >= 0) ? pwlen : rs ;
-}
-/* end subroutine (getpwlogname) */
+int tryer::check(cchar *namep) noex {
+    	int		rs = SR_OK ;
+	int		pwl = 0 ; /* return-value */
+	if (namep && namep[0]) {
+	    if ((rs = getpwx_name(pwp,pwbuf,pwlen,namep)) >= 0) {
+		pwl = rs ;
+	        if (pwp->pw_uid != uid) {
+	            pwl = 0 ;
+		}
+	    } /* end if (getpwx_name) */
+	} /* end if (variable) */
+	return (rs >= 0) ? pwl : rs ;
+} /* end method (tryer::check) */
 
 
