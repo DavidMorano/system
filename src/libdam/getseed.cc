@@ -37,23 +37,35 @@
 #include	<sys/types.h>
 #include	<sys/time.h>		/* |gettimeofday(3c)| */
 #include	<unistd.h>
-#include	<climits>		/* |CHAR_BIT| */
+#include	<climits>		/* |CHAR_BIT| + |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
-#include	<cfdec.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>		/* |cfdec(3u)| */
+#include	<ucsysmisc.h>		/* |uc_gettimeofday(3uc)| */
 #include	<randlc.h>
 #include	<localmisc.h>
 
 #include	"getseed.h"
 
-import uconstants ;
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
 #ifndef	CF_GETHRTIME
 #define	CF_GETHRTIME	0
 #endif
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+using libu::cfdec ;			/* subroutine */
 
 
 /* external subroutines */
@@ -80,29 +92,30 @@ constexpr bool		f_gethrtime = CF_GETHRTIME ;
 
 int getseed(int seed) noex {
 	cchar		*vn = varname.random ;
-	TIMEVAL		tv ;
 	int		rs ;
-	if ((rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
+	if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
 	    static cchar	*val = getenv(vn) ;
+	    uint	secs	= intconv(tv.tv_sec) ;
+	    uint	usecs	= intconv(tv.tv_usec) ;
 	    uint	rv = 0 ;
 	    cint	uid = getuid() ;
 	    cint	pid = getpid() ;
 	    cint	v1 = getppid() ;
 	    cint	v2 = getpgrp() ;
 	    if (val) {
-		if (int v ; cfdeci(val,-1,&v) >= 0) {
+		if (int v ; cfdec(val,-1,&v) >= 0) {
 	    	    rv += randlc(v) ;
 		}
-	    }
-	    rv += randlc(tv.tv_usec) ;
+	    } /* end if (try environment) */
+	    rv += randlc(usecs) ;
 	    rv += randlc(uid) ;
 	    rv += randlc(pid) ;
 	    rv += randlc(v1) ;
 	    rv += randlc(v2) ;
-	    rv += randlc(tv.tv_sec) ;
+	    rv += randlc(secs) ;
 	    rv += randlc(seed) ;
 	    if_constexpr (f_gethrtime) {
-	        hrtime_t	h = gethrtime() ;
+	        hrtime_t h = gethrtime() ;
 	        rv += uint(h) ;
 	        h >>= (szof(uint) * CHAR_BIT) ;
 	        rv += uint(h) ;
