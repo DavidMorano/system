@@ -26,17 +26,18 @@ namespace libu {
     extern int ctdecui(char *,int,uint) noex ;
     extern int ctdecul(char *,int,ulong) noex ;
     extern int ctdecull(char *,int,ulonglong) noex ;
-    template<typename T> inline int ctdec(char *,int,T v) noex {
+    template<typename T> inline int ctdec(char *,int,T uv) noex {
+	(void) uv ;
 	return 0 ;
     }
-    template<> inline int ctdec(char *dp,int dl,uint v) noex {
-	return ctdecui(dp,dl,v) ;
+    template<> inline int ctdec(char *dp,int dl,uint uv) noex {
+	return ctdecui(dp,dl,uv) ;
     }
-    template<> inline int ctdec(char *dp,int dl,ulong v) noex {
-	return ctdecul(dp,dl,v) ;
+    template<> inline int ctdec(char *dp,int dl,ulong uv) noex {
+	return ctdecul(dp,dl,uv) ;
     }
-    template<> inline int ctdec(char *dp,int dl,ulonglong v) noex {
-	return ctdecull(dp,dl,v) ;
+    template<> inline int ctdec(char *dp,int dl,ulonglong uv) noex {
+	return ctdecull(dp,dl,uv) ;
     }
 } /* end namespace (libu) */
 
