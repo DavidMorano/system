@@ -28,7 +28,6 @@ EXTERNC_begin
 
 extern pthread_t gettid() noex ;
 
-
 EXTERNC_end
 
 
