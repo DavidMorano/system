@@ -1,4 +1,4 @@
-/* uc_procpid SUPPORT */
+/* ucprocpid SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -43,7 +43,10 @@
 #include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<sfx.h>
 #include	<cfdec.h>
@@ -55,6 +58,12 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_openprog(cchar *,int,mainv,mainv) noex ;
+    extern int uc_read(int,void *,int) noex ;
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */
@@ -99,10 +108,10 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 	            argv[i] = nullptr ;
 	            if ((rs = uc_openprog(pfname,of,argv,np)) >= 0) {
 	                cint	fd = rs ;
-			if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+			if ((rs = getbufsize(bufsize_mp)) >= 0) {
 			    cint	llen = (rs + DIGBUFLEN + 2) ;
 			    char	*lbuf{} ;
-			    if ((rs = uc_malloc((llen + 1),&lbuf)) >= 0) {
+			    if ((rs = lm_mall((llen + 1),&lbuf)) >= 0) {
 	                        if ((rs = uc_read(fd,lbuf,llen)) > 0) {
 	                            cint	sl = rs ;
 	                            int		cl ;
@@ -113,7 +122,7 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 	                                pid = v ;
 	                            }
 	                        } /* end if (u_read) */
-			        rs1 = uc_free(lbuf) ;
+			        rs1 = lm_free(lbuf) ;
 			        if (rs >= 0) rs = rs1 ;
 			    } /* end if (m-a-f) */
 			} /* end if (getbufsize) */
