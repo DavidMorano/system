@@ -34,6 +34,7 @@
 #include	<usysbase.h>
 #include	<mkfile.h>
 #include	<strx.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -44,23 +45,11 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 #define	BUFLEN		(MAXPATHLEN + (LINELEN * 2))
 #define	DISBUFLEN	300
 
 
 /* external subroutines */
-
-extern "C" {
-    extern char	*strbasename(char *) knoex ;
-}
 
 
 /* forward references */
@@ -77,14 +66,13 @@ static int	newbuf(char *,int,int,char **) noex ;
 
 /* exported subroutines */
 
-
 int bopenremote(fpa,environ,remotehost,cmd)
 bfile	*fpa[] ;
 char	*environ[] ;
 char	remotehost[] ;
 char	cmd[] ;
 {
-	struct utsname	uts ;
+	UTSNAME		uts ;
 	bfile		jobfile, *jfp = &jobfile ;
 	pid_t		pid ;
 	int		rs = SR_BAD ;
@@ -181,8 +169,9 @@ char	cmd[] ;
 
 /* what SHELL to use on the remote side ? */
 
-	if ((! f_ksh) || (strcmp(strbasename(cmd_shell),"ksh") == 0))
+	if ((! f_ksh) || hasbasename(cmd_shell,"ksh")) {
 	    f_ksh = TRUE ;
+	}
 
 #if	CF_DEBUGS
 	debugprintf("bopenremote: f_ksh=%d\n",f_ksh) ;
