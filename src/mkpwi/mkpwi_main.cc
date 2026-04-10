@@ -47,7 +47,7 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -75,33 +75,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
-extern int	pcsuserfile(cchar *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	getfname(cchar *,cchar *,int,char *) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	getgid_def(cchar *,gid_t) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	progdb(PROGINFO *,bfile *,cchar *) ;
@@ -116,11 +89,6 @@ extern int	strlinelen(cchar *,int,int) ;
 #if	CF_DEBUGN
 extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
