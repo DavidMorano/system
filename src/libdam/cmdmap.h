@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 
 
@@ -33,17 +34,17 @@
 struct cmdmap_entry {
 	int		key ;
 	int		cmd ;
-} ;
+} ; /* end struct */
 
 struct cmdmap_flags {
 	uint		sorted:1 ;
-} ;
+} ; /* end struct */
 
 struct cmdmap_head {
 	vecobj		*mlp ;		/* map-list-pointer */
 	CMDMAP_FL	fl ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 typedef	CMDMAP		cmdmap ;
 typedef	CMDMAP_FL	cmdmap_fl ;
