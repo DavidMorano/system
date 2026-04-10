@@ -1,4 +1,5 @@
 /* strcasestr SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* find a substring within a larger string (case insensitive) */
@@ -43,16 +44,18 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<nleadstr.h>
-#include	<char.h>
+#include	<char.h>		/* |CHAR_{x}(3uc)| */
 #include	<localmisc.h>
 
 #include	"strx.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -61,6 +64,12 @@
 
 
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -72,28 +81,31 @@
 /* exported subroutines */
 
 char *strcasestr(cchar *sp,cchar *s2) noex {
-	cint		s2len = strlen(s2) ;
-	char		*rp = (char *) sp ;
-	if (s2len > 0) {
-	    cint	sl = strlen(sp) ;
-	    if (s2len <= sl) {
-	        cint	s2lead = CHAR_TOLC(s2[0]) ;
-		int	m ;
-		int	i ; /* used-afterwards */
-		bool	f = false ;
-	        for (i = 0 ; i <= (sl-s2len) ; i += 1) {
-		    int	ch = CHAR_TOLC(sp[i]) ;
-	            if (ch == s2lead) {
-	                m = nleadcasestr((sp+i),s2,s2len) ;
-	                f = (m == s2len) ;
-			if (f) break ;
-	            } /* end if */
-	        } /* end for */
-	        rp = (char *) ((f) ? (sp+i) : nullptr) ;
-	    } else {
-	        rp = nullptr ;
-	    }
-	} /* end if (positive) */
+    	char		*rp = nullptr ;
+	if (sp && s2) {
+	    cint	s2len = lenstr(s2) ;
+	    rp = charp(sp) ;
+	    if (s2len > 0) {
+	        cint	sl = lenstr(sp) ;
+	        if (s2len <= sl) {
+	            cint	s2lead = CHAR_TOLC(s2[0]) ;
+		    int	m ;
+		    int	i ; /* used-afterwards */
+		    bool	f = false ;
+	            for (i = 0 ; i <= (sl-s2len) ; i += 1) {
+		        int	ch = CHAR_TOLC(sp[i]) ;
+	                if (ch == s2lead) {
+	                    m = nleadcasestr((sp+i),s2,s2len) ;
+	                    f = (m == s2len) ;
+			    if (f) break ;
+	                } /* end if */
+	            } /* end for */
+	            rp = (char *) ((f) ? (sp+i) : nullptr) ;
+	        } else {
+	            rp = nullptr ;
+	        }
+	    } /* end if (positive) */
+	} /* end if (non-null) */
 	return rp ;
 }
 /* end subroutine (strcasestr) */
