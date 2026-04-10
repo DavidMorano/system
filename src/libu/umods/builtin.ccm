@@ -2,9 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* UNIX® kernel support subroutines */
+/* subroutine interfaces to compiler built-in instrinsics */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-04-10, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -39,11 +46,11 @@ export module builtin ;
 #  if __has_builtin(__builtin_addc)
 #define	F_ADDC	1
 constexpr inline uint	builtin_addc(uint v0,uint v1,uint ci,
-		uint *cop) noex {
+		mut uint *cop) noex {
     return __builtin_addc(v0,v1,ci,cop) ;
 }
 constexpr inline ulong	builtin_addc(ulong v0,ulong v1,ulong ci,
-		ulong *cop) noex {
+		mut ulong *cop) noex {
     return __builtin_addcl(v0,v1,ci,cop) ;
 }
 #  else
@@ -55,7 +62,7 @@ constexpr inline ulong	builtin_addc(ulong v0,ulong v1,ulong ci,
 
 #if	(F_ADDC == 0)
 template <integral_unsigned UT>
-constexpr inline UT builtin_addc(UT v0,UT v1,UT ci,UT *) noex {
+constexpr inline UT builtin_addc(UT v0,UT v1,UT ci,mut UT *) noex {
     return v0 + v1 + ci ;
 }
 #endif /* ADDC needed */
@@ -64,11 +71,11 @@ constexpr inline UT builtin_addc(UT v0,UT v1,UT ci,UT *) noex {
 #  if __has_builtin(__builtin_subc)
 #define	F_SUBC	1
 constexpr inline uint	builtin_subc(uint v0,uint v1,uint ci,
-		uint *cop) noex {
+		mut uint *cop) noex {
     return __builtin_subc(v0,v1,ci,cop) ;
 }
 constexpr inline ulong	builtin_subc(ulong v0,ulong v1,ulong ci,
-		ulong *cop) noex {
+		mut ulong *cop) noex {
     return __builtin_subcl(v0,v1,ci,cop) ;
 }
 #  else
@@ -80,7 +87,7 @@ constexpr inline ulong	builtin_subc(ulong v0,ulong v1,ulong ci,
 
 #if	(F_SUBC == 0)
 template <integral_unsigned UT>
-constexpr inline UT builtin_subc(UT v0,UT v1,UT ci,UT *) noex {
+constexpr inline UT builtin_subc(UT v0,UT v1,UT ci,mut UT *) noex {
     return v0 + v1 + ci ;
 }
 #endif /* SUBC needed */
@@ -106,7 +113,7 @@ constexpr bool szok = ((szof(UT) == sz_uint) || (szof(UT) == sz_ulong)) ;
 
 export {
     template<typename UT> 
-    constexpr inline UT mach_addc(UT v0,UT v1,UT ci,UT *cop) noex {
+    constexpr inline UT mach_addc(UT v0,UT v1,UT ci,mut UT *cop) noex {
     	UT	r ;
     	if_constexpr (f_machaddc && szok<UT>) {
 	    r = builtin_addc(v0,v1,ci,cop) ;
@@ -123,7 +130,7 @@ export {
 	return r ;
     } /* end subroutine (mach_addc) */
     template<typename UT> 
-    constexpr inline UT mach_subc(UT v0,UT v1,UT ci,UT *cop) noex {
+    constexpr inline UT mach_subc(UT v0,UT v1,UT ci,mut UT *cop) noex {
     	UT	r ;
     	if_constexpr (f_machsubc && szok<UT>) {
 	    r = builtin_subc(v0,v1,ci,cop) ;
@@ -135,7 +142,7 @@ export {
 	        UT t = r ;
 	        co += mach_subone(r,t) ;
 	    }
-	    if (cop) *cop = UT(co) ;
+	    *cop = UT(co) ;
 	} /* end if_constexpr (f_machsubc) */
 	return r ;
     } /* end subroutine (mach_subc) */
