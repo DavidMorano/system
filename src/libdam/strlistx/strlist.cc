@@ -43,12 +43,14 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getpwd.h>
 #include	<absfn.h>
 #include	<endian.h>
@@ -64,7 +66,9 @@
 #include	"strlist.h"
 #include	"strlisthdr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memset(3u)| */
 
 /* local defines */
 
@@ -92,7 +96,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -118,53 +121,50 @@ enum itentries {
 /* forward references */
 
 template<typename ... Args>
-static int strlist_ctor(strlist *op,Args ... args) noex {
+local int strlist_ctor(strlist *op,Args ... args) noex {
     	STRLIST		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->fhp = new(nothrow) strlisthdr) != np) {
+	    if ((op->fhp = new(nothrow) strlisthdr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-strlisthdr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strlist_ctor) */
+} /* end subroutine (strlist_ctor) */
 
-static int strlist_dtor(strlist *op) noex {
+local int strlist_dtor(strlist *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->fhp) {
+	    if (op->fhp) ylikely {
 		delete op->fhp ;
 		op->fhp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strlist_dtor) */
+} /* end subroutine (strlist_dtor) */
 
 template<typename ... Args>
-static inline int strlist_magic(strlist *op,Args ... args) noex {
+local inline int strlist_magic(strlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == STRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (strlist_magic) */
+} /* end subroutine (strlist_magic) */
 
-static int strlist_dbloadbegin(SL *,time_t) noex ;
-static int strlist_dbloadend(SL *) noex ;
-static int strlist_dbmapcreate(SL *,time_t) noex ;
-static int strlist_dbmapdestroy(SL *) noex ;
-static int strlist_filemapcreate(SL *,SL_FM *,cc *,time_t) noex ;
-static int strlist_filemapdestroy(SL *,SL_FM *) noex ;
-static int strlist_dbproc(SL *,time_t) noex ;
-static int strlist_viverify(SL *,time_t) noex ;
-static int strlist_ouraudit(SL *) noex ;
+local int strlist_dbloadbegin(SL *,time_t) noex ;
+local int strlist_dbloadend(SL *) noex ;
+local int strlist_dbmapcreate(SL *,time_t) noex ;
+local int strlist_dbmapdestroy(SL *) noex ;
+local int strlist_filemapcreate(SL *,SL_FM *,cc *,time_t) noex ;
+local int strlist_filemapdestroy(SL *,SL_FM *) noex ;
+local int strlist_dbproc(SL *,time_t) noex ;
+local int strlist_viverify(SL *,time_t) noex ;
+local int strlist_ouraudit(SL *) noex ;
 
 static bool	ismatkey(cchar *,cchar *,int) noex ;
 
@@ -187,20 +187,21 @@ int strlist_open(SL *op,cchar *dbname) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = strlist_ctor(op,dbname)) >= 0) {
+	if ((rs = strlist_ctor(op,dbname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dbname[0]) {
+	    if (dbname[0]) ylikely {
 		cchar	*fnp{} ;
-		if (absfn db ; (rs = db.start(dbname,-1,&fnp)) >= 0) {
+		if (absfn db ; (rs = db.start(dbname,-1,&fnp)) >= 0) ylikely {
 		    cint	fnl = rs ;
-	            if (cchar *cp{} ; (rs = uc_mallocstrw(fnp,fnl,&cp)) >= 0) {
+	            if (cchar *cp{} ; (rs = lm_strw(fnp,fnl,&cp)) >= 0) {
 	                op->dbname = cp ;
 		        if ((rs = strlist_dbloadbegin(op,dt)) >= 0) {
 			    op->ti_lastcheck = dt ;
 			    op->magic = STRLIST_MAGIC ;
 		        }
 		        if (rs < 0) {
-	    		    uc_free(op->dbname) ;
+	    		    void *vp = voidp(op->dbname) ;
+	    		    lm_free(vp) ;
 	    		    op->dbname = nullptr ;
 		        }
 		    } /* end if (memory-allocation) */
@@ -219,13 +220,14 @@ int strlist_open(SL *op,cchar *dbname) noex {
 int strlist_close(SL *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = strlist_magic(op)) >= 0) {
+	if ((rs = strlist_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = strlist_dbloadend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->dbname) {
-	        rs1 = uc_free(op->dbname) ;
+	    if (op->dbname) ylikely {
+	        void *vp = voidp(op->dbname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbname = nullptr ;
 	    }
@@ -421,7 +423,7 @@ int strlist_curenum(SL *op,SL_CUR *curp,char *kbuf,int klen) noex {
 
 /* private subroutines */
 
-static int strlist_dbloadbegin(SL *op,time_t dt) noex {
+local int strlist_dbloadbegin(SL *op,time_t dt) noex {
 	int		rs ;
 	if ((rs = strlist_dbmapcreate(op,dt)) >= 0) {
 	    rs = strlist_dbproc(op,dt) ;
@@ -433,7 +435,7 @@ static int strlist_dbloadbegin(SL *op,time_t dt) noex {
 }
 /* end subroutine (strlist_dbloadbegin) */
 
-static int strlist_dbloadend(SL *op) noex {
+local int strlist_dbloadend(SL *op) noex {
 	int		rs ;
 	if ((rs = strlist_dbmapdestroy(op)) >= 0) {
 	    SL_MI	*mip = &op->mi ;
@@ -445,23 +447,23 @@ static int strlist_dbloadend(SL *op) noex {
 }
 /* end subroutine (strlist_dbloadend) */
 
-static int strlist_dbmapcreate(SL *op,time_t dt) noex {
+local int strlist_dbmapcreate(SL *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*suf = STRLISTHDR_FSUF ;
 	cchar		*end = ENDIANSTR ;
-	if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
 	        rs = strlist_filemapcreate(op,&op->vf,tbuf,dt) ;
 	    }
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (strlist_dbmapcreate) */
 
-static int strlist_dbmapdestroy(SL *op) noex {
+local int strlist_dbmapdestroy(SL *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -472,7 +474,7 @@ static int strlist_dbmapdestroy(SL *op) noex {
 }
 /* end subroutine (strlist_dbmapdestroy) */
 
-static int strlist_filemapcreate(SL *op,SL_FM *fip,cchar *fn,time_t dt) noex {
+local int strlist_filemapcreate(SL *op,SL_FM *fip,cchar *fn,time_t dt) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op && fip) {
@@ -505,7 +507,7 @@ static int strlist_filemapcreate(SL *op,SL_FM *fip,cchar *fn,time_t dt) noex {
 }
 /* end subroutine (strlist_filemapcreate) */
 
-static int strlist_filemapdestroy(SL *op,SL_FM *fip) noex {
+local int strlist_filemapdestroy(SL *op,SL_FM *fip) noex {
 	int		rs = SR_FAULT ;
 	if (op && fip) {
 	    rs = R_OK ;
@@ -522,7 +524,7 @@ static int strlist_filemapdestroy(SL *op,SL_FM *fip) noex {
 }
 /* end subroutine (strlist_filemapdestroy) */
 
-static int strlist_dbproc(SL *op,time_t dt) noex {
+local int strlist_dbproc(SL *op,time_t dt) noex {
 	SL_FM		*fip = &op->vf ;
 	SL_MI		*mip = &op->mi ;
 	int		rs = SR_FAULT ;
@@ -541,7 +543,7 @@ static int strlist_dbproc(SL *op,time_t dt) noex {
 }
 /* end subroutine (strlist_dbproc) */
 
-static int strlist_viverify(SL *op,time_t dt) noex {
+local int strlist_viverify(SL *op,time_t dt) noex {
 	SL_FM		*fip = &op->vf ;
 	strlisthdr	*hip = op->fhp ;
 	uint		utime = (uint) dt ;
@@ -575,7 +577,7 @@ static int strlist_viverify(SL *op,time_t dt) noex {
 }
 /* end subroutine (strlist_viverify) */
 
-static int strlist_ouraudit(SL *op) noex {
+local int strlist_ouraudit(SL *op) noex {
 	SL_MI		*mip = &op->mi ;
 	strlisthdr	*hip = op->fhp ;
 	uint		khash, chash ;
