@@ -1,7 +1,8 @@
 /* naturalwords HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* natural-word management */
+/* create some "naturalwords" constants */
 /* version %I% last-modified %G% */
 
 
@@ -14,14 +15,45 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	Name:
+	naturalwords
+
+	Description:
+	This subroutine contains constants for managing facilities
+	that relate to natural-word processing.
+
+	Synopsis:
+
+	Arguments:
+
+	Returns:
+
+*******************************************************************************/
+
 #ifndef	NATURALWORDS_INCLUDE
 #define NATURALWORDS_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
 
 
 /* English-language natural-word length */
 #ifndef	NATURALWORDLEN
 #define	NATURALWORDLEN		60
 #endif
+
+#ifdef	__cplusplus
+struct naturalwords {
+    inline static cint		wordlen = NATURALWORDLEN ;
+} ; /* end (struct naturalwords) */
+#endif /* __cplusplus */
 
 /**** extra credit:
 
@@ -34,6 +66,10 @@ increasingly coming across).  So we set a limit at 60 for now.  If
 we run into trouble, we will extend this as necessary.
 
 ****/
+
+#ifdef	__cplusplus
+extern const naturalwords	naturalword ;
+#endif /* __cplusplus */
 
 
 #endif /* NATURALWORDS_INCLUDE */
