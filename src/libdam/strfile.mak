@@ -1,4 +1,4 @@
-# MAKEFILES (strfile)
+# MAKEFILE (strfile)
 
 T= strfile
 
