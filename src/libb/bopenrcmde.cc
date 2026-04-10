@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	bopenrcmde
+
+  	Description:
 	This is supposed to be the same as the |bopenrcmd(3b)|
 	subroutine except that environment can be passed to the
 	remote command.
@@ -25,9 +29,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/utsname.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
-#include	<sys/utsname.h>
+#include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
@@ -35,16 +40,18 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
-#include	<cstrings>		/* for |strcasecmp(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<getnodename.h>
+#include	<mkfile.h>		/* |mkfilejob(3uc)| */
 #include	<strx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -54,12 +61,6 @@ import libutil ;
 
 
 /* external subroutines */
-
-extern int	mkfilejob(const char *,mode_t,char *) ;
-
-extern "C" {
-    extern char	*strbasename(char *) noex ;
-}
 
 
 /* forward references */
@@ -153,8 +154,9 @@ int bopenrcmde(bfile *fpa[],mainv environ,cc *remotehost,cc *cmd) noex {
 
 /* what SHELL to use on the remote side? */
 
-	if ((! f_ksh) || (strcmp(strbasename(cmd_shell),"ksh") == 0))
+	if ((! f_ksh) || hasbasename(cmd_shell,-1,"ksh")) {
 	    f_ksh = TRUE ;
+	}
 
 #if	CF_DEBUGS
 	debugprintf("bopenrcmde: f_ksh=%d\n",f_ksh) ;
