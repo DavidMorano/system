@@ -68,7 +68,7 @@ typedef ulonglong	ull ;
 /* module subroutines */
 
 template<typename Dig>
-constexpr inline int addc(Dig *r,const Dig v0,const Dig v1,int ci = 0) noex {
+constexpr inline int addc(mut Dig *r,Dig v0,Dig v1,int ci = 0) noex {
 	Dig		co{} ;
 	Dig		dci = cast_static<Dig>(ci) ;
 	*r = mach_addc(v0,v1,dci,&co) ;
@@ -76,14 +76,14 @@ constexpr inline int addc(Dig *r,const Dig v0,const Dig v1,int ci = 0) noex {
 } /* end subroutine (addc) */
 
     template<typename Dig>
-    constexpr void vclear(int n,Dig *v) noex {
+    constexpr void vclear(int n,mut Dig *v) noex {
 	for (int i = 0 ; i < n ; i += 1) {
 	    v[i] = 0 ;
 	}
     } /* end subroutine (vclear) */
 
 /* n= number-product-result digits */
-constexpr void vmuler(int n,ulong *r,const ulong *v0,const ulong *v1) noex {
+constexpr void vmuler(int n,mut ulong *r,con ulong *v0,con ulong *v1) noex {
 	cint nb = (szof(ulong) * CHAR_BIT) ;
 	cint nh = (n / 2) ;
 	ulonglong vl0 ;
@@ -107,39 +107,39 @@ constexpr void vmuler(int n,ulong *r,const ulong *v0,const ulong *v1) noex {
 } /* end subroutine (vmuler) */
 
 template<integral_unsigned T2,integral_unsigned T1>
-    constexpr inline void muldigx(T1 *r,const T1 v0,const T1 v1) noex {
+    constexpr inline void muldigx(mut T1 *r,T1 v0,T1 v1) noex {
 	cint nb = (szof(T1) * CHAR_BIT) ;
-	const T2 vi0 = v0 ;
-	const T2 vi1 = v1 ;
+	con T2 vi0 = v0 ;
+	con T2 vi1 = v1 ;
 	{
-	    const T2 res = vi0 * vi1 ;
+	    con T2 res = vi0 * vi1 ;
 	    r[0] = T1(res >> 00) ;
 	    r[1] = T1(res >> nb) ;
 	}
     } /* end subroutine (muldigx) */
 
 export {
-    constexpr void muldig(int1 *r,const int1 v0,const int1 v1) noex {
+    constexpr void muldig(mut int1 *r,int1 v0,int1 v1) noex {
 	return muldigx<uint>(r,v0,v1) ;
     } /* end subroutine (muldig) */
-    constexpr void muldig(int2 *r,const int2 v0,const int2 v1) noex {
+    constexpr void muldig(mut int2 *r,int2 v0,int2 v1) noex {
 	return muldigx<uint>(r,v0,v1) ;
     } /* end subroutine (muldig) */
-    constexpr void muldig(int4 *r,const int4 v0,const int4 v1) noex {
+    constexpr void muldig(mut int4 *r,int4 v0,int4 v1) noex {
 	return muldigx<ulong>(r,v0,v1) ;
     } /* end subroutine (muldig) */
-    constexpr void muldig(int8 *r,const int8 v0,const int8 v1) noex {
+    constexpr void muldig(mut int8 *r,int8 v0,int8 v1) noex {
 	return muldigx<ulonglong>(r,v0,v1) ;
     } /* end subroutine (muldig) */
 } /* end export */
 
-constexpr inline void split(ulong *va,const ulonglong v) noex {
+constexpr inline void split(mut ulong *va,ulonglong v) noex {
 	cint nb = (szof(ulong) * CHAR_BIT) ;
     	va[0] = ulong(v >> 00) ;
     	va[1] = ulong(v >> nb) ;
 } /* end subroutine */
 
-constexpr inline ulonglong join(ulong *va) noex {
+constexpr inline ulonglong join(con ulong *va) noex {
 	cint nb = (szof(ulong) * CHAR_BIT) ;
     	ulonglong lo = va[0] ;
     	ulonglong hi = va[1] ;
@@ -147,7 +147,7 @@ constexpr inline ulonglong join(ulong *va) noex {
 } /* end subroutine */
 
 export {
-    constexpr void muldig(ull *r,const ull v0,const ull v1) noex {
+    constexpr void muldig(mut ull *r,ull v0,ull v1) noex {
 	ulong v0a[2] ;
 	ulong v1a[2] ;
 	ulong res[4] ;
