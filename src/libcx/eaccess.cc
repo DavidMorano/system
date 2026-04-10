@@ -37,13 +37,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<permx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 
@@ -67,8 +64,10 @@
 
 /* exported subroutines */
 
-int eaccess(cchar *fname,int am) noex {
-	return perm(fname,-1,-1,nullptr,am) ;
+unixret_t eaccess(cchar *fname,int am) noex {
+    	const int	fdcwd = AT_FDCWD ;
+    	const int	fl = AT_EACCESS ;
+	return faccessat(fdcwd,fname,am,fl) ;
 }
 /* end subroutine (eaccess) */
 
