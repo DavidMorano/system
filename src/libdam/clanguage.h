@@ -33,12 +33,12 @@
 #endif
 #endif /* noex */
 
-#ifndef	scharconv
-#define	scharconv		schar
-#endif
-
 #ifndef	charconv
 #define	charconv		char
+#endif
+
+#ifndef	scharconv
+#define	scharconv		schar
 #endif
 #ifndef	shortconv
 #define	shortconv		short
@@ -114,6 +114,12 @@
 #ifdef	__cplusplus
 #ifndef	typealias
 #define	typealias		typedef
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	neg
+#define	neg			-
 #endif
 #endif /* __cplusplus */
 
@@ -264,6 +270,13 @@
 #endif
 #endif /* __cplusplus */
 
+#ifndef	mut
+#define	mut			/* mutable */
+#endif /* __cplusplus */
+
+#ifndef	con
+#define	con			const
+#endif /* __cplusplus */
 
 #ifdef	__cplusplus
 #ifndef	szof
