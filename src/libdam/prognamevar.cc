@@ -32,7 +32,7 @@
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<usyscalls.h>
-#include	<usupport.h>
+#include	<usupport.h>		/* |strwcpy(3u)| */
 #include	<ulogerror.h>
 #include	<six.h>			/* LIBUC */
 #include	<getourenv.h>		/* LIBUC */
