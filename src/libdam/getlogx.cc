@@ -54,18 +54,21 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucgetpid.h>		/* |ucsid| */
 #include	<getutmp.h>		/* |getutmpterm(3uc)| */
 #include	<tmpx.h>
 #include	<storebuf.h>
-#include	<mknpathxw.h>
+#include	<mknpath.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"getlogx.h"
 
-import uconstants ;
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -76,9 +79,6 @@ import uconstants ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -96,14 +96,13 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int getusid(pid_t sid) noex {
+local int getusid(pid_t sid) noex {
     	int	rs = int(sid) ;
 	if (sid < 0) {
 	    rs = ucsid ;
 	}
 	return rs ;
-}
-/* end subroutine (getusid) */
+} /* end subroutine (getusid) */
 
 
 /* local variables */
@@ -122,11 +121,11 @@ constexpr bool		f_getutmpterm = CF_GETUTMPTERM ;
 
 int getlogid(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (rlen > 0) {
-	        if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) >= 0) {
+	    if (rlen > 0) ylikely {
+	        if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) >= 0) ylikely {
 	            rs = sncpy(rbuf,rlen,ue.id) ;
 	        }
 	    } /* end if (valid) */
@@ -137,11 +136,11 @@ int getlogid(char *rbuf,int rlen,pid_t sid) noex {
 
 int getlogname(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (rlen > 0) {
-	        if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) >= 0) {
+	    if (rlen > 0) ylikely {
+	        if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) >= 0) ylikely {
 	            rs = sncpy(rbuf,rlen,ue.user) ;
 	        }
 	    } /* end if (valid) */
@@ -150,14 +149,14 @@ int getlogname(char *rbuf,int rlen,pid_t sid) noex {
 }
 /* end subroutine (getlogname) */
 
-static int getlogtermer(char *dbuf,int dlen,int usid) noex {
+local int getlogtermer(char *dbuf,int dlen,int usid) noex {
 	cnullptr	np{} ;
 	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
-        if (tmpx ut ; (rs = ut.open(np,of)) >= 0) {
-            if (tmpx_ent ue{} ; (rs = ut.fetchpid(&ue,usid)) >= 0) {
+	int		len = 0 ; /* return-value */
+        if (tmpx ut ; (rs = ut.open(np,of)) >= 0) ylikely {
+            if (tmpx_ent ue{} ; (rs = ut.fetchpid(&ue,usid)) >= 0) ylikely {
 		cchar	*devdir = sysword.w_devdir ;
 		rs = mknpathw(dbuf,dlen,devdir,ue.ut_line,lline) ;
 		len = rs ;
@@ -172,15 +171,15 @@ static int getlogtermer(char *dbuf,int dlen,int usid) noex {
 int getlogterm(char *dbuf,int dlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (dbuf) {
+	if (dbuf) ylikely {
 	    rs = SR_INVALID ;
 	    dbuf[0] = '\0' ;
-	    if (dlen > 0) {
+	    if (dlen > 0) ylikely {
 		if_constexpr (f_getutmpterm) {
 		    rs = getutmpterm(dbuf,dlen,sid) ;
 		    len = rs ;
 		} else {
-		    if ((rs = getusid(sid)) >= 0) {
+		    if ((rs = getusid(sid)) >= 0) ylikely {
 		        rs = getlogtermer(dbuf,dlen,rs) ;
 		        len = rs ;
 		    } /* end if (getusid) */
@@ -193,11 +192,11 @@ int getlogterm(char *dbuf,int dlen,pid_t sid) noex {
 
 int getloghost(char *dbuf,int dlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (dbuf) {
+	if (dbuf) ylikely {
 	    rs = SR_INVALID ;
 	    dbuf[0] = '\0' ;
-	    if (dlen > 0) {
-	        if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) >= 0) {
+	    if (dlen > 0) ylikely {
+	        if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) >= 0) ylikely {
 	            rs = sncpy(dbuf,dlen,ue.host) ;
 	        }
 	    } /* end if (valid) */
