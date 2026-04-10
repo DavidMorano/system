@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 enum ucprogdatas {
@@ -29,8 +30,8 @@ enum ucprogdatas {
 	ucprogdata_overlast
 } ; /* end enum (ucprogdatas) */
 
-#define	UCPROGDATA_DNETLOAD	ucprogdatas_netload
-#define	UCPROGDATA_DSYSTAT	ucprogdatas_systat
+#define	UCPROGDATA_DNETLOAD	ucprogdata_netload
+#define	UCPROGDATA_DSYSTAT	ucprogdata_systat
 
 EXTERNC_begin
 
