@@ -29,7 +29,7 @@
 
 struct systems_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct systems_entry {
 	cchar		*sysname ;
@@ -39,14 +39,14 @@ struct systems_entry {
 	int		sysnamelen ;
 	int		dialernamelen ;
 	int		dialerargslen ;
-} ;
+} ; /* end struct */
 
 struct systems_head {
 	vecobj		*flp ;		/* file-list-pointer */
 	vecobj		*elp ;		/* entry-list-pointer */
 	time_t		checktime ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 typedef	SYSTEMS		systems ;
 typedef	SYSTEMS_CUR	systems_cur ;
