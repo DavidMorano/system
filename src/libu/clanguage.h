@@ -270,6 +270,13 @@
 #endif
 #endif /* __cplusplus */
 
+#ifndef	mut
+#define	mut			/* mutable */
+#endif /* __cplusplus */
+
+#ifndef	con
+#define	con			const
+#endif /* __cplusplus */
 
 #ifdef	__cplusplus
 #ifndef	szof
