@@ -15,7 +15,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<sys/stat.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 #include	<hdb.h>
 
@@ -31,24 +32,24 @@
 struct dirdb_fider {
 	ino_t		ino ;
 	dev_t		dev ;
-} ;
+} ; /* end struct */
 
 struct dirdb_entry {
 	cchar		*name ;
 	DIRDB_FID	fid ;
 	int		count ;
-} ;
+} ; /* end struct */
 
 struct dirdb_head {
 	vechand		*dlp ;		/* directory-list-pointer */
 	hdb		*dbp ;		/* data-base-pointer */
 	uint		magic ;
 	int		count ;
-} ;
+} ; /* end struct */
 
 struct dirdb_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef	DIRDB		dirdb ;
 typedef	DIRDB_ENT	dirdb_ent ;
