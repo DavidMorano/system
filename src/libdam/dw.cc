@@ -38,10 +38,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<absfn.h>
@@ -56,7 +58,9 @@
 
 #include	"dw.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -73,7 +77,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -81,6 +84,25 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_getpid() noex ;
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_moveup(int,int) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_lockf(int,int,off_t) noex ;
+    extern int uc_readln(int,void *,int) noex ;
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_writedesc(int,int,int) noex ;
+    extern int uc_rewind(int) noex ;
+    extern int uc_seek(int,off_t,int) noex ;
+    extern int uc_setappend(int,int) noex ;
+    extern int uc_ftruncate(int,off_t) noex ;
+    extern int uc_setappend(int,int) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_close(int) noex ;
+} /* end extern */
 
 
 /* external variables */
@@ -114,12 +136,12 @@ struct dw_ient {
 template<typename ... Args>
 local int dw_ctor(dw *op,Args ... args) noex {
     	DW		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->elp = new(nothrow) vecobj) != np) {
+	    if ((op->elp = new(nothrow) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
@@ -129,9 +151,9 @@ local int dw_ctor(dw *op,Args ... args) noex {
 
 local int dw_dtor(dw *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->elp) {
+	    if (op->elp) ylikely {
 		delete op->elp ;
 		op->elp = nullptr ;
 	    }
@@ -143,7 +165,7 @@ local int dw_dtor(dw *op) noex {
 template<typename ... Args>
 static inline int dw_magic(dw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DW_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -166,7 +188,7 @@ static int	dw_findi(DW *,cchar *,IENT **) noex ;
 static int	dw_diropen(DW *,time_t) noex ;
 static int	dw_dirclose(DW *) noex ;
 
-static int	ient_start(IENT *,DW *,cchar *,USTAT *) noex ;
+static int	ient_start(IENT *,DW *,cchar *,ustat *) noex ;
 static int	ient_finish(IENT *,DW *) noex ;
 
 static int	entry_load(DW_ENT *,IENT *,cchar *) noex ;
@@ -228,13 +250,12 @@ local int dw_starter(DW *op,cchar *dn) noex {
 	    op->count_checkable = 0 ;
             /* initialize */
 	    if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) {
-		cauto		mall = uc_mallocstrw ;
 	        custime		dt = getustime ;
 	        op->timod = 0 ;
 	        op->tiopen = 0 ;
 	        op->ticheck = dt ;
 	        op->tiremove = dt ;
-	        if (cchar *cp ; (rs = mall(dn,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(dn,-1,&cp)) >= 0) {
 	            if (rs <= var.maxpathlen) {
 	                op->dirname = cp ;
 	                rs = dw_scan(op,dt) ;
@@ -246,7 +267,8 @@ local int dw_starter(DW *op,cchar *dn) noex {
 		        rs = SR_TOOBIG ;
 	            } /* end if (size OK) */
 	            if (rs < 0) {
-	                uc_free(cp) ;
+			void *vp = voidp(cp) ;
+	                lm_free(vp) ;
 		    }
 	        } /* end if (m-a) */
 	        if (rs < 0) {
@@ -275,7 +297,8 @@ int dw_finish(DW *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->dirname) {
-	        rs1 = uc_free(op->dirname) ;
+	        void *vp = voidp(op->dirname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dirname = nullptr ;
 	    }
@@ -479,7 +502,7 @@ int dw_check(DW *op,time_t dt) noex {
 local int dw_checker(DW *op,time_t dt) noex {
     	int		rs ;
 	int		n = 0 ;
-	if (USTAT sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
 	    bool	f = false ;
 	    f = f || (sb.st_mtime >= op->timod) ;
 	    f = f || ((dt = op->ticheck) >= intval.maxidle) ;
@@ -501,13 +524,15 @@ local int dw_checker(DW *op,time_t dt) noex {
 
 local int dw_checkx(DW *op,time_t dt) noex {
     	int		rs ;
+	int		rs1 ;
 	int		n = 0 ;
-	if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
 	    if ((rs = dw_checknew(op,dt,dbuf)) >= 0) {
 	        rs = dw_checkrm(op,dt,dbuf) ;
 		n = rs ;
 	    }
-	    rs = rsfree(rs,dbuf) ;
+	    rs1 = lm_free(dbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -537,7 +562,7 @@ local int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
 local int dw_checknewent(DW *op,time_t dt,IENT *iep,char *dbuf) noex {
 	int		rs ;
 	int		n = 0 ;
-	if (USTAT sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
 	    if ((dt - sb.st_mtime) >= op->intcheck) {
 		iep->state = DW_SCHECK ;
 		op->count_new -= 1 ;
@@ -592,7 +617,7 @@ local int dw_checkrment(DW *op,time_t dt,IENT *iep,cchar *dbuf) noex {
     	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if (USTAT sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
 	    iep->itime = dt ;
 	} else if (isNotPresent(rs)) {
 	    f = true ;
@@ -628,14 +653,16 @@ int dw_state(DW *op,int i,int state) noex {
 
 local int dw_scan(DW *op,time_t dt) noex {
 	int		rs ;
+	int		rs1 ;
 	int		n = 0 ;
-	if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
 	    if ((rs = mkpath(dbuf,op->dirname)) >= 0) {
 		if ((rs = dw_scaner(op,dbuf,rs,dt)) >= 0) {
 		    n = rs ;
 		}
 	    } /* end if (mkpath) */
-	    rs = rsfree(rs,dbuf) ;
+	    rs1 = lm_free(dbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -646,7 +673,7 @@ local int dw_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
     	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if (fsdir d ; (rs = d.open(dbuf)) >= 0) {
 	        fsdir_ent	ds ;
@@ -661,7 +688,7 @@ local int dw_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
 		rs1 = d.close ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdir) */
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = lm_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
@@ -671,7 +698,7 @@ local int dw_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
 local int dw_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
 	int		rs ;
 	int		n = 0 ;
-	if (USTAT sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
 	        if (IENT *iep ; (rs = dw_findi(op,dn,&iep)) >= 0) {
                     if (iep->state == DW_SNEW) {
@@ -765,20 +792,22 @@ local int dw_findi(DW *op,cchar *name,IENT **iepp) noex {
 /* end subroutine (dw_findi) */
 
 /* initialize an entry */
-local int ient_start(IENT *iep,DW *op,cchar *name,USTAT *sbp) noex {
+local int ient_start(IENT *iep,DW *op,cchar *name,ustat *sbp) noex {
 	int		rs ;
+	int		rs1 ;
 	iep->state = DW_SNEW ;
-	if (cchar *cp ; (rs = uc_mallocstrw(name,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = lm_strw(name,-1,&cp)) >= 0) {
 	    iep->name = cp ;
 	    /* do we need to get some status on the file? */
 	    if (sbp == nullptr) {
-		if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
+		if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
 	            if ((rs = mkpath(dbuf,op->dirname,name)) >= 0) {
-		        if (USTAT sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
+		        if (ustat sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
 	                    sbp = &sb ;
 		        }
 	            }
-		    rs = rsfree(rs,dbuf) ;
+		    rs1 = lm_free(dbuf) ;
+		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (non-null) */
 	    iep->itime = ((sbp) ? sbp->st_mtime : 0) ;
@@ -796,7 +825,8 @@ local int ient_finish(IENT *iep,DW *op) noex {
 	    op->count_checkable -= 1 ;
 	}
 	if (iep->name) {
-	    rs1 = uc_free(iep->name) ;
+	    void *vp = voidp(iep->name) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    iep->name = nullptr ;
 	}
@@ -806,7 +836,7 @@ local int ient_finish(IENT *iep,DW *op) noex {
 
 local int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
 	int		rs = SR_FAULT ;
-	if (dep && iep) {
+	if (dep && iep) ylikely {
 	    rs = SR_OK ;
 	    dep->itime = iep->itime ;
 	    dep->timod = iep->timod ;
@@ -823,7 +853,7 @@ local int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	} /* end if (getbufsize) */
     	return rs ;
