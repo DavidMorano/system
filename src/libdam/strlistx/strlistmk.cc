@@ -28,12 +28,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<dlfcn.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
 #include	<modload.h>
 #include	<sncpyx.h>
@@ -42,7 +45,9 @@
 #include	"strlistmk.h"
 #include	"strlistmks.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -51,7 +56,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -82,7 +86,7 @@ struct strlistmk_calls {
 	soadd_f		add ;
 	soabort_f	abort ;
 	soclose_f	close ;
-} ;
+} ; /* end struct */
 
 typedef strlistmk_calls *	callsp ;
 
@@ -90,16 +94,16 @@ typedef strlistmk_calls *	callsp ;
 /* forward references */
 
 template<typename ... Args>
-static int strlistmk_ctor(strlistmk *op,Args ... args) noex {
+local int strlistmk_ctor(strlistmk *op,Args ... args) noex {
     	STRLISTMK	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->mlp = new(nothrow) modload) != np) {
+	    if ((op->mlp = new(nothrow) modload) != np) ylikely {
 		strlistmk_calls	*callp ;
-	        if ((callp = new(nothrow) strlistmk_calls) != np) {
+	        if ((callp = new(nothrow) strlistmk_calls) != np) ylikely {
 		    op->callp = callp ;
 		    rs = SR_OK ;
 		} /* end if (new-strlistmk_calls) */
@@ -110,42 +114,39 @@ static int strlistmk_ctor(strlistmk *op,Args ... args) noex {
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strlistmk_ctor) */
+} /* end subroutine (strlistmk_ctor) */
 
-static int strlistmk_dtor(strlistmk *op) noex {
+local int strlistmk_dtor(strlistmk *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->callp) {
+	    if (op->callp) ylikely {
 		strlistmk_calls	*callp = callsp(op->callp) ;
 		delete callp ;
 		op->callp = nullptr ;
 	    }
-	    if (op->mlp) {
+	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strlistmk_dtor) */
+} /* end subroutine (strlistmk_dtor) */
 
 template<typename ... Args>
-static inline int strlistmk_magic(strlistmk *op,Args ... args) noex {
+local inline int strlistmk_magic(strlistmk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == STRLISTMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (strlistmk_magic) */
+} /* end subroutine (strlistmk_magic) */
 
-static int	strlistmk_objloadbegin(SLM *,cchar *,cchar *) noex ;
-static int	strlistmk_objloadend(SLM *) noex ;
-static int	strlistmk_loadcalls(SLM *,vecstr *) noex ;
+local int	strlistmk_objloadbegin(SLM *,cchar *,cchar *) noex ;
+local int	strlistmk_objloadend(SLM *) noex ;
+local int	strlistmk_loadcalls(SLM *,vecstr *) noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* local variables */
@@ -157,7 +158,7 @@ enum subs {
 	sub_chgrp,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum (subs) */
 
 constexpr cpcchar	subs[] = {
 	"open",
@@ -166,7 +167,7 @@ constexpr cpcchar	subs[] = {
 	"chgrp",
 	"close",
 	nullptr
-} ;
+} ; /* end array (subs) */
 
 
 /* exported variables */
@@ -177,11 +178,11 @@ constexpr cpcchar	subs[] = {
 int strlistmk_open(SLM *op,cc *pr,cc *dbn,cc *lfn,int of,om_t om,int n) noex {
 	int		rs ;
 	cchar		*objn = STRLISTMK_OBJNAME ;
-	if ((rs = strlistmk_ctor(op,pr,dbn,lfn)) >= 0) {
+	if ((rs = strlistmk_ctor(op,pr,dbn,lfn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dbn[0] && lfn[0]) {
+	    if (dbn[0] && lfn[0]) ylikely {
 		strlistmk_calls		*callp = callsp(op->callp) ;
-	        if ((rs = strlistmk_objloadbegin(op,pr,objn)) >= 0) {
+	        if ((rs = strlistmk_objloadbegin(op,pr,objn)) >= 0) ylikely {
 		    auto	co = callp->open ;
 	            if ((rs = co(op->obj,dbn,lfn,of,om,n)) >= 0) {
 		        op->magic = STRLISTMK_MAGIC ;
@@ -269,7 +270,7 @@ int strlistmk_chgrp(SLM *op,gid_t gid) noex {
 
 /* private subroutines */
 
-static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
+local int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = vecstrm.compact ;
@@ -288,11 +289,11 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
                         if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {
 			    cint	sz = op->objsize ;
                             op->objsize = mv[0] ;
-                            if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+                            if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
                                 op->obj = vp ;
                                 rs = strlistmk_loadcalls(op,&syms) ;
                                 if (rs < 0) {
-                                    uc_free(op->obj) ;
+                                    lm_free(op->obj) ;
                                     op->obj = nullptr ;
                                 }
                             } /* end if (memory-allocation) */
@@ -315,11 +316,11 @@ static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
 }
 /* end subroutine (strlistmk_objloadbegin) */
 
-static int strlistmk_objloadend(SLM *op) noex {
+local int strlistmk_objloadend(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
-	    rs1 = uc_free(op->obj) ;
+	    rs1 = lm_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
@@ -332,7 +333,7 @@ static int strlistmk_objloadend(SLM *op) noex {
 }
 /* end subroutine (strlistmk_objloadend) */
 
-static int strlistmk_loadcalls(SLM *op,vecstr *slp) noex {
+local int strlistmk_loadcalls(SLM *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
 	strlistmk_calls	*callp = callsp(op->callp) ;
 	cint		rsn = SR_NOTFOUND ;
@@ -370,7 +371,7 @@ static int strlistmk_loadcalls(SLM *op,vecstr *slp) noex {
 }
 /* end subroutine (strlistmk_loadcalls) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
