@@ -33,13 +33,16 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"cmdmap.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -50,9 +53,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -74,11 +74,11 @@ typedef cmdmap_ent *	entp ;
 /* forward references */
 
 template<typename ... Args>
-static int cmdmap_ctor(cmdmap *op,Args ... args) noex {
+local int cmdmap_ctor(cmdmap *op,Args ... args) noex {
 	CMDMAP		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->mlp = new(nothrow) vecobj) != np) {
@@ -86,36 +86,33 @@ static int cmdmap_ctor(cmdmap *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cmdmap_ctor) */
+} /* end subroutine (cmdmap_ctor) */
 
-static int cmdmap_dtor(cmdmap *op) noex {
+local int cmdmap_dtor(cmdmap *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->mlp) {
+	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cmdmap_dtor) */
+} /* end subroutine (cmdmap_dtor) */
 
 template<typename ... Args>
-static inline int cmdmap_magic(cmdmap *op,Args ... args) noex {
+local inline int cmdmap_magic(cmdmap *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CMDMAP_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (cmdmap_magic) */
+} /* end subroutine (cmdmap_magic) */
 
-static int cmdmap_defmap(cmdmap *,const cmdmap_ent *) noex ;
+local int cmdmap_defmap(cmdmap *,const cmdmap_ent *) noex ;
 
 extern "C" {
-    static int	vcmpfind(cvoid **,cvoid **) noex ;
+    local int	vcmpfind(cvoid **,cvoid **) noex ;
 }
 
 
@@ -182,8 +179,8 @@ int cmdmap_load(cmdmap *op,int key,int cmd) noex {
 	        bool		f_add = true ;
 	        e.key = key ;
 	        e.cmd = cmd ;
-		auto vos = vecobj_search ;
-	        auto vcf = vcmpfind ;
+		cauto vos = vecobj_search ;
+	        cauto vcf = vcmpfind ;
 	        if (void *vp{} ; (rs = vos(op->mlp,&e,vcf,&vp)) >= 0) {
 	            cmdmap_ent	*ep = entp(vp) ;
 		    cint	idx = rs ;
@@ -219,9 +216,9 @@ int cmdmap_lookup(cmdmap *op,int key) noex {
 	        if (rs >= 0) {
 	            cmdmap_ent	te{} ;
 	            te.key = key ;
-		    auto	vos = vecobj_search ;
-	            auto	vcf = vcmpfind ;
-	            if (void *vp{} ; (rs = vos(op->mlp,&te,vcf,&vp)) >= 0) {
+		    cauto	vos = vecobj_search ;
+	            cauto	vcf = vcmpfind ;
+	            if (void *vp ; (rs = vos(op->mlp,&te,vcf,&vp)) >= 0) {
 	                if (vp) {
 			    cmdmap_ent	*ep = entp(vp) ;
 	                    cmd = ep->cmd ;
@@ -237,7 +234,7 @@ int cmdmap_lookup(cmdmap *op,int key) noex {
 
 /* private subroutines */
 
-static int cmdmap_defmap(cmdmap *op,const cmdmap_ent *defmap) noex {
+local int cmdmap_defmap(cmdmap *op,const cmdmap_ent *defmap) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if_constexpr (f_fastdef) {
@@ -255,7 +252,7 @@ static int cmdmap_defmap(cmdmap *op,const cmdmap_ent *defmap) noex {
 }
 /* end subroutine (cmdmap_defmap) */
 
-static int vcmpfind(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpfind(cvoid **v1pp,cvoid **v2pp) noex {
 	cmdmap_ent	*e1p = (cmdmap_ent *) *v1pp ;
 	cmdmap_ent	*e2p = (cmdmap_ent *) *v2pp ;
 	int		rc = 0 ;
