@@ -44,7 +44,10 @@
 #include	<cstdlib>
 #include	<cstring>		/* |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<endian.h>
 #include	<mkmagic.h>
 #include	<hasx.h>
@@ -57,8 +60,6 @@
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -84,7 +85,7 @@ enum his {
 	hi_nstrs,			/* total number of strings */
 	hi_nskip,			/* hash lookup paramter */
 	hi_overlast
-} ;
+} ; /* end enum (his) */
 
 
 /* forward references */
