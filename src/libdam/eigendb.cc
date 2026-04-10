@@ -73,7 +73,6 @@ import sif ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -93,14 +92,14 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 static int eigendb_ctor(eigendb *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->dbp = nullptr ;
-	    if ((op->spp = new(nothrow) strpack) != np) {
-	        if ((op->dbp = new(nothrow) hdb) != np) {
+	    if ((op->spp = new(nothrow) strpack) != np) ylikely {
+	        if ((op->dbp = new(nothrow) hdb) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-hdb) */
 		if (rs < 0) {
@@ -115,13 +114,13 @@ static int eigendb_ctor(eigendb *op,Args ... args) noex {
 
 static int eigendb_dtor(eigendb *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->dbp) {
+	    if (op->dbp) ylikely {
 		delete op->dbp ;
 		op->dbp = nullptr ;
 	    }
-	    if (op->spp) {
+	    if (op->spp) ylikely {
 		delete op->spp ;
 		op->spp = nullptr ;
 	    }
@@ -133,7 +132,7 @@ static int eigendb_dtor(eigendb *op) noex {
 template<typename ... Args>
 static int eigendb_magic(eigendb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == EIGENDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
