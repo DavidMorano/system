@@ -1,6 +1,6 @@
 /* outfmt HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* output formats */
 /* version %I% last-modified %G% */
@@ -14,19 +14,17 @@
 
 #include	<envstandards.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 
+
+extern cpcchar	outfmts[] ;
 
 enum ofis {
 	outfmt_raw,
 	outfmt_fill,
 	outfmt_bible,
 	outfmt_overlast
-} ;
-
-extern cpcchar		outfmts[] ;
+} ; /* end enum (ofis) */
 
 
 #endif /* OUTFMT_INCLUDE */
