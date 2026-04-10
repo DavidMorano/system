@@ -42,9 +42,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<netdb.h>
 #include	<clusterdb.h>
 #include	<ids.h>
@@ -56,7 +58,9 @@
 
 #include	"sysnamedb.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -73,7 +77,6 @@ import libutil ;
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -83,6 +86,10 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
 
 
 /* external variables */
@@ -96,21 +103,21 @@ namespace {
 	int		elen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int sysnamedb_ctor(sysnamedb *op,Args ... args) noex {
+local int sysnamedb_ctor(sysnamedb *op,Args ... args) noex {
     	SYSNAMEDB	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->nlp = new(nothrow) nodedb) != np) {
-	        if ((op->clp = new(nothrow) clusterdb) != np) {
+	    if ((op->nlp = new(nothrow) nodedb) != np) ylikely {
+	        if ((op->clp = new(nothrow) clusterdb) != np) ylikely {
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
@@ -120,42 +127,39 @@ static int sysnamedb_ctor(sysnamedb *op,Args ... args) noex {
 	    } /* end if (new-nodedb) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysnamedb_ctor) */
+} /* end subroutine (sysnamedb_ctor) */
 
-static int sysnamedb_dtor(sysnamedb *op) noex {
+local int sysnamedb_dtor(sysnamedb *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->clp) {
+	    if (op->clp) ylikely {
 		delete op->clp ;
 		op->clp = nullptr ;
 	    }
-	    if (op->nlp) {
+	    if (op->nlp) ylikely {
 		delete op->nlp ;
 		op->nlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysnamedb_dtor) */
+} /* end subroutine (sysnamedb_dtor) */
 
 template<typename ... Args>
-static inline int sysnamedb_magic(sysnamedb *op,Args ... args) noex {
+local inline int sysnamedb_magic(sysnamedb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SYSNAMEDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (sysnamedb_magic) */
+} /* end subroutine (sysnamedb_magic) */
 
-static int sysnamedb_nodebegin(sysnamedb *,ids *,cchar *) noex ;
-static int sysnamedb_nodeend(sysnamedb *) noex ;
-static int sysnamedb_clusterbegin(sysnamedb *,ids *,cchar *) noex ;
-static int sysnamedb_clusterend(sysnamedb *) noex ;
-static int sysnamedb_trynodes(sysnamedb *,vecstr *,cc *) noex ;
-static int sysnamedb_tryclusters(sysnamedb *,vecstr *,cc *) noex ;
+local int sysnamedb_nodebegin(sysnamedb *,ids *,cchar *) noex ;
+local int sysnamedb_nodeend(sysnamedb *) noex ;
+local int sysnamedb_clusterbegin(sysnamedb *,ids *,cchar *) noex ;
+local int sysnamedb_clusterend(sysnamedb *) noex ;
+local int sysnamedb_trynodes(sysnamedb *,vecstr *,cc *) noex ;
+local int sysnamedb_tryclusters(sysnamedb *,vecstr *,cc *) noex ;
 
 
 /* local variables */
@@ -243,7 +247,7 @@ int sysnamedb_getnodes(sysnamedb *op,vecstr *clp,vecstr *nlp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = sysnamedb_magic(op,clp,nlp)) >= 0) {
-	    if (char *cbuf ; (rs = malloc_nn(&cbuf)) >= 0) {
+	    if (char *cbuf ; (rs = lm_nn(&cbuf)) >= 0) {
 		clusterdb	*cop = op->clp ;
 		cint		clen = rs ;
 		int		cl ;
@@ -270,7 +274,8 @@ int sysnamedb_getnodes(sysnamedb *op,vecstr *clp,vecstr *nlp) noex {
 	            }
 	            if (rs < 0) break ;
 	        } /* end for */
-		rs = rsfree(rs,cbuf) ;
+		rs1 = lm_free(cbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
@@ -280,9 +285,10 @@ int sysnamedb_getnodes(sysnamedb *op,vecstr *clp,vecstr *nlp) noex {
 
 /* private subroutines */
 
-static int sysnamedb_nodebegin(sysnamedb *op,ids *idp,cchar *pr) noex {
+local int sysnamedb_nodebegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	int		rs ;
-	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	int		rs1 ;
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,NODEFNAME)) >= 0) {
 	        if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 	            if ((rs = permid(idp,&sb,R_OK)) >= 0) {
@@ -297,13 +303,14 @@ static int sysnamedb_nodebegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	            rs = SR_OK ;
 	        }
 	    }
-	    rs = rsfree(rs,tbuf) ;
+	    rs1 = lm_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (sysnamedb_nodebegin) */
 
-static int sysnamedb_nodeend(sysnamedb *op) noex {
+local int sysnamedb_nodeend(sysnamedb *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.node) {
@@ -316,9 +323,10 @@ static int sysnamedb_nodeend(sysnamedb *op) noex {
 }
 /* end subroutine (sysnamedb_nodeend) */
 
-static int sysnamedb_clusterbegin(sysnamedb *op,ids *idp,cchar *pr) noex {
+local int sysnamedb_clusterbegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	int		rs ;
-	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	int		rs1 ;
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,CLUSTERFNAME)) >= 0) {
 	        if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 	            if ((rs = permid(idp,&sb,R_OK)) >= 0) {
@@ -333,13 +341,14 @@ static int sysnamedb_clusterbegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	            rs = SR_OK ;
 	        }
 	    } /* end if (mkpath) */
-	    rs = rsfree(rs,tbuf) ;
+	    rs1 = lm_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (sysnamedb_clusterbegin) */
 
-static int sysnamedb_clusterend(sysnamedb *op) noex {
+local int sysnamedb_clusterend(sysnamedb *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.clu) {
@@ -352,14 +361,14 @@ static int sysnamedb_clusterend(sysnamedb *op) noex {
 }
 /* end subroutine (sysnamedb_clusterend) */
 
-static int sysnamedb_trynodes(sysnamedb *op,vecstr *slp,cc *nn) noex {
+local int sysnamedb_trynodes(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (op->fl.node) {
 	    cint	elen = var.elen ;
-	    if (char *ebuf ; (rs = uc_malloc((elen + 1),&ebuf)) >= 0) {
+	    if (char *ebuf ; (rs = lm_mall((elen + 1),&ebuf)) >= 0) {
 	        nodedb		*nop = op->nlp ;
 	        nodedb_cur	cur ;
 	        if ((rs = nodedb_curbegin(nop,&cur)) >= 0) {
@@ -380,20 +389,21 @@ static int sysnamedb_trynodes(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	            rs1 = nodedb_curend(nop,&cur) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (cursor) */
-		rs = rsfree(rs,ebuf) ;
+		rs1 = lm_free(ebuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (DB lookup) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (sysnamedb_trynodes) */
 
-static int sysnamedb_tryclusters(sysnamedb *op,vecstr *slp,cc *nn) noex {
+local int sysnamedb_tryclusters(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (op->fl.clu) {
-	    if (char *cbuf ; (rs = malloc_nn(&cbuf)) >= 0) {
+	    if (char *cbuf ; (rs = lm_nn(&cbuf)) >= 0) {
 	        clusterdb	*cop = op->clp ;
 	    	cint		clen = rs ;
 	        clusterdb_cur	cur ; 
@@ -412,7 +422,8 @@ static int sysnamedb_tryclusters(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	            rs1 = clusterdb_curend(cop,&cur) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (cluster-cursor) */
-		rs = rsfree(rs,cbuf) ;
+		rs1 = lm_free(cbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (have cluster-DB) */
 	return (rs >= 0) ? c : rs ;
@@ -421,7 +432,7 @@ static int sysnamedb_tryclusters(sysnamedb *op,vecstr *slp,cc *nn) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	if ((rs = getbufsize(bufsize_nn)) >= 0) {
 	    nodenamelen = rs ;
 	    elen = (rs * EBUFMULT) ;
 	}
