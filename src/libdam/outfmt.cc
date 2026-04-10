@@ -26,14 +26,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<stddef.h>		/* |nullptr_t| */
+#include	<stdlib.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<usysbase.h>
 
 #include	"outfmt.h"
 
@@ -43,6 +39,6 @@ const cpcchar	outfmts[] = {
 	"fill",
 	"bible",
 	nullptr
-} ;
+} ; /* end array (outfmts) */
 
 
