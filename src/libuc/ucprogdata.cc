@@ -80,7 +80,12 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucatexit.h>
+#include	<ucatfork.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<ptc.h>
@@ -129,7 +134,7 @@ extern "C" {
 
 struct ucprogdata_head {
 	ptm		mx ;		/* data mutex */
-	ptc		cv ;		/* condition variable */
+	ptc		cn ;		/* condition variable */
 	varray		*ents ;
 	vaflag		waiters ;
 	vaflag		f_void ;
@@ -184,26 +189,28 @@ int ucprogdata_init() noex {
 	int		f = false ;
 	if (! uip->f_void) {
 	    if (! uip->f_init) {
+	        ptm *mxp = &uip->mx ;
 	        uip->f_init = true ;
-	        if ((rs = ptm_create(&uip->mx,nullptr)) >= 0) {
-	            if ((rs = ptc_create(&uip->cv,nullptr)) >= 0) {
+	        if ((rs = mxp->create) >= 0) {
+		    ptc *cnp = &uip->cn ;
+	            if ((rs = cnp->create) >= 0) {
 	                void_f	b = ucprogdata_atforkbefore ;
 	                void_f	a = ucprogdata_atforkafter ;
-	                if ((rs = uc_atfork(b,a,a)) >= 0) {
+	                if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	                    if ((rs = uc_atexit(ucprogdata_exit)) >= 0) {
 	                        uip->f_initdone = true ;
 	                        f = true ;
 	                    }
 	                    if (rs < 0) {
-	                        uc_atforkexpunge(b,a,a) ;
+	                        uc_atforkexp(b,a,a) ;
 			    }
 	                } /* end if (uc_atfork) */
 	                if (rs < 0) {
-	                    ptc_destroy(&uip->cv) ;
+	                    cnp->destroy() ;
 			}
 	            } /* end if (ptc_create) */
 	            if (rs < 0) {
-	                ptm_destroy(&uip->mx) ;
+	                mxp->destroy() ;
 		    }
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
@@ -234,15 +241,17 @@ int ucprogdata_fini() noex {
 	    {
 	        void_f	b = ucprogdata_atforkbefore ;
 	        void_f	a = ucprogdata_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptc_destroy(&uip->cv) ;
+		ptc *cnp = &uip->cn ;
+	        rs1 = cnp->destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(&uip->mx) ;
+	        ptm *mxp = &uip->mx ;
+	        rs1 = mxp->destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    uip->f_init = false ;
@@ -383,16 +392,20 @@ static int ucprogdata_entfins(UCPD *uip) noex {
 static int ucprogdata_capbegin(UCPD *uip,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lockto(&uip->mx,to)) >= 0) {
-	    uip->waiters += 1 ;
-	    while ((rs >= 0) && uip->f_capture) { /* busy */
-	        rs = ptc_waiter(&uip->cv,&uip->mx,to) ;
-	    } /* end while */
-	    if (rs >= 0) {
-	        uip->f_capture = true ;
-	    }
-	    uip->waiters -= 1 ;
-	    rs1 = ptm_unlock(&uip->mx) ;
+	ptm *mxp = &uip->mx ;
+	if ((rs = mxp->lockbegin(to)) >= 0) {
+	    ptc *cnp = &uip->cn ;
+	    {
+	        uip->waiters += 1 ;
+	        while ((rs >= 0) && uip->f_capture) { /* busy */
+	            rs = cnp->wait(mxp,to) ;
+	        } /* end while */
+	        if (rs >= 0) {
+	            uip->f_capture = true ;
+	        }
+	        uip->waiters -= 1 ;
+	    } /* end block */
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -402,12 +415,16 @@ static int ucprogdata_capbegin(UCPD *uip,int to) noex {
 static int ucprogdata_capend(UCPD *uip) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lock(&uip->mx)) >= 0) {
-	    uip->f_capture = false ;
-	    if (uip->waiters > 0) {
-	        rs = ptc_signal(&uip->cv) ;
-	    }
-	    rs1 = ptm_unlock(&uip->mx) ;
+	ptm *mxp = &uip->mx ;
+	if ((rs = mxp->lockbegin) >= 0) {
+	    {
+		ptc *cnp = &uip->cn ;
+	        uip->f_capture = false ;
+	        if (uip->waiters > 0) {
+	            rs = cnp->signal ;
+	        }
+	    } /* end block */
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
