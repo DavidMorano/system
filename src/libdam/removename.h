@@ -1,11 +1,12 @@
 /* removename HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* remove a named file-system object (and its descendants) */
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1996 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	REMOVENAME_INCLUDE
 #define	REMOVENAME_INCLUDE
