@@ -31,7 +31,6 @@
 #include	<dlfcn.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<new>
 #include	<usystem.h>
 #include	<vecstr.h>
@@ -70,9 +69,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -115,16 +111,16 @@ typedef sysrealname_calls *		callsp ;
 /* forward references */
 
 template<typename ... Args>
-static int sysrealname_ctor(sysrealname *op,Args ... args) noex {
+local int sysrealname_ctor(sysrealname *op,Args ... args) noex {
     	SYSREALNAME	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->mlp = new(nothrow) modload) != np) {
+	    if ((op->mlp = new(nothrow) modload) != np) ylikely {
 		sysrealname_calls    *callp ;
-                if ((callp = new(nothrow) sysrealname_calls) != np) {
+                if ((callp = new(nothrow) sysrealname_calls) != np) ylikely {
                     op->callp = callp ;
                     rs = SR_OK ;
                 } /* end if (new-sysrealname_calls) */
@@ -135,42 +131,39 @@ static int sysrealname_ctor(sysrealname *op,Args ... args) noex {
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysrealname_ctor) */
+} /* end subroutine (sysrealname_ctor) */
 
-static int sysrealname_dtor(sysrealname *op) noex {
+local int sysrealname_dtor(sysrealname *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-            if (op->callp) {
+            if (op->callp) ylikely {
                 sysrealname_calls    *callp = callsp(op->callp) ;
                 delete callp ;
                 op->callp = nullptr ;
             }
-	    if (op->mlp) {
+	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysrealname_dtor) */
+} /* end subroutine (sysrealname_dtor) */
 
 template<typename ... Args>
-static inline int sysrealname_magic(sysrealname *op,Args ... args) noex {
+local inline int sysrealname_magic(sysrealname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SYSREALNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (sysrealname_magic) */
+} /* end subroutine (sysrealname_magic) */
 
-static int	sysrealname_objloadbegin(SRN *,cchar *,cchar *) noex ;
-static int	sysrealname_objloadend(SRN *) noex ;
-static int	sysrealname_loadcalls(SRN *,vecstr *) noex ;
+local int	sysrealname_objloadbegin(SRN *,cchar *,cchar *) noex ;
+local int	sysrealname_objloadend(SRN *) noex ;
+local int	sysrealname_loadcalls(SRN *,vecstr *) noex ;
 
-static int	sysrealname_curload(SRN *,SRN_CUR *,
+local int	sysrealname_curload(SRN *,SRN_CUR *,
 			int,cchar **,int) noex ;
 
 static bool	isrequired(int) noex ;
@@ -445,7 +438,7 @@ int sysrealname_audit(SRN *op) noex {
 
 /* private subroutines */
 
-static int sysrealname_objloadbegin(SRN *op,cchar *pr,cchar *objn) noex {
+local int sysrealname_objloadbegin(SRN *op,cchar *pr,cchar *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -494,7 +487,7 @@ static int sysrealname_objloadbegin(SRN *op,cchar *pr,cchar *objn) noex {
 }
 /* end subroutine (sysrealname_objloadbegin) */
 
-static int sysrealname_objloadend(SRN *op) noex {
+local int sysrealname_objloadend(SRN *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) ylikely {
@@ -511,7 +504,7 @@ static int sysrealname_objloadend(SRN *op) noex {
 }
 /* end subroutine (sysrealname_objloadend) */
 
-static int sysrealname_loadcalls(SRN *op,vecstr *slp) noex {
+local int sysrealname_loadcalls(SRN *op,vecstr *slp) noex {
         sysrealname_calls   *callp = callsp(op->callp) ;
 	modload		*lp = op->mlp ;
 	cint		rsn = SR_NOTFOUND ;
@@ -558,7 +551,7 @@ static int sysrealname_loadcalls(SRN *op,vecstr *slp) noex {
 }
 /* end subroutine (sysrealname_loadcalls) */
 
-static int sysrealname_curload(SRN *op,SRN_CUR *curp,
+local int sysrealname_curload(SRN *op,SRN_CUR *curp,
 		int fo,cc **sa,int sn) noex {
 	int		rs = SR_FAULT ;
 	if (op && sa) ylikely {
@@ -572,7 +565,7 @@ static int sysrealname_curload(SRN *op,SRN_CUR *curp,
 	    for (int i = 0 ; i < sn ; i += 1) {
 	        ssize += (lenstr(sa[i]) + 1) ;
 	    }
-	    if (char *bp ; (rs = uc_malloc(ssize,&bp)) >= 0) {
+	    if (char *bp ; (rs = uc_malloc(ssize,&bp)) >= 0) ylikely {
 	        int	i{} ; /* used-afterwards */
 	        cchar	**sap = (cchar **) bp ;
 	        char	*sbp = (bp + sasize) ;
@@ -590,7 +583,7 @@ static int sysrealname_curload(SRN *op,SRN_CUR *curp,
 }
 /* end subroutine (sysrealname_curload) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
