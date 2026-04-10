@@ -37,10 +37,13 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibsubs.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
 #include	<char.h>
