@@ -40,6 +40,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"getngroups.h"
+
 
 /* local defines */
 
@@ -54,7 +56,7 @@
 
 struct groupmgr {
 	int		n ;
-} ;
+} ; /* end struct (groupmgr) */
 
 
 /* forward references */
