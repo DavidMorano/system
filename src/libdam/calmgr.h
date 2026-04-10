@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 #include	<vecobj.h>
 
@@ -43,19 +40,19 @@
 
 struct calmgr_cursor {
 	void		*results ;
-	uint		magic ;
+	uint		magval ;
 	uint		nresults ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct calmgr_flags {
 	uint		idxes:1 ;		/* IDXES container open */
-} ;
+} ; /* end struct */
 
 struct calmgr_head {
 	cchar		*dn ;			/* DB directory-name */
 	cchar 		*cn ;			/* DB calendar-name */
-	cchar		*a ;			/* memory-allocations */
+	char		*a ;			/* memory-allocations */
 	cchar		*idxdname ;
 	void		*cyp ;			/* CALYEARS object pointer */
 	cchar		*mapdata ;		/* DB memory-map address */
@@ -66,10 +63,10 @@ struct calmgr_head {
 	size_t		fsize ;			/* DB file size */
 	size_t		mapsize ;		/* DB map length */
 	CALMGR_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		nentries ;		/* DB entries */
 	int		cidx ;			/* parent index (ordinal) */
-} ;
+} ; /* end struct */
 
 typedef CALMGR		calmgr ;
 typedef	CALMGR_FL	calmgr_fl ;
