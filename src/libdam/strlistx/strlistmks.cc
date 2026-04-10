@@ -46,17 +46,19 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| + |UINT_MAX| */
 #include	<ctime>
+#include	<climits>		/* |INT_MAX| + |UINT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<endian.h>
 #include	<vecobj.h>
 #include	<strtab.h>
@@ -117,9 +119,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -131,6 +130,10 @@ typedef uint		*rectab_t ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_fminmod(int,mode_t) noex ;
+}
 
 
 /* external variables */
@@ -154,15 +157,15 @@ struct vars {
 /* forward references */
 
 template<typename ... Args>
-static int strlistmks_ctor(strlistmks *op,Args ... args) noex {
+local int strlistmks_ctor(strlistmks *op,Args ... args) noex {
     	STRLISTMKS	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->stp = new(nothrow) strtab) != np) {
-		if ((op->rtp = new(nothrow) srectab) != np) {
+	    if ((op->stp = new(nothrow) strtab) != np) ylikely {
+		if ((op->rtp = new(nothrow) srectab) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-rectab) */
 		if (rs < 0) {
@@ -172,50 +175,48 @@ static int strlistmks_ctor(strlistmks *op,Args ... args) noex {
 	    } /* end if (new-strtab) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strlistmks_ctor) */
+} /* end subroutine (strlistmks_ctor) */
 
-static int strlistmks_dtor(strlistmks *op) noex {
+local int strlistmks_dtor(strlistmks *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->rtp) {
+	    if (op->rtp) ylikely {
 		delete op->rtp ;
 		op->rtp = nullptr ;
 	    }
-	    if (op->stp) {
+	    if (op->stp) ylikely {
 		delete op->stp ;
 		op->stp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strlistmks_dtor) */
+} /* end subroutine (strlistmks_dtor) */
 
-static int	strlistmks_filesbegin(SLM *) noex ;
-static int	strlistmks_filesend(SLM *) noex ;
-static int	strlistmks_fexists(SLM *,char *) noex ;
-static int	strlistmks_dirok(SLM *,char *) noex ;
+local int	strlistmks_filesbegin(SLM *) noex ;
+local int	strlistmks_filesend(SLM *) noex ;
+local int	strlistmks_fexists(SLM *,char *) noex ;
+local int	strlistmks_dirok(SLM *,char *) noex ;
 
-static int	strlistmks_listbegin(SLM *,int) noex ;
-static int	strlistmks_listend(SLM *) noex ;
+local int	strlistmks_listbegin(SLM *,int) noex ;
+local int	strlistmks_listend(SLM *) noex ;
 
-static int	strlistmks_nfcreate(SLM *,char *,int) noex ;
-static int	strlistmks_nfdestroy(SLM *) noex ;
-static int	strlistmks_mknfn(SLM *,char *,int) noex ;
+local int	strlistmks_nfcreate(SLM *,char *,int) noex ;
+local int	strlistmks_nfdestroy(SLM *) noex ;
+local int	strlistmks_mknfn(SLM *,char *,int) noex ;
 
 #ifdef	COMMENT
-static int	strlistmks_nfstore(SLM *,char *) noex ;
+local int	strlistmks_nfstore(SLM *,char *) noex ;
 #endif /* COMMENT */
 
-static int	strlistmks_mksfile(SLM *) noex ;
-static int	strlistmks_wrsfile(SLM *) noex ;
-static int	strlistmks_mkind(SLM *,char *,uint (*)[3],int) noex ;
-static int	strlistmks_renamefiles(SLM *) noex ;
+local int	strlistmks_mksfile(SLM *) noex ;
+local int	strlistmks_wrsfile(SLM *) noex ;
+local int	strlistmks_mkind(SLM *,char *,uint (*)[3],int) noex ;
+local int	strlistmks_renamefiles(SLM *) noex ;
 
-static int	indinsert(rectab_t,uint (*it)[3],int,VE *) noex ;
+local int	indinsert(rectab_t,uint (*it)[3],int,VE *) noex ;
 
-static int	mkvars() noex ;
+local int	mkvars() noex ;
 
 
 /* local variables */
@@ -252,12 +253,11 @@ strlistmks_obj	strlistmks_modinfo = {
 
 int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 	int		rs ;
-	if ((rs = strlistmks_ctor(op,dbname)) >= 0) {
+	if ((rs = strlistmks_ctor(op,dbname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dbname[0]) {
+	    if (dbname[0]) ylikely {
 		static cint	rsv = mkvars() ;
-		if ((rs = rsv) >= 0) {
-	            cchar	*cp ;
+		if ((rs = rsv) >= 0) ylikely {
 	            if (n < STRLISTMKS_NENTRIES) {
 	                n = STRLISTMKS_NENTRIES ;
 	            }
@@ -267,7 +267,7 @@ int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 	            op->fl.ofcreat = !!(of & O_CREAT) ;
 	            op->fl.ofexcl = !!(of & O_EXCL) ;
 	            op->fl.none = (! op->fl.ofcreat) && (! op->fl.ofexcl) ;
-	            if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
+	            if (cc *cp ; (rs = lm_strw(dbname,-1,&cp)) >= 0) ylikely {
 		        op->dbname = cp ;
 		        if ((rs = strlistmks_filesbegin(op)) >= 0) {
 		            if ((rs = strlistmks_listbegin(op,n)) >= 0) {
@@ -278,7 +278,8 @@ int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 		            }
 		        } /* end if */
 		        if (rs < 0) {
-	    	            uc_free(op->dbname) ;
+	    	            void *vp = voidp(op->dbname) ;
+	    	            lm_free(vp) ;
 	    	            op->dbname = nullptr ;
 		        }
 	            } /* end if (memory-allocation) */
@@ -296,7 +297,7 @@ int strlistmks_close(SLM *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		nvars = 0 ;
-	if ((rs = strlistmks_magic(op)) >= 0) {
+	if ((rs = strlistmks_magic(op)) >= 0) ylikely {
 	    nvars = op->nstrs ;
 	    if (! op->fl.abort) {
 	        rs1 = strlistmks_mksfile(op) ;
@@ -319,8 +320,9 @@ int strlistmks_close(SLM *op) noex {
 	        rs1 = strlistmks_filesend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->dbname) {
-	        rs1 = uc_free(op->dbname) ;
+	    if (op->dbname) ylikely {
+	        void *vp = voidp(op->dbname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbname = nullptr ;
 	    }
@@ -369,31 +371,31 @@ int strlistmks_chgrp(SLM *op,gid_t gid) noex {
 
 /* private subroutines */
 
-static int strlistmks_filesbegin(SLM *op) noex {
+local int strlistmks_filesbegin(SLM *op) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    cint	tlen = rs ;
 	    if ((rs = strlistmks_fexists(op,tbuf)) >= 0) {
 	        if ((rs = strlistmks_dirok(op,tbuf)) >= 0) {
 		    rs = strlistmks_nfcreate(op,tbuf,tlen) ;
 	            if (rs < 0) {
 		        if (op->idname) { /* from |_dirok()| */
-	    	            uc_free(op->idname) ;
+	    	            void *vp = voidp(op->idname) ;
+	    	            lm_free(vp) ;
 	    	            op->idname = nullptr ;
 		        }
 	            } /* end if (error) */
 	        } /* end if (strlistmks_dirok) */
 	    } /* end if (strlistmks_fexists) */
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (strlistmks_filesbegin) */
 
-static int strlistmks_filesend(SLM *op) noex {
+local int strlistmks_filesend(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -401,7 +403,8 @@ static int strlistmks_filesend(SLM *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->idname) {
-	    rs1 = uc_free(op->idname) ;
+	    void *vp = voidp(op->idname) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->idname = nullptr ;
 	}
@@ -410,18 +413,19 @@ static int strlistmks_filesend(SLM *op) noex {
 /* end subroutine (strlistmks_filesend) */
 
 /* check that the index-directory is writable to us */
-static int strlistmks_dirok(SLM *op,char *tbuf) noex {
+local int strlistmks_dirok(SLM *op,char *tbuf) noex {
 	int		rs = SR_NOTDIR ;
 	cchar		*dnp ;
 	if (int dnl ; (dnl = sfdirname(op->dbname,-1,&dnp)) > 0) {
-	    if (cchar *cp ; (rs = uc_mallocstrw(dnp,dnl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(dnp,dnl,&cp)) >= 0) {
 	        op->idname = cp ;
 		if ((rs = mkpath1w(tbuf,dnp,dnl)) >= 0) {
 		    cint	am = (X_OK | W_OK) ;
 		    rs = perm(tbuf,-1,-1,nullptr,am) ;
 		} /* end if (mkpath) */
 	        if (rs < 0) {
-	    	    uc_free(op->idname) ;
+	    	    void *vp = voidp(op->idname) ;
+	    	    lm_free(vp) ;
 	    	    op->idname = nullptr ;
 	        } /* end if (error) */
 	    } /* end if (memory-allocation) */
@@ -430,21 +434,20 @@ static int strlistmks_dirok(SLM *op,char *tbuf) noex {
 }
 /* end if (strlistmks_dirok) */
 
-static int strlistmks_nfcreate(SLM *op,char *tbuf,int tlen) noex {
+local int strlistmks_nfcreate(SLM *op,char *tbuf,int tlen) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = strlistmks_mknfn(op,tbuf,tlen)) >= 0) {
 	    cint	nfl = rs ;
-	    char	*rbuf{} ;
-	    if ((rs = malloc_mp(&rbuf)) >= 0) {
+	    if (char *rbuf ; (rs = lm_mp(&rbuf)) >= 0) {
 		cint	of = (O_CREAT | O_EXCL | O_WRONLY) ;
 		cmode	om = op->om ;
 	        if ((rs = opentmpfile(tbuf,of,om,rbuf)) >= 0) {
-	            if (cchar *cp ; (rs = uc_mallocstrw(rbuf,nfl,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = lm_strw(rbuf,nfl,&cp)) >= 0) {
 	                op->nfname = charp(cp) ;
 		    } /* end if (memory-allocation of 'nfname') */
 	        } /* end if (opentmpfile) */
-		rs1 = uc_free(rbuf) ;
+		rs1 = lm_free(rbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (strlistmks_mknfn) */
@@ -452,7 +455,7 @@ static int strlistmks_nfcreate(SLM *op,char *tbuf,int tlen) noex {
 }
 /* end subroutine (txindexmks_nfcreate) */
 
-static int strlistmks_nfdestroy(SLM *op) noex {
+local int strlistmks_nfdestroy(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nfd >= 0) {
@@ -467,7 +470,7 @@ static int strlistmks_nfdestroy(SLM *op) noex {
 		op->nfname[0] = '\0' ;
 	    }
 	    {
-	        rs1 = uc_free(op->nfname) ;
+	        rs1 = lm_free(op->nfname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->nfname = nullptr ;
 	    }
@@ -476,7 +479,7 @@ static int strlistmks_nfdestroy(SLM *op) noex {
 }
 /* end subroutine (strlistmks_nfdestroy) */
 
-static int strlistmks_mknfn(SLM *op,char *tbuf,int tlen) noex {
+local int strlistmks_mknfn(SLM *op,char *tbuf,int tlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		i = 0 ;
@@ -537,16 +540,16 @@ static int strlistmks_mknfn(SLM *op,char *tbuf,int tlen) noex {
 /* end subroutine (strlistmks_nfdestroy) */
 
 #ifdef	COMMENT
-static int strlistmks_nfstore(SLM *op,char *outfname) noex {
+local int strlistmks_nfstore(SLM *op,char *outfname) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nfname) {
-	    rs1 = uc_free(op->nfname) ;
+	    rs1 = lm_free(op->nfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nfname = nullptr ;
 	}
 	if (rs >= 0) {
-	    if (cchar *cp ; (rs = uc_mallocstrw(outfname,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(outfname,-1,&cp)) >= 0) {
 		op->nfname = charp(cp) ;
 	    }
 	}
@@ -555,7 +558,7 @@ static int strlistmks_nfstore(SLM *op,char *outfname) noex {
 /* end subroutine (strlistmks_nfstore) */
 #endif /* COMMENT */
 
-static int strlistmks_fexists(SLM *op,char *tbuf) noex {
+local int strlistmks_fexists(SLM *op,char *tbuf) noex {
 	int		rs = SR_OK ;
 	if (op->fl.ofcreat && op->fl.ofexcl) {
 	    cchar	*dbn = op->dbname ;
@@ -572,7 +575,7 @@ static int strlistmks_fexists(SLM *op,char *tbuf) noex {
 }
 /* end subroutine (strlistmks_fexists) */
 
-static int strlistmks_listbegin(SLM *op,int n) noex {
+local int strlistmks_listbegin(SLM *op,int n) noex {
 	cint		sz = (n * STRLISTMKS_SIZEMULT) ;
 	int		rs ;
 	if ((rs = strtab_start(op->stp,sz)) >= 0) {
@@ -585,7 +588,7 @@ static int strlistmks_listbegin(SLM *op,int n) noex {
 }
 /* end subroutine (strlistmks_listbegin) */
 
-static int strlistmks_listend(SLM *op) noex {
+local int strlistmks_listend(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->rtp) {
@@ -600,7 +603,7 @@ static int strlistmks_listend(SLM *op) noex {
 }
 /* end subroutine (strlistmks_listend) */
 
-static int strlistmks_mksfile(SLM *op) noex {
+local int strlistmks_mksfile(SLM *op) noex {
 	cint		rtl = srectab_done(op->rtp) ;
 	int		rs = SR_BUGCHECK ;
 	int		nstrs = 0 ;
@@ -629,7 +632,7 @@ namespace {
     } ;
 }
 
-static int strlistmks_wrsfile(SLM *op) noex {
+local int strlistmks_wrsfile(SLM *op) noex {
 	sub_wrsfile	wrf(op) ;
 	return wrf ;
 }
@@ -715,8 +718,7 @@ int sub_wrsfile::mkfile(rectab_t rt,int rtl) noex {
 int sub_wrsfile::mkkstab(filer *vfp,int rtl,int sz) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*kstab{} ;
-	if ((rs = uc_malloc(sz,&kstab)) >= 0) {
+	if (char *kstab ; (rs = lm_mall(sz,&kstab)) >= 0) {
 	    strtab	*ksp = op->stp ;
 	    if ((rs = strtab_strmk(ksp,kstab,sz)) >= 0) {
 		/* write out the key-string table */
@@ -728,17 +730,17 @@ int sub_wrsfile::mkkstab(filer *vfp,int rtl,int sz) noex {
 	            hf.itoff = foff ;
 	            hf.itlen = itl ;
 	            sz = (itl + 1) * 3 * szof(uint) ;
-	            if ((rs = uc_malloc(sz,&indtab)) >= 0) {
+	            if ((rs = lm_mall(sz,&indtab)) >= 0) {
 			memset(indtab,0,sz) ;
 	                if ((rs = strlistmks_mkind(op,kstab,indtab,itl)) >= 0) {
 	                    rs = filer_write(vfp,indtab,sz) ;
 	                    foff += rs ;
 	                }
-	                rs1 = uc_free(indtab) ;
+	                rs1 = lm_free(indtab) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
 	        } /* end if (record-index table) */
-	        rs1 = uc_free(kstab) ;
+	        rs1 = lm_free(kstab) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (key-string table) */
@@ -779,11 +781,10 @@ int strlistmks_mkind(SLM *op,char *kst,uint (*it)[3], int il) noex {
 }
 /* end subroutine (strlistmks_mkind) */
 
-static int strlistmks_renamefiles(SLM *op) noex {
+local int strlistmks_renamefiles(SLM *op) noex {
 	int		rs ;
 	int		rs1 ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
 	        if ((rs = u_rename(op->nfname,tbuf)) >= 0) {
 	            op->nfname[0] = '\0' ;
@@ -793,14 +794,14 @@ static int strlistmks_renamefiles(SLM *op) noex {
 	            op->nfname[0] = '\0' ;
 	        }
 	    } /* end if (mkfnamesuf) */
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (strlistmks_renamefiles) */
 
-static int indinsert(rectab_t rt,uint (*it)[3],int il,VE *vep) noex {
+local int indinsert(rectab_t rt,uint (*it)[3],int il,VE *vep) noex {
 	uint		nhash = vep->khash ;
 	uint		chash = (vep->khash & INT_MAX) ;
 	uint		hi = vep->hi ;
@@ -832,11 +833,11 @@ static int indinsert(rectab_t rt,uint (*it)[3],int il,VE *vep) noex {
 }
 /* end subroutine (indinsert) */
 
-static int mkvars() noex {
+local int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
-	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mn)) >= 0) {
 	        var.maxnamelen = rs ;
 	    }
 	}
