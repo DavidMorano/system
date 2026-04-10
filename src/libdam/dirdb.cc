@@ -35,9 +35,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<hdb.h>
 #include	<sfx.h>
 #include	<mkpathx.h>
@@ -46,16 +46,15 @@
 
 #include	"dirdb.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -65,6 +64,10 @@ typedef dirdb_ent *	entp ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
 
 
 /* external variables */
@@ -78,13 +81,13 @@ typedef dirdb_ent *	entp ;
 template<typename ... Args>
 static int dirdb_ctor(dirdb *op,Args ... args) noex {
 	DIRDB		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->dlp = new(nothrow) vechand) != np) {
-	        if ((op->dbp = new(nothrow) hdb) != np) {
+	    if ((op->dlp = new(nothrow) vechand) != np) ylikely {
+	        if ((op->dbp = new(nothrow) hdb) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new­hdb) */
 		if (rs < 0) {
@@ -99,13 +102,13 @@ static int dirdb_ctor(dirdb *op,Args ... args) noex {
 
 static int dirdb_dtor(dirdb *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->dbp) {
+	    if (op->dbp) ylikely {
 		delete op->dbp ;
 		op->dbp = nullptr ;
 	    }
-	    if (op->dlp) {
+	    if (op->dlp) ylikely {
 		delete op->dlp ;
 		op->dlp = nullptr ;
 	    }
@@ -147,11 +150,12 @@ extern "C" {
 /* exported subroutines */
 
 int dirdb_start(dirdb *op,int n) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = dirdb_ctor(op)) >= 0) {
 	    op->count = 0 ;
 	    if ((rs = vechand_start(op->dlp,n,0)) >= 0) {
-	        if ((rs = hdb_start(op->dbp,n,1,nullptr,nullptr)) >= 0) {
+	        if ((rs = hdb_start(op->dbp,n,1,np,np)) >= 0) {
 	            op->magic = DIRDB_MAGIC ;
 	        }
 	        if (rs < 0) {
@@ -181,7 +185,7 @@ int dirdb_finish(dirdb *op) noex {
 	                    if (rs >= 0) rs = rs1 ;
 		        }
 		        {
-	                    rs1 = uc_free(ep) ;
+	                    rs1 = lm_free(ep) ;
 	                    if (rs >= 0) rs = rs1 ;
 		        }
 	            }
@@ -214,7 +218,7 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 	    rs = SR_INVALID ;
 	    if (dp[0]) {
 	        if (dl < 0) dl = lenstr(dp) ;
-	        if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	             if ((rs = mkpath1w(tbuf,dp,dl)) >= 0) {
 	                 if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 		             if (S_ISDIR(sb.st_mode)) {
@@ -247,7 +251,7 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 		             rs = SR_OK ;
 	                 } /* end if (stat) */
 	            } /* end if (mkpath) */
-		    rs1 = uc_free(tbuf) ;
+		    rs1 = lm_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -275,7 +279,7 @@ int dirdb_clean(dirdb *op) noex {
 		            if (rs >= 0) rs = rs1 ;
 		        }
 		        {
-	                    rs1 = uc_free(ep) ;
+	                    rs1 = lm_free(ep) ;
 		            if (rs >= 0) rs = rs1 ;
 		        }
 	            } else if (isNotPresent(rs)) {
@@ -331,7 +335,7 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 static int dirdb_adding(dirdb *op,ustat *sbp,cchar *sp,int sl) noex {
 	cint		sz = szof(dirdb_ent) ;
 	int		rs ;
-	if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	    dirdb_ent	*ep = entp(vp) ;
 	    if ((rs = entry_start(ep,sp,sl,sbp,op->count)) >= 0) {
 	        if ((rs = vechand_add(op->dlp,ep)) >= 0) {
@@ -354,7 +358,7 @@ static int dirdb_adding(dirdb *op,ustat *sbp,cchar *sp,int sl) noex {
 		}
 	    } /* end if (entry_start) */
 	    if (rs < 0) {
-	        uc_free(ep) ;
+	        lm_free(ep) ;
 	    }
 	} /* end if (m-a) */
 	return rs ;
@@ -384,7 +388,7 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if (nlen < 0) nlen = lenstr(name) ;
 	    if ((rs = mkpath1w(tbuf,name,nlen)) >= 0) {
 	        if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
@@ -404,7 +408,7 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	            rs = SR_OK ;
 	        }
 	    } /* end if (mkpath) */
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f : rs ;
@@ -413,13 +417,13 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 
 static int entry_start(dirdb_ent *ep,cc *sp,int sl,ustat *sbp,int count) noex {
 	int		rs = SR_FAULT ;
-	if (ep) {
+	if (ep) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(ep) ;
 	    ep->fid.ino = sbp->st_ino ;
 	    ep->fid.dev = sbp->st_dev ;
 	    ep->count = count ;
-	    if (cchar *cp ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) ylikely {
 	        ep->name = cp ;
 	    }
 	} /* end if (non-null) */
@@ -430,10 +434,11 @@ static int entry_start(dirdb_ent *ep,cc *sp,int sl,ustat *sbp,int count) noex {
 static int entry_finish(dirdb_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
-	    if (ep->name) {
-	        rs1 = uc_free(ep->name) ;
+	    if (ep->name) ylikely {
+	        void *vp = voidp(ep->name) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->name = nullptr ;
 	    }
