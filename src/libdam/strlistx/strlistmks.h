@@ -35,7 +35,7 @@ struct strlistmks_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		dummy ;
-} ;
+} ; /* end struct */
 
 struct strlistmks_flags {
 	uint		viopen:1 ;
@@ -45,7 +45,7 @@ struct strlistmks_flags {
 	uint		none:1 ;
 	uint		inprogress:1 ;
 	uint		fcreated:1 ;
-} ;
+} ; /* end struct */
 
 struct strlistmks_head {
 	cchar 		*dbname ;	/* data-base name */
@@ -59,7 +59,7 @@ struct strlistmks_head {
 	int		nstrs ;
 	int		nfd ;
 	mode_t		om ;
-} ;
+} ; /* end struct */
 
 typedef	STRLISTMKS	strlistmks ;
 typedef	STRLISTMKS_FL	strlistmks_fl ;
@@ -84,8 +84,7 @@ static inline int strlistmks_magic(strlistmks *op,Args ... args) noex {
 	    rs = (op->magic == STRLISTMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (strlistmks_magic) */
+} /* end subroutine (strlistmks_magic) */
 
 #endif /* __cplusplus */
 
