@@ -33,7 +33,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<nodedb.h>
 #include	<clusterdb.h>
 #include	<vecstr.h>
@@ -47,15 +48,14 @@
 struct sysnamedb_flags {
 	uint		node:1 ;
 	uint		clu:1 ;
-} ;
+} ; /* end struct */
 
 struct sysnamedb_head {
 	nodedb		*nlp ;		/* node-list-pointer */
 	clusterdb	*clp ;		/* cluster-list-pointer */
 	SYSNAMEDB_FL	fl ;
 	uint		magic ;
-} ;
-
+} ; /* end struct */
 
 typedef	SYSNAMEDB	sysnamedb ;
 typedef	SYSNAMEDB_FL	sysnamedb_fl ;
