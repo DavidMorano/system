@@ -23,7 +23,10 @@
 
 	Description:
 	This function removes a named UNIX® file-system object along
-	with all of its descendents (if any).
+	with all of its descendents (if any).  But besides a
+	basic removæl (deletion), this subroutine can "burn"
+	the file before deletion (a specified number of times
+	as desired).
 
 	Synopsis:
 	int removename(cchar *name,int rno,randomvar *rvp,int bc) noex
@@ -42,12 +45,13 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<wdt.h>
 #include	<vecpstr.h>
 #include	<randomvar.h>
@@ -82,7 +86,7 @@ struct remover_flags {
     	uint		randomvar:1 ;
 	uint		burn:1 ;
 	uint		follow:1 ;
-} ;
+} ; /* end struct */
 
 namespace {
     struct remover {
@@ -98,17 +102,18 @@ namespace {
 	} ;
 	int start(int) noex ;
 	int finish() noex ;
-	int decider(USTAT *) noex ;
+	int decider(ustat *) noex ;
 	int rmdirs() noex ;
-	int removeit(cchar *,USTAT *) noex ;
+	int removeit(cchar *,ustat *) noex ;
+	int removelink(cchar *,ustat *) noex ;
     } ; /* end struct (remover) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 extern "C" {
-    static int	remover_co(cchar *,USTAT *,void *) noex ;
+    local int	remover_co(cchar *,ustat *,void *) noex ;
 }
 
 
@@ -127,7 +132,7 @@ int removename(cchar *name,int rno,randomvar *rvp,int bcount) noex {
 	if (name) {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
-		if (USTAT sb ; (rs = u_lstat(name,&sb)) >= 0) {
+		if (ustat sb ; (rs = u_lstat(name,&sb)) >= 0) {
 		    remover	ro(name,rvp,bcount) ;
 		    if ((rs = ro.start(rno)) >= 0) {
 			{
@@ -174,7 +179,7 @@ int remover::finish() noex {
 }
 /* end method (remover::finish) */
 
-int remover::decider(USTAT *sbp) noex {
+int remover::decider(ustat *sbp) noex {
     	cint		vn = 10 ;
 	cint		vo = 0 ;
     	int		rs ;
@@ -185,7 +190,7 @@ int remover::decider(USTAT *sbp) noex {
 	    wopts |= ((fl.follow) ? WDT_MFOLLOW : 0) ;
 	    if (S_ISLNK(sbp->st_mode)) {
 	        if (fl.follow) {
-	            if (USTAT sbf ; (rs = u_stat(name,&sbf)) >= 0) {
+	            if (ustat sbf ; (rs = u_stat(name,&sbf)) >= 0) {
 			if (S_ISDIR(sbf.st_mode)) {
 	            	    rs = wdt(name,wopts,wuf,this) ;
 			} else {
@@ -215,29 +220,34 @@ int remover::decider(USTAT *sbp) noex {
 }
 /* end subroutine (remover::decider) */
 
-int remover::removeit(cchar *name,USTAT *sbp) noex {
+int remover::removelink(cchar *n,ustat *) noex {
+    	int		rs = SR_OK ;
+	if (fl.follow) {
+	    if (ustat sb2 ; (rs = u_stat(n,&sb2) >= 0)) {
+	        if (S_ISDIR(sb2.st_mode)) {
+	            rs = dirs.add(n) ;
+		} else {
+	            if ((rs = u_unlink(n)) >= 0) {
+	                crem += 1 ;
+		    }
+		} /* end if */
+	    } /* end if (u_stat) */
+	} /* end if (follow) */
+	return rs ;
+} /* end method (remover::removelink) */
+
+int remover::removeit(cchar *n,ustat *sbp) noex {
 	int		rs = SR_OK ;
 	if (S_ISLNK(sbp->st_mode)) {
-	    USTAT	sb2 ;
-	    bool	f = true ;
-	    f = f && fl.follow ;
-	    f = f && (u_stat(name,&sb2) >= 0) ;
-	    f = f && S_ISDIR(sb2.st_mode) ;
-	    if (f) {
-	        rs = dirs.add(name) ;
-	    } else {
-	        if ((rs = u_unlink(name)) >= 0) {
-	            crem += 1 ;
-		}
-	    } /* end if */
+	    rs = removelink(n,sbp) ;
 	} else if (S_ISDIR(sbp->st_mode)) {
-	    rs = dirs.add(name) ;
+	    rs = dirs.add(n) ;
 	} else {
 	    if (fl.burn && S_ISREG(sbp->st_mode)) {
-	        rs = burn(name,bcount,rvp) ;
+	        rs = burn(n,bcount,rvp) ;
 	    }
 	    if (rs >= 0) {
-	        if ((rs = u_unlink(name)) >= 0) {
+	        if ((rs = u_unlink(n)) >= 0) {
 	            crem += 1 ;
 		}
 	    } /* end if */
@@ -274,7 +284,7 @@ int remover::rmdirs() noex {
 }
 /* end method (remover::rmdirs) */
 
-static int remover_co(cchar *name,USTAT *sbp,void *vop) noex {
+local int remover_co(cchar *name,ustat *sbp,void *vop) noex {
     	remover		*op = (remover *) vop ;
 	return op->removeit(name,sbp) ;
 }
