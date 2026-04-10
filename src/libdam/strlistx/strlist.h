@@ -42,32 +42,32 @@ struct strlist_informtion {
 	time_t		mtime ;
 	uint		nstrlist ;
 	uint		nskip ;
-} ;
+} ; /* end struct */
 
 /* this is the shared-object description */
 struct strlist_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct strlist_cursor {
 	uint		chash ;		/* "check" hash for key */
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct strlist_filemap {
 	char		*mdata ;	/* file map */
 	time_t		ti_mod ;
 	time_t		ti_map ;
 	size_t		msize ;
-} ;
+} ; /* end struct */
 
 struct strlist_mapidx {
 	int		(*rt)[1] ;	/* mapped record table */
 	int		(*it)[3] ;	/* mapped key-index table */
 	char		*kst ;		/* mapped key-string table */
-} ;
+} ; /* end struct */
 
 struct strlist_head {
 	cchar 		*dbname ;
@@ -77,7 +77,7 @@ struct strlist_head {
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magic ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	STRLIST		strlist ;
 typedef	STRLIST_INFO	strlist_info ;
