@@ -21,11 +21,10 @@
 	gettid
 
   	Description:
-	Return the current Thread-ID (TID).
-
+	Return the current POSIX® Thread-ID (TID).
 
 	Synopsis:
-	int gettid(void) noex
+	pthread_t int gettid() noex
 
 	Arguments:
 	-		N/A
@@ -39,12 +38,21 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<upt.h>
 #include	<localmisc.h>
 
+#include	"gettid.h"
+
 
 /* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
