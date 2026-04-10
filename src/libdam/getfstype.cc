@@ -29,8 +29,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |u_fstype(3u)| */
 #include	<localmisc.h>
+
+#include	"getfstype.h"
 
 
 /* local defines */
