@@ -44,18 +44,18 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uinet.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<hostent.h>
 #include	<gethe.h>
+#include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
 #include	<strwcpy.h>
@@ -64,9 +64,9 @@
 #include	<isindomain.h>
 #include	<localmisc.h>
 
-#include	"nlspeername.h"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -162,7 +162,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	(void) al ;
 	if ((rs = cfhexui((ap + adv),8,&uv)) >= 0) {
 	    cint	family = int(uv) ;
-	    if (char *hebuf{} ; (rs = malloc_ho(&hebuf)) >= 0) {
+	    if (char *hebuf ; (rs = lm_ho(&hebuf)) >= 0) {
 	        ucentho		he ;
 		cint		helen = rs ;
 	        if ((rs = getheaddr(&he,hebuf,helen,ap)) >= 0) {
@@ -198,7 +198,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 			}
 	            } /* end if (gethostent_af) */
 	        } /* end if (getheaddr) */
-	        rs1 = uc_free(hebuf) ;
+	        rs1 = lm_free(hebuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a,-f) */
 	} /* end if (cfhexui) */
@@ -208,7 +208,7 @@ static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	if ((rs = getbufsize(bufsize_hn)) >= 0) ylikely {
 	    var.maxhostlen = rs ;
 	}
 	return rs ;
