@@ -18,6 +18,7 @@
 #ifndef LIBCX_INCLUDE
 #define	LIBCX_INCLUDE
 
+
 #include	<envstandards.h>	/* order first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
@@ -25,6 +26,9 @@
 #include	<usysdefs.h>
 
 #include	<ischartype.h>
+
+
+extern unixret_t	eaccess(cchar *,int) noex ;
 
 
 #endif	/* LIBCX_INCLUDE */
