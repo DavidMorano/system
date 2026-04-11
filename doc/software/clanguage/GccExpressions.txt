@@ -1,0 +1,17 @@
+GCC-Expressions
+--------------------------------------------------------------------------------
+
+
+#define	ABS(a)	({ int y = (a) ; int z ; \
+   				if (y > 0) { \
+				  z = (+y) ; \
+				} else { \
+				  z = (-y) ; \
+				} \
+   				z ; })
+
+int sub() noex {
+	return ABS(2) ;
+}
+/* end subroutine (sub) */
+
