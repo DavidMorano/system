@@ -22,10 +22,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<time.h>		/* clock defines */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
@@ -34,10 +31,10 @@ extern int uc_clockset(clockid_t,const TIMESPEC *) noex ;
 extern int uc_clockres(clockid_t,TIMESPEC *) noex ;
 extern int uc_clockget(clockid_t,TIMESPEC *) noex ;
 
-static inline int uc_clockreal(TIMESPEC *tsp) noex {
+local inline int uc_clockreal(TIMESPEC *tsp) noex {
     const clockid_t	cid = CLOCK_REALTIME ;
     return uc_clockget(cid,tsp) ;
-}
+} /* end subroutine (uc_clockreal) */
 
 EXTERNC_end
 
