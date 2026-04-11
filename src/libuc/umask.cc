@@ -32,7 +32,9 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<aflag.hh>
 #include	<timewatch.hh>
 #include	<sigblocker.h>
@@ -158,14 +160,14 @@ int umasker::init() noex {
 	        if ((rs = mx.create) >= 0) {
 	            void_f	b = umask_atforkbefore ;
 	            void_f	a = umask_atforkafter ;
-	            if ((rs = uc_atfork(b,a,a)) >= 0) {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 			void_f	e = umask_exit ;
 	                if ((rs = uc_atexit(e)) >= 0) {
 	    	            finitdone = true ;
 		            f = true ;
 		        }
 		        if (rs < 0) {
-		            uc_atforkexpunge(b,a,a) ;
+		            uc_atforkexp(b,a,a) ;
 			}
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
@@ -200,7 +202,7 @@ int umasker::fini() noex {
 	    {
 	        void_f	b = umask_atforkbefore ;
 	        void_f	a = umask_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
