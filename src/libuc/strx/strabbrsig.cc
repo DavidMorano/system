@@ -52,6 +52,19 @@
 
 #define	SIGABBR		struct sigabbr
 
+#if	defined(_SIGRTMIN) && defined(_SIGRTMAX)
+#define	F_SIGRT		1
+#else
+#define	F_SIGRT		1
+#endif /* SIGRTXXX */
+
+#ifndef	_SIGRTMIN
+#define	_SIGRTMIN	0
+#endif
+#ifndef	_SIGRTMAX
+#define	_SIGRTMAX	0
+#endif
+
 
 /* imported namespaces */
 
@@ -70,7 +83,7 @@
 struct sigabbr {
 	int		n ;
 	cchar		*s ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -135,6 +148,8 @@ constexpr sigabbr	cvts[] = {
 	{ -1, nullptr }
 } ; /* end array (cvts) */
 
+cbool		f_sigrt		= F_SIGRT ;
+
 
 /* exported variables */
 
@@ -143,13 +158,11 @@ constexpr sigabbr	cvts[] = {
 
 const char *strabbrsig(int n) noex {
 	cchar		*s = nullptr ;
-
-#if	defined(_SIGRTMIN) && defined(_SIGRTMAX)
-	if ((n > _SIGRTMIN) && (n < _SIGRTMAX)) {
-	    s = "RTXXX" ;
-	}
-#endif /* SIGRTXXX */
-
+	if_constexpr (f_sigrt) {
+	    if ((n > _SIGRTMIN) && (n < _SIGRTMAX)) {
+	        s = "RTXXX" ;
+	    }
+	} /* end if_constexpr (f_sigrt) */
 	if (s == nullptr) {
 	    for (int i = 0 ; cvts[i].n >= 0 ; i += 1) {
 	        if (cvts[i].n == n) {
@@ -158,7 +171,6 @@ const char *strabbrsig(int n) noex {
 	        }
 	    } /* end for */
 	} /* end if */
-
 	return s ;
 }
 /* end subroutine (strabbrsig) */
