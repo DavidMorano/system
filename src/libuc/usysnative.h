@@ -34,6 +34,7 @@
 #include	<sys/types.h>
 #include	<sys/uio.h>
 #include	<sys/utsname.h>
+#include	<sys/select.h>		/* |u_select(3u)| */
 
 #include	<sys/shm.h>		/* UNIX® Sys-V IPC - Shared-Memory */
 #include	<sys/msg.h>		/* UNIX® Sys-V IPC - Message-Queues */
