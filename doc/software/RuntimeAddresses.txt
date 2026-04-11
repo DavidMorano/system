@@ -1,0 +1,41 @@
+RuntimeAddresses
+-----------------
+
+synbol		Darwin-alternative	description
+--------------------------------------------------------------------------------
+stext		_stext			start-of-text (not always provided)
+etext		_etext			end-of-text
+edata		_edata			end-of-data
+end		_end			end-of-program
+
+
+= Markers
+
+| Platform | Compiler    | Section attribute syntax                    |
+| -------- | ----------- | ------------------------------------------- |
+| macOS    | Clang & GCC | `__attribute__((section("__TEXT,__text")))` |
+| Linux    | Clang & GCC | `__attribute__((section(".text")))`         |
+
+
+Sample code:
+
+#include <stdio.h>
+
+__attribute__((section("__TEXT,__text")))
+static const char marker[] = "End of text marker";
+
+int main() {
+    printf("Marker is at address: %p\n", (void*)marker);
+    return 0;
+}
+
+
+Creating markers:
+
+__attribute__((section("__DATA,mysect"))) char start_marker = 0;
+__attribute__((section("__DATA,mysect"))) char end_marker = 0;
+
+printf("My section starts at: %p\n", &start_marker);
+printf("My section ends at:   %p\n", &end_marker);
+
+
