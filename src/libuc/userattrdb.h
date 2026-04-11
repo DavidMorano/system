@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 2001-06-05, David A­D­ Morano
+	= 1998-05-07, David A­D­ Morano
 	I wrote this so that both the old UDOMAIN facility and the
 	newer user-attribute database capability of Sun Solaris®
 	2.6 (first that I have seen of it) can be included into a
@@ -23,14 +23,15 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	USERATTRDB_INCLUDE
 #define	USERATTRDB_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<userattr.h>		/* <- money shot */
 
 
@@ -42,7 +43,7 @@
 struct userattrdb_flags {
 	uint		sysdb:1 ;	/* OS database */
 	uint		udomain:1 ;	/* UDOMAIN database */
-} ;
+} ; /* end struct (userattrdb_flags) */
 
 struct userattrdb_head {
 	cchar		*username ;	/* passed argument */
@@ -50,14 +51,14 @@ struct userattrdb_head {
 	userattr	*uap ;		/* returned (allocated) */
 	uint		magic ;
 	USERATTRDB_FL	init, have ;
-} ;
+} ; /* end struct (userattrdb_head) */
 
 #ifdef	__cplusplus
 enum userattrdbmems {
 	userattrdbmem_count,
 	userattrdbmem_close,
 	userattrdbmem_overlast
-} ;
+} ; /* end enum (userattrdbmems) */
 struct userattrdb ;
 struct userattrdb_co {
 	userattrdb	*op = nullptr ;
@@ -95,10 +96,10 @@ typedef	USERATTRDB_FL	userattrdb_fl ;
 
 EXTERNC_begin
 
-extern int userattrdb_open(userattrdb *,cchar *) noex ;
-extern int userattrdb_lookup(userattrdb *,char *,int,cchar *) noex ;
-extern int userattrdb_count(userattrdb *) noex ;
-extern int userattrdb_close(userattrdb *) noex ;
+extern int userattrdb_open	(userattrdb *,cchar *) noex ;
+extern int userattrdb_lookup	(userattrdb *,char *,int,cchar *) noex ;
+extern int userattrdb_count	(userattrdb *) noex ;
+extern int userattrdb_close	(userattrdb *) noex ;
 
 EXTERNC_end
 
