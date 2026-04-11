@@ -23,7 +23,10 @@
 #include	<fcntl.h>
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<usystem.h>
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
@@ -35,11 +38,16 @@
 
 /* exported subroutines */
 
-int u_fstat(int fd,USTAT *sbp) noex {
-	int		rs ;
-	repeat {
-	    if ((rs = fstat(fd,sbp)) < 0) rs = (- errno) ;
-	} until (rs != SR_INTR) ;
+int u_fstat(int fd,ustat *sbp) noex {
+	int		rs = SR_FAULT ;
+	if (sbp) {
+	    rs = SR_BADFD ;
+	    if (fd >= 0) {
+	        repeat {
+	            if ((rs = fstat(fd,sbp)) < 0) rs = (- errno) ;
+	        } until (rs != SR_INTR) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (u_fstat) */
