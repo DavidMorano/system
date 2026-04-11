@@ -1,0 +1,15 @@
+UNIXPIPE
+
+	Notes:
+	In the old days (or on many BSD type UNIX® systems to the
+	present day, and on Linux) the two resulting pipe ends from
+	|pipe(2)| were unidirectional as follows:
+
+	end	access
+	---------------
+	0	reading
+	1	writing
+
+	With the advent of System V UNIX® (officiially in 1984 or
+	earlier) both ends are bidirectional.
+
