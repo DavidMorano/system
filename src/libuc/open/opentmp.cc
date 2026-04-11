@@ -62,10 +62,14 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucsysmisc.h>		/* |uc_gettimeofday(3uc)| */
 #include	<ucgetpid.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
+#include	<aflag.hh>
+#include	<filetypes.h>
 #include	<sigblocker.h>
 #include	<sockaddress.h>
 #include	<pathadd.h>
@@ -79,6 +83,7 @@
 
 #include	"opentmp.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -102,6 +107,37 @@ typedef SOCKADDR *	sockaddrp ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_mkdir(cchar *,mode_t) noex ;
+    extern int uc_mkfifo(cchar *,mode_t) noex ;
+    extern int uc_chmod(cchar *,mode_t) noex ;
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_unlink(cchar *) noex ;
+    extern int uc_unlinkshm(cchar *) noex ;
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_socket(int,int,int) noex ;
+    extern int uc_openshm(cchar *,int,mode_t) noex ;
+    extern int uc_duper(int,int) noex ;
+    extern int uc_pipe(int *) noex ;
+    extern int uc_bind(int,cvoid *,int) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_fchown(int,uid_t,gid_t) noex ;
+    extern int uc_fminmod(int,mode_t) noex ;
+    extern int uc_connect(int,cvoid *,int) noex ;
+    extern int uc_connecte(int,cvoid *,int,int) noex ;
+    extern int uc_read(int,void *,int) noex ;
+    extern int uc_write(int,cvoid *,int) noex ;
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_iocctl(int,int,...) noex ;
+    extern int uc_rewind(int) noex ;
+    extern int uc_ftruncate(int,off_t ) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_fpathconf(int,int,char *) noex ;
+    extern int uc_setsockopt(int,int,int,int *,int) noex ;
+    extern int uc_linger(int,int) noex ;
+    extern int uc_close(int) ;
+} /* end extern */
 
 
 /* external variables */
@@ -145,23 +181,23 @@ namespace {
 	int oreg() noex ;
 	int osock() noex ;
     } ; /* end struct (openmgr) */
-}
+} /* end namespace */
 
 namespace {
     struct vars {
 	int		maxpathlen ;
 	operator int () noex ;
     } ;
-}
+} /* end namespace */
 
 
 /* forward reference */
 
-static int	opentmpx(cchar *,int,mode_t,int,char *) noex ;
-static int	opentmpxer(cchar *,int,mode_t,int,char *) noex ;
-static int	randload(ulong *) noex ;
-static int	substr(char *,int,ulong) noex ;
-static int	mkvarsx() noex ;
+local int	opentmpx(cchar *,int,mode_t,int,char *) noex ;
+local int	opentmpxer(cchar *,int,mode_t,int,char *) noex ;
+local int	randload(ulong *) noex ;
+local int	substr(char *,int,ulong) noex ;
+local int	mkvarsx() noex ;
 
 
 /* local variables */
@@ -204,15 +240,19 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	int		rs = SR_INVALID ;
 	int		rs1 ;
 	int		fd = -1 ;
-	of &= (~ O_ACCMODE) ;
-	of |= O_RDWR ;
-	om |= 0600 ;
-	if (dname == nullptr) dname = val_tmpdir ;
+	{
+	    of &= (~ O_ACCMODE) ;
+	    of |= O_RDWR ;
+	    om |= 0600 ;
+	}
+	if (dname == nullptr) {
+	    dname = val_tmpdir ;
+	}
 	if (dname && dname[0] && (of >= 0)) {
 	    if ((rs = mkvarsx()) >= 0) {
 		cint	maxpath = rs ;
 		cint	sz = (2 * (var.maxpathlen + 1)) ;
-		if (char *a{} ; (rs = uc_malloc(sz,&a)) >= 0) {
+		if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 	            char	*ibuf = (a) ;
 	            char	*obuf = (a + (maxpath + 1)) ;
 	            if ((rs = mkpath(ibuf,dname,platename)) >= 0) {
@@ -229,7 +269,7 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (sigblock) */
 	            } /* end if (mkpath) */
-	            rs1 = uc_free(a) ;
+	            rs1 = lm_free(a) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (mkvarsx) */
@@ -242,14 +282,14 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 
 /* local subroutines */
 
-static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
+local int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
 	if (inname && obuf) {
 	    rs = SR_INVALID ;
 	    if (inname[0] && (of >= 0) && (opt >= 0)) {
-	        if (char *pbuf ; (rs = malloc_mp(&pbuf)) >= 0) {
+	        if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
 	            if ((rs = mkpathexp(pbuf,inname,-1)) > 0) {
 		        rs = opentmpxer(pbuf,of,om,opt,obuf) ;
 		        fd = rs ;
@@ -257,7 +297,7 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 		        rs = opentmpxer(inname,of,om,opt,obuf) ;
 		        fd = rs ;
 	            }
-	            rs1 = uc_free(pbuf) ;
+	            rs1 = lm_free(pbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 		if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
@@ -267,7 +307,7 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 }
 /* end subroutine (opentmpx) */
 
-static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
+local int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
 	if (inname && obuf) {
@@ -357,7 +397,7 @@ int openmgr::dirload() noex {
 int openmgr::obufbegin() noex {
 	int		rs = SR_OK ;
 	if (obuf == nullptr) {
-	    if ((rs = malloc_mp(&obuf)) >= 0) {
+	    if ((rs = lm_mp(&obuf)) >= 0) {
 		obuf[0] = '\0' ;
 		falloc = true ;
 	    }
@@ -371,7 +411,7 @@ int openmgr::obufend() noex {
 	int		rs1 ;
 	if (falloc && obuf) {
 	    obuf[0] = '\0' ;
-	    rs1 = uc_free(obuf) ;
+	    rs1 = lm_free(obuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    obuf = nullptr ;
 	    falloc = false ;
@@ -508,7 +548,7 @@ int openmgr::osock() noex {
 }
 /* end method (openmgr::osock) */
 
-static int randload(ulong *rvp) noex {
+local int randload(ulong *rvp) noex {
 	int		rs = SR_FAULT ;
 	if (rvp) {
 	    cnullptr	np{} ;
@@ -537,7 +577,7 @@ static int randload(ulong *rvp) noex {
 /* end subroutine (randload) */
 
 /* load buffer w/ random HEX digits (16 bytes) from random variable (8 bytes) */
-static int substr(char *dp,int dl,ulong rv) noex {
+local int substr(char *dp,int dl,ulong rv) noex {
 	cint		randlen = RANDBUFLEN ;
 	int		rs ;
 	char		randbuf[RANDBUFLEN+1] ;
@@ -555,7 +595,7 @@ static int substr(char *dp,int dl,ulong rv) noex {
 }
 /* end subroutine (substr) */
 
-static int mkvarsx() noex {
+local int mkvarsx() noex {
 	static cint	rsv = var ;
 	return rsv ;
 }
@@ -563,7 +603,7 @@ static int mkvarsx() noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	}
 	return rs ;
