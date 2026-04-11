@@ -28,6 +28,17 @@
 
 EXTERNC_begin
 
+extern int	uc_bind(int,cvoid *,int) noex ;
+extern int	uc_connect(int,cvoid *,int) noex ;
+extern int	uc_connecte(int,cvoid *,int,int) noex ;
+extern int	uc_setsockopt(int,int,int,int *,int) noex ;
+extern int	uc_linger(int,int) noex ;
+extern int	uc_recve(int,void *,int,int,int,int) noex ;
+extern int	uc_recvfrome(int,void *,int,int,void *,int *,int,int) noex ;
+extern int	uc_recvmsge(int,MSGHDR *,int,int,int) noex ;
+extern int	uc_sockatmark(int) noex ;
+extern int	uc_getsocktype(int) noex ;
+
 extern int uc_sockjoin(int,SOCKADDR *,int,int,mode_t) noex ;
 extern int uc_sockreuse(int) noex ;
 
