@@ -1,0 +1,127 @@
+DuffNulSearch
+
+Search for NUL character:
+--------------------------------------------------------------------------------
+
+const char* strchrnul_word_at_a_time(const char* s) {
+    // Phase 1: Handle alignment and potential NUL at the beginning
+    const char* start = s;
+    uintptr_t s_int = (uintptr_t)s;
+
+    // Check first byte or if pointer is NULL
+    if (!s || *s == '\0') {
+        return s;
+    }
+
+    // Align the pointer
+    while (s_int % sizeof(uint64_t) != 0) {
+        if (*s == '\0') {
+            return s;
+        }
+        s++;
+        s_int++;
+    }
+
+    // Phase 2: Word-at-a-time search
+    const uint64_t* word_ptr = (const uint64_t*)s;
+    const uint64_t magic_const = 0x0101010101010101ULL;
+
+    while (true) {
+        uint64_t word = *word_ptr;
+
+        // The bitwise trick
+        if (((word - magic_const) & ~word) & 0x8080808080808080ULL) {
+            // NUL byte found in this word
+            break;
+        }
+        word_ptr++;
+    }
+
+    // Phase 3: Byte-by-byte validation to find the exact location
+    s = (const char*)word_ptr;
+    while (*s != '\0') {
+        s++;
+    }
+
+    return s;
+}
+--------------------------------------------------------------------------------
+
+
+Search for arbitrary (non-NUL) character:
+--------------------------------------------------------------------------------
+
+const char* strchr_word_at_a_time(const char* s, int c) {
+    // Phase 1: Handle alignment and potential character at the beginning
+    const char* start = s;
+    uintptr_t s_int = (uintptr_t)s;
+    unsigned char uc = (unsigned char)c;
+
+    // Check first byte or if pointer is NULL
+    if (!s) {
+        return NULL;
+    }
+    if (*s == uc) {
+        return s;
+    }
+    if (*s == '\0') {
+        return (uc == '\0') ? s : NULL;
+    }
+
+    // Align the pointer
+    while (s_int % sizeof(uint64_t) != 0) {
+        s++;
+        s_int++;
+        if (*s == uc) return s;
+        if (*s == '\0') return (uc == '\0') ? s : NULL;
+    }
+
+    // Phase 2: Word-at-a-time search
+    const uint64_t* word_ptr = (const uint64_t*)s;
+    const uint64_t magic_const = 0x0101010101010101ULL;
+
+    // Create a magic mask for the target character 'c'
+    uint64_t magic_mask = (unsigned char)c;
+    magic_mask |= magic_mask << 8;
+    magic_mask |= magic_mask << 16;
+    magic_mask |= magic_mask << 32;
+
+    while (true) {
+        uint64_t word = *word_ptr;
+
+        // Check for NUL byte
+        if (((word - magic_const) & ~word) & 0x8080808080808080ULL) {
+            // NUL byte found in this word
+            break;
+        }
+
+        // Check for target character 'c'
+        uint64_t xored_word = word ^ magic_mask;
+        if (((xored_word - magic_const) & ~xored_word) & 
+		0x8080808080808080ULL) {
+            // Target character found in this word
+            break;
+        }
+
+        word_ptr++;
+    }
+
+    // Phase 3: Byte-by-byte validation to find the exact location
+    s = (const char*)word_ptr;
+    while (*s != '\0') {
+        if (*s == uc) {
+            return s;
+        }
+        s++;
+    }
+
+    // Target character not found, return NULL
+    if (uc == '\0') {
+        return s;
+    }
+    return NULL;
+}
+
+--------------------------------------------------------------------------------
+
+
