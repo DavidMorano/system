@@ -33,15 +33,20 @@
 	Returns:
 	-		character-string representation of system-error return
 
+	Notes:
+	I make no attænpt to put any kind of mutex-lock on the
+	static buffer.  he current API does not allow for it in any
+	case.  No major harm is done if some races occurs.
+
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>		/* |ctdec(3u)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DECBUFLEN| */
 
 #include	"strabbrerr.h"
 
@@ -236,8 +241,8 @@ constexpr sysret		cvts[] = {
 	{ SR_OK,		"OK" }
 } ; /* end array (cvts) */
 
-cint		oklen = DIGBUFLEN ;
-char		okbuf[DIGBUFLEN+1] ;
+static cint		oklen = DECBUFLEN ;
+static char		okbuf[DECBUFLEN+1] ;
 
 
 /* exported variables */
