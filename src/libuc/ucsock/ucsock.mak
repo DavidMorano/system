@@ -1,4 +1,4 @@
-# MAKEFILES (ucsock)
+# MAKEFILE (ucsock)
 
 T= ucsock
 
