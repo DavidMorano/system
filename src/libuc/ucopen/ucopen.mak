@@ -1,4 +1,4 @@
-# MAKEFILES (ucopen)
+# MAKEFILE (ucopen)
 
 T= ucopen
 
