@@ -30,7 +30,8 @@
 #include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sockaddress.h>
 #include	<stdorder.h>
 #include	<serialbuf.h>
