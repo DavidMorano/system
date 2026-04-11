@@ -5,11 +5,10 @@
 /* user-attribute database management */
 /* version %I% last-modified %G% */
 
-#define	CF_UDOMAIN	0		/* call |udomain(3dam)| */
 
 /* revision history:
 
-	= 2001-06-05, David A­D­ Morano
+	= 1998-05-07, David A­D­ Morano
 	I wrote this so that both the old UDOMAIN facility and the
 	newer user-attribute database capability of Sun Solaris®
 	2.6 (first that I have seen of it) can be included into a
@@ -24,7 +23,7 @@
 
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -59,19 +58,22 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
-#include	<localmisc.h>
-#include	<bufsizevar.hh>
-#include	<mallocxx.h>
-#include	<udomain.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ulogerror.h>
+#include	<uclibmem.h>
+#include	<uckvamatch.h>
+#include	<ucuserattr.h>		/* |uc_userattr{x})(3uc)| */
 #include	<matstr.h>
 #include	<sncpyx.h>
+#include	<userattr.h>		/* <- money shot */
 #include	<localmisc.h>
 
-#include	"userattr.h"		/* <- money shot */
 #include	"userattrdb.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* lenstr(3u)| */
 
 /* local defines */
 
@@ -106,7 +108,7 @@ typedef userattrdb	uad ;
 template<typename ... Args>
 static inline int userattrdb_ctor(userattrdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 	    op->magic = 0 ;
 	    op->init = {} ;
@@ -114,33 +116,31 @@ static inline int userattrdb_ctor(userattrdb *op,Args ... args) noex {
 	    op->username = nullptr ;
 	    op->domain = nullptr ;
 	    op->uap = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine (userattrdb_ctor) */
 
 static inline int userattrdb_dtor(userattrdb *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (userattrdb_dtor) */
+} /* end subroutine (userattrdb_dtor) */
 
 template<typename ... Args>
 static int userattrdb_magic(userattrdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == USERATTRDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine (userattrdb_magic) */
 
 static int	userattrdb_opensysdb(uad *) noex ;
 static int	userattrdb_sysdb(uad *,char *,int,const char *) noex ;
 
 static int	userattrdb_openudomain(uad *) noex ;
-static int	userattrdb_ud(uad *,char *,int) noex ;
 
 
 /* local variables */
@@ -150,8 +150,6 @@ static cpcchar	specials[] = {
 	nullptr
 } ;
 
-constexpr bool	f_udomain = CF_UDOMAIN ;
-
 
 /* exported variables */
 
@@ -160,9 +158,9 @@ constexpr bool	f_udomain = CF_UDOMAIN ;
 
 int userattrdb_open(uad *op,cchar *username) noex {
 	int		rs ;
-	if ((rs = userattrdb_ctor(op,username)) >= 0) {
+	if ((rs = userattrdb_ctor(op,username)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (username[0]) {
+	    if (username[0]) ylikely {
 		rs = SR_OK ;
 	        op->username = username ;
 	        op->magic = USERATTRDB_MAGIC ;
@@ -178,13 +176,14 @@ int userattrdb_open(uad *op,cchar *username) noex {
 int userattrdb_close(uad *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = userattrdb_magic(op)) >= 0) {
-	    if (op->domain) {
-	        rs1 = uc_free(op->domain) ;
+	if ((rs = userattrdb_magic(op)) >= 0) ylikely {
+	    if (op->domain) ylikely {
+		void *vp = voidp(op->domain) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->domain = nullptr ;
 	    }
-	    if (op->uap) {
+	    if (op->uap) ylikely {
 	        rs1 = uc_userattrfree(op->uap) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->uap = nullptr ;
@@ -201,17 +200,11 @@ int userattrdb_close(uad *op) noex {
 
 int userattrdb_lookup(uad *op,char *rbuf,int rlen,cchar *keyname) noex {
 	int		rs ;
-	if ((rs = userattrdb_magic(op,keyname)) >= 0) {
+	if ((rs = userattrdb_magic(op,keyname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (keyname[0]) {
+	    if (keyname[0]) ylikely {
 	        rbuf[0] = '\0' ;
 	        rs = userattrdb_sysdb(op,rbuf,rlen,keyname) ;
-		if_constexpr (f_udomain) {
-		    cint	rsn = SR_NOTOPEN ;
-	            if ((rs == rsn) && (matstr(specials,keyname,-1) >= 0)) {
-	                rs = userattrdb_ud(op,rbuf,rlen) ;
-	            }
-		} /* end if_constexpr (f_udomain) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -220,7 +213,7 @@ int userattrdb_lookup(uad *op,char *rbuf,int rlen,cchar *keyname) noex {
 
 int userattrdb_count(uad *op) noex {
     	int		rs ;
-	if ((rs = userattrdb_magic(op)) >= 0) {
+	if ((rs = userattrdb_magic(op)) >= 0) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -260,14 +253,14 @@ static int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 	if (! op->init.sysdb) {
 	    rs = userattrdb_opensysdb(op) ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    if (op->have.sysdb) {
 	        cchar	*cp{} ;
 		if ((rs = uc_kvamatch(op->uap->attr,kn,&cp)) >= 0) {
 		    if (rbuf) {
 		        rs = sncpy1(rbuf,rlen,cp) ;
 		    } else {
-		        rs = strlen(cp) ;
+		        rs = lenstr(cp) ;
 		    }
 	        } /* end if (successful lookup) */
 	    } else {
@@ -277,44 +270,6 @@ static int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 	return rs ;
 }
 /* end subroutine (userattrdb_sysdb) */
-
-[[maybe_unused]] static int userattrdb_ud(uad *op,char *rbuf,int rlen) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	if (! op->init.udomain) {
-	    rs = userattrdb_openudomain(op) ;
-	}
-	if (rs >= 0) {
-	    if (op->have.sysdb) {
-	        if (op->domain) {
-		    cchar	*pr = nullptr ;
-		    cchar	*un = op->username ;
-	            if (char *dbuf{} ; (rs = malloc_hn(&dbuf)) >= 0) {
-		        cint	dlen = rs ;
-	                if ((rs = udomain(pr,dbuf,dlen,un)) >= 0) {
-			    cchar	*cp ;
-		            if ((rs = uc_mallocstrw(dbuf,rs,&cp)) >= 0) {
-			        op->domain = cp ;
-			    }
-		        } /* end if (udomain) */
-			rs1 = uc_free(dbuf) ;
-			if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-		} /* end if (domain) */
-	        if ((rs >= 0) && op->domain) {
-		    if (rbuf) {
-		        rs = sncpy(rbuf,rlen,op->domain) ;
-		    } else {
-		        rs = strlen(op->domain) ;
-		    }
-	        } /* end if (successful lookup) */
-	    } else {
-	        rs = SR_NOTFOUND ;
-	    }
-	} /* end if (ok) */
-	return rs ;
-}
-/* end subroutine (userattrdb_ud) */
 
 int userattrdb::open(cchar *un) noex {
 	return userattrdb_open(this,un) ;
@@ -332,7 +287,7 @@ void userattrdb::dtor() noex {
 
 userattrdb_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case userattrdbmem_count:
 	        rs = userattrdb_count(op) ;
