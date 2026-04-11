@@ -97,8 +97,8 @@
 	implementation consisting of |openqotd_capbegin()| and
 	|openqotd_capend()|.
 
-	Q. Why didn't we just use |ptm_lock()| and |ptm_unloc()| as
-	our mutual-exclusion lock around |lockfile()|?
+	Q. Why did not we just use |ptm_lockbegin()| and |ptm_lockend()|
+	as our mutual-exclusion lock around |lockfile()|?
 	A. Because:
 	a. it is not a good idea to put POSIX® mutexes around a large
 	piece of code (that calls unknown subroutines)
@@ -120,9 +120,15 @@
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<csignal>		/* |sig_atomic_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucfork.h>
+#include	<ucatfork.h>
+#include	<ucatexit.h>
+#include	<ucwrite.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<tmtime.hh>
@@ -141,7 +147,9 @@
 #include	"maintqotd.h"
 #include	"openqotd.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -167,6 +175,40 @@ typedef volatile sig_atomic_t	vaflag ;
 /* external subroutines */
 
 extern "C" {
+    extern int uc_mkdir(cchar *,mode_t) noex ;
+    extern int uc_mkfifo(cchar *,mode_t) noex ;
+    extern int uc_chmod(cchar *,mode_t) noex ;
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_unlink(cchar *) noex ;
+    extern int uc_unlinkshm(cchar *) noex ;
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_socket(int,int,int) noex ;
+    extern int uc_sockjoin(int,SOCKADDR *,int,int,mode_t) noex ;
+    extern int uc_openshm(cchar *,int,mode_t) noex ;
+    extern int uc_duper(int,int) noex ;
+    extern int uc_pipe(int *) noex ;
+    extern int uc_bind(int,cvoid *,int) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_fsize(int) noex ;
+    extern int uc_fchown(int,uid_t,gid_t) noex ;
+    extern int uc_fminmod(int,mode_t) noex ;
+    extern int uc_connect(int,cvoid *,int) noex ;
+    extern int uc_connecte(int,cvoid *,int,int) noex ;
+    extern int uc_lockf(int,int,off_t) noex ;
+    extern int uc_read(int,void *,int) noex ;
+    extern int uc_write(int,cvoid *,int) noex ;
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_iocctl(int,int,...) noex ;
+    extern int uc_rewind(int) noex ;
+    extern int uc_ftruncate(int,off_t ) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_fpathconf(int,int,char *) noex ;
+    extern int uc_setsockopt(int,int,int,int *,int) noex ;
+    extern int uc_linger(int,int) noex ;
+    extern int uc_close(int) ;
+} /* end extern */
+
+extern "C" {
     int	openqotd_init() noex ;
     int	openqotd_fini() noex ;
 }
@@ -178,8 +220,8 @@ extern "C" {
 /* local structures */
 
 struct openqotd_head {
-	ptm		m ;		/* data mutex */
-	ptc		c ;		/* condition variable */
+	ptm		mx ;		/* data mutex */
+	ptc		cn ;		/* condition variable */
 	volatile int	waiters ;
 	vaflag		f_capture ;	/* capture flag */
 	vaflag		f_init ;
@@ -230,7 +272,7 @@ extern "C" {
 /* local variables */
 
 static OPENQOTD		openqotd_data ;
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
@@ -242,30 +284,34 @@ int openqotd_init() noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	int		rs = 1 ;
 	if (! uip->f_init) {
+	    ptm *mxp = &uip->mx ;
 	    uip->f_init = true ;
-	    if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
-	        if ((rs = ptc_create(&uip->c,nullptr)) >= 0) {
+	    if ((rs = mxp->create) >= 0) {
+		ptc *cnp = &uip->cn ;
+	        if ((rs = cnp->create) >= 0) {
 	    	    void_f	b = openqotd_atforkbefore ;
 	    	    void_f	a = openqotd_atforkafter ;
-	            if ((rs = uc_atfork(b,a,a)) >= 0) {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(openqotd_exit)) >= 0) {
 	                    rs = 0 ;
 	                    uip->f_initdone = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexpunge(b,a,a) ;
+	                    uc_atforkexp(b,a,a) ;
 			}
 	            }
 	            if (rs < 0) {
-	                ptc_destroy(&uip->c) ;
+	                cnp->destroy() ;
 		    }
 	        } /* end if (ptc_create) */
 	        if (rs < 0) {
-	            ptm_destroy(&uip->m) ;
+	            mxp->destroy() ;
 		}
 	    } /* end if (ptm_create) */
 	} else {
-	    while (! uip->f_initdone) msleep(1) ;
+	    while (! uip->f_initdone) {
+		msleep(1) ;
+	    }
 	}
 	return rs ;
 }
@@ -281,15 +327,17 @@ int openqotd_fini() noex {
 	    {
 	        void_f	b = openqotd_atforkbefore ;
 	        void_f	a = openqotd_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptc_destroy(&uip->c) ;
+		ptc *cnp = &uip->cn ;
+	        rs1 = cnp->destroy() ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(&uip->m) ;
+	        ptm *mxp = &uip->mx ;
+	        rs1 = mxp->destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    memclear(uip) ;
@@ -323,7 +371,7 @@ int openqotd(cchar *pr,int mjd,int of,int to) noex {
 	                rs = qotdexpire(vtd,rnp,rnl,cn,dt,to) ;
 	            }
 	            if (rs >= 0) {
-			if (char *qfname ; (rs = malloc_mp(&qfname)) >= 0) {
+			if (char *qfname ; (rs = lm_mp(&qfname)) >= 0) {
 			    auto	mk = mkqfname ;
 	                    if ((rs = mk(qfname,vtd,rnp,rnl,cn,mjd)) >= 0) {
 	                        {
@@ -345,7 +393,7 @@ int openqotd(cchar *pr,int mjd,int of,int to) noex {
 	                        }
 	                        if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	                    } /* end if (mkqfname) */
-			    rs1 = uc_free(qfname) ;
+			    rs1 = lm_free(qfname) ;
 			    if (rs >= 0) rs = rs1 ;
 		        } /* end if (m-a-f) */
 	            } /* end if (ok) */
@@ -365,16 +413,20 @@ static int openqotd_capbegin(int to) noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lockto(&uip->m,to)) >= 0) {
-	    uip->waiters += 1 ;
-	    while ((rs >= 0) && uip->f_capture) { /* busy */
-	        rs = ptc_waiter(&uip->c,&uip->m,to) ;
-	    } /* end while */
-	    if (rs >= 0) {
-	        uip->f_capture = true ;
-	    }
-	    uip->waiters -= 1 ;
-	    rs1 = ptm_unlock(&uip->m) ;
+	ptm *mxp = &uip->mx ;
+	if ((rs = mxp->lockbegin(to)) >= 0) {
+	    {
+	        ptc *cnp = &uip->cn ;
+	        uip->waiters += 1 ;
+	        while ((rs >= 0) && uip->f_capture) { /* busy */
+	            rs = cnp->wait(mxp,to) ;
+	        } /* end while */
+	        if (rs >= 0) {
+	            uip->f_capture = true ;
+	        }
+	        uip->waiters -= 1 ;
+	    } /* end block */
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -385,12 +437,16 @@ static int openqotd_capend() noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptm_lock(&uip->m)) >= 0) {
-	    uip->f_capture = false ;
-	    if (uip->waiters > 0) {
-	        rs = ptc_signal(&uip->c) ;
-	    }
-	    rs1 = ptm_unlock(&uip->m) ;
+	ptm *mxp = &uip->mx ;
+	if ((rs = mxp->lockbegin) >= 0) {
+	    {
+		ptc *cnp = &uip->cn ;
+	        uip->f_capture = false ;
+	        if (uip->waiters > 0) {
+	            rs = cnp->signal ;
+	        }
+	    } /* end block */
+	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -410,7 +466,7 @@ static int openqotd_open(OPENQOTD_SUB *sip) noex {
 	    cchar	*qfname = sip->qfname ;
 	    cchar	*vtmpdname = sip->vtmpdname ;
 	    cchar	*qcname = sip->qcname ;
-	    if (char *qdname ; (rs = malloc_mp(&qdname)) >= 0) {
+	    if (char *qdname ; (rs = lm_mp(&qdname)) >= 0) {
 	        if ((rs = prmktmpdir(pr,qdname,vtmpdname,qcname,dm)) >= 0) {
 	            cint	mjd = sip->mjd ;
 	            cint	of = sip->of ;
@@ -418,7 +474,7 @@ static int openqotd_open(OPENQOTD_SUB *sip) noex {
 	            rs = qotdfetch(pr,mjd,of,ttl,qfname) ;
 	            fd = rs ;
 	        } /* end if (prmktmpdir) */
-		rs1 = uc_free(qdname) ;
+		rs1 = lm_free(qdname) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (NOENT) */
@@ -428,13 +484,19 @@ static int openqotd_open(OPENQOTD_SUB *sip) noex {
 
 static void openqotd_atforkbefore() noex {
 	OPENQOTD	*uip = &openqotd_data ;
-	ptm_lock(&uip->m) ;
+	{
+	    ptm *mxp = &uip->mx ;
+	    mxp->lockbegin() ;
+	}
 }
 /* end subroutine (openqotd_atforkbefore) */
 
 static void openqotd_atforkafter() noex {
 	OPENQOTD	*uip = &openqotd_data ;
-	ptm_unlock(&uip->m) ;
+	{
+	    ptm *mxp = &uip->mx ;
+	    mxp->lockend() ;
+	}
 }
 /* end subroutine (openqotd_atforkafter) */
 
@@ -451,7 +513,7 @@ static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (to <= 0) to = TTL_EXPIRE ;
-	if (char *qdname ; (rs = malloc_mp(&qdname)) >= 0) {
+	if (char *qdname ; (rs = lm_mp(&qdname)) >= 0) {
 	    if ((rs = mkqdname(qdname,vtd,rnp,rnl,cn)) >= 0) {
 	        if (USTAT sb ; (rs = uc_stat(qdname,&sb)) >= 0) {
 	            if (S_ISDIR(sb.st_mode)) {
@@ -479,7 +541,7 @@ static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 		    rs = SR_OK ;
 	        } /* end if (stat) */
 	    } /* end if (mkqdname) */
-	    rs1 = uc_free(qdname) ;
+	    rs1 = lm_free(qdname) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
@@ -490,7 +552,7 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *ebuf ; (rs = malloc_mn(&ebuf)) >= 0) {
+	if (char *ebuf ; (rs = lm_mn(&ebuf)) >= 0) {
 	    cint	elen = rs ;
 	    if (fsdir d ; (rs = fsdir_open(&d,qfname)) >= 0) {
 	        fsdir_ent	de ;
@@ -519,7 +581,7 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	        rs1 = fsdir_close(&d) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdir) */
-	    rs1 = uc_free(ebuf) ;
+	    rs1 = lm_free(ebuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
@@ -557,7 +619,7 @@ static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	                    	    if (rs >= 0) rs = rs1 ;
 	                        } /* end if (maintqotd) */
 	                    } /* end if (file-size-is-zero) */
-	                    rs1 = uc_lockf(fd,F_ULOCK,0L) ;
+	                    rs1 = uc_lockf(fd,F_ULOCK,0z) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (file-lock) */
 	                rs1 = openqotd_capend() ;
@@ -606,12 +668,12 @@ static int getdefmjd(time_t dt) noex {
 	TMTIME		ct ;
 	int		rs ;
 	if (dt == 0) dt = time(nullptr) ;
-	if ((rs = tmtime_localtime(&ct,dt)) >= 0) {
+	if ((rs = tmtime_timelocal(&ct,dt)) >= 0) {
 	    int	y = (ct.year + TM_YEAR_BASE) ;
 	    int	m = ct.mon ;
 	    int	d = ct.mday ;
 	    rs = getmjd(y,m,d) ;
-	} /* end if (tmtime_localtime) */
+	} /* end if (tmtime_timelocal) */
 	return rs ;
 }
 /* end subroutine (getdefmjd) */
