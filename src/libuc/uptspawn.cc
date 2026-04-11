@@ -51,10 +51,15 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
 #include	<localmisc.h>
 
 #include	"upt.h"
+#include	"uptspawn.h"
 
 
 /* local defines */
@@ -70,10 +75,6 @@ using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
-
-extern "C" {
-    typedef int (*objsub_t)(void *,void *) noex ;
-}
 
 
 /* external subroutines */
