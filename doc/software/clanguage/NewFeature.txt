@@ -1,0 +1,44 @@
+NewFeature
+------------------------
+
+
++ the function member pointer (C-language style function pointer call)
+
+struct example ;
+typedef int (example::*ex_m)(int = 0) noex ;
+struct example {
+    ex_m	m ;
+    int callone(int) noex ;
+    int calltwo(int) noex ;
+} ;
+
+{
+    example	ex ;
+    int		rs ;
+    ex.m = &example::callone ;
+    rs = ex.m(43) ;
+
+    example	*exp = &ex ;
+    rs = exp->m(42) ;
+    rs = (exp->*(exp->m))(42) ;
+
+}
+
+
+{
+    typedef int (*caller_f)(int) ;
+    int rs ;
+    int cal1(int v) ;
+    struct clang {
+	caller_f	m ;
+    } ;
+
+    clang	cc ;
+    cc.m = call ;
+    rs = cc.m(42) ;
+
+    clang	*clp = &cc ;
+    rs = clp->m(42) ;
+
+}
+
