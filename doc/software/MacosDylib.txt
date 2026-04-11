@@ -1,0 +1,12 @@
+MacosDylib
+
+
+= Add an "install name" to an existing dynamic shared sobject (library):
+
+$ install_name_tool -id @rpath/libfoo.dylib libfoo.dylib
+
+or if the progam executable does not already have the proper "rpath":
+
+$ install_name_tool -add_rpath /custom/lib/path your_program
+
+
