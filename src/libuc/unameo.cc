@@ -37,14 +37,18 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bufsizevar.hh>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"unameo.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -72,9 +76,9 @@ static inline int unameo_ctor(unameo *op,Args ... args) noex {
 	    op->release = nullptr ;
 	    op->version = nullptr ;
 	    op->machine = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine (unameo_ctor) */
 
 static inline int unameo_dtor(unameo *op) noex {
 	int		rs = SR_FAULT ;
@@ -82,13 +86,12 @@ static inline int unameo_dtor(unameo *op) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (unameo_dtor) */
+} /* end subroutine (unameo_dtor) */
 
 
 /* local variables */
 
-static bufsizevar		nodenamelen(getbufsize_nn) ;
+static bufsizevar		nodenamelen(bufsize_nn) ;
 
 
 /* exported variables */
@@ -103,7 +106,7 @@ int unameo_start(unameo *op) noex {
 	    if ((rs = nodenamelen) >= 0) ylikely {
 	        cint	nlen = rs ;
 	        cint	usz = szof(UTSNAME) ;
-	        if (void *vp ; (rs = uc_malloc(usz,&vp)) >= 0) ylikely {
+	        if (void *vp ; (rs = lm_mall(usz,&vp)) >= 0) ylikely {
 	            UTSNAME	*unp = (UTSNAME *) vp ;
 	            if ((rs = u_uname(unp)) >= 0) ylikely {
 	                int	sz = 0 ;
@@ -112,7 +115,7 @@ int unameo_start(unameo *op) noex {
 	                sz += (lenstr(unp->release,nlen) + 1) ;
 	                sz += (lenstr(unp->version,nlen) + 1) ;
 	                sz += (lenstr(unp->machine,nlen) + 1) ;
-	                if (char *bp ; (rs = uc_malloc(sz,&bp)) >= 0) ylikely {
+	                if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
 	                    op->a = bp ;
 	                    op->sysname = bp ;
 	                    bp = (strwcpy(bp,unp->sysname,nlen) + 1) ;
@@ -126,7 +129,7 @@ int unameo_start(unameo *op) noex {
 	                    bp = (strwcpy(bp,unp->machine,nlen) + 1) ;
 	                } /* end if (memory-allocation) */
 	            } /* end if (uname) */
-	            rs1 = uc_free(unp) ;
+	            rs1 = lm_free(unp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (nodenamelen) */
@@ -144,7 +147,7 @@ int unameo_finish(unameo *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->a) ylikely {
-	        rs1 = uc_free(op->a) ;
+	        rs1 = lm_free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
 	        op->sysname = nullptr ;
