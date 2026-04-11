@@ -21,7 +21,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<pthread.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<pta.h>
 
 
@@ -45,7 +46,6 @@ extern int uptsetcanceltype(int,int *) noex ;
 extern int upttestcancel() noex ;
 extern int uptequal(pthread_t,pthread_t) noex ;
 extern int uptself(pthread_t *) noex ;
-extern int uptatfork(void_f,void_f,void_f) noex ;
 extern int uptncpus(int) noex ;
 
 EXTERNC_end
