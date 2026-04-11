@@ -62,9 +62,11 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<cstring>		/* |strcmp(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<estrings.h>
 #include	<snwcpy.h>
 #include	<mkpathx.h>
@@ -74,6 +76,9 @@
 
 #include	"udomain.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -112,7 +117,7 @@ namespace {
 	uargs(char *dp,int dl,cchar *u,int mf) noex : dbuf(dp) , dlen(dl) {
 	    un = u ;
 	    if (un) {
-	        ul = strlen(un) ;
+	        ul = lenstr(un) ;
  	    }
 	    maxfilesize = mf ;
 	} ; /* end ctor */
@@ -121,7 +126,7 @@ namespace {
 	int udomainerf(cchar *) noex ;
 	int parseline(cchar *,int) noex ;
     } ; /* end struct (uargs) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -146,12 +151,12 @@ int udomain(cchar *pr,char *dbuf,int dlen,cchar *username) noex {
 	        uargs	a(dbuf,dlen,username,MAXFILESIZE) ;
 	        cchar	*fname = UDOMASTDFNIN ;
 	        if (pr && (pr[0] != '\0') && (strcmp(pr,"/") != 0)) {
-		     if (char *fbuf{} ; (rs = malloc_mp(&fbuf)) >= 0) {
+		     if (char *fbuf ; (rs = lm_mp(&fbuf)) >= 0) {
 	    	         if ((rs = mkpath(fbuf,pr,fname)) >= 0) {
 	             	    rs = a.udomainer(fbuf) ;
 		     	    len = rs ;
 		         }
-		         rs1 = uc_free(fbuf) ;
+		         rs1 = lm_free(fbuf) ;
 		         if (rs >= 0) rs = rs1 ;
 		     } /* end if (m-a-f) */
 	         } else {
@@ -170,7 +175,7 @@ int udomain(cchar *pr,char *dbuf,int dlen,cchar *username) noex {
 int uargs::udomainer(cchar *fname) noex {
 	int		rs ;
 	int		len = 0 ;
-	if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode) && (sb.st_size < maxfilesize)) {
 		rs = udomainerm(fname) ;
 		len = rs ;
@@ -210,7 +215,7 @@ int uargs::udomainerf(cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
 	        cint	fd = rs ;
@@ -229,7 +234,7 @@ int uargs::udomainerf(cchar *fname) noex {
 	        rs1 = uc_close(fd) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (opened file) */
-	    rs1 = uc_free(lbuf) ;
+	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
@@ -248,11 +253,11 @@ int uargs::parseline(cchar *lbuf,int llen) noex {
 	    sl -= 1 ;
 	}
 	if ((tp = strnchr(sp,sl,'#')) != nullptr) {
-	    sl = (tp - sp) ;
+	    sl = intconv(tp - sp) ;
 	}
 	if ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    if ((cl == ul) && (strncmp(un,cp,cl) == 0)) {
-	        sl -= ((cp + cl) - sp) ;
+	        sl -= intconv((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
 	        if ((cl = sfnext(sp,sl,&cp)) > 0) {
 	            rs = snwcpy(dbuf,dlen,cp,cl) ;
