@@ -1,0 +1,12 @@
+MKSHAREDLIB (Make-Shared-Lib)
+
+There are several subroutines that can be used to create
+shared-library names or file-names.  These are:
+
+file-name		description
+--------------------------------------------------------------------------------
+
+mkshlib			make a shared-library name from components
+mksoname		make a shared-library name from a counted-string
+mksofname		make a shared-library full file-name from components
+
