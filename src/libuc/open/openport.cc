@@ -52,10 +52,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getusername.h>
-#include	<mallocxx.h>		/* |malloc_mm(3uc)| */
 #include	<nulstr.h>
 #include	<sockaddress.h>
 #include	<sfx.h>
@@ -88,13 +90,16 @@ import uconstants ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-
 
 /* local type-defs */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_close(int) ;
+} /* end extern */
 
 
 /* external variables */
@@ -195,17 +200,17 @@ openporter::operator int () noex {
 
 int openporter::start() noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	if ((rs = getbufsize(bufsize_un)) >= 0) {
 	    ulen = rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
 		cint	sz = (ulen+1) + (rs+1) ;
 		plen = rs ;
-		if ((rs = uc_malloc(sz,&a)) >= 0) {
+		if ((rs = lm_mall(sz,&a)) >= 0) {
 		    ubuf = a ;
 		    pbuf = (ubuf + (ulen+1)) ;
 		    rs = getusername(ubuf,ulen,-1) ;
 		    if (rs < 0) {
-			uc_free(a) ;
+			lm_free(a) ;
 			ubuf = nullptr ;
 			pbuf = nullptr ;
 		    } /* end if (error) */
@@ -224,7 +229,7 @@ int openporter::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (a) {
-	    rs1 = uc_free(a) ;
+	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
 	    pbuf = nullptr ;
@@ -348,7 +353,7 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (char *mbuf ; (rs = malloc_mm(&mbuf)) >= 0) {
+	if (char *mbuf ; (rs = lm_mm(&mbuf)) >= 0) {
 	    cint	mlen = rs ;
 	    openportmsg_req	m0{} ;
 	    openportmsg_res	m1{} ;
@@ -359,7 +364,6 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	    m0.proto = proto ;
 	    m0.sa = *sap ; /* <- copy object */
 	    strwcpy(m0.username,un,unlen) ;
-    
 	    if ((rs = openportmsg_msgrequest(&m0,1,mbuf,mlen)) >= 0) {
 	        ml = rs ;
 	        if ((rs = uc_writen(cfd,mbuf,ml)) >= 0) {
@@ -383,10 +387,9 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	            } else {
 	                rs = SR_PROTO ;
 	            }
-        
 	        } /* end if (write was successful) */
 	    } /* end if (openportmsg) */
-	    rs1 = uc_free(mbuf) ;
+	    rs1 = lm_free(mbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? fd : rs ;
