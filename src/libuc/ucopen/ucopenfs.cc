@@ -27,7 +27,7 @@
 
 	Synopsis:
 	int uc_openfs(passfname,oflags,timeout,opts)
-	const char	passfname[] ;
+	char	passfname[] ;
 	int		oflags ;
 	int		timeout ;
 	int		opts ;
@@ -91,18 +91,8 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	strkeycmp(const char *,const char *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	dialpass(const char *,int,int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(char *,...) ;
 #endif
 
 
@@ -124,11 +114,12 @@ enum accmodes {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_openfs(cchar *passfname,int oflags,int timeout,int opts)
-{
+int uc_openfs(cchar *passfname,int oflags,int timeout,int opts) noex {
 	int		rs ;
 
 #if	CF_DEBUGS
