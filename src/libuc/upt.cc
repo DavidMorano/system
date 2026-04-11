@@ -37,13 +37,21 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdint>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucsysmisc.h>		/* |uc_nprocessors(3uc)| */
+#include	<uclibmem.h>
+#include	<ucsigset.h>
 #include	<hasx.h>
 #include	<cfdec.h>
 #include	<localmisc.h>
 
 #include	"upt.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -269,11 +277,6 @@ int uptsetconcurrency(int c) noex {
 	return c ;
 }
 /* end subroutine (uptsetconcurrency) */
-
-int uptatfork(void_f pre,void_f par,void_f chi) noex {
-	return uc_atfork(pre,par,chi) ;
-}
-/* end subroutine (uptatfork) */
 
 /* ARGSUSED */
 int uptncpus(int w) noex {
