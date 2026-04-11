@@ -49,7 +49,8 @@
 #include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<dial.h>		/* <- money shot! */
 #include	<localmisc.h>
 
@@ -60,6 +61,10 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_openenv(cchar *,int,mode_t,mainv,int) noex ;
+}
 
 
 /* external variables */
