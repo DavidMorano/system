@@ -1,0 +1,121 @@
+New C-language operators
+------------------------
+
+- for reference: existing operators
+
+|	bit-wize OR
+&	bit-wise AND
+^	bit-wise XOR
+||	logical OR
+&&	logical AND
+!	logical NOT
+!!	unary operator to make operand a boolean (exists already)
+<=>	spaceship (three-way comparison)
+<<=	assignment left-shift
+>>=	assignment right-shift
+
+- should have always been there
+
+^^	logical exclusive OR (XOR)
+**	exponentiation
+
+&&=	assignment logical AND
+||=	assignment logical OR
+^^=	assignment logical XOR
+**=	assignment exponentiation ( a **= 4 )
+
+- new operators
+
+^^	logical exclusive OR (same as above)
+!^^	logical equivalence
+===	logical equivalence
+|>	rotate right
+|>>	rotate right
+<|	rotate left
+<<|	rotate left
+<>	equivalence?
+><	exclusion of some kind?
+
+- popular unary operators
+
+÷	division
+·	multiplication (dot-product, inner-product)
+×	multiplication (matrix or outer-product)
+»	?
+«	?
+¡	?
+¿	?
+¦	?
+±	?
+¤	? (outer-product)
+§	?
+¶	?
+­	? (hyphen)
+
+||>	*unassigned*
+||<	*unassigned*
+<||	*unassigned*
+>||	*unassigned*
+|<	*unassigned*
+>|	*unassigned*
+|»
+«|
+||»
+»||
+
++>	?
+<+	?
+
+- postfix unary operators
+
+°	exponentiation
+¹	exponentiation
+²	exponentiation
+³	exponentiation
+
+- op-equal forms
+
+|>=	rotate right
+<|=	rotate left
+<>=	equivalence
+><=	exclusion of some kind?
+^^=	logical exclusive OR
+!^^=	logical equivalence
+!!=	?
+
+||>=	assignment rotate-right
+||<=	assignment rotate-left
+<||=	*unassigned*
+>||=	*unassigned*
+|<=	*unassigned*
+>|=	*unassigned*
+
+**=	exponentiation
+
+= Example expressions
+
+y = (x**4 + x³ + 2*x² + x¹ + 17*x°)²
+
+
+= named operator keyword aliases
+
+bitand		&
+bitor		|
+bitxor		^
+
+bitand_eq	&=
+bitor_eq	|=
+bitxor_eq	^=
+
+logand		&&
+logor		||
+logxor		^^
+
+logand_eq	&&=
+logor_eq	||=
+logxor_eq	^^=
+
+bitnot		~
+lognot		!
+
+
