@@ -51,7 +51,8 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
@@ -68,6 +69,13 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_socket(int,int,int) noex ;
+    extern int uc_connect(int,cvoid *,int) noex ;
+    extern int uc_connecte(int,cvoid *,int,int) noex ;
+    extern int uc_close(int) ;
+} /* end extern */
 
 
 /* external variables */
