@@ -46,10 +46,13 @@
 #include	<climits>		/* <- for |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<syswords.hh>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>
+#include	<uclibmem.h>
+#include	<ucsysmisc.h>
+#include	<ucgetpid.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<sigblocker.h>
 #include	<cthex.h>
 #include	<sncpyx.h>
@@ -57,7 +60,11 @@
 
 #include	"openshm.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -77,6 +84,12 @@ import libutil ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_openshm(cchar *,int,mode_t) noex ;
+    extern int uc_close(int) ;
+    extern int uc_unlinkshm(cchar *) noex ;
+} /* end extern */
+
 
 /* external variables */
 
@@ -89,7 +102,7 @@ static int	mktmpname(char *,int,ulong) noex ;
 
 /* local variables */
 
-static bufsizevar	maxnamelen(getbufsize_mn) ;
+static bufsizevar	maxnamelen(bufsize_mn) ;
 
 static cint		tmplen = lenstr(sysword.w_tmpdir) ;
 
@@ -103,16 +116,18 @@ int openshmtmpx(mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (char *sbuf ; (rs = malloc_mn(&sbuf)) >= 0) {
+	if (char *sbuf ; (rs = lm_mn(&sbuf)) >= 0) {
 	    cint	slen = rs ;
 	    {
 		rs = openshmtmp(sbuf,slen,om) ;
 		fd = rs ;
 	    }
-	    rs1 = uc_free(sbuf) ;
+	    rs1 = lm_free(sbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-	if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
+	if ((rs < 0) && (fd >= 0)) {
+	    uc_close(fd) ;
+	}
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (openshmtmpx) */
@@ -142,7 +157,9 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 	                rs1 = b.finish ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (sigblock) */
-		    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
+		    if ((rs < 0) && (fd >= 0)) {
+			uc_close(fd) ;
+		    }
 	        } /* end if (randinit) */
 	    } /* end if (maxnamelen) */
 	} /* end if (non-null) */
