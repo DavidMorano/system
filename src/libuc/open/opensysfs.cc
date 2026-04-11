@@ -54,9 +54,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<endian.h>		/* |ENDIANSTR(3u)| */
 #include	<ids.h>
 #include	<vecpstr.h>
@@ -76,6 +78,8 @@
 #include	<localmisc.h>
 
 #include	"opensysfs.h"
+
+#pragma		GCC dependency		"mod/unixfnames.ccm"
 
 import unixfnames ;
 
@@ -97,6 +101,10 @@ import unixfnames ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_unlink(cchar *) noex ;
+} /* end extern */
 
 /* external variables */
 
@@ -112,7 +120,7 @@ namespace {
 	int		usernamelen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -136,19 +144,19 @@ constexpr cpcchar	prvars[] = {
 	"EXTRA",
 	"PREROOT",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	prdirs[] = {
 	"/usr/extra",
 	"/usr/preroot",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	prbins[] = {
 	"sbin",
 	"bin",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	envbads[] = {
 	"_",
@@ -158,7 +166,7 @@ constexpr cpcchar	envbads[] = {
 	"RANDOM",
 	"SECONDS",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -219,9 +227,10 @@ static int opencfile(int w,int of,int ttl) noex {
     	cint		sz = ((var.maxpathlen + 1) * 2) ;
 	cint		maxpath = var.maxpathlen ;
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ; /* return-value */
 	int		ai = 0 ;
-	if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 	    cchar	*sdname = OPENSYSFS_SYSDNAME ;
 	    cchar	*gcname = opensysdb[w] ;
 	    char	*gfname = (a + ((maxpath + 1) * ai++)) ;
@@ -315,7 +324,8 @@ static int opencfile(int w,int of,int ttl) noex {
 	            } /* end if (file-open) */
 	        } /* end if (ok) */
 	    } /* end if (mkrealpath) */
-	    rs = rsfree(rs,a) ;
+	    rs1 = lm_free(a) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? fd : rs ;
 }
@@ -323,7 +333,8 @@ static int opencfile(int w,int of,int ttl) noex {
 
 static int mkrealpath(char *gfname,int w,cchar *sdname,cchar *gcname) noex {
 	int		rs ;
-	if (char *cbuf ; (rs = malloc_mp(&cbuf)) >= 0) {
+	int		rs1 ;
+	if (char *cbuf ; (rs = lm_mp(&cbuf)) >= 0) {
 	    cint	slen = szof(REALNAMESUF) + 10 ;
 	    cint	clen = rs ;
 	    cchar	*suf = REALNAMESUF ;
@@ -343,7 +354,8 @@ static int mkrealpath(char *gfname,int w,cchar *sdname,cchar *gcname) noex {
 	        rs = mkpath2(gfname,sdname,gcname) ;
 	        break ;
 	    } /* end switch */
-	    rs = rsfree(rs,cbuf) ;
+	    rs1 = lm_free(cbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
@@ -374,7 +386,7 @@ static int runmkpwi(int w,cchar *dbp,int dbl) noex {
 	    cint	sz = ((var.maxpathlen + 1) + (var.maxnamelen + 1)) ;
 	    cint	maxpath = var.maxpathlen ;
 	    int		ai = 0 ;
-	    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 		cint	zlen = maxpath ;
 	        char	*pfname = (a + ((maxpath + 1) * ai++)) ;
 	        char	*zbuf = (a + ((maxpath + 1) * ai++)) ;
@@ -424,7 +436,8 @@ static int runmkpwi(int w,cchar *dbp,int dbl) noex {
 	                } /* end if (envhelp) */
 	            } /* end if (sncpyuc) */
 	        } /* end if (findprog) */
-	        rs = rsfree(rs,a) ;
+	        rs1 = lm_free(a) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    rs1 = ids_release(&id) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -445,7 +458,7 @@ static int runsysfs(int w) noex {
 	    sz += (var.maxpathlen + 1) ;
 	    sz += (var.maxnamelen + 1) ;
 	    sz += (var.usernamelen + 1) ;
-	    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 		cint	zlen = maxpath ;
 		cint	alen = maxname ;
 	        char	*pfname = (a + ((maxpath + 1) * ai++)) ;
@@ -473,7 +486,8 @@ static int runsysfs(int w) noex {
 	                } /* end if (argument-preparation) */
 	            } /* end if (sncpyuc) */
 	        } /* end if (findprog) */
-	        rs = rsfree(rs,a) ;
+	        rs1 = lm_free(a) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    rs1 = ids_release(&id) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -540,7 +554,7 @@ static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	bool		f = false ;
 	if (USTAT sb ; (rs = u_stat(pr,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
-		if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+		if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	            for (int i = 0 ; (rs >= 0) && prbins[i] ; i += 1) {
 	                if ((rs = mkpath2(tbuf,pr,prbins[i])) >= 0) {
 	                    cint	dl = rs ;
@@ -574,11 +588,11 @@ static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	if ((rs = getbufsize(bufsize_mn)) >= 0) {
 	    maxnamelen = rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
-	        if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	        if ((rs = getbufsize(bufsize_un)) >= 0) {
 		    usernamelen = rs ;
 	        }
 	    }
