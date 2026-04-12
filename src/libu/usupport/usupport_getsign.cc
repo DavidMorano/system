@@ -45,7 +45,7 @@
 #include	<usysbase.h>
 #include	<localmisc.h>
 
-#include	"usupport_getsign.h"
+#include	"usupport_getsign.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
