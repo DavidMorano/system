@@ -60,9 +60,10 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sbuf.h>
 #include	<char.h>
 #include	<sigblocker.h>
@@ -150,7 +151,7 @@ int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
 	        if ((rs = dialticotsord(abuf,alen,to,opts)) >= 0) {
 	            fd = rs ;
 	            if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
-			if (char *tbuf ; (rs = malloc_mn(&tbuf)) >= 0) {
+			if (char *tbuf ; (rs = lm_mn(&tbuf)) >= 0) {
 			    cint	tlen = rs ;
 			    {
 	                        rs = readnlsresp(fd,tbuf,tlen,to) ;
