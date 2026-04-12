@@ -1,4 +1,4 @@
-/* ureserve2 MODULE */
+/* ureserve2 MODULE (charx) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -76,18 +76,18 @@ namespace {
 	bitset<chtablen>	isuc ;
 	bitset<chtablen>	isfc ;
 	uchar			toval[chtablen] ;
-	constexpr void mkiswhite() noex ;
-	constexpr void mkislc() noex ;
-	constexpr void mkisuc() noex ;
-	constexpr void mkisfc() noex ;
-	constexpr void mktoval() noex ;
-	constexpr charinfo() noex {
+	constexpr void mkiswhite()	noex ;
+	constexpr void mkislc()		noex ;
+	constexpr void mkisuc()		noex ;
+	constexpr void mkisfc()		noex ;
+	constexpr void mktoval()	noex ;
+	constexpr charinfo()		noex {
 	    mkiswhite() ;
 	    mkislc() ;
 	    mkisuc() ;
 	    mkisfc() ;
 	    mktoval() ;
-	} ;
+	} ; /* end ctor */
     } ; /* end struct (charinfo) */
 } /* end namespace */
 
@@ -97,8 +97,7 @@ constexpr void charinfo::mkiswhite() noex {
 	    cint	ch = w[i] ;
 	    iswhite.set(ch,true) ;
 	}
-}
-/* end method (charinfo::mkiswhite) */
+} /* end method (charinfo::mkiswhite) */
 
 constexpr void charinfo::mkislc() noex {
 	for (int ch = 'a' ; ch <= 'z' ; ch += 1) {
@@ -109,8 +108,7 @@ constexpr void charinfo::mkislc() noex {
 	}
 	islc.set(UC('÷'),false) ;
 	islc.set(UC('ß'),true) ; 	/* <- this is 'ss' in German */
-}
-/* end method (charinfo::mkislc) */
+} /* end method (charinfo::mkislc) */
 
 constexpr void charinfo::mkisuc() noex {
 	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
@@ -121,8 +119,7 @@ constexpr void charinfo::mkisuc() noex {
 	}
 	isuc.set(UC('×'),false) ;
 	isuc.set(UC('ß'),false) ; 	/* <- this is 'ss' in German */
-}
-/* end method (charinfo::mkisuc) */
+} /* end method (charinfo::mkisuc) */
 
 constexpr void charinfo::mkisfc() noex {
 	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
@@ -149,8 +146,7 @@ constexpr void charinfo::mktoval() noex {
                 toval[ch] = UCHAR_MAX ;
             }
         } /* end for */
-}
-/* end method (charinfo::mktoval) */
+} /* end method (charinfo::mktoval) */
 
 
 /* local variables */
