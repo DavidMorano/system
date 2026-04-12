@@ -53,7 +53,7 @@
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>
 
-#include	"usupport_cfdect.h"
+#include	"usupport_cfdect.hh"
 	
 import ureserve ;			/* |sf{x}(3u)| */
 
