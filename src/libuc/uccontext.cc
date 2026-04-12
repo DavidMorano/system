@@ -4,7 +4,6 @@
 
 /* interface component for UNIX® library-3c */
 /* version %I% last-modified %G% */
-/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,9 +16,16 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ucontext.h>
+#include	<ucontext.h>		/* «- system-header money-shot */
 #include	<cerrno>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
+
+#include	"uccontext.h"
 
 
 /* local defines */
@@ -30,18 +36,23 @@
 
 /* local typedefs */
 
-extern "C" {
-    typedef int (*context_f)(int) noex ;
-}
-
 
 /* external subroutines */
 
-extern "C" {
-    int uc_contextmake(ucontext_t *,context_f,int) noex ;
-    int uc_contextswap(ucontext_t *,const ucontext_t *) noex ;
-    int uc_contextset(ucontext_t *) noex ;
-}
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
