@@ -71,6 +71,10 @@
 /* external subroutines */
 
 extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
+
+extern "C" {
     extern int	opensockaddr(int,int,int,SOCKADDR *,int) noex ;
 }
 
