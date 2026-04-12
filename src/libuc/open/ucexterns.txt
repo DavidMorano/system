@@ -24,6 +24,7 @@ extern "C" {
     extern int uc_read(int,void *,int) noex ;
     extern int uc_write(int,cvoid *,int) noex ;
     extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_writedesc(int,int,int) noex ;
     extern int uc_iocctl(int,int,...) noex ;
     extern int uc_rewind(int) noex ;
     extern int uc_ftruncate(int,off_t ) noex ;
