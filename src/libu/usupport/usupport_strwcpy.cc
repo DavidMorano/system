@@ -41,7 +41,7 @@
 #include	<usysbase.h>
 #include	<localmisc.h>
 
-#include	"usupport_strwcpy.h"
+#include	"usupport_strwcpy.hh"
 
 
 /* local defines */
