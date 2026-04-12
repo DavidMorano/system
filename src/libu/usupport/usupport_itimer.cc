@@ -47,7 +47,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>		/* |gethostid(3c)| */
-#include	<poll.h>
 #include	<ctime>
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
@@ -61,7 +60,7 @@
 #include	<stdintx.h>
 #include	<localmisc.h>
 
-#include	"usupport.h"
+#include	"usupport_itimer.hh"
 
 
 /* local defines */
@@ -104,7 +103,7 @@ namespace libu {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-    }
+    } /* end subroutine (uitimer_get) */
     sysret_t uitimer_set(int w,CITIMERVAL *ntvp,ITIMERVAL *otvp) noex {
 	int		rs = SR_FAULT ;
 	if (ntvp && otvp) {
@@ -115,7 +114,7 @@ namespace libu {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-    }
+    } /* end subroutine (uitimer_set) */
 } /* end namespace (libu) */
 
 
