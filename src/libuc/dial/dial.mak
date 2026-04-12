@@ -1,4 +1,4 @@
-# MAKEFILES (dial)
+# MAKEFILE (dial)
 
 T= dial
 
