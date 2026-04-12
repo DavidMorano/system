@@ -1,4 +1,4 @@
-/* ureserve1 MODULE */
+/* ureserve1 MODULE (isnot) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -81,13 +81,13 @@ constexpr int	npresent[] = {
 	SR_STALE,
 	SR_PERM,			/* Apple-Darwin from |stat(2)| */
 	0	
-} ;
+} ; /* end array */
 
 constexpr int	naccess[] = {
 	SR_ACCESS,
 	SR_PERM,			
 	0	
-} ;
+} ; /* end array */
 
 constexpr int	nvalid[] = {
 	SR_INVALID,
@@ -96,7 +96,7 @@ constexpr int	nvalid[] = {
 	SR_NOENT,
 	SR_NOTSUP,
 	0	
-} ;
+} ; /* end array */
 
 constexpr int	nlib[] = {
 	SR_NOENT,
@@ -105,7 +105,7 @@ constexpr int	nlib[] = {
 	SR_NOTDIR,
 	SR_STALE,
 	0	
-} ;
+} ; /* end array */
 
 constexpr int	rnoterm[] = {
 	SR_BADF,
@@ -113,7 +113,7 @@ constexpr int	rnoterm[] = {
 	SR_NOTTY,
 	SR_ACCESS,
 	0
-} ;
+} ; /* end array */
 
 constexpr int	rnosupport[] = {
 	SR_NOSYS,
@@ -124,7 +124,7 @@ constexpr int	rnosupport[] = {
 	SR_PFNOSUPPORT,
 	SR_AFNOSUPPORT,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
