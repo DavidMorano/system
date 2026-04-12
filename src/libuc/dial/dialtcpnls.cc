@@ -53,8 +53,11 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
 #include	<sbuf.h>
 #include	<char.h>
 #include	<sfx.h>
@@ -72,6 +75,11 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */
@@ -102,7 +110,7 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	    if (hn[0] && svc[0]) {
 	        cchar	*sp{} ;
 	        if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) {
-	            if (char *nlsbuf ; (rs = malloc_mn(&nlsbuf)) >= 0) {
+	            if (char *nlsbuf ; (rs = lm_mn(&nlsbuf)) >= 0) {
 	                cint	nlslen = rs ;
 	                if ((rs = mknlsreq(nlsbuf,nlslen,sp,sl)) >= 0) {
 		            SIGACTION	osig ;
@@ -137,7 +145,7 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	                } else {
 	                    rs = SR_TOOBIG ;
 	                }
-	                rs1 = uc_free(nlsbuf) ;
+	                rs1 = lm_free(nlsbuf) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (memory-allocation) */
 	            if ((rs < 0) && (fd >= 0)) u_close(fd) ;
@@ -154,12 +162,12 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 static int dialconn(int fd,cc *nbuf,int nlen,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *rbuf ; (rs = malloc_mn(&rbuf)) >= 0) {
+	if (char *rbuf ; (rs = lm_mn(&rbuf)) >= 0) {
 	    cint	rlen = rs ;
 	    if ((rs = uc_writen(fd,nbuf,nlen)) >= 0) {
 		rs = readnlsresp(fd,rbuf,rlen,to) ;
 	    } /* end if (read response) */
-	    rs1 = uc_free(rbuf) ;
+	    rs1 = lm_free(rbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
