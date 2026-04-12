@@ -74,6 +74,10 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<ucgetx.h>		/* |uc_getipnodebyname(3uc)| */
+#include	<uchostent.h>
+#include	<ucsig.h>
+#include	<ucread.h>
 #include	<getproto.h>
 #include	<getprotofamily.h>
 #include	<getportnum.h>
@@ -90,7 +94,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;			/* |lenstr(3uc)| */
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -117,6 +121,11 @@ import libutil ;			/* |lenstr(3uc)| */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_close(int) noex ;
+}
 
 extern "C" {
     extern int	opensockaddr(int,int,int,SOCKADDR *,int) noex ;
