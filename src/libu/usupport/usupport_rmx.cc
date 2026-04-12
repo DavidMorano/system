@@ -58,7 +58,7 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
-#include	"usupport_rmx.h"
+#include	"usupport_rmx.hh"
 
 import libutil ;			/* |lenstr(3u)| */
 import ureserve ;			/* |ischarx(3u)| */
