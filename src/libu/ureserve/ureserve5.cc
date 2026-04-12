@@ -1,4 +1,4 @@
-/* ureserve5 MODULE (module-implementation-unit) */
+/* ureserve5 MODULE (sfx -- module-implementation-unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
