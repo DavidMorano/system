@@ -74,6 +74,11 @@
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_socket(int,int,int) noex ;
+    extern int uc_connect(int,cvoid *,int) noex ;
+}
+
 
 /* external variables */
 
