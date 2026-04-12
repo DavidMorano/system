@@ -35,7 +35,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |trullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |u_stat(3u)| */
+#include	<uclibmem.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
@@ -77,14 +80,14 @@ typedef cachetime_st *	stp ;
 /* forward references */
 
 template<typename ... Args>
-static int cachetime_ctor(cachetime *op,Args ... args) noex {
+local int cachetime_ctor(cachetime *op,Args ... args) noex {
 	CACHETIME	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->dbp = new(nothrow) hdb) != nullptr) {
-	        if ((op->mxp = new(nothrow) ptm) != nullptr) {
+	    if ((op->dbp = new(nothrow) hdb) != nullptr) ylikely {
+	        if ((op->mxp = new(nothrow) ptm) != nullptr) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-ptm) */
 		if (rs < 0) {
@@ -94,32 +97,29 @@ static int cachetime_ctor(cachetime *op,Args ... args) noex {
 	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cachetime_ctor) */
+} /* end subroutine (cachetime_ctor) */
 
-static int cachetime_dtor(cachetime *op) noex {
+local int cachetime_dtor(cachetime *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cachetime_dtor) */
+} /* end subroutine (cachetime_dtor) */
 
 template<typename ... Args>
-static int cachetime_magic(cachetime *op,Args ... args) noex {
+local inline int cachetime_magic(cachetime *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CACHETIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (cachetime_magic) */
+} /* end subroutine (cachetime_magic) */
 
-static int	cachetime_lookuper(CT *,cchar *,int,time_t *) noex ;
+local int	cachetime_lookuper(CT *,cchar *,int,time_t *) noex ;
 
-static int	entry_start(ent *,cchar *,int) noex ;
-static int	entry_finish(ent *) noex ;
+local int	entry_start(ent *,cchar *,int) noex ;
+local int	entry_finish(ent *) noex ;
 
 
 /* local variables */
@@ -131,12 +131,13 @@ static int	entry_finish(ent *) noex ;
 /* exported subroutines */
 
 int cachetime_start(CT *op) noex {
-	int		rs = SR_FAULT ;
-	if ((rs = cachetime_ctor(op)) >= 0) {
-	    cnullptr	np{} ;
+	cnullptr	np{} ;
+	int		rs ;
+	if ((rs = cachetime_ctor(op)) >= 0) ylikely {
 	    cint	ne = CACHETIME_NENTS ;
-	    if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) {
-	        if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
+	    if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) ylikely {
+	        ptm *mxp = op->mxp ;
+	        if ((rs = mxp->create) >= 0) ylikely {
 		    op->magic = CACHETIME_MAGIC ;
 	        }
 	        if (rs < 0) {
@@ -154,9 +155,10 @@ int cachetime_start(CT *op) noex {
 int cachetime_finish(CT *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = cachetime_magic(op)) >= 0) {
+	if ((rs = cachetime_magic(op)) >= 0) ylikely {
 	    {
-	        rs1 = ptm_destroy(op->mxp) ;
+	        ptm *mxp = op->mxp ;
+	        rs1 = mxp->destroy() ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -181,7 +183,7 @@ int cachetime_finish(CT *op) noex {
 	        } /* end if (cursor) */
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->dbp) ylikely {
 	        rs1 = hdb_finish(op->dbp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -199,14 +201,15 @@ int cachetime_lookup(CT *op,cchar *sp,int 탎l,time_t *timep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = cachetime_magic(op,sp)) >= 0) {
-	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
-	        if ((rs = ptm_lock(op->mxp)) >= 0) {
+	if ((rs = cachetime_magic(op,sp)) >= 0) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
+	        ptm *mxp = op->mxp ;
+	        if ((rs = mxp->lockbegin) >= 0) ylikely {
 		    {
 	                rs = cachetime_lookuper(op,sp,sl,timep) ;
 		        rv = rs ;
 		    }
-	            rs1 = ptm_unlock(op->mxp) ;
+	            rs1 = mxp->lockend ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex) */
 	    } /* end if (getlenstr) */
@@ -216,15 +219,18 @@ int cachetime_lookup(CT *op,cchar *sp,int 탎l,time_t *timep) noex {
 /* end subroutine (cachetime_lookup) */
 
 int cachetime_curbegin(CT *op,CT_CUR *curp) noex {
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs ;
-	if ((rs = cachetime_magic(op,curp)) >= 0) {
+	if ((rs = cachetime_magic(op,curp)) >= 0) ylikely {
 	    memclear(curp) ;
 	    rs = SR_NOMEM ;
-	    if ((curp->hcp = new(nothrow) hdb_cur) != nullptr) {
-	        if ((rs = ptm_lock(op->mxp)) >= 0) {
+	    if ((curp->hcp = new(nt) hdb_cur) != np) ylikely {
+	        ptm *mxp = op->mxp ;
+	        if ((rs = mxp->lockbegin) >= 0) ylikely {
 	            rs = hdb_curbegin(op->dbp,curp->hcp) ;
 	            if (rs < 0) {
-		        ptm_unlock(op->mxp) ;
+		        mxp->lockend() ;
 	            }
 	        } /* end if (mutex-locked) */
 		if (rs < 0) {
@@ -240,13 +246,14 @@ int cachetime_curbegin(CT *op,CT_CUR *curp) noex {
 int cachetime_curend(CT *op,CT_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = cachetime_magic(op,curp)) >= 0) {
-	    {
+	if ((rs = cachetime_magic(op,curp)) >= 0) ylikely {
+	    if (op->dbp) ylikely {
 	        rs1 = hdb_curend(op->dbp,curp->hcp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
-	        rs1 = ptm_unlock(op->mxp) ;
+	    if (op->mxp) ylikely {
+	        ptm *mxp = op->mxp ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -260,12 +267,12 @@ int cachetime_curend(CT *op,CT_CUR *curp) noex {
 
 int cachetime_enum(CT *op,CT_CUR *curp,char *pbuf,int plen,time_t *timep) noex {
 	int		rs ;
-	if ((rs = cachetime_magic(op,curp,pbuf)) >= 0) {
+	if ((rs = cachetime_magic(op,curp,pbuf)) >= 0) ylikely {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
-	    if ((rs = hdb_curenum(op->dbp,curp->hcp,&key,&val)) >= 0) {
+	    if ((rs = hdb_curenum(op->dbp,curp->hcp,&key,&val)) >= 0) ylikely {
 	        ent	*ep = entp(val.buf) ;
-	        if ((rs = sncpy1(pbuf,plen,ep->name)) >= 0) {
+	        if ((rs = sncpy1(pbuf,plen,ep->name)) >= 0) ylikely {
 	            if (timep) {
 	                *timep = ep->mtime ;
 		    }
@@ -280,14 +287,15 @@ int cachetime_stats(CT *op,st *statp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = cachetime_magic(op,statp)) >= 0) {
-	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	if ((rs = cachetime_magic(op,statp)) >= 0) ylikely {
+	    ptm *mxp = op->mxp ;
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        {
 	            statp->req = op->c_req ;
 	            statp->hit = op->c_hit ;
 	            statp->miss = op->c_miss ;
 	        }
-	        rs1 = ptm_unlock(op->mxp) ;
+	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
 	} /* end if (magic) */
@@ -298,7 +306,7 @@ int cachetime_stats(CT *op,st *statp) noex {
 
 /* private subroutines */
 
-static int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
+local int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 	ent		*ep ;
 	hdb_dat		key ;
 	hdb_dat		val ;
@@ -315,8 +323,8 @@ static int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 	    f_hit = true ;
 	} else if (rs == SR_NOTFOUND) {
 	    cint	sz = sizeof(ent) ;
-	    if ((rs = libmem.mall(sz,&ep)) >= 0) {
-	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
+	    if ((rs = libmem.mall(sz,&ep)) >= 0) ylikely {
+	        if ((rs = entry_start(ep,sp,sl)) >= 0) ylikely {
 	    	    key.buf = ep->name ;
 	    	    key.len = lenstr(ep->name) ;
 	            val.buf = ep ;
@@ -338,11 +346,11 @@ static int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 }
 /* end subroutine (cachetime_lookup) */
 
-static int entry_start(ent *ep,cchar *sp,int sl) noex {
+local int entry_start(ent *ep,cchar *sp,int sl) noex {
 	int		rs ;
 	cchar		*cp ;
 	memclear(ep) ; /* dangerous */
-	if ((rs = libmem.strw(sp,sl,&cp)) >= 0) {
+	if ((rs = libmem.strw(sp,sl,&cp)) >= 0) ylikely {
 	    if (ustat sb ; (rs = u_stat(cp,&sb)) >= 0) {
 		ep->name = cp ;
 	        ep->mtime = sb.st_mtime ;
@@ -356,10 +364,10 @@ static int entry_start(ent *ep,cchar *sp,int sl) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(ent *ep) noex {
+local int entry_finish(ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ep->name != nullptr) {
+	if (ep->name != nullptr) ylikely {
 	    void *vp = voidp(ep->name) ;
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
