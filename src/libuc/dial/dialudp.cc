@@ -60,6 +60,7 @@
 #include	<clanguage.h>
 #include	<usyscalls.h>
 #include	<usysbase.h>
+#include	<uinet.h>		/* |PF_{x}(3u)| */
 #include	<uclibmem.h>
 #include	<hostaddr.h>
 #include	<getprotofamily.h>
@@ -108,7 +109,7 @@ static constexpr int	pfs[] = {
 	PF_INET4,
 	PF_INET6,
 	0
-} ;
+} ; /* end array (pfs) */
 
 constexpr bool		f_proto = CF_PROTO ;
 
