@@ -25,13 +25,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
+#include	<ucread.h>
 #include	<buffer.h>
 #include	<sfx.h>
 #include	<mkx.h>			/* |mkquoted(3uc)| */
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"dialuss.h"
@@ -53,6 +55,10 @@ typedef mainv		mv ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_writen(int,cvoid *,int) noex ;
+}
 
 
 /* external variables */
@@ -118,13 +124,13 @@ static int dialer(cc *ps,cc *sp,int sl,mv sargv,int to,int dot) noex {
 	                if ((rs = dialuss(ps,to,dot)) >= 0) {
 	                    fd = rs ;
 	                    if ((rs = uc_writen(fd,bp,blen)) >= 0) {
-	                        auto	rln = uc_readlinetimed ;
-	                        if (char *rbuf ; (rs = malloc_mn(&rbuf)) >= 0) {
+	                        auto	rln = uc_readlnto ;
+	                        if (char *rbuf ; (rs = lm_mn(&rbuf)) >= 0) {
 	                            cint	rlen = rs ;
 	                            if ((rs = rln(fd,rbuf,rlen,to)) >= 0) {
 					rs = badreq(rs,rbuf) ;
 	                            } /* end if (rln) */
-				    rs1 = uc_free(rbuf) ;
+				    rs1 = lm_free(rbuf) ;
 				    if (rs >= 0) rs = rs1 ;
 				} /* end if (m-a-f) */
 	                    } /* end if (wrote service code) */
@@ -150,7 +156,7 @@ static int buffer_loadargs(buffer *bp,mainv sargv) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sargv != nullptr) {
-	    if (char *qbuf ; (rs = malloc_ml(&qbuf)) >= 0) {
+	    if (char *qbuf ; (rs = lm_ml(&qbuf)) >= 0) {
 	        cint	qlen = rs ;
 	        for (int i = 0 ; sargv[i] ; i += 1) {
 	            rs = mkquoted(qbuf,qlen,sargv[i],-1) ;
@@ -158,7 +164,7 @@ static int buffer_loadargs(buffer *bp,mainv sargv) noex {
 	            bp->chr(' ') ;
 	            bp->buf(qbuf,rs) ;
 	        } /* end for */
-		rs1 = uc_free(qbuf) ;
+		rs1 = lm_free(qbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
