@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	SPLITFNAME	struct splitfname_head
@@ -35,7 +32,7 @@ struct splitfname_head {
 	cchar		*bp ;	/* directory part (length) */
 	int		dl ;	/* base-name part (pointer) */
 	int		bl ;	/* base-name part (length) */
-} ;
+} ; /* end struct (splitfname_head) */
 
 #ifdef	__cplusplus
 struct splitfname : splitfname_head {
