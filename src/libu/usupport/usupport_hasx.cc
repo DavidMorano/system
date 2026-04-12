@@ -48,7 +48,7 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>		/* |UC(3dam)| */
 
-#include	"usupport_hasx.h"
+#include	"usupport_hasx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
