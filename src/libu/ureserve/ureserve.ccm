@@ -33,7 +33,6 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -45,10 +44,10 @@ module ;
 
 export module ureserve ;
 
-export import :vecstr ;
-export import :charx ;
 export import :isnot ;
+export import :charx ;
 export import :isx ;
+export import :vecstr ;
 export import :sfx ;
 
 
