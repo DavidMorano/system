@@ -43,7 +43,7 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
-#include	"usupport_toxc.h"
+#include	"usupport_toxc.hh"
 
 import ureserve ;			/* |char(3u)| */
 
