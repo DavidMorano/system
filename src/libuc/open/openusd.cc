@@ -40,8 +40,8 @@
 #include	<sys/socket.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
@@ -58,8 +58,36 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	uc_joinus(int,SOCKADDR *,int,int,mode_t) noex ;
-}
+    extern int uc_mkdir(cchar *,mode_t) noex ;
+    extern int uc_mkfifo(cchar *,mode_t) noex ;
+    extern int uc_chmod(cchar *,mode_t) noex ;
+    extern int uc_stat(cchar *,ustat *) noex ;
+    extern int uc_unlink(cchar *) noex ;
+    extern int uc_unlinkshm(cchar *) noex ;
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_socket(int,int,int) noex ;
+    extern int uc_sockjoin(int,SOCKADDR *,int,int,mode_t) noex ;
+    extern int uc_openshm(cchar *,int,mode_t) noex ;
+    extern int uc_duper(int,int) noex ;
+    extern int uc_pipe(int *) noex ;
+    extern int uc_bind(int,cvoid *,int) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_fchown(int,uid_t,gid_t) noex ;
+    extern int uc_fminmod(int,mode_t) noex ;
+    extern int uc_connect(int,cvoid *,int) noex ;
+    extern int uc_connecte(int,cvoid *,int,int) noex ;
+    extern int uc_read(int,void *,int) noex ;
+    extern int uc_write(int,cvoid *,int) noex ;
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_iocctl(int,int,...) noex ;
+    extern int uc_rewind(int) noex ;
+    extern int uc_ftruncate(int,off_t ) noex ;
+    extern int uc_closeonexec(int,int) noex ;
+    extern int uc_fpathconf(int,int,char *) noex ;
+    extern int uc_setsockopt(int,int,int,int *,int) noex ;
+    extern int uc_linger(int,int) noex ;
+    extern int uc_close(int) ;
+} /* end extern */
 
 
 /* external variables */
@@ -83,22 +111,22 @@ int openusd(cchar *sfn,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (sfn) {
+	if (sfn) ylikely {
 	    rs = SR_INVALID ;
-	    if (sfn[0] && (of >= 0)) {
+	    if (sfn[0] && (of >= 0)) ylikely {
 	        cint	pf = PF_UNIX ;
 	        cint	st = SOCK_DGRAM ;
-	        if ((rs = uc_socket(pf,st,0)) >= 0) {
+	        if ((rs = uc_socket(pf,st,0)) >= 0) ylikely {
 	            sockaddress	sa ;
 	            cint	af = AF_UNIX ;
 	            fd = rs ;
-	            if ((rs = sockaddress_start(&sa,af,sfn,0,0)) >= 0) {
+	            if ((rs = sa.start(af,sfn,0,0)) >= 0) {
 		        SOCKADDR	*sap = (SOCKADDR *) &sa ;
 		        cint		sal = rs ;
 		        {
-		            rs = uc_joinus(fd,sap,sal,of,om) ;
+		            rs = uc_sockjoin(fd,sap,sal,of,om) ;
 		        }
-	  	        rs1 = sockaddress_finish(&sa) ;
+	  	        rs1 = sa.finish ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (sockaddress) */
 	            if (rs < 0) {
