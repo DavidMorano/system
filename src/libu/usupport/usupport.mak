@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += usupport.h usupport_sncpyx.h
+INCS += usupport.h usupport_sncpyx.hh
 
 MODS +=
 
@@ -74,7 +74,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-.SUFFIXES:		.hh .ii .iim .ccm
+.SUFFIXES:		.hhh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -170,21 +170,21 @@ obj.o:			$(OBJ)
 
 
 uhupport_prime.o:	usupport_prime.cc	usupport_prime.h	$(INCS)
-usupport_itimer.o:	usupport_itimer.cc	usupport_itimer.h	$(INCS)
-usupport_sncpyx.o:	usupport_sncpyx.cc	usupport_sncpyx.h	$(INCS)
-usupport_cfdec.o:	usupport_cfdec.cc	usupport_cfdec.h	$(INCS)
-usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.h	$(INCS)
-usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.h		$(INCS)
-usupport_ctdec.o:	usupport_ctdec.cc	usupport_ctdec.h	$(INCS)
-usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.h	$(INCS)
-usupport_matstr.o:	usupport_matstr.cc	usupport_matstr.h	$(INCS)
-usupport_nleadstr.o:	usupport_nleadstr.cc	usupport_nleadstr.h	$(INCS)
-usupport_toxc.o:	usupport_toxc.cc	usupport_toxc.h		$(INCS)
-usupport_rmx.o:		usupport_rmx.cc		usupport_rmx.h		$(INCS)
-usupport_strwcpy.o:	usupport_strwcpy.cc	usupport_strwcpy.h	$(INCS)
-usupport_ustrftime.o:	usupport_ustrftime.cc	usupport_ustrftime.h	$(INCS)
-usupport_sixchr.o:	usupport_sixchr.cc	usupport_sixchr.h	$(INCS)
-usupport_sichar.o:	usupport_sichar.cc	usupport_sichar.h	$(INCS)
-usupport_cfdect.o:	usupport_cfdect.cc	usupport_cfdect.h	$(INCS)
+usupport_itimer.o:	usupport_itimer.cc	usupport_itimer.hh	$(INCS)
+usupport_sncpyx.o:	usupport_sncpyx.cc	usupport_sncpyx.hh	$(INCS)
+usupport_cfdec.o:	usupport_cfdec.cc	usupport_cfdec.hh	$(INCS)
+usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.hh	$(INCS)
+usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.hh	$(INCS)
+usupport_ctdec.o:	usupport_ctdec.cc	usupport_ctdec.hh	$(INCS)
+usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.hh	$(INCS)
+usupport_matstr.o:	usupport_matstr.cc	usupport_matstr.hh	$(INCS)
+usupport_nleadstr.o:	usupport_nleadstr.cc	usupport_nleadstr.hh	$(INCS)
+usupport_toxc.o:	usupport_toxc.cc	usupport_toxc.hh	$(INCS)
+usupport_rmx.o:		usupport_rmx.cc		usupport_rmx.hh		$(INCS)
+usupport_strwcpy.o:	usupport_strwcpy.cc	usupport_strwcpy.hh	$(INCS)
+usupport_ustrftime.o:	usupport_ustrftime.cc	usupport_ustrftime.hh	$(INCS)
+usupport_sixchr.o:	usupport_sixchr.cc	usupport_sixchr.hh	$(INCS)
+usupport_sichar.o:	usupport_sichar.cc	usupport_sichar.hh	$(INCS)
+usupport_cfdect.o:	usupport_cfdect.cc	usupport_cfdect.hh	$(INCS)
 
 
