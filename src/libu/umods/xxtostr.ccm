@@ -145,13 +145,13 @@ constexpr cint		xxtostr_maxbase = MAXBASE ; /* standard value */
 export {
     template<typename UT>
     constexpr inline int uxxtostr(char *endp,int b,UT v) noex {
-	uint		ub = uint(b) ;
 	int		rs = SR_FAULT ;
 	char		*rp = endp ;
 	if (endp) {
 	    rs = SR_NOTSUP ;
 	    *rp = '\0' ;
 	    if ((b >= 2) && (b <= xxtostr_maxbase)) {
+		uint ub = uint(b) ;
 	        if (v != 0) {
                     int		di ;
 	            if_constexpr (szof(UT) > szof(ulong)) {
@@ -233,7 +233,7 @@ export {
 	    errno = (- rs) ;
 	}
 	return (rs >= 0) ? rp : nullptr ;
-    }
+    } /* end subroutine (stostr) */
     template<typename UT> 
     constexpr inline char *utostr(UT uv,char *endp) noex {
 	char		*rp = nullptr ;
@@ -244,7 +244,7 @@ export {
 	    errno = (- rs) ;
 	}
 	return (rs >= 0) ? rp : nullptr ;
-    }
+    } /* end subroutine (utostr) */
 } /* end export */
 
 export extern "C" {
