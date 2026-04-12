@@ -44,12 +44,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<netdb.h>
 #include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usyscalls.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<sigblocker.h>
 #include	<buffer.h>
 #include	<sfx.h>
@@ -117,7 +119,7 @@ int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,int to,int opts) noex {
 	            if (buffer srv ; (rs = buffer_start(&srv,100)) >= 0) {
 	                cint	dlen = DBUFLEN ;
 	                char *dbuf ; 
-		        if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
+		        if ((rs = lm_mall((dlen+1),&dbuf)) >= 0) {
 	                    buffer_strw(&srv,svc,svclen) ;
 	                    if (sargv != NULL) {
 		                auto	mq = mkquoted ;
@@ -137,7 +139,7 @@ int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,int to,int opts) noex {
 	                        rs = dialer(&srv,abuf,alen,dbuf,dlen,to,opts) ;
 	                        fd = rs ;
 	                    } /* end if (positive) */
-	                    rs1 = uc_free(dbuf) ;
+	                    rs1 = lm_free(dbuf) ;
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (m-a-f) */
 	                rs1 = buffer_finish(&srv) ;
@@ -166,7 +168,7 @@ static int dialer(buffer *sbp,cchar *abuf,int alen,char *dbuf,int dlen,
 	            fd = rs ;
 	            if ((rs = uc_writen(fd,bp,blen)) >= 0) {
 	                dbuf[0] = '\0' ;
-	                if ((rs = uc_readlinetimed(fd,dbuf,dlen,to)) >= 0) {
+	                if ((rs = uc_readlnto(fd,dbuf,dlen,to)) >= 0) {
 	                    if ((rs == 0) || (dbuf[0] != '+')) {
 	                        rs = SR_BADREQUEST ;
 	                    }
