@@ -66,12 +66,14 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
+#include	<netdb.h>
 #include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
 #include	<sbuf.h>
 #include	<mkx.h>
 #include	<char.h>
@@ -79,7 +81,9 @@
 
 #include	"dial.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -95,6 +99,12 @@ import libutil ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_shutdown(int,int) noex ;
+    extern int uc_close(int) noex ;
+}
+
 
 /* external variables */
 
@@ -104,10 +114,10 @@ import libutil ;
 
 /* forward references */
 
-static int	getsvclen(cchar *) noex ;
-static int	getmlen(int,mainv) noex ;
-static int	dialourtcp(cchar *,cchar *,int,int,int) noex ;
-static int	mkmuxreq(char *,int,cchar *,int,mainv,int) noex ;
+local int	getsvclen(cchar *) noex ;
+local int	getmlen(int,mainv) noex ;
+local int	dialourtcp(cchar *,cchar *,int,int,int) noex ;
+local int	mkmuxreq(char *,int,cchar *,int,mainv,int) noex ;
 
 
 /* local variables */
@@ -136,7 +146,7 @@ int dialfinger(cc *hn,cc *ps,int af,cc *svc,
 	        }
 	        svclen = getsvclen(svc) ;
 	        mlen = getmlen(svclen,sargs) ;
-	        if ((rs = uc_malloc((mlen+1),&mbuf)) >= 0) {
+	        if ((rs = lm_mall((mlen+1),&mbuf)) >= 0) {
 	            if ((rs = mkmuxreq(mbuf,mlen,svc,svclen,sargs,dot)) >= 0) {
 	                SIGACTION	nhand{} ;
 	                SIGACTION	ohand ;
@@ -159,7 +169,7 @@ int dialfinger(cc *hn,cc *ps,int af,cc *svc,
 	            } else {
 	                rs = SR_TOOBIG ;
 	            }
-	            rs1 = uc_free(mbuf) ;
+	            rs1 = lm_free(mbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (memory-allocation-free) */
 	        if ((rs < 0) && (fd >= 0)) u_close(fd) ;
@@ -172,7 +182,7 @@ int dialfinger(cc *hn,cc *ps,int af,cc *svc,
 
 /* local subroutines */
 
-static int getsvclen(cchar *svc) noex {
+local int getsvclen(cchar *svc) noex {
 	int		sl = lenstr(svc) ;
 	while (sl && CHAR_ISWHITE(svc[sl- 1])) {
 	    sl -= 1 ;
@@ -181,7 +191,7 @@ static int getsvclen(cchar *svc) noex {
 }
 /* end subroutine (getsvclen) */
 
-static int getmlen(int svclen,mainv sargs) noex {
+local int getmlen(int svclen,mainv sargs) noex {
 	int		ml = (svclen + 4) ;
 	if (sargs) {
 	    for (int i = 0 ; sargs[i] ; i += 1) {
@@ -193,7 +203,7 @@ static int getmlen(int svclen,mainv sargs) noex {
 }
 /* end subroutine (getmlen) */
 
-static int dialourtcp(cchar *hs,cchar *ps,int af,int to,int opt) noex {
+local int dialourtcp(cchar *hs,cchar *ps,int af,int to,int opt) noex {
 	int		rs = SR_OK ;
 	int		fd = -1 ;
 	if ((ps == nullptr) || (ps[0] == '\0')) {
@@ -214,7 +224,7 @@ static int dialourtcp(cchar *hs,cchar *ps,int af,int to,int opt) noex {
 /* end subroutine (dialourtcp) */
 
 /* format the service code and arguments for transmission */
-static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
+local int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
 		mainv sargs,int dot) noex {
 	sbuf		b ;
 	int		rs ;
@@ -226,8 +236,7 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
 	            rs = sbuf_strw(&b," /W",3) ;
 	        }
 	        if ((rs >= 0) && (sargs != nullptr)) {
-	            char	*qbuf{} ;
-		    if ((rs = malloc_mn(&qbuf)) >= 0) {
+	            if (char *qbuf ; (rs = lm_mn(&qbuf)) >= 0) {
 			cint	qlen = rs ;
 	                for (int i = 0 ; (rs >= 0) && sargs[i] ; i += 1) {
 			    cchar	*sa = sargs[i] ;
@@ -237,7 +246,7 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
 	                        sbuf_buf(&b,qbuf,ql) ;
 	                    }
 	                } /* end for */
-			rs1 = uc_free(qbuf) ;
+			rs1 = lm_free(qbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	        } /* end if */
