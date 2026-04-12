@@ -70,8 +70,8 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"usupport_toxc.h"
-#include	"usupport_nleadstr.h"
+#include	"usupport_toxc.hh"
+#include	"usupport_nleadstr.hh"
 
 
 /* local defines */
