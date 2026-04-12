@@ -54,7 +54,7 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"usupport_sixchr.h"
+#include	"usupport_sixchr.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
