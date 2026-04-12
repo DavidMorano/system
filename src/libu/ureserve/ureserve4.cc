@@ -1,4 +1,4 @@
-/* ureserve4 MODULE */
+/* ureserve4 MODULE (vecstr) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
