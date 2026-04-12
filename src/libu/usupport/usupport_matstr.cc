@@ -82,9 +82,9 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
-#include	"usupport_toxc.h"
-#include	"usupport_nleadstr.h"
-#include	"usupport_matstr.h"
+#include	"usupport_toxc.hh"
+#include	"usupport_nleadstr.hh"
+#include	"usupport_matstr.hh"
 
 
 /* local defines */
