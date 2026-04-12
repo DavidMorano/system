@@ -60,15 +60,20 @@
 #include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<uxti.h>
-#include	<mallocxx.h>
+#include	<uclibmem.h>
 #include	<strn.h>
 #include	<sfx.h>
 #include	<cfhexstr.h>
 #include	<localmisc.h>
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -129,12 +134,12 @@ int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
 	int		fd = -1 ;
 	(void) opts ;
 	if (abuf) {
-	    if (char *addrbuf{} ; (rs = malloc_mp(&addrbuf)) >= 0) {
+	    if (char *addrbuf{} ; (rs = lm_mp(&addrbuf)) >= 0) {
 		cint	addlen = rs ;
 	        if (alen < 0) {
 	            if (strncmp(abuf,"\\x",2) == 0) {
 	                abuf += 2 ;
-	                alen = strlen(abuf) ;
+	                alen = lenstr(abuf) ;
 	                if ((alen >> 1) <= addrlen) {
 	                    rs = cfhexstr(abuf,alen,addrbuf) ;
 	                    abuf = addrbuf ;
@@ -143,7 +148,7 @@ int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
 	                    rs = SR_TOOBIG ;
 		        }
 	            } else {
-	                alen = strlen(abuf) ;
+	                alen = lenstr(abuf) ;
 	            }
 	        } /* end if */
 	        /* try to connect to the remote machine */
@@ -214,7 +219,7 @@ static int pushmod(int fd,cchar *mods) noex {
 	                rs = u_ioctl(fd,I_PUSH,timod) ;
 	            }
 	        } else { /* pop 'timod' if it is on the stack */
-	            if (char *mbuf{} ; (rs = malloc_mp(&mbuf)) >= 0) {
+	            if (char *mbuf{} ; (rs = lm_mp(&mbuf)) >= 0) {
 		        cint	mlen = rs ;
 	                if ((rs = u_ioctl(fd,I_LOOK,mbuf)) >= 0) {
 	                    if (strcmp(mbuf,timod) == 0) {
