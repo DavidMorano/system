@@ -57,16 +57,21 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uinet.h>		/* |AF_{x}(3u)| */
+#include	<uclibmem.h>
+#include	<ucsig.h>
 #include	<getnodename.h>
 #include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
 #include	<getprogpath.h>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<varnames.hh>
 #include	<estrings.h>
 #include	<ids.h>
@@ -84,6 +89,9 @@
 #include	"dialtcp.h"
 #include	"dialprog.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -137,7 +145,7 @@ static constexpr cpcchar	prnames[] = {
 	nullptr
 } ;
 
-static bufsizevar		maxpathlen(getbufsize_mp) ;
+static bufsizevar		maxpathlen(bufsize_mp) ;
 static int			urlbuflen ;
 
 
@@ -173,10 +181,10 @@ static int dialhttper(cc *hn,cc *ps,int,cc *svc,mv sargv,int to,int) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (char *ubuf ; (rs = uc_malloc((ulen+1),&ubuf)) >= 0) {
+	if (char *ubuf ; (rs = lm_mall((ulen+1),&ubuf)) >= 0) {
 	    if ((rs = mkurl(ubuf,ulen,hn,ps,svc,sargv)) >= 0) {
 		cchar	*pn = PROG_WGET ;
-		if (char *ebuf ; (rs = malloc_mp(&ebuf)) >= 0) {
+		if (char *ebuf ; (rs = lm_mp(&ebuf)) >= 0) {
 		    if ((rs = findprog(ebuf,pn)) >= 0) {
 			char	tobuf[TOBUFLEN + 1] = {} ;
 	                if (to >= 0) {
@@ -188,14 +196,16 @@ static int dialhttper(cc *hn,cc *ps,int,cc *svc,mv sargv,int to,int) noex {
 	                    fd = rs ;
 			} /* end if (ok) */
 		    } /* end if (findprog) */
-		    rs1 = uc_free(ebuf) ;
+		    rs1 = lm_free(ebuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (mkurl) */
-	    rs1 = uc_free(ubuf) ;
+	    rs1 = lm_free(ubuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	if ((rs < 0) && (fd >= 0)) {
+	    u_close(fd) ;
+	}
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (dialhttper) */
@@ -231,12 +241,12 @@ static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
 	int		rs1 ;
 	int		rl = 0 ;
 	rbuf[0] = '\0' ;
-	if (char *dn ; (rs = malloc_hn(&dn)) >= 0) {
+	if (char *dn ; (rs = lm_hn(&dn)) >= 0) {
 	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cint	sz = ((maxpathlen + 1) * 2) ;
 	        cchar	*bdname = BINDNAME ;
-	        if (char *prbuf ; (rs = uc_malloc((sz+1),&prbuf)) >= 0) {
+	        if (char *prbuf ; (rs = lm_mall((sz+1),&prbuf)) >= 0) {
 		    cint	prlen = maxpathlen ;
 	            char	*dbuf = (prbuf + (maxpathlen+1)) ;
 	            for (int i = 0 ; prnames[i] ; i += 1) {
@@ -267,11 +277,11 @@ static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
 	                if (rl > 0) break ;
 	                if (rs < 0) break ;
 	            } /* end for */
-		    rs1 = uc_free(prbuf) ;
+		    rs1 = lm_free(prbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (getnodedomain) */
-	    rs1 = uc_free(dn) ;
+	    rs1 = lm_free(dn) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
@@ -317,7 +327,7 @@ static int loadpath(vecstr *plp) noex {
 	int		c = 0 ;
 	cchar		*vn = varname.path ;
 	if (cchar *pp ; (pp = getenv(vn)) != nullptr) {
-	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	        cchar	*tp ;
 	        while ((tp = strbrk(pp,":;")) != nullptr) {
 		    cint	pl = intconv(tp - pp) ;
@@ -334,7 +344,7 @@ static int loadpath(vecstr *plp) noex {
 			c += (rs < INT_MAX) ;
 	            }
 	        } /* end if (trailing one) */
-		rs1 = uc_free(tbuf) ;
+		rs1 = lm_free(tbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (getenv) */
