@@ -45,15 +45,14 @@
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
 #include	<ctime>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"dialpass.h"
@@ -75,6 +74,14 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_open(cchar *,int,mode_t) noex ;
+    extern int uc_fstat(int,ustat *) noex ;
+    extern int uc_pipe(int *) noex ;
+    extern int uc_ioctl(int,int,...) noex ;
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */
