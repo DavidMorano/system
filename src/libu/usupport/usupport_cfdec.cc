@@ -37,7 +37,7 @@
 #include	<strnul.hh>
 #include	<localmisc.h>		/* |DECBUFLEN| */
 
-#include	"usupport_cfdec.h"
+#include	"usupport_cfdec.hh"
 
 
 /* local defines */
