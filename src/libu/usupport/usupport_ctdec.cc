@@ -33,12 +33,12 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
-#include	<xxtostr.h>		/* |{x}tostr(3u)| */
 #include	<localmisc.h>		/* |DECBUFLEN| */
 
-#include	"usupport_sncpyx.h"
-#include	"usupport_ctdec.h"
+#include	"usupport_sncpyx.hh"
+#include	"usupport_ctdec.hh"
 
+import xxtostr ;
 
 /* local defines */
 
@@ -80,17 +80,20 @@ namespace libu {
 	    char	dbuf[DECBUFLEN + 1] ;
 	    char	*bp = ctx(uv,(dbuf + dlen)) ;
 	    rs = sncpy(dp,dl,bp) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine-template (ctdecx) */
-    int ctdecui(char *dp,int dl,uint uv) noex {
+    int ctdecui		(char *dp,int dl,uint uv)	noex {
 	return ctdecx(uitostr,dp,dl,uv) ;
     }
-    int ctdecul(char *dp,int dl,ulong uv) noex {
+    int ctdecul		(char *dp,int dl,ulong uv)	noex {
 	return ctdecx(ultostr,dp,dl,uv) ;
     }
-    int ctdecull(char *dp,int dl,ulonglong uv) noex {
+    int ctdecull	(char *dp,int dl,ulonglong uv)	noex {
 	return ctdecx(ulltostr,dp,dl,uv) ;
+    }
+    int ctdec_unknown	(char *dp,int dl)		noex {
+	return sncpy(dp,dl,"unknown") ;
     }
 } /* end namespace (libu) */
 
