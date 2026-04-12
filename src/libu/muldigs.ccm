@@ -120,16 +120,16 @@ template<integral_unsigned T2,integral_unsigned T1>
 
 export {
     constexpr void muldig(mut int1 *r,int1 v0,int1 v1) noex {
-	return muldigx<uint>(r,v0,v1) ;
+	return muldigx<uint>		(r,v0,v1) ;
     } /* end subroutine (muldig) */
     constexpr void muldig(mut int2 *r,int2 v0,int2 v1) noex {
-	return muldigx<uint>(r,v0,v1) ;
+	return muldigx<uint>		(r,v0,v1) ;
     } /* end subroutine (muldig) */
     constexpr void muldig(mut int4 *r,int4 v0,int4 v1) noex {
-	return muldigx<ulong>(r,v0,v1) ;
+	return muldigx<ulong>		(r,v0,v1) ;
     } /* end subroutine (muldig) */
     constexpr void muldig(mut int8 *r,int8 v0,int8 v1) noex {
-	return muldigx<ulonglong>(r,v0,v1) ;
+	return muldigx<ulonglong>	(r,v0,v1) ;
     } /* end subroutine (muldig) */
 } /* end export */
 
