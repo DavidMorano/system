@@ -50,7 +50,7 @@
 #include	<intsat.h>
 #include	<localmisc.h>
 
-#include	"usupport_ustrftime.h"
+#include	"usupport_ustrftime.hh"
 
 
 /* local defines */
