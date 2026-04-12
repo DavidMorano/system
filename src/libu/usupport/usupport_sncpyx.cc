@@ -48,7 +48,7 @@
 #include	<usysbase.h>
 #include	<localmisc.h>
 
-#include	"usupport_sncpyx.h"
+#include	"usupport_sncpyx.hh"
 
 
 /* local defines */
