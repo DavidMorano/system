@@ -29,8 +29,11 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
 #include	<sfx.h>
 #include	<nlsdialassist.h>
 #include	<localmisc.h>
@@ -54,6 +57,10 @@ typedef mainv		mv ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_writen(int,cvoid *,int) noex ;
+}
 
 
 /* external variables */
@@ -83,7 +90,7 @@ int dialussnls(cchar *portspec,cchar *svc,int to,int aopts) noex {
 	    if (portspec[0] && svc[0]) {
 		cchar	*sp{} ;
 	        if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) {
-	            if (char *nlsbuf ; (rs = malloc_mn(&nlsbuf)) >= 0) {
+	            if (char *nlsbuf ; (rs = lm_mn(&nlsbuf)) >= 0) {
 	                cint	nlslen = rs ;
 	                if ((rs = mknlsreq(nlsbuf,nlslen,sp,sl)) >= 0) {
 	                    SIGACTION	osig ;
@@ -98,8 +105,8 @@ int dialussnls(cchar *portspec,cchar *svc,int to,int aopts) noex {
 	                        if ((rs = dialuss(portspec,to,aopts)) >= 0) {
 	                            fd = rs ;
 	                            if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
-	                                char	*rbuf{} ;
-					if ((rs = malloc_mn(&rbuf)) >= 0) {
+	                                char	*rbuf ;
+					if ((rs = lm_mn(&rbuf)) >= 0) {
 	                                    cint	rlen = rs ;
 	                                    rs = readnlsresp(fd,rbuf,rlen,to) ;
 					}
@@ -111,7 +118,7 @@ int dialussnls(cchar *portspec,cchar *svc,int to,int aopts) noex {
 	                } else {
 	                    rs = SR_TOOBIG ;
 	                }
-	                rs1 = uc_free(nlsbuf) ;
+	                rs1 = lm_free(nlsbuf) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
 		    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
