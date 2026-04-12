@@ -220,7 +220,7 @@ using std::bitset ;			/* type */
 constexpr int   chtablen = (UCHAR_MAX+1) ;
 
 namespace {
-    struct charinfo {
+    struct charmgr {
 	bitset<chtablen>	isalpha ;
 	bitset<chtablen>	isalnum ;
 	bitset<chtablen>	isdigex ;
@@ -232,20 +232,20 @@ namespace {
 	consteval void mkisdigex() noex ;
 	consteval void mkisprint() noex ;
 	consteval void mkisterm() noex ;
-	consteval charinfo() noex {
+	consteval charmgr() noex {
 	    mkisalpha() ;
 	    mkisalnum() ;
 	    mkisdigex() ;
 	    mkisprint() ;
 	    mkisterm() ;
 	} ; /* end ctor */
-    } ; /* end struct (charinfo) */
+    } ; /* end struct (charmgr) */
 } /* end namespace */
 
 
 /* forward references */
 
-consteval void charinfo::mkalpha(bitset<chtablen> &s) noex {
+consteval void charmgr::mkalpha(bitset<chtablen> &s) noex {
 	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
 	    s.set(ch,true) ;
 	    s.set((ch + 0x20),true) ;
@@ -255,20 +255,20 @@ consteval void charinfo::mkalpha(bitset<chtablen> &s) noex {
 	}
 	s.set(UC('×'),false) ;
 	s.set(UC('÷'),false) ;
-} /* end method (charinfo::mkalpha) */
+} /* end method (charmgr::mkalpha) */
 
-consteval void charinfo::mkisalpha() noex {
+consteval void charmgr::mkisalpha() noex {
     	mkalpha(isalpha) ;
-} /* end method (charinfo::mkisalpha) */
+} /* end method (charmgr::mkisalpha) */
 
-consteval void charinfo::mkisalnum() noex {
+consteval void charmgr::mkisalnum() noex {
     	mkalpha(isalnum) ;
 	for (int ch = '0' ; ch <= '9' ; ch += 1) {
 	    isalnum.set(ch,true) ;
 	}
-} /* end method (charinfo::mkisalnum) */
+} /* end method (charmgr::mkisalnum) */
 
-consteval void charinfo::mkisdigex() noex {
+consteval void charmgr::mkisdigex() noex {
 	for (int ch = '0' ; ch <= '9' ; ch += 1) {
 	    isdigex.set(ch,true) ;
 	}
@@ -276,9 +276,9 @@ consteval void charinfo::mkisdigex() noex {
 	    isdigex.set(ch,true) ;
 	    isdigex.set((ch + 0x20),true) ;
 	}
-} /* end method (charinfo::mkisdigex) */
+} /* end method (charmgr::mkisdigex) */
 
-consteval void charinfo::mkisprint() noex {
+consteval void charmgr::mkisprint() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
 	    bool f = ((ch & 0x7f) >= 0x20) && (ch != CH_DEL) ;
 	    f = f || (ch == CH_TAB) ;
@@ -286,7 +286,7 @@ consteval void charinfo::mkisprint() noex {
 	        isprint.set(ch,true) ;
 	    }
 	} /* end for */
-} /* end method (charinfo::mkisprint) */
+} /* end method (charmgr::mkisprint) */
 
 constexpr uchar		termchars[] = {
 	CH_TAB,	CH_CR,	CH_NL,	CH_BS,
@@ -295,7 +295,7 @@ constexpr uchar		termchars[] = {
 	CH_ESC,	CH_CSI,	CH_DCS
 } ; /* end array (termchars) */
 
-consteval void charinfo::mkisterm() noex {
+consteval void charmgr::mkisterm() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
 	    if (((ch & 0x7f) >= 0x20) && (ch != CH_DEL)) {
 		isterm.set(ch,true) ;
@@ -304,12 +304,12 @@ consteval void charinfo::mkisterm() noex {
 	for (cauto &ch : termchars) {
 	    isterm.set(ch,true) ;
 	} /* end for */
-} /* end method (charinfo::mkisterm) */
+} /* end method (charmgr::mkisterm) */
 
 
 /* local variables */
 
-constexpr charinfo	ischarx_data ;
+constexpr charmgr	ischarx_data ;
 
 
 /* exported variables */
