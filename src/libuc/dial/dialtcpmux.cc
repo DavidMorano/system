@@ -64,8 +64,12 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucsig.h>
+#include	<ucread.h>
 #include	<sbuf.h>
 #include	<sfx.h>
 #include	<mkx.h>
@@ -74,7 +78,9 @@
 
 #include	"dialtcp.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -94,6 +100,11 @@ import libutil ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_writen(int,cvoid *,int) noex ;
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */
@@ -180,7 +191,7 @@ int dialtcpmux(cc *hn,cc *ps,int af,cc *svc,mainv sargs,int to,int dot) noex {
 int muxhelp::start() noex {
 	int		rs ;
 	mlen = getmuxlen(sl,sargs) ;
-	if (void *vp ; (rs = uc_malloc((mlen+1),&vp)) >= 0) {
+	if (void *vp ; (rs = lm_mall((mlen+1),&vp)) >= 0) {
 	    mbuf = charp(vp) ;
 	}
 	return rs ;
@@ -191,7 +202,7 @@ int muxhelp::finish() noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (mbuf) {
-	    rs1 = uc_free(mbuf) ;
+	    rs1 = lm_free(mbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mbuf = nullptr ;
 	}
@@ -232,14 +243,14 @@ int muxhelp::reqsvc(int fd) noex {
 	int		rs ;
 	int		rs1 ;
         if ((rs = uc_writen(fd,mbuf,mlen)) >= 0) {
-            if (char *rbuf  ; (rs = malloc_mn(&rbuf)) >= 0) {
+            if (char *rbuf  ; (rs = lm_mn(&rbuf)) >= 0) {
 		cint	rlen = rs ;
-                if ((rs = uc_readlinetimed(fd,rbuf,rlen,to)) >= 0) {
+                if ((rs = uc_readlnto(fd,rbuf,rlen,to)) >= 0) {
                     if ((rs == 0) || (rbuf[0] != '+')) {
                         rs = SR_BADREQUEST ;
 		    }
                 }
-		rs1 = uc_free(rbuf) ;
+		rs1 = lm_free(rbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
         } /* end if (read response) */
@@ -266,7 +277,7 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
 	if (sbuf b ; (rs = b.start(mbuf,mlen)) >= 0) {
 	    if ((rs = b.strw(sp,sl)) >= 0) {
 	        if (sargs) {
-	            if (char *qbuf ; (rs = malloc_mn(&qbuf)) >= 0) {
+	            if (char *qbuf ; (rs = lm_mn(&qbuf)) >= 0) {
 			cint	qlen = rs ;
 	                for (int i = 0 ; (rs >= 0) && sargs[i] ; i += 1) {
 			    cchar	*sa = sargs[i] ;
@@ -276,7 +287,7 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
 	                        rs = b.buf(qbuf,len) ;
 	                    }
 	                } /* end for */
-		        rs1 = uc_free(qbuf) ;
+		        rs1 = lm_free(qbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	        } /* end if (svc-args) */
