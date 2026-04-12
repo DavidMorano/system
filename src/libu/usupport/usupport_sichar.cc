@@ -66,7 +66,7 @@
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>
 
-#include	"usupport_sichar.h"
+#include	"usupport_sichar.hh"
 
 import ureserve ;			/* |is{x}(3u)| */
 
