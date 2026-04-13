@@ -49,20 +49,20 @@ struct msgid_buffer {
 	uint		mlen ;		/* fixed buffer length */
 	uint		off ;		/* file offset of valid area */
 	uint		len ;		/* length of valid area */
-} ;
+} ; /* end struct */
 
 /* decoded file magic */
 struct msgid_filemagic {
 	char		magic[MSGID_MAGICSIZE] ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 /* decoded file header values */
 struct msgid_filehead {
 	uint		wcount ;
 	uint		wtime ;
 	uint		nentries ;
-} ;
+} ; /* end struct */
 
 struct msgid_flags {
 	uint		fileinit:1 ;		/* file init'ed */
@@ -72,7 +72,7 @@ struct msgid_flags {
 	uint		cursorlockbroken:1 ;	/* cursor lock broken */
 	uint		cursoracc:1 ;		/* accessed while cursored? */
 	uint		remote:1 ;		/* remote mounted file */
-} ;
+} ; /* end struct */
 
 struct msgid_head {
 	cchar		*fname ;
@@ -91,16 +91,16 @@ struct msgid_head {
 	int		fd ;
 	int		cursors ;
 	int		entsz ;		/* entry buffer size */
-} ;
+} ; /* end struct */
 
 struct msgid_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct msgid_keyer {
 	cchar		*recip ;
 	cchar		*msgid ;
-} ;
+} ; /* end struct */
 
 typedef MSGID		msgid ;
 typedef	MSGID_FL	msgid_fl ;
