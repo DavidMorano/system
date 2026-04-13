@@ -72,7 +72,7 @@
 #include	<usyscalls.h>
 #include	<uinet.h>
 #include	<uclibmem.h>
-#include	<ucfuncodes.h>		/* |FM_{x}(3uc)| */
+#include	<funcodes.h>		/* |FM_{x}(3uc)| */
 #include	<getbufsize.h>
 #include	<getprotofamily.h>
 #include	<dialtcp.h>
