@@ -16,10 +16,7 @@
 #include	<sys/types.h>		/* system types */
 #include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 #include	<cq.h>
 
@@ -40,7 +37,7 @@ struct grcache_stats {
 	uint		refreshes ;		/* refreshes */
 	uint		phits, pmisses ;	/* positive */
 	uint		nhits, nmisses ;	/* negative */
-} ;
+} ; /* end struct (gncache_stats) */
 
 struct grcache_head {
 	cq		*flp ;		/* free-list-pointer */
@@ -51,7 +48,7 @@ struct grcache_head {
 	uint		wcount ;
 	int		ttl ;		/* time-to-live */
 	int		nmax ;		/* maximum entries */
-} ;
+} ; /* end struct (gncache_head) */
 
 typedef	GRCACHE		grcache ;
 typedef	GRCACHE_ST	grcache_st ;
