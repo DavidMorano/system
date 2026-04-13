@@ -1,0 +1,133 @@
+/* arithmetic_mul MODULE (mul -- primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* Vector-Arithmetic */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2017-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+/*******************************************************************************
+
+  	Module:
+	varithmetic.mul
+
+	Description:
+	These subroutines are used in performing extended precision
+	integer arithmetic.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>
+#include	<localmisc.h>
+#include	<dprintf.hh>		/* |DPRINTF| */
+
+export module varithmetic.mul ;
+
+import builtin ;
+import bitmanip ;
+import muldigs ;
+import varithmetic.util ;
+import varithmetic.add ;
+
+/* local defines */
+
+
+/* local typedefs */
+
+
+/* module subroutines */
+
+constexpr void vmuler(int n,mut ulong *r,con ulong *v0,con ulong *v1) noex {
+	cint nb = (szof(ulong) * CHAR_BIT) ;
+	cint nh = (n / 2) ;
+	ulonglong vl0 ;
+	ulonglong vl1 ;
+	ulonglong res ;
+	vclear(n,r) ;
+	for (int i = 0 ; i < nh ; i += 1) {
+	    vl0 = v0[i] ;
+	    for (int j = 0 ; j < nh ; j += 1) {
+		ulong	tmp ;
+		cint	ri = (i + j) ;
+		int	co = 0 ;
+	        vl1 = v1[j] ;
+	        res = vl0 * vl1 ;
+		tmp = ulongconv(res >> 0) ;
+    		co = addc((r + ri + 0),r[ri + 0],tmp,co) ;
+		tmp = ulongconv(res >> nb) ;
+    		co = addc((r + ri + 1),r[ri + 1],tmp,co) ;
+	    } /* end for */
+	} /* end for */
+} /* end subroutine (vmuler) */
+
+    template<typename Dig>
+    constexpr void vmuler(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
+	cint nh = (n / 2) ;
+	vclear(n,r) ;
+	for (int i = 0 ; i < nh ; i += 1) {
+	    for (int j = 0 ; j < nh ; j += 1) {
+		cint	ri = (i + j) ;
+		int	co = 0 ;
+		Dig	res[2] ; muldig(res,v0[j],v1[i]) ;
+    		co = addc((r + ri + 0),r[ri + 0],res[0],co) ;
+    		co = addc((r + ri + 1),r[ri + 1],res[1],co) ;
+	    } /* end for */
+	} /* end for */
+    } /* end subroutine (vmuler) */
+
+export {
+    /* n= quotient-reminder-digits */
+    template<typename Dig>
+    constexpr void vmulone(int n,mut Dig *r,con Dig *v0,con Dig one) noex {
+	cint nh = (n / 2) ;
+	vclear(n,r) ;
+	for (int i = 0 ; i < nh ; i += 1) {
+	    cint	ri = i ;
+	    int		co = 0 ;
+	    Dig		res[2] ; muldig(res,v0[i],one) ;
+	    co = addc((r + ri + 0),r[ri + 0],res[0],co) ;
+	    co = addc((r + ri + 1),r[ri + 1],res[1],co) ;
+	} /* end for */
+    } /* end subroutine (vmulone) */
+} /* end export */
+
+export {
+    template<typename Dig>
+    constexpr void vmul(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
+	vmuler(n,r,v0,v1) ;
+    } /* end subroutine (vmul) */
+} /* end export */
+
+export {
+    template<typename Dig>
+    constexpr void vmultrunc(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
+	cint n2 = (n * 2) ;
+	{
+    	    Dig res[n2] ;
+	    vmuler(n2,res,v0,v1) ;
+	    vcopy(n,r,res) ; /* <- truncation */
+	}
+    } /* end subroutine (vmultrunc) */
+} /* end export */
+
+
