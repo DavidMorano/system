@@ -1,0 +1,100 @@
+/* arithmetic_rotate MODULE (rotate -- primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* Vector-Arithmetic */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2017-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+/*******************************************************************************
+
+  	Module:
+	varithmetic.rotate
+
+	Description:
+	These subroutines are used in performing extended precision
+	integer arithmetic.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>
+#include	<localmisc.h>
+
+export module varithmetic.rotate ;
+
+import builtin ;
+import bitmanip ;
+import varithmetic.util ;
+
+/* module subroutines */
+
+export {
+    template<typename Dig>
+    constexpr void vrotr(int n,mut Dig *r,con Dig *v,int nb) noex {
+	cint nbits	= (szof(Dig) * CHAR_BIT) ;
+	cint nbitstotal = (szof(Dig) * CHAR_BIT * n) ;
+	if ((nb >= 0) && (nb < nbitstotal)) {
+	    cint nb_hi = (nb / nbits) ;
+	    cint nb_lo = (nb % nbits) ;
+	    if (nb) {
+		Dig lomask = ((Dig(1) << nb_lo) - 1) ;
+		Dig vlo ;
+		Dig vhi ;
+	        for (int i = 0 ; i < n ; i += 1) {
+		    cint ilo = ((i + nb_hi) % n) ;
+		    cint ihi = ((i + nb_hi + 1) % n) ;
+		    vlo = ((v[ilo] >> nb_lo) & lomask) ;
+		    vhi =  (v[ihi] << (nbits - nb_lo)) ;
+	            r[i] = vhi | vlo ;
+	        } /* end for */
+	    } else {
+		vcopy(n,r,v) ;
+	    }
+	} else {
+	    vclear(n,r) ;
+	}
+    } /* end subroutine (vrotr) */
+    template<typename Dig>
+    constexpr void vrotl(int n,mut Dig *r,con Dig *v,int nb) noex {
+	cint nbitstotal = (szof(Dig) * CHAR_BIT * n) ;
+	if ((nb >= 0) && (nb < nbitstotal)) {
+	    if (nb) {
+	        vrotr(n,r,v,(nbitstotal - nb)) ;
+	    } else {
+		vcopy(n,r,v) ;
+	    }
+	} else {
+	    vclear(n,r) ;
+	}
+    } /* end subroutine (vrotl) */
+    template<typename Dig>
+    constexpr void vrotx(int n,mut Dig *r,con Dig *v,int nb) noex {
+	if (nb >= 0) {
+	    vrotr(r,v,nb) ;
+	} else {
+	    vrotl(r,v,(- nb)) ;
+	}
+    } /* end subroutine (vrotx) */
+} /* end export */
+
+
