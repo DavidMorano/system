@@ -36,7 +36,9 @@
 
 #include	"streamsync.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -56,7 +58,7 @@ import libutil ;
 template<typename ... Args>
 static inline int streamsync_magic(streamsync *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == STREAMSYNC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -77,7 +79,7 @@ constexpr bool		f_memcmp = CF_MEMCMP ;
 int streamsync_start(streamsync *op,cchar *st,int stlen) noex {
 	int		rs = SR_FAULT ;
 	int		sz ;
-	if (op && st) {
+	if (op && st) ylikely {
 	    rs = SR_INVALID ;
 	    if (stlen < 0) stlen = lenstr(st) ;
 	    memclear(op) ;
@@ -101,8 +103,8 @@ int streamsync_start(streamsync *op,cchar *st,int stlen) noex {
 int streamsync_finish(streamsync *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = streamsync_magic(op)) >= 0) {
-	    if (op->st) {
+	if ((rs = streamsync_magic(op)) >= 0) ylikely {
+	    if (op->st) ylikely {
 	        rs1 = uc_free(op->st) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->st = nullptr ;
