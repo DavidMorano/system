@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<hdb.h>
 
 
@@ -42,7 +39,7 @@ struct namecache_statistics {
 	uint		refreshes ;
 	uint		phits, pmisses ;	/* positive */
 	uint		nhits, nmisses ;	/* negative */
-} ;
+} ; /* end struct (namecache_statistics) */
 
 struct namecache_head {
 	hdb		*dbp ;
@@ -51,7 +48,7 @@ struct namecache_head {
 	uint		magic ;
 	int		nmax ;		/* maximum number of entries */
 	int		ttl ;		/* time-to-live (in seconds) */
-} ;
+} ; /* end struct (namecache_head) */
 
 typedef	NAMECACHE		namecache ;
 typedef	NAMECACHE_ST		namecache_st ;
