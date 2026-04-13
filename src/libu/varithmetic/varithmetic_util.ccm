@@ -1,0 +1,136 @@
+/* varithmetic_util MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* Vector-Arithmetic */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2017-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+/*******************************************************************************
+
+  	Module:
+	varithmetic.util
+
+	Description:
+	These subroutines are used in performing extended precision
+	integer arithmetic.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>
+#include	<localmisc.h>
+#include	<dprintf.hh>		/* |DPRINTF| */
+
+export module varithmetic.util ;
+
+import builtin ;
+import bitmanip ;
+
+/* module subroutines */
+
+/* how many digits are in a divisor-array, on the low end */
+export {
+    template<typename TA> constexpr int nsigdig(int n,con TA *d) noex {
+    	int c = 0 ;
+    	for (int i = (n - 1) ; i >= 0 ; --i) {
+	    if (d[i]) {
+		c = (i + 1) ;
+		break ;
+	    }
+	} /* end for */
+    	return c ;
+    } /* end subroutine-template (nsigdig) */
+} /* end export */
+
+export {
+    template<typename Dig>
+    constexpr void vclear(int n,mut Dig *v) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    v[i] = 0 ;
+	}
+    } /* end subroutine (vclear) */
+    template<typename Dig>
+    constexpr void vopaque(int n,mut Dig *v) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    v[i] = (compl Dig(0)) ;
+	}
+    } /* end subroutine (vopaque) */
+    template<typename Dig>
+    constexpr void vcopy(int n,mut Dig *r,con Dig *o = nullptr) noex {
+	if (o) {
+	    for (int i = 0 ; i < n ; i += 1) {
+	        r[i] = o[i] ;
+	    }
+	} else {
+	    vclear(n,r) ;
+	}
+    } /* end subroutine (vcopy) */
+} /* end export */
+
+export {
+    template<typename Dig>
+    constexpr int vcmp(int n,con Dig *v1,con Dig *v2) noex {
+	int		rc = 0 ;
+	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
+	    if ((rc = (v1[i] != v2[i]))) {
+		rc = (v1[i] > v2[i]) ? +1 : -1 ;
+		break ;
+	    }
+	} /* end for */
+	return rc ;
+    } /* end subroutine (vcmp) */
+} /* end export */
+
+export {
+    template<typename Dig>
+    constexpr int addone(mut Dig &r,con Dig v) noex {
+	r = v + 1 ;
+	return int(r < v) ; /* carry-out */
+    }
+    template<typename Dig>
+    constexpr int subone(mut Dig &r,con Dig v) noex {
+	r = v - 1 ;
+	return int(r > v) ; /* carry-out */
+    }
+} /* end export */
+
+export {
+    template<typename Dig>
+    constexpr int addc(mut Dig *r,con Dig v0,con Dig v1,
+	    int ci = 0) noex {
+	Dig		co{} ;
+	Dig		dci = cast_static<Dig>(ci) ;
+	*r = mach_addc(v0,v1,dci,&co) ;
+	return int(co) ;
+    }
+    template<typename Dig>
+    constexpr int subc(mut Dig *r,con Dig v0,con  Dig v1,
+	    int ci = 0) noex {
+	Dig		co{} ;
+	Dig		dci = cast_static<Dig>(ci) ;
+	*r = mach_subc(v0,v1,dci,&co) ;
+	return int(co) ;
+    }
+} /* end export */
+
+
