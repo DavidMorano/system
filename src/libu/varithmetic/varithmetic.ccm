@@ -1,0 +1,51 @@
+/* varithmetic MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* Vector-Arithmetic */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2017-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+/*******************************************************************************
+
+  	Module:
+	varithmetic
+
+	Description:
+	These subroutines are used in performing extended precision
+	integer arithmetic.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+
+export module varithmetic ;
+
+export import varithmetic.util ;
+export import varithmetic.logical ;
+export import varithmetic.shift ;
+export import varithmetic.rotate ;
+export import varithmetic.add ;
+export import varithmetic.sub ;
+export import varithmetic.mul ;
+export import varithmetic.div ;
+
+
