@@ -25,14 +25,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 
-#ifndef	noex
-#ifdef	__cplusplus
-#define	noex			noexcept
-#else
-#define	noex			/* noexcept */
-#endif
-#endif /* noex */
-
 #ifndef	charconv
 #define	charconv		char
 #endif
@@ -110,6 +102,22 @@
 #define	attrpure		__attribute__((pure))
 #endif
 #endif /* __cplusplus */
+
+#ifndef	noex
+#ifdef	__cplusplus
+#define	noex			noexcept
+#else
+#define	noex			/* noexcept */
+#endif
+#endif /* noex */
+
+#ifndef	conex
+#ifdef	__cplusplus
+#define	conex			constexpr
+#else
+#define	conex			/* constexpr */
+#endif
+#endif /* conex */
 
 #ifdef	__cplusplus
 #ifndef	typealias
