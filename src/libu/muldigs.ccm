@@ -133,30 +133,34 @@ export {
     } /* end subroutine (muldig) */
 } /* end export */
 
-constexpr inline void split(mut ulong *va,ulonglong v) noex {
+export {
+    constexpr inline void llsplit(mut ulong *va,ulonglong v) noex {
 	cint nb = (szof(ulong) * CHAR_BIT) ;
     	va[0] = ulong(v >> 00) ;
     	va[1] = ulong(v >> nb) ;
-} /* end subroutine */
+    } /* end subroutine (llsplit) */
+} /* end export */
 
-constexpr inline ulonglong join(con ulong *va) noex {
+export {
+    constexpr inline ulonglong lljoin(con ulong *va) noex {
 	cint nb = (szof(ulong) * CHAR_BIT) ;
     	ulonglong lo = va[0] ;
     	ulonglong hi = va[1] ;
 	return (hi << nb) | lo ;
-} /* end subroutine */
+    } /* end subroutine (lljoin) */
+} /* end export */
 
 export {
     constexpr void muldig(mut ull *r,ull v0,ull v1) noex {
 	ulong v0a[2] ;
 	ulong v1a[2] ;
 	ulong res[4] ;
-	split(v0a,v0) ;
-	split(v1a,v1) ;
+	llsplit(v0a,v0) ;
+	llsplit(v1a,v1) ;
     	vmuler(4,res,v0a,v1a) ;
-	r[0] = join(res + 0) ;
-	r[1] = join(res + 2) ;
+	r[0] = lljoin(res + 0) ;
+	r[1] = lljoin(res + 2) ;
     } /* end subroutine (muldig) */
-} /* end export */
+} /* end export muldig) */
 
 
