@@ -37,9 +37,11 @@
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<string>		/* |string(3c++)| */
-#include	<usystem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucentgr.h>
 #include	<getax.h>
 #include	<vechand.h>
 #include	<cq.h>
@@ -67,7 +69,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -107,14 +108,14 @@ typedef grcache_rec *	recp ;
 /* forward references */
 
 template<typename ... Args>
-static int grcache_ctor(grcache *op,Args ... args) noex {
+local int grcache_ctor(grcache *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(op) ;
-	    if ((op->flp = new(nothrow) cq) != np) {
-	        if ((op->rlp = new(nothrow) vechand) != np) {
+	    if ((op->flp = new(nothrow) cq) != np) ylikely {
+	        if ((op->rlp = new(nothrow) vechand) != np) ylikely {
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
@@ -124,57 +125,54 @@ static int grcache_ctor(grcache *op,Args ... args) noex {
 	    } /* end if (new-cq) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (grcache_ctor) */
+} /* end subroutine (grcache_ctor) */
 
-static int grcache_dtor(grcache *op) noex {
+local int grcache_dtor(grcache *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->rlp) {
+	    if (op->rlp) ylikely {
 		delete op->rlp ;
 		op->rlp = nullptr ;
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (grcache_dtor) */
+} /* end subroutine (grcache_dtor) */
 
 template<typename ... Args>
-static inline int grcache_magic(grcache *op,Args ... args) noex {
+local inline int grcache_magic(grcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == GRCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (grcache_magic) */
+} /* end subroutine (grcache_magic) */
 
-static int grcache_searchname(grcache *,rec **,cchar *) noex ;
-static int grcache_mkrec(grcache *,time_t,rec **,cchar *) noex ;
-static int grcache_getrec(grcache *,time_t,rec **) noex ;
-static int grcache_allocrec(grcache *,rec **) noex ;
-static int grcache_recstart(grcache *,time_t,rec *,cchar *) noex ;
-static int grcache_recrear(grcache *,rec *) noex ;
-static int grcache_recaccess(grcache *,time_t,rec *) noex ;
-static int grcache_recdel(grcache *,int,rec *) noex ;
-static int grcache_recfree(grcache *,rec *) noex ;
-static int grcache_maintenance(grcache *,time_t) noex ;
-static int grcache_record(grcache *,int,int) noex ;
+local int grcache_searchname(grcache *,rec **,cchar *) noex ;
+local int grcache_mkrec(grcache *,time_t,rec **,cchar *) noex ;
+local int grcache_getrec(grcache *,time_t,rec **) noex ;
+local int grcache_allocrec(grcache *,rec **) noex ;
+local int grcache_recstart(grcache *,time_t,rec *,cchar *) noex ;
+local int grcache_recrear(grcache *,rec *) noex ;
+local int grcache_recaccess(grcache *,time_t,rec *) noex ;
+local int grcache_recdel(grcache *,int,rec *) noex ;
+local int grcache_recfree(grcache *,rec *) noex ;
+local int grcache_maintenance(grcache *,time_t) noex ;
+local int grcache_record(grcache *,int,int) noex ;
 
 #if	CF_SEARCHGID
-static int grcache_searchgid(grcache *,rec **,gid_t) noex ;
+local int grcache_searchgid(grcache *,rec **,gid_t) noex ;
 #endif /* CF_SEARCHGID */
 
-static int record_start(rec *,time_t,int,cchar *) noex ;
-static int record_access(rec *,time_t) noex ;
-static int record_refresh(rec *,time_t,int) noex ;
-static int record_old(rec *,time_t,int) noex ;
-static int record_finish(rec *) noex ;
+local int record_start(rec *,time_t,int,cchar *) noex ;
+local int record_access(rec *,time_t) noex ;
+local int record_refresh(rec *,time_t,int) noex ;
+local int record_old(rec *,time_t,int) noex ;
+local int record_finish(rec *) noex ;
 
 
 /* local variables */
@@ -194,11 +192,11 @@ constexpr bool		f_maintextra = CF_MAINTEXTRA ;
 int grcache_start(grcache *op,int nmax,int ttl) noex {
 	cint		defnum = GRCACHE_DEFENTS ;
 	int		rs ;
-	if ((rs = grcache_ctor(op)) >= 0) {
+	if ((rs = grcache_ctor(op)) >= 0) ylikely {
 	    if (nmax < 4) nmax = GRCACHE_DEFMAX ;
 	    if (ttl < 1) ttl = GRCACHE_DEFTTL ;
-	    if ((rs = cq_start(op->flp)) >= 0) {
-	        if ((rs = vechand_start(op->rlp,defnum,0)) >= 0) {
+	    if ((rs = cq_start(op->flp)) >= 0) ylikely {
+	        if ((rs = vechand_start(op->rlp,defnum,0)) >= 0) ylikely {
 		    op->nmax = nmax ;
 		    op->ttl = ttl ;
 		    op->ti_check = time(nullptr) ;
@@ -219,10 +217,10 @@ int grcache_start(grcache *op,int nmax,int ttl) noex {
 int grcache_finish(grcache *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = grcache_magic(op)) >= 0) {
+	if ((rs = grcache_magic(op)) >= 0) ylikely {
 	    vechand	*rlp = op->rlp ;
 	    void	*vp{} ;
-	    if (rlp) {
+	    if (rlp) ylikely {
 	        for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
 	                rec	*rp = recp(vp) ;
@@ -231,23 +229,23 @@ int grcache_finish(grcache *op) noex {
 			    if (rs >= 0) rs = rs1 ;
 			}
 			{
-	                    rs1 = libmem.free(rp) ;
+	                    rs1 = lm_free(rp) ;
 			    if (rs >= 0) rs = rs1 ;
 			}
 	            }
 	        } /* end for */
 	    }
-	    if (rlp) {
+	    if (rlp) ylikely {
 	        rs1 = vechand_finish(rlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 	        while (cq_rem(op->flp,&vp) >= 0) {
-	            rs1 = libmem.free(vp) ;
+	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end while */
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 	        rs1 = cq_finish(op->flp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -264,9 +262,9 @@ int grcache_finish(grcache *op) noex {
 int grcache_lookname(grcache *op,GE *grp,char *grbuf,int grlen,cc *gn) noex {
 	time_t		dt = time(nullptr) ;
 	int		rs ;
-	if ((rs = grcache_magic(op,grp,grbuf,gn)) >= 0) {
+	if ((rs = grcache_magic(op,grp,grbuf,gn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (gn[0]) {
+	    if (gn[0]) ylikely {
 		rec	*rp{} ;
 	        int	ct ;
 	        op->s.total += 1 ;
@@ -304,7 +302,7 @@ int grcache_lookgid(grcache *op,GE *grp,char *grbuf,int grlen,gid_t gid) noex {
 	time_t		dt = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		grl = 0 ;
-	if ((rs = grcache_magic(op,grp,grbuf)) >= 0) {
+	if ((rs = grcache_magic(op,grp,grbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (gid != gidend) {
 	        rec	*rp{} ;
@@ -336,8 +334,8 @@ int grcache_lookgid(grcache *op,GE *grp,char *grbuf,int grlen,gid_t gid) noex {
 
 int grcache_getstats(grcache *op,grcache_st *sp) noex {
 	int		rs ;
-	if ((rs = grcache_magic(op,sp)) >= 0) {
-	    if ((rs = vechand_count(op->rlp)) >= 0) {
+	if ((rs = grcache_magic(op,sp)) >= 0) ylikely {
+	    if ((rs = vechand_count(op->rlp)) >= 0) ylikely {
 	        *sp = op->s ;
 	        sp->nentries = rs ;
 	    }
@@ -349,7 +347,7 @@ int grcache_getstats(grcache *op,grcache_st *sp) noex {
 int grcache_check(grcache *op,time_t dt) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = grcache_magic(op)) >= 0) {
+	if ((rs = grcache_magic(op)) >= 0) ylikely {
 	    if (dt == 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_check) >= TO_CHECK) {
 	        f = true ;
@@ -364,18 +362,18 @@ int grcache_check(grcache *op,time_t dt) noex {
 
 /* private subroutines */
 
-static int grcache_mkrec(grcache *op,time_t dt,rec **epp,cc *gn) noex {
+local int grcache_mkrec(grcache *op,time_t dt,rec **epp,cc *gn) noex {
 	int		rs ;
 	int		grl = 0 ;
 	*epp = nullptr ;
-	if ((rs = vechand_count(op->rlp)) >= 0) {
+	if ((rs = vechand_count(op->rlp)) >= 0) ylikely {
 	    cint	n = rs ;
 	    if (n >= op->nmax) {
 	        rs = grcache_getrec(op,dt,epp) ;
 	    } else {
 	        rs = grcache_allocrec(op,epp) ;
 	    } /* end if */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = grcache_recstart(op,dt,*epp,gn) ;
 		grl = rs ;
 	    }
@@ -384,11 +382,11 @@ static int grcache_mkrec(grcache *op,time_t dt,rec **epp,cc *gn) noex {
 }
 /* end subroutine (grcache_mkrec) */
 
-static int grcache_recstart(grcache *op,time_t dt,rec *ep,cc *gn) noex {
+local int grcache_recstart(grcache *op,time_t dt,rec *ep,cc *gn) noex {
 	cint		wc = op->wcount++ ;
 	int		rs ;
 	int		grl = 0 ;
-	if ((rs = record_start(ep,dt,wc,gn)) >= 0) {
+	if ((rs = record_start(ep,dt,wc,gn)) >= 0) ylikely {
 	    grl = rs ;
 	    rs = vechand_add(op->rlp,ep) ;
 	    if (rs < 0) {
@@ -399,9 +397,9 @@ static int grcache_recstart(grcache *op,time_t dt,rec *ep,cc *gn) noex {
 }
 /* end subroutine (grcache_recstart) */
 
-static int grcache_recaccess(grcache *op,time_t dt,rec *ep) noex {
+local int grcache_recaccess(grcache *op,time_t dt,rec *ep) noex {
 	int		rs ;
-	if ((rs = grcache_recrear(op,ep)) >= 0) {
+	if ((rs = grcache_recrear(op,ep)) >= 0) ylikely {
 	    if ((rs = record_old(ep,dt,op->ttl)) > 0) {
 		int	wc = op->wcount++ ;
 	        op->s.refreshes += 1 ;
@@ -414,7 +412,7 @@ static int grcache_recaccess(grcache *op,time_t dt,rec *ep) noex {
 }
 /* end subroutine (grcache_recaccess) */
 
-static int grcache_recrear(grcache *op,rec *ep) noex {
+local int grcache_recrear(grcache *op,rec *ep) noex {
 	int		rs = SR_FAULT ;
 	if (op && ep) {
 	    rs = SR_OK ;
@@ -423,7 +421,7 @@ static int grcache_recrear(grcache *op,rec *ep) noex {
 }
 /* end subroutine (grcache_recrear) */
 
-static int grcache_recdel(grcache *op,int ri,rec *ep) noex {
+local int grcache_recdel(grcache *op,int ri,rec *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ri >= 0) {
@@ -442,7 +440,7 @@ static int grcache_recdel(grcache *op,int ri,rec *ep) noex {
 }
 /* end subroutine (grcache_recdel) */
 
-static int grcache_searchname(grcache *op,rec **rpp,cchar *gn) noex {
+local int grcache_searchname(grcache *op,rec **rpp,cchar *gn) noex {
 	vechand		*rlp = op->rlp ;
 	int		rs ;
 	rec		*rp = nullptr ;
@@ -465,12 +463,12 @@ static int grcache_searchname(grcache *op,rec **rpp,cchar *gn) noex {
 /* end subroutine (grcache_searchname) */
 
 #if	CF_SEARCHGID
-static int grcache_searchgid(grcache *op,rec **rpp,gid_t gid) noex {
+local int grcache_searchgid(grcache *op,rec **rpp,gid_t gid) noex {
 	vechand		*rlp = op->rlp ;
 	int		rs ;
 	rec		*rp = nullptr ;
 	void		*vp{} ;
-	bool		f = false ;
+	bool		f = false ; /* used-afterwards */
 	for (int i = 0 ; (rs = vechand_get(op->rlp,i,vp)) >= 0 ; i += 1) {
 	    rp = recp(vp) ;
 	    if (vp) {
@@ -486,7 +484,7 @@ static int grcache_searchgid(grcache *op,rec **rpp,gid_t gid) noex {
 /* end subroutine (grcache_searchgid) */
 #endif /* CF_SEARCHGID */
 
-static int grcache_getrec(grcache *op,time_t dt,rec **rpp) noex {
+local int grcache_getrec(grcache *op,time_t dt,rec **rpp) noex {
 	rec		*rp = nullptr ;
 	vechand		*rlp = op->rlp ;
 	time_t		ti_oldest = timemax ;
@@ -496,7 +494,7 @@ static int grcache_getrec(grcache *op,time_t dt,rec **rpp) noex {
 	void		*vp{} ;
 	for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
 	    rp = recp(vp) ;
-	    if (vp) {
+	    if (vp) ylikely {
 	        if (record_old(rp,dt,op->ttl) > 0) {
 	            grcache_recdel(op,i,rp) ;
 	            grcache_recfree(op,rp) ;
@@ -510,7 +508,7 @@ static int grcache_getrec(grcache *op,time_t dt,rec **rpp) noex {
 	    }
 	    if (rs < 0) break ;
 	} /* end for */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    if (f_exp || (iold < 0)) {
 		rs = grcache_allocrec(op,&rp) ;
 	    } else {
@@ -528,7 +526,7 @@ static int grcache_getrec(grcache *op,time_t dt,rec **rpp) noex {
 }
 /* end subroutine (grcache_getrec) */
 
-static int grcache_maintenance(grcache *op,time_t dt) noex {
+local int grcache_maintenance(grcache *op,time_t dt) noex {
 	rec		*rp = nullptr ;
 	time_t		ti_oldest = timemax ;
 	int		rs = SR_OK ;
@@ -552,7 +550,7 @@ static int grcache_maintenance(grcache *op,time_t dt) noex {
 	/* delete entries (at least one) if we are too big */
 	if ((rs >= 0) && (iold >= 0)) {
 	    if ((rs = vechand_count(op->rlp)) > op->nmax) {
-	        if ((rs = vechand_get(op->rlp,iold,&vp)) >= 0) {
+	        if ((rs = vechand_get(op->rlp,iold,&vp)) >= 0) ylikely {
 		    rp = recp(vp) ;
 	            if (rp) {
 	                grcache_recdel(op,iold,rp) ;
@@ -565,11 +563,11 @@ static int grcache_maintenance(grcache *op,time_t dt) noex {
 }
 /* end subroutine (grcache_maintenance) */
 
-static int grcache_allocrec(grcache *op,rec **rpp) noex {
+local int grcache_allocrec(grcache *op,rec **rpp) noex {
 	int		rs ;
 	if ((rs = cq_rem(op->flp,rpp)) == SR_NOTFOUND) {
 	    cint	sz = szof(rec) ;
-	    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	        *rpp = recp(vp) ;
 	    } /* end if (memory-allocation) */
 	} /* end if (cq_rem) */
@@ -577,21 +575,21 @@ static int grcache_allocrec(grcache *op,rec **rpp) noex {
 }
 /* end subroutine (grcache_allocrec) */
 
-static int grcache_recfree(grcache *op,rec *rp) noex {
+local int grcache_recfree(grcache *op,rec *rp) noex {
 	int		rs ;
-	if ((rs = cq_count(op->flp)) >= 0) {
+	if ((rs = cq_count(op->flp)) >= 0) ylikely {
 	    cint	n = rs ;
 	    if (n < GRCACHE_MAXFREE) {
 	        rs = cq_ins(op->flp,rp) ;
 	    } else {
-	        libmem.free(rp) ;
+	        lm_free(rp) ;
 	    }
 	}
 	return rs ;
 }
 /* end subroutine (grcache_recfree) */
 
-static int grcache_record(grcache *op,int ct,int rs) noex {
+local int grcache_record(grcache *op,int ct,int rs) noex {
 	int		f_got = (rs > 0) ;
 	switch (ct) {
 	case ct_hit:
@@ -607,22 +605,22 @@ static int grcache_record(grcache *op,int ct,int rs) noex {
 }
 /* end subroutine (grcache_record) */
 
-static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
+local int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		grl = 0 ;
-	if (rp && gn) {
+	if (rp && gn) ylikely {
 	    rs = SR_INVALID ;
-	    if (gn[0]) {
+	    if (gn[0]) ylikely {
 		cint	rsn = SR_NOTFOUND ;
 	        if (dt == 0) dt = time(nullptr) ;
 	        memclear(rp) ;
-	        if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) {
+	        if (char *grbuf ; (rs = lm_gr(&grbuf)) >= 0) ylikely {
 	            cint	grlen = rs ;
 	            if (ucentgr gr ; (rs = gr.getnam(grbuf,grlen,gn)) >= 0) {
 	                cint	sz = (rs+1) ;
 	                grl = rs ; /* indicates entry found */
-	                if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+	                if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 			    ucentgr	*grp = &rp->gr ;
 		            char	*nbuf = charp(vp) ;
 		            if ((rs = grp->load(nbuf,grl,&gr)) >= 0) {
@@ -630,15 +628,15 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	    	                rp->grl = grl ;
 		            }
 		            if (rs < 0) {
-				libmem.free(grbuf) ;
+				lm_free(grbuf) ;
 			    }
 	                } /* end if (memory-allocation) */
 	            } else if (rs == rsn) {
 	                rp->grl = 0 ; /* optional */
 	                grl = 0 ; /* indicates an empty (not-found) entry */
 		    }
-	            if (rs >= 0) {
-			if (cchar *cp ; (rs = libmem.strw(gn,-1,&cp)) >= 0) {
+	            if (rs >= 0) ylikely {
+			if (cchar *cp ; (rs = lm_strw(gn,-1,&cp)) >= 0) {
 			    rp->gn = cp ;
 	                    rp->ti_create = dt ;
 	                    rp->ti_access = dt ;
@@ -646,7 +644,7 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	                    rp->magic = RECORD_MAGIC ;
 			} /* end if (memory-allocation) */
 	            } /* end if (ok) */
-	            rs1 = libmem.free(grbuf) ; /* free first one up at top */
+	            rs1 = lm_free(grbuf) ; /* free first one up at top */
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -655,21 +653,21 @@ static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 }
 /* end subroutine (record_start) */
 
-static int record_finish(rec *rp) noex {
+local int record_finish(rec *rp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (rp) {
+	if (rp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (rp->magic == RECORD_MAGIC) {
+	    if (rp->magic == RECORD_MAGIC) ylikely {
 		rs = SR_OK ;
-		if (rp->gn) {
+		if (rp->gn) ylikely {
 		    void *vp = voidp(rp->gn) ;
-	            rs1 = libmem.free(vp) ;
+	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            rp->gn = nullptr ;
 		}
-	        if (rp->grbuf) {
-	            rs1 = libmem.free(rp->grbuf) ;
+	        if (rp->grbuf) ylikely {
+	            rs1 = lm_free(rp->grbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	            rp->grbuf = nullptr ;
 	        }
@@ -682,12 +680,12 @@ static int record_finish(rec *rp) noex {
 }
 /* end subroutine (record_finish) */
 
-static int record_access(rec *ep,time_t dt) noex {
+local int record_access(rec *ep,time_t dt) noex {
 	int		rs = SR_FAULT ;
 	int		grl ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if (ep->magic == RECORD_MAGIC) {
+	    if (ep->magic == RECORD_MAGIC) ylikely {
 		rs = SR_OK ;
 	        ep->ti_access = dt ;
 	        grl  = ep->grl ;
@@ -697,36 +695,36 @@ static int record_access(rec *ep,time_t dt) noex {
 }
 /* end subroutine (record_access) */
 
-static int record_reload(rec *ep,int grl,ucentgr *ngrp) noex {
+local int record_reload(rec *ep,int grl,ucentgr *ngrp) noex {
 	int		rs = SR_OK ;
         void    	*vp{} ;
         if (ep->grbuf) {
-            rs = libmem.rall(ep->grbuf,(grl + 1),&vp) ;
+            rs = lm_rall(ep->grbuf,(grl + 1),&vp) ;
         } else {
-            rs = libmem.mall((grl + 1),&vp) ;
+            rs = lm_mall((grl + 1),&vp) ;
         }
-        if (rs >= 0) {
+        if (rs >= 0) ylikely {
             char        *grbuf = charp(vp) ; /* new variable */
 	    ucentgr	*grp = &ep->gr ;
             ep->grbuf = charp(vp) ;
             ep->grl = grl ;
             rs = grp->load(grbuf,grl,ngrp) ;
             if (rs < 0) {
-                libmem.free(vp) ;
+                lm_free(vp) ;
             }
         } /* end if (ok) */
 	return rs ;
 }
 /* end subroutine (record_reload) */
 
-static int record_refresh(rec *ep,time_t dt,int wc) noex {
+local int record_refresh(rec *ep,time_t dt,int wc) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		grl = 0 ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if (ep->magic == RECORD_MAGIC) {
-	        if (char *grbuf ; (rs = malloc_gr(&grbuf)) >= 0) {
+	    if (ep->magic == RECORD_MAGIC) ylikely {
+	        if (char *grbuf ; (rs = lm_gr(&grbuf)) >= 0) ylikely {
 		    ucentgr	gr ;
 		    cint	rsn = SR_NOTFOUND ;
 	            cint	grlen = rs ;
@@ -735,18 +733,18 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
 			rs = record_reload(ep,grl,&gr) ;
 	            } else if (rs == rsn) {
 	                if (ep->grbuf) {
-		            libmem.free(ep->grbuf) ;
+		            lm_free(ep->grbuf) ;
 		            ep->grbuf = nullptr ;
 	                }
 	                ep->grl = 0 ; /* signal whatever? */
 	                grl = 0 ; /* indicates an empty (not-found) entry */
 		    } /* end if */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                ep->ti_create = dt ;
 	                ep->ti_access = dt ;
 	                ep->wcount = wc ;
 	            } /* end if (ok) */
-	            rs1 = libmem.free(grbuf) ; /* free first one up top */
+	            rs1 = lm_free(grbuf) ; /* free first one up top */
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
@@ -755,10 +753,10 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
 }
 /* end subroutine (record_refresh) */
 
-static int record_old(rec *ep,time_t dt,int ttl) noex {
+local int record_old(rec *ep,time_t dt,int ttl) noex {
 	int		rs = SR_FAULT ;
 	int		f_old = false ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (ep->magic == RECORD_MAGIC) {
 		rs = SR_OK ;
