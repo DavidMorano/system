@@ -30,7 +30,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<serialbuf.h>
 #include	<sncpyx.h>
@@ -39,7 +42,9 @@
 
 #include	"msgide.hh"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -63,8 +68,9 @@ namespace {
 	int		reciplen ;
 	int		maxhostlen ;
 	operator int () noex ;
-    } ;
-}
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
@@ -87,7 +93,7 @@ int msgide::istart() noex {
 	    cint	maxhost = var.maxhostlen ;
 	    cint	sz = ((var.reciplen + 1) + (2 * (var.maxhostlen + 1))) ;
 	    int		ai = 0 ;
-	    if ((rs = uc_malloc(sz,&a)) >= 0) {
+	    if ((rs = lm_mall(sz,&a)) >= 0) {
 		from 		= (a + ((maxhost + 1) * ai++)) ;
 		messageid 	= (a + ((maxhost + 1) * ai++)) ;
 		recipient 	= (a + ((maxhost + 1) * ai++)) ;
@@ -111,7 +117,7 @@ int msgide::ifinish() noex {
     	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
 	if (a) {
-	    rs1 = uc_free(a) ;
+	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
 	    {
@@ -268,18 +274,17 @@ msgide_co<msgide>::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (msgide_co<msgide>::operator) */
+} /* end method (msgide_co<msgide>::operator) */
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
 	    reciplen = rs ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
 		maxhostlen = rs ;
 	    }
 	}
 	return rs ;
-}
+} /* end method (vars::operator) */
 
 
