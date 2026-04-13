@@ -23,13 +23,9 @@
 #include	<sys/types.h>		/* system-types */
 #include	<time.h>		/* |time_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vechand.h>
 #include	<cq.h>
-#include	<localmisc.h>		/* |GROUPNAMELEN| */
 
 
 #define	GNCACHE			struct gncache_head
@@ -48,7 +44,7 @@ struct gncache_stats {
 	uint		refreshes ;
 	uint		phits, pmisses ;	/* positive */
 	uint		nhits, nmisses ;	/* negative */
-} ;
+} ; /* end struct (gncache_stats) */
 
 struct gncache_head {
 	cq		*flp ;
@@ -58,7 +54,7 @@ struct gncache_head {
 	uint		magic ;
 	int		ttl ;		/* time-to-live in seconds */
 	int		nmax ;		/* maximum entries */
-} ;
+} ; /* end struct (gncache_head) */
 
 typedef	GNCACHE		gncache ;
 typedef	GNCACHE_ST	gncache_st ;
