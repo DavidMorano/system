@@ -39,7 +39,7 @@ MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm
 MODS += libutil.ccm chrset.ccm bitgrp.ccm
 MODS += digtab.ccm xxtostr.ccm 
 MODS += usigsets.o usigblock.ccm umisc.ccm
-MODS += unixfnames.ccm constdiv.ccm builtin.ccm
+MODS += unixfnames.ccm constdiv.ccm
 MODS += usysbasic.ccm ureserve.cmm vecbool.ccm
 
 LIBS += -liconv -lproc
@@ -85,6 +85,11 @@ OBJ29= clockids.o itimers.o filetypes.o funcodes.o
 OBJ30= binchunk.o conintx.o udiv.o stdintx.o
 OBJ31= ccfile.o readln.o dprintf.o
 
+OBJ32= muldigs.o varithmetic.o
+OBJ33=
+OBJ34=
+OBJ45=
+
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
@@ -93,8 +98,9 @@ OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
+OBJI= obj32.o 
 
-OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o
+OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o obji.o
 
 
 INCDIRS=
@@ -285,6 +291,18 @@ obj31.o:		$(OBJ31)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj32.o:		$(OBJ32)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj33.o:		$(OBJ33)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj34.o:		$(OBJ34)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj35.o:		$(OBJ35)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obja.o:			$(OBJA)
 	$(LD) -r -o $@ $(LDFLAGS) $^
@@ -311,6 +329,9 @@ objh.o:			$(OBJH)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obji.o:			$(OBJI)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+objj.o:			$(OBJJ)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
@@ -467,6 +488,11 @@ ptx.o:			ptx.dir
 ptx.dir:
 	makesubdir $@
 
+# VARITHMETIC
+varithmetic.o:		varithmetic.dir bitmanip.o muldigs.o
+varithmetic.dir:
+	makesubdir $@
+
 # misc-objects
 chrset.o:		chrset.ccm			$(INCS)
 bitgrp.o:		bitgrp.ccm			$(INCS)
@@ -517,9 +543,10 @@ readln.o:		readln.cc	readln.hh			$(INCS)
 dprintf.o:		dprintf.cc	dprintf.hh			$(INCS)
 
 # ARITHMETIC
-intext.o:		intext.ccm	varithmetic.o
-varithmetic.o:		varithmetic.ccm	muldigs.o
+bitmanip.o:		bitmanip.ccm
 muldigs.o:		muldigs.ccm
+loadvals.o:		loadvals.ccm
+intext.o:		intext.ccm	varithmetic.o loadvals.o
 
 ischx.o:		ischx0.o ischx1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
