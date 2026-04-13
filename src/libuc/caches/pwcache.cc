@@ -30,16 +30,20 @@
 #include        <ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include        <cstdlib>
-#include        <usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>		/* |getustime(3u)| */
+#include	<uclibmem.h>
+#include        <ucgetpw.h>
 #include        <getbufsize.h>
-#include        <mallocxx.h>
-#include        <ucentpw.h>
 #include        <strwcpy.h>
 #include        <localmisc.h>
 
 #include        "pwcache.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -48,7 +52,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -97,9 +100,9 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static inline int pwcache_ctor(pwcache *op,Args ... args) noex {
+local inline int pwcache_ctor(pwcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->s = {} ;
@@ -107,8 +110,8 @@ static inline int pwcache_ctor(pwcache *op,Args ... args) noex {
 	    op->wcount = 0 ;
 	    op->ttl = 0 ;
 	    op->nmax = 0 ;
-	    if ((op->dbp = new(nothrow) hdb) != nullptr) {
-	        if ((op->lrup = new(nothrow) pq) != nullptr) {
+	    if ((op->dbp = new(nothrow) hdb) != nullptr) ylikely {
+	        if ((op->lrup = new(nothrow) pq) != nullptr) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-pq) */
 	        if (rs < 0) {
@@ -121,53 +124,51 @@ static inline int pwcache_ctor(pwcache *op,Args ... args) noex {
 }
 /* end method (pwcache_ctor) */
 
-static inline int pwcache_dtor(pwcache *op) noex {
+local inline int pwcache_dtor(pwcache *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->lrup) {
+	    if (op->lrup) ylikely {
 		delete op->lrup ;
 		op->lrup = nullptr ;
 	    }
-	    if (op->dbp) {
+	    if (op->dbp) ylikely {
 		delete op->dbp ;
 		op->dbp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (pwcache_dtor) */
+} /* end method (pwcache_dtor) */
 
 template<typename ... Args>
-static int pwcache_magic(pwcache *op,Args ... args) noex {
+local int pwcache_magic(pwcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == PWCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end method (pwcache_magic) */
+} /* end method (pwcache_magic) */
 
-static int      pwcache_mkrec(pwcache *,time_t,rec **,ureq *) noex ;
-static int      pwcache_newrec(pwcache *,time_t,rec **,ureq *) noex ;
-static int      pwcache_oldrec(pwcache *,rec *) noex ;
-static int      pwcache_recstart(pwcache *,time_t,rec *,ureq *) noex ;
-static int      pwcache_recdel(pwcache *,rec *) noex ;
-static int      pwcache_recaccess(pwcache *,time_t,rec *) noex ;
-static int      pwcache_recrear(pwcache *,rec *) noex ;
-static int      pwcache_recfins(pwcache *) noex ;
-static int      pwcache_record(pwcache *,int,int) noex ;
-static int	pwcache_finduid(pwcache *,rec **,uid_t) noex ;
+local int      pwcache_mkrec(pwcache *,time_t,rec **,ureq *) noex ;
+local int      pwcache_newrec(pwcache *,time_t,rec **,ureq *) noex ;
+local int      pwcache_oldrec(pwcache *,rec *) noex ;
+local int      pwcache_recstart(pwcache *,time_t,rec *,ureq *) noex ;
+local int      pwcache_recdel(pwcache *,rec *) noex ;
+local int      pwcache_recaccess(pwcache *,time_t,rec *) noex ;
+local int      pwcache_recrear(pwcache *,rec *) noex ;
+local int      pwcache_recfins(pwcache *) noex ;
+local int      pwcache_record(pwcache *,int,int) noex ;
+local int	pwcache_finduid(pwcache *,rec **,uid_t) noex ;
 
-static int	record_start(rec *,time_t,int,ureq *) noex ;
-static int	record_loadun(rec *,ucentpw *) noex ;
-static int	record_access(rec *,time_t) noex ;
-static int	record_refresh(rec *,time_t,int) noex ;
-static int	record_old(rec *,time_t,int) noex ;
-static int	record_finish(rec *) noex ;
+local int	record_start(rec *,time_t,int,ureq *) noex ;
+local int	record_loadun(rec *,ucentpw *) noex ;
+local int	record_access(rec *,time_t) noex ;
+local int	record_refresh(rec *,time_t,int) noex ;
+local int	record_old(rec *,time_t,int) noex ;
+local int	record_finish(rec *) noex ;
 
-static int	getpw(ucentpw *,char *,int,ureq *) noex ;
-static int	getpw_name(ucentpw *,char *,int,cchar *) noex ;
+local int	getpw(ucentpw *,char *,int,ureq *) noex ;
+local int	getpw_name(ucentpw *,char *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -179,13 +180,13 @@ static int	getpw_name(ucentpw *,char *,int,cchar *) noex ;
 /* exported subroutines */
 
 int pwcache_start(pwcache *op,int nmax,int ttl) noex {
+	cnullptr	np{} ;
         int             rs  ;
-	if ((rs = pwcache_ctor(op)) >= 0) {
-	    cnullptr	np{} ;
+	if ((rs = pwcache_ctor(op)) >= 0) ylikely {
             if (nmax < PWCACHE_DEFMAX) nmax = PWCACHE_DEFMAX ;
             if (ttl < PWCACHE_DEFTTL) ttl = PWCACHE_DEFTTL ;
-            if ((rs = hdb_start(op->dbp,nmax,1,np,np)) >= 0) {
-                if ((rs = pq_start(op->lrup)) >= 0) {
+            if ((rs = hdb_start(op->dbp,nmax,1,np,np)) >= 0) ylikely {
+                if ((rs = pq_start(op->lrup)) >= 0) ylikely {
                     op->nmax = nmax ;
                     op->ttl = ttl ;
                     op->ti_check = getustime ;
@@ -206,8 +207,8 @@ int pwcache_start(pwcache *op,int nmax,int ttl) noex {
 int pwcache_finish(pwcache *op) noex {
         int             rs ;
         int             rs1 ;
-	if ((rs = pwcache_magic(op)) >= 0) {
-            if (op->lrup) {
+	if ((rs = pwcache_magic(op)) >= 0) ylikely {
+            if (op->lrup) ylikely {
                 rs1 = pq_finish(op->lrup) ; /* finish up the LRU queue */
                 if (rs >= 0) rs = rs1 ;
             }
@@ -215,7 +216,7 @@ int pwcache_finish(pwcache *op) noex {
                 rs1 = pwcache_recfins(op) ; /* freeing all cache entries */
                 if (rs >= 0) rs = rs1 ;
             }
-            if (op->dbp) {
+            if (op->dbp) ylikely {
                 rs1 = hdb_finish(op->dbp) ; /* free up everything else */
                 if (rs >= 0) rs = rs1 ;
             }
@@ -232,9 +233,9 @@ int pwcache_finish(pwcache *op) noex {
 int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
         custime    	dt = getustime ;
         int             rs ;
-	if ((rs = pwcache_magic(op,pwp,pwbuf,un)) >= 0) {
+	if ((rs = pwcache_magic(op,pwp,pwbuf,un)) >= 0) ylikely {
             rs = SR_INVALID ;
-            if (un[0]) {
+            if (un[0]) ylikely {
                 hdb_dat		key ;
                 hdb_dat		val{} ;
                 rec		*ep = nullptr ;
@@ -271,7 +272,7 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 int pwcache_uid(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
         custime		dt = getustime ;
         int             rs ;
-	if ((rs = pwcache_magic(op,pwp,pwbuf)) >= 0) {
+	if ((rs = pwcache_magic(op,pwp,pwbuf)) >= 0) ylikely {
             rec         *ep = nullptr ;
             int         ct = 0 ;
             op->s.total += 1 ;
@@ -303,22 +304,22 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
 	int             rs ;
         int             rs1 ;
         int             f_found = false ;
-	if ((rs = pwcache_magic(op,un)) >= 0) {
+	if ((rs = pwcache_magic(op,un)) >= 0) ylikely {
             rs = SR_INVALID ;
-            if (un[0]) {
+            if (un[0]) ylikely {
                 hdb_dat   key ;
                 hdb_dat   val{} ;
                 key.buf = un ;
                 key.len = lenstr(un) ;
-                if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
+                if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) ylikely {
                     rec     *ep = (rec *) val.buf ;
                     f_found = true ;
-                    {
+                    if (op->lrup) ylikely {
                         pq_ent      *pep = (pq_ent *) ep ;
                         rs1 = pq_unlink(op->lrup,pep) ;
                         if (rs >= 0) rs = rs1 ;
                     }
-                    {
+                    if (op->dbp) ylikely {
                         rs1 = hdb_delkey(op->dbp,key) ;
                         if (rs >= 0) rs = rs1 ;
                     }
@@ -327,7 +328,7 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
                         if (rs >= 0) rs = rs1 ;
                     }
                     {
-                        rs1 = uc_free(ep) ;
+                        rs1 = lm_free(ep) ;
                         if (rs >= 0) rs = rs1 ;
                     }
                 } else if (rs == SR_NOTFOUND) {
@@ -343,8 +344,8 @@ int pwcache_check(pwcache *op,time_t dt) noex {
         int             rs ;
         int             rs1 ;
         int             f = false ;
-	if ((rs = pwcache_magic(op)) >= 0) {
-            if (hdb_cur cur ; (rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
+	if ((rs = pwcache_magic(op)) >= 0) ylikely {
+            if (hdb_cur cur ; (rs = hdb_curbegin(op->dbp,&cur)) >= 0) ylikely {
                 hdb_dat       key{} ;
                 hdb_dat       val{} ;
                 if (dt == 0) dt = getustime ;
@@ -352,14 +353,14 @@ int pwcache_check(pwcache *op,time_t dt) noex {
                     rs1 = hdb_curenum(op->dbp,&cur,&key,&val) ;
                     if (rs1 == SR_NOTFOUND) break ;
                     rs = rs1 ;
-                    if (rs >= 0) {
+                    if (rs >= 0) ylikely {
                         rec         *ep = recp(val.buf) ;
-                        if ((rs = record_old(ep,dt,op->ttl)) > 0) {
+                        if ((rs = record_old(ep,dt,op->ttl)) > 0) ylikely {
                             f = true ;
-                            if ((rs = pwcache_recdel(op,ep)) >= 0) {
+                            if ((rs = pwcache_recdel(op,ep)) >= 0) ylikely {
                                 pq_ent      *pep = (pq_ent *) ep ;
                                 rs = pq_unlink(op->lrup,pep) ;
-                                uc_free(ep) ;
+                                lm_free(ep) ;
                             }
                         } /* end if (entry-old) */
                     } /* end if (ok) */
@@ -374,8 +375,8 @@ int pwcache_check(pwcache *op,time_t dt) noex {
 
 int pwcache_getstat(pwcache *op,pwcache_st *sp) noex {
         int             rs ;
-	if ((rs = pwcache_magic(op,sp)) >= 0) {
-            if ((rs = hdb_count(op->dbp)) >= 0) {
+	if ((rs = pwcache_magic(op,sp)) >= 0) ylikely {
+            if ((rs = hdb_count(op->dbp)) >= 0) ylikely {
                 *sp = op->s ;
                 sp->nentries = rs ;
             }
@@ -387,18 +388,18 @@ int pwcache_getstat(pwcache *op,pwcache_st *sp) noex {
 
 /* private subroutines */
 
-static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
+local int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
         int             rs ;
         int             rs1 ;
         int             pwl = 0 ;
         *epp = nullptr ;
-        if ((rs = hdb_count(op->dbp)) >= 0) {
+        if ((rs = hdb_count(op->dbp)) >= 0) ylikely {
             pq_ent	*pep{} ;
             cint	n = rs ;
             if (n >= op->nmax) {
-                if ((rs = pq_rem(op->lrup,&pep)) >= 0) {
+                if ((rs = pq_rem(op->lrup,&pep)) >= 0) ylikely {
                     rec		*ep = recp(pep) ;
-                    if ((rs = pwcache_recdel(op,ep)) >= 0) {
+                    if ((rs = pwcache_recdel(op,ep)) >= 0) ylikely {
                         if ((rs = pwcache_recstart(op,dt,ep,rp)) >= 0) {
                             pwl = rs ;
                 	    if (epp) {
@@ -410,7 +411,7 @@ static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (removed entry) */
             } else {
-                if ((rs = pwcache_newrec(op,dt,epp,rp)) >= 0) {
+                if ((rs = pwcache_newrec(op,dt,epp,rp)) >= 0) ylikely {
                     pwl = rs ;
                     if (*epp) {
                         pep = (pq_ent *) *epp ;
@@ -426,15 +427,15 @@ static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
 }
 /* end subroutine (pwcache_mkrec) */
 
-static int pwcache_newrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
+local int pwcache_newrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
         int             rs = SR_BUGCHECK ;
-        if (epp) {
+        if (epp) ylikely {
             cint	rsz = szof(rec) ;
-            rec		*ep = nullptr ;
-            if ((rs = uc_malloc(rsz,&ep)) >= 0) {
+            rec		*ep = nullptr ; /* used-afterwards */
+            if ((rs = lm_mall(rsz,&ep)) >= 0) ylikely {
                 rs = pwcache_recstart(op,dt,ep,rp) ;
                 if (rs < 0) {
-		    uc_free(ep) ;
+		    lm_free(ep) ;
 		}
             } /* end if (memory-allocation) */
             *epp = (rs >= 0) ? ep : nullptr ;
@@ -443,16 +444,16 @@ static int pwcache_newrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
 }
 /* end subroutine (pwcache_newrec) */
 
-static int pwcache_oldrec(pwcache *op,rec *ep) noex {
+local int pwcache_oldrec(pwcache *op,rec *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op && ep) {
+	if (op && ep) ylikely {
 	    {
                 rs1 = record_finish(ep) ;
                 if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = uc_free(ep) ;
+	        rs1 = lm_free(ep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	}
@@ -460,11 +461,11 @@ static int pwcache_oldrec(pwcache *op,rec *ep) noex {
 }
 /* end subroutine (pwcache_newrec) */
 
-static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
+local int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
         cint		wc = op->wcount++ ;
         int             rs ;
         int             pwl = 0 ;
-        if ((rs = record_start(ep,dt,wc,rp)) >= 0) {
+        if ((rs = record_start(ep,dt,wc,rp)) >= 0) ylikely {
             hdb_dat	key ;
             hdb_dat	val ;
             cint	rsz = szof(rec) ;
@@ -482,10 +483,10 @@ static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
 }
 /* end subroutine (pwcache_recstart) */
 
-static int pwcache_recaccess(pwcache *op,time_t dt,rec *ep) noex {
+local int pwcache_recaccess(pwcache *op,time_t dt,rec *ep) noex {
         int             rs ;
-        if ((rs = pwcache_recrear(op,ep)) >= 0) {
-            if ((rs = record_old(ep,dt,op->ttl)) > 0) {
+        if ((rs = pwcache_recrear(op,ep)) >= 0) ylikely {
+            if ((rs = record_old(ep,dt,op->ttl)) > 0) ylikely {
                 cint     wc = op->wcount++ ;
                 op->s.refreshes += 1 ;
                 rs = record_refresh(ep,dt,wc) ;
@@ -497,10 +498,10 @@ static int pwcache_recaccess(pwcache *op,time_t dt,rec *ep) noex {
 }
 /* end subroutine (pwcache_recaccess) */
 
-static int pwcache_recrear(pwcache *op,rec *ep) noex {
+local int pwcache_recrear(pwcache *op,rec *ep) noex {
         pq_ent          *pcp = (pq_ent *) ep ;
         int             rs ;
-        if (pq_ent *pep{} ; (rs = pq_gettail(op->lrup,&pep)) >= 0) {
+        if (pq_ent *pep{} ; (rs = pq_gettail(op->lrup,&pep)) >= 0) ylikely {
             if (pcp != pep) {
                 pep = (pq_ent *) ep ;
                 if ((rs = pq_unlink(op->lrup,pep)) >= 0) {
@@ -508,7 +509,7 @@ static int pwcache_recrear(pwcache *op,rec *ep) noex {
                     if (rs < 0) {
 			rec	*rep = (rec *) pep ;
                         record_finish(rep) ;
-                        uc_free(pep) ;
+                        lm_free(pep) ;
                     }
                 }
             }
@@ -517,7 +518,7 @@ static int pwcache_recrear(pwcache *op,rec *ep) noex {
 }
 /* end subroutine (pwcache_recrear) */
 
-static int pwcache_recdel(pwcache *op,rec *ep) noex {
+local int pwcache_recdel(pwcache *op,rec *ep) noex {
         int             rs = SR_OK ;
         int             rs1 ;
 	{
@@ -535,11 +536,10 @@ static int pwcache_recdel(pwcache *op,rec *ep) noex {
 }
 /* end subroutine (pwcache_recdel) */
 
-static int pwcache_recfins(pwcache *op) noex {
-        hdb_cur         cur{} ;
+local int pwcache_recfins(pwcache *op) noex {
         int             rs = SR_OK ;
         int             rs1 ;
-        if ((rs1 = hdb_curbegin(op->dbp,&cur)) >= 0) {
+        if (hdb_cur cur{} ; (rs1 = hdb_curbegin(op->dbp,&cur)) >= 0) ylikely {
             hdb_dat	key{} ;
             hdb_dat	val{} ;
             while (hdb_curenum(op->dbp,&cur,&key,&val) >= 0) {
@@ -555,8 +555,8 @@ static int pwcache_recfins(pwcache *op) noex {
 }
 /* end subroutine (pwcache_recfins) */
 
-static int pwcache_record(pwcache *op,int ct,int rs) noex {
-	if (rs >= 0) {
+local int pwcache_record(pwcache *op,int ct,int rs) noex {
+	if (rs >= 0) ylikely {
             bool	f_got = (rs > 0) ;
             switch (ct) {
             case ct_hit:
@@ -568,19 +568,18 @@ static int pwcache_record(pwcache *op,int ct,int rs) noex {
                 else op->s.nmisses += 1 ;
                 break ;
             } /* end switch */
-	}
+	} /* end if (ok) */
         return SR_OK ;
 }
 /* end subroutine (pwcache_record) */
 
-static int pwcache_finduid(pwcache *op,rec **rpp,uid_t uid) noex {
+local int pwcache_finduid(pwcache *op,rec **rpp,uid_t uid) noex {
 	hdb		*dbp = op->dbp ;
-	hdb_cur		cur{} ;
 	int		rs ;
 	int		rs1 ;
 	int		ffound = false ;
         rec         	*ep = nullptr ;
-	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
+	if (hdb_cur cur{} ; (rs = hdb_curbegin(dbp,&cur)) >= 0) ylikely {
 	    hdb_dat   key{} ;
 	    hdb_dat   val{} ;
             while ((rs = hdb_curenum(dbp,&cur,&key,&val)) >= 0) {
@@ -602,19 +601,19 @@ static int pwcache_finduid(pwcache *op,rec **rpp,uid_t uid) noex {
 }
 /* end subroutine (pwcache_finduid) */
 
-static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
+local int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
         int             rs = SR_FAULT ;
         int             rs1 ;
         int             pwl = 0 ;
-        if (ep && rp) {
+        if (ep && rp) ylikely {
             memclear(ep) ; /* dangerous */
-            if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+            if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
                 ucentpw		pw{} ;
                 cint		pwlen = rs ;
-                if ((rs = getpw(&pw,pwbuf,pwlen,rp)) >= 0) {
-		    if ((rs = record_loadun(ep,&pw)) >= 0) {
+                if ((rs = getpw(&pw,pwbuf,pwlen,rp)) >= 0) ylikely {
+		    if ((rs = record_loadun(ep,&pw)) >= 0) ylikely {
                         pwl = rs ;
-                        if (void *vp ; (rs = uc_malloc((pwl+1),&vp)) >= 0) {
+                        if (void *vp ; (rs = lm_mall((pwl+1),&vp)) >= 0) {
 			    ucentpw	*pwp = pwentp(&ep->pw) ;
 			    ucentpw	*opwp = pwentp(&pw) ;
                             char	*pwb = charp(vp) ;
@@ -623,7 +622,7 @@ static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
                                 ep->pwl = pwl ;
                             }
                             if (rs < 0) {
-				uc_free(vp) ;
+				lm_free(vp) ;
 			    }
                         } /* end if (memory-allocation - pwbuf) */
 	    	    } /* end if (memory-allocation - un) */
@@ -631,10 +630,10 @@ static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
                     ep->pwl = 0 ; /* optional */
                     pwl = 0 ; /* indicates a not-found entry */
                 } /* end if (getpw) */
-                rs1 = uc_free(pwbuf) ;
+                rs1 = lm_free(pwbuf) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (m-a-f) */
-            if (rs >= 0) {
+            if (rs >= 0) ylikely {
                 ep->ti_create = dt ;
                 ep->ti_access = dt ;
                 ep->wcount = wc ;
@@ -647,28 +646,28 @@ static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
 }
 /* end subroutine (record_start) */
 
-static int record_loadun(rec *ep,ucentpw *pwp) noex {
+local int record_loadun(rec *ep,ucentpw *pwp) noex {
 	int		rs ;
 	cchar		*un = pwp->pw_name ;
-	if (cchar *cp ; (rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = lm_strw(un,-1,&cp)) >= 0) ylikely {
 	    ep->un = cast_const<charp>(cp) ;
 	}
 	return rs ;
 }
 /* end subroutine (record_loadun) */
 
-static int record_finish(rec *ep) noex {
+local int record_finish(rec *ep) noex {
         int             rs = SR_FAULT ;
         int             rs1 ;
-        if (ep) {
+        if (ep) ylikely {
 	    rs = SR_OK ;
-            if (ep->pwbuf) {
-                rs1 = uc_free(ep->pwbuf) ;
+            if (ep->pwbuf) ylikely {
+                rs1 = lm_free(ep->pwbuf) ;
                 if (rs >= 0) rs = rs1 ;
                 ep->pwbuf = nullptr ;
             }
-	    if (ep->un) {
-                rs1 = uc_free(ep->un) ;
+	    if (ep->un) ylikely {
+                rs1 = lm_free(ep->un) ;
                 if (rs >= 0) rs = rs1 ;
                 ep->un = nullptr ;
 	    }
@@ -678,10 +677,10 @@ static int record_finish(rec *ep) noex {
 }
 /* end subroutine (record_finish) */
 
-static int record_access(rec *ep,time_t dt) noex {
+local int record_access(rec *ep,time_t dt) noex {
         int             rs = SR_FAULT ;
         int             pwl = 0 ;
-        if (ep) {
+        if (ep) ylikely {
 	    rs = SR_OK ;
             ep->ti_access = dt ;
             pwl  = ep->pwl ;
@@ -690,45 +689,45 @@ static int record_access(rec *ep,time_t dt) noex {
 }
 /* end subroutine (record_access) */
 
-static int record_refresh(rec *ep,time_t dt,int wc) noex {
+local int record_refresh(rec *ep,time_t dt,int wc) noex {
         int             rs = SR_FAULT ;
         int             rs1 ;
         int             pwl = 0 ;
-        if (ep) {
-            if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+        if (ep) ylikely {
+            if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
                 cint		pwlen = rs ;
                 ucentpw		pw{} ;
-                if ((rs = getpw_name(&pw,pwbuf,pwlen,ep->un)) >= 0) {
+                if ((rs = getpw_name(&pw,pwbuf,pwlen,ep->un)) >= 0) ylikely {
                     void    *vp{} ;
                     pwl = rs ;
                     ep->pwl = pwl ;
                     if (ep->pwbuf) {
-                        rs = uc_realloc(ep->pwbuf,(pwl+1),&vp) ;
+                        rs = lm_rall(ep->pwbuf,(pwl+1),&vp) ;
                     } else {
-                        rs = uc_malloc((pwl+1),&vp) ;
+                        rs = lm_mall((pwl+1),&vp) ;
                     }
-                    if (rs >= 0) {
+                    if (rs >= 0) ylikely {
                         ucentpw     *pwp = pwentp(&ep->pw) ;
                         ucentpw     *opwp = pwentp(&pw) ;
                         char        *mbuf = charp(vp) ;
                         ep->pwbuf = charp(vp) ;
                         rs = pwp->load(mbuf,pwl,opwp) ;
                         if (rs < 0) {
-			    uc_free(vp) ;
+			    lm_free(vp) ;
 			}
                     } /* end if (ok) */
                 } else if (rs == SR_NOTFOUND) {
                     if (ep->pwbuf != nullptr) {
-                        uc_free(ep->pwbuf) ;
+                        lm_free(ep->pwbuf) ;
                         ep->pwbuf = nullptr ;
                     }
                     ep->pwl = 0 ;
                     pwl = 0 ; /* indicates an empty (not-found) entry */
                 } /* end if (getpw_name) */
-                rs1 = uc_free(pwbuf) ;
+                rs1 = lm_free(pwbuf) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (m-a) */
-            if (rs >= 0) {
+            if (rs >= 0) ylikely {
                 ep->ti_create = dt ;
                 ep->ti_access = dt ;
                 ep->wcount = wc ;
@@ -738,10 +737,10 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
 }
 /* end subroutine (record_refresh) */
 
-static int record_old(rec *ep,time_t dt,int ttl) noex {
+local int record_old(rec *ep,time_t dt,int ttl) noex {
 	int		rs = SR_FAULT ;
         int             f_old = false ;
-        if (ep) {
+        if (ep) ylikely {
 	    rs = SR_OK ;
             f_old = ((dt - ep->ti_create) >= ttl) ;
 	}
@@ -749,7 +748,7 @@ static int record_old(rec *ep,time_t dt,int ttl) noex {
 }
 /* end subroutine (record_old) */
 
-static int getpw(ucentpw *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
+local int getpw(ucentpw *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
 	ucentpw		*pp = pwentp(pwp) ;
 	int		rs ;
 	if (rp->un) {
@@ -760,7 +759,7 @@ static int getpw(ucentpw *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
 	return rs ;
 }
 
-static int getpw_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
+local int getpw_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	return uc_getpwnam(pwp,pwbuf,pwlen,un) ;
 }
 
