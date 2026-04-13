@@ -1,6 +1,6 @@
 /* funmode HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* Function-Mode */
 /* version %I% last-modified %G% */
@@ -27,11 +27,11 @@
 #include	<usysdefs.h>
 
 
-enum struct funmode : int {
+enum struct funmode {
     	wr,
 	rd,
 	overlast
-} ;
+} ; /* end enum-struct */
 
 
 #endif /* __cplusplus */
