@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<hdb.h>
 #include	<ptm.h>
 
@@ -41,16 +38,16 @@ struct cachetime_statistics {
 	uint		req ;
 	uint		hit ;
 	uint		miss ;
-} ;
+} ; /* end struct (cachetime_statistics) */
 
 struct cachetime_cursor {
 	hdb_cur		*hcp ;
-} ;
+} ; /* end struct (cachetime_cursor) */
 
 struct cachetime_entry {
 	cchar		*name ;
 	time_t		mtime ;
-} ;
+} ; /* end struct (cachetime_entry) */
 
 struct cachetime_head {
 	hdb		*dbp ;
@@ -59,7 +56,7 @@ struct cachetime_head {
 	uint		c_req ;
 	uint		c_hit ;
 	uint		c_miss ;
-} ;
+} ; /* end struct (cachetime_head) */
 
 typedef CACHETIME		cachetime ;
 typedef CACHETIME_CUR		cachetime_cur ;
