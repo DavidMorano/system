@@ -1,0 +1,116 @@
+/* loadvals MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* integer-extended operations */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Module:
+	loadvals
+
+	Names:
+	loadval
+
+	Description:
+	Perform some integer-extended operations.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<concepts>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>
+#include	<localmisc.h>
+
+export module loadvals ;
+
+import bitmanip ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::integral_signed ;		/* concept */
+using std::integral_unsigned ;		/* concept */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
+
+
+/* local constants */
+
+
+/* exported stuff */
+
+template<integral_unsigned UT>
+constexpr void vfill(int n,mut UT *v,UT a) noex {
+	for (int i = 0 ; i < n ; i += 1) {
+	    v[i] = a ;
+	}
+} /* end subroutine (vfill) */
+
+export {
+    template<integral_unsigned TV,integral_signed TA>
+    constexpr void loadval(int n,mut TV *v,TA a) noex {
+	cint sz_tv = szof(TV) ;
+	cint sz_ta = szof(TA) ;
+	const TV fv = bitsign(a) ? TA(-1) : TA(0) ;
+	int j = 0 ;
+	if (sz_tv < sz_ta) {
+	    cint nb = (sz_tv * CHAR_BIT) ;
+	    cint nn = min(n,(sz_ta / sz_tv)) ;
+	    for (int i = 0 ; i < nn ; ++i,++j) {
+	        v[j] = TV(a >> (j * nb)) ;
+	    }
+	} else {
+	    v[j++] = a ;
+	}
+	vfill((n - j),(v + j),fv) ;
+    } /* end subroutine (loadval) */
+} /* end export */
+
+export {
+    template<integral_unsigned TV,integral_unsigned TA>
+    constexpr void loadval(int n,mut TV *v,TA a) noex {
+	cint sz_tv = szof(TV) ;
+	cint sz_ta = szof(TA) ;
+	const TV fv = TV(0) ;
+	int j = 0 ;
+	if (sz_tv < sz_ta) {
+	    cint nb = (sz_tv * CHAR_BIT) ;
+	    cint nn = min(n,(sz_ta / sz_tv)) ;
+	    for (int i = 0 ; i < nn ; ++i,++j) {
+	        v[j] = TV(a >> (j * nb)) ;
+	    }
+	} else {
+	    v[j++] = a ;
+	}
+	vfill((n - j),(v + j),fv) ;
+    } /* end subroutine (loadval) */
+} /* end export */
+
+
