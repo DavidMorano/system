@@ -46,7 +46,7 @@
 
 	Synopsis:
 	template<typename UT,typename ST>
-	char *uxxtostr(char **endp,int b,ST v) noex
+	char *uxxtostr(char **endp,int b,UT v) noex
 	char *sxxtostr(char **endp,int b,ST v) noex
 
 	Arguments:
@@ -144,7 +144,7 @@ constexpr cint		xxtostr_maxbase = MAXBASE ; /* standard value */
 
 export {
     template<typename UT>
-    constexpr inline int uxxtostr(char *endp,int b,UT v) noex {
+    constexpr int uxxtostr(char *endp,int b,UT v) noex {
 	int		rs = SR_FAULT ;
 	char		*rp = endp ;
 	if (endp) {
@@ -196,7 +196,7 @@ export {
 
 export {
     template<typename UT,typename ST>
-    constexpr inline int sxxtostr(char *endp,int b,ST v) noex {
+    constexpr int sxxtostr(char *endp,int b,ST v) noex {
 	UT		ulv = (UT) v ;
 	int		rs = SR_FAULT ;
 	char		*rp = nullptr ;
@@ -224,7 +224,7 @@ constexpr int		b = 10 ;
 
 export {
     template<typename UT,typename T> 
-    constexpr inline char *stostr(T v,char *endp) noex {
+    constexpr char *stostr(T v,char *endp) noex {
 	int		rs ;
 	char		*rp = nullptr ;
 	if ((rs = sxxtostr<UT>(endp,b,v)) >= 0) {
@@ -235,7 +235,7 @@ export {
 	return (rs >= 0) ? rp : nullptr ;
     } /* end subroutine (stostr) */
     template<typename UT> 
-    constexpr inline char *utostr(UT uv,char *endp) noex {
+    constexpr char *utostr(UT uv,char *endp) noex {
 	char		*rp = nullptr ;
 	int		rs ;
 	if ((rs = uxxtostr(endp,b,uv)) >= 0) {
@@ -248,22 +248,22 @@ export {
 } /* end export */
 
 export extern "C" {
-    char *itostr	(int v,char *endp)		noex {
+    char *itostr	(int v,		char *endp)	noex {
 	return stostr<uint>(v,endp) ;
     }
-    char *ltostr	(long v,char *endp)		noex {
+    char *ltostr	(long v,	char *endp)	noex {
 	return stostr<ulong>(v,endp) ;
     }
-    char *lltostr	(longlong v,char *endp)		noex {
+    char *lltostr	(longlong v,	char *endp)	noex {
 	return stostr<ulonglong>(v,endp) ;
     }
-    char *uitostr	(uint uv,char *endp)		noex {
+    char *uitostr	(uint uv,	char *endp)	noex {
 	return utostr(uv,endp) ;
     }
-    char *ultostr	(ulong uv,char *endp)		noex {
+    char *ultostr	(ulong uv,	char *endp)	noex {
 	return utostr(uv,endp) ;
     }
-    char *ulltostr	(ulonglong uv,char *endp)	noex {
+    char *ulltostr	(ulonglong uv,	char *endp)	noex {
 	return utostr(uv,endp) ;
     }
 } /* end export (extern) */
