@@ -117,12 +117,6 @@ export {
 	    vcopy(n,v,r) ;
 	    return *this ;
 	} /* end method (timeval::operator) */
-	uintx &operator *=	(const uintx &o) noex {
-	    Digit	r[n] ;
-	    vmultrunc(n,r,v,o.v) ;
-	    vcopy(n,v,r) ;
-	    return *this ;
-	} /* end method (timeval::operator) */
 	uintx &operator +=	(const uintx &o) noex {
 	    Digit	r[n] ;
 	    vadd(n,r,v,o.v) ;
@@ -135,6 +129,19 @@ export {
 	    vcopy(n,v,r) ;
 	    return *this ;
         } /* end method (timeval::operator) */
+	uintx &operator *=	(const uintx &o) noex {
+	    Digit	r[n] ;
+	    vmultrunc(n,r,v,o.v) ;
+	    vcopy(n,v,r) ;
+	    return *this ;
+	} ;
+	uintx &operator /=	(const uintx &o) noex {
+	    Digit	q[n] ;
+	    Digit	r[n] ;
+	    vdibtrunc(n,r,v,o.v) ;
+	    vcopy(n,v,r) ;
+	    return *this ;
+	} ;
 	uintx &operator and_eq	(const uintx &o) noex {
 	    veq_and(n,v,o.v) ;
 	    return *this ;
@@ -182,6 +189,11 @@ export {
 	uintx mul	(const uintx &o) const noex {
 	    uintx res ;
 	    vmultrunc(n,res.v,v,o.v) ;
+	    return res ;
+	} ;
+	uintx div	(const uintx &o) const noex {
+	    uintx res ;
+	    vdivtrunc(n,res.v,v,o.v) ;
 	    return res ;
 	} ;
 	uintx band	(const uintx &o) const noex {
@@ -265,6 +277,9 @@ export {
 	uintx operator *	(const uintx &o) const noex {
 	    return mul(o) ;
 	} ;
+	uintx operator /	(const uintx &o) const noex {
+	    return div(o) ;
+	} ;
 	uintx operator bitand	(const uintx &o) const noex {
 	    return band(o) ;
 	} ;
@@ -303,17 +318,17 @@ export {
 
 export {
     template<int Nbits,typename Digit>
-	void uintx<Nbits,Digit>::load(uint a) noex {
+	void uintx<Nbits,Digit>::load(uint a)		noex {
 	    vclear(n,v) ;
             v[0] = a ;
 	} ;
     template<int Nbits,typename Digit>
-	void uintx<Nbits,Digit>::load(ulong a) noex {
+	void uintx<Nbits,Digit>::load(ulong a)		noex {
 	    vclear(n,v) ;
             v[0] = a ;
 	} ;
     template<int Nbits,typename Digit>
-	void uintx<Nbits,Digit>::load(ulonglong a) noex {
+	void uintx<Nbits,Digit>::load(ulonglong a)	noex {
 	    vclear(n,v) ;
             v[0] = a ;
 	} ;
@@ -321,45 +336,45 @@ export {
 
 export {
     template<int Nbits,typename Digit>
-	void uintx<Nbits,Digit>::load(int a) noexcept {
+	void uintx<Nbits,Digit>::load(int a)		noexcept {
 	    loadval(n,v,a) ;
         } ; /* end ctor */
     template<int Nbits,typename Digit>
-	void uintx<Nbits,Digit>::load(long a) noexcept {
+	void uintx<Nbits,Digit>::load(long a)		noexcept {
 	    loadval(n,v,a) ;
         } ; /* end ctor */
     template<int Nbits,typename Digit>
-	void uintx<Nbits,Digit>::load(longlong a) noexcept {
+	void uintx<Nbits,Digit>::load(longlong a)	noexcept {
 	    loadval(n,v,a) ;
         } ; /* end ctor */
 } /* end export */
 
 export {
     template<int Nbits,typename Digit>
-	uintx<Nbits,Digit>::uintx(int a) noexcept {
+	uintx<Nbits,Digit>::uintx(int a)	noexcept {
 	    load(a) ;
 	} ;
     template<int Nbits,typename Digit>
-	uintx<Nbits,Digit>::uintx(long a) noexcept {
+	uintx<Nbits,Digit>::uintx(long a)	noexcept {
 	    load(a) ;
 	} ;
     template<int Nbits,typename Digit>
-	uintx<Nbits,Digit>::uintx(longlong a) noexcept {
+	uintx<Nbits,Digit>::uintx(longlong a)	noexcept {
 	    load(a) ;
 	} ;
 } /* end export */
 
 export {
     template<int Nbits,typename Digit>
-        uintx<Nbits,Digit>::uintx(uint a) noexcept {
+        uintx<Nbits,Digit>::uintx(uint a)	noexcept {
 	    load(a) ;
         } ; /* end ctor */
     template<int Nbits,typename Digit>
-        uintx<Nbits,Digit>::uintx(ulong a) noexcept {
+        uintx<Nbits,Digit>::uintx(ulong a)	noexcept {
 	    load(a) ;
         } ; /* end ctor */
     template<int Nbits,typename Digit>
-        uintx<Nbits,Digit>::uintx(ulonglong a) noexcept {
+        uintx<Nbits,Digit>::uintx(ulonglong a)	noexcept {
 	    load(a) ;
         } ; /* end ctor */
 } /* end export */
