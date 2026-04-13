@@ -1,0 +1,180 @@
+/* varithmetic_shift MODULE (shift -- primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* Vector-Arithmetic */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2017-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+/*******************************************************************************
+
+  	Module:
+	varithmetic.shift
+
+	Description:
+	These subroutines are used in performing extended precision
+	integer arithmetic.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |CHAR_BIT| */
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<stdintx.h>
+#include	<localmisc.h>
+
+export module varithmetic.shift ;
+
+import builtin ;
+import bitmanip ;
+import varithmetic.util ;
+
+/* module subroutines */
+
+export {
+    template<typename Dig>
+    constexpr void vlshr(int n,mut Dig *r,con Dig *v,int nb) noex {
+	constexpr Dig ones = (compl Dig(0)) ;
+	cint nbits	= (szof(Dig) * CHAR_BIT) ;
+	cint nbitstotal = (szof(Dig) * CHAR_BIT * n) ;
+	if ((nb >= 0) && (nb < nbitstotal)) {
+	    cint nb_hi = (nb / nbits) ;
+	    cint nb_lo = (nb % nbits) ;
+	    if (nb) {
+		Dig lomask = (compl (ones << (nbits - nb_lo))) ;
+		Dig vlo ;
+		Dig vhi ;
+	        for (int i = 0 ; i < n ; i += 1) {
+		    cint ilo = (i + nb_hi) ;
+		    cint ihi = (i + nb_hi + 1) ;
+		    if (ilo < n) {
+		        vlo = ((v[ilo] >> nb_lo) & lomask) ;
+		    } else {
+			vlo = 0 ;
+		    }
+		    if (ihi < n) {
+		        vhi = (v[ihi] << (nbits - nb_lo)) ;
+		    } else {
+		        vhi = 0 ;
+		    }
+	            r[i] = vhi | vlo ;
+	        } /* end for */
+	    } else {
+		vcopy(n,r,v) ;
+	    }
+	} else {
+	    vclear(n,r) ;
+	}
+    } /* end subroutine (vlshr) */
+    template<typename Dig>
+    constexpr void vlshl(int n,mut Dig *r,con Dig *v,int nb) noex {
+	cint nbits	= (szof(Dig) * CHAR_BIT) ;
+	cint nbitstotal = (szof(Dig) * CHAR_BIT * n) ;
+	if ((nb >= 0) && (nb < nbitstotal)) {
+	    cint nb_hi = (nb / nbits) ;
+	    cint nb_lo = (nb % nbits) ;
+	    if (nb) {
+		Dig lomask = ((Dig(1) << nb_lo) - 1) ;
+		Dig vlo ;
+		Dig vhi ;
+	        for (int i = 0 ; i < n ; i += 1) {
+		    cint ilo = (i - nb_hi - 1) ;
+		    cint ihi = (i - nb_hi - 0) ;
+		    if (ihi >= 0) {
+		        vhi = (v[ihi] << nb_lo) ;
+		    } else {
+			vhi = 0 ;
+		    }
+		    if (ilo >= 0) {
+		        vlo = (v[ilo] >> (nbits - nb_lo)) & lomask ;
+		    } else {
+		        vlo = 0 ;
+		    }
+	            r[i] = vhi | vlo ;
+	        } /* end for */
+	    } else {
+		vcopy(n,r,v) ;
+	    }
+	} else {
+	    vclear(n,r) ;
+	}
+    } /* end subroutine (vlshl) */
+    template<typename Dig>
+    constexpr void vlshx(int n,mut Dig *r,con Dig *v,int nb) noex {
+	if (nb >= 0) {
+	    vlshr(r,v,nb) ;
+	} else {
+	    vlshl(r,v,(- nb)) ;
+	}
+    } /* end subroutine (vlshx) */
+    template<typename Dig>
+    constexpr void vashr(int n,mut Dig *r,con Dig *v,int nb) noex {
+	constexpr Dig ones = (compl Dig(0)) ;
+	cint nbits	= (szof(Dig) * CHAR_BIT) ;
+	cint nbitstotal = (szof(Dig) * CHAR_BIT * n) ;
+	if ((nb >= 0) && (nb < nbitstotal)) {
+	    cint nb_hi = (nb / nbits) ;
+	    cint nb_lo = (nb % nbits) ;
+	    if (nb) {
+		Dig fill = 0 ;
+		Dig lomask = ((Dig(1) << (nbits - nb_lo)) - 1) ;
+		Dig himask = (ones << (nbits - nb_lo)) ;
+		Dig vlo ;
+		Dig vhi ;
+		if (bit(v[n-1],(nbits-1))) {
+		   fill = ones ;
+		}
+	        for (int i = 0 ; i < n ; i += 1) {
+		    cint ilo = (i + nb_hi) ;
+		    cint ihi = (i + nb_hi + 1) ;
+		    if (ilo < n) {
+		        vlo = ((v[ilo] >> nb_lo) & lomask) ;
+		    } else {
+			vlo = fill & lomask ;
+		    }
+		    if (ihi < n) {
+		        vhi = (v[ihi] << (nbits - nb_lo)) ;
+		    } else {
+		        vhi = fill & himask ;
+		    }
+	            r[i] = vhi | vlo ;
+	        } /* end for */
+	    } else {
+		vcopy(n,r,v) ;
+	    }
+	} else {
+	    vclear(n,r) ;
+	}
+    } /* enf subroutine (vashr) */
+    template<typename Dig>
+    constexpr void vashl(int n,mut Dig *r,con Dig *v,int nb) noex {
+	vlshl(n,r,v,nb) ;
+    } /* enf subroutine (vashl) */
+    template<typename Dig>
+    constexpr void vashx(int n,mut Dig *r,con Dig *v,int nb) noex {
+	if (nb >= 0) {
+	    vashr(r,v,nb) ;
+	} else {
+	    vashl(r,v,(- nb)) ;
+	}
+    } /* enf subroutine (vashx) */
+} /* end export */
+
+
