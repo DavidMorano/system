@@ -42,6 +42,9 @@
 
 #include	"offindex.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -52,7 +55,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -82,12 +84,12 @@ struct offindex_e {
 template<typename ... Args>
 static int offindex_ctor(offindex *op,Args ... args) noex {
     	OFFINDEX	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->oip = new(nothrow) vecobj) != np) {
+	    if ((op->oip = new(nothrow) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
@@ -97,9 +99,9 @@ static int offindex_ctor(offindex *op,Args ... args) noex {
 
 static int offindex_dtor(offindex *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->oip) {
+	    if (op->oip) ylikely {
 		delete op->oip ;
 		op->oip = nullptr ;
 	    }
@@ -111,7 +113,7 @@ static int offindex_dtor(offindex *op) noex {
 template<typename ... Args>
 static inline int offindex_magic(offindex *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == OFFINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
