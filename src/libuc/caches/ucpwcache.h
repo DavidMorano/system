@@ -21,7 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucentpw.h>
 
 
 #define	UCPWCACHE_ST		struct ucpwcache_stats
@@ -38,7 +40,7 @@ struct ucpwcache_stats {
 	uint		acc ;
 	uint		phit, nhit ;
 	uint		pmis, nmis ;
-} ;
+} ; /* end struct (ucpwcache_stats) */
 
 typedef UCPWCACHE_ST	ucpwcache_st ;
 
