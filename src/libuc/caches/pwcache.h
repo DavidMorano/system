@@ -14,7 +14,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |uid_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<hdb.h>
 #include	<pq.h>
 
@@ -33,7 +34,7 @@ struct pwcache_stats {
 	uint		refreshes ;		/* refreshes */
 	uint		phits, pmisses ;	/* positive */
 	uint		nhits, nmisses ;	/* negative */
-} ;
+} ; /* end struct (pwcache_stats) */
 
 struct pwcache_head {
 	hdb		*dbp ;
@@ -44,7 +45,7 @@ struct pwcache_head {
 	uint		wcount ;	/* write-count */
 	int		ttl ;		/* time-to-live */
 	int		nmax ;		/* maximum entries */
-} ;
+} ; /* end struct (pwcache_head) */
 
 typedef	PWCACHE		pwcache ;
 typedef PWCACHE_ST	pwcache_st ;
