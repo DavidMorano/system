@@ -62,10 +62,14 @@
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<atomic>		/* |atomic_int(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucatfork.h>
+#include	<ucatexit.h>
+#include	<ucentpw.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<ptc.h>
@@ -74,14 +78,15 @@
 
 #include	"ucpwcache.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::atomic_int ;			/* type */
 using std::nothrow ;			/* constant */
 
@@ -121,7 +126,7 @@ namespace {
 	operator int () noex {
 	    return (*this)() ;
 	} ;
-    } ;
+    } ; /* end struct (ucpwcache_co) */
     struct ucpwcache {
 	ptm		mx ;		/* data mutex */
 	ptc		cv ;		/* condition variable */
@@ -217,17 +222,17 @@ int ucpwcache::iinit() noex {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {	/* <- the money shot */
-	        if ((rs = mx.create) >= 0) {
-	            if ((rs = cv.create) >= 0) {
+	        if ((rs = mx.create) >= 0) ylikely {
+	            if ((rs = cv.create) >= 0) ylikely {
 	    	        void_f	b = ucpwcache_atforkbefore ;
 	    	        void_f	a = ucpwcache_atforkafter ;
-	                if ((rs = uc_atfork(b,a,a)) >= 0) {
-	                    if ((rs = uc_atexit(ucpwcache_exit)) >= 0) {
+	                if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	                    if ((rs = uc_atexit(ucpwcache_exit)) >= 0) ylikely {
 	                        finitdone = true ;
 	                        f = true ;
 	                    }
 	                    if (rs < 0) {
-	                        uc_atforkexpunge(b,a,a) ;
+	                        uc_atforkexp(b,a,a) ;
 			    }
 	                } /* end if (uc_atfork) */
 	                if (rs < 0) {
@@ -270,7 +275,7 @@ int ucpwcache::ifini() noex {
 	    {
 	        void_f	b = ucpwcache_atforkbefore ;
 	        void_f	a = ucpwcache_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -292,11 +297,11 @@ int ucpwcache::name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (pwp && pwbuf && un) {
+	if (pwp && pwbuf && un) ylikely {
 	    memclear(pwp) ;		/* <- noted */
-	    if ((rs = init) >= 0) {
-	        if ((rs = capbegin) >= 0) {
-	            if ((rs = opcheck) >= 0) {
+	    if ((rs = init) >= 0) ylikely {
+	        if ((rs = capbegin) >= 0) ylikely {
+	            if ((rs = opcheck) >= 0) ylikely {
 	                pwcache		*pwcp = (pwcache *) pwc ;
 	                rs = pwcache_lookup(pwcp,pwp,pwbuf,pwlen,un) ;
 	                len = rs ;
@@ -314,11 +319,11 @@ int ucpwcache::uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (pwp && pwbuf) {
+	if (pwp && pwbuf) ylikely {
 	    memclear(pwp) ;		/* <- noted */
-	    if ((rs = init()) >= 0) {
-	        if ((rs = capbegin) >= 0) {
-	            if ((rs = opcheck) >= 0) {
+	    if ((rs = init()) >= 0) ylikely {
+	        if ((rs = capbegin) >= 0) ylikely {
+	            if ((rs = opcheck) >= 0) ylikely {
 	                pwcache		*pwcp = (pwcache *) pwc ;
 	                rs = pwcache_uid(pwcp,pwp,pwbuf,pwlen,uid) ;
 	                len = rs ;
@@ -336,13 +341,13 @@ int ucpwcache::getstat(ucpwcache_st *usp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (usp) {
+	if (usp) ylikely {
 	    memclear(usp) ;		/* dangerous */
-	    if ((rs = init()) >= 0) {
-	        if ((rs = capbegin) >= 0) {
-	            if ((rs = opcheck) >= 0) {
+	    if ((rs = init()) >= 0) ylikely {
+	        if ((rs = capbegin) >= 0) ylikely {
+	            if ((rs = opcheck) >= 0) ylikely {
 	                pwcache_st s ; 
-			if ((rs = pwcache_getstat(pwc,&s)) >= 0) {
+			if ((rs = pwcache_getstat(pwc,&s)) >= 0) ylikely {
 	                    usp->nmax = nmax ;
 	                    usp->ttl = ttl ;
 	                    usp->nent = s.nentries ;
@@ -366,7 +371,7 @@ int ucpwcache::getstat(ucpwcache_st *usp) noex {
 int ucpwcache::icapbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin(to)) >= 0) {
+	if ((rs = mx.lockbegin(to)) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
 	        rs = cv.wait(&mx,to) ;
@@ -385,7 +390,7 @@ int ucpwcache::icapbegin(int to) noex {
 int ucpwcache::icapend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin) >= 0) {
+	if ((rs = mx.lockbegin) >= 0) ylikely {
 	    fcapture = false ;
 	    if (waiters > 0) {
 	        rs = cv.signal ;
@@ -410,7 +415,7 @@ int ucpwcache::iopbegin() noex {
 	int		rs = SR_OK ;
 	if (pwc == nullptr) {
 	    cint	esz = szof(ucpwcache) ;
-	    if (void *vp ; (rs = lm_mall(esz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(esz,&vp)) >= 0) ylikely {
 	        cint		amax = UCPWCACHE_MAX ;
 	        cint		attl = UCPWCACHE_TTL ;
 	        pwcache		*pwcp = (pwcache *) vp ;
@@ -431,7 +436,7 @@ int ucpwcache::iopbegin() noex {
 int ucpwcache::iopend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pwc != nullptr) {
+	if (pwc != nullptr) ylikely {
 	    pwcache	*pwcp = (pwcache *) pwc ;
 	    {
 	        rs1 = pwcache_finish(pwcp) ;
@@ -466,7 +471,7 @@ static void ucpwcache_exit() noex {
 
 int ucpwcache_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucpwcacheco_init:
 		rs = op->iinit() ;
