@@ -33,12 +33,11 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
+#include	<xxtostr.h>
 #include	<localmisc.h>		/* |DECBUFLEN| */
 
 #include	"usupport_sncpyx.hh"
 #include	"usupport_ctdec.hh"
-
-import xxtostr ;
 
 /* local defines */
 
