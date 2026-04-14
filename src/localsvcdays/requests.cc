@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C99 */
 
+/* request object */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -12,21 +15,39 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Object:
+	requests
+
+	Description:
+
+*******************************************************************************/
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<cstddef>
+#include	<cstdlib>
+#include	<uclibsubs.h>
 #include	<localmisc.h>
 
 #include	"requests.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -44,7 +65,7 @@
 /* exported subroutines */
 
 int requests_start(requests *op) noex {
-	cint		esize = sizeof(requests_it) ;
+	cint		esize = szof(requests_it) ;
 	cint		vn = 1000 ;
 	cint		vo = (VECOBJ_OREUSE|VECOBJ_OSWAP) ;
 	int		rs = SR_FAULT ;
