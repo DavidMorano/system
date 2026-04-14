@@ -1,4 +1,4 @@
-# MAKEFILES (logfile)
+# MAKEFILE (logfile)
 
 T= logfile
 
