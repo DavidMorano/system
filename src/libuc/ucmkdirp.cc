@@ -48,7 +48,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
@@ -82,7 +86,7 @@ extern "C" {
 
 /* forward references */
 
-static int	ucmkdirp(cchar *,mode_t) noex ;
+local int	ucmkdirp(cchar *,mode_t) noex ;
 
 
 /* local variables */
@@ -109,7 +113,7 @@ int uc_mkdirp(cchar *fname,mode_t m) noex {
 
 /* local subroutines */
 
-static int ucmkdirp(cchar *fname,mode_t m) noex {
+local int ucmkdirp(cchar *fname,mode_t m) noex {
 	int		rs ;
 	int		to_io = utimeout[uto_io] ;
 	int		to_dquot = utimeout[uto_dquot] ;
