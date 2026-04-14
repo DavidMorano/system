@@ -2,9 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* counted-string copy while compacting white-space from the source */
+/* find and return am alternative c-string for a wide-character */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-01-10, David A-D- Morano
+	This was written from scratch.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
