@@ -37,7 +37,7 @@ INCS += umods.h
 
 MODS += valuelims.ccm digbufsizes.ccm
 MODS += bitop.ccm
-MODS += digtab.ccm xxtostr.ccm 
+MODS += digtab.ccm
 MODS +=
 MODS += unixfnames.ccm constdiv.ccm builtin.ccm
 MODS += usysbasic.ccm
@@ -47,7 +47,7 @@ LIBS +=
 
 OBJ00_UMODS = valuelims.o digbufsizes.o 
 OBJ01_UMODS = builtin.o
-OBJ02_UMODS = digtab.o xxtostr.o
+OBJ02_UMODS = digtab.o
 OBJ03_UMODS = bitop.o
 OBJ04_UMODS = unixfnames.o 
 OBJ05_UMODS = constdiv.o 
@@ -213,9 +213,6 @@ digtab.o:		digtab.ccm
 constdiv.o:		constdiv.ccm
 builtin.o:		builtin.ccm
 bitop.o:		bitop.ccm
-
-xxtostr.o:		xxtostr.ccm digtab.o
-	makemodule xxtostr
 
 # VALUELIMS (module)
 valuelims.o:		valuelims.ccm			$(INCS)
