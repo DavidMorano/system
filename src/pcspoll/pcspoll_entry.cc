@@ -1,4 +1,5 @@
-/* progentry SUPPORT */
+/* pcspoll_progentry SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* build up a program entry piece-meal as it were */
@@ -18,6 +19,7 @@
 
 /******************************************************************************
 
+  	Description:
 	This little object is used to create a program entry and
 	to populate aspects of it with different operations on the
 	object.  This object is used in "server" types of programs.
@@ -29,11 +31,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<field.h>
@@ -61,25 +65,17 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strbasename(char *) ;
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	progentry_process(PROGENTRY *,const char *,PROGENTRY_ARGS *,
+static int	progentry_process(PROGENTRY *,cchar *,PROGENTRY_ARGS *,
 			char *,int) ;
-static int	expand(PROGENTRY_ARGS *,const char *,int,char *,int) ;
+static int	expand(PROGENTRY_ARGS *,cchar *,int,char *,int) ;
 static int	vecstr_processargs(vecstr *,char *) ;
-static int	mkfile(const char *,const char *,char *) ;
+static int	mkfile(cchar *,cchar *,char *) ;
 
 static void	freeit(char **) ;
 
@@ -89,7 +85,7 @@ static void	freeit(char **) ;
 
 /* local variables */
 
-static const char	xes[] = "XXXXXXXXXXXXXX" ;
+static cchar	xes[] = "XXXXXXXXXXXXXX" ;
 
 
 /* exported subroutines */
@@ -324,7 +320,7 @@ PROGENTRY_ARGS	*esap ;
 	int	sl, cl ;
 	int	opts ;
 
-	const char	*oldservice, *oldinterval ;
+	cchar	*oldservice, *oldinterval ;
 
 	char	outbuf[OUTBUFLEN + 1] ;
 	char	*argz ;
@@ -476,20 +472,17 @@ PROGENTRY_ARGS	*esap ;
 	    rs = vecstr_count(&pep->srvargs) ;
 
 	if ((rs == 0) && (pep->program != NULL)) {
-
-	    if ((cp = strbasename(pep->program)) != NULL) {
-
+	    cchar *cp ;
+	    if (int cl = sfbasename(pep->program,-1,&cp) ; cl >= 0) {
 	        if (! pep->fl.srvargs) {
-
 	            rs = vecstr_start(&pep->srvargs,2,0) ;
-		    if (rs >= 0)
+		    if (rs >= 0) {
 	    		pep->fl.srvargs = TRUE ;
-
+		    }
 		}
-
-		if (pep->fl.srvargs)
-	            rs = vecstr_add(&pep->srvargs,cp,-1) ;
-
+		if (pep->fl.srvargs) {
+	            rs = vecstr_add(&pep->srvargs,cp,cl) ;
+		}
 	    }
 
 	} /* end if (setting 'argv[0]') */
@@ -542,14 +535,14 @@ retok:
 /* expand out one program string entry */
 static int progentry_process(pep,inbuf,esap,outbuf,outlen)
 PROGENTRY	*pep ;
-const char	inbuf[] ;		/* input string */
+cchar	inbuf[] ;		/* input string */
 PROGENTRY_ARGS	*esap ;			/* key-type arguments */
 char		outbuf[] ;		/* output buffer */
 int		outlen ;		/* output buffer length */
 {
 	int	vlen, elen ;
 
-	const char	*ibp ;
+	cchar	*ibp ;
 	char	vbuf[OUTBUFLEN + 1] ;
 	char	ebuf[OUTBUFLEN + 1] ;
 
@@ -611,15 +604,15 @@ int		outlen ;		/* output buffer length */
 
 static int expand(esap,buf,len,rbuf,rlen)
 PROGENTRY_ARGS	*esap ;
-const char	buf[] ;
+cchar	buf[] ;
 int		len ;
 char		rbuf[] ;
 int		rlen ;
 {
 	int	elen, sl ;
 
-	const char	*bp = buf ;
-	const char	*cp ;
+	cchar	*bp = buf ;
+	cchar	*cp ;
 
 	char	hostbuf[MAXHOSTNAMELEN + 1] ;
 	char	*rbp = rbuf ;
@@ -853,8 +846,8 @@ ret0:
 
 /* make our little files for input and output of the server programs */
 static int mkfile(tmpdname,in,outbuf)
-const char	tmpdname[] ;
-const char	in[] ;
+cchar	tmpdname[] ;
+cchar	in[] ;
 char		outbuf[] ;
 {
 	SBUF	b ;
