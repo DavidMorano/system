@@ -53,13 +53,13 @@ enum vecitemos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecitemms {
-    inline static cint	reuse		= (1 << vecitemo_reuse) ;
-    inline static cint	compact		= (1 << vecitemo_compact) ;
-    inline static cint	swap		= (1 << vecitemo_swap) ;
-    inline static cint	stationary	= (1 << vecitemo_stationary) ;
-    inline static cint	conserve	= (1 << vecitemo_conserve) ;
-    inline static cint	sorted		= (1 << vecitemo_sorted) ;
-    inline static cint	ordered		= (1 << vecitemo_ordered) ;
+    static constexpr int	reuse		= (1 << vecitemo_reuse) ;
+    static constexpr int	compact		= (1 << vecitemo_compact) ;
+    static constexpr int	swap		= (1 << vecitemo_swap) ;
+    static constexpr int	stationary	= (1 << vecitemo_stationary) ;
+    static constexpr int	conserve	= (1 << vecitemo_conserve) ;
+    static constexpr int	sorted		= (1 << vecitemo_sorted) ;
+    static constexpr int	ordered		= (1 << vecitemo_ordered) ;
 } ; /* end struct (vecitemms) */
 
 #endif /* __cplusplus */
