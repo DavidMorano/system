@@ -54,13 +54,13 @@ enum vecobjos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecobjms {
-    inline static cint	reuse		= (1 << vecobjo_reuse) ;
-    inline static cint	compact		= (1 << vecobjo_compact) ;
-    inline static cint	swap		= (1 << vecobjo_swap) ;
-    inline static cint	stationary	= (1 << vecobjo_stationary) ;
-    inline static cint	conserve	= (1 << vecobjo_conserve) ;
-    inline static cint	sorted		= (1 << vecobjo_sorted) ;
-    inline static cint	ordered		= (1 << vecobjo_ordered) ;
+    static constexpr int	reuse		= (1 << vecobjo_reuse) ;
+    static constexpr int	compact		= (1 << vecobjo_compact) ;
+    static constexpr int	swap		= (1 << vecobjo_swap) ;
+    static constexpr int	stationary	= (1 << vecobjo_stationary) ;
+    static constexpr int	conserve	= (1 << vecobjo_conserve) ;
+    static constexpr int	sorted		= (1 << vecobjo_sorted) ;
+    static constexpr int	ordered		= (1 << vecobjo_ordered) ;
 } ; /* end struct */
 
 #endif /* __cplusplus */
