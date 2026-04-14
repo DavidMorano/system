@@ -63,7 +63,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<fsdir.h>
 #include	<mkpathx.h>
 #include	<pathadd.h>
@@ -158,10 +163,10 @@ procer::operator int () noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = setid()) >= 0) {
-	    if ((rs = var) >= 0) {
+	if ((rs = setid()) >= 0) ylikely {
+	    if ((rs = var) >= 0) ylikely {
 		nlen = var.maxnamelen ;
-	        if ((rs = libmem.mall((nlen + 1),&nbuf)) >= 0) {
+	        if ((rs = libmem.mall((nlen + 1),&nbuf)) >= 0) ylikely {
 		    {
 	                rs = fsdent() ;
 		        c = rs ;
@@ -290,9 +295,9 @@ int procer::selection() noex {
 vars::operator int () noex {
     	int		rs = SR_OK ;
 	if (maxnamelen == 0) {
-	    if ((rs = ulibval.maxnamelen) >= 0) {
+	    if ((rs = ulibval.maxnamelen) >= 0) ylikely {
 		maxnamelen = rs ;
-		if ((rs = ulibval.maxpathlen) >= 0) {
+		if ((rs = ulibval.maxpathlen) >= 0) ylikely {
 		    maxpathlen = rs ;
 		}
 	    }
