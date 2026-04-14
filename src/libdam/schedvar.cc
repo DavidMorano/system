@@ -1,4 +1,4 @@
-/* schedvar SUPPORT */
+/* schedvar SUPPORT (libuc-permx) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -32,24 +32,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
-#include	<storebuf.h>
 #include	<sbuf.h>
 #include	<snx.h>			/* |snkeyval(3uc)| */
 #include	<sncpyx.h>
 #include	<snwcpy.h>
-#include	<vstrkeycmpx.h>
+#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"schedvar.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -91,8 +93,7 @@ inline int schedvar_magic(schedvar *op,Args ... args) noex {
 	    rs = (op->magic == SCHEDVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (schedvar_magic) */
+} /* end subroutine (schedvar_magic) */
 
 static int schedvar_exper(SV *,char *,int,cc *,int) noex ;
 
@@ -112,7 +113,7 @@ int schedvar_start(SV *op) noex {
 	if (op) ylikely {
 	    cint	osz = szof(vecstr) ;
 	    op->magic = 0 ;
-	    if (void *vp ; (rs = uc_malloc(osz,&vp)) >= 0) ylikely {
+	    if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) ylikely {
 		vecstr	*slp = vecstrp(vp) ;
 	        cint	ve = SCHEDVAR_NE ;
 	        cint	vo = vecstrm.sorted ;
@@ -121,7 +122,7 @@ int schedvar_start(SV *op) noex {
 		    op->magic = SCHEDVAR_MAGIC ;
 		}
 		if (rs < 0) {
-		    uc_free(slp) ;
+		    lm_free(slp) ;
 		}
 	    } /* end if (object allocation) */
 	} /* end if (non-null) */
@@ -139,7 +140,7 @@ int schedvar_finish(SV *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-		    rs1 = uc_free(op->slp) ;
+		    rs1 = lm_free(op->slp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->slp = nullptr ;
 	        }
@@ -179,11 +180,11 @@ int schedvar_curend(SV *op,SV_C *curp) noex {
 
 int schedvar_curenum(SV *op,SV_C *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = schedvar_magic(op,curp,kbuf)) >= 0) ylikely {
 	    vecstr	*slp = op->slp ;
-	    cnullptr	np{} ;
 	    int		i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	    cchar	*cp{} ;
 	    kbuf[0] = '\0' ;
@@ -257,11 +258,11 @@ int schedvar_expand(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 /* private subroutines */
 
 static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	int		len = 0 ;
 	if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) ylikely {
 	    vecstr	*slp = op->slp ;
-	    cnullptr	np{} ;
             cchar	*lfp = (sp + sl) ;
             char	keybuf[2] ;
             for (cc *fp = sp ; (fp < lfp) && *fp && (rs >= 0) ; fp += 1) {
