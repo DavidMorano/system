@@ -42,16 +42,16 @@ LIBS +=
 
 OBJ0= strxbrk.o straltwchar.o
 OBJ1= strabbrsig.o strabbrerr.o
-OBJ2= strsub.o strwhite.o 
-OBJ3= strbasename.o strdirname.o
+OBJ2= strsub.o strwildsub.o
+OBJ3= strwhite.o 
 
 OBJ4= strlinelen.o strlocktype.o
-OBJ5=
+OBJ5= strbasename.o strdirname.o
 OBJ6=
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o
+OBJB= obj4.o obj5.o
 
 OBJ= $(OBJA) $(OBJB)
 
@@ -155,17 +155,15 @@ objb.o:			$(OBJB)
 strxbrk.o:		strxbrk.cc	strxbrk.h		$(INCS)
 strwhite.o:		strwhite.cc	strwhite.h		$(INCS)
 strsub.o:		strsub.cc	strsub.h		$(INCS)
+strwoldsub.o:		strwildsub.cc	strwildsub.h		$(INCS)
 strabbrerr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
 strabbrsig.o:		strabbrsig.cc	strabbrsig.h		$(INCS)
 straltwchar.o:		straltwchar.cc	straltwchar.h		$(INCS)
 strlinelen.o:		strlinelen.cc	strlinelen.h		$(INCS)
 strlocktype.o:		strlocktype.cc	strlocktype.h		$(INCS)
 
+# these subroutines (below) are very close to retirement!
 strbasename.o:		strbasename.cc				$(INCS)
 strdirname.o:		strdirname.cc				$(INCS)
-
-# 2014-12-26, David A-D- Morano
-# I retired the ass of this subroutine (below).
-#strwildsub.o:		strwildsub.cc				$(INCS)
 
 
