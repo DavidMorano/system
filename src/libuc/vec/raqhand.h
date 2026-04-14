@@ -52,13 +52,13 @@ enum raqhandos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct raqhandms {
-    inline static cint	reuse		= (1 << raqhando_reuse) ;
-    inline static cint	compact		= (1 << raqhando_compact) ;
-    inline static cint	swap		= (1 << raqhando_swap) ;
-    inline static cint	stationary	= (1 << raqhando_stationary) ;
-    inline static cint	conserve	= (1 << raqhando_conserve) ;
-    inline static cint	sorted		= (1 << raqhando_sorted) ;
-    inline static cint	ordered		= (1 << raqhando_ordered) ;
+    static constexpr int	reuse		= (1 << raqhando_reuse) ;
+    static constexpr int	compact		= (1 << raqhando_compact) ;
+    static constexpr int	swap		= (1 << raqhando_swap) ;
+    static constexpr int	stationary	= (1 << raqhando_stationary) ;
+    static constexpr int	conserve	= (1 << raqhando_conserve) ;
+    static constexpr int	sorted		= (1 << raqhando_sorted) ;
+    static constexpr int	ordered		= (1 << raqhando_ordered) ;
 } ; /* end struct (raqhandms) */
 
 #endif /* __cplusplus */
