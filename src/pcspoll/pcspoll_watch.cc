@@ -1,4 +1,5 @@
 /* progwatch SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process the service names given us */
@@ -39,6 +40,7 @@
 
 /*****************************************************************************
 
+  	Description:
 	This subroutine is responsible for processing the jobs that
 	have been handed to us from the initialization code.
 
@@ -55,8 +57,8 @@
 #include	<sys/wait.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cerrno>
 #include	<ctime>
+#include	<cerrno>
 #include	<csignal>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -102,10 +104,6 @@
 
 #ifndef	XDEBFILE
 #define	XDEBFILE	"/var/tmp/pcspoll.deb"
-#endif
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
 #endif
 
 
@@ -177,44 +175,44 @@ struct subinfo {
 
 /* forward references */
 
-static int	procjobdname(struct proginfo *) ;
-static int	procloadnames(struct proginfo *,vecstr *) ;
-static int	procname(struct proginfo *,
+local int	procjobdname(struct proginfo *) ;
+local int	procloadnames(struct proginfo *,vecstr *) ;
+local int	procname(struct proginfo *,
 			SVCENTRY_ARGS *,cchar *) ;
-static int	procservice(struct proginfo *,
+local int	procservice(struct proginfo *,
 			SVCFILE_ENT *,SVCENTRY_ARGS *) ;
-static int	procnewprogentry(struct proginfo *,SVCENTRY **) ;
-static int	procfreeprogentry(struct proginfo *,SVCENTRY *) ;
-static int	procjobdel(struct proginfo *,int,SVCENTRY *) ;
-static int	procruncheck(struct proginfo *) ;
-static int	procjobfind(struct proginfo *,pid_t,SVCENTRY **) ;
-static int	procjobstart(struct proginfo *,SVCENTRY *) ;
-static int	procjobadd(struct proginfo *,SVCENTRY *,cchar *) ;
-static int	procmorecheck(struct proginfo *) ;
-static int	procjobactive(struct proginfo *,
+local int	procnewprogentry(struct proginfo *,SVCENTRY **) ;
+local int	procfreeprogentry(struct proginfo *,SVCENTRY *) ;
+local int	procjobdel(struct proginfo *,int,SVCENTRY *) ;
+local int	procruncheck(struct proginfo *) ;
+local int	procjobfind(struct proginfo *,pid_t,SVCENTRY **) ;
+local int	procjobstart(struct proginfo *,SVCENTRY *) ;
+local int	procjobadd(struct proginfo *,SVCENTRY *,cchar *) ;
+local int	procmorecheck(struct proginfo *) ;
+local int	procjobactive(struct proginfo *,
 			cchar *,SVCENTRY **) ;
-static int	procaccess(struct proginfo *,
+local int	procaccess(struct proginfo *,
 			cchar *) ;
 
-static int	procstampfile(struct proginfo *) ;
+local int	procstampfile(struct proginfo *) ;
 #if	CF_PROCFINDPROG
-static int	procfindprog(struct proginfo *,cchar *,char *,int *) ;
+local int	procfindprog(struct proginfo *,cchar *,char *,int *) ;
 #endif
 
-static int	procfreeall(struct proginfo *) ;
-static int	proclogjobs(struct proginfo *) ;
-static int	proclogjob(struct proginfo *,SVCENTRY *) ;
-static int	proclogsecurity(struct proginfo *,cchar *) ;
+local int	procfreeall(struct proginfo *) ;
+local int	proclogjobs(struct proginfo *) ;
+local int	proclogjob(struct proginfo *,SVCENTRY *) ;
+local int	proclogsecurity(struct proginfo *,cchar *) ;
 
 #if	CF_SVCFILEFREE || CF_ACCTABFREE
-static int	procdbdump(struct proginfo *) ;
+local int	procdbdump(struct proginfo *) ;
 #endif /* CF_SVCFILEFREE || CF_ACCTABFREE */
 
 #if	CF_ENVLOCAL
-static int	loadexports(struct proginfo *,vecstr *) ;
+local int	loadexports(struct proginfo *,vecstr *) ;
 #endif
 
-static int	procxfile(struct proginfo *,cchar *) ;
+local int	procxfile(struct proginfo *,cchar *) ;
 
 static void	int_all(int) ;
 
@@ -730,7 +728,7 @@ ret0:
 /* local subroutines */
 
 
-static int procjobdname(struct proginfo *pip)
+local int procjobdname(struct proginfo *pip)
 {
 	int		rs ;
 
@@ -781,7 +779,7 @@ static int procjobdname(struct proginfo *pip)
 /* end subroutine (procjobdname) */
 
 
-static int procloadnames(pip,snp)
+local int procloadnames(pip,snp)
 struct proginfo	*pip ;
 vecstr		*snp ;
 {
@@ -845,7 +843,7 @@ vecstr		*snp ;
 /* end subroutine (procloadnames) */
 
 
-static int procname(pip,pap,name)
+local int procname(pip,pap,name)
 struct proginfo	*pip ;
 SVCENTRY_ARGS	*pap ;
 cchar	name[] ;
@@ -918,7 +916,7 @@ SVCENTRY	*pep ;
 
 
 /* do a cycle of work */
-static int procruncheck(pip)
+local int procruncheck(pip)
 struct proginfo	*pip ;
 {
 	struct subinfo	*pcp = pip->sip ;
@@ -1151,7 +1149,7 @@ ret0:
 
 
 /* spawn a job */
-static int procjobstart(pip,pep)
+local int procjobstart(pip,pep)
 struct proginfo	*pip ;
 SVCENTRY	*pep ;
 {
@@ -1247,7 +1245,7 @@ ret0:
 /* end subroutine (procjobstart) */
 
 
-static int procjobadd(pip,pep,pfname)
+local int procjobadd(pip,pep,pfname)
 struct proginfo	*pip ;
 SVCENTRY	*pep ;
 cchar	*pfname ;
@@ -1327,7 +1325,7 @@ cchar	*pfname ;
 
 
 /* find a job by its PID */
-static int procjobfind(pip,pid,pepp)
+local int procjobfind(pip,pid,pepp)
 struct proginfo	*pip ;
 pid_t		pid ;
 SVCENTRY	**pepp ;
@@ -1352,7 +1350,7 @@ SVCENTRY	**pepp ;
 
 
 /* delete a job and free up the progentry */
-static int procjobdel(pip,ji,pep)
+local int procjobdel(pip,ji,pep)
 struct proginfo	*pip ;
 int		ji ;
 SVCENTRY	*pep ;
@@ -1376,7 +1374,7 @@ SVCENTRY	*pep ;
 
 
 /* check on program intervals when in daemon mode */
-static int procmorecheck(pip)
+local int procmorecheck(pip)
 struct proginfo	*pip ;
 {
 	struct subinfo	*pcp = pip->sip ;
@@ -1469,7 +1467,7 @@ struct proginfo	*pip ;
 
 
 /* check the interval of a service entry */
-static int procservice(pip,sep,pap)
+local int procservice(pip,sep,pap)
 struct proginfo	*pip ;
 SVCFILE_ENT	*sep ;
 SVCENTRY_ARGS	*pap ;
@@ -1766,7 +1764,7 @@ bad0:
 /* end subroutine (procservice) */
 
 /* is a named job active in the system already? */
-static int procjobactive(proginfo *pip,cchar *name,svcentry **pepp) noex {
+local int procjobactive(proginfo *pip,cchar *name,svcentry **pepp) noex {
 	struct subinfo	*pcp = pip->sip ;
 	cq_cur		cur ;
 	SVCENTRY	*pep ;
@@ -1812,7 +1810,7 @@ static int procjobactive(proginfo *pip,cchar *name,svcentry **pepp) noex {
 ****/
 
 /* check if this connection is allowed based on the service access */
-static int procaccess(pip,access)
+local int procaccess(pip,access)
 struct proginfo	*pip ;
 cchar	access[] ;
 {
@@ -2003,15 +2001,11 @@ ret0:
 }
 /* end subroutine (procaccess) */
 
-
-static int procstampfile(pip)
-struct proginfo	*pip ;
-{
+local int procstampfile(proginfo *pip) noex {
 	int		rs = SR_OK ;
-
-	if ((pip->stampfname != NULL) && (pip->stampfname[0] != '\0'))
-	    rs = u_utime(pip->stampfname,NULL) ;
-
+	if ((pip->stampfname != NULL) && (pip->stampfname[0] != '\0')) {
+	    rs = uc_filetime(pip->stampfname,NULL) ;
+	}
 	return rs ;
 }
 /* end subroutine (procstampfile) */
@@ -2019,7 +2013,7 @@ struct proginfo	*pip ;
 
 /* find a program server and evaluate its security */
 #if	CF_PROCFINDPROG
-static int procfindprog(pip,program,progpath,sp)
+local int procfindprog(pip,program,progpath,sp)
 struct proginfo	*pip ;
 cchar	program[] ;
 char		progpath[] ;
@@ -2129,7 +2123,7 @@ int		*sp ;			/* secure path? */
 #endif /* CF_PROCFINDPROG */
 
 
-static int procfreeall(pip)
+local int procfreeall(pip)
 struct proginfo	*pip ;
 {
 	struct subinfo	*sip = pip->sip ;
@@ -2179,7 +2173,7 @@ struct proginfo	*pip ;
 }
 /* end subroutine (procfreeall) */
 
-static int proclogjobs(progifo *pip) noex {
+local int proclogjobs(progifo *pip) noex {
 	struct subinfo	*sip = pip->sip ;
 	SVCENTRY	*pep ;
 	cq_cur		cur ;
@@ -2237,7 +2231,7 @@ ret0:
 /* end subroutine (proclogjobs) */
 
 
-static int proclogjob(pip,pep)
+local int proclogjob(pip,pep)
 struct proginfo	*pip ;
 SVCENTRY	*pep ;
 {
@@ -2263,7 +2257,7 @@ SVCENTRY	*pep ;
 /* end subroutine (proclogjob) */
 
 
-static int proclogsecurity(struct proginfo *pip,cchar *pfname)
+local int proclogsecurity(struct proginfo *pip,cchar *pfname)
 {
 	int		al ;
 	cchar	*ap ;
@@ -2290,7 +2284,7 @@ static int proclogsecurity(struct proginfo *pip,cchar *pfname)
 
 #if	CF_SVCFILEFREE || CF_ACCTABFREE
 
-static int procdbdump(pip)
+local int procdbdump(pip)
 struct proginfo	*pip ;
 {
 	struct subinfo	*sip = pip->sip ;
@@ -2332,7 +2326,7 @@ struct proginfo	*pip ;
 #endif /* CF_SVCFILEFREE || CF_ACCTABFREE */
 
 
-static int procxfile(pip,fname)
+local int procxfile(pip,fname)
 struct proginfo	*pip ;
 cchar	fname[] ;
 {
@@ -2357,18 +2351,12 @@ cchar	fname[] ;
 
 #if	CF_ENVLOCAL
 
-static int loadexports(pip,elp)
-struct proginfo	*pip ;
-vecstr		*elp ;
-{
+local int loadexports(proginfo *pip,vecstr *elp) noex {
 	int		rs = SR_OK ;
-	int		i ;
-
-	for (i = 0 ; pip->envv[i] != NULL ; i += 1) {
+	for (int i = 0 ; pip->envv[i] != NULL ; i += 1) {
 	    rs = vecstr_add(elp,pip->envv[i],-1) ;
 	    if (rs < 0) break ;
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (loadexports) */
