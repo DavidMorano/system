@@ -6,6 +6,13 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-03-01, David A­D­ Morano
+	This code was originally written.
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRWHITE_INCLUDE
@@ -25,9 +32,10 @@ EXTERNC_end
 
 #if	__cpluspls
 
-extern char	*strwhite(cchar *,int) noex ;
-
-local inline char *strwht(cchar *sp,int sl) noex {
+inline char *strwhite(cchar *sp) noex {
+    	return strwhite(sp,-1) ;
+}
+inline char *strwht(cchar *sp,int sl) noex {
     	return strwhite(sp,sl) ;
 }
 
