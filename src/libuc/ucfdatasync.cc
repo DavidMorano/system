@@ -1,10 +1,9 @@
-/* uc_fdatasync */
+/* ucfdatasync */
 /* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,9 +15,7 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
@@ -26,18 +23,17 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cerrno>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usupport.h>
+#include	<utimeout.h>
 #include	<localmisc.h>
 
 
 /* local defines */
-
-#define	TO_IO		5
-#define	TO_BUSY		5
-#define	TO_NOSPC	10
 
 
 /* external subroutines */
@@ -49,30 +45,38 @@
 /* exported subroutines */
 
 int uc_fdatasync(int fd) noex {
-	int		rs ;
-	int		to_nospc = TO_NOSPC ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if ((rs = fdatasync(fd)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOSPC:
-	            if (to_nospc-- > 0) {
-	                msleep(1000) ;
-		    } else {
-	                f_exit = TRUE ;
-	            }
-		    break ;
-	        case SR_INTR:
-	            break ;
-	        default:
-		    f_exit = TRUE ;
-	            break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
+	int		rs = SR_BADFD ;
+	if (fd >= 0) {
+	    int		to_again = utimeout[uto_again] ;
+	    int		to_nospc = utimeout[uto_nospc] ;
+	    bool	fexit = false ;
+	    repeat {
+	        if ((rs = fdatasync(fd)) < 0) {
+		    rs = (- errno) ;
+	            switch (rs) {
+	            case SR_AGAIN:
+	                if (to_again-- > 0) {
+	                    msleep(1000) ;
+		        } else {
+	                    fexit = true ;
+	                }
+		        break ;
+	            case SR_NOSPC:
+	                if (to_nospc-- > 0) {
+	                    msleep(1000) ;
+		        } else {
+	                    fexit = true ;
+	                }
+		        break ;
+	            case SR_INTR:
+	                break ;
+	            default:
+		        fexit = true ;
+	                break ;
+	            } /* end switch */
+	        } /* end if (error) */
+	    } until ((rs >= 0) || fexit) ;
+	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (uc_fdatasync) */
