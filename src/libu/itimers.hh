@@ -37,9 +37,9 @@
 
 
 struct itimers {
-    inline static cint	real		= ITIMER_REAL ;
-    inline static cint	virt		= ITIMER_VIRTUAL ;
-    inline static cint	prof		= ITIMER_PROF ;
+    static constexpr int	real		= ITIMER_REAL ;
+    static constexpr int	virt		= ITIMER_VIRTUAL ;
+    static constexpr int	prof		= ITIMER_PROF ;
 } ; /* end struct (timers) */
 
 extern const itimers	itimer ;
