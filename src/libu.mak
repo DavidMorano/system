@@ -85,7 +85,7 @@ OBJ29= clockids.o itimers.o filetypes.o funcodes.o
 OBJ30= binchunk.o conintx.o udiv.o stdintx.o
 OBJ31= ccfile.o readln.o dprintf.o
 
-OBJ32= muldigs.o varithmetic.o
+OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33=
 OBJ34=
 OBJ45=
@@ -558,5 +558,6 @@ ischx1.o:		ischx1.cc	ischx0.o			$(INCS)
 conintx.o:		conintx.cc	conintx.hh			$(INCS)
 udiv.o:			udiv.cc		udiv.hh				$(INCS)
 stdintx.o:		stdintx.cc	stdintx.h			$(INCS)
+xxtostr.o:		xxtostr.cc	xxtostr.h			$(INCS)
 
 
