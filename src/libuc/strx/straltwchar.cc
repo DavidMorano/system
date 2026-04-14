@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* counted-string copy while compacting white-space from the source */
+/* find and return am alternative c-string for an wide-character */
 /* version %I% last-modified %G% */
 
 
