@@ -57,13 +57,13 @@ enum veclongos {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct veclongms {
-    inline static cint	reuse		= (1 << veclongo_reuse) ;
-    inline static cint	compact		= (1 << veclongo_compact) ;
-    inline static cint	swap		= (1 << veclongo_swap) ;
-    inline static cint	stationary	= (1 << veclongo_stationary) ;
-    inline static cint	conserve	= (1 << veclongo_conserve) ;
-    inline static cint	sorted		= (1 << veclongo_sorted) ;
-    inline static cint	ordered		= (1 << veclongo_ordered) ;
+    static constexpr int	reuse		= (1 << veclongo_reuse) ;
+    static constexpr int	compact		= (1 << veclongo_compact) ;
+    static constexpr int	swap		= (1 << veclongo_swap) ;
+    static constexpr int	stationary	= (1 << veclongo_stationary) ;
+    static constexpr int	conserve	= (1 << veclongo_conserve) ;
+    static constexpr int	sorted		= (1 << veclongo_sorted) ;
+    static constexpr int	ordered		= (1 << veclongo_ordered) ;
 } ; /* end struct (veclongms) */
 
 #endif /* __cplusplus */
