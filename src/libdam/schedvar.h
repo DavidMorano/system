@@ -1,4 +1,4 @@
-/* schedvar HEADER */
+/* schedvar HEADER (libuc-permx) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 
 
@@ -28,12 +25,12 @@
 
 struct schedvar_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct schedvar_head {
 	vecstr		*slp ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 typedef	SCHEDVAR	schedvar ;
 typedef	SCHEDVAR_CUR	schedvar_cur ;
