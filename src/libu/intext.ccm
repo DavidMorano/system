@@ -110,13 +110,6 @@ export {
 	    vcopy(n,v,vt) ;
 	    return *this ;
 	} ; /* end ctor */
-	uintx &operator *=	(int m) noex {
-	    Digit	s(m) ;
-	    Digit	r[n] ;
-	    vmultrunc(n,r,v,s.v) ;
-	    vcopy(n,v,r) ;
-	    return *this ;
-	} /* end method (timeval::operator) */
 	uintx &operator +=	(const uintx &o) noex {
 	    Digit	r[n] ;
 	    vadd(n,r,v,o.v) ;
@@ -129,6 +122,13 @@ export {
 	    vcopy(n,v,r) ;
 	    return *this ;
         } /* end method (timeval::operator) */
+	uintx &operator *=	(int m) noex {
+	    Digit	s(m) ;
+	    Digit	r[n] ;
+	    vmultrunc(n,r,v,s.v) ;
+	    vcopy(n,v,r) ;
+	    return *this ;
+	} /* end method (timeval::operator) */
 	uintx &operator *=	(const uintx &o) noex {
 	    Digit	r[n] ;
 	    vmultrunc(n,r,v,o.v) ;
