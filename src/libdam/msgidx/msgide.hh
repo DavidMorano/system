@@ -17,6 +17,7 @@
 
 #ifndef	MAGIDE_INCLUDE
 #define	MAGIDE_INCLUDE
+#ifdef	__cplusplus /* C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -32,7 +33,7 @@ enum msgidemems {
 	msgidemem_entsz,
 	msgidemem_finish,
 	msgidemem_overlast
-} ;
+} ; /* end enum (msgidemems) */
 
 struct msgide ;
 
@@ -56,7 +57,7 @@ struct msgide {
 	    int		recipient ;
 	    int		messageid ;
 	    int		from ;
-	} ;
+	} ; /* end struct */
 	char		*a{} ;
 	char		*recipient{} ;
 	char		*messageid{} ;
@@ -92,6 +93,7 @@ struct msgide {
 } ; /* end struct (msgide) */
 
 
+#endif /* __cplusplus (C++ only) */
 #endif /* MAGIDE_INCLUDE */
 
 
