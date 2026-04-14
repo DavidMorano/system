@@ -49,7 +49,7 @@
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"sesnotes.h"
-#include	"sesmsg.h"
+#include	"sesmsg.hh"
 
 #pragma		GCC dependency	"mod/libutil.ccm"
 
@@ -86,11 +86,11 @@ template<typename ... Args>
 local int sesnotes_ctor(SN *op,Args ... args) noex {
 	SESNOTES	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
-	    if (char *bp ; (rs = malloc_un(&bp)) >= 0) {
+	    if (char *bp ; (rs = malloc_un(&bp)) >= 0) ylikely {
 		static cint	rsv = mkvars(rs) ;
-		if ((rs = rsv) >= 0) {
+		if ((rs = rsv) >= 0) ylikely {
 		    op->unbuf = bp ;
 		}
 		if (rs < 0) {
@@ -106,9 +106,9 @@ local int sesnotes_ctor(SN *op,Args ... args) noex {
 local int sesnotes_dtor(SN *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->unbuf) {
+	    if (op->unbuf) ylikely {
 		rs1 = uc_free(op->unbuf) ;
 		if (rs >= 0) rs = rs1 ;
 		op->unbuf = nullptr ;
@@ -121,7 +121,7 @@ local int sesnotes_dtor(SN *op) noex {
 template<typename ... Args>
 static inline int sesnotes_magic(SN *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SESNOTES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -147,10 +147,10 @@ static vars		var ;
 
 int sesnotes_open(SN *op,cchar *un) noex {
 	int		rs ;
-	if ((rs = sesnotes_ctor(op,un)) >= 0) {
+	if ((rs = sesnotes_ctor(op,un)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (un[0]) {
-		if ((rs = ucpid) >= 0) {
+	    if (un[0]) ylikely {
+		if ((rs = ucpid) >= 0) ylikely {
 		    cint	ulen = var.usernamelen ;
 		    op->pid = rs ;
 		    op->fd = -1 ;
@@ -169,13 +169,13 @@ int sesnotes_open(SN *op,cchar *un) noex {
 int sesnotes_close(SN *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sesnotes_magic(op)) >= 0) {
+	if ((rs = sesnotes_magic(op)) >= 0) ylikely {
 	    if (op->fd >= 0) {
 	        rs1 = u_close(op->fd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fd = -1 ;
 	    }
-	    if (op->sfname) {
+	    if (op->sfname) ylikely {
 	        if (op->sfname[0] != '\0') {
 	            uc_unlink(op->sfname) ;
 	            op->sfname[0] = '\0' ;
@@ -213,11 +213,11 @@ int sesnotes_send(SN *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = sesnotes_magic(op,mp)) >= 0) {
+	if ((rs = sesnotes_magic(op,mp)) >= 0) ylikely {
 	    custime	dt = getustime ;
 	    uint	uv = sid ;
 	    int		sz = 0 ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
 		cint	maxpath = rs ;
 		int	ai = 0 ;
 		sz += ((maxpath + 1) * 2) ;
@@ -424,7 +424,7 @@ int vars::operator () (int unl) noex {
 	int		rs = SR_BUGCHECK ;
 	if (unl > 0) {
 	    var.usernamelen = unl ;
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
 		var.maxpathlen = rs ;
 	    }
 	}
