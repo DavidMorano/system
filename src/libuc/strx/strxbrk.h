@@ -6,6 +6,13 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1999-06-08, David A­D­ Morano
+	This code was originally written for some reason.
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRXBRK_INCLUDE
