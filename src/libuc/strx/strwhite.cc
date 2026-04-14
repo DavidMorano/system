@@ -105,9 +105,4 @@ char *strwhite(cchar *sp,int sl) noex {
 }
 /* end subroutine (strwhite) */
 
-char *strwhite(cchar *sp) noex {
-    	return strwhite(sp,-1) ;
-}
-/* end subroutine (strwhite) */
-
 
