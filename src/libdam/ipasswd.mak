@@ -1,4 +1,4 @@
-# MAKEFILES (ipasswd)
+# MAKEFILE (ipasswd)
 
 T= ipasswd
 
