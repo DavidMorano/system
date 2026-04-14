@@ -66,13 +66,13 @@ enum vecpstros {
 #ifdef	__cplusplus	/* C++ only! */
 
 struct vecpstrms {
-    inline static cint	reuse		= (1 << vecpstro_reuse) ;
-    inline static cint	compact		= (1 << vecpstro_compact) ;
-    inline static cint	swap		= (1 << vecpstro_swap) ;
-    inline static cint	stationary	= (1 << vecpstro_stationary) ;
-    inline static cint	conserve	= (1 << vecpstro_conserve) ;
-    inline static cint	sorted		= (1 << vecpstro_sorted) ;
-    inline static cint	ordered		= (1 << vecpstro_ordered) ;
+    static constexpr int	reuse		= (1 << vecpstro_reuse) ;
+    static constexpr int	compact		= (1 << vecpstro_compact) ;
+    static constexpr int	swap		= (1 << vecpstro_swap) ;
+    static constexpr int	stationary	= (1 << vecpstro_stationary) ;
+    static constexpr int	conserve	= (1 << vecpstro_conserve) ;
+    static constexpr int	sorted		= (1 << vecpstro_sorted) ;
+    static constexpr int	ordered		= (1 << vecpstro_ordered) ;
 } ; /* end struct (vecpstrms) */
 
 #endif /* __cplusplus */
