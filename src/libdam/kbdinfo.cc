@@ -102,7 +102,7 @@ template<typename ... Args>
 static int kbdinfo_ctor(kbdinfo *op,Args ... args) noex {
     	KBDINFO		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -111,7 +111,7 @@ static int kbdinfo_ctor(kbdinfo *op,Args ... args) noex {
 
 static int kbdinfo_dtor(kbdinfo *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -121,7 +121,7 @@ static int kbdinfo_dtor(kbdinfo *op) noex {
 template<typename ... Args>
 static inline int kbdinfo_magic(kbdinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == KBDINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -367,10 +367,10 @@ static int kbdinfo_parse(KI *op,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (fname) {
-	    if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (fname) ylikely {
+	    if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) ylikely {
 		cint	llen = rs ;
-	        if (bfile df ; (rs = df.open(fname,"r",0)) >= 0) {
+	        if (bfile df ; (rs = df.open(fname,"r",0)) >= 0) ylikely {
 	            while ((rs = df.readln(lbuf,llen)) > 0) {
 			cchar	*sp ;
 			if (int sl ; (sl = sfcontent(lbuf,rs,&sp)) > 0) {
