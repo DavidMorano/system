@@ -55,6 +55,9 @@
 
 #include	"recipient.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -68,7 +71,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -89,15 +91,15 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int recipient_ctor(recipient *op,Args ... args) noex {
+local int recipient_ctor(recipient *op,Args ... args) noex {
     	RECIPIENT	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
-	    rs = SR_OK ;
-	    if ((op->hlp = new(nothrow) hdb) != np) {
-	        if ((op->nlp = new(nothrow) vecstr) != np) {
+	    rs = SR_NOMEM ;
+	    if ((op->hlp = new(nothrow) hdb) != np) ylikely {
+	        if ((op->nlp = new(nothrow) vecstr) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-vecstr) */
 		if (rs < 0) {
@@ -107,35 +109,32 @@ static int recipient_ctor(recipient *op,Args ... args) noex {
 	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (recipient_ctor) */
+} /* end subroutine (recipient_ctor) */
 
-static int recipient_dtor(recipient *op) noex {
+local int recipient_dtor(recipient *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->nlp) {
+	    if (op->nlp) ylikely {
 		delete op->nlp ;
 		op->nlp = nullptr ;
 	    }
-	    if (op->hlp) {
+	    if (op->hlp) ylikely {
 		delete op->hlp ;
 		op->hlp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (recipient_dtor) */
+} /* end subroutine (recipient_dtor) */
 
 template<typename ... Args>
-static inline int recipient_magic(recipient *op,Args ... args) noex {
+local inline int recipient_magic(recipient *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == RECIPIENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (recipient_magic) */
+} /* end subroutine (recipient_magic) */
 
 
 /* local variables */
@@ -149,10 +148,10 @@ static inline int recipient_magic(recipient *op,Args ... args) noex {
 int recipient_start(RC *op,int vn) noex {
 	int		rs ;
 	if (vn <= 1) vn = RC_DEFENTS ;
-	if ((rs = recipient_ctor(op)) >= 0) {
-	    if ((rs = hdb_start(op->hlp,vn,0,nullptr,nullptr)) >= 0) {
+	if ((rs = recipient_ctor(op)) >= 0) ylikely {
+	    if ((rs = hdb_start(op->hlp,vn,0,nullptr,nullptr)) >= 0) ylikely {
 	        cint	vo = VECSTR_OCONSERVE ;
-	        if ((rs = vecstr_start(op->nlp,vn,vo)) >= 0) {
+	        if ((rs = vecstr_start(op->nlp,vn,vo)) >= 0) ylikely {
 		    rs = RC_MAGIC ;
 		}
 	        if (rs < 0) {
@@ -172,7 +171,7 @@ int recipient_finish(RC *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rs2 ;
-	if ((rs = recipient_magic(op)) >= 0) {
+	if ((rs = recipient_magic(op)) >= 0) ylikely {
 	    /* pop the hash table first */
 	    if (hdb_cur kcur ; (rs = hdb_curbegin(op->hlp,&kcur)) >= 0) {
 		hdb_dat		key{} ;
