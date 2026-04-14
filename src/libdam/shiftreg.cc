@@ -42,6 +42,9 @@
 
 #include	"shiftreg.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -66,7 +69,7 @@
 template<typename ... Args>
 static inline int shiftreg_magic(shiftreg *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SHIFTREG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -86,10 +89,10 @@ int shiftreg_start(shiftreg *op,int n) noex {
     	SHIFTREG	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (n < 1) n = 1 ;
-	if (op) {
+	if (op) ylikely {
 	    cint	sz = n * szof(ulong) ;
 	    memclear(hop) ;
-	    if (ulong *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    if (ulong *a ; (rs = uc_malloc(sz,&a)) >= 0) ylikely {
 		op->regs = a ;
 	        op->n = n ;
 	        for (int i = 0 ; i < op->n ; i += 1) {
@@ -104,8 +107,8 @@ int shiftreg_start(shiftreg *op,int n) noex {
 int shiftreg_finish(shiftreg *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = shiftreg_magic(op)) >= 0) {
-	    if (op->regs) {
+	if ((rs = shiftreg_magic(op)) >= 0) ylikely {
+	    if (op->regs) ylikely {
 	        rs1 = uc_free(op->regs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->regs = nullptr ;
