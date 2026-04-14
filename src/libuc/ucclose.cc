@@ -1,4 +1,4 @@
-/* uc_close */
+/* ucclose */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -55,8 +55,12 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
