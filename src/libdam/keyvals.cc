@@ -30,11 +30,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t(3c++)| */
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<hash.h>		/* |hash_elf(3dam)| */
@@ -42,7 +44,9 @@
 
 #include	"keyvals.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
