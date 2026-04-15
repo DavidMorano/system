@@ -1,4 +1,6 @@
-/* statvfs */
+/* statvfs HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
 
 
 
