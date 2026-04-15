@@ -180,18 +180,16 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	            fsp->l_whence = SEEK_SET ;
 	            fsp->l_start = 0L ;
 	            fsp->l_len = 0L ;
-		    fallthrough ;
-        /* fall through to next case */
-        /* FALLTHROUGH */
-        /* enter here for a lock (or unlock) of a requested area of the file */
+		    falldown ;
+        	    /* fall through to next case */
+        	    /* enter here for a lock (or unlock) */
 	        case BC_SETLK:
 	        case BC_SETLKW:
 	            if (op->fl.writing && (op->len > 0)) {
 	                rs = bfile_flush(op) ;
 	            }
-		    fallthrough ;
-        /* fall through to next case */
-        /* FALLTHROUGH */
+		    falldown ;
+        	    /* fall through to next case */
 	        case BC_GETLK:
 	            switch (cmd) {
 	            case BC_LOCKWRITE:
