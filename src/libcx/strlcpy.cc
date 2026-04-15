@@ -1,4 +1,5 @@
 /* strlcpy SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* buffer-size-conscious string operation */
@@ -17,6 +18,10 @@
 
 /******************************************************************************
 
+  	Name:
+	strlcpy
+
+	Description:
 	This subroutine is a knock off of the |strlcpy(3c)| that
 	first appeared in the Solaris UNIX® system from Sun
 	Microsystems.
@@ -24,15 +29,40 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
 
 
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -44,7 +74,7 @@ size_t strlcpy(char *dst,cchar *src,size_t maxlen) noex {
 	size_t		rsz = 0 ;
 	if (dst && src) {
 	    cint	ml = int(maxlen) ;
-	    int		i{} ;
+	    int		i{} ; /* used-afterwards */
 	    for (i = 0 ; (i < (ml - 1)) && *src ; i += 1) {
 	        dst[i] = *src++ ;
 	    }
