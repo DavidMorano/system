@@ -60,6 +60,9 @@
 
 #include	"syshelper.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -76,7 +79,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -100,7 +102,7 @@ template<typename ... Args>
 static int syshelper_ctor(SH *op,Args ... args) noex {
     	SYSHELPER	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -109,7 +111,7 @@ static int syshelper_ctor(SH *op,Args ... args) noex {
 
 static int syshelper_dtor(SH *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -119,7 +121,7 @@ static int syshelper_dtor(SH *op) noex {
 template<typename ... Args>
 static inline int syshelper_magic(SH *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SYSHELPER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -137,14 +139,14 @@ static int syshelper_opencheck(SH *) noex ;
 int syshelper_open(SH *op,cchar *filename) noex {
 	int		rs ;
 	if (filename == nullptr) filename = SYSHELPER_DEFFILE ;
-	if ((rs = syshelper_ctor(op)) >= 0) {
+	if ((rs = syshelper_ctor(op)) >= 0) ylikely {
 	    cint	am = (R_OK | W_OK) ;
 	    op->pid = -1 ;
-	    if ((rs = perm(filename,-1,-1,nullptr,am)) >= 0) {
-	        if ((rs = dialuss(filename,5,0)) >= 0) {
+	    if ((rs = perm(filename,-1,-1,nullptr,am)) >= 0) ylikely {
+	        if ((rs = dialuss(filename,5,0)) >= 0) ylikely {
 	            op->fd = rs ;
-	            if ((uc_closeonexec(op->fd,true)) >= 0) {
-		        if ((rs = syshelper_opencheck(op)) >= 0) {
+	            if ((uc_closeonexec(op->fd,true)) >= 0) ylikely {
+		        if ((rs = syshelper_opencheck(op)) >= 0) ylikely {
 		            op->magic = SYSHELPER_MAGIC ;
 		        }
 	            } /* end if (closeonexec) */
@@ -165,8 +167,8 @@ int syshelper_open(SH *op,cchar *filename) noex {
 int syshelper_close(SH *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = syshelper_magic(op)) >= 0) {
-	    if (op->fd >= 0) {
+	if ((rs = syshelper_magic(op)) >= 0) ylikely {
+	    if (op->fd >= 0) ylikely {
 	        rs1 = u_close(op->fd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fd = -1 ;
@@ -184,7 +186,7 @@ int syshelper_close(SH *op) noex {
 int syshelper_read(SH *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rl = 0 ;
-	if ((rs = syshelper_magic(op,rbuf)) >= 0) {
+	if ((rs = syshelper_magic(op,rbuf)) >= 0) ylikely {
 	    cint	to = TO_READ ;
 	    cint	fm = FM_EXACT ;
 	    cint	clen = min(UCHAR_MAX,CMDBUFLEN) ;
