@@ -5,10 +5,9 @@
 /* PING an INET machine */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time */
+#define	CF_DEBUG	0		/* compile-time */
 #define	CF_DEBUGPING	0		/* debug PING */
 #define	CF_DEBUGINT	0		/* compile |makeint()| */
-#define	CF_BROKEN	1		/* PING program broken */
 
 /* revision history:
 
@@ -50,24 +49,31 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
-#include	<estrings.h>
-#include	<getbufsize.h>
+#include	<csignal>		/* |SIG{x}| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uinet.h>
+#include	<uclibmem.h>
+#include	<bufsizevar.hh>
 #include	<hostent.h>
 #include	<inetaddr.h>
-#include	<spawnproc.h>
-#include	<strn.h>
-#include	<sfx.h>
+#include	<spawnproc.h>		/* |spawnproc_con(3uc)| */
+#include	<strn.h>		/* |strnchr(3uc)| */
+#include	<sfx.h>			/* |sfnext(3uc)| */
 #include	<ctdec.h>
-#include	<isnot.h>
 #include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<debprintf.h>		/* |DEBPRINTF(3u)| */
 
 #include	"inetping.h"
 
+#pragma		GCC dependency		"mod/debug.ccm"
+
+import debug ;
 
 /* local defines */
 
@@ -75,17 +81,11 @@
 #define	ADDR_NOT	((uint) (~ 0))
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	80		/* can hold |int245_t| in decimal */
-#endif
-
 #ifndef	DOTBUFLEN
-#define	DOTBUFLEN	40		/* INET dotted-decimal length */
+#define	DOTBUFLEN	INETX_ADDRSTRLEN /* INET dotted-decimal length */
 #endif
 
 #define	TOBUFLEN	DIGBUFLEN
-
-#define	RBUFLEN		MAXNAMELEN
 
 #undef	PROGNAME_PING
 #define	PROGNAME_PING	"INETPING"
@@ -102,58 +102,92 @@
 
 #define	TO_CHILDEXIT	5		/* time to wait for child exit */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0
+#endif
+
+#define CDEBPR(FMT, ...) \
+	({								\
+	    int rc = 0 ;						\
+	    if_constexpr (f_debug) {					\
+    	        rc = debprintf(__func__, FMT __VA_OPT__(,) __VA_ARGS__) ; \
+	    }								\
+	    rc ;							\
+	})
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef in4_addr_t	*addrp ;
+
 
 /* external subroutines */
 
 extern "C" {
-   extern int	getheour(cchar *,char *,HOSTENT *,char *,int) noex ;
+    extern int uc_readlnto(int,void *,int,int) noex ;
+    extern int	getheour(cchar *,char *,HOSTENT *,char *,int) noex ;
 }
-
-#if	CF_DEBUGS
-extern "C" {
-    extern int	debugprintf(cchar *,...) noex ;
-}
-#endif
 
 
 /* external variables */
 
 
-/* local typedefs */
-
-#if	defined(IRIX) && (! defined(TYPEDECF_INADDRT))
-#define	TYPEDECF_INADDRT
-typedef unsigned int	in_addr_t ;
-#endif
-
-
 /* local structures */
+
+namespace {
+    struct suber {
+	HOSTENT		he{} ;
+	cchar		*rhost ;	/* supplied argument */
+	cchar		*prog{} ;
+	char		*hebuf{} ;
+	in4_addr_t	a{} ;
+	int		to ;		/* supplied argument */
+	int		helen ;
+	bool		fnumeric{} ;
+	suber(cchar *r,int t) noex : rhost(r), to(t) { } ;
+	operator int () noex ;
+	int getaddr() noex ;
+	int getprog() noex ;
+	int getping() noex ;
+    } ; /* end sturct (suber) */
+} /* end namespace */
 
 
 /* forward reference */
 
-extern "C" {
-    extern int	inetping(cchar *,int) noex ;
-}
+local int	pingone(cchar *,const in4_addr_t *,int) noex ;
+local int	pingoneresp(int,int) noex ;
+local int	pingoneparse(cchar *,int) noex ;
 
-static int	pingone(cchar *,in_addr_t *,int) noex ;
-static int	pingoneresp(int,int) noex ;
-static int	pingoneparse(cchar *,int) noex ;
-
-#if	CF_DEBUGS & CF_DEBUGINT
-static int	makeint(void *) noex ;
+#if	CF_DEBUG & CF_DEBUGINT
+local int	makeint(void *) noex ;
 #endif
 
 
 /* local variables */
 
-static cchar	*pings[] = {
+constexpr cpcchar	pings[] = {
 	"/usr/sbin/ping",
 	"/usr/bin/ping",
 	"/sbin/ping",
 	"/bin/ping",
-	NULL
-} ;
+	nullptr
+} ; /* end array (pings) */
+
+typedef int (suber::*suber_m)() noex ;
+
+constexpr suber_m	mems[] = {
+    	&suber::getaddr,
+    	&suber::getprog,
+    	&suber::getping
+} ; /* end array (mems) */
+
+local bufsizevar	rbuflen(bufsize_mn) ;	/* max-name */
+
+cbool			f_debug = CF_DEBUG ;
 
 
 /* exported variables */
@@ -161,105 +195,100 @@ static cchar	*pings[] = {
 
 /* exported subroutines */
 
-int inetping(cchar *rhost,int timeout) noex {
-	HOSTENT		he, *hep ;
-	cint		helen = getbufsize(getbufsize_he) ;
-	int		rs ;
-	char		*hebuf ;
-
-#if	CF_DEBUGS
-	debugprintf("inetping: ent host=%s to=%d\n",rhost,timeout) ;
-#endif
-
-	if (rhost == NULL) return SR_FAULT ;
-
-	if (rhost[0] == '\0') return SR_INVALID ;
-
-/* get an addressable ("E"ntry) hostname */
-
-	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
-	    in_addr_t	addr ;
-	    int		f_numeric = TRUE ;
-	    if ((addr = inet_addr(rhost)) == ADDR_NOT) {
-	        f_numeric = FALSE ;
-	        hep = &he ;
-	        if ((rs = getheour(rhost,NULL,hep,hebuf,helen)) >= 0) {
-	            if (hep->h_addrtype != AF_INET) {
-	                rs = SR_HOSTUNREACH ;
-	            }
-	        }
-	    } /* end (non-numeric addresses) */
-	    /* find a "ping" program */
-	    if (rs >= 0) {
-	        int	i ; /* used-afterwards */
-	        for (i = 0 ; pings[i] != NULL ; i += 1) {
-	            if (u_access(pings[i],X_OK) >= 0) break ;
-	        }
-	        if (pings[i] != NULL) {
-	            in_addr_t	*iap ;
-	            cchar	*pingprog = pings[i] ;
-		    /* do the dirty deed! */
-	            if (f_numeric) {
-	                iap = (in_addr_t *) &addr ;
-	                rs = pingone(pingprog,iap,timeout) ;
-	            } else {
-	                hostent_cur	hc ;
-	                if ((rs = hostent_curbegin(&he,&hc)) >= 0) {
-			    auto	enumaddr = hostent_curenumaddr ;
-	            	    cuchar	*ap ;
-	                    while ((rs = enumaddr(&he,&hc,&ap)) > 0) {
-	                        iap = (in_addr_t *) ap ;
-	                        rs = pingone(pingprog,iap,timeout) ;
-	                        if (rs >= 0) break ;
-	                    } /* end while */
-	                    hostent_curend(&he,&hc) ;
-	                } /* end if (cursor) */
-	            } /* end if */
-	        } else {
-	            rs = SR_NOTSUP ;
-	        }
-	    } /* end if (ok) */
-	    uc_free(hebuf) ;
-	} /* end if (m-a-f) */
-
-#if	CF_DEBUGS
-	debugprintf("inetping: ret rs=%d\n",rs) ;
-#endif
-
+int inetping(cchar *rhost,int to) noex {
+	int		rs = SR_FAULT ;
+	CDEBPR("ent host=%s to=%d\n",rhost,to) ;
+	if (rhost) ylikely {
+	    rs = SR_INVALID ;
+	    if (rhost[0]) ylikely {
+		suber sub(rhost,to) ;
+		rs = sub ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	CDEBPR("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (inetping) */
+} /* end subroutine (inetping) */
 
 
 /* local subroutines */
 
-int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
-	inetaddr	ia ;
+suber::operator int () noex {
+    	int		rs ;
+	int		rs1 ;
+	if ((rs = lm_ho(&hebuf)) >= 0) ylikely {
+	    helen = rs ;
+	    {
+		for (cauto &m : mems) {
+		    rs = (this->*m)() ;
+		    if (rs < 0) break ;
+		} /* end for */
+	    }
+	    rs1 = lm_free(hebuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return rs ;
+} /* end method (suber::operator) */
+
+int suber::getaddr() noex {
+    	cnullptr	np{} ;
+	int		rs = SR_OK ;
+	if ((a = inet_addr(rhost)) == ADDR_NOT) {
+	    HOSTENT	*hep = &he ;
+	    if ((rs = getheour(rhost,np,hep,hebuf,helen)) >= 0) {
+		if (hep->h_addrtype != AF_INET) {
+		    rs = SR_HOSTUNREACH ;
+		}
+	    } /* end if (getheour) */
+	} else {
+	    fnumeric = true ;
+	} /* end (non-numeric addresses) */
+	return rs ;
+} /* end method (suber::getaddr) */
+
+int suber::getprog() noex {
+    	int		rs = SR_NOENT ;
+	for (int i = 0 ; pings[i] != nullptr ; i += 1) {
+	    if ((rs = u_access(pings[i],X_OK)) >= 0) {
+		prog = pings[i] ;
+		break ;
+	    }
+	} /* end for */
+	return rs ;
+} /* end method (suber::getprog) */
+
+int suber::getping() noex {
+    	int		rs ;
+	int		rs1 ;
+	if (fnumeric) {
+	    rs = pingone(prog,&a,to) ;
+	} else {
+	    if (hostent_cur hc ; (rs = hostent_curbegin(&he,&hc)) >= 0) {
+		cauto enumaddr = hostent_curenumaddr ;
+		for (cuchar *ap ; (rs = enumaddr(&he,&hc,&ap)) > 0 ; ) {
+		    const in4_addr_t *iap = addrp(ap) ;
+		    rs = pingone(prog,iap,to) ;
+		    if (rs >= 0) break ;
+		} /* end for */
+		rs1 = hostent_curend(&he,&hc) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (cursor) */
+	} /* end if (numberic or otherwise) */
+	return rs ;
+} /* end method (suber::getping) */
+
+local int pingone(cchar *pingprog,const in4_addr_t *ap,int to) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-
-#if	CF_DEBUGS
-	{
-	    cint	af = AF_INET4 ;
-	    cchar	*as = (cchar *) ap ;
-	    char	abuf[INETX_ADDRSTRLEN+1] ;
-	    debugprintf("inetping/pingone: ent to=%d\n",to) ;
-	    sninetaddr(abuf,INETX_ADDRSTRLEN,af,as) ;
-	    debugprintf("inetping/pingone: a=%s\n",abuf) ;
-	    debugprintf("inetping/pingone: pingprog=%s\n",pingprog) ;
-	}
-#endif /* CF_DEBUGS */
-
-#if	CF_BROKEN
+	CDEBPR("ent to=%d\n",to) ;
 	if (to < 0) to = TO_PING ;
-#endif /* CF_BROKEN */
-
-	if ((rs = inetaddr_start(&ia,ap)) >= 0) {
+	inetaddrs at = inetaddr_bin ;
+	if (inetaddr ia ; (rs = inetaddr_start(&ia,at,ap,-1)) >= 0) ylikely {
 	    cint	dotlen = DOTBUFLEN ;
 	    char	dotbuf[DOTBUFLEN + 1] ;
-	    if ((rs = inetaddr_getdotaddr(&ia,dotbuf,dotlen)) >= 0) {
-		SPAWNPROC	ps{} ;
+	    if ((rs = inetaddr_getdotaddr(&ia,dotbuf,dotlen)) >= 0) ylikely {
+		spawnproc_con	ps{} ;
 		cint		tolen = TOBUFLEN ;
 		int		ai = 0 ;
 		cchar		*args[4] ;
@@ -271,12 +300,12 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 	    	    ctdeci(tobuf,tolen,to) ;
 	    	    args[ai++] = tobuf ;
 	        }
-		args[ai] = NULL ;
+		args[ai] = nullptr ;
 
 		ps.disp[0] = SPAWNPROC_DNULL ;
 		ps.disp[1] = SPAWNPROC_DCREATE ;
 		ps.disp[2] = SPAWNPROC_DNULL ;
-		if ((rs = spawnproc(&ps,pingprog,args,NULL)) >= 0) {
+		if ((rs = spawnproc(&ps,pingprog,args,np)) >= 0) {
 		    const pid_t	pid = rs ;
 		    cint	fd = ps.fd[1] ;
 		    int		cs = 0 ;
@@ -291,64 +320,61 @@ int pingone(cchar *pingprog,in_addr_t *ap,int to) noex {
 		    }
 		    u_close(fd) ;
 		} /* end if (spawnproc) */
-#if	CF_DEBUGS
-	debugprintf("inetping/pingone: spawnproc-out rs=%d\n",rs) ;
-#endif
+		CDEBPR("spawnproc-out rs=%d\n",rs) ;
 	    } /* end if (inetaddr_getdotaddr) */
 	    rs1 = inetaddr_finish(&ia) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (inetaddr) */
-#if	CF_DEBUGS
-	debugprintf("inetping/pingone: ret rs=%d rv=%d\n",rs,rv) ;
-#endif
+	CDEBPR("ret rs=%d rv=%d\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (pingone) */
 
-static int pingoneresp(int fd,int to) noex {
-	cint		rlen = RBUFLEN ;
-	int		rs = SR_OK ;
-	int		tl = 0 ;
-	int		t = 0 ;
-	int		len = 0 ;
-	char		rbuf[RBUFLEN+1] ;
-	while ((rs >= 0) && (tl < rlen) && (t < to)) {
-	    int		f_found ;
-	    int		rl = (rlen-tl) ;
-	    char	*rp = (rbuf+tl) ;
-	    if ((rs = uc_readlinetimed(fd,rp,rl,TO_READ)) > 0) {
-	        len = rs ;
-	        if (len > 0) {
-#if	CF_DEBUGS
-	            debugprintf("inetping/pingone: rbuf=>%r<\n",rp,len) ;
-#endif
-	            f_found = (strnchr(rp,len,'\n') != NULL) ;
-	            tl += len ;
-	            if (f_found) break ;
-	        } else {
-	            t += TO_READ ;
+local int pingoneresp(int fd,int to) noex {
+	cnullptr	np{} ;
+	int		rs ;
+	int		rs1 ;
+	CDEBPR("ent\n") ;
+	if ((rs = rbuflen) >= 0) ylikely {
+	    cint rlen = rs ;
+	    if (char *rbuf ; (rs = lm_mall((rlen + 1),&rbuf)) >= 0) ylikely {
+	        int	tl = 0 ;
+	        int	t = 0 ;
+		int	len = 0 ; /* used-multiple */
+	        while ((rs >= 0) && (tl < rlen) && (t < to)) {
+	            int		f_found{} ; /* used-afterwards */
+	            int		rl = (rlen-tl) ;
+	            char	*rp = (rbuf+tl) ;
+	            if ((rs = uc_readlnto(fd,rp,rl,TO_READ)) >= 0) {
+	                len = rs ;
+	                if (len > 0) {
+	                    CDEBPR("rbuf=>%r<\n",rp,len) ;
+	                    f_found = (strnchr(rp,len,'\n') != np) ;
+	                    tl += len ;
+	                    if (f_found) break ;
+	                } else {
+	                    t += TO_READ ;
+	                }
+	                CDEBPR("bottom loop to=%d\n",to) ;
+	            } /* end if (uc_readlnto) */
+	            if (f_found || (len == 0)) break ;
+	        } /* end while (reading response from PING program) */
+	        if (rs >= 0) {
+	            rs = pingoneparse(rbuf,tl) ;
 	        }
-#if	CF_DEBUGS
-	        debugprintf("inetping/pingone: bottom loop to=%d\n",to) ;
-#endif
-	    } /* end if (uc_readlinetimed) */
-	    if (f_found || (len == 0)) break ;
-	} /* end while (reading response from PING program) */
-	if (rs >= 0) {
-	    rs = pingoneparse(rbuf,tl) ;
-	}
-#if	CF_DEBUGS
-	debugprintf("inetping/pingoneresp: ret rs=%d\n",rs) ;
-#endif
+		rs1 = lm_free(rbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (rbuflen) */
+	CDEBPR("ret rs=%d\n",rs) ;
 	return rs ;
 }
 /* end subroutine (pingoneresp) */
 
-static int pingoneparse(cchar *rbuf,int rlen) noex {
+local int pingoneparse(cchar *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		cl ;
-	cchar		*cp ;
-	if ((cl = nextfield(rbuf,rlen,&cp)) > 0) {
+	if (cchar *cp ; (cl = sfnext(rbuf,rlen,&cp)) > 0) ylikely {
 	    if (sfsub((rbuf+cl),(rlen-cl),"is alive",&cp) < 0) {
 	        rs = SR_HOSTDOWN ;
 	    }
@@ -359,8 +385,8 @@ static int pingoneparse(cchar *rbuf,int rlen) noex {
 }
 /* end subroutine (pingoneparse) */
 
-#if	CF_DEBUGS & CF_DEBUGINT
-static int makeint(void *addr) noex {
+#if	CF_DEBUG & CF_DEBUGINT
+local int makeint(void *addr) noex {
 	int		hi = 0 ;
 	uchar		*us = (uchar *) addr ;
 	hi |= ((us[3] & 0xFF) << 24) ;
@@ -368,7 +394,7 @@ static int makeint(void *addr) noex {
 	hi |= ((us[1] & 0xFF) << 8) ;
 	hi |= (us[0] & 0xFF)  ;
 	return hi ;
-}
-#endif /* CF_DEBUGS */
+} /* end subroutine (makeint) */
+#endif /* CF_DEBUG */
 
 
