@@ -23,6 +23,9 @@
 
 
 namespace libu {
+    extern int ctdeci	(char *,int,int)		noex ;
+    extern int ctdecl	(char *,int,long)		noex ;
+    extern int ctdecll	(char *,int,longlong)		noex ;
     extern int ctdecui	(char *,int,uint)		noex ;
     extern int ctdecul	(char *,int,ulong)		noex ;
     extern int ctdecull	(char *,int,ulonglong)		noex ;
@@ -31,6 +34,15 @@ namespace libu {
 	(void) uv ;
 	return ctdec_unknown(rp,rl) ;
     }
+    template<> inline int ctdec(char *dp,int dl,int sv)		noex {
+	return ctdeci(dp,dl,sv) ;
+    }
+    template<> inline int ctdec(char *dp,int dl,long sv)	noex {
+	return ctdecl(dp,dl,sv) ;
+    }
+    template<> inline int ctdec(char *dp,int dl,longlong sv)	noex {
+	return ctdecll(dp,dl,sv) ;
+    }
     template<> inline int ctdec(char *dp,int dl,uint uv)	noex {
 	return ctdecui(dp,dl,uv) ;
     }
@@ -38,18 +50,6 @@ namespace libu {
 	return ctdecul(dp,dl,uv) ;
     }
     template<> inline int ctdec(char *dp,int dl,ulonglong uv)	noex {
-	return ctdecull(dp,dl,uv) ;
-    }
-    template<> inline int ctdec(char *dp,int dl,int sv)		noex {
-	uint		uv = uint(sv) ;
-	return ctdecui(dp,dl,uv) ;
-    }
-    template<> inline int ctdec(char *dp,int dl,long sv)	noex {
-	ulong 		uv = ulong(sv) ;
-	return ctdecul(dp,dl,uv) ;
-    }
-    template<> inline int ctdec(char *dp,int dl,longlong sv)	noex {
-	ulonglong	uv = ulonglong(sv) ;
 	return ctdecull(dp,dl,uv) ;
     }
 } /* end namespace (libu) */
