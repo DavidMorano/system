@@ -91,8 +91,7 @@ int sidquote(cchar *sp,int sl) noex {
 		    break ;
 	        case CH_DQUOTE:
 		    if (! f_skip) f_done = true ;
-		    fallthrough ;
-	            /* FALLTHROUGH */
+		    falldown ;
 	        default:
 		    f_skip = false ;
 		    break ;
