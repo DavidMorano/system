@@ -250,8 +250,7 @@ local int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 	                        }
 	                    } /* end if */
 	                } /* end if (not in a quote) */
-			fallthrough ;
-			/* FALLTHROUGH */
+			falldown ;
 	            default:
 	                if (c_comment) {
 	                    sbuf_chr((as + MHCOM_SCOMMENT),*sp++) ;
