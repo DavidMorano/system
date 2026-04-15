@@ -26,7 +26,7 @@
 struct calcite_head {
 	ushort		y ;
 	uchar		m, d ;
-} ;
+} ; /* end struct */
 
 typedef	CALCITE		calcite ;
 
