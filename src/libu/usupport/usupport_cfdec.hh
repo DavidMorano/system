@@ -23,12 +23,12 @@
 
 
 namespace libu {
-    extern int cfdec(cchar *,int,int *) noex ;
-    extern int cfdec(cchar *,int,long *) noex ;
-    extern int cfdec(cchar *,int,longlong *) noex ;
-    extern int cfdec(cchar *,int,uint *) noex ;
-    extern int cfdec(cchar *,int,ulong *) noex ;
-    extern int cfdec(cchar *,int,ulonglong *) noex ;
+    extern int cfdec(cchar *,int,int *)		noex ;
+    extern int cfdec(cchar *,int,long *)	noex ;
+    extern int cfdec(cchar *,int,longlong *)	noex ;
+    extern int cfdec(cchar *,int,uint *)	noex ;
+    extern int cfdec(cchar *,int,ulong *)	noex ;
+    extern int cfdec(cchar *,int,ulonglong *)	noex ;
     inline int cfdeci(cchar *sp,int sl,int *vp = nullptr) noex {
     	int		rs ;
 	if (int v ; (rs = cfdec(sp,sl,&v)) >= 0) {
