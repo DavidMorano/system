@@ -283,8 +283,7 @@ namespace ema_ns {
 	                    } /* end if (parts) */
 	                } /* end if */
 	            } /* end if (not in a quote) */
-	            fallthrough ;
-	            /* FALLTHROUGH */
+	            falldown ;
 	        default:
 	            if (ch > 0) {
 	                if (c_comment) {
