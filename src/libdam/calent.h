@@ -32,11 +32,11 @@
 struct calent_line {
 	uint		loff ;
 	int		llen ;
-} ;
+} ; /* end struct */
 
 struct calent_flags {
 	uint		hash:1 ;
-} ;
+} ; /* end struct */
 
 struct calent_head {
 	CALENT_LN	*lines ;
@@ -49,7 +49,7 @@ struct calent_head {
 	int		e ;		/* (lines) extent */
 	int		i ;		/* (lines) index */
 	int		cidx ;
-} ;
+} ; /* end struct */
 
 typedef	CALENT		calent ;
 typedef	CALENT_LN	calent_ln ;
