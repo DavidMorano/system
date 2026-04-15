@@ -56,7 +56,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -79,10 +78,10 @@ static int ds_ctor(ds *op,Args ... args) noex {
     	DS		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->tdp = new(nothrow) td) != np) {
+	    if ((op->tdp = new(nothrow) td) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-td) */
 	} /* end if (non-null) */
@@ -92,9 +91,9 @@ static int ds_ctor(ds *op,Args ... args) noex {
 
 static int ds_dtor(ds *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->tdp) {
+	    if (op->tdp) ylikely {
 		delete op->tdp ;
 		op->tdp = nullptr ;
 	    }
@@ -106,7 +105,7 @@ static int ds_dtor(ds *op) noex {
 template<typename ... Args>
 static inline int ds_magic(ds *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
