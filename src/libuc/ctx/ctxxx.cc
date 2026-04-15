@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	This subroutine was written having been adapated (from
+	This subroutine was written having been adapted (from
 	memory) from something I wrote back in the early 1980s (for
 	embedded work).  I had to write every ... last  ... thing
 	myself back in the old days.
@@ -125,7 +125,7 @@ static constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	if (v != 0) {
 	    int		di ;
 	    if_constexpr (szof(UT) > szof(ulong)) {
-	        const UT	vmask(~ ULONG_MAX) ;
+                const UT        vmask = (compl UT(ULONG_MAX)) ;
 	        UT		nv ;
 	        while ((v & vmask) != 0UL) {
 	            nv = v / ub ;
