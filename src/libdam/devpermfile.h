@@ -38,7 +38,7 @@
 
 struct devpermfile_flags {
 	uint		dummy:1 ;
-} ;
+} ; /* end struct */
 
 struct devpermfile_head {
 	cchar		*fname ;
@@ -52,18 +52,18 @@ struct devpermfile_head {
 	int		intcheck ;	/* check interval (seconds) */
 	int		intchange ;	/* file-change interval (seconds) */
 	int		ccount ;	/* cursor count */
-} ;
+} ; /* end struct */
 
 struct devpermfile_entry {
 	cchar		*console ;
 	cchar		*dev ;
 	int		devlen ;
 	mode_t		devmode ;
-} ;
+} ; /* end struct */
 
 struct devpermfile_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef	DEVPERMFILE		devpermfile ;
 typedef	DEVPERMFILE_FL		devpermfile_fl ;
