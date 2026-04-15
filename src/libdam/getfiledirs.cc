@@ -17,7 +17,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2024 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -61,12 +61,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strchr(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<getpwd.h>
-#include	<mallocxx.h>
 #include	<ids.h>
 #include	<permx.h>
 #include	<strlibval.hh>
@@ -83,6 +85,8 @@
 
 #include	"getfiledirs.h"
 
+#pragma		GCC dependency		"mod/sif.ccm"
+
 import sif ;
 
 /* local defines */
@@ -90,13 +94,17 @@ import sif ;
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
+
 
 /* external variables */
 
 
 /* local structures */
 
-static cchar	*getdefpath() noex ;
+local cchar	*getdefpath() noex ;
 
 namespace {
     struct getter {
@@ -111,7 +119,7 @@ namespace {
 	bool		fpwd = false ;
 	getter(cc *ap,cc *af,int aa,vecstr *vp) noex : path(ap), fname(af) {
 	    if (path == nullptr) {
-		static cchar *gpath = getdefpath() ;
+		local cchar *gpath = getdefpath() ;
 		path = gpath ;
 	    }
 	    am = aa ;
@@ -126,9 +134,9 @@ namespace {
 	int checker(cc *,int) noex ;
 	int checkname(bool,int) noex ;
     } ; /* end struct (getter) */
-}
+} /* end namespace */
 
-enum nametypes : bool {
+enum nametypes : uchar {
 	nametype_dir,
 	nametype_file
 } ;
@@ -141,7 +149,7 @@ static int	getmode(cchar *) noex ;
 
 /* local variables */
 
-static strlibval		defpath(strlibval_path) ;
+static strlibval	defpath(strlibval_path) ;
 
 
 /* exported variables */
@@ -176,7 +184,7 @@ getter::operator int () noex {
     	    rs = SR_INVALID ;
 	    if (path[0]) {
                 if ((rs = id.load) >= 0) {
-                    if ((rs = malloc_mp(&pbuf)) >= 0) {
+                    if ((rs = lm_mp(&pbuf)) >= 0) {
                         plen = rs ;
 		        if (fname[0] == '/') {
 		            rs = tryabs() ;
@@ -188,7 +196,8 @@ getter::operator int () noex {
 		            rs = trypath() ;
 		            c = rs ;
 		        }
-                        rs = rsfree(rs,pbuf) ;
+                        rs1 = lm_free(pbuf) ;
+			if (rs >= 0) rs = rs1 ;
 		        pbuf = nullptr ;
                         plen = 0 ;
                     } /* end if (m-a-f) */
@@ -232,8 +241,8 @@ int getter::checkfile(int pl) noex {
 	if ((rs = checkname(ty,am)) > 0) {
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfdirname(pbuf,pl,&cp)) > 0) {
-		c = 1 ;
 		rs = dlp->adduniq(cp,cl) ;
+		c += (rs < INT_MAX) ;
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
@@ -342,7 +351,7 @@ static int getmode(cchar *modestr) noex {
 }
 /* end subroutine (getmode) */
 
-static cchar *getdefpath() noex {
+local cchar *getdefpath() noex {
     	return defpath ;
 }
 
