@@ -1,4 +1,5 @@
 /* strnlen SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate the length of a c-string */
@@ -37,12 +38,38 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -51,14 +78,14 @@
 /* exported subroutines */
 
 int strnlen(cchar *s,int n) noex {
-	int	i = 0 ;
+	int	i = 0 ; /* return-value */
 	if (s) {
 	    if (n >= 0) {
 	        for (i = 0 ; (i < n) && *s ; i += 1) {
 	            s += 1 ;
 	        }
 	    } else {
-	        i = strlen(s) ;
+	        i = intconv(strlen(s)) ;
 	    }
 	} /* end if (non-null) */
 	return i ;
