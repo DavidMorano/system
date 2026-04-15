@@ -1,4 +1,4 @@
-/* xxtostr HEADER */
+/* xxtostr HEADER (X-To-String) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A-D- Morano
+	= 1998-03-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 	= 2024-01-15, David A-D- Morano
@@ -28,7 +28,7 @@
 	of various sized types) into their c-string digit
 	representations.
 
-	The following subroutines are provoided for base-20 conversions
+	The following subroutines are provoided for base-10 conversions
 	of the various types:
 
 	name		signed	size
@@ -38,22 +38,6 @@
 	uitostr		no	32-bit
 	ultostr		no	64-bit
 	ulltostr	no	128-bit
-
-	The two subroutine-templates (below) can convert for any
-	number base.  The subroutine-templates are:
-
-	name		signed	size	base
-	sxxtostr	yes	any	any up to base-64
-	uxxtostr	no	any	any up to base-64
-
-	Rnjoy.
-
-	Notes:
-	As you may know, aside from the more recent standardization
-	of the "convert-to-string" numeric conversion subroutine-templates
-	in C++, there has never been a standardized implementation
-	of these kinds of conversion functions.
-		-- 2024-01-15, David A-D- Morano
 
 *******************************************************************************/
 
@@ -90,6 +74,26 @@ extern char *lltostr(longlong,		char *,int) noex ;
 extern char *uitostr(uint,		char *,int) noex ;
 extern char *ultostr(ulong,		char *,int) noex ;
 extern char *ulltostr(ulonglong,	char *,int) noex ;
+
+inline char *xtostr(int sv,		char *endp,int b = 10) noex {
+    return itostr(sv,endp,b) ;
+}
+inline char *xtostr(long sv,		char *endp,int b = 10) noex {
+    return ltostr(sv,endp,b) ;
+}
+inline char *xtostr(longlong sv,	char *endp,int b = 10) noex {
+    return lltostr(sv,endp,b) ;
+}
+
+inline char *xtostr(uint uv,		char *endp,int b = 10) noex {
+    return uitostr(uv,endp,b) ;
+}
+inline char *xtostr(ulong uv,		char *endp,int b = 10) noex {
+    return ultostr(uv,endp,b) ;
+}
+inline char *xtostr(ulonglong uv,	char *endp,int b = 10) noex {
+    return ulltostr(uv,endp,b) ;
+}
 
 #endif /* __cplusplus */
 
