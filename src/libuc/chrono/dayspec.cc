@@ -192,16 +192,14 @@ local int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	        yl = min(4,(sl - 4)) ;
 	        sp += 4 ;
 	        sl -= 4 ;
-		fallthrough ;
-		/* FALLTHROUGH */
+		falldown ;
 	    case 4:
 	    case 3:
 	        mp = sp ;
 	        ml = min(2,(sl - 2)) ;
 	        sp += 2 ;
 	        sl -= 2 ;
-		fallthrough ;
-	        /* FALLTHROUGH */
+		falldown ;
 	    case 2:
 	    case 1:
 	        dp = sp ;
@@ -257,7 +255,7 @@ local int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	        	ml = min(2,(sl - 2)) ;
 	        	sp += 2 ;
 	        	sl -= 2 ;
-			/* FALLTHROUGH */
+			falldown ;
 		    case 2:
 		    case 1:
 	                dp = sp ;
