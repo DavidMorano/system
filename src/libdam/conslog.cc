@@ -54,6 +54,9 @@
 
 #include	"conslog.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -93,7 +96,7 @@ template<typename ... Args>
 static int conslog_ctor(conslog *op,Args ... args) noex {
     	CONSLOG		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -102,7 +105,7 @@ static int conslog_ctor(conslog *op,Args ... args) noex {
 
 static int conslog_dtor(conslog *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -112,7 +115,7 @@ static int conslog_dtor(conslog *op) noex {
 template<typename ... Args>
 static inline int conslog_magic(conslog *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CONSLOG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
