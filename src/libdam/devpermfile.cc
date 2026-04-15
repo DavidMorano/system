@@ -41,9 +41,11 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strncmp(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
-#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
@@ -62,7 +64,9 @@
 
 #include	"devpermfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -81,7 +85,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -89,6 +92,10 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_stat(cchar *,ustat *) noex ;
+}
 
 
 /* external variables */
@@ -124,11 +131,11 @@ static int devpermfile_ctor(devpermfile *op,Args ... args) noex {
     	DEVPERMFILE	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->klp = new(nothrow) vecobj) != np) {
-	        if ((op->elp = new(nothrow) vecobj) != np) {
+	    if ((op->klp = new(nothrow) vecobj) != np) ylikely {
+	        if ((op->elp = new(nothrow) vecobj) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-vecobj) */
 		if (rs < 0) {
@@ -143,13 +150,13 @@ static int devpermfile_ctor(devpermfile *op,Args ... args) noex {
 
 static int devpermfile_dtor(devpermfile *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->elp) {
+	    if (op->elp) ylikely {
 		delete op->elp ;
 		op->elp = nullptr ;
 	    }
-	    if (op->klp) {
+	    if (op->klp) ylikely {
 		delete op->klp ;
 		op->klp = nullptr ;
 	    }
@@ -161,7 +168,7 @@ static int devpermfile_dtor(devpermfile *op) noex {
 template<typename ... Args>
 static inline int devpermfile_magic(devpermfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DEVPERMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -251,11 +258,12 @@ int devpermfile_open(DP *op,cc *fname) noex {
 	            op->ti_check = getustime ;
 	            cchar	*fn ;
 	            if (absfn catfn ; (rs = catfn.start(fname,-1,&fn)) >= 0) {
-	                if (cc *cp ; (rs = uc_mallocstrw(fn,rs,&cp)) >= 0) {
+	                if (cc *cp ; (rs = lm_strw(fn,rs,&cp)) >= 0) {
 	                    op->fname = cp ;
 		            rs = devpermfile_opener(op) ;
 			    if (rs < 0) {
-			        uc_free(op->fname) ;
+			        void *vp = voidp(op->fname) ;
+			        lm_free(vp) ;
 			        op->fname = nullptr ;
 			    } /* end if (error) */
 	                } /* end if (memory-allocation) */
@@ -320,7 +328,8 @@ int devpermfile_close(DP *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->fname) {
-	        rs1 = uc_free(op->fname) ;
+		void *vp = voidp(op->fname) ;
+	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    }
@@ -455,7 +464,7 @@ static int devpermfile_parser(DP *op,cchar *fname) noex ;
 static int devpermfile_parse(DP *op,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ; /* return-value */
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 		rs = devpermfile_parser(op,fname) ;
@@ -471,7 +480,7 @@ static int devpermfile_parser(DP *op,cchar *fname) noex {
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    cmode	om = 0 ;
 	    if (bfile lf ; (rs = lf.open(fname,"r",om)) >= 0) {
@@ -493,7 +502,8 @@ static int devpermfile_parser(DP *op,cchar *fname) noex {
 		rs1 = lf.close ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (bfile) */
-	    rs = rsfree(rs,lbuf) ;
+	    rs1 = lm_free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -592,8 +602,9 @@ static int devpermfile_keyadd(DP *op,cchar *kp,int kl) noex {
 	cnullptr	np{} ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
+	int		rs1 ;
 	int		ci = 0 ; /* return-value */
-	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = pathclean(tbuf,kp,kl)) >= 0) {
 		cint	cl = rs ;
 	        if (DP_KEY k ; (rs = key_fake(&k,tbuf,cl)) >= 0) {
@@ -610,7 +621,8 @@ static int devpermfile_keyadd(DP *op,cchar *kp,int kl) noex {
 		    } /* end if (was not found) */
 		} /* end if (key_fake) */
 	    } /* end if (pathclean) */
-	    rs = rsfree(rs,tbuf) ;
+	    rs1 = lm_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? ci : rs ;
 }
@@ -665,10 +677,10 @@ static int devpermfile_keydecr(DP *op,int ci) noex {
 static int devpermfile_entexpand(DP *op,int ci,mode_t dm,cc *dp,int dl) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ; /* return-value */
-	if (dp) {
+	if (dp) ylikely {
 	    cchar	*bp ;
 	    if (dl < 0) dl = lenstr(dp) ;
-	    if (int bl ; (bl = sfbasename(dp,dl,&bp)) > 0) {
+	    if (int bl ; (bl = sfbasename(dp,dl,&bp)) > 0) ylikely {
 	        if ((bl == 1) && (bp[0] == '*')) {
 		    cint tl = intconv(bp - 1 - dp) ;
 	            rs = devpermfile_entdir(op,ci,dm,dp,tl) ;
@@ -709,7 +721,7 @@ static int devpermfile_entdir(DP *op,int ci,mode_t dm,cc *dp,int dl) noex {
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
 	(void) ci ;
-	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    cchar	*dname ;
 	    if (nulstr ns ; (rs = ns.start(dp,dl,&dname)) >= 0) {
 		{
@@ -719,7 +731,8 @@ static int devpermfile_entdir(DP *op,int ci,mode_t dm,cc *dp,int dl) noex {
 	        rs1 = ns.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (nullstr) */
-	    rs = rsfree(rs,tbuf) ;
+	    rs1 = lm_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -730,7 +743,7 @@ static int devpermfile_entdirs(DP *op,char *tbuf,int ci,mode_t dm,
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if (fsdir d ; (rs = d.open(dp)) >= 0) {
 		for (fsdir_ent de ; (rs = d.read(&de,nbuf,nlen)) > 0 ; ) {
@@ -747,7 +760,8 @@ static int devpermfile_entdirs(DP *op,char *tbuf,int ci,mode_t dm,
 	        rs1 = d.close ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdir_open) */
-	    rs = rsfree(rs,nbuf) ;
+	    rs1 = lm_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -773,12 +787,12 @@ static int devpermfile_keymat(DP *op,DP_IE *iep,cchar *key) noex {
 
 static int key_start(DP_KEY *kep,cchar *conbuf,int conlen) noex {
 	int		rs = SR_FAULT ;
-	if (kep && conbuf) {
+	if (kep && conbuf) ylikely {
 	    rs = SR_INVALID ;
 	    memclear(kep) ;
-	    if (conbuf[0]) {
+	    if (conbuf[0]) ylikely {
 	        if (conlen < 0) conlen = lenstr(conbuf) ;
-	        if (cchar *cp ; (rs = uc_mallocstrw(conbuf,conlen,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(conbuf,conlen,&cp)) >= 0) {
 	            kep->console = cp ;
 	            kep->conlen = conlen ;
 	        }
@@ -790,7 +804,7 @@ static int key_start(DP_KEY *kep,cchar *conbuf,int conlen) noex {
 
 static int key_incr(DP_KEY *kep) noex {
     	int		rs = SR_FAULT ;
-	if (kep) {
+	if (kep) ylikely {
 	    kep->count += 1 ;
 	    rs = kep->count ;
 	} /* end if (non-null) */
@@ -800,7 +814,7 @@ static int key_incr(DP_KEY *kep) noex {
 
 static int key_decr(DP_KEY *kep) noex {
     	int		rs = SR_FAULT ;
-	if (kep) {
+	if (kep) ylikely {
 	    if (kep->count > 0) kep->count -= 1 ;
 	    rs = kep->count ;
 	} /* end if (non-null) */
@@ -810,7 +824,7 @@ static int key_decr(DP_KEY *kep) noex {
 
 static int key_count(DP_KEY *kep) noex {
     	int		rs = SR_FAULT ;
-	if (kep) {
+	if (kep) ylikely {
 	    rs = kep->count ;
 	} /* end if (non-null) */
 	return rs ;
@@ -820,7 +834,7 @@ static int key_count(DP_KEY *kep) noex {
 static int key_mat(DP_KEY *kep,cchar *keyp,int keyl) noex {
     	int		rs = SR_FAULT ;
 	int		f = false ; /* return-value */
-	if (kep && keyp) {
+	if (kep && keyp) ylikely {
 	    cint	cl = kep->conlen ;
 	    cchar	*cp = kep->console ;
 	    rs = SR_OK ;
@@ -835,10 +849,11 @@ static int key_mat(DP_KEY *kep,cchar *keyp,int keyl) noex {
 static int key_finish(DP_KEY *kep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (kep) {
+	if (kep) ylikely {
 	    rs = SR_OK ;
 	    if (kep->console) {
-	        rs1 = uc_free(kep->console) ;
+	        void *vp = voidp(kep->console) ;
+	        rs1 = lm_free(vp) ;
 		if (rs >= 0) rs = rs1 ;
 	        kep->console = nullptr ;
 	    }
@@ -849,8 +864,7 @@ static int key_finish(DP_KEY *kep) noex {
 
 static int key_fake(DP_KEY *kep,cchar *keyp,int keyl) noex {
     	int		rs = SR_FAULT ;
-	if (kep && keyp) {
-	    rs = SR_OK ;
+	if (kep && keyp) ylikely {
 	    if (keyl < 0) keyl = lenstr(keyp) ;
 	    kep->console = keyp ;
 	    kep->conlen = keyl ;
@@ -862,14 +876,14 @@ static int key_fake(DP_KEY *kep,cchar *keyp,int keyl) noex {
 
 static int ientry_start(DP_IE *iep,int ci,mode_t m,cc *dp,int dl) noex {
 	int		rs = SR_FAULT ;
-	if (iep && dp) {
+	if (iep && dp) ylikely {
 	    rs = SR_INVALID ;
 	    memclear(iep) ;
 	    if (ci >= 0) {
 	        iep->ci = ci ;
 	        iep->dmode = m ;
 	        if (dl < 0) dl = lenstr(dp) ;
-	        if (cchar *cp ; (rs = uc_mallocstrw(dp,dl,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(dp,dl,&cp)) >= 0) {
 	            iep->dev = cp ;
 	            iep->devlen = rs ;
 	        }
@@ -882,10 +896,11 @@ static int ientry_start(DP_IE *iep,int ci,mode_t m,cc *dp,int dl) noex {
 static int ientry_finish(DP_IE *iep) noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (iep) {
+	if (iep) ylikely {
 	    rs = SR_OK ;
-	    if (iep->dev) {
-	        rs1 = uc_free(iep->dev) ;
+	    if (iep->dev) ylikely {
+	        void *vp = voidp(iep->dev) ;
+	        rs1 = lm_free(vp) ;
 		if (rs >= 0) rs = rs1 ;
 	        iep->dev = nullptr ;
 	    }
@@ -907,7 +922,7 @@ static int ientry_ci(DP_IE *iep) noex {
 static int entry_load(DP_ENT *ep,char *ebuf,int elen,DP_IE *iep) noex {
 	int		rs = SR_FAULT ;
 	int		el = 0 ; /* return-value */
-	if (ep && ebuf && iep) {
+	if (ep && ebuf && iep) ylikely {
 	    rs = SR_INVALID ;
 	    memclear(ep) ;
 	    if (elen > 0) {
@@ -937,7 +952,7 @@ static int mkdirfile(char *bufp,cc *dp,int dl,cc *dnp,int dnl) noex {
 	cint		bufl = var.maxpathlen ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = storebuf_strw(bufp,bufl,i,dp,dl) ;
 	    i += rs ;
 	}
@@ -945,7 +960,7 @@ static int mkdirfile(char *bufp,cc *dp,int dl,cc *dnp,int dnl) noex {
 	    rs = storebuf_chr(bufp,bufl,i,'/') ;
 	    i += rs ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = storebuf_strw(bufp,bufl,i,dnp,dnl) ;
 	    i += rs ;
 	}
@@ -956,9 +971,9 @@ static int mkdirfile(char *bufp,cc *dp,int dl,cc *dnp,int dnl) noex {
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = maxpathlen) == 0) {
-	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
-	        if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+	        if ((rs = getbufsize(bufsize_ml)) >= 0) {
 	            maxlinelen = rs ;
 	        }
 	    }
