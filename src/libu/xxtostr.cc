@@ -1,4 +1,4 @@
-/* xxtostr SUPPORT (primary-module-interface) */
+/* xxtostr SUPPORT (X-To-String) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -9,16 +9,12 @@
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	This code was originally written.
-
-	= 2023-07-11, David A-D- Morano
-	I changed this code from a regular source C++ file into
-	a C++20 module.  I will track how successful this change
-	turns out to be.
+	This code was originally written, based on code I wrote
+	from the old days at the Labs.
 
 */
 
-/* Copyright © 1998,2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -42,9 +38,9 @@
 	hexadecimal digit charactes are supported (characters '0'
 	through '9' and 'A' through 'Z').  Convert your resuling
 	hexadecimal digit c-string to lower case afterwards if you
-	want.  For bases between 27 and 52 inclusive, the resulting
-	digits are in the range of the lower-case alpha character
-	'a' to 'z'.  One the following integer types are supported:
+	want.  For bases between 27 and 62 inclusive, the resulting
+	digits are in the range of the lower-case alpha characters
+	'a' to 'z'.  Only the following integer types are supported:
 	|int|		(32-bits), 
 	|long|		(64-bits), 
 	|longlong|	(128-bits),
@@ -121,7 +117,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>		/* extended integers */
-#include	<syswords.hh>		/* |sysword(3u)| */
 #include	<localmisc.h>		/* ?? not-needed ?? */
 
 #include	"xxtostr.h"
@@ -147,11 +142,9 @@ namespace {
     struct digmgr {
 	uchar		tab[div100] ;
 	consteval void mktab() noex {
-	    int lo ;
-	    int hi ;
 	    for (int i = 0 ; i < div100 ; i += 1) {
-		lo = (i % 10) ;
-		hi = (i / 10) ;
+		cint lo = (i % 10) ;
+		cint hi = (i / 10) ;
 		tab[i] = uchar((hi << 4) | lo) ;
 	    } /* end for */
 	} ; /* end method (mktab) */
@@ -169,77 +162,70 @@ constexpr cint		xxtostr_maxbase = MAXBASE ; /* standard value */
 local char getdig_lo(int) noex ;
 local char getdig_hi(int) noex ;
 
-local int rmleadzeros(charp endp,int rsl) noex {
-	for (charp ep = (endp - rsl) ; (rsl > 1) && (*ep == '0') ; ++ep) {
-	    rsl -= 1 ;
-	} /* end for */
-	return rsl ;
-} /* end subroutine (rmleadzeros) */
-
-    template<typename UT>
-    constexpr int uxxtostr(char *endp,int b,UT v) noex {
-	int		rs = SR_FAULT ;
-	char		*rp = endp ;
-	if (endp) {
-	    rs = SR_NOTSUP ;
-	    *rp = '\0' ;
-	    if ((b >= 2) && (b <= xxtostr_maxbase)) {
-		uint ub = uint(b) ;
-	        if (v != 0) {
-                    int		di ;
-	            if_constexpr (szof(UT) > szof(ulong)) {
-	                const UT	vmask(compl LONG_MAX) ;
-		        UT		utnv ;
-	                while ((v & vmask) != 0L) {
-	                    utnv = v / ub ;
-                            di = int(v - (utnv * ub)) ;
+template<typename UT>
+constexpr int uxxtostr(char *endp,int b,UT v) noex {
+    int             rs = SR_FAULT ;
+    char            *rp = endp ;
+    if (endp) {
+        rs = SR_NOTSUP ;
+        *rp = '\0' ;
+        if ((b >= 2) && (b <= xxtostr_maxbase)) {
+            uint ub = uint(b) ;
+            if (v != 0) {
+                int         di ;
+                if_constexpr (szof(UT) > szof(ulong)) {
+                    const UT        vmask = (compl UT(ULONG_MAX)) ;
+                    UT              utnv ;
+                    while ((v & vmask) != 0UL) {
+                        utnv = v / ub ;
+                        di = int(v % ub) ;
+                        *--rp = digtab_enc(di) ;
+                        v = utnv ;
+                    } /* end while (slower) */
+                    {
+                        ulong       lv = ulong(v) ;
+                        ulong       nv ;
+                        while (lv != 0) {
+                            nv = lv / ub ;
+                            di = int(lv % ub) ;
                             *--rp = digtab_enc(di) ;
-	                    v = utnv ;
-	                } /* end while (slower) */
-	                {
-		            ulong	lv = ulong(v) ;
-		            ulong	nv ;
-		            while (lv != 0) {
-	                        nv = lv / ub ;
-                                di = int(lv - (nv * ub)) ;
-                                *--rp = digtab_enc(di) ;
-	                        lv = nv ;
-		            } /* end while */
-		            v = lv ;
-	                } /* end block (faster) */
-	            } else {
-		        UT		nv ;
-	                while (v != 0) {
-	                    nv = v / ub ;
-                            di = int(v - (nv * ub)) ;
-                            *--rp = digtab_enc(di) ;
-	                    v = nv ;
-	                } /* end while (regular) */
-		    } /* end if-constexpr (size-of-operand) */
-	            rs = SR_OK ;
-	        } else {
-	            rs = SR_OK ;
-	            *--rp = '0' ;
-	        } /* end if */
-	    } /* end if (base supported) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? int(endp - rp) : rs ;
-    } /* end subroutine-template (uxxtostr) */
+                            lv = nv ;
+                        } /* end while */
+                        v = lv ;
+                    } /* end block (faster) */
+                } else {
+                    UT              nv ;
+                    while (v != 0) {
+                        nv = v / ub ;
+                        di = int(v % ub) ;
+                        *--rp = digtab_enc(di) ;
+                        v = nv ;
+                    } /* end while (regular) */
+                } /* end if-constexpr (size-of-operand) */
+                rs = SR_OK ;
+            } else {
+                rs = SR_OK ;
+                *--rp = '0' ;
+            } /* end if */
+        } /* end if (base supported) */
+    } /* end if (non-null) */
+    return (rs >= 0) ? int(endp - rp) : rs ;
+} /* end subroutine-template (uxxtostr) */
 
-    template<typename UT,typename ST>
-    constexpr int sxxtostr(char *endp,int b,ST v) noex {
-	UT		ulv = (UT) v ;
-	int		rs = SR_FAULT ;
-	char		*rp = nullptr ;
-	if (v < 0) ulv = (- ulv) ;
-	if (endp) {
-	    if ((rs = uxxtostr(endp,b,ulv)) >= 0) {
-		rp = (endp - rs) ;
-	        if (v < 0) *--rp = '-' ;
-	    }
-	}
-	return (rs >= 0) ? int(endp - rp) : rs ;
-    } /* end subroutine (sxxtostr) */
+template<typename UT,typename ST>
+constexpr int sxxtostr(char *endp,int b,ST v) noex {
+    UT              ulv = (UT) v ;
+    int             rs = SR_FAULT ;
+    char            *rp = nullptr ;
+    if (v < 0) ulv = (- ulv) ;
+    if (endp) {
+        if ((rs = uxxtostr(endp,b,ulv)) >= 0) {
+            rp = (endp - rs) ;
+            if (v < 0) *--rp = '-' ;
+        }
+    }
+    return (rs >= 0) ? int(endp - rp) : rs ;
+} /* end subroutine (sxxtostr) */
 
 template<typename UT>
 constexpr int uxxtostr10(char *endp,UT v) noex {
@@ -249,109 +235,110 @@ constexpr int uxxtostr10(char *endp,UT v) noex {
     if (endp) {
         rs = SR_NOTSUP ;
         *rp = '\0' ;
-            if (v != 0) {
-                int         di ;
-                if_constexpr (szof(UT) > szof(ulong)) {
-                    const UT        vmask(compl LONG_MAX) ;
-                    UT              utnv ;
-                    while ((v & vmask) != 0L) {
-                        utnv = v / ub100 ;
-                        di = int(v - (utnv * ub100)) ;
+        if (v != 0) {
+            int         di ;
+            if_constexpr (szof(UT) > szof(ulong)) {
+                const UT        vmask = (compl UT(ULONG_MAX)) ;
+                UT              utnv ;
+                while ((v & vmask) != 0UL) {
+                    utnv = v / ub100 ;
+                    di = int(v % ub100) ;
+                    *--rp = getdig_lo(di) ;
+                    *--rp = getdig_hi(di) ;
+                    v = utnv ;
+                } /* end while (slower) */
+                {
+                    ulong       lv = ulong(v) ;
+                    ulong       nv ;
+                    while (lv != 0) {
+                        nv = lv / ub100 ;
+                        di = int(lv % ub100) ;
                         *--rp = getdig_lo(di) ;
                         *--rp = getdig_hi(di) ;
-                        v = utnv ;
-                    } /* end while (slower) */
-                    {
-                        ulong       lv = ulong(v) ;
-                        ulong       nv ;
-                        while (lv != 0) {
-                            nv = lv / ub100 ;
-                            di = int(lv - (nv * ub100)) ;
-                            *--rp = getdig_lo(di) ;
-                            *--rp = getdig_hi(di) ;
-                            lv = nv ;
-                        } /* end while */
-                        v = lv ;
-                    } /* end block (faster) */
-                } else {
-                    UT              nv ;
-                    while (v != 0) {
-                        nv = v / ub100 ;
-                        di = int(v - (nv * ub100)) ;
-                        *--rp = getdig_lo(di) ;
-                        *--rp = getdig_hi(di) ;
-                        v = nv ;
-                    } /* end while (regular) */
-                } /* end if-constexpr (size-of-operand) */
-                rs = SR_OK ;
+                        lv = nv ;
+                    } /* end while */
+                    v = lv ;
+                } /* end block (faster) */
             } else {
-                rs = SR_OK ;
-                *--rp = '0' ;
-            } /* end if */
+                UT              nv ;
+                while (v != 0) {
+                    nv = v / ub100 ;
+                    di = int(v % ub100) ;
+                    *--rp = getdig_lo(di) ;
+                    *--rp = getdig_hi(di) ;
+                    v = nv ;
+                } /* end while (regular) */
+            } /* end if-constexpr (size-of-operand) */
+	    if ((rs = int(endp - rp)) > 1) {
+		while ((rs > 1) && (*rp == '0')) {
+		    rp += 1 ;
+		    rs -= 1 ;
+		} /* end while */
+	    } /* end if */
+        } else {
+            rs = SR_OK ;
+            *--rp = '0' ;
+        } /* end if */
     } /* end if (non-null) */
     return (rs >= 0) ? int(endp - rp) : rs ;
 } /* end subroutine-template (uxxtostr10) */
 
-    template<typename UT,typename ST>
-    constexpr int sxxtostr10(char *endp,ST v) noex {
-	UT		ulv = (UT) v ;
-	int		rs = SR_FAULT ;
-	char		*rp = nullptr ;
-	if (v < 0) ulv = (- ulv) ;
-	if (endp) {
-	    if ((rs = uxxtostr10(endp,ulv)) >= 0) {
-		rp = (endp - rs) ;
-	        if (v < 0) *--rp = '-' ;
-	    }
-	}
-	return (rs >= 0) ? int(endp - rp) : rs ;
-    } /* end subroutine (sxxtostr10) */
+template<typename UT,typename ST>
+constexpr int sxxtostr10(char *endp,ST v) noex {
+    UT              ulv = (UT) v ;
+    int             rs = SR_FAULT ;
+    char            *rp = nullptr ;
+    if (v < 0) ulv = (- ulv) ;
+    if (endp) {
+        if ((rs = uxxtostr10(endp,ulv)) >= 0) {
+            rp = (endp - rs) ;
+            if (v < 0) *--rp = '-' ;
+        }
+    }
+    return (rs >= 0) ? int(endp - rp) : rs ;
+} /* end subroutine (sxxtostr10) */
 
-    template<typename UT,typename T> 
-    constexpr char *stostr(T v,char *endp,int b) noex {
-	int		rs ;
-	char		*rp = nullptr ;
-	cauto sxx = [&endp,&b] (auto &vv) -> int {
-	    int	rsl ;
-	    if (b == 10) {
-		if ((rsl = sxxtostr10<UT>(endp,vv)) >= 0) {
-		    rsl = rmleadzeros(endp,rsl) ;
-		}
-	    } else {
-		rsl = sxxtostr<UT>(endp,b,vv) ;
-	    }
-	    return rsl ;
-	} ; /* end lambda */
-	if ((rs = sxx(v)) >= 0) {
-	    rp = (endp - rs) ;
-	} else {
-	    errno = (- rs) ;
-	}
-	return (rs >= 0) ? rp : nullptr ;
-    } /* end subroutine (stostr) */
+template<typename UT,typename T> 
+constexpr char *stostr(T v,char *endp,int b) noex {
+    int             rs ;
+    char            *rp = nullptr ;
+    cauto sxx = [&endp,&b] (cauto &vv) -> int {
+        int rsl ;
+        if (b == 10) {
+            rsl = sxxtostr10<UT>(endp,vv) ;
+        } else {
+            rsl = sxxtostr<UT>(endp,b,vv) ;
+        }
+        return rsl ;
+    } ; /* end lambda */
+    if ((rs = sxx(v)) >= 0) {
+        rp = (endp - rs) ;
+    } else {
+        errno = (- rs) ;
+    }
+    return (rs >= 0) ? rp : nullptr ;
+} /* end subroutine (stostr) */
 
-    template<typename UT> 
-    constexpr char *utostr(UT uv,char *endp,int b) noex {
-	char		*rp = nullptr ;
-	int		rs ;
-	cauto uxx = [&endp,&b] (auto &vv) -> int {
-	    int	rsl ;
-	    if (b == 10) {
-		if ((rsl = uxxtostr10<UT>(endp,vv)) >= 0) {
-		    rsl = rmleadzeros(endp,rsl) ;
-		}
-	    } else {
-		rsl = uxxtostr<UT>(endp,b,vv) ;
-	    }
-	    return rsl ;
-	} ; /* end lambda */
-	if ((rs = uxx(uv)) >= 0) {
-	    rp = (endp - rs) ;
-	} else {
-	    errno = (- rs) ;
-	}
-	return (rs >= 0) ? rp : nullptr ;
-    } /* end subroutine (utostr) */
+template<typename UT> 
+constexpr char *utostr(UT uv,char *endp,int b) noex {
+    char            *rp = nullptr ;
+    int             rs ;
+    cauto uxx = [&endp,&b] (cauto &vv) -> int {
+        int rsl ;
+        if (b == 10) {
+            rsl = uxxtostr10<UT>(endp,vv) ;
+        } else {
+            rsl = uxxtostr<UT>(endp,b,vv) ;
+        }
+        return rsl ;
+    } ; /* end lambda */
+    if ((rs = uxx(uv)) >= 0) {
+        rp = (endp - rs) ;
+    } else {
+        errno = (- rs) ;
+    }
+    return (rs >= 0) ? rp : nullptr ;
+} /* end subroutine (utostr) */
 
 
 /* local variables */
@@ -413,13 +400,5 @@ local char getdig_lo(int r) noex {
 local char getdig_hi(int r) noex {
 	return char(((digs.tab[r] >> 4) & 0x0F) + '0') ;
 }
-
-#ifdef	COMMENT
-local void debtab() noex  {
-    	for (int i = 0 ; i < div100 ; i += 1) {
-	    printf("tab[%2d]=%02X\n",i,digs.tab[i]) ;
-	}
-} /* end subroutine (debtab) */
-#endif /* COMMENT */
 
 
