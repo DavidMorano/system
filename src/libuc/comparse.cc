@@ -279,8 +279,7 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                        }
 			    } /* end if (buffer_get) */
 	                } /* end if (not in a quote) */
-			fallthrough ;
-			/* FALLTHROUGH */
+			falldown ;
 	            default:
 	                if (c_comment > 0) {
 	                    rs = buffer_chr((as + state_comment),*sp++) ;
