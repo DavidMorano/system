@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* access for the HOLIDAYS database */
+/* access for the holidays database */
 /* version %I% last-modified %G% */
 
 #define	CF_FIRSTHASH	0		/* perform FIRSTHASH */
@@ -22,7 +22,7 @@
 	holidays
 
 	Description:
-	This object module provides an interface to the HOLIDAYS (see
+	This object module provides an interface to the holidays (see
 	|holidays(4)|) database.
 
 *******************************************************************************/
@@ -31,11 +31,15 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<estrings.h>
 #include	<ids.h>
 #include	<bfile.h>
@@ -43,22 +47,34 @@
 #include	<strtab.h>
 #include	<tmtime.hh>
 #include	<sfx.h>
-#include	<hash.h>		/* |hash_elf(3dam)| */
+#include	<nleadstr.h>
+#include	<hash.h>		/* |hash_{x}(3uc)| */
 #include	<hashindex.h>
 #include	<nextpowtwo.h>
 #include	<permx.h>
+#include	<cfdec.h>
+#include	<ctdec.h>
 #include	<char.h>
-#include	<localmisc.h>
+#include	<hasx.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"holidays.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	HOLIDAYS_DEFRECS	20
-#define	HOLIDAYS_HOLSUF		"holidays"
-#define	HOLIDAYS_MAXRECS	(USHORT_MAX - 2)
-#define	HOLIDAYS_NSKIP		4
+#define	HO		holidays
+#define	HO_MAGIC	HOLIDAYS_MAGIC
+#define	HO_DEFRECS	20
+#define	HO_HOLSUF	"holidays"
+#define	HO_MAXRECS	(USHORT_MAX - 2)
+#define	HO_NSKIP	4
+#define	HO_OBJ		holidays_obj
+#define	HO_CITE		holidays_cite
+#define	HO_CUR		holidays_cur
 
 #ifndef	LINEBUFLEN
 #ifdef	LINE_MAX
@@ -70,10 +86,6 @@
 
 #ifndef	KEYBUFLEN
 #define	KEYBUFLEN	40
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
 #define	MODP2(v,n)	((v) & ((n) - 1))
@@ -95,14 +107,14 @@ struct varentry {
 	uint		ri ;
 	uint		ki ;
 	uint		hi ;
-} ;
+} ; /* end struct */
 
 enum itentries {
 	itentry_ri,
 	itentry_info,
 	itentry_nhi,
 	itentry_overlast
-} ;
+} ; /* end enum */
 
 
 /* local structures */
@@ -111,43 +123,43 @@ struct subinfo_record {
 	uint		cite ;		/* m:d */
 	uint		ki ;		/* key-string index */
 	uint		vi ;		/* val-string index */
-} ;
+} ; /* end struct */
 
 struct subinfo {
-	HOLIDAYS	*op ;
-	VECOBJ		recs ;
+	holidays	*op ;
+	vecobj		recs ;
 	STRTAB		kstrs ;
 	STRTAB		vstrs ;
 	bfile		hfile ;
-	int		fsize ;
-} ;
+	int		fsz ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	holidays_dbfind(HOLIDAYS *,ids *,char *) ;
-static int	holidays_dbfinder(HOLIDAYS *,ids *,char *,cchar *) ;
+local int	holidays_dbfind(HO *,ids *,char *) noex ;
+local int	holidays_dbfinder(HO *,ids *,char *,cchar *) noex ;
 
-static int	subinfo_start(SUBINFO *,HOLIDAYS *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_procfile(SUBINFO *) ;
-static int	subinfo_procyear(SUBINFO *,cchar *,int) ;
-static int	subinfo_procline(SUBINFO *,cchar *,int) ;
-static int	subinfo_proclineval(SUBINFO *,uint,cchar *,int) ;
-static int	subinfo_mkdata(SUBINFO *) ;
-static int	subinfo_mkrt(SUBINFO *) ;
-static int	subinfo_mkst(SUBINFO *) ;
-static int	subinfo_mkind(SUBINFO *,cchar *,int (*)[3],int) ;
+local int	subinfo_start(SUBINFO *,HO *) noex ;
+local int	subinfo_finish(SUBINFO *) noex ;
+local int	subinfo_procfile(SUBINFO *) noex ;
+local int	subinfo_procyear(SUBINFO *,cchar *,int) noex ;
+local int	subinfo_procline(SUBINFO *,cchar *,int) noex ;
+local int	subinfo_proclineval(SUBINFO *,uint,cchar *,int) noex ;
+local int	subinfo_mkdata(SUBINFO *) noex ;
+local int	subinfo_mkrt(SUBINFO *) noex ;
+local int	subinfo_mkst(SUBINFO *) noex ;
+local int	subinfo_mkind(SUBINFO *,cchar *,int (*)[3],int) noex ;
 
-static int	getyear(time_t) ;
-static int	getcite(uint *,cchar *,int) ;
-static int	mkcite(uint *,int,int) ;
+local int	getyear(time_t) noex ;
+local int	getcite(uint *,cchar *,int) noex ;
+local int	mkcite(uint *,int,int) noex ;
 
-static int	indinsert(uint (*rt)[3],int (*it)[3],int,struct varentry *) ;
-static int	ismatkey(cchar *,cchar *,int) ;
+local int	indinsert(uint (*rt)[3],int (*it)[3],int,varentry *) noex ;
+local int	ismatkey(cchar *,cchar *,int) noex ;
 
-static int	vcmprec(cvoid *,cvoid *) ;
-static int	cmprec(cvoid *,cvoid *) ;
+local int	vcmprec(cvoid **,cvoid **) noex ;
+local int	cmprec(cvoid *,cvoid *) noex ;
 
 
 /* local variables */
@@ -156,8 +168,8 @@ constexpr cpcchar	holdnames[] = {
 	"etc/acct",
 	"etc",
 	"/etc/acct",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 
 /* exported variables */
@@ -165,22 +177,22 @@ constexpr cpcchar	holdnames[] = {
 extern const holidays_obj	holidays_modinfo = {
 	"holidays",
 	szof(holidays),
-	szof(holidays_cur)
-} ;
+	szof(HO_CUR)
+} ; /* end array */
 
 
 /* exported subroutines */
 
-int holidays_open(HOLIDAYS *op,cchar *pr,int year,cchar *fname) noex {
-	time_t		dt = time(NULL) ;
+int holidays_open(HO *op,cchar *pr,int year,cchar *fname) noex {
+	time_t		dt = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		fl = -1 ;
 	int		c = 0 ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
@@ -194,22 +206,20 @@ int holidays_open(HOLIDAYS *op,cchar *pr,int year,cchar *fname) noex {
 	op->year = year ;
 	op->pr = pr ;
 
-	if ((fname == NULL) || (fname[0] == '\0')) {
-	    ids	id ;
-
-	    if ((ids_load(&id)) >= 0) {
+	if ((fname == nullptr) || (fname[0] == '\0')) {
+	    if (ids id ; (ids_load(&id)) >= 0) {
 	        rs = holidays_dbfind(op,&id,tmpfname) ;
 	        fl = rs ;
-	        if ((rs >= 0) && (fl > 0))
+	        if ((rs >= 0) && (fl > 0)) {
 	            fname = tmpfname ;
+		}
 	        ids_release(&id) ;
 	    } /* end if (ids) */
 
 	} /* end if */
 
 	if (rs >= 0) {
-	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(fname,fl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(fname,fl,&cp)) >= 0) {
 	        SUBINFO	si ;
 	        op->fname = cp ;
 	        if ((rs = subinfo_start(&si,op)) >= 0) {
@@ -217,62 +227,64 @@ int holidays_open(HOLIDAYS *op,cchar *pr,int year,cchar *fname) noex {
 	                c = rs ;
 	                if ((rs = subinfo_mkdata(&si)) >= 0) {
 	                    op->ti_check = dt ;
-	                    op->magic = HOLIDAYS_MAGIC ;
+	                    op->magic = HO_MAGIC ;
 	                }
 	            }
 	            rs1 = subinfo_finish(&si) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (subinfo) */
 	        if (rs < 0) {
-	            uc_free(op->fname) ;
-	            op->fname = NULL ;
-	        }
+	            void *vp = voidp(op->fname) ;
+	            lm_free(vp) ;
+	            op->fname = nullptr ;
+	        } /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (ok) */
-	if (rs < 0) holidays_close(op) ;
+	if (rs < 0) {
+	    holidays_close(op) ;
+	}
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (holidays_open) */
 
-
-int holidays_close(HOLIDAYS *op)
-{
+int holidays_close(HO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != HO_MAGIC) return SR_NOTOPEN ;
 
-	if (op->vst != NULL) {
-	    rs1 = uc_free(op->vst) ;
+	if (op->vst != nullptr) {
+	    rs1 = lm_free(op->vst) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->vst = NULL ;
+	    op->vst = nullptr ;
 	}
 
-	if (op->kit != NULL) {
-	    rs1 = uc_free(op->kit) ;
+	if (op->kit != nullptr) {
+	    rs1 = lm_free(op->kit) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->kit = NULL ;
+	    op->kit = nullptr ;
 	}
 
-	if (op->kst != NULL) {
-	    rs1 = uc_free(op->kst) ;
+	if (op->kst != nullptr) {
+	    rs1 = lm_free(op->kst) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->kst = NULL ;
+	    op->kst = nullptr ;
 	}
 
-	if (op->rt != NULL) {
-	    rs1 = uc_free(op->rt) ;
+	if (op->rt != nullptr) {
+	    rs1 = lm_free(op->rt) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->rt = NULL ;
+	    op->rt = nullptr ;
 	}
 
-	if (op->fname != NULL) {
-	    rs1 = uc_free(op->fname) ;
+	if (op->fname != nullptr) {
+	    void *vp = voidp(op->fname) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 
 	op->magic = 0 ;
@@ -280,77 +292,65 @@ int holidays_close(HOLIDAYS *op)
 }
 /* end subroutine (holidays_close) */
 
-
-int holidays_count(HOLIDAYS *op)
-{
+int holidays_count(HO *op) noex {
 	int		rs = SR_OK ;
 	int		c ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != HO_MAGIC) return SR_NOTOPEN ;
 
 	c = (op->rtlen - 1) ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (holidays_count) */
 
-
-int holidays_audit(HOLIDAYS *op)
-{
+int holidays_audit(HO *op) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != HO_MAGIC) return SR_NOTOPEN ;
 
 	return rs ;
 }
 /* end subroutine (holidays_audit) */
 
+int HO_CURbegin(HO *op,holidays_cur *curp) noex {
+    	int		rs = SR_OK ;
 
-int holidays_curbegin(HOLIDAYS *op,HOLIDAYS_CUR *curp)
-{
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != HOLIDAYS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != HO_MAGIC) return SR_NOTOPEN ;
 
 	curp->i = 0 ;
 	curp->chash = 0 ;
 	op->ncursors += 1 ;
 
-	return SR_OK ;
+	return rs ;
 }
-/* end subroutine (holidays_curbegin) */
+/* end subroutine (HO_CURbegin) */
 
+int HO_CURend(HO *op,holidays_cur *curp) noex {
+    	int		rs = SR_OK ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-int holidays_curend(HOLIDAYS *op,HOLIDAYS_CUR *curp)
-{
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (op->magic != HOLIDAYS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != HO_MAGIC) return SR_NOTOPEN ;
 
 	curp->i = 0 ;
-	if (op->ncursors > 0)
+	if (op->ncursors > 0) {
 	    op->ncursors -= 1 ;
+	}
 
-	return SR_OK ;
+	return rs ;
 }
-/* end subroutine (holidays_curend) */
+/* end subroutine (HO_CURend) */
 
-
-int holidays_fetchcite(op,qp,curp,vbuf,vlen)
-HOLIDAYS	*op ;
-HOLIDAYS_CITE	*qp ;
-HOLIDAYS_CUR	*curp ;
-char		vbuf[] ;
-int		vlen ;
-{
-	HOLIDAYS_CUR	dcur ;
+int holidays_fetchcite(HO *op,HO_CITE *qp,HO_CUR *curp,
+		char *vbuf,int vlen) noex {
+	HO_CUR		dcur ;
 	uint		(*rt)[3] ;
 	uint		(*rpp)[3] ;
 	uint		scite ;
@@ -362,17 +362,17 @@ int		vlen ;
 	cchar	*vst ;
 	cchar	*vp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (qp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (qp == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != HO_MAGIC) return SR_NOTOPEN ;
 
-	if (curp == NULL) {
+	if (curp == nullptr) {
 	    curp = &dcur ;
 	    curp->i = 0 ;
 	}
 
-	if (vbuf != NULL)
+	if (vbuf != nullptr)
 	    vbuf[0] = '\0' ;
 
 	vst = op->vst ;
@@ -389,11 +389,11 @@ int		vlen ;
 	    uint	(*srt)[3] = (rt + 1) ;
 	    int		srtlen = (rtlen - 1) ;
 	    rpp = (uint (*)[3]) bsearch(&scite,srt,srtlen,esz,cmprec) ;
-	    if (rpp == NULL)
+	    if (rpp == nullptr)
 	        rs = SR_NOTFOUND ;
 
 	    if (rs >= 0) {
-	        ri = (rpp - rt) ;
+	        ri = intconv(rpp - rt) ;
 	        while (ri > 0) {
 	            int	pri ;
 	            pri = (ri - 1) ;
@@ -401,7 +401,7 @@ int		vlen ;
 	                break ;
 	            ri = pri ;
 	        } /* end while */
-	    }
+	    } /* end if (ok) */
 
 	} else {
 
@@ -417,13 +417,13 @@ int		vlen ;
 
 	    vi = rt[ri][2] ;
 	    vp = (vst + vi) ;
-	    if (vbuf != NULL) {
+	    if (vbuf != nullptr) {
 	        rs = sncpy1(vbuf,vlen,vp) ;
 	        vl = rs ;
 	    } else
 	        vl = lenstr(vp) ;
 
-	    if (qp != NULL) {
+	    if (qp != nullptr) {
 	        uint	cite = rt[ri][0] ;
 	        qp->m = ((cite >> 8) & UCHAR_MAX) ;
 	        qp->d = ((cite >> 0) & UCHAR_MAX) ;
@@ -438,20 +438,12 @@ int		vlen ;
 }
 /* end subroutine (holidays_fetchcite) */
 
-
-int holidays_fetchname(op,kp,kl,curp,qp,vbuf,vlen)
-HOLIDAYS	*op ;
-cchar	*kp ;
-int		kl ;
-HOLIDAYS_CUR	*curp ;
-HOLIDAYS_CITE	*qp ;
-char		vbuf[] ;
-int		vlen ;
-{
-	HOLIDAYS_CUR	dcur ;
+int holidays_fetchname(HO *op,cc *kp,int kl,HO_CUR *curp,HO_CITE *qp,
+		char *vbuf,int vlen) noex {
+	HO_CUR	dcur ;
 	uint		khash, nhash, chash ;
 	uint		(*rt)[3] ;
-	cint	nskip = HOLIDAYS_NSKIP ;
+	cint	nskip = HO_NSKIP ;
 	int		rs = SR_OK ;
 	int		ri, ki, vi, hi ;
 	int		c ;
@@ -464,12 +456,12 @@ int		vlen ;
 	cchar	*cp ;
 	char		keybuf[KEYBUFLEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (kp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (kp == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != HO_MAGIC) return SR_NOTOPEN ;
 
-	if (curp == NULL) {
+	if (curp == nullptr) {
 	    curp = &dcur ;
 	    curp->i = 0 ;
 	}
@@ -483,7 +475,7 @@ int		vlen ;
 	    kp = keybuf ;
 	}
 
-	if (vbuf != NULL)
+	if (vbuf != nullptr)
 	    vbuf[0] = '\0' ;
 
 	kst = op->kst ;
@@ -524,7 +516,7 @@ int		vlen ;
 	        if (c >= (itlen + nskip))
 	            break ;
 
-	        nhash = hashagain(nhash,c++,nskip) ;
+	        nhash = hash_again(nhash,c++,nskip) ;
 
 	        hi = hashindex(nhash,itlen) ;
 
@@ -555,17 +547,21 @@ int		vlen ;
 	                    f_mat = ismatkey((kst + ki),kp,kl) ;
 	                }
 
-	                if (! f_mat)
+	                if (! f_mat) {
 	                    rs = SR_NOTFOUND ;
+			}
 
-	            } else
+	            } else {
 	                rs = SR_NOTFOUND ;
+		    }
 
-	        } else
+	        } else {
 	            rs = SR_NOTFOUND ;
+		}
 
-	    } else
+	    } else {
 	        rs = SR_NOTFOUND ;
+	    }
 
 	} /* end if (preparation) */
 
@@ -575,20 +571,21 @@ int		vlen ;
 
 	    vi = rt[ri][2] ;
 	    vp = (vst + vi) ;
-	    if (vbuf != NULL) {
+	    if (vbuf != nullptr) {
 	        rs = sncpy1(vbuf,vlen,vp) ;
 	        vl = rs ;
 	    } else
 	        vl = lenstr(vp) ;
 
-	    if (qp != NULL) {
+	    if (qp != nullptr) {
 	        uint	cite = rt[ri][0] ;
 	        qp->m = ((cite >> 8) & UCHAR_MAX) ;
 	        qp->d = ((cite >> 0) & UCHAR_MAX) ;
 	    }
 
-	    if (rs >= 0)
+	    if (rs >= 0) {
 	        curp->i = hi ;
+	    }
 
 	} /* end if (got one) */
 
@@ -596,14 +593,7 @@ int		vlen ;
 }
 /* end subroutine (holidays_fetchname) */
 
-
-int holidays_enum(op,curp,qp,vbuf,vlen)
-HOLIDAYS	*op ;
-HOLIDAYS_CUR	*curp ;
-HOLIDAYS_CITE	*qp ;
-char		vbuf[] ;
-int		vlen ;
-{
+int holidays_enum(HO *op,HO_CUR *curp,HO_CITE *qp,char *vbuf,int vlen) noex {
 	uint		(*rt)[3] ;
 	int		rs = SR_OK ;
 	int		ri, vi ;
@@ -611,15 +601,16 @@ int		vlen ;
 	cchar	*vst ;
 	cchar	*vp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != HO_MAGIC) return SR_NOTOPEN ;
 
 	if (op->ncursors == 0) return SR_INVALID ;
 
-	if (vbuf != NULL)
+	if (vbuf != nullptr) {
 	    vbuf[0] = '\0' ;
+	}
 
 	ri = (curp->i < 1) ? 1 : (curp->i + 1) ;
 
@@ -632,13 +623,13 @@ int		vlen ;
 	    if (vi < op->vslen) {
 
 	        vp = (vst + vi) ;
-	        if (vbuf != NULL) {
+	        if (vbuf != nullptr) {
 	            rs = sncpy1(vbuf,vlen,vp) ;
 	            vl = rs ;
 	        } else
 	            vl = lenstr(vp) ;
 
-	        if (qp != NULL) {
+	        if (qp != nullptr) {
 	            uint	cite = rt[ri][0] ;
 	            qp->m = ((cite >> 8) & UCHAR_MAX) ;
 	            qp->d = ((cite >> 0) & UCHAR_MAX) ;
@@ -656,17 +647,15 @@ int		vlen ;
 }
 /* end subroutine (holidays_enum) */
 
-
-int holidays_check(HOLIDAYS *op,time_t dt)
-{
+int holidays_check(HO *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f_changed = FALSE ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != HO_MAGIC) return SR_NOTOPEN ;
 
-	if (dt == 0) dt = time(NULL) ;
+	if (dt == 0) dt = time(nullptr) ;
 
 #ifdef	COMMENT
 #else
@@ -680,12 +669,10 @@ int holidays_check(HOLIDAYS *op,time_t dt)
 
 /* private subroutines */
 
-
-static int holidays_dbfind(HOLIDAYS *op,ids *idp,char *tmpfname)
-{
+local int holidays_dbfind(HO *op,ids *idp,char *tmpfname) noex {
 	int		rs ;
 	int		fl = 0 ;
-	cchar	*fsuf = HOLIDAYS_HOLSUF ;
+	cchar	*fsuf = HO_HOLSUF ;
 	char		digbuf[DIGBUFLEN + 1] ;
 	char		cname[MAXNAMELEN + 1] ;
 
@@ -705,8 +692,8 @@ static int holidays_dbfind(HOLIDAYS *op,ids *idp,char *tmpfname)
 }
 /* end subroutine (holidays_dbfind) */
 
-static int holidays_dbfinder(HOLIDAYS *op,ids *idp,char *tmpfname,
-		cchar *cname) {
+local int holidays_dbfinder(HO *op,ids *idp,char *tmpfname,
+		cchar *cname) noex {
 	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_NOENT ;
@@ -714,7 +701,7 @@ static int holidays_dbfinder(HOLIDAYS *op,ids *idp,char *tmpfname,
 	int		fl = 0 ;
 	cchar	*hdn ;
 
-	for (i = 0 ; holdnames[i] != NULL ; i += 1) {
+	for (i = 0 ; holdnames[i] != nullptr ; i += 1) {
 
 	    hdn = holdnames[i] ;
 	    if (hdn[0] != '/') {
@@ -725,9 +712,9 @@ static int holidays_dbfinder(HOLIDAYS *op,ids *idp,char *tmpfname,
 	    fl = rs ;
 
 	    if (rs >= 0) {
-	        rs1 = u_stat(tmpfname,&sb) ;
-	        if (rs1 >= 0)
+	        if ((rs1 = u_stat(tmpfname,&sb)) >= 0) {
 	            rs1 = permid(idp,&sb,R_OK) ;
+		}
 	    }
 
 	    if (rs1 >= 0)
@@ -742,36 +729,37 @@ static int holidays_dbfinder(HOLIDAYS *op,ids *idp,char *tmpfname,
 }
 /* end subroutine (holidays_dbfinder) */
 
-static int subinfo_start(SUBINFO *sip,HOLIDAYS *op) noex {
+local int subinfo_start(SUBINFO *sip,HO *op) noex {
 	int		rs = SR_OK ;
 	memclear(sip) ;
 	sip->op = op ;
 	if ((rs = bopen(&sip->hfile,op->fname,"r",0666)) >= 0) {
 	    cint	sz = szof(SUBINFO_REC) ;
-	    cint	n = HOLIDAYS_DEFRECS ;
+	    cint	n = HO_DEFRECS ;
 	    if ((rs = vecobj_start(&sip->recs,sz,n,0)) >= 0) {
-	        USTAT	sb ;
+	        ustat	sb ;
 	        bcontrol(&sip->hfile,BC_STAT,&sb) ;
-	        sip->fsize = sb.st_size ;
-	        if ((rs = strtab_start(&sip->kstrs,(sip->fsize/3))) >= 0) {
-	            rs = strtab_start(&sip->vstrs,sip->fsize) ;
-	            if (rs < 0)
+	        sip->fsz = intconv(sb.st_size) ;
+	        if ((rs = strtab_start(&sip->kstrs,(sip->fsz/3))) >= 0) {
+	            rs = strtab_start(&sip->vstrs,sip->fsz) ;
+	            if (rs < 0) {
 	                strtab_finish(&sip->kstrs) ;
+		    }
 	        }
-	        if (rs < 0)
+	        if (rs < 0) {
 	            vecobj_finish(&sip->recs) ;
+		}
 	    } /* end if (vecobj_start) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        bclose(&sip->hfile) ;
+	    }
 	} /* end if (file-open) */
 
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+local int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -787,17 +775,15 @@ static int subinfo_finish(SUBINFO *sip)
 	rs1 = bclose(&sip->hfile) ;
 	if (rs >= 0) rs = rs1 ;
 
-	sip->op = NULL ;
+	sip->op = nullptr ;
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_procfile(SUBINFO *sip)
-{
-	HOLIDAYS	*op = sip->op ;
+local int subinfo_procfile(SUBINFO *sip) noex {
+	HO		*op = sip->op ;
 	cint	llen = LINEBUFLEN ;
-	cint	maxrecs = HOLIDAYS_MAXRECS ;
+	cint	maxrecs = HO_MAXRECS ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		c = 0 ;
@@ -835,20 +821,18 @@ static int subinfo_procfile(SUBINFO *sip)
 }
 /* end subroutine (subinfo_procfile) */
 
-
-static int subinfo_procyear(SUBINFO *sip,cchar lbuf[],int llen)
-{
+local int subinfo_procyear(SUBINFO *sip,cchar lbuf[],int llen) noex {
 	int		rs = SR_ILSEQ ;
-	int		sl, cl ;
+	int		sl ;
 	int		year = SR_ILSEQ ;
 	cchar	*sp ;
-	cchar	*cp ;
 
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 
 	sp = lbuf ;
 	sl = llen ;
-	if ((cl = nextfield(sp,sl,&cp)) > 0) {
+	cchar *cp ;
+	if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 	    rs = cfdeci(cp,cl,&year) ;
 	}
 
@@ -856,9 +840,7 @@ static int subinfo_procyear(SUBINFO *sip,cchar lbuf[],int llen)
 }
 /* end subroutine (subinfo_procyear) */
 
-
-static int subinfo_procline(SUBINFO *sip,cchar lbuf[],int llen)
-{
+local int subinfo_procline(SUBINFO *sip,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		sl = llen ;
 	int		cl ;
@@ -869,7 +851,7 @@ static int subinfo_procline(SUBINFO *sip,cchar lbuf[],int llen)
 	if ((cl = nextfield(sp,sl,&cp)) > 0) {
 	    uint	cite ;
 	    if (getcite(&cite,cp,cl) >= 0) { /* ignore errors */
-	        sl -= ((cp + cl) - sp) ;
+	        sl -= intconv((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
 	        if ((cl = sfshrink(sp,sl,&cp)) > 0) {
 	            rs = subinfo_proclineval(sip,cite,cp,cl) ;
@@ -882,9 +864,7 @@ static int subinfo_procline(SUBINFO *sip,cchar lbuf[],int llen)
 }
 /* end subroutine (subinfo_procline) */
 
-
-static int subinfo_proclineval(SUBINFO *sip,uint cite,cchar *sp,int sl)
-{
+local int subinfo_proclineval(SUBINFO *sip,uint cite,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
@@ -915,29 +895,24 @@ static int subinfo_proclineval(SUBINFO *sip,uint cite,cchar *sp,int sl)
 }
 /* end subroutine (subinfo_proclineval) */
 
-
-static int subinfo_mkdata(SUBINFO *sip)
-{
-	HOLIDAYS	*op = sip->op ;
+local int subinfo_mkdata(SUBINFO *sip) noex {
+	HO		*op = sip->op ;
 	int		rs ;
 
 	if ((rs = subinfo_mkrt(sip)) >= 0) {
 	    rs = subinfo_mkst(sip) ;
-	    if ((rs < 0) && (op->rt != NULL)) {
-	        uc_free(op->rt) ;
-	        op->rt = NULL ;
-	    }
+	    if ((rs < 0) && (op->rt != nullptr)) {
+	        lm_free(op->rt) ;
+	        op->rt = nullptr ;
+	    } /* end if (error) */
 	}
 
 	return rs ;
 }
 /* end subroutine (subinfo_mkdata) */
 
-
-static int subinfo_mkrt(SUBINFO *sip)
-{
-	SUBINFO_REC	*rp ;
-	HOLIDAYS	*op = sip->op ;
+local int subinfo_mkrt(SUBINFO *sip) noex {
+	HO		*op = sip->op ;
 	uint		(*rt)[3] ;
 	int		rs = SR_OK ;
 	int		sz ;
@@ -951,17 +926,20 @@ static int subinfo_mkrt(SUBINFO *sip)
 	}
 
 	sz = (n + 2) * 3 * szof(uint) ;
-	if ((rs = uc_malloc(sz,&rt)) >= 0) {
+	if ((rs = lm_mall(sz,&rt)) >= 0) {
 	    rt[c][0] = 0 ;
 	    rt[c][1] = 0 ;
 	    rt[c][2] = 0 ;
 	    c += 1 ;
-	    for (int i = 0 ; vecobj_get(&sip->recs,i,&rp) >= 0 ; i += 1) {
-	        if (rp == NULL) continue ;
-	        rt[c][0] = rp->cite ;
-	        rt[c][1] = rp->ki ;
-	        rt[c][2] = rp->vi ;
-	        c += 1 ;
+	    void *vp ;
+	    for (int i = 0 ; vecobj_get(&sip->recs,i,&vp) >= 0 ; i += 1) {
+		SUBINFO_REC *rp = (SUBINFO_REC *) vp ;
+	        if (vp) {
+	            rt[c][0] = rp->cite ;
+	            rt[c][1] = rp->ki ;
+	            rt[c][2] = rp->vi ;
+	            c += 1 ;
+		}
 	    } /* end for */
 	    rt[c][0] = 0 ;
 	    rt[c][1] = 0 ;
@@ -974,28 +952,26 @@ static int subinfo_mkrt(SUBINFO *sip)
 }
 /* end subroutine (subinfo_mkrt) */
 
-
-static int subinfo_mkst(SUBINFO *sip)
-{
-	HOLIDAYS	*op = sip->op ;
+local int subinfo_mkst(SUBINFO *sip) noex {
+	HO		*op = sip->op ;
 	int		rs ;
 
 	if ((rs = strtab_strsize(&sip->kstrs)) >= 0) {
 	    cint	ksize = rs ;
 	    char	*kst ;
-	    if ((rs = uc_malloc(ksize,&kst)) >= 0) {
+	    if ((rs = lm_mall(ksize,&kst)) >= 0) {
 		int	kisize ;
 		if ((rs = strtab_strmk(&sip->kstrs,kst,ksize)) >= 0) {
 		    int		(*kit)[3] ;
 		    op->itlen = nextpowtwo(op->rtlen) ;
 		    kisize = (op->itlen + 1) * 3 * szof(int) ;
-		    if ((rs = uc_malloc(kisize,&kit)) >= 0) {
+		    if ((rs = lm_mall(kisize,&kit)) >= 0) {
 		        memset(kit,0,kisize) ;
 			if ((rs = subinfo_mkind(sip,kst,kit,op->itlen)) >= 0) {
 			    if ((rs = strtab_strsize(&sip->vstrs)) >= 0) {
 				cint	vs = rs ;
 				char		*vst ;
-				if ((rs = uc_malloc(vs,&vst)) >= 0) {
+				if ((rs = lm_mall(vs,&vst)) >= 0) {
 				    STRTAB	*vsp = &sip->vstrs ;
 				    if ((rs = strtab_strmk(vsp,vst,vs)) >= 0) {
 					op->kst = kst ;
@@ -1007,12 +983,14 @@ static int subinfo_mkst(SUBINFO *sip)
 				} /* end if (m-a) */
 			    } /* end if */
 			} /* end if */
-			if (rs < 0)
-			    uc_free(kit) ;
+			if (rs < 0) {
+			    lm_free(kit) ;
+			}
 		    } /* end if (m-a) */
+		} /* end if (strtab_strmk) */
+	        if (rs < 0) {
+		    lm_free(kst) ;
 		}
-	        if (rs < 0)
-		    uc_free(kst) ;
 	    } /* end if (m-a) */
 	} /* end if */
 
@@ -1020,16 +998,14 @@ static int subinfo_mkst(SUBINFO *sip)
 }
 /* end subroutine (subinfo_mkst) */
 
-
 /* make an index table of the record table */
-int subinfo_mkind(SUBINFO *sip,cchar kst[],int (*it)[3],int il)
-{
-	HOLIDAYS	*op = sip->op ;
-	struct varentry	ve ;
+int subinfo_mkind(SUBINFO *sip,cchar kst[],int (*it)[3],int il) noex {
+	HO		*op = sip->op ;
+	varentry	ve ;
 	uint		khash ;
 	uint		(*rt)[3] ;
 	int		rs = SR_OK ;
-	int		rs1 ;
+	[[maybe_unused]] int		rs1 ;
 	int		ri, ki, hi ;
 	int		rtl ;
 	int		sc = 0 ;
@@ -1040,12 +1016,10 @@ int subinfo_mkind(SUBINFO *sip,cchar kst[],int (*it)[3],int il)
 
 #if	CF_FIRSTHASH
 	{
-	    VECOBJ		ves ;
-	    cint		sz = szof(struct varentry) ;
-	    int			opts ;
-
-	    opts = VECOBJ_OCOMPACT ;
-	    if ((rs = vecobj_start(&ves,sz,rtl,opts)) >= 0) {
+	    vecobj		ves ;
+	    cint		sz = szof(varentry) ;
+	    int			vo = VECOBJ_OCOMPACT ;
+	    if ((rs = vecobj_start(&ves,sz,rtl,vo)) >= 0) {
 	        int	i ;
 
 	        for (ri = 1 ; ri < rtl ; ri += 1) {
@@ -1107,39 +1081,35 @@ int subinfo_mkind(SUBINFO *sip,cchar kst[],int (*it)[3],int il)
 	it[il][1] = 0 ;
 	it[il][2] = 0 ;
 
-	if (sc < 0)
+	if (sc < 0) {
 	    sc = 0 ;
+	}
 
 	return (rs >= 0) ? sc : rs ;
 }
 /* end subroutine (subinfo_mkind) */
 
 
-static int getyear(time_t dt)
-{
+local int getyear(time_t dt) noex {
 	TMTIME		tm ;
 	int		rs ;
 	int		year ;
 
-	rs = tmtime_gmtime(&tm,dt) ;
+	rs = tmtime_timegm(&tm,dt) ;
 	year = (tm.year + TM_YEAR_BASE) ;
 
 	return (rs >= 0) ? year : rs ;
 }
 /* end subroutine (getyear) */
 
-
-static int getcite(uint *citep,cchar *cp,int cl)
-{
+local int getcite(uint *citep,cchar *cp,int cl) noex {
 	int		rs = SR_ILSEQ ;
-	cchar	*tp ;
-
-	if ((tp = strnchr(cp,cl,'/')) != NULL) {
-	    int		m, d ;
-	    if ((rs = cfdeci(cp,(tp - cp),&m)) >= 0) {
-	        cl -= ((tp + 1) - cp) ;
+	if (cchar *tp ; (tp = strnchr(cp,cl,'/')) != nullptr) {
+	    int tl = intconv(tp - cp) ;
+	    if (int m ; (rs = cfdeci(cp,tl,&m)) >= 0) {
+	        cl -= intconv((tp + 1) - cp) ;
 	        cp = (tp + 1) ;
-	        if ((rs = cfdeci(cp,cl,&d)) >= 0) {
+	        if (int d ; (rs = cfdeci(cp,cl,&d)) >= 0) {
 	            rs = mkcite(citep,m,d) ;
 	        } /* end if (cfdeci) */
 	    } /* end if (cfdeci) */
@@ -1149,9 +1119,7 @@ static int getcite(uint *citep,cchar *cp,int cl)
 }
 /* end subroutine (getcite) */
 
-
-static int mkcite(uint *citep,int m,int d)
-{
+local int mkcite(uint *citep,int m,int d) noex {
 	uint		c ;
 	int		rs = SR_DOM ;
 
@@ -1170,9 +1138,7 @@ static int mkcite(uint *citep,int m,int d)
 }
 /* end subroutine (mkcite) */
 
-
-static int indinsert(uint (*rt)[3],int (*it)[3],int il,struct varentry *vep)
-{
+local int indinsert(uint (*rt)[3],int (*it)[3],int il,varentry *vep) noex {
 	uint		nhash, chash ;
 	uint		ri, ki ;
 	uint		lhi, nhi, hi ;
@@ -1193,7 +1159,7 @@ static int indinsert(uint (*rt)[3],int (*it)[3],int il,struct varentry *vep)
 	        break ;
 
 	    it[hi][1] |= (~ INT_MAX) ;
-	    nhash = hashagain(nhash,c++,HOLIDAYS_NSKIP) ;
+	    nhash = hash_again(nhash,c++,HO_NSKIP) ;
 
 	    hi = hashindex(nhash,il) ;
 
@@ -1222,42 +1188,44 @@ static int indinsert(uint (*rt)[3],int (*it)[3],int il,struct varentry *vep)
 }
 /* end subroutine (indinsert) */
 
-static int ismatkey(cchar key[],cchar kp[],int kl) noex {
+local int ismatkey(cchar key[],cchar kp[],int kl) noex {
 	int	f = (key[0] == kp[0]) ;
 	if (f) {
-	    int	m = nleadstr(key,kp,kl) ;
+	    cint	m = nleadstr(key,kp,kl) ;
 	    f = (m == kl) && (key[m] == '\0') ;
 	}
 	return f ;
 }
 /* end subroutine (ismatkey) */
 
-static int vcmprec(cvoid *v1p,cvoid *v2p) noex {
-	uint		**i1pp = (uint **) v1p ;
-	uint		**i2pp = (uint **) v2p ;
+local int vcmprec(cvoid **v1pp,cvoid **v2pp) noex {
+	uint		**i1pp = (uint **) v1pp ;
+	uint		**i2pp = (uint **) v2pp ;
 	int		rc = 0 ;
-	if ((i1pp != NULL) || (i2pp != NULL)) {
-	    if (i1pp != NULL) {
-	        if (i2pp != NULL) {
+	if ((i1pp != nullptr) || (i2pp != nullptr)) {
+	    if (i1pp != nullptr) {
+	        if (i2pp != nullptr) {
 	            uint	*i1p = *i1pp ;
 	            uint	*i2p = *i2pp ;
 	            rc = (*i1p - *i2p) ;
-	        } else
+	        } else {
 	            rc = -1 ;
-	    } else
+		}
+	    } else {
 	        rc = +1 ;
+	    }
 	}
 	return rc ;
 }
 /* end subroutine (vcmprec) */
 
-static int cmprec(cvoid *v1p,cvoid *v2p) noex {
+local int cmprec(cvoid *v1p,cvoid *v2p) noex {
 	uint		*i1p = (uint *) v1p ;
 	uint		*i2p = (uint *) v2p ;
 	int		rc = 0 ;
-	if ((i1p != NULL) || (i2p != NULL)) {
-	    if (i1p != NULL) {
-	        if (i2p != NULL) {
+	if ((i1p != nullptr) || (i2p != nullptr)) {
+	    if (i1p != nullptr) {
+	        if (i2p != nullptr) {
 	      	    rc = (*i1p - *i2p) ;
 	    	} else
 	            rc = -1 ;
