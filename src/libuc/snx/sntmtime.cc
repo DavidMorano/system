@@ -252,8 +252,7 @@ local int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'r': /* this is what Free-BSD does */
 	                rs = sbuf_fmtstrs(ssp,tmp,"%I:%M:%S ") ;
-			fallthrough ;
-    			/* FALLTHROUGH */
+			falldown ;
 	            case 'p':
 	                if (rs >= 0) {
 	                    cchar *cp = (tmp->hour < 12) ? "am" : "pm" ;
