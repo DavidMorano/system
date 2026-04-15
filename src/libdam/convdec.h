@@ -2,13 +2,13 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* convert a long (signed or unsigned) integer to its decimal string */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
+	= 1998-03-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -28,7 +28,8 @@
 
 EXTERNC_begin
 
-extern char	*convdecu(ulong,char *) noex ;
+extern char	*convdecs(long,		char *) noex ;
+extern char	*convdecu(ulong,	char *) noex ;
 
 EXTERNC_end
 
