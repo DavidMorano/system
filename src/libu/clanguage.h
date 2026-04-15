@@ -201,8 +201,8 @@
 #define	typealias		typedef
 #endif
 
-#ifndef	fallthrough
-#define	fallthrough		/* FALLTHROUGH */
+#ifndef	falldown
+#define	falldown		[[fallthrough]]
 #endif
 
 #ifndef	nelements
