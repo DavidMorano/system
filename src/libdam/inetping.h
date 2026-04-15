@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	INETPING_INCLUDE
 #define	INETPING_INCLUDE
