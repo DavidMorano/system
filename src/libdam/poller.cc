@@ -40,6 +40,9 @@
 
 #include	"poller.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -48,7 +51,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -71,12 +73,12 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 static int poller_ctor(poller *op,Args ... args) noex {
     	POLLER		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->rlp = new(nothrow) vecobj) != np) {
+	    if ((op->rlp = new(nothrow) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
@@ -86,9 +88,9 @@ static int poller_ctor(poller *op,Args ... args) noex {
 
 static int poller_dtor(poller *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->rlp) {
+	    if (op->rlp) ylikely {
 		delete op->rlp ;
 		op->rlp = nullptr ;
 	    }
@@ -100,7 +102,7 @@ static int poller_dtor(poller *op) noex {
 template<typename ... Args>
 static inline int poller_magic(poller *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == POLLER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -123,11 +125,11 @@ static bool	ismatch(poller_spec *,poller_spec *) noex ;
 
 int poller_start(poller *op) noex {
 	int		rs ;
-	if ((rs = poller_ctor(op)) >= 0) {
+	if ((rs = poller_ctor(op)) >= 0) ylikely {
 	    cint	esz = szof(poller_spec) ;
 	    cint	vn = POLLER_NDEF ;
 	    cint	vo = 0 ;
-	    if ((rs = vecobj_start(op->rlp,esz,vn,vo)) >= 0) {
+	    if ((rs = vecobj_start(op->rlp,esz,vn,vo)) >= 0) ylikely {
 	        op->magic = POLLER_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -141,12 +143,12 @@ int poller_start(poller *op) noex {
 int poller_finish(poller *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = poller_magic(op)) >= 0) {
-	    if (op->rlp) {
+	if ((rs = poller_magic(op)) >= 0) ylikely {
+	    if (op->rlp) ylikely {
 	        rs1 = vecobj_finish(op->rlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->pa) {
+	    if (op->pa) ylikely {
 	        rs1 = uc_free(op->pa) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->pa = nullptr ;
