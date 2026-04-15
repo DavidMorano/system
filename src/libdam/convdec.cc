@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* subroutine to convert integers to strings */
+/* convert a long (signed or unsigned) integer to its decimal string */
 /* version %I% last-modified %G% */
 
 #define	CF_ULTOSTR	1	/* use |ultostr(3u)| subroutine */
@@ -32,13 +32,7 @@
 	had assembly language convert-integer-to-string subroutines
 	for both decimal and hexadecimal (very heavily used back
 	then for hardware development), but for some reason this
-	code (below) was still used within |printf|.  Interestingly,
-	the |printf| subroutine was not actually used a lot (or at
-	all) in the ROM and debug monitor code back then.  This was
-	most likely because I had to write the ROM and debug monitor
-	codes before I wrote the higher-level library subroutines
-	like |printf|.  Almost everyting was "bare-metal" back in
-	the 1980s.
+	code (below) was still used within |printf|.
 
 */
 
@@ -102,8 +96,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdintx.h>
-#include	<climits>
-#include	<cstring>		/* |INT_MAX| */
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
