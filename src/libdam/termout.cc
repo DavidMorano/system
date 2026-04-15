@@ -762,20 +762,16 @@ local int termout_loadcs(termout *op,ustring &line,int n,cc *pp,int pl) noex {
 	        switch (ml) {
 	        case 4:
 		    a4 = pp[i+3] ;
-		    fallthrough ;
-		    /* FALLTHROUGH */
+		    falldown ;
 	        case 3:
 		    a3 = pp[i+2] ;
-		    fallthrough ;
-		    /* FALLTHROUGH */
+		    falldown ;
 	        case 2:
 		    a2 = pp[i+1] ;
-		    fallthrough ;
-		    /* FALLTHROUGH */
+		    falldown ;
 	        case 1:
 		    a1 = pp[i+0] ;
-		    fallthrough ;
-		    /* FALLTHROUGH */
+		    falldown ;
 	        case 0:
 		    break ;
 	        } /* end switch */
