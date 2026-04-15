@@ -244,8 +244,7 @@ static int opencfile(int w,int of,int ttl) noex {
 	            case opensysdb_shadow:
 		        ufn = unixfname.shadow ;
 		        mm &= (~7) ;
-		        fallthrough ;
-		        /* FALLTHROUGH */
+		        falldown ;
 		    default:
 	                rs = checkperms(gfname,&sb,mm) ;
 		        break ;
