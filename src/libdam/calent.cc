@@ -32,8 +32,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<estrings.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<sbuf.h>
 #include	<sfx.h>
 #include	<hash.h>		/* |hash_elf(3dam)| */
@@ -41,13 +43,15 @@
 
 #include	"calent.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -71,7 +75,7 @@ template<typename ... Args>
 static int calent_ctor(calent *op,Args ... args) noex {
     	CALENT		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -80,7 +84,7 @@ static int calent_ctor(calent *op,Args ... args) noex {
 
 static int calent_dtor(calent *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -90,7 +94,7 @@ static int calent_dtor(calent *op) noex {
 template<typename ... Args>
 static inline int calent_magic(calent *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CALENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -115,7 +119,7 @@ int calent_start(calent *op,calent_q *qp,uint loff,int llen) noex {
 	    op->q = *qp ;
 	    op->voff = loff ;
 	    op->vlen = llen ;
-	    if (calent_ln *elp ; (rs = uc_malloc(sz,&elp)) >= 0) {
+	    if (calent_ln *elp ; (rs = lm_mall(sz,&elp)) >= 0) {
 	        op->lines = elp ;
 	        op->e = ne ;
 	        op->i += 1 ;
@@ -141,7 +145,7 @@ int calent_finish(calent *op) noex {
 	        if ((op->i >= 0) && (op->i <= op->e)) {
 		    rs = SR_OK ;
 	            if (op->lines) {
-	                rs1 = uc_free(op->lines) ;
+	                rs1 = lm_free(op->lines) ;
 	                if (rs >= 0) rs = rs1 ;
 	                op->lines = nullptr ;
 	            }
@@ -185,7 +189,7 @@ int calent_add(calent *op,uint loff,int llen) noex {
 	            if (op->i == op->e) {
 	                cint	ne = (op->e * 2) + CALENT_NLE ;
 	                sz = ne * szof(calent_ln) ;
-	                if ((rs = uc_realloc(op->lines,sz,&elp)) >= 0) {
+	                if ((rs = lm_rall(op->lines,sz,&elp)) >= 0) {
 	                    op->e = ne ;
 	                    op->lines = elp ;
 	                }
@@ -234,7 +238,7 @@ int calent_mkhash(calent *op,cchar *md) noex {
 	                    sl = elp[i].llen ;
 	                    while ((cl = nextfield(sp,sl,&cp)) > 0) {
 	                        hash += hash_elf(cp,cl) ;
-	                        sl -= ((cp + cl) - sp) ;
+	                        sl -= intconv((cp + cl) - sp) ;
 	                        sp = (cp + cl) ;
 	                    } /* end while */
 	                } /* end for */
