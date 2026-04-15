@@ -1,4 +1,5 @@
 /* strlen SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* calculate the length of a string */
@@ -17,22 +18,61 @@
 
 /*******************************************************************************
 
+  	Name:
+	strlen
+
+	Description:
 	This subroutine is a knock off of the |strlen(3c)| from the
 	regular UNIX® system.
 
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<utypedefs.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
-size_t strlen(const char *s) noex {
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* external subroutines */
+
+size_t strlen(cchar *s) noex {
 	size_t		len = 0 ;
-	while (*s++) len += 1 ;
+	if (s) {
+	    while (*s++) len += 1 ;
+	}
 	return len ;
 }
 /* end subroutine (strlen) */
