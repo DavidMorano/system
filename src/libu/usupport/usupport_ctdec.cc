@@ -82,6 +82,15 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine-template (ctdecx) */
+    int ctdeci		(char *dp,int dl,int uv)	noex {
+	return ctdecx(itostr,dp,dl,uv) ;
+    }
+    int ctdecl		(char *dp,int dl,long uv)	noex {
+	return ctdecx(ltostr,dp,dl,uv) ;
+    }
+    int ctdecll		(char *dp,int dl,longlong uv)	noex {
+	return ctdecx(lltostr,dp,dl,uv) ;
+    }
     int ctdecui		(char *dp,int dl,uint uv)	noex {
 	return ctdecx(uitostr,dp,dl,uv) ;
     }
