@@ -36,7 +36,6 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<mallocstuff.h>
@@ -64,9 +63,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -95,13 +91,13 @@ struct dialtab_file {
 template<typename ... Args>
 static int dialtab_ctor(DT *op,Args ... args) noex {
     	DIALTAB		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->flp = new(nothrow) vecobj) != np) {
-	        if ((op->elp = new(nothrow) vecobj) != np) {
+	    if ((op->flp = new(nothrow) vecobj) != np) ylikely {
+	        if ((op->elp = new(nothrow) vecobj) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-vecobj) */
 		if (rs < 0) {
@@ -116,13 +112,13 @@ static int dialtab_ctor(DT *op,Args ... args) noex {
 
 static int dialtab_dtor(DT *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->elp) {
+	    if (op->elp) ylikely {
 		delete op->elp ;
 		op->elp = nullptr ;
 	    }
-	    if (op->flp) {
+	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
 	    }
@@ -134,7 +130,7 @@ static int dialtab_dtor(DT *op) noex {
 template<typename ... Args>
 static inline int dialtab_magic(DT *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -531,7 +527,7 @@ static int dialtab_fileload(DT *op,DT_FI *fep,cchar *fn,DT_FI **rpp) noex {
 static int dialtab_filedump(DT *op,int fi) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    void	*vp{} ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; vecobj_get(op->elp,i,&vp) >= 0 ; i += 1) {
@@ -578,7 +574,7 @@ static int dialtab_filedel(DT *op,int fi) noex {
 
 static int file_start(DT_FI *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fep && fname) {
+	if (fep && fname) ylikely {
 	    rs = memclear(fep) ;
 	    if ((fep->fname = mallocstr(fname)) == nullptr) {
 	        rs = SR_NOMEM ;
@@ -591,9 +587,9 @@ static int file_start(DT_FI *fep,cchar *fname) noex {
 static int file_finish(DT_FI *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (fep) {
+	if (fep) ylikely {
 	    rs = SR_OK ;
-	    if (fep->fname) {
+	    if (fep->fname) ylikely {
 	        rs1 = uc_free(fep->fname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->fname = nullptr ;
@@ -620,7 +616,7 @@ static int entry_start(DT_ENT *dep,int fi,cchar *sp,int sl) noex {
 static int entry_enough(DT_ENT *dep) noex {
     	int		rs = SR_FAULT ;
 	int		fret = false ;
-	if (dep) {
+	if (dep) ylikely {
 	    rs = SR_OK ;
 	    if (dep->name && dep->name[0]) {
 	        fret = fret || (dep->uucp && (dep->uucp[0] != '\0')) ;
@@ -635,9 +631,9 @@ static int entry_enough(DT_ENT *dep) noex {
 
 static int entry_finish(DT_ENT *dep) noex {
     	int		rs = SR_FAULT ;
-	if (dep) {
+	if (dep) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (dep->name) {
+	    if (dep->name) ylikely {
 	        rs = SR_OK ;
 		freeit(&dep->name) ;
 		freeit(&dep->uucp) ;
