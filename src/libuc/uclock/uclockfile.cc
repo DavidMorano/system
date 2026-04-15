@@ -187,15 +187,13 @@ int uc_lockfile(int fd,int cmd,off_t start,off_t sz,int to) noex {
 	    switch (cmd) {
 	    case F_TRLOCK:
 	        to = 0 ;
-		fallthrough ;
-		/* FALLTHROUGH */
+		falldown ;
 	    case F_RLOCK:
 	        fl.l_type = F_RDLCK ;
 	        break ;
 	    case F_TWLOCK:
 	        to = 0 ;
-		fallthrough ;
-		/* FALLTHROUGH */
+		falldown ;
 	    case F_WLOCK:
 	        fl.l_type = F_WRLCK ;
 		break ;
