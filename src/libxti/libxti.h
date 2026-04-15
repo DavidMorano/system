@@ -47,8 +47,13 @@
 #endif
 
 
-#if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
-#if	(! defined(LIBUT_MASTER)) || (LIBUT_MASTER == 0)
+#ifndef	TBADF
+#define	TBADF		0
+#endif
+#ifndef	TSYSERR
+#define	TSYSERR		0
+#endif
+
 
 EXTERNC_begin
 
@@ -64,9 +69,6 @@ extern int	ut_close(int) noex ;
 extern int	ut_free(void *,int) noex ;
 
 EXTERNC_end
-
-#endif /* LIBUT_MASTER */
-#endif /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */
 
 
 #endif /* UXTI_INCLUDE */
