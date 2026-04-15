@@ -31,52 +31,38 @@
 
 
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-
-#include	<usystem.h>
-#include	<ptm.h>
-#include	<ptc.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ciq.h>
 #include	<psem.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	DISPATCHER	struct dispatcher_head
 
 
 struct dispatcher_head {
-	uint		magic ;
-	CIQ		wq ;		/* work Q */
-	PSEM		ws ;		/* work semaphore */
+	ciq		wq ;		/* work Q */
+	psem		ws ;		/* work semaphore */
 	vecobj		tids ;
 	void		*callsub ;	/* called subroutine entry-address */
 	void		*callarg ;	/* called subroutine argument */
-	DISPATCHER_THR	*threads ;
+	uint		magic ;
 	volatile int	f_exit ;	/* CMD to exit immediately */
 	volatile int	f_done ;	/* CMD to exit after work completed */
 	int		nthr ;		/* concurrency */
-} ;
+} ; /* end struct */
 
+typedef	DISPATCHER	dispatcher ;
 
-#if	(! defined(DISPATCHER_MASTER)) || (DISPATCHER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	dispatcher_start(dispatcher *,int,void *,void *) noex ;
+extern int	dispatcher_add(dispatcher *,void *) noex ;
+extern int	dispatcher_finish(dispatcher *,int) noex ;
 
-extern int	dispatcher_start(DISPATCHER *,int,void *,void *) ;
-extern int	dispatcher_add(DISPATCHER *,void *) ;
-extern int	dispatcher_finish(DISPATCHER *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* DISPATCHER_MASTER */
 
 #endif /* DISPATCHER_INCLUDE */
 
