@@ -91,14 +91,23 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine-template (cfdecx) */
-    int cfdec(cchar *sp,int sl,int *rp) noex {
+    int cfdec(cchar *sp,int sl,int *rp)		noex {
 	return cfdecx(strtoxi,sp,sl,rp) ;
     }
-    int cfdec(cchar *sp,int sl,long *rp) noex {
+    int cfdec(cchar *sp,int sl,long *rp)	noex {
 	return cfdecx(strtoxl,sp,sl,rp) ;
     }
-    int cfdec(cchar *sp,int sl,longlong *rp) noex {
+    int cfdec(cchar *sp,int sl,longlong *rp)	noex {
 	return cfdecx(strtoxll,sp,sl,rp) ;
+    }
+    int cfdec(cchar *sp,int sl,uint *rp)	noex {
+	return cfdecx(strtoxui,sp,sl,rp) ;
+    }
+    int cfdec(cchar *sp,int sl,ulong *rp)	noex {
+	return cfdecx(strtoxul,sp,sl,rp) ;
+    }
+    int cfdec(cchar *sp,int sl,ulonglong *rp)	noex {
+	return cfdecx(strtoxull,sp,sl,rp) ;
     }
 } /* end namespace (libu) */
 
