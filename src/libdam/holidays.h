@@ -22,7 +22,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<time.h>		/* |time_t| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 #define	HOLIDAYS_MAGIC	0x63328183
@@ -36,17 +37,17 @@ struct holidays_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct holidays_query {
 	ushort		y ;
 	uchar		m, d ;
-} ;
+} ; /* end struct */
 
 struct holidays_cursor {
 	uint		chash ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct holidays_head {
 	cchar		*pr ;
@@ -64,7 +65,7 @@ struct holidays_head {
 	int		rtlen ;
 	int		itlen ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	HOLIDAYS	holidays ;
 typedef	HOLIDAYS_OBJ	holidays_obj ;
@@ -73,25 +74,25 @@ typedef	HOLIDAYS_CUR	holidays_cur ;
 
 EXTERNC_begin
 
-extern int holidays_open(holidays *,cchar *,int,cchar *) ;
-extern int holidays_count(holidays *) ;
-extern int holidays_curbegin(holidays *,holidays_cur *) ;
-extern int holidays_curend(holidays *,holidays_cur *) ;
+extern int holidays_open(holidays *,cchar *,int,cchar *) noex ;
+extern int holidays_count(holidays *) noex ;
+extern int holidays_curbegin(holidays *,holidays_cur *) noex ;
+extern int holidays_curend(holidays *,holidays_cur *) noex ;
 extern int holidays_fetchcite(holidays *,holidays_cite *,holidays_cur *,
-		char *,int) ;
+		char *,int) noex ;
 extern int holidays_fetchname(holidays *,cchar *,int,holidays_cur *,
-		holidays_cite *,char *,int) ;
+		holidays_cite *,char *,int) noex ;
 extern int holidays_enum(holidays *,holidays_cur *,
-		holidays_cite *,char *,int) ;
-extern int holidays_check(holidays *,time_t) ;
-extern int holidays_audit(holidays *) ;
-extern int holidays_close(holidays *) ;
+		holidays_cite *,char *,int) noex ;
+extern int holidays_check(holidays *,time_t) noex ;
+extern int holidays_audit(holidays *) noex ;
+extern int holidays_close(holidays *) noex ;
 
 #ifdef	COMMENT
-extern int holidays_lookday(holidays *,holidays_cur *,holidays_cite *) ;
-extern int holidays_lookname(holidays *,holidays_cur *,cchar *,int) ;
+extern int holidays_lookday(holidays *,holidays_cur *,holidays_cite *) noex ;
+extern int holidays_lookname(holidays *,holidays_cur *,cchar *,int) noex ;
 extern int holidays_read(holidays *,holidays_cur *,
-			holidays_cite *,char *,int) ;
+			holidays_cite *,char *,int) noex ;
 #endif
 
 EXTERNC_end
