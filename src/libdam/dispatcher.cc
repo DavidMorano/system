@@ -20,6 +20,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	dispatcher
+
   	Description:
 	This object is used as a helper to manage jobs that need
 	to be dispatched to parrallel theads.
@@ -34,45 +37,37 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<upt.h>
 #include	<localmisc.h>
 
 #include	"dispatcher.h"
-#include	"upt.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
 
 /* typedefs */
 
-typedef int (*workthr)(void *) ;
-typedef int (*callthr)(void *,void *) ;
+extern "C" {
+    typedef int (*workthr)(void *) noex ;
+    typedef int (*callthr)(void *,void *) noex ;
+}
 
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int,int *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getnprocessors(const char **,int) ;
-extern int	msleep(int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) noex ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern "C" {
+    extern int uc_nprocessors(int) noex ;
+}
 
 
 /* external variables */
@@ -83,25 +78,27 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int dispatcher_worker(DISPATCHER *) ;
+local int	dispatcher_worker(DISPATCHER *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int dispatcher_start(DISPATCHER *dop,int n,void *callsub,void *callarg)
-{
+int dispatcher_start(DISPATCHER *dop,int n,void *callsub,void *callarg) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGS
 	debugprintf("dispatcher_start: ent\n") ;
 #endif
 
-	if (dop == NULL) return SR_FAULT ;
-	if (callsub == NULL) return SR_FAULT ;
+	if (dop == nullptr) return SR_FAULT ;
+	if (callsub == nullptr) return SR_FAULT ;
 
 	memclear(dop) ;
 	dop->nthr = n ;
@@ -125,35 +122,39 @@ int dispatcher_start(DISPATCHER *dop,int n,void *callsub,void *callarg)
 	if (rs >= 0) {
 	    dop->nthr = n ;
 	    if ((rs = ciq_start(&dop->wq)) >= 0) {
-	        if ((rs = psem_create(&dop->ws,FALSE,0)) >= 0) {
-	            cint	size = szof(pthread_t) ;
+	        if ((rs = psem_create(&dop->ws,false,0)) >= 0) {
+	            cint	psz = szof(pthread_t) ;
+		    cint	vn = 10 ;
 	            cint	vo = (VECOBJ_OREUSE) ;
-	            if ((rs = vecobj_start(&dop->tids,size,10,vo)) >= 0) {
+	            if ((rs = vecobj_start(&dop->tids,psz,vn,vo)) >= 0) {
 	                pthread_t	tid, *tidp ;
 	                workthr		w = (workthr) dispatcher_worker ;
 	                int		i ;
-/* create threads to handle it */
+			/* create threads to handle it */
 	                for (i = 0 ; (rs >= 0) && (i < dop->nthr) ; i += 1) {
-	                    if ((rs = uptcreate(&tid,NULL,w,dop)) >= 0) {
+	                    if ((rs = uptcreate(&tid,np,w,dop)) >= 0) {
 	                        rs = vecobj_add(&dop->tids,&tid) ;
 	                    }
 	                } /* end for */
-/* all setup: but handle any errors */
+			/* all setup: but handle any errors */
 	                if (rs < 0) {
-	                    dop->f_exit = TRUE ;
+	                    dop->f_exit = true ;
 	                    for (i = 0 ; i < dop->nthr ; i += 1) {
 	                        psem_post(&dop->ws) ;
 	                    }
 	                    i = 0 ;
-	                    while (vecobj_get(&dop->tids,i,&tidp) >= 0) {
-	                        if (tidp != NULL) {
-	                            uptjoin(*tidp,NULL) ;
+			    void *vp ;
+	                    while (vecobj_get(&dop->tids,i,&vp) >= 0) {
+	                	tidp = (pthread_t *) vp ;
+				if (vp) {
+	                            uptjoin(*tidp,nullptr) ;
 	                        }
 	                        i += 1 ;
 	                    } /* end while */
-	                } /* end if (failure) */
-	                if (rs < 0)
+	                } /* end if (error) */
+	                if (rs < 0) {
 	                    vecobj_finish(&dop->tids) ;
+			}
 	            } /* end if (vecobj) */
 	            if (rs < 0)
 	                psem_destroy(&dop->ws) ;
@@ -167,9 +168,7 @@ int dispatcher_start(DISPATCHER *dop,int n,void *callsub,void *callarg)
 }
 /* end subroutine (dispatcher_start) */
 
-
-int dispatcher_finish(DISPATCHER *dop,int f_abort)
-{
+int dispatcher_finish(DISPATCHER *dop,int f_abort) noex {
 	pthread_t	*tidp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -180,10 +179,12 @@ int dispatcher_finish(DISPATCHER *dop,int f_abort)
 	debugprintf("dispatcher_finish: ent\n") ;
 #endif
 
-	if (dop == NULL) return SR_FAULT ;
+	if (dop == nullptr) return SR_FAULT ;
 
-	dop->f_done = TRUE ; /* broadcast that we are "done" */
-	if (f_abort) dop->f_exit = TRUE ;
+	dop->f_done = true ; /* broadcast that we are "done" */
+	if (f_abort) {
+	    dop->f_exit = true ;
+	}
 
 	for (i = 0 ; i < dop->nthr ; i += 1) {
 	    psem_post(&dop->ws) ;
@@ -193,8 +194,10 @@ int dispatcher_finish(DISPATCHER *dop,int f_abort)
 	debugprintf("dispatcher_finish: mid3 rs=%d\n",rs) ;
 #endif
 
-	for (i = 0 ; vecobj_get(&dop->tids,i,&tidp) >= 0 ; i += 1) {
-	    if (tidp != NULL) {
+	void *vp ;
+	for (i = 0 ; vecobj_get(&dop->tids,i,&vp) >= 0 ; i += 1) {
+	    tidp = (pthread_t *) vp ;
+	    if (vp){
 	        rs1 = uptjoin(*tidp,&trs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        if (rs >= 0) rs = trs ;
@@ -204,15 +207,18 @@ int dispatcher_finish(DISPATCHER *dop,int f_abort)
 #if	CF_DEBUGS
 	debugprintf("dispatcher_finish: mid5 rs=%d\n",rs) ;
 #endif
-
+	{
 	rs1 = vecobj_finish(&dop->tids) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = psem_destroy(&dop->ws) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = ciq_finish(&dop->wq) ;
 	if (rs >= 0) rs = rs1 ;
+	}
 
 #if	CF_DEBUGS
 	debugprintf("dispatcher_finish: ret rs=%d\n",rs) ;
@@ -222,13 +228,11 @@ int dispatcher_finish(DISPATCHER *dop,int f_abort)
 }
 /* end subroutine (dispatcher_finish) */
 
-
-int dispatcher_add(DISPATCHER *dop,void *wop)
-{
+int dispatcher_add(DISPATCHER *dop,void *wop) noex {
 	int		rs ;
 
-	if (dop == NULL) return SR_FAULT ;
-	if (wop == NULL) return SR_FAULT ;
+	if (dop == nullptr) return SR_FAULT ;
+	if (wop == nullptr) return SR_FAULT ;
 
 	if ((rs = ciq_ins(&dop->wq,wop)) >= 0) {
 	    rs = psem_post(&dop->ws) ;
@@ -241,10 +245,8 @@ int dispatcher_add(DISPATCHER *dop,void *wop)
 
 /* local subroutines */
 
-
 /* of course this runs in parallel threads */
-static int dispatcher_worker(DISPATCHER *dop)
-{
+local int dispatcher_worker(DISPATCHER *dop) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
