@@ -14,7 +14,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ids.h>
 #include	<vechand.h>
 
@@ -33,28 +34,28 @@ struct holidayer_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
-} ;
+} ; /* end struct */
 
 struct holidayer_cursor {
 	holidays_cur	hcur ;
 	holidays	*hop ;
 	uint		magic ;
 	uint		year ;
-} ;
+} ; /* end struct */
 
 struct holidayer_flags {
 	uint		hols:1 ;
-} ;
+} ; /* end struct */
 
 struct holidayer_head {
 	cchar		*pr ;
 	ids		id ;
 	vechand		hols ;
-	HOLIDAYER_FL	fl[ ;
+	HOLIDAYER_FL	fl ;
 	uint		magic ;
 	uint		year ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	HOLIDAYER	holidayer ;
 typedef	HOLIDAYER_FL	holidayer_fl ;
