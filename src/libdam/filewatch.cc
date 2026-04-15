@@ -68,7 +68,6 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -93,10 +92,10 @@ static int filewatch_ctor(filewatch *op,Args ... args) noex {
     	FILEWATCH	*hop = op ;
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->wfp = new(nothrow) bfile) != np) {
+	    if ((op->wfp = new(nothrow) bfile) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-bfile) */
 	} /* end if (non-null) */
@@ -105,9 +104,9 @@ static int filewatch_ctor(filewatch *op,Args ... args) noex {
 
 static int filewatch_dtor(filewatch *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->wfp) {
+	    if (op->wfp) ylikely {
 		delete op->wfp ;
 		op->wfp = nullptr ;
 	    }
@@ -118,7 +117,7 @@ static int filewatch_dtor(filewatch *op) noex {
 template<typename ... Args>
 static inline int filewatch_magic(filewatch *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == FILEWATCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -238,11 +237,11 @@ static int filewatch_checkrest(FW *,time_t) noex ;
 int filewatch_check(FW *op,time_t dt,BF *ofp) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
-	if (op && ofp) {
+	if (op && ofp) ylikely {
 	    if (dt < 0) dt = getustime ;
 	    if ((dt - op->lastcheck) >= op->interval) {
 		op->lastcheck = dt ;
-		if (ustat sb ; (rs = filewatch_stat(op,&sb)) >= 0) {
+		if (ustat sb ; (rs = filewatch_stat(op,&sb)) >= 0) ylikely {
 		    coff	fsize = sb.st_size ;
 		    custime	mtime = sb.st_mtime ;
 		    bool	fchanged = false ;
@@ -347,9 +346,9 @@ static int filewatch_readget(FW *,char *,int,time_t) noex ;
 int filewatch_readln(FW *op,time_t dt,char *lbuf,int llen) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
-	if (op && lbuf) {
+	if (op && lbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (llen >= 0) {
+	    if (llen >= 0) ylikely {
 		if (op->ll > 0) {
 		    rs = filewatch_readhave(op,lbuf,llen) ;
 		    wlen = rs ;
