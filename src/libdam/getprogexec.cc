@@ -34,10 +34,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sncpy.h>
 #include	<localmisc.h>
 
@@ -77,9 +77,10 @@
 int getprogexec(char *ebuf,int elen) noex {
 	int		rs = SR_FAULT ;
 	if (ebuf) {
+	    static cchar *en = getexecname() ;
 	    rs = SR_NOSYS ;
 	    ebuf[0] = '\0' ;
-	    if (cchar *en ; (en = getexecname()) != nullptr) {
+	    if (en) {
 	        rs = sncpy1(ebuf,elen,en) ;
 	    }
 	} /* end if (non-null) */
