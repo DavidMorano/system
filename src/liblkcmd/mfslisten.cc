@@ -1,12 +1,12 @@
-/* mfs-listen */
+/* mfs-listen SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* MFSERVE Listen */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
@@ -22,31 +22,31 @@
 
 /*******************************************************************************
 
-	This module contains the subroutines that manage program listening.
-
+  	Description:
+	This module contains the subroutines that manage program
+	listening.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<vecstr.h>
 #include	<poller.h>
+#include	<listenspec.h>
+#include	<prmkfname.h>		/* LIBPR */
 #include	<localmisc.h>
 
-#include	"listenspec.h"
-#include	"prmkfname.h"
 #include	"defs.h"
 #include	"mfsmain.h"
 #include	"mfslocinfo.h"
@@ -56,55 +56,44 @@
 
 /* local defines */
 
+#define	PI	proginfo
+
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	cfdecmfu(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) noex ;
+extern int	strlinelen(cchar *,int,int) noex ;
 #endif
 
-extern cchar	*getourenv(const char **,const char *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
 
-static int	mfslisten_acqmerge(PROGINFO *,MFSLISTEN_ACQ *) ;
-static int	mfslisten_acqpresent(PROGINFO *,MFSLISTEN_ACQ *,LISTENSPEC *) ;
-static int	mfslisten_acqtmpdel(PROGINFO *,MFSLISTEN_ACQ *,int) ;
-static int	mfslisten_acqfins(PROGINFO *,MFSLISTEN_ACQ *) ;
-static int	mfslisten_delmarked(PROGINFO *,POLLER *) ;
-static int	mfslisten_hit(PROGINFO *,LISTENSPEC **,int,int) ;
-static int	mfslisten_new(PROGINFO *,int,int) ;
-static int	mfslisten_fins(PROGINFO *) ;
+local int	mfslisten_acqmerge(PI *,MFSLISTEN_ACQ *) ;
+local int	mfslisten_acqpresent(PI *,MFSLISTEN_ACQ *,LISTENSPEC *) ;
+local int	mfslisten_acqtmpdel(PI *,MFSLISTEN_ACQ *,int) ;
+local int	mfslisten_acqfins(PI *,MFSLISTEN_ACQ *) ;
+local int	mfslisten_delmarked(PI *,POLLER *) ;
+local int	mfslisten_hit(PI *,LISTENSPEC **,int,int) ;
+local int	mfslisten_new(PI *,int,int) ;
+local int	mfslisten_fins(PI *) ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mfslisten_begin(PROGINFO *pip)
-{
+int mfslisten_begin(PI *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	if (! lip->open.listens) {
@@ -125,7 +114,7 @@ int mfslisten_begin(PROGINFO *pip)
 /* end subroutine (mfslisten_begin) */
 
 
-int mfslisten_end(PROGINFO *pip)
+int mfslisten_end(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -147,7 +136,7 @@ int mfslisten_end(PROGINFO *pip)
 /* end subroutine (mfslisten_end) */
 
 
-int mfslisten_acqbegin(PROGINFO *pip,MFSLISTEN_ACQ *acp)
+int mfslisten_acqbegin(PI *pip,MFSLISTEN_ACQ *acp)
 {
 	int		rs = SR_OK ;
 	if (pip->fl.daemon) {
@@ -166,7 +155,7 @@ int mfslisten_acqbegin(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 /* end subroutine (mfslisten_acqbegin) */
 
 
-int mfslisten_acqend(PROGINFO *pip,MFSLISTEN_ACQ *acp)
+int mfslisten_acqend(PI *pip,MFSLISTEN_ACQ *acp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -188,7 +177,7 @@ int mfslisten_acqend(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 /* end subroutine (mfslisten_acqend) */
 
 
-int mfslisten_acqadd(PROGINFO *pip,MFSLISTEN_ACQ *acp,cchar *ebuf,int elen)
+int mfslisten_acqadd(PI *pip,MFSLISTEN_ACQ *acp,cchar *ebuf,int elen)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -275,7 +264,7 @@ int mfslisten_acqadd(PROGINFO *pip,MFSLISTEN_ACQ *acp,cchar *ebuf,int elen)
 /* end subroutine (mfslisten_acqadd) */
 
 
-int mfslisten_maint(PROGINFO *pip,POLLER *pmp)
+int mfslisten_maint(PI *pip,POLLER *pmp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -340,7 +329,7 @@ int mfslisten_maint(PROGINFO *pip,POLLER *pmp)
 
 
 /* ATHSUSED */
-int mfslisten_poll(PROGINFO *pip,POLLER *pmp,int fd,int re)
+int mfslisten_poll(PI *pip,POLLER *pmp,int fd,int re)
 {
 	LOCINFO		*lip = pip->lip ;
 	LISTENSPEC	*lsp ;
@@ -381,7 +370,7 @@ int mfslisten_poll(PROGINFO *pip,POLLER *pmp,int fd,int re)
 /* end subroutine (mfslisten_poll) */
 
 
-int mfslisten_getinst(PROGINFO *pip,MFSLISTEN_INST *ip,int idx)
+int mfslisten_getinst(PI *pip,MFSLISTEN_INST *ip,int idx)
 {
 	LOCINFO		*lip = pip->lip ;
 	LISTENSPEC	*lsp ;
@@ -399,7 +388,7 @@ int mfslisten_getinst(PROGINFO *pip,MFSLISTEN_INST *ip,int idx)
 /* local subroutines */
 
 
-static int mfslisten_acqmerge(PROGINFO *pip,MFSLISTEN_ACQ *acp)
+local int mfslisten_acqmerge(PI *pip,MFSLISTEN_ACQ *acp)
 {
 	LOCINFO		*lip = pip->lip ;
 	VECOBJ		*tlp = &acp->tmps ;
@@ -462,7 +451,7 @@ static int mfslisten_acqmerge(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 /* end subroutine (mfslisten_acqmerge) */
 
 
-static int mfslisten_acqpresent(PROGINFO *pip,MFSLISTEN_ACQ *acp,
+local int mfslisten_acqpresent(PI *pip,MFSLISTEN_ACQ *acp,
 		LISTENSPEC *lsp)
 {
 	VECOBJ		*tlp = &acp->tmps ;
@@ -496,7 +485,7 @@ static int mfslisten_acqpresent(PROGINFO *pip,MFSLISTEN_ACQ *acp,
 /* end subroutine (mfslisten_acqpresent) */
 
 
-static int mfslisten_acqtmpdel(PROGINFO *pip,MFSLISTEN_ACQ *acp,int ei)
+local int mfslisten_acqtmpdel(PI *pip,MFSLISTEN_ACQ *acp,int ei)
 {
 	VECOBJ		*tlp = &acp->tmps ;
 	LISTENSPEC	*tlsp = NULL ;
@@ -519,7 +508,7 @@ static int mfslisten_acqtmpdel(PROGINFO *pip,MFSLISTEN_ACQ *acp,int ei)
 /* end subroutine (mfslisten_acqtmpdel) */
 
 
-static int mfslisten_acqfins(PROGINFO *pip,MFSLISTEN_ACQ *acp)
+local int mfslisten_acqfins(PI *pip,MFSLISTEN_ACQ *acp)
 {
 	VECOBJ		*tlp = &acp->tmps ;
 	LISTENSPEC	*lsp ;
@@ -541,7 +530,7 @@ static int mfslisten_acqfins(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 /* end subroutine (mfslisten_acqfins) */
 
 
-static int mfslisten_delmarked(PROGINFO *pip,POLLER *pmp)
+local int mfslisten_delmarked(PI *pip,POLLER *pmp)
 {
 	LOCINFO		*lip = pip->lip ;
 	LISTENSPEC	*lsp ;
@@ -579,7 +568,7 @@ static int mfslisten_delmarked(PROGINFO *pip,POLLER *pmp)
 
 
 /* ARGSUSED */
-static int mfslisten_hit(PROGINFO *pip,LISTENSPEC **rpp,int fd,int re)
+local int mfslisten_hit(PI *pip,LISTENSPEC **rpp,int fd,int re)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -611,7 +600,7 @@ static int mfslisten_hit(PROGINFO *pip,LISTENSPEC **rpp,int fd,int re)
 /* end subroutine (mfslisten_hit) */
 
 
-static int mfslisten_new(PROGINFO *pip,int stype,int fd)
+local int mfslisten_new(PI *pip,int stype,int fd)
 {
 	int		rs = SR_OK ;
 
@@ -635,9 +624,7 @@ static int mfslisten_new(PROGINFO *pip,int stype,int fd)
 }
 /* end subroutine (mfslisten_new) */
 
-
-static int mfslisten_fins(PROGINFO *pip)
-{
+local int mfslisten_fins(PI *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
