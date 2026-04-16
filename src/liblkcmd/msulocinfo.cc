@@ -56,7 +56,7 @@
 #include	<lfm.h>
 #include	<utmpacc.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<localmisc.h>
 
 #include	"msumain.h"
@@ -512,7 +512,7 @@ int locinfo_msfile(LOCINFO *lip)
 	        if (uid == euid) { /* we are not running SUID */
 		    if ((rs = proginfo_rootname(pip)) >= 0) {
 	                struct passwd	pw ;
-			const int	pwlen = getbufsize(getbufsize_pw) ;
+			const int	pwlen = getbufsize(bufsize_pw) ;
 	                char		*pwbuf ;
 			if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 			    cchar	*rn = pip->rootname ;
@@ -655,7 +655,7 @@ int locinfo_gidrootname(LOCINFO *lip)
 	if (lip->gid_rootname == 0) {
 	    if ((rs = proginfo_rootname(pip)) >= 0) {
 	        struct passwd	pw ;
-	        const int	pwlen = getbufsize(getbufsize_pw) ;
+	        const int	pwlen = getbufsize(bufsize_pw) ;
 	        char		*pwbuf ;
 	        lip->gid_rootname = 0 ; /* super (unwanted) default */
 		if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
