@@ -21,20 +21,17 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	TERMOUT_MAGIC	0x13f3c201
 #define	TERMOUT		struct termout_head
 #define	TERMOUT_FL	struct termout_flags
+#define	TERMOUT_MAGIC	0x13f3c201
 
 
 struct termout_flags {
 	uint		isterm:1 ;
-} ;
+} ; /* end struct */
 
 struct termout_head {
 	void		*cvp ;		/* character-vector-pointer */
@@ -44,7 +41,7 @@ struct termout_head {
 	uint		termattr ;	/* mask of terminal attributes */
 	int		ncols ;		/* terminal columns */
 	int		ncol ;
-} ;
+} ; /* end struct */
 
 typedef TERMOUT		termout ;
 typedef TERMOUT_FL	termout_fl ;
