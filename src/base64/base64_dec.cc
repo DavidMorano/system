@@ -1,11 +1,10 @@
-/* progdecode SUPPORT base64) */
+/* base64_dec SUPPORT base64) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* decode a file (encoded in BASE64) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time debugging */
 
 /* revision history:
@@ -25,10 +24,7 @@
 	This module does the work of decoding the BASE64 input.
 
 	Synopsis:
-	int progdecode(pip,ofp,name)
-	PROGINFO	*pip ;
-	bfile		*ofp ;
-	char		name[] ;
+	int progdecode(PI *pip,bfile *ofp,cchar *name) noex
 
 	Arguments:
 	pip		program information pointer
@@ -36,31 +32,22 @@
 	ofp		(BIO) output file pointer
 
 	Returns:
-	>=		OK
+	>=0		OK
 	<0		error (system-return)
 
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<csignal>
 #include	<cstddef>
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<ascii.h>
 #include	<bfile.h>
 #include	<strn.h>
-#include	<base64.h>
+#include	<b64decoder.h>
 #include	<localmisc.h>
-#include	<libdebug.h>		/* |LIBDEBUG| */
-
-#include	"b64decoder.h"
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
@@ -96,7 +83,7 @@ local int	procln(PI *,bfile *,b64decoder *,STATE *,cchar *,int) noex ;
 
 local int	bwritetext(bfile *,int *,cchar *,int) noex ;
 
-local int	haseol(cchar *,int) noex ;
+local int	coneol(cchar *,int) noex ;
 
 
 /* local variables */
@@ -116,7 +103,7 @@ int progdecode(PI *pip,bfile *ofp,cchar *name) noex {
 	int		wlen = 0 ;
 	char		*abuf ;
 
-	if (name == NULL) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
 	if (name[0] == '\0') return SR_INVALID ;
 
 	if (name[0] == '-') name = BFILE_STDIN ;
@@ -124,10 +111,9 @@ int progdecode(PI *pip,bfile *ofp,cchar *name) noex {
 	size += (llen+1) ;
 	size += (olen+1) ;
 	if ((rs = uc_malloc(size,&abuf)) >= 0) {
-	    b64decoder	d ;
 	    char	*lbuf = (abuf + 0) ;
 	    char	*obuf = (abuf + (llen+1)) ;
-	    if ((rs = b64decoder_start(&d)) >= 0) {
+	    if (b64decoder d ; (rs = b64decoder_start(&d)) >= 0) {
 	        bfile	ifile, *ifp = &ifile ;
 	        if ((rs = bopen(ifp,name,"r",0666)) >= 0) {
 	    	    STATE	cb ;
@@ -136,7 +122,7 @@ int progdecode(PI *pip,bfile *ofp,cchar *name) noex {
 	    	    cb.cr = 0 ;
 	            while ((rs = breadln(ifp,lbuf,llen)) > 0) {
 	                int	len = rs ;
-	                if (int el ; (el = haseol(lbuf,len)) > 0) {
+	                if (int el ; (el = coneol(lbuf,len)) > 0) {
 			    len -= el ;
 			}
 	                if (len > 0) {
@@ -197,10 +183,10 @@ local int bwritetext(bfile *ofp,int crp,cchar *sp,int sl) noex {
 	int		wlen = 0 ;
 	cchar		*cp ;
 
-	while ((cp = strnbrk(sp,sl,"\r\n")) != NULL) {
+	while ((cp = strnbrk(sp,sl,"\r\n")) != nullptr) {
 
 	    if (*crp && (*sp != '\n')) {
-	        *crp = FALSE ;
+	        *crp = false ;
 	        rs = bputc(ofp,'\r') ;
 	        wlen += rs ;
 	    } /* end if */
@@ -211,11 +197,11 @@ local int bwritetext(bfile *ofp,int crp,cchar *sp,int sl) noex {
 	    } /* end if */
 
 	    if ((rs >= 0) && (*cp == '\n')) {
-	        *crp = FALSE ;
+	        *crp = false ;
 	        rs = bputc(ofp,'\n') ;
 	        wlen += rs ;
 	    } else if (*cp == '\r') {
-	        *crp = TRUE ;
+	        *crp = true ;
 	    }
 
 	    sl -= ((cp + 1) - sp) ;
@@ -227,7 +213,7 @@ local int bwritetext(bfile *ofp,int crp,cchar *sp,int sl) noex {
 	if ((rs >= 0) && (sl > 0)) {
 
 	    if (*crp) {
-	        *crp = FALSE ;
+	        *crp = false ;
 	        rs = bputc(ofp,'\r') ;
 	        wlen += rs ;
 	    } /* end if */
@@ -243,18 +229,18 @@ local int bwritetext(bfile *ofp,int crp,cchar *sp,int sl) noex {
 }
 /* end subroutine (bwritetext) */
 
-local int haseol(cchar *lp,int ll) noex {
+local int coneol(cchar *lp,int ll) noex {
 	int		el = 0 ;
-	if ((ll > 0) && (lp[-1] == CH_NL)) {
+	if ((ll > 0) && (lp[ll -1] == CH_NL)) {
 	    ll -= 1 ;
 	    el += 1 ;
 	}
-	if ((ll > 0) && (lp[-1] == CH_CR)) {
+	if ((ll > 0) && (lp[ll -1] == CH_CR)) {
 	    ll -= 1 ;
 	    el += 1 ;
 	}
 	return el ;
 }
-/* end subroutine (haseol) */
+/* end subroutine (coneol) */
 
 
