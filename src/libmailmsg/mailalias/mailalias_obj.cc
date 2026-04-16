@@ -54,7 +54,6 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>		/* Memory Management */
-#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
