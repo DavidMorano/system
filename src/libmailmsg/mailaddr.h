@@ -22,15 +22,15 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<ematypes.h>
+#include	<mailaddrtypes.h>
 
 
 /* mail-address types */
 #define	MAILADDRTYPE_NOHOST	-1
-#define	MAILADDRTYPE_LOCAL	ematype_local
-#define	MAILADDRTYPE_UUCP	ematype_uucp
-#define	MAILADDRTYPE_ARPA	ematype_arpa
-#define	MAILADDRTYPE_ARPAROUTE	ematype_arparoute
+#define	MAILADDRTYPE_LOCAL	mailaddrtype_local
+#define	MAILADDRTYPE_UUCP	mailaddrtype_uucp
+#define	MAILADDRTYPE_ARPA	mailaddrtype_arpa
+#define	MAILADDRTYPE_ARPAROUTE	mailaddrtype_arparoute
 /* special token to indicate a local address */
 #define	MAILADDR_LOCALHOST	"*LOCAL*"
 #define	LOCALHOSTPART		"*LOCAL*"
@@ -39,8 +39,8 @@
 EXTERNC_begin
 
 extern int mailaddrparse(cchar *,int,char *,char *) noex ;
-extern int mailaddrjoin(char *,int,cchar *,cchar *,int) noex ;
-extern int mailaddrarpa(char *,int,cchar *,cchar *,int) noex ;
+extern int mailaddrjoin(char *,int,cchar *,cchar *,mailaddrtypes) noex ;
+extern int mailaddrarpa(char *,int,cchar *,cchar *,mailaddrtypes) noex ;
 
 EXTERNC_end
 
