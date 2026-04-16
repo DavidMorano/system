@@ -1,6 +1,9 @@
-/* mfserve */
+/* mfserve HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* support for loadable modules for MFSERVE */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,12 +16,17 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MFSERVE_INCLUDE
-#define	MFSERVE_INCLUDE	1
+#define	MFSERVE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
 
 
 /* object defines */
