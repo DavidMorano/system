@@ -52,12 +52,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstrings>		/* |strncasecmp(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<bit>			/* |rotl(3c++)| + |rotr(3c++)| */
 #include	<cstddef>		/* |nullptr_t| */
