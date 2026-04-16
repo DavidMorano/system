@@ -1,4 +1,4 @@
-/* bbnewsrc */
+/* bbnewsrc SUPPORT */
 /* charset=ISO8859-1 */
 /* version %I% last-modified %G% */
 
@@ -24,6 +24,9 @@
 
 /*******************************************************************************
 
+  	Name:
+
+	Description:
 	This object module accesses the user currency file. The
 	user currency file is usually named '.bbnewsrc' and is
 	normally located in the user's home directory.  Having all
@@ -36,19 +39,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<ctime>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibsubs.h>
 #include	<strn.h>
 #include	<char.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"bbnewsrc.h"
 
@@ -72,21 +76,6 @@
 
 /* external subroutines */
 
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	siskipwhite(const char *,int) ;
-extern int	cfdecul(const char *,int,ulong *) ;
-extern int	dater_getbbtime(DATER *,const char *,int,time_t *) ;
-extern int	isdigitlatin(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* external variables */
 
@@ -96,20 +85,21 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	bbnewsrc_ent(BBNEWSRC *,BBNEWSRC_ENT *,const char *,int) ;
+static int	bbnewsrc_ent(BBNEWSRC *,BBNEWSRC_ENT *,cchar *,int) ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bbnewsrc_open(BBNEWSRC *ungp,cchar ufname[],int f_readtime)
-{
+int bbnewsrc_open(BBNEWSRC *ungp,cchar ufname[],int f_readtime) noex {
 	int		rs ;
 	int		f_opened = FALSE ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS
 	debugprintf("bbnewsrc_open: ent\n") ;
@@ -238,7 +228,7 @@ int bbnewsrc_read(BBNEWSRC *ungp,BBNEWSRC_ENT *ep)
 	    lbuf[len] = '\0' ;
 
 	    {
-		const char	*lp ;
+		cchar	*lp ;
 		int		ll ;
 		if ((ll = sfshrink(lbuf,len,&lp)) > 0) {
 		    if (lp[0] != '#') {
@@ -401,7 +391,6 @@ int bbnewsrc_rewind(BBNEWSRC *ungp)
 
 /* local subroutines */
 
-
 static int bbnewsrc_ent(BBNEWSRC *ungp,BBNEWSRC_ENT *ep,cchar lbuf[],int llen)
 {
 	int		rs = SR_OK ;
@@ -409,9 +398,9 @@ static int bbnewsrc_ent(BBNEWSRC *ungp,BBNEWSRC_ENT *ep,cchar lbuf[],int llen)
 	int		cl ;
 	int		ngl = -1 ;
 	int		dsl = -1 ;
-	const char	*tp, *cp ;
-	const char	*ngp = NULL ;
-	const char	*dsp = NULL ;
+	cchar	*tp, *cp ;
+	cchar	*ngp = NULL ;
+	cchar	*dsp = NULL ;
 
 #if	CF_DEBUGS
 	debugprintf("bbnewsrc_ent: ent\n") ;
