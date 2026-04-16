@@ -1,20 +1,20 @@
-/* msu-adjunct */
+/* msu-adjunct SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* MSU adjunct subroutines */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_IPCPID	0		/* do not do this stuff */
 
-
 /* revision history:
 
 	= 2011-01-25, David A­D­ Morano
-	This code was separated out from the main code (in 'pcsmain.c') due to
-	conflicts over including different versions of the system socket
-	structures.
+	This code was separated out from the main code (in 'pcsmain.c')
+	due to conflicts over including different versions of the
+	system socket structures.
 
 */
 
@@ -22,14 +22,15 @@
 
 /*******************************************************************************
 
-	This is adjunct code to the main MSU program.
+  	Name:
+	msu-adjunct
 
+	Description:
+	This is adjunct code to the main MSU program.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -38,13 +39,14 @@
 #include	<sys/msg.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<poll.h>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<netdb.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<logfile.h>
 #include	<msfile.h>
 #include	<sockaddress.h>
@@ -104,36 +106,6 @@
 
 
 /* external subroutines */
-
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	listenusd(const char *,mode_t,int) ;
-extern int	isNotValid(int) ;
-extern int	isBadMsg(int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
