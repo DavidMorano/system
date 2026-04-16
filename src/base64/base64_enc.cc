@@ -1,4 +1,4 @@
-/* progencode SUPPORT (base64) */
+/* bas64_enc SUPPORT (base64) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -28,16 +28,8 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<csignal>
 #include	<cstddef>
 #include	<cstdlib>
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
