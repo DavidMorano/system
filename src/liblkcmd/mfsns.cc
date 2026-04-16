@@ -1,4 +1,6 @@
-/* mfs-ns */
+/* mfs-ns SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* MFSNS object-load management */
 /* version %I% last-modified %G% */
@@ -6,7 +8,6 @@
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_LOOKOTHER	0		/* look elsewhere */
-
 
 /* revision history:
 
@@ -22,26 +23,23 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that provides
-	access to the MFSNS object (which is dynamically loaded).
-
+  	Description:
+	This module implements an interface (a trivial one) that
+	provides access to the MFSNS object (which is dynamically
+	loaded).
 
 *******************************************************************************/
 
-
-#define	MFSNS_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
@@ -67,16 +65,11 @@
 
 /* forward references */
 
-static int	mfsns_objloadbegin(MFSNS *,const char *,const char *) ;
+static int	mfsns_objloadbegin(MFSNS *,cchar *,cchar *) ;
 static int	mfsns_objloadend(MFSNS *) ;
-static int	mfsns_loadcalls(MFSNS *,const char *) ;
+static int	mfsns_loadcalls(MFSNS *,cchar *) ;
 
 static int	isrequired(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -84,7 +77,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* local variables */
 
-static const char	*subs[] = {
+static cchar	*subs[] = {
 	"open",
 	"setopts",
 	"get",
@@ -115,7 +108,7 @@ enum subs {
 int mfsns_open(MFSNS *op,cchar *pr)
 {
 	int		rs ;
-	const char	*objname = MFSNS_OBJNAME ;
+	cchar	*objname = MFSNS_OBJNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pr == NULL) return SR_FAULT ;
@@ -331,9 +324,9 @@ static int mfsns_objloadbegin(MFSNS *op,cchar *pr,cchar *objname)
 	    } /* end for */
 
 	    if (rs >= 0) {
-		const char	**sv ;
+		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*modbname = MFSNS_MODBNAME ;
+	            cchar	*modbname = MFSNS_MODBNAME ;
 #if	CF_LOOKOTHER
 	            const int	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
 #else
@@ -432,7 +425,7 @@ static int mfsns_loadcalls(MFSNS *op,cchar *objname)
 
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *)) snp ;
+			(int (*)(void *,cchar *)) snp ;
 		    break ;
 
 		case sub_setopts:
