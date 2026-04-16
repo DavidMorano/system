@@ -27,9 +27,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstrings>		/* for |strcasecmp(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
