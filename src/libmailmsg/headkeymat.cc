@@ -57,10 +57,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strncasecmp(3c)| */
+#include	<cstrings>		/* |strncasecmp(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<six.h>			/* |sichr(3uc)| */
@@ -121,7 +120,7 @@ int headkeymat(cchar *keyp,cchar *hbuf,int µhlen) noex {
 		            if (strncasecmp(hbuf,keyp,keyl) == 0) {
 			        idx = (si + 1) ;
 		            }
-		        } /* end if (sfshrink) */
+		        } /* end if (rmblk) */
 	            } /* end if (had ':') */
 		} /* end if (basic requirement) */
 	    } /* end if (getlenstr) */
