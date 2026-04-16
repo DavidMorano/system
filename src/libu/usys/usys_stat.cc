@@ -28,7 +28,6 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
