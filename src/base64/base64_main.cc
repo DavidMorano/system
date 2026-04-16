@@ -194,7 +194,6 @@ int main(int argc,mainv argv,mainv envv) {
 /* initialize */
 
 	pip->verboselevel = 1 ;
-
 	pip->fl.encode = true ;
 
 /* start parsing the arguments */
