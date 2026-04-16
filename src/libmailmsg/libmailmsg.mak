@@ -40,6 +40,8 @@ MODS=
 LIBS= -luc -lu
 
 
+MAT= mailaddrtypes.h
+
 OBJ00= mailmsgx.o mailmsg.o msgentry.o mailbox.o
 OBJ01= mailmsgmatx.o mailmsghdrx.o
 OBJ02= retpath.o envmat.o lkmail.o
@@ -250,7 +252,7 @@ mhcom.o:		mhcom.cc	mhcom.h			$(INCS)
 mcmsg.o:		mcmsg.cc	mcmsg.hh		$(INCS)
 comsatmsg.o:		comsatmsg.cc	comsatmsg.h		$(INCS)
 csro.o:			csro.cc		csro.h			$(INCS)
-emainfo.o:		emainfo.cc	emainfo.h		$(INCS)
+emainfo.o:		emainfo.cc	emainfo.h $(MAT)	$(INCS)
 mimetypes.o:		mimetypes.cc	mimetypes.h		$(INCS)
 
 outema.o:		outema.cc outema.h			$(INCS)
@@ -265,7 +267,7 @@ filer_mailsup.o:	filer_mailsup.cc			$(INCS)
 
 envmat.o:		envmat.cc	envmat.h		$(INCS)
 headkeymat.o:		headkeymat.cc	headkeymat.h		$(INCS)
-mailaddr.o:		mailaddr.cc	mailaddr.h		$(INCS)
+mailaddr.o:		mailaddr.cc	mailaddr.h $(MAT)	$(INCS)
 ourmsginfo.o:		ourmsginfo.cc	ourmsginfo.h		$(INCS)
 
 
