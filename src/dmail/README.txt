@@ -1,8 +1,8 @@
-DMAIL
+DMAIL (Deliver-Mail)
 
-This is a mail delivery program similar to '/usr/bin/mail -d'.  It is very
-close to its semantics so programs like '/usr/lib/sendmail' can call it as if
-they had called '/usr/bin/mail -d'!
+This is a mail delivery program similar to '/usr/bin/mail -d'.  It
+is very close to its semantics so programs like '/usr/lib/sendmail'
+can call it as if they had called '/usr/bin/mail -d'!
 
 Synopsis:
 $ dmail < <input>.msg <recipient(s)> [...] [-d] [-f <fromaddr>] [-V]
