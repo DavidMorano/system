@@ -45,6 +45,7 @@
 #include	<unistd.h>
 #include	<ctime>
 #include	<csignal>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
