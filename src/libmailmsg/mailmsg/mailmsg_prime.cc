@@ -74,7 +74,6 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
