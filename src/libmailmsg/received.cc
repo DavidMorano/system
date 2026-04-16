@@ -46,7 +46,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* |strlen(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -139,7 +138,7 @@ constexpr bool		f_fieldword = CF_FIELDWORD ;
 
 /* exported variables */
 
-cpcchar	received_keys[] = {
+constexpr cpcchar	received_keys[] = {
 	"from",
 	"by",
 	"with",
