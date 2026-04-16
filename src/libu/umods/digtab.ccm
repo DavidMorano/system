@@ -78,13 +78,13 @@ export module digtab ;
 
 /* local structures */
 
-export {
-    constexpr int	maxbase = MAXBASE ;
-}
+constexpr int		div100 = 100 ;
 
 struct digtaber {
+    static constexpr int	maxbase = MAXBASE ;
     uchar	dig[maxbase] ;
-    consteval digtaber() noex {
+    char	dig100[div100][2] ;
+    consteval void mkdig() noex {
     	int	i = 0 ;
 	for (int j = 0 ; j < 10 ; j += 1) {
 	    dig[i++] = uchar('0' + j) ;
@@ -97,7 +97,17 @@ struct digtaber {
 	}
 	dig[i++] = uchar('Ø') ;
 	dig[i++] = uchar('ø') ;
-    } ; /* end ctor (digtaber) */
+    } ; /* end method (mkdig) */
+    consteval void mkdig100() noex {
+	for (int i = 0 ; i < div100 ; i += 1) {
+	    dig100[i][0] = char((i % 10) + '0') ;
+	    dig100[i][1] = char((i / 10) + '0') ;
+	} /* end for */
+    } ; /* end method (mkdig100) */
+    consteval digtaber() noex {
+	mkdig() ;
+	mkdig100() ;
+    } ; /* end ctor */
     constexpr char operator [] (cint) const noex ;
 } ; /* end struct (digtaber) */
 
@@ -111,27 +121,29 @@ struct digtaber {
 /* exported variables */
 
 export {
-    constexpr digtaber	digtab ;
+    extern const digtaber	digtab ;
 }
+
+constexpr digtaber	digtab ;
 
 
 /* exported subroutines */
 
 export {
     constexpr char digtab_enc(int v) noex {
-	cint idx = (v % maxbase) ;
+	cint idx = (v % digtab.maxbase) ;
 	return char(digtab.dig[idx]) ;
     } /* end subroutine (digtab_get) */
     constexpr char digtaber::operator [] (cint v) const noex {
 	cint idx = (v % maxbase) ;
-	return dig[idx] ;
+	return char(dig[idx]) ;
     } /* end method (digtaber::operator) */
 } /* end export */
 
 export {
     extern "C" {
         char getdig(int v) noex {
-	    cint idx = (v % maxbase) ;
+	    cint idx = (v % digtab.maxbase) ;
 	    return char(digtab.dig[idx]) ;
         } /* end subroutine (getdig) */
     } /* end extern (C) */
