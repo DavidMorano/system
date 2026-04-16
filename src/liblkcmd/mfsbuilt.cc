@@ -1,11 +1,11 @@
-/* mfs-built */
+/* mfs-built SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* built-in services */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -21,29 +21,25 @@
 
 /*******************************************************************************
 
-        This module is responsible for providing some built-in services for the
-        MFSBUILT server.
-
+  	Description:
+	This module is responsible for providing some built-in
+	services for the MFSBUILT server.
 
 *******************************************************************************/
 
-
-#define	MFSBUILT_MASTER		0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
+#include	<ctime>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
 #include	<dlfcn.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<fsdir.h>
 #include	<localmisc.h>
@@ -51,6 +47,9 @@
 #include	"mfsbuilt.h"
 #include	"mfserve.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -63,30 +62,20 @@
 
 /* type-defs */
 
-typedef int	(*objstart_t)(void *,cchar *,void *,cchar **,cchar **) ;
-typedef int	(*objcheck_t)(void *) ;
-typedef int	(*objabort_t)(void *) ;
-typedef int	(*objfinish_t)(void *) ;
+extern "C" {
+    typedef int	(*objstart_t)(void *,cchar *,void *,cchar **,cchar **) noex ;
+    typedef int	(*objcheck_t)(void *) noex ;
+    typedef int	(*objabort_t)(void *) noex ;
+    typedef int	(*objfinish_t)(void *) noex ;
+}
 
 
 /* external subroutines */
-
-extern int	pathadd(char *,int,cchar *) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	chmods(const char *,mode_t) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	hasNotDots(cchar *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -110,49 +99,47 @@ struct mfsbuilt_ent {
 
 /* forward references */
 
-static int	mfsbuilt_entprune(MFSBUILT *) ;
-static int	mfsbuilt_entload(MFSBUILT *) ;
-static int	mfsbuilt_ent(MFSBUILT *,cchar *,int,cchar *,int) ;
-static int	mfsbuilt_fins(MFSBUILT *) ;
+local int	mfsbuilt_entprune(MFSBUILT *) noex ;
+local int	mfsbuilt_entload(MFSBUILT *) noex ;
+local int	mfsbuilt_ent(MFSBUILT *,cchar *,int,cchar *,int) noex ;
+local int	mfsbuilt_fins(MFSBUILT *) noex ;
 
-static int	ent_start(ENT *,cchar *,int,cchar *,int) ;
-static int	ent_getsvc(ENT *,cchar **) ;
-static int	ent_loadbegin(ENT *,MFSERVE_INFO *) ;
-static int	ent_loadend(ENT *) ;
-static int	ent_loadinfo(ENT *) ;
-static int	ent_getinfo(ENT *,MFSERVE_INFO *) ;
-static int	ent_isnotloaded(ENT *) ;
-static int	ent_finish(ENT *) ;
+local int	ent_start(ENT *,cchar *,int,cchar *,int) noex ;
+local int	ent_getsvc(ENT *,cchar **) noex ;
+local int	ent_loadbegin(ENT *,MFSERVE_INFO *) noex ;
+local int	ent_loadend(ENT *) noex ;
+local int	ent_loadinfo(ENT *) noex ;
+local int	ent_getinfo(ENT *,MFSERVE_INFO *) noex ;
+local int	ent_isnotloaded(ENT *) noex ;
+local int	ent_finish(ENT *) noex ;
 
 #ifdef	COMMENT
-static int	mkfile(cchar *,cchar **) ;
+local int	mkfile(cchar *,cchar **) noex ;
 #endif /* COMMENT */
 
-static int	hasFileType(cchar *,int) ;
+local int	hasFileType(cchar *,int) noex ;
 
 
 /* local variables */
 
-static cchar	*exts[] = {
+constexpr cpcchar	exts[] = {
 	"so",
 	"o",
-	NULL
+	nullptr
 } ;
 
-static cchar	*methods[] = {
+constexpr cpcchar	methods[] = {
 	"start",
 	"check",
 	"abort",
 	"finish",
-	NULL
+	nullptr
 } ;
 
 
 /* exported subroutines */
 
-
-int mfsbuilt_start(MFSBUILT *op,cchar *dname)
-{
+int mfsbuilt_start(MFSBUILT *op,cchar *dname) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*cp ;
@@ -161,20 +148,20 @@ int mfsbuilt_start(MFSBUILT *op,cchar *dname)
 	debugprintf("mfsbuilt_start: ent dn=%s\n",dname) ;
 #endif
 
-	if (op == NULL) return SR_FAULT ;
-	if (dname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (dname == nullptr) return SR_FAULT ;
 
-	memset(op,0,sizeof(MFSBUILT)) ;
+	memclear(op) ;
 
 	if ((rs = uc_mallocstrw(dname,-1,&cp)) >= 0) {
-	    HDB		*dbp = &op->db ;
-	    const int	n = MFSBUILT_NENTS ;
-	    const int	at = FALSE ;
+	    hdb		*dbp = &op->db ;
+	    cint	n = MFSBUILT_NENTS ;
+	    cint	at = false ;
 	    op->dname = cp ;
-	    if ((rs = hdb_start(dbp,n,at,NULL,NULL)) >= 0) {
+	    if ((rs = hdb_start(dbp,n,at,nullptr,nullptr)) >= 0) {
 		if ((rs = mfsbuilt_entload(op)) >= 0) {
 		    c = rs ;
-		    op->ti_check = time(NULL) ;
+		    op->ti_check = time(nullptr) ;
 		    op->magic = MFSBUILT_MAGIC ;
 		}
 		if (rs < 0) {
@@ -184,7 +171,7 @@ int mfsbuilt_start(MFSBUILT *op,cchar *dname)
 	    } /* end if (hdb_start) */
 	    if (rs < 0) {
 		uc_free(op->dname) ;
-		op->dname = NULL ;
+		op->dname = nullptr ;
 	    }
 	} /* end if (m-a) */
 
@@ -196,10 +183,8 @@ int mfsbuilt_start(MFSBUILT *op,cchar *dname)
 }
 /* end subroutine (mfsbuilt_start) */
 
-
-int mfsbuilt_finish(MFSBUILT *op)
-{
-	HDB		*dbp ;
+int mfsbuilt_finish(MFSBUILT *op) noex {
+	hdb		*dbp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -207,20 +192,22 @@ int mfsbuilt_finish(MFSBUILT *op)
 	debugprintf("mfsbuilt_finish: ent\n") ;
 #endif
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 
-	rs1 = mfsbuilt_fins(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	dbp = &op->db ;
-	rs1 = hdb_finish(dbp) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->dname != NULL) {
+	{
+	    rs1 = mfsbuilt_fins(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    dbp = &op->db ;
+	    rs1 = hdb_finish(dbp) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	if (op->dname) {
 	    rs1 = uc_free(op->dname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dname = NULL ;
+	    op->dname = nullptr ;
 	}
 
 #if	CF_DEBUGS
@@ -232,26 +219,24 @@ int mfsbuilt_finish(MFSBUILT *op)
 }
 /* end subroutine (mfsbuilt_finish) */
 
-
 /* 0=no, 1=yes */
-int mfsbuilt_have(MFSBUILT *op,cchar *sp,int sl)
-{
-	HDB		*dbp ;
-	HDB_DATUM	k, v ;
+int mfsbuilt_have(MFSBUILT *op,cchar *sp,int sl) noex {
+	hdb		*dbp ;
+	hdb_datum	k, v ;
 	int		rs ;
 	int		f = 0 ;
 #if	CF_DEBUGS
 	debugprintf("mfsbuilt_have: ent s=%r\n",sp,sl) ;
 #endif
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	k.buf = sp ;
 	k.len = sl ;
-	if ((rs = hdb_fetch(dbp,k,NULL,&v)) >= 0) {
-	    f = TRUE ;
+	if ((rs = hdb_fetch(dbp,k,nullptr,&v)) >= 0) {
+	    f = true ;
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	}
@@ -262,27 +247,25 @@ int mfsbuilt_have(MFSBUILT *op,cchar *sp,int sl)
 }
 /* end subroutine (mfsbuilt_have) */
 
-
 /* 0=no, 1=yes */
-int mfsbuilt_loadbegin(MFSBUILT *op,MFSERVE_INFO *ip,cchar *sp,int sl)
-{
-	HDB		*dbp ;
-	HDB_DATUM	k, v ;
+int mfsbuilt_loadbegin(MFSBUILT *op,MFSERVE_INFO *ip,cchar *sp,int sl) noex {
+	hdb		*dbp ;
+	hdb_datum	k, v ;
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 #if	CF_DEBUGS
 	    debugprintf("mfsbuilt_loadbegin: ent s=%r\n",sp,sl) ;
 #endif
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	k.buf = sp ;
 	k.len = sl ;
-	if ((rs = hdb_fetch(dbp,k,NULL,&v)) >= 0) {
+	if ((rs = hdb_fetch(dbp,k,nullptr,&v)) >= 0) {
 	    ENT		*ep = (ENT *) v.buf ;
-	    f = TRUE ;
+	    f = true ;
 	    rs = ent_loadbegin(ep,ip) ;
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
@@ -294,23 +277,21 @@ int mfsbuilt_loadbegin(MFSBUILT *op,MFSERVE_INFO *ip,cchar *sp,int sl)
 }
 /* end subroutine (mfsbuilt_loadbegin) */
 
-
-int mfsbuilt_loadend(MFSBUILT *op,cchar *sp,int sl)
-{
-	HDB		*dbp ;
-	HDB_DATUM	k, v ;
+int mfsbuilt_loadend(MFSBUILT *op,cchar *sp,int sl) noex {
+	hdb		*dbp ;
+	hdb_datum	k, v ;
 	int		rs ;
-	int		f = FALSE ;
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	int		f = false ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	k.buf = sp ;
 	k.len = sl ;
-	if ((rs = hdb_fetch(dbp,k,NULL,&v)) >= 0) {
+	if ((rs = hdb_fetch(dbp,k,nullptr,&v)) >= 0) {
 	    ENT	*ep = (ENT *) v.buf ;
-	    f = TRUE ;
+	    f = true ;
 	    rs = ent_loadend(ep) ;
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
@@ -319,28 +300,24 @@ int mfsbuilt_loadend(MFSBUILT *op,cchar *sp,int sl)
 }
 /* end subroutine (mfsbuilt_loadend) */
 
-
-int mfsbuilt_count(MFSBUILT *op)
-{
-	HDB		*dbp ;
-	if (op == NULL) return SR_FAULT ;
+int mfsbuilt_count(MFSBUILT *op) noex {
+	hdb		*dbp ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
 	return hdb_count(dbp) ;
 }
 /* end subroutine (mfsbuilt_count) */
 
-
-int mfsbuilt_curbegin(MFSBUILT *op,MFSBUILT_CUR *curp)
-{
-	HDB		*dbp ;
-	HDB_CUR		*hcp ;
+int mfsbuilt_curbegin(MFSBUILT *op,MFSBUILT_CUR *curp) noex {
+	hdb		*dbp ;
+	hdb_cur		*hcp ;
 	int		rs ;
 #if	CF_DEBUGS
 	debugprintf("mfsbuilt_curbegin: ent\n") ;
 #endif
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
 	hcp = &curp->hcur ;
@@ -354,18 +331,16 @@ int mfsbuilt_curbegin(MFSBUILT *op,MFSBUILT_CUR *curp)
 }
 /* end subroutine (mfsbuilt_curbegin) */
 
-
-int mfsbuilt_curend(MFSBUILT *op,MFSBUILT_CUR *curp)
-{
-	HDB		*dbp ;
-	HDB_CUR		*hcp ;
+int mfsbuilt_curend(MFSBUILT *op,MFSBUILT_CUR *curp) noex {
+	hdb		*dbp ;
+	hdb_cur		*hcp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 #if	CF_DEBUGS
 	debugprintf("mfsbuilt_curend: ent\n") ;
 #endif
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
@@ -380,21 +355,19 @@ int mfsbuilt_curend(MFSBUILT *op,MFSBUILT_CUR *curp)
 }
 /* end subroutine (mfsbuilt_curend) */
 
-
-int mfsbuilt_enum(MFSBUILT *op,MFSBUILT_CUR *curp,char *rbuf,int rlen)
-{
-	HDB		*dbp ;
-	HDB_CUR		*hcp ;
-	HDB_DATUM	k, v ;
+int mfsbuilt_enum(MFSBUILT *op,MFSBUILT_CUR *curp,char *rbuf,int rlen) noex {
+	hdb		*dbp ;
+	hdb_cur		*hcp ;
+	hdb_datum	k, v ;
 	int		rs ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
 	hcp = &curp->hcur ;
 	if ((rs = hdb_curenum(dbp,hcp,&k,&v)) >= 0) {
-	    const int	sl = k.len ;
+	    cint	sl = k.len ;
 	    cchar	*sp = (cchar *) k.buf ;
 	    rs = snwcpy(rbuf,rlen,sp,sl) ;
 	} else if (isNotPresent(rs)) {
@@ -407,22 +380,20 @@ int mfsbuilt_enum(MFSBUILT *op,MFSBUILT_CUR *curp,char *rbuf,int rlen)
 }
 /* end subroutine (mfsbuilt_enum) */
 
-
-int mfsbuilt_strsize(MFSBUILT *op)
-{
-	HDB		*dbp ;
-	HDB_CUR		hcur ;
-	HDB_DATUM	k, v ;
+int mfsbuilt_strsize(MFSBUILT *op) noex {
+	hdb		*dbp ;
+	hdb_cur		hcur ;
+	hdb_datum	k, v ;
 	int		rs ;
 	int		rs1 ;
 	int		size = 0 ;
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
 	if ((rs = hdb_curbegin(dbp,&hcur)) >= 0) {
 	    while ((rs1 = hdb_curenum(dbp,&hcur,&k,&v)) >= 0) {
 	        cchar	*sp = (cchar *) k.buf ;
-		size += (strlen(sp)+1) ;
+		size += (lenstr(sp)+1) ;
 	    } /* end while */
 	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	    rs1 = hdb_curend(dbp,&hcur) ;
@@ -432,19 +403,17 @@ int mfsbuilt_strsize(MFSBUILT *op)
 }
 /* end subroutine (mfsbuilt_strsize) */
 
-
-int mfsbuilt_strvec(MFSBUILT *op,cchar **va,char *rbuf,int rlen)
-{
-	HDB		*dbp ;
-	HDB_CUR		hcur ;
-	HDB_DATUM	k, v ;
+int mfsbuilt_strvec(MFSBUILT *op,cchar **va,char *rbuf,int rlen) noex {
+	hdb		*dbp ;
+	hdb_cur		hcur ;
+	hdb_datum	k, v ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	int		rl = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if (va == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (va == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
 	if ((rs = hdb_curbegin(dbp,&hcur)) >= 0) {
@@ -457,7 +426,7 @@ int mfsbuilt_strvec(MFSBUILT *op,cchar **va,char *rbuf,int rlen)
 		bp += (rs+1) ;
 		if (rs < 0) break ;
 	    } /* end while */
-	    va[c] = NULL ;
+	    va[c] = nullptr ;
 	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	    rs1 = hdb_curend(dbp,&hcur) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -466,15 +435,13 @@ int mfsbuilt_strvec(MFSBUILT *op,cchar **va,char *rbuf,int rlen)
 }
 /* end subroutine (mfsbuilt_strvec) */
 
-
-int mfsbuilt_check(MFSBUILT *op,time_t dt)
-{
-	const int	to = MFSBUILT_INTCHECK ;
+int mfsbuilt_check(MFSBUILT *op,time_t dt) noex {
+	cint	to = MFSBUILT_INTCHECK ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
-	if (op == NULL) return SR_FAULT ;
+	int		f = false ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
-	if (dt == 0) dt = time(NULL) ;
+	if (dt == 0) dt = time(nullptr) ;
 	if ((dt - op->ti_check) >= to) {
 	    op->ti_check = dt ;
 	    if ((rs = mfsbuilt_entprune(op)) >= 0) {
@@ -488,12 +455,10 @@ int mfsbuilt_check(MFSBUILT *op,time_t dt)
 
 /* private subroutines */
 
-
-static int mfsbuilt_entprune(MFSBUILT *op)
-{
-	HDB		*dbp = &op->db ;
-	HDB_DATUM	k, v ;
-	HDB_CUR		c ;
+local int mfsbuilt_entprune(MFSBUILT *op) noex {
+	hdb		*dbp = &op->db ;
+	hdb_datum	k, v ;
+	hdb_cur		c ;
 	int		rs ;
 	int		rs1 ;
 	int		rs2 ;
@@ -504,11 +469,11 @@ static int mfsbuilt_entprune(MFSBUILT *op)
 
 	if ((rs = hdb_curbegin(dbp,&c)) >= 0) {
 	    ENT		*ep ;
-	    const int	rsn = SR_NOTFOUND ;
+	    cint	rsn = SR_NOTFOUND ;
 	    int		i ;
 	    for (i = 0 ; (rs2 = hdb_curenum(dbp,&c,&k,&v)) >= 0 ; i += 1) {
 		ep = (ENT *) v.buf ;
-		if (ep != NULL) {
+		if (ep != nullptr) {
 		    if ((rs = ent_isnotloaded(ep)) > 0) {
 		        rs1 = hdb_curdel(dbp,&c,0) ;
 		        if (rs >= 0) rs = rs1 ;
@@ -532,11 +497,9 @@ static int mfsbuilt_entprune(MFSBUILT *op)
 }
 /* end subroutine (mfsbuilt_entprune) */
 
-
-static int mfsbuilt_entload(MFSBUILT *op)
-{
-	FSDIR		d ;
-	FSDIR_ENT	de ;
+local int mfsbuilt_entload(MFSBUILT *op) noex {
+	fsdir		d ;
+	fsdir_ent	de ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -546,7 +509,7 @@ static int mfsbuilt_entload(MFSBUILT *op)
 	if ((rs = fsdir_open(&d,op->dname)) >= 0) {
 	    char	pbuf[MAXPATHLEN+1] ;
 	    if ((rs = mkpath1(pbuf,op->dname)) >= 0) {
-	        const int	plen = rs ;
+	        cint	plen = rs ;
 	        while ((rs = fsdir_read(&d,&de)) > 0) {
 		    cchar	*ep = de.name ;
 		    int		el = rs ;
@@ -572,12 +535,10 @@ static int mfsbuilt_entload(MFSBUILT *op)
 }
 /* end subroutine (mfsbuilt_entload) */
 
-
-static int mfsbuilt_ent(MFSBUILT *op,cchar *sp,int sl,cchar *pp,int pl)
-{
-	HDB		*dbp = &op->db ;
-	HDB_DATUM	k, v ;
-	const int	rsn = SR_NOTFOUND ;
+local int mfsbuilt_ent(MFSBUILT *op,cchar *sp,int sl,cchar *pp,int pl) noex {
+	hdb		*dbp = &op->db ;
+	hdb_datum	k, v ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		c = 0 ;
 #if	CF_DEBUGS
@@ -586,11 +547,11 @@ static int mfsbuilt_ent(MFSBUILT *op,cchar *sp,int sl,cchar *pp,int pl)
 #endif
 	k.buf = sp ;
 	k.len = sl ;
-	if ((rs = hdb_fetch(dbp,k,NULL,&v)) == rsn) {
-	    const int	am = (R_OK|X_OK) ;
+	if ((rs = hdb_fetch(dbp,k,nullptr,&v)) == rsn) {
+	    cint	am = (R_OK|X_OK) ;
 	    if ((rs = uc_access(pp,am)) >= 0) {
 	        ENT		*ep ;
-	        const int	esize = sizeof(ENT) ;
+	        cint	esize = sizeof(ENT) ;
 	        if ((rs = uc_malloc(esize,&ep)) >= 0) {
 	            if ((rs = ent_start(ep,sp,sl,pp,pl)) >= 0) {
 		        cchar	*svc ;
@@ -620,12 +581,10 @@ static int mfsbuilt_ent(MFSBUILT *op,cchar *sp,int sl,cchar *pp,int pl)
 }
 /* end subroutine (mfsbuilt_ent) */
 
-
-static int mfsbuilt_fins(MFSBUILT *op)
-{
-	HDB		*dbp = &op->db ;
-	HDB_DATUM	k, v ;
-	HDB_CUR		c ;
+local int mfsbuilt_fins(MFSBUILT *op) noex {
+	hdb		*dbp = &op->db ;
+	hdb_datum	k, v ;
+	hdb_cur		c ;
 	int		rs ;
 	int		rs1 ;
 	int		rs2 ;
@@ -636,11 +595,11 @@ static int mfsbuilt_fins(MFSBUILT *op)
 
 	if ((rs = hdb_curbegin(dbp,&c)) >= 0) {
 	    ENT		*ep ;
-	    const int	rsn = SR_NOTFOUND ;
+	    cint	rsn = SR_NOTFOUND ;
 	    int		i ;
 	    for (i = 0 ; (rs2 = hdb_curenum(dbp,&c,&k,&v)) >= 0 ; i += 1) {
 		ep = (ENT *) v.buf ;
-		if (ep != NULL) {
+		if (ep != nullptr) {
 #ifdef	OPTIONAL
 		    rs1 = hdb_curdel(dbp,&c,0) ; /* why is this needed? */
 		    if (rs >= 0) rs = rs1 ;
@@ -667,18 +626,16 @@ static int mfsbuilt_fins(MFSBUILT *op)
 }
 /* end subroutine (mfsbuilt_fins) */
 
-
-static int ent_start(ENT *ep,cchar *sp,int sl,cchar *fp,int fl)
-{
+local int ent_start(ENT *ep,cchar *sp,int sl,cchar *fp,int fl) noex {
 	int		rs ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	char		*bp ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (fl < 0) fl = strlen(fp) ;
-	size += (sl+1) ;
-	size += (fl+1) ;
-	memset(ep,0,sizeof(ENT)) ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	if (sl < 0) sl = lenstr(sp) ;
+	if (fl < 0) fl = lenstr(fp) ;
+	sz += (sl+1) ;
+	sz += (fl+1) ;
+	memclear(ep) ;
+	if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	    ep->a = bp ;
 	    ep->svc = bp ;
 	    bp = (strwcpy(bp,sp,sl)+1) ;
@@ -689,55 +646,43 @@ static int ent_start(ENT *ep,cchar *sp,int sl,cchar *fp,int fl)
 }
 /* end subroutine (ent_start) */
 
-
-static int ent_finish(ENT *ep)
-{
+local int ent_finish(ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (ep->sop != NULL) {
+	if (ep->sop) {
 	    dlclose(ep->sop) ;
-	    ep->sop = NULL ;
+	    ep->sop = nullptr ;
 	    ep->rcount = 0 ;
 	}
-
-	if (ep->a != NULL) {
+	if (ep->a) {
 	    rs1 = uc_free(ep->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->a = NULL ;
+	    ep->a = nullptr ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("ent_finish: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (ent_finish) */
 
-
-static int ent_getsvc(ENT *ep,cchar **rpp)
-{
-	int		rs ;
-	rs = strlen(ep->svc) ;
-	if (rpp != NULL) *rpp = ep->svc ;
+local int ent_getsvc(ENT *ep,cchar **rpp) noex {
+	int		rs = lenstr(ep->svc) ;
+	if (rpp) {
+	    *rpp = ep->svc ;
+	}
 	return rs ;
 }
 /* end subroutine (ent_getsvc) */
 
-
 /* ARGSUSED */
-static int ent_loadbegin(ENT *ep,MFSERVE_INFO *ip)
-{
+local int ent_loadbegin(ENT *ep,MFSERVE_INFO *ip) noex {
 	int		rs = SR_OK ;
 #if	CF_DEBUGS
 	debugprintf("ent_loadbegin: ent\n") ;
 	debugprintf("ent_loadbegin: fn=%s\n",ep->fname) ;
 #endif
-	if (ep->sop == NULL) {
-	    const int	m = RTLD_LAZY ;
+	if (ep->sop == nullptr) {
+	    cint	m = RTLD_LAZY ;
 	    void	*sop ;
-	    if ((sop = dlopen(ep->fname,m)) != NULL) {
+	    if ((sop = dlopen(ep->fname,m)) != nullptr) {
 		ep->sop = sop ;
 		ep->rcount = 1 ;
 		if ((rs = ent_loadinfo(ep)) >= 0) {
@@ -764,41 +709,37 @@ static int ent_loadbegin(ENT *ep,MFSERVE_INFO *ip)
 }
 /* end subroutine (ent_loadbegin) */
 
-
-static int ent_loadend(ENT *ep)
-{
+local int ent_loadend(ENT *ep) noex {
 	int		rs = SR_OK ;
-	if ((ep->sop != NULL) && (ep->rcount > 0)) {
+	if ((ep->sop != nullptr) && (ep->rcount > 0)) {
 	    ep->rcount -= 1 ;
 	    if (ep->rcount == 0) {
 		dlclose(ep->sop) ;
-		ep->sop = NULL ;
+		ep->sop = nullptr ;
 	    }
 	}
 	return rs ;
 }
 /* end subroutine (ent_loadend) */
 
-
-static int ent_loadinfo(ENT *ep)
-{
+local int ent_loadinfo(ENT *ep) noex {
 	int		rs = SR_OK ;
 	cchar		*svc = ep->svc ;
 	void		*p ;
 #if	CF_DEBUGS
 	debugprintf("ent_loadinfo: ent svc=%s\n",svc) ;
 #endif
-	if ((p = dlsym(ep->sop,svc)) != NULL) {
+	if ((p = dlsym(ep->sop,svc)) != nullptr) {
 	    MFSERVE_MOD	*mp = (MFSERVE_MOD *) p ;
 	    int		i ;
 	    ep->info.objsize = mp->objsize ;
-	    for (i = 0 ; (rs >= 0) && (methods[i] != NULL) ; i += 1) {
-	    	const int	slen = SYMBUFLEN ;
+	    for (i = 0 ; (rs >= 0) && (methods[i] != nullptr) ; i += 1) {
+	    	cint	slen = SYMBUFLEN ;
 		cchar		*m = methods[i] ;
 	    	char		sbuf[SYMBUFLEN+1] ;
 		if ((rs = sncpy3(sbuf,slen,svc,"_",m)) >= 0) {
 	    	    caddr_t	symp ;
-		    if ((symp = (caddr_t) dlsym(ep->sop,sbuf)) != NULL) {
+		    if ((symp = (caddr_t) dlsym(ep->sop,sbuf)) != nullptr) {
 #if	CF_DEBUGS
 	    		debugprintf("ent_loadinfo: sn=%s symp{%p}\n",
 				sbuf,symp) ;
@@ -838,31 +779,25 @@ static int ent_loadinfo(ENT *ep)
 }
 /* end subroutine (ent_loadinfo) */
 
-
-static int ent_getinfo(ENT *ep,MFSERVE_INFO *ip)
-{
+local int ent_getinfo(ENT *ep,MFSERVE_INFO *ip) noex {
 	int		rs = SR_OK ;
 	if (ep->info.objsize != 0) {
 	    *ip = ep->info ;
 	    rs = 1 ;
 	} else {
-	    memset(ip,0,sizeof(MFSERVE_INFO)) ;
+	    memclear(ip) ;
 	}
 	return rs ;
 }
 /* end subroutine (ent_getinfo) */
 
-
-static int ent_isnotloaded(ENT *ep)
-{
+local int ent_isnotloaded(ENT *ep) noex {
 	return (ep->info.objsize == 0) ;
 }
 /* end subrouine (ent_isnotloaded) */
 
-
 #ifdef	COMMENT
-static int mkfile(cchar *template,cchar **rpp)
-{
+local int mkfile(cchar *template,cchar **rpp) noex {
 	int		rs ;
 	int		tl = 0 ;
 	char		tbuf[MAXPATHLEN + 1] ;
@@ -873,7 +808,7 @@ static int mkfile(cchar *template,cchar **rpp)
 	    rs = uc_mallocstrw(tbuf,tl,rpp) ;
 	    if (rs < 0) {
 	        u_unlink(tbuf) ;
-		*rpp = NULL ;
+		*rpp = nullptr ;
 	    } /* end if (error-recovery) */
 	} /* end if (mktmpfile) */
 
@@ -882,15 +817,12 @@ static int mkfile(cchar *template,cchar **rpp)
 /* end subroutines (mkfile) */
 #endif /* COMMENT */
 
-
-static int hasFileType(cchar *sp,int sl)
-{
-	cchar		*tp ;
-	if (sl < 0) sl = strlen(sp) ;
-	if ((tp = strnchr(sp,sl,'.')) != NULL) {
-	    cchar	*ep = (tp+1) ;
-	    const int	el = ((sp+sl)-(tp+1)) ;
-	    sl = (tp-sp) ;
+local int hasFileType(cchar *sp,int sl) noex {
+	if (sl < 0) sl = lenstr(sp) ;
+	if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) {
+	    cchar	*ep = (tp + 1) ;
+	    cint	el = intconv((sp+sl)-(tp+1)) ;
+	    sl = intconv(tp - sp) ;
 	    if (matstr(exts,ep,el) < 0) {
 		sl = 0 ;
 	    }
