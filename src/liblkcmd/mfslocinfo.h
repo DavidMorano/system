@@ -41,7 +41,7 @@
 
 #include	"mfsmain.h"
 #include	"mfsns.h"
-#include	"defs.h"		/* for PROGINFO */
+#include	"liblkcmd_defs.h"		/* for PROGINFO */
 
 
 #define	LOCINFO		struct locinfo
