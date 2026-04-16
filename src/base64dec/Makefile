@@ -40,14 +40,14 @@ MODS +=
 LIBS += -lf -luo -lu
 
 
-DEPS_MAIN += base128.o
+DEPS_MAIN += b64decoder.o base64.o nzeros.o
 
 OBJ0= base64dec_main.o
-OBJ1= base64.o b64decoder.o
-OBJ2= bufos.o
-OBJ3= 
+OBJ1= base64dec_dec.o
+OBJ2= b64decoder.o base64.o nzeros.o
+OBJ3= bufos.o bufslide.o binchunk.o
 
-OBJ= obj0.o obj1.o obj2.o
+OBJ= obj0.o obj1.o obj2.o obj3.o
 
 
 INCDIRS=
@@ -172,10 +172,15 @@ bufos.o:		bufos.dir
 bufos.dir:
 	makesubdir $@
 
-base64.o:		base64.cc	base64.h		$(INCS)
-base128.o:		base128.cc	base128.h		$(INCS)
-b64decoder.o:		b64decoder.cc	b64decoder.h		$(INCS)
+# BUFSLIDE
+bufslide.o:		bufslide.dir
+bufslide.dir:
+	makesubdir $@
 
-nzeros.o:		nzeros.ccm
+base64.o:		base64.cc	base64.h
+base128.o:		base128.cc	base128.h
+b64decoder.o:		b64decoder.cc	b64decoder.h
+nzeros.o:		nzeros.ccm	nzeros.h
+binchunk.o:		binchunk.cc	binchunk.hh
 
 
