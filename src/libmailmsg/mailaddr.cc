@@ -29,16 +29,16 @@
 	language) was on the first host.
 
 	Synopsis:
-	int mailaddrparse(dp,dl,mahost,malocal)
-	int mailaddrjoin(dp,dl,mahost,malocal,type)
-	int mailaddrarpa(dp,dl,mahost,malocal,type)
+	int mailaddrparse(dp,dl,mahost,malocal) noex
+	int mailaddrjoin(dp,dl,mahost,malocal,type) noex
+	int mailaddrarpa(dp,dl,mahost,malocal,type) noex
 
 	Arguments:
 	dp		string buffer containing route address
 	dl		length of string buffer
-	mahost	supplied buffer to receive mahost
-	malocal	supplied buffer to receive malocal
-	type		type of address desired
+	mahost		supplied buffer to receive mahost
+	malocal		supplied buffer to receive malocal
+	type		type of address desired (of type ¯mailaddrtypes')
 
 	Returns:
 	0		local address
@@ -60,7 +60,7 @@
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<sncpyx.h>
 #include	<snwcpy.h>
-#include	<ematypes.h>
+#include	<mailaddrtypes.h>
 #include	<localmisc.h>
 
 #include	"mailaddr.h"
@@ -76,6 +76,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* local typedefs */
+
+typedef mailaddrtypes	mat ;
 
 
 /* external subroutines */
@@ -128,7 +130,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	        if (cc *cp1 ; (cp1 = strnchr(sp,sl,'@')) != np) {
 	            if (cc *cp2 ; (cp2 = strnchr(sp,sl,':')) != np) {
 		        /* ARPAnet route address */
-	                t = MAILADDRTYPE_ARPAROUTE ;
+	                t = mailaddrtype_arparoute ;
 	                if ((tp = strnchr(sp,sl,',')) != np) {
 	                    if (rs >= 0) {
 			        cint	vlen = intconv(tp - (cp1 + 1)) ;
@@ -150,7 +152,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	                } /* end if */
 	            } else {
 		        /* normal ARPAnet address */
-	                t = MAILADDRTYPE_ARPA ;
+	                t = mailaddrtype_arpa ;
 	                if (rs >= 0) {
 	                    rs = sncpy1(mahost,hnl,(cp1 + 1)) ;
 		        }
@@ -160,7 +162,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 		        }
 	            } /* end if */
 	        } else if ((tp = strnrchr(sp,sl,'!')) != nullptr) {
-	            t = MAILADDRTYPE_UUCP ;
+	            t = mailaddrtype_uucp ;
 	            if (rs >= 0) {
 			cint	tl = intconv(tp - sp) ;
 	                rs = snwcpy(mahost,hnl,sp,tl) ;
@@ -170,7 +172,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	            }
 	        } else {
 	           /* local */
-	            t = MAILADDRTYPE_LOCAL ;
+	            t = mailaddrtype_local ;
 	            if (rs >= 0) {
 	                rs = sncpy(mahost,hnl,localhostpart) ;
 	            }
@@ -193,7 +195,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 /* end subroutine (mailaddrparse) */
 
 /* put an address back together as it was ORIGINALLY */
-int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
+int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,mat type) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dp && mahost && malocal) {
@@ -202,26 +204,26 @@ int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 		storebuf	b(dp,dl) ;
 		rs = SR_OK ;
 	        switch (type) {
-	        case MAILADDRTYPE_LOCAL:
+	        case mailaddrtype_local:
 	  	    {
 	                rs = b.str(malocal) ;
 		    }
 	            break ;
-	        case MAILADDRTYPE_UUCP:
+	        case mailaddrtype_uucp:
 	            if ((rs = b.str(mahost)) >= 0) {
 	                if ((rs = b.chr('!')) >= 0) {
 	                    rs = b.str(malocal) ;
 			}
 		    }
 	            break ;
-	        case MAILADDRTYPE_ARPA:
+	        case mailaddrtype_arpa:
 	            if ((rs = b.str(malocal)) >= 0) {
 	                if ((rs = b.chr('@')) >= 0) {
 	                    rs = b.str(mahost) ;
 			}
 		    }
 	            break ;
-	        case MAILADDRTYPE_ARPAROUTE:
+	        case mailaddrtype_arparoute:
 		    {
 	                rs = b.strw("@",1) ;
 		    }
@@ -251,7 +253,7 @@ int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 /* end subroutine (mailaddjoin) */
 
 /* put an address back together as its ARPA form only */
-int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
+int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,mat type) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dp && mahost && malocal) {
@@ -260,12 +262,12 @@ int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 		storebuf	b(dp,dl) ;
 	        rs = SR_OK ;
 	        switch (type) {
-	        case MAILADDRTYPE_LOCAL:
+	        case mailaddrtype_local:
 	            if (rs >= 0) {
 	                rs = b.str(malocal) ;
 		    }
 	            break ;
-	        case MAILADDRTYPE_UUCP:
+	        case mailaddrtype_uucp:
 	            if (rs >= 0) {
 	                rs = b.str(malocal) ;
 		    }
@@ -276,7 +278,7 @@ int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 	                rs = b.str(mahost) ;
 		    }
 	            break ;
-	        case MAILADDRTYPE_ARPA:
+	        case mailaddrtype_arpa:
 	            if (rs >= 0) {
 	                rs = b.str(malocal) ;
 		    }
@@ -287,7 +289,7 @@ int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
 	                rs = b.str(mahost) ;
 		    }
 	            break ;
-	        case MAILADDRTYPE_ARPAROUTE:
+	        case mailaddrtype_arparoute:
 		    if (rs >= 0) {
 	                rs = b.strw("@",1) ;
 		    }
