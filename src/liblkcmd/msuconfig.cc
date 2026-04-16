@@ -77,32 +77,6 @@ typedef const char	cchar ;
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(const char *,int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
 
 /* external variables */
 
@@ -112,8 +86,8 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int	config_reader(CONFIG *cfp) ;
-static int	config_addcooks(CONFIG *) ;
+local int	config_reader(CONFIG *cfp) ;
+local int	config_addcooks(CONFIG *) ;
 
 
 /* local variables */
@@ -281,7 +255,7 @@ int config_check(CONFIG *cfp)
 	pip = cfp->pip ;
 	if (cfp->fl.p) {
 	    const time_t	dt = pip->daytime ;
-	    const int		intcheck = cfp->intcheck ;
+	    cint		intcheck = cfp->intcheck ;
 	    int			f_check = TRUE ;
 
 	    f_check = f_check && (intcheck > 0) ;
@@ -330,7 +304,7 @@ int config_read(CONFIG *cfp)
 /* private subroutines */
 
 
-static int config_reader(CONFIG *cfp)
+local int config_reader(CONFIG *cfp)
 {
 	PROGINFO	*pip = cfp->pip ;
 	LOCINFO		*lip ;
@@ -346,8 +320,8 @@ static int config_reader(CONFIG *cfp)
 
 	lip = pip->lip ;
 	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
-	    const int	plen = PBUFLEN ;
-	    const int	elen = EBUFLEN ;
+	    cint	plen = PBUFLEN ;
+	    cint	elen = EBUFLEN ;
 	    int		rs1 ;
 	    int		pi ;
 	    int		kl ;
@@ -434,7 +408,7 @@ static int config_reader(CONFIG *cfp)
 	        case param_pidfile:
 	            if (! pip->final.pidfname) {
 	                pip->have.pidfname = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    RUNDNAME,pip->nodename,PIDFNAME) ;
 	                ccp = pip->pidfname ;
 	                if ((ccp == NULL) ||
@@ -448,7 +422,7 @@ static int config_reader(CONFIG *cfp)
 	        case param_msfile:
 	            if (! lip->final.msfname) {
 	                lip->have.msfname = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    MSDNAME,MSFNAME,"") ;
 	                ccp = lip->msfname ;
 	                if ((ccp == NULL) ||
@@ -462,7 +436,7 @@ static int config_reader(CONFIG *cfp)
 	        case param_logfile:
 	            if (! pip->final.logprog) {
 	                pip->have.logprog = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    LOGDNAME,pip->searchname,"") ;
 	                ccp = pip->lfname ;
 	                if ((ccp == NULL) ||
@@ -477,7 +451,7 @@ static int config_reader(CONFIG *cfp)
 	            if (! lip->final.reqfname) {
 	                lip->have.reqfname = TRUE ;
 #ifdef	COMMENT
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    LOGDNAME,pip->searchname,"") ;
 #else			    
 	                rs1 = mkpath1w(tbuf,ebuf,el) ;
@@ -521,7 +495,7 @@ static int config_reader(CONFIG *cfp)
 /* end subroutine (config_reader) */
 
 
-static int config_addcooks(CONFIG *cfp)
+local int config_addcooks(CONFIG *cfp)
 {
 	PROGINFO	*pip = cfp->pip ;
 	EXPCOOK		*ckp = &cfp->cooks ;
@@ -531,7 +505,7 @@ static int config_addcooks(CONFIG *cfp)
 
 	if (pip == NULL) return SR_FAULT ;
 	for (i = 0 ; keys[i] ; i += 1) {
-	    const int	kch = MKCHAR(keys[i]) ;
+	    cint	kch = MKCHAR(keys[i]) ;
 	    int		vl = -1 ;
   	    cchar	*vp = NULL ;
 	    switch (kch) {
@@ -549,7 +523,7 @@ static int config_addcooks(CONFIG *cfp)
 		break ;
 	    case 'H':
 		{
-		    const int	hlen = MAXHOSTNAMELEN ;
+		    cint	hlen = MAXHOSTNAMELEN ;
 		    cchar	*nn = pip->domainname ;
 		    cchar	*dn = pip->nodename ;
 		    char	hbuf[MAXHOSTNAMELEN+1] ;
