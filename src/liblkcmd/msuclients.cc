@@ -36,10 +36,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
-#include	<cstdlib>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<vecstr.h>
 #include	<vechand.h>
@@ -47,6 +48,7 @@
 #include	<sockaddress.h>
 #include	<spawnproc.h>
 #include	<ctdec.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"msuclients.h"
@@ -99,26 +101,9 @@
 
 /* external subroutines */
 
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -129,15 +114,15 @@ static char	**environ ;
 /* local structures */
 
 union conmsg {
-	struct cmsghdr	cm ;
+	CMSGHDR		cm ;
 	char		cmbuf[CMSGBUFLEN + 1] ;
 } ;
 
 struct ipcmsginfo {
-	struct msghdr	ipcmsg ;
-	struct iovec	vecs[NIOVECS] ;
+	MSGHDR		ipcmsg ;
+	IOVEC		vecs[NIOVECS] ;
 	union conmsg	ipcconbuf ;
-	SOCKADDRESS	ipcfrom ;
+	sockaddress	ipcfrom ;
 	int		ipcmsglen ;
 	int		ns ;
 	char		ipcbuf[IPCBUFLEN + 1] ;
@@ -151,10 +136,10 @@ struct envmgr {
 
 /* forward references */
 
-static int	msuclients_setbegin(MSUCLIENTS *,const char *,const char *) ;
+static int	msuclients_setbegin(MSUCLIENTS *,cchar *,cchar *) ;
 static int	msuclients_setend(MSUCLIENTS *) ;
-static int	msuclients_pr(MSUCLIENTS *,const char *) ;
-static int	msuclients_reqfname(MSUCLIENTS *,const char *) ;
+static int	msuclients_pr(MSUCLIENTS *,cchar *) ;
+static int	msuclients_reqfname(MSUCLIENTS *,cchar *) ;
 static int	msuclients_tmpourdname(MSUCLIENTS *) ;
 static int	msuclients_bind(MSUCLIENTS *,int) ;
 static int	msuclients_connect(MSUCLIENTS *) ;
@@ -163,20 +148,20 @@ static int	msuclients_istatus(MSUCLIENTS *) ;
 static int	msuclients_spawn(MSUCLIENTS *) ;
 
 static int	envmgr_start(ENVMGR *) ;
-static int	envmgr_set(ENVMGR *,const char *,const char *,int) ;
-static int	envmgr_getvec(ENVMGR *,const char ***) ;
+static int	envmgr_set(ENVMGR *,cchar *,cchar *,int) ;
+static int	envmgr_getvec(ENVMGR *,cchar ***) ;
 static int	envmgr_finish(ENVMGR *) ;
 
 static int	ipcmsginfo_init(struct ipcmsginfo *,struct sockaddr *,int) ;
 
 #ifdef	COMMENT
-static int	venvcmp(const void **,const void **) ;
+static int	venvcmp(cvoid **,cvoid **) ;
 #endif
 
 
 /* local variables */
 
-static const char	*prbins[] = {
+constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
 } ;
@@ -184,7 +169,7 @@ static const char	*prbins[] = {
 
 /* exported variables */
 
-MSUCLIENTS_OBJ	msuclients = {
+const MSUCLIENTS_OBJ	msuclients = {
 	"msuclients",
 	sizeof(MSUCLIENTS)
 } ;
@@ -192,11 +177,10 @@ MSUCLIENTS_OBJ	msuclients = {
 
 /* exported subroutines */
 
-
 int msuclients_open(op,pr,reqfname,to)
 MSUCLIENTS	*op ;
-const char	*pr ;
-const char	*reqfname ;
+cchar	*pr ;
+cchar	*reqfname ;
 int		to ;
 {
 	int		rs ;
@@ -387,9 +371,9 @@ static int msuclients_reqfname(MSUCLIENTS *op,cchar *reqfname)
 {
 	int		rs = SR_OK ;
 	int		pl = -1 ;
-	const char	*tmpdname = TMPDNAME ;
-	const char	*facname = MSUCLIENTS_FACNAME ;
-	const char	*reqname = MSUCLIENTS_REQNAME ;
+	cchar	*tmpdname = TMPDNAME ;
+	cchar	*facname = MSUCLIENTS_FACNAME ;
+	cchar	*reqname = MSUCLIENTS_REQNAME ;
 	cchar		*cp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
@@ -436,8 +420,8 @@ static int msuclients_tmpourdname(MSUCLIENTS *op)
 	int		rs = SR_OK ;
 	int		cl ;
 	int		i = 0 ;
-	const char	*tmpdname = TMPDNAME ;
-	const char	*facname = MSUCLIENTS_FACNAME ;
+	cchar	*tmpdname = TMPDNAME ;
+	cchar	*facname = MSUCLIENTS_FACNAME ;
 	cchar		*cp ;
 	char		tmpourdname[MAXPATHLEN + 1] ;
 
@@ -602,7 +586,7 @@ static int msuclients_connect(MSUCLIENTS *op)
 #if	CF_DEBUGS
 	   { 
 		int	mc = COLUMNS ;
-		const char	*s = (const char *) &op->srv ;
+		cchar	*s = (cchar *) &op->srv ;
 	        debugprintf("msuclients_connect: srvlen=%d\n",rs) ;
 	        debugprinthexblock("msuclients_connect:",mc,s,op->srvlen) ;
 	    }
@@ -712,9 +696,9 @@ static int msuclients_spawn(MSUCLIENTS *op)
 	int		cs ;
 	int		i ;
 	int		to_run = TO_RUN ;
-	const char	*av[6] ;
-	const char	**ev ;
-	const char	*argz = MSUCLIENTS_FACNAME ;
+	cchar	*av[6] ;
+	cchar	**ev ;
+	cchar	*argz = MSUCLIENTS_FACNAME ;
 	char		progfname[MAXPATHLEN + 1] ;
 	char		optbuf[OPTBUFLEN + 1] ;
 
@@ -828,7 +812,7 @@ static int envmgr_finish(ENVMGR *emp)
 /* end subroutine (envmgr_finish) */
 
 
-static int envmgr_set(ENVMGR *emp,const char *kp,const char *vp,int vl)
+static int envmgr_set(ENVMGR *emp,cchar *kp,cchar *vp,int vl)
 {
 	vecstr		*esp = &emp->envstrs ;
 	vechand		*elp = &emp->envlist ;
@@ -838,8 +822,8 @@ static int envmgr_set(ENVMGR *emp,const char *kp,const char *vp,int vl)
 	    cchar	*ep ;
 	    if ((rs = vecstr_get(esp,i,&ep)) >= 0) {
 		const int	nrs = SR_NOTFOUND ;
-	        int (*venvcmp)(const void **,const void **) ;
-	        venvcmp = (int (*)(const void **,const void **)) vstrkeycmp ;
+	        int (*venvcmp)(cvoid **,cvoid **) ;
+	        venvcmp = (int (*)(cvoid **,cvoid **)) vstrkeycmp ;
 	        if ((rs = vechand_search(elp,kp,venvcmp,NULL)) >= 0) {
 	            vechand_del(elp,rs) ;
 	        } else if (rs == nrs) {
@@ -856,7 +840,7 @@ static int envmgr_set(ENVMGR *emp,const char *kp,const char *vp,int vl)
 /* end subroutine (envmgr_set) */
 
 
-static int envmgr_getvec(ENVMGR *emp,const char ***rppp)
+static int envmgr_getvec(ENVMGR *emp,cchar ***rppp)
 {
 	int		rs ;
 
@@ -893,7 +877,7 @@ static int ipcmsginfo_init(IPCMSGINFO *mip,SOCKADDR *sap,int sal)
 	    mip->ipcmsg.msg_name = (struct sockaddr *) &mip->ipcfrom ;
 	}
 
-	mip->ipcmsg.msg_namelen = (sal > 0) ? sal : sizeof(SOCKADDRESS) ;
+	mip->ipcmsg.msg_namelen = (sal > 0) ? sal : sizeof(sockaddress) ;
 
 	mip->ipcmsg.msg_iov = mip->vecs ;
 	mip->ipcmsg.msg_iovlen = NIOVECS ;
@@ -907,10 +891,10 @@ static int ipcmsginfo_init(IPCMSGINFO *mip,SOCKADDR *sap,int sal)
 
 #ifdef	COMMENT
 static int venvcmp(e1pp,e2pp)
-const void	**e1pp, **e2pp ;
+cvoid	**e1pp, **e2pp ;
 {
-	const char	*e1p ;
-	const char	*e2p ;
+	cchar	*e1p ;
+	cchar	*e2p ;
 	int		rc ;
 
 	if ((*e1pp == NULL) && (*e2pp == NULL))
@@ -922,8 +906,8 @@ const void	**e1pp, **e2pp ;
 	if (*e2pp == NULL)
 	    return -1 ;
 
-	e1p = (const char *) *e1pp ;
-	e2p = (const char *) *e2pp ;
+	e1p = (cchar *) *e1pp ;
+	e2p = (cchar *) *e2pp ;
 	rc = (e1p[0] - e2p[0]) ;
 	if (rc == 0)
 	    rc = strcmp(e1p,e2p) ;
