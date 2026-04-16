@@ -37,10 +37,10 @@
 	sl		length of string buffer
 
 	Returns:
-	ematype_local		type - local emainfo
-	ematype_uucp		type - UUCP
-	ematype_arpa		type - ARPAnet normal
-	ematype_arparoute	type - ARPAnet route emainfo
+	mailaddrtype_local	type - local emainfo
+	mailaddrtype_uucp	type - UUCP
+	mailaddrtype_arpa	type - ARPAnet normal
+	mailaddrtype_arparoute	type - ARPAnet route emainfo
 	<0			type - bad emainfo of some kind (system-return)
 
 *******************************************************************************/
@@ -48,14 +48,13 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<storebuf.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<strwcpy.h>
-#include	<ematypes.h>
+#include	<mailaddrtypes.h>
 #include	<localmisc.h>
 
 #include	"emainfo.h"
@@ -109,7 +108,7 @@ int emainfo_load(emainfo *op,cchar *sp,int µsl) noex {
 	        if ((cp1 = strnchr(sp,sl,'@')) != nullptr) {
 	            if ((cp2 = strnchr(sp,sl,':')) != nullptr) {
 		        /* ARPAnet route address */
-	                op->type = ematype_arparoute ;
+	                op->type = mailaddrtype_arparoute ;
 	                if ((cp = strnchr(sp,sl,',')) != nullptr) {
 	                    op->hpart = (cp1 + 1) ;
 	                    op->hlen = intconv(cp - (cp1 + 1)) ;
@@ -123,21 +122,21 @@ int emainfo_load(emainfo *op,cchar *sp,int µsl) noex {
 	                } /* end if */
 	            } else {
 		        /* normal ARPAnet address */
-	                op->type = ematype_arpa ;
+	                op->type = mailaddrtype_arpa ;
 	                op->hpart = (cp1 + 1) ;
 	                op->hlen = intconv((sp + sl) - (cp1 + 1)) ;
 	                op->lpart = sp ;
 	                op->llen = intconv(cp1 - sp) ;
 	            } /* end if */
 	        } else if ((cp = strnrchr(sp,sl,'!')) != nullptr) {
-	            op->type = ematype_uucp ;
+	            op->type = mailaddrtype_uucp ;
 	            op->hpart = sp ;
 	            op->hlen = intconv(cp - sp) ;
 	            op->lpart = (cp + 1) ;
 	            op->llen = intconv((sp + sl) - (cp + 1)) ;
 	        } else {
 	            /* local */
-	            op->type = ematype_local ;
+	            op->type = mailaddrtype_local ;
 	            op->hpart = nullptr ;
 	            op->hlen = 0 ;
 	            op->lpart = sp ;
@@ -150,7 +149,7 @@ int emainfo_load(emainfo *op,cchar *sp,int µsl) noex {
 }
 /* end subroutine (emainfo_load) */
 
-int emainfo_mktype(emainfo *op,ematypes type,char *rbuf,int rlen) noex {
+int emainfo_mktype(emainfo *op,mailaddrtypes type,char *rbuf,int rlen) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		idx = 0 ; /* return-value */
@@ -162,11 +161,11 @@ int emainfo_mktype(emainfo *op,ematypes type,char *rbuf,int rlen) noex {
 	        rs = SR_OK ;
 	        if (type >= 0) {
 	            switch (type) {
-	            case ematype_local:
+	            case mailaddrtype_local:
 		        tl = min(op->llen,rlen) ;
 	                idx = intconv(strwcpy(rbuf,op->lpart,tl) - rbuf) ;
 	                break ;
-	            case ematype_uucp:
+	            case mailaddrtype_uucp:
 	                if (op->hpart && (op->hlen >= 0)) {
 	                    if ((rs = sb.strw(op->hpart,op->hlen)) >= 0) {
 	                        rs = sb.chr('!') ;
@@ -178,7 +177,7 @@ int emainfo_mktype(emainfo *op,ematypes type,char *rbuf,int rlen) noex {
 		            }
 		        } /* end if (ok) */
 	                break ;
-	            case ematype_arpa:
+	            case mailaddrtype_arpa:
 	                if ((rs = sb.strw(op->lpart,op->llen)) >= 0) {
 	                    if (op->hpart && (op->hlen >= 0)) {
 	                        if ((rs = sb.chr('@')) >= 0) {
@@ -188,7 +187,7 @@ int emainfo_mktype(emainfo *op,ematypes type,char *rbuf,int rlen) noex {
 		            idx = sb ;
 	                } /* end if */
 	                break ;
-	            case ematype_arparoute:
+	            case mailaddrtype_arparoute:
 	                if (op->hpart && (op->hlen >= 0)) {
 	                    if ((rs = sb.chr('@')) >= 0) {
 	                        rs = sb.strw(op->hpart,op->hlen) ;
