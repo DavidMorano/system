@@ -22,16 +22,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<ematypes.h>
+#include	<mailaddrtypes.h>
 
 
 /* object defines */
 #define	EMAINFO			struct emainfo_head
 /* other defines */
-#define	EMAINFO_TLOCAL		ematype_local
-#define	EMAINFO_TUUCP		ematype_uucp
-#define	EMAINFO_TARPA		ematype_arpa
-#define	EMAINFO_TARPAROUTE	ematype_arparoute
+#define	EMAINFO_TLOCAL		mailaddrtype_local
+#define	EMAINFO_TUUCP		mailaddrtype_uucp
+#define	EMAINFO_TARPA		mailaddrtype_arpa
+#define	EMAINFO_TARPAROUTE	mailaddrtype_arparoute
 /* special token */
 #define	EMAINFO_LOCALHOST	"*LOCAL*"
 
@@ -39,7 +39,7 @@
 struct emainfo_head {
 	cchar		*lpart ;
 	cchar		*hpart ;
-	ematypes	type ;
+	mailaddrtypes	type ;
 	int		llen ;
 	int		hlen ;
 } ; /* end struct (emainfo_head) */
@@ -49,7 +49,7 @@ typedef	EMAINFO		emainfo ;
 EXTERNC_begin
 
 extern int	emainfo_load(emainfo *,cchar *,int) noex ;
-extern int	emainfo_mktype(emainfo *,ematypes,char *,int) noex ;
+extern int	emainfo_mktype(emainfo *,mailaddrtypes,char *,int) noex ;
 
 EXTERNC_end
 
