@@ -26,7 +26,7 @@
 #include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstring>
 
 #include	<usystem.h>
