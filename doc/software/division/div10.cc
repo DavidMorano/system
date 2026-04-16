@@ -1,4 +1,8 @@
-/* dv10 SUPORT */
+/* dv10 SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+
 
 uint div10u(uint u) noex {
     return (n * 0x00CD) >> 11 ;
