@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
