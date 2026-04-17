@@ -35,16 +35,26 @@ DEFS +=
 
 INCS += libxti.h
 
+MODS +=
+
 LIBS +=
 
 
-INCDIRS +=
+OBJ0= 
+OBJ1= 
+OBJ2= 
+OBJ3= 
 
+OBJA= obj0.o 
+OBJB=
+
+OBJ= $(OBJA)
+
+
+INCDIRS +=
 LIBDIRS += -L$(LIBDIR)
 
-
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,17 +65,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= 
-OBJ1= 
-OBJ2= 
-OBJ3= 
-
-OBJA= obj0.o 
-
-OBJ= $(OBJA)
-
-
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -78,6 +78,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -98,8 +101,8 @@ all:			$(ALL)
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order
@@ -117,21 +120,28 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
 
 obj1.o:			$(OBJ1)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
 
 obj2.o:			$(OBJ2)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
 
 obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
 
 obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
 
 obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
+
+
+obja.o:			$(OBJA)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
+
+objb.o:			$(OBJB)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
 
 
