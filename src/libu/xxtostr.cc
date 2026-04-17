@@ -63,7 +63,7 @@
 	>=0		length of buffer used by the conversion
 	<0		error in the conversion
 
-	Group:
+	Names:
     	itostr
     	ltostr
     	lltostr
@@ -111,7 +111,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cerrno>		/* |errno| */
-#include	<climits>		/* |LONG_MAX| */
+#include	<climits>		/* |ULONG_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -136,75 +136,47 @@ import digtab ;				/* |getdig(3u)| + |digtab_enc(3u)| */
 
 /* local structures */
 
-constexpr int		div100 = 100 ;
-
-namespace {
-    struct digmgr {
-	uchar		tab[div100] ;
-	consteval void mktab() noex {
-	    for (int i = 0 ; i < div100 ; i += 1) {
-		cint lo = (i % 10) ;
-		cint hi = (i / 10) ;
-		tab[i] = uchar((hi << 4) | lo) ;
-	    } /* end for */
-	} ; /* end method (mktab) */
-	consteval digmgr() noex {
-	    mktab() ;
-	} ; /* end ctor */
-    } ; /* end struct (digmgr) */
-} /* end namespace */
-
 
 /* forward references */
 
-constexpr cint		xxtostr_maxbase = MAXBASE ; /* standard value */
+constexpr int		div100 = 100 ;
+constexpr int		xxtostr_maxbase = digtab.maxbase ; /* standard value */
 
-local char getdig_lo(int) noex ;
-local char getdig_hi(int) noex ;
+local inline char getdig_lo(int) noex ;
+local inline char getdig_hi(int) noex ;
 
 template<typename UT>
 constexpr int uxxtostr(char *endp,int b,UT v) noex {
     int             rs = SR_FAULT ;
     char            *rp = endp ;
     if (endp) {
-        rs = SR_NOTSUP ;
+        rs = SR_INVALID ;
         *rp = '\0' ;
         if ((b >= 2) && (b <= xxtostr_maxbase)) {
-            uint ub = uint(b) ;
+            const uint ub = uint(b) ;
+	    rs = SR_OK ;
             if (v != 0) {
-                int         di ;
+                int di ;
                 if_constexpr (szof(UT) > szof(ulong)) {
-                    const UT        vmask = (compl UT(ULONG_MAX)) ;
-                    UT              utnv ;
-                    while ((v & vmask) != 0UL) {
-                        utnv = v / ub ;
-                        di = int(v % ub) ;
-                        *--rp = digtab_enc(di) ;
-                        v = utnv ;
-                    } /* end while (slower) */
-                    {
-                        ulong       lv = ulong(v) ;
-                        ulong       nv ;
-                        while (lv != 0) {
-                            nv = lv / ub ;
-                            di = int(lv % ub) ;
-                            *--rp = digtab_enc(di) ;
-                            lv = nv ;
-                        } /* end while */
-                        v = lv ;
-                    } /* end block (faster) */
-                } else {
-                    UT              nv ;
-                    while (v != 0) {
+                    const UT vmask = (compl UT(ULONG_MAX)) ;
+                    for (UT nv ; v & vmask ; v = nv) {
                         nv = v / ub ;
                         di = int(v % ub) ;
                         *--rp = digtab_enc(di) ;
-                        v = nv ;
-                    } /* end while (regular) */
-                } /* end if-constexpr (size-of-operand) */
-                rs = SR_OK ;
+                    } /* end for (slower) */
+                    for (ulong nlv, lv = ulong(v) ; lv ; lv = nlv) {
+                        nlv = lv / ub ;
+                        di = int(lv % ub) ;
+                        *--rp = digtab_enc(di) ;
+                    } /* end for (faster) */
+                } else {
+                    for (UT nv ; v ; v = nv) {
+                        nv = v / ub ;
+                        di = int(v % ub) ;
+                        *--rp = digtab_enc(di) ;
+                    } /* end for (regular) */
+                } /* end if_constexpr (size-of-operand) */
             } else {
-                rs = SR_OK ;
                 *--rp = '0' ;
             } /* end if */
         } /* end if (base supported) */
@@ -214,12 +186,12 @@ constexpr int uxxtostr(char *endp,int b,UT v) noex {
 
 template<typename UT,typename ST>
 constexpr int sxxtostr(char *endp,int b,ST v) noex {
-    UT              ulv = (UT) v ;
+    UT              uv = (UT) v ;
     int             rs = SR_FAULT ;
     char            *rp = nullptr ;
-    if (v < 0) ulv = (- ulv) ;
+    if (v < 0) uv = (- uv) ;
     if (endp) {
-        if ((rs = uxxtostr(endp,b,ulv)) >= 0) {
+        if ((rs = uxxtostr(endp,b,uv)) >= 0) {
             rp = (endp - rs) ;
             if (v < 0) *--rp = '-' ;
         }
@@ -229,46 +201,36 @@ constexpr int sxxtostr(char *endp,int b,ST v) noex {
 
 template<typename UT>
 constexpr int uxxtostr10(char *endp,UT v) noex {
-    const uint		ub100	= 100 ;
+    constexpr uint	udiv100	= uint(div100) ;
     int             rs = SR_FAULT ;
     char            *rp = endp ;
     if (endp) {
-        rs = SR_NOTSUP ;
+        rs = SR_OK ;
         *rp = '\0' ;
         if (v != 0) {
-            int         di ;
+            int di ;
             if_constexpr (szof(UT) > szof(ulong)) {
-                const UT        vmask = (compl UT(ULONG_MAX)) ;
-                UT              utnv ;
-                while ((v & vmask) != 0UL) {
-                    utnv = v / ub100 ;
-                    di = int(v % ub100) ;
+                const UT vmask = (compl UT(ULONG_MAX)) ;
+                for (UT nv ; v & vmask ; v = nv) {
+                    nv = v / udiv100 ;
+                    di = int(v % udiv100) ;
                     *--rp = getdig_lo(di) ;
                     *--rp = getdig_hi(di) ;
-                    v = utnv ;
-                } /* end while (slower) */
-                {
-                    ulong       lv = ulong(v) ;
-                    ulong       nv ;
-                    while (lv != 0) {
-                        nv = lv / ub100 ;
-                        di = int(lv % ub100) ;
-                        *--rp = getdig_lo(di) ;
-                        *--rp = getdig_hi(di) ;
-                        lv = nv ;
-                    } /* end while */
-                    v = lv ;
-                } /* end block (faster) */
+                } /* end for (slower) */
+                for (ulong nlv, lv = ulong(v) ; lv ; lv = nlv) {
+                    nlv = lv / udiv100 ;
+                    di = int(lv % udiv100) ;
+                    *--rp = getdig_lo(di) ;
+                    *--rp = getdig_hi(di) ;
+                } /* end for (faster) */
             } else {
-                UT              nv ;
-                while (v != 0) {
-                    nv = v / ub100 ;
-                    di = int(v % ub100) ;
+                for (UT nv ; v ; v = nv) {
+                    nv = v / udiv100 ;
+                    di = int(v % udiv100) ;
                     *--rp = getdig_lo(di) ;
                     *--rp = getdig_hi(di) ;
-                    v = nv ;
-                } /* end while (regular) */
-            } /* end if-constexpr (size-of-operand) */
+                } /* end for (regular) */
+            } /* end if_constexpr (size-of-operand) */
 	    if ((rs = int(endp - rp)) > 1) {
 		while ((rs > 1) && (*rp == '0')) {
 		    rp += 1 ;
@@ -276,7 +238,6 @@ constexpr int uxxtostr10(char *endp,UT v) noex {
 		} /* end while */
 	    } /* end if */
         } else {
-            rs = SR_OK ;
             *--rp = '0' ;
         } /* end if */
     } /* end if (non-null) */
@@ -285,12 +246,12 @@ constexpr int uxxtostr10(char *endp,UT v) noex {
 
 template<typename UT,typename ST>
 constexpr int sxxtostr10(char *endp,ST v) noex {
-    UT              ulv = (UT) v ;
+    UT              uv = (UT) v ;
     int             rs = SR_FAULT ;
     char            *rp = nullptr ;
-    if (v < 0) ulv = (- ulv) ;
+    if (v < 0) uv = (- uv) ;
     if (endp) {
-        if ((rs = uxxtostr10(endp,ulv)) >= 0) {
+        if ((rs = uxxtostr10(endp,uv)) >= 0) {
             rp = (endp - rs) ;
             if (v < 0) *--rp = '-' ;
         }
@@ -310,7 +271,7 @@ constexpr char *stostr(T v,char *endp,int b) noex {
             rsl = sxxtostr<UT>(endp,b,vv) ;
         }
         return rsl ;
-    } ; /* end lambda */
+    } ; /* end lambda (sxx) */
     if ((rs = sxx(v)) >= 0) {
         rp = (endp - rs) ;
     } else {
@@ -331,7 +292,7 @@ constexpr char *utostr(UT uv,char *endp,int b) noex {
             rsl = uxxtostr<UT>(endp,b,vv) ;
         }
         return rsl ;
-    } ; /* end lambda */
+    } ; /* end lambda (uxx) */
     if ((rs = uxx(uv)) >= 0) {
         rp = (endp - rs) ;
     } else {
@@ -343,7 +304,6 @@ constexpr char *utostr(UT uv,char *endp,int b) noex {
 
 /* local variables */
 
-constexpr digmgr	digs ;
 constexpr int		b10 = 10 ;
 
 
@@ -394,11 +354,11 @@ char *ulltostr	(ulonglong uv,  char *endp,int b)	noex {
 /* local subroutines */
 
 local char getdig_lo(int r) noex {
-	return char(((digs.tab[r] >> 0) & 0x0F) + '0') ;
+        return digtab.dig100[r][0] ;
 }
 
 local char getdig_hi(int r) noex {
-	return char(((digs.tab[r] >> 4) & 0x0F) + '0') ;
+        return digtab.dig100[r][1] ;
 }
 
 
