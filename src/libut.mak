@@ -33,29 +33,30 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += libut.h
+INCS += libut.h utbase.hh
 
 MODS +=
 
 LIBS +=
 
 
+OBJ00= utbase.o
 OBJ01= utopen.o utclose.o
-OBJ02= utbind.o utconnect.o
+OBJ02= utbind.o 
 OBJ03= utaccept.o utlisten.o 
 OBJ04= utlook.o utsync.o
 OBJ05= utalloc.o utfree.o 
-OBJ06=
+OBJ06= utconnect.o
 OBJ07=
 
-OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj5.o
+OBJA= obj00.o obj01.o obj02.o obj03.o
+OBJB= obj04.o obj05.o obj06.o
 
-OBJ= $(OBJA) $(OBJB)
+OBJ= obja.o objb.o
 
 
-INCDIRS +=
-LIBDIRS += -L$(LIBDIR)
+INCDIRS += -I inc -I /usr/local/include
+LIBDIRS += -L $(LIBDIR)
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -101,8 +102,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+$(T).o:			obj.o
+	$(LD) -r $(LDFLAGS) -o $@ obj.o
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -122,28 +123,28 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0)
+obj00.o:		$(OBJ00)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1.o:			$(OBJ1)
+obj01.o:		$(OBJ01)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2.o:			$(OBJ2)
+obj02.o:		$(OBJ02)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3.o:			$(OBJ3)
+obj03.o:		$(OBJ03)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4.o:			$(OBJ4)
+obj04.o:		$(OBJ04)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj5.o:			$(OBJ5)
+obj05.o:		$(OBJ05)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj6.o:			$(OBJ6)
+obj06.o:		$(OBJ06)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj7.o:			$(OBJ7)
+obj07.o:		$(OBJ07)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -153,6 +154,12 @@ obja.o:			$(OBJA)
 objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+
+obj.o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+utbase.o:		utbase.cc		$(INCS)
 
 utopen.o:		utopen.cc		$(INCS)
 utclose.o:		utclose.cc		$(INCS)
