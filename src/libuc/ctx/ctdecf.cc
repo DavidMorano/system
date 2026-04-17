@@ -112,7 +112,7 @@ namespace {
 	int addchr(int) noex ;
 	int addfloat(int,double,int,int,int,char *) noex ;
     } ; /* end struct (subinfo) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -148,7 +148,8 @@ int ctdecf(char *dbuf,int dlen,double dv,int fcode,int w,int p,int fill) noex {
 
 int subinfo::start(char *bufp,int bufl,int am) noex {
 	int		rs = SR_FAULT ;
-	if (this) {
+	if (bufp) {
+	    rs = SR_OK ;
 	    ubuf = bufp ;
 	    ulen = bufl ;
 	    mode = am ;
