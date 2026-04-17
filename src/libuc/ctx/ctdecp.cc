@@ -52,6 +52,7 @@
 #include	<usysbase.h>
 #include	<stdintx.h>
 #include	<ctdec.h>
+#include	<localmisc.h>
 
 #include	"ctdecp.h"
 
@@ -70,7 +71,7 @@
 
 /* forward references */
 
-static int	zerofill(char *,int,int,int) noex ;
+local int	zerofill(char *,int,int,int) noex ;
 
 
 /* local variables */
@@ -85,8 +86,7 @@ int ctdecpux(int (*ctx)(char *,int,UT),char *dp,int dl,int p,UT uv) noex {
 	    rs = zerofill(dp,dl,p,rs) ;
 	}
 	return rs ;
-}
-/* end subroutine (ctdecpux) */
+} /* end subroutine-template (ctdecpux) */
 
 template<typename UT,typename T>
 int ctdecpx(int (*ctx)(char *,int,int,UT),char *dp,int dl,int p,T v) noex {
@@ -110,8 +110,7 @@ int ctdecpx(int (*ctx)(char *,int,int,UT),char *dp,int dl,int p,T v) noex {
 	    } /* end if (ctx) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (ctdecpx) */
+} /* end subroutine-template (ctdecpx) */
 
 
 /* exported variables */
@@ -146,7 +145,7 @@ int ctdecpll(char *rbuf,int rlen,int prec,longlong v) noex {
 
 /* local subroutines */
 
-static int zerofill(char *rbuf,int rlen,int prec,int n) noex {
+local int zerofill(char *rbuf,int rlen,int prec,int n) noex {
 	int		rs = SR_OVERFLOW ;
 	cint		bi = (prec - n) ;
 	if (prec <= rlen) ylikely {
