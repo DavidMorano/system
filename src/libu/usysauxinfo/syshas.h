@@ -870,7 +870,7 @@ struct syshas_mgr {
         uint    pipes:1 ;
         uint    libproc:1 ;
 	uint	eaccess:1 ;
-	constexpr syshas_mgr() noexcept ;
+	consteval syshas_mgr() noexcept ;
 } ; /* end struct (syshas_mgr) */
 
 extern const syshas_mgr		syshas ;
