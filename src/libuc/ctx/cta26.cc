@@ -113,8 +113,7 @@ static constexpr int icta26x(char *rbuf,int rlen,int type,int prec,UT v) noex {
 	    }
 	}
 	return rl ;
-}
-/* end subroutine-template (icta26x) */
+} /* end subroutine-template (icta26x) */
 
 template<stdintx UT,stdintx ST>
 static int cta26sx(char *rbuf,int rlen,int type,int prec,ST v) noex {
@@ -126,8 +125,7 @@ static int cta26sx(char *rbuf,int rlen,int type,int prec,ST v) noex {
 	len = icta26x(digbuf,diglen,type,prec,uv) ;
 	if (v < 0) digbuf[diglen-(++len)] = '-' ;
 	return sncpy(rbuf,rlen,(digbuf + diglen - len)) ;
-}
-/* end subroutine (cta26sx) */
+} /* end subroutine (cta26sx) */
 
 template<stdintx T>
 static int cta26ux(char *rbuf,int rlen,int type,int prec,T uv) noex {
@@ -136,8 +134,7 @@ static int cta26ux(char *rbuf,int rlen,int type,int prec,T uv) noex {
 	char		digbuf[A26BUFLEN + 1] ;
 	len = icta26x(digbuf,diglen,type,prec,uv) ;
 	return sncpy(rbuf,rlen,(digbuf + diglen - len)) ;
-}
-/* end subroutine (cta26ux) */
+} /* end subroutine (cta26ux) */
 
 
 /* local variables */
