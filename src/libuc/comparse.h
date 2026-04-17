@@ -21,15 +21,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
-#define	COMPARSE_MAGIC	0x77811276
 #define	COMPARSE	struct comparse_head
 #define	COMPARSE_STR	struct comparse_string
+#define	COMPARSE_MAGIC	0x77811276
 #define	COMPARSE_DEFSZ	80
 
 
@@ -41,7 +38,7 @@ struct comparse_string {
 struct comparse_head {
 	COMPARSE_STR	val ;
 	COMPARSE_STR	com ;
-	uint		magic ;
+	uint		magval ;
 	int		mailaddrlen ;
 	int		mailcommlen ;
 } ; /* end struct */
@@ -70,7 +67,7 @@ struct comparse : comparse_head {
 	comparse_co	finish ;
 	comparse() noex {
 	    finish	(this,comparsemem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ;
 	comparse(const comparse &) = delete ;
 	comparse &operator = (const comparse &) = delete ;
@@ -79,7 +76,7 @@ struct comparse : comparse_head {
 	int getcom(cchar **) noex ;
 	void dtor() noex ;
 	destruct comparse() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (comparse) */
 #else	/* __cplusplus */
