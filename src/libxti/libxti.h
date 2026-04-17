@@ -1,4 +1,4 @@
-/* uxti HEADER */
+/* uxti HEADER (X/Open Transport Interface) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -11,12 +11,9 @@
 	= 1998-03-21, David A­D­ Morano
 	This module was originally written.
 
-	= 2017-08-01, David A­D­ Morano
-	Updated for lack of interfaces in Apple-Darwin
-
 */
 
-/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -24,7 +21,8 @@
 	uxti
 
 	Description:
-	Additional (or supplemental) support for UNIX® limits.
+	This is the nehanced (cleaned up) API for the
+	X/Open Transport Interface.
 
 *******************************************************************************/
 
@@ -33,39 +31,22 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
-#if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
-#include	<xti.h>
-#endif
-
-
-#ifndef	TBADF
-#define	TBADF		0
-#endif
-#ifndef	TSYSERR
-#define	TSYSERR		0
-#endif
+#include	<usysbase.h>
 
 
 EXTERNC_begin
 
-extern int	ut_alloc(int,int,int,void **) noex ;
-extern int	ut_open(cchar *,int,struct t_info *) noex ;
-extern int	ut_bind(int,struct t_bind *,struct t_bind *) noex ;
-extern int	ut_listen(int,struct t_call *) noex ;
-extern int	ut_connect(int,struct t_call *,struct t_call *) noex ;
-extern int	ut_accept(int,int,const struct t_call *) noex ;
+extern int	ut_open(cchar *,int,UTINFO *) noex ;
+extern int	ut_bind(int,UTBIND *,UTBIND *) noex ;
+extern int	ut_listen(int,UTCALL *) noex ;
+extern int	ut_connect(int,UTCALL *,UTCALL *) noex ;
+extern int	ut_accept(int,int,const UTCALL *) noex ;
 extern int	ut_look(int) noex ;
 extern int	ut_sync(int) noex ;
 extern int	ut_close(int) noex ;
+
+extern int	ut_alloc(int,int,int,void **) noex ;
 extern int	ut_free(void *,int) noex ;
 
 EXTERNC_end
