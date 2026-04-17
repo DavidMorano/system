@@ -103,10 +103,10 @@ import uconstants ;			/* |digbufsize(3u)| */
 
 /* forward references */
 
-static inline constexpr int ffbsi(int b) noex {
+local inline constexpr int ffbsi(int b) noex {
 	cuint	uv = uint(b) ;
 	return std::countr_zero(uv) ;	/* <- first bit set */
-}
+} /* end subroutine (ffbsi) */
 
 
 /* local variables */
@@ -117,67 +117,56 @@ constexpr int		maxstack = (256+1) ;	/* |int256_t| in binary */
 /* local subroutine-templates */
 
 template<typename UT>
-static constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
+local constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	cuint		ub(b) ;
 	int		rl = 0 ;
 	char		*rp = (dbuf + dlen) ;
 	*rp = '\0' ;
 	if (v != 0) {
-	    int		di ;
+	    int di ;
 	    if_constexpr (szof(UT) > szof(ulong)) {
-                const UT        vmask = (compl UT(ULONG_MAX)) ;
-	        UT		nv ;
-	        while ((v & vmask) != 0UL) {
+                const UT vmask = (compl UT(ULONG_MAX)) ;
+	        for (UT nv ; v & vmask ; v = nv) {
 	            nv = v / ub ;
-		    di = int(v - (nv * ub)) ;
+		    di = int(v % ub) ;
 		    *--rp = getdig(di) ;
-		    v = nv ;
-	        } /* end while (slower) */
-	        {
-		    ulong	lv = ulong(v) ;
-		    ulong	nlv ;
-		    while (lv != 0) {
-	                nlv = lv / ub ;
-			di = int(lv - (nlv * ub)) ;
-	                *--rp = getdig(di) ;
-	                lv = nlv ;
-		    } /* end while */
-		    v = lv ;
-	        } /* end block (faster) */
+	        } /* end for (slower) */
+	        for (ulong nlv, lv = ulong(v) ; lv ; lv = nlv) {
+		    nlv = lv / ub ;
+		    di = int(lv % ub) ;
+	            *--rp = getdig(di) ;
+		} /* end for (faster) */
 	    } else {
-		UT		nv ;
-	        while (v != 0) {
+	        for (UT nv ; v ; v = nv) {
 	            nv = v / ub ;
-		    di = int(v - (nv * ub)) ;
+		    di = int(v % ub) ;
 		    *--rp = getdig(di) ;
-	            v = nv ;
-	        } /* end while (regular) */
+	        } /* end for (regular) */
 	    } /* end if_constexpr (size-of-operand) */
 	    rl = intconv(dbuf + dlen - rp) ;
 	} else {
 	    *--rp = '0' ;
 	}
 	return rl ;
-}
-/* end subroutine (ctxxxx) */
+} /* end subroutine (ctxxxx) */
 
 template<typename UT,typename ST>
-static int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
-	UT		ulv = (UT) v ;
+local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
+	UT		uv = (UT) v ;
 	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (v < 0) ulv = (- ulv) ;
+	if (v < 0) uv = (- uv) ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;
 	    rs = SR_NOTSUP ;
-	    if ((b >= 2) && (b <= maxbase)) {
+	    if ((b >= 2) && (b <= digtab.maxbase)) {
 	        cint	dlen = digbufsize.bufsize[t][b] ;
 		int	len ;
 		if (dlen > maxstack) {
 		    if (char *dbuf ; (rs = lm_mall((dlen+1),&dbuf)) >= 0) {
 			{
-		            len = ctxxxx(dbuf,dlen,b,ulv) ;
+		            len = ctxxxx(dbuf,dlen,b,uv) ;
 		            if (v < 0) dbuf[dlen-(++len)] = '-' ;
 		            rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 			}
@@ -185,37 +174,35 @@ static int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (memory-allocation-deallocation) */
 		} else {
-		    char	dbuf[dlen+1] ;
-		    len = ctxxxx(dbuf,dlen,b,ulv) ;
+		    char dbuf[dlen+1] ;
+		    len = ctxxxx(dbuf,dlen,b,uv) ;
 		    if (v < 0) dbuf[dlen-(++len)] = '-' ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		} /* end block */
 	   } /* end if (supported base) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (sctxxxx) */
+} /* end subroutine-template (sctxxxx) */
 
 template<typename UT>
-static int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
+local int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 	cint		n = szof(UT) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;
 	    rs = SR_NOTSUP ;
-	    if ((b >= 2) && (b <= maxbase)) {
+	    if ((b >= 2) && (b <= digtab.maxbase)) {
 	        cint	dlen = digbufsize.bufsize[t][b] ;
 		int	len ;
 		{
-		    char	dbuf[dlen+1] ;
+		    char dbuf[dlen+1] ;
 		    len = ctxxxx(dbuf,dlen,b,uv) ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		} /* end block */
 	    } /* end if (base supported) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (uctxxxx) */
+} /* end subroutine-template (uctxxxx) */
 
 
 /* exported variables */
