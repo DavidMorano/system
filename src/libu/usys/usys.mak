@@ -56,7 +56,7 @@ OBJ10_USYS= usys_usendfile.o usys_ufstype.o usys_libstr.o
 OBJ11_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 
 OBJ12_USYS= usys_shadow.o usys_isaexec.o usys_fdatasync.o
-OBJ13_USYS= usys_eaccess.o usys_stat.o
+OBJ13_USYS= usys_eaccess.o usys_stat.o usys_xti.o
 OBJ14_USYS=
 OBJ15_USYS=
 
@@ -248,5 +248,6 @@ usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
 usys_isaexec.o:		usys_isaexec.cc		usys_isaexec.h		$(INCS)
 usys_fatasync.o:	usys_fdatasync.cc	usys_fdatasync.h	$(INCS)
 usys_eaccess.o:		usys_eaccess.cc		usys_eaccess.h		$(INCS)
+usys_xti.o:		usys_xti.cc		usys_xti.h		$(INCS)
 
 
