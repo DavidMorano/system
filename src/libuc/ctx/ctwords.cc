@@ -41,13 +41,13 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<new>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<string>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>
+#include	<localmisc.h>
 
 #include	"ctwords.hh"
 
@@ -74,14 +74,14 @@ using std::string ;			/* type */
 
 /* forward references */
 
-static int speak_billions(string *,int) ;
-static int speak_millions(string *,int) ;
-static int speak_thousands(string *,int) ;
-static int speak_group(string *,int) ;
-static int speak_hundreds(string *,int) ;
-static int speak_tens(string *,int) ;
-static int speak_teens(string *,int) ;
-static int speak_ones(string *,int) ;
+local int speak_billions	(string *,int) ;
+local int speak_millions	(string *,int) ;
+local int speak_thousands	(string *,int) ;
+local int speak_group		(string *,int) ;
+local int speak_hundreds	(string *,int) ;
+local int speak_tens		(string *,int) ;
+local int speak_teens		(string *,int) ;
+local int speak_ones		(string *,int) ;
 
 
 /* local variables */
@@ -176,7 +176,7 @@ int ctwords(string *sp,int v) noex {
 
 /* local subroutines */
 
-static int speak_billions(string *sp,int v) {
+local int speak_billions(string *sp,int v) {
 	cint	lv = (v/1000000000) ;
 	speak_group(sp,lv) ;
 	sp->append(" Billion") ;
@@ -184,21 +184,21 @@ static int speak_billions(string *sp,int v) {
 }
 /* end subroutine (speak_nillions) */
 
-static int speak_millions(string *sp,int v) {
+local int speak_millions(string *sp,int v) {
 	cint	lv = (v/1000000) ;
 	speak_group(sp,lv) ;
 	sp->append(" Million") ;
 	return 0 ;
 } /* end subroutine (speak_millions) */
 
-static int speak_thousands(string *sp,int v) {
+local int speak_thousands(string *sp,int v) {
 	cint	lv = (v/1000) ;
 	speak_group(sp,lv) ;
 	sp->append(" Thousand") ;
 	return 0 ;
 } /* end subroutine (speak_thousands) */
 
-static int speak_group(string *sp,int v) {
+local int speak_group(string *sp,int v) {
 	while (v > 0) {
 	    if (v >= 100) {
 	        speak_hundreds(sp,v) ;
@@ -217,28 +217,28 @@ static int speak_group(string *sp,int v) {
 	return 0 ;
 } /* end subroutine (speak_group) */
 
-static int speak_hundreds(string *sp,int v) {
+local int speak_hundreds(string *sp,int v) {
 	cint	h = (v / 100) ;
 	speak_ones(sp,h) ;
 	sp->append(" Hundred") ;
 	return 0 ;
 }
 
-static int speak_tens(string *sp,int v) {
+local int speak_tens(string *sp,int v) {
 	cint	t = (v / 10) ;
 	sp->append(" ") ;
 	sp->append(tens[t]) ;
 	return 0 ;
 }
 
-static int speak_teens(string *sp,int v) {
+local int speak_teens(string *sp,int v) {
 	cint	t = (v % 10) ;
 	sp->append(" ") ;
 	sp->append(teens[t]) ;
 	return 0 ;
 }
 
-static int speak_ones(string *sp,int v) {
+local int speak_ones(string *sp,int v) {
 	sp->append(" ") ;
 	sp->append(ones[v]) ;
 	return 0 ;
