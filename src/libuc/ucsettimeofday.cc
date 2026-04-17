@@ -1,5 +1,6 @@
-/* uc_settimeofday */
+/* ucsettimeofday */
 /* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
 /* set the current time of day */
@@ -16,46 +17,50 @@
 
 /*******************************************************************************
 
-	This routine calls the system's (library) 'settimeofday' subroutine.
+	This routine calls the system's (library) 'settimeofday'
+	subroutine.
 
 	Question:
 		What does this stupid function return?
 		The documentation is not as clear as it could be!
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/time.h>
 #include	<unistd.h>
-#include	<cstring>
 #include	<cerrno>
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<usysflag.h>
 #include	<localmisc.h>
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* external subroutines */
 
-
-int uc_settimeofday(tvp,dp)
-struct timeval	*tvp ;
-void		*dp ;
-{
-	int	rs ;
-
-
-	if (tvp == NULL)
-		return SR_FAULT ;
-
-	rs = SR_OK ;
-	if (settimeofday(tvp,dp) == -1)
+int uc_settimeofday(TIMEVAL *tvp,cvoid *cvp) noex {
+	int		rs = SR_FAULT ;
+	if (tvp) {
+	    rs = SR_OK ;
+	    {
+	        auto *ctp = (CTIMEZONE *) cvp ;
+	        rs = settimeofday(tvp,ctp) ;
+	    } /* end block */
+	    if (rs < 0) {
 		rs = (- errno) ;
-
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uc_settimeofday) */
