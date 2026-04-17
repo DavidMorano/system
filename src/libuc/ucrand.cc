@@ -45,7 +45,13 @@
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucatexit.h>
+#include	<ucatfork.h>
+#include	<ucgetrandom.h>
 #include	<sigblocker.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
@@ -58,6 +64,9 @@
 
 #include	"getrandom.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -108,7 +117,7 @@ namespace {
 	int operator () () noex { 
 	    return operator int () ;
 	} ;
-    } ;
+    } ; /* end struct (rander_co) */
     struct rander {
 	friend		rander_co ;
 	ptm		mx ;		/* data mutex */
@@ -195,17 +204,17 @@ int rander::iinit() noex {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
-	        if ((rs = mx.create) >= 0) {
-	            if ((rs = cv.create) >= 0) {
+	        if ((rs = mx.create) >= 0) ylikely {
+	            if ((rs = cv.create) >= 0) ylikely {
 	    	        void_f	b = rander_atforkbefore ;
 	    	        void_f	a = rander_atforkafter ;
-	                if ((rs = uc_atforkrecord(b,a,a)) >= 0) {
+	                if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	                    if ((rs = uc_atexit(rander_exit)) >= 0) {
 	                        finitdone = true ;
 		 	        f = true ;
 	                    }
 	                    if (rs < 0) {
-	                        uc_atforkexpunge(b,a,a) ;
+	                        uc_atforkexp(b,a,a) ;
 			    }
 	                } /* end if (uc_atfork) */
 	                if (rs < 0) {
@@ -248,7 +257,7 @@ int rander::ifini() noex {
 	    {
 	        void_f	b = rander_atforkbefore ;
 	        void_f	a = rander_atforkafter ;
-	        rs1= uc_atforkexpunge(b,a,a) ;
+	        rs1= uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -270,10 +279,10 @@ int rander::get(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rbuf[0] = '\0' ;
-	    if (sigblocker b ; (rs = b.start) >= 0) {
-	        if ((rs = init) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	        if ((rs = init) >= 0) ylikely {
 	            cint	to = utimeout[uto_capture] ;
 	            if ((rs = capbegin(to)) >= 0) {
 		        if ((rs = randcheck) >= 0) {
@@ -310,7 +319,7 @@ int rander::geter(char *rbuf,int rlen) noex {
 	    ti_noise = dt ;
 	    rs = addnoise ;
 	} /* end if */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
 	    while ((rs >= 0) && (rlen > 0)) {
 		if (ulong uv ; (rs = randomvar_getulong(rvp,&uv)) >= 0) {
@@ -322,7 +331,7 @@ int rander::geter(char *rbuf,int rlen) noex {
 		    } /* end for */
 		} /* end if (randomvar_getulong) */
 	    } /* end while */
-	} /* end if */
+	} /* end if (ok) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end method (randero::geter) */
@@ -380,7 +389,7 @@ int rander::irandbegin() noex {
 int rander::irandend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (rvarp) {
+	if (rvarp) ylikely {
 	    {
 	        randomvar	*rvp = cast_static<randomvar *>(rvarp) ;
 	        rs1 = randomvar_finish(rvp) ;
@@ -399,7 +408,7 @@ int rander::irandend() noex {
 int rander::capbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin(to)) >= 0) {
+	if ((rs = mx.lockbegin(to)) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
 	        rs = cv.wait(&mx,to) ;
@@ -418,7 +427,7 @@ int rander::capbegin(int to) noex {
 int rander::icapend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin) >= 0) {
+	if ((rs = mx.lockbegin) >= 0) ylikely {
 	    fcapture = false ;
 	    if (waiters > 0) {
 	        rs = cv.signal ;
@@ -449,7 +458,7 @@ static void rander_exit() noex {
 
 rander_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case randermem_init:
 	        rs = op->iinit() ;
