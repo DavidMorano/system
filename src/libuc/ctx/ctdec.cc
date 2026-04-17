@@ -69,12 +69,15 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<sncpyx.h>
+#include	<localmisc.h>
 
 #include	"ctdec.h"
 
 #pragma		GCC dependency		"mod/uconstants.ccm"
+#pragma		GCC dependency		"mod/digtab.ccm"
 
 import uconstants ;			/* |digbufsize(3u)| */
+import digtab ;
 
 /* local defines */
 
@@ -93,6 +96,8 @@ import uconstants ;			/* |digbufsize(3u)| */
 
 /* local structures */
 
+constexpr int           div100 = 100 ;
+
 
 /* forward references */
 
@@ -106,72 +111,75 @@ local inline constexpr int ffbsi(int b) noex {
 
 constexpr int		base = 10 ;
 
+local inline char getdig_lo(int) noex ;
+local inline char getdig_hi(int) noex ;
+
 
 /* local subroutine-templates */
 
 template<typename UT>
 local constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
+	constexpr uint	udiv100 = uint(div100) ;
 	char		*rp = (dbuf + dlen) ;
 	int		rl = 0 ;
 	*rp = '\0' ;
 	if (v != 0) {
-	    constexpr uint	ub = uint(base) ;
+	    int di ;
 	    if_constexpr (szof(UT) > szof(ulong)) {
-                const UT        vmask = (compl UT(ULONG_MAX)) ;
-	        UT		nv ;
-	        while ((v & vmask) != 0UL) {
-	            nv = v / ub ;
-	            *--rp = char((v - (nv * ub)) + '0') ;
-	            v = nv ;
-	        } /* end while (slower) */
-	        {
-		    ulong	lv = ulong(v) ;
-		    ulong	nlv ;
-		    while (lv != 0) {
-	                nlv = lv / ub ;
-	                *--rp = char((lv - (nlv * ub)) + '0') ;
-	                lv = nlv ;
-		    } /* end while */
-		    v = lv ;
-	        } /* end block (faster) */
+                const UT vmask = (compl UT(ULONG_MAX)) ;
+	        for (UT nv ; v & vmask ; v = nv) {
+	            nv = v / udiv100 ;
+		    di = int(v % udiv100) ;
+		    *--rp = getdig_lo(di) ;
+		    *--rp = getdig_hi(di) ;
+	        } /* end for (slower) */
+	        for (ulong nlv, lv = ulong(v) ; lv ; lv = nlv) {
+		    nlv = lv / udiv100 ;
+		    di = int(lv % udiv100) ;
+		    *--rp = getdig_lo(di) ;
+		    *--rp = getdig_hi(di) ;
+		} /* end for (faster) */
 	    } else {
-		UT		nv ;
-	        while (v != 0) {
-	            nv = v / ub ;
-	            *--rp = char((v - (nv * ub)) + '0') ;
-	            v = nv ;
-	        } /* end while (regular) */
+	        for (UT nv ; v ; v = nv) {
+		    nv = v / udiv100 ;
+		    di = int(v % udiv100) ;
+		    *--rp = getdig_lo(di) ;
+		    *--rp = getdig_hi(di) ;
+	        } /* end for (regular) */
 	    } /* end if (constexpr) */
-	    rl = intconv(dbuf + dlen - rp) ;
+	    if ((rl = intconv(dbuf + dlen - rp)) > 1) {
+                while ((rl > 1) && (*rp == '0')) {
+                    rp += 1 ;
+                    rl -= 1 ;
+                } /* end while */
+            } /* end if */
 	} else {
 	    *--rp = '0' ;
 	}
 	return rl ;
-}
-/* end subroutine (ctdecx) */
+} /* end subroutine-template (ctdecx) */
 
 template<typename UT,typename ST>
 local int ctdecsx(char *dp,int dl,const ST &v) noex {
-	UT		ulv = (UT) v ;
+	UT		uv = (UT) v ;
 	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
-	if (v < 0) ulv = (- ulv) ;
+	if (v < 0) uv = (- uv) ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;
 	    {
 	        cint	dlen = digbufsize.bufsize[t][base] ;
+		int	len ;
 		{
-		    char	dbuf[dlen+1] ;
-		    int		len ;
-		    len = ctdecx(dbuf,dlen,ulv) ;
+		    char dbuf[dlen+1] ;
+		    len = ctdecx(dbuf,dlen,uv) ;
 		    if (v < 0) dbuf[dlen-(++len)] = '-' ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		} /* end block */
 	   } /* end block */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (ctdecsx) */
+} /* end subroutine-template (ctdecsx) */
 
 template<typename UT>
 local int ctdecux(char *dp,int dl,const UT &uv) noex {
@@ -181,17 +189,16 @@ local int ctdecux(char *dp,int dl,const UT &uv) noex {
 	    cint	t = ffbsi(n) ;
 	    {
 	        cint	dlen = digbufsize.bufsize[t][base] ;
+		int	len ;
 		{
-		    char	dbuf[dlen+1] ;
-		    int		len ;
+		    char dbuf[dlen+1] ;
 		    len = ctdecx(dbuf,dlen,uv) ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		} /* end block */
 	    } /* end block */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (ctdecux) */
+} /* end subroutine-template (ctdecux) */
 
 
 /* exported variables */
@@ -221,6 +228,17 @@ int ctdecul(char *dp,int dl,ulong v) noex {
 
 int ctdecull(char *dp,int dl,ulonglong v) noex {
 	return ctdecux(dp,dl,v) ;
+}
+
+
+/* local subroutines */
+
+local char getdig_lo(int r) noex {
+        return digtab.dig100[r][0] ;
+}
+
+local char getdig_hi(int r) noex {
+        return digtab.dig100[r][1] ;
 }
 
 
