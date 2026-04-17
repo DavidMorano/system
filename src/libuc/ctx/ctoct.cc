@@ -34,6 +34,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
+#include	<localmisc.h>
 
 #include	"ctoct.h"
 
