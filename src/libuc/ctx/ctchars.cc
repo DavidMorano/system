@@ -63,6 +63,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<sncpyx.h>
+#include	<localmisc.h>
 
 #include	"ctchars.h"
 
@@ -113,8 +114,7 @@ local int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
 	    } /* end switch */
 	} /* end if (handle errors) */
 	return rs ;
-}
-/* end subroutine-template (ctcharsx) */
+} /* end subroutine-template (ctcharsx) */
 
 
 /* local variables */
