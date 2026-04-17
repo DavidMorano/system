@@ -78,7 +78,7 @@ export module cvtdig ;
 
 import digtab ;				/* |getdig(3u)| + |maxbase(3u)| */
 
-inline cint	cvtdig_maxbase = maxbase ; /* <- from |digtab(3u)| */
+inline cint	cvtdig_maxbase = digtab.maxbase ; /* <- from |digtab(3u)| */
 
 constexpr inline int cvtdig_ffbsi(int b) noex {
 	cuint		ub = uint(b) ;
