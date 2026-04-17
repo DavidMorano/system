@@ -66,7 +66,7 @@ static int	ictroman(char *,int,ulonglong) noex ;
 
 /* local variables */
 
-local constexpr cchar	*hundreds[] = {
+constexpr cchar		*hundreds[] = {
 	"",
 	"C",
 	"CC",
@@ -79,7 +79,7 @@ local constexpr cchar	*hundreds[] = {
 	"CM"
 } ; /* end array (hundreds) */
 
-local constexpr cchar	*tens[] = {
+constexpr cchar		*tens[] = {
 	"",
 	"X",
 	"XX",
@@ -92,7 +92,7 @@ local constexpr cchar	*tens[] = {
 	"XC"
 } ; /* end array (tens) */
 
-local constexpr cchar	*ones[] = {
+constexpr cchar		*ones[] = {
 	"",
 	"I",
 	"II",
@@ -161,17 +161,17 @@ static int ictroman(char *dbuf,int dlen,ulonglong v) noex {
 	    cint	ntabs = nelem(tabs) ;
 	    ulonglong	n = 1000 ;
 	    if (v >= n) {
-	        cint		i = intconv(v / n) ;
+	        cint i = intconv(v / n) ;
 	        rs = b.chrs('M',i) ;
 	        v = (v%n) ;
-	    }
+	    } /* end if */
 	    n /= 10 ;
 	    for (int r = 0 ; (rs >= 0) && (r < ntabs) ; r += 1) {
 	        if (v >= n) {
-	            cint	i = intconv(v / n) ;
+	            cint i = intconv(v / n) ;
 	            rs = b.strw(tabs[r][i],-1) ;
 	            v = (v % n) ;
-	        }
+	        } /* end if */
 	        n /= 10 ;
 	    } /* end for */
 	    rs1 = b.finish ;
