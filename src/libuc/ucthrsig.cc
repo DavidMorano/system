@@ -21,7 +21,10 @@
 #include	<cerrno>
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<usystem.h>
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
