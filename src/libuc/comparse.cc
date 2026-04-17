@@ -94,7 +94,7 @@ template<typename ... Args>
 local inline int comparse_magic(comparse *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == COMPARSE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == COMPARSE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (comparse_(magic) */
@@ -133,7 +133,7 @@ int comparse_start(comparse *op,cchar *sp,int µsl) noex {
 	            }
 	            if ((rs = comparse_bake(op,sp,sl)) >= 0) {
 	                vl = rs ;
-	                op->magic = COMPARSE_MAGIC ;
+	                op->magval = COMPARSE_MAGIC ;
 	            } /* end if (comparse_bake) */
 	        } /* end if (vars) */
 	    } /* end if (getlenstr) */
@@ -158,7 +158,7 @@ int comparse_finish(comparse *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->com.sp = nullptr ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
