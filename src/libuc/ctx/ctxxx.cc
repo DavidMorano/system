@@ -119,7 +119,7 @@ constexpr int		maxstack = (256+1) ;	/* |int256_t| in binary */
 template<typename UT>
 local constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	cuint		ub(b) ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	char		*rp = (dbuf + dlen) ;
 	*rp = '\0' ;
 	if (v != 0) {
@@ -145,6 +145,7 @@ local constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	    } /* end if_constexpr (size-of-operand) */
 	    rl = intconv(dbuf + dlen - rp) ;
 	} else {
+	    rl = 1 ;
 	    *--rp = '0' ;
 	}
 	return rl ;
@@ -156,6 +157,7 @@ local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rl = 0 ; /* return-value */
 	if (v < 0) uv = (- uv) ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;
@@ -169,6 +171,7 @@ local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 		            len = ctxxxx(dbuf,dlen,b,uv) ;
 		            if (v < 0) dbuf[dlen-(++len)] = '-' ;
 		            rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
+			    rl = rs ;
 			}
 			rs1 = lm_free(dbuf) ;
 			if (rs >= 0) rs = rs1 ;
@@ -178,16 +181,18 @@ local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 		    len = ctxxxx(dbuf,dlen,b,uv) ;
 		    if (v < 0) dbuf[dlen-(++len)] = '-' ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
+		    rl = rs ;
 		} /* end block */
 	   } /* end if (supported base) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 } /* end subroutine-template (sctxxxx) */
 
 template<typename UT>
 local int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 	cint		n = szof(UT) ;
 	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
 	if (dp) {
 	    cint	t = ffbsi(n) ;
 	    rs = SR_NOTSUP ;
@@ -198,10 +203,11 @@ local int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 		    char dbuf[dlen+1] ;
 		    len = ctxxxx(dbuf,dlen,b,uv) ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
+		    rl = rs ;
 		} /* end block */
 	    } /* end if (base supported) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 } /* end subroutine-template (uctxxxx) */
 
 
@@ -210,28 +216,28 @@ local int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 
 /* exported subroutines */
 
-int ctxxxi(char *dp,int dl,int b,int v) noex {
+int ctxxxi(char *dp,int dl,int b,int v)			noex {
 	return sctxxxx<uint>(dp,dl,b,v) ;
 }
 
-int ctxxxl(char *dp,int dl,int b,long v) noex {
+int ctxxxl(char *dp,int dl,int b,long v)		noex {
 	return sctxxxx<ulong>(dp,dl,b,v) ;
 }
 
-int ctxxxll(char *dp,int dl,int b,longlong v) noex {
+int ctxxxll(char *dp,int dl,int b,longlong v)		noex {
 	return sctxxxx<ulonglong>(dp,dl,b,v) ;
 }
 
-int ctxxxui(char *dp,int dl,int b,uint v) noex {
-	return uctxxxx(dp,dl,b,v) ;
+int ctxxxui(char *dp,int dl,int b,uint uv)		noex {
+	return uctxxxx(dp,dl,b,uv) ;
 }
 
-int ctxxxul(char *dp,int dl,int b,ulong v) noex {
-	return uctxxxx(dp,dl,b,v) ;
+int ctxxxul(char *dp,int dl,int b,ulong uv)		noex {
+	return uctxxxx(dp,dl,b,uv) ;
 }
 
-int ctxxxull(char *dp,int dl,int b,ulonglong v) noex {
-	return uctxxxx(dp,dl,b,v) ;
+int ctxxxull(char *dp,int dl,int b,ulonglong uv)	noex {
+	return uctxxxx(dp,dl,b,uv) ;
 }
 
 
