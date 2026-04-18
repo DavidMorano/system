@@ -16,24 +16,34 @@
 	VAX assembly).
 
 	= 2013-04-30, David A­D­ Morano
-	I took the plunge and rewrote this set of subroutines using
-	the LIBC subroutines |strtoXX(3c)|, being much simplified
-	now.  It is no longer stand-alone (no LIBC dependency),
-	like in the old days, but we have been mostly on UNIX®i for
-	some time now (decades) and use in non-UNIX®i environments
-	is now quite rare.  I hope that this is not a problem.  We
-	will see.
+	I took my old code above and created two parts from it.
+	The first part was changed to use the Standard C-language
+	Library subroutines |{xx}tostr(3c)|, provided by all UNIX-like
+	operating sytems (really any system that has the standard
+	LIBC library available on it).  That first part is now witin
+	the subroutine-group |cfsysx(3uc)|.  The old code remains
+	here and is now called the |cfdigs(3uc)| suvroutine group.
+	Currently (I think) there is no longer any use of this code
+	here.  My thinking was that any "system" or "standardized"
+	subroutine group (like in LIBC) will be better optimized
+	and therefore faster than the code here.  I did not test
+	this assumption (with benchmarking), but I think it should
+	be reasonably true.
 
 	= 2020-05-07, David A-D- Morano
 	I converted this (formerly a header-only file) to a module.
+	I simultaneoulsy did this also to the cousin code of
+	this code named |cfsysx(3uc)|.
 
 	= 2023-10,10, David A-D- Morano
 	I took the liberty to rewite these subroutines in terms of
 	a subroutine-template.  This did nothing to make the code
-	faster in any way.  After template expansion the code is the
-	same as before.  All type-versions of the former subroutines
-	are now in a single subroutine-template.  I guess that I had
-	too much idle time on my hands.
+	faster in any way.  After template expansion the code is
+	the same as before.  All type-versions of the former
+	subroutines are now in a single subroutine-template.  I
+	guess that I had too much idle time on my hands.  I
+	simultaneoulsy did this also to the cousin code of this
+	code named |cfsysx(3uc)|.
 
 */
 
