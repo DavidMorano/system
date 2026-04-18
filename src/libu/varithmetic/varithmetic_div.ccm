@@ -83,7 +83,7 @@ typedef const ulonglong	cull ;
 /* forward references */
 
 export {
-    conex ull vdivshort(int,mut ull *,con ull *,ull) noex ;
+    conex ull vdivushort(int,mut ull *,con ull *,ull) noex ;
 }
 
 
@@ -150,7 +150,7 @@ export {
 /* n= dividend-and-quotient digits */
 export {
     template<integral_unsigned T1>
-    conex T1 vdivshort(int n,mut T1 *q,con T1 *dd,T1 d) noex {
+    conex T1 vdivushort(int n,mut T1 *q,con T1 *dd,T1 d) noex {
 	T1 rem = 0 ;
 	if (d) {
 	    T1 ww[n+1] ;
@@ -166,7 +166,7 @@ export {
 	    vclear(n,q) ;
 	} /* end if (non-zero divisor) */
 	return rem ;
-    } /* end subroutine (vdivshort) */
+    } /* end subroutine (vdivushort) */
 } /* end export */
 
 export {
@@ -189,7 +189,7 @@ export {
 
 /* n= divisor-digits, quotient-digits are double */
 template<integral_unsigned T2,integral_unsigned T1>
-conex bool vdivx(int n,mut T1 *q,mut T1 *r,con T1 *u,con T1 *v) noex {
+conex bool vdivux(int n,mut T1 *q,mut T1 *r,con T1 *u,con T1 *v) noex {
     	cint		n2 = (n * 2) ;
     	cint		t2bits = nbits<T2>
     	cint		ndiv = nsigdig(n,v) ;
@@ -236,14 +236,14 @@ conex bool vdivx(int n,mut T1 *q,mut T1 *r,con T1 *u,con T1 *v) noex {
 	} /* end if (zero-divisor detect) */
 	DPRINTF("ent\n") ;
     	return fz ;
-} /* end subroutine (vdivx) */
+} /* end subroutine (vdivux) */
 
 #endif /* COMMENT */
 
 /* n= dividend-quotient-remainder digits */
 export {
     template<integral_unsigned TA> 
-    conex bool vdivh(int n,mut TA *q,mut TA *r,con TA *u,con TA *v) noex {
+    conex bool vdivuh(int n,mut TA *q,mut TA *r,con TA *u,con TA *v) noex {
 	TA	dv ;
 	cint	ndiv = nsigdig((n/2),v) ;
 	cint	nh = (n/2) ;
@@ -271,8 +271,8 @@ export {
 		} /* end block */
 		tqq = (tq[1]) ? (compl TA(0)) : tq[0] ;
 		forever {
-		    vmulone(n,prod,v,tqq) ;
-		    if (vcmp((nh+1),(uu + i),prod) >= 0) break ;
+		    vmuluone(n,prod,v,tqq) ;
+		    if (vcmpu((nh+1),(uu + i),prod) >= 0) break ;
 		    tqq -= 1 ;
 		} /* end forever */
 		vsub((nh+1),trem,(uu + i),prod,0) ;
@@ -285,12 +285,12 @@ export {
 	    vclear(nh,r) ;
 	} /* end if (non-zero divisor) */
 	return fz ;
-    } /* end subroutine-template (vdivh) */
+    } /* end subroutine-template (vdivuh) */
 } /* end export */
 
 /* n= dividend-quotient-remainder digits */
 export {
-    conex bool vdivh(int n,mut ull *q,mut ull *r,con ull *u,con ull *v) noex {
+    conex bool vdivuh(int n,mut ull *q,mut ull *r,con ull *u,con ull *v) noex {
     	cint	ndiv = nsigdig(n,v) ;
 	cint	nh = (n/2) ;
     	bool	fz = true ;
@@ -305,7 +305,7 @@ export {
 	    for (int i = 0 ; i < nh ; i += 1) {
 	        llsplit((lv+(i*2)),v[i]) ;
 	    } /* end for */
-	    fz = vdivh(n,lq,lr,lu,lv) ;
+	    fz = vdivuh(n,lq,lr,lu,lv) ;
 	    for (int i = 0 ; i < n ; i += 1) {
 		q[i] = lljoin(lq + (i*2)) ;
 		r[i] = lljoin(lr + (i*2)) ;
@@ -315,13 +315,13 @@ export {
 	    vclear(nh,r) ;
 	} /* end if (non-zero divisor) */
     	return fz ;
-    } /* end subroutine (vdivh) */
+    } /* end subroutine (vdivuh) */
 } /* end export */
 
 /* n= dividend-quotient-dividend digits */
 export {
     template<integral_unsigned TA>
-    conex bool vdivx(int n,mut TA *q,mut TA *r,con TA *u,con TA *v) noex {
+    conex bool vdivux(int n,mut TA *q,mut TA *r,con TA *u,con TA *v) noex {
     	cint	ndiv = nsigdig(n,v) ;
 	cint	nh = (n/2) ;
 	bool	fz = true ;
@@ -329,23 +329,23 @@ export {
 	    if ((ndiv == 1) && (szof(TA) < szof(ulonglong))) {
 		TA rem ;
 		TA divisor = v[nh-1] ;
-    		rem = vdivshort(n,q,u,divisor) ;
+    		rem = vdivushort(n,q,u,divisor) ;
 		vclear(n,r) ;
 		r[0] = rem ;
 	    } else {
-		fz = vdivh(n,q,r,u,v) ;
+		fz = vdivuh(n,q,r,u,v) ;
 	    }
 	} else if (n > 0) {
 	    vclear(n,q) ;
 	    vclear(nh,r) ;
 	} /* end if (non-zero divisor) */
     	return fz ;
-    } /* end subroutine (vdivx) */
+    } /* end subroutine (vdivux) */
 } /* end export */
 
 /* n= dividend-quotient-remainder digits */
 export {
-    conex ull vdivshort(int n,mut ull *q,con ull *u,ull d) noex {
+    conex ull vdivushort(int n,mut ull *q,con ull *u,ull d) noex {
 	cint	nh = (n/2) ;
 	ull	rem = 0 ;
 	if ((n > 0) && d) {
@@ -358,7 +358,7 @@ export {
 	    } /* end for */
 	    vclear(nh,lv) ;
 	    llsplit(lv,d) ;
-	    vdivx(n,lq,lr,lu,lv) ;
+	    vdivux(n,lq,lr,lu,lv) ;
 	    for (int i = 0 ; i < n ; i += 1) {
 		q[i] = lljoin(lq + (i*2)) ;
 	    } /* end for */
@@ -367,12 +367,12 @@ export {
 	    vclear(n,q) ;
 	} /* end if (non-zero divisor) */
     	return rem ;
-    } /* end subroutine (vdivshort) */
+    } /* end subroutine (vdivushort) */
 } /* end export */
 
 /* nh= dividend-quotient-remainder-divisor digits */
 export {
-    conex bool vdivtrunc(int nh,mut ull *q,mut ull *r,
+    conex bool vdivutrunc(int nh,mut ull *q,mut ull *r,
 	    con ull *u,con ull *v) noex {
     	cint	ndiv = nsigdig(nh,v) ;
 	cint	nh2 = (nh*2) ;
@@ -388,7 +388,7 @@ export {
 	        llsplit((dv+(i*2)),v[i]) ;
 	    } /* end for */
 	    vclear(nh,(du+nh2)) ;
-	    fz = vdivx(nh2,dq,dr,du,dv) ;
+	    fz = vdivux(nh2,dq,dr,du,dv) ;
 	    for (int i = 0 ; i < nh ; i += 1) { /* <- truncation */
 		q[i] = lljoin(dq + (i*2)) ;
 		r[i] = lljoin(dr + (i*2)) ;
@@ -398,7 +398,7 @@ export {
 	    vclear(nh,r) ;
 	} /* end if (non-zero divisor) */
     	return fz ;
-    } /* end subroutine (vdivtrunc) */
+    } /* end subroutine (vdivutrunc) */
 } /* end export */
 
 
