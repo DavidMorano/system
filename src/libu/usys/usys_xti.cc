@@ -1,4 +1,4 @@
-/* usys_xti SUPPORT */
+/* usys_xti SUPPORT (X/Open Transport Interface) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,9 +18,10 @@
 /*******************************************************************************
 
 	Note:
-	There is (at least no longer) any XTI on Apple-Darwin.
-	But neither is there any XTI on Linux or (I think) any
-	other BSD variants.
+	This file contains some support for the X/Open Transport
+	Interface (XTI) related operations.  There is (at least no longer)
+	any XTI on Apple-Darwin.  But neither is there any XTI on
+	Linux or (I think) any other BSD variants.
 
 *******************************************************************************/
 
