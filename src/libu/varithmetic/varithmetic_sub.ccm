@@ -57,7 +57,7 @@ export {
 	    co = subc((r+i),v[i],0u,co) ;
 	}
 	return co ;
-    } /* enf subroutine (vsubone) */
+    } /* end subroutine (vsubone) */
 } /* end export */
 
 export {
@@ -77,7 +77,7 @@ export {
     constexpr void vneg(int n,mut Dig *r,con Dig *v) noex {
     	Dig t[n] ;
 	vcomp(n,t,v) ;
-	vaddone(n,r,t) ;
+	vadduone(n,r,t) ;
     } /* end subroutine (vneg) */
 } /* end export */
 
