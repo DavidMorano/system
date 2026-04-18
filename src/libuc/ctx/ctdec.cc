@@ -121,7 +121,7 @@ template<typename UT>
 local constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
 	constexpr uint	udiv100 = uint(div100) ;
 	char		*rp = (dbuf + dlen) ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	*rp = '\0' ;
 	if (v != 0) {
 	    int di ;
@@ -154,6 +154,7 @@ local constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
                 } /* end while */
             } /* end if */
 	} else {
+	    rl = 1 ;
 	    *--rp = '0' ;
 	}
 	return rl ;
@@ -164,6 +165,7 @@ local int ctdecsx(char *dp,int dl,const ST &v) noex {
 	UT		uv = (UT) v ;
 	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
 	if (v < 0) uv = (- uv) ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;
@@ -175,16 +177,18 @@ local int ctdecsx(char *dp,int dl,const ST &v) noex {
 		    len = ctdecx(dbuf,dlen,uv) ;
 		    if (v < 0) dbuf[dlen-(++len)] = '-' ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
+		    rl = rs ;
 		} /* end block */
 	   } /* end block */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 } /* end subroutine-template (ctdecsx) */
 
 template<typename UT>
 local int ctdecux(char *dp,int dl,const UT &uv) noex {
 	cint		n = szof(UT) ;
 	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
 	if (dp) {
 	    cint	t = ffbsi(n) ;
 	    {
@@ -194,10 +198,11 @@ local int ctdecux(char *dp,int dl,const UT &uv) noex {
 		    char dbuf[dlen+1] ;
 		    len = ctdecx(dbuf,dlen,uv) ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
+		    rl = rs ;
 		} /* end block */
 	    } /* end block */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 } /* end subroutine-template (ctdecux) */
 
 
@@ -206,28 +211,28 @@ local int ctdecux(char *dp,int dl,const UT &uv) noex {
 
 /* exported subroutines */
 
-int ctdeci(char *dp,int dl,int v) noex {
+int ctdeci(char *dp,int dl,int v)		noex {
 	return ctdecsx<uint>(dp,dl,v) ;
 }
 
-int ctdecl(char *dp,int dl,long v) noex {
+int ctdecl(char *dp,int dl,long v)		noex {
 	return ctdecsx<ulong>(dp,dl,v) ;
 }
 
-int ctdecll(char *dp,int dl,longlong v) noex {
+int ctdecll(char *dp,int dl,longlong v)		noex {
 	return ctdecsx<ulonglong>(dp,dl,v) ;
 }
 
-int ctdecui(char *dp,int dl,uint v) noex {
-	return ctdecux(dp,dl,v) ;
+int ctdecui(char *dp,int dl,uint uv)		noex {
+	return ctdecux(dp,dl,uv) ;
 }
 
-int ctdecul(char *dp,int dl,ulong v) noex {
-	return ctdecux(dp,dl,v) ;
+int ctdecul(char *dp,int dl,ulong uv)		noex {
+	return ctdecux(dp,dl,uv) ;
 }
 
-int ctdecull(char *dp,int dl,ulonglong v) noex {
-	return ctdecux(dp,dl,v) ;
+int ctdecull(char *dp,int dl,ulonglong uv)	noex {
+	return ctdecux(dp,dl,uv) ;
 }
 
 
