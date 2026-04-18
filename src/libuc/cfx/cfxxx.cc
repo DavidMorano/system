@@ -16,25 +16,18 @@
 	VAX assembly).
 
 	= 2013-04-30, David A­D­ Morano
-	I took the plunge and rewrote this set of subroutines using
-	the LIBC subroutines |strtoXX(3c)|, being much simplified
-	now.  It is no longer stand-alone (no LIBC dependency),
-	like in the old days, but we have been mostly on UNIX®i for
-	some time now (decades) and use in non-UNIX®i environments
-	is now quite rare.  I hope that this is not a problem.  We
-	will see.
-
-	= 2023-10,10, David A-D- Morano
-	I took the liberty to rewite these subroutines in terms of
-	a subroutine-template.  This did nothing to make the code
-	faster in any way.  After template expansion the code is the
-	same as before.  All type-versions of the former subroutines
-	are now in a single subroutine-template.  I guess that I had
-	too much idle time on my hands.
+	I made a switch in this code from using (depending on) the
+	|cfdigx(3uc)| group of subroutines (for the actual conversions)
+	to the |cfsysx(3uc)| group of subroutines.  The latter uses
+	the operating system standard C-language library subroutines
+	to do the actual conversions, so therefore (it is assumed)
+	should be faster than the older conversion routines.  See
+	the notes within the source file for the subroutine group
+	|cfdigx(3uc)| for more information on this change.
 
 */
 
-/* Copyright © 1998,2013,2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2013 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
