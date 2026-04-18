@@ -207,6 +207,4 @@ varithmetic_mul.o:	varithmetic_mul.ccm	$(MUTIL) varithmetic_add.o
 
 varithmetic_div.o:	varithmetic_div.ccm	$(MUTIL) $(DEP_DIV)
 
-varithmetic7.o:		varithmetic7.cc		$(MUTIL) varithmetic0.o
-
 
