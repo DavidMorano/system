@@ -31,21 +31,21 @@
 
 EXTERNC_begin
 
-extern int	uc_strtof(cchar *,cchar **,float *) noex ;
-extern int	uc_strtod(cchar *,cchar **,double *) noex ;
-extern int	uc_strtold(cchar *,cchar **,longdouble *) noex ;
+extern int	uc_strtof(cchar *,cchar **,float *)		noex ;
+extern int	uc_strtod(cchar *,cchar **,double *)		noex ;
+extern int	uc_strtold(cchar *,cchar **,longdouble *)	noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int uc_strto(cchar *sp,cchar **endpp,float *rp) noex {
+inline int uc_strto(cchar *sp,cchar **endpp,float *rp)		noex {
 	return uc_strtof(sp,endpp,rp) ;
 }
-inline int uc_strto(cchar *sp,cchar **endpp,double *rp) noex {
+inline int uc_strto(cchar *sp,cchar **endpp,double *rp)		noex {
 	return uc_strtod(sp,endpp,rp) ;
 }
-inline int uc_strto(cchar *sp,cchar **endpp,longdouble *rp) noex {
+inline int uc_strto(cchar *sp,cchar **endpp,longdouble *rp)	noex {
 	return uc_strtold(sp,endpp,rp) ;
 }
 
