@@ -1,4 +1,4 @@
-/* usys_xti HEADER */
+/* usys_xti HEADER (X/Open Transport Interface) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -21,8 +21,8 @@
 	usys_xti
 
 	Description:
-	This file contains some support for the UNIX® USTSXTI related
-	operations.
+	This file contains some support for the X/Open Transport
+	Interface (XTI) related operations.
 
 *******************************************************************************/
 
