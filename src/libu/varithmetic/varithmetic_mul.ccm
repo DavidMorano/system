@@ -57,7 +57,7 @@ import varithmetic.add ;
 
 /* module subroutines */
 
-constexpr void vmuler(int n,mut ulong *r,con ulong *v0,con ulong *v1) noex {
+constexpr void vmuluer(int n,mut ulong *r,con ulong *v0,con ulong *v1) noex {
 	cint nb = (szof(ulong) * CHAR_BIT) ;
 	cint nh = (n / 2) ;
 	ulonglong vl0 ;
@@ -78,10 +78,10 @@ constexpr void vmuler(int n,mut ulong *r,con ulong *v0,con ulong *v1) noex {
     		co = addc((r + ri + 1),r[ri + 1],tmp,co) ;
 	    } /* end for */
 	} /* end for */
-} /* end subroutine (vmuler) */
+} /* end subroutine (vmuluer) */
 
     template<typename Dig>
-    constexpr void vmuler(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
+    constexpr void vmuluer(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
 	cint nh = (n / 2) ;
 	vclear(n,r) ;
 	for (int i = 0 ; i < nh ; i += 1) {
@@ -93,12 +93,12 @@ constexpr void vmuler(int n,mut ulong *r,con ulong *v0,con ulong *v1) noex {
     		co = addc((r + ri + 1),r[ri + 1],res[1],co) ;
 	    } /* end for */
 	} /* end for */
-    } /* end subroutine (vmuler) */
+    } /* end subroutine (vmuluer) */
 
 export {
     /* n= quotient-reminder-digits */
     template<typename Dig>
-    constexpr void vmulone(int n,mut Dig *r,con Dig *v0,con Dig one) noex {
+    constexpr void vmuluone(int n,mut Dig *r,con Dig *v0,con Dig one) noex {
 	cint nh = (n / 2) ;
 	vclear(n,r) ;
 	for (int i = 0 ; i < nh ; i += 1) {
@@ -108,26 +108,46 @@ export {
 	    co = addc((r + ri + 0),r[ri + 0],res[0],co) ;
 	    co = addc((r + ri + 1),r[ri + 1],res[1],co) ;
 	} /* end for */
-    } /* end subroutine (vmulone) */
+    } /* end subroutine (vmuluone) */
 } /* end export */
 
 export {
     template<typename Dig>
-    constexpr void vmul(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
-	vmuler(n,r,v0,v1) ;
-    } /* end subroutine (vmul) */
+    constexpr void vmulu(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
+	vmuluer(n,r,v0,v1) ;
+    } /* end subroutine (vmulu) */
 } /* end export */
 
 export {
     template<typename Dig>
-    constexpr void vmultrunc(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
+    constexpr void vmulutrunc(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
 	cint n2 = (n * 2) ;
 	{
     	    Dig res[n2] ;
-	    vmuler(n2,res,v0,v1) ;
+	    vmuluer(n2,res,v0,v1) ;
 	    vcopy(n,r,res) ; /* <- truncation */
 	}
-    } /* end subroutine (vmultrunc) */
+    } /* end subroutine (vmulutrunc) */
 } /* end export */
+
+#ifdef	COMMENT
+
+export {
+    template<typename Dig>
+    constexpr void vmulstrunc(int n,mut Dig *r,con Dig *v0,con Dig *v1) noex {
+	cbool	v0s = vsignget(n,v0) ;
+	cbool	v1s = vsignget(n,v1) ;
+	cint n2 = (n * 2) ;
+	{
+    	    Dig res[n2] ;
+	    vmuluer(n2,res,v0,v1) ;
+	    vcopy(n,r,res) ; /* <- truncation */
+	}
+    } /* end subroutine (vmulstrunc) */
+} /* end export */
+
+
+
+#endif /* COMMENT */
 
 
