@@ -1,4 +1,4 @@
-/* usys_xtierror HEADER */
+/* usys_xtierror HEADER (X/Open Transport Interface) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -18,16 +18,16 @@
 /*******************************************************************************
 
   	System:
-	usys_xti
+	usys_xtierror
 
 	Description:
-	This file contains some support for the UNIX® USTSXTIERROR related
-	operations.
+	This file contains some support for the X/Open Transport
+	Interface (XTI) related operations.
 
 *******************************************************************************/
 
-#ifndef	USTSXTIERROR_INCLUDE
-#define	USTSXTIERROR_INCLUDE
+#ifndef	USYSXTIERROR_INCLUDE
+#define	USYSXTIERROR_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -169,6 +169,6 @@
 #endif /* defined(SYSHAS_XTIERROR) && (SYSHAS_XTIERROR > 0) */
 
 
-#endif /* USTSXTIERROR_INCLUDE */
+#endif /* USYSXTIERROR_INCLUDE */
 
 
