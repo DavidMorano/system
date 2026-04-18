@@ -94,9 +94,9 @@
 	endp	the ending pointer position of a supplied buffer
 
 	Notes:
-	As it stands now, these subroutines do not perform any funny
-	business in trying to make this process faster!  These
-	subroutines are, therefore, probably the slowest such
+	As it stands now, these subroutines do not perform any
+	special tenchiques to try to make this process faster.
+	These subroutines are, therefore, probably the slowest such
 	conversions routinely available.  To really move (execute)
 	quickly through the division-related aspects of the required
 	algorithm, one would have to use assembly language where
@@ -181,7 +181,7 @@ constexpr int uxxtostr(char *endp,int b,UT v) noex {
             } /* end if */
         } /* end if (base supported) */
     } /* end if (non-null) */
-    return (rs >= 0) ? int(endp - rp) : rs ;
+    return (rs >= 0) ? intconv(endp - rp) : rs ;
 } /* end subroutine-template (uxxtostr) */
 
 template<typename UT,typename ST>
@@ -196,7 +196,7 @@ constexpr int sxxtostr(char *endp,int b,ST v) noex {
             if (v < 0) *--rp = '-' ;
         }
     }
-    return (rs >= 0) ? int(endp - rp) : rs ;
+    return (rs >= 0) ? intconv(endp - rp) : rs ;
 } /* end subroutine (sxxtostr) */
 
 template<typename UT>
@@ -241,7 +241,7 @@ constexpr int uxxtostr10(char *endp,UT v) noex {
             *--rp = '0' ;
         } /* end if */
     } /* end if (non-null) */
-    return (rs >= 0) ? int(endp - rp) : rs ;
+    return (rs >= 0) ? intconv(endp - rp) : rs ;
 } /* end subroutine-template (uxxtostr10) */
 
 template<typename UT,typename ST>
@@ -256,7 +256,7 @@ constexpr int sxxtostr10(char *endp,ST v) noex {
             if (v < 0) *--rp = '-' ;
         }
     }
-    return (rs >= 0) ? int(endp - rp) : rs ;
+    return (rs >= 0) ? intconv(endp - rp) : rs ;
 } /* end subroutine (sxxtostr10) */
 
 template<typename UT,typename T> 
