@@ -1,4 +1,4 @@
-/* usys_xtistructs HEADER */
+/* usys_xtistructs HEADER (X/Open Transport Interface) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -18,16 +18,16 @@
 /*******************************************************************************
 
   	System:
-	usys_xti
+	usys_xtistructs
 
 	Description:
-	This file contains some support for the UNIX® USTSXTI related
-	operations.
+	This file contains some support for the X/Open Transport
+	Interface (XTI) related operations.
 
 *******************************************************************************/
 
-#ifndef	USTSXTISTRUCTSINCLUDE
-#define	USTSXTISTRUCTSINCLUDE
+#ifndef	USTSXTISTRUCTS_INCLUDE
+#define	USTSXTISTRUCTS_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -84,6 +84,6 @@ struct t_call {
 #endif /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */
 
 
-#endif /* USTSXTISTRUCTSINCLUDE */
+#endif /* USTSXTISTRUCTS_INCLUDE */
 
 
