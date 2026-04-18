@@ -33,6 +33,7 @@ module ;
 #include	<climits>		/* |CHAR_BIT| */
 #include	<cstddef>
 #include	<cstdlib>
+#include	<concepts>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -46,11 +47,33 @@ export module varithmetic.util ;
 import builtin ;
 import bitmanip ;
 
+using std::integral_unsigned ;
+
 /* module subroutines */
+
+export {
+    template<integral_unsigned Dig>
+    constexpr bool vsignget(int n,con Dig *v) noex {
+	return bitsign(v[n - 1]) ;
+    } /* end subroutine (vsignget) */
+    template<integral_unsigned Dig>
+    constexpr void vsignclr(int n,mut Dig *v) noex {
+    	cint nb = nbits<Dig> ;
+    	const Dig smask = ((compl Dig(0)) >> 1) ;
+	v[n-1] &= smask ;
+    } /* end subroutine (vsignget) */
+    template<integral_unsigned Dig>
+    constexpr void vsignset(int n,mut Dig *v) noex {
+    	cint nb = nbits<Dig> ;
+    	Dig smask = Dig(1) ;
+    	smask <<= (nb-1) ;
+	v[n-1] |= smask ;
+    } /* end subroutine (vsignset) */
+} /* end export */
 
 /* how many digits are in a divisor-array, on the low end */
 export {
-    template<typename TA> constexpr int nsigdig(int n,con TA *d) noex {
+    template<integral_unsigned TA> constexpr int nsigdig(int n,con TA *d) noex {
     	int c = 0 ;
     	for (int i = (n - 1) ; i >= 0 ; --i) {
 	    if (d[i]) {
@@ -63,19 +86,19 @@ export {
 } /* end export */
 
 export {
-    template<typename Dig>
+    template<integral_unsigned Dig>
     constexpr void vclear(int n,mut Dig *v) noex {
 	for (int i = 0 ; i < n ; i += 1) {
 	    v[i] = 0 ;
 	}
     } /* end subroutine (vclear) */
-    template<typename Dig>
+    template<integral_unsigned Dig>
     constexpr void vopaque(int n,mut Dig *v) noex {
 	for (int i = 0 ; i < n ; i += 1) {
 	    v[i] = (compl Dig(0)) ;
 	}
     } /* end subroutine (vopaque) */
-    template<typename Dig>
+    template<integral_unsigned Dig>
     constexpr void vcopy(int n,mut Dig *r,con Dig *o = nullptr) noex {
 	if (o) {
 	    for (int i = 0 ; i < n ; i += 1) {
@@ -88,8 +111,8 @@ export {
 } /* end export */
 
 export {
-    template<typename Dig>
-    constexpr int vcmp(int n,con Dig *v1,con Dig *v2) noex {
+    template<integral_unsigned Dig>
+    constexpr int vcmpu(int n,con Dig *v1,con Dig *v2) noex {
 	int		rc = 0 ;
 	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
 	    if ((rc = (v1[i] != v2[i]))) {
@@ -98,16 +121,41 @@ export {
 	    }
 	} /* end for */
 	return rc ;
-    } /* end subroutine (vcmp) */
+    } /* end subroutine (vcmpu) */
+    template<integral_unsigned Dig>
+    constexpr int vcmps(int n,con Dig *v1,con Dig *v2) noex {
+	cbool		v1s = vsignget(n,v1) ;
+	cbool		v2s = vsignget(n,v2) ;
+	int		rc = 0 ;
+	if (v1s && v2s) {
+	    rc = vcmp(n,v1,v2) ;
+	} else if ((! v1s) && (! v2s)) {
+	    rc = vcmp(n,v1,v2) ;
+	} else {
+	    rc = (v1s) ? -1 : +1 ;
+	} /* end if */
+	return rc ;
+    } /* end subroutine (vcmps) */
 } /* end export */
 
 export {
-    template<typename Dig>
+    template<integral_unsigned Dig>
+    constexpr bool visgot(int n,con Dig *v) noex {
+	bool f = false ;
+	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
+	    if ((f = v[i])) break ;
+	} /* end for */
+	return f ;
+    } /* end subroutine-template (visgot) */
+} /* end export */
+
+export {
+    template<integral_unsigned Dig>
     constexpr int addone(mut Dig &r,con Dig v) noex {
 	r = v + 1 ;
 	return int(r < v) ; /* carry-out */
     }
-    template<typename Dig>
+    template<integral_unsigned Dig>
     constexpr int subone(mut Dig &r,con Dig v) noex {
 	r = v - 1 ;
 	return int(r > v) ; /* carry-out */
@@ -115,7 +163,7 @@ export {
 } /* end export */
 
 export {
-    template<typename Dig>
+    template<integral_unsigned Dig>
     constexpr int addc(mut Dig *r,con Dig v0,con Dig v1,
 	    int ci = 0) noex {
 	Dig		co{} ;
@@ -123,7 +171,7 @@ export {
 	*r = mach_addc(v0,v1,dci,&co) ;
 	return int(co) ;
     }
-    template<typename Dig>
+    template<integral_unsigned Dig>
     constexpr int subc(mut Dig *r,con Dig v0,con  Dig v1,
 	    int ci = 0) noex {
 	Dig		co{} ;
