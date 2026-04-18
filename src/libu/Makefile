@@ -86,7 +86,7 @@ OBJ30= binchunk.o conintx.o udiv.o stdintx.o
 OBJ31= ccfile.o readln.o dprintf.o
 
 OBJ32= muldigs.o varithmetic.o xxtostr.o
-OBJ33=
+OBJ33= intext.o
 OBJ34=
 OBJ45=
 
@@ -98,7 +98,7 @@ OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
-OBJI= obj32.o 
+OBJI= obj32.o obj33.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o obji.o
 
@@ -489,8 +489,13 @@ ptx.dir:
 	makesubdir $@
 
 # VARITHMETIC
-varithmetic.o:		varithmetic.dir bitmanip.o muldigs.o
-varithmetic.dir:
+varithmetic.o:		varithmetic.dir 
+varithmetic.dir:	bitmanip.o muldigs.o
+	makesubdir $@
+
+# INREXT
+intext.o:		intext.dir	
+intext.dir:		varithmetic.o loadvals.o
 	makesubdir $@
 
 # misc-objects
@@ -546,7 +551,6 @@ dprintf.o:		dprintf.cc	dprintf.hh			$(INCS)
 bitmanip.o:		bitmanip.ccm
 muldigs.o:		muldigs.ccm
 loadvals.o:		loadvals.ccm
-intext.o:		intext.ccm	varithmetic.o loadvals.o
 
 ischx.o:		ischx0.o ischx1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
