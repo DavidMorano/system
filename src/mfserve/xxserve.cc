@@ -1,4 +1,4 @@
-/* progserve */
+/* progserve SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -37,14 +37,16 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
+#include	<pwd.h>
 #include	<ctime>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<pwd.h>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getx.h>
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<field.h>
@@ -62,6 +64,9 @@
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<char.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<svckey.h>
+#include	<procse.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -70,9 +75,10 @@
 #include	"clientinfo.h"
 #include	"builtin.h"
 #include	"standing.h"
-#include	"svckey.h"
-#include	"procse.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -133,30 +139,11 @@
 
 /* external subroutines */
 
-extern int	sninetaddr(char *,int,int,const void *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	mkpath3w(char *,const char *,const char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkshlibname(char *,cchar *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfbaselib(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	nlspeername(const char *,const char *,char *) ;
-extern int	getprogpath(IDS *,vecstr *,char *,const char *,int) ;
-extern int	netgroupcheck(const char *,vecstr *,vecstr *) ;
-extern int	mkquoted(char *,int,cchar *,int) ;
-extern int	optbool(const char *,int) ;
-extern int	isasocket(int) ;
-extern int	uc_waitwritable(int,int) ;
+extern "C" {
+    extern int	uc_waitwritable(int,int) noex ;
+}
 
-extern int	progsrvargs(PROGINFO *,vecstr *,const char *) ;
+extern int	progsrvargs(PROGINFO *,vecstr *,cchar *) ;
 extern int	progshlib(PROGINFO *,cchar *,cchar *,vecstr *,cchar *,int) ;
 extern int	progexec(PROGINFO *,cchar *,cchar *,vecstr *) ;
 
@@ -165,18 +152,11 @@ extern int	proguseracctmat(PROGINFO *,struct passwd *,char *,int,cchar *) ;
 extern int	proguseracctexec(PROGINFO *,CLIENTINFO *,struct passwd *) ;
 #endif /* P_FINGERS */
 
-extern int	xfile(IDS *,const char *) ;
+extern int	xfile(IDS *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strdcpy1(char *,int,cchar *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*strbasename(char *) ;
 
 
 /* external variables */
@@ -190,33 +170,33 @@ namespace {
 	int	maxpathlen ;
 	operator int () noex ;
     } ;
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int	procserver(PROGINFO *,CLIENTINFO *,
+local inr	procserver(PROGINFO *,CLIENTINFO *,
 			SVCFILE_ENT *,cchar **) ;
-static int	procserverpass(PROGINFO *,CLIENTINFO *,
+local inr	procserverpass(PROGINFO *,CLIENTINFO *,
 			PROCSE *, VECSTR *,cchar *) ;
-static int	procserverlib(PROGINFO *,CLIENTINFO *,
+local inr	procserverlib(PROGINFO *,CLIENTINFO *,
 			PROCSE *, VECSTR *,cchar *) ;
-static int	procserverexec(PROGINFO *,CLIENTINFO *,
+local inr	procserverexec(PROGINFO *,CLIENTINFO *,
 			PROCSE *, VECSTR *,cchar *) ;
-static int	procfindprog(PROGINFO *,vecstr *,cchar **,
+local inr	procfindprog(PROGINFO *,vecstr *,cchar **,
 			char *,cchar *,int) ;
 
 #if	CF_CHECKACCESS
-static int	procaccperm(PROGINFO *,CLIENTINFO *,PROCSE *) ;
+local inr	procaccperm(PROGINFO *,CLIENTINFO *,PROCSE *) ;
 #endif
 
 #ifdef	COMMENT
-static int	procusersetup(PROGINFO *,CLIENTINFO *,SVCFILE_ENT *) ;
+local inr	procusersetup(PROGINFO *,CLIENTINFO *,SVCFILE_ENT *) ;
 #endif
 
-static int	loadcooks(PROGINFO *,CLIENTINFO *,cchar **) ;
-static int	loadpeernames(PROGINFO *,CLIENTINFO *,vecstr *) ;
-static int	loadaccgroups(PROGINFO *,vecstr *,cchar *,int) ;
+local inr	loadcooks(PROGINFO *,CLIENTINFO *,cchar **) ;
+local inr	loadpeernames(PROGINFO *,CLIENTINFO *,vecstr *) ;
+local inr	loadaccgroups(PROGINFO *,vecstr *,cchar *,int) ;
 
 
 /* local variables */
@@ -257,8 +237,8 @@ STANDING	*sop ;
 BUILTIN		*bop ;
 CLIENTINFO	*cip ;
 vecstr		*nelp ;
-const char	svcspec[] ;
-const char	*sav[] ;
+cchar	svcspec[] ;
+cchar	*sav[] ;
 {
 	SVCFILE_ENT	ste ;
 	int		rs = SR_OK ;
@@ -266,8 +246,8 @@ const char	*sav[] ;
 	int		si ;
 	int		svcspeclen ;
 	int		f_served = FALSE ;
-	const char	*svcspecp = svcspec ;
-	const char	*tp, *cp ;
+	cchar	*svcspecp = svcspec ;
+	cchar	*tp, *cp ;
 	char		svcbuf[SVCSPECLEN + 1] ;
 	char		stebuf[STEBUFLEN + 1] ;
 	char		timebuf[TIMEBUFLEN + 1] ;
@@ -278,12 +258,12 @@ const char	*sav[] ;
 	        cip->peername) ;
 #endif
 
-/* has a service been passed to us (overrides normal service) */
+/* has a service been passed to us (over-rides normal service) */
 
 	if ((pip->svcpass != nullptr) && (pip->svcpass[0] != '\0'))
 	    svcspecp = pip->svcpass ;
 
-	svcspeclen = strlen(svcspecp) ;
+	svcspeclen = lenstr(svcspecp) ;
 
 /* do we have a subservice? */
 
@@ -346,7 +326,7 @@ const char	*sav[] ;
 	    rs = vecstr_envadd(&pip->exports,VARHOME,pip->homedname,-1) ;
 
 	if (rs >= 0) {
-	    const char	*varterm = VARTERM ;
+	    cchar	*varterm = VARTERM ;
 
 	    rs1 = vecstr_search(&pip->exports,varterm,vstrkeycmp,&cp) ;
 	    if ((rs1 == SR_NOTFOUND) && (nelp != nullptr)) {
@@ -393,7 +373,7 @@ const char	*sav[] ;
 	if ((rs >= 0) && (! f_served) && pip->fl.loginsvc) {
 	    if (pip->fl.useracct && (strcmp(cip->service,"help") != 0)) {
 	        struct passwd	pw ;
-	        const int	pwlen = getbufsize(bufsize_pw) ;
+	        cint	pwlen = getbufsize(bufsize_pw) ;
 	        char		*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	            cchar	*svc = cip->service ;
@@ -461,13 +441,13 @@ badnosvc:
 #if	defined(P_FINGERS) && (P_FINGERS > 0)
 	    if (pip->fl.defnoserver) {
 	        cp = "no user\n" ;
-	        rs = uc_writen(cip->fd_output,cp,strlen(cp)) ;
+	        rs = uc_writen(cip->fd_output,cp,lenstr(cp)) ;
 	    }
 #endif /* defined(P_FINGERS) */
 
 #if	defined(P_TCPMUXD) && (P_TCPMUXD > 0)
 	    cp = "-\r\n" ;
-	    rs = uc_writen(cip->fd_output,cp,strlen(cp)) ;
+	    rs = uc_writen(cip->fd_output,cp,lenstr(cp)) ;
 #endif /* defined (P_FINGERS) */
 
 	} /* end if (no service match) */
@@ -502,12 +482,11 @@ ret1:
 
 /* local subroutines */
 
-
-static int procserver(pip,cip,step,sav)
+local inr procserver(pip,cip,step,sav)
 PROGINFO	*pip ;
 CLIENTINFO	*cip ;
 SVCFILE_ENT	*step ;
-const char	*sav[] ;
+cchar	*sav[] ;
 {
 	PROCSE		se ;
 	PROCSE_ARGS	sea ;
@@ -522,7 +501,7 @@ const char	*sav[] ;
 	int		f_served = FALSE ;
 	int		f_failcont = TRUE ;
 	int		f_cont = TRUE ;
-	const char	*argz ;
+	cchar	*argz ;
 
 	if (cip == nullptr) return SR_FAULT ;
 	if (step == nullptr) return SR_FAULT ;
@@ -687,7 +666,7 @@ const char	*sav[] ;
 #endif
 
 	if (! f_served) {
-	    const char	*msg = "no server configured" ;
+	    cchar	*msg = "no server configured" ;
 	    if (pip->open.logprog)
 	        proglog_printf(pip,"%s (%d)",msg,rs) ;
 	    bprintf(pip->efp,"%s: %s (%d)\n",pip->progname,msg,rs) ;
@@ -715,12 +694,12 @@ ret0:
 /* end subroutine (procserver) */
 
 
-static int procserverpass(pip,cip,sep,alp,argz)
+local inr procserverpass(pip,cip,sep,alp,argz)
 PROGINFO	*pip ;
 CLIENTINFO	*cip ;
 PROCSE		*sep ;
 VECSTR		*alp ;
-const char	*argz ;
+cchar	*argz ;
 {
 	ustat	sb ;
 	mode_t		operms ;
@@ -729,7 +708,7 @@ const char	*argz ;
 	int		oflags ;
 	int		to = TO_SENDFD ;
 	int		f_served = FALSE ;
-	const char	*passfname = sep->a.passfile ;
+	cchar	*passfname = sep->a.passfile ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -807,22 +786,22 @@ ret0:
 /* end subroutine (procserverpass) */
 
 
-static int procserverlib(pip,cip,sep,alp,argz)
+local inr procserverlib(pip,cip,sep,alp,argz)
 PROGINFO	*pip ;
 CLIENTINFO	*cip ;
 PROCSE		*sep ;
 VECSTR		*alp ;
-const char	*argz ;
+cchar	*argz ;
 {
-	const int	nlen = MAXNAMELEN ;
+	cint	nlen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		pnl ;
 	int		enl = 0 ;
-	const char	*program = sep->a.sharedobj ;
-	const char	*pnp ;
-	const char	*tp ;
-	const char	*enp = nullptr ;	/* shlib entry-point */
-	const char	*cp ;
+	cchar	*program = sep->a.sharedobj ;
+	cchar	*pnp ;
+	cchar	*tp ;
+	cchar	*enp = nullptr ;	/* shlib entry-point */
+	cchar	*cp ;
 	char		progfname[MAXPATHLEN + 1] ;
 	char		shlibname[MAXNAMELEN + 1] ;
 	char		argzbuf[MAXNAMELEN + 1] ;
@@ -872,7 +851,7 @@ const char	*argz ;
 	if ((enp == nullptr) || (enl == 0)) {
 	    if ((argz != nullptr) && (argz[0] != '\0')) {
 	        enp = argz ;
-	        enl = strlen(argz) ;
+	        enl = lenstr(argz) ;
 	    } else {
 	        enl = sfbaselib(pnp,pnl,&enp) ;
 	    }
@@ -898,7 +877,7 @@ const char	*argz ;
 /* can we execute this service daemon? */
 
 	if (strnchr(pnp,pnl,'.') == nullptr) {
-	    rs = mkshlibname(shlibname,pnp,pnl) ;
+	    rs = mksoname(shlibname,pnp,pnl) ;
 	    pnl = rs ;
 	    pnp = shlibname ;
 	}
@@ -1054,20 +1033,20 @@ ret0:
 /* end subroutine (procserverlib) */
 
 
-static int procserverexec(pip,cip,sep,alp,argz)
+local inr procserverexec(pip,cip,sep,alp,argz)
 PROGINFO	*pip ;
 CLIENTINFO	*cip ;
 PROCSE		*sep ;
 VECSTR		*alp ;
-const char	*argz ;
+cchar	*argz ;
 {
 	int		rs = SR_OK ;
 	int		pnl ;
 	int		cl ;
-	const char	*program ;
-	const char	*pnp ;
-	const char	*ccp ;
-	const char	*cp ;
+	cchar	*program ;
+	cchar	*pnp ;
+	cchar	*ccp ;
+	cchar	*cp ;
 	char		progfname[MAXPATHLEN + 1] ;
 	char		argzbuf[MAXNAMELEN + 1] ;
 
@@ -1120,7 +1099,7 @@ const char	*argz ;
 #endif
 
 	pnp = program ;
-	pnl = strlen(program) ;
+	pnl = lenstr(program) ;
 	while ((pnl > 0) && (pnp[pnl-1] == '/')) pnl -= 1 ;
 
 	rs = procfindprog(pip,&pip->pathexec,prbins,progfname,pnp,pnl) ;
@@ -1217,7 +1196,7 @@ const char	*argz ;
 
 	if (pip->open.logprog) {
 #ifdef	COMMENT
-	    proglog_printf(pip,"server=%s\n",strbasename(program)) ;
+	    proglog_printf(pip,"server=%s\n",pip->program) ;
 #endif
 	    proglog_end(pip) ;
 	}
@@ -1265,19 +1244,19 @@ ret0:
 /* end subroutines (procserverexec) */
 
 
-static int procfindprog(pip,plp,prdirs,progfname,pnp,pnl)
+local inr procfindprog(pip,plp,prdirs,progfname,pnp,pnl)
 PROGINFO	*pip ;
 char		progfname[] ;
 vecstr		*plp ;
-const char	*prdirs[] ;
-const char	pnp[] ;
+cchar	*prdirs[] ;
+cchar	pnp[] ;
 int		pnl ;
 {
 	int		rs = SR_OK ;
 	int		i ;
 	int		rlen = 0 ;
 
-	if (pnl < 0) pnl = strlen(pnp) ;
+	if (pnl < 0) pnl = lenstr(pnp) ;
 
 	while (pnl && (pnp[pnl-1] == '/')) pnl -= 1 ;
 
@@ -1323,7 +1302,7 @@ int		pnl ;
 
 #if	CF_CHECKACCESS
 
-static int procaccperm(PROGINFO *pip,CLIENTINFO *cip,PROCSE *sep)
+local inr procaccperm(PROGINFO *pip,CLIENTINFO *cip,PROCSE *sep)
 {
 	vecstr		netgroups, names ;
 	int		rs = SR_OK ;
@@ -1457,7 +1436,7 @@ ret0:
 #endif /* CF_CHECKACCESS */
 
 
-static int loadcooks(PROGINFO *pip,CLIENTINFO *cip,cchar **sav)
+local inr loadcooks(PROGINFO *pip,CLIENTINFO *cip,cchar **sav)
 {
 	EXPCOOK		*ecp = &pip->cooks ;
 	int		rs = SR_OK ;
@@ -1465,10 +1444,10 @@ static int loadcooks(PROGINFO *pip,CLIENTINFO *cip,cchar **sav)
 
 	if ((rs >= 0) && (cip->salen > 0)) {
 	    SOCKADDRESS	*sap = &cip->sa ;
-	    const int	alen = MAXPATHLEN ;
-	    const int	vlen = INETX_ADDRSTRLEN ;
+	    cint	alen = MAXPATHLEN ;
+	    cint	vlen = INETX_ADDRSTRLEN ;
 	    int		af = sockaddress_getaf(&cip->sa) ;
-	    const char	*name = "ipaddr" ;
+	    cchar	*name = "ipaddr" ;
 	    char	abuf[MAXPATHLEN+1] ;
 	    char	vbuf[INETX_ADDRSTRLEN+1] = { 0 } ;
 	    switch (af) {
@@ -1509,7 +1488,7 @@ static int loadcooks(PROGINFO *pip,CLIENTINFO *cip,cchar **sav)
 	    char	*svcargs, *cp ;
 
 	    for (i = 0 ; sav[i] != nullptr ; i += 1) {
-	        size += ((2 * strlen(sav[i])) + 2 + 1) ;
+	        size += ((2 * lenstr(sav[i])) + 2 + 1) ;
 	    }
 
 	    if ((rs = uc_malloc(size,&svcargs)) >= 0) {
@@ -1550,7 +1529,7 @@ static int loadcooks(PROGINFO *pip,CLIENTINFO *cip,cchar **sav)
 /* end subroutine (loadcooks) */
 
 
-static int loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
+local inr loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 {
 	CONNECTION	conn ;
 	int		rs ;
@@ -1624,16 +1603,14 @@ static int loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 }
 /* end subroutines (loadpeernames) */
 
-
-static int loadaccgroups(PROGINFO *pip,vecstr *glp,cchar *accbuf,int acclen)
-{
+local inr loadaccgroups(PROGINFO *pip,vecstr *glp,cchar *accbuf,int acclen) {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
 	if (glp == nullptr) return SR_FAULT ;
 	if (accbuf == nullptr) return SR_FAULT ;
 
-	if (acclen < 0) acclen = strlen(accbuf) ;
+	if (acclen < 0) acclen = lenstr(accbuf) ;
 
 	if ((acclen > 0) && (accbuf[0] != '\0')) {
 	    FIELD	af ;
