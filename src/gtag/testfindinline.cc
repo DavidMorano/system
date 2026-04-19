@@ -1,10 +1,16 @@
 /* testfindinline */
+/* charset=ISO8859-1 */
 /* lang=C89 */
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
+
 #include	<envstandards.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getx.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
@@ -13,25 +19,22 @@
 #define	VARDEBUGFNAME	"TESTFINDINLINE_DEBUGFILE"
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern const char 	*getourenv(const char **,const char *) ;
 
-
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,cchar **argv,cchar **envv) noex {
 	FINDINLINE	fi ;
 
 	bfile	ofile, *ofp = &ofile ;
 	bfile	ifile, *ifp = &ifile ;
 
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*sp ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*sp ;
 
 #if	CF_DEBUGS && CF_DEBUGMALL
 	uint	mo_start = 0 ;
@@ -43,7 +46,7 @@ int main(int argc,const char **argv,const char **envv)
 
 #if	CF_DEBUGS
 	{
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL)
 	        debugopen(cp) ;
 	    debugprintf("main: starting\n") ;
@@ -79,9 +82,9 @@ int main(int argc,const char **argv,const char **envv)
 
 	if ((rs = bopen(ifp,ifname,"r",0666)) >= 0) {
 	    FINDINLINE	fi ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
-	    const char	*fmt ;
+	    cchar	*fmt ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    while ((rs = breadln(ifp,lbuf,llen)) > 0) {
 		len = rs ;
