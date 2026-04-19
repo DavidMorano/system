@@ -5,7 +5,6 @@
 /* decode a file (encoded in BASE64) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time debugging */
 
 /* revision history:
@@ -33,7 +32,7 @@
 	ofp		(BIO) output file pointer
 
 	Returns:
-	>=		OK
+	>=0		OK
 	<0		error (system-return)
 
 ******************************************************************************/
@@ -48,7 +47,7 @@
 #include	<strn.h>
 #include	<b64decoder.h>
 #include	<localmisc.h>
-#include	<libdebug.h>		/* |LIBDEBUG| */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
@@ -202,7 +201,7 @@ local int bwritetext(bfile *ofp,int crp,cchar *sp,int sl) noex {
 	        rs = bputc(ofp,'\n') ;
 	        wlen += rs ;
 	    } else if (*cp == '\r') {
-	        *crp = TRUE ;
+	        *crp = true ;
 	    }
 
 	    sl -= ((cp + 1) - sp) ;
