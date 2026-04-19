@@ -1,10 +1,11 @@
 /* hello (HELLO) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* this is a MFSERVE loadable service-module */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -18,12 +19,10 @@
 /*******************************************************************************
 
 	Description:
-
-	This object is a MFSERVE loadable service-module.  This basically
-	just prints out "Hello world!".
+	This object is a MFSERVE loadable service-module.  This
+	basically just prints out "Hello world!".
 
 	Synopsis:
-
 	int hello_start(op,pr,jep,argv,envv)
 	HELLO		*op ;
 	const char	*pr ;
@@ -32,7 +31,6 @@
 	const char	**envv ;
 
 	Arguments:
-
 	op		object pointer
 	pr		program-root
 	sn		search-name (of program calling us)
@@ -40,24 +38,21 @@
 	envv		array-environment array
 
 	Returns:
-
 	>=0		OK
 	<0		error code
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<buffer.h>
 #include	<localmisc.h>
@@ -81,19 +76,12 @@
 
 /* typedefs */
 
-typedef int	(*thrsub_t)(void *) ;
+extern "C" {
+    typedef int	(*thrsub_t)(void *) noex ;
+}
 
 
 /* external subroutines */
-
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	localgetorg(cchar *,char *,int,cchar *) ;
-extern int	localgetorgcode(cchar *,char *,int,cchar *) ;
-extern int	hasNotDots(cchar *,int) ;
-extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
@@ -109,8 +97,8 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int hello_argsbegin(HELLO *,cchar **) ;
-static int hello_argsend(HELLO *) ;
+local int hello_argsbegin(HELLO *,cchar **) ;
+local int hello_argsend(HELLO *) ;
 
 
 /* local variables */
@@ -120,16 +108,14 @@ static int hello_argsend(HELLO *) ;
 
 MFSERVE_MOD	hello = {
 	"hello",
-	sizeof(HELLO),
+	szof(HELLO),
 	0
 } ;
 
 
 /* exported subroutines */
 
-
-int hello_start(HELLO *op,cchar *pr,SREQ *jep,cchar **argv,cchar **envv)
-{
+int hello_start(HELLO *op,cchar *pr,SREQ *jep,mainv argv,mainv envv) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -165,7 +151,7 @@ int hello_start(HELLO *op,cchar *pr,SREQ *jep,cchar **argv,cchar **envv)
 			if (rs >= 0) {
 			    cchar	*bp ;
 			    if ((rs = buffer_get(&b,&bp)) >= 0) {
-				const int	bl = rs ;
+				cint	bl = rs ;
 			        if ((rs = uc_writen(op->ofd,bp,bl)) >= 0) {
 				    if ((rs = sreq_closefds(jep)) >= 0) {
 					op->magic = HELLO_MAGIC ;
@@ -186,14 +172,12 @@ int hello_start(HELLO *op,cchar *pr,SREQ *jep,cchar **argv,cchar **envv)
 	debugprintf("hello_start: ret rs=%d\n",rs) ;
 #endif
 
-	op->f_exiting = TRUE ;
+	op->f_exiting = true ;
 	return rs ;
 }
 /* end subroutine (hello_start) */
 
-
-int hello_finish(HELLO *op)
-{
+int hello_finish(HELLO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -221,11 +205,9 @@ int hello_finish(HELLO *op)
 }
 /* end subroutine (hello_finish) */
 
-
-int hello_check(HELLO *op)
-{
+int hello_check(HELLO *op) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 #if	CF_DEBUGS
 	debugprintf("hello_check: ent {%p}\n",op) ;
@@ -245,9 +227,7 @@ int hello_check(HELLO *op)
 }
 /* end subroutine (hello_check) */
 
-
-int hello_abort(HELLO *op)
-{
+int hello_abort(HELLO *op) noex {
 	int	f ;
 #if	CF_DEBUGS
 	debugprintf("hello_abort: ent {%p}\n",op) ;
@@ -258,7 +238,7 @@ int hello_abort(HELLO *op)
 #if	CF_DEBUGS
 	debugprintf("hello_abort: cont f=%u\n",f) ;
 #endif
-	op->f_abort = TRUE ;
+	op->f_abort = true ;
 	return f ;
 }
 /* end subroutine (hello_abort) */
@@ -266,20 +246,17 @@ int hello_abort(HELLO *op)
 
 /* provate subroutines */
 
-
-static int hello_argsbegin(HELLO *op,cchar **argv)
-{
-	VECPSTR		*alp = &op->args ;
-	const int	ss = HELLO_CSIZE ;
+local int hello_argsbegin(HELLO *op,cchar **argv) noex {
+	vecpstr		*alp = &op->args ;
+	cint		ss = HELLO_CSIZE ;
 	int		rs ;
 	if ((rs = vecpstr_start(alp,5,0,ss)) >= 0) {
-	    int		i ;
-	    op->fl.args = TRUE ;
-	    for (i = 0 ; (rs >= 0) && (argv[i] != NULL) ; i += 1) {
+	    op->fl.args = true ;
+	    for (int i = 0 ; (rs >= 0) && (argv[i] != NULL) ; i += 1) {
 	        rs = vecpstr_add(alp,argv[i],-1) ;
 	    }
 	    if (rs < 0) {
-	        op->fl.args = FALSE ;
+	        op->fl.args = false ;
 	        vecpstr_finish(alp) ;
 	    }
 	} /* end if (m-a) */
@@ -287,13 +264,11 @@ static int hello_argsbegin(HELLO *op,cchar **argv)
 }
 /* end subroutine (hello_argsbegin) */
 
-
-static int hello_argsend(HELLO *op)
-{
+local int hello_argsend(HELLO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.args) {
-	    VECPSTR	*alp = &op->args ;
+	    vecpstr	*alp = &op->args ;
 	    rs1 = vecpstr_finish(alp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
