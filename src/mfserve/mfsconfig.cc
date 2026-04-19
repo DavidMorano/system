@@ -481,7 +481,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	        case param_msfile:
 	            if (! lip->final.msfname) {
 	                lip->have.msfname = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    MSDNAME,MSFNAME,"") ;
 	                ccp = lip->msfname ;
 	                if ((ccp == NULL) ||
@@ -495,7 +495,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	        case param_pidfile:
 	            if (! pip->final.pidfname) {
 	                pip->have.pidfname = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    RUNDNAME,pip->nodename,PIDFNAME) ;
 	                ccp = pip->pidfname ;
 	                if ((ccp == NULL) ||
@@ -509,7 +509,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	        case param_logfile:
 	            if (! pip->final.logprog) {
 	                pip->have.logprog = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    LOGDNAME,pip->searchname,"") ;
 	                ccp = pip->lfname ;
 	                if ((ccp == NULL) ||
@@ -524,7 +524,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	            if (! lip->final.reqfname) {
 	                lip->have.reqfname = TRUE ;
 #ifdef	COMMENT
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    LOGDNAME,pip->searchname,"") ;
 #else			    
 	                rs1 = mkpath1w(tbuf,ebuf,el) ;
