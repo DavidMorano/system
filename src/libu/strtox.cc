@@ -75,7 +75,7 @@
 	to create the |strtol(3c)| subroutine.
 	3. Further thanks are due to Gwynne "Gwyn" Morgan (of BSD
 	fame) for possibly being the inventor of the specific
-	'cutoff-curlim' overflow-prevntion algorithm (which, as you
+	'cutoff-curlim' overflow-prevention algorithm (which, as you
 	know, is widely used now-a-days).
 
 	Notes:
@@ -115,11 +115,11 @@
 	provide for the larger integer type conversions (also up
 	to 128-bit and beyond also).
 
-	Q. Why are the names of these subroutine prefixed with |strtox|
-	rather than simply |strto| like the standard C-language
-	subroutine are?  
-	
-	A. Because the standard C-language library aready provdes
+	Q. Why are the names of these subroutines prefixed with
+	|strtox| rather than simply |strto| like the standard
+	C-language subroutine are?
+
+	A. Because the standard C-language library already provides
 	subroutines named |strtoll| and |strtoull|, but they do the
 	wrong thing.  The 'll' postfix in the subroutine name
 	indicates (or is supposed to indicate) that the 'long long'
@@ -184,7 +184,7 @@ import bitmanip ;			/* LIBU bit-manipulations */
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
