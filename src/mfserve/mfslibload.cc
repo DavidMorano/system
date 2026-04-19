@@ -1,4 +1,4 @@
-/* mfs-libload */
+/* mfs-libload SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++11 */
 
@@ -20,22 +20,25 @@
 
 /*******************************************************************************
 
-        This code (part of the MFSERVE deamon program) tryies to load a shared
-        library object into the program in order to call a Acommand" from within
-        the shared library.
+  	Name:
+	mfs-libload
+
+	Description:
+	This code (part of the MFSERVE deamon program) tryies to
+	load a shared library object into the program in order to
+	call a Acommand" from within the shared library.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<strn.h>
@@ -78,16 +81,9 @@
 
 /* external subroutines */
 
-extern "C" int	matstr(const char **,const char *,int) ;
-extern "C" int	matostr(const char **,int,const char *,int) ;
-extern "C" int	mkshlibname(char *,cchar *,int) ;
-extern "C" int	xfile(IDS *,cchar *) ;
-extern "C" int	getprogpath(IDS *,vecpstr *,char *,cchar *,int) ;
-extern "C" int	isNotPresent(int) ;
-
 #if	CF_DEBUGS || CF_DEBUG
-extern "C" int	debugprintf(const char *,...) ;
-extern "C" int	strllen(const char *,int,int) ;
+extern "C" int	debugprintf(cchar *,...) noex ;
+extern "C" int	strllen(cchar *,int,int) noex ;
 #endif
 
 
@@ -99,64 +95,55 @@ extern "C" int	strllen(const char *,int,int) ;
 struct libinfo {
 	int		enl = 0 ;
 	int		lnl = 0 ;
-	cchar		*enp = NULL ;
-	cchar		*lnp = NULL ;
+	cchar		*enp = nullptr ;
+	cchar		*lnp = nullptr ;
 	char		shlibname[MAXNAMELEN+1] ;
 	int		soparse(const SREQ *) ;
 	int		libent(const SREQ *) ;
 	int		libentsvc(const SREQ *) ;
 	int		findlib(PROGINFO *,char *) ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	mfslibload_findlib(PROGINFO *,char *,cchar *,int) ;
+local int	mfslibload_findlib(PROGINFO *,char *,cchar *,int) noex ;
 
 
 /* local variables */
 
-static cchar	*prlibs[] = {
+constexpr cpcchar	prlibs[] = {
 	"lib",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 
 /* exported subroutines */
 
-
-int mfslibload_jobstart(PROGINFO *pip,SREQ *jep)
-{
-	libinfo		li ;
-	int		rs ;
-
-	if (pip == NULL) return SR_FAULT ;
-
-	if ((rs = li.soparse(jep)) >= 0) {
-	    int	el ;
-	    if ((el = li.libent(jep)) >= 0) {
-		if ((rs = li.libentsvc(jep)) >= 0) {
-		    char	rbuf[MAXPATHLEN+1] ;
-		    if ((rs = li.findlib(pip,rbuf)) >= 0) {
-			rs = 1 ;
-
+int mfslibload_jobstart(PROGINFO *pip,SREQ *jep) noex {
+	int		rs = SR_FAULT ;
+	if (pip) {
+	    if (libinfo li ; (rs = li.soparse(jep)) >= 0) {
+	        if (int el ; (el = li.libent(jep)) >= 0) {
+		    if ((rs = li.libentsvc(jep)) >= 0) {
+		        char	rbuf[MAXPATHLEN+1] ;
+		        if ((rs = li.findlib(pip,rbuf)) >= 0) {
+			    rs = 1 ;
+    
+		        }
 		    }
-		}
-	    }
-	} /* end if */
-
+	        }
+	    } /* end if (libinfo) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mfslibload_jobstart) */
 
-
-int mfslibload_jobfinish(PROGINFO *pip,SREQ *jep)
-{
-	int		rs = SR_OK ;
-
-	if (pip == NULL) return SR_FAULT ;
-
-
+int mfslibload_jobfinish(PROGINFO *pip,SREQ *jep) noex {
+	int		rs = SR_FAULT ;
+	if (pip) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (mfslibload_jobfinish) */
@@ -164,19 +151,17 @@ int mfslibload_jobfinish(PROGINFO *pip,SREQ *jep)
 
 /* object methods */
 
-
-int libinfo::soparse(const SREQ *jep)
-{
+int libinfo::soparse(const SREQ *jep) noex {
 	int		rs = SR_NOTFOUND ;
 	cchar		*so = jep->ss.var[svckey_so] ;
 
 	if ((lnl = sfshrink(so,-1,&lnp)) > 0) {
 	    cchar	*tp ;
 	    rs = lnl ;
-	    if ((tp = strnchr(lnp,lnl,':')) == NULL) {
+	    if ((tp = strnchr(lnp,lnl,':')) == nullptr) {
 	        tp = strnbrk(lnp,lnl," \t") ;
 	    }
-	    if (tp != NULL) {
+	    if (tp != nullptr) {
 	        enl = sfshrink((tp+1),((lnp+lnl)-(tp+1)),&enp) ;
 	        lnl = (tp-lnp) ;
 	        while ((lnl > 0) && CHAR_ISWHITE(lnp[lnl-1])) lnl -= 1 ;
@@ -187,22 +172,20 @@ int libinfo::soparse(const SREQ *jep)
 }
 /* end method (libinfo::soparse) */
 
-
-int libinfo::libent(const SREQ *jep)
-{
+int libinfo::libent(const SREQ *jep) noex {
 	int		rs = SR_OK ;
 
-	if ((enp == NULL) || (enl == 0)) {
+	if ((enp == nullptr) || (enl == 0)) {
 	    cchar	*a = jep->ss.var[svckey_a] ;
 	    cchar	*p = jep->ss.var[svckey_p] ;
-	    if ((a != NULL) && (a[0] != '\0')) {
+	    if ((a != nullptr) && (a[0] != '\0')) {
 	        int	cl ;
 		cchar	*cp ;
 		if ((cl = sfnext(a,-1,&cp)) > 0) {
 	            enp = cp ;
 	            enl = cl ;
 		    rs = cl ;
-		} else if ((p != NULL) && (p[0] != '\0')) {
+		} else if ((p != nullptr) && (p[0] != '\0')) {
 		    if ((cl = sfbasename(p,-1,&cp)) > 0) {
 	                enp = cp ;
 	                enl = cl ;
@@ -216,9 +199,7 @@ int libinfo::libent(const SREQ *jep)
 }
 /* end method (libinfo::libent) */
 
-
-int libinfo::libentsvc(const SREQ *jep)
-{
+int libinfo::libentsvc(const SREQ *jep) noex {
 	if (enl == 0) {
 	    enp = jep->svc ;
 	    enl = strlen(enp) ;
@@ -227,11 +208,9 @@ int libinfo::libentsvc(const SREQ *jep)
 }
 /* end method (lib::libentsvc) */
 
-
-int libinfo::findlib(PROGINFO *pip,char *rbuf)
-{
+int libinfo::findlib(PROGINFO *pip,char *rbuf) noex {
 	MFSWATCH	*wip = (MFSWATCH *) pip->watch ;
-	IDS		*idp = &pip->id ;
+	ids		*idp = &pip->id ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
@@ -239,8 +218,8 @@ int libinfo::findlib(PROGINFO *pip,char *rbuf)
 
 	while (lnl && (lnp[lnl-1] == '/')) lnl -= 1 ;
 
-	if (strnchr(lnp,lnl,'.') == NULL) {
-	    rs = mkshlibname(shlibname,lnp,lnl) ;
+	if (strnchr(lnp,lnl,'.') == nullptr) {
+	    rs = mksoname(shlibname,lnp,lnl) ;
 	    lnl = rs ;
 	    lnp = shlibname ;
 	}
@@ -258,7 +237,7 @@ int libinfo::findlib(PROGINFO *pip,char *rbuf)
 	} else {
 	    cchar	*pr = pip->pr ;
 	    int		i ;
-	    for (i = 0 ; prlibs[i] != NULL ; i += 1) {
+	    for (i = 0 ; prlibs[i] != nullptr ; i += 1) {
 		cchar	*dir = prlibs[i] ;
 	        if ((rs = mkpath3w(rbuf,pr,dir,lnp,lnl)) >= 0) {
 	            rl = rs ;
@@ -283,11 +262,9 @@ int libinfo::findlib(PROGINFO *pip,char *rbuf)
 
 /* local subroutines */
 
-
-static int mfslibload_findlib(PROGINFO *pip,char *rbuf,cchar *lnp,int lnl)
-{
+local int mfslibload_findlib(PROGINFO *pip,char *rbuf,cchar *lnp,int lnl) noex {
 	MFSWATCH	*wip = (MFSWATCH *) pip->watch ;
-	IDS		*idp = &pip->id ;
+	ids		*idp = &pip->id ;
 	vecpstr		*plp ;
 	int		rs = SR_OK ;
 	int		pl = 0 ;
@@ -299,7 +276,7 @@ static int mfslibload_findlib(PROGINFO *pip,char *rbuf,cchar *lnp,int lnl)
 #endif
 	plp = &wip->libdirs ;
 	for (i = 0 ; vecpstr_get(plp,i,&pp) >= 0 ; i += 1) {
-	    if (pp != NULL) {
+	    if (pp != nullptr) {
 	        if ((rs = mkpath2w(rbuf,pp,lnp,lnl)) >= 0) {
 	            pl = rs ;
 	            if (((rs = xfile(idp,rbuf)) < 0) && isNotPresent(rs)) {
