@@ -63,7 +63,8 @@
 #include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<opendefstds.h>
 #include	<bfile.h>
 #include	<varsub.h>
@@ -124,26 +125,6 @@
 
 /* external subroutines */
 
-extern int	snddd(char *,int,uint,uint) ;
-extern int	snsdd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	bufprintf(const char *,int,...) ;
-extern int	dupup(int,int) ;
-extern int	nlspeername(const char *,const char *,char *) ;
-extern int	mklogidsub(char *,int,const char *,int) ;
-extern int	rmdirfiles(cchar *,cchar *,int) ;
-extern int	acceptpass(int,struct strrecvfd *,int) ;
-extern int	varsub_addvec(VARSUB *,VECSTR *) ;
-extern int	isasocket(int) ;
-extern int	isBadSend(int) ;
-
 extern int	progpidbegin(PROGINFO *,int) ;
 extern int	progpidcheck(PROGINFO *) ;
 extern int	progpidend(PROGINFO *) ;
@@ -167,11 +148,6 @@ extern int	debugprinthexblock(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	progexports(PROGINFO *,cchar *) ;
 #endif /* CF_DEBUGS */
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
