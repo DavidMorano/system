@@ -52,6 +52,9 @@
 #include	"config.h"
 #include	"defs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
