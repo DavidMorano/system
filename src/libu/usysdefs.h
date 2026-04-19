@@ -64,6 +64,12 @@ enum missingsignals {
 	missingsignal_pwr = 1000,
 	missingsignal_cancel,
 	missingsignal_lost,
+	missingsignal_waiting,
+	missingsignal_lwp,
+	missingsignal_freeze,
+	missingsignal_thaw,
+	missingsignal_rtmin,
+	missingsignal_rtmax,
 	missingsignal_overlast,
 	missingsignal_start = missingsignal_pwr
 } ; /* end enum */
@@ -90,6 +96,17 @@ enum missingplocks {
 #define	PROCLOCK	missingplock_proclock
 #endif
 
+/* signal aliases */
+#ifndef	SIGRTMIN
+#ifdef	_SIGRTMIN
+#define	SIGRTMIN	_SIGRTMIN
+#endif
+#endif
+#ifndef	SIGRTMAX
+#ifdef	_SIGRTMAX
+#define	SIGRTMAX	_SIGRTMAX
+#endif
+#endif
 /* possibly missing signals */
 #ifndef	SIGCLD
 #define	SIGCLD		SIGCHLD
@@ -111,6 +128,24 @@ enum missingplocks {
 #endif
 #ifndef	SIGLOST
 #define	SIGLOST		missingsignal_lost
+#endif
+#ifndef	SIGWAITING
+#define	SIGWAITING	missingsignal_waiting
+#endif
+#ifndef	SIGLWP
+#define	SIGLWP		missingsignal_lwp
+#endif
+#ifndef	SIGFREEZE
+#define	SIGFREEZE	missingsignal_freeze
+#endif
+#ifndef	SIGTHAW
+#define	SIGTHAW		missingsignal_thaw
+#endif
+#ifndef	SIGRTMIN
+#define	SIGRTMIN	missingsignal_rtmin
+#endif
+#ifndef	SIGRTMAX
+#define	SIGRTMAX	missingsignal_rtmax
 #endif
 
 /* missing file open-flags */
