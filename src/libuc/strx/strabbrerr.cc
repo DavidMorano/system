@@ -250,16 +250,16 @@ static char		okbuf[DECBUFLEN+1] ;
 
 /* exported subroutines */
 
-cchar *strabbrerr(int rs) noex {
+cchar *strabbrerr(int rsv) noex {
 	cchar		*s = nullptr ;
-	if (rs >= 0) {
-	    ctdec(okbuf,oklen,rs) ;
+	if (rsv >= 0) {
+	    ctdec(okbuf,oklen,rsv) ;
 	    s = okbuf ;
 	} else {
 	    int		i ; /* used-afterwards */
 	    bool	f = false ;
 	    for (i = 0 ; cvts[i].s != 0 ; i += 1) {
-	        f = (cvts[i].n == rs) ;
+	        f = (cvts[i].n == rsv) ;
 	        if (f) break ;
 	    } /* end for */
 	    s = (f) ? cvts[i].s : "*UNK*" ;
