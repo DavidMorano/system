@@ -44,13 +44,14 @@
 #include	<sys/msg.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<ugetpw.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getpwx.h>
 #include	<utmpacc.h>
 #include	<getbufsize.h>
 #include	<getax.h>
@@ -59,6 +60,7 @@
 #include	<vecstr.h>
 #include	<lfm.h>
 #include	<char.h>
+#include	<rmdirfiles.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -100,40 +102,12 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	mkquoted(char *,int,cchar *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	rmdirfiles(cchar *,cchar *,int) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	chownsame(cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
-
 extern int	proginfo_rootname(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
