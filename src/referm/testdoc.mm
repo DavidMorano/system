@@ -1,5 +1,5 @@
-.\"_
-.\" GBCS NGO Broadband
+.\"_ GBCS NGO Broadband
+.\"_ TROFF (Memorandum Macros)
 .\"_
 .PF "'GBCS''Starbase Technology'"
 .\"_
