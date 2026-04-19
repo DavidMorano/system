@@ -50,20 +50,11 @@
 
 /* local defines */
 
-#define	SIGABBR		struct sigabbr
-
 #if	defined(_SIGRTMIN) && defined(_SIGRTMAX)
 #define	F_SIGRT		1
 #else
-#define	F_SIGRT		1
+#define	F_SIGRT		0
 #endif /* SIGRTXXX */
-
-#ifndef	_SIGRTMIN
-#define	_SIGRTMIN	0
-#endif
-#ifndef	_SIGRTMAX
-#define	_SIGRTMAX	0
-#endif
 
 
 /* imported namespaces */
@@ -92,59 +83,47 @@ struct sigabbr {
 /* local variables */
 
 constexpr sigabbr	cvts[] = {
-	{ 0, "TEST" },
-	{ SIGHUP, "HUP" },
-	{ SIGINT, "INT" },
-	{ SIGQUIT, "QUIT" },
-	{ SIGILL, "ILL" },
-	{ SIGTRAP, "TRAP" }, /* 5 */
-	{ SIGABRT, "ABRT" },
-	{ SIGEMT, "EMT" },
-	{ SIGFPE, "FPE" },
-	{ SIGKILL, "KILL" },
-	{ SIGBUS, "BUS" }, /* 10 */
-	{ SIGSEGV, "SEGV" },
-	{ SIGSYS, "SYS" },
-	{ SIGPIPE, "PIPE" },
-	{ SIGALRM, "ALRM" },
-	{ SIGTERM, "TERM" }, /* 15 */
-	{ SIGUSR1, "USR1" },
-	{ SIGUSR2, "USR2" },
-	{ SIGCLD, "CLD" },
-	{ SIGCHLD, "CHLD" },
-	{ SIGPWR, "PWR" }, /* 20 */
-	{ SIGWINCH, "WINCH" },
-	{ SIGURG, "URG" },
-	{ SIGPOLL, "POLL" },
-	{ SIGSTOP, "STOP" },
-	{ SIGTSTP, "TSTP" }, /* 25 */
-	{ SIGCONT, "CONT" },
-	{ SIGTTIN, "TTIN" },
-	{ SIGTTOU, "TTOU" },
-	{ SIGVTALRM, "VTALRM" },
-	{ SIGPROF, "PROF" }, /* 30 */
-	{ SIGXCPU, "XCPU" },
-	{ SIGXFSZ, "XFSZ" },
-#ifdef	SIGWAITING
-	{ SIGWAITING, "WAITING" },
-#endif
-#ifdef	SIGLWP
-	{ SIGLWP, "LWP" },
-#endif
-#ifdef	SIGFREEZE
-	{ SIGFREEZE, "FREEZE" },
-#endif
-#ifdef	SIGTHAW
-	{ SIGTHAW, "THAW" },
-#endif
-	{ SIGCANCEL, "CANCEL" },
-	{ SIGLOST, "LOST" },
-#if	defined(_SIGRTMIN)
-	{ _SIGRTMIN, "RTMIN" },
-#endif
-#if	defined(_SIGRTMAX)
-	{ _SIGRTMAX, "RTMAX" },
-#endif
+	{ 0,		"TEST" },
+	{ SIGHUP,	"HUP" },
+	{ SIGINT,	"INT" },
+	{ SIGQUIT,	"QUIT" },
+	{ SIGILL,	"ILL" },
+	{ SIGTRAP,	"TRAP" }, /* 5 */
+	{ SIGABRT,	"ABRT" },
+	{ SIGEMT,	"EMT" },
+	{ SIGFPE,	"FPE" },
+	{ SIGKILL,	"KILL" },
+	{ SIGBUS,	"BUS" }, /* 10 */
+	{ SIGSEGV,	"SEGV" },
+	{ SIGSYS,	"SYS" },
+	{ SIGPIPE,	"PIPE" },
+	{ SIGALRM,	"ALRM" },
+	{ SIGTERM,	"TERM" }, /* 15 */
+	{ SIGUSR1,	"USR1" },
+	{ SIGUSR2,	"USR2" },
+	{ SIGCLD,	"CLD" },
+	{ SIGCHLD,	"CHLD" },
+	{ SIGPWR,	"PWR" }, /* 20 */
+	{ SIGWINCH,	"WINCH" },
+	{ SIGURG,	"URG" },
+	{ SIGPOLL,	"POLL" },
+	{ SIGSTOP,	"STOP" },
+	{ SIGTSTP,	"TSTP" }, /* 25 */
+	{ SIGCONT,	"CONT" },
+	{ SIGTTIN,	"TTIN" },
+	{ SIGTTOU,	"TTOU" },
+	{ SIGVTALRM,	"VTALRM" },
+	{ SIGPROF,	"PROF" }, /* 30 */
+	{ SIGXCPU,	"XCPU" },
+	{ SIGXFSZ,	"XFSZ" },
+	{ SIGWAITING,	"WAITING" },
+	{ SIGLWP,	"LWP" },
+	{ SIGFREEZE,	"FREEZE" },
+	{ SIGTHAW,	"THAW" },
+	{ SIGCANCEL,	"CANCEL" },
+	{ SIGLOST,	"LOST" },
+	{ SIGRTMIN,	"RTMIN" },
+	{ SIGRTMAX,	"RTMAX" },
 	{ -1, nullptr }
 } ; /* end array (cvts) */
 
@@ -159,7 +138,7 @@ cbool		f_sigrt		= F_SIGRT ;
 const char *strabbrsig(int n) noex {
 	cchar		*s = nullptr ;
 	if_constexpr (f_sigrt) {
-	    if ((n > _SIGRTMIN) && (n < _SIGRTMAX)) {
+	    if ((n >= SIGRTMIN) && (n <= SIGRTMAX)) {
 	        s = "RTXXX" ;
 	    }
 	} /* end if_constexpr (f_sigrt) */
