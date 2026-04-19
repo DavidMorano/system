@@ -1,19 +1,19 @@
-/* mfs-log */
+/* mfs-log SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* utility to support logging */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
 	= 2011-01-25, David A­D­ Morano
-        This code was seperated out for for more modularity. This was in turn
-        needed to fix the AST-code sockets library definition problems (see
-        notes elsewhere).
+	This code was seperated out for for more modularity. This
+	was in turn needed to fix the AST-code sockets library
+	definition problems (see notes elsewhere).
 
 	= 2017-08-10, David A­D­ Morano
 	This subroutine was borrowed to code MFSERVE.
@@ -24,23 +24,22 @@
 
 /*******************************************************************************
 
-        This modeule contains code to support logging of various bit of
-        information.
-
+  	Description:
+	This modeule contains code to support logging of various
+	bit of information.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<cstdarg>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"proglog.h"
@@ -72,39 +71,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(const char *,int) ;
-extern int	isNotPresent(int) ;
-
-extern int	proglogout(PROGINFO *,cchar *,cchar *) ;
+extern int	proglogout(PROGINFO *,cchar *,cchar *) noex ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) noex ;
+extern int	strlinelen(cchar *,int,int) noex ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
-extern char	*strval(char *,int) ;
 
 
 /* external variables */
@@ -119,11 +91,12 @@ extern char	*strval(char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int logbegin(PROGINFO *pip,USERINFO *uip)
-{
+int logbegin(PROGINFO *pip,USERINFO *uip) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUG
