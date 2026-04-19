@@ -74,6 +74,47 @@ struct t_call {
         int             sequence;       /* sequence number      */
 } ; /* end struct */
 
+/* * t_opthdr structure */
+struct t_opthdr {
+	xti_uint	len;	/* total length of option */
+	xti_uint	level;	/* protocol level */
+	xti_uint	name;	/* option name */
+	xti_uint	status;	/* status value */
+	/* followed by option value */
+} ;
+
+struct t_iovec {
+	void	*iov_base;
+	size_t	iov_len;
+} ;
+
+/* * options management */
+struct t_optmgmt {
+	struct netbuf	opt;
+	xti_int	flags;
+} ;
+
+/* * disconnect structure */
+struct t_discon {
+	struct netbuf	udata;		/* user data		*/
+	int		reason;		/* reason code		*/
+	int		sequence;	/* sequence number	*/
+} ;
+
+/* * data gram structure */
+struct t_unitdata {
+	struct netbuf	addr;		/*  address		*/
+	struct netbuf	opt;		/* options		*/
+	struct netbuf	udata;		/* user data		*/
+};
+
+/* * unitdata error */
+struct t_uderr {
+	struct netbuf	addr;		/* address		*/
+	struct netbuf	opt;		/* options		*/
+	xti_int	error;		/* error code		*/
+};
+
 /* type-aliases for XTI structures */
 #define	NETBUF		struct netbuf
 #define	UTINFO		struct t_info
