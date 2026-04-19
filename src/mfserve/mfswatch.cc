@@ -78,6 +78,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
+#include	<getx.h>
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<varsub.h>
@@ -161,43 +162,6 @@ typedef int (*svcprocer_t)(PROGINFO *pip,SREQ *jep) ;
 
 /* external subroutines */
 
-extern int	pathadd(char *,int,cchar *) ;
-extern int	pathaddw(char *,int,cchar *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	bufprintf(const char *,int,...) ;
-extern int	dupup(int,int) ;
-extern int	passfd(cchar *,int) ;
-extern int	nlspeername(const char *,const char *,char *) ;
-extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	acceptpass(int,struct strrecvfd *,int) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	xfile(IDS *,cchar *) ;
-extern int	varsub_addvec(VARSUB *,VECSTR *) ;
-extern int	vecstr_srvargs(vecstr *,cchar *) ;
-extern int	vecpstr_addpath(vecpstr *,cchar *) ;
-extern int	vecpstr_addcspath(vecpstr *) ;
-extern int	hasnonwhite(cchar *,int) ;
-extern int	isasocket(int) ;
-extern int	isOneOf(cint *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isBadMsg(int) ;
-extern int	isBadSend(int) ;
-
-#if	CF_DEBUGS || CF_DEBUG 
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	progexports(PROGINFO *,const char *) ;
-#endif /* CF_DEBUGS */
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
-
 
 /* external variables */
 
@@ -213,92 +177,92 @@ struct svcprocargs {
 
 /* forward references */
 
-static int	mfswatch_beginner(PROGINFO *) ;
-static int	mfswatch_ender(PROGINFO *) ;
-static int	mfswatch_envbegin(PROGINFO *) ;
-static int	mfswatch_envend(PROGINFO *) ;
-static int	mfswatch_svcaccum(PROGINFO *,SREQ *,int,int) ;
-static int	mfswatch_uptimer(PROGINFO *) ;
-static int	mfswatch_configmaint(PROGINFO *) ;
-static int	mfswatch_poll(PROGINFO *,POLLER_SPEC *) ;
-static int	mfswatch_pollreg(PROGINFO *,int,int) ;
-static int	mfswatch_polljobs(PROGINFO *,int,int) ;
+local int	mfswatch_beginner(PROGINFO *) ;
+local int	mfswatch_ender(PROGINFO *) ;
+local int	mfswatch_envbegin(PROGINFO *) ;
+local int	mfswatch_envend(PROGINFO *) ;
+local int	mfswatch_svcaccum(PROGINFO *,SREQ *,int,int) ;
+local int	mfswatch_uptimer(PROGINFO *) ;
+local int	mfswatch_configmaint(PROGINFO *) ;
+local int	mfswatch_poll(PROGINFO *,POLLER_SPEC *) ;
+local int	mfswatch_pollreg(PROGINFO *,int,int) ;
+local int	mfswatch_polljobs(PROGINFO *,int,int) ;
 
-static int	mfswatch_pathbegin(PROGINFO *) ;
-static int	mfswatch_pathend(PROGINFO *) ;
-static int	mfswatch_pathload(PROGINFO *,vecpstr *,int,cchar *) ;
-static int	mfswatch_pathfindbin(PROGINFO *,char *,cchar *,int) ;
-static int	mfswatch_pathfindbinpr(PROGINFO *,char *,cchar *,int) ;
-static int	mfswatch_pathfindbinlist(PROGINFO *,char *,cchar *,int) ;
+local int	mfswatch_pathbegin(PROGINFO *) ;
+local int	mfswatch_pathend(PROGINFO *) ;
+local int	mfswatch_pathload(PROGINFO *,vecpstr *,int,cchar *) ;
+local int	mfswatch_pathfindbin(PROGINFO *,char *,cchar *,int) ;
+local int	mfswatch_pathfindbinpr(PROGINFO *,char *,cchar *,int) ;
+local int	mfswatch_pathfindbinlist(PROGINFO *,char *,cchar *,int) ;
 
-static int	mfswatch_svcsbegin(PROGINFO *) ;
-static int	mfswatch_svcsend(PROGINFO *) ;
-static int	mfswatch_svcsmaint(PROGINFO *) ;
+local int	mfswatch_svcsbegin(PROGINFO *) ;
+local int	mfswatch_svcsend(PROGINFO *) ;
+local int	mfswatch_svcsmaint(PROGINFO *) ;
 
-static int	mfswatch_tabsbegin(PROGINFO *) ;
-static int	mfswatch_tabsend(PROGINFO *) ;
-static int	mfswatch_tabsmaint(PROGINFO *) ;
+local int	mfswatch_tabsbegin(PROGINFO *) ;
+local int	mfswatch_tabsend(PROGINFO *) ;
+local int	mfswatch_tabsmaint(PROGINFO *) ;
 
-static int	mfswatch_usersbegin(PROGINFO *) ;
-static int	mfswatch_usersend(PROGINFO *) ;
-static int	mfswatch_usersload(PROGINFO *,setostr *) ;
-static int	mfswatch_usersmaint(PROGINFO *) ;
-static int	mfswatch_usershave(PROGINFO *,cchar *) ;
-static int	mfswatch_usershandle(PROGINFO *,SREQ *) ;
-static int	mfswatch_usershandler(PROGINFO *,SREQ *) ;
-static int	mfswatch_usersproj(PROGINFO *,int,char *,int,cchar *) ;
-static int	mfswatch_usersplan(PROGINFO *,int,char *,int,cchar *) ;
-static int	mfswatch_usersfile(PROGINFO *,int,char *,int,cchar *) ;
+local int	mfswatch_usersbegin(PROGINFO *) ;
+local int	mfswatch_usersend(PROGINFO *) ;
+local int	mfswatch_usersload(PROGINFO *,setostr *) ;
+local int	mfswatch_usersmaint(PROGINFO *) ;
+local int	mfswatch_usershave(PROGINFO *,cchar *) ;
+local int	mfswatch_usershandle(PROGINFO *,SREQ *) ;
+local int	mfswatch_usershandler(PROGINFO *,SREQ *) ;
+local int	mfswatch_usersproj(PROGINFO *,int,char *,int,cchar *) ;
+local int	mfswatch_usersplan(PROGINFO *,int,char *,int,cchar *) ;
+local int	mfswatch_usersfile(PROGINFO *,int,char *,int,cchar *) ;
 
-static int	mfswatch_builtbegin(PROGINFO *) ;
-static int	mfswatch_builtend(PROGINFO *) ;
-static int	mfswatch_builtmaint(PROGINFO *) ;
+local int	mfswatch_builtbegin(PROGINFO *) ;
+local int	mfswatch_builtend(PROGINFO *) ;
+local int	mfswatch_builtmaint(PROGINFO *) ;
 
-static int mfswatch_svcfind(PROGINFO *,SREQ *) ;
-static int mfswatch_svcfinder(PROGINFO *,SREQ *) ;
-static int mfswatch_svcproc(PROGINFO *,SREQ *,SVCFILE_ENT *,cchar **) ;
+local int mfswatch_svcfind(PROGINFO *,SREQ *) ;
+local int mfswatch_svcfinder(PROGINFO *,SREQ *) ;
+local int mfswatch_svcproc(PROGINFO *,SREQ *,SVCFILE_ENT *,cchar **) ;
 
-static int mfswatch_svcprocer(PROGINFO *,SREQ *,svcprocer_t) ;
+local int mfswatch_svcprocer(PROGINFO *,SREQ *,svcprocer_t) ;
 
-static int mfswatch_svcprocfile(PROGINFO *,SREQ *,SVCENT *) ;
-static int mfswatch_svcprocpass(PROGINFO *,SREQ *,SVCENT *) ;
-static int mfswatch_svcprocprog(PROGINFO *,SREQ *,SVCENT *) ;
-static int mfswatch_svcprocproger(PROGINFO *,SREQ *,cchar *,vecstr *) ;
-static int mfswatch_progspawn(PROGINFO *,SREQ *,cchar *,vecstr *) ;
+local int mfswatch_svcprocfile(PROGINFO *,SREQ *,SVCENT *) ;
+local int mfswatch_svcprocpass(PROGINFO *,SREQ *,SVCENT *) ;
+local int mfswatch_svcprocprog(PROGINFO *,SREQ *,SVCENT *) ;
+local int mfswatch_svcprocproger(PROGINFO *,SREQ *,cchar *,vecstr *) ;
+local int mfswatch_progspawn(PROGINFO *,SREQ *,cchar *,vecstr *) ;
 
 #if	CF_SHLIB
-static int mfswatch_tabsprocshlib(PROGINFO *,SREQ *,SVCENT *) ;
+local int mfswatch_tabsprocshlib(PROGINFO *,SREQ *,SVCENT *) ;
 #endif
 
-static int mfswatch_builthave(PROGINFO *,cchar *) ;
-static int mfswatch_builthandle(PROGINFO *,SREQ *) ;
+local int mfswatch_builthave(PROGINFO *,cchar *) ;
+local int mfswatch_builthandle(PROGINFO *,SREQ *) ;
 
-static int mfswatch_svchelp(PROGINFO *,SREQ *) ;
-static int mfswatch_svchelper(PROGINFO *,SREQ *) ;
-static int mfswatch_loadsvcs(PROGINFO *,SREQ *) ;
+local int mfswatch_svchelp(PROGINFO *,SREQ *) ;
+local int mfswatch_svchelper(PROGINFO *,SREQ *) ;
+local int mfswatch_loadsvcs(PROGINFO *,SREQ *) ;
 
-static int mfswatch_svcprocfiler(PROGINFO *,SREQ *) ;
+local int mfswatch_svcprocfiler(PROGINFO *,SREQ *) ;
 
-static int mfswatch_svcretstat(PROGINFO *,SREQ *,int) ;
-static int mfswatch_jobretire(PROGINFO *,SREQ *) ;
-static int mfswatch_checkthrs(PROGINFO *) ;
-static int mfswatch_checkprogs(PROGINFO *) ;
-static int mfswatch_checkbuilts(PROGINFO *) ;
-static int mfswatch_checkbuilt(PROGINFO *,SREQ *) ;
-static int mfswatch_logprogres(PROGINFO *,int,cchar *,pid_t,int) ;
-static int mfswatch_logprogchild(PROGINFO *,SREQ *) ;
+local int mfswatch_svcretstat(PROGINFO *,SREQ *,int) ;
+local int mfswatch_jobretire(PROGINFO *,SREQ *) ;
+local int mfswatch_checkthrs(PROGINFO *) ;
+local int mfswatch_checkprogs(PROGINFO *) ;
+local int mfswatch_checkbuilts(PROGINFO *) ;
+local int mfswatch_checkbuilt(PROGINFO *,SREQ *) ;
+local int mfswatch_logprogres(PROGINFO *,int,cchar *,pid_t,int) ;
+local int mfswatch_logprogchild(PROGINFO *,SREQ *) ;
 
-static int mfswatch_thrdone(PROGINFO *,SREQ *) ;
-static int mfswatch_logconn(PROGINFO *,int,int,int,cchar *) ;
-static int mfswatch_logsvc(PROGINFO *,SREQ *) ;
+local int mfswatch_thrdone(PROGINFO *,SREQ *) ;
+local int mfswatch_logconn(PROGINFO *,int,int,int,cchar *) ;
+local int mfswatch_logsvc(PROGINFO *,SREQ *) ;
 
 #if	defined(COMMENT)
-static int	mfswatch_islong(PROGINFO *,vecstr *) ;
+local int	mfswatch_islong(PROGINFO *,vecstr *) ;
 #endif
 
-static int	svcprocers(SVCPROCARGS *) ;
+local int	svcprocers(SVCPROCARGS *) ;
 
-static int	isBadService(int) ;
+local int	isBadService(int) ;
 
 
 /* local variables */
@@ -455,7 +419,7 @@ int mfswatch_service(PROGINFO *pip)
 
 
 /* update our poll time-out value */
-static int mfswatch_uptimer(PROGINFO *pip)
+local int mfswatch_uptimer(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	cint	max = (pip->intpoll * POLL_INTMULT) ;
@@ -490,7 +454,7 @@ static int mfswatch_uptimer(PROGINFO *pip)
 /* end subroutine (mfswatch_uptimer) */
 
 
-static int mfswatch_configmaint(PROGINFO *pip)
+local int mfswatch_configmaint(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -513,7 +477,7 @@ static int mfswatch_configmaint(PROGINFO *pip)
 
 
 /* poll (everything) for a hit */
-static int mfswatch_poll(PROGINFO *pip,POLLER_SPEC *psp)
+local int mfswatch_poll(PROGINFO *pip,POLLER_SPEC *psp)
 {
 	MFSWATCH	*wip = pip->watch ;
 	POLLER		*pmp ;
@@ -602,7 +566,7 @@ int mfswatch_newjob(PROGINFO *pip,int jtype,int stype,int ifd,int ofd)
 /* private subroutines */
 
 
-static int mfswatch_beginner(PROGINFO *pip)
+local int mfswatch_beginner(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs ;
@@ -645,7 +609,7 @@ static int mfswatch_beginner(PROGINFO *pip)
 /* end subroutine (mfswatch_beginner) */
 
 
-static int mfswatch_ender(PROGINFO *pip)
+local int mfswatch_ender(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -694,7 +658,7 @@ static int mfswatch_ender(PROGINFO *pip)
 /* end subroutine (mfswatch_ender) */
 
 
-static int mfswatch_envbegin(PROGINFO *pip)
+local int mfswatch_envbegin(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	ENVHELP		*ehp ;
@@ -708,7 +672,7 @@ static int mfswatch_envbegin(PROGINFO *pip)
 /* end subroutine (mfswatch_envbegin) */
 
 
-static int mfswatch_envend(PROGINFO *pip)
+local int mfswatch_envend(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -726,7 +690,7 @@ static int mfswatch_envend(PROGINFO *pip)
 /* end subroutine (mfswatch_envend) */
 
 
-static int mfswatch_pathbegin(PROGINFO *pip)
+local int mfswatch_pathbegin(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	vecpstr		*plp ;
@@ -750,7 +714,7 @@ static int mfswatch_pathbegin(PROGINFO *pip)
 /* end subroutine (mfswatch_pathbegin) */
 
 
-static int mfswatch_pathend(PROGINFO *pip)
+local int mfswatch_pathend(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -773,7 +737,7 @@ static int mfswatch_pathend(PROGINFO *pip)
 /* end subroutine (mfswatch_pathend) */
 
 
-static int mfswatch_pathload(PROGINFO *pip,vecpstr *plp,int f,cchar *var)
+local int mfswatch_pathload(PROGINFO *pip,vecpstr *plp,int f,cchar *var)
 {
 	cint	n = 40 ;
 	cint	cs = 1024 ;
@@ -794,7 +758,7 @@ static int mfswatch_pathload(PROGINFO *pip,vecpstr *plp,int f,cchar *var)
 /* end subroutine (mfswatch_pathload) */
 
 
-static int mfswatch_pathfindbin(PROGINFO *pip,char *rbuf,cchar *np,int nl)
+local int mfswatch_pathfindbin(PROGINFO *pip,char *rbuf,cchar *np,int nl)
 {
 	int		rs ;
 	int		pl = 0 ;
@@ -829,7 +793,7 @@ static int mfswatch_pathfindbin(PROGINFO *pip,char *rbuf,cchar *np,int nl)
 /* end subroutine (mfswatch_pathfindbin) */
 
 
-static int mfswatch_pathfindbinpr(PROGINFO *pip,char *rbuf,cchar *np,int nl)
+local int mfswatch_pathfindbinpr(PROGINFO *pip,char *rbuf,cchar *np,int nl)
 {
 	IDS		*idp = &pip->id ;
 	int		rs ;
@@ -874,7 +838,7 @@ static int mfswatch_pathfindbinpr(PROGINFO *pip,char *rbuf,cchar *np,int nl)
 /* end subroutine (mfswatch_pathfindbinpr) */
 
 
-static int mfswatch_pathfindbinlist(PROGINFO *pip,char *rbuf,cchar *np,int nl)
+local int mfswatch_pathfindbinlist(PROGINFO *pip,char *rbuf,cchar *np,int nl)
 {
 	MFSWATCH	*wip = pip->watch ;
 	IDS		*idp = &pip->id ;
@@ -910,7 +874,7 @@ static int mfswatch_pathfindbinlist(PROGINFO *pip,char *rbuf,cchar *np,int nl)
 /* end subroutine (mfswatch_pathfindbinlist) */
 
 
-static int mfswatch_polljobs(PROGINFO *pip,int fd,int re)
+local int mfswatch_polljobs(PROGINFO *pip,int fd,int re)
 {
 	MFSWATCH	*wip = pip->watch ;
 	SREQDB		*srp ;
@@ -961,7 +925,7 @@ static int mfswatch_polljobs(PROGINFO *pip,int fd,int re)
 
 
 /* register this FD w/ the poller object */
-static int mfswatch_pollreg(PROGINFO *pip,int fd,int re)
+local int mfswatch_pollreg(PROGINFO *pip,int fd,int re)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs ;
@@ -978,7 +942,7 @@ static int mfswatch_pollreg(PROGINFO *pip,int fd,int re)
 
 
 /* ARGSUSED */
-static int mfswatch_svcaccum(PROGINFO *pip,SREQ *jep,int fd,int re)
+local int mfswatch_svcaccum(PROGINFO *pip,SREQ *jep,int fd,int re)
 {
 	MFSWATCH	*wip = pip->watch ;
 	cint	llen = LINEBUFLEN ;
@@ -1030,7 +994,7 @@ static int mfswatch_svcaccum(PROGINFO *pip,SREQ *jep,int fd,int re)
 /* end subroutine (mfswatch_svcaccum) */
 
 
-static int mfswatch_svcfind(PROGINFO *pip,SREQ *jep)
+local int mfswatch_svcfind(PROGINFO *pip,SREQ *jep)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs ;
@@ -1047,7 +1011,7 @@ static int mfswatch_svcfind(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_svcfind) */
 
 
-static int mfswatch_svcfinder(PROGINFO *pip,SREQ *jep)
+local int mfswatch_svcfinder(PROGINFO *pip,SREQ *jep)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs ;
@@ -1103,7 +1067,7 @@ static int mfswatch_svcfinder(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_svcfinder) */
 
 
-static int mfswatch_svcsbegin(PROGINFO *pip)
+local int mfswatch_svcsbegin(PROGINFO *pip)
 {
 	int		rs ;
 #if	CF_DEBUG
@@ -1124,7 +1088,7 @@ static int mfswatch_svcsbegin(PROGINFO *pip)
 /* end subroutine (mfswatch_svcsbegin) */
 
 
-static int mfswatch_svcsend(PROGINFO *pip)
+local int mfswatch_svcsend(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1153,7 +1117,7 @@ static int mfswatch_svcsend(PROGINFO *pip)
 /* end subroutine (mfswatch_svcsend) */
 
 
-static int mfswatch_svcsmaint(PROGINFO *pip)
+local int mfswatch_svcsmaint(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = mfswatch_builtmaint(pip)) >= 0) {
@@ -1166,7 +1130,7 @@ static int mfswatch_svcsmaint(PROGINFO *pip)
 /* end subroutine (mfswatch_svcsmaint) */
 
 
-static int mfswatch_tabsbegin(PROGINFO *pip)
+local int mfswatch_tabsbegin(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	LOCINFO		*lip ;
@@ -1193,7 +1157,7 @@ static int mfswatch_tabsbegin(PROGINFO *pip)
 /* end subroutine (mfswatch_tabsbegin) */
 
 
-static int mfswatch_tabsend(PROGINFO *pip)
+local int mfswatch_tabsend(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1218,7 +1182,7 @@ static int mfswatch_tabsend(PROGINFO *pip)
 /* end subroutine (mfswatch_tabsend) */
 
 
-static int mfswatch_tabsmaint(PROGINFO *pip)
+local int mfswatch_tabsmaint(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1236,7 +1200,7 @@ static int mfswatch_tabsmaint(PROGINFO *pip)
 /* end subroutine (mfswatch_tabsmaint) */
 
 
-static int mfswatch_usersbegin(PROGINFO *pip)
+local int mfswatch_usersbegin(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	MFSWATCH	*wip = pip->watch ;
@@ -1264,7 +1228,7 @@ static int mfswatch_usersbegin(PROGINFO *pip)
 /* end subroutine (mfswatch_usersbegin) */
 
 
-static int mfswatch_usersend(PROGINFO *pip)
+local int mfswatch_usersend(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1280,7 +1244,7 @@ static int mfswatch_usersend(PROGINFO *pip)
 /* end subroutine (mfswatch_usersend) */
 
 
-static int mfswatch_usersload(PROGINFO *pip,setostr *ulp)
+local int mfswatch_usersload(PROGINFO *pip,setostr *ulp)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1296,7 +1260,7 @@ static int mfswatch_usersload(PROGINFO *pip,setostr *ulp)
 /* end subrlutine (mfswatch_usersload) */
 
 
-static int mfswatch_usersmaint(PROGINFO *pip)
+local int mfswatch_usersmaint(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1315,7 +1279,7 @@ static int mfswatch_usersmaint(PROGINFO *pip)
 /* end subrlutine (mfswatch_usersmaint) */
 
 
-static int mfswatch_usershave(PROGINFO *pip,cchar *sp)
+local int mfswatch_usershave(PROGINFO *pip,cchar *sp)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1333,7 +1297,7 @@ static int mfswatch_usershave(PROGINFO *pip,cchar *sp)
 
 
 /* ARGSUSED */
-static int mfswatch_usershandle(PROGINFO *pip,SREQ *jep)
+local int mfswatch_usershandle(PROGINFO *pip,SREQ *jep)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1354,7 +1318,7 @@ static int mfswatch_usershandle(PROGINFO *pip,SREQ *jep)
 
 
 /* this is an independent thread */
-static int mfswatch_usershandler(PROGINFO *pip,SREQ *jep)
+local int mfswatch_usershandler(PROGINFO *pip,SREQ *jep)
 {
 	cint	hlen = MAXPATHLEN ;
 	int		rs ;
@@ -1392,7 +1356,7 @@ static int mfswatch_usershandler(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_usershandler) */
 
 
-static int mfswatch_usersproj(PROGINFO *pip,int ofd,char *lbuf,int llen,
+local int mfswatch_usersproj(PROGINFO *pip,int ofd,char *lbuf,int llen,
 		cchar *hbuf)
 {
 	int		rs ;
@@ -1408,7 +1372,7 @@ static int mfswatch_usersproj(PROGINFO *pip,int ofd,char *lbuf,int llen,
 /* end subroutine (mfswatch_usersproj) */
 
 
-static int mfswatch_usersplan(PROGINFO *pip,int ofd,char *lbuf,int llen,
+local int mfswatch_usersplan(PROGINFO *pip,int ofd,char *lbuf,int llen,
 		cchar *hbuf)
 {
 	int		rs ;
@@ -1424,7 +1388,7 @@ static int mfswatch_usersplan(PROGINFO *pip,int ofd,char *lbuf,int llen,
 /* end subroutine (mfswatch_usersplan) */
 
 
-static int mfswatch_usersfile(PROGINFO *pip,int ofd,char *lbuf,int llen,
+local int mfswatch_usersfile(PROGINFO *pip,int ofd,char *lbuf,int llen,
 		cchar *fn)
 {
 	int		rs ;
@@ -1466,7 +1430,7 @@ static int mfswatch_usersfile(PROGINFO *pip,int ofd,char *lbuf,int llen,
 /* end subroutine (mfswatch_usersfile) */
 
 
-static int mfswatch_builtbegin(PROGINFO *pip)
+local int mfswatch_builtbegin(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	LOCINFO		*lip = pip->lip ;
@@ -1491,7 +1455,7 @@ static int mfswatch_builtbegin(PROGINFO *pip)
 /* end subroutine (mfswatch_builtbegin) */
 
 
-static int mfswatch_builtend(PROGINFO *pip)
+local int mfswatch_builtend(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1518,7 +1482,7 @@ static int mfswatch_builtend(PROGINFO *pip)
 /* end subroutine (mfswatch_builtend) */
 
 
-static int mfswatch_builtmaint(PROGINFO *pip)
+local int mfswatch_builtmaint(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1537,7 +1501,7 @@ static int mfswatch_builtmaint(PROGINFO *pip)
 
 
 /* ARGSUSED */
-static int mfswatch_svcproc(PROGINFO *pip,SREQ *jep,SVCFILE_ENT *sep,
+local int mfswatch_svcproc(PROGINFO *pip,SREQ *jep,SVCFILE_ENT *sep,
 		cchar **sav)
 {
 	LOCINFO		*lip = pip->lip ;
@@ -1587,7 +1551,7 @@ static int mfswatch_svcproc(PROGINFO *pip,SREQ *jep,SVCFILE_ENT *sep,
 /* end subroutine (mfswatch_svcproc) */
 
 
-static int mfswatch_svcprocfile(PROGINFO *pip,SREQ *jep,SVCENT *sep)
+local int mfswatch_svcprocfile(PROGINFO *pip,SREQ *jep,SVCENT *sep)
 {
 	cint	n = sep->nkeys ;
 	int		rs = SR_OK ;
@@ -1616,7 +1580,7 @@ static int mfswatch_svcprocfile(PROGINFO *pip,SREQ *jep,SVCENT *sep)
 
 
 /* this runs as an independent thread */
-static int mfswatch_svcprocfiler(PROGINFO *pip,SREQ *jep)
+local int mfswatch_svcprocfiler(PROGINFO *pip,SREQ *jep)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1660,7 +1624,7 @@ static int mfswatch_svcprocfiler(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_svcprocfiler) */
 
 
-static int mfswatch_svcprocpass(PROGINFO *pip,SREQ *jep,SVCENT *sep)
+local int mfswatch_svcprocpass(PROGINFO *pip,SREQ *jep,SVCENT *sep)
 {
 	cint	n = sep->nkeys ;
 	int		rs ;
@@ -1719,7 +1683,7 @@ static int mfswatch_svcprocpass(PROGINFO *pip,SREQ *jep,SVCENT *sep)
 
 
 #if	CF_SHLIB
-static int mfswatch_tabsprocshlib(PROGINFO *pip,SREQ *jep,SVCENT *sep)
+local int mfswatch_tabsprocshlib(PROGINFO *pip,SREQ *jep,SVCENT *sep)
 {
 	int		rs = SR_OK ;
 	int		vl ;
@@ -1735,7 +1699,7 @@ static int mfswatch_tabsprocshlib(PROGINFO *pip,SREQ *jep,SVCENT *sep)
 #endif /* CF_SHLIB */
 
 
-static int mfswatch_svcprocprog(PROGINFO *pip,SREQ *jep,SVCENT *sep)
+local int mfswatch_svcprocprog(PROGINFO *pip,SREQ *jep,SVCENT *sep)
 {
 	cint	n = sep->nkeys ;
 	int		rs ;
@@ -1794,7 +1758,7 @@ static int mfswatch_svcprocprog(PROGINFO *pip,SREQ *jep,SVCENT *sep)
 /* end subroutine (mfswatch_svcprocprog) */
 
 
-static int mfswatch_svcprocproger(PROGINFO *pip,SREQ *jep,
+local int mfswatch_svcprocproger(PROGINFO *pip,SREQ *jep,
 		cchar *pfn,vecstr *alp)
 {
 	int		rs ;
@@ -1813,7 +1777,7 @@ static int mfswatch_svcprocproger(PROGINFO *pip,SREQ *jep,
 /* end subroutine (mfswatch_svcprocproger) */
 
 
-static int mfswatch_progspawn(PROGINFO *pip,SREQ *jep,cchar *pbuf,vecstr *alp)
+local int mfswatch_progspawn(PROGINFO *pip,SREQ *jep,cchar *pbuf,vecstr *alp)
 {
 	MFSWATCH	*wip = pip->watch ;
 	LOCINFO		*lip = pip->lip ;
@@ -1891,7 +1855,7 @@ static int mfswatch_progspawn(PROGINFO *pip,SREQ *jep,cchar *pbuf,vecstr *alp)
 /* end subroutine (mfswatch_progspawn) */
 
 
-static int mfswatch_builthave(PROGINFO *pip,cchar *svc)
+local int mfswatch_builthave(PROGINFO *pip,cchar *svc)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1912,7 +1876,7 @@ static int mfswatch_builthave(PROGINFO *pip,cchar *svc)
 /* end subroutine (mfswatch_builthave) */
 
 
-static int mfswatch_builthandle(PROGINFO *pip,SREQ *jep)
+local int mfswatch_builthandle(PROGINFO *pip,SREQ *jep)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -1942,7 +1906,7 @@ static int mfswatch_builthandle(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_builthandle) */
 
 
-static int mfswatch_svchelp(PROGINFO *pip,SREQ *jep)
+local int mfswatch_svchelp(PROGINFO *pip,SREQ *jep)
 {
 	svcprocer_t	w = (svcprocer_t) mfswatch_svchelper ;
 	int		rs ;
@@ -1972,7 +1936,7 @@ static int mfswatch_svchelp(PROGINFO *pip,SREQ *jep)
 
 
 /* this runs as an independent thread */
-static int mfswatch_svchelper(PROGINFO *pip,SREQ *jep)
+local int mfswatch_svchelper(PROGINFO *pip,SREQ *jep)
 {
 	int		rs ;
 	int		rs1 ;
@@ -2004,7 +1968,7 @@ static int mfswatch_svchelper(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_svchelper) */
 
 
-static int mfswatch_loadsvcs(PROGINFO *pip,SREQ *jep)
+local int mfswatch_loadsvcs(PROGINFO *pip,SREQ *jep)
 {
 	MFSWATCH	*wip = pip->watch ;
 	cint	elen = (5*MAXNAMELEN) ;
@@ -2091,7 +2055,7 @@ static int mfswatch_loadsvcs(PROGINFO *pip,SREQ *jep)
 
 
 /* this spawns a thread with the required arguments */
-static int mfswatch_svcprocer(PROGINFO *pip,SREQ *jep,svcprocer_t w)
+local int mfswatch_svcprocer(PROGINFO *pip,SREQ *jep,svcprocer_t w)
 {
 	MFSWATCH	*wip = pip->watch ;
 	cint	js = sreqstate_thread ;
@@ -2126,7 +2090,7 @@ static int mfswatch_svcprocer(PROGINFO *pip,SREQ *jep,svcprocer_t w)
 
 
 #ifdef	COMMENT
-static int mfswatch_islong(PROGINFO *pip,vecstr *sap)
+local int mfswatch_islong(PROGINFO *pip,vecstr *sap)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -2145,7 +2109,7 @@ static int mfswatch_islong(PROGINFO *pip,vecstr *sap)
 
 
 /* returns connect status to the client */
-static int mfswatch_svcretstat(PROGINFO *pip,SREQ *jep,int f)
+local int mfswatch_svcretstat(PROGINFO *pip,SREQ *jep,int f)
 {
 	LOCINFO		*lip = pip->lip ;
 	MFSWATCH	*wip = pip->watch ;
@@ -2191,7 +2155,7 @@ static int mfswatch_svcretstat(PROGINFO *pip,SREQ *jep,int f)
 /* end subroutine (mfswatch_svcretstat) */
 
 
-static int mfswatch_jobretire(PROGINFO *pip,SREQ *jep)
+local int mfswatch_jobretire(PROGINFO *pip,SREQ *jep)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs ;
@@ -2216,7 +2180,7 @@ static int mfswatch_jobretire(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_jobretire) */
 
 
-static int mfswatch_checkthrs(PROGINFO *pip)
+local int mfswatch_checkthrs(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -2250,7 +2214,7 @@ static int mfswatch_checkthrs(PROGINFO *pip)
 
 
 /* ARGSUSED */
-static int mfswatch_thrdone(PROGINFO *pip,SREQ *jep)
+local int mfswatch_thrdone(PROGINFO *pip,SREQ *jep)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs ;
@@ -2272,7 +2236,7 @@ static int mfswatch_thrdone(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_thrdone) */
 
 
-static int mfswatch_checkprogs(PROGINFO *pip)
+local int mfswatch_checkprogs(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -2317,7 +2281,7 @@ static int mfswatch_checkprogs(PROGINFO *pip)
 /* end subroutine (mfswatch_checkprogs) */
 
 
-static int mfswatch_checkbuilts(PROGINFO *pip)
+local int mfswatch_checkbuilts(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs = SR_OK ;
@@ -2350,7 +2314,7 @@ static int mfswatch_checkbuilts(PROGINFO *pip)
 /* end subroutine (mfswatch_checkbuilts) */
 
 
-static int mfswatch_checkbuilt(PROGINFO *pip,SREQ *jep)
+local int mfswatch_checkbuilt(PROGINFO *pip,SREQ *jep)
 {
 	MFSWATCH	*wip = pip->watch ;
 	int		rs ;
@@ -2375,7 +2339,7 @@ static int mfswatch_checkbuilt(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_checkbuilt) */
 
 
-static int mfswatch_logprogres(PROGINFO *pip,int jsn,cchar *lid,
+local int mfswatch_logprogres(PROGINFO *pip,int jsn,cchar *lid,
 		pid_t pid,int cs)
 {
 	int		rs = SR_OK ;
@@ -2465,7 +2429,7 @@ static int mfswatch_logprogres(PROGINFO *pip,int jsn,cchar *lid,
 /* end subroutine (mfswatch_logprogres) */
 
 
-static int mfswatch_logprogchild(PROGINFO *pip,SREQ *jep)
+local int mfswatch_logprogchild(PROGINFO *pip,SREQ *jep)
 {
 	int		rs = SR_OK ;
 #if	CF_DEBUG
@@ -2493,7 +2457,7 @@ static int mfswatch_logprogchild(PROGINFO *pip,SREQ *jep)
 
 
 /* log a connection */
-static int mfswatch_logconn(PROGINFO *pip,int jsn,int jt,int st,cchar *lid)
+local int mfswatch_logconn(PROGINFO *pip,int jsn,int jt,int st,cchar *lid)
 {
 	int		rs = SR_OK ;
 	cchar		*fmt ;
@@ -2506,7 +2470,7 @@ static int mfswatch_logconn(PROGINFO *pip,int jsn,int jt,int st,cchar *lid)
 /* end subroutine (mfswatch_logconn) */
 
 
-static int mfswatch_logsvc(PROGINFO *pip,SREQ *jep)
+local int mfswatch_logsvc(PROGINFO *pip,SREQ *jep)
 {
 	int		rs ;
 	cchar		*svc ;
@@ -2519,7 +2483,7 @@ static int mfswatch_logsvc(PROGINFO *pip,SREQ *jep)
 /* end subroutine (mfswatch_logconn) */
 
 
-static int svcprocers(SVCPROCARGS *sap)
+local int svcprocers(SVCPROCARGS *sap)
 {
 	PROGINFO	*pip = sap->pip ;
 	SREQ		*jep = sap->jep ;
@@ -2538,7 +2502,7 @@ static int svcprocers(SVCPROCARGS *sap)
 /* end subroutine (svcprocers) */
 
 
-static int isBadService(int rs)
+local int isBadService(int rs)
 {
 	return isOneOf(rsnets,rs) ;
 }
