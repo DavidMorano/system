@@ -88,7 +88,7 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ugetpid.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<uinfo.h>
 #include	<userinfo.h>
 #include	<getax.h>
