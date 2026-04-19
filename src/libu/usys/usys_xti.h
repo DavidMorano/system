@@ -43,6 +43,8 @@
 
 #else /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */
 
+
+#include	"usys_xtibase.h"
 #include	"usys_xtierror.h"
 #include	"usys_xtistructs.h"
 
