@@ -1,11 +1,12 @@
-/* textmkind *NOT_FINISHED* */
+/* textmkind SUPPORT *NOT_FINISHED* */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* make an index for some text files */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG 	0		/* run-time debugging */
 #define	CF_EXTRAWORDS	1		/* extra words? */
-
 
 /* revision history:
 
@@ -18,24 +19,26 @@
 
 /*******************************************************************************
 
-	This module will create a single index out of all of the files given to
-	us.
+  	Obkect:
+	textmkind
 
+	Description:
+	This module will create a single index out of all of the
+	files given to us.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ids.h>
 #include	<baops.h>
 #include	<bfile.h>
@@ -73,15 +76,6 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfword(const char *,int,const char **) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	getnprocessors(const char **,int) ;
-extern int	field_word(FIELD *,const uchar *,const char **) ;
-
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-
 
 /* external variables */
 
@@ -92,8 +86,8 @@ struct subinfo {
 	PROGINFO	*pip ;
 	ARGINFO	*aip ;
 	const uchar	*terms ;
-	const char	*delimiter ;
-	const char	*ignorechars ;
+	cchar	*delimiter ;
+	cchar	*ignorechars ;
 	IDS		id ;
 	int		pan ;
 } ;
@@ -115,46 +109,46 @@ struct wargs {
 	PTM		*omp ;
 	bfile		*ofp ;
 	const uchar	*terms ;
-	const char	*delimiter ;
-	const char	*ignorechars ;
+	cchar	*delimiter ;
+	cchar	*ignorechars ;
 } ;
 
 
 /* forward references */
 
-static int	subinfo_start(struct subinfo *,PROGINFO *,
+local int	subinfo_start(struct subinfo *,PROGINFO *,
 			ARGINFO *,const uchar *,
-			const char *,const char *) ;
-static int	subinfo_finish(struct subinfo *) ;
-static int	subinfo_sendparams(struct subinfo *,bfile *) ;
-static int	subinfo_sendparamseigens(struct subinfo *,bfile *) ;
-static int	subinfo_sendparamsval(struct subinfo *,bfile *,
-			const char *,int) ;
-static int	subinfo_sendparamsstr(struct subinfo *,bfile *,
-			const char *,const char *) ;
+			cchar *,cchar *) ;
+local int	subinfo_finish(struct subinfo *) ;
+local int	subinfo_sendparams(struct subinfo *,bfile *) ;
+local int	subinfo_sendparamseigens(struct subinfo *,bfile *) ;
+local int	subinfo_sendparamsval(struct subinfo *,bfile *,
+			cchar *,int) ;
+local int	subinfo_sendparamsstr(struct subinfo *,bfile *,
+			cchar *,cchar *) ;
 
-static int	subinfo_args(struct subinfo *,DISP *) ;
-static int	subinfo_argfile(struct subinfo *,DISP *) ;
-static int	subinfo_stdin(struct subinfo *,DISP *) ;
-static int	subinfo_procfile(struct subinfo *,DISP *,const char *) ;
+local int	subinfo_args(struct subinfo *,DISP *) ;
+local int	subinfo_argfile(struct subinfo *,DISP *) ;
+local int	subinfo_stdin(struct subinfo *,DISP *) ;
+local int	subinfo_procfile(struct subinfo *,DISP *,cchar *) ;
 
-static int	worker(void *) ;
+local int	worker(void *) ;
 
-static int	disp_start(DISP *,WARGS *) ;
-static int	disp_addwork(DISP *,const char *,int) ;
-static int	disp_finish(DISP *,int) ;
+local int	disp_start(DISP *,WARGS *) ;
+local int	disp_addwork(DISP *,cchar *,int) ;
+local int	disp_finish(DISP *,int) ;
 
-static int	progkey(PROGINFO *,bfile *,PTM *,
+local int	progkey(PROGINFO *,bfile *,PTM *,
 			const uchar *,
-			const char *,const char *,char *) ;
+			cchar *,cchar *,char *) ;
 
-static int	ignoreline(const char *,int,const char *) ;
-static int	procword(PROGINFO *,HDB *,
-			int, const char *,int) ;
+local int	ignoreline(cchar *,int,cchar *) ;
+local int	procword(PROGINFO *,HDB *,
+			int, cchar *,int) ;
 
 extern int	keysstart(PROGINFO *,HDB *,int) ;
-extern int	keysadd(PROGINFO *,HDB *,const char *,int) ;
-extern int	keysfinish(PROGINFO *,HDB *,bfile *,PTM *,const char *,
+extern int	keysadd(PROGINFO *,HDB *,cchar *,int) ;
+extern int	keysfinish(PROGINFO *,HDB *,bfile *,PTM *,cchar *,
 			off_t,int) ;
 
 
@@ -167,8 +161,8 @@ extern int	keysfinish(PROGINFO *,HDB *,bfile *,PTM *,const char *,
 int textmkind_open(op,pap,basedname,dbname)
 TEXTMKIND	*op ;
 TEXTMKIND_PARAMS	*pap ;
-const char	basedname[] ;
-const char	dbname[] ;
+cchar	basedname[] ;
+cchar	dbname[] ;
 {
 	int	rs = SR_OK ;
 
@@ -179,10 +173,10 @@ const char	dbname[] ;
 /* end subroutine (textmkind_open) */
 
 
-extern int textmkind_open(TEXTMKIND *,const char *,const char *,const char *) ;
+extern int textmkind_open(TEXTMKIND *,cchar *,cchar *,cchar *) ;
 extern int textmkind_count(TEXTMKIND *) ;
 extern int textmkind_info(TEXTMKIND *,TEXTMKIND_INFO *) ;
-extern int textmkind_add(TEXTMKIND *,const char *,int) ;
+extern int textmkind_add(TEXTMKIND *,cchar *,int) ;
 extern int textmkind_close(TEXTMKIND *) ;
 
 
@@ -205,9 +199,9 @@ int mkkey(pip,aip,terms,delimiter,ignorechars,outfname)
 PROGINFO	*pip ;
 ARGINFO	*aip ;
 const uchar	terms[] ;
-const char	delimiter[] ;
-const char	ignorechars[] ;
-const char	outfname[] ;
+cchar	delimiter[] ;
+cchar	ignorechars[] ;
+cchar	outfname[] ;
 {
 	struct subinfo	si, *sip = &si ;
 
@@ -237,7 +231,7 @@ const char	outfname[] ;
 	    strcat(openstr,"t") ;
 	}
 
-	if ((outfname == NULL) || (outfname[0] == '\0')) {
+	if ((outfname == nullptr) || (outfname[0] == '\0')) {
 	    strcat(openstr,"d") ;
 	    rs = bopen(ofp,BFILE_STDOUT,openstr,0666) ;
 	} else
@@ -302,13 +296,13 @@ ret0:
 /* local subroutines */
 
 
-static int subinfo_start(sip,pip,aip,terms,delimiter,ignorechars)
+local int subinfo_start(sip,pip,aip,terms,delimiter,ignorechars)
 struct subinfo	*sip ;
 PROGINFO	*pip ;
 ARGINFO	*aip ;
 const uchar	terms[] ;
-const char	delimiter[] ;
-const char	ignorechars[] ;
+cchar	delimiter[] ;
+cchar	ignorechars[] ;
 {
 	int		rs ;
 
@@ -326,7 +320,7 @@ const char	ignorechars[] ;
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -344,7 +338,7 @@ static int subinfo_finish(SUBINFO *sip)
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_sendparams(sip,ofp)
+local int subinfo_sendparams(sip,ofp)
 struct subinfo	*sip ;
 bfile		*ofp ;
 {
@@ -357,7 +351,7 @@ bfile		*ofp ;
 
 	if (pip->fl.optsendparams) {
 	    for (i = 0 ; i < mkcmd_overlast ; i += 1) {
-		const char	*cp = mkcmds[i] ;
+		cchar	*cp = mkcmds[i] ;
 
 	    switch (i) {
 
@@ -412,7 +406,7 @@ bfile		*ofp ;
 /* end subroutine (subinfo_sendparams) */
 
 
-static int subinfo_sendparamseigens(sip,ofp)
+local int subinfo_sendparamseigens(sip,ofp)
 struct subinfo	*sip ;
 bfile		*ofp ;
 {
@@ -497,10 +491,10 @@ ret0:
 /* end subroutine (subinfo_sendparamseigens) */
 
 
-static int subinfo_sendparamsval(sip,ofp,cmd,v)
+local int subinfo_sendparamsval(sip,ofp,cmd,v)
 struct subinfo	*sip ;
 bfile		*ofp ;
-const char	cmd[] ;
+cchar	cmd[] ;
 int		v ;
 {
 	int	rs = SR_OK ;
@@ -517,17 +511,17 @@ int		v ;
 /* end subroutine (subinfo_sendparamsval) */
 
 
-static int subinfo_sendparamsstr(sip,ofp,cmd,s)
+local int subinfo_sendparamsstr(sip,ofp,cmd,s)
 struct subinfo	*sip ;
 bfile		*ofp ;
-const char	cmd[] ;
-const char	s[] ;
+cchar	cmd[] ;
+cchar	s[] ;
 {
 	int	rs = SR_OK ;
 	int	wlen = 0 ;
 
 
-	if ((s != NULL) && (s[0] != '\0')) {
+	if ((s != nullptr) && (s[0] != '\0')) {
 	    rs = bprintf(ofp,"-%s %s\n",cmd,s) ;
 	    wlen += rs ;
 	}
@@ -537,7 +531,7 @@ const char	s[] ;
 /* end subroutine (subinfo_sendparamsstr) */
 
 
-static int subinfo_args(sip,dop)
+local int subinfo_args(sip,dop)
 struct subinfo	*sip ;
 DISP		*dop ;
 {
@@ -549,7 +543,7 @@ DISP		*dop ;
 	int	ai ;
 	int	f ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	pip = sip->pip ;
@@ -557,7 +551,7 @@ DISP		*dop ;
 	for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	    f = (ai <= aip->ai_max) && (bits_test(&aip->pargs,ai) > 0) ;
-	    f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	    f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	    if (! f) continue ;
 
 	    cp = aip->argv[ai] ;
@@ -573,7 +567,7 @@ DISP		*dop ;
 /* end subroutine (subinfo_args) */
 
 
-static int subinfo_argfile(sip,dop)
+local int subinfo_argfile(sip,dop)
 struct subinfo	*sip ;
 DISP		*dop ;
 {
@@ -584,7 +578,7 @@ DISP		*dop ;
 
 	pip = sip->pip ;
 	aip = sip->aip ;
-	if ((aip->afname == NULL) || (aip->afname[0] == '\0'))
+	if ((aip->afname == nullptr) || (aip->afname[0] == '\0'))
 	    goto ret0 ;
 
 	if (strcmp(aip->afname,"-") != 0) {
@@ -632,7 +626,7 @@ ret0:
 /* end subroutine (subinfo_argfile) */
 
 
-static int subinfo_stdin(sip,dop)
+local int subinfo_stdin(sip,dop)
 struct subinfo	*sip ;
 DISP		*dop ;
 {
@@ -654,10 +648,10 @@ ret0:
 /* end subroutine (subinfo_stdin) */
 
 
-static int subinfo_procfile(sip,dop,fname)
+local int subinfo_procfile(sip,dop,fname)
 struct subinfo	*sip ;
 DISP		*dop ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	PROGINFO	*pip = sip->pip ;
 
@@ -695,7 +689,7 @@ ret0:
 /* end subroutine (subinfo_procfile) */
 
 
-static int disp_start(dop,wap)
+local int disp_start(dop,wap)
 DISP		*dop ;
 WARGS		*wap ;
 {
@@ -710,10 +704,10 @@ WARGS		*wap ;
 	int	i ;
 
 
-	if (dop == NULL)
+	if (dop == nullptr)
 	    return SR_FAULT ;
 
-	if (wap == NULL)
+	if (wap == nullptr)
 	    return SR_FAULT ;
 
 	wap->dop = dop ;
@@ -726,7 +720,7 @@ WARGS		*wap ;
 	if (rs < 0)
 	    goto bad0 ;
 
-	rs = psem_init(&dop->wq_sem,FALSE,0) ;
+	rs = psem_init(&dop->wq_sem,false,0) ;
 	if (rs < 0)
 	    goto bad2 ;
 
@@ -736,7 +730,8 @@ WARGS		*wap ;
 	if (rs < 0)
 	    goto bad3 ;
 
-	rs = ptm_create(&dop->om,NULL) ;
+	ptm *omp = &dop->om ;
+	rs = omp->create ;
 	if (rs < 0)
 	    goto bad4 ;
 
@@ -750,7 +745,7 @@ WARGS		*wap ;
 
 	for (i = 0 ; i < dop->n ; i += 1) {
 
-	    rs = uptcreate(&tid,NULL,worker,wap) ;
+	    rs = uptcreate(&tid,nullptr,worker,wap) ;
 	    if (rs < 0)
 	        break ;
 
@@ -761,12 +756,12 @@ WARGS		*wap ;
 	} /* end for */
 
 	if (rs < 0) {
-	    dop->f_exit = TRUE ;
+	    dop->f_exit = true ;
 	    for (i = 0 ; i < dop->n ; i += 1)
 	        psem_post(&dop->wq_sem) ;
 	    for (i = 0 ; vecobj_get(&dop->tids,i,&tidp) >= 0 ; i += 1) {
-	        if (tidp == NULL) continue ;
-	        uptjoin(*tidp,NULL) ;
+	        if (tidp == nullptr) continue ;
+	        uptjoin(*tidp,nullptr) ;
 	    }
 	} /* end if (failure) */
 
@@ -779,7 +774,7 @@ ret0:
 /* bad stuff */
 bad6:
 bad5:
-	ptm_destroy(&dop->om) ;
+	omp->destroy() ;
 
 bad4:
 	vecobj_finish(&dop->tids) ;
@@ -796,49 +791,49 @@ bad0:
 }
 /* end subroutine (disp_start) */
 
-
-static int disp_finish(dop,f_abort)
-DISP		*dop ;
-int		f_abort ;
-{
+local int disp_finish(DISP *dop,int f_abort) noex DISP		*dop ;
 	pthread_t	*tidp ;
-
-	int	rs = SR_OK ;
+	int		rs = SR_OK ;
+	int		rs1 ;
 	int	i ;
 
+	if (dop == nullptr) return SR_FAULT ;
 
-	if (dop == NULL)
-	    return SR_FAULT ;
-
-	dop->f_done = TRUE ;
-	if (f_abort)
-	    dop->f_exit = TRUE ;
-
-	for (i = 0 ; i < dop->n ; i += 1)
-	    psem_post(&dop->wq_sem) ;
-
-	for (i = 0 ; vecobj_get(&dop->tids,i,&tidp) >= 0 ; i += 1) {
-	    if (tidp == NULL) continue ;
-	    uptjoin(*tidp,NULL) ;
+	dop->f_done = true ;
+	if (f_abort) {
+	    dop->f_exit = true ;
 	}
-
-	ptm_destroy(&dop->om) ;
-
-	vecobj_finish(&dop->tids) ;
-
-	psem_destroy(&dop->wq_sem) ;
-
-	fsi_finish(&dop->wq) ;
-
-ret0:
+	for (i = 0 ; i < dop->n ; i += 1) {
+	    psem_post(&dop->wq_sem) ;
+	}
+	for (i = 0 ; vecobj_get(&dop->tids,i,&tidp) >= 0 ; i += 1) {
+	    if (tidp == nullptr) continue ;
+	    uptjoin(*tidp,nullptr) ;
+	}
+	{
+	    ptm *omp = &dop->om ;
+	    rs1 = omp->destroy ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = vecobj_finish(&dop->tids) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = psem_destroy(&dop->wq_sem) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = fsi_finish(&dop->wq) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (disp_finish) */
 
-
-static int disp_addwork(dop,tagbuf,taglen)
+local int disp_addwork(dop,tagbuf,taglen)
 DISP		*dop ;
-const char	tagbuf[] ;
+cchar	tagbuf[] ;
 int		taglen ;
 {
 	int	rs = SR_OK ;
@@ -854,7 +849,7 @@ int		taglen ;
 /* end subroutine (disp_addwork) */
 
 
-static int worker(ptvp)
+local int worker(ptvp)
 void		*ptvp ;
 {
 	PROGINFO	*pip ;
@@ -966,12 +961,12 @@ char		fname[] ;
 	int	entries = 0 ;
 	int	n = 0 ;
 	int	f_start, f_ent, f_finish ;
-	int	f_open = FALSE ;
+	int	f_open = false ;
 	int	f_bol, f_eol ;
 
 	uchar	bterms[32] ;
 
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 	char	lbuf[LINEBUFLEN + 1], *lp ;
 
@@ -1040,14 +1035,14 @@ char		fname[] ;
 /* go to it, read the file line by line */
 
 	f_start = pip->fl.wholefile ;
-	f_ent = FALSE ;
-	f_finish = FALSE ;
+	f_ent = false ;
+	f_finish = false ;
 
 	offset = 0 ;
 	recoff = 0 ;
 	reclen = 0 ;
 	lo = 0 ;
-	f_bol = TRUE ;
+	f_bol = true ;
 	while (rs >= 0) {
 
 	    rs = breadln(ifp,(lbuf + lo),(LINEBUFLEN - lo)) ;
@@ -1099,8 +1094,8 @@ char		fname[] ;
 	                debugprintf("progkey: delimit every line\n") ;
 #endif
 
-	            f_start = TRUE ;
-	            f_finish = TRUE ;
+	            f_start = true ;
+	            f_finish = true ;
 
 	        } else if (CHAR_ISWHITE(delimiter[0])) {
 
@@ -1114,12 +1109,12 @@ char		fname[] ;
 	            if (sl == 0) {
 
 	                if (f_ent)
-	                    f_finish = TRUE ;
+	                    f_finish = true ;
 
 	            } else {
 
 	                if (! f_ent)
-	                    f_start = TRUE ;
+	                    f_start = true ;
 
 	            }
 
@@ -1138,7 +1133,7 @@ char		fname[] ;
 #endif
 
 	                if (f_ent)
-	                    f_finish = TRUE ;
+	                    f_finish = true ;
 
 	            } else {
 
@@ -1148,7 +1143,7 @@ char		fname[] ;
 #endif
 
 	                if (! f_ent)
-	                    f_start = TRUE ;
+	                    f_start = true ;
 
 	            }
 
@@ -1161,8 +1156,8 @@ char		fname[] ;
 	                debugprintf("progkey: finishing off entry\n") ;
 #endif
 
-	            f_ent = FALSE ;
-	            f_finish = FALSE ;
+	            f_ent = false ;
+	            f_finish = false ;
 	            if (n > 0) {
 
 #if	CF_DEBUG
@@ -1170,7 +1165,7 @@ char		fname[] ;
 	                    debugprintf("progkey: closing a DB\n") ;
 #endif
 
-	                f_open = FALSE ;
+	                f_open = false ;
 	                reclen = (int) (offset - recoff) ;
 	                rs = keysfinish(pip,&keydb,ofp,omp,
 				fname,recoff,reclen) ;
@@ -1192,8 +1187,8 @@ char		fname[] ;
 	                offset) ;
 #endif
 
-	        f_start = FALSE ;
-	        f_ent = TRUE ;
+	        f_start = false ;
+	        f_ent = true ;
 
 	        n = 0 ;
 	        reclen = 0 ;
@@ -1205,7 +1200,7 @@ char		fname[] ;
 	                debugprintf("progkey: opening a DB\n") ;
 #endif
 
-	            f_open = TRUE ;
+	            f_open = true ;
 	            rs = keysstart(pip,&keydb,hashsize) ;
 
 	        } /* end if (opening keys DB) */
@@ -1220,7 +1215,7 @@ char		fname[] ;
 	        if ((rs = field_start(&fsb,lp,ll)) >= 0) {
 		    int		ch ;
 	            int		fl ;
-	            int		f_first = FALSE ;
+	            int		f_first = false ;
 	            cchar	*fp ;
 
 	            if (pip->fl.optbible) {
@@ -1247,7 +1242,7 @@ char		fname[] ;
 	                char	lowbuf[LOWBUFLEN + 1] ;
 
 
-	                f_first = FALSE ;
+	                f_first = false ;
 
 /* remove apostrophes (single quotes) from the leading edge */
 
@@ -1345,7 +1340,7 @@ char		fname[] ;
 
 	if (f_open) {
 
-	    f_open = FALSE ;
+	    f_open = false ;
 	    reclen = (int) (offset - recoff) ;
 	    rs1 = keysfinish(pip,&keydb,ofp,omp,fname,recoff,reclen) ;
 	    nk = rs1 ;
@@ -1370,39 +1365,39 @@ ret0:
 
 
 /* which input lines are supposed to be ignored ? */
-static int ignoreline(lbuf,ll,ignorechars)
-const char	lbuf[] ;
-const char	ignorechars[] ;
+local int ignoreline(lbuf,ll,ignorechars)
+cchar	lbuf[] ;
+cchar	ignorechars[] ;
 const int	ll ;
 {
 
-	if ((ignorechars != NULL) && (lbuf[0] == '%')) {
+	if ((ignorechars != nullptr) && (lbuf[0] == '%')) {
 
 	    if (ll < 2)
-	        return TRUE ;
+	        return true ;
 
-	    if (strchr(ignorechars,lbuf[1]) != NULL)
-	        return TRUE ;
+	    if (strchr(ignorechars,lbuf[1]) != nullptr)
+	        return true ;
 
 	} /* end if */
 
-	return FALSE ;
+	return false ;
 }
 /* end subroutine (ignoreline) */
 
 
 /* process a word */
-static int procword(pip,keydbp,n,buf,buflen)
+local int procword(pip,keydbp,n,buf,buflen)
 PROGINFO	*pip ;
 HDB		*keydbp ;
 int		n ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	EIGENDB		*edbp = &pip->eigendb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 
 /* continue with regular checks */
 
