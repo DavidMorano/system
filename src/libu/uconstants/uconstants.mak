@@ -46,9 +46,7 @@ OBJ_UCONSTS= uconstants0.o uconstants_def.o
 
 
 INCDIRS=
-
 LIBDIRS=
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -121,7 +119,6 @@ uconstants0.o:		uconstants.ccm $(DEP_UCONST)
 uconstants_def.o:	uconstants_def.cc uconstants.ccm $(DEP_UCONST)
 	makemodule uconstants
 	$(COMPILE.cc) $<
-
 
 # UMODS
 umods.o:		umods.dir
