@@ -1,4 +1,6 @@
-/* ow */
+/* openweather SUPPORT (OpenWeather) */
+/* lang=C++20 (conformance reviewed) */
+/* charset=ISO8859-1 */
 
 /* support for Open-Weather (OW) */
 /* version %I% last-modified %G% */
@@ -17,7 +19,8 @@
 
 /******************************************************************************
 
-	These subroutines provide support for the 'openweather(3dam)'
+  	Description:
+	These subroutines provide support for the |openweather(3dam)|
 	subroutine (facility?).
 
 ******************************************************************************/
@@ -29,12 +32,12 @@
 #include	<sys/syslog.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 #include	<cstdarg>
-#include	<ctime>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getbufsize.h>
 #include	<vecstr.h>
 #include	<logfile.h>
@@ -49,18 +52,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	mklogid(char *,int,const char *,int,int) ;
-extern int	strkeycmp(const char *,const char *) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	getuid_name(cchar *,int) ;
-extern int	isNotPresent(int) ;
 
 
 /* external variables */
@@ -82,15 +73,17 @@ static int	ow_lsclose(OW *) ;
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int ow_start(sip,pr,sn,vd,ws,daytime,of,to)
 OW		*sip ;
-const char	*pr ;
-const char	*sn ;
-const char	*vd ;
-const char	*ws ;
+cchar	*pr ;
+cchar	*sn ;
+cchar	*vd ;
+cchar	*ws ;
 time_t		daytime ;
 int		of ;
 int		to ;
@@ -203,15 +196,15 @@ int		f_abort ;
 
 int ow_setentry(sip,epp,vp,vl)
 OW		*sip ;
-const char	**epp ;
-const char	*vp ;
+cchar	**epp ;
+cchar	*vp ;
 int		vl ;
 {
 	int	rs = SR_OK ;
 	int	oi, i ;
 	int	vnlen = 0 ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if (sip == NULL)
@@ -336,7 +329,7 @@ OW		*sip ;
 /* end subroutine (ow_prid) */
 
 
-int ow_logprintf(OW *sip,const char *fmt,...)
+int ow_logprintf(OW *sip,cchar *fmt,...)
 {
 	va_list	ap ;
 
@@ -398,9 +391,9 @@ OW		*sip ;
 	int	f_created = FALSE ;
 	int	f_runasprn = FALSE ;
 
-	const char	*tn = sip->tmpdname ;
-	const char	*rn = NULL ;
-	const char	*sn = sip->sn ;
+	cchar	*tn = sip->tmpdname ;
+	cchar	*rn = NULL ;
+	cchar	*sn = sip->sn ;
 
 	char	tmpourdname[MAXPATHLEN + 1] ;
 
@@ -543,7 +536,7 @@ OW		*sip ;
 	int	rs = SR_OK ;
 	int	pl = 0 ;
 
-	const char	*reqcname = REQCNAME ;
+	cchar	*reqcname = REQCNAME ;
 
 	char	reqfname[MAXPATHLEN + 1] ;
 
@@ -576,8 +569,8 @@ int		f ;
 	int	rs = SR_OK ;
 	int	oflags = (O_CREAT | O_WRONLY | O_TRUNC) ;
 
-	const char	*pidcname = PIDCNAME ;
-	const char	*pf ;
+	cchar	*pidcname = PIDCNAME ;
+	cchar	*pf ;
 
 	char	pidfname[MAXPATHLEN + 1] ;
 
@@ -701,8 +694,8 @@ OW		*sip ;
 int ow_setfname(sip,fname,ebuf,el,f_def,dname,name,suf)
 OW		*sip ;
 char		fname[] ;
-const char	ebuf[] ;
-const char	dname[], name[], suf[] ;
+cchar	ebuf[] ;
+cchar	dname[], name[], suf[] ;
 int		el ;
 int		f_def ;
 {
@@ -710,7 +703,7 @@ int		f_def ;
 	int	ml ;
 	int	fl = 0 ;
 
-	const char	*np ;
+	cchar	*np ;
 
 	char	tmpname[MAXNAMELEN + 1] ;
 
@@ -771,7 +764,7 @@ OW		*sip ;
 	if (sip->rn == NULL) {
 	    sip->pid = getpid() ;
 	    {
-	        const char	*rnp ;
+	        cchar	*rnp ;
 	        int		rnl ;
 	        rnl = sfbasename(sip->pr,-1,&rnp) ;
 	        if (rnl == 0) {
@@ -793,7 +786,7 @@ static int ow_lfopen(OW *sip)
 	int	rs1 ;
 	int	f_open = FALSE ;
 
-	const char	*ln = sip->logfname ;
+	cchar	*ln = sip->logfname ;
 
 
 	if (sip->fl.lf) {
@@ -856,8 +849,8 @@ static int ow_lsopen(OW *sip)
 	    int	logfac = LOG_DAEMON ;
 	    rs = ow_mklogid(sip) ;
 	    if (rs >= 0) {
-	        const char	*logtag = sip->sn ;
-	        const char	*logid = sip->logid ;
+	        cchar	*logtag = sip->sn ;
+	        cchar	*logid = sip->logid ;
 	        rs1 = logsys_open(&sip->ls,logfac,logtag,logid,0) ;
 	        f_open = (rs1 >= 0) ;
 	        sip->open.ls = f_open ;
@@ -896,7 +889,7 @@ static int ow_mklogid(OW *sip)
 	        rs = ow_nodedomain(sip) ;
 
 	    if (rs >= 0) {
-	        const char	*nn = sip->nodename ;
+	        cchar	*nn = sip->nodename ;
 	        int		v = sip->pid ;
 	        rs = mklogid(sip->logid,logidlen,nn,-1,v) ;
 	    }
