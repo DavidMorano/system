@@ -1,12 +1,12 @@
-/* mfs-listen */
+/* mfs-listen SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* MFSERVE Listen */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
@@ -22,31 +22,31 @@
 
 /*******************************************************************************
 
-	This module contains the subroutines that manage program listening.
-
+  	Description:
+	This module contains the subroutines that manage program
+	listening.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<vecstr.h>
 #include	<poller.h>
+#include	<listenspec.h>
+#include	<prmkfname.h>
 #include	<localmisc.h>
 
-#include	"listenspec.h"
-#include	"prmkfname.h"
 #include	"defs.h"
 #include	"mfsmain.h"
 #include	"mfslocinfo.h"
@@ -59,30 +59,10 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	cfdecmfu(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* forward references */
