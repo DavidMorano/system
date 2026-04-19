@@ -1,4 +1,4 @@
-/* progspec SSUPPORT */
+/* msgclean_progspec SSUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -30,9 +30,11 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<ctime>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<paramopt.h>
 #include	<fsdir.h>
@@ -106,15 +108,13 @@ int progspec(PROGINFO *pip,PARAMOPT *pop,cchar *fname) noex {
 	        char	tmpfname[MAXPATHLEN + 1] ;
 
 	        if (pip->fl.recurse) {
-	            FSDIRTREE		dt ;
-	            FSDIRTREE_STAT	fsb ;
-	            int		dtopts = 0 ;
+	            int		fdo = 0 ;
 	            char	dename[MAXPATHLEN + 1] ;
-
-	            dtopts |= ((pip->fl.follow) ? FSDIRTREE_MFOLLOW : 0) ;
-	            if ((rs = fsdirtree_open(&dt,fname,dtopts)) >= 0) {
-	                const int	mpl = MAXPATHLEN ;
-
+	            fdo |= ((pip->fl.follow) ? fsdirtreem.follow : 0) ;
+	            fsdirtree	dt ;
+	            if ((rs = fsdirtree_open(&dt,fname,fdo)) >= 0) {
+	                ustat	fsb ;
+	                cint	mpl = MAXPATHLEN ;
 	                while (rs >= 0) {
 	                    del = fsdirtree_read(&dt,&fsb,dename,mpl) ;
 	                    if (del == 0) break ;
