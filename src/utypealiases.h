@@ -142,7 +142,7 @@
 #define	TM		struct tm
 #endif
 
-#ifndef	TMS
+#ifndef	TMS		/* used by |times(2)| (considered obsoleted) */
 #define	TMS		struct tms
 #endif
 
@@ -474,7 +474,7 @@
 #define	CSYSDBSP	const SPWD
 #define	CSYSDBUA	const USERATTR
 #define	CSYSDBGR	const GROUP
-#define	CSYSDBPH	const PROJECT
+#define	CSYSDBPJ	const PROJECT
 #define	CSYSDBPR	const PROTOENT
 #define	CSYSDBNW	const NETENT
 #define	CSYSDBHO	const HOSTENT
