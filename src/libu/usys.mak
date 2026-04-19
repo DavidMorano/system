@@ -69,7 +69,7 @@ OBJE= obj12_usys.o obj13_usys.o
 OBJ_USYS= obja.o objb.o objc.o objd.o obje.o
 
 
-INCDIRS=
+INCDIRS= -I inc -I /usr/local/include
 
 LIBDIRS= -L$(LIBDIR)
 
