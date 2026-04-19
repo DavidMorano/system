@@ -35,7 +35,20 @@ DEFS +=
 
 INCS +=
 
+MODS +=
+
 LIBS +=
+
+
+OBJ0_SRC= libu.o libuc.o
+OBJ1_SRC= libdam.o libpcs.o
+OBJ2_SRC= libmailmsg.o
+OBJ3_SRC= libpr.o
+
+OBJA_SRC= obj0_src.o obj1_src.o
+OBJB_SRC= obj2_src.o obj3_src.o
+
+OBJ_SRC= $(OBJA_SRC) $(OBJB_SRC)
 
 
 INCDIRS=
@@ -52,17 +65,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ0_SRC= libu.o libuc.o
-OBJ1_SRC= libdam.o libpcs.o
-OBJ2_SRC= libmailmsg.o
-OBJ3_SRC= libpr.o
-
-OBJA_SRC= obj0_src.o obj1_src.o
-OBJB_SRC= obj2_src.o obj3_src.o
-
-OBJ_SRC= $(OBJA_SRC) $(OBJB_SRC)
 
 
 .SUFFIXES:		.hh .ii .iim .ccm
@@ -120,16 +122,16 @@ control:
 
 
 obj0_src.o:		$(OBJ0_SRC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SRC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1_src.o:		$(OBJ1_SRC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SRC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2_src.o:		$(OBJ2_SRC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SRC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3_src.o:		$(OBJ3_SRC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SRC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 # LIBU
