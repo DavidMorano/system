@@ -1,10 +1,11 @@
-/* pingstatmsg */
+/* pingstatmsg SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* create and parse the internal messages */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,24 +18,24 @@
 
 /******************************************************************************
 
-        This module contains the subroutines to make and parse the PINGSTAT
-        family of messages.
+  	Name:
+	pingstatmsg
 
+	Description:
+	This module contains the subroutines to make and parse the
+	PINGSTAT family of messages.
 
 ******************************************************************************/
 
-
-#define	PINGSTATMSG_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<serialbuf.h>
 #include	<stdorder.h>
 #include	<localmisc.h>
