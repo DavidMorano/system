@@ -8,8 +8,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	KEYS_INCLUDE
-#define	KEYS_INCLUDE
+#ifndef	PIKEYS_INCLUDE
+#define	PIKEYS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -32,6 +32,6 @@ extern int keys_end(proginfo *,hdb *,bfile *,ptm *,cchar *,off_t,int) noex ;
 EXTERNC_end
 
 
-#endif /* KEYS_INCLUDE */
+#endif /* PIKEYS_INCLUDE */
 
 
