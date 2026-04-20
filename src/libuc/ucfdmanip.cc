@@ -97,9 +97,12 @@
 #include	<unistd.h>		/* <- for |getdtablesize(3c)| */
 #include	<fcntl.h>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"ucfdmanip.h"
@@ -115,6 +118,10 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_close(int) noex ;
+}
 
 
 /* external variables */
@@ -139,7 +146,9 @@ int uc_duper(int fd,int min) noex {
 	        if (ufd < min) {
 	            rs = uc_moveup(ufd,min) ;
 	            ufd = rs ;
-	            if (rs < 0) uc_close(ufd) ;
+	            if (rs < 0) {
+			uc_close(ufd) ;
+		    }
 	        } /* end if (move needed) */
 	    } /* end if (dup) */
 	} /* end if (non-null) */
