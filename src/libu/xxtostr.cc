@@ -189,7 +189,7 @@ constexpr int sxxtostr(char *endp,int b,ST v) noex {
     UT              uv = (UT) v ;
     int             rs = SR_FAULT ;
     char            *rp = nullptr ;
-    if (v < 0) uv = (- uv) ;
+    if (v < 0) uv = (neg uv) ;
     if (endp) {
         if ((rs = uxxtostr(endp,b,uv)) >= 0) {
             rp = (endp - rs) ;
@@ -249,7 +249,7 @@ constexpr int sxxtostr10(char *endp,ST v) noex {
     UT              uv = (UT) v ;
     int             rs = SR_FAULT ;
     char            *rp = nullptr ;
-    if (v < 0) uv = (- uv) ;
+    if (v < 0) uv = (neg uv) ;
     if (endp) {
         if ((rs = uxxtostr10(endp,uv)) >= 0) {
             rp = (endp - rs) ;
@@ -296,7 +296,7 @@ constexpr char *utostr(UT uv,char *endp,int b) noex {
     if ((rs = uxx(uv)) >= 0) {
         rp = (endp - rs) ;
     } else {
-        errno = (- rs) ;
+        errno = (neg rs) ;
     }
     return (rs >= 0) ? rp : nullptr ;
 } /* end subroutine (utostr) */
