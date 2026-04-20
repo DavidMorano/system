@@ -59,10 +59,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<sfx.h>			/* |sfnext(3uc)| */
 #include	<toxc.h>		/* |chtouc(3uc)| */
 #include	<localmisc.h>
