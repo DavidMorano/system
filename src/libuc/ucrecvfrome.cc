@@ -1,4 +1,4 @@
-/* uc_recvfrome SUPPORT */
+/* ucrecvfrome SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -23,15 +23,9 @@
 	abort if it times out.
 
 	Synopsis:
-	int uc_recvfrome(fd,rbuf,rlen,flags,fromp,fromlenp,timeout,opts)
-	int		fd ;
-	void		*rbuf ;
-	int		rlen ;
-	int		flags ;
-	struct sockaddr	*fromp ;
-	int		*fromlenp ;
-	int		timeout ;
-	int		opts ;
+	int uc_recvfrome(int fd,void *rbuf,int rlen,int flags,
+		SICKADDR *fromp,int *fromlenp,
+		timeout,opts) noex
 
 	Arguments:
 	fd		file descriptor
@@ -56,10 +50,13 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<poll.h>
-#include	<climits>
 #include	<ctime>
-#include	<cstring>
-#include	<usystem.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bufprintf.h>
 #include	<localmisc.h>
 
@@ -88,32 +85,24 @@ static char	*d_reventstr() ;
 
 /* exported subroutines */
 
-int uc_recvfrome(fd,rbuf,rlen,flags,fromvp,fromlenp,timeout,opts)
-int		fd ;
-void		*rbuf ;
-int		rlen ;
-void		*fromvp ;
-int		*fromlenp ;
-int		timeout ;
-int		opts ;
-{
-	struct pollfd	fds[2] ;
+int uc_recvfrome(int fd,void *rbuf,int rlen,int flags,
+		void *fromvp,int *fromlenp,int timeout,int opts) noex {
+	POLLFD		fds[2] = {} ;
 
-	struct sockaddr	*fromp = (struct sockaddr *) fromvp ;
+	SOCKADDR	*fromp = (SOCKADDR *) fromvp ;
 
-	time_t	previous = time(NULL) ;
+	time_t	previous = time(nullptr) ;
 	time_t	current ;
 
 	int	rs = SR_OK ;
-	int	events = POLLEVENTS ;
 	int	pollint ;
 	int	len = 0 ;
 	int	f_first ;
+	short events = POLLEVENTS ;
 
 #if	CF_DEBUGS
 	char	ebuf[EBUFLEN + 1] ;
 #endif
-
 
 #if	CF_DEBUGS
 	    debugprintf("uc_recvfrome: rlen=%d\n",rlen) ;
@@ -121,9 +110,10 @@ int		opts ;
 	    debugprintf("uc_recvfrome: timeout=%d\n",timeout) ;
 #endif
 
+	(void) opts ;
 	if (rlen <= 0) return SR_OK ;
 
-	if (rbuf == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
 
 	if (timeout < 0) timeout = INT_MAX ;
 
@@ -136,15 +126,14 @@ int		opts ;
 	events |= POLLRDBAND ;
 #endif
 
-	memset(fds,0,sizeof(fds)) ;
 	fds[0].fd = fd ;
 	fds[0].events = events ;
 	fds[1].fd = -1 ;
 
-	f_first = TRUE ;
+	f_first = true ;
 	while (f_first || (timeout > 0)) {
 
-	    f_first = FALSE ;
+	    f_first = false ;
 	    rs = u_poll(fds,1,(pollint * POLL_INTMULT)) ;
 	    if (rs < 0) break ;
 
@@ -173,9 +162,9 @@ int		opts ;
 
 	    } else {
 
-	        current = time(NULL) ;
+	        current = time(nullptr) ;
 
-	        timeout -= (current - previous) ;
+	        timeout -= intconv(current - previous) ;
 	        previous = current ;
 	        if (timeout < TI_POLL)
 	            pollint = timeout ;
@@ -200,11 +189,7 @@ int		opts ;
 /* local subroutines */
 
 #if	CF_DEBUGS
-static char *d_reventstr(revents,rbuf,rlen)
-int	revents ;
-char	rbuf[] ;
-int	rlen ;
-{
+static char *d_reventstr(int revents,char *rbuf,int rlen) noex {
 	rbuf[0] = '\0' ;
 	bufprintf(rbuf,rlen,"%s %s %s %s %s %s %s %s %s",
 	    (revents & POLLIN) ? "I " : "  ",
