@@ -1,11 +1,9 @@
-/* uc_linger */
+/* uclinger */
 /* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
 /* set (or unset) a LINGER time-out on a socket */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -17,17 +15,18 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
@@ -40,9 +39,8 @@
 /* exported subroutines */
 
 int uc_linger(int fd,int to) noex {
-	USTAT		sb ;
 	int		rs ;
-	if ((rs = u_fstat(fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	    if (S_ISSOCK(sb.st_mode)) {
 	        LINGER	ls{} ;
 		cint	sol = SOL_SOCKET ;
