@@ -124,10 +124,14 @@ namespace libut {
                         r = to_io(rs) ;
 		        break ;
 		    case SR_INPROGRESS: /* who thought up this? */
-                        r = to_closewait(rs) ;
+                        if (! fl.brkinprogress) {
+			    r = to_closewait(rs) ;
+			}
 		        break ;
                     case SR_INTR:
-			r(false) ;
+			if (! fl.brkintr) {
+			    r(false) ;
+			}
                         break ;
                     } /* end switch */
 		    rs = r ;
