@@ -158,7 +158,7 @@ local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ; /* return-value */
-	if (v < 0) uv = (- uv) ;
+	if (v < 0) uv = (neg uv) ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;
 	    rs = SR_NOTSUP ;
