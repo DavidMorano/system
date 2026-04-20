@@ -1,12 +1,11 @@
-/* uc_setpriority */
+/* ucsetpriority */
 /* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
 /* set a process priority (old style) */
 
-
 #define	CF_DEBUGS	0
-
 
 /* revision history:
 
@@ -19,50 +18,40 @@
 
 /*******************************************************************************
 
-        This subroutine sets a process priority (the old style priority from the
-        beginning days).
-
+	This subroutine sets a process priority (the old style
+	priority from the beginning days).
 
 *******************************************************************************/
 
-
-#define	LIBUC_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/resource.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cerrno>
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_setpriority(which,who,prio)
-int	which ;
-id_t	who ;
-int	prio ;
-{
+int uc_setpriority(int which,id_t who,int prio) noex {
 	int	rs = SR_OK ;
-
-
-again:
 	errno = 0 ;
-	rs = setpriority(which,who,prio) ;
-
-	if ((rs == -1) && (errno != 0))
-	    rs = (- errno) ;
-
+	if ((rs = setpriority(which,who,prio)) < 0) {
+	    if (errno != 0) rs = (- errno) ;
+	}
 	return rs ;
 }
 /* end subroutine (uc_setpriority) */
