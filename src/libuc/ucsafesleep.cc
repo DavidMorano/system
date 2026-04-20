@@ -48,7 +48,9 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<mtime.h>
 #include	<localmisc.h>
 
@@ -81,7 +83,7 @@
 /* exported subroutines */
 
 int uc_safesleep(int n) noex {
-	mtime_t		dt = mtime ;
+	mtime_t		dt = getusmtime ;
 	int		rs = SR_OK ;
 	if (n > 0) {
 	    POLLFD	fds[1] = {} ;
@@ -93,7 +95,7 @@ int uc_safesleep(int n) noex {
 	    while ((rs >= 0) && ((dt - st) < mn)) {
 	        cint	intpoll = int(mn - (dt - st)) ;
 	        rs = u_poll(fds,0,intpoll) ;
-	        dt = mtime ;
+	        dt = getusmtime ;
 		if (rs == SR_INTR) rs = SR_OK ;
 	    } /* end while */
 	} /* end if (positive) */
