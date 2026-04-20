@@ -58,13 +58,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<ucodenames.h>
+#include	<snwcpy.h>
 #include	<sncpyx.h>
 #include	<ctdec.h>
-#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"snabbr.h"
@@ -79,7 +77,7 @@
 /* local typedefs */
 
 extern "C" {
-    typedef cchar *(*strabbr_f)(int) noex ;
+    typedef int (*ucode_f)(int,ccharpp) noex ;
 }
 
 
@@ -94,11 +92,11 @@ extern "C" {
 
 /* forward references */
 
-local int snabbrx(strabbr_f abbr,char *dbuf,int dlen,int n) noex {
+local int snabbrx(ucode_f get,char *dbuf,int dlen,int n) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) ylikely {
-	    if (cchar *s ; (s = abbr(n)) != nullptr) {
-	        rs = sncpy(dbuf,dlen,s) ;
+	    if (cchar *rp ; (rs = get(n,&rp)) >= 0) {
+	        rs = snwcpy(dbuf,dlen,rp,rs) ;
 	    } else {
 	        rs = ctdec(dbuf,dlen,n) ;
 	    }
@@ -116,12 +114,12 @@ local int snabbrx(strabbr_f abbr,char *dbuf,int dlen,int n) noex {
 /* exported subroutines */
 
 int snabbrerr(char *dbuf,int dlen,int n) noex {
-    	return snabbrx(strabbrerr,dbuf,dlen,n) ;
+    	return snabbrx(ucodename_sr,dbuf,dlen,n) ;
 }
 /* end subroutine (snabbrerr) */
 
 int snabbrsig(char *dbuf,int dlen,int n) noex {
-    	return snabbrx(strabbrsig,dbuf,dlen,n) ;
+    	return snabbrx(ucodename_sig,dbuf,dlen,n) ;
 }
 /* end subroutine (snabbrsig) */
 
