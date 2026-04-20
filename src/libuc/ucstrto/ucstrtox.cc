@@ -28,9 +28,9 @@
 	module (3 types X 2 signs).
 
 	Notes:
-	I had to do some cleanup work on the case of concerting to
-	a reular integer (which is 32-bits on most platforms
-	now-a-days) so that its overflow and underflow return statis
+	I had to do some cleanup work on the case of converting to
+	a regular integer (which is 32-bits on most platforms
+	now-a-days) so that its overflow and underflow return status
 	is correct.
 
 *******************************************************************************/
