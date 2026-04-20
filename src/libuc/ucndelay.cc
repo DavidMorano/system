@@ -1,4 +1,4 @@
-/* uc_ndelay SUPPORT */
+/* ucndelay SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -21,7 +21,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
