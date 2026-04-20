@@ -34,6 +34,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 
+#include	<snxti.h>
 
 EXTERNC_begin
 
