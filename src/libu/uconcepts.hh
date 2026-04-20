@@ -36,7 +36,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 
-#include	<conccharp.hh>
+#include	<concharp.hh>
 #include	<conintx.hh>
 
 
