@@ -40,18 +40,18 @@ MODS +=
 LIBS +=
 
 
-OBJ0= 
-OBJ1= 
+OBJ0= snxtierr.o
+OBJ1= snxtilook.o
 OBJ2= 
 OBJ3= 
 
-OBJA= obj0.o 
+OBJA= obj0.o obj1.o
 OBJB=
 
 OBJ= $(OBJA)
 
 
-INCDIRS +=
+INCDIRS += -I inc -I /usr/local/include
 LIBDIRS += -L$(LIBDIR)
 
 RUNINFO= -rpath $(RUNDIR)
@@ -143,5 +143,9 @@ obja.o:			$(OBJA)
 
 objb.o:			$(OBJB)
 	$(CXX) -r -o $@ $(LDFLAGS) $^
+
+
+snxtierr.o:		snxtierr.cc	snxti.h			$(INCS)
+snxtilook.o:		snxtilook.cc	snxti.h			$(INCS)
 
 
