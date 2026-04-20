@@ -63,10 +63,7 @@
 #include	<cstdio>
 #include	<algorithm>		/* |min(3c++)| + |mac(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"snwx.h"
