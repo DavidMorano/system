@@ -1,4 +1,4 @@
-/* uc_nonblock SUPPORT */
+/* ucnonblock SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -17,11 +17,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<poll.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
@@ -47,20 +49,20 @@
 
 int uc_nonblock(int fd,int f) noex {
 	int		rs ;
-	int		f_previous = false ;
+	int		fprev = false ;
 	if ((rs = u_fcntl(fd,F_GETFL,0)) >= 0) {
-	    int		flflags = rs ;
-	    f_previous = (flflags & O_NONBLOCK) ? 1 : 0 ;
-	    if (! LEQUIV(f_previous,f)) {
+	    int		fl = rs ;
+	    fprev = (fl & O_NONBLOCK) ? 1 : 0 ;
+	    if (! LEQUIV(fprev,f)) {
 	        if (f) {
-	            flflags |= O_NONBLOCK ;
+	            fl |= O_NONBLOCK ;
 	        } else {
-	            flflags &= (~ O_NONBLOCK) ;
+	            fl &= (~ O_NONBLOCK) ;
 		}
-	        rs = u_fcntl(fd,F_SETFL,flflags) ;
+	        rs = u_fcntl(fd,F_SETFL,fl) ;
 	    } /* end if (needed a change) */
 	} /* end if (u_fcntl) */
-	return (rs >= 0) ? f_previous : rs ;
+	return (rs >= 0) ? fprev : rs ;
 }
 /* end subroutine (uc_nonblock) */
 
