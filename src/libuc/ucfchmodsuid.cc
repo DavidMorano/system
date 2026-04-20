@@ -1,4 +1,4 @@
-/* uc_fchmodsuid SUPPORT */
+/* ucfchmodsuid SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -23,7 +23,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
@@ -40,23 +44,21 @@
 /* exported subroutines */
 
 int uc_fchmodsuid(int fd,int f) noex {
-	USTAT		sb ;
 	int		rs ;
-	int		fperm ;
-	int		f_previous = false ;
-	if ((rs = u_fstat(fd,&sb)) >= 0) {
-	    fperm = sb.st_mode ;
-	    f_previous = ((fperm & S_IXSUID) == S_IXSUID) ? 1 : 0 ;
-	    if (! LEQUIV(f_previous,f)) {
+	int		fprev = false ;
+	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	    mode_t fmod = sb.st_mode ;
+	    fprev = ((fmod & S_IXSUID) == S_IXSUID) ;
+	    if (! LEQUIV(fprev,f)) {
 	        if (f) {
-	            fperm |= S_IXSUID ;
+	            fmod |= S_IXSUID ;
 	        } else {
-	            fperm &= (~ S_ISUID) ;
+	            fmod &= (~ S_ISUID) ;
 		}
-	        rs = u_fchmod(fd,fperm) ;
+	        rs = u_fchmod(fd,fmod) ;
 	    } /* end if (needed a change) */
 	} /* end if (stat) */
-	return (rs >= 0) ? f_previous : rs ;
+	return (rs >= 0) ? fprev : rs ;
 }
 /* end subroutine (uc_fchmodsuid) */
 
