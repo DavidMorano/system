@@ -66,12 +66,11 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine */
 using std::sort ;			/* subroutine */
-using std::ranges::partition_point ;	/* subroutine */
+using std::partition_point ;	/* subroutine */
 
 
 /* local typedefs */
 
-local cauto  	partfind = std::ranges::partition_point ;
 
 
 /* external subroutines */
@@ -106,9 +105,8 @@ namespace {
 		} ; /* end lambda (predf) */
 		con uchar *itf = tab ;
 		con uchar *itl = (tab + ne) ;
-		if (cauto it = partfind(itf,itl,predf) ; it != itl) {
-	    	    cint ii = *it ;
-	    	    if (ns[ii].n == n) {
+		if (cauto it = partition_point(itf,itl,predf) ; it != itl) {
+	    	    if (cint ii = *it ; ns[ii].n == n) {
 			rs = SR_OK ;
 	        	if (rpp) *rpp = ns[ii].s ;
 	        	rl = lenstr(ns[ii].s) ;
