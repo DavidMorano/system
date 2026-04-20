@@ -60,10 +60,7 @@
 #include	<cstdlib>
 #include	<cstdint>		/* |uint64_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<sbuf.h>
 #include	<mkuuid.h>		/* |uuid_dat| below */
 #include	<localmisc.h>		/* |DIGBUFLEN| */
