@@ -1,4 +1,4 @@
-/* uc_forkdetached SUPPORT */
+/* ucforkdetached SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -38,14 +38,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<storebuf.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucsig.h>
+#include	<ucfork.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -66,24 +67,24 @@
 /* exported subroutines */
 
 int uc_forkdetached() noex {
-	SIGACTION	osh ;
-	SIGACTION	nsh{} ;
-	sigset_t	sm ;
 	int		rs ;
 	int		rs1 ;
 	int		pid = 0 ;
-	uc_sigemptyset(&sm) ;
-	nsh.sa_handler = SIG_IGN ;
-	nsh.sa_mask = sm ;
-	nsh.sa_flags = (SA_NOCLDWAIT | SA_NOCLDSTOP) ;
-	if ((rs = u_sigaction(SIGCLD,&nsh,&osh)) >= 0) {
-	    {
-	        rs = uc_fork() ;
-	        pid = rs ;
-	    }
-	    rs1 = u_sigaction(SIGCLD,&osh,nullptr) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (sigaction) */
+	if (sigset_t sm ; (rs = uc_sigsetempty(&sm)) >= 0) {
+	    SIGACTION	osh ;
+	    SIGACTION	nsh{} ;
+	    nsh.sa_handler = SIG_IGN ;
+	    nsh.sa_mask = sm ;
+	    nsh.sa_flags = (SA_NOCLDWAIT | SA_NOCLDSTOP) ;
+	    if ((rs = u_sigaction(SIGCLD,&nsh,&osh)) >= 0) {
+	        {
+	            rs = uc_fork() ;
+	            pid = rs ;
+	        }
+	        rs1 = u_sigaction(SIGCLD,&osh,nullptr) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sigaction) */
+	} /* end if (uc_sigsetempty) */
 	return (rs >= 0) ? pid : rs ;
 }
 /* end subroutine (uc_forkdetached) */
