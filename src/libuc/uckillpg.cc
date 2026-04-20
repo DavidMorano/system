@@ -1,12 +1,11 @@
-/* uc_killpg */
+/* uckillpg */
 /* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
 /* send a kill-signal to a process group */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -23,9 +22,7 @@
 	Send a signal to a process group.
 
 	Synopsis:
-	int uc_killpg(pgrp,signo)
-	pid_t		pgrp ;
-	int		signo ;
+	int uc_killpg(pid_t pgrp,int signo) noex
 
 	Arguments:
 	pgrp		program group ID
@@ -41,7 +38,11 @@
 #include	<sys/types.h>
 #include	<csignal>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 
@@ -60,17 +61,16 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_killpg(pid_t pgrp,int signo)
-{
-	int	rs ;
-
+int uc_killpg(pid_t pgrp,int signo) noex {
+	int		rs ;
 	repeat {
 	    if ((rs = killpg(pgrp,signo)) < 0) rs = (- errno) ;
 	} until (rs != SR_INTR) ;
-
 	return rs ;
 }
 /* end subroutine (uc_killpg) */
