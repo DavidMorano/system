@@ -1,4 +1,4 @@
-/* l_main SUPPORT (liblkcmd) */
+/* liblkcmd_main SUPPORT (liblkcmd) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -41,10 +41,12 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<intceil.h>
 #include	<sighand.h>
 #include	<mapex.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -67,29 +69,11 @@
 
 /* imported namespaces */
 
-using std:nullptr_t ;			/* type */
-using std:nothrow ;			/* constant */
-
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy2w(char *,int,cchar *,cchar *,int) ;
-extern int	sncpylc(char *,int,cchar *) ;
-extern int	sncpyuc(char *,int,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	ucontext_rtn(ucontext_t *,long *) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	msleep(int) ;
-extern int	haslc(cchar *,int) ;
-extern int	hasuc(cchar *,int) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-extern cchar	*strsigabbr(int) ;
 
 
 /* external variables */
@@ -105,10 +89,10 @@ struct sigcode {
 
 /* forward references */
 
-static void	main_sighand(int,siginfo_t *,void *) ;
-static int	main_sigdump(siginfo_t *) ;
+local void	main_sighand(int,siginfo_t *,void *) noex ;
+local int	main_sigdump(siginfo_t *) noex ;
 
-static cchar	*strsigcode(const SIGCODE *,int) ;
+local cchar	*strsigcode(const SIGCODE *,int) noex ;
 
 
 /* local variables */
@@ -215,11 +199,10 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* local subroutines */
 
-/* ARGSUSED */
-static void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
+local void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	if (vcp != nullptr) {
 	    Dl_info	dl ;
-	    long	ra ;
+	    long	ra{} ;
 	    ucontext_t	*ucp = (ucontext_t *) vcp ;
 	    void	*rtn ;
 	    cint	wlen = LINEBUFLEN ;
@@ -235,7 +218,6 @@ static void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	        write(2,wbuf,wl) ;
 	    }
 	}
-
 	if (sip != nullptr) {
 	    main_sigdump(sip) ;
 	}
@@ -243,29 +225,30 @@ static void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 }
 /* end subroutine (main_sighand) */
 
-static int main_sigdump(siginfo_t *sip) noex {
+local int main_sigdump(siginfo_t *sip) noex {
 	cint	wlen = LINEBUFLEN ;
 	cint	si_signo = sip->si_signo ;
 	cint	si_code = sip->si_code ;
+	cint		alen = 16 ;
 	int		wl ;
-	cchar	*sn = strsigabbr(sip->si_signo) ;
+	cchar	*sn = strabbrsig(sip->si_signo) ;
 	cchar	*as = "*na*" ;
 	cchar	*scs = nullptr ;
 	cchar	*fmt ;
 	char		wbuf[LINEBUFLEN+1] ;
-	char		abuf[16+1] ;
+	char		abuf[alen +1] ;
 	switch (si_signo) {
 	case SIGILL:
 	    scs = strsigcode(sigcode_ill,si_code) ;
 	    break ;
 	case SIGSEGV:
 	    scs = strsigcode(sigcode_segv,si_code) ;
-	    bufprintf(abuf,16,"%p",sip->si_addr) ;
+	    bufprintf(abuf,alen,"%p",sip->si_addr) ;
 	    as = abuf ;
 	    break ;
 	case SIGBUS:
 	    scs = strsigcode(sigcode_bus,si_code) ;
-	    bufprintf(abuf,16,"%p",sip->si_addr) ;
+	    bufprintf(abuf,alen,"%p",sip->si_addr) ;
 	    as = abuf ;
 	    break ;
 	case SIGQUIT:
@@ -282,8 +265,8 @@ static int main_sigdump(siginfo_t *sip) noex {
 }
 /* end subroutine (main_sigdump) */
 
-static cchar *strsigcode(const SIGCODE *scp,int code) noex {
-	int		i ;
+local cchar *strsigcode(const SIGCODE *scp,int code) noex {
+	int		i ; /* used-afterwards */
 	bool		f = false ;
 	cchar		*sn = "UNKNOWN" ;
 	for (i = 0 ; scp[i].code != 0 ; i += 1) {
