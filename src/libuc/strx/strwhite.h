@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* c-string comparisons */
+/* find the first white-space character in a c-string */
 /* version %I% last-modified %G% */
 
 
@@ -14,6 +14,15 @@
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Notes:
+	1. The existence of this subroutine (oringally |strwhite(3uc)|
+	is historical.  Although it is not deprecated, it is rarely
+	used and other alternatives exist.
+
+*******************************************************************************/
 
 #ifndef	STRWHITE_INCLUDE
 #define	STRWHITE_INCLUDE
@@ -27,16 +36,19 @@
 
 
 EXTERNC_begin
-extern char	*strwhite(cchar *) noex ; /* <- historical */
+extern char *strwht(cchar *,int) noex ;
+local inline char *strwhite(cchar *sp) noex {
+    	return strwht(sp,-1) ;
+}
 EXTERNC_end
 
 #if	__cpluspls
 
-inline char *strwhite(cchar *sp) noex {
-    	return strwhite(sp,-1) ;
+inline char *strwhite(cchar *sp,int sl) noex {
+    	return strwht(sp,sl) ;
 }
-inline char *strwht(cchar *sp,int sl) noex {
-    	return strwhite(sp,sl) ;
+inline char *strwit(cchar *sp) noex {
+    	return strwht(sp,sl) ;
 }
 
 #endif /* __cpluspls */
