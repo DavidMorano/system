@@ -62,7 +62,7 @@ OBJ11= ustr.o uobjlock.o ureserve.o
 
 OBJ12= usysflag.o usysdata.o usysauxinfo.o 
 OBJ13= ufileop.o ufiledesc.o 
-OBJ14= um.o uprocess.o
+OBJ14= um.o uprocess.o ucodenames.o
 OBJ15= usysop.o vecbool.o uchartype.o
 
 OBJ16= syswords.o varnames.o
@@ -482,6 +482,7 @@ ustream.dir:
 	makesubdir $@
 
 usigblock.o:		usigblock.ccm			$(INCS)
+ucodenames.o:		ucodenames.cc	ucodenames.h	$(INCS)
 
 # POSIX® synchronization mechanisms
 ptx.o:			ptx.dir
