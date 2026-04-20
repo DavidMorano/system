@@ -166,7 +166,7 @@ local int ctdecsx(char *dp,int dl,const ST &v) noex {
 	cint		n = szof(ST) ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (v < 0) uv = (- uv) ;
+	if (v < 0) uv = (neg uv) ;
 	if (dp) {
 	    cint	t = ffbsi(n) ;
 	    {
