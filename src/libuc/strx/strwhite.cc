@@ -2,10 +2,10 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* find the next white space character in a string */
+/* find the first white-space character in a c-string */
 /* version %I% last-modified %G% */
 
-#define	CF_STRBRK	0		/* use |strbrk(3c)| */
+#define	CF_STRBRK	1		/* use |strbrk(3c)| */
 
 /* revision history:
 
@@ -31,6 +31,8 @@
 	Synopsis:
 	char *strwhite(cchar *sp,int sl) noex
 	char *strwhite(cchar *sp) noex
+	char *strwht(cchar *sp,int sl) noex
+	char *strwht(cchar *sp) noex
 
 	Arguments:
 	sp		search-string pointer
@@ -40,11 +42,17 @@
 	NULL		if no white space was found
 	!= NULL		the pointer to the first white space character
 
+	Notes:
+	1. The existence of this subroutine (oringally |strwhite(3uc)|
+	is historical.  Although it is not deprecated, it is rarely
+	used and other alternatives exist.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |strbrk(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -81,6 +89,8 @@
 
 /* local variables */
 
+constexpr char	whites[] = " \t\v\f\r\n" ;
+
 cbool		f_strbrk = CF_STRBRK ;
 
 
@@ -89,11 +99,15 @@ cbool		f_strbrk = CF_STRBRK ;
 
 /* exported subroutines */
 
-char *strwhite(cchar *sp,int sl) noex {
+char *strwht(cchar *sp,int sl) noex {
     	char		*rsp = nullptr ;
 	if (sp) {
 	    if_constexpr (f_strbrk) {
-		rsp = strnbrk(sp,sl," \t\v\f\r\n") ;
+		if (sl < 0) {
+		    rsp = strbrk(sp,whites) ;
+		} else {
+		    rsp = strnbrk(sp,sl,whites) ;
+		}
 	    } else {
 	        for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
 		    if (ISW(ch) || (ch == CH_NL)) break ;
@@ -103,6 +117,6 @@ char *strwhite(cchar *sp,int sl) noex {
 	} /* end if (non-null) */
 	return rsp ;
 }
-/* end subroutine (strwhite) */
+/* end subroutine (strwht) */
 
 
