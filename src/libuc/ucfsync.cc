@@ -1,10 +1,9 @@
-/* uc_fsync */
+/* ucfsync */
 /* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* interface component for UNIX® library-3c */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,60 +15,104 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
 #include	<cerrno>
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<usupport.h>
+#include	<utimeout.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#define	TO_NOSPC	10
-
 
 /* external subroutines */
 
-extern int	msleep(int) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int uc_fsync(int fd)
-{
-	int		rs ;
-	int		to_nospc = TO_NOSPC ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if ((rs = fsync(fd)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOSPC:
-	            if (to_nospc-- > 0) {
-	                msleep(1000) ;
-		    } else {
-	                f_exit = TRUE ;
-	            }
-		    break ;
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
+int uc_fsync(int fd) noex {
+	int		rs = SR_BADFD ;
+	if (fd >= 0) {
+	    int		to_again = utimeout[uto_again] ;
+	    int		to_nospc = utimeout[uto_nospc] ;
+	    bool	fexit = false ;
+	    repeat {
+	        if ((rs = fsync(fd)) < 0) {
+		    rs = (- errno) ;
+	            switch (rs) {
+	            case SR_AGAIN:
+	                if (to_again-- > 0) {
+	                    msleep(1000) ;
+		        } else {
+	                    fexit = true ;
+	                }
+		        break ;
+	            case SR_NOSPC:
+	                if (to_nospc-- > 0) {
+	                    msleep(1000) ;
+		        } else {
+	                    fexit = true ;
+	                }
+		        break ;
+	            case SR_INTR:
+	                break ;
+		    default:
+		        fexit = true ;
+		        break ;
+	            } /* end switch */
+	        } /* end if (error) */
+	    } until ((rs >= 0) || fexit) ;
+	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (uc_fsync) */
+
+int uc_fsyncdata(int fd) noex {
+	int		rs = SR_BADFD ;
+	if (fd >= 0) {
+	    int		to_again = utimeout[uto_again] ;
+	    int		to_nospc = utimeout[uto_nospc] ;
+	    bool	fexit = false ;
+	    repeat {
+	        if ((rs = fdatasync(fd)) < 0) {
+		    rs = (- errno) ;
+	            switch (rs) {
+	            case SR_AGAIN:
+	                if (to_again-- > 0) {
+	                    msleep(1000) ;
+		        } else {
+	                    fexit = true ;
+	                }
+		        break ;
+	            case SR_NOSPC:
+	                if (to_nospc-- > 0) {
+	                    msleep(1000) ;
+		        } else {
+	                    fexit = true ;
+	                }
+		        break ;
+	            case SR_INTR:
+	                break ;
+	            default:
+		        fexit = true ;
+	                break ;
+	            } /* end switch */
+	        } /* end if (error) */
+	    } until ((rs >= 0) || fexit) ;
+	} /* end if (valid) */
+	return rs ;
+}
+/* end subroutine (uc_fsyncdata) */
 
 
