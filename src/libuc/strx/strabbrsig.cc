@@ -43,6 +43,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<ucodenames.h>
 #include	<localmisc.h>
 
 #include	"strabbrsig.h"
@@ -143,12 +144,12 @@ const char *strabbrsig(int n) noex {
 	    }
 	} /* end if_constexpr (f_sigrt) */
 	if (s == nullptr) {
-	    for (int i = 0 ; cvts[i].n >= 0 ; i += 1) {
-	        if (cvts[i].n == n) {
-		    s = cvts[i].s ;
-		    break ;
-	        }
-	    } /* end for */
+	    int rs ;
+	    if (cchar *rp ; (rs = ucodename_sig(n,&rp)) >= 0) {
+		s = rp ;
+	    } else {
+	        s = "*UNK*" ;
+	    }
 	} /* end if */
 	return s ;
 }
