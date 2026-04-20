@@ -37,10 +37,8 @@
 
 namespace libut {
     struct utbase_fl {
-	uint		fclose:1 ;
-	uint		fwrite:1 ;
-	uint		fintr:1 ;	/* request interrupts to return */
-	uint		fatcwd:1 ;	/* allow |AT_FDCWD| file-descriptor */
+	uint		brkinprogress:1 ;	/* 'in-progress' returns */
+	uint		brkintr:1 ;		/* interrupts return */
     } ; /* end struct (utbase_fl) */
     struct utbase {
 	UTBIND		*utbindp ;
