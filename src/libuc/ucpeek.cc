@@ -44,9 +44,10 @@
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<libmallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
 #include	"ucpeek.h"
@@ -117,7 +118,7 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *cbuf{} ; (rs = libmalloc_ml(&cbuf)) >= 0) {
+	if (char *cbuf{} ; (rs = lm_ml(&cbuf)) >= 0) {
 	    cint	clen = rs ;
 	    cbuf[0] = '\0' ;
 	    {
