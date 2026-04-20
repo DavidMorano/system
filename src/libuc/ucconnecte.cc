@@ -52,11 +52,13 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
+#include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<ctime>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 
@@ -76,6 +78,10 @@
 #endif
 
 /* external subroutines */
+
+extern "C" {
+    extern int uc_nonblock(int,int) noex ;
+}
 
 
 /* external variables */
