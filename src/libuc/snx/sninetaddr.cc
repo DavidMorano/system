@@ -61,10 +61,7 @@
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)|+ |max(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<uinet.h>		/* |AF_INET4| */
 #include	<inetaddr.h>
 #include	<sncpyx.h>
@@ -178,10 +175,11 @@ static int snunix(char *dbuf,int dlen,cchar *addr) noex {
 /* end subroutine (snunix) */
 
 static int sninet4(char *dbuf,int dlen,cchar *addr) noex {
+    	con inetaddrs	at = inetaddr_str ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (inetaddr ia ; (rs = ia.start(addr)) >= 0) ylikely {
+	if (inetaddr ia ; (rs = ia.start(at,addr)) >= 0) ylikely {
 	    {
 	        rs = ia.getdotaddr(dbuf,dlen) ;
 		len = rs ;
