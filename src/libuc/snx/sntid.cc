@@ -60,10 +60,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdint>		/* |uintptr_t| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<ctdec.h>
 #include	<localmisc.h>
 
