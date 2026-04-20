@@ -1,4 +1,4 @@
-/* uc_recve SUPPORT */
+/* ucrecve SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -23,7 +23,7 @@
 	abort if it times out.
 
 	Synopsis:
-	int uc_recve(fd,rbuf,rlen,mflags,to,opts)
+	int uc_recve(fd,rbuf,rlen,mflags,to,opts) noex
 	int		fd ;
 	char		rbuf[] ;
 	int		rlen ;
@@ -53,10 +53,14 @@
 #include	<sys/uio.h>
 #include	<unistd.h>
 #include	<poll.h>
-#include	<climits>
 #include	<ctime>
-#include	<cstring>
-#include	<usystem.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucread.h>
 #include	<bufprintf.h>
 #include	<localmisc.h>
 
@@ -92,12 +96,11 @@ static char	*d_reventstr() ;
 /* exported subroutines */
 
 int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
-	POLLFD		fds[2] ;
+	POLLFD		fds[2] = {} ;
 	time_t		previous = time(NULL) ;
 	time_t		current ;
 	int		rs = SR_OK ;
 	int		events = POLLEVENTS ;
-	int		to ;
 	int		pollint ;
 	int		tlen = 0 ;
 	int		f_eof = FALSE ;
@@ -125,9 +128,8 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 
 	pollint = MIN(to,POLLTIMEINT) ;
 
-	memset(fds,0,sizeof(fds)) ;
 	fds[0].fd = fd ;
-	fds[0].events = events ;
+	fds[0].events = short(events) ;
 	fds[1].fd = -1 ;
 	fds[1].events = 0 ;
 
@@ -164,7 +166,7 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 
 	            current = time(NULL) ;
 
-	            to -= (current - previous) ;
+	            to -= intconv((current - previous)) ;
 	            previous = current ;
 	            if (to < POLLTIMEINT) {
 	                pollint = to ;
