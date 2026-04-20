@@ -1,4 +1,4 @@
-/* snxtilook SUPPORT */
+/* snxtilook SUPPORT (X/Open Transport Interface) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -47,6 +47,8 @@
 #include	<sncpy.h>
 #include	<localmisc.h>
 
+#include	"snxti.h"
+
 
 /* local defines */
 
@@ -63,27 +65,36 @@ struct val {
 	int		v ;		/* value */
 	cchar		*n ;		/* name */
 	cchar		*msg ;		/* message */
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	findent(int) noex ;
+local int	findent(int) noex ;
 
 
 /* local variables */
 
-static const val	vals[] = {
-	{ T_LISTEN, "LISTEN", "connection indication received" },
-	{ T_CONNECT, "CONNECT", "connect confirmation received" },
-	{ T_DATA, "DATA", "normal data received" },
-	{ T_EXDATA, "EXDATA", "expedited data received" },
-	{ T_DISCONNECT, "DISCONNECT", "disconnect received" },
-	{ T_UDERR, "UDERR", "data gram error indication" },
-	{ T_ORDREL, "ORDREL", "orderly release indication" },
-	{ T_GODATA, "GODATA", "sending normal data is again possible" },
-	{ T_GOEXDATA, "GOEXDATA", "sending expedited data is again possible" },
-	{ -1, NULL }
+constexpr val		vals[] = {
+	{ T_LISTEN,	"LISTEN",
+	    "connection indication received" },
+	{ T_CONNECT,	"CONNECT",
+	    "connect confirmation received" },
+	{ T_DATA,	"DATA",
+	    "normal data received" },
+	{ T_EXDATA,	"EXDATA",
+	    "expedited data received" },
+	{ T_DISCONNECT,	"DISCONNECT",
+	    "disconnect received" },
+	{ T_UDERR,	"UDERR",
+	    "data gram error indication" },
+	{ T_ORDREL,	"ORDREL",
+	    "orderly release indication" },
+	{ T_GODATA,	"GODATA",
+	    "sending normal data is again possible" },
+	{ T_GOEXDATA,	"GOEXDATA",
+	    "sending expedited data is again possible" },
+	{ -1, nullptr, nullptr }
 } ; /* end struct (val) */
 
 
@@ -106,7 +117,7 @@ int snxtilook(char *dbuf,int dlen,int v) noex {
 
 /* local subroutines */
 
-static int findent(int v) noex {
+local int findent(int v) noex {
 	int		i ; /* used-afterwards */
 	bool		f = false ;
 	for (i = 0 ; vals[i].v >= 0 ; i += 1) {
@@ -114,7 +125,6 @@ static int findent(int v) noex {
 	    if (f) break ;
 	} /* end for */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (findent) */
+} /* end subroutine (findent) */
 
 
