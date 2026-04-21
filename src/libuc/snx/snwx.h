@@ -27,8 +27,8 @@
 
 EXTERNC_begin
 
-extern int snwvprintf(char *,int,cchar *,va_list) noex ;
-extern int snwprintf(char *,int,cchar *,...) noex ;
+extern int snwvprintf	(char *,int,cchar *,va_list) noex ;
+extern int snwprintf	(char *,int,cchar *,...) noex ;
 
 EXTERNC_end
 
