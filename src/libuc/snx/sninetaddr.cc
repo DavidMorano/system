@@ -41,12 +41,12 @@
 	See-also:
 	snxtilook(3uc)
 	sninetaddr(3uc)
+	snabbrname(3uc)
+	snabbrerr(3uc)
 	snsigabbr(3uc)
-	snabbr(3uc)
 	snshellunder(3uc)
 	snfilemode(3uc)
 	sntid(3uc)
-	snerrabbr(3uc)
 	snrealname(3uc)
 	snloadavg(3uc)
 	snkeyval(3uc)
@@ -121,9 +121,9 @@
 
 /* forward references */
 
-static int snunix(char *,int,cchar *) noex ;
-static int sninet4(char *,int,cchar *) noex ;
-static int sninet6(char *,int,cchar *) noex ;
+local int snunix(char *,int,cchar *) noex ;
+local int sninet4(char *,int,cchar *) noex ;
+local int sninet6(char *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -163,7 +163,7 @@ int sninetaddr(char *dbuf,int dlen,int af,cchar *addr) noex {
 
 /* local subroutines */
 
-static int snunix(char *dbuf,int dlen,cchar *addr) noex {
+local int snunix(char *dbuf,int dlen,cchar *addr) noex {
 	int		rs ;
 	if_constexpr (f_cthexuc) {
 	    rs = intconv(strdcpy(dbuf,dlen,addr) - dbuf) ;
@@ -174,7 +174,7 @@ static int snunix(char *dbuf,int dlen,cchar *addr) noex {
 }
 /* end subroutine (snunix) */
 
-static int sninet4(char *dbuf,int dlen,cchar *addr) noex {
+local int sninet4(char *dbuf,int dlen,cchar *addr) noex {
     	con inetaddrs	at = inetaddr_str ;
 	int		rs ;
 	int		rs1 ;
@@ -191,7 +191,7 @@ static int sninet4(char *dbuf,int dlen,cchar *addr) noex {
 }
 /* end subroutine (sninet4) */
 
-static int sninet6(char *dbuf,int dlen,cchar *addr) noex {
+local int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	cint		astrlen = INETX_ADDRSTRLEN ;
 	int		rs = SR_OK ;
 	int		pl = 0 ; /* return-value */
