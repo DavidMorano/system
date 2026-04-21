@@ -34,9 +34,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>
 #include	<cstdlib>
+#include	<type_traits>
+#include	<concepts>
 #include	<clanguage.h>
-#include <concepts>
-#include <type_traits>
 
 
 template <typename T>
