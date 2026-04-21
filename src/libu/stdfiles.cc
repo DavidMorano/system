@@ -24,8 +24,7 @@
 	stdfile
 
 	Description:
-	This module provides that c-strings for the standard file
-	names.
+	This module provides c-strings for the standard file names.
 
 *******************************************************************************/
 
