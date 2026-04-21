@@ -15,10 +15,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/time.h>		/* |TIMEVAL| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	NETTIME		struct nettime_head
