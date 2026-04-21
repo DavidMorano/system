@@ -39,12 +39,11 @@
 
 	See-also:
 	sninetaddr(3uc)
-	snsigabbr(3uc)
-	snabbr(3uc)
+	snabbrname(3uc)
+	snabbrerr(3uc)
 	snshellunder(3uc)
 	snfilemode(3uc)
 	sntid(3uc)
-	snerrabbr(3uc)
 	snrealname(3uc)
 	snloadavg(3uc)
 	snkeyval(3uc)
@@ -97,7 +96,7 @@ local int snabbrx(ucode_f get,char *dbuf,int dlen,int n) noex {
 	if (dbuf) ylikely {
 	    if (cchar *rp ; (rs = get(n,&rp)) >= 0) {
 	        rs = snwcpy(dbuf,dlen,rp,rs) ;
-	    } else {
+	    } else if (rs == SR_NOTFOUND) {
 	        rs = ctdec(dbuf,dlen,n) ;
 	    }
 	} /* end if (non-null) */
