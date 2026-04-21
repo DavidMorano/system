@@ -52,11 +52,11 @@ struct svcentry_arguments {
 	cchar		*jobid ;	/* ID for logging */
 	cchar		*tmpdname ;
 	time_t		daytime ;	/* time of day (UNIX) */
-} ;
+} ; /* end struct */
 
 struct svcentry_flags {
 	uint		srvargs:1 ;	/* initialized? */
-} ;
+} ; /* end struct */
 
 struct svcentry_head {
 	vecstr		*sap ;		/* server program arguments */
@@ -76,7 +76,7 @@ struct svcentry_head {
 	uint		magic ;
 	int		interval ;	/* interval (seconds) */
 	char		jobid[SVCENTRY_IDLEN + 1] ;
-} ;
+} ; /* end struct */
 
 
 typedef SVCENTRY	svcentry ;
