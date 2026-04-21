@@ -49,7 +49,7 @@
 	Description:
 	This subroutine allocates (in regular heap memory) a de-quoted
 	(naively) and compacted c-string.  This has the identical
-	call signature of |uc_mallocstrw(3uc)| but perform the
+	call signature of |uc_mallocstrw(3uc)| but performs the
 	dequoting and compaction in addition.  The "compaction"
 	means no white-space at all, as compared with meaning
 	no-redundant white-space.  This kind of thing is suitable
@@ -73,7 +73,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucmem.h>
 #include	<mallocstuff.h>
 #include	<strn.h>
 #include	<ascii.h>		/* |CH_{xx}| */
@@ -91,6 +93,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* imported namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -147,14 +151,13 @@ local int mallcompactstr_reg(cchar *sp,int sl,char **rpp) noex {
     	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
         bool    	f_quote = false ;
-        if (char *buf ; (rs = uc_malloc(sz,&buf)) >= 0) {
+        if (char *buf ; (rs = mem.mall(sz,&buf)) >= 0) {
             char        *bp = buf ;
             while (sl > 0) {
                 switch (cint ch = mkchar(*sp) ; ch) {
                 case CH_DQUOTE:
                     f_quote = (! f_quote) ;
-                     fallthrough ;
-                    /* FALLTHROUGH */
+                     falldown ;
                 default:
                     if (f_quote || (! CHAR_ISWHITE(ch))) {
                         *bp++ = char(ch) ;
