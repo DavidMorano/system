@@ -33,14 +33,25 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<mkchar.h>
+#include	<localmisc.h>
 
 #include	"fmtutil.h"
 
 module fmtutil ;
 
 
-bool isourbad(int ch) noex {
-    	return (! isprintterm(ch)) ;
+bool hasourbad(cchar *sp,int sl) noex {
+	bool		f = false ;
+	while (sl && *sp) {
+	    cint	ch = mkchar(*sp) ;
+	    f = isourbad(ch) ;
+	    if (f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
 }
+/* end subroutine (hasourbad) */
 
 
