@@ -58,6 +58,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
