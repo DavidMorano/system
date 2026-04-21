@@ -52,6 +52,7 @@
 #include	<localmisc.h>
 
 #include	"pow.h"
+#include	"xpow.h"
 
 
 /* local defines */
@@ -79,6 +80,10 @@ constexpr int	b10tab[] = {
 
 /* forward references */
 
+local inline int ipow10(int n) noex {
+	return b10tab[n] ;
+}
+
 template<typename T> local T xpowraw(T b,int n) noex {
     	T	r = 1 ;
 	if (n == 1) {
@@ -86,7 +91,7 @@ template<typename T> local T xpowraw(T b,int n) noex {
 	} else if (n == 2) { /* common case */
 	    r = b * b ;
 	} else if (n > 2) {
-	    cint t = xpowraw(b,(n / 2)) ;
+	    con T t = xpowraw(b,(n / 2)) ;
 	    if ((n & 1) == 0) {
 		r = (t * t) ;
 	    } else {
@@ -109,10 +114,10 @@ template<typename T> local T xpowten(T b,int n) noex {
 template<typename T> local T xpow(T b,int n) noex {
 	T	r = 1 ;
 	if (b == 10) {
-	    r = ipow10(b,n) ;
+	    r = ipow10(n) ;
 	} else if (b == 2) {
 	    cint nb = (szof(T) * CHAR_BIT) ;
-	    if (b < 32) {
+	    if (n < nb) {
 	        r = (1 << n) ;
 	    } else {
 		r = 0 ;
@@ -132,7 +137,7 @@ template<typename T> local T xpow(T b,int n) noex {
 
 /* exported subroutines */
 
-int		ipow(long b,int n) noex {
+int		ipow(int b,int n) noex {
     	return xpow(b,n) ;
 } /* end subroutine (ipow) */
 
