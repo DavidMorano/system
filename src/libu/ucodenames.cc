@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		length of returned c-string
-	<=		not-found
+	<0		not-found
 
 	Notes:
 	1. Of course, the code below might be more than expected
@@ -66,7 +66,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine */
 using std::sort ;			/* subroutine */
-using std::partition_point ;	/* subroutine */
+using std::partition_point ;		/* subroutine */
 
 
 /* local typedefs */
@@ -91,8 +91,7 @@ namespace {
 	con codepair	*ns ;
 	con uchar	*tab ;
 	int 		ne ;
-	getter(con codepair *ªns,con uchar *ªtab,int n) noex {
-	    ns = ªns ;
+	getter(con codepair *ªns,con uchar *ªtab,int n) noex : ns(ªns) {
 	    tab = ªtab ;
 	    ne = n ;
 	} ; /* end ctor */
@@ -191,6 +190,7 @@ constexpr codepair		names_sr[] = {
 	{ SR_NOPKG,		"NOPKG" },
 	{ SR_REMOTE,		"REMOTE" },
 	{ SR_NOLINK,		"NOLINK" },
+	{ SR_NOATTR,		"NOATTR" },		/* Apple-Darwin */
 	{ SR_ADV,		"ADV" },
 	{ SR_SRMNT,		"SRMNT" },
 	{ SR_COMM,		"COMM" },
@@ -278,6 +278,23 @@ constexpr codepair		names_sr[] = {
 	{ SR_LOOK,		"LOOK" },
 	{ SR_DOWN,		"DOWN" },
 	{ SR_UNAVAIL,		"UNAVAIL" },
+	{ SR_BADRPC,		"BADRPC" },		/* Apple-Darwin */
+	{ SR_RPCMISMATCH,	"RPCMISMATCH" },	/* Apple-Darwin */
+	{ SR_PROGUNAVAIL,	"PROGUNAVAIL" },	/* Apple-Darwin */
+	{ SR_PROGMISMATCH,	"PROGMISMATCH" },	/* Apple-Darwin */
+	{ SR_PROCUNAVAIL,	"PROCUNAVAIL" },	/* Apple-Darwin */
+	{ SR_FTYPE,		"FTYPE" },		/* Apple-Darwin */
+	{ SR_AUTH,		"AUTH" },		/* Apple-Darwin */
+	{ SR_NEEDAUTH,		"NEEDAUTH" },		/* Apple-Darwin */
+	{ SR_PWROFF,		"PWROFF" },		/* Apple-Darwin */
+	{ SR_DEVERR,		"DEVERR" },		/* Apple-Darwin */
+	{ SR_BADEXEC,		"BADEXEC" },		/* Apple-Darwin */
+	{ SR_BADARCH,		"BADARCH" },		/* Apple-Darwin */
+	{ SR_SHLIBVERS,		"SHLIBVERS" },		/* Apple-Darwin */
+	{ SR_BADMACHO,		"BADMACHO" },		/* Apple-Darwin */
+	{ SR_PROCLIM,		"PROCLIM" },		/* Apple-Darwin */
+	{ SR_NOPOLICY,		"NOPOLICY" },		/* Apple-Darwin */
+	{ SR_QFULL,		"QFULL" },		/* Apple-Darwin */
 	{ SR_TIMEOUT,		"TIMEOUT" },
 	{ SR_CREATED,		"CREATED" },
 	{ SR_OK,		"OK" }
@@ -334,12 +351,12 @@ namespace {
     struct codemgr {
 	uchar		tab_sr	[ne_sr] ;
 	uchar		tab_sig	[ne_sig] ;
-	consteval void tabload_x(uchar *tab,int n) noex {
+	consteval void tabload_x(mut uchar *tab,int n) noex {
 	    for (int i = 0 ; i < n ; i += 1) {
 		tab[i] = uchar(i) ;
 	    } ; /* end for */
 	} ; /* end method (tabload_x) */
-	consteval void tabinit(uchar *tab,con codepair *pairs,int ne) noex {
+	consteval void tabinit(mut uchar *tab,con codepair *pairs,int ne) noex {
 	    cauto cmpf = [pairs] (con uchar &ia,con uchar &ib) noex -> bool {
     		return (pairs[ia].n < pairs[ib].n) ;
 	    } ;
