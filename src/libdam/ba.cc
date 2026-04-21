@@ -34,7 +34,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"ba.h"
