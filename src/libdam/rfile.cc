@@ -65,16 +65,22 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memcpy(3c)| */
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<netfile.h>
+#include	<mkfile.h>		/* |mkfilejob(3uc)| */
+#include	<strx.h>		/* |srbasename(3uc)| */
+#include	<bufprintf.h>
 #include	<rex.h>
 #include	<localmisc.h>
 
 #include	"rfile.h"
 #include	"incfile_rfilewrite.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memcopy(3u)| */
 
 /* local defines */
 
@@ -86,11 +92,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	reade() noex ;
-    extern char	*strbasename() noex ;
-}
-
 
 /* external variables */
 
@@ -99,8 +100,6 @@ extern "C" {
 
 
 /* forward subroutines */
-
-static int	hostequiv() noex ;
 
 
 /* local variables */
@@ -115,17 +114,13 @@ int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 	REX_AUTH	aa, *ap ;
 	NETFILE_ENT	*mp ;
 	cnullptr	np{} ;
-	int		i, j ;
 	int		srs, rs, len, l ;
 	int		fd, fd2 ;
 	cchar	*prog_shell = PROG_SHELL ;
 	cchar	*args[4] = {} ;
 
-	char	*cp, *cp1, *cp2 ;
-
 	char	buf[BUFLEN + 1], *bp ;
-	char	hostname[BUFLEN + 1] ;
-	char	jobfname[MAXPATHLEN + 1], *jobid ;
+	char	jobfname[MAXPATHLEN + 1] ;
 
 
 	if ((rhost == nullptr) || (rhost[0] == '\0'))
@@ -137,16 +132,10 @@ int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 
 /* make a job file name */
 
-	if ((rs = mkjobfile("/tmp",0600,jobfname)) < 0)
+	if ((rs = mkfilejob(jobfname,"/tmp",0600)) < 0)
 	    return SR_PROTO ;
 
-	jobid = strbasename(jobfname) ;
-
 /* start by opening a connection to the remote machine */
-
-	f.keepalive = false ;
-	if (flags & O_KEEPALIVE) 
-		f.keepalive = true ;
 
 	bufprintf(buf,BUFLEN,"/bin/cat > %s",jobfname) ;
 
@@ -248,7 +237,7 @@ int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 	    ap = auth ;
 	    if ((ap != nullptr) && (mp != nullptr)) {
 
-	        memcpy(&aa,ap) ;
+	        memcopy(&aa,ap) ;
 
 	        aa.res = "rcmd" ;
 	        if (mp->login != nullptr)
@@ -278,7 +267,7 @@ int rfile(cc *rhost,REX_AUTH *auth,cc *rfilename,int flags,mode_t mode) noex {
 /* check if we have the go ahead signal from the other end */
 
 	    len = 0 ;
-	    while (((l = reade(fd2,buf + len,1,FM_NONE,15)) > 0)
+	    while (((l = uc_reade(fd2,buf + len,1,FM_NONE,15)) > 0)
 	        && (buf[len] != '\n'))
 	        len += l ;
 
