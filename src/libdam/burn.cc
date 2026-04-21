@@ -46,7 +46,11 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
+#include	<ucopen.h>
 #include	<randomvar.h>
 #include	<hash.h>		/* |hash_elf(3dam)| */
 #include	<localmisc.h>
@@ -71,7 +75,11 @@ using std::max ;			/* subroutine-template */
 /* external subroutines */
 
 extern "C" {
+    extern int	uc_fstat(int,ustat *) noex ;
     extern int	uc_seek(int,off_t,int) noex ;
+    extern int	uc_writen(int,cvoid *,int) noex ;
+    extern int	uc_fsyncdata(int) noex ;
+    extern int	uc_close(int) noex ;
 }
 
 
@@ -101,7 +109,7 @@ namespace {
 	int rewind(int,int) noex ;
 	int loadbuf(char *,int) noex ;
     } ; /* end struct (burner) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -159,22 +167,25 @@ int burner::rvend() noex {
 int burner::operator () (cchar *fn) noex {
     	int		rs ;
 	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = ucpagesize) >= 0) {
 	    cint	ps = rs ;
 	    if ((rs = rvbegin(fn)) >= 0) {
 		cint	flen = (NPAGES * ps) ;
-		if (char *fbuf{} ; (rs = uc_valloc(flen,&fbuf)) >= 0) {
+		if (char *fbuf{} ; (rs = lm_vall(flen,&fbuf)) >= 0) {
 	            {
 		        rs = filer(fbuf,flen,fn) ;
+			rv = rs ;
 		    }
-		    rs = rsfree(rs,fbuf) ;
+		    rs1 = lm_free(fbuf) ;
+		    if (rs >= 0) rs = rs1 ;
 		    fbuf = nullptr ;
 	        } /* end if (m-a-f) */
 	        rs1 = rvend() ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (randomvar) */
 	} /* end if (ucpagesize) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end method (burner::operator) */
 
@@ -220,8 +231,9 @@ int burner::writer(int fd,char *fbuf,int flen) noex {
 int burner::rewind(int fd,int idx) noex {
     	int		rs = SR_OK ;
 	if (idx > 1) {
-	    rs = uc_seek(fd,0z,SEEK_SET) ;
-	    uc_fdatasync(fd) ;
+	    if ((rs = uc_seek(fd,0z,SEEK_SET)) >= 0) {
+	        rs = uc_fsyncdata(fd) ;
+	    }
 	}
 	return rs ;
 }
