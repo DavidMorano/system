@@ -61,14 +61,19 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<uclock.h>		/* |uc_lockf(3uc)| */
+#include	<ucprochave.h>		/* |uc_prochave(3uc)| */
 #include	<sigblocker.h>
 #include	<cfdec.h>
 #include	<ids.h>
 #include	<fsdir.h>
 #include	<vecpstr.h>
 #include	<permx.h>
+#include	<removes.h>
 #include	<pathadd.h>
 #include	<mkpathx.h>
 #include	<sfx.h>
@@ -81,7 +86,9 @@
 
 #include	"rmsesfiles.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -90,10 +97,6 @@ import libutil ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	removes(cchar *) noex ;
-}
 
 
 /* external variables */
@@ -136,7 +139,7 @@ constexpr int		rslocked[] = {
 	SR_AGAIN,
 	SR_ACCESS,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -152,12 +155,13 @@ int rmsesfiles(cchar *dname) noex {
 	    rs = SR_INVALID ;
 	    if (dname[0]) {
 	        if (ids id ; (rs = ids_load(&id)) >= 0) {
-		    if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+		    if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
 		        {
 		            rs = rmsesfiler(&id,pbuf,dname) ;
 			    c = rs ;
 		        }
-		        rs = rsfree(rs,pbuf) ;
+		        rs1 = lm_free(pbuf) ;
+			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		    rs1 = ids_release(&id) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -177,14 +181,14 @@ static int rmsesfiler(ids *idp,char *pbuf,cchar *dname) noex {
 	int		c = 0 ;
 	if ((rs = mkpath(pbuf,dname)) >= 0) {
 	    cint	pl = rs ;
-	    if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	    if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
 		cint	nlen = rs ;
 	        if (sigblocker s ; (rs = s.start) >= 0) {
 	            if ((rs = lockbegin(pbuf,pl)) >= 0) {
 	                cint	lfd = rs ;
-	                if (fsdir d ; (rs = fsdir_open(&d,pbuf)) >= 0) {
+	                if (fsdir d ; (rs = d.open(pbuf)) >= 0) {
 	                    fsdir_ent	de ;
-	                    while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
+	                    while ((rs = d.read(&de,nbuf,nlen)) > 0) {
 	                        cchar	*sp = de.name ;
 	                        if (hasNotDots(sp,rs) && (sp[0] == 's')) {
 	                            if ((rs = pathadd(pbuf,pl,sp)) >= 0) {
@@ -194,7 +198,7 @@ static int rmsesfiler(ids *idp,char *pbuf,cchar *dname) noex {
 	                        } /* end (not dots) */
 	                        if (rs < 0) break ;
 	                    } /* end while */
-	                    rs1 = fsdir_close(&d) ;
+	                    rs1 = d.close ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (fsdir) */
 	                pbuf[pl] = '\0' ;
@@ -208,7 +212,8 @@ static int rmsesfiler(ids *idp,char *pbuf,cchar *dname) noex {
 	            rs1 = s.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblocker) */
-		rs = rsfree(rs,nbuf) ;
+		rs1 = lm_free(nbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (mkpath) */
 	return (rs >= 0) ? c : rs ;
@@ -220,8 +225,8 @@ static int lockbegin(char *pbuf,int plen) noex {
 	int		lfd = -1 ;
 	cchar		*lfn = RMSESFILES_LOCKFILE ;
 	if ((rs = pathadd(pbuf,plen,lfn)) >= 0) {
-	    cmode	om = 0666 ;
 	    cint	of = (O_CREAT|O_RDWR|O_TRUNC) ;
+	    cmode	om = 0666 ;
 	    if (openstate ols ; (rs = openstate_open(&ols,pbuf,of,om)) >= 0) {
 	        lfd = rs ;
 	        if (ols.f_created) {
@@ -235,7 +240,7 @@ static int lockbegin(char *pbuf,int plen) noex {
 	                u_unlink(pbuf) ;
 	            }
 	            u_close(lfd) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (open) */
 	    pbuf[plen] = '\0' ; /* <- restore */
 	} /* end if (pathadd) */
@@ -273,7 +278,7 @@ static int rmsesdir(ids *idp,char *pbuf,int plen) noex {
 	        } else if (isNotAccess(rs)) {
 	            rs = SR_OK ;
 	        }
-	    }
+	    } /* end if (is-dir) */
 	} else if (isNotAccess(rs)) {
 	    rs = SR_OK ;
 	} /* end if (stat) */
@@ -315,11 +320,11 @@ static int vecpstr_dirload(vecpstr *flp,char *pbuf,int plen) noex {
 	int		c = 0 ;
 	strnul		dname(pbuf,plen) ;
 	if (cchar *dn = dname ; dn != nullptr) {
-	    if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
+	    if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
 		cint	nlen = rs ;
-	        if (fsdir dir ; (rs = fsdir_open(&dir,dn)) >= 0) {
+	        if (fsdir dir ; (rs = dir.open(dn)) >= 0) {
 	            fsdir_ent	de ;
-	            while ((rs = fsdir_read(&dir,&de,nbuf,nlen)) > 0) {
+	            while ((rs = dir.read(&de,nbuf,nlen)) > 0) {
 	                cint	sl = rs ;
 	                cchar	*sp = de.name ;
 	                if (hasNotDots(sp,sl)) {
@@ -328,10 +333,11 @@ static int vecpstr_dirload(vecpstr *flp,char *pbuf,int plen) noex {
 	                } /* end if (hasNotDots) */
 	                if (rs < 0) break ;
 	            } /* end while */
-	            rs1 = fsdir_close(&dir) ;
+	            rs1 = dir.close ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (fsdir) */
-		rs = rsfree(rs,nbuf) ;
+		rs1 = lm_free(nbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (strnul) */
 	return (rs >= 0) ? c : rs ;
@@ -396,24 +402,26 @@ static bool isLocked(int rs) noex {
 }
 /* end subroutine (isLocked) */
 
-static bool isNotRunning(cchar *sp,int sl) noex {
-	cint		sch = mkchar(sp[0]) ;
-	int		rs = SR_OK ;
+static bool isNotRunning(cchar *sp,int µsl) noex {
+	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (sl < 0) sl = lenstr(sp) ;
-	if ((sl > 1) && ((sch == 'p') || (sch == 's'))) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	    if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
-	        const pid_t	pid = v ;
-	        if ((rs = uc_prochave(pid)) == 0) {
+	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
+	    cint	sch = mkchar(sp[0]) ;
+	    rs = SR_OK ;
+	    if ((sl > 1) && ((sch == 'p') || (sch == 's'))) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	        if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
+	            const pid_t	pid = v ;
+	            if ((rs = uc_prochave(pid)) == 0) {
+	                f = true ;
+	            }
+	        } else if (isNotValid(rs)) {
 	            f = true ;
+	            rs = SR_OK ;
 	        }
-	    } else if (isNotValid(rs)) {
-	        f = true ;
-	        rs = SR_OK ;
-	    }
-	}
+	    } /* end if */
+	} /* end if (getlenstr) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (isNotRunning) */
