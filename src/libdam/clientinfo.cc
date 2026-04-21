@@ -45,13 +45,15 @@
 
 #include	"clientinfo.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -228,7 +230,7 @@ static int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
 	                if ((rs1 >= 0) && (rs1 < INT_MAX)) {
 		            c += 1 ;
 		        }
-	            }
+	            } /* end if */
 	            rs1 = connection_finish(&conn) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (connection_start) */
