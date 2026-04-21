@@ -25,7 +25,7 @@
 
 EXTERNC_begin
 
-extern int rfile(cc *,rex_au *,cc *,int,mode_t) noex ;
+extern int	rfile(cc *,rex_au *,cc *,int,mode_t) noex ;
 
 EXTERNC_end
 
