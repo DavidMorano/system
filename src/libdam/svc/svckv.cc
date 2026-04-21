@@ -1,4 +1,5 @@
 /* svckv SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* key-value type functions */
@@ -17,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	svckv
+
+	Descriptin:
 	We perform some light key-value type management.
 
 *******************************************************************************/
@@ -25,7 +30,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<estrings.h>
 #include	<nleadstr.h>
 #include	<matstr.h>
@@ -33,7 +41,9 @@
 
 #include	"svckv.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -64,17 +74,17 @@ constexpr cpcchar	isexecs[] = {
 	"program",
 	"args",
 	nullptr
-} ;
+} ; /* end array */
 
 enum svcopts {
 	svcopt_termout,
 	svcopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	svcopts[] = {
 	"termout",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
