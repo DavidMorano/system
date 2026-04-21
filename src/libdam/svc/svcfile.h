@@ -43,7 +43,7 @@
 struct svcfile_cursor {
 	hdb_cur		*ecp ;		/* memory-allocated */
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct svcfile_head {
 	vecobj		*flp ;		/* file-list-pointer */
@@ -52,7 +52,7 @@ struct svcfile_head {
 	time_t		checktime ;
 	uint		magic ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 struct svcfile_entry {
 	cchar		*(*keyvals)[2] ;
@@ -60,7 +60,7 @@ struct svcfile_entry {
 	int		nkeys ;
 	int		sz ;
 	int		fi ;		/* file index */
-} ;
+} ; /* end struct */
 
 typedef SVCFILE		svcfile ;
 typedef SVCFILE_CUR	svcfile_cur ;
