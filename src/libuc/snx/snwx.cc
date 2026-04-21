@@ -25,8 +25,8 @@
 	Create a c-string according to some formatting rules.
 
 	Synopsis:
-	int snwprintf(char *rbuf,int rlen,cchar *fmt,...) noex
-	int snwvprintf(char *rbuf,int rlen,cchar *fmt,va_list *ap) noex
+	int snwprintf	(char *rbuf,int rlen,cchar *fmt,...) noex
+	int snwvprintf	(char *rbuf,int rlen,cchar *fmt,va_list *ap) noex
 
 	Arguments:
 	rbuf		c-string buffer pointer
@@ -60,7 +60,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstdio>
+#include	<cstdio>		/* |vsnprintf(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |mac(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
