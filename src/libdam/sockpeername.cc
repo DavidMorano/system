@@ -33,9 +33,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<uinet.h>		/* |INETXADDRLEN| */
-#include	<mallocxx.h>
+#include	<uclibmem.h>
+#include	<ucgetx.h>		/* |uc_getnameinfo(3uc)| */
 #include	<getbufsize.h>
 #include	<getxx.h>
 #include	<sockaddress.h>
@@ -164,14 +167,16 @@ int suber::operator () (int s) noex {
 		
 int suber::proc_unix(sockaddress *sap) noex {
 	int		rs ;
+	int		rs1 ;
 	int		rl = 0 ;
-	if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
 	    cint	plen = rs ;
 	    if ((rs = sockaddress_getaddr(sap,pbuf,plen)) >= 0) {
 		rs = sncpyw(rbuf,rlen,pbuf,rs) ;
 	        rl = rs ;
 	    } /* end if (sockaddress_getaddr) */
-	    rs = rsfree(rs,pbuf) ;
+	    rs1 = lm_free(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
 }
@@ -181,9 +186,10 @@ int suber::proc_in4(sockaddress *sap) noex {
 	INADDR4		naddr{} ;
 	cint		nalen = INET4ADDRLEN ;
 	int		rs ;
+	int		rs1 ;
 	int		rl = 0 ;
 	if ((rs = sockaddress_getaddr(sap,&naddr,nalen)) >= 0) {
-	    if (char *hebuf{} ; (rs = malloc_ho(&hebuf)) >= 0) {
+	    if (char *hebuf ; (rs = lm_ho(&hebuf)) >= 0) {
 		ucentho		he ;
 		cint		af = AF_INET4 ;
 	        cint		helen = rs ;
@@ -199,7 +205,8 @@ int suber::proc_in4(sockaddress *sap) noex {
 		    rs = proc_in4addr(&naddr) ;
 		    rl = rs ;
 		}
-		rs = rsfree(rs,hebuf) ;
+		rs1 = lm_free(hebuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (sockaddress_getaddr) */
 	return (rs >= 0) ? rl : rs ;
@@ -327,17 +334,19 @@ int suber::proc_in6(sockaddress *sap) noex {
 
 int in6er::operator () (sockaddress *sap) noex {
 	int		rs ;
+	int		rs1 ;
 	int		rl = 0 ;
 	if ((rs = sockaddress_getlen(sap)) >= 0) {
 	    sockaddr	*sp = sockaddrp(sap) ;
 	    cint	sl = rs ;
-	    if (char *sbuf{} ; (rs = malloc_nn(&sbuf)) >= 0) {
+	    if (char *sbuf ; (rs = lm_nn(&sbuf)) >= 0) {
 		cint	slen = rs ;
 		cint	fl = 0 ;
 	        if ((rs = uc_getnameinfo(sp,sl,rbuf,rlen,sbuf,slen,fl)) >= 0) {
 		    rl = rs ;
 		} /* end if (uc_getnameinfo) */
-	        rs = rsfree(rs,sbuf) ;
+	        rs1 = lm_free(sbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (sockaddress_getlen) */
 	return (rs >= 0) ? rl : rs ;
@@ -346,9 +355,9 @@ int in6er::operator () (sockaddress *sap) noex {
 
 static int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	if ((rs = getbufsize(bufsize_hn)) >= 0) {
 	    var.maxhostlen = rs ;
-	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_nn)) >= 0) {
 		var.svcnamelen = rs ;
 	    }
 	}
