@@ -59,7 +59,7 @@
 #endif
 
 
-extern cchar	*const stdfnames[] ;
+extern cpcchar		stdfnames[] ;
 
 
 #endif /* STDFNAMES_INCLUDE */
