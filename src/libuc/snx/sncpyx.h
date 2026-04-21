@@ -43,11 +43,12 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-template<typename ... Args>
+template<concharp ... Args>
 inline int sncpy(char *dp,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return sncpyx(dp,dl,na,args ...) ;
-}
+} /* end subroutine-template (sncpy) */
+
 
 #endif /* __cplusplus */
 
