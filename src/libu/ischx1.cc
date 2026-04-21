@@ -179,24 +179,24 @@ constexpr charinfo	ischx_data ;
 
 /* exported subroutines */
 
-    bool ischalpha(int ch) noex attrpure {
+bool ischalpha(int ch) noex attrpure {
 	return ischx_data.isalpha[ch & UCHAR_MAX] ;
-    }
-    bool ischalnum(int ch) noex attrpure {
+}
+bool ischalnum(int ch) noex attrpure {
 	return ischx_data.isalnum[ch & UCHAR_MAX] ;
-    }
-    bool ischwhite(int ch) noex attrpure {
+}
+bool ischwhite(int ch) noex attrpure {
 	return ischx_data.iswhite[ch & UCHAR_MAX] ;
-    }
-    bool ischlower(int ch) noex attrpure {
+}
+bool ischlower(int ch) noex attrpure {
 	return ischx_data.islc[ch & UCHAR_MAX] ;
-    }
-    bool ischupper(int ch) noex attrpure {
+}
+bool ischupper(int ch) noex attrpure {
 	return ischx_data.isuc[ch & UCHAR_MAX] ;
-    }
-    bool ischfold(int ch) noex attrpure {
+}
+bool ischfold(int ch) noex attrpure {
 	return ischx_data.isfc[ch & UCHAR_MAX] ;
-    }
+}
 
 
 /* local subroutines */
