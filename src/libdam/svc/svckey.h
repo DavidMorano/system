@@ -38,7 +38,7 @@ enum svckeys {
 	svckey_include,
 	svckey_svc,
 	svckey_overlast
-} ;
+} ; /* end enum (svckeys) */
 
 struct svckey_head {
 	cchar		*file ;		/* data-file */
@@ -54,7 +54,7 @@ struct svckey_head {
 	cchar		*failcont ;	/* fail-continue */
 	cchar		*include ;
 	cchar		*svc ;		/* service */
-} ;
+} ; /* end struct */
 
 typedef	SVCKEY		svckey ;
 
