@@ -95,7 +95,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdintx.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -104,6 +103,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<xxtostr.h>		/* |ultostr(3u)| */
+#include	<stdintx.h>
 #include	<localmisc.h>
 
 #include	"convdec.h"
@@ -127,7 +127,7 @@
 
 /* forward references */
 
-static char	*local_ultostr(ulong,char *) noex ;
+local char	*local_ultostr(ulong,char *) noex ;
 
 
 /* local variables */
@@ -157,7 +157,7 @@ char *convdecs(long snum,char *endptr) noex {
 	char		*bp = nullptr ;
 	if (endptr) {
 	    ulong	unum = ulong(snum) ;
-	    if (snum < 0) unum = (- unum) ;
+	    if (snum < 0) unum = (neg unum) ;
 	    bp = convdecu(unum,endptr) ;
 	    if (snum < 0) *--bp = '-' ;
 	} /* end if (non-null) */
@@ -167,20 +167,21 @@ char *convdecs(long snum,char *endptr) noex {
 
 /* local subroutines */
 
-static char *local_ultostr(ulong unum,char *endptr) noex {
+local char *local_ultostr(ulong unum,char *endptr) noex {
+    	cuint		b10 = 10 ;	/* base-10 */
     	ulong		lval = unum ;
-    	char		*bp = endptr ;
+    	char		*bp = endptr ; /* return-value */
 	/* zero is a special case */
 	if (lval > 0) {
 	    /* first loop to get value down to <= INT_MAX */
 	    for (ulong nv ; lval > INT_MAX ; lval = nv) {
-	        nv = (lval / 10) ;
-	        *--bp = char((lval - (nv * 10)) + '0') ;
+	        nv = (lval / b10) ;
+	        *--bp = char((lval - (nv * b10)) + '0') ;
 	    } /* end for */
 	    /* does not lose precision since 'ival' is <= INT_MAX */
-	    for (uint nv,ival = uint(lval) ; ival > 0 ; ival = nv ) {
-	        nv = (ival / 10) ;
-	        *--bp = char((ival - (nv * 10)) + '0') ;
+	    for (uint nv, ival = uint(lval) ; ival > 0 ; ival = nv ) {
+	        nv = (ival / b10) ;
+	        *--bp = char((ival - (nv * b10)) + '0') ;
 	    } /* end for */
 	} else {
 	    *--bp = '0' ;
