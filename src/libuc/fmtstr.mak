@@ -46,9 +46,15 @@ MOBJ += fmtsub.o fmtobj.o
 
 MOBJ_SUB += fmtsub0.o fmtsub1.o fmtsub2.o fmtsub3.o
 
-MOBJ_SPEC += fmtspec0.o fmtspec1.o
+OBJ0= fmtstr_prime.o 
+OBJ1= fmtstrdata.o fmtspec.o 
+OBJ2= fmtsub.o fmtobj.o
+OBJ3= fmtopts.o fmtutil.o
 
-OBJ= fmtstr_prime.o mods.o fmtopts.o
+OBJA=
+OBJB=
+
+OBJ= obj0.o obj1.o obj2.o obj3.o
 
 
 INCDIRS=
@@ -115,16 +121,16 @@ control:
 	(uname -n ; date) > Control
 
 
-obj00.o:		$(OBJ00)
+obj0.o:			$(OBJ0)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
-obj01.o:		$(OBJ01)
+obj1.o:			$(OBJ1)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
-obj02.o:		$(OBJ02)
+obj2.o:			$(OBJ2)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
-obj03.o:		$(OBJ03)
+obj3.o:			$(OBJ3)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
@@ -132,6 +138,10 @@ obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -203,8 +213,8 @@ fmtsub3.o:		fmtsub3.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
 	makemodule fmtsub
 	$(COMPILE.cc) $<
 
-fmtspec.o:		$(MOBJ_SPEC)				$(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ_SPEC)
+fmtspec.o:		fmtspec0.o fmtspec1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 fmtspec0.o:		fmtsub.ccm $(DEPS_SPEC)			$(INCS)
 	makemodule fmtspec
@@ -214,13 +224,13 @@ fmtspec1.o:		fmtspec1.cc fmtspec0.o $(DEPS_SPEC)	$(INCS)
 	$(COMPILE.cc) $<
 
 # FMTUTIL
-fmrutil.o:		fmtutil0.o fmtutil1.o
+fmtutil.o:		fmtutil0.o fmtutil1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 fmtutil0.o:		fmtutil.ccm				$(INCS)
 	makemodule fmtspec
 
-fmtutil1.o:		fmtutil1.cc fmtutil0.o
+fmtutil1.o:		fmtutil1.cc fmtutil0.o			$(INCS)
 	makemodule fmtspec
 	$(COMPILE.cc) $<
 
