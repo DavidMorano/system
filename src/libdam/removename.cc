@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-	The subroutine was adapated from other programs that do
+	The subroutine was adapted from other programs that do
 	similar types of functions.
 
 */
