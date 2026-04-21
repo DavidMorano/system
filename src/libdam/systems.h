@@ -14,10 +14,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 
 
@@ -45,7 +42,7 @@ struct systems_head {
 	vecobj		*flp ;		/* file-list-pointer */
 	vecobj		*elp ;		/* entry-list-pointer */
 	time_t		checktime ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 typedef	SYSTEMS		systems ;
@@ -54,15 +51,16 @@ typedef	SYSTEMS_ENT	systems_ent ;
 
 EXTERNC_begin
 
-extern int systems_open(systems *,cchar *) noex ;
-extern int systems_fileadd(systems *,cchar *) noex ;
-extern int systems_filedel(systems *,cchar *) noex ;
-extern int systems_check(systems *,time_t) noex ;
-extern int systems_curbegin(systems *,systems_cur *) noex ;
-extern int systems_curend(systems *,systems_cur *) noex ;
-extern int systems_curenum(systems *,systems_cur *,systems_ent **) noex ;
-extern int systems_fetch(systems *,cchar *,systems_cur *,systems_ent **) noex ;
-extern int systems_close(systems *) noex ;
+extern int systems_open		(systems *,cchar *) noex ;
+extern int systems_fileadd	(systems *,cchar *) noex ;
+extern int systems_filedel	(systems *,cchar *) noex ;
+extern int systems_check	(systems *,time_t) noex ;
+extern int systems_curbegin	(systems *,systems_cur *) noex ;
+extern int systems_curend	(systems *,systems_cur *) noex ;
+extern int systems_curenum	(systems *,systems_cur *,systems_ent **) noex ;
+extern int systems_fetch	(systems *,cchar *,
+		systems_cur *,systems_ent **) noex ;
+extern int systems_close	(systems *) noex ;
 
 EXTERNC_end
 
