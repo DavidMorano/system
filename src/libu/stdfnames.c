@@ -27,6 +27,13 @@
 	This module provides that c-strings for the standard file
 	names.
 
+	Notes:
+	1. This is written in the C-language because supposedly
+	(actually really, according to the standard) the C++ language
+	is not supposed to allow for aggregate array initialization.
+	Ya, that is how dumb C++ can be.  But as you probably already
+	know, I have aggregate array intialization elsewhere.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -65,7 +72,7 @@
 
 /* exported variables */
 
-cchar *const stdfnames[] = {
+cpcchar		stdfnames[] = {
 	[stdfile_in]		= "*STDIN*",
 	[stdfile_out]		= "*STDOUT*",
 	[stdfile_err]		= "*STDERR*",
