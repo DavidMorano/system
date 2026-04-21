@@ -1,4 +1,4 @@
 UCONCEPTS
 
-These are various system-like concepts.
+These are various concepts that are used in system-related libraries.
 
