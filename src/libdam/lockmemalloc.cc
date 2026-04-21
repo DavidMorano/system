@@ -172,13 +172,13 @@ int lockmemalloc_init() noex {
 	    if ((rs = uip->mx.create) >= 0) {
 	        void_f	b = lockmemalloc_atforkbefore ;
 	        void_f	a = lockmemalloc_atforkafter ;
-	        if ((rs = uc_atforkrecord(b,a,a)) >= 0) {
+	        if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	            if ((rs = uc_atexit(lockmemalloc_exit)) >= 0) {
 	                uip->f_initdone = true ;
 			f = true ;
 	            } /* end if (uc_atexit) */
 	            if (rs < 0) {
-	                uc_atforkexpunge(b,a,a) ;
+	                uc_atforkexp(b,a,a) ;
 		    }
 		} /* end if (uc_atfork) */
 		if (rs < 0) {
@@ -205,7 +205,7 @@ int lockmemalloc_fini() noex {
 	    {
 	        void_f	b = lockmemalloc_atforkbefore ;
 	        void_f	a = lockmemalloc_atforkafter ;
-	        rs1 = uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
