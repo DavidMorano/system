@@ -62,17 +62,4 @@ export {
     }
 } /* end export */
 
-bool hasourbad(cchar *sp,int sl) noex {
-	bool		f = false ;
-	while (sl && *sp) {
-	    cint	ch = mkchar(*sp) ;
-	    f = isourbad(ch) ;
-	    if (f) break ;
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	return f ;
-}
-/* end subroutine (hasourbad) */
-
 
