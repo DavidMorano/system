@@ -140,7 +140,8 @@ cint tmtime::znlen  = 	getznlen() ;
 
 /* exported subroutines */
 
-int tmtime_ztime(tmtime *op,bool fz,time_t t) noex {
+/* 0=GMT 1=local */
+int tmtime_timex(tmtime *op,bool fz,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if (fz) {
@@ -151,7 +152,7 @@ int tmtime_ztime(tmtime *op,bool fz,time_t t) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (tmtime_ztime) */
+/* end subroutine (tmtime_timex) */
 
 int tmtime_timegm(tmtime *op,time_t t) noex {
 	int		rs ;
@@ -315,8 +316,7 @@ local int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
 	    }
 	} /* end if (tmtime_zinit) */
 	return rs ;
-}
-/* end subroutine (tmtime_mktimer) */
+} /* end subroutine (tmtime_mktimer) */
 
 int tmtime::timex(bool fz,time_t t) noex {
 	return tmtime_timex(this,fz,t) ;
