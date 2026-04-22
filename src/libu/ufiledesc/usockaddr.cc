@@ -59,8 +59,6 @@
 
 /* imported namespaces */
 
-using libu::ufiledescbase ;		/* type */
-
 
 /* local typedefs */
 
