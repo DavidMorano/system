@@ -13,8 +13,6 @@
 	Names:
 	u_closeonexec
 	u_nonblock
-	u_readn
-	u_writen
 	u_fchdir
 	u_fchmod
 	u_fchmodmin
@@ -32,6 +30,7 @@
 	u_ftruncate
 	u_ioctl
 	u_lockf
+	u_readn
 	u_readp
 	u_writep
 	u_read
@@ -44,6 +43,7 @@
 	u_rewind
 	u_seekable
 	u_write
+	u_writen
 	u_writev
 
 	General-Description:
