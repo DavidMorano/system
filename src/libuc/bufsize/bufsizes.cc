@@ -36,7 +36,7 @@
 #include	"bufsizenames.h"
 
 
-cchar *bufsizs[] = {
+cchar *bufsizes[] = {
 	[bufsize_ps]		= "PS",		/* page-size */
 	[bufsize_mi]		= "MI",		/* max-pid */
 	[bufsize_ma]		= "MA",		/* max-args */
