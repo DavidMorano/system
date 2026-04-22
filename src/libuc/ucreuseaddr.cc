@@ -32,9 +32,9 @@
 /* exported subroutines */
 
 int uc_reuseaddr(int s) noex {
-	int		optlen = sizeof(int) ;
+	cint		optlen = sizeof(int) ;
 	int		rs = SR_BADFD ;
-	int		one = 1 ;
+	mut int		one = 1 ; /* <- must be mutable */
 	if (s >= 0) {
 	    rs = u_setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&one,optlen) ;
 	}
