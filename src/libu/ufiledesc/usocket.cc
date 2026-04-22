@@ -18,20 +18,19 @@
 /*******************************************************************************
 
 	Names:
-	usocket (module)
 	u_bind
-	u_listen
 	u_setsockopt
 	u_getsockopt
 	u_getsockname
 	u_getpeername
+	u_listen
+	u_recv
+	u_recvmsg
+	u_recvfrom
 	u_send
 	u_sendmsg
 	u_sendto
 	u_sendfiler
-	u_recv
-	u_recvmsg
-	u_recvfrom
 	u_shutdown
 
 	Description:
@@ -223,7 +222,7 @@ namespace {
 	} ;
 	int isendfile(int) noex ;
     } ; /* end struct (usender) */
-}
+} /* end namespace */
 
 
 /* forward references */
