@@ -48,7 +48,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |sort(3c++)| + |search(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>		/* |DECBUFLEN| */
@@ -64,7 +63,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local namespaces */
 
-using std::min ;			/* subroutine */
 using std::sort ;			/* subroutine */
 using std::partition_point ;		/* subroutine */
 
@@ -96,8 +94,8 @@ namespace {
 	    ne = n ;
 	} ; /* end ctor */
 	int operator () (int n,cchar **rpp) const noex {
-    		int		rs = SR_NOTFOUND ;
-		int		rl = 0 ; /* return-value */
+    		int	rs = SR_NOTFOUND ;
+		int	rl = 0 ; /* return-value */
 		cauto predf = [this,n] (uchar c) noex -> bool {
 	    	    cint i = int(c) ;
 	    	    return (ns[i].n < n) ;
