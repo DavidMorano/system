@@ -172,7 +172,6 @@ local int uwrcheck(int fd) noex {
 	    }
 	} /* end if (we had some poll results) */
 	return rs ;
-}
-/* end subroutine (uwrcheck) */
+} /* end subroutine (uwrcheck) */
 
 
