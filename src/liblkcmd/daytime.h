@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* DAYTIME loadable service for MFSERVE */
+/* DAYTIME loadable service-module for MFSERVE */
 /* version %I% last-modified %G% */
 
 
@@ -28,7 +28,6 @@
 #include	<usysrets.h>
 #include	<pthread.h>
 #include	<vecpstr.h>
-#include	<sreq.h>
 
 #include	"sreq.h"
 
