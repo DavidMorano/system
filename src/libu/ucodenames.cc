@@ -48,6 +48,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<algorithm>		/* |sort(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>		/* |DECBUFLEN| */
