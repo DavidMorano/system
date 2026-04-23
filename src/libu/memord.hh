@@ -35,7 +35,6 @@
 #include	<cstdlib>
 #include	<atomic>
 #include	<clanguage.h>
-#include	<usysbase.h>
 
 
 /* C-C++ memory order */
