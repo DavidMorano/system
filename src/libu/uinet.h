@@ -48,14 +48,6 @@
 #endif
 #endif
 
-#ifndef	AF_INET4
-#ifdef	AF_INET
-#define	AF_INET4	AF_INET
-#else
-#define	AF_INET4	2
-#endif
-#endif
-
 #ifndef	INET4ADDRLEN
 #define	INET4ADDRLEN	szof(in4_addr_t)
 #endif
