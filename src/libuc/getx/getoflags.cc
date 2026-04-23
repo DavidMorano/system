@@ -81,8 +81,7 @@ int getoflags(cchar *os) noex {
 	int		of = O_CLOEXEC ;
 	if (os) {
 	    amode	am{} ;
-	    cchar	*osp = os ;
-	    while (*osp) {
+	    for (cchar *osp = os ; *osp ; ) {
 	        switch (cint sc = mkchar(*osp++) ; sc) {
 	        case 'r':
 	            am.rd = true ;
@@ -127,7 +126,7 @@ int getoflags(cchar *os) noex {
 	            of |= O_MINMODE ;	/* minimum file-permissions-mode */
 		    break ;
 	        } /* end switch */
-	   } /* end while (open flags) */
+	   } /* end for (open flags) */
 	   if (am.rd && am.wr) {
 	       of |= O_RDWR ;
 	   } else if (am.wr) {
