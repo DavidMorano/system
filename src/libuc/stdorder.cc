@@ -93,8 +93,7 @@ local int stdorder_rxx(cchar *buf,T *wp) noex {
 	}
 	*wp = stage ;
 	return n ;
-}
-/* end subroutine-template (stdorder_rxx) */
+} /* end subroutine-template (stdorder_rxx) */
 
 template<typename T>
 local int stdorder_wxx(char *buf,T w) noex {
@@ -104,8 +103,7 @@ local int stdorder_wxx(char *buf,T w) noex {
 	    ubuf[i] = uchar(w >> (i * nb)) ;
 	}
 	return n ;
-}
-/* end subroutine-template (stdorder_wxx) */
+} /* end subroutine-template (stdorder_wxx) */
 
 
 /* exported variables */
