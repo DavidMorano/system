@@ -84,7 +84,7 @@
 #include	<usysbase.h>
 #include	<uinet.h>		/* |AF_{x}| */
 #include	<endian.h>		/* |htoni(3u)| + |ntohi(3u)| */
-#include	<sncpyx.h>		/* |sncpy(3uc)| */
+#include	<snwcpy.h>		/* |snwcpy(3uc)| */
 #include	<strn.h>		/* |strncpybc(3uc)| */
 #include	<cthexstr.h>		/* |cthexstr(3uc)| */
 #include	<mkchar.h>
@@ -273,7 +273,7 @@ int sockaddress_getport(SA *sap) noex {
 /* end subroutine (sockaddress_getport) */
 
 /* get the address for this sockaddress (based on address type) */
-int sockaddress_getaddr(SA *sap,char *abuf,int alen) noex {
+int sockaddress_getaddr(SA *sap,void *abuf,int alen) noex {
 	sa		*extp = (sa *) sap ;
 	int		rs = SR_FAULT ;
 	if (sap && abuf) {
@@ -284,9 +284,10 @@ int sockaddress_getaddr(SA *sap,char *abuf,int alen) noex {
 	    case AF_UNIX:
 		{
 	            SOCKADDR_UN	*unix_sap = (SOCKADDR_UN *) sap ;
+		    char *sbuf = charp(abuf) ;
 	            sp = unix_sap->sun_path ;
 	            if (alen < 0) alen = maxpath ;
-	            rs = sncpy(abuf,alen,sp) ;
+	            rs = snwcpy(sbuf,alen,sp) ;
 		}
 	        break ;
 	    case AF_INET4:
