@@ -124,18 +124,18 @@ struct hostinfo_n {
 	cchar		*name ;
 	int		namelen ;
 	int		af ;
-} ;
+} ; /* end struct */
 
 struct hostinfo_a {
 	int		af ;
 	int		addrlen ;
 	uchar		addr[INETXADDRLEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct known {
 	cchar		*name ;
 	uint		a ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -217,8 +217,8 @@ local int	getinet_knowner(hostinfo *,int) noex ;
 local int	matknown(cchar *,int) noex ;
 
 extern "C" {
-local int	vmatname(cvoid **,cvoid **) noex ;
-local int	vmataddr(cvoid **,cvoid **) noex ;
+    local int	vmatname(cvoid **,cvoid **) noex ;
+    local int	vmataddr(cvoid **,cvoid **) noex ;
 }
 
 
@@ -234,14 +234,14 @@ constexpr int		(*getinets[])(hostinfo *,int) = {
 } ;
 
 constexpr known		knowns[] = {
-	{ "localhost", 0x7F000001 },
-	{ "anyhost",   0x00000000 },
-	{ "allhost",   0xFFFFFFFF },
-	{ "broadcast", 0xFFFFFFFF },
-	{ "testhost",  0x7F0000FF },
-	{ "local", 0x7F000001 },
-	{ nullptr, 0x00000000 }
-} ;
+	{ "localhost",	0x7F000001 },
+	{ "anyhost",	0x00000000 },
+	{ "allhost",	0xFFFFFFFF },
+	{ "broadcast",	0xFFFFFFFF },
+	{ "testhost",	0x7F0000FF },
+	{ "local",	0x7F000001 },
+	{ nullptr,	0x00000000 }
+} ; /* end array */
 
 static bufsizevar	maxhostlen(bufsize_hn) ;
 
