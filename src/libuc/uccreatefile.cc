@@ -1,4 +1,4 @@
-/* uccreatefile */
+/* uccreatefile SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -26,11 +26,29 @@
 #include	<localmisc.h>
 
 
+/* local defnes */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
     extern int uc_create(cchar *,mode_t) noex ;
 }
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -44,7 +62,7 @@ int uc_createfile(cchar *fname,mode_t om) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 	        if ((rs = uc_create(fname,om)) >= 0) {
-	            rs = u_close(rs) ;
+	            rs = uc_close(rs) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
