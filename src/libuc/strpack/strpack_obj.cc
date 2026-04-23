@@ -95,7 +95,7 @@ void strpack::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("strpack",rs,"fini-finish") ;
 	}
-}
+} /* end method (strpack::dtor) */
 
 int strpack_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
