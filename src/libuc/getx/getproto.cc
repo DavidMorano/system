@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-07-10, David A­D­ Morano
+	= 1998-03-21, David A­D­ Morano
 	This code was originally written.
 
 */
@@ -21,14 +21,14 @@
 	getproto_name
 
 	Description:
-	We try to retrieve a protocol number given a protocol name.
+	Retrieve a protocol number given a protocol name.
 
 	Synopsis:
-	int getproto_name(char *pp,int pl) noex
+	int getproto_name(cchar *pp,int pl) noex
 
 	Arguments:
-	pp		pointer to protocol name string
-	pl		length of protocol name string
+	pp		protocol name string pointer
+	pl		protocol name string length
 
 	Returns:
 	>=0		protocol number
@@ -37,11 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -85,8 +80,8 @@ int getproto_name(cchar *pnp,int pnl) noex {
 	    rs = SR_INVALID ;
 	    if (pnp[0]) ylikely {
 	        cchar	*pname{} ;
-	        if (nulstr n ; (rs = n.start(pnp,pnl,&pname)) >= 0) {
-	    	    if (char *prbuf ; (rs = lm_pr(&prbuf)) >= 0) {
+	        if (nulstr n ; (rs = n.start(pnp,pnl,&pname)) >= 0) ylikely {
+	    	    if (char *prbuf ; (rs = lm_pr(&prbuf)) >= 0) ylikely {
 	                ucentpr		pr ;
 	                cint		prlen = rs ;
 	                if ((rs = uc_getprnam(&pr,prbuf,prlen,pname)) >= 0) {
