@@ -206,14 +206,13 @@ int tmpx_write(tmpx *op,int ei,tmpx_ent *ep) noex {
             cint    am = (op->oflags & O_ACCMODE) ;
             rs = SR_BADF ;
             if ((am == SR_WRONLY) || (am == O_RDWR)) {
+                cint    esz = TMPX_ENTSIZE ;
                 if (op->fd < 0) {
                     rs = tmpx_fileopen(op,0L) ;
                 }
                 if (rs >= 0) ylikely {
-                    off_t   poff ;
-                    cint    esz = TMPX_ENTSIZE ;
-                    poff = (off_t) (ei * esz) ;
-                    rs = u_pwrite(op->fd,ep,esz,poff) ;
+                    coff  poff = off_t(ei * esz) ;
+                    rs = u_writep(op->fd,ep,esz,poff) ;
                 } /* end if */
             } /* end if */
 	} /* end if (magic) */
