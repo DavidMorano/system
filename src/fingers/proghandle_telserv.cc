@@ -1,9 +1,12 @@
-/* proghandle_telserv */
+/* proghandle_telserv SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle this service request */
+/* version %I% last-modified %G% */
 
 
-#define	P_TELSERV	1		/* which basic function */
+#define	CF_TELSERV	1		/* which basic function */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -95,8 +98,8 @@
 #include <syslog.h>
 #include <netdb.h>
 #include <csignal>
-#include <cstddef>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include <cstring>
 
 #ifndef SYSV
@@ -116,6 +119,7 @@
 #include <cstdio>
 
 #include	<vecstr.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -132,7 +136,7 @@
 #define	PROGNAME	"telnetd"
 #endif
 
-#if	P_TELSERV
+#if	CF_TELSERV
 #define	PROGNAME	"telserv"
 #endif
 
@@ -202,24 +206,15 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	mkutmpid(char *,int,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	audit_settid(int);	/* set terminal ID */
-
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,vecstr *,
-			const char *,const char **) ;
+			cchar *,cchar **) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strdomain(char *) ;
 
 
@@ -254,7 +249,7 @@ static int	procsvcspec(struct proginfo *,vecstr *,char *,int) ;
 static int	doit(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,int,struct sockaddr_storage *) ;
 static int	telnet(struct proginfo *,struct clientinfo *,pid_t,int,int) ;
-static int	mkpam(struct proginfo *,const char *,const char *) ;
+static int	mkpam(struct proginfo *,cchar *,cchar *) ;
 
 static int	tcsetdefault(int) ;
 static int	tcspeednonzero(int) ;
@@ -262,19 +257,19 @@ static int	tcnoecho(int) ;
 static int	readstream();
 static int	telrcv() ;
 static int	send_oob(int fd, char *ptr, int count);
-static int	setenv(const char *name, const char *value, int rdebugwrite);
+static int	setenv(cchar *name, cchar *value, int rdebugwrite);
 static int	removemod(int f, char *modname);
-static int	fatal(int,const char *) ;
+static int	fatal(int,cchar *) ;
 
-static int	termsecure(const char *,char *) ;
-static int	telserv_service(const char *,const char *) ;
+static int	termsecure(cchar *,char *) ;
+static int	telserv_service(cchar *,cchar *) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-static int	debugfstat(const char *,int) ;
+static int	debugfstat(cchar *,int) ;
 #endif
 
 static void	drainstream();
-static void	unsetenv(const char *name);
+static void	unsetenv(cchar *name);
 static void	suboption();
 static void	showbanner() ;
 static void	cleanup();
@@ -417,7 +412,7 @@ char	*envinit[2];
 
 #if	CF_LOCALSVC
 
-static const char *termtypes[] = {
+static cchar *termtypes[] = {
 	"screen",
 	"vt100",
 	"vt101",
@@ -435,7 +430,7 @@ static const char *termtypes[] = {
 	NULL
 } ;
 
-static const char *services[] = {
+static cchar *services[] = {
 	"talker",			/* historical */
 	"talk",
 	"weather",
@@ -453,7 +448,7 @@ static const char *services[] = {
  */
 
 static int
-new_env(const char *name, const char *value)
+new_env(cchar *name, cchar *value)
 {
 	struct envlist *env, *index;
 
@@ -484,7 +479,7 @@ new_env(const char *name, const char *value)
  */
 
 static int
-del_env(const char *name)
+del_env(cchar *name)
 {
 	struct envlist *env;
 
@@ -567,7 +562,7 @@ struct clientinfo	*cip ;
 		exit(1);
 	}
 
-	if (setsockopt(0, SOL_SOCKET, SO_KEEPALIVE, (const char *)&on,
+	if (setsockopt(0, SOL_SOCKET, SO_KEEPALIVE, (cchar *)&on,
 						sizeof (on)) < 0) {
 		syslog(LOG_WARNING, "setsockopt (SO_KEEPALIVE): %m");
 	}
@@ -605,8 +600,8 @@ int			svcspeclen ;
 	int	sl ;
 	int	len = 0 ;
 
-	const char	*tp, *cp ;
-	const char	*sp ;
+	cchar	*tp, *cp ;
+	cchar	*sp ;
 
 
 	if (nelp == NULL)
@@ -1243,7 +1238,7 @@ gotpty:
 	opts = VECSTR_OCOMPACT ;
 	if ((rs = vecstr_start(&envs,10,opts)) >= 0) {
 
-		const char	*sav[1] ;
+		cchar	*sav[1] ;
 
 
 		rs = vecstr_envadd(&envs,VARTERM,(terminaltype + 5),-1) ;
@@ -1308,7 +1303,7 @@ gotpty:
 
 static int fatal(f, msg)
 int 		f ;
-const char	*msg;
+cchar	*msg;
 {
 	char buf[BUFSIZ];
 
@@ -2711,7 +2706,7 @@ rmut()
 			strncpy(rhost, up->ut_host, sizeof (up->ut_host));
 			rhost[sizeof (up->ut_host)] = '\0';
 
-#if	P_TELSERV
+#if	CF_TELSERV
 	cp = "telserv" ;
 #else
 	cp = "telnet" ;
@@ -2931,7 +2926,7 @@ static int send_oob(int fd, char *ptr, int count)
 #define	__P(x)	()
 #endif
 
-static char *__findenv __P((const char *, int *));
+static char *__findenv __P((cchar *, int *));
 
 /*
  * setenv --
@@ -2939,8 +2934,8 @@ static char *__findenv __P((const char *, int *));
  *	"value".  If rdebugwrite is set, replace any current value.
  */
 setenv(name, value, rdebugwrite)
-	const char *name;
-	const char *value;
+	cchar *name;
+	cchar *value;
 	int rdebugwrite;
 {
 	extern char **environ;
@@ -3016,7 +3011,7 @@ setenv(name, value, rdebugwrite)
  */
 void
 unsetenv(name)
-	const char *name;
+	cchar *name;
 {
 	extern char **environ;
 	register char **p;
@@ -3034,7 +3029,7 @@ unsetenv(name)
  */
 char *
 getenv(name)
-	const char *name;
+	cchar *name;
 {
 	int offset;
 
@@ -3050,12 +3045,12 @@ getenv(name)
  */
 static char *
 __findenv(name, offset)
-	register const char *name;
+	register cchar *name;
 	int *offset;
 {
 	extern char **environ;
 	register int len;
-	register const char *np;
+	register cchar *np;
 	register char **p, *c;
 
 	if (name == NULL || environ == NULL)
@@ -3229,7 +3224,7 @@ static int removemod(int f, char *modname)
 
 /* check if a terminal/service specification is allowed */
 static int termsecure(terminaltype,svc)
-const char	terminaltype[] ;
+cchar	terminaltype[] ;
 char		svc[] ;
 {
 	int	svcoff, i, j ;
@@ -3286,8 +3281,8 @@ char		svc[] ;
 
 /* see if this service is allowed from the "services" file */
 static int telserv_service(fname,service)
-const char	fname[] ;
-const char	service[] ;
+cchar	fname[] ;
+cchar	service[] ;
 {
 	FILE	*fp ;
 
@@ -3464,17 +3459,17 @@ int	fd ;
 
 static int mkpam(pip,rhost,slavename)
 struct proginfo	*pip ;
-const char	rhost[] ;
-const char	slavename[] ;
+cchar	rhost[] ;
+cchar	slavename[] ;
 {
 	pam_handle_t    *pamh;
 
 	int	rs1 ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
-#if	P_TELSERV
+#if	CF_TELSERV
 	cp = "telserv" ;
 #else
 	cp = "telnet" ;
@@ -3512,7 +3507,7 @@ fd_set	*sp ;
 #if	CF_DEBUG || CF_DEBUGS
 
 static int	debugfstat(s,fd)
-const char	s[] ;
+cchar	s[] ;
 int		fd ;
 {
 	ustat	sb ;
