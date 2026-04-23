@@ -25,8 +25,8 @@
 
 
 EXTERNC_begin
-extern int	ucodename_sr(int,ccharpp) noex ;
-extern int	ucodename_sig(int,ccharpp) noex ;
+extern int	ucodename_sr	(int,ccharpp) noex ;
+extern int	ucodename_sig	(int,ccharpp) noex ;
 EXTERNC_end
 
 
