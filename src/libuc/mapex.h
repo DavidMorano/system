@@ -32,6 +32,9 @@
 #ifndef	MAPEX
 #define	MAPEX		struct mapex_map
 #endif
+#ifndef	MAPEXENT
+#define	MAPEXENT	struct mapex_map
+#endif
 
 
 #ifndef	STRUCT_MAPEXMAP
