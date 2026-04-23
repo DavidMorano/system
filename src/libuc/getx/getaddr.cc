@@ -88,7 +88,7 @@
 struct addrfamily {
 	cchar		*name ;
 	int		af ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -97,13 +97,13 @@ struct addrfamily {
 /* local variables */
 
 constexpr addrfamily	addrfamilies[] = {
-	{ "unspecified", AF_UNSPEC },
-	{ "unix", AF_UNIX },
-	{ "inet", AF_INET },
-	{ "inet4", AF_INET4 },
-	{ "inet6", AF_INET6 },
-	{ nullptr, 0 }
-} ;
+	{ "unspec",	AF_UNSPEC },
+	{ "unix",	AF_UNIX },
+	{ "inet",	AF_INET },
+	{ "inet4",	AF_INET4 },
+	{ "inet6",	AF_INET6 },
+	{ nullptr,	0 }
+} ; /* end array */
 
 static bufsizevar	maxpathlen(bufsize_mp) ;
 
