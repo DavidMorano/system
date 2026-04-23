@@ -45,9 +45,9 @@ int uc_linger(int fd,int to) noex {
 	        LINGER	ls{} ;
 		cint	sol = SOL_SOCKET ;
 		cint	cmd = SO_LINGER ;
-		cint	llen = sizeof(LINGER) ;
+		cint	llen = szof(LINGER) ;
 		if (to >= 0) {
-	            ls.l_onoff = TRUE ;
+	            ls.l_onoff = true ;
 	            ls.l_linger = to ;
 		}
 		{
