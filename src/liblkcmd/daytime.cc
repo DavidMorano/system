@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* this is a MFSERVE loadable service-module */
+/* DAYTIME loadable service-module for MFSERVE */
 /* version %I% last-modified %G% */
 
 
@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	daytime
 
 	Description:
@@ -56,6 +56,9 @@
 #include	"mfserve.h"
 #include	"daytime.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -94,7 +97,7 @@ typedef mainv	mv ;
 template<typename ... Args>
 static int daytime_ctor(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = memclear(op) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -103,7 +106,7 @@ static int daytime_ctor(lfm *op,Args ... args) noex {
 
 static int daytime_dtor(lfm *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -113,7 +116,7 @@ static int daytime_dtor(lfm *op) noex {
 template<typename ... Args>
 static inline int daytime_magic(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DAYTIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -132,7 +135,7 @@ static int daytime_worker(DT *) noex ;
 
 DAYTIME_OBJ	daytime_modinfo = {
 	"daytime",
-	sizeof(daytime),
+	szof(daytime),
 	0
 } ;
 
@@ -141,16 +144,16 @@ DAYTIME_OBJ	daytime_modinfo = {
 
 int daytime_start(DT *op,cc *pr,SREQ *jep,mv argv,mv envv) noex {
 	int		rs = SR_OK ;
-	if ((rs = daytime_ctor(op,pr,jep,argv,envv)) >= 0) {
+	if ((rs = daytime_ctor(op,pr,jep,argv,envv)) >= 0) ylikely {
 	    op->pr = pr ;
 	    op->jep = jep ;
 	    op->envv = envv ;
-	    if ((rs = sreq_getstdout(jep)) >= 0) {
+	    if ((rs = sreq_getstdout(jep)) >= 0) ylikely {
 	        op->ofd = rs ;
-	        if ((rs = daytime_argsbegin(op,argv)) >= 0) {
+	        if ((rs = daytime_argsbegin(op,argv)) >= 0) ylikely {
 	            pthread_t	tid ;
 	            thrsub_f	thr = (thrsub_f) daytime_worker ;
-	            if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) {
+	            if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) ylikely {
 	                op->fl.working = true ;
 	                op->tid = tid ;
 	                op->magic = DAYTIME_MAGIC ;
@@ -171,7 +174,7 @@ int daytime_start(DT *op,cc *pr,SREQ *jep,mv argv,mv envv) noex {
 int daytime_finish(DT *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = daytime_magic(op)) >= 0) {
+	if ((rs = daytime_magic(op)) >= 0) ylikely {
 	    if (op->fl.working) {
 		if ((rs = ucpid) >= 0) {
 	            if (rs == op->pid) {
@@ -200,7 +203,7 @@ int daytime_check(DT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = daytime_magic(op)) >= 0) {
+	if ((rs = daytime_magic(op)) >= 0) ylikely {
 	    if (op->fl.working) {
 	        const pid_t		pid = getpid() ;
 	        if (pid == op->pid) {
@@ -226,7 +229,7 @@ int daytime_check(DT *op) noex {
 int daytime_abort(DT *op) noex {
     	int		rs ;
 	int		f = false ;
-	if ((rs = daytime_magic(op)) >= 0) {
+	if ((rs = daytime_magic(op)) >= 0) ylikely {
 	    f = op->f_exiting ;
 	    op->f_abort = true ;
 	} /* end if (magic) */
@@ -241,7 +244,7 @@ static int daytime_argsbegin(DT *op,cchar **argv) noex {
 	vecpstr		*alp = &op->args ;
 	cint		ss = DAYTIME_CSIZE ;
 	int		rs ;
-	if ((rs = vecpstr_start(alp,5,0,ss)) >= 0) {
+	if ((rs = vecpstr_start(alp,5,0,ss)) >= 0) ylikely {
 	    op->fl.args = true ;
 	    for (int i = 0 ; (rs >= 0) && (argv[i] != nullptr) ; i += 1) {
 	        rs = vecpstr_add(alp,argv[i],-1) ;
@@ -258,7 +261,7 @@ static int daytime_argsbegin(DT *op,cchar **argv) noex {
 static int daytime_argsend(DT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->fl.args) {
+	if (op->fl.args) ylikely {
 	    vecpstr	*alp = &op->args ;
 	    rs1 = vecpstr_finish(alp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -272,7 +275,7 @@ static int daytime_worker(DT *op) noex {
 	int		wlen = 0 ;
 	if (! op->f_abort) {
 	    cchar	*pr = op->pr ;
-	    if (USTAT sb ; (rs = uc_stat(pr,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_stat(pr,&sb)) >= 0) {
 		if (char *ybuf{} ; (rs = malloc_un(&ubuf)) >= 0) {
 	        const uid_t	uid = sb.st_uid ;
 	        if ((rs = getusername(ubuf,rs,uid)) >= 0) {
