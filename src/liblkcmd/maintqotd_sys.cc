@@ -55,6 +55,7 @@
 #include	<filer.h>
 #include	<logfile.h>
 #include	<snwcpy.h>
+#include	<strx.h>
 #include	<localmisc.h>
 
 #include	"maintqotd.h"
@@ -67,10 +68,6 @@
 
 #define	CHECKER		struct checker
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 #ifndef	VBUFLEN
 #define	VBUFLEN		(6 * MAXPATHLEN)
 #endif
@@ -78,38 +75,11 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath2w(char *,cchar *,cchar *,int) ;
-extern int	mkpath3w(char *,cchar *,cchar *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	matkeystr(cchar **,char *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optvalue(cchar *,int) ;
-extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
-extern int	isNotPresent(int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 static int	debugoutput(cchar *,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-extern cchar	*strsigabbr(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnwcpy(char *,int,cchar *,int) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -459,8 +429,9 @@ static int loadsysfiles(proginfo *pip,systems *sdbp) noex {
 
 	        if (j == 0) {
 	            schedvar_add(&sf,"f",SYSFNAME1,-1) ;
-	        } else
+	        } else {
 	            schedvar_add(&sf,"f",SYSFNAME2,-1) ;
+		}
 
 	        for (i = 0 ; sysfiles[i] != NULL ; i += 1) {
 
@@ -810,7 +781,7 @@ static int checker_proglog(CHECKER *chp,int cs)
 		int	sig = WTERMSIG(cs) ;
 		cchar	*ss ;
 		char		sigbuf[20+1] ;
-		if ((ss = strsigabbr(sig)) == NULL) {
+		if ((ss = strabbrsig(sig)) == NULL) {
 		     ctdeci(sigbuf,20,sig) ;
 		     ss = sigbuf ;
 		}
