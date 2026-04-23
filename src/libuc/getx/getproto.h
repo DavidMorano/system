@@ -11,12 +11,9 @@
 	= 1998-03-21, David A­D­ Morano
 	This module was originally written.
 
-	= 2017-08-01, David A­D­ Morano
-	Updated for lack of interfaces in Apple-Darwin
-
 */
 
-/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -24,8 +21,7 @@
 	getproto_name
 
 	Description:
-	This file contains some support for the UNIX® Address-Familt
-	(AF) related operations.
+	Retrieve a protocol number given a protocol name.
 
 *******************************************************************************/
 
