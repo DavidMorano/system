@@ -27,21 +27,12 @@
 
 	Synopsis:
 	int envhelp_start(envhelp *op,mainv envbads,mainv envv) noex
+	int envhelp_finish(envhelp *op) noex
 
 	Arguments:
 	op		object pointer
 	envbads		list of environment variables that are not included
 	envv		environment array
-
-	Returns:
-	>=0		OK
-	<0		error (system-return)
-
-	Synopsis:
-	int envhelp_finish(envhelp *op) noex
-
-	Arguments:
-	op		object pointer
 
 	Returns:
 	>=0		OK
@@ -196,7 +187,7 @@ int envhelp_finish(envhelp *op) noex {
 int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		i = INT_MAX ;
+	int		i = INT_MAX ; /* return-value */
 	if (op && kp) ylikely {
 	    vechand	*elp = op->elp ;
 	    int		elen = 1 ; /* for the equals sign character */
@@ -205,7 +196,7 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 	        if (vl < 0) vl = lenstr(vp) ;
 	        elen += lenstr(vp,vl) ;
 	    }
-	    if (char *ebuf{} ; (rs = lm_mall((elen+1),&ebuf)) >= 0) ylikely {
+	    if (char *ebuf ; (rs = lm_mall((elen+1),&ebuf)) >= 0) ylikely {
 	        cchar		*ep{} ;
 	        char		*bp = ebuf ;
 	        bp = strwcpy(bp,kp,-1) ;
@@ -229,7 +220,7 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 int envhelp_present(envhelp *op,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if (op && kp) ylikely {
 	    cchar	*cp{} ;
 	    if (nulstr ks ; (rs = ks.start(kp,kl,&cp)) >= 0) ylikely {
@@ -269,14 +260,16 @@ int envhelp_count(envhelp *op) noex {
 }
 /* end subroutine (envhelp_count) */
 
-int envhelp_getvec(envhelp *op,cchar ***eppp) noex {
+int envhelp_getvec(envhelp *op,mainv *listp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
 	    vechand		*elp = op->elp ;
 	    if ((rs = vechand_sort(elp,vcf)) >= 0) ylikely {
-	        if (eppp) {
-	            rs = vechand_getvec(elp,eppp) ;
+	        if (listp) {
+		    if (void *va ; (rs = vechand_getvec(elp,&va)) >= 0) {
+			*listp = mainv(va) ;
+		    }
 	        } else {
 	            rs = vechand_count(elp) ;
 	        }
@@ -292,7 +285,7 @@ int envhelp_getvec(envhelp *op,cchar ***eppp) noex {
 local int envhelp_copy(envhelp *op,mainv envbads,mainv envv) noex {
 	vechand		*elp = op->elp ;
 	int		rs = SR_OK ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	if (envv != nullptr) ylikely {
 	    cchar	*ep{} ;
 	    if (envbads != nullptr) {
@@ -312,8 +305,7 @@ local int envhelp_copy(envhelp *op,mainv envbads,mainv envv) noex {
 	    } /* end if (envbads) */
 	} /* end if (envv) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (envhelp_copy) */
+} /* end subroutine (envhelp_copy) */
 
 local int vechand_addover(vechand *elp,cchar *ep) noex {
 	vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
@@ -329,8 +321,7 @@ local int vechand_addover(vechand *elp,cchar *ep) noex {
 	    rs = vechand_add(elp,ep) ;
 	}
 	return rs ;
-}
-/* end subroutine (vechand_addover) */
+} /* end subroutine (vechand_addover) */
 
 int envhelp::start(mainv argv,mainv envv) noex {
 	return envhelp_start(this,argv,envv) ;
@@ -352,7 +343,7 @@ void envhelp::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("envhelp",rs,"fini-finish") ;
 	}
-}
+} /* end method (envhelp::dtor) */
 
 envhelp_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -370,7 +361,6 @@ envhelp_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (envhelp_co::operator) */
+} /* end method (envhelp_co::operator) */
 
 
