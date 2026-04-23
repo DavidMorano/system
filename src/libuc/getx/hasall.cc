@@ -1,0 +1,1 @@
+../hasx/hasall.cc
