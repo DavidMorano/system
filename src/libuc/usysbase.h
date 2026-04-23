@@ -24,8 +24,8 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<ubufdefs.h>
 #include	<usys.h>
+#include	<ubufdefs.h>
 
 
 #endif /* USYSBASE_INCLUDE */
