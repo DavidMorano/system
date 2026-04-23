@@ -42,6 +42,8 @@ LIBS +=
 
 OBJ0= bufsizedata.o bufsizes.o
 OBJ1= bufsizevar.o 
+OBJ2=
+OBJ3=
 
 OBJA= obj0.o obj1.o 
 
