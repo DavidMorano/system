@@ -56,6 +56,8 @@
 #include	<rmx.h>			/* <- for |rmchr(3uc)| */
 #include	<localmisc.h>
 
+#include	"getnodename.h"
+
 #pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;			/* |varname(3u)| */
@@ -96,10 +98,10 @@ namespace {
 
 /* local variables */
 
-static constexpr nodeinfo_m	nodes[] = {
+constexpr nodeinfo_m	nodes[] = {
 	&nodeinfo::env,
 	&nodeinfo::uinfo
-} ;
+} ; /* end array */
 
 
 /* exported variables */
