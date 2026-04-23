@@ -20,12 +20,12 @@
 
 /*******************************************************************************
 
-  	Names:
-	uc_seeko
-	uc_fcntl
+  	Group
+	ucfiledesc
 
   	Description:
-	Additional (or supplemental) support for UNIX® limits.
+	All of the call that take a file-descriptor as its first
+	argument.
 
 *******************************************************************************/
 
@@ -34,23 +34,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* types? */
-#include	<fcntl.h>		/* types? */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
-
-EXTERNC_begin
-
-extern int	uc_seeko(int,off_t,int,off_t *) noex ;
-extern int	uc_fcntl(int,int,...) noex ;
-
-EXTERNC_end
+#include	<ucread.h>
+#include	<ucwrite.h>
+#include	<ucsock.h>
+#include	<ucdescmisc.h>
 
 
 #endif /* UCFILEDESC_INCLUDE */
