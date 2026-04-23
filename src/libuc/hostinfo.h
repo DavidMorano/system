@@ -80,6 +80,7 @@ EXTERNC_begin
 extern int hostinfo_start(hostinfo *,int,cchar *) noex ;
 extern int hostinfo_geteffective(hostinfo *,cchar **) noex ;
 extern int hostinfo_getcanonical(hostinfo *,cchar **) noex ;
+extern int hostinfo_getoffical(hostinfo *,cchar **) noex ;
 extern int hostinfo_curbegin(hostinfo *,hostinfo_cur *) noex ;
 extern int hostinfo_curend(hostinfo *,hostinfo_cur *) noex ;
 extern int hostinfo_curenumname(hostinfo *,hostinfo_cur *,cchar **) noex ;
