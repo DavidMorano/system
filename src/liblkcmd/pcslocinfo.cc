@@ -44,18 +44,20 @@
 #include	<sys/msg.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<poll.h>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getpwx.h>
 #include	<getbufsize.h>
+#include	<getax.h>
 #include	<vecstr.h>
 #include	<lfm.h>
 #include	<utmpacc.h>
-#include	<getax.h>
-#include	<ugetpw.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -106,40 +108,12 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	rmdirfiles(cchar *,cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	isNotPresent(int) ;
-
 extern int	proginfo_rootname(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -545,7 +519,7 @@ int locinfo_rootids(LOCINFO *lip)
 	if (lip->gid_rootname < 0) {
 	    if ((rs = proginfo_rootname(pip)) >= 0) {
 	        struct passwd	pw ;
-	        const int	pwlen = getbufsize(getbufsize_pw) ;
+	        const int	pwlen = getbufsize(bufsize_pw) ;
 	        char		*pwbuf ;
 		if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 		    cchar	*rn = pip->rootname ;
