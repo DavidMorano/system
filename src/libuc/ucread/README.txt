@@ -1,4 +1,0 @@
-UCREAD
-
-Various 'read" functions.
-
