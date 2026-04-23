@@ -108,9 +108,9 @@ OBJ21=
 OBJ22=
 OBJ23=
 
-OBJ24=
-OBJ25=
-OBJ26=
+OBJ24= ucdescbase.o 
+OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
+OBJ26= ucdescmisc.o
 OBJ27=
 
 OBJ28= ucttyname.o uctc.o ucsysconf.o
@@ -380,7 +380,8 @@ uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
 ucuserattr.o:		ucuserattr.cc	ucuserattr.h		$(INCS)
 ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
 ucprochave.o:		ucprochave.cc	ucprochave.h		$(INCS)
-ucmincode.o:		ucmincode.cc	ucmincode.h		$(INCS)
+ucdescbase.o:		ucdescbase.cc	ucdescbase.h		$(INCS)
+ucdescmisc.o:		ucdescmisc.cc	ucdescmisc.h		$(INCS)
 
 # uctimeout (time-out call-backs)
 uctimeout.o:		uctimeout.cc
@@ -499,13 +500,18 @@ ucsysconf.dir:
 	makesubdir $@
 
 # UCREAD
-ucread.o:		ucread.dir
-ucread.dir:
+ucdescread.o:		ucdescread.dir
+ucdescread.dir:
 	makesubdir $@
 
 # UCREAD
-ucwrite.o:		ucwrite.dir
-ucwrite.dir:
+ucdescwrite.o:		ucdescwrite.dir
+ucdescwrite.dir:
+	makesubdir $@
+
+# UCSOCK
+ucdescsock.o:		ucdescsock.dir
+ucdescsock.dir:
 	makesubdir $@
 
 # UCIDS
@@ -535,6 +541,10 @@ strdcpy.dir:
 
 open.o:			open.dir
 open.dir:
+	makesubdir $@
+
+openx.o:		openx.dir
+openx.dir:
 	makesubdir $@
 
 dial.o:			dial.dir
@@ -1008,11 +1018,6 @@ mnw.dir:
 # UCFILEOP
 ucfileop.o:		ucfileop.dir
 ucfileop.dir:
-	makesubdir $@
-
-# UCSOCK
-ucsock.o:		ucsock.dir
-ucsock.dir:
 	makesubdir $@
 
 # UCSTREAM
