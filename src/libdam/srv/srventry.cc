@@ -47,6 +47,9 @@
 #include	"srvtab.h"
 #include	"srventry.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
