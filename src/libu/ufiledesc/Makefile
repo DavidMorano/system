@@ -42,7 +42,7 @@ LIBS +=
 
 OBJ0= ufiledescbase.o 
 OBJ1= uconnect.o uregular.o 
-OBJ2= usocket.o usockaddr.o
+OBJ2= usocket.o usockaddr.o usockextra.o
 OBJ3= ugetdents.o 
 OBJ4= uatx.o ufcntl.o
 OBJ5= ulockfile.o uselect.o uterminal.o
@@ -155,6 +155,7 @@ ufiledescbase.o:	ufiledescbase.cc	ufiledescbase.hh	$(INCS)
 
 usocket.o:		usocket.cc		usocket.h		$(INCS)
 usockaddr.o:		usockaddr.cc		usockaddr.h		$(INCS)
+usockextra.o:		usockextra.cc		usockextra.h		$(INCS)
 uconnect.o:		uconnect.cc					$(INCS)
 uregular.o:		uregular.cc		uregular.h		$(INCS)
 ugetdents.o:		ugetdents.cc		ugetdents.h		$(INCS)
