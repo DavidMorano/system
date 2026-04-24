@@ -62,7 +62,7 @@
 #include	<usyscalls.h>
 #include	<ucsysmisc.h>
 #include	<uclibmem.h>
-#include	<ucread.h>
+#include	<ucdescread.h>
 #include	<getbufsize.h>
 #include	<filetypes.h>		/* |filetype(3u)| */
 #include	<localmisc.h>
