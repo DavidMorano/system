@@ -89,7 +89,7 @@
 #include	<localmisc.h>
 
 #include	"ucdescbase.hh"
-#include	"ucread.h"
+#include	"ucdescread.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
