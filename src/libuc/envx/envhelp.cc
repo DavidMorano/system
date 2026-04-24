@@ -81,19 +81,18 @@ using std::nothrow ;			/* constant */
 
 /* external variables */
 
-extern cchar	**environ ; /* what it should be  */
-
 
 /* forward reference */
 
 template<typename ... Args>
 local int envhelp_ctor(envhelp *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((op->elp = new(nothrow) vechand) != np) ylikely {
-	        if ((op->spp = new(nothrow) strpack) != np) ylikely {
+	    if ((op->elp = new(nt) vechand) != np) ylikely {
+	        if ((op->spp = new(nt) strpack) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-strpack) */
 	        if (rs < 0) {
@@ -135,25 +134,24 @@ local int	vechand_addover(vechand *,cchar *) noex ;
 /* exported subroutines */
 
 int envhelp_start(envhelp *op,mainv envbads,mainv envv) noex {
-	cint		vo = (VECHAND_OCOMPACT | VECHAND_OSORTED) ;
+	cint		vo = (vechandm.compact | vechandm.sorted) ;
 	int		rs ;
-	if (envv == nullptr) envv = environ ;
 	if ((rs = envhelp_ctor(op)) >= 0) ylikely {
-	    cint	vn = NENVS ;
-	    if ((rs = vechand_start(op->elp,vn,vo)) >= 0) ylikely {
-	        cint	sz = DEFENVSTORESIZE ;
-	        if ((rs = strpack_start(op->spp,sz)) >= 0) ylikely {
-		    if (envv) {
-	    	        rs = envhelp_copy(op,envbads,envv) ;
-		    }
+	        cint	vn = NENVS ;
+	        if ((rs = vechand_start(op->elp,vn,vo)) >= 0) ylikely {
+	            cint	sz = DEFENVSTORESIZE ;
+	            if ((rs = strpack_start(op->spp,sz)) >= 0) ylikely {
+		        if (envv) {
+	    	            rs = envhelp_copy(op,envbads,envv) ;
+		        }
+	                if (rs < 0) {
+		            strpack_finish(op->spp) ;
+		        } /* end if (error) */
+	            } /* end if (strpack_start) */
 	            if (rs < 0) {
-		        strpack_finish(op->spp) ;
-		    } /* end if (error) */
-	        } /* end if (strpack_start) */
-	        if (rs < 0) {
-		    vechand_finish(op->elp) ;
-	        } /* end if (error) */
-	    } /* end if (vechand_start) */
+		        vechand_finish(op->elp) ;
+	            } /* end if (error) */
+	        } /* end if (vechand_start) */
 	    if (rs < 0) {
 		envhelp_dtor(op) ;
 	    }
@@ -282,14 +280,24 @@ int envhelp_getvec(envhelp *op,mainv *listp) noex {
 
 /* private subroutines */
 
+local int envhelp_envv(envhelp *op,mainv ev) noex {
+    	int	rs = SR_OK ;
+	if ((op->envv = ev) == nullptr) {
+	    if ((rs = u_getenviron(&ev)) >= 0) {
+		op->envv = ev ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (envhelp_envv) */
+
 local int envhelp_copy(envhelp *op,mainv envbads,mainv envv) noex {
 	vechand		*elp = op->elp ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		n = 0 ; /* return-value */
-	if (envv != nullptr) ylikely {
+	if ((rs = envhelp_envv(op,envv)) >= 0) ylikely {
 	    cchar	*ep{} ;
 	    if (envbads != nullptr) {
-	        for (int i = 0 ; (rs >= 0) && envv[i] ; i += 1) {
+	        for (int i = 0 ; (rs >= 0) && op->envv[i] ; i += 1) {
 	            ep = envv[i] ;
 	            if (matkeystr(envbads,ep,-1) < 0) {
 	                n += 1 ;
@@ -297,13 +305,13 @@ local int envhelp_copy(envhelp *op,mainv envbads,mainv envv) noex {
 	            } /* end if (was not bad) */
 	        } /* end for (copy ENVs) */
 	    } else {
-	        for (int i = 0 ; (rs >= 0) && envv[i] ; i += 1) {
-	            ep = envv[i] ;
+	        for (int i = 0 ; (rs >= 0) && op->envv[i] ; i += 1) {
+	            ep = op->envv[i] ;
 	            n += 1 ;
 	            rs = vechand_add(elp,ep) ;
 	        } /* end for (copy ENVs) */
 	    } /* end if (envbads) */
-	} /* end if (envv) */
+	} /* end if (envhelp_envv) */
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (envhelp_copy) */
 
@@ -323,8 +331,8 @@ local int vechand_addover(vechand *elp,cchar *ep) noex {
 	return rs ;
 } /* end subroutine (vechand_addover) */
 
-int envhelp::start(mainv argv,mainv envv) noex {
-	return envhelp_start(this,argv,envv) ;
+int envhelp::start(mainv argv,mainv ev) noex {
+	return envhelp_start(this,argv,ev) ;
 }
 
 int envhelp::present(cchar *kp,int kl,cchar **rpp) noex {
