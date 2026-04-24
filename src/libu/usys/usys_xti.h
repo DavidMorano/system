@@ -26,8 +26,8 @@
 
 *******************************************************************************/
 
-#ifndef	USTSXTI_INCLUDE
-#define	USTSXTI_INCLUDE
+#ifndef	USYSXTI_INCLUDE
+#define	USYSXTI_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -68,6 +68,6 @@ EXTERNC_end
 #endif /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */
 
 
-#endif /* USTSXTI_INCLUDE */
+#endif /* USYSXTI_INCLUDE */
 
 
