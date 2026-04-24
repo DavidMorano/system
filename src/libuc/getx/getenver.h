@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-03-21, David A­D­ Morano
+	= 1998-02-01, David A­D­ Morano
 	This module was originally written.
 
 */
 
-/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -40,6 +40,12 @@ EXTERNC_begin
 extern cchar	*getenver(cchar *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+inline cchar *getenver(cchar *key) noex {
+    	return getenver(key,-1) ;
+}
+#endif /* __cplusplus */
 
 
 #endif /* GETENVER_INCLUDE */
