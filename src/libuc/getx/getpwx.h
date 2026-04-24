@@ -37,9 +37,9 @@
 
 EXTERNC_begin
 
-extern int getpwx_name(ucentpw *,char *,int,cchar *) noex ;
-extern int getpwx_uid(ucentpw *,char *,int,uid_t) noex ;
-extern int getpwx_control(int) noex ;
+extern int getpwx_name		(ucentpw *,char *,int,cchar *) noex ;
+extern int getpwx_uid		(ucentpw *,char *,int,uid_t) noex ;
+extern int getpwx_control	(int) noex ;
 
 EXTERNC_end
 
