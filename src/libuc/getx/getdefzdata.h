@@ -23,7 +23,7 @@
 struct defzdata_head {
 	int	zoff  ;		/* minutes west of GMT */
 	int	isdst ;		/* is-dst flag */
-} ;
+} ; /* end struct (defzdata_head) */
 
 #ifdef	__cplusplus
 struct defzdata : defzdata_head {
