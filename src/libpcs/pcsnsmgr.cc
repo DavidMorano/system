@@ -110,10 +110,10 @@ struct pcsnsmgr_head {
 
 /* forward references */
 
-static int	pcsnsmgr_begin(PCSNSMGR *) noex ;
-static int	pcsnsmgr_end(PCSNSMGR *) noex ;
-static int	pcsnsmgr_capbegin(PCSNSMGR *,int) noex ;
-static int	pcsnsmgr_capend(PCSNSMGR *) noex ;
+local int	pcsnsmgr_begin(PCSNSMGR *) noex ;
+local int	pcsnsmgr_end(PCSNSMGR *) noex ;
+local int	pcsnsmgr_capbegin(PCSNSMGR *,int) noex ;
+local int	pcsnsmgr_capend(PCSNSMGR *) noex ;
 
 extern "C" {
     static void	pcsnsmgr_atforkbefore() noex ;
@@ -340,7 +340,7 @@ int pcsnsmgr_stats(PCSNSMGR_STATS *usp) noex {
 
 /* local subroutines (or "private"?) */
 
-static int pcsnsmgr_capbegin(PCSNSMGR *uip,int to) noex {
+local int pcsnsmgr_capbegin(PCSNSMGR *uip,int to) noex {
 	ptm *mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
@@ -363,7 +363,7 @@ static int pcsnsmgr_capbegin(PCSNSMGR *uip,int to) noex {
 }
 /* end subroutine (pcsnsmgr_capbegin) */
 
-static int pcsnsmgr_capend(PCSNSMGR *uip) noex {
+local int pcsnsmgr_capend(PCSNSMGR *uip) noex {
 	ptm *mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
@@ -408,7 +408,7 @@ static void pcsnsmgr_exit() noex {
 }
 /* end subroutine (pcsnsmgr_exit) */
 
-static int pcsnsmgr_begin(PCSNSMGR *uip) noex {
+local int pcsnsmgr_begin(PCSNSMGR *uip) noex {
 	int		rs = SR_OK ;
 
 	if (uip->recs == nullptr) {
@@ -432,10 +432,9 @@ static int pcsnsmgr_begin(PCSNSMGR *uip) noex {
 }
 /* end subroutine (pcsnsmgr_begin) */
 
-static int pcsnsmgr_end(PCSNSMGR *uip) noex {
+local int pcsnsmgr_end(PCSNSMGR *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (uip->recs != nullptr) {
 	    PCSNSRECS	*recsp = (PCSNSRECS *) uip->recs ;
 	    rs1 = pcsnsrecs_finish(recsp) ;
@@ -444,7 +443,6 @@ static int pcsnsmgr_end(PCSNSMGR *uip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    uip->recs = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (pcsnsmgr_end) */
