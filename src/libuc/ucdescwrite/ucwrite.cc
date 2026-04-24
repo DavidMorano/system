@@ -65,7 +65,7 @@
 #include	<localmisc.h>		/* |POLL_INTMULT| */
 
 #include	"ucdescbase.hh"
-#include	"ucwrite.h"
+#include	"ucdescwrite.h"
 
 #pragma		GCC dependency	"mod/libutil.ccm"
 
