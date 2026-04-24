@@ -101,6 +101,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<ids.h>
 #include	<sncpyx.h>
@@ -135,8 +136,6 @@ extern "C" {
 
 /* external variables */
 
-extern cchar	**environ ;
-
 
 /* local structures */
 
@@ -148,6 +147,7 @@ namespace {
     struct subinfo : openxsvc {
 	subinfo(const openxsvc &so) noex : openxsvc(so) { } ;
 	subinfo(const openxsvc *sop) noex : openxsvc(sop) { } ;
+	mainv		envv ;
 	char		*basename ;	/* memory-allocated */
 	char		*svcdname ;	/* memory-allocated */
 	char		*dialsym ;	/* memory-allocated */
@@ -169,23 +169,25 @@ namespace {
 
 /* forward references */
 
-static bool	isNoAcc(int) noex ;
+local int	subinfo_envv(DI *,mainv) noex ;
+
+local bool	isNoAcc(int) noex ;
 
 
 /* local variables */
 
-static cpcchar		soexts[] = {
+constexpr cpcchar	soexts[] = {
 	"so",
 	"o",
 	"dyld",
 	""
-} ;
+} ; /* end array */
 
-static cint		rsnoacc[] = {
+constexpr cint		rsnoacc[] = {
 	SR_NOENT,
 	SR_ACCESS,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -232,16 +234,14 @@ int subinfo::start() noex {
 		basename = nullptr ;
 	        svcdname = nullptr ;
 	        dialsym = nullptr ;
-	        if (envv == nullptr) {
-		    envv = mainv(environ) ;
-	        }
 	        fd = -1 ;
-	        rs = starts() ;
+		if ((rs = subinfo_envv(this,nullptr)) >= 0) {
+	            rs = starts() ;
+		} /* end if (subinfo_envv) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 int subinfo::starts() noex {
     	int		rs ;
@@ -259,8 +259,7 @@ int subinfo::starts() noex {
 	    rs = lm_rsfree(rs,bbuf) ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end method (subinfo::starts) */
+} /* end method (subinfo::starts) */
 
 int subinfo::startdir() noex {
     	int		rs ;
@@ -286,8 +285,7 @@ int subinfo::startdir() noex {
 	    rs = lm_rsfree(rs,dbuf) ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end method (subinfo::startdir) */
+} /* end method (subinfo::startdir) */
 
 int subinfo::startsym() noex {
     	int		rs ;
@@ -300,8 +298,7 @@ int subinfo::startsym() noex {
 	    rs = lm_rsfree(rs,sbuf) ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end method (subinfo::startsym) */
+} /* end method (subinfo::startsym) */
 
 int subinfo::finish() noex {
 	int		rs = SR_OK ;
@@ -322,8 +319,7 @@ int subinfo::finish() noex {
 	    basename = nullptr ;
 	}
 	return rs ;
-}
-/* end method (subinfo::finish) */
+} /* end method (subinfo::finish) */
 
 int subinfo::search() noex {
 	int		rs ;
@@ -345,8 +341,7 @@ int subinfo::search() noex {
 	    fd = -1 ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (subinfo::search) */
+} /* end method (subinfo::search) */
 
 int subinfo::exts(char *fbuf) noex {
 	cint		am = (R_OK|X_OK) ;
@@ -372,8 +367,7 @@ int subinfo::exts(char *fbuf) noex {
 	    if (rs < 0) break ;
 	} /* end for (soexts) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (subinfo::exts) */
+} /* end method (subinfo::exts) */
 
 int subinfo::searchlib(cchar *sfn) noex {
     	cnullptr	np{} ;
@@ -388,8 +382,7 @@ int subinfo::searchlib(cchar *sfn) noex {
 	    dlclose(sop) ;
 	} /* end if (dlopen) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (subinfo::searchlib) */
+} /* end method (subinfo::searchlib) */
 
 int subinfo::searchcall(subsvc_f symp) noex {
 	int		rs ;
@@ -399,12 +392,22 @@ int subinfo::searchcall(subsvc_f symp) noex {
 	    f = true ;
 	} /* end if (call) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (subinfo::searchcall) */
+} /* end method (subinfo::searchcall) */
 
-static bool isNoAcc(int rs) noex {
+local int subinfo_envv(subinfo *op,mainv envv) noex {
+    	int	rs = SR_OK ;
+	if ((op->envv = envv) == nullptr) {
+	    if (mainv ev ; (rs = u_getenviron(&ev)) >= 0) {
+		op->envv = ev ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (subinfo_envv) */
+
+
+
+local bool isNoAcc(int rs) noex {
 	return isOneOf(rsnoacc,rs) ;
-}
-/* end subroutine (isNoAcc) */
+} /* end subroutine (isNoAcc) */
 
 
