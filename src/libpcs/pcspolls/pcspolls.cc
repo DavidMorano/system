@@ -157,40 +157,40 @@ enum cmds {
 
 /* forward references */
 
-static int pcspolls_valsbegin(pcspolls *,PCSCONF *,cchar *) noex ;
-static int pcspolls_valsend(pcspolls *) noex ;
+local int pcspolls_valsbegin(pcspolls *,PCSCONF *,cchar *) noex ;
+local int pcspolls_valsend(pcspolls *) noex ;
 
-static int thread_start(THREAD *,pcspolls *) noex ;
-static int thread_finish(THREAD *) noex ;
-static int thread_cmdrecv(THREAD *,int) noex ;
-static int thread_exiting(THREAD *) noex ;
-static int thread_cmdexit(THREAD *) noex ;
-static int thread_waitexit(THREAD *) noex ;
-static int thread_worker(THREAD *) noex ;
+local int thread_start(THREAD *,pcspolls *) noex ;
+local int thread_finish(THREAD *) noex ;
+local int thread_cmdrecv(THREAD *,int) noex ;
+local int thread_exiting(THREAD *) noex ;
+local int thread_cmdexit(THREAD *) noex ;
+local int thread_waitexit(THREAD *) noex ;
+local int thread_worker(THREAD *) noex ;
 
 #ifdef	COMMENT
-static int thread_setdone(THREAD *) noex ;
+local int thread_setdone(THREAD *) noex ;
 #endif
 
-static int work_start(WORK *,THREAD *) noex ;
-static int work_term(WORK *) noex ;
-static int work_finish(WORK *) noex ;
-static int work_objloads(WORK *,THREAD *,char *,int) noex ;
-static int work_objloadcheck(WORK *,cchar *,cchar *,int) noex ;
-static int work_objload(WORK *,POLLINFO *) noex ;
-static int work_objstarts(WORK *,THREAD *) noex ;
-static int work_objchecks(WORK *) noex ;
-static int work_objfins(WORK *) noex ;
+local int work_start(WORK *,THREAD *) noex ;
+local int work_term(WORK *) noex ;
+local int work_finish(WORK *) noex ;
+local int work_objloads(WORK *,THREAD *,char *,int) noex ;
+local int work_objloadcheck(WORK *,cchar *,cchar *,int) noex ;
+local int work_objload(WORK *,POLLINFO *) noex ;
+local int work_objstarts(WORK *,THREAD *) noex ;
+local int work_objchecks(WORK *) noex ;
+local int work_objfins(WORK *) noex ;
 
-static int pollinfo_syms(POLLINFO *,void *,cchar *,int) noex ;
+local int pollinfo_syms(POLLINFO *,void *,cchar *,int) noex ;
 
-static int pollobj_callstart(POLLOBJ *,THREAD *) noex ;
-static int pollobj_check(POLLOBJ *) noex ;
-static int pollobj_finish(POLLOBJ *) noex ;
+local int pollobj_callstart(POLLOBJ *,THREAD *) noex ;
+local int pollobj_check(POLLOBJ *) noex ;
+local int pollobj_finish(POLLOBJ *) noex ;
 
-static int mksymname(char *,cchar *,int,cchar *) noex ;
+local int mksymname(char *,cchar *,int,cchar *) noex ;
 
-static bool isrequired(int) noex ;
+local bool isrequired(int) noex ;
 
 
 /* local variables */
@@ -332,7 +332,7 @@ int pcspolls_cmd(pcspolls *op,int cmd)
 /* private subroutines */
 
 
-static int pcspolls_valsbegin(pcspolls *op,PCSCONF *pcp,cchar *sn)
+local int pcspolls_valsbegin(pcspolls *op,PCSCONF *pcp,cchar *sn)
 {
 	int		rs ;
 	int		size = 0 ;
@@ -357,7 +357,7 @@ static int pcspolls_valsbegin(pcspolls *op,PCSCONF *pcp,cchar *sn)
 /* end subroutine (pcspolls_valsbegin) */
 
 
-static int pcspolls_valsend(pcspolls *op)
+local int pcspolls_valsend(pcspolls *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -391,7 +391,7 @@ struct pcspolls_thread {
 #endif /* COMMENT */
 
 
-static int thread_start(THREAD *tip,pcspolls *op)
+local int thread_start(THREAD *tip,pcspolls *op)
 {
 	int		rs ;
 
@@ -423,7 +423,7 @@ static int thread_start(THREAD *tip,pcspolls *op)
 /* end subroutine (thread_start) */
 
 
-static int thread_finish(THREAD *tip)
+local int thread_finish(THREAD *tip)
 {
 	const pid_t	pid = getpid() ;
 	int		rs = SR_OK ;
@@ -458,7 +458,7 @@ static int thread_finish(THREAD *tip)
 /* end subroutine (thread_finish) */
 
 
-static int thread_cmdrecv(THREAD *tip,int to)
+local int thread_cmdrecv(THREAD *tip,int to)
 {
 	int		rs ;
 	int		cmd = 0 ;
@@ -474,7 +474,7 @@ static int thread_cmdrecv(THREAD *tip,int to)
 /* end subroutine (thread_cmdrecv) */
 
 
-static int thread_exiting(THREAD *tip)
+local int thread_exiting(THREAD *tip)
 {
 	tip->f_exiting = true ;
 	return thrcomm_exiting(&tip->tc) ;
@@ -482,7 +482,7 @@ static int thread_exiting(THREAD *tip)
 /* end subroutine (thread_exiting) */
 
 
-static int thread_cmdexit(THREAD *tip)
+local int thread_cmdexit(THREAD *tip)
 {
 	int		rs = SR_OK ;
 	if (! tip->f_exiting) {
@@ -494,7 +494,7 @@ static int thread_cmdexit(THREAD *tip)
 /* end subroutine (thread_cmdexit) */
 
 
-static int thread_waitexit(THREAD *tip)
+local int thread_waitexit(THREAD *tip)
 {
 	int		rs ;
 	int		trs ;
@@ -507,7 +507,7 @@ static int thread_waitexit(THREAD *tip)
 
 
 #ifdef	COMMENT
-static int thread_setdone(THREAD *tip)
+local int thread_setdone(THREAD *tip)
 {
 	cint	rrs = 1 ;
 	return thrcomm_rspsend(&tip->tc,rrs,-1) ;
@@ -516,7 +516,7 @@ static int thread_setdone(THREAD *tip)
 #endif /* COMMENT */
 
 
-static int thread_worker(THREAD *tip)
+local int thread_worker(THREAD *tip)
 {
 	WORK		w ;
 	cint	to = 4 ;
@@ -569,7 +569,7 @@ static int thread_worker(THREAD *tip)
 }
 /* end subroutine (thread_worker) */
 
-static int work_start(WORK *wp,THREAD *tip) noex {
+local int work_start(WORK *wp,THREAD *tip) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar	*pr = tip->pr ;
@@ -623,7 +623,7 @@ static int work_start(WORK *wp,THREAD *tip) noex {
 /* end subroutine (work_start) */
 
 
-static int work_finish(WORK *wp)
+local int work_finish(WORK *wp)
 {
 	VECHAND		*plp ;
 	int		rs = SR_OK ;
@@ -656,7 +656,7 @@ static int work_finish(WORK *wp)
 /* end subroutine (work_finish) */
 
 
-static int work_term(WORK *wp)
+local int work_term(WORK *wp)
 {
 	if (wp == nullptr) return SR_FAULT ;
 	wp->f_term = true ;
@@ -668,7 +668,7 @@ static int work_term(WORK *wp)
 }
 /* end subroutine (work_term) */
 
-static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen) noex {
+local int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -697,7 +697,7 @@ static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen) noex {
 }
 /* end subroutine (work_objloads) */
 
-static int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
+local int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
 	struct pollinfo	oi ;
 	int		rs ;
 	int		c = 0 ;
@@ -744,7 +744,7 @@ static int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
 /* end subroutine (work_objloadcheck) */
 
 
-static int work_objload(WORK *wp,POLLINFO *oip)
+local int work_objload(WORK *wp,POLLINFO *oip)
 {
 	cint	psize = sizeof(POLLOBJ) ;
 	int		rs ;
@@ -792,7 +792,7 @@ static int work_objload(WORK *wp,POLLINFO *oip)
 /* end subroutine (work_objload) */
 
 
-static int work_objstarts(WORK *wp,THREAD *tip)
+local int work_objstarts(WORK *wp,THREAD *tip)
 {
 	VECHAND		*plp = &wp->polls ;
 	POLLOBJ		*pop ;
@@ -815,7 +815,7 @@ static int work_objstarts(WORK *wp,THREAD *tip)
 /* end subroutine (work_objstarts) */
 
 
-static int work_objchecks(WORK *wp)
+local int work_objchecks(WORK *wp)
 {
 	VECHAND		*plp = &wp->polls ;
 	POLLOBJ		*pop ;
@@ -841,7 +841,7 @@ static int work_objchecks(WORK *wp)
 /* end subroutine (work_objchecks) */
 
 
-static int work_objfins(WORK *wp)
+local int work_objfins(WORK *wp)
 {
 	VECHAND		*plp = &wp->polls ;
 	POLLOBJ		*pop ;
@@ -869,7 +869,7 @@ static int work_objfins(WORK *wp)
 /* end subroutine (work_objfins) */
 
 
-static int pollinfo_syms(POLLINFO *oip,void *sop,cchar *sp,int sl)
+local int pollinfo_syms(POLLINFO *oip,void *sop,cchar *sp,int sl)
 {
 	int		rs ;
 	char		symname[SYMNAMELEN+1] ;
@@ -914,7 +914,7 @@ static int pollinfo_syms(POLLINFO *oip,void *sop,cchar *sp,int sl)
 /* end subroutine (pollinfo_syms) */
 
 
-static int pollobj_callstart(POLLOBJ *pop,THREAD *tip)
+local int pollobj_callstart(POLLOBJ *pop,THREAD *tip)
 {
 	int		rs = SR_OK ;
 
@@ -944,7 +944,7 @@ static int pollobj_callstart(POLLOBJ *pop,THREAD *tip)
 /* end subroutine (pollobj_callstart) */
 
 
-static int pollobj_check(POLLOBJ *pop)
+local int pollobj_check(POLLOBJ *pop)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -979,7 +979,7 @@ static int pollobj_check(POLLOBJ *pop)
 /* end subroutine (pollobj_check) */
 
 
-static int pollobj_finish(POLLOBJ *pop)
+local int pollobj_finish(POLLOBJ *pop)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1024,7 +1024,7 @@ static int pollobj_finish(POLLOBJ *pop)
 }
 /* end subroutine (pollobj_finish) */
 
-static int mksymname(char *rbuf,cchar *sp,int sl,cchar *sub) noex {
+local int mksymname(char *rbuf,cchar *sp,int sl,cchar *sub) noex {
 	cint		rlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		nl = 0 ;
@@ -1044,7 +1044,7 @@ static int mksymname(char *rbuf,cchar *sp,int sl,cchar *sub) noex {
 }
 /* end subroutine (mksymname) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	int		f = false ;
 	switch (i) {
 	case sub_start:
