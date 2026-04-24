@@ -111,7 +111,7 @@ namespace {
 	    	    } /* end if (got a match) */
 		} /* end if */
 		return (rs >= 0) ? rl : rs ;
-	} /* end method (operator) */
+	} ; /* end method (operator) */
     } ; /* end struct (getter) */
 } /* end namespace */
 
