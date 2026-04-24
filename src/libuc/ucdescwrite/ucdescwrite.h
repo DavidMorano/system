@@ -54,7 +54,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 
-#include	<ucwrite.h>
 #include	<ucwritedesc.h>
 #include	<ucwritefile.h>
 
