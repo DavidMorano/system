@@ -76,6 +76,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<bufsizevar.hh>
+#include	<getx.h>
 #include	<sncpyx.h>
 #include	<isnot.h>		/* isNotPresent(3uc)| */
 #include	<localmisc.h>
@@ -98,8 +99,8 @@ import uconstants ;			/* |varname(3u)| */
 /* external subroutines */
 
 extern "C" {
-    extern int uc_stat(int,ustat *) noex ;
-    extern int uc_getcwd(char *,int) noex ;
+    extern int uc_stat		(int,ustat *) noex ;
+    extern int uc_getcwd	(char *,int) noex ;
 }
 
 
@@ -133,7 +134,7 @@ int getpwds(ustat *sbp,char *pwbuf,int pwlen) noex {
 	if (pwbuf) {
 	    pwbuf[0] = '\0' ;
 	    if ((rs = maxpathlen) >= 0) {
-		static cchar	*pwd = getenv(varname.pwd) ;
+		static cchar	*pwd = getenver(varname.pwd) ;
 	        if (pwlen < 0) pwlen = rs ;
 	        if (pwd != nullptr) {
 	            ustat	*ssbp, sb1, sb2 ;
