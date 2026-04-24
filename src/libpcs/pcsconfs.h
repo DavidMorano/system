@@ -40,7 +40,7 @@
 
 struct pcsconfs_cursor {
 	var_cur		vcur ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct pcsconfs_object {
@@ -58,11 +58,11 @@ struct pcsconfs_head {
 	mainv		envv ;
 	cchar		*pr ;			/* program-root */
 	cchar		*cfname ;		/* DB database name */
-	cchar		*a ;			/* memory allocation */
+	char		*a ;			/* memory allocation */
 	var		db ;
 	time_t		ti_conf ;		/* DB mtime */
 	PCSCONFS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 } ; /* end struct */
 
