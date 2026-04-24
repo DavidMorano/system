@@ -1,4 +1,4 @@
-/* ucsock HEADER */
+/* ucdescsock HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -15,24 +15,27 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	UCSOCK_INCLUDE
-#define	UCSOCK_INCLUDE
+#ifndef	UCDESCSOCK_INCLUDE
+#define	UCDESCSOCK_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
 
-#include	"ucsockprime.h"
+#include	<ucsockprime.h>
 
 EXTERNC_begin
 
 extern int uc_sockjoin(int,SOCKADDR *,int,int,mode_t) noex ;
 extern int uc_sockreuse(int) noex ;
+local inline int uc_reuseaddr(int fd) noex {
+    	return uc_sockreuse(fd) ;
+}
 
 EXTERNC_end
 
 
-#endif /* UCSOCK_INCLUDE */
+#endif /* UCDESCSOCK_INCLUDE */
 
 
