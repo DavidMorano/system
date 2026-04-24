@@ -1,0 +1,16 @@
+
+
+#if defined(__APPLE__) || defined(__MACH__)
+    #include <crt_externs.h>
+    #define FETCH_ENVIRON() (*_NSGetEnviron())
+#elif defined(__sun) || defined(__SVR4)
+    // Solaris/Illumos specific handling if needed
+    extern char **environ;
+    #define FETCH_ENVIRON() (environ)
+#else
+    // Linux and other standard Unices
+    extern char **environ;
+    #define FETCH_ENVIRON() (environ)
+#endif
+
+
