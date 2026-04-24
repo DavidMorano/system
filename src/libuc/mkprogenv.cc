@@ -67,9 +67,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |lenstr(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>		/* |u_getenviron(3u)| */
 #include	<uclibmem.h>
 #include	<ucsysconf.h>
 #include	<uinfo.h>
@@ -115,8 +115,6 @@ import uconstants ;
 
 /* imported namespaces */
 
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -128,17 +126,15 @@ using std::nothrow ;			/* constant */
 
 /* external variables */
 
-extern cchar	**environ ; /* secretly it is really 'char **' */
-
 
 /* forward reference */
 
 template<typename ... Args>
 local int mkprogenv_ctor(mkprogenv *op,Args ... args) noex {
     	MKPROGENV	*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    cnullptr	np{} ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->envp = new(nothrow) vechand) != np) ylikely {
@@ -174,12 +170,13 @@ template<typename ... Args>
 local inline int mkprogenv_magic(mkprogenv *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MKPROGENV_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MKPROGENV_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mkprogenv_magic) */
 
-local int mkprogenv_mkenv(mkprogenv *,mainv) noex ;
+local int mkprogenv_envv(mkprogenv *,mainv) noex ;
+local int mkprogenv_mkenv(mkprogenv *) noex ;
 local int mkprogenv_mkenvdef(mkprogenv *,EL *,mainv) noex ;
 local int mkprogenv_mkenvsys(mkprogenv *,EL *,mainv) noex ;
 local int mkprogenv_mkenvextras(mkprogenv *,EL *,mainv) noex ;
@@ -276,28 +273,30 @@ static bufsizevar	maxhostlen(bufsize_hn) ;
 
 /* exported subroutines */
 
-int mkprogenv_start(mkprogenv *op,mainv envv) noex {
-	mainv		progenviron = mainv(environ) ;
+int mkprogenv_start(mkprogenv *op,mainv ev) noex {
 	int		rs ;
 	if ((rs = mkprogenv_ctor(op)) >= 0) ylikely {
-	    cint	vn = NENVS ;
-	    cint	vo = VECHAND_OCOMPACT ;
-	    op->envv = (envv) ? envv : progenviron ;
-	    if ((rs = vechand_start(op->envp,vn,vo)) >= 0) ylikely {
-	        cint	ssz = 256 ;
-	        if ((rs = strpack_start(op->storep,ssz)) >= 0) ylikely {
-	            rs = mkprogenv_mkenv(op,envv) ;
+	    if ((rs = mkprogenv_envv(op,ev)) >= 0) ylikely {
+	        cint	vn = NENVS ;
+	        cint	vo = VECHAND_OCOMPACT ;
+	        if ((rs = vechand_start(op->envp,vn,vo)) >= 0) ylikely {
+	            cint	ssz = 256 ;
+	            if ((rs = strpack_start(op->storep,ssz)) >= 0) ylikely {
+	                if ((rs = mkprogenv_mkenv(op)) >= 0) {
+			    op->magval = MKPROGENV_MAGIC ;
+		        }
+	                if (rs < 0) {
+	                    strpack_finish(op->storep) ;
+		        }
+	            } /* end if (strpack_start) */
 	            if (rs < 0) {
-	                strpack_finish(op->storep) ;
-		    }
-	        } /* end if (strpack_start) */
+	                vechand_finish(op->envp) ;
+	            }
+	        } /* end if (vechand_start) */
 	        if (rs < 0) {
-	            vechand_finish(op->envp) ;
+		    mkprogenv_dtor(op) ;
 	        }
-	    } /* end if (vechand_start) */
-	    if (rs < 0) {
-		mkprogenv_dtor(op) ;
-	    }
+	    } /* end if (mkprogenv_envv) */
 	} /* end if (mkprogenv_ctor) */
 	return rs ;
 }
@@ -324,7 +323,7 @@ int mkprogenv_finish(mkprogenv *op) noex {
 	        rs1 = strpack_finish(op->storep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->envv) {
+	    if (op->envp) {
 	        rs1 = vechand_finish(op->envp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -397,6 +396,16 @@ int mkprogenv_getvec(mkprogenv *op,mainv *evp) noex {
 
 /* private subroutines */
 
+local int mkprogenv_envv(mkprogenv *op,mainv ev) noex {
+    	int	rs = SR_OK ;
+	if ((op->envv = ev) == nullptr) {
+	    if ((rs = u_getenviron(&ev)) >= 0) ylikely {
+		op->envv = ev ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (mkprogenv_envv) */
+
 local int mkprogenv_mkenvpwd(mkprogenv *op,EL *etp) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
@@ -417,7 +426,7 @@ local int mkprogenv_mkenvpwd(mkprogenv *op,EL *etp) noex {
 }
 /* end subroutine (mkprogenv_mkenvpwd) */
 
-local int mkprogenv_mkenv(mkprogenv *op,mainv envv) noex {
+local int mkprogenv_mkenv(mkprogenv *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -425,9 +434,9 @@ local int mkprogenv_mkenv(mkprogenv *op,mainv envv) noex {
 	    vechand	*elp = op->envp ;
 	    bool	f_path = false ;
 	    cchar	*varpath = varname.path ;
-	    if ((rs >= 0) && (envv != nullptr)) {
-	        for (int i = 0 ; (rs >= 0) && envv[i] ; i += 1) {
-	            cchar	*kp = envv[i] ;
+	    if ((rs >= 0) && (op->envv != nullptr)) {
+	        for (int i = 0 ; (rs >= 0) && op->envv[i] ; i += 1) {
+	            cchar	*kp = op->envv[i] ;
 	            if (matkeystr(envbad,kp,-1) < 0) {
 	                if ((! f_path) && (kp[0] == 'P')) {
 	                    f_path = (strkeycmp(kp,varpath) == 0) ;
@@ -444,14 +453,14 @@ local int mkprogenv_mkenv(mkprogenv *op,mainv envv) noex {
 	        n += rs ;
 	    } /* end if (PATH) */
 	    /* default environment variables */
-	    if ((rs >= 0) && (envv == nullptr)) {
+	    if ((rs >= 0) && (op->envv == nullptr)) {
 	        rs = mkprogenv_mkenvdef(op,&et,envdef) ;
 	        n += rs ;
 	    }
 	    /* system environment variables */
 	    if (rs >= 0) ylikely {
 	        if ((rs = mkprogenv_mkenvdef(op,&et,envsys)) >= 0) ylikely {
-		    cint	ne = int(nelem(envsys) - 1) ;
+		    cint ne = int(nelem(envsys) - 1) ;
 	            n += rs ;
 	            if (rs < ne) {
 	                rs = mkprogenv_mkenvsys(op,&et,envsys) ;
@@ -485,7 +494,7 @@ local int mkprogenv_mkenvdef(mkprogenv *op,EL *etp,mainv envs) noex {
 	    cchar	*kp = envs[i] ;
 	    if ((rs = etp->present(kp)) == rsn) {
 	        rs = SR_OK ;
-	        if (cchar *cp ; (cp = getourenv(op->envv,kp)) != nullptr) {
+	        if (cchar *cp = getourenv(op->envv,kp) ; cp) {
 	            n += 1 ;
 	            rs = mkprogenv_envadd(op,etp,kp,cp,-1) ;
 	        } /* end if */
