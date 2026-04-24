@@ -141,32 +141,30 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* external variables */
 
-extern cchar	**environ ;
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	u_openex(UCOPENINFO *) noex ;
+local int	u_openex(UCOPENINFO *) noex ;
 
-static int	open_eval(UCOPENINFO *) noex ;
-static int	open_otherlink(UCOPENINFO *,int *,char *) noex ;
-static int	open_othertry(UCOPENINFO *,int *,char *) noex ;
-static int	open_floatpath(UCOPENINFO *,int) noex ;
-static int	open_pseudopath(UCOPENINFO *,cchar *,int) noex ;
-static int	open_nonpath(UCOPENINFO *,int) noex ;
-static int	open_nonpather(UCOPENINFO *,int,cchar *,cchar *) noex ;
+local int	open_eval(UCOPENINFO *) noex ;
+local int	open_otherlink(UCOPENINFO *,int *,char *) noex ;
+local int	open_othertry(UCOPENINFO *,int *,char *) noex ;
+local int	open_floatpath(UCOPENINFO *,int) noex ;
+local int	open_pseudopath(UCOPENINFO *,cchar *,int) noex ;
+local int	open_nonpath(UCOPENINFO *,int) noex ;
+local int	open_nonpather(UCOPENINFO *,int,cchar *,cchar *) noex ;
 
-static int	openproger(cchar *,int,mainv) noex ;
-static int	accmode(int) noex ;
-static int	waitready(int,int,int) noex ;
-static int	pollok(int) noex ;
-static int	getprefixfs(cchar *,cchar **) noex ;
-static int	getnormalfs(cchar *,cchar **) noex ;
-static int	noexist(cchar *,int) noex ;
-static int	loadargs(vecstr *,cchar *) noex ;
+local int	openproger(cchar *,int,mainv) noex ;
+local int	accmode(int) noex ;
+local int	waitready(int,int,int) noex ;
+local int	pollok(int) noex ;
+local int	getprefixfs(cchar *,cchar **) noex ;
+local int	getnormalfs(cchar *,cchar **) noex ;
+local int	noexist(cchar *,int) noex ;
+local int	loadargs(vecstr *,cchar *) noex ;
 
 #if	CF_ISMORE
 extern int	isMorePossible(int) noex ;
@@ -284,7 +282,7 @@ int uc_openinfo(ucopeninfo *oip) noex {
 
 /* local subroutines */
 
-static int u_openex(ucopeninfo *oip) noex {
+local int u_openex(ucopeninfo *oip) noex {
 	int		rs ;
 	int		oflags = oip->oflags ;
 	int		fd = -1 ;
@@ -336,7 +334,7 @@ static int u_openex(ucopeninfo *oip) noex {
 }
 /* end subroutine (u_openex) */
 
-static int open_eval(ucopeninfo *oip) noex {
+local int open_eval(ucopeninfo *oip) noex {
 	int		rs = SR_OK ;
 	int		npi ;			/* non-path index */
 	int		fd = -1 ;
@@ -393,7 +391,7 @@ static int open_eval(ucopeninfo *oip) noex {
 }
 /* end subroutine (open_eval) */
 
-static int open_othertry(ucopeninfo *oip,int *fdp,char *ofname) noex {
+local int open_othertry(ucopeninfo *oip,int *fdp,char *ofname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
@@ -443,7 +441,7 @@ static int open_othertry(ucopeninfo *oip,int *fdp,char *ofname) noex {
 }
 /* end subroutine (open_othertry) */
 
-static int open_otherlink(ucopeninfo *oip,int *fdp,char *ofname) noex {
+local int open_otherlink(ucopeninfo *oip,int *fdp,char *ofname) noex {
 	cint	rlen = MAXPATHLEN ;
 	int		rs ;
 	int		fd = -1 ;
@@ -500,7 +498,7 @@ static int open_otherlink(ucopeninfo *oip,int *fdp,char *ofname) noex {
 }
 /* end subroutine (open_otherlink) */
 
-static int open_floatpath(ucopeninfo *oip,int npi) noex {
+local int open_floatpath(ucopeninfo *oip,int npi) noex {
 	int		rs = SR_OK ;
 	switch (npi) {
 	case nonpath_dialer:
@@ -516,7 +514,7 @@ static int open_floatpath(ucopeninfo *oip,int npi) noex {
 }
 /* end subroutine (open_floatpath) */
 
-static int open_pseudopath(ucopeninfo *oip,cchar *rp,int pi) noex {
+local int open_pseudopath(ucopeninfo *oip,cchar *rp,int pi) noex {
 	int		rs = SR_OK ;
 	switch (pi) {
 	case prefixfs_proto:
@@ -561,7 +559,7 @@ static int open_pseudopath(ucopeninfo *oip,cchar *rp,int pi) noex {
 }
 /* end subroutine (open_pseudopath) */
 
-static int open_nonpath(ucopeninfo *oip,int npi) noex {
+local int open_nonpath(ucopeninfo *oip,int npi) noex {
 	cint	nlen = PRNBUFLEN ;
 	cint	nch = mkchar(nonpaths[npi]) ;
 	int		rs = SR_OK ;
@@ -598,7 +596,7 @@ static int open_nonpath(ucopeninfo *oip,int npi) noex {
 }
 /* end subroutine (open_nonpath) */
 
-static int open_nonpather(ucopeninfo *oip,int npi,cchar *prn,cchar *sp) noex {
+local int open_nonpather(ucopeninfo *oip,int npi,cchar *prn,cchar *sp) noex {
 	vecstr		args ;
 	int		rs ;
 	int		rs1 ;
@@ -708,7 +706,7 @@ static int open_nonpather(ucopeninfo *oip,int npi,cchar *prn,cchar *sp) noex {
 }
 /* end if (open_nonpather) */
 
-static int openproger(cchar *fname,int oflags,mainv ev) noex {
+local int openproger(cchar *fname,int oflags,mainv ev) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
@@ -763,7 +761,7 @@ static int openproger(cchar *fname,int oflags,mainv ev) noex {
 }
 /* end subroutine (openproger) */
 
-static int accmode(int oflags) noex {
+local int accmode(int oflags) noex {
 	int		rs = SR_INVALID ;
 	int		am = (oflags & O_ACCMODE) ;
 	switch (am) {
@@ -784,7 +782,7 @@ static int accmode(int oflags) noex {
 }
 /* end subroutine (accmode) */
 
-static int waitready(int fd,int oflags,int timeout) noex {
+local int waitready(int fd,int oflags,int timeout) noex {
 	cint	f_rdonly = (oflags & O_RDONLY) ;
 	int		rs = SR_OK ;
 	int		f_wait ;
@@ -830,7 +828,7 @@ static int waitready(int fd,int oflags,int timeout) noex {
 }
 /* end subroutine (waitready) */
 
-static int pollok(int re) noex {
+local int pollok(int re) noex {
 	int		rs = SR_OK ;
 	if (re & POLLHUP) {
 	    rs = SR_HANGUP ;
@@ -843,7 +841,7 @@ static int pollok(int re) noex {
 }
 /* end subroutine (pollok) */
 
-static int getnormalfs(cchar *fname,cchar **rpp) noex {
+local int getnormalfs(cchar *fname,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		pi = -1 ;
 
@@ -873,7 +871,7 @@ static int getnormalfs(cchar *fname,cchar **rpp) noex {
 /* end subroutine (getnormalfs) */
 
 /* get the prefix-FS index (if there is a prefix-FS) */
-static int getprefixfs(cchar *fname,cchar **rpp) noex {
+local int getprefixfs(cchar *fname,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		pi = -1 ;
 	cchar		*tp = nullptr ;
@@ -918,7 +916,7 @@ static int getprefixfs(cchar *fname,cchar **rpp) noex {
 }
 /* end subroutine (getprefixfs) */
 
-static int noexist(cchar *pp,int pl) noex {
+local int noexist(cchar *pp,int pl) noex {
 	cint		nlen = MAXNAMELEN ;
 	int		rs ;
 	char		nbuf[MAXNAMELEN + 1] ;
@@ -939,7 +937,7 @@ static int noexist(cchar *pp,int pl) noex {
 }
 /* end subroutine (noexist) */
 
-static int loadargs(vecstr *alp,cchar *sp) noex {
+local int loadargs(vecstr *alp,cchar *sp) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (sp[0] != '\0') {
@@ -964,7 +962,7 @@ static int loadargs(vecstr *alp,cchar *sp) noex {
 /* end subroutine (loadargs) */
 
 #if	CF_ISMORE
-static int isMorePossible(int rs) noex {
+local int isMorePossible(int rs) noex {
 	return isOneOf(rsmore,rs) ;
 }
 /* end subroutine (isMorePossible) */
