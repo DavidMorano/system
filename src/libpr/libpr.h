@@ -23,10 +23,11 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 
-#include	<prgetprogpath.h>
+#include	<prenvfile.h>
 #include	<prgetclustername.h>
-#include	<prmktmpdir.h>
+#include	<prgetprogpath.h>
 #include	<prmkfname.h>
+#include	<prmktmpdir.h>
 #include	<propenqotd.h>
 
 
