@@ -32,7 +32,7 @@ enum gethzes {
 	gethz_tck,
 	gethz_guess,
 	gethz_overlast
-} ;
+} ; /* end enum (gethzes) */
 
 #ifdef	__cplusplus
 
@@ -43,7 +43,7 @@ namespace ucgetx {
 	    return operator () (0) ;
 	} ;
     } ; /* end struct (gethzer) */
-}
+} /* end namespace (ucgetx) */
 
 extern ucgetx::gethzer	gethz ;
 
