@@ -69,7 +69,7 @@ import libutil ;			/* |lenstr(3u)| */
 /* forward references */
 
 template<typename ... Args>
-static inline int pcsunodes_magic(pcsunodes *op,Args ... args) noex {
+local inline int pcsunodes_magic(pcsunodes *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == PN_MAGIC) ? SR_OK : SR_NOTOPEN ;
