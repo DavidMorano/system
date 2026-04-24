@@ -52,7 +52,7 @@
 #include	<usyscalls.h>
 #include	<uctc.h>		/* terminal-control */
 #include	<ucsysconf.h>
-#include	<ucread.h>
+#include	<ucdescread.h>
 #include	<ascii.h>
 #include	<baops.h>
 #include	<charq.h>
