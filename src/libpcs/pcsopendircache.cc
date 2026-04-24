@@ -116,12 +116,12 @@ namespace {
 
 /* forward references */
 
-static int procdname(cchar *,int) noex ;
-static int procdnamer(cchar *) noex ;
-static int procdiffers(vecpstr *,cchar *) noex ;
-static int procdiffer(vecpstr *,cchar *) noex ;
-static int procdircache(vecpstr *,cchar *) noex ;
-static int procdircacher(vecpstr *,cchar *) noex ;
+local int procdname(cchar *,int) noex ;
+local int procdnamer(cchar *) noex ;
+local int procdiffers(vecpstr *,cchar *) noex ;
+local int procdiffer(vecpstr *,cchar *) noex ;
+local int procdircache(vecpstr *,cchar *) noex ;
+local int procdircacher(vecpstr *,cchar *) noex ;
 
 
 /* local variables */
@@ -233,7 +233,7 @@ int dirhelp::proc() noex {
 }
 /* end method (dirhelp::proc) */
 
-static int procdname(cchar *newsdname,int ttl) noex {
+local int procdname(cchar *newsdname,int ttl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -260,7 +260,7 @@ static int procdname(cchar *newsdname,int ttl) noex {
 }
 /* end subroutine (procdname) */
 
-static int procdnamer(cchar *newsdname) noex {
+local int procdnamer(cchar *newsdname) noex {
 	vecpstr		dirs ;
 	int		rs ;
 	int		rs1 ;
@@ -279,7 +279,7 @@ static int procdnamer(cchar *newsdname) noex {
 }
 /* end subroutine (procdnamer) */
 
-static int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
+local int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 	cint		ml = strlen(DIRCACHE_MAGICSTR) ;
 	int		rs ;
 	int		rs1 ;
@@ -309,7 +309,7 @@ static int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 }
 /* end subroutine (procdiffer) */
 
-static int procdiffers(vecpstr *dlp,cchar *dcfname) noex {
+local int procdiffers(vecpstr *dlp,cchar *dcfname) noex {
 	int		rs ;
 	int		rs1 ;
 	bool		fmis = false ;
@@ -343,7 +343,7 @@ static int procdiffers(vecpstr *dlp,cchar *dcfname) noex {
 }
 /* end subroutine (procdiffers) */
 
-static int procdircache(vecpstr *dlp,cchar *newsdname) noex {
+local int procdircache(vecpstr *dlp,cchar *newsdname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -374,7 +374,7 @@ static int procdircache(vecpstr *dlp,cchar *newsdname) noex {
 }
 /* end subroutine (procdircache) */
 
-static int procdircacher(vecpstr *dlp,cchar *fn) noex {
+local int procdircacher(vecpstr *dlp,cchar *fn) noex {
 	bfile		dcfile, *dcfp = &dcfile ;
 	int		rs ;
 	int		rs1 ;
