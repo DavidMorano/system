@@ -81,7 +81,7 @@
 
 /* forward references */
 
-static int	makeconn(int,int,SOCKADDR *,int, int) noex ;
+local int	makeconn(int,int,SOCKADDR *,int, int) noex ;
 
 
 /* local variables */
@@ -98,7 +98,7 @@ int uc_opensocket(cchar *fname,int oflags,int to) noex {
 	int		s = -1 ;
 	char		buf[BUFLEN + 1] ;
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
@@ -132,7 +132,7 @@ int uc_opensocket(cchar *fname,int oflags,int to) noex {
 
 /* local subroutines */
 
-static int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int to) noex {
+local int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int to) noex {
 	int		rs ;
 	int		s = 0 ;
 	char	sfname[MAXPATHLEN+1] = { 0 } ;
@@ -141,7 +141,7 @@ static int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int to) noex {
 	if (ptype == SOCK_DGRAM) {
 	    cchar	*cp ;
 	    char	tpat[MAXPATHLEN + 1] ;
-	    if ((cp = getenv(VARTMPDNAME)) == NULL) {
+	    if ((cp = getenv(VARTMPDNAME)) == nullptr) {
 		cp = TMPDNAME ;
 	    }
 	    mkpath2(tpat,cp,"openXXXXXXXXXX") ;
@@ -166,7 +166,6 @@ static int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int to) noex {
 	}
 
 	return (rs >= 0) ? s : rs ;
-}
-/* end subroutine (makeconn) */
+} /* end subroutine (makeconn) */
 
 
