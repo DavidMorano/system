@@ -34,7 +34,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<ucwrite.h>
+#include	<ucdescwrite.h>
 #include	<localmisc.h>
 
 #include	"recip.h"
