@@ -46,6 +46,7 @@
 	u_waitpid
 	u_nanosleep
 	u_getcwd
+	u_getenviron
 
 
 	Name:
@@ -147,9 +148,7 @@
 #include	<cstdarg>		/* |uintptr_t| */
 #include	<utility>		/* |unreachable(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<usupport.h>
 #include	<intsat.h>
@@ -516,6 +515,10 @@ int u_getcwd(char *pbuf,int plen) noex {
 }
 /* end subroutine (u_getcwd) */
 
+int u_getenviron(mainv *rp) noex {
+	return libu::usys_environ(rp) ;
+}
+
 
 /* local subroutines */
 
@@ -702,6 +705,6 @@ namespace libu {
 	}
 	return rs ;
     } /* end method (ungroper::operator) */
-}
+} /* end namespace (libu) */
 
 
