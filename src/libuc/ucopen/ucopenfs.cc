@@ -101,7 +101,7 @@ extern int	debugprintf(char *,...) ;
 
 /* forward reference */
 
-static int	accmode(int) ;
+local int	accmode(int) ;
 
 
 /* local variables */
@@ -148,9 +148,7 @@ int uc_openfs(cchar *passfname,int oflags,int timeout,int opts) noex {
 
 /* local subroutines */
 
-
-static int accmode(int oflags)
-{
+local int accmode(int oflags) noex {
 	int		rs = SR_INVALID ;
 	int		am = (oflags & (O_RDONLY | O_WRONLY | O_RDWR)) ;
 	switch (am) {
@@ -168,7 +166,6 @@ static int accmode(int oflags)
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end subroutine (accmode) */
+} /* end subroutine (accmode) */
 
 
