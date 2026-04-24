@@ -71,7 +71,7 @@ extern "C" {
 
 /* forward references */
 
-static int isRealName(cchar *,int) noex ;
+local int isRealName(cchar *,int) noex ;
 
 
 /* local variables */
@@ -197,7 +197,7 @@ int uc_opensys(cc *fname,int of,mode_t om,mainv envv,int to,int oo) noex {
 
 /* local subroutines */
 
-static int isRealName(cchar *fname,int fl) noex {
+local int isRealName(cchar *fname,int fl) noex {
 	int		len = 0 ;
 	cchar		*cp ;
 	if (int cl ; (cl = sfbasename(fname,fl,&cp)) > 0) {
@@ -215,7 +215,6 @@ static int isRealName(cchar *fname,int fl) noex {
 	    }
 	}
 	return len ;
-}
-/* end subroutine (isRealName) */
+} /* end subroutine (isRealName) */
 
 
