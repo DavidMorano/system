@@ -40,7 +40,7 @@
 	dfd		destination file-descriptor
 	sfname		source file-name
 	dfname		destination file-name
-	len		number of byte to copy
+	len		number of bytes to copy
 
 *******************************************************************************/
 
@@ -57,7 +57,7 @@
 #include	<ucdescbase.hh>
 #include	<ucdescread.h>
 #include	<ucdescwrite.h>
-#include	<ucsock.h>
+#include	<ucdescsock.h>
 #include	<ucdescmisc.h>
 
 
