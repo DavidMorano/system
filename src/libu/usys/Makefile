@@ -57,14 +57,14 @@ OBJ11_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 
 OBJ12_USYS= usys_shadow.o usys_isaexec.o usys_fdatasync.o
 OBJ13_USYS= usys_eaccess.o usys_stat.o usys_xti.o
-OBJ14_USYS=
+OBJ14_USYS= usys_environ.o
 OBJ15_USYS=
 
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
 OBJC= obj06_usys.o obj07_usys.o obj08_usys.o
 OBJD= obj09_usys.o obj10_usys.o obj11_usys.o 
-OBJE= obj12_usys.o obj13_usys.o
+OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
 
 OBJ_USYS= obja.o objb.o objc.o objd.o obje.o
 
@@ -243,11 +243,12 @@ usys_streams.o:		usys_streams.cc usys_streams.h			$(INCS)
 usys_pipes.o:		usys_pipes.cc usys_pipes.h			$(INCS)
 usys_stat.o:		usys_stat.cc usys_stat.h			$(INCS)
 usys_libstr.o:		usys_libstr.cc usys_libstr.h			$(INCS)
-usys_getexecname.o:	usys_getexecname.cc getexecname.h		$(INCS)
+usys_getexecname.o:	usys_getexecname.cc	getexecname.h		$(INCS)
 usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
 usys_isaexec.o:		usys_isaexec.cc		usys_isaexec.h		$(INCS)
 usys_fatasync.o:	usys_fdatasync.cc	usys_fdatasync.h	$(INCS)
 usys_eaccess.o:		usys_eaccess.cc		usys_eaccess.h		$(INCS)
 usys_xti.o:		usys_xti.cc		usys_xti.h		$(INCS)
+usys_environ.o:		usys_environ.cc		usys_environ.hh		$(INCS)
 
 
