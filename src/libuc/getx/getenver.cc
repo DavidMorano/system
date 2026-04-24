@@ -5,14 +5,14 @@
 /* get the value of an environment variable */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
 	This subroutine was written from scratch.  There are (or
-	may) be some other standard ones floating around like it
-	but I could not find one that was exactly what I needed
-	(sigh).
+	may be) some other ones floating around like it but I could
+	not find one that was exactly what I needed (sigh).
 
 */
 
@@ -26,8 +26,8 @@
 	Description:
 	This subroutine is like |getenv(3c)| except that it also
 	takes an additional argument that specifies the length of
-	the environment variable string to look up in the environment
-	array.
+	the environment variable key string to look up in the
+	environment array.
 
 	Synposis:
 	cchar		*getenver(cchar *np,int nl) noex
@@ -49,6 +49,7 @@
 #include	<algorithm>		/* |sort(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>		/* |u_getenviron(3u)| */
 #include	<ulogerror.h>
 #include	<uclibmem.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
@@ -56,14 +57,19 @@
 #include	<strnul.hh>
 #include	<matkeystr.h>
 #include	<localmisc.h>
+#include	<dprintf.hh>		/* debugging */
 
 #include	"getenver.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -81,8 +87,6 @@ using libuc::libmem ;			/* variable */
 
 /* external variables */
 
-extern mainv	environ ;
-
 
 /* local strctures */
 
@@ -95,8 +99,8 @@ namespace {
 		tab[i] = ushort(i) ;
 	    } ; /* end for */
 	} ; /* end method (tabload_x) */
-	void tabinit(con mainv envv,int ne) noex {
-	    cauto predf = [envv] (con uchar &ia,con uchar &ib) noex -> bool {
+	void tabinit(con mainv envv) noex {
+	    cauto predf = [envv] (con ushort &ia,con ushort &ib) noex -> bool {
 		cchar *s1 = envv[ia] ;
 		cchar *s2 = envv[ib] ;
     		return (strkeycmp(s1,s2) < 0) ;
@@ -104,11 +108,11 @@ namespace {
 	    tabload_x() ;
 	    sort(tab,(tab+ne),predf) ;
 	} ; /* end method (tabinit) */
-	codemgr() noex : tab(nullptr), ne(0) { } ;
-	int start() noex ;
+	codemgr() = default ;
+	int start(mainv,int) noex ;
 	int finish() noex ;
 	void dtor() noex ;
-	operatior int () noex ;
+	int operator () (con mainv,int) noex ;
 	destruct codemgr() {
 	    if (tab) dtor() ;
 	} ; /* end destruct */
@@ -117,43 +121,44 @@ namespace {
 
 namespace {
     struct getter {
-	con addrfam	*ns ;
-	con uchar	*tab ;
+	mainv		ns ;
+	ushortp		tab ;
 	int 		ne ;
-	getter(con addrfam *ªns,con uchar *ªtab,int n) noex : ns(ªns) {
-	    tab = ªtab ;
+	getter() noex : ne(0) { } ;
+	int operator () (con mainv ev,con ushortp tp,int n) noex {
+	    ns = ev ;
 	    ne = n ;
-	} ; /* end ctor */
-	int operator () (cchar *sp,int sl) const noex {
-            int     rs = SR_AFNOSUPPORT ;
-            int     af = 0 ; /* return-value */
-            cauto predf = [this,sp,sl] (uchar c) noex -> bool {
-                cchar *an = ns[c] ;
-                return (strwcmp(an,sp,sl) < 0) ;
-            } ; /* end lambda (predf) */
-            con uchar *itf = (tab + 0) ;
-            con uchar *itl = (tab + ne) ;
-            if (cauto it = partition_point(itf,itl,predf) ; it != itl) {
-                cauto mat = [this,sp,sl] (int c) noex -> bool {
-                    cchar *an = ns[c].name ;
-                    return (strwcmp(an,sp,sl) == 0) ;
-                } ; /* end lambda (mat) */
-                if (cint ii = *it ; mat(ii)) {
-                    if ((af = ns[ii].af) >= 0) rs = SR_OK ;
-                } /* end if (got a match) */
-            } /* end if */
-            return (rs >= 0) ? af : rs ;
-	} /* end method (operator) */
+	    return ((tab = tp)) ? SR_OK : SR_BUGCHECK ;
+	} ; /* end method (operator) */
+	int operator () (cchar *,int) const noex ;
     } ; /* end struct (getter) */
+} /* end namespace */
+
+namespace {
+    struct subiniter {
+	mainv envv ;
+	operator int () noex ;
+    } ; /* end struct (subiniter) */
 } /* end namespace */
 
 
 /* forward references */
 
+local int rmeq(cchar *kp,int kl) noex {
+	if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
+	    kl = intconv(tp - kp) ;
+	}
+	return kl ;
+} /* end subroutine (rmeq) */
+
 
 /* local variables */
 
-constexpr codemgr	codetab ;
+static subiniter	sub ;
+static codemgr		codetab ;
+static getter		go ;
+
+cbool			f_debug = CF_DEBUG ;
 
 
 /* exported variables */
@@ -161,49 +166,25 @@ constexpr codemgr	codetab ;
 
 /* exported subroutines */
 
-#ifdef	COMMENT
-cchar *getenver(cchar *kp,int kl) noex {
-	cchar		*vp = nullptr ;
-	if (kp) ylikely {
-	    if (kl < 0) kl = lenstr(kp) ;
-	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
-		kl = intconv(tp - kp) ;
-	    }
-	    if (int ei ; (ei = matkeystr(environ,kp,kl)) >= 0) {
-	        if ((vp = strchr(environ[ei],'=')) != nullptr) {
-	            vp += 1 ;
-		}
-	    }
-	} /* end if */
-	return vp ;
-}
-/* end subroutine (getenver) */
-#endif /* COMMENT */
-
-local int rmeq(cchar *kp,int kl) noex {
-	if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
-	    kl = intconv(tp - kp) ;
-	}
-} /* end subroutine (rmeq) */
-
-cchar *getenver(cchar *kp,int kl) noex {
+cchar *getenver(cchar *kp,int ªkl) noex {
     	cnullptr	np{} ;
 	cchar		*valp = nullptr ;
-	if (int kl = getlenstr(kp,ªkl) ; kl > 0) {
-	    static cint rsv = codetab ;
+	DPRINTF("ent kl=%d\n",ªkl) ;
+	if (int rs, kl = getlenstr(kp,ªkl) ; kl > 0) {
+	    static cint rsv = sub ;
 	    if ((rs = rsv) >= 0) {
-		getter co ;
 		if ((kl = rmeq(kp,kl)) > 0) {
-		    if (cint ei = co(kp,kl) ; ei >= 0) {
-	                if ((valp = strchr(environ[ei],'=')) != np) {
+		    if (cint ei = go(kp,kl) ; ei >= 0) {
+	                if ((valp = strchr(sub.envv[ei],'=')) != np) {
 	                    valp += 1 ;
 		        }
 	            } /* end if (getter) */
 		} /* end if (rmeq) */
 	    } else {
-		ulogerror("getaf",rs,"geenver") ;
-	    } /* end if (codetab) */
+		ulogerror("getenver",rs,"initialization") ;
+	    } /* end if (sub) */
 	} /* end if (getlenstr) */
+	DPRINTF("ret valp=%s\n",((valp) ? valp : "null")) ;
 	return valp ;
 }
 /* end subroutine (getenver) */
@@ -211,23 +192,14 @@ cchar *getenver(cchar *kp,int kl) noex {
 
 /* local subroutines */
 
-local int nenv() noex {
-    	int	ne = 0 ;
-	while (environ[ne]) ne += 1 ;
-	return ne ;
-} /* end subroutine (nenv) */
-
-int codemgr::start() noex {
-    	int		rs = SR_OK ;
-	if ((ne = nenv()) > 0) {
-	    cint sz = ((ne + 1) * szof(ushort)) ;
-	    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
-		tab = ushortp(vp) ;
-		{
-	            tabinit(environ,ne) ;
-	        }
-	    } /* end if (memory-allocation) */
-	} /* end if (nenv) */
+int codemgr::start(mainv envv,int n) noex {
+    	int	rs = SR_OK ;
+	cint	sz = ((n + 1) * szof(ushort)) ;
+	if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+	    tab = ushortp(vp) ;
+	    ne = n ;
+	    tabinit(envv) ;
+	} /* end if (memory-allocation) */
 	return rs ;
 } /* end method (codemgr::start) */
 
@@ -245,13 +217,47 @@ int codemgr::finish() noex {
 } /* end method (codemgr::finish) */
 
 void codemgr::dtor() noex {
-	if (cint rs = finish ; rs < 0) {
+	if (cint rs = finish() ; rs < 0) {
 	    ulogerror("getenver",rs,"fini-finish") ;
 	}
 } /* end method (codemgr::dtor) */
 
-codemgr::operator int () noex {
-	return start() ;
+int codemgr::operator () (mainv envv,int n) noex {
+	return start(envv,n) ;
 } /* end method (codemgr::operator) */
+
+int getter::operator () (cchar *sp,int sl) const noex {
+    int         ei = -1 ; /* return-value */
+    DPRINTF("ent ne=%d sl=%d\n",ne,sl) ;
+    if (strnul ss(sp,sl) ; ss.fok) {
+        cauto predf = [this,&ss] (ushort c) noex -> bool {
+            cchar *an = ns[c] ;
+            return (strkeycmp(an,ss) < 0) ;
+        } ; /* end lambda (predf) */
+        con ushort *itf = (tab + 0) ;
+        con ushort *itl = (tab + ne) ;
+        if (cauto it = partition_point(itf,itl,predf) ; it != itl) {
+            cauto mat = [this,&ss] (int c) noex -> bool {
+                cchar *an = ns[c] ;
+                return (strkeycmp(an,ss) == 0) ;
+            } ; /* end lambda (mat) */
+            if (cint ii = *it ; mat(ii)) {
+                ei = ii ;
+            } /* end if (got a match) */
+        } /* end if */
+    } /* end if (non-null) */
+    DPRINTF("ret ei=%d\n",ei) ;
+    return ei ;
+} /* end method (getter::operator) */
+
+subiniter::operator int () noex {
+    	int		rs ;
+	if ((rs = u_getenviron(&envv)) >= 0) {
+	    if ((rs = codetab(envv,rs)) >= 0) {
+	        rs = go(envv,codetab.tab,codetab.ne) ;
+	    }
+	} /* end if (u_getenviron) */
+	return rs ;
+} /* end method (subiniter::operator) */
 
 
