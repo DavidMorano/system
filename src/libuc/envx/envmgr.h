@@ -33,16 +33,17 @@
 struct envmgr_head {
 	vechand		*listp ;
 	vecstr		*strp ;
+	mainv		envv ;
 } ; /* end struct (envmgr_head) */
 
 typedef ENVMGR		envmgr ;
 
 EXTERNC_begin
 
-extern int	envmgr_start(envmgr *) noex ;
-extern int	envmgr_set(envmgr *,cchar *,cchar *,int) noex ;
-extern int	envmgr_getvec(envmgr *,cchar ***) noex ;
-extern int	envmgr_finish(envmgr *) noex ;
+extern int	envmgr_start	(envmgr *) noex ;
+extern int	envmgr_set	(envmgr *,cchar *,cchar *,int) noex ;
+extern int	envmgr_getvec	(envmgr *,cchar ***) noex ;
+extern int	envmgr_finish	(envmgr *) noex ;
 
 EXTERNC_end
 
