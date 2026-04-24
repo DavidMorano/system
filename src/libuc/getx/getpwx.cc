@@ -50,8 +50,8 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 extern "C" {
-    typedef int (*getpwxname_f)(ucentpw *,char *,int,cchar *) noex ;
-    typedef int (*getpwxuid_f)(ucentpw *,char *,int,uid_t) noex ;
+    typedef int (*getpwxname_f)	(ucentpw *,char *,int,cchar *) noex ;
+    typedef int (*getpwxuid_f)	(ucentpw *,char *,int,uid_t) noex ;
 }
 
 
