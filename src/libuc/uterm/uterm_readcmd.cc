@@ -47,7 +47,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<ucread.h>
+#include	<ucdescread.h>
 #include	<ascii.h>		/* |CH_{xx}| */
 #include	<ndigit.h>
 #include	<cfdec.h>
