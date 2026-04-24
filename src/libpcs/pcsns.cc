@@ -65,9 +65,9 @@
 
 /* forward references */
 
-static int	pcsns_objloadbegin(pcsns *,cchar *,cchar *) noex ;
-static int	pcsns_objloadend(pcsns *) noex ;
-static int	pcsns_loadcalls(pcsns *,cchar *) noex ;
+local int	pcsns_objloadbegin(pcsns *,cchar *,cchar *) noex ;
+local int	pcsns_objloadend(pcsns *) noex ;
+local int	pcsns_loadcalls(pcsns *,cchar *) noex ;
 
 static bool	isrequired(int) noex ;
 
@@ -265,7 +265,7 @@ int pcsns_enum(pcsns *op,PCSNS_CUR *curp,char *vbuf,int vlen,int w) noex {
 
 /* private subroutines */
 
-static int pcsns_objloadbegin(pcsns *op,cchar *pr,cchar *objname) noex {
+local int pcsns_objloadbegin(pcsns *op,cchar *pr,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	VECSTR		syms ;
 	cint	n = nelem(subs) ;
@@ -332,7 +332,7 @@ static int pcsns_objloadbegin(pcsns *op,cchar *pr,cchar *objname) noex {
 }
 /* end subroutine (pcsns_objloadbegin) */
 
-static int pcsns_objloadend(pcsns *op) noex {
+local int pcsns_objloadend(pcsns *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -349,7 +349,7 @@ static int pcsns_objloadend(pcsns *op) noex {
 }
 /* end subroutine (pcsns_objloadend) */
 
-static int pcsns_loadcalls(pcsns *op,cchar *objname) noex {
+local int pcsns_loadcalls(pcsns *op,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	cint	nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
