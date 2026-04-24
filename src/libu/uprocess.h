@@ -45,6 +45,8 @@
 	u_waitid
 	u_waitpid
 	u_nanosleep
+	u_getcwd
+	u_getenviron
 
 	Description:
 	All of the UNIX® system calls that use (operate on) a
@@ -115,6 +117,7 @@ extern int u_waitid(idtype_t idtype,id_t id,siginfo_t *sip,int opts) noex ;
 extern int u_waitpid(pid_t pid,int *sp,int flags) noex ;
 extern int u_nanosleep(CTIMESPEC *,TIMESPEC *) noex ;
 extern int u_getcwd(char *,int) noex ;
+extern int u_getenviron(mainv *) noex ;
 
 EXTERNC_end
 
