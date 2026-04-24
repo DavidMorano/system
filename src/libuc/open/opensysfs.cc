@@ -108,8 +108,6 @@ extern "C" {
 
 /* external variables */
 
-extern cchar	**environ ;
-
 
 /* local structures */
 
