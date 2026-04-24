@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* this is a PCSPOLLS module for performing LOGUSER pseudo-polls */
+/* this is a PCSPOLLS module for performing LU pseudo-polls */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -22,15 +22,11 @@
 	loguser
 
 	Description:
-	This object is a PCSPOLLS module for performing LOGUSER polls.
+	This object is a PCSPOLLS module for performing LU polls.
 
 	Synopsis:
-	int loguser_start(op,pr,sn,envv,pcp)
-	PCSPOLLS	*op ;
-	cchar	*pr ;
-	cchar	*sn ;
-	cchar	**envv ;
-	PCSCONF		*pcp ;
+	int loguser_start(pcspolls *op,cc *pr,cc *sn,
+		mainv envv,pcsconf *pcp) noex
 
 	Arguments:
 	op		object pointer
@@ -70,11 +66,14 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	LOGUSER		struct loguser_head
-#define	LOGUSER_FL	struct loguser_flags
-#define	LOGUSER_MAGIC	0x88773424
-#define	LOGUSER_LCNAME	"log"
-#define	LOGUSER_LBNAME	"pcspolls"
+#define	LU		loguser_head
+#define	LU_FL		loguser_flags
+#define	LU_MAGIC	0x88773424
+#define	LU_LCNAME	"log"
+#define	LU_LBNAME	"pcspolls"
+
+
+/* impored namespaces */
 
 
 /* typedefs */
@@ -89,34 +88,33 @@ extern "C" {
 
 /* external variables */
 
-extern cchar	**environ ;
-
 
 /* local structures */
 
 struct loguser_flags {
 	uint		working:1 ;
-} ;
+} ; /* end struct */
 
 struct loguser_head {
-	uint		magic ;
-	LOGUSER_FL	f ;
+	char		*a ;		/* memory allocation */
+	cchar		*pr ;
+	cchar		*sn ;
+	mainv		envv ;
+	PCSCONF		*pcp ;
+	uint		magval ;
+	LU_FL		fl ;
 	pid_t		pid ;
 	pthread_t	tid ;
-	cchar	*a ;		/* memory allocation */
-	cchar	*pr ;
-	cchar	*sn ;
-	cchar	**envv ;
-	PCSCONF		*pcp ;
 	volatile int	f_exiting ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-local int loguser_argsbegin(LOGUSER *,cchar *,cchar *) noex ;
-local int loguser_argsend(LOGUSER *) noex ;
-local int loguser_worker(LOGUSER *) noex ;
+local int loguser_argsbegin(LU *,cchar *,cchar *) noex ;
+local int loguser_argsend(LU *) noex ;
+local int loguser_worker(LU *) noex ;
+local int loguser_envv(loguser *,mainv) noex ;
 
 local int mklogentry(cchar *,cchar *,mainv,PCSCONF *) noex ;
 
@@ -126,63 +124,51 @@ local int mklogentry(cchar *,cchar *,mainv,PCSCONF *) noex ;
 
 /* exported variables */
 
-PCSPOLLS_NAME	loguser = {
+pcspolls_obj		loguser_info = {
 	"loguser",
-	szof(LOGUSER),
+	szof(loguser),
 	0
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
 
-int loguser_start(LOGUSER *op,cc *pr,cc *sn,mainv envv,PCSCONF *pcp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("loguser_start: ent\n") ;
-	debugprintf("loguser_start: pr=%s\n",pr) ;
-	debugprintf("loguser_start: sn=%s\n",sn) ;
-#endif
-
-	if (envv == nullptr) envv = environ ;
-
-	memclear(op) ;
-	op->envv = envv ;
-	op->pcp = pcp ;
-	op->pid = getpid() ;
-
-	if ((rs = loguser_argsbegin(op,pr,sn)) >= 0) {
-	    if ((pr != nullptr) && (sn != nullptr)) {
-	        pthread_t	tid ;
-	        thrsub_t	thr = (thrsub_t) loguser_worker ;
-	        if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) {
-	            op->fl.working = true ;
-		    op->tid = tid ;
-	        }
-	    } /* end if (non-null) */
-	    if (rs >= 0) {
-	        op->magic = LOGUSER_MAGIC ;
-	    }
-	    if (rs < 0)
-		loguser_argsend(op) ;
-	} /* end if (loguser_argsbegin) */
-
-#if	CF_DEBUGS
-	debugprintf("loguser_start: ret rs=%d\n",rs) ;
-#endif
-
+int loguser_start(LU *op,cc *pr,cc *sn,mainv ev,PCSCONF *pcp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    memclear(op) ;
+	    if ((rs = loguser_envv(ev)) >= 0) {
+	        op->pcp = pcp ;
+	        op->pid = getpid() ;
+	        if ((rs = loguser_argsbegin(op,pr,sn)) >= 0) {
+	            if ((pr != nullptr) && (sn != nullptr)) {
+	                pthread_t	tid ;
+	                thrsub_t	thr = (thrsub_t) loguser_worker ;
+	                if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) {
+	                    op->fl.working = true ;
+		            op->tid = tid ;
+	                }
+	            } /* end if (non-null) */
+	            if (rs >= 0) {
+	                op->magval = LU_MAGIC ;
+	            }
+	            if (rs < 0) {
+		        loguser_argsend(op) ;
+	            }
+	        } /* end if (loguser_argsbegin) */
+	    } /* end if (loguser_envv) */
+	    /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (loguser_start) */
 
-int loguser_check(LOGUSER *op) noex {
+int loguser_check(LU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = false ;
 	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != LOGUSER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != LU_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.working) {
 	    const pid_t	pid = getpid() ;
@@ -204,13 +190,13 @@ int loguser_check(LOGUSER *op) noex {
 }
 /* end subroutine (loguser_check) */
 
-int loguser_finish(LOGUSER *op) noex {
+int loguser_finish(LU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != LOGUSER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != LU_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	debugprintf("loguser_finish: f_working=%d\n",op->fl.working) ;
@@ -237,7 +223,7 @@ int loguser_finish(LOGUSER *op) noex {
 	debugprintf("loguser_finish: ret rs=%d\n",rs) ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (loguser_finish) */
@@ -245,7 +231,7 @@ int loguser_finish(LOGUSER *op) noex {
 
 /* provate subroutines */
 
-local int loguser_argsbegin(LOGUSER *op,cchar *pr,cchar *sn) noex {
+local int loguser_argsbegin(LU *op,cchar *pr,cchar *sn) noex {
 	int		rs ;
 	int		sz = 0 ;
 	char		*bp ;
@@ -266,7 +252,7 @@ local int loguser_argsbegin(LOGUSER *op,cchar *pr,cchar *sn) noex {
 }
 /* end subroutine (loguser_argsbegin) */
 
-local int loguser_argsend(LOGUSER *op) noex {
+local int loguser_argsend(LU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->a) {
@@ -278,12 +264,12 @@ local int loguser_argsend(LOGUSER *op) noex {
 }
 /* end subroutine (loguser_argsend) */
 
-local int loguser_worker(LOGUSER *op) noex {
+local int loguser_worker(LU *op) noex {
 	PCSCONF		*pcp = op->pcp ;
 	int		rs ;
 	cchar		*pr = op->pr ;
 	cchar		*sn = op->sn ;
-	cchar		**envv = op->envv ;
+	mainv		envv = op->envv ;
 
 #if	CF_DEBUGS
 	debugprintf("loguser_worker: ent\n") ;
@@ -300,12 +286,22 @@ local int loguser_worker(LOGUSER *op) noex {
 }
 /* end subroutine (loguser_worker) */
 
+local int loguser_envv(loguser *op,mainv ev) noex {
+    	int	rs = SR_OK ;
+	if ((op->envv = ev) == nullptr) {
+	    if ((rs = u_getenviron(&ev)) >= 0) {
+		op->envv = ev ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (loguser_envv) */
+
 /* ARGSUSED */
 local int mklogentry(cchar *pr,cchar *sn,mainv envv,PCSCONF *pcp) noex {
 	int		rs ;
 	int		rs1 ;
-	cchar	*lcname = LOGUSER_LCNAME ;
-	cchar	*lbname = LOGUSER_LBNAME ;
+	cchar	*lcname = LU_LCNAME ;
+	cchar	*lbname = LU_LBNAME ;
 	char		lfname[MAXPATHLEN+1] ;
 
 	if ((rs = mkpath3(lfname,pr,lcname,lbname)) >= 0) {
