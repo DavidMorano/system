@@ -70,6 +70,17 @@ using std::nothrow ;			/* constant */
 
 /* exported subroutines */
 
+ccharp strnul::operator () (cchar *ap,int al) noex {
+    rp = nullptr ;
+    if (as) {
+        delete [] as ;
+        as = nullptr ;
+    }
+    sp = ap ;
+    sl = al ;
+    return operator ccharp () ;
+} /* end method (strnul::operator) */
+
 strnul::operator ccharp () noex {
 	if (rp == nullptr) {
 	    rp = sp ;
@@ -81,6 +92,7 @@ strnul::operator ccharp () noex {
 		    } else {
 			ulogerror("strnul",SR_NOMEM,"mem-alloc failure") ;
 			rp = "«mem-alloc-failure»" ;
+			fok = false ;
 		    }
 	        } else {
 		    strwcpy(buf,sp,sl) ;
@@ -89,6 +101,11 @@ strnul::operator ccharp () noex {
 	    } /* end if (possibly required) */
 	} /* end if (need calculation) */
 	return rp ;
+}
+/* end method (strnul::operator) */
+
+strnul::operator bool () const noex {
+	return fok ;
 }
 /* end method (strnul::operator) */
 
