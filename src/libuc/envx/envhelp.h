@@ -32,7 +32,8 @@
 struct envhelp_head {
 	vechand		*elp ;		/* Environment-List-Pointer */
 	strpack		*spp ;		/* String-Pack-Pointer */
-} ;
+	mainv		envv ;
+} ; /* end struct (envhelp_head) */
 
 #ifdef	__cplusplus
 enum envhelpmems {
@@ -63,7 +64,7 @@ struct envhelp : envhelp_head {
 	    count(this,envhelpmem_count) ;
 	    finish(this,envhelpmem_finish) ;
 	    elp = nullptr ;
-	} ;
+	} ; /* end ctor */
 	envhelp(const envhelp &) = delete ;
 	envhelp &operator = (const envhelp &) = delete ;
 	int start(mainv,mainv) noex ;
@@ -81,13 +82,13 @@ typedef ENVHELP		envhelp ;
 
 EXTERNC_begin
 
-extern int envhelp_start(envhelp *,mainv,mainv) noex ;
-extern int envhelp_present(envhelp *,cchar *,int,cchar **) noex ;
-extern int envhelp_envset(envhelp *,cchar *,cchar *,int) noex ;
-extern int envhelp_sort(envhelp *) noex ;
-extern int envhelp_count(envhelp *) noex ;
-extern int envhelp_getvec(envhelp *,mainv *) noex ;
-extern int envhelp_finish(envhelp *) noex ;
+extern int envhelp_start	(envhelp *,mainv,mainv) noex ;
+extern int envhelp_present	(envhelp *,cchar *,int,cchar **) noex ;
+extern int envhelp_envset	(envhelp *,cchar *,cchar *,int) noex ;
+extern int envhelp_sort		(envhelp *) noex ;
+extern int envhelp_count	(envhelp *) noex ;
+extern int envhelp_getvec	(envhelp *,mainv *) noex ;
+extern int envhelp_finish	(envhelp *) noex ;
 
 EXTERNC_end
 
