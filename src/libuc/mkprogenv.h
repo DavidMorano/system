@@ -29,8 +29,8 @@ struct mkprogenv_head {
 	mainv		envv ;
 	vechand		*envp ;
 	strpack		*storep ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct (mkprogenv_head) */
 
 typedef MKPROGENV	mkprogenv ;
 
