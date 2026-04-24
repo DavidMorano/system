@@ -95,11 +95,11 @@ struct inetargs {
 
 /* forward references */
 
-static int opendev_default(cchar *,int,mode_t) noex ;
-static int opendev_inet(int,cchar *,int,int,int) noex ;
+local int opendev_default(cchar *,int,mode_t) noex ;
+local int opendev_inet(int,cchar *,int,int,int) noex ;
 
-static int inetargs_start(INETARGS *,cchar *,int) noex ;
-static int inetargs_finish(INETARGS *) noex ;
+local int inetargs_start(INETARGS *,cchar *,int) noex ;
+local int inetargs_finish(INETARGS *) noex ;
 
 
 /* local variables */
@@ -190,7 +190,7 @@ int uc_opendev(cchar *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 
 /* private subroutines */
 
-static int opendev_default(cchar *fname,int of,mode_t om) noex {
+local int opendev_default(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		sz = 0 ;
@@ -216,7 +216,7 @@ static int opendev_default(cchar *fname,int of,mode_t om) noex {
 }
 /* end subroutine (opendev_default) */
 
-static int opendev_inet(int fi,cchar *fname,int of,int to,int ne) noex {
+local int opendev_inet(int fi,cchar *fname,int of,int to,int ne) noex {
 	INETARGS	ia ;
 	int		rs ;
 	int		fd = -1 ;
@@ -255,7 +255,7 @@ static int opendev_inet(int fi,cchar *fname,int of,int to,int ne) noex {
 }
 /* end subroutine (opendev_inet) */
 
-static int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
+local int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (sl < 0) sl = lenstr(sp) ;
 	memclear(iap) ;
@@ -322,7 +322,7 @@ static int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
 }
 /* end subroutine (inetargs_start) */
 
-static int inetargs_finish(INETARGS *iap) noex {
+local int inetargs_finish(INETARGS *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iap->a != nullptr) {
