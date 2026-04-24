@@ -25,7 +25,7 @@
 #include	<localmisc.h>
 
 #include	"ucdescbase.hh"
-#include	"ucread.h"
+#include	"ucdescread.h"
 
 
 /* local defines */
