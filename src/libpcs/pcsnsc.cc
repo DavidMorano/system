@@ -99,22 +99,22 @@ extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 
 /* forward references */
 
-static int	pcsnsc_setbegin(PCSNSC *,cchar *) noex ;
-static int	pcsnsc_setend(PCSNSC *) noex ;
-static int	pcsnsc_srvdname(PCSNSC *,char *) noex ;
-static int	pcsnsc_srvfname(PCSNSC *,cchar *) noex ;
-static int	pcsnsc_bind(PCSNSC *,int,cchar *) noex ;
-static int	pcsnsc_bufbegin(PCSNSC *) noex ;
-static int	pcsnsc_bufend(PCSNSC *) noex ;
-static int	pcsnsc_connect(PCSNSC *) noex ;
-static int	pcsnsc_istatus(PCSNSC *,PCSNSC_STATUS *) noex ;
+local int	pcsnsc_setbegin(PCSNSC *,cchar *) noex ;
+local int	pcsnsc_setend(PCSNSC *) noex ;
+local int	pcsnsc_srvdname(PCSNSC *,char *) noex ;
+local int	pcsnsc_srvfname(PCSNSC *,cchar *) noex ;
+local int	pcsnsc_bind(PCSNSC *,int,cchar *) noex ;
+local int	pcsnsc_bufbegin(PCSNSC *) noex ;
+local int	pcsnsc_bufend(PCSNSC *) noex ;
+local int	pcsnsc_connect(PCSNSC *) noex ;
+local int	pcsnsc_istatus(PCSNSC *,PCSNSC_STATUS *) noex ;
 
 #ifdef	COMMENT
-static int	pcsnsc_spawn(PCSNSC *) noex ;
-static int	pcsnsc_envload(PCSNSC *,ENVMGR *) noex ;
+local int	pcsnsc_spawn(PCSNSC *) noex ;
+local int	pcsnsc_envload(PCSNSC *,ENVMGR *) noex ;
 #endif
 
-static int	mksrvdname(char *,cchar *,cchar *,cchar *) noex ;
+local int	mksrvdname(char *,cchar *,cchar *,cchar *) noex ;
 
 
 /* local variables */
@@ -250,16 +250,16 @@ int pcsnsc_help(PCSNSC *op,char *rbuf,int rlen,int idx)
 	if (op->fl.srv) {
 	    struct pcsmsg_gethelp	mreq ;
 	    struct pcsmsg_help		mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    mreq.idx = (uchar) idx ;
 	    if ((rs = pcsmsg_gethelp(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = pcsmsg_help(&mres,1,mbuf,rs)) >= 0) {
 	                    if (mres.rc == pcsmsgrc_ok) {
@@ -313,20 +313,20 @@ int pcsnsc_getval(PCSNSC *op,char *rbuf,int rlen,cchar *un,int w)
 	if (op->fl.srv) {
 	    struct pcsmsg_getval	mreq ;
 	    struct pcsmsg_val		mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    mreq.w = (uchar) w ;
 	    strwcpy(mreq.key,un,PCSMSG_KEYLEN) ;
 	    if ((rs = pcsmsg_getval(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 #if	CF_DEBUGS
 	debugprintf("pcsnsc_getval: fd=%d\n",fd) ;
 #endif
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = pcsmsg_val(&mres,1,mbuf,rs)) >= 0) {
 	                    if (mres.rc == pcsmsgrc_ok) {
@@ -385,15 +385,15 @@ int pcsnsc_mark(PCSNSC *op)
 	if (op->fl.srv) {
 	    struct pcsmsg_mark	mreq ;
 	    struct pcsmsg_ack	mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    if ((rs = pcsmsg_mark(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = pcsmsg_ack(&mres,1,mbuf,rs)) >= 0) {
 	                    if (mres.rc == pcsmsgrc_ok) {
@@ -439,8 +439,8 @@ int pcsnsc_exit(PCSNSC *op,cchar *reason)
 	if (op->fl.srv) {
 	    struct pcsmsg_exit	mreq ;
 	    struct pcsmsg_ack	mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    mreq.reason[0] = '\0' ;
@@ -448,10 +448,10 @@ int pcsnsc_exit(PCSNSC *op,cchar *reason)
 	        strwcpy(mreq.reason,reason,REALNAMELEN) ;
 	    }
 	    if ((rs = pcsmsg_exit(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = pcsmsg_ack(&mres,1,mbuf,rs)) >= 0) {
 	                    if (mres.rc == pcsmsgrc_ok) {
@@ -483,7 +483,7 @@ int pcsnsc_exit(PCSNSC *op,cchar *reason)
 
 int pcsnsc_getname(PCSNSC *op,char *rbuf,int rlen,cchar *un)
 {
-	const int	w = pcsnsreq_pcsname ;
+	cint	w = pcsnsreq_pcsname ;
 	return pcsnsc_getval(op,rbuf,rlen,un,w) ;
 }
 /* end subroutine (pcsnsc_getname) */
@@ -492,7 +492,7 @@ int pcsnsc_getname(PCSNSC *op,char *rbuf,int rlen,cchar *un)
 /* local subroutines */
 
 
-static int pcsnsc_setbegin(PCSNSC *op,cchar *pr)
+local int pcsnsc_setbegin(PCSNSC *op,cchar *pr)
 {
 	int		rs ;
 	int		f = FALSE ;
@@ -527,7 +527,7 @@ static int pcsnsc_setbegin(PCSNSC *op,cchar *pr)
 /* end subroutine (pcsnsc_setbegin) */
 
 
-static int pcsnsc_setend(PCSNSC *op)
+local int pcsnsc_setend(PCSNSC *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -555,7 +555,7 @@ static int pcsnsc_setend(PCSNSC *op)
 /* end subroutine (pcsnsc_setend) */
 
 
-static int pcsnsc_srvdname(PCSNSC *op,char *rbuf)
+local int pcsnsc_srvdname(PCSNSC *op,char *rbuf)
 {
 	int		rs ;
 	int		rl = 0 ;
@@ -570,7 +570,7 @@ static int pcsnsc_srvdname(PCSNSC *op,char *rbuf)
 	    USTAT	sb ;
 	    if ((rs = u_stat(rbuf,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
-	            const int	am = (W_OK|W_OK|X_OK) ;
+	            cint	am = (W_OK|W_OK|X_OK) ;
 	            if ((rs = perm(rbuf,-1,-1,NULL,am)) >= 0) {
 	                rl = 1 ;
 	            } else if (isNotAccess(rs)) {
@@ -591,7 +591,7 @@ static int pcsnsc_srvdname(PCSNSC *op,char *rbuf)
 /* end subroutine (pcsnsc_srvdname) */
 
 
-static int pcsnsc_srvfname(PCSNSC *op,cchar *srvdname)
+local int pcsnsc_srvfname(PCSNSC *op,cchar *srvdname)
 {
 	int		rs ;
 	int		rl = 0 ;
@@ -610,7 +610,7 @@ static int pcsnsc_srvfname(PCSNSC *op,cchar *srvdname)
 #endif
 	    if ((rs = u_stat(srvfname,&sb)) >= 0) {
 	        if (S_ISSOCK(sb.st_mode)) {
-	            const int	am = (R_OK|W_OK) ;
+	            cint	am = (R_OK|W_OK) ;
 	            if ((rs = perm(srvfname,-1,-1,NULL,am)) >= 0) {
 	                cchar	*cp ;
 	                if ((rs = uc_mallocstrw(srvfname,rl,&cp)) >= 0) {
@@ -641,7 +641,7 @@ static int pcsnsc_srvfname(PCSNSC *op,cchar *srvdname)
 /* end subroutine (pcsnsc_srvfname) */
 
 
-static int pcsnsc_bind(PCSNSC *op,int f,cchar *srvdname)
+local int pcsnsc_bind(PCSNSC *op,int f,cchar *srvdname)
 {
 	int		rs = SR_OK ;
 	int		f_err = FALSE ;
@@ -656,7 +656,7 @@ static int pcsnsc_bind(PCSNSC *op,int f,cchar *srvdname)
 
 	    if ((rs = mkpath2(template,srvdname,tn)) >= 0) {
 	        const mode_t	om = (S_IFSOCK | 0666) ;
-	        const int	of = (O_RDWR | O_CLOEXEC | O_MINMODE) ;
+	        cint	of = (O_RDWR | O_CLOEXEC | O_MINMODE) ;
 	        char		fname[MAXPATHLEN + 1] ;
 	        if ((rs = opentmpusd(template,of,om,fname)) >= 0) {
 	            cchar	*cp ;
@@ -701,9 +701,9 @@ static int pcsnsc_bind(PCSNSC *op,int f,cchar *srvdname)
 /* end subroutine (pcsnsc_bind) */
 
 
-static int pcsnsc_bufbegin(PCSNSC *op)
+local int pcsnsc_bufbegin(PCSNSC *op)
 {
-	const int	blen = MSGBUFLEN ;
+	cint	blen = MSGBUFLEN ;
 	int		rs ;
 	char		*bp ;
 	if ((rs = uc_malloc((blen+1),&bp)) >= 0) {
@@ -715,7 +715,7 @@ static int pcsnsc_bufbegin(PCSNSC *op)
 /* end subroutine (pcsnsc_bufbegin) */
 
 
-static int pcsnsc_bufend(PCSNSC *op)
+local int pcsnsc_bufend(PCSNSC *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -730,7 +730,7 @@ static int pcsnsc_bufend(PCSNSC *op)
 /* end subroutine (pcsnsc_bufend) */
 
 
-static int pcsnsc_connect(PCSNSC *op)
+local int pcsnsc_connect(PCSNSC *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -742,12 +742,12 @@ static int pcsnsc_connect(PCSNSC *op)
 
 	if (op->srvfname != NULL) {
 	    SOCKADDRESS	sa ;
-	    const int	af = AF_UNIX ;
+	    cint	af = AF_UNIX ;
 	    cchar	*sfn = op->srvfname ;
 	    if ((rs = sockaddress_start(&sa,af,sfn,0,0)) >= 0) {
 	        SOCKADDR	*sap = (SOCKADDR *) &sa ;
-	        const int	sal = rs ;
-	        const int	to = op->to ;
+	        cint	sal = rs ;
+	        cint	to = op->to ;
 	        if ((rs = uc_connecte(op->fd,sap,sal,to)) >= 0) {
 	            f = TRUE ;
 	        } else if (isFailConn(rs)) {
@@ -767,7 +767,7 @@ static int pcsnsc_connect(PCSNSC *op)
 /* end subroutine (pcsnsc_connect) */
 
 
-static int pcsnsc_istatus(PCSNSC *op,PCSNSC_STATUS *statp)
+local int pcsnsc_istatus(PCSNSC *op,PCSNSC_STATUS *statp)
 {
 	int		rs = SR_OK ;
 	int		rc = 0 ;
@@ -783,15 +783,15 @@ static int pcsnsc_istatus(PCSNSC *op,PCSNSC_STATUS *statp)
 	if (op->fl.srv) {
 	    struct pcsmsg_getstatus	mreq ;
 	    struct pcsmsg_status	mres ;
-	    const int		to = op->to ;
-	    const int		mlen = op->mlen ;
+	    cint		to = op->to ;
+	    cint		mlen = op->mlen ;
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    if ((rs = pcsmsg_getstatus(&mreq,0,mbuf,mlen)) >= 0) {
-	        const int	fd = op->fd ;
+	        cint	fd = op->fd ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
-	            const int	mf = 0 ;
-	            const int	ro = FM_TIMED ;
+	            cint	mf = 0 ;
+	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = pcsmsg_status(&mres,1,mbuf,rs)) >= 0) {
 #if	CF_DEBUGS
@@ -839,7 +839,7 @@ static int pcsnsc_istatus(PCSNSC *op,PCSNSC_STATUS *statp)
 
 #ifdef	COMMENT
 
-static int pcsnsc_spawn(PCSNSC *op)
+local int pcsnsc_spawn(PCSNSC *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -859,7 +859,7 @@ static int pcsnsc_spawn(PCSNSC *op)
 	    ENVMGR	em ;
 	    if ((rs = envmgr_start(&em)) >= 0) {
 	        if ((rs = pcsnsc_envload(op,&em)) >= 0) {
-		    const int	dlen = DIGBUFLEN ;
+		    cint	dlen = DIGBUFLEN ;
 	            char	dbuf[DIGBUFLEN + 1] ;
 	            if ((rs = ctdeci(dbuf,dlen,to_run)) >= 0) {
 	                char	optbuf[OPTBUFLEN + 1] ;
@@ -897,7 +897,7 @@ static int pcsnsc_spawn(PCSNSC *op)
 /* end subroutine (pcsnsc_spawn) */
 
 
-static int pcsnsc_envload(PCSNSC *op,ENVMGR *emp)
+local int pcsnsc_envload(PCSNSC *op,ENVMGR *emp)
 {
 	int		rs ;
 	if ((rs = envmgr_set(emp,VARPCSQUIET,"1",1)) >= 0) {
@@ -909,10 +909,8 @@ static int pcsnsc_envload(PCSNSC *op,ENVMGR *emp)
 
 #endif /* COMMENT */
 
-
-static int mksrvdname(char *rbuf,cchar *td,cchar *pr,cchar *fn)
-{
-	const int	rlen = MAXPATHLEN ;
+local int mksrvdname(char *rbuf,cchar *td,cchar *pr,cchar *fn) noex {
+	cint	rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 
