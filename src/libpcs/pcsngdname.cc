@@ -84,9 +84,9 @@
 
 /* forward references */
 
-static int	mknewsdname(cchar *,char *,cchar *) noex ;
-static int	mkdname(char *,int,cchar *,int) noex ;
-static int	ndots(cchar *) noex ;
+local int	mknewsdname(cchar *,char *,cchar *) noex ;
+local int	mkdname(char *,int,cchar *,int) noex ;
+local int	ndots(cchar *) noex ;
 static bool	isNotOurs(int) noex ;
 
 
@@ -138,7 +138,7 @@ int pcsngdname(cchar *pcs,char *rbuf,cchar *newsdname,cchar *ngname) noex {
 
 /* local subroutines */
 
-static int mknewsdname(cchar *pr,char *rbuf,cchar *newsdname) noex {
+local int mknewsdname(cchar *pr,char *rbuf,cchar *newsdname) noex {
 	int		rs ;
 	if (newsdname[0] != '/') {
 	    rs = mkpath2(rbuf,pr,newsdname) ;
@@ -149,7 +149,7 @@ static int mknewsdname(cchar *pr,char *rbuf,cchar *newsdname) noex {
 }
 /* end subroutine (mknewsdname) */
 
-static int mkdname(char *rbuf,int rlen,cchar *ngname,int mask) noex {
+local int mkdname(char *rbuf,int rlen,cchar *ngname,int mask) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = pathadd(rbuf,rlen,ngname)) >= 0) {
@@ -173,7 +173,7 @@ static int mkdname(char *rbuf,int rlen,cchar *ngname,int mask) noex {
 }
 /* end subroutine (mkdname) */
 
-static int ndots(cchar *ngname) noex {
+local int ndots(cchar *ngname) noex {
 	int		n = 0 ;
 	for (int i = 0 ; ngname[i] ; i += 1) {
 	    if (ngname[i] == '.') n += 1 ;
