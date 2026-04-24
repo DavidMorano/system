@@ -48,7 +48,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<ucwrite.h>
+#include	<ucdescwrite.h>
 #include	<uclock.h>
 #include	<sysval.hh>
 #include	<sigblocker.h>
