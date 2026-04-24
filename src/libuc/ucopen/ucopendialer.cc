@@ -87,6 +87,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<getnodedomain.h>
 #include	<ids.h>
 #include	<sncpyx.h>
@@ -128,8 +129,6 @@ typedef mode_t		m_t ;
 
 /* external variables */
 
-extern char	**environ ;
-
 
 /* local structures */
 
@@ -139,7 +138,7 @@ extern "C" {
 
 struct subinfo_flags {
 	uint		dummy:1 ;
-} ;
+} ; /* end struct (subinfo_flags) */
 
 struct subinfo {
 	ids		id ;
@@ -153,36 +152,37 @@ struct subinfo {
 	int		to ;
 	int		fd ;
 	mode_t		om ;
-} ;
+} ; /* end struct (subinfo) */
 
 
 /* forward references */
 
-static int	subinfo_start(SI *,cchar *,cchar *,
+local int	subinfo_start(SI *,cchar *,cchar *,
 			int,mode_t,mainv,mainv,int) noex ;
-static int	subinfo_finish(SI *) noex ;
-static int	subinfo_search(SI *) noex ;
-static int	subinfo_exts(SI *,cchar *,cchar *,char *) noex ;
-static int	subinfo_searchlib(SI *,cchar *,cchar *) noex ;
-static int	subinfo_searchcall(SI *,cchar *,subdialer_t) noex ;
-static int	subinfo_idbegin(SI *) noex ;
-static int	subinfo_idend(SI *) noex ;
+local int	subinfo_finish(SI *) noex ;
+local int	subinfo_search(SI *) noex ;
+local int	subinfo_exts(SI *,cchar *,cchar *,char *) noex ;
+local int	subinfo_searchlib(SI *,cchar *,cchar *) noex ;
+local int	subinfo_searchcall(SI *,cchar *,subdialer_t) noex ;
+local int	subinfo_idbegin(SI *) noex ;
+local int	subinfo_idend(SI *) noex ;
+local int	subinfo_envv(SI *op,mainv) noex ;
 
 
 /* local variables */
 
-static cpcchar		prns[] = {
+constexpr cpcchar		prns[] = {
 	"extra",
 	"preroot",
 	nullptr
-} ;
+} ; /* end array (prns) */
 
-static cpcchar		soexts[] = {
+constexpr cpcchar		soexts[] = {
 	"so",
 	"o",
 	"",
 	nullptr
-} ;
+} ; /* end array (soexts) */
 
 
 /* exported variables */
@@ -218,57 +218,53 @@ int uc_opendialer(cc *prn,cc *svc,int of,m_t om,mv argv,mv envv,int to) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SI *sip,cc *prn,cc *svc,int of,mode_t om,
-		mainv argv,mainv envv,int to) noex {
+local int subinfo_start(SI *sip,cc *prn,cc *svc,int of,mode_t om,
+		mainv argv,mainv ev,int to) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
-	   if ((rs = memclear(sip)) >= 0) {
-	       sip->prn = prn ;
-	       sip->svc = svc ;
-	       sip->argv = argv ;
-	       sip->envv = (envv) ? envv : ((cchar **) environ) ;
-	       sip->of = of ;
-	       sip->om = om ;
-	       sip->to = to ;
-	       sip->fd = -1 ;
-	       {
-		   const int	maxname = MAXNAMELEN ;
-	           cchar	*prefix = SVCSYMPREFIX ;
-	           char	dialsym[maxname +1] ;
-	           if ((rs = sncpy2(dialsym,maxname,prefix,sip->prn)) >= 0) {
-		       auto	mall = lm_strw ;
-		       cchar	*sp = dialsym ;
-	               if (cchar *cp ; (rs = mall(sp,rs,&cp)) >= 0) {
-	                   sip->dialsym = const_cast<char *>(cp) ;
-		       }
-	           }
-	        } /* end block */
-	    } /* end if (memclear) */
+	   if ((rs = memclear(sip)) >= 0) ylikely {
+	       if ((rs = subinfo_envv(sip,ev)) >= 0) ylikely {
+	           sip->prn = prn ;
+	           sip->svc = svc ;
+	           sip->argv = argv ;
+	           sip->of = of ;
+	           sip->om = om ;
+	           sip->to = to ;
+	           sip->fd = -1 ;
+	           {
+		       cint		mn = MAXNAMELEN ;
+	               cchar	*prefix = SVCSYMPREFIX ;
+	               char		dialsym[mn +1] ;
+	               if ((rs = sncpy2(dialsym,mn,prefix,sip->prn)) >= 0) {
+		           auto		mall = lm_strw ;
+		           cchar	*sp = dialsym ;
+	                   if (cchar *cp ; (rs = mall(sp,rs,&cp)) >= 0) {
+	                       sip->dialsym = const_cast<char *>(cp) ;
+		           }
+	               }
+	            } /* end block */
+	        } /* end if (memclear) */
+	    } /* end if (subifo_envv) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SI *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (sip->dialsym != nullptr) {
 	    rs1 = lm_free(sip->dialsym) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->dialsym = nullptr ;
 	}
-
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
-static int subinfo_search(SI *sip) noex {
+local int subinfo_search(SI *sip) noex {
 	cint	plen = MAXPATHLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-
 	if ((rs = subinfo_idbegin(sip)) >= 0) {
 	    cint	size = ((plen+1)*3) ;
 	    char	*abuf ;
@@ -278,7 +274,7 @@ static int subinfo_search(SI *sip) noex {
 	        char	*sdn = (abuf+(1*(plen+1))) ;
 	        char	*sfn = (abuf+(2*(plen+1))) ;
 	        if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-		    USTAT	sb ;
+		    ustat	sb ;
 	            for (int i = 0 ; prns[i] != nullptr ; i += 1) {
 	                if ((rs = mkpr(pdn,plen,prns[i],dn)) > 0) {
 		            if ((rs = mkpath2(sdn,pdn,SVCDNAME)) >= 0) {
@@ -295,7 +291,6 @@ static int subinfo_search(SI *sip) noex {
 			if (f) break ;
 			if (rs < 0) break ;
 	            } /* end for (prns) */
-
 	        } /* end if */
 	        rs1 = lm_free(abuf) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -303,18 +298,15 @@ static int subinfo_search(SI *sip) noex {
 	    rs1 = subinfo_idend(sip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (subinfo-id) */
-
 	if ((rs < 0) && (sip->fd >= 0)) {
 	    u_close(sip->fd) ;
 	    sip->fd = -1 ;
 	}
-
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_search) */
+} /* end subroutine (subinfo_search) */
 
-static int subinfo_exts(SI *sip,cchar *pr,cchar *sdn,char *sfn) noex {
-	USTAT		sb ;
+local int subinfo_exts(SI *sip,cchar *pr,cchar *sdn,char *sfn) noex {
+	ustat		sb ;
 	cint		am = (R_OK|X_OK) ;
 	int		rs = SR_OK ;
 	int		f = false ;
@@ -338,10 +330,9 @@ static int subinfo_exts(SI *sip,cchar *pr,cchar *sdn,char *sfn) noex {
 	    if (rs < 0) break ;
 	} /* end for (soexts) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_exts) */
+} /* end subroutine (subinfo_exts) */
 
-static int subinfo_searchlib(SI *sip,cchar *pr,cchar *sfn) noex {
+local int subinfo_searchlib(SI *sip,cchar *pr,cchar *sfn) noex {
 	cint		dlmode = RTLD_LAZY ;
 	int		rs = SR_OK ;
 	int		f = false ;
@@ -355,10 +346,9 @@ static int subinfo_searchlib(SI *sip,cchar *pr,cchar *sfn) noex {
 	    dlclose(sop) ;
 	} /* end if (dlopen) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_searchlib) */
+} /* end subroutine (subinfo_searchlib) */
 
-static int subinfo_searchcall(SI *sip,cchar *pr,subdialer_t symp) noex {
+local int subinfo_searchcall(SI *sip,cchar *pr,subdialer_t symp) noex {
 	mode_t		om = sip->om ;
 	int		rs ;
 	int		of = sip->of ;
@@ -368,23 +358,19 @@ static int subinfo_searchcall(SI *sip,cchar *pr,subdialer_t symp) noex {
 	cchar	*svc = sip->svc ;
 	mainv		argv = sip->argv ;
 	mainv		envv = sip->envv ;
-
 	if ((rs = (*symp)(pr,prn,svc,of,om,argv,envv,to)) >= 0) {
 	    sip->fd = rs ;
 	    f = true ;
 	} /* end if (call) */
-
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_searchcall) */
+} /* end subroutine (subinfo_searchcall) */
 
-static int subinfo_idbegin(SI *sip) noex {
+local int subinfo_idbegin(SI *sip) noex {
 	int		rs = ids_load(&sip->id) ;
 	return rs ;
-}
-/* end subroutine (subinfo_idbegin) */
+} /* end subroutine (subinfo_idbegin) */
 
-static int subinfo_idend(SI *sip) noex {
+local int subinfo_idend(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sip) {
@@ -395,7 +381,16 @@ static int subinfo_idend(SI *sip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_idend) */
+} /* end subroutine (subinfo_idend) */
+
+local int subinfo_envv(subinfo *op,mainv envv) noex {
+    	int	rs = SR_OK ;
+	if ((op->envv = envv) == nullptr) {
+	    if (mainv ev ; (rs = u_getenviron(&ev)) >= 0) {
+		op->envv = ev ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (subinfo_envv) */
 
 
