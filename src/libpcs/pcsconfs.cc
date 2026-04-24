@@ -47,12 +47,19 @@
 #include	<fsdir.h>
 #include	<varmk.h>
 #include	<paramfile.h>
+#include	<pathadd.h>
+#include	<sfx.h>
 #include	<strwcpy.h>
+#include	<permx.h>
+#include	<var.h>
+#include	<varmk.h>
+#include	<hasx.h>
+#include	<isoneof.h>
+#include	<isnot.h>
 #include	<localmisc.h>
+#include	<libpr.h>		/* LIBPR */
 
 #include	"pcsconfs.h"
-#include	"var.h"
-#include	"varmk.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -60,89 +67,94 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#ifndef	VARSYSNAME
-#define	VARSYSNAME	"SYSNAME"
+#ifndef	varSYSNAME
+#define	varSYSNAME	"SYSNAME"
 #endif
 
-#ifndef	VARRELEASE
-#define	VARRELEASE	"RELEASE"
+#ifndef	varRELEASE
+#define	varRELEASE	"RELEASE"
 #endif
 
-#ifndef	VARVERSION
-#define	VARVERSION	"VERSION"
+#ifndef	varVERSION
+#define	varVERSION	"VERSION"
 #endif
 
-#ifndef	VARMACHINE
-#define	VARMACHINE	"MACHINE"
+#ifndef	varMACHINE
+#define	varMACHINE	"MACHINE"
 #endif
 
-#ifndef	VARARCHITECTURE
-#define	VARARCHITECTURE	"ARCHITECTURE"
+#ifndef	varARCHITECTURE
+#define	varARCHITECTURE	"ARCHITECTURE"
 #endif
 
-#ifndef	VARHZ
-#define	VARHZ		"HZ"
+#ifndef	varHZ
+#define	varHZ		"HZ"
 #endif
 
-#ifndef	VARDOMAIN
-#define	VARDOMAIN	"DOMAIN"
+#ifndef	varDOMAIN
+#define	varDOMAIN	"DOMAIN"
 #endif
 
-#ifndef	VARNODE
-#define	VARNODE		"NODE"
+#ifndef	varNODE
+#define	varNODE		"NODE"
 #endif
 
-#ifndef	VARHOMEDNAME
-#define	VARHOMEDNAME	"HOME"
+#ifndef	varHOMEDNAME
+#define	varHOMEDNAME	"HOME"
 #endif
 
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
+#ifndef	varUSERNAME
+#define	varUSERNAME	"USERNAME"
 #endif
 
-#ifndef	VARLOGNAME
-#define	VARLOGNAME	"LOGNAME"
+#ifndef	varLOGNAME
+#define	varLOGNAME	"LOGNAME"
 #endif
 
-#ifndef	VARTZ
-#define	VARTZ		"TZ"
+#ifndef	varTZ
+#define	varTZ		"TZ"
 #endif
 
-#ifndef	VARWSTATION
-#define	VARWSTATION	"ESTATION"
+#ifndef	varWSTATION
+#define	varWSTATION	"ESTATION"
 #endif
 
-#ifndef	VARPWD
-#define	VARPWD		"PWD"
+#ifndef	varPWD
+#define	varPWD		"PWD"
 #endif
 
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME	"TMPDIR"
+#ifndef	varTMPDNAME
+#define	varTMPDNAME	"TMPDIR"
 #endif
 
-#ifndef	VARPRLOCAL
-#define	VARPRLOCAL	"LOCAL"
+#ifndef	varPRLOCAL
+#define	varPRLOCAL	"LOCAL"
 #endif
 
 #ifndef	TMPDNAME
 #define	TMPDNAME	"/tmp"
 #endif
 
-#undef	VARSVDBNAME
-#define	VARSVDBNAME	"PCSCONFS_DBNAME"
+#undef	varSVDBNAME
+#define	varSVDBNAME	"PCSCONFS_DBNAME"
 
-#undef	VARSVPR
-#define	VARSVPR		"PCSCONFS_PROGRAMROOT"
+#undef	varSVPR
+#define	varSVPR		"PCSCONFS_PROGRAMROOT"
 
 #ifndef	TMPDNAME
 #define	TMPDNAME	"/tmp"
 #endif
 
-#ifndef	TMPVARDNAME
-#define	TMPVARDNAME	"/var/tmp"
+#ifndef	TMPvarDNAME
+#define	TMPvarDNAME	"/var/tmp"
 #endif
 
-#define	CONFVARS	struct confvars
+#define	PC		pcsconfs
+#define	PC_CUR		pcsconfs_cur
+#define	PC_MAGIC	PCSCONFS_MAGIC
+#define	PC_CURMAGIC	PCSCONFS_CURMAGIC
+#define	CV		confvars
+#define	CV_FL		confvars_flags
 
 #define	PRCONF		"conf"
 
@@ -182,16 +194,11 @@ import libutil ;			/* |lenstr(3u)| */
 #define	DEFNVARS	20
 #endif
 
-#define	CONFVARS	confvars
-#define	CONFVARS_FL	confvars_flags
-
 
 /* external subroutines */
 
 
 /* external variables */
-
-extern char	**environ ;
 
 
 /* local structures */
@@ -207,8 +214,8 @@ struct confvars {
 	ids		id ;
 	paramfile	pf ;
 	varmk		v ;
-	CONFVARS_FL	fl ;
-	PCSCONFS	*op ;
+	CV_FL		fl ;
+	pcsconfs	*op ;
 	mainv		envv ;
 	cchar		*prconf ;
 	cchar		*pr ;
@@ -222,24 +229,25 @@ struct confvars {
 
 /* forward references */
 
-static int	pcsconfs_valsbegin(PCSCONFS *,cchar *,cchar *) noex ;
-static int	pcsconfs_valsend(PCSCONFS *) noex ;
-static int	pcsconfs_dbcheck(PCSCONFS *) noex ;
-static int	pcsconfs_dbclose(PCSCONFS *) noex ;
-static int	pcsconfs_finout(PCSCONFS *) noex ;
+local int	pcsconfs_valsbegin(PC *,cchar *,cchar *) noex ;
+local int	pcsconfs_valsend(PC *) noex ;
+local int	pcsconfs_dbcheck(PC *) noex ;
+local int	pcsconfs_dbclose(PC *) noex ;
+local int	pcsconfs_finout(PC *) noex ;
+local int	pcsconfs_envv(PC *,mainv) noex ;
 
-static int	confvars_start(CONFVARS *,PCSCONFS *) noex ;
-static int	confvars_finish(CONFVARS *) noex ;
-static int	confvars_dbstart(CONFVARS *) noex ;
-static int	confvars_loadsubs(CONFVARS *,vecstr *) noex ;
-static int	confvars_confglobal(CONFVARS *,char *) noex ;
-static int	confvars_conflocal(CONFVARS *,char *) noex ;
-static int	confvars_dbopen(CONFVARS *,cchar *) noex ;
-static int	confvars_dbclose(CONFVARS *) noex ;
-static int	confvars_dbmake(CONFVARS *,cchar *) noex ;
-static int	confvars_proc(CONFVARS *) noex ;
-static int	confvars_chown(CONFVARS *,char *,int) noex ;
-static int	confvars_ids(CONFVARS *) noex ;
+local int	confvars_start(CV *,PC *) noex ;
+local int	confvars_finish(CV *) noex ;
+local int	confvars_dbstart(CV *) noex ;
+local int	confvars_loadsubs(CV *,vecstr *) noex ;
+local int	confvars_confglobal(CV *,char *) noex ;
+local int	confvars_conflocal(CV *,char *) noex ;
+local int	confvars_dbopen(CV *,cchar *) noex ;
+local int	confvars_dbclose(CV *) noex ;
+local int	confvars_dbmake(CV *,cchar *) noex ;
+local int	confvars_proc(CV *) noex ;
+local int	confvars_chown(CV *,char *,int) noex ;
+local int	confvars_ids(CV *) noex ;
 
 
 /* local variables */
@@ -261,79 +269,74 @@ constexpr int		stales[] = {
 
 /* exported variables */
 
-PCSCONFS_OBJ	pcsconfs = {
+pcsconfs_obj		pcsconfs_mod = {
 	"pcsconfs",
-	szof(PCSCONFS),
-	szof(PCSCONFS_CUR)
+	szof(pcsconfs),
+	szof(pcsconfs_cur)
 } ; /* end object */
 
 
 /* exported subroutines */
 
-int pcsconfs_start(PCSCONFS *op,cchar *pr,cchar **envv,cchar *cfname) noex {
-	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	if ((cfname != nullptr) && (cfname[0] == '\0')) return SR_INVALID ;
-
-	memclear(op) ; /* dangerous */
-	op->envv = (envv != nullptr) ? envv : (cchar **) environ ;
-	op->fl.prdb = (cfname == nullptr) ;
-
-	if ((rs = pcsconfs_valsbegin(op,pr,cfname)) >= 0) {
-	    if ((rs = pcsconfs_dbcheck(op)) >= 0) {
-		op->magic = PCSCONFS_MAGIC ;
-	    }
-	    if (rs < 0)
-		pcsconfs_valsend(op) ;
-	} /* end if */
-
+int pcsconfs_start(PC *op,cchar *pr,mainv ev,cchar *cfname) noex {
+	int		rs = SR_FAULT ;
+	if (op && pr) {
+	    rs = SR_INVALID ;
+	    memclear(op) ; /* dangerous */
+	    op->fl.prdb = (cfname == nullptr) ;
+	    if (pr[0]) {
+		if ((rs = pcsconfs_envv(op,ev)) >= 0) {
+	            if ((rs = pcsconfs_valsbegin(op,pr,cfname)) >= 0) {
+	                if ((rs = pcsconfs_dbcheck(op)) >= 0) {
+		            op->magval = PC_MAGIC ;
+	                }
+	                if (rs < 0) {
+		            pcsconfs_valsend(op) ;
+	                }
+	            } /* end if */
+		} /* end if (pcsconfs_envv) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pcsconfs_start) */
 
-int pcsconfs_finish(PCSCONFS *op) noex {
-	int		rs = SR_OK ;
+int pcsconfs_finish(PC *op) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
-	{
-	    rs1 = pcsconfs_finout(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-	op->magic = 0 ;
+	if (op) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magval == PC_MAGIC) {
+	        rs1 = pcsconfs_finout(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pcsconfs_finish) */
 
-int pcsconfs_audit(PCSCONFS *op) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
-
-	if (op->fl.db) {
-	    rs = var_audit(&op->db) ;
-	}
-
+int pcsconfs_audit(PC *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magval == PC_MAGIC) {
+	        if (op->fl.db) {
+	            rs = var_audit(&op->db) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pcsconfs_audit) */
 
-int pcsconfs_curbegin(PCSCONFS *op,PCSCONFS_CUR *curp) noex {
+int pcsconfs_curbegin(PC *op,PC_CUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PC_MAGIC) return SR_NOTOPEN ;
 
 	memclear(curp) ;
 
@@ -342,21 +345,21 @@ int pcsconfs_curbegin(PCSCONFS *op,PCSCONFS_CUR *curp) noex {
 	    if (rs >= 0) op->ncursors += 1 ;
 	}
 
-	if (rs >= 0) curp->magic = PCSCONFS_CURMAGIC ;
+	if (rs >= 0) curp->magval = PC_CURMAGIC ;
 
 	return rs ;
 }
 /* end subroutine (pcsconfs_curbegin) */
 
-int pcsconfs_curend(PCSCONFS *op,PCSCONFS_CUR *curp) noex {
+int pcsconfs_curend(PC *op,PC_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != PCSCONFS_CURMAGIC) return SR_NOTOPEN ;
+	if (op->magval != PC_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != PC_CURMAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.db) {
 	    rs1 = var_curend(&op->db,&curp->vcur) ;
@@ -364,12 +367,12 @@ int pcsconfs_curend(PCSCONFS *op,PCSCONFS_CUR *curp) noex {
 	    if (op->ncursors > 0) op->ncursors -= 1 ;
 	}
 
-	curp->magic = 0 ;
+	curp->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (pcsconfs_curend) */
 
-int pcsconfs_fetch(PCSCONFS *op,cchar *kp,int kl,PCSCONFS_CUR *curp,
+int pcsconfs_fetch(PC *op,cchar *kp,int kl,PC_CUR *curp,
 		char *vbuf,int vlen) noex {
 	int		rs = SR_NOTFOUND ;
 
@@ -377,8 +380,8 @@ int pcsconfs_fetch(PCSCONFS *op,cchar *kp,int kl,PCSCONFS_CUR *curp,
 	if (curp == nullptr) return SR_FAULT ;
 	if (kp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != PCSCONFS_CURMAGIC) return SR_NOTOPEN ;
+	if (op->magval != PC_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != PC_CURMAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.db) {
 	    rs = var_fetch(&op->db,kp,kl,&curp->vcur,vbuf,vlen) ;
@@ -393,7 +396,7 @@ int pcsconfs_fetch(PCSCONFS *op,cchar *kp,int kl,PCSCONFS_CUR *curp,
 /* end subroutine (pcsconfs_fetch) */
 
 
-int pcsconfs_enum(PCSCONFS *op,PCSCONFS_CUR *curp,char *kbuf,int klen,
+int pcsconfs_enum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs = SR_NOTFOUND ;
 
@@ -401,8 +404,8 @@ int pcsconfs_enum(PCSCONFS *op,PCSCONFS_CUR *curp,char *kbuf,int klen,
 	if (curp == nullptr) return SR_FAULT ;
 	if (kbuf == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != PCSCONFS_CURMAGIC) return SR_NOTOPEN ;
+	if (op->magval != PC_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != PC_CURMAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.db) {
 	    rs = var_enum(&op->db,&curp->vcur,kbuf,klen,vbuf,vlen) ;
@@ -416,12 +419,12 @@ int pcsconfs_enum(PCSCONFS *op,PCSCONFS_CUR *curp,char *kbuf,int klen,
 }
 /* end subroutine (pcsconfs_enum) */
 
-int pcsconfs_count(PCSCONFS *op) noex {
+int pcsconfs_count(PC *op) noex {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSCONFS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PC_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.db) {
 	    rs = var_count(&op->db) ;
@@ -434,7 +437,7 @@ int pcsconfs_count(PCSCONFS *op) noex {
 
 /* private subroutines */
 
-static int pcsconfs_valsbegin(PCSCONFS *op,cchar *pr,cchar *cfname) noex {
+local int pcsconfs_valsbegin(PC *op,cchar *pr,cchar *cfname) noex {
 	int		rs ;
 	int		sz = 0 ;
 	sz += (lenstr(pr)+1) ;
@@ -454,22 +457,20 @@ static int pcsconfs_valsbegin(PCSCONFS *op,cchar *pr,cchar *cfname) noex {
 }
 /* end subroutine (pcsconfs_valsbegin) */
 
-static int pcsconfs_valsend(PCSCONFS *op) noex {
+local int pcsconfs_valsend(PC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->a != nullptr) {
 	    rs1 = lm_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (pcsconfs_valsend) */
 
-static int pcsconfs_dbcheck(PCSCONFS *op) noex {
-	CONFVARS	si, *sip = &si ;
+local int pcsconfs_dbcheck(PC *op) noex {
+	CV	si, *sip = &si ;
 	int		rs ;
 	int		rs1 ;
 	int		f_conf = false ;
@@ -489,7 +490,7 @@ static int pcsconfs_dbcheck(PCSCONFS *op) noex {
 }
 /* end subroutine (pcsconfs_dbcheck) */
 
-static int pcsconfs_dbclose(PCSCONFS *op) noex {
+local int pcsconfs_dbclose(PC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.db) {
@@ -501,7 +502,7 @@ static int pcsconfs_dbclose(PCSCONFS *op) noex {
 }
 /* end subroutine (pcsconfs_dbclose) */
 
-static int pcsconfs_finout(PCSCONFS *op) noex {
+local int pcsconfs_finout(PC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -516,13 +517,23 @@ static int pcsconfs_finout(PCSCONFS *op) noex {
 }
 /* end subroutine (pcsconfs_finout) */
 
-static int confvars_start(CONFVARS *sip,PCSCONFS *op) noex {
+local int pcsconfs_envv(PC *op,mainv ev) noex {
+    	int	rs = SR_OK ;
+	if ((op->envv = ev) == nullptr) {
+	    if ((rs = u_getenviron(&ev)) >= 0) {
+		op->envv = ev ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (pcsconfs_envv) */
+
+local int confvars_start(CV *sip,PC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	cchar		*cfname ;
 	char		tmpfname[MAXPATHLEN+1] ;
 
-	memset(sip,0,sizeof(CONFVARS)) ;
+	memclear(sip) ;
 	sip->op = op ;
 	sip->envv = op->envv ;
 	sip->prconf = PRCONF ;
@@ -548,7 +559,7 @@ static int confvars_start(CONFVARS *sip,PCSCONFS *op) noex {
 	            rs1 = permsched(schedconf,&subs,pbuf,plen,cn,m) ;
 		    if (rs1 >= 0) {
 			cchar	*cp ;
-			if ((rs = lm_mallstrw(pbuf,rs1,&cp)) >= 0) {
+			if ((rs = lm_strw(pbuf,rs1,&cp)) >= 0) {
 			    sip->fl.cfname = true ;
 			    sip->cfname = cp ;
 			}
@@ -574,28 +585,26 @@ static int confvars_start(CONFVARS *sip,PCSCONFS *op) noex {
 }
 /* end subroutine (confvars_start) */
 
-static int confvars_finish(CONFVARS *sip) noex {
+local int confvars_finish(CV *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (sip->fl.cfname && (sip->cfname != nullptr)) {
 	    sip->fl.cfname = false ;
-	    rs1 = lm_free(sip->cfname) ;
+	    void *vp = voidp(sip->cfname) ;
+	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->cfname = nullptr ;
 	}
-
 	if (sip->fl.id) {
 	    sip->fl.id = false ;
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (confvars_finish) */
 
-static int confvars_loadsubs(CONFVARS *sip,vecstr *slp) noex {
+local int confvars_loadsubs(CV *sip,vecstr *slp) noex {
 	int		rs = SR_OK ;
 	int		bl ;
 	cchar		*bp ;
@@ -613,8 +622,8 @@ static int confvars_loadsubs(CONFVARS *sip,vecstr *slp) noex {
 }
 /* end subroutine (confvars_loadsubs) */
 
-static int confvars_dbstart(CONFVARS *sip) noex {
-	PCSCONFS	*op = sip->op ;
+local int confvars_dbstart(CV *sip) noex {
+	pcsconfs	*op = sip->op ;
 	int		rs = SR_OK ;
 	int		dl = -1 ;
 	char		dbname[MAXPATHLEN+1] ;
@@ -662,10 +671,10 @@ static int confvars_dbstart(CONFVARS *sip) noex {
 }
 /* end subroutine (confvars_dbstart) */
 
-static int confvars_confglobal(CONFVARS *sip,char *dname) noex {
+local int confvars_confglobal(CV *sip,char *dname) noex {
 	int		rs ;
 	cmode		dm = 0777 ;
-	cchar		*tmpdname = getenv(VARTMPDNAME) ;
+	cchar		*tmpdname = getenv(varTMPDNAME) ;
 	cchar		*cdname = "pcsconf" ;
 
 	if (sip == nullptr) return SR_FAULT ;
@@ -683,7 +692,7 @@ static int confvars_confglobal(CONFVARS *sip,char *dname) noex {
 }
 /* end subroutine (confvars_confglobal) */
 
-static int confvars_conflocal(CONFVARS *sip,char *dname) noex {
+local int confvars_conflocal(CV *sip,char *dname) noex {
 	int		rs ;
 	cmode		dm = 0775 ;
 	cchar		*cdname = "pcsconf" ;
@@ -696,20 +705,19 @@ static int confvars_conflocal(CONFVARS *sip,char *dname) noex {
 }
 /* end subroutine (confvars_conflocal) */
 
-static int confvars_dbopen(CONFVARS *sip,cchar *dbname) noex {
-	PCSCONFS	*op = sip->op ;
-	VAR		*vdp ;
+local int confvars_dbopen(CV *sip,cchar *dbname) noex {
+	pcsconfs	*op = sip->op ;
+	var		*vdp = &op->db ;
 	int		rs ;
 
 #if	CF_DEBUGS
 	debugprintf("confvars_dbopen: dbname=%s\n",dbname) ;
 #endif
 
-	vdp = &op->db ;
 	if ((rs = var_open(vdp,dbname)) >= 0) {
-	    VAR_INFO	vi ;
+	    var_info	vi ;
 	    op->fl.db = true ;
-	    if ((rs = var_info(vdp,&vi)) >= 0) {
+	    if ((rs = var_getinfo(vdp,&vi)) >= 0) {
 #if	CF_DEBUGS
 	{
 		char	timebuf[TIMEBUFLEN+1] ;
@@ -739,9 +747,9 @@ static int confvars_dbopen(CONFVARS *sip,cchar *dbname) noex {
 }
 /* end subroutine (confvars_dbopen) */
 
-static int confvars_dbclose(CONFVARS *sip) noex {
-	PCSCONFS	*op = sip->op ;
-	VAR		*vdp ;
+local int confvars_dbclose(CV *sip) noex {
+	pcsconfs	*op = sip->op ;
+	var		*vdp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -756,7 +764,7 @@ static int confvars_dbclose(CONFVARS *sip) noex {
 }
 /* end subroutine (confvars_dbclose) */
 
-static int confvars_dbmake(CONFVARS *sip,cchar *dbname) noex {
+local int confvars_dbmake(CV *sip,cchar *dbname) noex {
 	varmk		*vmp = &sip->v ;
 	cint		of = O_CREAT ;
 	cint		n = 40 ;
@@ -776,49 +784,45 @@ static int confvars_dbmake(CONFVARS *sip,cchar *dbname) noex {
 }
 /* end subroutine (confvars_dbmake) */
 
-static int confvars_proc(CONFVARS *sip) noex {
+local int confvars_proc(CV *sip) noex {
 	ustat		sb ;
 	int		rs ;
 	int		rs1 ;
 
 	if ((rs = u_stat(sip->cfname,&sb)) >= 0) {
 	    paramfile		*pfp = &sip->pf ;
-	    paramfile_cur	cur ;
-	    paramfile_ent	pe ;
 	    if ((rs = paramfile_open(pfp,sip->envv,sip->cfname)) >= 0) {
-
+	        paramfile_cur	cur ;
+	        paramfile_ent	pe ;
 	        if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
 	            cint	plen = PARAMBUFLEN ;
 	            int		kl ;
 	            char	pbuf[PARAMBUFLEN+1] ;
-
 	            while (rs >= 0) {
 	                kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
 	                if (kl == SR_NOTFOUND) break ;
 	                rs = kl ;
 	                if (rs < 0) break ;
-
-	                rs = varmk_addvar(&sip->v,pe.key,pe.value,pe.vlen) ;
-
+	                rs = varmk_addvar(&sip->v,pe.key,pe.val,pe.vlen) ;
 	            } /* end while (reading parameters) */
-
 	            paramfile_curend(pfp,&cur) ;
 	        } /* end if (cursor) */
-
 	        rs1 = paramfile_close(pfp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (paramfile) */
 	} /* end if (stat-file) */
 
 	return rs ;
-}
-/* end subroutine (confvars_proc) */
+} /* end subroutine (confvars_proc) */
 
-static int confvars_chown(CONFVARS *sip,char *dname,int dl) noex {
+local int confvars_chown(CV *sip,char *dname,int dl) noex {
 	cint		req = _PC_CHOWN_RESTRICTED ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 
 #ifdef	_PC_CHOWN_RESTRICTED
+	if (char *dbuf ; (rs = lm_mn(&dbuf)) >= 0) {
+	    cint dlen = rs ;
 	if ((rs = u_pathconf(dname,req,nullptr)) == 0) {
 	    if ((rs = confvars_ids(sip)) >= 0) {
 		ids		*idp = &sip->id ;
@@ -828,7 +832,7 @@ static int confvars_chown(CONFVARS *sip,char *dname,int dl) noex {
 	            fsdir_ent	e ;
 		    int		naml ;
 		    cchar	*namp ;
-		    while ((rs = fsdir_read(&d,&e)) > 0) {
+		    while ((rs = fsdir_read(&d,&e,dbuf,dlen)) > 0) {
 			namp = e.name ;
 			naml = rs ;
 			if (hasNotDots(namp,naml)) {
@@ -853,13 +857,15 @@ static int confvars_chown(CONFVARS *sip,char *dname,int dl) noex {
 	} else if (rs == SR_NOSYS) {
 	    rs = SR_OK ;
 	}
+	rs1 = lm_free(dbuf) ;
+	if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 #endif /* _PC_CHOWN_RESTRICTED */
 
 	return rs ;
-}
-/* end subroutine (confvars_chown) */
+} /* end subroutine (confvars_chown) */
 
-static int confvars_ids(CONFVARS *sip) noex {
+local int confvars_ids(CV *sip) noex {
 	int		rs = SR_OK ;
 	if (! sip->fl.id) {
 	    sip->fl.id = true ;
@@ -875,7 +881,6 @@ static int confvars_ids(CONFVARS *sip) noex {
 	    } /* end if (loaded IDs) */
 	} /* end if (needed IDs) */
 	return rs ;
-}
-/* end subroutine (confvars_ids) */
+} /* end subroutine (confvars_ids) */
 
 
