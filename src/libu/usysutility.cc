@@ -19,19 +19,14 @@
 /*******************************************************************************
 
 	Name:
-	libu::ctdecf
+	usysutility
 
 	Description:
-	Convert a |double| to a decimal digit-string.
+	These are various utility subroutines.
 
 	Synopsis:
-	int libu::ctdecf(char *rbuf,int rlen,int prec,double v) noex
 
 	Arguments:
-	rbuf		result buffer pointer
-	rlen		result buffer length
-	prec		precision (places after decimal point)
-	v		value to convert
 
 	Returns:
 	>=0		OK
