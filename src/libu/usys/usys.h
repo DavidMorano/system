@@ -75,6 +75,7 @@
 #include	<usys_fdatasync.h>
 #include	<usys_eaccess.h>
 #include	<usys_xti.h>
+#include	<usys_environ.hh>
 
 
 #endif /* USYS_INCLUDE */
