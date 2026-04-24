@@ -127,7 +127,7 @@
 #include	<ucfork.h>
 #include	<ucatfork.h>
 #include	<ucatexit.h>
-#include	<ucwrite.h>
+#include	<ucdescwrite.h>
 #include	<bufsizevar.hh>
 #include	<ptm.h>
 #include	<ptc.h>
