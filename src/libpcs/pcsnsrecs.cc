@@ -91,23 +91,23 @@ struct pcsnsrecs_r {
 
 /* forward references */
 
-static int	pcsnsrecs_fetch(RECS *,PCSNSRECS_REC **,cchar *,int) noex ;
-static int	pcsnsrecs_mkrec(RECS *,time_t,RECINFO *) noex ;
-static int	pcsnsrecs_newrec(RECS *,time_t,
+local int	pcsnsrecs_fetch(RECS *,PCSNSRECS_REC **,cchar *,int) noex ;
+local int	pcsnsrecs_mkrec(RECS *,time_t,RECINFO *) noex ;
+local int	pcsnsrecs_newrec(RECS *,time_t,
 			PCSNSRECS_REC **,RECINFO *) noex ;
-static int	pcsnsrecs_recstart(RECS *,time_t,
+local int	pcsnsrecs_recstart(RECS *,time_t,
 			PCSNSRECS_REC *,RECINFO *) noex ;
-static int	pcsnsrecs_recdel(RECS *,PCSNSRECS_REC *) noex ;
-static int	pcsnsrecs_recaccess(RECS *,time_t,PCSNSRECS_REC *) noex ;
-static int	pcsnsrecs_recrear(RECS *,PCSNSRECS_REC *) noex ;
-static int	pcsnsrecs_recfins(RECS *) noex ;
-static int	pcsnsrecs_upstats(RECS *,int,int) noex ;
+local int	pcsnsrecs_recdel(RECS *,PCSNSRECS_REC *) noex ;
+local int	pcsnsrecs_recaccess(RECS *,time_t,PCSNSRECS_REC *) noex ;
+local int	pcsnsrecs_recrear(RECS *,PCSNSRECS_REC *) noex ;
+local int	pcsnsrecs_recfins(RECS *) noex ;
+local int	pcsnsrecs_upstats(RECS *,int,int) noex ;
 
-static int record_start(PCSNSRECS_REC *,time_t,int,RECINFO *) noex ;
-static int record_access(PCSNSRECS_REC *,time_t) noex ;
-static int record_old(PCSNSRECS_REC *,time_t,int) noex ;
-static int record_finish(PCSNSRECS_REC *) noex ;
-static int record_get(PCSNSRECS_REC *,char *,int) noex ;
+local int record_start(PCSNSRECS_REC *,time_t,int,RECINFO *) noex ;
+local int record_access(PCSNSRECS_REC *,time_t) noex ;
+local int record_old(PCSNSRECS_REC *,time_t,int) noex ;
+local int record_finish(PCSNSRECS_REC *) noex ;
+local int record_get(PCSNSRECS_REC *,char *,int) noex ;
 
 
 /* local variables */
@@ -360,7 +360,7 @@ int pcsnsrecs_stats(RECS *op,PCSNSRECS_ST *sp) noex {
 
 /* private subroutines */
 
-static int pcsnsrecs_fetch(RECS *op,PCSNSRECS_REC **epp,cchar *un,int w) noex {
+local int pcsnsrecs_fetch(RECS *op,PCSNSRECS_REC **epp,cchar *un,int w) noex {
 	RECARR		*rlp = op->recs ;
 	PCSNSRECS_REC	*ep ;
 	int		rs ;
@@ -379,7 +379,7 @@ static int pcsnsrecs_fetch(RECS *op,PCSNSRECS_REC **epp,cchar *un,int w) noex {
 }
 /* end subroutine (pcsnsrecs_fetch) */
 
-static int pcsnsrecs_mkrec(RECS *op,time_t dt,RECINFO *rip) noex {
+local int pcsnsrecs_mkrec(RECS *op,time_t dt,RECINFO *rip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ;
@@ -411,7 +411,7 @@ static int pcsnsrecs_mkrec(RECS *op,time_t dt,RECINFO *rip) noex {
 }
 /* end subroutine (pcsnsrecs_mkrec) */
 
-static int pcsnsrecs_newrec(RECS *op,time_t dt,
+local int pcsnsrecs_newrec(RECS *op,time_t dt,
 		PCSNSRECS_REC **epp,RECINFO *rip) noex {
 	PCSNSRECS_REC	*ep ;
 	cint	size = sizeof(PCSNSRECS_REC) ;
@@ -429,7 +429,7 @@ static int pcsnsrecs_newrec(RECS *op,time_t dt,
 /* end subroutine (pcsnsrecs_newrec) */
 
 
-static int pcsnsrecs_recstart(RECS *op,time_t dt,PCSNSRECS_REC *ep,
+local int pcsnsrecs_recstart(RECS *op,time_t dt,PCSNSRECS_REC *ep,
 		RECINFO *rip) noex {
 	cint		wc = op->wcount++ ;
 	int		rs ;
@@ -445,7 +445,7 @@ static int pcsnsrecs_recstart(RECS *op,time_t dt,PCSNSRECS_REC *ep,
 }
 /* end subroutine (pcsnsrecs_recstart) */
 
-static int pcsnsrecs_recaccess(RECS *op,time_t dt,PCSNSRECS_REC *ep) noex {
+local int pcsnsrecs_recaccess(RECS *op,time_t dt,PCSNSRECS_REC *ep) noex {
 	int		rs ;
 	if ((rs = pcsnsrecs_recrear(op,ep)) >= 0) {
 	    rs = record_access(ep,dt) ;
@@ -454,7 +454,7 @@ static int pcsnsrecs_recaccess(RECS *op,time_t dt,PCSNSRECS_REC *ep) noex {
 }
 /* end subroutine (pcsnsrecs_recaccess) */
 
-static int pcsnsrecs_recrear(RECS *op,PCSNSRECS_REC *ep) noex {
+local int pcsnsrecs_recrear(RECS *op,PCSNSRECS_REC *ep) noex {
 	pq_ent		*pcp = (pq_ent *) ep ;
 	pq_ent		*pep ;
 	int		rs ;
@@ -477,7 +477,7 @@ static int pcsnsrecs_recrear(RECS *op,PCSNSRECS_REC *ep) noex {
 }
 /* end subroutine (pcsnsrecs_recrear) */
 
-static int pcsnsrecs_recdel(RECS *op,PCSNSRECS_REC *ep) noex {
+local int pcsnsrecs_recdel(RECS *op,PCSNSRECS_REC *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -493,7 +493,7 @@ static int pcsnsrecs_recdel(RECS *op,PCSNSRECS_REC *ep) noex {
 }
 /* end subroutine (pcsnsrecs_recdel) */
 
-static int pcsnsrecs_recfins(RECS *op) noex {
+local int pcsnsrecs_recfins(RECS *op) noex {
 	RECARR		*rlp = op->recs ;
 	PCSNSRECS_REC	*ep ;
 	int		rs = SR_OK ;
@@ -513,7 +513,7 @@ static int pcsnsrecs_recfins(RECS *op) noex {
 }
 /* end subroutine (pcsnsrecs_recfins) */
 
-static int pcsnsrecs_upstats(RECS *op,int ct,int rs) noex {
+local int pcsnsrecs_upstats(RECS *op,int ct,int rs) noex {
 	int		f_got = (rs > 0) ;
 	switch (ct) {
 	case ct_hit:
@@ -529,7 +529,7 @@ static int pcsnsrecs_upstats(RECS *op,int ct,int rs) noex {
 }
 /* end subroutine (pcsnsrecs_upstats) */
 
-static int record_start(PCSNSRECS_REC *ep,time_t dt,int wc,RECINFO *rip) noex {
+local int record_start(PCSNSRECS_REC *ep,time_t dt,int wc,RECINFO *rip) noex {
 	int		rs ;
 	int		vlen ;
 	int		vl = 0 ;
@@ -564,7 +564,7 @@ static int record_start(PCSNSRECS_REC *ep,time_t dt,int wc,RECINFO *rip) noex {
 }
 /* end subroutine (record_start) */
 
-static int record_finish(PCSNSRECS_REC *ep) noex {
+local int record_finish(PCSNSRECS_REC *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -582,7 +582,7 @@ static int record_finish(PCSNSRECS_REC *ep) noex {
 }
 /* end subroutine (record_finish) */
 
-static int record_access(PCSNSRECS_REC *ep,time_t dt) noex {
+local int record_access(PCSNSRECS_REC *ep,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		vl = 0 ;
 
@@ -594,7 +594,7 @@ static int record_access(PCSNSRECS_REC *ep,time_t dt) noex {
 }
 /* end subroutine (record_access) */
 
-static int record_old(PCSNSRECS_REC *ep,time_t dt,int ttl) noex {
+local int record_old(PCSNSRECS_REC *ep,time_t dt,int ttl) noex {
 	int		f_old = false ;
 	if (ep == NULL) return SR_FAULT ;
 	if ((ep->ttl > 0) && (ep->ttl < ttl)) ttl = ep->ttl ;
@@ -603,7 +603,7 @@ static int record_old(PCSNSRECS_REC *ep,time_t dt,int ttl) noex {
 }
 /* end subroutine (record_old) */
 
-static int record_get(PCSNSRECS_REC *ep,char *rbuf,int rlen) noex {
+local int record_get(PCSNSRECS_REC *ep,char *rbuf,int rlen) noex {
 	int		rs ;
 	rs = snwcpy(rbuf,rlen,ep->vbuf,ep->vl) ;
 	return rs ;
