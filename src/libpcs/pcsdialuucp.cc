@@ -25,6 +25,7 @@
 	pcsdialuucp
 
 	Description:
+	Dial out to a UUCP system.
 
 	Synopsis:
 	int pcsdialuucp(cchar *pr,cchar *nodename,cchar *filepath) noex
@@ -54,6 +55,7 @@
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bfile.h>
 #include	<sbuf.h>
 #include	<vecstr.h>
@@ -63,6 +65,9 @@
 
 #include	"pcsdialuucp.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -95,17 +100,22 @@ extern int	debugprintf(cchar *,...) ;
 
 /* external variables */
 
-extern char	**environ ;
-
 
 /* local structures */
+
+namespace {
+    struct vars {
+	mainv	envv ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward reference */
 
-static int	findprogname(cchar *,char *,cchar *) ;
-static int	testuucp(cchar *,cchar *) ;
-static int	waitpidtimed(pid_t,int *) ;
+local int	findprogname(cchar *,char *,cchar *) noex ;
+local int	testuucp(cchar *,cchar *) noex ;
+local int	waitpidtimed(pid_t,int *) noex ;
 
 
 /* local variablies */
@@ -125,7 +135,7 @@ constexpr cpcchar	goodenvs[] = {
 	"NCMP",
 	"PCS",
 	nullptr
-} ;
+} ; /* end array (goodenvs) */
 
 
 /* exported variables */
@@ -134,11 +144,11 @@ constexpr cpcchar	goodenvs[] = {
 /* exported subroutines */
 
 int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
+    	static cint rsv = var ;
 	pid_t		pid ;
 	mode_t		mkmode ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
 	int		child_stat = 0 ;
 	int		pfd = -1 ;
 	cchar	*varpcs = VARPRPCS ;
@@ -230,12 +240,7 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	debugprintf("uucp: about to fork\n") ;
 #endif
 
-	rs = uc_fork() ;
-	pid = rs ;
-	if (rs < 0)
-	    goto badfork ;
-
-	if (rs == 0) {
+	if ((rs = uc_fork()) == 0) {
 	    vecstr	args, envs ;
 	    int		fd ;
 	    char	*arg0 ;
@@ -248,19 +253,16 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 
 	    vecstr_start(&envs,10,0) ;
 
-	    for (i = 0 ; i < 3 ; i += 1)
+	    for (int i = 0 ; i < 3 ; i += 1) {
 	        u_close(i) ;
-
+	    }
 	    u_open(NULLDEV,O_RDONLY,0600) ;
-
 	    fd = u_open(NULLDEV,O_WRONLY,0600) ;
-
 	    u_dup(fd) ;
 
 /* pop us one ... more ... time! */
 
 	    rs = uc_fork() ;
-
 	    if (rs > 0)
 	        uc_exit(EX_OK) ;
 
@@ -278,45 +280,25 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 
 	    vecstr_add(&args,dst,-1) ;
 
-/* environment */
-
-#if	CF_DEBUGS
-	    debugprintf("pcsdialuucp: environment\n") ;
-#endif
-
-	    if (environ != nullptr) {
-
-#if	CF_DEBUGS
-	        debugprintf("pcsdialuucp: got some\n") ;
-#endif
-
-	        for (i = 0 ; environ[i] != nullptr ; i += 1) {
-
-#if	CF_DEBUGS && 0
-	            debugprintf("pcsdialuucp: E> %s\n",environ[i]) ;
-#endif
-
-	            if (matkeystr(goodenvs,environ[i],-1) >= 0)
-	                vecstr_add(&envs,environ[i],-1) ;
-
+	    /* environment */
+	        for (int i = 0 ; var.envv[i] != nullptr ; i += 1) {
+		    cchar *evp = var.envv[i] ;
+	            if (matkeystr(goodenvs,evp,-1) >= 0) {
+	                vecstr_add(&envs,ecp,-1) ;
+		    }
 	        } /* end for */
-
-	        if (vecstr_finder(&envs,varpcs,vstrkeycmp,nullptr) < 0)
+	        if (vecstr_finder(&envs,varpcs,vstrkeycmp,nullptr) < 0) {
 	            vecstr_envadd(&envs,varpcs,pr,-1) ;
-
-	    } else
-	        vecstr_envadd(&envs,varpcs,pr,-1) ;
-
-/* do the exec */
-
+		}
+	    /* do the exec */
 	    {
 		cchar	**eav = (cchar **) args.va ;
 		cchar	**eev = (cchar **) envs.va ;
 	        u_execve(progfname,eav,eev) ;
 	    }
-
 	    uc_exit(EX_NOEXEC) ;
-
+	} else if (rs >= 0) {
+	    pid = rs ;
 	} /* end if (fork) */
 
 #if	CF_DEBUGS
@@ -373,25 +355,17 @@ bad0:
 
 /* local subroutines */
 
-
 /* check for UUCP availability */
-static int testuucp(pr,uunode)
-cchar	pr[] ;
-cchar	uunode[] ;
-{
+local int testuucp(cchar *pr,cchar *uunode) noex {
 	bfile	file0, file2 ;
 	bfile	procfile, *pfp = &procfile ;
 	bfile	*fpa[3] ;
-
 	pid_t	pid ;
-
 	int	rs ;
 	int	i ;
 	int	len, sl ;
 	int	child_stat ;
-
 	cchar	*progname = PROG_UUNAME ;
-
 	char	progfname[MAXPATHLEN + 2] ;
 	char	buf[NODENAMELEN + 1] ;
 	char	*cp ;
@@ -427,12 +401,10 @@ cchar	uunode[] ;
 #endif
 
 	    pid = rs ;
-
 	    bclose(fpa[0]) ;
+	    /* find the part of the machine name that we like */
 
-/* find the part of the machine name that we like */
-
-	    i = strlen(uunode) ;
+	    i = lenstr(uunode) ;
 
 	    if ((cp = strchr(uunode,'.')) != nullptr)
 	        i = cp - uunode ;
@@ -447,7 +419,7 @@ cchar	uunode[] ;
 	        buf[len] = '\0' ;
 	        cp = strshrink(buf) ;
 
-	        sl = strlen(cp) ;
+	        sl = lenstr(cp) ;
 
 	        if ((i == sl) && (strncasecmp(cp,uunode,i) == 0)) {
 
@@ -476,20 +448,12 @@ ret0:
 #endif
 
 	return rs ;
-}
-/* end subroutine (testuucp) */
+} /* end subroutine (testuucp) */
 
-
-static int findprogname(pr,progfname,pn)
-cchar	pr[] ;
-char		progfname[] ;
-cchar	pn[] ;
-{
+local int findprogname(cchar *pr,cchar *progfname,cchar *pn) noex {
 	int	rs ;
 	int	len = 0 ;
-
 	char	cname[MAXNAMELEN+1] ;
-
 
 	rs = sncpy2(cname,MAXNAMELEN,"pcs",pn) ;
 	if (rs >= 0) {
@@ -510,36 +474,23 @@ cchar	pn[] ;
 	} /* end if */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (findprogname) */
-
+} /* end subroutine (findprogname) */
 
 /* waitpidtimed */
-static int waitpidtimed(pid,cp)
-pid_t	pid ;
-int	*cp ;
-{
-	const int	wopt = (WUNTRACED | WNOHANG) ;
-
+local int waitpidtimed(pid_t pid,int *cp) noex {
+	cint	wopt = (WUNTRACED | WNOHANG) ;
 	int	rs = SR_OK ;
 	int	to = TO_WAITPID ;
-	int	i ;
-
-
-	for (i = 0 ; to-- > 0 ; i += 1) {
-
+	for (int i = 0 ; to-- > 0 ; i += 1) {
 	    if (i > 0) sleep(1) ;
-
 	    rs = u_waitpid(pid,cp,wopt) ;
-
-	    if (rs != 0)
-	        break ;
-
+	    if (rs != 0) break ;
 	} /* end while */
-
 	return rs ;
-}
-/* end subroutine (waitpidtimed) */
+} /* end subroutine (waitpidtimed) */
 
+vars::operator int () noex {
+	return u_getenviron(&envv) ;
+} /* end method (vars::operator) */
 
 
