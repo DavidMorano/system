@@ -81,7 +81,7 @@
 
 /* forward references */
 
-static int	ucopenshm(cc *,int,mode_t) noex ;
+local int	ucopenshm(cc *,int,mode_t) noex ;
 
 
 /* local variables */
@@ -133,7 +133,7 @@ int uc_openshm(cchar *shmname,int of,mode_t om) noex {
 
 /* local subroutines */
 
-static int ucopenshm(cc *name,int of,mode_t om) noex {
+local int ucopenshm(cc *name,int of,mode_t om) noex {
 	errtimer	to_mfile = utimeout[uto_mfile] ;
 	errtimer	to_nfile = utimeout[uto_nfile] ;
 	errtimer	to_nomem = utimeout[uto_nomem] ;
@@ -166,7 +166,6 @@ static int ucopenshm(cc *name,int of,mode_t om) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (ucopenshm) */
+} /* end subroutine (ucopenshm) */
 
 
