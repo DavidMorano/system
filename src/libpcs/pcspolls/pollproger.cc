@@ -1,4 +1,4 @@
-/* pollproger SUPPORT (POLLPROG) */
+/* pollproger SUPPORT (PP) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -27,12 +27,8 @@
 	program.
 
 	Synopsis:
-	int pollprog_start(op,pr,sn,envv,pcp)
-	PCSPOLLS	*op ;
-	cchar	*pr ;
-	cchar	*sn ;
-	cchar	**envv ;
-	PCSCONF		*pcp ;
+	int pollprog_start(pcspolls *op,cc *pr,cc *sn,
+		mainv envv,pcsconf *pcp) noex
 
 	Arguments:
 	op		object pointer
@@ -54,7 +50,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<pcsconf.h>
 #include	<storebuf.h>
 #include	<upt.h>
@@ -68,9 +66,9 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	POLLPROG	struct pollprog_head
-#define	POLLPROG_FL	struct pollprog_flags
-#define	POLLPROG_MAGIC	0x88773422
+#define	PP	pollprog_head
+#define	PP_FL	pollprog_flags
+#define	PP_MAGIC	0x88773422
 
 
 /* imported namespaces */
@@ -94,40 +92,39 @@ extern "C" {
 
 /* external variables */
 
-extern cchar	**environ ;
-
 
 /* local structures */
 
 struct pollprog_flags {
 	uint		working:1 ;
-} ;
+} ; /* end struct */
 
 struct pollprog_head {
-	cchar		*a ;		/* memory allocation */
+	char		*a ;		/* memory allocation */
 	cchar		*pr ;
 	cchar		*sn ;
 	mainv		envv ;
 	PCSCONF		*pcp ;
 	pid_t		pid ;
 	pthread_t	tid ;
-	POLLPROG_FL	f ;
-	uint		magic ;
+	PP_FL		fl ;
+	uint		magval ;
 	volatile int	f_exiting ;
-} ;
+} ; /* end struct */
 
 enum cmds {
 	cmd_noop,
 	cmd_exit,
 	cmd_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
 
-static int	pollprog_argsbegin(POLLPROG *,cchar *,cchar *) ;
-static int	pollprog_argsend(POLLPROG *) ;
-static int	pollprog_worker(POLLPROG *) ;
+local int	pollprog_envv(pollprog *,mainv) noex ;
+local int	pollprog_argsbegin(PP *,cchar *,cchar *) ;
+local int	pollprog_argsend(PP *) ;
+local int	pollprog_worker(PP *) ;
 
 
 /* local variables */
@@ -137,58 +134,49 @@ static int	pollprog_worker(POLLPROG *) ;
 
 pcspolls_name	pollprog_mod = {
 	"pollprog",
-	sizeof(pollprog),
+	szof(pollprog),
 	0
 } ;
 
 
 /* exported subroutines */
 
-int pollprog_start(POLLPROG *op,cc *pr,cc *sn,mv envv,PCSCONF *pcp) noex {
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (envv == NULL) envv = environ ;
-
-	memclear(op) ;
-	op->envv = envv ;
-	op->pcp = pcp ;
-	op->pid = getpid() ;
-
-	if ((rs = pollprog_argsbegin(op,pr,sn)) >= 0) {
-	    if ((pr != NULL) && (sn != NULL)) {
-	        pthread_t	tid ;
-	        thrsub_f	thr = (thrsub_f) pollprog_worker ;
-	        if ((rs = uptcreate(&tid,NULL,thr,op)) >= 0) {
-	            op->fl.working = TRUE ;
-		    op->tid = tid ;
-	        }
-	    } /* end if (non-null) */
-	    if (rs >= 0) {
-	        op->magic = POLLPROG_MAGIC ;
-	    }
-	    if (rs < 0)
-		pollprog_argsend(op) ;
-	} /* end if (pollprog_argsbegin) */
-
-#if	CF_DEBUGS
-	debugprintf("pollprog_start: ret rs=%d\n",rs) ;
-#endif
-
+int pollprog_start(PP *op,cc *pr,cc *sn,mainv ev,PCSCONF *pcp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    memclear(op) ;
+	    if ((pollprog_envv(op,ev)) >= 0) {
+	        op->pcp = pcp ;
+	        op->pid = getpid() ;
+	        if ((rs = pollprog_argsbegin(op,pr,sn)) >= 0) {
+	            if ((pr != nullptr) && (sn != nullptr)) {
+	                pthread_t	tid ;
+	                thrsub_f	thr = (thrsub_f) pollprog_worker ;
+	                if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) {
+	                    op->fl.working = true ;
+		            op->tid = tid ;
+	                }
+	            } /* end if (non-null) */
+	            if (rs >= 0) {
+	                op->magval = PP_MAGIC ;
+	            }
+	            if (rs < 0) {
+		        pollprog_argsend(op) ;
+	            }
+	        } /* end if (pollprog_argsbegin) */
+	    /* end if (pollprog_envv) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pollprog_start) */
 
-
-int pollprog_finish(POLLPROG *op)
-{
+int pollprog_finish(PP *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != POLLPROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PP_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	debugprintf("pollprog_finish: f_working=%d\n",op->fl.working) ;
@@ -198,55 +186,53 @@ int pollprog_finish(POLLPROG *op)
 	    const pid_t	pid = getpid() ;
 	    if (pid == op->pid) {
 	        int	trs = 0 ;
-	        op->fl.working = FALSE ;
+	        op->fl.working = false ;
 	        rs1 = uptjoin(op->tid,&trs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        if (rs >= 0) rs = trs ;
 	    } else {
-		op->fl.working = FALSE ;
+		op->fl.working = false ;
 		op->tid = 0 ;
 	    }
 	}
-
+	{
 	rs1 = pollprog_argsend(op) ;
 	if (rs >= 0) rs = rs1 ;
+	}
 
 #if	CF_DEBUGS
 	debugprintf("pollprog_finish: ret rs=%d\n",rs) ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (pollprog_finish) */
 
-
-int pollprog_check(POLLPROG *op)
-{
-	int		rs = SR_OK ;
+int pollprog_check(PP *op) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		f = FALSE ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != POLLPROG_MAGIC) return SR_NOTOPEN ;
-
-	if (op->fl.working) {
-	    const pid_t	pid = getpid() ;
-	    if (pid == op->pid) {
-	        if (op->f_exiting) {
-	            int		trs = 0 ;
-	            op->fl.working = FALSE ;
-	            rs1 = uptjoin(op->tid,&trs) ;
-	            if (rs >= 0) rs = rs1 ;
-	            if (rs >= 0) rs = trs ;
-	            f = TRUE ;
-		}
-	    } else {
-		op->fl.working = FALSE ;
-	    }
-	}
-
+	int		f = false ;
+	if (op) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magval == PP_MAGIC) {
+	        if (op->fl.working) {
+	            static const pid_t	pid = getpid() ;
+	            if (pid == op->pid) {
+	                if (op->f_exiting) {
+	                    int		trs = 0 ;
+	                    op->fl.working = false ;
+	                    rs1 = uptjoin(op->tid,&trs) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                    if (rs >= 0) rs = trs ;
+	                    f = true ;
+		        }
+	            } else {
+		        op->fl.working = false ;
+	            }
+	        }
+	    } /* end if (magval) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (pollprog_check) */
@@ -254,21 +240,29 @@ int pollprog_check(POLLPROG *op)
 
 /* private subroutines */
 
+local int pollprog_envv(pollprog *op,mainv ev) noex {
+    	int	rs = SR_OK ;
+	if ((op->envv = ev) == nullptr) {
+	    if ((rs = u_getenviron(&ev)) >= 0) {
+		op->envv = ev ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (pollprog_envv) */
 
-static int pollprog_argsbegin(POLLPROG *op,cchar *pr,cchar *sn)
-{
+local int pollprog_argsbegin(PP *op,cchar *pr,cchar *sn) noex {
 	int		rs ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	char		*bp ;
-	size += (((pr !=NULL)?strlen(pr):0)+1) ;
-	size += (((sn !=NULL)?strlen(sn):0)+1) ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	sz += (((pr !=nullptr)?lenstr(pr):0)+1) ;
+	sz += (((sn !=nullptr)?lenstr(sn):0)+1) ;
+	if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	    op->a = bp ;
-	    if (pr != NULL) {
+	    if (pr != nullptr) {
 	        op->pr = bp ;
 	        bp = (strwcpy(bp,pr,-1)+1) ;
 	    }
-	    if (sn != NULL) {
+	    if (sn != nullptr) {
 	        op->sn = bp ;
 	        bp = (strwcpy(bp,sn,-1)+1) ;
 	    }
@@ -277,23 +271,19 @@ static int pollprog_argsbegin(POLLPROG *op,cchar *pr,cchar *sn)
 }
 /* end subroutine (pollprog_argsbegin) */
 
-
-static int pollprog_argsend(POLLPROG *op)
-{
+local int pollprog_argsend(PP *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->a != NULL) {
+	if (op->a != nullptr) {
 	    rs1 = uc_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->a = NULL ;
+	    op->a = nullptr ;
 	}
 	return rs ;
 }
 /* end subroutine (pollprog_argsend) */
 
-
-static int pollprog_worker(POLLPROG *op)
-{
+local int pollprog_worker(PP *op) noex {
 	PCSCONF		*pcp = op->pcp ;
 	int		rs ;
 	cchar	**envv = op->envv ;
@@ -310,9 +300,19 @@ static int pollprog_worker(POLLPROG *op)
 	debugprintf("pollprog/work_start: ret rs=%d\n",rs) ;
 #endif
 
-	op->f_exiting = TRUE ;
+	op->f_exiting = true ;
 	return rs ;
 }
 /* end subroutine (pollprog_worker) */
+
+local int pollprog_envv(pollprog *op,mainv ev) noex {
+    	int	rs = SR_OK ;
+	if ((op->envv = ev) == nullptr) {
+	    if ((rs = u_getenviron(&ev)) >= 0) {
+		op->envv = ev ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (pollprog_envv) */
 
 
