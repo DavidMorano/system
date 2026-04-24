@@ -1,0 +1,43 @@
+Enivron
+
+
+--------------------------------------------------------------------------------
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <crt_externs.h>
+
+
+#define environ (*_NSGetEnviron())
+
+
+#if defined(__APPLE__)
+    #include <crt_externs.h>
+    #define PLATFORM_ENVIRON (*_NSGetEnviron())
+#else
+    extern char **environ;
+    #define PLATFORM_ENVIRON environ
+#endif
+
+__attribute__((constructor))
+void my_library_init(void) {
+    char **env = PLATFORM_ENVIRON;
+
+    if (env == NULL) {
+        // This is extremely rare, but possible if the process
+        // was launched with an empty environment.
+        return;
+    }
+
+    for (char **var = env; *var != NULL; var++) {
+        // Read-only logic here
+        // Example: if (strncmp(*var, "MY_CONFIG=", 10) == 0) { ... }
+    }
+}
+
+
+--------------------------------------------------------------------------------
+
+
