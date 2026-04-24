@@ -80,12 +80,12 @@ typedef ENVLIST		envlist ;
 
 EXTERNC_begin
 
-extern int envlist_start(envlist *,int) noex ;
-extern int envlist_addkeyval(envlist *,cchar *,cchar *,int) noex ;
-extern int envlist_add(envlist *,cchar *,int) noex ;
-extern int envlist_present(envlist *,cchar *,int,cchar **) noex ;
-extern int envlist_count(envlist *) noex ;
-extern int envlist_finish(envlist *) noex ;
+extern int envlist_start	(envlist *,int) noex ;
+extern int envlist_addkeyval	(envlist *,cchar *,cchar *,int) noex ;
+extern int envlist_add		(envlist *,cchar *,int) noex ;
+extern int envlist_present	(envlist *,cchar *,int,cchar **) noex ;
+extern int envlist_count	(envlist *) noex ;
+extern int envlist_finish	(envlist *) noex ;
 
 EXTERNC_end
 
