@@ -40,10 +40,11 @@ struct strnul {
 	char		*as = nullptr ;	/* allocated memory */
 	int		sl = 0 ;
 	char		buf[STRNUL_SHORTLEN + 1] ;
+	bool		fok = true ;
 	strnul(cchar *ap,int al = -1) noex : sp(ap), sl(al) { 
 	    buf[0] = '\0' ;
 	} ; /* end ctor */
-	strnul(strview &sv) noex {
+	strnul(const strview &sv) noex {
 	    buf[0] = '\0' ;
 	    sp = sv.data() ;
 	    sl = (int) sv.length() ;
@@ -56,23 +57,15 @@ struct strnul {
 	    sp = sv.data() ;
 	    sl = (int) sv.length() ;
 	    return *this ;
-	} ; /* end operator (assignment from |string_view| */
-	ccharp operator () (cchar *ap,int al) noex {
-	    rp = nullptr ;
-	    if (as) {
-		delete [] as ;
-		as = nullptr ;
-	    }
-	    sp = ap ;
-	    sl = al ;
-	    return operator ccharp () ;
-	} ; /* end method */
-	ccharp operator () (strview &sv) noex {
+	} ; /* end operator (assignment from |string_view|) */
+	ccharp operator () (cchar *,int) noex ;
+	ccharp operator () (const strview &sv) noex {
 	    cchar	*ap = sv.data() ;
 	    cint	al = (int) sv.length() ;
 	    return operator () (ap,al) ;
 	} ; /* end method */
 	operator ccharp () noex ;
+	operator bool () const noex ;
 	destruct strnul() {
 	    if (as) {
 		delete [] as ;
