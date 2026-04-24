@@ -54,8 +54,6 @@ using std::nothrow ;			/* constant */
 
 /* external variables */
 
-extern cchar	**environ ;
-
 
 /* local structures */
 
@@ -97,6 +95,16 @@ local int envmgr_dtor(envmgr *op) noex {
 	return rs ;
 } /* end subroutine (envmgr_dtor) */
 
+local int envmgr_envv(envmgr *op,mainv ev) noex {
+    	int	rs = SR_OK ;
+	if ((op->envv = ev) == nullptr) {
+	    if ((rs = u_getenviron(&ev)) >= 0) {
+		op->envv = ev ;
+	    }
+	}
+	return rs ;
+} /* end subroutine (envmgr_envv) */
+
 
 /* local variables */
 
@@ -109,23 +117,28 @@ local int envmgr_dtor(envmgr *op) noex {
 int envmgr_start(envmgr *op) noex {
 	int		rs ;
 	if ((rs = envmgr_ctor(op)) >= 0) ylikely {
-	    vechand	*elp = op->listp ;
-	    cint	vn = 10 ;
-	    cint	vo = (VECHAND_OCOMPACT | VECHAND_OSORTED) ;
-	    if ((rs = vechand_start(elp,vn,vo)) >= 0) ylikely {
-	        vecstr		*slp = op->strp ;
-	        if ((rs = vecstr_start(slp,2,0)) >= 0) ylikely {
-		    for (int i = 0 ; (rs >= 0) && environ[i] ; i += 1) {
-	    	        rs = vechand_add(elp,environ[i]) ;
-		    }
-	        }
+	    if ((rs = envmgr_envv(op,nullptr)) >= 0) {
+	        vechand	*elp = op->listp ;
+	        cint	vn = 10 ;
+	        cint	vo = (vechandm.compact | vechandm.sorted) ;
+	        if ((rs = elp->start(vn,vo)) >= 0) ylikely {
+	            vecstr *slp = op->strp ;
+	            if ((rs = slp->start(2,0)) >= 0) ylikely {
+		        for (int i = 0 ; (rs >= 0) && op->envv[i] ; i += 1) {
+	    	            rs = elp->add(op->envv[i]) ;
+		        }
+		        if (rs < 0) {
+			    slp->finish() ;
+		        }
+	            } /* end if (vecstr_start) */
+	            if (rs < 0) {
+	                elp->finish() ;
+	            }
+	        } /* end if (vechand_start) */
 	        if (rs < 0) {
-	            vechand_finish(op->listp) ;
+		    envmgr_dtor(op) ;
 	        }
-	    } /* end if (vechand_start) */
-	    if (rs < 0) {
-		envmgr_dtor(op) ;
-	    }
+	    } /* end if (envmgr_envv) */
 	} /* end if (envmgr_ctor) */
 	return rs ;
 }
@@ -154,6 +167,8 @@ int envmgr_finish(envmgr *op) noex {
 /* end subroutine (envmgr_finish) */
 
 int envmgr_set(envmgr *op,cchar *kp,cchar *vp,int vl) noex {
+	cnullptr	np{} ;
+	cint		nrs = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	if (op && kp) ylikely {
 	    vecstr	*esp = op->strp ;
@@ -162,8 +177,6 @@ int envmgr_set(envmgr *op,cchar *kp,cchar *vp,int vl) noex {
 	        cint		i = rs ;
 	        if (cchar *ep ; (rs = vecstr_get(esp,i,&ep)) >= 0) ylikely {
 		    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
-		    cnullptr		np{} ;
-		    cint		nrs = SR_NOTFOUND ;
 	            if ((rs = vechand_search(elp,kp,vcf,np)) >= 0) {
 	                vechand_del(elp,rs) ;
 	            } else if (rs == nrs) {
