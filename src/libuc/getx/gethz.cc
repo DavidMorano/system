@@ -57,12 +57,14 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<getx.h>
 #include	<cfdec.h>
 #include	<isnot.h>		/* |isNotValid(3uc)| */
 #include	<localmisc.h>
 
 #include	"gethz.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -139,7 +141,7 @@ namespace ucgetx {
     int gethzer::operator () (int w) noex {
 	return gethz_data(w) ;
     } /* end method (gethzer::operator) */
-}
+} /* end namespace (ucgetx) */
 
 
 /* local subroutines */
@@ -152,8 +154,7 @@ int hzmgr::operator () (int w) noex {
 	    rs = hz ;
 	}
 	return rs ;
-}
-/* end method (hzmgr::operator) */
+} /* end method (hzmgr::operator) */
 
 int hzmgr::getany(int w) noex {
 	int		rs = SR_OK ;
@@ -162,13 +163,12 @@ int hzmgr::getany(int w) noex {
 	    if (rs != 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (hzmgr::getany) */
+} /* end method (hzmgr::getany) */
 
 int hzmgr::tryenv(int w) noex {
 	int		rs = SR_OK ;
 	if ((hz == 0) && ((w == gethz_any) || (w == gethz_env))) {
-	    static cchar	*val = getenv(varname.hz) ;
+	    static cchar	*val = getenver(varname.hz) ;
 	    if (val) {
 	        if ((rs = decval(val)) > 0) {
 	            hz = rs ;
@@ -178,8 +178,7 @@ int hzmgr::tryenv(int w) noex {
 	    } /* end if (HZ environment) */
 	}
 	return rs ;
-}
-/* end method (hzmgr::tryenv) */
+} /* end method (hzmgr::tryenv) */
 
 int hzmgr::tryconf(int w) noex {
 	int		rs = SR_OK ;
@@ -193,8 +192,7 @@ int hzmgr::tryconf(int w) noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (hzmgr::tryconf) */
+} /* end method (hzmgr::tryconf) */
 
 int hzmgr::tryconst(int w) noex {
 	int		rs = SR_OK ;
@@ -203,8 +201,7 @@ int hzmgr::tryconst(int w) noex {
 	    hz = rs ;
 	}
 	return rs ;
-}
-/* end method (hzmgr::tryconst) */
+} /* end method (hzmgr::tryconst) */
 
 int hzmgr::trytck(int w) noex {
 	int		rs = SR_OK ;
@@ -213,8 +210,7 @@ int hzmgr::trytck(int w) noex {
 	    hz = rs ;
 	}
 	return rs ;
-}
-/* end method (hzmgr::trytck) */
+} /* end method (hzmgr::trytck) */
 
 int hzmgr::tryguess(int w) noex {
 	int		rs = SR_OK ;
@@ -222,8 +218,7 @@ int hzmgr::tryguess(int w) noex {
 	    rs = HZ_GUESS ;
 	}
 	return rs ;
-}
-/* end method (hzmgr::tryguess) */
+} /* end method (hzmgr::tryguess) */
 
 local int decval(cchar *s) noex {
 	int		rs ;
@@ -232,7 +227,6 @@ local int decval(cchar *s) noex {
 	    if (rv < 0) rs = SR_DOM ;
 	}
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (decval) */
+} /* end subroutine (decval) */
 
 
