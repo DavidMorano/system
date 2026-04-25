@@ -57,7 +57,6 @@
 #include	<strnul.hh>
 #include	<matkeystr.h>
 #include	<localmisc.h>
-#include	<dprintf.hh>		/* debugging */
 
 #include	"getenver.h"
 
@@ -92,6 +91,7 @@ using libuc::libmem ;			/* variable */
 
 namespace {
     struct codemgr {
+	mainv		envv ;
 	ushortp		tab = nullptr ;
 	int		ne = 0 ;
 	void tabload_x() noex {
@@ -99,8 +99,8 @@ namespace {
 		tab[i] = ushort(i) ;
 	    } ; /* end for */
 	} ; /* end method (tabload_x) */
-	void tabinit(con mainv envv) noex {
-	    cauto predf = [envv] (con ushort &ia,con ushort &ib) noex -> bool {
+	void tabinit() noex {
+	    cauto predf = [this] (con ushort &ia,con ushort &ib) noex -> bool {
 		cchar *s1 = envv[ia] ;
 		cchar *s2 = envv[ib] ;
     		return (strkeycmp(s1,s2) < 0) ;
@@ -109,29 +109,15 @@ namespace {
 	    sort(tab,(tab+ne),predf) ;
 	} ; /* end method (tabinit) */
 	codemgr() = default ;
-	int start(mainv,int) noex ;
+	int start(con mainv,int) noex ;
 	int finish() noex ;
 	void dtor() noex ;
 	int operator () (con mainv,int) noex ;
+	int operator () (cchar *,int) const noex ;
 	destruct codemgr() {
 	    if (tab) dtor() ;
 	} ; /* end destruct */
     } ; /* end struct (codemgr) */
-} /* end namespace */
-
-namespace {
-    struct getter {
-	mainv		ns ;
-	ushortp		tab ;
-	int 		ne ;
-	getter() noex : ne(0) { } ;
-	int operator () (con mainv ev,con ushortp tp,int n) noex {
-	    ns = ev ;
-	    ne = n ;
-	    return ((tab = tp)) ? SR_OK : SR_BUGCHECK ;
-	} ; /* end method (operator) */
-	int operator () (cchar *,int) const noex ;
-    } ; /* end struct (getter) */
 } /* end namespace */
 
 namespace {
@@ -156,7 +142,6 @@ local int rmeq(cchar *kp,int kl) noex {
 
 static subiniter	sub ;
 static codemgr		codetab ;
-static getter		go ;
 
 cbool			f_debug = CF_DEBUG ;
 
@@ -169,12 +154,11 @@ cbool			f_debug = CF_DEBUG ;
 cchar *getenver(cchar *kp,int 法l) noex {
     	cnullptr	np{} ;
 	cchar		*valp = nullptr ;
-	DPRINTF("ent kl=%d\n",法l) ;
 	if (int rs, kl = getlenstr(kp,法l) ; kl > 0) {
 	    static cint rsv = sub ;
 	    if ((rs = rsv) >= 0) {
 		if ((kl = rmeq(kp,kl)) > 0) {
-		    if (cint ei = go(kp,kl) ; ei >= 0) {
+		    if (cint ei = codetab(kp,kl) ; ei >= 0) {
 	                if ((valp = strchr(sub.envv[ei],'=')) != np) {
 	                    valp += 1 ;
 		        }
@@ -184,7 +168,6 @@ cchar *getenver(cchar *kp,int 法l) noex {
 		ulogerror("getenver",rs,"initialization") ;
 	    } /* end if (sub) */
 	} /* end if (getlenstr) */
-	DPRINTF("ret valp=%s\n",((valp) ? valp : "null")) ;
 	return valp ;
 }
 /* end subroutine (getenver) */
@@ -192,13 +175,14 @@ cchar *getenver(cchar *kp,int 法l) noex {
 
 /* local subroutines */
 
-int codemgr::start(mainv envv,int n) noex {
+int codemgr::start(mainv ev,int n) noex {
     	int	rs = SR_OK ;
 	cint	sz = ((n + 1) * szof(ushort)) ;
+	envv = ev ;
 	if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
 	    tab = ushortp(vp) ;
 	    ne = n ;
-	    tabinit(envv) ;
+	    tabinit() ;
 	} /* end if (memory-allocation) */
 	return rs ;
 } /* end method (codemgr::start) */
@@ -213,7 +197,6 @@ int codemgr::finish() noex {
 	    ne = 0 ;
 	}
 	return rs ;
-
 } /* end method (codemgr::finish) */
 
 void codemgr::dtor() noex {
@@ -222,23 +205,22 @@ void codemgr::dtor() noex {
 	}
 } /* end method (codemgr::dtor) */
 
-int codemgr::operator () (mainv envv,int n) noex {
-	return start(envv,n) ;
+int codemgr::operator () (mainv ev,int n) noex {
+	return start(ev,n) ;
 } /* end method (codemgr::operator) */
 
-int getter::operator () (cchar *sp,int sl) const noex {
-    int         ei = -1 ; /* return-value */
-    DPRINTF("ent ne=%d sl=%d\n",ne,sl) ;
+int codemgr::operator () (cchar *sp,int sl) const noex {
+    int         ei = -1 ; /* return-value (initially indicating "not-found") */
     if (strnul ss(sp,sl) ; ss.fok) {
         cauto predf = [this,&ss] (ushort c) noex -> bool {
-            cchar *an = ns[c] ;
+            cchar *an = envv[c] ;
             return (strkeycmp(an,ss) < 0) ;
         } ; /* end lambda (predf) */
         con ushort *itf = (tab + 0) ;
         con ushort *itl = (tab + ne) ;
         if (cauto it = partition_point(itf,itl,predf) ; it != itl) {
             cauto mat = [this,&ss] (int c) noex -> bool {
-                cchar *an = ns[c] ;
+                cchar *an = envv[c] ;
                 return (strkeycmp(an,ss) == 0) ;
             } ; /* end lambda (mat) */
             if (cint ii = *it ; mat(ii)) {
@@ -246,16 +228,13 @@ int getter::operator () (cchar *sp,int sl) const noex {
             } /* end if (got a match) */
         } /* end if */
     } /* end if (non-null) */
-    DPRINTF("ret ei=%d\n",ei) ;
     return ei ;
-} /* end method (getter::operator) */
+} /* end method (codemgr::operator) */
 
 subiniter::operator int () noex {
     	int		rs ;
 	if ((rs = u_getenviron(&envv)) >= 0) {
-	    if ((rs = codetab(envv,rs)) >= 0) {
-	        rs = go(envv,codetab.tab,codetab.ne) ;
-	    }
+	    rs = codetab(envv,rs) ;
 	} /* end if (u_getenviron) */
 	return rs ;
 } /* end method (subiniter::operator) */
