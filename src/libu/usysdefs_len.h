@@ -70,6 +70,7 @@
 #endif
 #endif /* MAXLINELEN */
 
+/* max-nodelen */
 #ifndef	NODENAMELEN
 #ifdef	SYS_NMLN
 #define	NODENAMELEN	(SYS_NMLN-1)	/* usually 256 for SVR4! */
@@ -78,6 +79,7 @@
 #endif
 #endif
 
+/* max-userlen */
 #ifndef	USERNAMELEN
 #ifdef	LOGNAME_MAX
 #define	USERNAMELEN	LOGNAME_MAX
@@ -103,6 +105,7 @@
 #endif
 #endif
 
+/* max-loglen */
 #ifndef	LOGNAMELEN
 #ifdef	LOGNAME_MAX
 #define	LOGNAMELEN	LOGNAME_MAX
