@@ -47,10 +47,13 @@
 #include	<cstring>		/* for |strchr(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<matkeystr.h>
 #include	<localmisc.h>
 
 #include	"getev.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
