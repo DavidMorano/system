@@ -7,11 +7,11 @@
 
 #define	CF_DEBUG	0		/* debugging */
 #define	CF_TEST		0		/* test */
-#define	CF_GETAFLEN	0		/* |getaflen()| */
+#define	CF_GETAFLEN	1		/* |getaflen()| */
 
 /* revision history:
 
-	= 1999-10-14, David A­D­ Morano
+	= 1998-03-21, David A­D­ Morano
 	This was written to get a roughly standardized subroutine
 	to handle both IPv4 and IPv6.  Note that the order of the
 	AF list is not in the order to the definitions of the defines.
@@ -21,7 +21,7 @@
 
 */
 
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -47,7 +47,7 @@
 	nl		address family string length
 
 	Returns:
-	>=0		resulting address-family index
+	>=0		found address-family
 	<0		error (system-return)
 
 	Name:
@@ -87,6 +87,8 @@
 #include	<dprintf.hh>		/* debugging */
 
 #include	"getaf.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 
