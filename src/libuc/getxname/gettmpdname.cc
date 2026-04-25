@@ -43,6 +43,7 @@
 #include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<getourenv.h>
 #include	<localmisc.h>
 
@@ -88,7 +89,7 @@ cchar *gettmpdnamex(mainv envv) noex {
 	    vp = getourenv(envv,vn) ;
 	}
 	if ((vp == nullptr) || (vp[0] == '\0')) {
-	    static cchar	*tmpval = getenv(vn) ;
+	    static cchar	*tmpval = getenver(vn) ;
 	    vp = tmpval ;
 	}
 	if ((vp == nullptr) || (vp[0] == '\0')) {
