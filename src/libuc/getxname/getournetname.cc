@@ -85,7 +85,7 @@ extern "C" {
 
 /* forward references */
 
-static int	getothernetname(char *,int,cchar *) noex ;
+local int	getothernetname(char *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -111,7 +111,7 @@ int getournetname(char *nbuf,int nlen,cchar *un) noex {
 	                rs = sncpy1(nbuf,nlen,netname) ;
 	                len = rs ;
 	            }
-	        }
+	        } /* end if */
 	    } else {
 	        rs = getothernetname(nbuf,nlen,un) ;
 	        len = rs ;
@@ -124,13 +124,13 @@ int getournetname(char *nbuf,int nlen,cchar *un) noex {
 
 /* local subroutines */
 
-static int getothernetname(char *nbuf,int nlen,cchar *un) noex {
+local int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	cchar		*procname = PROCNAME ;
 	if ((rs = uc_procpid(procname,0)) > 0) {
-	    if (char *dbuf{} ; (rs = lm_hn(&dbuf)) >= 0) {
+	    if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
 		cint	dlen = rs ;
 	        if ((rs = getnisdomain(dbuf,dlen)) >= 0) {
 	            cint	dl = rs ;
