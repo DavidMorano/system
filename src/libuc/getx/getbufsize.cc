@@ -180,7 +180,7 @@ int ubufsize::init() noex {
 	    if (rs < 0) finit = false ;
 	} else if (! finitdone) {
 	    timewatch	tw(to) ;
-	    auto lamb = [this] () -> int {
+	    cauto lamb = [this] () -> int {
 	        int	rsl = SR_OK ;
 	        if (!finit) {
 		    rsl = SR_LOCKLOST ;		/* <- failure */
