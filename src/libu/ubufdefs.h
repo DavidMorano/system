@@ -193,6 +193,7 @@
 #endif
 #endif /* FSBUFLEN */
 
+/* symbol-name length */
 #ifndef	SNBUFLEN
 #define	SNBUFLEN	SYMNAMELEN	/* symbol-name-length (really 255) */
 #endif
