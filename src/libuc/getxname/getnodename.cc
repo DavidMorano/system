@@ -51,6 +51,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uinfo.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<rmx.h>			/* <- for |rmchr(3uc)| */
@@ -137,7 +138,7 @@ int nodeinfo::env() noex {
 	cchar		*vn = varname.node ;
 	if (vn) {
 	    if (vn[0]) {
-		static cchar	*vp = getenv(vn) ;
+		static cchar	*vp = getenver(vn) ;
 	 	if (vp) {
 		    if (vp[0]) {
 			rs = sncpy1(nbuf,nlen,vp) ;
