@@ -24,12 +24,12 @@
 #include	<uinet.h>
 
 
-#define	HOSTINFO_MAGIC		0x73625196
 #define	HOSTINFO		struct hostinfo_head
 #define	HOSTINFO_FL		struct hostinfo_flags
 #define	HOSTINFO_ADDR		struct hostinfo_address
 #define	HOSTINFO_ARGS		struct hostinfo_arguments
 #define	HOSTINFO_CUR		struct hostinfo_cursor
+#define	HOSTINFO_MAGIC		0x73625196
 
 
 struct hostinfo_flags {
