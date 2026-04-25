@@ -52,6 +52,7 @@
 #include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getax.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<snx.h>
 #include	<sncpyx.h>
 #include	<isoneof.h>
@@ -102,12 +103,12 @@ namespace {
 	int trygid() noex ;
 	int trydef() noex ;
     } ; /* end struct (helper) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int	isNotOurs(int) noex ;
+local bool	isNotOurs(int) noex ;
 
 
 /* local variables */
@@ -116,13 +117,13 @@ constexpr int		rsnotours[] = {
 	SR_SEARCH,
 	SR_NOTFOUND,
 	0
-} ;
+} ; /* end array (rsnotours) */
 
 constexpr helper_m	mems[] = {
 	&helper::tryus,
 	&helper::trygid,
 	&helper::trydef
-} ;
+} ; /* end array (mems) */
 
 constexpr gid_t		gidend = -1 ;
 
@@ -140,9 +141,8 @@ int getgroupname(char *gbuf,int glen,gid_t gid) noex {
 	if (gbuf) {
 	    rs = SR_OVERFLOW ;
 	    if (glen > 0) {
-		helper		ho(gbuf,glen,gid) ;
-	        static cchar	*vgn = getenv(vn) ;
-		if ((rs = ho.start(vgn)) >= 0) {
+	        static cchar	*vgn = getenver(vn) ;
+		if (helper ho(gbuf,glen,gid) ; (rs = ho.start(vgn)) >= 0) {
 		    {
 			rs = ho ;
 			len = rs ;
@@ -167,7 +167,7 @@ int helper::start(cchar *vgp) noex {
 	    grlen = rs ;
 	}
 	return rs ;
-}
+} /* end method */
 
 int helper::finish() noex {
 	int		rs = SR_OK ;
@@ -179,16 +179,16 @@ int helper::finish() noex {
 	    grlen = 0 ;
 	}
 	return rs ;
-}
+} /* end method */
 
 helper::operator int () noex {
 	int		rs = SR_OK ;
 	for (cauto &m : mems) {
 	    rs = (this->*m)() ;
 	    if (rs != SR_OK) break ;
-	}
+	} /* end for */
 	return rs ;
-}
+} /* end method */
 
 int helper::tryus() noex {
 	int		rs = SR_OK ;
@@ -204,7 +204,7 @@ int helper::tryus() noex {
 	    }
 	} /* end if (is us) */
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int helper::trygid() noex {
 	int		rs ;
@@ -217,15 +217,14 @@ int helper::trygid() noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int helper::trydef() noex {
 	return snsd(rbuf,rlen,"G",gid) ;
-}
+} /* end method */
 
-static int isNotOurs(int rs) noex {
+local bool isNotOurs(int rs) noex {
 	return isOneOf(rsnotours,rs) ;
-}
-/* end subroutine (isNotOurs) */
+} /* end subroutine (isNotOurs) */
 
 
