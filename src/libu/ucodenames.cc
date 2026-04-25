@@ -42,6 +42,10 @@
 	code-number is done using a binary search.  That is the
 	whole rub of this thing.  For a large number of code-name
 	pairs, this is a big win.  For smaller numbers, not so much.
+	2. The code below can only handle 256 entries in any of
+	the data tables below.  If a table ever exceeds 256 entries,
+	change the type of the sort-table from |uchar| to |ushort)
+	to get more table-length range.
 
 *******************************************************************************/
 
@@ -95,22 +99,22 @@ namespace {
 	    ne = n ;
 	} ; /* end ctor */
 	int operator () (int n,cchar **rpp) const noex {
-    		int	rs = SR_NOTFOUND ;
-		int	rl = 0 ; /* return-value */
-		cauto predf = [this,n] (uchar c) noex -> bool {
-	    	    cint i = int(c) ;
-	    	    return (ns[i].n < n) ;
-		} ; /* end lambda (predf) */
-		con uchar *itf = tab ;
-		con uchar *itl = (tab + ne) ;
-		if (cauto it = partition_point(itf,itl,predf) ; it != itl) {
-	    	    if (cint ii = *it ; ns[ii].n == n) {
-			rs = SR_OK ;
-	        	if (rpp) *rpp = ns[ii].s ;
-	        	rl = lenstr(ns[ii].s) ;
-	    	    } /* end if (got a match) */
-		} /* end if */
-		return (rs >= 0) ? rl : rs ;
+	    int		rs = SR_NOTFOUND ;
+	    int		rl = 0 ; /* return-value */
+	    cauto predf = [this,n] (uchar c) noex -> bool {
+		cint i = int(c) ;
+		return (ns[i].n < n) ;
+	    } ; /* end lambda (predf) */
+	    con uchar *itf = tab ;
+	    con uchar *itl = (tab + ne) ;
+	    if (cauto it = partition_point(itf,itl,predf) ; it != itl) {
+		if (cint ii = *it ; ns[ii].n == n) {
+		    rs = SR_OK ;
+	    	    if (rpp) *rpp = ns[ii].s ;
+	    	    rl = lenstr(ns[ii].s) ;
+		} /* end if (got a match) */
+	    } /* end if (partition) */
+	    return (rs >= 0) ? rl : rs ;
 	} ; /* end method (operator) */
     } ; /* end struct (getter) */
 } /* end namespace */
