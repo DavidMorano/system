@@ -57,7 +57,7 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getx.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<cfdec.h>
 #include	<isnot.h>		/* |isNotValid(3uc)| */
 #include	<localmisc.h>
@@ -158,7 +158,7 @@ int hzmgr::operator () (int w) noex {
 
 int hzmgr::getany(int w) noex {
 	int		rs = SR_OK ;
-	for (auto &m : mems) {
+	for (cauto &m : mems) {
 	    rs = (this->*m)(w) ;
 	    if (rs != 0) break ;
 	} /* end for */
