@@ -49,8 +49,8 @@ OBJ5= ulockfile.o uselect.o uterminal.o
 OBJ6= ureade.o ureadext.o
 OBJ7=
 
-OBJA_UFILEDESC= obj0.o obj1.o obj2.o
-OBJB_UFILEDESC= obj3.o obj4.o obj5.o obj6.o
+OBJA_UFILEDESC= obj0.o obj1.o obj2.o obj3.o
+OBJB_UFILEDESC= obj4.o obj5.o obj6.o
 
 OBJ_UFILEDESC= obja.o objb.o
 
