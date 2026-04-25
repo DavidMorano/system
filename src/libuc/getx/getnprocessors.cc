@@ -46,6 +46,7 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<getourenv.h>
 #include	<cfdec.h>
 #include	<isnot.h>
@@ -137,7 +138,7 @@ int getnprocessors(mainv envv,int w) noex {
 
 /* local subroutines */
 
-static int decout(cchar *valp) noex {
+local int decout(cchar *valp) noex {
 	int		rs ;
 	if (int v{} ; (rs = cfdeci(valp,-1,&v)) >= 0) {
 	    rs = v ;
@@ -166,7 +167,7 @@ int procer::gloenv() noex {
 	cchar		*vn = varname.ncpu ;
 	int		rs = SR_OK ;
 	if ((w == w_all) || (w == w_gloenv)) {
-	    static cchar	*valp = getenv(vn) ;
+	    static cchar	*valp = getenver(vn) ;
 	    if (valp) {
 		rs = decout(valp) ;
 	    } /* end if (global-environment) */
