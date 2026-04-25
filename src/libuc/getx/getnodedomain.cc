@@ -82,6 +82,7 @@
 #include	<uclibmem.h>
 #include	<ucgetho.h>
 #include	<getbufsize.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<bufsizevar.hh>
 #include	<estrings.h>		/* most all string subroutines */
 #include	<filer.h>
@@ -171,23 +172,23 @@ namespace {
 
 /* forward references */
 
-static int	try_start(TRY *,char *,char *,int) noex ;
-static int	try_finish(TRY *) noex ;
-static int	try_resolvefd(TRY *,char *,int,int) noex ;
+local int	try_start(TRY *,char *,char *,int) noex ;
+local int	try_finish(TRY *) noex ;
+local int	try_resolvefd(TRY *,char *,int,int) noex ;
 
-static int	try_initvarnode(TRY *) noex ;
-static int	try_inituname(TRY *) noex ;
-static int	try_initnode(TRY *) noex ;
-static int	try_vardomain(TRY *) noex ;
-static int	try_varlocaldomain(TRY *) noex ;
-static int	try_varnode(TRY *) noex ;
-static int	try_uname(TRY *) noex ;
-static int	try_gethost(TRY *) noex ;
-static int	try_resolve(TRY *) noex ;
-static int	try_resolvefile(TRY *,cchar *) noex ;
-static int	try_guess(TRY *) noex ;
+local int	try_initvarnode(TRY *) noex ;
+local int	try_inituname(TRY *) noex ;
+local int	try_initnode(TRY *) noex ;
+local int	try_vardomain(TRY *) noex ;
+local int	try_varlocaldomain(TRY *) noex ;
+local int	try_varnode(TRY *) noex ;
+local int	try_uname(TRY *) noex ;
+local int	try_gethost(TRY *) noex ;
+local int	try_resolve(TRY *) noex ;
+local int	try_resolvefile(TRY *,cchar *) noex ;
+local int	try_guess(TRY *) noex ;
 
-static int	rmwhitedot(char *,int) noex ;
+local int	rmwhitedot(char *,int) noex ;
 
 
 /* local variables */
@@ -201,7 +202,7 @@ constexpr int		(*tries[])(TRY *) = {
 	try_resolve,
 	try_guess,
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr int		(*systries[])(TRY *) = {
 	try_uname,
@@ -209,25 +210,25 @@ constexpr int		(*systries[])(TRY *) = {
 	try_resolve,
 	try_guess,
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	resolvefnames[] = {
 	RESOLVFNAME,			/* most operating systems */
 	"/var/run/resolv.conf",		/* for example: MacOS */
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr guess		ga[] = {
-	{ "rc", "rightcore.com" },
-	{ "rca", "rightcore.com" },
-	{ "rcb", "rightcore.com" },
-	{ "rcc", "rightcore.com" },
-	{ "rcd", "rightcore.com" },
-	{ "rce", "rightcore.com" },
-	{ "rcf", "rightcore.com" },
-	{ "rcg", "rightcore.com" },
-	{ "jig", "rightcore.com" },
-	{ nullptr, nullptr }
+	{ "rc",		"rightcore.com" },
+	{ "rca",	"rightcore.com" },
+	{ "rcb",	"rightcore.com" },
+	{ "rcc",	"rightcore.com" },
+	{ "rcd",	"rightcore.com" },
+	{ "rce",	"rightcore.com" },
+	{ "rcf",	"rightcore.com" },
+	{ "rcg",	"rightcore.com" },
+	{ "jig",	"rightcore.com" },
+	{ nullptr,	nullptr }
 } ; /* end array (ga) */
 
 static bufsizevar	maxnodelen(bufsize_nn) ;
@@ -319,7 +320,7 @@ int getuserdomain(char *dbuf,int dlen) noex {
 
 /* local subroutines */
 
-static int try_start(TRY *tip,char *nb,char *db,int dl) noex {
+local int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 	int		rs = SR_FAULT ;
 	if (tip) ylikely {
 	    memclear(tip) ;
@@ -344,7 +345,7 @@ static int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 }
 /* end subroutine (try_start) */
 
-static int try_finish(TRY *tip) noex {
+local int try_finish(TRY *tip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (tip) ylikely {
@@ -366,12 +367,12 @@ static int try_finish(TRY *tip) noex {
 }
 /* end subroutine (try_finish) */
 
-static int try_initvarnode(TRY *tip) noex {
+local int try_initvarnode(TRY *tip) noex {
 	int		rs = SR_FAULT ;
 	if (tip) ylikely {
 	    rs = SR_OK ;
 	    if (! tip->fl.initvarnode) {
-	        static cchar	*val = getenv(varname.node) ;
+	        static cchar	*val = getenver(varname.node) ;
 	        tip->fl.initvarnode = true ;
 		if (val) {
 	            tip->fl.varnode = true ;
@@ -383,7 +384,7 @@ static int try_initvarnode(TRY *tip) noex {
 }
 /* end subroutine (try_initvarnode) */
 
-static int try_inituname(TRY *tip) noex {
+local int try_inituname(TRY *tip) noex {
 	int		rs = SR_FAULT ;
 	if (tip) ylikely {
 	    rs = SR_OK ;
@@ -404,7 +405,7 @@ static int try_inituname(TRY *tip) noex {
 }
 /* end subroutine (try_inituname) */
 
-static int try_initnode(TRY *tip) noex {
+local int try_initnode(TRY *tip) noex {
 	int		rs = SR_FAULT ;
 	if (tip) ylikely {
 	    rs = SR_OK ;
@@ -451,8 +452,8 @@ static int try_initnode(TRY *tip) noex {
 }
 /* end subroutine (try_initnode) */
 
-static int try_vardomain(TRY *tip) noex {
-	static cchar	*val = getenv(varname.domain) ;
+local int try_vardomain(TRY *tip) noex {
+	static cchar	*val = getenver(varname.domain) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (val) {
@@ -467,8 +468,8 @@ static int try_vardomain(TRY *tip) noex {
 }
 /* end subroutine (try_vardomain) */
 
-static int try_varlocaldomain(TRY *tip) noex {
-	static cchar	*val = getenv(varname.localdomain) ;
+local int try_varlocaldomain(TRY *tip) noex {
+	static cchar	*val = getenver(varname.localdomain) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (val) {
@@ -492,7 +493,7 @@ static int try_varlocaldomain(TRY *tip) noex {
 }
 /* end subroutine (try_varlocaldomain) */
 
-static int try_varnode(TRY *tip) noex {
+local int try_varnode(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (! tip->fl.initvarnode) {
@@ -513,7 +514,7 @@ static int try_varnode(TRY *tip) noex {
 }
 /* end subroutine (try_varnode) */
 
-static int try_uname(TRY *tip) noex {
+local int try_uname(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (! tip->fl.inituname) {
@@ -534,7 +535,7 @@ static int try_uname(TRY *tip) noex {
 }
 /* end subroutine (try_uname) */
 
-static int try_gethost(TRY *tip) noex {
+local int try_gethost(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -580,7 +581,7 @@ static int try_gethost(TRY *tip) noex {
 }
 /* end subroutine (try_gethost) */
 
-static int try_resolve(TRY *tip) noex {
+local int try_resolve(TRY *tip) noex {
 	int		rs = SR_OK ;
 	for (int i = 0 ; (rs == SR_OK) && resolvefnames[i] ; i += 1) ylikely {
 	    cchar	*fn = resolvefnames[i] ;
@@ -590,7 +591,7 @@ static int try_resolve(TRY *tip) noex {
 }
 /* end subroutine (try_resolve) */
 
-static int try_resolvefile(TRY *tip,cchar *fname) noex {
+local int try_resolvefile(TRY *tip,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -614,9 +615,9 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 }
 /* end subroutine (try_resolvefile) */
 
-static int tryreader(int,char *,int,cchar **) noex ;
+local int tryreader(int,char *,int,cchar **) noex ;
 
-static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
+local int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
 	if (cchar *dp{} ; (rs = tryreader(fd,lbuf,llen,&dp)) > 0) ylikely {
@@ -631,7 +632,7 @@ static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
 }
 /* end subroutine (try_resolvefd) */
 
-static int tryreader(int fd,char *lbuf,int llen,cchar **rpp) noex {
+local int tryreader(int fd,char *lbuf,int llen,cchar **rpp) noex {
     	cint		bsz = FILERLEN ; /* buffer size */
 	int		rs ;
 	int		rs1 ;
@@ -649,7 +650,7 @@ static int tryreader(int fd,char *lbuf,int llen,cchar **rpp) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (tryreader) */
 
-static int try_guess(TRY *tip) noex {
+local int try_guess(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if_constexpr (f_guess) {
@@ -683,8 +684,8 @@ static int try_guess(TRY *tip) noex {
 /* end subroutine (try_guess) */
 
 /* remove trailing whitespace and dots */
-static int rmwhitedot(char *bp,int bl) noex {
-	auto isrm = [] (int ch) -> bool {
+local int rmwhitedot(char *bp,int bl) noex {
+	cauto isrm = [] (int ch) -> bool {
 	    return (ch == '.') || char_iswhite(ch) ;
 	} ;
 	while ((bl > 0) && isrm(bp[bl - 1])) {
