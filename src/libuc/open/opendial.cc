@@ -60,6 +60,14 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef const mainv	cmv ;
+
+
 /* external subroutines */
 
 extern "C" {
@@ -85,10 +93,10 @@ extern "C" {
 /* exported subroutines */
 
 int opendial(int di,int af,cc *hn,cc *ps,cc *svc,
-		mainv av,mainv ev,int to,int opts) noex {
+		cmv av,cmv ev,int to,int opts) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (hn) {
-	    cnullptr	np{} ;
 	    rs = SR_INVALID ;
 	    if ((di >= 0) && (af >= 0)) {
 	        cint	of = O_RDWR ;
