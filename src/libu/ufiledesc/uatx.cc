@@ -132,12 +132,12 @@ int u_atlink(int fd,cchar *fn,int dfd,cchar *dfn,int fl) noex {
 	if (fn && dfn) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0] && dfn[0]) ylikely {
-		    uatxer fo(&uatxer::iatlink,fn,0,fl) ;
-		    fo.dfd = dfd ;
-		    fo.dfn = dfn ;
-		    fo.fl = fl ;
-		    fo.fdfl.fatcwd = true ;
-		    rs = fo(fd) ;
+		uatxer fo(&uatxer::iatlink,fn,0,fl) ;
+		fo.dfd = dfd ;
+		fo.dfn = dfn ;
+		fo.fl = fl ;
+		fo.fdfl.fatcwd = true ;
+		rs = fo(fd) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
