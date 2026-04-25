@@ -309,7 +309,7 @@ local int try_add(SI *mip) noex {
 			        ADDRINFO	*hp = aip->hintp ;
 			        ADDRINFO	**rpp = aip->rpp ;
 	                        cchar		*sn = aip->svcname ;
-				auto		gai = uc_addrinfoget ;
+				cauto		gai = uc_addrinfoget ;
 	                        if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
 				    c = 1 ;
 			        } else if (isNotPresent(rs)) {
@@ -352,7 +352,7 @@ local int try_rem(SI *mip) noex {
 				    ADDRINFO	*hp = aip->hintp ;
 				    ADDRINFO	**rpp = aip->rpp ;
 				    cchar	*sn = aip->svcname ;
-				    auto	gai = uc_addrinfoget ;
+				    cauto	gai = uc_addrinfoget ;
 	        		    if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
 				        c = 1 ;
 			            } else if (isNotPresent(rs)) {
@@ -394,7 +394,7 @@ local int try_remlocal(SI *mip) noex {
 			        ADDRINFO	*hp = aip->hintp ;
 			        ADDRINFO	**rpp = aip->rpp ;
 			        cchar		*sn = aip->svcname ;
-			        auto		gai = uc_addrinfoget ;
+			        cauto		gai = uc_addrinfoget ;
 	                        if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
 				    c = 1 ;
 			        } else if (isNotPresent(rs)) {
