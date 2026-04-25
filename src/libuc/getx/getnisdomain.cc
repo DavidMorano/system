@@ -51,6 +51,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<ucgetx.h>		/* |uc_getnisdomain(3uc)| */
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<filereadln.h>
 #include	<sncpyx.h>
 #include	<isnot.h>
@@ -93,14 +94,14 @@ namespace {
 	int tryget() noex ;
 	int tryfile() noex ;
     } ; /* end struct (nisfind) */
-}
+} /* end namespace */
 
 typedef int (nisfind::*nisfind_m)() noex ;
 
 
 /* forward references */
 
-static int	nisfile(char *,int,cchar *) noex ;
+local int	nisfile(char *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -109,7 +110,7 @@ constexpr nisfind_m	mems[] = {
 	&nisfind::tryenv,
 	&nisfind::tryget,
 	&nisfind::tryfile
-} ;
+} ; /* end array (mems) */
 
 constexpr cchar		vn[] = VARNISDOMAIN ;
 
@@ -143,30 +144,27 @@ nisfind::operator int () noex {
 	    if (rs != 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (nisfind::operator) */
+} /* end method (nisfind::operator) */
 
 int nisfind::tryenv() noex {
-	static cchar	*val = getenv(vn) ;
+	static cchar	*val = getenver(vn) ;
 	int		rs = SR_OK ;
 	if (val && val[0]) {
 	    rs = sncpy(rbuf,rlen,val) ;
 	} /* end block (environment variable) */
 	return rs ;
-}
-/* end method (nisfind::tryenv) */
+} /* end method (nisfind::tryenv) */
 
 int nisfind::tryget() noex {
 	return uc_getnisdomain(rbuf,rlen) ;
-}
-/* end method (nisfind::tryget) */
+} /* end method (nisfind::tryget) */
 
 int nisfind::tryfile() noex {
 	return nisfile(rbuf,rlen,NISFN) ;
 }
 /* end method (nisfind::tryfile) */
 
-static int nisfile(char *rbuf,int rlen,cchar *fname) noex {
+local int nisfile(char *rbuf,int rlen,cchar *fname) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = filereadln(fname,rbuf,rlen)) >= 0) {
@@ -175,7 +173,6 @@ static int nisfile(char *rbuf,int rlen,cchar *fname) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (nisfile) */
+} /* end subroutine (nisfile) */
 
 
