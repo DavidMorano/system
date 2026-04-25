@@ -168,13 +168,13 @@ namespace {
 
 /* forward references */
 
-static int	subinfo_start(SI *,cchar *,char *,int,cchar *) noex ;
-static int	subinfo_finish(SI *) noex ;
-static int	subinfo_cacheget(SI *) noex ;
-static int	subinfo_cacheset(SI *) noex ;
-static int	subinfo_ndb(SI *) noex ;
-static int	subinfo_ndber(SI *,cchar *) noex ;
-static int	subinfo_cdb(SI *) noex ;
+local int	subinfo_start(SI *,cchar *,char *,int,cchar *) noex ;
+local int	subinfo_finish(SI *) noex ;
+local int	subinfo_cacheget(SI *) noex ;
+local int	subinfo_cacheset(SI *) noex ;
+local int	subinfo_ndb(SI *) noex ;
+local int	subinfo_ndber(SI *,cchar *) noex ;
+local int	subinfo_cdb(SI *) noex ;
 
 
 /* local variables */
@@ -280,7 +280,7 @@ int searcher::getprs() noex {
 }
 /* end method (searcher::getprs) */
 
-static int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *nn) noex {
+local int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *nn) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    sip->pr = pr ;
@@ -293,7 +293,7 @@ static int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *nn) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SI *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = SR_OK ;
@@ -302,18 +302,18 @@ static int subinfo_finish(SI *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_cacheget(SI *sip) noex {
+local int subinfo_cacheget(SI *sip) noex {
 	return uclustername_get(sip->rbuf,sip->rlen,sip->nn) ;
 }
 /* end subroutine (getsubinfo_cacheget) */
 
-static int subinfo_cacheset(SI *sip) noex {
+local int subinfo_cacheset(SI *sip) noex {
 	cint		ttl = TO_TTL ;
 	return uclustername_set(sip->rbuf,sip->rlen,sip->nn,ttl) ;
 }
 /* end subroutine (subinfo_cacheset) */
 
-static int subinfo_ndb(SI *sip) noex {
+local int subinfo_ndb(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -330,7 +330,7 @@ static int subinfo_ndb(SI *sip) noex {
 }
 /* end subroutine (subinfo_ndb) */
 
-static int subinfo_ndber(SI *sip,cchar *nfn) noex {
+local int subinfo_ndber(SI *sip,cchar *nfn) noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -340,7 +340,7 @@ static int subinfo_ndber(SI *sip,cchar *nfn) noex {
         if (nodedb st ; (rs = nodedb_open(&st,nfn)) >= 0) {
 	    cint	elen = st.entbuflen ;
 	    if (char *ebuf{} ; (rs = lm_mall((elen + 1),&ebuf)) >= 0) {
-		auto curbegin = nodedb_curbegin ;
+		cauto curbegin = nodedb_curbegin ;
                 if (nodedb_cur cur ; (rs = curbegin(&st,&cur)) >= 0) {
                     nodedb_ent  ste ;
                     cint    	rsn = SR_NOTFOUND ;
@@ -372,7 +372,7 @@ static int subinfo_ndber(SI *sip,cchar *nfn) noex {
 }
 /* end if (subinfor_ndber) */
 
-static int subinfo_cdb(SI *sip) noex {
+local int subinfo_cdb(SI *sip) noex {
 	cint		rlen = sip->rlen ;
 	int		rs ;
 	int		rs1 ;
@@ -385,7 +385,7 @@ static int subinfo_cdb(SI *sip) noex {
 	    if ((rs = mkpath2(tbuf,pr,clusterfname)) >= 0) {
 		cnullptr	np{} ;
 	        if (clusterdb cdb ; (rs = clusterdb_open(&cdb,tbuf)) >= 0) {
-	            auto	cf = clusterdb_curfetchrev ;
+	            cauto	cf = clusterdb_curfetchrev ;
 	            cint	rsn = SR_NOTFOUND ;
 	            if (char *cbuf ; (rs = lm_nn(&cbuf)) >= 0) {
 			cint	clen = rs ;
