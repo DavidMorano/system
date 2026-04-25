@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 2003-10-01, David A­D­ Morano
+	= 1998-10-01, David A­D­ Morano
 	This was written to consolidate this type of code that was
 	previously done separately in different places.  This code
 	only makes sense if access to the user UCENTPW record is
@@ -18,7 +18,7 @@
 
 */
 
-/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -62,10 +62,6 @@
 
 /* local defines */
 
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100		/* real name length */
-#endif
-
 
 /* imported namespaces */
 
@@ -84,7 +80,7 @@
 
 /* forward references */
 
-static int getpwname(ucentpwx *,char *,int,cchar *) noex ;
+local int	getpwname(ucentpwx *,char *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -99,21 +95,24 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (rlen < 0) rlen = REALNAMELEN ;
 	if (rbuf) {
-	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
-	        ucentpwx	pw ;
-	        cint		pwlen = rs ;
-	        if ((rs = getpwname(&pw,pwbuf,pwlen,un)) >= 0) {
-	            cchar *gp ;
-	            if ((rs = getgecosname(pw.pw_gecos,-1,&gp)) > 0) {
-		        rs = mkrealname(rbuf,rlen,gp,rs) ;
-			rl = rs ;
-	            } /* end if (getgecosname) */
-	        } /* end if (getpwname) */
-	        rs1 = lm_free(pwbuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
+	    rs = SR_INVALID ;
+	    if (rlen > 1) {
+	        if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
+	            ucentpwx	pw ;
+	            cint	pwlen = rs ;
+	            if ((rs = getpwname(&pw,pwbuf,pwlen,un)) >= 0) {
+			cauto gc = getgecosname ;
+			cchar *gecos = pw.pw_gecos ;
+	                if (cchar *gp ; (rs = gc(gecos,-1,&gp)) > 0) {
+		            rs = mkrealname(rbuf,rlen,gp,rs) ;
+			    rl = rs ;
+	                } /* end if (getgecosname) */
+	            } /* end if (getpwname) */
+	            rs1 = lm_free(pwbuf) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
@@ -122,7 +121,7 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 
 /* local subroutines */
 
-static int getpwname(ucentpwx *pwp,char *pwbuf,int pwlen,cchar *un) noex {
+local int getpwname(ucentpwx *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	int		rs ;
 	if (un && (un[0] != '\0') && (un[0] != '-')) {
 	    rs = pwp->nam(pwbuf,pwlen,un) ;
@@ -130,7 +129,6 @@ static int getpwname(ucentpwx *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	    rs = getpwusername(pwp,pwbuf,pwlen,-1) ;
 	}
 	return rs ;
-}
-/* end if (getpwname) */
+} /* end subroutine (getpwname) */
 
 
