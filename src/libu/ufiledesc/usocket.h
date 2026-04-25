@@ -39,27 +39,27 @@
 
 EXTERNC_begin
 
-extern int u_bind(int,cvoid *,int) noex ;
-extern int u_connect(int,cvoid *,int) noex ;
-extern int u_connecte(int,cvoid *,int,int) noex ;
-extern int u_getpeername(int,void *,int *) noex ;
-extern int u_getsockname(int,void *,int *) noex ;
-extern int u_getsockopt(int,int,int,void *,int *) noex ;
-extern int u_getsocktype(int) noex ;
-extern int u_linger(int,int) noex ;
-extern int u_listen(int,int) noex ;
-extern int u_recv(int,void *,int,int) noex ;
-extern int u_recve(int,void *,int,int,int,int) noex ;
-extern int u_recvfrom(int,void *,int,int,void *,int *) noex ;
-extern int u_recvmsg(int,MSGHDR *,int) noex ;
-extern int u_recvmsge(int,MSGHDR *,int,int,int) noex ;
-extern int u_send(int,cvoid *,int,int) noex ;
-extern int u_sendfiler(int,int,off_t,size_t) noex ;
-extern int u_sendmsg(int,CMSGHDR *,int) noex ;
-extern int u_sendto(int,cvoid *,int,int,cvoid *,int) noex ;
-extern int u_setsockopt(int,int,int,cvoid *,int) noex ;
-extern int u_shutdown(int,int) noex ;
-extern int u_sockatmark(int) noex ;
+extern int u_bind		(int,cvoid *,int) noex ;
+extern int u_connect		(int,cvoid *,int) noex ;
+extern int u_connecte		(int,cvoid *,int,int) noex ;
+extern int u_getpeername	(int,void *,int *) noex ;
+extern int u_getsockname	(int,void *,int *) noex ;
+extern int u_getsockopt		(int,int,int,void *,int *) noex ;
+extern int u_getsocktype	(int) noex ;
+extern int u_linger		(int,int) noex ;
+extern int u_listen		(int,int) noex ;
+extern int u_recv		(int,void *,int,int) noex ;
+extern int u_recve		(int,void *,int,int,int,int) noex ;
+extern int u_recvfrom		(int,void *,int,int,void *,int *) noex ;
+extern int u_recvmsg		(int,MSGHDR *,int) noex ;
+extern int u_recvmsge		(int,MSGHDR *,int,int,int) noex ;
+extern int u_send		(int,cvoid *,int,int) noex ;
+extern int u_sendfiler		(int,int,off_t,size_t) noex ;
+extern int u_sendmsg		(int,CMSGHDR *,int) noex ;
+extern int u_sendto		(int,cvoid *,int,int,cvoid *,int) noex ;
+extern int u_setsockopt		(int,int,int,cvoid *,int) noex ;
+extern int u_shutdown		(int,int) noex ;
+extern int u_sockatmark		(int) noex ;
 
 EXTERNC_end
 
