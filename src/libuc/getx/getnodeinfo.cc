@@ -116,8 +116,8 @@ namespace {
 
 /* forward references */
 
-static int	getx(cc *,char *,char *,vecstr *,cc *) noex ;
-static int	vecload(vecstr *,ent *) noex ;
+local int	getx(cc *,char *,char *,vecstr *,cc *) noex ;
+local int	vecload(vecstr *,ent *) noex ;
 
 
 /* local variables */
@@ -152,7 +152,7 @@ int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 
 /* local subroutines */
 
-static int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
+local int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = -1 ;
@@ -168,7 +168,7 @@ static int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
                     cnullptr        np{} ;
                     if (nodedb st ; (rs = nodedb_open(&st,tbuf)) >= 0) {
                         nodedb_ent  ste{} ;
-                        auto        nf = nodedb_fetch ;
+                        cauto	    nf = nodedb_fetch ;
                         cint        elen = var.entlen ;
                         char        *ebuf = (a + (nlen + 1) + (tlen + 1)) ;
                         if ((rs = nf(&st,nn,np,&ste,ebuf,elen)) >= 0) {
@@ -197,7 +197,7 @@ static int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 }
 /* end subroutine (getx) */
 
-static int vecload(vecstr *klp,ent *ep) noex {
+local int vecload(vecstr *klp,ent *ep) noex {
     	int		rs = SR_OK ;
 	for (int i = 0 ; ep->keys[i][0] ; i += 1) {
 	    cchar	*kp = ep->keys[i][0] ;
