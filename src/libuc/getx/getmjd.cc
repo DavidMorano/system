@@ -140,12 +140,12 @@ enum mons {
 	mon_nov,
 	mon_dec,
 	mon_overlast
-} ;
+} ; /* end enum (mons) */
 
 
 /* forward references */
 
-static int	indomain(int,int,int) noex ;
+local int	indomain(int,int,int) noex ;
 
 
 /* local variables */
@@ -199,10 +199,10 @@ int getyrd(int yr,int mo,int day) noex {
 	    /* calculate */
 	    if (yr < yrbase) yr += yrbase ;
 	    yday += (doy[mo] + (day - 1)) ;
-/*
+/****
 	    If the current month is March or later, then we must
 	    add 1 day if the current year is a leap year.
-*/
+****/
 	    if ((mo >= mon_mar) && isleapyear(yr)) {
 	        yday += 1 ;
 	    }
@@ -214,7 +214,7 @@ int getyrd(int yr,int mo,int day) noex {
 
 /* local subroutines */
 
-static int indomain(int yr,int mo,int day) noex {
+local int indomain(int yr,int mo,int day) noex {
 	int		rs = SR_DOM ;
 	if (yr >= 0) {
 	    if ((mo >= mon_jan) && (mo < mon_overlast)) {
@@ -224,7 +224,6 @@ static int indomain(int yr,int mo,int day) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (indomain) */
+} /* end subroutine (indomain) */
 
 
