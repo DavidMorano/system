@@ -31,9 +31,8 @@
 	resulting name can be translated into a good INET address.
 	If you want a name that is guaranteed to be translatable
 	into a valid INET address, then you want to investigate the
-	subroutine GETEHOSTNAME (Get Entry HostName).  Having said
-	that the resuling name is not guaranteed to be translatable,
-	a good translation facility will generally figure out that
+	subroutine GETEHOSTNAME (Get Entry HostName).  Note that a
+	good translation facility will generally figure out that
 	the given name is something that can be translated given
 	the existing host information.
 
