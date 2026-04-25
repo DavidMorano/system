@@ -25,8 +25,13 @@
 #include	<usysbase.h>
 
 
+enum opendialopts {
+	opendialopt_long,
+	opendialopt_overlast
+} ; /* end enum (opendialopts) */
+
 /* options */
-#define	OPENDIAL_OLONG		(1<<0)		/* FINGER "long" option */
+#define	OPENDIAL_OLONG		(1 << opendialopt_long)	/* FINGER "long" */
 
 
 enum opendials {
@@ -45,11 +50,11 @@ enum opendials {
 	opendial_prog,
 	opendial_finger,
 	opendial_overlast
-} ;
+} ; /* end enum (opendials) */
 
 EXTERNC_begin
 
-extern int opendial(int,int,cc *,cc *,cc *,mainv,mainv,int,int) noex ;
+extern int opendial(int,int,cc *,cc *,cc *,con mainv,con mainv,int,int) noex ;
 
 EXTERNC_end
 
