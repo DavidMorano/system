@@ -42,12 +42,15 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<ucsysauxinfo.h>	/* |usysauxinforeq_architecture| */
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<sfx.h>
 #include	<snwcpy.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getarchitecture.h"
+
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -83,7 +86,7 @@ namespace {
 	int trysys() noex ;
 	int trydef() noex ;
     } ; /* end struct (archer) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -96,7 +99,7 @@ constexpr archer_m	mems[] = {
 	&archer::trylib,
 	&archer::trysys,
 	&archer::trydef
-} ;
+} ; /* end array (mems) */
 
 
 /* exported variables */
@@ -128,11 +131,10 @@ archer::operator int () noex {
 	    if (rs != SR_OK) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (archer::operator) */
+} /* end method (archer::operator) */
 
 int archer::tryenv() noex {
-	static cchar	*valp = getenv(varname.architecture) ;
+	static cchar	*valp = getenver(varname.architecture) ;
 	int		rs = SR_OK ;
 	if (valp) {
 	    cchar	*cp{} ;
@@ -141,13 +143,11 @@ int archer::tryenv() noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (archer::tryenv) */
+} /* end method (archer::tryenv) */
 
 int archer::trylib() noex {
 	return uc_getarchitecture(rbuf,rlen) ;
-}
-/* end method (archer::trylib) */
+} /* end method (archer::trylib) */
 
 int archer::trysys() noex {
 	cint		cmd = usysauxinforeq_architecture ;
@@ -160,12 +160,10 @@ int archer::trysys() noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end method (archer::trysys) */
+} /* end method (archer::trysys) */
 
 int archer::trydef() noex {
 	return snwcpy(rbuf,rlen,ARCHITECTURE) ;
-}
-/* end method (archer::trydef) */
+} /* end method (archer::trydef) */
 
 
