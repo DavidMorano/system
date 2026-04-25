@@ -70,7 +70,7 @@ import libutil ;
 
 /* forward references */
 
-static int	extfd(cchar *,int) noex ;
+local int	extfd(cchar *,int) noex ;
 
 
 /* local variables */
@@ -121,7 +121,7 @@ int getfdfilex(cchar *fp,int fl) noex {
 
 /* local subroutines */
 
-static int extfd(cchar *sp,int sl) noex {
+local int extfd(cchar *sp,int sl) noex {
 	int		rs = SR_DOM ;
 	int		fd = -1 ;
 	if (sl < 0) sl = lenstr(sp) ;
