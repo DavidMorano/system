@@ -40,7 +40,7 @@ enum opensysdbs {
 	opensysdb_overlast
 } ; /* end enum (opensysdbs) */
 
-extern cpcchar		opensysdb[] ;
+extern cpcchar	opensysdb[] ;
 
 
 #endif /* OPENSYSDBS_INCLUDE */
