@@ -48,7 +48,9 @@
 
 
 enum missingerrnos {
-	missingerrno_l2nsync = 10000,
+	missingerrno_BEGIN = 10000,
+	missingerrno_lockfail,
+	missingerrno_l2nsync,
 	missingerrno_l2hlt,
 	missingerrno_l3hlt,
 	missingerrno_l3rst,
@@ -108,6 +110,9 @@ enum missingerrnos {
 } ; /* end enum (missingerrnos) */
 
 
+#ifndef	ELOCKFAIL
+#define	ELOCKFAIL	missingerrno_lockfail
+#endif
 #ifndef	EL2NSYNC
 #define	EL2NSYNC	missingerrno_l2nsync
 #endif
@@ -407,8 +412,8 @@ enum missingerrnos {
 #define	SR_ALREADY	(- EALREADY)	/* operation already in progress */
 #define	SR_INPROGRESS	(- EINPROGRESS)	/* operation now in progress */
 #define	SR_STALE	(- ESTALE)	/* Stale NFS file handle */
+#define	SR_LOCKFAIL	(- ELOCKFAIL)	/* failed to acquire lock */
 #define	SR_NOATTR	(- ENOATTR)	/* no (extended) attribute */
-
 #define SR_BADRPC         (- EBADRPC)	/* RPC struct is bad */
 #define SR_RPCMISMATCH    (- ERPCMISMATCH) /* RPC version wrong */
 #define SR_PROGUNAVAIL    (- EPROGUNAVAIL) /* RPC prog. not avail */
@@ -423,13 +428,11 @@ enum missingerrnos {
 #define SR_BADARCH	(- EBADARCH)
 #define SR_SHLIBVERS	(- ESHLIBVERS)
 #define SR_BADMACHO	(- EBADMACHO)
-
 #define	SR_PROCLIM	(- EPROCLIM)	/* too many processes */
 #define	SR_NOPOLICY	(- ENOPOLICY)	/* no policy */
 #define	SR_QFULL	(- EQFULL)	/* queue full */
 
 /* our favorite aliases */
-
 #define	SR_QUIT		SR_L2HLT	/* quit requested */
 #define	SR_EXIT		SR_L3HLT	/* exit requested */
 #define	SR_NOENTRY	SR_NOENT	/* no entry */
@@ -442,7 +445,6 @@ enum missingerrnos {
 #define	SR_EXISTS	SR_EXIST	/* object already exists */
 #define	SR_LOCKED	SR_AGAIN	/* object is already locked */
 #define	SR_INUSE	SR_ADDRINUSE	/* already in use */
-#define	SR_LOCKLOST	SR_NXIO		/* a lock was lost */
 #define	SR_HANGUP	SR_NXIO		/* hangup on device (not writable) */
 #define	SR_POLLERR	SR_IO		/* SPECIAL for |poll(2)| error */
 #define	SR_TOOBIG	SR_2BIG		/* arguments too big */
