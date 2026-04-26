@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* subroutines to access the 'passwd' and 'group' databases */
+/* retrieve a PWENTRY given a name or UID */
 /* version %I% last-modified %G% */
 
 
@@ -84,14 +84,14 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward subroutines */
 
-static int	getpwentry_load(pwentry *,char *,int,ucentpw *) noex ;
-static int	getpwentry_gecos(pwentry *,SI *,cchar *) noex ;
-static int	getpwentry_shadow(pwentry *,SI *,ucentpw *) noex ;
-static int	getpwentry_setnuls(pwentry *,cchar *) noex ;
+local int	getpwentry_load		(pwentry *,char *,int,ucentpw *) noex ;
+local int	getpwentry_gecos	(pwentry *,SI *,cchar *) noex ;
+local int	getpwentry_shadow	(pwentry *,SI *,ucentpw *) noex ;
+local int	getpwentry_setnuls	(pwentry *,cchar *) noex ;
 
-static int	isNoEntry(int) noex ;
+local bool	isNoEntry(int) noex ;
 
-static int	checknul(cchar *,cchar **) noex ;
+local int	checknul(cchar *,cchar **) noex ;
 
 
 /* local variables */
@@ -101,7 +101,7 @@ constexpr int		rsents[] = {
 	SR_ACCESS,
 	SR_NOSYS,
 	0
-} ;
+} ; /* end array (rsents) */
 
 constexpr bool		f_shadow = F_SHADOW ;
 
@@ -150,7 +150,7 @@ int getpwentry_uid(pwentry *uep,char *ebuf,int elen,uid_t uid) noex {
 
 /* local subroutines */
 
-static int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
+local int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uep && ebuf && pep) {
@@ -159,7 +159,7 @@ static int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 	        cchar		*emptyp = nullptr ;
 	        if (SI ub ; (rs = ub.start(ebuf,elen)) >= 0) {
 		    cchar	**vpp = &uep->username ;
-/* fill in the stuff that we got from the system */
+		    /* fill in the stuff that we got from the system */
 	            rs = ub.strw(pep->pw_name,-1,vpp) ;
 	            emptyp = (uep->username + rs) ;
 		    if_constexpr (f_shadow) {
@@ -174,7 +174,7 @@ static int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 		        vpp = &uep->gecos ;
 	                ub.strw(pep->pw_gecos,-1,vpp) ;
 		    }
-/* break up the gecos field further */
+		    /* break up the gecos field further */
 		    if (rs >= 0) {
 		        cchar	*gecos = pep->pw_gecos ;
 	                if ((rs = getpwentry_gecos(uep,&ub,gecos)) >= 0) {
@@ -187,7 +187,7 @@ static int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 	                        ub.strw(pep->pw_shell,-1,vpp) ;
 		            }
 			    if (rs >= 0) {
-				auto	gpws = getpwentry_shadow ;
+				cauto	gpws = getpwentry_shadow ;
 	                        if ((rs = gpws(uep,&ub,pep)) >= 0) {
 	                            rs = 0 ;
 	                        } else if (isNoEntry(rs)) {
@@ -205,10 +205,9 @@ static int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getpwentry_load) */
+} /* end subroutine (getpwentry_load) */
 
-static int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
+local int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
 	int		rs ;
 	int		rs1 ;
 	if (gecos g ; (rs = gecos_start(&g,gecosdata,-1)) >= 0) {
@@ -269,7 +268,7 @@ static int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
 }
 /* end subroutine (getpwentry_gecos) */
 
-static int getpwentry_shadow(pwentry *uep,SI *sip,ucentpw *pep) noex {
+local int getpwentry_shadow(pwentry *uep,SI *sip,ucentpw *pep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if_constexpr (f_shadow) {
@@ -317,10 +316,9 @@ static int getpwentry_shadow(pwentry *uep,SI *sip,ucentpw *pep) noex {
 	    uep->flag = 0 ;
 	} /* end if_constexpr (f_shadow) */
 	return rs ;
-}
-/* end subroutine (getpwentry_shadow) */
+} /* end subroutine (getpwentry_shadow) */
 
-static int getpwentry_setnuls(pwentry *uep,cchar *emptyp) noex {
+local int getpwentry_setnuls(pwentry *uep,cchar *emptyp) noex {
 	checknul(emptyp,&uep->username) ;
 	checknul(emptyp,&uep->password) ;
 	checknul(emptyp,&uep->gecos) ;
@@ -338,20 +336,17 @@ static int getpwentry_setnuls(pwentry *uep,cchar *emptyp) noex {
 	checknul(emptyp,&uep->hphone) ;
 	checknul(emptyp,&uep->printer) ;
 	return SR_OK ;
-}
-/* end subroutine (getpwentry_setnuls) */
+} /* end subroutine (getpwentry_setnuls) */
 
-static int checknul(cchar *emptyp,cchar **epp) noex {
+local int checknul(cchar *emptyp,cchar **epp) noex {
 	if (*epp == nullptr) {
 	    *epp = emptyp ;
 	}
 	return 0 ;
-}
-/* end subroutine (checknul) */
+} /* end subroutine (checknul) */
 
-static int isNoEntry(int rs) noex {
+local bool isNoEntry(int rs) noex {
 	return isOneOf(rsents,rs) ;
-}
-/* end subroutine (isNoEntry) */
+} /* end subroutine (isNoEntry) */
 
 
