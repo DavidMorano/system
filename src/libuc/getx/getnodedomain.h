@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get program root directory */
+/* get the local node-name and INET domain-name */
 /* version %I% last-modified %G% */
 
 
