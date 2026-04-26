@@ -175,7 +175,7 @@
 #include	<usupport.h>		/* |getsign(3u)| */
 #include	<stdintx.h>
 #include	<localmisc.h>
-#include	<dprintf.hh>		/* debugging */
+#include	<dprint.hh>		/* debugging */
 
 #include	"strtox.h"
 
