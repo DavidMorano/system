@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* get the local node-name and INET domain name */
+/* get the local node-name and INET domain-name */
 /* version %I% last-modified %G% */
 
 #define	CF_GUESS	1	/* try to guess domain names? */
