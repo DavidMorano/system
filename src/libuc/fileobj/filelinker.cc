@@ -46,7 +46,7 @@
 #include	<strnul.hh>		/* LIBU */
 #include	<nulstr.h>		/* LIBU */
 #include	<localmisc.h>
-#include	<dprintf.hh>		/* LIBU */
+#include	<dprint.hh>		/* LIBU */
 
 #include	"filelinker.hh"
 
