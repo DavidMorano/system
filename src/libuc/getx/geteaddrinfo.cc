@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* subroutine to get a canonical hostname */
+/* get effective host inforamation given a name */
 /* version %I% last-modified %G% */
 
 
