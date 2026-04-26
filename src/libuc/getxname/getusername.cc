@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* get the best approximation of the user's username */
+/* get the best current username */
 /* version %I% last-modified %G% */
 
 #define	CF_UTMPACC	1		/* use |utmpacc(3uc)| */
