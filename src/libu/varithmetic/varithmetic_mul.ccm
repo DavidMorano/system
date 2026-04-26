@@ -39,7 +39,7 @@ module ;
 #include	<usysdefs.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
-#include	<dprintf.hh>		/* |DPRINTF| */
+#include	<dprint.hh>		/* |DPRINTF| */
 
 export module varithmetic.mul ;
 
