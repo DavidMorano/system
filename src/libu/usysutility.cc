@@ -127,19 +127,33 @@ local int std_vsnprintf(char *,int,cc *,va_list) noex ;
 /* exported subroutines */
 
 namespace libu {
+    int ugetrandom(void *rbuf,int rlen,uint fl) noex {
+	csize		rem = size_t(rlen) ;
+	int		rs ;
+	repeat {
+	    errno = 0 ;
+	    if ((rs = getrandom(rbuf,rem,fl)) < 0) {
+	        rs = (errno) ? (- errno) : SR_NOTSUP ;
+	    }
+	} until ((rs != SR_INTR) && (rs != SR_AGAIN)) ;
+	return (rs >= 0) ? rlen : rs ;
+    } /* end subroutine (ugetrandom) */
+} /* end namespace (libu) */
+
+namespace libu {
     int uloadavgd(double *dla,int n) noex {
 	int		rs = SR_FAULT ;
 	if (dla) {
 	    rs = SR_INVALID ;
 	    if (n >= 0) {
-		syscaller	sc ;
+		syscaller sc ;
 		sc.m = &syscaller::std_getloadavg ;
 		rs = sc(dla,n) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (uloadavgd) */
-}
+} /* end namespace (libu) */
 
 namespace libu {
     int ctdecf(char *rbuf,int rlen,int prec,double v) noex {
@@ -250,8 +264,7 @@ int syscaller::std_getloadavg() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}		
-/* end method (syscaller::std_getloadavg) */
+} /* end method (syscaller::std_getloadavg) */
 
 local int std_vsnprintf(char *rbuf,int rlen,cc *fmt,va_list ap) noex {
 	csize		rsize = size_t(rlen + 1) ;
@@ -264,7 +277,6 @@ local int std_vsnprintf(char *rbuf,int rlen,cc *fmt,va_list ap) noex {
 	    rs = (- errno) ;
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (std_vsnprintf) */
+} /* end subroutine (std_vsnprintf) */
 
 
