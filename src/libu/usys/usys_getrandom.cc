@@ -34,10 +34,13 @@
 #if	(!defined(SYSHAS_GETRANDOM)) || (SYSHAS_GETRANDOM == 0)
 
 #include	<cerrno>
+#include	<cstddef>
+#include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<usysflag.h>
 
 #include	"usys_getrandom.h"
@@ -47,19 +50,18 @@
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
-
-unixret_t getrandom(void *rbuf,size_t rlen,uint) noex {
+unixret_t getrandom(void *rbuf,size_t rsz,uint) noex {
 	unixret_t	rc = 0 ;
-	int		rl = 0 ;
+	unixret_t	rl = 0 ; /* return-value */
 	if (rbuf) {
-	    if (rlen > 0) {
+	    if (rsz > 0) {
 		csize		inc = MAXRANDSIZE ;
 		const caddr_t	ca = caddr_t(rbuf) ;
-		while ((rc >= 0) && (rlen > 0)) {
-		    csize	ml = min(rlen,inc) ;
-		    if ((rc = getentropy((ca+rl),ml)) >= 0) {
-			rl += rc ;
-			rlen -= rc ;
+		while ((rc >= 0) && (rsz > 0)) {
+		    csize msz = min(rsz,inc) ;
+		    if ((rc = getentropy((ca+rl),msz)) >= 0) {
+			rl += intconv(msz) ;
+			rsz -= msz ;
 		    } /* end if */
 	 	} /* end while */
 	    } /* end if (non-negative) */
@@ -68,7 +70,7 @@ unixret_t getrandom(void *rbuf,size_t rlen,uint) noex {
 	    errno = EFAULT ;
 	} /* end if (non-null) */
 	return (rc >= 0) ? rl : rc ;
-}
+} /* end subroutine (getrandom) */
 
 
 #endif /* (!defined(SYSHAS_GETRANDOM)) || (SYSHAS_GETRANDOM == 0) */
