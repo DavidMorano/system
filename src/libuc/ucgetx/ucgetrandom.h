@@ -24,6 +24,10 @@
 #include	<usysbase.h>
 
 
+#ifndef	GRND_RANDOM
+#define	GRND_RANDOM	0		/* option for third argument */
+#endif
+
 EXTERNC_begin
 
 extern int uc_getrandom(void *,int,uint) noex ;
