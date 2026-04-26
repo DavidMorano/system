@@ -8,19 +8,19 @@
 
 /* revision history:
 
-	= 1998-07-01, David AÂ­DÂ­ Morano
+	= 1998-07-01, David A­D­ Morano
 	This code was originally written.
 
 */
 
-/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	Name:
 	getsysname
 
-	Descriptor:
+	Description:
 	This subroutine retrieves the name of the operating system.
 
 	Synopsis:
@@ -42,6 +42,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uinfo.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<sfx.h>
 #include	<snwcpy.h>
 #include	<sncpyx.h>
@@ -50,6 +51,7 @@
 
 #include	"getsysname.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;
 
@@ -74,8 +76,8 @@ namespace {
 	operator int () noex ;
 	int tryenv() noex ;
 	int trysys() noex ;
-    } ;
-}
+    } ; /* end struct (names) */
+} /* end namespace */
 
 
 /* forward references */
@@ -86,7 +88,7 @@ namespace {
 constexpr namer_m	mems[] = {
 	&namer::tryenv,
 	&namer::trysys
-} ;
+} ; /* end array (mems) */
 
 
 /* exported variables */
@@ -99,8 +101,8 @@ int getsysname(char *rbuf,int rlen) noex {
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
-	        namer	no(rbuf,rlen) ;
-	        rs = no ;
+	        namer nao(rbuf,rlen) ;
+	        rs = nao ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -112,16 +114,15 @@ int getsysname(char *rbuf,int rlen) noex {
 
 namer::operator int () noex {
 	int		rs = SR_OK ;
-	for (auto &m : mems) {
+	for (cauto &m : mems) {
 	    rs = (this->*m)() ;
 	    if (rs != 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (namer::operator) */
+} /* end method (namer::operator) */
 
 int namer::tryenv() noex {
-	static cchar	*val = getenv(varname.sysname) ;
+	static cchar	*val = getenver(varname.sysname) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (val) {
@@ -132,8 +133,7 @@ int namer::tryenv() noex {
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (namer::tryenv) */
+} /* end method (namer::tryenv) */
 
 int namer::trysys() noex {
 	int		rs ;
@@ -143,7 +143,6 @@ int namer::trysys() noex {
 	    len = rs ;
 	} /* end if (uinfo) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (namer::trysys) */
+} /* end method (namer::trysys) */
 
 
