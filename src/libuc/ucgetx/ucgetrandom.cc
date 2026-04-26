@@ -36,6 +36,8 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usysbase.h>
+#include	<usysutility.hh>	/* |ugetrandom(3u)| */
 #include	<usysflag.h>
 #include	<usys.h>		/* |getrandom(3u)| */
 #include	<localmisc.h>
@@ -50,6 +52,7 @@
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libu::ugetrandom ;		/* subroutine */
 
 
 /* local typedefs */
@@ -65,8 +68,6 @@ using std::max ;			/* subroutine-template */
 
 
 /* forward references */
-
-static int	sysgetrandom(void *,int,uint) noex ;
 
 
 /* local variables */
@@ -85,7 +86,7 @@ int uc_getrandom(void *rbuf,int rlen,uint fl) noex {
 	int		rl = 0 ;
 	while ((rs >= 0) && (rem > 0)) {
 	    cint	ml = min(rem,inc) ;
-	    if ((rs = sysgetrandom((ca+rl),ml,fl)) >= 0) {
+	    if ((rs = ugetrandom((ca+rl),ml,fl)) >= 0) {
 		rl += rs ;
 		rem -= rs ;
 	    }
@@ -94,37 +95,32 @@ int uc_getrandom(void *rbuf,int rlen,uint fl) noex {
 }
 /* end subroutine (uc_getrandom) */
 
-int uc_getentropy(void *rbuf,int rlen) noex {
+int uc_getentropy(void *vbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
-	    char	*cbuf = cast_static<charp>(rbuf) ;
+	if (vbuf) {
+	    int c = 0 ;
+	    char *rbuf = cast_static<charp>(vbuf) ;
 	    rs = SR_OK ;
-	    cbuf[0] = '\0' ;
+	    rbuf[0] = '\0' ;
 	    if (rlen > 0) {
-		csize	rem = size_t(rlen) ;
-	        if ((rs = getentropy(rbuf,rem)) < 0) {
-		    rs = (- errno) ;
-		}
-	    }
+		csize maxget = 256 ;
+		for (size_t rem = size_t(rlen) ; rem > 0 ; ) {
+		    size_t msz = min(rem,maxget) ;
+	            if ((rs = getentropy((rbuf + c),msz)) >= 0) {
+			rem -= msz ;
+			c += intconv(msz) ;
+		    } else {
+		        rs = (- errno) ;
+		    }
+		    if (rs < 0) break ;
+		} /* end for */
+	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rlen : rs ;
 }
 /* end subroutine (uc_getentropy) */
 
 
 /* local subroutines */
-
-static int sysgetrandom(void *rbuf,int rlen,uint fl) noex {
-	csize		rem = size_t(rlen) ;
-	int		rs ;
-	repeat {
-	    errno = 0 ;
-	    if ((rs = getrandom(rbuf,rem,fl)) < 0) {
-	        rs = (errno != 0) ? (- errno) : SR_NOTSUP ;
-	    }
-	} until ((rs != SR_INTR) && (rs != SR_AGAIN)) ;
-	return rs ;
-}
-/* end subroutine (sysgetrandom) */
 
 
