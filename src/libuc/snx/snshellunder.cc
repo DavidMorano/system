@@ -29,13 +29,13 @@
 	execfname	program exec-file-name
 
 	Synopsis:
-	int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *) noex
+	int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *en) noex
 
 	Arguments:
 	dbuf		destination buffer pointer
 	dlen		destination buffer length
 	pid		parent process ID
-	execdname	exec-file-name
+	en		exec-file-name
 
 	Returns:
 	>=0		length of created string
