@@ -84,7 +84,7 @@
 #include	<strwcmp.h>
 #include	<hasx.h>		/* |hasalldig(3uc)| */
 #include	<localmisc.h>
-#include	<dprintf.hh>		/* debugging */
+#include	<dprint.hh>		/* debugging */
 
 #include	"getaf.h"
 
