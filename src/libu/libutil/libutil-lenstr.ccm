@@ -27,9 +27,9 @@ export module libutil:lenstr ;
 
 export {
     constexpr inline int clenstr(cchar *sp,int sl = -1) noex {
-    	cchar		*cp = sp ;
-	while (sl && *cp++) {
-	    sl -= 1 ;
+    	cchar *cp = sp ;
+	while (sl-- && *cp) {
+	    cp += 1 ;
 	}
 	return intconv(cp - sp) ;
     } /* end subroutine (clenstr) */
@@ -37,8 +37,8 @@ export {
     	int		len = -1 ;
 	if (sp) {
 	    if (sl >= 0) {
-    	        csize	ssize = size_t(sl) ;
-	        len = intconv(strnlen(sp,ssize)) ;
+    	        csize strsize = size_t(sl) ;
+	        len = intconv(strnlen(sp,strsize)) ;
 	    } else {
 	        len = intconv(strlen(sp)) ;
 	    }
