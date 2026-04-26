@@ -105,8 +105,8 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	    op->execname = nullptr ;
 	    if (under[0] != '\0') ylikely {
 	        if (under[0] == '*') {
-	            cchar	*dp = (under + 1) ;
-	            if (cchar *tp = strchr(under,'*') ; tp) {
+	            cchar *dp = (under + 1) ;
+	            if (cchar *tp = strchr(dp,'*') ; tp) {
 	                cint dl = intconv(tp - dp) ;
 	                under = (tp+1) ;
 	                if (int v ; (rs = cfdec(dp,dl,&v)) >= 0) {
