@@ -175,7 +175,7 @@ int kernlocker::init() noex {
                 auto lamb = [this] () -> int {
                     int         rs = SR_OK ;
                     if (!finit) {
-                        rs = SR_LOCKLOST ;              /* <- failure */
+                        rs = SR_LOCKFAIL ;              /* <- failure */
                     } else if (finitdone) {
                         rs = 1 ;                        /* <- OK ready */
                     }                       
