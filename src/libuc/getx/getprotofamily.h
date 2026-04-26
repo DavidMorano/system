@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* UNIX® Protocol-Family support */
+/* get a protocol family from an address family */
 /* version %I% last-modified %G% */
 
 
