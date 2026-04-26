@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* retrieve a cheap random number */
+/* get random data from the UNIX® kernel */
 /* version %I% last-modified %G% */
 
 
@@ -27,30 +27,26 @@
 
 EXTERNC_begin
 
-extern int	getrand(void *,int) noex ;
-extern int	getrandi(int *) noex ;
-extern int	getrandl(long *) noex ;
-extern int	getrandll(longlong *) noex ;
-
-static inline int getrandv(void *vp,int vsz) noex {
-    	return getrand(vp,vsz) ;
-}
+extern int	getrand		(void *,int)	noex ;
+extern int	getrandi	(int *)		noex ;
+extern int	getrandl	(long *)	noex ;
+extern int	getrandll	(longlong *)	noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int getrand(uint *p, int n = 1) noex {
+local inline int getrand(uint *p,int n = 1)	noex {
 	cint	sz = szof(uint) ;
-	return getrandv(p,(sz * n)) ;
+	return getrand(p,(sz * n)) ;
 }
-static inline int getrand(ulong *p,int n = 1) noex {
+local inline int getrand(ulong *p,int n = 1)	noex {
 	cint	sz = szof(ulong) ;
-	return getrandv(p,(sz * n)) ;
+	return getrand(p,(sz * n)) ;
 }
-static inline int getrand(longlong *p,int n = 1) noex {
+local inline int getrand(longlong *p,int n = 1)	noex {
 	cint	sz = szof(ulonglong) ;
-	return getrandv(p,(sz * n)) ;
+	return getrand(p,(sz * n)) ;
 }
 
 #endif /* __cplusplus */
