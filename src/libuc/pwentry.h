@@ -108,11 +108,11 @@ typedef PWENTRY		pwentry ;
 
 EXTERNC_begin
 
-extern int	pwentry_start(pwentry *) noex ;
-extern int	pwentry_finish(pwentry *) noex ;
-extern int	pwentry_fieldpw(pwentry *,int,cchar *,int) noex ;
+extern int	pwentry_start	(pwentry *) noex ;
+extern int	pwentry_finish	(pwentry *) noex ;
+extern int	pwentry_fieldpw	(pwentry *,int,cchar *,int) noex ;
 extern int	pwentry_mkextras(pwentry *) noex ;
-extern int	pwentry_mkcopy(pwentry *,pwentry *,char *,int) noex ;
+extern int	pwentry_mkcopy	(pwentry *,pwentry *,char *,int) noex ;
 
 extern int	pwentrybufsize(void) noex ;
 
