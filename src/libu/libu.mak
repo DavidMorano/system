@@ -83,7 +83,7 @@ OBJ27= ucomposite.o
 OBJ28= bitmanip.o findbit.o baops.o
 OBJ29= clockids.o itimers.o filetypes.o funcodes.o 
 OBJ30= binchunk.o conintx.o udiv.o stdintx.o
-OBJ31= ccfile.o readln.o dprintf.o
+OBJ31= ccfile.o readln.o dprint.o
 
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o
@@ -546,7 +546,7 @@ strnul.o:		strnul.cc	strnul.hh			$(INCS)
 stdclib.o:		stdclib.cc	stdclib.hh			$(INCS)
 ccfile.o:		ccfile.cc	ccfile.hh			$(INCS)
 readln.o:		readln.cc	readln.hh			$(INCS)
-dprintf.o:		dprintf.cc	dprintf.hh			$(INCS)
+dprint.o:		dprint.cc	dprint.hh			$(INCS)
 
 # ARITHMETIC
 bitmanip.o:		bitmanip.ccm
