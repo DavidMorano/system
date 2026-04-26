@@ -249,50 +249,50 @@ struct fingerargs {
 
 /* forward references */
 
-static int	openproto_ussmux(SI *,cchar *,cchar *,int,int) noex ;
-static int	openproto_finger(SI *,cchar *,int,int) noex ;
-static int	openproto_http(SI *,cchar *,int,int) noex ;
-static int	openproto_ticotsord(SI *,int,int,int,int) noex ;
-static int	openproto_inet(SI *,int,cchar *,int,int) noex ;
+local int	openproto_ussmux(SI *,cchar *,cchar *,int,int) noex ;
+local int	openproto_finger(SI *,cchar *,int,int) noex ;
+local int	openproto_http(SI *,cchar *,int,int) noex ;
+local int	openproto_ticotsord(SI *,int,int,int,int) noex ;
+local int	openproto_inet(SI *,int,cchar *,int,int) noex ;
 
-static int	inetargs_start(inetargs *,cchar *) noex ;
-static int	inetargs_starter(inetargs *,cchar *) noex ;
-static int	inetargs_alloc(inetargs *) noex ;
-static int	inetargs_finish(inetargs *) noex ;
+local int	inetargs_start(inetargs *,cchar *) noex ;
+local int	inetargs_starter(inetargs *,cchar *) noex ;
+local int	inetargs_alloc(inetargs *) noex ;
+local int	inetargs_finish(inetargs *) noex ;
 
 #if	CF_TICOTSORD
-static int ticotsordargs_start(TICOTSORDARGS *,char *,int,cchar *,int) noex ;
-static int ticotsordargs_load(TICOTSORDARGS *,cchar *,int) noex ;
-static int ticotsordargs_finish(TICOTSORDARGS *) noex ;
+local int ticotsordargs_start(TICOTSORDARGS *,char *,int,cchar *,int) noex ;
+local int ticotsordargs_load(TICOTSORDARGS *,cchar *,int) noex ;
+local int ticotsordargs_finish(TICOTSORDARGS *) noex ;
 #endif /* CF_TICOTSORD */
 
-static int	loadargs(vecstr *,cchar *) noex ;
-static int	sockshut(int,int) noex ;
+local int	loadargs(vecstr *,cchar *) noex ;
+local int	sockshut(int,int) noex ;
 
-static int	dialfinger(inetargs *,cchar *,int,int,int) noex ;
+local int	dialfinger(inetargs *,cchar *,int,int,int) noex ;
 
 #if	CF_FINGERCLEAN
-static int	fingerclean(int) noex ;
+local int	fingerclean(int) noex ;
 #if	CF_FINERBACK
-static int	fingerworker(FINGERARGS *) noex ;
-static int	fingerworker_loop(FINGERARGS *,FILER *,FILER *,
+local int	fingerworker(FINGERARGS *) noex ;
+local int	fingerworker_loop(FINGERARGS *,FILER *,FILER *,
 			int,int,int) noex ;
-static int	fingerworker_liner(FINGERARGS *,FILER *,
+local int	fingerworker_liner(FINGERARGS *,FILER *,
 			int,int,int,cchar *,int) noex ;
 #endif /* CF_FINERBACK */
 #endif /* CF_FINGERCLEAN */
 
 #if	CF_FINGERCLEAN
 #if	CF_FINGERBACK
-static int	getline(int,cchar *,int) noex ;
-static int	mkexpandtab(char *,int,int,cchar *,int) noex ;
+local int	getline(int,cchar *,int) noex ;
+local int	mkexpandtab(char *,int,int,cchar *,int) noex ;
 #endif /* CF_FINGERBACK */
-static bool	hasdirty(cchar *,int) noex ;
-static bool	hasmseol(cchar *,int) noex ;
-static bool	isdirty(int) noex ;
+local bool	hasdirty(cchar *,int) noex ;
+local bool	hasmseol(cchar *,int) noex ;
+local bool	isdirty(int) noex ;
 #endif /* CF_FINGERCLEAN */
 
-static bool	hasBadOflags(int) noex ;
+local bool	hasBadOflags(int) noex ;
 
 
 /* local variables */
@@ -462,7 +462,7 @@ int uc_openproto(cchar *fname,int of,int to,int opts) noex {
 
 /* local subroutines */
 
-static int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no) noex {
+local int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no) noex {
 	inetargs	a ;
 	int		rs ;
 	int		rs1 ;
@@ -522,7 +522,7 @@ static int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no) noex {
 /* end subroutine (openproto_inet) */
 
 #if	CF_TICOTSORD
-static int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
+local int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
 	vecstr		args ;
 	int		rs = SR_OK ;
 	int		pl = -1 ;
@@ -588,7 +588,7 @@ static int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
 /* end subroutine (openproto_ticotsord) */
 #else /* CF_TICOTSORD */
 /* ARGSUSED */
-static int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
+local int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
 	(void) sip ;
 	(void) pni ;
 	(void) of ;
@@ -598,7 +598,7 @@ static int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
 }
 #endif /* CF_TICOTSORD */
 
-static int openproto_ussmux(SI *sip,cchar *fpath,cchar *svc,
+local int openproto_ussmux(SI *sip,cchar *fpath,cchar *svc,
 		int to,int no) noex {
 	int		rs = SR_OK ;
 	int		f_args = false ;
@@ -637,7 +637,7 @@ static int openproto_ussmux(SI *sip,cchar *fpath,cchar *svc,
 }
 /* end subroutine (openproto_ussmux) */
 
-static int openproto_finger(SI *sip,cchar *sp,int of,int to) noex {
+local int openproto_finger(SI *sip,cchar *sp,int of,int to) noex {
 	inetargs	a ;
 	int		rs ;
 	int		rs1 ;
@@ -687,7 +687,7 @@ static int openproto_finger(SI *sip,cchar *sp,int of,int to) noex {
 }
 /* end subroutine (openproto_finger) */
 
-static int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
+local int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ; /* return-value */
@@ -719,7 +719,7 @@ static int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
 }
 /* end subroutine (openproto_http) */
 
-static int inetargs_start(inetargs *iap,cchar *args) noex {
+local int inetargs_start(inetargs *iap,cchar *args) noex {
 	int		rs = SR_OK ;
 	cchar		*tp, *sp ;
 	memclear(iap) ;
@@ -762,7 +762,7 @@ static int inetargs_start(inetargs *iap,cchar *args) noex {
 }
 /* end subroutine (inetargs_start) */
 
-static int inetargs_starter(inetargs *iap,cchar *sp) noex {
+local int inetargs_starter(inetargs *iap,cchar *sp) noex {
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	if ((rs = vecstr_start(&iap->args,4,vo)) >= 0) {
@@ -793,7 +793,7 @@ static int inetargs_starter(inetargs *iap,cchar *sp) noex {
 }
 /* end subroutine (inetargs_starter) */
 
-static int inetargs_finish(inetargs *iap) noex {
+local int inetargs_finish(inetargs *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iap->a) {
@@ -811,7 +811,7 @@ static int inetargs_finish(inetargs *iap) noex {
 }
 /* end subroutine (inetargs_finish) */
 
-static int inetargs_alloc(inetargs *iap) noex {
+local int inetargs_alloc(inetargs *iap) noex {
 	int		rs = SR_OK ;
 	int		sz = 0 ;
 #ifdef	COMMENT
@@ -868,7 +868,7 @@ static int inetargs_alloc(inetargs *iap) noex {
 
 #if	CF_TICOTSORD
 
-static int ticotsordargs_start(TICOTSORDARGS *tap,char *abuf,int alen,
+local int ticotsordargs_start(TICOTSORDARGS *tap,char *abuf,int alen,
 		cchar *pp,int pl) noex {
 	int		rs ;
 	memclear(tap) ;
@@ -896,12 +896,12 @@ static int ticotsordargs_start(TICOTSORDARGS *tap,char *abuf,int alen,
 }
 /* end subroutine (ticotsordargs_start) */
 
-static int ticotsordargs_finish(TICOTSORDARGS *tap) noex {
+local int ticotsordargs_finish(TICOTSORDARGS *tap) noex {
 	return storeitem_finish(&tap->ss) ;
 }
 /* end subroutine (ticotsordargs_finish) */
 
-static int ticotsordargs_load(TICOTSORDARGS *tap,cchar *sp,int sl) noex {
+local int ticotsordargs_load(TICOTSORDARGS *tap,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (sl > 0) {
 	    switch (tap->c++) {
@@ -919,7 +919,7 @@ static int ticotsordargs_load(TICOTSORDARGS *tap,cchar *sp,int sl) noex {
 
 #endif /* CF_TICOTSORD */
 
-static int dialfinger(inetargs *iap,cchar *psp,int af,int to,int of) noex {
+local int dialfinger(inetargs *iap,cchar *psp,int af,int to,int of) noex {
 	cint		reqlen = REQBUFLEN ;
 	int		rs = SR_OK ;
 	int		fd = -1 ;
@@ -991,7 +991,7 @@ static int dialfinger(inetargs *iap,cchar *psp,int af,int to,int of) noex {
 
 #if	CF_FINGERCLEAN
 #if	CF_FINGERBACK
-static int fingerclean(int nfd) noex {
+local int fingerclean(int nfd) noex {
 	int		rs = SR_OK ;
 	int		pfds[2] ;
 	int		fd = -1 ;
@@ -1019,7 +1019,7 @@ static int fingerclean(int nfd) noex {
 }
 /* end subroutine (fingerclean) */
 
-static int fingerworker(FINGERARGS *fap) noex {
+local int fingerworker(FINGERARGS *fap) noex {
 	filer		out, *ofp = &out ;
 	cint		nfd = fap->nfd ;
 	cint		cfd = fap->cfd ;
@@ -1049,7 +1049,7 @@ static int fingerworker(FINGERARGS *fap) noex {
 }
 /* end subroutine (fingerworker) */
 
-static int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
+local int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 		int cols,int ind,int to) noex {
 	int		rs ;
 	int		rs1 ;
@@ -1098,7 +1098,7 @@ static int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 }
 /* end subroutine (fingerworker_loop) */
 
-static int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
+local int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
 		int ind,int ln,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
@@ -1169,7 +1169,7 @@ static int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
 }
 /* end subroutine (fingerworker_liner) */
 #else /* CF_FINGERBACK */
-static int fingerclean(cint fd) noex {
+local int fingerclean(cint fd) noex {
 	cmode		om = 0664 ;
 	int		rs ;
 	int		rs1 ;
@@ -1221,7 +1221,7 @@ static int fingerclean(cint fd) noex {
 #endif /* CF_FINGERBACK */
 #endif /* CF_FINGERCLEAN */
 
-static int loadargs(vecstr *alp,cchar *sp) noex {
+local int loadargs(vecstr *alp,cchar *sp) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*tp ;
@@ -1240,7 +1240,7 @@ static int loadargs(vecstr *alp,cchar *sp) noex {
 }
 /* end subroutine (loadargs) */
 
-static int sockshut(int fd,int of) noex {
+local int sockshut(int fd,int of) noex {
 	cint		am = (of & O_ACCMODE) ;
 	int		rs = SR_OK ;
 	switch (am) {
@@ -1259,7 +1259,7 @@ static int sockshut(int fd,int of) noex {
 
 #if	CF_FINGERBACK
 
-static int getline(int linelen,cchar *sp,int sl) noex {
+local int getline(int linelen,cchar *sp,int sl) noex {
 	int		len = 0 ;
 	if (sl > 0) {
 	    cchar	*tp ;
@@ -1278,7 +1278,7 @@ static int getline(int linelen,cchar *sp,int sl) noex {
 }
 /* end subroutine (getline) */
 
-static int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl) noex {
+local int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl) noex {
 	sbuf		d ;
 	int		rs ;
 	int		len = 0 ;
@@ -1303,7 +1303,7 @@ static int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl) noex {
 
 #endif /* CF_FINGERBACK */
 
-static bool hasmseol(cchar *lp,int ll) noex {
+local bool hasmseol(cchar *lp,int ll) noex {
 	bool		f = false ;
 	if (ll >= 2) {
 	    f = ((lp[ll-2] == CH_CR) && (lp[ll-1] == CH_NL)) ;
@@ -1312,7 +1312,7 @@ static bool hasmseol(cchar *lp,int ll) noex {
 }
 /* end subroutine (hasmseol) */
 
-static bool hasdirty(cchar *lp,int ll) noex {
+local bool hasdirty(cchar *lp,int ll) noex {
 	int		ch ;
 	bool		f = false ;
 	for (int i = 0 ; (i < ll) && (lp[i] != '\0')  ; i += 1) {
@@ -1324,7 +1324,7 @@ static bool hasdirty(cchar *lp,int ll) noex {
 }
 /* end subroutine (hasdirty) */
 
-static bool isdirty(int ch) noex {
+local bool isdirty(int ch) noex {
 	bool		f = false ;
 	f = f || isprintlatin(ch) ;
 	f = f || (ch == CH_BEL) ;
@@ -1332,8 +1332,7 @@ static bool isdirty(int ch) noex {
 	f = f || (ch == CH_TAB) ;
 	f = f || (ch == CH_NL) ;
 	return (! f) ;
-}
-/* end subroutine (isdirty) */
+} /* end subroutine (isdirty) */
 
 #endif /* CF_FINGERCLEAN */
 
@@ -1341,7 +1340,7 @@ static bool isdirty(int ch) noex {
 /* DEBUG subroutines */
 
 #if	COMMENT
-static int makeint(const void *addr) noex {
+local int makeint(const void *addr) noex {
 	int	hi = 0 ;
 	uchar	*us = (uchar *) addr ;
 	hi |= (mkchar(us[0]) << 24) ;
@@ -1352,14 +1351,13 @@ static int makeint(const void *addr) noex {
 }
 #endif /* CF_DEBUGS */
 
-static bool hasBadOflags(int of) noex {
+local bool hasBadOflags(int of) noex {
 	bool		f = false ;
 	f = f || (of & O_WRONLY) ;
 	f = f || (of & O_RDWR) ;
 	f = f || (of & O_CREAT) ;
 	f = f || (of & O_TRUNC) ;
 	return f ;
-}
-/* end subroutine (hasBadOflags) */
+} /* end subroutine (hasBadOflags) */
 
 
