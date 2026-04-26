@@ -399,7 +399,7 @@ int uctim::pinit() noex {
 	        auto lamb = [this] () -> int {
 	            int		rs = SR_OK ;
 	            if (!finit) {
-		        rs = SR_LOCKLOST ;
+		        rs = SR_LOCKFAIL ;
 	            } else if (finitdone) {
 		        rs = 1 ;
 	            }
