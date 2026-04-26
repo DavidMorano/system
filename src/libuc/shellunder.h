@@ -24,7 +24,7 @@
 struct shellunder_data {
 	cchar		*execname ;	/* child program exec-name */
 	pid_t		pid ;		/* parent (shell) PID */
-} ;
+} ; /* end struct (shellunder_data) */
 
 typedef	SHELLUNDER_DAT	shellunder_dat ;
 
