@@ -26,13 +26,13 @@ module ;
 export module libutil:lenstrarr ;
 
 export {
-    int lenstrarr(mainv a) noex {
+    int lenstrarr(con mainv a) noex {
     	int	n = -1 ; /* return-value */
 	if (a) {
 	    for (n = 0 ; a[n] ; n += 1) ;
 	}
 	return n ;
-    }
+    } /* end subroutine (lenstrarr) */
 } /* end export */
 
 
