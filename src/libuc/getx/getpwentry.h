@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* subroutines to access the 'passwd' and 'group' databases */
+/* retrieve a PWENTRY given a name or UID */
 /* version %I% last-modified %G% */
 
 
@@ -21,8 +21,8 @@
 
 EXTERNC_begin
 
-extern int getpwentry_name(pwentry *,char *,int,cchar *) noex ;
-extern int getpwentry_uid(pwentry *,char *,int,uid_t) noex ;
+extern int getpwentry_name	(pwentry *,char *,int,cchar *) noex ;
+extern int getpwentry_uid	(pwentry *,char *,int,uid_t) noex ;
 
 EXTERNC_end
 
