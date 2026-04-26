@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get program root directory */
+/* get the node-name of the current system */
 /* version %I% last-modified %G% */
 
 
