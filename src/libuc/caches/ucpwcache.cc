@@ -251,7 +251,7 @@ int ucpwcache::iinit() noex {
 	        auto lamb = [this] () -> int {
 	            int		rsl = SR_OK ; /* XX GCC complaint */
 	            if (!finit) {
-		        rsl = SR_LOCKLOST ;
+		        rsl = SR_LOCKFAIL ;
 	            } else if (finitdone) {
 		        rsl = 1 ;
 	            }
