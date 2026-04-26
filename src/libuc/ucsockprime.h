@@ -47,10 +47,6 @@ extern int	uc_setsockopt(int,int,int,int *,int) noex ;
 extern int	uc_shutdown(int,int) noex ;
 extern int	uc_sockatmark(int) noex ;
 
-static inline int uc_reuseaddr(int fd) noex {
-    	return uc_sockreuse(fd) ;
-}
-
 EXTERNC_end
 
 
