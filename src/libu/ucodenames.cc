@@ -93,9 +93,12 @@ namespace {
     struct getter {
 	con codepair	*ns ;
 	con uchar	*tab ;
+	con uchar	*len ;
 	int 		ne ;
-	getter(con codepair *ªns,con uchar *ªtab,int n) noex : ns(ªns) {
+	getter(con codepair *ªns,cuchar *ªtab,cuchar *ªlen,int n) noex {
+	    ns = ªns ;
 	    tab = ªtab ;
+	    len = ªlen ;
 	    ne = n ;
 	} ; /* end ctor */
 	int operator () (int n,cchar **rpp) const noex {
@@ -111,7 +114,7 @@ namespace {
 		if (cint ii = *it ; ns[ii].n == n) {
 		    rs = SR_OK ;
 	    	    if (rpp) *rpp = ns[ii].s ;
-	    	    rl = lenstr(ns[ii].s) ;
+	    	    rl = len[intconv(it - itf)] ;
 		} /* end if (got a match) */
 	    } /* end if (partition) */
 	    return (rs >= 0) ? rl : rs ;
@@ -259,7 +262,7 @@ constexpr codepair		names_sr[] = {
 	{ SR_EXISTS,		"EXISTS" },
 	{ SR_LOCKED,		"LOCKED" },
 	{ SR_INUSE,		"INUSE" },
-	{ SR_LOCKLOST,		"LOCKLOST" },
+	{ SR_LOCKFAIL,		"LOCKFAIL" },
 	{ SR_HANGUP,		"HANGUP" },
 	{ SR_POLLERR,		"POLLERR" },
 	{ SR_TOOBIG,		"TOOBIG" },
@@ -351,24 +354,46 @@ constexpr int	ne_sr	= nelem(names_sr) ;
 constexpr int	ne_sig	= nelem(names_sig) ;
 
 namespace {
+    enum whichs {
+	w_sr,
+	w_sig,
+	w_overlast
+    } ;
     struct codemgr {
 	uchar		tab_sr	[ne_sr] ;
 	uchar		tab_sig	[ne_sig] ;
+	uchar		len_sr	[ne_sr] ;
+	uchar		len_sig	[ne_sig] ;
 	consteval void tabload_x(mut uchar *tab,int n) noex {
 	    for (int i = 0 ; i < n ; i += 1) {
 		tab[i] = uchar(i) ;
 	    } ; /* end for */
 	} ; /* end method (tabload_x) */
-	consteval void tabinit(mut uchar *tab,con codepair *pairs,int ne) noex {
+	consteval void tabinit(int w,con codepair *pairs,int ne) noex {
+	    uchar *tab{} ;
+	    uchar *len{} ;
+	    switch (w) {
+	    case w_sr:
+		tab = tab_sr ;
+		len = len_sr ;
+		break ;
+	    case w_sig:
+		tab = tab_sig ;
+		len = len_sig ;
+		break ;
+	    } /* end switch */
 	    cauto cmpf = [pairs] (con uchar &ia,con uchar &ib) noex -> bool {
     		return (pairs[ia].n < pairs[ib].n) ;
-	    } ;
+	    } ; /* end lambda */
 	    tabload_x(tab,ne) ;
 	    sort(tab,(tab+ne),cmpf) ;
+	    for (int i = 0 ; i < ne ; i += 1) {
+		len[i] = uchar(clenstr(pairs[tab[i]].s)) ;
+	    } /* end for */
 	} ; /* end method (tabinit) */
 	consteval codemgr() noex {
-	    tabinit(tab_sr,names_sr,ne_sr) ;
-	    tabinit(tab_sig,names_sig,ne_sig) ;
+	    tabinit(w_sr,	names_sr,	ne_sr) ;
+	    tabinit(w_sig,	names_sig,	ne_sig) ;
 	} /* end ctor (codemgr) */
     } ; /* end struct (codemgr) */
 } /* end namespace */
@@ -382,14 +407,14 @@ constexpr codemgr	tabcode ;
 /* exported subroutines */
 
 int ucodename_sr(int n,ccharpp rpp) noex {
-    	getter go(names_sr,tabcode.tab_sr,ne_sr) ;
+    	getter go(names_sr,tabcode.tab_sr,tabcode.len_sr,ne_sr) ;
     	return go(n,rpp) ;
-}
+} /* end subroutine */
 
 int ucodename_sig(int n,ccharpp rpp) noex {
-    	getter go(names_sig,tabcode.tab_sig,ne_sig) ;
+    	getter go(names_sig,tabcode.tab_sig,tabcode.len_sig,ne_sig) ;
     	return go(n,rpp) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
