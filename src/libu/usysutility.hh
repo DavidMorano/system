@@ -31,11 +31,12 @@
 
 namespace libu {
     typedef double	dbl ;
-    extern int	uloadavgd(double *,int) noex ;
-    extern int	snprintf(char *,int,cchar *,...) noex ;
-    extern int	snvprintf(char *,int,cchar *,va_list) noex ;
-    extern int	snloadavgd(char *,int,int,double *,int) noex ;
-    extern int	ctdecf(char *,int,int,double) noex ;
+    extern int	ugetrandom	(void *,int,uint)		noex ;
+    extern int	uloadavgd	(double *,int)			noex ;
+    extern int	snprintf	(char *,int,cchar *,...)	noex ;
+    extern int	snvprintf	(char *,int,cchar *,va_list)	noex ;
+    extern int	snloadavgd	(char *,int,int,double *,int)	noex ;
+    extern int	ctdecf		(char *,int,int,double)		noex ;
 } /* end namespace (libu) */
 
 
