@@ -41,7 +41,7 @@ enum sysdbfiles {
 	sysdbfile_overlast
 } ; /* end enum (sysdbfiles) */
 
-extern cpcchar		sysdbfile[] ;
+extern cpcchar	sysdbfile[] ;
 
 
 #endif /* SYSDBFILES_INCLUDE */
