@@ -43,6 +43,7 @@
 #include	<ucatfork.h>
 #include	<ucatexit.h>
 #include	<getbufsize.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<timewatch.hh>
 #include	<bufsizevar.hh>
 #include	<ptm.h>
@@ -107,9 +108,9 @@ namespace {
     } ; /* end struct (valstore_co) */
     struct valstore {
 	friend		valstore_co ;
-	cchar		*strp[strlibval_overlast] ;
-	char		*ma[strlibval_overlast] ;	/* memory-allocation */
-	bool		facc[strlibval_overlast] ;
+	cchar		*strp	[strlibval_overlast] ;
+	char		*ma	[strlibval_overlast] ;	/* memory-allocation */
+	bool		facc	[strlibval_overlast] ;
 	ptm		mx ;		/* data mutex */
 	aflag		fvoid ;
 	aflag		finit ;
@@ -263,7 +264,7 @@ int valstore::iinit() noex {
 	        cauto lamb = [this] () -> int {
 	            int		rsl = SR_OK ;
 	            if (!finit) {
-		        rsl = SR_LOCKLOST ;
+		        rsl = SR_LOCKFAIL ;
 	            } else if (finitdone) {
 		        rsl = 1 ;
 	            }
@@ -340,7 +341,7 @@ int valstore::valtmpdir(int aw) noex {
 	int		rs = SR_OK ;
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
 	    cchar	*rp ; /* used-afterwards */
-	    if ((rp = getenv(vn)) == nullptr) {
+	    if ((rp = getenver(vn)) == nullptr) {
 		rp = sysword.w_tmpdir ;
 	    } /* end if (env-variable access) */
 	    strp[aw] = rp ;
@@ -354,7 +355,7 @@ int valstore::valmaildir(int aw) noex {
 	int		rs = SR_OK ;
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
 	    cchar	*rp ;
-	    if ((rp = getenv(vn)) == nullptr) {
+	    if ((rp = getenver(vn)) == nullptr) {
 		rp = sysword.w_maildir ;
 	    } /* end if (env-variable access) */
 	    strp[aw] = rp ;
@@ -369,7 +370,7 @@ int valstore::valpath(int aw) noex {
 	int		rs1 ;
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
 	    cchar	*rp ; /* used-afterwards */
-	    if ((rp = getenv(vn)) == nullptr) {
+	    if ((rp = getenver(vn)) == nullptr) {
 		if ((rs = maxpathlen) >= 0) ylikely {
 		    cint	tlen = (rs * PLMULT) ;
 		    if (char *tbuf ; (rs = lm_mall((tlen+1),&tbuf)) >= 0) {
@@ -394,7 +395,7 @@ int valstore::valpath(int aw) noex {
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
-	    } /* end if (getenv) */
+	    } /* end if (getenver) */
 	    strp[aw] = rp ;
 	} /* end if (env-variable name) */
 	facc[aw] = true ;
@@ -405,7 +406,7 @@ int valstore::valpath(int aw) noex {
 int valstore::valenv(int aw) noex {
 	int		rs = SR_OK ;
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
-	    strp[aw] = getenv(vn) ;
+	    strp[aw] = getenver(vn) ;
 	}
 	facc[aw] = true ;
 	return rs ;
