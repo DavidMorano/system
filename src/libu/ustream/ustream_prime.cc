@@ -44,7 +44,7 @@
 #include	<intfloor.h>
 #include	<fmtstr.h>
 #include	<localmisc.h>
-#include	<dprintf.hh>		/* debugging */
+#include	<dprint.hh>		/* debugging */
 
 #include	"ustream.hh"
 
