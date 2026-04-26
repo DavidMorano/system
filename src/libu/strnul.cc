@@ -37,6 +37,9 @@
 
 #include	"strnul.hh"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -64,49 +67,93 @@ using std::nothrow ;			/* constant */
 
 /* local variables */
 
+cint		blen = STRNUL_SHORTLEN ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-ccharp strnul::operator () (cchar *ap,int al) noex {
-    rp = nullptr ;
-    if (as) {
-        delete [] as ;
-        as = nullptr ;
-    }
-    sp = ap ;
-    sl = al ;
-    return operator ccharp () ;
-} /* end method (strnul::operator) */
+strnul::strnul(cchar *sp,int sl) noex {
+    	buf[0] = '\0' ;
+	proc(sp,sl) ;
+} /* end ctor */
 
-strnul::operator ccharp () noex {
-	if (rp == nullptr) {
+strnul::strnul(const strview &sv) noex {
+	ccharp	sp = sv.data() ;
+	cint	sl = (int) sv.length() ;
+    	buf[0] = '\0' ;
+	proc(sp,sl) ;
+} /* end ctor */
+
+void strnul::clear() noex {
+	rp = nullptr ;
+    	buf[0] = '\0' ;
+	if (as) {
+	    delete [] as ;
+	    as = nullptr ;
+	}
+} /* end method (strnul::proc) */
+
+void strnul::alloc(cchar *sp,int sl) noex {
+	if ((as = new(nothrow) char[sl + 1]) != nullptr) {
+	    strwcpy(as,sp,sl) ;
+	    rp = as ;
+	} else {
+	    ulogerror("strnul",SR_NOMEM,"mem-alloc failure") ;
+	    rp = "«mem-alloc-failure»" ;
+	    fok = false ;
+	}
+} /* end method (strnul::alloc) */
+
+ccharp strnul::proc(cchar *sp,int sl) noex {
+	if (sp) {
 	    rp = sp ;
-	    if ((sl >= 0) && (sp[sl] != '\0')) {
-	        if (sl > STRNUL_SHORTLEN) {
-		    if ((as = new(nothrow) char[sl + 1]) != nullptr) {
-			strwcpy(as,sp,sl) ;
-			rp = as ;
-		    } else {
-			ulogerror("strnul",SR_NOMEM,"mem-alloc failure") ;
-			rp = "«mem-alloc-failure»" ;
-			fok = false ;
-		    }
-	        } else {
-		    strwcpy(buf,sp,sl) ;
-		    rp = buf ;
-	        }
+	    if (sl >= 0) {
+		if (sp[sl] != '\0') {
+		    if (lenstr(sp,sl) >= sl) {
+	                if (sl > blen) {
+		            alloc(sp,sl) ;
+	                } else {
+		            strwcpy(buf,sp,sl) ;
+		            rp = buf ;
+	                }
+		    } /* end if (storeage required) */
+		} /* end if (not nul-terminated as given) */
 	    } /* end if (possibly required) */
 	} /* end if (need calculation) */
 	return rp ;
-}
-/* end method (strnul::operator) */
+} /* end method (strnul::proc) */
 
-strnul::operator bool () const noex {
-	return fok ;
-}
-/* end method (strnul::operator) */
+void strnul::dtor() noex {
+	clear() ;
+} /* end method (strnul::dtor) */
+
+strnul &strnul::operator = (cchar *sp) noex {
+	clear() ;
+	proc(sp) ;
+	return *this ;
+} /* end operator (assignment from |ccharp|) */
+
+strnul &strnul::operator = (const strview &sv) noex {
+	ccharp	sp = sv.data() ;
+	cint	sl = (int) sv.length() ;
+	clear() ;
+	proc(sp,sl) ;
+	return *this ;
+} /* end operator (assignment from |string_view|) */
+
+ccharp strnul::operator () (cchar *sp,int sl) noex {
+    	clear() ;
+	return proc(sp,sl) ;
+} /* end method (strnul::operator) */
+
+ccharp strnul::operator () (const strview &sv) noex {
+	ccharp	sp = sv.data() ;
+	cint	sl = (int) sv.length() ;
+	clear() ;
+	return proc(sp,sl) ;
+} /* end method (strnul::operator) */
 
 
