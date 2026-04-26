@@ -1071,7 +1071,7 @@ opendialer.dir:
 	makesubdir $@
 
 # string-constants
-syhsdbfiles.o:		sysdbfiles.c sysdbfiles.h
+sysdbfiles.o:		sysdbfiles.c sysdbfiles.h
 sysdbfn.o:		sysdbfn.cc sysdbfn.h
 opensysdbs.o:		opensysdbs.c opensysdbs.h
 
