@@ -30,47 +30,37 @@
 #include	<usysdefs.h>
 
 
-#define	STRNUL_SHORTLEN		128	/* "short-string optimization" */
+#define	STRNUL_SHORTLEN		127	/* "short-string optimization" */
 
 
-struct strnul {
+class strnul {
 	typedef std::string_view	strview ;
 	cchar		*rp = nullptr ;
-	cchar		*sp = nullptr ;
 	char		*as = nullptr ;	/* allocated memory */
-	int		sl = 0 ;
 	char		buf[STRNUL_SHORTLEN + 1] ;
+	void clear() noex ;
+	void alloc(cchar *,int) noex ;
+	ccharp proc(cchar *,int = -1) noex ;
+    public:
 	bool		fok = true ;
-	strnul(cchar *ap,int al = -1) noex : sp(ap), sl(al) { 
-	    buf[0] = '\0' ;
-	} ; /* end ctor */
-	strnul(const strview &sv) noex {
-	    buf[0] = '\0' ;
-	    sp = sv.data() ;
-	    sl = (int) sv.length() ;
-	} ; /* end ctor */
+	strnul(cchar *,int = -1) noex ;
+	strnul(const strview &sv) noex ;
 	strnul() noex : strnul(nullptr,0) { } ;
 	strnul(const strnul &) = delete ;
 	strnul &operator = (const strnul &) = delete ;
-	strnul &operator = (const strview &sv) noex {
-	    buf[0] = '\0' ;
-	    sp = sv.data() ;
-	    sl = (int) sv.length() ;
-	    return *this ;
-	} ; /* end operator (assignment from |string_view|) */
-	ccharp operator () (cchar *,int) noex ;
-	ccharp operator () (const strview &sv) noex {
-	    cchar	*ap = sv.data() ;
-	    cint	al = (int) sv.length() ;
-	    return operator () (ap,al) ;
-	} ; /* end method */
-	operator ccharp () noex ;
-	operator bool () const noex ;
+	strnul &operator = (cchar *) noex ;
+	strnul &operator = (const strview &) noex ;
+	ccharp operator () (cchar *,int = -1) noex ;
+	ccharp operator () (const strview &) noex ;
+	void dtor() noex ;
+	operator ccharp () const noex {
+	    return rp ;
+	} ;
+	operator bool () const noex {
+	    return fok ;
+	} ;
 	destruct strnul() {
-	    if (as) {
-		delete [] as ;
-		as = nullptr ;
-	    }
+	    if (as) dtor() ;
 	} ; /* end dtor */
 } ; /* end struct (strnul) */
 
