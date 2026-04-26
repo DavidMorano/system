@@ -135,7 +135,7 @@
 #include	<strnul.hh>
 #include	<ascii.h>
 #include	<localmisc.h>
-#include	<dprintf.hh>		/* debugging */
+#include	<dprint.hh>		/* debugging */
 
 #include	"ureade.h"
 
