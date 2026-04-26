@@ -325,7 +325,7 @@ int uctimeout::init() noex {
 	        auto lamb = [this] () -> int {
 	            int		lrs = SR_OK ;
 	            if (!finit) {
-		        lrs = SR_LOCKLOST ;
+		        lrs = SR_LOCKFAIL ;
 	            } else if (finitdone) {
 		        lrs = 1 ;
 	            }
