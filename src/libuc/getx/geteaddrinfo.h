@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get "effective" address information */
+/* get "effective" address information for a host */
 /* version %I% last-modified %G% */
 
 
