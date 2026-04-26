@@ -31,8 +31,8 @@
 	af		address family
 
 	Returns:
-	<0		no corresponding protocol family exists
-	>=0		protocol family
+	>=0		found protocol family
+	<0		no corresponding protocol family exists (system-return)
 
 *******************************************************************************/
 
@@ -54,13 +54,16 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* external variables */
-
-
-/* local typedefs */
 
 
 /* local structures */
@@ -78,6 +81,7 @@ struct typematch {
 constexpr typematch	prototab[] = {
 	{ PF_UNSPEC,	AF_UNSPEC },
 	{ PF_INET,	AF_INET },
+	{ PF_INET4,	AF_INET4 },
 	{ PF_INET6,	AF_INET6 },
 	{ PF_LOCAL,	AF_LOCAL },
 	{ PF_UNIX,	AF_UNIX },
@@ -112,6 +116,18 @@ constexpr typematch	prototab[] = {
 	{ PF_SYSTEM,	AF_SYSTEM },
 	{ PF_NETBIOS,	AF_NETBIOS },
 	{ PF_NDRV,	AF_NDRV },
+	{ PF_CNT,	AF_CNT },
+	{ PF_COIP,	AF_COIP },
+	{ PF_E164,	AF_E164 },
+	{ PF_IEEE80211,	AF_IEEE80211 },
+	{ PF_ISO,	AF_ISO },
+	{ PF_MAX,	AF_MAX },
+	{ PF_NATM,	AF_NATM },
+	{ PF_PPP,	AF_PPP },
+	{ PF_RESERVED_36,	AF_RESERVED_36 },
+	{ PF_SIP,	AF_SIP },
+	{ PF_UTUN,	AF_UTUN },
+	{ PF_VSOCK,	AF_VSOCK },
 	{ -1, -1 }
 } ; /* end array */
 
