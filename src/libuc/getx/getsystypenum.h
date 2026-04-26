@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get the system type and OS number (if we can) */
+/* get the system type number and c-strings of other system information */
 /* version %I% last-modified %G% */
 
 
@@ -23,6 +23,13 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 
+
+enum systypenames {
+	systypename_sysv,
+	systypename_darwin,
+	systypename_linux,
+	systypename_overlast
+} ; /* end enum (systypenames) */
 
 EXTERNC_begin
 
