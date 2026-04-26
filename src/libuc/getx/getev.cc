@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* get an environment variable by name */
+/* get the value of an environment variable */
 /* version %I% last-modified %G% */
 
 
