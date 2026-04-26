@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* calculate column values */
+/* retrive the maximum number of possible file-descriptors */
 /* version %I% last-modified %G% */
 
 
