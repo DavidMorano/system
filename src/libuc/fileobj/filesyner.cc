@@ -45,7 +45,7 @@
 #include	<ulogerror.h>
 #include	<strnul.hh>
 #include	<localmisc.h>
-#include	<dprintf.hh>
+#include	<dprint.hh>
 
 #include	"filesyner.hh"
 
