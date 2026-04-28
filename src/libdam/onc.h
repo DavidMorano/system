@@ -21,17 +21,14 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
 
-extern int onckeyalready(cchar *) noex ;
-extern int onckeygetset(cchar *,cchar *) noex ;
-extern int onckeylogin(cchar *) noex ;
+extern int onckeyalready	(cchar *)		noex ;
+extern int onckeygetset		(cchar *,cchar *)	noex ;
+extern int onckeylogin		(cchar *)		noex ;
 
 EXTERNC_end
 
