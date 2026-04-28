@@ -41,6 +41,7 @@ class strnul {
 	void clear() noex ;
 	void alloc(cchar *,int) noex ;
 	ccharp proc(cchar *,int = -1) noex ;
+	void dtor() noex ;
     public:
 	bool		fok = true ;
 	strnul(cchar *,int = -1) noex ;
@@ -52,7 +53,6 @@ class strnul {
 	strnul &operator = (const strview &) noex ;
 	ccharp operator () (cchar *,int = -1) noex ;
 	ccharp operator () (const strview &) noex ;
-	void dtor() noex ;
 	operator ccharp () const noex {
 	    return rp ;
 	} ;
