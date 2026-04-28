@@ -318,7 +318,7 @@ int logzones_curenum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 	                } /* end if (ok) */
 	            } /* end if (ok) */
 	        } else {
-	            rs = SR_LOCKLOST ;
+	            rs = SR_LOCKFAIL ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (magic) */
