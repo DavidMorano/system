@@ -5,14 +5,14 @@ T= bbnews
 ALL= $(T)
 
 #PCS= /usr/add-on/pcs
-SRCROOT= $(PCS)
+REPO= $(shell reporoot )
 
 
-BINDIR= $(SRCROOT)/bin
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
-MANDIR= $(SRCROOT)/man/man1
-HELPDIR= $(SRCROOT)/share/help
+BINDIR= $(REPO)/bin
+INCDIR= $(REPO)/include
+LIBDIR= $(REPO)/lib
+MANDIR= $(REPO)/man/man1
+HELPDIR= $(REPO)/share/help
 
 LDCRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
@@ -157,14 +157,14 @@ NMFLAGS= -xs -v
 CPP= cpp
 
 
-INCS= config.h defs.h mkdirlist.h dirshown.h artlist.h
+INCS= config.h defs.h
 
 
 OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o
 OBJ01= proguserlist.o proglogid.o proglog.o
 OBJ02= progconf.o prognewsrc.o progufname.o
-OBJ03= progmode.o progng.o progmsgenv.o proghdr.o
-OBJ04= mkdirlist.o dirshown.o
+OBJ03= progmode.o progng.o progmsgenv.o 
+OBJ04= proghdr.o
 OBJ05= cmd_save.o cmd_output.o cmd_printout.o cmd_follow.o
 OBJ06= emit_count.o emit_header.o emit_article.o emit_mailbox.o emit_test.o
 OBJ07= printhelp.o 
@@ -173,7 +173,7 @@ OBJ08=
 OBJ09= monthname.o getfield.o mm_getfield.o getbbopts.o hdrextid.o
 OBJ10= sfcenter.o
 OBJ11= bbcmp.o bbcpy.o
-OBJ12= bbnewsrc.o artlist.o outbuf.o
+OBJ12= bbnewsrc.o
 OBJ13= 
 OBJ14= matthingenv.o hmatch.o
 OBJ15= dater_getbbtime.o dater.o
@@ -325,13 +325,13 @@ progufname.o:		progufname.c defs.h
 
 progconfig.o:		progconfig.c $(INCS)
 
-prognewsrc.o:		prognewsrc.c $(INCS) mkdirlist.h bbnewsrc.h
+prognewsrc.o:		prognewsrc.c $(INCS) bbnewsrc.h
 
-progmode.o:		progmode.c $(INCS) mkdirlist.h bbnewsrc.h
+progmode.o:		progmode.c $(INCS) bbnewsrc.h
 
 proghdr.o:		proghdr.c $(INCS) proghdr.h
 
-progng.o:		progng.c $(INCS) mkdirlist.h bbnewsrc.h
+progng.o:		progng.c $(INCS) bbnewsrc.h
 
 progmsgenv.o:		progmsgenv.c $(INCS)
 
@@ -343,13 +343,7 @@ getbbopts.o:		getbbopts.c $(INCS)
 
 update.o:		update.c $(INCS) bbnewsrc.h
 
-mkdirlist.o:		mkdirlist.c $(INCS)
-
-dirshown.o:		dirshown.c dirshown.h $(INCS) mkdirlist.h
-
 bbnewsrc.o:		bbnewsrc.c bbnewsrc.h
-
-artlist.o:		artlist.c artlist.h
 
 cfbbdate.o:		cfbbdate.c $(INCS)
 
