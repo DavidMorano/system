@@ -40,12 +40,10 @@ module ;
 #include	<usysrets.h>
 
 #pragma		GCC dependency		"mod/ureserve.ccm"
-#pragma		GCC dependency		"mod/debug.ccm"
 
 export module modproc ;
 
 import ureserve ;			/* |vecstr(3u)| */
-import debug ;
 
 /* local defines */
 
