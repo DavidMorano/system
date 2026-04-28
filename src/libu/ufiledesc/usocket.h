@@ -31,11 +31,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>
-#include	<unistd.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<usupport.h>
 
 EXTERNC_begin
 
@@ -54,7 +51,7 @@ extern int u_recvfrom		(int,void *,int,int,void *,int *) noex ;
 extern int u_recvmsg		(int,MSGHDR *,int) noex ;
 extern int u_recvmsge		(int,MSGHDR *,int,int,int) noex ;
 extern int u_send		(int,cvoid *,int,int) noex ;
-extern int u_sendfiler		(int,int,off_t,size_t) noex ;
+extern int u_sendfile		(int,int,off_t,size_t) noex ;
 extern int u_sendmsg		(int,CMSGHDR *,int) noex ;
 extern int u_sendto		(int,cvoid *,int,int,cvoid *,int) noex ;
 extern int u_setsockopt		(int,int,int,cvoid *,int) noex ;
