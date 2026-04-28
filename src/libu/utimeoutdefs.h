@@ -92,6 +92,7 @@
 #define	UTO_CAPURE	5
 #define	UTO_TXTBUSY	5
 #define	UTO_CLOSEWAIT	2
+#define	UTO_INPROGRESS	(5*60)
 #define	UTO_DEFAULT	(5*60)
 
 
