@@ -51,7 +51,7 @@
 #include	<localmisc.h>
 #include	<libf.h>		/* LIBF */
 #include	<libdebug.h>		/* LIBDEBUG */
-#include	<dprintf.hh>		/* debugging */
+#include	<dprint.hh>		/* debugging */
 
 #include	"base64dec.h"		/* program-private */
 
