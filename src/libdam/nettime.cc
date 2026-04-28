@@ -74,7 +74,7 @@
 #include	<uclibmem.h>
 #include	<funcodes.h>		/* |FM_{x}(3uc)| */
 #include	<getbufsize.h>
-#include	<getprotofamily.h>
+#include	<getpf.h>
 #include	<dialtcp.h>
 #include	<hostaddr.h>
 #include	<sockaddress.h>
@@ -306,7 +306,7 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 	if ((af == AF_UNSPEC) || (af == AF_INET4)) {
 	    raf = AF_INET4 ;
 	    pf = PF_UNSPEC ;
-	    if ((rs1 = getprotofamily(raf)) >= 0) pf = rs1 ;
+	    if ((rs1 = getpf(raf)) >= 0) pf = rs1 ;
 	    ntp->pf = pf ;
 	    rs = dialtcp(hostname,svc,raf,to,0) ;
 	    s = rs ;
@@ -315,7 +315,7 @@ static int nettime_tcp(nettime *ntp,int af,cc *hostname,cc *svc,int to) noex {
 	    ((af == AF_UNSPEC) || (af == AF_INET6))) {
 	    raf = AF_INET6 ;
 	    pf = PF_UNSPEC ;
-	    if ((rs1 = getprotofamily(raf)) >= 0) pf = rs1 ;
+	    if ((rs1 = getpf(raf)) >= 0) pf = rs1 ;
 	    ntp->pf = pf ;
 	    rs = dialtcp(hostname,svc,raf,to,0) ;
 	    s = rs ;
@@ -367,7 +367,7 @@ static int nettime_udptrythem(UA *uap,char *tsbuf) noex {
 	uap->proto = proto ;
 	hint.ai_protocol = proto ;
 	if (uap->af >= 0) {
-	    if (cint pf = getprotofamily(uap->af) ; pf >= 0) {
+	    if (cint pf = getpf(uap->af) ; pf >= 0) {
 	        uap->pf = pf ;
 	        hint.ai_family = pf ;
 	    }
