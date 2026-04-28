@@ -148,6 +148,10 @@
 #define	SVCNAMELEN	32
 #endif
 
+#ifndef	NETNAMELEN		/* this is for ONC operations */
+#define	NETNAMELEN	255	/* maximum length of network user-name */
+#endif
+
 
 #endif /* USYSDEFSLEN_INCLUDE */
 
