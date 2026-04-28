@@ -122,7 +122,7 @@ export {
 	    return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
     }
     constexpr inline bool	isspacetab(int ch)	noex {
-	    return isblank(ch) ;
+	    return isblanklatin(ch) ;
     }
     constexpr inline bool	isAbbr(int ch)		noex {
     	    return isabbr(ch) ;
