@@ -72,7 +72,7 @@ module ;
 #include	<mkchar.h>
 #include	<hasx.h>		/* |headlead(3uc)| */
 #include	<localmisc.h>
-#include	<debprintf.h>		/* |DEBPRINTF(3u)| */
+#include	<deb.hh>		/* |DEBPRINTF(3u)| */
 
 #pragma		GCC dependency		"mod/modproc.ccm"
 #pragma		GCC dependency		"mod/libutil.ccm"
@@ -82,6 +82,7 @@ module modproc ;
 
 import libutil ;			/* |getlenstr(3u)| */
 import ulibvals ;			/* |ulibval(3u)| + |pagesz| */
+import deb ;
 
 /* local defines */
 
