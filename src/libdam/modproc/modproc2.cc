@@ -59,6 +59,8 @@ module ;
 
 module modproc ;
 
+import deb ;
+
 /* local defines */
 
 #define CDEBPR(FMT, ...) \
