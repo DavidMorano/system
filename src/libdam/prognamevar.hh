@@ -40,62 +40,23 @@ struct prognamevar {
 	char		*as = nullptr ;	/* allocated memory */
 	int		sl = 0 ;
 	char		buf[PROGNAMEVAR_SHORTLEN + 1] ;
-	prognamevar(int argc,mainv argv,mainv envv = nullptr) noex {
-	    buf[0] = '\0' ;
-	    if ((argc > 0) && argv[0]) {
-	        if (proc(argv[0]) == false) {
-		    procenv(envv) ;
-		}
-	    }
-	} ; /* end ctor */
-	prognamevar(cchar *ap,int al = -1) noex {
-	    buf[0] = '\0' ;
-	    proc(ap,al) ;
-	} ; /* end ctor */
-	prognamevar(strview &sv) noex {
-	    buf[0] = '\0' ;
-	    {
-	        cchar *cp = sv.data() ;
-	        cint cl = (int) sv.length() ;
-	        proc(cp,cl) ;
-	    }
-	} ; /* end ctor */
+	prognamevar(int argc,con mainv argv,con mainv envv = nullptr) noex ;
+	prognamevar(cchar *ap,int al = -1) noex ;
+	prognamevar(strview &sv) noex ;
 	prognamevar() noex : prognamevar(nullptr,0) { } ;
 	prognamevar(const prognamevar &) = delete ;
 	prognamevar &operator = (const prognamevar &) = delete ;
-	prognamevar &operator = (const strview &sv) noex {
-	    buf[0] = '\0' ;
-	    {
-	        cchar *cp = sv.data() ;
-	        cint cl = (int) sv.length() ;
-	        proc(cp,cl) ;
-	    }
-	    return *this ;
-	} ; /* end operator (assignment from |string_view| */
-	ccharp operator () (cchar *ap,int al = -1) noex {
-	    rp = nullptr ;
-	    if (as) {
-		delete [] as ;
-		as = nullptr ;
-	    }
-	    proc(ap,al) ;
-	    return operator ccharp () ;
-	} ; /* end method */
-	ccharp operator () (strview &sv) noex {
-	    cchar	*ap = sv.data() ;
-	    cint	al = (int) sv.length() ;
-	    return operator () (ap,al) ;
-	} ; /* end method */
+	prognamevar &operator = (const strview &sv) noex ;
+	ccharp operator () (cchar *ap,int al = -1) noex ;
+	ccharp operator () (strview &sv) noex ;
 	operator ccharp () noex ;
+	void dtor() noex ;
 	destruct prognamevar() {
-	    if (as) {
-		delete [] as ;
-		as = nullptr ;
-	    }
+	    if (as) dtor() ;
 	} ; /* end dtor */
     private:
 	bool proc(cchar *,int = -1) noex ;
-	bool procenv(mainv = nullptr) noex ;
+	bool procenv(con mainv = nullptr) noex ;
 } ; /* end struct (prognamevar) */
 
 
