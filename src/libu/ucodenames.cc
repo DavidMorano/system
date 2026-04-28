@@ -68,8 +68,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local namespaces */
 
-using std::sort ;			/* subroutine */
-using std::partition_point ;		/* subroutine */
+using std::sort ;			/* subroutine-template */
+using std::partition_point ;		/* subroutine-template */
 
 
 /* local typedefs */
@@ -347,7 +347,7 @@ constexpr codepair		names_sig[] = {
 	{ SIGCANCEL,		"CANCEL" },
 	{ SIGLOST,		"LOST" },
 	{ SIGRTMIN,		"RTMIN" },
-	{ SIGRTMAX,		"RTMAX" },
+	{ SIGRTMAX,		"RTMAX" }
 } ; /* end array (names_sig) */
 
 constexpr int	ne_sr	= nelem(names_sr) ;
@@ -367,7 +367,7 @@ namespace {
 	consteval void tabload_x(mut uchar *tab,int n) noex {
 	    for (int i = 0 ; i < n ; i += 1) {
 		tab[i] = uchar(i) ;
-	    } ; /* end for */
+	    } /* end for */
 	} ; /* end method (tabload_x) */
 	consteval void tabinit(int w,con codepair *pairs,int ne) noex {
 	    uchar *tab{} ;
