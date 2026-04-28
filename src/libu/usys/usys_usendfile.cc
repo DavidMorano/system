@@ -55,16 +55,19 @@
 
 namespace usys {
     sysret_t usendfile(int fd,int s,off_t fo,size_t c) noex {
-	int		rs = SR_BADFD ;
+	int		rs = SR_BADF ;
 	int		len = 0 ;
-	if ((fd >= 0) && (s >= 0) && (fo >= 0)) {
-	    if (ssize_t ret ; (ret = sendfile(fd,s,fo,c)) >= 0) {
-		clong lw = ret ;
-		rs = SR_OK ;
-	        len = intsat(lw) ;
-	    } else {
-		rs = (- errno) ;
-	    }
+	if ((fd >= 0) && (s >= 0)) {
+	    rs = SR_INVALID ;
+	    if (fo >= 0) {
+	        if (ssize_t ret ; (ret = sendfile(fd,s,fo,c)) >= 0) {
+		    clong lw = ret ;
+		    rs = SR_OK ;
+	            len = intsat(lw) ;
+	        } else {
+		    rs = (- errno) ;
+	        }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (usendfile) */
@@ -74,7 +77,7 @@ namespace usys {
 
 namespace usys {
     sysret_t usendfile(int fd,int s,off_t fo,size_t c) noex {
-	int		rs = SR_BADFD ;
+	int		rs = SR_BADF ;
 	int		len = 0 ;
 	(void) c ;
 	if ((fd >= 0) && (s >= 0) && (fo >= 0)) {
@@ -94,16 +97,19 @@ namespace usys {
 
 namespace usys {
     sysret_t usendfile(int fd,int s,off_t fo,size_t c) noex {
-	int		rs = SR_BADFD ;
+	int		rs = SR_BADF ;
 	int		len = 0 ;
-	if ((fd >= 0) && (s >= 0) && (fo >= 0)) {
-	    if (ssize_t ret ; (ret = sendfile(fd,s,fo,c)) >= 0) {
-		clong lw = res ;
-		rs = SR_OK ;
-	        len = intsat(lw) ;
-	    } else {
-		rs = (- errno) ;
-	    }
+	if ((fd >= 0) && (s >= 0)) {
+	    rs = SR_INVALID ;
+	    if (fo >= 0) {
+	        if (ssize_t ret ; (ret = sendfile(fd,s,fo,c)) >= 0) {
+		    clong lw = res ;
+		    rs = SR_OK ;
+	            len = intsat(lw) ;
+	        } else {
+		    rs = (- errno) ;
+	        }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (usendfile) */
@@ -113,11 +119,14 @@ namespace usys {
 
 namespace usys {
     sysret_t usendfile(int fd,int s,off_t fo,size_t c) noex {
-	int		rs = SR_BADFD ;
+	int		rs = SR_BADF ;
 	int		len = 0 ;
-	if ((fd >= 0) && (s >= 0) && (fo >= 0)) {
-	    (void) c ;
-	    rs = SR_NOSYS ;
+	if ((fd >= 0) && (s >= 0)) {
+	    rs = SR_INVALID ;
+	    if (fo >= 0) {
+	        (void) c ;
+	        rs = SR_NOSYS ;
+	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (usendfile) */
