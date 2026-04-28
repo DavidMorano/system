@@ -114,6 +114,7 @@ consteval syshas_mgr::syshas_mgr() noexcept {
         pipes           = SYSHAS_PIPES ;
         libproc         = SYSHAS_LIBPROC ;
         eaccess         = SYSHAS_EACCESS ;
+	onc		= SYSHAS_ONC ;	/* Open-Network-Computing */
 } /* end ctor (syshas_mgr::syshas_mgr) */
 
 constexpr syshas_mgr		syshas ;
