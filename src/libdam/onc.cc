@@ -117,7 +117,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<usystem.h>
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"stubrpc.h"
@@ -145,11 +148,24 @@
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int	netnamelen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
+local int oncinit() noex ;
+
 
 /* local variables */
+
+static vars	var ;
+
+cint		passlen = PASSPHRASELEN ;
 
 
 /* exported variables */
@@ -173,19 +189,21 @@ int onckeygetset(cchar *netname,cchar *passbuf) noex {
 	if (netname && passbuf) {
 	    rs = SR_INVALID ;
 	    if (netname[0]) {
-	        key_netstarg	sna{} ;
-	        cchar		*nnp = netname ;
-	        char		passphrase[PASSPHRASELEN + 1] ;
-		rs = SR_OK ;
-	        strncpy(passphrase,passbuf,PASSPHRASELEN) ;
-	        passphrase[PASSPHRASELEN] = '\0' ;	/* truncate */
-	        memset(sna.st_priv_key,0,HEXKEYBYTES) ;
-	        sna.st_pub_key[0] = '\0' ;
-	        sna.st_netname = (char *) netname ;
-/* decrypt and retrieve the private key */
-	            if (getsecretkey(nnp,sna.st_priv_key,passphrase) > 0) {
+		if ((rs = oncinit()) >= 0) {
+	            key_netstarg	sna{} ;
+	            cchar		*nnp = netname ;
+	            char		passbuf[passlen + 1] ;
+		    rs = SR_OK ;
+	            strncpy(passbuf,passbuf,passlen) ;
+	            passbuf[passlen] = '\0' ;	/* truncate */
+	            memset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	            sna.st_pub_key[0] = '\0' ;
+	            sna.st_netname = (char *) netname ;
+		    /* decrypt and retrieve the private key */
+	            if (getsecretkey(nnp,sna.st_priv_key,passbuf) > 0) {
 	                if (sna.st_priv_key[0] != '\0') {
-/* we have successfully decrypted our private ONC key, give it to KEYSERV */
+			/* we have successfully decrypted our private ONC key */
+			/* give it to KEYSERV */
 	                    if ((rs = key_setnet(&sna)) > 0) {
 	                        memset(sna.st_priv_key,0,HEXKEYBYTES) ;
 		            } else if (rs == 0) {
@@ -199,7 +217,8 @@ int onckeygetset(cchar *netname,cchar *passbuf) noex {
 	            } else {
 	                rs = SR_NOENT ;
 	            }
-	        memset(passphrase,0,PASSPHRASELEN) ;
+	            memset(passbuf,0,passlen) ;
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -209,38 +228,61 @@ int onckeygetset(cchar *netname,cchar *passbuf) noex {
 int onckeylogin(cchar *passbuf) noex {
 	int		rs = SR_FAULT ;
 	if (passbuf) {
-	    key_netstarg	sna{} ;
-	    char		netname[MAXNETNAMELEN + 1] ;
-	    rs = SR_OK ;
-	    sna.st_netname = netname ;
-	    if (int f_netname ; (f_netname = getnetname(netname)) == 0) {
-	        if (int rc ; (rc = key_secretkey_is_set()) == 0) {
-	            char	netname3[MAXNETNAMELEN + 1] ;
-	            char	passphrase[PASSPHRASELEN + 1] ;
-	            char	*nnp = netname ;
-	            strncpy(passphrase,passbuf,PASSPHRASELEN) ;
-	            passphrase[PASSPHRASELEN] = '\0' ; /* truncate at maximum */
-	            strcpy(netname3,nnp) ;
-	            memset(sna.st_priv_key,0,HEXKEYBYTES) ;
-	            sna.st_pub_key[0] = '\0' ;
-	            sna.st_netname = netname3 ;
-	            if (getsecretkey(netname,sna.st_priv_key,passphrase) &&
-	                (sna.st_priv_key[0] != '\0')) {
-/* decrypted private ONC key, give it to KEYSERV */
-	                if ((rs = key_setnet(&sna)) < 0) {
-	                    rs = SR_ACCESS ;
-		        }
-/* destroy the private key since we do not really need or want it! */
+	    if ((rs = oncinit()) >= 0) {
+		cint netlen = var.netnamelen ;
+	        key_netstarg	sna{} ;
+	        char		netname[netlen + 1] ;
+	        sna.st_netname = netname ;
+	        if (int f_nn ; (f_nn = getnetname(netname)) == 0) {
+	            if (int rc ; (rc = key_secretkey_is_set()) == 0) {
+	                char	netname3[netlen + 1] ;
+	                char	passbuf[passlen + 1] ;
+	                char	*nnp = netname ;
+	                strncpy(passbuf,passbuf,passlen) ;
+		        /* truncate at maximum */
+	                passbuf[passlen] = '\0' ; 
+	                strcpy(netname3,nnp) ;
 	                memset(sna.st_priv_key,0,HEXKEYBYTES) ;
-	            } /* end if (decrypted and retrieved private key) */
-	            memset(passphrase,0,PASSPHRASELEN) ;
-	        } /* end if (key-is-already-set) */
-	    } else {
-	        rs = SR_NOTSUP ;
-	    }
+	                sna.st_pub_key[0] = '\0' ;
+	                sna.st_netname = netname3 ;
+		        bool f = true ;
+		        cauto gsk = getsecretkey ;
+	                f = f && gsk(netname,sna.st_priv_key,passbuf) ;
+		        f = f && (sna.st_priv_key[0] != '\0') ;
+		        if (f) {
+			    /* decrypted private ONC key */
+			    /* give it to KEYSERV */
+	                    if ((rs = key_setnet(&sna)) < 0) {
+	                        rs = SR_ACCESS ;
+		            }
+			    /* destroy the private key */
+	                    memset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	                } /* end if (decrypted and retrieved private key) */
+	                memset(passbuf,0,passlen) ;
+	            } /* end if (key-is-already-set) */
+	        } else {
+	            rs = SR_NOTSUP ;
+	        }
+	    } /* end if (oncinit) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (onckeylogin) */
+
+
+/* local subroutines */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = usys::getnetnamelen()) >= 0) {
+	    netnamelen = rs ;
+	}
+	return rs ;
+} /* end methof (vars::operator) */
+
+local int oncinit() noex ; {
+    static cint rsv = var ;
+    return rsv ;
+} /* end subroutine (oncinit) */
 
 
