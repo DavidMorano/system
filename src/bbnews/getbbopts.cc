@@ -1,17 +1,18 @@
-/* getbbopts */
+/* getbbopts SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* get the BB options */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 
-
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -22,54 +23,53 @@
 
 /*******************************************************************************
 
+  	Name:
+	getbbopts
+
+	Description:
 	This subroutine parses out options from the main PCS
 	configuration file.
 
 	Synopsis:
-
-	int getpfopts(pip,setsp)
-	struct proginfo	*pip ;
-	vecstr		*setsp ;
+	int getbbopts(proginfo *,vecstr *,setsp) noex
 
 	Arguments:
-
 	hp		pointer to program information
 	setsp		pointer to the PCS configuration SET variables
 
 	Returns:
-
-	<0		error
 	>=0		number of configuration options processed
-
+	<0		error (return-syste)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<termios.h>
 #include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<userinfo.h>
 #include	<baops.h>
 #include	<field.h>
 #include	<fieldterms.h>
 #include	<vecstr.h>
+#include	<matstr.h>
+#include	<cfdec.h>
+#include	<dirlist.h>
 #include	<pcsconf.h>
 #include	<mallocstuff.h>
 #include	<localmisc.h>
 
-#include	"dirlist.h"
+#include	"getbbopts.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -78,10 +78,6 @@
 
 
 /* external subroutines */
-
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
 
 
 /* external variables */
@@ -92,16 +88,6 @@ extern int	optbool(const char *,int) ;
 
 /* local variables */
 
-static const char *bbopts[] = {
-	"newsdir",
-	"fastscan",
-	"extrascan",
-	"popscreen",
-	"readtime",
-	"querytext",
-	NULL
-} ;
-
 enum bbopts {
 	bbopt_newsdir,
 	bbopt_fastscan,
@@ -110,28 +96,33 @@ enum bbopts {
 	bbopt_readtime,
 	bbopt_querytext,
 	bbopt_overlast
-} ;
+} ; /* end enum */
+
+constexpr cpcchar	bbopts[] = {
+	"newsdir",
+	"fastscan",
+	"extrascan",
+	"popscreen",
+	"readtime",
+	"querytext",
+	NULL
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int getbbopts(pip,setsp)
-struct proginfo	*pip ;
-vecstr		*setsp ;
-{
-	FIELD	fb, *fbp = &fb ;
-
+int getbbopts(proginfo *pip,vecstr *setsp) noex {
+	field	fb, *fbp = &fb ;
 	int	rs = SR_OK ;
-	int	i, oi, val ;
+	int	oi, val ;
 	int	fl ;
 	int	c = 0 ;
-
-	const char	*fp ;
-	const char	*cp ;
-
+	cchar	*fp ;
+	cchar	*cp ;
 	uchar	fterms[32] ;
-
 
 /* system-wide options? */
 
@@ -140,8 +131,8 @@ vecstr		*setsp ;
 	    debugprintf("getbbopts: scanning system options\n") ;
 #endif
 
-	for (i = 0 ; vecstr_get(setsp,i,&cp) >= 0 ; i += 1) {
-	    const char	*cp2 ;
+	for (int i = 0 ; vecstr_get(setsp,i,&cp) >= 0 ; i += 1) {
+	    cchar	*cp2 ;
 
 	    if (cp == NULL) continue ;
 
