@@ -30,7 +30,7 @@
 	u_send
 	u_sendmsg
 	u_sendto
-	u_sendfiler
+	u_sendfile
 	u_shutdown
 
 	Description:
@@ -107,8 +107,6 @@
 
 
 /* imported namespaces */
-
-using namespace	usys ;			/* namespace */
 
 using std::nullptr_t ;			/* type */
 using libu::ufiledescbase ;		/* type */
@@ -319,7 +317,7 @@ int u_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 }
 /* end subroutine (u_sendto) */
 
-int u_sendfiler(int s,int fd,off_t fo,size_t c) noex {
+int u_sendfile(int s,int fd,off_t fo,size_t c) noex {
 	int		rs = SR_FAULT ;
 	if (fo >= 0) {
 	    usender	so(s,fo,c) ;
@@ -533,7 +531,7 @@ int usocket::ishutdown(int fd) noex {
 /* end method (usocket::ishutdown) */
 
 int usender::isendfile(int fd) noex {
-	return usendfile(fd,s,fo,c) ;
+	return usys::usendfile(fd,s,fo,c) ;
 }
 /* end method (usender::isendfile) */
 
