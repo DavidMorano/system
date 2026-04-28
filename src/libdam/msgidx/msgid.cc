@@ -407,7 +407,7 @@ int msgid_curenum(msgid *op,msgid_cur *curp,msgide *ep) noex {
 	if ((rs = msgid_magic(op,curp)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (op->fl.fileinit) {
-	    	rs = SR_LOCKLOST ;
+	    	rs = SR_LOCKFAIL ;
 	        if (! op->fl.cursorlockbroken) {
 		    cfm		fc = funmode::rd ;
 		    cint	ebs = op->entsz ;
