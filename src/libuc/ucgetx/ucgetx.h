@@ -29,6 +29,7 @@
 #include	<ucgetpid.h>
 #include	<ucgetrandom.h>
 #include	<ucgethost.h>
+#include	<ucgetnetname.h>
 
 
 EXTERNC_begin
@@ -50,7 +51,6 @@ extern int	uc_getauid() noex ;
 extern int	uc_getpriority(int,id_t,int *) noex ;
 extern int	uc_getpuid(pid_t) noex ;
 
-extern int	uc_getnetname(char *) noex ;
 extern int	uc_getrusage(int,RUSAGE *) noex ;
 
 /* NETWORK SOCKADDR combined database */
