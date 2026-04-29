@@ -54,6 +54,7 @@
 #include	<usys_umaxmsglen.h>
 #include	<usys_pathpid.h>
 #include	<usys_plock.h>		/* defines |usys_plock()| */
+#include	<usys_onc.hh>
 
 /* missing operating system calls or facilities */
 #include	<usys_shadow.h>
@@ -76,6 +77,7 @@
 #include	<usys_eaccess.h>
 #include	<usys_xti.h>
 #include	<usys_environ.hh>
+#include	<usys_getnetname.h>
 
 
 #endif /* USYS_INCLUDE */
