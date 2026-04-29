@@ -47,7 +47,7 @@ struct kvsfile_head {
 	hdb		*kvlp ;		/* indexed by key-value */
 	hdb		*elp ;		/* indexed by key */
 	time_t		ti_check ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct (kvsfile_head) */
 
 typedef KVSFILE		kvsfile ;
