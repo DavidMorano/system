@@ -44,10 +44,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* for |strchr(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getx.h>		/* |getenver(3uc)| */
 #include	<matkeystr.h>
 #include	<localmisc.h>
 
@@ -55,7 +54,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -86,9 +85,9 @@ import libutil ;
 
 /* exported subroutines */
 
-int getev(mainv envv,cchar *kp,int kl,cchar **rpp) noex {
+int getev(con mainv envv,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		vl = 0 ;
+	int		vl = 0 ; /* return-value */
 	cchar		*vp = nullptr ;
 	if (envv && kp) ylikely {
 	    rs = SR_INVALID ;
