@@ -58,7 +58,7 @@ module ;
 #include	<strnul.hh>
 #include	<mkchar.h>
 #include	<localmisc.h>
-#include	<debprintf.h>		/* |DEBPRINTF| */
+#include	<deb.hh>		/* |DEBPRINTF| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/ureserve.ccm"
@@ -69,7 +69,7 @@ module strfilter ;
 import libutil ;			/* |lenstr(3u)| */
 import ureserve ;			/* |vecstr(3u)| */
 import sif ;
-import debug ;				/* |defprintf(3uc)| */
+import deb ;				/* |defprintf(3uc)| */
 
 /* local defines */
 
