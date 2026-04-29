@@ -52,7 +52,7 @@
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |UC(3dam)| */
 #include	<strnul.hh>
-#include	<dprintf.hh>		/* |DPRINTF(3dam)| */
+#include	<dprint.hh>		/* |DPRINTF(3dam)| */
 
 #include	"hasinet.h"
 #include	"hasall.h"		/* |hasalldig(3uc)| */
