@@ -49,6 +49,19 @@
 
 /* local structures */
 
+namespace {
+    struct timepieces {
+	char	*rbuf ;
+	int	rlen ;
+	int	mins ;
+	int	secs ;
+	int	hours ;
+	int	days ;
+	timepieces(char *b,int l) noex : rbuf(b), rlen(l) { } ;
+	int cvt(cchar *) noex ;
+    } ; /* end struct (timepieces) */
+} /* end namespace */
+
 
 /* forward subroutines */
 
@@ -67,16 +80,17 @@ char *timestr_elapsed(time_t t,char *rbuf) noex {
 	if (rbuf) {
 	    rs = SR_DOM ;
 	    if (t >= 0) {
+		timepieces te(rbuf,rlen) ;
 	        cuint	tmins = uint(t / 60) ; /* conversion */
-	        cuint	secs = uint(t % 60) ; /* conversion */
+	        te.secs = uint(t % 60) ; /* conversion */
 		{
-	            cuint	thours = (tmins / 60) ;
-	            cuint	mins = (tmins % 60) ;
+	            cuint thours = (tmins / 60) ;
+	            te.mins = (tmins % 60) ;
 		    {
-	                cuint	days = (thours / 24) ;
-	                cuint	hours = (thours % 24) ;
-	                cchar	*fmt = "%5u-%02u:%02u:%02u" ;
-	                rs = snwprintf(rbuf,rlen,fmt,days,hours,mins,secs) ;
+	                te.days = (thours / 24) ;
+	                te.hours = (thours % 24) ;
+	                cchar fmt[] = "%5u-%02u:%02u:%02u" ;
+	                rs = te.cvt(fmt) ;
 		    }
 		}
 	    } /* end if (valid) */
@@ -88,5 +102,12 @@ char *timestr_elapsed(time_t t,char *rbuf) noex {
 	return (rs >= 0) ? rbuf : nullptr ;
 }
 /* end subroutine (timestr_elapsed) */
+
+
+/* local subroutines */
+
+int timepieces::cvt(cchar *fmt) noex {
+    return snwprintf(rbuf,rlen,fmt,days,hours,mins,secs) ;
+} /* end method (timepieces::cvt) */
 
 
