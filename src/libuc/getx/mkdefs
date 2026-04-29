@@ -1,0 +1,11 @@
+#!/usr/local/bin/ksh
+# MKDEFS
+
+while read AF B ; do 
+  L=$( echo $AF | tolc )
+  printf "#ifndef\t%s\n" ${AF}
+  printf "#define\t%s\tmssing%s\n" ${AF} ${L}
+  printf "#endif\n"
+done
+
+

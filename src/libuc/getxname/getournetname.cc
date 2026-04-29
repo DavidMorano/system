@@ -50,6 +50,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
+#include	<ucgetnetname.h>
 #include	<getxid.h>		/* |getuid_name(3uc)| */
 #include	<getxname.h>
 #include	<getnisdomain.h>	/* |getnisdomain(3uc)| */
@@ -72,7 +73,6 @@
 /* external subroutines */
 
 extern "C" {
-    extern int uc_getnetname(char *) noex ;
     extern int uc_procpid(cchar *,uid_t) noex ;
 }
 
@@ -90,6 +90,8 @@ local int	getothernetname(char *,int,cchar *) noex ;
 
 /* local variables */
 
+cint		netlen = MAXNETNAMELEN ;
+
 
 /* exported variables */
 
@@ -99,16 +101,16 @@ local int	getothernetname(char *,int,cchar *) noex ;
 int getournetname(char *nbuf,int nlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (nlen < 0) nlen = MAXNETNAMELEN ;
+	if (nlen < 0) nlen = netlen ;
 	if (nbuf) {
 	    if ((un == nullptr) || (un[0] == '\0') || (un[0] == '-')) {
-	        if (nlen >= MAXNETNAMELEN) {
-	            rs = uc_getnetname(nbuf) ;
+	        if (nlen >= netlen) {
+	            rs = uc_getnetname(nbuf,nlen) ;
 	            len = rs ;
 	        }  else {
-	            char	netname[MAXNETNAMELEN+1] ;
-	            if ((rs = uc_getnetname(netname)) >= 0) {
-	                rs = sncpy1(nbuf,nlen,netname) ;
+	            char	netbuf[netlen +1] ;
+	            if ((rs = uc_getnetname(netbuf,netlen)) >= 0) {
+	                rs = sncpy1(nbuf,nlen,netbuf) ;
 	                len = rs ;
 	            }
 	        } /* end if */
@@ -127,7 +129,7 @@ int getournetname(char *nbuf,int nlen,cchar *un) noex {
 local int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	cchar		*procname = PROCNAME ;
 	if ((rs = uc_procpid(procname,0)) > 0) {
 	    if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
