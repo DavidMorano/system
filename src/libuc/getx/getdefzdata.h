@@ -1,6 +1,6 @@
 /* getdefzdata HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* this is supposed to provide an OS-independent time management operation */
 /* version %I% last-modified %G% */
