@@ -149,13 +149,12 @@ extern "C" {
 local bool hasallx(isc_f isx,cchar *sp,int sl) noex {
 	bool		f = true ;
 	if (sp) ylikely {
-	    while (sl && *sp) {
-		cint ch = mkchar(*sp) ;
+	    for (int ch ; sl && ((ch = mkchar(*sp))) ; ) {
 	        f = isx(ch) ;
 	        if (! f) break ;
 	        sp += 1 ;
 	        sl -= 1 ;
-	    } /* end while */
+	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
 } /* end subroutine (hasallx) */
@@ -235,15 +234,14 @@ bool hasallbase(cchar *sp,int sl,int b) noex {
 	bool		f = false ;
 	if (sp && (maxbase >= 0)) ylikely {
 	    if ((b >= 2) && (b <= maxbase)) {
-	        while (sl && *sp) {
-	            cint	ch = mkchar(*sp) ;
-	            cint	v = CHAR_TOVAL(*sp) ;
+	        for (int ch ; sl && ((ch = mkchar(*sp))) ; ) {
+	            cint v = CHAR_TOVAL(*sp) ;
 	            f = (v < b) ;
 	            f = f || ((ch == '-') || iswht(ch) || (ch == CH_NBSP)) ;
 	            if (! f) break ;
 	            sp += 1 ;
 	            sl -= 1 ;
-	        } /* end while */
+	        } /* end for */
 	    } /* end if (valid base) */
 	} /* end if (non-null) */
 	return f ;
@@ -274,13 +272,12 @@ namespace {
 bool haser::operator () (cchar *sp,int sl) const noex {
 	bool		f = false ;
 	if (sp) ylikely {
-	    while (sl && *sp) {
-	        cint	ch = mkchar(*sp) ;
+	    for (int ch ; sl && ((ch = mkchar(*sp))) ; ) {
 	        f = cond(ch) ;
 	        if (! f) break ;
 	        sp += 1 ;
 	        sl -= 1 ;
-	    } /* end while */
+	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
 } /* end method (haser::operator) */
