@@ -1,0 +1,9 @@
+#!/usr/local/bin/ksh
+# MKMISSING
+
+while read AF B ; do 
+  L=$( echo $AF | tolc )
+  printf "\tmissing%s,\n" $L
+done
+
+
