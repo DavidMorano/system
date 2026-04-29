@@ -191,17 +191,16 @@ local int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	    while ((rs >= 0) && *fmt) {
 	        int	ch = mkchar(*fmt++) ;
 	        if (ch == '%') {
-	            ch = mkchar(*fmt++) ;
-	            switch (ch) {
+	            switch ((ch = mkchar(*fmt++))) {
 	            case '%':
-	                rs = sbuf_chr(ssp,ch) ;
+	                rs = ssp->chr(ch) ;
 	                break ;
 	            case 'a':
-	                rs = sbuf_strw(ssp,dayp[tmp->wday],3) ;
+	                rs = ssp->strw(dayp[tmp->wday],3) ;
 	                break ;
 	            case 'b':
 	            case 'h':
-	                rs = sbuf_strw(ssp,monp[tmp->mon],3) ;
+	                rs = ssp->strw(monp[tmp->mon],3) ;
 	                break ;
 	            case 'C':
 	                {
@@ -256,7 +255,7 @@ local int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	            case 'p':
 	                if (rs >= 0) {
 	                    cchar *cp = (tmp->hour < 12) ? "am" : "pm" ;
-	                    rs = sbuf_strw(ssp,cp,2) ;
+	                    rs = ssp->strw(cp,2) ;
 	                }
 	                break ;
 	            case 'S':
@@ -434,8 +433,7 @@ local int sbuf_dated(sbuf *ssp,tmtime *tmp) noex {
 	    if ((rs = sbuf_chr(ssp,'/')) >= 0) ylikely {
 	        if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) ylikely {
 	    	    if ((rs = sbuf_chr(ssp,'/')) >= 0) ylikely {
-	        	int	y ;
-	        	y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
+	        	cint y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
 	        	rs = sbuf_twodig(ssp,y) ;
 		    }
 		}
