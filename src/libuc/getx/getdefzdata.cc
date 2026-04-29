@@ -48,7 +48,6 @@
 #include	<uctimeconv.h>		/* uc_time{xx}(3uc)| */
 #include	<bufsizevar.hh>		/* |zn| */
 #include	<snwcpy.h>
-#include	<altzone.h>
 #include	<localmisc.h>
 
 #include	"getdefzdata.h"
@@ -93,12 +92,10 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 	            zp = tmo.tm_zone ;
 		}
 	    } else {
-		rs = SR_OK ;
-	        tzset() ;
-		{
-	            bool f_daylight = (isdst >= 0) ? isdst : daylight ;
-	            zip->zoff = (((f_daylight) ? altzone : timezone) / 60) ;
-	            zp = (f_daylight) ? tzname[1] : tzname[0] ;
+		custime		dt = time(nullptr) ;
+		if (TM tmo ; (rs = uc_timelocal(&dt,&tmo)) >= 0) ylikely {
+	            zip->zoff = intconv(tmo.tm_gmtoff / 60) ;
+	            zp = tmo.tm_zone ;
 		}
 	    } /* end if_constexpr (f_darwin) */
 	    if ((rs >= 0) && zp) ylikely {
@@ -106,7 +103,7 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 	            rs = snwcpy(zbuf,zlen,zp,rs) ;
 		    znl = rs ;
 		}
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? znl : rs ;
 }
@@ -114,6 +111,6 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 
 int defzdata::get(char *zbuf,int zlen,int dst) noex {
 	return getdefzdata(this,zbuf,zlen,dst) ;
-}
+} /* end method */
 
 
