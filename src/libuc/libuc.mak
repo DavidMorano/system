@@ -78,7 +78,7 @@ OBJ05_INIT=
 OBJ06_INIT=
 OBJ07_INIT=
 
-OBJ00= debug.o matxstr.o toxc.o char.o 
+OBJ00= deb.o matxstr.o toxc.o char.o 
 OBJ01= strn.o strnxcmp.o
 OBJ02= snwcpy.o strcpyx.o strdcpy.o
 OBJ03= strw.o strx.o mnw.o
@@ -108,7 +108,7 @@ OBJ21=
 OBJ22=
 OBJ23=
 
-OBJ24= ucdescbase.o 
+OBJ24= ucdescbase.o
 OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
 OBJ26= ucdescmisc.o
 OBJ27=
@@ -380,7 +380,7 @@ uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
 ucuserattr.o:		ucuserattr.cc	ucuserattr.h		$(INCS)
 ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
 ucprochave.o:		ucprochave.cc	ucprochave.h		$(INCS)
-ucdescbase.o:		ucdescbase.cc	ucdescbase.h		$(INCS)
+ucdescbase.o:		ucdescbase.cc	ucdescbase.hh		$(INCS)
 ucdescmisc.o:		ucdescmisc.cc	ucdescmisc.h		$(INCS)
 
 # uctimeout (time-out call-backs)
@@ -771,11 +771,6 @@ tmpx.o:			tmpx.dir
 tmpx.dir:
 	makesubdir $@
 
-# TIMESTR
-timestr.o:		timestr.dir
-timestr.dir:
-	makesubdir $@
-
 # POW
 pow.o:			pow.dir
 pow.dir:
@@ -1031,17 +1026,17 @@ termx.dir:
 	makesubdir $@
 
 # DEBUG
-debug.o:		debug.dir
-debug.dir:
+deb.o:			deb.dir
+deb.dir:
 	makesubdir $@
 
 # RECIP
-recip.o:	recip.dir
+recip.o:		recip.dir
 recip.dir:
 	makesubdir $@
 
 # NCOLX
-ncolx.o:	ncolx.dir
+ncolx.o:		ncolx.dir
 ncolx.dir:
 	makesubdir $@
 
@@ -1070,18 +1065,23 @@ opendialer.o:		opendialer.dir
 opendialer.dir:
 	makesubdir $@
 
+# TIMESTR
+timestr.o:		timestr.dir
+timestr.dir:
+	makesubdir $@
+
 # string-constants
-sysdbfiles.o:		sysdbfiles.c sysdbfiles.h
-sysdbfn.o:		sysdbfn.cc sysdbfn.h
-opensysdbs.o:		opensysdbs.c opensysdbs.h
+sysdbfiles.o:		sysdbfiles.c	sysdbfiles.h
+sysdbfn.o:		sysdbfn.cc	sysdbfn.h
+opensysdbs.o:		opensysdbs.c	opensysdbs.h
 
 # SINGLES
 findbit.o:		findbit.cc	findbit.h		$(INCS)
-termtypemat.o:		termtypemat.cc termtypemat.h
-termcmd.o:		termcmd.cc termcmd.h
-matparam.o:		matparam.cc matparam.h
-typenonpath.o:		typenonpath.cc typenonpath.h
-digval.o:		digval.cc digval.h
+termtypemat.o:		termtypemat.cc	termtypemat.h
+termcmd.o:		termcmd.cc	termcmd.h
+matparam.o:		matparam.cc	matparam.h
+typenonpath.o:		typenonpath.cc	typenonpath.h
+digval.o:		digval.cc	digval.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 strwcmp.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
