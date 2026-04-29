@@ -1,0 +1,10 @@
+#!/usr/local/bin/ksh
+# MKENTS_AF
+
+while read AF B ; do 
+  EXT=$( echo ${AF} | cut -d '_' -f 2-10 )
+  LEXT=$( echo ${EXT} | tolc )
+  printf "\t{ \"%s\",\t%s },\n"  ${LEXT} ${AF}
+done
+
+
