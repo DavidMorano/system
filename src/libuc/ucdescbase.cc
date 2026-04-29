@@ -58,6 +58,8 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
+using libuc::ucdescbase ;		/* type */
+
 
 /* local typedefs */
 
