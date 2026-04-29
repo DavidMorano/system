@@ -72,6 +72,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/socket.h>
+#include	<climits>		/* |UCHAR_MAX */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |sort(3c++)| */
@@ -101,8 +102,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using std::sort ;			/* subroutine */
-using std::partition_point ;		/* subroutine */
+using std::sort ;			/* subroutine-template */
+using std::partition_point ;		/* subroutine-template */
 using libu::cfdec ;			/* subroutine */
 
 
@@ -161,8 +162,8 @@ consteval int cstrcmp(cchar *s1,cchar *s2) noex {
 	while (*s1 && *s2 && (*s1 == *s2)) {
 	    s1++ ;
 	    s2++ ;
-	}
-	return (int(*s1) - int(*s2)) ;
+	} /* end while */
+	return (int(*s1 & UCHAR_MAX) - int(*s2 & UCHAR_MAX)) ;
 } /* end subroutine (cstrcmp) */
 
 local int	getdb(cchar *,int) noex ;
@@ -170,57 +171,115 @@ local int	getdb(cchar *,int) noex ;
 
 /* local variables */
 
-constexpr addrfam	names_af[] = {
-	{ "unspec",	AF_UNSPEC },
-	{ "unix",	AF_UNIX },
-	{ "inet",	AF_INET },
-	{ "inet4",	AF_INET4 },
-	{ "inet6",	AF_INET6 },
-	{ "implink",	AF_IMPLINK },
-	{ "pup",	AF_PUP },
-	{ "chaos",	AF_CHAOS },
-	{ "ns",		AF_NS },
-	{ "nbs",	AF_NBS },
-	{ "ecma",	AF_ECMA },
-	{ "datakit",	AF_DATAKIT },
-	{ "ccitt",	AF_CCITT },
-	{ "sna",	AF_SNA },
-	{ "decnet",	AF_DECnet },
-	{ "dli",	AF_DLI },
-	{ "lat",	AF_LAT },
-	{ "hylink",	AF_HYLINK },
-	{ "appletalk",	AF_APPLETALK },
-	{ "nit",	AF_NIT },
-	{ "802",	AF_802 },
-	{ "osi",	AF_OSI },
-	{ "x25",	AF_X25 },
-	{ "osinet",	AF_OSINET },
-	{ "gosip",	AF_GOSIP },
-	{ "ipx",	AF_IPX },
-	{ "route",	AF_ROUTE },
-	{ "link",	AF_LINK },
-	{ "key",	AF_KEY },
-	{ "nca",	AF_NCA },
-	{ "local",	AF_LOCAL },
-	{ "isdn",	AF_ISDN },
-	{ "system",	AF_SYSTEM },
-	{ "netbios",	AF_NETBIOS },
-	{ "ndrv",	AF_NDRV },
-	{ "cnt",	AF_CNT },
-	{ "coip",	AF_COIP },
-	{ "e164",	AF_E164 },
-	{ "ieee80211",	AF_IEEE80211 },
-	{ "iso",	AF_ISO },
-	{ "max",	AF_MAX },
-	{ "natm",	AF_NATM },
-	{ "ppp",	AF_PPP },
-	{ "reserved_36", AF_RESERVED_36 },
-	{ "sip",	AF_SIP },
-	{ "utun",	AF_UTUN },
-	{ "vsock",	AF_VSOCK }
+constexpr addrfam		names_af[] = {
+	{ "unspec",		AF_UNSPEC },
+	{ "unix",		AF_UNIX },
+	{ "inet",		AF_INET },
+	{ "inet4",		AF_INET4 },
+	{ "inet6",		AF_INET6 },
+	{ "implink",		AF_IMPLINK },
+	{ "pup",		AF_PUP },
+	{ "chaos",		AF_CHAOS },
+	{ "ns",			AF_NS },
+	{ "nbs",		AF_NBS },
+	{ "ecma",		AF_ECMA },
+	{ "datakit",		AF_DATAKIT },
+	{ "ccitt",		AF_CCITT },
+	{ "sna",		AF_SNA },
+	{ "decnet",		AF_DECnet },
+	{ "dli",		AF_DLI },
+	{ "lat",		AF_LAT },
+	{ "hylink",		AF_HYLINK },
+	{ "appletalk",		AF_APPLETALK },
+	{ "nit",		AF_NIT },
+	{ "802",		AF_802 },
+	{ "osi",		AF_OSI },
+	{ "x25",		AF_X25 },
+	{ "osinet",		AF_OSINET },
+	{ "gosip",		AF_GOSIP },
+	{ "ipx",		AF_IPX },
+	{ "route",		AF_ROUTE },
+	{ "link",		AF_LINK },
+	{ "key",		AF_KEY },
+	{ "nca",		AF_NCA },
+	{ "local",		AF_LOCAL },
+	{ "isdn",		AF_ISDN },
+	{ "system",		AF_SYSTEM },
+	{ "netbios",		AF_NETBIOS },
+	{ "ndrv",		AF_NDRV },
+	{ "cnt",		AF_CNT },
+	{ "coip",		AF_COIP },
+	{ "e164",		AF_E164 },
+	{ "ieee80211",		AF_IEEE80211 },
+	{ "ieee802154",		AF_IEEE802154 },
+	{ "iso",		AF_ISO },
+	{ "max",		AF_MAX },
+	{ "natm",		AF_NATM },
+	{ "ppp",		AF_PPP },
+	{ "reserved_36", 	AF_RESERVED_36 },
+	{ "sip",		AF_SIP },
+	{ "utun",		AF_UTUN },
+	{ "vsock",		AF_VSOCK },
+	{ "alg",		AF_ALG },
+	{ "arp",		AF_ARP },
+	{ "ash",		AF_ASH },
+	{ "atm",		AF_ATM },
+	{ "atmpvc",		AF_ATMPVC },
+	{ "atmsvc",		AF_ATMSVC },
+	{ "ax25",		AF_AX25 },
+	{ "bluetooth",		AF_BLUETOOTH },
+	{ "bridge",		AF_BRIDGE },
+	{ "caif",		AF_CAIF },
+	{ "can",		AF_CAN },
+	{ "dnssd",		AF_DNSSD },
+	{ "dontÿero",		AF_DONTZERO },
+	{ "econet",		AF_ECONET },
+	{ "file",		AF_FILE },
+	{ "force_nosleep",	AF_FORCE_NOSLEEP },
+	{ "ib",			AF_IB },
+	{ "inet6_sdp",		AF_INET6_SDP },
+	{ "inet_offload",	AF_INET_OFFLOAD },
+	{ "inet_sdp",		AF_INET_SDP },
+	{ "irda",		AF_IRDA },
+	{ "iucv",		AF_IUCV },
+	{ "kcm",		AF_KCM },
+	{ "llc",		AF_LLC },
+	{ "max_gain",		AF_MAX_GAIN },
+	{ "mctp",		AF_MCTP },
+	{ "min_gain",		AF_MIN_GAIN },
+	{ "mpls",		AF_MPLS },
+	{ "netbeui",		AF_NETBEUI },
+	{ "netgraph",		AF_NETGRAPH },
+	{ "netlink",		AF_NETLINK },
+	{ "netrom",		AF_NETROM },
+	{ "nfc",		AF_NFC },
+	{ "no_abts",		AF_NO_ABTS },
+	{ "packet",		AF_PACKET },
+	{ "phonet",		AF_PHONET },
+	{ "pltenter",		AF_PLTENTER },
+	{ "pltexit",		AF_PLTEXIT },
+	{ "policy",		AF_POLICY },
+	{ "pppox",		AF_PPPOX },
+	{ "qipcrtr",		AF_QIPCRTR },
+	{ "rds",		AF_RDS },
+	{ "registered",		AF_REGISTERED },
+	{ "rose",		AF_ROSE },
+	{ "rxrpc",		AF_RXRPC },
+	{ "scluster",		AF_SCLUSTER },
+	{ "security",		AF_SECURITY },
+	{ "slow",		AF_SLOW },
+	{ "smc",		AF_SMC },
+	{ "sun_hwcapverify",	AF_SUN_HWCAPVERIFY },
+	{ "sun_noplm",		AF_SUN_NOPLM },
+	{ "sun_setugid",	AF_SUN_SETUGID },
+	{ "sys_control",	AF_SYS_CONTROL },
+	{ "tipc",		AF_TIPC },
+	{ "trill",		AF_TRILL },
+	{ "wanpipe",		AF_WANPIPE },
+	{ "xdp",		AF_XDP }
 } ; /* end array (names_af) */
 
-constexpr int	ne_af	= nelem(names_af) ;
+constexpr int		ne_af	= nelem(names_af) ;
 
 namespace {
     struct codemgr {
@@ -228,7 +287,7 @@ namespace {
 	consteval void tabload_x(mut uchar *tab,int n) noex {
 	    for (int i = 0 ; i < n ; i += 1) {
 		tab[i] = uchar(i) ;
-	    } ; /* end for */
+	    } /* end for */
 	} ; /* end method (tabload_x) */
 	consteval void tabinit(mut uchar *tab,con addrfam *pairs,int ne) noex {
 	    cauto predf = [pairs] (con uchar &ia,con uchar &ib) noex -> bool {
@@ -313,6 +372,9 @@ local int getdb(cchar *sp,int sl) noex {
 	return go(sp,sl) ;
 } /* end subroutine (getdb) */
 
+
+/* test items */
+
 #if	defined(CF_TEST) && (CF_TEST > 0)
 
 constexpr cpcchar	testafs[] = { 
@@ -320,7 +382,7 @@ constexpr cpcchar	testafs[] = {
     "decnet", "x25"
 } ; /* end array */
 
-int main() {
+int main(int,con mainv,con mainv) {
     for (int i = 0 ; i < ne_af ; i += 1) {
 	cint idx = codetab.tab_af[i] ;
 	cint af = names_af[idx].af ;
