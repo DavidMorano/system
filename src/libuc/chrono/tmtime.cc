@@ -11,9 +11,12 @@
 	- 2008-10-01, David A­D­ Morano
 	This object module was originally written.
 
+	= 2026-04-28, David A­D­ Morano
+	I modified (this POS) to remove references to |altzone|.
+
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2008,2026 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -37,12 +40,6 @@
 	have been in there from the beginning, but provision has
 	to made for it none-the-less.
 
-	Finally, note that SlowLaris has a 'define' bug in that it
-	does not declare the 'altzone' variable unless some other
-	defines are made (see the code).  It is not clear if and
-	when this will be or has been fixed.  This subroutine does
-	not currently use the 'altzone' variable anyway.
-
 	Finally, the Darwin OS (from Apple) has some extra fields
 	in its |TM| object that needs handling.
 
@@ -63,7 +60,6 @@
 #include	<strdcpy.h>
 #include	<strwcpy.h>
 #include	<sncpyx.h>
-#include	<altzone.h>		/* <- special for bad systems */
 #include	<localmisc.h>
 
 #include	"tmtime.hh"
@@ -130,12 +126,13 @@ local int	getznlen() noex ;
 
 static bufsizevar	znlen(bufsize_zn) ;
 
-constexpr bool		f_darwin = F_DARWIN ;
+constexpr bool		f_darwin	= F_DARWIN ;
+constexpr bool		f_linux		= F_LINUX ;
 
 
 /* exported variables */
 
-cint tmtime::znlen  = 	getznlen() ;
+cint tmtime::znlen	= getznlen() ;
 
 
 /* exported subroutines */
@@ -209,13 +206,12 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	    } /* end if (need DST indicator) */
 	    if (rs >= 0) ylikely {
 	        cchar	*zp ;
-	        if_constexpr (f_darwin) {
-	            op->gmtoff = intconv(tc.tm_gmtoff) ;
-	            zp = tc.tm_zone ;
+	        if_constexpr (f_darwin || f_linux) {
+	            op->gmtoff	= intconv(tc.tm_gmtoff) ;
+	            zp		= tc.tm_zone ;
 	        } else {
-	            cbool	f_isdst = (tc.tm_isdst > 0) ;
-	            op->gmtoff = (f_isdst) ? altzone : timezone ;
-	            zp = (f_isdst) ? tzname[1] : tzname[0] ;
+	            op->gmtoff	= intconv(tc.tm_gmtoff) ;
+	            zp 		= tc.tm_zone ;
 	        } /* end if_constexpr (f_darwin) */
 	        rs = intconv(strwcpy(op->znbuf,zp,znlen) - op->znbuf) ;
 	    } /* end if (getting zone-name) */
@@ -240,7 +236,10 @@ int tmtime_extract(tmtime *op,TM *tmp) noex {
 	    tmp->tm_wday	= op->wday ;
 	    tmp->tm_yday	= op->yday ;
 	    tmp->tm_isdst	= op->isdst ;
-	    if_constexpr (f_darwin) {
+	    if_constexpr (f_darwin || f_linux) {
+	        tmp->tm_gmtoff = long(op->gmtoff) ;
+	        tmp->tm_zone = op->znbuf ;
+	    } else {
 	        tmp->tm_gmtoff = long(op->gmtoff) ;
 	        tmp->tm_zone = op->znbuf ;
 	    } /* end if_constexpr (f_darwin) */
@@ -291,12 +290,10 @@ local int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
 	int		rs ;
 	if ((rs = tmtime_zinit(op)) >= 0) ylikely {
 	    time_t	t = 0 ;
-	    if (TM tmd ; (tmtime_extract(op,&tmd)) >= 0) ylikely {
+	    if (TM tmd ; (rs = tmtime_extract(op,&tmd)) >= 0) ylikely {
 	        if ((rs = uc_mktime(&tmd,&t)) >= 0) ylikely {
 	            cint	taroff = op->gmtoff ;
-	            int 	locoff ;
-	            cbool	f_isdst = (tmd.tm_isdst > 0) ;
-	            locoff = intconv((f_isdst) ? altzone : timezone) ;
+	            cint 	locoff = intconv(tmd.tm_gmtoff) ;
 	            t += (taroff - locoff) ;
 	            if (fadj) ylikely {
 	                op->sec = tmd.tm_sec ;
@@ -308,7 +305,7 @@ local int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
 	                op->wday = tmd.tm_wday ;
 	                op->yday = tmd.tm_yday ;
 	                op->isdst = tmd.tm_isdst ;
-	            }
+	            } /* end if (fadj) */
 	        } /* end if (uc_mktime) */
 	    } /* end if (ttime_extract) */
 	    if (tp) {
