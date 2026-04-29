@@ -57,7 +57,7 @@ OBJ11_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 
 OBJ12_USYS= usys_shadow.o usys_isaexec.o usys_fdatasync.o
 OBJ13_USYS= usys_eaccess.o usys_stat.o usys_xti.o
-OBJ14_USYS= usys_environ.o
+OBJ14_USYS= usys_environ.o usys_onc.o usys_getnetname.o
 OBJ15_USYS=
 
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
@@ -250,5 +250,7 @@ usys_fatasync.o:	usys_fdatasync.cc	usys_fdatasync.h	$(INCS)
 usys_eaccess.o:		usys_eaccess.cc		usys_eaccess.h		$(INCS)
 usys_xti.o:		usys_xti.cc		usys_xti.h		$(INCS)
 usys_environ.o:		usys_environ.cc		usys_environ.hh		$(INCS)
+usys_onc.o:		usys_onc.cc		usys_onc.hh		$(INCS)
+usys_getnetname.o:	usys_getnetname.cc	usys_getnetname.h	$(INCS)
 
 
