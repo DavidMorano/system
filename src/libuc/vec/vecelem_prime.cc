@@ -41,15 +41,15 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<localmisc.h>
-#include	<debprintf.h>
+#include	<deb.hh>
 
 #include	"vecelem.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/debug.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |memcopy(3u)| */
-import debug ;
+import deb ;
 
 /* local defines */
 
