@@ -1,4 +1,4 @@
-/* ucgetnetname */
+/* ucgetnetname SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	ucgetnetname
+
+	Description:
 	This subroutine retrieves (we will go with that word) the
 	(so-called) net-name of the current user.
 
@@ -27,18 +31,32 @@
 	an example of which is:
 		unix.201@rightcore.com
 
+	Synopsis:
+	int uc_getnetname(char *nbuf,int nlen) noex
+
+	Arguments:
+	nbuf		result buffer pointer
+	nlen		result buffer length
+
+	Rerurns:
+	>=0		length (in bytes) of result
+	<0		error (return-system)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<new>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<usupport.h>
+#include	<uclibmem.h>
 #include	<localmisc.h>
 
-#include	"ucgetx.h"
+#include	"ucgetnetname.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -51,6 +69,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local namespaces */
 
+using libu::sncpy ;			/* subroutine */
+using libuc::libmem ;			/* variable */
+
 
 /* local typedefs */
 
@@ -62,7 +83,7 @@ extern "C" {
 }
 
 extern "C" {
-    extern int	getnetname(cchar *) ;	/* UNIX® ONC interface */
+    extern int	getnetname(char *) noex ;	/* UNIX® ONC interface */
 }
 
 
@@ -71,11 +92,20 @@ extern "C" {
 
 /* local structures */
 
+namespace {
+    struct vars {
+    	int	netnamelen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
 
 /* local variables */
+
+static vars	var ;
 
 
 /* exported variables */
@@ -83,23 +113,41 @@ extern "C" {
 
 /* exported subroutines */
 
-int uc_getnetname(char *nbuf) noex {
+int uc_getnetname(char *nbuf,int nlen) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
 	if (nbuf) {
-	    const uid_t		uid = 0 ; /* root user */
-	    if ((rs = uc_procpid(PROCNAME,uid)) > 0) {
-	        if (getnetname(nbuf) > 0) {
-	            len = lenstr(nbuf) ;
-	        } else {
-	            rs = SR_NOTFOUND ;
-	        }
-	    } else if (rs == 0) {
-	        rs = SR_BUSY ;		/* was previously SR_UNAVAIL */
-	    }
+	    static cint	rsv = var ;
+	    nbuf[0] = '\0' ;
+	    if ((rs = rsv) >= 0) {
+		cint rlen = rs ;
+		if (char *rbuf ; (rs = libmem.mall((rlen+1),&rbuf)) >= 0) {
+	            const uid_t	uid = 0 ; /* root user */
+	            if ((rs = uc_procpid(PROCNAME,uid)) > 0) {
+	                if (getnetname(rbuf) > 0) {
+			    rs = sncpy(nbuf,nlen,rbuf) ;
+	                    len = rs ;
+	                } else {
+	                    rs = SR_NOTFOUND ;
+	                }
+	            } else if (rs == 0) {
+		        rs = SR_BUSY ; /* was previously SR_UNAVAIL */
+	            }
+		    rs1 = libmem.free(rbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uc_getnetname) */
+} /* end subroutine (uc_getnetname) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = usys::getnetnamelen()) >= 0) {
+	    netnamelen = rs ;
+	}
+    	return rs ;
+} /* end method (vars::operator) */
 
 
