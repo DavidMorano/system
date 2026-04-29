@@ -94,6 +94,10 @@ int uc_ioctl(int fd,int cmd,...) noex {
 }
 /* end subroutine (uc_ioctl) */
 
+int uc_seeko(int fd,off_t fo,int cmd,off_t *resp) noex {
+    	return u_seeko(fd,fo,cmd,resp) ;
+}
+
 int uc_tell(int fd,off_t *offp) noex {
 	return u_tell(fd,offp) ;
 }
