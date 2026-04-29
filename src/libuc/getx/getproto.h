@@ -33,8 +33,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 
-#include	<getprotofamily.h>
-
 
 EXTERNC_begin
 
