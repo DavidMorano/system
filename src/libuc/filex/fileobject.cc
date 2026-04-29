@@ -191,7 +191,7 @@ int matcher::mat_fat() noex {
     	int		f = false ;
 	if (cint n = szof(uint) ; mlen >= n) {
 	    uint	val = 0 ;
-	    for (int i = (n - 1) ; i >= 0 ; i += 1) {
+	    for (int i = (n - 1) ; i >= 0 ; --i) {
 		int	ch = mkchar(mbuf[i]) ;
 		val <<= CHAR_BIT ;
 		val |= uint(ch) ;
