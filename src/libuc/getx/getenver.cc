@@ -73,8 +73,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using std::sort ;			/* subroutine */
-using std::partition_point ;		/* subroutine */
+using std::sort ;			/* subroutine-template */
+using std::partition_point ;		/* subroutine-template */
 using libuc::libmem ;			/* variable */
 
 
@@ -97,7 +97,7 @@ namespace {
 	void tabload_x() noex {
 	    for (int i = 0 ; i < ne ; i += 1) {
 		tab[i] = ushort(i) ;
-	    } ; /* end for */
+	    } /* end for */
 	} ; /* end method (tabload_x) */
 	void tabinit() noex {
 	    cauto predf = [this] (con ushort &ia,con ushort &ib) noex -> bool {
@@ -153,7 +153,7 @@ cbool			f_debug = CF_DEBUG ;
 
 cchar *getenver(cchar *kp,int ªkl) noex {
     	cnullptr	np{} ;
-	cchar		*valp = nullptr ;
+	cchar		*valp = nullptr ; /* return-value */
 	if (int rs, kl = getlenstr(kp,ªkl) ; kl > 0) {
 	    static cint rsv = sub ;
 	    if ((rs = rsv) >= 0) {
