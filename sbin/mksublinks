@@ -1,3 +1,5 @@
+#!/usr/local/bin/ksh
+# MKSUBLINKS
 
 while read D ; do 
   if [[ -d ${D}/gcm.cache ]] ; then
