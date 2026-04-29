@@ -56,6 +56,7 @@
 
 #include	<ucwritedesc.h>
 #include	<ucwritefile.h>
+#include	<ucwrite.h>
 
 
 #endif /* UCDESCWRITE_INCLUDE */
