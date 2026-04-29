@@ -66,6 +66,7 @@
 
 #include	"ucdescbase.hh"
 #include	"ucdescwrite.h"
+#include	"ucwrite.h"
 
 #pragma		GCC dependency	"mod/libutil.ccm"
 
