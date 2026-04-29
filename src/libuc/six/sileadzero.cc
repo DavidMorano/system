@@ -45,6 +45,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -79,7 +80,7 @@ int sileadzero(cchar *sp,int sl) noex {
 	if (sp) ylikely {
 	    cauto isx = [] (int ch) -> bool {
 	        ch &= UCHAR_MAX ;
-		return iszero(ch) || iswhite(ch) ;
+		return iszero(ch) || iswhitelatin(ch) ;
 	    } ; /* end lambda (isx) */
 	    for (i = 0 ; (i < (sl - 1)) && isx(sp[0]) ; i += 1) ;
 	} /* end if (non-null) */
