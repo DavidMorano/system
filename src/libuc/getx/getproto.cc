@@ -75,7 +75,7 @@
 int getproto_name(cchar *pnp,int pnl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		proto = 0 ;
+	int		proto = 0 ; /* return-value */
 	if (pnp) ylikely {
 	    rs = SR_INVALID ;
 	    if (pnp[0]) ylikely {
