@@ -221,8 +221,7 @@ int sysdbmgr::init() noex {
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (sysdbmgr::init) */
+} /* end method (sysdbmgr::init) */
 
 int sysdbmgr::fini() noex {
 	int		rs = SR_OK ;
@@ -252,8 +251,7 @@ int sysdbmgr::fini() noex {
 	    finit = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end method (sysdbmgr::fini) */
+} /* end method (sysdbmgr::fini) */
 
 int sysdbmgr::get(int w,cchar **rpp) noex {
 	int		rs = SR_OK ;
@@ -272,8 +270,7 @@ int sysdbmgr::get(int w,cchar **rpp) noex {
 	    } /* end if (sysdbmgr::init) */
 	} /* end if (value needed to be calculated) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (sysdbmgr::get) */
+} /* end method (sysdbmgr::get) */
 
 int sysdbmgr::gets(int w,cchar **rpp) noex {
 	int		rs ;
