@@ -35,15 +35,15 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>		/* |um(3u)| */
 #include	<localmisc.h>
-#include	<debprintf.h>		/* |DEBPRINTF(3uc)| */
+#include	<deb.hh>		/* |DEBPRINTF(3uc)| */
 
 #include	"sintq.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/debug.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |memcopy(3u)| */
-import debug ;				/* |debprintf(3uc)| */
+import deb ;				/* |debprintf(3uc)| */
 
 /* local defines */
 
