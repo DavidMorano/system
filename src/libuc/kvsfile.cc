@@ -153,7 +153,7 @@ local int kvsfile_ctor(kvsfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    if ((op->flp = new(nothrow) vecobj) != np) ylikely {
 	        if ((op->klp = new(nothrow) vecobj) != np) ylikely {
 	            if ((op->kvlp = new(nothrow) hdb) != np) ylikely {
@@ -207,7 +207,7 @@ template<typename ... Args>
 local int kvsfile_magic(kvsfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == KF_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == KF_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (kvsfile_magic) */
@@ -277,12 +277,12 @@ int kvsfile_open(kvsfile *op,int ndef,cchar *atfname) noex {
 	            if ((rs = hdb_start(op->kvlp,ndef,0,hf,cf)) >= 0) {
 		        hdb		*elp = op->elp ;
 	                if ((rs = hdb_start(elp,ndef,0,np,np)) >= 0) {
-	                    op->magic = KF_MAGIC ;
+	                    op->magval = KF_MAGIC ;
 	                    op->ti_check = getustime ;
 	                    if (atfname && (atfname[0] != '\0')) {
 	                        rs = kvsfile_fileadd(op,atfname) ;
 	                        if (rs < 0) {
-	                            op->magic = 0 ;
+	                            op->magval = 0 ;
 	                        }
 	                    } /* end if (adding first file) */
 	                    if (rs < 0) {
@@ -345,7 +345,7 @@ int kvsfile_close(kvsfile *op) noex {
 	        rs1 = kvsfile_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -597,6 +597,7 @@ local int kvsfile_fparse(kvsfile *op,int fi) noex {
 		KF_FILE		*fep = cast_static<filep>(vp) ;
 	        if (ucstream kf ; (rs = kf.open(fep->fname,"r")) >= 0) {
 	            if (ustat sb ; (rs = kf.stat(&sb)) >= 0) {
+			csize fsize = size_t(sb.st_size) ;
 	                if (! S_ISDIR(sb.st_mode)) {
 	                    if (sb.st_mtime > fep->mtime) {
 	                        cint		nrs = SR_NOTFOUND ;
@@ -606,7 +607,7 @@ local int kvsfile_fparse(kvsfile *op,int fi) noex {
 	                            fep->dev = dev ;
 	                            fep->ino = ino ;
 	                            fep->mtime = sb.st_mtime ;
-	                            fep->fsize = intsat(sb.st_size) ;
+	                            fep->fsize = intsat(fsize) ;
 	                            rs = kvsfile_fparser(op,fi,&kf) ;
 	                            c = rs ;
 	                            if (rs < 0) {
