@@ -64,16 +64,16 @@
 
 #if	F_SUNOS || F_DARWIN
 
-static int getdom(char *rbuf,int rlen) noex {
+local unixret_t getdom(char *rbuf,int rlen) noex {
     	return getdomainname(rbuf,rlen) ;
-}
+} /* end subroutine */
 
 #else /* all other OSes */
 
-static int getdom(char *rbuf,int rlen) noex {
+local unixret_t getdom(char *rbuf,int rlen) noex {
     	csize	rsize = size_t(rlen) ;
     	return getdomainname(rbuf,rsize) ;
-}
+} /* end subroutine */
 
 #endif /* which operating system */
 
@@ -95,6 +95,6 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ugetnisdom) */
-}
+} /* end namespace (libu) */
 
 
