@@ -41,7 +41,7 @@ module ;
 #include	<usysdefs.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
-#include	<dprintf.hh>		/* debugging */
+#include	<dprint.hh>		/* debugging */
 
 export module intext.uintx ;
 
