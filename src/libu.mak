@@ -50,9 +50,9 @@ OBJ01= aflag.o errtimer.o
 OBJ02= timewatch.o timecount.o
 OBJ03= libutil.o usysconf.o umods.o 
 
-OBJ04= ulibvals.o utimeout.o utimeouts.o 
+OBJ04= utimeout.o utimeouts.o utimeoutdefs.o
 OBJ05= ulogerror.o ischx.o strtox.o
-OBJ06= uconstants.o usupport.o
+OBJ06= ulibvals.o uconstants.o usupport.o
 OBJ07= umem.o usigsets.o usigblock.o umisc.o
 
 OBJ08= usys.o usyscallbase.o usysutility.o 
@@ -350,6 +350,7 @@ itimerspec.o:		itimerspec.cc	itimerspec.h		$(INCS)
 usysflag.o:		usysflag.cc	usysflag.h		$(INCS)
 utimeout.o:		utimeout.c	utimeout.h		$(INCS)
 utimeouts.o:		utimeouts.cc	utimeouts.h		$(INCS)
+utimeoutdefs.o:		utimeoutdefs.cc	utimeoutdefs.h		$(INCS)
 usyscallbase.o:		usyscallbase.cc	usyscallbase.hh		$(INCS)
 usysutility.o:		usysutility.cc	usysutility.hh		$(INCS)
 usysdata.o:		usysdata.cc	usysdata.h		$(INCS)
