@@ -40,7 +40,7 @@
 
 EXTERNC_begin
 
-extern int	getev(mainv,cchar *,int,cchar **) noex ;
+extern int	getev(con mainv,cchar *,int,cchar **) noex ;
 
 EXTERNC_end
 
