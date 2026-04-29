@@ -89,10 +89,6 @@
 
 /* forward references */
 
-extern "C" {
-    char *timestr_date(time_t,int,char *) noex ;
-}
-
 
 /* local variables */
 
@@ -169,7 +165,7 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 	    tbuf[0] = '\0' ;
 	    rs = SR_DOM ;
 	    if (t >= 0) {
-	        TMTIME	tmt ;
+	        tmtime	tmt ;
 	        bool	f_gmt = false ;
 	        switch (type) {
 	        case timestrtype_gmstd:
@@ -178,13 +174,13 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 	            f_gmt = true ;
 	            break ;
 	        } /* end switch */
-        /* split the time into its component parts */
+		/* split the time into its component parts */
 	        if (f_gmt) {
 	            rs = tmtime_timegm(&tmt,t) ;
 	        } else {
 	            rs = tmtime_timelocal(&tmt,t) ;
 	        }
-        /* create the appropriate string based on the type-code */
+        	/* create the appropriate string based on the type-code */
 	        if (rs >= 0) {
 		    cchar	*fmt = nullptr ;
 	            switch (type) {
