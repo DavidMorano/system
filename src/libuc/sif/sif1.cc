@@ -76,13 +76,13 @@ module ;
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/strnwht.ccm"
-#pragma		GCC dependency		"mod/debug.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 module sif ;
 
 import libutil ;			/* |getlenstr(3u)| */
 import strnwht ;			/* <- STRN module linkage */
-import debug ;
+import deb ;
 
 /* local defines */
 
