@@ -293,13 +293,13 @@ local int readln_stream(int fd,char *lbuf,int llen,int to) noex {
 local int readln_seekable(int fd,char *lbuf,int llen,int to,off_t fo) noex {
 	int		rs ;
 	(void) to ;
-	if ((rs = u_pread(fd,lbuf,llen,fo)) > 0) {
+	if ((rs = u_readp(fd,lbuf,llen,fo)) > 0) {
 	    int	rlen = rs ;
 	    if (int si ; (si = sichr(lbuf,rlen,'\n')) > 0) {
 		rlen = (si + 1) ;
 	    }
 	    rs = u_read(fd,lbuf,rlen) ;
-	} /* end if (u_pread) */
+	} /* end if (u_readp) */
 	return rs ;
 }
 /* end subroutine (readln_seekable) */
