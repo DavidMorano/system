@@ -70,20 +70,20 @@ struct tmtime {
 
 EXTERNC_begin
 
-extern int	tmtime_insert(tmtime *,CTM *) noex ;
-extern int	tmtime_timex(tmtime *,bool,time_t) noex ;
-extern int	tmtime_timegm(tmtime *,time_t) noex ;
-extern int	tmtime_timelocal(tmtime *,time_t) noex ;
-extern int	tmtime_extract(tmtime *,TM *) noex ;
-extern int	tmtime_mktime(tmtime *,time_t *) noex ;
-extern int	tmtime_adjtime(tmtime *,time_t *) noex ;
-extern int	tmtime_getzn(tmtime *,char *,int) noex ;
-extern int	tmtime_loadzn(tmtime *,cchar *,int) noex ;
+extern int	tmtime_insert		(tmtime *,CTM *) noex ;
+extern int	tmtime_timex		(tmtime *,bool,time_t) noex ;
+extern int	tmtime_timegm		(tmtime *,time_t) noex ;
+extern int	tmtime_timelocal	(tmtime *,time_t) noex ;
+extern int	tmtime_extract		(tmtime *,TM *) noex ;
+extern int	tmtime_mktime		(tmtime *,time_t *) noex ;
+extern int	tmtime_adjtime		(tmtime *,time_t *) noex ;
+extern int	tmtime_getzn		(tmtime *,char *,int) noex ;
+extern int	tmtime_loadzn		(tmtime *,cchar *,int) noex ;
 
 #ifdef	COMMENT
-extern int	tmtime_setznoe(tmtime *,cchar *,int) noex ;
-extern int	tmtime_settimez(tmtime *,cchar *,cchar *,time_t) noex ;
-extern int	tmtime_gettime(tmtime *,cchar *,time_t *) noex ;
+extern int	tmtime_setznoe		(tmtime *,cchar *,int) noex ;
+extern int	tmtime_settimez		(tmtime *,cchar *,cchar *,time_t) noex ;
+extern int	tmtime_gettime		(tmtime *,cchar *,time_t *) noex ;
 #endif /* COMMENT */
 
 local inline int tmtime_gmtime(tmtime *tmp,time_t t) noex {
