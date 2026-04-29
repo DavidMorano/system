@@ -65,6 +65,10 @@ extern "C" {
     extern int uc_close(int) ;
 } /* end extern */
 
+extern "C" {
+    extern int uc_filecopy(cchar *,cchar *) noex ;
+}
+
 /* external variables */
 
 
