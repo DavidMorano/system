@@ -53,7 +53,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	mainprog(int,mainv,mainv) noex ;
+    extern int	mainprog(int,con mainv,con mainv) noex ;
 }
 
 
@@ -62,7 +62,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int main(int argc,mainv argv,mainv envv) {
+int main(int argc,con mainv argv,con mainv envv) {
 	int	ex ;
 	try {
 	    ex = mainprog(argc,argv,envv) ;
