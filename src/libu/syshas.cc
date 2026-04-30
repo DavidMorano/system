@@ -115,6 +115,8 @@ consteval syshas_mgr::syshas_mgr() noexcept {
         libproc         = SYSHAS_LIBPROC ;
         eaccess         = SYSHAS_EACCESS ;
 	onc		= SYSHAS_ONC ;	/* Open-Network-Computing */
+	getnetname	= SYSHAS_ONC ;	/* part of Open-Network-Computing */
+	ftime		= SYSHAS_FTIME ;	/* working |ftime(3c)| */
 } /* end ctor (syshas_mgr::syshas_mgr) */
 
 constexpr syshas_mgr		syshas ;
