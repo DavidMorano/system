@@ -71,7 +71,7 @@ typedef const mainv	cmv ;
 /* external subroutines */
 
 extern "C" {
-    extern int uc_openenv(cchar *,int,mode_t,mainv,int) noex ;
+    extern int uc_openenv(cchar *,int,mode_t,con mainv,int) noex ;
 }
 
 
@@ -88,6 +88,26 @@ extern "C" {
 
 
 /* exported variables */
+
+namespace libuc {
+    cpcchar	opendialers[] = {
+	[opendial_unspec] 		= "unspec", 
+	[opendial_udp] 			= "udp", 
+	[opendial_tcp] 			= "tcp", 
+	[opendial_tcpmux] 		= "tcpmux", 
+	[opendial_tcpnls] 		= "tcpnls", 
+	[opendial_uss] 			= "uss", 
+	[opendial_ussmux] 		= "ussmux", 
+	[opendial_ussnls] 		= "ussnls", 
+	[opendial_ticotsord] 		= "ticotsord",
+	[opendial_ticotsordnls] 	= "ticotsordnls", 
+	[opendial_pass] 		= "pass", 
+	[opendial_open] 		= "open", 
+	[opendial_prog] 		= "prog", 
+	[opendial_finger] 		= "finger", 
+	[opendial_overlast] 		= nullptr
+    } ; /* end array (opendialers) */
+} /* end namespace (libuc) */
 
 
 /* exported subroutines */
