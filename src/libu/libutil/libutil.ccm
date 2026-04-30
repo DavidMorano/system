@@ -34,5 +34,6 @@ export import :strcopy ;
 export import :strcpy ;
 export import :strlen ;
 export import :strxspn ;
+export import :strcmp ;
 
 
