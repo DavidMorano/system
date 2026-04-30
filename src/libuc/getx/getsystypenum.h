@@ -22,14 +22,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<systypenames.h>
 
-
-enum systypenames {
-	systypename_sysv,
-	systypename_darwin,
-	systypename_linux,
-	systypename_overlast
-} ; /* end enum (systypenames) */
 
 EXTERNC_begin
 
