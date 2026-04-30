@@ -43,6 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
@@ -90,7 +91,7 @@ using libuc::libmem ;			/* variable */
 /* local strctures */
 
 namespace {
-    struct codemgr {
+    struct namemgr {
 	mainv		envv ;
 	ushortp		tab = nullptr ;
 	int		ne = 0 ;
@@ -103,21 +104,29 @@ namespace {
 	    cauto predf = [this] (con ushort &ia,con ushort &ib) noex -> bool {
 		cchar *s1 = envv[ia] ;
 		cchar *s2 = envv[ib] ;
-    		return (strkeycmp(s1,s2) < 0) ;
+		bool f = false ;
+		{
+		    cuchar uch1 = uchar(*s1) ;
+		    cuchar uch2 = uchar(*s2) ;
+		    if ((f = (uch1 < uch2)) == false) {
+			f = ((uch1 == uch2) && (strkeycmp(s1,s2) < 0)) ;
+		    }
+		}
+		return f ;
 	    } ; /* end lambda */
 	    tabload_x() ;
 	    sort(tab,(tab+ne),predf) ;
 	} ; /* end method (tabinit) */
-	codemgr() = default ;
+	namemgr() = default ;
 	int start(con mainv,int) noex ;
 	int finish() noex ;
 	void dtor() noex ;
 	int operator () (con mainv,int) noex ;
 	int operator () (cchar *,int) const noex ;
-	destruct codemgr() {
+	destruct namemgr() {
 	    if (tab) dtor() ;
 	} ; /* end destruct */
-    } ; /* end struct (codemgr) */
+    } ; /* end struct (namemgr) */
 } /* end namespace */
 
 namespace {
@@ -141,7 +150,7 @@ local int rmeq(cchar *kp,int kl) noex {
 /* local variables */
 
 static subiniter	sub ;
-static codemgr		codetab ;
+static namemgr		nametab ;
 
 cbool			f_debug = CF_DEBUG ;
 
@@ -158,7 +167,7 @@ cchar *getenver(cchar *kp,int ªkl) noex {
 	    static cint rsv = sub ;
 	    if ((rs = rsv) >= 0) {
 		if ((kl = rmeq(kp,kl)) > 0) {
-		    if (cint ei = codetab(kp,kl) ; ei >= 0) {
+		    if (cint ei = nametab(kp,kl) ; ei >= 0) {
 	                if ((valp = strchr(sub.envv[ei],'=')) != np) {
 	                    valp += 1 ;
 		        }
@@ -175,7 +184,7 @@ cchar *getenver(cchar *kp,int ªkl) noex {
 
 /* local subroutines */
 
-int codemgr::start(mainv ev,int n) noex {
+int namemgr::start(mainv ev,int n) noex {
     	int	rs = SR_OK ;
 	cint	sz = ((n + 1) * szof(ushort)) ;
 	envv = ev ;
@@ -185,9 +194,9 @@ int codemgr::start(mainv ev,int n) noex {
 	    tabinit() ;
 	} /* end if (memory-allocation) */
 	return rs ;
-} /* end method (codemgr::start) */
+} /* end method (namemgr::start) */
 
-int codemgr::finish() noex {
+int namemgr::finish() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	if (tab) {
@@ -197,24 +206,32 @@ int codemgr::finish() noex {
 	    ne = 0 ;
 	}
 	return rs ;
-} /* end method (codemgr::finish) */
+} /* end method (namemgr::finish) */
 
-void codemgr::dtor() noex {
+void namemgr::dtor() noex {
 	if (cint rs = finish() ; rs < 0) {
 	    ulogerror("getenver",rs,"fini-finish") ;
 	}
-} /* end method (codemgr::dtor) */
+} /* end method (namemgr::dtor) */
 
-int codemgr::operator () (mainv ev,int n) noex {
+int namemgr::operator () (mainv ev,int n) noex {
 	return start(ev,n) ;
-} /* end method (codemgr::operator) */
+} /* end method (namemgr::operator) */
 
-int codemgr::operator () (cchar *sp,int sl) const noex {
+int namemgr::operator () (cchar *sp,int sl) const noex {
     int         ei = -1 ; /* return-value (initially indicating "not-found") */
     if (strnul ss(sp,sl) ; ss.fok) {
-        cauto predf = [this,&ss] (ushort c) noex -> bool {
+        cauto predf = [this,sp,&ss] (ushort c) noex -> bool {
             cchar *an = envv[c] ;
-            return (strkeycmp(an,ss) < 0) ;
+	    bool f = false ;
+	    {
+		cuchar uch_a = uchar(an[0]) ;
+		cuchar uch_s = uchar(sp[0]) ;
+		if ((f = (uch_a < uch_s)) == false) {
+		    f = ((uch_a == uch_s) && (strkeycmp(an,ss) < 0)) ;
+		}
+	    }
+            return f ;
         } ; /* end lambda (predf) */
         con ushort *itf = (tab + 0) ;
         con ushort *itl = (tab + ne) ;
@@ -229,12 +246,12 @@ int codemgr::operator () (cchar *sp,int sl) const noex {
         } /* end if */
     } /* end if (non-null) */
     return ei ;
-} /* end method (codemgr::operator) */
+} /* end method (namemgr::operator) */
 
 subiniter::operator int () noex {
     	int		rs ;
 	if ((rs = u_getenviron(&envv)) >= 0) {
-	    rs = codetab(envv,rs) ;
+	    rs = nametab(envv,rs) ;
 	} /* end if (u_getenviron) */
 	return rs ;
 } /* end method (subiniter::operator) */
