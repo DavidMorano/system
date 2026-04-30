@@ -35,7 +35,7 @@
 #include	<usysdefs.h>
 
 /* GETNETNAME begin */
-#if	(!defined(SYSHAS_ONC)) || (SYSHAS_ONC == 0)
+#if	(!defined(SYSHAS_GETNETNAME)) || (SYSHAS_GETNETNAME == 0)
 
 
 #ifndef	SUBROUTINE_GETNETNAME
@@ -48,7 +48,7 @@ EXTERNC_end
 #endif /* SUBROUTINE_GETNETNAME */
 
 
-#endif /* (!defined(SYSHAS_ONC)) || (SYSHAS_ONC == 0) */
+#endif /* (!defined(SYSHAS_GETNETNAME)) || (SYSHAS_GETNETNAME == 0) */
 /* GETNETNAME end */
 
 
