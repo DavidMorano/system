@@ -270,8 +270,14 @@
 /* Solaris: |eaccess(2)| */
 #define	SYSHAS_EACCESS		1
 
-/* Solaris: |getnetname(3onc)| - Open-Network-Compuring */
+/* Solaris: Open-Network-Compuring */
 #define	SYSHAS_ONC		1
+
+/* Solaris: |getnetname(3onc)| - part of "secure" Open-Network-Compuring */
+#define	SYSHAS_GETNETNAME	1
+
+/* Solaris: properly working |ftime(3c)| */
+#define	SYSHAS_FTIME		0
 
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -532,8 +538,14 @@
 /* Darwin: |eaccess(2)| */
 #define	SYSHAS_EACCESS		0
 
-/* Darwinw: |getnetname(3onc)| */
-#define	SYSHAS_ONC		0
+/* Darwin: |getnetname(3onc)| */
+#define	SYSHAS_ONC		1
+
+/* Darwin: |getnetname(3onc)| - part of "secure" Open-Network-Compuring */
+#define	SYSHAS_GETNETNAME	0
+
+/* Darwin: properly working |ftime(3c)| */
+#define	SYSHAS_FTIME		1
 
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
@@ -774,8 +786,14 @@
 /* Linux: |eaccess(2)| */
 #define	SYSHAS_EACCESS		1
 
-/* Linux: |getnetname(3onc)| */
-#define	SYSHAS_ONC		0
+/* Linux: Open-Network-Compuring */
+#define	SYSHAS_ONC		1
+
+/* Linux: |getnetname(3onc)| - part of "secure" Open-Network-Compuring */
+#define	SYSHAS_GETNETNAME	1
+
+/* Linux: properly working |ftime(3c)| */
+#define	SYSHAS_FTIME		0
 
 /******************************************************************************/
 #endif /* OSNAME */
@@ -880,6 +898,8 @@ struct syshas_mgr {
         uint    libproc:1 ;
 	uint	eaccess:1 ;
 	uint	onc:1 ;			/* Open-Network-Computing */
+	uint	getnetname:1 ;		/* part of Open-Network-Computing */
+	uint	ftime:1 ;		/* properly working |ftime(3c)| */
 	consteval syshas_mgr() noexcept ;
 } ; /* end struct (syshas_mgr) */
 
