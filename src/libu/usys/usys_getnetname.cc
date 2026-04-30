@@ -53,7 +53,7 @@ using libu::ugetnisdom ;		/* subroutine */
 using std::nothrow ;			/* constant */
 
 /* GETRANDOM start */
-#if	(!defined(SYSHAS_ONC)) || (SYSHAS_ONC == 0)
+#if	(!defined(SYSHAS_BETNETNAME)) || (SYSHAS_BETNETNAME == 0)
 
 
 local int mknetname(char *,int) noex ;
@@ -111,7 +111,7 @@ local int mknetname(char *rbuf,int rlen) noex {
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (mknetname) */
 
-#endif /* (!defined(SYSHAS_ONC)) || (SYSHAS_ONC == 0) */
+#endif /* (!defined(SYSHAS_BETNETNAME)) || (SYSHAS_BETNETNAME == 0) */
 /* GETRANDOM end */
 
 
