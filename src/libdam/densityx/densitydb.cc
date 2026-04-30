@@ -368,7 +368,7 @@ int densitydb_curenum(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
 	if ((rs = density_magic(op,curp,ep)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (op->fl.fileinit) {
-		rs = SR_LOCKLOST ;
+		rs = SR_LOCKFAIL ;
 		if (! op->fl.cursorlockbroken) {
 		    rs = densitydb_curenums(op,curp,ep) ;
 		    ei = rs ;
