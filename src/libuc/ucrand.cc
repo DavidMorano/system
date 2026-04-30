@@ -102,7 +102,7 @@ enum randermems {
 	randermem_capend,
 	randermem_addnoise,
 	randermem_overlast
-} ;
+} ; /* end enum (randermems) */
 
 namespace {
     struct rander ;
@@ -150,10 +150,10 @@ namespace {
 	int geter(char *,int) noex ;
 	void atbefore() noex {
 	    mx.lockbegin() ;
-	}
+	} ;
 	void atafter() noex {
 	    mx.lockend() ;
-	}
+	} ;
     private:
 	int iinit() noex ;
 	int ifini() noex ;
@@ -169,9 +169,9 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void	rander_atforkbefore() noex ;
-    static void	rander_atforkafter() noex ;
-    static void	rander_exit() noex ;
+    local void	rander_atforkbefore() noex ;
+    local void	rander_atforkafter() noex ;
+    local void	rander_exit() noex ;
 }
 
 
@@ -233,7 +233,7 @@ int rander::iinit() noex {
 	        auto lamb = [this] () -> int {
 	            int		lrs = SR_OK ;
 	            if (!finit) {
-		        lrs = SR_LOCKLOST ;		/* <- failure */
+		        lrs = SR_LOCKFAIL ;		/* <- failure */
 	            } else if (finitdone) {
 		        lrs = 1 ;			/* <- OK ready */
 	            }
@@ -243,8 +243,7 @@ int rander::iinit() noex {
 	    } /* end if (initialization) */
 	} /* end if (non-voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (rander::iinit) */
+} /* end method (rander::iinit) */
 
 int rander::ifini() noex {
 	int		rs = SR_OK ;
@@ -272,8 +271,7 @@ int rander::ifini() noex {
 	    finitdone = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end method (rander::ifini) */
+} /* end method (rander::ifini) */
 
 int rander::get(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -298,8 +296,7 @@ int rander::get(char *rbuf,int rlen) noex {
 	    } /* end if (sigblock) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (rander::get) */
+} /* end method (rander::get) */
 
 int rander::irandcheck() noex {
 	int		rs = SR_OK ;
@@ -307,8 +304,7 @@ int rander::irandcheck() noex {
 	    rs = randbegin ;
 	}
 	return rs ;
-}
-/* end method (rander::irandcheck) */
+} /* end method (rander::irandcheck) */
 
 int rander::geter(char *rbuf,int rlen) noex {
 	custime		dt = time(nullptr) ;
@@ -333,8 +329,7 @@ int rander::geter(char *rbuf,int rlen) noex {
 	    } /* end while */
 	} /* end if (ok) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (randero::geter) */
+} /* end method (randero::geter) */
 
 int rander::iaddnoise() noex {
 	int		rs ;
@@ -365,8 +360,7 @@ int rander::iaddnoise() noex {
 	    } /* end if (file-random) */
 	} /* end if_constexpr (f_getrandom) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (rander::iaddnoise) */
+} /* end method (rander::iaddnoise) */
 
 int rander::irandbegin() noex {
 	int		rs = SR_OK ;
@@ -383,8 +377,7 @@ int rander::irandbegin() noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
 	return rs ;
-}
-/* end method (rander::irandbegin) */
+} /* end method (rander::irandbegin) */
 
 int rander::irandend() noex {
 	int		rs = SR_OK ;
@@ -402,8 +395,7 @@ int rander::irandend() noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (rander::irandend) */
+} /* end method (rander::irandend) */
 
 int rander::capbegin(int to) noex {
 	int		rs ;
@@ -421,8 +413,7 @@ int rander::capbegin(int to) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end method (rander::capbegin) */
+} /* end method (rander::capbegin) */
 
 int rander::icapend() noex {
 	int		rs ;
@@ -436,25 +427,21 @@ int rander::icapend() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end method (rander::icapend) */
+} /* end method (rander::icapend) */
 
-static void rander_atforkbefore() noex {
+local void rander_atforkbefore() noex {
 	rander_data.atbefore() ;
-}
-/* end subroutine (rander_atforkbefore) */
+} /* end subroutine (rander_atforkbefore) */
 
-static void rander_atforkafter() noex {
+local void rander_atforkafter() noex {
 	rander_data.atafter() ;
-}
-/* end subroutine (rander_atforkafter) */
+} /* end subroutine (rander_atforkafter) */
 
-static void rander_exit() noex {
+local void rander_exit() noex {
 	if (cint rs = rander_data.fini() ; rs < 0) {
 	    ulogerror("ucrand",rs,"exit-fini") ;
 	}
-}
-/* end subroutine (rander_exit) */
+} /* end subroutine (rander_exit) */
 
 rander_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -484,7 +471,6 @@ rander_co::operator int () noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
-/* end method (rander_co::operator) */
+} /* end method (rander_co::operator) */
 
 
