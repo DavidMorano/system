@@ -6,6 +6,13 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 2020-10-13, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
 /* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
 
 module ;
