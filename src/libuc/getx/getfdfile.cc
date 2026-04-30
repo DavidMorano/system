@@ -36,7 +36,7 @@
 				SR_FAULT
 				SR_INVALID
 				SR_DOM
-				SR_BADFD
+				SR_BADF
 				SR_EMPTY
 				*other*
 
@@ -50,16 +50,20 @@
 #include	<stdfnames.h>
 #include	<cfdec.h>
 #include	<matstr.h>
-#include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"getfdfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
+
+#define	ISUPP(ch)	isupperlatin(ch)
+#define	ISDIG(ch)	isdigitlatin(ch)
 
 
 /* external subroutines */
@@ -72,12 +76,12 @@ import libutil ;
 
 local int	extfd(cchar *,int) noex ;
 
+constexpr bool	isstar(int ch) noex attrconst {
+	return (ch == '*') ;
+} /* end subroutine (isstart) */
+
 
 /* local variables */
-
-constexpr bool	isstar(int ch) noex {
-	return (ch == '*') ;
-}
 
 
 /* exported variables */
@@ -85,18 +89,16 @@ constexpr bool	isstar(int ch) noex {
 
 /* exported subroutines */
 
-int getfdfilex(cchar *fp,int fl) noex {
+int getfdfile(cchar *fp,int µfl) noex {
 	int		rs = SR_FAULT ;
 	int 		fd = -1 ;
-	if (fp) {
+	if (int fl = getlenstr(fp,µfl) ; fl >= 0) {
 	    rs = SR_INVALID ;
-	    if (fl < 0) fl = lenstr(fp) ;
 	    if ((fl > 0) && fp[0]) {
 		rs = SR_DOM ;
 		if ((fl >= 2) && isstar(fp[0])) {
-		    cint	ch1 = mkchar(fp[1]) ;
-		    rs = SR_BADFD ;
-		    if (isupperlatin(ch1)) {
+		    if (cint ch1 = mkchar(fp[1]) ; ISUPP(ch1)) {
+		        rs = SR_BADF ;
 	                if ((fd = matstr(stdfnames,fp,fl)) >= 0) {
 	                    if (fd == stdfile_null) {
 		                rs = SR_EMPTY ;
@@ -104,7 +106,7 @@ int getfdfilex(cchar *fp,int fl) noex {
 			        rs = SR_OK ;
 			    }
 			} /* end if (matstr) */
-	            } else if (isdigitlatin(ch1)) {
+	            } else if (ISDIG(ch1)) {
 			rs = extfd(fp,fl) ;
 			fd = rs ;
 		    } /* end if (FD decision) */
@@ -124,20 +126,17 @@ int getfdfilex(cchar *fp,int fl) noex {
 local int extfd(cchar *sp,int sl) noex {
 	int		rs = SR_DOM ;
 	int		fd = -1 ;
-	if (sl < 0) sl = lenstr(sp) ;
 	if ((sl > 0) && isstar(*sp)) {
-	   rs = SR_BADFD ;
+	   rs = SR_BADF ;
 	   sp += 1 ;
 	   sl -= 1 ;
 	   if (sl > 0) {
-	       cint	ch = mkchar(sp[0]) ;
-	       if (isdigitlatin(ch)) {
+	       if (cint ch = mkchar(sp[0]) ; ISDIG(ch)) {
 		    rs = cfdeci(sp,sl,&fd) ;
 	        }
 	    } /* end if (ok) */
-	}
+	} /* end if (has leading star) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (extfd) */
+} /* end subroutine (extfd) */
 
 
