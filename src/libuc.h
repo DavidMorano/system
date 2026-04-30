@@ -32,7 +32,6 @@
 
 #include	<absfn.h>
 #include	<acceptpass.h>
-#include	<altzone.h>
 #include	<ascii.h>
 #include	<attachso.h>
 #include	<baops.h>
