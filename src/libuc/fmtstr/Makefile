@@ -228,7 +228,7 @@ fmtutil.o:		fmtutil0.o fmtutil1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 fmtutil0.o:		fmtutil.ccm				$(INCS)
-	makemodule fmtspec
+	makemodule fmtutil
 
 fmtutil1.o:		fmtutil1.cc fmtutil0.o			$(INCS)
 	makemodule fmtspec
