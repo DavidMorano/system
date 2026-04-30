@@ -103,19 +103,19 @@
 
 /* local structures */
 
-constexpr int   chtablen = (UCHAR_MAX + 1) ;
+constexpr int   	chtablen = (UCHAR_MAX + 1) ;
 
 namespace {
    struct decoder {
 	uchar		hextab[chtablen] ;
-	constexpr void mkhextab() noex ;
-	constexpr decoder() noex {
+	consteval void mkhextab() noex ;
+	consteval decoder() noex {
 	    mkhextab() ;
 	} ; /* end ctor */
     } ; /* end struct (decoder) */
 } /* end namespace */
 
-constexpr void decoder::mkhextab() noex {
+consteval void decoder::mkhextab() noex {
         for (int ch = 0 ; ch < chtablen ; ch += 1) {
             if ((ch >= '0') && (ch <= '9')) {
                 hextab[ch] = uchar(ch - '0') ;
