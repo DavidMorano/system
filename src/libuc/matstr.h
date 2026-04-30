@@ -30,18 +30,18 @@
 
 EXTERNC_begin
 
-extern int matbasestr(mainv,cchar *,int) noex ;
-extern int matcasestr(mainv,cchar *,int) noex ;
-extern int matfoldstr(mainv,cchar *,int) noex ;
+extern int matbasestr(con mainv,cchar *,int) noex ;
+extern int matcasestr(con mainv,cchar *,int) noex ;
+extern int matfoldstr(con mainv,cchar *,int) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int matstr(mainv bs,cchar *sp,int sl = -1) noex {
+inline int matstr(con mainv bs,cchar *sp,int sl = -1) noex {
 	return matbasestr(bs,sp,sl) ;
 }
 #else
-static inline int matstr(mainv bs,cchar *sp,int sl) noex {
+static inline int matstr(con mainv bs,cchar *sp,int sl) noex {
 	return matbasestr(bs,sp,sl) ;
 }
 #endif /* __cplusplus */
