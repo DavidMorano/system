@@ -40,20 +40,15 @@
 
 EXTERNC_begin
 
-extern int getfdfilex(cchar *,int) noex ;
+extern int getfdfile(cchar *,int) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int getfdfile(cchar *sp,int sl = -1) {
-	return getfdfilex(sp,sl) ;
+local inline int getfdfile(cchar *sp) noex {
+	return getfdfile(sp,-1) ;
 }
-
-#else /* __cplusplus */
-
-static inline int getfdfile(cchar *sp,int sl) {
-	return getfdfilex(sp,sl) ;
 
 #endif /* __cplusplus */
 
