@@ -35,7 +35,7 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>		/* |NETNAMELEN| */
+#include	<usysdefs.h>		/* |MAXNETNAMELEN| */
 #include	<usysrets.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
@@ -45,7 +45,7 @@
 
 namespace usys {
     sysret_t getnetnamelen() noex {
-	return NETNAMELEN ;
+	return MAXNETNAMELEN ;
     } /* end subroutine (getnetnamelen) */
 } /* end namespace (usys) */
 
