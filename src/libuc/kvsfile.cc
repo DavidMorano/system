@@ -109,10 +109,6 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
-extern "C" {
-    int		kvsfile_fileadd(kvsfile *,cchar *) noex ;
-}
-
 
 /* external variables */
 
@@ -125,12 +121,12 @@ struct kvsfile_file {
 	ino_t		ino ;
 	dev_t		dev ;
 	int		fsize ;
-} ;
+} ; /* end struct */
 
 struct kvsfile_key {
 	cchar		*kname ;
 	int		count ;
-} ;
+} ; /* end struct */
 
 struct kvsfile_ent {
 	KF_KEY		*kep ;
@@ -138,7 +134,7 @@ struct kvsfile_ent {
 	int		vlen ;
 	int		fi ;		/* KF_FILE index */
 	int		ki ;		/* key index */
-} ;
+} ; /* end struct */
 
 typedef kvsfile_file *	filep ;
 typedef kvsfile_key *	keyp ;
@@ -275,7 +271,7 @@ int kvsfile_open(kvsfile *op,int ndef,cchar *atfname) noex {
 		    hdbcmp_f	cf = hdbcmp_f(cmpkeyval) ;
 		    hdbhash_f	hf = hdbhash_f(hashkeyval) ;
 	            if ((rs = hdb_start(op->kvlp,ndef,0,hf,cf)) >= 0) {
-		        hdb		*elp = op->elp ;
+		        hdb	*elp = op->elp ;
 	                if ((rs = hdb_start(elp,ndef,0,np,np)) >= 0) {
 	                    op->magval = KF_MAGIC ;
 	                    op->ti_check = getustime ;
