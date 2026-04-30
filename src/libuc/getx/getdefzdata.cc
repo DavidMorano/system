@@ -72,7 +72,8 @@
 
 static bufsizevar	znlen(bufsize_zn) ;	/* time-zone-name (abbr) */
 
-constexpr bool		f_darwin = F_DARWIN ;
+constexpr bool		f_darwin	= F_DARWIN ;
+constexpr bool		f_linux		= F_LINUX ;
 
 
 /* exported variables */
@@ -85,7 +86,7 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 	int		znl = 0 ;
 	if (zip && zbuf) ylikely {
 	    cchar	*zp{} ;
-	    if_constexpr (f_darwin) {
+	    if_constexpr (f_darwin || f_linux) {
 		custime		dt = time(nullptr) ;
 		if (TM tmo ; (rs = uc_timelocal(&dt,&tmo)) >= 0) ylikely {
 	            zip->zoff = intconv(tmo.tm_gmtoff / 60) ;
