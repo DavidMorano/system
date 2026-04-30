@@ -55,6 +55,7 @@
 #include	<getbufsize.h>
 #include	<matstr.h>
 #include	<snwcpy.h>
+#include	<systypenames.h>	/* |systypename| */
 #include	<localmisc.h>
 
 #include	"getsystypenum.h"
@@ -82,13 +83,6 @@ local int	getfield(cchar *,int,cchar **) noex ;
 
 /* local variables */
 
-constexpr cpcchar	names[] = {
-	"SysV",
-	"Darwin",
-	"Linux",
-	nullptr
-} ; /* end array (names) */
-
 
 /* exported variables */
 
@@ -104,7 +98,7 @@ int getsystypenum(char *tbuf,char *nbuf,cchar *stn,cchar *release) noex {
 	    if (stn[0] && release[0]) {
 		if ((rs = getbufsize(bufsize_un)) >= 0) {
 		    cint	olen = rs ;
-	            if (int si ; (si = matstr(names,stn,-1)) >= 0) {
+	            if (int si ; (si = matstr(systypename,stn,-1)) >= 0) {
 	                int	cl ;
 	                cchar	*osts = nullptr ;
 	                cchar	*cp ;
