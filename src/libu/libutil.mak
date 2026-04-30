@@ -264,5 +264,6 @@ libutil-strxspn.o:	libutil-strxspn.ccm			$(INCS)
 libutil-stpcpy.o:	libutil-stpcpy.ccm			$(INCS)
 libutil-strcpy.o:	libutil-strcpy.ccm			$(INCS)
 libutil-strcopy.o:	libutil-strcopy.ccm			$(INCS)
+libutil-strcmp.o:	libutil-strcmp.ccm			$(INCS)
 
 
