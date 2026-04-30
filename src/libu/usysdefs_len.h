@@ -148,8 +148,9 @@
 #define	SVCNAMELEN	32
 #endif
 
-#ifndef	NETNAMELEN		/* this is for ONC operations */
-#define	NETNAMELEN	255	/* maximum length of network user-name */
+/* everyone (GNU/Linux, Solaris-Illumos, and macOS) seems to have this!  */
+#ifndef	MAXNETNAMELEN		/* this is for ONC operations */
+#define	MAXNETNAMELEN	255	/* maximum length of network user-name */
 #endif
 
 
