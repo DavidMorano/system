@@ -65,24 +65,19 @@
 
 /* exported variables */
 
+consteval stdfiler::stdfiler() noex {
+	name[stdfile_in]	= "/dev/fd/0" ;
+	name[stdfile_out]	= "/dev/fd/1" ;
+	name[stdfile_err]	= "/dev/fd/2" ;
+	name[stdfile_log]	= "/dev/fd/3" ;
+	name[stdfile_null]	= "/dev/null" ;
+	name[stdfile_zero]	= "/dev/zero" ;
+	name[stdfile_minus]	= "/dev/stdin" ;
+} /* end ctor */
+
+constexpr stdfiler	stdfile ;
+
 
 /* exported subroutines */
-
-#ifdef	COMMENT
-
-    struct stdfiler {
-	cchar	*name[stdfile_overlast] = {} ;
-	consteval stdfiler() noex {
-	    name[stdfile_in]	= "/dev/fd/0" ;
-	    name[stdfile_out]	= "/dev/fd/1" ;
-	    name[stdfile_err]	= "/dev/fd/2" ;
-	    name[stdfile_log]	= "/dev/fd/3" ;
-	    name[stdfile_null]	= "/dev/null" ;
-	    name[stdfile_zero]	= "/dev/zero" ;
-	    name[stdfile_minus]	= "/dev/stdin" ;
-	} ; /* end ctor */
-    } ; /* end struct (devnames) */
-
-#endif /* COMMENT */
 
 
