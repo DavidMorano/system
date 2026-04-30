@@ -55,7 +55,7 @@ OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
 OBJ13= getnisdomain.o getfstype.o
 OBJ14= getoflags.o
-OBJ15= getpwx.o
+OBJ15= getpwx.o systypenames.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o 
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -191,6 +191,7 @@ objd.o:			$(OBJD)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+systypenames.o:		systypenames.c		systypenames.h		$(INCS)
 getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
 
 getaddr.o:		getaddr.cc		getaddr.h		$(INCS)
@@ -229,11 +230,10 @@ getuserhome.o:		getuserhome.cc		getuserhome.h		$(INCS)
 getuserorg.o:		getuserorg.cc		getuserorg.h		$(INCS)
 getuserterms.o:		getuserterms.cc		getuserterms.h		$(INCS)
 getxid.o:		getxid.cc		getxid.h		$(INCS)
-getopendial.o:		getopendial.c		getopendial.h		$(INCS)
+getopendial.o:		getopendial.cc		getopendial.h		$(INCS)
 getmaxpid.o:		getmaxpid.cc		getmaxpid.h		$(INCS)
 getnisdomain.o:		getnisdomain.cc		getnisdomain.h		$(INCS)
 getpwx.o:		getpwx.cc		getpwx.h		$(INCS)
 getoflags.o:		getoflags.cc		getoflags.h		$(INCS)
 getfstype.o:		getfstype.cc		getfstype.h		$(INCS)
-
 
