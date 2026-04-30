@@ -40,6 +40,17 @@ enum stdfiles {
 	stdfile_overlast
 } ; /* end enum (stdfiles) */
 
+#ifdef	__cplusplus
+
+struct stdfiler {
+	cchar	*name[stdfile_overlast] = {} ;
+	consteval stdfiler() noex ;
+} ; /* end struct (stdfiler) */
+
+extern const stdfiler	stdfile ;
+
+#endif /* __cplusplus */
+
 
 #endif /* STDFILES_INCLUDE */
 
