@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* debugging */
-#define	CF_TEST		0		/* test */
 #define	CF_GETAFLEN	1		/* |getaflen()| */
 
 /* revision history:
@@ -72,7 +71,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/socket.h>
-#include	<climits>		/* |UCHAR_MAX */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |sort(3c++)| */
@@ -91,7 +90,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;			/* |lenstr(3u)| */
+import libutil ;			/* |lenstr(3u)| + |cstrcmp(3u)| */
 
 /* local defines */
 
@@ -137,7 +136,17 @@ namespace {
             int     af = 0 ; /* return-value */
             cauto predf = [this,sp,sl] (uchar c) noex -> bool {
                 cchar *an = ns[c].name ;
-                return (strwcmp(an,sp,sl) < 0) ;
+		bool f = false ;
+		{
+		    cint ch_a = int(an[0] & UCHAR_MAX) ;
+		    cint ch_s = int(sp[0] & UCHAR_MAX) ;
+		    {
+			cint d = (ch_a - ch_s) ;
+		        f = f || (d < 0) ;
+                        f = f || ((d == 0) && (strwcmp(an,sp,sl) < 0)) ;
+		    }
+		}
+                return f ;
             } ; /* end lambda (predf) */
             con uchar *itf = (tab + 0) ;
             con uchar *itl = (tab + ne) ;
@@ -157,14 +166,6 @@ namespace {
 
 
 /* forward references */
-
-consteval int cstrcmp(cchar *s1,cchar *s2) noex {
-	while (*s1 && *s2 && (*s1 == *s2)) {
-	    s1++ ;
-	    s2++ ;
-	} /* end while */
-	return (int(*s1 & UCHAR_MAX) - int(*s2 & UCHAR_MAX)) ;
-} /* end subroutine (cstrcmp) */
 
 local int	getdb(cchar *,int) noex ;
 
@@ -282,29 +283,29 @@ constexpr addrfam		names_af[] = {
 constexpr int		ne_af	= nelem(names_af) ;
 
 namespace {
-    struct codemgr {
+    struct namemgr {
 	uchar		tab_af	[ne_af] ;
-	consteval void tabload_x(mut uchar *tab,int n) noex {
-	    for (int i = 0 ; i < n ; i += 1) {
-		tab[i] = uchar(i) ;
+	consteval void tabload_x() noex {
+	    for (int i = 0 ; i < ne_af ; i += 1) {
+		tab_af[i] = uchar(i) ;
 	    } /* end for */
 	} ; /* end method (tabload_x) */
-	consteval void tabinit(mut uchar *tab,con addrfam *pairs,int ne) noex {
-	    cauto predf = [pairs] (con uchar &ia,con uchar &ib) noex -> bool {
-		cchar *s1 = pairs[ia].name ;
-		cchar *s2 = pairs[ib].name ;
+	consteval void tabinit() noex {
+	    cauto predf = [] (con uchar &ia,con uchar &ib) noex -> bool {
+		cchar *s1 = names_af[ia].name ;
+		cchar *s2 = names_af[ib].name ;
     		return (cstrcmp(s1,s2) < 0) ;
 	    } ; /* end lambda */
-	    tabload_x(tab,ne) ;
-	    sort(tab,(tab+ne),predf) ;
+	    tabload_x() ;
+	    sort(tab_af,(tab_af+ne_af),predf) ;
 	} ; /* end method (tabinit) */
-	consteval codemgr() noex {
-	    tabinit(tab_af,names_af,ne_af) ;
-	} /* end ctor (codemgr) */
-    } ; /* end struct (codemgr) */
+	consteval namemgr() noex {
+	    tabinit() ;
+	} ; /* end ctor (namemgr) */
+    } ; /* end struct (namemgr) */
 } /* end namespace */
 
-constexpr codemgr	codetab ;
+constexpr namemgr	nametab ;
 
 static bufsizevar	maxpathlen(bufsize_mp) ;
 
@@ -368,41 +369,8 @@ cchar *strafname(int af) noex {
 /* local subroutines */
 
 local int getdb(cchar *sp,int sl) noex {
-	getter go(names_af,codetab.tab_af,ne_af) ;
+	getter go(names_af,nametab.tab_af,ne_af) ;
 	return go(sp,sl) ;
 } /* end subroutine (getdb) */
-
-
-/* test items */
-
-#if	defined(CF_TEST) && (CF_TEST > 0)
-
-constexpr cpcchar	testafs[] = { 
-    "unspec", "unix", "local", "inet4", "inet6",
-    "decnet", "x25"
-} ; /* end array */
-
-int main(int,con mainv,con mainv) {
-    for (int i = 0 ; i < ne_af ; i += 1) {
-	cint idx = codetab.tab_af[i] ;
-	cint af = names_af[idx].af ;
-	cchar *name = names_af[idx].name ;
-	printf("%03d %03d %03d %s\n",i,idx,af,name) ;
-    } /* end for */
-    {
-	int rs = SR_OK ;
-	printf("test-get\n") ;
-	for (cauto &n : testafs) {
-	    printf("n=%s\n",n) ;
-	    if ((rs = getaf(n,-1)) >= 0) {
-		printf("req=%s af=%d\n",n,rs) ;
-	    }
-	    if (rs < 0) break ;
-	} /* end for */
-	printf("test-get rs=%d\n",rs) ;
-    } /* end block */
-} /* end subroutine (main) */
-
-#endif /* defined(CF_TEST) && (CF_TEST > 0) */
 
 
