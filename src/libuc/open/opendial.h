@@ -33,7 +33,6 @@ enum opendialopts {
 /* options */
 #define	OPENDIAL_OLONG		(1 << opendialopt_long)	/* FINGER "long" */
 
-
 enum opendials {
 	opendial_unspec,
 	opendial_udp,
@@ -57,6 +56,12 @@ EXTERNC_begin
 extern int opendial(int,int,cc *,cc *,cc *,con mainv,con mainv,int,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+namespace libuc {
+    extern cpcchar	opendialers[] ;
+} /* end namespace (libuc) */
+#endif /* __cplusplus */
 
 
 #endif /* OPENDIAL_INCLUDE */
