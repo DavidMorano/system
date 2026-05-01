@@ -251,7 +251,7 @@ int uinfo::init() noex {
 	        auto lamb = [this] () -> int {
 	            int		rsl = SR_OK ;
 	            if (!finit) {
-		        rsl = SR_LOCKLOST ;		/* <- failure */
+		        rsl = SR_LOCKFAIL ;		/* <- failure */
 	            } else if (finitdone) {
 		        rsl = 1 ;			/* <- OK ready */
 	            }
@@ -261,8 +261,7 @@ int uinfo::init() noex {
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (uinfo::init) */
+} /* end subroutine (uinfo::init) */
 
 int uinfo::fini() noex {
 	int		rs = SR_OK ;
@@ -295,8 +294,7 @@ int uinfo::fini() noex {
 	    finitdone = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (uinfo::fini) */
+} /* end subroutine (uinfo::fini) */
 
 int uinfo::getname(uinfo_infoname *unp) noex {
 	int		rs = SR_FAULT ;
@@ -314,8 +312,7 @@ int uinfo::getname(uinfo_infoname *unp) noex {
 	    } /* end if (sigblock) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uinfo::getname) */
+} /* end subroutine (uinfo::getname) */
 
 int uinfo::getname_setup() noex {
 	int		rs = SR_OK ;
@@ -325,8 +322,7 @@ int uinfo::getname_setup() noex {
 	    } /* end if (ok) */
 	} /* end if (setup needed) */
 	return rs ;
-}
-/* end method (uinfo::getname_setup) */
+} /* end method (uinfo::getname_setup) */
 
 int uinfo::getname_load(setname *setp) noex {
     	cnullptr	np{} ;
@@ -363,8 +359,7 @@ int uinfo::getname_load(setname *setp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end method (uinfo::getname_load) */
+} /* end method (uinfo::getname_load) */
 
 int uinfo::getname_install(setname *setp) noex {
 	int		rs ;
@@ -386,8 +381,7 @@ int uinfo::getname_install(setname *setp) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (forklock) */
 	return rs ;
-}
-/* end method (uinfo::getname_install) */
+} /* end method (uinfo::getname_install) */
 
 int uinfo::getaux(uinfo_infoaux *uxp) noex {
 	int		rs = SR_FAULT ;
@@ -405,8 +399,7 @@ int uinfo::getaux(uinfo_infoaux *uxp) noex {
 	    } /* end if (sigblock) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uinfo::getaux) */
+} /* end subroutine (uinfo::getaux) */
 
 int uinfo::getaux_setup() noex {
 	int		rs = SR_OK ;
@@ -416,8 +409,7 @@ int uinfo::getaux_setup() noex {
 	    } /* end if (ok) */
 	} /* end if (setup needed) */
 	return rs ;
-}
-/* end method (uinfo::getaux_setup) */
+} /* end method (uinfo::getaux_setup) */
 
 int uinfo::getaux_load(setaux *setp) noex {
     	cnullptr	np{} ;
@@ -474,8 +466,7 @@ int uinfo::getaux_load(setaux *setp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end method (uinfo::getaux_load) */
+} /* end method (uinfo::getaux_load) */
 
 int uinfo::getaux_install(setaux *setp) noex {
 	int		rs ;
@@ -497,8 +488,7 @@ int uinfo::getaux_install(setaux *setp) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (forklock) */
 	return rs ;
-}
-/* end method (uinfo::getaux_install) */
+} /* end method (uinfo::getaux_install) */
 
 int auxinfo::start() noex {
     	int		rs ;
@@ -520,8 +510,7 @@ int auxinfo::start() noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (getbufsize) */
 	return rs ;
-}
-/* end subroutine (auxinfo::start) */
+} /* end subroutine (auxinfo::start) */
 
 int auxinfo::finish() noex {
     	int		rs = SR_OK ;
@@ -533,8 +522,7 @@ int auxinfo::finish() noex {
 	}
 	flen = 0 ;
 	return rs ;
-}
-/* end method (auxinfo::finish) */
+} /* end method (auxinfo::finish) */
 
 int auxinfo::load() noex {
 	cint    	nlen = flen ;
@@ -581,8 +569,7 @@ int auxinfo::load() noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end method (auxinfo::load) */
+} /* end method (auxinfo::load) */
 
 local void uinfo_atforkbefore() noex {
 	uinfo_data.atforkbefore() ;
