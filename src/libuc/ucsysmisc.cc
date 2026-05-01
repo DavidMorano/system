@@ -81,16 +81,16 @@
 
   	Description:
 	This was originally supposed to implement the (so-called)
-	|ftime(3c)| subroutine.  But that subroutine is *broken* by
-	design.  Why is it broken?  It is broken because it always
-	returns the standard time-zone offset from GMT in its
-	'timezone' structure member.  This is essentually useless
+	|ftime(3c)| subroutine.  But that subroutine is *broken*
+	by design.  Why is it broken?  It is broken because it
+	always returns the standard time-zone offset from GMT in
+	its 'timezone' structure member.  This is essentually useless
 	in real life.  The only useful thing to return there is the
 	*current* time-zone offset as indicated by the 'dstflag'
 	member.  So this is what we do instead of the original
 	behavior.  We instead return the current time-zone offset
-	in the 'timezone' variable, as indicated by the 'dstflag'
-	member variable.
+	in the 'timezone' (minues west of GMT) variable of the TIMEB
+	struction.
 
 	Use of this subroutine (|uc_ftime(3dam)|) and its UNIX®
 	inspired piece of crap (|ftime(3c)|) should be eliminated
@@ -108,7 +108,7 @@
 	Note:
 	Only Apple Darwin still fully supports this subroutine.
 	Solaris® supports it only partially (not filling in the
-	POSIX® optional fields).  Linux does not (no longer) supports
+	POSIX® optional fields).  Linux does not (no longer) support
 	this subroutine at all.
 
 	Synopsis:
@@ -232,6 +232,8 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
+local sysret_t	local_ftime(TIMEB *) noex ;
+
 
 /* local variables */
 
@@ -349,25 +351,14 @@ int uc_pagesize() noex {
 /* end subroutine (uc_pagesize) */
 
 int uc_ftime(TIMEB *tbp) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (tbp) ylikely {
-	    if_constexpr (f_darwin) {
+	    if constexpr(f_darwin) {
 		ftime(tbp) ;
 		rs = SR_OK ;
 	    } else {
-	        memclear(tbp) ;
-	        if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) ylikely {
-		    custime 	t = tbp->time ;
-	            tbp->time = tv.tv_sec ;
-	            tbp->millitm = ushortconv(tv.tv_usec / 1000) ;
-	            if (tmtime tmt ; (rs = tmtime_timelocal(&tmt,t)) >= 0) {
-	                tbp->timezone = shortconv(tmt.gmtoff / 60) ;
-	                tbp->dstflag = shortconv(tmt.isdst) ;
-	                rs = (tmt.isdst > 0) ;
-	            } /* end if (tmtime_timelocal) */
-	        } /* end if (uc_gettimeofday) */
-	    } /* end if_constexpr (f_darwin) */
+		rs = local_ftime(tbp) ;
+	    } /* end if (syshas.ftime) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -406,5 +397,22 @@ namespace libuc {
 	return uc_nprocessors(w) ;
     } /* end method (ucprocesser::operator) */
 } /* end namespace (libuc) */
+
+local sysret_t local_ftime(TIMEB *tbp) noex {
+    	cnullptr	np{} ;
+    	int		rs ;
+        memclear(tbp) ;
+        if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) ylikely {
+            custime     t = tbp->time ;
+            tbp->time = tv.tv_sec ;
+            tbp->millitm = ushortconv(tv.tv_usec / 1000) ;
+            if (tmtime tmt ; (rs = tmtime_timelocal(&tmt,t)) >= 0) {
+                tbp->timezone = shortconv(tmt.gmtoff / 60) ;
+                tbp->dstflag = shortconv(tmt.isdst) ;
+                rs = (tmt.isdst > 0) ;
+            } /* end if (tmtime_timelocal) */
+        } /* end if (uc_gettimeofday) */
+	return rs ;
+} /* end subroutine (local_ftime) */
 
 
