@@ -26,19 +26,19 @@
 
 EXTERNC_begin
 
-extern cchar	*gettmpdnamex(cpccharp) noex ;
+extern cchar	*gettmpdnamex(con mainv) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline cchar *gettmpdname(cpccharp envv = nullptr) noex {
+local inline cchar *gettmpdname(con mainv envv = nullptr) noex {
 	return gettmpdnamex(envv) ;
 }
 
 #else /* __cplusplus */
 
-static inline cchar *gettmpdname(cpccharp envv) noex {
+local inline cchar *gettmpdname(con mainv envv) noex {
 	return gettmpdnamex(envv) ;
 }
 
