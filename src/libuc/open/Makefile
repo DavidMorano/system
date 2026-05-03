@@ -45,7 +45,7 @@ OBJ1_OPEN= openport.o openportmsg.o
 OBJ2_OPEN= opendefstds.o opensysfs.o
 OBJ3_OPEN= openusd.o 
 OBJ4_OPEN= openqotd.o opensys_banner.o
-OBJ5_OPEN= opendial.o
+OBJ5_OPEN= opendial.o opendials.o
 OBJ6_OPEN= opensysdbs.o
 OBJ7_OPEN=
 
@@ -156,22 +156,23 @@ objc.o:			$(OBJC)
 
 
 # objects
-openport.o:		openport.cc openport.h		$(INCS)
-openportmsg.o:		openportmsg.cc openportmsg.h	$(INCS)
+openport.o:		openport.cc		openport.h	$(INCS)
+openportmsg.o:		openportmsg.cc		openportmsg.h	$(INCS)
 
 # subroutines
-openaddrinfo.o:		openaddrinfo.cc openaddrinfo.h	$(INCS)
-opensockaddr.o:		opensockaddr.cc opensockaddr.h	$(INCS)
-opendefstds.o:		opendefstds.cc			$(INCS)
-openqotd.o:		openqotd.cc openqotd.h		$(INCS)
-openshm.o:		openshm.cc openshm.h		$(INCS)
-opensysfs.o:		opensysfs.cc opensysfs.h	$(INCS)
-openusd.o:		openusd.cc			$(INCS)
-opensys_banner.o:	opensys_banner.cc		$(INCS)
+openaddrinfo.o:		openaddrinfo.cc		openaddrinfo.h	$(INCS)
+opensockaddr.o:		opensockaddr.cc		opensockaddr.h	$(INCS)
+opendefstds.o:		opendefstds.cc				$(INCS)
+openqotd.o:		openqotd.cc		openqotd.h	$(INCS)
+openshm.o:		openshm.cc		openshm.h	$(INCS)
+opensysfs.o:		opensysfs.cc		opensysfs.hh	$(INCS)
+openusd.o:		openusd.cc				$(INCS)
+opensys_banner.o:	opensys_banner.cc			$(INCS)
 
-opendial.o:		opendial.cc	opendial.h	$(INCS)
+opendial.o:		opendial.cc		opendial.h	$(INCS)
+opendials.o:		opendials.cc		opendials.h	$(INCS)
 
 # associated
-opensysdbs.o:		opensysdbs.c	opensysdbs.h	$(INCS)
+opensysdbs.o:		opensysdbs.c		opensysdbs.h	$(INCS)
 
 
