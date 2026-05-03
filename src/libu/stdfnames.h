@@ -59,7 +59,7 @@
 #endif
 
 
-extern cpcchar	stdfnames[] ;
+extern ccharp	stdfnames[stdfile_overlast + 1] ;
 
 
 #endif /* STDFNAMES_INCLUDE */
