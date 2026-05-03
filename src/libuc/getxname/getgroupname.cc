@@ -119,11 +119,11 @@ constexpr int		rsnotours[] = {
 	0
 } ; /* end array (rsnotours) */
 
-constexpr helper_m	mems[] = {
+constexpr helper_m	tries[] = {
 	&helper::tryus,
 	&helper::trygid,
 	&helper::trydef
-} ; /* end array (mems) */
+} ; /* end array (tries) */
 
 constexpr gid_t		gidend = -1 ;
 
@@ -177,15 +177,15 @@ int helper::finish() noex {
 	    if (rs >= 0) rs = rs1 ;
 	    grbuf = nullptr ;
 	    grlen = 0 ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end method */
 
 helper::operator int () noex {
 	int		rs = SR_OK ;
-	for (cauto &m : mems) {
+	for (cauto &m : tries) {
 	    rs = (this->*m)() ;
-	    if (rs != SR_OK) break ;
+	    if (rs) break ;
 	} /* end for */
 	return rs ;
 } /* end method */
