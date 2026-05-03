@@ -40,11 +40,16 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+enum grnds {
+    grnd_nonblock,
+    grnd_random,
+    grnd_insecure,
+    grnd_overlast
+} ;
 
-#define GRND_NONBLOCK		0x01	/* do not block open */
-#define GRND_RANDOM		0x02	/* use '/dev/random' */
-#define GRND_INSECURE		0x04	/* quality can be compromised */
-
+#define GRND_NONBLOCK	(1 << grnd_nonblock)	/* do not block open */
+#define GRND_RANDOM	(1 << grnd_random)	/* use '/dev/random' */
+#define GRND_INSECURE	(1 << grnd_insecure)	/* quality can be compromised */
 
 #ifndef	SUBROUTINE_GETRANDOM
 #define	SUBROUTINE_GETRANDOM
