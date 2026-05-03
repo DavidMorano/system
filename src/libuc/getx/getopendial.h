@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get the type of operating system we are on */
+/* get an 'open-dial' number given a dialer c-string */
 /* version %I% last-modified %G% */
 
 
@@ -43,8 +43,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
-
-#include	<opendial.h>
+#include	<opendials.h>		/* these are the return-values */
 
 
 EXTERNC_begin
