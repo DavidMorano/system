@@ -43,6 +43,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<ucdesc.h>
 #include	<sysval.hh>
 #include	<intsat.h>
 #include	<intceil.h>
@@ -74,7 +75,6 @@ extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
     extern int uc_fstat(int,ustat *) noex ;
     extern int uc_fdatasync(int) noex ;
-    extern int uc_close(int) ;
 } /* end extern */
 
 
