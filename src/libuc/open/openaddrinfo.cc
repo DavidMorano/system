@@ -49,6 +49,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucdesc.h>
 #include	<localmisc.h>
 
 #include	"openaddrinfo.h"
@@ -69,7 +70,6 @@ extern "C" {
     extern int uc_socket(int,int,int) noex ;
     extern int uc_connect(int,cvoid *,int) noex ;
     extern int uc_connecte(int,cvoid *,int,int) noex ;
-    extern int uc_close(int) ;
 } /* end extern */
 
 
