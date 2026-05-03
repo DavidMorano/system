@@ -49,6 +49,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucdesc.h>
 #include	<opentmp.h>
 #include	<localmisc.h>
 
@@ -62,10 +63,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_close(int) noex ;
-}
 
 
 /* external variables */
