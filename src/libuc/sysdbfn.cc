@@ -216,7 +216,7 @@ int sysdbmgr::init() noex {
 		        rsl = 1 ;
 	            }
 	            return rsl ;
-	        } ; /* end lambda */
+	        } ; /* end lambda (lamb) */
 	        rs = tw(lamb) ;		/* <- time watching */
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
