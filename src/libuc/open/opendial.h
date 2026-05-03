@@ -23,6 +23,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<opendials.h>
 
 
 enum opendialopts {
@@ -33,35 +34,11 @@ enum opendialopts {
 /* options */
 #define	OPENDIAL_OLONG		(1 << opendialopt_long)	/* FINGER "long" */
 
-enum opendials {
-	opendial_unspec,
-	opendial_udp,
-	opendial_tcp,
-	opendial_tcpmux,
-	opendial_tcpnls,
-	opendial_uss,
-	opendial_ussmux,
-	opendial_ussnls,
-	opendial_ticotsord,
-	opendial_ticotsordnls,
-	opendial_pass,
-	opendial_open,
-	opendial_prog,
-	opendial_finger,
-	opendial_overlast
-} ; /* end enum (opendials) */
-
 EXTERNC_begin
 
 extern int opendial(int,int,cc *,cc *,cc *,con mainv,con mainv,int,int) noex ;
 
 EXTERNC_end
-
-#ifdef	__cplusplus
-namespace libuc {
-    extern cpcchar	opendialers[] ;
-} /* end namespace (libuc) */
-#endif /* __cplusplus */
 
 
 #endif /* OPENDIAL_INCLUDE */
