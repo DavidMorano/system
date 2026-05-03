@@ -88,7 +88,7 @@ OBJ05= nleadx.o
 OBJ06= mapex.o
 OBJ07=
 
-OBJ08=
+OBJ08= caches.o
 OBJ09= strobj.o
 OBJ10= ctx.o cfx.o mapblock.o memtrack.o
 OBJ11= field.o termx.o
@@ -110,8 +110,8 @@ OBJ23=
 
 OBJ24= ucdescbase.o
 OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
-OBJ26= ucdescmisc.o
-OBJ27=
+OBJ26= ucdescmisc.o ucdesclock.o
+OBJ27= ucproc.o ucdata.o
 
 OBJ28= ucttyname.o uctc.o ucsysconf.o
 OBJ29= uclibmem.o ucyserattr.o
@@ -367,19 +367,14 @@ ucpathconf.o:		ucpathconf.cc
 ucmain.o:		ucmain.cc
 ucatfork.o:		ucatfork.cc	ucatfork.h		$(INCS)
 ucatexit.o:		ucatexit.cc	ucatexit.h		$(INCS)
-ucfork.o:		ucfork.cc
 ucgetipnodeby.o:	ucgetipnodeby.cc
 ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
-ucproguser.o:		ucproguser.cc	ucproguser.h		$(INCS)
-ucprogdata.o:		ucprogdata.cc	ucprogdata.h		$(INCS)
-ucclustername.o:	ucclustername.cc ucclustername.h
 ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
 ucobjmode.o:		ucobjmode.cc
 ucunlink.o:		ucunlink.cc
 uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
-ucuserattr.o:		ucuserattr.cc	ucuserattr.h		$(INCS)
 ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
-ucprochave.o:		ucprochave.cc	ucprochave.h		$(INCS)
+
 ucdescbase.o:		ucdescbase.cc	ucdescbase.hh		$(INCS)
 ucdescmisc.o:		ucdescmisc.cc	ucdescmisc.h		$(INCS)
 
@@ -499,24 +494,44 @@ ucsysconf.o:		ucsysconf.dir
 ucsysconf.dir:
 	makesubdir $@
 
-# UCREAD
+# UCDESCREAD
 ucdescread.o:		ucdescread.dir
 ucdescread.dir:
 	makesubdir $@
 
-# UCREAD
+# UCDESCREAD
 ucdescwrite.o:		ucdescwrite.dir
 ucdescwrite.dir:
 	makesubdir $@
 
-# UCSOCK
+# UCDESCSOCK
 ucdescsock.o:		ucdescsock.dir
 ucdescsock.dir:
 	makesubdir $@
 
+# UCDESCLOCK
+ucdesclock.o:		ucdesclock.dir
+ucdesclock.dir:
+	makesubdir $@
+
 # UCIDS
-ucids.o:		ucids.dir
-ucids.dir:
+ucdata.o:		ucdata.dir
+ucdata.dir:
+	makesubdir $@
+
+# UCFILEOP
+ucfileop.o:		ucfileop.dir
+ucfileop.dir:
+	makesubdir $@
+
+# UCPROC
+ucproc.o:		ucproc.dir
+ucproc.dir:
+	makesubdir $@
+
+# UCSTREAM
+ucstream.o:		ucstream.dir
+ucstream.dir:
 	makesubdir $@
 
 # ADDRSET
@@ -801,11 +816,6 @@ sigx.o:			sigx.dir
 sigx.dir:
 	makesubdir $@
 
-# UCLOCK
-uclock.o:		uclock.dir
-uclock.dir:
-	makesubdir $@
-
 # UCSIG
 ucsig.o:		ucsig.dir
 ucsig.dir:
@@ -1010,16 +1020,6 @@ mnw.o:			mnw.dir
 mnw.dir:
 	makesubdir $@
 
-# UCFILEOP
-ucfileop.o:		ucfileop.dir
-ucfileop.dir:
-	makesubdir $@
-
-# UCSTREAM
-ucstream.o:		ucstream.dir
-ucstream.dir:
-	makesubdir $@
-
 # TERMX
 termx.o:		termx.dir
 termx.dir:
@@ -1050,11 +1050,6 @@ fileobj.o:		fileobj.dir
 fileobj.dir:
 	makesubdir $@
 
-# UCONSTANTS
-uconstants.o:		uconstants.dir
-uconstants.dir:
-	makesubdir $@
-
 # DIRS
 dirs.o:			dirs.dir
 dirs.dir:
@@ -1071,9 +1066,8 @@ timestr.dir:
 	makesubdir $@
 
 # string-constants
-sysdbfiles.o:		sysdbfiles.c	sysdbfiles.h
+sysdbfiles.o:		sysdbfiles.cc	sysdbfiles.h
 sysdbfn.o:		sysdbfn.cc	sysdbfn.h
-opensysdbs.o:		opensysdbs.c	opensysdbs.h
 
 # SINGLES
 findbit.o:		findbit.cc	findbit.h		$(INCS)
@@ -1105,7 +1099,7 @@ inaddrbad.o:		inaddrbad.cc	inaddrbad.hh		$(INCS)
 retstat.o:		retstat.cc	retstat.h		$(INCS)
 
 # integer-conversion-to-string-digits
-strval.o:		strval.cc strval.h uconstants.o
+strval.o:		strval.cc strval.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h
