@@ -43,7 +43,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<matstr.h>
-#include	<opendial.h>		/* |opendialer(3uc)| */
+#include	<opendials.h>		/* |opendialer(3uc)| */
 #include	<localmisc.h>
 
 #include	"getopendial.h"
@@ -51,10 +51,12 @@
 
 /* local defines */
 
+#define	names	opendial_data.name
+
 
 /* imported namespaces */
 
-using libuc::opendialers ;		/* variable */
+using libuc::opendial_data ;		/* variable */
 
 
 /* local typedefs */
@@ -87,7 +89,7 @@ int getopendial(cchar *name) noex {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
 		rs = SR_NOTFOUND ;
-		if ((v = matstr(opendialers,name,-1)) >= 0) {
+		if ((v = matstr(names,name,-1)) >= 0) {
 		    rs = SR_OK ;
 		} else {
 	            if (strcmp(name,"unix") == 0) {
