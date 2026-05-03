@@ -31,7 +31,7 @@ enum systypenames {
 	systypename_overlast
 } ; /* end enum (systypenames) */
 
-extern cpcchar		systypename[] ;
+extern ccharp		systypename[systypename_overlast + 1] ;
 
 
 #endif /* SYSTYPENAMES_INCLUDE */
