@@ -85,10 +85,10 @@ namespace {
 
 /* local variables */
 
-constexpr namer_m	mems[] = {
+constexpr namer_m	tries[] = {
 	&namer::tryenv,
 	&namer::trysys
-} ; /* end array (mems) */
+} ; /* end array (tries) */
 
 
 /* exported variables */
@@ -103,7 +103,7 @@ int getsysname(char *rbuf,int rlen) noex {
 	    if (rlen >= 0) {
 	        namer nao(rbuf,rlen) ;
 	        rs = nao ;
-	    }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -114,7 +114,7 @@ int getsysname(char *rbuf,int rlen) noex {
 
 namer::operator int () noex {
 	int		rs = SR_OK ;
-	for (cauto &m : mems) {
+	for (cauto &m : tries) {
 	    rs = (this->*m)() ;
 	    if (rs != 0) break ;
 	} /* end for */
@@ -122,16 +122,16 @@ namer::operator int () noex {
 } /* end method (namer::operator) */
 
 int namer::tryenv() noex {
-	static cchar	*val = getenver(varname.sysname) ;
+	static cchar	*valp = getenver(varname.sysname) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (val) {
+	if (valp) {
 	    cchar	*cp ;
-	    if (int cl ; (cl = sfshrink(val,-1,&cp)) > 0) {
+	    if (int cl ; (cl = sfshrink(valp,-1,&cp)) > 0) {
 		rs = snwcpy(rbuf,rlen,cp,cl) ;
 		len = rs ;
 	    }
-	}
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 } /* end method (namer::tryenv) */
 
