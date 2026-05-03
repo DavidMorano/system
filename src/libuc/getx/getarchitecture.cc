@@ -42,6 +42,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<ucsysauxinfo.h>	/* |usysauxinforeq_architecture| */
+#include	<ucgetx.h>		/* |uc_getarch(3uc)| */
 #include	<getx.h>		/* |getenver(3uc)| */
 #include	<sfx.h>
 #include	<snwcpy.h>
@@ -64,7 +65,6 @@ import uconstants ;
 /* external subroutines */
 
 extern "C" {
-    extern int uc_getarchitecture(char *,int) noex ;
     extern int uc_sysauxinfo(char *,int,int) noex ;
 }
 
@@ -128,7 +128,7 @@ archer::operator int () noex {
 	int		rs = SR_OK ;
 	for (cauto &m : mems) {
 	    rs = (this->*m)() ;
-	    if (rs != SR_OK) break ;
+	    if (rs) break ;
 	} /* end for */
 	return rs ;
 } /* end method (archer::operator) */
@@ -141,12 +141,12 @@ int archer::tryenv() noex {
 	    if (int cl ; (cl = sfshrink(valp,-1,&cp)) > 0) {
 	        rs = snwcpy(rbuf,rlen,cp,cl) ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end method (archer::tryenv) */
 
 int archer::trylib() noex {
-	return uc_getarchitecture(rbuf,rlen) ;
+	return uc_getarch(rbuf,rlen) ;
 } /* end method (archer::trylib) */
 
 int archer::trysys() noex {
