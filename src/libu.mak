@@ -66,7 +66,7 @@ OBJ14= um.o uprocess.o ucodenames.o
 OBJ15= usysop.o vecbool.o uchartype.o
 
 OBJ16= syswords.o varnames.o
-OBJ17= ptx.o uacceptpass.o 
+OBJ17= ptx.o
 OBJ18= timeval.o itimerval.o 
 OBJ19= timespec.o itimerspec.o
 
@@ -508,7 +508,6 @@ posixdirent.o:		posixdirent.cc	posixdirent.hh	$(INCS)
 binchunk.o:		binchunk.cc	binchunk.hh	$(INCS)
 
 # OTHER subroutine-groups
-uacceptpass.o:		uacceptpass.cc	uopen.h		$(INCS)
 ulogerror.o:		ulogerror.cc	ulogerror.h	$(INCS)
 umem.o:			umem.cc		umem.hh		$(INCS)
 um.o:			um.cc		um.h		$(INCS)
@@ -525,7 +524,7 @@ endian.o:		endian.cc	endian.h			$(INCS)
 syswords.o:		syswords.cc	syswords.hh			$(INCS)
 varnames.o:		varnames.cc	varnames.hh			$(INCS)
 stdfiles.o:		stdfiles.cc	stdfiles.h			$(INCS)
-stdfnames.o:		stdfnames.c	stdfnames.h			$(INCS)
+stdfnames.o:		stdfnames.cc	stdfnames.h			$(INCS)
 mailvalues.o:		mailvalues.cc	mailvalues.hh			$(INCS)
 
 # IDS of-various-sorts
