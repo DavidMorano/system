@@ -12,9 +12,7 @@
 	This code was originally written.
 
 	= 2023-10-27, David A-D- Morano
-	1. I added the code to dynamically determine the MAXPATHLEN
-	value. 
-	2. I removed an unnecessary note about stupid BSD-like
+	1. I removed an unnecessary note about stupid BSD-like
 	systems (like Linux and Apple-Darwin, but we will not name
 	names here) not having bidirectional UNIX® pipes.
 
@@ -39,12 +37,12 @@
 	int getpwd(char *pwbuf,int pwlen) noex
 
 	Arguments:
-	pwbuf	- buffer to hold resultant path string
-	pwlen	- buflen of buffer
+	pwbuf		- result buffer pointer
+	pwlen		- result buffer length
 
 	Returns:
-	>=0	length of returned string in user buffer
-	<0	error (system-return)
+	>=0		length of returned string in user buffer
+	<0		error (system-return)
 
 
 	Name:
@@ -59,13 +57,13 @@
 	int getpwds(ustat *sbp,char *pwbuf,int pwlen) noex
 
 	Arguments:
-	sbp		ustat block pointer to receive result
-	pwbuf		present-working buffer pointer
-	pwlen		prsent-working buffer length
+	sbp		STAT block pointer to receive result
+	pwbuf		- result buffer pointer
+	pwlen		- result buffer length
 
 	Returns:
-	>=0	length of returned string in user buffer
-	<0	error (system-return)
+	>=0		length of returned string in user buffer
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -75,9 +73,9 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<bufsizevar.hh>
-#include	<getx.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<sncpyx.h>
+#include	<snwcpy.h>		/* <- currently unused */
 #include	<isnot.h>		/* isNotPresent(3uc)| */
 #include	<localmisc.h>
 
@@ -98,16 +96,25 @@ import uconstants ;			/* |varname(3u)| */
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_stat		(int,ustat *) noex ;
-    extern int uc_getcwd	(char *,int) noex ;
-}
-
 
 /* external variables */
 
 
 /* local structures */
+
+namespace {
+    struct getter ;
+    typedef int (getter::*getter_m)() noex ;
+    struct getter {
+	ustat	*sbp ;
+	char	*pwbuf ;
+	int	pwlen ;
+	getter(ustat *s,char *b,int l) noex : sbp(s), pwbuf(b), pwlen(l) { } ;
+	int getenv() noex ;
+	int getcwd() noex ;
+	operator int () noex ;
+    } ; /* end struct (getter) */
+} /* end namespace */
 
 
 /* forward references */
@@ -115,7 +122,10 @@ extern "C" {
 
 /* local variables */
 
-static bufsizevar	maxpathlen(bufsize_mp) ;
+constexpr getter_m	mgets[] = {
+    	&getter::getenv,
+    	&getter::getcwd
+} ; /* end array (gets) */
 
 
 /* exported variables */
@@ -130,43 +140,66 @@ int getpwd(char *pwbuf,int pwlen) noex {
 
 int getpwds(ustat *sbp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_FAULT ;
-	int		pl = 0 ;
 	if (pwbuf) {
+	    rs = SR_INVALID ;
 	    pwbuf[0] = '\0' ;
-	    if ((rs = maxpathlen) >= 0) {
-		static cchar	*pwd = getenver(varname.pwd) ;
-	        if (pwlen < 0) pwlen = rs ;
-	        if (pwd != nullptr) {
-	            ustat	*ssbp, sb1, sb2 ;
-	            if ((rs = u_stat(pwd,&sb1)) >= 0) {
-		        ssbp = (sbp) ? sbp : &sb2 ;
-	                if ((rs = u_stat(".",ssbp)) >= 0) {
-			    bool	f = true ;
-	                    f = f && (sb1.st_dev == ssbp->st_dev) ;
-			    f = f && (sb1.st_ino == ssbp->st_ino) ;
-			    if (f) {
-		                rs = sncpy(pwbuf,pwlen,pwd) ;
-			        pl = rs ;
-		            }
-			} else if (isNotPresent(rs)) {
-			    rs = SR_OK ;
-	                } /* end if (stat) */
-		    } else if (isNotPresent(rs)) {
-			rs = SR_OK ;
-	            } /* end if (stat) */
-	        } /* end if (quickie) */
-	        if ((rs >= 0) && (pl == 0)) {
-	            if ((rs = uc_getcwd(pwbuf,pwlen)) >= 0) {
-	                pl = rs ;
-	                if (sbp) {
-		            rs = u_stat(pwbuf,sbp) ;
-		        }
-	            }
-	        } /* end if (longer) */
-	    } /* end if (maxpathlen) */
+	    if (pwlen > 0) {
+	        getter go(sbp,pwbuf,pwlen) ;
+	        rs = go ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? pl : rs ;
+	return rs ;
 }
 /* end subroutine (getpwds) */
+
+
+/* local subroutines */
+
+getter::operator int () noex {
+    	int	rs = SR_OK ;
+	for (cauto &e : mgets) {
+	    rs = (this->*e)() ;
+	    if (rs) break ;
+	} /* end for */
+	return rs ;
+} /* end method (getter::operator) */
+
+int getter::getenv() noex {
+	static cchar	*pwd = getenver(varname.pwd) ;
+    	int		rs = SR_OK ;
+	int		pl = 0 ; /* return-value */
+        if (pwd) {
+            ustat       *ssbp, sb1, sb2 ;
+            if ((rs = u_stat(pwd,&sb1)) >= 0) {
+                ssbp = (sbp) ? sbp : &sb2 ;
+                if ((rs = u_stat(".",ssbp)) >= 0) {
+                    bool        f = true ;
+                    f = f && (sb1.st_dev == ssbp->st_dev) ;
+                    f = f && (sb1.st_ino == ssbp->st_ino) ;
+                    if (f) {
+                        rs = sncpy(pwbuf,pwlen,pwd) ;
+                        pl = rs ;
+                    }
+                } else if (isNotPresent(rs)) {
+                    rs = SR_OK ;
+                } /* end if (stat) */
+            } else if (isNotPresent(rs)) {
+                rs = SR_OK ;
+            } /* end if (stat) */
+        } /* end if (quickie) */
+	return (rs >= 0) ? pl : rs ;
+} /* end method (getter::getenv) */
+
+int getter::getcwd() noex {
+    	int		rs ;
+	int		pl = 0 ; /* return-value */
+	if ((rs = u_getcwd(pwbuf,pwlen)) >= 0) {
+	    pl = rs ;
+	    if (sbp) {
+		rs = u_stat(pwbuf,sbp) ;
+	    }
+	} /* end if (getcwd) */
+	return (rs >= 0) ? pl : rs ;
+} /* end method (getter::getcwd) */
 
 
