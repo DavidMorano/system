@@ -172,8 +172,6 @@ import ureserve ;			/* |vecstr(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -421,9 +419,9 @@ local int getxusername_self(getxuser *xup) noex {
 	int		len = 0 ; /* return-value */
 	xup->unl = 0 ;
 	if (xup->f_self && (! xup->f_tried)) {
+	    const uid_t	uid = xup->uid ;
 	    char	*ubuf = xup->ubuf ;
 	    cint	ulen = xup->ulen ;
-	    const uid_t	uid = xup->uid ;
 	    if ((rs = ucproguser_nameget(ubuf,ulen,uid)) > 0) {
 		xup->unl = rs ;
 		len = rs ;
@@ -433,8 +431,7 @@ local int getxusername_self(getxuser *xup) noex {
 	    } /* end if (ucproguser_nameget) */
 	} /* end if (self) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getxusername_self) */
+} /* end subroutine (getxusername_self) */
 
 local int getxusername_varenv(getxuser *xup) noex {
 	int		rs = SR_OK ;
@@ -469,8 +466,7 @@ local int getxusername_varenv(getxuser *xup) noex {
 	    if (rs != 0) break ;
 	} /* end for */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getxusername_varenv) */
+} /* end subroutine (getxusername_varenv) */
 
 local int getxusername_utmp(getxuser *xup) noex {
 	int		rs = SR_OK ;
@@ -519,8 +515,7 @@ local int getxusername_utmp(getxuser *xup) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getxusername_utmp) */
+} /* end subroutine (getxusername_utmp) */
 
 local int getxusername_map(getxuser *xup) noex {
 	const uid_t	uid = xup->uid ;
@@ -540,8 +535,7 @@ local int getxusername_map(getxuser *xup) noex {
 	    }
 	} /* end if (match) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getxusername_map) */
+} /* end subroutine (getxusername_map) */
 
 local int getxusername_uid(getxuser *xup) noex {
     	char		*pwbuf = xup->pwbuf ;
@@ -561,8 +555,7 @@ local int getxusername_uid(getxuser *xup) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getxusername_uid) */
+} /* end subroutine (getxusername_uid) */
 
 local int getxusername_varbase(getxuser *xup,cchar *vv) noex {
 	int		rs = SR_OK ;
@@ -586,8 +579,7 @@ local int getxusername_varbase(getxuser *xup,cchar *vv) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getxusername_varbase) */
+} /* end subroutine (getxusername_varbase) */
 
 local int getxusername_lookup(getxuser *xup,cchar *sp) noex {
     	vecstr		*nlp = vecstrp(xup->nlp) ;
@@ -609,8 +601,7 @@ local int getxusername_lookup(getxuser *xup,cchar *sp) noex {
 	    }
 	} /* end if (search) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (getxusername_lookup) */
+} /* end subroutine (getxusername_lookup) */
 
 #ifdef	COMMENT
 local int logpop(uid_t uid) noex {
@@ -624,8 +615,7 @@ local int logpop(uid_t uid) noex {
 	fmt = "%-23s p=%d u=%u ef=%s\n" ;
 	rs = nprintf(DEBFNAME,fmt,timebuf,pid,uid,pp) ;
 	return rs ;
-}
-/* end subroutine (logpop) */
+} /* end subroutine (logpop) */
 #endif /* COMMENT */
 
 
