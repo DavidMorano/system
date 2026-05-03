@@ -115,7 +115,7 @@ int getnodename(char *nbuf,int nlen) noex {
 	if (nbuf) {
 	    nodeinfo	ni(nbuf,nlen) ;
 	    rs = ni ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (getnodename) */
@@ -130,8 +130,7 @@ nodeinfo::operator int () noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (nodeinfo::operator) */
+} /* end method (nodeinfo::operator) */
 
 int nodeinfo::env() noex {
 	int		rs = SR_OK ;
@@ -147,8 +146,7 @@ int nodeinfo::env() noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (nodeinfo::env) */
+} /* end method (nodeinfo::env) */
 
 int nodeinfo::uinfo() noex {
 	int		rs ;
@@ -157,7 +155,6 @@ int nodeinfo::uinfo() noex {
 	    rs = snwcpy(nbuf,nlen,uin.nodename,nl) ;
 	} /* end if (uinfo_name) */
 	return rs ;
-}
-/* end method (nodeinfo::uinfo) */
+} /* end method (nodeinfo::uinfo) */
 
 
