@@ -418,8 +418,7 @@ int uopen::init() noex {
 	    } /* end if */
 	} /* end if (not-voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (uopen_init) */
+} /* end subroutine (uopen_init) */
 
 int uopen::fini() noex {
 	int		rs = SR_OK ;
@@ -439,8 +438,7 @@ int uopen::fini() noex {
 	    finitdone = false ;
 	} /* end if (atexit registered) */
 	return rs ;
-}
-/* end method (uopen::fini) */
+} /* end method (uopen::fini) */
 
 int uopen::ilockbegin() noex {
 	int		rs ;
@@ -448,28 +446,23 @@ int uopen::ilockbegin() noex {
 	    rs = mx.lockbegin ;
 	}
 	return rs ;
-}
-/* end subroutine (uopen::ilockbegin) */
+} /* end subroutine (uopen::ilockbegin) */
 
 int uopen::ilockend() noex {
     	return mx.lockend ;
-}
-/* end subroutine (uopen::ilockend) */
+} /* end subroutine (uopen::ilockend) */
 
 local void uopen_atforkbefore() noex {
 	uopen_data.forkbefore() ;
-}
-/* end subroutine (uopen_atforkbefore) */
+} /* end subroutine (uopen_atforkbefore) */
 
 local void uopen_atforkafter() noex {
 	uopen_data.forkafter() ;
-}
-/* end subroutine (uopen_atforkafter) */
+} /* end subroutine (uopen_atforkafter) */
 
 local void uopen_exit() noex {
 	uopen_data.exitnow() ;
-}
-/* end subroutine (uopen_exit) */
+} /* end subroutine (uopen_exit) */
 
 int stdcaller::callready(cchar *fn,int of,mode_t om) noex {
 	int		rs ;
@@ -492,8 +485,7 @@ int stdcaller::callready(cchar *fn,int of,mode_t om) noex {
 	} /* end if (usigblock) */
 	if (rs < 0) fderror(fd) ;
 	return (rs >= 0) ? fd : rs ;
-}
-/* end method (stdcaller::callready) */
+} /* end method (stdcaller::callready) */
 
 int stdcaller::callstd(cchar *fn,int of,mode_t om) noex {
 	int		rs ;
@@ -502,8 +494,7 @@ int stdcaller::callstd(cchar *fn,int of,mode_t om) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (stdcaller::callstd) */
+} /* end method (stdcaller::callstd) */
 
 int stdcaller::loopcall(cchar *fn,int of,mode_t om) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
@@ -573,8 +564,7 @@ int stdcaller::loopcall(cchar *fn,int of,mode_t om) noex {
 	    }
 	} /* end if_constexpr (f_sunos) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end method (stdcaller::loopcall) */
+} /* end method (stdcaller::loopcall) */
 
 int stdcaller::iopen(cchar *fn,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
@@ -587,8 +577,7 @@ int stdcaller::iopen(cchar *fn,int of,mode_t om) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (stdcaller::iopen) */
+} /* end method (stdcaller::iopen) */
 
 int stdcaller::iopenat(cchar *fn,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
@@ -601,8 +590,7 @@ int stdcaller::iopenat(cchar *fn,int of,mode_t om) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (stdcaller::iopenat) */
+} /* end method (stdcaller::iopenat) */
 
 int stdcaller::isocket(cchar *,int,mode_t) noex {
 	int		rs = SR_INVALID ;
@@ -612,8 +600,7 @@ int stdcaller::isocket(cchar *,int,mode_t) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (stdcaller::isocket) */
+} /* end method (stdcaller::isocket) */
 
 int stdcaller::iaccept(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
@@ -627,8 +614,7 @@ int stdcaller::iaccept(cchar *,int,mode_t) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (stdcaller::iaccept) */
+} /* end method (stdcaller::iaccept) */
 
 int stdcaller::idup1(cchar *,int,mode_t) noex {
 	int		rs ;
@@ -636,8 +622,7 @@ int stdcaller::idup1(cchar *,int,mode_t) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (stdcaller::idup1) */
+} /* end method (stdcaller::idup1) */
 
 int stdcaller::idupover(cchar *,int,mode_t) noex {
 	int		rs = SR_BADF ;
@@ -647,8 +632,7 @@ int stdcaller::idupover(cchar *,int,mode_t) noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (stdcaller::idupover) */
+} /* end method (stdcaller::idupover) */
 
 int stdcaller::idupmin(cchar *,int,mode_t) noex {
 	int		rs = SR_BADF ;
@@ -659,8 +643,7 @@ int stdcaller::idupmin(cchar *,int,mode_t) noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (stdcaller::idupmin) */
+} /* end method (stdcaller::idupmin) */
 
 int stdcaller::idupminer(cchar *,int of,mode_t) noex {
 	int		rs = SR_BADF ;
@@ -680,8 +663,7 @@ int stdcaller::idupminer(cchar *,int of,mode_t) noex {
 	    }
 	}
 	return (rs >= 0) ? fd : rs ;
-}
-/* end method (stdcaller::idupminer) */
+} /* end method (stdcaller::idupminer) */
 
 int stdcaller::isocketpair(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
@@ -694,8 +676,7 @@ int stdcaller::isocketpair(cchar *,int,mode_t) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (stdcaller::isocketpair) */
+} /* end method (stdcaller::isocketpair) */
 
 int stdcaller::ipipe(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
@@ -705,8 +686,7 @@ int stdcaller::ipipe(cchar *,int,mode_t) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (stdcaller::ipipe) */
+} /* end method (stdcaller::ipipe) */
 
 int stdcaller::ipipe2(cchar *,int of,mode_t) noex {
 	int		rs = SR_FAULT ;
@@ -716,8 +696,7 @@ int stdcaller::ipipe2(cchar *,int of,mode_t) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (stdcaller::ipipe2) */
+} /* end method (stdcaller::ipipe2) */
 
 int stdcaller::ipiper(cchar *,int of,mode_t) noex {
 	int		rs = SR_FAULT ;
@@ -727,8 +706,7 @@ int stdcaller::ipiper(cchar *,int of,mode_t) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (stdcaller::ipiper) */
+} /* end method (stdcaller::ipiper) */
 
 int stdcaller::iclose(cchar *,int,mode_t) noex {
 	int		rs = SR_BADF ;
@@ -738,8 +716,7 @@ int stdcaller::iclose(cchar *,int,mode_t) noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (stdcaller::iclose) */
+} /* end method (stdcaller::iclose) */
 
 /* internal only - no external interface */
 int stdcaller::icloseonexec(int fd) noex {
@@ -767,8 +744,7 @@ int stdcaller::icloseonexec(int fd) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end method (stdcaller::icloseonexec) */
+} /* end method (stdcaller::icloseonexec) */
 
 void stdcaller::fderror(int fd) noex {
 	switch (flavor) {
@@ -790,12 +766,11 @@ void stdcaller::fderror(int fd) noex {
 	default:
 	    break ;
 	} /* end switch */
-}
-/* end method (stdcaller::fderror) */
+} /* end method (stdcaller::fderror) */
 
 uopen_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case uopenmem_lockbegin:
 	        rs = op->ilockbegin() ;
@@ -806,7 +781,6 @@ uopen_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (uopen_co::operator) */
+} /* end method (uopen_co::operator) */
 
 
