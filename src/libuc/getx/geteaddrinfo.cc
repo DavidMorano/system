@@ -1,4 +1,4 @@
-/* geteaddrinfo SUPPORT */
+/* geteaddrinfo SUPPORT (Get-Effective-Address-Information) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	geaddrinfo
+	geteaddrinfo
 
 	Description:
 	This subroutine is used to get a canonical INET hostname
@@ -102,7 +102,7 @@ import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 #define	ARI		arginfo
 
 #define	SI		subinfo
-#define	SI_FL		subinfo_flags
+#define	SI_FL		subinfo_fl
 
 
 /* imported namespaces */
@@ -129,12 +129,12 @@ struct arginfo {
 	cchar		*svcname ;
 	ADDRINFO	*hintp ;
 	ADDRINFO	**rpp ;
-} ;
+} ; /* end struct */
 
-struct subinfo_flags {
+struct subinfo_fl {
 	uint		inetaddr:1 ;
 	uint		inetaddr_init:1 ;
-} ;
+} ; /* end struct */
 
 struct subinfo {
 	arginfo		*aip ;		/* user argument (hint) */
@@ -142,21 +142,23 @@ struct subinfo {
 	cchar		*domainname ;	/* dynamically determined */
 	SI_FL		fl ;
 	int		rs_last ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
+typedef int (*subinfo_f)(SI *) noex ;
+
 local int	arginfo_load(ARI *,cc *,cc *,AI *,AI **) noex ;
 
-local int	subinfo_start(SI *,char *,ARI *) noex ;
-local int	subinfo_domain(SI *) noex ;
-local int	subinfo_finish(SI *) noex ;
+local int	subinfo_start	(SI *,char *,ARI *) noex ;
+local int	subinfo_domain	(SI *) noex ;
+local int	subinfo_finish	(SI *) noex ;
 
-local int	try_straight(SI *) noex ;
-local int	try_add(SI *) noex ;
-local int	try_rem(SI *) noex ;
-local int	try_remlocal(SI *) noex ;
+local int	try_straight	(SI *) noex ;
+local int	try_add		(SI *) noex ;
+local int	try_rem		(SI *) noex ;
+local int	try_remlocal	(SI *) noex ;
 
 
 /* external variables */
@@ -164,13 +166,13 @@ local int	try_remlocal(SI *) noex ;
 
 /* local variables */
 
-static constexpr int	(*tries[])(SI *) = {
+constexpr subinfo_f	tries[] = {
 	try_straight,
 	try_add,
 	try_rem,
 	try_remlocal,
 	nullptr
-} ;
+} ; /* end array (tries) */
 
 static bufsizevar		maxhostlen(bufsize_hn) ;
 
@@ -191,7 +193,7 @@ int geteaddrinfo(cc *hn,cc *svc,AI *hintp,char *ehostname,AI **rpp) noex {
 	            for (int i = 0 ; tries[i] ; i += 1) {
 	                rs = (*tries[i])(&mi) ;
 		        c = rs ;
-	                if (rs != 0) break ;
+	                if (rs) break ;
 	            } /* end for */
 	            rs_last = mi.rs_last ;
 	            rs1 = subinfo_finish(&mi) ;
