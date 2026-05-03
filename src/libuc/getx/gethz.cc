@@ -117,7 +117,7 @@ constexpr hzmgr_m	mems[] = {
 	&hzmgr::tryconst,
 	&hzmgr::trytck,
 	&hzmgr::tryguess
-} ; /* end array */
+} ; /* end array (mems) */
 
 
 /* forward references */
@@ -168,7 +168,7 @@ int hzmgr::getany(int w) noex {
 int hzmgr::tryenv(int w) noex {
 	int		rs = SR_OK ;
 	if ((hz == 0) && ((w == gethz_any) || (w == gethz_env))) {
-	    static cchar	*val = getenver(varname.hz) ;
+	    static cchar *val = getenver(varname.hz) ;
 	    if (val) {
 	        if ((rs = decval(val)) > 0) {
 	            hz = rs ;
