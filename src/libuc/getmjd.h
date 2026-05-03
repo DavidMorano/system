@@ -24,6 +24,23 @@
 #include	<usysbase.h>
 
 
+enum mons {
+	mon_jan,
+	mon_feb,
+	mon_mar,
+	mon_apr,
+	mon_may,
+	mon_jun,
+	mon_jul,
+	mon_aug,
+	mon_sep,
+	mon_oct,
+	mon_nov,
+	mon_dec,
+	mon_overlast
+} ; /* end enum (mons) */
+
+
 EXTERNC_begin
 
 extern int	getmjd(int,int,int) noex ;
