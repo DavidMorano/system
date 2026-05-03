@@ -191,7 +191,7 @@ objd.o:			$(OBJD)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-systypenames.o:		systypenames.c		systypenames.h		$(INCS)
+systypenames.o:		systypenames.cc		systypenames.h		$(INCS)
 getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
 
 getaddr.o:		getaddr.cc		getaddr.h		$(INCS)
