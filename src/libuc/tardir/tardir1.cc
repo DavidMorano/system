@@ -50,10 +50,6 @@ import fonce ;
 
 /* local defines */
 
-#ifndef	CF_DEBUG
-#define	CF_DEBUG	0		/* debugging */
-#endif
-
 
 /* imported namespaces */
 
