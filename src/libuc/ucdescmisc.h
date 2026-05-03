@@ -36,20 +36,18 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* types? */
 #include	<fcntl.h>		/* types? */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<stddef.h>		/* |nullptr_t| */
+#include	<stdlib.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
 
-
-EXTERNC_begin
-
-extern int	uc_seeko	(int,off_t,int,off_t *) noex ;
-extern int	uc_fcntl	(int,int,...) noex ;
-extern int	uc_ioctl	(int,int,...) noex ;
-extern int	uc_tell		(int,off_t *) noex ;
-
-EXTERNC_end
+#include	<ucdescmiscers.h>
+#include	<uccloseonexec.h>
+#include	<ucftruncate.h>
+#include	<ucfminmod.h>
+#include	<ucfstat.h>
+#include	<ucnonblock.h>
+#include	<ucclose.h>
 
 
 #endif /* UCDESCMISC_INCLUDE */
