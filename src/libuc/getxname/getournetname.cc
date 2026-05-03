@@ -154,7 +154,6 @@ local int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	    rs = SR_UNAVAIL ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getothernetname) */
+} /* end subroutine (getothernetname) */
 
 
