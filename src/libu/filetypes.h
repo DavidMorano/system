@@ -111,7 +111,17 @@ local inline filetypes filetype(mode_t m) noex {
 
 EXTERNC_end
 
-extern cpcchar		filetypes_names[] ;
+#ifdef	__cplusplus
+
+struct filetyper {
+    	cchar	*name[filetype_overlast + 1] ;
+	consteval void mkname() noex ;
+	consteval filetyper() noex ;
+} ; /* end struct */
+
+extern const filetyper	filetype_data ;
+
+#endif /* __cplusplus */
 
 
 #endif /* FILETYPES_INCLUDE */
