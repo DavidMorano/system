@@ -92,12 +92,6 @@ extern "C" {
     extern int uc_write(int,cvoid *,int) noex ;
 }
 
-extern "C" {
-    int uc_mmapbegin(void *,size_t,int,int,int,off_t,void **) noex ;
-    int uc_mmapend(void *,size_t) noex ;
-    int uc_madvise(void *,size_t,int) noex ;
-}
-
 
 /* external variables */
 
@@ -201,9 +195,9 @@ int writer::copymaper(off_t fo,size_t ms) noex {
         int             rs ;
 	int		rs1 ;
         int             tlen = 0 ; /* return-value */
-        if (void *md ; (rs = uc_mmapbegin(np,ms,mp,mf,fd,fo,&md)) >= 0) {
+        if (void *md ; (rs = u_mmapbegin(np,ms,mp,mf,fd,fo,&md)) >= 0) {
             cint        cmd = MADV_SEQUENTIAL ;
-            if ((rs = uc_madvise(md,ms,cmd)) >= 0) ylikely {
+            if ((rs = u_madvise(md,ms,cmd)) >= 0) ylikely {
 		size_t	lsize = 0 ;
                 cchar   *lp = charp(md) ;
                 for (size_t ll = ms ; ll > 0 ; ) {
@@ -219,7 +213,7 @@ int writer::copymaper(off_t fo,size_t ms) noex {
 		} /* end for */
 		tlen = intsat(lsize) ;
             } /* end if (memory-advise) */
-            rs1 = uc_mmapend(md,ms) ;
+            rs1 = u_mmapend(md,ms) ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (map-file) */
 	return (rs >= 0) ? tlen : rs ;
