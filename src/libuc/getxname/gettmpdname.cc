@@ -82,14 +82,14 @@ import uconstants ;
 
 /* exported subroutines */
 
-cchar *gettmpdnamex(mainv envv) noex {
+cchar *gettmpdnamex(con mainv envv) noex {
 	cchar		*vn = varname.tmpdir ;
 	cchar		*vp = nullptr ;
 	if (envv) {
 	    vp = getourenv(envv,vn) ;
 	}
 	if ((vp == nullptr) || (vp[0] == '\0')) {
-	    static cchar	*tmpval = getenver(vn) ;
+	    static cchar *tmpval = getenver(vn) ;
 	    vp = tmpval ;
 	}
 	if ((vp == nullptr) || (vp[0] == '\0')) {
