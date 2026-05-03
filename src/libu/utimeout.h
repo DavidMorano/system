@@ -54,7 +54,7 @@ extern int	utimeout[] ;
 
 EXTERNC_begin
 
-extern int u_timeout(int,int) noex ;
+extern int	u_timeout(int,int) noex ;
 
 EXTERNC_end
 
