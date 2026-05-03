@@ -25,6 +25,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>
