@@ -259,8 +259,7 @@ ucaller::operator int () noex {
             } /* end if (error) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (ucaller::operator) */
+} /* end subroutine (ucaller::operator) */
 
 sysret_t ucaller::stdatfork() noex {
 	int		rs ;
@@ -268,8 +267,7 @@ sysret_t ucaller::stdatfork() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaller::stdatfork) */
+} /* end method (ucaller::stdatfork) */
 
 sysret_t ucaller::stdatexit() noex {
 	int		rs ;
@@ -277,8 +275,7 @@ sysret_t ucaller::stdatexit() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaller::stdatexit) */
+} /* end method (ucaller::stdatexit) */
 
 sysret_t ucaller::stdstat() noex {
     	ustat		*p = cast_static<ustat *>(sbp) ;
@@ -287,8 +284,7 @@ sysret_t ucaller::stdstat() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaller::stdstat) */
+} /* end method (ucaller::stdstat) */
 
 sysret_t ucaller::stdstatfs() noex {
     	ustatfs		*p = cast_static<ustatfs *>(sbp) ;
@@ -297,8 +293,7 @@ sysret_t ucaller::stdstatfs() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaller::stdstatfs) */
+} /* end method (ucaller::stdstatfs) */
 
 sysret_t ucaller::stdstatvfs() noex {
     	ustatvfs	*p = cast_static<ustatvfs *>(sbp) ;
@@ -307,21 +302,19 @@ sysret_t ucaller::stdstatvfs() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaller::stdstatvfs) */
+} /* end method (ucaller::stdstatvfs) */
 
 sysret_t ucaller::stdgetcwd() noex {
     	cnullptr	np{} ;
     	csize		rsize = size_t(rlen) ;
-	int		rs = SR_OK ;
+	int		rs ;
 	if (char *rp ; (rp = getcwd(rbuf,(rsize + 1))) != np) {
 	    rs = lenstr(rp) ;
 	} else {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaller::stdgetcwd) */
+} /* end method (ucaller::stdgetcwd) */
 
 sysret_t ucaller::stdaccess() noex {
 	int		rs ;
@@ -329,7 +322,6 @@ sysret_t ucaller::stdaccess() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaller::stdaccess) */
+} /* end method (ucaller::stdaccess) */
 
 
