@@ -221,7 +221,7 @@ int uatfork_head::init() noex {
 	        auto lamb = [this] () -> int {
 	            int		rsl = SR_OK ;
 	            if (!finit) {
-		        rsl = SR_LOCKLOST ;		/* <- failure */
+		        rsl = SR_LOCKFAIL ;		/* <- failure */
 	            } else if (finitdone) {
 		        rsl = 1 ;			/* <- OK ready */
 	            }
