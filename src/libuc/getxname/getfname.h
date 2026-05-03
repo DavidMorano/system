@@ -24,17 +24,22 @@
 #include	<usysbase.h>
 
 
+enum getfnames {
+    	getfname_local,
+    	getfname_root,
+    	getfname_overlast
+} ; /* end enum (getfnames) */
+
 #ifndef	GETFNAME_TYPELOCAL
 #define	GETFNAME_TYPEUNKNOWN	-1
-#define	GETFNAME_TYPELOCAL	0
-#define	GETFNAME_TYPEROOT	1
+#define	GETFNAME_TYPELOCAL	getfname_local
+#define	GETFNAME_TYPEROOT	getfname_root
 #endif
-
 
 #ifdef	__cplusplus
 
 extern "C" {
-    extern int getfname(cchar *,char *,int,cchar *,int = 0) noex ;
+    extern int getfname(cc *,char *,getfnames,cc *,int = 0) noex ;
 }
 
 #else /* __cplusplus */
