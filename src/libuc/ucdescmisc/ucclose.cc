@@ -1,0 +1,93 @@
+/* ucclose */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* interface component for UNIX® library-3c */
+/* higher-level "close" */
+
+
+/* revision history:
+
+	= 1998-04-13, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Filename formats:
+
+	UNIX® domain sockets have the format:
+		/filepath
+
+	where:
+		filepath
+
+	is just a regular UNIX® file path to the socket file.
+
+	All other protocols have the format:
+		/proto/protofamily/protoname/host/service
+
+	where:
+		proto		constant name 'proto'
+		protofamily	protocol family
+					inet
+					inet6
+		protoname	protocol name
+					tcp
+					udp
+		host		hostname of remote host to contact
+		service		service within the specified 
+					daytime
+
+
+	Examples:
+	/something/unix/domain/socket
+	/proto/inet/tcp/rca/daytime
+	/proto/inet/udp/rca/daytime
+	/proto/inet6/udp/rca/daytime
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
+
+#include	"ucclose.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int uc_close(int fd) noex {
+	return u_close(fd) ;
+}
+/* end subroutine (uc_close) */
+
+
