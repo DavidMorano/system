@@ -69,6 +69,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<getfdfile.h>
 #include	<intsat.h>
 #include	<filer.h>
@@ -99,7 +100,6 @@ using std::max ;			/* subroutine-template */
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
     extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_close(int) ;
 } /* end extern */
 
 
