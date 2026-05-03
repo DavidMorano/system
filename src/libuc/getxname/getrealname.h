@@ -2,9 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* subroutines to access the 'passwd' and 'group' databases */
+/* retrieve the real name of the user from the system */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-10-01, David A­D­ Morano
+	This was writen for RightCore Network Services.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
