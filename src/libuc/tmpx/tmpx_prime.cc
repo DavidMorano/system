@@ -65,6 +65,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<utmpacc.h>
 #include	<getfdfile.h>
 #include	<opentmp.h>
@@ -106,7 +107,6 @@ extern "C" {
     extern int uc_duper(int,int) noex ;
     extern int uc_fstat(int,ustat *) noex ;
     extern int uc_closeonexec(int,int) noex ;
-    extern int uc_close(int) ;
     extern int uc_pipe(int *) noex ;
 }
 
