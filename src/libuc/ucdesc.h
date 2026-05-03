@@ -55,10 +55,11 @@
 #include	<usysbase.h>
 
 #include	<ucdescbase.hh>
+#include	<ucdescmisc.h>
 #include	<ucdescread.h>
 #include	<ucdescwrite.h>
 #include	<ucdescsock.h>
-#include	<ucdescmisc.h>
+#include	<ucclose.h>
 
 
 #endif /* UCDESC_INCLUDE */
