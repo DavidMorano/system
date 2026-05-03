@@ -78,8 +78,8 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<uclustername.h>
 #include	<uclibmem.h>
+#include	<ucclustername.h>
 #include	<getbufsize.h>
 #include	<getnodename.h>
 #include	<nodedb.h>
@@ -143,7 +143,7 @@ struct subinfo {
 	cchar		*nn ;
 	char		*rbuf ;
 	int		rlen ;
-} ;
+} ; /* end struct (subinfo) */
 
 namespace {
     struct searcher {
@@ -163,7 +163,7 @@ namespace {
 	int		entlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -247,7 +247,7 @@ namespace libuc {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (prgetclustername) */
-}
+} /* end namespace (libuc) */
 
 
 /* local subroutines */
@@ -257,7 +257,7 @@ int searcher::getprs() noex {
 	int		rs1 ;
 	int		len = 0 ;
         if (ids id ; (rs = id.load) >= 0) {
-            if (char *pbuf{} ; (rs = lm_mp(&pbuf)) >= 0) {
+            if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
                 cint    am = R_OK ;
                 for (cauto &pr : prs) {
                     if ((rs = mkpath(pbuf,nodefname)) >= 0) {
@@ -277,8 +277,7 @@ int searcher::getprs() noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (ids) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (searcher::getprs) */
+} /* end method (searcher::getprs) */
 
 local int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *nn) noex {
 	int		rs = SR_FAULT ;
@@ -290,8 +289,7 @@ local int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *nn) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
@@ -299,26 +297,23 @@ local int subinfo_finish(SI *sip) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 local int subinfo_cacheget(SI *sip) noex {
-	return uclustername_get(sip->rbuf,sip->rlen,sip->nn) ;
-}
-/* end subroutine (getsubinfo_cacheget) */
+	return ucclustername_get(sip->rbuf,sip->rlen,sip->nn) ;
+} /* end subroutine (getsubinfo_cacheget) */
 
 local int subinfo_cacheset(SI *sip) noex {
 	cint		ttl = TO_TTL ;
-	return uclustername_set(sip->rbuf,sip->rlen,sip->nn,ttl) ;
-}
-/* end subroutine (subinfo_cacheset) */
+	return ucclustername_set(sip->rbuf,sip->rlen,sip->nn,ttl) ;
+} /* end subroutine (subinfo_cacheset) */
 
 local int subinfo_ndb(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	cchar		*pr = sip->pr ;
-	if (char *tbuf{} ; (rs = lm_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) {
 		rs = subinfo_ndber(sip,tbuf) ;
 		len = rs ;
@@ -327,8 +322,7 @@ local int subinfo_ndb(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_ndb) */
+} /* end subroutine (subinfo_ndb) */
 
 local int subinfo_ndber(SI *sip,cchar *nfn) noex {
     	int		rs ;
@@ -339,7 +333,7 @@ local int subinfo_ndber(SI *sip,cchar *nfn) noex {
 	char		*rbuf = sip->rbuf ;
         if (nodedb st ; (rs = nodedb_open(&st,nfn)) >= 0) {
 	    cint	elen = st.entbuflen ;
-	    if (char *ebuf{} ; (rs = lm_mall((elen + 1),&ebuf)) >= 0) {
+	    if (char *ebuf ; (rs = lm_mall((elen + 1),&ebuf)) >= 0) {
 		cauto curbegin = nodedb_curbegin ;
                 if (nodedb_cur cur ; (rs = curbegin(&st,&cur)) >= 0) {
                     nodedb_ent  ste ;
@@ -369,8 +363,7 @@ local int subinfo_ndber(SI *sip,cchar *nfn) noex {
                 rs = SR_OK ;
         } /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end if (subinfor_ndber) */
+} /* end if (subinfor_ndber) */
 
 local int subinfo_cdb(SI *sip) noex {
 	cint		rlen = sip->rlen ;
@@ -380,7 +373,7 @@ local int subinfo_cdb(SI *sip) noex {
 	cchar		*pr = sip->pr ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-	if (char *tbuf{} ; (rs = lm_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
 	    if ((rs = mkpath2(tbuf,pr,clusterfname)) >= 0) {
 		cnullptr	np{} ;
@@ -408,8 +401,7 @@ local int subinfo_cdb(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_cdb) */
+} /* end subroutine (subinfo_cdb) */
 
 int searcher::start() noex {
     	int		rs = SR_OK ;
@@ -427,8 +419,7 @@ int searcher::start() noex {
 	    } /* end if (memory-allocation) */
 	} /* end if ('nodename' was NULL) */
 	return rs ;
-}
-/* end method (search::start) */
+} /* end method (search::start) */
 
 int searcher::finish() noex {
     	int		rs = SR_OK ;
@@ -439,8 +430,7 @@ int searcher::finish() noex {
 	    a = nullptr ;
 	}
 	return rs ;
-}
-/* end method (search::finish) */
+} /* end method (search::finish) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -448,7 +438,6 @@ vars::operator int () noex {
 	    entlen = (rs * ENTLENMULT) ;
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
