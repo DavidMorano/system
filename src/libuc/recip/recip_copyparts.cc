@@ -34,7 +34,8 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<ucdescwrite.h>
+#include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<localmisc.h>
 
 #include	"recip.h"
@@ -44,10 +45,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_seek(int,off_t,int) noex ;
-}
 
 
 /* external variables */
