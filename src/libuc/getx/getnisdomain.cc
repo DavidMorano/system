@@ -59,10 +59,11 @@
 
 #include	"getnisdomain.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
-
-#define	VARNISDOMAIN	"NISDOMAIN"
 
 #define	NISFN		"/etc/defaultdomain"
 
@@ -70,7 +71,6 @@
 /* imported namespaces */
 
 using libu::ugetnisdom ;		/* subroutine */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -86,7 +86,7 @@ using std::nothrow ;			/* constant */
 
 namespace {
     struct nisfind {
-	char		*rbuf  ;
+	char		*rbuf ;
 	int		rlen ;
 	nisfind(char *b,int l) noex : rbuf(b), rlen(l) { } ;
 	operator int () noex ;
@@ -106,13 +106,11 @@ local int	nisfile(char *,int,cchar *) noex ;
 
 /* local variables */
 
-constexpr nisfind_m	mems[] = {
+constexpr nisfind_m	tries[] = {
 	&nisfind::tryenv,
 	&nisfind::tryget,
 	&nisfind::tryfile
-} ; /* end array (mems) */
-
-constexpr cchar		vn[] = VARNISDOMAIN ;
+} ; /* end array (tries) */
 
 
 /* exported variables */
@@ -139,15 +137,15 @@ int getnisdomain(char *rbuf,int rlen) noex {
 
 nisfind::operator int () noex {
 	int		rs = SR_OK ;
-	for (cauto &m : mems) {
+	for (cauto &m : tries) {
 	    rs = (this->*m)() ;
-	    if (rs != 0) break ;
+	    if (rs) break ;
 	} /* end for */
 	return rs ;
 } /* end method (nisfind::operator) */
 
 int nisfind::tryenv() noex {
-	static cchar	*val = getenver(vn) ;
+	static cchar	*val = getenver(varname.nisdomain) ;
 	int		rs = SR_OK ;
 	if (val && val[0]) {
 	    rs = sncpy(rbuf,rlen,val) ;
