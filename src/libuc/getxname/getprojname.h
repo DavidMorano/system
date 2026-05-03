@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get a project name from the system account database */
+/* get a project name from the system */
 /* version %I% last-modified %G% */
 
 
