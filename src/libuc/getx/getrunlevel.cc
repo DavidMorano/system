@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-18, David A­D­ Morano
+	= 1998-03-21, David A­D­ Morano
 	This subroutine was written to simplify getting the current
 	"run-level" of the system.
 
@@ -71,7 +71,7 @@
 
 /* forward references */
 
-static int	getrunlevel_tmpx(cchar *) noex ;
+local int	getrunlevel_tmpx(cchar *) noex ;
 
 
 /* local variables */
@@ -96,7 +96,7 @@ int getrunlevel(cchar *utmpfname) noex {
 
 /* local subroutines */
 
-static int getrunlevel_tmpx(cchar *utmpfname) noex {
+local int getrunlevel_tmpx(cchar *utmpfname) noex {
     	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
@@ -110,7 +110,6 @@ static int getrunlevel_tmpx(cchar *utmpfname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (tmpx) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (getrunlevel) */
+} /* end subroutine (getrunlevel) */
 
 
