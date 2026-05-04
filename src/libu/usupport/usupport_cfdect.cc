@@ -5,6 +5,7 @@
 /* convert from a decimal string with time codes on the end */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -43,15 +44,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
+#include	<bitset>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<intsat.h>		/* |intsat(3u)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>
+#include	<dprint.hh>		/* LIBU |DPRINT(3u)| */
 
 #include	"usupport_cfdect.hh"
 	
@@ -62,6 +66,7 @@ import ureserve ;			/* |sf{x}(3u)| */
 
 /* imported namespaces */
 
+using std::bitset ;			/* type */
 using libu::cfdec ;			/* subroutine */
 using libu::sialpha ;			/* subroutine */
 
@@ -77,6 +82,27 @@ using libu::sialpha ;			/* subroutine */
 
 /* local structures */
 
+constexpr char		chvals[] = "YMDWwdhms" ;
+
+namespace {
+    constexpr int	chtablen = (UCHAR_MAX + 1) ;
+    struct chvalid {
+	bitset<chtablen>	isval ;
+	consteval void mkisval() noex {
+	    for (cchar *cp = chvals ; *cp ; cp += 1) {
+		cint ch = mkchar(*cp) ;
+		isval.set(ch) ;
+	    } /* end for */
+	} ; /* end method (mkisval) */
+	consteval chvalid() noex {
+	    mkisval() ;
+	} ; /* end ctor */
+	int operator [] (int ch) const noex {
+	    return (isval[ch & UCHAR_MAX]) ? SR_OK : SR_INVALID ;
+	} ; /* end method (operator) */
+    } ; /* end struct (chvalie) */
+} /* end namespace */
+
 
 /* forward references */
 
@@ -84,6 +110,9 @@ local int	cfloop(cchar *,int,int *) noex ;
 
 
 /* local variables */
+
+constexpr chvalid	tabval ;
+const bool		f_debug	= CF_DEBUG ;
 
 
 /* exported variables */
@@ -127,6 +156,7 @@ namespace libu {
 template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 	int		rs = SR_OK ;
 	cchar		*cp ;
+	DPRINTF("ent sl=%d\n",sl) ;
 	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	    T		mf = 1 ;
 	    switch (mc) {
@@ -154,6 +184,7 @@ template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 	    case 0:			/* <- indicates no multiply character */
 	        break ;
 	    default:
+		DPRINTF("invalid code >%c<\n",mc) ;
 		rs = SR_NOMSG ;
 		break ;
 	    } /* end switch */
@@ -170,6 +201,7 @@ template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 	} else {
 	    rs = SR_INVALID ;
 	} /* end if (non-zero) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine-template (convert) */
 
@@ -177,12 +209,14 @@ local int cfloop(cchar *sp,int sl,int *rp) noex {
     	int		rs = SR_OK ;
 	int		res = 0 ; /* accumulated-result */
 	int		inc{} ;
+	DPRINTF("ent sl=%d sp=>%s<\n",sl,sp) ;
 	for (int si ; (rs >= 0) && (si = sialpha(sp,sl)) >= 0 ; ) {
-	    if (si > 0) {
-	        cint mch = mkchar(sp[si]) ;
-	        rs = convert(sp,si,mch,&inc) ;
-	        res += inc ;
-	    }
+	    if (cint mch = mkchar(sp[si]) ; (rs = tabval[mch]) >= 0) {
+	        if (si > 0) {
+	            rs = convert(sp,si,mch,&inc) ;
+	            res += inc ;
+	        } /* end if (non-zero positive) */
+	    } /* end if (valid) */
 	    sl -= (si + 1) ;
 	    sp += (si + 1) ;
 	} /* end for */
@@ -191,6 +225,7 @@ local int cfloop(cchar *sp,int sl,int *rp) noex {
 	    res += inc ;
 	}
 	*rp = res ;
+	DPRINTF("ret rs=%d v=%d\n",rs,res) ;
 	return rs ;
 } /* end subroutine (cfloop) */
 
