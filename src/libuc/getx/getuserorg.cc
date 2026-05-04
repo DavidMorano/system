@@ -51,12 +51,13 @@
 #include	<fcntl.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
+#include	<getx.h>		/* |getenver(3uc)| */
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
@@ -98,19 +99,19 @@ struct subinfo {
 	cchar		*un ;
 	char		*rbuf ;		/* user-supplied buffer */
 	int		rlen ;
-} ;
+} ; /* end sruct (subinfo) */
 
 
 /* forward references */
 
-static int	subinfo_start(SI *,cchar *,char *,int,cchar *) noex ;
-static int	subinfo_finish(SI *) noex ;
+local int	subinfo_start		(SI *,cchar *,char *,int,cchar *) noex ;
+local int	subinfo_finish		(SI *) noex ;
 
-static int	getuserorg_var(SI *) noex ;
-static int	getuserorg_home(SI *) noex ;
-static int	getuserorg_passwd(SI *) noex ;
+local int	getuserorg_var		(SI *) noex ;
+local int	getuserorg_home		(SI *) noex ;
+local int	getuserorg_passwd	(SI *) noex ;
 #if	CF_ORGSYS
-static int	getuserorg_sys(SI *) noex ;
+local int	getuserorg_sys		(SI *) noex ;
 #endif
 
 
@@ -198,7 +199,7 @@ int gethomeorg(char *rbuf,int rlen,cchar *hd) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SI *sip,cc *ofp,char *rbuf,int rlen,cc *un) noex {
+local int subinfo_start(SI *sip,cc *ofp,char *rbuf,int rlen,cc *un) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = memclear(sip) ;
@@ -208,19 +209,17 @@ static int subinfo_start(SI *sip,cc *ofp,char *rbuf,int rlen,cc *un) noex {
 	    sip->un = un ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SI *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
-static int getuserorg_var(SI *sip) noex {
+local int getuserorg_var(SI *sip) noex {
 	cchar		*vusername = varname.username ;
 	cchar		*vorganization = varname.organization ;
 	int		rs = SR_OK ;
@@ -228,23 +227,22 @@ static int getuserorg_var(SI *sip) noex {
 	cchar		*un = sip->un ;
 	bool		f = (un[0] == '-') ;
 	if (! f) {
-	    static cchar	*vun = getenv(vusername) ;
+	    static cchar	*vun = getenver(vusername) ;
 	    if (vun && vun[0]) {
 	        f = (strcmp(vun,un) == 0) ;
 	    }
 	}
 	if (f) {
-	    static cchar	*vorg = getenv(vorganization) ;
+	    static cchar	*vorg = getenver(vorganization) ;
 	    if (vorg && vorg[0]) {
 	        rs = sncpy1(sip->rbuf,sip->rlen,vorg) ;
 	        len = rs ;
 	    }
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getuserorg_var) */
+} /* end subroutine (getuserorg_var) */
 
-static int getuserorg_home(SI *sip) noex {
+local int getuserorg_home(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -259,11 +257,10 @@ static int getuserorg_home(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getuserorg_home) */
+} /* end subroutine (getuserorg_home) */
 
 /* this tries to retrieve from the PASSWD gecos field */
-static int getuserorg_passwd(SI *sip) noex {
+local int getuserorg_passwd(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -291,12 +288,11 @@ static int getuserorg_passwd(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getuserorg_passwd) */
+} /* end subroutine (getuserorg_passwd) */
 
 #if	CF_ORGSYS
 
-static int getuserorg_sys(SI *sip) noex {
+local int getuserorg_sys(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -309,8 +305,7 @@ static int getuserorg_sys(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getuserorg_sys) */
+} /* end subroutine (getuserorg_sys) */
 
 #endif /* CF_ORGSYS */
 
