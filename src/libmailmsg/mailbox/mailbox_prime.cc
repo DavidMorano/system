@@ -48,7 +48,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<ucdescwrite.h>
+#include	<ucdesc.h>
 #include	<uclock.h>
 #include	<sysval.hh>
 #include	<sigblocker.h>
@@ -143,7 +143,6 @@ extern "C" {
 extern "C" {
     extern int uc_ftruncate(int,off_t) noex ;
     extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
