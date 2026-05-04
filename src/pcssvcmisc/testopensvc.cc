@@ -36,8 +36,6 @@
 
 #define	VARDEBUGFNAME	"TESTOPENSVC_DEBUGFILE"
 
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	fbwrite(FILE *,const void *,int) ;
 
 #if	CF_DEBUGS
 extern int	debugopen(const char *) ;
@@ -47,9 +45,6 @@ extern int	debugprinthexblock(const char *,int,const void *,int) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern cchar 	*getourenv(cchar **,cchar *) ;
-
-extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
