@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* UNIX® Protocol-Family support */
+/* retrieve information about the current node */
 /* version %I% last-modified %G% */
 
 
