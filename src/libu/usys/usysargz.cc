@@ -33,7 +33,7 @@
 	-		the exec-name pointer or NULL (if not found)
 
 	Notes:
-	1. This subroutine helps (is itself a header object)
+	1. This subroutine helps (is itself a header object) to
 	facilitate retrieving or otherwise attempting to calculate
 	the full path-name of the executable file of the current
 	process.
@@ -60,7 +60,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usupport.h>		/* |libu::snwcpy(3u)| */
+#include	<usupport.h>		/* |libu::sncpy(3u)| */
 #include	<localmisc.h>
 
 #include	"usys_pathpid.h"	/* |usys:usys_namepid(3usys)| */
@@ -75,13 +75,12 @@ import libutil ;
 using libu::sncpy ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
 using std::call_once ;			/* subroutine */
-using std::nothrow ;			/* constant */
 
 cint		tlen = MAXPATH ;
 
-static void oncefunc(usys::usysargz *op) noex {
+local void oncefunc(usys::usysargz *op) noex {
 	op->initonce() ;
-}
+} /* end subroutine */
 
 namespace usys {
     usysargz::operator int () noex {
