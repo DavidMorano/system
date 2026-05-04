@@ -58,7 +58,6 @@
 #include	"usysargz.hh"		/* |usys:usysargz(3u)| */
 
 using usys::usysargz ;			/* type */
-using std::nothrow ;			/* constant */
 
 static usysargz		argz_data ;
 
