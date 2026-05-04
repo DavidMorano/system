@@ -28,13 +28,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/resource.h>
+#include	<sys/resource.h>	/* |RLIMIT_NOFILE| + |RLIM_INFINITY| */
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -46,7 +43,7 @@
 /* local defines */
 
 #ifndef	GETNFILE_MAXFD
-#define	GETNFILE_MAXFD	2048	/* our fake maximum limit */
+#define	GETNFILE_MAXFD		2048	/* our fake maximum limit */
 #endif
 
 
@@ -73,13 +70,16 @@
 int getnfile(int w) noex {
 	cint		cmd = RLIMIT_NOFILE ;
 	int		rs ;
-	int		nf = 0 ;
+	int		nf = 0 ; /* return-value */
 	if (RLIMIT lim{} ; (rs = u_getrlimit(cmd,&lim)) >= 0) {
+	    typeof(lim.rlim_cur) val{} ;
 	    switch (w) {
 	    case 0:
+	        val = lim.rlim_cur ;
 	        nf = int(lim.rlim_cur) ;
 		break ;
 	    case 1:
+		val = lim.rlim_max ;
 	        nf = int(lim.rlim_max) ;
 		break ;
 	    case 2:
@@ -89,8 +89,8 @@ int getnfile(int w) noex {
 		rs = SR_INVALID ;
 		break ;
 	    } /* end switch */
-	    if (rs >= 0) {
-  	        if (nf == RLIM_INFINITY) {
+	    if ((rs >= 0) && (w < 2)) {
+		if (val == RLIM_INFINITY) {
 		    nf = GETNFILE_MAXFD ;
 	        } else if (nf < 0) {
 		    nf = NOFILE ;
