@@ -100,7 +100,7 @@ namespace {
 	int ucsys() noex ;
 	int def() noex ;
     } ; /* end struct (procer) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -146,8 +146,7 @@ local int decout(cchar *valp) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (decout) */
+} /* end subroutine (decout) */
 
 int procer::locenv() noex {
 	int		rs = SR_OK ;
@@ -160,21 +159,19 @@ int procer::locenv() noex {
 	    } /* end if (selected) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (procer::locent) */
+} /* end method (procer::locent) */
 
 int procer::gloenv() noex {
 	cchar		*vn = varname.ncpu ;
 	int		rs = SR_OK ;
 	if ((w == w_all) || (w == w_gloenv)) {
-	    static cchar	*valp = getenver(vn) ;
+	    static cchar *valp = getenver(vn) ;
 	    if (valp) {
 		rs = decout(valp) ;
 	    } /* end if (global-environment) */
 	} /* end if (selected) */
 	return rs ;
-}
-/* end method (procer::gloent) */
+} /* end method (procer::gloent) */
 
 int procer::ucsys() noex {
 	int		rs = SR_OK ;
@@ -182,8 +179,7 @@ int procer::ucsys() noex {
 	    rs = uc_nprocessors(0) ;
 	} /* end if (selected) */
 	return rs ;
-}
-/* end method (procer::ucsys) */
+} /* end method (procer::ucsys) */
 
 int procer::def() noex {
 	int		rs = SR_OK ;
@@ -191,7 +187,6 @@ int procer::def() noex {
 	    rs = 1 ;
 	} /* end if (selected) */
 	return rs ;
-}
-/* end method (procer::def) */
+} /* end method (procer::def) */
 
 
