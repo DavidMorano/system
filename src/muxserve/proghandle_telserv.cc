@@ -5,7 +5,8 @@
 /* handle this service request */
 /* version %I% last-modified %G% */
 
-#define	P_TELSERV	1		/* which basic function */
+
+#define	CF_TELSERV	1		/* which basic function */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -66,10 +67,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/socket.h>
 #include	<sys/utsname.h>
+
 #include <sys/wait.h>
 #include <sys/file.h>
 #include <sys/stat.h>
@@ -95,8 +98,8 @@
 #include <syslog.h>
 #include <netdb.h>
 #include <csignal>
-#include <cstddef>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include <cstring>
 
 #ifndef SYSV
@@ -115,8 +118,6 @@
 #include <cerrno>
 #include <cstdio>
 
-#include	<clanguage.h>
-#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
@@ -135,7 +136,7 @@
 #define	PROGNAME	"telnetd"
 #endif
 
-#if	P_TELSERV
+#if	CF_TELSERV
 #define	PROGNAME	"telserv"
 #endif
 
@@ -212,6 +213,9 @@ extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 #endif
+
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdomain(char *) ;
 
 
 /* external variables */
@@ -2220,10 +2224,11 @@ suboption()
 			return;
 		c = SB_GET();
 		if (c == TELQUAL_IS) {
-			if (subchar == TELOPT_OLD_ENVIRON)
+			if (subchar == TELOPT_OLD_ENVIRON) {
 				settimer(oenvironsubopt);
-			else
+			} else {
 				settimer(environsubopt);
+			}
 		} else if (c != TELQUAL_INFO) {
 			return;
 		}
@@ -2702,7 +2707,7 @@ rmut()
 			strncpy(rhost, up->ut_host, sizeof (up->ut_host));
 			rhost[sizeof (up->ut_host)] = '\0';
 
-#if	P_TELSERV
+#if	CF_TELSERV
 	cp = "telserv" ;
 #else
 	cp = "telnet" ;
@@ -3465,7 +3470,7 @@ cchar	slavename[] ;
 	cchar	*cp ;
 
 
-#if	P_TELSERV
+#if	CF_TELSERV
 	cp = "telserv" ;
 #else
 	cp = "telnet" ;
