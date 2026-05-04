@@ -185,10 +185,10 @@ constexpr cpcchar	prs[] = {
     "/",
     "/usr/extra",
     "/usr/local"
-} ;
+} ; /* end array (prs) */
 
-constexpr char		nodefname[] = NODEFNAME ;
-constexpr char		clusterfname[] = CLUSTERFNAME ;
+constexpr char		nodefname[]	= NODEFNAME ;
+constexpr char		clusterfname[]	= CLUSTERFNAME ;
 
 
 /* exported variables */
