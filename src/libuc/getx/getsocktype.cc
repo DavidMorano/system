@@ -64,7 +64,7 @@
 struct socktype {
 	int		proto ;
 	int		type ;
-} ;
+} ; /* end struct (socktype) */
 
 
 /* forward references */
@@ -73,13 +73,13 @@ struct socktype {
 /* local variables */
 
 constexpr socktype	socktypes[] = {
-	{ IPPROTO_TCP, SOCK_STREAM },
-	{ IPPROTO_UDP, SOCK_DGRAM },
-	{ IPPROTO_ICMP, SOCK_DGRAM },
-	{ IPPROTO_EGP, SOCK_DGRAM },
-	{ IPPROTO_GGP, SOCK_DGRAM },
+	{ IPPROTO_TCP,	SOCK_STREAM },
+	{ IPPROTO_UDP,	SOCK_DGRAM },
+	{ IPPROTO_ICMP,	SOCK_DGRAM },
+	{ IPPROTO_EGP,	SOCK_DGRAM },
+	{ IPPROTO_GGP,	SOCK_DGRAM },
 	{ 0, 0 }
-} ;
+} ; /* end array (socktypes) */
 
 
 /* exported variables */
