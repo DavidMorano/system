@@ -45,7 +45,7 @@ OBJ1= getgroupname.o
 OBJ2= getnodename.o getournetname.o
 OBJ3= getrealname.o getsysname.o 
 OBJ4= getusername.o getprojname.o
-OBJ5= gettmpdname.o getfname.o
+OBJ5= getfname.o
 OBJ6=
 OBJ7=
 
@@ -161,7 +161,6 @@ getournetname.o:	getournetname.cc getournetname.h	$(INCS)
 getprojname.o:		getprojname.cc	getprojname.h		$(INCS)
 getrealname.o:		getrealname.cc	getrealname.h		$(INCS)
 getsysname.o:		getsysname.cc	getsysname.h		$(INCS)
-gettmpdname.o:		gettmpdname.cc	gettmpdname.h		$(INCS)
 getusername.o:		getusername.cc	getusername.h		$(INCS)
 
 
