@@ -50,6 +50,7 @@ module ;
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<ulogerror.h>
+#include	<ucdesc.h>
 #include	<getoflags.h>
 #include	<localmisc.h>
 
@@ -68,7 +69,6 @@ module ucstream ;
 
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
