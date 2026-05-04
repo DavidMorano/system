@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* system type numbers */
+/* system type numbers (and associated strings) */
 /* version %I% last-modified %G% */
 
 
