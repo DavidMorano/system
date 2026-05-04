@@ -57,7 +57,9 @@
 
 #include	"getprogpath.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -81,7 +83,7 @@ typedef vecstr		vs ;
 
 /* forward references */
 
-static int getprogpathrel(ids *,vs *,char *,cc *,int) noex ;
+local int getprogpathrel(ids *,vs *,char *,cc *,int) noex ;
 
 
 /* local variables */
@@ -94,7 +96,7 @@ static int getprogpathrel(ids *,vs *,char *,cc *,int) noex ;
 
 int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pnp,int pnl) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	if (idp && plp && rbuf && pnp) {
 	     rs = SR_INVALID ;
 	     rbuf[0] = '\0' ;
@@ -122,10 +124,10 @@ int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pnp,int pnl) noex {
 
 /* local subroutines */
 
-static int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
+local int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 	int		rs ;
 	int		rs1 ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	if (char *pwdp ; (rs = lm_mp(&pwdp)) >= 0) {
 	    cint	pwdl = rs ;
 	    bool	f = false ;
@@ -162,7 +164,6 @@ static int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (getprogpathrel) */
+} /* end subroutine (getprogpathrel) */
 
 
