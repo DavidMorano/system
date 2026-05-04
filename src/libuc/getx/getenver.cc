@@ -204,7 +204,7 @@ int namemgr::finish() noex {
 	    if (rs >= 0) rs = rs1 ;
 	    tab = nullptr ;
 	    ne = 0 ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end method (namemgr::finish) */
 
