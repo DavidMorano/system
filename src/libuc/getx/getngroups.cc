@@ -132,8 +132,7 @@ groupinfo::operator int () noex {
 	    }
 	} /* end if (needed value) */
 	return rs ;
-}
-/* end method (groupinfo::operator) */
+} /* end method (groupinfo::operator) */
 
 int groupinfo::operator () (int x) noex {
 	int		rs = SR_INVALID ;
@@ -146,7 +145,6 @@ int groupinfo::operator () (int x) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end method (groupinfo::operator) */
+} /* end method (groupinfo::operator) */
 
 
