@@ -45,7 +45,8 @@
 
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<strings.h>		/* |strlen(3c)| */
+#include	<cstring>		/* |strchr(3c)| */
+#include	<cstrings>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -146,7 +147,7 @@ char * _escape(char *s,char *esc) noex {
 	char	*tmp;
 
 	if (s == nullptr || esc == nullptr)
-		return (nullptr);
+		return (nullptr) ;
 
 	len_s = lenstr(s) ;
 	for (i = 0; i < len_s; i++) {
