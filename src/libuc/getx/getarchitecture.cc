@@ -57,8 +57,8 @@ import uconstants ;
 
 /* local defines */
 
-#ifndef	ARCHITECTURE
-#define	ARCHITECTURE	"Armv9"
+#ifndef	DEFARCH
+#define	DEFARCH		"Armv9"
 #endif
 
 
@@ -94,12 +94,12 @@ namespace {
 
 /* local variables */
 
-constexpr archer_m	mems[] = {
+constexpr archer_m	tries[] = {
 	&archer::tryenv,
 	&archer::trylib,
 	&archer::trysys,
 	&archer::trydef
-} ; /* end array (mems) */
+} ; /* end array (tries) */
 
 
 /* exported variables */
@@ -126,7 +126,7 @@ int getarchitecture(char *rbuf,int rlen) noex {
 
 archer::operator int () noex {
 	int		rs = SR_OK ;
-	for (cauto &m : mems) {
+	for (cauto &m : tries) {
 	    rs = (this->*m)() ;
 	    if (rs) break ;
 	} /* end for */
@@ -163,7 +163,7 @@ int archer::trysys() noex {
 } /* end method (archer::trysys) */
 
 int archer::trydef() noex {
-	return snwcpy(rbuf,rlen,ARCHITECTURE) ;
+	return snwcpy(rbuf,rlen,DEFARCH) ;
 } /* end method (archer::trydef) */
 
 
