@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	- 2008-10-01, David A­D­ Morano
+	- 1998-10-01, David A­D­ Morano
 	This object module was originally written.
 
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
