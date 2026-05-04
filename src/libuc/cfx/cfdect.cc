@@ -43,13 +43,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
+#include	<bitset>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<intsat.h>		/* |intsat(3u)| */
-#include	<strn.h>		/* |strnalpha(3uc)| */
+#include	<six.h>			/* |sialpha(3uc)| */
 #include	<sfx.h>			/* |sfshrink(3uc)| */
 #include	<cfdec.h>
 #include	<mkchar.h>
@@ -61,6 +63,14 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+using std::bitset ;
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -69,6 +79,27 @@
 
 /* local structures */
 
+constexpr char          chvals[] = "YMDWwdhms" ;
+
+namespace {
+    constexpr int       chtablen = (UCHAR_MAX + 1) ;
+    struct chvalid {
+        bitset<chtablen>        isval ;
+        consteval void mkisval() noex {
+            for (cchar *cp = chvals ; *cp ; cp += 1) {
+                cint ch = mkchar(*cp) ;
+                isval.set(ch) ;
+            } /* end for */
+        } ; /* end method (mkisval) */
+        consteval chvalid() noex {
+            mkisval() ;
+        } ; /* end ctor */
+        int operator [] (int ch) const noex {
+            return (isval[ch & UCHAR_MAX]) ? SR_OK : SR_INVALID ;
+        } ; /* end method (operator) */
+    } ; /* end struct (chvalie) */
+} /* end namespace */
+
 
 /* forward references */
 
@@ -76,6 +107,8 @@ local int	cfloop(cchar *,int,int *) noex ;
 
 
 /* local variables */
+
+constexpr chvalid       tabval ;
 
 
 /* exported variables */
@@ -167,15 +200,16 @@ local int cfloop(cchar *sp,int sl,int *rp) noex {
     	int		rs = SR_OK ;
 	int		res = 0 ; /* accumulated-result */
 	int		inc{} ;
-	for (cc *tp ; (rs >= 0) && (tp = strnalpha(sp,sl)) != np ; ) {
-	    if (cint tl = intconv(tp - sp) ; tl > 0) {
-	        cint mch = mkchar(*tp) ;
-	        rs = convert(sp,tl,mch,&inc) ;
-	        res += inc ;
-	    }
-	    sl -= intconv((tp + 1) - sp) ;
-	    sp = (tp + 1) ;
-	} /* end for */
+        for (int si ; (rs >= 0) && (si = sialpha(sp,sl)) >= 0 ; ) {
+            if (cint mch = mkchar(sp[si]) ; (rs = tabval[mch]) >= 0) {
+                if (si > 0) {
+                    rs = convert(sp,si,mch,&inc) ;
+                    res += inc ;
+                } /* end if (non-zero positive) */
+            } /* end if (valid) */
+            sl -= (si + 1) ;
+            sp += (si + 1) ;
+        } /* end for */
 	if ((rs >= 0) && (sl > 0)) {
 	    rs = convert(sp,sl,0,&inc) ;
 	    res += inc ;
