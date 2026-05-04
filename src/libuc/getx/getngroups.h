@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-07-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -24,19 +24,10 @@
 #include	<usysbase.h>
 
 
-#ifdef	__cplusplus
-
 extern "C" {
-    extern int getngroups(int) noex ;
-    extern int getngroupsx(int = 0) noex ;
+    extern int getngroups()	noex ;
+    extern int getngroupsx(int) noex ;
 }
-
-#else /* __cplusplus */
-
-extern int getngroups() noex ;
-extern int getngroupsx(int) noex ;
-
-#endif /* __cplusplus */
 
 
 #endif /* GETNGROUPS_INCLUDE */
