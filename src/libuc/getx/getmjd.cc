@@ -126,22 +126,6 @@ extern "C" {
 
 /* local structures */
 
-enum mons {
-	mon_jan,
-	mon_feb,
-	mon_mar,
-	mon_apr,
-	mon_may,
-	mon_jun,
-	mon_jul,
-	mon_aug,
-	mon_sep,
-	mon_oct,
-	mon_nov,
-	mon_dec,
-	mon_overlast
-} ; /* end enum (mons) */
-
 
 /* forward references */
 
@@ -174,16 +158,16 @@ int getmjd(int yr,int mo,int day) noex {
 	    /* continue to calculate MHD */
 	    myr = (yr - yrbase) ;	/* get modified year */
 	    nlyears = (myr - 1)/4 ;	/* number of leap years since 1900 */
-/*
+/****
 	compute number of days since 1900 
 	+ 1 day for each leap year
 	+ number of days since start of this year
-*/
+****/
 	    mjd += ((365 * myr) + nlyears + doy[mo] + (day - 1)) ;
-/*
+/****
 	If the current month is March or later, then we must add 1 day if
 	the current year is a leap year.
-*/
+****/
 	    if ((mo >= mon_mar) && isleapyear(yr)) {
 	        mjd += 1 ;
 	    }
