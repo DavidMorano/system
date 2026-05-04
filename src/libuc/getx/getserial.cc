@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-1, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This program was originally written.
 
 */
@@ -57,6 +57,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<lockfile.h>
 #include	<estrings.h>
 #include	<cfnum.h>
@@ -108,11 +109,8 @@ extern "C" {
     extern int uc_read(int,void *,int) noex ;
     extern int uc_write(int,cvoid *,int) noex ;
     extern int uc_iocctl(int,int,...) noex ;
-    extern int uc_rewind(int) noex ;
     extern int uc_ftruncate(int,off_t ) noex ;
     extern int uc_closeonexec(int,int) noex ;
-    extern int uc_close(int) ;
-    extern int uc_fpathconf(int,int,char *) noex ;
     extern int uc_setsockopt(int,int,int,int *,int) noex ;
     extern int uc_linger(int,int) noex ;
     extern int uc_stat(cchar *,ustat *) noex ;
@@ -127,9 +125,9 @@ extern "C" {
 
 /* forward references */
 
-static int	getserial_open(cchar *) noex ;
-static int	getserial_read(int,char *,int) noex ;
-static int	getserial_write(int,char *,int,int) noex ;
+local int	getserial_open(cchar *) noex ;
+local int	getserial_read(int,char *,int) noex ;
+local int	getserial_write(int,char *,int,int) noex ;
 
 
 /* local variables */
@@ -169,7 +167,7 @@ int getserial(cchar *sfname) noex {
 
 /* local subroutines */
 
-static int getserial_open(cchar *sfname) noex {
+local int getserial_open(cchar *sfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
@@ -190,9 +188,9 @@ static int getserial_open(cchar *sfname) noex {
 	            if ((rs = uc_fpathconf(fd,cmd,nullptr)) == 0) {
 	                cchar	*cp{} ;
 	                if (int cl ; (cl = sfdirname(sfname,-1,&cp)) > 0) {
-	                    if (char *pbuf{} ; (rs = lm_mp(&pbuf)) >= 0) {
+	                    if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
 	                        if ((rs = mkpath1w(pbuf,cp,cl)) >= 0) {
-	                	    USTAT	sb ;
+	                	    ustat	sb ;
 	                            if ((rs = uc_stat(pbuf,&sb)) >= 0) {
 					const uid_t	u = sb.st_uid ;
 					const gid_t	g = sb.st_gid ;
@@ -208,10 +206,9 @@ static int getserial_open(cchar *sfname) noex {
 	    } /* end if (uc_open) */
 	} /* end if (NOTENT) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (getserial_open) */
+} /* end subroutine (getserial_open) */
 
-static int getserial_read(int fd,char *dbuf,int dlen) noex {
+local int getserial_read(int fd,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		serial = 0 ;
 	if ((rs = u_read(fd,dbuf,dlen)) > 0) {
@@ -227,10 +224,9 @@ static int getserial_read(int fd,char *dbuf,int dlen) noex {
 	    } /* end if (sfnext) */
 	} /* end if (u_read) */
 	return (rs >= 0) ? serial : rs ;
-}
-/* end subroutine (getserial_read) */
+} /* end subroutine (getserial_read) */
 
-static int getserial_write(int fd,char *dbuf,int dlen,int serial) noex {
+local int getserial_write(int fd,char *dbuf,int dlen,int serial) noex {
 	cint		nserial = ((serial+1) & INT_MAX) ;
 	int		rs ;
 	if ((rs = ctdec(dbuf,dlen,nserial)) >= 0) {
@@ -241,7 +237,6 @@ static int getserial_write(int fd,char *dbuf,int dlen,int serial) noex {
 	    }
 	} /* end if (ctdec) */
 	return rs ;
-}
-/* end subroutine (getserial_write) */
+} /* end subroutine (getserial_write) */
 
 
