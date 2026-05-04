@@ -39,6 +39,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<bfile.h>
 #include	<contypevals.h>
 #include	<contentencodings.h>
@@ -82,7 +83,6 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     extern int uc_unlink(cchar *) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
