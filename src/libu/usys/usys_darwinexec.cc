@@ -16,7 +16,7 @@
 	= 2011-03-19, David A-D- Morano
 	This was updated to replace preprocessor defines with
 	C++11 'if_constexpr'.  You have got to love those 
-	preprocessor defines. Yes?
+	preprocessor defines.  Yes?
 
 */
 
@@ -64,7 +64,7 @@
 	3. Take a look at the amount of code below -- and the various
 	subroutines called residing in other modules.  Ya, it is
 	no joke how hard some things can be when there is not a
-	rull and rich set of interfaces that we mear mortals have
+	full and rich set of interfaces that we mere mortals have
 	come to use and love.
 	3. This subroutine is both Thread-Safe and Fork-Safe.  This
 	was easy since the subroutine is a pure-function.
@@ -177,20 +177,20 @@ namespace {
     typedef int (namer::*namer_m)() ;
 } /* end namespace */
 
-constexpr namer_m	mems[] = {
+constexpr namer_m	namegets[] = {
     	&namer::abs,
     	&namer::env,
 	&namer::proc,
 	&namer::pwd,
 	&namer::pr,
 	&namer::path
-} ;
+} ; /* end array */
 
 namer::operator int () noex {
     	cnullptr	np{} ;
     	int		rs = SR_NOSYS ;
 	if ((az = darwin_getargz()) != np) {
-	    for (cauto &m : mems) {
+	    for (cauto &m : namegets) {
 	        rs = (this->*m)() ;
 	        if (rs != 0) break ;
 	    } /* end for */
