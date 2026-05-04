@@ -71,6 +71,7 @@
 #include	<ucfork.h>
 #include	<ucatfork.h>
 #include	<ucatexit.h>
+#include	<ucdesc.h>
 #include	<uctc.h>		/* terminal-control */
 #include	<getbufsize.h>
 #include	<timewatch.hh>
@@ -131,10 +132,6 @@ typedef volatile sig_atomic_t	vint ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_close(int) noex ;
-}
 
 
 /* local structures */
