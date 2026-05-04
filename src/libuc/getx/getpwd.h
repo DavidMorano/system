@@ -8,8 +8,8 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	= 1998-07-01, David A­D­ Morano
+	This code was originally written.
 
 */
 
