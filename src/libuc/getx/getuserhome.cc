@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		OK
-	<0		some error (syhstem-return)
+	<0		error (system-return)
 
 	Implementation note:
 	Is "home-searching" faster than just asking the system for
@@ -124,7 +124,7 @@ extern "C" {
 
 struct subinfo_flags {
 	uint		pw:1 ;
-} ;
+} ; /* end struct */
 
 struct subinfo {
 	cchar		*un ;
@@ -133,20 +133,22 @@ struct subinfo {
 	uid_t		uid ;
 	SUBINFO_FL	init ;
 	int		pwlen ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	subinfo_start(subinfo *,cchar *) noex ;
-static int	subinfo_getpw(subinfo *) noex ;
-static int	subinfo_finish(subinfo *) noex ;
+typedef int (*subinfo_f)(subinfo *,char *,int) ;
 
-static int	subinfo_getvar(subinfo *,char *,int) noex ;
-static int	subinfo_getdirsearch(subinfo *,char *,int) noex ;
-static int	subinfo_getsysdb(subinfo *,char *,int) noex ;
+local int	subinfo_start(subinfo *,cchar *) noex ;
+local int	subinfo_getpw(subinfo *) noex ;
+local int	subinfo_finish(subinfo *) noex ;
 
-static int	dirsearch(cchar *,cchar *) noex ;
+local int	subinfo_getvar(subinfo *,char *,int) noex ;
+local int	subinfo_getdirsearch(subinfo *,char *,int) noex ;
+local int	subinfo_getsysdb(subinfo *,char *,int) noex ;
+
+local int	dirsearch(cchar *,cchar *) noex ;
 
 
 /* local variables */
@@ -157,17 +159,17 @@ constexpr cpcchar	homednames[] = {
 	"/sysadm",
 	"/Users",
 	nullptr
-} ;
+} ; /* end array */
 
-constexpr int		(*gethomes[])(subinfo *,char *,int) = {
+constexpr subinfo_f	gethomes[] = {
 	subinfo_getvar,
 	subinfo_getdirsearch,
 	subinfo_getsysdb,
 	nullptr
-} ;
+} ; /* end array (gethomes) */
 
-static strlibval	val_username(strlibval_username) ;
-static strlibval	val_home(strlibval_home) ;
+static strlibval	val_username	(strlibval_username) ;
+static strlibval	val_home	(strlibval_home) ;
 
 
 /* exported variables */
@@ -202,7 +204,7 @@ int getuserhome(char *rbuf,int rlen,cchar *un) noex {
 
 /* local subroutines */
 
-static int subinfo_start(subinfo *sip,cchar *un) noex {
+local int subinfo_start(subinfo *sip,cchar *un) noex {
 	int		rs ;
 	memclear(sip) ;			/* <- noted (dangerous?) */
 	sip->un = un ;
@@ -215,10 +217,9 @@ static int subinfo_start(subinfo *sip,cchar *un) noex {
 	    }
 	} /* end if (getbufsize) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(subinfo *sip) noex {
+local int subinfo_finish(subinfo *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sip) {
@@ -230,10 +231,9 @@ static int subinfo_finish(subinfo *sip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
-static int subinfo_getpw(subinfo *sip) noex {
+local int subinfo_getpw(subinfo *sip) noex {
 	int		rs = SR_OK ;
 	cchar		*un = sip->un ;
 	if (! sip->init.pw) {
@@ -257,10 +257,9 @@ static int subinfo_getpw(subinfo *sip) noex {
 	    }
 	} /* end if (needed initialization) */
 	return rs ;
-}
-/* end subroutine (subinfo_getpw) */
+} /* end subroutine (subinfo_getpw) */
 
-static int subinfo_getvar(subinfo *sip,char *rbuf,int rlen) noex {
+local int subinfo_getvar(subinfo *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar		*un = sip->un ;
@@ -280,15 +279,14 @@ static int subinfo_getvar(subinfo *sip,char *rbuf,int rlen) noex {
 	    } /* end if */
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_getvar) */
+} /* end subroutine (subinfo_getvar) */
 
-static int subinfo_getdirsearch(subinfo *sip,char *rbuf,int rlen) noex {
+local int subinfo_getdirsearch(subinfo *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar		*un = sip->un ;
 	if (un[0] != '-') {
-	    USTAT	sb ;
+	    ustat	sb ;
 	    for (int i = 0 ; homednames[i] ; i += 1) {
 	        cchar	*hdn = homednames[i] ;
 	        if ((rs = uc_stat(hdn,&sb)) >= 0) {
@@ -312,10 +310,9 @@ static int subinfo_getdirsearch(subinfo *sip,char *rbuf,int rlen) noex {
 	    } /* end for (looping over login-directory root directories) */
 	} /* end if (specified) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_getdirsearch) */
+} /* end subroutine (subinfo_getdirsearch) */
 
-static int subinfo_getsysdb(subinfo *sip,char *rbuf,int rlen) noex {
+local int subinfo_getsysdb(subinfo *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (! sip->init.pw) {
@@ -326,10 +323,9 @@ static int subinfo_getsysdb(subinfo *sip,char *rbuf,int rlen) noex {
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_getsysdb) */
+} /* end subroutine (subinfo_getsysdb) */
 
-static int dirsearch(cchar *basedname,cchar *un) noex {
+local int dirsearch(cchar *basedname,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_found = false ;
@@ -351,7 +347,6 @@ static int dirsearch(cchar *basedname,cchar *un) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f_found : rs ;
-}
-/* end subroutine (dirsearch) */
+} /* end subroutine (dirsearch) */
 
 
