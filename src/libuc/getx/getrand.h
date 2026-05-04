@@ -36,12 +36,12 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-local inline int getrand(uint *p,int n = 1)	noex {
-	cint	sz = szof(uint) ;
+local inline int getrand(int *p,int n = 1)	noex {
+	cint	sz = szof(int) ;
 	return getrand(p,(sz * n)) ;
 }
-local inline int getrand(ulong *p,int n = 1)	noex {
-	cint	sz = szof(ulong) ;
+local inline int getrand(long *p,int n = 1)	noex {
+	cint	sz = szof(long) ;
 	return getrand(p,(sz * n)) ;
 }
 local inline int getrand(longlong *p,int n = 1)	noex {
