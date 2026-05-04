@@ -644,7 +644,7 @@ static int subinfo_tmtime(SUBINFO *sip)
 	if (sip->mday <= 0) {
 	    TMTIME	t ;
 	    time_t	daytime = time(NULL) ;
-	    rs = tmtime_localtime(&t,daytime) ;
+	    rs = tmtime_timelocal(&t,daytime) ;
 	    sip->year = (t.year + TM_YEAR_BASE) ;
 	    sip->mon = t.mon ;
 	    sip->mday = t.mday ;
