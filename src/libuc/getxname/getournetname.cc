@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-08-20, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -34,7 +34,7 @@
 
 	Arguments:
 	nbuf		result buffer
-	nlen		lenght of result buffer
+	nlen		length of result buffer
 	un		username
 
 	Returns:
