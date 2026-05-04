@@ -2078,9 +2078,9 @@ static int subinfo_tmtime(SUBINFO *sip) noex {
 	        sip->ti_tmtime = sip->dt ;
 	        sip->fl.tmtime = true ;
 	        if (sip->fl.gmt) {
-	            rs = tmtime_gmtime(&sip->tm,sip->dt) ;
+	            rs = tmtime_timegm(&sip->tm,sip->dt) ;
 	        } else {
-	            rs = tmtime_localtime(&sip->tm,sip->dt) ;
+	            rs = tmtime_timelocal(&sip->tm,sip->dt) ;
 	        }
 	    }
 	} /* end if */
