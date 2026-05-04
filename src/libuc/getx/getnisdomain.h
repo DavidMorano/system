@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	= 1995-07-01, David A­D­ Morano
+	This code was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GETNISDOMAIN_INCLUDE
 #define	GETNISDOMAIN_INCLUDE
