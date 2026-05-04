@@ -15,7 +15,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -113,11 +113,11 @@ namespace {
 
 /* forward references */
 
-static int	terment_start(TE *,cc *,int,time_t) noex ;
-static int	terment_finish(TE *) noex ;
+local int	terment_start(TE *,cc *,int,time_t) noex ;
+local int	terment_finish(TE *) noex ;
 
-static int	getatime(cchar *,time_t *) noex ;
-static int	revsortfunc(cvoid **,cvoid **) noex ;
+local int	getatime(cchar *,time_t *) noex ;
+local int	revsortfunc(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
@@ -266,7 +266,7 @@ int userterms::proc() noex {
 }
 /* end method (userterms::proc) */
 
-static int terment_start(TE *ep,cc *sp,int sl,time_t t) noex {
+local int terment_start(TE *ep,cc *sp,int sl,time_t t) noex {
 	int		rs ;
 	ep->atime = t ;
 	if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
@@ -276,7 +276,7 @@ static int terment_start(TE *ep,cc *sp,int sl,time_t t) noex {
 }
 /* end subroutine (terment_start) */
 
-static int terment_finish(TE *ep) noex {
+local int terment_finish(TE *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (ep) {
@@ -292,7 +292,7 @@ static int terment_finish(TE *ep) noex {
 }
 /* end subroutine (terment_finish) */
 
-static int getatime(cc *termdev,time_t *tp) noex {
+local int getatime(cc *termdev,time_t *tp) noex {
 	int		rs ;
 	*tp = 0 ;
 	if (USTAT sb ; (rs = u_stat(termdev,&sb)) >= 0) {
@@ -307,7 +307,7 @@ static int getatime(cc *termdev,time_t *tp) noex {
 }
 /* end subroutine (getatime) */
 
-static int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
+local int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
 	TE		**f1pp = (TE **) v1pp ;
 	TE		**f2pp = (TE **) v2pp ;
 	int		rc = 0 ;
