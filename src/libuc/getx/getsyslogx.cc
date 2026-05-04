@@ -78,7 +78,7 @@
 struct logitem {
 	cchar		*name ;
 	int		val ;
-} ;
+} ; /* end struct (logitem) */
 
 
 /* local variables */
@@ -103,7 +103,7 @@ constexpr logitem	logfacs[] = {
 	{ "local6",	LOG_LOCAL6 },
 	{ "local7",	LOG_LOCAL7 },
 	{ nullptr, 0 }
-} ;
+} ; /* end array (logfacs) */
 
 constexpr logitem	logpris[] = {
 	{ "emergency",	LOG_EMERG },
@@ -115,7 +115,7 @@ constexpr logitem	logpris[] = {
 	{ "information", LOG_INFO },
 	{ "debug",	LOG_DEBUG },
 	{ nullptr, 0 }
-} ;
+} ; /* end array (logpris) */
 
 
 /* exported variables */
