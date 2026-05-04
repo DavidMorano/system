@@ -114,36 +114,40 @@ constexpr bool		f_shadow = F_SHADOW ;
 int getpwentry_name(pwentry *uep,char *ebuf,int elen,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 	if (uep && ebuf && name) {
-	    if (char *pwbuf{} ; (rs = lm_pw(&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	        ucentpw		pw ;
 	        cint		pwlen = rs ;
 	        if ((rs = getpwx_name(&pw,pwbuf,pwlen,name)) >= 0) {
 	            rs = getpwentry_load(uep,ebuf,elen,&pw) ;
+		    rv = rs ;
 	        }
 	        rs1 = lm_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (getpwentry_name) */
 
 int getpwentry_uid(pwentry *uep,char *ebuf,int elen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 	if (uep && ebuf) {
-	    if (char *pwbuf{} ; (rs = lm_pw(&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	        ucentpw		pw ;
 		cint		pwlen = rs ;
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,uid)) >= 0) {
 	            rs = getpwentry_load(uep,ebuf,elen,&pw) ;
+		    rv = rs ;
 	        }
 	        rs1 = lm_free(pwbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (getpwentry_uid) */
 
@@ -155,8 +159,8 @@ local int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 	int		rs1 ;
 	if (uep && ebuf && pep) {
 	    memclear(uep) ;		 /* noted potentially dangerous */
-	    if (pep->pw_name != nullptr) {
-	        cchar		*emptyp = nullptr ;
+	    if (pep->pw_name) {
+	        cchar	*emptyp = nullptr ;
 	        if (SI ub ; (rs = ub.start(ebuf,elen)) >= 0) {
 		    cchar	**vpp = &uep->username ;
 		    /* fill in the stuff that we got from the system */
@@ -222,7 +226,7 @@ local int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
 	                break ;
 	            case gecosval_realname:
 	                if ((rs = lm_mall((vl+1),&mp)) >= 0) {
-	                    char	*nbuf = charp(mp) ;
+	                    char *nbuf = charp(mp) ;
 	                    if (strnchr(vp,vl,'_') != nullptr) {
 	                        rs = snwcpyhyphen(nbuf,-1,vp,vl) ;
 	                        vp = nbuf ;
@@ -231,7 +235,7 @@ local int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
 	                        vpp = &uep->realname ;
 	                        rs = sip->strw(vp,vl,vpp) ;
 				vpp = nullptr ;
-	                    }
+	                    } /* end if (ok) */
 	                    rs1 = lm_free(mp) ;
 			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (m-a-f) */
@@ -272,33 +276,34 @@ local int getpwentry_shadow(pwentry *uep,SI *sip,ucentpw *pep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if_constexpr (f_shadow) {
-	    if (char *spbuf{} ; (rs = lm_sp(&spbuf)) >= 0) {
-	        ucentsp		sd ;
-		cint		splen = rs ;
-	        cchar		*pn = pep->pw_name ;
-	        cchar		**vpp = &uep->password ;
-	        if ((rs = getsp_name(&sd,spbuf,splen,pn)) >= 0) {
-	            uep->lstchg = sd.sp_lstchg ;
-	            uep->daymin = sd.sp_min ;
-	            uep->daymax = sd.sp_max ;
-	            uep->warn = sd.sp_warn ;
-	            uep->inact = sd.sp_inact ;
-	            uep->expire = sd.sp_expire ;
-	            uep->flag = sd.sp_flag ;
-	            if (pep->pw_passwd != nullptr) {
-	                if ((strcmp(pep->pw_passwd,"*NP*") == 0) ||
-	                    (strcmp(pep->pw_passwd,"x") == 0)) {
+	    if (char *spbuf ; (rs = lm_sp(&spbuf)) >= 0) {
+		cint	splen = rs ;
+	        cchar	*pn = pep->pw_name ;
+	        cchar	**vpp = &uep->password ;
+	        if (ucentsp sd ; (rs = getsp_name(&sd,spbuf,splen,pn)) >= 0) {
+	            uep->lstchg	= sd.sp_lstchg ;
+	            uep->daymin	= sd.sp_min ;
+	            uep->daymax	= sd.sp_max ;
+	            uep->warn	= sd.sp_warn ;
+	            uep->inact	= sd.sp_inact ;
+	            uep->expire	= sd.sp_expire ;
+	            uep->flag	= sd.sp_flag ;
+	            if (pep->pw_passwd) {
+			bool f = false ;
+			cc *pp = pep->pw_passwd ;
+	                f = f || (strcmp(pp,"*NP*") == 0) ;
+			f = f || (strcmp(pp,"x") == 0) ;
+			if (f) {
 	                    sip->strw(sd.sp_pwdp,-1,vpp) ;
 	                } else {
-	                    cchar	*pwp = pep->pw_passwd ;
-	                    sip->strw(pwp,-1,vpp) ;
+	                    sip->strw(pp,-1,vpp) ;
 	                }
 	            } else {
 	                sip->strw(sd.sp_pwdp,-1,vpp) ;
 	            }
 	        } else if (rs == SR_ACCESS) {
 	            rs = SR_OK ;
-	            if (pep->pw_passwd != nullptr) {
+	            if (pep->pw_passwd) {
 	                rs = sip->strw(pep->pw_passwd,-1,vpp) ;
 	            }
 	        } /* end if */
