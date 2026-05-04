@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-09-10, David A­D­ Morano
+	= 1998-03-21, David A­D­ Morano
 	This program was originally written.
 
 */
