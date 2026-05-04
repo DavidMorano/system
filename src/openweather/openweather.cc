@@ -520,7 +520,7 @@ LFM		*lfp ;
 	    }
 #endif /* CF_DEBUGS */
 
-	if (rs == SR_LOCKLOST) {
+	if (rs == SR_LOCKFAIL) {
 	    msumainlockprint(sip,&ci) ;
 	}
 
