@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* UNIX® retrieve the run-level of the system */
+/* retrieve the run-level of the system */
 /* version %I% last-modified %G% */
 
 
