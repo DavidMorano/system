@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-07-10, David A­D­ Morano
+	= 1998-02-01, David A­D­ Morano
 	This was written from scratch.
 
 */
