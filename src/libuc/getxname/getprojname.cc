@@ -33,7 +33,7 @@
 	un		username to lookup
 
 	Returns:
-	>=0		length of retrieved nodename
+	>=0		length of retrieved name
 	<0		error (system-return)
 
 *******************************************************************************/
@@ -114,11 +114,9 @@ local int getprojnamer(char *rbuf,int rlen,cchar *un) noex {
             } /* end if */
             if (rs >= 0) {
                 if (char *pjbuf ; (rs = lm_pj(&pjbuf)) >= 0) {
-                    cauto       getpj = uc_getpjdef ;
-                    ucentpj     pj ;
                     cint        pjlen = rs ;
-                    if ((rs = getpj(&pj,pjbuf,pjlen,un)) >= 0) {
-                        rs = sncpy1(rbuf,rlen,pj.pj_name) ;
+                    if (ucentpj pj ; (rs = pj.getdef(pjbuf,pjlen,un)) >= 0) {
+                        rs = sncpy(rbuf,rlen,pj.pj_name) ;
                         rl = rs ;
                     }
                     rs1 = lm_free(pjbuf) ;
