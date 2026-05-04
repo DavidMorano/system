@@ -17,19 +17,26 @@
 
 /*******************************************************************************
 
-	Name:
+	Group:
 	getrand
+	getrandi
+	getrandl
+	getrandll
 
 	Synopsis:
-	int getrand(char *rbuf,int rlen) noex
+	int getrand	(char *rbuf,int rlen)	noex
+	int getrandi	(int *p)		noex
+	int getrandl	(long *p)		noex
+	int getrandll	(longlong *p)		noex
 
 	Arguments:
-	rbuf		result buffer
-	rlen		length of supplied result buffer
+	rbuf		result buffer pointer
+	rlen		result buffer length
+	p		pinter to integer result variable
 
 	Returns:
-	>=0		returned number of bytes
-	<0		error code (system-return)
+	>=0		succes or returned number of bytes
+	<0		error (system-return)
 
 *******************************************************************************/
 
