@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
+	= 1998-03-21, David A­D­ Morano
 	This code was originally written.
 
 */
@@ -29,12 +29,12 @@
 	int getportnum(cchar *protoname,cchar *portspec) noex
 
 	Arguments:
-	protoname	protocol name
+	protoname	protocol name (optional)
 	portspec	port specification to lookup 
 
 	Return:
 	>=0		port-number
-	<0		error (syhstem-return)
+	<0		error (system-return)
 
 	Notes:
 	Notice that the port-name and service-name are given in
@@ -104,7 +104,7 @@ int getportnum(cchar *pn,cchar *ps) noex {
 	        if (hasalldig(ps,pl)) {
 	            rs = cfdeci(ps,pl,&port) ;
 	        } /* end if */
-	        if ((rs >= 0) && (port < 0) && (pn != nullptr)) {
+	        if ((rs >= 0) && (port < 0) && pn) {
 	            if ((rs = getserv_name(ps,pn)) >= 0) {
 	                port = rs ;
 	            } /* end if (getserv_port) */
