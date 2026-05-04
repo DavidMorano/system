@@ -77,6 +77,8 @@
 
 #include	"getnodeinfo.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */
@@ -86,8 +88,6 @@ import libutil ;
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -111,7 +111,7 @@ namespace {
 	int		sz ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -134,7 +134,7 @@ constexpr char		nodefname[] = NODEFNAME ;
 
 int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 	int		rs = SR_FAULT ;
-	int		len = -1 ;
+	int		len = -1 ; /* return-value */
 	if (pr == nullptr) pr = "/" ;
 	if (nn) {
 	    if (pr[0] && nn[0]) {
@@ -152,20 +152,28 @@ int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 
 /* local subroutines */
 
+/****
+  Be careful with the memory allocation here (below).  We want to
+  consolidate several allocations into one (a curse afflicting many
+  novice developes).  But one has to be careful to get the allocation
+  size correct.  Also, the offsets for each buffer requires attention.
+****/
+
 local int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
+	cnullptr        np{} ;
+	cint		clen = var.nodenamelen ;	/* "cluster" length */
+	cint		slen = var.nodenamelen ;	/* "system" length */
     	int		rs ;
 	int		rs1 ;
-	int		len = -1 ;
+	int		len = -1 ; /* return-value */
+	int		ai = 0 ;
 	if (char *a ; (rs = lm_mall(var.sz,&a)) >= 0) {
 	    cint	nlen = var.nodenamelen ;	/* "node" length */
-	    cint	clen = var.nodenamelen ;	/* "cluster" length */
-	    cint	slen = var.nodenamelen ;	/* "system" length */
-	    char	*nbuf = (a + 0) ;
+	    char	*nbuf = (a + (ai++ * (clen + 1))) ;
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
 		cint	tlen = var.maxpathlen ;
-	        char	*tbuf = (a + nlen) ;
+	        char	*tbuf = (a + (ai++ * (clen + 1))) ;
                 if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) {
-                    cnullptr        np{} ;
                     if (nodedb st ; (rs = nodedb_open(&st,tbuf)) >= 0) {
                         nodedb_ent  ste{} ;
                         cauto	    nf = nodedb_fetch ;
@@ -177,7 +185,7 @@ local int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
                                 len = rs ;
                             } else {
                                 len = lenstr(ste.clu) ;
-                                }
+                            }
                             if ((rs >= 0) && sbuf) {
                                 rs = sncpy(sbuf,slen,ste.sys) ;
                             }
@@ -194,8 +202,7 @@ local int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getx) */
+} /* end subroutine (getx) */
 
 local int vecload(vecstr *klp,ent *ep) noex {
     	int		rs = SR_OK ;
@@ -206,8 +213,7 @@ local int vecload(vecstr *klp,ent *ep) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (vecload) */
+} /* end subroutine (vecload) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -222,7 +228,6 @@ vars::operator int () noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
