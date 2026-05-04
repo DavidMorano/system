@@ -2,9 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get the best approximation of the username of the current user */
+/* get the best home directory for a given username */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-06-01, David A­D­ Morano
+	This code was originally written.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
