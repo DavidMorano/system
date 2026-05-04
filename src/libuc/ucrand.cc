@@ -62,7 +62,7 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
-#include	"getrandom.h"
+#include	"ucrand.h"
 
 #pragma		GCC dependency		"mod/uconstants.ccm"
 
