@@ -6,10 +6,17 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* revision history:
 
-#ifndef	GETFSTYPE_INCLUDE
-#define	GETFSTYPE_INCLUDE
+	= 1999-09-27, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	GETFSTYPE_INCLUE
+#define	GETFSTYPE_INCLUE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
