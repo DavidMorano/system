@@ -157,7 +157,7 @@
 
 #include	"uprocess.h"
 
-import usysbasic ;
+import usysbasic ;			/* |ugetcwd(3u)| */
 
 /* local defines */
 
