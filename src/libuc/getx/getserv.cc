@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-07-10, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	This code was originally written.
 
 */
