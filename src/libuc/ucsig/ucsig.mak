@@ -127,7 +127,7 @@ obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ucsigset.o:		ucsigset.cc ucsigset.h		$(INCS)
-ucsigx.o:		ucsigx.cc ucsigx.h		$(INCS)
+ucsigset.o:		ucsigset.cc	ucsigset.h		$(INCS)
+ucsigx.o:		ucsigx.cc	ucsigx.h		$(INCS)
 
 
