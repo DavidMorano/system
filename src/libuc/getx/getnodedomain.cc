@@ -80,6 +80,7 @@
 #include	<usysbase.h>
 #include	<uinfo.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<ucgetho.h>
 #include	<getbufsize.h>
 #include	<getx.h>		/* |getenver(3uc)| */
@@ -114,8 +115,6 @@ import uconstants ;			/* |varname(3u)| */
 
 #undef	TRY
 #define	TRY		tryer
-#define	TRY_FL		tryer_flags
-
 #ifndef	CF_GUESS
 #define	CF_GUESS	0
 #endif
@@ -136,7 +135,6 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
@@ -146,7 +144,7 @@ extern "C" {
 /* local structures */
 
 namespace {
-    struct tryer_flags {
+    struct tryer_fl {
 	uint		initvarnode:1 ;
 	uint		inituname:1 ;
 	uint		initnode:1 ;
@@ -160,7 +158,7 @@ namespace {
 	char		*nbuf ;
 	cchar		*varnode ;
 	cchar		*sysnodename ;
-	TRY_FL		fl ;
+	tryer_fl	fl ;
 	int		dlen ;
     } ; /* end struct (try) */
     struct guess {
@@ -342,8 +340,7 @@ local int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 	    } /* end if (maxhostlen) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (try_start) */
+} /* end subroutine (try_start) */
 
 local int try_finish(TRY *tip) noex {
 	int		rs = SR_FAULT ;
@@ -364,8 +361,7 @@ local int try_finish(TRY *tip) noex {
 	    tip->varnode = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (try_finish) */
+} /* end subroutine (try_finish) */
 
 local int try_initvarnode(TRY *tip) noex {
 	int		rs = SR_FAULT ;
@@ -381,8 +377,7 @@ local int try_initvarnode(TRY *tip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (try_initvarnode) */
+} /* end subroutine (try_initvarnode) */
 
 local int try_inituname(TRY *tip) noex {
 	int		rs = SR_FAULT ;
@@ -402,8 +397,7 @@ local int try_inituname(TRY *tip) noex {
 	    } /* end if (needed initialization) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (try_inituname) */
+} /* end subroutine (try_inituname) */
 
 local int try_initnode(TRY *tip) noex {
 	int		rs = SR_FAULT ;
@@ -449,8 +443,7 @@ local int try_initnode(TRY *tip) noex {
 	    } /* end if (needed initialization) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? 0 : rs ;
-}
-/* end subroutine (try_initnode) */
+} /* end subroutine (try_initnode) */
 
 local int try_vardomain(TRY *tip) noex {
 	static cchar	*val = getenver(varname.domain) ;
@@ -465,8 +458,7 @@ local int try_vardomain(TRY *tip) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (try_vardomain) */
+} /* end subroutine (try_vardomain) */
 
 local int try_varlocaldomain(TRY *tip) noex {
 	static cchar	*val = getenver(varname.localdomain) ;
@@ -490,8 +482,7 @@ local int try_varlocaldomain(TRY *tip) noex {
 	    }
 	} /* end if (localdomain) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (try_varlocaldomain) */
+} /* end subroutine (try_varlocaldomain) */
 
 local int try_varnode(TRY *tip) noex {
 	int		rs = SR_OK ;
@@ -511,8 +502,7 @@ local int try_varnode(TRY *tip) noex {
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (try_varnode) */
+} /* end subroutine (try_varnode) */
 
 local int try_uname(TRY *tip) noex {
 	int		rs = SR_OK ;
@@ -532,8 +522,7 @@ local int try_uname(TRY *tip) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (try_uname) */
+} /* end subroutine (try_uname) */
 
 local int try_gethost(TRY *tip) noex {
 	int		rs = SR_OK ;
@@ -578,8 +567,7 @@ local int try_gethost(TRY *tip) noex {
 	    }
 	} /* end if (have node) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (try_gethost) */
+} /* end subroutine (try_gethost) */
 
 local int try_resolve(TRY *tip) noex {
 	int		rs = SR_OK ;
@@ -588,8 +576,7 @@ local int try_resolve(TRY *tip) noex {
 	    rs = try_resolvefile(tip,fn) ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (try_resolve) */
+} /* end subroutine (try_resolve) */
 
 local int try_resolvefile(TRY *tip,cchar *fname) noex {
 	int		rs ;
@@ -612,8 +599,7 @@ local int try_resolvefile(TRY *tip,cchar *fname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs;
-}
-/* end subroutine (try_resolvefile) */
+} /* end subroutine (try_resolvefile) */
 
 local int tryreader(int,char *,int,cchar **) noex ;
 
@@ -629,8 +615,7 @@ local int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
 	    }
         } /* end if (tryreader) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (try_resolvefd) */
+} /* end subroutine (try_resolvefd) */
 
 local int tryreader(int fd,char *lbuf,int llen,cchar **rpp) noex {
     	cint		bsz = FILERLEN ; /* buffer size */
@@ -680,8 +665,7 @@ local int try_guess(TRY *tip) noex {
 	    } /* end if (have node) */
 	} /* end if_constexpr (f_guess) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (try_guess) */
+} /* end subroutine (try_guess) */
 
 /* remove trailing whitespace and dots */
 local int rmwhitedot(char *bp,int bl) noex {
@@ -692,7 +676,6 @@ local int rmwhitedot(char *bp,int bl) noex {
 	    bp[--bl] = '\0' ;
 	}
 	return (bl > 0) ? bl : SR_NOTFOUND ;
-}
-/* end subroutine (rmwhitedot) */
+} /* end subroutine (rmwhitedot) */
 
 
