@@ -85,7 +85,7 @@ struct pidmgr {
 /* forward references */
 
 local int	getsys() noex ;
-local int	isnosys(int) noex ;
+local bool	isnosys(int) noex ;
 
 
 /* local variables */
@@ -138,8 +138,8 @@ local int getsys() noex {
 	return rs ;
 } /* end subroutine (getsys) */
 
-local int isnosys(int rs) noex {
+local bool isnosys(int rs) noex {
     	return isOneOf(rsnosys,rs) ;
-}
+} /* end subroutine (isnosys) */
 
 
