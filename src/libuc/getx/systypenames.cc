@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* get the system 'type-number' and 'osnum' for a given system and release */
+/* system type numbers (and associated strings) */
 /* version %I% last-modified %G% */
 
 
