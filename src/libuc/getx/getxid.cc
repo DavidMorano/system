@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-09-01, David A­D­ Morano
+	= 1998-08-20, David A­D­ Morano
 	This program was originally written.
 
 	= 2017-11-22, David A­D­ Morano
@@ -17,7 +17,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -118,10 +118,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern projid_t	getprojid() noex ;
-}
 
 
 /* external variables */
@@ -245,7 +241,7 @@ int getgid_def(cchar *gname,gid_t gid) noex {
 	        } else {
 	            rs = gid ;
 	        }
-	    }
+	    } /* end if (getgid_group) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -306,7 +302,7 @@ int getpjid_def(cchar *name,projid_t pjid) noex {
 	        } else {
 	            rs = pjid ;
 	        }
-	    }
+	    } /* end if (getpjid_proj) */
 	} /* end if (non-null) */
 	return rs ;
 }
