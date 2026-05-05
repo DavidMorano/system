@@ -1,4 +1,4 @@
-/* getrand HEADER */
+/* getserv HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
