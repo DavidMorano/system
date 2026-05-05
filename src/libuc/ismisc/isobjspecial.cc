@@ -64,7 +64,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<stdfnames.h>
+#include	<stdfnames.h>		/* |stdfname(3u)| */
 #include	<matstr.h>
 #include	<localmisc.h>
 
@@ -74,7 +74,7 @@
 /* local defines */
 
 #ifndef	RTLD_PROBE
-#define	RTLD_PROBE		voidp(1)	/* real vals are negative */
+#define	RTLD_PROBE	voidp(1)	/* real vals are negative */
 #endif
 
 
@@ -118,7 +118,7 @@ bool isobjspecial(void *sop) noex {
 /* end subroutine (isobjspecial) */
 
 bool isfnamespecial(cchar *fp,int fl) noex {
-	return (matstr(stdfnames,fp,fl) >= 0) ;
+	return (matstr(stdfname,fp,fl) >= 0) ;
 }
 /* end subroutine (isfnamespecial) */
 
