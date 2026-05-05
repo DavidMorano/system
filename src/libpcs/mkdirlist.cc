@@ -61,6 +61,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<getbufsize.h>
 #include	<bfile.h>
 #include	<filer.h>
@@ -108,10 +109,6 @@ typedef mkdirlist_ent *	entp ;
 extern "C" {
     extern int	pcsopendircache(cchar *,cchar *,int,mode_t,int) noex ;
     extern int	bbcmp(cchar *,cchar *) noex ;
-}
-
-extern "C" {
-    extern int uc_close(int) noex ;
 }
 
 
