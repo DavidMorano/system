@@ -40,6 +40,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<vecobj.h>
 #include	<strn.h>
 #include	<localmisc.h>
@@ -68,7 +69,6 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
