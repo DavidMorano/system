@@ -51,6 +51,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<opentmp.h>
@@ -108,7 +109,6 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     extern int uc_unlink(cchar *) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
