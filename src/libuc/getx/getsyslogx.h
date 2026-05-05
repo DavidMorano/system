@@ -26,9 +26,9 @@
 
 EXTERNC_begin
 
-extern int	getlogfac(cchar *,int) noex ;
-extern int	getsyslogpri(cchar *,int) noex ;
-extern cchar	*strfacname(int) noex ;
+extern int	getlogfac	(cchar *,int)	noex ;
+extern int	getsyslogpri	(cchar *,int)	noex ;
+extern cchar	*strfacname	(int)		noex ;
 
 EXTERNC_end
 
