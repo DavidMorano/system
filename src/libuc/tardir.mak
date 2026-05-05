@@ -53,6 +53,7 @@ OBJ2=
 OBJ3=
 
 OBJA= obj0.o obj1.o
+OBJB=
 
 OBJ= obja.o
 
@@ -105,8 +106,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ) objpart.o
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ) objpart.o
+$(T).o:			obj.o objpart.o
+	$(LD) -r $(LDFLAGS) -o $@ obj.o objpart.o
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -138,6 +139,10 @@ obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj.o:		$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
