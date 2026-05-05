@@ -1,4 +1,4 @@
-/* stdfnames HEADER */
+/* stdfname HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -31,35 +31,35 @@
 
 
 #ifndef	STDFNIN
-#define	STDFNIN		stdfnames[stdfile_in]
+#define	STDFNIN		stdfname[stdfile_in]
 #endif
 
 #ifndef	STDFNOUT
-#define	STDFNOUT	stdfnames[stdfile_out]
+#define	STDFNOUT	stdfname[stdfile_out]
 #endif
 
 #ifndef	STDFNERR
-#define	STDFNERR	stdfnames[stdfile_err]
+#define	STDFNERR	stdfname[stdfile_err]
 #endif
 
 #ifndef	STDFNLOG
-#define	STDFNLOG	stdfnames[stdfile_log]
+#define	STDFNLOG	stdfname[stdfile_log]
 #endif
 
 #ifndef	STDFNNULL
-#define	STDFNNULL	stdfnames[stdfile_null]
+#define	STDFNNULL	stdfname[stdfile_null]
 #endif
 
 #ifndef	STDFNZERO
-#define	STDFNZERO	stdfnames[stdfile_zero]
+#define	STDFNZERO	stdfname[stdfile_zero]
 #endif
 
 #ifndef	STDFNMINUX
-#define	STDFNMINUS	stdfnames[stdfile_minus]
+#define	STDFNMINUS	stdfname[stdfile_minus]
 #endif
 
 
-extern ccharp	stdfnames[stdfile_overlast + 1] ;
+extern ccharp	stdfname[stdfile_overlast + 1] ;
 
 
 #endif /* STDFNAMES_INCLUDE */
