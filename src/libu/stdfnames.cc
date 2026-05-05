@@ -1,4 +1,4 @@
-/* stdfnames SUPPORT */
+/* stdfname SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -21,7 +21,7 @@
 /*******************************************************************************
 
   	Variable:
-	stdfnames
+	stdfname
 
 	Description:
 	This module provides that c-strings for the standard file
@@ -46,7 +46,7 @@
 #include	<stdfiles.h>
 #include	<localmisc.h>
 
-#include	"stdfnames.h"
+#include	"stdfname.h"
 
 
 /* local defines */
@@ -83,7 +83,7 @@ const stdfnamer		stdfname_data ;
 
 /* exported variables */
 
-ccharp		stdfnames[stdfile_overlast + 1] ;
+ccharp		stdfname[stdfile_overlast + 1] ;
 
 
 /* exported subroutines */
@@ -92,14 +92,15 @@ ccharp		stdfnames[stdfile_overlast + 1] ;
 /* local subroutines */
 
 stdfnamer::stdfnamer() noex {
-	stdfnames[stdfile_in]		= "*STDIN*" ;
-	stdfnames[stdfile_out]		= "*STDOUT*" ;
-	stdfnames[stdfile_err]		= "*STDERR*" ;
-	stdfnames[stdfile_log]		= "*STDLOG*" ;
-	stdfnames[stdfile_null]		= "*STDNULL*" ;
-	stdfnames[stdfile_zero]		= "*STDZERO*" ;
-	stdfnames[stdfile_minus]	= "-" ;
-	stdfnames[stdfile_overlast]	= nullptr ;
+    	ccharp *n = stdfname ;
+	n[stdfile_in]		= "*STDIN*" ;
+	n[stdfile_out]		= "*STDOUT*" ;
+	n[stdfile_err]		= "*STDERR*" ;
+	n[stdfile_log]		= "*STDLOG*" ;
+	n[stdfile_null]		= "*STDNULL*" ;
+	n[stdfile_zero]		= "*STDZERO*" ;
+	n[stdfile_minus]	= "-" ;
+	n[stdfile_overlast]	= nullptr ;
 } /* end ctor (stdfnamer) */
 
 
