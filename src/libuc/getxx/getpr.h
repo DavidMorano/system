@@ -20,11 +20,11 @@
 
 EXTERNC_begin
 
-extern int getpr_begin(int) noex ;
-extern int getpr_ent(ucentpr *,char *,int) noex ;
-extern int getpr_name(ucentpr *,char *,int,cchar *) noex ;
-extern int getpr_num(ucentpr *,char *,int,int) noex ;
-extern int getpr_end() noex ;
+extern int getpr_begin	(int) noex ;
+extern int getpr_ent	(ucentpr *,char *,int) noex ;
+extern int getpr_name	(ucentpr *,char *,int,cchar *) noex ;
+extern int getpr_num	(ucentpr *,char *,int,int) noex ;
+extern int getpr_end	() noex ;
 
 EXTERNC_end
 
