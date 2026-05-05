@@ -19,9 +19,9 @@
 
 EXTERNC_begin
 
-extern int getus_begin() noex ;
-extern int getus_ent(char *,int) noex ;
-extern int getus_end() noex ;
+extern int getus_begin	() noex ;
+extern int getus_ent	(char *,int) noex ;
+extern int getus_end	() noex ;
 
 EXTERNC_end
 
