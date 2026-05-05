@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* read a password from the user's terminal */
+/* read a password from the user terminal */
 /* version %I% last-modified %G% */
 
 
@@ -37,6 +37,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<ucdesc.h>
 #include	<uctc.h>		/* terminal-conrol */
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -62,7 +63,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) ;
     extern int uc_read(int,void *,int) noex ;
     extern int uc_write(int,cvoid *,int) noex ;
 }
