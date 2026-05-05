@@ -8,12 +8,14 @@
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	= 1999-01-10, David A­D­ Morano
+	This code was originally written.  It was prompted by
+	the failure of other terminal message programs from finding
+	the proper controlling terminal.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GETUSERTERMS_INCLUDE
 #define	GETUSERTERMS_INCLUDE
