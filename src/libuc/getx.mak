@@ -42,7 +42,7 @@ LIBS +=
 
 OBJ00= getaddr.o getaf.o getarchitecture.o getbufsize.o
 OBJ01= getdefzdata.o geteaddrinfo.o
-OBJ02= getenver.o getev.o getfdfile.o
+OBJ02= getev.o getfdfile.o
 OBJ03= gethz.o getmailgid.o getmjd.o
 OBJ04= getnfile.o getngroups.o getnodedomain.o
 OBJ05= getnodeinfo.o getnprocessors.o getourenv.o
@@ -54,8 +54,8 @@ OBJ10= getsocktype.o getsyslogx.o getsystypenum.o
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
 OBJ13= getnisdomain.o getfstype.o
-OBJ14= getoflags.o
-OBJ15= getpwx.o systypenames.o
+OBJ14= getoflags.o getpwx.o systypenames.o
+OBJ15= getenver.o gettmpdir.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o 
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -200,7 +200,6 @@ getpf.o:		getpf.cc		getpf.h			$(INCS)
 getarchitecture.o:	getarchitecture.cc	getarchitecture.h	$(INCS)
 getdefzdata.o:		getdefzdata.cc		getdefzdata.h		$(INCS)
 geteaddrinfo.o:		geteaddrinfo.cc		geteaddrinfo.h		$(INCS)
-getenver.o:		getenver.cc		getenver.h		$(INCS)
 getev.o:		getev.cc		getev.h			$(INCS)
 getfdfile.o:		getfdfile.cc		getfdfile.h		$(INCS)
 gethz.o:		gethz.cc		gethz.h			$(INCS)
@@ -236,4 +235,9 @@ getnisdomain.o:		getnisdomain.cc		getnisdomain.h		$(INCS)
 getpwx.o:		getpwx.cc		getpwx.h		$(INCS)
 getoflags.o:		getoflags.cc		getoflags.h		$(INCS)
 getfstype.o:		getfstype.cc		getfstype.h		$(INCS)
+
+# returns |char|
+getenver.o:		getenver.cc		getenver.h		$(INCS)
+gettmpdir.o:		gettmpdir.cc		gettmpdir.h		$(INCS)
+
 
