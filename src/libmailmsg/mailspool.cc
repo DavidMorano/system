@@ -57,7 +57,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<uclock.h>
+#include	<ucdesc.h>
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
@@ -97,7 +97,6 @@ extern "C" {
     extern int uc_unlink(cchar *) noex ;
     extern int uc_open(cchar *,int,mode_t) noex ;
     extern int uc_fminmod(int,mode_t) noex ;
-    extern int uc_close(int) noex ;
 } /* end extern */
 
 
