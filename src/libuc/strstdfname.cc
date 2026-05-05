@@ -38,6 +38,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<stdfiles.h>
+#include	<stdfnames.h>		/* |stdfname(3u)| */
 #include	<localmisc.h>
 
 #include	"strstdfname.h"
@@ -69,7 +71,7 @@
 cchar *strstdfname(int w,cchar *atf) noex {
 	if ((w >= 0) && (w < stdfile_overlast)) ylikely {
             if ((atf == nullptr) || (atf[0] == '\0') || (atf[0] == '-')) {
-                atf = stdfnames[w] ;
+                atf = stdfname[w] ;
 	    }
 	}
 	return atf ;
