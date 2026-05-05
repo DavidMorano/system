@@ -77,18 +77,19 @@ ccharp		sysdbfile[sysdbfile_overlast + 1] ;
 /* local subroutines */
 
 sysdbfiler::sysdbfiler() noex {
-	sysdbfile[sysdbfile_pw] 	= "passwd" ;
-	sysdbfile[sysdbfile_sp] 	= "shadow" ;
-	sysdbfile[sysdbfile_ua] 	= "userattr" ;
-	sysdbfile[sysdbfile_gr] 	= "group" ;
-	sysdbfile[sysdbfile_pj] 	= "project" ;
-	sysdbfile[sysdbfile_pr] 	= "protocols" ;
-	sysdbfile[sysdbfile_nw] 	= "networks" ;
-	sysdbfile[sysdbfile_nm] 	= "netmasks" ;
-	sysdbfile[sysdbfile_ho] 	= "hosts" ;
-	sysdbfile[sysdbfile_sv] 	= "services" ;
-	sysdbfile[sysdbfile_sh]		= "shells" ;
-	sysdbfile[sysdbfile_overlast]	= nullptr ;
-} /* end ctor (sysdbfiler) */
+    	ccharp *n = sysdbfile ;
+	n[sysdbfile_pw] 	= "passwd" ;
+	n[sysdbfile_sp] 	= "shadow" ;
+	n[sysdbfile_ua] 	= "userattr" ;
+	n[sysdbfile_gr] 	= "group" ;
+	n[sysdbfile_pj] 	= "project" ;
+	n[sysdbfile_pr] 	= "protocols" ;
+	n[sysdbfile_nw] 	= "networks" ;
+	n[sysdbfile_nm] 	= "netmasks" ;
+	n[sysdbfile_ho] 	= "hosts" ;
+	n[sysdbfile_sv] 	= "services" ;
+	n[sysdbfile_sh]		= "shells" ;
+	n[sysdbfile_overlast]	= nullptr ;
+} /* end ctor (nr) */
 
 
