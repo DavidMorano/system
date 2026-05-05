@@ -62,6 +62,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<filer.h>
 #include	<fdliner.h>
 #include	<vechand.h>
@@ -125,7 +126,6 @@ typedef msgentry *	msgentryp ;
 
 extern "C" {
     extern int uc_closeonexec(int,int) noex ;
-    extern int uc_close(int) noex ;
     extern int uc_unlink(cchar *) noex ;
 } /* end extern */
 
