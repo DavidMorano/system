@@ -65,6 +65,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<ucsysmisc.h>		/* |uc_gettimeofday(3uc)| */
 #include	<ucgetpid.h>
 #include	<getbufsize.h>
@@ -130,13 +131,10 @@ extern "C" {
     extern int uc_write(int,cvoid *,int) noex ;
     extern int uc_writen(int,cvoid *,int) noex ;
     extern int uc_iocctl(int,int,...) noex ;
-    extern int uc_rewind(int) noex ;
     extern int uc_ftruncate(int,off_t ) noex ;
     extern int uc_closeonexec(int,int) noex ;
-    extern int uc_fpathconf(int,int,char *) noex ;
     extern int uc_setsockopt(int,int,int,int *,int) noex ;
     extern int uc_linger(int,int) noex ;
-    extern int uc_close(int) ;
 } /* end extern */
 
 
