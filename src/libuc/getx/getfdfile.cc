@@ -47,7 +47,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<stdfnames.h>
+#include	<stdfnames.h>		/* |stdfname(3u)| */
 #include	<cfdec.h>
 #include	<matstr.h>
 #include	<mkchar.h>
@@ -99,7 +99,7 @@ int getfdfile(cchar *fp,int µfl) noex {
 		if ((fl >= 2) && isstar(fp[0])) {
 		    if (cint ch1 = mkchar(fp[1]) ; ISUPP(ch1)) {
 		        rs = SR_BADF ;
-	                if ((fd = matstr(stdfnames,fp,fl)) >= 0) {
+	                if ((fd = matstr(stdfname,fp,fl)) >= 0) {
 	                    if (fd == stdfile_null) {
 		                rs = SR_EMPTY ;
 		            } else {
