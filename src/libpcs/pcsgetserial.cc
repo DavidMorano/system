@@ -59,6 +59,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<mkpathx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -84,7 +85,6 @@ extern "C" {
     extern int uc_fpathconf(int,int,long *) noex ;
     extern int uc_fchown(int,uid_t,gid_t) noex ;
     extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_close(int) noex ;
 } /* end extern */
 
 extern "C" {
