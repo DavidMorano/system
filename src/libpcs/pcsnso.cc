@@ -42,6 +42,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<getpx.h>
 #include	<getpwx.h>
 #include	<getbufsize.h>
 #include	<getusername.h>
@@ -1023,7 +1024,7 @@ local int getprojinfo_sysdb(SI *sip) noex {
 	    char	*pjbuf ;
 	    if ((rs = lm_mall((pjlen+1),&pjbuf)) >= 0) {
 	        cchar	*un = sip->un ;
-	        if ((rs = uc_getdefproj(un,&pj,pjbuf,pjlen)) >= 0) {
+	        if ((rs = uc_getprojdef(&pj,pjbuf,pjlen)) >= 0) {
 	            int	f = (strcmp(pj.pj_name,DEFPROJNAME) != 0) ;
 	            if (f) {
 	                PCSNSO_PWD	*pdp = &op->pwd ;
