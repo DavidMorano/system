@@ -2,13 +2,13 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get a password (c-string) from the controlling terminal */
+/* read a password from the user terminal */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
+	= 1998-03-17, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
