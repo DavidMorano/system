@@ -20,11 +20,11 @@
 
 EXTERNC_begin
 
-extern int getnw_begin(int) noex ;
-extern int getnw_ent(ucentnw *,char *,int) noex ;
-extern int getnw_name(ucentnw *,char *,int,cchar *) noex ;
-extern int getnw_addr(ucentnw *,char *,int,int,int) noex ;
-extern int getnw_end() noex ;
+extern int getnw_begin	(int) noex ;
+extern int getnw_ent	(ucentnw *,char *,int) noex ;
+extern int getnw_name	(ucentnw *,char *,int,cchar *) noex ;
+extern int getnw_addr	(ucentnw *,char *,int,int,int) noex ;
+extern int getnw_end	() noex ;
 
 EXTERNC_end
 
