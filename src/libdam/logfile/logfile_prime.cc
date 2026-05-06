@@ -60,6 +60,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<getnodename.h>
 #include	<sigblocker.h>
 #include	<ascii.h>
@@ -133,7 +134,6 @@ extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
     extern int uc_moveup(int,int) noex ;
     extern int uc_closeonexec(int,int) noex ;
-    extern int uc_close(int) noex ;
     extern int uc_readln(int,void *,int) noex ;
     extern int uc_writen(int,cvoid *,int) noex ;
     extern int uc_writedesc(int,int,int) noex ;
