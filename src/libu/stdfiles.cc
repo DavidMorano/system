@@ -75,6 +75,7 @@ consteval stdfiler::stdfiler() noex {
 	name[stdfile_null]	= "/dev/null" ;
 	name[stdfile_zero]	= "/dev/zero" ;
 	name[stdfile_minus]	= "/dev/stdin" ;
+	name[stdfile_overlast]	= nullptr ;
 } /* end ctor */
 
 constexpr stdfiler	stdfile ;
