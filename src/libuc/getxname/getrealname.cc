@@ -97,7 +97,7 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 	int		rl = 0 ;
 	if (rbuf) {
 	    rs = SR_INVALID ;
-	    if (rlen > 1) {
+	    if (rlen > 0) {
 	        if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	            ucentpwx	pw ;
 	            cint	pwlen = rs ;
