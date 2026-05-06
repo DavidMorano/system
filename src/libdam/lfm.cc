@@ -619,7 +619,7 @@ static int lfm_lockload(lfm *op,lfm_ch *lcp) noex {
 	                        rs = lfm_locklost(op,lcp,&b) ;
 			    }
 	                } else {
-	                    rs = SR_LOCKLOST ;
+	                    rs = SR_LOCKFAIL ;
 	                }
 	                rs1 = b.finish ;
 	                if (rs >= 0) rs = rs1 ;
@@ -841,7 +841,7 @@ static int lfm_checklock(lfm *op,time_t dt) noex {
 	    if ((rs = lfm_lockreadpid(op)) >= 0) {
 	        const pid_t	pid_lock = rs ;
 	        if (pid_lock != op->pid)  {
-	            rs = SR_LOCKLOST ;
+	            rs = SR_LOCKFAIL ;
 	        }
 	        if (rs >= 0) {
 	            v = pid_lock ;
@@ -860,7 +860,7 @@ static int lfm_checklock(lfm *op,time_t dt) noex {
 static int lfm_ourdevino(lfm *op,USTAT *sbp) noex {
 	int		rs = SR_OK ;
 	if ((sbp->st_dev != op->dev) || (sbp->st_ino != op->ino)) {
-	    rs = SR_LOCKLOST ;
+	    rs = SR_LOCKFAIL ;
 	}
 	return rs ;
 }
