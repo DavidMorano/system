@@ -58,15 +58,15 @@
 #include	<char.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
-#include	<debprintf.h>		/* |DEBPRINTF| */
+#include	<deb.hh>		/* |DEBPRINTF| */
 
 #include	"langparse.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/debug.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
-import debug ;
+import deb ;
 
 /* local defines */
 
