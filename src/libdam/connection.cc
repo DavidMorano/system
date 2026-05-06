@@ -72,6 +72,7 @@
 #include	<usyscalls.h>
 #include	<uinet.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<ucgetx.h>		/* |uc_getnameinfo(3uc)| */
 #include	<getbufsize.h>
 #include	<getxx.h>
@@ -130,7 +131,6 @@ extern "C" {
     extern int uc_ftruncate(int,off_t) noex ;
     extern int uc_setappend(int,int) noex ;
     extern int uc_closeonexec(int,int) noex ;
-    extern int uc_close(int) noex ;
 } /* end extern */
 
 
