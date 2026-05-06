@@ -38,10 +38,10 @@ typedef LIBRANDOM	librandom ;
 
 EXTERNC_begin
 
-extern int	librandom_start(librandom *,int,uint) noex ;
-extern int	librandom_finish(librandom *) noex ;
-extern int	librandom_getuint(librandom *,uint *) noex ;
-extern int	librandom_getulong(librandom *,ulong *) noex ;
+extern int	librandom_start		(librandom *,int,uint)	noex ;
+extern int	librandom_finish	(librandom *)		noex ;
+extern int	librandom_getuint	(librandom *,uint *)	noex ;
+extern int	librandom_getulong	(librandom *,ulong *)	noex ;
 
 EXTERNC_end
 
