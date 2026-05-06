@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		OK
-	<0		error code (syhstem-return)
+	<0		error (system-return)
 
 *******************************************************************************/
 
