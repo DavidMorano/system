@@ -28,18 +28,18 @@
 
 EXTERNC_begin
 
-extern int matbasesubstr(mainv,int,cchar *,int) noex ;
-extern int matcasesubstr(mainv,int,cchar *,int) noex ;
-extern int matfoldsubstr(mainv,int,cchar *,int) noex ;
+extern int matbasesubstr(con mainv,int,cchar *,int) noex ;
+extern int matcasesubstr(con mainv,int,cchar *,int) noex ;
+extern int matfoldsubstr(con mainv,int,cchar *,int) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int matsubstr(mainv bs,int n,cchar *sp,int sl = -1) noex {
+inline int matsubstr(con mainv bs,int n,cchar *sp,int sl = -1) noex {
 	return matbasesubstr(bs,n,sp,sl) ;
 }
 #else
-static inline int matsubstr(mainv bs,int n,cchar *sp,int sl) noex {
+static inline int matsubstr(con mainv bs,int n,cchar *sp,int sl) noex {
 	return matbasesubstr(bs,n,sp,sl) ;
 }
 #endif /* __cplusplus */
