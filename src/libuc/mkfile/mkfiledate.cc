@@ -50,7 +50,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uctimeconv.h>
-#include	<gettmpdname.h>
+#include	<gettmpdir.h>
 #include	<bufsizevar.hh>
 #include	<mkpathx.h>
 #include	<mkfnamesuf.h>
@@ -136,7 +136,7 @@ int mkfiledate(char *rbuf,cchar *dname,cchar *fs,mode_t fm) noex {
 	    if (fs[0]) ylikely {
 	        if ((dname == nullptr) || (dname[0] == '\0')) {
 	            if ((dname = defdname) == nullptr) {
-		        defdname = gettmpdname() ;
+		        defdname = gettmpdir() ;
 		        dname = defdname ;
 	            }
 	        } /* end if (null or empty) */
