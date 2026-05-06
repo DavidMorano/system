@@ -72,6 +72,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<endian.h>
@@ -166,7 +167,7 @@ template<typename ... Args>
 local inline int ipasswd_magic(ipasswd *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == IPASSWD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == IPASSWD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (ipasswd_magic) */
@@ -202,7 +203,7 @@ local int	mkvars() noex ;
 
 /* local variables */
 
-static sysval		pagesize(sysval_ps) ;
+static sysval		pagesz(sysval_ps) ;
 
 static vars		var ;
 
@@ -230,8 +231,8 @@ int ipasswd_open(ipasswd *op,cchar *dbname) noex {
 	    static cint		rsv = mkvars() ;
 	    memclear(op) ;
 	    if ((rs = rsv) >= 0) ylikely {
-	        if ((rs = pagesize) >= 0) ylikely {
-	            op->pagesize = rs ;
+	        if ((rs = pagesz) >= 0) ylikely {
+	            op->pagesz = rs ;
 	            op->fd = -1 ;
 	            op->oflags = O_RDONLY ;
 	            op->operm = 0666 ;
@@ -243,7 +244,7 @@ int ipasswd_open(ipasswd *op,cchar *dbname) noex {
 	                        if ((rs = ipasswd_fileopen(op,dt)) >= 0) {
 	                            if ((rs = ipasswd_mapbegin(op,dt)) >= 0) {
 	                                if ((rs = ipasswd_hdrload(op)) >= 0) {
-	                                    op->magic = IPASSWD_MAGIC ;
+	                                    op->magval = IPASSWD_MAGIC ;
 	                                }
 	                                if (rs < 0) {
 	                                    ipasswd_mapend(op) ;
@@ -262,7 +263,7 @@ int ipasswd_open(ipasswd *op,cchar *dbname) noex {
 		        rs1 = lm_free(dbfname) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
-	        } /* end if (pagesize) */
+	        } /* end if (pagesz) */
 	    } /* end if (mkvars) */
 	} /* end if (non-null) */
 	return rs ;
@@ -278,7 +279,7 @@ int ipasswd_close(ipasswd *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->fd >= 0) ylikely {
-	        rs1 = u_close(op->fd) ;
+	        rs1 = uc_close(op->fd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fd = -1 ;
 	    }
@@ -288,7 +289,7 @@ int ipasswd_close(ipasswd *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -324,14 +325,14 @@ int ipasswd_fetch(ipasswd *op,realname *rp,ipasswd_cur *curp,
             bool	    f_cur = false ;
             if (curp == nullptr) {
                 curp = &cur ;
-                curp->magic = IPASSWD_CURMAGIC ;
+                curp->magval = IPASSWD_CURMAGIC ;
                 curp->wi = 0 ;
                 for (int i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
                     curp->i[i] = -1 ;
                 }
             } else {
                 f_cur = true ;
-                if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
+                if (curp->magval != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
                 if (! op->fl.cursor) return SR_INVALID ;
             }
             if (up) *up = '\0' ;
@@ -487,7 +488,7 @@ int ipasswd_curbegin(ipasswd *op,ipasswd_cur *curp) noex {
 	    for (int i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
 	        curp->i[i] = -1 ;
 	    }
-	    curp->magic = IPASSWD_CURMAGIC ;
+	    curp->magval = IPASSWD_CURMAGIC ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -497,13 +498,13 @@ int ipasswd_curend(ipasswd *op,ipasswd_cur *curp) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	if ((rs = ipasswd_magic(op,curp)) >= 0) {
-	    if (curp->magic == IPASSWD_CURMAGIC) {
+	    if (curp->magval == IPASSWD_CURMAGIC) {
 	        if (op->fl.cursoracc) op->ti_access = dt ;
 	        op->fl.cursor = false ;
 	        for (int i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
 	            curp->i[i] = -1 ;
 	        }
-	        curp->magic = 0 ;
+	        curp->magval = 0 ;
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return rs ;
@@ -516,7 +517,7 @@ int ipasswd_curenum(ipasswd *op,ipasswd_cur *curp,char *ubuf,cc **sa,
 	int		rs1 ;
 	int		ul = 0 ;
 	if ((rs = ipasswd_magic(op,curp,ubuf,sa,rbuf)) >= 0) {
-	    if (curp->magic == IPASSWD_CURMAGIC) {
+	    if (curp->magval == IPASSWD_CURMAGIC) {
 		rs = SR_INVALID ;
 	        if (op->fl.cursor) {
 		    time_t	dt = 0 ;
@@ -602,17 +603,19 @@ int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 	bool		f_cur = false ;
 
 	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != IPASSWD_MAGIC) return SR_NOTOPEN ;
 
 	if (sa == nullptr) return SR_FAULT ;
 
 	if (curp == nullptr) {
 	    curp = &cur ;
-	    curp->magic = IPASSWD_CURMAGIC ;
-	    for (int i = 0 ; i < IPASSWD_NINDICES ; i += 1) curp->i[i] = -1 ;
+	    curp->magval = IPASSWD_CURMAGIC ;
+	    for (int i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
+		curp->i[i] = -1 ;
+	    }
 	} else {
 	    f_cur = true ;
-	    if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
+	    if (curp->magval != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
 	    if (! op->fl.cursor) return SR_INVALID ;
 	}
 
@@ -862,7 +865,7 @@ local int ipasswd_hdrload(ipasswd *op) noex {
 		    /* if looks good, read the header stuff */
 		    /* try to validate the header table */
 	            for (i = pwihdr_rectab ; i < IPASSWD_IDLEN ; i += 1) {
-	                if (table[i] >= op->filesize) break ;
+	                if (table[i] >= op->filesz) break ;
 	            } /* end for */
 	            if (i >= IPASSWD_IDLEN) {
 	                rs = ipasswd_hdrloader(op) ;
@@ -931,22 +934,22 @@ local int ipasswd_fileopen(ipasswd *op,time_t dt) noex {
 	        if (dt == 0) dt = getustime ;
 	        op->ti_open = dt ;
 	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
-	            if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
-			csize	fsz = size_t(sb.st_size) ;
+	            if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+			csize	fsize = size_t(sb.st_size) ;
 	                int	sz = 0 ;
 	                sz += IPASSWD_IDLEN ;
 	                sz += (pwihdr_overlast * szof(int)) ;
-	                if (int isz = intsat(fsz) ; isz >= sz) {
+	                if (int isz = intsat(fsize) ; isz >= sz) {
 	                    op->mtime = sb.st_mtime ;
-	                    op->filesize = intsat(sb.st_size) ;
+	                    op->filesz = intsat(fsize) ;
 	                    rs = ipasswd_remotefs(op) ;
 	                } else {
 	                    rs = SR_NOMSG ;
 	                }
-	            }
-	        }
+	            } /* end if (uc_fstat) */
+	        } /* end if (uc_closeonexec) */
 	        if (rs < 0) {
-	            u_close(op->fd) ;
+	            uc_close(op->fd) ;
 	            op->fd = -1 ;
 	        }
 	    } /* end if (u_open) */
@@ -958,7 +961,7 @@ local int ipasswd_fileopen(ipasswd *op,time_t dt) noex {
 local int ipasswd_fileclose(ipasswd *op) noex {
 	int		rs = SR_OK ;
 	if (op->fd >= 0) {
-	    rs = u_close(op->fd) ;
+	    rs = uc_close(op->fd) ;
 	    op->fd = -1 ;
 	}
 	return rs ;
@@ -966,17 +969,17 @@ local int ipasswd_fileclose(ipasswd *op) noex {
 /* end subroutine (ipasswd_fileclose) */
 
 local int ipasswd_mapbegin(ipasswd *op,time_t dt) noex {
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (op->mapdata == nullptr) {
-	    cnullptr	np{} ;
-	    size_t	ms = uceil(op->filesize,op->pagesize) ;
 	    cint	fd = op->fd ;
 	    cint	mp = PROT_READ ;
 	    cint	mf = MAP_SHARED ;
+	    int		ms = uceil(op->filesz,op->pagesz) ;
 	    void	*md ;
-	    if (ms == 0) ms = op->pagesize ;
-	    if ((rs = u_mmap(np,ms,mp,mf,fd,0L,&md)) >= 0) {
+	    if (ms == 0) ms = op->pagesz ;
+	    if ((rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	        op->mapdata = charp(md) ;
 	        op->mapsize = ms ;
 	        op->ti_map = dt ;
@@ -1028,7 +1031,9 @@ local int ipasswd_keymatchl3(ipasswd *op,int opts,int ri,realname *rp) noex {
 	cint		si = op->rectab[ri].last ;
 	int		f ;
 	(void) opts ;
-	f = (strncmp((op->stab + si),rp->last,3) == 0) ;
+	{
+	    f = (strncmp((op->stab + si),rp->last,3) == 0) ;
+	}
 	return f ;
 }
 /* end subroutine (ipasswd_keymatchl3) */
@@ -1037,7 +1042,9 @@ local int ipasswd_keymatchl1(ipasswd *op,int opts,int ri,realname *rp) noex {
 	cint		si = op->rectab[ri].last ;
 	int		f ;
 	(void) opts ;
-	f = ((op->stab + si)[0] == rp->last[0]) ;
+	{
+	    f = ((op->stab + si)[0] == rp->last[0]) ;
+	}
 	return f ;
 }
 /* end subroutine (ipasswd_keymatchl1) */
@@ -1046,7 +1053,9 @@ local int ipasswd_keymatchf(ipasswd *op,int opts,int ri,realname *rp) noex {
 	cint		si = op->rectab[ri].first ;
 	int		f ;
 	(void) opts ;
-	f = ((op->stab + si)[0] == rp->first[0]) ;
+	{
+	    f = ((op->stab + si)[0] == rp->first[0]) ;
+	}
 	return f ;
 }
 /* end subroutine (ipasswd_keymatchf) */
@@ -1156,7 +1165,7 @@ local int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 	            len = intconv(tp - fname) ;
 	        }
 	    }
-	}
+	} /* end if (sfbasename) */
 	return len ;
 }
 /* end subroutine (detOurSuf) */
