@@ -40,7 +40,7 @@ MODS +=
 LIBS += -ldam
 
 
-OBJ00= unlinkd.o rmermsg.o
+OBJ00= unlinker.o rmermsg.o
 OBJ01=
 
 OBJA= $(OBJ00) $(OBJ01)
@@ -142,7 +142,7 @@ obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-unlinkd.o:		unlinkd.cc	rmermsg.h		$(INCS)
+unlinkder.o:		unlinker.cc	rmermsg.h		$(INCS)
 
 rmermsg.o:		rmermsg.cc	rmermsg.h		$(INCS)
 
