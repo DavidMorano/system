@@ -99,7 +99,7 @@ namespace {
 
 /* local variables */
 
-constexpr nodeinfo_m	nodes[] = {
+constexpr nodeinfo_m	tries[] = {
 	&nodeinfo::env,
 	&nodeinfo::uinfo
 } ; /* end array */
@@ -125,7 +125,7 @@ int getnodename(char *nbuf,int nlen) noex {
 
 nodeinfo::operator int () noex {
 	int		rs = SR_OK ;
-	for (cauto &m : nodes) {
+	for (cauto &m : tries) {
 	    rs = (this->*m)() ;
 	    if (rs < 0) break ;
 	} /* end for */
