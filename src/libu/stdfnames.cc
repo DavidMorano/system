@@ -46,7 +46,7 @@
 #include	<stdfiles.h>
 #include	<localmisc.h>
 
-#include	"stdfname.h"
+#include	"stdfnames.h"
 
 
 /* local defines */
@@ -84,6 +84,19 @@ const stdfnamer		stdfname_data ;
 /* exported variables */
 
 ccharp		stdfname[stdfile_overlast + 1] ;
+
+extern ccharp	stdfnames[stdfile_overlast + 1] ;
+
+ccharp		stdfnames[stdfile_overlast + 1] = {
+	"*STDIN*",
+	"*STDOUT*",
+	"*STDERR*",
+	"*STDLOG*",
+	"*STDNULL*",
+	"*STDZERO*",
+	"-",
+	nullptr
+} ; /* end array */
 
 
 /* exported subroutines */
