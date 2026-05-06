@@ -606,13 +606,13 @@ local int grcache_record(grcache *op,int ct,int rs) noex {
 /* end subroutine (grcache_record) */
 
 local int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		grl = 0 ;
 	if (rp && gn) ylikely {
 	    rs = SR_INVALID ;
 	    if (gn[0]) ylikely {
-		cint	rsn = SR_NOTFOUND ;
 	        if (dt == 0) dt = time(nullptr) ;
 	        memclear(rp) ;
 	        if (char *grbuf ; (rs = lm_gr(&grbuf)) >= 0) ylikely {
@@ -718,6 +718,7 @@ local int record_reload(rec *ep,int grl,ucentgr *ngrp) noex {
 /* end subroutine (record_reload) */
 
 local int record_refresh(rec *ep,time_t dt,int wc) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		grl = 0 ;
@@ -726,7 +727,6 @@ local int record_refresh(rec *ep,time_t dt,int wc) noex {
 	    if (ep->magic == RECORD_MAGIC) ylikely {
 	        if (char *grbuf ; (rs = lm_gr(&grbuf)) >= 0) ylikely {
 		    ucentgr	gr ;
-		    cint	rsn = SR_NOTFOUND ;
 	            cint	grlen = rs ;
 	            if ((rs = getgr_name(&gr,grbuf,grlen,ep->gn)) >= 0) {
 	                grl = rs ; /* <- indicates entry found */
