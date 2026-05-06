@@ -53,7 +53,7 @@
 
 #pragma		GCC dependency		"mod/uconstants.ccm"
 
-import uconstants ;
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
