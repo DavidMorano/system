@@ -43,7 +43,7 @@ enum stdfiles {
 #ifdef	__cplusplus
 
 struct stdfiler {
-	cchar	*name[stdfile_overlast] = {} ;
+	cchar	*name[stdfile_overlast + 1] = {} ;
 	consteval stdfiler() noex ;
 } ; /* end struct (stdfiler) */
 
