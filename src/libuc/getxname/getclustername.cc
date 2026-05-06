@@ -325,6 +325,7 @@ local int subinfo_ndb(SI *sip) noex {
 } /* end subroutine (subinfo_ndb) */
 
 local int subinfo_ndber(SI *sip,cchar *nfn) noex {
+ 	cint    	rsn = SR_NOTFOUND ;
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -337,14 +338,13 @@ local int subinfo_ndber(SI *sip,cchar *nfn) noex {
 		cauto curbegin = nodedb_curbegin ;
                 if (nodedb_cur cur ; (rs = curbegin(&st,&cur)) >= 0) {
                     nodedb_ent  ste ;
-                    cint    	rsn = SR_NOTFOUND ;
                     while (rs >= 0) {
                         rs1 = nodedb_fetch(&st,nn,&cur,&ste,ebuf,elen) ;
                         if (rs1 == rsn) break ;
                         rs = rs1 ;
                         if (rs >= 0) {
                             if (ste.clu && (ste.clu[0] != '\0')) {
-                                rs = sncpy1(rbuf,rlen,ste.clu) ;
+                                rs = sncpy(rbuf,rlen,ste.clu) ;
                                 len = rs ;
                             }
                         } /* end if (ok) */
@@ -366,6 +366,8 @@ local int subinfo_ndber(SI *sip,cchar *nfn) noex {
 } /* end if (subinfor_ndber) */
 
 local int subinfo_cdb(SI *sip) noex {
+	cnullptr	np{} ;
+	cint		rsn = SR_NOTFOUND ;
 	cint		rlen = sip->rlen ;
 	int		rs ;
 	int		rs1 ;
@@ -376,14 +378,12 @@ local int subinfo_cdb(SI *sip) noex {
 	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
 	    if ((rs = mkpath2(tbuf,pr,clusterfname)) >= 0) {
-		cnullptr	np{} ;
 	        if (clusterdb cdb ; (rs = clusterdb_open(&cdb,tbuf)) >= 0) {
 	            cauto	cf = clusterdb_curfetchrev ;
-	            cint	rsn = SR_NOTFOUND ;
 	            if (char *cbuf ; (rs = lm_nn(&cbuf)) >= 0) {
 			cint	clen = rs ;
 	                if ((rs = cf(&cdb,nn,np,cbuf,clen)) >= 0) {
-	                    rs = sncpy1(rbuf,rlen,cbuf) ;
+	                    rs = sncpy(rbuf,rlen,cbuf) ;
 	                    len = rs ;
 	                } else if (rs == rsn) {
 	                    rs = SR_OK ;
