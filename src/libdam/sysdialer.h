@@ -21,13 +21,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<usystem.h>		/* for |ino_t| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
 
 
 /* striaght up */
-#define	SYSDIALER_MAGIC	0x31815927
 #define	SYSDIALER	struct sysdialer_head
 #define	SYSDIALER_FL	struct sysdialer_flags
 #define	SYSDIALER_ENT	struct sysdialer_entry
@@ -36,6 +36,7 @@
 #define	SYSDIALER_ARGS	struct sysdialer_arguments
 #define	SYSDIALER_PRC	struct sysdialer_prcache
 #define	SYSDIALER_MOD	struct sysdialer_module
+#define	SYSDIALER_MAGIC	0x31815927
 #define	SYSDIALER_LF	"sysdialer"
 /* optional */
 #ifdef	COMMENT
@@ -53,19 +54,19 @@ enum sysdialeros {
     	sysdialero_overlast,
     	sysdialero_rdonly = sysdialero_halfin,
     	sysdialero_wronly = sysdialero_halfout
-} ;
+} ; /* end enum (sysdialeros) */
 
 #ifdef	__cplusplus
 
 struct sysdialerms {
-	static cint	full ;
-	static cint	halfout ;
-	static cint	halfin ;
-	static cint	cor ;
-	static cint	co ;
-	static cint	cl ;
-	static cint	nargs ;
-} ;
+	inline static cint	full	= (1 << sysdialero_full) ;
+	inline static cint	halfout	= (1 << sysdialero_halfout) ;
+	inline static cint	halfin	= (1 << sysdialero_halfin) ;
+	inline static cint	cor	= (1 << sysdialero_cor) ;
+	inline static cint	co	= (1 << sysdialero_co) ;
+	inline static cint	cl	= (1 << sysdialero_cl) ;
+	inline static cint	nargs	= (1 << sysdialero_nargs) ;
+} ; /* end struct (sysdialerms) */
 
 #endif /* __cplusplus */
 
@@ -80,26 +81,25 @@ struct sysdialerms {
 #define	SYSDIALER_MRDONLY	SYSDIALER_MHALFIN
 #define	SYSDIALER_MWRONLY	SYSDIALER_MHALFOUT
 
-
 struct sysdialer_information {
 	cchar		*name ;
 	cchar		*version ;
 	cchar		*itype ;
-	int		osize ;
+	int		osz ;
 	int		flags ;
-} ;
+} ; /* end struct */
 
 struct sysdialer_flags {
 	uint		vsprs:1 ;
 	uint		vsdirs:1 ;
 	uint		voents:1 ;
 	uint		prcache:1 ;
-} ;
+} ; /* end struct */
 
 struct sysdialer_prcache {
 	cchar		*domainname ;
-	mainv		prs ;
-} ;
+	cchar		**prs ;
+} ; /* end struct */
 
 struct sysdialer_head {
 	cchar		*pr ;
@@ -107,29 +107,28 @@ struct sysdialer_head {
 	vecobj		*elp ;		/* entry-list-pointer */
 	vecstr		*plp ;		/* pr-list-pointer */
 	vecstr		*dlp ;		/* directory-list-pointer */
-	void		*callp ;	/* calls-structure pointer */
 	SYSDIALER_PRC	pc ;
 	SYSDIALER_FL	fl ;
 	time_t		ti_lastcheck ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct sysdialer_module {
 	void		*dhp ;		/* SO-dlopen handle */
 	ino_t		ino ;
 	dev_t		dev ;
 	int		count ;
-} ;
+} ; /* end struct */
 
 struct sysdialer_entry {
 	cchar		*name ;
 	cchar		*itype ;
 	SYSDIALER_MOD	*mp ;
 	void		*callp ;
-	int		osize ;		/* object size */
+	int		osz ;		/* object size */
 	int		flags ;
 	int		count ;
-} ;
+} ; /* end struct */
 
 struct sysdialer_arguments {
 	cchar		*pr ;		/* program root */
@@ -139,13 +138,60 @@ struct sysdialer_arguments {
 	mainv		envv ;
 	int		timeout ;
 	int		options ;
-} ;
+} ; /* end struct */
+
+struct sysdialer_fext {
+	cchar		*exp ;
+	int		exl ;
+} ; /* end struct (sysdialer_fext) */
+
+#ifdef	__cplusplus
+namespace sysdialer_util {
+    EXTERNC_begin
+        typedef int (*soopen_f)(void *,SYSDIALER_ARGS *,
+			cchar *,cchar *,cchar **) noex ;
+        typedef int (*soreade_f)(void *,char *,int,int,int) noex ;
+        typedef int (*sorecve_f)(void *,char *,int,int,int,int) noex ;
+        typedef int (*sorecvfrome_f)(void *,char *,int,int,void *,int *,
+	    		int,int) noex ;
+        typedef int (*sorecvmsge_f)(void *,MSGHDR *,int,int,int) noex ;
+        typedef int (*sowrite_f)(void *,cchar *,int) noex ;
+        typedef int (*sosend_f)(void *,cchar *,int,int) noex ;
+        typedef int (*sosendto_f)(void *,cchar *,int,int,void *,int) noex ;
+        typedef int (*sosendmsg_f)(void *,MSGHDR *,int) noex ;
+        typedef int (*soshutdown_f)(void *,int) noex ;
+        typedef int (*soclose_f)(void *) noex ;
+    EXTERNC_end
+    struct sysdialer_calls {
+	soopen_f	open ;
+	soreade_f	reade ;
+	sorecve_f	recve ;
+	sorecvfrome_f	recvfrome ;
+	sorecvmsge_f	recvmsge ;
+	sowrite_f	write ;
+	sosend_f	send ;
+	sosendto_f	sendto ;
+	sosendmsg_f	sendmsg ;
+	soshutdown_f	shutdown ;
+	soclose_f	close ;
+    } ; /* end struct (sysdialer_calls) */
+} /* end namespace (sysdialer_util) */
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+namespace sysdialer_util {
+    struct vars {
+	int		maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace (sysdialer_util) */
+#endif /* __cplusplus */
 
 #ifdef	COMMENT
 struct interface {
 	char		*name ;
-	int		osize ;
-} ;
+	int		osz ;
+} ; /* end struct */
 #endif /* COMMENT */
 
 typedef	SYSDIALER	sysdialer ;
@@ -159,15 +205,31 @@ typedef	SYSDIALER_MOD	sysdialer_mod ;
 
 EXTERNC_begin
 
-extern int sysdialer_start(sysdialer *,cchar *,mainv,mainv) noex ;
-extern int sysdialer_loadin(sysdialer *,cchar *,sysdialer_ent **) noex ;
-extern int sysdialer_loadout(sysdialer *,cchar *) noex ;
-extern int sysdialer_check(sysdialer *,time_t) noex ;
-extern int sysdialer_finish(sysdialer *) noex ;
+extern int sysdialer_start	(sysdialer *,cchar *,mainv,mainv) noex ;
+extern int sysdialer_loadin	(sysdialer *,cchar *,sysdialer_ent **) noex ;
+extern int sysdialer_loadout	(sysdialer *,cchar *) noex ;
+extern int sysdialer_check	(sysdialer *,time_t) noex ;
+extern int sysdialer_finish	(sysdialer *) noex ;
 
 EXTERNC_end
 
-extern sysdialerms	sysdialerm ;
+#ifdef	__cplusplus
+extern const sysdialerms	sysdialerm ;
+namespace sysdialer_util {
+    extern int		vecstr_loadexts(vecstr *,cc *,cc *,int) noex ;
+    extern cpcchar	exts[] ;
+    extern cpcchar	prnames[] ;
+    extern vars		var ;
+    extern int		prcache_start(sysdialer_prcache *) noex ;
+    extern int		prcache_lookup(sysdialer_prcache *,int,cchar **) noex ;
+    extern int		prcache_finish(sysdialer_prcache *) noex ;
+    extern int entry_start	(SYSDIALER_ENT *,cchar *,cchar *) noex ;
+    extern int entry_checkdir	(SYSDIALER_ENT *,cchar *,cchar *) noex ;
+    extern int entry_loadcalls	(SYSDIALER_ENT *,void *) noex ;
+    extern int entry_hasname	(SYSDIALER_ENT *,void *,cchar *) noex ;
+    extern int entry_finish	(SYSDIALER_ENT *) noex ;
+} /* end namespace (sysdialer_util) */
+#endif /* __cplusplus */
 
 
 #endif /* SYSDIALER_INCLUDE */
