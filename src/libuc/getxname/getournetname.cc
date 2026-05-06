@@ -56,7 +56,7 @@
 #include	<getnisdomain.h>	/* |getnisdomain(3uc)| */
 #include	<sncpyx.h>
 #include	<ctdec.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<localmisc.h>		/* |DECBUFLEN| */
 
 #include	"getournetname.h"
 
@@ -137,9 +137,9 @@ local int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	        if ((rs = getnisdomain(dbuf,dlen)) >= 0) {
 	            cint	dl = rs ;
 		    if ((rs = getuid_user(un,-1)) >= 0) {
-	                cint	dilen = DIGBUFLEN ;
+	                cint	dilen = DECBUFLEN ;
 	                cint	v = rs ;
-	                char	dibuf[DIGBUFLEN+1] ;
+	                char	dibuf[DECBUFLEN+1] ;
 	                if ((rs = ctdeci(dibuf,dilen,v)) >= 0) {
 			    cchar	*u = "unix." ;
 	                    rs = sncpy4w(nbuf,nlen,u,dibuf,"@",dbuf,dl) ;
