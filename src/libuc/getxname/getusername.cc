@@ -22,7 +22,7 @@
   	Group:
 	getusername
 
-	[Description:
+	Description:
 	Get the username given a UID, the best that we can.  These things
 	have a certain level of confusion about them.  What is a
 	'username'?  After all of these years, one would think that
@@ -126,6 +126,7 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<utility>		/* |unreachable(c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
@@ -171,6 +172,8 @@ import ureserve ;			/* |vecstr(3u)| */
 
 
 /* imported namespaces */
+
+using std::unreachable ;
 
 
 /* local typedefs */
@@ -331,7 +334,7 @@ local int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
 	if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
-	    ucentpw	pw ;
+	    ucentpw	pw ; /* used-multiple */
 	    cint	pwlen = rs ;
 	    getxuser	xu{} ;
 	    xu.pwp = &pw ;
@@ -361,14 +364,14 @@ local int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 /* end subroutine (getusernamer) */
 
 local int getxusername_µprep(getxuser *xup) noex {
+    	static const uid_t	uid = getuid() ;
 	int		rs = SR_OK ;
 	xup->ubuf[0] = '\0' ;
 	if (xup->uid == uidend) {
 	    xup->f_self = true ;
-	    xup->uid = getuid() ;
+	    xup->uid = uid ;
 	} else {
-	    const uid_t	suid = getuid() ;
-	    xup->f_self = (xup->uid == suid) ;
+	    xup->f_self = (xup->uid == uid) ;
 	}
 	return rs ;
 } /* end subroutine (getxusername_µprep) */
@@ -387,7 +390,7 @@ local int getxusername_µtryer(getxuser *xup) noex {
                     for (int i = 0 ; getxusernames[i] ; i += 1) {
                         getxuser_f  fun = getxusernames[i] ;
                         rs = fun(xup) ;
-                        if (rs != 0) break ;
+                        if (rs) break ;
                     } /* end for */
                     len = rs ;
 		} /* end block */
@@ -434,9 +437,10 @@ local int getxusername_self(getxuser *xup) noex {
 } /* end subroutine (getxusername_self) */
 
 local int getxusername_varenv(getxuser *xup) noex {
+    	cint		n = strlibval_overlast ;
 	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
-	for (int i = 0 ; strusers[i] < strlibval_overlast ; i += 1) {
+	for (int i = 0 ; strusers[i] < n ; i += 1) {
 	    strlibvals	sv = strusers[i] ;
 	    cchar	*vv = nullptr ;
 	    switch (sv) {
@@ -522,7 +526,7 @@ local int getxusername_map(getxuser *xup) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
 	int		i{} ; /* used-afterwards */
-	int		f = false ;
+	bool		f = false ;
 	xup->unl = 0 ;
 	for (i = 0 ; mapents[i].uid != uidend ; i += 1) {
 	    f = (uid == mapents[i].uid) ;
