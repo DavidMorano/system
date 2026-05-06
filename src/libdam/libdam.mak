@@ -286,7 +286,7 @@ OBJ167=
 
 OBJ168= getprogexec.o getnodedomain.o getrand.o getgid_def.o
 OBJ169= getehostname.o getchostname.o getcanonical.o getourhe.o
-OBJ170= gethename.o getheaddr.o getcname.o getfstype.o gethz.o getsocktype.o
+OBJ170= gethename.o getheaddr.o getcname.o gethz.o getsocktype.o
 OBJ171= getsystypenum.o getstacksize.o gettid.o getprovider.o getproviderid.o
 OBJ172= getseed.o
 OBJ173= getnfile.o getpwd.o getrunlevel.o
