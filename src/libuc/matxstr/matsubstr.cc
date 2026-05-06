@@ -25,7 +25,7 @@
 	strings given (case insensitively).
 
 	Synopsis:
-	int mat{x}substr(mainv a,cchar *sp,int sl) noex
+	int mat{x}substr(con mainv a,cchar *sp,int sl) noex
 
 	Arguments:
 	{x}		base, case, fold
@@ -80,7 +80,7 @@ extern "C" {
 /* forward references */
 
 template<sixsub_f sixsub>
-local int matxsubstr(mainv a,cchar *sp,int 탎l) noex {
+local int matxsubstr(con mainv a,cchar *sp,int 탎l) noex {
     	int		rc = -1 ;
 	if (int sl ; a && ((sl = getlenstr(sp,탎l)) >= 0)) {
 	    int		i{} ; /* used-afterwards */
@@ -102,17 +102,17 @@ local int matxsubstr(mainv a,cchar *sp,int 탎l) noex {
 
 /* exported subroutines */
 
-int matbasesubstr(mainv a,cchar *sp,int sl) noex {
+int matbasesubstr(con mainv a,cchar *sp,int sl) noex {
     	return matxsubstr<sibasesub>(a,sp,sl) ;
 }
 /* end subroutine (matbasesubstr) */
 
-int matcasesubstr(mainv a,cchar *sp,int sl) noex {
+int matcasesubstr(con mainv a,cchar *sp,int sl) noex {
     	return matxsubstr<sicasesub>(a,sp,sl) ;
 }
 /* end subroutine (matcasesubstr) */
 
-int matfoldsubstr(mainv a,cchar *sp,int sl) noex {
+int matfoldsubstr(con mainv a,cchar *sp,int sl) noex {
     	return matxsubstr<sifoldsub>(a,sp,sl) ;
 }
 /* end subroutine (matfoldsubstr) */
