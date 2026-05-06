@@ -49,8 +49,9 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
 #include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
 #include	<randomvar.h>
 #include	<hash.h>		/* |hash_elf(3dam)| */
 #include	<localmisc.h>
@@ -79,7 +80,6 @@ extern "C" {
     extern int	uc_seek(int,off_t,int) noex ;
     extern int	uc_writen(int,cvoid *,int) noex ;
     extern int	uc_fsyncdata(int) noex ;
-    extern int	uc_close(int) noex ;
 }
 
 
