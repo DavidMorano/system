@@ -40,13 +40,21 @@
 #include	<usysdefs.h>
 
 
+#ifndef	AF_INET4
+#ifdef	AF_INET
+#define	AF_INET4	AF_INET
+#else
+#define	AF_INET4	2
+#endif
+#endif /* AF_INET4 */
+
 #ifndef	PF_INET4
 #ifdef	PF_INET
 #define	PF_INET4	PF_INET
 #else
 #define	PF_INET4	2
 #endif
-#endif
+#endif /* PF_INET4 */
 
 #ifndef	INET4ADDRLEN
 #define	INET4ADDRLEN	szof(in4_addr_t)
