@@ -27,7 +27,7 @@
 	match, we return "less-than-zero".
 
 	Synopsis:
-	int mat(x)str(mainv a,cchar *sp,int sl) noex
+	int mat(x)str(con mainv a,cchar *sp,int sl) noex
 
 	Arguments:
 	{x}		base, case, fold
@@ -93,7 +93,7 @@ extern "C" {
 /* forward references */
 
 template<toxc_f toxc,nleadxstr_f nleadxstr>
-local int matxstr(mainv a,cchar *sp,int sl) noex {
+local int matxstr(con mainv a,cchar *sp,int sl) noex {
     	int		rc = -1 ;
 	if (a && sp) {
 	    cint	lch = toxc(sp[0]) ;
@@ -127,17 +127,17 @@ local int matxstr(mainv a,cchar *sp,int sl) noex {
 
 /* exported subroutines */
 
-int matbasestr(mainv a,cchar *sp,int sl) noex {
+int matbasestr(con mainv a,cchar *sp,int sl) noex {
 	return matxstr<tobc,nleadbasestr>(a,sp,sl) ;
 }
 /* end subroutine (matbasestr) */
 
-int matcasestr(mainv a,cchar *sp,int sl) noex {
+int matcasestr(con mainv a,cchar *sp,int sl) noex {
 	return matxstr<touc,nleadcasestr>(a,sp,sl) ;
 }
 /* end subroutine (matcasestr) */
 
-int matfoldstr(mainv a,cchar *sp,int sl) noex {
+int matfoldstr(con mainv a,cchar *sp,int sl) noex {
 	return matxstr<tofc,nleadfoldstr>(a,sp,sl) ;
 }
 /* end subroutine (matfoldstr) */
