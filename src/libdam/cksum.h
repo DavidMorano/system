@@ -34,16 +34,16 @@
 
 struct cksum_flags {
 	uint		loc:1 ;
-} ;
+} ; /* end struct */
 
 struct cksum_state {
 	uint		len, sum ;
-} ;
+} ; /* end struct */
 
 struct cksum_head {
 	CKSUM_ST	loc, total ;
 	CKSUM_FL	fl ;
-} ;
+} ; /* end struct */
 
 typedef	CKSUM		cksum ;
 typedef	CKSUM_FL	cksum_fl ;
@@ -51,13 +51,13 @@ typedef	CKSUM_ST	cksum_st ;
 
 EXTERNC_begin
 
-extern int cksum_start(cksum *) noex ;
-extern int cksum_begin(cksum *) noex ;
-extern int cksum_accum(cksum *,cvoid *,int) noex ;
-extern int cksum_end(cksum *) noex ;
-extern int cksum_getsum(cksum *,uint *) noex ;
-extern int cksum_getsumall(cksum *,uint *) noex ;
-extern int cksum_finish(cksum *) noex ;
+extern int cksum_start		(cksum *) noex ;
+extern int cksum_begin		(cksum *) noex ;
+extern int cksum_accum		(cksum *,cvoid *,int) noex ;
+extern int cksum_end		(cksum *) noex ;
+extern int cksum_getsum		(cksum *,uint *) noex ;
+extern int cksum_getsumall	(cksum *,uint *) noex ;
+extern int cksum_finish		(cksum *) noex ;
 
 EXTERNC_end
 
