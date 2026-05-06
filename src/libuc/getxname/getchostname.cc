@@ -1,4 +1,4 @@
-/* getchostname SUPPORT */
+/* getchostname SUPPORT (Get-Canonical­Host-Name) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
