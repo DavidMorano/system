@@ -25,21 +25,21 @@
 
 /*******************************************************************************
 
+  	Object:
+	cksum
+
+	Description:
 	This object provides a way to accumulate a check sum like
 	what the UNIX® System V utility program |cksum(1)| does.
-
 	The caller initializes this object and then applies the
 	|cksum_accum| subroutine for as much data as desired.  A
 	call to |cksum_getsum| retrieves the accumulated check sum.
-
 	This routine provides only the POSIX 1003.2 version of
 	CKSUM.  Any other options that your UNIX© |cksum(1)| program
 	may have other than the POSIX© 1003.2 basic function is not
-	provided by this object.
-
-	In the interest of avoiding any further confusion than I
-	have caused already, the polynomial used for this check-sum
-	is:
+	provided by this object.  In the interest of avoiding any
+	further confusion than I have caused already, the polynomial
+	used for this check-sum is:
 
 		x32+x26+x22+x16+x12+x11+x10+x8+x7+x5+x4+x2+x1+1
 
@@ -103,7 +103,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -119,11 +120,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* local typedefs */
-
-#ifndef	TYPEDEF_UCHARP
-#define	TYPEDEF_UCHARP
-typedef unsigned char *ucharp ;
-#endif
 
 
 /* external subroutines */
@@ -193,7 +189,7 @@ constexpr uint		table[] = {
 	0x8d79e0be, 0x803ac667, 0x84fbdbd0, 0x9abc8bd5, 0x9e7d9662,
 	0x933eb0bb, 0x97ffad0c, 0xafb010b1, 0xab710d06, 0xa6322bdf,
 	0xa2f33668, 0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
-} ;
+} ; /* end array */
 
 
 /* exported variables */
