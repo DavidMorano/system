@@ -108,13 +108,13 @@ local int	findtype() noex ;
 /* local variables */
 
 constexpr osguess	guesses[] = {
-	{ "sunos",	ostype_sysv },
 	{ "darwin",	ostype_darwin },
 	{ "linux",	ostype_linux },
 	{ "sysv",	ostype_sysv },
+	{ "sunos",	ostype_sysv },
 	{ "unix",	ostype_sysv },	/* <- original AT&T "system" name */
 	{ "bsd",	ostype_bsd }	/* some BSD systems */
-} ;
+} ; /* end array (guesses) */
 
 constexpr bool		f_darwin	= F_DARWIN ;
 constexpr bool		f_sunos		= F_SUNOS ;
@@ -134,11 +134,11 @@ constexpr typer_m	mems[] = {
 libdam::ostyper		ostype ;
 
 cpcchar			ostypenames[] = {
-	"bsd",
-	"sysv",
-	"linux",
-	"darwin",
-	nullptr
+	[ostype_bsd]		= "bsd",
+	[ostype_sysv]		= "sysv",
+	[ostype_linux]		= "linux",
+	[ostype_darwin]		= "darwin",
+	[ostype_overlast]	= nullptr
 } ; /* end array (ostypenames) */
 
 
@@ -165,14 +165,12 @@ local int mktype() noex {
 	    rs = findtype() ;
 	} /* end if_constexpr */
 	return rs ;
-}
-/* end subroutine (mktype) */
+} /* end subroutine (mktype) */
 
 local int findtype() noex {
 	typer to ;
 	return to ;
-}
-/* end subroutine (findtype) */
+} /* end subroutine (findtype) */
 
 typer::operator int () noex {
 	int		rs = SR_OK ;
@@ -181,8 +179,7 @@ typer::operator int () noex {
 	    if ((rs < 0) || fgot) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (typer::operator) */
+} /* end method (typer::operator) */
 
 int typer::envostype() noex {
 	cchar		*eot = getenv(varname.ostype) ;
@@ -197,18 +194,15 @@ int typer::envostype() noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end method (typer::envostype) */
+} /* end method (typer::envostype) */
 
 int typer::envosname() noex {
 	return env(varname.osname) ;
-}
-/* end method (typer::envosname) */
+} /* end method (typer::envosname) */
 
 int typer::envsysname() noex {
 	return env(varname.sysname) ;
-}
-/* end method (typer::envsysname) */
+} /* end method (typer::envsysname) */
 
 int typer::env(cchar *vn) noex {
 	int		rs = SR_OK ;
@@ -219,8 +213,7 @@ int typer::env(cchar *vn) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end method (typer::env) */
+} /* end method (typer::env) */
 
 int typer::trysysname() noex {
 	int		rs ;
@@ -235,8 +228,7 @@ int typer::trysysname() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rtype : rs ;
-}
-/* end method (typer::trysysname) */
+} /* end method (typer::trysysname) */
 
 int typer::matguess(cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -248,15 +240,13 @@ int typer::matguess(cchar *sp,int sl) noex {
 	    if (fgot) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (typer::matguess) */
+} /* end method (typer::matguess) */
 
 int typer::other() noex {
 	cint		rs = ostype_bsd ;
 	fgot = true ;
 	return rs ;
-}
-/* end method (typer::other) */
+} /* end method (typer::other) */
 
 namespace libdam {
     ostyper::operator int () noex {
