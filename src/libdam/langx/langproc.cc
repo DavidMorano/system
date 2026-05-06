@@ -63,11 +63,11 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/ureserve.ccm"
-#pragma		GCC dependency		"mod/debug.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |resumelife(3u)| */
 import ureserve ;			/* |vecstr(3u)| */
-import debug ;
+import deb ;
 
 /* local defines */
 
