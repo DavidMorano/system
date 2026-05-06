@@ -67,13 +67,13 @@
 #include	<ctdec.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
-#include	<debprintf.h>		/* |DEBPRINTF(3u)| */
+#include	<deb.hh>		/* |DEBPRINTF(3u)| */
 
 #include	"inetping.h"
 
-#pragma		GCC dependency		"mod/debug.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
-import debug ;
+import deb ;
 
 /* local defines */
 
