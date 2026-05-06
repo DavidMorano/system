@@ -254,7 +254,7 @@ int debugprint_init() noex {
 	        rs = msleep(1) ;
 	    }
 	    if ((rs >= 0) && (! uip->f_init)) {
-		rs = SR_LOCKLOST ;
+		rs = SR_LOCKFAIL ;
 	    }
 	} /* end if */
 	return rs ;
