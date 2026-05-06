@@ -28,7 +28,6 @@
 
 
 /* striaght up */
-#define	SYSDIALER_MAGIC	0x31815927
 #define	SYSDIALER	struct sysdialer_head
 #define	SYSDIALER_FL	struct sysdialer_flags
 #define	SYSDIALER_ENT	struct sysdialer_entry
@@ -37,6 +36,7 @@
 #define	SYSDIALER_ARGS	struct sysdialer_arguments
 #define	SYSDIALER_PRC	struct sysdialer_prcache
 #define	SYSDIALER_MOD	struct sysdialer_module
+#define	SYSDIALER_MAGIC	0x31815927
 #define	SYSDIALER_LF	"sysdialer"
 /* optional */
 #ifdef	COMMENT
@@ -59,14 +59,14 @@ enum sysdialeros {
 #ifdef	__cplusplus
 
 struct sysdialerms {
-	constexpr static cint	full	= (1 << sysdialero_full) ;
-	constexpr static cint	halfout	= (1 << sysdialero_halfout) ;
-	constexpr static cint	halfin	= (1 << sysdialero_halfin) ;
-	constexpr static cint	cor	= (1 << sysdialero_cor) ;
-	constexpr static cint	co	= (1 << sysdialero_co) ;
-	constexpr static cint	cl	= (1 << sysdialero_cl) ;
-	constexpr static cint	nargs	= (1 << sysdialero_nargs) ;
-} ; /* end struct */
+	inline static cint	full	= (1 << sysdialero_full) ;
+	inline static cint	halfout	= (1 << sysdialero_halfout) ;
+	inline static cint	halfin	= (1 << sysdialero_halfin) ;
+	inline static cint	cor	= (1 << sysdialero_cor) ;
+	inline static cint	co	= (1 << sysdialero_co) ;
+	inline static cint	cl	= (1 << sysdialero_cl) ;
+	inline static cint	nargs	= (1 << sysdialero_nargs) ;
+} ; /* end struct (sysdialerms) */
 
 #endif /* __cplusplus */
 
