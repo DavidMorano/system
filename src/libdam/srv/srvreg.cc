@@ -60,6 +60,9 @@
 #include	"srvreg.h"
 #include	"srvrege.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -477,7 +480,7 @@ SRVREG_ENT	*ep ;
 /* has our lock been broken */
 
 	if (op->fl.cursorlockbroken)
-	    return SR_LOCKLOST ;
+	    return SR_LOCKFAIL ;
 
 /* do we have proper file access? */
 
