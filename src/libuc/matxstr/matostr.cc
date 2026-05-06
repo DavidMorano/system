@@ -71,7 +71,7 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
     typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
-    typedef int (*matxstr_f)(mainv,cchar *,int) noex ;
+    typedef int (*matxstr_f)(con mainv,cchar *,int) noex ;
 }
 
 
@@ -88,7 +88,7 @@ namespace {
 	toxc_f		toxc ;
 	nleadxstr_f	nleadx ;
 	matxstr_f	matxstr ;
-	int matoxstr(mainv,int,cchar *,int) noex ;
+	int matoxstr(con mainv,int,cchar *,int) noex ;
 	mater(toxc_f t,nleadxstr_f n,matxstr_f m) noex { 
 	    toxc = t ;
 	    nleadx = n ;
@@ -109,19 +109,19 @@ namespace {
 
 /* exported subroutines */
 
-int matobasestr(mainv a,int n,cchar *sp,int sl) noex {
+int matobasestr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tobc,nleadbasestr,matbasestr) ;
 	return mo.matoxstr(a,n,sp,sl) ;
 }
 /* end subroutine (matobasestr) */
 
-int matocasestr(mainv a,int n,cchar *sp,int sl) noex {
+int matocasestr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tolc,nleadcasestr,matcasestr) ;
 	return mo.matoxstr(a,n,sp,sl) ;
 }
 /* end subroutine (matocasestr) */
 
-int matofoldstr(mainv a,int n,cchar *sp,int sl) noex {
+int matofoldstr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tofc,nleadfoldstr,matfoldstr) ;
 	return mo.matoxstr(a,n,sp,sl) ;
 }
@@ -130,7 +130,7 @@ int matofoldstr(mainv a,int n,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-int mater::matoxstr(mainv a,int n,cchar *sp,int µsl) noex {
+int mater::matoxstr(con mainv a,int n,cchar *sp,int µsl) noex {
 	int		si = -1 ;
 	if (int sl ; a && ((sl = getlenstr(sp,µsl)) >= 0)) {
 	    if (n >= 0) {
