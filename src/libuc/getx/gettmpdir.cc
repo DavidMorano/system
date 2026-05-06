@@ -24,7 +24,7 @@
 	gettmpdir
 
 	Description:
-	Retrieve the name of the current TMPDIR.
+	Retrieve the file-path of the current TMPDIR.
 
 	Synopsis:
 	cchar *gettmpdir(mainv) noex
@@ -51,7 +51,7 @@
 
 #pragma		GCC dependency		"mod/uconstants.ccm"
 
-import uconstants ;
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
