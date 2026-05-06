@@ -40,6 +40,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<bufsizevar.hh>
 #include	<intsat.h>
 #include	<isnot.h>
@@ -63,7 +64,6 @@ extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
     extern int uc_stat(cchar *,ustat *) noex ;
     extern int uc_readn(int,void *,int) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
