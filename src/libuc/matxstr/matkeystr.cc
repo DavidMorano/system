@@ -27,7 +27,7 @@
 	return something "less-than-zero."
 
 	Synopsis:
-	int matkeystr(mainv a,cchar *sp,int sl) noex
+	int matkeystr(con mainv a,cchar *sp,int sl) noex
 
 	Arguments:
 	a		array of strings to match against
@@ -87,7 +87,7 @@ constexpr bool keyend(cint ch) noex {
 
 /* exported subroutines */
 
-int matkeystr(mainv a,cchar *sp,int sl) noex {
+int matkeystr(con mainv a,cchar *sp,int sl) noex {
     	int		rc = -1 ;
 	if (a && sp) {
 	    cint	sch = sp[0] ; /* ok: everything promotes the same */
