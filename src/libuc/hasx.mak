@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= hasprime.o hasclass.o hasall.o
+OBJ0= hasmisc.o hasclass.o hasall.o
 OBJ1= hasvarprefix.o hasnot.o
 OBJ2= hasprint.o hasonly.o
 OBJ3= hasuniq.o haslead.o hasnon.o
@@ -152,7 +152,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-hasxprime.o:		hasprime.cc	hasprime.h		$(INCS)	
+hasxprime.o:		hasmisc.cc	hasmisc.h		$(INCS)	
 hasclass.o:		hasclass.cc	hasclass.h		$(INCS)
 hasall.o:		hasall.cc	hasall.h		$(INCS)
 hasnon.o:		hasnon.cc	hasnon.h		$(INCS)
