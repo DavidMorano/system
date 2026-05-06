@@ -69,6 +69,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>	
+#include	<ucdesc.h>
 #include	<rmx.h>
 #include	<fmtstr.h>
 #include	<localmisc.h>
@@ -106,7 +107,6 @@ extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
     extern int uc_lockfile(int,int,off_t,off_t,int) noex ;
     extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_close(int) noex ;
 } /* end extern */
 
 
