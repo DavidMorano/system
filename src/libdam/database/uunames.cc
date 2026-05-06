@@ -40,6 +40,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<getbufsize.h>
 #include	<endian.h>
 #include	<vecstr.h>
@@ -218,7 +219,6 @@ typedef uunames_cur	cur ;
 
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) noex ;
     extern int uc_fstat(int,ustat *) noex ;
 }
 
