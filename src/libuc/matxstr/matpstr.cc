@@ -29,7 +29,7 @@
 	array index.  If we do not match, we return "less-than-zero".
 
 	Synopsis:
-	int matp{x}str(mainv a,int n,cchar *sp,int sl) noex
+	int matp{x}str(con mainv a,int n,cchar *sp,int sl) noex
 
 	Arguments:
 	{x}		base, case, fold
@@ -83,7 +83,7 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
     typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
-    typedef int (*matxstr_f)(mainv,cchar *,int) noex ;
+    typedef int (*matxstr_f)(con mainv,cchar *,int) noex ;
 }
 
 
@@ -100,7 +100,7 @@ namespace {
 	toxc_f		toxc ;
 	nleadxstr_f	nleadx ;
 	matxstr_f	matxstr ;
-	int matpxstr(mainv,int,cchar *,int) noex ;
+	int matpxstr(con mainv,int,cchar *,int) noex ;
 	mater(toxc_f t,nleadxstr_f n,matxstr_f m) noex { 
 	    toxc = t ;
 	    nleadx = n ;
@@ -121,17 +121,17 @@ namespace {
 
 /* exported subroutines */
 
-int matpbasestr(mainv a,int n,cchar *sp,int sl) noex {
+int matpbasestr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tobc,nleadbasestr,matbasestr) ;
 	return mo.matpxstr(a,n,sp,sl) ;
 }
 
-int matpcasestr(mainv a,int n,cchar *sp,int sl) noex {
+int matpcasestr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(touc,nleadcasestr,matcasestr) ;
 	return mo.matpxstr(a,n,sp,sl) ;
 }
 
-int matpfoldstr(mainv a,int n,cchar *sp,int sl) noex {
+int matpfoldstr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tofc,nleadfoldstr,matfoldstr) ;
 	return mo.matpxstr(a,n,sp,sl) ;
 }
@@ -139,7 +139,7 @@ int matpfoldstr(mainv a,int n,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-int mater::matpxstr(mainv a,int n,cchar *sp,int µsl) noex {
+int mater::matpxstr(con mainv a,int n,cchar *sp,int µsl) noex {
 	int		si = -1 ;
 	if (int sl ; a && ((sl = getlenstr(sp,µsl)) >= 0)) {
 	    if (n >= 0) {
