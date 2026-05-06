@@ -37,6 +37,7 @@
 #include	<arpa/inet.h>
 #include	<cinttypes>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
@@ -49,10 +50,6 @@
 
 
 /* local defines */
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
 
 
 /* external subroutines */
