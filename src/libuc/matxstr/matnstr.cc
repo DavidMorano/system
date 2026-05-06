@@ -27,7 +27,7 @@
 	we return "less-than-zero".
 
 	Synopsis:
-	int matnstr(mainv a,cchar *sp,int sl) noex
+	int matnstr(con mainv a,cchar *sp,int sl) noex
 
 	Arguments:
 	a		array of string to match against
@@ -87,7 +87,7 @@ extern "C" {
 namespace {
     struct mater {
 	nxcmp_f		xcmp ;
-	int matnxstr(mainv,cchar *,int) noex ;
+	int matnxstr(con mainv,cchar *,int) noex ;
 	mater(nxcmp_f c) noex : xcmp(c) { } ;
     } ; /* end struct (mater) */
 } /* end namespace */
@@ -104,17 +104,17 @@ namespace {
 
 /* exported subroutines */
 
-int matnbasestr(mainv a,cchar *sp,int sl) noex {
+int matnbasestr(con mainv a,cchar *sp,int sl) noex {
 	mater	mo(strnbasecmp) ;
 	return mo.matnxstr(a,sp,sl) ;
 } /* end subroutine (matnbasestr) */
 
-int matncasestr(mainv a,cchar *sp,int sl) noex {
+int matncasestr(con mainv a,cchar *sp,int sl) noex {
 	mater	mo(strncasecmp) ;
 	return mo.matnxstr(a,sp,sl) ;
 } /* end subroutine (matncasestr) */
 
-int matnfoldstr(mainv a,cchar *sp,int sl) noex {
+int matnfoldstr(con mainv a,cchar *sp,int sl) noex {
 	mater	mo(strnfoldcmp) ;
 	return mo.matnxstr(a,sp,sl) ;
 } /* end subroutine (matnfoldstr) */
@@ -122,7 +122,7 @@ int matnfoldstr(mainv a,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-int mater::matnxstr(mainv a,cchar *sp,int µsl) noex {
+int mater::matnxstr(con mainv a,cchar *sp,int µsl) noex {
     	int		rc = -1 ;
 	if (int sl ; a && ((sl = getlenstr(sp,µsl)) >= 0)) {
 	    cint	lc = sp[0] ; /* ok: everything promotes the same */
