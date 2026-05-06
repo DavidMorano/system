@@ -42,11 +42,11 @@ module ;
 
 #include	"argmgr.h"
 
-#pragma		GCC dependency		"mod/debug.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 module argmgr ;
 
-import debug ;
+import deb ;
 
 /* local defines */
 
