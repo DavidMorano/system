@@ -38,15 +38,15 @@ module ;
 #include	<usyscalls.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
-#include	<debprintf.h>		/* |DEBPRINTF| */
+#include	<deb.hh>		/* |DEBPRINTF| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/debug.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 module cmdutils ;
 
 import libutil ;			/* |lenstr(3u)| */
-import debug ;				/* |debprintf(3u)| */
+import deb ;				/* |debprintf(3u)| */
 
 
 /* local defines */
