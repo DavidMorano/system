@@ -61,8 +61,9 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>
+#include	<cstddef>
+#include	<utility>		/* |std::unreachable(c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<mkpathx.h>
@@ -82,6 +83,8 @@
 
 
 /* imported namespaces */
+
+using std::unreachable ;
 
 
 /* local typedefs */
@@ -105,13 +108,12 @@ namespace {
 	cchar		*fname ;
 	char		*rbuf ;
 	int		am ;
-	bool		ft ;
-	subinfo(cc *p,char *r,getfnames t,cc *f,int a) noex {
+	getfnames	ft ;
+	subinfo(cc *p,char *r,getfnames t,cc *f,int a) noex : ft(t) {
 	    pr = p ;
 	    rbuf = r ;
 	    fname = f ;
 	    am = (a & O_ACCMODE) ;
-	    ft = bool(t) ;
 	} ; /* end ctor */
 	operator int () noex ;
 	int round() noex ;
@@ -126,24 +128,22 @@ namespace {
 
 /* local variables */
 
-constexpr int		rsn = SR_NOTFOUND ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int getfname(cc *pr,char *rbuf,getfnames type,cc *fn,int am) noex {
+int getfname(cc *pr,char *rbuf,getfnames ft,cc *fn,int am) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (pr && rbuf && fn) {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
-	    if ((type >= 0) && fn[0]) {
+	    if ((ft >= 0) && (ft < getfname_overlast) && fn[0]) ylikely {
 		rs = SR_OK ;
 	        if (fn[0] != '/') {
-		    subinfo si(pr,rbuf,type,fn,am) ;
+		    subinfo si(pr,rbuf,ft,fn,am) ;
 		    rs = si ;
 		    len = rs ;
 		} /* end if (relative file-name) */
@@ -157,9 +157,10 @@ int getfname(cc *pr,char *rbuf,getfnames type,cc *fn,int am) noex {
 /* local subroutines */
 
 subinfo::operator int () noex {
+    	cint		n = getfname_overlast ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	for (int i = 0 ; (rs >= 0) && (i < 2) ; i += 1) {
+	for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	    rs = round() ;
 	    len = rs ;
 	    if (len > 0) break ;
@@ -169,12 +170,17 @@ subinfo::operator int () noex {
 
 int subinfo::round() noex {
 	int		rs = 0 ;
-	if (ft) {
-	    rs = rem() ;
-	} else {
+	switch (ft) {
+	case getfname_local:
 	    rs = loc() ;
-	}
-	ft = (!ft) ;
+	    break ;
+	case getfname_root:
+	    rs = rem() ;
+	    break ;
+	default:
+	    unreachable() ;
+	} /* end switch */
+	ft = getfnames(ft % getfname_overlast) ;
 	return rs ;
 } /* end method (subinfo::round) */
 
@@ -200,7 +206,7 @@ int subinfo::rem() noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (pr) {
-	    if ((rs = mkpath(rbuf,pr,fname)) >= 0) {
+	    if ((rs = mkpath(rbuf,pr,fname)) >= 0) ylikely {
 		len = rs ;
 	        if ((rs = perm(rbuf,-1,-1,nullptr,am)) >= 0) {
 	            if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) {
