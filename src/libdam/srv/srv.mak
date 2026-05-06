@@ -1,4 +1,4 @@
-# MAKEFILES (srv)
+# MAKEFILE (srv)
 
 T= srv
 
