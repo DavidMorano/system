@@ -49,9 +49,40 @@
 
 
 /* network-related name resolving service (some system do not have) */
-#ifndef	NETDB_INTERAL
+#ifndef	NETDB_INTERAL			/* indicated to see |errno| */
 #define	NETDB_INTERAL	-1
 #endif
+#ifndef	NETDB_SUCCESS			/* indicates success */
+#define	NETDB_SUCCESS	0
+#endif
+
+#ifndef	NETDB_TRYAGAIN
+#define	NETDB_TRYAGAIN		TRY_AGAIN
+#endif
+#ifndef	NETDB_NOTFOUND
+#define	NETDB_NOTFOUND		HOST_NOT_FOUND
+#endif
+#ifndef	NETDB_NOADDRESS
+#define	NETDB_NOADDRESS		NO_ADDRESS
+#endif
+#ifndef	NETDB_NORECOVERY
+#define	NETDB_NORECOVERY	NO_RECOVERY
+#endif
+
+#ifdef	__cplusplus
+
+struct netdberrs {
+    static constexpr int	internal	= NETDB_INTERNAL ;
+    static constexpr int	success		= NETDB_SUCCESS ;
+    static constexpr int	tryagain	= NETDB_TRYAGAIN ;
+    static constexpr int	notfound	= NETDB_NOTFOUND ;
+    static constexpr int	noaddress	= NETDB_NOADDRESS ;
+    static constexpr int	norecovery	= NETDB_NORECOVERY ;
+} ; /* end struct (netdberrs) */
+
+extern const netdberrs		netdberr ;
+
+#endif /* __cplusplus */
 
 
 #endif /* USYSDEFSNETDB_INCLUDE */
