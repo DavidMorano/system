@@ -45,6 +45,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
 #include	<getbufsize.h>
 #include	<getax.h>
@@ -134,7 +135,6 @@ extern "C" {
     extern int uc_ftruncate(int,off_t) noex ;
     extern int uc_setappend(int,int) noex ;
     extern int uc_closeonexec(int,int) noex ;
-    extern int uc_close(int) noex ;
     extern int uc_unlink(cchar *) noex ;
     extern int uc_unlinkshm(cchar *) noex ;
 } /* end extern */
