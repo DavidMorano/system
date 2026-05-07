@@ -349,7 +349,7 @@ local int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname) noex {
 	debugprintf("calyear_objloadbegin: objname=%s\n",objname) ;
 #endif
 
-	opts = VECSTR_OCOMPACT ;
+	opts = vecstrm.compact ;
 	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
 	    cint	nlen = SYMNAMELEN ;
 	    bool	f_modload = false ;
