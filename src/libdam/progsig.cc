@@ -42,6 +42,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<ucatexit.h>
 #include	<ucatfork.h>
 #include	<ucfork.h>
@@ -133,7 +134,6 @@ extern "C" {
     extern int uc_stat(cchar *,ustat *) noex ;
     extern int uc_minmod(cchar *,mode_t) noex ;
     extern int uc_unlink(cchar *) noex ;
-    extern int uc_close(int) ;
     extern int uc_closeonexec(int,int) noex ;
 } /* end extern */
 
