@@ -439,7 +439,7 @@ int commandment_search(CMD *op,cc *s,cmpfunc,cchar **rpp) noex {
 local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
