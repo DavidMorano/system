@@ -49,7 +49,6 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
-#include	<uclock.h>
 #include	<sysval.hh>
 #include	<sigblocker.h>
 #include	<filer.h>
@@ -61,7 +60,7 @@
 #include	<strn.h>		/* |strnset(3uc)| */
 #include	<mkpathx.h>
 #include	<sncpyx.h>
-#include	<matxstr.h>
+#include	<matstr.h>		/* |matcasestr(3uc)| */
 #include	<lockfile.h>
 #include	<intceil.h>
 #include	<opentmp.h>
@@ -554,7 +553,7 @@ int mailbox_readln(MB *op,MB_READ *curp,char *lbuf,int llen) noex {
 		    cint	rbs = curp->rsize ;
 		    char	*rbp = curp->rbuf ;
 	            curp->rbp = curp->rbuf ;
-	            if ((rs = u_pread(mfd,rbp,rbs,po)) >= 0) {
+	            if ((rs = u_readp(mfd,rbp,rbs,po)) >= 0) {
 	                curp->rlen = rs ;
 	                curp->foff += rs ;
 	            }
