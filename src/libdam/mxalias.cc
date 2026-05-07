@@ -520,7 +520,7 @@ static int mxalias_curlooks(MA *op,MA_CUR *curp,cc *kbuf,int klen) noex {
 	    cint	vn = 4 ;
 	    int		vo = 0 ;
 	    if (vecstr klist ; (rs = klist.start(vn,vo)) >= 0) {
-	        vo = VECSTR_OSTATIONARY ;
+	        vo = vecstrm.stationary ;
 	        if (vecstr vlist ; (rs = vlist.start(vn,vo)) >= 0) {
 	            if ((rs = mxalias_addvals(op,&klist,&vlist,kp)) >= 0) {
 			cchar	*cp{} ;
