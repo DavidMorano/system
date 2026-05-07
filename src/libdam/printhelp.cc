@@ -342,7 +342,7 @@ int helper::schedfile() noex {
 	if ((rs = mkpath2(tbuf,pr,HELPSCHEDFNAME)) >= 0) {
 	    if ((rs = perm(tbuf,-1,-1,nullptr,R_OK)) >= 0) {
 		vecstr	hs ;
-		cint	vo = VECSTR_OCOMPACT ;
+		cint	vo = vecstrm.compact ;
 	        if ((rs = vecstr_start(&hs,15,vo)) >= 0) {
 	            if ((rs = vecstr_loadfile(&hs,false,tbuf)) >= 0) {
 			mainv	spp{} ;
