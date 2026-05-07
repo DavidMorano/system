@@ -55,7 +55,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<bufsizevar.hh>
 #include	<sysval.hh>
 #include	<stdfnames.h>
@@ -104,7 +104,6 @@ extern "C" {
     extern int uc_fcntl(int,int,...) noex ;
     extern int uc_tell(int,off_t *) noex ;
     extern int uc_fminmod(int,mode_t) noex ;
-    extern int uc_close(int) noex ;
     extern int uc_dupmince(int,int) noex ;
 }
 
