@@ -534,7 +534,7 @@ int textlook_curlook(TL *op,TL_CUR *curp,int qo,cchar **qsp) noex {
 	            if (SK sk ; (rs = searchkeys_start(&sk,qsp)) >= 0) {
 	                vecstr	hkeys, *hlp = &hkeys ; /* hash-keys */
 		        cint	vn = 10 ;
-	                cint	vo = (VECSTR_OCOMPACT) ;
+	                cint	vo = (vecstrm.compact) ;
 	                if ((rs = hlp->start(vn,vo)) >= 0) {
 	                    if ((rs = textlook_mkhkeys(op,&hkeys,&sk)) >= 0) {
 	            		mainv	hkeya{} ;
