@@ -65,7 +65,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<uclock.h>		/* |uc_lockf(3uc)| */
+#include	<ucdesc.h>		/* |uc_lockf(3uc)| */
 #include	<ucprochave.h>		/* |uc_prochave(3uc)| */
 #include	<sigblocker.h>
 #include	<cfdec.h>
