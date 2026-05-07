@@ -1,4 +1,4 @@
-/* strstdfname SUPPORT */
+/* bfilestfname SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	strstdfname
+	bfilestfname
 
 	Description:
 	Test and figure out if the caller intent was to really get
@@ -40,6 +40,9 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<localmisc.h>
+#include	<stdfiles.h>
+#include	<stdfnames.h>		/* |stdfname(3u)| */
 #include	<localmisc.h>
 
 #include	"strstdfname.h"
@@ -71,7 +74,7 @@
 cchar *bfilestfname(int w,cchar *atf) noex {
 	if ((w >= 0) && (w < stdfile_overlast)) {
             if ((atf == nullptr) || (atf[0] == '\0') || (atf[0] == '-')) {
-                atf = stdfnames[w] ;
+                atf = stdfname[w] ;
 	    }
 	}
 	return atf ;
