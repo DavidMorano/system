@@ -51,7 +51,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<ucwrite.h>
+#include	<ucdescwrite.h>
 #include	<strn.h>
 #include	<localmisc.h>
 
