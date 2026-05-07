@@ -1432,7 +1432,7 @@ static int listenspec_openportaddr(LS *op,cchar *pr,ADDRINFO *aip,
 	    }
 	    if (rs >= 0) {
 	        if (raf > 0) {
-	            if ((rs = getprotofamily(raf)) >= 0) {
+	            if ((rs = getpf(raf)) >= 0) {
 	                aip->ai_family = rs ;
 	            }
 	        } else {
