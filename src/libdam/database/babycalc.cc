@@ -282,7 +282,7 @@ int babycalc_getinfo(BC *op,BC_INFO *ip) noex {
 local int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
 	modload		*mlp = op->mlp ;
 	cint		vn = sub_overlast ;
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
