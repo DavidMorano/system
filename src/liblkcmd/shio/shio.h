@@ -64,7 +64,7 @@ enum shiobms {
 
 struct shio_flags {
 	uint		sfio:1 ;
-	uint		stdfname:1 ;
+	uint		stdfn:1 ;
 	uint		bufwhole:1 ;
 	uint		bufline:1 ;
 	uint		bufnone:1 ;
