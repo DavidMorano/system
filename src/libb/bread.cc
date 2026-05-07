@@ -44,7 +44,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<ucread.h>
+#include	<ucdescread.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
