@@ -40,9 +40,8 @@
 #include	<cstddef>
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
+#include	<usupport.h>
 #include	<stdfiles.h>
 #include	<localmisc.h>
 
@@ -53,6 +52,8 @@
 
 
 /* imported namespaces */
+
+using libu::matstr ;			/* subroutine */
 
 
 /* local typedefs */
@@ -100,6 +101,14 @@ ccharp		stdfnames[stdfile_overlast + 1] = {
 
 
 /* exported subroutines */
+
+int getstdfname(cchar *sp,int sl) noex {
+    	int		rs = SR_FAULT ;
+	if (sp) {
+	    rs = matstr(stdfname,sp,sl) ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (getstddname) */
 
 
 /* local subroutines */
