@@ -58,15 +58,16 @@ OBJ11_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 OBJ12_USYS= usys_shadow.o usys_isaexec.o usys_fdatasync.o
 OBJ13_USYS= usys_eaccess.o usys_stat.o usys_xti.o
 OBJ14_USYS= usys_environ.o usys_onc.o usys_getnetname.o
-OBJ15_USYS=
+OBJ15_USYS= usys_getauid.o
 
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
 OBJC= obj06_usys.o obj07_usys.o obj08_usys.o
 OBJD= obj09_usys.o obj10_usys.o obj11_usys.o 
 OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
+OBJF= obj15_usys.o
 
-OBJ_USYS= obja.o objb.o objc.o objd.o obje.o
+OBJ_USYS= obja.o objb.o objc.o objd.o obje.o objf.o
 
 
 INCDIRS= -I inc -I /usr/local/include
@@ -252,5 +253,6 @@ usys_xti.o:		usys_xti.cc		usys_xti.h		$(INCS)
 usys_environ.o:		usys_environ.cc		usys_environ.hh		$(INCS)
 usys_onc.o:		usys_onc.cc		usys_onc.hh		$(INCS)
 usys_getnetname.o:	usys_getnetname.cc	usys_getnetname.h	$(INCS)
+usys_getauid.o:		usys_getauid.cc		usys_getauid.h		$(INCS)
 
 
