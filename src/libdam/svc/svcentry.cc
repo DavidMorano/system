@@ -469,7 +469,7 @@ int expander::comp_a() noex {
 	if (sk.a) {
 	    if ((rs = svcentry_proc(op,sk.a,esap,obuf,olen)) >= 0) {
 		cint	vn = 6 ;
-	        cint	vo = VECSTR_OCOMPACT ;
+	        cint	vo = vecstrm.compact ;
 	        if ((rs = vecstr_start(op->sap,vn,vo)) >= 0) {
 	            op->fl.srvargs = true ;
 	            if ((rs = vecstr_procargs(op->sap,obuf)) > 0) {
