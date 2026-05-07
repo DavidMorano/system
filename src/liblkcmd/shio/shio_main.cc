@@ -100,6 +100,8 @@
 #include	<mkpathx.h>
 #include	<matstr.h>
 #include	<fmtstr.h>
+#include	<stdfiles.h>
+#include	<stdfnames.h>
 #include	<isoneof.h>
 #include	<localmisc.h>
 
@@ -111,9 +113,9 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	SHIO_MODESTRLEN	20
-#define	SHIO_KSHSYM	"sh_main"
-#define	SHIO_PERSISTENT	struct shio_persistent
+#define	SHIO_MODESTRLEN		20
+#define	SHIO_KSHSYM		"sh_main"
+#define	SHIO_PERSISTENT		shio_persistent
 
 #ifndef	SFIO_OFF
 #define	SFIO_OFF	0
@@ -169,63 +171,59 @@ extern int	sfisterm(Sfio_t *) noex ;
 struct shio_persistent {
 	volatile uint	f_init ;
 	volatile uint	f_outside ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int shio_ctor(shio *op,Args ... args) noex {
-	cnullptr	np{} ;
+local int shio_ctor(shio *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (shio_ctor) */
+} /* end subroutine (shio_ctor) */
 
-static int shio_dtor(shio *op) noex {
+local int shio_dtor(shio *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (shio_dtor) */
+} /* end subroutine (shio_dtor) */
 
 template<typename ... Args>
-static inline int shio_magic(shio *op,Args ... args) noex {
+local inline int shio_magic(shio *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SHIO_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (shio_magic) */
+} /* end subroutine (shio_magic) */
 
-static int	shio_bopene(SHIO *,int,cchar *,cchar *,mode_t,int) noex ;
-static int	shio_bclose(SHIO *) noex ;
+local int	shio_bopene(SHIO *,int,cchar *,cchar *,mode_t,int) noex ;
+local int	shio_bclose(SHIO *) noex ;
 
 #if	CF_SFIO
-static int	shio_outside() noex ;
-static int	shio_sfiscook(SHIO *) noex ;
-static int	shio_sfflush(SHIO *) noex ;
-static int	shio_shprintln(SHIO *,cchar *,int) noex ;
-static int	shio_sfwrite(SHIO *,cchar *,int) noex ;
-static int	shio_sfcookline(SHIO *op,int f) noex ;
-static int	shio_sfcookbegin(SHIO *) noex ;
-static int	shio_sfcookend(SHIO *) noex ;
-static int	shio_sfcheckwrite(SHIO *,cchar *,int) noex ;
-static int	shio_sfcookdump(SHIO *) noex ;
-static int	shio_sfcookflush(SHIO *) noex ;
-static int	shio_sfcookwrite(SHIO *,cchar *,int) noex ;
+local int	shio_outside() noex ;
+local int	shio_sfiscook(SHIO *) noex ;
+local int	shio_sfflush(SHIO *) noex ;
+local int	shio_shprintln(SHIO *,cchar *,int) noex ;
+local int	shio_sfwrite(SHIO *,cchar *,int) noex ;
+local int	shio_sfcookline(SHIO *op,int f) noex ;
+local int	shio_sfcookbegin(SHIO *) noex ;
+local int	shio_sfcookend(SHIO *) noex ;
+local int	shio_sfcheckwrite(SHIO *,cchar *,int) noex ;
+local int	shio_sfcookdump(SHIO *) noex ;
+local int	shio_sfcookflush(SHIO *) noex ;
+local int	shio_sfcookwrite(SHIO *,cchar *,int) noex ;
 #endif /* CF_SFIO */
 
-static bool	hasnl(cchar *,int) noex ;
-static bool	isNotSeek(int) noex ;
-static bool	isInterrupt(volatile int **) noex ;
+local bool	hasnl(cchar *,int) noex ;
+local bool	isNotSeek(int) noex ;
+local bool	isInterrupt(volatile int **) noex ;
 
 
 /* static writable data */
@@ -237,28 +235,10 @@ static struct shio_persistent	shio_data ; /* initialized to all zeros */
 
 /* local variables */
 
-enum stdfnames {
-	stdfname_stdin,
-	stdfname_stdout,
-	stdfname_stderr,
-	stdfname_stdnull,
-	stdfname_oldnull,
-	stdfname_overlast
-} ;
-
-constexpr cpcchar	stdfnames[] = {
-	STDFNIN,
-	STDFNOUT,
-	STDFNERR,
-	STDFNNULL,
-	"*nullptr*",
-	nullptr
-} ;
-
 constexpr int		seekrs[] = {
 	SR_NOTSEEK,
 	0
-} ;
+} ; /* end array (seekrs) */
 
 
 /* exported variables */
@@ -285,9 +265,9 @@ int shio_opene(SHIO *op,cchar *fname,cchar *ms,mode_t om,int to) noex {
 
 	memclear(op) ;
 
-	fni = matstr(stdfnames,fname,-1) ;
+	fni = getstdfname(fname) ;
 
-	op->fl.stdfname = (fni >= 0) ;
+	op->fl.stdfn = (fni >= 0) ;
 	switch (fni) {
 	case stdfname_stdin:
 	    ofname = BFILE_STDIN ;
@@ -1162,7 +1142,7 @@ int shio_writefile(SHIO *op,cchar *fname) noex {
 
 /* private subroutines */
 
-static int shio_bopene(SHIO *op,int fni,cc *fname,cc *ms,
+local int shio_bopene(SHIO *op,int fni,cc *fname,cc *ms,
 		mode_t om,int to) noex {
 	cint		osz = szof(bfile) ;
 	int		rs ;
@@ -1184,10 +1164,9 @@ static int shio_bopene(SHIO *op,int fni,cc *fname,cc *ms,
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (shio_bopene) */
+} /* end subroutine (shio_bopene) */
 
-static int shio_bclose(SHIO *op) noex {
+local int shio_bclose(SHIO *op) noex {
 	int		rs = SR_OK ;
 	if (op->fp != nullptr) ylikely {
 	    rs = bclose(op->fp) ;
@@ -1197,11 +1176,10 @@ static int shio_bclose(SHIO *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (shio_bclose) */
+} /* end subroutine (shio_bclose) */
 
 #if	CF_SFIO
-static int shio_shprintln(SHIO *op,cchar *lbuf,int llen) noex {
+local int shio_shprintln(SHIO *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if (llen < 0) llen = lenstr(lbuf) ;
@@ -1227,13 +1205,12 @@ static int shio_shprintln(SHIO *op,cchar *lbuf,int llen) noex {
 	    }
 	}
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (shio_shprintln) */
+} /* end subroutine (shio_shprintln) */
 #endif /* CF_SFIO */
 
 #if	CF_SFIO
 
-static int shio_sfiscook(SHIO *op) noex {
+local int shio_sfiscook(SHIO *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	f = f || op->fl.terminal ;
@@ -1243,16 +1220,14 @@ static int shio_sfiscook(SHIO *op) noex {
 	    rs = shio_sfcookline(op,f) ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (shio_sfiscook) */
+} /* end subroutine (shio_sfiscook) */
 
-static int shio_sfflush(SHIO *op) noex {
+local int shio_sfflush(SHIO *op) noex {
 	sfsync(op->fp) ;
 	return SR_OK ;
-}
-/* end subroutine (shio_sfflush) */
+} /* end subroutine (shio_sfflush) */
 
-static int shio_sfcookline(SHIO *op,int f) noex {
+local int shio_sfcookline(SHIO *op,int f) noex {
 	int		rs ;
 	if (f) {
 	    rs = shio_sfcookbegin(op) ;
@@ -1260,10 +1235,9 @@ static int shio_sfcookline(SHIO *op,int f) noex {
 	    rs = shio_sfcookend(op) ;
 	}
 	return rs ;
-}
-/* end subroutine (shio_sfcookline) */
+} /* end subroutine (shio_sfcookline) */
 
-static int shio_sfcookbegin(SHIO *op) noex {
+local int shio_sfcookbegin(SHIO *op) noex {
 	int		rs = SR_OK ;
 	if (op->outstore == nullptr) {
 	    cint	size = szof(OUTSTORE) ;
@@ -1279,10 +1253,9 @@ static int shio_sfcookbegin(SHIO *op) noex {
 	    } /* end if (m-a) */
 	} /* end if (needed) */
 	return rs ;
-}
-/* end subroutine (shio_sfcookbegin) */
+} /* end subroutine (shio_sfcookbegin) */
 
-static int shio_sfcookend(SHIO *op) noex {
+local int shio_sfcookend(SHIO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->outstore != nullptr) ylikely {
@@ -1302,10 +1275,9 @@ static int shio_sfcookend(SHIO *op) noex {
 	    op->outstore = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (shio_sfcookend) */
+} /* end subroutine (shio_sfcookend) */
 
-static int shio_sfcookdump(SHIO *op) noex {
+local int shio_sfcookdump(SHIO *op) noex {
 	int		rs = SR_OK ;
 	if (op->outstore != nullptr) {
 	    OUTSTORE	*osp = (OUTSTORE *) op->outstore ;
@@ -1317,10 +1289,9 @@ static int shio_sfcookdump(SHIO *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (shio_sfcookflush) */
+} /* end subroutine (shio_sfcookflush) */
 
-static int shio_sfcookflush(SHIO *op) noex {
+local int shio_sfcookflush(SHIO *op) noex {
 	int		rs = SR_OK ;
 	if (op->outstore != nullptr) {
 	    if ((rs = shio_sfcookdump(op)) >= 0) {
@@ -1330,10 +1301,9 @@ static int shio_sfcookflush(SHIO *op) noex {
 	    rs = shio_sfflush(op) ;
 	}
 	return rs ;
-}
-/* end subroutine (shio_sfcookflush) */
+} /* end subroutine (shio_sfcookflush) */
 
-static int shio_sfcheckwrite(SHIO *op,cchar *lbuf,int llen) noex {
+local int shio_sfcheckwrite(SHIO *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	if (llen < 0) llen = lenstr(lbuf) ;
 	if ((rs = shio_sfiscook(op)) > 0) {
@@ -1342,10 +1312,9 @@ static int shio_sfcheckwrite(SHIO *op,cchar *lbuf,int llen) noex {
 	    rs = shio_sfwrite(op,lbuf,llen) ;
 	}
 	return (rs >= 0) ? llen : rs ;
-}
-/* end subroutine (shio_sfcheckwrite) */
+} /* end subroutine (shio_sfcheckwrite) */
 
-static int shio_sfcookwrite(SHIO *op,cchar *lbuf,int llen) noex {
+local int shio_sfcookwrite(SHIO *op,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	if ((op->outstore != nullptr) && (llen > 0)) {
 	    OUTSTORE	*osp = (OUTSTORE *) op->outstore ;
@@ -1382,24 +1351,22 @@ static int shio_sfcookwrite(SHIO *op,cchar *lbuf,int llen) noex {
 	    rs = shio_sfwrite(op,lbuf,llen) ;
 	}
 	return (rs >= 0) ? llen : rs ;
-}
-/* end subroutine (shio_sfcookwrite) */
+} /* end subroutine (shio_sfcookwrite) */
 #endif /* CF_SFIO */
 
 #if	CF_SFIO
-static int shio_sfwrite(SHIO *op,cchar *lbuf,int llen) noex {
+local int shio_sfwrite(SHIO *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	if ((rs = sfwrite(op->fp,lbuf,llen)) < 0) {
 	    rs = SR_PIPE ;
 	}
 	return rs ;
-}
-/* end subroutine (shio_sfwrite) */
+} /* end subroutine (shio_sfwrite) */
 #endif /* CF_SFIO */
 
 #if	CF_SFIO
 /* are we outside of KSH? */
-static int shio_outside() noex {
+local int shio_outside() noex {
 	SHIO_PERSISTENT	*pdp = &shio_data ;
 	int		f = pdp->f_outside ;
 	if (! pdp->f_init) { /* race is OK here */
@@ -1410,21 +1377,18 @@ static int shio_outside() noex {
 	    pdp->f_init = true ;
 	} /* end if (needed initialization) */
 	return f ;
-}
-/* end subroutine (shio_outside) */
+} /* end subroutine (shio_outside) */
 #endif /* CF_SFIO */
 
-static bool hasnl(cchar *sp,int sl) noex {
+local bool hasnl(cchar *sp,int sl) noex {
 	return (strnrchr(sp,sl,'\n') != nullptr) ;
-}
-/* end subroutine (hasnl) */
+} /* end subroutine (hasnl) */
 
-static int isNotSeek(int rs) noex {
+local bool isNotSeek(int rs) noex {
 	return isOneOf(seekrs,rs) ;
-}
-/* end subroutine (isNotSeek) */
+} /* end subroutine (isNotSeek) */
 
-static bool isInterrupt(volatile int **ipp) noex {
+local bool isInterrupt(volatile int **ipp) noex {
 	bool		f = false ;
 	if (ipp != nullptr) ylikely {
 	    int	i = 0 ;
@@ -1434,7 +1398,6 @@ static bool isInterrupt(volatile int **ipp) noex {
 	    }
 	}
 	return f ;
-}
-/* end subroutine (isInterrupt) */
+} /* end subroutine (isInterrupt) */
 
 
