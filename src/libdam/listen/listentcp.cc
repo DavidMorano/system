@@ -50,8 +50,11 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getnodename.h>
+#include	<getpf.h>
+#include	<getproto.h>
 #include	<hostaddr.h>
 #include	<isoneof.h>
 #include	<localmisc.h>
@@ -85,11 +88,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	getprotofamily(int) noex ;
-    extern int	getproto_name(cchar *,int) noex ;
-}
-
 
 /* external variables */
 
@@ -99,10 +97,10 @@ extern "C" {
 
 /* forward references */
 
-static int	listentcp_lookup(int,int,cchar *,cchar *,int) noex ;
-static int	listentcp_try(ADDRINFO *,int) noex ;
+local int	listentcp_lookup(int,int,cchar *,cchar *,int) noex ;
+local int	listentcp_try(ADDRINFO *,int) noex ;
 
-static int	isFailListen(int) noex ;
+local int	isFailListen(int) noex ;
 
 
 /* local variables */
@@ -113,7 +111,7 @@ constexpr int	rsfails[] = {
 	SR_AFNOSUPPORT,
 	SR_ACCESS,
 	0
-} ;
+} ; /* end array (rsfails) */
 
 constexpr bool		f_protolookup = CF_PROTOLOOKUP ;
 
@@ -146,12 +144,12 @@ int listentcp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 	            }
 	        }
 	        if (rs >= 0) {
-	            if ((rs = getprotofamily(af)) >= 0) {
+	            if ((rs = getpf(af)) >= 0) {
 	                cint	pf = rs ;
 	                cchar	*ps = portspec ;
 	                rs = listentcp_lookup(pf,proto,hp,ps,opts) ;
 	                s = rs ;
-	            } /* end if (getprotofamily) */
+	            } /* end if (getpf) */
 	        } /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -162,7 +160,7 @@ int listentcp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 
 /* local subroutines */
 
-static int listentcp_lookup(int pf,int proto,cc *hs,cc *ps,int opts) noex {
+local int listentcp_lookup(int pf,int proto,cc *hs,cc *ps,int opts) noex {
 	ADDRINFO	hint{} ;
 	HOSTADDR	ha ;
 	HOSTADDR_CUR	hacur ;
@@ -211,14 +209,14 @@ static int listentcp_lookup(int pf,int proto,cc *hs,cc *ps,int opts) noex {
 }
 /* end subroutine (listentcp_lookup) */
 
-static int listentcp_try(ADDRINFO *aip,int opts) noex {
+local int listentcp_try(ADDRINFO *aip,int opts) noex {
 	cint		proto = aip->ai_protocol ;
 	cint		st = aip->ai_socktype ;
 	cint		af = aip->ai_family ;
 	int		rs ;
 	int		s = -1 ;
 
-	if ((rs = getprotofamily(af)) >= 0) {
+	if ((rs = getpf(af)) >= 0) {
 	    cint	spf = rs ;
 	    if ((rs = u_socket(spf,st,proto)) >= 0) {
 	        s = rs ;
@@ -250,13 +248,13 @@ static int listentcp_try(ADDRINFO *aip,int opts) noex {
 
 	        if ((rs < 0) && (s >= 0)) u_close(s) ;
 	    } /* end if (socket) */
-	} /* end if (getprotofamily) */
+	} /* end if (getpf) */
 
 	return (rs >= 0) ? s : rs ;
 }
 /* end subroutine (listentcp_try) */
 
-static int isFailListen(int rs) noex {
+local int isFailListen(int rs) noex {
 	return isOneOf(rsfails,rs) ;
 }
 /* end subroutine (isFailListen) */
