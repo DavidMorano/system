@@ -186,7 +186,7 @@ int clientinfo_loadnames(clientinfo *cip,cchar *dname) noex {
 	    if (dname[0]) {
 	        rs = SR_OK ;
 	        if (cip->nnames < 0) {
-	            cint	vo = VECSTR_OCOMPACT ;
+	            cint	vo = vecstrm.compact ;
 	            cip->nnames = 0 ;
 	            rs = vecstr_start(cip->nlp,5,vo) ;
 	        }
