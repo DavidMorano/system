@@ -1,51 +1,57 @@
-/* getpfopts */
+/* getpfopts SUPPORT (Get-Postfacts-Options) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-/* get the PCS-wide options */
+/* get the POSTFACTS options */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUG	0
-
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
-	= 95/05/01, David A­D­ Morano
-
+	= 1995-05-01, David A­D­ Morano
 	This code module was completely rewritten to replace any
 	original garbage that was here before.
 
-
 */
 
+/* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /******************************************************************************
 
+  	Name:
+	getpfopts
+
+  	Description:
 	This subroutine parses out options from the main PCS
 	configuration file.
 
-
 	Synopsis:
+	int getpfopts(proginfo *gp,vecstr *setsp) noex
 
-	int getpfopts(gp,setsp)
-	struct proginfo	*gp ;
-	vecstr		*setsp ;
+	Arguments:
+	gp		pointer to PROGINO
+	setsp		pointer to VECSTR
 
-
-
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 ******************************************************************************/
 
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<userinfo.h>
 #include	<baops.h>
@@ -53,149 +59,103 @@
 #include	<vecstr.h>
 #include	<pcsconf.h>
 #include	<mallocstuff.h>
+#include	<headkeymat.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
+#include	"getpfopts.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
 
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
-
 /* external subroutines */
 
-extern int	matstr3(char *const *,const char *,int) ;
-extern int	headkeymat(char *,char *,int) ;
-
-extern char	*strbasename(char *) ;
-
-
-/* local forward references */
-
 
 /* external variables */
 
 
-/* external variables */
+/* local structures */
 
 
-/* local data */
-
-static char *const progopts[] = {
-	    "mailername",
-	    "progrbbpost",
-	    "progmsgs",
-	    "newsgroup",
-	    "spooldir",
-	    NULL
-} ;
+/* forward references */
 
 
-#define	PROGOPT_MAILERNAME	0
-#define	PROGOPT_PROGRBBPOST	1
-#define	PROGOPT_PROGMSGS	2
-#define	PROGOPT_NEWSGROUP	3
-#define	PROGOPT_SPOOLDIR	4
+/* local variables */
+
+constexpr cpcchar	progopts[] = {
+	[getpfopt_mailername]	= "mailername",
+	[getpfopt_progrbbpost]	= "progrbbpost",
+	[getpfopt_progmsgs]	= "progmsgs",
+	[getpfopt_newsgroup]	= "newsgroup",
+	[getpfopt_spooldir]	= "spooldir",
+	[getpfopt_overlast]	= nullptr
+} ; /* end array */
+
+constexpr char		sname[] = SEARCHNAME ;
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
-int getpfopts(gp,setsp)
-struct proginfo	*gp ;
-vecstr		*setsp ;
-{
-	int	i, oi ;
-
-	char	*cp ;
-
-
-/* system-wide options ? */
-
-#if	CF_DEBUG
-	if (gp->debuglevel > 1)
-	    debugprintf("getpfopts: scanning system options\n") ;
-#endif
-
-	for (i = 0 ; vecstr_get(setsp,i,&cp) >= 0 ; i += 1) {
-
-	    char	*cp2 ;
-
-
-	    if (cp == NULL) 
-		continue ;
-
-#if	CF_DEBUG
-	    if (gp->debuglevel > 1)
-	        debugprintf("getpfopts: conf >%s<\n",cp) ;
-#endif
-
-	    if (! headkeymat(SEARCHNAME,cp,-1))
-	        continue ;
-
-/* we have one of ours, separate the keyname from the value */
-
-	    cp += (strlen(SEARCHNAME) + 1) ;
-	    if ((cp2 = strchr(cp,'=')) == NULL)
-	        continue ;
-
-#if	CF_DEBUG
-	    if (gp->debuglevel > 1)
-	        debugprintf("getpfopts: opt >%s<\n",cp) ;
-#endif
-
-	    if ((oi = matstr3(progopts,cp,(cp2 - cp))) >= 0) {
-
-#if	CF_DEBUG
-	        if (gp->debuglevel > 1)
-	            debugprintf("getpfopts: system valid option, oi=%d\n",
-	                oi) ;
-#endif
-
-	        cp2 += 1 ;
-	        switch (oi) {
-
-	        case PROGOPT_MAILERNAME:
-	            if (*cp2 && (gp->mailername == NULL))
-	                gp->mailername = mallocstr(cp2) ;
-
-	            break ;
-
-	        case PROGOPT_PROGRBBPOST:
-	            if (*cp2 && (gp->prog_rbbpost == NULL))
-	                gp->prog_rbbpost = mallocstr(cp2) ;
-
-	            break ;
-
-	        case PROGOPT_PROGMSGS:
-	            if (*cp2 && (gp->prog_msgs == NULL))
-	                gp->prog_msgs = mallocstr(cp2) ;
-
-	            break ;
-
-	        case PROGOPT_NEWSGROUP:
-	            if (*cp2 && (gp->newsgroup == NULL))
-	                gp->newsgroup = mallocstr(cp2) ;
-
-	            break ;
-
-	        case PROGOPT_SPOOLDIR:
-	            if (*cp2 && (gp->spooldname == NULL))
-	                gp->spooldname = mallocstr(cp2) ;
-
-	            break ;
-
-	        } /* end switch */
-
-	    } /* end if (got a match) */
-
-	} /* end for */
-
-	return OK ;
+int getpfopts(proginfo *gp,vecstr *setsp) noex {
+    	cnullptr	np{} ;
+    	int		rs = SR_FAULT ;
+	if (gp & setsp) {
+            char    *cp ;
+            /* system-wide options? */
+	    rs = SR_OK ;
+            for (int i = 0 ; vecstr_get(setsp,i,&cp) >= 0 ; i += 1) {
+                char        *cp2 ;
+                if (cp == nullptr) continue ;
+                if (! headkeymat(sname,cp,-1)) continue ;
+                /* we have one of ours, separate the keyname from the value */
+                cp += (lenstr(sname) + 1) ;
+                if ((cp2 = strchr(cp,'=')) == nullptr) continue ;
+		cint cl = intconv(cp2 - cp) ;
+                if (int oi ; (oi = matstr3(progopts,cp,cl)) >= 0) {
+                    cp2 += 1 ;
+                    switch (oi) {
+                    case getpfopt_mailername:
+                        if (*cp2 && (gp->mailername == nullptr)) {
+                            gp->mailername = mallocstr(cp2) ;
+                        }
+                        break ;
+                    case getpfopt_progrbbpost:
+                        if (*cp2 && (gp->prog_rbbpost == nullptr)) {
+                            gp->prog_rbbpost = mallocstr(cp2) ;
+                        }
+                        break ;
+                    case getpfopt_progmsgs:
+                        if (*cp2 && (gp->prog_msgs == nullptr)) {
+                            gp->prog_msgs = mallocstr(cp2) ;
+                        }
+                        break ;
+                    case getpfopt_newsgroup:
+                        if (*cp2 && (gp->newsgroup == nullptr)) {
+                            gp->newsgroup = mallocstr(cp2) ;
+                        }
+                        break ;
+                    case getpfopt_spooldir:
+                        if (*cp2 && (gp->spooldname == nullptr)) {
+                            gp->spooldname = mallocstr(cp2) ;
+                        }
+                        break ;
+		    default:
+			rs = SR_BUGCHECK ;
+			break ;
+                    } /* end switch */
+                } /* end if (got a match) */
+            } /* end for */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (getpfopts) */
-
 
 
