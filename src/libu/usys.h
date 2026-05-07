@@ -78,6 +78,7 @@
 #include	<usys_xti.h>
 #include	<usys_environ.hh>
 #include	<usys_getnetname.h>
+#include	<usys_getauid.h>
 
 
 #endif /* USYS_INCLUDE */
