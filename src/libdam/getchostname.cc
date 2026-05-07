@@ -112,8 +112,8 @@ int getchostname(char *hbuf,cchar *name) noex {
 	int		len = 0 ;
 	if (hbuf && name) {
 	    if ((rs = getbufsize(bufsize_hn)) >= 0) {
-	        cint		af = AF_UNSPEC ;
-	        cint		hlen = rs ;
+	        cint	af = AF_UNSPEC ;
+	        cint	hlen = rs ;
 	        if (hostinfo hi ; (rs = hostinfo_start(&hi,af,name)) >= 0) {
 	            cchar	*cnp{} ;
 	            if ((rs = hostinfo_getcanonical(&hi,&cnp)) >= 0) {
