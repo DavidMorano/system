@@ -425,7 +425,7 @@ int sysvar_curenum(SV *op,SV_CUR *curp,char *kbuf,int klen,
 local int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
