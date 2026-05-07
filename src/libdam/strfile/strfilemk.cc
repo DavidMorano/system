@@ -254,7 +254,7 @@ cchar	*objname ;
 	{
 		VECSTR		syms ;
 	        const int	n = nelem(subs) ;
-		int		opts = VECSTR_OCOMPACT ;
+		int		opts = vecstrm.compact ;
 	        if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
 		    const int	symlen = SYMNAMELEN ;
 	            int		i ;
