@@ -573,7 +573,7 @@ int opener::mkend() noex {
 
 int opener::mkproc(cchar *pbuf) noex {
 	cint		vn = 10 ;
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 	int		cpid = 0 ;
