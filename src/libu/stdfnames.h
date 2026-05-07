@@ -59,7 +59,17 @@
 #endif
 
 
-extern ccharp	stdfname[stdfile_overlast + 1] ;
+extern ccharp		stdfname[stdfile_overlast + 1] ;
+
+EXTERNC_begin
+extern int		getstdfname(cchar *,int) noex ;
+EXTERNC_end
+
+#ifdef	__cplusplus
+local inline int	getstdfname(cchar *sp) noex {
+    	return getstdfname(sp,-1) ;
+} /* end subroutine (getstdfname) */
+#endif /* __cplusplus */
 
 
 #endif /* STDFNAMES_INCLUDE */
