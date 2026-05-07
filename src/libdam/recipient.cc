@@ -150,7 +150,7 @@ int recipient_start(RC *op,int vn) noex {
 	if (vn <= 1) vn = RC_DEFENTS ;
 	if ((rs = recipient_ctor(op)) >= 0) ylikely {
 	    if ((rs = hdb_start(op->hlp,vn,0,nullptr,nullptr)) >= 0) ylikely {
-	        cint	vo = VECSTR_OCONSERVE ;
+	        cint	vo = vecstrm.conserve ;
 	        if ((rs = vecstr_start(op->nlp,vn,vo)) >= 0) ylikely {
 		    rs = RC_MAGIC ;
 		}
