@@ -152,7 +152,7 @@ extern "C" {
 int csro_start(csro *op,int n) noex {
 	int		rs ;
 	if ((rs = csro_ctor(op)) >= 0) ylikely {
-	    int		vo = VECSTR_OCONSERVE ;
+	    int		vo = vecstrm.conserve ;
 	    int		sz = szof(csro_val) ;
 	    if (n <= 1) n = CSRO_DEFENTS ;
 	    if ((rs = vecstr_start(op->nlp,n,vo)) >= 0) ylikely {
