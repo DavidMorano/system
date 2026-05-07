@@ -43,16 +43,16 @@
 #include	<bfile.h>
 #include	<contypevals.h>
 #include	<contentencodings.h>
-#include	<ismmclass.h>
-#include	<stdfnames.h>
 #include	<permx.h>
 #include	<mktmp.h>
 #include	<sfx.h>
 #include	<six.h>
 #include	<mkpathx.h>
 #include	<matstr.h>
+#include	<stdfiles.h>
 #include	<strstdfname.h>
 #include	<mkchar.h>
+#include	<ismmclass.h>
 #include	<localmisc.h>
 
 #include	"mailmsgattent.h"
