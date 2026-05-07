@@ -47,12 +47,15 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getportnum.h>
+#include	<getproto.h>
+#include	<getpf.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
 #include	<hostent.h>
@@ -119,11 +122,6 @@ typedef unsigned int	in_addr_t ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	getprotofamily(int) noex ;
-    extern int	getproto_name(cchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -204,7 +202,7 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 
 	if (rs >= 0) {
 	    if (af == AF_UNSPEC) af = AF_INET6 ;
-	    rs = getprotofamily(af) ;
+	    rs = getpf(af) ;
 	    pf = rs ;
 	}
 
