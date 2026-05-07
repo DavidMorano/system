@@ -80,7 +80,7 @@ int retpath_start(retpath *plp) noex {
     	int		rs = SR_FAULT ;
 	if (plp) {
     	    cint	vn = 10 ;
-	    cint	vo = VECSTR_OORDERED ;
+	    cint	vo = vecstrm.ordered ;
 	    rs = vecstr_start(plp,vn,vo) ;
 	} /* end if (non-null) */
 	return rs ;
