@@ -532,7 +532,7 @@ local int sysvars_indopenseq(SVS *op,SUBINFO *sip) noex {
 	if (dirseen ds ; (rs = dirseen_start(&ds)) >= 0) ylikely {
 	    expcook	cooks ;
 	    cint	vn = 6 ;
-	    cint	vo = VECSTR_OCOMPACT ;
+	    cint	vo = vecstrm.compact ;
 	    if (vecstr sdirs ; (rs = vecstr_start(&sdirs,vn,vo)) >= 0) {
 	        if ((rs = expcook_start(&cooks)) >= 0) {
 		    if ((rs = sysvars_loadcooks(op,&cooks)) >= 0) {
@@ -819,7 +819,7 @@ local int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
 	        if (rs >= 0) {
 	            vecstr	envs ;
 		    cint	vn = 20 ;
-	            cint	vo = VECSTR_OCOMPACT ;
+	            cint	vo = vecstrm.compact ;
 	            if ((rs = vecstr_start(&envs,vn,vo)) >= 0) {
 	                cchar	*cp ;
 
