@@ -432,7 +432,7 @@ int txtindex_curenum(txtindex *op,TI_CUR *curp,TI_TAG *tagp,
 local int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 	modload		*lp = op->mlp ;
 	cint		vn = sub_overlast ;
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
