@@ -679,7 +679,7 @@ local int mailalias_opener(MA *op) noex {
 			cchar	*cp ;
 	                if ((rs = libmem.strw(dbfname,-1,&cp)) >= 0) {
 	                    vecstr	*alp = op->afp ;
-	                    cint	vo = VECSTR_OCOMPACT ;
+	                    cint	vo = vecstrm.compact ;
 	                    op->dbfname = cp ;
 	                    if ((rs = vecstr_start(alp,5,vo)) >= 0) {
 	                        if ((rs = mailalias_dbopen(op,dt)) >= 0) {
