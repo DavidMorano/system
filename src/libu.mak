@@ -46,7 +46,7 @@ LIBS += -liconv -lproc
 
 
 OBJ00= syshas.o mailvalues.o endian.o 
-OBJ01= aflag.o errtimer.o 
+OBJ01= aflag.o errtimer.o usysdefs.o
 OBJ02= timewatch.o timecount.o
 OBJ03= libutil.o usysconf.o umods.o 
 
@@ -337,6 +337,7 @@ objj.o:			$(OBJJ)
 
 # SUPPORT objects
 syshas.o:		syshas.cc	syshas.h		$(INCS)
+ustsdefs.o:		usysdefs.cc	usysdefs.h		$(INCS)
 timewatch.o:		timewatch.cc	timewatch.hh		$(INCS)
 timecount.o:		timecount.cc	timecount.hh		$(INCS)
 aflag.o:		aflag.cc	aflag.hh		$(INCS)
