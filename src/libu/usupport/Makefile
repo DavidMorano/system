@@ -40,21 +40,23 @@ MODS +=
 LIBS +=
 
 
-OBJ0= usupport_prime.o usupport_sncpyx.o
-OBJ1= usupport_itimer.o usupport_hasx.o
-OBJ2= usupport_cfdec.o usupport_ctdec.o
-OBJ3= usupport_snwcpy.o usupport_strwcpy.o
-OBJ4= usupport_toxc.o usupport_nleadstr.o
-OBJ5= usupport_matstr.o usupport_rmx.o
-OBJ6= usupport_ustrftime.o usupport_sixchr.o
-OBJ7= usupport_sichar.o usupport_cfdect.o
+OBJ00= usupport_prime.o usupport_sncpyx.o
+OBJ01= usupport_itimer.o usupport_hasx.o
+OBJ02= usupport_cfdec.o usupport_ctdec.o
+OBJ03= usupport_snwcpy.o usupport_strwcpy.o
+OBJ04= usupport_toxc.o usupport_nleadstr.o
+OBJ05= usupport_matstr.o usupport_rmx.o
+OBJ06= usupport_ustrftime.o usupport_sixchr.o
+OBJ07= usupport_sichar.o usupport_cfdect.o
 
-OBJ8= usupport_getsign.o
-OBJ9=
+OBJ08= usupport_getsign.o
+OBJ09= usupport_strnxchr.o usupport_strnxbrk.o
+OBJ10= usupport_strnchar.o usupport_strnwht.o
+OBJ11=
 
-OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o obj6.o obj7.o
-OBJC= obj8.o
+OBJA= obj00.o obj01.o obj02.o obj03.o
+OBJB= obj04.o obj05.o obj06.o obj07.o
+OBJC= obj08.o obj09.o obj10.o
 
 OBJ= obja.o objb.o objc.o
 
@@ -123,35 +125,41 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0)
+obj00.o:		$(OBJ00)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1.o:			$(OBJ1)
+obj01.o:		$(OBJ01)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2.o:			$(OBJ2)
+obj02.o:		$(OBJ02)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3.o:			$(OBJ3)
+obj03.o:		$(OBJ03)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4.o:			$(OBJ4)
+obj04.o:		$(OBJ04)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj5.o:			$(OBJ5)
+obj05.o:		$(OBJ05)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj6.o:			$(OBJ6)
+obj06.o:		$(OBJ06)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj7.o:			$(OBJ7)
+obj07.o:		$(OBJ07)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obj8.o:			$(OBJ8)
+obj08.o:		$(OBJ08)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj9.o:			$(OBJ9)
+obj09.o:		$(OBJ09)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj10.o:		$(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj11.o:		$(OBJ11)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -186,5 +194,9 @@ usupport_ustrftime.o:	usupport_ustrftime.cc	usupport_ustrftime.hh	$(INCS)
 usupport_sixchr.o:	usupport_sixchr.cc	usupport_sixchr.hh	$(INCS)
 usupport_sichar.o:	usupport_sichar.cc	usupport_sichar.hh	$(INCS)
 usupport_cfdect.o:	usupport_cfdect.cc	usupport_cfdect.hh	$(INCS)
+usupport_strnxchr.o:	usupport_strnxchr.cc	usupport_strnxchr.hh	$(INCS)
+usupport_strnxbrk.o:	usupport_strnxbrk.cc	usupport_strnxbrk.hh	$(INCS)
+usupport_strnchar.o:	usupport_strnchar.cc	usupport_strnchar.hh	$(INCS)
+usupport_strnwht.o:	usupport_strnwht.cc	usupport_strnwht.hh	$(INCS)
 
 
