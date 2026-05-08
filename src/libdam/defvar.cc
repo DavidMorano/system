@@ -142,7 +142,7 @@ int defvar_open(DF *op,cchar *fname) noex {
 	            op->fname = cp ;
 	            if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) {
 		        cint	vn = 10 ;
-		        cint	vo = VECSTR_OSTATIONARY ;
+		        cint	vo = vecstrm.stationary ;
 	    	        op->ti_filemod = sb.st_mtime ;
 	                if ((rs = vecstr_start(op->vlp,vn,vo)) >= 0) {
 	                    if ((rs = vecstr_envfile(op->vlp,fname)) >= 0) {
