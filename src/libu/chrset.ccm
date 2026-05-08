@@ -77,7 +77,7 @@ export {
 	    load(ss) ;
 	} ;
 	chrset(int ch) noex {
-	    BASETLL(bs,ch) ;
+	    BASETL(bs,ch) ;
 	} ;
 	int load(cchar *) noex ;
 	int set(int) noex ;
@@ -94,12 +94,7 @@ int chrset::load(cchar *ss) noex {
 	if (ss) {
 	    rs = SR_OK ;
 	    for (int ch ; ((ch = (*ss & UCHAR_MAX))) ; ss += 1) {
-		if (ch < nbits) {
-		    BASETLL(bs,ch) ;
-		} else {
-		    rs = SR_INVALID ;
-		    break ;
-		}
+		    BASETL(bs,ch) ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
@@ -108,7 +103,7 @@ int chrset::load(cchar *ss) noex {
 int chrset::tst(int ch) const noex {
     	int rs = SR_INVALID ;
 	if ((ch >= 0) && (ch < nbits)) {
-	    rs = bool(BATSTLL(bs,ch)) ;
+	    rs = bool(BATSTL(bs,ch)) ;
 	}
 	return rs ;
 } /* end method (chrset::tst) */
@@ -117,7 +112,7 @@ int chrset::set(int ch) noex {
     	int rs = SR_INVALID ;
 	if ((ch >= 0) && (ch < nbits)) {
 	    rs = SR_OK ;
-	    BASETLL(bs,ch) ;
+	    BASETL(bs,ch) ;
 	}
 	return rs ;
 } /* end method (chrset::set) */
@@ -126,7 +121,7 @@ int chrset::clr(int ch) noex {
     	int rs = SR_INVALID ;
 	if ((ch >= 0) && (ch < nbits)) {
 	    rs = SR_OK ;
-	    BACLR(bs,ch) ;
+	    BACLRL(bs,ch) ;
 	}
 	return rs ;
 } /* end method (chrset::clr) */
