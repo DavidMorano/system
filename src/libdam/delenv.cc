@@ -58,7 +58,7 @@ extern char	**environ ;
 
 /* forward references */
 
-static bool	namecmp(cchar *,int,cchar *) noex ;
+local bool	namecmp(cchar *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -106,7 +106,7 @@ cchar *delenv(cchar *name) noex {
 
 /* local subroutines */
 
-static bool namecmp(cchar *name,int namelen,cchar *entry) noex {
+local bool namecmp(cchar *name,int namelen,cchar *entry) noex {
 	cchar	*nep = (name + namelen) ;
 	cchar	*ep = entry ;
 	bool	f = false ;
@@ -115,7 +115,6 @@ static bool namecmp(cchar *name,int namelen,cchar *entry) noex {
 	    if (f) break ;
 	} /* end while */
 	return f ;
-}
-/* end subroutine (namecmp) */
+} /* end subroutine (namecmp) */
 
 
