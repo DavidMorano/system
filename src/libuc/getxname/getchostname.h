@@ -1,4 +1,4 @@
-/* getchostname HEADER */
+/* getchostname HEADER (Get-Canonical­Host-Name) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
