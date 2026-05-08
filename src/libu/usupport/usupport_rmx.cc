@@ -58,6 +58,7 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
+#include	"usupport_strnxchr.hh"
 #include	"usupport_rmx.hh"
 
 import libutil ;			/* |lenstr(3u)| */
@@ -68,8 +69,15 @@ import ureserve ;			/* |ischarx(3u)| */
 
 /* imported namespaces */
 
+using libu::strnochr ;			/* subroutine */
+using libu::strnrchr ;			/* subroutine */
+
 
 /* local typedefs */
+
+extern "C" {
+    typedef char *(*strnx_f)(cchar *,int,int) noex ;
+}
 
 extern "C" {
     typedef bool (*iscond_f)(int) noex ;
@@ -119,6 +127,18 @@ namespace {
 
 /* forward references */
 
+local int rmxchr(strnx_f sx,cchar *sp,int sl,int ch) noex {
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    if (cchar *tp ; (tp = sx(sp,sl,ch)) != nullptr) {
+	        sl = intconv(tp - sp) ;
+	    }
+	} else {
+	    sl = -1 ;
+	} /* end if */
+	return sl ;
+} /* end subroutine (rmxchr) */
+
 
 /* local variables */
 
@@ -127,6 +147,15 @@ namespace {
 
 
 /* exported subroutines */
+
+namespace libu {
+    int rmochr(cchar *sp,int sl,int ch) noex {
+    	return rmxchr(strnochr,sp,sl,ch) ;
+    } /* end subroutine (rmochr) */
+    int rmrchr(cchar *sp,int sl,int ch) noex {
+    	return rmxchr(strnrchr,sp,sl,ch) ;
+    } /* end subroutine (rmrchr) */
+} /* end namespace (libu) */
 
 namespace libu {
     int rmeol(cchar *sp,int sl) noex {
