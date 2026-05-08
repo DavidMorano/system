@@ -93,7 +93,7 @@ OBJ09= strobj.o
 OBJ10= ctx.o cfx.o mapblock.o memtrack.o
 OBJ11= field.o termx.o
 
-OBJ12=
+OBJ12= nonpath.o
 OBJ13=
 OBJ14=
 OBJ15=
@@ -952,7 +952,6 @@ td.o:			td.cc		td.h termstr.h
 recip.o:		recip.cc	recip.h
 querystr.o:		querystr.cc	querystr.h
 absfn.o:		absfn.cc	absfn.h
-nonpathfn.o:		nonpathfn.cc	nonpathfn.h
 posname.o:		posname.cc	posname.h
 ids.o:			ids.cc		ids.h
 groupids.o:		groupids.cc	groupids.hh
@@ -1065,6 +1064,11 @@ timestr.o:		timestr.dir
 timestr.dir:
 	makesubdir $@
 
+# GETHE
+gethe.o:		gethe.dir
+gethe.dir:
+	makesubdir $@
+
 # string-constants
 sysdbfiles.o:		sysdbfiles.cc	sysdbfiles.h
 sysdbfn.o:		sysdbfn.cc	sysdbfn.h
@@ -1074,7 +1078,6 @@ findbit.o:		findbit.cc	findbit.h		$(INCS)
 termtypemat.o:		termtypemat.cc	termtypemat.h
 termcmd.o:		termcmd.cc	termcmd.h
 matparam.o:		matparam.cc	matparam.h
-typenonpath.o:		typenonpath.cc	typenonpath.h
 digval.o:		digval.cc	digval.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 strwcmp.o:		strwcmp.cc strwcmp.h
