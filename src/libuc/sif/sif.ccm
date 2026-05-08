@@ -24,10 +24,7 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 #pragma		GCC dependency		"mod/chrset.ccm"
 
@@ -62,13 +59,15 @@ export {
 	chrset		sset ;
 	cchar		*sp ;
 	cchar		*sstr ;
-	int		µsl ;
+	int		sl ;
 	int		sch ;
-	sif(cc *p,int l,cc *ss,int c = 0) noex : sp(p), µsl(l), sch(c) { 
+	int		finit ;
+	sif(cc *p,int l,cc *ss,int c = 0) noex : sp(p), sl(l), sch(c) { 
 	    iswhitechr	(this,sifmem_iswhitechr) ;
 	    iswhitestr	(this,sifmem_iswhitestr) ;
 	    isspanchr	(this,sifmem_isspanchr) ;
 	    isspanstr	(this,sifmem_isspanstr) ;
+	    finit = false ;
 	    sstr = ss ;
 	    if (ss) {
 		sset.load(ss) ;
@@ -85,11 +84,13 @@ export {
 	int chr		(cchar **) noex ;
 	int brk		(cchar **) noex ;
 	int operator () (cchar **) noex ;
+    private:
+	int enter(cchar **) noex ;
     } ; /* end struct (sif) */
 } /* end export */
 
 int sif::nextchr(cchar **rpp) noex {
     	return nextbrk(rpp) ;
-}
+} /* end method */
 
 
