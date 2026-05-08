@@ -31,21 +31,25 @@
 #include	<stdintx.h>
 #include	<intx.h>
 
-#include	<usupport_prime.h>
-#include	<usupport_hasx.hh>
-#include	<usupport_itimer.hh>
-#include	<usupport_sncpyx.hh>
 #include	<usupport_ctdec.hh>
 #include	<usupport_cfdec.hh>
 #include	<usupport_cfdect.hh>
-#include	<usupport_snwcpy.hh>
+#include	<usupport_getsign.hh>
+#include	<usupport_hasx.hh>
+#include	<usupport_itimer.hh>
 #include	<usupport_matstr.hh>
+#include	<usupport_prime.h>
 #include	<usupport_rmx.hh>
-#include	<usupport_strwcpy.hh>
-#include	<usupport_ustrftime.hh>
 #include	<usupport_sixchr.hh>
 #include	<usupport_sichar.hh>
-#include	<usupport_getsign.hh>
+#include	<usupport_sncpyx.hh>
+#include	<usupport_snwcpy.hh>
+#include	<usupport_strnchar.hh>
+#include	<usupport_strnwht.hh>
+#include	<usupport_strnxchr.hh>
+#include	<usupport_strnxbrk.hh>
+#include	<usupport_strwcpy.hh>
+#include	<usupport_ustrftime.hh>
 
 
 #endif /* USUPPORT_INCLUDE */
