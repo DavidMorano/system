@@ -395,7 +395,7 @@ int subinfo::setmode(mode_t fm) noex {
     	if_constexpr (f_debug) {
 	    filetypes dt = filetype(fm) ;
 	    {
-		cc *ftn = filetypes_names[dt] ;
+		cc *ftn = filetype_data.name[dt] ;
 	        DPRINTF("ftn=%s\n",ftn) ;
 	    }
 	} /* end if_constexpr (f_debug) */
