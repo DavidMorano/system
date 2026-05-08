@@ -110,8 +110,8 @@ int getchostname(char *hbuf,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (name && hbuf) {
-	    if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	if (hbuf && name) ylikely {
+	    if ((rs = getbufsize(bufsize_hn)) >= 0) ylikely {
 	        cint	af = AF_UNSPEC ;
 	        cint	hlen = rs ;
 	        if (hostinfo hi ; (rs = hostinfo_start(&hi,af,name)) >= 0) {
