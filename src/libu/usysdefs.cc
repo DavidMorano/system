@@ -38,8 +38,6 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
-#include	"stdfiles.h"
-
 
 /* local defines */
 
