@@ -40,7 +40,7 @@ MODS=
 LIBS +=
 
 
-OBJ0= getchostname.o getclustername.o
+OBJ0= getchostname.o getehostname.o getclustername.o
 OBJ1= getgroupname.o
 OBJ2= getnodename.o getournetname.o
 OBJ3= getrealname.o getsysname.o 
@@ -153,6 +153,7 @@ objb.o:			$(OBJB)
 
 
 getchostname.o:		getchostname.cc	getchostname.h		$(INCS)
+getehostname.o:		getehostname.cc	getehostname.h		$(INCS)
 getclustername.o:	getclustername.cc getclustername.h	$(INCS)
 getfname.o:		getfname.cc	getfname.h		$(INCS)
 getgroupname.o:		getgroupname.cc	getgroupname.h		$(INCS)
