@@ -41,11 +41,11 @@ LIBS +=
 
 
 OBJ0= uopen_prime.o
-OBJ1=
+OBJ1= uacceptpass.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 OBJB=
 
 OBJ= obja.o
@@ -136,5 +136,6 @@ objb.o:			$(OBJB)
 
 
 uopen_prime.o:	uopen_prime.cc		$(INCS)
+uacceptpass.o:	uacceptpass.cc		$(INCS)
 
 
