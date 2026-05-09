@@ -118,7 +118,7 @@ bool isobjspecial(void *sop) noex {
 /* end subroutine (isobjspecial) */
 
 bool isfnamespecial(cchar *fp,int fl) noex {
-	return (matstr(stdfname,fp,fl) >= 0) ;
+	return (getstdfname(fp,fl) >= 0) ;
 }
 /* end subroutine (isfnamespecial) */
 
