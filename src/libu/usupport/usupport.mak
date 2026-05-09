@@ -41,24 +41,30 @@ LIBS +=
 
 
 OBJ00= usupport_prime.o usupport_sncpyx.o
-OBJ01= usupport_itimer.o usupport_hasx.o
+OBJ01= usupport_itimer.o 
 OBJ02= usupport_cfdec.o usupport_ctdec.o
 OBJ03= usupport_snwcpy.o usupport_strwcpy.o
-OBJ04= usupport_toxc.o usupport_nleadstr.o
-OBJ05= usupport_matstr.o usupport_rmx.o
+OBJ04= usupport_toxc.o 
+OBJ05= usupport_rmx.o
 OBJ06= usupport_ustrftime.o usupport_sixchr.o
 OBJ07= usupport_sichar.o usupport_cfdect.o
 
 OBJ08= usupport_getsign.o
 OBJ09= usupport_strnxchr.o usupport_strnxbrk.o
 OBJ10= usupport_strnchar.o usupport_strnwht.o
-OBJ11=
+OBJ11= usupport_strkeycmp.o 
+
+OBJ12= usupport_matkeystr.o usupport_matstr.o 
+OBJ13= usupport_hasnot.o
+OBJ14= usupport_nleadkeystr.o usupport_nleadstr.o
+OBJ15=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
-OBJC= obj08.o obj09.o obj10.o
+OBJC= obj08.o obj09.o obj10.o obj11.o
+OBJD= obj12.o obj13.o obj14.o
 
-OBJ= obja.o objb.o objc.o
+OBJ= obja.o objb.o objc.o objd.o
 
 
 INCDIRS +=
@@ -163,6 +169,19 @@ obj11.o:		$(OBJ11)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj12.o:		$(OBJ12)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj13.o:		$(OBJ13)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj14.o:		$(OBJ14)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj15.o:		$(OBJ15)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -170,6 +189,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objc.o:			$(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -183,6 +205,7 @@ usupport_sncpyx.o:	usupport_sncpyx.cc	usupport_sncpyx.hh	$(INCS)
 usupport_cfdec.o:	usupport_cfdec.cc	usupport_cfdec.hh	$(INCS)
 usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.hh	$(INCS)
 usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.hh	$(INCS)
+usupport_hasnot.o:	usupport_hasnot.cc	usupport_hasnot.hh	$(INCS)
 usupport_ctdec.o:	usupport_ctdec.cc	usupport_ctdec.hh	$(INCS)
 usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.hh	$(INCS)
 usupport_matstr.o:	usupport_matstr.cc	usupport_matstr.hh	$(INCS)
@@ -198,5 +221,8 @@ usupport_strnxchr.o:	usupport_strnxchr.cc	usupport_strnxchr.hh	$(INCS)
 usupport_strnxbrk.o:	usupport_strnxbrk.cc	usupport_strnxbrk.hh	$(INCS)
 usupport_strnchar.o:	usupport_strnchar.cc	usupport_strnchar.hh	$(INCS)
 usupport_strnwht.o:	usupport_strnwht.cc	usupport_strnwht.hh	$(INCS)
+usupport_strkeycmp.o:	usupport_strkeycmp.cc	usupport_strkeycmp.hh	$(INCS)
+usupport_nleadkeystr.o:	usupport_nleadkeystr.cc	usupport_nleadkeystr.hh	$(INCS)
+usupport_matkeystr.o:	usupport_matkeystr.cc	usupport_matkeystr.hh	$(INCS)
 
 
