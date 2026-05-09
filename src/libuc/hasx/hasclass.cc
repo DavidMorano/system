@@ -105,13 +105,9 @@ extern "C" {
 local bool hasx(ischar_f isx,cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
-	    while (sl && *sp) {
-		cint ch = mkchar(*sp) ;
-	        f = isx(ch) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
+	    for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
+	        if ((f = isx(ch))) break ;
+	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
 } /* end subroutine (hasx) */
