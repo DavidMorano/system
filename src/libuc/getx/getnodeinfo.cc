@@ -136,10 +136,11 @@ int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 	int		rs = SR_FAULT ;
 	int		len = -1 ; /* return-value */
 	if (pr == nullptr) pr = "/" ;
-	if (nn) {
-	    if (pr[0] && nn[0]) {
+	if (nn) ylikely {
+	    rs = SR_INVALID ;
+	    if (pr[0] && nn[0]) ylikely {
 		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if ((rs = rsv) >= 0) ylikely {
 		    rs = getx(pr,cbuf,sbuf,klp,nn) ;
 		    len = rs ;
 		} /* end if (vars) */
@@ -167,13 +168,13 @@ local int getx(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 	int		rs1 ;
 	int		len = -1 ; /* return-value */
 	int		ai = 0 ;
-	if (char *a ; (rs = lm_mall(var.sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(var.sz,&a)) >= 0) ylikely {
 	    cint	nlen = var.nodenamelen ;	/* "node" length */
 	    char	*nbuf = (a + (ai++ * (clen + 1))) ;
-	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
+	    if ((rs = getnodename(nbuf,nlen)) >= 0) ylikely {
 		cint	tlen = var.maxpathlen ;
 	        char	*tbuf = (a + (ai++ * (clen + 1))) ;
-                if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) {
+                if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) ylikely {
                     if (nodedb st ; (rs = nodedb_open(&st,tbuf)) >= 0) {
                         nodedb_ent  ste{} ;
                         cauto	    nf = nodedb_fetch ;
@@ -217,9 +218,9 @@ local int vecload(vecstr *klp,ent *ep) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	if ((rs = getbufsize(bufsize_nn)) >= 0) ylikely {
 	    nodenamelen = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
 		maxpathlen = rs ;
 		entlen = (ENTLENMULT * nodenamelen) ;
 		sz += (nodenamelen + 1) ;
