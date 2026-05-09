@@ -40,12 +40,12 @@ MODS +=
 LIBS +=
 
 
-OBJ00= getaddr.o getaf.o getarchitecture.o getbufsize.o
-OBJ01= getdefzdata.o geteaddrinfo.o
-OBJ02= getev.o getfdfile.o
+OBJ00= systypenames.o
+OBJ01= getdefzdata.o getbufsize.o
+OBJ02= getaddr.o getaf.o getarch.o 
 OBJ03= gethz.o getmailgid.o getmjd.o
 OBJ04= getnfile.o getngroups.o getnodedomain.o
-OBJ05= getnodeinfo.o getnprocessors.o getourenv.o
+OBJ05= getnodeinfo.o getnprocessors.o
 OBJ06= getpassword.o getportnum.o getprogpath.o
 OBJ07= getproto.o getpf.o getpwd.o
 OBJ08= getpwentry.o getrand.o getrunlevel.o
@@ -54,8 +54,8 @@ OBJ10= getsocktype.o getsyslogx.o getsystypenum.o
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
 OBJ13= getnisdomain.o getfstype.o
-OBJ14= getoflags.o getpwx.o systypenames.o
-OBJ15= getenver.o gettmpdir.o
+OBJ14= getoflags.o getpwx.o 
+OBJ15= gettmpdir.o geteaddrinfo.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o 
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -197,11 +197,10 @@ getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
 getaddr.o:		getaddr.cc		getaddr.h		$(INCS)
 getaf.o:		getaf.cc		getaf.h			$(INCS)
 getpf.o:		getpf.cc		getpf.h			$(INCS)
-getarchitecture.o:	getarchitecture.cc	getarchitecture.h	$(INCS)
+getarch.o:		getarch.cc		getarch.h		$(INCS)
 getdefzdata.o:		getdefzdata.cc		getdefzdata.h		$(INCS)
 geteaddrinfo.o:		geteaddrinfo.cc		geteaddrinfo.h		$(INCS)
 getev.o:		getev.cc		getev.h			$(INCS)
-getfdfile.o:		getfdfile.cc		getfdfile.h		$(INCS)
 gethz.o:		gethz.cc		gethz.h			$(INCS)
 getmailgid.o:		getmailgid.cc		getmailgid.h		$(INCS)
 getmjd.o:		getmjd.cc		getmjd.h		$(INCS)
@@ -210,7 +209,6 @@ getngroups.o:		getngroups.cc		getngroups.h		$(INCS)
 getnodedomain.o:	getnodedomain.cc	getnodedomain.h		$(INCS)
 getnodeinfo.o:		getnodeinfo.cc		getnodeinfo.h		$(INCS)
 getnprocessors.o:	getnprocessors.cc	getnprocessors.h	$(INCS)
-getourenv.o:		getourenv.cc		getourenv.h		$(INCS)
 getpassword.o:		getpassword.cc		getpassword.h		$(INCS)
 getportnum.o:		getportnum.cc		getportnum.h		$(INCS)
 getprogpath.o:		getprogpath.cc		getprogpath.h		$(INCS)
@@ -235,9 +233,5 @@ getnisdomain.o:		getnisdomain.cc		getnisdomain.h		$(INCS)
 getpwx.o:		getpwx.cc		getpwx.h		$(INCS)
 getoflags.o:		getoflags.cc		getoflags.h		$(INCS)
 getfstype.o:		getfstype.cc		getfstype.h		$(INCS)
-
-# returns |char|
-getenver.o:		getenver.cc		getenver.h		$(INCS)
-gettmpdir.o:		gettmpdir.cc		gettmpdir.h		$(INCS)
 
 
