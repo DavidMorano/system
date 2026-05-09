@@ -37,7 +37,7 @@ INCS += libu.h
 
 MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
 MODS += libutil.ccm chrset.ccm bitgrp.ccm
-MODS += digtab.ccm xxtostr.ccm 
+MODS += digtab.ccm xxtostr.ccm
 MODS += usigsets.o usigblock.ccm umisc.ccm
 MODS += unixfnames.ccm constdiv.ccm
 MODS += usysbasic.ccm ureserve.cmm vecbool.ccm
@@ -47,7 +47,7 @@ LIBS += -liconv -lproc
 
 OBJ00= syshas.o mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o usysdefs.o
-OBJ02= timewatch.o timecount.o
+OBJ02= timewatch.o timecount.o clanguage.o
 OBJ03= libutil.o usysconf.o umods.o 
 
 OBJ04= utimeout.o utimeouts.o utimeoutdefs.o
@@ -77,7 +77,7 @@ OBJ23= syscontain.o stdfnames.o stdfiles.o
 
 OBJ24= posixdirent.o nulstr.o
 OBJ25= fonce.o filerec.o
-OBJ26= ustd.o
+OBJ26= ustd.o ugetx.o
 OBJ27= ucomposite.o
 
 OBJ28= bitmanip.o findbit.o baops.o
@@ -86,7 +86,7 @@ OBJ30= binchunk.o conintx.o udiv.o stdintx.o
 OBJ31= ccfile.o readln.o dprint.o
 
 OBJ32= muldigs.o varithmetic.o xxtostr.o
-OBJ33= intext.o
+OBJ33= intext.o cmporders.o localmisc.o
 OBJ34=
 OBJ45=
 
@@ -340,6 +340,7 @@ syshas.o:		syshas.cc	syshas.h		$(INCS)
 ustsdefs.o:		usysdefs.cc	usysdefs.h		$(INCS)
 timewatch.o:		timewatch.cc	timewatch.hh		$(INCS)
 timecount.o:		timecount.cc	timecount.hh		$(INCS)
+clanguage.o:		clanguage.cc	clanguage.h		$(INCS)
 aflag.o:		aflag.cc	aflag.hh		$(INCS)
 errtimer.o:		errtimer.cc	errtimer.hh		$(INCS)
 timeval.o:		timeval.cc	timeval.hh		$(INCS)
@@ -404,8 +405,8 @@ usysauxinfo.dir:
 	makesubdir $@
 
 # USYNC
-ulock.o:		ulock.dir
-ulock.dir:
+ugetx.o:		ugetx.dir
+ugetx.dir:
 	makesubdir $@
 
 # INTX
@@ -565,5 +566,7 @@ conintx.o:		conintx.cc	conintx.hh			$(INCS)
 udiv.o:			udiv.cc		udiv.hh				$(INCS)
 stdintx.o:		stdintx.cc	stdintx.h			$(INCS)
 xxtostr.o:		xxtostr.cc	xxtostr.h			$(INCS)
+cmporders.o:		cmporders.cc	cmporders.h			$(INCS)
+localmisc.o:		localmisc.cc	localmisc.h			$(INCS)
 
 
