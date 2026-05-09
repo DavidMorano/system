@@ -115,11 +115,9 @@ namespace libu {
 			rsp = charp(tp) ;
 		    }
 		} else {
-	            for (cchar *lsp = (sp + sl) ; (sp < lsp) && *sp ; ) {
-			cint	ch = mkchar(*sp) ;
-	                f = (ch == sch) ;
-		        if (f) break ;
-	                sp += 1 ;
+	            cchar *lsp = (sp + sl) ;
+	            for (int ch ; (sp < lsp) && ((ch = mkchar(*sp))) ; ++sp) {
+	                if ((f = (ch == sch))) break ;
 	            } /* end for */
 		    if (f) rsp = charp(sp) ;
 		} /* end if_constexpr (f_memchr) */
@@ -127,12 +125,9 @@ namespace libu {
 	        if_constexpr (f_strchr) {
 	            rsp = strchr(sp,sch) ;
 	        } else {
-	            while (*sp) {
-			cint	ch = mkchar(*sp) ;
-	                f = (ch == sch) ;
-		        if (f) break ;
-	                sp += 1 ;
-	            } /* end while */
+		    for (int ch ; ((ch = mkchar(*sp))) ; sp += 1) {
+	                if ((f = (ch == sch))) break ;
+	            } /* end for */
 		    if (f) rsp = charp(sp) ;
 	        } /* end if_constexpr (f_strchr) */
 	    } /* end if */
@@ -150,7 +145,7 @@ namespace libu {
 	        for (cchar *csp = (sp + sl) ; rsp && (--csp >= sp) ; ) {
 	            cint	ch = mkchar(*csp) ;
 	            if (ch == sch) rsp = charp(csp) ;
-	        } /* end while */
+	        } /* end for */
 	    } else {
 		if_constexpr (f_strrchr) {
 	            rsp = strrchr(sp,sch) ;
