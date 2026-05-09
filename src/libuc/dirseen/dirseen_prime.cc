@@ -166,11 +166,11 @@ int dirseen_finish(dirseen *op) noex {
 /* end subroutine (dirseen_finish) */
 
 int dirseen_add(dirseen *op,cchar *sp,int sl,ustat *sbp) noex {
+	cnullptr	np{} ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	if ((rs = dirseen_magic(op,sp,sbp)) >= 0) ylikely {
 	    dirseen_ent		e(sbp->st_dev,sbp->st_ino) ;
-	    cnullptr		np{} ;
-	    cint		rsn = SR_NOTFOUND ;
 	    if ((rs = vecobj_search(op->dlistp,&e,vcmpdevino,np)) == rsn) {
 	        dev_t	dev = sbp->st_dev ;
 	        ino_t	ino = sbp->st_ino ;
