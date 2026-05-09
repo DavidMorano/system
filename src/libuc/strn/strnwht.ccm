@@ -48,7 +48,7 @@ module ;
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#pragma		GCC dependency	"mod/chrset.ccm"
+#pragma		GCC dependency		"mod/chrset.ccm"
 
 export module strnwht ;
 
