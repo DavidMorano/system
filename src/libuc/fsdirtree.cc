@@ -67,7 +67,7 @@
 #include	<fsdir.h>
 #include	<fifostr.h>
 #include	<strwcpy.h>
-#include	<matxstr.h>
+#include	<matstr.h>
 #include	<filetypes.h>
 #include	<hasx.h>
 #include	<ischarx.h>
