@@ -121,7 +121,7 @@ namespace {
 	toxc_f		toxc ;
 	nleadxstr_f	nleadxstr ;
 	matxstr(toxc_f f1,nleadxstr_f f2) noex : toxc(f1), nleadxstr(f2) { } ;
-	int operator () (mainv a,cchar *sp,int sl) noex {
+	int operator () (con mainv a,cchar *sp,int sl) noex {
     	    int		rc = -1 ;
 	    if (a && sp) {
 	        cint	lch = toxc(sp[0]) ;
@@ -161,15 +161,15 @@ namespace {
 /* exported subroutines */
 
 namespace libu {
-    int matbasestr(mainv a,cchar *sp,int sl) noex {
+    int matbasestr(con mainv a,cchar *sp,int sl) noex {
 	matxstr mo(tobc,nleadbasestr) ;
 	return mo(a,sp,sl) ;
     } /* end subroutine (matbasestr) */
-    int matcasestr(mainv a,cchar *sp,int sl) noex {
+    int matcasestr(con mainv a,cchar *sp,int sl) noex {
 	matxstr mo(touc,nleadcasestr) ;
 	return mo(a,sp,sl) ;
     } /* end subroutine (matcasestr) */
-    int matfoldstr(mainv a,cchar *sp,int sl) noex {
+    int matfoldstr(con mainv a,cchar *sp,int sl) noex {
 	matxstr mo(tofc,nleadfoldstr) ;
 	return mo(a,sp,sl) ;
     } /* end subroutine (matfoldstr) */
