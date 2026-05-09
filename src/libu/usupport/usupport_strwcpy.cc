@@ -86,7 +86,7 @@ namespace libu {
 	    dp = nullptr ;
 	} /* end if (non-null) */
 	return dp ;
-    }
+    } /* end subroutine (strwcpy) */
 } /* end namespace (libu) */
 
 
