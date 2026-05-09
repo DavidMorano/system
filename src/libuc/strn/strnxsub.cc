@@ -195,7 +195,6 @@ char *strner::strnxsub(cchar *sp,int µsl,cchar *ss,int sslen) noex {
 	    } /* end block */
         } /* end if (getlenstr) */
 	return rp ;
-}
-/* end method (strner::strnxsub) */
+} /* end method (strner::strnxsub) */
 
 
