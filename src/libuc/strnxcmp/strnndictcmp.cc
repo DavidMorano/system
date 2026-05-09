@@ -191,14 +191,12 @@ local int dch_start(DCH *dcp,cchar *sp,int sl) noex {
 	dcp->sp = (const uchar *) sp ;
 	dcp->sl = sl ;
 	return 0 ;
-}
-/* end subroutine (dch_start) */
+} /* end subroutine (dch_start) */
 
 local int dch_finish(DCH *dcp) noex {
 	int		sl = dcp->sl ;
 	return sl ;
-}
-/* end subroutine (dch_finish) */
+} /* end subroutine (dch_finish) */
 
 local int dch_get(DCH *dcp) noex {
 	int		doch = 0 ;
@@ -212,8 +210,7 @@ local int dch_get(DCH *dcp) noex {
 	    if (isdict(doch)) break ;
 	} /* end forever */
 	return doch ;
-}
-/* end subroutine (dch_get) */
+} /* end subroutine (dch_get) */
 
 local int strdocmp(cchar *s1,cchar *s2,int slen) noex {
 	int		do1 ;
@@ -235,7 +232,6 @@ local int strdocmp(cchar *s1,cchar *s2,int slen) noex {
 	    if (*s2) s2 += 1 ;
 	} /* end for */
 	return rc ;
-}
-/* end subroutine (strdocmp) */
+} /* end subroutine (strdocmp) */
 
 
