@@ -55,22 +55,22 @@ enum fsdirtreeos {
 /* masks */
 #ifdef	__cplusplus
 struct fsdirtreems {
-    inline static cint	pipe		= (1 << fsdirtreeo_pipe) ;
-    inline static cint	chr		= (1 << fsdirtreeo_chr) ;
-    inline static cint	dir		= (1 << fsdirtreeo_dir) ;
-    inline static cint	name		= (1 << fsdirtreeo_name) ;
-    inline static cint	blk		= (1 << fsdirtreeo_blk) ;
-    inline static cint	reg		= (1 << fsdirtreeo_reg) ;
-    inline static cint	lnk		= (1 << fsdirtreeo_lnk) ;
-    inline static cint	sock		= (1 << fsdirtreeo_sock) ;
-    inline static cint	door		= (1 << fsdirtreeo_door) ;
-    inline static cint	wht		= (1 << fsdirtreeo_wht) ;
-    inline static cint	follow		= (1 << fsdirtreeo_follow) ;
-    inline static cint	noent		= (1 << fsdirtreeo_noent) ;
-    inline static cint	uniqfile	= (1 << fsdirtreeo_uniqfile) ;
-    inline static cint	uniqdir		= (1 << fsdirtreeo_uniqdir) ;
-    inline static cint	igndotfile	= (1 << fsdirtreeo_igndotfile) ;
-    inline static cint	igndotdir	= (1 << fsdirtreeo_igndotdir) ;
+    static constexpr int	pipe		= (1 << fsdirtreeo_pipe) ;
+    static constexpr int	chr		= (1 << fsdirtreeo_chr) ;
+    static constexpr int	dir		= (1 << fsdirtreeo_dir) ;
+    static constexpr int	name		= (1 << fsdirtreeo_name) ;
+    static constexpr int	blk		= (1 << fsdirtreeo_blk) ;
+    static constexpr int	reg		= (1 << fsdirtreeo_reg) ;
+    static constexpr int	lnk		= (1 << fsdirtreeo_lnk) ;
+    static constexpr int	sock		= (1 << fsdirtreeo_sock) ;
+    static constexpr int	door		= (1 << fsdirtreeo_door) ;
+    static constexpr int	wht		= (1 << fsdirtreeo_wht) ;
+    static constexpr int	follow		= (1 << fsdirtreeo_follow) ;
+    static constexpr int	noent		= (1 << fsdirtreeo_noent) ;
+    static constexpr int	uniqfile	= (1 << fsdirtreeo_uniqfile) ;
+    static constexpr int	uniqdir		= (1 << fsdirtreeo_uniqdir) ;
+    static constexpr int	igndotfile	= (1 << fsdirtreeo_igndotfile) ;
+    static constexpr int	igndotdir	= (1 << fsdirtreeo_igndotdir) ;
 } ; /* end struct (fsdirtreems) */
 #endif /* __cplusplus */
 
