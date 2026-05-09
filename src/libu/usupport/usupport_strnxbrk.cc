@@ -99,9 +99,9 @@ namespace libu {
     char *strnobrk(cchar *sp,int µsl,const chrset &sset) noex {
 	char		*rsp = nullptr ;
 	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
+	    cchar	*lsp = (sp + sl) ;
 	    bool	f = false ;
-	    for (cchar *lsp = (sp + sl) ; (sp < lsp) && *sp ; sp += 1) {
-		cint	ch = mkchar(*sp) ;
+	    for (int ch ; (sp < lsp) && ((ch = mkchar(*sp))) ; sp += 1) {
 	        f = sset.tst(ch) ;
 		if (f) break ;
 	    } /* end for */
