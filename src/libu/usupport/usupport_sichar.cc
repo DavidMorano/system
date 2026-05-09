@@ -95,13 +95,11 @@ extern "C" {
 /* forward references */
 
 local int sichar(ischr_f ischr,cchar *sp,int sl) noex {
-	int		i = 0 ; /* used-afterwards */
+	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	if (sp) ylikely {
-	    for (i = 0 ; sl && sp[i] ; i += 1) {
-	        cint	ch = mkchar(sp[i]) ;
+	    for (int ch ; sl-- && ((ch = mkchar(sp[i]))) ; i += 1) {
 	        if ((f = ischr(ch))) break ;
-	        sl -= 1 ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return (f) ? i : -1 ;
