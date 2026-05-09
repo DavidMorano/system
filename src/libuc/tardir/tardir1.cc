@@ -180,11 +180,13 @@ int tardir::icount() noex {
 int tardir::add(cchar *sp,int sl) noex {
     	int		rs ;
 	int		c = 0 ;
+	DPRINTF("ent\n") ;
 	if ((rs = magic(sp)) >= 0) ylikely {
 	    sif so(sp,sl,':') ;
 	    cchar *cp ;
 	    for (int cl ; (cl = so(&cp)) > 0 ; ) {
 	        strnul dn(cp,cl) ; 
+	        DPRINTF("s=>%s<\n",ccp(dn)) ;
 	        if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
 		    rs = SR_NOTDIR ;
 		    if (S_ISDIR(sb.st_mode)) {
@@ -192,9 +194,11 @@ int tardir::add(cchar *sp,int sl) noex {
 			c += rs ;
 		    }
 	        } /* end if (u_stat) */
+	        DPRINTF("stat-out rs=%d\n",rs) ;
 		if (rs < 0) break ;
 	    } /* end for */
 	} /* end if (tardir_magic) */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end method (tardir::add) */
 
