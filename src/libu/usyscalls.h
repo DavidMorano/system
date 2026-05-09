@@ -69,6 +69,7 @@
 #include	<uchartype.h>
 #include	<ustream.hh>
 #include	<ucodenames.h>
+#include	<ugetx.h>
 
 #include	<varnames.hh>
 #include	<syswords.hh>
