@@ -11,12 +11,9 @@
 	= 1999-06-08, David A­D­ Morano
 	This code was originally written for some reason.
 
-	= 2020-03-22, David A­D­ Morano
-	I modularized this (made into a C++20 module).
-
 */
 
-/* Copyright © 1999,2020 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1999 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -108,11 +105,10 @@ namespace libu {
 	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    cchar	*lsp = (sp + sl) ;
 	    bool	f = false ;
-	    while ((sp < lsp) && *sp && (*sp != '\n')) {
-		cint	ch = mkchar(*sp) ;
+	    for (int ch ; (sp < lsp) && *sp && (*sp != '\n') ; sp += 1) {
+		ch = mkchar(*sp) ;
 		if ((f = ISWHT(ch))) break ;
-		sp += 1 ;
-	    } /* end while */
+	    } /* end for */
 	    rsp = (f) ? charp(sp) : nullptr ;
 	} /* end if (non-zero positive) */
 	return rsp ;
@@ -145,21 +141,17 @@ namespace libu {
 	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    cchar	*lsp = (sp + sl) ;
 	    bool	fwht = false ;
-	    while ((sp < lsp) && *sp) {
-		cint	ch = mkchar(*sp) ;
+	    for (int ch ; (sp < lsp) && ((ch = mkchar(*sp))) ; sp += 1) {
 		if (((fwht = ISWHT(ch))) || sset[ch]) {
 		    rsp = charp(sp) ;
 		    break ;
 		}
-	        sp += 1 ;
-	    } /* end while */
+	    } /* end for */
 	    if (fwht) {
 		bool fchr = false ;
-	        while ((sp < lsp) && *sp) {
-		    cint	ch = mkchar(*sp) ;
+		for (int ch ; (sp < lsp) && ((ch = mkchar(*sp))) ; sp += 1) {
 		    if (((fchr = sset[ch])) || (! ISWHT(ch))) break ;
-		    sp += 1 ;
-		} /* end while */
+		} /* end for */
 		if (fchr) rsp = charp(sp) ;
 	    } /* end if (had white-space) */
 	} /* end if (non-zero positive) */
