@@ -1,0 +1,125 @@
+/* usupport_matkeystr SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* match the key part of a string */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-12-01, David A­D­ Morano
+	Module was originally written.
+
+*/
+
+/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	matkeystr
+
+	Description:
+	Check that the key of the given string matches EXACTLY some
+	key-string in the given array of strings.  If we get a
+	match, we return the array index.  If we do not match, we
+	return something "less-than-zero."
+
+	Synopsis:
+	int matkeystr(con mainv a,cchar *sp,int sl) noex
+
+	Arguments:
+	a		array of strings to match against
+	sp		string to test against array
+	sl		length of test string
+
+	Returns:
+	>=0		index of match in array
+	<0		no match found (not further distinguished)
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<localmisc.h>
+
+#include	"usupport_nleadkeystr.hh"
+#include	"usupport_strkeycmp.hh"
+#include	"usupport_matkeystr.hh"
+
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using libu::nleadkeystr ;		/* subroutine */
+using libu::strkeycmp ;			/* subroutine */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local variables */
+
+
+/* forward references */
+
+constexpr bool keyend(cint ch) noex {
+	return (((ch) == '\0') || ((ch) == '=')) ;
+} /* end subroutine */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+namespace libu {
+    int matkeystr(con mainv a,cchar *sp,int sl) noex {
+    	int		rc = -1 ;
+	if (a && sp) {
+	    cint	sch = sp[0] ; /* ok: everything promotes the same */
+	    int		i{} ; /* used-afterwards */
+	    bool 	f = false ;
+	    if (sl >= 0) {
+		int m ;
+	        for (i = 0 ; a[i] != nullptr ; i += 1) {
+		    if ((m = (sch == a[i][0])) > 0) {
+		        m = nleadkeystr(a[i],sp,sl) ;
+		    }
+		    f = (((m == sl) || keyend(sp[m])) && keyend(a[i][m])) ;
+		    if (f) break ;
+	        } /* end for */
+	    } else {
+	        for (i = 0 ; a[i] != nullptr ; i += 1) {
+	            if (sch == a[i][0]) {
+		        f = (strkeycmp(a[i],sp) == 0) ;
+		    } else {
+		        f = (keyend(sp[0]) && keyend(a[i][0])) ;
+		    }
+		    if (f) break ;
+	        } /* end for */
+	    } /* end if */
+	    rc = (f) ? i : -1 ;
+	} /* end if (non-null) */
+	return rc ;
+    } /* end subroutine (matkeystr) */
+} /* end namespace (libu) */
+
+
