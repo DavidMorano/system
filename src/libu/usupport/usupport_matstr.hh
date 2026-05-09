@@ -21,10 +21,10 @@
 
 
 namespace libu {
-    extern int matbasestr(mainv,cchar *,int = -1) noex ;
-    extern int matcasestr(mainv,cchar *,int = -1) noex ;
-    extern int matfoldstr(mainv,cchar *,int = -1) noex ;
-    inline int matstr(mainv bs,cchar *sp,int sl = -1) noex {
+    extern int matbasestr	(con mainv,cchar *,int = -1) noex ;
+    extern int matcasestr	(con mainv,cchar *,int = -1) noex ;
+    extern int matfoldstr	(con mainv,cchar *,int = -1) noex ;
+    inline int matstr		(con mainv bs,cchar *sp,int sl = -1) noex {
 	return matbasestr(bs,sp,sl) ;
     }
 } /* end namespace (libu) */
