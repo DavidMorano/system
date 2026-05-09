@@ -131,8 +131,7 @@ local int strnkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p,int n) noex {
 	    } /* end block */
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strnkeyxcmp) */
+} /* end subroutine (strnkeyxcmp) */
 
 local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
     	int		rc = 0 ;
