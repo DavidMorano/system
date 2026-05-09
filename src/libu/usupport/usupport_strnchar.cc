@@ -83,12 +83,9 @@ local char *strnxx(xchr_f xchr,cchar *sp,int sl) noex {
 	char		*rsp = nullptr ;
 	if (sp) ylikely {
 	    bool	f = false ;
-	    while (sl-- && *sp) {
-		cint	ch = mkchar(*sp) ;
-		f = xchr(ch) ;
-		if (f) break ;
-		sp += 1 ;
-	    } /* end while */
+	    for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
+		if ((f = xchr(ch))) break ;
+	    } /* end for */
 	    if (f) rsp = charp(sp) ;
 	} /* end if (non-null) */
 	return rsp ;
