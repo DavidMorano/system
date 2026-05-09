@@ -107,8 +107,7 @@ namespace libu {
 	if (sp) ylikely {
 	    if_constexpr (f_strchr) {
 	        if (sl > 0) {
-	            for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	                cint ch = mkchar(sp[i]) ;
+	            for (int ch ; sl-- && ((ch = mkchar(sp[i]))) ; i += 1) {
 	                if ((f = (ch == sch))) break ;
 	            } /* end for */
 	        } else {
@@ -118,8 +117,7 @@ namespace libu {
 		    }
 	        } /* end if */
 	    } else {
-	        for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	            cint ch = mkchar(sp[i]) ;
+	        for (int ch ; sl-- && ((ch = mkchar(sp[i]))) ; i += 1) {
 	            if ((f = (ch == sch))) break ;
 	        } /* end for */
 	    } /* end if_constexpr (f_strchr) */
