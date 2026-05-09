@@ -149,11 +149,9 @@ extern "C" {
 local bool hasallx(isc_f isx,cchar *sp,int sl) noex {
 	bool		f = true ;
 	if (sp) ylikely {
-	    for (int ch ; sl && ((ch = mkchar(*sp))) ; ) {
+	    for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
 	        f = isx(ch) ;
 	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
@@ -272,11 +270,9 @@ namespace {
 bool haser::operator () (cchar *sp,int sl) const noex {
 	bool		f = false ;
 	if (sp) ylikely {
-	    for (int ch ; sl && ((ch = mkchar(*sp))) ; ) {
+	    for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
 	        f = cond(ch) ;
 	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
