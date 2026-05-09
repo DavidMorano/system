@@ -126,12 +126,9 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 	        if_constexpr (f_strchr) {
 	            rsp = strchr(sp,sch) ;
 	        } else {
-	            while (*sp) {
-			cint	ch = mkchar(*sp) ;
-	                f = (ch == sch) ;
-		        if (f) break ;
-	                sp += 1 ;
-	            } /* end while */
+		    for (int ch ; ((ch = mkchar(*sp))) ; sp += 1) {
+	                if ((f = (ch == sch))) break ;
+	            } /* end for */
 		    if (f) rsp = charp(sp) ;
 	        } /* end if_constexpr (f_strchr) */
 	    } /* end if */
