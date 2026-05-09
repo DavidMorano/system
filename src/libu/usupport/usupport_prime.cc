@@ -149,7 +149,6 @@ local int isleep(int mto) noex {
 	    } /* end if (poll got an error) */
 	} until ((rs >= 0) || fexit) ;
 	return rs ;
-}
-/* end subroutine (isleep) */
+} /* end subroutine (isleep) */
 
 
