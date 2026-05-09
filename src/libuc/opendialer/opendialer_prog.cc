@@ -165,16 +165,13 @@ int		to ;
 
 /* local subroutines */
 
-
-local int findprog(cchar *pr,char *progfname,cchar *svc)
-{
-	ids		id ;
+local int findprog(cchar *pr,char *progfname,cchar *svc) noex {
+	cint		rsn = SR_NOENT ;
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
-	if ((rs = ids_load(&id)) >= 0) {
-	    vecstr	p ;
-	    if ((rs = vecstr_start(&p,20,0)) >= 0) {
+	if (ids id ; (rs = ids_load(&id)) >= 0) {
+	    if (vecstr p ; (rs = vecstr_start(&p,20,0)) >= 0) {
 		cchar	*pp = getenv(VARPATH) ;
 		if ((pp != nullptr) && (pp[0] != '\0')) {
 		    rs = vecstr_addpath(&p,pp,-1) ;
@@ -184,7 +181,6 @@ local int findprog(cchar *pr,char *progfname,cchar *svc)
 		    }
 		}
 		if (rs >= 0) {
-		    cint	rsn = SR_NOENT ;
 		    if ((rs = getprogpath(&id,&p,progfname,svc,-1)) == rsn) {
 			if ((rs = vecstr_addpr(&p,progfname,pr)) > 0) {
 		    	    rs = getprogpath(&id,&p,progfname,svc,-1) ;
@@ -207,11 +203,11 @@ local int findprog(cchar *pr,char *progfname,cchar *svc)
 /* end subroutine (findprog) */
 
 local int vecstr_addpr(vecstr *plp,char *rbuf,cchar *pr) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
 	if (vecstr m ; (rs = vecstr_start(&m,2,0)) >= 0) {
-	    cint	rsn = SR_NOTFOUND ;
 	    int		rl ;
 	    for (int i = 0 ; bins[i] != nullptr ; i += 1) {
 		if ((rs = mkpath2(rbuf,pr,bins[i])) > 0) {
