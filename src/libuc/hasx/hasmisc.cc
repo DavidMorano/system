@@ -188,7 +188,7 @@ bool hascdpath(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
 	    if (sl && sp[0]) {
-	        int	ch = mkchar(sp[0]) ;
+	        cint ch = mkchar(sp[0]) ;
 	        f = (ch == chx_ec) ;
 	    }
 	} /* end if (non-null) */
@@ -223,7 +223,7 @@ bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 /* end subroutine (hasvalidmagic) */
 
 bool hasfnamespecial(cchar *fp,int fl) noex {
-	return (matstr(stdfname,fp,fl) >= 0) ;
+	return (getstdfname(fp,fl) >= 0) ;
 } /* end subroutine (hasfnamespecial) */
 
 
