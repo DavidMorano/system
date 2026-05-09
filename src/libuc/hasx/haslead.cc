@@ -137,12 +137,10 @@ bool haslead(cchar *sp,int µsl,int chx) noex {
 bool hasleadcolon(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
-	    while (sl && *sp) {
+	    for ( ; sl-- && *sp ; sp += 1) {
 	        f = (*sp == ':') ;
 	        if (f) break ;
 	        if (*sp == '/') break ;
-	        sp += 1 ;
-	        sl -= 1 ;
 	    } /* end while */
 	} /* end if (non-null) */
 	return f ;
