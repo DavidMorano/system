@@ -64,6 +64,8 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 
 /* local defines */
 
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
+
 
 /* imported namespaces */
 
@@ -94,12 +96,9 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 bool hasnonwhite(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
-	    while (sl && *sp) {
-	        f = (! CHAR_ISWHITE(*sp)) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
+	    for ( ; sl-- && *sp ; sp += 1) {
+	        if ((f = (! ISWHT(*sp)))) break ;
+	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
 }
