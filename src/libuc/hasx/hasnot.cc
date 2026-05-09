@@ -116,13 +116,9 @@ bool hasnotdots(cchar *sp,int µsl) noex {
 bool hasnotempty(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
-	    while (sl && *sp) {
-	        cint	ch = mkchar(*sp) ;
-	        f = isnotempry(ch) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
+	    for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
+	        if ((f = isnotempry(ch))) break ;
+	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
 }
