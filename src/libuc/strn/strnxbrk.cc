@@ -105,7 +105,8 @@ char *strnobrk(cchar *sp,int µsl,const chrset &sset) noex {
 	    if (f) rsp = charp(sp) ;
 	} /* end if (getlenstr) */
 	return rsp ;
-} /* end subroutine (strnobrk) */
+}
+/* end subroutine (strnobrk) */
 
 char *strnobrk(cchar *sp,int sl,cchar *ss) noex {
 	char		*rsp = nullptr ;
@@ -118,7 +119,8 @@ char *strnobrk(cchar *sp,int sl,cchar *ss) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rsp ;
-} /* end subroutine (strnobrk) */
+}
+/* end subroutine (strnobrk) */
 
 char *strnrbrk(cchar *sp,int µsl,const chrset &sset) noex {
 	char		*rsp = nullptr ;
@@ -132,7 +134,8 @@ char *strnrbrk(cchar *sp,int µsl,const chrset &sset) noex {
 	    if (! f) rsp = nullptr ;
 	} /* end if (getlenstr) */
 	return rsp ;
-} /* end subroutine (strnrbrk) */
+}
+/* end subroutine (strnrbrk) */
 
 char *strnrbrk(cchar *sp,int sl,cchar *ss) noex {
 	char		*rsp = nullptr ;
@@ -141,6 +144,7 @@ char *strnrbrk(cchar *sp,int sl,cchar *ss) noex {
 	    rsp = strnrbrk(sp,sl,sset) ;
 	} /* end if (non-null) */
 	return rsp ;
-} /* end subroutine (strnrbrk) */
+}
+/* end subroutine (strnrbrk) */
 
 
