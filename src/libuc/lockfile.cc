@@ -89,7 +89,7 @@
 #include	<sys/types.h>		/* system types */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<uclock.h>
+#include	<ucdesclock.h>
 #include	<localmisc.h>
 
 #include	"lockfile.h"
