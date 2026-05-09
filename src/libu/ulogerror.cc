@@ -111,8 +111,7 @@ static charp strdcpyu(char *dp,int dl,cchar *sp) noex {
 	    }
 	}
 	return rp ;
-}
-/* end subroutine (strdcpyu) */
+} /* end subroutine (strdcpyu) */
 
 
 /* local variables */
@@ -155,8 +154,7 @@ int ulogerrmgr::record(cchar *id,int err,cchar *msg) noex {
 	    c += 1 ;
 	} /* end if (recorded) */
 	return f ;
-}
-/* end subroutine (ulogerrmgr::record) */
+} /* end subroutine (ulogerrmgr::record) */
 
 void ulogerrmgr::fini() noex {
 	static cint	fd = FD_STDERR ;
@@ -178,7 +176,6 @@ void ulogerrmgr::fini() noex {
 		} /* end for */
 	    } /* end if (have valid) */
 	} /* end if (have variable) */
-}
-/* end subroutine (ulogerrmgr::fini) */
+} /* end subroutine (ulogerrmgr::fini) */
 
 
