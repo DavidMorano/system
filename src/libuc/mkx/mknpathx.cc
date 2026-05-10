@@ -65,15 +65,15 @@ namespace {
     struct maxpather {
 	static int operator () (int) noex ;
     } ; /* end struct (maxpather) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int cstrlcpy(char *dp,cchar *sp,int sl) noex {
+local int cstrlcpy(char *dp,cchar *sp,int sl) noex {
     	csize	ssize = size_t(sl) ;
 	return int(strlcpy(dp,sp,ssize)) ;
-}
+} /* end subroutine (cstrlcpy) */
 
 
 /* local variables */
@@ -166,7 +166,6 @@ int maxpather::operator () (int plen) noex {
 	    rs = maxpathlen ;
 	}
 	return rs ;
-}
-/* end method (maxpather::operator) */
+} /* end method (maxpather::operator) */
 
 
