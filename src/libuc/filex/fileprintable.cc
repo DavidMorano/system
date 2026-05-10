@@ -43,6 +43,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<filer.h>
 #include	<rmx.h>
 #include	<char.h>
@@ -59,7 +60,6 @@
 
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) noex ;
     extern int uc_fstat(int,ustat *) noex ;
     extern int uc_read(int,void *,int) noex ;
 }
