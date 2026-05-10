@@ -160,7 +160,7 @@ namespace {
 	    delete mbuf ;
 	    mbuf = nullptr ;
 	    mlen = 0 ;
- 	} ;
+ 	} ; /* end destruct (memory-release) */
 	int setup() noex ;
     private:
 	char		*mbuf ;
@@ -397,7 +397,7 @@ int umachiner::setup() noex {
 			} /* end switch */
 			bp = (strwcpy(bp,sp) + 1) ;
 		    } /* end for */
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	        rs1 = dob.finish() ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (dob.load) */
@@ -427,7 +427,7 @@ int datobj::finish() noex {
 	    delete [] a ;
 	    a = nullptr ;
 	    rs = SR_OK ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 }
 /* end method (datobj::finish) */
