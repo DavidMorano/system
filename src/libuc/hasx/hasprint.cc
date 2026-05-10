@@ -110,29 +110,28 @@ constexpr int   nch = (UCHAR_MAX + 1) ;
 namespace {
     struct printinfo ;
     struct printinfo_co {
-	printinfo	*op = nullptr ;
-	void operator () (printinfo *p) noex {
-	    op = p ;
-	} ; /* end method */
-	operator bool () noex ;
+	printinfo	*op ;
+	consteval printinfo_co(printinfo *p) noex : op(p) { } ;
+	operator bool () const noex ;
     } ; /* end struct (printinfo_co) */
     struct printinfo {
 	friend		printinfo_co ;
 	bitset<nch>	iscmd ;
 	printinfo_co	init ;
-	printinfo() noex {
-	    init	(this) ;
-	} ;
+	consteval void mkiscmd1() noex ;
+	void mkiscmd2() noex ;
+	consteval printinfo() noex : init(this) {
+	    mkiscmd1() ;
+	} ; /* end ctor */
     private:
 	aflag		finit ;
 	bool create() noex ;
-	void mkiscmd() noex ;
     } ; /* end struct (printinfo) */
 } /* end namespace */
 
 bool printinfo::create() noex {
     	if (! finit) {
-    	    mkiscmd() ;
+    	    mkiscmd2() ;
 	    finit = true ;
 	} /* end if (initialization needed) */
 	return finit ;
@@ -143,16 +142,19 @@ constexpr uchar		termchars[] = {
 	CH_VT,	CH_FF,	CH_SO,	CH_SI,	CH_SS2,	CH_SS3
 } ; /* end array */
 
-void printinfo::mkiscmd() noex {
+consteval void printinfo::mkiscmd1() noex {
+	for (cauto &ch : termchars) {
+	    iscmd.set(ch) ;
+	} /* end for */
+} /* end method (printinfo::mkiscmd1) */
+
+void printinfo::mkiscmd2() noex {
     	for (int ch = 0 ; ch < nch ; ch += 1) {
 	    if (iscmdstart(ch)) {
-		iscmd.set(ch,true) ;
+		iscmd.set(ch) ;
 	    }
 	} /* end for */
-	for (cauto &ch : termchars) {
-	    iscmd.set(ch,true) ;
-	} /* end for */
-} /* end method (printinfo::mkiscmd) */
+} /* end method (printinfo::mkiscmd2) */
 
 
 /* forward references */
@@ -164,7 +166,7 @@ local bool hasx(isx_f,cchar *,int) noex ;
 
 /* local variables */
 
-static printinfo	print_data ;
+constinit printinfo	print_data ;
 
 
 /* exported variables */
@@ -196,18 +198,14 @@ local bool isprintcmd(int ch) noex {
 local bool hasx(isx_f isx,cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
-	    while (sl && *sp) {
-	        cint	ch = mkchar(*sp) ;
-	        f = isx(ch) ;
-	        if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
+	    for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
+	        if ((f = isx(ch))) break ;
 	    } /* end while */
 	} /* end if (non-null) */
 	return f ;
 } /* end subroutine (hasx) */
 
-printinfo_co::operator bool () noex {
+printinfo_co::operator bool () const noex {
     	bool f = false ;
     	if (op) ylikely {
  	    f = op->create() ;
