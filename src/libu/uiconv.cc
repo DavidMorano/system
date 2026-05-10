@@ -128,8 +128,8 @@ int uiconv_open(uiconv *op,cchar *tsp,cchar *fsp) noex {
 			cdp = iconvp(op->cdp) ;
 		        delete cdp ;
 		        op->cdp = nullptr ;
-	            } /* end if (error) */
-	        } /* end if (memory-allocation) */
+	            } /* end if (error - memory-release) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		uiconv_dtor(op) ;
@@ -151,7 +151,7 @@ int uiconv_close(uiconv *op) noex {
 		iconv_t *cdp = iconvp(op->cdp) ;
 		delete cdp ;
 	        op->cdp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 		rs1 = uiconv_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
