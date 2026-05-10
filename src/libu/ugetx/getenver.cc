@@ -54,7 +54,7 @@
 #include	<usupport.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
 #include	<umem.hh>		/* LIBU */
-#include	<strnul.hh>		/* LIBU */
+#include	<strnul.hh>		/* LIBU (currently unused) */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"getenver.h"
@@ -76,6 +76,7 @@ using std::sort ;			/* subroutine-template */
 using std::partition_point ;		/* subroutine-template */
 using libu::strnchr ;			/* subroutine */
 using libu::strkeycmp ;			/* subroutine */
+using libu::strnkeycmp ;		/* subroutine */
 using libu::umem ;			/* variable */
 
 
@@ -111,7 +112,7 @@ namespace {
 		    if ((f = (uch1 < uch2)) == false) {
 			f = ((uch1 == uch2) && (strkeycmp(s1,s2) < 0)) ;
 		    }
-		}
+		} /* end block */
 		return f ;
 	    } ; /* end lambda */
 	    tabload_x() ;
@@ -140,7 +141,7 @@ namespace {
 /* forward references */
 
 local int rmeq(cchar *kp,int kl) noex {
-	if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
+	if (cchar *tp = strnchr(kp,kl,'=') ; tp) {
 	    kl = intconv(tp - kp) ;
 	}
 	return kl ;
@@ -192,7 +193,7 @@ int namemgr::start(mainv ev,int n) noex {
 	    tab = ushortp(vp) ;
 	    ne = n ;
 	    tabinit() ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end method (namemgr::start) */
 
@@ -204,7 +205,7 @@ int namemgr::finish() noex {
 	    if (rs >= 0) rs = rs1 ;
 	    tab = nullptr ;
 	    ne = 0 ;
-	} /* end if (non-null) */
+	} /* end if (memory-release) */
 	return rs ;
 } /* end method (namemgr::finish) */
 
@@ -220,15 +221,14 @@ int namemgr::operator () (mainv ev,int n) noex {
 
 int namemgr::operator () (cchar *sp,int sl) const noex {
     int         ei = -1 ; /* return-value (initially indicating "not-found") */
-    if (strnul ss(sp,sl) ; ss.fok) {
-        cauto predf = [this,sp,&ss] (ushort c) noex -> bool {
+        cauto predf = [this,sp,sl] (ushort c) noex -> bool {
             cchar *an = envv[c] ;
 	    bool f = false ;
 	    {
 		cuchar uch_a = uchar(an[0]) ;
 		cuchar uch_s = uchar(sp[0]) ;
 		if ((f = (uch_a < uch_s)) == false) {
-		    f = ((uch_a == uch_s) && (strkeycmp(an,ss) < 0)) ;
+		    f = ((uch_a == uch_s) && (strnkeycmp(an,sp,sl) < 0)) ;
 		}
 	    } /* end block */
             return f ;
@@ -236,15 +236,14 @@ int namemgr::operator () (cchar *sp,int sl) const noex {
         con ushort *itf = (tab + 0) ;
         con ushort *itl = (tab + ne) ;
         if (cauto it = partition_point(itf,itl,predf) ; it != itl) {
-            cauto mat = [this,&ss] (int c) noex -> bool {
+            cauto mat = [this,sp,sl] (int c) noex -> bool {
                 cchar *an = envv[c] ;
-                return (strkeycmp(an,ss) == 0) ;
+                return (strnkeycmp(an,sp,sl) == 0) ;
             } ; /* end lambda (mat) */
             if (cint ii = *it ; mat(ii)) {
                 ei = ii ;
             } /* end if (got a match) */
         } /* end if */
-    } /* end if (non-null) */
     return ei ;
 } /* end method (namemgr::operator) */
 
