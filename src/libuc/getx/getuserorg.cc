@@ -54,10 +54,10 @@
 #include	<cstring>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
-#include	<getx.h>		/* |getenver(3uc)| */
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
