@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJ00= usupport_prime.o usupport_sncpyx.o
-OBJ01= usupport_itimer.o 
+OBJ01= usupport_itimer.o usupport_getustime.o
 OBJ02= usupport_cfdec.o usupport_ctdec.o
 OBJ03= usupport_snwcpy.o usupport_strwcpy.o
 OBJ04= usupport_toxc.o 
@@ -52,17 +52,17 @@ OBJ07= usupport_sichar.o usupport_cfdect.o
 OBJ08= usupport_getsign.o
 OBJ09= usupport_strnxchr.o usupport_strnxbrk.o
 OBJ10= usupport_strnchar.o usupport_strnwht.o
-OBJ11= usupport_strkeycmp.o 
+OBJ11= usupport_strkeycmp.o usupport_strnkeycmp.o
 
 OBJ12= usupport_matkeystr.o usupport_matstr.o 
 OBJ13= usupport_hasnot.o
 OBJ14= usupport_nleadkeystr.o usupport_nleadstr.o
-OBJ15=
+OBJ15= usupport_getusmtime.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
-OBJD= obj12.o obj13.o obj14.o
+OBJD= obj12.o obj13.o obj14.o obj15.o
 
 OBJ= obja.o objb.o objc.o objd.o
 
@@ -199,7 +199,10 @@ obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-uhupport_prime.o:	usupport_prime.cc	usupport_prime.h	$(INCS)
+usupport_prime.o:	usupport_prime.cc	usupport_prime.h	$(INCS)
+usupport_getsign.o:	usupport_getsign.cc	usupport_getsign.hh	$(INCS)
+usupport_getusmtime.o:	usupport_getusmtime.cc	usupport_getusmtime.hh	$(INCS)
+usupport_getustime.o:	usupport_getustime.cc	usupport_getustime.hh	$(INCS)
 usupport_itimer.o:	usupport_itimer.cc	usupport_itimer.hh	$(INCS)
 usupport_sncpyx.o:	usupport_sncpyx.cc	usupport_sncpyx.hh	$(INCS)
 usupport_cfdec.o:	usupport_cfdec.cc	usupport_cfdec.hh	$(INCS)
@@ -222,6 +225,7 @@ usupport_strnxbrk.o:	usupport_strnxbrk.cc	usupport_strnxbrk.hh	$(INCS)
 usupport_strnchar.o:	usupport_strnchar.cc	usupport_strnchar.hh	$(INCS)
 usupport_strnwht.o:	usupport_strnwht.cc	usupport_strnwht.hh	$(INCS)
 usupport_strkeycmp.o:	usupport_strkeycmp.cc	usupport_strkeycmp.hh	$(INCS)
+usupport_strnkeycmp.o:	usupport_strnkeycmp.cc	usupport_strnkeycmp.hh	$(INCS)
 usupport_nleadkeystr.o:	usupport_nleadkeystr.cc	usupport_nleadkeystr.hh	$(INCS)
 usupport_matkeystr.o:	usupport_matkeystr.cc	usupport_matkeystr.hh	$(INCS)
 
