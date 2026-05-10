@@ -115,7 +115,7 @@ namespace {
     } ;
     struct uregfork {
 	ptm		mx ;		/* data mutex */
-	uregfork_list	hlist ;		/* memory allocations */
+	uregfork_list	hlist ;		/* memory allocated */
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
@@ -265,7 +265,7 @@ int uregfork::record(void_f sb,void_f sp,void_f sc) noex {
 			    uregfork_list	*lp = &hlist ;
 			    entry_load(ep,sb,sp,sc) ;
 			    list_add(lp,ep) ;
-	                } /* end if (memory-allocation) */
+	                } /* end if (memory-acquire) */
 	            } /* end if (track-begin) */
 	            rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
@@ -295,7 +295,7 @@ int uregfork::expunge(void_f sb,void_f sp,void_f sc) noex {
                                 c += 1 ;
                                 list_rem(lp,ep) ;
                                 um.free(ep) ;
-                            } /* end if (match) */
+                            } /* end if (memory-release) */
                             ep = nep ;
                         } /* end while (deleting matches) */
                     } /* end if (track-begin) */
@@ -328,7 +328,7 @@ int uregfork::trackend() noex {
 	        rs1 = um.free(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	        ep = nep ;
-	    } /* end while */
+	    } /* end while (memory-release) */
 	    hlist.head = nullptr ;
 	    hlist.tail = nullptr ;
 	} /* end if (tracking was started) */
