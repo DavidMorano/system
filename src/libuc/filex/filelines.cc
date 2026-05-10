@@ -49,6 +49,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<ucdesc.h>
 #include	<localmisc.h>
 
 #include	"filelines.h"
@@ -67,7 +68,6 @@
 
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) noex ;
     extern int uc_fstat(int,ustat *) noex ;
 }
 
