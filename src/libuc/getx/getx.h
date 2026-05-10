@@ -22,7 +22,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
-
 #include	<getaddr.h>
 #include	<getaf.h>
 #include	<getarch.h>
@@ -30,8 +29,6 @@
 #include	<getchostname.h>
 #include	<getdefzdata.h>
 #include	<geteaddrinfo.h>
-#include	<getev.h>
-#include	<getfdfile.h>
 #include	<gethz.h>
 #include	<getmailgid.h>
 #include	<getmjd.h>
@@ -42,7 +39,6 @@
 #include	<getnodeinfo.h>
 #include	<getnprocessors.h>
 #include	<getoflags.h>
-#include	<getourenv.h>
 #include	<getpassword.h>
 #include	<getportnum.h>
 #include	<getprogpath.h>
@@ -62,8 +58,6 @@
 #include	<getxid.h>
 #include	<getopendial.h>
 #include	<getseed.h>
-
-#include	<getenver.h>
 #include	<gettmpdir.h>
 
 
