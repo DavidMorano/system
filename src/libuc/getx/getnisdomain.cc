@@ -51,7 +51,6 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<ucgetx.h>		/* |uc_getnisdomain(3uc)| */
-#include	<getx.h>		/* |getenver(3uc)| */
 #include	<filereadln.h>
 #include	<sncpyx.h>
 #include	<isnot.h>
