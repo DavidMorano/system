@@ -73,7 +73,7 @@
 
 /* forward references */
 
-static int		getdlen(int) noex ;
+local int		getdlen(int) noex ;
 
 
 /* local variables */
@@ -106,7 +106,7 @@ int mkfdfname(char *dbuf,int dlen,int fd) noex {
 
 /* local subroutines */
 
-static int getdlen(int dlen) noex {
+local int getdlen(int dlen) noex {
 	int		rs = SR_OK ;
 	if (dlen < 2) {
 	    rs = SR_INVALID ;
@@ -115,7 +115,6 @@ static int getdlen(int dlen) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (getdlen) */
+} /* end subroutine (getdlen) */
 
 
