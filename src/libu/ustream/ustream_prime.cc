@@ -189,8 +189,8 @@ local int ustream_opener(ustream *op) noex {
                 if (rs < 0) {
                     umem.free(op->dbuf) ;
                     op->dbuf = nullptr ;
-                }       
-            } /* end if (memory-allocation) */
+                } /* error (memory-release) */
+            } /* end if (memory-acquire) */
         } /* end if (ustream_adjbuf) */
 	DPRINTF("ret rs=%d \n",rs) ;
 	return rs ;
@@ -209,7 +209,7 @@ namespace ustream_ns {
 	        rs1 = umem.free(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->fd >= 0) {
 		rs1 = u_close(op->fd) ;
 	        if (rs >= 0) rs = rs1 ;
