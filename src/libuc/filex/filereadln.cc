@@ -46,6 +46,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<filer.h>
 #include	<sfx.h>
 #include	<sncpyxw.h>
@@ -61,7 +62,6 @@
 
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
