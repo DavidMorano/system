@@ -34,10 +34,10 @@
 
 EXTERNC_begin
 
-extern int	mkpathuser(char *,cchar *,cchar *,int) noex ;
-extern int	mkpathvar(char *,cchar *,int) noex ;
-extern int	mkpathexp(char *,cchar *,int) noex ;
-extern int	mkpathmulti(char *,cchar *,int) noex ;
+extern int	mkpathuser	(char *,cchar *,cchar *,int) noex ;
+extern int	mkpathvar	(char *,cchar *,int) noex ;
+extern int	mkpathexp	(char *,cchar *,int) noex ;
+extern int	mkpathmulti	(char *,cchar *,int) noex ;
 
 EXTERNC_end
 
