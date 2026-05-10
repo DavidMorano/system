@@ -1,0 +1,43 @@
+/* usupport_getustime HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	USUPPORTGETUSTIME_INCLUDE
+#define	USUPPORTGETUSTIME_INCLUDE
+#ifdef	__cplusplus
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>
+#include	<usysbase.h>
+
+
+#ifndef	OBJECT_GETUSTIME
+#define	OBJECT_GETUSTIME
+
+namespace libu {
+    struct ugetustime {
+	operator time_t () noex {
+	    return time(nullptr) ;
+	} ;
+	static time_t operator () () noex {
+	    return time(nullptr) ;
+	} ;
+    } ; /* end struct (getustime) */
+} /* end namespace (libu) */
+
+extern libu::ugetustime		getustime ;
+
+#endif /* OBJECT_GETUSTIME */
+
+
+#endif /* __cplusplus */
+#endif /* USUPPORTGETUSTIME_INCLUDE */
+
+
