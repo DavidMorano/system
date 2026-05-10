@@ -46,9 +46,8 @@
 #include	<cstring>		/* |strlcpy(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)|  */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<getfdfile.h>		/* <- for |FD_STDxxx| */
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<localmisc.h>
 
 #include	"ulogerror.h"		/* <- redundant */
