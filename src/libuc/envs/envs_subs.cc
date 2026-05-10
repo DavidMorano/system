@@ -220,7 +220,7 @@ int subinfo::procvarnorm(cchar *kp,int kl) noex {
 
 int subinfo::procvarpath(cchar *kp,int kl) noex {
     	cint		vn = DEFNPATHS ;
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
