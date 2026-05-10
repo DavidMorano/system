@@ -41,9 +41,9 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<ucsysauxinfo.h>	/* |usysauxinforeq_architecture| */
 #include	<ucgetx.h>		/* |uc_getarch(3uc)| */
-#include	<getx.h>		/* |getenver(3uc)| */
 #include	<sfx.h>
 #include	<snwcpy.h>
 #include	<isnot.h>
