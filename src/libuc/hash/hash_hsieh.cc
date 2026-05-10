@@ -38,7 +38,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdint>
@@ -99,19 +99,19 @@ uint hash_hsieh(cchar *data,int len) noex {
             } /* end for */
             /* handle end cases */
             switch (rem) {
-            case 3: 
-		hash += get16bits(data);
+            case 3:
+		hash += get16bits(data) ;
                 hash ^= hash << 16 ;
-                hash ^= ((signed char)data[szof(uint16_t)]) << 18 ;
+                hash ^= (schar(data[szof(uint16_t)])) << 18 ;
                 hash += hash >> 11 ;
                 break ;
-	    case 2: 
+	    case 2:
 		hash += get16bits(data) ;
                 hash ^= hash << 11 ;
                 hash += hash >> 17 ;
                 break ;
-	    case 1: 
-		hash += (signed char) *data ;
+	    case 1:
+		hash += schar(*data) ;
                 hash ^= hash << 10 ;
                 hash += hash >> 1 ;
 		break ;
