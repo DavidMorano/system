@@ -73,7 +73,6 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<getx.h>		/* |getenver(3uc)| */
 #include	<sncpyx.h>
 #include	<snwcpy.h>		/* <- currently unused */
 #include	<isnot.h>		/* isNotPresent(3uc)| */
