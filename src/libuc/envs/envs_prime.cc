@@ -435,8 +435,8 @@ local int entry_start(ENVS_ENT *ep,cc *kp,cc *vnam,int vnlen,cc**rpp) noex {
 	            int		vo = 0 ;
 	            ep->kl = rs ;
 	            ep->kp = cp ;
-	            vo |= (VECSTR_OCOMPACT | VECSTR_OORDERED) ;
-	            vo |= VECSTR_OREUSE ;
+	            vo |= (vecstrm.compact | vecstrm.ordered) ;
+	            vo |= (vecstrm.reuse) ;
 	            if ((rs = elp->start(vn,vo)) >= 0) {
 		        if (vnam == nullptr) vnam = (ep->kp + ep->kl) ;
 		        if ((rs = elp->add(vnam,vnlen)) >= 0) {
