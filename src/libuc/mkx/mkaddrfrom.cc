@@ -101,19 +101,19 @@ enum atypes {
 
 /* forward references */
 
-static int	mkaddrx(char *,int,cchar *,int) noex ;
-static int	emaentry_bestfrom(ema_ent *,char *,int) noex ;
+local int	mkaddrx(char *,int,cchar *,int) noex ;
+local int	emaentry_bestfrom(ema_ent *,char *,int) noex ;
 
 static bool	isBadAddr(int) noex ;
 
 
 /* local variables */
 
-static constexpr int	rsbadaddr[] = {
+constexpr int	rsbadaddr[] = {
 	SR_INVALID,
 	SR_DOM,
 	0
-} ;
+} ; /* end array */
 
 constexpr bool		f_massage = CF_MASSAGE ;
 
@@ -144,7 +144,7 @@ int mkaddrfrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int mkaddrx(char *rbuf,int rlen,cchar *sp,int sl) noex {
+local int mkaddrx(char *rbuf,int rlen,cchar *sp,int sl) noex {
         cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
@@ -168,7 +168,7 @@ static int mkaddrx(char *rbuf,int rlen,cchar *sp,int sl) noex {
 }
 /* end subroutine (mkaddrx) */
 
-static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
+local int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ;
 	int		atype = -1 ;
