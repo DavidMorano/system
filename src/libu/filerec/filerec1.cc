@@ -61,7 +61,7 @@ module filerec ;
 
 using std::unordered_set ;              /* type */
 using std::pair ;                       /* type */
-using libu::um ;			/* variable */
+using libu::umem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -143,7 +143,7 @@ int filerec::checkin(custat *sbp,cchar *fn) noex {
 		k.load(timod,fsize) ;
 		rs = SR_OK ;
 		if (! setp->contains(k)) ylikely {
-		    if (cchar *cp ; (rs = um.strw(fn,-1,&cp)) >= 0) {
+		    if (cchar *cp ; (rs = umem.strw(fn,-1,&cp)) >= 0) {
 			k.fname = cp ;
 		        try {
 	                    pair<setiter,bool>	ret = setp->insert(k) ;
@@ -154,10 +154,10 @@ int filerec::checkin(custat *sbp,cchar *fn) noex {
 		        }
 		        if (rs < 0) {
 			    char *bp = cast_const<charp>(cp) ;
-			    um.free(bp) ;
+			    umem.free(bp) ;
 			    k.fname = nullptr ;
 			} /* end if (error) */
-		    } /* end if (memory-allocation) */
+		    } /* end if (memory-acquire) */
 		} /* end if (already) */
 	    } /* end if (initialize) */
 	} /* end if (non-null) */
@@ -182,10 +182,10 @@ int filerec::finents() noex {
 		char **fpp = cast_const<charpp>(&it->fname) ;
 		char *bp = cast_const<charp>(it->fname) ;
 		{
-		    rs1 = um.free(bp) ;
+		    rs1 = umem.free(bp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    *fpp = nullptr ;
-		}
+		} /* end if (memory-release) */
 	    } /* end for */
 	} /* end block */
 	return rs ;
