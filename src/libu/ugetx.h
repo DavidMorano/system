@@ -24,8 +24,9 @@
 #include	<usysbase.h>
 
 #include	<getfdfile.h>
-#include	<getev.h>
 #include	<getenver.h>
+#include	<getev.h>
+#include	<getourenv.h>
 
 
 #endif /* UGETX_INCLUDE */
