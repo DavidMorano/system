@@ -124,12 +124,11 @@ local int	twochars(char *,cchar *,int) noex ;
 bool hasempty(cchar *sp,int sl) noex {
 	bool		f = true ;
 	if (sp) ylikely {
-	    while (sl && *sp) {
+	    for ( ; sl && *sp ; sp += 1) {
 	        f = ISWHT(*sp) ;
 	        if (! f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
+		sl -= 1 ;
+	    } /* end for */
 	    if ((! f) && sl && *sp) {
 	        f = (*sp == '\n') ;
 	    } /* end if */
@@ -157,7 +156,7 @@ bool haseoh(cchar *sp,int sl) noex {
 	    if (sl > 0) {
 	        f = (sp[0] == '\n') ;
 	        f = f || ((sl > 1) && (sp[0] == '\r') && (sp[1] == '\n')) ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return f ;
 }
@@ -167,7 +166,7 @@ bool hasdoublewhite(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
 	    bool	f_prev = false ;
-	    for (int i = 0 ; sl && sp[i] ; i += 1) {
+	    for (int i = 0 ; sl-- && sp[i] ; i += 1) {
 	        cbool	f_white = ISWHT(sp[i]) ;
 	        if (f_white) {
 		    f = f_prev ;
@@ -176,7 +175,6 @@ bool hasdoublewhite(cchar *sp,int sl) noex {
 	            if (f) break ;
 	        } /* end if */
 	        f_prev = f_white ;
-	        sl -= 1 ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
@@ -190,7 +188,7 @@ bool hascdpath(cchar *sp,int sl) noex {
 	    if (sl && sp[0]) {
 	        cint ch = mkchar(sp[0]) ;
 	        f = (ch == chx_ec) ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return f ;
 }
@@ -203,7 +201,7 @@ bool hasmacro(cchar *lp,int ll) noex {
 	        if (char tbuf[3] ; twochars(tbuf,(lp+1),(ll-1)) > 1) {
 	            f = (strcmp(tbuf,"\\\"") != 0) ;
 	        }
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return f ;
 }
@@ -231,13 +229,11 @@ bool hasfnamespecial(cchar *fp,int fl) noex {
 
 local int twochars(char *tbuf,cchar *sp,int sl) noex {
 	int		c = 0 ;
-	while (sl && (c < 2)) {
+	for ( ; sl-- && (c < 2) && *sp ; sp += 1) {
 	    if (! ISWHT(*sp)) {
 		tbuf[c++] = *sp ;
-	    }
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
+	    } /* end if */
+	} /* end for */
 	tbuf[c] = '\0' ;
 	return c ;
 } /* end subroutine (twochars) */
