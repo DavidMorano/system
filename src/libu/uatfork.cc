@@ -84,7 +84,7 @@ import usysbasic ;			/* |uatexit(3u)| + |uatfork(3u)| */
 
 /* imported namespaces */
 
-using libu::um ;			/* variable */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -112,7 +112,7 @@ namespace {
     } ;
     struct uatfork_head {
 	ptm		mx ;		/* data mutex */
-	uatfork_list	hlist ;		/* memory allocations */
+	uatfork_list	hlist ;		/* memory allocated */
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
@@ -259,19 +259,19 @@ int uatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 	int		rs1 ;
 	if (usigblock b ; (rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
-	            if ((rs = mx.lockbegin) >= 0) { /* single */
-			uatfork_ent	*ep{} ;
-	                if ((rs = uatfork_trackbegin()) >= 0) {
-	                    cint	esz = szof(UAF_ENT) ;
-	                    if ((rs = um.mall(esz,&ep)) >= 0) {
-				uatfork_list	*lp = &hlist ;
-				entry_load(ep,sb,sp,sc) ;
-				list_add(lp,ep) ;
-	                    } /* end if (memory-allocation) */
-	                } /* end if (track-begin) */
-	                rs1 = mx.lockend ;
-			if (rs >= 0) rs = rs1 ;
-	            } /* end if (mutex) */
+	        if ((rs = mx.lockbegin) >= 0) { /* single */
+		    uatfork_ent	*ep{} ;
+		    if ((rs = uatfork_trackbegin()) >= 0) {
+	                cint	esz = szof(UAF_ENT) ;
+	                if ((rs = umem.mall(esz,&ep)) >= 0) {
+			    uatfork_list	*lp = &hlist ;
+			    entry_load(ep,sb,sp,sc) ;
+			    list_add(lp,ep) ;
+	                } /* end if (memory-acquire) */
+	            } /* end if (track-begin) */
+	            rs1 = mx.lockend ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (mutex) */
 	    } /* end if (init) */
 	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -296,8 +296,8 @@ int uatfork_head::expunge(void_f sb,void_f sp,void_f sc) noex {
                             if (entry_match(ep,sb,sp,sc)) {
                                 c += 1 ;
                                 list_rem(lp,ep) ;
-                                um.free(ep) ;
-                            } /* end if (match) */
+                                umem.free(ep) ;
+                            } /* end if (memory-release) */
                             ep = nep ;
                         } /* end while (deleting matches) */
                     } /* end if (track-begin) */
@@ -327,10 +327,10 @@ int uatfork_head::trackend() noex {
 	    ftrack = false ;
 	    while (ep) {
 	        nep = ep->next ;
-	        rs1 = um.free(ep) ;
+	        rs1 = umem.free(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	        ep = nep ;
-	    } /* end while */
+	    } /* end while (memory-release) */
 	    hlist.head = nullptr ;
 	    hlist.tail = nullptr ;
 	} /* end if (tracking was started) */
