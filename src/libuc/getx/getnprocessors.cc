@@ -46,8 +46,7 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getx.h>		/* |getenver(3uc)| */
-#include	<getourenv.h>
+#include	<usyscalls.h>
 #include	<cfdec.h>
 #include	<isnot.h>
 #include	<localmisc.h>
