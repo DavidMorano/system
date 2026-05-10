@@ -79,7 +79,6 @@
 #include	<getusername.h>
 #include	<getpwd.h>
 #include	<gethz.h>
-#include	<getourenv.h>
 #include	<getxname.h>
 #include	<getnisdomain.h>	/* |getnisdomain(3uc)| */
 #include	<bufsizevar.hh>
