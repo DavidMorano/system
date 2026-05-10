@@ -105,9 +105,9 @@ enum atypes {
 
 /* forward references */
 
-static int	emaentry_addrname(ema_ent *,char *,int) noex ;
+local int	emaentry_addrname(ema_ent *,char *,int) noex ;
 
-static bool	isBadAddr(int) noex ;
+local bool	isBadAddr(int) noex ;
 
 
 /* local variables */
@@ -161,7 +161,7 @@ int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int emaentry_addrname(ema_ent *ep,char *fbuf,int flen) noex {
+local int emaentry_addrname(ema_ent *ep,char *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ;
 	int		atype = -1 ;
@@ -219,12 +219,10 @@ static int emaentry_addrname(ema_ent *ep,char *fbuf,int flen) noex {
 	    } /* end if (positive) */
 	} /* end if_constexpr (f_massage) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (emaentry_addrname) */
+} /* end subroutine (emaentry_addrname) */
 
-static bool isBadAddr(int rs) noex {
+local bool isBadAddr(int rs) noex {
 	return isOneOf(rsbadaddr,rs) ;
-}
-/* end subroutine (emaentry_addrname) */
+} /* end subroutine (emaentry_addrname) */
 
 
