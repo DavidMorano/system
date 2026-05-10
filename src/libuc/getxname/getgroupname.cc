@@ -49,10 +49,10 @@
 #include	<grp.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<getbufsize.h>
 #include	<getax.h>
-#include	<getx.h>		/* |getenver(3uc)| */
 #include	<snx.h>
 #include	<sncpyx.h>
 #include	<isoneof.h>
