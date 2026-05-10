@@ -91,11 +91,10 @@ int matkeystr(con mainv a,cchar *sp,int sl) noex {
     	int		rc = -1 ;
 	if (a && sp) {
 	    cint	sch = sp[0] ; /* ok: everything promotes the same */
-	    int		i{} ; /* used-afterwards */
+	    int		i = 0 ; /* used-afterwards */
 	    bool 	f = false ;
 	    if (sl >= 0) {
-		int m ;
-	        for (i = 0 ; a[i] != nullptr ; i += 1) {
+	        for (int m ; a[i] ; i += 1) {
 		    if ((m = (sch == a[i][0])) > 0) {
 		        m = nleadkeystr(a[i],sp,sl) ;
 		    }
@@ -103,7 +102,7 @@ int matkeystr(con mainv a,cchar *sp,int sl) noex {
 		    if (f) break ;
 	        } /* end for */
 	    } else {
-	        for (i = 0 ; a[i] != nullptr ; i += 1) {
+	        for ( ; a[i] ; i += 1) {
 	            if (sch == a[i][0]) {
 		        f = (strkeycmp(a[i],sp) == 0) ;
 		    } else {
