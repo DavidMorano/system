@@ -35,10 +35,9 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<ulogerror.h>
 #include	<usupport.h>
+#include	<ulogerror.h>
 #include	<umem.hh>
-#include	<getfdfile.h>		/* |FD_STDIN| */
 #include	<libf.h>		/* |fwrite(3f)| */
 #include	<ascii.h>
 #include	<base64.h>
