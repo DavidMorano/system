@@ -32,7 +32,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<ucread.h>
+#include	<ucdescread.h>
 #include	<sbuf.h>
 #include	<snwcpy.h>
 #include	<strn.h>
