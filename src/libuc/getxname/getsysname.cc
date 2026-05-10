@@ -41,8 +41,8 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<uinfo.h>
-#include	<getx.h>		/* |getenver(3uc)| */
 #include	<sfx.h>
 #include	<snwcpy.h>
 #include	<sncpyx.h>
