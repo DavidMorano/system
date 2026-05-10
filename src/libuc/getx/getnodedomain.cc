@@ -78,12 +78,12 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<uinfo.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
 #include	<ucgetho.h>
 #include	<getbufsize.h>
-#include	<getx.h>		/* |getenver(3uc)| */
 #include	<bufsizevar.hh>
 #include	<estrings.h>		/* most all string subroutines */
 #include	<filer.h>
