@@ -20,7 +20,7 @@
 #ifdef	__cplusplus
 
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<time.h>		/* |TM| */
 #include	<limits.h>		/* |SHORT_MIN| */
 #include	<clanguage.h>
