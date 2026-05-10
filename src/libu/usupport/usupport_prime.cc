@@ -92,9 +92,6 @@ constexpr int		onethousand = 1000 ;
 
 /* exported variables */
 
-libu::ugetustime	getustime ;
-usys_mtime		getusmtime ;
-
 
 /* exported subroutines */
 
