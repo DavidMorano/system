@@ -35,6 +35,8 @@
 #include	<usupport_cfdec.hh>
 #include	<usupport_cfdect.hh>
 #include	<usupport_getsign.hh>
+#include	<usupport_getusmtime.hh>
+#include	<usupport_getustime.hh>
 #include	<usupport_hasnot.hh>
 #include	<usupport_itimer.hh>
 #include	<usupport_matkeystr.hh>
@@ -48,11 +50,13 @@
 #include	<usupport_sncpyx.hh>
 #include	<usupport_snwcpy.hh>
 #include	<usupport_strkeycmp.hh>
+#include	<usupport_strnkeycmp.hh>
 #include	<usupport_strnchar.hh>
 #include	<usupport_strnwht.hh>
 #include	<usupport_strnxchr.hh>
 #include	<usupport_strnxbrk.hh>
 #include	<usupport_strwcpy.hh>
+#include	<usupport_toxc.hh>
 #include	<usupport_ustrftime.hh>
 
 
