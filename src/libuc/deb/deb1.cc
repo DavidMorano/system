@@ -58,7 +58,6 @@ module ;
 #include	<usyscalls.h>
 #include	<usupport.h>		/* |sncpy(3u)| */
 #include	<usysutility.hh>	/* |snvprintf(3u)| */
-#include	<getfdfile.h>		/* |FD_STDERR| */
 #include	<localmisc.h>
 
 module deb ;
