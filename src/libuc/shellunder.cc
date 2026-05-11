@@ -54,18 +54,19 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>		/* |cfdec(3u)| */
-#include	<char.h>		/* |char_iswhite(3uc)| */
 #include	<localmisc.h>
 
 #include	"shellunder.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ureserve.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import ureserve ;			/* |char{x}(3u)| */
 
 /* local defines */
 
-#define	ISWHT(ch)	CHAR_ISWHITE(ch)
+#define	ISWHT(ch)	char_iswhite(ch)
 
 
 /* imported namespaces */
