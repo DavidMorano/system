@@ -32,6 +32,10 @@ extern int	strnkeybasecmp	(cchar *,cchar *,int) noex ;
 extern int	strnkeycasecmp	(cchar *,cchar *,int) noex ;
 extern int	strnkeyfoldcmp	(cchar *,cchar *,int) noex ;
 
+local inline int	strnkeycmp(cchar *a,cchar *sp,int sl) noex {
+    	return strnkeybasecmp(a,sp,sl) ;
+}
+
 extern int	strnkeybasecmpo	(cchar *,cchar *,int) noex ;
 extern int	strnkeybasecmpr	(cchar *,cchar *,int) noex ;
 
