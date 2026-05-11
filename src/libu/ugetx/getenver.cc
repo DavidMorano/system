@@ -220,7 +220,7 @@ int namemgr::operator () (mainv ev,int n) noex {
 } /* end method (namemgr::operator) */
 
 int namemgr::operator () (cchar *sp,int sl) const noex {
-    int         ei = -1 ; /* return-value (initially indicating "not-found") */
+	int	ei = -1 ; /* return-value (initially "not-found") */
         cauto predf = [this,sp,sl] (ushort c) noex -> bool {
             cchar *an = envv[c] ;
 	    bool f = false ;
@@ -244,7 +244,7 @@ int namemgr::operator () (cchar *sp,int sl) const noex {
                 ei = ii ;
             } /* end if (got a match) */
         } /* end if */
-    return ei ;
+	return ei ;
 } /* end method (namemgr::operator) */
 
 subiniter::operator int () noex {
