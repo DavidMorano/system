@@ -104,7 +104,7 @@ int vecstrx::srvargs(cchar *abuf) noex {
 /* end subroutine (vecstrx_srvargs) */
 
 
-/* local subroutines */
+/* private subroutines */
 
 local int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
 	cint		alen = lenstr(abuf) ;
@@ -127,12 +127,10 @@ local int vecstrx_arger(vecstrx *vsp,cchar *abuf) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_arger) */
+} /* end subroutine (vecstrx_arger) */
 
 local int mkterms() noex {
 	return fieldterms(terms,false,'\t',' ') ;
-}
-/* end subroutine (mkterms) */
+} /* end subroutine (mkterms) */
 
 
