@@ -46,7 +46,7 @@
 #include	<usysbase.h>
 #include	<localmisc.h>
 
-#include	"ucsys_sup.h"
+#include	"ucsys_sup.hh"
 
 
 /* local defines */
@@ -74,22 +74,24 @@
 
 namespace ucsys {
     errno_t getresolvec(int herr) noex {
-	errno_t		ec = EBUGCHECK ;
+	errno_t		ec = 0 ;
 	switch (herr) {
-	case HOST_NOT_FOUND:
+	case NETDB_SUCCESS:
+	    break ;
+	case NETDB_NOTFOUND:
 	    ec = ENOENT ;
 	    break ;
-	case TRY_AGAIN:
+	case NETDB_TRYAGAIN:
 	    ec = EAGAIN ;
 	    break ;
-	case NO_RECOVERY:
+	case NETDB_NORECOVERY:
 	    ec = ENOTRECOVERABLE ;
 	    break ;
-	case NO_DATA:
-	    ec = ENODATA ;
+	case NETDB_NOADDRESS:
+	    ec = EAFNOSUPPORT ;
 	    break ;
 	case NETDB_INTERNAL:
-	    ec = EAFNOSUPPORT ;		/* suggested from Solaris® */
+	    ec = errno ;		/* suggested from Solaris® */
 	    break ;
 	default:
 	    ec = EPROTONOSUPPORT ;
