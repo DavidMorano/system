@@ -67,7 +67,6 @@
 #include	<uclibmem.h>
 #include	<ucdesc.h>
 #include	<utmpacc.h>
-#include	<getfdfile.h>
 #include	<opentmp.h>
 #include	<sysval.hh>
 #include	<intfloor.h>
