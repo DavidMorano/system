@@ -171,7 +171,7 @@ int vecstrx::envfile(cchar *fname) noex {
 /* end subroutine (vecstrx_envfile) */
 
 
-/* local subroutines */
+/* private subroutines */
 
 int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
 	cnullptr	np{} ;
@@ -205,8 +205,7 @@ int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (subinfo) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_envfiler) */
+} /* end subroutine (vecstrx_envfiler) */
 
 int subinfo::start() noex {
 	int		rs ;
@@ -221,8 +220,7 @@ int subinfo::start() noex {
 	    elen = llen ;
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (subinfo::start) */
+} /* end subroutine (subinfo::start) */
 
 int subinfo::finish() noex {
 	int		rs = SR_OK ;
@@ -233,8 +231,7 @@ int subinfo::finish() noex {
 	    a = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 int subinfo::line(cchar *lp,int ll) noex {
 	static constexpr eword	ew ;
@@ -256,17 +253,16 @@ int subinfo::line(cchar *lp,int ll) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fields) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo::line) */
+} /* end subroutine (subinfo::line) */
 
 int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
+	cint		rsn = SR_NOTFOUND ;
 	cint		klen = (elen - 1) ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	char		*kbuf = ebuf ;
 	if (kl <= klen) ylikely {
 	    vs_f	vs = vstrkeycmp ;
-	    cint	rsn = SR_NOTFOUND ;
 	    cint	vlen = elen ;
 	    int		vl ;
 	    char	*vbuf = ebuf ;
@@ -293,13 +289,11 @@ int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
 	    } /* end if (did not have it already) */
 	} /* end if (not-overflow) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo::parse) */
+} /* end subroutine (subinfo::parse) */
 
 local int mkterms() noex {
 	return fieldterms(fterms,false,'\t',' ','#','=') ;
-}
-/* end subroutine (mkterms) */
+} /* end subroutine (mkterms) */
 
 vars::operator int () noex {
 	int		rs ;
@@ -307,8 +301,7 @@ vars::operator int () noex {
 	    linebuflen = (rs * LINEBUFMULT) ;
 	}
 	return rs ;
-}
-/* end subroutine (vars::operator) */
+} /* end subroutine (vars::operator) */
 
 local int mkinit() noex {
     	int		rs ;
@@ -316,7 +309,6 @@ local int mkinit() noex {
 	    rs = var ;
 	}
 	return rs ;
-}
-/* end subroutine (mkinit) */
+} /* end subroutine (mkinit) */
 
 
