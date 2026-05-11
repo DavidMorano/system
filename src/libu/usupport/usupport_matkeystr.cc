@@ -98,7 +98,7 @@ namespace libu {
 	    int		i = 0 ; /* used-afterwards */
 	    bool 	f = false ;
 	    if (sl >= 0) {
-	        for (int m ; a[i] != nullptr ; i += 1) {
+	        for (int m ; a[i] ; i += 1) {
 		    if ((m = (sch == a[i][0])) > 0) {
 		        m = nleadkeystr(a[i],sp,sl) ;
 		    }
@@ -106,7 +106,7 @@ namespace libu {
 		    if (f) break ;
 	        } /* end for */
 	    } else {
-	        for ( ; a[i] != nullptr ; i += 1) {
+	        for ( ; a[i] ; i += 1) {
 	            if (sch == a[i][0]) {
 		        f = (strkeycmp(a[i],sp) == 0) ;
 		    } else {
