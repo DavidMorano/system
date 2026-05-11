@@ -111,7 +111,7 @@ int vecstrx::loadpjusers(cchar *pjn) noex {
 /* end subroutine (vecstrx_loadpjusers) */
 
 
-/* local subroutines */
+/* private subroutines */
 
 local int vecstrx_loadpjnent(vecstrx *vsp,ent *uap,cchar *pjn) noex {
 	int		rs ;
@@ -126,7 +126,6 @@ local int vecstrx_loadpjnent(vecstrx *vsp,ent *uap,cchar *pjn) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_loadpjnent) */
+} /* end subroutine (vecstrx_loadpjnent) */
 
 
