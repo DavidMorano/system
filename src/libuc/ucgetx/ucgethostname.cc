@@ -82,8 +82,8 @@ int uc_gethostname(char *hbuf,int hlen) noex {
 	    rs = SR_INVALID ;
 	    hbuf[0] = '\0' ;
 	    if (hlen > 0) {
-		csize	hsz = size_t(hlen + 1) ;
-	        if ((rs = gethostname(hbuf,hsz)) >= 0) {
+		csize	hsize = size_t(hlen + 1) ;
+	        if ((rs = gethostname(hbuf,hsize)) >= 0) {
 	            hbuf[hlen] = '\0' ;
 	            rs = lenstr(hbuf) ;
 	        } else {
