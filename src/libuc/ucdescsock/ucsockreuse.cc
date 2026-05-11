@@ -15,7 +15,7 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/socket.h>
 #include	<uclibsubs.h>
 #include	<localmisc.h>
