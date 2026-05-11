@@ -104,7 +104,7 @@ int vecstrx::svcargs(int *fp,cchar *abuf) noex {
 /* end subroutine (vecstrx_svcargs) */
 
 
-/* local subroutines */
+/* private subroutines */
 
 local int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
     	cnullptr	np{} ;
@@ -146,13 +146,11 @@ local int vecstrx_arger(vecstrx *vsp,int *fp,cchar *abuf) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_arger) */
+} /* end subroutine (vecstrx_arger) */
 
 local int mkterms() noex {
 	return fieldterms(terms,false,'\t',' ') ;
-}
-/* end subroutine (mkterms) */
+} /* end subroutine (mkterms) */
 
 local int hasLong(cchar *sp,int µsl) noex {
 	int		f = false ;
@@ -165,7 +163,6 @@ local int hasLong(cchar *sp,int µsl) noex {
 	    }
 	} /* end if (getlenstr) */
 	return f ;
-}
-/* end subroutine (hasLong) */
+} /* end subroutine (hasLong) */
 
 
