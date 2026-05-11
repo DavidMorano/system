@@ -56,7 +56,7 @@
 #include	<localmisc.h>
 #include	<cmporders.h>
 
-#include	"strnxcmp.h"
+#include	"strnkeycmp.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
