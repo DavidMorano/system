@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= cmporders.o strxxxxcmp.o strkeycmp.o 
+OBJ0= strxxxxcmp.o strkeycmp.o 
 OBJ1= strkeydictcmp.o 
 OBJ2= stremacmp.o strvalcmp.o strleadcmp.o
 OBJ3= strpcmp.o 
@@ -138,7 +138,6 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-comporders.o:		cmporders.cc		cmporders.h	$(INCS)
 stremacmp.o:		stremacmp.cc		stremacmp.h	$(INCS)
 strkeycmp.o:		strkeycmp.cc		strkeycmp.h	$(INCS)
 strvalcmp.o:		strvalcmp.cc		strvalcmp.h	$(INCS)
