@@ -397,13 +397,13 @@ local int namesemclose(namesem *op) noex {
 /* end subroutine (namesemclose) */
 
 local int namesemdiradd(cchar *name,mode_t om) noex {
+	cint		rsn = SR_NOENT ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (name) ylikely {
 	    if (char *tmpfname ; (rs = lm_mp(&tmpfname)) >= 0) ylikely {
 		cchar	*pp = NAMESEM_PATHPREFIX ;
 		if ((rs = mkpath2(tmpfname,pp,name)) >= 0) ylikely {
-		    cint	rsn = SR_NOENT ;
 	            if ((rs = u_creat(tmpfname,om)) == rsn) {
 	                if ((rs = namesemdircheck(pp)) >= 0) {
 	                    rs = u_creat(tmpfname,om) ;
