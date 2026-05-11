@@ -68,9 +68,9 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
-#include	<getfdfile.h>
 #include	<intsat.h>
 #include	<filer.h>
 #include	<field.h>
