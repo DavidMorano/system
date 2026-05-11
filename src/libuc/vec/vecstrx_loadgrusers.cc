@@ -92,9 +92,6 @@ local int	pwentparse(cchar *,int,gid_t *) noex ;
 /* local variables */
 
 
-/* local subroutines */
-
-
 /* exported variables */
 
 
@@ -120,7 +117,7 @@ int vecstrx::loadgrusers(gid_t sgid) noex {
 /* end subroutine (vecstrx_loadgrusers) */
 
 
-/* local subroutines */
+/* private subroutines */
 
 int subinfo::start(vecstrx *p,gid_t g) noex {
     	int		rs = SR_BUGCHECK ;
@@ -130,8 +127,7 @@ int subinfo::start(vecstrx *p,gid_t g) noex {
 	    sgid = g ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo::start) */
+} /* end subroutine (subinfo::start) */
 
 int subinfo::finish() noex {
 	int		rs = SR_FAULT ;
@@ -139,8 +135,7 @@ int subinfo::finish() noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo::finish) */
+} /* end subroutine (subinfo::finish) */
 
 int subinfo::pwmapload() noex {
 	int		rs ;
@@ -167,8 +162,7 @@ int subinfo::pwmapload() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (grmems-pwmap) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo::pwmapload) */
+} /* end subroutine (subinfo::pwmapload) */
 
 int subinfo::pwmapbegin() noex {
 	cnullptr	np{} ;
@@ -202,8 +196,7 @@ int subinfo::pwmapbegin() noex {
 	    } /* end if (file-open) */
 	} /* end if (need mapping) */
 	return rs ;
-}
-/* end subroutine (subinfo::pwmapbegin) */
+} /* end subroutine (subinfo::pwmapbegin) */
 
 int subinfo::pwmapend() noex {
 	int		rs = SR_OK ;
@@ -217,8 +210,7 @@ int subinfo::pwmapend() noex {
 	    mapsize = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo::pwmapend) */
+} /* end subroutine (subinfo::pwmapend) */
 
 /* PASSWD entry parsing */
 local int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
@@ -251,7 +243,6 @@ local int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
 	} /* end for (looping through fields) */
 	if (fi < 4) ul = 0 ;
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (pwentparse) */
+} /* end subroutine (pwentparse) */
 
 
