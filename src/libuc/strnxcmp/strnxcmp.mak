@@ -136,7 +136,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-strnkeycmp.o:		strnkeycmp.cc				$(INCS)
+strnkeycmp.o:		strnkeycmp.cc		strnkeycmp.h	$(INCS)
 strnvalcmp.o:		strnvalcmp.cc				$(INCS)
 strnleadcmp.o:		strnleadcmp.cc				$(INCS)
 strnncmp.o:		strnncmp.cc				$(INCS)
