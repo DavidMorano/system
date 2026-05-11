@@ -21,18 +21,17 @@
 	Name:
 	uc_getipnodebyname
 	uc_getipnodebyaddr
-	lm_freehostent
 	uc_hostentfree
 
 	Description:
-	This subroutine is a platform independent subroutine to
-	get an INET host address entry, but does it dumbly on purpose.
+	These subroutines provide a platform independent way to
+	retreive host (mode) information given either: a hostname
+	and address-family, or an IP address and address-family.
 
 	Synopsis:
 	int uc_getipnodebyname(HE **rpp,cc *hostname,int af,int fl) noex
 	int uc_getipnodebyaddr(HE **rpp,cvoid *ap,int al,int af) noex
-	int lm_freehostent(HE *hep) noex
-	int uc_ehostentfree(HE *hep) noex
+	int uc_hostentfree(HE *hep) noex
 
 	Arguments:
 	- hepp		pointer to get a HOSTENT pointer
@@ -47,12 +46,19 @@
 	SR_FAULT	address fault
 	SR_TIMEDOUT	request timed out (bad network someplace)
 	SR_NOTFOUND	host could not be found
-	SR_PROTO	this really means some unknownerror happened 
+	SR_PROTO	this really means some unknown error happened 
+	SR_AFNOSUPPORT	address-family not-found
+	SR_DOWN		some sort of fatæl "unrecoverable" error
+	-		other error (system-return)
 
 	Notes:
 	Some special errors returned by the underlying library calls are:
-		TRY_AGAIN	means to try the operation again
-		HOST_NOT_FOUND	means that the host (entry) was not found
+		NETDB_INTERNAL		see |errno|
+		NETDB_SUCCESS		success
+		NETDB_TRYAGAIN		try the operation again
+		NETDB_NOTFOUND		host (entry) was not found
+		NETDB_NOADDRESS		address-family not found
+		NETDB_NORECOVERY	mean total fatal error (of some kind)
 
 *******************************************************************************/
 
@@ -63,18 +69,26 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>		/* |msleep(3u)| */
+#include        <errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ucgetx.h"
+#include	"ucgetipnodeby.h"
 
 
 /* local defines */
 
-#define	TO_GET		3
+#define	HE		hostent
+
+#ifndef	NETDB_INTERNAL			/* indicates to see |errno| */
+#define	NETDB_INTERNAL	-1
+#endif
+#ifndef	NETDB_SUCCESS			/* indicates success */
+#define	NETDB_SUCCESS	0
+#endif
 
 
 /* external subroutines */
@@ -85,8 +99,33 @@
 
 /* local structures */
 
+namespace {
+    struct getter ;
+    typedef int (getter::*getter_m)(HE **,int) noex ;
+    struct getter {
+	getter_m	m ;
+	cchar		*hn ;
+	cvoid		*ap ;
+	int		al ;
+	int		fl ;
+	int callname(HE **,int) noex ;
+	int calladdr(HE **,int) noex ;
+	getter(cchar *h,int f) noex : hn(h), fl(f) {
+	    m = &getter::callname ;
+	} ;
+	getter(cvoid *p,int l) noex : ap(p), al(l) {
+	    m = &getter::calladdr ;
+	} ;
+	int operator () (HE **,int) noex ;
+    } ; /* end struct (getter) */
+} /* end namespace */
+
 
 /* forward references */
+
+local sysret_t	std_getipnodebyname(HE **,cc *,int,int) noex ;
+local sysret_t	std_getipnodebyaddr(HE **,cvoid *,int,int) noex ;
+local int	errcvt(int) noex ;
 
 
 /* local variables */
@@ -97,67 +136,28 @@
 
 /* exported subroutines */
 
-int uc_getipnodebyname(HOSTENT **hepp,cchar *hostname,int af,int fl) noex {
+int uc_getipnodebyname(HOSTENT **hepp,cchar *hn,int af,int fl) noex {
 	int		rs = SR_FAULT ;
-	HOSTENT		*lp = nullptr ;
-	if (hostname) {
+	if (hepp && hn) {
 	    rs = SR_INVALID ;
-	    if (af >= 0) {
-	        int	herr = 0 ;
-		int	i ; /* used-afterwards */
-	        for (i = 0 ; i < TO_GET ; i += 1) {
-	            errno = 0 ;
-	            lp = getipnodebyname(hostname,af,fl,&herr) ;
-	            if ((lp != nullptr) || (herr != TRY_AGAIN)) break ;
-	            msleep(1000) ;
-	        } /* end for */
-	        if (i >= TO_GET) {
-	            rs = SR_TIMEDOUT ;
-	        } else if (lp == nullptr) {
-		    if (herr == HOST_NOT_FOUND) {
-	                rs = SR_NOTFOUND ;
-		    } else {
-			rs = SR_PROTO ;
-		    }
-	        }
+	    if ((af >= 0) && (fl >= 0)) {
+		getter go(hn,fl) ;
+		rs = go(hepp,af) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	if (hepp) {
-	    *hepp = (rs >= 0) ? lp : nullptr ;
-	}
 	return rs ;
 }
 /* end subroutine (uc_getipnodebyname) */
 
 int uc_getipnodebyaddr(HOSTENT **hepp,cvoid *ap,int al,int af) noex {
-	csize		asz = size_t(al) ;
 	int		rs = SR_FAULT ;
-	HOSTENT		*lp = nullptr ;
-	if (ap) {
+	if (hepp && ap) {
 	    rs = SR_INVALID ;
-	    if (af >= 0) {
-	        int	herr = 0 ;
-		int	i ; /* used-afterwards */
-	        for (i = 0 ; i < TO_GET ; i += 1) {
-	            errno = 0 ;
-	            lp = getipnodebyaddr(ap,asz,af,&herr) ;
-	            if ((lp != nullptr) || (herr != TRY_AGAIN)) break ;
-	            msleep(1000) ;
-	        } /* end for */
-	        if (i >= TO_GET) {
-	            rs = SR_TIMEDOUT ;
-	        } else if (lp == nullptr) {
-		    if (herr == HOST_NOT_FOUND) {
-	                rs = SR_NOTFOUND ;
-		    } else {
-			rs = SR_PROTO ;
-		    }
-	        }
+	    if ((af >= 0) && (al >= 0)) {
+		getter go(ap,al) ;
+		rs = go(hepp,af) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	if (hepp) {
-	    *hepp = (rs >= 0) ? lp : nullptr ;
-	}
 	return rs ;
 }
 /* end subroutine (uc_getipnodebyaddr) */
@@ -167,9 +167,115 @@ int uc_hostentfree(HOSTENT *hep) noex {
 	if (hep) {
 	    rs = SR_OK ;
 	    freehostent(hep) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uc_hostentfree) */
+
+
+/* local subroutines */
+
+int getter::operator () (HE **hepp,int af) noex {
+    	int		rs = SR_OK ;
+        errtimer        to_mfile        = utimeout[uto_mfile] ;
+        errtimer        to_nfile        = utimeout[uto_nfile] ;
+        errtimer        to_nomem        = utimeout[uto_nomem] ;
+        errtimer        to_nospc        = utimeout[uto_nospc] ;
+        errtimer        to_again        = utimeout[uto_again] ;
+        errtimer        to_busy         = utimeout[uto_busy] ;
+        reterr          r ;
+        repeat {
+            if ((rs = (this->*m)(hepp,af)) < 0) {
+                r(rs) ;                 /* <- default causes exit */
+                switch (rs) {
+                case SR_MFILE:
+                    r = to_mfile(rs) ;
+                    break ;
+                case SR_NFILE:
+                    r = to_nfile(rs) ;
+                    break ;
+                case SR_NOMEM:
+                    r = to_nomem(rs) ;
+                    break ;
+                case SR_NOSPC:
+                    r = to_nospc(rs) ;
+                    break ;
+                case SR_AGAIN:
+                    r = to_again(rs) ;
+                    break ;
+                case SR_BUSY:
+                    r = to_busy(rs) ;
+                    break ;
+                case SR_INTR:
+                    r(false) ;
+                    break ;
+                } /* end switch */
+                rs = r ;
+            } /* end if (error) */
+        } until ((rs >= 0) || r.fexit) ;
+	return rs ;
+} /* end method (getter::operator) */
+
+int getter::callname(HE **hepp,int af) noex {
+	return std_getipnodebyname(hepp,hn,af,fl) ;
+} /* end method (getter::callname) */
+
+int getter::calladdr(HE **hepp,int af) noex {
+	return std_getipnodebyaddr(hepp,ap,al,af) ;
+} /* end method (getter::calladdr) */
+
+local sysret_t std_getipnodebyname(HE **hepp,cc *hn,int af,int fl) noex {
+	cnullptr	np{} ;
+    	int		rs = SR_OK ;
+	int		herr = 0 ;
+	errno = 0 ;
+	if (HE *lp ; (lp = getipnodebyname(hn,af,fl,&herr)) == np) {
+	    rs = errcvt(herr) ;
+	} else {
+	    *hepp = lp ;
+	} /* end error */
+	return rs ;
+} /* end subroutine (std_getipnodebyname) */
+
+local sysret_t std_getipnodebyaddr(HE **hepp,cvoid *ap,int al,int af) noex {
+    	cnullptr	np{} ;
+	csize		asize = size_t(al) ;
+	int		rs = SR_OK ;
+	int		herr = 0 ;
+	errno = 0 ;
+	if (HE *lp ; (lp = getipnodebyaddr(ap,asize,af,&herr)) == np) {
+	    rs = errcvt(herr) ;
+	} else {
+	    *hepp = lp ;
+	} /* end error */
+	return rs ;
+} /* end subroutine (std_getipnodebyaddr) */
+
+local int errcvt(int herr) noex {
+    	int		rs = SR_OK ;
+	switch (herr) {
+	case NETDB_SUCCESS:
+	    break ;
+	case NETDB_TRYAGAIN:
+	    rs = SR_AGAIN ;
+	    break ;
+	case NETDB_NOTFOUND:
+	    rs = SR_NOTFOUND ;
+	    break ;
+	case NETDB_NOADDRESS:
+	    rs = SR_AFNOSUPPORT ;
+	    break ;
+	case NETDB_NORECOVERY:
+	    rs = SR_DOWN ;
+	    break ;
+	case NETDB_INTERNAL:
+	    rs = (- errno) ;
+	    break ;
+	default:
+	    rs = SR_PROTO ;
+	    break ;
+	} /* end switch */
+	return rs ;
+} /* end subroutine (errcvt) */
 
 
