@@ -84,7 +84,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/socket.h>
 #include	<cstddef>
 #include	<cstdlib>
