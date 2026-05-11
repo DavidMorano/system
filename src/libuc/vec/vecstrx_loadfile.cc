@@ -69,7 +69,6 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getfdfile.h>
 #include	<filer.h>
 #include	<field.h>
 #include	<fieldterms.h>
@@ -159,7 +158,7 @@ int vecstrx::loadfile(int fu,cchar *fname) noex {
 /* end subroutine (vecstrx_loadfile) */
 
 
-/* local subroutines */
+/* private subroutines */
 
 local int vecstrx_loadfiler(vecstrx *op,int fu,cchar *fname) noex {
 	int		rs = SR_OK ;
@@ -183,8 +182,7 @@ local int vecstrx_loadfiler(vecstrx *op,int fu,cchar *fname) noex {
             c = rs ;
         } /* end if (file or STDIN) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_loadfiler) */
+} /* end subroutine (vecstrx_loadfiler) */
 
 local int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	int		rs ;
@@ -222,8 +220,7 @@ local int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	    } /* end if (not a directory) */
 	} /* end if (stat) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_loadfd) */
+} /* end subroutine (vecstrx_loadfd) */
 
 local int vecstrx_loadline(vecstrx *vsp,int fu,cchar *lbuf,int len) noex {
 	int		rs ;
@@ -248,13 +245,11 @@ local int vecstrx_loadline(vecstrx *vsp,int fu,cchar *lbuf,int len) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fields) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_loadline) */
+} /* end subroutine (vecstrx_loadline) */
 
 local int mkterms() noex {
 	return fieldterms(fterms,false,'\n','#') ;
-}
-/* end subroutine (mkterms) */
+} /* end subroutine (mkterms) */
 
 vars::operator int () noex {
         int             rs ;
@@ -262,7 +257,6 @@ vars::operator int () noex {
             var.linebuflen = (rs * LINEBUFMULT) ;
         }
         return rs ;
-}       
-/* end subroutine (vars::operator) */
+}       /* end subroutine (vars::operator) */
 
 
