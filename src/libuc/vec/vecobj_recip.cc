@@ -110,7 +110,7 @@ int vecobj_recipfins(vecobj *op) noex {
 /* end subroutine (vecobj_recipfins) */
 
 
-/* local subroutines */
+/* private subroutines */
 
 local int vecobj_reciphave(vecobj *op,cchar *sp,int sl) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -128,7 +128,6 @@ local int vecobj_reciphave(vecobj *op,cchar *sp,int sl) noex {
 	} /* end for */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (vecobj_reciphave) */
+} /* end subroutine (vecobj_reciphave) */
 
 
