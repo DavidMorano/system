@@ -121,6 +121,7 @@ int varray_start(varray *op,int esz,int n) noex {
 	            rs = lookaside_start(op->lap,esz,n) ;
 	            if (rs < 0) {
 	                libmem.free(vp) ;
+			op->va = nullptr ;
 		    }
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
@@ -148,13 +149,13 @@ int varray_finish(varray *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 	            op->va = nullptr ;
 		}
-	        {
-		    rs1 = varray_dtor(op) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-	        op->c = 0 ;
-		op->n = 0 ;
 	    } /* end if (open) */
+	    {
+		rs1 = varray_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->c = 0 ;
+	    op->n = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -395,7 +396,6 @@ local int varray_extend(varray *op,int ni) noex {
 	    }
 	} /* end if (re-allocation needed) */
 	return rs ;
-}
-/* end subroutine (varray_extend) */
+} /* end subroutine (varray_extend) */
 
 
