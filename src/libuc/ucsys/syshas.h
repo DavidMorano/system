@@ -452,7 +452,7 @@
 #define	SYSHAS_PMQ		0
 
 /* Darwin: AUDIT */
-#define	SYSHAS_AUDIT		0
+#define	SYSHAS_AUDIT		1
 
 /* Darwin: get-directory-entries (|getdents(2)|) */
 #define	SYSHAS_GETDENTS		0
