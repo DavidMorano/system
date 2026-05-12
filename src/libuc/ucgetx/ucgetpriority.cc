@@ -49,19 +49,19 @@
 
 int uc_getpriority(int which,id_t who,int *rp) noex {
 	int		rs = SR_INVALID ;
+	int		prio = 0 ; /* return-value */
 	if (which >= 0) {
-	    int		prio ;
 	    rs = SR_OK ;
 	    errno = 0 ;
 	    prio = getpriority(which,who) ;
-	    if ((prio == -1) && (errno != 0)) {
+	    if ((prio == -1) && errno) {
 	        rs = (- errno) ;
 	    }
 	    if (rp) {
 	        *rp = prio ;
 	    }
 	} /* end if (valid) */
-	return rs ;
+	return (rs >= 0) ? prio : rs ;
 }
 /* end subroutine (uc_getpriority) */
 
