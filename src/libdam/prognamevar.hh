@@ -44,11 +44,11 @@ struct prognamevar {
 	prognamevar(cchar *ap,int al = -1) noex ;
 	prognamevar(strview &sv) noex ;
 	prognamevar() noex : prognamevar(nullptr,0) { } ;
-	prognamevar(const prognamevar &) = delete ;
-	prognamevar &operator = (const prognamevar &) = delete ;
-	prognamevar &operator = (const strview &sv) noex ;
+	prognamevar(con prognamevar &) = delete ;
+	prognamevar &operator = (con prognamevar &) = delete ;
+	prognamevar &operator = (con strview &sv) noex ;
 	ccharp operator () (cchar *ap,int al = -1) noex ;
-	ccharp operator () (strview &sv) noex ;
+	ccharp operator () (con strview &sv) noex ;
 	operator ccharp () noex ;
 	void dtor() noex ;
 	destruct prognamevar() {
