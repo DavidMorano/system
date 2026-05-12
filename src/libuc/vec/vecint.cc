@@ -497,8 +497,7 @@ consteval int mkoptmask() noex {
 	m |= vecintm.sorted ;
 	m |= vecintm.ordered ;
 	return m ;
-}
-/* end subroutine (mkoptmask) */
+} /* end subroutine (mkoptmask) */
 
 local int vecint_setopts(vecint *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
@@ -515,8 +514,7 @@ local int vecint_setopts(vecint *op,int vo) noex {
 	    if (vo & vecintm.conserve)		op->fl.oconserve = true ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (vecint_setopts) */
+} /* end subroutine (vecint_setopts) */
 
 local int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 	int		rs = SR_OK ;
@@ -556,8 +554,7 @@ local int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 	    op->fl.issorted = false ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecint_addval) */
+} /* end subroutine (vecint_addval) */
 
 local int vecint_extend(vecint *op,int amount) noex {
 	int		rs = SR_OK ;
@@ -582,8 +579,7 @@ local int vecint_extend(vecint *op,int amount) noex {
 	    }
 	} /* end if (needed) */
 	return rs ;
-}
-/* end subroutine (vecint_extend) */
+} /* end subroutine (vecint_extend) */
 
 local int vecint_insertval(vecint *op,int ii,VECINT_TYPE val) noex {
 	if (ii < op->i) ylikely {
@@ -609,8 +605,7 @@ local int vecint_insertval(vecint *op,int ii,VECINT_TYPE val) noex {
 	op->c += 1 ;
 	op->fl.issorted = false ;
 	return ii ;
-}
-/* end subroutine (vecint_insertval) */
+} /* end subroutine (vecint_insertval) */
 
 local int vecint_extrange(vecint *op,int n) noex {
 	if (n > op->i) {
@@ -620,13 +615,11 @@ local int vecint_extrange(vecint *op,int n) noex {
 	    op->va[op->i] = VECINT_MIN ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (vecint_extrange) */
+} /* end subroutine (vecint_extrange) */
 
 local int deftypecmp(const VECINT_TYPE *l1p,const VECINT_TYPE *l2p) noex {
 	return intsat(*l1p - *l2p) ;
-}
-/* end subroutine (deftypecmp) */
+} /* end subroutine (deftypecmp) */
 
 int vecint_st::operator () (int vn,int vo) noex {
     	int		rs = SR_BUGCHECK ;
