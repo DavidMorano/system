@@ -37,13 +37,13 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucsysconf.h>
 #include	<ucfork.h>
 #include	<ucatfork.h>
 #include	<ucatexit.h>
 #include	<getbufsize.h>
-#include	<getx.h>		/* |getenver(3uc)| */
 #include	<timewatch.hh>
 #include	<bufsizevar.hh>
 #include	<ptm.h>
