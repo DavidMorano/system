@@ -870,8 +870,7 @@ consteval int mkoptmask() noex {
 	m |= vecstrm.sorted ;
 	m |= vecstrm.ordered ;
 	return m ;
-}
-/* end subroutine (mkoptmask) */
+} /* end subroutine (mkoptmask) */
 
 local int vecstr_setopts(vecstr *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
@@ -888,8 +887,7 @@ local int vecstr_setopts(vecstr *op,int vo) noex {
 	    if (vo & vecstrm.conserve)		op->fl.oconserve	= true ;
 	} /* end if (valid options) */
 	return rs ;
-}
-/* end subroutine (vecstr_setopts) */
+} /* end subroutine (vecstr_setopts) */
 
 local int vecstr_extvec(vecstr *op,int n) noex {
 	int		rs = SR_OK ;
@@ -913,8 +911,7 @@ local int vecstr_extvec(vecstr *op,int n) noex {
 	    }
 	} /* end if (extension needed) */
 	return rs ;
-}
-/* end subroutine (vecstr_extvec) */
+} /* end subroutine (vecstr_extvec) */
 
 local int vecstr_addsp(vecstr *op,cchar *sp) noex {
 	int		i = 0 ;
@@ -939,8 +936,7 @@ local int vecstr_addsp(vecstr *op,cchar *sp) noex {
 	op->c += 1 ;
 	op->fl.issorted = false ;
 	return i ;
-}
-/* end subroutine (vecstr_addsp) */
+} /* end subroutine (vecstr_addsp) */
 
 local int vecstr_insertsp(vecstr *op,int ii,cchar *sp) noex {
 	if (ii == op->i) {
@@ -963,13 +959,11 @@ local int vecstr_insertsp(vecstr *op,int ii,cchar *sp) noex {
 	op->c += 1 ;
 	op->fl.issorted = false ;
 	return ii ;
-}
-/* end subroutine (vecstr_insertsp) */
+} /* end subroutine (vecstr_insertsp) */
 
 local int vecstr_validx(vecstr *op,int i) noex {
 	return ((i >= 0) && (i < op->i)) ? SR_OK : SR_NOTFOUND ;
-}
-/* end subroutine (vecstr_validx) */
+} /* end subroutine (vecstr_validx) */
 
 local void vecstr_arrsort(vecstr *op,vecstr_vcmp vcf) noex {
 	cchar	**va = op->va ;
@@ -977,8 +971,7 @@ local void vecstr_arrsort(vecstr *op,vecstr_vcmp vcf) noex {
 	csize	esize = sizeof(char *) ;
 	qsort_f	scf = qsort_f(vcf) ;
 	qsort(va,alen,esize,scf) ;
-}
-/* end subroutine (vecstr_arrsort) */
+} /* end subroutine (vecstr_arrsort) */
 
 int vecstr::add(cchar *sp,int sl) noex {
 	return vecstr_add(this,sp,sl) ;
