@@ -97,7 +97,7 @@ using ai = ADDRINFO ;
 
 /* forward references */
 
-local int std_geaddinfo(cc *,cc *,con ai *,ai **) noex ;
+local int std_getaddinfo(cc *,cc *,con ai *,ai **) noex ;
 
 
 /* local variables */
@@ -107,7 +107,7 @@ local int std_geaddinfo(cc *,cc *,con ai *,ai **) noex ;
 
 int uc_addrinfoget(cc *hn,cc *svc,con ai *hintp,ai **rpp) noex {
     	int		rs = SR_FAULT ;
-	if (hn && svc) {
+	if (hn || svc) { /* <- either must be non-NULL */
 	    rs = SR_INVALID ;
 	    if (hn[0] && svc[0]) {
                 errtimer    to_again        = utimeout[uto_again] ;
@@ -124,7 +124,7 @@ int uc_addrinfoget(cc *hn,cc *svc,con ai *hintp,ai **rpp) noex {
 		errtimer    to_inprogress   = utimeout[uto_inprogress] ;
                 reterr      r ;
 	        repeat {
-	            if ((rs = std_geaddinfo(hn,svc,hintp,rpp)) < 0) {
+	            if ((rs = std_getaddinfo(hn,svc,hintp,rpp)) < 0) {
                         r(rs) ;		/* <- default causes exit */
                         switch (rs) {
                         case SR_AGAIN:
@@ -189,7 +189,7 @@ int uc_addrinfofree(ADDRINFO *aip) noex {
 
 /* local subroutines */
 
-local int std_geaddinfo(cc *hn,cc *svc,con ai *hintp,ai **rpp) noex {
+local int std_getaddinfo(cc *hn,cc *svc,con ai *hintp,ai **rpp) noex {
     	int		rs = SR_OK ;
 	errno = 0 ;
 	if (int rc ; (rc = getaddrinfo(hn,svc,hintp,rpp)) != 0) {
