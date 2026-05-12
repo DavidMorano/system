@@ -190,7 +190,7 @@ int vecpstr_svcargs(vecpstr *op,int *fp,cchar *abuf) noex {
 /* end subroutine (vecpstr_svcargs) */
 
 
-/* local subroutines */
+/* private subroutines */
 
 int vecpstrer::add(cchar *sp,int sl) noex {
     	return vecpstr_add(op,sp,sl) ;
