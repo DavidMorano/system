@@ -107,16 +107,16 @@ namespace {
 	} ; /* end dtor */
 	int igetpid() noex ;
     } ; /* end structure (ucgetpid) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 extern "C" {
-    static void	ucgetpid_atforkbefore() noex ;
-    static void	ucgetpid_atforkparent() noex ;
-    static void	ucgetpid_atforkchild() noex ;
-    static void	ucgetpid_exit() noex ;
+    local void	ucgetpid_atforkbefore() noex ;
+    local void	ucgetpid_atforkparent() noex ;
+    local void	ucgetpid_atforkchild() noex ;
+    local void	ucgetpid_exit() noex ;
 }
 
 
@@ -202,8 +202,7 @@ int ucgetpid::init() noex {
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
 	return (rs >= 0) ? fr : rs ;
-}
-/* end method (ucgetpid::init) */
+} /* end method (ucgetpid::init) */
 
 int ucgetpid::fini() noex {
 	int		rs = SR_OK ;
@@ -224,8 +223,7 @@ int ucgetpid::fini() noex {
 	    finit = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end method (ucgetpid::fini) */
+} /* end method (ucgetpid::fini) */
 
 int ucgetpid::igetpid() noex {
 	int		rs = SR_OK ;
@@ -235,28 +233,23 @@ int ucgetpid::igetpid() noex {
 	    rs = pid ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetpid::igetpid) */
+} /* end subroutine (ucgetpid::igetpid) */
 
-static void ucgetpid_atforkbefore() noex {
+local void ucgetpid_atforkbefore() noex {
 	ucgetpid_data.atforkbefore() ;
-}
-/* end subroutine (ucgetpid_atforkbefore) */
+} /* end subroutine (ucgetpid_atforkbefore) */
 
-static void ucgetpid_atforkparent() noex {
+local void ucgetpid_atforkparent() noex {
 	ucgetpid_data.atforkparent() ;
-}
-/* end subroutine (ucgetpid_atforkparent) */
+} /* end subroutine (ucgetpid_atforkparent) */
 
-static void ucgetpid_atforkchild() noex {
+local void ucgetpid_atforkchild() noex {
 	ucgetpid_data.atforkchild() ;
-}
-/* end subroutine (ucgetpid_atforkchild) */
+} /* end subroutine (ucgetpid_atforkchild) */
 
-static void ucgetpid_exit() noex {
+local void ucgetpid_exit() noex {
 	ucgetpid_data.fini() ;
-}
-/* end subroutine (ucgetpid_exit) */
+} /* end subroutine (ucgetpid_exit) */
 
 namespace libuc {
     ucpider::operator int () noex {
