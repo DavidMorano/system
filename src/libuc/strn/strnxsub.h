@@ -30,7 +30,7 @@ extern char *strnbasesub(cchar *,int,cchar *) noex ;
 extern char *strncasesub(cchar *,int,cchar *) noex ;
 extern char *strnfoldsub(cchar *,int,cchar *) noex ;
 
-static inline char *strnsub(cchar *sp,int sl,cchar *ss) noex {
+local inline char *strnsub(cchar *sp,int sl,cchar *ss) noex {
     	return strnbasesub(sp,sl,ss) ;
 }
 
