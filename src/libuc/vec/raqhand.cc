@@ -303,8 +303,7 @@ consteval int mkoptmask() noex {
 	m |= raqhandm.sorted ;
 	m |= raqhandm.ordered ;
 	return m ;
-}
-/* end subroutine (mkoptmask) */
+} /* end subroutine (mkoptmask) */
 
 local int raqhand_setopts(raqhand *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
@@ -321,8 +320,7 @@ local int raqhand_setopts(raqhand *op,int vo) noex {
 	    if (vo & raqhandm.conserve)		op->fl.oconserve	= true ;
 	} /* end if (valid options) */
 	return rs ;
-}
-/* end subroutine (raqhand_setopts) */
+} /* end subroutine (raqhand_setopts) */
 
 local int raqhand_valid(raqhand *op,int i) noex {
 	int		rs = SR_NOTFOUND ;
@@ -335,7 +333,6 @@ local int raqhand_valid(raqhand *op,int i) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (raqhand_valid) */
+} /* end subroutine (raqhand_valid) */
 
 
