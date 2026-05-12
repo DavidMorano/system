@@ -165,9 +165,6 @@ local int	indexlen(int) noex ;
 local int	indexsize(int) noex ;
 
 
-/* local subroutines */
-
-
 /* local variables */
 
 constexpr int		defents = VECPSTR_DEFENTS ;
@@ -867,8 +864,7 @@ consteval int mkoptmask() noex {
 	m |= vecpstrm.sorted ;
 	m |= vecpstrm.ordered ;
 	return m ;
-}
-/* end subroutine (mkoptmask) */
+} /* end subroutine (mkoptmask) */
 
 local int vecpstr_setopts(vecpstr *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
@@ -885,8 +881,7 @@ local int vecpstr_setopts(vecpstr *op,int vo) noex {
 	    if (vo & vecpstrm.conserve)		op->fl.oconserve	= true ;
 	} /* end if (valid options) */
 	return rs ;
-}
-/* end subroutine (vecpstr_setopts) */
+} /* end subroutine (vecpstr_setopts) */
 
 local int vecpstr_insertsp(vecpstr *op,int ii,cchar *sp) noex {
 	if (ii == op->idx) {
@@ -909,8 +904,7 @@ local int vecpstr_insertsp(vecpstr *op,int ii,cchar *sp) noex {
 	op->cnt += 1 ;
 	op->fl.issorted = false ;
 	return ii ;
-}
-/* end subroutine (vecpstr_insertsp) */
+} /* end subroutine (vecpstr_insertsp) */
 
 local int vecpstr_finchunks(vecpstr *op) noex {
 	vechand		*clp = op->clp ;
@@ -934,8 +928,7 @@ local int vecpstr_finchunks(vecpstr *op) noex {
 	} /* end for */
 	op->chp = nullptr ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecpstr_finchunks) */
+} /* end subroutine (vecpstr_finchunks) */
 
 local int vecpstr_extstr(vecpstr *op,int amount) noex {
 	int		rs = SR_OK ;
@@ -946,8 +939,7 @@ local int vecpstr_extstr(vecpstr *op,int amount) noex {
 	    rs = vecpstr_newchunk(op,amount) ;
 	}
 	return rs ;
-}
-/* end subroutine (vecpstr_extstr) */
+} /* end subroutine (vecpstr_extstr) */
 
 local int vecpstr_newchunk(vecpstr *op,int amount) noex {
 	cint		sz = szof(VPS_CH) ;
@@ -968,8 +960,7 @@ local int vecpstr_newchunk(vecpstr *op,int amount) noex {
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (vecpstr_newchunk) */
+} /* end subroutine (vecpstr_newchunk) */
 
 local int vecpstr_extvec(vecpstr *op,int n) noex {
 	int		rs = SR_OK ;
@@ -996,8 +987,7 @@ local int vecpstr_extvec(vecpstr *op,int n) noex {
 	    }
 	} /* end if (needed) */
 	return rs ;
-}
-/* end subroutine (vecpstr_extvec) */
+} /* end subroutine (vecpstr_extvec) */
 
 local int vecpstr_record(vecpstr *op,cchar *sp) noex {
 	int		rs = SR_OK ;
@@ -1012,8 +1002,7 @@ local int vecpstr_record(vecpstr *op,cchar *sp) noex {
 	    op->cnt += 1 ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecpstr_record) */
+} /* end subroutine (vecpstr_record) */
 
 local int vecpstr_reset(vecpstr *op) noex {
 	op->cnt = 0 ;
@@ -1022,8 +1011,7 @@ local int vecpstr_reset(vecpstr *op) noex {
 	op->fidx = 0 ;
 	op->stsz = 0 ;
 	return SR_OK ;
-}
-/* end subroutine (vecpstr_reset) */
+} /* end subroutine (vecpstr_reset) */
 
 local void vecpstr_arrsort(vecpstr *op,vecpstr_vcmp vcf) noex {
 	cchar		**va = op->va ;
@@ -1031,8 +1019,7 @@ local void vecpstr_arrsort(vecpstr *op,vecpstr_vcmp vcf) noex {
 	csize		esize = sizeof(char *) ;
 	qsort_f		scf = qsort_f(vcf) ;
 	qsort(va,alen,esize,scf) ;
-}
-/* end subroutine (vecpstr_arrsort) */
+} /* end subroutine (vecpstr_arrsort) */
 
 local int vecpstr_validx(vecpstr *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -1040,8 +1027,7 @@ local int vecpstr_validx(vecpstr *op,int i) noex {
 	    rs = ((i >= 0) && (i < op->idx)) ? SR_OK : SR_NOTFOUND ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecpstr_validx) */
+} /* end subroutine (vecpstr_validx) */
 
 local int chunk_start(VPS_CH *chkp,int chsize) noex {
 	int		rs ;
@@ -1054,8 +1040,7 @@ local int chunk_start(VPS_CH *chkp,int chsize) noex {
 	    chkp->tablen = 0 ;
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (chunk_start) */
+} /* end subroutine (chunk_start) */
 
 local int chunk_finish(VPS_CH *chkp) noex {
 	int		rs = SR_OK ;
@@ -1067,13 +1052,11 @@ local int chunk_finish(VPS_CH *chkp) noex {
 	}
 	chkp->tabsize = 0 ;
 	return rs ;
-}
-/* end subroutine (chunk_finish) */
+} /* end subroutine (chunk_finish) */
 
 local int chunk_check(VPS_CH *chkp,int amount) noex {
 	return (amount > (chkp->tabsize - chkp->tablen)) ;
-}
-/* end subroutine (chunk_check) */
+} /* end subroutine (chunk_check) */
 
 local int chunk_add(VPS_CH *chkp,cchar *sp,int sl,cchar **rpp) noex {
 	cint		amount = (sl + 1) ;
@@ -1090,8 +1073,7 @@ local int chunk_add(VPS_CH *chkp,cchar *sp,int sl,cchar **rpp) noex {
 	    rs = SR_BUGCHECK ;
 	}
 	return rs ;
-}
-/* end subroutine (chunk_add) */
+} /* end subroutine (chunk_add) */
 
 local int chunk_addkeyval(VPS_CH *chkp,cc *kp,int kl,cc *vp,int vl,
 		cc **rpp) noex {
@@ -1115,19 +1097,16 @@ local int chunk_addkeyval(VPS_CH *chkp,cc *kp,int kl,cc *vp,int vl,
 	    rs = SR_BUGCHECK ;
 	}
 	return rs ;
-}
-/* end subroutine (chunk_addkeyval) */
+} /* end subroutine (chunk_addkeyval) */
 
 local int indexlen(int n) noex {
 	return nextpowtwo(n) ;
-}
-/* end subroutine (indexlen) */
+} /* end subroutine (indexlen) */
 
 local int indexsize(int il) noex {
 	cint		isize = ((il + 1) * 3 * szof(int)) ;
 	return isize ;
-}
-/* end subroutine (indexsize) */
+} /* end subroutine (indexsize) */
 
 int vecpstr::add(cchar *sp,int sl) noex {
 	return vecpstr_add(this,sp,sl) ;
