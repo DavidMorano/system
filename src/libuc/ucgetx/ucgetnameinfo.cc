@@ -33,7 +33,7 @@
 	sal		SOCDADDR length (address length)
 	hbuf		host-name result buffer pointer
 	hlen		host-name result buffer length (supplied)
-	sbuf		serv-name result buffer pointer
+	sbuf		serv-name result buffer pointer (can be NULL)
 	slen		serv-name result buffer length (supplied)
 	fl		optional request flags
 
@@ -55,6 +55,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include        <errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ucgetx.h"
@@ -85,6 +86,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
+local int std_getnameinfo(con SA *,int,char *,int,char *,int,int) noex ;
+
 
 /* local variables */
 
@@ -96,105 +99,116 @@ import libutil ;			/* |lenstr(3u)| */
 
 int uc_getnameinfo(const SA *sap,int sal,char *hbuf,int hlen,
 		char *sbuf,int slen,int fl) noex {
-	const socklen_t	hbl = socklen_t((hlen > 0) ? (hlen+1) : 0) ;
-	const socklen_t	sbl = socklen_t((slen > 0) ? (slen+1) : 0) ;
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;
-	if (sap && hbuf && sbuf) {
+	int		rl = 0 ; /* return-value */
+	if (sap && hbuf) {
 	    rs = SR_INVALID ;
-	    if (fl >= 0) {
-	        int		to_again = utimeout[uto_again] ;
-	        int		rc ;
-	        bool	f_exit = false ;
+	    if ((sal > 0) && (hlen > 0) && (fl >= 0)) {
+                errtimer	to_mfile	= utimeout[uto_mfile] ;
+                errtimer        to_nfile	= utimeout[uto_nfile] ;
+                errtimer        to_nomem	= utimeout[uto_nomem] ;
+                errtimer        to_nospc	= utimeout[uto_nospc] ;
+                errtimer        to_again	= utimeout[uto_again] ;
+                errtimer        to_busy		= utimeout[uto_busy] ;
+                reterr          r ;
+		cauto		getinfo = std_getnameinfo ;
 	        repeat {
-	            rs = SR_OK ;
-	            errno = 0 ;
-	            rc = getnameinfo(sap,sal,hbuf,hbl,sbuf,sbl,fl) ;
-	            if (rc != 0) {
-	                switch (rc) {
-	                case EAI_ADDRFAMILY:
-	                    rs = SR_AFNOSUPPORT ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_AGAIN:
-	                    if (to_again-- > 0) {
-			        msleep(1000) ;
-		            } else {
-	                        rs = SR_AGAIN ;
-			        f_exit = true ;
-		            }
-	                    break ;
-	                case EAI_BADFLAGS:
-	                    rs = SR_INVALID ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_FAIL:
-	                    rs = SR_FAIL ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_FAMILY:
-	                    rs = SR_PFNOSUPPORT ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_MEMORY:
-	                    rs = SR_NOMEM ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_NODATA:
-	                    rs = SR_NODATA ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_NONAME:
-	                    rs = SR_NOTFOUND ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_SERVICE:
-	                    rs = SR_ADDRNOTAVAIL ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_SOCKTYPE:
-	                    rs = SR_SOCKTNOSUPPORT ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_SYSTEM:
-	                    rs = (- errno) ;
-	                    switch (rs) {
-	                    case SR_AGAIN:
-	                        if (to_again-- > 0) {
-			            msleep(1000) ;
-			        } else {
-			            f_exit = true ;
-			        }
-	                        break ;
-		            default:
-			        f_exit = true ;
-			        break ;
-	                    } /* end switch */
-	                    break ;
-	                case EAI_BADHINTS:
-	                    rs = SR_INVALID ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_PROTOCOL:
-	                    rs = SR_PROTONOSUPPORT ;
-		            f_exit = true ;
-	                    break ;
-	                case EAI_OVERFLOW:
-	                    rs = SR_OVERFLOW ;
-		            f_exit = true ;
-	                    break ;
-	                default:
-	                    rs = SR_NOANODE ;
-		            f_exit = true ;
-		            break ;
-	                } /* end switch */
-	            } /* end if (some sort of error condition) */
-	        } until ((rs >= 0) || f_exit) ;
-	        rs = lenstr(hbuf,hlen) ;
+		    if ((rs = getinfo(sap,sal,hbuf,hlen,sbuf,slen,fl)) < 0) {
+                        r(rs) ;                 /* <- default causes exit */
+			switch (rs) {
+                        case SR_MFILE:
+                            r = to_mfile(rs) ;
+                            break ;
+                        case SR_NFILE:
+                            r = to_nfile(rs) ;
+                            break ;
+                        case SR_NOMEM:
+                            r = to_nomem(rs) ;
+                            break ;
+                        case SR_NOSPC:
+                            r = to_nospc(rs) ;
+                            break ;
+                        case SR_AGAIN:
+                            r = to_again(rs) ;
+                            break ;
+                        case SR_BUSY:
+                            r = to_busy(rs) ;
+                            break ;
+                        case SR_INTR:
+                            r(false) ;
+                            break ;
+                        } /* end switch */
+                        rs = r ;
+		    } /* end if (error) */
+	        } until ((rs >= 0) || r.fexit) ;
+	        if (rs >= 0) {
+		    rl = lenstr(hbuf,hlen) ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (uc_getnameinfo) */
+
+
+/* local subroutines */
+
+local int std_getnameinfo(con SA *sap,int sal,char *hbuf,int hlen,
+		char *sbuf,int slen,int fl) noex {
+	const socklen_t	hbl = socklen_t((hlen > 0) ? (hlen+1) : 0) ;
+	const socklen_t	sbl = socklen_t((slen > 0) ? (slen+1) : 0) ;
+	int		rs = SR_OK ;
+	errno = 0 ;
+	if (int rc = getnameinfo(sap,sal,hbuf,hbl,sbuf,sbl,fl) ; rc) {
+            switch (rc) {
+            case EAI_ADDRFAMILY:
+                rs = SR_AFNOSUPPORT ;
+                break ;
+            case EAI_AGAIN:
+                rs = SR_AGAIN ;
+                break ;
+            case EAI_BADFLAGS:
+                rs = SR_INVALID ;
+                break ;
+            case EAI_FAIL:
+                rs = SR_FAIL ;
+                break ;
+            case EAI_FAMILY:
+                rs = SR_PFNOSUPPORT ;
+                break ;
+            case EAI_MEMORY:
+                rs = SR_NOMEM ;
+                break ;
+            case EAI_NODATA:
+                rs = SR_NODATA ;
+                break ;
+            case EAI_NONAME:
+                rs = SR_NOTFOUND ;
+                break ;
+            case EAI_SERVICE:
+                rs = SR_ADDRNOTAVAIL ;
+                break ;
+            case EAI_SOCKTYPE:
+                rs = SR_SOCKTNOSUPPORT ;
+                break ;
+            case EAI_SYSTEM:
+                rs = (- errno) ;
+                break ;
+            case EAI_BADHINTS:
+                rs = SR_INVALID ;
+                break ;
+            case EAI_PROTOCOL:
+                rs = SR_PROTONOSUPPORT ;
+                break ;
+            case EAI_OVERFLOW:
+                rs = SR_OVERFLOW ;
+                break ;
+            default:
+                rs = SR_NOANODE ;
+                break ;
+            } /* end switch */
+	} /* end if (error) */
+	return rs ;
+} /* end subroutine (std_getnameinfo) */
 
 
