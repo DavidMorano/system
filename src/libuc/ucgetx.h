@@ -25,33 +25,28 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 
+#include	<ucgethost.h>
+#include	<ucgetipnodeby.h>
 #include	<ucgetloadavg.h>
+#include	<ucgetnetname.h>
 #include	<ucgetpid.h>
 #include	<ucgetrandom.h>
-#include	<ucgethost.h>
-#include	<ucgetnetname.h>
 
 
 EXTERNC_begin
 
-extern int	uc_getdefproj(PROJECT *,char *,int,cchar *) noex ;
-extern int	uc_gethostid(ulong *) noex ;
-extern int	uc_gethostname(char *,int) noex ;
-extern int	uc_getarchitecture(char *,int) noex ;
-extern int	uc_getnisdomain(char *,int) noex ;
-extern int	uc_getloadavg(double *,int) noex ;
-extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
-
-/* NETWORK IPNODE database */
-extern int	uc_getipnodebyname(HOSTENT **,cchar *,int,int) noex ;
-extern int	uc_getipnodebyaddr(HOSTENT **,cvoid *,int,int) noex ;
-
-extern int	uc_getcwd(char *,int) noex ;
-extern int	uc_getauid() noex ;
-extern int	uc_getpriority(int,id_t,int *) noex ;
-extern int	uc_getpuid(pid_t) noex ;
-
-extern int	uc_getrusage(int,RUSAGE *) noex ;
+extern int	uc_getarch	(char *,int)			noex ;
+extern int	uc_getauid	()				noex ;
+extern int	uc_getcwd	(char *,int)			noex ;
+extern int	uc_gethostid	(ulong *)			noex ;
+extern int	uc_gethostname	(char *,int)			noex ;
+extern int	uc_getloadavg	(double *,int)			noex ;
+extern int	uc_getnisdomain	(char *,int)			noex ;
+extern int	uc_getpriority	(int,id_t,int *)		noex ;
+extern int	uc_getprojdef	(PROJECT *,char *,int,cchar *)	noex ;
+extern int	uc_getpuid	(pid_t)				noex ;
+extern int	uc_getrusage	(int,RUSAGE *)			noex ;
+extern int	uc_gettimeofday	(TIMEVAL *,void *)		noex ;
 
 /* NETWORK SOCKADDR combined database */
 extern int	uc_getnameinfo(CSOCKADDR *,int,char *,int,char *,int,int) noex ;
@@ -59,9 +54,6 @@ extern int	uc_getnameinfo(CSOCKADDR *,int,char *,int,char *,int,int) noex ;
 /* why was this missing? */
 extern int	uc_getlogin(char *,int) noex ;
 
-local inline int uc_getarch(char *rb,int rl) noex {
-    	return uc_getarchitecture(rb,rl) ;
-}
 
 EXTERNC_end
 
