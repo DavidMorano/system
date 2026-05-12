@@ -461,8 +461,7 @@ constexpr int mkoptmask() noex {
 	m |= recarrm.sorted ;
 	m |= recarrm.ordered ;
 	return m ;
-}
-/* end subroutine (mkoptmask) */
+} /* end subroutine (mkoptmask) */
 
 local int recarr_setopts(recarr *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
@@ -479,8 +478,7 @@ local int recarr_setopts(recarr *op,int vo) noex {
 	    if (vo & recarrm.conserve)		op->fl.oconserve	= true ;
 	} /* end if (valid options) */
 	return rs ;
-}
-/* end subroutine (recarr_setopts) */
+} /* end subroutine (recarr_setopts) */
 
 local int recarr_extend(recarr *op,int n) noex {
 	int		rs = SR_OK ;
@@ -505,7 +503,6 @@ local int recarr_extend(recarr *op,int n) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (recarr_extend) */
+} /* end subroutine (recarr_extend) */
 
 
