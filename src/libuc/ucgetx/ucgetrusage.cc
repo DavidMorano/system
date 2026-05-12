@@ -34,6 +34,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include        <errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ucgetx.h"
@@ -53,6 +54,8 @@
 
 /* forward references */
 
+local int	std_getrusage(int,RUSAGE *) noex ;
+
 
 /* local variables */
 
@@ -63,32 +66,55 @@
 /* exported subroutines */
 
 int uc_getrusage(int who,RUSAGE *rp) noex {
+	errtimer        to_mfile	= utimeout[uto_mfile] ;
+	errtimer        to_nfile	= utimeout[uto_nfile] ;
+	errtimer        to_nomem	= utimeout[uto_nomem] ;
+	errtimer        to_nospc	= utimeout[uto_nospc] ;
+	errtimer        to_again	= utimeout[uto_again] ;
+	errtimer        to_busy		= utimeout[uto_busy] ;
+	reterr          r ;
 	int		rs ;
-	int		to_again = utimeout[uto_again] ;
-	bool		f_exit = false ;
 	repeat {
-	    if ((rs = getrusage(who,rp)) < 0) {
-		rs = (- errno) ;
-	    }
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_AGAIN:
-		    if (to_again-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-		    break ;
-	        case SR_INTR:
-		    break ;
-		default:
-		    f_exit = true ;
-		    break ;
-	        } /* end switch */
+	    if ((rs = std_getrusage(who,rp)) < 0) {
+                r(rs) ;                 /* <- default causes exit */
+                switch (rs) {
+                case SR_MFILE:
+                    r = to_mfile(rs) ;
+                    break ;
+                case SR_NFILE:
+                    r = to_nfile(rs) ;
+                    break ;
+                case SR_NOMEM:
+                    r = to_nomem(rs) ;
+                    break ;
+                case SR_NOSPC:
+                    r = to_nospc(rs) ;
+                    break ;
+                case SR_AGAIN:
+                    r = to_again(rs) ;
+                    break ;
+                case SR_BUSY:
+                    r = to_busy(rs) ;
+                    break ;
+                case SR_INTR:
+                    r(false) ;
+                    break ;
+                } /* end switch */
+                rs = r ;
 	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (uc_getrusage) */
+} /* end subroutine (uc_getrusage) */
+
+
+/* local subroutines */
+
+local int std_getrusage(int who,RUSAGE *rp) noex {
+    	int		rs ;
+	if ((rs = getrusage(who,rp)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+} /* end subroutine (std_getrusage) */
 
 
