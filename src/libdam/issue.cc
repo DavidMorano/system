@@ -52,8 +52,8 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<ucread.h>
-#include	<ucwrite.h>
+#include	<ucdescread.h>
+#include	<ucdescwrite.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
 #include	<getusername.h>
