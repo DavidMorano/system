@@ -89,7 +89,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::destroy_at ;			/* subroutine */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
