@@ -29,7 +29,7 @@
 #define	FSI_INCLUDE
 
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<fifostr.h>
