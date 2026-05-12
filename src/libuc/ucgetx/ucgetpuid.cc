@@ -60,7 +60,7 @@
 
 #pragma		GCC dependency		"mod/uconstants.ccm"
 
-import uconstants ;
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -84,7 +84,7 @@ import uconstants ;
 
 /* forward references */
 
-static int	mkpidfname(char *,cchar *,pid_t) noex ;
+local int	mkpidfname(char *,cchar *,pid_t) noex ;
 
 
 /* local variables */
@@ -98,18 +98,17 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 /* exported subroutines */
 
 int uc_getpuid(pid_t pid) noex {
+	cint		nrs = SR_NOENT ;
 	int		rs = SR_INVALID ;
 	int		rs1 ;
-	int		r = 0 ;
+	int		r = 0 ; /* return-value */
 	if (pid >= 0) {
 	    uid_t	uid = 0 ;
 	    if (pid > 0) {
 	        if (char *pidfname ; (rs = lm_mp(&pidfname)) >= 0) {
 	            cchar	*pd = sysword.w_procdir ;
 	            if ((rs = mkpidfname(pidfname,pd,pid)) >= 0) {
-	                USTAT	sb ;
-		        cint	nrs = SR_NOENT ;
-	                if ((rs = u_stat(pidfname,&sb)) == nrs) {
+	                if (ustat sb ; (rs = u_stat(pidfname,&sb)) == nrs) {
 		            if ((rs = u_stat(pd,&sb)) >= 0) {
 		                rs = SR_SRCH ;
 		            } else if (rs == nrs) {
@@ -125,7 +124,7 @@ int uc_getpuid(pid_t pid) noex {
 	    } else if (pid == 0) {
 	        uid = getuid() ;
 	    }
-	    r = int(uid & INT_MAX) ;
+	    r = intsat(uid) ;
 	} /* end if (valid PID) */
 	return (rs >= 0) ? r : rs ;
 }
@@ -134,7 +133,7 @@ int uc_getpuid(pid_t pid) noex {
 
 /* local subroutines */
 
-static int mkpidfname(char *fname,cchar *dev,pid_t pid) noex {
+local int mkpidfname(char *fname,cchar *dev,pid_t pid) noex {
 	int		rs  ;
 	int		i = 0 ;
 	if ((rs = maxpathlen) >= 0) {
@@ -151,10 +150,9 @@ static int mkpidfname(char *fname,cchar *dev,pid_t pid) noex {
 	        cint	v = pid ;
 	        rs = storebuf_deci(fname,flen,i,v) ;
 	        i += rs ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mkpidfname) */
+} /* end subroutine (mkpidfname) */
 
 
