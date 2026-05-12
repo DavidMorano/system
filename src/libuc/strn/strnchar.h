@@ -35,16 +35,16 @@ extern char *strndigex(cchar *,int) noex ;
 extern char *strnoctal(cchar *,int) noex ;
 extern char *strnblank(cchar *,int) noex ;
 
-static inline char *strndig(cchar *sp,int sl) noex {
+local inline char *strndig(cchar *sp,int sl) noex {
 	return strndigit(sp,sl) ;
 }
-static inline char *strnoct(cchar *sp,int sl) noex {
+local inline char *strnoct(cchar *sp,int sl) noex {
 	return strnoctal(sp,sl) ;
 }
-static inline char *strndec(cchar *sp,int sl) noex {
+local inline char *strndec(cchar *sp,int sl) noex {
 	return strndigit(sp,sl) ;
 }
-static inline char *strnhex(cchar *sp,int sl) noex {
+local inline char *strnhex(cchar *sp,int sl) noex {
 	return strndigex(sp,sl) ;
 }
 
