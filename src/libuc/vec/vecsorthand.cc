@@ -316,8 +316,7 @@ local int vecsorthand_extend(vecsorthand *op) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (vecsorthand_extend) */
+} /* end subroutine (vecsorthand_extend) */
 
 int vecsorthand::start(cmp_f cf,int vn) noex {
 	return vecsorthand_start(this,cf,vn) ;
