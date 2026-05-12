@@ -36,8 +36,6 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |strwcpy(3u)| */
 #include	<ulogerror.h>		/* LIBU */
-#include	<six.h>			/* LIBUC */
-#include	<getourenv.h>		/* LIBUC */
 #include	<shellunder.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -54,6 +52,7 @@ import ureserve ;			/* |sfbasename(3u)| */
 
 /* imported namespaces */
 
+using libu::sirchr ;			/* subroutine */
 using libu::strwcpy ;			/* subroutine */
 
 
@@ -88,6 +87,8 @@ prognamevar::prognamevar(int argc,cmv argv,cmv envv) noex {
 	    if (proc(argv[0]) == false) {
 		procenv(envv) ;
 	    }
+	} else {
+	    procenv(envv) ;
 	}
 } /* end ctor (prognamevar) */
 
@@ -120,12 +121,12 @@ ccharp prognamevar::operator () (cchar *ap,int al) noex {
 	if (as) {
 	    delete [] as ;
 	    as = nullptr ;
-	}
+	} /* end if (memory-release) */
 	proc(ap,al) ;
 	return operator ccharp () ;
 } /* end method (prognamevar::operator) */
 
-ccharp prognamevar::operator () (strview &sv) noex {
+ccharp prognamevar::operator () (const strview &sv) noex {
 	cchar	*ap = sv.data() ;
 	cint	al = (int) sv.length() ;
 	return operator () (ap,al) ;
@@ -141,7 +142,7 @@ prognamevar::operator ccharp () noex {
 		    if ((as = new(nt) char[sl + 1]) != np) {
 			strwcpy(as,sp,sl) ;
 			rp = as ;
-		    } else {
+		    } else { /* (memory-acquire) */
 			cint rsnomem = SR_NOMEM ;
 			ulogerror("prognamevar",rsnomem,"mem-alloc failure") ;
 			rp = "«mem-alloc-failure»" ;
@@ -159,7 +160,7 @@ void prognamevar::dtor() noex {
 	if (as) {
 	    delete [] as ;
 	    as = nullptr ;
-	}
+	} /* end if (memory-release) */
 } /* end method (prognamevar::dtor) */
 
 bool prognamevar::proc(cchar *pp,int pl) noex {
@@ -178,6 +179,7 @@ bool prognamevar::proc(cchar *pp,int pl) noex {
 
 bool prognamevar::procenv(con mainv envv) noex {
     	bool		f = false ;
+	sp = buf ;
 	if (envv) {
 	    if (cchar *valp = getourenv(envv,"_") ; valp) {
 		int rs{} ;
