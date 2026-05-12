@@ -40,12 +40,12 @@ MODS=
 LIBS +=
 
 
-OBJ0= ucgetarchitecture.o ucgetcwd.o ucgethost.o
+OBJ0= ucgetarch.o ucgetcwd.o ucgethost.o
 OBJ1= ucgethostname.o ucgetipnodeby.o ucgetloadavg.o
 OBJ2= ucgetlogin.o ucgetnameinfo.o ucgetnisdomain.o
 OBJ3= ucgetpid.o ucgetpuid.o ucgetrandom.o
 OBJ4= ucgetrusage.o ucgetsocktype.o ucgetnetname.o
-OBJ5= ucgetauid.o ucgetdefproj.o ucgetpriority.o
+OBJ5= ucgetauid.o ucgetprojdef.o ucgetpriority.o
 OBJ6=
 OBJ7=
 
@@ -148,10 +148,10 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ucgetarchitecture.o:	ucgetarchitecture.cc			$(INCS)
+ucgetarch.o:		ucgetarch.cc				$(INCS)
 ucgetauid.o:		ucgetauid.cc				$(INCS)
 ucgetcwd.o:		ucgetcwd.cc				$(INCS)
-ucgetdefproj.o:		ucgetdefproj.cc				$(INCS)
+ucgetprojdef.o:		ucgetprojdef.cc				$(INCS)
 ucgethost.o:		ucgethost.cc		ucgethost.h	$(INCS)
 ucgethostname.o:	ucgethostname.cc			$(INCS)
 ucgetipnodeby.o:	ucgetipnodeby.cc			$(INCS)
