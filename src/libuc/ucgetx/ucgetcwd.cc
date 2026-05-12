@@ -68,16 +68,16 @@ import usysbasic ;
 
 namespace {
     struct ucgetcwd ;
-    typedef int (ucgetcwd::*mem_m)() noex ;
+    typedef int (ucgetcwd::*ucgetcwd_m)() noex ;
     struct ucgetcwd {
-	mem_m		m ;
+	ucgetcwd_m	m ;
 	char		*cwbuf ;
 	int		cwlen ;
 	ucgetcwd(char *b,int l) noex : cwbuf(b), cwlen(l) { } ;
 	int stdgetcwd() noex ;
 	operator int () noex ;
     } ; /* end struct (ucgetcwd) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -112,20 +112,24 @@ int uc_getcwd(char *cwbuf,int cwlen) noex {
 /* local subroutines */
 
 ucgetcwd::operator int () noex {
-	errtimer	to_again = utimeout[uto_again] ;
-	errtimer	to_nomem = utimeout[uto_nomem] ;
+	errtimer	to_nomem	= utimeout[uto_nomem] ;
+	errtimer	to_again	= utimeout[uto_again] ;
+	errtimer	to_busy		= utimeout[uto_busy] ;
 	reterr		r ;
 	int		rs ;
 	repeat {
             if ((rs = (this->*m)()) < 0) {
 		r(rs) ;
                 switch (rs) {
-                case SR_AGAIN:
-		    r = to_again(rs) ;
-                    break ;
                 case SR_NOMEM:
 		    r = to_nomem(rs) ;
 		    break ;
+                case SR_AGAIN:
+		    r = to_again(rs) ;
+                    break ;
+                case SR_BUSY:
+		    r = to_busy(rs) ;
+                    break ;
                 case SR_INTR:
 		    r(false) ;
                     break ;
@@ -134,8 +138,7 @@ ucgetcwd::operator int () noex {
             } /* end if (error) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (ucgetcwd::operator) */
+} /* end subroutine (ucgetcwd::operator) */
 
 int ucgetcwd::stdgetcwd() noex {
 	int		rs ;
@@ -145,7 +148,6 @@ int ucgetcwd::stdgetcwd() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ucgetcwd::stdgetcwd) */
+} /* end method (ucgetcwd::stdgetcwd) */
 
 
