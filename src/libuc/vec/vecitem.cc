@@ -473,8 +473,7 @@ consteval int mkoptmask() noex {
 	m |= vecitemm.sorted ;
 	m |= vecitemm.ordered ;
 	return m ;
-}
-/* end subroutine (mkoptmask) */
+} /* end subroutine (mkoptmask) */
 
 local int vecitem_setopts(vecitem *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
@@ -491,8 +490,7 @@ local int vecitem_setopts(vecitem *op,int vo) noex {
 	    if (vo & vecitemm.conserve)		op->fl.oconserve	= true ;
 	} /* end if (valid options) */
 	return rs ;
-}
-/* end subroutine (vecitem_setopts) */
+} /* end subroutine (vecitem_setopts) */
 
 local int vecitem_extend(vecitem *op) noex {
 	int		rs = SR_OK ;
@@ -517,8 +515,7 @@ local int vecitem_extend(vecitem *op) noex {
 	    }
 	} /* end if (extension required) */
 	return rs ;
-}
-/* end subroutine (vecitem_extend) */
+} /* end subroutine (vecitem_extend) */
 
 local int vecitem_iget(vecitem *op,int i,void **gpp) noex {
 	int		rs = SR_FAULT ;
@@ -531,8 +528,7 @@ local int vecitem_iget(vecitem *op,int i,void **gpp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecitem_iget) */
+} /* end subroutine (vecitem_iget) */
 
 local int vecitem_fetchbeg(vecitem *op,fetchargs *ap) noex {
 	int		rs ;
@@ -569,8 +565,7 @@ local int vecitem_fetchbeg(vecitem *op,fetchargs *ap) noex {
 	    curp->c = 1 ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecitem_fetchbeg) */
+} /* end subroutine (vecitem_fetchbeg) */
 
 local int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
 	int		rs = SR_OK ;
@@ -645,8 +640,7 @@ local int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
             if (rpp) *rpp = tep ;
         }
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecitem_fetchcont) */
+} /* end subroutine (vecitem_fetchcont) */
 
 int vecitem::start(int an,int ao) noex {
 	return vecitem_start(this,an,ao) ;
