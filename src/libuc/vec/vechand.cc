@@ -83,9 +83,6 @@ local int	vechand_extend(vechand *) noex ;
 local int	vechand_validx(vechand *,int) noex ;
 
 
-/* local subroutines */
-
-
 /* local variables */
 
 cint			defents = VECHAND_DEFENTS ;
@@ -466,8 +463,7 @@ local int vechand_ctor(vechand *op) noex {
 	    op->fi = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (vechand_ctor) */
+} /* end subroutine (vechand_ctor) */
 
 consteval int mkoptmask() noex {
 	int		m = 0 ;
@@ -479,8 +475,7 @@ consteval int mkoptmask() noex {
 	m |= vechandm.sorted ;
 	m |= vechandm.ordered ;
 	return m ;
-}
-/* end subroutine (mkoptmask) */
+} /* end subroutine (mkoptmask) */
 
 local int vechand_setopts(vechand *op,int vo) noex {
     	constexpr int	optmask = mkoptmask() ;
@@ -497,8 +492,7 @@ local int vechand_setopts(vechand *op,int vo) noex {
 	    if (vo & vechandm.conserve)		op->fl.oconserve 	= true ;
 	} /* end if (valid options) */
 	return rs ;
-}
-/* end subroutine (vechand_setopts) */
+} /* end subroutine (vechand_setopts) */
 
 local int vechand_extend(vechand *op) noex {
 	int		rs = SR_OK ;
@@ -523,13 +517,11 @@ local int vechand_extend(vechand *op) noex {
 	    }
 	} /* end if (extension required) */
 	return rs ;
-}
-/* end subroutine (vechand_extend) */
+} /* end subroutine (vechand_extend) */
 
 local int vechand_validx(vechand *op,int i) noex {
 	return ((i >= 0) && (i < op->i)) ? SR_OK : SR_NOENT ;
-}
-/* end subroutine (vechand_validx) */
+} /* end subroutine (vechand_validx) */
 
 int vechand::start(int an,int ao) noex {
 	return vechand_start(this,an,ao) ;
