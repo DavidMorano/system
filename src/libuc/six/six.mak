@@ -155,7 +155,7 @@ obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-sifext.o:		sifext.cc sifext.h		$(INCS)
+sifext.o:		sifext.cc	sifext.h	$(INCS)
 sibasename.o:		sibasename.cc			$(INCS)
 sicite.o:		sicite.cc			$(INCS)
 sidquote.o:		sidquote.cc			$(INCS)
