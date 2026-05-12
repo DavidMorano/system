@@ -24,11 +24,11 @@
 	Description:
 	This subroutine gets the system load averages as double-floats!
 	This is pretty much totally contrary to how they have ever
-	been gotten before on any platform! Yes, the load averages
+	been gotten before on any platform!  Yes, the load averages
 	are still just 32-bit integer quantities inside the kernel
-	but the stupid new interface specified that the averages
-	should be returned as double-floats. Yes, it is stupid but
-	that is the way it works with these stupid interfaces!
+	but the new interface specified that the averages should
+	be returned as double-floats.  That is the way it works
+	with these interfaces!
 
 *******************************************************************************/
 
