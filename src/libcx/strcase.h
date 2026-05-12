@@ -18,7 +18,7 @@
 #ifndef STRCASE_INCLUDE
 #define	STRCASE_INCLUDE
 
-#include	<envstandards.h>	/* order first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
