@@ -179,6 +179,7 @@ int vecstrx::envget(cchar *kp,cchar **rpp) noex {
 
 local int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		f_added = false ;
 	if (sl < 0) sl = lenstr(sp) ;
@@ -223,7 +224,6 @@ local int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
 			}
 	            } /* end if */
 	            if (rs >= 0) {
-		        cint	rsn = SR_NOTFOUND ;
 			auto	vs = vstrkeycmp ;
 	                if ((rs = op->finder(kp,vs,np)) == rsn) {
 	                    f_added = true ;
@@ -238,7 +238,6 @@ local int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
 	    } /* end if (had a value even if NUL) */
 	} /* end if (non-zero string) */
 	return (rs >= 0) ? f_added : rs ;
-}
-/* end subroutine (vecstrx_addwithin) */
+} /* end subroutine (vecstrx_addwithin) */
 
 
