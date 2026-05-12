@@ -29,11 +29,11 @@ EXTERNC_begin
 extern char *strnobrk(cchar *,int,cchar *) noex ;
 extern char *strnrbrk(cchar *,int,cchar *) noex ;
 
-static inline char *strnbrk(cchar *sp,int sl,cchar *ss) noex {
+local inline char *strnbrk(cchar *sp,int sl,cchar *ss) noex {
 	return strnobrk(sp,sl,ss) ;
 }
 
-static inline char *strnpbrk(cchar *sp,int sl,cchar *ss) noex {
+local inline char *strnpbrk(cchar *sp,int sl,cchar *ss) noex {
 	return strnobrk(sp,sl,ss) ;
 }
 
