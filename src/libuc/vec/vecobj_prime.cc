@@ -75,9 +75,6 @@ local int	vecobj_iget(vecobj *,int,void **) noex ;
 local int	vecobj_sorted(vecobj *,vecobj_vcf) noex ;
 
 
-/* local subroutines */
-
-
 /* local variables */
 
 cint			defents = VECOBJ_DEFENTS ;
@@ -657,8 +654,7 @@ local int vecobj_ctor(vecobj *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_ctor) */
+} /* end subroutine (vecobj_ctor) */
 
 local int vecobj_dtor(vecobj *op) noex {
 	int		rs = SR_OK ;
@@ -680,8 +676,7 @@ consteval int mkoptmask() noex {
 	m |= vecobjm.sorted ;
 	m |= vecobjm.ordered ;
 	return m ;
-}
-/* end subroutine (mkoptmask) */
+} /* end subroutine (mkoptmask) */
 
 local int vecobj_setopts(vecobj *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
@@ -698,8 +693,7 @@ local int vecobj_setopts(vecobj *op,int vo) noex {
 	    if (vo & vecobjm.conserve)		op->fl.oconserve = true ;
 	} /* end if (valid options) */
 	return rs ;
-}
-/* end subroutine (vecobj_setopts) */
+} /* end subroutine (vecobj_setopts) */
 
 local int vecobj_extend(vecobj *op) noex {
 	int		rs = SR_OK ;
@@ -724,8 +718,7 @@ local int vecobj_extend(vecobj *op) noex {
 	    }
 	} /* end if (extension required) */
 	return rs ;
-}
-/* end subroutine (vecobj_extend) */
+} /* end subroutine (vecobj_extend) */
 
 local int vecobj_iget(vecobj *op,int i,void **rpp) noex {
 	int		rs = SR_NOTFOUND ;
@@ -736,8 +729,7 @@ local int vecobj_iget(vecobj *op,int i,void **rpp) noex {
 	    *rpp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (vecobj_iget) */
+} /* end subroutine (vecobj_iget) */
 
 local int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
 	int		rs = SR_OK ;
@@ -753,8 +745,7 @@ local int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
 	    }
 	} /* end if (sorting) */
 	return (rs >= 0) ? fsorted : rs ;
-}
-/* end subroutine (vecobj_sorted) */
+} /* end subroutine (vecobj_sorted) */
 
 int sub_fetch::first(cur *curp) noex {
 	int		rs ;
@@ -781,8 +772,7 @@ int sub_fetch::first(cur *curp) noex {
 	    if (rpp) *rpp = rep ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end method (sub_fetch::first) */
+} /* end method (sub_fetch::first) */
 
 int sub_fetch::next(cur *curp) noex {
 	int		rs ;
@@ -800,8 +790,7 @@ int sub_fetch::next(cur *curp) noex {
 	    if (rpp) *rpp = rep ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end method (sub_fetch::next) */
+} /* end method (sub_fetch::next) */
 
 int vecobj::start(int osz,int vn,int vo) noex {
 	return vecobj_start(this,osz,vn,vo) ;
