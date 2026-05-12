@@ -89,8 +89,8 @@ namespace {
 
 /* forward references */
 
-static int	nlspeername_unix(char *,cchar *,cchar *,int) noex ;
-static int	nlspeername_inet4(char *,cchar *,cchar *,int) noex ;
+local int	nlspeername_unix(char *,cchar *,cchar *,int) noex ;
+local int	nlspeername_inet4(char *,cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -135,7 +135,7 @@ int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 
 /* local subroutines */
 
-static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
+local int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
 	cint		nlen = var.maxhostlen ;
 	cint		adv = 4 ;
 	int		rs = SR_OK ;
@@ -153,7 +153,7 @@ static int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
 }
 /* end subroutine (nlspeername_unix) */
 
-static int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
+local int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	uint		uv ;
 	cint		adv = 8 ;
 	int		rs ;
