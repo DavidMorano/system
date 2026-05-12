@@ -39,7 +39,6 @@
 #include	<usysbase.h>
 #include	<usysutility.hh>	/* |ugetrandom(3u)| */
 #include	<usysflag.h>
-#include	<usys.h>		/* |getrandom(3u)| */
 #include	<localmisc.h>
 
 #include	"ucgetrandom.h"
@@ -72,6 +71,8 @@ using libu::ugetrandom ;		/* subroutine */
 
 /* local variables */
 
+csize		maxget = 256 ;		/* |getrandom| maximum to get */
+
 
 /* exported variables */
 
@@ -98,17 +99,16 @@ int uc_getrandom(void *rbuf,int rlen,uint fl) noex {
 int uc_getentropy(void *vbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (vbuf) {
-	    int c = 0 ;
 	    char *rbuf = cast_static<charp>(vbuf) ;
 	    rs = SR_OK ;
 	    rbuf[0] = '\0' ;
 	    if (rlen > 0) {
-		csize maxget = 256 ;
+	        int rl = 0 ;
 		for (size_t rem = size_t(rlen) ; rem > 0 ; ) {
-		    size_t msz = min(rem,maxget) ;
-	            if ((rs = getentropy((rbuf + c),msz)) >= 0) {
-			rem -= msz ;
-			c += intconv(msz) ;
+		    csize msize = min(rem,maxget) ;
+	            if ((rs = getentropy((rbuf + rl),msize)) >= 0) {
+			rem -= msize ;
+			rl += intconv(msize) ;
 		    } else {
 		        rs = (- errno) ;
 		    }
