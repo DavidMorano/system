@@ -52,7 +52,7 @@ extern char *strnwht(cchar *,int) noex ;
 extern char *strnwhtchr(cchar *,int,int) noex ;
 extern char *strnwhtbrk(cchar *,int,cchar *) noex ;
 
-static inline char *strnwhite(cchar *sp,int sl) noex {
+local inline char *strnwhite(cchar *sp,int sl) noex {
 	return strnwht(sp,sl) ;
 }
 
