@@ -497,8 +497,7 @@ consteval int mkoptmask() noex {
 	m |= veclongm.sorted ;
 	m |= veclongm.ordered ;
 	return m ;
-}
-/* end subroutine (mkoptmask) */
+} /* end subroutine (mkoptmask) */
 
 local int veclong_setopts(veclong *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
@@ -515,8 +514,7 @@ local int veclong_setopts(veclong *op,int vo) noex {
 	    if (vo & veclongm.conserve)		op->fl.oconserve = true ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (veclong_setopts) */
+} /* end subroutine (veclong_setopts) */
 
 local int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 	int		rs = SR_OK ;
@@ -556,8 +554,7 @@ local int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 	    op->fl.issorted = false ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (veclong_addval) */
+} /* end subroutine (veclong_addval) */
 
 local int veclong_extend(veclong *op,int amount) noex {
 	int		rs = SR_OK ;
@@ -582,8 +579,7 @@ local int veclong_extend(veclong *op,int amount) noex {
 	    }
 	} /* end if (needed) */
 	return rs ;
-}
-/* end subroutine (veclong_extend) */
+} /* end subroutine (veclong_extend) */
 
 local int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val) noex {
 	if (ii < op->i) ylikely {
@@ -609,8 +605,7 @@ local int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val) noex {
 	op->c += 1 ;
 	op->fl.issorted = false ;
 	return ii ;
-}
-/* end subroutine (veclong_insertval) */
+} /* end subroutine (veclong_insertval) */
 
 local int veclong_extrange(veclong *op,int n) noex {
 	if (n > op->i) {
@@ -620,13 +615,11 @@ local int veclong_extrange(veclong *op,int n) noex {
 	    op->va[op->i] = VECLONG_MIN ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (veclong_extrange) */
+} /* end subroutine (veclong_extrange) */
 
 local int deftypecmp(const VECLONG_TYPE *l1p,const VECLONG_TYPE *l2p) noex {
 	return intsat(*l1p - *l2p) ;
-}
-/* end subroutine (deftypecmp) */
+} /* end subroutine (deftypecmp) */
 
 int veclong_st::operator () (int vn,int vo) noex {
     	int		rs = SR_BUGCHECK ;
@@ -753,8 +746,7 @@ bool veclong_iter::operator != (const veclong_iter &oit) noex {
 	    f = (i < oit.i) ;
 	}
 	return f ;
-}
-/* end method (veclong_iter::operator) */
+} /* end method (veclong_iter::operator) */
 
 veclong_iter veclong_iter::operator + (int n) const noex {
 	veclong_iter	rit(va,i,i) ;
