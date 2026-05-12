@@ -59,6 +59,7 @@
 #include	<ucdescread.h>
 #include	<ucdescwrite.h>
 #include	<ucdescsock.h>
+#include	<ucdesclock.h>
 #include	<ucclose.h>
 
 
