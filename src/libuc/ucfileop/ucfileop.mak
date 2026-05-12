@@ -44,7 +44,7 @@ OBJ0= prefixfn.o
 OBJ1= ucchown.o ucfiletimes.o
 OBJ2= uclink.o uclstat.o ucpathconf.o
 OBJ3= ucreadlink.o ucstat.o
-OBJ4= ucstatvfs.o ucaccess.o
+OBJ4= ucstatvfs.o ucaccess.o ucmkfifo.o
 OBJ5= ucresolvepath.o ucrealpath.o
 OBJ6= ucunlink.o ucremove.o uctruncate.o
 OBJ7= ucmkdir.o ucrmdir.o ucfilemode.o
@@ -169,5 +169,6 @@ ucstatvfs.o:		ucstatvfs.cc				$(INCS)
 ucsymlink.o:		ucsymlink.cc				$(INCS)
 ucunlink.o:		ucunlink.cc				$(INCS)
 uctruncate.o:		uctruncate.cc	uctruncate.h		#(INCS)
+ucmkfifo.o:		ucmkfifo.cc	ucmkfifo.h		#(INCS)
 
 
