@@ -87,7 +87,7 @@ OBJ31= ccfile.o readln.o dprint.o
 
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o cmporders.o localmisc.o
-OBJ34=
+OBJ34= exitcodes.o stacktypes.o
 OBJ45=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -98,7 +98,7 @@ OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
-OBJI= obj32.o obj33.o
+OBJI= obj32.o obj33.o obj34.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o obji.o
 
@@ -341,6 +341,8 @@ ustsdefs.o:		usysdefs.cc	usysdefs.h		$(INCS)
 timewatch.o:		timewatch.cc	timewatch.hh		$(INCS)
 timecount.o:		timecount.cc	timecount.hh		$(INCS)
 clanguage.o:		clanguage.cc	clanguage.h		$(INCS)
+exitcodes.o:		exitcodes.cc	exitcodes.h		$(INCS)
+stacktypes.o:		stacktypes.cc	stacktypes.h		$(INCS)
 aflag.o:		aflag.cc	aflag.hh		$(INCS)
 errtimer.o:		errtimer.cc	errtimer.hh		$(INCS)
 timeval.o:		timeval.cc	timeval.hh		$(INCS)
