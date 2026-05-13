@@ -73,9 +73,10 @@ ccharp		systypename[systypename_overlast + 1] ;
 
 systyper::systyper() noex {
     	ccharp *n = systypename ;
-       	n[systypename_darwin]	= "Darwin" ;
-	n[systypename_linux]	= "Linux" ;
+       	n[systypename_bsd]	= "BSD" ;
 	n[systypename_sysv]	= "SysV" ;
+	n[systypename_linux]	= "Linux" ;
+       	n[systypename_darwin]	= "Darwin" ;
 	n[systypename_overlast]	= nullptr ;
 } /* end ctor (systyper) */
 
