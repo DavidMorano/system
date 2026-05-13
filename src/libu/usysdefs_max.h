@@ -61,7 +61,25 @@
 #define	MAXBASE		64		/* standard (common) value */
 #endif
 
-
+#ifndef	LINK_MAX
+#ifdef	MAXLINK
+#define	LINK_MAX	MAXLINK
+#else
+#ifdef	_POSIX_SYMLINK_MAX
+#define	LINK_MAX	_POSIX_SYMLINK_MAX
+#else
+#ifdef	MAXSYMLINKS
+#define	LINK_MAX	MAXSYMLINKS
+#else
+#ifdef	_POSIX_LINK_MAX
+#define	LINK_MAX	_POSIX_LINK_MAX
+#else
+#define	LINK_MAX	8
+#endif /* _POSIX_LINK_MAX */
+#endif /* MAXSYMLINKS */
+#endif /* _POSIC_SYNLINK_MAX */
+#endif /* MAXLINK */
+#endif /* LINK_MAX */
 #endif /* USYSDEFSMAX_INCLUDE */
 
 
