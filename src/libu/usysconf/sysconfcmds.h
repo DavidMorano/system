@@ -44,6 +44,7 @@ enum sysconfcmds {
     sysconfcmd_synthetic = 1000,
     sysconfcmd_maxpid,
     sysconfcmd_maxline,
+    sysconfcmd_maxlink,
     sysconfcmd_maxlogin,
     sysconfcmd_maxgroups,
     sysconfcmd_maxsymbol,
@@ -80,6 +81,9 @@ enum sysconfcmds {
 #endif
 #ifndef	_SC_LINE_MAX
 #define	_SC_LINE_MAX		sysconfcmd_maxline
+#endif
+#ifndef	_SC_LINK_MAX
+#define	_SC_LINK_MAX		sysconfcmd_maxlink
 #endif
 #ifndef	_SC_LOGIN_NAME_MAX
 #define	_SC_LOGIN_NAME_MAX	sysconfcmd_maxlogin
