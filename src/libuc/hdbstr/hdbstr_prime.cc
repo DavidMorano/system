@@ -209,7 +209,7 @@ int hdbstr_add(hdbstr *op,cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 	        if (rs < 0) {
 	            libmem.free(bp) ;
 	        }
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -478,7 +478,7 @@ hdbstr_iter hdbstr::begin() noex {
 		it.curp = nullptr ;
 		it.op = nullptr ;
 	    } /* end if (error handling) */
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	if (rs < 0) {
 	    ulogerror(objname,rs,"begin") ;
 	}
@@ -499,7 +499,7 @@ hdbstr_iter hdbstr::end() noex {
 		it.curp = nullptr ;
 		it.op = nullptr ;
 	    } /* end if (error handling) */
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	if (rs < 0) {
 	    ulogerror(objname,rs,"begin") ;
 	}
