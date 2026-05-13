@@ -84,7 +84,7 @@ template<typename ... Args>
 local inline int ptm_magic(ptm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == PTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == PTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (ptm_magic) */
@@ -307,7 +307,7 @@ void ptm::dtor() noex {
 int ptm_creater::operator () (ptma *ap) noex {
     	int		rs ;
 	if ((rs = ptm_create(op,ap)) >= 0) ylikely {
-	    op->magic = PTM_MAGIC ;
+	    op->magval = PTM_MAGIC ;
 	}
 	return rs ;
 } /* end method (ptm_creater::operator) */
@@ -318,7 +318,7 @@ int ptm_co::operator () (int to) noex {
 	    switch (w) {
 	    case ptmmem_destroy:
 	        rs = ptm_destroy(op) ;
-	    	op->magic = 0 ;
+	    	op->magval = 0 ;
 	        break ;
 	    case ptmmem_lockbegin:
 	        rs = ptm_lockbeginto(op,to) ;
