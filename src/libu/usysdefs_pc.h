@@ -1,8 +1,8 @@
-/* usysdefs_pc HEADER */
+/* usysdefs_pc HEADER (Path-Config) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* these are (a multitude) of various UNIX® system pre-processor defines */
+/* these are various UNIX® system pre-processor defines */
 /* version %I% last-modified %G% */
 
 
