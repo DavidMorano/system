@@ -25,9 +25,10 @@
 
 
 enum systypenames {
+	systypename_bsd,
 	systypename_sysv,
-	systypename_darwin,
 	systypename_linux,
+	systypename_darwin,
 	systypename_overlast
 } ; /* end enum (systypenames) */
 
