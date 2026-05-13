@@ -2,10 +2,13 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
+/* determine if the given string represents a non-path filename */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-04-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -18,16 +21,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 enum nonpaths {
     	nonpath_reg,			/* regular: absolute or relative */
     	nonpath_user,
-    	nonpath_cd,
+    	nonpath_var,
 	nonpath_dialer,
 	nonpath_fsvc,
 	nonpath_usvc,
@@ -40,6 +40,8 @@ EXTERNC_begin
 extern int	nonpath(cchar *,int) noex ;
 
 EXTERNC_end
+
+extern cchar	nonpathchs[nonpath_overlast + 1] ;
 
 
 #endif /* NONPATH_INCLUDE */
