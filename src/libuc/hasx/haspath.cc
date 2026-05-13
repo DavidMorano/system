@@ -38,6 +38,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -46,7 +47,6 @@
 #include	<usysdefs.h>
 #include	<ascii.h>
 #include	<mkchar.h>
-#include	<char.h>
 #include	<localmisc.h>		/* |UC(3dam)| */
 
 #include	"haspath.h"
@@ -77,6 +77,17 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 
 /* forward references */
 
+local bool haspathx(int chx,cchar *sp,int sl) noex {
+	bool		f = false ;
+	if (sp) ylikely {
+	    if (sl && sp[0]) {
+	        cint ch = mkchar(sp[0]) ;
+	        f = (ch == (chx & UCHAR_MAX)) ;
+	    }
+	} /* end if (non-null) */
+	return f ;
+} /* end subroutine (haspathx) */
+
 
 /* local variables */
 
@@ -86,31 +97,27 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 
 /* exported subroutines */
 
+bool haspathuser(cchar *sp,int sl) noex {
+    	return haspathx('~',sp,sl) ;
+}
+/* end subroutine (haspathuser) */
+
 bool haspathvar(cchar *sp,int sl) noex {
-    	constexpr int	chx_ec = mkchar('¬') ;
-	bool		f = false ;
-	if (sp) ylikely {
-	    if (sl && sp[0]) {
-	        cint ch = mkchar(sp[0]) ;
-	        f = (ch == chx_ec) ;
-	    }
-	} /* end if (non-null) */
-	return f ;
+    	return haspathx('¬',sp,sl) ;
 }
 /* end subroutine (haspathvar) */
 
-bool haspathuser(cchar *sp,int sl) noex {
-    	constexpr int	chx_ec = mkchar('~') ;
+bool haspathnon(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
 	    if (sl && sp[0]) {
 	        cint ch = mkchar(sp[0]) ;
-	        f = (ch == chx_ec) ;
+	        f = f || (ch == mkchar('~')) ;
+	        f = f || (ch == mkchar('¬')) ;
 	    }
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (haspathuser) */
+} /* end subroutine (haspathnon) */
 
 
 /* local subroutines */
