@@ -50,8 +50,12 @@
 
 EXTERNC_begin
 
-extern bool haspathvar		(cchar *,int) noex ;
+extern bool haspathnon		(cchar *,int) noex ;
 extern bool haspathuser		(cchar *,int) noex ;
+extern bool haspathvar		(cchar *,int) noex ;
+local inline bool haspathexp(cchar *sp,int sl) noex {
+	return haspathnon	(sp,sl) ;
+} /* end subroutine (haspathexp) */
 
 EXTERNC_end
 
