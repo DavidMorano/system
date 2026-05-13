@@ -72,19 +72,19 @@ struct ptm : pthread_mutex_t {
 	ptm_co		destroy ;
 	ptm_co		lockbegin ;
 	ptm_co		lockend ;
-	uint		magic ;
+	uint		magval ;
 	constexpr ptm() noex {
 	    create	(this,ptmmem_create) ;
 	    destroy	(this,ptmmem_destroy) ;
 	    lockbegin	(this,ptmmem_lockbegin) ;
 	    lockend	(this,ptmmem_lockend) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	ptm(const ptm &) = delete ;
 	ptm &operator = (const ptm &) = delete ;
 	void dtor() noex ;
 	destruct ptm() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ; /* end dtor (ptm) */
 } ; /* end class (ptm) */
 #else
