@@ -157,7 +157,7 @@ int subinfo::start() noex {
 		tbuf = nullptr ;
 		tlen = 0 ;
 	    } /* end if (error) */
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end method (subinfo::start) */
@@ -296,7 +296,7 @@ static int terment_start(terment *ep,cchar *fp,int fl,time_t t) noex {
 	    ep->atime = t ;
 	    if (cchar *cp ; (rs = lm_strw(fp,fl,&cp)) >= 0) {
 	        ep->devpath = cp ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 }
