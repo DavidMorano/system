@@ -667,7 +667,7 @@ local int nodedb_addentry(ND *op,int fi,SE *sep) noex {
 	        if (rs < 0) {
 	            lm_free(iep) ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 }
