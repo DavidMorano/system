@@ -123,7 +123,7 @@ hdbstr_iter &hdbstr_iter::operator = (const hdbstr_iter &oit) noex {
 			lm_free(curp) ;
 			curp = nullptr ;
 		    } /* end if (error handling) */
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    }
 	    if (rs < 0) {
 		ulogerror(objname,rs,"copy") ;
