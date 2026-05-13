@@ -74,11 +74,7 @@ module ;
 #include	<new>			/* |nothrow(3c++)| */
 #include	<atomic>		/* |atomic_int(3c++)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ubufdefs.h>
+#include	<usysbase.h>
 #include	<utimeout.h>
 #include	<ustd.h>		/* converted system calls */
 #include	<usys.h>		/* |umaxmsglen(3u)| */
@@ -119,6 +115,7 @@ enum dataitems {
 	dataitem_maxpid,
 	dataitem_maxarg,
 	dataitem_maxline,
+	dataitem_maxlink,
 	dataitem_maxlogin,
 	dataitem_maxgroups,
 	dataitem_maxusername,
@@ -227,13 +224,11 @@ int usysconf::getvalsys(int req) noex {
 	    rs = callstd(req) ;
 	}
     	return rs ;
-}
-/* end subroutine (usysconf::getvalsys) */
+} /* end subroutine (usysconf::getvalsys) */
 
 int usysconf::getstr(int req) noex {
     	return callstd(req) ;
-}
-/* end subroutine (usysconf::getstr) */
+} /* end subroutine (usysconf::getstr) */
 
 int usysconf::getval(int req) noex {
     	int		rs = SR_OK ;
@@ -242,6 +237,7 @@ int usysconf::getval(int req) noex {
 	case _SC_PID_MAX:
 	case _SC_ARG_MAX:
 	case _SC_LINE_MAX:
+	case _SC_LINK_MAX:
 	case _SC_LOGIN_NAME_MAX:
 	case _SC_NGROUPS_MAX:
 	case _SC_USERNAME_MAX:
@@ -272,6 +268,9 @@ int usysconf::synthetic(int req) noex {
 	    break ;
         case sysconfcmd_maxline:
 	    val = MLBUFLEN ;
+	    break ;
+        case sysconfcmd_maxlink:
+	    val = LINK_MAX ;
 	    break ;
         case sysconfcmd_maxlogin:
 	    val = UNBUFLEN ;
@@ -344,8 +343,7 @@ int usysconf::synthetic(int req) noex {
 	    rs = intsat(val) ;
 	}
 	return rs ;
-}
-/* end subroutine (usysconf::synthetic) */
+} /* end subroutine (usysconf::synthetic) */
 
 int usysconf::callstd(int req) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
@@ -374,18 +372,15 @@ int usysconf::callstd(int req) noex {
 	    } /* end if (std-call) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (usysconf::callstd) */
+} /* end subroutine (usysconf::callstd) */
 
 int usysconf::mconfval(int req) noex {
     	return ustd_confval(req,lp) ;
-}
-/* end subroutine (usysconf::mconfval) */
+} /* end subroutine (usysconf::mconfval) */
 
 int usysconf::mconfstr(int req) noex {
     	return ustd_confstr(req,rbuf,rlen) ;
-}
-/* end subroutine (usysconf::mconfstr) */
+} /* end subroutine (usysconf::mconfstr) */
 
 int usysconf::getvalcache(int req) noex {
 	int		rs = SR_OK ;
@@ -395,6 +390,7 @@ int usysconf::getvalcache(int req) noex {
 	case _SC_PID_MAX:		ii = dataitem_maxpid ; 		break ;
 	case _SC_ARG_MAX:		ii = dataitem_maxarg ; 		break ;
 	case _SC_LINE_MAX:		ii = dataitem_maxline ; 	break ;
+	case _SC_LINK_MAX:		ii = dataitem_maxlink ; 	break ;
 	case _SC_LOGIN_NAME_MAX:	ii = dataitem_maxlogin ; 	break ;
 	case _SC_NGROUPS_MAX:		ii = dataitem_maxgroups ; 	break ;
 	case _SC_USERNAME_MAX:		ii = dataitem_maxusername ; 	break ;
@@ -420,8 +416,7 @@ int usysconf::getvalcache(int req) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (usysconf::getvalcache) */
+} /* end subroutine (usysconf::getvalcache) */
 
 int usysconf::getdefmsg() noex {
 	int		rs ;
@@ -431,20 +426,17 @@ int usysconf::getdefmsg() noex {
 	    rs = MMBUFLEN ;		/* Maximum-Message-Buffer-Length */
 	} /* end if_constexpr (usysflag.darwin) */
 	return rs ;
-}
-/* end method (usysconf::getdefmsg) */
+} /* end method (usysconf::getdefmsg) */
 
 int usysconf::getdefzoneinfo() noex {
 	cint		cmdname = _SC_NAME_MAX ;
 	return getval(cmdname) ;
-}
-/* end method (usysconf::getdefzoneinfo) */
+} /* end method (usysconf::getdefzoneinfo) */
 
 int usysconf::getdefacctname() noex {
 	cint		cmdlogin = _SC_LOGIN_NAME_MAX ;
 	return getval(cmdlogin) ;
-}
-/* end method (usysconf::getdefacctname) */
+} /* end method (usysconf::getdefacctname) */
 
 int usysconf::getdefnodename() noex {
     	UTSNAME		ut ;
@@ -453,8 +445,7 @@ int usysconf::getdefnodename() noex {
 	    rs = (szof(ut.nodename) - 1) ;
 	}
 	return rs ;
-}
-/* end method (usysconf::getdefnodename) */
+} /* end method (usysconf::getdefnodename) */
 
 int usysconf::getdefmailaddr() noex {
 	cint		cmdnode = _SC_NODENAME_MAX ;
@@ -470,7 +461,6 @@ int usysconf::getdefmailaddr() noex {
 	    }
 	}
     	return (rs >= 0) ? len : rs ;
-}
-/* end method (usysconf::getdefmailaddr) */
+} /* end method (usysconf::getdefmailaddr) */
 
 
