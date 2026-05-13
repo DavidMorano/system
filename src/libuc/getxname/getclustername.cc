@@ -416,7 +416,7 @@ int searcher::start() noex {
 		    lm_free(a) ;
 		    a = nullptr ;
 		} /* end if (error handling) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if ('nodename' was NULL) */
 	return rs ;
 } /* end method (search::start) */
