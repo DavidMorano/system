@@ -125,7 +125,7 @@ int recip_start(recip *op,cchar *sp,int sl) noex {
 	            libmem.free(vp) ;
 	            op->recipient = nullptr ;
 	        } /* end if (error) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 		recip_dtor(op) ;
 	    }
