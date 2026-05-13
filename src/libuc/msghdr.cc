@@ -33,6 +33,8 @@
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
+#include	"msghdr.h"
+
 
 /* local defines */
 
@@ -54,18 +56,18 @@
 
 /* exported subroutines */
 
-int msghdr_size(MSGHDR *mhp) noex {
+int msghdr_sz(MSGHDR *mhp) noex {
     	int		rs = SR_FAULT ;
 	int		sz = 0 ;
 	if (mhp) {
 	    IOVEC	*vlp = mhp->msg_iov ;
-	    int		vll = mhp->msg_iovlen ;
+	    cint	vll = mhp->msg_iovlen ;
 	    for (int i = 0 ; i < vll ; i += 1) {
 	       sz += intconv(vlp->iov_len) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
 }
-/* end subroutine (msghdr_size) */
+/* end subroutine (msghdr_sz) */
 
 
