@@ -287,7 +287,7 @@ int ptc_creater::operator () (ptca *ap) noex {
 
 int ptc_co::operator () (int) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = op->magic) >= 0) ylikely {
 	        switch (w) {
 	        case ptcmem_destroy:
