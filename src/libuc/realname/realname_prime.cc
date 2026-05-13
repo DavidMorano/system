@@ -103,7 +103,7 @@ static int realname_ctor(realname *op,Args ... args) noex {
 		op->stbuf = charp(vp) ;
 		op->stlen = ssz ;
 		rs = SR_OK ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 }
