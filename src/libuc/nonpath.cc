@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* determine if the given string represent a non-path filename */
+/* determine if the given string represents a non-path filename */
 /* version %I% last-modified %G% */
 
 
@@ -32,19 +32,22 @@
 	- pl	length of given path string
 
 	Returns:
-	true
-	false
+	>0	type nonpath found
+	0	regualr file-name
+	<0	error (system-return)
+
+	Notes:
+	1. Non-paths are among the following:
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<bitset>		/* <- currently unused */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<six.h>			/* |siochr(3uc)| */
 #include	<ascii.h>		/* |CH_{xx}| */
 #include	<mkchar.h>
@@ -52,8 +55,8 @@
 
 #include	"nonpath.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"mod/chrset.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/chrset.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 import chrset ;				/* |lenstr(3u)| + |getlenstr(3u)| */
@@ -62,6 +65,8 @@ import chrset ;				/* |lenstr(3u)| + |getlenstr(3u)| */
 
 
 /* imported namespaces */
+
+using std::bitset ;			/* type (currently unused) */
 
 
 /* local typedefs */
@@ -77,15 +82,17 @@ extern "C++" {
 
 /* external variables */
 
+cchar		nonpathchs[nonpath_overlast + 1] = " ~¬¥§" ;
+
 
 /* local structures */
 
 namespace {
+    constexpr int	chlen = (UCHAR_MAX + 1) ;
     struct nons {
-	cchar		*nonpaths = "¥§~" ;
 	chrset		ss ;
-	constexpr nons() noex {
-	    for (int ch, i = 0 ; ((ch = nonpaths[i])) ; i += 1) {
+	nons() noex {
+	    for (int ch, i = 0 ; ((ch = nonpathchs[i])) ; i += 1) {
 		ss.set(ch) ;
 	    } /* end for */
 	} ; /* end ctor (nons) */
@@ -98,11 +105,11 @@ namespace {
 
 /* local variables */
 
-constexpr nons		bs ;
+static const nons	bs ;
 
-cint			chx_user1 = mkchar('~') ;
-cint			chx_user2 = mkchar('µ') ;
-cint			chx_cd = mkchar('¬') ;
+constexpr int		chx_user1	= mkchar('~') ;
+constexpr int		chx_user2	= mkchar('µ') ;
+constexpr int		chx_var		= mkchar('¬') ;
 
 
 /* exported variables */
@@ -116,20 +123,19 @@ int nonpath(cchar *fp,int µfl) noex {
 	if (fp) ylikely {
 	    rs = SR_INVALID ;
 	    if (int fl ; (fl = getlenstr(fp,µfl)) > 0) {
-		cint ch = mkchar(fp[0]) ;
 		rs = SR_OK ;
-	        if (ch != CH_SLASH) {
+		if (cint ch = mkchar(fp[0]) ; ch != CH_SLASH) {
 		    t = nonpath_user ;
 		    if ((ch != chx_user1) && (ch != chx_user2)) {
-			t = nonpath_cd ;
-			if (ch != chx_cd) {
+			t = nonpath_var ;
+			if (ch != chx_var) {
 			    t = nonpath_reg ;
 	                    if (int si ; (si = siobrk(fp,fl,bs.ss)) >= 0) {
 			        t = (si + nonpath_dialer) ;
 			    }
 			}
 	            } /* end if (nonpath_user) */
-	        } /* end if (absolute path) */
+	        } /* end if (relative path) */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? t : rs ;
