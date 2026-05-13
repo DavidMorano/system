@@ -57,6 +57,7 @@ export {
 	static const int	maxpid ;
 	static const int	maxarg ;
 	static const int	maxline ;
+	static const int	maxlink ;
 	static const int	maxlogin ;
 	static const int	maxsymbol ;
 	static const int	maxgroups ;
