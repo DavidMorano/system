@@ -162,7 +162,7 @@ int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 		        dp = strwcpy(dp,op->sbuf,op->len) ;
 		        rs = intconv(strwcpy(dp,sp,sl) - dp) ;
 		        op->len += rs ;
-		    } /* end if (memory-allocation) */
+		    } /* end if (memory-acquire) */
 	        } else {
 		    char	*rp = (op->sbuf + op->len) ;
 		    rs = intconv(strwcpy(rp,sp,sl) - rp) ;
