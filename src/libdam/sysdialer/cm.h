@@ -25,18 +25,16 @@
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<systems.h>
+#include	<usysbase.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sysdialer.h>
 
 
-#define	CM_MAGIC	31815926
 #define	CM		struct cm_head
 #define	CM_ARGS		struct cm_arguments
 #define	CM_INFO		struct cm_information
+#define	CM_MAGIC	31815926
 
 
 struct cm_arguments {
