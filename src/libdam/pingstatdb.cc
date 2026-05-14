@@ -225,7 +225,7 @@ local int pingstatdb_opener(pingstatdb *op) noex {
 		if (char *a ; (rs = uc_mallocstrw(znbuf,rs,&a)) >= 0) {
 		    op->zname = a ;
 		    op->magic = PINGSTATDB_MAGIC ;
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    }
 	    rs = rsfree(rs,znbuf) ;
 	} /* end if (m-a-f) */
