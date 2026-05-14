@@ -307,7 +307,7 @@ int entry_start(dirseen_ent *ep,cchar *sp,int sl,dev_t dev,ino_t ino) noex {
 	if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) ylikely {
 	    ep->namep = cp ;
 	    ep->namel = rs ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
