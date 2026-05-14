@@ -270,14 +270,14 @@ int starter::allocbegin() noex {
 		nnlen = rs ;
 	        nn = nnbuf ;
 	        rs = getnodename(nnbuf,nnlen) ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	}
 	if ((rs >= 0) && (un == nullptr)) {
 	    if ((rs = malloc_un(&unbuf)) >= 0) {
 		unlen = rs ;
 	        un = unbuf ;
 	        rs = getusername(unbuf,unlen,-1) ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	}
 	return rs ;
 }
@@ -508,7 +508,7 @@ static int lfm_fnbegin(lfm *op,cchar *fname) noex {
 	    if (absfn af ; (rs = af.start(fnp,fnl,&afn)) >= 0) {
 	        if (cchar *cp{} ; (rs = uc_mallocstrw(afn,rs,&cp)) >= 0) {
 		    op->lfname = cp ;
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 		rs1 = af.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (absfn) */
