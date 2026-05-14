@@ -354,7 +354,7 @@ int motd_open(motd *op,cchar *pr) noex {
 		            lm_free(vp) ;
 		            op->pr = nullptr ;
 	                } /* end if (error) */
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
@@ -613,7 +613,7 @@ local int motd_envbegin(motd *op) noex {
 	    } /* end for */
 	    va[c] = nullptr ;
 	    op->nenv = c ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (motd_envbegin) */
@@ -806,7 +806,7 @@ local int mapper_start(MR *mmp,time_t dt,cchar *fname) noex {
 		    lm_free(vp) ;
 		    mmp->fname = nullptr ;
 		} /* end if (error) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 		lockrw_destroy(&mmp->rwm) ;
 	    }
@@ -1041,7 +1041,7 @@ local int mapper_mapadd(MR *mmp,cc *kp,int kl,cc *valp,int vall) noex {
 	           if (rs < 0) {
 	               lm_free(ep) ;
 	           } /* end if (error) */
-	       } /* end if (memory-allocation) */
+	       } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -1102,8 +1102,8 @@ local int mapdir_start(MD *ep,cchar *kp,int kl,cchar *valp,int vall) noex {
 	                    lm_free(vp) ;
 	                    ep->admin = nullptr ;
 	                } /* end if (error) */
-	            } /* end if (memory-allocation) */
-	        } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -1239,7 +1239,7 @@ local int mapdir_expanders(MD *ep,cc *un,cc *pp) noex {
                         cauto malls = lm_strw ;
                         if (cchar *cp ; (rs = malls(hbuf,fl,&cp)) >= 0) {
                             ep->dname = cp ;
-                        } /* end if (memory-allocation) */
+                        } /* end if (memory-acquire) */
                     } /* end if (OK) */
                 } else if (isNotPresent(rs)) {
                     rs = SR_OK ;
