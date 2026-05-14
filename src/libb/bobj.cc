@@ -55,7 +55,6 @@
 #include	<bufsizevar.hh>
 #include	<sysval.hh>
 #include	<stdfnames.h>
-#include	<getfdfile.h>
 #include	<snx.h>
 #include	<cfdec.h>
 #include	<conallof.h>
