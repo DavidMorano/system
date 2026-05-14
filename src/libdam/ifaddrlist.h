@@ -35,7 +35,7 @@
 
 #pragma ident	"@(#)ifaddrlist.h	1.3	99/03/02 SMI"
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<net/if.h>
 
