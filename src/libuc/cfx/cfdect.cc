@@ -196,7 +196,6 @@ template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 } /* end subroutine-template (convert) */
 
 local int cfloop(cchar *sp,int sl,int *rp) noex {
-    	cnullptr	np{} ;
     	int		rs = SR_OK ;
 	int		res = 0 ; /* accumulated-result */
 	int		inc{} ;
