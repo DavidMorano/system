@@ -473,7 +473,7 @@ local int termtrans_process(TT *op,const wchar_t *wbuf,int wlen) noex {
 	    }
 	    rs1 = lm_free(obuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return (rs >= 0) ? ln : rs ;
 }
 /* end subroutine (termtrans_process) */
