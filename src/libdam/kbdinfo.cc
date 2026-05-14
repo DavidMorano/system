@@ -563,7 +563,7 @@ static int ke_start(KI_ENT *kep,int ktype,cchar *knp,int knl,
 		uc_free(kep->a) ;
 		kep->a = nullptr ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 
 	    } /* end if (valid) */
 	} /* end if (non-null) */
