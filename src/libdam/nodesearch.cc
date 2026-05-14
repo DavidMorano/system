@@ -165,7 +165,7 @@ int nodesearch_open(NS *op,cc *fname,int fsz) noex {
 	    		        op->fi.fn = nullptr ;
 			    }
 		        } /* end if (error-handling) */
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 		    rs1 = af.finish ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (absfn) */
