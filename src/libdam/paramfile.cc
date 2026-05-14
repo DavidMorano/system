@@ -1034,7 +1034,7 @@ local int entry_start(PF_E *pep,int fi,cc *kp,int kl,VS *vsp,int olen) noex {
 	            if (i > 0) bp[-1] = CH_FS ;
 	            bp = strwcpy(bp,cp,-1) + 1 ;
 	        } /* end for */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? bsize : rs ;
 }
