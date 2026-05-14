@@ -473,7 +473,7 @@ int mxalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	                    lm_free(kvcp) ;
 	                    curp->kvcp = nullptr ;
 	                } /* end if (error-handling) */
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } /* end if (was empty) */
 	        if (rs >= 0) {
 	            cchar	*kp{} ;
@@ -1091,7 +1091,7 @@ static int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	                } /* end for */
 	                curp->vals[c] = nullptr ;
 	                curp->nvals = c ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	            if (rs < 0) {
 	                lm_free(curp->vals) ;
 	                curp->vals = nullptr ;
@@ -1193,7 +1193,7 @@ static int bufdesc_start(BD *bdp,int llen) noex {
 	    bp += (klen+1) ;
 	    bdp->kbuf = bp ;
 	    bdp->klen = klen ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (bufdesc_start) */
