@@ -137,7 +137,7 @@ export {
 	                        } /* end if (loading) */
 			        rs1 = lm_free(dbuf) ;
 			        if (rs >= 0) rs = rs1 ;
-		            } /* end if (memory-allocation) */
+		            } /* end if (memory-acquire) */
 	                } /* end if */
 		    } else {
 			rs = cfsystox(nsp,b,rp) ;
