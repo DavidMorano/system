@@ -1,4 +1,4 @@
-/* usupport_geusmtime HEADER */
+/* usupport_getusmtime HEADER */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
