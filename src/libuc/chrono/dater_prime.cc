@@ -185,7 +185,7 @@ int dater_start(dater *op,TIMEB *nowp,cchar *zsp,int zsl) noex {
 	                    znwcpy(op->cname,znl,zsp,zsl) ;
 	                }
 	                op->magic = DATER_MAGIC ;
-		    } /* end if (memory-allocation) */
+		    } /* end if (memory-acquire) */
 		} /* end if (znlen) */
 	    } /* end if (memclear) */
 	} /* end if (non-null) */
