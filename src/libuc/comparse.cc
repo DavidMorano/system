@@ -310,14 +310,14 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	                        if ((rs = libmem.strw(bp,bl,&cp)) >= 0) {
 	                            op->val.sp = cp ;
 	                            op->val.sl = bl ;
-	                        } /* end if (memory-allocation) */
+	                        } /* end if (memory-acquire) */
 	                    } /* end if (buffer_get) */
 	                    if (rs < 0) {
 				void *vp = voidp(op->com.sp) ;
 	                        libmem.free(vp) ;
 	                        op->com.sp = nullptr ;
 	                    } /* end if (error) */
-	                } /* end if (memory-allocation) */
+	                } /* end if (memory-acquire) */
 	            } /* end if (buffer_get) */
 	        } /* end if (finishing-up) */
 	        rs1 = buffer_finish(&as[1]) ;	/* comment */
