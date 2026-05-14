@@ -229,7 +229,7 @@ int filecounts_open(FC *op,cchar *fn,int of,mode_t om) noex {
 	            if (cchar *cp{} ; (rs = lm_strw(fn,-1,&cp)) >= 0) {
 		        op->fname = cp ;
 	                op->magic = FILECOUNTS_MAGIC ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	            if (rs < 0) {
 	                u_close(op->fd) ;
 	                op->fd = -1 ;
