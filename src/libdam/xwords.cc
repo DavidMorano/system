@@ -27,7 +27,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -213,7 +213,7 @@ local int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 			        op->xa[j].wl = ep->wl ;
 			        j += 1 ;
 			    } /* end for */
-		        } /* end if (memory-allocation) */
+		        } /* end if (memory-acquire) */
 		    } else {
 			j = op->nwords ;
 			void	*vp ;
