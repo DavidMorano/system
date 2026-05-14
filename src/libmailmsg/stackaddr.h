@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	STACKADDR	struct stackaddr_head
@@ -37,7 +34,7 @@ struct stackaddr_head {
 	int		dlen ;
 	int		i ;
 	int		ri ;
-} ;
+} ; /* end struct */
 
 typedef	STACKADDR	stackaddr ;
 
