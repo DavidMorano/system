@@ -47,8 +47,10 @@
 #include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucmem.h>
 #include	<vecstr.h>
 #include	<ccfile.hh>
 #include	<field.h>
@@ -60,7 +62,6 @@
 #include	<sfx.h>
 #include	<snwcpy.h>
 #include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<getev.h>
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"defproc.h"
