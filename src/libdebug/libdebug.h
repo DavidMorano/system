@@ -21,21 +21,17 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<strlinelen.h>
 
 #include	<debugprime.h>
 #include	<debugmkhex.h>
 #include	<debugprint.h>
 #include	<debugline.h>
-#include	<debugging.h>
 #include	<debugutil.hh>		/* C++ only */
 
-#include	<zprintf.h>
 #include	<nprintf.h>
+#include	<zprintf.h>
 
 
 #endif /* LIBDEBUG_INCLUDE */
