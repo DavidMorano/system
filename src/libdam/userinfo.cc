@@ -589,7 +589,7 @@ static int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	        } else {
 	            lm_free(a) ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if */
 	return (rs >= 0) ? sz : rs ;
 }
@@ -820,7 +820,7 @@ static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
 	            if (rs < 0) {
 	                lm_free(p) ;
 		    }
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (passwdent_size) */
 	} /* end if (procinfo_getpwuser) */
 	return (rs >= 0) ? f : rs ;
@@ -1039,7 +1039,7 @@ static int procinfo_gecos(PROCINFO *pip) noex {
 	                            } /* end if (ok) */
 	                            rs1 = lm_free(nbuf) ;
 				    if (rs >= 0) rs = rs1 ;
-	                        } /* end if (memory-allocation) */
+	                        } /* end if (memory-acquire) */
 	                    } else {
 	                        vp = nullptr ;
 			    }
