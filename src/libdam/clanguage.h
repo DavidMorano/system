@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-03-21, David A­D­ Morano
+	= 1998-02-15, David A­D­ Morano
 	This module was originally written.
 
 	= 2017-08-01, David A­D­ Morano
@@ -297,8 +297,8 @@
 #define	EXTERNC_begin		extern "C" {
 #define	EXTERNC_end		}
 #else
-#define	EXTERNC_begin	/* externc_begin */
-#define	EXTERNC_end	/* externc_end */
+#define	EXTERNC_begin		/* externc_begin */
+#define	EXTERNC_end		/* externc_end */
 #endif /* __cplusplus */
 #endif /* EXTERNC_begin */
 
