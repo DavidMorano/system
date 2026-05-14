@@ -321,7 +321,7 @@ int keyvals_curbegin(keyvals *op,keyvals_cur *curp) noex {
 		    uc_free(curp->ecp) ;
 		    curp->ecp = nullptr ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -660,7 +660,7 @@ static int keyvals_entadd(keyvals *op,ENT *nep) noex {
 	    if (rs < 0) {
 		uc_free(ep) ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (keyvals_entadd) */
