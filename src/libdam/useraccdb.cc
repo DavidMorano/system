@@ -60,6 +60,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<bufsizevar.hh>
 #include	<linebuffer.h>
 #include	<estrings.h>
@@ -140,7 +141,6 @@ extern "C" {
     extern int uc_ftruncate(int,off_t) noex ;
     extern int uc_setappend(int,int) noex ;
     extern int uc_closeonexec(int,int) noex ;
-    extern int uc_close(int) noex ;
 } /* end extern */
 
 
@@ -286,7 +286,7 @@ int useraccdb_open(UAD *op,cchar *pr,cchar *dbname) noex {
 	    		                lm_free(vp) ;
 	    		                op->fname = nullptr ;
 		                    } /* end if (error) */
-		                } /* end if (memory-allocation) */
+		                } /* end if (memory-acquire) */
 	                    } /* end if (mkpath) */
 	                } /* end if (make-component) */
 		        rs1 = lm_free(a) ;
@@ -416,7 +416,7 @@ int useraccdb_curbegin(UAD *op,UAD_CUR *curp) noex {
 		    lm_free(curp->fbp) ;
 		    curp->fbp = nullptr ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return rs ;
 }
