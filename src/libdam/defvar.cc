@@ -158,7 +158,7 @@ int defvar_open(DF *op,cchar *fname) noex {
 	                lm_free(vp) ;
 	                op->fname = nullptr ;
 	            }
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 		if (rs < 0) {
 		    defvar_dtor(op) ;
 		}
