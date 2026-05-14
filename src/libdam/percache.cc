@@ -52,7 +52,7 @@
 	Note:
 	We need to (should) use the special memory allocation
 	subroutines that are set aside for library use.  These
-	memory-allocation-free subroutines are:
+	memory-acquire-free subroutines are:
 
 	+ lm_mall(3uc)
 	+ lm_free(3uc)
@@ -494,7 +494,7 @@ int geter::getstr(int pt) noex {
 		        pcp->items[pt].data = bp ;
 	                pcp->items[pt].t = uint(dt) ;
 		        pcp->items[pt].v = len ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 		} /* end if (getx) */
 		rs1 = lm_free(dbuf) ;
 		if (rs >= 0) rs = rs1 ;
