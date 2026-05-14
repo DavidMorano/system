@@ -126,7 +126,7 @@ int calent_start(calent *op,calent_q *qp,uint loff,int llen) noex {
 	        op->magic = CALENT_MAGIC ;
 	        elp->loff = loff ;
 	        elp->llen = llen ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 		calent_dtor(op) ;
 	    }
