@@ -335,7 +335,7 @@ int issue_open(IS *op,cchar *pr) noex {
 	                    lm_free(vp) ;
 	                    op->pr = nullptr ;
 	                } /* end if (error) */
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
@@ -571,7 +571,7 @@ local int issue_envbegin(IS *op) noex {
 	    } /* end for */
 	    va[c] = nullptr ;
 	    op->nenv = c ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (issue_envbegin) */
@@ -688,7 +688,7 @@ local int mapper_start(IS_MAP *mmp,time_t dt,cchar fname[]) noex {
 	            lm_free(vp) ;
 	            mmp->fname = nullptr ;
 	        } /* end if (error) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 	        lockrw_destroy(&mmp->rwm) ;
 	    }
@@ -882,7 +882,7 @@ local int mapper_mapadd(IS_MAP *mmp,cc *kp,int kl,cc *vap,int val) noex {
 	            if (rs < 0) {
 	                lm_free(ep) ;
 	            }
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -959,7 +959,7 @@ local int mapdir_start(MD *ep,cc *kp,int kl,cc *vap,int val) noex {
 	                    lm_free(vp) ;
 	                    ep->admin = nullptr ;
 	                } /* end if (error) */
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } /* end block */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -1094,7 +1094,7 @@ local int mapdir_expanders(MD *ep,cc *un,cc *pp) noex {
                     if (rs >= 0) {
                         if (cchar *cp ; (rs = lm_strw(hbuf,fl,&cp)) >= 0) {
                             ep->dname = cp ;
-                        } /* end if (memory-allocation) */
+                        } /* end if (memory-acquire) */
                     } /* end if (OK) */
                 } else if (isNotPresent(rs)) {
                     rs = SR_OK ;
