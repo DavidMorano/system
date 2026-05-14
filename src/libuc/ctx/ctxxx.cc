@@ -175,7 +175,7 @@ local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 			}
 			rs1 = lm_free(dbuf) ;
 			if (rs >= 0) rs = rs1 ;
-		    } /* end if (memory-allocation-deallocation) */
+		    } /* end if (memory-acquire-deallocation) */
 		} else {
 		    char dbuf[dlen+1] ;
 		    len = ctxxxx(dbuf,dlen,b,uv) ;
