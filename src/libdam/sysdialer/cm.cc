@@ -99,45 +99,42 @@ namespace {
 	int		maxarg ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int cmsb_ctor(cmsb *op,Args ... args) noex {
+local int cmsb_ctor(cmsb *op,Args ... args) noex {
     	CM		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cmsb_ctor) */
+} /* end subroutine (cmsb_ctor) */
 
-static int cmsb_dtor(cmsb *op) noex {
+local int cmsb_dtor(cmsb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cmsb_dtor) */
+} /* end subroutine (cmsb_dtor) */
 
 template<typename ... Args>
-static inline int cmsb_magic(cmsb *op,Args ... args) noex {
+local inline int cmsb_magic(cmsb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == CM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (cmsb_magic) */
+} /* end subroutine (cmsb_magic) */
 
-static int cm_loadcooks(CM *,SI *,EC *,cm_args *,cc *,cc *,mv) noex ;
-static int cm_trysys(CM *,SI *,SD *,SD_ARGS *,
+local int cm_loadcooks(CM *,SI *,EC *,cm_args *,cc *,cc *,mv) noex ;
+local int cm_trysys(CM *,SI *,SD *,SD_ARGS *,
 			EC *,SY_ENT *,cc *,cc *,mv) noex ;
-static int cm_trysysargs(CM *,SI *,vecstr *,cc *,int) noex ;
+local int cm_trysysargs(CM *,SI *,vecstr *,cc *,int) noex ;
 
 
 /* local variables */
@@ -343,7 +340,7 @@ int cm_shutdown(CM *op,int cmd) noex {
 
 /* private subroutines */
 
-static int cm_loadcooks(cm *op,SI *sip,EC *cookp,cm_args *ap,
+local int cm_loadcooks(cm *op,SI *sip,EC *cookp,cm_args *ap,
 		cc *hostname,cc *svcname,mainv av) noex {
 	int		rs = SR_OK ;
 	int		sz ;
@@ -455,7 +452,7 @@ static int cm_loadcooks(cm *op,SI *sip,EC *cookp,cm_args *ap,
 }
 /* end subroutine (cm_loadcooks) */
 
-static int cm_trysys(cm *op,SI *sip,SD *dp,SD_ARGS *dap,
+local int cm_trysys(cm *op,SI *sip,SD *dp,SD_ARGS *dap,
 	    EC *cookp,SY_ENT *sep,cc *sysname,cc *svcname,mainv av) noex {
 	SYSDIALER_ENT	*dep ;
 	vecstr		args ;
@@ -492,7 +489,7 @@ static int cm_trysys(cm *op,SI *sip,SD *dp,SD_ARGS *dap,
 	    cchar	*abuf = nullptr ;
 	    int		alen = 0 ;
 
-	    memset(op->dobj,0,op->dsize) ;
+	    memclear(op->dobj,op->dsize) ;
 
 	    op->c = dep->c ;
 
@@ -549,7 +546,7 @@ static int cm_trysys(cm *op,SI *sip,SD *dp,SD_ARGS *dap,
 }
 /* end subroutine (cm_trysys) */
 
-static int cm_trysysargs(cm *op,SI *sip,vecstr *alp,
+local int cm_trysysargs(cm *op,SI *sip,vecstr *alp,
 		char *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
