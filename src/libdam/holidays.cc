@@ -946,7 +946,7 @@ local int subinfo_mkrt(SUBINFO *sip) noex {
 	    rt[c][2] = 0 ;
 	    op->rt = rt ;
 	    op->rtlen = c ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 
 	return (rs >= 0) ? c : rs ;
 }
