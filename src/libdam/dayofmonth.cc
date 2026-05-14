@@ -334,7 +334,7 @@ local int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 	                op->months[m] = nullptr ;
 	            }
 	        } /* end if (error) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (work needed) */
 	return rs ;
 } /* end subroutine (dayofmonth_mkmonth) */
