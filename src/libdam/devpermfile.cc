@@ -266,7 +266,7 @@ int devpermfile_open(DP *op,cc *fname) noex {
 			        lm_free(vp) ;
 			        op->fname = nullptr ;
 			    } /* end if (error) */
-	                } /* end if (memory-allocation) */
+	                } /* end if (memory-acquire) */
 	                rs1 = catfn.finish ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (absfn) */
