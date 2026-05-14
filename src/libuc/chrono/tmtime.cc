@@ -98,7 +98,7 @@ local int tmtime_zinit(tmtime *op,Args ... args) noex {
 		    op->znbuf = a ;
 		    memclear(a,rs) ;
 		    a[rs] = '\0' ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (NULL zname) */
 	} /* end if (non-null) */
 	return rs ;
