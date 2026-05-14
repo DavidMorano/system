@@ -26,7 +26,7 @@
 
 EXTERNC_begin
 
-extern int	getprogroot(cchar *,mainv,int *,char *,cchar *) noex ;
+extern int	getprogroot(cchar *,con mainv,int *,char *,cchar *) noex ;
 
 EXTERNC_end
 
