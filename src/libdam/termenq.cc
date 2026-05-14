@@ -165,7 +165,7 @@ int termenq_open(TE *op,cchar *dbfn,int oflags) noex {
                             libmem.free(vp) ;
                             op->fname = nullptr ;
                         }
-                    } /* end if (memory-allocation) */
+                    } /* end if (memory-acquire) */
 		} /* end if (termenq_initstuff) */
 	    } /* end if (pagesize) */
 	    if (rs < 0) {
