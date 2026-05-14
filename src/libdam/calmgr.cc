@@ -877,7 +877,7 @@ local int mkbve_start(cyimk_ent *bvep,cchar *md,calent *ep) noex {
 	                }
 	                lines[i].loff = 0 ;
 	                lines[i].llen = 0 ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } else {
 	            rs = SR_TOOBIG ;
 	        }
