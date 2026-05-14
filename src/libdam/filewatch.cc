@@ -169,7 +169,7 @@ int filewatch_start(FW *op,FW_ARGS *ap,LF *lfp,cc *fn) noex {
 				uc_free(op->fname) ;
 				op->fname = nullptr ;
 			    } /* end if (error) */
-			} /* end if (memory-allocation) */
+			} /* end if (memory-acquire) */
 			if (rs < 0) {
 			    bclose(op->wfp) ;
 			} /* end if (error) */
@@ -181,7 +181,7 @@ int filewatch_start(FW *op,FW_ARGS *ap,LF *lfp,cc *fn) noex {
 			    op->bufl = 0 ;
 			}
 		    } /* end if (error) */
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		filewatch_dtor(op) ;
