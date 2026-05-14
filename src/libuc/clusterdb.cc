@@ -242,7 +242,7 @@ int clusterdb_curbegin(CD *op,CD_CUR *curp) noex {
 		        curp->kcurp = nullptr ;
 		    }
 		} /* end block */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rsc : rs ;
 }
