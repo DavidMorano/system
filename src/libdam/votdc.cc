@@ -297,7 +297,7 @@ int votdc_open(votdc *op,cchar *pr,cchar *lang,int of) noex {
 	                    if (rs < 0) {
 		                votdc_strend(op) ;
 		            }
-	                } /* end if (memory-allocation) */
+	                } /* end if (memory-acquire) */
 	                if (rs < 0) {
 		            votdc_shmhandend(op) ;
 	                }
@@ -746,7 +746,7 @@ static int votdc_strbegin(votdc *op,cchar *pr,cchar *lang) noex {
 	    bp = (strwcpy(bp,pr,-1)+1) ;
 	    op->lang = bp ;
 	    bp = (strwcpy(bp,lang,-1)+1) ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (votdc_strbegin) */
