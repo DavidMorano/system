@@ -72,8 +72,7 @@ local int htm_ctor(htm *op,Args ... args) noex {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (htm_ctor) */
+} /* end subroutine (htm_ctor) */
 
 local int htm_dtor(htm *op) noex {
 	int		rs = SR_FAULT ;
@@ -81,8 +80,7 @@ local int htm_dtor(htm *op) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (htm_dtor) */
+} /* end subroutine (htm_dtor) */
 
 template<typename ... Args>
 static inline int htm_magic(htm *op,Args ... args) noex {
@@ -91,8 +89,7 @@ static inline int htm_magic(htm *op,Args ... args) noex {
 	    rs = (op->magic == HTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (htm_magic) */
+} /* end subroutine (htm_magic) */
 
 local int	htm_tagalone(htm *,cchar *,cchar *,cchar *) noex ;
 local int	htm_printout(htm *,int,cchar *,int) noex ;
@@ -139,7 +136,7 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 			op->lbuf = nullptr ;
 			op->llen = 0 ;
 		    } /* end if (error handling) */
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (doctype) */
 	    op->wlen += wlen ;
 	    if (rs < 0) {
@@ -636,8 +633,7 @@ int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_tagalone) */
+} /* end subroutine (htm_tagalone) */
 
 local int htm_printout(htm *op,int c,cchar *bp,int bl) noex {
 	int		rs ;
@@ -661,8 +657,7 @@ local int htm_printout(htm *op,int c,cchar *bp,int bl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (linefold) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_printout) */
+} /* end subroutine (htm_printout) */
 
 local int htm_wrfile(htm *op,cchar *cfname) noex {
 	int		rs ;
@@ -678,7 +673,6 @@ local int htm_wrfile(htm *op,cchar *cfname) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (copy-content-file) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_wrfile) */
+} /* end subroutine (htm_wrfile) */
 
 
