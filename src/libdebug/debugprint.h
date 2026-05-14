@@ -21,10 +21,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+
+
+#define DEBUGPRINTF(FMT, ...)					\
+    debugprintf("%s: ",__func__) ;				\
+    debugprintf(FMT __VA_OPT__(,) __VA_ARGS__)
 
 
 EXTERNC_begin
