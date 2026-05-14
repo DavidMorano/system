@@ -811,7 +811,7 @@ local int ient_start(IENT *iep,DW *op,cchar *name,ustat *sbp) noex {
 		} /* end if (m-a-f) */
 	    } /* end if (non-null) */
 	    iep->itime = ((sbp) ? sbp->st_mtime : 0) ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (ient_start) */
