@@ -572,7 +572,7 @@ static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
 		    if (rs < 0) {
 			lm_free(vp) ;
 		    } /* end if (error) */
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (nodesfile_fnalready) */
 	} /* end if (bfile_stat) */
 	return (rs >= 0) ? idx : rs ;
@@ -644,7 +644,7 @@ static int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
 	    if (rs < 0) {
 		lm_free(vp) ;
 	    } /* end if (error) */
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (nodesfile_fnparseload) */
