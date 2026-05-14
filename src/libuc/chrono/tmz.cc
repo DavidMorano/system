@@ -140,7 +140,7 @@ local int tmz_zinit(tmz *op,Args ... args) noex {
 		        op->zname = a ;
 		        memclear(a,rs) ;
 		        a[rs] = '\0' ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } /* end if (zname was NULL) */
 	    } /* end if (mkvars) */
 	} /* end if (non-null) */
