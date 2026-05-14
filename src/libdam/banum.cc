@@ -120,7 +120,7 @@ int banum_prepare(banum *cnp) noex {
 	        for (int i = 0 ; i < BANUM_LIM16 ; i += 1) {
 	            cnp->num[i] = numbits(i) ;
 	        }
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 }
