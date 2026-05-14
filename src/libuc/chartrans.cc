@@ -146,7 +146,7 @@ int chartrans_open(CT *op ,cchar *pr,int maxtx) noex {
 	                op->nmax = maxtx ;
 	                op->magic = CHARTRANS_MAGIC ;
 	                memset(p,0,asize) ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	            if (rs < 0) {
 			void *vp = voidp(op->pr) ;
 	                libmem.free(vp) ;
@@ -328,7 +328,7 @@ local int chartrans_setopen(CT *op,time_t dt,int txid,cc *sp,int sl) noex {
                 libmem.free(vp) ;
                 setp->name = nullptr ;
             }
-        } /* end if (memory-allocation) */
+        } /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (chartrans_setopen) */
