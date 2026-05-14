@@ -56,7 +56,7 @@ struct ipasswd_object {
 } ; /* end struct */
 
 struct ipasswd_cursor {
-	uint		magic ;
+	uint		magval ;
 	int		wi ;
 	int		i[IPASSWD_NINDICES] ;
 } ; /* end struct */
@@ -101,10 +101,10 @@ struct ipasswd_head {
 	time_t		ti_map ;
 	size_t		mapsize ;
 	IPASSWD_FL	fl ;		/* currently unused! */
-	uint		magic ;
+	uint		magval ;
 	uint		ropts ;
-	int		pagesize ;
-	int		filesize ;
+	int		pagesz ;
+	int		filesz ;
 	int		stcount ;
 	int		stsize ;
 	int		rtlen ;
