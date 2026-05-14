@@ -126,6 +126,29 @@ obj2.o:			$(OBJ2)
 obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj.o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 ipasswd.o:		ipasswd_prime.cc	$(INCS)
 
