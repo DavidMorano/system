@@ -189,7 +189,7 @@ int subproc::start() noex {
 	if ((rs = lm_mall(sz,&a)) >= 0) {
 	    vbuf = a ;
 	    ebuf = (a + (vlen+1)) ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end method (subproc::start) */
