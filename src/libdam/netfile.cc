@@ -418,7 +418,7 @@ static int netstate_item(netstate *nsp,int ki,cchar *sp,int sl) noex {
 	            if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	                nsp->item[ki] = cp ;
 	                nsp->c += 1 ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 		} /* end if (ok) */
 	    } /* end if (non-null) */
 	} /* end if (valid) */
