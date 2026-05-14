@@ -497,7 +497,7 @@ local int statmsg_userbegin(SM *op,cchar *username) noex {
 		                bp = (strwcpy(bp,username,-1) + 1) ;
 		                op->userhome = bp ;
 		                bp = (strwcpy(bp,hbuf,-1) + 1) ;
-		            } /* end if (memory-allocation) */
+		            } /* end if (memory-acquire) */
 	                } /* end if (getuserhome) */
 	            } /* end if (ok) */
 		    rs1 = lm_free(a) ;
@@ -655,7 +655,7 @@ local int statmsg_envbegin(SM *op) noex {
 	        } /* end for */
 	        va[c] = nullptr ;
 	        op->nenv = c ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end block */
 	return (rs >= 0) ? c : rs ;
 }
@@ -807,7 +807,7 @@ local int mapper_start(MA *mmp,time_t dt,cc *un,cc *uh,cc *fname) noex {
 	    	    lm_free(vp) ;
 	            mmp->fname = nullptr ;
 	        }
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 	        lockrw_destroy(&mmp->rwm) ;
 	    }
@@ -1077,7 +1077,7 @@ local int mapper_mapadd(MA *mmp,cc *kp,int kl,cc *vap,int val) noex {
 	            if (rs < 0) {
 	                lm_free(ep) ;
 	            }
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -1140,7 +1140,7 @@ local int mapdir_start(MD *ep,cc *un,cc *uh,
 	    		    lm_free(vp) ;
 		            ep->admin = nullptr ;
 		        } /* end if (error) */
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } /* end block */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -1248,7 +1248,7 @@ local int mapdir_expander(MD *ep) noex {
 		    if (cchar *cp ; (rs = lm_strw(pp,pl,&cp)) >= 0) {
 	                ep->dname = cp ;
 		        if (pl < 0) pl = rs ;
-		    } /* end if (memory-allocation) */
+		    } /* end if (memory-acquire) */
 	        } /* end if (OK) */
 	        rs1 = lm_free(tbuf) ;
 	        if (rs >= 0) rs = rs1 ;
