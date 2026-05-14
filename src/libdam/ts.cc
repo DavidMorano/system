@@ -361,7 +361,7 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 			    lm_free(vp) ;
 			    op->fname = nullptr ;
 			}
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
