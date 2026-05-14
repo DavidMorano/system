@@ -154,7 +154,7 @@ local int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	                    if (cc *cp ; (rs = lm_strw(pbuf,nl,&cp)) >= 0) {
 	                        *rpp = cp ;
 	                        op->as = cp ;
-	                    } /* end if (memory-allocation) */
+	                    } /* end if (memory-acquire) */
 	                } else {
 	                    *rpp = op->buf ;
 	                    strwcpy(op->buf,pbuf,nl) ;
@@ -177,7 +177,7 @@ local int absfn_loadnul(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 		nl = rs ;
 		*rpp = cp ;
 		op->as = cp ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} else {
 	    nl = sl ;
 	    *rpp = op->buf ;
