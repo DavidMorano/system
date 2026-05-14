@@ -35,10 +35,10 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bufsizevar.hh>
 #include	<sysval.hh>
 #include	<stdfnames.h>
-#include	<getfdfile.h>
 #include	<snx.h>
 #include	<cfdec.h>
 #include	<intsat.h>
