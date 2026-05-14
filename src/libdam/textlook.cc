@@ -480,7 +480,7 @@ int textlook_curbegin(TL *op,TL_CUR *curp) noex {
 		    lm_free(tb) ;
 		    curp->tbuf = nullptr ;
 		} /* end if (error-handling) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -1018,7 +1018,7 @@ local int textlook_dispstart(TL *op,int qo,SK *skp,rtags *rtp) noex {
 	            if (rs < 0) {
 		        lm_free(p) ;
 		    }
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (uptgetconcurrency) */
 	} /* end if (needed start-up) */
 	return rs ;
