@@ -16,7 +16,7 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
