@@ -91,7 +91,7 @@ int ba_start(ba *op,int n) noex {
 	            op->a = digitp(vp) ;
 	            op->nbits = n ;
 	            op->nwords = nw ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
