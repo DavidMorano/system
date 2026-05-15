@@ -128,6 +128,7 @@
 #include	<ucatexit.h>
 #include	<ucopen.h>
 #include	<ucdesc.h>
+#include	<ucfileop.h>
 #include	<bufsizevar.hh>
 #include	<ptm.h>
 #include	<ptc.h>
@@ -145,6 +146,7 @@
 #include	<localmisc.h>
 
 #include	"prqotd.h"
+#include	"prqotd_util.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -158,12 +160,12 @@ import libutil ;			/* |lenstr(3u)| */
 #define	OPENQOTD	openqotd_head
 #define	OPENQOTD_SUB	openqotd_sub
 
-#define	TTL_EXPIRE	(30*24*3600)		/* default 30 days */
-
-#define	NFNAME		"qotd.ndeb"
+#define	TTL_EXPIRE	(30*24*3600)	/* default 30 days */
 
 
 /* imported namespaces */
+
+using prqotd::init ;			/* variable */
 
 
 /* local typedefs */
@@ -172,37 +174,6 @@ typedef volatile sig_atomic_t	vaflag ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_mkdir(cchar *,mode_t) noex ;
-    extern int uc_mkfifo(cchar *,mode_t) noex ;
-    extern int uc_chmod(cchar *,mode_t) noex ;
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_unlink(cchar *) noex ;
-    extern int uc_unlinkshm(cchar *) noex ;
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_socket(int,int,int) noex ;
-    extern int uc_sockjoin(int,SOCKADDR *,int,int,mode_t) noex ;
-    extern int uc_openshm(cchar *,int,mode_t) noex ;
-    extern int uc_duper(int,int) noex ;
-    extern int uc_pipe(int *) noex ;
-    extern int uc_bind(int,cvoid *,int) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_fsize(int) noex ;
-    extern int uc_fchown(int,uid_t,gid_t) noex ;
-    extern int uc_fminmod(int,mode_t) noex ;
-    extern int uc_connect(int,cvoid *,int) noex ;
-    extern int uc_connecte(int,cvoid *,int,int) noex ;
-    extern int uc_lockf(int,int,off_t) noex ;
-    extern int uc_read(int,void *,int) noex ;
-    extern int uc_write(int,cvoid *,int) noex ;
-    extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_iocctl(int,int,...) noex ;
-    extern int uc_ftruncate(int,off_t ) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_setsockopt(int,int,int,int *,int) noex ;
-    extern int uc_linger(int,int) noex ;
-} /* end extern */
 
 extern "C" {
     int	openqotd_init() noex ;
@@ -222,7 +193,7 @@ struct openqotd_head {
 	vaflag		f_capture ;	/* capture flag */
 	vaflag		f_init ;
 	vaflag		f_initdone ;
-} ; /* end struct */
+} ; /* end struct (openqotd_head) */
 
 struct openqotd_sub {
 	cchar		*pr ;
@@ -233,7 +204,7 @@ struct openqotd_sub {
 	int		ttl ;
 	int		mjd ;
 	mode_t		dm ;
-} ;
+} ; /* end struct (openqotd_sub) */
 
 
 /* forward references */
@@ -295,20 +266,20 @@ int openqotd_init() noex {
 	                if (rs < 0) {
 	                    uc_atforkexp(b,a,a) ;
 			}
-	            }
+	            } /* end if (uc_atforkrec) */
 	            if (rs < 0) {
 	                cnp->destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptc_create) */
 	        if (rs < 0) {
 	            mxp->destroy() ;
-		}
+		} /* end if (error) */
 	    } /* end if (ptm_create) */
 	} else {
 	    while (! uip->f_initdone) {
 		msleep(1) ;
-	    }
-	}
+	    } /* end while */
+	} /* end if */
 	return rs ;
 }
 /* end subroutine (openqotd_init) */
@@ -342,60 +313,24 @@ int openqotd_fini() noex {
 }
 /* end subroutine (openqotd_fini) */
 
+local int prqotd_opens(cc *,int,int,int,time_t) noex ;
+
 int prqotd_open(cchar *pr,int mjd,int of,int to) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
-	int		fd = -1 ;
+	int		fd = -1 ; /* return-value */
 	if (pr) {
 	    time_t	dt = 0 ;
-	    cmode	dm = 0777 ;
-	    cchar	*vtmpdname = VTMPDNAME ;
-	    cchar	*qcname = QCNAME ;
+	    rs = SR_OK ;
 	    if (mjd <= 0) {
 	        if (dt == 0) dt = time(nullptr) ;
 	        rs = getdefmjd(dt) ;
 	        mjd = rs ;
-	    }
-    
+	    } /* end if (needed) */
 	    if (rs >= 0) {
-	        cchar	*rnp{} ;
-	        if (int rnl ; (rnl = sfbasename(pr,-1,&rnp)) > 0) {
-	            cchar	*vtd = vtmpdname ;
-	            cchar	*cn = qcname ;
-	            if (of & O_EXCL) {
-	                if (dt == 0) dt = time(nullptr) ;
-	                rs = qotdexpire(vtd,rnp,rnl,cn,dt,to) ;
-	            }
-	            if (rs >= 0) {
-			if (char *qfname ; (rs = lm_mp(&qfname)) >= 0) {
-			    cauto	mk = mkqfname ;
-	                    if ((rs = mk(qfname,vtd,rnp,rnl,cn,mjd)) >= 0) {
-	                        {
-	                            OPENQOTD_SUB	qs{} ;
-	                            qs.pr = pr ;
-	                            qs.qfname = qfname ;
-	                            qs.vtmpdname = vtmpdname ;
-	                            qs.qcname = qcname ;
-	                            qs.ttl = to ;
-	                            qs.of = of ;
-	                            qs.dm = dm ;
-	                            qs.mjd = mjd ;
-	                            if ((rs = openqotd_open(&qs)) >= 0) {
-	                                fd = rs ;
-	                            }
-	                        }
-	                        if ((rs >= 0) && (of & O_NOCTTY)) {
-	                            uc_unlink(qfname) ;
-	                        }
-	                        if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
-	                    } /* end if (mkqfname) */
-			    rs1 = lm_free(qfname) ;
-			    if (rs >= 0) rs = rs1 ;
-		        } /* end if (m-a-f) */
-	            } /* end if (ok) */
-	        } else {
-	            rs = SR_NOTDIR ;
-	        }
+		if (static cint rsi = init ; (rs = rsi) >= 0) {
+		    rs = prqotd_opens(pr,mjd,of,to,dt) ;
+		    fd = rs ;
+		} /* end if (init) */
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
@@ -404,6 +339,54 @@ int prqotd_open(cchar *pr,int mjd,int of,int to) noex {
 
 
 /* local subroutines */
+
+local int prqotd_opens(cc *pr,int mjd,int of,int to,time_t dt) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		fd = -1 ; /* return-value */
+	cmode		dm = 0777 ;
+	cchar		*vtmpdname = VTMPDNAME ;
+	cchar		*qcname = QCNAME ;
+	cchar		*rnp{} ;
+        if (int rnl ; (rnl = sfbasename(pr,-1,&rnp)) > 0) {
+            cchar       *vtd = vtmpdname ;
+            cchar       *cn = qcname ;
+            if (of & O_EXCL) {
+                if (dt == 0) dt = time(nullptr) ;
+                rs = qotdexpire(vtd,rnp,rnl,cn,dt,to) ;
+            }
+            if (rs >= 0) {
+                if (char *qfname ; (rs = lm_mp(&qfname)) >= 0) {
+                    cauto       mk = mkqfname ;
+                    if ((rs = mk(qfname,vtd,rnp,rnl,cn,mjd)) >= 0) {
+                        {
+                            OPENQOTD_SUB        qs{} ;
+                            qs.pr = pr ;
+                            qs.qfname = qfname ;
+                            qs.vtmpdname = vtmpdname ;
+                            qs.qcname = qcname ;
+                            qs.ttl = to ;
+                            qs.of = of ;
+                            qs.dm = dm ;
+                            qs.mjd = mjd ;
+                            if ((rs = openqotd_open(&qs)) >= 0) {
+                                fd = rs ;
+                            }
+                        } /* end block */
+                        if ((rs >= 0) && (of & O_NOCTTY)) {
+                            uc_unlink(qfname) ;
+                        }
+                        if ((rs < 0) && (fd >= 0)) {
+                            uc_close(fd) ;
+                        }
+                    } /* end if (mkqfname) */
+                    rs1 = lm_free(qfname) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (m-a-f) */
+            } /* end if (ok) */
+        } /* end if (sfbasename) */
+	return (rs >= 0) ? fd : rs ;
+} /* end subroutine (prqotd_opens) */
 
 local int openqotd_capbegin(int to) noex {
 	OPENQOTD	*uip = &openqotd_data ;
@@ -555,7 +538,6 @@ local int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	                    cint	fl = rs ;
 	                    if (uc_stat(qfname,&sb) >= 0) {
 	                        if (S_ISREG(sb.st_mode)) {
-    
 	                            if ((dt-sb.st_mtime) >= to) {
 	                                c += 1 ;
 	                                rs = vecpstr_add(dsp,qfname,fl) ;
@@ -649,10 +631,9 @@ local int loadchown(cchar *pr,int fd) noex {
 } /* end subroutine (loadchown) */
 
 local int getdefmjd(time_t dt) noex {
-	TMTIME		ct ;
 	int		rs ;
 	if (dt == 0) dt = time(nullptr) ;
-	if ((rs = tmtime_timelocal(&ct,dt)) >= 0) {
+	if (tmtime ct ; (rs = tmtime_timelocal(&ct,dt)) >= 0) {
 	    int	y = (ct.year + TM_YEAR_BASE) ;
 	    int	m = ct.mon ;
 	    int	d = ct.mday ;
