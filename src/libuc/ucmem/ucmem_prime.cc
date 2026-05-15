@@ -346,7 +346,7 @@ namespace libuc {
 		    cchar **rpp = ccharpp(vpp) ;
 		    ml = intconv(strwcpy(bp,sp,sl) - bp) ;
 		    *rpp = bp ;
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ml : rs ;
