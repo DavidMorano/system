@@ -18,9 +18,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/socket.h>
 #include	<uclibsubs.h>
+#include	<ucdesc.h>
 #include	<localmisc.h>
 
-#include	"ucsock.h"
+#include	"ucdescsock.h"
 
 /* local defines */
 
