@@ -110,7 +110,7 @@ int vecelem_start(vecelem *op,int esz,int vn,int vo) noex {
 	                op->va = p ;
 	    	        op->n = vn ;
 		    	op->magval = VECELEM_MAGIC ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } /* end if */
 	    } /* end if (valid) */
 	    if (rs < 0) {
