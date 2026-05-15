@@ -182,7 +182,7 @@ int vecstr_start(vecstr *op,int vn,int vo) noex {
 	            op->va[0] = nullptr ;
 	            op->stsz = 1 ;
 		    op->fl.stsz = true ;	/* starts off true */
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if */
 	    if (rs < 0) {
 		vecstr_dtor(op) ;
@@ -287,7 +287,7 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	            *bp = '\0' ;
 	            op->stsz += sz ;
 	            i = vecstr_addsp(op,ap) ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
@@ -309,7 +309,7 @@ int vecstr_insert(vecstr *op,int ii,cchar *sp,int µsl) noex {
 	                     strwcpy(bp,sp,sl) ;
 	                     op->stsz += sz ;
 	                     i = vecstr_insertsp(op,ii,bp) ;
-	                 } /* end if (memory-allocation) */
+	                 } /* end if (memory-acquire) */
 	             } /* end if (OK) */
 	        } /* end if (valid index) */
 	    } /* end if (getlenstr) */
