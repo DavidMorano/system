@@ -92,7 +92,7 @@ int raqhand_start(raqhand *op,int n,int opts) noex {
 		    memclear(vp,sz) ;
 		    op->va = (cvoid **) vp ;
 	            op->n = n ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (options) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
