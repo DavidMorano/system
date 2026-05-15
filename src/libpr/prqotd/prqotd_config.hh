@@ -58,10 +58,14 @@
 
 
 namespace prqotd {
+    const int		config_magicval = 0x8932170 ;
+} /* end namespace (prqotd) */
+
+namespace prqotd {
     struct config {
-	subinfo		*sip ;
-	paramfile	pf ;
-	expcook		cooks ;
+	subinfo		*sip ;		/* supplied argument */
+	paramfile	*pfp ;		/* allocated */
+	expcook		*ecp ;		/* allocated */
 	uint		magval ;
 	uint		f_p:1 ;
 	uint		f_cooks:1 ;
@@ -70,12 +74,8 @@ namespace prqotd {
 
 namespace prqotd {
     extern int	config_start		(config *,subinfo *,cchar *) noex ;
-    extern int	config_findfile		(config *,char *,cchar *) noex ;
-    extern int	config_cookbegin	(config *) noex ;
-    extern int	config_cookend		(config *) noex ;
-    extern int	config_read		(config *) noex ;
-    extern int	config_reader		(config *,char *,int) noex ;
     extern int	config_finish		(config *) noex ;
+    extern int	config_read		(config *) noex ;
     extern int	config_check		(config *) noex ;
 } /* end namespace (prqotd) */
 
