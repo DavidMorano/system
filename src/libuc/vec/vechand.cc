@@ -106,7 +106,7 @@ int vechand_start(vechand *op,int vn,int vo) noex {
 	            op->va[0] = nullptr ;
 	            op->n = vn ;
 	            op->fl.issorted = false ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (options) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? vn : rs ;
