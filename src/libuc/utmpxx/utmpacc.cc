@@ -365,7 +365,7 @@ int utmpacc_curbegin(utmpacc_cur *curp) noex {
 			libmem.free(ufp) ;
 			icurp->utmpfentp = nullptr ;
 		    }
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 		if (rs < 0) {
 		    libmem.free(icurp) ;
 		    curp->icursor = nullptr ;
