@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* assert a NUL-terminated string */
+/* create an absolute file-name */
 /* version %I% last-modified %G% */
 
 
