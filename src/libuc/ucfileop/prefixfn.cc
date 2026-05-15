@@ -22,8 +22,8 @@
 	
 	Description:
 	This object module (prefixfn) creates an absolute file-name
-	when needed.  It does this by prepending the present 
-	working directory (PWD) to those file names that a relative.
+	when needed.  It does this by prepending the present working
+	directory (PWD) to those file names that are relative.
 
 *******************************************************************************/
 
@@ -156,7 +156,7 @@ local int prefixfn_loadnul(prefixfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	    sl = rs ;
 	    op->as = cp ;
 	    *rpp = cp ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (prefixfn_loadnul) */
