@@ -6,9 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* compile-time debugging */
-#define	CF_OPENDEF	0		/* ? */
-#define	CF_SOURCES	1		/* use sources */
-#define	CF_CONFIGCHECK	0		/* |config_check()| */
 
 /* revision history:
 
@@ -60,16 +57,15 @@
 #include	<ucgetpid.h>
 #include	<estrings.h>
 #include	<mkfnamesuf.h>
-#include	<ids.h>
-#include	<sigman.h>
-#include	<tmtime.hh>
-#include	<storebuf.h>
 #include	<vecstr.h>
 #include	<vecpstr.h>
 #include	<ascii.h>
 #include	<paramfile.h>
 #include	<expcook.h>
-#include	<permx.h>
+#include	<permx.h>		/* |permsched(3uc)| */
+#include	<cfdecmf.h>
+#include	<cfdect.h>
+#include	<ctdec.h>
 #include	<isnot.h>
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
@@ -88,41 +84,40 @@ import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
-#ifndef	VBUFLEN
-#define	VBUFLEN		(2 * MAXPATHLEN)
-#endif
-
 #ifndef	LOGCNAME
 #define	LOGCNAME	"log"
 #endif
 
-#define	CONFIGFNAME	"conf"
-#define	QCNAME		"qotd"
-
-#ifndef	MAINTQOTD_SEARCHNAME
-#define	MAINTQOTD_SEARCHNAME	"maintqotd"
-#endif
-#ifndef	MAINTQOTD_PROGEXEC
-#define	MAINTQOTD_PROGEXEC	"qotd"
-#endif
-#ifndef	MAINTQOTD_VARSPOOL
-#define	MAINTQOTD_VARSPOOL	"var/spool"
-#endif
-
-#define	MAINTQOTD_SEARCHNAME	"maintqotd"
-#define	MAINTQOTD_PRNAME	"LOCAL"
-#define	MAINTQOTD_PROGEXEC	"qotd"
-#define	MAINTQOTD_PROGMKQOTD	"helloworld"
-#define	MAINTQOTD_CONFMAGIC	0x8932170
-
 #define	CF		prqotd::config
 
-#ifndef	SI
-#define	SI		subinfo
+#ifndef	SUB
+#define	SUB		subinfo
 #endif
 
 #define	PF		paramfile
 #define	PF_CUR		paramfile_cur
+
+#define	EC		expcook
+#define	EC_CUR		expcook_cur
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+
+/* imported namespaces */
+
+using prqotd::config ;			/* type */
+using prqotd::subinfo ;			/* type */
+using prqotd::subinfo_setfname ;        /* subroutine */
+using prqotd::subinfo_setentry ;        /* subroutine */
+using prqotd::subinfo_spooldir ;        /* subroutine */
+using prqotd::subinfo_hostname ;        /* subroutine */
+using prqotd::subinfo_source ;          /* subroutine */
+using prqotd::var ;			/* variable */
+using prqotd::config_magicval ;		/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -135,6 +130,58 @@ import uconstants ;			/* |varname(3u)| */
 
 
 /* forward references */
+
+template<typename ... Args>
+local int config_ctor(config *op,Args ... args) noex {
+    	config		*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ; /* <- dangerous */
+	    rs = SR_NOMEM ;
+	    if ((op->pfp = new(nt) paramfile) != np) ylikely {
+	        if ((op->ecp = new(nt) expcook) != np) ylikely {
+		    rs = SR_OK ;
+		} /* end if (new-expcook) */
+		if (rs < 0) {
+		    delete op->pfp ;
+		    op->pfp = nullptr ;
+		}
+	    } /* end if (new-paramfile) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (config_ctor) */
+
+local int config_dtor(config *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+	    if (op->ecp) ylikely {
+		delete op->ecp ;
+		op->ecp = nullptr ;
+	    }
+	    if (op->pfp) ylikely {
+		delete op->pfp ;
+		op->pfp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (config_dtor) */
+
+template<typename ... Args>
+local inline int config_magic(config *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == config_magicval) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (config_magic) */
+
+local int	config_findfile		(config *,char *,cchar *) noex ;
+local int	config_cookbegin	(config *) noex ;
+local int	config_cookend		(config *) noex ;
+local int	config_reader		(config *,char *,int) noex ;
 
 
 /* local variables */
@@ -169,30 +216,33 @@ constexpr cpcchar	cparams[] = {
 	nullptr
 } ; /* end array (cparams) */
 
+cbool		f_debug = CF_DEBUG ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int config_start(CF *csp,SI *sip,cchar *cfname) noex {
-	int		rs = SR_FAULT ;
+namespace prqotd {
+    int config_start(CF *csp,SUB *sip,cchar *cfname) noex {
+	int		rs ;
 	int		rs1 ;
-	if (csp && cfname) {
-	    memclear(csp) ;
+	if ((rs = config_ctor(csp,sip,cfname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (cfname[0]) {
 	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+		    PF	*pfp = csp->pfp ;
 	            csp->sip = sip ;
-	            if ((rs = config_findfile(csp,tbu,cfname)) >= 0) {
-	                cchar	**envv = var.envv ;
+	            if ((rs = config_findfile(csp,tbuf,cfname)) >= 0) {
+	                con mainv envv = var.envv ;
 	                if (rs > 0) cfname = tbuf ;
-	                if ((rs = paramfile_open(&csp->p,envv,cfname)) >= 0) {
+	                if ((rs = pfp->open(envv,cfname)) >= 0) {
 	                    if ((rs = config_cookbegin(csp)) >= 0) {
 	                        csp->f_p = true ;
 	                    }
 	                    if (rs < 0) {
-	                        paramfile_close(&csp->p) ;
+	                        pfp->close() ;
 		            }
 	                } else if (isNotPresent(rs)) {
 	                    rs = SR_OK ;
@@ -201,7 +251,7 @@ int config_start(CF *csp,SI *sip,cchar *cfname) noex {
 	                rs = SR_OK ;
 	            }
 	            if (rs >= 0) {
-	                csp->magval = MAINTQOTD_CONFMAGIC ;
+	                csp->magval = config_magicval ;
 	            }
 		    rs1 = lm_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -210,315 +260,294 @@ int config_start(CF *csp,SI *sip,cchar *cfname) noex {
 		    csp->magval = 0 ;
 		}
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		config_dtor(csp) ;
+	    }
+	} /* end if (config_ctor) */
 	return rs ;
-}
-/* end subroutine (config_start) */
-
-int config_finish(CF *csp) noex {
-	int		rs = SR_FAULT ;
+    } /* end subroutine (config_start) */
+    int config_finish(CF *csp) noex {
+	int		rs ;
 	int		rs1 ;
-	if (csp) {
-	    rs = SR_NOTOPEN ;
-	    if (csp->magval == MAINTQOTD_CONFMAGIC) {
-		rs = SR_OK ;
-	        if (csp->f_p) {
-	            if (csp->f_cooks) {
-	                rs1 = config_cookend(csp) ;
-	                if (rs >= 0) rs = rs1 ;
-	            }
-	            rs1 = paramfile_close(&csp->p) ;
+	if ((rs = config_magic(csp)) >= 0) {
+	    if (csp->f_p) {
+	        if (csp->f_cooks) {
+	            rs1 = config_cookend(csp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+		{
+	            rs1 = paramfile_close(csp->pfp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            csp->f_p = false ;
-	        } /* end if */
-	    } /* end if (config_magic) */
-	} /* end if (non-null) */
+		}
+	    } /* end if */
+	    {
+		rs1 = config_dtor(csp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (config_magic) */
 	return rs ;
-}
-/* end subroutine (config_finish) */
+    } /* end subroutine (config_finish) */
+    int config_read(CF *csp) noex {
+	int		rs ;
+	int		rs1 ;
+	int		rv = 0 ; /* return-value */
+	if ((rs = config_magic(csp)) >= 0) {
+	    SUB		*sip = csp->sip ;
+	    rs = SR_FAULT ;
+	    if ((sip = csp->sip)) {
+		rs = SR_OK ;
+	        if (csp->f_p) {
+	            cint	elen = var.ebuflen ;
+	            if (char *ebuf ; (rs = lm_mall((elen+1),&ebuf)) >= 0) {
+			{
+		            rs = config_reader(csp,ebuf,elen) ;
+			    rv = rs ;
+			}
+		        rs1 = lm_free(ebuf) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (memory-allocation) */
+	        } /* end if (avtive) */
+	    } /* end if (valid) */
+	} /* end if (config_magic) */
+	return (rs >= 0) ? rv : rs ;
+    } /* end subroutine (config_read) */
+    int config_check(CF *csp) noex {
+	int		rs ;
+	int		rv = 0 ; /* return-value */
+	if ((rs = config_magic(csp)) >= 0) {
+	    SUB		*sip = csp->sip ;
+	    if (csp->f_p) {
+	        custime dt = sip->dt ;
+	        if ((rs = paramfile_check(csp->pfp,dt)) > 0) {
+	            rs = config_read(csp) ;
+		    rv = rs ;
+		}
+	    }
+	} /* end if (config_magic) */
+	return (rs >= 0) ? rv : rs ;
+    } /* end subroutine (config_check) */
+} /* end namespace (prqotd) */
 
-int config_findfile(CF *csp,char *tbuf,cchar *cfname) noex {
-	MAINTQOTD	*sip = csp->sip ;
+
+/* private subroutines */
+
+local int config_findfile(CF *csp,char *tbuf,cchar *cfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ; /* return-value */
-	tbuf[0] = '\0' ;
-	if (vecstr sv ; (rs = vecstr_start(&sv,6,0)) >= 0) {
-	    cint	tlen = var.maxpathlen ;
-	    if (rs >= 0) rs = vecstr_envset(&sv,"p",sip->pr,-1) ;
-	    if (rs >= 0) rs = vecstr_envset(&sv,"e","etc",-1) ;
-	    if (rs >= 0) rs = vecstr_envset(&sv,"n",sip->sn,-1) ;
-	    if (rs >= 0) {
-	        rs = permsched(csched,&sv,tbuf,tlen,cfname,R_OK) ;
-	        pl = rs ;
-	    }
-	    rs1 = vecstr_finish(&sv) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (finding file) */
+	if ((rs = config_magic(csp)) >= 0) {
+	    SUB		*sip = csp->sip ;
+	    tbuf[0] = '\0' ;
+	    if (vecstr sv ; (rs = vecstr_start(&sv,6,0)) >= 0) {
+	        cint	tlen = var.maxpathlen ;
+	        if (rs >= 0) rs = vecstr_envset(&sv,"p",sip->pr,-1) ;
+	        if (rs >= 0) rs = vecstr_envset(&sv,"e","etc",-1) ;
+	        if (rs >= 0) rs = vecstr_envset(&sv,"n",sip->sn,-1) ;
+	        if (rs >= 0) {
+	            rs = permsched(csched,&sv,tbuf,tlen,cfname,R_OK) ;
+	            pl = rs ;
+	        }
+	        rs1 = vecstr_finish(&sv) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (finding file) */
+	} /* end if (config_magic) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (config_findfile) */
+} /* end subroutine (config_findfile) */
 
-int config_cookbegin(CF *csp) noex {
-	MAINTQOTD	*sip = csp->sip ;
+local int config_cookbegin(CF *csp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) {
-	    int	hlen = rs ;
-	    if ((rs = expcook_start(&csp->cooks)) >= 0) {
-	        cchar	*ks = "PSNDHRU" ;
-	        char	kbuf[2] ;
-	        kbuf[1] = '\0' ;
-	        for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
-		    cchar *vp = nullptr ;
-	            int    vl = -1 ;
-	            switch (cint kch = MKCHAR(ks[i]) ; kch) {
-	            case 'P':
-	                vp = sip->pn ;
-	                break ;
-	            case 'S':
-	                vp = sip->sn ;
-	                break ;
-	            case 'N':
-	                vp = sip->nn ;
-	                break ;
-	            case 'D':
-	                vp = sip->dn ;
-	                break ;
-	            case 'H':
-	                {
-	                    cchar	*nn = sip->nn ;
-	                    cchar	*dn = sip->dn ;
-	                    rs = snsds(hbuf,hlen,nn,dn) ;
-	                    vl = rs ;
-	                    vp = hbuf ;
+	if ((rs = config_magic(csp)) >= 0) {
+	    SUB		*sip = csp->sip ;
+	    if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) {
+		EC	*ecp = csp->ecp ;
+	        int	hlen = rs ;
+	        if ((rs = ecp->start) >= 0) {
+	            cchar	*ks = "PSNDHRU" ;
+		    cchar	*vp = nullptr ;
+	            char	kbuf[2] = {} ;
+	            int		vl = -1 ;
+	            for (int i = 0 ; (rs >= 0) && ks[i] ; i += 1) {
+	                cint kch = MKCHAR(ks[i]) ;
+	                switch (kch) {
+	                case 'P':
+	                    vp = sip->pn ;
+	                    break ;
+	                case 'S':
+	                    vp = sip->sn ;
+	                    break ;
+	                case 'N':
+	                    vp = sip->nn ;
+	                    break ;
+	                case 'D':
+	                    vp = sip->dn ;
+	                    break ;
+	                case 'H':
+	                    {
+	                        cchar	*nn = sip->nn ;
+	                        cchar	*dn = sip->dn ;
+	                        rs = snsds(hbuf,hlen,nn,dn) ;
+	                        vl = rs ;
+	                        vp = hbuf ;
+	                    } /* end block */
+	                    break ;
+	                case 'R':
+	                    vp = sip->pr ;
+	                    break ;
+	                case 'U':
+	                    vp = sip->un ;
+	                    break ;
+	                } /* end switch */
+	                if ((rs >= 0) && vp) {
+	                    kbuf[0] = char(kch) ;
+	                    rs = ecp->add(kbuf,vp,vl) ;
 	                }
-	                break ;
-	            case 'R':
-	                vp = sip->pr ;
-	                break ;
-	            case 'U':
-	                vp = sip->un ;
-	                break ;
-	            } /* end switch */
-	            if ((rs >= 0) && vp) {
-	                kbuf[0] = kch ;
-	                rs = expcook_add(&csp->cooks,kbuf,vp,vl) ;
+	            } /* end for */
+	            if (rs >= 0) {
+	                if ((vl = sfbasename(sip->pr,-1,&vp)) > 0) {
+	                    rs = ecp->add("RN",vp,vl) ;
+	                }
+	            } /* end if (ok) */
+	            if (rs >= 0) {
+	                if ((rs = ctdeci(hbuf,hlen,sip->mjd)) >= 0) {
+	                    rs = ecp->add("MJD",hbuf,rs) ;
+	                }
+	            } /* end if (ok) */
+	            if (rs >= 0) {
+	                csp->f_cooks = true ;
+	            } else {
+	                ecp->finish() ;
 	            }
-	        } /* end for */
-	        if (rs >= 0) {
-	            if ((vl = sfbasename(sip->pr,-1,&vp)) > 0) {
-	                rs = expcook_add(&csp->cooks,"RN",vp,vl) ;
-	            }
-	        } /* end if (ok) */
-	        if (rs >= 0) {
-	            if ((rs = ctdeci(hbuf,hlen,sip->mjd)) >= 0) {
-	                rs = expcook_add(&csp->cooks,"MJD",hbuf,rs) ;
-	            }
-	        } /* end if (ok) */
-	        if (rs >= 0) {
-	            csp->f_cooks = true ;
-	        } else {
-	            expcook_finish(&csp->cooks) ;
-	        }
-	    } /* end if (expcook_start) */
-	    rs1 = lm_free(hbuf) ;
+	        } /* end if (expcook_start) */
+	        rs1 = lm_free(hbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (config_magic) */
+	return rs ;
+} /* end subroutine (config_cookbegin) */
+
+local int config_cookend(CF *csp) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = config_magic(csp)) >= 0) {
+	    if (csp->f_cooks) {
+	        csp->f_cooks = false ;
+	        rs1 = expcook_finish(csp->ecp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if */
+	} /* end if (config_magic) */
+	return rs ;
+} /* end subroutine (config_cookend) */
+
+local int config_readers(CF *,char *,int,int) noex ;
+
+local int config_reader(CF *csp,char *ebuf,int elen) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent f_active=%u\n",csp->f_p) ;
+	if (csp->f_p) {
+	    EC		*ecp = csp->ecp ;
+	    PF		*pfp = csp->pfp ;
+	    cint	sz = (var.vbuflen + 1) ;
+	    if (char *vbuf ; (rs = lm_mall(sz,&vbuf)) >= 0) {
+	        cint	vlen = var.vbuflen ;
+	        for (int i = 0 ; cparams[i] ; i += 1) {
+		    cchar	*cparam = cparams[i] ;
+	            if (PF_CUR cur ; (rs = pfp->curbegin(&cur)) >= 0) {
+	                while (rs >= 0) {
+	                    cint vl = pfp->fetch(cparam,&cur,vbuf,vlen) ;
+	    		    int	el = 0 ;
+	                    if (vl == SR_NOTFOUND) break ;
+	                    rs = vl ;
+	                    if (rs < 0) break ;
+	                    ebuf[0] = '\0' ;
+	                    if (vl > 0) {
+	                        rs = ecp->exp(0,ebuf,elen,vbuf,vl) ;
+			        el = rs ;
+	                        if (el >= 0) ebuf[el] = '\0' ;
+	                    }
+	                    if ((rs >= 0) && (el > 0)) {
+			        rs = config_readers(csp,ebuf,el,i) ;
+			        c += 1 ;
+			    }
+	                } /* end while (fetching) */
+	                rs1 = paramfile_curend(pfp,&cur) ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (cursor) */
+	            if (rs < 0) break ;
+	        } /* end for (parameters) */
+	        rs1 = lm_free(vbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (active) */
+	DEBUGPRINTF("ret rs=%d c=%d\n",rs,c) ;
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (config_reader) */
+
+local int config_readers(CF *csp,char *ebuf,int el,int i) noex {
+	SUB		*sip = csp->sip ;
+	cnullptr	np{} ;
+    	int		rs ;
+	int		rs1 ;
+	DEBUGPRINTF("ent i=%d el=%d\n",i,el) ;
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	    cchar	*sn = sip->sn ;
+            switch (int v ; i) {
+            case cparam_logsize:
+                if (cfdecmfi(ebuf,el,&v) >= 0) {
+                    if (v >= 0) {
+                        switch (i) {
+                        case cparam_logsize:
+                            sip->logsize = v ;
+                            break ;
+                        } /* end switch */
+                    }
+                } /* end if (valid number) */
+                break ;
+            case cparam_to:
+                if (cfdecti(ebuf,el,&v) >= 0) {
+                    if (v >= 0) {
+                        sip->to = v ;
+                    }
+                } /* end if (valid number) */
+                break ;
+            case cparam_logfile:
+                if (! sip->finval.lfname) {
+		    int ml ;
+                    cchar *lfn = sip->lfname ;
+                    cchar *tfn = tbuf ;
+                    sip->finval.lfname = true ;
+                    sip->have.lfname = true ;
+                    ml = subinfo_setfname(sip,tbuf,ebuf,el,true,
+                        LOGCNAME,sn,"") ;
+                    if ((lfn == np) || (strcmp(lfn,tfn) != 0)) {
+                        cchar   **vpp = &sip->lfname ;
+                        sip->changed.lfname = true ;
+                        rs = subinfo_setentry(sip,vpp,tbuf,ml) ;
+                    }
+                } /* end if (needed) */
+                break ;
+            case cparam_spooldir:
+                if (sip->spooldname == nullptr) {
+                    rs = subinfo_spooldir(sip,ebuf,el) ;
+                }
+                break ;
+            case cparam_hostname:
+                if (sip->hostname == nullptr) {
+                    rs = subinfo_hostname(sip,ebuf,el) ;
+                }
+                break ;
+            case cparam_source:
+                rs = subinfo_source(sip,ebuf,el) ;
+                break ;
+            } /* end switch */
+	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (config_cookbegin) */
-
-int config_cookend(CF *csp) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	if (csp->f_cooks) {
-	    csp->f_cooks = false ;
-	    rs1 = expcook_finish(&csp->cooks) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if */
-	return rs ;
-}
-/* end subroutine (config_cookend) */
-
-int config_check(CF *csp) noex {
-	int		rs = SR_FAULT ;
-	int		rv = 0 ; /* return-value */
-	if (csp) {
-	    MAINTQOTD	*sip = csp->sip ;
-	    rs = SR_NOTOPEN ;
-	    if (csp->magval == MAINTQOTD_CONFMAGIC) {
-		rs = SR_OK ;
-	        if (csp->f_p) {
-	            custime dt = sip->dt ;
-	            if ((rs = paramfile_check(&csp->p,dt)) > 0) {
-	                rs = config_read(csp) ;
-			rv = rs ;
-		    }
-	        }
-	    } /* end if (config_magic) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (config_check) */
-
-int config_read(CF *csp) noex {
-	MAINTQOTD	*sip = csp->sip ;
-	int		rs = SR_FAULT ;
-	int		rv = 0 ; /* return-value */
-	if (csp) {
-	    MAINTQOTD	*sip = csp->sip ;
-	    rs = SR_NOTOPEN ;
-	    if (csp->magval == MAINTQOTD_CONFMAGIC) {
-		rs = SR_FAULT ;
-		if ((sip = csp->sip)) {
-		    rs = SR_OK ;
-	            if (csp->f_p) {
-	                cint	elen = var.ebuflen ;
-	                if (char *ebuf ; (rs = lm_mall((elen+1),&ebuf)) >= 0) {
-			    {
-		                rs = config_reader(csp,ebuf,elen) ;
-			        rv = rs ;
-			    }
-		            rs1 = lm_free(ebuf) ;
-			    if (rs >= 0) rs = rs1 ;
-	                } /* end if (memory-allocation) */
-	            } /* end if (avtive) */
-	        } /* end if (valid) */
-	    } /* end if (config_magic) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (config_read) */
-
-int config_reader(CF *csp,char *ebuf,int elen) noex {
-	MAINTQOTD	*sip = csp->sip ;
-	PF	*pfp = &csp->p ;
-	PF_CUR	cur ;
-	cint	vlen = var.vbuflen ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		i ;
-	int		vl, el ;
-	int		v ;
-	int		ml ;
-	int		c = 0 ;
-	char		vbuf[VBUFLEN + 1] ;
-
-#if	CF_DEBUG
-	debugprintf("maintqotd/config_reader: ent f_active=%u\n",
-		csp->f_p) ;
-#endif
-	if (sip == nullptr) return SR_FAULT ;
-
-	if (csp->f_p) {
-	    for (i = 0 ; cparams[i] != nullptr ; i += 1) {
-		cchar	*cparam = cparams[i] ;
-
-#if	CF_DEBUG
-	        debugprintf("mqintqotd/config_read: cparam=%s\n",cparam) ;
-#endif
-
-	        if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
-
-	            while (rs >= 0) {
-	                vl = paramfile_fetch(pfp,cparam,&cur,vbuf,vlen) ;
-#if	CF_DEBUG
-	                debugprintf("mqintqotd/config_read: "
-			"paramfile_fetch() rs=%d\n",vl) ;
-#endif
-	                if (vl == SR_NOTFOUND) break ;
-	                rs = vl ;
-	                if (rs < 0) break ;
-
-#if	CF_DEBUG
-	                    debugprintf("mqintqotd/config_read: "
-				"vbuf=>%r<\n",vbuf,vl) ;
-#endif
-
-	                ebuf[0] = '\0' ;
-	                el = 0 ;
-	                if (vl > 0) {
-	                    el = expcook_exp(&csp->cooks,0,ebuf,elen,vbuf,vl) ;
-	                    if (el >= 0) ebuf[el] = '\0' ;
-	                }
-
-#if	CF_DEBUG
-	                debugprintf("maintqotd/config_read: "
-				"ebuf=>%r<\n",ebuf,el) ;
-#endif
-
-	                if (el > 0) {
-	                    cchar	*sn = sip->sn ;
-	                    char	tbuf[MAXPATHLEN + 1] ;
-
-			    c += 1 ;
-	                    switch (i) {
-
-	                    case cparam_logsize:
-	                        if (cfdecmfi(ebuf,el,&v) >= 0) {
-	                            if (v >= 0) {
-	                                switch (i) {
-	                                case cparam_logsize:
-	                                    sip->logsize = v ;
-	                                    break ;
-	                                } /* end switch */
-	                            }
-	                        } /* end if (valid number) */
-	                        break ;
-
-	                    case cparam_to:
-	                        if (cfdecti(ebuf,el,&v) >= 0) {
-	                            if (v >= 0) {
-	                                sip->to = v ;
-	                            }
-	                        } /* end if (valid number) */
-	                        break ;
-
-	                    case cparam_logfile:
-	                        if (! sip->finval.lfname) {
-	                            cchar *lfn = sip->lfname ;
-	                            cchar	*tfn = tbuf ;
-	                            sip->finval.lfname = true ;
-	                            sip->have.lfname = true ;
-	                            ml = setfname(sip,tbuf,ebuf,el,true,
-	                                LOGCNAME,sn,"") ;
-	                            if ((lfn == nullptr) || 
-	                                (strcmp(lfn,tfn) != 0)) {
-	                                cchar	**vpp = &sip->lfname ;
-	                                sip->changed.lfname = true ;
-	                                rs = subinfo_setentry(sip,vpp,tbuf,ml) ;
-	                            }
-	                        }
-	                        break ;
-
-	                    case cparam_spooldir:
-	                        if (sip->spooldname == nullptr) {
-	                            rs = subinfo_spooldir(sip,ebuf,el) ;
-	                        }
-	                        break ;
-
-	                    case cparam_hostname:
-	                        if (sip->hostname == nullptr) {
-	                            rs = subinfo_hostname(sip,ebuf,el) ;
-	                        }
-	                        break ;
-
-	                    case cparam_source:
-	                        rs = subinfo_source(sip,ebuf,el) ;
-	                        break ;
-	                    } /* end switch */
-	                } /* end if (got one) */
-	            } /* end while (fetching) */
-	            rs1 = paramfile_curend(pfp,&cur) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (cursor) */
-	        if (rs < 0) break ;
-	    } /* end for (parameters) */
-	} /* end if (active) */
-
-	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (config_reader) */
+} /* end subroutine (config_readers) */
 
 
