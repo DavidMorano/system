@@ -118,6 +118,7 @@ int ucsysconf::getstd(int req) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
 	errtimer	to_busy		= utimeout[uto_busy] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
+	errtimer	to_nospc	= utimeout[uto_nospc] ;
 	reterr		r ;
 	int		rs ;
 	repeat {
@@ -132,6 +133,9 @@ int ucsysconf::getstd(int req) noex {
                     break ;
                 case SR_NOMEM:
                     r = to_nomem(rs) ;
+                    break ;
+                case SR_NOSPC:
+                    r = to_nospc(rs) ;
                     break ;
 	        case SR_INTR:
 		    r(false) ;
