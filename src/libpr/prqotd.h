@@ -26,6 +26,20 @@
 #include	<prqotd_config.hh>
 
 
+#ifndef	PRQOTD_SN
+#define	PRQOTD_SN	"maintqotd"
+#endif
+#ifndef	PRQOTD_PROGEXEC
+#define	PRQOTD_PROGEXEC	"qotd"
+#endif
+#ifndef	PRQOTD_VARSPOOL
+#define	PRQOTD_VARSPOOL	"var/spool"
+#endif
+
+#define	PRQOTD_PRNAME	"LOCAL"
+#define	PRQOTD_PROG	"helloworld"
+
+
 EXTERNC_begin
 
 extern int	prqotd_open	(cchar *,int,int,int) noex ;
