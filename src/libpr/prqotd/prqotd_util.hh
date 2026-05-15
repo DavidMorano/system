@@ -5,10 +5,6 @@
 /* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_OPENDEF	0		/* ? */
-#define	CF_SOURCES	1		/* use sources */
-#define	CF_CONFIGCHECK	0		/* |config_check()| */
 
 /* revision history:
 
@@ -36,7 +32,6 @@
 	>=0		FD of QOTD
 	<0		error (system-return)
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -49,6 +44,9 @@
 
 
 namespace prqotd {
+    struct initer {
+	operator int () noex ;
+    } ; /* end struct (initer) */
     struct vars {
 	mainv	envv ;
 	int	pid ;
@@ -68,6 +66,7 @@ namespace prqotd {
 
 namespace prqotd {
     extern vars		var ;
+    extern initer	init ;
 } /* end namespace (prqotd) */
 
 
