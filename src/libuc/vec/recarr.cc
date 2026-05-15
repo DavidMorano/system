@@ -116,7 +116,7 @@ int recarr_start(recarr *op,int n,int opts) noex {
 		    op->va = voidpp(vp) ;
 		    op->n = n ;
 	            op->va[0] = nullptr ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (recarr_setopts) */
 	    if (rs < 0) {
 		recarr_dtor(op) ;
