@@ -118,6 +118,7 @@ int ucsysconf::sysconfval(int req) noex {
 	case _SC_PID_MAX:
 	case _SC_ARG_MAX:
 	case _SC_LINE_MAX:
+	case _SC_LINK_MAX:
 	case _SC_LOGIN_NAME_MAX:
 	case _SC_NGROUPS_MAX:
 	case _SC_NODENAME_MAX:
@@ -154,18 +155,19 @@ int ucsysconf::getvalcache(int req) noex {
 	int		rs = SR_OK ;
 	int		ii = -1 ;
 	switch (req) {
-	case _SC_PID_MAX:		ii = dataitem_maxpid ; break ;
-	case _SC_ARG_MAX:		ii = dataitem_maxarg ; break ;
+	case _SC_PID_MAX:		ii = dataitem_maxpid ;	break ;
+	case _SC_ARG_MAX:		ii = dataitem_maxarg ;	break ;
 	case _SC_LINE_MAX:		ii = dataitem_maxline ; break ;
+	case _SC_LINK_MAX:		ii = dataitem_maxlink ; break ;
 	case _SC_LOGIN_NAME_MAX:	ii = dataitem_maxlogin ; break ;
 	case _SC_NODENAME_MAX:		ii = dataitem_maxnode ; break ;
 	case _SC_PROTNAME_MAX:		ii = dataitem_maxprot ; break ;
 	case _SC_HOSTNAME_MAX:		ii = dataitem_maxhost ; break ;
 	case _SC_SERVNAME_MAX:		ii = dataitem_maxserv ; break ;
-	case _SC_MSG_MAX:		ii = dataitem_maxmsg ; break ;
+	case _SC_MSG_MAX:		ii = dataitem_maxmsg ;	break ;
 	case _SC_TZNAME_MAX:		ii = dataitem_maxtzname ; break ;
-	case _SC_NGROUPS_MAX:		ii = dataitem_ngroups ; break ;
-	case _SC_CLK_TCK:		ii = dataitem_clk ; break ;
+	case _SC_NGROUPS_MAX:		ii = dataitem_ngroups ;	break ;
+	case _SC_CLK_TCK:		ii = dataitem_clk ;	break ;
 	    break ;
 	default:
 	    rs = SR_BUGCHECK ;
