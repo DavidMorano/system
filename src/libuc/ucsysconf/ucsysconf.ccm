@@ -99,6 +99,7 @@ enum dataitems {
 	dataitem_maxpid,
 	dataitem_maxarg,
 	dataitem_maxline,
+	dataitem_maxlink,
 	dataitem_maxlogin,
 	dataitem_ngroups,
 	dataitem_maxnode,
