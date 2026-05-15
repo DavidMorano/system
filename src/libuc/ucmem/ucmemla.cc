@@ -108,7 +108,7 @@ int ucmemla_acquire(ucmemla *op,size_t us,void *rp) noex {
 		    if ((rs = libmem.mall(am,&vp)) >= 0) {
 		        op->ma = vp ;
 		        op->ms = us ;
-		    } /* end if (memory-allocation) */
+		    } /* end if (memory-acquire) */
 		} /* end if (pagesz) */
 		*rpp = vp ;
 	    } /* end if (valid) */
