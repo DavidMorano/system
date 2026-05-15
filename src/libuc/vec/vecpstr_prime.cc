@@ -312,7 +312,7 @@ int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int µsl) noex {
 	                strwcpy(bp,sp,sl) ;
 	                op->stsz += sz ;
 	                i = vecpstr_insertsp(op,ii,bp) ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } /* end if (OK) */
 	    } /* end if (getlenstr) */
 	} /* end if (valid index) */
@@ -958,7 +958,7 @@ local int vecpstr_newchunk(vecpstr *op,int amount) noex {
 	        libmem.free(op->chp) ;
 	        op->chp = nullptr ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (vecpstr_newchunk) */
 
@@ -1038,7 +1038,7 @@ local int chunk_start(VPS_CH *chkp,int chsize) noex {
 	    chkp->tabsize = chsize ;
 	    chkp->tab[0] = '\0' ;
 	    chkp->tablen = 0 ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (chunk_start) */
 
