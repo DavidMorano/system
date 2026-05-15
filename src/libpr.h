@@ -28,7 +28,7 @@
 #include	<prgetprogpath.h>
 #include	<prmkfname.h>
 #include	<prmktmpdir.h>
-#include	<propenqotd.h>
+#include	<prqotd.h>
 
 
 #endif /* LIBPR_INCLUDE */
