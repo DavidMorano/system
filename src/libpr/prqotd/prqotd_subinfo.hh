@@ -44,44 +44,25 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<climits>
+#include	<sys/types.h>		/* system types */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucgetpid.h>
-#include	<estrings.h>
-#include	<mkfnamesuf.h>
 #include	<ids.h>
-#include	<sigman.h>
-#include	<tmtime.hh>
-#include	<storebuf.h>
 #include	<vecstr.h>
 #include	<vecpstr.h>
-#include	<ascii.h>
 #include	<paramfile.h>
 #include	<expcook.h>
-#include	<logfile.h>
-#include	<isnot.h>
-#include	<ischarx.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 
+#ifndef	SUBINFO
 #define	SUBINFO		subinfo_head
-
-#ifndef	SI
-#define	SI		subinfo_head
 #endif
-#ifndef	SI_FL
-#define	SI_FL		subinfo_flags
+#ifndef	SUBINFO_FL
+#define	SUBINFO_FL	subinfo_flags
 #endif
 
 
@@ -102,8 +83,8 @@ namespace prqotd {
 	vecpstr		hosts ;
 	vecpstr		sources ;
 	ids		id ;
-	SI_FL		fl, have, changed, finval ;
-	SI_FL		open ;
+	SUBINFO_FL	fl, have, changed, finval ;
+	SUBINFO_FL	open ;
 	cchar		*pr ;
 	cchar		*pn ;		/* program-name */
 	cchar		*sn ;		/* search-name */
@@ -115,8 +96,8 @@ namespace prqotd {
 	cchar		*hostname ;
 	cchar		*spooldname ;	/* spool directory */
 	cchar		*qdname ;	/* particular quote directory */
-	void		*config ;	/* configuration state */
-	void		*logsub ;	/* log-file state */
+	void		*cfp ;		/* config-file-pointer */
+	void		*lfp ;		/* log-file-pointer state */
 	uid_t		euid ;
 	uid_t		uid_pr ;
 	gid_t		gid_pr ;
@@ -130,40 +111,22 @@ namespace prqotd {
 } /* end namespace (prqotd) */
 
 namespace prqotd {
-    extern int	subinfo_start(SI *,time_t,cchar *,int,int,int) noex ;
-    extern int	subinfo_finish(SI *) noex ;
-    extern int	subinfo_confbegin(SI *) noex ;
-    extern int	subinfo_confend(SI *) noex ;
-    extern int	subinfo_setentry(SI *,cchar **,cchar *,int) noex ;
-    extern int	subinfo_envbegin(SI *) noex ;
-    extern int	subinfo_envend(SI *) noex ;
-    extern int	subinfo_logfile(SI *,cchar *,int) noex ;
-    extern int	subinfo_hostname(SI *,cchar *,int) noex ;
-    extern int	subinfo_source(SI *,cchar *,int) noex ;
-    extern int	subinfo_logbegin(SI *) noex ;
-    extern int	subinfo_logend(SI *) noex ;
-    extern int	subinfo_logenv(SI *) noex ;
-    extern int	subinfo_defaults(SI *) noex ;
-    extern int	subinfo_spooldir(SI *,cchar *,int) noex ;
-    extern int	subinfo_spoolcheck(SI *) noex ;
-    extern int	subinfo_qdirname(SI *,int) noex ;
-    extern int	subinfo_gather(SI *,cchar *,mode_t) noex ;
-    extern int	subinfo_opensource(SI *,cchar *,cchar *) noex ;
-    extern int	subinfo_opensourceprog(SI *,cchar *,cchar *) noex ;
-    extern int subinfo_defprog(SI *,cchar *) noex ;
-    extern int subinfo_defproger(SI *,vecstr *,cchar *,cchar *) noex ;
-    extern int subinfo_addourpath(SI *,vecstr *) noex ;
-    extern int subinfo_addprbins(SI *,vecstr *) noex ;
-    extern int subinfo_addprbin(SI *,vecstr *,cchar *,cchar *) noex ;
-    extern int subinfo_id(SI *) noex ;
-    extern int subinfo_dircheck(SI *,cchar *) noex ;
-    extern int subinfo_dirminmode(SI *,cchar *,mode_t) noex ;
-    extern int subinfo_setfname(SI *sip,char *,cc *,int,int,
-	    cc *,cc *,cc *) noex ;
-} /* end namespace (prqotd) */
-
-namespace prqotd {
     typedef SUBINFO	subinfo ;
+    extern int	subinfo_start(subinfo *,time_t,cchar *,int,int,int) noex ;
+    extern int	subinfo_finish(subinfo *) noex ;
+    extern int	subinfo_logbegin(subinfo *) noex ;
+    extern int	subinfo_logend(subinfo *) noex ;
+    extern int	subinfo_defaults(subinfo *) noex ;
+    extern int	subinfo_spoolcheck(subinfo *) noex ;
+    extern int	subinfo_qdirname(subinfo *,int) noex ;
+    extern int	subinfo_gather(subinfo *,cchar *,mode_t) noex ;
+    extern int	subinfo_prog(subinfo *,cchar *,cchar *) noex ;
+    extern int	subinfo_setfname(subinfo *,char *,cc *,int,int,
+	    		cc *,cc *,cc *) noex ;
+    extern int	subinfo_setentry(subinfo *,cchar **,cchar *,int) noex ;
+    extern int	subinfo_spooldir(subinfo *,cchar *,int) noex ;
+    extern int	subinfo_hostname(subinfo *sip,cchar *,int) noex ;
+    extern int	subinfo_source(subinfo *,cchar *,int) noex ;
 } /* end namespace (prqotd) */
 
 
