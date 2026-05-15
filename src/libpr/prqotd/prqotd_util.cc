@@ -96,6 +96,13 @@ import uconstants ;			/* |varname(3u)| */
 /* exported subroutines */
 
 namespace prqotd {
+    initer::operator int () noex {
+	static cint rsv = var ;
+	return rsv ;
+    } ; /* end method (initer::operator) */
+} /* end namespace (prqotd) */
+
+namespace prqotd {
     vars::operator int () noex {
 	int	rs ;
 	if ((rs = u_getenviron(&envv)) >= 0) {
@@ -131,7 +138,7 @@ namespace prqotd {
 
 namespace prqotd {
     int mkqfname(char *rbuf,cchar *qdname,int mjd) noex {
-	int		rlen = MAXPATHLEN ;
+	int		rlen = var.maxpathlen ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if (rs >= 0) {
