@@ -90,8 +90,7 @@ module ;
 #include	<cstdlib>
 #include	<cstdarg>		/* |va_list(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 export module fmtobj ;
