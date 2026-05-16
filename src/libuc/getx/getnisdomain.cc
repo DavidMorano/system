@@ -45,7 +45,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstdlib>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
