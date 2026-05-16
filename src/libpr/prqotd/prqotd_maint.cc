@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* compile-time debugging */
-#define	CF_OPENDEF	0		/* ? */
 
 /* revision history:
 
@@ -129,14 +128,14 @@ int prqotd_maint(cchar *pr,int mjd,int of,int to) noex {
 	int		fd = -1 ; /* return-value */
 	if (pr) {
 	    time_t	dt = 0 ;
+	    rs = SR_OK ;
 	    if (mjd <= 0) {
 	        if (dt == 0) dt = getustime ;
 	        rs = getdefmjd(dt) ;
 	        mjd = rs ;
 	    } /* end if */
 	    if (rs >= 0) {
-		static cint	rsi = init ;
-		if ((rs = rsi) >= 0) {
+		if (static cint	rsi = init ; (rs = rsi) >= 0) {
 	            rs = prqotd_maints(pr,mjd,of,to,dt) ;
 		    fd = rs ;
 		} /* end if (init) */
@@ -155,37 +154,40 @@ local int prqotd_maints(cchar *pr,int mjd,int of,int to,time_t dt) noex {
 	int		fd = -1 ; /* return-value */
 	SUB	 	si, *sip = &si ;
 	if ((rs = subinfo_start(sip,dt,pr,of,to,mjd)) >= 0) {
-	        if ((rs = subinfo_defaults(sip)) >= 0) {
-	            if ((rs = subinfo_logbegin(sip)) >= 0) {
-	                if ((rs = subinfo_spoolcheck(sip)) >= 0) {
-	                    if ((rs = subinfo_qdirname(sip,mjd)) >= 0) {
-	                        cchar	*qd = sip->qdname ;
-	                        char	qfname[MAXPATHLEN+1] ;
-	                        if ((rs = mkqfname(qfname,qd,mjd)) >= 0) {
-	                            cmode	om = 0664 ;
-	                            of &= (~ OM_SPECIAL) ;
-	                            rs = u_open(qfname,of,om) ;
-	                            fd = rs ;
-	                            if (rs == SR_NOENT) {
-	                                rs = subinfo_gather(sip,qfname,om) ;
-	                                fd = rs ;
-					if (rs < 0) {
-					    uc_unlink(qfname) ;
-					} /* end if (error) */
-	                            } /* end if (NOENT) */
-	                        } /* end if (mkqfname) */
-			    } /* end if (qdirname) */
-	                } /* end if (spoolcheck) */
-	                rs1 = subinfo_logend(sip) ;
-	        	if (rs >= 0) rs = rs1 ;
-		    } /* end if (logging) */
-	        } /* end if (defaults) */
-	        rs1 = subinfo_finish(sip) ;
-	        if (rs >= 0) rs = rs1 ;
-	        if ((rs < 0) && (fd >= 0)) {
-		    u_close(fd) ;
-		} /* end if (error) */
-	    } /* end if (subinfo) */
+            if ((rs = subinfo_defaults(sip)) >= 0) {
+                if ((rs = subinfo_logbegin(sip)) >= 0) {
+                    if ((rs = subinfo_spoolcheck(sip)) >= 0) {
+                        if ((rs = subinfo_qdirname(sip,mjd)) >= 0) {
+                            cchar   *qd = sip->qdname ;
+			    if (char *qfname ; (rs = lm_mp(&qfname)) >= 0) {
+                                if ((rs = mkqfname(qfname,qd,mjd)) >= 0) {
+                                    cmode       om = 0664 ;
+                                    of &= (~ OM_SPECIAL) ;
+                                    rs = u_open(qfname,of,om) ;
+                                    fd = rs ;
+                                    if (rs == SR_NOENT) {
+                                        rs = subinfo_gather(sip,qfname,om) ;
+                                        fd = rs ;
+                                        if (rs < 0) {
+                                            uc_unlink(qfname) ;
+                                        } /* end if (error) */
+                                    } /* end if (NOENT) */
+                                } /* end if (mkqfname) */
+			        rs1 = lm_free(qfname) ;
+			        if (rs >= 0) rs = rs1 ;
+                            } /* end if (m-a-f) */
+			} /* end if (subinfo_qfirname) */
+                    } /* end if (spoolcheck) */
+                    rs1 = subinfo_logend(sip) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (logging) */
+            } /* end if (defaults) */
+            rs1 = subinfo_finish(sip) ;
+            if (rs >= 0) rs = rs1 ;
+            if ((rs < 0) && (fd >= 0)) {
+                u_close(fd) ;
+            } /* end if (error) */
+        } /* end if (subinfo) */
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (prqotd_maints) */
 
