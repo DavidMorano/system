@@ -13,7 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<filemap.h>
 
 
@@ -24,17 +25,17 @@
 
 struct sysusershells_head {
 	filemap		*fmp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef SYSUSERSHELLS	sysusershells ;
 
 EXTERNC_begin
 
-extern int sysusershells_open(sysusershells *,cchar *) noex ;
-extern int sysusershells_close(sysusershells *) noex ;
-extern int sysusershells_readent(sysusershells *,char *,int) noex ;
-extern int sysusershells_reset(sysusershells *) noex ;
+extern int sysusershells_open		(sysusershells *,cchar *) noex ;
+extern int sysusershells_close		(sysusershells *) noex ;
+extern int sysusershells_readent	(sysusershells *,char *,int) noex ;
+extern int sysusershells_reset		(sysusershells *) noex ;
 
 EXTERNC_end
 
