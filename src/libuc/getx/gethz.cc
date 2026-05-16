@@ -54,7 +54,7 @@
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
