@@ -13,7 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<filemap.h>
 
 
@@ -24,17 +25,17 @@
 
 struct sysusernames_head {
 	filemap		*fmp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef SYSUSERNAMES	sysusernames ;
 
 EXTERNC_begin
 
-extern int sysusernames_open(sysusernames *,cchar *) noex ;
-extern int sysusernames_close(sysusernames *) noex ;
-extern int sysusernames_readent(sysusernames *,char *,int) noex ;
-extern int sysusernames_reset(sysusernames *) noex ;
+extern int sysusernames_open	(sysusernames *,cchar *) noex ;
+extern int sysusernames_close	(sysusernames *) noex ;
+extern int sysusernames_readent	(sysusernames *,char *,int) noex ;
+extern int sysusernames_reset	(sysusernames *) noex ;
 
 EXTERNC_end
 
