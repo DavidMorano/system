@@ -128,7 +128,7 @@ local int getsys() noex {
 	int		rs ;
 	if ((rs = op->pid) == 0) {
             cint    cmd = _SC_MAXPID ;
-            if ((rs = uc_sysconf(cmd,nullptr)) >= 0) {
+            if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
                 op->pid = rs ;
             } else if (isnosys(rs)) {
                 rs = PID_MAX ;
