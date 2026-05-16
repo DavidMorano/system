@@ -28,7 +28,7 @@
 
 EXTERNC_begin
 
-extern int getprogpath(ids *,vecstr *,char *,cchar *,int) noex ;
+extern int	getprogpath(ids *,vecstr *,char *,cchar *,int) noex ;
 
 EXTERNC_end
 
