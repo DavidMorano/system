@@ -169,23 +169,23 @@ int prgetprogpath(cchar *pr,char *rbuf,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (pr && rbuf && sp) {
+	if (pr && rbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (sp[0]) {
+	    if (sp[0]) ylikely {
 		bool fchanged = false ;
 	        if (sl < 0) sl = lenstr(sp) ;
 	        while ((sl > 0) && (sp[sl - 1] == '/')) {
 	            fchanged = true ;
 	            sl -= 1 ;
 	        } /* end while */
-	        if (subinfo si ; (rs = subinfo_start(&si,pr)) >= 0) {
+	        if (subinfo si ; (rs = subinfo_start(&si,pr)) >= 0) ylikely {
 	            for (int i = 0 ; tries[i] ; i += 1) {
 			subinfo_f fun = tries[i] ;
 		        rs = fun(&si,rbuf,sp,sl) ;
 		        if ((rs != 0) || si.f_done) break ;
 	            } /* end for */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 		        rl = rs ;
 		        if (rl == 0) {
 		            rs = SR_NOENT ;
@@ -207,7 +207,7 @@ int prgetprogpath(cchar *pr,char *rbuf,cchar *sp,int sl) noex {
 
 local int subinfo_start(SI *sip,cchar *pr) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    memclear(sip) ;
 	    sip->pr = pr ;
 	    rs = ids_load(&sip->id) ;
@@ -219,7 +219,7 @@ local int subinfo_start(SI *sip,cchar *pr) noex {
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	    if (sip->f_dirs) {
 	        sip->f_dirs = false ;
@@ -239,7 +239,7 @@ local int subinfo_tryfull(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ; /* return-value */
 	if (strnchr(sp,sl,'/') != nullptr) {
-	    if ((rs = mkpath1w(rbuf,sp,sl)) >= 0) {
+	    if ((rs = mkpath1w(rbuf,sp,sl)) >= 0) ylikely {
 		rl = rs ;
 		rs = subinfo_xfile(sip,rbuf) ;
 	        if (isNotPresent(rs)) {
@@ -247,7 +247,7 @@ local int subinfo_tryfull(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 		    rl = 0 ;
 		    sip->f_done = true ;
 		}
-	    }
+	    } /* end if */
 	} /* end if (full-path) */
 	return (rs >= 0) ? rl : rs ;
 }
@@ -269,7 +269,7 @@ local int subinfo_tryroot(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	                rs = subinfo_record(sip,rbuf,rl) ;
 			rl = 0 ;
 		    }
-		}
+		} /* end if (pathaddw) */
 	    } else if (isOverNoEntAcc(rs)) {
 	        rs = SR_OK ;
 	    }
@@ -350,7 +350,7 @@ local int subinfo_record(SI *sip,cchar *dp,int dl) noex {
 	    rs = vecstr_start(&sip->dirs,10,0) ;
 	    sip->f_dirs = (rs >= 0) ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = vecstr_add(&sip->dirs,dp,dl) ;
 	}
 	return rs ;
@@ -359,10 +359,10 @@ local int subinfo_record(SI *sip,cchar *dp,int dl) noex {
 
 local int mkdfname(char *rbuf,cchar *dp,int dl,cchar *sp,int sl) noex {
 	int		rs ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-vakue */
 	if ((rs = getbufsize(bufsize_mp)) >= 0) {
 	    cint	rlen = rs ;
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_strw(rbuf,rlen,i,dp,dl) ;
 	        i += rs ;
 	    }
@@ -370,7 +370,7 @@ local int mkdfname(char *rbuf,cchar *dp,int dl,cchar *sp,int sl) noex {
 	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_strw(rbuf,rlen,i,sp,sl) ;
 	        i += rs ;
 	    }
