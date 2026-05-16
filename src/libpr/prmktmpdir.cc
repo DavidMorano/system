@@ -59,7 +59,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<mkpathx.h>
-#include	<sfx.h>
+#include	<sfx.h>			/* |sfx(3uc)| */
 #include	<mkdirs.h>
 #include	<strlibval.hh>
 #include	<isnot.h>		/* |isNotPresent(3uc)| */
@@ -147,10 +147,10 @@ static strlibval	vtmpdir(strlibval_tmpdir) ;
 int prmktmpdir(cchar *pr,char *rbuf,cc *tmpdname,cc *dname,mode_t m) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
-	if (pr && rbuf) {
+	if (pr && rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (pr[0]) {
+	    if (pr[0]) ylikely {
 		if (mker mo(pr,rbuf,tmpdname,dname,m) ; (rs = mo) >= 0) {
 		    len = rs ;
 		}
@@ -164,7 +164,7 @@ int prmktmpdir(cchar *pr,char *rbuf,cc *tmpdname,cc *dname,mode_t m) noex {
 
 mker::operator int () noex {
 	int		rs = SR_INVALID ;
-	if ((ªm & (~ mmask)) == 0) {
+	if ((ªm & (~ mmask)) == 0) ylikely {
 	    if (tmpdname == nullptr) tmpdname = vtmpdir ;
 	    if (tmpdname == nullptr) tmpdname = sysword.w_tmpdir ;
 	    rs = wrap() ;
@@ -176,7 +176,7 @@ int mker::wrap() noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) ylikely {
 	    cint dlen = rs ;
 	    {
 		dbuf[0] = '\0' ;
@@ -193,9 +193,9 @@ int mker::suber(char *dbuf,int) noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (subinfo si(pr,ªm) ; (rs = si.start()) >= 0) {
+	if (subinfo si(pr,ªm) ; (rs = si.start()) >= 0) ylikely {
 	    /* phase one */
-	    if ((rs = si.mkprtmp(dbuf,tmpdname)) >= 0) {
+	    if ((rs = si.mkprtmp(dbuf,tmpdname)) >= 0) ylikely {
 	        cbool f_prtmp = (rs > 0) ;
 		/* phase two */
 	        if ((dname != nullptr) && (dname[0] != '\0')) {
@@ -235,7 +235,7 @@ int subinfo::finish() noex {
 } /* end method (subinfo::finish) */
 
 int subinfo::mkprtmp(char *dbuf,cc *tmpdname) noex {
-	int		rs ;
+	int		rs = SR_NOENT ;
 	int		f_create = false ; /* return-value */
 	cchar		*rn{} ;
 	if (int rl ; (rl = sfbasename(pr,-1,&rn)) > 0) ylikely {
@@ -258,9 +258,7 @@ int subinfo::mkprtmp(char *dbuf,cc *tmpdname) noex {
 	            }
 		} /* end if (stat) */
 	    } /* end if (mkpath2) */
-	} else {
-	    rs = SR_NOENT ;
-	}
+	} /* end if (sfbasename) */
 	return (rs >= 0) ? f_create : rs ;
 } /* end method (subinfo::mkprtmp) */
 
@@ -268,7 +266,7 @@ int subinfo::mkext(char *rbuf,char *dbuf,cchar *dname) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
 	cmode		dm = TMPDMODE ;
-        if ((rs = mkpath2(rbuf,dbuf,dname)) >= 0) {
+        if ((rs = mkpath2(rbuf,dbuf,dname)) >= 0) ylikely {
             len = rs ;
             if (ustat sb ; (rs = u_stat(rbuf,&sb)) >= 0) {
                 rs = SR_NOTDIR ;
