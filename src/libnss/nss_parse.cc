@@ -200,14 +200,17 @@ char * _strdup_null(char *s) noex {
  * read a line into buffer from a mmap'ed file.
  * return length of line read.
  */
-int _readbufline(char *mapbuf,	/* input mmap buffer */
-    int mapsize,		/* input size */
-    char *buffer,		/* output storage */
-    int buflen,			/* output size */
-    int *lastlen) noex		/* input read till here last time */
-{
-	int	linelen;
+/**** Arguments:
+mapbuf		- input mmap buffer 
+mapsize		- input size 
+buffer		- output storage 
+buflen		- output size 
+lastlen		- input read till here last time 
+****/
 
+int _readbufline(char *mapbuf,int mapsize,char *buffer,int buflen,
+		int *lastlen) noex {
+	int	linelen;
 	for (;;) {
 		linelen = 0;
 		while (linelen < buflen - 1) {	/* "- 1" saves room for \n\0 */
@@ -237,7 +240,7 @@ int _readbufline(char *mapbuf,	/* input mmap buffer */
 				buffer[linelen] = mapbuf[*lastlen];
 				(*lastlen)++;
 				linelen++;
-			}
+			} /* end switch */
 		}
 		/* Buffer overflow -- eat rest of line and loop again */
 		while (mapbuf[*lastlen] != '\n') {
@@ -245,7 +248,7 @@ int _readbufline(char *mapbuf,	/* input mmap buffer */
 				return (-1);
 			}
 			(*lastlen)++;
-		};
+		} /* end while */
 	} /* end for */
 	/* NOTREACHED */
 } /* end subroutine (_readbufline) */
