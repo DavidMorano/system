@@ -73,7 +73,7 @@
 #include	<fcntl.h>		/* for |O_RDONLY| */
 #include	<climits>		/* for |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
@@ -334,8 +334,8 @@ local int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 	            if (char *bp ; (rs = lm_nn(&bp)) >= 0) ylikely {
 		       tip->nbuf = bp ;
 	    	       tip->nodename = bp ;
-		    } /* memory-allocation) */
-	        } /* end if (memory-allocation) */
+		    } /* memory-acquire) */
+	        } /* end if (memory-acquire) */
 	        if (rs >= 0) tip->nodename[0] = '\0' ;
 	    } /* end if (maxhostlen) */
 	} /* end if (non-null) */
@@ -392,7 +392,7 @@ local int try_inituname(TRY *tip) noex {
 	                tip->fl.uname = true ;
 	                tip->sysnodename = cp ;
 	                rs = 0 ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } /* end if (uname) */
 	    } /* end if (needed initialization) */
 	} /* end if (magic) */
