@@ -59,7 +59,7 @@
 
 #pragma		GCC dependency		"mod/uconstants.ccm"
 
-import uconstants ;
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -83,7 +83,7 @@ import uconstants ;
 
 /* forward references */
 
-static int	filexfile_path(ids *,char *,cc *,cc *) noex ;
+local int	filexfile_path(ids *,char *,cc *,cc *) noex ;
 
 
 /* local variables */
@@ -121,7 +121,7 @@ int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
 
 /* local subroutines */
 
-static int filexfile_path(ids *idp,char *rbuf,cc *pn,cc *path) noex {
+local int filexfile_path(ids *idp,char *rbuf,cc *pn,cc *path) noex {
     	cnullptr	np{} ;
         cint        vn = NENTS ;
         cint        vo = 0 ;
