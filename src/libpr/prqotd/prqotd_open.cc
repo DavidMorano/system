@@ -139,7 +139,7 @@
 #include	<pathadd.h>
 #include	<sfx.h>
 #include	<getmjd.h>		/* |getmjd(3uc)| */
-#include	<prmktmpdir.h>
+#include	<prmktmpdir.h>		/* LIBPR */
 #include	<lockfile.h>
 #include	<hasx.h>
 #include	<isnot.h>		/* |isNotAccess(3uc)| */
@@ -165,6 +165,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
+using prqotd::getdefmjd ;		/* subroutine */
 using prqotd::init ;			/* variable */
 
 
@@ -224,8 +225,6 @@ local int	openmask(cchar *,int,mode_t) noex ;
 
 local int	loadchown(cchar *,int) noex ;
 
-local int	getdefmjd(time_t) noex ;
-
 local int	mkqdname(char *,cchar *, cchar *,int,cchar *) noex ;
 local int	mkqfname(char *,cchar *, cchar *,int,cchar *,int) noex ;
 
@@ -262,16 +261,16 @@ int openqotd_init() noex {
 	                if ((rs = uc_atexit(openqotd_exit)) >= 0) {
 	                    rs = 0 ;
 	                    uip->f_initdone = true ;
-	                }
-	                if (rs < 0) {
+	                } /* end if (uc_atexit) */
+	                if (rs < 0) nlikely {
 	                    uc_atforkexp(b,a,a) ;
-			}
+			} /* end if (error) */
 	            } /* end if (uc_atforkrec) */
-	            if (rs < 0) {
+	            if (rs < 0) nlikely {
 	                cnp->destroy() ;
 		    } /* end if (error) */
 	        } /* end if (ptc_create) */
-	        if (rs < 0) {
+	        if (rs < 0) nlikely {
 	            mxp->destroy() ;
 		} /* end if (error) */
 	    } /* end if (ptm_create) */
@@ -326,8 +325,8 @@ int prqotd_open(cchar *pr,int mjd,int of,int to) noex {
 	        rs = getdefmjd(dt) ;
 	        mjd = rs ;
 	    } /* end if (needed) */
-	    if (rs >= 0) {
-		if (static cint rsi = init ; (rs = rsi) >= 0) {
+	    if (rs >= 0) ylikely {
+		if (static cint rsi = init ; (rs = rsi) >= 0) ylikely {
 		    rs = prqotd_opens(pr,mjd,of,to,dt) ;
 		    fd = rs ;
 		} /* end if (init) */
@@ -348,17 +347,17 @@ local int prqotd_opens(cc *pr,int mjd,int of,int to,time_t dt) noex {
 	cchar		*vtmpdname = VTMPDNAME ;
 	cchar		*qcname = QCNAME ;
 	cchar		*rnp{} ;
-        if (int rnl ; (rnl = sfbasename(pr,-1,&rnp)) > 0) {
+        if (int rnl ; (rnl = sfbasename(pr,-1,&rnp)) > 0) ylikely {
             cchar       *vtd = vtmpdname ;
             cchar       *cn = qcname ;
             if (of & O_EXCL) {
                 if (dt == 0) dt = time(nullptr) ;
                 rs = qotdexpire(vtd,rnp,rnl,cn,dt,to) ;
             }
-            if (rs >= 0) {
-                if (char *qfname ; (rs = lm_mp(&qfname)) >= 0) {
+            if (rs >= 0) ylikely {
+                if (char *qfname ; (rs = lm_mp(&qfname)) >= 0) ylikely {
                     cauto       mk = mkqfname ;
-                    if ((rs = mk(qfname,vtd,rnp,rnl,cn,mjd)) >= 0) {
+                    if ((rs = mk(qfname,vtd,rnp,rnl,cn,mjd)) >= 0) ylikely {
                         {
                             OPENQOTD_SUB        qs{} ;
                             qs.pr = pr ;
@@ -369,7 +368,7 @@ local int prqotd_opens(cc *pr,int mjd,int of,int to,time_t dt) noex {
                             qs.of = of ;
                             qs.dm = dm ;
                             qs.mjd = mjd ;
-                            if ((rs = openqotd_open(&qs)) >= 0) {
+                            if ((rs = openqotd_open(&qs)) >= 0) ylikely {
                                 fd = rs ;
                             }
                         } /* end block */
@@ -378,7 +377,7 @@ local int prqotd_opens(cc *pr,int mjd,int of,int to,time_t dt) noex {
                         }
                         if ((rs < 0) && (fd >= 0)) {
                             uc_close(fd) ;
-                        }
+                        } /* end if (error) */
                     } /* end if (mkqfname) */
                     rs1 = lm_free(qfname) ;
                     if (rs >= 0) rs = rs1 ;
@@ -393,7 +392,7 @@ local int openqotd_capbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
 	ptm *mxp = &uip->mx ;
-	if ((rs = mxp->lockbegin(to)) >= 0) {
+	if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
 	    {
 	        ptc *cnp = &uip->cn ;
 	        uip->waiters += 1 ;
@@ -416,7 +415,7 @@ local int openqotd_capend() noex {
 	int		rs ;
 	int		rs1 ;
 	ptm *mxp = &uip->mx ;
-	if ((rs = mxp->lockbegin) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) ylikely {
 	    {
 		ptc *cnp = &uip->cn ;
 	        uip->f_capture = false ;
@@ -443,7 +442,7 @@ local int openqotd_open(OPENQOTD_SUB *sip) noex {
 	    cchar	*qfname = sip->qfname ;
 	    cchar	*vtmpdname = sip->vtmpdname ;
 	    cchar	*qcname = sip->qcname ;
-	    if (char *qdname ; (rs = lm_mp(&qdname)) >= 0) {
+	    if (char *qdname ; (rs = lm_mp(&qdname)) >= 0) ylikely {
 	        if ((rs = prmktmpdir(pr,qdname,vtmpdname,qcname,dm)) >= 0) {
 	            cint	mjd = sip->mjd ;
 	            cint	of = sip->of ;
@@ -486,14 +485,14 @@ local int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (to <= 0) to = TTL_EXPIRE ;
-	if (char *qdname ; (rs = lm_mp(&qdname)) >= 0) {
-	    if ((rs = mkqdname(qdname,vtd,rnp,rnl,cn)) >= 0) {
-	        if (ustat sb ; (rs = uc_stat(qdname,&sb)) >= 0) {
-	            if (S_ISDIR(sb.st_mode)) {
+	if (char *qdname ; (rs = lm_mp(&qdname)) >= 0) ylikely {
+	    if ((rs = mkqdname(qdname,vtd,rnp,rnl,cn)) >= 0) ylikely {
+	        if (ustat sb ; (rs = uc_stat(qdname,&sb)) >= 0) ylikely {
+	            if (S_ISDIR(sb.st_mode)) ylikely {
 	                cint	n = intconv(sb.st_size / 10) ;
 	                cint	cs = intconv(sb.st_size / 4) ;
 	                vecpstr	ds ;
-	                if ((rs = vecpstr_start(&ds,n,cs,0)) >= 0) {
+	                if ((rs = vecpstr_start(&ds,n,cs,0)) >= 0) ylikely {
 	                    if ((rs = qotdexpireload(&ds,qdname,dt,to)) > 0) {
 			        cauto	vg = vecpstr_get ;
 	                        cchar	*fn{} ;
@@ -524,9 +523,9 @@ local int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *ebuf ; (rs = lm_mn(&ebuf)) >= 0) {
+	if (char *ebuf ; (rs = lm_mn(&ebuf)) >= 0) ylikely {
 	    cint	elen = rs ;
-	    if (fsdir d ; (rs = fsdir_open(&d,qfname)) >= 0) {
+	    if (fsdir d ; (rs = fsdir_open(&d,qfname)) >= 0) ylikely {
 	        fsdir_ent	de ;
 	        ustat		sb ;
 	        cint		dlen = lenstr(qfname) ;
@@ -534,9 +533,9 @@ local int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	            cint	el = rs ;
 	            cchar	*ep = de.name ;
 	            if (hasNotDots(ep,el)) {
-	                if ((rs = pathadd(qfname,dlen,ep)) >= 0) {
+	                if ((rs = pathadd(qfname,dlen,ep)) >= 0) ylikely {
 	                    cint	fl = rs ;
-	                    if (uc_stat(qfname,&sb) >= 0) {
+	                    if (uc_stat(qfname,&sb) >= 0) ylikely {
 	                        if (S_ISREG(sb.st_mode)) {
 	                            if ((dt-sb.st_mtime) >= to) {
 	                                c += 1 ;
@@ -569,15 +568,15 @@ local int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	lof &= (~ O_TRUNC) ;
 	lof &= (~ O_EXCL) ;
 	lof |= (O_CREAT | O_RDWR) ;
-	if ((rs = uc_open(qfname,lof,om)) >= 0) {
+	if ((rs = uc_open(qfname,lof,om)) >= 0) ylikely {
 	    fd = rs ;
-	    if ((rs = uc_fminmod(fd,om)) >= 0) {
-	        if ((rs = openqotd_init()) >= 0) {
+	    if ((rs = uc_fminmod(fd,om)) >= 0) ylikely {
+	        if ((rs = openqotd_init()) >= 0) ylikely {
 	            cint	to = utimeout[uto_busy] ;
-	            if ((rs = openqotd_capbegin(to)) >= 0) {
+	            if ((rs = openqotd_capbegin(to)) >= 0) ylikely {
 	                cint	cmd = F_WLOCK ;
-	                if ((rs = lockfile(fd,cmd,0L,0L,to)) >= 0) {
-	                    if ((rs = uc_fsize(fd)) == 0) {
+	                if ((rs = lockfile(fd,cmd,0L,0L,to)) >= 0) ylikely {
+	                    if ((rs = uc_fsize(fd)) == 0) ylikely {
 	                        if ((rs = prqotd_maint(pr,mjd,of,ttl)) >= 0) {
 	                            cint	s = rs ;
 	                            if ((rs = uc_writedesc(fd,s,-1)) >= 0) {
@@ -607,21 +606,23 @@ local int openmask(cchar *qfname,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = umaskset(0)) >= 0) {
+	if ((rs = umaskset(0)) >= 0) ylikely {
 	    mode_t	pm = rs ;
 	    rs = uc_open(qfname,of,om) ;
 	    fd = rs ;
 	    rs1 = umaskset(pm) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
-	if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
+	if ((rs < 0) && (fd >= 0)) nlikely {
+	    uc_close(fd) ;
+	} /* end if (error) */
 	return (rs >= 0) ? fd : rs ;
 } /* end if (openmask) */
 #endif /* CF_OPENMASK */
 
 local int loadchown(cchar *pr,int fd) noex {
 	int		rs ;
-	if (ustat sb ; (rs = uc_stat(pr,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_stat(pr,&sb)) >= 0) ylikely {
 	    uid_t	euid = geteuid() ;
 	    if (euid != sb.st_uid) {
 	        uc_fchown(fd,sb.st_uid,sb.st_gid) ;
@@ -630,24 +631,27 @@ local int loadchown(cchar *pr,int fd) noex {
 	return rs ;
 } /* end subroutine (loadchown) */
 
+#ifdef	COMMENT
+local int	getdefmjd(time_t) noex ;
 local int getdefmjd(time_t dt) noex {
 	int		rs ;
 	if (dt == 0) dt = time(nullptr) ;
-	if (tmtime ct ; (rs = tmtime_timelocal(&ct,dt)) >= 0) {
-	    int	y = (ct.year + TM_YEAR_BASE) ;
-	    int	m = ct.mon ;
-	    int	d = ct.mday ;
+	if (tmtime ct ; (rs = tmtime_timelocal(&ct,dt)) >= 0) ylikely {
+	    cint	y = (ct.year + TM_YEAR_BASE) ;
+	    cint	m = ct.mon ;
+	    cint	d = ct.mday ;
 	    rs = getmjd(y,m,d) ;
 	} /* end if (tmtime_timelocal) */
 	return rs ;
 } /* end subroutine (getdefmjd) */
+#endif /* COMMENT */
 
 local int mkqdname(char *rbuf,cc *vtmpdname,cc *rnp,int rnl,cc *qcname) noex {
 	int		rs ;
 	int		i = 0 ;
-	if ((rs = maxpathlen) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
 	    cint	rlen = rs ;
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_strw(rbuf,rlen,i,vtmpdname,-1) ;
 	        i += rs ;
 	    }
@@ -655,7 +659,7 @@ local int mkqdname(char *rbuf,cc *vtmpdname,cc *rnp,int rnl,cc *qcname) noex {
 	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_strw(rbuf,rlen,i,rnp,rnl) ;
 	        i += rs ;
 	    }
@@ -663,7 +667,7 @@ local int mkqdname(char *rbuf,cc *vtmpdname,cc *rnp,int rnl,cc *qcname) noex {
 	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_strw(rbuf,rlen,i,qcname,-1) ;
 	        i += rs ;
 	    }
@@ -674,9 +678,9 @@ local int mkqdname(char *rbuf,cc *vtmpdname,cc *rnp,int rnl,cc *qcname) noex {
 local int mkqfname(char *rbuf,cc *vtdn,cc *rnp,int rnl,cc *qcn,int mjd) noex {
 	int		rs ;
 	int		i = 0 ;
-	if ((rs = maxpathlen) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
 	    cint	rlen = rs ;
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = mkqdname(rbuf,vtdn,rnp,rnl,qcn) ;
 	        i += rs ;
 	    }
@@ -684,11 +688,11 @@ local int mkqfname(char *rbuf,cc *vtdn,cc *rnp,int rnl,cc *qcn,int mjd) noex {
 	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_chr(rbuf,rlen,i,'q') ;
 	        i += rs ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = storebuf_deci(rbuf,rlen,i,mjd) ;
 	        i += rs ;
 	    }
