@@ -139,11 +139,10 @@ prgetclustername.o:	prgetclustername.cc	prgetclustername.h	$(INCS)
 prgetprogpath.o:	prgetprogpath.cc	prgetprogpath.h		$(INCS)
 prmkfname.o:		prmkfname.cc		prmkfname.h		$(INCS)
 prmktmpdir.o:		prmktmpdir.cc		prmktmpdir.h		$(INCS)
-
-propenqotd.o:		propenqotd.dir				$(INCS)
-propenqotd.dir:
-	makesubdir $@
-
 prenvfile.o:		prenvfile.cc		prenvfile.h		$(INCS)
+
+prqotd.o:		prqotd.dir					$(INCS)
+prqotd.dir:
+	makesubdir $@
 
 
