@@ -18,18 +18,21 @@
 
 /*******************************************************************************
 
+  	Object:
+	sysusernames
+
+	Description:
 	We enumerate (reentrantly and thread safely) user-name
 	entries from the system USER-NAME database.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getax.h>
 #include	<snwcpy.h>
 #include	<localmisc.h>
@@ -41,8 +44,6 @@
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -60,17 +61,18 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 local inline int sysusernames_ctor(sysusernames *op) noex {
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
-	    if ((op->fmp = new(nothrow) filemap) != nullptr) ylikely {
+	    op->magval = 0 ;
+	    if ((op->fmp = new(nt) filemap) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-filemap) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine sysusernames_ctor) */
+} /* end subroutine sysusernames_ctor) */
 
 local inline int sysusernames_dtor(sysusernames *op) noex {
 	int		rs = SR_FAULT ;
@@ -79,26 +81,24 @@ local inline int sysusernames_dtor(sysusernames *op) noex {
 	    if (op->fmp) ylikely {
 		delete op->fmp ;
 		op->fmp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine sysusernames_dtor) */
+} /* end subroutine sysusernames_dtor) */
 
 template<typename ... Args>
 local int sysusernames_magic(sysusernames *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SYSUSERNAMES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SYSUSERNAMES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (sysusernames_magic) */
+} /* end subroutine (sysusernames_magic) */
 
 
 /* local variables */
 
-constexpr cchar		*defufname = SYSUSERNAMES_FNAME ;
+constexpr char		defufname[] = SYSUSERNAMES_FNAME ;
 
 
 /* exported variables */
@@ -112,7 +112,7 @@ int sysusernames_open(sysusernames *op,cchar *sufname) noex {
 	    csize	nmax = INT_MAX ;
 	    if (sufname == nullptr) sufname = defufname ;
 	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) ylikely {
-	    	op->magic = SYSUSERNAMES_MAGIC ;
+	    	op->magval = SYSUSERNAMES_MAGIC ;
 	    }
 	    if (rs < 0) {
 		sysusernames_dtor(op) ;
@@ -134,7 +134,7 @@ int sysusernames_close(sysusernames *op) noex {
 		rs1 = sysusernames_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } 
@@ -143,15 +143,13 @@ int sysusernames_close(sysusernames *op) noex {
 int sysusernames_readent(sysusernames *op,char *ubuf,int ulen) noex {
 	int		rs ;
 	if ((rs = sysusernames_magic(op,ubuf)) >= 0) ylikely {
-	    cchar	*lp ;
 	    ubuf[0] = '\0' ;
-	    while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
-	        int		ll = rs ;
+	    for (cchar *lp ; (rs = filemap_getln(op->fmp,&lp)) > 0 ; ) {
+	        int	ll = rs ;
 	        if (lp[ll-1] == '\n') ll -= 1 ;
 	        rs = snwcpy(ubuf,ulen,lp,ll) ;
-	        if (rs > 0) break ;
-	        if (rs < 0) break ;
-	    } /* end while */
+	        if (rs) break ;
+	    } /* end for */
 	} /* end if (magic) */
 	return rs ;
 }
