@@ -172,7 +172,7 @@ int userterms::start() noex {
 	    if ((rs = lm_mp(&tbuf)) >= 0) {
 		tlen = rs ;
 		tl = intconv(strwcpy(tbuf,DEVDNAME) - tbuf) ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 		vecobj_finish(&el) ;
 	    }
@@ -271,7 +271,7 @@ local int terment_start(TE *ep,cc *sp,int sl,time_t t) noex {
 	ep->atime = t ;
 	if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
 	    ep->devpath = cp ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (terment_start) */
