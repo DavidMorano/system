@@ -34,11 +34,9 @@
 #include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usupport.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<intceil.h>
 #include	<sbuf.h>
 #include	<storeitem.h>
@@ -72,12 +70,12 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
-static int storeitem_storestrs(SI *,int,cchar *,int,char ***) noex ;
-static int storeitem_loadstrs(SI *,vechand *,int,cchar *,int) noex ;
+local int storeitem_storestrs(SI *,int,cchar *,int,char ***) noex ;
+local int storeitem_loadstrs(SI *,vechand *,int,cchar *,int) noex ;
 
-static int si_copystr(storeitem *,char **,cchar *) noex ;
+local int si_copystr(storeitem *,char **,cchar *) noex ;
 
-static int sbuf_fmtstrs(sbuf *,int,char **) noex ;
+local int sbuf_fmtstrs(sbuf *,int,char **) noex ;
 
 
 /* local variables */
@@ -95,7 +93,7 @@ int projectent_parse(PJE *pjp,char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	if (pjp && pjbuf && sp) ylikely {
 	    storeitem	ib, *ibp = &ib ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    memclear(pjp,sizeof(PJE)) ;
+	    memclear(pjp,szof(PJE)) ;
 	    if ((rs = storeitem_start(ibp,pjbuf,pjlen)) >= 0) ylikely {
 	        int		fi = 0 ;
 	        cchar		**vpp ;
@@ -106,7 +104,7 @@ int projectent_parse(PJE *pjp,char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	            vpp = nullptr ;
 	            switch (fi++) {
 	            case 0:
-	                vpp = (cchar **) &pjp->pj_name ;
+	                vpp = ccharpp(&pjp->pj_name) ;
 	                break ;
 	            case 1:
 			{
@@ -115,7 +113,7 @@ int projectent_parse(PJE *pjp,char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 			}
 	                break ;
 	            case 2:
-	                vpp = (cchar **) &pjp->pj_comment ;
+	                vpp = ccharpp(&pjp->pj_comment) ;
 	                break ;
 		    case 3:
 	                rs = storeitem_storestrs(ibp,',',sp,tl,&sv) ;
@@ -126,7 +124,7 @@ int projectent_parse(PJE *pjp,char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 		        pjp->pj_groups = sv ;
 	                break ;
 	            case 5:
-	                vpp = (cchar **) &pjp->pj_attr ;
+	                vpp = ccharpp(&pjp->pj_attr) ;
 	                break ;
 	            } /* end switch */
 	            if ((rs >= 0) && vpp) {
@@ -138,10 +136,10 @@ int projectent_parse(PJE *pjp,char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	            sl -= intconv((tp + 1) - sp) ;
 	            sp = (tp + 1) ;
 	            if (rs < 0) break ;
-	        } /* end while */
+	        } /* end for */
 	        if ((rs >= 0) && (fi == 5) && sl && sp[0]) {
 	            cchar	*cp ;
-		    vpp = (cchar **) &pjp->pj_attr ;
+		    vpp = ccharpp(&pjp->pj_attr) ;
 		    fi += 1 ;
 	            if (int cl ; (cl = sfshrink(sp,sl,&cp)) >= 0) {
 	                rs = storeitem_strw(ibp,cp,cl,vpp) ;
@@ -160,28 +158,29 @@ int projectent_load(PJE *pjp,char *pjbuf,int pjlen,CPJE *spjp) noex {
 	int		rs1 ;
 	if (pjp && pjbuf && spjp) ylikely {
 	    storeitem	ib ;
-	    memcpy(pjp,spjp,sizeof(PJE)) ;
+	    memcopy(pjp,spjp,szof(PJE)) ;
 	    if ((rs = storeitem_start(&ib,pjbuf,pjlen)) >= 0) ylikely {
 	        int	n ; /* used-afterwards (muliple places) */
 	        void	**ptab ;
-	        if (spjp->pj_users) {
-	            for (n = 0 ; spjp->pj_users[n] ; n += 1) ;
+	        if ((rs >= 0) && spjp->pj_users) {
+		    n = lenstrarr(spjp->pj_users) ;
 	            if ((rs = storeitem_ptab(&ib,n,&ptab)) >= 0) {
-	                int	i = 0 ;
-	                char	**tab = (char **) ptab ;
+	                int	i = 0 ; /* used-afterwards */
+	                char	**tab = charpp(ptab) ;
 	                pjp->pj_users = tab ;
 	                while ((rs >= 0) && spjp->pj_users[i]) {
-	                    rs = si_copystr(&ib,(tab + i),spjp->pj_users[i]) ;
+			    cchar *un = spjp->pj_users[i] ;
+	                    rs = si_copystr(&ib,(tab + i),un) ;
 			    i += 1 ;
 	                } /* end while */
 	                pjp->pj_users[i] = nullptr ;
 	            } /* end if (storeitem-ptab) */
 	        } /* end if (users) */
-	        if (spjp->pj_groups) {
-	            for (n = 0 ; spjp->pj_groups[n] ; n += 1) ;
+	        if ((rs >= 0) && spjp->pj_groups) {
+	            n = lenstrarr(spjp->pj_groups) ;
 	            if ((rs = storeitem_ptab(&ib,n,&ptab)) >= 0) {
-	                int	i = 0 ;
-	                char	**tab = (char **) ptab ;
+	                int	i = 0 ; /* used-afterwards */
+	                char	**tab = charpp(ptab) ;
 	                pjp->pj_groups = tab ;
 	                while ((rs >= 0) && spjp->pj_groups[i]) {
 	                    rs = si_copystr(&ib,(tab + i),spjp->pj_groups[i]) ;
@@ -246,25 +245,25 @@ int projectent_size(CPJE *pjp) noex {
 	int		rs = SR_FAULT ;
 	if (pjp) ylikely {
 	    int		sz = 1 ;
-	    int		i = 0 ;
+	    int		i = 0 ; /* used-multiple */
 	    if (pjp->pj_name) ylikely  {
-	        sz += (lenstr(pjp->pj_name)+1) ;
+	        sz += (lenstr(pjp->pj_name)+ 1) ;
 	    }
 	    if (pjp->pj_comment) {
-	        sz += (lenstr(pjp->pj_comment)+1) ;
+	        sz += (lenstr(pjp->pj_comment)+ 1) ;
 	    }
 	    if (pjp->pj_attr) {
-	        sz += (lenstr(pjp->pj_attr)+1) ;
+	        sz += (lenstr(pjp->pj_attr)+ 1) ;
 	    }
 	    if (pjp->pj_users) {
 	        for (i = 0 ; pjp->pj_users[i] ; i += 1) {
-	            sz += (lenstr(pjp->pj_users[i])+1) ;
+	            sz += (lenstr(pjp->pj_users[i])+ 1) ;
 	        } /* end for */
 	        sz += ((i + 1) * szof(cchar *)) ;
 	    } /* end if */
 	    if (pjp->pj_groups) {
 	        for (i = 0 ; pjp->pj_groups[i] ; i += 1) {
-	            sz += (lenstr(pjp->pj_groups[i])+1) ;
+	            sz += (lenstr(pjp->pj_groups[i])+ 1) ;
 	        } /* end for */
 	        sz += ((i + 1) * szof(cchar *)) ;
 	    } /* end if */
@@ -277,19 +276,19 @@ int projectent_size(CPJE *pjp) noex {
 
 /* local subroutines */
 
-static int storeitem_storestrs(SI *ibp,int sch,cc *sp,int sl,char ***svp) noex {
+local int storeitem_storestrs(SI *ibp,int sch,cc *sp,int sl,char ***svp) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vechand u ; (rs = vechand_start(&u,8,0)) >= 0) ylikely {
 	    if ((rs = storeitem_loadstrs(ibp,&u,sch,sp,sl)) > 0) ylikely {
 	        int	n = rs ;
-	        void	**ptab ;
-	        if ((rs = storeitem_ptab(ibp,n,&ptab)) >= 0) ylikely {
-		    int		i ;
+	        void **ptab ; 
+		if ((rs = storeitem_ptab(ibp,n,&ptab)) >= 0) ylikely {
+		    int		i ; /* used-afterwards */
 	            void	*vp ;
-	            *svp = (char **) ptab ;
+	            *svp = charpp(ptab) ;
 		    for (i = 0 ; vechand_get(&u,i,&vp) >= 0 ; i += 1) {
-	                (*svp)[i] = (char *) vp ;
+	                (*svp)[i] = charp(vp) ;
 	            } /* end for */
 	            (*svp)[i] = nullptr ;
 	        } /* end if (storeitem_ptab) */
@@ -300,10 +299,9 @@ static int storeitem_storestrs(SI *ibp,int sch,cc *sp,int sl,char ***svp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
 	return rs ;
-}
-/* end subroutine (storeitem_storestrs) */
+} /* end subroutine (storeitem_storestrs) */
 
-static int storeitem_loadstrs(SI *ibp,vechand *ulp,int sch,cc *sp,int sl) noex {
+local int storeitem_loadstrs(SI *ibp,vechand *ulp,int sch,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
@@ -315,9 +313,9 @@ static int storeitem_loadstrs(SI *ibp,vechand *ulp,int sch,cc *sp,int sl) noex {
 	        }
 	    } /* end if (non-zero) */
 	    sl -= intconv((tp + 1) - sp) ;
-	    sp = (tp+1) ;
+	    sp = (tp + 1) ;
 	    if (rs < 0) break ;
-	} /* end while */
+	} /* end for */
 	if ((rs >= 0) && sl && sp[0]) {
 	    if ((rs = storeitem_strw(ibp,sp,sl,&cp)) >= 0) ylikely {
 		c += 1 ;
@@ -325,26 +323,23 @@ static int storeitem_loadstrs(SI *ibp,vechand *ulp,int sch,cc *sp,int sl) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (storeitem_loadstrs) */
+} /* end subroutine (storeitem_loadstrs) */
 
-static int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
+local int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
 	int		rs = SR_OK ;
-	cchar		**cpp = (cchar **) pp ;
+	cchar		**cpp = ccharpp(pp) ;
 	*cpp = nullptr ;
 	if (p1) {
 	    rs = storeitem_strw(ibp,p1,-1,cpp) ;
 	}
 	return rs ;
-}
-/* end subroutine (si_copystr) */
+} /* end subroutine (si_copystr) */
 
-static int sbuf_fmtstrs(sbuf *bp,int sch,char **sv) noex {
+local int sbuf_fmtstrs(sbuf *bp,int sch,char **sv) noex {
 	int		rs = SR_OK ;
-	if (sv) {
+	if (sv) ylikely {
 	    for (int i = 0 ; sv[i] ; i += 1) {
-	        cchar	*sp = sv[i] ;
-		if (sp[0]) {
+	        if (cchar *sp = sv[i] ; sp[0]) {
 	            if (i > 0) rs = sbuf_char(bp,sch) ;
 	            if (rs >= 0) rs = sbuf_strw(bp,sp,-1) ;
 		}
@@ -352,7 +347,6 @@ static int sbuf_fmtstrs(sbuf *bp,int sch,char **sv) noex {
 	    } /* end for */
 	} /* end if (non-null vector) */
 	return rs ;
-}
-/* end subroutine (sbuf_fmtstrs) */
+} /* end subroutine (sbuf_fmtstrs) */
 
 
