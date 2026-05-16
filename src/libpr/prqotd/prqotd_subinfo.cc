@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* compile-time debugging */
-#define	CF_OPENDEF	0		/* ? */
+#define	CF_OPENDEF	0		/* debugging support? */
 
 /* revision history:
 
@@ -19,12 +19,12 @@
 
 /*******************************************************************************
 
-  	Name:
-	prqotd_subinfo
+  	Object:
+	subinfo
 
 	Description:
-	This subroutine sort of forms the back-end maintenance end
-	of the QOTD mechansim.
+	This object supports (is really the guts of) the |prqotd_maint|
+	subroutine.
 
 	Synopsis:
 
@@ -36,14 +36,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
-#include	<fcntl.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<climits>
+#include	<fcntl.h>		/* |O_{x}| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -72,7 +70,6 @@
 #include	<timestr.h>
 #include	<matxstr.h>		/* |matostr(3uc)| */
 #include	<isnot.h>
-#include	<ischarx.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| + |TIEBUFLEN| */
 #include	<libdebug.h>		/* LIBDEBUG */
 
@@ -104,6 +101,8 @@ import uconstants ;			/* |varname(3u)| */
 
 using prqotd::subinfo ;			/* type */
 using prqotd::config ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using prqotd::config_start ;		/* subroutine */
 using prqotd::config_finish ;		/* subroutine */
 using prqotd::config_read ;		/* subroutine */
@@ -221,28 +220,28 @@ namespace prqotd {
 	sip->dt = dt ;
 	sip->euid = geteuid() ;
 	sip->fl.logsub = true ;
-	if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) ylikely {
 	    sip->uid_pr = sb.st_uid ;
 	    sip->gid_pr = sb.st_gid ;
-	    if ((rs = subinfo_envbegin(sip)) >= 0) {
-	        if ((rs = subinfo_confbegin(sip)) >= 0) {
+	    if ((rs = subinfo_envbegin(sip)) >= 0) ylikely {
+	        if ((rs = subinfo_confbegin(sip)) >= 0) ylikely {
 		    cint	llen = LOGIDLEN ;
 		    cint	v = var.pid ;
 		    cchar	*nn = sip->nn ;
 		    char	lbuf[LOGIDLEN+1] ;
-		    if ((rs = mklogid(lbuf,llen,nn,5,v)) >= 0) {
+		    if ((rs = mklogid(lbuf,llen,nn,5,v)) >= 0) ylikely {
 			cchar	**vpp = &sip->logid ;
 			rs = subinfo_setentry(sip,vpp,lbuf,rs) ;
 		    }
-		    if (rs < 0) {
+		    if (rs < 0) nlikely {
 	        	subinfo_confend(sip) ;
 		    } /* end if (error) */
 		} /* end if (subinfo_confbegin) */
-	        if (rs < 0) {
+	        if (rs < 0) nlikely {
 	            subinfo_envend(sip) ;
 		} /* end if (error) */
 	    } /* end if (subinfo_envbegin) */
-	    if (rs < 0) {
+	    if (rs < 0) nlikely {
 	        if (sip->open.stores) {
 	            sip->open.stores = false ;
 	            vecstr_finish(&sip->stores) ;
@@ -286,15 +285,15 @@ namespace prqotd {
 	    cchar	*vp = sip->sn ;
 	    cint	vl = -1 ;
 	    rs = subinfo_spooldir(sip,vp,vl) ;
-	}
-	{
+	} /* end if */
+	if (rs >= 0) ylikely {
 	    cchar	*lf = sip->lfname ;
 	    if (((lf == nullptr) || (lf[0] == '+')) && sip->fl.logsub) {
 	        cchar	*vp = sip->sn ;
 	        cint	vl = -1 ;
 	        rs = subinfo_logfile(sip,vp,vl) ;
-	    }
-	}
+	    } /* end if */
+	} /* end if (ok) */
 	return rs ;
     } /* end subroutine (subinfo_defaults) */
     int subinfo_logbegin(SUB *sip) noex {
@@ -303,7 +302,7 @@ namespace prqotd {
 	DEBUGPRINTF("ent\n") ;
 	if ((lf != nullptr) && (lf[0] != '-')) {
 	    cint	sz = szof(logfile) ;
-	    if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
+	    if (void *p ; (rs = lm_mall(sz,&p)) >= 0) ylikely {
 		logfile	*lfp = (logfile *) p ;
 	        cchar	*logid = sip->logid ;
 	        sip->lfp = (logfile *) p ;
@@ -311,15 +310,15 @@ namespace prqotd {
 	        if ((rs = logfile_open(lfp,lf,0,0666,logid)) >= 0) {
 		    sip->open.logsub = true ;
 		    rs = subinfo_logenv(sip) ;
-		    if (rs < 0) {
+		    if (rs < 0) nlikely {
 			sip->open.logsub = false ;
 			logfile_close(lfp) ;
-		    }
+		    } /* end if (error) */
 		} else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
 		}
 		DEBUGPRINTF("out rs=%d\n",rs) ;
-		if (rs < 0) {
+		if (rs < 0) nlikely {
 		    lm_free(sip->lfp) ;
 		    sip->lfp = nullptr ;
 		} /* end if (error) */
@@ -334,15 +333,15 @@ namespace prqotd {
 	if (sip->lfp) {
 	    logfile	*lfp = (logfile *) sip->lfp ;
 	    {
-	    rs1 = logfile_close(lfp) ;
-	    if (rs >= 0) rs = rs1 ;
+	        rs1 = logfile_close(lfp) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	    rs1 = lm_free(sip->lfp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sip->lfp = nullptr ;
+	        rs1 = lm_free(sip->lfp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sip->lfp = nullptr ;
 	    }
-	}
+	} /* end if */
 	return rs ;
     } /* end subroutine (subinfo_logend) */
     int subinfo_spoolcheck(SUB *sip) noex {
@@ -362,10 +361,10 @@ namespace prqotd {
 	cchar		*sdname = sip->spooldname ;
 	char		dbuf[DIGBUFLEN+1] ;
 	DEBUGPRINTF("ent mjd=%d\n",mjd) ;
-	if ((rs = ctdecpi((dbuf+1),(dlen-1),prec,(mjd/100))) > 0) {
-	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	if ((rs = ctdecpi((dbuf+1),(dlen-1),prec,(mjd/100))) > 0) ylikely {
+	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	        dbuf[0] = 'd' ;
-	        if ((rs = mkpath2w(tbuf,sdname,dbuf,(rs+1))) >= 0) {
+	        if ((rs = mkpath2w(tbuf,sdname,dbuf,(rs+1))) >= 0) ylikely {
 	            cchar	**vpp = &sip->qdname ;
 		    len = rs ;
 		    if ((rs = subinfo_setentry(sip,vpp,tbuf,len)) >= 0) {
@@ -404,97 +403,97 @@ namespace prqotd {
 	    fd = rs ;
 	} /* end if */
 	DEBUGPRINTF("mid rs=%d fd=%u\n",rs,fd) ;
-	if (rs >= 0) {
-	    if ((rs = u_rewind(fd)) >= 0) {
-		if ((rs = uc_fminmod(fd,om)) >= 0) {
+	if (rs >= 0) ylikely {
+	    if ((rs = u_rewind(fd)) >= 0) ylikely {
+		if ((rs = uc_fminmod(fd,om)) >= 0) ylikely {
 		    uid_t	u = sip->uid_pr ;
 		    gid_t	g = sip->gid_pr ;
-		    if ((rs = u_fchown(fd,u,g)) == SR_PERM) rs = SR_OK ;
-		}
+		    if ((rs = u_fchown(fd,u,g)) == SR_PERM) {
+			rs = SR_OK ;
+		    }
+		} /* end if */
 	    } /* end if (rewind) */
 	    if (rs < 0) u_close(fd) ;
 	} /* end if (got a source) */
 	DEBUGPRINTF("ret rs=%d fd=%d\n",rs,fd) ;
 	return (rs >= 0) ? fd : rs ;
     } /* end subroutine (subinfo_gather) */
-    int subinfo_setfname(SUB *sip,char *fname,cc *ebuf,int el,int f_def,
+    int subinfo_setfname(SUB *sip,char *fnamep,cc *ebuf,int el,int f_def,
 		cchar *dname,cchar *name,cchar *suf) noex {
-	int		rs = SR_OK ;
-	int		ml ;
-	cchar		*namp ;
-	char		tmpname[MAXNAMELEN + 1] ;
-
-	if ((f_def && (ebuf[0] == '\0')) ||
-	    (strcmp(ebuf,"+") == 0)) {
-
-	    namp = name ;
-	    if ((suf != nullptr) && (suf[0] != '\0')) {
-	        namp = tmpname ;
-	        mkfnamesuf1(tmpname,name,suf) ;
-	    }
-
-	    if (namp[0] != '/') {
-	        if ((dname != nullptr) && (dname[0] != '\0')) {
-	            rs = mkpath3(fname,sip->pr,dname,namp) ;
-	        } else {
-	            rs = mkpath2(fname,sip->pr,namp) ;
-		}
-	    } else {
-	        rs = mkpath1(fname,namp) ;
-	    }
-	} else if (strcmp(ebuf,"-") == 0) {
-	    fname[0] = '\0' ;
-	} else if (ebuf[0] != '\0') {
-
-	    namp = ebuf ;
-	    if (el >= 0) {
-	        namp = tmpname ;
-	        ml = MIN(MAXPATHLEN,el) ;
-	        strwcpy(tmpname,ebuf,ml) ;
-	    }
-
-	    if (ebuf[0] != '/') {
-	        if (strchr(namp,'/') != nullptr) {
-	            rs = mkpath2(fname,sip->pr,namp) ;
-	        } else {
-	            if ((dname != nullptr) && (dname[0] != '\0')) {
-	                rs = mkpath3(fname,sip->pr,dname,namp) ;
-	            } else {
-	                rs = mkpath2(fname,sip->pr,namp) ;
-		    }
+	cint		fnamel = var.maxpathlen ;
+	int		rs ;
+	int		rs1 ;
+	if (char *tmpname ; (rs = lm_mn(&tmpname)) >= 0) ylikely {
+	    cchar	*namp ; /* used-multiple */
+	    if ((f_def && (ebuf[0] == '\0')) || (strcmp(ebuf,"+") == 0)) {
+	        namp = name ;
+	        if ((suf != nullptr) && (suf[0] != '\0')) {
+	            namp = tmpname ;
+	            rs = mkfnamesuf1(tmpname,name,suf) ;
 	        } /* end if */
-	    } else {
-	        rs = mkpath1(fname,namp) ;
-	    }
-
-	} /* end if */
-
+		if (rs >= 0) ylikely {
+	            if (namp[0] != '/') {
+	                if ((dname != nullptr) && (dname[0] != '\0')) {
+	                    rs = mkpath3(fnamep,sip->pr,dname,namp) ;
+	                } else {
+	                    rs = mkpath2(fnamep,sip->pr,namp) ;
+		        }
+	            } else {
+	                rs = mkpath1(fnamep,namp) ;
+	            }
+		} /* end if (ok) */
+	    } else if (strcmp(ebuf,"-") == 0) {
+	        fnamep[0] = '\0' ;
+	    } else if (ebuf[0] != '\0') {
+	        namp = ebuf ;
+	        if (el >= 0) {
+	            cint ml = min(fnamel,el) ;
+	            namp = tmpname ;
+	            strwcpy(tmpname,ebuf,ml) ;
+	        } /* end if */
+	        if (ebuf[0] != '/') {
+	            if (strchr(namp,'/') != nullptr) {
+	                rs = mkpath2(fnamep,sip->pr,namp) ;
+	            } else {
+	                if ((dname != nullptr) && (dname[0] != '\0')) {
+	                    rs = mkpath3(fnamep,sip->pr,dname,namp) ;
+	                } else {
+	                    rs = mkpath2(fnamep,sip->pr,namp) ;
+		        }
+	            } /* end if */
+	        } else {
+	            rs = mkpath1(fnamep,namp) ;
+	        }
+	    } /* end if */
+	    rs1 = lm_free(tmpname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
     } /* end subroutine (subinfo_setfname) */
     int subinfo_setentry(SUB *lip,cchar **epp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		vnlen = 0 ; /* return-value */
-	if (lip && epp) {
+	if (lip && epp) ylikely {
 	    rs = SR_OK ;
-	if (! lip->open.stores) {
-	    rs = vecstr_start(&lip->stores,4,0) ;
-	    lip->open.stores = (rs >= 0) ;
-	}
-	if (rs >= 0) {
-	    int	oi = -1 ;
-	    if (*epp != nullptr) {
-	        oi = vecstr_findaddr(&lip->stores,*epp) ;
+	    if (! lip->open.stores) {
+	        rs = vecstr_start(&lip->stores,4,0) ;
+	        lip->open.stores = (rs >= 0) ;
 	    }
-	    if (vp != nullptr) {
-	        vnlen = lenstr(vp,vl) ;
-	        rs = vecstr_store(&lip->stores,vp,vnlen,epp) ;
-	    } else {
-		*epp = nullptr ;
-	    }
-	    if ((rs >= 0) && (oi >= 0)) {
-	        vecstr_del(&lip->stores,oi) ;
-	    }
-	} /* end if (ok) */
+	    if (rs >= 0) ylikely {
+	        int	oi = -1 ;
+	        if (*epp != nullptr) {
+	            oi = vecstr_findaddr(&lip->stores,*epp) ;
+	        }
+	        if (vp != nullptr) {
+	            vnlen = lenstr(vp,vl) ;
+	            rs = vecstr_store(&lip->stores,vp,vnlen,epp) ;
+	        } else {
+		    *epp = nullptr ;
+	        }
+	        if ((rs >= 0) && (oi >= 0)) {
+	            vecstr_del(&lip->stores,oi) ;
+	        }
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? vnlen : rs ;
     } /* end subroutine (subinfo_setentry) */
@@ -504,7 +503,7 @@ namespace prqotd {
 	cchar		*pr = sip->pr ;
 	cchar		*inter = PRQOTD_VARSPOOL ;
 	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-	    if ((rs = mkourname(tbuf,pr,inter,vp,vl)) >= 0) {
+	    if ((rs = mkourname(tbuf,pr,inter,vp,vl)) >= 0) ylikely {
 	        cchar	**vpp = &sip->spooldname ;
 	        rs = subinfo_setentry(sip,vpp,tbuf,rs) ;
 	    } /* end if (mkourname) */
@@ -542,52 +541,60 @@ namespace prqotd {
 
 local int subinfo_envbegin(SUB *sip) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	DEBUGPRINTF("ent\n") ;
 	{
-	    cint	elen = MAXPATHLEN ;
-	    int		el = -1 ;
-	    cchar	*en ;
-	    char	ebuf[MAXPATHLEN+1] ;
-	    en = ebuf ;
-	    if ((rs = getprogexec(ebuf,elen)) == SR_NOSYS) {
-	        rs = SR_OK ;
-	        en = PRQOTD_PROGEXEC ;
-	    } else {
-	        el = rs ;
-	    }
-	    if (rs >= 0) {
-	        cchar	**vpp = &sip->pn ;
-		cchar	*cp ;
-	        if (int cl ; (cl = sfbasename(en,el,&cp)) > 0) {
-		    if (char *tp = strnchr(cp,cl,'.') ; tp) {
-			cl = intconv(tp - cp) ;
-		    }
-	            rs = subinfo_setentry(sip,vpp,cp,cl) ;
-	        } /* end if (sfbasename) */
-	    } /* end if (ok) */
+	    if (char *ebuf ; (rs = lm_mp(&ebuf)) >= 0) ylikely {
+	        cint	elen = rs ;
+	        int	el = -1 ;
+	        cchar	*en = ebuf ;
+	        if ((rs = getprogexec(ebuf,elen)) == SR_NOSYS) {
+	            rs = SR_OK ;
+	            en = PRQOTD_PROGEXEC ;
+	        } else {
+	            el = rs ;
+	        } /* end if */
+	        if (rs >= 0) ylikely {
+	            cchar	**vpp = &sip->pn ;
+		    cchar	*cp ;
+	            if (int cl ; (cl = sfbasename(en,el,&cp)) > 0) ylikely {
+		        if (char *tp = strnchr(cp,cl,'.') ; tp) {
+			    cl = intconv(tp - cp) ;
+		        }
+	                rs = subinfo_setentry(sip,vpp,cp,cl) ;
+	            } /* end if (sfbasename) */
+	        } /* end if (ok) */
+		rs1 = lm_free(ebuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end block */
-	if (rs >= 0) {
-	    char	nn[NODENAMELEN+1] ;
-	    char	dn[MAXHOSTNAMELEN+1] ;
-	    if ((rs = getnodedomain(nn,dn)) >= 0) {
-	        cchar	**vpp = &sip->nn ;
-#if	CF_DEBUG
-	        debugprintf("maintqotd/subinfo_envbegin: nn=%s\n",nn) ;
-	        debugprintf("maintqotd/subinfo_envbegin: dn=%s\n",dn) ;
-#endif
-	        if ((rs = subinfo_setentry(sip,vpp,nn,-1)) >= 0) {
-	            vpp = &sip->dn ;
-	            rs = subinfo_setentry(sip,vpp,dn,-1) ;
-	        }
-	    }
+	if (rs >= 0) ylikely {
+	    cint sz = ((var.nodenamelen + 1) + (var.hostnamelen + 1)) ;
+	    int ai = 0 ;
+	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
+	        char	*nn = (a + (ai++ * (var.nodenamelen + 1))) ;
+	        char	*dn = (a + (ai++ * (var.nodenamelen + 1))) ;
+	        if ((rs = getnodedomain(nn,dn)) >= 0) {
+	            cchar	**vpp = &sip->nn ;
+	            if ((rs = subinfo_setentry(sip,vpp,nn,-1)) >= 0) {
+	                vpp = &sip->dn ;
+	                rs = subinfo_setentry(sip,vpp,dn,-1) ;
+	            }
+	        } /* end if (getnodename) */
+	        rs1 = lm_free(a) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (ok) */
-	if (rs >= 0) {
-	    cint	ulen = USERNAMELEN ;
-	    char	ubuf[USERNAMELEN+1] ;
-	    if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
-	        cchar	**vpp = &sip->un ;
-	        rs = subinfo_setentry(sip,vpp,ubuf,rs) ;
-	    }
+	if (rs >= 0) ylikely {
+	    if (char *ubuf ; (rs = lm_un(&ubuf)) >= 0) ylikely {
+		cint ulen = rs ;
+	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) ylikely {
+	            cchar	**vpp = &sip->un ;
+	            rs = subinfo_setentry(sip,vpp,ubuf,rs) ;
+	        }
+	        rs1 = lm_free(ubuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (ok) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
@@ -606,21 +613,21 @@ local int subinfo_confbegin(SUB *sip) noex {
 	int		rs = SR_OK ;
 	cchar		*cfname = CONFIGFNAME ;
 	DEBUGPRINTF("ent\n") ;
-	if (void *p ; (rs = lm_mall(csz,&p)) >= 0) {
+	if (void *p ; (rs = lm_mall(csz,&p)) >= 0) ylikely {
 	    CF	*csp = configp(p) ;
 	    sip->cfp = csp ;
-	    if ((rs = config_start(csp,sip,cfname)) >= 0) {
-	        if ((rs = config_read(csp)) >= 0) {
+	    if ((rs = config_start(csp,sip,cfname)) >= 0) ylikely {
+	        if ((rs = config_read(csp)) >= 0) ylikely {
 	            rs = 1 ;
 	        }
-	        if (rs < 0) {
+	        if (rs < 0) nlikely {
 	            config_finish(csp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (config) */
-	    if (rs < 0) {
+	    if (rs < 0) nlikely {
 	        lm_free(p) ;
 	        sip->cfp = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-allocation) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
@@ -630,16 +637,16 @@ local int subinfo_confend(SUB *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	DEBUGPRINTF("ent\n") ;
-	if (sip->cfp) {
+	if (sip->cfp) ylikely {
 	    CF	*csp = configp(sip->cfp) ;
 	    {
-	    rs1 = config_finish(csp) ;
-	    if (rs >= 0) rs = rs1 ;
+	        rs1 = config_finish(csp) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	    rs1 = lm_free(sip->cfp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sip->cfp = nullptr ;
+	        rs1 = lm_free(sip->cfp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sip->cfp = nullptr ;
 	    }
 	} /* end if */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
@@ -651,8 +658,8 @@ local int subinfo_logfile(SUB *sip,cchar *vp,int vl) noex {
 	int		rs1 ;
 	cchar		*pr = sip->pr ;
 	cchar		*inter = LOGCNAME ;
-	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-	    if ((rs = mkourname(tbuf,pr,inter,vp,vl)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
+	    if ((rs = mkourname(tbuf,pr,inter,vp,vl)) >= 0) ylikely {
 	        cchar	**vpp = &sip->lfname ;
 	        rs = subinfo_setentry(sip,vpp,tbuf,rs) ;
 	    } /* end if (mkourname) */
@@ -711,12 +718,11 @@ local int subinfo_opensrc(SUB *sip,cchar *qf,cchar *sep) noex {
 	} else {
 	    rs = SR_NOENT ;
 	}
-
 #if	CF_DEBUG && CF_OPENDEF
 	if (rs == SR_NOENT) {
 	    rs = opendef(sip) ;
 	    fd = rs ;
-	}
+	} /* end if (opendef) */
 #endif /* CF_DEBUG */
 	DEBUGPRINTF("ret rs=%d fd=%d\n",rs,fd) ;
 	return (rs >= 0) ? fd : rs ;
@@ -738,10 +744,10 @@ local int subinfo_defprog(SUB *sip,cchar *qfn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = subinfo_id(sip)) >= 0) {
+	if ((rs = subinfo_id(sip)) >= 0) ylikely {
 	    vecstr	path, *plp = &path ;
-	    if ((rs = vecstr_start(plp,5,0)) >= 0) {
-	        if ((rs = subinfo_addourpath(sip,plp)) >= 0) {
+	    if ((rs = vecstr_start(plp,5,0)) >= 0) ylikely {
+	        if ((rs = subinfo_addourpath(sip,plp)) >= 0) ylikely {
 	            for (int i = 0 ; defprogs[i] ; i += 1) {
 	                cchar	*prog = defprogs[i] ;
 	                if ((rs = subinfo_defproger(sip,plp,prog,qfn)) >= 0) {
@@ -764,27 +770,31 @@ local int subinfo_defprog(SUB *sip,cchar *qfn) noex {
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (subinfo_defprog) */
 
+/****
+  The memory allocation below is a combination of a 
+  MAXPATHLEN and a MAXNAMELEN, in that order.
+****/
 local int subinfo_defproger(SUB *sip,vecstr *plp,cc *prog,cc *qfn) noex {
 	ids		*idp = &sip->id ;
-	cint		sz = (2 * (var.maxpathlen + 1)) ;
+	cint		sz = ((var.maxpathlen + 1) + (var.maxnamelen + 1)) ;
 	cint		maxpath = var.maxpathlen ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ; /* return-value */
 	int		ai = 0 ;
-	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	    char	*rbuf = (a + (ai++ * (maxpath + 1))) ;
-	    if ((rs = getprogpath(idp,plp,rbuf,prog,-1)) >= 0) {
+	    if ((rs = getprogpath(idp,plp,rbuf,prog,-1)) >= 0) ylikely {
 	        cint	alen = maxpath ;
 	        cint	rl = rs ;
 	        char	*abuf = (a + (ai++ * (maxpath + 1))) ;
 	        if (rl == 0) {
 		    rs = mkpath1(rbuf,prog) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    cchar	*cp ;
-	            if (int cl ; (cl = sfbasename(prog,-1,&cp)) > 0) {
-		        if ((rs = sncpy1w(abuf,alen,cp,cl)) >= 0) {
+	            if (int cl ; (cl = sfbasename(prog,-1,&cp)) > 0) ylikely {
+		        if ((rs = sncpy1w(abuf,alen,cp,cl)) >= 0) ylikely {
 			    cint	of = O_RDONLY ;
 		            cchar	*av[2] ;
 		            cchar	**ev = nullptr ;
@@ -822,10 +832,10 @@ local int subinfo_addourpath(SUB *sip,vecstr *plp) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (path) {
-	    rs = vecstr_addpathclean(plp,path,-1) ;
+	    rs = plp->addpathclean(path,-1) ;
 	    c += rs ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = subinfo_addprbins(sip,plp) ;
 	    c += rs ;
 	}
@@ -848,10 +858,10 @@ local int subinfo_addprbin(SUB *sip,vecstr *plp,cc *pr,cc *prbin) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-	    if ((rs = mkpath2(tbuf,pr,prbin)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
+	    if ((rs = mkpath2(tbuf,pr,prbin)) >= 0) ylikely {
 	        cint	tl = rs ;
-	        if (ustat sb ; (rs = u_stat(tbuf,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(tbuf,&sb)) >= 0) ylikely {
 		    if (S_ISDIR(sb.st_mode)) {
 		        cint	am = (R_OK|X_OK) ;
 		        if ((rs = permid(&sip->id,&sb,am)) >= 0) {
@@ -900,7 +910,7 @@ local int subinfo_dircheck(SUB *sip,cchar *dname) noex {
 local int subinfo_dirminmode(SUB *sip,cchar *dname,mode_t dm) noex {
 	const uid_t	euid = sip->euid ;
 	int		rs ;
-	if ((rs = uc_minmod(dname,dm)) >= 0) {
+	if ((rs = uc_minmod(dname,dm)) >= 0) ylikely {
 	    if (sip->uid_pr != euid) {
 		u_chown(dname,sip->uid_pr,sip->gid_pr) ;
 	    }
@@ -915,7 +925,7 @@ local int opendef(SUB *sip) noex {
 	int		pipes[2] ;
 	int		fd = -1 ;
 	(void) sip ;
-	if ((rs = uc_piper(pipes,0,3)) >= 0) {
+	if ((rs = uc_piper(pipes,0,3)) >= 0) ylikely {
 	    int		wfd = pipes[0] ;
 	    int		sl ;
 	    cchar	*sp = "hello world!\n" ;
@@ -923,7 +933,7 @@ local int opendef(SUB *sip) noex {
 	    sl = lenstr(sp) ;
 	    rs = uc_writen(wfd,sp,sl) ;
 	    u_close(wfd) ;
-	}
+	} /* end if */
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (opendef) */
 #endif /* CF_DEBUG */
@@ -932,7 +942,7 @@ local int opendef(SUB *sip) noex {
 local int debugmode(cchar *ids,cchar *s,cchar *fname) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
-	if (char *mstr ; (rs = lm_ml(&mstr)) >= 0) {
+	if (char *mstr ; (rs = lm_ml(&mstr)) >= 0) ylikely {
 	    cint	mlen = rs ;
 	    if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	        if ((rs = snfilemode(mstr,mlen,sb.st_mode)) >= 0) {
@@ -953,9 +963,9 @@ local int debugfmode(cchar *id,cchar *s,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (char *mstr ; (rs = lm_ml(&mstr)) >= 0) {
+	if (char *mstr ; (rs = lm_ml(&mstr)) >= 0) ylikely {
 	    cint	mlen = rs ;
-	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
 	        if ((rs = snfilemode(mstr,mlen,sb.st_mode)) >= 0) {
 	            rs = debugprintf("%s: %s m=%s\n",id,s,mstr) ;
 		    len = rs ;
