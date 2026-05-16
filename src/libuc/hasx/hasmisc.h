@@ -101,7 +101,6 @@ extern bool hasempty		(cchar *,int) noex ;
 extern bool hasdots		(cchar *,int) noex ;
 extern bool haseoh		(cchar *,int) noex ;
 extern bool hasdoublewhite	(cchar *,int) noex ;
-extern bool hascdpath		(cchar *,int) noex ;
 extern bool hasmacro		(cchar *,int) noex ;
 extern bool hasvalidmagic	(cchar *,int,cchar *) noex ;
 extern bool hasfnamespecial	(cchar *,int) noex ;
