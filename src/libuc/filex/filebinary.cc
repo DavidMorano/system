@@ -157,8 +157,7 @@ local bool hasbinary(cchar *sp,int sl) noex {
 	    sp += 1 ;
 	} /* end while */
 	return f ;
-}
-/* end subroutine (hasbinary) */
+} /* end subroutine (hasbinary) */
 
 local bool isbinary(int ch) noex {
 	bool		f = false ;
@@ -169,17 +168,14 @@ local bool isbinary(int ch) noex {
 	    f = true ;
 	}
 	return f ;
-}
-/* end subroutine (isbinary) */
+} /* end subroutine (isbinary) */
 
 local bool isc0(int ch) noex {
 	return (ch < 0x20) ;
-}
-/* end subroutine (isc0) */
+} /* end subroutine (isc0) */
 
 local bool isc1(int ch) noex {
 	return ((ch >= 0x80) && (ch < 0xA0)) ;
-}
-/* end subroutine (isc1) */
+} /* end subroutine (isc1) */
 
 
