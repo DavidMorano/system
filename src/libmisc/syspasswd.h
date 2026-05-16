@@ -13,7 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<filemap.h>
 
 
@@ -24,17 +25,17 @@
 
 struct syspasswd_head {
 	filemap		*fmp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef SYSPASSWD	syspasswd ;
 
 EXTERNC_begin
 
-extern int syspasswd_open(syspasswd *,cchar *) noex ;
-extern int syspasswd_close(syspasswd *) noex ;
-extern int syspasswd_readent(syspasswd *,ucentpw *,char *,int) noex ;
-extern int syspasswd_reset(syspasswd *) noex ;
+extern int syspasswd_open	(syspasswd *,cchar *) noex ;
+extern int syspasswd_close	(syspasswd *) noex ;
+extern int syspasswd_readent	(syspasswd *,ucentpw *,char *,int) noex ;
+extern int syspasswd_reset	(syspasswd *) noex ;
 
 EXTERNC_end
 
