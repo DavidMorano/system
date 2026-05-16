@@ -28,6 +28,6 @@ file			description
 libnss.h		library-header
 
 nss_parse.h		Name-Service-Switch public-part (header)
-nss_parse.c		Name-Service-Switch private-part
+nss_parse.cc		Name-Service-Switch private-part
 
 
