@@ -17,6 +17,12 @@
 
 /*******************************************************************************
 
+  	Group:
+	userattrent
+
+	Description:
+	User-Attribute-Entry
+
 	Notes:
 	This subroutine group has been obsoleted and should be replaced
 	by UCENTUA.
@@ -28,7 +34,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<userattr.h>		/* <- money shot */
 
 
@@ -41,12 +48,14 @@
 #endif
 
 
+typedef	USERATTRENT	userattrent ;
+
 EXTERNC_begin
 
-extern int userattrent_load(USERATTRENT *,char *,int,CUSERATTRENT *) noex ;
-extern int userattrent_parse(USERATTRENT *,char *,int,cchar *,int) noex ;
-extern int userattrent_size(CUSERATTRENT *) noex ;
-extern int userattrent_format(CUSERATTRENT *,char *,int) noex ;
+extern int userattrent_load(userattrent *,char *,int,con userattrent *) noex ;
+extern int userattrent_parse(userattrent *,char *,int,cchar *,int) noex ;
+extern int userattrent_size(con userattrent *) noex ;
+extern int userattrent_format(con userattrent *,char *,int) noex ;
 
 EXTERNC_end
 
