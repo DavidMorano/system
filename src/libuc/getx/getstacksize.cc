@@ -57,6 +57,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucsysconf.h>
 #include	<sysconfcmds.h>		/* |_SC_THREAD_STACK_MIN| */
 #include	<localmisc.h>
 #include	<stacktypes.h>
@@ -76,10 +77,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_sysconf(int,long *) noex ;
-}
 
 
 /* external variables */
@@ -132,7 +129,7 @@ local int getval(stacktypes w) noex {
 	case stacktype_thread:
 	    {
 		cint	cmd = _SC_THREAD_STACK_MIN ;
-	        rs = uc_sysconf(cmd,nullptr) ;
+	        rs = uc_sysconfval(cmd,nullptr) ;
 	    }
 	    break ;
 	case stacktype_default:
