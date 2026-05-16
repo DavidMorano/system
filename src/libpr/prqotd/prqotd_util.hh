@@ -52,6 +52,8 @@ namespace prqotd {
 	int	pid ;
 	int	maxnamelen ;
 	int	maxpathlen ;
+	int	nodenamelen ;
+	int	hostnamelen ;
 	int	ebuflen ;
 	int	vbuflen ;
 	operator int () noex ;
