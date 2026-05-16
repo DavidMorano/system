@@ -181,19 +181,6 @@ bool hasdoublewhite(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasdoublewhite) */
 
-bool hascdpath(cchar *sp,int sl) noex {
-    	constexpr int	chx_ec = mkchar('¬') ;
-	bool		f = false ;
-	if (sp) ylikely {
-	    if (sl && sp[0]) {
-	        cint ch = mkchar(sp[0]) ;
-	        f = (ch == chx_ec) ;
-	    } /* end if */
-	} /* end if (non-null) */
-	return f ;
-}
-/* end subroutine (hascdpath) */
-
 bool hasmacro(cchar *lp,int ll) noex {
 	bool		f = false ;
 	if (lp) ylikely {
