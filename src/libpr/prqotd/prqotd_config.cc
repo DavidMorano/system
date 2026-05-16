@@ -228,16 +228,16 @@ namespace prqotd {
     int config_start(CF *csp,SUB *sip,cchar *cfname) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = config_ctor(csp,sip,cfname)) >= 0) {
+	if ((rs = config_ctor(csp,sip,cfname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (cfname[0]) {
-	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	    if (cfname[0]) ylikely {
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 		    PF	*pfp = csp->pfp ;
 	            csp->sip = sip ;
-	            if ((rs = config_findfile(csp,tbuf,cfname)) >= 0) {
+	            if ((rs = config_findfile(csp,tbuf,cfname)) >= 0) ylikely {
 	                con mainv envv = var.envv ;
 	                if (rs > 0) cfname = tbuf ;
-	                if ((rs = pfp->open(envv,cfname)) >= 0) {
+	                if ((rs = pfp->open(envv,cfname)) >= 0) ylikely {
 	                    if ((rs = config_cookbegin(csp)) >= 0) {
 	                        csp->f_p = true ;
 	                    }
@@ -256,20 +256,20 @@ namespace prqotd {
 		    rs1 = lm_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
-		if (rs < 0) {
+		if (rs < 0) nlikely {
 		    csp->magval = 0 ;
-		}
+		} /* end if (error) */
 	    } /* end if (valid) */
-	    if (rs < 0) {
+	    if (rs < 0) nlikely {
 		config_dtor(csp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (config_ctor) */
 	return rs ;
     } /* end subroutine (config_start) */
     int config_finish(CF *csp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = config_magic(csp)) >= 0) {
+	if ((rs = config_magic(csp)) >= 0) ylikely {
 	    if (csp->f_p) {
 	        if (csp->f_cooks) {
 	            rs1 = config_cookend(csp) ;
@@ -292,7 +292,7 @@ namespace prqotd {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if ((rs = config_magic(csp)) >= 0) {
+	if ((rs = config_magic(csp)) >= 0) ylikely {
 	    SUB		*sip = csp->sip ;
 	    rs = SR_FAULT ;
 	    if ((sip = csp->sip)) {
@@ -315,7 +315,7 @@ namespace prqotd {
     int config_check(CF *csp) noex {
 	int		rs ;
 	int		rv = 0 ; /* return-value */
-	if ((rs = config_magic(csp)) >= 0) {
+	if ((rs = config_magic(csp)) >= 0) ylikely {
 	    SUB		*sip = csp->sip ;
 	    if (csp->f_p) {
 	        custime dt = sip->dt ;
@@ -336,10 +336,10 @@ local int config_findfile(CF *csp,char *tbuf,cchar *cfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ; /* return-value */
-	if ((rs = config_magic(csp)) >= 0) {
+	if ((rs = config_magic(csp)) >= 0) ylikely {
 	    SUB		*sip = csp->sip ;
 	    tbuf[0] = '\0' ;
-	    if (vecstr sv ; (rs = vecstr_start(&sv,6,0)) >= 0) {
+	    if (vecstr sv ; (rs = vecstr_start(&sv,6,0)) >= 0) ylikely {
 	        cint	tlen = var.maxpathlen ;
 	        if (rs >= 0) rs = vecstr_envset(&sv,"p",sip->pr,-1) ;
 	        if (rs >= 0) rs = vecstr_envset(&sv,"e","etc",-1) ;
@@ -358,12 +358,12 @@ local int config_findfile(CF *csp,char *tbuf,cchar *cfname) noex {
 local int config_cookbegin(CF *csp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = config_magic(csp)) >= 0) {
+	if ((rs = config_magic(csp)) >= 0) ylikely {
 	    SUB		*sip = csp->sip ;
-	    if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) {
+	    if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) ylikely {
 		EC	*ecp = csp->ecp ;
 	        int	hlen = rs ;
-	        if ((rs = ecp->start) >= 0) {
+	        if ((rs = ecp->start) >= 0) ylikely {
 	            cchar	*ks = "PSNDHRU" ;
 		    cchar	*vp = nullptr ;
 	            char	kbuf[2] = {} ;
@@ -404,21 +404,21 @@ local int config_cookbegin(CF *csp) noex {
 	                    rs = ecp->add(kbuf,vp,vl) ;
 	                }
 	            } /* end for */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                if ((vl = sfbasename(sip->pr,-1,&vp)) > 0) {
 	                    rs = ecp->add("RN",vp,vl) ;
 	                }
 	            } /* end if (ok) */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                if ((rs = ctdeci(hbuf,hlen,sip->mjd)) >= 0) {
 	                    rs = ecp->add("MJD",hbuf,rs) ;
 	                }
 	            } /* end if (ok) */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                csp->f_cooks = true ;
 	            } else {
 	                ecp->finish() ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (expcook_start) */
 	        rs1 = lm_free(hbuf) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -430,7 +430,7 @@ local int config_cookbegin(CF *csp) noex {
 local int config_cookend(CF *csp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = config_magic(csp)) >= 0) {
+	if ((rs = config_magic(csp)) >= 0) ylikely {
 	    if (csp->f_cooks) {
 	        csp->f_cooks = false ;
 	        rs1 = expcook_finish(csp->ecp) ;
@@ -451,7 +451,7 @@ local int config_reader(CF *csp,char *ebuf,int elen) noex {
 	    EC		*ecp = csp->ecp ;
 	    PF		*pfp = csp->pfp ;
 	    cint	sz = (var.vbuflen + 1) ;
-	    if (char *vbuf ; (rs = lm_mall(sz,&vbuf)) >= 0) {
+	    if (char *vbuf ; (rs = lm_mall(sz,&vbuf)) >= 0) ylikely {
 	        cint	vlen = var.vbuflen ;
 	        for (int i = 0 ; cparams[i] ; i += 1) {
 		    cchar	*cparam = cparams[i] ;
@@ -492,7 +492,7 @@ local int config_readers(CF *csp,char *ebuf,int el,int i) noex {
     	int		rs ;
 	int		rs1 ;
 	DEBUGPRINTF("ent i=%d el=%d\n",i,el) ;
-	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	    cchar	*sn = sip->sn ;
             switch (int v ; i) {
             case cparam_logsize:
