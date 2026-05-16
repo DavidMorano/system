@@ -264,13 +264,13 @@ int fsdirtree_open(fsdirtree *op,cchar *dname,int opts) noex {
 				    op->bnbuf = nullptr ;
 				    op->bnlen = 0 ;
 				} /* end if (error) */
-			    } /* end if (memory-allocation) */
+			    } /* end if (memory-acquire) */
 			    if (rs < 0) {
 			        lm_free(op->nbuf) ;
 			        op->nbuf = nullptr ;
 				op->nlen = 0 ;
 			    } /* end if (error) */
-			} /* end if (memory-allocation) */
+			} /* end if (memory-acquire) */
 			if (rs < 0) {
 			    lm_free(op->lbuf) ;
 			    op->lbuf = nullptr ;
@@ -652,7 +652,7 @@ local int fsdirtree_diradd(fsdirtree *op,dev_t dev,ino_t ino) noex {
 	    if (rs < 0) {
 	        lm_free(dip) ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (fsdirtree_diradd) */
