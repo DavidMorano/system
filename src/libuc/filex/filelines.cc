@@ -80,7 +80,7 @@ extern "C" {
 
 /* forward references */
 
-static int	liner(int,size_t) noex ;
+local int	liner(int,size_t) noex ;
 
 
 /* local variables */
@@ -124,13 +124,13 @@ int filelines(cchar *fn) noex {
 
 /* local subroutines */
 
-static int liner(int fd,csize ms) noex {
+local int liner(int fd,csize ms) noex {
+	cnullptr	np{} ;
 	cint		mp = PROT_READ ;
 	cint		mf = MAP_SHARED ;
 	int		rs ;
 	int		rs1 ;
 	int		lines = 0 ; /* return-value */
-	cnullptr	np{} ;
 	if (void *md ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) ylikely {
 	    cint	cmd = MADV_SEQUENTIAL ;
 	    if ((rs = u_madvise(md,ms,cmd)) >= 0) ylikely {
@@ -148,7 +148,6 @@ static int liner(int fd,csize ms) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (map-file) */
 	return (rs >= 0) ? lines : rs ;
-}
-/* end subroutine (liner) */
+} /* end subroutine (liner) */
 
 
