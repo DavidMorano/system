@@ -249,16 +249,16 @@ int fmtobj::decide(va_list ap) noex {
 	    fcode = 0 ;
 	    rs = sub.blanks(spec.width) ;
 	    break ;
-	case 'C':
-	case 'c':
+	case 'c':			/* <- regular character */
+	case 'C':			/* <- wide character */
 	    rs = code_chr(ap) ;
 	    break ;
 	case chx_expand:
 	    rs = code_exp(ap) ;
 	    break ;
-	case 'r':
-	case 's':
-	case 'S':
+	case 'r':			/* <- counted c-string */
+	case 's':			/* <- regular c-string */
+	case 'S':			/* <- wide c-string */
 	    rs = code_str(ap) ;
 	    break ;
 	case chx_binary:
