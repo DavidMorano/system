@@ -41,12 +41,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types |pid_t| */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strchr(3c)| */
@@ -64,13 +63,14 @@
 #include	<filer.h>
 #include	<logfile.h>
 #include	<ctdec.h>
-#include	<sfx.h>
-#include	<strn.h>
+#include	<sfx.h>			/* |sfbasename(3uc)| */
+#include	<strn.h>		/* |strnwcpy(3uc)| */
 #include	<strx.h>
 #include	<strwcpy.h>
+#include	<ischarx.h>		/* |ispm(3uc)| */
 #include	<localmisc.h>
-#include	<libpr.h>
-#include	<libdebug.h>
+#include	<libpr.h>		/* LIBPR */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"prqotd.h"
 #include	"prqotd_util.hh"
@@ -127,12 +127,12 @@ typedef vecstr *	vecstrp ;
 struct checker {
 	vecstr		*slp ;		/* store-list-pointer */
 	SUB		*sip ;		/* caller supplied */
-	mainv		envv ;
-	ccharpp		argv ;
+	mainv		envv ;		/* <- type |mainv| is desired */
+	ccharpp		argv ;		/* <- type |ccharpp| */
 	cchar		*pr ;
 	cchar		*sep ;
 	cchar		*progfname ;
-	char		*a ;		/* allocation */
+	char		*a ;		/* allocated */
 	int		intcheck ;	/* interval-check */
 	int		an ;
 } ; /* end struct (checker) */
@@ -171,33 +171,35 @@ namespace ptqotd {
 	int		rs1 ;
 	int		fd = -1 ;
 	DEBUGPRINTF("ent qfn=%s\n",qfname) ;
-	if (sip && qfname && sep) {
-	    if (CK c ; (rs = checker_start(&c,sip,sep)) >= 0) {
-	        int		pl = -1 ;
-	        cchar	*pp = sep ;
-	        cchar	*ap = sep ;
-	        cchar	*tp ;
-	        char	rbuf[MAXPATHLEN+1] ;
-	        if ((tp = strchr(pp,CH_FS)) != nullptr) {
-	            pl = intconv(tp - pp) ;
-	            ap = (tp + 1) ;
-	        } /* end if */
-	        if ((rs = checker_findprog(&c,rbuf,pp,pl)) > 0) {
-	            if ((rs = checker_argbegin(&c,ap)) >= 0) {
-		        {
-	                    rs = checker_progrun(&c,qfname) ;
-	                    fd = rs ;
-	                    DEBUGPRINTF("_progrun() rs=%d\n",rs) ;
-		        }
-	                rs1 = checker_argend(&c) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (arg) */
-	        } /* end if (findprog) */
-	        DEBUGPRINTF("findprog-out rs=%d\n",rs) ;
-	        rs1 = checker_finish(&c) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (checker) */
-	    if ((rs < 0) && (fd >= 0)) {
+	if (sip && qfname && sep) ylikely {
+	    if (char *rbuf ; (rs = lm_mp(&rbuf)) >= 0) ylikely {
+	        if (CK c ; (rs = checker_start(&c,sip,sep)) >= 0) ylikely {
+	            int		pl = -1 ; /* used-multiple */
+	            cchar	*pp = sep ;
+	            cchar	*ap = sep ;
+	            if (cchar *tp = strchr(pp,CH_FS) ; tp) {
+	                pl = intconv(tp - pp) ;
+	                ap = (tp + 1) ;
+	            } /* end if */
+	            if ((rs = checker_findprog(&c,rbuf,pp,pl)) > 0) ylikely {
+	                if ((rs = checker_argbegin(&c,ap)) >= 0) ylikely {
+		            {
+	                        rs = checker_progrun(&c,qfname) ;
+	                        fd = rs ;
+	                        DEBUGPRINTF("_progrun() rs=%d\n",rs) ;
+		            }
+	                    rs1 = checker_argend(&c) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (arg) */
+	            } /* end if (findprog) */
+	            DEBUGPRINTF("findprog-out rs=%d\n",rs) ;
+	            rs1 = checker_finish(&c) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (checker) */
+	        rs1 = lm_free(rbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	    if ((rs < 0) && (fd >= 0)) nlikely {
 		uc_unlink(qfname) ;
 	        u_close(fd) ;
 	        fd = -1 ;
@@ -219,12 +221,12 @@ local int checker_start(CK *chp,SUB *sip,cchar *sep) noex {
 	chp->sip = sip ;
 	chp->sep = sep ;
 	chp->envv = var.envv ;
-	if (vecstr *slp ; (rs = lm_mall(vsz,&slp)) >= 0) {
+	if (vecstr *slp ; (rs = lm_mall(vsz,&slp)) >= 0) ylikely {
 	    chp->slp = slp ;
 	    {
 	        rs = slp->start(1,0) ;
 	    }
-	    if (rs < 0) {
+	    if (rs < 0) nlikely {
 	       lm_free(slp) ;
 	       chp->slp = nullptr ;
 	    } /* end if (error) */
@@ -258,14 +260,15 @@ local int checker_finish(CK *chp) noex {
 	return rs ;
 } /* end subroutine (checker_finish) */
 
-int checker_setentry(CK *chp,cchar **epp,cchar *vap,int val) noex {
+local int checker_setentry(CK *chp,cchar **epp,cchar *vap,int val) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		oi = -1 ;
 	int		len = 0 ; /* return-value */
 	DEBUGPRINTF("ent\n") ;
 	if (chp && epp) {
 	    vecstr	*slp = chp->slp ;
+	    int		oi = -1 ;
+	    rs = SR_OK ;
 	    if (*epp) {
 	        oi = vecstr_findaddr(slp,*epp) ;
 	    }
@@ -284,6 +287,7 @@ int checker_setentry(CK *chp,cchar **epp,cchar *vap,int val) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (checker_setentry) */
 
+#ifdef	COMMENT
 namespace {
     struct argsizer {
 	int	na ;
@@ -302,6 +306,10 @@ namespace {
 	    sz += ((na + 1) * szof(cchar **)) ;
 	} ; /* end ctor */
     } ; /* end struct (argsizer) */
+} /* end namespace */
+#endif /* COMMENT */
+
+namespace {
     struct argloader {
 	ccharpp		av ;
 	argloader(char *a,cchar *sp,int na,int chx) noex {
@@ -326,8 +334,7 @@ namespace {
     } ; /* end struct (argloader) */
 } /* end namespace */
 
-#ifdef	COMMENT
-local pair<int,int> fields_sz(cchar *sp,int chx) noex {
+local pair<int,int> argsz(cchar *sp,int chx) noex {
     	cnullptr	np{} ;
     	pair<int,int>	rv{} ;
 	int	sz = 0 ; /* return-value */
@@ -344,21 +351,13 @@ local pair<int,int> fields_sz(cchar *sp,int chx) noex {
 	rv.first = na ;
 	rv.second = ((na + 1) * szof(cchar **)) ;
 	return rv ;
-} /* end subroutine (fields_sz) */
-#endif /* COMMENT */
+} /* end subroutine (argsz) */
 
 local int checker_argbegin(CK *chp,cchar *ap) noex {
-    	const argsizer	argf(ap,CH_FS) ;
+    	cauto		[na, sz] = argsz(ap,CH_FS) ;
 	int		rs ;
-	int		na = 0 ; /* return-value */
-	int		sz{} ;
 	DEBUGPRINTF("ent\n") ;
-	{
-	    chp->an = argf.na ;
-	    na = argf.na ;
-	    sz = argf.sz ;
-	}
-	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	    const argloader	ald(a,ap,na,CH_FS) ;
 	    chp->a = a ;
 	    chp->argv = ald.av ;
@@ -385,156 +384,175 @@ local int checker_findprog(CK *chp,char *rbuf,cchar *pp,int pl) noex {
 	DEBUGPRINTF("ent\n") ;
 	rbuf[0] = '\0' ;
 	if (pp[0] != '/') {
-	    if ((pp[0] == '\0') || (pp[0] == '-') || (pp[0] == '+')) {
+	    if (ispm(pp[0]) || (pp[0] == '\0')) {
 	        pp = PRQOTD_PROG ;
 	        pl = -1 ;
 	    }
 	} /* end if */
-	if ((rs = prgetprogpath(chp->pr,rbuf,pp,pl)) >= 0) {
+	if ((rs = prgetprogpath(chp->pr,rbuf,pp,pl)) >= 0) ylikely {
 	    cchar	**vpp = &chp->progfname ;
 	    rl = (rs > 0) ? rs : lenstr(rbuf) ;
 	    rs = checker_setentry(chp,vpp,rbuf,rl) ;
 	} /* end if */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    SUB	*sip = chp->sip ;
 	    if (sip->open.logsub) {
 		logfile	*lhp = logfilep(sip->lfp) ;
 		logfile_printf(lhp,"svc=prog") ;
 		logfile_printf(lhp,"pf=%s",rbuf) ;
-	    }
+	    } /* end if (logging) */
 	} /* end if (ok) */
 	DEBUGPRINTF("ret rs=%d rl=%d\n",rs,rl) ;
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (checker_findprog) */
+} /* end subroutine (checker_findprog) */
+
+namespace {
+    struct progrunner {
+	CK	*chp ;
+	cchar	*qfname ;
+	char	*argz{} ;		/* allocated */
+	int	maxname ;
+	progrunner(CK *p,cchar *q) noex : chp(p), qfname(q) { 
+	    maxname = var.maxnamelen ;
+	} ;
+	int proc() noex ;
+	operator int () noex ;
+    } ; /* end struct (progrunner) */
+} /* end namespace */
 
 local int checker_progrun(CK *chp,cchar *qfname) noex {
-	int		rs = SR_OK ;
+    	int		rs = SR_FAULT ;
+	int		fd = -1 ;
+	if (chp) ylikely {
+	    rs = SR_NOENT ;
+	    if (chp->progfname) ylikely {
+		progrunner ro(chp,qfname) ;
+		rs = ro ;
+		fd = rs ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fd : rs ;
+} /* end subroutine (checker_progrun) */
+
+progrunner::operator int () noex {
+    	int		rs ;
+	int		rs1 ;
+	int		fd = -1 ;
+	if ((rs = lm_mn(&argz)) >= 0) ylikely {
+	    {
+	        rs = proc() ;
+	        fd = rs ;
+	    }
+	    rs1 = lm_free(argz) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? fd : rs ;
+} /* end method (progrunner::operator) */
+
+int progrunner::proc() noex {
+	int		rs = SR_NOENT ;
 	int		rs1 ;
 	int		fd = -1 ;
 	DEBUGPRINTF("ent\n") ;
-	if (chp == nullptr) return SR_FAULT ;
-
-	if (chp->progfname != nullptr) {
-	    cchar	*pf = chp->progfname ;
-	    mainv	ev = chp->envv ;
-	    ccharp	*av = chp->argv ;
-	    cchar *zp ;
-	    if (int zl ; (zl = sfbasename(pf,-1,&zp)) > 0) {
-		cmode	om = 0664 ;
-		cint	of = (O_RDWR|O_CREAT|O_TRUNC) ;
-	        cchar	*ap = av[0] ;
-	        char	argz[MAXNAMELEN+1] ;
-	        if (ap) {
-	            if ((ap[0] == '+') || (ap[0] == '-') || (ap[0] == '\0')) {
-	                char	*bp = argz ;
-	                if (ap[0] == '-') *bp++ = '-' ;
-	                bp = strnwcpy(bp,(MAXNAMELEN-1),zp,zl) ;
-	                av[0] = argz ;
-	            }
-	        } /* end if */
-	        if ((rs = u_open(qfname,of,om)) >= 0) {
-		    spawner s ;
-	            fd = rs ;
-	            if ((rs = spawner_start(&s,pf,av,ev)) >= 0) {
-	                cchar	*varpr = PRQOTD_PRNAME ;
-	                if (getourenv(ev,varpr) == nullptr) {
-	                    rs = spawner_envset(&s,varpr,chp->pr,-1) ;
-	                }
-	                if (rs >= 0) {
-			    if_constexpr (f_background) {
-	                        spawner_sigignores(&s) ;
-	                        spawner_setsid(&s) ;
-			    } /* end if_constexpr (f_background) */
-	                    for (int i = 0 ; i < 3 ; i += 1) {
-	                        spawner_fdclose(&s,i) ;
-			    }
-	                    spawner_fdnull(&s,O_RDONLY) ;
-	                    spawner_fddup(&s,fd) ;
-	                    spawner_fdnull(&s,O_WRONLY) ;
-	                    if ((rs = spawner_run(&s)) >= 0) {
-				pid_t	pid = rs ;
-				int	cs = 0 ;
-
-	                	rs1 = spawner_wait(&s,&cs,0) ;
-	                	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUG
-	                        debugprintf("checker_progrun: w rs=%d cs=%d\n",
-				    rs,cs) ;
-#endif
-
-				if (rs >= 0) {
-				    rs = checker_proglog(chp,fd,pid,cs) ;
-				}
-
-	                        if (rs >= 0) u_rewind(fd) ;
-			    } /* end if (spawner_run) */
-
-#if	CF_DEBUG
-	                    debugprintf("checker_progrun: "
-				"spawner_run() rs=%d\n", rs) ;
-	                    debugoutput("checker_progrun: =",fd) ;
-#endif
-
-	                } /* end if (ok) */
-#if	CF_DEBUG
-	    	    debugprintf("checker_progrun: ok-out rs=%d\n",rs) ;
-#endif
-
-	                rs1 = spawner_finish(&s) ;
-			if (rs >= 0) rs = rs1 ;
-	            } /* end if (spawner) */
-#if	CF_DEBUG
-	    	    debugprintf("checker_progrun: spawner-out rs=%d\n",rs) ;
-#endif
-	            if (rs < 0) {
-			uc_unlink(qfname) ;
-	                u_close(fd) ;
-	                fd = -1 ;
-	            }
-	        } /* end if (u_open) */
-#if	CF_DEBUG
-	    	    debugprintf("checker_progrun: open-out rs=%d\n",rs) ;
-#endif
-	    } else {
-	        rs = SR_NOENT ;
-	    }
-	} else {
-	    rs = SR_NOENT ;
-	}
+        cchar       *pf = chp->progfname ;
+        mainv       ev = chp->envv ;
+        ccharp      *av = chp->argv ; /* <- type |ccharpp| */
+        cchar *zp ;
+        if (int zl ; (zl = sfbasename(pf,-1,&zp)) > 0) ylikely {
+            cint    of = (O_RDWR|O_CREAT|O_TRUNC) ;
+            cmode   om = 0664 ;
+            cchar   *ap = av[0] ;
+            if (ap) {
+                if (ispm(ap[0]) || (ap[0] == '\0')) {
+		    int		blen = maxname ;
+                    char    *bp = argz ;
+                    if (ap[0] == '-') {
+			*bp++ = '-' ;
+			blen -= 1 ;
+		    }
+                    bp = strnwcpy(bp,blen,zp,zl) ;
+                    av[0] = argz ;
+                } /* end if (special) */
+            } /* end if */
+            if ((rs = u_open(qfname,of,om)) >= 0) ylikely {
+                spawner s ;
+                fd = rs ;
+                if ((rs = spawner_start(&s,pf,av,ev)) >= 0) ylikely {
+                    cchar   *varpr = PRQOTD_PRNAME ;
+                    if (getourenv(ev,varpr) == nullptr) {
+                        rs = spawner_envset(&s,varpr,chp->pr,-1) ;
+                    }
+                    if (rs >= 0) ylikely {
+                        if_constexpr (f_background) {
+                            spawner_sigignores(&s) ;
+                            spawner_setsid(&s) ;
+                        } /* end if_constexpr (f_background) */
+                        for (int i = 0 ; i < 3 ; i += 1) {
+                            spawner_fdclose(&s,i) ;
+                        } /* end for */
+                        spawner_fdnull(&s,O_RDONLY) ;
+                        spawner_fddup(&s,fd) ;
+                        spawner_fdnull(&s,O_WRONLY) ;
+                        if ((rs = spawner_run(&s)) >= 0) ylikely {
+                            con pid_t       pid = rs ;
+                            int             cs = 0 ;
+                            {
+                                rs1 = spawner_wait(&s,&cs,0) ;
+                                if (rs >= 0) rs = rs1 ;
+                            }
+                            DEBUGPRINTF("w rs=%d cs=%d\n",rs,cs) ;
+                            if (rs >= 0) ylikely {
+                                rs = checker_proglog(chp,fd,pid,cs) ;
+                            }
+                            if (rs >= 0) u_rewind(fd) ;
+                        } /* end if (spawner_run) */
+                        DEBUGPRINTF("spawner_run() rs=%d\n", rs) ;
+                    } /* end if (ok) */
+                    DEBUGPRINTF("ok-out rs=%d\n",rs) ;
+                    rs1 = spawner_finish(&s) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (spawner) */
+		DEBUGPRINTF("spawner-out rs=%d\n",rs) ;
+                if (rs < 0) nlikely {
+                    uc_unlink(qfname) ;
+                    u_close(fd) ;
+                    fd = -1 ;
+                } /* end if (error) */
+            } /* end if (u_open) */
+            DEBUGPRINTF("open-out rs=%d\n",rs) ;
+        } /* end if (sfbasename) */
 	DEBUGPRINTF("ret rs=%d fd=%d\n",rs,fd) ;
 	return (rs >= 0) ? fd : rs ;
-} /* end subroutine (checker_progrun) */
+} /* end method (progrunner::proc) */
 
 local int checker_proglog(CK *chp,int fd,pid_t pid,int cs) noex {
 	SUB		*sip = chp->sip ;
 	int		rs = SR_OK ;
 	if (sip->open.logsub) {
 	    logfile	*lhp = logfilep(sip->lfp) ;
-	    uint	v = pid ;
+	    con uint	v = pid ;
 	    cchar	*fmt ;
 	    if (WIFEXITED(cs)) {
-		int	ex = WEXITSTATUS(cs) ;
+		cint	ex = WEXITSTATUS(cs) ;
 		fmt = "program (%u) exited normally ex=%u" ;
 		logfile_printf(lhp,fmt,v,ex) ;
 	    } else if (WIFSIGNALED(cs)) {
-		int	sig = WTERMSIG(cs) ;
+		cint	sig = WTERMSIG(cs) ;
 		cchar	*ss ;
 		char	sigbuf[20+1] ;
 		if ((ss = strabbrsig(sig)) == nullptr) {
 		     rs = ctdeci(sigbuf,20,sig) ;
 		     ss = sigbuf ;
-		}
+		} /* end if */
 		if (rs >= 0) {
 		    fmt = "program (%u) exited w/ sig=%s" ;
 		    logfile_printf(lhp,fmt,v,ss) ;
-		}
+		} /* end if (ok) */
 	    } else {
 		fmt = "program (%u) exited weirdly cs=\\x%08x" ;
 		logfile_printf(lhp,fmt,v,cs) ;
-	    }
-	    if (rs >= 0) {
+	    } /* end if */
+	    if (rs >= 0) ylikely {
 		if ((rs = uc_fsize(fd)) >= 0) {
 		    logfile_printf(lhp,"quote size=%u",rs) ;
 		}
@@ -558,20 +576,24 @@ local int mksfname(char *rbuf,cc *pr,cc *sdname,cc *sname) noex {
 #if	CF_DEBUG
 local int debugoutput(cchar *ids,int fd) noex {
 	int		rs ;
+	int		rs1 ;
 	int		wlen = 0 ;
 	debugprintf("%r\n",ids,strlinelen(ids,80,60)) ;
 	sleep(2) ;
 	if ((rs = uc_fsize(fd)) >= 0) {
 	    debugprintf("%r fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
-	    if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
-	        cint	llen = LINEBUFLEN ;
-	        char	lbuf[LINEBUFLEN+1] ;
-	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
-	            debugprintf("o> %r\n",
-	                lbuf,strlinelen(lbuf,rs,70)) ;
-	        } /* end while */
-	        filer_finish(&b) ;
-	    } /* end if (filer) */
+	    if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
+		cint llen = rs ;
+	        if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
+	            while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
+	                debugprintf("o> %r\n",lbuf,strlinelen(lbuf,rs,70)) ;
+	            } /* end while */
+	            rs1 = filer_finish(&b) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (filer) */
+	        rs1 = lm_free(lbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (fsize) */
 	if (rs >= 0) u_rewind(fd) ;
 	return (rs >= 0) ? wlen : rs ;
