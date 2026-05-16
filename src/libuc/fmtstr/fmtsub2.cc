@@ -225,7 +225,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	                if (f_eol) abuf[i++] = '\n' ;
 	                sl = i ;
 	                sp = abuf ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } /* end if (hasourbad) */
 	    } /* end if (option-clean) */
 	} /* end if_constexpr (f_cleanstr) */
@@ -299,7 +299,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	                } /* end for */
 	            } /* end if */
 	            p[j] = 0 ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (not-null) */
 	} /* end if ('wint' or 'wchar') */
 	if (rs >= 0) {
