@@ -132,7 +132,7 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	if (pr && fname) {
 	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 		cint	tlen = rs ;
-	        cchar	*sp ;
+	        cchar	*sp ; /* used-multiple */
 	        if ((f_def && (ebuf[0] == '\0')) || (strcmp(ebuf,"+") == 0)) {
 	            sp = name ;
 	            if ((suf != nullptr) && (suf[0] != '\0')) {
@@ -159,7 +159,7 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	                cint	ml = min(tlen,el) ;
 	                sp = tbuf ;
 	                strwcpy(tbuf,ebuf,ml) ;
-	            }
+	            } /* end if */
 	            if (ebuf[0] != '/') {
 	                if (strchr(sp,'/') != nullptr) {
 	                    rs = mkpath2(fname,pr,sp) ;
@@ -176,7 +176,7 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	            } else {
 	                rs = mkpath1(fname,sp) ;
 			len = rs ;
-	            }
+	            } /* end if */
 	        } /* end if */
 	        rs1 = lm_free(tbuf) ;
 	        if (rs >= 0) rs = rs1 ;
