@@ -158,7 +158,7 @@ int filer_start(filer *op,int fd,off_t foff,int bsz,int of) noex {
 		            libmem.free(op->dbuf) ;
 		            op->dbuf = nullptr ;
 	                }	
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 		} /* end if (filer_adjbuf) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
