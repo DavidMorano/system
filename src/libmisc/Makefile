@@ -40,12 +40,24 @@ MODS +=
 LIBS +=
 
 
-OBJ_LIBNSS= nss_parse.o
+OBJ0= groupent.o projectent.o 
+OBJ1= sysgroup.o syspasswd.o 
+OBJ2= sysproject.o sysusernames.o
+OBJ3= sysusers.o sysusershells.o
+OBJ4= userattrent.o
+OBJ5=
+OBJ6=
+OBJ7=
+
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o
+
+OBJ= obja.o objb.o
 
 
 INCDIRS=
 
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -61,7 +73,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 .SUFFIXES:		.hh .ii .iim .ccm
 
 
-default:		$(T).a
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -91,13 +103,13 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).so:		$(OBJ_LIBNSS)
-	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ_LIBNSS) $(RUNINFO) $(LIBINFO)
+$(T).so:		$(OBJ)
+	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ) $(RUNINFO) $(LIBINFO)
 
-$(T).o:			$(OBJ_LIBNSS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBNSS)
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
-$(T).a:			$(OBJ_LIBNSS)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).o
@@ -118,6 +130,50 @@ control:
 	(uname -n ; date) > Control
 
 
-nss_parse.o:		nss_parse.cc nss_parse.h
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj.o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+groupent.o:		groupent.cc		groupent.h		${INCS}
+projectent.o:		projectent.cc		projectent.h		${INCS}
+sysgroup.o:		sysgroup.cc		sysgroup.h		${INCS}
+syspasswd.o:		syspasswd.cc		syspasswd.h		${INCS}
+sysproject.o:		sysproject.cc		sysproject.h		${INCS}
+sysusernames.o:		sysusernames.cc		sysusernames.h		${INCS}
+sysusers.o:		sysusers.cc		sysusers.h		${INCS}
+sysusershells.o:	sysusershells.cc	sysusershells.h		${INCS}
+userattrent.o:		userattrent.cc		userattrent.h		${INCS}
 
 
