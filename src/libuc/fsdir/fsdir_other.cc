@@ -152,7 +152,7 @@ local int fsdir_ctor(fsdir *op,Args ... args) noex {
 		    lm_free(op->posixp) ;
 		    op->posixp = nullptr ;
 		} /* end if (error) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	}
 	return rs ;
 } /* end subroutine (fsdir_ctor) */
@@ -333,7 +333,7 @@ int othermgr::open(cchar *dname) noex {
 		            bdata = bp ;
 			    bsz = sz ;
 	                    op->magic = FSDIR_MAGIC ;
-	                } /* end if (memory-allocation) */
+	                } /* end if (memory-acquire) */
 		    } /* end if (pagesize) */
 		} /* end if (direcyory indicated) */
 	    } /* end if (stat) */
