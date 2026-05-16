@@ -51,7 +51,7 @@ module ;
 
 module fmtspec ;
 
-import libutil ;
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
@@ -74,11 +74,11 @@ namespace {
 	    fsp = sp ; /* beginning pointer */
 	} ;
 	int operator () (va_list) noex ;
-	int leader(va_list) noex ;
-	int widther(va_list) noex ;
-	int precer(va_list) noex ;
-	int moder(va_list) noex ;
-	int coder(va_list) noex ;
+	int leader	(va_list) noex ;
+	int widther	(va_list) noex ;
+	int precer	(va_list) noex ;
+	int moder	(va_list) noex ;
+	int coder	(va_list) noex ;
     } ; /* end if (fmtproc) */
 } /* end namespace (fmtproc) */
 
@@ -94,7 +94,7 @@ constexpr fmtproc_m	fmtmems[] = {
 	&fmtproc::precer,
 	&fmtproc::moder,
 	&fmtproc::coder
-} ; /* end array */
+} ; /* end array (fmtmems) */
 
 constexpr cshort	ten = short(10) ;
 
@@ -104,10 +104,9 @@ constexpr cshort	ten = short(10) ;
 
 /* exported subroutines */
 
-int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
+int fmtspec::start(va_list ap,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
-	if (ap && sp) {
-	    if (sl < 0) sl = lenstr(sp) ;
+	if (int sl ; ap && ((sl = getlenstr(sp,µsl)) >= 0)) {
 	    fcode = 0 ;
 	    width = -1 ;
 	    prec = -1 ;
@@ -117,7 +116,7 @@ int fmtspec::start(va_list ap,cchar *sp,int sl) noex {
 	        fmtproc	fo(this,sp,sl) ;
 	        rs = fo(ap) ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	return rs ;
 }
 /* end method (fmtspec::start) */
@@ -132,7 +131,7 @@ int fmtproc::operator () (va_list ap) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
+} /* end method */
 
 int fmtproc::leader(va_list) noex {
 	int		rs = SR_OK ;
@@ -165,7 +164,7 @@ int fmtproc::leader(va_list) noex {
             if (fcont) { sl-- ; sp++ ; }
         } /* end while */
 	return rs ;
-}
+} /* end method */
 
 /* now comes a digit string which may be a '*' */
 int fmtproc::widther(va_list ap) noex {
@@ -184,12 +183,12 @@ int fmtproc::widther(va_list ap) noex {
                 while ((sl > 0) && (*sp >= '0') && (*sp <= '9')) {
 		    short inc = shortconv((sl--,*sp++) - '0') ;
                     width = shortconv((width * ten) + inc) ;
-                }
+                } /* end while */
             } /* end if (width) */
         } /* end if (width) */
 	op->width = width ;
 	return rs ;
-}
+} /* end method */
 
 /* maybe a decimal point followed by more digits (or '*') */
 int fmtproc::precer(va_list ap) noex {
@@ -205,12 +204,12 @@ int fmtproc::precer(va_list ap) noex {
                 while ((sl > 0) && (*sp >= '0') && (*sp <= '9')) {
 		    short inc = shortconv((sl--,*sp++) - '0') ;
                     prec = shortconv((prec * ten) + inc) ;
-                }
-            }
+                } /* end while */
+            } /* end if */
 	} /* end if (a precision was specified) */
 	op->prec = prec ;
 	return rs ;
-}
+} /* end method */
 
 /* check for a format length-modifier */
 int fmtproc::moder(va_list) noex {
@@ -222,8 +221,7 @@ int fmtproc::moder(va_list) noex {
             schar       nimax = 0 ;
             bool	fcont = true ;
             while (fcont && (sl > 0)) {
-                cint    ch = mkchar(*sp) ;
-                switch (ch) {
+                switch (cint    ch = mkchar(*sp) ; ch) {
                 case 'h':
                     lenmod = lenmod_half ;
                     nhalf += 1 ;
@@ -232,7 +230,7 @@ int fmtproc::moder(va_list) noex {
                     lenmod = lenmod_long ;
                     nlong += 1 ;
                     break ;
-                case 'j':
+                case 'j':		/* for |intmax_t| */
                     lenmod = lenmod_imax ;
                     nimax += 1 ;
                     break ;
@@ -242,13 +240,13 @@ int fmtproc::moder(va_list) noex {
                 case 'D':
                     lenmod = lenmod_longdouble ;
                     break ;
-                case 't':
+                case 't':		/* for |ptrdiff_t| */
                     lenmod = lenmod_diff ;
                     break ;
-                case 'w':
+                case 'w':		/* wide-character */
                     lenmod = lenmod_wide ;
                     break ;
-                case 'z':
+                case 'z':		/* |ssize_t| + |off_t| */
                     lenmod = lenmod_size ;
                     break ;
                 default:
@@ -269,7 +267,7 @@ int fmtproc::moder(va_list) noex {
 	    op->lenmod = lenmod ;
 	} /* end block (possible format-length specifier) */
 	return rs ;
-}
+} /* end method */
 
 int fmtproc::coder(va_list) noex {
 	int		rs = SR_INVALID ;
@@ -280,11 +278,11 @@ int fmtproc::coder(va_list) noex {
 	    rs = int(op->fcode) ;
         } /* end if (valid) */
 	return rs ;
-}
+} /* end method */
 
 fmtspec_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case fmtspecmem_code:
 		rs = int(op->fcode) ;
@@ -293,9 +291,8 @@ fmtspec_co::operator int () noex {
 		rs = int(op->skiplen) ;
 		break ;
 	    } /* end switch */
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (fmtspec_co::operator) */
+} /* end method (fmtspec_co::operator) */
 
 
