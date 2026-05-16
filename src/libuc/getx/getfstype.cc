@@ -21,8 +21,8 @@
 	getfstype
 
 	Description:
-	We return the file-system type associated with the file
-	attached to the given file-descriptor.
+	I return the file-system type (a c-string) associated with
+	the file attached to the given file-descriptor.
 
 *******************************************************************************/
 
