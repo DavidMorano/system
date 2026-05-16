@@ -209,7 +209,7 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 	        } /* end if */
 	        rs1 = lm_free(ebuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
