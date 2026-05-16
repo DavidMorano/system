@@ -14,7 +14,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<filemap.h>
 
 
@@ -25,18 +26,18 @@
 
 struct sysusers_head {
 	filemap		*fmp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef SYSUSERS	sysusers ;
 typedef PASSWD		sysusers_ent ;
 
 EXTERNC_begin
 
-extern int sysusers_open(sysusers *,cchar *) noex ;
-extern int sysusers_close(sysusers *) noex ;
-extern int sysusers_readent(sysusers *,sysusers_ent *,char *,int) noex ;
-extern int sysusers_reset(sysusers *) noex ;
+extern int sysusers_open	(sysusers *,cchar *) noex ;
+extern int sysusers_close	(sysusers *) noex ;
+extern int sysusers_readent	(sysusers *,sysusers_ent *,char *,int) noex ;
+extern int sysusers_reset	(sysusers *) noex ;
 
 EXTERNC_end
 
