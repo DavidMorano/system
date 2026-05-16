@@ -16,10 +16,8 @@
 #include	<sys/types.h>
 #include	<grp.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<ucentgr.h>
 #include	<filemap.h>
 
 
@@ -30,19 +28,19 @@
 
 
 struct sysgroup_head {
-	filemap		*fp ;
-	uint		magic ;
-} ;
+	filemap		*fmp ;
+	uint		magval ;
+} ; /* end struct */
 
 
 typedef SYSGROUP	sysgroup ;
 
 EXTERNC_begin
 
-extern int sysgroup_open(sysgroup *,cchar *) noex ;
-extern int sysgroup_close(sysgroup *) noex ;
-extern int sysgroup_readent(sysgroup *,ucgrent *,char *,int) noex ;
-extern int sysgroup_reset(sysgroup *) noex ;
+extern int sysgroup_open	(sysgroup *,cchar *) noex ;
+extern int sysgroup_close	(sysgroup *) noex ;
+extern int sysgroup_readent	(sysgroup *,ucentgr *,char *,int) noex ;
+extern int sysgroup_reset	(sysgroup *) noex ;
 
 EXTERNC_end
 
