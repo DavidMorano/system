@@ -84,6 +84,7 @@ constexpr bool		f_linux		= F_LINUX ;
 int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 	int		rs = SR_FAULT ;
 	int		znl = 0 ;
+	(void) isdst ;			/* <- ?? */
 	if (zip && zbuf) ylikely {
 	    cchar	*zp{} ;
 	    if_constexpr (f_darwin || f_linux) {
