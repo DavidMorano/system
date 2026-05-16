@@ -245,7 +245,7 @@ local int subinfo_domain(SI *mip) noex {
 	            len = lenstr(dbuf) ;
 	            if (cchar *dp ; (rs = libmem.strw(dbuf,len,&dp)) >= 0) {
 	                mip->domainname = dp ;
-		    } /* end if (memory-allocation) */
+		    } /* end if (memory-acquire) */
 	        } /* end if (getnodedomain) */
 		rs1 = lm_free(dbuf) ;
 		if (rs >= 0) rs = rs1 ;
