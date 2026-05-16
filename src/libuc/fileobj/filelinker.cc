@@ -206,7 +206,7 @@ int filelinker::istart(mainv tlist) noex {
 			    umem.free(pbuf) ;
 			    plen = 0 ;
 		        }
-		    } /* end if (memory-allocation) */
+		    } /* end if (memory-acquire) */
 		} /* end if (vars) */
 	    } /* end if (maxpathlen) */
 	    if (rs < 0) {
