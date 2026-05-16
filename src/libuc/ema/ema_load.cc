@@ -140,7 +140,7 @@ loader::operator int () noex {
             if (rs < 0) {
                 libmem.free(ep) ;
             }
-        } /* end if (memory-allocation) */
+        } /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (ema_load) */
 
@@ -204,7 +204,7 @@ int loader::loadorig(ema_ent *ep) noex {
                 if (cc *cp ; (rs = libmem.strw(origp,rs,&cp)) >= 0) {
                     ep->op = cp ;
                     ep->ol = origl ;
-                } /* end if (memory-allocation) */
+                } /* end if (memory-acquire) */
 	    } /* end if (rmwht) */
         } /* end if */
 	return rs ;
