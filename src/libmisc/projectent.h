@@ -35,28 +35,26 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #define	PROJECTENT	PROJECT
 #define	CPROJECTENT	const PROJECT
 
+typedef	PROJECTENT	projectent ;
+
 EXTERNC_begin
 
-extern int projectent_load(PROJECT *,char *,int,CPROJECT *) noex ;
-extern int projectent_parse(PROJECT *,char *,int,cchar *,int) noex ;
-extern int projectent_size(CPROJECT *) noex ;
-extern int projectent_format(CPROJECT *,char *,int) noex ;
+extern int projectent_load	(projectent *,char *,int,
+					con projectent *) noex ;
+extern int projectent_parse	(projectent *,char *,int,cchar *,int) noex ;
+extern int projectent_size	(con projectent *) noex ;
+extern int projectent_format	(con projectent *,char *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* PROJECTENT_INCLUDE */
+#endif /* projectentENT_INCLUDE */
 
 
