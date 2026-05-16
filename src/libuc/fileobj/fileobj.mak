@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += fileobj.h filelinker.hh
+INCS += fileobj.h
 
 MODS +=
 
@@ -42,14 +42,14 @@ LIBS +=
 
 OBJ0= filegrp.o
 OBJ1= filelinker.o
-OBJ2=
+OBJ2= filemap.o
 OBJ3=
 OBJ4=
 OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o
@@ -57,7 +57,7 @@ OBJ= obja.o
 
 INCDIRS +=
 
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -153,6 +153,7 @@ objb.o:			$(OBJB)
 
 filegrp.o:		filegrp.cc	filegrp.h		$(INCS)
 filelinker.o:		filelinker.cc	filelinker.hh		$(INCS)
+filemap.p:		filemap.cc	filemap.h		$(INCS)
 
 filesyncer.o:		filesyncer.cc	filesyncer.hh		$(INCS)
 
