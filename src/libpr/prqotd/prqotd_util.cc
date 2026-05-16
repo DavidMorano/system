@@ -30,15 +30,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -46,19 +40,12 @@
 #include	<ucgetpid.h>
 #include	<getbufsize.h>
 #include	<getmjd.h>
-#include	<estrings.h>
-#include	<mkfnamesuf.h>
 #include	<ids.h>
 #include	<tmtime.hh>
 #include	<storebuf.h>
-#include	<vecstr.h>
-#include	<vecpstr.h>
-#include	<ascii.h>
-#include	<paramfile.h>
-#include	<expcook.h>
-#include	<logfile.h>
-#include	<isnot.h>
-#include	<ischarx.h>
+#include	<strn.h>		/* |strnchr(3uc)| */
+#include	<mkpathxw.h>
+#include	<mkfnamesuf.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"prqotd_util.hh"
@@ -112,8 +99,16 @@ namespace prqotd {
 		    maxnamelen = rs ;
 	            if ((rs = getbufsize(bufsize_mp)) >= 0) {
 		        maxpathlen = rs ;
-		        ebuflen = (rs * EBUFLENMULT) ;
-		        vbuflen = (rs * VBUFLENMULT) ;
+			if ((rs = getbufsize(bufsize_nn)) >= 0) {
+			    nodenamelen = rs ;
+			    if ((rs = getbufsize(bufsize_hn)) >= 0) {
+			        hostnamelen = rs ;
+			        {
+		                    ebuflen = (maxpathlen * EBUFLENMULT) ;
+		                    vbuflen = (maxpathlen * VBUFLENMULT) ;
+			        }
+			    } /* end if (getbufsize) */
+			} /* end if (getbufsize) */
 	            }
 	        }
 	    } /* end if (ucpid) */
@@ -140,7 +135,7 @@ namespace prqotd {
     int mkqfname(char *rbuf,cchar *qdname,int mjd) noex {
 	int		rlen = var.maxpathlen ;
 	int		rs = SR_OK ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if (rs >= 0) {
 	    rs = storebuf_strw(rbuf,rlen,i,qdname,-1) ;
 	    i += rs ;
@@ -178,6 +173,7 @@ namespace prqotd {
 } /* end namespace (prqotd) */
 
 namespace prqotd {
+    initer		init ;
     vars		var ;
 } /* end namespace (prqotd) */
 
