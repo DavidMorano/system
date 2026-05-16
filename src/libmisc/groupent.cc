@@ -29,11 +29,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<grp.h>
-#include	<usystem.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
+#include	<cstddef>
+#include	<cstdlib>
+#include	<cstring>		/* for |lenstr(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>
@@ -67,13 +68,13 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
-static int groupent_parseusers(GROUP *,SI *,cchar *,int) noex ;
-static int groupent_formatusers(GROUP *,sbuf *) noex ;
+local int groupent_parseusers(GROUP *,SI *,cchar *,int) noex ;
+local int groupent_formatusers(GROUP *,sbuf *) noex ;
 
-static int si_copystr(SI *,char **,cchar *) noex ;
+local int si_copystr(SI *,char **,cchar *) noex ;
 
-static int storeitem_loadusers(SI *,vechand *,cchar *,int) noex ;
-static int storeitem_loaduser(SI *,vechand *,cchar *,int) noex ;
+local int storeitem_loadusers(SI *,vechand *,cchar *,int) noex ;
+local int storeitem_loaduser(SI *,vechand *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -85,51 +86,51 @@ static int storeitem_loaduser(SI *,vechand *,cchar *,int) noex ;
 /* exported subroutines */
 
 int groupent_parse(GROUP *grp,char *grbuf,int grlen,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (grp && grbuf && sp) {
+	if (grp && grbuf && sp) ylikely {
 	    storeitem	ib, *ibp = &ib ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(grp) ;
-	    if ((rs = storeitem_start(ibp,grbuf,grlen)) >= 0) {
+	    if ((rs = storeitem_start(ibp,grbuf,grlen)) >= 0) ylikely {
 	        int	fi = 0 ;
-	        cchar	*tp ;
-	        while ((tp = strnchr(sp,sl,':')) != nullptr) {
+	        for (cchar *tp ; (tp = strnchr(sp,sl,':')) != np ; ) {
+		    cint	tl = intconv(tp - sp) ;
 	            int		v = 0 ;
 	            cchar	**vpp = nullptr ;
 	            switch (fi++) {
 	            case 0:
-	                vpp = (cchar **) &grp->gr_name ;
+	                vpp = ccharpp(&grp->gr_name) ;
 	                break ;
 	            case 1:
-	                vpp = (cchar **) &grp->gr_passwd ;
+	                vpp = ccharpp(&grp->gr_passwd) ;
 	                break ;
 	            case 2:
-	                rs = cfdeci(sp,(tp-sp),&v) ;
+	                rs = cfdeci(sp,tl,&v) ;
 	                grp->gr_gid = v ;
 	                break ;
 	            case 3:
-	                rs = groupent_parseusers(grp,ibp,sp,(tp-sp)) ;
+	                rs = groupent_parseusers(grp,ibp,sp,tl) ;
 	                break ;
 	            } /* end switch */
 		    if ((rs >= 0) && vpp) {
-	    	        int	cl ;
 	    	        cchar	*cp ;
-	    	        if ((cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
+	    	        if (int cl ; (cl = sfshrink(sp,tl,&cp)) >= 0) {
 	        	    rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	    	        }
 		    }
-	            sl -= ((tp+1)-sp) ;
-	            sp = (tp+1) ;
+	            sl -= intconv((tp + 1) - sp) ;
+	            sp = (tp + 1) ;
 	            if (rs < 0) break ;
-	        } /* end while */
-	        if (rs >= 0) {
+	        } /* end for */
+	        if (rs >= 0) ylikely {
 		    if ((fi == 3) && sl && sp[0]) {
 		        fi += 1 ;
 		        rs = groupent_parseusers(grp,ibp,sp,sl) ;
 		    }
 		    if ((rs >= 0) && (fi < 3)) rs = SR_BADFMT ;
-	        }
+	        } /* end if (ok) */
 	        rs1 = storeitem_finish(ibp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -141,17 +142,15 @@ int groupent_parse(GROUP *grp,char *grbuf,int grlen,cchar *sp,int sl) noex {
 int groupent_load(GROUP *grp,char *grbuf,int grlen,CGROUP *sgrp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (grp && grbuf && sgrp) {
+	if (grp && grbuf && sgrp) ylikely {
+	    memcopy(grp,sgrp,szof(GROUP)) ;
 	    storeitem	ib ;
-	    memcpy(grp,sgrp,sizeof(GROUP)) ;
-	    if ((rs = storeitem_start(&ib,grbuf,grlen)) >= 0) {
+	    if ((rs = storeitem_start(&ib,grbuf,grlen)) >= 0) ylikely {
 	        if (sgrp->gr_mem != nullptr) {
-	            int		n ;
-	            void	**ptab{} ;
-	            for (n = 0 ; sgrp->gr_mem[n] != nullptr ; n += 1) ;
-	            if ((rs = storeitem_ptab(&ib,n,&ptab)) >= 0) {
-	                int	i = 0 ;
-	                char	**tab = (char **) ptab ;
+	            cint	n = lenstrarr(sgrp->gr_mem) ;
+	            if (void **ptab ; (rs = storeitem_ptab(&ib,n,&ptab)) >= 0) {
+	                int	i = 0 ; /* used-afterwards */
+	                char	**tab = charpp(ptab) ;
 	                grp->gr_mem = tab ;
 	                for (i = 0 ; (rs >= 0) && sgrp->gr_mem[i] ; i += 1) {
 			    char	**rpp = (grp->gr_mem + i) ;
@@ -176,8 +175,7 @@ int groupent_format(GROUP *grp,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (grp && rbuf) {
-	    sbuf	b ;
-	    if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	    if (sbuf b ; (rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	        for (int i = 0 ; i < 4 ; i += 1) {
 		    int		v ;
 	            if (i > 0) rs = sbuf_char(&b,':') ;
@@ -211,21 +209,21 @@ int groupent_format(GROUP *grp,char *rbuf,int rlen) noex {
 int groupent_size(CGROUP *grp) noex {
 	int		rs = SR_FAULT ;
 	if (grp) {
-	    int		size = 1 ;
+	    int		sz = 1 ;
 	    if (grp->gr_name) {
-	        size += (strlen(grp->gr_name)+1) ;
+	        sz += (lenstr(grp->gr_name)+ 1) ;
 	    }
 	    if (grp->gr_passwd) {
-	        size += (strlen(grp->gr_passwd)+1) ;
+	        sz += (lenstr(grp->gr_passwd)+ 1) ;
 	    }
 	    if (grp->gr_mem) {
 	        int	i = 0 ;
 	        while (grp->gr_mem[i]) {
-	            size += (strlen(grp->gr_mem[i++])+1) ;
+	            sz += (lenstr(grp->gr_mem[i++])+ 1) ;
 	        } /* end for */
-	        size += ((i+1)*sizeof(cchar *)) ;
+	        sz += ((i+ 1) * szof(cchar *)) ;
 	    } /* end if (group members) */
-	    rs = iceil(size,sizeof(cchar *)) ;
+	    rs = iceil(sz,szof(cchar *)) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -234,16 +232,15 @@ int groupent_size(CGROUP *grp) noex {
 
 /* local subroutines */
 
-static int groupent_parseusers(GROUP *grp,SI *ibp,cchar *sp,int sl) noex {
+local int groupent_parseusers(GROUP *grp,SI *ibp,cchar *sp,int sl) noex {
 	vechand		u ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = vechand_start(&u,8,0)) >= 0) {
 	    if ((rs = storeitem_loadusers(ibp,&u,sp,sl)) > 0) {
 	        int	n = rs ;
-	        void	**ptab{} ;
-	        if ((rs = storeitem_ptab(ibp,n,&ptab)) >= 0) {
-		    int		i{} ;
+	        if (void **ptab ; (rs = storeitem_ptab(ibp,n,&ptab)) >= 0) {
+		    int		i{} ; /* used-afterwards */
 	            void	*vp{} ;
 	            grp->gr_mem = (char **) ptab ;
 		    for (i = 0 ; vechand_get(&u,i,&vp) >= 0 ; i += 1) {
@@ -258,57 +255,52 @@ static int groupent_parseusers(GROUP *grp,SI *ibp,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
 	return rs ;
-}
-/* end subroutine (groupent_parseusers) */
+} /* end subroutine (groupent_parseusers) */
 
-static int groupent_formatusers(GROUP *grp,sbuf *bp) noex {
+local int groupent_formatusers(GROUP *grp,sbuf *bp) noex {
 	int		rs = SR_OK ;
 	if (grp->gr_mem) {
 	    for (int i = 0 ; grp->gr_mem[i] ; i += 1) {
-	        cchar	*un = grp->gr_mem[i] ;
-		if (un[0]) {
+	        if (cchar *un = grp->gr_mem[i] ; un[0]) {
 	            if (i > 0) rs = sbuf_char(bp,',') ;
 		    if (rs >= 0) rs = sbuf_strw(bp,un,-1) ;
-		}
+		} /* end if */
 	        if (rs < 0) break ;
 	    } /* end for */
 	} /* end if (non-null members) */
 	return rs ;
-}
-/* end subroutine (groupent_formatusers) */
+} /* end subroutine (groupent_formatusers) */
 
-static int storeitem_loadusers(SI *ibp,vechand *ulp,cchar *sp,int sl) noex {
+local int storeitem_loadusers(SI *ibp,vechand *ulp,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	cchar		*tp ;
-	while ((tp = strnchr(sp,sl,',')) != nullptr) {
-	    if ((tp-sp) > 0) {
+	for (cchar *tp ; (tp = strnchr(sp,sl,',')) != np ; ) {
+	    if (cint tl = intconv(tp - sp) ; tl > 0) {
 		c += 1 ;
-		rs = storeitem_loaduser(ibp,ulp,sp,(tp-sp)) ;
+		rs = storeitem_loaduser(ibp,ulp,sp,tl) ;
 	    } /* end if (non-zero) */
-	    sl -= ((tp+1)-sp) ;
-	    sp = (tp+1) ;
+	    sl -= intconv((tp + 1) - sp) ;
+	    sp = (tp + 1) ;
 	    if (rs < 0) break ;
-	} /* end while */
+	} /* end for */
 	if ((rs >= 0) && sl && sp[0]) {
 	    c += 1 ;
 	    rs = storeitem_loaduser(ibp,ulp,sp,sl) ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (storeitem_loadusers) */
+} /* end subroutine (storeitem_loadusers) */
 
-static int storeitem_loaduser(SI *ibp,vechand *ulp,cchar *sp,int sl) noex {
+local int storeitem_loaduser(SI *ibp,vechand *ulp,cchar *sp,int sl) noex {
 	int		rs ;
 	cchar		*cp{} ;
 	if ((rs = storeitem_strw(ibp,sp,sl,&cp)) >= 0) {
 	    rs = vechand_add(ulp,cp) ;
 	}
 	return rs ;
-}
-/* end subroutine (storeitem_loaduser) */
+} /* end subroutine (storeitem_loaduser) */
 
-static int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
+local int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
 	int		rs = SR_OK ;
 	cchar		**cpp = (cchar **) pp ;
 	*cpp = nullptr ;
@@ -316,7 +308,6 @@ static int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
 	    rs = storeitem_strw(ibp,p1,-1,cpp) ;
 	}
 	return rs ;
-}
-/* end subroutine (si_copystr) */
+} /* end subroutine (si_copystr) */
 
 
