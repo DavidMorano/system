@@ -452,7 +452,7 @@ local int entry_start(ENVS_ENT *ep,cc *kp,cc *vnam,int vnlen,cc**rpp) noex {
 		        libmem.free(vp) ;
 		        ep->kp = nullptr ;
 	            }
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? kl : rs ;
