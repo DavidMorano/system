@@ -72,12 +72,12 @@ export {
 	lenmod_diff,			/* 't' */
 	lenmod_size,			/* 'z' */
 	lenmod_overlast
-    } ;
+    } ; /* end enum */
     enum fmtspecmems {
 	fmtspecmem_code,
 	fmtspecmem_finish,
 	fmtspecmem_overlast
-    } ;
+    } ; /* end enum */
 } /* end export */
 
 export {
@@ -88,7 +88,7 @@ export {
 	uint		left:1 ;	/* left justified */
 	uint		space:1 ;	/* leading space */
 	uint		thousands:1 ;	/* group by thousands */
-    } ;
+    } ; /* end struct */
     struct fmtspec_head {
 	FMTSPEC_FL	fl ;
 	short		fcode ;		/* the format "code" */
@@ -96,7 +96,7 @@ export {
 	short		prec ;		/* <0 turns off */
 	short		lenmod ;	/* length modifier */
 	short		skiplen ;	/* skip-specification-length */
-    } ;
+    } ; /* end struct */
     struct fmtspec ;
     struct fmtspec_co {
 	fmtspec		*op = nullptr ;
@@ -116,7 +116,7 @@ export {
 	    finish(this,fmtspecmem_finish) ;
 	} ;
 	int start(va_list,cchar *,int = -1) noex ;
-    } ;
+    } ; /* end struct (fmtspec) */
 } /* end export */
 
 export {
