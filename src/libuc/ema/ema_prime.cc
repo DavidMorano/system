@@ -300,7 +300,7 @@ local int ema_addentone(ema *op,ema_ent *ep) noex {
 	    if (rs < 0) {
 	        libmem.free(nep) ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (ema_addentone) */
