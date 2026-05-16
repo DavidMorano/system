@@ -14,29 +14,29 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<filemap.h>
-#include	<project.h>		/* <- money shot */
 
 
 #define	SYSPROJECT		struct sysproject_head
 #define	SYSPROJECT_MAGIC	0x88776216
-#define	SYSPROJECT_FNAME	"/sysdb/projects"
+#define	SYSPROJECT_FNAME	"/sysdb/project"
 
 
 struct sysproject_head {
-	filemap		b ;
-	uint		magic ;
-} ;
+	filemap		*fmp ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef SYSPROJECT	sysproject ;
 
 EXTERNC_begin
 
-extern int sysproject_open(sysproject *,const char *) noex ;
-extern int sysproject_close(sysproject *) noex ;
-extern int sysproject_readent(sysproject *,PROJECT *,char *,int) noex ;
-extern int sysproject_reset(sysproject *) noex ;
+extern int sysproject_open	(sysproject *,cchar *) noex ;
+extern int sysproject_close	(sysproject *) noex ;
+extern int sysproject_readent	(sysproject *,PROJECT *,char *,int) noex ;
+extern int sysproject_reset	(sysproject *) noex ;
 
 EXTERNC_end
 
