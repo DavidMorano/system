@@ -77,7 +77,7 @@ extern "C" {
 
 /* forward references */
 
-static int	reader(cchar *,char *,int) noex ;
+local int	reader(cchar *,char *,int) noex ;
 
 
 /* local variables */
@@ -106,7 +106,7 @@ int filereadstrs(cchar *fname,char *rbuf,int rlen) noex {
 
 /* local subroutines */
 
-static int reader(cchar *fname,char *rbuf,int rlen) noex {
+local int reader(cchar *fname,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
@@ -148,7 +148,6 @@ static int reader(cchar *fname,char *rbuf,int rlen) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (reader) */
+} /* end subroutine (reader) */
 
 
