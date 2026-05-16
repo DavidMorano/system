@@ -522,7 +522,7 @@ local int grmems_starter(grmems *op) noex {
 	            lm_free(op->recs) ;
 	            op->recs = nullptr ;
 	        }
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (needed initialization) */
 	return rs ;
 }
@@ -594,7 +594,7 @@ local int grmems_newrec(grmems *op,time_t dt,grmems_rec **epp,
 	        if (rs < 0) {
 		    lm_free(ep) ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	    *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
 	return rs ;
@@ -792,7 +792,7 @@ local int grmems_mkugstore(grmems *op,time_t dt,vecobj *ulp) noex {
 	        op->usergids = ugs ;
 	        op->nusergids = c ;
 	        op->ti_usergids = dt ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (vecobj-count) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -973,7 +973,7 @@ local int record_start(grmems_rec *ep,time_t dt,int wc,
 		    lm_free(ep->gn) ;
 		    ep->gn = nullptr ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -1064,7 +1064,7 @@ local int record_mems(grmems_rec *ep,time_t dt,int wc,
 	            ep->wcount = wc ;
 	            ep->mems = mems ;
 	            ep->nmems = c ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (vecobj-count) */
 	} /* end if (load user members) */
 	return (rs >= 0) ? n : rs ;
@@ -1139,7 +1139,7 @@ local int usergid_start(grmems_ug *ugp,cchar *unp,int unl,gid_t gid) noex {
 	    ugp->un = unbuf ;
 	    ul = intconv(strnwcpy(ugp->un,unlen,unp,unl) - ugp->un) ;
 	    ugp->gid = gid ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return (rs >= 0) ? ul : rs ;
 }
 /* end subroutine (usergid_start) */
