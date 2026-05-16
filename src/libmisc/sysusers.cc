@@ -19,39 +19,42 @@
 
 /*******************************************************************************
 
+  	Object:
+	sysusers
+
+	Description:
 	We enumerate (reentrantly and thread safely) user names
 	from the system PASSWD database.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<getbufsize.h>
-#include	<getax.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucentpw.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
+#include	<getax.h>
+#include	<getpwx.h>
+#include	<rmx.h>
 #include	<strdcpyx.h>
 #include	<localmisc.h>
 
 #include	"sysusers.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
-
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UCPWCACHE */
-#undef	COMMENT
 
 
 /* local namesapces */
 
-using std::nothrow ;			/* constant */
+using libuc::libmem ;			/* variable */
 
 
 /* local typdefs */
@@ -65,46 +68,45 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static inline int sysusers_ctor(sysusers *op) noex {
+local inline int sysusers_ctor(sysusers *op) noex {
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
-	    if ((op->fmp = new(nothrow) filemap) != nullptr) ylikely {
+	    op->magval = 0 ;
+	    if ((op->fmp = new(nt) filemap) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-filemap) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine sysusers_ctor) */
+} /* end subroutine sysusers_ctor) */
 
-static inline int sysusers_dtor(sysusers *op) noex {
+local inline int sysusers_dtor(sysusers *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->fmp) ylikely {
 		delete op->fmp ;
 		op->fmp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine sysusers_dtor) */
+} /* end subroutine sysusers_dtor) */
 
 template<typename ... Args>
-static int sysusers_magic(sysusers *op,Args ... args) noex {
+local int sysusers_magic(sysusers *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == SYSUSERS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SYSUSERS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (sysusers_magic) */
+} /* end subroutine (sysusers_magic) */
 
 
 /* local variables */
 
-constexpr cchar		*defufname = SYSUSERS_FNAME ;
+constexpr char		defufname[] = SYSUSERS_FNAME ;
 
 
 /* exported variables */
@@ -118,7 +120,7 @@ int sysusers_open(sysusers *op,cchar *sufname) noex {
 	    csize	nmax = INT_MAX ;
 	    if (sufname == nullptr) sufname = defufname ;
 	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) ylikely {
-	        op->magic = SYSUSERS_MAGIC ;
+	        op->magval = SYSUSERS_MAGIC ;
 	    }
 	    if (rs < 0) {
 		sysusers_dtor(op) ;
@@ -140,7 +142,7 @@ int sysusers_close(sysusers *op) noex {
 	        rs1 = sysusers_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } 
@@ -150,25 +152,22 @@ int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = sysusers_magic(op,pwp,pwbuf)) >= 0) ylikely {
-            if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
+	    ucentpw *entp = resumelife<ucentpw>(pwp) ;
+            if (char *ubuf ; (rs = lm_un(&ubuf)) >= 0) ylikely {
                 cint        ulen = rs ;
-                char        *ubuf ;
-                if ((rs = lm_mall((ulen+1),&ubuf)) >= 0) ylikely {
-                    cchar   *lp{} ;
-                    while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
-                        int         ll = rs ;
-                        if (lp[ll-1] == '\n') ll -= 1 ;
-                        if ((rs = (strdcpy1w(ubuf,ulen,lp,ll)-ubuf)) > 0) {
-                            rs = GETPW_NAME(pwp,pwbuf,pwlen,ubuf) ;
+                for (cc *lp ; (rs = filemap_getln(op->fmp,&lp)) > 0 ; ) {
+                    if (cint ll = rmeol(lp,rs) ; ll > 0) {
+                        rs = intconv(strdcpy1w(ubuf,ulen,lp,ll) - ubuf) ;
+                        if (rs > 0) {
+                            rs = getpwx_name(entp,pwbuf,pwlen,ubuf) ;
                             if (rs == SR_NOTFOUND) rs = SR_OK ;
                         }
-                        if (rs > 0) break ;
-                        if (rs < 0) break ;
-                    } /* end while */
-                    rs1 = lm_free(ubuf) ;
-                    if (rs >= 0) rs = rs1 ;
-                } /* end if (m-a-f) */
-            } /* end if (getbufsize) */
+		    } /* end if (non-zero positive) */
+                    if (rs) break ;
+                } /* end for */
+                rs1 = lm_free(ubuf) ;
+                if (rs >= 0) rs = rs1 ;
+            } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return rs ;
 }
