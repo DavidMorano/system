@@ -57,7 +57,9 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucopen.h>
 #include	<ucdesc.h>
+#include	<ucfileop.h>
 #include	<lockfile.h>
 #include	<estrings.h>
 #include	<cfnum.h>
@@ -99,26 +101,9 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_duper(int,int) noex ;
-    extern int uc_pipe(int *) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_fchown(int,uid_t,gid_t) noex ;
-    extern int uc_fminmod(int,mode_t) noex ;
-    extern int uc_read(int,void *,int) noex ;
-    extern int uc_write(int,cvoid *,int) noex ;
-    extern int uc_iocctl(int,int,...) noex ;
-    extern int uc_ftruncate(int,off_t ) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_setsockopt(int,int,int,int *,int) noex ;
-    extern int uc_linger(int,int) noex ;
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_unlink(cchar *) noex ;
-} /* end extern */
-
 
 /* external variables */
+
 
 /* local structures */
 
