@@ -344,7 +344,7 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	            op->htaddr = hepp ;
 	            op->count = 0 ;
 	            op->magval = HDB_MAGIC ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	        if (rs < 0) {
 	            if (op->at > 0) lookaside_finish(op->esp) ;
 	        }
