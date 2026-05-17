@@ -31,6 +31,14 @@ extern int cfhexstr(cchar *,int,uchar *) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+inline int cfhexstr(cchar *sp,int sl,char *rbuf) noex {
+    	uchar *ubuf = cast_reinterpret<uchar *>(rbuf) ;
+	return cfhexstr(sp,sl,ubuf) ;
+} /* end subroutine (cfhexstr) */
+
+#endif /* __cplusplus */
 
 #endif /* CFHEXSTR_INCLUDE */
 
