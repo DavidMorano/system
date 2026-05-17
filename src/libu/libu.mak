@@ -87,7 +87,7 @@ OBJ31= ccfile.o readln.o dprint.o
 
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o cmporders.o localmisc.o
-OBJ34= exitcodes.o stacktypes.o
+OBJ34= exitcodes.o stacktypes.o sysconfcmds.o
 OBJ45=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -570,5 +570,6 @@ stdintx.o:		stdintx.cc	stdintx.h			$(INCS)
 xxtostr.o:		xxtostr.cc	xxtostr.h			$(INCS)
 cmporders.o:		cmporders.cc	cmporders.h			$(INCS)
 localmisc.o:		localmisc.cc	localmisc.h			$(INCS)
+sysconfcmds.o:		sysconfcmds.cc	sysconfcmds.h			$(INCS)
 
 
