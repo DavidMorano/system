@@ -36,17 +36,27 @@
 
 
 /* this is the NLS dial-out connection-request string-prefix */
+#ifndef	NLSDIALSTR
 #define	NLSDIALSTR	"NLPS:002:002:"
+#endif
+
 /* these are some kind of NLS codes */
+/* these are UNIX® System V standard */
+#ifndef	NLSSTART
 #define	NLSSTART	0
 #define	NLSFORMAT	2
 #define	NLSUNKNOWN	3
 #define	NLSDISABLED	4
+#endif /* NLSSTART */
+
 /* these are environment variables passed down to a NLPS sub-servier */
+/* these are UNIX® System V standard */
+#ifndef	NLSADDR
 #define	NLSADDR		"NLSADDR"
 #define	NLSOPT		"NLSOPT"
 #define	NLSUDATA	"NLSUDATA"
 #define	NLSPROVIDER	"NLSPROVIDER"
+#endif /* NLSADDR */
 
 
 #endif /* NLSMSG_INCLUDE */
