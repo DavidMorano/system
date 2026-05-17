@@ -788,7 +788,7 @@ local int kvsfile_addentry(kvsfile *op,KF_ENT *nep) noex {
 	    if (rs < 0) {
 	        lm_free(ep) ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (kvsfile_addentry) */
