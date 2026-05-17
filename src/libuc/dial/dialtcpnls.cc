@@ -57,6 +57,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<ucsig.h>
 #include	<sbuf.h>
 #include	<char.h>
@@ -78,7 +79,6 @@
 
 extern "C" {
     extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
@@ -147,7 +147,7 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	                }
 	                rs1 = lm_free(nlsbuf) ;
 	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	            if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	        } /* end if (sfshrink) */
 	    } /* end if (valid) */
