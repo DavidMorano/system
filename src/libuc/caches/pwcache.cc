@@ -437,7 +437,7 @@ local int pwcache_newrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
                 if (rs < 0) {
 		    lm_free(ep) ;
 		}
-            } /* end if (memory-allocation) */
+            } /* end if (memory-acquire) */
             *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
         return rs ;
@@ -624,8 +624,8 @@ local int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
                             if (rs < 0) {
 				lm_free(vp) ;
 			    }
-                        } /* end if (memory-allocation - pwbuf) */
-	    	    } /* end if (memory-allocation - un) */
+                        } /* end if (memory-acquire - pwbuf) */
+	    	    } /* end if (memory-acquire - un) */
                 } else if (rs == SR_NOTFOUND) {
                     ep->pwl = 0 ; /* optional */
                     pwl = 0 ; /* indicates a not-found entry */
