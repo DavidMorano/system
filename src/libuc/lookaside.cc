@@ -264,7 +264,7 @@ local int lookaside_newchunk(lookaside *op) noex {
 	        if (rs < 0) {
 		    libmem.free(a) ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 }
