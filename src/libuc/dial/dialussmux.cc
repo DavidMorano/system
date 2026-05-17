@@ -30,7 +30,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucsig.h>
-#include	<ucread.h>
+#include	<ucdescread.h>
 #include	<buffer.h>
 #include	<sfx.h>
 #include	<mkx.h>			/* |mkquoted(3uc)| */
