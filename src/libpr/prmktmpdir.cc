@@ -160,11 +160,12 @@ int prmktmpdir(cchar *pr,char *rbuf,cc *tmpdname,cc *dname,mode_t m) noex {
 }
 /* end subroutine (prmktmpdir) */
 
+
 /* local subroutines */
 
 mker::operator int () noex {
 	int		rs = SR_INVALID ;
-	if ((ªm & (~ mmask)) == 0) ylikely {
+	if ((ªm & (compl mmask)) == 0) ylikely {
 	    if (tmpdname == nullptr) tmpdname = vtmpdir ;
 	    if (tmpdname == nullptr) tmpdname = sysword.w_tmpdir ;
 	    rs = wrap() ;
