@@ -28,7 +28,7 @@
 
 EXTERNC_begin
 
-extern bool hasnonwhite(cchar *,int) noex ;
+extern bool	hasnonwhite(cchar *,int) noex ;
 
 EXTERNC_end
 
