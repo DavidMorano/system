@@ -96,10 +96,8 @@
 #include	"prmkfname.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
-import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
