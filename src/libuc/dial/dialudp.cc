@@ -63,7 +63,7 @@
 #include	<uinet.h>		/* |PF_{x}(3u)| */
 #include	<uclibmem.h>
 #include	<hostaddr.h>
-#include	<getprotofamily.h>
+#include	<getpf.h>
 #include	<getproto.h>
 #include	<openaddrinfo.h>
 #include	<iserror.h>
@@ -146,7 +146,7 @@ static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 	    hint.ai_protocol = IPPROTO_UDP ;
 	} /* end if_constexpr (f_proto) */
 	if ((rs >= 0) && (af > 0)) {
-	    if ((rs = getprotofamily(af)) >= 0) {
+	    if ((rs = getpf(af)) >= 0) {
 	        hint.ai_family = rs ; /* PF */
 	    }
 	}
