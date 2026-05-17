@@ -77,8 +77,10 @@
 #include	"prqotd_subinfo.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/argutils.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import argutils ;			/* |argsz(3dam)| */
 
 /* local defines */
 
@@ -98,11 +100,6 @@ import libutil ;			/* |lenstr(3u)| */
 using std::pair ;			/* type */
 using prqotd::var ;			/* type */
 using prqotd::subinfo ;			/* type */
-using prqotd::config ;			/* type */
-using prqotd::config_start ;		/* subroutine */
-using prqotd::config_finish ;		/* subroutine */
-using prqotd::config_read ;		/* subroutine */
-using prqotd::config_check ;		/* subroutine */
 using prqotd::getdefmjd ;		/* subroutine */
 using prqotd::mkqfname ;		/* subroutine */
 using prqotd::mkourname ;		/* subroutine */
@@ -111,7 +108,6 @@ using libuc::libmem ;			/* variable */
 
 /* local typedefs */
 
-typedef config *	configp ;
 typedef logfile *	logfilep ;
 typedef vecstr *	vecstrp ;
 
@@ -281,77 +277,11 @@ local int checker_setentry(CK *chp,cchar **epp,cchar *vap,int val) noex {
 	    if ((rs >= 0) && (oi >= 0)) {
 	        rs1 = vecstr_del(slp,oi) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	DEBUGPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (checker_setentry) */
-
-#ifdef	COMMENT
-namespace {
-    struct argsizer {
-	int	na ;
-	int	sz ;
-	argsizer(cchar *sp,int chx) noex {
-    	    cnullptr	np{} ;
-	    for (cchar *tp ; (tp = strchr(sp,chx)) != np ; ) {
-	        na += 1 ;
-	        sz += intconv((tp - sp) + 1) ;
-	        sp = (tp + 1) ;
-	    } /* end for */
-	    if (sp[0] != '\0') {
-	        na += 1 ;
-	        sz += (lenstr(sp) + 1) ;
-	    } /* end if */
-	    sz += ((na + 1) * szof(cchar **)) ;
-	} ; /* end ctor */
-    } ; /* end struct (argsizer) */
-} /* end namespace */
-#endif /* COMMENT */
-
-namespace {
-    struct argloader {
-	ccharpp		av ;
-	argloader(char *a,cchar *sp,int na,int chx) noex {
-	    cnullptr	np{} ;
-	    cint	avsz = (na + 1) * szof(cchar **) ;
-	    char	*bp = a ;
-	    int		c = 1 ;
-	    av = ccharpp(a) ;
-	    bp += avsz ;
-	    for (cchar *tp ; (tp = strchr(sp,chx)) != np ; ) {
-		cint tl = intconv(tp - sp) ;
-	        av[c++] = bp ;
-		bp = (strwcpy(bp,sp,tl) + 1) ;
-		sp = (tp + 1) ;
-	    } /* end for */
-	    if (sp[0] != '\0') {
-	        av[c++] = sp ;
-	        bp = (strwcpy(bp,sp,-1) + 1) ;
-	    } /* end if */
-	    av[c] = nullptr ;
-	} /* end ctor */
-    } ; /* end struct (argloader) */
-} /* end namespace */
-
-local pair<int,int> argsz(cchar *sp,int chx) noex {
-    	cnullptr	np{} ;
-    	pair<int,int>	rv{} ;
-	int	sz = 0 ; /* return-value */
-	int	na = 0 ;
-	for (cchar *tp ; (tp = strchr(sp,chx)) != np ; ) {
-	    na += 1 ;
-	    sz += intconv((tp - sp) + 1) ;
-	    sp = (tp + 1) ;
-	} /* end for */
-	if (sp[0] != '\0') {
-	    na += 1 ;
-	    sz += (lenstr(sp) + 1) ;
-	} /* end if */
-	rv.first = na ;
-	rv.second = ((na + 1) * szof(cchar **)) ;
-	return rv ;
-} /* end subroutine (argsz) */
 
 local int checker_argbegin(CK *chp,cchar *ap) noex {
     	cauto		[na, sz] = argsz(ap,CH_FS) ;
@@ -495,7 +425,7 @@ int progrunner::proc() noex {
                         spawner_fdnull(&s,O_WRONLY) ;
                         if ((rs = spawner_run(&s)) >= 0) ylikely {
                             con pid_t       pid = rs ;
-                            int             cs = 0 ;
+                            int             cs = 0 ; /* used-multiple */
                             {
                                 rs1 = spawner_wait(&s,&cs,0) ;
                                 if (rs >= 0) rs = rs1 ;
@@ -538,7 +468,7 @@ local int checker_proglog(CK *chp,int fd,pid_t pid,int cs) noex {
 		logfile_printf(lhp,fmt,v,ex) ;
 	    } else if (WIFSIGNALED(cs)) {
 		cint	sig = WTERMSIG(cs) ;
-		cchar	*ss ;
+		cchar	*ss ; /* used-multiple */
 		char	sigbuf[20+1] ;
 		if ((ss = strabbrsig(sig)) == nullptr) {
 		     rs = ctdeci(sigbuf,20,sig) ;
