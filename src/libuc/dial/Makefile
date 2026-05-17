@@ -38,23 +38,6 @@ INCS += dial.h dialopts.h
 LIBS +=
 
 
-INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
-
-RUNINFO= -rpath $(RUNDIR)
-
-LIBINFO= $(LIBDIRS) $(LIBS)
-
-# flag setting
-CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS		?= $(MAKECFLAGS)
-CXXFLAGS	?= $(MAKECXXFLAGS)
-ARFLAGS		?= $(MAKEARFLAGS)
-LDFLAGS		?= $(MAKELDFLAGS)
-
-
 OBJ0_DIAL= dialopts.o nlsdialassist.o
 OBJ1_DIAL= dialpass.o 
 OBJ2_DIAL= dialtcp.o dialtcpmux.o dialtcpnls.o 
@@ -71,12 +54,27 @@ OBJA_DIAL= obj0_dial.o obj1_dial.o
 OBJB_DIAL= obj2_dial.o obj3_dial.o
 OBJC_DIAL= obj4_dial.o obj5_dial.o
 OBJD_DIAL= obj6_dial.o obj7_dial.o
-OBJE_DIAL= obj8_dial.o obj9_dial.o
+OBJE_DIAL= obj8_dial.o
 
-OBJ_DIAL= obja_dial.o objb_dial.o objc_dial.o objd_dial.o
+OBJ_DIAL+= obja_dial.o objb_dial.o objc_dial.o 
+OBJ_DIAL+= objd_dial.o obje_dial.o
 
 
-.SUFFIXES:		.hh .ii .ccm
+INCDIRS=
+LIBDIRS= -L lib
+
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
+
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
+
+
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -89,6 +87,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -107,10 +108,10 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_DIAL)
-	$(LD) -r $(LDFLAGS) -r -o $@ $(OBJ_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_DIAL)
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order
@@ -127,32 +128,42 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_dial.o:	$(OBJ0_DIAL)
+obj0_dial.o:		$(OBJ0_DIAL)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ0_DIAL)
 
-obj1_dial.o:	$(OBJ1_DIAL)
+obj1_dial.o:		$(OBJ1_DIAL)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ1_DIAL)
 
-obj2_dial.o:	$(OBJ2_DIAL)
+obj2_dial.o:		$(OBJ2_DIAL)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ2_DIAL)
 
-obj3_dial.o:	$(OBJ3_DIAL)
+obj3_dial.o:		$(OBJ3_DIAL)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ3_DIAL)
 
-obj4_dial.o:	$(OBJ4_DIAL)
+obj4_dial.o:		$(OBJ4_DIAL)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4_DIAL)
 
-obj5_dial.o:	$(OBJ5_DIAL)
+obj5_dial.o:		$(OBJ5_DIAL)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5_DIAL)
 
-obj6_dial.o:	$(OBJ6_DIAL)
+obj6_dial.o:		$(OBJ6_DIAL)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ6_DIAL)
 
-obj7_dial.o:	$(OBJ7_DIAL)
+obj7_dial.o:		$(OBJ7_DIAL)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7_DIAL)
 
-obj8_dial.o:	$(OBJ8_DIAL)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ8_DIAL)
+
+obj8_dial.o:		$(OBJ8_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj9_dial.o:		$(OBJ9_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj10_dial.o:		$(OBJ10_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj11_dial.o:		$(OBJ11_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja_dial.o:	$(OBJA_DIAL)
