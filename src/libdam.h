@@ -91,7 +91,6 @@
 #include	<getfstype.h>
 #include	<getlogx.h>
 #include	<getostype.h>
-#include	<getprogexec.h>
 #include	<getprogroot.h>
 #include	<getprovider.h>
 #include	<getseed.h>
