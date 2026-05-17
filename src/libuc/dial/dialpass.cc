@@ -53,6 +53,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<localmisc.h>
 
 #include	"dialpass.h"
@@ -80,7 +81,6 @@ extern "C" {
     extern int uc_fstat(int,ustat *) noex ;
     extern int uc_pipe(int *) noex ;
     extern int uc_ioctl(int,int,...) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
