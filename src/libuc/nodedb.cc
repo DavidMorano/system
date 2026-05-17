@@ -214,7 +214,7 @@ local int nodedb_dtor(nodedb *op) noex {
 } /* end subroutine (nodedb_dtor) */
 
 template<typename ... Args>
-static inline int nodedb_magic(nodedb *op,Args ... args) noex {
+local inline int nodedb_magic(nodedb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == NODEDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -479,8 +479,7 @@ local int nodedb_fileadder(NODEDB *op,cchar *fname) noex {
 	    }
 	} /* end if (file-start) */
 	return rs ;
-}
-/* end subroutine (nodedb_fileadder) */
+} /* end subroutine (nodedb_fileadder) */
 
 local int nodedb_filefins(ND *op) noex {
 	vecobj		*flp = op->filep ;
@@ -495,8 +494,7 @@ local int nodedb_filefins(ND *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (nodedb_filefins) */
+} /* end subroutine (nodedb_filefins) */
 
 local int nodedb_checkfiles(ND *op,time_t daytime) noex {
 	vecobj		*flp = op->filep ;
@@ -520,8 +518,7 @@ local int nodedb_checkfiles(ND *op,time_t daytime) noex {
 	} /* end for (looping through files) */
 	op->checktime = daytime ;
 	return (rs >= 0) ? c_changed : rs ;
-}
-/* end subroutine (nodedb_checkfiles) */
+} /* end subroutine (nodedb_checkfiles) */
 
 local int nodedb_fileparse(ND *op,int fi) noex {
 	vecobj		*flp = op->filep ;
@@ -539,8 +536,7 @@ local int nodedb_fileparse(ND *op,int fi) noex {
 	    } /* end if (non-null) */
 	} /* end if (vector_get) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (nodedb_fileparse) */
+} /* end subroutine (nodedb_fileparse) */
 
 local int nodedb_fileparser(ND *op,ND_F *fep,int fi) noex {
     	cint		lsz = var.lineslen ;
@@ -570,8 +566,7 @@ local int nodedb_fileparser(ND *op,ND_F *fep,int fi) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (nodedb_fileparser) */
+} /* end subroutine (nodedb_fileparser) */
 
 local int nodedb_fileparserd(ND *op,UCS *nfp,char *lp,int ll,int fi) noex {
 	cnullptr	np{} ;
@@ -643,8 +638,7 @@ local int nodedb_fileparseln(ND *op,int fi,cchar *lp,int ll) noex {
 	    rs = lm_rsfree(rs,abuf) ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f_ent : rs ;
-}
-/* end subroutine (nodedb_fileparseln) */
+} /* end subroutine (nodedb_fileparseln) */
 
 local int nodedb_addentry(ND *op,int fi,SE *sep) noex {
 	int		rs = SR_FAULT ;
@@ -670,8 +664,7 @@ local int nodedb_addentry(ND *op,int fi,SE *sep) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (nodedb_addentry) */
+} /* end subroutine (nodedb_addentry) */
 
 local int nodedb_filedump(ND *op,int fi) noex {
 	hdb		*elp = op->entsp ;
@@ -703,8 +696,7 @@ local int nodedb_filedump(ND *op,int fi) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (nodedb_filedump) */
+} /* end subroutine (nodedb_filedump) */
 
 local int nodedb_filedel(ND *op,int fi) noex {
 	vecobj		*flp = op->filep ;
@@ -724,13 +716,11 @@ local int nodedb_filedel(ND *op,int fi) noex {
 	    } /* end if (non-null) */
 	} /* end if (vecob_get) */
 	return rs ;
-}
-/* end subroutine (nodedb_filedel) */
+} /* end subroutine (nodedb_filedel) */
 
 local int nodedb_entfins(ND *op) noex {
 	return nodedb_filedump(op,-1) ;
-}
-/* end subroutine (nodedb_entfins) */
+} /* end subroutine (nodedb_entfins) */
 
 local int file_start(ND_F *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
@@ -744,8 +734,7 @@ local int file_start(ND_F *fep,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_start) */
+} /* end subroutine (file_start) */
 
 local int file_finish(ND_F *fep) noex {
 	int		rs = SR_FAULT ;
@@ -760,8 +749,7 @@ local int file_finish(ND_F *fep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_finish) */
+} /* end subroutine (file_finish) */
 
 local int ientry_start(ND_IE *iep,int fi,SE *sep) noex {
 	int		rs = SR_FAULT ;
@@ -860,8 +848,7 @@ local int ientry_start(ND_IE *iep,int fi,SE *sep) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ientry_start) */
+} /* end subroutine (ientry_start) */
 
 local int ientry_finish(ND_IE *iep) noex {
 	int		rs = SR_FAULT ;
@@ -876,8 +863,7 @@ local int ientry_finish(ND_IE *iep) noex {
 	    iep->svc = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ientry_finish) */
+} /* end subroutine (ientry_finish) */
 
 local int svcentry_start(SE *sep,lineinfo *lip) noex {
 	int		rs = SR_FAULT ;
@@ -920,8 +906,7 @@ local int svcentry_start(SE *sep,lineinfo *lip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (svcentry_start) */
+} /* end subroutine (svcentry_start) */
 
 /* add a key to this entry */
 local int svcentry_addkey(SE *sep,cc *kp,int kl,cc *ap,int al) noex {
@@ -967,8 +952,7 @@ local int svcentry_addkey(SE *sep,cc *kp,int kl,cc *ap,int al) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (svcentry_addkey) */
+} /* end subroutine (svcentry_addkey) */
 
 local int svcentry_finish(SE *sep) noex {
 	int		rs = SR_FAULT ;
@@ -1001,8 +985,7 @@ local int svcentry_finish(SE *sep) noex {
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (svcentry_finish) */
+} /* end subroutine (svcentry_finish) */
 
 local int entry_load(ND_E *ep,char *ebuf,int elen,ND_IE *iep) noex {
 	cint		bo = NODEDB_BO((ulong) ebuf) ;
@@ -1055,8 +1038,7 @@ local int entry_load(ND_E *ep,char *ebuf,int elen,ND_IE *iep) noex {
 	    rs = SR_OVERFLOW ;
 	}
 	return (rs >= 0) ? svclen : rs ;
-}
-/* end subroutine (entry_load) */
+} /* end subroutine (entry_load) */
 
 local int mkterms() noex {
 	int		rs ;
@@ -1066,8 +1048,7 @@ local int mkterms() noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (mkterms) */
+} /* end subroutine (mkterms) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -1081,8 +1062,7 @@ vars::operator int () noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 local int mkinit() noex {
     	int		rs ;
@@ -1090,8 +1070,7 @@ local int mkinit() noex {
 	    rs = mkterms() ;
 	}
 	return rs ;
-}
-/* end subroutine (mkinit) */
+} /* end subroutine (mkinit) */
 
 local int cmpfne(ND_F *e1p,ND_F *e2p) noex {
 	int		rc = 0 ;
@@ -1105,8 +1084,7 @@ local int cmpfne(ND_F *e1p,ND_F *e2p) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (cmpfne) */
+} /* end subroutine (cmpfne) */
 
 local int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
 	ND_F		*e1p = (ND_F *) *v1pp ;
@@ -1122,7 +1100,6 @@ local int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpfn) */
+} /* end subroutine (vcmpfn) */
 
 
