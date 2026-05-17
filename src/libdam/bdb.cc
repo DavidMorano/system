@@ -1,10 +1,11 @@
-/* bdb */
+/* bdb SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Bibliographical DataBase */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -12,18 +13,20 @@
 	This module was changed to serve in the REFERM program.
 
 	= 2005-10-01, David A­D­ Morano
-        This was changed to work in the MMCITE program. The old REFERM program
-        is really obsolete. It used a database lookup strategy to remote
-        databases. The high-level problem is: what to do if the cited BIB entry
-        isn't found? How does a maintainer of the present (local) document know
-        what that BIB entry was? The new strategy (implemented by the MMCITE
-        program) is more like what is done with BibTeX in the TeX (or LaTeX)
-        world. All BIB databases are really expected to be maintained by the
-        document creator -- not some centralized entity. The older centralized
-        model reflected more the use in the corporate world (where different
-        people create BIB entries) than in the more "modern"
-        personal-responsibility type of world! :-) Anyway, this is the way the
-        gods seem to now want to do things. Deal with it!
+	This was changed to work in the MMCITE program.  The old
+	REFERM program is really obsolete.  It used a database lookup
+	strategy to remote databases.  The high-level problem is:
+	what to do if the cited BIB entry is not found?  How does a
+	maintainer of the present (local) document know what that
+	BIB entry was?  The new strategy (implemented by the MMCITE
+	program) is more like what is done with BibTeX in the TeX
+	(or LaTeX) world.  All BIB databases are really expected to
+	be maintained by the document creator -- not some centralized
+	entity.  The older centralized model reflected more the use
+	in the corporate world (where different people create BIB
+	entries) than in the more "modern" personal-responsibility
+	type of world! :-)  Anyway, this is the way the gods seem
+	to now want to do things.  Deal with it!
 
 */
 
@@ -31,24 +34,26 @@
 
 /*******************************************************************************
 
-        This code object module implements a little DB query facility. The
-        database is a set of files that contain bibliographical entries in the
-        "REFER" format.
+	Object:
+	bdb
 
-        Queries to the database that succeed return a structure with the
-        elements of the bibliographic entry.
-
-        All queries are to database files that were referenced last (most
-        previously) in the processing of the document. The idea is that a more
-        recent reference to a database file means that it is the preferred one
-        to use since it is closest to the user (or the most preferred by the
-        user).
-
-        A small nice thing about this database is that database files (files
-        containing "REFER"-formatted entries) are not indexed unless they are
-        needed (due to a failure to find the query in existing indexed files).
-        Only after all database files have been indexed and scanned to try to
-        satisfy the query (and the request os not found), does the query fail.
+	Description:
+	This code object module implements a little DB query facility.
+	The database is a set of files that contain bibliographical
+	entries in the "REFER" format.  Queries to the database
+	that succeed return a structure with the elements of the
+	bibliographic entry.  All queries are to database files
+	that were referenced last (most previously) in the processing
+	of the document.  The idea is that a more recent reference
+	to a database file means that it is the preferred one to
+	use since it is closest to the user (or the most preferred
+	by the user).  A small nice thing about this database is
+	that database files (files containing "REFER"-formatted
+	entries) are not indexed unless they are needed (due to a
+	failure to find the query in existing indexed files).  Only
+	after all database files have been indexed and scanned to
+	try to satisfy the query (and the request os not found),
+	does the query fail.
 
 *******************************************************************************/
 
@@ -58,15 +63,24 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>
+#include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
-#include	<char.h>
 #include	<hdb.h>
-#include	<sbuf.h>
 #include	<vecobj.h>
 #include	<buffer.h>
-#include	<localmisc.h>
+#include	<sbuf.h>
+#include	<sfx.h>
+#include	<strwcpy.h>
+#include	<matstr.h>
+#include	<char.h>
+#include	<ischarx.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"bdb.h"
 
@@ -91,26 +105,16 @@ import libutil ;			/* |memclear(3u)| */
 #define	BDB_DEFFILES	10		/* default files */
 #define	BDB_DEFENTRIES	40		/* default entries */
 
-#define	BDB_KA		sizeof(char *(*)[2])
+#define	BDB_KA		szof(char *(*)[2])
 #define	BDB_BO(v)		\
 	((BDB_KA - ((v) % BDB_KA)) % BDB_KA)
 
 #define	KEYVAL		struct keyval
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	TWOCHARS(a,b)	(((a) << 8) + (b))
 
 
 /* external subroutines */
-
-extern int	matstr(const char **,const char *,int) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	isalphalatin(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -119,24 +123,24 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local structures */
 
 struct bdb_key {
-	const char	*citekey ;
+	cchar	*citekey ;
 	uint		coff ;
 	int		clen ;
 	int		fi ;		/* file index */
 } ;
 
 struct bdb_file {
-	const char	*fname ;
+	cchar	*fname ;
 	int		f_indexed ;
 } ;
 
 struct keyval {
-	const char	*kp, *vp ;
+	cchar	*kp, *vp ;
 	int		kl, vl ;
 } ;
 
 struct bibentry {
-	const char	*kp ;
+	cchar	*kp ;
 	VECOBJ		keyvals ;
 	BUFFER		vb ;
 	int		size ;
@@ -147,32 +151,32 @@ struct bibentry {
 
 /* forward references */
 
-static int bdb_scan(BDB *,HDB_DATUM,struct bdb_key *) ;
-static int bdb_fileindex(BDB *,int) ;
-static int bdb_fileproc(BDB *,int,struct bdb_file *) ;
-static int bdb_keyinsert(BDB *,int,uint,const char *,int) ;
-static int bdb_readentry(BDB *,BDB_ENT *,char *,int,struct bdb_key *) ;
+local int bdb_scan(BDB *,HDB_DATUM,struct bdb_key *) ;
+local int bdb_fileindex(BDB *,int) ;
+local int bdb_fileproc(BDB *,int,struct bdb_file *) ;
+local int bdb_keyinsert(BDB *,int,uint,cchar *,int) ;
+local int bdb_readentry(BDB *,BDB_ENT *,char *,int,struct bdb_key *) ;
 
-static int bdbfile_start(struct bdb_file *,const char *) ;
-static int bdbfile_finish(struct bdb_file *) ;
-static int bdbfile_indexed(struct bdb_file *) ;
+local int bdbfile_start(struct bdb_file *,cchar *) ;
+local int bdbfile_finish(struct bdb_file *) ;
+local int bdbfile_indexed(struct bdb_file *) ;
 
-static int bdbkey_start(struct bdb_key *,int,uint,const char *,int) ;
-static int bdbkey_finish(struct bdb_key *) ;
+local int bdbkey_start(struct bdb_key *,int,uint,cchar *,int) ;
+local int bdbkey_finish(struct bdb_key *) ;
 
-static int bibentry_start(struct bibentry *,int) ;
-static int bibentry_begin(struct bibentry *,cchar *,int,cchar *,int) ;
-static int bibentry_continue(struct bibentry *,const char *,int) ;
-static int bibentry_end(struct bibentry *) ;
-static int bibentry_finish(struct bibentry *) ;
+local int bibentry_start(struct bibentry *,int) ;
+local int bibentry_begin(struct bibentry *,cchar *,int,cchar *,int) ;
+local int bibentry_continue(struct bibentry *,cchar *,int) ;
+local int bibentry_end(struct bibentry *) ;
+local int bibentry_finish(struct bibentry *) ;
 
-static int	entry_load(BDB_ENT *,char *,int,struct bibentry *) ;
+local int	entry_load(BDB_ENT *,char *,int,struct bibentry *) ;
 
-static int	keyval_start(KEYVAL *) ;
-static int	keyval_size(KEYVAL *) ;
-static int	keyval_finish(KEYVAL *) ;
+local int	keyval_start(KEYVAL *) ;
+local int	keyval_size(KEYVAL *) ;
+local int	keyval_finish(KEYVAL *) ;
 
-static int	iskey(const char *,int) ;
+local bool	iskey(cchar *,int) noex ;
 
 
 /* local variables */
@@ -184,32 +188,33 @@ enum states {
 } ;
 
 #if	CF_DEBUGS
-static const char	*states[] = {
+static cchar	*states[] = {
 	"search",
 	"have",
-	NULL
+	nullptr
 } ;
 #endif /* CF_DEBUGS */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bdb_start(BDB *op,cchar *qkey,int opts)
-{
+int bdb_start(BDB *op,cchar *qkey,int opts) noex {
 	int		rs ;
 	int		cl ;
-	const char	*cp ;
+	cchar	*cp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	memset(op,0,sizeof(BDB)) ;
+	memclear(op) ;
 
 #if	CF_DEBUGS
 	debugprintf("bdb_start: qkey=%s\n",qkey) ;
 #endif
 
-	if ((qkey == NULL) || (qkey[0] == '\0'))
+	if ((qkey == nullptr) || (qkey[0] == '\0'))
 	    qkey = BDB_QUERYKEY ;
 
 /* store away stuff */
@@ -218,14 +223,14 @@ int bdb_start(BDB *op,cchar *qkey,int opts)
 	op->opts = opts ;
 
 	if ((rs = uc_mallocstrw(qkey,cl,&cp)) >= 0) {
-	    const int	esize = sizeof(struct bdb_file) ;
-	    const int	nf = BDB_DEFFILES ;
-	    const int	vo = (VECOBJ_OORDERED | VECOBJ_OSTATIONARY) ;
+	    cint	esize = szof(struct bdb_file) ;
+	    cint	nf = BDB_DEFFILES ;
+	    cint	vo = (VECOBJ_OORDERED | VECOBJ_OSTATIONARY) ;
 	    op->qkbuf = cp ;
 	    op->qklen = cl ;
 	    if ((rs = vecobj_start(&op->files,esize,nf,vo)) >= 0) {
-		const int	ne = BDB_DEFENTRIES ;
-		if ((rs = hdb_start(&op->keys,ne,1,NULL,NULL)) >= 0) {
+		cint	ne = BDB_DEFENTRIES ;
+		if ((rs = hdb_start(&op->keys,ne,1,nullptr,nullptr)) >= 0) {
 		    op->magic = BDB_MAGIC ;
 		}
 		if (rs < 0)
@@ -233,7 +238,7 @@ int bdb_start(BDB *op,cchar *qkey,int opts)
 	    } /* end if (vecobj_start) */
 	    if (rs < 0) {
 	        uc_free(op->qkbuf) ;
-	        op->qkbuf = NULL ;
+	        op->qkbuf = nullptr ;
 	    }
 	} /* end if (m-a) */
 	
@@ -252,14 +257,14 @@ int bdb_finish(BDB *op)
 	int		rs1 ;
 	int		i ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BDB_MAGIC) return SR_NOTOPEN ;
 
-	if (op->qkbuf != NULL) {
+	if (op->qkbuf != nullptr) {
 	    rs1 = uc_free(op->qkbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->qkbuf = NULL ;
+	    op->qkbuf = nullptr ;
 	}
 
 /* free up all key entries */
@@ -284,7 +289,7 @@ int bdb_finish(BDB *op)
 /* free up all file entries */
 
 	for (i = 0 ; vecobj_get(&op->files,i,&bfep) >= 0 ; i += 1) {
-	    if (bfep != NULL) {
+	    if (bfep != nullptr) {
 	        rs1 = bdbfile_finish(bfep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -306,8 +311,8 @@ int bdb_add(BDB *op,cchar *fname)
 	ustat	sb ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (op->magic != BDB_MAGIC) return SR_NOTOPEN ;
 
@@ -340,7 +345,7 @@ int bdb_count(BDB *op)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BDB_MAGIC) return SR_NOTOPEN ;
 
@@ -356,8 +361,8 @@ int bdb_delcur(BDB *op,BDB_CUR *curp,int f_adv)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BDB_MAGIC) return SR_NOTOPEN ;
 
@@ -375,7 +380,7 @@ int bdb_delcur(BDB *op,BDB_CUR *curp,int f_adv)
 /* make a query */
 int bdb_query(op,citekey,bep,bebuf,belen)
 BDB		*op ;
-const char	citekey[] ;
+cchar	citekey[] ;
 BDB_ENT		*bep ;
 char		bebuf[] ;
 int		belen ;
@@ -390,10 +395,10 @@ int		belen ;
 	debugprintf("bdb_query: ent citekey=%s\n",citekey) ;
 #endif
 
-	if (op == NULL) return SR_FAULT ;
-	if (citekey == NULL) return SR_FAULT ;
-	if (bep == NULL) return SR_FAULT ;
-	if (bebuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (citekey == nullptr) return SR_FAULT ;
+	if (bep == nullptr) return SR_FAULT ;
+	if (bebuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != BDB_MAGIC) return SR_NOTOPEN ;
 
@@ -514,8 +519,8 @@ int bdb_curbegin(BDB *op,BDB_CUR *curp)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BDB_MAGIC) return SR_NOTOPEN ;
 
@@ -530,8 +535,8 @@ int bdb_curend(BDB *op,BDB_CUR *curp)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BDB_MAGIC) return SR_NOTOPEN ;
 
@@ -545,7 +550,7 @@ int bdb_curend(BDB *op,BDB_CUR *curp)
 /* private subroutines */
 
 
-static int bdb_scan(BDB *op,HDB_DATUM key,struct bdb_key *ubkp)
+local int bdb_scan(BDB *op,HDB_DATUM key,struct bdb_key *ubkp)
 {
 	struct bdb_key	*bkp ;
 	HDB_CUR		cur ;
@@ -581,9 +586,9 @@ static int bdb_scan(BDB *op,HDB_DATUM key,struct bdb_key *ubkp)
 
 
 /* index one BDB database file (the most recent unindexed file) */
-static int bdb_fileindex(BDB *op,int n)
+local int bdb_fileindex(BDB *op,int n)
 {
-	struct bdb_file	*bfep = NULL ;
+	struct bdb_file	*bfep = nullptr ;
 	vecobj		*flp = &op->files ;
 	int		rs = SR_NOTFOUND ;
 	int		fi = 0 ;
@@ -600,7 +605,7 @@ static int bdb_fileindex(BDB *op,int n)
 	    (fi >= 0) && ((rs = vecobj_get(flp,fi,&bfep)) >= 0) ; 
 	    fi -= 1) {
 
-	    if (bfep != NULL) {
+	    if (bfep != nullptr) {
 	        if (! bfep->f_indexed) break ;
 	    }
 
@@ -612,7 +617,7 @@ static int bdb_fileindex(BDB *op,int n)
 
 /* something to index? */
 
-	if ((rs >= 0) && (fi >= 0) && (bfep != NULL)) {
+	if ((rs >= 0) && (fi >= 0) && (bfep != nullptr)) {
 	    rs = bdb_fileproc(op,fi,bfep) ;
 	}
 
@@ -625,7 +630,7 @@ static int bdb_fileindex(BDB *op,int n)
 /* end subroutine (bdb_fileindex) */
 
 
-static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
+local int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 {
 	SBUF		citekey ;
 	bfile		bibfile, *bfp = &bibfile ;
@@ -634,7 +639,7 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 	int		rs ;
 	int		rs1 ;
 	int		len ;
-	int		f_inkey = FALSE ;
+	int		f_inkey = false ;
 
 #if	CF_DEBUGS
 	debugprintf("bdb_fileproc: fi=%u\n",fi) ;
@@ -642,11 +647,11 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 
 	op->unindexed -= 1 ;
 	if ((rs = bopen(bfp,bfep->fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
-	    const int	clen = CITEBUFLEN  ;
+	    cint	llen = LINEBUFLEN ;
+	    cint	clen = CITEBUFLEN  ;
 	    int		state = state_search ;
 	    int		ll, cl, kl ;
-	    int		f_bol = TRUE ;
+	    int		f_bol = true ;
 	    int		f_eol ;
 	    cchar	*lp, *cp, *kp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
@@ -691,14 +696,14 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 #endif
 
 	                if (f_inkey) {
-	                    f_inkey = FALSE ;
+	                    f_inkey = false ;
 	                    sbuf_finish(&citekey) ;
 	                }
 
 	                lp += 1 ;
 	                ll -= 1 ;
 
-	                cl = nextfield(lp,ll,&cp) ;
+	                cl = sfnext(lp,ll,&cp) ;
 
 #if	CF_DEBUGS
 	                debugprintf("bdb_fileproc: cl=%u c=%r\n",cl,cp,cl) ;
@@ -716,7 +721,7 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 	                    debugprintf("bdb_fileproc: rline=%r\n",lp,ll) ;
 #endif
 
-	                    kl = nextfield(lp,ll,&kp) ;
+	                    kl = sfnext(lp,ll,&kp) ;
 
 #if	CF_DEBUGS
 	                    debugprintf("bdb_fileproc: citekey start\n") ;
@@ -759,7 +764,7 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 
 	                state = state_search ;
 	                if (f_inkey) {
-	                    f_inkey = FALSE ;
+	                    f_inkey = false ;
 	                    sbuf_finish(&citekey) ;
 	                }
 
@@ -768,7 +773,7 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 #endif
 
 	                if (cbuf[0] != '\0') {
-			    const int	colen = (foff-coff) ;
+			    cint	colen = (foff-coff) ;
 
 #if	CF_DEBUGS
 	                    debugprintf("bdb_fileproc: inserting key=%s\n",
@@ -804,7 +809,7 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 	} /* end if (bfile) */
 
 	if (f_inkey) {
-	    f_inkey = FALSE ;
+	    f_inkey = false ;
 	    sbuf_finish(&citekey) ;
 	}
 
@@ -824,15 +829,15 @@ static int bdb_fileproc(BDB *op,int fi,struct bdb_file *bfep)
 
 
 /* insert a citation-key into the BIB key DB */
-static int bdb_keyinsert(op,fi,coff,cbuf,clen)
+local int bdb_keyinsert(op,fi,coff,cbuf,clen)
 BDB		*op ;
 int		fi ;
 uint		coff ;
-const char	cbuf[] ;
+cchar	cbuf[] ;
 int		clen ;
 {
 	struct bdb_key	*bkp ;
-	const int	esize = sizeof(struct bdb_key) ;
+	cint	esize = szof(struct bdb_key) ;
 	int		rs ;
 
 #if	CF_DEBUGS
@@ -873,7 +878,7 @@ int		clen ;
 
 
 /* read a BIB entry */
-static int bdb_readentry(op,bep,bebuf,belen,bkp)
+local int bdb_readentry(op,bep,bebuf,belen,bkp)
 BDB		*op ;
 BDB_ENT		*bep ;
 char		bebuf[] ;
@@ -893,10 +898,10 @@ struct bdb_key	*bkp ;
 #endif
 
 #ifdef	COMMENT
-	if (op == NULL) return SR_FAULT ;
-	if (bkp == NULL) return SR_FAULT ;
-	if (bep == NULL) return SR_FAULT ;
-	if (bebuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (bkp == nullptr) return SR_FAULT ;
+	if (bep == nullptr) return SR_FAULT ;
+	if (bebuf == nullptr) return SR_FAULT ;
 #endif /* COMMENT */
 
 #if	CF_DEBUGS
@@ -906,8 +911,7 @@ struct bdb_key	*bkp ;
 	debugprintf("bdb_readentry: bk clen=%d\n",bkp->clen) ;
 #endif
 
-	memset(bep,0,sizeof(BDB_ENT)) ;
-
+	memclear(bep) ;
 	if ((rs = vecobj_get(&op->files,bkp->fi,&bfep)) >= 0) {
 
 	if ((rs = bibentry_start(&ie,bkp->fi)) >= 0) {
@@ -919,11 +923,11 @@ struct bdb_key	*bkp ;
 
 	    if ((rs = bopen(bfp,bfep->fname,"r",0666)) >= 0) {
 		off_t	boff = (off_t) bkp->coff ;
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 		int		ll, cl ;
 		int		len ;
 		int		f_bol, f_eol ;
-	        const char	*lp, *cp ;
+	        cchar	*lp, *cp ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 #if	CF_DEBUGS
@@ -933,8 +937,8 @@ struct bdb_key	*bkp ;
 
 	        bseek(bfp,boff,SEEK_SET) ;
 
-	        f_inkey = FALSE ;
-	        f_bol = TRUE ;
+	        f_inkey = false ;
+	        f_bol = true ;
 	        rlen = 0 ;
 	        while ((rlen < bkp->clen) &&
 	            ((rs = breadln(bfp,lbuf,llen)) > 0)) {
@@ -959,8 +963,8 @@ struct bdb_key	*bkp ;
 	                    rs = bibentry_end(&ie) ;
 			}
 
-	                f_inkey = TRUE ;
-	                cl = nextfield((lp + 1),(ll - 1),&cp) ;
+	                f_inkey = true ;
+	                cl = sfnext((lp + 1),(ll - 1),&cp) ;
 
 	                if (rs >= 0) {
 	                    ll -= ((cp + cl) - lp) ;
@@ -1013,64 +1017,51 @@ struct bdb_key	*bkp ;
 #endif
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (bdb_readentry) */
+} /* end subroutine (bdb_readentry) */
 
 /* operate on the BDBFILE object */
-static int bdbfile_start(struct bdb_file *fp,cchar *fname) noex {
+local int bdbfile_start(struct bdb_file *fp,cchar *fname) noex {
 	int		rs ;
 	cchar		*cp ;
-
 	memclear(fp) ;
-
 	fp->f_indexed = 0 ;
-	rs = uc_mallocstrw(fname,-1,&cp) ;
-	if (rs >= 0) fp->fname = cp ;
-
+	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	    fp->fname = cp ;
+	}
 	return rs ;
-}
-/* end subroutine (bdbfile_start) */
+} /* end subroutine (bdbfile_start) */
 
-
-static int bdbfile_finish(struct bdb_file *fp)
-{
+local int bdbfile_finish(struct bdb_file *fp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (fp == NULL) return SR_FAULT ;
+	if (fp == nullptr) return SR_FAULT ;
 
-	if (fp->fname != NULL) {
+	if (fp->fname != nullptr) {
 	    rs1 = uc_free(fp->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    fp->fname = NULL ;
+	    fp->fname = nullptr ;
 	}
 
 	return rs ;
-}
-/* end subroutine bdbfile_finish) */
+} /* end subroutine bdbfile_finish) */
 
-
-static int bdbfile_indexed(struct bdb_file *fp)
-{
-
-	if (fp == NULL) return SR_FAULT ;
-
-	fp->f_indexed = TRUE ;
+local int bdbfile_indexed(struct bdb_file *fp) noex {
+	if (fp == nullptr) return SR_FAULT ;
+	fp->f_indexed = true ;
 	return SR_OK ;
-}
-/* end subroutine bdbfile_indexed) */
-
+} /* end subroutine bdbfile_indexed) */
 
 /* operate on the BDBKEY object */
-static int bdbkey_start(bkp,fi,coff,citekey,clen)
+local int bdbkey_start(bkp,fi,coff,citekey,clen)
 struct bdb_key	*bkp ;
 int		fi ;
 uint		coff ;
-const char	citekey[] ;
+cchar	citekey[] ;
 int		clen ;
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS
 	debugprintf("bdb/bdbkey_start: fi=%u\n",fi) ;
@@ -1079,8 +1070,7 @@ int		clen ;
 	debugprintf("bdb/bdbkey_start: clen=%d\n",clen) ;
 #endif
 
-	memset(bkp,0,sizeof(struct bdb_key)) ;
-
+	memclear(bkp) ;
 	bkp->fi = fi ;
 	bkp->coff = coff ;
 	bkp->clen = clen ;
@@ -1092,33 +1082,27 @@ int		clen ;
 }
 /* end subroutine (bdbkey_start) */
 
-
-static int bdbkey_finish(struct bdb_key *bkp)
-{
+local int bdbkey_finish(struct bdb_key *bkp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (bkp == NULL) return SR_FAULT ;
+	if (bkp == nullptr) return SR_FAULT ;
 
-	if (bkp->citekey != NULL) {
+	if (bkp->citekey != nullptr) {
 	    rs1 = uc_free(bkp->citekey) ;
 	    if (rs >= 0) rs = rs1 ;
-	    bkp->citekey = NULL ;
+	    bkp->citekey = nullptr ;
 	}
 
 	bkp->fi = -1 ;
 	return rs ;
-}
-/* end subroutine (bdbkey_finish) */
-
+} /* end subroutine (bdbkey_finish) */
 
 /* initialize a BIB accumulation object */
-static int bibentry_start(struct bibentry *iep,int fi)
-{
-	const int	size = sizeof(KEYVAL) ;
+local int bibentry_start(struct bibentry *iep,int fi) noex {
+	cint	size = szof(KEYVAL) ;
 	int		rs ;
-
-	memset(iep,0,sizeof(struct bibentry)) ;
+	memclear(iep) ;
 
 	if ((rs = vecobj_start(&iep->keyvals,size,10,0)) >= 0) {
 	    iep->size = 0 ;
@@ -1130,19 +1114,19 @@ static int bibentry_start(struct bibentry *iep,int fi)
 /* end subroutine (bibentry_start) */
 
 
-static int bibentry_begin(iep,kp,kl,vp,vl)
+local int bibentry_begin(iep,kp,kl,vp,vl)
 struct bibentry	*iep ;
-const char	*kp, *vp ;
+cchar	*kp, *vp ;
 int		kl, vl ;
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (kl < 0) kl = strlen(kp) ;
 
 /* key */
 
-	iep->kp = NULL ;
+	iep->kp = nullptr ;
 	if ((rs = uc_mallocstrw(kp,kl,&cp)) >= 0) {
 	    iep->kp = cp ;
 	    iep->kl = kl ;
@@ -1158,7 +1142,7 @@ int		kl, vl ;
 	    }
 	    if (rs < 0) {
 	        uc_free(iep->kp) ;
-	        iep->kp = NULL ;
+	        iep->kp = nullptr ;
 	    }
 	} /* end if (m-a) */
 
@@ -1167,11 +1151,11 @@ int		kl, vl ;
 /* end subroutine (bibentry_begin) */
 
 
-static int bibentry_continue(struct bibentry *iep,cchar *vp,int vl)
+local int bibentry_continue(struct bibentry *iep,cchar *vp,int vl)
 {
 	int		rs ;
 	int		bl ;
-	const char	*bp ;
+	cchar	*bp ;
 
 	if (vl < 0) vl = strlen(vp) ;
 
@@ -1199,21 +1183,21 @@ static int bibentry_continue(struct bibentry *iep,cchar *vp,int vl)
 /* end subroutine (bibentry_continue) */
 
 
-static int bibentry_end(struct bibentry *iep)
+local int bibentry_end(struct bibentry *iep)
 {
 	KEYVAL	kv ;
 	int		rs ;
 	int		rs1 ;
 	int		vl ;
 	int		size ;
-	const char	*vp ;
-	const char	*cp ;
+	cchar	*vp ;
+	cchar	*cp ;
 
 	keyval_start(&kv) ;
 
 	kv.kl = iep->kl ;
 	kv.kp = iep->kp ;
-	iep->kp = NULL ;		/* good!  zapped! */
+	iep->kp = nullptr ;		/* good!  zapped! */
 
 	rs = buffer_get(&iep->vb,&vp) ;
 	vl = rs ;
@@ -1245,7 +1229,7 @@ static int bibentry_end(struct bibentry *iep)
 /* end subroutine (bibentry_end) */
 
 
-static int bibentry_finish(iep)
+local int bibentry_finish(iep)
 struct bibentry	*iep ;
 {
 	KEYVAL		*kvp ;
@@ -1253,14 +1237,14 @@ struct bibentry	*iep ;
 	int		rs1 ;
 	int		i ;
 
-	if (iep->kp != NULL) {
+	if (iep->kp != nullptr) {
 	    rs1 = uc_free(iep->kp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    iep->kp = NULL ;
+	    iep->kp = nullptr ;
 	}
 
 	for (i = 0 ; vecobj_get(&iep->keyvals,i,&kvp) >= 0 ; i += 1) {
-	    if (kvp != NULL) {
+	    if (kvp != nullptr) {
 	        rs1 = keyval_finish(kvp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -1275,7 +1259,7 @@ struct bibentry	*iep ;
 
 
 /* load up the user-interface entry from the internal structure */
-static int entry_load(ep,ebuf,ebuflen,iep)
+local int entry_load(ep,ebuf,ebuflen,iep)
 BDB_ENT		*ep ;
 char		*ebuf ;
 int		ebuflen ;
@@ -1289,13 +1273,13 @@ struct bibentry *iep ;
 #ifdef	OPTIONAL
 	int		bl ;
 #endif
-	const char	*(*keyvals)[2] ;
+	cchar	*(*keyvals)[2] ;
 	char		*bp ;
 
 	if ((rs = vecobj_count(&iep->keyvals)) > 0) {
 	    n = rs ;
 
-	tabsize = ((n + 1) * 2 * sizeof(const char *)) ;
+	tabsize = ((n + 1) * 2 * szof(cchar *)) ;
 	size = (tabsize + iep->size) ;
 
 	bo = BDB_BO((ulong) ebuf) ;
@@ -1303,7 +1287,7 @@ struct bibentry *iep ;
 	    vecobj	*klp = &iep->keyvals ;
 	    int		j = 0 ;
 
-	    keyvals = (const char *(*)[2]) (ebuf + bo) ;
+	    keyvals = (cchar *(*)[2]) (ebuf + bo) ;
 	    kal = tabsize ;
 	    bp = (char *) (ebuf + bo + kal) ;
 #ifdef	OPTIONAL
@@ -1311,7 +1295,7 @@ struct bibentry *iep ;
 #endif
 
 	    for (i = 0 ; vecobj_get(klp,i,&kvp) >= 0 ; i += 1) {
-	        if (kvp != NULL) {
+	        if (kvp != nullptr) {
 
 	        keyvals[j][0] = bp ;
 	        bp = strwcpy(bp,kvp->kp,kvp->kl) + 1 ;
@@ -1320,11 +1304,11 @@ struct bibentry *iep ;
 	        debugprintf("entry_load: k=%s\n",keyvals[j][0]) ;
 #endif
 
-	        if (kvp->vp != NULL) {
+	        if (kvp->vp != nullptr) {
 	            keyvals[j][1] = bp ;
 	            bp = strwcpy(bp,kvp->vp,kvp->vl) + 1 ;
 	        } else {
-	            keyvals[j][1] = NULL ;
+	            keyvals[j][1] = nullptr ;
 		}
 
 	        j += 1 ;
@@ -1332,8 +1316,8 @@ struct bibentry *iep ;
 	        }
 	    } /* end for */
 
-	    keyvals[j][0] = NULL ;
-	    keyvals[j][1] = NULL ;
+	    keyvals[j][0] = nullptr ;
+	    keyvals[j][1] = nullptr ;
 
 	    ep->size = size ;
 	    ep->nkeys = n ;
@@ -1350,70 +1334,51 @@ struct bibentry *iep ;
 }
 /* end subroutine (entry_load) */
 
-
-static int keyval_start(KEYVAL *kvp)
-{
-
-	memset(kvp,0,sizeof(KEYVAL)) ;
+local int keyval_start(KEYVAL *kvp) noex {
+	memclear(kvp) ;
 	return SR_OK ;
-}
-/* end subroutine (keyval_start) */
+} /* end subroutine (keyval_start) */
 
-
-static int keyval_size(KEYVAL *kvp)
-{
+local int keyval_size(KEYVAL *kvp) noex {
 	int		rs = SR_OK ;
 	int		size = 2 ;
 
-	if (kvp->kp != NULL)
+	if (kvp->kp != nullptr) {
 	    size += kvp->kl ;
-
-	if (kvp->vp != NULL)
+	}
+	if (kvp->vp != nullptr) {
 	    size += kvp->vl ;
-
+	}
 	return (rs >= 0) ? size : rs ;
-}
-/* end subroutine (keyval_size) */
+} /* end subroutine (keyval_size) */
 
-
-static int keyval_finish(KEYVAL *kvp)
-{
+local int keyval_finish(KEYVAL *kvp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (kvp->kp != NULL) {
+	if (kvp->kp != nullptr) {
 	    rs1 = uc_free(kvp->kp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    kvp->kp = NULL ;
+	    kvp->kp = nullptr ;
 	}
-
-	if (kvp->vp != NULL) {
+	if (kvp->vp != nullptr) {
 	    rs1 = uc_free(kvp->vp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    kvp->vp = NULL ;
+	    kvp->vp = nullptr ;
 	}
-
 	return rs ;
-}
-/* end subroutine (keyval_finish) */
-
+} /* end subroutine (keyval_finish) */
 
 /* is there a key? */
-static int iskey(cchar *lp,int ll)
-{
-	int		ch ;
-	int		f = FALSE ;
-
+local bool iskey(cchar *lp,int ll) noex {
+	bool		f = false ;
 	if (ll >= 2) {
 	    f = (lp[0] == '%') ;
 	    if (f) {
-	        ch = lp[1] & 0xff ;
+	        cint ch = lp[1] & UCHAR_MAX ;
 	        f = isalphalatin(ch) ;
 	    }
-	}
-
+	} /* end if */
 	return f ;
-}
-/* end subroutine (iskey) */
+} /* end subroutine (iskey) */
 
 
