@@ -86,7 +86,7 @@ int fbliner_start(fbliner *lsp,filer *fbp,off_t foff,int to) noex {
 	        lsp->foff = foff ;
 	        lsp->fbp = fbp ;
 	        lsp->to = to ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 }
