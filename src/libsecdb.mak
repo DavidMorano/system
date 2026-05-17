@@ -2,7 +2,7 @@
 
 T= libsecdb
 
-ALL= $(T).o $(T).a $(T).so
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -62,7 +62,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 .SUFFIXES:		.hh .ii .iim .ccm
 
 
-default:		$(T).a
+default:		$(T).o
 
 so:			$(T).so
 
