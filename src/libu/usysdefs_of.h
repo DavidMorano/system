@@ -56,10 +56,11 @@ enum extraopenflags {
 	extraopenflag_start = extraopenflag_minmode
 } ; /* end enum */
 
-/* missing file open-flags */
+/* mask for extended open-options*/
 #ifndef	OM_SPECIAL
-#define	OM_SPECIALMASK	((~ 0) << extraopenflag_start)
+#define	OM_SPECIAL	((~ 0) << extraopenflag_start)
 #endif
+/* missing file open-flags */
 #ifndef	O_LARGEFILE
 #define	O_LARGEFILE	0
 #endif
