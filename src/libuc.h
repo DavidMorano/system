@@ -89,7 +89,7 @@
 #include	<gecos.h>
 #include	<getbufsize.h>
 #include	<getexecname.h>
-#include	<getmjd.h>
+#include	<gethe.h>
 #include	<getngroups.h>
 #include	<getutmp.h>
 #include	<getx.h>
@@ -331,8 +331,6 @@ extern int	uc_nprocs(int) noex ;
 /* process group */
 extern int	uc_atfork(void_f,void_f,void_f) noex ;
 
-extern int	uc_execve(cchar *,mainv,mainv) noex ;
-extern int	uc_isaexecve(cchar *,mainv,mainv) noex ;
 extern int	uc_initgroups(cchar *,gid_t) noex ;
 extern int	uc_exit(int) noex ;
 extern int	uc_atexit(void_f) noex ;
@@ -344,9 +342,6 @@ extern int	uc_setpriority(int,id_t,int) noex ;
 extern int	uc_procpid(cchar *,uid_t) noex ;
 
 /* double-special open group */
-extern int	uc_pipe(int *) noex ;
-extern int	uc_pipes(int *,int) noex ;
-extern int	uc_piper(int *,int,int) noex ;
 extern int	uc_sockpair(int,int,int,int *) noex ;
 
 /* operate group */
@@ -386,12 +381,8 @@ extern int	uc_tell(int,off_t *) noex ;
 extern int	uc_copy(int,int,int) noex ;
 extern int	uc_peek(int,void *,int) noex ;
 extern int	uc_keepalive(int,int) noex ;
-extern int	uc_moveup(int,int) noex ;
-extern int	uc_ndelay(int,int) noex ;
-extern int	uc_nonblock(int,int) noex ;
 extern int	uc_msgdiscard(int) noex ;
 extern int	uc_setappend(int,int) noex ;
-extern int	uc_closeonexec(int,int) noex ;
 
 extern int	uc_remove(cchar *) noex ;
 extern int	uc_link(cchar *,cchar *) noex ;
