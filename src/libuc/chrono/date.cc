@@ -119,7 +119,7 @@ int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 		        lm_free(op->zname) ;
 		        op->zname = nullptr ;
 		    }
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (znlen) */
 	} /* end if (non-null) */
 	return rs ;
