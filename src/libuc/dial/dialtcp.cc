@@ -74,12 +74,12 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<ucdesc.h>
 #include	<ucgetx.h>		/* |uc_getipnodebyname(3uc)| */
 #include	<uchostent.h>
 #include	<ucsig.h>
-#include	<ucread.h>
 #include	<getproto.h>
-#include	<getprotofamily.h>
+#include	<getpf.h>
 #include	<getportnum.h>
 #include	<hostinfo.h>
 #include	<hostaddr.h>
@@ -124,7 +124,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_close(int) noex ;
 }
 
 extern "C" {
@@ -426,7 +425,7 @@ static int try_addr(SUBINFO *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = 0 ;
-	if ((rs = getprotofamily(sip->af)) >= 0) {
+	if ((rs = getpf(sip->af)) >= 0) {
 	    sockaddress		server ;
 	    cint		pf = rs ;
 	    cint		port = sip->port ;
@@ -442,7 +441,7 @@ static int try_addr(SUBINFO *sip) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-	} /* end if (getprotofamily) */
+	} /* end if (getpf) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (try_addr) */
@@ -455,7 +454,7 @@ static int try_inet(SUBINFO *sip) noex {
 	int		fd = -1 ;
 	hint.ai_protocol = sip->proto ;
 	if (sip->af >= 0) {
-	    if ((rs = getprotofamily(sip->af)) >= 0) {
+	    if ((rs = getpf(sip->af)) >= 0) {
 	        hint.ai_family = rs ;	/* documentation says use PF! */
 	    }
 	}
