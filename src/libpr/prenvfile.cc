@@ -88,7 +88,7 @@ using libuc::mem ;			/* variable */
 int prenvfile(cc *pr,cc *fn,vecstr *lp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		n = 0 ; /* return-value*/
+	int		n = 0 ; /* return-value */
 	if (pr && fname && lp) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && fn[0]) {
