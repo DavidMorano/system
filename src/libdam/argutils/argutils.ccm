@@ -1,0 +1,100 @@
+/* argutils MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* Argument-Vector utilities */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-06-01, David A­D­ Morano
+	This code was originally written.
+
+	= 2020-04-23, David A­D­ Morano
+	I converted this code to be a C++ module.
+
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Group:
+	argsz
+    	argloader
+
+	Description:
+	These are utility subroutines for managing argument-vector
+	objects.
+
+	Synopsis:
+	pair<int,int> argsz(cchar *sp,int chx) noex
+
+	Arguments:
+	sp		pointer to data containing the argument-string
+	chx		field sepærator chacter
+
+	Returns:
+	-		C++ |pair| containing: 
+				na	- number of arguments
+				sz	- size of congolmerate
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<utility>		/* |pair(3c++)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
+
+export module argutils ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::pair ;			/* type */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+export {
+    struct argloader {
+	ccharpp		av ;
+	argloader(char *,cchar *,int,int) noex ;
+    } ; /* end struct (argloader) */
+} /* end export */
+
+export {
+    extern pair<int,int> argsz(cchar *,int) noex ;
+} /* end export */
+
+
