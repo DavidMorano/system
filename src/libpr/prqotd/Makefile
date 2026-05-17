@@ -45,12 +45,12 @@ OBJ1= prqotd_open.o
 OBJ2= prqotd_subinfo.o
 OBJ3= prqotd_util.o
 OBJ4= prqotd_maint.o
-OBJ5=
+OBJ5= argutils.o
 OBJ6=
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o 
-OBJB= obj4.o 
+OBJB= obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
@@ -160,5 +160,10 @@ prqotd_config.o:	prqotd_config.cc	prqotd_config.hh	$(INCS)
 prqotd_util.o:		prqotd_util.cc		prqotd_util.hh		$(INCS)
 prqotd_subinfo.o:	prqotd_subinfo.cc	prqotd_subinfo.hh	$(INCS)
 prqotd_prog.o:		prqotd_prog.cc		prqotd_subinfo.hh	$(INCS)
+
+# ARGUTILS
+argutils.o:		argutils.dir
+argutils.dir:
+	makesubdir $@
 
 
