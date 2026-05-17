@@ -45,7 +45,7 @@ LIBS= -lu -lsecdb
 
 INCDIRS=
 
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -94,7 +94,7 @@ OBJ10= ctx.o cfx.o mapblock.o memtrack.o
 OBJ11= field.o termx.o
 
 OBJ12= nonpath.o
-OBJ13=
+OBJ13= msghdr.o conmsghdr.o
 OBJ14=
 OBJ15=
 
@@ -108,7 +108,7 @@ OBJ21=
 OBJ22=
 OBJ23=
 
-OBJ24= ucdescbase.o
+OBJ24= ucopen.o nonpath.o ucdescbase.o
 OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
 OBJ26= ucdescmisc.o ucdesclock.o
 OBJ27= ucproc.o ucdata.o
@@ -116,7 +116,7 @@ OBJ27= ucproc.o ucdata.o
 OBJ28= ucttyname.o uctc.o ucsysconf.o
 OBJ29= uclibmem.o ucyserattr.o
 OBJ30= ucsys.o ucatexit.o ucatfork.o
-OBJ31= tcx.o
+OBJ31= tcx.o ucpts.o ucpwcache.o
 
 OBJ=
 OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
@@ -376,7 +376,6 @@ uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
 ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
 
 ucdescbase.o:		ucdescbase.cc	ucdescbase.hh		$(INCS)
-ucdescmisc.o:		ucdescmisc.cc	ucdescmisc.h		$(INCS)
 
 # uctimeout (time-out call-backs)
 uctimeout.o:		uctimeout.cc
@@ -391,9 +390,6 @@ uc_openuser.o:		uc_openuser.c opensysfs.h
 
 uckvamatch.o:		uckvamatch.cc	uckvamatch.h		$(INCS)
 
-hostinfo.o:		hostinfo.cc hostinfo.h
-hostaddr.o:		hostaddr.cc hostaddr.h
-hostent.o:		hostent.cc hostent.h
 inetaddr.o:		inetaddr.cc inetaddr.h
 sockaddress.o:		sockaddress.cc sockaddress.h
 
@@ -420,7 +416,6 @@ upt.o:			upt.cc upt.h
 spawnproc.o:		spawnproc.cc spawnproc.h
 
 memfile.o:		memfile.cc memfile.h
-filemap.o:		filemap.cc filemap.h
 
 numsign.o:		numsign.cc numsign.h
 
@@ -512,6 +507,11 @@ ucdescsock.dir:
 # UCDESCLOCK
 ucdesclock.o:		ucdesclock.dir
 ucdesclock.dir:
+	makesubdir $@
+
+# UCDESCMISC
+ucdescmisc.o:		ucdescmisc.dir
+ucdescmisc.dir:
 	makesubdir $@
 
 # UCIDS
@@ -941,7 +941,8 @@ tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
 inetconv.o:		inetconv.cc inetconv.h
 
 # LIBUC
-ucpts.o:		ucpts.cc	ucpts.h
+ucpts.o:		ucpts.cc	ucpts.h			$(INCS)
+ucpwcache.o:		ucpwcache.cc	ucpwcache.h		$(INCS)
 tcx.o:			tcx.cc		tcx.h			$(INCS)
 
 # other objects
@@ -949,7 +950,6 @@ expcook.o:		expcook.cc	expcook.h		$(INCS)
 keyopt.o:		keyopt.cc	keyopt.h		$(INCS)
 utf8decoder.o:		utf8decoder.cc	utf8decoder.h		$(INCS)
 td.o:			td.cc		td.h termstr.h
-recip.o:		recip.cc	recip.h
 querystr.o:		querystr.cc	querystr.h
 absfn.o:		absfn.cc	absfn.h
 posname.o:		posname.cc	posname.h
@@ -960,8 +960,6 @@ userattrdb.o:		userattrdb.cc	userattrdb.h
 pmq.o:			pmq.cc		pmq.h
 filegrp.o:		filegrp.cc	filegrp.h
 unameo.o:		unameo.cc	unameo.h
-hostaddr.o:		hostaddr.cc	hostaddr.h
-hostinfo.o:		hostinfo.cc	hostinfo.h
 lookaside.o:		lookaside.cc	lookaside.h
 memfile.o:		memfile.cc	memfile.h		$(INCS)
 dirlist.o:		dirlist.cc	dirlist.h		$(INCS)
@@ -1064,6 +1062,11 @@ timestr.o:		timestr.dir
 timestr.dir:
 	makesubdir $@
 
+# HOST
+host.o:			host.dir
+host.dir:
+	makesubdir $@
+
 # GETHE
 gethe.o:		gethe.dir
 gethe.dir:
@@ -1083,8 +1086,8 @@ inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 strwcmp.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 sysnoise.o:		sysnoise.cc sysnoise.h
-findfilepath.o:		findfilepath.cc findfilepath.h
-findxfile.o:		findxfile.cc findxfile.h
+findfilepath.o:		findfilepath.cc findfilepath.h		$(INCS)
+findxfile.o:		findxfile.cc	findxfile.h		$(INCS)
 calstrs.o:		calstrs.cc	calstrs.h		$(INCS)
 ipow.o:			ipow.cc		ipow.h			$(INCS)
 base64.o:		base64.cc	base64.h		$(INCS)
@@ -1100,6 +1103,8 @@ conallof.o:		conallof.cc	conallof.h		$(INCS)
 nchr.o:			nchr.cc		nchr.h			$(INCS)
 inaddrbad.o:		inaddrbad.cc	inaddrbad.hh		$(INCS)
 retstat.o:		retstat.cc	retstat.h		$(INCS)
+msghdr.o:		msghdr.cc	msghdr.h		$(INCS)
+conmsghdr.o:		conmsghdr.cc	conmsghdr.h		$(INCS)
 
 # integer-conversion-to-string-digits
 strval.o:		strval.cc strval.h
