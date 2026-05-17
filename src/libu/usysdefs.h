@@ -41,6 +41,7 @@
 #include	<usysdefs_af.h>		/* address families */
 #include	<usysdefs_pf.h>		/* protocol families */
 #include	<usysdefs_fcntl.h>
+#include	<usysdefs_ioctl.h>
 #include	<usysdefs_len.h>
 #include	<usysdefs_lim.h>
 #include	<usysdefs_lock.h>
