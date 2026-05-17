@@ -34,6 +34,8 @@
 #include	<usysdefs.h>
 #include	<localmisc.h>
 
+#include	"exitcodes.h"
+
 
 /* local defines */
 
