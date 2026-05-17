@@ -32,11 +32,12 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<ucdescread.h>
+#include	<ucdesc.h>
 #include	<sbuf.h>
 #include	<snwcpy.h>
 #include	<strn.h>
 #include	<cfdec.h>
+#include	<nlscodes.hh>
 #include	<localmisc.h>
 
 #include	"nlsmsg.h"		/* <- NLS dial-response codes */
@@ -63,7 +64,7 @@
 
 /* forward references */
 
-static int	nlsresponse(char *,int,cchar *,int) noex ;
+local int	nlsresponse(char *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -82,7 +83,7 @@ int mknlsreq(char *nlsbuf,int nlslen,cchar *svcbuf,int svclen) noex {
 	        svc.strw(NLPS_REQ2,-1) ;
 	        svc.strw(svcbuf,svclen) ;
 	        svc.chr(0) ;
-	    }
+	    } /* end block */
 	    len = svc.finish ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (nlsbuf) */
@@ -99,13 +100,13 @@ int readnlsresp(int fd,char *tbuf,int tlen,int to) noex {
 	        if ((rs = nlsresponse(tbuf,tlen,rbuf,rs)) >= 0) {
 	            cint	code = rs ;
 	            switch (code) {
-	            case NLSSTART:
+	            case nlscode.start:
 	                break ;
-	            case NLSFORMAT:
-	            case NLSUNKNOWN:
+	            case nlscode.format:
+	            case nlscode.sunknown:
 	                rs = SR_BADREQUEST ;
 	                break ;
-	            case NLSDISABLED:
+	            case nlscode.disabled:
 	                rs = SR_NOTAVAIL ;
 	                break ;
 	            default:
@@ -124,7 +125,7 @@ int readnlsresp(int fd,char *tbuf,int tlen,int to) noex {
 
 /* local subroutine */
 
-static int nlsresponse(char *tbuf,int tlen,cchar *rbuf,int rlen) noex {
+local int nlsresponse(char *tbuf,int tlen,cchar *rbuf,int rlen) noex {
 	int		rs = SR_PROTO ;
 	int		sl = rlen ;
 	int		pv = 0 ;	/* used-afterwards */
@@ -145,13 +146,12 @@ static int nlsresponse(char *tbuf,int tlen,cchar *rbuf,int rlen) noex {
 	        } else {
 	            rs = SR_PROTO ;
 		}
-	    }
-	}
+	    } /* end if (cfdec) */
+	} /* end if (strnchr) */
 	if ((rs >= 0) && (pv != NLPS_REQVERSION)) {
 	    rs = SR_NOPROTOOPT ;
 	}
 	return (rs >= 0) ? code : rs ;
-}
-/* end subroutine (nlsresponse) */
+} /* end subroutine (nlsresponse) */
 
 
