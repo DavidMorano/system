@@ -236,6 +236,7 @@ static int findprog(char *execfname,cchar *pn) noex {
 /* end subroutine (findprog) */
 
 static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
+	cint		rsn = SR_NOTFOUND ;
 	cint		perms = (R_OK | X_OK) ;
 	int		rs ;
 	int		rs1 ;
@@ -243,7 +244,6 @@ static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
 	rbuf[0] = '\0' ;
 	if (char *dn ; (rs = lm_hn(&dn)) >= 0) {
 	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-	        cint	rsn = SR_NOTFOUND ;
 	        cint	sz = ((maxpathlen + 1) * 2) ;
 	        cchar	*bdname = BINDNAME ;
 	        if (char *prbuf ; (rs = lm_mall((sz+1),&prbuf)) >= 0) {
