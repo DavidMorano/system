@@ -63,16 +63,23 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uxti.h>
 #include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<ucsigset.h>
 #include	<sbuf.h>
-#include	<char.h>
 #include	<sigblocker.h>
 #include	<cfdec.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"nlsdialassist.h"
-#include	"dialtocotsord.h"
+#include	"dialticotsord.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -124,7 +131,7 @@ int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
 	    return SR_INVAL ;
 
 	while (CHAR_ISWHITE(*svcbuf)) svcbuf += 1 ;
-	svclen = strlen(svcbuf) ;
+	svclen = lenstr(svcbuf) ;
 
 	while (svclen && CHAR_ISWHITE(svcbuf[svclen - 1])) {
 	    svclen -= 1 ;
@@ -135,15 +142,15 @@ int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
 
 	if (abuf == nullptr) {
 	    abuf = "local" ;
-	    alen = strlen(abuf) ;
+	    alen = lenstr(abuf) ;
 	} /* end if (default UNIX® address!) */
 
 	if ((rs = mknlsreq(nlsbuf,nlslen,svcbuf,svclen)) >= 0) {
 	    SIGACTION	osigs ;
 	    SIGACTION	nsigs{} ;
-	    nsigset_t	sigmask ;
+	    sigset_t	sigmask ;
 	    cint	blen = rs ;
-	    uc_nsigsetempty(&sigmask) ;
+	    uc_sigsetempty(&sigmask) ;
 	    nsigs.sa_handler = SIG_IGN ;
 	    nsigs.sa_mask = sigmask ;
 	    nsigs.sa_flags = 0 ;
@@ -156,8 +163,9 @@ int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
 			    {
 	                        rs = readnlsresp(fd,tbuf,tlen,to) ;
 			    }
-			    rs = rsfree(rs,tbuf) ;
-			} /* end if (m-a-f) *?
+			    rs1 = lm_free(tbuf) ;
+			    if (rs >= 0) rs = rs1 ;
+			} /* end if (m-a-f) */
 	            } /* end if (reading response) */
 	        } /* end if (opened) */
 	        rs1 = u_sigaction(SIGPIPE,&osigs,nullptr) ;
