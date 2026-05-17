@@ -242,7 +242,7 @@ int submgr::alloc() noex {
 	    a = (stpcpy(a,ucp) + 1) ;
 	    op->groupname = a ;
 	    a = (stpcpy(a,gcp) + 1) ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end method (submgr::alloc) */
 
