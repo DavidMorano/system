@@ -117,7 +117,7 @@ int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
 		}
 	        rs1 = lm_free(ep) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
