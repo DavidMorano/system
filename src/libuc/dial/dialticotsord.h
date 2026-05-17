@@ -45,9 +45,9 @@
 
 EXTERNC_begin
 
-extern int dialticotsord(cc *,int,int,int) noex ;
-extern int dialticotsordnls(cc *,int,cc *,int,int) noex ;
-extern int dialticotsordmux(cc *,int,cc *,mainv,int,int) noex ;
+extern int dialticotsord	(cc *,int,int,int)			noex ;
+extern int dialticotsordnls	(cc *,int,cc *,int,int)			noex ;
+extern int dialticotsordmux	(cc *,int,cc *,con mainv,int,int)	noex ;
 
 EXTERNC_end
 
