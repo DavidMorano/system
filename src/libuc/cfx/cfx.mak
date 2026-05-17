@@ -51,17 +51,19 @@ OBJ6_CFX= cfa26.o
 OBJ7_CFX= cfnum.o
 OBJ8_CFX= cfutil.o
 OBJ9_CFX= cfchars.o cfhexstr.o cfroman.o
+OBJ10_CFX=
+OBJ11_CFX=
 
 OBJA_CFX= obj0cfx.o obj1cfx.o obj2cfx.o obj3cfx.o
 OBJB_CFX= obj4cfx.o obj5cfx.o obj6cfx.o obj7cfx.o
-OBJC_CFX= obj8cfx.o
+OBJC_CFX= obj8cfx.o obj9cfx.o
 
 OBJ_CFX= obja_cfx.o objb_cfx.o objc_cfx.o
 
 
 INCDIRS=
 
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -148,6 +150,12 @@ obj8cfx.o:		$(OBJ8_CFX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj9cfx.o:		$(OBJ9_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj10cfx.o:		$(OBJ11_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj11cfx.o:		$(OBJ11_CFX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
