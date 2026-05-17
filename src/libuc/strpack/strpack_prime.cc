@@ -251,7 +251,7 @@ local int strpack_chunknew(strpack *op,int amount) noex {
 	    if (rs < 0) {
 	        lm_free(cep) ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (strpack_chunknew) */
