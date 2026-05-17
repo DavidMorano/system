@@ -42,10 +42,11 @@ LIBS +=
 
 OBJ0= prgetclustername.o prgetprogpath.o
 OBJ1= prmkfname.o prmktmpdir.o
-OBJ2=
+OBJ2= prqotd.o
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
+OBJB=
 
 OBJ= $(OBJA)
 
