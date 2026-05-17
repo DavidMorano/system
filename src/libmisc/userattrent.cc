@@ -149,7 +149,7 @@ int userattrent_parse(UA *uap,char *uabuf,int ualen,cc *sp,int sl) noex {
 	                    cchar	*cp ;
 	                    if (int cl ; (cl = sfshrink(sp,tl,&cp)) >= 0) {
 	                        rs = storeitem_strw(ibp,cp,cl,vpp) ;
-	                    }
+	                    } /* end if */
 	                } /* end if */
 	                sl -= intconv((tp + 1) - sp) ;
 	                sp = (tp + 1) ;
@@ -198,7 +198,7 @@ int userattrent_load(UA *uap,char *uabuf,int ualen,CUA *suap) noex {
 	                            if ((rs = si_copystr(ibp,&rp,dp)) >= 0) {
 	                                kvp[i].value = charp(rp) ;
 	                            }
-	                        }
+	                        } /* end if */
 	                        if (rs < 0) break ;
 	                    } /* end for */
 	                } /* end if (storeitem_block) */
