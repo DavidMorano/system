@@ -152,7 +152,7 @@ int mapstrint_add(MSI *dbp,cchar *kstr,int µklen,int ival) noex {
 	            if (rs < 0) {
 		        libmem.free(ip) ;
 	            } /* end if (error) */
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
