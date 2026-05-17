@@ -73,6 +73,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<ucsig.h>
 #include	<sbuf.h>
 #include	<mkx.h>
@@ -102,7 +103,6 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     extern int uc_writen(int,cvoid *,int) noex ;
     extern int uc_shutdown(int,int) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
@@ -171,7 +171,7 @@ int dialfinger(cc *hn,cc *ps,int af,cc *svc,
 	            }
 	            rs1 = lm_free(mbuf) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory-allocation-free) */
+	        } /* end if (memory-acquire-free) */
 	        if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
