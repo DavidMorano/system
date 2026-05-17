@@ -1,4 +1,4 @@
-/* usysdefs HEADER */
+/* usysdefs_poll HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
