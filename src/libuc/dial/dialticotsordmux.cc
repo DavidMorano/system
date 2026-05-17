@@ -25,7 +25,7 @@
 	implements a multiplexor on the server side.
 
 	Synopsis:
-	int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,
+	int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sav,
 			int to,int opts) noex
 
 	Origin:
@@ -49,9 +49,13 @@
 #include	<csignal>
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<usyscalls.h>
 #include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uxti.h>
 #include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<ucsigset.h>
 #include	<sigblocker.h>
 #include	<buffer.h>
 #include	<sfx.h>
@@ -59,8 +63,11 @@
 #include	<char.h>
 #include	<localmisc.h>
 
-#include	"dialtixotsord.h"
+#include	"dialticotsord.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -76,7 +83,7 @@
 
 /* local typedefs */
 
-typedef mainv		mv ;
+typedef const mainv	cmv ;
 
 
 /* external subroutines */
@@ -90,16 +97,16 @@ typedef mainv		mv ;
 
 /* forward references */
 
-static int	dialer(buffer *,cchar *,int,char *,int,int,int) noex ;
+local int	dialer(buffer *,cchar *,int,char *,int,int,int) noex ;
 
 
 /* local variables */
 
-static constexpr int	sigblocks[] = {
+constexpr int	sigblocks[] = {
 	SIGPIPE,
 	SIGHUP,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -107,45 +114,48 @@ static constexpr int	sigblocks[] = {
 
 /* exported subroutines */
 
-int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,int to,int opts) noex {
+int dialticotsordmux(cc *abuf,int alen,cc *svc,cmv sav,int to,int opts) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (abuf && svc) {
+	if (abuf && svc) ylikely {
 	    rs = SR_INVALID ;
-	    if (svc[0]) {
+	    if (svc[0]) ylikely {
 	        cchar	*sp{} ;
-		if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) {
-	            if (buffer srv ; (rs = buffer_start(&srv,100)) >= 0) {
+		if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) ylikely {
+		    cint bs = 100 ;
+	            if (buffer srv ; (rs = srv.start(bs)) >= 0) ylikely {
 	                cint	dlen = DBUFLEN ;
 	                char *dbuf ; 
-		        if ((rs = lm_mall((dlen+1),&dbuf)) >= 0) {
-	                    buffer_strw(&srv,svc,svclen) ;
-	                    if (sargv != NULL) {
-		                auto	mq = mkquoted ;
-	                        for (int i = 0 ; sargv[i] ; i += 1) {
-				    cchar	*sap = sargv[i] ;
+		        if ((rs = lm_mall((dlen+1),&dbuf)) >= 0) ylikely {
+	                    srv.strw(svc) ;
+	                    if (sav) {
+		                cauto	mq = mkquoted ;
+	                        for (int i = 0 ; sav[i] ; i += 1) {
+				    cchar	*sap = sav[i] ;
 	                            if ((rs = mq(dbuf,dlen,sap,-1)) >= 0) {
-	                                buffer_chr(&srv,' ') ;
-	                                buffer_buf(&srv,dbuf,rs) ;
+	                                srv.chr(' ') ;
+	                                srv.buf(dbuf,rs) ;
 	                            } /* end if (mkquoted) */
 				    if (rs < 0) break ;
 	                        } /* end for */
 	                    } /* end if */
 	                    if (rs >= 0) {
-	                        buffer_chr(&srv,'\n') ;
-	                    }
+	                        srv.chr('\n') ;
+	                    } /* end if (ok) */
 	                    if (rs >= 0) {
 	                        rs = dialer(&srv,abuf,alen,dbuf,dlen,to,opts) ;
 	                        fd = rs ;
-	                    } /* end if (positive) */
+	                    } /* end if (ok) */
 	                    rs1 = lm_free(dbuf) ;
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (m-a-f) */
-	                rs1 = buffer_finish(&srv) ;
+	                rs1 = srv.finish ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (buffer) */
-	            if ((rs >= 0) && (fd >= 0)) u_close(fd) ;
+	            if ((rs >= 0) && (fd >= 0)) nlikely {
+			u_close(fd) ;
+		    } /* end if (error) */
 		} /* end if (sfshrink) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -156,34 +166,33 @@ int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,int to,int opts) noex {
 
 /* local subroutines */
 
-static int dialer(buffer *sbp,cchar *abuf,int alen,char *dbuf,int dlen,
+local int dialer(buffer *sbp,cchar *abuf,int alen,char *dbuf,int dlen,
 		int to,int opts) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (cchar *bp ; (rs = sbp->get(&bp)) >= 0) {
+	if (cchar *bp ; (rs = sbp->get(&bp)) >= 0) ylikely {
 	    cint	blen = rs ;
 	    if (sigblocker ss ; (rs = sigblocker_start(&ss,sigblocks)) >= 0) {
-	        if ((rs = dialticotsord(abuf,alen,to,opts)) >= 0) {
+	        if ((rs = dialticotsord(abuf,alen,to,opts)) >= 0) ylikely {
 	            fd = rs ;
-	            if ((rs = uc_writen(fd,bp,blen)) >= 0) {
+	            if ((rs = uc_writen(fd,bp,blen)) >= 0) ylikely {
 	                dbuf[0] = '\0' ;
 	                if ((rs = uc_readlnto(fd,dbuf,dlen,to)) >= 0) {
 	                    if ((rs == 0) || (dbuf[0] != '+')) {
 	                        rs = SR_BADREQUEST ;
 	                    }
-	                }
+	                } /* end if (uc_readlnto) */
 	            } /* end if (wrote service code) */
 	        } /* end if (opened) */
 	        rs1 = sigblocker_finish(&ss) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
-	    if ((rs < 0) && (fd >= 0)) {
+	    if ((rs < 0) && (fd >= 0)) nlikely {
 		u_close(fd) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (buffer_get) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutiner (dialer) */
+} /* end subroutiner (dialer) */
 
 
