@@ -2,7 +2,7 @@
 
 T= libnss
 
-ALL= $(T).o $(T).so $(T).a
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -61,7 +61,7 @@ LDFLAGS		?= $(MAKELDFLAGS)
 .SUFFIXES:		.hh .ii .iim .ccm
 
 
-default:		$(T).a
+default:		$(T).o
 
 all:			$(ALL)
 
