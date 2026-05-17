@@ -68,8 +68,8 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<ucsig.h>
-#include	<ucread.h>
 #include	<sbuf.h>
 #include	<sfx.h>
 #include	<mkx.h>
@@ -103,7 +103,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_close(int) noex ;
 }
 
 
