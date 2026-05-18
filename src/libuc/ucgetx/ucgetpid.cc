@@ -189,7 +189,7 @@ int ucgetpid::init() noex {
 		}
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
+	        cauto lamb = [this] () -> int {
 	            int		rsl = SR_OK ; /* GCC 'shadow' complaint */
 	            if (!finit) {
 		        rsl = SR_LOCKFAIL ;
