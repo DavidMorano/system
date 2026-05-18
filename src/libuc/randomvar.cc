@@ -254,7 +254,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 		    op->state = nullptr ;
 		    op->magic = 0 ;
 		} /* end if (error) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 }
