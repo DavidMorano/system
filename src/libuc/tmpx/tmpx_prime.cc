@@ -479,7 +479,7 @@ static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 		libmem.free(vp) ;
 		op->fname = nullptr ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 } 
 /* end subroutine (tmpx_openbegin) */
