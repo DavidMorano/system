@@ -62,7 +62,7 @@ struct paramfile_head {
 	varsub		*envp ;		/* environment-variables */
 	time_t		ti_check ;	/* time last checked */
 	PARAMFILE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		llen ;
 	int		flen ;
 	int		intcheck ;
@@ -111,18 +111,21 @@ struct paramfile : paramfile_head {
 	    checkint(this,paramfilemem_checkint) ;
 	    close(this,paramfilemem_close) ;
 	} ;
-    	int open(mainv,cchar * = nullptr) noex ;
-	int curbegin(paramfile_cur *) noex ;
-	int curend(paramfile_cur *) noex ;
-	int curenum(paramfile_cur *,paramfile_ent *,char *,int) noex ;
-	int check(time_t = 0L) noex ;
+    	int open	(mainv,cchar * = nullptr) noex ;
+	int fileadd	(cchar *) noex ;
+	int setdefines	(vecstr *) noex ;
+	int curbegin	(paramfile_cur *) noex ;
+	int curend	(paramfile_cur *) noex ;
+	int curenum	(paramfile_cur *,paramfile_ent *,char *,int) noex ;
+	int fetch	(cchar *,paramfile_cur *,char *,int) noex ;
+	int check	(time_t = 0z) noex ;
 	void dtor() noex ;
 	destruct paramfile() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (paramfile) */
 #else
-typedef PARAMFILE		paramfile ;
+typedef PARAMFILE	paramfile ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
@@ -132,9 +135,9 @@ extern int paramfile_fileadd(paramfile *,cchar *) noex ;
 extern int paramfile_setdefines(paramfile *,vecstr *) noex ;
 extern int paramfile_curbegin(paramfile *,paramfile_cur *) noex ;
 extern int paramfile_curend(paramfile *,paramfile_cur *) noex ;
-extern int paramfile_fetch(paramfile *,cchar *,paramfile_cur *,
-		char *,int) noex ;
 extern int paramfile_curenum(paramfile *,paramfile_cur *,paramfile_ent *,
+		char *,int) noex ;
+extern int paramfile_fetch(paramfile *,cchar *,paramfile_cur *,
 		char *,int) noex ;
 extern int paramfile_checkint(paramfile *,int) noex ;
 extern int paramfile_check(paramfile *,time_t) noex ;
