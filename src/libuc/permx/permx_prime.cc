@@ -255,7 +255,7 @@ int tryer::start() noex {
 		        gids = nullptr ;
 		        f_gidalloc = false ;
 	            } /* end if (error) */
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (empty GIDs) */
 	} /* end if (getngroups) */
 	return rs ;
