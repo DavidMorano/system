@@ -47,6 +47,9 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<ucfileop.h>
 #include	<localmisc.h>
 
 #include	"dialopts.h"
@@ -68,12 +71,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	uc_setsockopt(int,int,int,int *,int) noex ;
-    extern int	uc_linger(int,int) noex ;
-    extern int	uc_closeonexec(int,int) noex ;
-}
 
 
 /* external variables */
@@ -156,7 +153,7 @@ int dialmgr::okeepalive() noex {
 	cint		sol = SOL_SOCKET ;
 	cint		cmd = SO_KEEPALIVE ;
 	int *const	onep = &one ;
-	return uc_setsockopt(fd,sol,cmd,onep,osz) ;
+	return uc_sockoptset(fd,sol,cmd,onep,osz) ;
 }
 /* end method (dialmgr::okeepalive) */
 
