@@ -56,7 +56,7 @@
 #include	<ucopen.h>
 #include	<ucdesc.h>
 #include	<ucsigset.h>
-#include	<sigblocker.h>
+#include	<sigign.h>
 #include	<buffer.h>
 #include	<sfx.h>
 #include	<mkx.h>
@@ -102,11 +102,11 @@ local int	dialer(buffer *,cchar *,int,char *,int,int,int) noex ;
 
 /* local variables */
 
-constexpr int	sigblocks[] = {
+constexpr int	igns[] = {
 	SIGPIPE,
 	SIGHUP,
 	0
-} ; /* end array */
+} ; /* end array (igns) */
 
 
 /* exported variables */
@@ -173,7 +173,7 @@ local int dialer(buffer *sbp,cchar *abuf,int alen,char *dbuf,int dlen,
 	int		fd = -1 ;
 	if (cchar *bp ; (rs = sbp->get(&bp)) >= 0) ylikely {
 	    cint	blen = rs ;
-	    if (sigblocker ss ; (rs = sigblocker_start(&ss,sigblocks)) >= 0) {
+	    if (sigign sig ; (rs = sig.start(igns)) >= 0) {
 	        if ((rs = dialticotsord(abuf,alen,to,opts)) >= 0) ylikely {
 	            fd = rs ;
 	            if ((rs = uc_writen(fd,bp,blen)) >= 0) ylikely {
@@ -185,9 +185,9 @@ local int dialer(buffer *sbp,cchar *abuf,int alen,char *dbuf,int dlen,
 	                } /* end if (uc_readlnto) */
 	            } /* end if (wrote service code) */
 	        } /* end if (opened) */
-	        rs1 = sigblocker_finish(&ss) ;
+	        rs1 = sig.finish ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (sigblock) */
+	    } /* end if (sigign) */
 	    if ((rs < 0) && (fd >= 0)) nlikely {
 		u_close(fd) ;
 	    } /* end if (error) */
