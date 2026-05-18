@@ -36,6 +36,19 @@ extern int	rmtrailchr	(cchar *,int,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+inline int rmeol		(cchar *sp) noex {
+    	return rmeol(sp,-1) ;
+}
+inline int rmwht		(cchar *sp) noex {
+    	return rmwht(sp,-1) ;
+}
+inline int rmblk		(cchar *sp) noex {
+    	return rmblk(sp,-1) ;
+}
+
+#endif /* __cplusplus */
 
 #endif /* RMXCLASS_INCLUDE */
 
