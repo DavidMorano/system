@@ -131,7 +131,7 @@ local inline int paramfile_ctor(paramfile *op,Args ... args) noex {
 	    op->fbuf = nullptr ;
 	    op->fl = {} ;
 	    op->ti_check = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->llen = 0 ;
 	    op->flen = 0 ;
 	    op->intcheck = 0 ;
@@ -185,7 +185,7 @@ template<typename ... Args>
 local inline int paramfile_magic(paramfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == PARAMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == PARAMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (paramfile_magic) */
@@ -263,7 +263,7 @@ int paramfile_open(PF *op,mainv envv,cchar *fname) noex {
 	                    rs = paramfile_envbegin(op) ;
 	                }
 	                if (rs >= 0) {
-	                    op->magic = PARAMFILE_MAGIC ;
+	                    op->magval = PARAMFILE_MAGIC ;
 	                    if (fname) {
 	                        rs = paramfile_fileadd(op,fname) ;
 	                    }
@@ -319,7 +319,7 @@ int paramfile_close(PF *op) noex {
 	        rs1 = paramfile_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -531,12 +531,12 @@ local int paramfile_fileadder(PF *op,cchar *fpath) noex {
 	        if (rs < 0)
 	            paramfile_filedel(op,fi) ;
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 	        file_finish(&fe) ;
+	    }
 	} /* end if (file-start) */
 	return rs ;
-}
-/* end subroutine (paramfile_fileadder) */
+} /* end subroutine (paramfile_fileadder) */
 
 local int paramfile_bufbegin(PF *op) noex {
 	cint		nlines = 2 ;
@@ -556,8 +556,7 @@ local int paramfile_bufbegin(PF *op) noex {
 	    } /* end if (m-a) */
 	} /* end if (maxlinelen) */
 	return (rs >= 0) ? llen : rs ;
-}
-/* end subroutine (paramfile_bufbegin) */
+} /* end subroutine (paramfile_bufbegin) */
 
 local int paramfile_bufend(PF *op) noex {
 	int		rs = SR_OK ;
@@ -569,8 +568,7 @@ local int paramfile_bufend(PF *op) noex {
 	    op->a = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (paramfile_bufend) */
+} /* end subroutine (paramfile_bufend) */
 
 local int paramfile_fileparse(PF *op,int fi) noex {
 	int		rs ;
@@ -604,8 +602,7 @@ local int paramfile_fileparse(PF *op,int fi) noex {
 	    rs = paramfile_filedump(op,fi) ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramfile_fileparse) */
+} /* end subroutine (paramfile_fileparse) */
 
 local int paramfile_fileparser(PF *op,int fi,bfile *lfp) noex {
 	int		rs ;
@@ -638,8 +635,7 @@ local int paramfile_fileparser(PF *op,int fi,bfile *lfp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (paramfile_buf) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramfile_fileparser) */
+} /* end subroutine (paramfile_fileparser) */
 
 local int paramfile_fileparseline(PF *op,int fi,cchar *lp,int ll) noex {
 	field		fsb ;
@@ -679,13 +675,11 @@ local int paramfile_fileparseline(PF *op,int fi,cchar *lp,int ll) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramfile_fileparseline) */
+} /* end subroutine (paramfile_fileparseline) */
 
 local int paramfile_entadd(PF *op,PF_E *pep) noex {
 	return vecobj_add(op->entsp,pep) ;
-}
-/* end subroutine (paramfile_entadd) */
+} /* end subroutine (paramfile_entadd) */
 
 local int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -761,8 +755,7 @@ local int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rvl : rs ;
-}
-/* end subroutine (paramfile_entsub) */
+} /* end subroutine (paramfile_entsub) */
 
 local int paramfile_filefins(PF *op) noex {
 	vecobj		*flp = op->filep ;
@@ -777,8 +770,7 @@ local int paramfile_filefins(PF *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (paramfile_filefins) */
+} /* end subroutine (paramfile_filefins) */
 
 local int paramfile_entfins(PF *op) noex {
 	vecobj		*elp = op->entsp ;
@@ -793,8 +785,7 @@ local int paramfile_entfins(PF *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (paramfile_entfins) */
+} /* end subroutine (paramfile_entfins) */
 
 local int paramfile_filedump(PF *op,int fi) noex {
 	vecobj		*slp = op->entsp ;
@@ -819,8 +810,7 @@ local int paramfile_filedump(PF *op,int fi) noex {
 	    } /* end if (non-null) */
 	} /* end for */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramfile_filedump) */
+} /* end subroutine (paramfile_filedump) */
 
 local int paramfile_filedel(PF *op,int fi) noex {
 	vecobj		*flp = op->filep ;
@@ -840,8 +830,7 @@ local int paramfile_filedel(PF *op,int fi) noex {
 	    }
 	} /* end if (get) */
 	return rs ;
-}
-/* end subroutine (paramfile_filedel) */
+} /* end subroutine (paramfile_filedel) */
 
 local int paramfile_envbegin(PF *op) noex {
 	int		rs = SR_OK ;
@@ -851,8 +840,7 @@ local int paramfile_envbegin(PF *op) noex {
 	    op->fl.envinit = (rs >= 0) ;
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (paramfile_envbegin) */
+} /* end subroutine (paramfile_envbegin) */
 
 local int paramfile_envend(PF *op) noex {
 	int		rs = SR_OK ;
@@ -863,8 +851,7 @@ local int paramfile_envend(PF *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (paramfile_envend) */
+} /* end subroutine (paramfile_envend) */
 
 local int paramfile_envload(PF *op) noex {
 	int		rs = SR_OK ;
@@ -878,8 +865,7 @@ local int paramfile_envload(PF *op) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutines (paramfile_envload) */
+} /* end subroutines (paramfile_envload) */
 
 local int paramfile_defbegin(PF *op,vecstr *dvp) noex {
 	int		rs = SR_OK ;
@@ -892,8 +878,7 @@ local int paramfile_defbegin(PF *op,vecstr *dvp) noex {
 	    rs = paramfile_defload(op,dvp) ;
 	}
 	return rs ;
-}
-/* end subroutines (paramfile_defbegin) */
+} /* end subroutines (paramfile_defbegin) */
 
 local int paramfile_defend(PF *op) noex {
 	int		rs = SR_OK ;
@@ -904,8 +889,7 @@ local int paramfile_defend(PF *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (paramfile_defend) */
+} /* end subroutine (paramfile_defend) */
 
 local int paramfile_defload(PF *op,vecstr *dvp) noex {
 	int		rs = SR_OK ;
@@ -924,8 +908,7 @@ local int paramfile_defload(PF *op,vecstr *dvp) noex {
 	    } /* end for */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (paramfile_defload) */
+} /* end subroutine (paramfile_defload) */
 
 local int paramfile_entrels(PF *op) noex {
 	vecobj		*slp = op->entsp ;
@@ -940,11 +923,18 @@ local int paramfile_entrels(PF *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (paramfile_entrels) */
+} /* end subroutine (paramfile_entrels) */
 
 int paramfile::open(mainv ev,cchar *fname) noex {
 	return paramfile_open(this,ev,fname) ;
+}
+
+int paramfile::fileadd(cchar *fname) noex {
+	return paramfile_fileadd(this,fname) ;
+}
+
+int paramfile::setdefines(vecstr *dvp) noex {
+	return paramfile_setdefines(this,dvp) ;
 }
 
 int paramfile::curbegin(PF_C *curp) noex {
@@ -957,6 +947,10 @@ int paramfile::curend(PF_C *curp) noex {
 
 int paramfile::curenum(PF_C *curp,PF_E *ep,char *rbuf,int rlen) noex {
 	return paramfile_curenum(this,curp,ep,rbuf,rlen) ;
+}
+
+int paramfile::fetch(cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
+	return paramfile_fetch(this,ks,curp,vbuf,vlen) ;
 }
 
 int paramfile::check(time_t dt) noex {
@@ -982,8 +976,7 @@ int paramfile_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (paramfile_co::operator) */
+} /* end method (paramfile_co::operator) */
 
 local int file_start(PF_F *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
@@ -994,8 +987,7 @@ local int file_start(PF_F *fep,cchar *fname) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_start) */
+} /* end subroutine (file_start) */
 
 local int file_finish(PF_F *fep) noex {
 	int		rs = SR_FAULT ;
@@ -1010,8 +1002,7 @@ local int file_finish(PF_F *fep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_finish) */
+} /* end subroutine (file_finish) */
 
 local int entry_start(PF_E *pep,int fi,cc *kp,int kl,VS *vsp,int olen) noex {
 	int		rs = SR_FAULT ;
@@ -1037,8 +1028,7 @@ local int entry_start(PF_E *pep,int fi,cc *kp,int kl,VS *vsp,int olen) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? bsize : rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_finish(PF_E *pep) noex {
 	int		rs = SR_FAULT ;
@@ -1063,8 +1053,7 @@ local int entry_finish(PF_E *pep) noex {
 	    pep->oval = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 local int entry_release(PF_E *pep) noex {
 	int		rs = SR_FAULT ;
@@ -1100,8 +1089,7 @@ local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpentry) */
+} /* end subroutine (vcmpentry) */
 
 local int mkterms() noex {
 	int		rs ;
@@ -1109,7 +1097,6 @@ local int mkterms() noex {
 	    rs = fieldterms(kterms,false,'\b','\t','\v','\f',' ','#','=') ;
 	}
 	return rs ;
-}
-/* end subroutine (mkterms) */
+} /* end subroutine (mkterms) */
 
 
