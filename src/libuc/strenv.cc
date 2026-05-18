@@ -108,7 +108,7 @@ namespace {
     struct valstore {
 	friend		valstore_co ;
 	cchar		*strp[strenv_overlast] ;
-	char		*ma[strenv_overlast] ;	/* memory-allocation */
+	char		*ma[strenv_overlast] ;	/* memory-acquire */
 	bool		facc[strenv_overlast] ;
 	ptm		mx ;		/* data mutex */
 	aflag		fvoid ;
