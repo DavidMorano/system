@@ -205,7 +205,7 @@ int ciq_ins(ciq *op,void *vp) noex {
 	        if ((rs = pq_remtail(op->freep,&pep)) == rse) {
 		    cint	esz = szof(ciq_ent) ;
 	            rs = libmem.mall(esz,&pep) ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	        if (rs >= 0) ylikely {
 	            ciq_ent	*cep = (ciq_ent *) pep ;
 	            cep->vp = vp ;
