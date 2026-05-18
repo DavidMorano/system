@@ -97,7 +97,7 @@ local int sesnotes_ctor(SN *op,Args ... args) noex {
 		    uc_free(bp) ;
 		    op->unbuf = nullptr ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 }
