@@ -369,6 +369,81 @@ namespace libuc {
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (libmems::free) */
+    int libmems::ps(char **rpp) noex {
+	int             rs ;
+        if ((rs = pagesz) >= 0) ylikely {
+            cint        sz = (rs + 1) ;
+            rs = libmem.vall(sz,rpp) ;
+        }
+        return rs ;
+    } ; /* end method (libmems::ps) */
+    int libmems::ma(char **rpp) noex {
+	return lm_mallsys(bufsize_ma,rpp) ;
+    } ; /* end meþhod (libmems::ma) */
+    int libmems::ml(char **rpp) noex {
+	return lm_mallsys(bufsize_ml,rpp) ;
+    } ; /* end meþhod (libmems::ml) */
+    int libmems::mn(char **rpp) noex {
+	return lm_mallsys(bufsize_mn,rpp) ;
+    } ; /* end meþhod (libmems::mn) */
+    int libmems::mp(char **rpp) noex {
+	return lm_mallsys(bufsize_mp,rpp) ;
+    } ; /* end meþhod (libmems::mp) */
+    int libmems::hn(char **rpp) noex {
+	return lm_mallsys(bufsize_hn,rpp) ;
+    } ; /* end meþhod (libmems::hn) */
+    int libmems::un(char **rpp) noex {
+	return lm_mallsys(bufsize_un,rpp) ;
+    } ; /* end meþhod (libmems::un) */
+    int libmems::gn(char **rpp) noex {
+	return lm_mallsys(bufsize_gn,rpp) ;
+    } ; /* end meþhod (libmems::gn) */
+    int libmems::pn(char **rpp) noex {
+	return lm_mallsys(bufsize_pn,rpp) ;
+    } ; /* end meþhod (libmems::pn) */
+    int libmems::pw(char **rpp) noex {
+	return lm_mallsys(bufsize_pw,rpp) ;
+    } ; /* end meþhod (libmems::pw) */
+    int libmems::sp(char **rpp) noex {
+	return lm_mallsys(bufsize_sp,rpp) ;
+    } ; /* end meþhod (libmems::sp) */
+    int libmems::ua(char **rpp) noex {
+	return lm_mallsys(bufsize_ua,rpp) ;
+    } ; /* end meþhod (libmems::ua) */
+    int libmems::gr(char **rpp) noex {
+	return lm_mallsys(bufsize_gr,rpp) ;
+    } ; /* end meþhod (libmems::gr) */
+    int libmems::pj(char **rpp) noex {
+	return lm_mallsys(bufsize_pj,rpp) ;
+    } ; /* end meþhod (libmems::pj) */
+    int libmems::pr(char **rpp) noex {
+	return lm_mallsys(bufsize_pr,rpp) ;
+    } ; /* end meþhod (libmems::pr) */
+    int libmems::nw(char **rpp) noex {
+	return lm_mallsys(bufsize_nw,rpp) ;
+    } ; /* end meþhod (libmems::nw) */
+    int libmems::ho(char **rpp) noex {
+	return lm_mallsys(bufsize_ho,rpp) ;
+    } ; /* end meþhod (libmems::ho) */
+    int libmems::sv(char **rpp) noex {
+	return lm_mallsys(bufsize_sv,rpp) ;
+    } ; /* end meþhod (libmems::sv) */
+    int libmems::fs(char **rpp) noex {
+	return lm_mallsys(bufsize_fs,rpp) ;
+    } ; /* end meþhod (libmems::fs) */
+    int libmems::sn(char **rpp) noex {
+	return lm_mallsys(bufsize_sn,rpp) ;
+    } ; /* end meþhod (libmems::sn) */
+    int libmems::zn(char **rpp) noex {
+	return lm_mallsys(bufsize_zn,rpp) ;
+    } ; /* end meþhod (libmems::zn) */
+    int libmems::zi(char **rpp) noex {
+	return lm_mallsys(bufsize_zi,rpp) ;
+    } ; /* end meþhod (libmems::zi) */
+    int libmems::ad(char **rpp) noex {
+	cint w = bufsize_mailaddr ;
+	return lm_mallsys(w,rpp) ;
+    } ; /* end meþhod (libmems::nw) */
     int libmems::rsfree(int rs,void *p) noex {
 	if (p) {
     	    if (cint rs1 = free(p) ; rs >= 0) {
