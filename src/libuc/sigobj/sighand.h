@@ -26,10 +26,9 @@
 #include	<usysbase.h>
 
 
-#define	SIGHAND_MAGIC	0x66938271
 #define	SIGHAND		struct sighand_head
 #define	SIGHAND_HA	struct sighand_handle
-
+#define	SIGHAND_MAGIC	0x66938271
 
 #ifndef	TYPEDEF_SIGHANDF
 #define	TYPEDEF_SIGHANDF
@@ -37,7 +36,6 @@ EXTERNC_begin
 typedef void (*sighand_f)(int,siginfo_t *,void *) noex ;
 EXTERNC_end
 #endif /* TYPEDEF_SIGHANDF */
-
 
 struct sighand_handle {
 	SIGACTION	action ;
@@ -47,17 +45,46 @@ struct sighand_handle {
 struct sighand_head {
 	SIGHAND_HA	*handles ;
 	sigset_t	osm ;
-	uint		magic ;
+	uint		magval ;
 	int		nhandles ;
 	int		nblocks ;
 } ; /* end struct */
 
-typedef SIGHAND		sighand ;
 typedef	SIGHAND_HA	sighand_ha ;
 
-EXTERNC_begin
+#ifdef	__cplusplus
+enum sighandmems {
+	sighandmem_finish,
+	sighandmem_overlast
+} ; /* end enum */
+struct sighand ;
+struct sighand_co {
+	sighand		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (sighand *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () (const int * = nullptr) noex ;
+} ; /* end struct (sighand_co) */
+struct sighand : sighand_head {
+	sighand_co	finish ;
+	sighand() noex {
+	    finish	(this,sighandmem_finish) ;
+	    magval = 0 ;
+	} ; /* end ctor */
+	int start(cint *,cint *,cint *,sighand_f) noex ;
+	void dtor() noex ;
+	destruct sighand() {
+	    if (magval) dtor() ;
+	} ; /* end destruct */
+} ; /* end class (sighand) */
+#else
+typedef	SIGHAND		sighand ;
+#endif /* __cplusplus */
 
-typedef void (*sighand_handler)(int,siginfo_t *,void *) noex ;
+EXTERNC_begin
 
 extern int sighand_start(sighand *,cint *,cint *,cint *,sighand_f) noex ;
 extern int sighand_finish(sighand *) noex ;
