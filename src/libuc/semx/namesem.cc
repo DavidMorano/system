@@ -156,7 +156,7 @@ int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint c) noex {
 				lm_free(op->name) ;
 				op->name = nullptr ;
 			    } /* end if (error) */
-			} /* end if (memory-allocation) */
+			} /* end if (memory-acquire) */
 	            } /* end if (opened) */
 		    rs1 = pn.finish ;
 		    if (rs >= 0) rs = rs1 ;
