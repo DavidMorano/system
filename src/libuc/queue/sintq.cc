@@ -95,7 +95,7 @@ int sintq_start(sintq *op,int ne) noex {
 	            op->cnt = 0 ;
 	            op->ri = 0 ;
 	            op->wi = 0 ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -291,7 +291,7 @@ local int sinq_ext(sintq *op) noex {
 		    op->qbuf = na ;
 		    op->qlen = nlen ;
 		} /* end if (memory-deallocation) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (bug-check) */
 	DEBPRINTF("ret rs=%d nlen=%d\n",rs,nlen) ;
 	return rs ;
