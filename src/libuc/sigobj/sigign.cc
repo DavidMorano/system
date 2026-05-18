@@ -69,7 +69,7 @@ using libuc::libmem ;
 
 /* forward references */
 
-static int	getnhandles(cint *) noex ;
+local int	getnhandles(cint *) noex ;
 
 
 /* local variables */
@@ -77,7 +77,7 @@ static int	getnhandles(cint *) noex ;
 constexpr int	sigouts[] = {
 	SIGTTOU,
 	0
-} ;
+} ; /* end array (sigouts) */
 
 
 /* exported variables */
@@ -132,7 +132,7 @@ int sigign_start(sigign *iap,cint *ignores) noex {
 	        } /* end if (handles) */
 	    } /* end if (ignores) */
 	    if (rs >= 0) {
-	        iap->magic = SIGIGN_MAGIC ;
+	        iap->magval = SIGIGN_MAGIC ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? nhandles : rs ;
@@ -144,7 +144,7 @@ int sigign_finish(sigign *iap) noex {
 	int		rs1 ;
 	if (iap) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (iap->magic == SIGIGN_MAGIC) ylikely {
+	    if (iap->magval == SIGIGN_MAGIC) ylikely {
 	        if (iap->handles) {
 	            SIGACTION	*sap ;
 	            for (int j = (iap->nhandles-1)  ; j >= 0 ; j -= 1) {
@@ -157,7 +157,7 @@ int sigign_finish(sigign *iap) noex {
 	            if (rs >= 0) rs = rs1 ;
 	            iap->handles = nullptr ;
 	        } /* end if */
-	        iap->magic = 0 ;
+	        iap->magval = 0 ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
@@ -167,7 +167,7 @@ int sigign_finish(sigign *iap) noex {
 
 /* local subroutines */
 
-static int getnhandles(cint *ignores) noex {
+local int getnhandles(cint *ignores) noex {
     	int		i = 0 ; /* used-afterwards */
 	if (ignores) ylikely {
 	    while (ignores[i] > 0) {
@@ -175,7 +175,35 @@ static int getnhandles(cint *ignores) noex {
 	    }
 	} /* end if (non-null) */
 	return i ;
-}
-/* end subroutine (getnhandles) */
+} /* end subroutine (getnhandles) */
+
+int sigign_co::operator () (cint *sigs) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    rs = sigign_start(op,sigs) ;
+	}
+	return rs ;
+} /* end method (sigign::operator) */
+
+sigign_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case sigignmem_start:
+	        rs = sigign_start(op,nullptr) ;
+	        break ;
+	    case sigignmem_finish:
+	        rs = sigign_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (sigign::operator) */
+
+void sigign::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("sigign",rs,"fini-finish") ;
+	}
+} /* end method (sigign::dtor) */
 
 
