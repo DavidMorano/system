@@ -56,6 +56,8 @@
 
 /* forward references */
 
+local int	mksignew(sigset_t *,cint *) noex ;
+
 
 /* local variables */
 
@@ -68,19 +70,12 @@
 int sigblocker_start(sigblocker *op,cint *sigs) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
-	    sigset_t	nsm ;
-	    rs = SR_OK ;
-	    if (sigs) {
-	        if ((rs = uc_sigsetempty(&nsm)) >= 0) {
-	            for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
-	                rs = uc_sigsetadd(&nsm,sigs[i]) ;
-	            }
-		}
-	    } else {
-	        rs = uc_sigsetfill(&nsm) ;
-	    }
-	    if (rs >= 0) ylikely {
-	        rs = u_sigmask(SIG_BLOCK,&nsm,&op->osm) ;
+	    if (sigset_t nsm{} ; (rs = mksignew(&nsm,sigs)) >= 0) ylikely {
+		cint cmd = SIG_BLOCK ;
+		if (sigset_t o ; (rs = u_sigmask(cmd,&nsm,&o)) >= 0) ylikely {
+		    op->osm = o ;
+		    op->magval = SIGBLOCKER_MAGIC ;
+		} /* end if */
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
@@ -91,7 +86,8 @@ int sigblocker_finish(sigblocker *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = u_sigmask(SIG_SETMASK,&op->osm,nullptr) ;
-	}
+	    op->magval = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sigblocker_finish) */
@@ -105,8 +101,7 @@ int sigblocker_co::operator () (cint *sigs) noex {
 	    rs = sigblocker_start(op,sigs) ;
 	}
 	return rs ;
-}
-/* end method (sigblocker::operator) */
+} /* end method (sigblocker::operator) */
 
 sigblocker_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -119,15 +114,28 @@ sigblocker_co::operator int () noex {
 	        rs = sigblocker_finish(op) ;
 	        break ;
 	    } /* end switch */
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (sigblocker::operator) */
+} /* end method (sigblocker::operator) */
 
 void sigblocker::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("sigblocker",rs,"fini-finish") ;
 	}
-}
+} /* end method (sigblocker::dtor) */
+
+local int mksignew(sigset_t *rp,cint *sigs) noex {
+    	int		rs = SR_OK ;
+	if (sigs) {
+	    if ((rs = uc_sigsetempty(rp)) >= 0) {
+		for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
+		    rs = uc_sigsetadd(rp,sigs[i]) ;
+		} /* end for */
+	    } /* end if */
+	} else {
+	    rs = uc_sigsetfill(rp) ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (mksignew) */
 
 
