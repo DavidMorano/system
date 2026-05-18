@@ -127,7 +127,7 @@ int unameo_start(unameo *op) noex {
 	                    bp = (strwcpy(bp,unp->version,nlen) + 1) ;
 	                    op->machine = bp ;
 	                    bp = (strwcpy(bp,unp->machine,nlen) + 1) ;
-	                } /* end if (memory-allocation) */
+	                } /* end if (memory-acquire) */
 	            } /* end if (uname) */
 	            rs1 = lm_free(unp) ;
 	            if (rs >= 0) rs = rs1 ;
