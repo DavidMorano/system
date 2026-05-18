@@ -42,8 +42,8 @@ LIBS +=
 
 OBJ0= ucdescmiscers.o uccloseonexec.o
 OBJ1= ucftruncate.o ucfminmod.o
-OBJ2= ucfstat.o
-OBJ3= ucnonblock.o
+OBJ2= ucfstat.o ucdescmanip.o
+OBJ3= ucnonblock.o ucndelay.o
 
 OBJ4= ucclose.o
 OBJ5= 
@@ -152,11 +152,13 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+ucdescmanip.o:		ucdescmanip.cc		ucdescmanip.h		$(INCS)
 ucdescmiscers.o:	ucdescmiscers.cc	ucdescmiscers.h		$(INCS)
 uccloseonexec.o:	uccloseonexec.cc	uccloseonexec.h		$(INCS)
 ucftruncate.o:		ucftruncate.cc		ucftruncate.h		$(INCS)
 ucfminmod.o:		ucfminmod.cc		ucfminmod.h		$(INCS)
 ucfstat.o:		ucfstat.cc		ucfstat.h		$(INCS)
+ucndelay.o:		ucndelay.cc		ucndelay.h		$(INCS)
 ucnonblock.o:		ucnonblock.cc		ucnonblock.h		$(INCS)
 ucclose.o:		ucclose.cc		ucclose.h		$(INCS)
 
