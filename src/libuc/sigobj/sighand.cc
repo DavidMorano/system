@@ -53,7 +53,7 @@ import libutil ;			/* |memclear(3u)| */
 /* local defines */
 
 #define	SH		sighand
-#define	SH_H		sighand_handler
+#define	SH_F		sighand_f
 
 
 /* imported namespaces */
@@ -76,14 +76,13 @@ using libuc::libmem ;
 /* forward references */
 
 template<typename ... Args>
-static inline int sighand_magic(SH *op,Args ... args) noex {
+local inline int sighand_magic(SH *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SIGHAND_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SIGHAND_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (sighand_magic) */
+} /* end subroutine (sighand_magic) */
 
 
 /* local variables */
@@ -94,7 +93,7 @@ static inline int sighand_magic(SH *op,Args ... args) noex {
 
 /* exported subroutines */
 
-int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
+int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_F hf) noex {
 	int		rs = SR_FAULT ;
 	if (iap) ylikely {
             sigset_t        nsm ;
@@ -103,7 +102,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
             void            *p ;
             rs = memclear(iap) ; /* dangerous */
             if (hf == nullptr) {
-                hf = cast_reinterpret<SH_H>(voidp(SIG_IGN)) ;
+                hf = cast_reinterpret<SH_F>(voidp(SIG_IGN)) ;
             }
     /* blocks */
             if ((rs >= 0) && (blocks != nullptr)) {
@@ -156,7 +155,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
                         hsig = cats[i] ;
                         hp[j].sig = hsig ;
                         sap = &hp[j].action ;
-                        san.sa_sigaction = (sighand_handler) hf ;
+                        san.sa_sigaction = (SH_F) hf ;
                         san.sa_mask = nsm ;
                         san.sa_flags = (SA_SIGINFO | SA_RESTART) ;
                         rs = u_sigaction(hsig,&san,sap) ;
@@ -176,7 +175,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_H hf) noex {
                 }
             } /* end if (memory allocations) */
             if (rs >= 0) {
-                iap->magic = SIGHAND_MAGIC ;
+                iap->magval = SIGHAND_MAGIC ;
             }
 	} /* end if (non-null) */
 	return rs ;
@@ -203,10 +202,35 @@ int sighand_finish(SH *iap) noex {
 	    if (iap->nblocks > 0)  {
 	        pthread_sigmask(SIG_SETMASK,&iap->osm,nullptr) ;
 	    }
-	    iap->magic = 0 ;
+	    iap->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sighand_finish) */
+
+
+/* private subroutines */
+
+int sighand::start(cint *blks,cint *igns,cint *cats,sighand_f hand) noex {
+    	return sighand_start(this,blks,igns,cats,hand) ;
+} /* end method (sighand::start) */
+
+sighand_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case sighandmem_finish:
+	        rs = sighand_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (sighand::operator) */
+
+void sighand::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("sighand",rs,"fini-finish") ;
+	}
+} /* end method (sighand::dtor) */
 
 
