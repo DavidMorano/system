@@ -32,6 +32,8 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<sockaddress.h>
 #include	<stdorder.h>
 #include	<serialbuf.h>
