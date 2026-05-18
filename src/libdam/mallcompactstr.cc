@@ -170,7 +170,7 @@ local int mallcompactstr_reg(cchar *sp,int sl,char **rpp) noex {
             *bp = '\0' ;
             len = intconv(bp - buf) ;
             *rpp = (rs >= 0) ? buf : nullptr ;
-        } /* end if (memory-allocation) */
+        } /* end if (memory-acquire) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (mallcompactstr_reg) */
 
