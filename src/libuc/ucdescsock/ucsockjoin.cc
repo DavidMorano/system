@@ -47,10 +47,11 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<uclibsubs.h>
+#include	<ucdesc.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
-#include	"ucsock.h"
+#include	"ucdescsock.h"
 
 /* local defines */
 
