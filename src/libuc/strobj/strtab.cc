@@ -688,7 +688,7 @@ local int strtab_newchunk(strtab *op,int amount) noex {
 	        lm_free(op->chp) ;
 	        op->chp = nullptr ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (strtab_newchunk) */
