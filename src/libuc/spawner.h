@@ -15,6 +15,30 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	Object:
+	spawner
+
+	Description:
+	Here we spawn a process while specifying options for its
+	start-up.
+
+	Synopsis:
+	int spawner_start(spawner *op,cchar *fname,mainv argv,mainv envv) noex
+
+	Arguments:
+	op		pointer to optional file descriptor dispositions
+	fname		program to execute
+	argv		arguments to program
+	envv		environment to program
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
+
+*******************************************************************************/
+
 #ifndef	SPAWNER_INCLUDE
 #define	SPAWNER_INCLUDE
 
@@ -58,7 +82,7 @@ struct spawner_head {
 	pid_t		pgrp ;
 	uint		magic ;
 	int		opts ;
-} ;
+} ; /* end struct (spawner_head) */
 
 typedef SPAWNER		spawner ;
 
