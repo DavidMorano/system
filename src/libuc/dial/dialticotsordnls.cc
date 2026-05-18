@@ -30,7 +30,7 @@
 	Arguments:
 	abuf		XTI address
 	alen		address of XTI address
-	svcbuf		service specification
+	svc		service specification
 	to		to ('>=0' mean use one, '-1' means do not)
 	dot
 
@@ -68,10 +68,12 @@
 #include	<ucopen.h>
 #include	<ucdesc.h>
 #include	<ucsigset.h>
+#include	<bufsizevar.hh>
+#include	<sigign.h>
 #include	<sbuf.h>
-#include	<sigblocker.h>
+#include	<rmx.h>
 #include	<cfdec.h>
-#include	<char.h>
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
 #include	"nlsdialassist.h"
@@ -83,15 +85,15 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	SRV_TCPMUX	"tcpmux"
-#define	SRV_LISTEN	"listen"
-#define	SRV_TCPNLS	"tcpnls"
+#define	NLSBUFLEN_MULT	30
 
-#ifndef	SVCLEN
-#define	SVCLEN		MAXNAMELEN
-#endif
 
-#define	NLSBUFLEN	(SVCLEN + 30)
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -102,11 +104,39 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local structures */
 
+namespace {
+    struct dialer {
+	cc	*svcp ;			/* caller supplied */
+	cc	*abuf ;			/* caller supplied */
+	char	*nlsbuf ;		/* allocated */
+	int	alen ;			/* caller supplied */
+	int	to ;			/* caller supplied */
+	int	opts ;			/* caller supplied */
+	int	nlslen ;		/* calculated */
+	int	svcl ;			/* calculated */
+	dialer(cc *ab,int al,cc *s,int t,int o) noex : abuf(ab), alen(al) {
+	    svcp = s ;
+	    to = t ;
+	    opts = o ;
+	    svcl = rmwht(s) ;
+	} ; /* emd ctor */
+	operator int () noex ;
+	int dialout() noex ;
+    } ; /* end struct (dialer) */
+} /* end namespace */
 
 /* forward references */
 
 
 /* local vaiables */
+
+static bufsizevar	maxpathlen(bufsize_mp) ;
+
+constexpr int	igns[] = {
+    	SIGPIPE,
+	SIGHUP,
+	0
+} ; /* end array (igns) */
 
 
 /* exported variables */
@@ -114,52 +144,61 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* exported subroutines */
 
-int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
-	cint		nlslen = NLSBUFLEN ;
+int dialticotsordnls(cc *abuf,int alen,cc *svc,int to,int opts) noex {
+    	int		rs = SR_FAULT ;
+	int		fd = -1 ;
+	if (svc) {
+	    rs = SR_INVALID ;
+	    if(svc[0]) {
+	        if ((rs = maxpathlen) >= 0) {
+	            if (dialer dobj(abuf,alen,svc,to,opts) ; (rs = dobj) >= 0) {
+		        fd = rs ;
+		    }
+	        } /* end if (maxpathlen) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+    	return (rs >= 0) ? fd : rs ;
+} /* end subroutine (dialticotsordnls) */
+
+
+/* local subroutines */
+
+dialer::operator int () noex {
+    	int		rs = SR_INVALID ;
+	int		rs1 ;
+	int		fd = -1 ;
+	if (svcl > 0) {
+	    if ((rs = maxpathlen) >= 0) {
+	        nlslen = (rs * NLSBUFLEN_MULT) ;
+	        if ((rs = lm_mall((nlslen + 1),&nlsbuf)) >= 0) {
+		    {
+		        rs = dialout() ;
+		        fd = rs ;
+		    }
+		    rs1 = lm_free(nlsbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (maxpathlen) */
+	} /* end if (valid) */
+    	return (rs >= 0) ? fd : rs ;
+} /* end method (dialer::operator) */
+
+int dialer::dialout() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		svclen ;
 	int		fd = -1 ;
-	char		nlsbuf[NLSBUFLEN + 1] ;
-
-	if ((abuf != nullptr) && (abuf[0] == '\0'))
-	    abuf = nullptr ;
-
-/* perform some cleanup on the service code specification */
-
-	if (svcbuf == nullptr)
-	    return SR_INVAL ;
-
-	while (CHAR_ISWHITE(*svcbuf)) svcbuf += 1 ;
-	svclen = lenstr(svcbuf) ;
-
-	while (svclen && CHAR_ISWHITE(svcbuf[svclen - 1])) {
-	    svclen -= 1 ;
-	}
-
-	if (svclen <= 0)
-	    return SR_INVAL ;
-
-	if (abuf == nullptr) {
+	if ((abuf == nullptr) || (abuf[0] == '\0')) {
 	    abuf = "local" ;
 	    alen = lenstr(abuf) ;
 	} /* end if (default UNIX® address!) */
-
-	if ((rs = mknlsreq(nlsbuf,nlslen,svcbuf,svclen)) >= 0) {
-	    SIGACTION	osigs ;
-	    SIGACTION	nsigs{} ;
-	    sigset_t	sigmask ;
+	if ((rs = mknlsreq(nlsbuf,nlslen,svcp,svcl)) >= 0) {
 	    cint	blen = rs ;
-	    uc_sigsetempty(&sigmask) ;
-	    nsigs.sa_handler = SIG_IGN ;
-	    nsigs.sa_mask = sigmask ;
-	    nsigs.sa_flags = 0 ;
-	    if ((rs = u_sigaction(SIGPIPE,&nsigs,&osigs)) >= 0) {
+	    if (sigign sig ; (rs = sig.start(igns)) >= 0) {
 	        if ((rs = dialticotsord(abuf,alen,to,opts)) >= 0) {
 	            fd = rs ;
 	            if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
 			if (char *tbuf ; (rs = lm_mn(&tbuf)) >= 0) {
-			    cint	tlen = rs ;
+			    cint tlen = rs ;
 			    {
 	                        rs = readnlsresp(fd,tbuf,tlen,to) ;
 			    }
@@ -168,16 +207,14 @@ int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
 			} /* end if (m-a-f) */
 	            } /* end if (reading response) */
 	        } /* end if (opened) */
-	        rs1 = u_sigaction(SIGPIPE,&osigs,nullptr) ;
+	        rs1 = sig.finish ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (sig-action) */
-	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-	} else {
-	    rs = SR_TOOBIG ;
-	}
-
+	    } /* end if (sigign) */
+	    if ((rs < 0) && (fd >= 0)) {
+		u_close(fd) ;
+	    } /* end if (error) */
+	} /* end if (mknlsreq) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialticotsordnls) */
+} /* end method (dialer::dialout) */
 
 
