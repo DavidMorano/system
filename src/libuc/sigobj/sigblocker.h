@@ -24,19 +24,21 @@
 #include	<usysbase.h>
 
 
-#define	SIGBLOCKER	struct sigblocker_head
+#define	SIGBLOCKER		struct sigblocker_head
+#define	SIGBLOCKER_MAGIC	0x01845626
 
 
 struct sigblocker_head {
 	sigset_t	osm ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum sigblockermems {
 	sigblockermem_start,
 	sigblockermem_finish,
 	sigblockermem_overlast
-} ;
+} ; /* end enum */
 struct sigblocker ;
 struct sigblocker_co {
 	sigblocker	*op = nullptr ;
@@ -52,15 +54,15 @@ struct sigblocker : sigblocker_head {
 	sigblocker_co	start ;
 	sigblocker_co	finish ;
 	sigblocker() noex {
-	    start(this,sigblockermem_start) ;
-	    finish(this,sigblockermem_finish) ;
-	} ;
+	    start	(this,sigblockermem_start) ;
+	    finish	(this,sigblockermem_finish) ;
+	    magval = 0 ;
+	} ; /* end ctor */
 	void dtor() noex ;
 	destruct sigblocker() {
-	    dtor() ;
-	}
+	    if (magval) dtor() ;
+	} ; /* end destruct */
 } ; /* end class (sigblocker) */
-
 #else
 typedef	SIGBLOCKER	sigblocker ;
 #endif /* __cplusplus */
