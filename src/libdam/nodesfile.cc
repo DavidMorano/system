@@ -171,7 +171,7 @@ int nodesfile_ent::finish() noex {
 /* forward references */
 
 template<typename ... Args>
-static inline int nodesfile_ctor(nodesfile *op,Args ... args) noex {
+local inline int nodesfile_ctor(nodesfile *op,Args ... args) noex {
     	NODESFILE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
@@ -191,7 +191,7 @@ static inline int nodesfile_ctor(nodesfile *op,Args ... args) noex {
 }
 /* end subroutine (nodesfile_ctor) */
 
-static int nodesfile_dtor(nodesfile *op) noex {
+local int nodesfile_dtor(nodesfile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -209,7 +209,7 @@ static int nodesfile_dtor(nodesfile *op) noex {
 /* end subroutine (nodesfile_dtor) */
 
 template<typename ... Args>
-static inline int nodesfile_magic(nodesfile *op,Args ... args) noex {
+local inline int nodesfile_magic(nodesfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == NODESFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -218,25 +218,25 @@ static inline int nodesfile_magic(nodesfile *op,Args ... args) noex {
 }
 /* end subroutine (nodesfile_magic) */
 
-static int	nodesfile_fnparse(NF *,cchar *) noex ;
-static int	nodesfile_fnparseln(NF *,int,cchar *,int) noex ;
-static int	nodesfile_fnparseload(NF *,int,cchar *,int) noex ;
+local int	nodesfile_fnparse(NF *,cchar *) noex ;
+local int	nodesfile_fnparseln(NF *,int,cchar *,int) noex ;
+local int	nodesfile_fnparseload(NF *,int,cchar *,int) noex ;
 
-static int	nodesfile_fnloadbegin(NF *,cc *,bfile *) noex ;
-static int	nodesfile_fnloadend(NF *,int) noex ;
-static int	nodesfile_fnalready(NF *,USTAT *) noex ;
+local int	nodesfile_fnloadbegin(NF *,cc *,bfile *) noex ;
+local int	nodesfile_fnloadend(NF *,int) noex ;
+local int	nodesfile_fnalready(NF *,USTAT *) noex ;
 
 #ifdef	COMMENT
-static int	nodesfile_filechanged(NF *,time_t) noex ;
+local int	nodesfile_filechanged(NF *,time_t) noex ;
 #endif
 
-static int	nodesfile_fins(NF *) noex ;
-static int	nodesfile_finents(NF *) noex ;
-static int	nodesfile_finfis(NF *) noex ;
+local int	nodesfile_fins(NF *) noex ;
+local int	nodesfile_finents(NF *) noex ;
+local int	nodesfile_finfis(NF *) noex ;
 
 extern "C" {
-    static uint	enthash(cvoid *,int) noex ;
-    static int	entmat(cvoid *,cvoid *,int) noex ;
+    local uint	enthash(cvoid *,int) noex ;
+    local int	entmat(cvoid *,cvoid *,int) noex ;
 }
 
 
@@ -311,7 +311,7 @@ int nodesfile_close(NF *op) noex {
 }
 /* end subroutine (nodesfile_close) */
 
-static int nodesfile_fins(NF *op) noex {
+local int nodesfile_fins(NF *op) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -326,7 +326,7 @@ static int nodesfile_fins(NF *op) noex {
 }
 /* end subroutine (nodesfile_fins) */
 
-static int nodesfile_finents(NF *op) noex {
+local int nodesfile_finents(NF *op) noex {
     	hdb		*elp = op->elp ;
 	cint		rsn = SR_NOTFOUND ;
     	int		rs ;
@@ -358,7 +358,7 @@ static int nodesfile_finents(NF *op) noex {
 }
 /* end subroutine (nodesfile_finents) */
 
-static int nodesfile_finfis(NF *op) noex {
+local int nodesfile_finfis(NF *op) noex {
     	vechand		*flp = op->flp ;
 	cint		rsn = SR_NOTFOUND ;
     	int		rs ;
@@ -500,7 +500,7 @@ int nodesfile_curenum(NF *op,NF_CUR *curp,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-static int nodesfile_fnparse(NF *op,cc *fn) noex {
+local int nodesfile_fnparse(NF *op,cc *fn) noex {
     	int		rs ;
 	int		rs1 ;
 	if (linebuffer lb ; (rs = lb.start) >= 0) {
@@ -528,10 +528,9 @@ static int nodesfile_fnparse(NF *op,cc *fn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (linebuffer) */
 	return rs ;
-}
-/* end subroutine (nodesfile_fnparse) */
+} /* end subroutine (nodesfile_fnparse) */
 
-static int nodesfile_fnparseln(NF *op,int fi,cc *lp,int ll) noex {
+local int nodesfile_fnparseln(NF *op,int fi,cc *lp,int ll) noex {
     	int		rs = SR_OK ;
 	sif		lo(lp,ll) ;
 	cchar		*cp ;
@@ -540,10 +539,9 @@ static int nodesfile_fnparseln(NF *op,int fi,cc *lp,int ll) noex {
 	    if (rs < 0) break ;
 	} /* end for */
     	return rs ;
-}
-/* end subroutine (nodesfile_fnparseln) */
+} /* end subroutine (nodesfile_fnparseln) */
 
-static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
+local int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
     	cnullptr	np{} ;
     	int		rs ;
 	int		idx = INT_MAX ;
@@ -576,10 +574,9 @@ static int nodesfile_fnloadbegin(NF *op,cchar *fn,bfile *fp) noex {
 	    } /* end if (nodesfile_fnalready) */
 	} /* end if (bfile_stat) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (nodesfile_fnloadbegin) */
+} /* end subroutine (nodesfile_fnloadbegin) */
 
-static int nodesfile_fnloadend(NF *op,int fi) noex {
+local int nodesfile_fnloadend(NF *op,int fi) noex {
     	vechand		*flp = op->flp ;
     	int		rs ;
 	int		rs1 ;
@@ -596,10 +593,9 @@ static int nodesfile_fnloadend(NF *op,int fi) noex {
 	    } /* end if (non-null) */
 	} /* end if (get) */
 	return rs ;
-}
-/* end subroutine (nodesfile_fnloadend) */
+} /* end subroutine (nodesfile_fnloadend) */
 
-static int nodesfile_fnalready(NF *op,USTAT *sbp) noex {
+local int nodesfile_fnalready(NF *op,USTAT *sbp) noex {
     	vechand		*flp = op->flp ;
     	int		rs ;
 	int		fal = false ;
@@ -614,10 +610,9 @@ static int nodesfile_fnalready(NF *op,USTAT *sbp) noex {
 	    if (fal) break ;
 	} /* end for */
 	return (rs >= 0) ? fal : rs ;
-}
-/* end subroutine (nodesfile_fnalready) */
+} /* end subroutine (nodesfile_fnalready) */
 
-static int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
+local int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
     	cint		esz = szof(NF_ENT) ;
 	int		rs ;
@@ -646,20 +641,18 @@ static int nodesfile_fnparseload(NF *op,int fi,cchar *sp,int sl) noex {
 	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (nodesfile_fnparseload) */
+} /* end subroutine (nodesfile_fnparseload) */
 
 #ifdef	COMMENT
-static int nodesfile_filechanged(NF *op,time_t dt) noex {
+local int nodesfile_filechanged(NF *op,time_t dt) noex {
 	(void) op ;
 	(void) dt ;
 	return 0 ;
-}
-/* end subroutine (nodesfile_filechanged) */
+} /* end subroutine (nodesfile_filechanged) */
 #endif /* COMMENT */
 
 #ifdef	COMMENT
-static int nodesfile_filechanged(NF *op,time_t daytime) noex {
+local int nodesfile_filechanged(NF *op,time_t daytime) noex {
 	int		rs ;
 	int		f = false ;
 	if (USTAT sb ; (rs = uc_stat(op->fi.fname,&sb)) >= 0) {
@@ -683,11 +676,10 @@ static int nodesfile_filechanged(NF *op,time_t daytime) noex {
 	    } /* end if (file changed) */
 	} /* end if (uc_stat) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (nodesfile_filechanged) */
+} /* end subroutine (nodesfile_filechanged) */
 #endif /* COMMENT */
 
-static uint enthash(cvoid *cvp,int cvl) noex {
+local uint enthash(cvoid *cvp,int cvl) noex {
     NF_ENT	*ep = (NF_ENT *) cvp ;
     uint	hv ;
     {
@@ -696,10 +688,9 @@ static uint enthash(cvoid *cvp,int cvl) noex {
         hv = hash_elf(nbuf,nlen) ;
     }
     return hv ;
-}
-/* end subroutine (enthash) */
+} /* end subroutine (enthash) */
 
-static int entmat(cvoid *v1p,cvoid *v2p,int) noex {
+local int entmat(cvoid *v1p,cvoid *v2p,int) noex {
     	NF_ENT	*e1p = (NF_ENT *) v1p ;
     	NF_ENT	*e2p = (NF_ENT *) v2p ;
 	int	rc = 0 ;
@@ -717,7 +708,6 @@ static int entmat(cvoid *v1p,cvoid *v2p,int) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (entmat) */
+} /* end subroutine (entmat) */
 
 
