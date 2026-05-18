@@ -21,8 +21,8 @@
 	sockmgr (module)
 	uc_bind
 	uc_listen
-	uc_setsockopt
-	uc_getsockopt
+	uc_sockoptset
+	uc_sockoptget
 	uc_getsockname
 	uc_getpeername
 	uc_send
@@ -266,19 +266,19 @@ int uc_listen(int fd,int backlog) noex {
 }
 /* end subroutine (uc_listen) */
 
-int uc_setsockopt(int fd,int level,int optname,cvoid *valp,int len) noex {
+int uc_sockoptset(int fd,int level,int optname,cvoid *valp,int len) noex {
 	sockmgr		so(level,optname,valp,len) ;
 	so.m = &sockmgr::isetsockopt ;
 	return so(fd) ;
 }
-/* end subroutine (uc_setsockopt) */
+/* end subroutine (uc_sockoptset) */
 
-int uc_getsockopt(int fd,int level,int optname,void *valp,int *lenp) noex {
+int uc_sockoptget(int fd,int level,int optname,void *valp,int *lenp) noex {
 	sockmgr		so(level,optname,valp,lenp) ;
 	so.m = &sockmgr::igetsockopt ;
 	return so(fd) ;
 }
-/* end subroutine (uc_getsockopt) */
+/* end subroutine (uc_sockoptget) */
 
 int uc_getpeername(int fd,void *sap,int *lenp) noex {
 	int		rs = SR_FAULT ;
