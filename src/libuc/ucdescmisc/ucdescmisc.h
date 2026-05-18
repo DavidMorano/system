@@ -41,12 +41,15 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 
+#include	<ucdescmanip.h>
 #include	<ucdescmiscers.h>
 #include	<uccloseonexec.h>
 #include	<ucftruncate.h>
 #include	<ucfminmod.h>
 #include	<ucfstat.h>
+#include	<ucndelay.h>
 #include	<ucnonblock.h>
+#include	<ucsetappend.h>
 #include	<ucclose.h>
 
 
