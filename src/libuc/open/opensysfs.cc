@@ -58,6 +58,8 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<getbufsize.h>
 #include	<endian.h>		/* |ENDIANSTR(3u)| */
 #include	<ids.h>
@@ -77,7 +79,7 @@
 #include	<opensysdbs.h>
 #include	<localmisc.h>
 
-#include	"opensysfs.h"
+#include	"opensysfs.hh"
 
 #pragma		GCC dependency		"mod/unixfnames.ccm"
 
@@ -125,7 +127,7 @@ namespace {
 
 static int	mkrealpath(char *,int,cchar *,cchar *) noex ;
 static int	opencfile(int,int,int) noex ;
-static int	checkperms(cchar *,USTAT *,mode_t) noex ;
+static int	checkperms(cchar *,ustat *,mode_t) noex ;
 
 static int	findprog(ids *,char *,cchar *) noex ;
 static int	findprogbin(ids *,dirseen *,char *,cchar *,cchar *) noex ;
@@ -234,7 +236,7 @@ static int opencfile(int w,int of,int ttl) noex {
 	    char	*gfname = (a + ((maxpath + 1) * ai++)) ;
 	    if ((rs = mkrealpath(gfname,w,sdname,gcname)) > 0) {
 	        time_t	dt = 0 ;
-	        if (USTAT sb ; (rs = u_stat(gfname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(gfname,&sb)) >= 0) {
 		    mode_t	mm = MINPERMS ;
 	            time_t	mt = sb.st_mtime ;
 		    cchar	*ufn = nullptr ;
@@ -358,7 +360,7 @@ static int mkrealpath(char *gfname,int w,cchar *sdname,cchar *gcname) noex {
 }
 /* end subroutine (mkrealpath) */
 
-static int checkperms(cchar *gfname,USTAT *sbp,mode_t mm) noex {
+static int checkperms(cchar *gfname,ustat *sbp,mode_t mm) noex {
 	int		rs = SR_OK ;
 	if ((sbp->st_mode & mm) != mm) {
 	    const uid_t		uid = getuid() ;
@@ -494,15 +496,15 @@ static int runsysfs(int w) noex {
 /* end subroutine (runsysfs) */
 
 static int findprog(ids *idp,char *pfname,cchar *pn) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
 	pfname[0] = '\0' ;
 	if (dirseen dirs ; (rs = dirs.start) >= 0) {
 	    if (vecpstr dhist ; (rs = dhist.start(4,0,0)) >= 0) {
-	        cint	rsn = SR_NOTFOUND ;
 	        bool	f = false ;
-	        cchar	*pr ;
+	        cchar	*pr ; /* used-multiple */
 	        for (int i = 0 ; (rs >= 0) && prvars[i] ; i += 1) {
 	            if ((pr = getenv(prvars[i])) != nullptr) {
 	                if ((rs = dhist.already(pr,-1)) == rsn) {
@@ -549,7 +551,7 @@ static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	int		rs ;
 	int		pl = 0 ; /* return-value */
 	bool		f = false ;
-	if (USTAT sb ; (rs = u_stat(pr,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 		if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	            for (int i = 0 ; (rs >= 0) && prbins[i] ; i += 1) {
@@ -557,7 +559,7 @@ static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	                    cint	dl = rs ;
 	                    if ((rs = dsp->notseen(&sb,tbuf,rs)) > 0) {
 	                        if ((rs = mkpath2(pfname,tbuf,pn)) >= 0) {
-	                            USTAT	psb ;
+	                            ustat psb ;
 	                            pl = rs ;
 	                            if ((rs = u_stat(pfname,&psb)) >= 0) {
 	                                if ((rs = permid(idp,&psb,X_OK)) >= 0) {
