@@ -345,7 +345,7 @@ static int ucprogdata_begin(UCPD *uip) noex {
 	        if (rs < 0) {
 	            libmem.free(vp) ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (needed initialization) */
 	return rs ;
 }
