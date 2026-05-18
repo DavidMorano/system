@@ -26,9 +26,9 @@
 #include	<usysbase.h>
 
 
-#define	SIGIGN_MAGIC	0x66938271
 #define	SIGIGN		struct sigign_head
 #define	SIGIGN_HA	struct sigign_handle
+#define	SIGIGN_MAGIC	0x66938271
 
 
 struct sigign_handle {
@@ -39,13 +39,48 @@ struct sigign_handle {
 struct sigign_head {
 	SIGIGN_HA	*handles ;
 	sigset_t	osm ;
-	uint		magic ;
+	uint		magval ;
 	int		nhandles ;
 	int		nblocks ;
 } ; /* end struct (sigign_head) */
 
-typedef	SIGIGN		sigign ;
 typedef	SIGIGN_HA	sigign_ha ;
+
+#ifdef	__cplusplus
+enum sigignmems {
+	sigignmem_start,
+	sigignmem_finish,
+	sigignmem_overlast
+} ; /* end enum */
+struct sigign ;
+struct sigign_co {
+	sigign		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (sigign *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () (const int * = nullptr) noex ;
+} ; /* end struct (sigign_co) */
+struct sigign : sigign_head {
+	sigign_co	start ;
+	sigign_co	finish ;
+	sigign() noex {
+	    start	(this,sigignmem_start) ;
+	    finish	(this,sigignmem_finish) ;
+	    magval = 0 ;
+	} ; /* end ctor */
+	void dtor() noex ;
+	destruct sigign() {
+	    if (magval) dtor() ;
+	} ; /* end destruct */
+} ; /* end class (sigign) */
+
+#else
+typedef	SIGIGN		sigign ;
+#endif /* __cplusplus */
+
 
 EXTERNC_begin
 
