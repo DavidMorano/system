@@ -75,7 +75,7 @@
 #include	<uinfo.h>
 #include	<userattrdb.h>
 #include	<getbufsize.h>
-#include	<getarchitecture.h>
+#include	<getarch.h>
 #include	<getusername.h>
 #include	<getpwd.h>
 #include	<gethz.h>
@@ -372,7 +372,7 @@ int mkprogenv_envset(mkprogenv *op,cchar *kp,cchar *valp,int vall) noex {
 	        } /* end if (strpack_store) */
 	        rs1 = lm_free(ebuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -661,7 +661,7 @@ local int mkprogenv_envadd(mkprogenv *op,EL *etp,cc *kp,cc *vp,int vl) noex {
 	        }
 	    } /* end if (store) */
 	    rs = lm_rsfree(rs,bp) ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return (rs >= 0) ? bl : rs ;
 }
 /* end subroutine (mkprogenv_envadd) */
@@ -701,8 +701,8 @@ local int mkprogenv_userinfo(mkprogenv *op) noex {
 			op->un = cp ;
 			if ((rs = lm_strw(uh,-1,&cp)) >= 0) {
 	                    op->uh = cp ;
-			} /* end if (memory-allocation) */
-		    } /* end if (memory-allocations) */
+			} /* end if (memory-acquire) */
+		    } /* end if (memory-acquires) */
 	        } /* end if (getpwusername) */
 	        rs1 = lm_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
