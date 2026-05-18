@@ -18,7 +18,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	spawner
 
 	Description:
@@ -80,6 +80,7 @@
 #include	<ucgetpid.h>		/* |uc_getpid(3uc)| */
 #include	<ucsysconf.h>
 #include	<ucsig.h>
+#include	<ucdesc.h>
 #include	<getbufsize.h>
 #include	<sigignores.h>
 #include	<sigign.h>
@@ -412,7 +413,7 @@ int starter::starts(cc *efname) noex {
                 lm_free(vp) ;
                 op->execfname = nullptr ;
             }
-        } /* end if (memory-allocation) */
+        } /* end if (memory-acquire) */
 	return rs ;
 }
 /* end method (starter::starts) */
