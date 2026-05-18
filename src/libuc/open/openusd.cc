@@ -42,6 +42,9 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
@@ -64,29 +67,6 @@ extern "C" {
     extern int uc_stat(cchar *,ustat *) noex ;
     extern int uc_unlink(cchar *) noex ;
     extern int uc_unlinkshm(cchar *) noex ;
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_socket(int,int,int) noex ;
-    extern int uc_sockjoin(int,SOCKADDR *,int,int,mode_t) noex ;
-    extern int uc_openshm(cchar *,int,mode_t) noex ;
-    extern int uc_duper(int,int) noex ;
-    extern int uc_pipe(int *) noex ;
-    extern int uc_bind(int,cvoid *,int) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_fchown(int,uid_t,gid_t) noex ;
-    extern int uc_fminmod(int,mode_t) noex ;
-    extern int uc_connect(int,cvoid *,int) noex ;
-    extern int uc_connecte(int,cvoid *,int,int) noex ;
-    extern int uc_read(int,void *,int) noex ;
-    extern int uc_write(int,cvoid *,int) noex ;
-    extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_iocctl(int,int,...) noex ;
-    extern int uc_rewind(int) noex ;
-    extern int uc_ftruncate(int,off_t ) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_fpathconf(int,int,char *) noex ;
-    extern int uc_setsockopt(int,int,int,int *,int) noex ;
-    extern int uc_linger(int,int) noex ;
-    extern int uc_close(int) ;
 } /* end extern */
 
 
