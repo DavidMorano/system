@@ -73,34 +73,31 @@ typedef	sigman_ha *	handp ;
 /* forward references */
 
 template<typename ... Args>
-static int sigman_ctor(sigman *op,Args ... args) noex {
+local int sigman_ctor(sigman *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    sigman_head	 *hp = cast_static<sigman_head *>(op) ;
 	    rs = memclear(hp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sigman_ctor) */
+} /* end subroutine (sigman_ctor) */
 
-static int sigman_dtor(sigman *op) noex {
+local int sigman_dtor(sigman *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sigman_dtor) */
+} /* end subroutine (sigman_dtor) */
 
 template<typename ... Args>
-static inline int sigman_magic(sigman *op,Args ... args) noex {
+local inline int sigman_magic(sigman *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SIGMAN_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SIGMAN_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (sigman_magic) */
+} /* end subroutine (sigman_magic) */
 
 
 /* local variables */
@@ -116,7 +113,7 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 	int		rs ;
 	if ((rs = sigman_ctor(op)) >= 0) ylikely {
 	    sigset_t	nsm ;
-	    int		i ;
+	    int		i ; /* used-multiple */
 	    int		nhs = 0 ;
 	    int		sz ;
 	    void	*p ;
@@ -136,12 +133,12 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 	        for (i = 0 ; igns[i] != 0 ; i += 1) {
 	            nhs += 1 ;
 	        }
-	    }
+	    } /* end if */
 	    if (cats) {
 	        for (i = 0 ; cats[i] != 0 ; i += 1) {
 	            nhs += 1 ;
 	        }
-	    }
+	    } /* end if */
 	    sz = (nhs * szof(sigman_ha)) ;
 	    if ((rs >= 0) && (nhs > 0) && ((rs = libmem.mall(sz,&p)) >= 0)) {
 	        sigman_ha	*hp = handp(p) ;
@@ -192,11 +189,11 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 	        } /* end if (error) */
 	    } /* end if (memory allocations) */
 	    if (rs >= 0) ylikely {
-	        op->magic = SIGMAN_MAGIC ;
+	        op->magval = SIGMAN_MAGIC ;
 	    }
 	    if (rs < 0) {
 		sigman_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (sigman_ctor) */
 	return rs ;
 }
@@ -208,7 +205,7 @@ int sigman_finish(sigman *op) noex {
 	if ((rs = sigman_magic(op)) >= 0) ylikely {
 	    if (op->handles) {
 	        SIGACTION	*sap ;
-	        for (int i = (op->nhs-1)  ; i >= 0 ; i -= 1) {
+	        for (int i = (op->nhs - 1) ; i >= 0 ; i -= 1) {
 	            cint	hsig = op->handles[i].sig ;
 	            sap = &op->handles[i].action ;
 	            rs1 = u_sigaction(hsig,sap,nullptr) ;
@@ -226,10 +223,35 @@ int sigman_finish(sigman *op) noex {
 		rs1 = sigman_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (sigman_finish) */
+
+
+/* private subroutines */
+
+int sigman::start(cint *blks,cint *igns,cint *cats,sigmanhand_f hand) noex {
+    	return sigman_start(this,blks,igns,cats,hand) ;
+} /* end method (sigman::start) */
+
+sigman_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case sigmanmem_finish:
+	        rs = sigman_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (sigman::operator) */
+
+void sigman::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("sigman",rs,"fini-finish") ;
+	}
+} /* end method (sigman::dtor) */
 
 
