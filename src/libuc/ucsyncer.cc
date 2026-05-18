@@ -50,7 +50,6 @@
 #include	<sys/stat.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -67,10 +66,8 @@
 
 /* local defines */
 
-#define	UCSYNCER	struct ucsyncer
-#define	UCSYNCER_SCOPE	PTHREAD_SCOPE_SYSTEM
-
-#define	NDF		"ucsyncer.deb"
+#define	US		ucsyncer
+#define	US_SCOPE	PTHREAD_SCOPE_SYSTEM
 
 
 /* local typedefs */
@@ -89,11 +86,6 @@ extern "C" {
 
 /* local structures */
 
-#ifndef	TYPEDEF_TWORKER
-#define	TYPEDEF_TWORKER	1
-typedef	int (*tworker)(void *) ;
-#endif
-
 struct ucsyncer {
 	ptm		mx ;		/* data mutex */
 	ptc		cn ;		/* condition variable */
@@ -109,38 +101,38 @@ struct ucsyncer {
 	volatile int	waiters ;
 	int		cmd ;
 	int		count ;
-} ;
+} ; /* end struct */
 
 enum cmds {
 	cmd_exit,
 	cmd_sync,
 	cmd_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
 
-static int	ucsyncer_sendsync(UCSYNCER *) noex ;
-static int	ucsyncer_run(UCSYNCER *) noex ;
-static int	ucsyncer_runcheck(UCSYNCER *) noex ;
-static int	ucsyncer_runner(UCSYNCER *) noex ;
-static int	ucsyncer_worker(UCSYNCER *) noex ;
-static int	ucsyncer_worksync(UCSYNCER *) noex ;
-static int	ucsyncer_cmdsend(UCSYNCER *,int) noex ;
-static int	ucsyncer_cmdrecv(UCSYNCER *) noex ;
-static int	ucsyncer_waitdone(UCSYNCER *) noex ;
+local int	ucsyncer_sendsync	(US *) noex ;
+local int	ucsyncer_run		(US *) noex ;
+local int	ucsyncer_runcheck	(US *) noex ;
+local int	ucsyncer_runner		(US *) noex ;
+local int	ucsyncer_worker		(US *) noex ;
+local int	ucsyncer_worksync	(US *) noex ;
+local int	ucsyncer_cmdsend	(US *,int) noex ;
+local int	ucsyncer_cmdrecv	(US *) noex ;
+local int	ucsyncer_waitdone	(US *) noex ;
 
 extern "C" {
-    static void	ucsyncer_atforkbefore() noex ;
-    static void	ucsyncer_atforkparent() noex ;
-    static void	ucsyncer_atforkchild() noex ;
-    static void	ucsyncer_exit() noex ;
+    local void	ucsyncer_atforkbefore() noex ;
+    local void	ucsyncer_atforkparent() noex ;
+    local void	ucsyncer_atforkchild() noex ;
+    local void	ucsyncer_exit() noex ;
 }
 
 
 /* local variables */
 
-static UCSYNCER		ucsyncer_data ;
+static US		ucsyncer_data ;
 
 
 /* exported variables */
@@ -149,7 +141,7 @@ static UCSYNCER		ucsyncer_data ;
 /* exported subroutines */
 
 int ucsyncer_init() noex {
-	UCSYNCER	*uip = &ucsyncer_data ;
+	US	*uip = &ucsyncer_data ;
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (! uip->f_void) {
@@ -188,16 +180,16 @@ int ucsyncer_init() noex {
 	        while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 		    rs = msleep(1) ;
 		    if (rs == SR_INTR) rs = SR_OK ;
-	        }
-	        if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKLOST ;
-	    }
+	        } /* end while */
+	        if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKFAIL ;
+	    } /* end if */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (ucsyncer_init) */
 
 int ucsyncer_fini() noex {
-	UCSYNCER	*uip = &ucsyncer_data ;
+	US	*uip = &ucsyncer_data ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->f_initdone) {
@@ -231,7 +223,7 @@ int ucsyncer_fini() noex {
 /* end subroutine (ucsyncer_fini) */
 
 int uc_syncer(int w) noex {
-	UCSYNCER	*uip = &ucsyncer_data ;
+	US	*uip = &ucsyncer_data ;
 	int		rs = SR_INVALID ;
 	if (w >= 0) {
 	    rs = SR_OK ;
@@ -254,13 +246,13 @@ int uc_syncer(int w) noex {
 
 /* local subroutines */
 
-static int ucsyncer_sendsync(UCSYNCER *uip) noex {
+local int ucsyncer_sendsync(US *uip) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (! uip->f_syncing) {
-	    sigblocker	b ;
-	    if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
+	    if (sigblocker b ; (rs = b.start(np)) >= 0) {
 	        if ((rs = ucsyncer_init()) >= 0) {
 		    if ((rs = ucsyncer_run(uip)) >= 0) {
 		        const int	cmd = cmd_sync ;
@@ -268,15 +260,14 @@ static int ucsyncer_sendsync(UCSYNCER *uip) noex {
 		        c = uip->count ;
 		    }
 	        } /* end if (init) */
-	        rs1 = sigblocker_finish(&b) ;
+	        rs1 = b.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
 	} /* end if (syncing not in progress) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ucsyncer_sendsync) */
+} /* end subroutine (ucsyncer_sendsync) */
 
-static int ucsyncer_run(UCSYNCER *uip) noex {
+local int ucsyncer_run(US *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = false ;
@@ -295,7 +286,7 @@ static int ucsyncer_run(UCSYNCER *uip) noex {
 			    uip->pid = pid ;
 			    rs = ucsyncer_runner(uip) ;
 			    f = rs ;
-			}
+			} /* end if */
 		    } /* end if (not running) */
 	            rs1 = mxp->lockend ;
 		    if (rs >= 0) rs = rs1 ;
@@ -308,10 +299,9 @@ static int ucsyncer_run(UCSYNCER *uip) noex {
 	    f = rs ;
 	} /* end if (not-running) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ucsyncer_run) */
+} /* end subroutine (ucsyncer_run) */
 
-static int ucsyncer_runcheck(UCSYNCER *uip) noex {
+local int ucsyncer_runcheck(US *uip) noex {
 	const pid_t	pid = getpid() ;
 	int		rs = SR_OK ;
 	int		f = false ;
@@ -323,15 +313,14 @@ static int ucsyncer_runcheck(UCSYNCER *uip) noex {
 	    f = rs ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ucsyncer_runcheck) */
+} /* end subroutine (ucsyncer_runcheck) */
 
-static int ucsyncer_runner(UCSYNCER *uip) noex {
+local int ucsyncer_runner(US *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
 	if (pta ta ; (rs = pta_create(&ta)) >= 0) {
-	    const int	scope = UCSYNCER_SCOPE ;
+	    const int	scope = US_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 		pthread_t	tid ;
 		uptsub_f	tsub = uptsub_f(ucsyncer_worker) ;
@@ -345,10 +334,9 @@ static int ucsyncer_runner(UCSYNCER *uip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pta) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ucsyncer_runner) */
+} /* end subroutine (ucsyncer_runner) */
 
-static int ucsyncer_worker(UCSYNCER *uip) noex {
+local int ucsyncer_worker(US *uip) noex {
 	int		rs ;
 	while ((rs = ucsyncer_cmdrecv(uip)) > 0) {
 	    switch (rs) {
@@ -360,20 +348,18 @@ static int ucsyncer_worker(UCSYNCER *uip) noex {
 	} /* end while (looping on commands) */
 	uip->f_exiting = true ;
 	return rs ;
-}
-/* end subroutine (ucsyncer_worker) */
+} /* end subroutine (ucsyncer_worker) */
 
-static int ucsyncer_worksync(UCSYNCER *uip) noex {
+local int ucsyncer_worksync(US *uip) noex {
 	int		rs = SR_OK ;
 	uip->f_syncing = true ;
 	sync() ;
 	uip->count += 1 ;
 	uip->f_syncing = false ;
 	return rs ;
-}
-/* end subroutine (ucsyncer_worksync) */
+} /* end subroutine (ucsyncer_worksync) */
 
-static int ucsyncer_cmdsend(UCSYNCER *uip,int cmd) noex {
+local int ucsyncer_cmdsend(US *uip,int cmd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		to = 5 ;
@@ -400,10 +386,9 @@ static int ucsyncer_cmdsend(UCSYNCER *uip,int cmd) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (mutex-section) */
 	return rs ;
-}
-/* end subroutine (ucsyncer_cmdsend) */
+} /* end subroutine (ucsyncer_cmdsend) */
 
-static int ucsyncer_cmdrecv(UCSYNCER *uip) noex {
+local int ucsyncer_cmdrecv(US *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		to = 1 ;
@@ -430,10 +415,9 @@ static int ucsyncer_cmdrecv(UCSYNCER *uip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (mutex-section) */
 	return (rs >= 0) ? cmd : rs ;
-}
-/* end subroutine (ucsyncer_cmdrecv) */
+} /* end subroutine (ucsyncer_cmdrecv) */
 
-static int ucsyncer_waitdone(UCSYNCER *uip) noex {
+local int ucsyncer_waitdone(US *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->f_running) {
 	    const pid_t	pid = getpid() ;
@@ -455,29 +439,26 @@ static int ucsyncer_waitdone(UCSYNCER *uip) noex {
 	    }
 	} /* end if (running) */
 	return rs ;
-}
-/* end subroutine (ucsyncer_waitdone) */
+} /* end subroutine (ucsyncer_waitdone) */
 
-static void ucsyncer_atforkbefore() noex {
-	UCSYNCER	*uip = &ucsyncer_data ;
+local void ucsyncer_atforkbefore() noex {
+	US	*uip = &ucsyncer_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbegin() ;
 	}
-}
-/* end subroutine (ucsyncer_atforkbefore) */
+} /* end subroutine (ucsyncer_atforkbefore) */
 
-static void ucsyncer_atforkparent() noex {
-	UCSYNCER	*uip = &ucsyncer_data ;
+local void ucsyncer_atforkparent() noex {
+	US	*uip = &ucsyncer_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
 	}
-}
-/* end subroutine (ucsyncer_atforkparent) */
+} /* end subroutine (ucsyncer_atforkparent) */
 
-static void ucsyncer_atforkchild() noex {
-	UCSYNCER	*uip = &ucsyncer_data ;
+local void ucsyncer_atforkchild() noex {
+	US	*uip = &ucsyncer_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    uip->f_running = false ;
@@ -485,12 +466,10 @@ static void ucsyncer_atforkchild() noex {
 	    uip->pid = getpid() ;
 	    mxp->lockend() ;
 	}
-}
-/* end subroutine (ucsyncer_atforkchild) */
+} /* end subroutine (ucsyncer_atforkchild) */
 
-static void ucsyncer_exit() noex {
+local void ucsyncer_exit() noex {
 	(void) ucsyncer_fini() ;
-}
-/* end subroutine (ucsyncer_exit) */
+} /* end subroutine (ucsyncer_exit) */
 
 
