@@ -61,7 +61,7 @@
 #include	<strn.h>		/* |strn{x}chr(3uc)| */
 #include	<six.h>			/* |siext(3uc)| */
 #include	<ischarx.h>		/* |iseol(3uc)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"rmx.h"
 
