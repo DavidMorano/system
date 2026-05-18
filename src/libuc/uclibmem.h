@@ -70,6 +70,30 @@ namespace libuc {
 	int call	(int,int,void *) noex ;
 	int rall	(void *,int,void *) noex ;
 	int free	(void *) noex ;
+	int ps		(char **) noex ;
+	int ma		(char **) noex ;
+	int ml		(char **) noex ;
+	int mn		(char **) noex ;
+	int mp		(char **) noex ;
+	int nn		(char **) noex ;
+	int hn		(char **) noex ;
+	int un		(char **) noex ;
+	int gn		(char **) noex ;
+	int pn		(char **) noex ;
+	int pw		(char **) noex ;
+	int sp		(char **) noex ;
+	int ua		(char **) noex ;
+	int gr		(char **) noex ;
+	int pj		(char **) noex ;
+	int pr		(char **) noex ;
+	int nw		(char **) noex ;
+	int ho		(char **) noex ;
+	int sv		(char **) noex ;
+	int fs		(char **) noex ;
+	int sn		(char **) noex ;
+	int zn		(char **) noex ;
+	int zi		(char **) noex ;
+	int ad		(char **) noex ;
 	int rsfree	(int,void *) noex ;
     } ; /* end struct (libmems) */
     extern libmems	libmem ;
@@ -106,9 +130,9 @@ EXTERNC_begin
 
 extern int lm_ps(char **) noex ;	/* PS pagesize */
 extern int lm_ma(char **) noex ;	/* MA max-args */
+extern int lm_ml(char **) noex ;	/* ML max-line */
 extern int lm_mn(char **) noex ;	/* MN max-name */
 extern int lm_mp(char **) noex ;	/* MP max-path */
-extern int lm_ml(char **) noex ;	/* ML max-line */
 extern int lm_mm(char **) noex ;	/* ML max-message */
 extern int lm_nn(char **) noex ;	/* NN node-name */
 extern int lm_hn(char **) noex ;	/* HN host-name */
