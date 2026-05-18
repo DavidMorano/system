@@ -174,7 +174,7 @@ procer::operator int () noex {
 		    rs1 = libmem.free(nbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		    nbuf = nullptr ;
-	        } /* end if (memory-allocation-free) */
+	        } /* end if (memory-acquire-free) */
 	    } /* end if (vars) */
 	} /* end if (valid) */
 	return (rs >= 0) ? c : rs ;
