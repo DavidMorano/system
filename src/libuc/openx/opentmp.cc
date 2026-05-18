@@ -65,9 +65,11 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<ucdesc.h>
 #include	<ucsysmisc.h>		/* |uc_gettimeofday(3uc)| */
 #include	<ucgetpid.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<ucfileop.h>
 #include	<getbufsize.h>
 #include	<aflag.hh>
 #include	<filetypes.h>
@@ -108,34 +110,6 @@ typedef SOCKADDR *	sockaddrp ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_mkdir(cchar *,mode_t) noex ;
-    extern int uc_mkfifo(cchar *,mode_t) noex ;
-    extern int uc_chmod(cchar *,mode_t) noex ;
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_unlink(cchar *) noex ;
-    extern int uc_unlinkshm(cchar *) noex ;
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_socket(int,int,int) noex ;
-    extern int uc_openshm(cchar *,int,mode_t) noex ;
-    extern int uc_duper(int,int) noex ;
-    extern int uc_pipe(int *) noex ;
-    extern int uc_bind(int,cvoid *,int) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_fchown(int,uid_t,gid_t) noex ;
-    extern int uc_fminmod(int,mode_t) noex ;
-    extern int uc_connect(int,cvoid *,int) noex ;
-    extern int uc_connecte(int,cvoid *,int,int) noex ;
-    extern int uc_read(int,void *,int) noex ;
-    extern int uc_write(int,cvoid *,int) noex ;
-    extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_iocctl(int,int,...) noex ;
-    extern int uc_ftruncate(int,off_t ) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_setsockopt(int,int,int,int *,int) noex ;
-    extern int uc_linger(int,int) noex ;
-} /* end extern */
 
 
 /* external variables */
@@ -185,7 +159,7 @@ namespace {
     struct vars {
 	int		maxpathlen ;
 	operator int () noex ;
-    } ;
+    } ; /* end struct (vars) */
 } /* end namespace */
 
 
@@ -302,8 +276,7 @@ local int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opentmpx) */
+} /* end subroutine (opentmpx) */
 
 local int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	int		rs = SR_FAULT ;
@@ -318,8 +291,7 @@ local int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opentmpxer) */
+} /* end subroutine (opentmpxer) */
 
 int openmgr::typeinit(int opt) noex {
 	int		rs = SR_OK ;
@@ -333,8 +305,7 @@ int openmgr::typeinit(int opt) noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (openmgr::typeinit) */
+} /* end method (openmgr::typeinit) */
 
 int openmgr::setft() noex {
 	int		rs = SR_OK ;
@@ -357,8 +328,7 @@ int openmgr::setft() noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end method (openmgr::setft) */
+} /* end method (openmgr::setft) */
 
 int openmgr::split(cchar *inname) noex {
 	int		rs = SR_OK ;
@@ -378,8 +348,7 @@ int openmgr::split(cchar *inname) noex {
 	    }
 	} /* end if_constexpr (f_splitfname) */
 	return rs ;
-}
-/* end method (openmgr::split) */
+} /* end method (openmgr::split) */
 
 int openmgr::dirload() noex {
 	int		rs = SR_OK ;
@@ -389,8 +358,7 @@ int openmgr::dirload() noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (openmgr::dirload) */
+} /* end method (openmgr::dirload) */
 
 int openmgr::obufbegin() noex {
 	int		rs = SR_OK ;
@@ -401,8 +369,7 @@ int openmgr::obufbegin() noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (openmgr::obufbegin) */
+} /* end method (openmgr::obufbegin) */
 
 int openmgr::obufend() noex {
 	int		rs = SR_OK ;
@@ -415,8 +382,7 @@ int openmgr::obufend() noex {
 	    falloc = false ;
 	}
 	return rs ;
-}
-/* end method (openmgr::obufend) */
+} /* end method (openmgr::obufend) */
 
 int openmgr::operator () (cchar *inname,int opt) noex {
 	int		rs ;
@@ -443,8 +409,7 @@ int openmgr::operator () (cchar *inname,int opt) noex {
 	    }
 	} /* end if (typeinit) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end method (openmgr::operator) */
+} /* end method (openmgr::operator) */
 
 int openmgr::mkofname() noex {
 	int		rs ;
@@ -454,8 +419,7 @@ int openmgr::mkofname() noex {
 	    rs = substr(bp,bl,rv) ;
 	}
 	return rs ;
-}
-/* end method (openmgr::mkofname) */
+} /* end method (openmgr::mkofname) */
 
 int openmgr::loop() noex {
 	int		rs = SR_OK ;
@@ -470,8 +434,7 @@ int openmgr::loop() noex {
 	    rs = SR_ADDRINUSE ;
 	}
 	return rs ;
-}
-/* end method (openmgr::loop) */
+} /* end method (openmgr::loop) */
 
 int openmgr::ofifo() noex {
 	int		rs ;
@@ -482,8 +445,7 @@ int openmgr::ofifo() noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end method (openmgr::ofifo) */
+} /* end method (openmgr::ofifo) */
 
 int openmgr::odir() noex {
 	int		rs ;
@@ -496,8 +458,7 @@ int openmgr::odir() noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end method (openmgr::odir) */
+} /* end method (openmgr::odir) */
 
 int openmgr::oreg() noex {
 	int		rs = SR_OK ;
@@ -512,8 +473,7 @@ int openmgr::oreg() noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end method (openmgr::oreg) */
+} /* end method (openmgr::oreg) */
 
 int openmgr::osock() noex {
 	cint		pf = PF_UNIX ;
@@ -543,8 +503,7 @@ int openmgr::osock() noex {
             }
         } /* end if */
 	return rs ;
-}
-/* end method (openmgr::osock) */
+} /* end method (openmgr::osock) */
 
 local int randload(ulong *rvp) noex {
 	int		rs = SR_FAULT ;
@@ -571,8 +530,7 @@ local int randload(ulong *rvp) noex {
 	    } /* end if (uc_getpid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (randload) */
+} /* end subroutine (randload) */
 
 /* load buffer w/ random HEX digits (16 bytes) from random variable (8 bytes) */
 local int substr(char *dp,int dl,ulong rv) noex {
@@ -580,8 +538,7 @@ local int substr(char *dp,int dl,ulong rv) noex {
 	int		rs ;
 	char		randbuf[RANDBUFLEN+1] ;
 	if ((rs = cthex(randbuf,randlen,rv)) >= 0) {
-	    int		j = rs ;
-	    for (int i = 0 ; i < dl ; i += 1) {
+	    for (int j = rs, i = 0 ; i < dl ; i += 1) {
 		if (dp[i] == 'X') {
 		    if (j > 0) {
 		        dp[i] = randbuf[--j] ;
@@ -590,14 +547,12 @@ local int substr(char *dp,int dl,ulong rv) noex {
 	    } /* end for */
 	} /* end if (cthex) */
 	return rs ;
-}
-/* end subroutine (substr) */
+} /* end subroutine (substr) */
 
 local int mkvarsx() noex {
 	static cint	rsv = var ;
 	return rsv ;
-}
-/* end subroutine (mkvarsx) */
+} /* end subroutine (mkvarsx) */
 
 vars::operator int () noex {
 	int		rs ;
@@ -605,7 +560,6 @@ vars::operator int () noex {
 	    maxpathlen = rs ;
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
