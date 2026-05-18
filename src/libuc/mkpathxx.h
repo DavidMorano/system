@@ -30,14 +30,14 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<mkpathrooted.h>
+#include	<mkpathmulti.h>
 
 
 EXTERNC_begin
 
+extern int	mkpathexp	(char *,cchar *,int) noex ;
 extern int	mkpathuser	(char *,cchar *,cchar *,int) noex ;
 extern int	mkpathvar	(char *,cchar *,int) noex ;
-extern int	mkpathexp	(char *,cchar *,int) noex ;
-extern int	mkpathmulti	(char *,cchar *,int) noex ;
 
 EXTERNC_end
 
