@@ -40,12 +40,13 @@ MODS +=
 LIBS +=
 
 
-OBJ0= ucsockjoin.o
+OBJ0= ucconnect.o ucsockjoin.o
 OBJ1= ucsockreuse.o
-OBJ2= ucsockprime.o
-OBJ3= 
+OBJ2= ucsockprime.o uckeepalive.o uclinger.o
+OBJ3= ucsockrecve.o ucsockrecvfrome.o
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
 
 OBJ= obja.o
 
@@ -133,8 +134,13 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+ucconnect.o:		ucconnect.cc			$(INCS)
 ucsockjoin.o:		ucsockjoin.cc			$(INCS)
 ucsockreuse.o:		ucsockreuse.cc			$(INCS)
 ucsockprime.o:		ucsockprime.cc	ucsockprime.h	$(INCS)
+ucsockrecve.o:		ucsockrecve.cc			$(INCS)
+ucsockrecvfrome.o:	ucsockrecvfrome.cc		$(INCS)
+uckeepalive.o:		uckeepalive.cc			$(INCS)
+uclinger.o:		uclinger.cc			$(INCS)
 
 
