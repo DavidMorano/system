@@ -15,6 +15,31 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	Name:
+	spawnproc
+
+	Description:
+	Spawn a process while specifying some options for its start-up.
+	This is a cheapy version of this kind of capability as compared
+	with other functions of this sort.
+
+	Synopsis:
+	int spawnproc(SP *psap,cchar *fname,cchar **argv,cchar **envv) noex
+
+	Arguments:
+	psap		pointer to optional file descriptor dispositions
+	fname		program to execute
+	argv		arguments to program
+	envv		environment to program
+
+	Returns:
+	>=0		file descriptor to program STDIN and STDOUT
+	<0		error (system-return)
+
+*******************************************************************************/
+
 #ifndef	SPAWNPROC_INCLUDE
 #define	SPAWNPROC_INCLUDE
 
