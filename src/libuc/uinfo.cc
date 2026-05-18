@@ -350,7 +350,7 @@ int uinfo::getname_load(setname *setp) noex {
                         bp = (strwcpy(bp,utsp->version,nlen) + 1) ;
                         setp->tmpname.machine = bp ;
                         bp = (strwcpy(bp,utsp->machine,nlen) + 1) ;
-                    } /* end if (memory-allocation) */
+                    } /* end if (memory-acquire) */
                 } /* end if (u_uname) */
 	        destroy_at(utsp) ;
 	    } /* end if (utsname) */
@@ -454,7 +454,7 @@ int uinfo::getaux_load(setaux *setp) noex {
                                 sp = tap->nisdomain ;
                                 bp = (strwcpy(bp,sp,nlen) + 1) ;
 		            }
-                        } /* end if (memory-allocation) */
+                        } /* end if (memory-acquire) */
                     } /* end if (uinfo_auxload) */
 	    	    rs1 = tap->finish() ;
 	            if (rs >= 0) rs = rs1 ;
@@ -506,7 +506,7 @@ int auxinfo::start() noex {
 		    hwserial =		(a + ((flen + 1) * ai++)) ;
 		    nisdomain =		(a + ((flen + 1) * ai++)) ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (getbufsize) */
 	return rs ;
 } /* end subroutine (auxinfo::start) */
