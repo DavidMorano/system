@@ -135,7 +135,7 @@ static int posname_loadslash(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 		        if (cc *cp ; (rs = lm_strw(nbuf,nl,&cp)) >= 0) ylikely {
 	                    op->as = cp ;
 	                    *rpp = cp ;
-	                } /* end if (memory-allocation) */
+	                } /* end if (memory-acquire) */
 	            } else {
 	                *rpp = op->buf ;
 	                strwcpy(op->buf,nbuf,nl) ;
@@ -157,7 +157,7 @@ static int posname_loadnul(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 		op->as = cp ;
 		nl = rs ;
 		*rpp = cp ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} else {
 	    *rpp = op->buf ;
 	    strwcpy(op->buf,sp,sl) ;
