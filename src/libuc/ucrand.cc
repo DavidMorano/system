@@ -374,7 +374,7 @@ int rander::irandbegin() noex {
 	        if (rs < 0) {
 	            libmem.free(vp) ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (needed initialization) */
 	return rs ;
 } /* end method (rander::irandbegin) */
