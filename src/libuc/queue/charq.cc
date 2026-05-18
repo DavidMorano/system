@@ -81,7 +81,7 @@ int charq_start(charq *op,int sz) noex {
 	            op->cnt = 0 ;
 	            op->ri = 0 ;
 	            op->wi = 0 ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
