@@ -29,14 +29,14 @@ EXTERNC_begin
 extern int pathnaddw(char *,int,int,cchar *,int) noex ;
 extern int pathnaddx(char *,int,int,int,cchar *,...) noex ;
 
-static inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp) noex {
+local inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp) noex {
 	return pathnaddw(pbuf,plen,pl,sp,-1) ;
 }
 
 extern int pathaddw(char *,int,cchar *,int) noex ;
 extern int pathaddx(char *,int,int,cchar *,...) noex ;
 
-static inline int pathadd(char *pbuf,int pl,cchar *sp) noex {
+local inline int pathadd(char *pbuf,int pl,cchar *sp) noex {
 	return pathaddw(pbuf,pl,sp,-1) ;
 }
 
@@ -44,7 +44,7 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
+local inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	return pathnaddw(pbuf,plen,pl,sp,sl) ;
 }
 
@@ -54,7 +54,7 @@ inline int pathnadd(char *dbuf,int dl,Args ... args) noex {
 	return pathnaddx(dbuf,dl,na,args ...) ;
 }
 
-static inline int pathadd(char *pbuf,int pl,cchar *sp,int sl) noex {
+local inline int pathadd(char *pbuf,int pl,cchar *sp,int sl) noex {
 	return pathaddw(pbuf,pl,sp,sl) ;
 }
 
