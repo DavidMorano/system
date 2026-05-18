@@ -33,7 +33,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
@@ -251,7 +251,7 @@ int searchkeys_popbegin(SK *op,SK_POP *pop,int f_prefix) noex {
 	                memset(pop->nmatch,0,sz) ;
 	                pop->cphrases = n ;
 	                pop->magic = SEARCHKEYS_MAGIC ;
-	            } /* end if (memory-allocation) */
+	            } /* end if (memory-acquire) */
 	        } /* end if (valid) */
 	    } /* end if (non-null) */
 	} /* end if (magic) */
@@ -688,7 +688,7 @@ local int searchkeys_buildload(SK *op,BUILD *bip) noex {
 	                op->kphrases = nullptr ;
 	            }
 	        } /* end if (error) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (vecobj_count) */
 	return (rs >= 0) ? nphrases : rs ;
 }
