@@ -624,7 +624,7 @@ local int strstore_chunknew(strstore *op,int amount) noex {
 	    if (rs < 0) {
 	        lm_free(cep) ;
 	    }
-	} /* end if (memory-allocations) */
+	} /* end if (memory-acquires) */
 	return rs ;
 }
 /* end subroutine (strstore_chunknew) */
