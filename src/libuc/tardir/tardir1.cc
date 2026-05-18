@@ -190,7 +190,7 @@ int tardir::add(cchar *sp,int sl) noex {
 	        if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
 		    rs = SR_NOTDIR ;
 		    if (S_ISDIR(sb.st_mode)) {
-		        rs = iaddone(&sb,sp,sl) ;
+		        rs = iaddone(&sb,cp,cl) ;
 			c += rs ;
 		    }
 	        } /* end if (u_stat) */
