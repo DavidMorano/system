@@ -87,7 +87,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int nodesearch_ctor(NS *op,Args ... args) noex {
+local int nodesearch_ctor(NS *op,Args ... args) noex {
     	NODESEARCH	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -102,7 +102,7 @@ static int nodesearch_ctor(NS *op,Args ... args) noex {
 }
 /* end subroutine (nodesearch_ctor) */
 
-static int nodesearch_dtor(NS *op) noex {
+local int nodesearch_dtor(NS *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -116,7 +116,7 @@ static int nodesearch_dtor(NS *op) noex {
 /* end subroutine (nodesearch_dtor) */
 
 template<typename ... Args>
-static inline int nodesearch_magic(NS *op,Args ... args) noex {
+local inline int nodesearch_magic(NS *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == NODESEARCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -126,7 +126,7 @@ static inline int nodesearch_magic(NS *op,Args ... args) noex {
 /* end subroutine (nodesearch_magic) */
 
 #ifdef	COMMENT
-static int	nodesearch_filechanged(NS *,time_t) noex ;
+local int	nodesearch_filechanged(NS *,time_t) noex ;
 #endif /* COMMENT */
 
 
@@ -283,7 +283,7 @@ int nodesearch_curenum(NS *op,NS_CUR *curp,char *rbuf,int rlen) noex {
 /* private subroutines */
 
 #ifdef	COMMENT
-static int nodesearch_filechanged(NS *op,time_t daytime) noex {
+local int nodesearch_filechanged(NS *op,time_t daytime) noex {
 	int		rs ;
 	int		f = false ;
 	if (ustat sb ; (rs = u_stat(op->fi.fn,&sb)) >= 0) {
