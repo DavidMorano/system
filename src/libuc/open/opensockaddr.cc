@@ -53,6 +53,8 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
@@ -74,7 +76,6 @@ extern "C" {
     extern int uc_socket(int,int,int) noex ;
     extern int uc_connect(int,cvoid *,int) noex ;
     extern int uc_connecte(int,cvoid *,int,int) noex ;
-    extern int uc_close(int) ;
 } /* end extern */
 
 
