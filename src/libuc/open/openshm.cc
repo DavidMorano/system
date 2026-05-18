@@ -50,6 +50,8 @@
 #include	<usysbase.h>
 #include	<usupport.h>
 #include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<ucsysmisc.h>
 #include	<ucgetpid.h>
 #include	<bufsizevar.hh>
@@ -86,7 +88,6 @@ import uconstants ;			/* |sysword(3u)| */
 
 extern "C" {
     extern int uc_openshm(cchar *,int,mode_t) noex ;
-    extern int uc_close(int) ;
     extern int uc_unlinkshm(cchar *) noex ;
 } /* end extern */
 
