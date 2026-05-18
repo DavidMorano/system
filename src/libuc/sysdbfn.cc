@@ -284,7 +284,7 @@ int sysdbmgr::gets(int w,cchar **rpp) noex {
 		    strs[w] = rp ;
 		    *rpp = rp ;
 		    len = lenstr(rp) ;
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (mkpath) */
 	    rs1 = lm_free(pbuf) ;
 	    if (rs >= 0) rs = rs1 ;
