@@ -54,6 +54,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucdesc.h>
 #include	<sysval.hh>
 #include	<localmisc.h>
 
@@ -72,7 +73,6 @@
 /* external subroutines */
 
 extern "C" {
-    extern int uc_close(int) noex ;
     extern int uc_unlinkshm(cchar *) noex ;
 }
 
