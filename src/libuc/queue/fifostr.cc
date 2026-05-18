@@ -146,7 +146,7 @@ int fifostr_add(fifostr *op,cchar *sp,int µsl) noex {
 	            } /* end if */
 	            c = ++op->ic ;
 	            op->cnt += sl ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
