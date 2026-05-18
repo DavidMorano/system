@@ -134,7 +134,7 @@ struct clustername {
 	ptm		mx ;		/* data mutex */
 	cchar		*nn ;		/* node-name */
 	cchar		*cn ;		/* cluster-name */
-	char		*a ;		/* memory-allocation */
+	char		*a ;		/* memory-acquire */
 	time_t		et ;
 	int		ttl ;		/* time-to-live */
 	vaflag		f_void ;
@@ -147,7 +147,7 @@ struct clustername_a {
 	time_t		et ;
 	cchar		*nn ;
 	cchar		*cn ;
-	char		*a ;		/* memory-allocation */
+	char		*a ;		/* memory-acquire */
 	int		ttl ;		/* time-to-live */
 } ;
 
