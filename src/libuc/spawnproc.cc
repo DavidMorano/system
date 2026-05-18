@@ -79,6 +79,7 @@
 #include	<usysflag.h>
 #include	<ucgetpid.h>
 #include	<ucsysconf.h>
+#include	<ucdesc.h>
 #include	<getbufsize.h>
 #include	<getpwd.h>
 #include	<sigignores.h>
@@ -278,7 +279,6 @@ local int spawnproc_pipes(scon *psap,cc *fname,mainv argv,mainv ev) noex {
 	int		rs ;
 	int		rs1 ;
 	int		pid = 0 ;
-	int		con[2] ;
 	int		dupes[3] ;
 	int		pipes[3][2] ;
 	for (int i = 0 ; i < 3 ; i += 1) {
@@ -287,9 +287,9 @@ local int spawnproc_pipes(scon *psap,cc *fname,mainv argv,mainv ev) noex {
 	    dupes[i] = -1 ;
 	} /* end for */
 	/* process the file descriptors as specified */
-	if ((rs = uc_piper(con,0,3)) >= 0) ylikely {
-	    cint	pfd = con[0] ;
-	    cint	cfd = con[1] ;
+	if (int cpipes[2] ; (rs = uc_piper(cpipes,0,3)) >= 0) ylikely {
+	    cint	pfd = cpipes[0] ;
+	    cint	cfd = cpipes[1] ;
 	    if ((rs = uc_closeonexec(cfd,true)) >= 0) ylikely {
 	        for (int i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
 	            switch (psap->disp[i]) {
@@ -343,8 +343,7 @@ local int spawnproc_parfin(scon *psap,int pfd,int *dupes,
 		int (*pipes)[2]) noex {
 	int		rs = SR_OK ;
 	for (int i = 0 ; i < 3 ; i += 1) {
-	    int		w ;
-	    switch (psap->disp[i]) {
+	    switch (int w ; psap->disp[i]) {
 	    case SPAWNPROC_DCREATE:
 	        w = (i != 0) ? 1 : 0 ;
 	        u_close(pipes[i][w]) ;
@@ -373,7 +372,7 @@ local int spawnproc_parfin(scon *psap,int pfd,int *dupes,
 }
 /* end subroutine (spawnproc_parfin) */
 
-static void spawnproc_child(scon *psap,cchar *fname,
+local void spawnproc_child(scon *psap,cchar *fname,
 		mv argv,mv ev,int cfd,int *dupes,int (*pipes)[2]) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
