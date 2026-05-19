@@ -5,6 +5,7 @@
 /* get various system buffer sizes */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -73,17 +74,18 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strstr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucsysconf.h>
-#include	<timewatch.hh>
-#include	<vecstr.h>
-#include	<matostr.h>
-#include	<cfdecmf.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucsysconf.h>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<matostr.h>		/* LIBUC */
+#include	<cfdecmf.h>		/* LIBUC */
 #include	<mailvalues.hh>		/* |hostnamemult| + |nodenamemult| */
-#include	<bufsizes.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<bufsizes.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU */
 
 #include	"getbufsize.h"
 
@@ -92,6 +94,10 @@
 import bufsizedata ;
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported modules */
@@ -140,15 +146,23 @@ namespace {
 
 /* local variables */
 
-static ubufsize			ubufsize_data ;
+static ubufsize		ubufsize_data ;
 
-static constexpr bufsizedata	bufdata ;
+constexpr bufsizedata	bufdata ;
+
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported subroutines */
 
 int getbufsize(int w) noex {
-	return ubufsize_data[w] ;
+    	int		rs ;
+    	DPRINTF("ent w=%d\n",w) ;
+	{
+	    rs = ubufsize_data[w] ;
+	}
+    	DPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
 }
 /* end subroutine (getbusize) */
 
@@ -157,13 +171,18 @@ int getbufsize(int w) noex {
 
 int ubufsize::operator [] (int w) noex {
 	int		rs = SR_INVALID ;
+	DPRINTF("ent w=%d\n",w) ;
 	if ((w >= 0) && (w < bufsize_overlast)) {
 	    if ((rs = bs[w]) == 0) {
+		DPRINTF("-> init\n") ;
 	        if ((rs = init()) >= 0) {
+		    DPRINTF("init() rs=%d\n",rs) ;
 	            rs = retrieve(w) ;
 	        } /* end if (ubufsize::init) */
+		DPRINTF("init-out rs=%d\n",rs) ;
 	    } /* end if (need initialization) */
 	} /* end if (valid) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 }
 /* end subroutine (ubufsize::operator) */
@@ -172,11 +191,15 @@ int ubufsize::init() noex {
 	cint		to = utimeout[uto_busy] ;
 	int		rs = SR_OK ;
 	int		f = false ;
+	DPRINTF("ent\n") ;
 	if (! finit.testandset) {
+	    DPRINTF("-> begin\n") ;
 	    if ((rs = begin()) >= 0) {
+	        DPRINTF("begin() rs=%d\n",rs) ;
 	        finitdone = true ;
 	        f = true ;
 	    }
+	    DPRINTF("begin-out rs=%d\n",rs) ;
 	    if (rs < 0) finit = false ;
 	} else if (! finitdone) {
 	    timewatch	tw(to) ;
@@ -191,6 +214,7 @@ int ubufsize::init() noex {
 	    } ; /* end lambda (lamb) */
 	    rs = tw(lamb) ;		/* <- time-watching occurs in there */
 	} /* end if (time-watching) */
+	DPRINTF("ret rs=%d f=%d\n",rs,f) ;
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (ubufsize::init) */
@@ -208,12 +232,17 @@ int ubufsize::begin() noex {
 int ubufsize::load() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
+	DPRINTF("ent\n") ;
 	if (! floaded) {
+	    DPRINTF("not-loaded\n") ;
 	    floaded = true ;
 	    if (vecstr cfv ; (rs = cfv.start(1,0)) >= 0) ylikely {
 	        cchar	*fn = GETBUFSIZE_CONF ;
+	        DPRINTF("fn=%s\n",fn) ;
+	        DPRINTF("vecstr_start() rs=%d\n",rs) ;
 	        if ((rs = cfv.envfile(fn)) >= 0) ylikely {
 	            cchar	*kp ;
+	            DPRINTF("vecstr_envfile() rs=%d\n",rs) ;
 	            for (int i = 0 ; cfv.get(i,&kp) >= 0 ; i += 1) {
 	                if (kp) {
 			    rs = loadent(kp) ;
@@ -221,12 +250,15 @@ int ubufsize::load() noex {
 	                if (rs < 0) break ;
 	            } /* end for */
 	        } else if (isNotPresent(rs)) {
+	            DPRINTF("vecstr_envfile-out not-present rs=%d\n",rs) ;
 	            rs = SR_OK ;
 	        }
+	        DPRINTF("vecstr_envfile-out rs=%d\n",rs) ;
 	        rs1 = cfv.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (vecstr) */
 	} /* end if (need load) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 }
 /* end subroutine (bufsize_load) */
@@ -236,7 +268,7 @@ int ubufsize::loadent(cchar *kp) noex {
 	int		kl = -1 ;
 	int		vl = 0 ;
 	cchar		*vp = nullptr ;
-	cchar		**vars = bufsizes ;
+	cpcchar		*vars = bufsizenames ;	/* <- from |bufsizes| */
 	if (cchar *tp ; (tp = strchr(kp,'=')) != nullptr) {
 	    kl = intconv(tp - kp) ;
 	    vp = (tp+1) ;
