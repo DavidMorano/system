@@ -1,0 +1,117 @@
+/* ureserve-field MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* reserved interfaces */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-21, David A­D­ Morano
+	This module was originally written.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	ureserve
+
+	Description:
+	This module provides miscellaneous UNIX® or other
+	common (library oriented) subroutines.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<localmisc.h>
+
+export module ureserve:field ;
+
+export {
+    struct field_head {
+	cchar		*lp ;		/* line pointer */
+	cchar		*fp ;		/* field pointer */
+	int		ll ;		/* line length remaining */
+	int		fl ;		/* field length */
+	int		term ;		/* terminating character */
+    } ; /* end struct (field_head) */
+} /* end export */
+
+enum fieldmems {
+	fieldmem_rem,
+	fieldmem_finish,
+	fieldmem_overlast
+} ; /* end enum (fieldmems) */
+
+struct field ;
+
+struct field_co {
+	field		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (field *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (field_co) */
+
+export {
+    struct field : field_head {
+	field_co	finish ;
+	field_co	rem ;
+	field() noex {
+	    rem(this,fieldmem_rem) ;
+	    finish(this,fieldmem_finish) ;
+	    lp = nullptr ;
+	} ; /* end ctor */
+	field(const field &) = delete ;
+	field &operator = (const field &) = delete ;
+	int start(cchar *,int = -1) noex ;
+	int get(cchar *,cchar **) noex ;
+	int getterm(cchar *,cchar **) noex ;
+	int word(cchar *,cchar **) noex ;
+	int wordphrase(cchar *,char *,int) noex ;
+	int sharg(cchar *,char *,int) noex ;
+	int srvarg(cchar *,char *,int) noex ;
+	int remaining(cchar ** = nullptr) noex ;
+	void dtor() noex ;
+	destruct field() {
+	    if (lp) dtor() ;
+	} ;
+    } ; /* end struct (field) */
+} /* end export */
+
+export {
+    extern int	field_start	(field *,cchar *,int) noex ;
+    extern int	field_get	(field *,cchar *,cchar **) noex ;
+    extern int	field_getterm	(field *,cchar *,cchar **) noex ;
+    extern int	field_sharg	(field *,cchar *,char *,int) noex ;
+    extern int	field_remaining	(field *,cchar **) noex ;
+    extern int	field_finish	(field *) noex ;
+    local inline int field_term	(field *op,cchar *tp,cchar **rpp) noex {
+	return field_getterm(op,tp,rpp) ;
+    }
+} /* end export */
+
+
+
+
+
+
