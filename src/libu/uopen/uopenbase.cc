@@ -489,7 +489,7 @@ int stdcaller::callready(cchar *fn,int of,mode_t om) noex {
 
 int stdcaller::callstd(cchar *fn,int of,mode_t om) noex {
 	int		rs ;
-	of &= (~ OM_SPECIALMASK) ;
+	of &= (~ OM_SPECIAL) ;
 	if ((rs = (this->*m)(fn,of,om)) < 0) {
 	    rs = (- errno) ;
 	}
