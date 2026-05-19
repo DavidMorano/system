@@ -17,6 +17,7 @@
 
 #ifndef	USUPPORTNLEADKEYSTR_INCLUDE
 #define	USUPPORTNLEADKEYSTR_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -31,6 +32,7 @@ namespace libu {
 }
 
 
+#endif /* __cplusplus */
 #endif /* USUPPORTNLEADKEYSTR_INCLUDE */
 
 
