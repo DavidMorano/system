@@ -185,7 +185,7 @@ OBJ77= sntid.o sncat1.o sncat2.o
 OBJ78= strdcpy.o strdcpyw.o strdcpycompact.o strdcpyopaque.o strdcpyclean.o
 OBJ79= strnwcpy.o strnncpy.o strnset.o
 
-OBJ80=  nathai.o
+OBJ80= nathai.o
 OBJ81= 
 OBJ82=
 OBJ83= tmstrs.o shellunder.o udomain.o
@@ -254,7 +254,7 @@ OBJ138= isBadSend.o isBadRecv.o isBadMsg.o
 OBJ139= isasocket.o isinteractive.o isfsremote.o isproc.o
 OBJ140= statvfsdir.o
 OBJ141= rmsesfiles.o
-OBJ142= prgetprogpath.o prsetfname.o prmktmpdir.o
+OBJ142=
 OBJ143=
 
 OBJ144=
@@ -267,7 +267,7 @@ OBJ150= wsnwcpynarrow.o
 OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
 
 OBJ152= getuserorg.o getdefzinfo.o getrealname.o getprojname.o
-OBJ153= getev.o getaflen.o getprotofamily.o getlogfac.o getlogpri.o getmjd.o 
+OBJ153= getaflen.o getprotofamily.o getlogfac.o getlogpri.o getmjd.o 
 OBJ154= msghdr.o cmsghdr.o
 OBJ155= mailboxappend.o
 OBJ156= termescseq.o termconseq.o termconseqi.o hdrextid.o hdrextnum.o 
@@ -279,19 +279,19 @@ OBJ160= tabcols.o nextfield.o nextfieldterm.o nextqtoken.o
 OBJ161= nusers.o mesg.o initnow.o 
 OBJ162= getfiledirs.o findfilepath.o findfile.o
 OBJ163= cvttemperature.o bufprintf.o xfile.o
-OBJ164= mapex.o strsigabbr.o strerrabbr.o strlocktype.o
-OBJ165= emainfo.o
+OBJ164= strsigabbr.o strerrabbr.o strlocktype.o
+OBJ165=
 OBJ166=
 OBJ167=
 
-OBJ168= getprogexec.o getnodedomain.o getrand.o getgid_def.o
-OBJ169= getehostname.o getchostname.o getcanonical.o getourhe.o
-OBJ170= gethename.o getheaddr.o getcname.o getfstype.o gethz.o getsocktype.o
-OBJ171= getsystypenum.o getstacksize.o gettid.o getprovider.o getproviderid.o
-OBJ172= getseed.o
-OBJ173= getnfile.o getpwd.o getrunlevel.o
-OBJ174= getsocktype.o
-OBJ175= getpwentry.o getpwlogname.o getgroupname.o getarchitecture.o
+OBJ168= getgid_def.o
+OBJ169=
+OBJ170=
+OBJ171= getprovider.o getproviderid.o
+OBJ172= gettid.o
+OBJ173=
+OBJ174=
+OBJ175= argutils.o cmdutils.o
 
 OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
 OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
@@ -770,11 +770,6 @@ srv.o:			srv.dir
 srv.dir:
 	makesubdir $@
 
-# GETHE
-gethe.o:		gethe.dir
-gethe.dir:
-	makesubdir $@
-
 # STRLISTX
 strlistx.o:		strlistx.dir
 strlistx.dir:
@@ -885,6 +880,11 @@ cmdutils.o:		cmdutils.dir
 cmdutils.dir:
 	makesubdir $@
 
+# ARGUTILS
+argutils.o:		argutils.dir
+argutils.dir:
+	makesubdir $@
+
 # EXMSG
 exmsg.o:		ecmsg.dir
 ecmsg.dir:
@@ -907,11 +907,9 @@ ba.o:			ba.cc ba.h
 printhelp.o:		printhelp.cc printhelp.hh
 removename.o:		removename.cc removename.h
 wdt.o:			wdt.cc wdt.h
-getlogx.o:		getlogx.cc		getlogx.h
-getostype.o:		getostype.cc		getostype.h
 getclusters.o:		getclusters.cc		getclusters.h
-sockpeername.o:		sockpeername.cc sockpeername.h
-nlspeername.o:		nlspeername.cc nlspeername.h
+sockpeername.o:		sockpeername.cc		sockpeername.h
+nlspeername.o:		nlspeername.cc		nlspeername.h
 ismatstar.o:		ismatstar.cc		ismatstar.h		$(INCS)
 findxfile.o:		findxfile.cc		findxfile.h		$(INCS)
 deprecated.o:		deprecated.cc		deprecated.h		$(INCS)
