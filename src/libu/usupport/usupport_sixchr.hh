@@ -6,6 +6,14 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-03-26, David A­D­ Morano
+	This was first written to give a little bit to UNIX® what
+	we have in our own circuit-pack OSes!
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	USUPPORTSIXCHR_INCLUDE
@@ -21,10 +29,10 @@
 namespace libu {
     extern int	siochr(cchar *,int,int) noex ;
     extern int	sirchr(cchar *,int,int) noex ;
-    inline int sichr(cchar *sp,int sl,int sch) noex {
+    inline int	sichr(cchar *sp,int sl,int sch) noex {
 	return siochr(sp,sl,sch) ;
     }
-    inline int sichr(cchar *sp,int sch) noex {
+    inline int	sichr(cchar *sp,int sch) noex {
 	return siochr(sp,-1,sch) ;
     }
 } /* end namespace (libu) */
