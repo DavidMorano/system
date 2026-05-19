@@ -96,7 +96,6 @@ using std::atomic_int ;			/* type */
 using libu::umaxmsglen ;		/* subroutine */
 using libu::ustd_confval ;		/* subroutine */
 using libu::ustd_confstr ;		/* subroutine */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
