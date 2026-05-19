@@ -42,8 +42,6 @@ namespace libu {
 	int mn(cchar **) noex ;
 	int mp(cchar **) noex ;
 	int nn(cchar **) noex ;
-        int rsfree(int,void *) noex ;
-        int malloc(int,void *) noex ;
     } ; /* end struct (umems) */
     extern umems	um ;
     extern umems	umem ;
