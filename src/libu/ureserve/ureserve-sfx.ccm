@@ -32,22 +32,28 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 export module ureserve:sfx ;
 
 export {
-	int sfshrink		(cchar *,int,cchar **) noex ;
-	int sfbasename		(cchar *,int,cchar **) noex ;
-	int sfdirname		(cchar *,int,cchar **) noex ;
-	int sfprogname		(cchar *,int,cchar **) noex ;
-	int sfrootname		(cchar *,int,cchar **) noex ;
+	int sfshrink	(cchar *,int,cchar **) noex ;
+	int sfbasename	(cchar *,int,cchar **) noex ;
+	int sfcontent	(cchar *,int,cchar **) noex ;
+	int sfdirname	(cchar *,int,cchar **) noex ;
+	int sfkeyval	(cchar *,int,cchar **) noex ;
+	int sfprogname	(cchar *,int,cchar **) noex ;
+	int sfrootname	(cchar *,int,cchar **) noex ;
+	int sfnext	(cchar *,int,cchar **) noex ;
+	int sfnextchr	(cchar *,int,int,cchar **) noex ;
+	int sfnextbrk	(cchar *,int,cchar *,cchar **) noex ;
+	int sfcontent	(cchar *,int,cchar **) noex ;
+	int sfkeyval	(cchar *,int,cchar *,cchar **) noex ;
 } /* end export */
 
 
