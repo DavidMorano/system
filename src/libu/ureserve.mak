@@ -42,7 +42,7 @@ LIBS +=
 
 OBJPART0= ureserve-vecstr.o ureserve-charx.o 
 OBJPART1= ureserve-isx.o ureserve-isnot.o 
-OBJPART2= ureserve-sfx.o
+OBJPART2= ureserve-sfx.o ureserve-strop.o
 OBJPART3= 
 
 OBJPARTA= objpart0.o objpart1.o
@@ -53,14 +53,19 @@ OBJPART= objparta.o objpartb.o
 OBJ00= ureserve0.o 
 OBJ01= ureserve1.o ureserve2.o 
 OBJ02= ureserve3.o ureserve4.o
-OBJ03= ureserve5.o
+OBJ03= ureserve5.o 
+
+OBJ04= ureserve8.o
+OBJ05=
+OBJ06=
+OBJ07=
 
 OBJA= obj00.o obj01.o
 OBJB= obj02.o obj03.o
-OBJC= 
+OBJC= obj04.o
 OBJD= 
 
-OBJ= obja.o objb.o
+OBJ= obja.o objb.o objc.o
 
 
 INCDIRS=
@@ -144,6 +149,19 @@ obj03.o:		$(OBJ03)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj04.o:		$(OBJ04)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj05.o:		$(OBJ05)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj06.o:		$(OBJ06)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj07.o:		$(OBJ07)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -215,6 +233,14 @@ ureserve6.o:		ureserve6.cc ureserve0.o
 	$(COMPILE.cc) $<
 
 ureserve7.o:		ureserve7.cc ureserve0.o
+	makemodule ureserve
+	$(COMPILE.cc) $<
+
+ureserve8.o:		ureserve8.cc ureserve0.o
+	makemodule ureserve
+	$(COMPILE.cc) $<
+
+ureserve9.o:		ureserve9.cc ureserve0.o
 	makemodule ureserve
 	$(COMPILE.cc) $<
 

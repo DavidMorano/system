@@ -36,12 +36,8 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<vector>
-#include	<string>
-#include	<iostream>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 #include	<usysrets.h>
 #include	<localmisc.h>
 
