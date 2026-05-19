@@ -70,11 +70,11 @@ import ulibvals ;			/* |getlenstr(3u)| + |memclear(3u)| */
 
 namespace {
     struct valcmds {
-	inline static cint	maxargs		= _SC_ARG_MAX ;
-	inline static cint	maxline		= _SC_LINE_MAX ;
-	inline static cint	maxname		= _SC_NAME_MAX ;
-	inline static cint	maxpath		= _SC_PATH_MAX ;
-	inline static cint	maxnode		= _SC_NODENAME_MAX ;
+	static cint	maxargs		= _SC_ARG_MAX ;
+	static cint	maxline		= _SC_LINE_MAX ;
+	static cint	maxname		= _SC_NAME_MAX ;
+	static cint	maxpath		= _SC_PATH_MAX ;
+	static cint	maxnode		= _SC_NODENAME_MAX ;
     } ; /* end struct (valcmds) */
 } /* end namespace */
 
@@ -202,16 +202,6 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (umems::free) */
-    int umems::rsfree(int rs,void *p) noex {
-	if (p) ylikely {
-    	    if (cint rs1 = free(p) ; rs >= 0) ylikely {
-		rs = rs1 ;
-	    }
-	} else {
-    	    if (rs >= 0) rs = SR_FAULT ;
-	}
-	return rs ;
-    } /* end subroutine (umems::rsfree) */
 } /* end namespace (libu) */
 
 namespace libu {
