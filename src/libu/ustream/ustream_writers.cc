@@ -80,11 +80,11 @@
 	We provide some extra small function for special circumstances.
 
 	Synopsis:
-	int ustream_writezero(USTREAM *bp,int size) noex
+	int ustream_writezero(USTREAM *bp,int sz) noex
 
 	Arguments:
 	bp		USTREAM object pointer
-	size		amount of zeros to write
+	sz		amount of zeros to write
 
 	Returns:
 	>=0		number of bytes written
@@ -138,7 +138,7 @@ import uconstants ;
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using ustream_ns::ustream_writealign ;	/* subroutine */
-using ustream_ns::ustream_writezero ;
+using ustream_ns::ustream_writezero ;	/* subroutine */
 
 /* local typedefs */
 
@@ -181,43 +181,36 @@ namespace ustream_ns {
     int ustream_writeblanks(ustream *op,int n) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	    while ((rs >= 0) && (wlen < n)) {
-	        cint	ml = min((n - wlen),bo.l) ;
-	        rs = op->iwrite(bo.p,ml) ;
-	        wlen += rs ;
-	    } /* end while */
+	while ((rs >= 0) && (wlen < n)) {
+	    cint	ml = min((n - wlen),bo.l) ;
+	    rs = op->iwrite(bo.p,ml) ;
+	    wlen += rs ;
+	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_writeblanks) */
-} /* end namespace (ustream_ns) */
-
-namespace ustream_ns {
     int ustream_writealign(ustream *op,int asz) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	    if (off_t foff ; (rs = op->tell(&foff)) >= 0) ylikely {
-	        cint	r = int(foff & (asz - 1)) ;
-	        if (r > 0) {
-	            cint	nzero = (asz - r) ;
-	            if (nzero > 0) {
-	                rs = ustream_writezero(op,nzero) ;
-	                wlen += rs ;
-	            }
+	if (off_t foff ; (rs = op->tell(&foff)) >= 0) ylikely {
+	    cint	r = int(foff & (asz - 1)) ;
+	    if (r > 0) {
+	        if (cint nzero = (asz - r) ; nzero > 0) {
+	            rs = ustream_writezero(op,nzero) ;
+	            wlen += rs ;
 	        }
-	    } /* end if (ustream_tell) */
+	    } /* end if (non-zero positive) */
+	} /* end if (ustream_tell) */
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_writeallign) */
-} /* end namespace (ustream_ns) */
-
-namespace ustream_ns {
     int ustream_writezero(ustream *op,int n) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	    while ((rs >= 0) && (n > 0)) {
-	        cint	ml = min(n,zo.l) ;
-	        rs = op->iwrite(zo.p,ml) ;
-	        n -= rs ;
-	        wlen += rs ;
-	    } /* end while */
+	while ((rs >= 0) && (n > 0)) {
+	    cint	ml = min(n,zo.l) ;
+	    rs = op->iwrite(zo.p,ml) ;
+	    n -= rs ;
+	    wlen += rs ;
+	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_writezero) */
 } /* end namespace (ustream_ns) */
@@ -235,9 +228,7 @@ int ustream::writefill(cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (ustream_writefill) */
-
+} /* end subroutine (ustream_writefill) */
 int ustream::writefd(char *bp,int bl,int mfd,int len) noex {
 	int		rs ;
 	int		wlen = 0 ;
@@ -259,7 +250,6 @@ int ustream::writefd(char *bp,int bl,int mfd,int len) noex {
 	    } /* end while */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (ustream_writefd) */
+} /* end subroutine (ustream_writefd) */
 
 
