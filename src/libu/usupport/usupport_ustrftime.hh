@@ -6,10 +6,18 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-03-26, David A­D­ Morano
+	This was first written to give a little bit to UNIX® what
+	we have in our own circuit-pack OSes!
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	USUPPORTSTRFTIME_INCLUDE
-#define	USUPPORTSTRFTIME_INCLUDE
+#ifndef	USUPPORTUSTRFTIME_INCLUDE
+#define	USUPPORTUSTRFTIME_INCLUDE
 #ifdef	__cplusplus
 
 
@@ -24,6 +32,6 @@ namespace libu {
 
 
 #endif /* __cplusplus */
-#endif /* USUPPORTSTRFTIME_INCLUDE */
+#endif /* USUPPORTUSTRFTIME_INCLUDE */
 
 
