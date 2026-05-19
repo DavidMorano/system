@@ -639,8 +639,7 @@ local int ustream_adjbuf(ustream *op,int bufsz) noex {
 	    op->dlen = bufsz ;
 	} /* end if (stat) */
 	return rs ;
-}
-/* end subroutine (ustream_adjbuf) */
+} /* end subroutine (ustream_adjbuf) */
 
 local int ustream_bufcpy(ustream *op,cchar *abp,int mlen) noex {
 	if (mlen > MEMCPYLEN) {
@@ -653,7 +652,6 @@ local int ustream_bufcpy(ustream *op,cchar *abp,int mlen) noex {
 	} /* end if */
 	op->bptr += mlen ;
 	return mlen ;
-}
-/* end subroutine (ustream_bufcpy) */
+} /* end subroutine (ustream_bufcpy) */
 
 
