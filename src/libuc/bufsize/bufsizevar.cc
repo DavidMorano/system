@@ -71,7 +71,7 @@
 bufsizevar::operator int () noex {
 	int		rs = SR_OK ;
 	if (val == 0) nlikely {
-	    if ((rs = getbufsize(name)) > 0) {
+	    if ((rs = getbufsize(name)) > 0) ylikely {
 		val = rs ;
 	    } else if (rs == 0) {
 		val = def ;
