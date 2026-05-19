@@ -57,7 +57,9 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucopen.h>
 #include	<ucdesc.h>
+#include	<ucfileop.h>
 #include	<sigblocker.h>
 #include	<ascii.h>
 #include	<lockfile.h>
@@ -95,17 +97,6 @@ import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
 extern "C" {
     extern int uc_getpid() noex ;
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_moveup(int,int) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_readln(int,void *,int) noex ;
-    extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_writedesc(int,int,int) noex ;
-    extern int uc_rewind(int) noex ;
-    extern int uc_seek(int,off_t,int) noex ;
-    extern int uc_setappend(int,int) noex ;
-    extern int uc_ftruncate(int,off_t) noex ;
-    extern int uc_setappend(int,int) noex ;
 } /* end extern */
 
 
