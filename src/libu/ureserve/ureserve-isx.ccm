@@ -36,10 +36,7 @@ module ;
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 export module ureserve:isx ;
@@ -63,14 +60,14 @@ export {
     constexpr inline bool	isblanklatin(int ch)	noex {
 	    return (ch == ' ') || (ch == '\t') ;
     }
-    constexpr inline bool	isdiglatin(int ch)	noex {
-	    return (ch >= '0') && (ch <= '9') ;
+    constexpr inline bool	isbinarlatin(int ch)	noex {
+	    return (ch >= '0') && (ch <= '1') ;
     }
     constexpr inline bool	isoctallatin(int ch)	noex {
 	    return (ch >= '0') && (ch <= '7') ;
     }
-    constexpr inline bool	isbinarlatin(int ch)	noex {
-	    return (ch >= '0') && (ch <= '7') ;
+    constexpr inline bool	isdiglatin(int ch)	noex {
+	    return (ch >= '0') && (ch <= '9') ;
     }
     constexpr inline bool	isbinlatin(int ch)	noex {
 	    return (ch >= '0') && (ch <= '1') ;
