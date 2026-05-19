@@ -17,6 +17,7 @@
 
 #ifndef	USUPPORTSTRNKEYCMP_INCLUDE
 #define	USUPPORTSTRNKEYCMP_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -81,6 +82,7 @@ namespace libu {
 } /* end namespace (libu) */
 
 
+#endif /* __cplusplus */
 #endif /* USUPPORTSTRNKEYCMP_INCLUDE */
 
 
