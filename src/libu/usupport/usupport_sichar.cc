@@ -127,6 +127,9 @@ namespace libu {
     int sidigex(cchar *sp,int sl) noex {
     	return sichar(isdigexlatin,sp,sl) ;
     } /* end subroutine (sidigex) */
+    int sibinar(cchar *sp,int sl) noex {
+    	return sichar(isbinarlatin,sp,sl) ;
+    } /* end subroutine (sioctal) */
     int sioctal(cchar *sp,int sl) noex {
     	return sichar(isoctallatin,sp,sl) ;
     } /* end subroutine (sioctal) */
