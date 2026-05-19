@@ -38,10 +38,7 @@ module ;
 #include	<vector>
 #include	<string>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 export module ureserve:vecstr ;
@@ -98,6 +95,7 @@ export {
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
 	int add(string *) noex ;
+	int addenvfile(cchar *) noex ;
 	int find(cchar *,int = -1) noex ;
 	int search(cchar *,int = -1) noex ;
 	int get(int,ccharpp) noex ;
