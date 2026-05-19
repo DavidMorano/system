@@ -60,8 +60,8 @@
 #pragma		GCC dependency		"mod/chrset.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
-import chrset ;
 import ureserve ;			/* |char(3u)| */
+import chrset ;
 
 /* local defines */
 
