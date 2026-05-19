@@ -65,7 +65,7 @@ enum bufsizes {
 	bufsize_overlast
 } ; /* end enum (bufsizes) */
 
-extern cchar	*bufsizes[] ;
+extern cpcchar	*bufsizenames ;
 
 
 #endif /* BUFSIZES_INCLUDE */
