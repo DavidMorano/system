@@ -41,7 +41,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<bufsizenames.h>
+#include	<bufsizes.h>
 
 
 class bufsizevar {
