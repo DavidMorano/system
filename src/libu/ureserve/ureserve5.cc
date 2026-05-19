@@ -1,33 +1,29 @@
-/* ureserve5 MODULE (sfx -- module-implementation-unit) */
+/* ureserve5 MODULE (implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* reserved interfaces */
+/* string-read-operations */
 /* version %I% last-modified %G% */
 
-#define	CF_STRCHR	1		/* use |strchr(3c)| */
 
 /* revision history:
 
-	= 1998-03-21, David A­D­ Morano
-	This module was originally written.
-
-	= 2020-05-07, David A-D- Morano
-	I converted this (formerly a header-only file) to a module.
+	= 1998-02-01, David A­D­ Morano
+	This code was originally written.  
 
 */
 
-/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Module:
-	ureserve
+  	Object:
+	strop
 
 	Description:
-	This module provides some subroutines are used in certain
-	circumstances where the LIBUC library is not availble (for
-	whatever reasons).
+	This object allows for some specialized manipulations on a
+	counted-string object.  The given string is supplied by the
+	caller and is read-only.
 
 *******************************************************************************/
 
@@ -37,31 +33,36 @@ module ;
 #include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
+#include	<usupport.h>
+#include	<ulogerror.h>
+#include	<baops.h>
 #include	<mkchar.h>
-#include	<localmisc.h>		/* |eol| */
+#include	<localmisc.h>
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 module ureserve ;
 
-import libutil ;			/* |lenstr(3u)| */
+import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
-#ifndef	CF_STRCHR
-#define	CF_STRCHR	1		/* use |strchr(3c)| */
-#endif
+#define	ISWHT(ch)	char_iswhite(ch)
 
 
 /* imported namespaces */
 
+using libu::siwht ;			/* subroutine */
+using libu::sispan ;			/* subroutine */
+using libu::siskipwhite ;		/* subroutine */
+using libu::siwhtbrk ;			/* subroutine */
+
 
 /* local typedefs */
+
 
 
 /* external subroutines */
@@ -75,12 +76,28 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-local int sirchr(cchar *,int,int) noex ;
+local bool iswhiteand(strop *sop,int tch) noex {
+	cint	ch = mkchar(sop->sp[0]) ;
+	return ISWHT(ch) && (ch != tch) ;
+}
+
+local bool isnotchr(strop *sop,int tch) noex {
+	cint	ch = mkchar(sop->sp[0]) ;
+	return (ch != tch) ;
+}
+
+local bool isnotterm(strop *sop,cchar *terms) noex {
+	cint	ch = mkchar(sop->sp[0]) ;
+	return (! batst(terms,ch)) ;
+}
+
+local bool isterm(strop *sop,cchar *terms) noex {
+	cint	ch = mkchar(sop->sp[0]) ;
+	return  batst(terms,ch) ;
+}
 
 
 /* local variables */
-
-cbool		f_strchr = CF_STRCHR ;
 
 
 /* exported variables */
@@ -88,154 +105,214 @@ cbool		f_strchr = CF_STRCHR ;
 
 /* exported subroutines */
 
-int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
-    	if (sp) ylikely {
-	    if (sl >= 0) {
-	        while ((sl > 0) && char_iswht(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        } /* end while */
-	        if (sp[0] == '\0') sl = 0 ;
-	    } else {
-	        while (char_iswht(*sp)) {
-	            sp += 1 ;
-	        }
-	        sl = lenstr(sp) ;
+int strop_start(strop *sop,cchar *sp,int µsl) noex {
+	int		rs = SR_FAULT ;
+	if (sop && sp) ylikely {
+	    rs = SR_INVALID ;
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	        sop->sp = sp ;
+	        sop->sl = sl ;
+	        rs = sop->sl ;
 	    } /* end if */
-	    while ((sl > 0) && char_iswht(sp[sl - 1])) {
-	        sl -= 1 ;
-	    }
-	} else {
-	    sl = -1 ;
-	}
-	if (rpp) *rpp = sp ;
-	return sl ;
-}
-/* end subroutine (sfshrink) */
-
-int sfbasename(cchar *sp,int µsl,cchar **rpp) noex {
-	int		rl = -1 ; /* return-value */
-	cchar		*rp = nullptr ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
-	    while ((sl > 1) && (sp[sl - 1] == '/')) {
-	        sl -= 1 ;
-	    }
-	    {
-	        int	si ; /* used-afterwards */
-	        for (si = sl ; si > 0 ; si -= 1) {
-	            if (sp[si - 1] == '/') break ;
-	        }
-	        if ((sl == 1) && (si == 1) && (sp[0] == '/')) {
-	            si -= 1 ;
-	        }
-	        rp = (sp + si) ;
-	        rl = (sl - si) ;
-	    } /* end block */
-	} /* end if (getlenstr) */
-	if (rpp) *rpp = rp ;
-	return rl ;
-}
-/* end subroutine (sfbasename) */
-
-int sfdirname(cchar *sp,int µsl,cchar **rpp) noex {
-	int		rl = -1 ;
-	cchar		*rp = nullptr ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
-	    int		i ; /* used-afterwards */
-	    while ((sl > 0) && (sp[sl - 1] == '/'))  {
-	        sl -= 1 ;
-	    }
-	    for (i = sl ; i > 0 ; i -= 1) {
-	        if (sp[i - 1] == '/') break ;
-	    }
-	    rp = sp ;
-	    if (i == 1) {
-	        rl = 1 ;
-	    } else if (i <= 0) {
-	        rl = 0 ;
-	    } else {
-	        rl = (i - 1) ;
-	    }
-	} /* end if (getlenstr) */
-	if (rpp) *rpp = rp ;
-	return rl ;
-}
-/* end subroutine (sfdirname) */
-
-int sfprogname(cchar *sp,int sl,cchar **rpp) noex {
-	int		cl = -1 ; /* return-value */
-	cchar		*cp = nullptr ;
-	if (sp) ylikely {
-	    if ((cl = sfbasename(sp,sl,&cp)) > 0) {
-	        if (int si ; (si = sirchr(cp,cl,'.')) >= 0) {
-		    cl -= si ;
-	        }
-	        if ((cl > 0) && (cp[0] == '=')) {
-		    cp += 1 ;
-		    cl -= 1 ;
-	        }
-	    } /* end if (sfbasename) */
 	} /* end if (non-null) */
-	if (rpp) *rpp = cp ;
-	return cl ;
-}
-/* end subroutine (sfprogname) */
+	return rs ;
+} /* end subroutine (strop_start) */
 
-int sfrootname(cchar *sp,int sl,cchar **rpp) noex {
-	int		rl = -1 ;
-	if (sp && rpp) {
-	    rl = sfbasename(sp,sl,rpp) ;
-	}
+int strop_finish(strop *sop) noex {
+	int		rs = SR_FAULT ;
+	if (sop) ylikely {
+	    rs = sop->sl ;
+	    sop->sp = nullptr ;
+	    sop->sl = 0 ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (strop_finish) */
+
+int strop_shrink(strop *sop) noex {
+    	int		rl ; /* return-value */
+    	if ((rl = strop_white(sop)) >= 0) {
+	    if (int si ; (si = siwht(sop->sp,sop->sl)) > 0) {
+	        sop->sl -= si ;
+	    }
+	    rl = sop->sl ;
+	} /* end if */
 	return rl ;
-}
-/* end subroutine (sfrootname) */
+} /* end subroutine (strop_shrink) */
+
+int strop_white(strop *sop) noex {
+    	int		rl = 0 ; /* return-value */
+	if (int si ; (si = siskipwhite(sop->sp,sop->sl)) > 0) {
+	    sop->sp += si ;
+	    sop->sl -= si ;
+	} /* end if */
+	rl = sop->sl ;
+	return rl ;
+} /* end subroutine (strop_white) */
+
+int strop_whitechr(strop *sop,int tch) noex {
+    	int		rl = 0 ; /* return-value */
+	while ((sop->sl > 0) && iswhiteand(sop,tch)) {
+	    sop->sp += 1 ;
+	    sop->sl -= 1 ;
+	} /* end while */
+	rl = sop->sl ;
+	return rl ;
+} /* end subroutine (strop_whitechr) */
+
+int strop_fieldwht(strop *sop,cchar **rpp) noex {
+    	cchar	wht[] = " \t\r\f\v" ;
+    	return strop_fieldbrk(sop,wht,rpp) ;
+} /* end subroutine (strop_fieldwht) */
+
+int strop_fieldchr(strop *sop,int sch,cchar **rpp) noex {
+    	char	bstr[2] = { char(sch) } ;
+	return strop_fieldbrk(sop,bstr,rpp) ;
+} /* end subroutine (strop_fieldchr) */
+
+int strop_fieldbrk(strop *sop,cchar *ss,cchar **rpp) noex {
+    	cnullptr	np{} ;
+    	int		rs = SR_FAULT ;
+	int		rl = -1 ; /* return-value */
+	if (sop && ss && rpp) ylikely {
+	    rs = SR_OK ;
+	    *rpp = nullptr ;
+	    if (sop->sl > 0) {
+	        if (int si ; (si = siskipwhite(sop->sp,sop->sl)) > 0) {
+	            sop->sp += si ;
+	            sop->sl -= si ;
+	        }
+	        if (sop->sl > 0) {
+	            *rpp = sop->sp ;
+	            if (int si ; (si = siwhtbrk(sop->sp,sop->sl,ss)) >= 0) {
+			cint tch = mkchar(sop->sp[si]) ; 
+			rl = si ;
+			if (strchr(ss,tch) != np) {
+			    while ((rl > 0) && iswht(sop->sp[rl - 1])) {
+				rl -= 1 ;
+			    }
+			}
+	                sop->sp += (si + 1) ; /* step over found character */
+	                sop->sl -= (si + 1) ; /* step over found character */
+	            } else {
+	                rl = sop->sl ;
+	                sop->sl = 0 ;
+	            }
+	        } /* end if (non-zero) */
+	    } /* end if (non-zero) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+} /* end subroutine (strop_fieldbrk) */
+
+int strop_findchr(strop *sop,int tch) noex {
+    	int		rl = 0 ; /* return-value */
+	while ((sop->sl > 0) && isnotchr(sop,tch)) {
+	    sop->sp += 1 ;
+	    sop->sl -= 1 ;
+	} /* end while */
+	rl = sop->sl ;
+	return rl ;
+} /* end subroutine (strop_findchr) */
+
+int strop_findterm(strop *sop,cchar *terms) noex {
+    	int		rl = 0 ; /* return-value */
+	while ((sop->sl > 0) && isnotterm(sop,terms)) {
+	    sop->sp += 1 ;
+	    sop->sl -= 1 ;
+	} /* end while */
+	rl = sop->sl ;
+	return rl ;
+} /* end subroutine (strop_findterm) */
+
+int strop_spanterm(strop *sop,cchar *terms) noex {
+    	int		rl = 0 ; /* return-value */
+	while ((sop->sl > 0) && isterm(sop,terms)) {
+	    sop->sp += 1 ;
+	    sop->sl -= 1 ;
+	} /* end while */
+	rl = sop->sl ;
+	return rl ;
+} /* end subroutine (strop_spanterm) */
+
+int strop_span(strop *sop,cchar *ss) noex {
+    	int		rl = 0 ; /* return-value */
+	if (int si ; (si = sispan(sop->sp,sop->sl,ss)) > 0) {
+	    sop->sp += si ;
+	    sop->sl -= si ;
+	}
+	rl = sop->sl ;
+	return rl ;
+} /* end subroutine (strop_span) */
 
 
 /* local subroutines */
 
-#ifdef	COMMENR
-local int siochr(cchar *sp,int sl,int sch) noex {
-    	cnullptr	np{} ;
-	int		i = 0 ; /* return-value */
-	bool		f = false ;
-	sch &= UCHAR_MAX ;
-	if (sp) ylikely {
-	    if_constexpr (f_strchr) {
-	        if (sl > 0) {
-	            for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	                cint	ch = mkchar(sp[i]) ;
-	                if ((f = (ch == sch))) break ;
-	            } /* end for */
-	        } else {
-		    if (cchar *tp ; (tp = strchr(sp,sch)) != np) {
-			f = true ;
-			i = intconv(tp - sp) ;
-		    }
-	        } /* end if */
-	    } else {
-	        for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	            cint	ch = mkchar(sp[i]) ;
-	            if ((f = (ch == sch))) break ;
-	        } /* end for */
-	    } /* end if_constexpr (f_strchr) */
-	} /* end if (non-null) */
-	return (f) ? i : -1 ;
+int strop::start(cchar *ap,int al) noex {
+	return strop_start(this,ap,al) ;
 }
-/* end subroutine (siochr) */
-#endif /* COMMENT */
+int strop::fieldwht(cchar **rpp) noex {
+	return strop_fieldwht(this,rpp) ;
+}
+int strop::fieldchr(int sch,cchar **rpp) noex {
+	return strop_fieldchr(this,sch,rpp) ;
+}
+int strop::fieldbrk(cchar *ss,cchar **rpp) noex {
+	return strop_fieldbrk(this,ss,rpp) ;
+}
+int strop::whitechr(int tch) noex {
+	return strop_whitechr(this,tch) ;
+}
+int strop::findchr(int tch) noex {
+	return strop_findchr(this,tch) ;
+}
+int strop::findterm(cchar *terms) noex {
+	return strop_findterm(this,terms) ;
+}
+int strop::spanterm(cchar *terms) noex {
+	return strop_spanterm(this,terms) ;
+}
+int strop::span(cchar *ss) noex {
+	return strop_span(this,ss) ;
+}
 
-local int sirchr(cchar *sp,int µsl,int sch) noex {
-	int		i = 0 ; /* return-value */
-	bool		f = false ;
-	sch &= UCHAR_MAX ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
-	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
-	        cint	ch = mkchar(sp[i]) ;
-	        if ((f = (ch == sch))) break ;
-	    } /* end for */
-	} /* end if (getlenstr) */
-	return (f) ? i : -1 ;
-}
-/* end subroutine (sirchr) */
+void strop::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("strop",rs,"fini-finish") ;
+	}
+} /* end method (strop::dtor) */
+
+strop_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	   switch (w) {
+	   case stropmem_remlen:
+	       rs = op->sl ;
+	       break ;
+	   case stropmem_inc:
+	       rs = 0 ;
+	       if (op->sl > 0) {
+		   rs = 1 ;
+	           op->sp += 1 ;
+	           op->sl -= 1 ;
+	       }
+	       break ;
+	   case stropmem_shrink:
+	       rs = strop_shrink(op) ;
+	       break ;
+	   case stropmem_white:
+	       rs = strop_white(op) ;
+	       break ;
+	   case stropmem_whitedash:
+	       rs = strop_whitechr(op,'-') ;
+	       break ;
+	   case stropmem_whitecolon:
+	       rs = strop_whitechr(op,':') ;
+	       break ;
+	   case stropmem_finish:
+	       rs = strop_finish(op) ;
+	       break ;
+	   } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (strop_co::operator) */
 
 
