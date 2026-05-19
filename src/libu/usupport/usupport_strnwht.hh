@@ -1,4 +1,4 @@
-/* strnwht HEADER */
+/* usupport_strnwht HEADER */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	Group:
-	siwht
+	strnwht
 
 	Description:
 	These subroutines search for a break-point that is either
@@ -30,15 +30,15 @@
 	is the first character of white-space returned.
 
 	Synopsis:
-	char *strwht(cchar *sp,int sl) noex
-	char *strwhtchr(cchar *sp,int sl,int sch) noex
-	char *strwhtbrk(cchar *sp,int sl,cchar *ss) noex
-	char *strwhtbrk(cchar *sp,int sl,chrset &sset) noex
+	char *stnrwht(cchar *sp,int sl) noex
+	char *strnwhtchr(cchar *sp,int sl,int sch) noex
+	char *strnwhtbrk(cchar *sp,int sl,cchar *ss) noex
+	char *strnwhtbrk(cchar *sp,int sl,chrset &sset) noex
 
 *******************************************************************************/
 
-#ifndef	STRNWHT_INCLUDE
-#define	STRNWHT_INCLUDE
+#ifndef	USUPPORTSTRNWHT_INCLUDE
+#define	USUPPORTSTRNWHT_INCLUDE
 #ifdef	__cplusplus
 
 
@@ -48,16 +48,16 @@
 
 
 namespace libu {
-    extern char *strnwht(cchar *,int) noex ;
-    extern char *strnwhtchr(cchar *,int,int) noex ;
-    extern char *strnwhtbrk(cchar *,int,cchar *) noex ;
-    inline char *strnwhite(cchar *sp,int sl) noex {
+    extern char *strnwht	(cchar *,int) noex ;
+    extern char *strnwhtchr	(cchar *,int,int) noex ;
+    extern char *strnwhtbrk	(cchar *,int,cchar *) noex ;
+    inline char *strnwhite	(cchar *sp,int sl) noex {
 	return strnwht(sp,sl) ;
     }
 } /* end namespace (libu) */
 
 
 #endif /* __cplusplus */
-#endif /* STRNWHT_INCLUDE */
+#endif /* USUPPORTSTRNWHT_INCLUDE */
 
 
