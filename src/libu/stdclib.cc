@@ -32,10 +32,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<strings.h>		/* |strcasecmp(3c)| */
+#include	<strings.h>		/* |str{x}casecmp(3c)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)|*/
+#include	<cstring>		/* |strcmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -81,14 +81,14 @@ namespace stdclib {
 	    rc = strcmp(s1,s2) ;
 	} /* end if (non-null) */
 	return rc ;
-    }
+    } /* end subroutine */
     int std_strcasecmp(cchar *s1,cchar *s2) noex {
 	int rc = 0 ;
 	if (s1 && s2) {
 	    rc = strcasecmp(s1,s2) ;
 	} /* end if (non-null) */
 	return rc ;
-    }
+    } /* end subroutine */
 } /* end namespace (stdclib) */
 
 namespace stdclib {
@@ -98,14 +98,14 @@ namespace stdclib {
 	    rc = strncmp(s1,s2,n) ;
 	} /* end if (non-null) */
 	return rc ;
-    }
+    } /* end subroutine */
     int std_strncasecmp(cchar *s1,cchar *s2,int n) noex {
 	int rc = 0 ;
 	if (s1 && s2) {
 	    rc = strncasecmp(s1,s2,n) ;
 	} /* end if (non-null) */
 	return rc ;
-    }
+    } /* end subroutine */
 } /* end namespace (stdclib) */
 
 
