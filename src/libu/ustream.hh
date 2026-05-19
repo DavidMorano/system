@@ -198,7 +198,7 @@ namespace ustream_ns {
     extern int	ustream_writeblanks	(ustream *,int) noex ;
     extern int	ustream_writealign	(ustream *,int) noex ;
     extern int	ustream_writezero	(ustream *,int) noex ;
-} /* end namespace (ustream_na) */
+} /* end namespace (ustream_ns) */
 
 
 #endif /* __cplusplus (C++ only) */
