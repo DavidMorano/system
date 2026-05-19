@@ -17,6 +17,7 @@
 
 #ifndef	USUPPORTHASNOT_INCLUDE
 #define	USUPPORTHASNOT_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -38,6 +39,7 @@ namespace libu {
 } /* end namespace (libu) */
 
 
+#endif /* __cplusplus */
 #endif /* USUPPORTHASNOT_INCLUDE */
 
 
