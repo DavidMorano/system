@@ -60,7 +60,9 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucopen.h>
 #include	<ucdesc.h>
+#include	<ucfileop.h>
 #include	<getnodename.h>
 #include	<sigblocker.h>
 #include	<ascii.h>
@@ -131,15 +133,6 @@ extern "C" {
 
 extern "C" {
     extern int uc_getpid() noex ;
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_moveup(int,int) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_readln(int,void *,int) noex ;
-    extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_writedesc(int,int,int) noex ;
-    extern int uc_setappend(int,int) noex ;
-    extern int uc_ftruncate(int,off_t) noex ;
-    extern int uc_setappend(int,int) noex ;
 } /* end extern */
 
 namespace logfile_util {
@@ -162,17 +155,17 @@ struct colstate {
 
 /* forward references */
 
-local int	logfile_loadid(logfile *,cchar *) noex ;
-local int	logfile_mklogid(logfile *) noex ;
-local int	logfile_fixlogid(logfile *,int) noex ;
-local int	logfile_fileopen(logfile *) noex ;
-local int	logfile_fileclose(logfile *) noex ;
-local int	logfile_iflush(logfile *) noex ;
-local int	logfile_mkentry(logfile *,time_t,cchar *,int) noex ;
-local int	logfile_mkline(logfile *,cchar *,int) noex ;
+local int	logfile_loadid		(logfile *,cchar *) noex ;
+local int	logfile_mklogid		(logfile *) noex ;
+local int	logfile_fixlogid	(logfile *,int) noex ;
+local int	logfile_fileopen	(logfile *) noex ;
+local int	logfile_fileclose	(logfile *) noex ;
+local int	logfile_iflush		(logfile *) noex ;
+local int	logfile_mkentry		(logfile *,time_t,cchar *,int) noex ;
+local int	logfile_mkline		(logfile *,cchar *,int) noex ;
 
-local int	colstate_load(COLSTATE *,int,int) noex ;
-local int	colstate_linecols(COLSTATE *,cchar *,int) noex ;
+local int	colstate_load		(COLSTATE *,int,int) noex ;
+local int	colstate_linecols	(COLSTATE *,cchar *,int) noex ;
 
 local int	mkclean(char *,int,cchar *,int) noex ;
 local bool	hasourbad(cchar *,int) noex ;
@@ -181,7 +174,7 @@ local bool	isourbad(int) noex ;
 
 /* local variables */
 
-constexpr int		sigblockers[] = {
+constexpr int		sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGHUP,
@@ -190,13 +183,13 @@ constexpr int		sigblockers[] = {
 	SIGQUIT,
 	SIGPIPE,
 	0
-} ; /* end array (sigblockers) */
+} ; /* end array (sigblocks) */
 
-constexpr int		logidlen = LOGFILE_LOGIDLEN ;
-constexpr int		linelen = LOGFILE_LINELEN ;
-constexpr int		userlen = LOGFILE_USERLEN ;
+constexpr int		logidlen	= LOGFILE_LOGIDLEN ;
+constexpr int		linelen		= LOGFILE_LINELEN ;
+constexpr int		userlen		= LOGFILE_USERLEN ;
 
-constexpr bool		f_chmod = CF_CHMOD ;
+constexpr bool		f_chmod		= CF_CHMOD ;
 
 
 /* exported variables */
@@ -238,12 +231,12 @@ int logfile_open(logfile *op,cc *lfname,int of,mode_t operm,cc *logid) noex {
 	                    } /* end if (ok) */
 	                    if (rs < 0) {
 		                logfile_fileclose(op) ;
-		            }
+		            } /* end if (error) */
 	                } /* end if (file-open) */
 	                if (rs < 0) {
 		            lm_free(op->buf) ;
 		            op->buf = nullptr ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (memory-allocation) */
 	            if (rs < 0) {
 			void *vp = voidp(op->fname) ;
@@ -269,13 +262,13 @@ int logfile_close(logfile *op) noex {
 	        rs1 = lm_free(op->buf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->buf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->fname) ylikely {
 		void *vp = voidp(op->fname) ;
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -283,7 +276,7 @@ int logfile_close(logfile *op) noex {
 /* end subroutine (logfile_close) */
 
 int logfile_printf(logfile *op,cchar *fmt,...) noex {
-	va_list	ap ;
+	va_list		ap ;
 	int		rs ;
 	if ((rs = logfile_magic(op)) >= 0) ylikely {
 	    va_begin(ap,fmt) ;
@@ -358,11 +351,12 @@ int logfile_control(logfile *op,int cmd,void *ap) noex {
 	        rs = SR_OK ;
 	        break ;
 	    case LOGFILE_CSIZE:
-	            if ((rs = logfile_fileopen(op)) >= 0) {
-	                if (ustat sb ; (rs = u_fstat(op->lfd,&sb)) >= 0) {
-	                    rs = intsat(sb.st_size) ;
-			}
-	            }
+		if ((rs = logfile_fileopen(op)) >= 0) {
+	            if (ustat sb ; (rs = u_fstat(op->lfd,&sb)) >= 0) {
+			csize fsize = size_t(sb.st_size) ;
+	                rs = intsat(fsize) ;
+		    }
+	        } /* end if */
 	        break ;
 	    default:
 	        rs = SR_INVALID ;
@@ -484,8 +478,7 @@ local int logfile_loadid(logfile *op,cchar *logstr) noex {
 	op->logid[len] = '\0' ;
 	rs = logfile_fixlogid(op,len) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (logfile_loadid) */
+} /* end subroutine (logfile_loadid) */
 
 local int logfile_mklogid(logfile *op) noex {
 	int		rs ;
@@ -508,8 +501,7 @@ local int logfile_mklogid(logfile *op) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (uc_getpid) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (logfile_mklogid) */
+} /* end subroutine (logfile_mklogid) */
 
 local int logfile_fixlogid(logfile *op,int cl) noex {
 	if (cl < NTABCOLS) {
@@ -519,8 +511,7 @@ local int logfile_fixlogid(logfile *op,int cl) noex {
 	op->logid[cl++] = '\t' ;
 	op->logidlen = cl ;
 	return cl ;
-}
-/* end subroutine (logfile_fixlogid) */
+} /* end subroutine (logfile_fixlogid) */
 
 local int logfile_fileopen(logfile *op) noex {
 	int		rs = SR_OK ;
@@ -540,12 +531,11 @@ local int logfile_fileopen(logfile *op) noex {
 		if (rs < 0) {
 		    u_close(op->lfd) ;
 		    op->lfd = -1 ;
-		}
+		} /* end if (error) */
 	    } /* end if (open) */
 	} /* end if (needs to be opened) */
 	return rs ;
-}
-/* end subroutine (logfile_fileopen) */
+} /* end subroutine (logfile_fileopen) */
 
 local int logfile_fileclose(logfile *op) noex {
 	int		rs = SR_OK ;
@@ -556,43 +546,44 @@ local int logfile_fileclose(logfile *op) noex {
 	        len = logfile_iflush(op) ;
 	        if (rs >= 0) rs = len ;
 	    }
-	    rs1 = uc_close(op->lfd) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->lfd = -1 ;
+	    {
+	        rs1 = uc_close(op->lfd) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->lfd = -1 ;
+	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (logfile_fileclose) */
+} /* end subroutine (logfile_fileclose) */
 
 /* out internal verion of a flush */
 local int logfile_iflush(logfile *op) noex {
-	sigblocker	blocker ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		len = 0 ;
-	int		f_havelock = false ;
+	int		len = 0 ; /* return-value */
 	if (op->len > 0) {
 	    if ((rs = logfile_fileopen(op)) >= 0) {
-	        if ((rs = sigblocker_start(&blocker,sigblockers)) >= 0) {
-	            rs1 = lockfile(op->lfd,F_WLOCK,0z,0z,TO_LOCK) ;
-	            f_havelock = (rs1 >= 0) ;
-		    /* write it, lock or no lock */
-	            u_seek(op->lfd,0L,SEEK_END) ;
-	            rs = uc_writen(op->lfd,op->buf,op->len) ;
-	            len = rs ;
-	            op->len = 0 ;
-		    /* do we have a lock? -- unlock if we do */
-	            if (f_havelock) {
-			lockfile(op->lfd,F_ULOCK,0L,0L,0) ;
-		    }
-	    	    rs1 = sigblocker_finish(&blocker) ;
+	        if (sigblocker b ; (rs = b.start(sigblocks)) >= 0) {
+		    bool f_havelock = false ;
+		    {
+	                rs1 = lockfile(op->lfd,F_WLOCK,0z,0z,TO_LOCK) ;
+	                f_havelock = (rs1 >= 0) ;
+		        /* write it, lock or no lock */
+	                u_seek(op->lfd,0L,SEEK_END) ;
+	                rs = uc_writen(op->lfd,op->buf,op->len) ;
+	                len = rs ;
+	                op->len = 0 ;
+		        /* do we have a lock? -- unlock if we do */
+	                if (f_havelock) {
+			    lockfile(op->lfd,F_ULOCK,0L,0L,0) ;
+		        }
+		    } /* end block */
+	    	    rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblocker) */
 	    } /* end if (file-open) */
 	} /* end if (non-zero) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (logfile_iflush) */
+} /* end subroutine (logfile_iflush) */
 
 local int logfile_mkentry(logfile *op,time_t dt,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -613,8 +604,7 @@ local int logfile_mkentry(logfile *op,time_t dt,cc *sp,int sl) noex {
 	    } /* end if (ok) */
 	} /* end block */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (logfile_mkentry) */
+} /* end subroutine (logfile_mkentry) */
 
 /* create the entry right in the storage buffer itself */
 local int logfile_mkline(logfile *op,cchar *sp,int sl) noex {
@@ -627,19 +617,17 @@ local int logfile_mkline(logfile *op,cchar *sp,int sl) noex {
 	    bp = strwcpy(bp,"\n",1) ;
 	    op->len += intconv(bp - buf) ;
 	    len = intconv(bp - buf) ;
-	}
+	} /* end block */
 	return len ;
-}
-/* end subroutine (logfile_mkline) */
+} /* end subroutine (logfile_mkline) */
 
 local int colstate_load(COLSTATE *csp,int ncols,int ncol) noex {
 	{
 	    csp->ncols = ncols ;
 	    csp->ncol = ncol ;
-	}
+	} /* end block */
 	return SR_OK ;
-}
-/* end subroutine (colstate_load) */
+} /* end subroutine (colstate_load) */
 
 /* return the number of characters that will fill the current column limit */
 local int colstate_linecols(COLSTATE *csp,cchar *sbuf,int slen) noex {
@@ -655,8 +643,7 @@ local int colstate_linecols(COLSTATE *csp,cchar *sbuf,int slen) noex {
 	    rcols -= cols ;
 	} /* end for */
 	return i ;
-}
-/* end subroutine (colstate_linecols) */
+} /* end subroutine (colstate_linecols) */
 
 local int mkclean(char *outbuf,int outlen,cchar *sbuf,int slen) noex {
 	int		i ; /* used afterwards */
@@ -667,8 +654,7 @@ local int mkclean(char *outbuf,int outlen,cchar *sbuf,int slen) noex {
 	    }
 	} /* end for */
 	return i ;
-}
-/* end subroutine (mkclean) */
+} /* end subroutine (mkclean) */
 
 local bool hasourbad(cchar *sp,int sl) noex {
 	bool		f = false ;
@@ -680,8 +666,7 @@ local bool hasourbad(cchar *sp,int sl) noex {
 	    sl -= 1 ;
 	} /* end if */
 	return f ;
-}
-/* end subroutine (hasourbad) */
+} /* end subroutine (hasourbad) */
 
 local bool isourbad(int ch) noex {
 	bool		f = false ;
@@ -698,7 +683,6 @@ local bool isourbad(int ch) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isourbad) */
+} /* end subroutine (isourbad) */
 
 
