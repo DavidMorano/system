@@ -39,7 +39,7 @@ module ;
 #include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
