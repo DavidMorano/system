@@ -50,24 +50,6 @@
 #endif
 #endif
 
-/* max-name */
-#ifndef	MNBUFLEN
-#ifdef	NAME_MAX
-#define	MNBUFLEN	NAME_MAX
-#else
-#define	MNBUFLEN	(1*1024)
-#endif
-#endif
-
-/* max-path */
-#ifndef	MPBUFLEN
-#ifdef	PATH_MAX
-#define	MPBUFLEN	PATH_MAX
-#else
-#define	MPBUFLEN	(4*1024)
-#endif
-#endif
-
 /* max-line */
 #ifndef	MLBUFLEN
 #ifdef	LINE_MAX
@@ -88,14 +70,23 @@
 #define	NNBUFLEN	256
 #endif
 #endif
+#endif /* NNBUFLEN */
+
+/* max-name (file-system) */
+#ifndef	MNBUFLEN
+#ifdef	NAME_MAX
+#define	MNBUFLEN	NAME_MAX
+#else
+#define	MNBUFLEN	(1*1024)
+#endif
 #endif
 
-/* host-name */
-#ifndef	HNBUFLEN
-#ifdef	MAXHOSTNAMELEN
-#define	HNBUFLEN	MAXHOSTNAMELEN
+/* max-path (file-system) */
+#ifndef	MPBUFLEN
+#ifdef	PATH_MAX
+#define	MPBUFLEN	PATH_MAX
 #else
-#define	HNBUFLEN	(1*1024)
+#define	MPBUFLEN	(4*1024)
 #endif
 #endif
 
@@ -103,6 +94,15 @@
 #ifndef	MMBUFLEN
 #define	MMBUFLEN	(16*1024)	/* (Max-Message-Buf-Len) */
 #endif
+
+/* login-name */
+#ifndef	LIBUFLEN
+#ifdef	_POSIX_LOGIN_NAME_MAX
+#define	LIBUFLEN	_POSIX_LOGIN_NAME_MAX
+#else
+#define	LIBUFLEN	255		/* picked value from MacOS! */
+#endif
+#endif /* LIBUFLEN */
 
 /* user-name */
 #ifndef	UNBUFLEN
@@ -125,11 +125,7 @@
 
 /* password entry */
 #ifndef	PWBUFLEN
-#ifdef	_SC_GETPW_R_SIZE_MAX
-#define	PWBUFLEN	_SC_GETPW_R_SIZE_MAX
-#else
 #define	PWBUFLEN	1024		/* Solaris® _SC_GETPW_R_SIZE_MAX */
-#endif
 #endif
 
 /* shadow-password entry */
