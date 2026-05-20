@@ -95,12 +95,12 @@ const int	ulibvals::maxgroups	= getval(_SC_NGROUPS_MAX) ;
 const int	ulibvals::maxnamelen	= getval(_SC_NAME_MAX) ;
 const int	ulibvals::maxpathlen	= getval(_SC_PATH_MAX) ;
 const int	ulibvals::maxmsglen	= getval(_SC_MSG_MAX) ;
+const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
 const int	ulibvals::usernamelen	= getval(_SC_USERNAME_MAX) ;
 const int	ulibvals::groupnamelen	= getval(_SC_GROUPNAME_MAX) ;
 const int	ulibvals::projnamelen	= 
 				getval(_SC_PROJECTNAME_MAX) ;
 const int	ulibvals::protnamelen	= getval(_SC_PROTNAME_MAX) ;
-const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
 const int	ulibvals::hostnamelen	= getval(_SC_HOSTNAME_MAX) ;
 const int	ulibvals::servnamelen	= getval(_SC_SERVNAME_MAX) ;
 const int	ulibvals::binbuflen	= BINBUFLEN ;	/* for |int256_t| */
