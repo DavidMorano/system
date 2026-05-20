@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= uopen_prime.o
+OBJ0= uopenprime.o
 OBJ1= uacceptpass.o
 OBJ2=
 OBJ3=
@@ -135,7 +135,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
 
 
-uopen_prime.o:	uopen_prime.cc		$(INCS)
+uopenprime.o:	uopenprime.cc		$(INCS)
 uacceptpass.o:	uacceptpass.cc		$(INCS)
 
 
