@@ -48,15 +48,15 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<concepts>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
-#include	<baops.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<concepts>		/* C++ */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module chrset ;
 
@@ -69,27 +69,27 @@ constexpr int	nwords = ((UCHAR_MAX + 1) / (szof(word_t) * CHAR_BIT)) ;
 export {
     struct chrset {
 	word_t		bs[nwords] = {} ;	/* 32 bytes (4 words) */
-	chrset() = default ;
-	chrset(const chrset &) = delete ;
-	chrset &operator = (const chrset &) = delete ;
-	chrset &operator = (chrset &&) = delete ;
-	chrset(cchar *ss) noex {
+	constexpr chrset() = default ;
+	constexpr chrset(const chrset &) = delete ;
+	constexpr chrset &operator = (const chrset &) = delete ;
+	constexpr chrset &operator = (chrset &&) = delete ;
+	constexpr chrset(cchar *ss) noex {
 	    load(ss) ;
 	} ;
-	chrset(int ch) noex {
+	constexpr chrset(int ch) noex {
 	    BASETL(bs,ch) ;
 	} ;
-	int load(cchar *) noex ;
-	int set(int) noex ;
-	int clr(int) noex ;
-	int tst(int) const noex ;
+	constexpr int load(cchar *) noex ;
+	constexpr int set(int) noex ;
+	constexpr int clr(int) noex ;
+	constexpr int tst(int) const noex ;
 	int operator [] (int ch) const noex {
 	    return tst(ch) ;
 	} ;
     } ; /* end struct (chrset) */
 } /* end export */
 
-int chrset::load(cchar *ss) noex {
+constexpr int chrset::load(cchar *ss) noex {
     	int		rs = SR_FAULT ;
 	if (ss) {
 	    rs = SR_OK ;
@@ -100,7 +100,7 @@ int chrset::load(cchar *ss) noex {
 	return rs ;
 } /* end method (chrset::load) */
 
-int chrset::tst(int ch) const noex {
+constexpr int chrset::tst(int ch) const noex {
     	int rs = SR_INVALID ;
 	if ((ch >= 0) && (ch < nbits)) {
 	    rs = bool(BATSTL(bs,ch)) ;
@@ -108,7 +108,7 @@ int chrset::tst(int ch) const noex {
 	return rs ;
 } /* end method (chrset::tst) */
 
-int chrset::set(int ch) noex {
+constexpr int chrset::set(int ch) noex {
     	int rs = SR_INVALID ;
 	if ((ch >= 0) && (ch < nbits)) {
 	    rs = SR_OK ;
@@ -117,7 +117,7 @@ int chrset::set(int ch) noex {
 	return rs ;
 } /* end method (chrset::set) */
 
-int chrset::clr(int ch) noex {
+constexpr int chrset::clr(int ch) noex {
     	int rs = SR_INVALID ;
 	if ((ch >= 0) && (ch < nbits)) {
 	    rs = SR_OK ;
