@@ -61,16 +61,16 @@ export {
 	static const int	maxlogin ;
 	static const int	maxsymbol ;
 	static const int	maxgroups ;
-	static const int	maxnamelen ;
-	static const int	maxpathlen ;
+	static const int	maxnamelen ;	/* file-system */
+	static const int	maxpathlen ;	/* file-system */
 	static const int	maxmsglen ;	/* Maximum-Message-Length */
-	static const int	usernamelen ;
-	static const int	groupnamelen ;
-	static const int	projnamelen ;
-	static const int	nodenamelen ;
-	static const int	protnamelen ;	/* network protocol-name */
-	static const int	hostnamelen ;	/* network host-name */
-	static const int	servnamelen ;	/* network service-name */
+	static const int	nodenamelen ;	/* name system node */
+	static const int	usernamelen ;	/* name system user */
+	static const int	groupnamelen ;	/* name system group */
+	static const int	projnamelen ;	/* name system project */
+	static const int	protnamelen ;	/* name network protocol */
+	static const int	hostnamelen ;	/* name network host*/
+	static const int	servnamelen ;	/* name network serice */
 	static const int	binbuflen ;	/* for |int256_t| */
 	static const int	octbuflen ;	/* for |int256_t| */
 	static const int	decbuflen ;	/* for |int256_t| */
