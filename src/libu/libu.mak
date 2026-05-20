@@ -88,7 +88,7 @@ OBJ31= ccfile.o readln.o dprint.o
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o cmporders.o localmisc.o
 OBJ34= exitcodes.o stacktypes.o sysconfcmds.o
-OBJ45=
+OBJ35= ascii.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -98,9 +98,10 @@ OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
-OBJI= obj32.o obj33.o obj34.o
+OBJI= obj32.o obj33.o obj34.o obj35.o
 
-OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o obji.o
+OBJ += obja.o objb.o objc.o objd.o 
+OBJ += obje.o objf.o objg.o objh.o obji.o
 
 
 INCDIRS=
