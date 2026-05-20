@@ -34,6 +34,8 @@
 #include	<usupport_ctdec.hh>
 #include	<usupport_cfdec.hh>
 #include	<usupport_cfdect.hh>
+#include	<usupport_cfhex.hh>
+#include	<usupport_cfinet.hh>
 #include	<usupport_getsign.hh>
 #include	<usupport_getusmtime.hh>
 #include	<usupport_getustime.hh>
