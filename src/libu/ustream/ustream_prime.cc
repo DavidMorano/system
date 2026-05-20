@@ -174,9 +174,8 @@ local int ustream_opener(ustream *op) noex {
 	int		rs ;
 	DPRINTF("ent\n") ;
         if ((rs = ustream_adjbuf(op,bsz)) >= 0) ylikely {
-	    cint dsz = (op->dlen + 1) ;
 	    DPRINTF("adjbuf() rs=%d\n",rs) ;
-            if (char *p ; (rs = umem.vall(dsz,&p)) >= 0) ylikely {
+            if (char *p ; (rs = umem.vall(op->dlen,&p)) >= 0) ylikely {
 	        DPRINTF("vall() rs=%d\n",rs) ;
                 op->dbuf = p ;
                 op->bptr = p ;
@@ -637,6 +636,9 @@ local int ustream_adjbuf(ustream *op,int bufsz) noex {
 	        } /* end if */
 	    } /* end if (bufsz) */
 	    op->dlen = bufsz ;
+	    if (rs >= 0) {
+		rs = op->dlen ;
+	    }
 	} /* end if (stat) */
 	return rs ;
 } /* end subroutine (ustream_adjbuf) */
