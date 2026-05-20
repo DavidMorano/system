@@ -87,6 +87,14 @@
 
  */
 
+/* missing on some systems (Apple-Darwin) */
+#ifndef	EX_CONFIG
+#define	EX_CONFIG	78
+#endif
+#ifndef	EX_NOTFOUND
+#define	EX_NOTFOUND	79
+#endif
+
 /* exit OK */
 #define	EX_OK		0		/* this is general (good) success */
 #define	EX_SUCCESS	0
