@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -40,9 +40,23 @@ MODS +=
 LIBS +=
 
 
-INCDIRS +=
+OBJPART=
 
-LIBDIRS += -L$(LIBDIR)
+OBJPRIME= filerec0.o
+
+OBJ0= filerec1.o 
+OBJ1= filerec2.o filerec3.o
+OBJ2= filerec4.o filerec5.o
+OBJ3=
+
+OBJA= obj0.o obj1.o obj2.o
+OBJB=
+
+OBJIMPL= obja.o
+
+
+INCDIRS +=
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -53,17 +67,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ0= filerec0.o filerec1.o 
-OBJ1= filerec2.o filerec3.o
-OBJ2= filerec4.o filerec5.o
-OBJ3=
-
-OBJA= obj0.o obj1.o obj2.o
-OBJB=
-
-OBJ= obja.o
 
 
 .SUFFIXES:		.hh .ii .iim .ccm
@@ -96,11 +99,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ)
-	makemodule filerec
+$(T).o:			objprime.o objimpl.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
@@ -136,27 +138,34 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-filerec0.o:		filerec.ccm			$(INCS)
-	makemodule filerec
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module primary
+filerec0.o:		filerec.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+# module implementation
 filerec1.o:		filerec1.cc filerec0.o		$(INCS)
-	makemodule filerec
 	$(COMPILE.cc) $<
 
 filerec2.o:		filerec2.cc filerec0.o		$(INCS)
-	makemodule filerec
 	$(COMPILE.cc) $<
 
 filerec3.o:		filerec3.cc filerec0.o		$(INCS)
-	makemodule filerec
 	$(COMPILE.cc) $<
 
 filerec4.o:		filerec4.cc filerec0.o		$(INCS)
-	makemodule filerec
 	$(COMPILE.cc) $<
 
 filerec5.o:		filerec5.cc filerec0.o		$(INCS)
-	makemodule filerec
 	$(COMPILE.cc) $<
 
 
