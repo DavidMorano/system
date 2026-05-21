@@ -35,18 +35,18 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<limits.h>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<limits.h>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	fieldterms(char *,int,cchar *) noex ;
-extern int	fieldtermsx(char *,int,int,...) noex ;
+extern int	fieldterms	(char *,int,cchar *) noex ;
+extern int	fieldtermsx	(char *,int,int,...) noex ;
 
 EXTERNC_end
 
@@ -55,10 +55,10 @@ EXTERNC_end
 constexpr int	fieldterms_termsize = ((UCHAR_MAX + 1) / CHAR_BIT) ;
 
 template<typename ... Args>
-static inline int fieldterms(char *t,int f,Args ... args) noex {
+local inline int fieldterms(char *t,int f,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return fieldtermsx(t,f,na,args ...) ;
-}
+} /* end subroutine-template */
 
 #endif /* __cplusplus */
 
