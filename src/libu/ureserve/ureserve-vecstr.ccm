@@ -55,12 +55,11 @@ enum vecstrmems {
     	vecstrmem_overlast
 } ; /* end enum (vecstrmems) */
 
-struct vecstr_fl {
+export {
+    struct vecstr_fl {
     	uint		open:1 ;
 	uint		sorted:1 ;
-} ; /* end struct (vecstr_fl) */
-
-export {
+    } ; /* end struct (vecstr_fl) */
     struct vecstr ;
     struct vecstr_co {
 	vecstr		*op = nullptr ;
@@ -92,22 +91,21 @@ export {
 	    sort	(this,vecstrmem_sort) ;
 	    delall	(this,vecstrmem_delall) ;
 	} ; /* end ctor */
-	int add(cchar *,int = -1) noex ;
-	int adduniq(cchar *,int = -1) noex ;
-	int add(string *) noex ;
-	int addenvfile(cchar *) noex ;
-	int find(cchar *,int = -1) noex ;
-	int search(cchar *,int = -1) noex ;
-	int get(int,ccharpp) noex ;
-	int del(int) noex ;
-	int curbegin(vecstr_cur *) noex ;
-	int curend(vecstr_cur *) noex ;
-	int curenum(vecstr_cur *,cchar **) noex ;
+	int add		(cchar *,int = -1) noex ;
+	int adduniq	(cchar *,int = -1) noex ;
+	int add		(string *) noex ;
+	int find	(cchar *,int = -1) noex ;
+	int search	(cchar *,int = -1) noex ;
+	int get		(int,ccharpp) noex ;
+	int del		(int) noex ;
+	int curbegin	(vecstr_cur *) noex ;
+	int curend	(vecstr_cur *) noex ;
+	int curenum	(vecstr_cur *,cchar **) noex ;
 	int icount() const noex ;
 	operator int () noex ;
 	destruct vecstr() {
 	    if (fl.open) dtor() ;
-	} ;
+	} ; /* end destrcut */
     private:
 	int istart(int = 0) noex ;
 	int ifinish() noex ;
@@ -119,7 +117,7 @@ export {
     struct vecstr_cur {
 	vecstr::iterator	it ;
     } ; /* end struct (vestr_cur) */
-    int vecstr_add(vecstr *,string *) noex ;
+    extern int vecstr_add(vecstr *,string *) noex ;
 } /* end export */
 
 
