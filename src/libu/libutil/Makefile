@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -42,11 +42,6 @@ LIBS +=
 
 DEPS += 
 
-OBJ00= libutil0.o libutil1.o
-OBJ01=
-OBJ02=
-OBJ03=
-
 OBJPART00= libutil-strlen.o libutil-strxspn.o
 OBJPART01= libutil-cvtconst.o libutil-getlen.o 
 OBJPART02= libutil-lenstr.o libutil-lenstrarr.o
@@ -63,17 +58,18 @@ OBJPARTD= objpart06.o
 
 OBJPART= objparta.o objpartb.o objpartc.o objpartd.o
 
-OBJA= obj00.o
-OBJB= obj04.o obj05.o obj06.o obj07.o
-OBJC= 
-OBJD= 
+OBJPRIME= libutil0.o
 
-OBJ= obja.o
+OBJ00= libutil1.o
+OBJ01=
+OBJ02=
+OBJ03=
+
+OBJIMPL= obj00.o
 
 
 INCDIRS=
-
-LIBDIRS=
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -116,17 +112,17 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ) objpart.o Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) objpart.o
+$(T).o:			objpart.o objprime.o objimpl.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 safe:
-	makesafe -v=3 -I $(INCDIR) $(OBJ)
+	makesafe -v=3 -I $(INCDIR) $(OBJIMPL)
 
 again:
 	rm -f $(ALL)
@@ -219,51 +215,80 @@ objd.o:			$(OBJD)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 libutil0.o:		libutil.ccm objpart.o
-	makemodule libutil
+	gxx -c -x c++ -o $@ -O $<
 
-libutil1.o:		libutil1.cc libutil.ccm
-	makemodule libutil
+libutil1.o:		libutil1.cc libutil0.o
 	$(COMPILE.cc) $<
 
-libutil2.o:		libutil2.cc libutil.ccm
-	makemodule libutil
+libutil2.o:		libutil2.cc libutil0.o
 	$(COMPILE.cc) $<
 
-libutil3.o:		libutil3.cc libutil.ccm
-	makemodule libutil
+libutil3.o:		libutil3.cc libutil0.o
 	$(COMPILE.cc) $<
 
-libutil4.o:		libutil4.cc libutil.ccm
-	makemodule libutil
+libutil4.o:		libutil4.cc libutil0.o
 	$(COMPILE.cc) $<
 
-libutil5.o:		libutil5.cc libutil.ccm
-	makemodule libutil
+libutil5.o:		libutil5.cc libutil0.o
 	$(COMPILE.cc) $<
 
 libutil6.o:		libutil6.cc libutil.ccm
-	makemodule libutil
 	$(COMPILE.cc) $<
 
 libutil7.o:		libutil7.cc libutil.ccm
-	makemodule libutil
 	$(COMPILE.cc) $<
 
 libutil-cvtconst.o:	libutil-cvtconst.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-getlen.o:	libutil-getlen.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-lenstr.o:	libutil-lenstr.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-lenstrarr.o:	libutil-lenstrarr.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-loadstrs.o:	libutil-loadstrs.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-memclear.o:	libutil-memclear.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-memcopy.o:	libutil-memcopy.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-memcpy.o:	libutil-memcpy.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-resumelife.o:	libutil-resumelife.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-strlen.o:	libutil-strlen.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-strxspn.o:	libutil-strxspn.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-stpcpy.o:	libutil-stpcpy.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-strcpy.o:	libutil-strcpy.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-strcopy.o:	libutil-strcopy.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 libutil-strcmp.o:	libutil-strcmp.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 
