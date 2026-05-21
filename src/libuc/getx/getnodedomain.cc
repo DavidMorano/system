@@ -230,7 +230,7 @@ constexpr guess		ga[] = {
 } ; /* end array (ga) */
 
 static bufsizevar	maxnodelen(bufsize_nn) ;
-static bufsizevar	maxhostlen(bufsize_hn) ;
+static bufsizevar	maxhostlen(bufsize_hostname) ;
 
 constexpr bool		f_guess = CF_GUESS ;
 
@@ -301,7 +301,7 @@ int getuserdomain(char *dbuf,int dlen) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (dbuf) ylikely {
-	    if (char *dn ; (rs = lm_hn(&dn)) >= 0) ylikely {
+	    if (char *dn ; (rs = lm_hostname(&dn)) >= 0) ylikely {
 	        if (dlen < 0) dlen = rs ;
 	        if ((rs = getnodedomain(nullptr,dn)) >= 0) ylikely {
 	            rs = sncpy(dbuf,dlen,dn) ;
