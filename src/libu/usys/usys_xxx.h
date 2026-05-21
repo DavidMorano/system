@@ -189,7 +189,7 @@ enum syshasmemplock {
 	syshasmemplock_locktxt,
 	syshasmemplock_lockdat,
 	syshasmemplock_verlast
-} ;
+} ; /* end enum (syshasmemplock) */
 
 #ifndef	UNLOCK
 #define	UNLOCK		syshasmemplock_locknon
@@ -241,16 +241,16 @@ namespace usys {
 #ifndef	SUBROUTINE_STATFILE
 #define	SUBROUTINE_STATFILE
 EXTERNC_begin
-static inline unixret_t statfile(cchar *fn,USTAT *sbp) noex {
+local inline unixret_t statfile(cchar *fn,USTAT *sbp) noex {
     	return stat(fn,sbp) ;
 }
-static inline unixret_t statfilefs(cchar *fn,USTATFS *sbp) noex {
+local inline unixret_t statfilefs(cchar *fn,USTATFS *sbp) noex {
     	return statfs(fn,sbp) ;
 }
-static inline unixret_t statfilevfs(cchar *fn,USTATVFS *sbp) noex {
+local inline unixret_t statfilevfs(cchar *fn,USTATVFS *sbp) noex {
     	return statvfs(fn,sbp) ;
 }
-static inline unixret_t fstatfile(int fd,USTAT *sbp) noex {
+local inline unixret_t fstatfile(int fd,USTAT *sbp) noex {
     	return fstat(fd,sbp) ;
 }
 EXTERNC_end
@@ -259,7 +259,7 @@ EXTERNC_end
 #ifndef	SUBROUTINE_DUPOVER
 #define	SUBROUTINE_DUPOVER
 EXTERNC_begin
-static inline unixret_t dupover(int sfd,int dfd) noex {
+local inline unixret_t dupover(int sfd,int dfd) noex {
     	return dup2(sfd,dfd) ;
 }
 EXTERNC_end
