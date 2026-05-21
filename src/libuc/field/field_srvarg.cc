@@ -101,8 +101,8 @@
 
 /* forward references */
 
-static int	fieldinit_terms() noex ;
-static int	field_srvarger(field *,cchar *,char *,int) noex ;
+local int	terminit() noex ;
+local int	field_srvarger(field *,cchar *,char *,int) noex ;
 
 
 /* local structures */
@@ -130,13 +130,12 @@ int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
     	int		rs = SR_FAULT ;
 	int		fl = 0 ;
 	if (fsbp && abuf) ylikely {
-    	    static cint		rsf = fieldinit_terms() ;
 	    abuf[0] = '\0' ;
-	    if ((rs = rsf) >= 0) ylikely {
+    	    if (static cint rsf = terminit() ; (rs = rsf) >= 0) ylikely {
 		if (terms == nullptr) terms = dterms ;
 	        rs = field_srvarger(fsbp,terms,abuf,alen) ;
 	        fl = rs ;
-	    }
+	    } /* end if (terminit) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ; 
 }
@@ -145,7 +144,7 @@ int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 
 /* local subroutines */
 
-static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
+local int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	int		rs = SR_OK ;
 	int		fl = 0 ;
         int         ch ; /* used-multiple-blocks */
@@ -313,17 +312,15 @@ static int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
         fsbp->fl = fl ;
         fsbp->term = chterm ;
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_srvarger) */
+} /* end subroutine (field_srvarger) */
 
-static int fieldinit_terms() noex {
+local int terminit() noex {
     	int		rs ;
 	cbool		f_retain = true ;
 	if ((rs = fieldterms(dterms,f_retain,",")) >= 0) ylikely {
 	    rs = fieldterms(doubles,f_retain,"\"$\\`") ;
 	}
 	return rs ;
-}
-/* end subroutine (fieldinit_terms) */
+} /* end subroutine (terminit) */
 
 
