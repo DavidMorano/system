@@ -132,7 +132,7 @@ local int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	int		len = 0 ; /* return-value */
 	cchar		*procname = PROCNAME ;
 	if ((rs = uc_procpid(procname,0)) > 0) {
-	    if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
+	    if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) {
 		cint	dlen = rs ;
 	        if ((rs = getnisdomain(dbuf,dlen)) >= 0) {
 	            cint	dl = rs ;
