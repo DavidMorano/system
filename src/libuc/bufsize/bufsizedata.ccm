@@ -89,13 +89,24 @@ export {
 	        ip->name = _SC_PAGESIZE ;
 		ip->defval = (8 * 1024) ;	/* page-size Solaris® */
 	        break ;
-	    case bufsize_mi:
-	        ip->name = _SC_PID_MAX ;
-		ip->defval = PID_MAX ;
+	    case bufsize_pl:			/* pid-length (digit string) */
+		ip->defval = 6 ;		/* log-base-10 MAX_PID */
 	        break ;
 	    case bufsize_ma:
 	        ip->name = _SC_ARG_MAX ;
 		ip->defval = ARBUFLEN ;
+	        break ;
+	    case bufsize_ml:		/* max-line */
+	        ip->name = _SC_LINE_MAX ;
+		ip->defval = MLBUFLEN ;
+	        break ;
+	    case bufsize_li:		/* login-name */
+		ip->name = _SC_LOGIN_NAME_MAX ;
+	        ip->defval = UNBUFLEN ;
+	        break ;
+	    case bufsize_mm:		/* max-message */
+	        ip->name = _SC_MSG_MAX ;
+		ip->defval = MMBUFLEN ;
 	        break ;
 	    case bufsize_mn:		/* max-name */
 	        ip->name = _SC_NAME_MAX ;
@@ -105,21 +116,9 @@ export {
 	        ip->name = _SC_PATH_MAX ;
 	        ip->defval = MPBUFLEN ;
 	        break ;
-	    case bufsize_ml:		/* max-line */
-	        ip->name = _SC_LINE_MAX ;
-		ip->defval = MLBUFLEN ;
-	        break ;
-	    case bufsize_mm:		/* max-message */
-	        ip->name = _SC_MSG_MAX ;
-		ip->defval = MMBUFLEN ;
-	        break ;
 	    case bufsize_nn:		/* node-name */
 	        ip->name = _SC_NODENAME_MAX ; /* <- really is "nodename" */
 		ip->defval = NNBUFLEN ;
-	        break ;
-	    case bufsize_hn:		/* host-name */
-	        ip->name = _SC_HOSTNAME_MAX ;
-	        ip->defval = HNBUFLEN ;
 	        break ;
 	    case bufsize_un:		/* user-name */
 		ip->name = _SC_LOGIN_NAME_MAX ;
@@ -131,33 +130,52 @@ export {
 	    case bufsize_pn:		/* project-name */
 	        ip->defval = PNBUFLEN ;
 	        break ;
-	    case bufsize_pw:			/* entry-password */
+	    case bufsize_protname:	/* prot-name */
+	        ip->name = _SC_PROTNAME_MAX ;
+	        ip->defval = PROTNAMELEN ;
+	        break ;
+	    case bufsize_hostname:	/* host-name */
+	        ip->name = _SC_HOSTNAME_MAX ;
+	        ip->defval = HOSTNAMELEN ;
+	        break ;
+	    case bufsize_servname:	/* serv-name */
+	        ip->name = _SC_SERVNAME_MAX ;
+	        ip->defval = SERVNAMELEN ;
+	        break ;
+	    case bufsize_pw:		/* entry-password */
 	        ip->name = _SC_GETPW_R_SIZE_MAX ;
 		ip->defval = PWBUFLEN ;
 	        break ;
-	    case bufsize_sp:			/* entry-shadow */
+	    case bufsize_sp:		/* entry-shadow */
+	        ip->name = _SC_GETSP_R_SIZE_MAX ;
 	        ip->defval = SPBUFLEN ;
 	        break ;
-	    case bufsize_ua:			/* entry-userattr */
+	    case bufsize_ua:		/* entry-userattr */
+	        ip->name = _SC_GETUA_R_SIZE_MAX ;
 	        ip->defval = UABUFLEN ;
 	        break ;
-	    case bufsize_gr:			/* entry-group */
+	    case bufsize_gr:		/* entry-group */
 		ip->name = _SC_GETGR_R_SIZE_MAX ;
 		ip->defval = GRBUFLEN ;
 	        break ;
-	    case bufsize_pj:			/* entry-project */
+	    case bufsize_pj:		/* entry-project */
+	        ip->name = _SC_GETPJ_R_SIZE_MAX ;
 		ip->defval = PJBUFLEN ;		/* project-buf */
 	        break ;
-	    case bufsize_pr:			/* entry-protocol */
+	    case bufsize_pr:		/* entry-protocol */
+	        ip->name = _SC_GETPR_R_SIZE_MAX ;
 		ip->defval = PRBUFLEN ;		/* protocol-buf */
 	        break ;
 	    case bufsize_nw:			/* entry-network */
+	        ip->name = _SC_GETNW_R_SIZE_MAX ;
 		ip->defval = NWBUFLEN ;		/* network-buf */
 	        break ;
-	    case bufsize_ho:			/* entry-host */
+	    case bufsize_ho:		/* entry-host */
+	        ip->name = _SC_GETHO_R_SIZE_MAX ;
 		ip->defval = HOBUFLEN ;		/* host-buf */
 	        break ;
-	    case bufsize_sv:			/* entry-service */
+	    case bufsize_sv:		/* entry-service */
+	        ip->name = _SC_GETSV_R_SIZE_MAX ;
 		ip->defval = SVBUFLEN ;		/* service-buf */
 	        break ;
 	    case bufsize_fs:
