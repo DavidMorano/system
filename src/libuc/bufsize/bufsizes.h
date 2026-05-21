@@ -37,17 +37,20 @@
 
 enum bufsizes {
 	bufsize_ps,		/* page-size */
-	bufsize_mi,		/* max-pid */
+	bufsize_pl,		/* pid-length (digit string length) */
 	bufsize_ma,		/* max-args */
+	bufsize_ml,		/* max-line */
+	bufsize_li,		/* max-login */
+	bufsize_mm,		/* max-message */
 	bufsize_mn,		/* max-name */
 	bufsize_mp,		/* max-path */
-	bufsize_ml,		/* max-line */
-	bufsize_mm,		/* max-message */
-	bufsize_nn,		/* node-name */
-	bufsize_hn,		/* host-name */
-	bufsize_un,		/* user-name */
-	bufsize_gn,		/* group-name */
-	bufsize_pn,		/* project-name */
+	bufsize_nn,		/* name system node-name */
+	bufsize_un,		/* name system user-name */
+	bufsize_gn,		/* name system group-name */
+	bufsize_pn,		/* name system roject-name */
+	bufsize_protname,	/* name network prot-name (protocl-name) */
+	bufsize_hostname,	/* name network host-name (host-name) */
+	bufsize_servname,	/* name network serv-name (service-name) */
 	bufsize_pw,		/* entry passwd */
 	bufsize_sp,		/* entry shadow */
 	bufsize_ua,		/* entry user-attr */
