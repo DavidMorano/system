@@ -1,8 +1,8 @@
-/* ureserve4 MODULE (vecstr) */
+/* ureserve8 MODULE (vecstr - implementation{) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* reserved interfaces */
+/* reserved interfaces - vecstr */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* debugging */
@@ -34,22 +34,19 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| + |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<stdexcept>		/* |std::out_of_range(3c++)| */
-#include	<vector>
-#include	<string>
-#include	<string_view>
-#include	<algorithm>		/* |ranges::sort(3c++)| */
-#include	<iostream>		/* |cerr(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ulogerror.h>
-#include	<localmisc.h>		/* |eol| */
+#include	<climits>		/* CSTD |UCHAR_MAX| + |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<stdexcept>		/* C++STD |std::out_of_range(3c++)| */
+#include	<string>		/* C++STD */
+#include	<string_view>		/* C++STD */
+#include	<algorithm>		/* C++STD |ranges::sort(3c++)| */
+#include	<vector>		/* C++STD |cerr(3c++)| */
+#include	<iostream>		/* C++STD |cerr(3c++)| */
+#include	<clanguage.h>		/* LINU */
+#include	<usysbase.h>		/* LINU */
+#include	<ulogerror.h>		/* LINU */
+#include	<localmisc.h>		/* LIBU |eol| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
