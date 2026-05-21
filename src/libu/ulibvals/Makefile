@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -40,7 +40,11 @@ MODS +=
 LIBS +=
 
 
-OBJ0= ulibvals0.o ulibvals1.o
+OBJPART=
+
+OBJPRIME= ulibvals0.o
+
+OBJ0= ulibvals1.o
 OBJ1=
 OBJ2=
 OBJ3=
@@ -48,13 +52,11 @@ OBJ3=
 OBJA= obj0.o 
 OBJB= obj2.o obj3.o
 
-OBJ= obja.o
+OBJIMPL= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -97,11 +99,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+$(T).o:			objprime.o objimpl.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -136,11 +138,22 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ulibvals0.o:		ulibvals.ccm
-	makemodule ulibvals
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-ulibvals1.o:		ulibvals1.cc ulibvals.ccm 
-	makemodule ulibvals
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module primary
+ulibvals0.o:		ulibvals.ccm
+	gxx -c -x c++ -o $@ -O $<
+
+# module implementation
+ulibvals1.o:		ulibvals1.cc objprime.o
 	$(COMPILE.cc) $<
 
 
