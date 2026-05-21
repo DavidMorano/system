@@ -27,13 +27,13 @@
 
 EXTERNC_begin
 
-extern int cfnumi(cchar *,int,int *) noex ;
-extern int cfnuml(cchar *,int,long *) noex ;
-extern int cfnumll(cchar *,int,longlong *) noex ;
+extern int cfnumi	(cchar *,int,int *)		noex ;
+extern int cfnuml	(cchar *,int,long *)		noex ;
+extern int cfnumll	(cchar *,int,longlong *)	noex ;
 
-extern int cfnumui(cchar *,int,uint *) noex ;
-extern int cfnumul(cchar *,int,ulong *) noex ;
-extern int cfnumull(cchar *,int,ulonglong *) noex ;
+extern int cfnumui	(cchar *,int,uint *)		noex ;
+extern int cfnumul	(cchar *,int,ulong *)		noex ;
+extern int cfnumull	(cchar *,int,ulonglong *)	noex ;
 
 EXTERNC_end
 
