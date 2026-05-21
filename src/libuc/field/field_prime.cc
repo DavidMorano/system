@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* subroutine to parse a line into fields */
+/* object to parse a line into fields */
 /* version %I% last-modified %G% */
 
 
@@ -93,19 +93,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<ascii.h>
-#include	<baops.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<ascii.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<strop.h>
-#include	<mkchar.h>
+#include	<mkchar.h>		/* LIBU */
 #include	<char.h>
 #include	<fieldterminit.hh>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"field.h"
 
@@ -144,15 +145,15 @@ constexpr fieldterminit		shterms(" #") ;
 
 /* local inline-subroutines */
 
-static inline bool istermorquote(cchar *terms,int ch) noex {
+local inline bool istermorquote(cchar *terms,int ch) noex {
 	return (batst(terms,ch) || batst(quotes.terms,ch)) ;
 }
 
-static inline bool istermandnotquote(cchar *terms,int ch) noex {
+local inline bool istermandnotquote(cchar *terms,int ch) noex {
 	return batst(terms,ch) && (! batst(quotes.terms,ch)) ;
 }
 
-static inline bool isquoteanddouble(int sl,int ch) noex {
+local inline bool isquoteanddouble(int sl,int ch) noex {
 	return ((ch == CH_SQUOTE) && (sl > 1) && batst(doubles.terms,ch)) ;
 }
 
