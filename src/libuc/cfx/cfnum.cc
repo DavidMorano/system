@@ -43,22 +43,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<concepts>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
-#include	<cfbin.h>
-#include	<cfoct.h>
-#include	<cfdec.h>
-#include	<cfhex.h>
-#include	<sfx.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<toxc.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<concepts>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<cfbin.h>		/* LIBUC */
+#include	<cfoct.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<cfhex.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<toxc.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cfnum.h"
 
@@ -154,8 +154,7 @@ int cfnumx(cchar *sp,int sl,UT *rp) noex {
 	    }
 	} /* end if (sfsign) */
 	return rs ;
-}
-/* end subroutine-template (cfnumx) */
+} /* end subroutine-template (cfnumx) */
 
 template<typename UT,typename T>
 int cfnumsx(cchar *bp,int bl,T *rp) noex {
@@ -169,8 +168,7 @@ int cfnumsx(cchar *bp,int bl,T *rp) noex {
 	    } /* end if (cfnumx) */
 	} /* end if (sfsign) */
 	return rs ;
-}
-/* end subroutine-template (cfnumsx) */
+} /* end subroutine-template (cfnumsx) */
 
 
 /* local variables */
