@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -40,36 +40,37 @@ MODS +=
 LIBS +=
 
 
-OBJPART0= ureserve-vecstr.o ureserve-charx.o 
-OBJPART1= ureserve-isx.o ureserve-isnot.o 
-OBJPART2= ureserve-sfx.o ureserve-strop.o
-OBJPART3= 
+OBJPART0= ureserve-isnot.o ureserve-charx.o 
+OBJPART1= ureserve-isx.o ureserve-sfx.o 
+OBJPART2= ureserve-strop.o ureserve-fieldterm.o 
+OBJPART3= ureserve-field.o ureserve-vecstr.o 
 
 OBJPARTA= objpart0.o objpart1.o
-OBJPARTB= objpart2.o 
+OBJPARTB= objpart2.o objpart3.o
 
 OBJPART= objparta.o objpartb.o
+
+OBJPRIME= ureserve0.o
 
 OBJ00= ureserve0.o 
 OBJ01= ureserve1.o ureserve2.o 
 OBJ02= ureserve3.o ureserve4.o
-OBJ03= ureserve5.o 
+OBJ03= ureserve5.o ureserve6.o
 
-OBJ04= ureserve8.o
+OBJ04= ureserve7.o ureserve8.o
 OBJ05=
 OBJ06=
 OBJ07=
 
-OBJA= obj00.o obj01.o
-OBJB= obj02.o obj03.o
-OBJC= obj04.o
+OBJA= objimpl01.o
+OBJB= objimpl02.o objimpl03.o
+OBJC= objimpl04.o
 OBJD= 
 
-OBJ= obja.o objb.o objc.o
+OBJIMPL= obja.o objb.o objc.o
 
 
 INCDIRS=
-
 LIBDIRS=
 
 RUNINFO= -rpath $(RUNDIR)
@@ -113,11 +114,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ) objpart.o Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) objpart.o
+$(T).o:			objpart.o objprime.o objimpl.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -130,35 +131,36 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat $(T) gcm.cache
 	rmobj
 
 control:
 	(uname -n ; date) > Control
 
 
-obj00.o:		$(OBJ00)
+objimpl00.o:		$(OBJ00)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj01.o:		$(OBJ01)
+objimpl01.o:		$(OBJ01)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj02.o:		$(OBJ02)
+objimpl02.o:		$(OBJ02)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj03.o:		$(OBJ03)
+objimpl03.o:		$(OBJ03)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obj04.o:		$(OBJ04)
+objimpl04.o:		$(OBJ04)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj05.o:		$(OBJ05)
+objimpl05.o:		$(OBJ05)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj06.o:		$(OBJ06)
+objimpl06.o:		$(OBJ06)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj07.o:		$(OBJ07)
+objimpl07.o:		$(OBJ07)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -198,50 +200,53 @@ objpartb.o:		$(OBJPARTB)
 objpart.o:		$(OBJPART)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-ureserve-charx.o:	ureserve-charx.ccm
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module partitions
 ureserve-isnot.o:	ureserve-isnot.ccm
+ureserve-charx.o:	ureserve-charx.ccm
 ureserve-isx.o:		ureserve-isx.ccm
-ureserve-vecstr.o:	ureserve-vecstr.ccm
 ureserve-sfx.o:		ureserve-sfx.ccm
+ureserve-strop.o:	ureserve-strop.ccm
+ureserve-fieldterm.o:	ureserve-fieldterm.ccm
+ureserve-field.o:	ureserve-field.ccm
+ureserve-vecstr.o:	ureserve-vecstr.ccm
 
+# module primary
 ureserve0.o:		ureserve.ccm objpart.o
-	makemodule ureserve
+	gxx -c -x c++ -o $@ -O $<
 
+# module implementation
 ureserve1.o:		ureserve1.cc ureserve0.o
-	makemodule ureserve
 	$(COMPILE.cc) $<
 
 ureserve2.o:		ureserve2.cc ureserve0.o
-	makemodule ureserve
 	$(COMPILE.cc) $<
 
 ureserve3.o:		ureserve3.cc ureserve0.o
-	makemodule ureserve
 	$(COMPILE.cc) $<
 
 ureserve4.o:		ureserve4.cc ureserve0.o
-	makemodule ureserve
 	$(COMPILE.cc) $<
 
 ureserve5.o:		ureserve5.cc ureserve0.o
-	makemodule ureserve
 	$(COMPILE.cc) $<
 
 ureserve6.o:		ureserve6.cc ureserve0.o
-	makemodule ureserve
 	$(COMPILE.cc) $<
 
 ureserve7.o:		ureserve7.cc ureserve0.o
-	makemodule ureserve
 	$(COMPILE.cc) $<
 
 ureserve8.o:		ureserve8.cc ureserve0.o
-	makemodule ureserve
 	$(COMPILE.cc) $<
 
 ureserve9.o:		ureserve9.cc ureserve0.o
-	makemodule ureserve
 	$(COMPILE.cc) $<
 
 
