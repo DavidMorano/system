@@ -5,7 +5,7 @@
 /* get various system buffer sizes */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -76,6 +76,7 @@
 #include	<cstring>		/* |strstr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ucsysconf.h>		/* LIBU */
 #include	<timewatch.hh>		/* LIBU */
 #include	<vecstr.h>		/* LIBUC */
@@ -171,27 +172,27 @@ int getbufsize(int w) noex {
 
 int ubufsize::operator [] (int w) noex {
 	int		rs = SR_INVALID ;
-	DPRINTF("ent w=%d\n",w) ;
+	DPRINTF("ent »getbufsize« w=%d\n",w) ;
 	if ((w >= 0) && (w < bufsize_overlast)) {
 	    if ((rs = bs[w]) == 0) {
 		DPRINTF("-> init\n") ;
 	        if ((rs = init()) >= 0) {
 		    DPRINTF("init() rs=%d\n",rs) ;
 	            rs = retrieve(w) ;
+		    DPRINTF("retrieve() rs=%d\n",rs) ;
 	        } /* end if (ubufsize::init) */
 		DPRINTF("init-out rs=%d\n",rs) ;
 	    } /* end if (need initialization) */
 	} /* end if (valid) */
-	DPRINTF("ret rs=%d\n",rs) ;
+	DPRINTF("ret »getbufszie« rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (ubufsize::operator) */
+} /* end subroutine (ubufsize::operator) */
 
 int ubufsize::init() noex {
 	cint		to = utimeout[uto_busy] ;
 	int		rs = SR_OK ;
 	int		f = false ;
-	DPRINTF("ent\n") ;
+	DPRINTF("ent »init«\n") ;
 	if (! finit.testandset) {
 	    DPRINTF("-> begin\n") ;
 	    if ((rs = begin()) >= 0) {
@@ -214,10 +215,9 @@ int ubufsize::init() noex {
 	    } ; /* end lambda (lamb) */
 	    rs = tw(lamb) ;		/* <- time-watching occurs in there */
 	} /* end if (time-watching) */
-	DPRINTF("ret rs=%d f=%d\n",rs,f) ;
+	DPRINTF("ret »init« rs=%d f=%d\n",rs,f) ;
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ubufsize::init) */
+} /* end subroutine (ubufsize::init) */
 
 int ubufsize::begin() noex {
 	int		rs = SR_OK ;
@@ -226,8 +226,7 @@ int ubufsize::begin() noex {
 	    rs = load() ;
 	}
 	return rs ;
-}
-/* end subroutine (ubufsize::begin) */
+} /* end subroutine (ubufsize::begin) */
 
 int ubufsize::load() noex {
 	int		rs = SR_OK ;
@@ -260,8 +259,7 @@ int ubufsize::load() noex {
 	} /* end if (need load) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (bufsize_load) */
+} /* end subroutine (bufsize_load) */
 
 int ubufsize::loadent(cchar *kp) noex {
     	int		rs = SR_OK ;
@@ -282,42 +280,54 @@ int ubufsize::loadent(cchar *kp) noex {
 	    }
 	} /* end if (matocasestr) */
 	return rs ;
-} 
-/* end method (ubufsize::loadent) */
+} /* end method (ubufsize::loadent) */
 
 int ubufsize::retrieve(int w) noex {
 	int		rs ;
+	DPRINTF("ent w=%d\n",w) ;
 	if ((rs = bs[w]) == 0) {
 	    cint	name = bufdata[w].name ;
 	    cint	defval = bufdata[w].defval ;
+	    DPRINTF("need\n") ;
 	    if (name >= 0) {
+	        DPRINTF("name-yes\n") ;
 	        if ((rs = sysbs(w,name)) == SR_NOTSUP) {
+	            DPRINTF("sysbs-notsup\n") ;
 		    rs = (defval) ? defval : GETBUFSIZE_DEFVAL ;
 		    bs[w] = rs ;
 		} else if (rs == 0) {
- 		   rs  = GETBUFSIZE_DEFVAL ;
+	            DPRINTF("sysbs-zero\n") ;
+ 		    rs  = GETBUFSIZE_DEFVAL ;
 		} /* end if (ubufsize::sysbs) */
+	        DPRINTF("sysbs-out rs=%d\n",rs) ;
 	    } else {
+	        DPRINTF("name-not\n") ;
 		rs = def(w) ;
 		bs[w] = rs ;
 	    } /* end if */
 	} /* end if (getting default value) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (ubufsize::retrieve) */
+} /* end subroutine (ubufsize::retrieve) */
 
 int ubufsize::sysbs(int w,int name) noex {
 	int		rs = bs[w] ;
+	DPRINTF("ent w=%d name=%d\n",w,name) ;
 	if (bs[w] == 0) {
+	    DPRINTF("need\n") ;
 	    if ((rs = uc_sysconfval(name,nullptr)) >= 0) {
+	        DPRINTF("uc_sysconf() rs=%d\n",rs) ;
 	        bs[w] = rs ;
-	    } else if (rs == SR_NOENT) {
+	    } else if ((rs == SR_NOENT) || (rs == SR_NOSYS)) {
+	        DPRINTF("uc_sysconf() rs=%d\n",rs) ;
+	        DPRINTF("uc_sysconf() NOENT || NOSYS\n") ;
 		rs = 0 ; /* specifies no-entry available */
-	    }
+	    } /* end if */
+	    DPRINTF("uc_sysconf-out rs=%d\n",rs) ;
 	} /* end if */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end method (ubufsize::sysbs) */
+} /* end method (ubufsize::sysbs) */
 
 int ubufsize::def(int w) noex {
 	cint		defval = bufdata[w].defval ;
@@ -338,8 +348,7 @@ int ubufsize::def(int w) noex {
 	    } /* end switch */
 	} /* end if */
 	return rs ;
-}
-/* end method (ubufsize::def) */
+} /* end method (ubufsize::def) */
 
 /* yes; I call myself recursively - repeatedly (deal with it) */
 int ubufsize::zoneinfo(int w) noex {
@@ -348,15 +357,14 @@ int ubufsize::zoneinfo(int w) noex {
 	    bs[w] = rs ;
 	}
 	return rs ;
-}
-/* end method (ubufsize::zoneinfo) */
+} /* end method (ubufsize::zoneinfo) */
 
 /* yes; I call myself recursively - repeatedly (deal with it) */
 int ubufsize::mailaddr(int w) noex {
     	cint		hostmult = mailvalue.hostnamemult ;
     	cint		nodemult = mailvalue.nodenamemult ;
     	int		rs ;
-	if ((rs = getbufsize(bufsize_hn)) >= 0) ylikely {
+	if ((rs = getbufsize(bufsize_hostname)) >= 0) ylikely {
 	    cint	hnl = rs ;
 	    if ((rs = getbufsize(bufsize_nn)) >= 0) ylikely {
 		cint	nnl = rs ;
@@ -365,7 +373,6 @@ int ubufsize::mailaddr(int w) noex {
 	    }
 	} /* end if (getbufsize) */
 	return rs ;
-}
-/* end method (ubufsize::mailaddr) */
+} /* end method (ubufsize::mailaddr) */
 
 
