@@ -42,30 +42,37 @@
 
 enum sysconfcmds {
     sysconfcmd_synthetic = 1000,
-    sysconfcmd_maxpid,
+    sysconfcmd_maxpid,		/* max PID value */
     sysconfcmd_maxline,
-    sysconfcmd_maxlink,
+    sysconfcmd_maxlink,		/* file-system hard links */
     sysconfcmd_maxlogin,
     sysconfcmd_maxgroups,
+    sysconfcmd_symlinks,	/* file-system symbolic (soft) links */
     sysconfcmd_maxsymbol,
+    sysconfcmd_maxnodename,	/* UNIX® system nodename length */
     sysconfcmd_maxtzname,
     sysconfcmd_maxzoneinfo,
-    sysconfcmd_maxname,
-    sysconfcmd_maxpath,
-    sysconfcmd_maxusername,
-    sysconfcmd_maxgroupname,
-    sysconfcmd_maxprojectname,
-    sysconfcmd_maxnodename,
-    sysconfcmd_maxprotname,
-    sysconfcmd_maxhostname,
-    sysconfcmd_maxservname,
+    sysconfcmd_maxname,		/* file-system max-name length */
+    sysconfcmd_maxpath,		/* file-system max-path length */
+    sysconfcmd_maxusername,	/* mame system-account user-name length */
+    sysconfcmd_maxgroupname,	/* name system-account group-name length */
+    sysconfcmd_maxprojectname,	/* name system-account project-name length */
+    sysconfcmd_maxprotname,	/* name network protocol-name */
+    sysconfcmd_maxnetwname,	/* name network network-name */
+    sysconfcmd_maxhostname,	/* name network host-name */
+    sysconfcmd_maxservname,	/* name network service-name */
     sysconfcmd_maxmsg,
     sysconfcmd_maxmailaddr,
-    sysconfcmd_pwent,
-    sysconfcmd_uaent,
-    sysconfcmd_grent,
-    sysconfcmd_pjent,
-    sysconfcmd_fstype,
+    sysconfcmd_pwent,		/* entry buffer size - PASSWD */
+    sysconfcmd_spent,		/* entry buffer size - SHADOW */
+    sysconfcmd_uaent,		/* entry buffer size - USERATTR */
+    sysconfcmd_grent,		/* entry buffer size - GROUP */
+    sysconfcmd_pjent,		/* entry buffer size - PROJECT */
+    sysconfcmd_prent,		/* entry buffer size - PROTOCOL */
+    sysconfcmd_nwent,		/* entry buffer size - NETWORK */
+    sysconfcmd_hoent,		/* entry buffer size - HOST */
+    sysconfcmd_svent,		/* entry buffer size - SERVICE */
+    sysconfcmd_fstype,		/* filesystem-type (c-string length) */
     sysconfcmd_maxaio,		/* no-limit */
     sysconfcmd_maxatexit,	/* no-limit */
     sysconfcmd_maxmqopen,	/* no-limit */
@@ -91,12 +98,21 @@ enum sysconfcmds {
 #ifndef	_SC_NGROUPS_MAX
 #define	_SC_NGROUPS_MAX		sysconfcmd_maxgroups
 #endif
+#ifndef	_SC_SYMLINKS_MAX
+#define	_SC_SYMLINKS_MAX	sysconfcmd_symlinks
+#endif
+#ifndef	_SC_SYMBOL_MAX
+#define	_SC_SYMBOL_MAX		sysconfcmd_maxsymbol
+#endif
 #ifndef	_SC_NAME_MAX
 #define	_SC_NAME_MAX		sysconfcmd_maxname
 #endif
 #ifndef	_SC_PATH_MAX
 #define	_SC_PATH_MAX		sysconfcmd_maxpath
 #endif
+#ifndef	_SC_NODENAME_MAX
+#define	_SC_NODENAME_MAX	sysconfcmd_maxnodename
+#endif /* _SC_NODENAME_MAX */
 #ifndef	_SC_USERNAME_MAX
 #define	_SC_USERNAME_MAX	sysconfcmd_maxusername
 #endif
@@ -107,15 +123,15 @@ enum sysconfcmds {
 #define	_SC_PROJECTNAME_MAX	sysconfcmd_maxprojectname
 #endif
 
-#ifndef	_SC_NODENAME_MAX
-#define	_SC_NODENAME_MAX	sysconfcmd_maxnodename
-#endif /* _SC_NODENAME_MAX */
-
 #ifndef	_SC_PROTNAME_MAX	/* network protocol-name */
 #define	_SC_PROTNAME_MAX	sysconfcmd_maxprotname
 #endif /* _SC_PROTNAME_MAX */
 
-#ifndef	_SC_HOSTNAME_MAX
+#ifndef	_SC_NETWTNAME_MAX	/* network network-name */
+#define	_SC_NETWNAME_MAX	sysconfcmd_maxprotname
+#endif /* _SC_PROTNAME_MAX */
+
+#ifndef	_SC_HOSTNAME_MAX	/* network host-name */
 #ifdef	_SC_HOST_NAME_MAX	/* really the node-name length */
 #define	_SC_HOSTNAME_MAX	_SC_HOST_NAME_MAX
 #else
@@ -134,6 +150,9 @@ enum sysconfcmds {
 #ifndef	_SC_GETPW_R_SIZE_MAX
 #define	_SC_GETPW_R_SIZE_MAX	sysconfcmd_pwent
 #endif
+#ifndef	_SC_GETSP_R_SIZE_MAX
+#define	_SC_GETSP_R_SIZE_MAX	sysconfcmd_spent
+#endif
 #ifndef	_SC_GETUA_R_SIZE_MAX
 #define	_SC_GETUA_R_SIZE_MAX	sysconfcmd_uaent
 #endif
@@ -143,11 +162,20 @@ enum sysconfcmds {
 #ifndef	_SC_GETPJ_R_SIZE_MAX
 #define	_SC_GETPJ_R_SIZE_MAX	sysconfcmd_pjent
 #endif
+#ifndef	_SC_GETPR_R_SIZE_MAX
+#define	_SC_GETPR_R_SIZE_MAX	sysconfcmd_prent
+#endif
+#ifndef	_SC_GETNW_R_SIZE_MAX
+#define	_SC_GETNW_R_SIZE_MAX	sysconfcmd_nwent
+#endif
+#ifndef	_SC_GETHO_R_SIZE_MAX
+#define	_SC_GETHO_R_SIZE_MAX	sysconfcmd_hoent
+#endif
+#ifndef	_SC_GETSV_R_SIZE_MAX
+#define	_SC_GETSV_R_SIZE_MAX	sysconfcmd_svent
+#endif
 #ifndef	_SC_FSTYPE
 #define	_SC_FSTYPE		sysconfcmd_fstype
-#endif
-#ifndef	_SC_SYMBOL_MAX
-#define	_SC_SYMBOL_MAX		sysconfcmd_maxsymbol
 #endif
 #ifndef	_SC_TZNAME_MAX
 #define	_SC_TZNAME_MAX		sysconfcmd_maxtzname
