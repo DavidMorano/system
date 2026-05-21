@@ -174,7 +174,7 @@ constexpr subinfo_f	tries[] = {
 	nullptr
 } ; /* end array (tries) */
 
-static bufsizevar		maxhostlen(bufsize_hn) ;
+static bufsizevar		maxhostlen(bufsize_hostname) ;
 
 
 /* exported variables */
@@ -240,7 +240,7 @@ local int subinfo_domain(SI *mip) noex {
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
 	if (mip->domainname == nullptr) {
-	    if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
+	    if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) {
 	        if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
 	            len = lenstr(dbuf) ;
 	            if (cchar *dp ; (rs = libmem.strw(dbuf,len,&dp)) >= 0) {
@@ -301,7 +301,7 @@ local int try_add(SI *mip) noex {
 	            if ((rs = subinfo_domain(mip)) >= 0) {
 			cchar	*dn = mip->domainname ;
 			cchar	*hn = aip->hostname ;
-	                if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) {
+	                if (char *hbuf ; (rs = lm_hostname(&hbuf)) >= 0) {
 			    cint	hlen = rs ;
 	                    char	*bp = hbuf ;
 	                    if (mip->ehostname != nullptr) {
@@ -344,7 +344,7 @@ local int try_rem(SI *mip) noex {
 	                if (isindomain(aip->hostname,mip->domainname)) {
 	                    int		hl = intconv(tp - aip->hostname) ;
 			    cchar	*hn = aip->hostname ;
-			    if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) {
+			    if (char *hbuf ; (rs = lm_hostname(&hbuf)) >= 0) {
 				cint	hlen = rs ;
 	    		        char	*bp = hbuf ;
 			        if (mip->ehostname != nullptr) {
@@ -386,7 +386,7 @@ local int try_remlocal(SI *mip) noex {
 	            if (isindomain(aip->hostname,LOCALDOMAINNAME)) {
 	                int	hl = intconv(tp - aip->hostname) ;
 			cchar	*hn = aip->hostname ;
-	                if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) {
+	                if (char *hbuf ; (rs = lm_hostname(&hbuf)) >= 0) {
 			    cint	hlen = rs ;
 			    char	*bp = hbuf ;
 	    		    if (mip->ehostname != nullptr) {
