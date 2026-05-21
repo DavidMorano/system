@@ -1,8 +1,8 @@
-/* ureserve2 MODULE (charx) */
+/* ureserve2 MODULE (charx - implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* reserved interfaces */
+/* reserved interfaces - charx */
 /* version %I% last-modified %G% */
 
 
