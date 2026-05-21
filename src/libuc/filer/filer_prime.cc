@@ -5,6 +5,7 @@
 /* support low-overhead file bufferring requirements */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -32,20 +33,24 @@
 #include	<unistd.h>		/* |SEEK_{xx}| */
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<funcodes.h>	/* |FM_{x}(3uc)| */
-#include	<sysval.hh>
-#include	<bufsizevar.hh>
-#include	<intfloor.h>
-#include	<fmtstr.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<algorithm>		/* C++ |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<funcodes.h>		/* LIBU |FM_{x}(3uc)| */
+#include	<intfloor.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU */
 
 #include	"filer.h"
 
@@ -63,6 +68,10 @@ import libutil ;			/* |memcopy(3u)| */
 #define	ISCONT(b,bl)	\
 	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	1		/* debugging */
+#endif
+
 
 /* imported namespaces */
 
@@ -76,13 +85,6 @@ using libuc::libmem ;		/* variable */
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_reade(int,void *,int,int,int) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_lockfile(int,int,off_t,off_t,int) noex ;
-    extern int uc_lockf(int,int,off_t) noex ;
-}
 
 /* external variables */
 
@@ -125,9 +127,11 @@ local int	filer_bufcpy(filer *,cchar *,int) noex ;
 
 /* local variables */
 
-static sysval		pagesize(sysval_ps) ;
+static sysval		pagesz(sysval_ps) ;
 
 static bufsizevar	maxlinelen(bufsize_ml) ;
+
+cbool			f_debug = CF_DEBUG ;
 
 
 /* exported variables */
@@ -137,18 +141,24 @@ static bufsizevar	maxlinelen(bufsize_ml) ;
 
 int filer_start(filer *op,int fd,off_t foff,int bsz,int of) noex {
 	int		rs ;
+	DPRINTF("ent fd=%d foff=%lld of=%08X\n",fd,foff,of) ;
 	if ((rs = filer_ctor(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fd >= 0) {
+	    if ((fd >= 0) && (foff >= 0) && (of >= 0)) {
+	        DPRINTF("valid\n") ;
 		op->fd = fd ;
 		op->of = of ;
 		if ((rs = filer_adjbuf(op,bsz)) >= 0) ylikely {
-	            if (char *p ; (rs = libmem.vall(bsz,&p)) >= 0) ylikely {
+	            DPRINTF("filer_adjbuf() rs=%d\n",rs) ;
+	            DPRINTF("-> libmem.vall dlen=%d\n",op->dlen) ;
+	            if (char *p ; (rs = libmem.vall(op->dlen,&p)) >= 0) ylikely {
+	                DPRINTF("libmem.vall() rs=%d\n",rs) ;
 	                op->dbuf = p ;
 	                op->bp = p ;
 	                if (foff < 0) {
 			    rs = u_tell(fd,&foff) ;
 			}
+	                DPRINTF("mid rs=%d\n",rs) ;
 	                if (rs >= 0) {
 		            op->off = foff ;
 		            if (of & FILER_ONET) op->fl.net = true ;
@@ -157,21 +167,24 @@ int filer_start(filer *op,int fd,off_t foff,int bsz,int of) noex {
 	                if (rs < 0) {
 		            libmem.free(op->dbuf) ;
 		            op->dbuf = nullptr ;
-	                }	
+	                } /* end if (error) */
+	                DPRINTF("mid2 rs=%d\n",rs) ;
 	            } /* end if (memory-acquire) */
+	            DPRINTF("libmem.vall-out rs=%d\n",rs) ;
 		} /* end if (filer_adjbuf) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		filer_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d bsz=%d\n",rs,bsz) ;
 	return (rs >= 0) ? bsz : rs ;
-}
-/* end subroutine (filer_start) */
+} /* end subroutine (filer_start) */
 
 int filer_finish(filer *op) noex {
 	int		rs ;
 	int		rs1 ;
+	DPRINTF("ent\n") ;
 	if ((rs = filer_magic(op)) >= 0) ylikely {
 	    if (op->fl.write && (op->len > 0)) {
 	        rs1 = uc_writen(op->fd,op->dbuf,op->len) ;
@@ -189,13 +202,14 @@ int filer_finish(filer *op) noex {
 	    op->len = 0 ;
 	    op->magval = 0 ;
 	} /* end if (magic) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (filer_finish) */
+} /* end subroutine (filer_finish) */
 
 int filer_read(filer *op,void *rbuf,int rlen,int to) noex {
 	int		rs ;
 	int		tlen = 0 ;
+	DPRINTF("ent\n") ;
 	if ((rs = filer_magic(op,rbuf)) >= 0) ylikely {
 	    cint	fmo = FM_TIMED ;
 	    int		rc = (op->fl.net) ? FILER_RCNET : 1 ;
@@ -236,9 +250,9 @@ int filer_read(filer *op,void *rbuf,int rlen,int to) noex {
 	    } /* end while */
 	    if (rs >= 0) op->off += tlen ;
 	} /* end if (magic) */
+	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (filer_read) */
+} /* end subroutine (filer_read) */
 
 int filer_readp(filer *op,void *rbuf,int rlen,off_t off,int to) noex {
 	int		rs ;
@@ -250,12 +264,12 @@ int filer_readp(filer *op,void *rbuf,int rlen,off_t off,int to) noex {
 	    rs = SR_NOSYS ;
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (filer_readp) */
+} /* end subroutine (filer_readp) */
 
 int filer_readln(filer *op,char *rbuf,int rlen,int to) noex {
 	int		rs ;
 	int		tlen = 0 ;
+	DPRINTF("ent\n") ;
 	if ((rs = filer_magic(op,rbuf)) >= 0) ylikely {
 	    cint	fmo = FM_TIMED ;
 	    int		rc = (op->fl.net) ? FILER_RCNET : 1 ;
@@ -303,9 +317,9 @@ int filer_readln(filer *op,char *rbuf,int rlen,int to) noex {
 	        op->off += tlen ;
 	    }
 	} /* end if (magic) */
+	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (filer_readln) */
+} /* end subroutine (filer_readln) */
 
 int filer_readlns(filer *op,char *lbuf,int llen,int to,int *lcp) noex {
 	int		rs ;
@@ -324,12 +338,12 @@ int filer_readlns(filer *op,char *lbuf,int llen,int to,int *lcp) noex {
 	    if (lcp) *lcp = lines ;
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (filer_readlns) */
+} /* end subroutine (filer_readlns) */
 
 /* update a section of the buffer */
 int filer_update(filer *op,off_t roff,cchar *rbuf,int rlen) noex {
 	int		rs ;
+	DPRINTF("ent\n") ;
 	if ((rs = filer_magic(op,rbuf)) >= 0) ylikely {
 	    uint	boff, bext ;
 	    uint	rext = uint(intconv(roff) + rlen) ;
@@ -361,13 +375,13 @@ int filer_update(filer *op,off_t roff,cchar *rbuf,int rlen) noex {
 	        memcopy((op->dbuf + bdiff),rbuf,rlen) ;
 	    }
 	} /* end if (magic) */
+	DPRINTF("ret rs=%d len=%d\n",rs,rlen) ;
 	return (rs >= 0) ? rlen : rs ;
-}
-/* end subroutine (filer_update) */
+} /* end subroutine (filer_update) */
 
 int filer_writeto(filer *op,cvoid *abuf,int alen,int) noex {
     	return filer_write(op,abuf,alen) ;
-}
+} /* end subroutine (filer_writeto) */
 
 int filer_write(filer *op,cvoid *abuf,int alen) noex {
 	int		rs ;
@@ -408,8 +422,7 @@ int filer_write(filer *op,cvoid *abuf,int alen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? alen : rs ;
-}
-/* end subroutine (filer_write) */
+} /* end subroutine (filer_write) */
 
 int filer_reserve(filer *op,int len) noex {
 	int		rs ;
@@ -421,8 +434,7 @@ int filer_reserve(filer *op,int len) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (filer_reserve) */
+} /* end subroutine (filer_reserve) */
 
 int filer_println(filer *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -448,8 +460,7 @@ int filer_println(filer *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_println) */
+} /* end subroutine (filer_println) */
 
 int filer_vprintf(filer *op,cchar *fmt,va_list ap) noex {
 	int		rs ;
@@ -469,8 +480,7 @@ int filer_vprintf(filer *op,cchar *fmt,va_list ap) noex {
 	    } /* end if (maxlinelen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_vprintf) */
+} /* end subroutine (filer_vprintf) */
 
 int filer_printf(filer *op,cchar *fmt,...) noex {
 	va_list		ap ;
@@ -483,8 +493,7 @@ int filer_printf(filer *op,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_printf) */
+} /* end subroutine (filer_printf) */
 
 int filer_adv(filer *op,int inc) noex {
 	int		rs ;
@@ -512,8 +521,7 @@ int filer_adv(filer *op,int inc) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (filer_adv) */
+} /* end subroutine (filer_adv) */
 
 int filer_seek(filer *op,off_t woff,int w) noex {
 	int		rs ;
@@ -554,8 +562,7 @@ int filer_seek(filer *op,off_t woff,int w) noex {
 	    } /* end if (seekable) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (filer_seek) */
+} /* end subroutine (filer_seek) */
 
 int filer_tell(filer *op,off_t *offp) noex {
 	int		rs ;
@@ -564,8 +571,7 @@ int filer_tell(filer *op,off_t *offp) noex {
 	    rs = int(op->off & INT_MAX) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (filer_tell) */
+} /* end subroutine (filer_tell) */
 
 int filer_invalidate(filer *op) noex {
 	int		rs ;
@@ -579,8 +585,7 @@ int filer_invalidate(filer *op) noex {
 	    op->bp = op->dbuf ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (filer_invalidate) */
+} /* end subroutine (filer_invalidate) */
 
 int filer_flush(filer *op) noex {
 	int		rs ;
@@ -594,8 +599,7 @@ int filer_flush(filer *op) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (filer_flush) */
+} /* end subroutine (filer_flush) */
 
 int filer_poll(filer *op,int mto) noex {
 	cint		nfds = 1 ;
@@ -608,14 +612,15 @@ int filer_poll(filer *op,int mto) noex {
 	    rs = u_poll(fds,nfds,mto) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (filer_poll) */
+} /* end subroutine (filer_poll) */
 
 int filer_stat(filer *op,ustat *sbp) noex {
     	int		rs ;
+	DPRINTF("ent\n") ;
 	if ((rs = filer_magic(op,sbp)) >= 0) ylikely {
 	    rs = uc_fstat(op->fd,sbp) ;
 	} /* end if (magic) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (filer_stat) */
 
@@ -645,31 +650,42 @@ int filer_lockend(filer *op) noex {
 
 local int filer_adjbuf(filer *op,int bufsz) noex {
 	int		rs ;
+	DPRINTF("ent bufsz=%d\n",bufsz) ;
 	if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) ylikely {
+	    DPRINTF("u_fstat() rs=%d\n",rs) ;
 	    op->dt = filetype(sb.st_mode) ;
 	    if (bufsz <= 0) {
+	        DPRINTF("need bufsz=%d\n",bufsz) ;
 	        if (S_ISFIFO(sb.st_mode)) {
+	            DPRINTF("-FIFO-yes\n") ;
 	            bufsz = PIPEBUFLEN ;
 	        } else {
-		    if ((rs = pagesize) >= 0) ylikely {
+	            DPRINTF("-FIFO-not\n") ;
+		    if ((rs = pagesz) >= 0) ylikely {
 			coff	ps = off_t(rs) ;
 		        off_t	cs ;
 	        	cint	of = op->of ;
+	                DPRINTF("pagesz=%d\n",rs) ;
 		        if ((of & O_ACCMODE) == O_RDONLY) {
+	                    DPRINTF("RDONLY-yes\n") ;
 		            csize fs = ((sb.st_size == 0) ? 1 : sb.st_size) ;
 		            cs = BCEIL(fs,BLOCKBUFLEN) ;
 	                    bufsz = (int) min(ps,cs) ;
 	                } else {
+	                    DPRINTF("RDONLY-not\n") ;
 		            bufsz = intconv(ps) ;
 		        }
-		    } /* end if (pagesize) */
+		    } /* end if (pagesz) */
 	        } /* end if */
 	    } /* end if (bufsz) */
 	    op->dlen = bufsz ;
+	    if (rs >= 0) {
+		rs = op->dlen ;
+	    }
 	} /* end if (stat) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (filer_adjbuf) */
+} /* end subroutine (filer_adjbuf) */
 
 local int filer_bufcpy(filer *op,cchar *abp,int mlen) noex {
 	if (mlen > MEMCPYLEN) {
@@ -682,7 +698,6 @@ local int filer_bufcpy(filer *op,cchar *abp,int mlen) noex {
 	} /* end if */
 	op->bp += mlen ;
 	return mlen ;
-}
-/* end subroutine (filer_bufcpy) */
+} /* end subroutine (filer_bufcpy) */
 
 
