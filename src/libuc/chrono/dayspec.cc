@@ -80,6 +80,7 @@
 #include	<estrings.h>
 #include	<cfdec.h>
 #include	<six.h>
+#include	<matxstr.h>		/* |matpcasestr(3uc)| */
 #include	<char.h>
 #include	<mkchar.h>
 #include	<hasx.h>
@@ -99,7 +100,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -284,8 +284,7 @@ local int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	    op->d = schar(v) ;
 	}
 	return rs ;
-}
-/* end subroutine (dayspec_parse) */
+} /* end subroutine (dayspec_parse) */
 
 local int parsemonth(cchar *mp,int ml) noex {
 	int		rs = SR_INVALID ;
@@ -302,8 +301,7 @@ local int parsemonth(cchar *mp,int ml) noex {
 	    }
 	} /* end if (sfshrink) */
 	return (rs >= 0) ? mi : rs ;
-}
-/* end subroutine (parsemonth) */
+} /* end subroutine (parsemonth) */
 
 local int siourbrk(cchar *sp,int sl,int f_dig) noex {
 	int		i = -1 ; /* return-value */
@@ -320,12 +318,11 @@ local int siourbrk(cchar *sp,int sl,int f_dig) noex {
 	    if (f) break ;
 	} /* end for */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (siourbrk) */
+} /* end subroutine (siourbrk) */
 
 int dayspec::load(cchar *sp,int sl) noex {
 	return dayspec_load(this,sp,sl) ;
-}
+} /* end method (dayspec::load) */
 
 dayspec_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -340,7 +337,6 @@ dayspec_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (dayspec_co::operator) */
+} /* end method (dayspec_co::operator) */
 
 
