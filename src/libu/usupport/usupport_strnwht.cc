@@ -33,7 +33,7 @@
 	char *strnwht(cchar *sp,int sl) noex
 	char *strnwhtchr(cchar *sp,int sl,int sch) noex
 	char *strnwhtbrk(cchar *sp,int sl,cchar *ss) noex
-	char *strnwhtbrk(cchar *sp,int sl,chrset &sset) noex
+	char *strnwhtbrk(cchar *sp,int sl,con chrset *sset) noex
 
 	Arguments:
 	sp		test c-string pointer
@@ -77,8 +77,8 @@ import chrset ;
 /* external subroutines */
 
 namespace libu {
-    extern char *strnwhtbrk(cchar *,int,con chrset &) noex ;
-    extern char *strnwhtchr(cchar *,int,con chrset &) noex ;
+    extern char *strnwhtbrk(cchar *,int,con chrset *) noex ;
+    extern char *strnwhtchr(cchar *,int,con chrset *) noex ;
 } /* end namespace (libu) */
 
 
@@ -117,7 +117,7 @@ namespace libu {
     	char		*rsp = nullptr ;
 	if (sp && ss) ylikely {
     	    chrset	sset(ss) ;
-	    rsp = strnwhtbrk(sp,sl,sset) ;
+	    rsp = strnwhtbrk(sp,sl,&sset) ;
 	}
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */
@@ -126,7 +126,7 @@ namespace libu {
 	if (sp) ylikely {
 	    if (sch) ylikely {
     	        chrset sset ; sset.set(sch) ;
-	        rsp = strnwhtbrk(sp,sl,sset) ;
+	        rsp = strnwhtbrk(sp,sl,&sset) ;
 	    } else {
 		rsp = strnwht(sp,sl) ;
 	    }
@@ -136,13 +136,13 @@ namespace libu {
 } /* end namespace (libu) */
 
 namespace libu {
-    char *strnwhtbrk(cchar *sp,int µsl,const chrset &sset) noex {
+    char *strnwhtbrk(cchar *sp,int µsl,const chrset *setp) noex {
 	char		*rsp = nullptr ;
 	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    cchar	*lsp = (sp + sl) ;
 	    bool	fwht = false ;
 	    for (int ch ; (sp < lsp) && ((ch = mkchar(*sp))) ; sp += 1) {
-		if (((fwht = ISWHT(ch))) || sset[ch]) {
+		if (((fwht = ISWHT(ch))) || setp->tst(ch)) {
 		    rsp = charp(sp) ;
 		    break ;
 		}
@@ -150,15 +150,15 @@ namespace libu {
 	    if (fwht) {
 		bool fchr = false ;
 		for (int ch ; (sp < lsp) && ((ch = mkchar(*sp))) ; sp += 1) {
-		    if (((fchr = sset[ch])) || (! ISWHT(ch))) break ;
+		    if (((fchr = setp->tst(ch))) || (! ISWHT(ch))) break ;
 		} /* end for */
 		if (fchr) rsp = charp(sp) ;
 	    } /* end if (had white-space) */
 	} /* end if (non-zero positive) */
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */
-    char *strnwhtchr(cchar *sp,int sl,const chrset &sset) noex {
-	return strnwhtbrk(sp,sl,sset) ;
+    char *strnwhtchr(cchar *sp,int sl,const chrset *setp) noex {
+	return strnwhtbrk(sp,sl,setp) ;
     }
 } /* end namespace (libu) */
 
