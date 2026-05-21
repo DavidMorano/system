@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -43,7 +43,9 @@ LIBS +=
 OBJPART += umisc-mknpathx.o umisc-mknpathxw.o
 OBJPART += umisc-pathnadd.o umisc-snadd.o
 
-OBJ00= umisc0.o umisc1.o umisc2.o umisc3.o
+OBJPRIME= umisc0.o
+
+OBJ00= umisc1.o umisc2.o umisc3.o
 OBJ01= umisc4.o umisc5.o umisc6.o
 OBJ02= 
 OBJ03= 
@@ -53,11 +55,10 @@ OBJB=
 OBJC= 
 OBJD= 
 
-OBJ= obja.o 
+OBJIMPL= obja.o 
 
 
 INCDIRS=
-
 LIBDIRS=
 
 RUNINFO= -rpath $(RUNDIR)
@@ -101,11 +102,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ) objpart.o Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ) objpart.o
+$(T).o:			objpart.o objprime.o objimpl.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -147,41 +148,51 @@ objb.o:			$(OBJB)
 objpart.o:		$(OBJPART)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module partitions
 umisc-mknpathx.o:	umisc-mknpathx.ccm
+	gxx -c -x c++ -o $@ -O $<
+
 umisc-mknpathxw.o:	umisc-mknpathxw.ccm
+	gxx -c -x c++ -o $@ -O $<
+
 umisc-pathnadd.o:	umisc-pathnadd.ccm
+	gxx -c -x c++ -o $@ -O $<
+
 umisc-snadd.o:		umisc-snadd.ccm
+	gxx -c -x c++ -o $@ -O $<
 
+
+# module primary
 umisc0.o:		umisc.ccm $(OBJPART)
-	makemodule umisc
+	gxx -c -x c++ -o $@ -O $<
 
-umisc1.o:		umisc1.cc umisc.ccm
-	makemodule umisc
+# module implementation
+umisc1.o:		umisc1.cc objprime.o
 	$(COMPILE.cc) $<
 
-umisc2.o:		umisc2.cc umisc.ccm
-	makemodule umisc
+umisc2.o:		umisc2.cc objprime.o
 	$(COMPILE.cc) $<
 
-umisc3.o:		umisc3.cc umisc.ccm
-	makemodule umisc
+umisc3.o:		umisc3.cc objprime.o
 	$(COMPILE.cc) $<
 
-umisc4.o:		umisc4.cc umisc.ccm
-	makemodule umisc
+umisc4.o:		umisc4.cc objprime.o
 	$(COMPILE.cc) $<
 
-umisc5.o:		umisc5.cc umisc.ccm
-	makemodule umisc
+umisc5.o:		umisc5.cc objprime.o
 	$(COMPILE.cc) $<
 
-umisc6.o:		umisc6.cc umisc.ccm
-	makemodule umisc
+umisc6.o:		umisc6.cc objprime.o
 	$(COMPILE.cc) $<
 
-umisc7.o:		umisc7.cc umisc.ccm
-	makemodule umisc
+umisc7.o:		umisc7.cc objprime.o
 	$(COMPILE.cc) $<
 
 
