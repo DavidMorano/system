@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -43,8 +43,8 @@ LIBS +=
 OBJ00= usupport_prime.o usupport_sncpyx.o
 OBJ01= usupport_itimer.o 
 OBJ02= usupport_cfdec.o usupport_cfdect.o
-OBJ03= usupport_snwcpy.o 
-OBJ04= usupport_toxc.o 
+OBJ03= usupport_cfhex.o usupport_cfinet.o
+OBJ04= usupport_toxc.o usupport_snwcpy.o 
 OBJ05= usupport_rmx.o
 OBJ06= usupport_ustrftime.o 
 OBJ07= usupport_ctdec.o
@@ -226,6 +226,8 @@ obj.o:			$(OBJ)
 
 usupport_cfdec.o:	usupport_cfdec.cc	usupport_cfdec.hh	$(INCS)
 usupport_cfdect.o:	usupport_cfdect.cc	usupport_cfdect.hh	$(INCS)
+usupport_cfhex.o:	usupport_cfhex.cc	usupport_cfhex.hh	$(INCS)
+usupport_cfinet.o:	usupport_cfinet.cc	usupport_cfinet.hh	$(INCS)
 usupport_getsign.o:	usupport_getsign.cc	usupport_getsign.hh	$(INCS)
 usupport_getusmtime.o:	usupport_getusmtime.cc	usupport_getusmtime.hh	$(INCS)
 usupport_getustime.o:	usupport_getustime.cc	usupport_getustime.hh	$(INCS)
