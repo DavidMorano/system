@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -40,18 +40,20 @@ MODS +=
 LIBS +=
 
 
-OBJ0= fonce0.o fonce1.o
+OBJPART=
+
+OBJPRIME= fonce0.o
+
+OBJ0= fonce1.o
 OBJ1=
 
 OBJA= obj0.o
 
-OBJ= obja.o
+OBJIMPL= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -97,8 +99,7 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ)
-	makemodule fonce
+$(T).o:			objprime.o objimpl.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
@@ -128,11 +129,22 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module primary
 fonce0.o:		fonce.ccm			$(INCS)
 	makemodule fonce
 
-fonce1.o:		fonce1.cc fonce.ccm		$(INCS)
-	makemodule fonce
+# module implementation
+fonce1.o:		fonce1.cc objprime.o		$(INCS)
 	$(COMPILE.cc) $<
 
 
