@@ -77,12 +77,12 @@ using libu::strnwhtbrk ;		/* subroutine */
 /* external subroutines */
 
 namespace libu {
-    extern char *strnwhtbrk(cchar *,int,con chrset &) noex ;
-    extern char *strnwhtchr(cchar *,int,con chrset &) noex ;
+    extern char *strnwhtbrk(cchar *,int,con chrset *) noex ;
+    extern char *strnwhtchr(cchar *,int,con chrset *) noex ;
 } /* end namespace (libu) */
 
 namespace libu {
-    extern int siwhtbrk(cchar *,int,con chrset &) noex ;
+    extern int siwhtbrk(cchar *,int,con chrset *) noex ;
 }
 
 
@@ -122,10 +122,10 @@ namespace libu {
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtbrk) */
-    int siwhtbrk(cchar *sp,int sl,const chrset &sset) noex {
+    int siwhtbrk(cchar *sp,int sl,con chrset *setp) noex {
     	int		si = -1 ;
 	if (sp) ylikely {
-	    if (cchar *tp = strnwhtbrk(sp,sl,sset) ; tp) {
+	    if (cchar *tp = libu::strnwhtbrk(sp,sl,setp) ; tp) {
 	        si = intconv(tp - sp) ;
 	    }
 	} /* end if (non-null) */
