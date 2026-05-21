@@ -43,24 +43,6 @@
 
 /* some stuff that not all systems (like GNU-Linux) have */
 
-/* max-namelen */
-#ifndef	MAXNAMELEN
-#ifdef	NAME_MAX
-#define	MAXNAMELEN	NAME_MAX
-#else
-#define	MAXNAMELEN	256		/* common value */
-#endif
-#endif /* MAXNAMELEN */
-
-/* max-pathlen */
-#ifndef	MAXPATHLEN
-#ifdef	PATH_MAX
-#define	MAXPATHLEN	PATH_MAX
-#else
-#define	MAXPATHLEN	2048		/* common value */
-#endif
-#endif /* MAXPATHLEN */
-
 /* max-linelen */
 #ifndef	MAXLINELEN
 #ifdef	LINE_MAX
@@ -77,35 +59,27 @@
 #else
 #define	NODENAMELEN	256		/* should be at least 256 for SVR4! */
 #endif
-#endif
+#endif /* NODENAMELEN */
 
-/* max-userlen */
-#ifndef	USERNAMELEN
-#ifdef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
+/* max-namelen (file-system) */
+#ifndef	MAXNAMELEN
+#ifdef	NAME_MAX
+#define	MAXNAMELEN	NAME_MAX
 #else
-#define	USERNAMELEN	32
+#define	MAXNAMELEN	256		/* common value */
 #endif
-#endif
+#endif /* MAXNAMELEN */
 
-#ifndef	GROUPNAMELEN
-#ifdef	LOGNAME_MAX
-#define	GROUPNAMELEN	LOGNAME_MAX
+/* max-pathlen (file-system) */
+#ifndef	MAXPATHLEN
+#ifdef	PATH_MAX
+#define	MAXPATHLEN	PATH_MAX
 #else
-#define	GROUPNAMELEN	32
+#define	MAXPATHLEN	2048		/* common value */
 #endif
-#endif
+#endif /* MAXPATHLEN */
 
-/* Solaris® project name */
-#ifndef	PROJNAMELEN
-#ifdef	LOGNAME_MAX
-#define	PROJNAMELEN	LOGNAME_MAX
-#else
-#define	PROJNAMELEN	32
-#endif
-#endif
-
-/* max-loglen */
+/* max-logname-length */
 #ifndef	LOGNAMELEN
 #ifdef	LOGNAME_MAX
 #define	LOGNAMELEN	LOGNAME_MAX
@@ -114,7 +88,58 @@
 #endif
 #endif
 
-/* symbol name (this is really 255 on most platforms) */
+/* max-username-length */
+#ifndef	USERNAMELEN
+#ifdef	LOGNAME_MAX
+#define	USERNAMELEN	LOGNAME_MAX
+#else
+#define	USERNAMELEN	32
+#endif
+#endif
+
+/* max-groupname-length */
+#ifndef	GROUPNAMELEN
+#ifdef	LOGNAME_MAX
+#define	GROUPNAMELEN	LOGNAME_MAX
+#else
+#define	GROUPNAMELEN	32
+#endif
+#endif
+
+/* max-projname-length (Solaris®) */
+#ifndef	PROJNAMELEN
+#ifdef	LOGNAME_MAX
+#define	PROJNAMELEN	LOGNAME_MAX
+#else
+#define	PROJNAMELEN	32
+#endif
+#endif
+
+/* max-protocol-name length */
+#ifndef	PROTNAMELEN
+#define	PROTNAMELEN	NODENAMELEN
+#endif
+
+/* max-network-name length */
+#ifndef	NETWNAMELEN
+#define	NETWNAMELEN	NODENAMELEN
+#endif
+
+/* max-hostname-name length */
+#ifndef	HOSTNAMELEN
+#ifdef	MAXHOSTNAMELEN
+#define	HOSTBUFLEN	MAXHOSTNAMELEN
+#else
+#define	HOSTNAMELEN	(8 * NODENAMELEN)
+#endif
+#endif /* HOSTNAMELEN */
+
+/* max-sericename-name length */
+#ifndef	SERVNAMELEN
+#define	SERVNAMELEN	NODENAMELEN
+#endif
+
+/* max-symname-length (this is really 255 on most platforms) */
 #ifndef	SYMNAMELEN
 #define	SYMNAMELEN	100		/* symbol-name-length (really 255) */
 #endif
