@@ -1,45 +1,53 @@
-/* ureserve-field MODULE (primary-module-interface) */
+/* ureserve-fieldterm MODULE (primary-module-interface) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* reserved interfaces */
+/* structure definition for field extraction calls */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-03-21, David A­D­ Morano
-	This module was originally written.
-
-	= 2020-05-07, David A-D- Morano
-	I converted this (formerly a header-only file) to a module.
+	= 1998-05-01, David A­D­ Morano
+	This code module was originally written in VAX assembly
+	(back around 1980 or so).  It was then rewritten into
+	C-language perhaps around 1983 (at AT&T Bell Laboratories).
+	This (below) is a new incarnation based on that older
+	C-language code.
 
 */
 
-/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-  	Module:
-	ureserve
+	Object:
+	field
 
 	Description:
-	This module provides miscellaneous UNIX® or other
-	common (library oriented) subroutines.
+	This is a classic, ported forward from the old VAX-11/780
+	days.  This was translated from VAX assembly language.
 
 *******************************************************************************/
 
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module ureserve:field ;
+
+
+enum fieldmems {
+	fieldmem_rem,
+	fieldmem_finish,
+	fieldmem_overlast
+} ; /* end enum (fieldmems) */
 
 export {
     struct field_head {
@@ -49,17 +57,8 @@ export {
 	int		fl ;		/* field length */
 	int		term ;		/* terminating character */
     } ; /* end struct (field_head) */
-} /* end export */
-
-enum fieldmems {
-	fieldmem_rem,
-	fieldmem_finish,
-	fieldmem_overlast
-} ; /* end enum (fieldmems) */
-
-struct field ;
-
-struct field_co {
+    struct field ;
+    struct field_co {
 	field		*op = nullptr ;
 	int		w = -1 ;
 	void operator () (field *p,int m) noex {
@@ -70,9 +69,7 @@ struct field_co {
 	int operator () () noex { 
 	    return operator int () ;
 	} ;
-} ; /* end struct (field_co) */
-
-export {
+    } ; /* end struct (field_co) */
     struct field : field_head {
 	field_co	finish ;
 	field_co	rem ;
@@ -83,14 +80,14 @@ export {
 	} ; /* end ctor */
 	field(const field &) = delete ;
 	field &operator = (const field &) = delete ;
-	int start(cchar *,int = -1) noex ;
-	int get(cchar *,cchar **) noex ;
-	int getterm(cchar *,cchar **) noex ;
-	int word(cchar *,cchar **) noex ;
-	int wordphrase(cchar *,char *,int) noex ;
-	int sharg(cchar *,char *,int) noex ;
-	int srvarg(cchar *,char *,int) noex ;
-	int remaining(cchar ** = nullptr) noex ;
+	int start	(cchar *,int = -1) noex ;
+	int get		(cchar *,cchar **) noex ;
+	int getterm	(cchar *,cchar **) noex ;
+	int word	(cchar *,cchar **) noex ;
+	int wordphrase	(cchar *,char *,int) noex ;
+	int sharg	(cchar *,char *,int) noex ;
+	int srvarg	(cchar *,char *,int) noex ;
+	int remaining	(cchar ** = nullptr) noex ;
 	void dtor() noex ;
 	destruct field() {
 	    if (lp) dtor() ;
@@ -105,13 +102,6 @@ export {
     extern int	field_sharg	(field *,cchar *,char *,int) noex ;
     extern int	field_remaining	(field *,cchar **) noex ;
     extern int	field_finish	(field *) noex ;
-    local inline int field_term	(field *op,cchar *tp,cchar **rpp) noex {
-	return field_getterm(op,tp,rpp) ;
-    }
 } /* end export */
-
-
-
-
 
 
