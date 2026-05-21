@@ -42,15 +42,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<mkchar.h>
-#include	<baops.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 
 
 constexpr int	fieldterminit_size = ((UCHAR_MAX+1)/CHAR_BIT) ;
