@@ -50,17 +50,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdio>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |hasnotdots(3u)| */
-#include	<posixdirent.hh>
-#include	<localmisc.h>
-#include	<dprint.hh>		/* debugging */
+#include	<sys/stat.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |hasnotdots(3u)| */
+#include	<posixdirent.hh>	/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBF debugging */
 
 #include	"urmdirs.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 import umisc ;				/* |mknpath(3u)| + |pathnpadd(3u) */
@@ -77,7 +79,6 @@ import ulibvals ;			/* |max{x}| */
 /* imported namespaces */
 
 using libu::hasnotdots ;		/* subroutine */
-
 using libu::umem ;			/* variable */
 
 
@@ -136,8 +137,7 @@ int u_rmdirs(cchar *tardname) noex {
 	if (tardname) {
 	    rs = SR_INVALID ;
 	    if (tardname[0]) {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
 		    mgr mo(tardname) ;
 		    rs = mo ;
 		} /* end if (vars) */
@@ -185,11 +185,11 @@ int mgr::remover(int pl) noex {
 	            rs = u_rmdir(pbuf) ;
 		    DPRINTF("u_rmdir rs=%d\n",rs) ;
 		} /* end if (removedents) */
-		    DPRINTF("after removedents rs=%d\n",rs) ;
+		DPRINTF("after removedents rs=%d\n",rs) ;
 	    } else {
 		rs = u_unlink(pbuf) ;
 		c = 1 ;
-		    DPRINTF("u_unlink rs=%d\n",rs) ;
+		DPRINTF("u_unlink() rs=%d\n",rs) ;
 	    }
 	} /* end if (u_lstat) */
 	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
@@ -207,9 +207,9 @@ int mgr::removedents(int pl) noex {
 	        cchar	*sp ;
 	        for (int i = 0 ; names.get(i,&sp) >= 0 ; i += 1) {
 	            if (sp) {
-	        DPRINTF("for i=%d sp=%s\n",i,sp) ;
+	        	DPRINTF("for i=%d sp=%s\n",i,sp) ;
 	                if ((rs = pathnadd(pbuf,plen,pl,sp)) >= 0) {
-	        DPRINTF("pathnadd() pbuf=%s\n",pbuf) ;
+	        	    DPRINTF("pathnadd() pbuf=%s\n",pbuf) ;
 			    rs = remover(rs) ;
 			    c += rs ;
 	                } /* end if (pathnadd) */
