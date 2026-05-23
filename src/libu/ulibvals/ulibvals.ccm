@@ -54,7 +54,7 @@ export {
 	static const int	pagesz ;
 	static const int	clktck ;
 	static const int	maxbase ;
-	static const int	maxpid ;
+	static const int	maxpid ;	/* max PID value */
 	static const int	maxarg ;
 	static const int	maxline ;
 	static const int	maxlink ;
