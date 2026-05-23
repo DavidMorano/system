@@ -416,7 +416,7 @@ int sub_mknames::addresses(hostinfo *hip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (char *nbuf ; (rs = lm_hn(&nbuf)) >= 0) ylikely {
+	if (char *nbuf ; (rs = lm_hostname(&nbuf)) >= 0) ylikely {
 	    cint	nlen = rs ;
 	    if (hostinfo_cur hc ; (rs = hostinfo_curbegin(hip,&hc)) >= 0) {
 	        const uchar	*ap{} ;
@@ -450,7 +450,7 @@ int sub_mknames::adddots(int af) noex {
 	int		rs1 ;
 	int		n = 0 ;
 	if ((af == AF_INET4) && op->fl.inet && op->fl.addr) {
-	    if (char *nbuf ; (rs = lm_hn(&nbuf)) >= 0) {
+	    if (char *nbuf ; (rs = lm_hostname(&nbuf)) >= 0) {
 	        cint	nlen = rs ;
 	        if (inetaddr ia ; (rs = ia.start(&op->netipaddr)) >= 0) {
 	            if ((rs = ia.getdotaddr(nbuf,nlen)) >= 0) {
@@ -551,7 +551,7 @@ static int connection_ip6lookup(CON *op,char *dp,int dl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *hnbuf ; (rs = lm_hn(&hnbuf)) >= 0) ylikely {
+	if (char *hnbuf ; (rs = lm_hostname(&hnbuf)) >= 0) ylikely {
 	    CSOCKADDR	*ssap = sockaddrp(op->sap) ;
 	    cint	sal = op->sal ;
 	    cint	slen = NI_MAXSERV ;
@@ -628,7 +628,7 @@ vars::operator int () noex {
 	int		rs ;
 	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(bufsize_hn)) >= 0) ylikely {
+	    if ((rs = getbufsize(bufsize_hostname)) >= 0) ylikely {
 	        maxhostlen = rs ;
 	        if ((rs = getbufsize(bufsize_ho)) >= 0) ylikely {
 		    hostentlen = rs ;
