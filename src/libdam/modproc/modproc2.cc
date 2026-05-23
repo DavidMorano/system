@@ -33,29 +33,21 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>		/* |O_{xx}| */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdio>		/* |FILE| */
-#include	<new>			/* placement-new + |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<ulogerror.h>
-#include	<ascii.h>
-#include	<hasx.h>		/* |hasmodname(3uc)| */
-#include	<strop.h>
-#include	<strwcmp.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
-
-#pragma		GCC dependency		"mod/modproc.ccm"
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX |O_{xx}| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD |FILE| */
+#include	<new>			/* C++ |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 module modproc ;
 
@@ -128,7 +120,7 @@ int modproc::ifinish() noex {
 	    }
 	    {
 		delete vsp ;
-	    }
+	    } /* end block (memory-release) */
 	    vop = nullptr ;
 	} /* end if (non-null) */
 	CDEBPR("ret rs=%d\n",rs) ;
@@ -158,7 +150,7 @@ int modproc::procout(FILE *osp,int ot) noex {
 	int		c = 0 ; /* return-value */
 	CDEBPR("ent ot=%u\n",ot) ;
 	if (osp) {
-	    vecstr *vsp = vecstrp(vop) ;
+	    vecstr	*vsp = vecstrp(vop) ;
 	    cchar	*cp ;
 	    rs = SR_OK ;
 	    (void) ot ;
