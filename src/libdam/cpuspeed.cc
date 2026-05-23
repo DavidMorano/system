@@ -234,7 +234,7 @@ int loadmgr::defpr(cc *pr) noex {
 	if (pr && pr[0]) {
 	    prn = pr ;
 	} else {
-	    if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) ylikely {
+	    if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) ylikely {
 	        cint dlen = rs ;
 	        if ((rs = getinetdomain(dbuf,dlen)) >= 0) ylikely {
 	            if ((rs = mkpr(pbuf,plen,dbuf,PRNAME)) >= 0) ylikely {
