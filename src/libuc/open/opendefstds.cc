@@ -47,6 +47,8 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<localmisc.h>
 
 #include	"open.h"
