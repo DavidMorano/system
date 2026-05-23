@@ -53,11 +53,15 @@
 #include	<intsat.h>		/* LIBU |intsat(3u)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBU |DPRINT(3u)| */
+#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
 
 #include	"cfinet.hh"		/* local */
 	
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
