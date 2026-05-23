@@ -25,25 +25,22 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |cfdec(3u)| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |cfdec(3u)| */
 #include	<matxstr.h>		/* |matocasestr| */
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |isnumlatin(3uc)| */
-#include	<localmisc.h>
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 module cmdutils ;
 
 import libutil ;			/* |getlenstr(3u)| */
+import ureserve ;			/* is{x}(2u)| */
 
 /* local defines */
 
