@@ -106,13 +106,13 @@ static int	name_vfind(PO_NAME *,cchar *,int,PO_VAL **) noex ;
 /* exported subroutines */
 
 int paramopt_start(PO *op) noex {
-    	PARAMOPT	*hop = op ;
+    	paramopt	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = memclear(hop)) >= 0) ylikely {
 	        op->head = nullptr ;
 	        op->tail = nullptr ;
-	        op->magval = PARAMOPT_MAGIC ;
+	        op->magval = paramopt_MAGIC ;
 	        op->f_inited = true ;
 	    }
 	} /* end if (non-null) */
