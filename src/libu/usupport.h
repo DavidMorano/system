@@ -31,6 +31,8 @@
 #include	<stdintx.h>
 #include	<intx.h>
 
+#include	<vstrorders.h>
+
 #include	<usupport_ctdec.hh>
 #include	<usupport_cfdec.hh>
 #include	<usupport_cfdect.hh>
@@ -53,6 +55,8 @@
 #include	<usupport_sixchr.hh>
 #include	<usupport_sncpyx.hh>
 #include	<usupport_snwcpy.hh>
+#include	<usupport_strdcpyx.hh>
+#include	<usupport_strdcpyxw.hh>
 #include	<usupport_strkeycmp.hh>
 #include	<usupport_strncmp.hh>
 #include	<usupport_strncpyxc.hh>
@@ -63,8 +67,11 @@
 #include	<usupport_strnxchr.hh>
 #include	<usupport_strnxbrk.hh>
 #include	<usupport_strwcpy.hh>
+#include	<usupport_strxxxxcmp.hh>
 #include	<usupport_toxc.hh>
 #include	<usupport_ustrftime.hh>
+#include	<usupport_vstrcmp.hh>
+#include	<usupport_vstrkeycmp.hh>
 
 
 #endif /* USUPPORT_INCLUDE */
