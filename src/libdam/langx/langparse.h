@@ -98,13 +98,13 @@ struct langparse : langparse_head {
 	} ; /* end ctor */
 	langparse(const langparse &) = delete ;
 	langparse &operator = (const langparse &) = delete ;
-	int load(cchar *,int = -1) noex ;
-	int remread(short *,int) noex ;
+	int load	(cchar *,int = -1) noex ;
+	int remread	(short *,int) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct langparse() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end destruct */
 } ; /* end struct (langparse) */
 #else	/* __cplusplus */
 typedef LANGPARSE	langparse ;
