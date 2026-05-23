@@ -40,20 +40,22 @@ MODS +=
 LIBS +=
 
 
-OBJ0= cmdutils0.o cmdutils1.o
+OBJPART=
+
+OBJPRIME= cmdutils0.o 
+
+OBJ0= cmdutils1.o
 OBJ1= cmdutils2.o
 OBJ2=
 OBJ3=
 
 OBJA= obj0.o obj1.o
 
-OBJ= obja.o
+OBJIMPL= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,11 +98,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ)
-	makemodule cmdutils
+$(T).o:			objprime.o objimpl.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
@@ -136,15 +137,23 @@ objb.o:			$(OBJB)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
-cmdutils0.o:		cmdutils.ccm
-	makemodule cmdutils
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-cmdutils1.o:		cmdutils1.cc cmdutils.ccm
-	makemodule cmdutils
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+cmdutils0.o:		cmdutils.ccm
+	gxx -c -x c++ -o $@ -O $<
+
+cmdutils1.o:		cmdutils1.cc objprime.o
 	$(COMPILE.cc) $<
 
-cmdutils2.o:		cmdutils2.cc cmdutils.ccm
-	makemodule cmdutils
+cmdutils2.o:		cmdutils2.cc objprime.o
 	$(COMPILE.cc) $<
 
 
