@@ -40,7 +40,11 @@ MODS +=
 LIBS +=
 
 
-OBJ0= argutils0.o argutils1.o
+OBJPART=
+
+OBJPRIME= argutils0.o
+
+OBJ0= argutils1.o
 OBJ1=
 OBJ2=
 OBJ3=
@@ -52,11 +56,10 @@ OBJ7=
 OBJA= obj0.o
 OBJB= obj4.o 
 
-OBJ= obja.o
+OBJIMPL= obja.o
 
 
 INCDIRS +=
-
 LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
@@ -100,11 +103,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+$(T).o:			objprime.o objimpl.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -151,11 +154,22 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-argutils0.o:		argutils.ccm					$(INCS)
-	makemodule $(T)
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module primary
+argutils0.o:		argutils.ccm					$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+# module implementation
 argutils1.o:		argutils1.cc argutils0.o			$(INCS)
-	makemodule $(T)
 	$(COMPILE.cc) $<
 
 
