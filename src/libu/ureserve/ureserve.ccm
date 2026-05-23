@@ -5,6 +5,7 @@
 /* reserved interfaces */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -42,6 +43,10 @@ module ;
 
 export module ureserve ;
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 export import :isnot ;
 export import :charx ;
 export import :isx ;
@@ -50,5 +55,7 @@ export import :strop ;
 export import :fieldterm ;
 export import :field ;
 export import :vecstr ;
+
+cbool		f_debug = CF_DEBUG ;
 
 
