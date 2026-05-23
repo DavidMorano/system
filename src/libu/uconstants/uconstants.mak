@@ -89,7 +89,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ_UCONSTS) Makefile
@@ -106,6 +106,7 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat uconstants	gcm.cache
 	rmobj
 
 control:
@@ -114,10 +115,9 @@ control:
 
 # UCONSTANTS
 uconstants0.o:		uconstants.ccm $(DEP_UCONST)
-	makemodule uconstants
+	gxx -c -x c++ -o $@ -O $<
 
 uconstants_def.o:	uconstants_def.cc uconstants.ccm $(DEP_UCONST)
-	makemodule uconstants
 	$(COMPILE.cc) $<
 
 # UMODS
