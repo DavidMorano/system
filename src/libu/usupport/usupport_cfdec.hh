@@ -39,7 +39,7 @@ namespace libu {
     extern int cfdec(cchar *,int,ulonglong *)	noex ;
     inline int cfdeci(cchar *sp,int sl,int *vp = nullptr) noex {
     	int		rs ;
-	if (int v ; (rs = cfdec(sp,sl,&v)) >= 0) {
+	if (int v ; (rs = libu::cfdec(sp,sl,&v)) >= 0) {
 	    cint va = abs(v) ;
 	    rs = va ;
 	    if (vp) *vp = v ;
