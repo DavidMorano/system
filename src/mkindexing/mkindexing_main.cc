@@ -116,7 +116,7 @@ struct pinfo {
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
 static int	procargs(PROGINFO *,ARGINFO *,cchar *) ;
 static int	process(PROGINFO *,ARGINFO *,PINFO *,cchar *) ;
 
@@ -278,7 +278,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo, *aip = &ainfo ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	PINFO		pinfo ;
 	bfile		errfile ;
 
@@ -894,7 +894,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1388,7 +1388,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1400,7 +1400,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
