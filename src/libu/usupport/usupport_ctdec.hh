@@ -40,25 +40,25 @@ namespace libu {
     extern int ctdec_unknown	(char *,int)		noex ;
     template<typename T> inline int ctdec(char *rp,int rl,T uv) noex {
 	(void) uv ;
-	return ctdec_unknown(rp,rl) ;
+	return libu::ctdec_unknown(rp,rl) ;
     }
     template<> inline int ctdec(char *dp,int dl,int sv)		noex {
-	return ctdeci(dp,dl,sv) ;
+	return libu::ctdeci(dp,dl,sv) ;
     }
     template<> inline int ctdec(char *dp,int dl,long sv)	noex {
-	return ctdecl(dp,dl,sv) ;
+	return libu::ctdecl(dp,dl,sv) ;
     }
     template<> inline int ctdec(char *dp,int dl,longlong sv)	noex {
-	return ctdecll(dp,dl,sv) ;
+	return libu::ctdecll(dp,dl,sv) ;
     }
     template<> inline int ctdec(char *dp,int dl,uint uv)	noex {
-	return ctdecui(dp,dl,uv) ;
+	return libu::ctdecui(dp,dl,uv) ;
     }
     template<> inline int ctdec(char *dp,int dl,ulong uv)	noex {
-	return ctdecul(dp,dl,uv) ;
+	return libu::ctdecul(dp,dl,uv) ;
     }
     template<> inline int ctdec(char *dp,int dl,ulonglong uv)	noex {
-	return ctdecull(dp,dl,uv) ;
+	return libu::ctdecull(dp,dl,uv) ;
     }
 } /* end namespace (libu) */
 
