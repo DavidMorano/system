@@ -118,6 +118,10 @@ struct paramopt : paramopt_head {
 typedef PARAMOPT	paramopt ;
 #endif /* __cplusplus */
 
+typedef	PARAMOPT_NAME	paramopt_name ;
+typedef	PARAMOPT_VAL	paramopt_val ;
+typedef	PARAMOPT_CUR	paramopt_cur ;
+
 EXTERNC_begin
 
 extern int paramopt_start	(paramopt *) noex ;
