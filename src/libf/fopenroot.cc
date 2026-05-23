@@ -55,14 +55,14 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstdio>
-#include	<cstring>		/* strcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<umem.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* STC-C */
+#include	<cstdlib>		/* STC-C */
+#include	<cstdio>		/* STC-C */
+#include	<cstring>		/* STD-C |strcpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<umem.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"libf.h"
