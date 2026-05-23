@@ -37,8 +37,11 @@ namespace libu {
     extern int strkeybasecmp(cchar *,cchar *)		noex ;
     extern int strkeycasecmp(cchar *,cchar *)		noex ;
     extern int strkeyfoldcmp(cchar *,cchar *)		noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline int strkeycmp(cchar *s1,cchar *s2)		noex {
-    	return strkeybasecmp(s1,s2) ;
+    	return libu::strkeybasecmp(s1,s2) ;
     }
 } /* end namespace (libu) */
 
@@ -49,14 +52,17 @@ namespace libu {
     extern int strkeyxcasecmpr(cchar *,cchar *)		noex ;
     extern int strkeyxfoldcmpo(cchar *,cchar *)		noex ;
     extern int strkeyxfoldcmpr(cchar *,cchar *)		noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline int strkeyxbasecmp(cchar *s1,cchar *s2)	noex {
-	return strkeyxbasecmpo(s1,s2) ;
+	return libu::strkeyxbasecmpo(s1,s2) ;
     }
     inline int strkeyxcasecmp(cchar *s1,cchar *s2)	noex {
-    	return strkeyxcasecmpo(s1,s2) ;
+    	return libu::strkeyxcasecmpo(s1,s2) ;
     }
     inline int strkeyxfoldcmp(cchar *s1,cchar *s2)	noex {
-    	return strkeyxfoldcmpo(s1,s2) ;
+    	return libu::strkeyxfoldcmpo(s1,s2) ;
     }
 } /* end namespace (libu) */
 
