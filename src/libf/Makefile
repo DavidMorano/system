@@ -37,7 +37,7 @@ INCS += libf.h
 
 MODS +=
 
-LIBS += -luo -lu
+LIBS += -lu
 
 
 OBJ0= freadln.o
@@ -53,7 +53,7 @@ OBJ= obja.o
 
 INCDIRS +=
 
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -157,7 +157,5 @@ fwrite.o:		fwrite.cc			$(INCS)
 fprint.o:		fprint.cc			$(INCS)
 fputch.o:		fputch.cc			$(INCS)
 fopenroot.o:		fopenroot.cc			$(INCS)
-
-uclibmem.o:		uclibmem.cc	uclibmem.h
 
 
