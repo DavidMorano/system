@@ -35,25 +35,25 @@ namespace libu {
     extern int	sispanwhite	(cchar *,int) noex ;
     extern int	sispanblank	(cchar *,int) noex ;
     inline int	sispandig	(cchar *sp,int sl) noex {
-    	return sispandigit(sp,sl) ;
+    	return libu::sispandigit(sp,sl) ;
     }
     inline int	sispanoct	(cchar *sp,int sl) noex {
-    	return sispanoctal(sp,sl) ;
+    	return libu::sispanoctal(sp,sl) ;
     }
     inline int	sispandec	(cchar *sp,int sl) noex {
-    	return sispandigit(sp,sl) ;
+    	return libu::sispandigit(sp,sl) ;
     }
     inline int	sispanhex	(cchar *sp,int sl) noex {
-    	return sispandigex(sp,sl) ;
+    	return libu::sispandigex(sp,sl) ;
     }
     inline int	sispanwht	(cchar *sp,int sl) noex {
-    	return sispanwhite(sp,sl) ;
+    	return libu::sispanwhite(sp,sl) ;
     }
     inline int	sispanblk	(cchar *sp,int sl) noex {
-    	return sispanblank(sp,sl) ;
+    	return libu::sispanblank(sp,sl) ;
     }
     inline int	siskipwhite	(cchar *sp,int sl) noex {
-    	return sispanwhite(sp,sl) ;
+    	return libu::sispanwhite(sp,sl) ;
     }
 } /* end namespace (libu) */
 
