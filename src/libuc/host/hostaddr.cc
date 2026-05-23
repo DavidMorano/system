@@ -179,7 +179,7 @@ int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hostaddr_ctor(op,hn,svc)) >= 0) ylikely {
-	    if (char *ehostname{} ; (rs = lm_hn(&ehostname)) >= 0) ylikely {
+	    if (char *ehostname{} ; (rs = lm_hostname(&ehostname)) >= 0) ylikely {
 	        ADDRINFO	*aip{} ;
 	        if ((rs = geteaddrinfo(hn,svc,hintp,ehostname,&aip)) >= 0) {
 	            op->aip = aip ;
