@@ -129,6 +129,7 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat libutil	gcm.cache
 	rmobj
 
 control:
