@@ -192,8 +192,7 @@ int filer_writeblanks(filer *op,int n) noex {
 	    } /* end while */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_writeblanks) */
+} /* end subroutine (filer_writeblanks) */
 
 int filer_writefill(filer *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -208,8 +207,7 @@ int filer_writefill(filer *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_writefill) */
+} /* end subroutine (filer_writefill) */
 
 int filer_writealign(filer *op,int asize) noex {
 	int		rs ;
@@ -227,8 +225,7 @@ int filer_writealign(filer *op,int asize) noex {
 	    } /* end if (filer_tell) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_writeallign) */
+} /* end subroutine (filer_writeallign) */
 
 int filer_writezero(filer *op,int n) noex {
 	int		rs ;
@@ -242,8 +239,7 @@ int filer_writezero(filer *op,int n) noex {
 	    } /* end while */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_writezero) */
+} /* end subroutine (filer_writezero) */
 
 int filer_writefd(filer *op,char *bp,int bl,int mfd,int len) noex {
 	int		rs ;
@@ -266,7 +262,6 @@ int filer_writefd(filer *op,char *bp,int bl,int mfd,int len) noex {
 	    } /* end while */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_writefd) */
+} /* end subroutine (filer_writefd) */
 
 
