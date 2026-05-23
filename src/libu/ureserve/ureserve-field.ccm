@@ -86,7 +86,6 @@ export {
 	int word	(cchar *,cchar **) noex ;
 	int wordphrase	(cchar *,char *,int) noex ;
 	int sharg	(cchar *,char *,int) noex ;
-	int srvarg	(cchar *,char *,int) noex ;
 	int remaining	(cchar ** = nullptr) noex ;
 	void dtor() noex ;
 	destruct field() {
