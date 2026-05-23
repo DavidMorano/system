@@ -119,6 +119,7 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat umisc		gcm.cache
 	rmobj
 
 control:
