@@ -36,16 +36,16 @@ namespace libu {
     extern int touc(int ch) noex ;
     extern int tofc(int ch) noex ;
     inline char chtobc(int ch) noex {
-	return char(tobc(ch)) ;
+	return char(libu::tobc(ch)) ;
     }
     inline char chtolc(int ch) noex {
-	return char(tolc(ch)) ;
+	return char(libu::tolc(ch)) ;
     }
     inline char chtouc(int ch) noex {
-	return char(touc(ch)) ;
+	return char(libu::touc(ch)) ;
     }
     inline char chtofc(int ch) noex {
-	return char(tofc(ch)) ;
+	return char(libu::tofc(ch)) ;
     }
 } /* end namespace (libu) */
 
