@@ -39,11 +39,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* CSTD */
+#include	<localmisc.h>		/* CSTD */
 
 #include	"usupport_getustime.hh"
 
@@ -74,7 +74,7 @@
 
 /* exported variables */
 
-libu::ugetustime	getustime ;
+libu::ustimemgr		getustime ;
 
 
 /* exported subroutines */
