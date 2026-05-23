@@ -131,6 +131,8 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat varithmetic	gcm.cache
+	rmobj
 
 control:
 	(uname -n ; date) > Control
