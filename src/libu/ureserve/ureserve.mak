@@ -52,26 +52,24 @@ OBJPART= objparta.o objpartb.o
 
 OBJPRIME= ureserve0.o
 
-OBJ00= ureserve0.o 
-OBJ01= ureserve1.o ureserve2.o 
-OBJ02= ureserve3.o ureserve4.o
-OBJ03= ureserve5.o ureserve6.o
-
-OBJ04= ureserve7.o ureserve8.o
-OBJ05=
+OBJ00= ureserve1.o ureserve2.o 
+OBJ01= ureserve3.o ureserve4.o
+OBJ02= ureserve5.o ureserve6.o
+OBJ03= ureserve7a.o ureserve7b.o 
+OBJ04= ureserve8a.o ureserve8b.o
 OBJ06=
 OBJ07=
 
-OBJA= objimpl01.o
-OBJB= objimpl02.o objimpl03.o
+OBJA= objimpl00.o objimpl01.o 
+OBJB= objimpl02.o objimpl03.o 
 OBJC= objimpl04.o
-OBJD= 
+OBJD=
 
 OBJIMPL= obja.o objb.o objc.o
 
 
 INCDIRS=
-LIBDIRS=
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -131,7 +129,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat $(T) gcm.cache
+	rmsubpat $(T)	gcm.cache
 	rmobj
 
 control:
@@ -240,13 +238,16 @@ ureserve5.o:		ureserve5.cc ureserve0.o
 ureserve6.o:		ureserve6.cc ureserve0.o
 	$(COMPILE.cc) $<
 
-ureserve7.o:		ureserve7.cc ureserve0.o
+ureserve7a.o:		ureserve7a.cc ureserve0.o
 	$(COMPILE.cc) $<
 
-ureserve8.o:		ureserve8.cc ureserve0.o
+ureserve7b.o:		ureserve7b.cc ureserve0.o
 	$(COMPILE.cc) $<
 
-ureserve9.o:		ureserve9.cc ureserve0.o
+ureserve8a.o:		ureserve8a.cc ureserve0.o
+	$(COMPILE.cc) $<
+
+ureserve8b.o:		ureserve8b.cc ureserve0.o
 	$(COMPILE.cc) $<
 
 
