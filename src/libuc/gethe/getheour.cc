@@ -204,7 +204,7 @@ int gether::tryname(cchar *name) noex {
 int gether::findcanonical() noex {
 	int		rs = SR_OK ;
 	if (hbuf) {
-	    if ((rs = getbufsize(bufsize_hn)) >= 0) ylikely {
+	    if ((rs = getbufsize(bufsize_hostname)) >= 0) ylikely {
 		cint	hlen = rs ;
 	        hostent	*hop = cast_static<hostentp>(hep) ;
 	        cchar	*canp ;
