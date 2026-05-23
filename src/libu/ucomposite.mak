@@ -53,7 +53,7 @@ OBJ= obja.o
 
 INCDIRS=
 
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -142,4 +142,5 @@ ulinkfile.o:		ulinkfile.cc	ulinkfile.h	$(INCS)
 uperm.o:		uperm.cc	uperm.h		$(INCS)
 umkdirs.o:		umkdirs.cc	umkdirs.h	$(INCS)
 urmdirs.o:		urmdirs.cc	urmdirs.h	$(INCS)
+
 
