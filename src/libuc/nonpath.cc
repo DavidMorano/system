@@ -75,8 +75,8 @@ using std::bitset ;			/* type (currently unused) */
 /* external subroutines */
 
 extern "C++" {
-    int		siobrk(cchar *,int,const chrset &) noex ;
-    int		sirbrk(cchar *,int,const chrset &) noex ;
+    int		siobrk(cchar *,int,con chrset *) noex ;
+    int		sirbrk(cchar *,int,con chrset *) noex ;
 }
 
 
@@ -130,7 +130,7 @@ int nonpath(cchar *fp,int µfl) noex {
 			t = nonpath_var ;
 			if (ch != chx_var) {
 			    t = nonpath_reg ;
-	                    if (int si ; (si = siobrk(fp,fl,bs.ss)) >= 0) {
+	                    if (int si ; (si = siobrk(fp,fl,&bs.ss)) >= 0) {
 			        t = (si + nonpath_dialer) ;
 			    }
 			}
