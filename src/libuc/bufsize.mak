@@ -95,7 +95,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -136,8 +136,9 @@ objb.o:			$(OBJB)
 
 bufsizes.o:		bufsizes.cc		bufsizes.h	$(INCS)
 bufsizevar.o:		bufsizevar.cc		bufsizevar.hh	$(INCS)
+bufsizeget.o:		bufsizeget.cc		bufsizeget.h	$(INCS)
 
-bufsizedata.o:		bufsizedata.ccm				$(INCS)
-	makemodule bufsizedata
+bufsizedata.o:		bufsizedata.ccm		bufsizes.h	$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 
