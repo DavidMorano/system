@@ -68,7 +68,6 @@
 #include	<pcspoll.h>
 #include	<mailmsghdrs.h>
 #include	<initnow.h>
-#include	<getourenv.h>
 #include	<mkdirlist.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
