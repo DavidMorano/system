@@ -116,6 +116,10 @@ struct keyopt : keyopt_head {
 typedef KEYOPT		keyopt ;
 #endif /* __cplusplus */
 
+typedef	KEYOPT_NA	keyopt_na ;
+typedef	KEYOPT_VAL	keyopt_val ;
+typedef	KEYOPT_CUR	keyopt_cur ;
+
 EXTERNC_begin
 
 extern int keyopt_start		(keyopt *) noex ;
