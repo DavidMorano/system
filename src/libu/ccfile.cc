@@ -53,19 +53,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<string>
-#include	<string_view>
-#include	<fstream>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<strnul.hh>
-#include	<stdfnames.h>
-#include	<readln.hh>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<string>		/* C++STD */
+#include	<string_view>		/* C++STD */
+#include	<fstream>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<strnul.hh>		/* LIBU */
+#include	<stdfnames.h>		/* LIBU */
+#include	<readln.hh>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* debugging */
 
 #include	"ccfile.hh"
@@ -74,8 +74,12 @@
 /* local defines */
 
 #ifndef	MAXLINE
+#ifdef	MAXLINELEN
+#define	MAXLINE		MAXLINELEN
+#else
 #define	MAXLINE		(4*1024)
 #endif
+#endif /* MAXLINE */
 
 
 /* imported namespaces */
