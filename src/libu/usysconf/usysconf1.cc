@@ -72,8 +72,8 @@ module ;
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD |nullptr_t| */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++ |nothrow(3c++)| */
-#include	<atomic>		/* C++ |atomic_int(3c++)| */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<atomic>		/* C++STD |atomic_int(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<utimeout.h>		/* LIBU */
@@ -83,9 +83,9 @@ module ;
 #include	<intsat.h>		/* LIBU */
 #include	<errtimer.hh>		/* LIBU */
 #include	<sysconfcmds.h>		/* LIBU */
-#include	<mailvalues.hh>		/* |mailvalue(3u)| */
+#include	<mailvalues.hh>		/* LIBU |mailvalue(3u)| */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBU */
+#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
 
 module usysconf ;
 
