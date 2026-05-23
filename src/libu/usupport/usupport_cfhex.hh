@@ -39,7 +39,7 @@ namespace libu {
     extern int cfhex(cchar *,int,ulonglong *)	noex ;
     inline int cfhexi(cchar *sp,int sl,int *vp = nullptr) noex {
     	int		rs ;
-	if (int v ; (rs = cfhex(sp,sl,&v)) >= 0) {
+	if (int v ; (rs = libu::cfhex(sp,sl,&v)) >= 0) {
 	    cint va = abs(v) ;
 	    rs = va ;
 	    if (vp) *vp = v ;
