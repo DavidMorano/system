@@ -23,13 +23,8 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 
-
-EXTERNC_begin
-
-extern int strlinelen(cchar *,int,int) noex ;
-extern int strnnlen(cchar *,int,int) noex ;
-
-EXTERNC_end
+#include	<strlinelen.h>
+#include	<strnnlen.h>
 
 
 #endif /* DEBUGLINE_INCLUDE */
