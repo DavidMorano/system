@@ -40,20 +40,23 @@ MODS +=
 LIBS +=
 
 
-OBJ0= modproc0.o modproc1.o
+OBJPART=
+
+OBJPRIME= modproc0.o
+
+OBJ0= modproc1.o
 OBJ1= modproc2.o
-OBJ2= haslead.o
-OBJ3=
+OBJ2= strmgr.o shortq.o langparse.o
+OBJ3= haslead.o hasmodname.o
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
 
-OBJ= obja.o
+OBJIMPL= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,11 +99,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ)
-	makemodule modproc
+$(T).o:			objprime.o objimpl.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
@@ -136,17 +138,32 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-modproc0.o:		modproc.ccm
-	makemodule modproc
+objpart.o:	$(OBJPATR)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objprime.o:	$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:	$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module primary
+modproc0.o:		modproc.ccm $(OBJPART)
+	gxx -c -x c++ -o $@ -O $<
+
+# module implemetation
 modproc1.o:		modproc1.cc modproc.ccm
-	makemodule modproc
 	$(COMPILE.cc) $<
 
 modproc2.o:		modproc2.cc modproc.ccm
-	makemodule modproc
 	$(COMPILE.cc) $<
 
-haslead.o:		haslead.cc haslead.h
+strmgr.o:		strmgr.cc	strmgr.h
+shortq.o:		shortq.cc	shortq.h
+langparse.o:		langparse.cc	langparse.h
+
+haslead.o:		haslead.cc	haslead.h
+hasmodname.o:		hasmodname.cc	hasmodname.h
 
 
