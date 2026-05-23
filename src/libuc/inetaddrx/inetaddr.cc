@@ -58,41 +58,44 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/socket.h>		/* POSIX */
+#include	<netinet/in.h>		/* POSIX */
 #include	<arpa/inet.h>		/* |inet_addr(3c)| + |in_addr_t| */
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<netdb.h>		/* POSIX */
+#include	<cstddef>		/* CSDT |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |cfdec(3u)| */
-#include	<uinet.h>
-#include	<strwcpy.h>
-#include	<inaddrbad.hh>
-#include	<cfnum.h>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* |cfinet(3u)| */
+#include	<uinet.h>		/* LIBU */
+#include	<inaddrbad.hh>		/* local */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"inetaddr.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/digtab.ccm"
+#pragma		GCC dependency		"mod/ureserve.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 import digtab ;
+import ureserve ;
 
 /* local defines */
+
+#define	ISWHT(ch)	char_iswhite(ch)	/* LIBU */
 
 
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libu::strwcpy ;			/* subtourine */
 using libu::ctdecui ;			/* subroutine (LIBU) */
+using libu::cfinet ;			/* subroutine (LIBU) */
 
 
 /* local typedefs */
@@ -112,6 +115,8 @@ using libu::ctdecui ;			/* subroutine (LIBU) */
 local int inetaddr_startbin(inetaddr *ip,cchar *addrp,int addrl) noex ;
 local int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex ;
 local int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex ;
+
+local bool hasaddrspecial(cchar *,int) noex ;
 
 
 /* local variables */
@@ -174,16 +179,16 @@ local int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    char	abuf[str4len + 1] ;
 	    rs = SR_OK ;
 	    if (addrl < 0) addrl = lenstr(addrp) ;
-	    while (CHAR_ISWHITE(*ap)) {
+	    while (ISWHT(*ap)) {
 	        ap += 1 ;
 	        addrl -= 1 ;
 	    }
-	    if (*ap == '\\') {
-	        if (uint uiw ; (rs = cfnumui(ap,addrl,&uiw)) >= 0) {
+	    if (hasaddrspecial(ap,addrl)) {
+	        if (uint uiw ; (rs = cfinet(ap,addrl,&uiw)) >= 0) {
 	            ip->a.s_addr = htonl(uiw) ;
 		}
 	    } else {
-	        while ((addrl > 0) && CHAR_ISWHITE(ap[addrl - 1])) {
+	        while ((addrl > 0) && ISWHT(ap[addrl - 1])) {
 	            addrl -= 1 ;
 	        }
 	        if (addrl > 0) {
@@ -211,11 +216,11 @@ local int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    char	abuf[(inet4addrlen * szof(in4_addr_t)) + 1] ;
 	    rs = SR_OK ;
 	    if (addrl < 0) addrl = lenstr(addrp) ;
-	    while (CHAR_ISWHITE(*ap)) {
+	    while (ISWHT(*ap)) {
 	        ap += 1 ;
 	        addrl -= 1 ;
 	    }
-	    while ((addrl > 0) && CHAR_ISWHITE(ap[addrl-1])) {
+	    while ((addrl > 0) && ISWHT(ap[addrl-1])) {
 	        addrl -= 1 ;
 	    }
 	    if (addrl > 0) {
@@ -294,6 +299,9 @@ int inetaddr_getdotaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 }
 /* end subroutine (inetaddr_getdotaddr) */
 
+
+/* local subroutines */
+
 inetaddr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
@@ -304,8 +312,7 @@ inetaddr_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (inetaddr_co::operator) */
+} /* end method (inetaddr_co::operator) */
 
 int inetaddr::start(inetaddrs at,cvoid *addr,int alen) noex {
 	return inetaddr_start(this,at,addr,alen) ;
@@ -318,5 +325,15 @@ int inetaddr::gethexaddr(char *bp,int bl) noex {
 int inetaddr::getdotaddr(char *bp,int bl) noex {
 	return inetaddr_getdotaddr(this,bp,bl) ;
 }
+
+local bool hasaddrspecial(cchar *ap,int al) noex {
+    	bool f = false;
+	if (al > 2) {
+	    f = true ;
+    	    f = f && ((ap[0] == '\\') && (ap[0] == '\\')) ;
+	    f = f && (ap[1] == 'x') ;
+	} /* end if */
+	return f ;
+} /* end subroutine (hasaddrspecial) */
 
 
