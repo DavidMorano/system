@@ -61,9 +61,9 @@ struct inetaddr : inetaddr_head {
 	} ;
 	inetaddr(const inetaddr &) = delete ;
 	inetaddr &operator = (const inetaddr &) = delete ;
-	int start(inetaddrs,cvoid *,int = -1) noex ;
-	int gethexaddr(char *,int) noex ;
-	int getdotaddr(char *,int) noex ;
+	int start	(inetaddrs,cvoid *,int = -1) noex ;
+	int gethexaddr	(char *,int) noex ;
+	int getdotaddr	(char *,int) noex ;
 } ; /* end struct (inetaddr) */
 #else /* __cplusplus */
 typedef INETADDR	inetaddr ;
@@ -71,10 +71,10 @@ typedef INETADDR	inetaddr ;
 
 EXTERNC_begin
 
-extern int inetaddr_start(inetaddr *,inetaddrs,cvoid *,int) noex ;
-extern int inetaddr_gethexaddr(inetaddr *,char *,int) noex ;
-extern int inetaddr_getdotaddr(inetaddr *,char *,int) noex ;
-extern int inetaddr_finish(inetaddr *) noex ;
+extern int inetaddr_start	(inetaddr *,inetaddrs,cvoid *,int) noex ;
+extern int inetaddr_gethexaddr	(inetaddr *,char *,int) noex ;
+extern int inetaddr_getdotaddr	(inetaddr *,char *,int) noex ;
+extern int inetaddr_finish	(inetaddr *) noex ;
 
 EXTERNC_end
 
