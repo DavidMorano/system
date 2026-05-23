@@ -303,7 +303,7 @@ int sysrealname_curbegin(SRN *op,SRN_CUR *curp) noex {
 		        uc_free(curp->scp) ;
 		        curp->scp = nullptr ;
 		    }
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -467,7 +467,7 @@ local int sysrealname_objloadbegin(SRN *op,cchar *pr,cchar *objn) noex {
 	                            uc_free(op->obj) ;
 	                            op->obj = nullptr ;
 	                        }
-	                    } /* end if (memory-allocation) */
+	                    } /* end if (memory-acquire) */
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 		            op->fl.modload = false ;
@@ -577,7 +577,7 @@ local int sysrealname_curload(SRN *op,SRN_CUR *curp,
 		    sbp = (strwcpy(sbp,sa[i],-1) + 1) ;
 	        }
 	        sap[i] = nullptr ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 }
