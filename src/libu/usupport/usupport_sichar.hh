@@ -35,25 +35,25 @@ namespace libu {
     extern int	siwhite(cchar *,int) noex ;
     extern int	siblank(cchar *,int) noex ;
     inline int	sidig(cchar *sp,int sl) noex {
-	return sidigit(sp,sl) ;
+	return libu::sidigit(sp,sl) ;
     }
     inline int	sibin(cchar *sp,int sl) noex {
-    	return sibinar(sp,sl) ;
+    	return libu::sibinar(sp,sl) ;
     }
     inline int	sioct(cchar *sp,int sl) noex {
-    	return sioctal(sp,sl) ;
+    	return libu::sioctal(sp,sl) ;
     }
     inline int	sidec(cchar *sp,int sl) noex {
-    	return sidigit(sp,sl) ;
+    	return libu::sidigit(sp,sl) ;
     }
     inline int	sihex(cchar *sp,int sl) noex {
-    	return sidigex(sp,sl) ;
+    	return libu::sidigex(sp,sl) ;
     }
     inline int	siwht(cchar *sp,int sl) noex {
-    	return siwhite(sp,sl) ;
+    	return libu::siwhite(sp,sl) ;
     }
     inline int	siblk(cchar *sp,int sl) noex {
-    	return siblank(sp,sl) ;
+    	return libu::siblank(sp,sl) ;
     }
 } /* end namespace (libu) */
 
