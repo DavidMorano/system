@@ -33,16 +33,16 @@ namespace libu {
     extern char *strnoctal(cchar *,int) noex ;
     extern char *strnblank(cchar *,int) noex ;
     inline char *strndig(cchar *sp,int sl) noex {
-	return strndigit(sp,sl) ;
+	return libu::strndigit(sp,sl) ;
     }
     inline char *strnoct(cchar *sp,int sl) noex {
-	return strnoctal(sp,sl) ;
+	return libu::strnoctal(sp,sl) ;
     }
     inline char *strndec(cchar *sp,int sl) noex {
-	return strndigit(sp,sl) ;
+	return libu::strndigit(sp,sl) ;
     }
     inline char *strnhex(cchar *sp,int sl) noex {
-	return strndigex(sp,sl) ;
+	return libu::strndigex(sp,sl) ;
     }
 } /* end namespace (libu) */
 
