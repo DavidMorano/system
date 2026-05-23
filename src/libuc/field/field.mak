@@ -43,7 +43,7 @@ LIBS +=
 OBJ0_FIELD= field_prime.o field_obj.o
 OBJ1_FIELD= field_srvarg.o field_svcargs.o
 OBJ2_FIELD= field_word.o field_wordphrase.o
-OBJ3_FIELD= fieldterms.o
+OBJ3_FIELD= fieldterms.o fieldterminit.o
 
 OBJA_FIELD= obj0_field.o obj1_field.o
 OBJB_FIELD= obj2_field.o obj3_field.o
@@ -52,9 +52,7 @@ OBJ_FIELD= $(OBJA_FIELD) $(OBJB_FIELD)
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -143,6 +141,7 @@ field_svcargs.o:	field_svcargs.cc	$(INCS)
 field_word.o:		field_word.cc		$(INCS)
 field_wordphrase.o:	field_wordphrase.cc	$(INCS)
 
-fieldterms.o:		fieldterms.cc fieldterms.h
+fieldterms.o:		fieldterms.cc		fieldterms.h
+fieldterminit.o:	fieldterminit.cc	fieldterminit.hh
 
 
