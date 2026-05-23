@@ -47,17 +47,13 @@
 #include	<string>		/* C++ |string| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<six.h>			/* |sichr(2uc)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<shortq.h>
-#include	<strwcpy.h>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 #include	<deb.hh>		/* |DEBPRINTF| */
 
 #include	"langparse.h"
@@ -76,7 +72,6 @@ import deb ;
 using std::string ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
