@@ -32,7 +32,7 @@ namespace libu {
     extern int nleadcasestr(cchar *,cchar *,int) noex ;
     extern int nleadfoldstr(cchar *,cchar *,int) noex ;
     inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
-	return nleadbasestr(bs,sp,sl) ;
+	return libu::nleadbasestr(bs,sp,sl) ;
     }
 } /* end namespace (libu) */
 
