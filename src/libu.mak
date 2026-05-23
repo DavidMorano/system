@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -88,7 +88,7 @@ OBJ31= ccfile.o readln.o dprint.o
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o cmporders.o localmisc.o
 OBJ34= exitcodes.o stacktypes.o sysconfcmds.o
-OBJ45=
+OBJ35= ascii.o mapex.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -98,9 +98,10 @@ OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
-OBJI= obj32.o obj33.o obj34.o
+OBJI= obj32.o obj33.o obj34.o obj35.o
 
-OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o obji.o
+OBJ += obja.o objb.o objc.o objd.o 
+OBJ += obje.o objf.o objg.o objh.o obji.o
 
 
 INCDIRS=
@@ -154,7 +155,7 @@ so:			$(T).so
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ) Makefile $(INCS)
@@ -183,6 +184,11 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat ischx		gcm.cache
+	rmsubpat findbit	gcm.cache
+	rmsubpat bitmanip	gcm.cache
+	rmsubpat bitgrp		gcm.cache
+	rmsubpat chrset		gcm.cache
 	rmobj
 
 control:
@@ -506,7 +512,11 @@ intext.dir:		varithmetic.o loadvals.o
 
 # misc-objects
 chrset.o:		chrset.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 bitgrp.o:		bitgrp.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 nulstr.o:		nulstr.cc	nulstr.h	$(INCS)
 posixdirent.o:		posixdirent.cc	posixdirent.hh	$(INCS)
 binchunk.o:		binchunk.cc	binchunk.hh	$(INCS)
@@ -538,9 +548,13 @@ filetypes.o:		filetypes.cc	filetypes.h			$(INCS)
 funcodes.o:		funcodes.cc	funcodes.h			$(INCS)
 
 # BITS
-bitmanip.o:		bitmanip.ccm					$(INCS)
 baops.o:		baops.c		baops.h				$(INCS)
+
+bitmanip.o:		bitmanip.ccm					$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 findbit.o:		findbit.ccm					$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 # STRING handling
 strtox.o:		strtox.cc	strtox.h bitmanip.o		$(INCS)
@@ -553,7 +567,6 @@ readln.o:		readln.cc	readln.hh			$(INCS)
 dprint.o:		dprint.cc	dprint.hh			$(INCS)
 
 # ARITHMETIC
-bitmanip.o:		bitmanip.ccm
 muldigs.o:		muldigs.ccm
 loadvals.o:		loadvals.ccm
 
@@ -561,7 +574,7 @@ ischx.o:		ischx0.o ischx1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 ischx0.o:		ischx.ccm					$(INCS)
-	makemodule $<
+	gxx -c -x c++ -o $@ -O $<
 
 ischx1.o:		ischx1.cc	ischx0.o			$(INCS)
 conintx.o:		conintx.cc	conintx.hh			$(INCS)
@@ -570,6 +583,7 @@ stdintx.o:		stdintx.cc	stdintx.h			$(INCS)
 xxtostr.o:		xxtostr.cc	xxtostr.h			$(INCS)
 cmporders.o:		cmporders.cc	cmporders.h			$(INCS)
 localmisc.o:		localmisc.cc	localmisc.h			$(INCS)
+mapex.o:		mapex.cc	mapex.h				$(INCS)
 sysconfcmds.o:		sysconfcmds.cc	sysconfcmds.h			$(INCS)
 
 
