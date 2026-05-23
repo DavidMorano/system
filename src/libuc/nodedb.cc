@@ -1052,7 +1052,7 @@ local int mkterms() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	if ((rs = getbufsize(bufsize_hostname)) >= 0) {
 	    maxhostlen = rs ;
 	    if ((rs = getbufsize(bufsize_ml)) >= 0) {
 		lineslen = ((rs + 1) * LINEBUFMULT) ;
