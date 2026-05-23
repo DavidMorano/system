@@ -25,6 +25,9 @@
 
 #include	<inetaddr.h>
 #include	<inetaddrparse.h>
+#include	<inetconv.h>
+#include	<inet4int.h>
+#include	<inaddrbad.hh>
 
 
 #endif /* INETADDRX_INCLUDE */
