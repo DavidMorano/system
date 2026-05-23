@@ -150,16 +150,16 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-getchostname.o:		getchostname.cc	getchostname.h		$(INCS)
-getehostname.o:		getehostname.cc	getehostname.h		$(INCS)
-getclustername.o:	getclustername.cc getclustername.h	$(INCS)
-getfname.o:		getfname.cc	getfname.h		$(INCS)
-getgroupname.o:		getgroupname.cc	getgroupname.h		$(INCS)
-getnodename.o:		getnodename.cc	getnodename.h		$(INCS)
-getournetname.o:	getournetname.cc getournetname.h	$(INCS)
-getprojname.o:		getprojname.cc	getprojname.h		$(INCS)
-getrealname.o:		getrealname.cc	getrealname.h		$(INCS)
-getsysname.o:		getsysname.cc	getsysname.h		$(INCS)
-getusername.o:		getusername.cc	getusername.h		$(INCS)
+getchostname.o:		getchostname.cc		getchostname.h		$(INCS)
+getehostname.o:		getehostname.cc		getehostname.h		$(INCS)
+getclustername.o:	getclustername.cc 	getclustername.h	$(INCS)
+getfname.o:		getfname.cc		getfname.h		$(INCS)
+getgroupname.o:		getgroupname.cc		getgroupname.h		$(INCS)
+getnodename.o:		getnodename.cc		getnodename.h		$(INCS)
+getournetname.o:	getournetname.cc	getournetname.h		$(INCS)
+getprojname.o:		getprojname.cc		getprojname.h		$(INCS)
+getrealname.o:		getrealname.cc		getrealname.h		$(INCS)
+getsysname.o:		getsysname.cc		getsysname.h		$(INCS)
+getusername.o:		getusername.cc		getusername.h		$(INCS)
 
 
