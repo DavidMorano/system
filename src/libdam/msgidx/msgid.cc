@@ -1290,7 +1290,7 @@ local bool keymat(msgid_key *kp,msgide *ep) noex {
 vars::operator int () noex {
         int		rs ;
 	int		rs1 ;
-	if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	if ((rs = getbufsize(bufsize_hostname)) >= 0) {
 	    hostnamelen = rs ;
 	    if ((rs = ucpagesize) >= 0) {
 		pagesize = rs ;
