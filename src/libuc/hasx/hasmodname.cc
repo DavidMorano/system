@@ -44,22 +44,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |isalphalatin(3u)| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>		/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* |UC(3dam)| */
 
 #include	"hasmodname.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ureserve.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
+import ureserve ;			/* |ix{x}(3u)| */
 
 /* local defines */
 
