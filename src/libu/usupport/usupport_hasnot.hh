@@ -31,10 +31,10 @@ namespace libu {
     extern bool hasnotdots(cchar *,int) noex ;
     extern bool hasnotempty(cchar *,int) noex ;
     inline bool hasNotDots(cchar *sp,int sl) noex {
-	return hasnotdots(sp,sl) ;
+	return libu::hasnotdots(sp,sl) ;
     }
     inline bool hasNotEmpty(cchar *sp,int sl) noex {
-	return hasnotempty(sp,sl) ;
+	return libu::hasnotempty(sp,sl) ;
     }
 } /* end namespace (libu) */
 
