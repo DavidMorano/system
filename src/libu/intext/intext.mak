@@ -128,6 +128,8 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat intext		gcm.cache
+	rmobj
 
 control:
 	(uname -n ; date) > Control
@@ -184,18 +186,24 @@ mdeps.o:		$(MDEP)
 
 
 intext0.o:		intext.ccm 		$(MDEP)
-	makemodule $<
+	gxx -c -x c++ -o $@ -O $<
 
 intext_util.o:		intext_util.ccm
+	gxx -c -x c++ -o $@ -O $<
 
 intext_uintx.o:		intext_uintx.ccm	$(MUTIL)
+	gxx -c -x c++ -o $@ -O $<
 
 intext_uint256.o:	intext_uint256.ccm	$(MUTIL) $(UINTX)
+	gxx -c -x c++ -o $@ -O $<
 
 intext_uint512.o:	intext_uint512.ccm	$(MUTIL) $(UINTX)
+	gxx -c -x c++ -o $@ -O $<
 
 intext_int256.o:	intext_int256.ccm	$(MUTIL) $(UINTX)
+	gxx -c -x c++ -o $@ -O $<
 
 intext_int512.o:	intext_int512.ccm	$(MUTIL) $(UINTX)
+	gxx -c -x c++ -o $@ -O $<
 
 
