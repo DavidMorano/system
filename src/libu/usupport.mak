@@ -60,21 +60,26 @@ OBJ14= usupport_sichar.o usupport_sispan.o
 OBJ15= usupport_sixchr.o usupport_siwhtx.o
 
 OBJ16= usupport_matstr.o usupport_matkeystr.o 
-OBJ17= usupport_hasnot.o
+OBJ17= usupport_hasnot.o usupport_strwcpy.o
 OBJ18= usupport_nleadkeystr.o usupport_nleadstr.o
-OBJ19= usupport_getusmtime.o usupport_strwcpy.o
+OBJ19= usupport_getusmtime.o usupport_getustime.o 
+
+OBJ20= usupport_strdcpyx.o usupport_strdcpyxw.o
+OBJ21= usupport_vstrcmp.o usupport_vstrkeycmp.o
+OBJ22= usupport_strxxxxcmp.o
+OBJ23= vstrorders.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
+OBJF= obj20.o obj21.o obj22.o obj23.o
 
-OBJ= obja.o objb.o objc.o objd.o obje.o
+OBJ= obja.o objb.o objc.o objd.o obje.o objf.o
 
 
 INCDIRS +=
-
 LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
@@ -118,7 +123,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -201,6 +206,19 @@ obj19.o:		$(OBJ19)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj20.o:		$(OBJ20)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj21.o:		$(OBJ21)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj22.o:		$(OBJ22)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj23.o:		$(OBJ23)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -223,6 +241,8 @@ objf.o:			$(OBJF)
 obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+
+vstrorders.o:		vstrorders.cc		vstrorders.h		$(INCS)
 
 usupport_cfdec.o:	usupport_cfdec.cc	usupport_cfdec.hh	$(INCS)
 usupport_cfdect.o:	usupport_cfdect.cc	usupport_cfdect.hh	$(INCS)
@@ -247,6 +267,8 @@ usupport_siwhtx.o:	usupport_siwhtx.cc	usupport_siwhtx.hh	$(INCS)
 usupport_sixchr.o:	usupport_sixchr.cc	usupport_sixchr.hh	$(INCS)
 usupport_sncpyx.o:	usupport_sncpyx.cc	usupport_sncpyx.hh	$(INCS)
 usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.hh	$(INCS)
+usupport_strdcpyx.o:	usupport_strdcpyx.cc	usupport_strdcpyx.hh	$(INCS)
+usupport_strdcpyxw.o:	usupport_strdcpyxw.cc	usupport_strdcpyxw.hh	$(INCS)
 usupport_strkeycmp.o:	usupport_strkeycmp.cc	usupport_strkeycmp.hh	$(INCS)
 usupport_strnchar.o:	usupport_strnchar.cc	usupport_strnchar.hh	$(INCS)
 usupport_strncmp.o:	usupport_strncmp.cc	usupport_strncmp.hh	$(INCS)
@@ -257,7 +279,10 @@ usupport_strnkeycmp.o:	usupport_strnkeycmp.cc	usupport_strnkeycmp.hh	$(INCS)
 usupport_strnwht.o:	usupport_strnwht.cc	usupport_strnwht.hh	$(INCS)
 usupport_strwcmp.o:	usupport_strwcmp.cc	usupport_strwcmp.hh	$(INCS)
 usupport_strwcpy.o:	usupport_strwcpy.cc	usupport_strwcpy.hh	$(INCS)
+usupport_strxxxxcpy.o:	usupport_strxxxxcpy.cc	usupport_strxxxxcpy.hh	$(INCS)
 usupport_toxc.o:	usupport_toxc.cc	usupport_toxc.hh	$(INCS)
 usupport_ustrftime.o:	usupport_ustrftime.cc	usupport_ustrftime.hh	$(INCS)
+usupport_vstrcmp.o:	usupport_vstrcmp.cc	usupport_vstrcmp.hh	$(INCS)
+usupport_vstrkeycmp.o:	usupport_vstrkeycmp.cc	usupport_vstrkeycmp.hh	$(INCS)
 
 
