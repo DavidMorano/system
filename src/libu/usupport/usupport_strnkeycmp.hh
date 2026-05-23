@@ -35,7 +35,7 @@ namespace libu {
 
 namespace libu {
     inline int	strnkeycmp(cchar *a,cchar *sp,int sl) noex {
-	return strnkeybasecmp(a,sp,sl) ;
+	return libu::strnkeybasecmp(a,sp,sl) ;
     }
 } /* end namespace (libu) */
 
@@ -71,13 +71,13 @@ namespace libu {
 
 namespace libu {
     inline int strnkeyxbasecmp	(cchar *s1,cchar *s2,int n) noex {
-    	return strnkeyxbasecmpo(s1,s2,n) ;
+    	return libu::strnkeyxbasecmpo(s1,s2,n) ;
     }
     inline int strnkeyxcasecmp	(cchar *s1,cchar *s2,int n) noex {
-    	return strnkeyxcasecmpo(s1,s2,n) ;
+    	return libu::strnkeyxcasecmpo(s1,s2,n) ;
     }
     inline int strnkeyxfoldcmp	(cchar *s1,cchar *s2,int n) noex {
-    	return strnkeyxfoldcmpo(s1,s2,n) ;
+    	return libu::strnkeyxfoldcmpo(s1,s2,n) ;
     }
 } /* end namespace (libu) */
 
