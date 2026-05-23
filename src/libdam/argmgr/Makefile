@@ -40,12 +40,17 @@ MODS += argmgr.ccm
 LIBS=
 
 
-OBJ_ARGMGR += argmgr0.o argmgr1.o argmgr2.o argmgr3.o
+OBJPART=
+
+OBJPRIME= argmgr0.o
+
+OBJA= argmgr1.o argmgr2.o argmgr3.o
+
+OBJIMPL= $(OBJA)
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -88,11 +93,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ_ARGMGR)
-	$(CXX) -r -o $@ $(LDFLAGS) $(OBJ_ARGMGR)
+$(T).o:			objprime.o objimpl.o
+	$(CXX) -r -o $@ $(LDFLAGS) objprime.o objimpl.o
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -104,20 +109,27 @@ clean:
 	makeclean $(ALL)
 
 
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 # ARGMGR
-argmgr0.o:		argmgr.ccm
-	makemodule argmgr
+argmgr0.o:		argmgr.ccm $(OBJPART)
+	gxx -c -x c++ -o $@ -O $<
 
-argmgr1.o:		argmgr1.cc argmgr.ccm
-	makemodule argmgr
+argmgr1.o:		argmgr1.cc objprime.o
 	$(COMPILE.cc) $<
 
-argmgr2.o:		argmgr2.cc argmgr.ccm
-	makemodule argmgr
+argmgr2.o:		argmgr2.cc objprime.o
 	$(COMPILE.cc) $<
 
-argmgr3.o:		argmgr3.cc argmgr.ccm
-	makemodule argmgr
+argmgr3.o:		argmgr3.cc objprime.o
 	$(COMPILE.cc) $<
 
 
