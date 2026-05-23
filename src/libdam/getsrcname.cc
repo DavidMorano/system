@@ -84,7 +84,7 @@ int getsrcname(char *rbuf,int rlen,int s) noex {
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if ((rlen > 0) && (s >= 0)) {
-		if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
+		if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) {
 		    cint	dlen = rs ;
 	            if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
 	                if (conn cn ; (rs = connection_start(&cn,dbuf)) >= 0) {
