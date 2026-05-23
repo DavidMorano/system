@@ -30,17 +30,17 @@
 #define	OBJECT_GETUSTIME
 
 namespace libu {
-    struct ugetustime {
+    struct ustimemgr {
 	operator time_t () noex {
 	    return time(nullptr) ;
 	} ;
 	static time_t operator () () noex {
 	    return time(nullptr) ;
 	} ;
-    } ; /* end struct (getustime) */
+    } ; /* end struct (ustimemgr) */
 } /* end namespace (libu) */
 
-extern libu::ugetustime		getustime ;
+extern libu::ustimemgr	getustime ;
 
 #endif /* OBJECT_GETUSTIME */
 
