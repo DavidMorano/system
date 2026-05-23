@@ -433,9 +433,9 @@ local int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
 
 local int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	if ((rs = getbufsize(bufsize_hostname)) >= 0) {
 	    var.maxhostlen = rs ;
-	    if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	    if ((rs = getbufsize(bufsize_hostname)) >= 0) {
 		var.maxpathlen = rs ;
 	    }
 	}
