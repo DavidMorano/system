@@ -37,7 +37,7 @@ INCS +=
 
 MODS +=
 
-LIBS += -lf -lu
+LIBS +=
 
 
 MDEP += varithmetic_util.o
@@ -74,8 +74,6 @@ OBJ= obja.o objb.o objc.o
 
 
 INCDIRS=
-
-#LIBDIRS= -L $(LIBDIR)
 LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
@@ -119,11 +117,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			obj.o Makefile
-	$(LD) -r -o $@ $(LDFLAGS) obj.o
+$(T).o:			obj.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -133,6 +131,8 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat varithmetic	gcm.cache
+	rmobj
 
 control:
 	(uname -n ; date) > Control
@@ -188,23 +188,41 @@ mdeps.o:		$(MDEP)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 varithmetic0.o:		varithmetic.ccm 	$(MDEP)
-	makemodule $<
+	gxx -c -x c++ -o $@ -O $<
 
 varithmetic_util.o:	varithmetic_util.ccm
+	gxx -c -x c++ -o $@ -O $<
 
 varithmetic_logical.o:	varithmetic_logical.ccm	$(MUTIL)
+	gxx -c -x c++ -o $@ -O $<
 
 varithmetic_shift.o:	varithmetic_shift.ccm	$(MUTIL)
+	gxx -c -x c++ -o $@ -O $<
 
 varithmetic_rotate.o:	varithmetic_rotate.ccm	$(MUTIL)
+	gxx -c -x c++ -o $@ -O $<
 
 varithmetic_add.o:	varithmetic_add.ccm	$(MUTIL)
+	gxx -c -x c++ -o $@ -O $<
 
 varithmetic_sub.o:	varithmetic_sub.ccm	$(MUTIL)
+	gxx -c -x c++ -o $@ -O $<
 
 varithmetic_mul.o:	varithmetic_mul.ccm	$(MUTIL) varithmetic_add.o
+	gxx -c -x c++ -o $@ -O $<
 
 varithmetic_div.o:	varithmetic_div.ccm	$(MUTIL) $(DEP_DIV)
+	gxx -c -x c++ -o $@ -O $<
 
 
