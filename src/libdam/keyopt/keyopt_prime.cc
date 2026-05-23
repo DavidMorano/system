@@ -110,7 +110,7 @@ int keyopt_start(keyopt *op) noex {
 	    op->head = nullptr ;
 	    op->tail = nullptr ;
 	    op->cnt = 0 ;
-	    op->magval = KEYOPT_MAGIC ;
+	    op->magval = keyopt_MAGIC ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -501,7 +501,7 @@ void keyopt::dtor() noex {
 
 keyopt::operator int () noex {
     	int		rs = SR_NOTOPEN ;
-	if (magval == KEYOPT_MAGIC) {
+	if (magval == keyopt_MAGIC) {
 	    rs = cnt ;
 	}
 	return rs ;
