@@ -31,13 +31,13 @@ namespace libu {
     extern int	rmochr(cchar *,int,int) noex ;
     extern int	rmrchr(cchar *,int,int) noex ;
     local inline int rmchr(cchar *sp,int sl,int sch) noex {
-	return rmochr(sp,sl,sch) ;
+	return libu::rmochr(sp,sl,sch) ;
     }
     local inline int rmdot(cchar *sp,int sl) noex {
-	return rmrchr(sp,sl,'.') ;
+	return libu::rmrchr(sp,sl,'.') ;
     }
     local inline int rmdot(cchar *sp) noex {
-	return rmrchr(sp,-1,'.') ;
+	return libu::rmrchr(sp,-1,'.') ;
     }
 } /* end namespace (libu) */
 
