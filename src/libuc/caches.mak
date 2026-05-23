@@ -45,10 +45,12 @@ OBJ1= gncache.o
 OBJ2= grcache.o
 OBJ3= namecache.o
 OBJ4= pwcache.o
-OBJ5= ucpwcache.o
+OBJ5=
+OBJ6=
+OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o 
-OBJB= obj3.o obj4.o obj5.o
+OBJB= obj3.o obj4.o
 
 OBJ= obja.o objb.o
 
@@ -149,6 +151,5 @@ gncache.o:		gncache.cc	gncache.h		$(INCS)
 grcache.o:		grcache.cc	grcache.h		$(INCS)
 namecache.o:		namecache.cc	namecache.h		$(INCS)
 pwcache.o:		pwcache.cc	pwcache.h		$(INCS)
-ucpwcache.o:		ucpwcache.cc	ucpwcache.h		$(INCS)
 
 
