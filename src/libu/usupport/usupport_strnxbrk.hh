@@ -29,10 +29,10 @@ namespace libu {
     extern char *strnobrk(cchar *,int,cchar *) noex ;
     extern char *strnrbrk(cchar *,int,cchar *) noex ;
     inline char *strnbrk(cchar *sp,int sl,cchar *ss) noex {
-	return strnobrk(sp,sl,ss) ;
+	return libu::strnobrk(sp,sl,ss) ;
     }
     inline char *strnpbrk(cchar *sp,int sl,cchar *ss) noex {
-	return strnobrk(sp,sl,ss) ;
+	return libu::strnobrk(sp,sl,ss) ;
     }
 } /* end namespace (libu) */
 
