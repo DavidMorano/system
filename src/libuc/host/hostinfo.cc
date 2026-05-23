@@ -243,7 +243,7 @@ constexpr known		knowns[] = {
 	{ nullptr,	0x00000000 }
 } ; /* end array */
 
-static bufsizevar	maxhostlen(bufsize_hn) ;
+static bufsizevar	maxhostlen(bufsize_hostname) ;
 
 constexpr int		af0 = AF_UNSPEC ;
 constexpr int		af4 = AF_INET4 ;
@@ -646,7 +646,7 @@ local int hostinfo_domain(hostinfo *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *domainname ; (rs = lm_hn(&domainname)) >= 0) ylikely {
+	if (char *domainname ; (rs = lm_hostname(&domainname)) >= 0) ylikely {
 	    if (op->domainname == nullptr) {
 	        if ((rs = getnodedomain(nullptr,domainname)) >= 0) ylikely {
 	            cchar	*dp{} ;
@@ -1066,7 +1066,7 @@ local int getinet_add(hostinfo *op,int af) noex {
 	        if ((rs = hostinfo_domain(op)) >= 0) {
 	            cchar	*hn = op->arg.hostname ;
 	            cchar	*dn = op->domainname ;
-	    	    if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) {
+	    	    if (char *hbuf ; (rs = lm_hostname(&hbuf)) >= 0) {
 	    		cint	hlen = rs ;
 	                if ((rs = snsds(hbuf,hlen,hn,dn)) >= 0) {
 	                    if ((rs = hostinfo_getname(op,af,hbuf)) > 0) {
@@ -1106,7 +1106,7 @@ local int getinet_rem(hostinfo *op,int af) noex {
 	            if (isindomain(op->arg.hostname,op->domainname)) {
 	                cint	cl = intconv(tp - op->arg.hostname) ;
 	                cchar	*cp = op->arg.hostname ;
-	                if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) {
+	                if (char *hbuf ; (rs = lm_hostname(&hbuf)) >= 0) {
 			    cint	hlen = rs ;
 	                    if ((rs = snwcpy(hbuf,hlen,cp,cl)) >= 0) {
 	                        if ((rs = hostinfo_getname(op,af,hbuf)) > 0) {
@@ -1146,7 +1146,7 @@ local int getinet_remlocal(hostinfo *op,int af) noex {
 	        if (isindomain(op->arg.hostname,LOCALDOMAINNAME)) {
 	            int		hl = intconv(tp - op->arg.hostname) ;
 		    cchar	*hn = op->arg.hostname ;
-	            if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) ylikely {
+	            if (char *hbuf ; (rs = lm_hostname(&hbuf)) >= 0) ylikely {
 			cint	hlen = rs ;
 	                if ((rs = snwcpy(hbuf,hlen,hn,hl)) >= 0) {
 	                    if ((rs = hostinfo_getname(op,af,hbuf)) > 0) {
@@ -1197,7 +1197,7 @@ local int getinet_knowner(hostinfo *op,int af) noex {
 	int		i = -1 ;
 	cchar		*locdom = LOCALDOMAINNAME ;
 	cchar		*sp = op->arg.hostname ;
-	if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) ylikely {
+	if (char *hbuf ; (rs = lm_hostname(&hbuf)) >= 0) ylikely {
             cint    	hlen = rs ;
             int     	sl = lenstr(sp) ;
             while ((sl > 0) && (sp[sl - 1] == '.')) {
