@@ -58,8 +58,7 @@ OBJ= obj0.o obj1.o obj2.o obj3.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -102,7 +101,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -116,6 +115,11 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat fmtutil	gcm.cache
+	rmsubpat fmtspec	gcm.cache
+	rmsubpat fmtsub		gcm.cache
+	rmsubpat fmtobj		gcm.cache
+	rmsubpat fmtstrdata	gcm.cache
 
 control:
 	(uname -n ; date) > Control
@@ -147,18 +151,14 @@ obj.o:			$(OBJ)
 
 DEPS_MAIN	+= $(MODS) mods.o
 DEPS_OBJ	+= $(MODS)
-DEPS_SUB	+= fmtutil.o fmtstrdata.o fmtspec.o 
-DEPS_SUB	+=
-DEPS_SPEC	+= 
+DEPS_SUB	+= fmtstrdata.o fmtspec.o cvtfloat.o
+DEPS_SPEC	+=
+DEPS_UTIL	+=
 
 
 fmtopts.o:		fmtopts.cc fmtopts.h			$(INCS)
 
 fmtstr_prime.o:		fmtstr_prime.cc $(DEPS_MAIN)		$(INCS)
-	makemodule fmtstrdata
-	makemodule fmtutil
-	makemodule fmtsub
-	makemodule fmtobj
 	$(COMPILE.cc) $<
 
 mods.o:			$(MOBJ)
@@ -168,17 +168,9 @@ fmtobj.o:		fmtobj0.o fmtobj1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 fmtobj0.o:		fmtobj.ccm $(DEPS_OBJ)			$(INCS)
-	makemodule fmtstrdata
-	makemodule fmtspec
-	makemodule fmtsub
-	makemodule fmtobj
+	gxx -c -x c++ -o $@ -O $<
 
 fmtobj1.o:		fmtobj1.cc fmtobj0.o $(DEPS_OBJ)	$(INCS)
-	makemodule fmtutil
-	makemodule fmtstrdata
-	makemodule fmtspec
-	makemodule fmtsub
-	makemodule fmtobj
 	$(COMPILE.cc) $<
 
 fmtstrdata.o:		fmtstrdata.ccm				$(INCS)
@@ -187,51 +179,41 @@ fmtsub.o:		$(MOBJ_SUB)				$(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ_SUB)
 
 fmtsub0.o:		fmtsub.ccm $(DEPS_SUB)			$(INCS)
-	makemodule fmtutil
-	makemodule fmtstrdata
-	makemodule fmtspec
-	makemodule fmtsub
+	gxx -c -x c++ -o $@ -O $<
 
 fmtsub1.o:		fmtsub1.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
-	makemodule fmtutil
-	makemodule fmtstrdata
-	makemodule fmtspec
-	makemodule fmtsub
 	$(COMPILE.cc) $<
 
 fmtsub2.o:		fmtsub2.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
-	makemodule fmtutil
-	makemodule fmtstrdata
-	makemodule fmtspec
-	makemodule fmtsub
 	$(COMPILE.cc) $<
 
 fmtsub3.o:		fmtsub3.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
-	makemodule fmtutil
-	makemodule fmtstrdata
-	makemodule fmtspec
-	makemodule fmtsub
 	$(COMPILE.cc) $<
 
 fmtspec.o:		fmtspec0.o fmtspec1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-fmtspec0.o:		fmtsub.ccm $(DEPS_SPEC)			$(INCS)
-	makemodule fmtspec
+fmtspec0.o:		fmtspec.ccm $(DEPS_SPEC)		$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 fmtspec1.o:		fmtspec1.cc fmtspec0.o $(DEPS_SPEC)	$(INCS)
-	makemodule fmtspec
 	$(COMPILE.cc) $<
 
 # FMTUTIL
 fmtutil.o:		fmtutil0.o fmtutil1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-fmtutil0.o:		fmtutil.ccm				$(INCS)
-	makemodule fmtutil
+fmtutil0.o:		fmtutil.ccm $(DEPS_UTIL)		$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 fmtutil1.o:		fmtutil1.cc fmtutil0.o			$(INCS)
-	makemodule fmtspec
 	$(COMPILE.cc) $<
+
+cvtfloat.o:		cvtfloat.ccm fmtflag.o		$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+fmtflag.o:		fmtflag.dir
+fmtflag.dir:
+	makesubdir $@
 
 
