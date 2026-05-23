@@ -29,15 +29,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>		/* |SEEK_{xx}| */
-#include	<fcntl.h>
-#include	<poll.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX |SEEK_{xx}| */
+#include	<fcntl.h>		/* POSIX */
+#include	<poll.h>		/* POSIX */
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD |nullptr_t| */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
-#include	<algorithm>		/* C++ |min(3c++)| + |max(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<funcodes.h>		/* LIBU |FM_{x}(3uc)| */
@@ -50,7 +50,7 @@
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<fmtstr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBU */
+#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
 
 #include	"filer.h"
 
