@@ -43,26 +43,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucmem.h>
-#include	<vecstr.h>
-#include	<ccfile.hh>
-#include	<field.h>
-#include	<fieldterminit.hh>
-#include	<ascii.h>
-#include	<buffer.h>
-#include	<expcook.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<snwcpy.h>
+#include	<unistd.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<ccfile.hh>		/* LIBU */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<ascii.h>		/* LIBU */
+#include	<buffer.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
 #include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 #include	"defproc.h"
 
@@ -71,6 +71,8 @@
 
 
 /* imported namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -136,14 +138,18 @@ int defproc(vecstr *dlp,mainv envv,expcook *clp,cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-} /* end subroutine (defproc) */
+} 
+/* end subroutine (defproc) */
+
+
+/* local subroutines */
 
 int subinfo::operator () (cchar *fn) noex {
 	cnullptr	np{} ;
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-        if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) ylikely {
+        if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) ylikely {
             cint        llen = rs ;
             if (ccfile df ; (rs = df.open(fn,"r")) >= 0) ylikely {
                 while ((rs = df.readlns(lbuf,llen,-1,np)) > 0) {
@@ -157,7 +163,7 @@ int subinfo::operator () (cchar *fn) noex {
                 rs1 = df.close ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (file) */
-            rs1 = uc_free(lbuf) ;
+            rs1 = mem.free(lbuf) ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
@@ -246,7 +252,7 @@ int subinfo::procvalues(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *fbuf ; (rs = malloc_mp(&fbuf)) >= 0) ylikely {
+	if (char *fbuf ; (rs = mem.mp(&fbuf)) >= 0) ylikely {
 	    cint	flen = rs ;
 	    if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
 	        int	c = 0 ;
@@ -268,7 +274,7 @@ int subinfo::procvalues(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	        rs1 = fsb.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (fields) */
-	    rs1 = uc_free(fbuf) ;
+	    rs1 = mem.free(fbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
