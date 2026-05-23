@@ -6,6 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* debugging */
+#define	CF_LOAD		0		/* load defaults from file */
 
 /* revision history:
 
@@ -69,11 +70,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strstr(3c)| */
+#include	<unistd.h>		/* POSIX */
+#include	<climits>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strstr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -86,7 +87,7 @@
 #include	<bufsizes.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBU */
+#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
 
 #include	"getbufsize.h"
 
@@ -152,6 +153,7 @@ static ubufsize		ubufsize_data ;
 constexpr bufsizedata	bufdata ;
 
 cbool			f_debug		= CF_DEBUG ;
+cbool			f_load		= CF_LOAD ;
 
 
 /* exported subroutines */
@@ -232,6 +234,7 @@ int ubufsize::load() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	DPRINTF("ent\n") ;
+	if_constexpr (f_load) {
 	if (! floaded) {
 	    DPRINTF("not-loaded\n") ;
 	    floaded = true ;
@@ -257,6 +260,7 @@ int ubufsize::load() noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (vecstr) */
 	} /* end if (need load) */
+	} /* end if_constexpr (f_load) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bufsize_load) */
