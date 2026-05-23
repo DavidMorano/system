@@ -53,26 +53,22 @@ module ;
 #include	<fcntl.h>		/* |O_{xx}| */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<strnul.hh>
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
 #include	<langparse.h>
-#include	<ascii.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<six.h>			/* |sispanwht(3uc)| */
-#include	<strmgr.h>
-#include	<strop.h>
-#include	<strwcmp.h>
-#include	<ascii.h>		/* |CH_NL| */
-#include	<mkchar.h>
-#include	<hasx.h>		/* |headlead(3uc)| */
-#include	<localmisc.h>
+#include	<ascii.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_NL| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 #include	<deb.hh>		/* |DEBPRINTF(3u)| */
+
+#include	"strmgr.h"		/* locally supplied */
+#include	"haslead.h"		/* locally suuplied */
+#include	"hasmodname.h"		/* locally suuplied */
 
 #pragma		GCC dependency		"mod/modproc.ccm"
 #pragma		GCC dependency		"mod/libutil.ccm"
@@ -95,7 +91,9 @@ import deb ;
 
 /* imported namespaces */
 
-using libu::um ;			/* variable */
+using libu::strnchr ;			/* subroutine */
+using libu::strwcmp ;			/* subroutine */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -324,7 +322,7 @@ int modmgr::fileproc() noex {
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
 	CDEBPR("ent\n") ;
-	if (char *tbuf ; (rs = um.mall((slen + 1),&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = umem.mall((slen + 1),&tbuf)) >= 0) {
 	    cint tlen = rs ;
 	    for (int ln = 1 ; (rs = procer.remread(sbuf,slen)) > 0 ; ) {
 		if ((rs = filter(tbuf,tlen,rs)) >= 0) {
@@ -346,7 +344,7 @@ int modmgr::fileproc() noex {
 		    } /* end if (reminder) */
 		} /* end if (filter) */
 	    } /* end for */
-	    rs1 = um.free(tbuf) ;
+	    rs1 = umem.free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	CDEBPR("ret rs=%d rv=%d\n",rs,rv) ;
@@ -409,16 +407,16 @@ int modmgr::lnbegin() noex {
 	if (lbuf == nullptr) {
 	    if ((rs = ulibval.pagesz) >= 0) {
 		cint	sz = (ALTLNMULT * rs) ;
-		if (char *bp ; (rs = um.mall(sz,&bp)) >= 0) {
+		if (char *bp ; (rs = umem.mall(sz,&bp)) >= 0) {
 		    lbuf = bp ;
 		    llen = sz ;
 		    rs = lnmgr.start(lbuf,llen) ;
 		    if (rs < 0) {
-			um.free(lbuf) ;
+			umem.free(lbuf) ;
 			lbuf = nullptr ;
 			llen = 0 ;
 		    } /* end if (error) */
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (ulibvals) */
 	} /* end if (required) */
 	return rs ;
@@ -433,11 +431,11 @@ int modmgr::lnend() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = um.free(lbuf) ;
+	        rs1 = umem.free(lbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        lbuf = nullptr ;
 	        llen = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	    li = 0 ;
 	} /* end if (was initialized) */
 	return rs ;
@@ -478,10 +476,10 @@ int modmgr::swbegin() noex {
 	if (sbuf == nullptr) {
 	    if ((rs = ulibval.pagesz) >= 0) {
 		cint	sz = (ALTLNMULT * rs) * szof(short) ;
-		if (void *bp ; (rs = um.mall(sz,&bp)) >= 0) {
+		if (void *bp ; (rs = umem.mall(sz,&bp)) >= 0) {
 		    sbuf = shortp(bp) ;
 		    slen = (ALTLNMULT * rs) ;
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (ulibvals) */
 	} /* end if (required) */
 	return rs ;
@@ -492,11 +490,11 @@ int modmgr::swend() noex {
 	int		rs1 ;
 	if (sbuf) {
 	    {
-	        rs1 = um.free(sbuf) ;
+	        rs1 = umem.free(sbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        sbuf = nullptr ;
 	        slen = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (was initialized) */
 	return rs ;
 } /* end method (modmgr::swend) */
