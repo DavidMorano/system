@@ -277,7 +277,7 @@ local int subinfo_pr(SI *sip,cc *pr,char *obuf,cc *sp,int sl) noex {
 local int subinfo_prs(SI *sip,mainv pns,char *obuf,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *dn ; (rs = lm_hn(&dn)) >= 0) {
+	if (char *dn ; (rs = lm_hostname(&dn)) >= 0) {
 	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
 	        if (char *pr ; (rs = lm_mp(&pr)) >= 0) {
 		    cint	maxlen = rs ;
