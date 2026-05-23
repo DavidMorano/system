@@ -42,21 +42,22 @@ LIBS +=
 
 OBJ0= inetaddr.o
 OBJ1= inetaddrparse.o
-OBJ2=
-OBJ3=
-OBJ4=
+OBJ2= inetconv.o
+OBJ3= inet4int.o
+OBJ4= inaddrbad.o
 OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o
 
-OBJ= obja.o
+OBJ= obja.o objb.o
 
 
 INCDIRS +=
 
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -150,7 +151,12 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-inetaddr.o:		inetaddr.cc inetaddr.h			$(INCS)
-inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h	$(INCS)
+inetaddr.o:		inetaddr.cc		inetaddr.h		$(INCS)
+inetaddrparse.o:	inetaddrparse.cc	inetaddrparse.h		$(INCS)
+inetconv.o:		inetconv.cc		inetconv.h		$(INCS)
+inet4int.o:		inet4int.cc		inet4int.h		$(INCS)
+inaddrbad.o:		inaddrbad.cc		inaddrbad.hh		$(INCS)
+
+cfinet.o:		cfinet.cc		cfinet.hh
 
 
