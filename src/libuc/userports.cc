@@ -410,7 +410,7 @@ local int userports_opener(UP *op,cchar *fname) noex {
 		    op->fname = nullptr ;
 		}
 	    } /* end if (error) */
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (userports_opener) */
