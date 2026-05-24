@@ -43,7 +43,7 @@ LIBS +=
 OBJ0= strxxxxcmp.o strkeycmp.o 
 OBJ1= strkeydictcmp.o 
 OBJ2= stremacmp.o strvalcmp.o strleadcmp.o
-OBJ3= strpcmp.o 
+OBJ3= strpcmp.o dictdiff.o
 
 OBJA= obj0.o obj1.o
 OBJB= obj2.o obj3.o
@@ -52,8 +52,7 @@ OBJ= obja.o objb.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,7 +95,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -145,5 +144,6 @@ strkeydictcmp.o:	strkeydictcmp.cc	strkeydictcmp.h	$(INCS)
 strleadcmp.o:		strleadcmp.cc		strleadcmp.h	$(INCS)
 strpcmp.o:		strpcmp.cc		strpcmp.h	$(INCS)
 strxxxxcmp.o:		strxxxxcmp.cc		strxxxxcmp.h	$(INCS)
+dictdiff.o:		dictdiff.cc		dictdiff.h	$(INCS)
 
 
