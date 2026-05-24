@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* convert a character string to a given case */
+/* v-string key comparison (w/ various cases) */
 /* version %I% last-modified %G% */
 
 
