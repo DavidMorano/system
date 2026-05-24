@@ -502,7 +502,7 @@ consteval int mkoptmask() noex {
 local int vecint_setopts(vecint *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ optmask)) == 0) ylikely {
+	if ((vo & (compl optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
 	    if (vo & vecintm.reuse)		op->fl.oreuse = true ;
@@ -527,7 +527,7 @@ local int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 	    i = op->fi ;
 	    while ((i < op->i) && (op->va[i] != VECINT_MIN)) {
 	        i += 1 ;
-	    }
+	    } /* end while */
 	    if (i < op->i) {
 	        op->va[i] = v ;
 	        op->fi = (i + 1) ;
@@ -547,12 +547,12 @@ local int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 	        i = op->i ;
 	        op->va[(op->i)++] = v ;
 	        op->va[op->i] = VECINT_MIN ;
-	    }
+	    } /* end if (ok) */
 	} /* end if */
 	if (rs >= 0) ylikely {
 	    op->c += 1 ;		/* increment list count */
 	    op->fl.issorted = false ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (vecint_addval) */
 
