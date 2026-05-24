@@ -40,19 +40,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* |strcasecmp(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdclib.hh>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdclib.hh>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strxxxxcmp.h"
 
