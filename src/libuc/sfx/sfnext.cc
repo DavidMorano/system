@@ -162,32 +162,32 @@ int sfnext(cchar *sp,int sl,cchar **rpp) noex {
 int sfnextchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
     	int		rl = -1 ;
 	struct esfx : sfnextx {
-	    int		sch ;
+	    int		sch ; /* <- initialized separately */
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
 	    bool termx(int ch) const noex override final {
 		return (ch == sch) ;
 	    } ;
-	} ; /* end struct */
+	} ; /* end struct (esfx) */
 	if (sch) ylikely {
-	    esfx	sf(sp,sl,rpp) ;
-	    sf.sch = sch ;
+	    esfx sf(sp,sl,rpp) ;
+	    sf.sch = sch ;		/* <- separate initialization */
 	    rl = sf ;
-	}
+	} /* end if */
 	return rl ;
 } /* end subroutine (sfnextchr) */
 
 int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 	int		rl = -1 ;
 	struct esfx : sfnextx {
-	    cchar	*bstr ;
+	    cchar	*bstr ;		/* <- initialized separately */
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
 	    bool termx(int ch) const noex override final {
 		return (strchr(bstr,ch) != nullptr) ;
 	    } ;
 	} ; /* end struct */
 	if (bstr) ylikely {
-	    esfx	sf(sp,sl,rpp) ;
-	    sf.bstr = bstr ;
+	    esfx sf(sp,sl,rpp) ;
+	    sf.bstr = bstr ;		/* <- separate initializing */
 	    rl = sf ;
 	} /* end if (non-null) */
 	return rl ;
@@ -196,15 +196,15 @@ int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 int sfnextterm(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
 	int		rl = -1 ;
 	struct esfx : sfnextx {
-	    cchar	*terms ;
+	    cchar	*terms ;	/* <- initialized separately */
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
 	    bool termx(int ch) const noex override final {
 		return batst(terms,ch) ;
 	    } ;
 	} ; /* end struct */
 	if (terms) ylikely {
-	    esfx	sf(sp,sl,rpp) ;
-	    sf.terms = terms ;
+	    esfx sf(sp,sl,rpp) ;
+	    sf.terms = terms ;		/* <- separate initializing */
 	    rl = sf ;
 	} /* end if (non-null) */
 	return rl ;
