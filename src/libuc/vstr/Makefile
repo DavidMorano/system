@@ -33,27 +33,26 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += vstr.h vstrorders.h
+INCS += vstr.h
 
 MODS +=
 
 LIBS +=
 
 
-OBJ0= vstrorders.o
+OBJ0= vstrsort.o
 OBJ1= vstrcmp.o vstrkeycmp.o 
 OBJ2= vstrkeydictcmp.o
-OBJ3= vstrsort.o
+OBJ3= 
 
-OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJA= obj0.o obj1.o obj2.o
 OBJB=
 
 OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,7 +95,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -135,12 +134,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-vstrorders.o:		vstrorders.cc		vstrorders.h		$(INCS)
+vstrsort.o:		vstrsort.cc		vstrsort.h		$(INCS)
 vstrcmp.o:		vstrcmp.cc		vstrcmp.h		$(INCS)
 vstrkeycmp.o:		vstrkeycmp.cc		vstrkeycmp.h		$(INCS)
 vstrkeydictcmp.o:	vstrkeydictcmp.cc	vstrkeydictcmp.h	$(INCS)
-
-vstrsort.o:		vstrsort.cc		vstrsort.h		$(INCS)
-
 
 
