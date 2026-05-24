@@ -226,4 +226,8 @@ int vecstrer::sort(vecstr_f vcmp) noex {
 	return vecstr_sort(op,vcmp) ;
 }
 
+int vecstr::addpathclean(cchar *lp,int ll) noex {
+	return vecstr_addpathclean(this,lp,ll) ;
+}
+
 
