@@ -43,7 +43,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
-#include	<strtox.h>		/* LINU */
+#include	<strtox.h>		/* LIBU */
 #include	<localmisc.h>
 
 #include	"ucstrtox.h"		/* <- the money shot */
