@@ -479,7 +479,7 @@ local int vecitem_setopts(vecitem *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
 	op->fl = {} ;
-	if ((vo & (~ optmask)) == 0) ylikely {
+	if ((vo & (compl optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    if (vo & vecitemm.reuse)		op->fl.oreuse		= true ;
 	    if (vo & vecitemm.swap)		op->fl.oswap		= true ;
@@ -508,11 +508,11 @@ local int vecitem_extend(vecitem *op) noex {
 	        sz = (nn + 1) * esz ;
 	        rs = libmem.rall(op->va,sz,&na) ;
 	        op->va = nullptr ;
-	    }
+	    } /* end if */
 	    if (rs >= 0) {
 	        op->va = (void **) na ;
 	        op->n = nn ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (extension required) */
 	return rs ;
 } /* end subroutine (vecitem_extend) */
@@ -638,7 +638,7 @@ local int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
             curp->i = i ;
             curp->c += 1 ;
             if (rpp) *rpp = tep ;
-        }
+        } /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (vecitem_fetchcont) */
 
@@ -749,8 +749,8 @@ void vecitem_iter::increment(int n) noex {
 	    i += n ;
 	    while ((i < ii) && (va[i] == nullptr)) {
 	        i += 1 ;
-	    }
-	}
+	    } /* end while */
+	} /* end if */
 } /* end method (vecitem_iter::increment) */
 
 
