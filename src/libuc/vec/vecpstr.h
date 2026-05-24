@@ -253,8 +253,11 @@ struct vecpstr : vecpstr_head {
 	int find	(cchar *) noex ;
 	int findn	(cchar *,int = -1) noex ;
 	int search	(cchar *,vecpstr_f,cchar ** = nullptr) noex ;
+	int searchl	(cchar *,int,vecpstr_vcmp,cc ** = nullptr) noex ;
 	int finder	(cchar *,vecpstr_f,cchar ** = nullptr) noex ;
+	int findkey	(cchar *,int,cchar **rpp = nullptr) noex ;
 	int del		(int = -1) noex ;
+	int addpathclean	(cchar *,int) noex ;
 	operator int () noex ;
 	vecpstr_iter begin() noex {
 	    vecpstr_iter		it(va,0,idx) ;
@@ -292,10 +295,11 @@ extern int vecpstr_del		(vecpstr *,int) noex ;
 extern int vecpstr_delall	(vecpstr *) noex ;
 extern int vecpstr_count	(vecpstr *) noex ;
 extern int vecpstr_sort		(vecpstr *,vecpstr_vcmp) noex ;
-extern int vecpstr_search	(vecpstr *,cchar *,vecpstr_vcmp,cchar **) noex ;
+extern int vecpstr_search	(vecpstr *,cchar *,vecpstr_vcmp,cc **) noex ;
+extern int vecpstr_searchl	(vecpstr *,cc *,int,vecpstr_vcmp,cc **) noex ;
 extern int vecpstr_find		(vecpstr *,cchar *) noex ;
 extern int vecpstr_findn	(vecpstr *,cchar *,int) noex ;
-extern int vecpstr_finder	(vecpstr *,cchar *,vecpstr_vcmp,cchar **) noex ;
+extern int vecpstr_finder	(vecpstr *,cchar *,vecpstr_vcmp,cc **) noex ;
 extern int vecpstr_findaddr	(vecpstr *,cchar *) noex ;
 extern int vecpstr_getsize	(vecpstr *) noex ;
 extern int vecpstr_strsize	(vecpstr *) noex ;
