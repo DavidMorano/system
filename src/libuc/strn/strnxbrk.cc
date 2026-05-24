@@ -43,7 +43,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usys.h>
@@ -93,13 +92,13 @@ extern "C++" {
 
 /* exported subroutines */
 
-char *strnobrk(cchar *sp,int 탎l,const chrset &sset) noex {
+char *strnobrk(cchar *sp,int 탎l,con chrset *setp) noex {
 	char		*rsp = nullptr ;
 	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 	    bool	f = false ;
 	    for (cchar *lsp = (sp + sl) ; (sp < lsp) && *sp ; sp += 1) {
 		cint	ch = mkchar(*sp) ;
-	        f = sset.tst(ch) ;
+	        f = setp->tst(ch) ;
 		if (f) break ;
 	    } /* end for */
 	    if (f) rsp = charp(sp) ;
@@ -113,7 +112,7 @@ char *strnobrk(cchar *sp,int sl,cchar *ss) noex {
 	if (sp && ss) ylikely {
 	    if (sl >= 0) {	
 		chrset	sset(ss) ;
-	        rsp = strnobrk(sp,sl,sset) ;
+	        rsp = strnobrk(sp,sl,&sset) ;
 	    } else {
 	        rsp = strbrk(sp,ss) ;
 	    } /* end if */
@@ -122,13 +121,13 @@ char *strnobrk(cchar *sp,int sl,cchar *ss) noex {
 }
 /* end subroutine (strnobrk) */
 
-char *strnrbrk(cchar *sp,int 탎l,const chrset &sset) noex {
+char *strnrbrk(cchar *sp,int 탎l,con chrset *setp) noex {
 	char		*rsp = nullptr ;
 	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 	    bool	f = false ;
 	    for (rsp = charp(sp + sl) ; --rsp >= sp ; ) {
 	        cint	ch = mkchar(*rsp) ;
-	        f = sset.tst(ch) ;
+	        f = setp->tst(ch) ;
 	        if (f) break ;
 	    } /* end for */
 	    if (! f) rsp = nullptr ;
@@ -141,7 +140,7 @@ char *strnrbrk(cchar *sp,int sl,cchar *ss) noex {
 	char		*rsp = nullptr ;
 	if (sp && ss) ylikely {
 	    chrset	sset(ss) ;
-	    rsp = strnrbrk(sp,sl,sset) ;
+	    rsp = strnrbrk(sp,sl,&sset) ;
 	} /* end if (non-null) */
 	return rsp ;
 }
