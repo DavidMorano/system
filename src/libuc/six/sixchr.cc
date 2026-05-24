@@ -5,7 +5,7 @@
 /* subroutine to find the index of a character in a given string */
 /* version %I% last-modified %G% */
 
-#define	CF_STRCHR	1		/* used |strchr(3c)| */
+#define	CF_STRCHR	1		/* use |strchr(3c)| */
 
 /* revision history:
 
