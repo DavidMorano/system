@@ -27,7 +27,7 @@
 	object can serve as a local cache (cotrolled by this
 	object itself), note that a process-wide cache of the
 	|uname(2)| information can be had and managed by the
-	|uinfo(3uc)| facility (enumated system call).
+	|ucinfo(3uc)| facility (enumated system call).
 
 *******************************************************************************/
 
@@ -66,7 +66,7 @@ import libutil ;			/* |lenstr(3u)| */
 /* forward references */
 
 template<typename ... Args>
-static inline int unameo_ctor(unameo *op,Args ... args) noex {
+local inline int unameo_ctor(unameo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
@@ -80,7 +80,7 @@ static inline int unameo_ctor(unameo *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (unameo_ctor) */
 
-static inline int unameo_dtor(unameo *op) noex {
+local inline int unameo_dtor(unameo *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
