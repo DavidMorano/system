@@ -228,4 +228,8 @@ int vecpstrer::sort(vecpstr_f vcmp) noex {
 	return vecpstr_sort(op,vcmp) ;
 }
 
+int vecpstr::addpathclean(cchar *lp,int ll) noex {
+	return vecpstr_addpathclean(this,lp,ll) ;
+}
+
 
