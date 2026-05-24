@@ -99,8 +99,7 @@ local char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 	    }
 	} /* end if (non-null) */
 	return dst ;
-}
-/* end subroutine-template (strncpyxc) */
+} /* end subroutine-template (strncpyxc) */
 
 
 /* local variables */
