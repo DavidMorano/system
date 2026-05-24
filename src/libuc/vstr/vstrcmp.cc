@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* v-string key comparison (w/ various cases) */
+/* v-string comparison (w/ various cases) */
 /* version %I% last-modified %G% */
 
 
@@ -36,19 +36,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdclib.hh>		/* |std_strcasecmp(3u)| */
-#include	<toxc.h>
-#include	<mkchar.h>
-#include	<strxcmp.h>
-#include	<localmisc.h>
-#include	<vstrorders.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdclib.hh>		/* LIBU |std_strcasecmp(3u)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<strxcmp.h>		/* LINUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<vstrorders.h>		/* LIBU */
 
 #include	"vstrcmp.h"
 
