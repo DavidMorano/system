@@ -183,8 +183,16 @@ int lm_nn(char **rpp) noex {
 	cint	w = bufsize_nn ;
 	return lm_mallsys(w,rpp) ;
 }
-int lm_hn(char **rpp) noex {
-	cint	w = bufsize_hn ;
+int lm_proname(char **rpp) noex {
+	cint	w = bufsize_protname ;	/* network prot-name (protocol-name) */
+	return lm_mallsys(w,rpp) ;
+}
+int lm_hostname(char **rpp) noex {
+	cint	w = bufsize_hostname ;	/* network host-name (host-name) */
+	return lm_mallsys(w,rpp) ;
+}
+int lm_servname(char **rpp) noex {
+	cint	w = bufsize_servname ;	/* network serv-name (service-name) */
 	return lm_mallsys(w,rpp) ;
 }
 int lm_un(char **rpp) noex {
@@ -389,9 +397,6 @@ namespace libuc {
     int libmems::mp(char **rpp) noex {
 	return lm_mallsys(bufsize_mp,rpp) ;
     } ; /* end meþhod (libmems::mp) */
-    int libmems::hn(char **rpp) noex {
-	return lm_mallsys(bufsize_hn,rpp) ;
-    } ; /* end meþhod (libmems::hn) */
     int libmems::un(char **rpp) noex {
 	return lm_mallsys(bufsize_un,rpp) ;
     } ; /* end meþhod (libmems::un) */
@@ -401,6 +406,15 @@ namespace libuc {
     int libmems::pn(char **rpp) noex {
 	return lm_mallsys(bufsize_pn,rpp) ;
     } ; /* end meþhod (libmems::pn) */
+    int libmems::protname(char **rpp) noex {
+	return lm_mallsys(bufsize_protname,rpp) ;
+    } ; /* end meþhod (libmems::protname) */
+    int libmems::hostname(char **rpp) noex {
+	return lm_mallsys(bufsize_hostname,rpp) ;
+    } ; /* end meþhod (libmems::hostname) */
+    int libmems::servname(char **rpp) noex {
+	return lm_mallsys(bufsize_servname,rpp) ;
+    } ; /* end meþhod (libmems::servname) */
     int libmems::pw(char **rpp) noex {
 	return lm_mallsys(bufsize_pw,rpp) ;
     } ; /* end meþhod (libmems::pw) */
@@ -488,8 +502,7 @@ int mgr::operator () (int sz,void *vp) noex {
 	    } /* end if (valid size) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mgr::operator) */
+} /* end subroutine (mgr::operator) */
 
 int mgr::stdmalloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
@@ -504,8 +517,7 @@ int mgr::stdmalloc(int sz,void *vp) noex {
 	    *rpp = nullptr ;
 	}
 	return rs ;
-}
-/* end method (mgr::stdmalloc) */
+} /* end method (mgr::stdmalloc) */
 
 int mgr::stdvalloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
@@ -520,8 +532,7 @@ int mgr::stdvalloc(int sz,void *vp) noex {
 	    *rpp = nullptr ;
 	}
 	return rs ;
-}
-/* end method (mgr::stdvalloc) */
+} /* end method (mgr::stdvalloc) */
 
 int mgr::stdrealloc(int sz,void *vp) noex {
 	csize		msize = size_t(sz) ;
