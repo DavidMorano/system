@@ -50,6 +50,7 @@
 #include	<ucndelay.h>
 #include	<ucnonblock.h>
 #include	<ucsetappend.h>
+#include	<ucttyname.h>
 #include	<ucclose.h>
 
 
