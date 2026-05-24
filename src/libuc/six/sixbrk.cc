@@ -100,13 +100,13 @@ constexpr bool		f_strchr = CF_STRCHR ;
 
 /* exported subroutines */
 
-int siobrk(cchar *sp,int 탎l,const chrset &sset) noex {
+int siobrk(cchar *sp,int 탎l,con chrset *setp) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	    for (i = 0 ; sl && sp[i] ; i += 1) {
 		cint	ch = mkchar(sp[i]) ;
-		if ((f = sset.tst(ch))) break ;
+		if ((f = setp->tst(ch))) break ;
 	        sl -= 1 ;
 	    } /* end for */
 	} /* end if (getlenstr) */
@@ -141,13 +141,13 @@ int siobrk(cchar *sp,int sl,cchar *ss) noex {
 	return (f) ? i : -1 ;
 } /* end subroutine (siobrk) */
 
-int sirbrk(cchar *sp,int 탎l,const chrset &sset) noex {
+int sirbrk(cchar *sp,int 탎l,con chrset *setp) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
 		cint	ch = mkchar(sp[i]) ;
-		if ((f = sset.tst(ch))) break ;
+		if ((f = setp->tst(ch))) break ;
 	    } /* end for */
 	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
