@@ -127,17 +127,17 @@ enum dataitems {
 	int		rlen ;
 	ucsysconf(char *rp,int rl) noex : rbuf(rp), rlen(rl) { } ;
 	ucsysconf(long *p) noex : lp(p) { } ;
-	int sysconfval(int) noex ;
-	int sysconfstr(int) noex ;
-	int mconfval(int) noex ;
-	int mconfstr(int) noex ;
-	int operator () (int) noex ;
-	int getval(int) noex ;
-	int getvalcache(int) noex ;
-	int getvalsyn(int) noex ;
-	int getstr(int) noex ;
-	int getstrsyn(int) noex ;
-	int getstd(int) noex ;
+	int sysconfval	(int) noex ;
+	int sysconfstr	(int) noex ;
+	int mconfval	(int) noex ;
+	int mconfstr	(int) noex ;
+	int operator ()	(int) noex ;
+	int getval	(int) noex ;
+	int getvalcache	(int) noex ;
+	int getvalsyn	(int) noex ;
+	int getstr	(int) noex ;
+	int getstrsyn	(int) noex ;
+	int getstd	(int) noex ;
     } ; /* end struct (ucsysconf) */
 
 
@@ -185,7 +185,7 @@ namespace libuc {
     ucmaxliner::operator int () noex {
 	cint		cmd = _SC_LINE_MAX ;
 	return uc_sysconfval(cmd,nullptr) ;
-    }
+    } /* end method */
     ucmaxgrouper::operator int () noex {
         int             rs ;
         if ((rs = ng) == 0) {
