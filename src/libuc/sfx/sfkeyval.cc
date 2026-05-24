@@ -44,16 +44,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<six.h>			/* |sichr(3uc)| */
-#include	<strwcmp.h>
-#include	<ischarx.h>		/* |iseol(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<six.h>			/* LIBUC |sichr(3uc)| */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"			/* |sfshrink(3uc)| + |sfnext(3uc)| */
+#include	"sfkeyval.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -92,7 +93,9 @@ int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 	        if (int si ; (si = sichr(sp,sl,'#')) >= 0) {
 		    sl = si ;
 	        } else {
-		    while (sl && iseol(sp[sl - 1])) sl -= 1 ;
+		    while (sl && iseol(sp[sl - 1])) {
+			sl -= 1 ;
+		    } /* end while */
 	        } /* end if (comment or EOL) */
 		if (sl) {
 		    rl = sfshrink(sp,sl,&rp) ;
