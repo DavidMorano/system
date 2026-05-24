@@ -37,7 +37,7 @@ struct unameo_head {
 	cchar		*version ;
 	cchar		*machine ;
 	cchar		*a ;		/* the memory-allocation */
-} ;
+} ; /* end struct */
 
 typedef UNAMEO		unameo ;
 
