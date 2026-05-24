@@ -186,7 +186,7 @@ int vecstr_start(vecstr *op,int vn,int vo) noex {
 	    } /* end if */
 	    if (rs < 0) {
 		vecstr_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? vn : rs ;
 }
@@ -540,7 +540,7 @@ int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 }
 /* end subroutine (vecstr_search) */
 
-int vecstr_searchl(vecstr *op,cchar *sp,int sl,vecstr_vcmp vcf,cc **rpp) noex {
+int vecstr_searchl(vecstr *op,cc *sp,int sl,vecstr_vcmp vcf,cc **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		i = -1 ;
@@ -591,7 +591,7 @@ int vecstr_find(vecstr *op,cchar *sp) noex {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) ylikely {
 		cint	sch = sp[0] ; /* ok: since all get promoted similarly */
-		int	i ;
+		int	i ; /* used-afterwards */
 	        for (i = 0 ; i < op->i ; i += 1) {
 	            cchar	*ep = op->va[i] ;
 	            if (ep) {
@@ -875,7 +875,7 @@ consteval int mkoptmask() noex {
 local int vecstr_setopts(vecstr *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ optmask)) == 0) ylikely {
+	if ((vo & (compl optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
 	    if (vo & vecstrm.reuse)		op->fl.oreuse		= true ;
@@ -903,12 +903,12 @@ local int vecstr_extvec(vecstr *op,int n) noex {
 	        nn = (op->n + 1) * 2 ;
 	        sz = (nn + 1) * szof(char **) ;
 	        rs = libmem.rall(op->va,sz,&na) ;
-	    }
+	    } /* end if */
 	    if (rs >= 0) {
 	        op->va = (cchar **) na ;
 		op->va[op->i] = nullptr ;
 	        op->n = nn ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (extension needed) */
 	return rs ;
 } /* end subroutine (vecstr_extvec) */
@@ -932,7 +932,7 @@ local int vecstr_addsp(vecstr *op,cchar *sp) noex {
 	    i = op->i ;
 	    op->va[op->i++] = sp ;
 	    op->va[op->i] = nullptr ;
-	}
+	} /* end if */
 	op->c += 1 ;
 	op->fl.issorted = false ;
 	return i ;
@@ -1037,9 +1037,17 @@ int vecstr::search(cchar *s,vecstr_f vcmp,cchar **rpp) noex {
 	return vecstr_search(this,s,vcmp,rpp) ;
 }
 
+int vecstr::searchl(cchar *sp,int sl,vecstr_f vcmp,cchar **rpp) noex {
+	return vecstr_searchl(this,sp,sl,vcmp,rpp) ;
+} /* end method (vecstr::searchl) */
+
 int vecstr::finder(cchar *s,vecstr_f vcmp,cchar **rpp) noex {
 	return vecstr_finder(this,s,vcmp,rpp) ;
 }
+
+int vecstr::findkey(cchar *kp,int kl,cchar **rpp) noex {
+	return searchl(kp,kl,vstrkeycmp,rpp) ;
+} /* end method (vecstr::findkey) */
 
 int vecstr::getvec(mainv *rppp) noex {
 	return vecstr_getvec(this,rppp) ;
@@ -1152,7 +1160,7 @@ void vecstr_iter::increment(int n) noex {
 	    while ((i < ii) && (va[i] == nullptr)) {
 	        i += 1 ;
 	    }
-	}
+	} /* end if */
 } /* end method (vecstr_iter::increment) */
 
 
