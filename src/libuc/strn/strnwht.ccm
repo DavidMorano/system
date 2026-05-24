@@ -36,7 +36,7 @@
 	char *strwht(cchar *sp,int sl) noex
 	char *strwhtchr(cchar *sp,int sl,int sch) noex
 	char *strwhtbrk(cchar *sp,int sl,cchar *ss) noex
-	char *strwhtbrk(cchar *sp,int sl,chrset &sset) noex
+	char *strwhtbrk(cchar *sp,int sl,con chrset *sset) noex
 
 *******************************************************************************/
 
@@ -61,8 +61,8 @@ export extern "C" {
 }
 
 export extern "C++" {
-    char *strnwhtchr(cchar *sp,int sl,const chrset &) noex ;
-    char *strnwhtbrk(cchar *sp,int sl,const chrset &) noex ;
+    char *strnwhtchr(cchar *sp,int sl,con chrset *) noex ;
+    char *strnwhtbrk(cchar *sp,int sl,con chrset *) noex ;
 }
 
 
