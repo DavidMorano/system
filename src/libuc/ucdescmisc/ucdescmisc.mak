@@ -45,20 +45,19 @@ OBJ1= ucftruncate.o ucfminmod.o
 OBJ2= ucfstat.o ucdescmanip.o
 OBJ3= ucnonblock.o ucndelay.o
 
-OBJ4= ucclose.o
-OBJ5= 
+OBJ4= ucttyname.o
+OBJ5= ucclose.o
 OBJ6= 
 OBJ7= 
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o
+OBJB= obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -101,7 +100,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -161,5 +160,6 @@ ucfstat.o:		ucfstat.cc		ucfstat.h		$(INCS)
 ucndelay.o:		ucndelay.cc		ucndelay.h		$(INCS)
 ucnonblock.o:		ucnonblock.cc		ucnonblock.h		$(INCS)
 ucclose.o:		ucclose.cc		ucclose.h		$(INCS)
+ucttyname.o:		ucttyname.cc		ucttyname.h		$(INCS)
 
 
