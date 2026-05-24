@@ -480,7 +480,7 @@ consteval int mkoptmask() noex {
 local int vechand_setopts(vechand *op,int vo) noex {
     	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ optmask)) == 0) ylikely {
+	if ((vo & (compl optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
 	    if (vo & vechandm.reuse)		op->fl.oreuse		= true ;
@@ -509,12 +509,12 @@ local int vechand_extend(vechand *op) noex {
 	        sz = (nn + 1) * szof(void **) ;
 	        rs = libmem.rall(op->va,sz,&nva) ;
 	        op->va = nullptr ;
-	    }
+	    } /* end if */
 	    if (rs >= 0) {
 	        op->va = voidpp(nva) ;
 	        op->n = nn ;
 		op->va[op->i] = nullptr ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (extension required) */
 	return rs ;
 } /* end subroutine (vechand_extend) */
