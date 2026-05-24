@@ -111,8 +111,7 @@ local char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return dp ;
-}
-/* end subroutine (strnwcpyxc) */
+} /* end subroutine (strnwcpyxc) */
 
 
 /* local variables */
