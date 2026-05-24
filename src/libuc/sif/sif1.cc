@@ -59,26 +59,24 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* <- STRN global linkage */
-#include	<sfx.h>
-#include	<strnul.hh>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/strnwht.ccm"
+#pragma		GCC dependency		"mod/ureserve.ccm"
 #pragma		GCC dependency		"mod/deb.ccm"
 
 module sif ;
 
 import libutil ;			/* |getlenstr(3u)| */
-import strnwht ;			/* <- STRN module linkage */
+import ureserve ;			/* |sfx(3u)| */
 import deb ;
 
 /* local defines */
@@ -87,14 +85,27 @@ import deb ;
 	if_constexpr (f_debug) \
     	debprintf(__func__,fmt __VA_OPT__(,) __VA_ARGS__)
 
-#define	ISW		CHAR_ISWHT
+#define	ISW(ch)		char_iswht(ch)	/* LIBU */
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
 #endif
 
 
+/* imported namespaces */
+
+using libu::strnchr ;			/* subroutine */
+using libu::strnbrk ;			/* subroutine */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+namespace libu {
+    extern "C++" char * strnwhtbrk(cchar *,int,con chrset *) noex ;
+}
 
 
 /* external variables */
@@ -173,7 +184,6 @@ int sif::next(cchar **rpp) noex {
 } /* end method (sif::next) */
 
 int sif::nextbrk(cchar **rpp) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_INVALID ;
 	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
@@ -181,14 +191,14 @@ int sif::nextbrk(cchar **rpp) noex {
 	if ((sstr || sch) && ((rs = enter(rpp)) >= 0)) ylikely {
             if_constexpr (f_debug) {
                 strnul sr(sp,sl) ;
-                debprintf(__func__,"str sl=%d sp=>%s<\n",sl,ccp(sr)) ;
+                CDEBPR("str sl=%d sp=>%s<\n",sl,ccp(sr)) ;
             }
             while ((sl > 0) && (rl <= 0)) {
                 if_constexpr (f_debug) {
                     strnul sr(sp,sl) ;
-                    debprintf(__func__,"rem sl=%d sp=>%s<\n",sl,ccp(sr)) ;
+                    CDEBPR("rem sl=%d sp=>%s<\n",sl,ccp(sr)) ;
                 }
-                if (cchar *tp ; (tp = strnwhtbrk(sp,sl,sset)) != np) {
+                if (cchar *tp = libu::strnwhtbrk(sp,sl,&sset) ; tp) {
                     cint tl = intconv(tp - sp) ;
                     CDEBPR("middle tl=%d\n",tl) ;
                     rl = sfshrink(sp,tl,&rp) ;
@@ -196,10 +206,10 @@ int sif::nextbrk(cchar **rpp) noex {
                     sp = (tp + 1) ;
                     CDEBPR("middle result sl=%d rl=%d\n",sl,rl) ;
                 } else {
-                if_constexpr (f_debug) {
-                    strnul sr(sp,sl) ;
-                    debprintf(__func__,"fin sl=%d ss=>%s<\n",sl,ccp(sr)) ;
-                }
+                    if_constexpr (f_debug) {
+                        strnul sr(sp,sl) ;
+                        CDEBPR("fin sl=%d ss=>%s<\n",sl,ccp(sr)) ;
+                    }
                     rl = sfshrink(sp,sl,&rp) ;
                     CDEBPR("sfshrink cl=%d rp=>%s<\n",rl,rp) ;
                     sp += sl ;
@@ -213,14 +223,13 @@ int sif::nextbrk(cchar **rpp) noex {
 } /* end method (sif::nextbrk) */
 
 int sif::spchr(cchar **rpp) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_INVALID ;
 	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
 	CDEBPR("ent\n") ;
 	if (sch && ((rs = enter(rpp)) >= 0)) ylikely {
 	    while ((sl > 0) && (rl <= 0)) {
-	        if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != np) {
+	        if (cchar *tp = strnchr(sp,sl,sch) ; tp) {
 		    cint tl = intconv(tp - sp) ;
 		    rl = sfshrink(sp,tl,&rp) ;
 		    sl -= intconv((tp + 1) - sp) ;
@@ -238,14 +247,13 @@ int sif::spchr(cchar **rpp) noex {
 } /* end method (sif::spchr) */
 
 int sif::spbrk(cchar **rpp) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_INVALID ;
 	int		rl = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
 	CDEBPR("ent\n") ;
 	if (sstr && ((rs = enter(rpp)) >= 0)) ylikely {
 	    while ((sl > 0) && (rl <= 0)) {
-	        if (cchar *tp ; (tp = strnbrk(sp,sl,sstr)) != np) {
+	        if (cchar *tp = strnbrk(sp,sl,sstr) ; tp) {
 		    cint tl = intconv(tp - sp) ;
 		    rl = sfshrink(sp,tl,&rp) ;
 		    sl -= intconv((tp + 1) - sp) ;
@@ -263,13 +271,12 @@ int sif::spbrk(cchar **rpp) noex {
 } /* end method (sif::spbrk) */
 
 int sif::chr(cchar **rpp) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_INVALID ;
 	int		rl = SR_NOTFOUND ;	/* <- indicate not-found */
 	cchar		*rp = nullptr ;
 	CDEBPR("ent\n") ;
 	if (sch && ((rs = enter(rpp)) >= 0)) ylikely {
-	    if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != np) {
+	    if (cchar *tp = strnchr(sp,sl,sch) ; tp) {
 		rp = sp ;
 		rl = intconv(tp - sp) ;
 		sl -= intconv((tp + 1) - sp) ;
@@ -287,13 +294,12 @@ int sif::chr(cchar **rpp) noex {
 } /* end method (sif::chr) */
 
 int sif::brk(cchar **rpp) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_INVALID ;
 	int		rl = SR_NOTFOUND ; /* return-value */
 	cchar		*rp = nullptr ;
 	CDEBPR("ent\n") ;
 	if (sstr && ((rs = enter(rpp)) >= 0)) ylikely {
-	    if (cchar *tp ; (tp = strnbrk(sp,sl,sstr)) != np) {
+	    if (cchar *tp = strnbrk(sp,sl,sstr) ; tp) {
 		rp = sp ;
 		rl = intconv(tp - sp) ;
 		sl -= intconv((tp + 1) - sp) ;
