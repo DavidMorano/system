@@ -57,7 +57,6 @@
 #include	<ctx.h>
 #include	<dater.h>
 #include	<defproc.h>
-#include	<dictdiff.h>
 #include	<digval.h>
 #include	<dirempty.h>
 #include	<dirent.h>
@@ -89,7 +88,7 @@
 #include	<gecos.h>
 #include	<getbufsize.h>
 #include	<getexecname.h>
-#include	<getmjd.h>
+#include	<gethe.h>
 #include	<getngroups.h>
 #include	<getutmp.h>
 #include	<getx.h>
@@ -106,10 +105,7 @@
 #include	<hostent.h>
 #include	<hostinfo.h>
 #include	<ids.h>
-#include	<inet4int.h>
-#include	<inetaddr.h>
-#include	<inetaddrparse.h>
-#include	<inetconv.h>
+#include	<inetaddrx.h>
 #include	<initnow.h>
 #include	<inttypesx.h>
 #include	<ischarx.h>
@@ -270,7 +266,6 @@
 #include	<ucinetconv.h>
 #include	<uckvamatch.h>
 #include	<uclibmem.h>
-#include	<uclock.h>
 #include	<ucmem.h>
 #include	<ucmemla.h>
 #include	<ucontext.h>
@@ -300,8 +295,8 @@
 #include	<uctimer.h>
 #include	<ucuserattr.h>
 #include	<ucutility.h>
+#include	<ucinfo.h>
 #include	<udomain.h>
-#include	<uinfo.h>
 #include	<umask.h>
 #include	<unameo.h>
 #include	<upt.h>
@@ -322,6 +317,8 @@
 #include	<xfile.h>
 
 
+#ifdef	COMMENT
+
 EXTERNC_begin
 
 /* system group */
@@ -330,8 +327,6 @@ extern int	uc_nprocs(int) noex ;
 /* process group */
 extern int	uc_atfork(void_f,void_f,void_f) noex ;
 
-extern int	uc_execve(cchar *,mainv,mainv) noex ;
-extern int	uc_isaexecve(cchar *,mainv,mainv) noex ;
 extern int	uc_initgroups(cchar *,gid_t) noex ;
 extern int	uc_exit(int) noex ;
 extern int	uc_atexit(void_f) noex ;
@@ -343,9 +338,6 @@ extern int	uc_setpriority(int,id_t,int) noex ;
 extern int	uc_procpid(cchar *,uid_t) noex ;
 
 /* double-special open group */
-extern int	uc_pipe(int *) noex ;
-extern int	uc_pipes(int *,int) noex ;
-extern int	uc_piper(int *,int,int) noex ;
 extern int	uc_sockpair(int,int,int,int *) noex ;
 
 /* operate group */
@@ -381,18 +373,10 @@ extern int	uc_fgid(int) noex ;
 extern int	uc_seeko(int,off_t,int,off_t *) noex ;
 extern int	uc_seek(int,off_t,int) noex ;
 extern int	uc_tell(int,off_t *) noex ;
-extern int	uc_rewind(int) noex ;
 
 extern int	uc_copy(int,int,int) noex ;
 extern int	uc_peek(int,void *,int) noex ;
-extern int	uc_keepalive(int,int) noex ;
-extern int	uc_moveup(int,int) noex ;
-extern int	uc_ndelay(int,int) noex ;
-extern int	uc_nonblock(int,int) noex ;
 extern int	uc_msgdiscard(int) noex ;
-extern int	uc_setappend(int,int) noex ;
-extern int	uc_closeonexec(int,int) noex ;
-extern int	uc_close(int) noex ;
 
 extern int	uc_remove(cchar *) noex ;
 extern int	uc_link(cchar *,cchar *) noex ;
@@ -404,12 +388,7 @@ extern int	uc_access(cchar *,int) noex ;
 extern int	uc_pathconf(cchar *,int,long *) noex ;
 
 /* special */
-extern int	uc_safesleep(int) noex ;
 extern int	uc_ttyname(int,char *,int) noex ;
-extern int	uc_mkfifo(cchar *,mode_t) noex ;
-
-/* project related */
-extern int	uc_inproj(cchar *,cchar *,char *,int) noex ;
 
 /* POSIX® shared memory operations */
 extern int	uc_unlinkshm(cchar *) noex ;
@@ -418,6 +397,8 @@ extern int	uc_unlinkshm(cchar *) noex ;
 extern int	uc_unlinksem(cchar *) noex ;
 
 EXTERNC_end
+
+#endif /* COMMENT */
 
 
 #endif /* UCLIBSUBS_INCLUDE */
