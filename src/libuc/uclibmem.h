@@ -75,11 +75,13 @@ namespace libuc {
 	int ml		(char **) noex ;
 	int mn		(char **) noex ;
 	int mp		(char **) noex ;
-	int nn		(char **) noex ;
-	int hn		(char **) noex ;
-	int un		(char **) noex ;
-	int gn		(char **) noex ;
-	int pn		(char **) noex ;
+	int nn		(char **) noex ;	/* name system node */
+	int un		(char **) noex ;	/* name system user */
+	int gn		(char **) noex ;	/* name system group */
+	int pn		(char **) noex ;	/* name system project */
+	int protname	(char **) noex ;	/* name network prot */
+	int hostname	(char **) noex ;	/* name network host */
+	int servname	(char **) noex ;	/* name network serv */
 	int pw		(char **) noex ;
 	int sp		(char **) noex ;
 	int ua		(char **) noex ;
@@ -89,11 +91,11 @@ namespace libuc {
 	int nw		(char **) noex ;
 	int ho		(char **) noex ;
 	int sv		(char **) noex ;
-	int fs		(char **) noex ;
-	int sn		(char **) noex ;
-	int zn		(char **) noex ;
-	int zi		(char **) noex ;
-	int ad		(char **) noex ;
+	int fs		(char **) noex ;	/* name file-system */
+	int sn		(char **) noex ;	/* name symbol */
+	int zn		(char **) noex ;	/* name zone (abbreviation) */
+	int zi		(char **) noex ;	/* name zone-info */
+	int ad		(char **) noex ;	/* buffer mail-address */
 	int rsfree	(int,void *) noex ;
     } ; /* end struct (libmems) */
     extern libmems	libmem ;
@@ -135,19 +137,21 @@ extern int lm_mn(char **) noex ;	/* MN max-name */
 extern int lm_mp(char **) noex ;	/* MP max-path */
 extern int lm_mm(char **) noex ;	/* ML max-message */
 extern int lm_nn(char **) noex ;	/* NN node-name */
-extern int lm_hn(char **) noex ;	/* HN host-name */
 extern int lm_un(char **) noex ;	/* UN user-name */
 extern int lm_gn(char **) noex ;	/* GN group-name */
 extern int lm_pn(char **) noex ;	/* PN project-name */
-extern int lm_pw(char **) noex ;	/* PW object */
-extern int lm_sp(char **) noex ;	/* SP object */
-extern int lm_ua(char **) noex ;	/* UA object */
-extern int lm_gr(char **) noex ;	/* GR object */
-extern int lm_pj(char **) noex ;	/* PJ object */
-extern int lm_pr(char **) noex ;	/* PR object */
-extern int lm_nw(char **) noex ;	/* NW object */
-extern int lm_ho(char **) noex ;	/* HO object */
-extern int lm_sv(char **) noex ;	/* SV object */
+extern int lm_protname(char **) noex ;	/* network prot-name */
+extern int lm_hostname(char **) noex ;	/* network host-name */
+extern int lm_servname(char **) noex ;	/* network serv-name */
+extern int lm_pw(char **) noex ;	/* PW entry object */
+extern int lm_sp(char **) noex ;	/* SP entry object */
+extern int lm_ua(char **) noex ;	/* UA entry object */
+extern int lm_gr(char **) noex ;	/* GR entry object */
+extern int lm_pj(char **) noex ;	/* PJ entry object */
+extern int lm_pr(char **) noex ;	/* PR entry object */
+extern int lm_nw(char **) noex ;	/* NW entry object */
+extern int lm_ho(char **) noex ;	/* HO entry object */
+extern int lm_sv(char **) noex ;	/* SV entry object */
 extern int lm_fs(char **) noex ;	/* FS type */
 extern int lm_sn(char **) noex ;	/* SN symbol-name */
 extern int lm_zn(char **) noex ;	/* ZN time-zone-name abbreviation */
