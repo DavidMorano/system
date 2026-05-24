@@ -128,7 +128,7 @@ int uptspawn(pthread_t *rp,pthread_attr_t *ptap,objsub_t start,
 		    rs1 = u_sigmask(SIG_SETMASK,&osm,NULL) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
 }
