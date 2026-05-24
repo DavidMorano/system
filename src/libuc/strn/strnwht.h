@@ -33,7 +33,7 @@
 	char *strwht(cchar *sp,int sl) noex
 	char *strwhtchr(cchar *sp,int sl,int sch) noex
 	char *strwhtbrk(cchar *sp,int sl,cchar *ss) noex
-	char *strwhtbrk(cchar *sp,int sl,chrset &sset) noex
+	char *strwhtbrk(cchar *sp,int sl,con chrset *sset) noex
 
 *******************************************************************************/
 
