@@ -1,6 +1,6 @@
-# MAKEFILE (ucids)
+# MAKEFILE (ucdata)
 
-T= ucids
+T= ucdata
 
 ALL= $(T).o
 
@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += ucids.h
+INCS += ucdata.h
 
 MODS +=
 
@@ -41,11 +41,11 @@ LIBS +=
 
 
 OBJ0= ucinproj.o 
-OBJ1=
-OBJ2=
-OBJ3=
+OBJ1= ucclustername.o
+OBJ2= ucprogdata.o ucproguser.o
+OBJ3= ucuserattr.o
 
-OBJA= obj0.o 
+OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB=
 
 OBJ= obja.o
@@ -135,6 +135,10 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ucinproj.o:		ucinproj.cc			$(INCS)
+ucinproj.o:		ucinproj.cc		ucinproj.h		$(INCS)
+ucclustername.o:	ucclustername.cc	ucclustername.h		$(INCS)
+ucprogdata.o:		ucprogdata.cc		ucprogdata.h		$(INCS)
+ucproguser.o:		ucproguser.cc		ucproguser.h		$(INCS)
+ucuserattr.o:		ucuserattr.cc		ucuserattr.h		$(INCS)
 
 
