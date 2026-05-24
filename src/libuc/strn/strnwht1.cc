@@ -36,13 +36,13 @@
 	char *strnwht(cchar *sp,int sl) noex
 	char *strnwhtchr(cchar *sp,int sl,int sch) noex
 	char *strnwhtbrk(cchar *sp,int sl,cchar *ss) noex
-	char *strnwhtbrk(cchar *sp,int sl,chrset &sset) noex
+	char *strnwhtbrk(cchar *sp,int sl,con chrset *setp) noex
 
 	Arguments:
 	sp		test c-string pointer
 	sp		test c-string length
 	ss		c-string of characters to compare against
-	sset		CHRSET object w/ selected characters
+	setp		CHRSET object pointer w/ selected characters
 	sch		search character to search for
 
 	Returns:
@@ -123,7 +123,7 @@ extern "C" {
     	char		*rsp = nullptr ;
 	if (sp && ss) ylikely {
     	    chrset	sset(ss) ;
-	    rsp = strnwhtbrk(sp,sl,sset) ;
+	    rsp = strnwhtbrk(sp,sl,&sset) ;
 	}
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */
@@ -132,7 +132,7 @@ extern "C" {
 	if (sp) ylikely {
 	    if (sch) ylikely {
     	        chrset sset ; sset.set(sch) ;
-	        rsp = strnwhtbrk(sp,sl,sset) ;
+	        rsp = strnwhtbrk(sp,sl,&sset) ;
 	    } else {
 		rsp = strnwht(sp,sl) ;
 	    }
@@ -142,14 +142,14 @@ extern "C" {
 } /* end extern (C) */
 
 extern "C++" {
-    char *strnwhtbrk(cchar *sp,int µsl,const chrset &sset) noex {
+    char *strnwhtbrk(cchar *sp,int µsl,con chrset *setp) noex {
 	char		*rsp = nullptr ;
 	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    cchar	*lsp = (sp + sl) ;
 	    bool	fwht = false ;
 	    while ((sp < lsp) && *sp) {
 		cint	ch = mkchar(*sp) ;
-		if (((fwht = ISW(ch))) || sset[ch]) {
+		if (((fwht = ISW(ch))) || setp->tst(ch)) {
 		    rsp = charp(sp) ;
 		    break ;
 		}
@@ -159,7 +159,7 @@ extern "C++" {
 		bool fchr = false ;
 	        while ((sp < lsp) && *sp) {
 		    cint	ch = mkchar(*sp) ;
-		    if (((fchr = sset[ch])) || (! ISW(ch))) break ;
+		    if (((fchr = setp->tst(ch))) || (! ISW(ch))) break ;
 		    sp += 1 ;
 		} /* end while */
 		if (fchr) rsp = charp(sp) ;
@@ -167,8 +167,8 @@ extern "C++" {
 	} /* end if (non-zero positive) */
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */
-    char *strnwhtchr(cchar *sp,int sl,const chrset &sset) noex {
-	return strnwhtbrk(sp,sl,sset) ;
+    char *strnwhtchr(cchar *sp,int sl,con chrset *setp) noex {
+	return strnwhtbrk(sp,sl,setp) ;
     }
 } /* end extern (C++) */
 
