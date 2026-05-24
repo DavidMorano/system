@@ -98,7 +98,33 @@ namespace libuc {
 	int vall	(int,void *) noex ;
 	int call	(int,int,void *) noex ;
 	int rall	(void *,int,void *) noex ;
-	int free	(void *vp) noex ;
+	int free	(void *) noex ;
+	int ps		(void *) noex ;
+	int ma		(void *) noex ;
+	int ml		(char **) noex ;
+	int mn		(char **) noex ;
+	int mp		(char **) noex ;
+	int nn		(char **) noex ;	/* name system node */
+	int un		(char **) noex ;	/* name system user */
+	int gn		(char **) noex ;	/* name system group */
+	int pn		(char **) noex ;	/* name system project */
+	int protname	(char **) noex ;	/* name network prot */
+	int hostname	(char **) noex ;	/* name network host */
+	int servname	(char **) noex ;	/* name network serv */
+	int pw		(void *) noex ;
+	int sp		(void *) noex ;
+	int ua		(void *) noex ;
+	int gr		(void *) noex ;
+	int pj		(void *) noex ;
+	int pr		(void *) noex ;
+	int nw		(void *) noex ;
+	int ho		(void *) noex ;
+	int sv		(void *) noex ;
+	int fs		(char **) noex ;	/* name system file-system */
+	int sn		(char **) noex ;	/* name system symbol */
+	int zn		(char **) noex ;	/* name zone (abbreviation) */
+	int zi		(char **) noex ;	/* name zone-info */
+	int ad		(char **) noex ;	/* buffer (mail-address) */
 	int mallset	(int) noex ;
 	int mallcount	(ulong *) noex ;
 	int mallout	(ulong *) noex ;
