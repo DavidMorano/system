@@ -293,7 +293,7 @@ int ucatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 				ucatfork_list	*lp = &hlist ;
 				entry_load(ep,sb,sp,sc) ;
 				list_add(lp,ep) ;
-	                    } /* end if (memory-allocation) */
+	                    } /* end if (memory-acquire) */
 	                } /* end if (track-begin) */
 	                rs1 = mx.lockend ;
 			if (rs >= 0) rs = rs1 ;
