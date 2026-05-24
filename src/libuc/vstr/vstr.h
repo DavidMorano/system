@@ -25,6 +25,7 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
+#include	<vstrorders.h>
 #include	<vstrcmp.h>
 #include	<vstrkeycmp.h>
 #include	<vstrkeydictcmp.h>
