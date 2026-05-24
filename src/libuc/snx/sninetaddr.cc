@@ -57,11 +57,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)|+ |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<uinet.h>		/* |AF_INET4| */
 #include	<inetaddr.h>
 #include	<sncpyx.h>
