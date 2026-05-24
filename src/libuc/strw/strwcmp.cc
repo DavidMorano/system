@@ -66,11 +66,13 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#define	strnbasecmp	std_strnbasecmp		
 #define	strncasecmp	std_strncasecmp		
 
 
 /* imported namespaces */
 
+using stdclib::std_strnbasecmp ;	/* subroutine */
 using stdclib::std_strncasecmp ;	/* subroutine */
 
 
@@ -97,15 +99,15 @@ namespace {
 	    return (ch & UCHAR_MAX) ;
 	} ;
 	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
-	    return strncmp(bs,sp,sl) ;
+	    return strnbasecmp(bs,sp,sl) ;
 	} ;
 	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
-	    return nleadstr(s1,s2,sl) ;
+	    return nleadbasestr(s1,s2,sl) ;
 	} ;
    } ; /* end struct */
    struct casecmpx : cmpx {
 	int tox(int ch)				const noex override final {
-	    return tolc(ch & UCHAR_MAX) ;
+	    return touc(ch & UCHAR_MAX) ;
 	} ;
 	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strncasecmp(bs,sp,sl) ;
