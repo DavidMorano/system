@@ -49,16 +49,19 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
-#include	<char.h>		/* |char_iswhite(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>
 
 #include	"sfx.h"
+#include	"sfkey.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* external subroutines */
@@ -87,7 +90,7 @@ int sfkey(cchar *sp,int sl,cchar **rpp) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
 	        kl = intconv(tp - sp) ;
-	        while ((kl > 0) && CHAR_ISWHITE(sp[kl - 1])) {
+	        while ((kl > 0) && ISWHT(sp[kl - 1])) {
 	            kl -= 1 ;
 		}
 	    } /* end if */
