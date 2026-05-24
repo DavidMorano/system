@@ -128,11 +128,10 @@ extern "C" {
 } /* end extern (C) */
 
 extern "C++" {
-    int siwhtbrk(cchar *sp,int sl,const chrset &sset) noex {
-    	cnullptr	np{} ;
+    int siwhtbrk(cchar *sp,int sl,con chrset *setp) noex {
     	int		si = -1 ;
 	if (sp) ylikely {
-	    if (cchar *tp ; (tp = strnwhtbrk(sp,sl,sset)) != np) {
+	    if (cchar *tp = strnwhtbrk(sp,sl,setp) ; tp) {
 	        si = intconv(tp - sp) ;
 	    }
 	} /* end if (non-null) */
