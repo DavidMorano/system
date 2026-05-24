@@ -466,7 +466,7 @@ constexpr int mkoptmask() noex {
 local int recarr_setopts(recarr *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ optmask)) == 0) {
+	if ((vo & (compl optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->fl = {} ;
 	    if (vo & recarrm.reuse)		op->fl.oreuse		= true ;
