@@ -121,7 +121,7 @@ int uptcreate(pthread_t *rp,pta *ptap,uptsub_f start,void *arg) noex {
 	        if ((rs < 0) && (tid < 0)) {
 		    libmem.free(oap) ;
 	        }
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? tid : rs ;
 }
