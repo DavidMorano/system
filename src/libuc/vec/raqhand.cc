@@ -308,7 +308,7 @@ consteval int mkoptmask() noex {
 local int raqhand_setopts(raqhand *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ optmask)) == 0) ylikely {
+	if ((vo & (compl optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
 	    if (vo & raqhandm.reuse)		op->fl.oreuse		= true ;
@@ -331,7 +331,7 @@ local int raqhand_valid(raqhand *op,int i) noex {
 		    rs = SR_NOTFOUND ;
 		}
 	    }
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (raqhand_valid) */
 
