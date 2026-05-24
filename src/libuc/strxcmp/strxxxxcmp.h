@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* make a character out of an integer */
+/* compare c-strings w/ various case insensitivities */
 /* version %I% last-modified %G% */
 
 
@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
