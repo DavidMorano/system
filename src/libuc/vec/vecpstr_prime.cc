@@ -78,6 +78,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<nulstr.h>
 #include	<vechand.h>
 #include	<vstrcmp.h>
 #include	<nleadstr.h>
@@ -193,7 +194,7 @@ int vecpstr_start(vecpstr *op,int vn,int vsz,int vo) noex {
 	    }
 	    if (rs < 0) {
 		vecpstr_dtor(op) ;
-	    }
+	    } /* end if(error) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -525,7 +526,31 @@ int vecpstr_search(vecpstr *op,cchar *sp,vecpstr_vcmp vcf,cchar **rpp) noex {
 }
 /* end subroutine (vecpstr_search) */
 
-int vecpstr_finder(vecpstr *op,cchar *sp,vecpstr_vcmp vcf,cchar **rpp) noex {
+int vecpstr_searchl(vecpstr *op,cc *sp,int sl,vecpstr_vcmp vcf,cc **rpp) noex {
+    	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		i = -1 ;
+	if (op && sp) ylikely {
+	    cchar	*s{} ;
+	    if (nulstr ns ; (rs = ns.start(sp,sl,&s)) >= 0) ylikely {
+		if ((rs = vecpstr_search(op,s,vcf,rpp)) >= 0) {
+		    i = rs ;
+		} else if (rs == rsn) {
+		    rs = SR_OK ;
+		}
+	        rs1 = ns.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (nulstr) */
+	} /* end if (non-null) */
+	if ((rs >= 0) && (i < 0)) {
+	    rs = SR_NOTFOUND ; /* real errors priority */
+	}
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (vecpstr_searchl) */
+
+int vecpstr_finder(vecpstr *op,cc *sp,vecpstr_vcmp vcf,cc **rpp) noex {
 	int		rs = SR_FAULT ;
 	if ((rs = vecpstr_magic(op,sp)) >= 0) ylikely {
             rs = SR_NOTFOUND ;
@@ -869,7 +894,7 @@ consteval int mkoptmask() noex {
 local int vecpstr_setopts(vecpstr *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ optmask)) == 0) ylikely {
+	if ((vo & (compl optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
 	    if (vo & vecpstrm.reuse)		op->fl.oreuse		= true ;
@@ -937,7 +962,7 @@ local int vecpstr_extstr(vecpstr *op,int amount) noex {
 	} /* end if (check if could add to existing chunk) */
 	if ((rs >= 0) && (amount > 0) && (op->chp == nullptr)) {
 	    rs = vecpstr_newchunk(op,amount) ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (vecpstr_extstr) */
 
@@ -984,7 +1009,7 @@ local int vecpstr_extvec(vecpstr *op,int n) noex {
 	        op->va = ccharpp(na) ;
 	        op->va[op->idx] = nullptr ;
 	        op->ext = nn ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (needed) */
 	return rs ;
 } /* end subroutine (vecpstr_extvec) */
@@ -1000,7 +1025,7 @@ local int vecpstr_record(vecpstr *op,cchar *sp) noex {
 	    op->va[(op->idx)++] = sp ;
 	    op->va[op->idx] = nullptr ;
 	    op->cnt += 1 ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (vecpstr_record) */
 
@@ -1049,7 +1074,7 @@ local int chunk_finish(VPS_CH *chkp) noex {
 	    rs1 = libmem.free(chkp->tab) ;
 	    if (rs >= 0) rs = rs1 ;
 	    chkp->tab = nullptr ;
-	}
+	} /* end if */
 	chkp->tabsize = 0 ;
 	return rs ;
 } /* end subroutine (chunk_finish) */
@@ -1068,7 +1093,7 @@ local int chunk_add(VPS_CH *chkp,cchar *sp,int sl,cchar **rpp) noex {
 	        chkp->tablen += intconv(ep - bp) ;
 	        chkp->count += 1 ;
 	        *rpp = bp ;
-	    }
+	    } /* end block */
 	} else {
 	    rs = SR_BUGCHECK ;
 	}
@@ -1172,9 +1197,17 @@ int vecpstr::search(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
 	return vecpstr_search(this,s,vcmp,rpp) ;
 }
 
+int vecpstr::searchl(cchar *sp,int sl,vecpstr_f vcmp,cchar **rpp) noex {
+	return vecpstr_searchl(this,sp,sl,vcmp,rpp) ;
+} /* end method (vecpstr::searchl) */
+
 int vecpstr::finder(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
 	return vecpstr_finder(this,s,vcmp,rpp) ;
 }
+
+int vecpstr::findkey(cchar *kp,int kl,cchar **rpp) noex {
+	return searchl(kp,kl,vstrkeycmp,rpp) ;
+} /* end method (vecpstr::findkey) */
 
 int vecpstr::del(int ai) noex {
 	if (ai < 0) ai = 0 ;
@@ -1185,7 +1218,7 @@ void vecpstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecpstr",rs,"fini-finish") ;
 	}
-}
+} /* end method (vecpstr::dtor) */
 
 vecpstr::operator int () noex {
     	int		rs = SR_NOTOPEN ;
@@ -1282,8 +1315,8 @@ void vecpstr_iter::increment(int n) noex {
 	    i += n ;
 	    while ((i < ii) && (va[i] == nullptr)) {
 	        i += 1 ;
-	    }
-	}
+	    } /* end while */
+	} /* end if */
 } /* end method (vecpstr_iter::increment) */
 
 
