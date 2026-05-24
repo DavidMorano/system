@@ -148,7 +148,7 @@ int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 		            if (rs < 0) {
 		                lm_free(sip) ;
 			    } /* end if (error) */
-	                } /* end if (memory-allocation) */
+	                } /* end if (memory-acquire) */
 		        rs1 = u_sigmask(SIG_SETMASK,&osm,np) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (sigmask) */
