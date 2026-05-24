@@ -2,7 +2,7 @@
 
 T= libut
 
-ALL= $(T).o
+ALL= $(T).o $(T).so
 
 
 BINDIR		?= $(REPOROOT)/bin
@@ -37,7 +37,7 @@ INCS += libut.h utbase.hh
 
 MODS +=
 
-LIBS +=
+LIBS += -lf -lu
 
 
 OBJ00= utbase.o
@@ -74,6 +74,8 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 default:		$(T).o
 
+so:			$(T).so
+
 all:			$(ALL)
 
 
@@ -104,6 +106,9 @@ all:			$(ALL)
 
 $(T).o:			obj.o
 	$(LD) -r $(LDFLAGS) -o $@ obj.o
+
+$(T).so:		obj.o
+	$(LD) -shared -o $@ $(LDFLAGS) obj.o $(RUNINFO) $(LIBINFO)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
