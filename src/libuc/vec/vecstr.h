@@ -238,8 +238,11 @@ struct vecstr : vecstr_head {
 	int find	(cchar *) noex ;
 	int findn	(cchar *,int = -1) noex ;
 	int search	(cchar *,vecstr_f,cchar ** = nullptr) noex ;
+	int searchl	(cchar *,int,vecstr_vcmp,cc ** = nullptr) noex ;
 	int finder	(cchar *,vecstr_f,cchar ** = nullptr) noex ;
+	int findkey	(cchar *,int,cchar ** = nullptr) noex ;
 	int del		(int = -1) noex ;
+	int addpathclean	(cchar *,int) noex ;
 	operator int () noex ;
 	vecstr_iter begin() noex {
 	    vecstr_iter		it(va,0,i) ;
