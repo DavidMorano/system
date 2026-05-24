@@ -502,7 +502,7 @@ consteval int mkoptmask() noex {
 local int veclong_setopts(veclong *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ optmask)) == 0) ylikely {
+	if ((vo & (compl optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
 	    if (vo & veclongm.reuse)		op->fl.oreuse = true ;
@@ -547,12 +547,12 @@ local int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 	        i = op->i ;
 	        op->va[(op->i)++] = v ;
 	        op->va[op->i] = VECLONG_MIN ;
-	    }
+	    } /* end if (ok) */
 	} /* end if */
 	if (rs >= 0) ylikely {
 	    op->c += 1 ;		/* increment list count */
 	    op->fl.issorted = false ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (veclong_addval) */
 
@@ -576,7 +576,7 @@ local int veclong_extend(veclong *op,int amount) noex {
 	        op->va = nva ;
 	        op->n = nn ;
 		op->va[op->i] = VECLONG_MIN ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (needed) */
 	return rs ;
 } /* end subroutine (veclong_extend) */
@@ -613,7 +613,7 @@ local int veclong_extrange(veclong *op,int n) noex {
 	    memclear((op->va+op->i),nsz) ;
 	    op->i = n ;
 	    op->va[op->i] = VECLONG_MIN ;
-	}
+	} /* end if */
 	return SR_OK ;
 } /* end subroutine (veclong_extrange) */
 
@@ -623,7 +623,7 @@ local int deftypecmp(const VECLONG_TYPE *l1p,const VECLONG_TYPE *l2p) noex {
 
 int veclong_st::operator () (int vn,int vo) noex {
     	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case 0:
     	        rs = veclong_start(op,vn,vo) ;
@@ -631,7 +631,7 @@ int veclong_st::operator () (int vn,int vo) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method (veclong_st::operator) */
 
 int veclong::add(VECLONG_TYPE v) noex {
 	return veclong_add(this,v) ;
@@ -778,8 +778,8 @@ void veclong_iter::increment(int n) noex {
 	    i += n ;
 	    while ((i < ii) && (va[i] == -1)) {
 	        i += 1 ;
-	    }
-	}
+	    } /* end while */
+	} /* end if */
 } /* end method (veclong_iter::increment) */
 
 
