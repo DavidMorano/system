@@ -51,7 +51,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<mtime.h>
 #include	<localmisc.h>
 
 #include	"ucsafesleep.h"
