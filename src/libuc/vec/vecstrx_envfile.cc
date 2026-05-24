@@ -5,6 +5,7 @@
 /* process an environment file */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -45,24 +46,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>		/* |strncasecmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<utimeout.h>
-#include	<uclibmem.h>
-#include	<filer.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<sfx.h>
-#include	<strcpyx.h>
-#include	<strdcpyxw.h>
-#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |strncasecmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strcpyx.h>		/* LIBUC */
+#include	<strdcpyxw.h>		/* LIBUC */
+#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBF */
 
 #include	"vecstrx.hh"
 
@@ -78,11 +80,14 @@ import ulibvals ;			/* |libval.maxline(3u)| */
 
 #define	WORDEXPORT	"export"	/* optional word to ignore */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -123,9 +128,9 @@ namespace {
 	int		l ;
 	static cchar	p[] ;
 	constexpr eword() noex {
-	    l = lenstr(WORDEXPORT) ;
+	    l = clenstr(WORDEXPORT) ;
 	} ;
-    } ;
+    } ; /* end struct (eword) */
     constexpr char eword::p[] = WORDEXPORT ;
     struct vars {
 	int		linebuflen ;
@@ -143,9 +148,10 @@ local int	mkterms() noex ;
 
 /* local variables */
 
-static int		maxline = ulibval.maxline ;
-static vars		var ;
-static char		fterms[fieldterms_termsize] ;
+static int	maxline = ulibval.maxline ;
+static vars	var ;
+static char	fterms[fieldterms_termsize] ;
+cbool		f_debug = CF_DEBUG ;
 
 
 /* exported variables */
@@ -156,16 +162,18 @@ static char		fterms[fieldterms_termsize] ;
 int vecstrx::envfile(cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	DPRINTF("ent fn=%s\n",fname) ;
 	if (fname) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
-		static cint	rsi = mkinit() ;
-		if ((rs = rsi) >= 0) ylikely {
+		if (static cint rsi = mkinit() ; (rs = rsi) >= 0) ylikely {
 		    rs = vecstrx_envfiler(this,fname) ;
 		    c = rs ;
 		} /* end if (mkinit) */
+		DPRINTF("mkinit() _out rs=%d\n",rs) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstrx_envfile) */
@@ -178,15 +186,19 @@ int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
+	DPRINTF("ent fn=%s\n",fname) ;
 	if (subinfo si(op,fterms) ; (rs = si.start()) >= 0) ylikely {
             cmode   om = 0666 ;
             cint    of = O_RDONLY ;
+	    DPRINTF("-> u_open() of=%08X\n",of) ;
             if ((rs = u_open(fname,of,om)) >= 0) ylikely {
-                cint		fd = rs ;
+                cint	fd = rs ;
+	        DPRINTF("u_open() rs=%d\n",rs) ;
                 if (filer df ; (rs = df.start(fd,0z,0,0)) >= 0) ylikely {
                     cint    to = utimeout[uto_read] ;
                     cint    llen = si.llen ;
                     char    *lbuf = si.lbuf ;
+	            DPRINTF("filer_start() rs=%d\n",rs) ;
                     while ((rs = df.readlns(lbuf,llen,to,np)) > 0) {
 			cchar	*cp{} ;
 			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
@@ -195,30 +207,34 @@ int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
                         }
                         if (rs < 0) break ;
                     } /* end while (reading lines) */
+	            DPRINTF("while-out rs=%d\n",rs) ;
                     rs1 = df.finish ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (filer) */
+	        DPRINTF("filer-out rs=%d\n",rs) ;
                 rs1 = u_close(fd) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (file) */
+	   DPRINTF("u_open()-out rs=%d\n",rs) ;
             rs1 = si.finish() ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (subinfo) */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (vecstrx_envfiler) */
 
 int subinfo::start() noex {
 	int		rs ;
 	int		sz = 0 ;
+	int		ai = 2 ;
 	llen = var.linebuflen ;
-	sz += (2 * (llen + 1)) ;
+	sz += (ai * (llen + 1)) ;
 	if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	    a = bp ;
-	    lbuf = bp ;
-	    bp += (llen + 1) ;
-	    ebuf = bp ;
+	    lbuf = (a + (--ai * (llen + 1))) ;
+	    ebuf = (a + (--ai * (llen + 1))) ;
 	    elen = llen ;
-	} /* end if (m-a) */
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (subinfo::start) */
 
@@ -229,7 +245,7 @@ int subinfo::finish() noex {
 	    rs1 = libmem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (subinfo_finish) */
 
@@ -255,37 +271,45 @@ int subinfo::line(cchar *lp,int ll) noex {
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (subinfo::line) */
 
+/****
+  ebuf -- expansion result buffer pointer
+  elen -- expansion result buffer length
+  -
+  I do not have to perform counted-string operations on the
+  destination buffer.  The reason for this recklessness is because
+  the source buffer that I am reading from (using the |sharg()|
+  FIELD method) is ony itself reading from a buffer with the
+  same legnth as my constructed destination buffer.  Botg buffers
+  (source and destiantion) happen to be MAXLINELEN (really the
+  dunamically determined line-length from the systtem) long.
+****/
 int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
 	cint		rsn = SR_NOTFOUND ;
-	cint		klen = (elen - 1) ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	char		*kbuf = ebuf ;
-	if (kl <= klen) ylikely {
+	if (kl <= (elen - 1)) ylikely {
 	    vs_f	vs = vstrkeycmp ;
-	    cint	vlen = elen ;
-	    int		vl ;
-	    char	*vbuf = ebuf ;
-	    char	*vp = strdcpy1w(kbuf,klen,kp,kl) ;
-	    if ((rs = vsp->finder(kbuf,vs,nullptr)) == rsn) {
-	        int	fl ;
+	    int		el = 0 ;
+	    char	*ep = strdcpy1w(ebuf,elen,kp,kl) ;
+	    if ((rs = vsp->finder(ebuf,vs,nullptr)) == rsn) {
+	        int	fl ; /* used-afterwards */
 	 	rs = SR_OK ;
-	        *vp++ = '=' ;
-	        *vp = '\0' ;
-	        vl = intconv(vp - vbuf) ;
-	        while ((fl = fsp->sharg(ft,vp,(vlen-vl))) >= 0) {
+	        *ep++ = '=' ;
+	        *ep = '\0' ;
+	        el = intconv(ep - ebuf) ;
+	        while ((fl = fsp->sharg(ft,ep,(elen - el))) >= 0) {
 	            if (fl > 0) {
-	                vp += fl ;
-	                vl += fl ;
+	                ep += fl ;
+	                el += fl ;
 	            }
 	            if (fsp->term == '#') break ;
 	        } /* end while */
 		if (fl != rsn) rs = fl ;
-	        *vp = '\0' ;
+	        *ep = '\0' ;
 	        if (rs >= 0) {
 	            c += 1 ;
-	            rs = vsp->add(vbuf,vl) ;
-	        }
+	            rs = vsp->add(ebuf,el) ;
+	        } /* end if (ok) */
 	    } /* end if (did not have it already) */
 	} /* end if (not-overflow) */
 	return (rs >= 0) ? c : rs ;
@@ -305,9 +329,11 @@ vars::operator int () noex {
 
 local int mkinit() noex {
     	int		rs ;
+	DPRINTF("ent\n") ;
 	if ((rs = mkterms()) >= 0) ylikely {
 	    rs = var ;
 	}
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (mkinit) */
 
