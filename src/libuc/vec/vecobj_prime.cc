@@ -681,7 +681,7 @@ consteval int mkoptmask() noex {
 local int vecobj_setopts(vecobj *op,int vo) noex {
 	constexpr int	optmask = mkoptmask() ;
 	int		rs = SR_INVALID ;
-	if ((vo & (~ optmask)) == 0) ylikely {
+	if ((vo & (compl optmask)) == 0) ylikely {
 	    rs = SR_OK ;
 	    op->fl = {} ;
 	    if (vo & vecobjm.reuse)		op->fl.oreuse = true ;
@@ -710,12 +710,12 @@ local int vecobj_extend(vecobj *op) noex {
 	        sz = (nn + 1) * szof(void **) ;
 	        rs = libmem.rall(op->va,sz,&nva) ;
 	        op->va = nullptr ;
-	    }
+	    } /* end if */
 	    if (rs >= 0) {
 	        op->va = voidpp(nva) ;
 	        op->n = nn ;
 		op->va[op->i] = nullptr ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (extension required) */
 	return rs ;
 } /* end subroutine (vecobj_extend) */
@@ -742,7 +742,7 @@ local int vecobj_sorted(vecobj *op,vecobj_vcf vcf) noex {
 	        csize	esize = sizeof(void *) ;
 		qsort_f	scf = qsort_f(vcf) ;
 		qsort(op->va,alen,esize,scf) ;
-	    }
+	    } /* end if */
 	} /* end if (sorting) */
 	return (rs >= 0) ? fsorted : rs ;
 } /* end subroutine (vecobj_sorted) */
@@ -770,7 +770,7 @@ int sub_fetch::first(cur *curp) noex {
 	if (rs >= 0) {
 	    curp->i = i ;
 	    if (rpp) *rpp = rep ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
 } /* end method (sub_fetch::first) */
 
@@ -788,7 +788,7 @@ int sub_fetch::next(cur *curp) noex {
 	if (rs >= 0) {
 	    curp->i = i ;
 	    if (rpp) *rpp = rep ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
 } /* end method (sub_fetch::next) */
 
