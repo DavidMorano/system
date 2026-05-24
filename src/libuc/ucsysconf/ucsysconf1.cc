@@ -62,18 +62,15 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<utimeout.h>		/* |uto_{x}| */
-#include	<ustd.h>		/* |ustd_conf{x}| */
-#include	<intsat.h>
-#include	<sysconfcmds.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBU |uto_{x}| */
+#include	<intsat.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsysconf.h"
 
@@ -83,9 +80,6 @@ module ucsysconf ;
 
 
 /* imported namespaces */
-
-using libu::ustd_confval ;		/* subroutine */
-using libu::ustd_confstr ;		/* subroutine */
 
 
 /* local typedefs */
@@ -145,7 +139,6 @@ int ucsysconf::getstd(int req) noex {
 	    } /* end if (std-call) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (ucsysconf::getstd) */
+} /* end subroutine (ucsysconf::getstd) */
 
 
