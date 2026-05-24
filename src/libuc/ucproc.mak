@@ -42,7 +42,7 @@ LIBS +=
 
 OBJ0= ucprochave.o ucprocpid.o
 OBJ1= ucfork.o ucforkdet.o
-OBJ2= ucexit.o
+OBJ2= ucexec.o ucisaexec.o ucexit.o
 OBJ3= ucsafesleep.o
 OBJ4= ucatexit.o ucatfork.o
 OBJ5= 
@@ -155,13 +155,15 @@ obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ucprochave.o:		ucprochave.cc	ucprochave.h		$(INCS)
-ucprocpid.o:		ucprocpid.cc	ucprocpid.h		$(INCS)
-ucexit.o:		ucexit.cc	ucexit.h		$(INCS)
-ucfork.o:		ucfork.cc	ucfork.h		$(INCS)
-ucforkdet.o:		ucforkdet.cc	ucforkdet.h		$(INCS)
-ucsafesleep.o:		ucsafesleep.cc	ucsafesleep.h		$(INCS)
 ucatexit.o:		ucatexit.cc	ucatexit.h		$(INCS)
 ucatfork.o:		ucatfork.cc	ucatfork.h		$(INCS)
+ucsafesleep.o:		ucsafesleep.cc	ucsafesleep.h		$(INCS)
+ucexec.o:		ucexec.cc	ucexec.h		$(INCS)
+ucisaexec.o:		ucisaexec.cc	ucexec.h		$(INCS)
+ucexit.o:		ucexit.cc	ucexit.h		$(INCS)
+ucprochave.o:		ucprochave.cc	ucprochave.h		$(INCS)
+ucprocpid.o:		ucprocpid.cc	ucprocpid.h		$(INCS)
+ucfork.o:		ucfork.cc	ucfork.h		$(INCS)
+ucforkdet.o:		ucforkdet.cc	ucforkdet.h		$(INCS)
 
 
