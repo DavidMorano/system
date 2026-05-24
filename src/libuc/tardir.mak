@@ -47,20 +47,23 @@ OBJPART3=
 
 OBJPART= objpart0.o objpart1.o
 
-OBJ0= tardir0.o 
+OBJPRIME= tardir0.o
+
+OBJ0=
 OBJ1= tardir1.o tardir2.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj1.o
 OBJB=
 
 OBJ= obja.o
 
+OBJIMPL= obja.o
+
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -103,11 +106,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			obj.o objpart.o
-	$(LD) -r $(LDFLAGS) -o $@ obj.o objpart.o
+$(T).o:			objprime.o objpart.o objimpl.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -117,6 +120,9 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat tardir-prime	gcm.cache
+	rmsubpat tardir-vecent	gcm.cache
+	rmsubpat tardir		gcm.cache
 
 control:
 	(uname -n ; date) > Control
@@ -156,19 +162,29 @@ objpart1.o:		$(OBJPART1)
 objpart.o:		$(OBJPART)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module partitions
 tardir-prime.o:		tardir-prime.ccm		$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 tardir-vecent.o:	tardir-vecent.ccm		$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
+# module primary
 tardir0.o:		tardir.ccm objpart.o		$(INCS)
-	makemodule tardir
+	gxx -c -x c++ -o $@ -O $<
 
+# module implementations
 tardir1.o:		tardir1.cc tardir0.o		$(INCS)
-	makemodule tardir
 	$(COMPILE.cc) $<
 
 tardir2.o:		tardir2.cc tardir0.o		$(INCS)
-	makemodule tardir
 	$(COMPILE.cc) $<
 
 
