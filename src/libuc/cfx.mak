@@ -117,6 +117,11 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat cfalphax	gcm.cache
+	rmsubpat cfcharsx	gcm.cache
+	rmsubpat cfdigx		gcm.cache
+	rmsubpat cfpowx		gcm.cache
+	rmsubpat cfsysx		gcm.cache
 
 control:
 	(uname -n ; date) > Control
@@ -196,9 +201,18 @@ mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
 cfalphax.o:		cfalphax.ccm	cfutil.hh
+	gxx -c -x c++ -o $@ -O $<
+
 cfcharsx.o:		cfcharsx.ccm	cfutil.hh
+	gxx -c -x c++ -o $@ -O $<
+
 cfdigx.o:		cfdigx.ccm	cfutil.hh
+	gxx -c -x c++ -o $@ -O $<
+
 cfpowx.o:		cfpowx.ccm	cfutil.hh
+	gxx -c -x c++ -o $@ -O $<
+
 cfsysx.o:		cfsysx.ccm	cfutil.hh
+	gxx -c -x c++ -o $@ -O $<
 
 
