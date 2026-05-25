@@ -56,7 +56,7 @@
 	be a substantial time savings in caching some of these
 	values rather trying to extract them from the OS everytime
 	they are requested.  And YES, I recognize that if every
-	caller used the (so-called) UINFO interface (see |uinfo(3uc)|)
+	caller used the (so-called) UCINFO interface (see |ucinfo(3uc)|)
 	these values are even more cached and accessable through
 	that interface than they even are through this present
 	(below) caching interface.  I say, the more the merrier!
