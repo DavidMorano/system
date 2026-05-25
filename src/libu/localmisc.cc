@@ -23,7 +23,7 @@
   	Miscellaneous:
 
 	Description:
-	This contains miscellaneious support subroutines.
+	This contains miscellaneous support.
 
 *******************************************************************************/
 
