@@ -32,14 +32,11 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<csignal>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usig.h>
-#include	<ulogerror.h>
+#include	<csignal>		/* CSTD */
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* LIBU */
+#include	<usig.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/usigsets.ccm"
 
