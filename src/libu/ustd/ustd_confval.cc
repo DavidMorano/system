@@ -39,16 +39,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* |confstr(2)| */
-#include	<cerrno>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |intsat(3u)| */
-#include	<sysconfcmds.h>		/* commands for |sysconf(3c)| */
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX |confstr(2)| */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |intsat(3u)| */
+#include	<sysconfcmds.h>		/* LIBU commands for |sysconf(3c)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ustd.h"
 
