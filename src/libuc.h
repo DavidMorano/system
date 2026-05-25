@@ -57,7 +57,6 @@
 #include	<ctx.h>
 #include	<dater.h>
 #include	<defproc.h>
-#include	<dictdiff.h>
 #include	<digval.h>
 #include	<dirempty.h>
 #include	<dirent.h>
@@ -87,7 +86,6 @@
 #include	<fsdir.h>
 #include	<fsdirtree.h>
 #include	<gecos.h>
-#include	<getbufsize.h>
 #include	<getexecname.h>
 #include	<gethe.h>
 #include	<getngroups.h>
@@ -106,10 +104,7 @@
 #include	<hostent.h>
 #include	<hostinfo.h>
 #include	<ids.h>
-#include	<inet4int.h>
-#include	<inetaddr.h>
-#include	<inetaddrparse.h>
-#include	<inetconv.h>
+#include	<inetaddrx.h>
 #include	<initnow.h>
 #include	<inttypesx.h>
 #include	<ischarx.h>
@@ -299,8 +294,8 @@
 #include	<uctimer.h>
 #include	<ucuserattr.h>
 #include	<ucutility.h>
+#include	<ucinfo.h>
 #include	<udomain.h>
-#include	<uinfo.h>
 #include	<umask.h>
 #include	<unameo.h>
 #include	<upt.h>
@@ -380,9 +375,7 @@ extern int	uc_tell(int,off_t *) noex ;
 
 extern int	uc_copy(int,int,int) noex ;
 extern int	uc_peek(int,void *,int) noex ;
-extern int	uc_keepalive(int,int) noex ;
 extern int	uc_msgdiscard(int) noex ;
-extern int	uc_setappend(int,int) noex ;
 
 extern int	uc_remove(cchar *) noex ;
 extern int	uc_link(cchar *,cchar *) noex ;
