@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -114,7 +114,7 @@ so:			$(T).so
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ_UMODS) Makefile
@@ -131,6 +131,13 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat digtab		gcm.cache
+	rmsubpat constdiv	gcm.cache
+	rmsubpat builtin	gcm.cache
+	rmsubpat bitop		gcm.cache
+	rmsubpat valuelims	gcm.cache
+	rmsubpat digbufsizes	gcm.cache
+	rmsubpat usysbasic	gcm.cache
 	rmobj
 
 control:
@@ -210,25 +217,33 @@ objf_umods.o:		$(OBJF_UMODS)
 
 # VARIOUS (module)
 digtab.o:		digtab.ccm
+	gxx -c -x c++ -o $@ -O $<
+
 constdiv.o:		constdiv.ccm
+	gxx -c -x c++ -o $@ -O $<
+
 builtin.o:		builtin.ccm
+	gxx -c -x c++ -o $@ -O $<
+
 bitop.o:		bitop.ccm
+	gxx -c -x c++ -o $@ -O $<
 
 # VALUELIMS (module)
 valuelims.o:		valuelims.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 # DIGBUFSIZES (module)
 digbufsizes.o:		digbufsizes.ccm
+	gxx -c -x c++ -o $@ -O $<
 
 # UNIXFNAMES
 unixfnames.o:		unixfnames0.o unixfnames1.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 unixfnames0.o:		unixfnames.ccm
-	makemodule unixfnames
+	gxx -c -x c++ -o $@ -O $<
 
-unixfnames1.o:		unixfnames1.cc unixfnames.ccm 
-	makemodule unixfnames
+unixfnames1.o:		unixfnames1.cc unixfnames0.o
 	$(COMPILE.cc) $<
 
 # USYSBASIC
@@ -236,10 +251,9 @@ usysbasic.o:		usysbasic0.o usysbasic1.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 usysbasic0.o:		usysbasic.ccm
-	makemodule usysbasic
+	gxx -c -x c++ -o $@ -O $<
 
-usysbasic1.o:		usysbasic1.cc usysbasic.ccm
-	makemodule usysbasic
+usysbasic1.o:		usysbasic1.cc usysbasic0.o
 	$(COMPILE.cc) $<
 
 
