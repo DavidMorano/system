@@ -49,8 +49,10 @@ enum bufsizes {
 	bufsize_gn,		/* name system group-name */
 	bufsize_pn,		/* name system roject-name */
 	bufsize_protname,	/* name network prot-name (protocl-name) */
+	bufsize_netwname,	/* name network host-name (host-name) */
 	bufsize_hostname,	/* name network host-name (host-name) */
 	bufsize_servname,	/* name network serv-name (service-name) */
+	bufsize_ut,		/* entry UTMP */
 	bufsize_pw,		/* entry passwd */
 	bufsize_sp,		/* entry shadow */
 	bufsize_ua,		/* entry user-attr */
