@@ -33,11 +33,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* |_SC_xx| */
-#include	<stddef.h>		/* |nullptr_t| */
-#include	<stdlib.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<unistd.h>		/* POSIX |_SC_xx| */
+#include	<stddef.h>		/* CSTD |nullptr_t| */
+#include	<stdlib.h>		/* CSTD */
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* CSTD */
 
 
 enum sysconfcmds {
@@ -47,7 +47,7 @@ enum sysconfcmds {
     sysconfcmd_maxlink,		/* file-system hard links */
     sysconfcmd_maxlogin,
     sysconfcmd_maxgroups,
-    sysconfcmd_symlinks,	/* file-system symbolic (soft) links */
+    sysconfcmd_maxsymloop,	/* file-system symbolic (soft) links */
     sysconfcmd_maxsymbol,
     sysconfcmd_maxnodename,	/* UNIX® system nodename length */
     sysconfcmd_maxtzname,
@@ -63,6 +63,7 @@ enum sysconfcmds {
     sysconfcmd_maxservname,	/* name network service-name */
     sysconfcmd_maxmsg,
     sysconfcmd_maxmailaddr,
+    sysconfcmd_utent,		/* entry buffer size - UTMP */
     sysconfcmd_pwent,		/* entry buffer size - PASSWD */
     sysconfcmd_spent,		/* entry buffer size - SHADOW */
     sysconfcmd_uaent,		/* entry buffer size - USERATTR */
@@ -98,9 +99,9 @@ enum sysconfcmds {
 #ifndef	_SC_NGROUPS_MAX
 #define	_SC_NGROUPS_MAX		sysconfcmd_maxgroups
 #endif
-#ifndef	_SC_SYMLINKS_MAX
-#define	_SC_SYMLINKS_MAX	sysconfcmd_symlinks
-#endif
+#ifndef	_SC_SYMLOOP_MAX
+#define	_SC_SYMLOOP_MAX		sysconfcmd_maxsymloop
+#endif /* _SC_SYMLOOP_MAX */
 #ifndef	_SC_SYMBOL_MAX
 #define	_SC_SYMBOL_MAX		sysconfcmd_maxsymbol
 #endif
@@ -127,8 +128,8 @@ enum sysconfcmds {
 #define	_SC_PROTNAME_MAX	sysconfcmd_maxprotname
 #endif /* _SC_PROTNAME_MAX */
 
-#ifndef	_SC_NETWTNAME_MAX	/* network network-name */
-#define	_SC_NETWNAME_MAX	sysconfcmd_maxprotname
+#ifndef	_SC_NETWNAME_MAX	/* network network-name */
+#define	_SC_NETWNAME_MAX	sysconfcmd_maxnetwname
 #endif /* _SC_PROTNAME_MAX */
 
 #ifndef	_SC_HOSTNAME_MAX	/* network host-name */
@@ -147,6 +148,9 @@ enum sysconfcmds {
 #define	_SC_SERVNAME_MAX	sysconfcmd_maxservname
 #endif /* _SC_SERVNAME_MAX */
 
+#ifndef	_SC_UTMPENT_SIZE_MAX
+#define	_SC_UTMPENT_SIZE_MAX	sysconfcmd_utent
+#endif
 #ifndef	_SC_GETPW_R_SIZE_MAX
 #define	_SC_GETPW_R_SIZE_MAX	sysconfcmd_pwent
 #endif
