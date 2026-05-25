@@ -39,9 +39,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizes.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizes.h>		/* LIBUC */
 
 
 class bufsizevar {
@@ -51,7 +51,7 @@ class bufsizevar {
 public:
 	constexpr bufsizevar(int n,int d = 0) noex : name(n), def(d) { 
 	    if (def == 0) def = (4*1024) ;
-	} ;
+	} ; /* end ctor */
 	bufsizevar() = delete ;
 	bufsizevar &operator = (const bufsizevar &) = delete ;
 	operator int () noex ;
