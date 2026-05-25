@@ -20,8 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
 
 
 EXTERNC_begin
