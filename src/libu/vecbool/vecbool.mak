@@ -49,9 +49,7 @@ OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -94,11 +92,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
-	makemodule vecbool
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
@@ -129,10 +126,9 @@ objb.o:			$(OBJB)
 
 
 vecbool0.o:		vecbool.ccm			$(INCS)
-	makemodule vecbool
+	gxx -c -x c++ -o $@ -O $<
 
-vecbool1.o:		vecbool1.cc vecbool.ccm		$(INCS)
-	makemodule vecbool
+vecbool1.o:		vecbool1.cc vecbool0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 
