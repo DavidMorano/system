@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -66,7 +66,7 @@ OBJ14= um.o uprocess.o ucodenames.o
 OBJ15= usysop.o vecbool.o uchartype.o
 
 OBJ16= syswords.o varnames.o
-OBJ17= ptx.o
+OBJ17= ptx.o sigblocker.o
 OBJ18= timeval.o itimerval.o 
 OBJ19= timespec.o itimerspec.o
 
@@ -88,7 +88,7 @@ OBJ31= ccfile.o readln.o dprint.o
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o cmporders.o localmisc.o
 OBJ34= exitcodes.o stacktypes.o sysconfcmds.o
-OBJ35= ascii.o
+OBJ35= utmptypes.o ascii.o mapex.o deb.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -105,8 +105,7 @@ OBJ += obje.o objf.o objg.o objh.o obji.o
 
 
 INCDIRS=
-
-LIBDIRS=
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -155,7 +154,7 @@ so:			$(T).so
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ) Makefile $(INCS)
@@ -184,6 +183,12 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat ischx		gcm.cache
+	rmsubpat findbit	gcm.cache
+	rmsubpat bitmanip	gcm.cache
+	rmsubpat bitgrp		gcm.cache
+	rmsubpat chrset		gcm.cache
+	rmsubpat chrset		gcm.cache
 	rmobj
 
 control:
@@ -488,6 +493,8 @@ ustream.dir:
 	makesubdir $@
 
 usigblock.o:		usigblock.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 ucodenames.o:		ucodenames.cc	ucodenames.h	$(INCS)
 
 # POSIX® synchronization mechanisms
@@ -505,24 +512,34 @@ intext.o:		intext.dir
 intext.dir:		varithmetic.o loadvals.o
 	makesubdir $@
 
+# DEBUG
+deb.o:			deb.dir
+deb.dir:
+	makesubdir $@
+
 # misc-objects
-chrset.o:		chrset.ccm			$(INCS)
-bitgrp.o:		bitgrp.ccm			$(INCS)
-nulstr.o:		nulstr.cc	nulstr.h	$(INCS)
-posixdirent.o:		posixdirent.cc	posixdirent.hh	$(INCS)
-binchunk.o:		binchunk.cc	binchunk.hh	$(INCS)
+chrset.o:		chrset.ccm					$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+bitgrp.o:		bitgrp.ccm					$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+nulstr.o:		nulstr.cc	nulstr.h			$(INCS)
+posixdirent.o:		posixdirent.cc	posixdirent.hh			$(INCS)
+binchunk.o:		binchunk.cc	binchunk.hh			$(INCS)
+sigblocker.o:		sigblocker.cc	sigblocker.h			$(INCS)
 
 # OTHER subroutine-groups
-ulogerror.o:		ulogerror.cc	ulogerror.h	$(INCS)
-umem.o:			umem.cc		umem.hh		$(INCS)
-um.o:			um.cc		um.h		$(INCS)
-usig.o:			usig.cc		usig.h		$(INCS)
-usysop.o:		usysop.cc	usysop.h	$(INCS)
-ugetloadavg.o:		ugetloadavg.cc	ugetloadavg.h	$(INCS)
-uexec.o:		uexec.cc	uexec.h		$(INCS)
-uinet.o:		uinet.cc	uinet.h		$(INCS)
-uiconv.o:		uiconv.cc	uiconv.h	$(INCS)
-uchartype.o:		uchartype.cc	uchartype.h	${INCS}
+ulogerror.o:		ulogerror.cc	ulogerror.h			$(INCS)
+umem.o:			umem.cc		umem.hh				$(INCS)
+um.o:			um.cc		um.h				$(INCS)
+usig.o:			usig.cc		usig.h				$(INCS)
+usysop.o:		usysop.cc	usysop.h			$(INCS)
+ugetloadavg.o:		ugetloadavg.cc	ugetloadavg.h			$(INCS)
+uexec.o:		uexec.cc	uexec.h				$(INCS)
+uinet.o:		uinet.cc	uinet.h				$(INCS)
+uiconv.o:		uiconv.cc	uiconv.h			$(INCS)
+uchartype.o:		uchartype.cc	uchartype.h			${INCS}
 
 # CONSTANTS
 endian.o:		endian.cc	endian.h			$(INCS)
@@ -539,9 +556,13 @@ filetypes.o:		filetypes.cc	filetypes.h			$(INCS)
 funcodes.o:		funcodes.cc	funcodes.h			$(INCS)
 
 # BITS
-bitmanip.o:		bitmanip.ccm					$(INCS)
 baops.o:		baops.c		baops.h				$(INCS)
+
+bitmanip.o:		bitmanip.ccm					$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
 findbit.o:		findbit.ccm					$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 # STRING handling
 strtox.o:		strtox.cc	strtox.h bitmanip.o		$(INCS)
@@ -554,7 +575,6 @@ readln.o:		readln.cc	readln.hh			$(INCS)
 dprint.o:		dprint.cc	dprint.hh			$(INCS)
 
 # ARITHMETIC
-bitmanip.o:		bitmanip.ccm
 muldigs.o:		muldigs.ccm
 loadvals.o:		loadvals.ccm
 
@@ -562,15 +582,21 @@ ischx.o:		ischx0.o ischx1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 ischx0.o:		ischx.ccm					$(INCS)
-	makemodule $<
+	gxx -c -x c++ -o $@ -O $<
 
+# singles
 ischx1.o:		ischx1.cc	ischx0.o			$(INCS)
 conintx.o:		conintx.cc	conintx.hh			$(INCS)
 udiv.o:			udiv.cc		udiv.hh				$(INCS)
 stdintx.o:		stdintx.cc	stdintx.h			$(INCS)
 xxtostr.o:		xxtostr.cc	xxtostr.h			$(INCS)
+
+# various types
+utmptypes.o:		utmptypes.cc	utmptypes.hh			$(INCS)
 cmporders.o:		cmporders.cc	cmporders.h			$(INCS)
 localmisc.o:		localmisc.cc	localmisc.h			$(INCS)
+mapex.o:		mapex.cc	mapex.h				$(INCS)
 sysconfcmds.o:		sysconfcmds.cc	sysconfcmds.h			$(INCS)
+ascii.o:		ascii.cc	ascii.h				$(INCS)
 
 
