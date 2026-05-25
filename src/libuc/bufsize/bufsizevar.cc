@@ -29,12 +29,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getbufsize.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bufsizevar.hh"
 
@@ -68,17 +68,19 @@
 
 /* exported subroutines */
 
+
+/* local subroutines */
+
 bufsizevar::operator int () noex {
 	int		rs = SR_OK ;
 	if (val == 0) nlikely {
-	    if ((rs = getbufsize(name)) > 0) ylikely {
+	    if ((rs = bufsizeget(name)) > 0) ylikely {
 		val = rs ;
 	    } else if (rs == 0) {
 		val = def ;
 	    }
 	} /* end if (needed) */
 	return (rs >= 0) ? val : rs ;
-}
-/* end method (bufsizevar::operator) */
+} /* end method (bufsizevar::operator) */
 
 
