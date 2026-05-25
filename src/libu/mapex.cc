@@ -72,11 +72,12 @@ constexpr mapex_map	def[] = {
 /* exported subroutines */
 
 int mapex(const mapex_map *mapexs,int rs) noex {
-	int		ex = EX_UNKNOWN ;
-	if (mapexs) {
-	    mapexs = def ;
-	}
+	int		ex = EX_OK ;
 	if (rs < 0) {
+	    ex = EX_UNKNOWN ;
+	    if (mapexs == nullptr) {
+	        mapexs = def ;
+	    } /* end if (default) */
 	    for (int i = 0 ; mapexs[i].rs ; i += 1) {
 	        if (mapexs[i].rs == rs) {
 		    ex = mapexs[i].ex ;
