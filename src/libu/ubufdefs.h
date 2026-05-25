@@ -209,8 +209,12 @@
 
 /* zone-info-name (from Zone-Info; a newer concept) */
 #ifndef	ZIBUFLEN
-#define	ZIBUFLEN	MAXNAMELEN	/* what some others have suggested */
+#ifndef	MAXNAMELEN	/* what some others have suggested */
+#define	ZIBUFLEN	MAXNAMELEN
+#else
+#define	ZIBUFLEN	255		/* what some others have suggested */
 #endif
+#endif /* ZIBUFLEN */
 
 
 #endif /* UBUFDEFS_INCLUDE */
