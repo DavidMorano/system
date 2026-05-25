@@ -57,8 +57,7 @@ OBJ_CTX= obja_ctx.o objb_ctx.o
 
 
 INCDIRS=
-
-LIBDIRS= -L${LIBDIR}
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -101,7 +100,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ_CTX)
@@ -116,6 +115,8 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat cvtdig		gcm.cache
+	rmsubpat cvtfloat	gcm.cache
 
 control:
 	(uname -n ; date) > Control
@@ -172,7 +173,10 @@ mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
 cvtdig.o:		cvtdig.ccm 			$(INCS)
-cvtfloat.o:		cvtfloat.ccm 			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+cvtfloat.o:		cvtfloat.ccm fmtflag.o		$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 convertx.o:		convertx.cc	convertx.h	$(INCS)
 
@@ -184,6 +188,11 @@ uconstants.dir:
 # UMODS
 umods.o:		umods.dir
 umods.dir:
+	makesubdir $@
+
+# FMTFLAG
+fmtflag.o:		fmtflag.dir
+fmtflag.dir:
 	makesubdir $@
 
 
