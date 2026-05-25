@@ -47,9 +47,9 @@
 #include	<fcntl.h>		/* |O_{x}| */
 
 
-/* maximum SHM name (as per POSIX®) */
-#ifndef	SHMNAME_MAX
-#define	SHMNAME_MAX	14		/* historic value (in decimal) */
+/* maximum numeric base for normal numeric conversions */
+#ifndef	MAXBASE
+#define	MAXBASE		64		/* standard (common) value */
 #endif
 
 /* maximum PID on the system (could be wrong) */
@@ -57,29 +57,74 @@
 #define	PID_MAX		999999		/* historic value (in decimal) */
 #endif
 
-#ifndef	MAXBASE
-#define	MAXBASE		64		/* standard (common) value */
-#endif
+#ifndef	LINE_MAX
+#define	LINE_MAX	4096
+#endif /* LINE_MAX */
 
 #ifndef	LINK_MAX
 #ifdef	MAXLINK
 #define	LINK_MAX	MAXLINK
-#else
-#ifdef	_POSIX_SYMLINK_MAX
-#define	LINK_MAX	_POSIX_SYMLINK_MAX
-#else
-#ifdef	MAXSYMLINKS
-#define	LINK_MAX	MAXSYMLINKS
 #else
 #ifdef	_POSIX_LINK_MAX
 #define	LINK_MAX	_POSIX_LINK_MAX
 #else
 #define	LINK_MAX	8
 #endif /* _POSIX_LINK_MAX */
-#endif /* MAXSYMLINKS */
-#endif /* _POSIC_SYNLINK_MAX */
 #endif /* MAXLINK */
 #endif /* LINK_MAX */
+
+#ifndef	NGROUPS_MAX
+#ifdef	NGROUPS_UMAX
+#define	NGROUPS_MAX	NGROUPS_UMAX
+#else
+#ifdef	NGROUPS
+#define	NGROUPS_MAX	NGROUPS
+#else
+#ifdef	_POSIX_NGROUPS_MAX
+#define	NGROUPS_MAX	_POSIX_NGROUPS_MAX
+#else
+#ifdef	NGROUPS_MAX_DEFAULT
+#define	NGROUPS_MAX	NGROUPS_MAX_DEFAULT
+#else
+#define	NGROUPS_MAX	32		/* typical normal value */
+#endif
+#endif
+#endif /* NGROUPS */
+#endif /* NGROUPS_UMAX */
+#endif /* NGROUPS_MAX */
+
+#ifndef	SYMLOOP_MAX
+#ifdef	_POSIX_SYMLOOP_MAX
+#define	SYMLOOP_MAX	_POSIX_SYMLOOP_MAX
+#else
+#ifdef	MAXSYMLINKS
+#define	SYMLOOP_MAX	MAXSYMLINKS
+#else
+#define	SYMLOOP_MAX	32
+#endif
+#endif
+#endif /* SYMLOOP_MAX */
+
+#ifndef	SYMBOL_MAX
+#define	SYMBOL_MAX	255
+#endif /* SYMBOL_MAX */
+
+#ifndef	NODENAME_MAX
+#define	NODENAME_MAX	255
+#endif /* NODENAME_MAX */
+
+#ifndef	NAME_MAX
+#define	NAME_MAX	NNBUFLEN
+#endif /* TZNAME_MAX */
+
+#ifndef	TZNAME_MAX
+#define	TZNAME_MAX	6
+#endif /* TZNAME_MAX */
+
+/* maximum SHM name (as per POSIX®) */
+#ifndef	SHMNAME_MAX
+#define	SHMNAME_MAX	14		/* historic value (in decimal) */
+#endif
 
 
 #endif /* USYSDEFSMAX_INCLUDE */
