@@ -21,18 +21,15 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<pthread.h>		/* |pthread_setmask(3c)| */
-#include	<cerrno>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<pthread.h>		/* POSIX |pthread_setmask(3c)| */
+#include	<cerrno>		/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 module usigsets ;
 
