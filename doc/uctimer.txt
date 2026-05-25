@@ -1,0 +1,4 @@
+UCTIMER
+
+This API group manages POSIC real-time timers.
+
