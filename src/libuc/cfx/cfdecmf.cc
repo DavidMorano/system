@@ -5,6 +5,7 @@
 /* Convert-From-Decimal-Multiply-Factor */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -77,23 +78,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>		/* |int64_t| */
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |int64_t| */
 #include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
-#include	<utility>		/* |in_range(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<intsat.h>
-#include	<ascii.h>
-#include	<cfdec.h>
-#include	<six.h>			/* |sialpha(3uc)| + |sichr(3uc)| */
-#include	<rmx.h>			/* |rmwht(3uc)| */
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<toxc.h>		/* |tolc(3uc)| */
-#include	<stdintx.h>		/* |int128_t| */
-#include	<localmisc.h>
+#include	<utility>		/* C++STD |in_range(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<cfdec.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC |si{x}(3uc)| */
+#include	<rmx.h>			/* LIBUC |rmwht(3uc)| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<toxc.h>		/* LIBUC |tolc(3uc)| */
+#include	<stdintx.h>		/* LIBU |int128_t| */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBG |DPRINTF(3f)| */
 
 #include	"cfdecmf.h"
 
@@ -103,12 +106,15 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 
 /* imported namespaces */
 
 
 /* local typedefs */
-
 
 /* external subroutines */
 
@@ -120,7 +126,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 constexpr char		xfacts[] = " kmgtpe" ;
 
-constexpr int		nfacts = lenstr(xfacts) ;
+constexpr int		nfacts = clenstr(xfacts) ;
+constexpr bool		f_debug = CF_DEBUG ;
 
 namespace {
     struct efactors {
@@ -143,27 +150,38 @@ template<typename T> local int inrange(int64_t v) noex {
     	cint		nbx = szof(int64_t) ;
     	cint		nb = szof(T) ;
     	int		rs = SR_OK ;
+	DPRINTF("ent\n") ;
 	if (nb <= nbx) {
 	    if (nb >= 2) {
-	        if (v >> ((nb * CHAR_BIT) - 1)) rs = SR_RANGE ;
+	        if (v >> ((nb * CHAR_BIT) - 1)) {
+		    rs = SR_RANGE ;
+		}
 	    } else {
 	        rs = SR_DOMAIN ;
 	    }
 	} /* end if (testable size) */
+	DPRINTF("ret rs=%d\n",rs) ;
     	return rs ;
 } /* end subroutine (inrange) */
 
 template<typename T> local int cfdecmfx(cc *sp,int µsl,T *rp) noex {
 	int		rs = SR_FAULT ;
 	int		rv = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
 	if (sp && rp) ylikely {
 	    rs = SR_INVALID ;
 	    if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	        if (int64_t mf{} ; (rs = getmf(sp,sl,&mf)) > 0) ylikely {
 	            cint	ml = rs ;
+		    DPRINTF("mf=%ld\n",longconv(mf)) ;
 	            if ((rs = inrange<T>(mf)) >= 0) ylikely {
+		        if_constexpr (f_debug) {
+			    strnul ps(sp,ml) ;
+		    	    DPRINTF("s=%s\n",ccp(ps)) ;
+		        }
 	                if (T v ; (rs = cfdec(sp,ml,&v)) >= 0) ylikely {
 		            const T	mfv = (T) mf ;
+		    	    DPRINTF("cfdec() v=%d\n",intsat(v)) ;
 		            if (T res{} ; (! ckd_mul(&res,v,mfv))) ylikely {
 	                        if (rp) *rp = res ;
 				rv = intsat(res) ; /* return-value */
@@ -175,6 +193,7 @@ template<typename T> local int cfdecmfx(cc *sp,int µsl,T *rp) noex {
 	        } /* end if (getmf) */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d rv=%d\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine-template (cfdecmfx) */
 
@@ -231,12 +250,18 @@ int cfdecmfull(cchar *sbuf,int slen,ulonglong *rp) noex {
 local int getmf(cchar *sbuf,int slen,int64_t *rp) noex {
 	int64_t		mf = 1 ; /* return-result */
 	int		rs = SR_INVALID ;
-	int		rl = 0 ; /* return-value */
+	int		rl = slen ; /* return-value */
+	DPRINTF("ent\n") ;
+	if_constexpr (f_debug) {
+	    strnul ps(sbuf,slen) ;
+	    DPRINTF("s=>%s<\n",ccp(ps)) ;
+	}
 	if (int sl ; (sl = rmwht(sbuf,slen)) > 0) ylikely {
 	    rs = SR_OK ;
 	    if (int si ; (si = sialpha(sbuf,sl)) > 0) {
 	        cint	chx = tolc(sbuf[si]) ;
 		cchar	*xp = (sbuf + si) ;
+	        DPRINTF("alpha atsi=%d\n",si) ;
 		rl = si ; /* <- return-value */
 		switch (cint xl = (sl - si) ; xl) {
 		case 1:
@@ -270,6 +295,7 @@ local int getmf(cchar *sbuf,int slen,int64_t *rp) noex {
 	    } /* end if (have extension) */
 	} /* end if (non-zero positive) */
 	*rp = mf ; /* <- return-result */
+	DPRINTF("ret rs=%d rl=%d\n",rs,rl) ;
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (getmf) */
 

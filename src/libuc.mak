@@ -40,11 +40,10 @@ MODS += bstree.ccm sview.ccm strfilter.ccm
 MODS += mapblock.ccm memtrack.ccm addrset.ccm
 MODS += sif.ccm
 
-LIBS= -lu -lsecdb
+LIBS= -lu -lsecdb -lnss
 
 
 INCDIRS=
-
 LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
@@ -78,14 +77,14 @@ OBJ05_INIT=
 OBJ06_INIT=
 OBJ07_INIT=
 
-OBJ00= deb.o matxstr.o toxc.o char.o 
+OBJ00= matxstr.o toxc.o char.o 
 OBJ01= strn.o strnxcmp.o
 OBJ02= snwcpy.o strcpyx.o strdcpy.o
 OBJ03= strw.o strx.o mnw.o
 
 OBJ04= isx.o
 OBJ05= nleadx.o
-OBJ06= mapex.o
+OBJ06=
 OBJ07=
 
 OBJ08= caches.o
@@ -113,7 +112,7 @@ OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
 OBJ26= ucdescmisc.o ucdesclock.o
 OBJ27= ucproc.o ucdata.o
 
-OBJ28= ucttyname.o uctc.o ucsysconf.o
+OBJ28= uctc.o ucsysconf.o
 OBJ29= uclibmem.o ucyserattr.o
 OBJ30= ucsys.o ucatexit.o ucatfork.o
 OBJ31= tcx.o ucpts.o ucpwcache.o
@@ -160,7 +159,7 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).so:		$(OBJ) Makefile
@@ -236,6 +235,10 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat bstree		gcm.cache
+	rmsubpat sview		gcm.cache
+	rmsubpat bufsizedata	gcm.cache
+	rmsubpat mapblock	gcm.cache
 
 control:
 	(uname -n ; date) > Control
@@ -374,6 +377,7 @@ ucobjmode.o:		ucobjmode.cc
 ucunlink.o:		ucunlink.cc
 uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
 ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
+ucinfo.o:		ucinfo.cc	ucinfo.h		$(INCS)
 
 ucdescbase.o:		ucdescbase.cc	ucdescbase.hh		$(INCS)
 
@@ -409,7 +413,6 @@ randomvar.o:		randomvar.cc randomvar.h
 serialbuf.o:		serialbuf.cc serialbuf.h stdorder.h
 stdorder.o:		stdorder.cc stdorder.h
 
-mapex.o:		mapex.cc mapex.h
 sigevent.o:		sigevent.cc sigevent.h
 timeout.o:		timeout.cc timeout.h
 upt.o:			upt.cc upt.h
@@ -455,7 +458,7 @@ ucproject.o:		ucproject.cc ucproject.h
 
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.ccm
-	makemodule mapblock
+	gxx -c -x c++ -o $@ -O $<
 
 # MEMTRACK
 memtrack.o:		memtrack.dir
@@ -937,9 +940,6 @@ ucinetconv.o:		ucinetconv.cc ucinetconv.h
 # tab and character column handling
 tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
 
-# INET
-inetconv.o:		inetconv.cc inetconv.h
-
 # LIBUC
 ucpts.o:		ucpts.cc	ucpts.h			$(INCS)
 ucpwcache.o:		ucpwcache.cc	ucpwcache.h		$(INCS)
@@ -1022,11 +1022,6 @@ termx.o:		termx.dir
 termx.dir:
 	makesubdir $@
 
-# DEBUG
-deb.o:			deb.dir
-deb.dir:
-	makesubdir $@
-
 # RECIP
 recip.o:		recip.dir
 recip.dir:
@@ -1093,7 +1088,6 @@ ipow.o:			ipow.cc		ipow.h			$(INCS)
 base64.o:		base64.cc	base64.h		$(INCS)
 shellunder.o:		shellunder.cc	shellunder.h		$(INCS)
 itcontrol.o:		itcontrol.cc	itcontrol.h		$(INCS)
-dictdiff.o:		dictdiff.cc	dictdiff.h		$(INCS)
 rsfree.o:		rsfree.cc	rsfree.h		$(INCS)
 xfile.o:		xfile.cc	xfile.h			$(INCS)
 sysmemutil.o:		sysmemutil.cc	sysmemutil.h		$(INCS)
@@ -1110,7 +1104,6 @@ conmsghdr.o:		conmsghdr.cc	conmsghdr.h		$(INCS)
 strval.o:		strval.cc strval.h
 
 # emulated system kernel calls
-uinfo.o:		uinfo.cc uinfo.h
 umask.o:		umask.cc umask.h
 unameo.o:		unameo.cc unameo.h
 
@@ -1120,12 +1113,15 @@ strenv.o:		strenv.cc	strenv.hh	$(INCS)
 
 # BSTREE
 bstree.o:		bstree.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 # SVIEW
 sview.o:		sview.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 # BUFSIZEDATA
 bufsizedata.o:		bufsizedata.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 
 obj00_mod.o:		$(OBJ00_MOD)
