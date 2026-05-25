@@ -70,11 +70,11 @@ export module cvtfloat ;
 
 import fmtflag ;
 
-constexpr int		wmax = 256 ;
-constexpr int		pmax = 256 ;
-constexpr int		fmtlen = 30 ;
-constexpr int		dlen = DECBUFLEN ;
-constexpr char		codes[] = "aefgAEFG" ;
+constexpr int		wmax	= 256 ;
+constexpr int		pmax	= 256 ;
+constexpr int		fmtlen	= 30 ;
+constexpr int		dlen	= DECBUFLEN ;
+constexpr char		codes[]	= "aefgAEFG" ;
 
 int ctstr(char *dbuf,int dlen,char *fp,int rl,int v) noex {
     	cnullptr	np{} ;
