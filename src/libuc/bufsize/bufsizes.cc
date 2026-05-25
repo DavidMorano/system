@@ -66,8 +66,10 @@ consteval void bufsizer::mknames() noex {
 	n[bufsize_gn]		= "GN" ;	/* name group-name */
 	n[bufsize_pn]		= "PN" ;	/* name project-name */
 	n[bufsize_protname]	= "PROTNAME" ;	/* name prot-name (protocol) */
+	n[bufsize_netwname]	= "NETWNAME" ;	/* name prot-name (network) */
 	n[bufsize_hostname]	= "HOSTNAME" ;	/* name host-name (host) */
 	n[bufsize_servname]	= "SERVNAME" ;	/* name serv-name (service) */
+	n[bufsize_ut]		= "UT" ;	/* entry system UTMP */
 	n[bufsize_pw]		= "PW" ;	/* entry system passwd */
 	n[bufsize_sp]		= "SP" ;	/* entry system shadow */
 	n[bufsize_ua]		= "UA" ;	/* entry system userattr */
