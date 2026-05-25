@@ -1,4 +1,4 @@
-/* tbufsizeget HEADER */
+/* bufsizeget HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	Name:
-	getbufsize
+	bufsizeget
 
 	Description:
 	This file provides the interface for retrieving system
@@ -33,9 +33,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizes.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizes.h>		/* LIBUC */
 
 
 #define	BUFSIZEGET_CONF		"/etc/default/bufsize"
