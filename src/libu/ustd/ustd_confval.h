@@ -37,9 +37,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sysconfcmds.h>		/* commands for |sysconf(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU commands for |sysconf(3c)| */
 
 
 namespace libu {
