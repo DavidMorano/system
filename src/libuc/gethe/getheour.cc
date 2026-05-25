@@ -63,7 +63,7 @@
 #include	<uinet.h>
 #include	<uclibmem.h>
 #include	<ucent.h>		/* |ucentho(3uc)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getnodename.h>		/* |getnodename(3uc)| */
 #include	<getxx.h>
 #include	<hostent.h>
@@ -204,14 +204,14 @@ int gether::tryname(cchar *name) noex {
 int gether::findcanonical() noex {
 	int		rs = SR_OK ;
 	if (hbuf) {
-	    if ((rs = getbufsize(bufsize_hostname)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 		cint	hlen = rs ;
 	        hostent	*hop = cast_static<hostentp>(hep) ;
 	        cchar	*canp ;
 	        if ((rs = hostent_getcanonical(hop,&canp)) >= 0) {
 		    rs = sncpy(hbuf,hlen,canp) ;
 	        } /* end if (hostent_getcanonical) */
-	    } /* end if (getbufsize) */
+	    } /* end if (bufsizeget) */
 	} /* end if (wanted) */
 	return rs ;
 } /* end method (gether::findcanonical) */
