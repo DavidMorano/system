@@ -151,7 +151,7 @@ obj.o:			$(OBJ)
 
 DEPS_MAIN	+= $(MODS) mods.o
 DEPS_OBJ	+= $(MODS)
-DEPS_SUB	+= fmtstrdata.o fmtspec.o cvtfloat.o
+DEPS_SUB	+= fmtstrdata.o fmtspec.o fmtutil.o cvtfloat.o
 DEPS_SPEC	+=
 DEPS_UTIL	+=
 
@@ -209,7 +209,7 @@ fmtutil0.o:		fmtutil.ccm $(DEPS_UTIL)		$(INCS)
 fmtutil1.o:		fmtutil1.cc fmtutil0.o			$(INCS)
 	$(COMPILE.cc) $<
 
-cvtfloat.o:		cvtfloat.ccm fmtflag.o		$(INCS)
+cvtfloat.o:		cvtfloat.ccm fmtflag.o			$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
 fmtflag.o:		fmtflag.dir
