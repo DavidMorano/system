@@ -49,9 +49,7 @@ OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -94,11 +92,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
-	makemodule usigsets
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
@@ -109,6 +106,7 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat usigsets	gcm.cache
 
 control:
 	(uname -n ; date) > Control
@@ -129,10 +127,9 @@ objb.o:			$(OBJB)
 
 
 usigsets0.o:		usigsets.ccm			$(INCS)
-	makemodule usigsets
+	gxx -c -x c++ -o $@ -O $<
 
-usigsets1.o:		usigsets1.cc usigsets.ccm	$(INCS)
-	makemodule usigsets
+usigsets1.o:		usigsets1.cc usigsets0.o	$(INCS)
 	$(COMPILE.cc) $<
 
 
