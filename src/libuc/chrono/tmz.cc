@@ -83,7 +83,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<estrings.h>		/* |osalpha(3uc)| */
 #include	<field.h>
 #include	<tmstrs.h>
@@ -1244,7 +1244,7 @@ tmz_co::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_zn)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_zn)) >= 0) ylikely {
 	    znlen = rs ;
 	}
 	return rs ;
