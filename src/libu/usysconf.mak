@@ -40,14 +40,16 @@ MODS +=
 LIBS +=
 
 
+DEPS= usysconfitems.o
+
 OBJPART=
 
 OBJPRIME= usysconf0.o
 
 OBJ0= usysconf1.o
-OBJ1=
+OBJ1= usysconfitems.o
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 OBJB=
 
 OBJIMPL= obja.o
@@ -141,11 +143,14 @@ objimpl.o:		$(OBJIMPL)
 
 
 # module primary
-usysconf0.o:		usysconf.ccm			$(INCS)
+usysconf0.o:		usysconf.ccm				$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
 # module implementation
-usysconf1.o:		usysconf1.cc usysconf0.o	$(INCS)
+usysconf1.o:		usysconf1.cc usysconf0.o $(DEPS)	$(INCS)
 	$(COMPILE.cc) $<
+
+usysconfitems.o:	usysconfitems.ccm 			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 
