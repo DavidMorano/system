@@ -90,6 +90,7 @@ const int	ulibvals::maxarg	= getval(_SC_ARG_MAX) ;
 const int	ulibvals::maxline	= getval(_SC_LINE_MAX) ;
 const int	ulibvals::maxlink	= getval(_SC_LINK_MAX) ;
 const int	ulibvals::maxlogin	= getval(_SC_LOGIN_NAME_MAX) ;
+const int	ulibvals::maxsymloop	= getval(_SC_SYMLOOP_MAX) ;
 const int	ulibvals::maxsymbol	= getval(_SC_SYMBOL_MAX) ;
 const int	ulibvals::maxgroups	= getval(_SC_NGROUPS_MAX) ;
 const int	ulibvals::maxnamelen	= getval(_SC_NAME_MAX) ;
