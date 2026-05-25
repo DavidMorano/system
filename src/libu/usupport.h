@@ -44,6 +44,7 @@
 #include	<usupport_hasnot.hh>
 #include	<usupport_itimer.hh>
 #include	<usupport_matkeystr.hh>
+#include	<usupport_matostr.hh>
 #include	<usupport_matstr.hh>
 #include	<usupport_nleadkeystr.hh>
 #include	<usupport_nleadstr.hh>
