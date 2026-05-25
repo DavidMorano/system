@@ -269,7 +269,9 @@ int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 	        if (int si ; (si = siochr(sp,sl,'#')) >= 0) {
 		    sl = si ;
 	        } else {
-		    while (sl && iseol(sp[sl - 1])) sl -= 1 ;
+		    while (sl && iseol(sp[sl - 1])) {
+			sl -= 1 ;
+		    } /* end while */
 	        } /* end if (comment or EOL) */
 		if (sl) {
 		    rl = sfshrink(sp,sl,&rp) ;
