@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* debugging */
-#define	CF_LOAD		0		/* load defaults from file */
+#define	CF_LOAD		1		/* load defaults from file */
 
 /* revision history:
 
@@ -80,7 +80,7 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<ucsysconf.h>		/* LIBU */
 #include	<timewatch.hh>		/* LIBU */
-#include	<vecstr.h>		/* LIBUC */
+#include	<strnul.hh>		/* LIBU */
 #include	<matostr.h>		/* LIBUC */
 #include	<cfdecmf.h>		/* LIBUC */
 #include	<mailvalues.hh>		/* |hostnamemult| + |nodenamemult| */
@@ -101,13 +101,21 @@ import bufsizedata ;
 #define	CF_DEBUG	0		/* debugging */
 #endif
 
+#ifndef	MAXLINELEN
+#define	MAXLINELEN	(2 * 1024)
+#endif
+
 
 /* imported modules */
 
-import bufsizedata ;
+import bufsizedata ;			/* default values */
+import ureserve ;			/* |sf{x}(3u)| */
 
 
 /* imported namespaces */
+
+using libu::strnchr ;			/* subroutine */
+using libu::cfdec ;			/* subroutine */
 
 
 /* local typedefs */
@@ -122,24 +130,32 @@ import bufsizedata ;
 /* local structures */
 
 namespace {
-    class ubufsize {
+    class ubufmgr {
 	aflag		finit ;
 	aflag		finitdone ;
 	aflag		fbegin ;
 	aflag		floaded ;
-	int init() noex ;
-	int begin() noex ;
-	int load() noex ;
-	int loadent(cchar *) noex ;
-	int retrieve(int) noex ;
-	int sysbs(int,int) noex ;
-	int def(int) noex ;
-	int zoneinfo(int) noex ;
-	int mailaddr(int) noex ;
+	int init	() noex ;
+	int begin	() noex ;
+	int retrieve	(int) noex ;
+	int sysbs	(int,int) noex ;
+	int def		(int) noex ;
+	int zoneinfo	(int) noex ;
+	int mailaddr	(int) noex ;
     public:
 	int		bs[bufsize_overlast] ; /* Buffer-Size */
 	int operator [] (int) noex ;
-    } ; /* end class (ubufsize) */
+	int fileload	(cchar *) noex ;
+	int fileread	(int,csize) noex ;
+	int fileline	(cchar *,csize) noex ;
+	int fileparse	(cchar *,int) noex ;
+	int filelook	(cchar *,int,cchar *,int) noex ;
+	ubufmgr() noex {
+	    for (int i = 0 ; i < bufsize_overlast ; i += 1) {
+		bs[i] = 0 ;
+	    } /* end for */
+	} ; /* end ctor */
+    } ; /* end class (ubufmgr) */
 } /* end namespace */
 
 
@@ -148,10 +164,10 @@ namespace {
 
 /* local variables */
 
-static ubufsize		ubufsize_data ;
-
+static ubufmgr		ubuf_vals ;
 constexpr bufsizedata	bufdata ;
-
+constexpr int		maxline		= MAXLINELEN ;
+constexpr char		fileconf[]	= BUFSIZEGET_CONF ;
 cbool			f_debug		= CF_DEBUG ;
 cbool			f_load		= CF_LOAD ;
 
@@ -162,35 +178,37 @@ int bufsizeget(int w) noex {
     	int		rs ;
     	DPRINTF("ent w=%d\n",w) ;
 	{
-	    rs = ubufsize_data[w] ;
+	    rs = ubuf_vals[w] ;
 	}
     	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 }
-/* end subroutine (getbusize) */
+/* end subroutine (busizeget) */
 
 
 /* local subroutines */
 
-int ubufsize::operator [] (int w) noex {
+int ubufmgr::operator [] (int w) noex {
 	int		rs = SR_INVALID ;
 	DPRINTF("ent »bufsizeget« w=%d\n",w) ;
 	if ((w >= 0) && (w < bufsize_overlast)) {
+	    DPRINTF("name=%s\n",bufsizenames[w]) ;
 	    if ((rs = bs[w]) == 0) {
 		DPRINTF("-> init\n") ;
 	        if ((rs = init()) >= 0) {
 		    DPRINTF("init() rs=%d\n",rs) ;
 	            rs = retrieve(w) ;
 		    DPRINTF("retrieve() rs=%d\n",rs) ;
-	        } /* end if (ubufsize::init) */
+	        } /* end if (ubufmgr::init) */
 		DPRINTF("init-out rs=%d\n",rs) ;
 	    } /* end if (need initialization) */
+	    DPRINTF("bs[%d]-out rs=%d\n",w,rs) ;
 	} /* end if (valid) */
-	DPRINTF("ret »getbufszie« rs=%d\n",rs) ;
+	DPRINTF("ret »bufszieget« rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (ubufsize::operator) */
+} /* end subroutine (ubufmgr::operator) */
 
-int ubufsize::init() noex {
+int ubufmgr::init() noex {
 	cint		to = utimeout[uto_busy] ;
 	int		rs = SR_OK ;
 	int		f = false ;
@@ -219,76 +237,22 @@ int ubufsize::init() noex {
 	} /* end if (time-watching) */
 	DPRINTF("ret »init« rs=%d f=%d\n",rs,f) ;
 	return (rs >= 0) ? f : rs ;
-} /* end subroutine (ubufsize::init) */
+} /* end subroutine (ubufmgr::init) */
 
-int ubufsize::begin() noex {
+int ubufmgr::begin() noex {
 	int		rs = SR_OK ;
 	if (! fbegin) {
 	    fbegin = true ;
-	    rs = load() ;
-	}
+	    if_constexpr (f_load) {
+	        rs = fileload(fileconf) ;
+	    } /* end if_constexpr (f_load) */
+	} /* end if (fileload) */
 	return rs ;
-} /* end subroutine (ubufsize::begin) */
+} /* end subroutine (ubufmgr::begin) */
 
-int ubufsize::load() noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	DPRINTF("ent\n") ;
-	if_constexpr (f_load) {
-	if (! floaded) {
-	    DPRINTF("not-loaded\n") ;
-	    floaded = true ;
-	    if (vecstr cfv ; (rs = cfv.start(1,0)) >= 0) ylikely {
-	        cchar	*fn = GETBUFSIZE_CONF ;
-	        DPRINTF("fn=%s\n",fn) ;
-	        DPRINTF("vecstr_start() rs=%d\n",rs) ;
-	        if ((rs = cfv.envfile(fn)) >= 0) ylikely {
-	            cchar	*kp ;
-	            DPRINTF("vecstr_envfile() rs=%d\n",rs) ;
-	            for (int i = 0 ; cfv.get(i,&kp) >= 0 ; i += 1) {
-	                if (kp) {
-			    rs = loadent(kp) ;
-	                } /* end if (non-null) */
-	                if (rs < 0) break ;
-	            } /* end for */
-	        } else if (isNotPresent(rs)) {
-	            DPRINTF("vecstr_envfile-out not-present rs=%d\n",rs) ;
-	            rs = SR_OK ;
-	        }
-	        DPRINTF("vecstr_envfile-out rs=%d\n",rs) ;
-	        rs1 = cfv.finish ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (vecstr) */
-	} /* end if (need load) */
-	} /* end if_constexpr (f_load) */
-	DPRINTF("ret rs=%d\n",rs) ;
-	return rs ;
-} /* end subroutine (bufsize_load) */
-
-int ubufsize::loadent(cchar *kp) noex {
-    	int		rs = SR_OK ;
-	int		kl = -1 ;
-	int		vl = 0 ;
-	cchar		*vp = nullptr ;
-	cpcchar		*vars = bufsizenames ;	/* <- from |bufsizes| */
-	if (cchar *tp ; (tp = strchr(kp,'=')) != nullptr) {
-	    kl = intconv(tp - kp) ;
-	    vp = (tp+1) ;
-	    vl = -1 ;
-	} /* end if */
-	if (int w ; (w = matocasestr(vars,4,kp,kl)) >= 0) {
-	    if (int v ; (rs = cfdecmfi(vp,vl,&v)) >= 0) {
-		bs[w] = v ;
-	    } else if (isNotValid(rs)) {
-		rs = SR_OK ;
-	    }
-	} /* end if (matocasestr) */
-	return rs ;
-} /* end method (ubufsize::loadent) */
-
-int ubufsize::retrieve(int w) noex {
+int ubufmgr::retrieve(int w) noex {
 	int		rs ;
-	DPRINTF("ent w=%d\n",w) ;
+	DPRINTF("ent w=%d bs=%d\n",w,bs[w]) ;
 	if ((rs = bs[w]) == 0) {
 	    cint	name = bufdata[w].name ;
 	    cint	defval = bufdata[w].defval ;
@@ -297,12 +261,12 @@ int ubufsize::retrieve(int w) noex {
 	        DPRINTF("name-yes\n") ;
 	        if ((rs = sysbs(w,name)) == SR_NOTSUP) {
 	            DPRINTF("sysbs-notsup\n") ;
-		    rs = (defval) ? defval : GETBUFSIZE_DEFVAL ;
+		    rs = (defval) ? defval : BUFSIZEGET_DEFVAL ;
 		    bs[w] = rs ;
 		} else if (rs == 0) {
 	            DPRINTF("sysbs-zero\n") ;
- 		    rs  = GETBUFSIZE_DEFVAL ;
-		} /* end if (ubufsize::sysbs) */
+ 		    rs  = BUFSIZEGET_DEFVAL ;
+		} /* end if (ubufmgr::sysbs) */
 	        DPRINTF("sysbs-out rs=%d\n",rs) ;
 	    } else {
 	        DPRINTF("name-not\n") ;
@@ -312,9 +276,9 @@ int ubufsize::retrieve(int w) noex {
 	} /* end if (getting default value) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (ubufsize::retrieve) */
+} /* end subroutine (ubufmgr::retrieve) */
 
-int ubufsize::sysbs(int w,int name) noex {
+int ubufmgr::sysbs(int w,int name) noex {
 	int		rs = bs[w] ;
 	DPRINTF("ent w=%d name=%d\n",w,name) ;
 	if (bs[w] == 0) {
@@ -331,13 +295,13 @@ int ubufsize::sysbs(int w,int name) noex {
 	} /* end if */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end method (ubufsize::sysbs) */
+} /* end method (ubufmgr::sysbs) */
 
-int ubufsize::def(int w) noex {
+int ubufmgr::def(int w) noex {
 	cint		defval = bufdata[w].defval ;
 	int		rs = SR_OK ;
 	if (defval >= 0) {
-    	    bs[w] = (defval) ? defval : GETBUFSIZE_DEFVAL ;
+    	    bs[w] = (defval) ? defval : BUFSIZEGET_DEFVAL ;
 	} else {
 	    switch (w) {
 	    case bufsize_zi:
@@ -352,19 +316,19 @@ int ubufsize::def(int w) noex {
 	    } /* end switch */
 	} /* end if */
 	return rs ;
-} /* end method (ubufsize::def) */
+} /* end method (ubufmgr::def) */
 
 /* yes; I call myself recursively - repeatedly (deal with it) */
-int ubufsize::zoneinfo(int w) noex {
+int ubufmgr::zoneinfo(int w) noex {
     	int		rs ;
 	if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 	    bs[w] = rs ;
 	}
 	return rs ;
-} /* end method (ubufsize::zoneinfo) */
+} /* end method (ubufmgr::zoneinfo) */
 
 /* yes; I call myself recursively - repeatedly (deal with it) */
-int ubufsize::mailaddr(int w) noex {
+int ubufmgr::mailaddr(int w) noex {
     	cint		hostmult = mailvalue.hostnamemult ;
     	cint		nodemult = mailvalue.nodenamemult ;
     	int		rs ;
@@ -377,6 +341,138 @@ int ubufsize::mailaddr(int w) noex {
 	    }
 	} /* end if (bufsizeget) */
 	return rs ;
-} /* end method (ubufsize::mailaddr) */
+} /* end method (ubufmgr::mailaddr) */
+
+int ubufmgr::fileload(cchar *fn) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
+	if (fn) ylikely {
+	    rs = SR_INVALID ;
+	    if (fn[0]) ylikely {
+		cint	of = O_RDONLY ;
+		if ((rs = u_open(fn,of,0)) >= 0) ylikely {
+		    cint	fd = rs ;
+		    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
+			csize	fsize = size_t(sb.st_size) ;
+		        if (S_ISREG(sb.st_mode)) ylikely {
+			    if (fsize > 0) {
+			        rs = fileread(fd,fsize) ;
+			        c += rs ;
+			    } /* end if (non-zero positive) */
+			} /* end if (regular file) */
+		    } /* end if (stat) */
+		    rs1 = u_close(fd) ;
+		    if (rs >= 0) rs = rs1 ;
+		} else if (isNotPresent(rs)) {
+		    rs = SR_OK ;
+		} /* end if (open) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
+	return (rs >= 0) ? c : rs ;
+} /* end method (ubufmgr::fileload) */
+
+int ubufmgr::fileread(int fd,csize ms) noex {
+	cnullptr	np{} ;
+	cint		mp = PROT_READ ;
+	cint		mf = MAP_SHARED ;
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
+	if (void *md ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) ylikely {
+	    cint	cmd = MADV_SEQUENTIAL ;
+	    if ((rs = u_madvise(md,ms,cmd)) >= 0) ylikely {
+		size_t	ll = ms ;
+		cchar	*lp = charp(md) ;
+		for (cchar *tp ; (tp = charp(memchr(lp,'\n',ll))) != np ; ) {
+		    csize lsize = size_t((tp + 1) - lp) ;
+		    {
+		        rs = fileline(lp,lsize) ;
+		        c += rs ;
+		    }
+		    ll -= lsize ;
+		    lp += lsize ;
+		    if (rs < 0) break ;
+		} /* end for */
+	    } /* end if (memory-advise) */
+	    rs1 = u_mmapend(md,ms) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (map-file) */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
+	return (rs >= 0) ? c : rs ;
+} /* end method (ubufmgr::fileread) */
+
+int ubufmgr::fileline(cchar *lp,csize lsize) noex {
+    	int		rs = SR_OK ;
+	int		c = 0 ;
+	if (lsize <= maxline) {
+	    cint lsz = intconv(lsize) ;
+	    cchar *cp ;
+	    if (int cl ; (cl = sfcontent(lp,lsz,&cp)) > 0) {
+		rs = fileparse(cp,cl) ;
+		c += rs ;
+	    } /* end if (sfcontent) */
+	} /* end if (sanity-check) */
+	return (rs >= 0) ? c : rs ;
+} /* end method (ubufmgr::fileline) */
+
+int ubufmgr::fileparse(cchar *sp,int sl) noex {
+    	int		rs = SR_OK ;
+	int		kl = -1 ;
+	int		vl = 0 ;
+	int		c = 0 ; /* return-value */
+	cchar		*kp = sp ;
+	cchar		*vp = nullptr ;
+	DPRINTF("ent\n") ;
+	if (cchar *tp = strnchr(sp,sl,'=') ; tp) {
+	    if (cint tl = intconv(tp - sp) ; tl > 0) {
+		if ((kl = sfshrink(sp,tl,&kp)) > 0) {
+		    sl -= intconv((tp + 1) - sp) ;
+		    sp = (tp + 1) ;
+		    if ((vl = sfshrink(sp,sl,&vp)) > 0) {
+			rs = filelook(kp,kl,vp,vl) ;
+			c += rs ;
+		    } /* end if (non-zero positive) */
+		} /* end if (non-zero positive) */
+	    } /* end if (non-zero positive) */
+	} else {
+	    if ((kl = sfnext(sp,sl,&kp)) > 0) {
+		sl -= intconv((kp + kl) - sp) ;
+		sp = (kp + kl) ;
+		if ((vl = sfnext(sp,sl,&vp)) > 0) {
+		    rs = filelook(kp,kl,vp,vl) ;
+		    c += rs ;
+		} /* end if (sfnext) */
+	    } /* end if (sfnext) */
+	} /* end if */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
+	return (rs >= 0) ? c : rs ;
+} /* end method (ubufmgr::fileline) */
+
+int ubufmgr::filelook(cchar *kp,int kl,cchar *vp,int vl) noex {
+    	int		rs = SR_OK ;
+	int		c = 0 ; /* return-value */
+	cpcchar		*names = bufsizenames ;	/* <- from |bufsizes| */
+	DPRINTF("ent\n") ;
+	if_constexpr (f_debug) {
+	    strnul ks(kp,kl) ;
+	    strnul vs(vp,vl) ;
+	    DPRINTF("key=%s\n",ccp(ks)) ;
+	    DPRINTF("val=%s\n",ccp(vs)) ;
+	} /* end if_constexpr (f_debug) */
+	if (int w ; (w = matocasestr(names,2,kp,kl)) >= 0) {
+	    if (int v ; (rs = cfdecmf(vp,vl,&v)) >= 0) {
+		DPRINTF("load v=%d\n",v) ;
+		bs[w] = v ;
+	    } else if (isNotValid(rs)) {
+		rs = SR_OK ;
+	    }
+	} /* end if (matocasestr) */
+	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
+	return (rs >= 0) ? c : rs ;
+} /* end method (ubufmgr::filelook) */
 
 
