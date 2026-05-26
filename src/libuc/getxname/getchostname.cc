@@ -69,7 +69,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sncpyx.h>
 #include	<hostinfo.h>
 #include	<localmisc.h>
@@ -111,7 +111,7 @@ int getchostname(char *hbuf,cchar *name) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (hbuf && name) ylikely {
-	    if ((rs = getbufsize(bufsize_hostname)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 	        cint	af = AF_UNSPEC ;
 	        cint	hlen = rs ;
 	        if (hostinfo hi ; (rs = hostinfo_start(&hi,af,name)) >= 0) {
@@ -123,7 +123,7 @@ int getchostname(char *hbuf,cchar *name) noex {
 	            rs1 = hostinfo_finish(&hi) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (hostinfo) */
-	    } /* end if (getbufsize) */
+	    } /* end if (bufsizeget) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
