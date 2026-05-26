@@ -27,21 +27,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>		/* |off_t| */
-#include	<fcntl.h>
-#include	<climits>		/* |ULONG_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucdesc.h>
-#include	<sysval.hh>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX |off_t| */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD |ULONG_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBU */
+#include	<sysval.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"filemap.h"
 
@@ -56,18 +57,12 @@ import libutil ;			/* |memclear(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-}
 
 
 /* external variables */
@@ -82,13 +77,14 @@ template<typename ... Args>
 local int filemap_ctor(filemap *op,Args ... args) noex {
     	FILEMAP		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->stbp = new(nothrow) ustat) != np) ylikely {
+	    if ((op->stbp = new(nt) ustat) != np) ylikely {
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-ustat) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (filemap_ctor) */
@@ -100,13 +96,13 @@ local int filemap_dtor(filemap *op) noex {
 	    if (op->stbp) ylikely {
 		delete op->stbp ;
 		op->stbp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (filemap_dtor) */
 
-local int filemap_opener(filemap *,cchar *) noex ;
-local int filemap_openmap(filemap *,int,size_t) noex ;
+local int filemap_opener	(filemap *,cchar *) noex ;
+local int filemap_openmap	(filemap *,int,size_t) noex ;
 
 
 /* local variables */
@@ -313,8 +309,7 @@ local int filemap_opener(filemap *op,cchar *fn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file-open) */
 	return rs ;
-}
-/* end subroutine (filemap_opener) */
+} /* end subroutine (filemap_opener) */
 
 local int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 	cnullptr	np{} ;
@@ -335,12 +330,11 @@ local int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 	        }
 	        if (rs < 0) {
 	            u_mmapend(md,ms) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (mmap) */
 	} /* end if (pagesz) */
 	return rs ;
-}
-/* end subroutine (filemap_openmap) */
+} /* end subroutine (filemap_openmap) */
 
 filemap_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -355,8 +349,7 @@ filemap_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (filemap_co::operator) */
+} /* end method (filemap_co::operator) */
 
 int filemap_teller::operator () (off_t *fop) noex {
 	int		rs = SR_BUGCHECK ;
@@ -368,8 +361,7 @@ int filemap_teller::operator () (off_t *fop) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (filemap_teller::operator) */
+} /* end method (filemap_teller::operator) */
 
 int filemap::open(cchar *fn,size_t fsz) noex {
     	return filemap_open(this,fn,fsz) ;
