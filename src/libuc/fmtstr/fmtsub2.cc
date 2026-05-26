@@ -58,9 +58,7 @@ module ;
 
 module fmtsub ;
 
-import fmtstrdata ;
 import fmtutil ;
-import fmtspec ;
 
 /* local defines */
 
@@ -119,6 +117,7 @@ int fmtsub_start(fmtsub *op,char *ubuf,int ulen,int fm) noex {
 	    op->mode = fm ;
 	    op->fl.mclean	= !!(fm & fopt.clean) ;
 	    op->fl.mnooverr	= !!(fm & fopt.nooverr) ;
+	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -136,6 +135,7 @@ int fmtsub_finish(fmtsub *op) noex {
 	            if (! op->fl.mnooverr) rs = SR_OVERFLOW ;
 	        }
 		op->ubuf = nullptr ;
+		rs = SR_OK ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -208,10 +208,10 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	    if (op->fl.mclean) {
 	        int	hl = sl ;
 	        bool	f_eol = false ;
-	        if ((sl > 0) && (sp[sl-1] == '\n')) {
-	            hl = (sl-1) ;
+	        if ((sl > 0) && (sp[sl - 1] == '\n')) {
+	            hl = (sl - 1) ;
 	            f_eol = true ;
-	        }
+	        } /* end if */
 	        if (hasourbad(sp,hl)) {
 	            if (cint sz = (sl + 1) ; (rs = umem.mall(sz,&abuf)) >= 0) {
 	                int	i ; /* used-afterwards */
@@ -221,7 +221,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 				ch = chx_badsub ;
 			    }
 	                    abuf[i] = char(ch) ;
-	                }
+	                } /* end for */
 	                if (f_eol) abuf[i++] = '\n' ;
 	                sl = i ;
 	                sp = abuf ;
@@ -232,10 +232,10 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	if (rs >= 0) {
 	    rs = fmtsub_strw(op,sp,sl) ;
 	    len = rs ;
-	}
+	} /* end if (ok) */
 	if (abuf) {
 	    umem.free(abuf) ;
-	}
+	} /* end if (memory-release) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (fmtsub_cleanstrw) */
@@ -305,12 +305,12 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	if (rs >= 0) {
 	    /* continue with normal character processing */
 	    if ((sp == nullptr) && (sl != 0)) {
-	        sp = nullstr ;
+	        sp = nullptr ;
 	        sl = -1 ;
 	        width = -1 ;
 	        prec = -1 ;
-	    }
-	   /* currently not needed if we did the string conversion above */
+	    } /* end if */
+	    /* currently not needed if we did the string conversion above */
 	    if ((sl != 0) && (! (f_wint || f_wchar))) {
 	        sl = lenstr(sp,sl) ;
 	    }
@@ -328,19 +328,19 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	    if ((width > 0) && (width > sl)) {
 	        rs = fmtsub_blanks(op,(width - sl)) ;
 	    }
-	}
+	} /* end if */
 	if (rs >= 0) {
 	    rs = fmtsub_cleanstrw(op,sp,sl) ;
-	}
+	} /* end if (ok) */
 	if ((rs >= 0) && fsp->fl.left) {
 	    if ((width > 0) && (width > sl)) {
 	        rs = fmtsub_blanks(op,(width - sl)) ;
 	    }
-	}
+	} /* end if */
 	if (f_memalloc && sp) {
 	    char *bp = cast_const<charp>(sp) ;
 	    umem.free(bp) ;
-	}
+	} /* end if (memory-release) */
 	return (rs >= 0) ? fcode : rs ;
 }
 /* end subroutine (fmtsub_formstr) */
