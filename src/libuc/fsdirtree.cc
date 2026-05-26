@@ -63,7 +63,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<fsdir.h>
 #include	<fifostr.h>
 #include	<strwcpy.h>
@@ -726,7 +726,7 @@ fsdirtree_co::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	    maxlinklen = (rs * MAXLINKLEN_MULT) ;
 	}
