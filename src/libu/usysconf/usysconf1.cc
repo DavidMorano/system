@@ -399,7 +399,7 @@ int usysconf::synthetic(int req) noex {
 	    val = PJBUFLEN ;
 	    break ;
         case sysconfcmd_maxmsg:
-	    val = getdefmsg() ;
+	    rs = getdefmsg() ;
 	    break ;
 	case sysconfcmd_fstype:
 	    val = FSBUFLEN ;
@@ -417,12 +417,11 @@ int usysconf::synthetic(int req) noex {
 	    rs = SR_NOSYS ;
 	    break ;
 	} /* end switch */
-	if (lp && (val >= 0)) {
-	    *lp = (rs >= 0) ? val : 0L ;
-	}
-	if ((rs >= 0) && (val >= 0)) {
+	if (rs >= 0) {
+	    if (val < 0) val = rs ;
 	    rs = intsat(val) ;
-	}
+	} /* end if (ok) */
+	if (lp) *lp = (rs >= 0) ? val : 0L ;
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (usysconf::synthetic) */
