@@ -63,7 +63,7 @@
 #include	<ucsysmisc.h>
 #include	<uclibmem.h>
 #include	<ucdescread.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<filetypes.h>		/* |filetype(3u)| */
 #include	<localmisc.h>
 
@@ -277,9 +277,9 @@ vars::operator int () noex {
 	if ((rs = pagesz) == 0) ylikely {
 	    if ((rs = ucpagesize) >= 0) ylikely {
 	        pagesz = rs ;
-		if ((rs = getbufsize(bufsize_mm)) >= 0) ylikely {
+		if ((rs = bufsizeget(bufsize_mm)) >= 0) ylikely {
 		    msglen = rs ;
-		    if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
+		    if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 			maxnamelen = rs ;
 		    }
 		}
