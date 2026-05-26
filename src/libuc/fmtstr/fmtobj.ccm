@@ -135,7 +135,7 @@ export {
 	fmtobj(char *b,int l,int m,cchar *f) noex : ubuf(b), ulen(l) {
 	    fm = m ;
 	    fmt = f ;
-	} ;
+	} ; /* end ctor */
 	int operator () (va_list) noex ;
 	int start() noex ;
 	int finish() noex ;
