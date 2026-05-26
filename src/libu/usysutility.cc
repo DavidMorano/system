@@ -35,24 +35,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>		/* |sleep(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdio>		/* |vsnprintf(3c)| */
-#include	<cstring>		/* |strlcpy(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)|  */
-#include	<string>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscallbase.hh>	/* |usyscallbase(3u)| */
-#include	<utimeout.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<sys/types.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD |vsnprintf(3c)| */
+#include	<cstring>		/* CSTD */
+#include	<string>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscallbase.hh>	/* LIBU |usyscallbase(3u)| */
+#include	<utimeout.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"usysutility.hh"
 
@@ -64,20 +58,13 @@
 
 using std::string ;			/* type */
 using libu::usyscallbase ;		/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::to_string ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	msleep(int) noex ;
-}
 
 namespace libu {
     extern int	snwcpy(char *,int,cchar *,int = -1) noex ;
