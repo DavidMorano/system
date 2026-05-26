@@ -14,7 +14,7 @@
 	effective!
 
 	= 2019-01-05, David A-D- Morano
-	Enhanced error checking for |getbufsize(3uc)|.
+	Enhanced error checking for |bufsizeget(3uc)|.
 	
 */
 
@@ -51,7 +51,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<snx.h>
 #include	<sncpyx.h>
