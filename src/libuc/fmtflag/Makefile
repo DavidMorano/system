@@ -44,9 +44,7 @@ OBJ= fmtflag0.o fmtflag1.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -89,7 +87,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -122,10 +120,9 @@ obj03.o:		$(OBJ03)
 
 
 fmtflag0.o:		fmtflag.ccm			$(INCS)
-	makemodule fmtflag
+	gxx -c -x c++ -o $@ -O $<
 
-fmtflag1.o:		fmtflag1.cc fmtflag.ccm		$(INCS)
-	makemodule fmtflag
+fmtflag1.o:		fmtflag1.cc fmtflag0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 
