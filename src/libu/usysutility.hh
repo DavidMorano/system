@@ -21,12 +21,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<udiv.hh>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 namespace libu {
