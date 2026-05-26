@@ -136,7 +136,7 @@
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getax.h>
 #include	<getpwx.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getutmpent.h>		/* <- for |getutmpname(3uc)| */
 #include	<aflag.hh>
 #include	<utmpacc.h>
@@ -286,7 +286,7 @@ int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	if (pwp && pwbuf) ylikely {
 	    rs = SR_INVALID ;
 	    if (pwlen > 0) ylikely {
-	        if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
+	        if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		    getxuser	xu{} ;
 		    cint	ulen = rs ;
 		    char	ubuf[rs + 1] ;	/* <- on the stack */
@@ -298,7 +298,7 @@ int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	            xu.uid = uid ;
 	            rs = getxusername(&xu) ;
 		    len = rs ;
-	        } /* end if (getbufsize) */
+	        } /* end if (bufsizeget) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
