@@ -51,7 +51,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<uinfo.h>
+#include	<ucinfo.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<rmx.h>			/* <- for |rmchr(3uc)| */
@@ -150,10 +150,10 @@ int nodeinfo::env() noex {
 
 int nodeinfo::uinfo() noex {
 	int		rs ;
-	if (uinfo_names uin ; (rs = uinfo_name(&uin)) >= 0) {
+	if (ucinfo_names uin ; (rs = ucinfo_name(&uin)) >= 0) {
 	    cint	nl = rmchr(uin.nodename,-1,'.') ;
 	    rs = snwcpy(nbuf,nlen,uin.nodename,nl) ;
-	} /* end if (uinfo_name) */
+	} /* end if (ucinfo_name) */
 	return rs ;
 } /* end method (nodeinfo::uinfo) */
 
