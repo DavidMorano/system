@@ -88,21 +88,22 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<cstring>		/* |strchr(3c)| */
-#include	<cwchar>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<stdintx.h>		/* extended integer types */
-#include	<snwcpyx.h>		/* |snwcpyexpesc(3uc)| */
-#include	<strdcpy.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<cstdio>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<cwchar>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU extended integer types */
+#include	<snwcpyx.h>		/* LIBUC |snwcpyexpesc(3uc)| */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fmtopts.h"
 
@@ -165,6 +166,7 @@ int fmtobj::operator () (va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
+	fprintf(stderr,"fmobj-oper: ent ap=%p\n",ap) ;
 	if (ap) {
 	    if ((rs = start()) >= 0) {
 	        {
@@ -175,11 +177,13 @@ int fmtobj::operator () (va_list ap) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if */
 	} /* end if (non-null) */
+	fprintf(stderr,"fmobj-oper: ret rs=%d\n",rs) ;
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int fmtobj::start() noex {
     	int		rs = SR_FAULT ;
+	fprintf(stderr,"fmobj-op: ent ubuf=%p fmt=%p\n",ubuf,fmt) ;
 	if (ubuf && fmt) {
 	    rs = SR_NOMEM ;
 	    if ((tbuf = new(nothrow) char[TBUFLEN+1]) != nullptr) {
@@ -188,8 +192,9 @@ int fmtobj::start() noex {
         	tbuf[tlen] = '\0' ;
 	    }
 	} /* end if (non-null) */
+	fprintf(stderr,"fmobj-start: ret rs=%d\n",rs) ;
 	return rs ;
-}
+} /* end method */
 
 int fmtobj::finish() noex {
 	int		rs = SR_NOTOPEN ;
@@ -198,9 +203,9 @@ int fmtobj::finish() noex {
 	    tbuf = nullptr ;
 	    tlen = 0 ;
 	    rs = SR_OK ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
+} /* end method */
 
 int fmtobj::loop(va_list ap) noex {
     	cnullptr	np{} ;
@@ -230,8 +235,7 @@ int fmtobj::loop(va_list ap) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fmtsub) */
 	return rs ;
-}
-/* end method (fmtobj::loop) */
+} /* end method (fmtobj::loop) */
 
 int fmtobj::decide(va_list ap) noex {
     	int		rs = SR_OK ;
@@ -335,8 +339,7 @@ int fmtobj::code_chr(va_list ap) noex {
             bl = 1 ;
         } /* end if */
 	return rs ;
-}
-/* end method (fmtobj::code_chr) */
+} /* end method (fmtobj::code_chr) */
 
 int fmtobj::code_exp(va_list ap) noex {
     	cnullptr	np{} ;
@@ -360,8 +363,7 @@ int fmtobj::code_exp(va_list ap) noex {
 	}
         fcode = 0 ;
 	return rs ;
-}
-/* end method (fmtobj::code_exp) */
+} /* end method (fmtobj::code_exp) */
 
 int fmtobj::code_str(va_list ap) noex {
     	int		rs = SR_OK ;
@@ -407,8 +409,7 @@ int fmtobj::code_str(va_list ap) noex {
         rs = sub.formstr(&spec,&sd) ;
         fcode = 0 ;
 	return rs ;
-}
-/* end method (fmtobj::code_str) */
+} /* end method (fmtobj::code_str) */
 
 /* handle binary numbers */
 int fmtobj::code_bin(va_list ap) noex {
