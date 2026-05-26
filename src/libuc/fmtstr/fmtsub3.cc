@@ -41,7 +41,6 @@ module ;
 #include	<cstdarg>
 #include	<cstring>
 #include	<cwchar>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
@@ -52,17 +51,12 @@ module ;
 
 module fmtsub ;
 
-import fmtstrdata ;
 import fmtutil ;
-import fmtspec ;
 
 /* local defines */
 
 
 /* imported namespaces */
-
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
