@@ -1,7 +1,7 @@
 New C-language operators
 ------------------------
 
-- for reference: existing operators
+= for reference: existing operators
 
 |	bit-wize OR
 &	bit-wise AND
@@ -117,5 +117,18 @@ logxor_eq	^^=
 
 bitnot		~
 lognot		!
+
+
+= new keywords
+
+repeat
+until
+
+
+= modifications to existing keywords
+
+Make the while' keyword essentially identical to the 'for' keyword,
+except that any trailing statement and its colon character (';')
+that introduces it is optional.
 
 
