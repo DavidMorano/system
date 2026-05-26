@@ -80,7 +80,7 @@
 #include	<usysbase.h>
 #include	<uclibmem.h>
 #include	<ucclustername.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getnodename.h>
 #include	<nodedb.h>
 #include	<clusterdb.h>
@@ -434,7 +434,7 @@ int searcher::finish() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 	    entlen = (rs * ENTLENMULT) ;
 	}
 	return rs ;
