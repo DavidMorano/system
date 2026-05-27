@@ -137,13 +137,13 @@ int fmtproc::leader(va_list) noex {
 	int		rs = SR_OK ;
         bool            fcont = true ;
         while (fcont && (sl > 0) && *sp) {
-            cint       ch = mkchar(sp[0]) ;
-            switch (ch) {
+            switch (cint ch = mkchar(sp[0]) ; ch) {
             case '-':
                 fl.left = true ;
+                fl.misign = true ;
                 break ;
             case '+':
-                fl.plus = true ;
+                fl.plsign = true ;
                 break ;
             case '\'':
                 fl.thousands = true ;
