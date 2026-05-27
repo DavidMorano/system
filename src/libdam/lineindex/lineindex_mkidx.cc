@@ -44,7 +44,6 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
 #include	<opentmp.h>		/* |opentmpfile(3uc)| */
