@@ -41,7 +41,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
 #include	<estrings.h>
 #include	<vecobj.h>
@@ -904,7 +904,7 @@ local int mkbve_finish(cyimk_ent *bvep) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	}
     	return rs ;
