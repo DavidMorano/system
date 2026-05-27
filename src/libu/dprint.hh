@@ -1,4 +1,4 @@
-/* dprint HEADER */
+/* dprint HEADER (LIBU - Debug-Print) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -21,11 +21,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstdio>		/* |stderr| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD |stderr| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
