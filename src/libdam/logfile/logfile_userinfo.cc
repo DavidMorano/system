@@ -55,7 +55,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getostype.h>
 #include	<userinfo.h>
 #include	<mkui.h>		/* |mkuiname(3dam)| */
@@ -233,9 +233,9 @@ int loguser::third() noex {
 local int mkvars() noex {
 	cchar		*vn = varname.architecture ;
 	int		rs ;
-	if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 	    var.nodenamelen = rs ;
-	    if ((rs = getbufsize(bufsize_un)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_un)) >= 0) {
 		var.usernamelen = rs ;
 		var.bangnamelen = (var.nodenamelen + var.usernamelen + 1) ;
 		var.arch = getenv(vn) ;
