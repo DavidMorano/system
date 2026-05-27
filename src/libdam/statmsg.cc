@@ -58,7 +58,7 @@
 #include	<getusername.h>
 #include	<getuserhome.h>
 #include	<getxid.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<estrings.h>
 #include	<ids.h>
 #include	<vecstr.h>
@@ -1473,11 +1473,11 @@ local int mapdir_procouter(MD *ep,cchar **ev,cchar *fn,int ofd) noex {
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = maxpathlen) == 0) {
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
-	        if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 		    maxnamelen = rs ;
-		    if ((rs = getbufsize(bufsize_un)) >= 0) {
+		    if ((rs = bufsizeget(bufsize_un)) >= 0) {
 		        usernamelen = rs ;
 			envlen = maxnamelen ;
 			parambuflen = maxpathlen ;
