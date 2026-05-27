@@ -73,7 +73,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sysval.hh>
 #include	<endian.h>
 #include	<mkfnamesuf.h>
@@ -1172,7 +1172,7 @@ local int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 
 local int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_un)) >= 0) {
+	if ((rs = bufsizeget(bufsize_un)) >= 0) {
 	    var.usernamelen = rs ;
 	}
 	return rs ;
