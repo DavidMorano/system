@@ -73,7 +73,7 @@
 #include	<uinet.h>
 #include	<uclibmem.h>
 #include	<funcodes.h>		/* |FM_{x}(3uc)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getpf.h>
 #include	<dialtcp.h>
 #include	<hostaddr.h>
@@ -774,7 +774,7 @@ static int mkprintscope(char *printaddr,int printalen,SOCKADDR *ssap) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	}
 	return rs ;
