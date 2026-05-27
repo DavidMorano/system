@@ -56,7 +56,7 @@
 #include	<usyscalls.h>
 #include	<usysflag.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getnodedomain.h>	/* |getnodedomain(3uc)| */
 #include	<ids.h>
 #include	<dirseen.h>
@@ -767,9 +767,9 @@ int subinfo::checksyms() noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
-	    if ((rs = getbufsize(bufsize_hostname)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 		var.maxhostlen = rs ;
 	    }
 	}
