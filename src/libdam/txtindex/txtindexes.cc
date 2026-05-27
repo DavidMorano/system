@@ -77,7 +77,6 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
 #include	<endian.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
