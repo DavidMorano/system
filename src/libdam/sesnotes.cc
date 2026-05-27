@@ -32,7 +32,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<ucgetpid.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<mallocxx.h>
 #include	<opentmp.h>
 #include	<mktmp.h>
@@ -217,7 +217,7 @@ int sesnotes_send(SN *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 	    custime	dt = getustime ;
 	    uint	uv = sid ;
 	    int		sz = 0 ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 		cint	maxpath = rs ;
 		int	ai = 0 ;
 		sz += ((maxpath + 1) * 2) ;
@@ -233,7 +233,7 @@ int sesnotes_send(SN *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 		    rs1 = uc_free(ap) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
-	    } /* end if (getbufsize) */
+	    } /* end if (bufsizeget) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -424,7 +424,7 @@ int vars::operator () (int unl) noex {
 	int		rs = SR_BUGCHECK ;
 	if (unl > 0) {
 	    var.usernamelen = unl ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 		var.maxpathlen = rs ;
 	    }
 	}
