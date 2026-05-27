@@ -36,7 +36,7 @@
 #include	<usyscalls.h>
 #include	<usupport.h>		/* |getustime(3u)| */
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<localmisc.h>
 
 #include	"sysdialer.h"
@@ -81,7 +81,7 @@ namespace sysdialer_util {
 namespace sysdialer_util {
     vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	}
 	return rs ;
