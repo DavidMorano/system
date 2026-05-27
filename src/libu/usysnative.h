@@ -65,7 +65,6 @@
 /* synthetics */
 #include	<usysacl.h>		/* need for stupid Apple-Darwin */
 
-#include	<clanguage.h>
 
 #endif /* USYSNATIVE_INCLUDE */
 
