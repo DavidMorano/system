@@ -1,4 +1,4 @@
-/* dprint SUPPORT */
+/* dprint SUPPORT (LIBU - Debug-Print) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -27,14 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstdio>		/* |FILE| + |stderr| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |rmeol(3u)| */
-#include	<strnul.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD |FILE| + |stderr| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |rmeol(3u)| */
+#include	<strnul.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dprint.hh"
 
