@@ -110,14 +110,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cerrno>		/* |errno| */
-#include	<climits>		/* |ULONG_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>		/* extended integers */
-#include	<localmisc.h>		/* ?? not-needed ?? */
+#include	<cerrno>		/* CSTD |errno| */
+#include	<climits>		/* CSTD |ULONG_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU extended integers */
+#include	<localmisc.h>		/* LIBU ?? not-needed ?? */
 
 #include	"xxtostr.h"
 
