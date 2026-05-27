@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<ulogerror.h>
@@ -43,8 +42,6 @@
 
 /* imported namespaces */
 
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using ustream_ns::ustream_close ;
 using ustream_ns::ustream_read ;
 using ustream_ns::ustream_readp ;
