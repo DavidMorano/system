@@ -33,13 +33,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<unistd.h>		/* system types */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<unistd.h>		/* POSIX system types */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	USTREAM_MAGIC	0x21387462
@@ -67,7 +67,7 @@ struct ustream ;
 struct ustream_fl {
 	uint		net:1 ;		/* network FD */
 	uint		write:1 ;	/* we are writing (otherwise reading) */
-} ; /* end struct (ustream_flags) */
+} ; /* end struct (ustream_fl) */
 
 struct ustream_ma {
 	ustream	*op = nullptr ;
