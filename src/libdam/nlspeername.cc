@@ -53,7 +53,7 @@
 #include	<usyscalls.h>
 #include	<uinet.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<gethe.h>
 #include	<hostent.h>
 #include	<sockaddress.h>
@@ -208,7 +208,7 @@ local int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_hostname)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 	    var.maxhostlen = rs ;
 	}
 	return rs ;
