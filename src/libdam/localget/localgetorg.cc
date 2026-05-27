@@ -56,7 +56,6 @@
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<gecos.h>
-#include	<getbufsize.h>
 #include	<aflag.hh>
 #include	<filereadln.h>
 #include	<sfx.h>
