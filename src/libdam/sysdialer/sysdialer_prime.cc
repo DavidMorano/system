@@ -42,7 +42,6 @@
 #include	<usyscalls.h>
 #include	<usupport.h>		/* |getustime(3u)| */
 #include	<uclibmem.h>
-#include	<getbufsize.h>
 #include	<getnodedomain.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
