@@ -47,7 +47,6 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
 #include	<endian.h>
