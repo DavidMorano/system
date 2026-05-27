@@ -17,8 +17,8 @@
 
 /*******************************************************************************
 
-	Object:
-	cmdutils
+	Names:
+	filelines
 
 *******************************************************************************/
 
@@ -146,7 +146,6 @@ local int liner(int fd,csize ms) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (map-file) */
 	return (rs >= 0) ? lines : rs ;
-}
-/* end subroutine (liner) */
+} /* end subroutine (liner) */
 
 
