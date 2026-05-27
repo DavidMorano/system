@@ -44,7 +44,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bfile.h>
 #include	<absfn.h>
 #include	<field.h>
@@ -1362,11 +1362,11 @@ local int entry_load(svcfile_ent *ep,char *ebuf,int elen,SF_IE *iep) noex {
 
 local int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	    var.maxnamelen = rs ;
-	    if ((rs = getbufsize(bufsize_ml)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_ml)) >= 0) {
 		var.maxlinelen = rs ;
-	        if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 		    var.maxhostlen = rs ;
 		}
 	    }
