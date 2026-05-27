@@ -65,7 +65,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<strlibval.hh>
 #include	<vecstr.h>
 #include	<varsub.h>
@@ -601,7 +601,7 @@ int svcentry_stime(SE *op,time_t daytime) noex {
 local int svcentry_starter(SE *op,svckey *skp,ARGS *esap) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    cint	olen = (rs * BUFMULT) ;
 	    if (char *obuf ; (rs = lm_mall((olen + 1),&obuf)) >= 0) {
 	        if (skp->acc) {
@@ -639,7 +639,7 @@ local int svcentry_starter(SE *op,svckey *skp,ARGS *esap) noex {
 	        rs1 = lm_free(obuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return rs ;
 }
 /* end subroutie (svcentry_starter) */
@@ -724,7 +724,7 @@ local int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 	    rbuf[0] = '\0' ;
 	    if ((sl != 0) && sp[0]) {
 	        if (sl < 0) sl = lenstr(sp) ;
-	        if (char *hbuf ; (rs = lm_hn(&hbuf)) >= 0) {
+	        if (char *hbuf ; (rs = lm_hostname(&hbuf)) >= 0) {
 		    cint	sch = '%' ;
 		    cint	hlen = rs ;
 		    int		bl = rlen ;
@@ -893,7 +893,7 @@ local int mkpat(char *pbuf,int plen,cc *tmpdname,int type) noex {
 
 local int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    var.olen = (rs * BUFMULT) ;
 	}
 	return rs ;
