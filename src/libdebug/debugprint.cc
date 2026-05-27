@@ -5,8 +5,8 @@
 /* special debug printing */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_LINELEN	0		/* use |strlinelen(3dam)| */
-#define	CF_USEMALLOC	0		/* do not use memory-allocation */
 
 /* revision history:
 
@@ -71,9 +71,6 @@
 	is likely buggy -- regardless of how many people have already
 	suffered due to those bugs.
 
-	= On the use of "uc_malloc(3uc)| and the CF_USEMALLOC
-	compile-time flag
-
 	Normally we want to use the heap for "large" buffers.  We
 	need a buffer of about 2k bytes.  This used to be a "small"
 	buffer in the old days when programs were mostly single-threaded.
@@ -81,37 +78,39 @@
 	run in a multi-thread environment, the amount of stack space
 	availble for "small" buffers is not that large any longer;
 	hence the need for dynamic allocation to the heap (not to
-	the stack) is now desired.  Using |uc_malloc(3uc)| is the
-	default, but if for some reason you need to be independent
-	of that subsystem, a non-dynamic buffer version is available
-	by setting the CF_USEMALLOC compile-time flag to zero (0).
+	the stack) is now desired.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<csignal>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstdarg>
-#include	<cstdio>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |strwcpy(3u)| */
-#include	<umem.hh>
-#include	<ptm.h>
-#include	<cfdec.h>
-#include	<fmtstr.h>
-#include	<hasx.h>
-#include	<strlinelen.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |strwcpy(3u)| */
+#include	<umem.hh>		/* LIBU */
+#include	<usysutility.hh>	/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucproc.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasprintbad(3uc)| */
+#include	<strlinelen.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"debugprint.h"
 #include	"debugline.h"
@@ -124,27 +123,32 @@ import ureserve ;			/* |is{x}(3u)| */
 
 /* local defines */
 
-#ifndef	NDF
-#define	NDF		"debugprintf.deb"
-#endif
-
 #ifndef	FD_STDERR
 #define	FD_STDERR	3
 #endif
 
 #define	FD_BADERR	4
-#define	FD_MAX		256		/* maximum FDs we'll consider */
+#define	FD_MAX		256		/* maximum FDs we will consider */
 
-#define	DEBUGPRINT	struct debugprint_head
+#define	DEBUGMGR	debugmgr_head
 
 #define	O_FLAGS		(O_WRONLY | O_CREAT | O_APPEND)
+
+#ifndef	LINEBUFLEN
+#define	LINEBUFLEN	(2*1024)
+#endif
+ 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
 
+using libu::sncpy ;			/* subroutine-template */
+using libu::snprintf ;			/* subroutine */
 using libu::strwcpy ;			/* subroutine */
 using libu::umem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -155,17 +159,9 @@ typedef volatile sig_atomic_t	vaflag ;
 /* external subroutines */
 
 extern "C" {
-    int debugprint_init() noex ;
-    int debugprint_fini() noex ;
-    int	debugprint(cchar *,int) noex ;
+    int debugmgr_init() noex ;
+    int debugmgr_fini() noex ;
     int	debugclose() noex ;
-}
-
-extern "C" {
-    extern int uc_atforkrec(void_f,void_f,void_f) noex ;
-    extern int uc_atforkexp(void_f,void_f,void_f) noex ;
-    extern int uc_atexit(void_f) noex ;
-    extern int uc_moveup(int,int) noex ;
 }
 
 
@@ -174,30 +170,37 @@ extern "C" {
 
 /* local structures */
 
-struct debugprint_head {
+namespace {
+    struct debugmgr_fl {
+	uint		seekable:1 ;
+    } ; /* end struct (debugmgr_fl) */
+    struct debugmgr_head {
 	ptm		mx ;		/* data mutex */
 	vaflag		f_void ;
 	vaflag		f_init ;
 	vaflag		f_initdone ;
+	debugmgr_fl	fl ;
 	int		fd ;
 	int		sz ;
-} ; /* end struct */
+	int advend() noex ;
+    } ; /* end struct (debugmgr_head) */
+} /* end namespace */
 
 
 /* forward references */
 
-local int	debugprinters(cchar *,int) noex ;
-
 extern "C" {
-    local void	debugprint_atforkbefore() noex ;
-    local void	debugprint_atforkafter() noex ;
+    local void	debugmgr_atforkbefore() noex ;
+    local void	debugmgr_atforkafter() noex ;
 }
 
 local int	debugprinter(cchar *,int) noex ;
 local int	snwcpyprintclean(char *,int,cchar *,int) noex ;
-local int	cthexi(char *,int) noex ;
 
-local char	*convdeci(LONG,char *) noex ;
+#ifdef	COMMENT
+local int	cthexi(char *,int) noex ;
+local char	*convdeci(long,char *) noex ;
+#endif /* COMMENT */
 
 #ifdef	COMMENT
 local bool	hasprintbad(cchar *,int) noex ;
@@ -206,7 +209,7 @@ local bool	hasprintbad(cchar *,int) noex ;
 
 /* local variables */
 
-static DEBUGPRINT	ef ; /* zero-initialized */
+static DEBUGMGR	ef ; /* zero-initialized */
 
 constexpr char	cthextable[] = {
 	'0', '1', '2', '3', '4', '5', '6', '7',
@@ -215,7 +218,9 @@ constexpr char	cthextable[] = {
 
 constexpr fmtoptms	fmtmask ;
 
-constexpr int		llen = LINEBUFLEN ;
+constexpr int		llen		= LINEBUFLEN ;
+constexpr bool		f_debug		= CF_DEBUG ;
+constexpr bool		f_linelen	= CF_LINELEN ;
 
 
 /* exported variables */
@@ -223,17 +228,17 @@ constexpr int		llen = LINEBUFLEN ;
 
 /* exported subroutines */
 
-int debugprint_init() noex {
-	DEBUGPRINT	*uip = &ef ;
+int debugmgr_init() noex {
+	DEBUGMGR	*uip = &ef ;
 	int		rs = 1 ;
 	if (! uip->f_init) {
 	    ptm *mxp = &uip->mx ;
 	    uip->f_init = true ;
 	    if ((rs = mxp->create) >= 0) {
-	        void_f b = debugprint_atforkbefore ;
-	        void_f a = debugprint_atforkafter ;
+	        void_f b = debugmgr_atforkbefore ;
+	        void_f a = debugmgr_atforkafter ;
 	        if ((rs = uc_atforkrec(b,a,a)) >= 0) {
-		    const void_f funexit = void_f(debugprint_fini) ;
+		    const void_f funexit = void_f(debugmgr_fini) ;
 	            if ((rs = uc_atexit(funexit)) >= 0) {
 	                rs = 0 ;
 	                uip->f_initdone = true ;
@@ -244,11 +249,11 @@ int debugprint_init() noex {
 	        } /* end if (uc_atfork) */
 	        if (rs < 0) {
 	            mxp->destroy() ;
-		}
+		} /* end if (error) */
 	    } /* end if (ptm_create) */
 	    if (rs < 0) {
 	        uip->f_init = false ;
-	    }
+	    } /* end if (error) */
 	} else {
 	    while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	        rs = msleep(1) ;
@@ -259,10 +264,10 @@ int debugprint_init() noex {
 	} /* end if */
 	return rs ;
 }
-/* end subroutine (debugprint_init) */
+/* end subroutine (debugmgr_init) */
 
-int debugprint_fini() noex {
-	DEBUGPRINT	*uip = &ef ;
+int debugmgr_fini() noex {
+	DEBUGMGR	*uip = &ef ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->f_initdone) {
@@ -273,8 +278,8 @@ int debugprint_fini() noex {
 	        uip->fd = 0 ; /* special case (use zero) */
 	    }
 	    {
-	        void_f	b = debugprint_atforkbefore ;
-	        void_f	a = debugprint_atforkafter ;
+	        void_f	b = debugmgr_atforkbefore ;
+	        void_f	a = debugmgr_atforkafter ;
 	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -287,34 +292,53 @@ int debugprint_fini() noex {
 	} /* end if (was initialized) */
 	return rs ;
 }
-/* end subroutine (debugprint_fini) */
+/* end subroutine (debugmgr_fini) */
 
 int debugprintf(cchar *fmt,...) noex {
 	va_list		ap ;
-	cnullptr	nt{} ;
+	int		rs = SR_FAULT ;
+	int		wlen = 0 ; /* return-value */
+	DPRINTF("ent fd=%d fmt=>%s<\n",ef.fd,fmt) ;
+	if (fmt) {
+	    rs = SR_NOTOPEN ;
+	    if (ef.fd > 0) {
+	        va_begin(ap,fmt) ;
+		{
+		    rs = debugvprintf(fmt,ap) ;
+		    wlen = rs ;
+		}
+	        va_end(ap) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	DPRINTF("ret rs=%d wlen=%d\n",rs,wlen) ;
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end subroutine (debugprintf) */
+
+int debugprintx(cchar *fun,cchar *fmt,...) noex {
+	va_list		ap ;
+    	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
 	if (fmt) {
 	    rs = SR_NOTOPEN ;
-	    if (ef.fd >= 0) {
-	        cint	fm = fmtmask.nooverr ; /* Format-Mode-Mask */
+	    if (ef.fd > 0) {
+		cint flen = (lenstr(__func__) + 2 + lenstr(fmt)) ;
 		rs = SR_NOMEM ;
-		if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
-	            va_begin(ap,fmt) ;
-	            if ((rs = fmtstr(lbuf,llen,fm,fmt,ap)) >= 0) {
-	                rs = debugprint(lbuf,rs) ;
+		if (char *fbuf = new(nt) char [flen + 1] ; fbuf) {
+		    if ((rs = sncpy(fbuf,flen,fun,": ",fmt)) >= 0) {
+	                va_begin(ap,fmt) ;
+	                rs = debugvprintf(fbuf,ap) ;
 	                wlen += rs ;
-	            } else {
-	                rs = SR_TOOBIG ;
-		    }
-	            va_end(ap) ;
-		    delete [] lbuf ;
+	                va_end(ap) ;
+	            } /* end if (sncpy) */
+		    delete [] fbuf ;
 	        } /* end if (new-char) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (debugprintf) */
+/* end subroutine (debugvprintx) */
 
 int debugvprintf(cchar *fmt,va_list ap) noex {
     	cnothrow	nt{} ;
@@ -322,16 +346,19 @@ int debugvprintf(cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
 	if (fmt) {
+	    DPRINTF("fmt=>%s<\n",fmt) ;
 	    rs = SR_NOTOPEN ;
-	    if (ef.fd >= 0) {
+	    if (ef.fd > 0) {
 		rs = SR_NOMEM ;
 		if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
 	            if ((rs = fmtstr(lbuf,llen,fm,fmt,ap)) >= 0) {
-	                rs = debugprint(lbuf,rs) ;
+			DPRINTF("fmtstr() rs=%d\n",rs) ;
+	        	rs = debugprinter(lbuf,rs) ;
 	                wlen += rs ;
-	            } else {
+	            } else if (rs == SR_OVERFLOW) {
 	                rs = SR_TOOBIG ;
-	            }
+			lbuf[0] = '\0' ;
+	            } /* end if */
 		    delete [] lbuf ;
 	        } /* end if (new-char) */
 	    } /* end if (valid) */
@@ -346,51 +373,9 @@ int debugprintdeci(cchar *s,int v) noex {
 	if (s) {
 	    rs = SR_NOMEM ;
 	    if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
-	    cint	diglen = DIGBUFLEN ;
-	    int		ll = llen ;
-	    int		sl ;
-	    cchar	*sp ;
-	    char	*lp = lbuf ;
-	    char	digbuf[DIGBUFLEN + 1] ;
-
-	if (rs >= 0) {
-	    sp = s ;
-	    sl = lenstr(s) ;
-	    if (sl <= ll) {
-	        lp = strwcpy(lp,sp,sl) ;
-	        ll -= sl ;
-	    } else {
-	        rs = SR_OVERFLOW ;
-	    }
-	} /* end if (ok) */
-
-	if (rs >= 0) {
-	    sp = convdeci(v,(digbuf+diglen)) ;
-	    sl = intconv((digbuf + diglen) - sp) ;
-	    if (sl <= ll) {
-	        lp = strwcpy(lp,sp,sl) ;
-	        ll -= sl ;
-	    } else {
-	        rs = SR_OVERFLOW ;
-	    }
-	} /* end if (ok) */
-
-	if (rs >= 0) {
-	    sp = "\n" ;
-	    sl = 1 ;
-	    if (sl <= ll) {
-	        lp = strwcpy(lp,sp,sl) ;
-	        ll -= sl ;
-	    } else {
-	        rs = SR_OVERFLOW ;
-	    }
-	} /* end if (ok) */
-
-	if (rs >= 0) {
-	    cint tl = intconv(lp - lbuf) ;
-	    rs = debugprint(lbuf,tl) ;
-	} /* end if (ok) */
-
+		if ((rs = snprintf(lbuf,llen,"%s %d\n",s,v)) >= 0) {
+	            rs = debugwrite(lbuf,rs) ;
+	        } /* end if (snprintf) */
 		delete [] lbuf ;
 	    } /* end if (new-char) */
 	} /* end if (non-null) */
@@ -404,51 +389,9 @@ int debugprinthexi(cchar *s,int v) noex {
 	if (s) {
 	    rs = SR_NOMEM ;
 	    if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
-	        int	ll = llen ;
-	        int	sl ;
-	        char	*lp = lbuf ;
-	        cchar	*sp ;
-	        char	digbuf[DIGBUFLEN + 1] ;
-    
-	    if (rs >= 0) {
-	        sp = s ;
-	        sl = lenstr(s) ;
-	        if (sl <= ll) {
-	            lp = strwcpy(lp,sp,sl) ;
-	            ll -= sl ;
-	        } else {
-	            rs = SR_OVERFLOW ;
-	        }
-	    } /* end if (ok) */
-    
-	    if (rs >= 0) {
-	        sp = digbuf ;
-	        rs = cthexi(digbuf,v) ;
-	        sl = rs ;
-	        if (sl <= ll) {
-	            lp = strwcpy(lp,sp,sl) ;
-	            ll -= sl ;
-	        } else {
-	            rs = SR_OVERFLOW ;
-	        }
-	    } /* end if (ok) */
-    
-	    if (rs >= 0) {
-	        sp = "\n" ;
-	        sl = 1 ;
-	        if (sl <= ll) {
-	            lp = strwcpy(lp,sp,sl) ;
-	            ll -= sl ;
-	        } else {
-	            rs = SR_OVERFLOW ;
-	        }
-	    } /* end if (ok) */
-    
-	    if (rs >= 0) {
-	        cint tl = intconv(lp - lbuf) ;
-	        rs = debugprint(lbuf,tl) ;
-	    } /* end if (ok) */
-    
+		if ((rs = snprintf(lbuf,llen,"%s %08x\n",s,v)) >= 0) {
+	            rs = debugwrite(lbuf,rs) ;
+	        } /* end if (snprintf) */
 		delete [] lbuf ;
 	    } /* end if (new-char) */
 	} /* end if (non-null) */
@@ -463,19 +406,16 @@ int debugprintnum(cchar *s,int v) noex {
 
 int debugsetfd(int fd) noex {
 	int		rs = SR_NOTOPEN ;
-
 	ef.fd = 0 ; /* special case (use zero) */
 	if (fd >= 0) {
-	    if (ustat sb ; (fd < FD_MAX) && ((rs = u_fstat(fd,&sb)) >= 0)) {
+	    if (ustat sb ; (fd < FD_MAX) && ((rs = uc_fstat(fd,&sb)) >= 0)) {
 	        ef.fd = fd ;
 	        ef.sz = intconv(sb.st_size) ;
 	    }
 	}
-
 	if ((rs >= 0) && (ef.fd >= 0)) {
-	    u_fchmod(ef.fd ,0666) ;
+	    uc_fchmod(ef.fd ,0666) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (debugsetfd) */
@@ -499,14 +439,17 @@ int debugopen(cchar *fname) noex {
 	                } else {
 	                    u_close(fd) ;
 	                }
-	            }
+	            } /* end if (u_open) */
 	        } /* end if */
 	        if (rs >= 0) {
 	            ef.fd = fd ;
 	            ef.sz = 0 ;
-	            if (ustat sb ; (rs = u_fstat(ef.fd,&sb)) >= 0) {
+	            if (ustat sb ; (rs = uc_fstat(ef.fd,&sb)) >= 0) {
 	                ef.sz = intconv(sb.st_size) ;
-	                u_fchmod(ef.fd,0666) ;
+	                uc_fchmod(ef.fd,0666) ;
+			ef.fl.seekable = true ;
+		    } else if (rs == SR_NOTSEEK) {
+			rs = SR_OK ;
 	            }
 	        } /* end if (ok) */
 	    } /* end if (valid) */
@@ -543,223 +486,162 @@ int debugprint(cchar *sbuf,int slen) noex {
 }
 /* end subroutine (debugprint) */
 
-#if	CF_USEMALLOC
-
-int debugprinter(cchar *sbuf,int slen) noex {
-	int		rs = SR_OK ;
-	int		wlen = 0 ;
-	int		f_needeol = false ;
-	char		*abuf = nullptr ;
-
-#if	CF_LINELEN
-	slen = strlinelen(sbuf,slen,LINEBUFLEN) ; /* some protection */
-#else
-	if (slen < 0) slen = lenstr(sbuf) ;
-	if (slen > LINEBUFLEN) slen = LINEBUFLEN ;
-#endif /* CF_LINELEN */
-
-/* preparation and check if need EOL */
-
-	if ((slen == 0) || (sbuf[slen-1] != '\n')) {
-	    f_needeol = true ;
+local int getlen(cchar *sp,int sl) noex {
+    	int	al = 0 ;
+    	if_constexpr (f_linelen) {
+	    al = strlinelen(sp,sl,llen) ; /* some protection */
 	} else {
-	    slen -= 1 ;
-	}
-
-/* scan for bad characters */
-
-	if (f_needeol || hasprintbad(sbuf,slen)) {
-	    cint	alen = (slen+2) ; /* additional room for added EOL */
-	    if ((rs = umem.mall((alen+1),&abuf)) >= 0) {
-	        if ((rs = snwcpyprintclean(abuf,(alen-2),sbuf,slen)) >= 0) {
-		    sbuf = abuf ;
-		    slen = rs ;
-		    abuf[slen++] = '\n' ;
-	        }
-		if (rs < 0) {
-		    umem.free(abuf) ;
-		    abuf = nullptr ;
-		}
-	    } /* end if (memory-allocation) */
-	} else {
-	    slen += 1 ;
-	}
-
-/* write the line-buffer out */
-
-	if (rs >= 0) {
-	    rs = debugprinters(sbuf,slen) ;
-	    wlen = rs ;
-	} /* end if (ok) */
-
-	if (abuf != nullptr) uc_free(abuf) ;
-
-	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (debugprinter) */
-
-#else /* CF_USEMALLOC */
-
-#ifdef	lint
-int debugprinter(cchar *sbuf,int slen) noex {
-	cint		alen = (LINEBUFLEN+2) ; /* room for added EOL */
-	int		rs = SR_OK ;
-	int		wlen = 0 ;
-	int		f_needeol = false ;
-	char		abuf[LINEBUFLEN+3] ; /* room for added EOL */
-
-#if	CF_LINELEN
-	slen = strlinelen(sbuf,slen,LINEBUFLEN) ; /* some protection */
-#else
-	if (slen < 0) slen = lenstr(sbuf) ;
-	if (slen > LINEBUFLEN) slen = LINEBUFLEN ;
-#endif /* CF_LINELEN */
-
-/* preparation and check if need EOL */
-
-	if ((slen == 0) || (sbuf[slen-1] != '\n')) {
-	    f_needeol = true ;
-	} else {
-	    slen -= 1 ;
-	}
-
-/* scan for bad characters */
-
-	if (f_needeol || hasprintbad(sbuf,slen)) {
-	    if ((rs = snwcpyprintclean(abuf,(alen-2),sbuf,slen)) >= 0) {
-		sbuf = abuf ;
-		slen = rs ;
-		abuf[slen++] = '\n' ;
+	    if (al = lenstr(sp,sl) ; al > llen) {
+		al = llen ;
 	    }
-	} else {
-	    slen += 1 ;
-	}
+	} /* end if_constexpr (f_linelen) */
+    	return al ;
+} /* end subroutine (getlen) */
 
-/* write the line-buffer out */
-
-	if (rs >= 0) {
-	    rs = debugprinters(sbuf,slen) ;
-	    wlen = rs ;
-	} /* end if (ok) */
-
+int debugwrite(cchar *sbuf,int 탎len) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	DPRINTF("ent slen=%d\n",탎len) ;
+	if (int slen ; sbuf && ((slen = getlenstr(sbuf,탎len)) >= 0)) {
+	    DPRINTF("getlen() slen=%d\n",slen) ;
+	    rs = SR_NOTOPEN ;
+	    if (ef.fd > 0) {
+	        if (((rs = debugmgr_init()) >= 0) && (slen > 0)) {
+	            DEBUGMGR	*uip = &ef ;
+	            ptm *mxp = &uip->mx ;
+	            if ((rs = mxp->lockbegin) >= 0) { /* single */
+		        int	cmd = F_LOCK ;
+		        if ((rs = u_lockf(ef.fd,cmd,0z)) >= 0) {
+			    if ((rs = ef.advend()) >= 0) {
+				if ((rs = u_write(ef.fd,sbuf,slen)) >= 0) {
+				    if_constexpr (f_debug) {
+				        cc *str = "u_write() rs=%d\n" ;
+				        DPRINTF(str,rs) ;
+				    }
+				    wlen = rs ;
+				    ef.sz += wlen ;
+				} /* end if (u_write) */
+		            } /* end if (advend) */
+		            cmd = F_UNLOCK ;
+		            rs1 = u_lockf(ef.fd,cmd,0z) ;
+		            if (rs >= 0) rs = rs1 ;
+		        } /* end if (uc_lockf) */
+	                rs1 = mxp->lockend ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (ptm) */
+	        } /* end if (debugmgr_init) */
+	    } /* end if (valid) */
+	} /* end if (getlenstr) */
+	DPRINTF("ret rs=%d wlen=%d\n",rs,wlen) ;
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (debugprinter) */
-#else /* lint */
-int debugprinter(cchar *sbuf,int slen) noex {
-	int		rs = SR_OK ;
-	int		wlen = 0 ; /* return-value */
-	int		alen ;
-	int		f_needeol = false ;
-
-#if	CF_LINELEN
-	slen = strlinelen(sbuf,slen,LINEBUFLEN) ; /* some protection */
-#else
-	if (slen < 0) slen = lenstr(sbuf) ;
-	if (slen > LINEBUFLEN) slen = LINEBUFLEN ;
-#endif /* CF_LINELEN */
-
-/* preparation and check if need EOL */
-
-	if ((slen == 0) || (sbuf[slen-1] != '\n')) {
-	    f_needeol = true ;
-	} else {
-	    slen -= 1 ;
-	}
-
-	alen = (slen+2) ; /* room for added EOL */
-	{
-	    char	abuf[alen+1] ;
-	    /* scan for bad characters */
-	    if (f_needeol || hasprintbad(sbuf,slen)) {
-	        if ((rs = snwcpyprintclean(abuf,(alen-2),sbuf,slen)) >= 0) {
-		    sbuf = abuf ;
-		    slen = rs ;
-		    abuf[slen++] = '\n' ;
-	        }
-	    } else {
-	        slen += 1 ;
-	    }
-	    /* write the line-buffer out */
-	    if (rs >= 0) {
-	        rs = debugprinters(sbuf,slen) ;
-	        wlen = rs ;
-	    } /* end if (ok) */
-
-	} /* end block (dynamic stack buffer allocation) */
-
-	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (debugprinter) */
-#endif /* lint */
-
-#endif /* CF_USEMALLOC */
+/* end subroutine (debugwrite) */
 
 
 /* local subroutines */
 
-local int debugprinters(cchar *sbuf,int slen) noex {
-	int		rs ;
-	int		rs1 ;
-	int		wlen = 0 ;
-	if ((rs = debugprint_init()) >= 0) {
-	    DEBUGPRINT	*uip = &ef ;
-	    ptm *mxp = &uip->mx ;
-	    if ((rs = mxp->lockbegin) >= 0) { /* single */
-		int	cmd = F_LOCK ;
-		if ((rs = u_lockf(ef.fd,cmd,0z)) >= 0) {
-		    if (ustat sb ; (rs = u_fstat(ef.fd,&sb)) >= 0) {
-			cint fsz = intconv(sb.st_size) ;
-	                if (S_ISREG(sb.st_mode) && (fsz != ef.sz)) {
-	                    coff	uoff = sb.st_size ;
-	                    ef.sz = fsz ;
-	                    u_seek(ef.fd,uoff,SEEK_SET) ;
-	                }
-	                if ((rs = u_write(ef.fd,sbuf,slen)) >= 0) {
-	                    wlen = rs ;
-	                    ef.sz += wlen ;
-	                }
-		    } /* end if (u_fstat) */
-		    cmd = F_UNLOCK ;
-		    rs1 = u_lockf(ef.fd,cmd,0z) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (uc_lockf) */
-	        rs1 = mxp->lockend ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (ptm) */
-	} /* end if (debugprint_init) */
+local int debugprinter(cchar *sbuf,int 탎len) noex {
+    	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	int		wlen = 0 ; /* return-value */
+	DPRINTF("ent slen=%d\n",탎len) ;
+	if (int slen ; sbuf && ((slen = getlen(sbuf,탎len)) >= 0)) {
+	    cint clen = slen ;
+	    rs = SR_NOMEM ;
+	    DPRINTF("getlen() slen=%d\n",slen) ;
+	    if (char *cbuf = new(nt) char[clen + 1] ; cbuf) {
+		    int		kl = slen ; /* check-length */
+	            bool	f_needeol = false ;
+	            bool	f_cleaned = false ;
+		    rs = SR_OK ;
+		    if (slen > 0) {
+	                if (sbuf[slen - 1] != '\n') {
+	                    f_needeol = true ;
+			} else {
+			    kl -= 1 ;
+			}
+		    } else {
+	                f_needeol = true ;
+		    } /* end if */
+	            /* scan for bad characters */
+	            if ((kl > 0) && hasprintbad(sbuf,kl)) {
+			cauto sncl = snwcpyprintclean ;
+			DPRINTF("-> sncl kl=%d\n",kl) ;
+	                if ((rs = sncl(cbuf,(clen - 1),sbuf,kl)) >= 0) {
+			    f_cleaned = true ;
+			    DPRINTF("sncl() rs=%d\n",rs) ;
+		            sbuf = cbuf ;
+		            slen = rs ;
+	                } /* end if */
+		    } /* end if (switched buffer) */
+		    if ((rs >= 0) && f_needeol) {
+			if (! f_cleaned) {
+			    strwcpy(cbuf,sbuf,slen) ;
+			}
+			cbuf[slen++] = '\n' ;
+		        cbuf[slen] = '\0' ;
+			sbuf = cbuf ;
+		    } /* end if (switched buffer) */
+	            /* write the line-buffer out */
+	            if (rs >= 0) {
+			DPRINTF("-> dwr slen=%d\n",slen) ;
+			if_constexpr (f_debug) {
+			    strnul ps(sbuf,slen) ;
+			    DPRINTF("s=>%s<",ccp(ps)) ;
+			}
+	                rs = debugwrite(sbuf,slen) ;
+	                wlen = rs ;
+	            } /* end if (ok) */
+		delete [] cbuf ;
+	    } /* end if (m-a-f) */
+	} /* end if (getlenstr) */
+	DPRINTF("ret rs=%d wlen=%d\n",rs,wlen) ;
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (debugprinters) */
+} /* end subroutine (debugprinter) */
 
-local void debugprint_atforkbefore() noex {
-	DEBUGPRINT	*uip = &ef ;
+local void debugmgr_atforkbefore() noex {
+	DEBUGMGR	*uip = &ef ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbegin() ;
 	}
-}
-/* end subroutine (debugprint_atforkbefore) */
+} /* end subroutine (debugmgr_atforkbefore) */
 
-local void debugprint_atforkafter() noex {
-	DEBUGPRINT	*uip = &ef ;
+local void debugmgr_atforkafter() noex {
+	DEBUGMGR	*uip = &ef ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
 	}
-}
-/* end subroutine (debugprint_atforkafter) */
+} /* end subroutine (debugmgr_atforkafter) */
 
-local char *convdeci(LONG num,char *endptr) noex {
-	ULONG		unum = (ULONG) num ;
+int debugmgr_head::advend() noex {
+    	int		rs = SR_OK ;
+	if (fl.seekable) {
+	    if (ustat sb ; (rs = uc_fstat(ef.fd,&sb)) >= 0) {
+		cint fsz = intconv(sb.st_size) ;
+		if (S_ISREG(sb.st_mode) && (fsz != ef.sz)) {
+		    ef.sz = fsz ;
+		    rs = uc_seek(ef.fd,0z,SEEK_END) ;
+		} /* end if (regular file) */
+	    } /* end if (uc_fstat) */
+	} /* end if (seekable) */
+	return rs ;
+} /* end if (debugmgr_head::advend) */
+
+#ifdef	COMMENT
+local char *convdeci(long num,char *endptr) noex {
+	ulong		unum = ulong(num) ;
 	char		*bp ;
 	if (num < 0) unum = (- unum) ;
-	bp = ulltostr(unum,endptr) ;
+	bp = ultostr(unum,endptr) ;
 	if (num < 0) *--bp = '-' ;
 	return bp ;
-}
-/* end subroutine (convdeci) */
+} /* end subroutine (convdeci) */
+#endif /* COMMENT */
 
+#ifdef	COMMENT
 local int cthexi(char *buf,int val) noex {
 	cint		n = (2 * szof(int)) ;
 	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
@@ -768,37 +650,35 @@ local int cthexi(char *buf,int val) noex {
 	} /* end for */
 	buf[n] = '\0' ;
 	return n ;
-}
-/* end subroutine (cthexi) */
+} /* end subroutine (cthexi) */
+#endif /* COMMENT */
 
 local int snwcpyprintclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		ch ;
-	int		dl = 0 ;
-	while (dlen-- && sl && *sp) {
-	    ch = MKCHAR(*sp) ;
+	int		dl = 0 ; /* return-value */
+	for (int ch ; dlen-- && sl && ((ch = MKCHAR(*sp))) ; sp += 1) {
 	    if (isprintbad(ch)) {
 	        if (ch == '\n') {
 		    ch = '�' ;
 	        } else {
 		    ch = '�' ;
 		}
-	    }
-	    dbuf[dl++] = (char) ch ;
-	    sp += 1 ;
+	    } /* end if (was print-bad) */
+	    dbuf[dl++] = char(ch) ;
 	    sl -= 1 ;
-	} /* end while */
-	if ((sl != 0) && (*sp != '\0')) rs = SR_OVERFLOW ;
+	} /* end for */
+	if ((sl != 0) && *sp) {
+	    rs = SR_OVERFLOW ;
+	} /* end if */
 	dbuf[dl] = '\0' ;
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (snwcpyprintclean) */
+} /* end subroutine (snwcpyprintclean) */
 
 #ifdef	COMMENT
 local bool hasprintbad(cchar *sp,int sl) noex {
-	int		f = false ;
+	bool		f = false ;
 	while (sl && *sp) {
-	    f = isprintbad(sp[0] & 0xff) ;
+	    f = isprintbad(sp[0] & UCHAR_MAX) ;
 	    if (f) break ;
 	    sp += 1 ;
 	    sl -= 1 ;
