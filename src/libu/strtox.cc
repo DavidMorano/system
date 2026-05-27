@@ -166,16 +166,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cerrno>
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |strtol(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |getsign(3u)| */
-#include	<stdintx.h>
-#include	<localmisc.h>
-#include	<dprint.hh>		/* debugging */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD |strtol(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |getsign(3u)| */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU debugging */
 
 #include	"strtox.h"
 
@@ -374,7 +374,7 @@ namespace {
 template<typename T>
 local inline void strtox(cchar *,char **,int,T *rp) noex {
 	*rp = 0 ;
-}
+} /* end subroutine-template (strtox) */
 
 template<>
 inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
@@ -512,6 +512,38 @@ ulonglong	strtoxull(cchar *sp,char **epp,int b) noex {
     	strer_unsll so(sp,epp,b) ;
 	return so ;
 } /* end subroutine (strtoxull) */
+
+slonglong	atosll(cchar *s) noex {
+    	longlong	res = 0 ;
+	int		ec = 0 ;
+	if (s) {
+	    if (s[0]) {
+		res = strtoxll(s,nullptr,10) ;
+	    } else {
+		ec = EINVAL ;
+	    }
+	} else {
+	    ec = EFAULT ;
+	} /* end if (non-null) */
+	if (ec) errno = ec ;
+    	return res ;
+} /* end subroutine (atoill) */
+
+ulonglong	atoull(cchar *s) noex {
+    	longlong	res = 0 ;
+	int		ec = 0 ;
+	if (s) {
+	    if (s[0]) {
+		res = strtoxull(s,nullptr,10) ;
+	    } else {
+		ec = EINVAL ;
+	    }
+	} else {
+	    ec = EFAULT ;
+	} /* end if (non-null) */
+	if (ec) errno = ec ;
+    	return res ;
+} /* end subroutine (atoull) */
 
 
 /* local subroutines */
