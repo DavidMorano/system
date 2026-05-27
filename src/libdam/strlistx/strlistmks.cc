@@ -56,7 +56,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
 #include	<endian.h>
@@ -835,9 +835,9 @@ local int indinsert(rectab_t rt,uint (*it)[3],int il,VE *vep) noex {
 
 local int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
-	    if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	        var.maxnamelen = rs ;
 	    }
 	}
