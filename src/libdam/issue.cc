@@ -55,7 +55,7 @@
 #include	<ucdescread.h>
 #include	<ucdescwrite.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
 #include	<getax.h>
 #include	<getpwx.h>
@@ -1322,9 +1322,9 @@ local int mapdir_procouter(MD *ep,cc **ev,cc *fn,int ofd) noex {
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = maxpathlen) == 0) {
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
-		if ((rs = getbufsize(bufsize_mn)) >= 0) {
+		if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 		    maxnamelen = rs ;
 		    envlen = maxnamelen ;
 		}
