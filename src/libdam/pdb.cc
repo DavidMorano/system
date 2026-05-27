@@ -53,7 +53,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<svcfile.h>
 #include	<vecstr.h>
 #include	<mkpathx.h>
@@ -443,9 +443,9 @@ static int pdb_dbcheck(pdb *op,int w) noex {
 
 int vars::mkvars() noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
     	return rs ;
 }
 /* end method (vars:mkvars) */
