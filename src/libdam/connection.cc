@@ -74,7 +74,7 @@
 #include	<uclibmem.h>
 #include	<ucdesc.h>
 #include	<ucgetx.h>		/* |uc_getnameinfo(3uc)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getxx.h>
 #include	<hostent.h>
 #include	<hostinfo.h>
@@ -626,11 +626,11 @@ connection_co::operator int () noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(bufsize_hostname)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 	        maxhostlen = rs ;
-	        if ((rs = getbufsize(bufsize_ho)) >= 0) ylikely {
+	        if ((rs = bufsizeget(bufsize_ho)) >= 0) ylikely {
 		    hostentlen = rs ;
 	            socknamelen = max(maxpathlen,maxhostlen) ;
 		}
