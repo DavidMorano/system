@@ -141,7 +141,7 @@ int msgdata_fini(msgdata *mip) noex {
 }
 /* end subroutine (msgdata_fini) */
 
-int msgdata_getbufsize(msgdata *mip) noex {
+int msgdata_bufsizeget(msgdata *mip) noex {
 	return mip->mlen ;
 }
 /* end subroutine (msgdata_bufsize) */
