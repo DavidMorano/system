@@ -45,7 +45,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<getusername.h>
 #include	<getuserhome.h>
@@ -1212,7 +1212,7 @@ static int bufdesc_finish(BD *bdp) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_ml)) >= 0) {
+	if ((rs = bufsizeget(bufsize_ml)) >= 0) {
 	    maxlinelen = rs ;
 	}
 	return rs ;
