@@ -87,7 +87,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<uinfo.h>
+#include	<ucinfo.h>
 #include	<estrings.h>		/* |sf{x}(3uc)| + |snwcpy(3uc)| */
 #include	<nleadstr.h>
 #include	<localmisc.h>
@@ -258,26 +258,23 @@ int trier::tryenv() noex {
 	    }
 	}
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (trier::tryenv) */
+} /* end method (trier::tryenv) */
 
 int trier::tryinfo() noex {
     	int		rs ;
 	int		rl = 0 ;
-	if (uinfo_infoaux aux ; (rs = uinfo_aux(&aux)) >= 0) {
+	if (ucinfo_infoaux aux ; (rs = ucinfo_aux(&aux)) >= 0) {
 	    if (aux.hwprovider) {
 		rs = sncpy(rbuf,rlen,aux.hwprovider) ;
 		rl = rs ;
 	    }
-	} /* end if (uinfo) */
+	} /* end if (ucinfo) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (trier::tryinfo) */
+} /* end method (trier::tryinfo) */
 
 int trier::trydef() noex {
 	return sncpy(rbuf,rlen,sysword.w_defprovider) ;
-}
-/* end method (trier::trydef) */
+} /* end method (trier::trydef) */
 
 namespace libdam {
     provider::operator int () noex {
