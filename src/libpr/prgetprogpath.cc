@@ -62,7 +62,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bufsizevar.hh>
 #include	<vecstr.h>
 #include	<ids.h>
@@ -360,7 +360,7 @@ local int subinfo_record(SI *sip,cchar *dp,int dl) noex {
 local int mkdfname(char *rbuf,cchar *dp,int dl,cchar *sp,int sl) noex {
 	int		rs ;
 	int		i = 0 ; /* return-vakue */
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    cint	rlen = rs ;
 	    if (rs >= 0) ylikely {
 	        rs = storebuf_strw(rbuf,rlen,i,dp,dl) ;
@@ -374,7 +374,7 @@ local int mkdfname(char *rbuf,cchar *dp,int dl,cchar *sp,int sl) noex {
 	        rs = storebuf_strw(rbuf,rlen,i,sp,sl) ;
 	        i += rs ;
 	    }
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (mkdfname) */
