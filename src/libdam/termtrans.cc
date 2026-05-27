@@ -40,7 +40,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<ascii.h>
 #include	<ansigr.h>
 #include	<buffer.h>
@@ -852,12 +852,12 @@ local bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 	    csnlen = rs ;
-	    if ((rs = getbufsize(bufsize_ml)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_ml)) >= 0) ylikely {
 	        outlinelen = (NLINEMULT * rs) ;
 	    }
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return rs ;
 }
 /* end method (vars::operator) */
