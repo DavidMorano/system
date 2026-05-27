@@ -1,4 +1,4 @@
-/* constdiv MODULE */
+/* constdiv MODULE (primary) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -21,7 +21,7 @@
 	constdiv
 
 	Description:
-	This is a common algorithn for performing division by a
+	This is a common algorithm for performing division by a
 	constant (what I am callig "constant division").  I forget
 	the name of the person who invented this.  If you know
 	or remember who he was, please let me know so that I
@@ -35,14 +35,14 @@
 	Rules:
 	Unisigned integer division of 32-bit numbers (|uint|).
 
-	How-to-use:
+	Example:
 	{
-	    uint	n = «x1» ;
-	    uint	d = «x2» ;
-	    uint	q ;
-	    constdiv	diver(d) ;
-	    q = diver(n) ;
-	    cout << q << eol ;
+	    uint	num = «x1» ;
+	    uint	den = «x2» ;
+	    uint	quo ;
+	    constdiv	diver(den) ;
+	    quo = diver(num) ;
+	    cout << quo << eol ;
 	}
 
 *******************************************************************************/
@@ -50,12 +50,14 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module constdiv ;
 
