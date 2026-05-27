@@ -38,7 +38,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucgetpid.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getmjd.h>
 #include	<ids.h>
 #include	<tmtime.hh>
@@ -95,20 +95,20 @@ namespace prqotd {
 	if ((rs = u_getenviron(&envv)) >= 0) {
 	    if ((rs = ucpid) >= 0) {
 		pid = rs ;
-	        if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 		    maxnamelen = rs ;
-	            if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	            if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 		        maxpathlen = rs ;
-			if ((rs = getbufsize(bufsize_nn)) >= 0) {
+			if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 			    nodenamelen = rs ;
-			    if ((rs = getbufsize(bufsize_hn)) >= 0) {
+			    if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 			        hostnamelen = rs ;
 			        {
 		                    ebuflen = (maxpathlen * EBUFLENMULT) ;
 		                    vbuflen = (maxpathlen * VBUFLENMULT) ;
 			        }
-			    } /* end if (getbufsize) */
-			} /* end if (getbufsize) */
+			    } /* end if (bufsizeget) */
+			} /* end if (bufsizeget) */
 	            }
 	        }
 	    } /* end if (ucpid) */
