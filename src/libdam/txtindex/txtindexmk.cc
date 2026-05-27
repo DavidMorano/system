@@ -39,7 +39,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getnodedomain.h>
 #include	<mkpr.h>
 #include	<estrings.h>
@@ -433,9 +433,9 @@ local int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
 
 local int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_hostname)) >= 0) {
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	    var.maxhostlen = rs ;
-	    if ((rs = getbufsize(bufsize_hostname)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 		var.maxpathlen = rs ;
 	    }
 	}
