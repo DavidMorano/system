@@ -90,8 +90,8 @@
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>		/* |lenstr(3c)| */
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>
 #include	<getusername.h>
