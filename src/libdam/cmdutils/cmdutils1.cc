@@ -17,8 +17,8 @@
 
 /*******************************************************************************
 
-	Object:
-	files_util 
+	Names:
+	optval
 
 *******************************************************************************/
 
@@ -31,7 +31,6 @@ module ;
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |cfdec(3u)| */
-#include	<matxstr.h>		/* |matocasestr| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -48,6 +47,7 @@ import ureserve ;			/* is{x}(2u)| */
 /* imported namespaces */
 
 using libu::cfdec ;			/* |cfdec(3u)| */
+using libu::matocasestr ;		/* |matocasestr(3u)| */
 
 
 /* local typedefs */
