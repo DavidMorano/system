@@ -36,7 +36,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<strn.h>
 #include	<sfx.h>
 #include	<strwcpy.h>
@@ -170,7 +170,7 @@ int querystr_start(querystr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = querystr_ctor(op,sp)) >= 0) {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	        if ((rs = strpack_start(op->spp,rs)) >= 0) {
 	            op->open.packer = true ;
 	            if (subinfo si(op) ; (rs = si.split(sp,sl)) >= 0) {
@@ -181,7 +181,7 @@ int querystr_start(querystr *op,cchar *sp,int sl) noex {
 		        strpack_finish(op->spp) ;
 	            }
 	        } /* end if (strpack_start) */
-	    } /* end if (getbufsize) */
+	    } /* end if (bufsizeget) */
 	    if (rs < 0) {
 		querystr_dtor(op) ;
 	    }
