@@ -54,11 +54,8 @@ OBJB= obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
-OBJS= obja.o objb.o
-
 
 INCDIRS=
-
 LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
@@ -102,7 +99,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 o:			$(T).o
@@ -111,15 +108,15 @@ a:			$(T).a
 
 so:			$(T).so
 
-$(T).o:			$(OBJ) Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+$(T).o:			$(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+$(T).so:		$(OBJ)
+	$(LD) -shared -o $@ $(LDFLAGS) $^ $(LIBDIRS) $(LIBS)
 
 $(T).a:			$(OBJ)
 	$(AR) -cr $@ $?
 	ranlib $@
-
-$(T).so:		$(OBJS) Makefile $(T).a
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJS) $(LIBDIRS) $(SLIBS)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
