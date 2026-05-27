@@ -29,21 +29,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>		/* |SEEK_{xx}| */
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usyscalls.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX |SEEK_{xx}| */
+#include	<fcntl.h>		/* POSIX */
+#include	<poll.h>		/* POSIX */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<funcodes.h>		/* |FM_{x}(3uc)| */
-#include	<intfloor.h>
-#include	<fmtstr.h>
-#include	<localmisc.h>
+#include	<intfloor.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* debugging */
 
 #include	"ustream.hh"
