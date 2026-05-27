@@ -83,7 +83,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucsysmisc.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getpwd.h>
 #include	<sysval.hh>
 #include	<endian.h>
@@ -1242,9 +1242,9 @@ local int mkvars() noex {
 	int		rs ;
 	if ((rs = ucpagesize) >= 0) {
 	    var.pagesize = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        var.maxpathlen = rs ;
-	    } /* end if (getbufsize) */
+	    } /* end if (bufsizeget) */
 	} /* end if (uc_pagesize) */
 	return rs ;
 }
