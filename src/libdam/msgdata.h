@@ -64,7 +64,7 @@ EXTERNC_begin
 
 extern int	msgdata_init(msgdata *,int) noex ;
 extern int	msgdata_setaddr(msgdata *,cvoid *,int) noex ;
-extern int	msgdata_getbufsize(msgdata *) noex ;
+extern int	msgdata_bufsizeget(msgdata *) noex ;
 extern int	msgdata_getbuf(msgdata *,char **) noex ;
 extern int	msgdata_getdatalen(msgdata *) noex ;
 extern int	msgdata_getdata(msgdata *,char **) noex ;
