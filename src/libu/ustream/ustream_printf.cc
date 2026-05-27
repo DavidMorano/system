@@ -28,20 +28,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>		/* |SEEK_{xx}| */
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usyscalls.h>
-#include	<funcodes.h>		/* |FM_{x}(3uc)| */
-#include	<intfloor.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX |SEEK_{xx}| */
+#include	<fcntl.h>		/* POSIX */
+#include	<poll.h>		/* POSIX */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LINU */
+#include	<usyscalls.h>		/* LINU */
+#include	<funcodes.h>		/* LIBU |FM_{x}(3uc)| */
+#include	<intfloor.h>		/* LINU */
+#include	<localmisc.h>		/* LINU */
 
 #include	"ustream.hh"
 
@@ -64,8 +63,6 @@ import ulibvals ;			/* |ulibval(3u)| */
 
 /* imported namespaces */
 
-using std::min ;		/* subroutine-template */
-using std::max ;		/* subroutine-template */
 using libu::uread ;		/* subroutine */
 using libu::ureade ;		/* subroutine */
 using libu::snvprintf ;		/* subroutine */
@@ -79,9 +76,6 @@ using ustream_ns::ustream_write ;
 
 
 /* external subroutines */
-
-extern "C" {
-}
 
 
 /* external variables */
