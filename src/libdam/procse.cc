@@ -35,7 +35,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<expcook.h>
@@ -301,7 +301,7 @@ int procse_process(procse *op,expcook *ecp) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    var.maxpathlen = rs ;
 	    var.ebuflen = (rs * BUFMULT) ;
 	}
