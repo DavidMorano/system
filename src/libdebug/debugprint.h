@@ -20,26 +20,39 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stdarg.h>		/* |va_list(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 
 
 #define DEBUGPRINTF(FMT, ...)					\
-    debugprintf("%s: ",__func__) ;				\
-    debugprintf(FMT __VA_OPT__(,) __VA_ARGS__)
+    debugprintx(__func__,FMT __VA_OPT__(,) __VA_ARGS__)
 
 
 EXTERNC_begin
 
-extern int debugopen(cchar *) noex ;
-extern int debugclose(void) noex ;
-extern int debugprint(cchar *,int) noex ;
-extern int debugprintf(cchar *,...) noex ;
-extern int debugprinthexblock(cchar *,int,cvoid *,int) noex ;
-extern int debugprinthex(cchar *,int,cchar *,int) noex ;
+extern int debugopen		(cchar *) noex ;
+extern int debugclose		(void) noex ;
+extern int debugwrite		(cchar *,int) noex ;
+extern int debugprint		(cchar *,int) noex ;
+extern int debugprintf		(cchar *,...) noex ;
+extern int debugprintx		(cchar *,cchar *,...) noex ;
+extern int debugvprintf		(cchar *,va_list) noex ;
+extern int debugprinthexblock	(cchar *,int,cvoid *,int) noex ;
+extern int debugprinthex	(cchar *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+inline int debugwrite(cchar *sp) noex {
+    	return debugwrite(sp,-1) ;
+}
+inline int debugprint(cchar *sp) noex {
+    	return debugprint(sp,-1) ;
+}
+
+#endif /* __cplusplus */
 
 #endif /* DEBUGPRINT_INCLUDE */
 
