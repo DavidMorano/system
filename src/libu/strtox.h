@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
@@ -37,6 +37,8 @@ extern ulong		strtoxul(cchar *,char **,int) noex ;	/* 64-bits */
 
 extern longlong		strtoxll(cchar *,char **,int) noex ;	/* 128-bits */
 extern ulonglong	strtoxull(cchar *,char **,int) noex ;	/* 128-bits */
+
+EXTERNC_end
 
 #ifdef	COMMENT /* this is a 256-bit integer; but it does not yet exist */
 #ifdef	__cplusplus
@@ -51,6 +53,11 @@ extern int512_t		strtos256(cchar *,char **,int) noex ;	/* 512-bits */
 extern uint512_t	strtou256(cchar *,char **,int) noex ;	/* 512-bits */
 #endif /* __cplusplus */
 #endif /* COMMENT */
+
+EXTERNC_begin
+
+extern slonglong	atosll(cchar *) noex ;
+extern ulonglong	atoull(cchar *) noex ;
 
 EXTERNC_end
 
