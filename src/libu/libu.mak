@@ -88,7 +88,7 @@ OBJ31= ccfile.o readln.o dprint.o
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o cmporders.o localmisc.o
 OBJ34= exitcodes.o stacktypes.o sysconfcmds.o
-OBJ35= utmptypes.o ascii.o mapex.o deb.o
+OBJ35= utmptypes.o utmpsizes.o ascii.o mapex.o deb.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -593,6 +593,7 @@ xxtostr.o:		xxtostr.cc	xxtostr.h			$(INCS)
 
 # various types
 utmptypes.o:		utmptypes.cc	utmptypes.hh			$(INCS)
+utmpsizes.o:		utmpsizes.cc	utmpsizes.hh			$(INCS)
 cmporders.o:		cmporders.cc	cmporders.h			$(INCS)
 localmisc.o:		localmisc.cc	localmisc.h			$(INCS)
 mapex.o:		mapex.cc	mapex.h				$(INCS)
