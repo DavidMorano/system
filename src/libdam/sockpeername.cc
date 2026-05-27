@@ -39,7 +39,7 @@
 #include	<uinet.h>		/* |INETXADDRLEN| */
 #include	<uclibmem.h>
 #include	<ucgetx.h>		/* |uc_getnameinfo(3uc)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getxx.h>
 #include	<sockaddress.h>
 #include	<hostent.h>
@@ -355,9 +355,9 @@ int in6er::operator () (sockaddress *sap) noex {
 
 static int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	    var.maxhostlen = rs ;
-	    if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 		var.svcnamelen = rs ;
 	    }
 	}
