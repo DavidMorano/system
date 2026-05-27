@@ -80,10 +80,10 @@
 #include	<getusername.h>
 #include	<getprojname.h>		/* |getprojname(3uc)| */
 #include	<getostype.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getnodedomain.h>
 #include	<getax.h>
-#include	<uinfo.h>
+#include	<ucinfo.h>
 #include	<userattrdb.h>
 #include	<gecos.h>
 #include	<bits.h>
@@ -247,7 +247,7 @@ struct procinfo {
 	PROCINFO_TMPS	tstrs ;
 	PASSWD		pw ;
 	bits		have ;
-	uinfo_names	unixinfo ;
+	ucinfo_names	unixinfo ;
 	userinfo	*uip ;		/* supplied argument */
 	strstore	*stp ;		/* supplied argument */
 	int		*sis ;		/* supplied argument */
@@ -280,75 +280,72 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static int userinfo_ctor(userinfo *op,Args ... args) noex {
+local int userinfo_ctor(userinfo *op,Args ... args) noex {
     	USERINFO	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (userinfo_ctor) */
+} /* end subroutine (userinfo_ctor) */
 
-static int userinfo_dtor(userinfo *op) noex {
+local int userinfo_dtor(userinfo *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (userinfo_dtor) */
+} /* end subroutine (userinfo_dtor) */
 
 template<typename ... Args>
-static inline int userinfo_magic(userinfo *op,Args ... args) noex {
+local inline int userinfo_magic(userinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == USERINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (userinfo_magic) */
+} /* end subroutine (userinfo_magic) */
 
-static int	userinfo_process(UI *,strstore *,int *,cchar *) noex ;
-static int	userinfo_id(UI *uip) noex ;
-static int	userinfo_load(UI *,strstore *,int *) noex ;
+local int	userinfo_process(UI *,strstore *,int *,cchar *) noex ;
+local int	userinfo_id(UI *uip) noex ;
+local int	userinfo_load(UI *,strstore *,int *) noex ;
 
 #ifdef	COMMENT
-static int	userinfo_setnuls(UI *,cchar *) noex ;
+local int	userinfo_setnuls(UI *,cchar *) noex ;
 #endif
 
-static int	procinfo_start(PROCINFO *,UI *,strstore *,int *) noex ;
-static int	procinfo_finish(PROCINFO *) noex ;
-static int 	procinfo_find(PROCINFO *,cchar *) noex ;
-static int	procinfo_pwentry(PROCINFO *,cchar *) noex ;
-static int	procinfo_getpwuser(PROCINFO *,ucentpw *,char *,int,
+local int	procinfo_start(PROCINFO *,UI *,strstore *,int *) noex ;
+local int	procinfo_finish(PROCINFO *) noex ;
+local int 	procinfo_find(PROCINFO *,cchar *) noex ;
+local int	procinfo_pwentry(PROCINFO *,cchar *) noex ;
+local int	procinfo_getpwuser(PROCINFO *,ucentpw *,char *,int,
 			cchar *) noex ;
-static int	procinfo_store(PROCINFO *,int,cchar *,int,cchar **) noex ;
-static int	procinfo_uabegin(PROCINFO *) noex ;
-static int	procinfo_uaend(PROCINFO *) noex ;
-static int	procinfo_ualookup(PROCINFO *,char *,int,cchar *) noex ;
+local int	procinfo_store(PROCINFO *,int,cchar *,int,cchar **) noex ;
+local int	procinfo_uabegin(PROCINFO *) noex ;
+local int	procinfo_uaend(PROCINFO *) noex ;
+local int	procinfo_ualookup(PROCINFO *,char *,int,cchar *) noex ;
 
 /* components */
-static int	procinfo_homedname(PROCINFO *) noex ;
-static int	procinfo_shell(PROCINFO *) noex ;
-static int	procinfo_org(PROCINFO *) noex ;
-static int	procinfo_bin(PROCINFO *) noex ;
-static int	procinfo_office(PROCINFO *) noex ;
-static int	procinfo_printer(PROCINFO *) noex ;
-static int	procinfo_gecos(PROCINFO *) noex ;
-static int	procinfo_gecosname(PROCINFO *) noex ;
-static int	procinfo_realname(PROCINFO *) noex ;
-static int	procinfo_mailname(PROCINFO *) noex ;
-static int	procinfo_name(PROCINFO *) noex ;
-static int	procinfo_fullname(PROCINFO *) noex ;
-static int	procinfo_uinfo(PROCINFO *) noex ;
-static int	procinfo_nodename(PROCINFO *) noex ;
-static int	procinfo_domainname(PROCINFO *) noex ;
-static int	procinfo_project(PROCINFO *) noex ;
-static int	procinfo_tz(PROCINFO *) noex ;
-static int	procinfo_md(PROCINFO *) noex ;
-static int	procinfo_wstation(PROCINFO *) noex ;
-static int	procinfo_logid(PROCINFO *) noex ;
+local int	procinfo_homedname(PROCINFO *) noex ;
+local int	procinfo_shell(PROCINFO *) noex ;
+local int	procinfo_org(PROCINFO *) noex ;
+local int	procinfo_bin(PROCINFO *) noex ;
+local int	procinfo_office(PROCINFO *) noex ;
+local int	procinfo_printer(PROCINFO *) noex ;
+local int	procinfo_gecos(PROCINFO *) noex ;
+local int	procinfo_gecosname(PROCINFO *) noex ;
+local int	procinfo_realname(PROCINFO *) noex ;
+local int	procinfo_mailname(PROCINFO *) noex ;
+local int	procinfo_name(PROCINFO *) noex ;
+local int	procinfo_fullname(PROCINFO *) noex ;
+local int	procinfo_uinfo(PROCINFO *) noex ;
+local int	procinfo_nodename(PROCINFO *) noex ;
+local int	procinfo_domainname(PROCINFO *) noex ;
+local int	procinfo_project(PROCINFO *) noex ;
+local int	procinfo_tz(PROCINFO *) noex ;
+local int	procinfo_md(PROCINFO *) noex ;
+local int	procinfo_wstation(PROCINFO *) noex ;
+local int	procinfo_logid(PROCINFO *) noex ;
 
 
 /* local variables */
@@ -445,7 +442,7 @@ int userinfo_finish(UI *op) noex {
 
 /* local subroutines */
 
-static int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
+local int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
 	PROCINFO	pi ;
 	int		rs ;
 	int		rs1 ;
@@ -459,10 +456,9 @@ static int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (procinfo) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (userinfo_process) */
+} /* end subroutine (userinfo_process) */
 
-static int userinfo_id(UI *uip) noex {
+local int userinfo_id(UI *uip) noex {
 	int		rs ;
 	if ((rs = ucpid) >= 0) {
 	    uip->pid = rs ;
@@ -475,10 +471,9 @@ static int userinfo_id(UI *uip) noex {
 	    }
 	} /* end if (ucpid) */
 	return rs ;
-}
 /* end subroutine (userinfo_id) */
 
-static int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
+local int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	int		rs ;
 	int		sz = 0 ;
 	if ((rs = strstore_strsize(stp)) >= 0) ylikely {
@@ -592,10 +587,9 @@ static int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (userinfo_load) */
+} /* end subroutine (userinfo_load) */
 
-static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
+local int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	cint		pwlen = var.pwlen ;
 	int		rs ;
 	int		sz = 0 ;
@@ -635,10 +629,9 @@ static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (procinfo_start) */
+} /* end subroutine (procinfo_start) */
 
-static int procinfo_finish(PROCINFO *pip) noex {
+local int procinfo_finish(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -661,10 +654,9 @@ static int procinfo_finish(PROCINFO *pip) noex {
 	    pip->a = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_finish) */
+} /* end subroutine (procinfo_finish) */
 
-static int procinfo_store(PROCINFO *pip,int uit,cc *vp,int vl,cc **rpp) noex {
+local int procinfo_store(PROCINFO *pip,int uit,cc *vp,int vl,cc **rpp) noex {
 	strstore	*stp = pip->stp ;
 	int		rs = SR_OK ;
 	if (uit >= 0) {
@@ -682,10 +674,9 @@ static int procinfo_store(PROCINFO *pip,int uit,cc *vp,int vl,cc **rpp) noex {
 	    *rpp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_store) */
+} /* end subroutine (procinfo_store) */
 
-static int procinfo_uabegin(PROCINFO *pip) noex {
+local int procinfo_uabegin(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
 	if ((! pip->fl.ua) && pip->fl.pw && (! pip->fl.uainit)) {
 	    pip->fl.uainit = true ;
@@ -711,10 +702,9 @@ static int procinfo_uabegin(PROCINFO *pip) noex {
 	    } /* end if (ok) */
 	} /* end if (f.ua) */
 	return rs ;
-}
-/* end subroutine (procinfo_uabegin) */
+} /* end subroutine (procinfo_uabegin) */
 
-static int procinfo_uaend(PROCINFO *pip) noex {
+local int procinfo_uaend(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pip->fl.ua) ylikely {
@@ -729,10 +719,9 @@ static int procinfo_uaend(PROCINFO *pip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_uaend) */
+} /* end subroutine (procinfo_uaend) */
 
-static int procinfo_ualookup(PROCINFO *pip,char *rbuf,int rlen,cc *kn) noex {
+local int procinfo_ualookup(PROCINFO *pip,char *rbuf,int rlen,cc *kn) noex {
 	int		rs = SR_FAULT ;
 	if (pip && rbuf && kn) ylikely {
 	    rbuf[0] = '\0' ;
@@ -747,10 +736,9 @@ static int procinfo_ualookup(PROCINFO *pip,char *rbuf,int rlen,cc *kn) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (procinfo_ualookup) */
+} /* end subroutine (procinfo_ualookup) */
 
-static int procinfo_find(PROCINFO *pip,cchar *un) noex {
+local int procinfo_find(PROCINFO *pip,cchar *un) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs ;
 	if ((rs = procinfo_pwentry(pip,un)) >= 0) ylikely {
@@ -796,10 +784,9 @@ static int procinfo_find(PROCINFO *pip,cchar *un) noex {
 	    } /* end if */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (procinfo_find) */
+} /* end subroutine (procinfo_find) */
 
-static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
+local int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
 	ucentpw		pw ;
 	int		rs ;
 	int		pwlen = pip->tlen ;
@@ -824,10 +811,9 @@ static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
 	    } /* end if (passwdent_size) */
 	} /* end if (procinfo_getpwuser) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (procinfo_pwentry) */
+} /* end subroutine (procinfo_pwentry) */
 
-static int procinfo_getpwuser(PROCINFO *pip,ucentpw *pwp,
+local int procinfo_getpwuser(PROCINFO *pip,ucentpw *pwp,
 		char *pwbuf,int pwlen,cchar *un) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs ;
@@ -843,10 +829,9 @@ static int procinfo_getpwuser(PROCINFO *pip,ucentpw *pwp,
 	    rs = getpwusername(pwp,pwbuf,pwlen,uip->uid) ;
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_getpwuser) */
+} /* end subroutine (procinfo_getpwuser) */
 
-static int procinfo_homedname(PROCINFO *pip) noex {
+local int procinfo_homedname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_homedname ;
@@ -866,10 +851,9 @@ static int procinfo_homedname(PROCINFO *pip) noex {
 	    uip->homedname = vp ;
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_homedname) */
+} /* end subroutine (procinfo_homedname) */
 
-static int procinfo_shell(PROCINFO *pip) noex {
+local int procinfo_shell(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_shell ;
@@ -885,10 +869,9 @@ static int procinfo_shell(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_shell) */
+} /* end subroutine (procinfo_shell) */
 
-static int procinfo_org(PROCINFO *pip) noex {
+local int procinfo_org(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	cint		orglen = var.maxnamelen ;
 	int		rs = SR_OK ;
@@ -934,10 +917,9 @@ static int procinfo_org(PROCINFO *pip) noex {
 	    } /* end if (m-a-f) */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (procinfo_org) */
+} /* end subroutine (procinfo_org) */
 
-static int procinfo_bin(PROCINFO *pip) noex {
+local int procinfo_bin(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_bin ;
@@ -953,10 +935,9 @@ static int procinfo_bin(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_bin) */
+} /* end subroutine (procinfo_bin) */
 
-static int procinfo_office(PROCINFO *pip) noex {
+local int procinfo_office(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_office ;
@@ -972,10 +953,9 @@ static int procinfo_office(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_office) */
+} /* end subroutine (procinfo_office) */
 
-static int procinfo_printer(PROCINFO *pip) noex {
+local int procinfo_printer(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_printer ;
@@ -991,11 +971,10 @@ static int procinfo_printer(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_printer) */
+} /* end subroutine (procinfo_printer) */
 
 /* parse out the GECOS field */
-static int procinfo_gecos(PROCINFO *pip) noex {
+local int procinfo_gecos(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*gstr = pip->pw.pw_gecos ;
@@ -1101,10 +1080,9 @@ static int procinfo_gecos(PROCINFO *pip) noex {
 	    } /* end if (gecos) */
 	} /* end if (non-empty) */
 	return rs ;
-}
-/* end subroutine (procinfo_gecos) */
+} /* end subroutine (procinfo_gecos) */
 
-static int procinfo_gecosname(PROCINFO *pip) noex {
+local int procinfo_gecosname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_gecosname ;
@@ -1122,10 +1100,9 @@ static int procinfo_gecosname(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_gecosname) */
+} /* end subroutine (procinfo_gecosname) */
 
-static int procinfo_realname(PROCINFO *pip) noex {
+local int procinfo_realname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_realname ;
@@ -1151,10 +1128,9 @@ static int procinfo_realname(PROCINFO *pip) noex {
 	    }
 	} /* end if (needed) */
 	return rs ;
-}
-/* end subroutine (procinfo_realname) */
+} /* end subroutine (procinfo_realname) */
 
-static int procinfo_mailname(PROCINFO *pip) noex {
+local int procinfo_mailname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_mailname ;
@@ -1202,10 +1178,9 @@ static int procinfo_mailname(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_mailname) */
+} /* end subroutine (procinfo_mailname) */
 
-static int procinfo_name(PROCINFO *pip) noex {
+local int procinfo_name(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_name ;
@@ -1246,10 +1221,9 @@ static int procinfo_name(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_name) */
+} /* end subroutine (procinfo_name) */
 
-static int procinfo_fullname(PROCINFO *pip) noex {
+local int procinfo_fullname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_fullname ;
@@ -1263,10 +1237,9 @@ static int procinfo_fullname(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_fullname) */
+} /* end subroutine (procinfo_fullname) */
 
-static int procinfo_nodename(PROCINFO *pip) noex {
+local int procinfo_nodename(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_nodename ;
@@ -1283,10 +1256,9 @@ static int procinfo_nodename(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_nodename) */
+} /* end subroutine (procinfo_nodename) */
 
-static int procinfo_domainname(PROCINFO *pip) noex {
+local int procinfo_domainname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_domainname ;
@@ -1330,10 +1302,9 @@ static int procinfo_domainname(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_domainename) */
+} /* end subroutine (procinfo_domainename) */
 
-static int procinfo_project(PROCINFO *pip) noex {
+local int procinfo_project(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	cint		dlen = var.projnamelen ;
 	int		rs = SR_OK ;
@@ -1368,10 +1339,9 @@ static int procinfo_project(PROCINFO *pip) noex {
 	    }
 	} /* end if (project) */
 	return rs ;
-}
-/* end subroutine (procinfo_project) */
+} /* end subroutine (procinfo_project) */
 
-static int procinfo_tz(PROCINFO *pip) noex {
+local int procinfo_tz(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_tz ;
@@ -1403,10 +1373,9 @@ static int procinfo_tz(PROCINFO *pip) noex {
 	    }
 	} /* end if (tz) */
 	return rs ;
-}
-/* end subroutine (procinfo_tz) */
+} /* end subroutine (procinfo_tz) */
 
-static int procinfo_md(PROCINFO *pip) noex {
+local int procinfo_md(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1420,7 +1389,7 @@ static int procinfo_md(PROCINFO *pip) noex {
 	    }
 	    if (uip->md == nullptr) {
 	        int	dl = -1 ;
-	        if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
+	        if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) {
 		    cint	dlen = rs ;
 	            if ((rs >= 0) && (dbuf[0] == '\0')) {
 	                if (pip->fl.pw) {
@@ -1442,10 +1411,9 @@ static int procinfo_md(PROCINFO *pip) noex {
 	    }
 	} /* end if (md) */
 	return rs ;
-}
-/* end subroutine (procinfo_md) */
+} /* end subroutine (procinfo_md) */
 
-static int procinfo_wstation(PROCINFO *pip) noex {
+local int procinfo_wstation(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_wstation ;
@@ -1477,10 +1445,9 @@ static int procinfo_wstation(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_wstation) */
+} /* end subroutine (procinfo_wstation) */
 
-static int procinfo_logid(PROCINFO *pip) noex {
+local int procinfo_logid(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
@@ -1500,14 +1467,13 @@ static int procinfo_logid(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_logid) */
+} /* end subroutine (procinfo_logid) */
 
-static int procinfo_uinfo(PROCINFO *pip) noex {
+local int procinfo_uinfo(PROCINFO *pip) noex {
 	int		rs ;
-	if ((rs = uinfo_name(&pip->unixinfo)) >= 0) {
+	if ((rs = ucinfo_name(&pip->unixinfo)) >= 0) {
 	    userinfo	*uip = pip->uip ;
-	    uinfo_names	*xip = &pip->unixinfo ;
+	    ucinfo_names	*xip = &pip->unixinfo ;
 	    cint	uit = uit_nodename ;
 	    uip->sysname = xip->sysname ;
 	    uip->release = xip->release ;
@@ -1518,14 +1484,13 @@ static int procinfo_uinfo(PROCINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procinfo_uinfo) */
+} /* end subroutine (procinfo_uinfo) */
 
 void userinfo::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("userinfo",rs,"fini-finish") ;
 	}
-}
+} /* end subroutine (useirnfo::dtor) */
 
 userinfo_cos::operator int () noex {
 	return userinfo_start(op,nullptr) ;
@@ -1545,8 +1510,7 @@ userinfo_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (userinfo_co::operator) */
+} /* end method (userinfo_co::operator) */
 
 #if	CF_OLDUSERINFO
 int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
@@ -1706,23 +1670,22 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (userinfo_data) */
+} /* end subroutine (userinfo_data) */
 #endif /* CF_OLDUSERINFO */
 
 int vars::mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	    maxnamelen = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
-	        if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 	            nodenamelen = rs ;
-	            if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	            if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	                hostnamelen = rs ;
-	                if ((rs = getbufsize(bufsize_pn)) >= 0) {
+	                if ((rs = bufsizeget(bufsize_pn)) >= 0) {
 	                    projnamelen = rs ;
-	                    if ((rs = getbufsize(bufsize_pw)) >= 0) {
+	                    if ((rs = bufsizeget(bufsize_pw)) >= 0) {
 				pwlen = rs ;
 			    }
 			}
@@ -1731,7 +1694,6 @@ int vars::mkvars() noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::mkvars) */
+} /* end method (vars::mkvars) */
 
 
