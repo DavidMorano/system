@@ -34,7 +34,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<serialbuf.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
@@ -278,9 +278,9 @@ msgide_co<msgide>::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 	    reciplen = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 		maxhostlen = rs ;
 	    }
 	}
