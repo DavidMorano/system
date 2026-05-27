@@ -47,7 +47,7 @@
 #include	<uclibmem.h>
 #include	<ucdesc.h>
 #include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<sigblocker.h>
 #include	<endian.h>
@@ -1722,7 +1722,7 @@ vars::operator int () noex {
     	int		rs ;
 	if ((rs = ucpagesize) >= 0) nlikely {
 	    pagesize = rs ;
-	    if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 		maxnamelen = rs ;
 		hdrbuflen = (szof(votdchdr) + maxnamelen) ;
 	    }
