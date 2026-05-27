@@ -50,7 +50,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<endian.h>
 #include	<lockfile.h>
 #include	<serialbuf.h>
@@ -1290,7 +1290,7 @@ local bool keymat(msgid_key *kp,msgide *ep) noex {
 vars::operator int () noex {
         int		rs ;
 	int		rs1 ;
-	if ((rs = getbufsize(bufsize_hostname)) >= 0) {
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	    hostnamelen = rs ;
 	    if ((rs = ucpagesize) >= 0) {
 		pagesize = rs ;
@@ -1304,7 +1304,7 @@ vars::operator int () noex {
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (msgide) */
 	    }
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return rs ;
 }
 /* end method (vars::operator) */
