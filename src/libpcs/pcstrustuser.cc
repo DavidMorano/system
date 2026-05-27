@@ -62,7 +62,6 @@
 #include	<uclibmem.h>
 #include	<ucentpw.h>
 #include	<ucentgr.h>
-#include	<getbufsize.h>
 #include	<getusername.h>
 #include	<getax.h>
 #include	<getpwx.h>
