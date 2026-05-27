@@ -46,7 +46,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<netdb.h>
 #include	<clusterdb.h>
 #include	<ids.h>
@@ -432,7 +432,7 @@ local int sysnamedb_tryclusters(sysnamedb *op,vecstr *slp,cc *nn) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 	    nodenamelen = rs ;
 	    elen = (rs * EBUFMULT) ;
 	}
