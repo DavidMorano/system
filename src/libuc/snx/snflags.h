@@ -2,100 +2,33 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* make string version of some flags */
+/* counted c-string operations */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This code was originally written.
+	This subroutine was written for Rightcore Network Services.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************
-
-  	Object:
-	snflags
-
-	Description:
-	Ths object is used in the creation of flags strings.
-
-******************************************************************************/
-
 #ifndef	SNFLAGS_INCLUDE
 #define	SNFLAGS_INCLUDE
 
 
-#include	<envstandards.h>	/* MUST be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
 
 
-#define	SNFLAGS		struct snflags_head
-
-
-struct snflags_head {
-	char		*bp ;
-	int		c ;
-	int		bl ;
-	int		bi ;
-} ; /* end struct */
-
-#ifdef	__cplusplus
-enum snflagsmems {
-    	snflagsmem_count,
-    	snflagsmem_len,
-	snflagsmem_finish,
-	snflagsmem_overlast
-} ; /* end enum (snflagsmems) */
-struct snflags ;
-struct snflags_co {
-	snflags		*op = nullptr ;
-	int		w = -1 ;
-	void operator () (snflags *p,int m) noex {
-	    op = p ;
-	    w = m ;
-	} ;
-	operator int () noex ;
-	int operator () () noex { 
-	    return operator int () ;
-	} ;
-} ; /* end struct (snflags_co) */
-struct snflags : snflags_head {
-	snflags_co	count ;
-	snflags_co	len ;
-	snflags_co	finish ;
-	snflags() noex {
-	    count(this,snflagsmem_count) ;
-	    len(this,snflagsmem_len) ;
-	    finish(this,snflagsmem_finish) ;
-	    bp = nullptr ;
-	} ; /* end ctor */
-	snflags(const snflags &) = delete ;
-	snflags &operator = (const snflags &) = delete ;
-	int start(char *,int) noex ;
-	int addstr(cchar *) noex ;
-	int addstrw(cchar *,int = -1) noex ;
-	void dtor() noex ;
-	destruct snflags() {
-	    if (bp) dtor() ;
-	} ;
-} ; /* end struct (snflags) */
-#else	/* __cplusplus */
-typedef SNFLAGS		snflags ;
-#endif /* __cplusplus */
-
 EXTERNC_begin
 
-extern int snflags_start	(snflags *,char *,int) noex ;
-extern int snflags_addstr	(snflags *,cchar *) noex ;
-extern int snflags_addstrw	(snflags *,cchar *,int) noex ;
-extern int snflags_count	(snflags *) noex ;
-extern int snflags_len		(snflags *) noex ;
-extern int snflags_finish	(snflags *) noex ;
+extern int snflagsfs	(char *,int,ulong) noex ;
+extern int snflagsopen	(char *,int,ulong) noex ;
+extern int snflagspoll	(char *,int,ulong) noex ;
 
 EXTERNC_end
 
