@@ -49,23 +49,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| + |SIZE_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD |INT_MAX| + |SIZE_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ucsysmisc.h>
 #include	<uclibmem.h>
 #include	<ucdescread.h>
 #include	<bufsizeget.h>
 #include	<filetypes.h>		/* |filetype(3u)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdescbase.hh"
 #include	"ucwritedesc.h"
@@ -105,10 +105,10 @@ namespace {
 	int		ulen ;
 	writer(int d,int s,int l) noex : dfd(d), sfd(s), ulen(l) { } ;
 	operator int() noex ;
-	int copymap(size_t) noex ;
-	int copybuf(int) noex ;
-	int copymaper(off_t,size_t) noex ;
-	int bufsize(int) noex ;
+	int copymap	(size_t) noex ;
+	int copybuf	(int) noex ;
+	int copymaper	(off_t,size_t) noex ;
+	int bufsize	(int) noex ;
     } ; /* end struct (writer) */
     struct vars {
 	int		pagesz ;
@@ -136,7 +136,7 @@ int uc_writedesc(int dfd,int sfd,int ulen) noex {
     	int		rs = SR_BADF ;
 	int		tlen = 0 ;
 	if ((dfd >= 0) && (sfd >= 0)) {
-	    if ((rs = var) >= 0) {
+	    if (static cint rsv = var ; ((rs = rsv) >= 0)) {
 	        writer wo(dfd,sfd,ulen) ;
 	        rs = wo ;
 		tlen = rs ;
@@ -230,7 +230,7 @@ int writer::copybuf(int ft) noex {
 		csize	bsize = size_t(blen) ;
 		size_t	lsize = 0 ;
 		cauto read = [&,this] () noex {
-		    int		lrs = SR_OK ;
+		    int lrs = SR_OK ;
 		    if (csize len = min(ll,bsize) ; len > 0) {
 		        cint rsz = int(len) ;
 		        lrs = uc_read(sfd,bbuf,rsz) ;
@@ -283,8 +283,8 @@ vars::operator int () noex {
 			maxnamelen = rs ;
 		    }
 		}
-	    }
-	}
+	    } /* end if (ucpagesize) */
+	} /* end if (pagesz) */
 	return rs ;
 } /* end method (vars::operator) */
 
