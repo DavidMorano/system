@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += ucstream.h
+INCS += ucstream.hh
 
 MODS +=
 
@@ -52,8 +52,7 @@ OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,11 +95,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -135,13 +134,10 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ucstream_primary.o:	ucstream_primary.cc		$(INCS)
-
 ucstream0.o:		ucstream.ccm			$(INCS)
-	makemodule ucstream
+	gxx -c -x c++ -o $@ -O $<
 
-ucstream1.o:		ucstream1.cc ucstream.ccm	$(INCS)
-	makemodule ucstream
+ucstream1.o:		ucstream1.cc ucstream0.o	$(INCS)
 	$(COMPILE.cc) $<
 
 
