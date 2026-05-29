@@ -19,7 +19,7 @@
 
 /*******************************************************************************
 
-	Object:
+	Module:
 	ucstream
 
 	Description:
@@ -40,14 +40,14 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>		/* |dev_t| + |ino_t| */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<filer.h>		/* <- the money shot */
+#include	<sys/stat.h>		/* POSIX |dev_t| + |ino_t| */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD|nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<filer.h>		/* LIBUC <- the money shot */
 
 export module ucstream ;
 
@@ -61,7 +61,7 @@ export {
     struct ucstream_co {
 	ucstream	*op = nullptr ;
 	int		w = -1 ;
-	constexpr void operator () (ucstream *p,int m) noex {
+	void operator () (ucstream *p,int m) noex {
 	    op = p ;
 	    w = m ;
 	} ;
