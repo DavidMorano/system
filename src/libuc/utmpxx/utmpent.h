@@ -20,10 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<utmpx.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX |pid_t| */
+#include	<utmpx.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utmptypes.hh>		/* LIBU */
 
 
 #ifndef	UTMPENT
@@ -51,24 +52,24 @@ typedef	UTMPENT		utmpent ;
 
 EXTERNC_begin
 
-extern int utmpent_start(utmpent *) noex ;
-extern int utmpent_settype(utmpent *,int) noex ;
-extern int utmpent_setpid(utmpent *,pid_t) noex ;
-extern int utmpent_setsession(utmpent *,int) noex ;
-extern int utmpent_setlines(utmpent *,int) noex ;
-extern int utmpent_setid(utmpent *,cchar *,int) noex ;
-extern int utmpent_setline(utmpent *,cchar *,int) noex ;
-extern int utmpent_setuser(utmpent *,cchar *,int) noex ;
-extern int utmpent_sethost(utmpent *,cchar *,int) noex ;
-extern int utmpent_gettype(utmpent *) noex ;
-extern int utmpent_getpid(utmpent *) noex ;
-extern int utmpent_getsession(utmpent *) noex ;
-extern int utmpent_getlines(utmpent *) noex ;
-extern int utmpent_getid(utmpent *,cchar **) noex ;
-extern int utmpent_getline(utmpent *,cchar **) noex ;
-extern int utmpent_getuser(utmpent *,cchar **) noex ;
-extern int utmpent_gethost(utmpent *,cchar **) noex ;
-extern int utmpent_finish(utmpent *) noex ;
+extern int utmpent_start	(utmpent *) noex ;
+extern int utmpent_settype	(utmpent *,int) noex ;
+extern int utmpent_setpid	(utmpent *,pid_t) noex ;
+extern int utmpent_setsession	(utmpent *,int) noex ;
+extern int utmpent_setlines	(utmpent *,int) noex ;
+extern int utmpent_setid	(utmpent *,cchar *,int) noex ;
+extern int utmpent_setline	(utmpent *,cchar *,int) noex ;
+extern int utmpent_setuser	(utmpent *,cchar *,int) noex ;
+extern int utmpent_sethost	(utmpent *,cchar *,int) noex ;
+extern int utmpent_gettype	(utmpent *) noex ;
+extern int utmpent_getpid	(utmpent *) noex ;
+extern int utmpent_getsession	(utmpent *) noex ;
+extern int utmpent_getlines	(utmpent *) noex ;
+extern int utmpent_getid	(utmpent *,cchar **) noex ;
+extern int utmpent_getline	(utmpent *,cchar **) noex ;
+extern int utmpent_getuser	(utmpent *,cchar **) noex ;
+extern int utmpent_gethost	(utmpent *,cchar **) noex ;
+extern int utmpent_finish	(utmpent *) noex ;
 
 EXTERNC_end
 
