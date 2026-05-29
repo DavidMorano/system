@@ -80,24 +80,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cerrno>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<functional>		/* |mem_fn(3c++)| */
-#include	<numeric>		/* |sat_mul(3c++)| */
-#include	<cstdckdint>		/* |ckd_mul(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |strwcpy(3u)| */
-#include	<uclibmem.h>
-#include	<ucfork.h>
-#include	<ucatfork.h>
-#include	<ucatexit.h>
-#include	<timewatch.hh>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<functional>		/* C++STD |mem_fn(3c++)| */
+#include	<numeric>		/* C++STD |sat_mul(3c++)| */
+#include	<cstdckdint>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |strwcpy(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucfork.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<bufsize.h>		/* LIBUC */
+#include	<timewatch.hh>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucmem.h"
 
@@ -234,7 +235,6 @@ extern "C" {
 /* local variables */
 
 static submgr		submgr_data ;
-
 static cint		pagesz = ulibval.pagesz ;
 
 
@@ -405,6 +405,104 @@ namespace libuc {
 	}
 	return rs ;
     } /* end method (mems::free) */
+    int mems::sysbuf(int w,void *vpp) noex {
+	int		rs ;
+	if ((rs = bufsizeget(w)) >= 0) {
+	    rs = mall((rs + 1),vpp) ;
+	} /* end if (bufsizeget) */
+	return rs ;
+    } ; /* end method (mems::sysbuf) */
+    int mems::ps(void *vpp) noex {
+	int		rs ;
+	if ((rs = pagesz) >= 0) {
+	    rs = vall(rs,vpp) ;
+	}
+	return rs ;
+    } /* end method (mems::ps) */
+    int mems::ma(void *vpp) noex {
+	return sysbuf(bufsize_ma,vpp) ;
+    } ; 
+    int mems::ml(char **cpp) noex {
+	return sysbuf(bufsize_ml,cpp) ;
+    } ; 
+    int mems::mn(char **cpp) noex {
+	return sysbuf(bufsize_mn,cpp) ;
+    } ; 
+    int mems::mp(char **cpp) noex {
+	return sysbuf(bufsize_mp,cpp) ;
+    } ; 
+    int mems::nn(char **cpp) noex {
+	return sysbuf(bufsize_nn,cpp) ;
+    } ; 
+    int mems::un(char **cpp) noex {
+	return sysbuf(bufsize_un,cpp) ;
+    } ; 
+    int mems::gn(char **cpp) noex {
+	return sysbuf(bufsize_gn,cpp) ;
+    } ; 
+    int mems::pn(char **cpp) noex {
+	return sysbuf(bufsize_pn,cpp) ;
+    } ; 
+    int mems::protname(char **cpp) noex {
+	return sysbuf(bufsize_protname,cpp) ;
+    } ; 
+    int mems::netwname(char **cpp) noex {
+	return sysbuf(bufsize_netwname,cpp) ;
+    } ; 
+    int mems::hostname(char **cpp) noex {
+	return sysbuf(bufsize_hostname,cpp) ;
+    } ; 
+    int mems::servname(char **cpp) noex {
+	return sysbuf(bufsize_servname,cpp) ;
+    } ; 
+    int mems::ut(void *vpp) noex {
+	return sysbuf(bufsize_ut,vpp) ;
+    } ; 
+    int mems::pw(void *vpp) noex {
+	return sysbuf(bufsize_pw,vpp) ;
+    } ; 
+    int mems::sp(void *vpp) noex {
+	return sysbuf(bufsize_sp,vpp) ;
+    } ; 
+    int mems::ua(void *vpp) noex {
+	return sysbuf(bufsize_ua,vpp) ;
+    } ; 
+    int mems::gr(void *vpp) noex {
+	return sysbuf(bufsize_gr,vpp) ;
+    } ; 
+    int mems::pj(void *vpp) noex {
+	return sysbuf(bufsize_pj,vpp) ;
+    } ; 
+    int mems::pr(void *vpp) noex {
+	return sysbuf(bufsize_pr,vpp) ;
+    } ; 
+    int mems::nw(void *vpp) noex {
+	return sysbuf(bufsize_nw,vpp) ;
+    } ; 
+    int mems::ho(void *vpp) noex {
+	return sysbuf(bufsize_ho,vpp) ;
+    } ; 
+    int mems::sv(void *vpp) noex {
+	return sysbuf(bufsize_sv,vpp) ;
+    } ; 
+    int mems::fs(char **cpp) noex {
+	return sysbuf(bufsize_fs,cpp) ;
+    } ; 
+    int mems::sn(char **cpp) noex {
+	return sysbuf(bufsize_sn,cpp) ;
+    } ; 
+    int mems::zn(char **cpp) noex {
+	return sysbuf(bufsize_zn,cpp) ;
+    } ; 
+    int mems::zi(char **cpp) noex {
+	return sysbuf(bufsize_zi,cpp) ;
+    } ; 
+    int mems::ad(char **cpp) noex {
+	return sysbuf(bufsize_mailaddr,cpp) ;
+    } ; 
+    int mems::mailaddr(char **cpp) noex {
+	return sysbuf(bufsize_mailaddr,cpp) ;
+    } ; 
     int mems::mallset(int cmd) noex {
 	return submgr_data.mallset(cmd) ;
     } /* end method (mems::mallset) */
@@ -493,14 +591,14 @@ int submgr::iinit() noex {
 	            } /* end if (uc_atfork) */
 	            if (rs < 0) {
 	                mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm-create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
+	        cauto lamb = [this] () -> int {
 	            int		rsl = SR_OK ;
 	            if (!finit) {
 		        rsl = SR_LOCKFAIL ;		/* <- failure */
@@ -513,8 +611,7 @@ int submgr::iinit() noex {
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (submgr::iinit) */
+} /* end method (submgr::iinit) */
 
 int submgr::ifini() noex {
 	int		rs = SR_OK ;
@@ -538,8 +635,7 @@ int submgr::ifini() noex {
 	    finitdone = false ;
 	} /* end if (initialization done) */
 	return rs ;
-}
-/* end method (submgr::ifini) */
+} /* end method (submgr::ifini) */
 
 int submgr::mallcount(ulong *rp) noex {
 	const ulong	out = (st.num_allocs = st.num_frees) ;
@@ -547,8 +643,7 @@ int submgr::mallcount(ulong *rp) noex {
 	    *rp = out ;
 	}
 	return intsat(out) ;
-}
-/* end subroutine (submgr::mallcount) */
+} /* end subroutine (submgr::mallcount) */
 
 int submgr::mallset(int cmd) noex {
 	int		rs ;
@@ -566,8 +661,7 @@ int submgr::mallset(int cmd) noex {
 	    } /* end switch */
 	} /* end if (init) */
 	return rs ;
-}
-/* end subroutine (submgr::mallset) */
+} /* end method (submgr::mallset) */
 
 int submgr::trackstart(int opts) noex {
 	int		rs = SR_INPROGRESS ;
@@ -584,8 +678,7 @@ int submgr::trackstart(int opts) noex {
 	    } /* end if (mutex) */
 	} /* end if (was not previously tracking) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (submgr::trackstart) */
+} /* end method (submgr::trackstart) */
 
 int submgr::trackstarter(int) noex {
 	int		rs = SR_OK ;
@@ -594,8 +687,7 @@ int submgr::trackstarter(int) noex {
 	    rserr(rs) ;
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (submgr_trackstarter) */
+} /* end method (submgr_trackstarter) */
 
 int submgr::trackfinish() noex {
 	int		rs = SR_NOTOPEN ;
@@ -612,8 +704,7 @@ int submgr::trackfinish() noex {
 	    } /* end if (mutex) */
 	} /* end if (was tracking) */
 	return rs ;
-}
-/* end subroutine (submgr::trackfinish) */
+} /* end method (submgr::trackfinish) */
 
 int submgr::trackcall(void *cp,int sz,void *vp) noex {
 	int		rs ;
@@ -634,38 +725,36 @@ int submgr::trackcall(void *cp,int sz,void *vp) noex {
 	    } /* end if (forklock) */
 	} /* end if (init) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (submgr::trackcall) */
+} /* end method (submgr::trackcall) */
 
 int submgr::trackmall(int sz,void *vp) noex {
 	m = &submgr::callxalloc ;
 	almem = &libmems::mall ;
 	return trackcall(nullptr,sz,vp) ;
-}
+} /* end method */
 
 int submgr::trackvall(int sz,void *vp) noex {
 	m = &submgr::callxalloc ;
 	almem = &libmems::vall ;
 	return trackcall(nullptr,sz,vp) ;
-}
+} /* end method */
 
 int submgr::tracrall(void *cp,int sz,void *vp) noex {
 	m = &submgr::callrealloc ;
 	return trackcall(cp,sz,vp) ;
-}
+} /* end method */
 
 int submgr::trackfree(void *cp) noex {
 	m = &submgr::callfree ;
 	return trackcall(cp) ;
-}
+} /* end method */
 
 /* track-present (address-size) */
 int submgr::trackpresent(cvoid *cp) noex {
     	void	*vp = cast_const<voidp>(cp) ;
 	m = &submgr::callpresent ;
 	return trackcall(vp) ;
-}
-/* end subroutine (submgr::trackpresent) */
+} /* end method (submgr::trackpresent) */
 
 int submgr::trackcurenum(ucmem_cur *curp,ucmem_ent *rp) noex {
 	int		rs ;
@@ -686,8 +775,7 @@ int submgr::trackcurenum(ucmem_cur *curp,ucmem_ent *rp) noex {
 	    } /* end if (forklock) */
 	} /* end if (init) */
 	return (rs >= 0) ? rsz : rs ;
-}
-/* end method (submgr::trackcurenum) */
+} /* end method (submgr::trackcurenum) */
 
 int submgr::callxalloc(void *,int sz,void *vp) noex {
 	int		rs ;
@@ -705,8 +793,7 @@ int submgr::callxalloc(void *,int sz,void *vp) noex {
 	    } /* end if (ok) */
 	} /* end if (pagesz) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (submgr::trackmall) */
+} /* end method (submgr::trackmall) */
 
 int submgr::callrealloc(void *cp,int sz,void *vp) noex {
 	int		rs ;
@@ -723,8 +810,7 @@ int submgr::callrealloc(void *cp,int sz,void *vp) noex {
 	    } /* end if (librealloc) */
 	} /* end if (trackrel) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (submgr::callrealloc) */
+} /* end method (submgr::callrealloc) */
 
 int submgr::callfree(void *cp,int,void *) noex {
 	int		rs ;
@@ -734,8 +820,7 @@ int submgr::callfree(void *cp,int,void *) noex {
 	    rv = rs ;
 	}
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (submgr::callfree) */
+} /* end method (submgr::callfree) */
 
 /* track-present (address-size) */
 int submgr::callpresent(void *cp,int,void *) noex {
@@ -746,8 +831,7 @@ int submgr::callpresent(void *cp,int,void *) noex {
 	    sz = rs ;
 	}
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (submgr::callpresent) */
+} /* end method (submgr::callpresent) */
 
 int submgr::callcurenum(ucmem_cur *curp,ucmem_ent *rp) noex {
 	int		rs = SR_NOTOPEN ;
@@ -762,8 +846,7 @@ int submgr::callcurenum(ucmem_cur *curp,ucmem_ent *rp) noex {
 	    } /* end if */
 	} /* end if (tracking) */
 	return (rs >= 0) ? rsz : rs ;
-}
-/* end subroutine (submgr::callcurenum) */
+} /* end method (submgr::callcurenum) */
 
 /* track-register (address-size) */
 int submgr::trackreg(cvoid *a,int sz) noex {
@@ -772,8 +855,7 @@ int submgr::trackreg(cvoid *a,int sz) noex {
 	    rs = mt.ins(a,sz) ;
 	} /* end if */
 	return rs ;
-}
-/* end method (submgr::trackreg) */
+} /* end method (submgr::trackreg) */
 
 /* track-release (address-size) */
 int submgr::trackrel(cvoid *a) noex {
@@ -782,16 +864,14 @@ int submgr::trackrel(cvoid *a) noex {
 	    rs = mt.rem(a) ;
 	} /* end if */
 	return rs ;
-}
-/* end method (submgr::trackrel) */
+} /* end method (submgr::trackrel) */
 
 int submgr::trackout(ulong *rp) noex {
 	if (rp) {
 	    *rp = st.out_size ;
 	}
 	return intsat(st.out_size) ;
-}
-/* end subroutine (submgr::trackout) */
+} /* end method (submgr::trackout) */
 
 int submgr::mallstats(ucmem_stats *statp) noex {
 	int		rs ;
@@ -812,23 +892,19 @@ int submgr::mallstats(ucmem_stats *statp) noex {
 	    } /* end if (forklock) */
 	} /* end if (init) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (submgr::mallstats) */
+} /* end method (submgr::mallstats) */
 
 local void submgr_atforkbefore() noex {
 	submgr_data.atforkbefore() ;
-}
-/* end subroutine (submgr_atforkbefore) */
+} /* end subroutine (submgr_atforkbefore) */
 
 local void submgr_atforkafter() noex {
 	submgr_data.atforkafter() ;
-}
-/* end subroutine (submgr_atforkafter) */
+} /* end subroutine (submgr_atforkafter) */
 
 local void submgr_exit() noex {
 	/* submgr_data.fvoid = true ; */
-}
-/* end subroutine (submgr_atforkafter) */
+} /* end subroutine (submgr_atforkafter) */
 
 submgr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -843,7 +919,6 @@ submgr_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (submgr_co::operator) */
+} /* end method (submgr_co::operator) */
 
 
