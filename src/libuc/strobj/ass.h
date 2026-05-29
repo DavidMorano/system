@@ -2,9 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* allocated string */
+/* allocated string object */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -55,7 +62,7 @@ struct ass : ass_head {
 	    len		(this,assmem_len) ;
 	    finish	(this,assmem_finish) ;
 	    rbuf = nullptr ;
-	} ;
+	} ; /* end ctor */
 	ass(const ass &) = delete ;
 	ass &operator = (const ass &) = delete ;
 	int addchr(int) noex ;
