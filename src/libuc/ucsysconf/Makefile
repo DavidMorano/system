@@ -51,8 +51,7 @@ OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -95,11 +94,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -135,18 +134,15 @@ objb.o:			$(OBJB)
 
 
 ucsysconf0.o:		ucsysconf.ccm				$(INCS)
-	makemodule ucsysconf
+	gxx -c -x c++ -o $@ -O $<
 
-ucsysconf1.o:		ucsysconf1.cc ucsysconf.ccm		$(INCS)
-	makemodule ucsysconf
+ucsysconf1.o:		ucsysconf1.cc ucsysconf0.o		$(INCS)
 	$(COMPILE.cc) $<
 
-ucsysconf2.o:		ucsysconf2.cc ucsysconf.ccm		$(INCS)
-	makemodule ucsysconf
+ucsysconf2.o:		ucsysconf2.cc ucsysconf0.o		$(INCS)
 	$(COMPILE.cc) $<
 
-ucsysconf3.o:		ucsysconf3.cc ucsysconf.ccm		$(INCS)
-	makemodule ucsysconf
+ucsysconf3.o:		ucsysconf3.cc ucsysconf0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 
