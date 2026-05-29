@@ -18,9 +18,10 @@
 /*******************************************************************************
 
 	Name:
+	pathnaddw
+	pathnaddx
 	pathaddw
 	pathaddx
-	pathadd
 
 	Description:
 	This subroutine adds a new component to an existing file-path.
@@ -29,10 +30,10 @@
 	assumed to be MAXPATHLEN (determined dynamically).
 
 	Synopses:
-	int pathnaddw(char *pbuf,int plen,int pl,cchar *sp) noex
-	int pathnaddx(char *pbuf,int plen,int pl,cchar *sp) noex
-	int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex
-	int pathaddx(char *pbuf,int pl,int n,cchar *sp ...) noex
+	int pathnaddw	(char *pbuf,int plen,int pl,cchar *sp) noex
+	int pathnaddx	(char *pbuf,int plen,int pl,cchar *sp) noex
+	int pathaddw	(char *pbuf,int pl,cchar *sp,int sl) noex
+	int pathaddx	(char *pbuf,int pl,int n,cchar *sp ...) noex
 
 	Arguments:
 	pbuf		result buffer pointer
@@ -60,10 +61,13 @@
 	The |pathaddw| subroutine is almost equivalent to:
 	    int pathaddw(char *rbuf,int rl,cc *sp,int sl) noex {
 	        int	rs ;
-	        if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 		    cint	rlen = rs ;
-	            rs = storebuf_strw(rbuf,rlen,rl,sp,sl) ;
-		    rl += rs ;
+	    	    if ((rs = storebuf_chr(rbuf,rlen,rl,'/')) >= 0) {
+		        rl += rs ;
+	                rs = storebuf_strw(rbuf,rlen,rl,sp,sl) ;
+		        rl += rs ;
+		    }
 	        }
 	        return (rs >= 0) ? rl : rs ;
 	    }
@@ -71,14 +75,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizevar.hh>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pathadd.h"
 
@@ -106,7 +110,7 @@ import libutil ;			/* ?? */
 
 /* forward references */
 
-static int		local_pathadd(char *,int,int,cchar *,int) noex ;
+local int		local_pathadd(char *,int,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -192,7 +196,7 @@ int pathaddx(char *pbuf,int pl,int n,...) noex {
 
 /* local subroutines */
 
-static int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
+local int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if ((pl > 0) && (pbuf[pl - 1] != '/')) {
 	    rs = storebuf_chr(pbuf,plen,pl,'/') ;
@@ -203,7 +207,6 @@ static int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	    pl += rs ;
 	}
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (local_pathadd) */
+} /* end subroutine (local_pathadd) */
 
 
