@@ -20,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utmpx.h>		/* <- POSIX® (the money shot) */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<utmpx.h>		/* POSIX® (the money shot) */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utmptypes.hh>		/* LIBU */
+#include	<utmpsizes.hh>		/* LIBU */
 
 
 #define	UTMPACCENT		struct utmpaccent_s
@@ -52,6 +54,7 @@
 
 
 struct utmpaccent_s {
+	cchar		*id ;
 	cchar		*user ;
 	cchar		*line ;
 	cchar		*host ;
@@ -62,7 +65,6 @@ struct utmpaccent_s {
 	ushort		syslen ;
 	short		e_exit ;
 	short		e_term ;
-	char		id[UTMPACCENT_LID+1] ;
 } ; /* end struct (utmpaccent_s) */
 
 typedef UTMPACCENT	utmpaccent ;
