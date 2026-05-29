@@ -51,9 +51,7 @@ OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,11 +94,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -135,9 +133,8 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-utmpent.o:		utmpent.cc utmpent.h		$(INCS)
-utmpacc.o:		utmpacc.cc utmpacc.h		$(INCS)
-utmpacc_enum.o:		utmpacc_enum.cc utmpacc.h	$(INCS)
-utmpaccent.o:		utmpaccent.cc utmpaccent.h	$(INCS)
+utmpent.o:		utmpent.cc		utmpent.h	$(INCS)
+utmpacc.o:		utmpacc.cc		utmpacc.h	$(INCS)
+utmpaccent.o:		utmpaccent.cc		utmpaccent.h	$(INCS)
 
 
