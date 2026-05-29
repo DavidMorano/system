@@ -55,17 +55,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>		/* |S_IF{xx}| */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ctoct.h>
-#include	<localmisc.h>		/* |OCTBUFLEN| */
+#include	<sys/stat.h>		/* POSIX |S_IF{xx}| */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ctoct.h>		/* LIBUC */
+#include	<snflager.h>		/* LINUC */
+#include	<localmisc.h>		/* LIBU |OCTBUFLEN| */
 
-#include	"snflags.h"
 #include	"snx.h"
 
 
@@ -89,7 +89,7 @@
 struct flent {
 	int		fl ;
 	cchar		*s ;
-} ;
+} ; /* end struct (flent) */
 
 
 /* forward references */
@@ -102,7 +102,7 @@ constexpr flent		fl_mode[] = {
 	{ S_ISGID, "SGID" },
 	{ S_ISVTX, "SAVETXT" },
 	{ 0, nullptr }
-} ;
+} ; /* end array (fl_mode) */
 
 
 /* exported variables */
@@ -114,7 +114,7 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf) ylikely {
-	    if (snflags ss ; (rs = ss.start(dbuf,dlen)) >= 0) ylikely {
+	    if (snflager fr ; (rs = fr.start(dbuf,dlen)) >= 0) ylikely {
 	        cint	ft = (fm & S_IFMT) ;
 	        cchar	*ms = nullptr ;
 	        switch (ft) {
@@ -150,11 +150,11 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 		    break ;
 	        } /* end switch */
 	        if (ms) ylikely {
-		    rs = ss.addstr(ms) ;
+		    rs = fr.addstr(ms) ;
 	        }
 	        for (int i = 0 ; (rs >= 0) && fl_mode[i].s ; i += 1) {
 	            if (fm & fl_mode[i].fl) {
-	                rs = ss.addstr(fl_mode[i].s) ;
+	                rs = fr.addstr(fl_mode[i].s) ;
 		    }
 	        } /* end for */
 	        if (rs >= 0) ylikely {
@@ -163,11 +163,11 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 		    cint	plen = OCTBUFLEN ;
 		    char	pbuf[OCTBUFLEN+1] ;
 		    if ((rs = ctoct(pbuf,plen,v)) >= 0) ylikely {
-		        cchar	*cp = ((rs > n) ? (pbuf+(rs-n)) : pbuf) ;
-	                rs = ss.addstr(cp) ;
+		        cchar	*cp = ((rs > n) ? (pbuf + (rs - n)) : pbuf) ;
+	                rs = fr.addstr(cp) ;
 		    } /* end if (ctoct) */
 	        } /* end if (ok) */
-	        rs1 = ss.finish ;
+	        rs1 = fr.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (snflags) */
 	} /* end if (non-null) */
