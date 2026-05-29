@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* find a character in a counted string */
+/* find a character in a counted c-string */
 /* version %I% last-modified %G% */
 
 
