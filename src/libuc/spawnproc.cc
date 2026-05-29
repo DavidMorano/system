@@ -80,7 +80,7 @@
 #include	<ucgetpid.h>
 #include	<ucsysconf.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getpwd.h>
 #include	<sigignores.h>
 #include	<sigign.h>
@@ -656,7 +656,7 @@ local int opendevnull(int *opens,int i) noex {
 
 int vars::mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	}
 	return rs ;
