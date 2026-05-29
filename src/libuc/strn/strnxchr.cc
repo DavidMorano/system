@@ -43,14 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| + |strrchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| + |strrchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strnxchr.h"
 
@@ -102,7 +102,6 @@ cbool		f_memchr	= CF_MEMCHR ;
 /* exported subroutines */
 
 char *strnochr(cchar *sp,int sl,int sch) noex {
-        cnullptr	np{} ;
 	char		*rsp = nullptr ;
 	if (sp) ylikely {
 	    bool	f = false ;
@@ -110,15 +109,12 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 	    if (sl >= 0) {
 		if_constexpr (f_memchr) {
 		    csize msize = size_t(sl) ;
-		    if (cc *tp ; (tp = charp(memchr(sp,sch,msize))) != np) {
+		    if (cchar *tp = charp(memchr(sp,sch,msize)) ; tp) {
 			rsp = charp(tp) ;
 		    }
 		} else {
-	            for (cchar *lsp = (sp + sl) ; (sp < lsp) && *sp ; ) {
-			cint	ch = mkchar(*sp) ;
-	                f = (ch == sch) ;
-		        if (f) break ;
-	                sp += 1 ;
+	            for (cchar *lsp = (sp + sl) ; (sp < lsp) && *sp ; sp++) {
+			if ((f = (mkchar(*sp) == sch))) break ;
 	            } /* end for */
 		    if (f) rsp = charp(sp) ;
 		} /* end if_constexpr (f_memchr) */
@@ -142,10 +138,12 @@ char *strnrchr(cchar *sp,int sl,int sch) noex {
 	if (sp) ylikely {
 	    sch &= UCHAR_MAX ;
 	    if (sl >= 0) {
-	        for (cchar *csp = (sp + sl) ; rsp && (--csp >= sp) ; ) {
-	            cint	ch = mkchar(*csp) ;
-	            if (ch == sch) rsp = charp(csp) ;
-	        } /* end while */
+	        for (cchar *csp = (sp + sl) ; (--csp >= sp) ; ) {
+	            if (mkchar(*csp) == sch) {
+			rsp = charp(csp) ;
+			break ;
+		    }
+	        } /* end for */
 	    } else {
 		if_constexpr (f_strrchr) {
 	            rsp = strrchr(sp,sch) ;
