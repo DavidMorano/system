@@ -1,6 +1,6 @@
 /* ucstream HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* file stream operations for LIBUC */
 /* version %I% last-modified %G% */
@@ -21,10 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 
 
 #endif /* UCSTREAM_INCLUDE */
