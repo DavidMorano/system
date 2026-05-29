@@ -37,11 +37,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<utmpx.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<utmpaccent.h>		/* pre-processor defines below */
+#include	<sys/types.h>		/* POSIX */
+#include	<utmpx.h>		/* POSIX */
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* CSTD */
+#include	<utmpaccent.h>		/* LIBUC access-entry */
+#include	<utmptypes.hh>		/* LIBU */
 
 
 #define	UTMPACC_ENT		UTMPACCENT
@@ -86,7 +87,7 @@ enum utxproctypes {
 	utxproctype_init,
 	utxproctype_dead,
 	utxproctype_overlast
-} ; /* end enum */
+} ; /* end enum (utxproctypes) */
 
 struct utmpacc_statistics {
 	uint		maxusers ;
@@ -94,7 +95,7 @@ struct utmpacc_statistics {
 } ; /* end struct */
 
 struct utmpacc_cursor {
-	void		*icursor ;
+	void		*icursorp ;
 } ; /* end struct */
 
 typedef	UTMPACC_SB	utmpacc_sb ;
@@ -103,20 +104,20 @@ typedef	UTMPACC_ENT	utmpacc_ent ;
 
 EXTERNC_begin
 
-extern int utmpacc_init() noex ;
-extern int utmpacc_boottime(time_t *) noex ;
-extern int utmpacc_runlevel() noex ;
-extern int utmpacc_users(int) noex ;
-extern int utmpacc_entsid(utmpacc_ent *,char *,int,pid_t) noex ;
-extern int utmpacc_entstat(utmpacc_ent *,char *,int,pid_t) noex ;
-extern int utmpacc_entline(utmpacc_ent *,char *,int,cchar *,int) noex ;
-extern int utmpacc_stats(utmpacc_sb *) noex ;
-extern int utmpacc_extract(int) noex ;
-extern int utmpacc_fini() noex ;
+extern int utmpacc_init		() noex ;
+extern int utmpacc_boottime	(time_t *) noex ;
+extern int utmpacc_runlevel	() noex ;
+extern int utmpacc_users	(int) noex ;
+extern int utmpacc_entsid	(utmpacc_ent *,char *,int,pid_t) noex ;
+extern int utmpacc_entstat	(utmpacc_ent *,char *,int,pid_t) noex ;
+extern int utmpacc_entline	(utmpacc_ent *,char *,int,cchar *,int) noex ;
+extern int utmpacc_getstats	(utmpacc_sb *) noex ;
+extern int utmpacc_extract	(int) noex ;
+extern int utmpacc_fini		() noex ;
 
-extern int utmpacc_curbegin(utmpacc_cur *) noex ;
-extern int utmpacc_curenum(utmpacc_cur *,utmpacc_ent *,char *,int) noex ;
-extern int utmpacc_curend(utmpacc_cur *) noex ;
+extern int utmpacc_curbegin	(utmpacc_cur *) noex ;
+extern int utmpacc_curenum	(utmpacc_cur *,utmpacc_ent *,char *,int) noex ;
+extern int utmpacc_curend	(utmpacc_cur *) noex ;
 
 EXTERNC_end
 
@@ -127,7 +128,7 @@ struct utmpacc_enter {
 	int operator () () noex {
 	    return operator int () ;
 	} ;
-} ; /* end struct */
+} ; /* end struct (utmpacc_enter) */
 
 extern utmpacc_enter	utmpacc_entbuflen ;
 
