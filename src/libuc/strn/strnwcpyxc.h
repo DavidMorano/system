@@ -1,8 +1,8 @@
-/* strnwcpyxc HEADER */
+/* strnwcpyxc HEADER (fixed-size destiantion buffer) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* copy a counted c-string to a sized destination buffer w/ case conversion */
+/* copy a counted c-string to a fixed-size destination buffer w/ case-convert */
 /* version %I% last-modified %G% */
 
 
