@@ -5,6 +5,7 @@
 /* split a file-name into its 'dirname' and its 'basename' */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -30,7 +31,7 @@
 	Arguments:
 	op		object pointer
 	fp		file-name pointer
-	dl		file-name length
+	fl		file-name length
 
 	Returns:
 	>=0		OK
@@ -39,12 +40,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnrchr(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnrchr(3uc)| */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"splitfname.h"
 
@@ -53,6 +56,10 @@
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* external subroutines */
@@ -69,6 +76,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -77,19 +86,28 @@ import libutil ;			/* |lenstr(3u)| */
 
 int splitfname_split(splitfname *op,cchar *fp,int fl) noex {
 	int		rs = SR_FAULT ;
+	int		bl = 0 ; /* return-value */
 	if (op && fp) {
+	    {
+		strnul	ps(fp,fl) ;
+	        DPRINTF("ent fl=%d f=>%s<\n",fl,ccp(ps)) ;
+	    }
 	    if (fl < 0) fl = lenstr(fp) ;
 	    op->dp = fp ;
 	    op->dl = fl ;
 	    op->bp = fp ;
 	    op->bl = fl ;
-	    if (cchar *tp ; (tp = strnrchr(fp,fl,'/')) != nullptr) {
+	    rs = SR_NOTDIR ;
+	    if (cchar *tp = strnrchr(fp,fl,'/') ; tp) {
 		op->bp = (tp + 1) ;
 		op->bl = intconv((fp + fl) - (tp + 1)) ;
 		op->dl = intconv(tp - fp) ;
+		bl = op->bl ;
+		rs = SR_OK ;
 	    } /* end if */
 	} /* end if (non-null) */
-	return rs ;
+	DPRINTF("ent rs=%d bl=%d\n",rs,bl) ;
+	return (rs >= 0) ? bl : rs ;
 }
 /* end subroutine (splitfname_split) */
 
@@ -102,7 +120,6 @@ int splitfname::operator () (cchar *fp,int fl) noex {
 	    rs = splitfname_split(this,fp,fl) ;
 	}
 	return rs ;
-}
-/* end method (splitfname::operator) */
+} /* end method (splitfname::operator) */
 
 
