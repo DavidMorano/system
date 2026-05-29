@@ -81,7 +81,7 @@
 #include	<ucsysconf.h>
 #include	<ucsig.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sigignores.h>
 #include	<sigign.h>
 #include	<ids.h>
@@ -187,7 +187,7 @@ namespace {
 	int		maxpathlen ;
 	int mkvars() noex {
 	    int		rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 		maxpathlen = rs ;
 	    }
 	    return rs ;
