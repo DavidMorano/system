@@ -56,13 +56,12 @@ extern int	uc_tell		(int,off_t *)			noex ;
 extern int	uc_fchown	(int,uid_t,gid_t)		noex ;
 extern int	uc_fchmod	(int,mode_t)			noex ;
 extern int	uc_fpathconf	(int,int,long *)		noex ;
-
 local inline int	uc_seek		(int fd,off_t wo,int wh) noex {
     		return uc_seeko(fd,wo,wh,nullptr) ;
-}
+} /* end subroutine */
 local inline int	uc_rewind	(int fd)		noex {
     		return uc_seek(fd,0z,SEEK_SET) ;
-}
+} /* end subroutine */
 
 EXTERNC_end
 
