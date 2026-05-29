@@ -18,13 +18,14 @@
 /*******************************************************************************
 
 	Name:
-	uc_pipe2
+	uc_pipes
+	uc_piper
 
 	Description:
 	Enhanced |pipe(2)|.
 
 	Synopsis:
-	int uc_pipe2(int pipes[2],int of) noex
+	int uc_pipes(int pipes[2],int of) noex
 	int uc_piper(int pipes[2],int of,min) noex
 
 	Arguments:
