@@ -62,17 +62,17 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<utimeout.h>		/* |uto_{x}| */
-#include	<usupport.h>		/* |sncpyx(3u)| */
-#include	<ustd.h>		/* |ustd_conf{x}| */
-#include	<intsat.h>
-#include	<sysconfcmds.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* CSYD */
+#include	<cstddef>		/* CSYD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBU |uto_{x}| */
+#include	<usupport.h>		/* LIBU |sncpyx(3u)| */
+#include	<ustd.h>		/* LIBU |ustd_conf{x}| */
+#include	<intsat.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsysconf.h"		/* |CS_{x}(3uc)| */
 
