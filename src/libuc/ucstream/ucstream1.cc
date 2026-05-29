@@ -5,6 +5,7 @@
 /* file stream operations for LIBUC */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -42,21 +43,27 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>		/* |dev_t| + |ino_t| */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<ucdesc.h>
-#include	<getoflags.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX |dev_t| + |ino_t| */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<getoflags.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 module ucstream ;
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -66,10 +73,6 @@ module ucstream ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-}
 
 
 /* external variables */
@@ -83,6 +86,8 @@ extern "C" {
 
 /* local variables */
 
+cbool		f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -94,14 +99,19 @@ extern "C" {
 
 int ucstream::open(cchar *fn,cchar *os,mode_t om) noex {
 	int		rs = SR_FAULT ;
+	DPRINTF("ent\n") ;
 	if (fn) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) ylikely {
+		DPRINTF("fn=%s\n",fn) ;
 		if ((rs = getoflags(os)) >= 0) {
 		    cint	µof = rs ;
+		    DPRINTF("getoflags() rs=%d\n",rs) ;
 		    if ((rs = uc_open(fn,rs,om)) >= 0) {
 			fd = rs ;
+			DPRINTF("open() rs=%d\n",rs) ;
 			rs = start(fd,0z,0,µof) ;
+			DPRINTF("start() rs=%d\n",rs) ;
 			if (rs < 0) {
 			    uc_close(fd) ;
 			    fd = -1 ;
@@ -110,24 +120,29 @@ int ucstream::open(cchar *fn,cchar *os,mode_t om) noex {
 		} /* end if (getoflags) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (ucstream::open) */
 
 int ucstream::iclose() noex {
 	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
+	DPRINTF("ent\n") ;
 	if (fd >= 0) ylikely {
 	    rs = SR_OK ;
 	    {
 		rs1 = finish ;
 		if (rs >= 0) rs = rs1 ;
+		DPRINTF("finish() rs=%d\n",rs) ;
 	    }
 	    {
 	        rs1 = uc_close(fd) ;
 	        if (rs >= 0) rs = rs1 ;
+		DPRINTF("uc_close() rs=%d\n",rs) ;
 	    }
 	    fd = -1 ;
 	} /* end if (was open) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (ucstream::iclose) */
 
