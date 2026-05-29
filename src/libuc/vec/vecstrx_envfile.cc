@@ -64,7 +64,7 @@
 #include	<strdcpyxw.h>		/* LIBUC */
 #include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBF */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"vecstrx.hh"
 
