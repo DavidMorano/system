@@ -48,7 +48,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sfx.h>
 #include	<cfdec.h>
 #include	<ctdec.h>
@@ -110,7 +110,7 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 	            argv[i] = nullptr ;
 	            if ((rs = uc_openprog(pfname,of,argv,np)) >= 0) {
 	                cint	fd = rs ;
-			if ((rs = getbufsize(bufsize_mp)) >= 0) {
+			if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 			    cint	llen = (rs + DIGBUFLEN + 2) ;
 			    char	*lbuf{} ;
 			    if ((rs = lm_mall((llen + 1),&lbuf)) >= 0) {
@@ -127,7 +127,7 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 			        rs1 = lm_free(lbuf) ;
 			        if (rs >= 0) rs = rs1 ;
 			    } /* end if (m-a-f) */
-			} /* end if (getbufsize) */
+			} /* end if (bufsizeget) */
 	                rs1 = uc_close(fd) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (open) */
