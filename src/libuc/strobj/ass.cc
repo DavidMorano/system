@@ -2,20 +2,39 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* experimenal string manipulation object */
+/* allocated string object */
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Object:
+	ass
+
+	Description:
+	This object manages a dynamically allocated string.  It is
+	very limited in what it can do.  It was created for a very
+	specialed purpose (which might be lost now).
+
+*******************************************************************************/
+
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ass.h"
 
@@ -61,6 +80,7 @@ int ass_start(ass *asp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
+/* end subroutine (ass_start) */
 
 int ass_addchr(ass *asp,int ch) noex {
 	int		rs = SR_FAULT ;
@@ -114,6 +134,9 @@ int ass_finish(ass *asp) noex {
 }
 /* end subroutine (ass_finish) */
 
+
+/* local subroutines */
+
 int ass::addchr(int ch) noex {
 	return ass_addchr(this,ch) ;
 }
@@ -140,7 +163,6 @@ ass_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ass_co::operator) */
+} /* end method (ass_co::operator) */
 
 
