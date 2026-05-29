@@ -1,0 +1,4 @@
+UCTIMEOUT
+
+This API group manages registerd call-backs for timer related purposes.
+
