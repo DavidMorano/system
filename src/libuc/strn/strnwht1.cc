@@ -169,7 +169,7 @@ extern "C++" {
     } /* end subroutine (strnwhtbrk) */
     char *strnwhtchr(cchar *sp,int sl,con chrset *setp) noex {
 	return strnwhtbrk(sp,sl,setp) ;
-    }
+    } /* end subroutine */
 } /* end extern (C++) */
 
 
