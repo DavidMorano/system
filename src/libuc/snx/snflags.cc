@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* make string version of some flags */
+/* make string version of the poll-event flags */
 /* version %I% last-modified %G% */
 
 
@@ -17,49 +17,44 @@
 
 /*******************************************************************************
 
-  	Object:
-	snflags
+	Group:
+	snflags{x}
 
 	Description:
-	Ths object is used in the creation of flags strings.
+	These subroutines create in the result buffer a list of
+	symbolic representations of various "flag" values of various
+	sorts.
 
-	See-also:
-	snfsflags(3uc)
-	snopenflags(3uc)
-	snpollflags(3uc)
-	snxtilook(3uc)
-	sninetaddr(3uc)
-	snsigabbr(3uc)
-	snabbr(3uc)
-	snshellunder(3uc)
-	snfilemode(3uc)
-	sntid(3uc)
-	snerrabbr(3uc)
-	snrealname(3uc)
-	snloadavg(3uc)
-	snkeyval(3uc)
-	snwvprintf(3uc)
-	snwprintf(3uc)
-	snkeyval(3uc)
+	Synopsis:
+	int snflagsfs	(char *dbuf,int dlen,ulong fl) noex
+	int snflagsopen	(char *dbuf,int dlen,ulong fl) noex
+	int snflagspoll	(char *dbuf,int dlen,ulong fl) noex
+
+	Arguments:
+	dbuf		destination string buffer
+	dlen		destination string buffer length
+	fl		flags to conver to symbolic form
+
+	Returns:
+	>=0		number of bytes in result
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>		/* |AF_{xx}| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<storebuf.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<sys/statvfs.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<poll.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LINU */
+#include	<usysbase.h>		/* LINU */
+#include	<snflager.h>		/* LINUC */
+#include	<localmisc.h>		/* LINU */
 
 #include	"snflags.h"
 
-#pragma		GCC dependency		"mod/libutil.ccm"
-
-import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -72,11 +67,124 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
+struct flent {
+	ulong		fl ;
+	cchar		*s ;
+} ; /* end struct (flent) */
+
 
 /* forward references */
 
+local int snflx(const flent *ftab,char *dbuf,int dlen,ulong fl) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (dbuf) ylikely {
+	    if (snflager fr ; (rs = fr.start(dbuf,dlen)) >= 0) ylikely {
+	        for (int i = 0 ; (rs >= 0) && ftab[i].s ; i += 1) {
+	            if (fl & ftab[i].fl) {
+	                rs = fr.addstr(ftab[i].s) ;
+		    }
+	        } /* end for */
+	        rs1 = fr.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (snflager) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (snflx) */
+
 
 /* local variables */
+
+constexpr flent		fl_fs[] = {
+	{ ST_RDONLY, "RDONLY" },
+	{ ST_NOSUID, "NOSUID" },
+#ifdef	ST_NOTRUNC
+	{ ST_NOTRUNC, "NOTRUNC" },
+#endif
+	{ 0, nullptr }
+} ; /* end array (fl_fs) */
+
+constexpr flent		fl_open[] = {
+	{ O_APPEND, "APPEND" },
+	{ O_CREAT, "CREAT" },
+	{ O_EXCL, "EXCL" },
+	{ O_TRUNC, "TRUNC" },
+	{ O_NOCTTY, "NOCTTY" },
+	{ O_SYNC, "SYNC" },
+	{ O_DSYNC, "DSYNC" },
+#ifdef	O_RSYNC
+	{ O_RSYNC, "RSYNC" },
+#endif
+	{ O_NDELAY,	"NDELAY" },
+	{ O_NONBLOCK,	"NONBLOCK" },
+#ifdef	O_LARGEFILE
+	{ O_LARGEFILE,	"LARGE" },
+#endif
+#ifdef	O_DIRECTORY
+	{ O_DIRECTORY,	"DIRECTORY" },
+#endif
+#ifdef	O_DIRECT
+	{ O_DIRECT,	"DIRECT" },
+#endif
+#ifdef	O_TMPFILE
+	{ O_TMPFILE,	"TMPFILE" },
+#endif
+#ifdef	O_PRIV
+	{ O_PRIV,	"PRIV" },
+#endif
+#ifdef	O_CLOEXEC
+	{ O_CLOEXEC,	"CLOEXEC" },
+#endif
+#ifdef	O_MINMOD
+	{ O_MINMOD,	"MINMOD" },
+#endif
+#ifdef	O_MINFD
+	{ O_MINFD,	"MINFD" },
+#endif
+#ifdef	O_NETWORK
+	{ O_NETWORK,	"NETWORK" },
+#endif
+#ifdef	O_SHLOCK
+	{ O_SHLOCK,	"SHLOCK" },
+#endif
+#ifdef	O_EXLOCK
+	{ O_EXLOCK,	"EXLOCK" },
+#endif
+#ifdef	O_SYMLINK
+	{ O_SYMLINK,	"SYMLINK" },
+#endif
+#ifdef	O_EVTONLY
+	{ O_EVTONLY,	"EVTONLY" },
+#endif
+	{ 0, nullptr }
+} ; /* end struct (fl_open) */
+
+constexpr flent		fl_poll[] = {
+	{ POLLIN,	"IN" },
+	{ POLLOUT,	"OUT" },
+	{ POLLERR,	"ERR" },
+	{ POLLHUP,	"HUP" },
+	{ POLLNVAL,	"NVAL" },
+#ifdef	POLLPRI
+	{ POLLPRI,	"PRI" },
+#endif
+#ifdef	POLLRDNORM
+	{ POLLRDNORM,	"RDNORM" },
+#endif
+#ifdef	POLLWRNORM
+	{ POLLWRNORM,	"WRNORM" },
+#endif
+#ifdef	POLLRDBAND
+	{ POLLRDBAND,	"RDBAND" },
+#endif
+#ifdef	POLLWRBAND
+	{ POLLWRBAND,	"WRBAND" },
+#endif
+#ifdef	POLLREMOVE
+	{ POLLREMOVE,	"REMOVE" },
+#endif
+	{ 0, nullptr }
+} ; /* end array (fl_poll) */
 
 
 /* exported variables */
@@ -84,110 +192,51 @@ import libutil ;			/* |memclear(3u)| */
 
 /* exported subroutines */
 
-int snflags_start(snflags *op,char *bp,int bl) noex {
-    	SNFLAGS		*hop = op ;
-	int		rs = SR_FAULT ;
-	if (op && bp) ylikely {
-	    rs = memclear(hop) ;
-	    op->bp = bp ;
-	    op->bl = bl ;
-	    *bp = '\0' ;
-	} /* end if (non-null) */
-	return rs ;
+int snflagsfs(char *dbuf,int dlen,ulong fl) noex {
+    	return snflx(fl_fs,dbuf,dlen,fl) ;
 }
-/* end subroutine (snflags_start) */
+/* end subroutine (snflagsfs) */
 
-int snflags_addstr(snflags *op,cchar *sp) noex {
-	return snflags_addstrw(op,sp,-1) ;
-}
-
-int snflags_addstrw(snflags *op,cchar *sp,int sl) noex {
+int snflagsopen(char *dbuf,int dlen,ulong fl) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;
-	if (op && sp) ylikely {
-	    rs = SR_OK ;
-	    if ((sl > 0) || sp[0]) ylikely {
-	        if (op->c++ > 0) {
-	            cint	ch_comma = CH_COMMA ;
-	            rs = storebuf_chr(op->bp,op->bl,op->bi,ch_comma) ;
-	            op->bi += rs ;
-		    rl += rs ;
+	int		rs1 ;
+	if (dbuf) ylikely {
+	    if (snflager fr ; (rs = fr.start(dbuf,dlen)) >= 0) ylikely {
+	        cint	am = (fl & O_ACCMODE) ;
+	        cchar	*ms = nullptr ;
+	        switch (am) {
+	        case O_RDONLY:
+		    ms = "RDONLY" ;
+		    break ;
+	        case O_WRONLY:
+		    ms = "WRONLY" ;
+		    break ;
+	        case O_RDWR:
+		    ms = "RDWR" ;
+		    break ;
+	        default:
+		    ms = "ACCINV" ; /* access invalid */
+		    break ;
+	        } /* end switch */
+	        if (ms) {
+		    rs = fr.addstr(ms) ;
 	        }
-	        if (rs >= 0) {
-	            rs = storebuf_strw(op->bp,op->bl,op->bi,sp,sl) ;
-	            op->bi += rs ;
-		    rl += rs ;
-	        }
-	    } /* end if (non-empty) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (snflags_addstrw) */
-
-int snflags_count(snflags *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) ylikely {
-	    rs = op->c ;
-	}
-	return rs ;
-}
-/* end subroutine (snflags_count) */
-
-int snflags_len(snflags *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) ylikely {
-	    rs = op->bi ;
-	}
-	return rs ;
-}
-/* end subroutine (snflags_count) */
-
-int snflags_finish(snflags *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) ylikely {
-	    rs = op->bi ;
-	    op->bp = nullptr ;
-	    op->bl = 0 ;
+	        for (int i = 0 ; (rs >= 0) && fl_open[i].s ; i += 1) {
+	            if (fl & fl_open[i].fl) {
+	                rs = fr.addstr(fl_open[i].s) ;
+		    }
+	        } /* end for */
+	        rs1 = fr.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (snflager) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (snflags_finish) */
+/* end subroutine (snflagsopen) */
 
-int snflags::start(char *bufp,int bufl) noex {
-	return snflags_start(this,bufp,bufl) ;
+int snflagspoll(char *dbuf,int dlen,ulong fl) noex {
+    	return snflx(fl_poll,dbuf,dlen,fl) ;
 }
-
-int snflags::addstr(cchar *sp) noex {
-	return snflags_addstrw(this,sp,-1) ;
-}
-
-int snflags::addstrw(cchar *sp,int sl) noex {
-	return snflags_addstrw(this,sp,sl) ;
-}
-
-void snflags::dtor() noex {
-	if (cint rs = int(finish) ; rs < 0) {
-	    ulogerror("snflags",rs,"fini-finish") ;
-	}
-} /* end method (snflags::dtor) */
-
-snflags_co::operator int () noex {
-	int		rs = SR_BUGCHECK ;
-	if (op) ylikely {
-	    switch (w) {
-	    case snflagsmem_count:
-	        rs = snflags_count(op) ;
-	        break ;
-	    case snflagsmem_len:
-	        rs = snflags_len(op) ;
-	        break ;
-	    case snflagsmem_finish:
-	        rs = snflags_finish(op) ;
-	        break ;
-	    } /* end switch */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end method (snflags_co::operator) */
+/* end subroutine (snflagspoll) */
 
 
