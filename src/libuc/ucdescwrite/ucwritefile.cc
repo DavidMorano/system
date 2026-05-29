@@ -42,6 +42,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucopen.h>
 #include	<ucdesc.h>
 #include	<localmisc.h>
 
@@ -61,7 +62,6 @@
 /* external subroutines */
 
 extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
     extern int uc_writedesc(int,int,int) noex ;
 } /* end extern */
 
