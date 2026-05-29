@@ -1,8 +1,8 @@
-/* strnwcpyxc SUPPORT */
+/* strnwcpyxc HEADER (fixed-size destiantion buffer) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* copy a counted c-string to a sized destination buffer w/ case conversion */
+/* copy a counted c-string to a fixed-size destination buffer w/ case-convert */
 /* version %I% last-modified %G% */
 
 
@@ -60,15 +60,21 @@
 	-		pointer to the end of the filled in part
 			of the created destination string
 
+	Notes:
+	+ fixed-size destiantion buffer
+	+ no mandatory NUL termination
+	+ zero fills out the destiantion buffer
+	+ acts very similarly to |strncpy(3c)|
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<toxc.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<toxc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strnwcpyxc.h"
 
