@@ -70,7 +70,7 @@
 #include	<ucfork.h>
 #include	<ucatfork.h>
 #include	<ucatexit.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sigblocker.h>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
 #include	<timewatch.hh>		/* LIBU */
@@ -492,7 +492,7 @@ int auxinfo::start() noex {
     	int		rs ;
 	a = nullptr ;
 	flen = 0 ;
-	if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 	    cint	sz = (nfields * (rs + 1)) ;
 	    flen = rs ;
 	    if (void *vp ; (rs = umem.mall(sz,&vp)) >= 0) {
@@ -506,7 +506,7 @@ int auxinfo::start() noex {
 		    nisdomain =		(a + ((flen + 1) * ai++)) ;
 		}
 	    } /* end if (memory-acquire) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return rs ;
 } /* end subroutine (auxinfo::start) */
 
