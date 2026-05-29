@@ -60,7 +60,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<utimeout.h>		/* |uto{x}(3u)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sysval.hh>
 #include	<errtimer.hh>
 #include	<localmisc.h>
@@ -276,7 +276,7 @@ int lm_ps(char **rpp) noex {
 
 int lm_mallsys(int w,charpp rpp) noex {
     	int		rs ;
-	if ((rs = getbufsize(w)) >= 0) ylikely {
+	if ((rs = bufsizeget(w)) >= 0) ylikely {
 	    rs = libmem.mall(rs,rpp) ;
 	}
 	return rs ;
