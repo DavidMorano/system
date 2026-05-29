@@ -42,16 +42,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<utmpx.h>		/* |UTMPX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storeitem.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<utmpx.h>		/* POSIX |UTMPX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<storeitem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"utmpaccent.h"
 
@@ -67,6 +67,14 @@ import libutil ;			/* |memclear(3u)| */
 #define	SI		storeitem
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef	utmpaccent	uent ;
+
+
 /* external subroutines */
 
 
@@ -75,18 +83,26 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
+enum strs {
+    str_id,
+    str_user,
+    str_line,
+    str_host,
+    str_overlast
+} ; /* end enum (strs) */
+
 
 /* forward references */
 
-static int	si_copystr(storeitem *,cchar **,cchar *,int) noex ;
+local int	si_copystr(storeitem *,uent *,strs,cchar *,int) noex ;
 
 
 /* local variables */
 
-constexpr int 	lid   = UTMPACCENT_LID ;
-constexpr int 	luser = UTMPACCENT_LUSER ;
-constexpr int 	lline = UTMPACCENT_LLINE ;
-constexpr int 	lhost = UTMPACCENT_LHOST ;
+const int 	szid   = utmpsize.id ;
+const int 	szuser = utmpsize.user ;
+const int 	szline = utmpsize.line ;
+const int 	szhost = utmpsize.host ;
 
 
 /* exported variables */
@@ -114,10 +130,10 @@ int utmpaccent_load(utmpaccent *uep,char *uebuf,int uelen,CFENT *suep) noex {
 	            uep->e_exit = suep->ut_exit.e_exit ;
 	            uep->e_term = suep->ut_exit.e_termination ;
 #endif
-	            strwcpy(uep->id,suep->ut_id,lid) ;
-	            si_copystr(&si,&uep->user,suep->ut_user,luser) ;
-	            si_copystr(&si,&uep->line,suep->ut_line,lline) ;
-	            si_copystr(&si,&uep->host,suep->ut_host,lhost) ;
+	            si_copystr(&si,uep,str_id	,suep->ut_id,szid) ;
+	            si_copystr(&si,uep,str_user	,suep->ut_user,szuser) ;
+	            si_copystr(&si,uep,str_line	,suep->ut_line,szline) ;
+	            si_copystr(&si,uep,str_host	,suep->ut_host,szhost) ;
 		} /* end block */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
@@ -131,6 +147,9 @@ int utmpaccent_size(cutmpaccent *uep) noex {
 	int		rs = SR_FAULT ;
 	int		sz = 0 ;
 	if (uep) {
+	    if (uep->id) {
+	        sz += (lenstr(uep->id) + 1) ;
+	    }
 	    if (uep->user) {
 	        sz += (lenstr(uep->user) + 1) ;
 	    }
@@ -148,15 +167,31 @@ int utmpaccent_size(cutmpaccent *uep) noex {
 
 /* local subroutines */
 
-static int si_copystr(storeitem *sip,cchar **pp,cchar *sp,int sl) noex {
+local int si_copystr(storeitem *sip,uent *uep,strs w,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	cchar		**cpp = ccharpp(pp) ;
-	*cpp = nullptr ;
+	int		len = 0 ; /* return-value */
 	if (sp) {
-	    rs = sip->strw(sp,sl,cpp) ;
-	}
-	return rs ;
-}
-/* end subroutine (si_copystr) */
-
+	    if (cchar *rp ; (rs = sip->strw(sp,sl,&rp)) >= 0) {
+		len = rs ;
+		switch (w) {
+		case str_id:
+		    uep->id = rp ;
+		    break ;
+		case str_user:
+		    uep->user = rp ;
+		    break ;
+		case str_line:
+		    uep->line = rp ;
+		    break ;
+		case str_host:
+		    uep->host = rp ;
+		    break ;
+		default:
+		    rs = SR_BUGCHECK ;
+		    break ;
+		} /* end switch */
+	    } /* end if (storeitem_strw) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (si_copystr) */
 
