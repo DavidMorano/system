@@ -26,16 +26,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucdescwrite.h>
-#include	<intfloor.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<intfloor.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -62,7 +62,7 @@ int bfile_bufreset(bfile *op) noex {
 	op->bbp = op->bdata ;
 	op->len = 0 ;
 	return SR_OK ;
-}
+} /* end subroutine */
 
 int bfile_acc(bfile *op,bool fwr) noex {
 	int		rs ;
@@ -142,21 +142,23 @@ int bfile_flush(bfile *op) noex {
 /* end subroutine (bfile_flush) */
 
 int bfile_pagein(bfile *op,off_t off,int i) noex {
+	cnullptr	np{} ;
+	csize		foff = size_t(off) ;
+	off_t		fo{} ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cnullptr	np{} ;
-	    csize	ms = size_t(op->pagesize) ;
-	    coff	of = floor(off,op->pagesize) ;
+	    csize	ms = size_t(op->pagesz) ;
 	    cint	mp = PROT_READ ;
 	    cint	mf = MAP_SHARED ;
 	    cint	fd = op->fd ;
+	    fo = floor(foff,op->pagesz) ;
 	    void	*vp ;
-	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,of,&vp)) >= 0) {
+	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,fo,&vp)) >= 0) {
 	        op->maps[i].bdata = charp(vp) ;
 	        op->maps[i].bsize = ms ;
-	        op->maps[i].offset = of ;
+	        op->maps[i].offset = fo ;
 	        op->maps[i].fl.valid = true ;
-	    }
+	    } /* end if (u_mapbegin) */
 	} /* end if (non-null) */
 	return rs ;
 }
