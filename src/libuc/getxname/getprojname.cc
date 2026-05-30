@@ -45,7 +45,7 @@
 #include	<usysbase.h>
 #include	<uclibmem.h>
 #include	<ucgetpj.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
@@ -105,7 +105,7 @@ local int getprojnamer(char *rbuf,int rlen,cchar *un) noex {
     	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ; /* return-value */
-        if ((rs = getbufsize(bufsize_un)) >= 0) {
+        if ((rs = bufsizeget(bufsize_un)) >= 0) {
             cint        ulen = rs ;
             char        ubuf[rs + 1] ;
             if ((un[0] == '-') || (un[0] == '\0')) {
@@ -123,7 +123,7 @@ local int getprojnamer(char *rbuf,int rlen,cchar *un) noex {
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (m-a-f) */
             } /* end if (ok) */
-        } /* end if (getbufsize) */
+        } /* end if (bufsizeget) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (getprojnamer) */
 
