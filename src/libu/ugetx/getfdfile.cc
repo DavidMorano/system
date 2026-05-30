@@ -43,8 +43,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |cfdec(3u)| */
@@ -115,7 +115,7 @@ int getfdfile(cchar *fp,int µfl) noex {
 			    } else if (fd == stdfile_minus) {
 				rs = SR_OK ;
 				fd = FD_STDIN ;
-			    }
+			    } /* end if */
 			} /* end if (getstdfname) */
 	            } else if (ISDIG(ch1)) {
 			rs = extfd(fp,fl) ;
