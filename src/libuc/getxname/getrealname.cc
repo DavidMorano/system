@@ -50,7 +50,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
