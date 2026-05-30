@@ -161,7 +161,6 @@ int mater::matpxstr(con mainv a,int n,cchar *sp,int µsl) noex {
 	    }
 	} /* end if (getlenstr) */
 	return si ;
-}
-/* end subroutine (mater::matpxstr) */
+} /* end subroutine (mater::matpxstr) */
 
 
