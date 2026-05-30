@@ -55,7 +55,7 @@
 #include	<intsat.h>		/* LIBU |intsat(3u)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"usupport_cfdect.hh"
 	
