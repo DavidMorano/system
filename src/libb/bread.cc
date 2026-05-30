@@ -5,6 +5,7 @@
 /* "Basic I-O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 #define	CF_MEMCPY	1		/* use |memcpy(3c)| */
 
 /* revision history:
@@ -36,22 +37,29 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucdescread.h>
-#include	<localmisc.h>
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"bfile.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 #ifndef	CF_MEMCPY
 #define	CF_MEMCPY	1		/* use |memcpy(3c)| */
 #endif
@@ -71,13 +79,14 @@
 
 /* forward references */
 
-static int bfile_rdmap(bfile *,void *,int,int,int) noex ;
-static int bfile_rdreg(bfile *,void *,int,int,int) noex ;
+local int bfile_rdmap(bfile *,void *,int,int,int) noex ;
+local int bfile_rdreg(bfile *,void *,int,int,int) noex ;
 
 
 /* local variables */
 
-constexpr bool		f_memcpy = CF_MEMCPY ;
+cbool		f_debug		= CF_DEBUG ;
+cbool		f_memcpy	= CF_MEMCPY ;
 
 
 /* exported variables */
@@ -87,6 +96,7 @@ constexpr bool		f_memcpy = CF_MEMCPY ;
 
 int breade(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	int		rs ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = bfile_magic(op,ubuf)) > 0) {
 	    if ((rs = bfile_ckrd(op)) >= 0) {
 	        if (op->fl.mapinit) {
@@ -96,6 +106,7 @@ int breade(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	        }
 	    } /* end if (reading) */
 	} /* end if (magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 }
 /* end routine (breade) */
@@ -108,22 +119,21 @@ int bread(bfile *op,void *ubuf,int ulen) noex {
 
 /* local subroutines */
 
-static int bfile_rdmap(bfile *op,void *ubuf,int ulen,int,int) noex {
-	USTAT		sb ;
+local int bfile_rdmap(bfile *op,void *ubuf,int ulen,int,int) noex {
+    	cnullptr	np{} ;
+	ustat		sb ;
 	int		rs ;
 	int		tlen = 0 ;
-	int		pagemask = op->pagesize - 1 ;
+	int		pagemask = (op->pagesz - 1) ;
 	int		i, mlen ;
-	int		f_already ;
-
-	f_already = false ;
+	bool		f_already = false ;
 	while (tlen < ulen) {
 	    mlen = intconv(op->fsize - op->offset) ;
 	    if ((mlen > 0) &&
-	        ((op->bp == nullptr) || (op->len == op->pagesize))) {
+	        ((op->bp == nullptr) || (op->len == op->pagesz))) {
 
-	        i = (op->offset / op->pagesize) & (BFILE_NMAPS - 1) ;
-	        if ((! op->maps[i].fl.valid) || (op->maps[i].bdata == nullptr)
+	        i = (op->offset / op->pagesz) & (BFILE_NMAPS - 1) ;
+	        if ((! op->maps[i].fl.valid) || (op->maps[i].bdata == np)
 	            || (op->maps[i].offset != (op->offset & (~ pagemask))))
 	            bfile_pagein(op,op->offset,i) ;
 
@@ -134,8 +144,8 @@ static int bfile_rdmap(bfile *op,void *ubuf,int ulen,int,int) noex {
 
 /* prepare to move data */
 
-	    if ((op->pagesize - op->len) < mlen) {
-	        mlen = (op->pagesize - op->len) ;
+	    if ((op->pagesz - op->len) < mlen) {
+	        mlen = (op->pagesz - op->len) ;
 	    }
 	    if ((ulen - tlen) < mlen) {
 	        mlen = (ulen - tlen) ;
@@ -153,59 +163,57 @@ static int bfile_rdmap(bfile *op,void *ubuf,int ulen,int,int) noex {
 
 	    if (op->offset >= op->fsize) {
 	        if (f_already) break ;
-
+		{
 	        rs = u_fstat(op->fd,&sb) ;
 	        if (rs < 0) break ;
-
+		}
+		{
 	        op->fsize = sb.st_size ;
 	        f_already = true ;
-
+		}
 	    } /* end if (file size limited) */
 
 	} /* end while (reading) */
 
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (bfile_rdmap) */
+} /* end subroutine (bfile_rdmap) */
 
-static int bfile_rdreg(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
+local int bfile_rdreg(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	int		rs = SR_OK ;
 	int		maxeof ;
 	int		neof = 0 ;
-	int		len ;
-	int		mlen ;
-	int		tlen = 0 ;
-	int		f_already = false ;
+	int		tlen = 0 ; /* return-value */
+	bool		f_already = false ;
 	char		*dbp ;
-
+	DEBUGPRINTF("ent to=%d\n",to) ;
 	maxeof = (op->fl.network && (to < 0)) ? BFILE_MAXNEOF : 1 ;
 	dbp = charp(ubuf) ;
 	while ((rs >= 0) && (ulen > 0) && (neof < maxeof)) {
-
-	    if (op->len <= 0) {
+	    int len ;
+	    if (op->len == 0) {
 	        if (f_already) break ;
 		if (to >= 0) {
-	            rs = uc_reade(op->fd,op->bdata,op->bsize,to,opts) ;
+	            rs = uc_reade(op->fd,op->bdata,op->bsz,to,opts) ;
 	            len = rs ;
 		} else {
-	            rs = u_read(op->fd,op->bdata,op->bsize) ;
+	            rs = u_read(op->fd,op->bdata,op->bsz) ;
 	            len = rs ;
-		}
+		} /* end if */
+		DEBUGPRINTF("read() rs=%d\n",rs) ;
 	        if (rs < 0) break ;
 		if (len == 0) {
 		    neof += 1 ;
 		} else {
 		    neof = 0 ;
 		}
-	        if (op->len < op->bsize) {
+	        if (op->len < op->bsz) {
 	            f_already = true ;
 		}
 	        op->bp = op->bdata ;
 		op->len = len ;
 	    } /* end if (refill buffer) */
-
 	    if ((rs >= 0) && (op->len > 0)) {
-	        mlen = (op->len < ulen) ? op->len : ulen ;
+	        cint mlen = (op->len < ulen) ? op->len : ulen ;
 		if_constexpr (f_memcpy) {
 	            memcpy(dbp,op->bp,mlen) ;
 	            op->bp += mlen ;
@@ -213,18 +221,16 @@ static int bfile_rdreg(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 		} else {
 	            for (int i = 0 ; i < mlen ; i += 1) {
 	                *dbp++ = *(op->bp)++ ;
-	 	    }
+	 	    } /* end for */
 		} /* end if_constexpr (f_memcpy) */
 	        op->offset += mlen ;
 	        op->len -= mlen ;
 	        tlen += mlen ;
 	        ulen -= mlen ;
 	    } /* end if */
-
 	} /* end while */
-
+	DEBUGPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (bfile_rdreg) */
+} /* end subroutine (bfile_rdreg) */
 
 
