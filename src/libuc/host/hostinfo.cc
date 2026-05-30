@@ -53,7 +53,6 @@
 #include	<uclibmem.h>
 #include	<ucgetx.h>		/* |uc_getipnode{x}(3uc)| */
 #include	<uchostent.h>		/* |uc_hostent{x}(3uc)| */
-#include	<getbufsize.h>
 #include	<getnodedomain.h>
 #include	<getnodename.h>
 #include	<getaf.h>
