@@ -34,18 +34,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>		/* ustat */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX ustat */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -54,15 +56,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_ftruncate(int,off_t) noex ;
-    extern int uc_fminmod(int,mode_t) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_fsyncdata(int) noex ;
-    extern int uc_fsync(int) noex ;
-    extern int uc_nonblock(int,int) noex ;
-} /* end extern (C) */
 
 
 /* external variables */
@@ -73,7 +66,7 @@ extern "C" {
 
 /* forward references */
 
-static int	bcontrol_lock(bfile *,FLOCK *,int,int,int) noex ;
+local int	bcontrol_lock(bfile *,FLOCK *,int,int,int) noex ;
 
 
 /* local variables */
@@ -93,7 +86,7 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	    va_end(ap) ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	int		rs ;
@@ -277,22 +270,7 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	            }
 	            break ;
 	        case BC_BUFSIZE:
-	            if ((rs = bfile_flush(op)) >= 0) {
-	 	        int	bsize = (int) va_arg(ap,int) ;
-	                char	*bdata ;
-		        if (bsize <= 1024) {
-		            bsize = op->pagesize ;
-		        }
-	                if ((rs = lm_vall(bsize,&bdata)) >= 0) {
-	                    if (op->bdata) {
-	                        lm_free(op->bdata) ;
-		            }
-	                    op->bsize = bsize ;
-	                    op->bdata = bdata ;
-		            op->bbp = op->bdata ;
-	                    op->bp = op->bdata ;
-	                } /* end if (successful) */
-	            } /* end if (was able to flush) */
+		    rs = SR_NOSYS ;
 	            break ;
 	        case BC_DSYNC:
 	            if ((rs = bfile_flush(op)) >= 0) {
@@ -393,9 +371,8 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 /* end subroutine (bcontrol) */
 
 int bsize(bfile *op) noex {
-	ustat		sb ;
 	int		rs ;
-	if ((rs = bcontrol(op,BC_STAT,&sb)) >= 0) {
+	if (ustat sb ; (rs = bcontrol(op,BC_STAT,&sb)) >= 0) {
 	    rs = (sb.st_size & INT_MAX) ;
 	}
 	return rs ;
@@ -410,7 +387,7 @@ int bstat(bfile *op,ustat *sbp) noex {
 
 /* private subroutines */
 
-static int bcontrol_lock(bfile *op,FLOCK *fsp,int fcmd,int f_tc,int to) noex {
+local int bcontrol_lock(bfile *op,FLOCK *fsp,int fcmd,int f_tc,int to) noex {
 	int		rs = SR_OK ;
 	if (to < 0) to = INT_MAX ;
 	for (int i = 0 ; i < to ; i += 1) {
@@ -434,7 +411,26 @@ static int bcontrol_lock(bfile *op,FLOCK *fsp,int fcmd,int f_tc,int to) noex {
 	    if ((! f_tc) || (rs != SR_LOCKED)) break ;
 	} /* end for (looping-timing on fcntl) */
 	return rs ;
-}
-/* end subroutine (bcontrol_lock) */
+} /* end subroutine (bcontrol_lock) */
+
+/* let the caller change the internal buffer size (in abeyance) */
+#ifdef	COMMENT
+	            if ((rs = bfile_flush(op)) >= 0) {
+	 	        int	bsize = (int) va_arg(ap,int) ;
+	                char	*bdata ;
+		        if (bsize <= 1024) {
+		            bsize = op->pagesz ;
+		        }
+	                if ((rs = lm_vall(bsize,&bdata)) >= 0) {
+	                    if (op->bdata) {
+	                        lm_free(op->bdata) ;
+		            }
+	                    op->bsz = bsize ;
+	                    op->bdata = bdata ;
+		            op->bbp = op->bdata ;
+	                    op->bp = op->bdata ;
+	                } /* end if (successful) */
+	            } /* end if (was able to flush) */
+#endif /* COMMENT */
 
 
