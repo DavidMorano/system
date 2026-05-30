@@ -132,10 +132,6 @@ int bfile::copyfile(bfile *ofp,char *ubuf,int ulen) noex {
 	return bcopyfile(this,ofp,ubuf,ulen) ;
 }
 
-int bfile::dup(bfile *fnewp) noex {
-	return bdup(this,fnewp) ;
-}
-
 int bfile::flushn(int n) noex {
 	return bflushn(this,n) ;
 }
