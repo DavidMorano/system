@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	bprintf
+
+	Description:
 	This version of PRINTF is compatible with the Version 7 C
 	PRINTF.  This function is implemented differently in that
 	the function that does the actual formatting is |bufprintf(3dam)|.
@@ -24,13 +28,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -40,16 +45,13 @@
 
 /* imported namespaces */
 
+using libuc::mem ;			/* variable */
+
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	bufprintf(char *,int,cchar *,...) noex ;
-    extern int	bufvprintf(char *,int,cchar *,va_list) noex ;
-}
 
 
 /* external variables */
@@ -60,8 +62,8 @@ extern "C" {
 
 /* forward references */
 
-static int	bwritefmt(bfile *,cchar *,va_list) noex ;
-static int	bwriteout(bfile *,cchar *,int) noex ;
+local int	bwritefmt(bfile *,cchar *,va_list) noex ;
+local int	bwriteout(bfile *,cchar *,int) noex ;
 
 
 /* exported variables */
@@ -70,13 +72,13 @@ static int	bwriteout(bfile *,cchar *,int) noex ;
 /* exported subroutines */
 
 int bprintf(bfile *op,cchar *fmt,...) noex {
-	int		rs ;
 	va_list		ap ;
-	va_begin(ap,fmt) ;
-	{
+	int		rs = SR_FAULT ;
+	if (fmt) {
+	    va_begin(ap,fmt) ;
 	    rs = bwritefmt(op,fmt,ap)  ;
-	}
-	va_end(ap) ;
+	    va_end(ap) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (bprintf) */
@@ -89,26 +91,26 @@ int bvprintf(bfile *op,cchar *fmt,va_list ap) noex {
 
 /* local subroutines */
 
-static int bwritefmt(bfile *op,cchar *fmt,va_list ap) noex {
+local int bwritefmt(bfile *op,cchar *fmt,va_list ap) noex {
+    	cint		fo = fmtoptm.clean ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = bfile_magic(op,fmt,ap)) > 0) {
-	    if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
+	    if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
 	        cint	llen = rs ;
-	        if ((rs = bufvprintf(lbuf,llen,fmt,ap)) >= 0) {
+	        if ((rs = fmtstr(lbuf,llen,fo,fmt,ap)) >= 0) {
 	            rs = bwriteout(op,lbuf,rs) ;
 	            wlen = rs ;
-	        }
-	        rs1 = lm_free(lbuf) ;
+	        } /* end if (fmtstr) */
+	        rs1 = mem.free(lbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bwritefmt) */
+} /* end subroutine (bwritefmt) */
 
-static int bwriteout(bfile *op,cchar *lbuf,int llen) noex {
+local int bwriteout(bfile *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = bwrite(op,lbuf,llen)) >= 0) {
@@ -123,7 +125,6 @@ static int bwriteout(bfile *op,cchar *lbuf,int llen) noex {
 	    } /* end if */
 	} /* end if (bwrite) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bwriteout) */
+} /* end subroutine (bwriteout) */
 
 
