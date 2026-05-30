@@ -5,6 +5,7 @@
 /* "Basic I-O" package */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1	/* debugging */
 #define	CF_MAPABLE	0	/* allow mapped files */
 
 /* revision history:
@@ -43,30 +44,34 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<bufsizevar.hh>
-#include	<sysval.hh>
-#include	<stdfnames.h>
-#include	<snx.h>
-#include	<cfdec.h>
-#include	<conallof.h>
-#include	<intsat.h>
-#include	<intceil.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<stdfnames.h>		/* LIBU */
+#include	<snx.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<conallof.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"bfile.h"
 
@@ -85,11 +90,16 @@ import libutil ;			/* |lenstr(3u)| */
 #define	CF_MAPABLE	0	/* allow mapped files */
 #endif
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0	/* debugging */
+#endif
+
 
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -98,13 +108,6 @@ typedef bfile_map *	maper ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_fcntl(int,int,...) noex ;
-    extern int uc_tell(int,off_t *) noex ;
-    extern int uc_fminmod(int,mode_t) noex ;
-    extern int uc_dupmince(int,int) noex ;
-}
 
 extern "C" {
     extern int	findfilepath(cchar *,char *,cchar *,int) noex ;
@@ -132,7 +135,7 @@ namespace {
 	mainv		argv = nullptr ;
 	mainv		envv = nullptr ;
 	int		to ;
-	int		bsize = 0 ;
+	int		bsz = 0 ;
 	sub_isreadonly	isreadonly ;
 	sub_bopen(bfile *aop,cc *afn,cc *aos,mode_t aom,int ato) noex {
 	    isreadonly(this) ;
@@ -143,33 +146,34 @@ namespace {
 	    to = ato ;
 	} ; /* end ctor */
 	int operator () (mainv av,mainv ev) noex ;
-	int mkoflags() noex ;
-	int getfile() noex ;
-	int openfd(int) noex ;
-	int openadj() noex ;
-	int openoffset() noex ;
-	int bufsize() noex ;
-	int openreg() noex ;
-	int iclose() noex ;
+	int mkoflags	() noex ;
+	int getfile	() noex ;
+	int openfd	(int) noex ;
+	int openreg	() noex ;
+	int openadj	() noex ;
+	int openoffset	() noex ;
+	int bufsize	() noex ;
+	int iclose	() noex ;
    } ; /* end struct (sub_bopen) */
 } /* end namespace */
 
 
 /* forward references */
 
-static int	bfile_bufbegin(bfile *,int) noex ;
-static int	bfile_bufend(bfile *) noex ;
-static int	bfile_opts(bfile *) noex ;
-static int	bfile_mapbegin(bfile *) noex ;
-static int	bfile_mapend(bfile *) noex ;
+local int	bfile_bufbegin	(bfile *,int) noex ;
+local int	bfile_bufend	(bfile *) noex ;
+local int	bfile_opts	(bfile *) noex ;
+local int	bfile_mapbegin	(bfile *) noex ;
+local int	bfile_mapend	(bfile *) noex ;
 
 
 /* local variables */
 
-constexpr bool		f_mapable = CF_MAPABLE ;
 
-static sysval		pagesize(sysval_ps) ;
-static bufsizevar	maxlinelen(bufsize_ml) ;
+static sysval		pagesz		(sysval_ps) ;
+static bufsizevar	maxlinelen	(bufsize_ml) ;
+constexpr bool		f_debug		= CF_DEBUG ;
+constexpr bool		f_mapable	= CF_MAPABLE ;
 
 
 /* exported variables */
@@ -181,15 +185,19 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
     	BFILE		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
+	DEBUGPRINTF("ent\n") ;
 	if (op && fn && os) {
+	    DEBUGPRINTF("fn=%s\n",fn) ;
 	    memclear(hop) ;
 	    op->fd = -1 ;
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
-		sub_bopen	bo(op,fn,os,om,to) ;
-		rs = bo(np,np) ;
+		if (sub_bopen bo(op,fn,os,om,to) ; (rs = bo(np,np)) >= 0) {
+		    op->magval = BFILE_MAGIC ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 }
 /* end subroutine (bopene) */
@@ -209,10 +217,10 @@ int bopenmod(bfile *fp,cchar *fname,cchar *of,mode_t om) noex {
 	            fp->of |= O_MINMODE ;
 	            rs = uc_fminmod(fp->fd,om) ;
 	        }
-	    }
+	    } /* end if (strchr) */
 	    if (rs < 0) {
 	        bclose(fp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (bopen) */
 	return (rs >= 0) ? rv : rs ;
 }
@@ -221,26 +229,37 @@ int bopenmod(bfile *fp,cchar *fname,cchar *of,mode_t om) noex {
 int bclose(bfile *op) noex {
 	int		rs ;
 	int		rs1 ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = bfile_magic(op)) >= 0) {
+	    rs = SR_OK ;
+	DEBUGPRINTF("1 rs=%d\n",rs) ;
             if (op->fl.writing && (op->len > 0)) {
+	        DEBUGPRINTF("flush\n") ;
                 rs1 = bfile_flush(op) ;
                 if (rs >= 0) rs = rs1 ;
             }
+	DEBUGPRINTF("2 rs=%d\n",rs) ;
             if (op->maps) {
+	        DEBUGPRINTF("mapend\n") ;
                 rs1 = bfile_mapend(op) ;
                 if (rs >= 0) rs = rs1 ;
             }
+	DEBUGPRINTF("3 rs=%d\n",rs) ;
             if (op->bdata) {
+	        DEBUGPRINTF("bufend\n") ;
                 rs1 = bfile_bufend(op) ;
                 if (rs >= 0) rs = rs1 ;
             }
+	DEBUGPRINTF("4 rs=%d\n",rs) ;
             if (op->fd >= 0) {
+	        DEBUGPRINTF("close\n") ;
                 rs1 = uc_close(op->fd) ;
                 if (rs >= 0) rs = rs1 ;
 		op->fd = -1 ;
             }
-            op->magic = 0 ;
+            op->magval = 0 ;
 	} /* end if (magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 }
 /* end subroutine (bclose) */
@@ -253,35 +272,48 @@ int sub_bopen::operator () (mainv av,mainv ev) noex {
 	argv = av ;
 	envv = ev ;
 	op->fd = -1 ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = mkoflags()) >= 0) {
+	    DEBUGPRINTF("mkoflags() rs=%d\n",rs) ;
 	    if ((rs = getfile()) > 0) {
+	        DEBUGPRINTF("getfile() rs=%d\n",rs) ;
 		if ((rs = bufsize()) >= 0) {
-	            if ((rs = bfile_bufbegin(op,bsize)) >= 0) {
+	    	    DEBUGPRINTF("bufsize() rs=%d\n",rs) ;
+	            if ((rs = bfile_bufbegin(op,bsz)) >= 0) {
+	    	        DEBUGPRINTF("bufbegin() rs=%d\n",rs) ;
 			rs = bfile_mapbegin(op) ;
-		    }
+	    	        DEBUGPRINTF("mapbegin() rs=%d\n",rs) ;
+		    } /* end if (bfile_bufbegin) */
 		} /* end if (bufsize) */
 		if (rs < 0) {
 		    iclose() ;
-		}
+		} /* end if (error) */
 	    } /* end if (getfile) */
 	} /* end if (mkoflags) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end method (sub_bopen::operator) */
+} /* end method (sub_bopen::operator) */
 
 int sub_bopen::getfile() noex {
-	int		rs = SR_OK ;
+	int		rs ;
+	DEBUGPRINTF("ent fn=%s\n",fn) ;
 	if ((rs = getfdfile(fn,-1)) >= 0) {	/* "standard" file */
+	    DEBUGPRINTF("getfdfile() rs=%d\n",rs) ;
 	    op->fl.filedesc = true ;
 	    rs = openfd(rs) ;
+	    DEBUGPRINTF("openfd() rs=%d\n",rs) ;
 	} else if (rs == SR_EMPTY) {		/* "null" file */
+	    DEBUGPRINTF("-EMPTY\n") ;
 	    op->fl.nullfile = true ;
-	} else if (rs != SR_DOM) {
+	    DEBUGPRINTF("nullfile\n") ;
+	} else if (rs == SR_DOM) {
+	    DEBUGPRINTF("-DOM\n") ;
 	    rs = openreg() ;
-	}
+	    DEBUGPRINTF("openreg() rs=%d\n",rs) ;
+	} /* end if */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end method (sub_bopen::getfile) */
+} /* end method (sub_bopen::getfile) */
 
 int sub_bopen::openfd(int idx) noex {
 	int		rs ;
@@ -289,14 +321,28 @@ int sub_bopen::openfd(int idx) noex {
 	    op->fd = rs ;
 	    if ((rs = openadj()) >= 0) {
 		rs = openoffset() ;
-	    }
+	    } /* end if (openadj) */
 	    if (rs < 0) {
 		iclose() ;
-	    }
-	} /* end if (uc_dupmin) */
+	    } /* end if (error) */
+	} /* end if (uc_dupmince) */
 	return rs ;
-}
-/* end method (sub_bopen::openfd) */
+} /* end method (sub_bopen::openfd) */
+
+int sub_bopen::openreg() noex {
+	cint		fok = true ;
+	cint		of = op->of ;
+	int		rs ;
+	cmode		om = op->om ;
+	if ((rs = uc_opene(fn,of,om,to)) >= 0) {
+	    op->fd = rs ;
+	    rs = bfile_opts(op) ;
+	    if (rs < 0) {
+		iclose() ;
+	    } /* end if (error) */
+	} /* end if (uc_opene) */
+	return (rs >= 0) ? fok : rs ;
+} /* end method (sub_bopen::openreg) */
 
 int sub_bopen::openadj() noex {
 	int		rs ;
@@ -319,23 +365,21 @@ int sub_bopen::openadj() noex {
 	    }
 	} /* end if (uc_fcntl) */
 	return rs ;
-}
-/* end method (sub_bopen::openadj) */
+} /* end method (sub_bopen::openadj) */
 
 int sub_bopen::openoffset() noex {
 	int		rs ;
-	off_t		fo{} ;
-	if ((rs = uc_tell(op->fd,&fo)) >= 0) {
+	if (off_t fo{} ; (rs = uc_tell(op->fd,&fo)) >= 0) {
 	    op->offset = size_t(fo) ;
 	}
 	return rs ;
-}
-/* end method (sub_bopen::openoffset) */
+} /* end method (sub_bopen::openoffset) */
 
 int sub_bopen::bufsize() noex {
 	int		rs ;
-	if ((rs = pagesize) >= 0) {
-	    op->pagesize = rs ;
+	DEBUGPRINTF("ent\n") ;
+	if ((rs = pagesz) >= 0) {
+	    op->pagesz = rs ;
 	    if ((rs = maxlinelen) >= 0) {
 	        cint	maxline = rs ;
 	        if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
@@ -351,80 +395,65 @@ int sub_bopen::bufsize() noex {
 	            f = f || S_ISBLK(sb.st_mode) ;
 	            if (f) {
 	                if (isreadonly) {
-	                    cint	ps = op->pagesize ;
+	                    cint	ps = op->pagesz ;
 	                    int		fs = intsat(fsize) ;
 	                    int		cs ;
 		            if (fs == 0) fs = 1 ;
 	                    cs = ceil(fs,512) ;
-		            bsize = min(cs,ps) ;
-	                }
+		            bsz = min(cs,ps) ;
+	                } /* end if (isreadonly) */
 	                f_notseek = false ;
 	            } else if (S_ISFIFO(sb.st_mode)) {
-	                bsize = min(maxline,2048) ;
+	                bsz = min(maxline,2048) ;
 	                op->bm = bfilebm_line ;
 	            } else if (S_ISCHR(sb.st_mode)) {
 	                if (isatty(op->fd)) {
-	                    bsize = min(maxline,2048) ;
+	                    bsz = min(maxline,2048) ;
 	                    op->fl.terminal = true ;
 	                    op->bm = bfilebm_line ;
 	                } /* end if (is a terminal) */
 	            } else if (S_ISSOCK(sb.st_mode)) {
 	                op->fl.network = true ;
-	                bsize = (64*1024) ;
+	                bsz = (64*1024) ;
 	                op->bm = bfilebm_line ;
-	            }
+	            } /* end if */
 		    op->fl.notseek = f_notseek ;
 	        } /* end if (fstat) */
 	    } /* end if (maxlinelen) */
 	} /* end if (pagesize) */
+	DEBUGPRINTF("ret rs=%d bsz=%d\n",rs,bsz) ;
 	return rs ;
-}
-/* end method (sub_bopen::bufsize) */
+} /* end method (sub_bopen::bufsize) */
 
-int sub_bopen::openreg() noex {
-	cint		of = op->of ;
+local int bfile_bufbegin(bfile *op,int bsz) noex {
 	int		rs ;
-	cmode		om = op->om ;
-	if ((rs = uc_opene(fn,of,om,to)) >= 0) {
-	    op->fd = rs ;
-	    rs = bfile_opts(op) ;
-	    if (rs < 0) {
-		iclose() ;
-	    }
-	}
-	return rs ;
-}
-/* end method (sub_bopen::openreg) */
-
-static int bfile_bufbegin(bfile *op,int bsize) noex {
-	int		rs ;
-	if (bsize == 0) bsize = op->pagesize ;
-	if (char *p ; (rs = lm_mall(bsize,&p)) >= 0) {
+	DEBUGPRINTF("ent bsz=%d\n",bsz) ;
+	if (bsz == 0) bsz = op->pagesz ;
+	if (char *p ; (rs = mem.mall(bsz,&p)) >= 0) {
 	    op->bdata = p ;
-	    op->bsize = bsize ;
+	    op->bsz = bsz ;
 	    op->bbp = p ;
 	    op->bp = p ;
-	}
+	} /* end if (memory-acquire) */
+	DEBUGPRINTF("ret rs=%d bsz=%d\n",rs,bsz) ;
 	return rs ;
-}
-/* end subroutine (bfile_bufbegin) */
+} /* end subroutine (bfile_bufbegin) */
 
-static int bfile_bufend(bfile *op) noex {
+local int bfile_bufend(bfile *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->bdata) {
-	    rs1 = lm_free(op->bdata) ;
+	    rs1 = mem.free(op->bdata) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->bdata = nullptr ;
 	    op->bbp = nullptr ;
 	    op->bp = nullptr ;
-	    op->bsize = 0 ;
-	}
+	    op->bsz = 0 ;
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (bfile_bufend) */
+} /* end subroutine (bfile_bufend) */
 
-static int bfile_opts(bfile *op) noex {
+local int bfile_opts(bfile *op) noex {
 	cint		of = op->of ;
 	int		rs = SR_OK ;
 	cmode		om = op->om ;
@@ -435,15 +464,14 @@ static int bfile_opts(bfile *op) noex {
 	    op->fl.network = true ;
 	}
 	return rs ;
-}
-/* end subroutine (bfile_opts) */
+} /* end subroutine (bfile_opts) */
 
-static int bfile_mapbegin(bfile *op) noex {
+local int bfile_mapbegin(bfile *op) noex {
 	cint		nm = BFILE_NMAPS ;
 	int		rs = SR_OK ;
 	if (op->fl.mapable) {
 	    cint	sz = (nm * szof(bfile_map)) ;
-	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = mem.mall(sz,&vp)) >= 0) {
 	        op->maps = maper(vp) ;
 	        for (int i = 0 ; i < nm ; i += 1) {
 	            op->maps[i].fl.valid = false ;
@@ -454,10 +482,9 @@ static int bfile_mapbegin(bfile *op) noex {
 	    } /* end if (m-a) */
 	} /* end if (fl.mapable) */
 	return rs ;
-}
-/* end subroutine (bfile_mapbegin) */
+} /* end subroutine (bfile_mapbegin) */
 
-static int bfile_mapend(bfile *op) noex {
+local int bfile_mapend(bfile *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->maps) {
@@ -470,80 +497,82 @@ static int bfile_mapend(bfile *op) noex {
 	        }
 	    } /* end for */
 	    {
-	        rs1 = lm_free(op->maps) ;
+	        rs1 = mem.free(op->maps) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->maps = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bfile_mapend) */
+} /* end subroutine (bfile_mapend) */
 
 int sub_bopen::mkoflags() noex {
 	int		rs = SR_OK ;
 	int		of = O_CLOEXEC ;
-	cchar		*osp = os ;
-	while (*os) {
-	    cint	sc = mkchar(*osp++) ;
-	    switch (sc) {
-	    case 'r':
-	        op->fl.rd = true ;
-	        break ;
-	    case 'w':
-		op->fl.wr = true ;
-	        break ;
-	    case 'm':
-	    case '+':
-	        op->fl.rd = true ;
-		op->fl.wr = true ;
-	        break ;
-	    case 'a':
-	        of |= O_APPEND ;
-		op->fl.append = true ;
-	        break ;
-	    case 'b': /* POSIX "binary" mode -- nothing on real UNIXes® */
-	        break ;
-	    case 'c':
-	        of |= O_CREAT ;
-	        break ;
-	    case 'e':
-	        of |= (O_CREAT | O_EXCL) ;
-	        break ;
-	    case 't':
-	        of |= (O_CREAT | O_TRUNC) ;
-	        break ;
-	    case 'n':
-	        of |= O_NDELAY ;
-	        break ;
-	    case 'p':
-	        op->fl.program = true ;
-	        break ;
-	    case 'x':
-	        of |= O_EXCL ;
-		break ;
-	    case 'F':
-		of |= O_MINFD ;		/* minimum-file-descriptor */
-		break ;
-	    case 'N':
-	        of |= O_NETWORK ;	/* "network" file */
-		op->fl.network = true ;
-		break ;
-	    case 'M':
-	        of |= O_MINMODE ;	/* minimum file-permissions-mode */
-		break ;
-	    } /* end switch */
-	} /* end while (open flags) */
+	DEBUGPRINTF("ent\n") ;
+	if (os) {
+	    cchar	*osp = os ;
+	    DEBUGPRINTF("os=%s\n",os) ;
+	    for (int sc ; ((sc = mkchar(*osp))) ; osp += 1) {
+	        switch (sc) {
+	        case 'r':
+	            op->fl.rd = true ;
+	            break ;
+	        case 'w':
+		    op->fl.wr = true ;
+	            break ;
+	        case 'm':
+	        case '+':
+	            op->fl.rd = true ;
+		    op->fl.wr = true ;
+	            break ;
+	        case 'a':
+	            of |= O_APPEND ;
+		    op->fl.append = true ;
+	            break ;
+	        case 'b': /* POSIX "binary" mode -- nothing on real UNIXes® */
+	            break ;
+	        case 'c':
+	            of |= O_CREAT ;
+	            break ;
+	        case 'e':
+	            of |= (O_CREAT | O_EXCL) ;
+	            break ;
+	        case 't':
+	            of |= (O_CREAT | O_TRUNC) ;
+	            break ;
+	        case 'n':
+	            of |= O_NDELAY ;
+	            break ;
+	        case 'p':
+	            op->fl.program = true ;
+	            break ;
+	        case 'x':
+	            of |= O_EXCL ;
+		    break ;
+	        case 'F':
+		    of |= O_MINFD ;		/* minimum-file-descriptor */
+		    break ;
+	        case 'N':
+	            of |= O_NETWORK ;	/* "network" file */
+		    op->fl.network = true ;
+		    break ;
+	        case 'M':
+	            of |= O_MINMODE ;	/* minimum file-permissions-mode */
+		    break ;
+	        } /* end switch */
+	    } /* end for (open flags) */
+	} /* end if (non-null) */
 	if (op->fl.rd && op->fl.wr) {
 	    of |= O_RDWR ;
 	} else if (op->fl.wr) {
 	    of |= O_WRONLY ;
 	} else {
 	    of |= O_RDONLY ;
-	}
+	} /* end if */
 	op->of = of ;
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end method (sub_bopen::mkoflags) */
+} /* end method (sub_bopen::mkoflags) */
 
 int sub_bopen::iclose() noex {
 	int		rs = SR_OK ;
@@ -554,12 +583,11 @@ int sub_bopen::iclose() noex {
 	    op->fd = -1 ;
 	}
 	return rs ;
-}
-/* end method (sub_bopen::iclose) */
+} /* end method (sub_bopen::iclose) */
 
 sub_isreadonly::operator bool () noex {
 	bfile		*op = sop->op ;
 	return (op->fl.rd && (! op->fl.wr)) ;
-}
+} /* end method */
 
 
