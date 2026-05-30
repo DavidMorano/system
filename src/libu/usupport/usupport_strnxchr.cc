@@ -43,14 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| + |strrchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| + |strrchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usupport_strnxchr.hh"
 
@@ -103,7 +103,6 @@ cbool		f_memchr	= CF_MEMCHR ;
 
 namespace libu {
     char *strnochr(cchar *sp,int sl,int sch) noex {
-        cnullptr	np{} ;
 	char		*rsp = nullptr ;
 	if (sp) ylikely {
 	    bool	f = false ;
@@ -111,7 +110,7 @@ namespace libu {
 	    if (sl >= 0) {
 		if_constexpr (f_memchr) {
 		    csize msize = size_t(sl) ;
-		    if (cc *tp ; (tp = charp(memchr(sp,sch,msize))) != np) {
+		    if (cc *tp = charp(memchr(sp,sch,msize)) ; tp) {
 			rsp = charp(tp) ;
 		    }
 		} else {
@@ -142,9 +141,11 @@ namespace libu {
 	if (sp) ylikely {
 	    sch &= UCHAR_MAX ;
 	    if (sl >= 0) {
-	        for (cchar *csp = (sp + sl) ; rsp && (--csp >= sp) ; ) {
-	            cint	ch = mkchar(*csp) ;
-	            if (ch == sch) rsp = charp(csp) ;
+	        for (cchar *csp = (sp + sl) ; --csp >= sp ; ) {
+	            if (mkchar(*csp) == sch) {
+			rsp = charp(csp) ;
+			break ;
+		    }
 	        } /* end for */
 	    } else {
 		if_constexpr (f_strrchr) {
