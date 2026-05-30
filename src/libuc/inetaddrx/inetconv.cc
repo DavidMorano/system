@@ -69,21 +69,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucinetconv.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<strwcpy.h>
-#include	<uinet.h>
-#include	<inaddrbad.hh>
-#include	<localmisc.h>
+#include	<sys/socket.h>		/* POSIX */
+#include	<netinet/in.h>		/* POSIX */
+#include	<arpa/inet.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |strwcpy(3u)| */
+#include	<ucinetconv.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<uinet.h>		/* LINU */
+#include	<inaddrbad.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LINU */
 
 #include	"inetconv.h"
 
@@ -95,6 +95,7 @@
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libu::strwcpy ;			/* subroutine */
 
 
 /* local typedefs */
