@@ -59,7 +59,7 @@ module ;
 #include	<sysconfcmds.h>		/* LIBU |_SC_LINE_MAX| */
 #include	<ccfile.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBF */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/ulibvals.ccm"
