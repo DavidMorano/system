@@ -25,11 +25,9 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-
 #include	<cmi.h>
 
 
-#define	COMMANDMENTS_MAGIC	0x99447248
 #define	COMMANDMENTS		struct commandments_head
 #define	COMMANDMENTS_INFO	struct commandments_information
 #define	COMMANDMENTS_CUR	struct commandments_cursor
@@ -38,6 +36,7 @@
 #define	COMMANDMENTS_E		struct commandments_entry
 #define	COMMANDMENTS_FL		struct commandments_flags
 #define	COMMANDMENTS_OBJ	struct commandments_object
+#define	COMMANDMENTS_MAGIC	0x99447248
 #define	COMMANDMENTS_DBNAME	"ten"
 
 
