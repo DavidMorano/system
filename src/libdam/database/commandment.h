@@ -29,10 +29,10 @@
 #include	<commandments.h>
 
 
-#define	COMMANDMENT_MAGIC	0x99447242
 #define	COMMANDMENT		struct commandment_head
 #define	COMMANDMENT_FL		struct commandment_flags
 #define	COMMANDMENT_CUR		struct commandment_cursor
+#define	COMMANDMENT_MAGIC	0x99447242
 
 
 struct commandment_flags {
