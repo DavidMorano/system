@@ -150,7 +150,6 @@ int mater::matoxstr(con mainv a,int n,cchar *sp,int µsl) noex {
 	    }
 	} /* end if (getlenstr) */
 	return si ;
-}
-/* end method (mater::matoxstr) */
+} /* end method (mater::matoxstr) */
 
 
