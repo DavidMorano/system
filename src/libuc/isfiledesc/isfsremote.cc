@@ -42,7 +42,7 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<matxstr.h>		/* |matlocalfs(3uc)| */
 #include	<getfstype.h>
 #include	<localmisc.h>
@@ -82,13 +82,13 @@
 int isfsremote(int fd) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = getbufsize(bufsize_un)) >= 0) {
+	if ((rs = bufsizeget(bufsize_un)) >= 0) {
 	    cint	fslen = rs ;
 	    char	fstype[fslen+ 1] ;	/* <- VLA (yeh!) */
 	    if ((rs = getfstype(fstype,fslen,fd)) >= 0) {
 	        f = (matlocalfs(fstype,rs) < 0) ;
 	    }
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (isfsremote) */
