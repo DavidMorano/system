@@ -42,7 +42,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<uinfo.h>
+#include	<ucinfo.h>
 #include	<sfx.h>
 #include	<snwcpy.h>
 #include	<sncpyx.h>
@@ -138,10 +138,10 @@ int namer::tryenv() noex {
 int namer::trysys() noex {
 	int		rs ;
 	int		len = 0 ;
-	if (uinfo_names names ; (rs = uinfo_name(&names)) >= 0) {
+	if (ucinfo_names names ; (rs = ucinfo_name(&names)) >= 0) {
 	    rs = sncpy(rbuf,rlen,names.sysname) ;
 	    len = rs ;
-	} /* end if (uinfo) */
+	} /* end if (ucinfo) */
 	return (rs >= 0) ? len : rs ;
 } /* end method (namer::trysys) */
 
