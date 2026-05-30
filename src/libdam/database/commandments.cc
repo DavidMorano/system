@@ -159,7 +159,10 @@ extern const commandments_obj	commandments_modinfo = {
 	"commandments",
 	szof(commandments),
 	szof(commandments_cur)
-} ;
+} ; /* end initialization */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
