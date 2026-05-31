@@ -242,8 +242,7 @@ local int	fsdirtree_opener(fsdirtree *,cchar *) noex ;
 int fsdirtree_open(fsdirtree *op,cchar *dname,int opts) noex {
 	int		rs ;
 	if ((rs = fsdirtree_ctor(op,dname)) >= 0) ylikely {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        op->opts = opts ;
 	        if ((rs = fifostr_start(op->dqp)) >= 0) ylikely {
 		    cint	sz = (var.maxlinklen + 1) ;
