@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJ0= hasmisc.o hasclass.o hasall.o
-OBJ1= hasvarprefix.o hasnot.o
+OBJ1= hasnot.o
 OBJ2= hasprint.o hasonly.o
 OBJ3= hasuniq.o haslead.o hasnon.o
 
@@ -165,7 +165,6 @@ hasbasename.o:		hasbasename.cc	hasbasename.h		$(INCS)
 
 hasuniq.o:		hasuniq.cc	hasuniq.h		$(INCS)
 haslead.o:		haslead.cc	haslead.h		$(INCS)
-hasvarprefix.o:		hasvarprefix.cc	hasvarprefix.h		$(INCS)
 hasprintbad.o:		hasprint.cc	hasprint.h		$(INCS)
 hasourmjd.o:		hasourmjd.cc	hasourmjd.h		$(INCS)
 haseol.o:		haseol.cc	haseol.h		$(INCS)
