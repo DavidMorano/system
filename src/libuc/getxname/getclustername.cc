@@ -200,10 +200,9 @@ int getclustername(char *rbuf,int rlen,cchar *nname) noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (rbuf) {
-	    static cint		rsv = var ;
+	if (rbuf) ylikely {
 	    rbuf[0] = '\0' ;
-	    if ((rs = rsv) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        if (searcher so(rbuf,rlen,nname) ; (rs = so.start()) >= 0) {
 		    {
 		        rs = so.getprs() ;
@@ -223,10 +222,10 @@ namespace libuc {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (pr && rbuf && nn) {
+	if (pr && rbuf && nn) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (pr[0] && nn[0]) {
+	    if (pr[0] && nn[0]) ylikely {
 	        SI	si ;
 	        if ((rs = subinfo_start(&si,pr,rbuf,rlen,nn)) >= 0) {
 	            if ((rs = subinfo_cacheget(&si)) == 0) {
