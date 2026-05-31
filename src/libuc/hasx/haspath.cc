@@ -35,29 +35,32 @@
 	false		c-string does not have all digits
 	true		c-string has all digits in it
 
+	Example-paths:
+	~<user>[/something/more]
+	¬<var>[/something/more]
+	%<???>[/something/more]
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<localmisc.h>		/* |UC(3dam)| */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |UC(3dam)| */
 
 #include	"haspath.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
+import chrset ;
 
 /* local defines */
-
-#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* imported namespaces */
@@ -74,15 +77,36 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 
 /* local structures */
 
+cint	chx_user	= mkchar('~') ;
+cint	chx_var		= mkchar('¬') ;
+cint	chx_multi	= mkchar('%') ;
+
+namespace {
+    struct prefixer {
+    	chrset	chrs ;
+	consteval void mkchrs() noex {
+	    chrs.set(chx_user) ;
+	    chrs.set(chx_var) ;
+	    chrs.set(chx_multi) ;
+	} ; /* end method */
+	consteval prefixer() noex {
+	    mkchrs() ;
+	} ; /* end ctor */
+	bool operator [] (int ch) const noex {
+	    ch &= UCHAR_MAX ;
+	    return bool(chrs[ch]) ;
+	} ; /* end method */
+    } ; /* end struct (prefixer) */
+} /* end namespace */
+
 
 /* forward references */
 
 local bool haspathx(int chx,cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
-	    if (sl && sp[0]) {
-	        cint ch = mkchar(sp[0]) ;
-	        f = (ch == (chx & UCHAR_MAX)) ;
+	    if (int ch ; sl && ((ch = mkchar(sp[0])))) {
+	        f = (ch == chx) ;
 	    }
 	} /* end if (non-null) */
 	return f ;
@@ -91,6 +115,8 @@ local bool haspathx(int chx,cchar *sp,int sl) noex {
 
 /* local variables */
 
+constexpr prefixer	prefix_data ;
+
 
 /* exported variables */
 
@@ -98,26 +124,29 @@ local bool haspathx(int chx,cchar *sp,int sl) noex {
 /* exported subroutines */
 
 bool haspathuser(cchar *sp,int sl) noex {
-    	return haspathx('~',sp,sl) ;
+    	return haspathx(chx_user,sp,sl) ;
 }
 /* end subroutine (haspathuser) */
 
 bool haspathvar(cchar *sp,int sl) noex {
-    	return haspathx('¬',sp,sl) ;
+    	return haspathx(chx_var,sp,sl) ;
 }
 /* end subroutine (haspathvar) */
 
-bool haspathnon(cchar *sp,int sl) noex {
+bool haspathmulti(cchar *sp,int sl) noex {
+    	return haspathx(chx_multi,sp,sl) ;
+}
+/* end subroutine (haspathvar) */
+
+bool haspathprefix(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) ylikely {
 	    if (sl && sp[0]) {
-	        cint ch = mkchar(sp[0]) ;
-	        f = f || (ch == mkchar('~')) ;
-	        f = f || (ch == mkchar('¬')) ;
+		f = prefix_data[sp[0]] ;
 	    }
 	} /* end if (non-null) */
 	return f ;
-} /* end subroutine (haspathnon) */
+} /* end subroutine (haspathprefix) */
 
 
 /* local subroutines */
