@@ -28,29 +28,6 @@
 #include	<stdintx.h>
 
 
-template<typename TU = uint>
-struct udiv {
-    TU quo ;
-    TU rem ;
-    void div(TU nom,TU dem) noex {
-	quo = nom / dem ;
-	rem = nom % dem ;
-    } ; /* end method */
-    udiv() = default ;
-    udiv(TU n,TU d) noex {
-	div(n,d) ;
-    } ;
-    udiv &operator = (const udiv &o) noex {
-	quo = o.quo ;
-	rem = o.rem ;
-	return *this ;
-    } ;
-    void operator () (TU n,TU d) noex {
-	div(n,d) ;
-    } ;
-} ; /* end struct (udiv) */
-
-
 #endif /* __cplusplus */
 #endif /* UDIV_INCLUDE */
 
