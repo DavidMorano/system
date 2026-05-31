@@ -208,15 +208,15 @@ EXTERNC_end
 #define	PTMA		pthread_mutexattr_t
 #endif
 
-#ifndef	SUBROUTINE_PTHREADMUTEXATTR
-#define	SUBROUTINE_PTHREADMUTEXATTR
+#ifndef	DECLARATION_PTHREADMUTEXATTR
+#define	DECLARATION_PTHREADMUTEXATTR
 EXTERNC_begin
 
 extern errno_t pthread_mutexattr_setrobust_np(PTMA *,int) noex ;
 extern errno_t pthread_mutexattr_getrobust_np(PTMA *,int *) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_PTHREADMUTEXATTR */
+#endif /* DECLARATION_PTHREADMUTEXATTR */
 
 #endif /* (!defined(SYSHAS_MUTEXROBUST)) || (SYSHAS_MUTEXROBUST == 0) */
 /* MUTEXROBUST end */
@@ -236,14 +236,14 @@ EXTERNC_end
 /* MEMCNTL begin */
 #if	(!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0)
 
-#ifndef	SUBROUTINE_MEMCNTL
-#define	SUBROUTINE_MEMCNTL
+#ifndef	DECLARATION_MEMCNTL
+#define	DECLARATION_MEMCNTL
 EXTERNC_begin
 
 extern unixret_t memcntl(void *,size_t,int,void *,int,int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_MEMCNTL */
+#endif /* DECLARATION_MEMCNTL */
 
 #endif /* (!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
 /* MEMCNTL end */
@@ -254,15 +254,15 @@ EXTERNC_end
 #if	CF_PSEMADAPT
 #if	(!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0)
 
-#ifndef	SUBROUTINE_SEMINIT
-#define	SUBROUTINE_SEMINIT
+#ifndef	DECLARATION_SEMINIT
+#define	DECLARATION_SEMINIT
 EXTERNC_begin
 
 extern unixret_t darwinsem_init(sem_t *,int,unsigned int) noex ;
 extern unixret_t darwinsem_destroy(sem_t *) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_SEMINIT */
+#endif /* DECLARATION_SEMINIT */
 
 #endif /* (!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0) */
 #endif /* CF_PSEMADAPT */
@@ -293,8 +293,8 @@ EXTERNC_end
 
 /*----------------------------------------------------------------------------*/
 #ifdef	COMMENT /* should not be necessary on Darwin */
-#ifndef	SUBROUTINE_RENAME
-#define	SUBROUTINE_RENAME
+#ifndef	DECLARATION_RENAME
+#define	DECLARATION_RENAME
 EXTERNC_begin
 extern unixret_t rename(cchar *,cchar *) noex ;
 EXTERNC_end
@@ -303,7 +303,7 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
-/* SUBROUTINES begin */
+/* DECLARATIONS begin */
 #ifdef	__cplusplus
 
 namespace usys {
@@ -315,7 +315,7 @@ namespace usys {
 }
 
 #endif /* __cplusplus */
-/* SUBROUTINES end */
+/* DECLARATIONS end */
 /*----------------------------------------------------------------------------*/
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
