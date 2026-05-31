@@ -1,4 +1,4 @@
-/* fmtobj1 MODULE */
+/* fmtobj1 MODULE (implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -101,6 +101,7 @@ module ;
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<stdintx.h>		/* LIBU extended integer types */
+#include	<strnul.hh>		/* LIBU */
 #include	<snwcpyx.h>		/* LIBUC |snwcpyexpesc(3uc)| */
 #include	<strdcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -118,7 +119,7 @@ import fmtflag ;
 
 /* local defines */
 
-/* BUFLEN must be large enough for both large floats and binaries */
+/* TBUFLEN must be large enough for both large floats and binaries */
 #define	MAXPREC		41		/* maximum floating precision */
 #define	TBUFLEN		MAX((310+MAXPREC+2),((CHAR_BIT * szof(longlong))+1))
 
@@ -166,7 +167,6 @@ int fmtobj::operator () (va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	fprintf(stderr,"fmobj-oper: ent ap=%p\n",ap) ;
 	if (ap) {
 	    if ((rs = start()) >= 0) {
 	        {
@@ -177,13 +177,11 @@ int fmtobj::operator () (va_list ap) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if */
 	} /* end if (non-null) */
-	fprintf(stderr,"fmobj-oper: ret rs=%d\n",rs) ;
 	return (rs >= 0) ? len : rs ;
 } /* end method */
 
 int fmtobj::start() noex {
     	int		rs = SR_FAULT ;
-	fprintf(stderr,"fmobj-op: ent ubuf=%p fmt=%p\n",ubuf,fmt) ;
 	if (ubuf && fmt) {
 	    rs = SR_NOMEM ;
 	    if ((tbuf = new(nothrow) char[TBUFLEN+1]) != nullptr) {
@@ -192,7 +190,6 @@ int fmtobj::start() noex {
         	tbuf[tlen] = '\0' ;
 	    }
 	} /* end if (non-null) */
-	fprintf(stderr,"fmobj-start: ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method */
 
@@ -213,24 +210,26 @@ int fmtobj::loop(va_list ap) noex {
 	int		rs1 ;
 	if ((rs = sub.start(ubuf,ulen,fm)) >= 0) {
 	    cchar	*tp ;
-	    while ((rs >= 0) && *fmt && ((tp = strchr(fmt,'%')) != np)) {
+	    while (*fmt && ((tp = strchr(fmt,'%')) != np)) {
 		cint tl = intconv(tp - fmt) ;
 		if ((rs = sub.cleanstrw(fmt,tl)) >= 0) {
 		    if ((rs = spec.start(ap,(tp+1))) >= 0) {
 			fcode = rs ;
 			if ((rs = decide(ap)) >= 0) {
 			    if ((rs = sub.emitter(&spec,bp,bl)) >= 0) {
+				fmt += tl ;
 			        fmt += (spec.skiplen + 1) ;
-			    }
+			    } /* end if (emitter) */
 			} /* end if (decide) */
 			rs1 = spec.finish ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (fmtspec) */
 		} /* end if (sub::cleanstrw) */
+		if (rs < 0) break ;
 	    } /* end while */
 	    if ((rs >= 0) && *fmt) {
 		rs = sub.cleanstrw(fmt) ;
-	    }
+	    } /* end if (remainder) */
 	    rs1 = sub.finish ;		/* <- result length */
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fmtsub) */
@@ -390,7 +389,7 @@ int fmtobj::code_str(va_list ap) noex {
         if (fcode == 't') {
             sd.sl = (int) va_arg(ap,int) ;
         }
-        #ifdef  COMMENT /* null-pointer check (done later) */
+#ifdef  COMMENT /* null-pointer check (done later) */
         {
             cvoid *p = sd.sp ;
             if (sd.fl.wint) {
@@ -403,9 +402,9 @@ int fmtobj::code_str(va_list ap) noex {
                 sd.wsp = nullptr ;
                 sd.sp = nullstr ;
                 sd.sl = -1 ;
-            }
+            } /* end if */
         } /* end block */
-        #endif /* COMMENT */
+#endif /* COMMENT */
         rs = sub.formstr(&spec,&sd) ;
         fcode = 0 ;
 	return rs ;
@@ -416,8 +415,6 @@ int fmtobj::code_bin(va_list ap) noex {
     	int		rs = SR_OK ;
         ulonglong       unum ;
         int             ndigits = 0 ;
-        int             ch ;
-        bool            f_got = false ;
         cchar   	*digtable = digtable_lo ;
         switch (spec.lenmod) {
         case lenmod_longlong:
@@ -438,6 +435,8 @@ int fmtobj::code_bin(va_list ap) noex {
             break ;
         } /* end switch */
 	if_constexpr (f_binarymin) {
+            int		ch ;
+            bool	f_got = false ;
             bp = tbuf ;
             if ((szof(ulonglong) > 4) && (ndigits > 32)) {
                 for (int i = 63 ; i >= 32 ; i -= 1) {
@@ -561,7 +560,7 @@ int fmtobj::code_dec(va_list ap) noex {
         if ((bp = ulltostr(unum,(tbuf + tlen))) != np) {
             if (f_signed && (snum < 0)) {
                 *--bp = '-' ;
-                fl.minus = true ;
+                fl.misign = true ;
             }
 	} else {
 	    bp = tbuf ;
@@ -625,11 +624,11 @@ int fmtobj::code_float(va_list ap) noex {
 	{
 	    ff.alternate	= spec.fl.alternate ;
 	    ff.zerofill		= spec.fl.zerofill ;
-	    ff.plus		= spec.fl.plus ;
+	    ff.pluser		= spec.fl.plsign ;
 	    ff.left		= spec.fl.left ;
 	    ff.space		= spec.fl.space ;
 	    ff.thousands	= spec.fl.thousands ;
-	}
+	} /* end block */
 	if (spec.lenmod == lenmod_long) {
 	    cint	fg = ff ;
   	    longdouble	dv = (longdouble) va_arg(ap,longdouble) ;
@@ -638,7 +637,7 @@ int fmtobj::code_float(va_list ap) noex {
 	    cint	fg = ff ;
   	    double	dv = (double) va_arg(ap,double) ;
             rs = sub.floater(tbuf,tlen,fcode,fg,wi,pr,dv) ;
-	}
+	} /* end if */
         fcode = 0 ;     /* no other output */
 	return rs ;
 } /* end method (fmtobj::code_float) */
