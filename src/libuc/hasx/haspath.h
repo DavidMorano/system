@@ -42,19 +42,20 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern bool haspathnon		(cchar *,int) noex ;
 extern bool haspathuser		(cchar *,int) noex ;
 extern bool haspathvar		(cchar *,int) noex ;
+extern bool haspathmulti	(cchar *,int) noex ;
+extern bool haspathprefix	(cchar *,int) noex ;
 local inline bool haspathexp(cchar *sp,int sl) noex {
-	return haspathnon	(sp,sl) ;
+	return haspathprefix	(sp,sl) ;
 } /* end subroutine (haspathexp) */
 
 EXTERNC_end
