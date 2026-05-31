@@ -124,8 +124,7 @@ int vecstrx::addsyms(cc *objn,mainv syms) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (objn && syms) ylikely {
-    	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) ylikely {
+    	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        while ((rs >= 0) && syms[c]) {
 	            cchar	*sn = syms[c++] ;
                     if ((rs = sncpy(var.symbuf,var.symlen,objn,"_",sn)) >= 0) {
@@ -147,8 +146,8 @@ vars::operator int () noex {
 	    symlen = rs ;
 	    if (char *p ; (rs = libmem.mall((symlen + 1),&p)) >= 0) {
 		symbuf = p ;
-	    }
-	}
+	    } /* end if (memory-acquire) */
+	} /* end if */
 	return rs ;
 } /* end method (vars:operator) */
 
@@ -157,7 +156,7 @@ void vars::dtor() noex {
     	    libmem.free(symbuf) ;
 	    symbuf = nullptr ;
 	    symlen = 0 ;
-	}
+	} /* end if (memory-release) */
 } /* end method (vars:dtor) */
 
 
