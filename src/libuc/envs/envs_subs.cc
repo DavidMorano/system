@@ -113,7 +113,7 @@ namespace {
 	int		elen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -140,8 +140,7 @@ int envs_subs(envs *nlp,expcook *clp,vecstr *pvp,vecstr *evp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (nlp && clp && pvp && evp) {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) {
 	        subinfo		si ;
 	        si.evp = evp ;
 	        si.clp = clp ;
