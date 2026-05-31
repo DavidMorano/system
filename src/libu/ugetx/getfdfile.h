@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #ifndef	FD_STDIN
@@ -40,13 +40,13 @@
 
 EXTERNC_begin
 
-extern int getfdfile(cchar *,int) noex ;
+extern int	getfdfile(cchar *,int) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-local inline int getfdfile(cchar *sp) noex {
+inline int	getfdfile(cchar *sp) noex {
 	return getfdfile(sp,-1) ;
 }
 
