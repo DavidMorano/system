@@ -66,7 +66,7 @@
 #include	<readln.hh>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* debugging */
+#include	<dprint.hh>		/* LIBU debugging */
 
 #include	"ccfile.hh"
 
@@ -400,8 +400,7 @@ int ccfile::iclose() noex {
 	    fl.fopened = false ;
 	} /* end if (not-fnulling) */
 	return rs ;
-}
-/* end method (ccfile::iclose) */
+} /* end method (ccfile::iclose) */
 
 int ccfile::irewind() noex {
 	int		rs = SR_OK ;
@@ -409,15 +408,13 @@ int ccfile::irewind() noex {
 	    rs = seek(0z) ;
 	}
 	return rs ;
-}
-/* end method (ccfile::irewind) */
+} /* end method (ccfile::irewind) */
 
 void ccfile::dtor() noex {
 	if (int rs ; (rs = iclose()) < 0) {
 	    ulogerror("ccfile",rs,"dtor-close") ;
 	}
-}
-/* end method (ccfile::dtor) */
+} /* end method (ccfile::dtor) */
 
 int ccfile_co::operator () (int) noex {
 	int		rs = SR_BUGCHECK ;
@@ -432,8 +429,7 @@ int ccfile_co::operator () (int) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ccfile_co::operator) */
+} /* end method (ccfile_co::operator) */
 
 local omode mkmode(cchar *sp) noex {
 	omode		om{} ;
@@ -452,8 +448,7 @@ local omode mkmode(cchar *sp) noex {
 	   }
 	} /* end for */
 	return om ;
-}
-/* end subroutine (mkmode) */
+} /* end subroutine (mkmode) */
 
 local bool isnomode(omode of) noex {
 	return ((! (of & ios::in)) && (! (of & ios::out))) ;
