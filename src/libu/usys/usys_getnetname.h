@@ -38,14 +38,14 @@
 #if	(!defined(SYSHAS_GETNETNAME)) || (SYSHAS_GETNETNAME == 0)
 
 
-#ifndef	SUBROUTINE_GETNETNAME
-#define	SUBROUTINE_GETNETNAME
+#ifndef	DECLARATION_GETNETNAME
+#define	DECLARATION_GETNETNAME
 EXTERNC_begin
 /* 0=not-found, 1=found */
 extern int	getnetname(char *) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_GETNETNAME */
+#endif /* DECLARATION_GETNETNAME */
 
 
 #endif /* (!defined(SYSHAS_GETNETNAME)) || (SYSHAS_GETNETNAME == 0) */
