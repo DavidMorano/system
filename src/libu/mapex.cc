@@ -5,6 +5,7 @@
 /* map status-return (SR) values to program exit-codes (EX) */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -20,11 +21,16 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"mapex.h"		/* LIBU */
 
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* local namespaces */
@@ -64,6 +70,8 @@ constexpr mapex_map	def[] = {
 	{ SR_NOSYS,	EX_OSFILE },
 	{ 0, 0 }
 } ; /* end array (mapex) */
+
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
