@@ -66,20 +66,20 @@
 typedef int	projid_t ;
 #endif
 
-#ifndef	SUBROUTINE_GETPROJID
-#define	SUBROUTINE_GETPROJID
+#ifndef	DECLARATION_GETPROJID
+#define	DECLARATION_GETPROJID
 EXTERNC_begin
 extern projid_t getprojid() noex ;
 extern projid_t getprojidbyname(cchar *) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_GETPROJID */
+#endif /* DECLARATION_GETPROJID */
 
-#ifndef	SUBROUTINE_INPROJ
-#define	SUBROUTINE_INPROJ
+#ifndef	DECLARATION_INPROJ
+#define	DECLARATION_INPROJ
 EXTERNC_begin
 extern int inproj(cchar *,cchar *,void *,size_t) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_INPROJ */
+#endif /* DECLARATION_INPROJ */
 
 #ifndef STRUCT_PROJECT
 #define STRUCT_PROJECT
@@ -93,8 +93,8 @@ struct project {
 } ; /* end struct (project) */
 #endif /* STRUCT_PROJECT */
 
-#ifndef	SUBROUTINE_GETPJ
-#define	SUBROUTINE_GETPJ
+#ifndef	DECLARATION_GETPJ
+#define	DECLARATION_GETPJ
 /* Solaris® implementation */
 EXTERNC_begin
 extern void setprojent(void) noex ;
@@ -106,7 +106,7 @@ extern CPROJECT *getdefaultproj(cchar *,PROJECT *,void *,size_t) noex ;
 extern int inproj(cchar *,cchar *,void *,size_t) noex ;
 extern projid_t getprojidbyname(cchar *) noex ;
 EXTERNC_end
-#endif	/* SUBROUTINE_GETPJ */
+#endif	/* DECLARATION_GETPJ */
 
 
 /******************************************************************************/
