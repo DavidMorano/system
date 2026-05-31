@@ -50,14 +50,14 @@
 /******************************************************************************/
 
 
-#ifndef	SUBROUTINE_STIME
-#define	SUBROUTINE_STIME
+#ifndef	DECLARATION_STIME
+#define	DECLARATION_STIME
 EXTERNC_begin
 
 extern unixret_t stime(const time_t *) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_STIME */
+#endif /* DECLARATION_STIME */
 
 
 /******************************************************************************/
