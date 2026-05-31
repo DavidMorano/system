@@ -86,7 +86,7 @@ module ;
 #include	<sysconfcmds.h>		/* LIBU */
 #include	<mailvalues.hh>		/* LIBU |mailvalue(3u)| */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 module usysconf ;
 
