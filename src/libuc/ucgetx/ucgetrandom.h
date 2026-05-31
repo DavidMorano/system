@@ -20,18 +20,26 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/random.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
 
 
+/* options for |uc_getrandom(3uc)| */
 #ifndef	GRND_RANDOM
-#define	GRND_RANDOM	0		/* option for third argument */
+#define	GRND_RANDOM	(1 << 0)	/* option for third argument */
+#endif
+#ifndef	GRND_NONBLOCK
+#define	GRND_NONBLOCK	(1 << 1)
+#endif
+#ifndef	GRND_INSECURE
+#define	GRND_INSECURE	(1 << 2)
 #endif
 
 EXTERNC_begin
 
-extern int uc_getrandom(void *,int,uint) noex ;
-extern int uc_getentropy(void *,int) noex ;
+extern int uc_getrandom		(void *,int,uint)	noex ;
+extern int uc_getentropy	(void *,int)		noex ;
 
 EXTERNC_end
 
