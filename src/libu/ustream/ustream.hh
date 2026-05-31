@@ -33,13 +33,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<unistd.h>		/* system types */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<unistd.h>		/* POSIX system types */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	USTREAM_MAGIC	0x21387462
@@ -53,6 +53,7 @@ enum ustreammems {
 	ustreammem_adv,
 	ustreammem_poll,
 	ustreammem_lockend,
+	ustreammem_rewind,
 	ustreammem_close,
 	ustreammem_writeblanks,
 	ustreammem_writealign,
@@ -67,7 +68,7 @@ struct ustream ;
 struct ustream_fl {
 	uint		net:1 ;		/* network FD */
 	uint		write:1 ;	/* we are writing (otherwise reading) */
-} ; /* end struct (ustream_flags) */
+} ; /* end struct (ustream_fl) */
 
 struct ustream_ma {
 	ustream	*op = nullptr ;
@@ -101,6 +102,7 @@ struct ustream {
 	ustream_co	adv ;
 	ustream_co	poll ;
 	ustream_co	lockend ;
+	ustream_co	rewind ;
 	ustream_co	close ;
 	ustream_co	writeblanks ;
 	ustream_co	writealign ;
@@ -198,6 +200,9 @@ namespace ustream_ns {
     extern int	ustream_writeblanks	(ustream *,int) noex ;
     extern int	ustream_writealign	(ustream *,int) noex ;
     extern int	ustream_writezero	(ustream *,int) noex ;
+    inline int	ustream_rewind		(ustream *op) noex {
+	return ustream_seek(op,0z,SEEK_SET) ;
+    } /* end subroutine */
 } /* end namespace (ustream_ns) */
 
 
