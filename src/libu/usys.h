@@ -79,6 +79,8 @@
 #include	<usys_environ.hh>
 #include	<usys_getnetname.h>
 #include	<usys_getauid.h>
+#include	<usys_atox.h>
+#include	<usys_strtox.h>
 
 
 #endif /* USYS_INCLUDE */
