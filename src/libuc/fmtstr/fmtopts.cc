@@ -29,13 +29,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	"fmtopts.h"
 
 
 cint	fmtoptms::clean		= (1 << fmtopt_clean) ;
 cint	fmtoptms::nooverr	= (1 << fmtopt_nooverr) ;
+
+const fmtoptms		fmtoptm ;
 
 
