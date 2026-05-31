@@ -5,6 +5,7 @@
 /* miscelllaneous (XXX) operating system support */
 /* version %I% last-modified %G% */
 
+#define	CF_STRTOX	0		/* enable compilation */
 
 /* revision history:
 
@@ -36,18 +37,27 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>		/* |stat| */
-#include	<sys/wait.h>		/* <- type |idtype_t| is there */
-#include	<sys/time.h>		/* <- |TIMESPEC| is there */
-#include	<unistd.h>		/* |dup2(2)| + |pipe2(2)| */
-#include	<signal.h>		/* <- |SIGEVENT| */
-#include	<pthread.h>
-#include	<string.h>		/* |strpbrk(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX for |statfs(2)| */
+#include	<sys/stat.h>		/* POSIX |stat| */
+#include	<sys/statvfs.h>		/* POSIX */
+#include	<sys/wait.h>		/* POSIX <- type |idtype_t| is there */
+#include	<sys/time.h>		/* POSIX <- |TIMESPEC| is there */
+#include	<sys/mount.h>		/* POSIX for |statfs(2)| */
+#include	<unistd.h>		/* POSIX |dup2(2)| + |pipe2(2)| */
+#include	<signal.h>		/* POSIX <- |SIGEVENT| */
+#include	<pthread.h>		/* POSIX */
+#include	<string.h>		/* CSTD |strpbrk(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+
+
+#ifndef	CF_STRTOX
+#define	CF_STRTOX	0		/* enable compilation */
+#endif
+
 
 /*----------------------------------------------------------------------------*/
 /* SECDB begin */
@@ -87,8 +97,8 @@ typedef struct userattr_s {
 } userattr ;
 #endif /* STRUCT_USERATTR */
 
-#ifndef	SUBROUTINE_USERATTR
-#define	SUBROUTINE_USERATTR
+#ifndef	DECLARATION_USERATTR
+#define	DECLARATION_USERATTR
 EXTERNC_begin
 
 extern void setuserattr() noex ;
@@ -99,7 +109,7 @@ extern userattr *getusernam(const char *) noex ;
 extern userattr *getuseruid(uid_t) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_USERATTR */
+#endif /* DECLARATION_USERATTR */
 
 #endif /* (!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
 /* USERATTR end */
@@ -115,8 +125,8 @@ EXTERNC_end
 typedef int	projid_t ;
 #endif
 
-#ifndef	SUBROUTINE_GETPROJID
-#define	SUBROUTINE_GETPROJID
+#ifndef	DECLARATION_GETPROJID
+#define	DECLARATION_GETPROJID
 #ifdef	__cplusplus
 extern "C" {
     extern projid_t getprojid() noex ;
@@ -124,7 +134,7 @@ extern "C" {
 #else
     extern projid_t getprojid() noex ;
 #endif /* __cplusplus */
-#endif /* SUBROUTINE_GETPROJID */
+#endif /* DECLARATION_GETPROJID */
 
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 /* PROJECT end */
@@ -149,14 +159,14 @@ typedef long		sysvmsgtype ;
 /* MEMCNTL begin */
 #if	(!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0)
 
-#ifndef	SUBROUTINE_MEMCNTL
-#define	SUBROUTINE_MEMCNTL
+#ifndef	DECLARATION_MEMCNTL
+#define	DECLARATION_MEMCNTL
 EXTERNC_begin
 
 extern unixret_t memcntl(void *,size_t,int,void *,int,int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_MEMCNTL */
+#endif /* DECLARATION_MEMCNTL */
 
 #endif /* (!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
 /* MEMCNTL end */
@@ -166,14 +176,14 @@ EXTERNC_end
 /* MEMINHERIT begin */
 #if	(!defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0)
 
-#ifndef	SUBROUTINE_MEMINHERIT
-#define	SUBROUTINE_MEMINHERIT
+#ifndef	DECLARATION_MEMINHERIT
+#define	DECLARATION_MEMINHERIT
 EXTERNC_begin
 
 extern unixret_t minherit(void *,size_t,int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_MEMINHERIT */
+#endif /* DECLARATION_MEMINHERIT */
 
 #endif /* (!defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0) */
 /* MEMINHERIT end */
@@ -207,14 +217,14 @@ enum syshasmemplock {
 #define	DATLOCK		syshasmemplock_lockdat
 #endif
 
-#ifndef	SUBROUTINE_MEMPLOCK
-#define	SUBROUTINE_MEMPLOCK
+#ifndef	DECLARATION_MEMPLOCK
+#define	DECLARATION_MEMPLOCK
 EXTERNC_begin
 
 extern unixret_t plock(int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_MEMPLOCK */
+#endif /* DECLARATION_MEMPLOCK */
 
 #endif /* (! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0) */
 /* MEMPLOCK end */
@@ -224,14 +234,14 @@ EXTERNC_end
 /* LOADAVGINT begin */
 #if	(! defined(SYSHAS_LOADAVGINT)) || (SYSHAS_LOADAVGINT == 0)
 
-#ifndef	SUBROUTINE_KLOADAVG
-#define	SUBROUTINE_KLOADAVG
+#ifndef	DECLARATION_KLOADAVG
+#define	DECLARATION_KLOADAVG
 #ifdef	__cplusplus /* C++ only! */
 namespace usys {
     extern sysret_t kloadavg(int *,int) noex ;
 }
 #endif /* __cplusplus (C++ only) */
-#endif /* SUBROUTINE_KLOADAVG */
+#endif /* DECLARATION_KLOADAVG */
 
 #endif /* (! defined(SYSHAS_LOADAVGINT)) || (SYSHAS_LOADAVGINT == 0) */
 /* LOADAVGINT end */
@@ -253,6 +263,9 @@ local inline unixret_t statfilevfs(cchar *fn,USTATVFS *sbp) noex {
 local inline unixret_t fstatfile(int fd,USTAT *sbp) noex {
     	return fstat(fd,sbp) ;
 }
+local inline unixret_t fstatfilevfs(int fd,USTATVFS *sbp) noex {
+    	return fstatvfs(fd,sbp) ;
+}
 EXTERNC_end
 #endif /* SUBROUTINE_STATFILE */
 
@@ -265,7 +278,7 @@ local inline unixret_t dupover(int sfd,int dfd) noex {
 EXTERNC_end
 #endif /* SUBROUTINE_DUPOVER */
 
-#ifndef	SUBROUTINE_STRBRK
+#ifndef	SUBRUOTINE_STRBRK
 #define	SUBROUTINE_STRBRK
 EXTERNC_begin
 local inline char *strbrk(cchar *sp,cchar *sc) noex {
@@ -284,13 +297,15 @@ local inline char *strochr(cchar *sp,int sch) noex {
 EXTERNC_end
 #endif /* SUBROUTINE_STROCHR */
 
-#ifndef	SUBROUTINE_STRTOI
-#define	SUBROUTINE_STRTOI
+#if	CF_STRTOX
+#ifndef	DECLARATION_STRTOX
+#define	DECLARATION_STRTOX
 EXTERNC_begin
-extern int	strtoi(cchar *,char **,int) noex ;
+extern sint	strtoi(cchar *,char **,int) noex ;
 extern uint	strtoui(cchar *,char **,int) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_STRTOI */
+#endif /* DECLARATION_STRTOX */
+#endif /* CF_STRTOX */
 
 
 #endif /* USYSXXX_INCLUDE */
