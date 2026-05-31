@@ -43,14 +43,14 @@
 #if	(!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0)
 
 
-#ifndef	SUBROUTINE_SIGQUEUE
-#define	SUBROUTINE_SIGQUEUE
+#ifndef	DECLARATION_SIGQUEUE
+#define	DECLARATION_SIGQUEUE
 EXTERNC_begin
 
 extern unixret_t sigqueue(pid_t,int,const SIGVAL) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_SIGUEUE */
+#endif /* DECLARATION_SIGUEUE */
 
 #endif /* (!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0) */
 /* SIGQUEUE end */
@@ -58,14 +58,14 @@ EXTERNC_end
 /* SIGSEND begin */
 #if	(!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0)
 
-#ifndef	SUBROUTINE_SIGSEND
-#define	SUBROUTINE_SIGSEND
+#ifndef	DECLARATION_SIGSEND
+#define	DECLARATION_SIGSEND
 EXTERNC_begin
 
 extern unixret_t sigsend(idtype_t,id_t,int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_SIGSEND */
+#endif /* DECLARATION_SIGSEND */
 
 #endif /* (!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0) */
 /* SIGSEND end */
@@ -94,12 +94,12 @@ struct procset {
 typedef struct procset		procset_t ;
 #endif
 
-#ifndef	SUBROUTINE_SIGSENDSET
-#define	SUBROUTINE_SIGSENDSET
+#ifndef	DECLARATION_SIGSENDSET
+#define	DECLARATION_SIGSENDSET
 EXTERNC_begin
 extern unixret_t sigsendset(procset_t *,int) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_SIGSENDSET */
+#endif /* DECLARATION_SIGSENDSET */
 
 #endif /* (!defined(SYSHAS_SIGSENDSET)) || (SYSHAS_SIGSENDSET == 0) */
 /* SIGSENDSET end */
@@ -107,12 +107,12 @@ EXTERNC_end
 /* PTHREADSIGQUEUE begin */
 #if	(!defined(SYSHAS_PTHREADSIGQUEUE)) || (SYSHAS_PTHREADSIGQUEUE == 0)
 
-#ifndef	SUBROUTINE_PTHREADSIGQUEUE
-#define	SUBROUTINE_PTHREADSIGQUEUE
+#ifndef	DECLARATION_PTHREADSIGQUEUE
+#define	DECLARATION_PTHREADSIGQUEUE
 EXTERNC_begin
 extern errno_t pthread_sigqueue(pthread_t,int,const SIGVAL) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_PTHREADSIGQUEUE */
+#endif /* DECLARATION_PTHREADSIGQUEUE */
 
 #endif /* (!defined(SYSHAS_PTHREADSIGQUEUE)) || (SYSHAS_PTHREADSIGQUEUE == 0) */
 /* PTHREADSIGQUEUE end */
