@@ -58,7 +58,7 @@
 #include	<usupport.h>		/* LIBU |hasnotdots(3u)| */
 #include	<posixdirent.hh>	/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBF debugging */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"urmdirs.h"
 
