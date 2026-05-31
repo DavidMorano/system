@@ -46,7 +46,7 @@
 #include	<strnul.hh>		/* LIBU */
 #include	<nulstr.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"filelinker.hh"
 
@@ -187,8 +187,7 @@ int filelinker::istart(mainv tlist) noex {
 	int		c = 0 ; /* return-value */
 	if ((rs = filelinker_ctor(this)) >= 0) {
 	    if ((rs = maxpathlen) >= 0) {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
 		    cint sz = ((var.maxpath + 1) * 2) ;
 		    int ai = 0 ;
 		    plen = var.maxpath ;
