@@ -53,14 +53,14 @@
 
 
 /* the call is actually named |pipe2(2)| */
-#ifndef	SUBROUTINE_PIPES
-#define	SUBROUTINE_PIPES
+#ifndef	DECLARATION_PIPES
+#define	DECLARATION_PIPES
 EXTERNC_begin
 
 extern unixret_t	pipe2(int *,int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_PIPES */
+#endif /* DECLARATION_PIPES */
 
 
 /******************************************************************************/
