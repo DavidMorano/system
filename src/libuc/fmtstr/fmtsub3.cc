@@ -74,13 +74,13 @@ namespace {
     struct subinfo_fl {
 	uint		left:1 ;
 	uint		zerofill:1 ;
-	uint		plus:1 ;
-	uint		plusminus:1 ;
+	uint		plsign:1 ;
+	uint		misign:1 ;
+	uint		pmsign:1 ;
 	uint		truncleft:1 ;
 	uint		isdigital:1 ;
 	uint		specialhex:1 ;
-	uint		minus:1 ;
-    } ;
+    } ; /* end struct (subinfo_fl) */
     struct subinfo {
 	fmtsub		*op ;
 	fmtspec		*fsp ;
@@ -94,24 +94,24 @@ namespace {
 	subinfo(fmtsub *p,fmtspec *s,cc *asp,int asl) noex : op(p), fsp(s) {
 	    sp = asp ;
 	    sl = asl ;
-	} ;
+	} ; /* end ctor */
 	operator int () noex ;
-	int loadvals() noex ;
-	int loadflags() noex ;
-	int calctrunc() noex ;
-	int calcdigit() noex ;
-	int calcfill() noex ;
-	int calcsign() noex ;
-	int adj1() noex ;
-	int adj2() noex ;
-	int adj3() noex ;
-	int adj4() noex ;
-	int adj5() noex ;
-	int alternate() noex ;
-	int zerofill() noex ;
-	int precfill() noex ;
-	int strput() noex ;
-	int putpad() noex ;
+	int loadvals	() noex ;
+	int loadflags	() noex ;
+	int calctrunc	() noex ;
+	int calcdigit	() noex ;
+	int calcfill	() noex ;
+	int calcsign	() noex ;
+	int adj1	() noex ;
+	int adj2	() noex ;
+	int adj3	() noex ;
+	int adj4	() noex ;
+	int adj5	() noex ;
+	int alternate	() noex ;
+	int zerofill	() noex ;
+	int precfill	() noex ;
+	int strput	() noex ;
+	int putpad	() noex ;
     } ; /* end struct (subinfo) */
     typedef int (subinfo::*subinfo_m)() noex ;
 } /* end export */
@@ -182,8 +182,8 @@ int subinfo::loadflags() noex {
     	int		rs = SR_OK ;
 	fl.left = fsp->fl.left ;
 	fl.zerofill = fsp->fl.zerofill ;
-	fl.plus = fsp->fl.plus ;
-	fl.plusminus = false ;
+	fl.plsign = fsp->fl.plsign ;
+	fl.pmsign = false ;
 	fl.truncleft = false ;
 	fl.isdigital = false ;
 	fl.specialhex = false ;
@@ -251,8 +251,8 @@ int subinfo::calcsign() noex {
 	        bool f_p = (*sp == '+') ;
 	        bool f_m = (*sp == '-') ;
 	        if (f_p || f_m) {
-	            fl.plus = f_p ;
-	            fl.minus = f_m ;
+	            fl.plsign = f_p ;
+	            fl.misign = f_m ;
 	            sp += 1 ;
 	            sl -= 1 ;
 	        }
@@ -281,7 +281,7 @@ int subinfo::adj2() noex {
 	        int	ml = 0 ;
 	        if (! fl.specialhex) ml = sl ;
 	        if ((prec >= 0) && (prec > ml)) ml = prec ;
-	        if (fl.plus | fl.minus) ml += 1 ;
+	        if (fl.plsign | fl.misign) ml += 1 ;
 	        if (ml > width) width = ml ;
 	return rs ;
 } /* end method (subinfo::adj2) */
@@ -289,35 +289,35 @@ int subinfo::adj2() noex {
 /* calculate any padding (blanks or zero-fills) */
 int subinfo::adj3() noex {
     	int		rs = SR_OK ;
-	    fl.plusminus = (fl.plus || fl.minus) ;
-	    {
-	        int ml = sl ;
-	        if ((prec >= 0) && (prec > sl)) ml = prec ;
-	        if (fl.plusminus) ml += 1 ;
-	        if (width > ml) npad = (width - ml) ;
-	    } /* end block */
+	fl.pmsign = (fl.plsign || fl.misign) ;
+	{
+	    int ml = sl ;
+	    if ((prec >= 0) && (prec > sl)) ml = prec ;
+	    if (fl.pmsign) ml += 1 ;
+	    if (width > ml) npad = (width - ml) ;
+	} /* end block */
 	return rs ;
 } /* end method (subinfo::adj3) */
 
 /* print out any leading padding (field width) */
 int subinfo::adj4() noex {
     	int		rs = SR_OK ;
-	    if ((! fsp->fl.left) && (! fl.zerofill)) {
-	        if (npad > 0) {
-	            rs = fmtsub_blanks(op,npad) ;
-	        }
-	    } /* end if */
+	if ((! fsp->fl.left) && (! fl.zerofill)) {
+	    if (npad > 0) {
+	        rs = fmtsub_blanks(op,npad) ;
+	    }
+	} /* end if */
 	return rs ;
 } /* end method (subinfo::adj4) */
 
 /* we may want to print a leading '-' before anything */
 int subinfo::adj5() noex {
     	int		rs = SR_OK ;
-	    if (fl.plusminus) {
-	        int	ch = (fl.minus) ? '-' : '+' ;
-	        rs = fmtsub_chr(op,ch) ;
-	        width -= 1 ;
-	    } /* end if */
+	if (fl.pmsign) {
+	    cint	ch = (fl.misign) ? '-' : '+' ;
+	    rs = fmtsub_chr(op,ch) ;
+	    width -= 1 ;
+	} /* end if */
 	return rs ;
 } /* end method (subinfo::adj5) */
 
