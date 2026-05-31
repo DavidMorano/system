@@ -27,13 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LINU */
+#include	<usysbase.h>		/* LINU */
+#include	<ulogerror.h>		/* LINU */
+#include	<localmisc.h>		/* LINU */
 
 #include	"filer.h"
 
@@ -42,9 +41,6 @@
 
 
 /* imported namespaces */
-
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -119,7 +115,7 @@ int filer::vprintf(cchar *fmt,va_list ap) noex {
 	    rs = filer_vprintf(this,fmt,ap) ;
 	}
 	return rs ;
-}
+} /* end method (filer::vprintf) */
 
 int filer::seek(off_t soff,int w) noex {
 	return filer_seek(this,soff,w) ;
@@ -138,15 +134,14 @@ int filer::stat(ustat *sbp) noex {
 }
 
 void filer::dtor() noex {
-	cint		rs = filer_finish(this) ;
-	if (rs < 0) {
+	if (cint rs = filer_finish(this) ; rs < 0) {
 	    ulogerror("filer",rs,"fini-finish") ;
 	}
 } /* end method (filer::dtor) */
 
 int filer_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case filermem_reserve:
 	        rs = filer_reserve(op,a) ;
@@ -174,6 +169,9 @@ int filer_co::operator () (int a) noex {
 	        break ;
 	    case filermem_writezero:
 	        rs = filer_writezero(op,a) ;
+	        break ;
+	    case filermem_rewind:
+	        rs = filer_rewind(op) ;
 	        break ;
 	    case filermem_finish:
 	        rs = filer_finish(op) ;
