@@ -52,11 +52,10 @@ module ;
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 export module fmtspec ;
-
-#define	FMTSPEC_FL	struct fmtspec_flags
 
 export {
     enum lenmods : short {
@@ -81,16 +80,17 @@ export {
 } /* end export */
 
 export {
-    struct fmtspec_flags {
+    struct fmtspec_fl {
 	uint		alternate:1 ;	/* alternate form */
 	uint		zerofill:1 ;	/* zero fill on left */
-	uint		plus:1 ;	/* leading plus sign */
+	uint		plsign:1 ;	/* leading plus sign */
+	uint		misign:1 ;	/* leading minus sign */
 	uint		left:1 ;	/* left justified */
 	uint		space:1 ;	/* leading space */
 	uint		thousands:1 ;	/* group by thousands */
-    } ; /* end struct */
+    } ; /* end struct (fmtspec_fl) */
     struct fmtspec_head {
-	FMTSPEC_FL	fl ;
+	fmtspec_fl	fl ;
 	short		fcode ;		/* the format "code" */
 	short		width ;		/* <0 turns off */
 	short		prec ;		/* <0 turns off */
@@ -114,13 +114,9 @@ export {
 	fmtspec() noex : fmtspec_head{} {
 	    code(this,fmtspecmem_code) ;
 	    finish(this,fmtspecmem_finish) ;
-	} ;
+	} ; /* end ctor */
 	int start(va_list,cchar *,int = -1) noex ;
     } ; /* end struct (fmtspec) */
-} /* end export */
-
-export {
-    typedef	FMTSPEC_FL	fmtspec_fl ;
 } /* end export */
 
 
