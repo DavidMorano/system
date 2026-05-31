@@ -53,12 +53,12 @@
 /******************************************************************************/
 
 
-#ifndef	SUBROUTINE_FDATASYNC
-#define	SUBROUTINE_FDATASYNC
+#ifndef	DECLARAION_FDATASYNC
+#define	DECLARAION_FDATASYNC
 EXTERNC_begin
     extern unixret_t fdatasync(int) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_FDATASYNC */
+#endif /* DECLARAION_FDATASYNC */
 
 
 /******************************************************************************/
