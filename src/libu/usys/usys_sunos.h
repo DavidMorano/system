@@ -80,14 +80,14 @@ typedef userattr_t	userattr ;
 /* LOADAVGINT begin */
 #if	defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0)
 
-#ifndef	SUBROUTINE_KLOADAVG
-#define	SUBROUTINE_KLOADAVG
+#ifndef	DECLARATION_KLOADAVG
+#define	DECLARATION_KLOADAVG
 #ifdef	__cplusplus /* C++ only! */
 namespace usys {
     extern sysret_t kloadavg(int *,int) noex ;
 }
 #endif /* __cplusplus (C++ only) */
-#endif /* SUBROUTINE_KLOADAVG */
+#endif /* DECLARATION_KLOADAVG */
 
 #endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 /* LOADAVGINT end */
