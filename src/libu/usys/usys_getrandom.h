@@ -51,14 +51,14 @@ enum grnds {
 #define GRND_RANDOM	(1 << grnd_random)	/* use '/dev/random' */
 #define GRND_INSECURE	(1 << grnd_insecure)	/* quality can be compromised */
 
-#ifndef	SUBROUTINE_GETRANDOM
-#define	SUBROUTINE_GETRANDOM
+#ifndef	DECLARATION_GETRANDOM
+#define	DECLARATION_GETRANDOM
 EXTERNC_begin
 
 extern unixret_t	getrandom(void *,size_t,uint) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_GETRANDOM */
+#endif /* DECLARATION_GETRANDOM */
 
 
 #endif /* (!defined(SYSHAS_GETRANDOM)) || (SYSHAS_GETRANDOM == 0) */
