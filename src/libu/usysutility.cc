@@ -44,6 +44,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscallbase.hh>	/* LIBU |usyscallbase(3u)| */
+#include	<usupport.h>		/* LIBU */
 #include	<utimeout.h>		/* LIBU */
 #include	<errtimer.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
@@ -65,10 +66,6 @@ using std::to_string ;			/* subroutine-template */
 
 
 /* external subroutines */
-
-namespace libu {
-    extern int	snwcpy(char *,int,cchar *,int = -1) noex ;
-}
 
 
 /* external variables */
@@ -95,14 +92,14 @@ namespace {
             }
             return rs ;
         } ;
-	int std_getloadavg() noex ;
+	sysret_t std_getloadavg() noex ;
     } ; /* end struct (syscaller) */
 } /* end namespace */
 
 
 /* forward references */
 
-local int std_vsnprintf(char *,int,cc *,va_list) noex ;
+local sysret_t std_vsnprintf(char *,int,cc *,va_list) noex ;
 
 
 /* local variables */
@@ -245,7 +242,7 @@ namespace libu {
 
 /* local subroutines */
 
-int syscaller::std_getloadavg() noex {
+sysret_t syscaller::std_getloadavg() noex {
 	int		rs ;
 	if ((rs = getloadavg(dlap,dlan)) < 0) {
 	    rs = (- errno) ;
@@ -253,7 +250,7 @@ int syscaller::std_getloadavg() noex {
 	return rs ;
 } /* end method (syscaller::std_getloadavg) */
 
-local int std_vsnprintf(char *rbuf,int rlen,cc *fmt,va_list ap) noex {
+local sysret_t std_vsnprintf(char *rbuf,int rlen,cc *fmt,va_list ap) noex {
 	csize		rsize = size_t(rlen + 1) ;
 	int		rs ;
 	if ((rs = vsnprintf(rbuf,rsize,fmt,ap)) >= 0) {
