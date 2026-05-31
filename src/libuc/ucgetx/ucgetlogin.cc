@@ -32,7 +32,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
@@ -75,7 +75,7 @@ constexpr bool		f_getloginr = SYSHAS_GETLOGINR ;
 int uc_getlogin(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    if ((rs = getbufsize(bufsize_un)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_un)) >= 0) {
 		cint	ulen = rs ;
 		rs = SR_OVERFLOW ;
 	        if ((rlen >= 0) && (rlen < ulen)) {
@@ -88,7 +88,7 @@ int uc_getlogin(char *rbuf,int rlen) noex {
 	                if (rs >= 0) rs = sncpy1(rbuf,rlen,rp) ;
 	            } /* end if_constexpr (f_getloginr) */
 	        } /* end if (valid) */
-	    } /* end if (getbufsize) */
+	    } /* end if (bufsizeget) */
 	} /* end if (non-null) */
 	return rs ;
 }
