@@ -200,8 +200,7 @@ int filesyner::istart(mainv tlist) noex {
 	int		c = 0 ; /* return-value */
 	if ((rs = filesyner_ctor(this)) >= 0) {
 	    if ((rs = maxpathlen) >= 0) {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
 		    cint sz = ((var.maxpath + 1) * 2) ;
 		    int ai = 0 ;
 		    plen = var.maxpath ;
