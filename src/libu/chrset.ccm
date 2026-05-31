@@ -62,9 +62,8 @@ export module chrset ;
 
 typedef ulong	word_t ;
 
-constexpr int	nbits = (UCHAR_MAX + 1) ;
-
-constexpr int	nwords = ((UCHAR_MAX + 1) / (szof(word_t) * CHAR_BIT)) ;
+constexpr int	nbits	= (UCHAR_MAX + 1) ;
+constexpr int	nwords	= ((UCHAR_MAX + 1) / (szof(word_t) * CHAR_BIT)) ;
 
 export {
     struct chrset {
@@ -94,19 +93,11 @@ constexpr int chrset::load(cchar *ss) noex {
 	if (ss) {
 	    rs = SR_OK ;
 	    for (int ch ; ((ch = (*ss & UCHAR_MAX))) ; ss += 1) {
-		    BASETL(bs,ch) ;
+		BASETL(bs,ch) ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (chrset::load) */
-
-constexpr int chrset::tst(int ch) const noex {
-    	int rs = SR_INVALID ;
-	if ((ch >= 0) && (ch < nbits)) {
-	    rs = bool(BATSTL(bs,ch)) ;
-	}
-	return rs ;
-} /* end method (chrset::tst) */
 
 constexpr int chrset::set(int ch) noex {
     	int rs = SR_INVALID ;
@@ -125,5 +116,13 @@ constexpr int chrset::clr(int ch) noex {
 	}
 	return rs ;
 } /* end method (chrset::clr) */
+
+constexpr int chrset::tst(int ch) const noex {
+    	int rs = SR_INVALID ;
+	if ((ch >= 0) && (ch < nbits)) {
+	    rs = bool(BATSTL(bs,ch)) ;
+	}
+	return rs ;
+} /* end method (chrset::tst) */
 
 
