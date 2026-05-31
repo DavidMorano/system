@@ -41,6 +41,7 @@ module ;
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
+#include	<localmisc.h>		/* LIBU */
 
 export module fmtflag ;
 
@@ -48,7 +49,7 @@ export {
     enum fmtflags {
 	fmtflag_alternate,		/* alternate form */
 	fmtflag_zerofill,		/* zero fill on left */
-	fmtflag_plus,			/* leading plus sign */
+	fmtflag_pluser,			/* leading plus sign */
 	fmtflag_left,			/* left justified */
 	fmtflag_space,			/* leading space */
 	fmtflag_thousands,		/* group by thousands */
@@ -59,12 +60,12 @@ export {
 enum fmtflagmems {
     	fmtflagmem_alternate,
 	fmtflagmem_zerofill,
-	fmtflagmem_plus,
+	fmtflagmem_pluser,
 	fmtflagmem_left,
 	fmtflagmem_space,
 	fmtflagmem_thousands,
 	fmtflagmem_overlast
-} ; /* end struct (fmtflagmems) */
+} ; /* end enum (fmtflagmems) */
 
 export {
     struct fmtflag ;
@@ -74,7 +75,7 @@ export {
 	void operator () (fmtflag *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end method */
 	void operator = (bool a) noex ;
 	operator bool () noex ;
 	bool operator () () noex { 
@@ -84,7 +85,7 @@ export {
     struct fmtflag {
 	fmtflag_co	alternate ;
 	fmtflag_co	zerofill ;
-	fmtflag_co	plus ;
+	fmtflag_co	pluser ;
 	fmtflag_co	left ;
 	fmtflag_co	space ;
 	fmtflag_co	thousands ;
@@ -92,7 +93,7 @@ export {
 	fmtflag() noex {
 	    alternate	(this,fmtflag_alternate) ;
 	    zerofill	(this,fmtflag_zerofill) ;
-	    plus	(this,fmtflag_plus) ;
+	    pluser	(this,fmtflag_pluser) ;
 	    left	(this,fmtflag_left) ;
 	    space	(this,fmtflag_space) ;
 	    thousands	(this,fmtflag_thousands) ;
