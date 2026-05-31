@@ -13,13 +13,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>		/* |S_IFMT| + |mode_t| */
-#include	<dirent.h>		/* possielbe preprocesor 'DT_{x}' */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX |S_IFMT| + |mode_t| */
+#include	<dirent.h>		/* POSIX preprocesor |DT_{x}| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #ifndef	S_IFMT
