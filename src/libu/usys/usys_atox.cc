@@ -42,12 +42,16 @@ sint	atosi(cchar *s) noex {
 } /* end subroutine (atosi) */
 
 uint	atoui(cchar *s) noex {
-    	uint	res = 0 ;
-	int	ec = 0 ;
+    	uint		res = 0 ; /* return-value */
+	errno_t		ec = 0 ;
 	if (s) {
 	    if (s[0]) {
 	        con ulong resl = strtoul(s,nullptr,10) ;
-	        res = uintconv(resl & UINT_MAX) ;
+		if ((resl >> (szof(uint) * CHAR_BIT)) == 0L) {
+	            res = uintconv(resl) ;
+		} else {
+		    ec = ERANGE ;
+		}
 	    } else {
 		ec = EINVAL ;
 	    }
@@ -63,8 +67,8 @@ slong	atosl(cchar *s) noex {
 } /* end subroutine (atosl) */
 
 ulong	atoul(cchar *s) noex {
-    	ulong	res = 0 ;
-	int	ec = 0 ;
+    	ulong		res = 0 ;
+	errno_t		ec = 0 ;
 	if (s) {
 	    if (s[0]) {
 	        res = strtoul(s,nullptr,10) ;
