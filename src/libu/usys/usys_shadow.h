@@ -98,8 +98,8 @@ struct spwd {
 } ; /* end struct (spwd) */
 #endif /* STRUCT_SPWD */
 
-#ifndef	SUBROUTINE_GETSP
-#define	SUBROUTINE_GETSP
+#ifndef	DECLARATION_GETSP
+#define	DECLARATION_GETSP
 #ifdef	__cplusplus /* (C++ only) */
 
 namespace solaris {
@@ -113,7 +113,7 @@ namespace gnu {
 }
 
 #endif /* __cplusplus (C++ only) */
-#endif /* SUBROUTINE_GETSP */
+#endif /* DECLARATION_GETSP */
 
 
 /******************************************************************************/
