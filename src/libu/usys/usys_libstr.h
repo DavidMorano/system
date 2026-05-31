@@ -44,12 +44,12 @@
 /* STRNLEN begin */
 #if	(!defined(SYSHAS_STRNLEN)) || (SYSHAS_STRNLEN == 0)
 
-#ifndef	SUBROUTINE_STRNLEN
-#define	SUBROUTINE_STRNLEN
+#ifndef	DECLARATION_STRNLEN
+#define	DECLARATION_STRNLEN
 EXTERNC_begin
 extern int	strnlen(cchar *,size_t) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_STRNLEN */
+#endif /* DECLARATION_STRNLEN */
 
 #endif /* (!defined(SYSHAS_STRNLEN)) || (SYSHAS_STRNLEN == 0) */
 /* STRNLEN end */
@@ -57,12 +57,12 @@ EXTERNC_end
 /* STRLCPY begin */
 #if	(!defined(SYSHAS_STRLCPY)) || (SYSHAS_STRLCPY == 0)
 
-#ifndef	SUBROUTINE_STRLCPY
-#define	SUBROUTINE_STRLCPY
+#ifndef	DECLARATION_STRLCPY
+#define	DECLARATION_STRLCPY
 EXTERNC_begin
 extern int	strlcpy(char *,cchar *,size_t) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_STRLCPY */
+#endif /* DECLARATION_STRLCPY */
 
 #endif /* (!defined(SYSHAS_STRLCPY)) || (SYSHAS_STRLCPY == 0) */
 /* STRLCPY end */
