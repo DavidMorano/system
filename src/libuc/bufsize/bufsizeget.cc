@@ -87,7 +87,7 @@
 #include	<bufsizes.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"bufsizeget.h"
 
