@@ -37,6 +37,7 @@
 #include	<cstddef>		/* CSTD |nullptr_t| */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |memcpy(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -48,9 +49,10 @@
 #include	<ucfileop.h>		/* LIBUC */
 #include	<sysval.hh>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
+#include	<snflags.h>		/* LIBUC */
 #include	<fmtstr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"filer.h"
 
@@ -124,6 +126,18 @@ local int filer_dtor(filer *op) noex {
 local int	filer_adjbuf(filer *,int) noex ;
 local int	filer_bufcpy(filer *,cchar *,int) noex ;
 
+local int	memover(char *dp,cchar *sp,int sl) noex {
+    	if (sl < 0) sl = lenstr(sp) ;
+    	if (csize msize = size_t(sl) ; msize > 0) {
+	    memcpy(dp,sp,msize) ;
+	}
+	return sl ;
+} /* end subroutine (memover) */
+
+[[maybe_unused]] local int	debflags	(int) noex ;
+[[maybe_unused]] local int	debdesc		(int) noex ;
+[[maybe_unused]] local int	debsize		(int) noex ;
+
 
 /* local variables */
 
@@ -131,6 +145,7 @@ static sysval		pagesz(sysval_ps) ;
 
 static bufsizevar	maxlinelen(bufsize_ml) ;
 
+cint			netrc = FILER_RCNET ;
 cbool			f_debug = CF_DEBUG ;
 
 
@@ -142,21 +157,28 @@ cbool			f_debug = CF_DEBUG ;
 int filer_start(filer *op,int fd,off_t foff,int bsz,int of) noex {
 	int		rs ;
 	DPRINTF("ent fd=%d foff=%lld of=%08X\n",fd,foff,of) ;
+	if_constexpr (f_debug) {
+	    debflags(of) ;
+	}
 	if ((rs = filer_ctor(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((fd >= 0) && (foff >= 0) && (of >= 0)) {
 	        DPRINTF("valid\n") ;
 		op->fd = fd ;
 		op->of = of ;
+	        if_constexpr (f_debug) {
+	            debdesc(fd) ;
+	            debsize(fd) ;
+	        }
 		if ((rs = filer_adjbuf(op,bsz)) >= 0) ylikely {
 	            DPRINTF("filer_adjbuf() rs=%d\n",rs) ;
 	            DPRINTF("-> libmem.vall dlen=%d\n",op->dlen) ;
-	            if (char *p ; (rs = libmem.vall(op->dlen,&p)) >= 0) ylikely {
+	            if (char *p ; (rs = libmem.vall(op->dlen,&p)) >= 0) {
 	                DPRINTF("libmem.vall() rs=%d\n",rs) ;
 	                op->dbuf = p ;
 	                op->bp = p ;
 	                if (foff < 0) {
-			    rs = u_tell(fd,&foff) ;
+			    rs = uc_tell(fd,&foff) ;
 			}
 	                DPRINTF("mid rs=%d\n",rs) ;
 	                if (rs >= 0) {
@@ -189,15 +211,18 @@ int filer_finish(filer *op) noex {
 	    if (op->fl.write && (op->len > 0)) {
 	        rs1 = uc_writen(op->fd,op->dbuf,op->len) ;
 	        if (rs >= 0) rs = rs1 ;
+		DPRINTF("1 rs=%d\n",rs) ;
 	    }
 	    if (op->dbuf) ylikely {
 	        rs1 = libmem.free(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
+		DPRINTF("2 rs=%d\n",rs) ;
 	    }
 	    {
 	        rs1 = filer_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
+		DPRINTF("3 rs=%d\n",rs) ;
 	    }
 	    op->len = 0 ;
 	    op->magval = 0 ;
@@ -206,53 +231,99 @@ int filer_finish(filer *op) noex {
 	return rs ;
 } /* end subroutine (filer_finish) */
 
-int filer_read(filer *op,void *rbuf,int rlen,int to) noex {
+namespace {
+    struct reader {
+	static constexpr int	fmo = FM_TIMED ;
+	filer	*op ;
+	char	*rbuf ;
+	int	rlen ;
+	int	to ;
+	int	feof ;
+	bool	fto ;
+	reader(filer *o,void *b,int l,int t) noex : op(o), rlen(l), to(t) { 
+	    rbuf = charp(b) ;
+	    feof = false ;
+	    fto = false ;
+	} ; /* end ctor */
+	operator int () noex ;
+    private:
+	int bufcopy(int) noex ;
+	int bufread(int) noex ;
+    } ; /* end struct (reader) */
+} /* end namespace */
+
+int filer_read(filer *op,void *vbuf,int rlen,int to) noex {
 	int		rs ;
-	int		tlen = 0 ;
-	DPRINTF("ent\n") ;
-	if ((rs = filer_magic(op,rbuf)) >= 0) ylikely {
-	    cint	fmo = FM_TIMED ;
-	    int		rc = (op->fl.net) ? FILER_RCNET : 1 ;
-	    bool	f_timedout = false ;
-	    char	*dbp = charp(rbuf) ;
-	    char	*bp ;
-	    char	*lastp ;
-	    while (tlen < rlen) {
-	        int	mlen ;
-	        while ((op->len == 0) && (rc-- > 0)) {
-		    cint	fd = op->fd ;
-		    cint	bsz = op->dlen ;
-		    char	*buf = op->dbuf ;
-	            op->bp = op->dbuf ;
-		    if (to >= 0) {
-	                rs = uc_reade(fd,buf,bsz,to,fmo) ;
-		    } else {
-	                rs = u_read(fd,buf,bsz) ;
-		    }
-	            if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
-	                f_timedout = true ;
-	                rs = SR_OK ;
-	                break ;
-	            }
-	            if (rs < 0) break ;
-	            op->len = rs ;
-	        } /* end while (refill) */
-	        if ((op->len == 0) || f_timedout) break ;
-	        mlen = min(op->len,(rlen - tlen)) ;
-	        bp = op->bp ;
-	        lastp = op->bp + mlen ;
-	        while (bp < lastp) {
-	            *dbp++ = *bp++ ;
-	        }
-	        op->bp += mlen ;
-	        tlen += mlen ;
-	        op->len -= mlen ;
-	    } /* end while */
-	    if (rs >= 0) op->off += tlen ;
+	DPRINTF("ent rlen=%d\n",rlen) ;
+	if ((rs = filer_magic(op,vbuf)) >= 0) ylikely {
+	    if (reader ro(op,vbuf,rlen,to) ; (rs = ro) > 0) {
+		op->off += rs ;
+	    }
 	} /* end if (magic) */
-	DPRINTF("ret rs=%d tlen=%d\n",rs,tlen) ;
-	return (rs >= 0) ? tlen : rs ;
+	DPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
 } /* end subroutine (filer_read) */
+
+reader::operator int () noex {
+    	int		rs = SR_OK ;
+	int		tlen = 0 ; /* return-value */
+	while ((rs >= 0) && (! fto) && (! feof) && (tlen < rlen)) {
+	    if ((rs = bufcopy(tlen)) >= 0) {
+		tlen += rs ;
+		rs = bufread(tlen) ;
+	    }
+	} /* end while */
+	return (rs >= 0) ? tlen : rs ;
+} /* end method (reader::operator) */
+
+int reader::bufcopy(int tlen) noex {
+    	int		rs = SR_OK ;
+	int		len = 0 ; /* return-value */
+    	if (cint nlen = (rlen - tlen) ; nlen > 0) {
+	    if (op->len > 0) {
+	        cint mlen = min(nlen,op->len) ;
+	        if ((rs = memover((rbuf + tlen),op->bp,mlen)) > 0) {
+		    op->bp += rs ;
+		    op->len -= rs ;
+		    len += rs ;
+		} /* end if (memcopy) */
+	    } /* end if (have some data) */
+	} /* end if (need data) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (reader::bufcopy) */
+
+int reader::bufread(int tlen) noex {
+    	cint		nlen = (rlen - tlen) ;
+    	int		rs = SR_OK ;
+	int		len = 0 ; /* return-value */
+	if ((nlen > 0) && (op->len == 0)) {
+	    cint	fd = op->fd ;
+	    cint	dlen = op->dlen ;
+	    int		rc = (op->fl.net) ? netrc : 1 ;
+	    char	*dbuf = op->dbuf ;
+	    for ( ; (op->len == 0) && (rc > 0) ; rc -= 1) {
+                op->bp = op->dbuf ;
+                if (to >= 0) {
+                    rs = uc_reade(fd,dbuf,dlen,to,fmo) ;
+                    len = rs ;
+                } else {
+                    rs = uc_read(fd,dbuf,dlen) ;
+                    len = rs ;
+                }
+                if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
+                    fto = true ;
+                    rs = SR_OK ;
+                    break ;
+                }
+                if (rs < 0) break ;
+                op->len = rs ;
+	    } /* end for (refill) */
+	    if ((rs >= 0) && (len == 0) && (rc == 0)) {
+	        feof = true ;
+	    } /* end if (EOF calculation) */
+	} /* end if (need refilling) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (reader:bufread) */
 
 int filer_readp(filer *op,void *rbuf,int rlen,off_t off,int to) noex {
 	int		rs ;
@@ -287,7 +358,7 @@ int filer_readln(filer *op,char *rbuf,int rlen,int to) noex {
 		    if (to >= 0) {
 	                rs = uc_reade(fd,buf,bsz,to,fmo) ;
 		    } else {
-	                rs = u_read(fd,buf,bsz) ;
+	                rs = uc_read(fd,buf,bsz) ;
 		    }
 	            if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
 	                f_timedout = true ;
@@ -385,24 +456,27 @@ int filer_writeto(filer *op,cvoid *abuf,int alen,int) noex {
 
 int filer_write(filer *op,cvoid *abuf,int alen) noex {
 	int		rs ;
+	cchar		*abp = charp(abuf) ;
+	DPRINTF("ent wlen=%d\n",alen) ;
 	if ((rs = filer_magic(op,abuf)) >= 0) ylikely {
 	    int		alenr ;
 	    int		blenr ;
 	    int		mlen ;
 	    int		len ;
-	    cchar	*abp = charp(abuf) ;
 	    op->fl.write = true ;
 	    if (alen < 0) alen = lenstr(abp) ;
 	    alenr = alen ;
 	    while ((rs >= 0) && (alenr > 0)) {
 	        if ((rs >= 0) && (op->len == 0) && (alenr >= op->dlen)) {
 	            mlen = ifloor(alenr,op->dlen) ;
+		    DPRINTF("mlen=%d\n",mlen) ;
 	            rs = uc_writen(op->fd,abp,mlen) ;
+		    DPRINTF("uc_writen() rs=%d\n",rs) ;
 	            len = rs ;
 	            if (rs >= 0) {
 	                abp += len ;
 	                alenr -= len ;
-	            }
+	            } /* end if (ok) */
 	        } /* end if */
 	        if ((rs >= 0) && (alenr > 0)) {
 	            blenr = op->dlen - op->len ;
@@ -414,13 +488,15 @@ int filer_write(filer *op,cvoid *abuf,int alen) noex {
 	            alenr -= len ;
 	            if (op->len == op->dlen) {
 	                rs = filer_flush(op) ;
-		    }
+		        DPRINTF("filer_flush() rs=%d\n",rs) ;
+		    } /* end if (flush) */
 	        } /* end if */
 	    } /* end while */
 	    if (rs >= 0) {
 	        op->off += alen ;
 	    }
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d len=%d\n",rs,alen) ;
 	return (rs >= 0) ? alen : rs ;
 } /* end subroutine (filer_write) */
 
@@ -505,17 +581,16 @@ int filer_adv(filer *op,int inc) noex {
 	            if (op->fl.write) {
 	                rs = filer_flush(op) ;
 	            } else {
-	                cint	ml = min(inc,op->len) ;
-	                if (ml > 0) {
+	                if (cint ml = min(inc,op->len) ; ml > 0) {
 	                    inc -= ml ;
 	                    op->len -= ml ;
 	                    op->bp += ml ;
 	                    op->off += ml ;
-	                }
+	                } /* end if */
 	            } /* end if (reading) */
 	            if ((rs >= 0) && (inc > 0)) {
 		        op->off += inc ;
-		        rs = u_seek(op->fd,inc,SEEK_CUR) ;
+		        rs = uc_seek(op->fd,inc,SEEK_CUR) ;
 	            } /* end if */
 	        } /* end if (positive) */
 	    } /* end if (valid) */
@@ -535,7 +610,7 @@ int filer_seek(filer *op,off_t woff,int w) noex {
 	            }
 	            if (rs >= 0) {
 			off_t	noff ;
-	                rs = u_seeko(op->fd,woff,w,&noff) ;
+	                rs = uc_seeko(op->fd,woff,w,&noff) ;
 	                op->off = noff ;
 	            }
 	        } else { /* read */
@@ -553,7 +628,7 @@ int filer_seek(filer *op,off_t woff,int w) noex {
 	            } /* end switch */
 	            if (rs >= 0) {
 			off_t	noff ;
-	                rs = u_seeko(op->fd,(woff + aoff),w,&noff) ;
+	                rs = uc_seeko(op->fd,(woff + aoff),w,&noff) ;
 	                op->off = noff ;
 	            }
 	            op->bp = op->dbuf ;
@@ -578,7 +653,7 @@ int filer_invalidate(filer *op) noex {
 	if ((rs = filer_magic(op)) >= 0) ylikely {
 	    if ((! op->fl.write) && (op->len > 0)) {
 	        if (! op->fl.net) {
-	            rs = u_seek(op->fd,op->off,SEEK_SET) ;
+	            rs = uc_seek(op->fd,op->off,SEEK_SET) ;
 		}
 	    }
 	    op->len = 0 ;
@@ -645,14 +720,19 @@ int filer_lockend(filer *op) noex {
 	return rs ;
 } /* end subroutine (filer_lockend) */
 
+int filer_rewind(filer *op) noex {
+	return filer_seek(op,0z,SEEK_SET) ;
+} /* end subroutine (filer_rewind) */
+
 
 /* private subroutines */
 
 local int filer_adjbuf(filer *op,int bufsz) noex {
 	int		rs ;
 	DPRINTF("ent bufsz=%d\n",bufsz) ;
-	if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) ylikely {
-	    DPRINTF("u_fstat() rs=%d\n",rs) ;
+	if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) ylikely {
+	    csize fsize = size_t(sb.st_size) ;
+	    DPRINTF("uc_fstat() rs=%d fsize=%lu\n",rs,fsize) ;
 	    op->dt = filetype(sb.st_mode) ;
 	    if (bufsz <= 0) {
 	        DPRINTF("need bufsz=%d\n",bufsz) ;
@@ -674,15 +754,15 @@ local int filer_adjbuf(filer *op,int bufsz) noex {
 	                } else {
 	                    DPRINTF("RDONLY-not\n") ;
 		            bufsz = intconv(ps) ;
-		        }
+		        } /* end if */
 		    } /* end if (pagesz) */
 	        } /* end if */
 	    } /* end if (bufsz) */
 	    op->dlen = bufsz ;
 	    if (rs >= 0) {
 		rs = op->dlen ;
-	    }
-	} /* end if (stat) */
+	    } /* end if (ok) */
+	} /* end if (uc_fstat) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (filer_adjbuf) */
@@ -699,5 +779,34 @@ local int filer_bufcpy(filer *op,cchar *abp,int mlen) noex {
 	op->bp += mlen ;
 	return mlen ;
 } /* end subroutine (filer_bufcpy) */
+
+local int debflags(int of) noex {
+    	int		rs ;
+	int		rs1 ;
+	if (char *lbuf ; (rs = libmem.ml(&lbuf)) >= 0) {
+	    if ((rs = snflagsopen(lbuf,rs,of)) >= 0) {
+		DPRINTF("ofl %s\n",lbuf) ;
+	    } /* end if (snflagsopen) */
+	    rs1 = libmem.free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-d) */
+	return rs ;
+} /* end subroutine (debflags) */
+
+local int debdesc(int fd) noex {
+    	int		rs ;
+	if ((rs = u_fgetfl(fd)) >= 0) {
+	    debflags(rs) ;
+	} /* end if (u_fgetfl) */
+	return rs ;
+} /* end subroutine (debdesc) */
+
+local int debsize(int fd) noex {
+    	int		rs ;
+	if ((rs = u_fsize(fd)) >= 0) {
+	    DPRINTF("fsz=%d\n",rs) ;
+	} /* end if (u_fsize) */
+	return rs ;
+} /* end subroutine (debsize) */
 
 
