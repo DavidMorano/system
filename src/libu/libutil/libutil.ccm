@@ -26,6 +26,7 @@ export import :lenstr ;
 export import :lenstrarr ;
 export import :loadstrs ;
 export import :memclear ;
+export import :memload ;
 export import :memcopy ;
 export import :memcpy ;
 export import :resumelife ;
