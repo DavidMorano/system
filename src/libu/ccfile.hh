@@ -21,11 +21,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<fstream>
-#include	<string>
-#include	<string_view>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<fstream>		/* C++STD */
+#include	<string>		/* C++STD */
+#include	<string_view>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum ccfilemems {
