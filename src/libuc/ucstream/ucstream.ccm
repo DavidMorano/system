@@ -79,6 +79,8 @@ export {
 	    fd = -1 ;
 	} ; /* end ctor) */
 	int open(cchar *,cchar * = nullptr,mode_t = 0) noex ;
+	int start	(int = 0,off_t = 0z,int = 0,int = 0) = delete ;
+	int finish	() = delete ;
 	void dtor() noex ;
 	destruct ucstream() {
 	    if (fd >= 0) dtor() ;
