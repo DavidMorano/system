@@ -110,7 +110,7 @@ int ucstream::open(cchar *fn,cchar *os,mode_t om) noex {
 		    if ((rs = uc_open(fn,rs,om)) >= 0) {
 			fd = rs ;
 			DPRINTF("open() rs=%d\n",rs) ;
-			rs = start(fd,0z,0,µof) ;
+			rs = filer::start(fd,0z,0,µof) ;
 			DPRINTF("start() rs=%d\n",rs) ;
 			if (rs < 0) {
 			    uc_close(fd) ;
@@ -131,7 +131,7 @@ int ucstream::iclose() noex {
 	if (fd >= 0) ylikely {
 	    rs = SR_OK ;
 	    {
-		rs1 = finish ;
+		rs1 = filer::finish ;
 		if (rs >= 0) rs = rs1 ;
 		DPRINTF("finish() rs=%d\n",rs) ;
 	    }
@@ -147,7 +147,7 @@ int ucstream::iclose() noex {
 } /* end method (ucstream::iclose) */
 
 void ucstream::dtor() noex {
-	if (cint rs = finish ; rs < 0) {
+	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucstream",rs,"fini-finish") ;
 	}
 } /* end method (ucstream::dtor) */
