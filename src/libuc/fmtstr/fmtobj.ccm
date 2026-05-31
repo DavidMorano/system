@@ -116,9 +116,10 @@ import fmtspec ;
 /* local structures */
 
 export {
-    struct fmtobj_flags {
-	uint		minus:1 ;	/* minus-sign encountered */
-    } ;
+    struct fmtobj_fl {
+	uint		plsign:1 ;	/* plus-sign encountered */
+	uint		misign:1 ;	/* misus-sign encountered */
+    } ; /* end struct */
     struct fmtobj {
 	fmtsub		sub ;
 	fmtspec		spec ;
@@ -126,7 +127,7 @@ export {
 	char		*ubuf{} ;
 	char		*tbuf{} ;
 	char		*bp{} ;
-	fmtobj_flags	fl{} ;
+	fmtobj_fl	fl{} ;
 	int		fm ;		/* format-mode (option-flags) */
 	int		ulen ;
 	int		tlen ;
@@ -137,22 +138,22 @@ export {
 	    fmt = f ;
 	} ; /* end ctor */
 	int operator () (va_list) noex ;
-	int start() noex ;
-	int finish() noex ;
-	int loop(va_list) noex ;
-	int decide(va_list) noex ;
-	int code_chr(va_list) noex ;
-	int code_exp(va_list) noex ;
-	int code_str(va_list) noex ;
-	int code_bin(va_list) noex ;
-	int code_oct(va_list) noex ;
-	int code_dec(va_list) noex ;
-	int code_hex(va_list) noex ;
-	int code_float(va_list) noex ;
+	int start	() noex ;
+	int finish	() noex ;
+	int loop	(va_list) noex ;
+	int decide	(va_list) noex ;
+	int code_chr	(va_list) noex ;
+	int code_exp	(va_list) noex ;
+	int code_str	(va_list) noex ;
+	int code_bin	(va_list) noex ;
+	int code_oct	(va_list) noex ;
+	int code_dec	(va_list) noex ;
+	int code_hex	(va_list) noex ;
+	int code_float	(va_list) noex ;
 	void dtor() noex ;
 	destruct fmtobj() {
 	    if (tbuf) dtor() ;
-	} ;
+	} ; /* end destruct */
     } ; /* end struct (fmtobj) */
 } /* end export */
 
