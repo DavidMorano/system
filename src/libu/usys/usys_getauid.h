@@ -46,13 +46,13 @@
 typedef uid_t		au_id_t ;
 #endif	/* TYPEDEF_AUIDT */
 
-#ifndef	SUBROUTINE_GETAUID
-#define	SUBROUTINE_GETAUID
+#ifndef	DECLARATION_GETAUID
+#define	DECLARATION_GETAUID
 EXTERNC_begin
 /* 0=not-found, 1=found */
 extern int	getauid(au_id_t *) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_GETAUID */
+#endif /* DECLARATION_GETAUID */
 
 
 #endif /* (!defined(SYSHAS_GETAUID)) || (SYSHAS_GETAUID == 0) */
