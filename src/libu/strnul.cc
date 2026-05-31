@@ -37,7 +37,7 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* LIBF |DPRINTF(3u)| */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"strnul.hh"
 
