@@ -71,19 +71,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usysflag.h>
-#include	<usys.h>		/* |kloadavg(3u)| */
-#include	<utimeout.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<usys.h>		/* LIBU |kloadavg(3u)| */
+#include	<utimeout.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ugetloadavg.h"
 
@@ -116,8 +113,8 @@ using usys::kloadavg ;			/* subroutine (LIBU) */
 
 /* forward references */
 
-static int	make_ugetloadavg(uint *,int) noex ;
-static sysret_t	std_getloadavg(double *,int) noex ;
+local int	make_ugetloadavg(uint *,int) noex ;
+local sysret_t	std_getloadavg(double *,int) noex ;
 
 
 /* local variables */
@@ -184,7 +181,7 @@ sysret_t u_loadavgd(double *dla,int n) noex {
 
 /* local subroutines */
 
-static sysret_t make_ugetloadavg(uint *la,int n) noex {
+local sysret_t make_ugetloadavg(uint *la,int n) noex {
 	cint		nmax = maxloadavgs ;
 	int		rs = SR_FAULT ;
 	int		rn = 0 ;
@@ -196,15 +193,15 @@ static sysret_t make_ugetloadavg(uint *la,int n) noex {
 		    rn = rs ;
 	            for (int i = 0 ; i < n ; i += 1) {
 	                la[i] = uint(d[i] * FSCALE) ;
-		    }
-		}
+		    } /* end for */
+		} /* end if (u_loadavgd) */
 	    } /* end if (greater-than) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rn : rs ;
 }
 /* end subroutine (make_ugetloadavg) */
 
-static sysret_t std_getloadavg(double *dla,int n) noex {
+local sysret_t std_getloadavg(double *dla,int n) noex {
 	int		rs ;
 	if ((rs = getloadavg(dla,n)) < 0) {
 	    rs = (- errno) ;
