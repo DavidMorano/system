@@ -36,12 +36,12 @@ export {
     template<typename T> constexpr inline void *memcpy(T *dp,cvoid *sp) noex {
 	csize	dsize = sizeof(T) ;
 	return memcpy(dp,sp,dsize) ;
-    }
+    } /* end subroutine */
     template<typename T>
     constexpr inline void *cmemcpy(T *dp,cvoid *sp,size_t dsize = -1) noex {
     	if (dsize > INT_MAX) dsize = sizeof(T) ;
     	return memcpy(dp,sp,dsize) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 
