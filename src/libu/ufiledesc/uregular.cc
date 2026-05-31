@@ -137,18 +137,18 @@
 #include	<sys/param.h>		/* required for |fstatfs(2)| */
 #include	<sys/mount.h>		/* required for |fstatfs(2)| */
 #include	<sys/ioctl.h>		/* for |ioctl(2)| */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usysflag.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ufiledescbase.hh"
 #include	"uregular.h"
@@ -389,16 +389,11 @@ int u_fstat(int fd,ustat *ssp) noex {
 	int		rs = SR_FAULT ;
 	if (ssp) {
 	    repeat {
-	        if ((rs = fstat(fd,ssp)) >= 0) {
+	        if ((rs = fstat(fd,ssp)) < 0) {
 	            rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
-	if_constexpr (f_darwin) {
-	    if (rs == SR_NOTTY) {
-		rs = SR_ACCESS ;
-	    }
-	} /* end if_constexpr (f_darwin) */
 	return rs ;
 }
 /* end subroutine (u_fstat) */
@@ -407,7 +402,7 @@ int u_fstatfs(int fd,ustatfs *ssp) noex {
 	int		rs = SR_FAULT ;
 	if (ssp) {
 	    repeat {
-	        if ((rs = fstatfs(fd,ssp)) >= 0) {
+	        if ((rs = fstatfs(fd,ssp)) < 0) {
 	            rs = (- errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
@@ -697,8 +692,7 @@ int uregular::ipoll(int) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uregular::ipoll) */
+} /* end method (uregular::ipoll) */
 
 int uregular::ifsync(int fd) noex {
 	int		rs ;
@@ -706,8 +700,7 @@ int uregular::ifsync(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ufiledesc::ifsync) */
+} /* end method (ufiledesc::ifsync) */
 
 int uregular::ifsyncdata(int fd) noex {
 	int		rs ;
@@ -715,8 +708,7 @@ int uregular::ifsyncdata(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ufiledesc::ifsyncdata) */
+} /* end method (ufiledesc::ifsyncdata) */
 
 int uregular::iftruncate(int fd) noex {
 	int		rs ;
@@ -724,8 +716,7 @@ int uregular::iftruncate(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ufiledesc::ifsync) */
+} /* end method (ufiledesc::ifsync) */
 
 int uregular::ilockf(int fd) noex {
 	int		rs ;
@@ -733,8 +724,7 @@ int uregular::ilockf(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uregular::ilockf) */
+} /* end method (uregular::ilockf) */
 
 int uregular::ireadp(int fd) noex {
 	csize		rsz = size_t(rlen) ;
@@ -745,8 +735,7 @@ int uregular::ireadp(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uregular::ireadp) */
+} /* end method (uregular::ireadp) */
 
 int uregular::iwritep(int fd) noex {
 	csize		wsz = size_t(wlen) ;
@@ -757,8 +746,7 @@ int uregular::iwritep(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uregular::iwritep) */
+} /* end method (uregular::iwritep) */
 
 int uregular::iread(int fd) noex {
 	csize		rsz = size_t(rlen) ;
@@ -769,8 +757,7 @@ int uregular::iread(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uregular::iread) */
+} /* end method (uregular::iread) */
 
 int uregular::ireadv(int fd) noex {
 	IOVEC		*riop = const_cast<IOVEC *>(iop) ;
@@ -781,8 +768,7 @@ int uregular::ireadv(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uregular::ireadv) */
+} /* end subroutine (uregular::ireadv) */
 
 int uregular::iwrite(int fd) noex {
 	csize		wsz = size_t(wlen) ;
@@ -793,8 +779,7 @@ int uregular::iwrite(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uregular::iwrite) */
+} /* end method (uregular::iwrite) */
 
 int uregular::iwritev(int fd) noex {
 	int		rs ;
@@ -804,8 +789,7 @@ int uregular::iwritev(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uregular::iwritev) */
+} /* end method (uregular::iwritev) */
 
 int uregular::iioctl(int fd) noex {
 	ulong		icmd = ulong(cmd) ;
@@ -814,7 +798,6 @@ int uregular::iioctl(int fd) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uregular::iioctl) */
+} /* end method (uregular::iioctl) */
 
 
