@@ -51,14 +51,14 @@ typedef unsigned long		hrtime_t ;
 
 #endif /* TYPEDEF_HRTIME */
 
-#ifndef	SUBROUTINE_GETHRTIME
-#define	SUBROUTINE_GETHRTIME
+#ifndef	DECLARATION_GETHRTIME
+#define	DECLARATION_GETHRTIME
 EXTERNC_begin
 
 extern hrtime_t gethrtime() noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_GETHRTIME */
+#endif /* DECLARATION_GETHRTIME */
 
 #endif /* defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0) */
 /* GETHRTIME end */
