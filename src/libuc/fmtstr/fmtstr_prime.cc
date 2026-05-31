@@ -140,18 +140,14 @@ import fmtobj ;
 int fmtstr(char *ubuf,int ulen,int fm,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	fprintf(stderr,"fmtstr: ent\n") ;
 	if (ubuf && fmt && ap) {
 	    rs = SR_INVALID ;
 	    if (fmt[0]) {
 		fmtobj	fo(ubuf,ulen,fm,fmt) ;
-		fprintf(stderr,"fmtstr: -> fmtobj\n") ;
 		rs = fo(ap) ;
-		fprintf(stderr,"fmtstr: fmtobj() rs=%d\n",rs) ;
 		len = rs ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	fprintf(stderr,"fmtstr: ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (fmtstr) */
