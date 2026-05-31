@@ -27,12 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ustream.hh"
 
@@ -243,6 +243,9 @@ int ustream_co::operator () (int a) noex {
 	            break ;
 	        case ustreammem_lockend:
 	            rs = ustream_lockend(op) ;
+	            break ;
+	        case ustreammem_rewind:
+	            rs = ustream_seek(op,0z,SEEK_SET) ;
 	            break ;
 	        case ustreammem_writeblanks:
 	            rs = ustream_writeblanks(op,a) ;
