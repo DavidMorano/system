@@ -37,6 +37,7 @@ module ;
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysdefs.h>
 #include	<localmisc.h>
 
 export module fmtsub ;
@@ -47,18 +48,15 @@ import fmtspec ;
 import fmtutil ;
 import cvtfloat ;
 
-#define	FMTSUB		fmtsub_head
-#define	FMTSUB_FL	fmtsub_flags
-
 export {
-    struct fmtsub_flags {
+    struct fmtsub_fl {
 	uint		ov:1 ;		/* overflow */
 	uint		mclean:1 ;	/* mode: clean-up */
 	uint		mnooverr:1 ;	/* mode: return-error */
     } ; /* end struct */
     struct fmtsub_head {
 	char		*ubuf{} ;	/* user buffer */
-	FMTSUB_FL	fl ;		/* flags */
+	fmtsub_fl	fl ;		/* flags */
 	int		ulen ;		/* buffer length */
 	int		len ;		/* current buffer usage count */
 	int		mode ;		/* format mode */
@@ -85,20 +83,20 @@ export {
 	fmtsub_co	audit ;
 	fmtsub_co	finish ;
 	fmtsub() noex : fmtsub_head{} {
-	    audit(this,fmtsubmem_audit) ;
-	    finish(this,fmtsubmem_finish) ;
+	    audit	(this,fmtsubmem_audit) ;
+	    finish	(this,fmtsubmem_finish) ;
 	    ubuf = nullptr ;
 	} ; /* end ctor */
 	fmtsub(const fmtsub &) = delete ;
 	fmtsub &operator = (const fmtsub &) = delete ;
-	int start(char *,int,int) noex ;
-	int cleanstrw(cchar *,int = -1) noex ;
-	int strw(cchar *,int = -1) noex ;
-	int chr(int) noex ;
-	int blanks(int = 1) noex ;
-	int emitter(fmtspec *,cchar *,int) noex ;
-	int emit(fmtspec *,cchar *,int) noex ;
-	int formstr(fmtspec *,fmtstrdata *) noex ;
+	int start	(char *,int,int) noex ;
+	int cleanstrw	(cchar *,int = -1) noex ;
+	int strw	(cchar *,int = -1) noex ;
+	int chr		(int) noex ;
+	int blanks	(int = 1) noex ;
+	int emitter	(fmtspec *,cchar *,int) noex ;
+	int emit	(fmtspec *,cchar *,int) noex ;
+	int formstr	(fmtspec *,fmtstrdata *) noex ;
 	template<typename T> 
 	int floater(char *tb,int tl,int fc,int fg,int wi,int pr,T dv) noex ;
 	void dtor() noex ;
@@ -106,7 +104,6 @@ export {
 	    if (ubuf) dtor() ;
 	} ; /* end destruct */
     } ; /* end struct (fmtsub) */
-    typedef	FMTSUB_FL	fmtsub_fl ;
 } /* end export */
 
 export {
@@ -130,4 +127,5 @@ int fmtsub::floater(char *tb,int tl,int fc,int fg,int wi,int pr,T dv) noex {
 	}
 	return rs ;
 } /* end method (fmtsub::floater) */
+
 
