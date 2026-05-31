@@ -40,7 +40,7 @@ MODS=
 LIBS=
 
 
-OBJ0_ISMISC= isdotdir.o
+OBJ0_ISMISC= isdotdir.o isaccmode.o
 OBJ1_ISMISC= isleapyear.o
 OBJ2_ISMISC= isprime.o
 OBJ3_ISMISC= isobjspecial.o issamehostname.o
@@ -52,8 +52,7 @@ OBJ_ISMISC= $(OBJA_ISMISC) $(OBJB_ISMISC)
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -100,7 +99,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_ISMISC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -128,10 +127,11 @@ obj3_ismisc.o:	$(OBJ3_ISMISC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-isdotdir.o:		isdotdir.cc		$(INCS)
-isleapyear.o:		isleapyear.cc		$(INCS)
-isobjspecial.o:		isobjspecial.cc		$(INCS)
-isprime.o:		isprime.cc		$(INCS)
-issamehostname.o:	issamehostname.cc	$(INCS)
+isdotdir.o:		isdotdir.cc				$(INCS)
+isleapyear.o:		isleapyear.cc				$(INCS)
+isobjspecial.o:		isobjspecial.cc				$(INCS)
+isprime.o:		isprime.cc				$(INCS)
+issamehostname.o:	issamehostname.cc			$(INCS)
+isaccmode.o:		isaccmode.cc		isaccmode.h	$(INCS)
 
 
