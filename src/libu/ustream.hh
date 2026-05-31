@@ -53,6 +53,7 @@ enum ustreammems {
 	ustreammem_adv,
 	ustreammem_poll,
 	ustreammem_lockend,
+	ustreammem_rewind,
 	ustreammem_close,
 	ustreammem_writeblanks,
 	ustreammem_writealign,
@@ -101,6 +102,7 @@ struct ustream {
 	ustream_co	adv ;
 	ustream_co	poll ;
 	ustream_co	lockend ;
+	ustream_co	rewind ;
 	ustream_co	close ;
 	ustream_co	writeblanks ;
 	ustream_co	writealign ;
@@ -198,6 +200,9 @@ namespace ustream_ns {
     extern int	ustream_writeblanks	(ustream *,int) noex ;
     extern int	ustream_writealign	(ustream *,int) noex ;
     extern int	ustream_writezero	(ustream *,int) noex ;
+    inline int	ustream_rewind		(ustream *op) noex {
+	return ustream_seek(op,0z,SEEK_SET) ;
+    } /* end subroutine */
 } /* end namespace (ustream_ns) */
 
 
