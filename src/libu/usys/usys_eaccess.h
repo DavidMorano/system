@@ -53,12 +53,12 @@
 /******************************************************************************/
 
 
-#ifndef	SUBROUTINE_EACCESS
-#define	SUBROUTINE_EACCESS
+#ifndef	DECLARATION_EACCESS
+#define	DECLARATION_EACCESS
 EXTERNC_begin
 extern unixret_t	eaccess(const char *,int) noexcept ;
 EXTERNC_end
-#endif /* SUBROUTINE_EACCESS */
+#endif /* DECLARATION_EACCESS */
 
 
 /******************************************************************************/
