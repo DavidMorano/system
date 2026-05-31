@@ -60,12 +60,12 @@
 /******************************************************************************/
 
 
-#ifndef	SUBROUTINE_PLOCK
-#define	SUBROUTINE_PLOCK
+#ifndef	DECLARATION_PLOCK
+#define	DECLARATION_PLOCK
 namespace usys {
     extern unixret_t usys_plock(int) noex ;
 }
-#endif /* SUBROUTINE_PLOCK */
+#endif /* DECLARATION_PLOCK */
 
 
 /******************************************************************************/
