@@ -52,7 +52,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<matstr.h>
 #include	<snwcpy.h>
 #include	<systypenames.h>	/* |systypename| */
@@ -96,7 +96,7 @@ int getsystypenum(char *tbuf,char *nbuf,cchar *stn,cchar *release) noex {
 	    tbuf[0] = '\0' ;
 	    nbuf[0] = '\0' ;
 	    if (stn[0] && release[0]) {
-		if ((rs = getbufsize(bufsize_un)) >= 0) {
+		if ((rs = bufsizeget(bufsize_un)) >= 0) {
 		    cint	olen = rs ;
 	            if (int si ; (si = matstr(systypename,stn,-1)) >= 0) {
 	                int	cl ;
@@ -127,7 +127,7 @@ int getsystypenum(char *tbuf,char *nbuf,cchar *stn,cchar *release) noex {
 	            } else {
 	                rs = SR_NOTFOUND ;
 	            }
-		} /* end if (getbufsize) */
+		} /* end if (bufsizeget) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
