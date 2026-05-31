@@ -54,18 +54,8 @@
 	filesystem as symbolic links.
 
 	Synopsis:
-	int uc_openfsvc(cc *pr,cc *prn,cc *svc,int of,mode_t om,
-		mainv argv,mainv envv,int to) noex
 
 	Arguments:
-	pr		program-root
-	prn		facility name
-	svc		service name
-	of		open-flags
-	om		open-mode
-	argv		array of arguments
-	envv		attay of environment
-	to		time-out
 
 	Returns:
 	>=0		file-descriptor
@@ -80,7 +70,7 @@
 	subroutine looks like:
 
 	int opensvc_<svc>(cc *pr,cc *prn,int of,mode_t om,
-		mainv argv,mainv envv,int to) noex
+		con mainv argv,con mainv envv,int to) noex
 
 	Multiple services can be actually implemented in the same
 	shared-object.  But the actual file of that object should
@@ -103,6 +93,8 @@ module ;
 
 export module openxsvc ;
 
+typedef const mainv	cmv ;
+
 export {
     struct openxsvc {
     	cchar		*prefix{} ;
@@ -117,9 +109,12 @@ export {
 	openxsvc() = default ;
 	openxsvc(const openxsvc *sop) noex ;
 	openxsvc(const openxsvc &so) noex : openxsvc(&so) { } ;
-	openxsvc(cc *apr,cc *aprn,cc *asvc,int aof,mode_t aom,
-		mainv aargv,mainv aenvv,int ato) noex ;
+	openxsvc(cc *,cc *,cc *,int,mode_t,cmv,cmv,int) noex ;
     } ; /* end struct (openxsvc) */
+} /* end export */
+
+export {
+    extern "C++" int	uc_openxsvc(con openxsvc *oscp) noex ;
 } /* end export */
 
 openxsvc::openxsvc(const openxsvc *sop) noex {
@@ -131,18 +126,18 @@ openxsvc::openxsvc(const openxsvc *sop) noex {
 	    of		= sop->of ;
 	    to		= sop->to ;
 	    om		= sop->om ;
-} ; /* end ctor */
+} ; /* end ctor (openxsvc) */
 
 openxsvc::openxsvc(cc *apr,cc *aprn,cc *asvc,int aof,mode_t aom,
-		mainv aargv,mainv aenvv,int ato) noex {
+		cmv av,cmv ev,int ato) noex {
 	    pr		= apr ;
 	    prn		= aprn ;
 	    svc		= asvc ;
-	    argv	= aargv ;
-	    envv	= aenvv ;
+	    argv	= av ;
+	    envv	= ev ;
 	    of		= aof ;
 	    to		= ato ;
 	    om		= aom ;
-} ; /* end ctor */
+} ; /* end ctor (openxsvc) */
 
 
