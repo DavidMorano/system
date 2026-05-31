@@ -143,7 +143,15 @@ int u_fcntl(int fd,int cmd,...) noex {
 	    } /* end if (plausible-command) */
 	} /* end if (good-FD) */
 	return rs ;
-} /* end subroutine (ufcntl) */
+} /* end subroutine (u_fcntl) */
+
+int u_fgetfl(int fd) noex {
+    	return u_fcntl(fd,F_GETFL,0) ;
+} /* end subroutine (u_fgetfl) */
+
+int u_fgetfd(int fd) noex {
+    	return u_fcntl(fd,F_GETFD,0) ;
+} /* end subroutine (u_fgetfd) */
 
 
 /* local subroutines */
@@ -152,14 +160,13 @@ local sysret_t try_fcntl(int fd,int cmd,uintptr_t anyarg) noex {
 	ufuncter	fo(cmd,anyarg) ;
 	fo.m = &ufuncter::ifcntl ;
 	return fo(fd) ;
-}
-/* end subroutine (try_fcntl) */
+} /* end subroutine (try_fcntl) */
 
 int ufuncter::ifcntl(int fd) noex {
 	int		rs ;
 	if ((rs = fcntl(fd,cmd,anyarg)) == -1) {
 	    rs = (- errno) ;
-	}
+	} /* end if */
 	if (rs == SR_ACCESS) {
 	    switch (cmd) {
 	    case F_GETLK:
@@ -170,7 +177,6 @@ int ufuncter::ifcntl(int fd) noex {
 	    } /* end switch */
 	} /* end if (old mess-up) */
 	return rs ;
-}
-/* end method (ufuncter::ifcntl) */
+} /* end method (ufuncter::ifcntl) */
 
 
