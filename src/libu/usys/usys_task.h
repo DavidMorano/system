@@ -58,12 +58,12 @@
 typedef int	taskid_t ;
 #endif
 
-#ifndef	SUBROUTINE_GETTASKID
-#define	SUBROUTINE_GETTASKID
+#ifndef	DECLARATION_GETTASKID
+#define	DECLARATION_GETTASKID
 EXTERNC_begin
 extern taskid_t gettaskid() noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_GETTASKID */
+#endif /* DECLARATION_GETTASKID */
 
 
 /******************************************************************************/
