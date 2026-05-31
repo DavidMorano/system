@@ -118,9 +118,8 @@ int uc_getnetname(char *nbuf,int nlen) noex {
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
 	if (nbuf) {
-	    static cint	rsv = var ;
 	    nbuf[0] = '\0' ;
-	    if ((rs = rsv) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) {
 		cint rlen = rs ;
 		if (char *rbuf ; (rs = libmem.mall((rlen+1),&rbuf)) >= 0) {
 	            const uid_t	uid = 0 ; /* root user */
