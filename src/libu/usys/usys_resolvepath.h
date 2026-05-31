@@ -45,14 +45,14 @@
 #include	<usysdefs.h>
 
 
-#ifndef	SUBROUTINE_RESOLVEPATH
-#define	SUBROUTINE_RESOLVEPATH
+#ifndef	DECLARATION_RESOLVEPATH
+#define	DECLARATION_RESOLVEPATH
 EXTERNC_begin
 
 extern unixret_t resolvepath(cchar *,char *,size_t) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_RESOLVEPATH */
+#endif /* DECLARATION_RESOLVEPATH */
 
 
 #endif /* (!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0) */
