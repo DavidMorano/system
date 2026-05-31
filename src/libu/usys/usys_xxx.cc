@@ -11,12 +11,9 @@
 	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
-	= 2014-06-27, David A-D- Morano
-	I updated this to use the 'constexpr' capability of C++14.
-
 */
 
-/* Copyright © 2001,2014 David A-D- Morano.  All rights reserved. */
+/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -29,16 +26,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 #include	"usys_xxx.h"
 
@@ -175,7 +172,9 @@ namespace usys {
 /* LOADAVGINT end */
 /*----------------------------------------------------------------------------*/
 
-#ifdef	SUBROUTINE_STRTOI
+#if	CF_STRTOX
+#ifndef	SUBROUTINE_STRTOX
+#define	SUBROUTINE_STRTOX
 extern int	strtoi	(cchar *sp,char **endp,int b) noex { 
     	int		res = 0 ;
     	cint nb = (szof(int) * CHAR_BIT) ;
@@ -205,5 +204,6 @@ extern uint	strtoui	(cchar *sp,char **endp,int b) noex {
 	return res ;
 } /* end subroutine */
 #endif /* SUBROUTINE_STRTOI */
+#endif /* CF_STRTOX */
 
 
