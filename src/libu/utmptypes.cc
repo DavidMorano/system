@@ -89,9 +89,6 @@ enum missingutmptypes {
 
 /* exported variables */
 
-
-/* exported subroutines */
-
 cint utmptypes::empty		= EMPTY ;
 cint utmptypes::runlevel	= RUN_LVL ;
 cint utmptypes::boottime	= BOOT_TIME ;
@@ -106,5 +103,8 @@ cint utmptypes::signature	= SIGNATURE ;
 cint utmptypes::timeshut	= SHUTDOWN_TIME ;
 
 const utmptypes			utmptype ;
+
+
+/* exported subroutines */
 
 
