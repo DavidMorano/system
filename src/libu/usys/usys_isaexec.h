@@ -53,12 +53,12 @@
 /******************************************************************************/
 
 
-#ifndef	SUBROUTINE_ISAEXEC
-#define	SUBROUTINE_ISAEXEC
+#ifndef	DECLARATION_ISAEXEC
+#define	DECLARATION_ISAEXEC
 EXTERNC_begin
     extern unixret_t isaexec(cchar *,char *const *,char *const *) noex ;
 EXTERNC_end
-#endif /* SUBROUTINE_ISAEXEC */
+#endif /* DECLARATION_ISAEXEC */
 
 
 /******************************************************************************/
