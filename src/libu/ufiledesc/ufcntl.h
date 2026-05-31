@@ -40,6 +40,8 @@
 EXTERNC_begin
 
 extern int	u_fcntl(int,int,...) noex ;
+extern int	u_fgetfl(int) noex ;
+extern int	u_fgetfd(int) noex ;
 
 EXTERNC_end
 
