@@ -1,6 +1,6 @@
 /* bitgrp HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* File-Once management */
 /* version %I% last-modified %G% */
@@ -17,6 +17,7 @@
 
 #ifndef	BITGRP_INCLUDE
 #define	BITGRP_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -27,6 +28,7 @@
 #include	<usysrets.h>
 
 
+#endif /* __cplusplus */
 #endif /* BITGRP_INCLUDE */
 
 
