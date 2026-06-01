@@ -22,8 +22,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* |nullptr_t| */
-#include	<stdlib.h>
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 
