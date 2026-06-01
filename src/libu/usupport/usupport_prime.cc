@@ -46,13 +46,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* |gethostid(3c)| */
-#include	<poll.h>
-#include	<cerrno>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |stpcpy(3c)| */
+#include	<unistd.h>		/* POSIX |gethostid(3c)| */
+#include	<poll.h>		/* POSIX */
+#include	<cerrno>		/* CSTD */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<intsat.h>
