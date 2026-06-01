@@ -40,18 +40,22 @@ MODS +=
 LIBS +=
 
 
-OBJ0= deb0.o deb1.o
+OBJPART=
+
+OBJPRIME= deb0.o
+
+OBJ0= deb1.o
 OBJ1= 
 OBJ2= 
 OBJ3= 
 
 OBJA= obj0.o 
 
-OBJ= obja.o 
+OBJIMPL= obja.o 
 
 
 INCDIRS +=
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -94,11 +98,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+$(T).o:			objprime.o objimpl.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -133,11 +137,20 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-deb0.o:		deb.ccm		$(INCS)
-	makemodule deb
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-deb1.o:		deb1.cc deb.ccm	$(INCS)
-	makemodule deb
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+deb0.o:		deb.ccm					$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+deb1.o:		deb1.cc deb0.o				$(INCS)
 	$(COMPILE.cc) $<
 
 
