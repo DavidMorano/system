@@ -27,11 +27,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* |faccessat(2)| */
-#include	<fcntl.h>		/* |AT_{x}| */
-#include	<cerrno>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
+#include	<unistd.h>		/* POSIX |faccessat(2)| */
+#include	<fcntl.h>		/* POSIX |AT_{x}| */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getenv(3c)| + |getprogname(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
