@@ -73,9 +73,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<mkchar.h>
