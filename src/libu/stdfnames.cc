@@ -1,4 +1,4 @@
-/* stdfname SUPPORT */
+/* stdfnames SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -85,19 +85,6 @@ const stdfnamer		stdfname_data ;
 /* exported variables */
 
 ccharp		stdfname[stdfile_overlast + 1] ;
-
-extern ccharp	stdfnames[stdfile_overlast + 1] ;
-
-ccharp		stdfnames[stdfile_overlast + 1] = {
-	"*STDIN*",
-	"*STDOUT*",
-	"*STDERR*",
-	"*STDLOG*",
-	"*STDNULL*",
-	"*STDZERO*",
-	"-",
-	nullptr
-} ; /* end array */
 
 
 /* exported subroutines */
