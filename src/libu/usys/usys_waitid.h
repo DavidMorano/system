@@ -71,14 +71,14 @@ typedef enum idtype {          /* pollutes XPG4.2 namespace */
 #endif /* TYPEDEF_WAITID */
 
 
-#ifndef	SUBROUTINE_WAITID
-#define	SUBROUTINE_WAITID
+#ifndef	DECLARATION_WAITID
+#define	DECLARATION_WAITID
 EXTERNC_begin
 
 extern unixret_t waitid(idtype_t,id_t,siginfo_t *,int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_WAITID */
+#endif /* DECLARATION_WAITID */
 
 
 #endif /* (!defined(SYSHAS_WAITID)) || (SYSHAS_WAITID == 0) */
