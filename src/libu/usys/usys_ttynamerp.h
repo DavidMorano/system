@@ -35,14 +35,14 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 
-#ifndef	SUBROUTINE_TTYNAMERP
-#define	SUBROUTINE_TTYNAMERP
+#ifndef	DECLARATION_TTYNAMERP
+#define	DECLARATION_TTYNAMERP
 EXTERNC_begin
 
 extern errno_t ttyname_rp(int,char *,int) noex ;
 
 EXTERNC_end
-#endif /* SUBROUTINE_TTYNAMERP */
+#endif /* DECLARATION_TTYNAMERP */
 
 
 #endif /* USYSTTYNAMERP_INCLUDE */
