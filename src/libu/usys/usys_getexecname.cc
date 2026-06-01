@@ -66,10 +66,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getprogname(3c)| |getexecname(3c) */
 #include	<cstring>		/* |strncpy(3c)| */
-#include	<new>			/* |nothrow(3c)| */
+#include	<new>			/* C++STD |nothrow(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
