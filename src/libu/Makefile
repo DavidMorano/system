@@ -88,7 +88,12 @@ OBJ31= ccfile.o readln.o dprint.o
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o cmporders.o localmisc.o
 OBJ34= exitcodes.o stacktypes.o sysconfcmds.o
-OBJ35= utmptypes.o utmpsizes.o ascii.o mapex.o deb.o
+OBJ35= utmptypes.o utmpsizes.o ascii.o 
+
+OBJ36= mapex.o deb.o
+OBJ37= syspredefined.o
+OBJ38=
+OBJ39=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -99,9 +104,11 @@ OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
 OBJI= obj32.o obj33.o obj34.o obj35.o
+OBJJ= obj36.o obj37.o
 
 OBJ += obja.o objb.o objc.o objd.o 
-OBJ += obje.o objf.o objg.o objh.o obji.o
+OBJ += obje.o objf.o objg.o objh.o
+OBJ += obji.o objj.o
 
 
 INCDIRS=
@@ -310,6 +317,19 @@ obj35.o:		$(OBJ35)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj36.o:		$(OBJ36)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj37.o:		$(OBJ37)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj38.o:		$(OBJ38)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj39.o:		$(OBJ39)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
@@ -338,6 +358,9 @@ obji.o:			$(OBJI)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 objj.o:			$(OBJJ)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+objk.o:			$(OBJK)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
@@ -581,23 +604,28 @@ loadvals.o:		loadvals.ccm
 ischx.o:		ischx0.o ischx1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-ischx0.o:		ischx.ccm					$(INCS)
+ischx0.o:		ischx.ccm	ischx.hh			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+ischx1.o:		ischx1.cc	ischx0.o	ischx.hh	$(INCS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+udiv.o:			udiv.ccm	udiv.hh				$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
 # singles
-ischx1.o:		ischx1.cc	ischx0.o			$(INCS)
-conintx.o:		conintx.cc	conintx.hh			$(INCS)
-udiv.o:			udiv.cc		udiv.hh				$(INCS)
-stdintx.o:		stdintx.cc	stdintx.h			$(INCS)
-xxtostr.o:		xxtostr.cc	xxtostr.h			$(INCS)
+conintx.o:		conintx.cc		conintx.hh		$(INCS)
+stdintx.o:		stdintx.cc		stdintx.h		$(INCS)
+xxtostr.o:		xxtostr.cc		xxtostr.h		$(INCS)
 
 # various types
-utmptypes.o:		utmptypes.cc	utmptypes.hh			$(INCS)
-utmpsizes.o:		utmpsizes.cc	utmpsizes.hh			$(INCS)
-cmporders.o:		cmporders.cc	cmporders.h			$(INCS)
-localmisc.o:		localmisc.cc	localmisc.h			$(INCS)
-mapex.o:		mapex.cc	mapex.h				$(INCS)
-sysconfcmds.o:		sysconfcmds.cc	sysconfcmds.h			$(INCS)
-ascii.o:		ascii.cc	ascii.h				$(INCS)
+utmptypes.o:		utmptypes.cc		utmptypes.hh		$(INCS)
+utmpsizes.o:		utmpsizes.cc		utmpsizes.hh		$(INCS)
+cmporders.o:		cmporders.cc		cmporders.h		$(INCS)
+localmisc.o:		localmisc.cc		localmisc.h		$(INCS)
+mapex.o:		mapex.cc		mapex.h			$(INCS)
+sysconfcmds.o:		sysconfcmds.cc		sysconfcmds.h		$(INCS)
+ascii.o:		ascii.cc		ascii.h			$(INCS)
+syspredefined.o:	syspredefined.cc	syspredefined.h		$(INCS)
 
 
