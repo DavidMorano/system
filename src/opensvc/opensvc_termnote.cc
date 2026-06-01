@@ -96,8 +96,8 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	SUBINFO_FL	have, f, changed, final ;
-	KEYOPT		akopts ;
+	SUBINFO_FL	have, f, changed, finval ;
+	keyopt		akopts ;
 	const char	**envv ;
 	int		max ;
 } ;
@@ -308,7 +308,7 @@ int		to ;
 /* maximum terminals per user */
 	                    case 'm':
 	                        sip->have.max = TRUE ;
-	                        sip->final.max = TRUE ;
+	                        sip->finval.max = TRUE ;
 	                        if (argr <= 0) {
 	                            rs = SR_INVALID ;
 	                            break ;
@@ -364,7 +364,7 @@ int		to ;
 
 /* initialize for action */
 
-	if ((! sip->final.max) && (argval != NULL)) {
+	if ((! sip->finval.max) && (argval != NULL)) {
 	    rs = cfdeci(argval,-1,&v) ;
 	    sip->max = v ;
 	}
@@ -525,8 +525,8 @@ static int subinfo_finish(SUBINFO *sip)
 
 static int subinfo_opts(SUBINFO *sip)
 {
-	KEYOPT		*kop = &sip->akopts ;
-	KEYOPT_CUR	kcur ;
+	keyopt		*kop = &sip->akopts ;
+	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	const char	*cp ;
@@ -549,9 +549,9 @@ static int subinfo_opts(SUBINFO *sip)
 	            switch (oi) {
 
 	            case akoname_all:
-	                if (! sip->final.all) {
+	                if (! sip->finval.all) {
 	                    sip->have.all = TRUE ;
-	                    sip->final.all = TRUE ;
+	                    sip->finval.all = TRUE ;
 	                    sip->fl.all = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
@@ -561,9 +561,9 @@ static int subinfo_opts(SUBINFO *sip)
 	                break ;
 
 	            case akoname_biff:
-	                if (! sip->final.biff) {
+	                if (! sip->finval.biff) {
 	                    sip->have.biff = TRUE ;
-	                    sip->final.biff = TRUE ;
+	                    sip->finval.biff = TRUE ;
 	                    sip->fl.biff = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
@@ -573,9 +573,9 @@ static int subinfo_opts(SUBINFO *sip)
 	                break ;
 
 	            case akoname_bell:
-	                if (! sip->final.bell) {
+	                if (! sip->finval.bell) {
 	                    sip->have.bell = TRUE ;
-	                    sip->final.bell = TRUE ;
+	                    sip->finval.bell = TRUE ;
 	                    sip->fl.bell = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
@@ -585,9 +585,9 @@ static int subinfo_opts(SUBINFO *sip)
 	                break ;
 
 	            case akoname_max:
-	                if (! sip->final.bell) {
+	                if (! sip->finval.bell) {
 	                    sip->have.bell = TRUE ;
-	                    sip->final.bell = TRUE ;
+	                    sip->finval.bell = TRUE ;
 	                    sip->fl.bell = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
