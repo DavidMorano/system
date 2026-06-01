@@ -22,9 +22,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |abs(3c)| */
-#include	<cstdint>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |abs(3c)| */
+#include	<cstdint>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<stdintx.h>
@@ -43,7 +43,7 @@ namespace libu {
 	    cint va = abs(v) ;
 	    rs = va ;
 	    if (vp) *vp = v ;
-	}
+	} /* end if */
 	return rs ;
     } /* end subroutine (cfhexi) */
 } /* end namespace (libu) */
