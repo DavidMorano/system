@@ -50,11 +50,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getpid(2)| */
-#include	<new>			/* |nothrow(3c)| */
-#include	<atomic>		/* |atomic_flag(3c++)| */
-#include	<mutex>			/* |call_once(3c++)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |getpid(2)| */
+#include	<new>			/* C++STD |nothrow(3c)| */
+#include	<atomic>		/* C++STD |atomic_flag(3c++)| */
+#include	<mutex>			/* C++STD |call_once(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
