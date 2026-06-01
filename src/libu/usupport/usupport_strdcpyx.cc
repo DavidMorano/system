@@ -47,7 +47,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
