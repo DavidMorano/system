@@ -31,8 +31,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>		/* |ustat| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU |ustat| */
 
 
 #define	FILEMAP		struct filemap_head
