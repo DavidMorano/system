@@ -46,12 +46,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* |gethostid(3c)| */
-#include	<ctime>
-#include	<cerrno>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>		/* |memset(3c)| + |strlcpy(3c)| */
+#include	<unistd.h>		/* POSIX |gethostid(3c)| */
+#include	<ctime>			/* CSTD */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstring>		/* CSTD |memset(3c)| + |strlcpy(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
