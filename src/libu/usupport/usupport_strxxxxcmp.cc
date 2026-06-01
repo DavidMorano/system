@@ -44,8 +44,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstrings>		/* CSTD |strcasecmp(3c)| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
