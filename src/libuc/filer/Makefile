@@ -51,8 +51,7 @@ OBJ_FILER= $(OBJA_FILER)
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -99,7 +98,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ_FILER)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_FILER)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).a:			$(OBJ_FILER)
 	$(AR) $(ARFLAGS) -rc $@ $?
