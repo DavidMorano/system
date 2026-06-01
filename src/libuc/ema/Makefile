@@ -98,7 +98,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ_EMA)
@@ -112,6 +112,9 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat ema_parts	gcm.cache
+	rmsubpat ema_entry	gcm.cache
+	rmsubpat ema_asstr	gcm.cache
 
 control:
 	(uname -n ; date) > Control
@@ -146,19 +149,20 @@ ema_first.o:		ema_first.cc				$(INCS)
 
 # EMA_PARTS
 ema_parts.o:		ema_parts.ccm				$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 # EMA_ENTRY
 ema_entry.o:		ema_entry.ccm				$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 # EMA_ASSTR
 ema_asstr.o:		ema_asstr0.o ema_asstr1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 ema_asstr0.o:		ema_asstr.ccm				$(INCS)
-	makemodule ema_asstr
+	gxx -c -x c++ -o $@ -O $<
 
-ema_asstr1.o:		ema_asstr1.cc				$(INCS)
-	makemodule ema_asstr
+ema_asstr1.o:		ema_asstr1.cc ema_asstr0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 
