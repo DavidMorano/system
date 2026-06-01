@@ -30,14 +30,15 @@
 #if	(!defined(SYSHAS_WAITID)) || (SYSHAS_WAITID == 0)
 
 #include	<climits>		/* |PATH_MAX| + |INT_MAX| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |realpath(3c)| */
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysflag.h>
-#include	<utypedefs.h>
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |realpath(3c)| */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
 
 #include	"usys_waitid.h"
 
