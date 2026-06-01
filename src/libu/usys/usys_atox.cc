@@ -27,7 +27,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>		/* CSTD */
 #include	<climits>		/* CSTD |UINT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
