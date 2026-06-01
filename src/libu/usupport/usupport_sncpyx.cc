@@ -40,10 +40,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdarg>		/* |va_list(3c)| + |va_arg(3c)| */
-#include	<cstring>		/* |strlcpy(3c)| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| + |va_arg(3c)| */
+#include	<cstring>		/* CSTD |strlcpy(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>
