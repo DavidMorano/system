@@ -42,8 +42,8 @@
 
 #include	<sys/types.h>
 #include	<unistd.h>		/* |getdomainname(3darwin)| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<clanguage.h>
