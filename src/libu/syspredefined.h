@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* virtual-system definitions */
+/* predefined variables in the various operating systems */
 /* version %I% last-modified %G% */
 
 
@@ -11,12 +11,9 @@
 	= 1998-03-21, David A­D­ Morano
 	This module was originally written.
 
-	= 2017-08-01, David A­D­ Morano
-	Updated for lack of interfaces in MacOS Darwin
-
 */
 
-/* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SYSPREDEFINED_INCLUDE
 #define	SYSPREDEFINED_INCLUDE
