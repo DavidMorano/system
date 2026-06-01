@@ -39,18 +39,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<filer.h>
-#include	<sfx.h>
-#include	<sncpyxw.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<sncpyxw.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"filereadln.h"
 
@@ -59,10 +60,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-}
 
 
 /* external variables */
