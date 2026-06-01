@@ -64,21 +64,21 @@ struct ccfile : std::fstream {
 	ccfile() noex {
 	    rewind	(this,ccfilemem_rewind) ;
 	    close	(this,ccfilemem_close) ;
-	} ;
+	} ; /* end ctor */
 	ccfile(const ccfile &) = delete ;
 	ccfile &operator = (const ccfile &) = delete ;
-	int open(cchar *,cchar * = nullptr,mode_t = 0) noex ;
-	int open(const strview &,cchar * = nullptr,mode_t = 0) noex ;
-	int open(const std::string &,cchar * = nullptr,mode_t = 0) noex ;
-	int readln(char *,int,int = 0) noex ;
-	int readln(std::string &,int = 0) noex ;
-	int readlns(char *,int,int = -1,int * = nullptr) noex ;
-	int seek(off_t = 0z,int = -1) noex ;
-	int write(cvoid *,int) noex ;
+	int open	(cchar *,cchar * = nullptr,mode_t = 0) noex ;
+	int open	(const strview &,cchar * = nullptr,mode_t = 0) noex ;
+	int open	(const std::string &,cc * = nullptr,mode_t = 0) noex ;
+	int readln	(char *,int,int = 0) noex ;
+	int readln	(std::string &,int = 0) noex ;
+	int readlns	(char *,int,int = -1,int * = nullptr) noex ;
+	int seek	(off_t = 0z,int = -1) noex ;
+	int write	(cvoid *,int) noex ;
 	void dtor() noex ;
 	destruct ccfile() {
 	    if (fl.fopened) dtor() ;
-	} ;
+	} ; /* end destruct */
     private:
 	int irewind() noex ;
 	int iclose() noex ;
