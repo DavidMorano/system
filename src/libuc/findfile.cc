@@ -50,7 +50,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<mkpathx.h>
 #include	<ids.h>
@@ -105,13 +105,12 @@ int findfile(ids *idp,vecstr *plp,int am,char *pbuf,cc *fbuf,int flen) noex {
 	int		rs = SR_FAULT ;
 	int		pl = 0 ; /* return-value */
 	if (idp && plp && pbuf && fbuf) ylikely {
-    	    static cint		rsv = var ;
 	    pbuf[0] = '\0' ;
-	    if ((rs = rsv) >= 0) {
+    	    if (static cint rsv = var ; (rs = rsv) >= 0) {
 	        if (flen < 0) flen = lenstr(fbuf) ;
 	        while ((flen > 0) && (fbuf[flen - 1] == '/')) {
 	            flen -= 1 ;
-	        }
+	        } /* end while */
 	        if (flen != 0) {
 	            bool f_done = false ;
 	            if (strnchr(fbuf,flen,'/') != nullptr) {
@@ -188,7 +187,7 @@ static int fileperm(ids *idp,cchar *fname,int am) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	}
 	return rs ;
