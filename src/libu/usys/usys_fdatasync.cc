@@ -42,9 +42,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
