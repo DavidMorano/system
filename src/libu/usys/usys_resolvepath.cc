@@ -38,12 +38,12 @@
 
 #include	<sys/param.h>		/* standard says this is necessary */
 #include	<climits>		/* |PATH_MAX| + |INT_MAX| */
-#include	<cerrno>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |realpath(3c)| */
-#include	<cstring>		/* |strcpy(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |realpath(3c)| */
+#include	<cstring>		/* CSTD |strcpy(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
