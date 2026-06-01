@@ -106,7 +106,7 @@ int mkflags(char *fbuf,int flen,int fg) noex {
 	        case fmtflag_zerofill:
 		    ch = '0' ;
 		    break ;
-	        case fmtflag_plus:
+	        case fmtflag_pluser:
 		    ch = '+' ;
 		    break ;
 	        case fmtflag_left:
