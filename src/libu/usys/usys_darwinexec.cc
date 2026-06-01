@@ -79,7 +79,7 @@
 
 #include	<sys/types.h>		/* system types */
 #include	<unistd.h>		/* |getpid(2)| */
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getenv(3c)| + |getprogname(3c)| */
 #include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
