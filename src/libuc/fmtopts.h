@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum fmtopts {
@@ -35,7 +35,9 @@ enum fmtopts {
 struct fmtoptms {
 	static cint	clean ;
 	static cint	nooverr ;
-} ;
+} ; /* end struct (fmtoptms) */
+
+extern const fmtoptms	fmtoptm ;
 
 #endif /* __cplusplus */
 
