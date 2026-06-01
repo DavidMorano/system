@@ -42,7 +42,7 @@
 
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getprogname(3c)| |getexecname(3c) */
 #include	<cstring>		/* |strncpy(3c)| */
 #include	<new>			/* |nothrow(3c)| */
