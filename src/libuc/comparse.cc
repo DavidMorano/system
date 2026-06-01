@@ -122,15 +122,14 @@ int comparse_start(comparse *op,cchar *sp,int µsl) noex {
 	int		vl = 0 ;
 	if (op && sp) ylikely {
 	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
-	        static cint	rsv = var ;
 	        memclear(hop) ;
-	        if ((rs = rsv) >= 0) ylikely {
+	        if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		    op->mailaddrlen = var.mailaddrlen ;
 		    op->mailcommlen = var.mailcommlen ;
 	            while ((sl > 0) && chiswh(*sp)) {
 	                sp += 1 ;
 	                sl -= 1 ;
-	            }
+	            } /* end while */
 	            if ((rs = comparse_bake(op,sp,sl)) >= 0) {
 	                vl = rs ;
 	                op->magval = COMPARSE_MAGIC ;
