@@ -49,16 +49,14 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* |getdomainname(3c)| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<utypealiases.h>
-#include	<utypedefs.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usysflag.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
 
 #include	"usys_ugetnisdom.h"
 
