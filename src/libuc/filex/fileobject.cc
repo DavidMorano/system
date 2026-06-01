@@ -38,16 +38,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| | |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| | |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fileobject.h"
 
@@ -59,12 +60,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_read(int,void *,int) noex ;
-}
 
 
 /* external variables */
