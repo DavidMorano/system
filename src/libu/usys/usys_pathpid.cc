@@ -41,11 +41,11 @@
 #include	<envstandards.h>	/* ordered first to configure */
 
 #include	<unistd.h>		/* |getpid(2)| */
-#include	<cerrno>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getenv(3c)| + |getprogname(3c)| */
-#include	<cstring>		/* |strchr(3c)| */
+#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
