@@ -1,4 +1,5 @@
 /* opensvc_logwelcome SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* ADMIN-user open-service (logwelcome) */
@@ -14,9 +15,10 @@
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-	This code was started by taking the corresponding code from the
-	TCP-family module.  In retrospect, that was a mistake.  Rather I should
-	have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module.  In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -52,38 +54,35 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
 	<0		error
 
-
-	Notes: We generally prefer using 'sntmtime(3dam)' over the POSIX®
-	'strftime(3c)' since it is somewhat cleaner and easier to use.
-
+	Notes: We generally prefer using |sntmtime(3dam)| over the
+	POSIX® |strftime(3c)| since it is somewhat cleaner and
+	easier to use.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>			/* for |strftime(3c)| */
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>		/* for 'strftime(3c)' */
-
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
 #include	<sbuf.h>
-#include	<tmctimeh>
+#include	<tmtime.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"opensvc_logwelcome.h"
 #include	"defs.h"
@@ -109,10 +108,6 @@
 
 #ifndef	ORGLOCLEN
 #define	ORGLOCLEN	32
-#endif
-
-#ifndef	COLUMNS
-#define	COLUMNS		80
 #endif
 
 #define	DEFORGUSER	"admin"
