@@ -49,7 +49,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bfile.h>
 #include	<rmx.h>
 #include	<localmisc.h>
@@ -93,7 +93,7 @@ int mailmsg_loadfile(mailmsg *op,bfile *fp) noex {
 	int		rs1 ;
 	int		tlen = 0 ; /* return-value */
 	if ((rs = mailmsg_magic(op,fp)) >= 0) {
-	    if ((rs = getbufsize(bufsize_ml)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_ml)) >= 0) {
 		cint	llen = (rs * MAILMSG_MF) ;
 		if (char *lbuf ; (rs = libmem.mall((llen + 1),&lbuf)) >= 0) {
 	    	    int		ln = 0 ;
@@ -108,7 +108,7 @@ int mailmsg_loadfile(mailmsg *op,bfile *fp) noex {
 	    	    rs1 = libmem.free(lbuf) ;
 	    	    if (rs >= 0) rs = rs1 ;
 		} /* end if (memory-allocation) */
-	    } /* end if (getbufsize) */
+	    } /* end if (bufsizeget) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
