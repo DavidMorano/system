@@ -43,7 +43,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bufsizevar.hh>
 #include	<vecobj.h>
 #include	<vecstr.h>
@@ -853,9 +853,9 @@ local int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
     	return rs ;
 }
 /* end method (vars::operator) */
