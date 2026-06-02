@@ -261,7 +261,6 @@
 #include	<ucgetpid.h>
 #include	<ucgetrandom.h>
 #include	<ucgetx.h>
-#include	<ucids.h>
 #include	<ucinetconv.h>
 #include	<uckvamatch.h>
 #include	<uclibmem.h>
