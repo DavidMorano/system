@@ -49,8 +49,8 @@
 	sl		test c-string length
 
 	Returns:
-	true		true (empty)
-	false		false (not empty)
+	true		empty yes
+	false		empty no
 
 	Notes:
 	1. I allow multiple initializations due to multi-thread
@@ -62,19 +62,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bitset>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<aflag.hh>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |isprintbad(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bitset>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<aflag.hh>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<ischarx.h>		/* LIBUC |isprintbad(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hasprint.h"
 
@@ -160,7 +160,6 @@ void printinfo::mkiscmd2() noex {
 /* forward references */
 
 local bool isprintcmd(int) noex ;
-
 local bool hasx(isx_f,cchar *,int) noex ;
 
 
@@ -196,11 +195,11 @@ local bool isprintcmd(int ch) noex {
 } /* end subroutine (isprintcmd) */
 
 local bool hasx(isx_f isx,cchar *sp,int sl) noex {
-	bool		f = false ;
+	bool f = false ;
 	if (sp) ylikely {
 	    for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
 	        if ((f = isx(ch))) break ;
-	    } /* end while */
+	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
 } /* end subroutine (hasx) */
