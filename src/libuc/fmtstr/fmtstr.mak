@@ -41,6 +41,12 @@ MODS += fmtsub.ccm fmtobj.ccm
 LIBS +=
 
 
+DEPS_MAIN	+= $(MODS) mods.o
+DEPS_OBJ	+= fmtsub.o fmtspec.o fmtstrdata.o fmtutil.o fmtflag.o
+DEPS_SUB	+= fmtstrdata.o fmtspec.o fmtutil.o cvtfloat.o
+DEPS_SPEC	+=
+DEPS_UTIL	+=
+
 MOBJ += fmtutil.o fmtstrdata.o fmtspec.o 
 MOBJ += fmtsub.o fmtobj.o
 
@@ -147,13 +153,6 @@ objb.o:			$(OBJB)
 
 obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
-
-
-DEPS_MAIN	+= $(MODS) mods.o
-DEPS_OBJ	+= $(MODS)
-DEPS_SUB	+= fmtstrdata.o fmtspec.o fmtutil.o cvtfloat.o
-DEPS_SPEC	+=
-DEPS_UTIL	+=
 
 
 fmtopts.o:		fmtopts.cc fmtopts.h			$(INCS)
