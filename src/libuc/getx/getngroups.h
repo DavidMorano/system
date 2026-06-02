@@ -20,14 +20,26 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* CSTD */
 
 
-extern "C" {
-    extern int getngroups()	noex ;
-    extern int getngroupsx(int) noex ;
-}
+enum grouptypes {
+    	grouptype_sys,
+    	grouptype_cache,
+    	grouptype_overlast
+} ; /* end enum */
+
+EXTERNC_begin
+    extern int getngroups()		noex ;
+    extern int getngroupsx(grouptypes)	noex ;
+EXTERNC_end
+
+#ifdef	__cplusplus
+inline int getngroups(grouptypes w) noex {
+    	return getngroupsx(w) ;
+} /* end subroutine */
+#endif /* __cplusplus */
 
 
 #endif /* GETNGROUPS_INCLUDE */
