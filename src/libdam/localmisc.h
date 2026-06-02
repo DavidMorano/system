@@ -215,19 +215,9 @@ typedef const unsigned long	culong ;
 typedef time_t			ustime ;
 #endif
 
-#ifndef	TYPEDEF_UNIXTIME
-#define	TYPEDEF_UNIXTIME
-typedef time_t			unixtime ;
-#endif
-
 #ifndef	TYPEDEF_CUSTIME
 #define	TYPEDEF_CUSTIME
 typedef const time_t		custime ;
-#endif
-
-#ifndef	TYPEDEF_CUNIXTIME
-#define	TYPEDEF_CUNIXTIME
-typedef const time_t		cunixtime ;
 #endif
 
 #ifndef	TYPEDEF_CC
