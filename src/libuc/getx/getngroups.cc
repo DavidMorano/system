@@ -38,7 +38,7 @@
 
 	Synopsis:
 	int getngroups() noex
-	int getngroupsx(int cmd) noex
+	int getngroupsx(grouptypes cmd) noex
 
 	Arguments:
 	cmd		command for |getngroupsx| (0=get, 1=invalidate)
@@ -51,15 +51,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<atomic>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<atomic>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getngroups.h"
 
@@ -78,10 +79,6 @@ using std::memory_order_relaxed ;
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_sysconfval(int,long *) noex ;
-}
-
 
 /* external variables */
 
@@ -89,11 +86,11 @@ extern "C" {
 /* local structures */
 
 namespace {
-    struct groupinfo {
+    struct groupmgr {
 	atomic_int	ng ;
 	operator int () noex ;
-	int operator () (int) noex ;
-    } ; /* end struct (groupinfo) */
+	int operator () (grouptypes) noex ;
+    } ; /* end struct (groupmgr) */
 } /* end namespace */
 
 
@@ -102,7 +99,7 @@ namespace {
 
 /* local variables */
 
-static groupinfo	getngroups_data ;
+static groupmgr		getngroups_data ;
 
 
 /* exported variables */
@@ -115,7 +112,7 @@ int getngroups() noex {
 }
 /* end subroutine (getngroups) */
 
-int getngroupsx(int x) noex {
+int getngroupsx(grouptypes x) noex {
 	return getngroups_data(x) ;
 }
 /* end subroutine (getngroups) */
@@ -123,7 +120,7 @@ int getngroupsx(int x) noex {
 
 /* local subroutines */
 
-groupinfo::operator int () noex {
+groupmgr::operator int () noex {
 	int		rs ;
 	if ((rs = ng) == 0) {
 	    cint	cmd = _SC_NGROUPS_MAX ;
@@ -132,19 +129,22 @@ groupinfo::operator int () noex {
 	    }
 	} /* end if (needed value) */
 	return rs ;
-} /* end method (groupinfo::operator) */
+} /* end method (groupmgr::operator) */
 
-int groupinfo::operator () (int x) noex {
-	int		rs = SR_INVALID ;
+int groupmgr::operator () (grouptypes x) noex {
+	int		rs{} ;
 	switch (x) {
-	case 0:
+	case grouptype_sys:
 	    rs = (*this) ;
 	    break ;
-	case 1:
+	case grouptype_cache:
 	    rs = ng.exchange(0,memord_relaxed) ;
+	    break ;
+	default:
+	    rs = SR_INVALID ;
 	    break ;
 	} /* end switch */
 	return rs ;
-} /* end method (groupinfo::operator) */
+} /* end method (groupmgr::operator) */
 
 
