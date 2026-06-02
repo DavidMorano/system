@@ -67,7 +67,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getnodename.h>
 #include	<vecstr.h>
 #include	<nodedb.h>
@@ -139,8 +139,7 @@ int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 	if (nn) ylikely {
 	    rs = SR_INVALID ;
 	    if (pr[0] && nn[0]) ylikely {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		    rs = getx(pr,cbuf,sbuf,klp,nn) ;
 		    len = rs ;
 		} /* end if (vars) */
@@ -218,9 +217,9 @@ local int vecload(vecstr *klp,ent *ep) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_nn)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) ylikely {
 	    nodenamelen = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 		maxpathlen = rs ;
 		entlen = (ENTLENMULT * nodenamelen) ;
 		sz += (nodenamelen + 1) ;
