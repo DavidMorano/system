@@ -42,27 +42,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<bufsizevar.hh>
 #include	<sysval.hh>
-#include	<stdfnames.h>
+#include	<stdfnames.h>		/* LIBU */
 #include	<snx.h>
 #include	<cfdec.h>
 #include	<conallof.h>
-#include	<intsat.h>
-#include	<intceil.h>
-#include	<mkchar.h>
+#include	<intsat.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
 #include	<ischarx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -102,8 +101,7 @@ int bfile::opene(cchar *fn,cchar *aos,mode_t aom,int to) noex {
 
 int bfile::open(cchar *fn,cchar *aos,mode_t aom) noex {
 	return bopene(this,fn,aos,aom,-1) ;
-}
-/* end subroutine (bopen) */
+} /* end subroutine (bfile::open) */
 
 int bfile::openmod(cchar *fname,cchar *aof,mode_t aom) noex {
 	return bopenmod(this,fname,aof,aom) ;
@@ -122,7 +120,7 @@ int bfile::control(int cmd,...) noex {
 	    va_end(ap) ;
 	}
     	return rs ;
-}
+} /* end subroutine (bfile::control) */
 
 int bfile::stat(USTAT *sbp) noex {
 	return bstat(this,sbp) ;
@@ -262,7 +260,6 @@ bfile_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (bfile_co::operator) */
+} /* end method (bfile_co::operator) */
 
 
