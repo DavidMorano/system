@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJ00= systypenames.o
-OBJ01= getdefzdata.o getbufsize.o
+OBJ01=
 OBJ02= getaddr.o getaf.o getarch.o 
 OBJ03= gethz.o getlogx.o getmailgid.o getmjd.o
 OBJ04= getnfile.o getngroups.o getnodedomain.o
@@ -192,7 +192,6 @@ objd.o:			$(OBJD)
 
 
 systypenames.o:		systypenames.cc		systypenames.h		$(INCS)
-getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
 
 getaddr.o:		getaddr.cc		getaddr.h		$(INCS)
 getaf.o:		getaf.cc		getaf.h			$(INCS)
