@@ -40,7 +40,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<mailbox.h>
 #include	<rmx.h>
 #include	<localmisc.h>
@@ -87,10 +87,10 @@ int mailmsg_loadmb(mailmsg *op,mailbox *mbp,off_t fbo) noex {
 	int		rs ;
 	int		tlen = 0 ; /* return-value */
 	if ((rs = mailmsg_magic(op)) >= 0) {
-	    if ((rs = getbufsize(bufsize_ml)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_ml)) >= 0) {
 		rs = mailmsg_read(op,mbp,fbo,rs) ;
 		tlen = rs ;
- 	    } /* end if (getbufsize) */
+ 	    } /* end if (bufsizeget) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
