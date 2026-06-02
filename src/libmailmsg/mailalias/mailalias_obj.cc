@@ -65,7 +65,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
 #include	<endian.h>
@@ -701,7 +701,7 @@ local int mailalias_opener(MA *op) noex {
 		rs1 = libmem.free(a) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return (rs >= 0) ? f_create : rs ;
 }
 /* end subroutine (mailalias_opener) */
@@ -1341,7 +1341,7 @@ local int mailalias_mapcheck(MA *op,time_t dt) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mailaddr)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mailaddr)) >= 0) ylikely {
 	    mailaddrlen = rs ;
 	    mailaliaslen = mailvalue.mailaliaslen ;
 	}
