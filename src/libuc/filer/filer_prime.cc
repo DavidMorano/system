@@ -126,14 +126,6 @@ local int filer_dtor(filer *op) noex {
 local int	filer_adjbuf(filer *,int) noex ;
 local int	filer_bufcpy(filer *,cchar *,int) noex ;
 
-local int	memover(char *dp,cchar *sp,int sl) noex {
-    	if (sl < 0) sl = lenstr(sp) ;
-    	if (csize msize = size_t(sl) ; msize > 0) {
-	    memcpy(dp,sp,msize) ;
-	}
-	return sl ;
-} /* end subroutine (memover) */
-
 [[maybe_unused]] local int	debflags	(int) noex ;
 [[maybe_unused]] local int	debdesc		(int) noex ;
 [[maybe_unused]] local int	debsize		(int) noex ;
@@ -230,100 +222,6 @@ int filer_finish(filer *op) noex {
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (filer_finish) */
-
-namespace {
-    struct reader {
-	static constexpr int	fmo = FM_TIMED ;
-	filer	*op ;
-	char	*rbuf ;
-	int	rlen ;
-	int	to ;
-	int	feof ;
-	bool	fto ;
-	reader(filer *o,void *b,int l,int t) noex : op(o), rlen(l), to(t) { 
-	    rbuf = charp(b) ;
-	    feof = false ;
-	    fto = false ;
-	} ; /* end ctor */
-	operator int () noex ;
-    private:
-	int bufcopy(int) noex ;
-	int bufread(int) noex ;
-    } ; /* end struct (reader) */
-} /* end namespace */
-
-int filer_read(filer *op,void *vbuf,int rlen,int to) noex {
-	int		rs ;
-	DPRINTF("ent rlen=%d\n",rlen) ;
-	if ((rs = filer_magic(op,vbuf)) >= 0) ylikely {
-	    if (reader ro(op,vbuf,rlen,to) ; (rs = ro) > 0) {
-		op->off += rs ;
-	    }
-	} /* end if (magic) */
-	DPRINTF("ret rs=%d\n",rs) ;
-	return rs ;
-} /* end subroutine (filer_read) */
-
-reader::operator int () noex {
-    	int		rs = SR_OK ;
-	int		tlen = 0 ; /* return-value */
-	while ((rs >= 0) && (! fto) && (! feof) && (tlen < rlen)) {
-	    if ((rs = bufcopy(tlen)) >= 0) {
-		tlen += rs ;
-		rs = bufread(tlen) ;
-	    }
-	} /* end while */
-	return (rs >= 0) ? tlen : rs ;
-} /* end method (reader::operator) */
-
-int reader::bufcopy(int tlen) noex {
-    	int		rs = SR_OK ;
-	int		len = 0 ; /* return-value */
-    	if (cint nlen = (rlen - tlen) ; nlen > 0) {
-	    if (op->len > 0) {
-	        cint mlen = min(nlen,op->len) ;
-	        if ((rs = memover((rbuf + tlen),op->bp,mlen)) > 0) {
-		    op->bp += rs ;
-		    op->len -= rs ;
-		    len += rs ;
-		} /* end if (memcopy) */
-	    } /* end if (have some data) */
-	} /* end if (need data) */
-	return (rs >= 0) ? len : rs ;
-} /* end method (reader::bufcopy) */
-
-int reader::bufread(int tlen) noex {
-    	cint		nlen = (rlen - tlen) ;
-    	int		rs = SR_OK ;
-	int		len = 0 ; /* return-value */
-	if ((nlen > 0) && (op->len == 0)) {
-	    cint	fd = op->fd ;
-	    cint	dlen = op->dlen ;
-	    int		rc = (op->fl.net) ? netrc : 1 ;
-	    char	*dbuf = op->dbuf ;
-	    for ( ; (op->len == 0) && (rc > 0) ; rc -= 1) {
-                op->bp = op->dbuf ;
-                if (to >= 0) {
-                    rs = uc_reade(fd,dbuf,dlen,to,fmo) ;
-                    len = rs ;
-                } else {
-                    rs = uc_read(fd,dbuf,dlen) ;
-                    len = rs ;
-                }
-                if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
-                    fto = true ;
-                    rs = SR_OK ;
-                    break ;
-                }
-                if (rs < 0) break ;
-                op->len = rs ;
-	    } /* end for (refill) */
-	    if ((rs >= 0) && (len == 0) && (rc == 0)) {
-	        feof = true ;
-	    } /* end if (EOF calculation) */
-	} /* end if (need refilling) */
-	return (rs >= 0) ? len : rs ;
-} /* end method (reader:bufread) */
 
 int filer_readp(filer *op,void *rbuf,int rlen,off_t off,int to) noex {
 	int		rs ;
