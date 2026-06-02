@@ -44,7 +44,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
@@ -395,7 +395,7 @@ local int mkterms() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 	    typelen = rs ;	/* "TYPELEN" is set to MAXNAMELEN */
 	    rs = mkterms() ;
 	}
