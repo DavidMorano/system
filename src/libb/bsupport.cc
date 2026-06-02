@@ -28,7 +28,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
