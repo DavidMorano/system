@@ -147,6 +147,7 @@ import ureserve ;			/* |is{x}(3u)| */
 
 using libu::sncpy ;			/* subroutine-template */
 using libu::snprintf ;			/* subroutine */
+using libu::snvprintf ;			/* subroutine */
 using libu::strwcpy ;			/* subroutine */
 using libu::umem ;			/* variable */
 
@@ -315,6 +316,7 @@ int debugprintf(cchar *fmt,...) noex {
 }
 /* end subroutine (debugprintf) */
 
+/* special for |DEBUGPRINTF(3debug)| */
 int debugprintx(cchar *fun,cchar *fmt,...) noex {
 	va_list		ap ;
     	cnothrow	nt{} ;
@@ -342,7 +344,6 @@ int debugprintx(cchar *fun,cchar *fmt,...) noex {
 
 int debugvprintf(cchar *fmt,va_list ap) noex {
     	cnothrow	nt{} ;
-	cint		fm = (fmtmask.clean | fmtmask.nooverr) ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
 	if (fmt) {
@@ -351,7 +352,7 @@ int debugvprintf(cchar *fmt,va_list ap) noex {
 	    if (ef.fd > 0) {
 		rs = SR_NOMEM ;
 		if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
-	            if ((rs = fmtstr(lbuf,llen,fm,fmt,ap)) >= 0) {
+	            if ((rs = snvprintf(lbuf,llen,fmt,ap)) >= 0) {
 			DPRINTF("fmtstr() rs=%d\n",rs) ;
 	        	rs = debugprinter(lbuf,rs) ;
 	                wlen += rs ;
