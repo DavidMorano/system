@@ -47,8 +47,8 @@
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getpwd.h>
 #include	<snx.h>
 #include	<mkpath.h>
