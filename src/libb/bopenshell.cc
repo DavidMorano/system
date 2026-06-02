@@ -40,14 +40,14 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -142,7 +142,7 @@ int bopenshell(bfile **fpa,cchar *cmd) noex {
 
 	for (i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
 
-	    if ((fpa[i] != NULL) && (fpa[i]->magic == BFILE_MAGIC))
+	    if ((fpa[i] != NULL) && (fpa[i]->magval == BFILE_MAGIC))
 	        rs = SR_OPEN ;
 
 	} /* end for */
