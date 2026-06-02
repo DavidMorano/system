@@ -27,9 +27,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<linefold.h>
@@ -70,8 +70,8 @@ using std::max ;			/* subroutine-template */
 
 /* forward references */
 
-static int	bprintfold(bfile *,int,cchar *,int) noex ;
-static int	bprintcleanliner(bfile *,int,cchar *,int) noex ;
+local int	bprintfold(bfile *,int,cchar *,int) noex ;
+local int	bprintcleanliner(bfile *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -107,7 +107,7 @@ int bprintcleanlns(bfile *op,int linelen,cchar *lp,int ll) noex {
 
 /* local subroutines */
 
-static int bprintfold(bfile *op,int linelen,cchar *lp,int ll) noex {
+local int bprintfold(bfile *op,int linelen,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -123,10 +123,9 @@ static int bprintfold(bfile *op,int linelen,cchar *lp,int ll) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (linefold) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bprintfold) */
+} /* end subroutine (bprintfold) */
 
-static int bprintcleanliner(bfile *op,int linelen,cchar *lp,int ll) noex {
+local int bprintcleanliner(bfile *op,int linelen,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		rl = rmeol(lp,ll) ;
 	int		wlen = 0 ;
@@ -138,7 +137,6 @@ static int bprintcleanliner(bfile *op,int linelen,cchar *lp,int ll) noex {
 	    rl -= ml ;
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bprintcleanliner) */
+} /* end subroutine (bprintcleanliner) */
 
 
