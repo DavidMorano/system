@@ -26,15 +26,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* placement-new + |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<mkx.h>			/* |mklineclean(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC |mklineclean(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"lineclean.h"
 
@@ -49,8 +49,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -68,7 +66,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int lineclean_ctor(lineclean *op,Args ... args) noex {
+local int lineclean_ctor(lineclean *op,Args ... args) noex {
     	LINECLEAN	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
@@ -77,7 +75,7 @@ static int lineclean_ctor(lineclean *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (lineclean_ctor) */
 
-static int lineclean_dtor(lineclean *op) noex {
+local int lineclean_dtor(lineclean *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -86,7 +84,7 @@ static int lineclean_dtor(lineclean *op) noex {
 } /* end subroutine (lineclean_dtor) */
 
 template<typename ... Args>
-static inline int lineclean_magic(lineclean *op,Args ... args) noex {
+local inline int lineclean_magic(lineclean *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == LINECLEAN_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -121,14 +119,14 @@ int lineclean_start(LC *op,cchar *sp,int sl,int m,cchar **rpp) noex {
 			op->cbuf = nullptr ;
 			op->clen = 0 ;
 		    } /* end if (error) */
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } else {
 		*rpp = op->cbuf ;
 		op->magic = LINECLEAN_MAGIC ;
 	    } /* end if (zero-length) */
 	    if (rs < 0) {
 		lineclean_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (lineclean_ctor) */
 	return rs ;
 } /* end subroutine (lineclean_start) */
@@ -142,7 +140,7 @@ int lineclean_finish(LC *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->cbuf = nullptr ;
 		op->clen = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = lineclean_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -150,8 +148,7 @@ int lineclean_finish(LC *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lineclean_finish) */
+} /* end subroutine (lineclean_finish) */
 
 
 /* private subroutines */
