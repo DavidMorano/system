@@ -49,7 +49,7 @@
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
@@ -317,8 +317,11 @@ int sub_bopen::getfile() noex {
 
 int sub_bopen::openfd(int idx) noex {
 	int		rs ;
+	int		fd = -1 ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = uc_dupmince(idx,BFILE_MINFD)) >= 0) {
 	    op->fd = rs ;
+	    fd = rs ;
 	    if ((rs = openadj()) >= 0) {
 		rs = openoffset() ;
 	    } /* end if (openadj) */
@@ -326,22 +329,28 @@ int sub_bopen::openfd(int idx) noex {
 		iclose() ;
 	    } /* end if (error) */
 	} /* end if (uc_dupmince) */
-	return rs ;
+	DEBUGPRINTF("ret rs=%d fd=%d\n",rs,fd) ;
+	return (rs >= 0) ? fd : rs ;
 } /* end method (sub_bopen::openfd) */
 
 int sub_bopen::openreg() noex {
-	cint		fok = true ;
 	cint		of = op->of ;
 	int		rs ;
+	int		fd = -1 ; /* return-value */
 	cmode		om = op->om ;
+	DEBUGPRINTF("ent fn=%s to=%d\n",fn,to) ;
 	if ((rs = uc_opene(fn,of,om,to)) >= 0) {
+	    DEBUGPRINTF("uc_opene() rs=%d\n",rs) ;
 	    op->fd = rs ;
+	    fd = rs ;
 	    rs = bfile_opts(op) ;
+	    DEBUGPRINTF("bfile_opts() rs=%d\n",rs) ;
 	    if (rs < 0) {
 		iclose() ;
 	    } /* end if (error) */
 	} /* end if (uc_opene) */
-	return (rs >= 0) ? fok : rs ;
+	DEBUGPRINTF("ret rs=%d fd=%d\n",rs,fd) ;
+	return (rs >= 0) ? fd : rs ;
 } /* end method (sub_bopen::openreg) */
 
 int sub_bopen::openadj() noex {
@@ -369,9 +378,11 @@ int sub_bopen::openadj() noex {
 
 int sub_bopen::openoffset() noex {
 	int		rs ;
+	DEBUGPRINTF("ent\n") ;
 	if (off_t fo{} ; (rs = uc_tell(op->fd,&fo)) >= 0) {
 	    op->offset = size_t(fo) ;
 	}
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (sub_bopen::openoffset) */
 
