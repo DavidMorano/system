@@ -36,14 +36,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
-#include	<stdfiles.h>
-#include	<stdfnames.h>		/* |stdfname(3u)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<stdfiles.h>		/* LIBU */
+#include	<stdfnames.h>		/* LIBU |stdfname(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strstdfname.h"
 
