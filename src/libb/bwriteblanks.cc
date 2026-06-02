@@ -40,9 +40,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<strw.h>		/* |strwset(3uc)| */
@@ -77,13 +77,12 @@ using std::max ;			/* subroutine-template */
 
 /* forward references */
 
-static int	bwritebuf(bfile *,cchar *,int) noex ;
+local int	bwritebuf(bfile *,cchar *,int) noex ;
 
 
 /* local variables */
 
 constexpr char		blanks[] = "        " ;
-
 constexpr int		nblanks = cstrlen(blanks) ;
 
 
@@ -130,7 +129,7 @@ int bwritechrs(bfile *op,int ch,int n) noex {
 
 /* local subroutines */
 
-static int bwritebuf(bfile *op,cchar *wbuf,int n) noex {
+local int bwritebuf(bfile *op,cchar *wbuf,int n) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		blen = n ;
@@ -141,7 +140,6 @@ static int bwritebuf(bfile *op,cchar *wbuf,int n) noex {
 	    blen -= rs ;
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bwritebuf) */
+} /* end subroutine (bwritebuf) */
 
 
