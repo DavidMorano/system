@@ -52,7 +52,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sysval.hh>
 #include	<opentmp.h>
 #include	<hdb.h>
@@ -795,10 +795,10 @@ local int mi_newlines(MMF_MI *mip,int n) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_ml)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_ml)) >= 0) ylikely {
 	    var.linebuflen = rs ;
 	    var.outbuflen = (rs * 2) ;
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return rs ;
 }
 /* end method (vars::operator) */
