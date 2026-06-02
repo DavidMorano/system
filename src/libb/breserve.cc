@@ -28,8 +28,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>
@@ -55,7 +55,7 @@ int breserve(bfile *op,int n) noex {
 	    if (n >= 0) {
 		rs = SR_OK ;
 	        if (op->fl.writing) {
-	            cint blenr = intconv(op->bdata + op->bsize - op->bp) ;
+	            cint blenr = intconv(op->bdata + op->bsz - op->bp) ;
 	            if (n > blenr) {
 			rs = bfile_flushn(op,-1) ;
 		    }
