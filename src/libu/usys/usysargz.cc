@@ -34,7 +34,7 @@
 
 	Notes:
 	1. This subroutine helps (is itself a header object) to
-	facilitate retrieving or otherwise attempting to calculate
+	facilitate retrieving, or otherwise attempting to calculate,
 	the full path-name of the executable file of the current
 	process.
 	2. This object is both Thread-Safe and Fork-Safe.  The issue
@@ -42,10 +42,10 @@
 	two threds call the same interface on the same instantiated
 	object) to this object in a race situation.  We maintain
 	some thread-safety by storing the lock in the instantiated
-	object itself.  Further different threads calling simultaneously
-	on differet object instantiations will not interfere since
-	the whole object is really pure with respect to reentrancy
-	and thread-safety.
+	object itself.  Further, different threads calling
+	simultaneously on differet object instantiations will not
+	interfere since the whole object is really pure with respect
+	to reentrancy and thread-safety.
 
 *******************************************************************************/
 
@@ -55,13 +55,13 @@
 #include	<new>			/* C++STD |nothrow(3c)| */
 #include	<atomic>		/* C++STD |atomic_flag(3c++)| */
 #include	<mutex>			/* C++STD |call_once(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>		/* |libu::sncpy(3u)| */
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |libu::sncpy(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys_pathpid.h"	/* |usys:usys_namepid(3usys)| */
 #include	"usysargz.hh"
@@ -93,7 +93,7 @@ namespace usys {
 	if ((rss >= 0) && (name == nullptr)) {
 	    rss = SR_NOMEM ;
 	    if (char *tbuf ; (tbuf = new(nt) char[tlen + 1]) != np) {
-		const pid_t	    pid = getpid() ;
+		const pid_t	pid = getpid() ;
 		if ((rss = usys_namepid(tbuf,tlen,pid)) >= 0) {
 		    nlen = rss ;
 		    rss = SR_NOMEM ;
@@ -119,7 +119,7 @@ namespace usys {
 	    delete [] name ;
 	    name = nullptr ;
 	    nlen = 0 ;
-	}
+	} /* end if (memory-release) */
     } ; /* end struct (usysargz::dtor) */
 } /* end namespace (usys) */
 
