@@ -37,7 +37,7 @@ INCS += libb.h bfile.h
 
 MODS +=
 
-LIBS += -luc
+LIBS += -ldebug -luo -lu
 
 
 OBJ00= bsupport.o bopen.o bcontrol.o
@@ -48,7 +48,7 @@ OBJ03= bisterm.o bobj.o
 OBJ04= bwrite.o 
 OBJ05= bwriteblock.o bwriteblanks.o bwritefile.o
 OBJ06= btruncate.o
-OBJ07=
+OBJ07= bcopyfile.o
 
 OBJ08= bprintf.o bputc.o
 OBJ09= bprintln.o bprintlns.o 
@@ -57,21 +57,19 @@ OBJ11=
 
 OBJ12= bread.o breadln.o breadlns.o bgetc.o 
 OBJ13= bwasteln.o
-OBJ14= 
+OBJ14= linex.o
 OBJ15=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
-OBJB= obj04.o obj05.o obj06.o
+OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o
-OBJD= obj12.o obj13.o
+OBJD= obj12.o obj13.o obj14.o
 
 OBJ= obja.o objb.o objc.o objd.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -117,8 +115,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).so:		$(OBJ) Makefile
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+$(T).so:		$(OBJ)
+	$(LD) -shared -o $@ $(LDFLAGS) $^ $(LIBINFO)
 
 $(T).o:			$(OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
@@ -222,6 +220,7 @@ breadlns.o:		breadlns.cc		$(INCS)
 bseek.o:		bseek.cc		$(INCS)
 btell.o:		btell.cc		$(INCS)
 btruncate.o:		btruncate.cc		$(INCS)
+bcopyfile.o:		bcopyfile.cc		$(INCS)
 bwasteline.o:		bwasteline.cc		$(INCS)
 bwrite.o:		bwrite.cc		$(INCS)
 bwriteblock.o:		bwriteblock.cc		$(INCS)
@@ -238,5 +237,10 @@ bminmod.o:		bminmod.cc		$(INCS)
 
 bsupport.o:		bsupport.cc		$(INCS)
 bobj.o:			bobj.cc			$(INCS)
+
+# LINEX
+linex.o:		linex.dir
+linex.dir:
+	makesubdir $@
 
 
