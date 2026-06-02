@@ -29,11 +29,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
-#include	<xxtostr.h>
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<xxtostr.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
 
 #include	"usupport_sncpyx.hh"
 #include	"usupport_ctdec.hh"
