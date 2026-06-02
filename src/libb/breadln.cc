@@ -38,9 +38,9 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memccpy(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memccpy(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -75,15 +75,15 @@
 
 /* forward references */
 
-static int	breadlnmap(bfile *,char *,int) noex ;
-static int	breadlnreg(bfile *,char *,int,int) noex ;
-static int	breload(bfile *,int,int) noex ;
+local int	breadlnmap(bfile *,char *,int) noex ;
+local int	breadlnreg(bfile *,char *,int,int) noex ;
+local int	breload(bfile *,int,int) noex ;
 
-static inline int	isoureol(int) noex ;
+local inline int	isoureol(int) noex ;
 
-static inline char *stpccpy(char *dp,cchar *sp,int ch,int n) noex {
+local inline char *stpccpy(char *dp,cchar *sp,int ch,int n) noex {
 	return charp(memccpy(dp,sp,ch,n)) ;
-}
+} /* end subroutine */
 
 
 /* local variables */
@@ -117,14 +117,14 @@ int breadlnto(bfile *op,char *ubuf,int ulen,int to) noex {
 
 /* local subroutines */
 
-static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
-	USTAT		sb ;
+local int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
+	ustat		sb ;
 	cnullptr	np{} ;
 	size_t		baseoff, runoff ;
 	int		rs = SR_OK ;
 	int		mlen ;
 	int		i ;
-	int		pagemask = (op->pagesize - 1) ;
+	int		pagemask = (op->pagesz - 1) ;
 	int		tlen = 0 ;
 	int		f_partial = false ;
 	char		*dbp = ubuf ;
@@ -137,9 +137,9 @@ static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
 	    mlen = intconv(op->fsize - runoff) ;
 
 	    if ((mlen > 0) &&
-	        ((op->bp == nullptr) || (op->len == op->pagesize))) {
+	        ((op->bp == nullptr) || (op->len == op->pagesz))) {
 
-	        i = (runoff / op->pagesize) & (BFILE_NMAPS - 1) ;
+	        i = (runoff / op->pagesz) & (BFILE_NMAPS - 1) ;
 	        baseoff = runoff & (~ pagemask) ;
 	        if ((! op->maps[i].fl.valid) || (op->maps[i].bdata == np)
 	            || (op->maps[i].offset != baseoff)) {
@@ -154,8 +154,8 @@ static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
 
 /* prepare to move data */
 
-	    if ((op->pagesize - op->len) < mlen) {
-	        mlen = (op->pagesize - op->len) ;
+	    if ((op->pagesz - op->len) < mlen) {
+	        mlen = (op->pagesz - op->len) ;
 	    }
 
 	    if ((ulen - tlen) < mlen) {
@@ -191,24 +191,20 @@ static int breadlnmap(bfile *op,char *ubuf,int ulen) noex {
 
 	    if ((rs >= 0) && (runoff >= op->fsize)) {
 	        if (f_partial) break ;
-
+		{
 	        rs = u_fstat(op->fd,&sb) ;
-
+		}
 	        op->fsize = sb.st_size ;
 	        f_partial = true ;
 	    } /* end if (file size limited) */
-
 	} /* end while (reading) */
-
 	if (rs >= 0) {
 	    op->offset += tlen ;
 	}
-
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (breadlnmap) */
+} /* end subroutine (breadlnmap) */
 
-static int breadlnreg(bfile *op,char *ubuf,int ulen,int to) noex {
+local int breadlnreg(bfile *op,char *ubuf,int ulen,int to) noex {
 	cnullptr	np{} ;
 	cint		opts = FM_TIMED ;
 	int		rs = SR_OK ;
@@ -224,7 +220,7 @@ static int breadlnreg(bfile *op,char *ubuf,int ulen,int to) noex {
 	        if (f_partial && op->fl.inpartline) break ;
 	        rs = breload(op,to,opts) ;
 	        if (rs <= 0) break ;
-	        if (op->len < op->bsize) f_partial = true ;
+	        if (op->len < op->bsz) f_partial = true ;
 	    } /* end if (refilling up buffer) */
 
 	    mlen = (op->len < ulen) ? op->len : ulen ;
@@ -261,10 +257,9 @@ static int breadlnreg(bfile *op,char *ubuf,int ulen,int to) noex {
 	}
 
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (breadlnreg) */
+} /* end subroutine (breadlnreg) */
 
-static int breload(bfile *op,int to,int opts) noex {
+local int breload(bfile *op,int to,int opts) noex {
 	int		rs = SR_OK ;
 	int		maxeof ;
 	int		neof = 0 ;
@@ -272,10 +267,10 @@ static int breload(bfile *op,int to,int opts) noex {
 	maxeof = (op->fl.network && (to < 0)) ? BFILE_MAXNEOF : 1 ;
 	while ((rs >= 0) && (len == 0) && (neof < maxeof)) {
 	    if (to >= 0) {
-	        rs = uc_reade(op->fd,op->bdata,op->bsize,to,opts) ;
+	        rs = uc_reade(op->fd,op->bdata,op->bsz,to,opts) ;
 	        len = rs ;
 	    } else {
-	        rs = u_read(op->fd,op->bdata,op->bsize) ;
+	        rs = u_read(op->fd,op->bdata,op->bsz) ;
 	        len = rs ;
 	    }
 	    if (rs >= 0) {
@@ -287,12 +282,10 @@ static int breload(bfile *op,int to,int opts) noex {
 	    op->bp = op->bdata ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (breload) */
+} /* end subroutine (breload) */
 
-static inline int isoureol(int ch) noex {
+local inline int isoureol(int ch) noex {
 	return (ch == '\n') ;
-}
-/* end subroutine (isoureol) */
+} /* end subroutine (isoureol) */
 
 
