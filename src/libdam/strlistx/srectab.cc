@@ -55,7 +55,7 @@
 #include	<sncpyx.h>
 #include	<mkx.h>
 #include	<isnot.h>
-#include	<localmisc.h>		/* |MODP2(3dam)| */
+#include	<localmisc.h>		/* LIBU |MODP2(3u)| */
 
 #include	"srectab.h"
 
