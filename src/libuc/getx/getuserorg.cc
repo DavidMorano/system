@@ -57,7 +57,6 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucpwcache.h>
-#include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
