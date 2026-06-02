@@ -74,7 +74,7 @@
 #include	<uclibmem.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<aflag.hh>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
@@ -209,13 +209,13 @@ local int subinfo_start(subinfo *sip,cchar *un) noex {
 	memclear(sip) ;			/* <- noted (dangerous?) */
 	sip->un = un ;
 	sip->uid = -1 ;
-	if ((rs = getbufsize(bufsize_pw)) >= 0) {
+	if ((rs = bufsizeget(bufsize_pw)) >= 0) {
 	    cint	pwlen = rs ;
 	    if (char *pwbuf ; (rs = lm_mall((pwlen+1),&pwbuf)) >= 0) {
 	        sip->pwbuf = pwbuf ;
 	        sip->pwlen = pwlen ;
 	    }
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return rs ;
 } /* end subroutine (subinfo_start) */
 
