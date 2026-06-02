@@ -79,11 +79,10 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<uinfo.h>
+#include	<ucinfo.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
 #include	<ucgetho.h>
-#include	<getbufsize.h>
 #include	<bufsizevar.hh>
 #include	<estrings.h>		/* most all string subroutines */
 #include	<filer.h>
@@ -385,7 +384,7 @@ local int try_inituname(TRY *tip) noex {
 	    rs = SR_OK ;
 	    if (! tip->fl.inituname) {
 	        tip->fl.inituname = true ;
-	        if (uinfo_names uin ; (rs = uinfo_name(&uin)) >= 0) ylikely {
+	        if (ucinfo_names uin ; (rs = ucinfo_name(&uin)) >= 0) ylikely {
 	            cchar	*sp = uin.nodename ;
 	            int		sl = lenstr(uin.nodename) ;
 	            if (cc *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
