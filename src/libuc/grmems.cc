@@ -59,7 +59,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucsysmisc.h>		/* |ucpagesize(3u)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<recarr.h>
 #include	<vecobj.h>
@@ -251,8 +251,7 @@ int grmems_start(grmems *op,int nmax,int ttl) noex {
 	if (nmax < GRMEMS_DEFMAX) nmax = GRMEMS_DEFMAX ;
 	if (ttl < GRMEMS_DEFTTL) ttl = GRMEMS_DEFTTL ;
 	if ((rs = grmems_ctor(op)) >= 0) ylikely {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        op->fd = -1 ;
 	        op->pagesize = var.pagesize ;
 	        if ((rs = pq_start(op->lrup)) >= 0) ylikely {
@@ -263,7 +262,7 @@ int grmems_start(grmems *op,int nmax,int ttl) noex {
 	    } /* end if (vars) */
 	    if (rs < 0) {
 		grmems_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (grmems_ctor) */
 	return rs ;
 }
@@ -1249,11 +1248,11 @@ vars::operator int () noex {
 	int		rs ;
 	if ((rs = ucpagesize) >= 0) ylikely {
 	    pagesize = rs ;
-	    if ((rs = getbufsize(bufsize_gr)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_gr)) >= 0) ylikely {
 	        grlen = rs ;
-	        if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
+	        if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 	            usernamelen = rs ;
-	            if ((rs = getbufsize(bufsize_gn)) >= 0) ylikely {
+	            if ((rs = bufsizeget(bufsize_gn)) >= 0) ylikely {
 	                groupnamelen = rs ;
 	            }
 	        }
