@@ -35,10 +35,10 @@
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
@@ -65,8 +65,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	quotevalue() noex ;
-static int	newbuf() noex ;
+local int	quotevalue() noex ;
+local int	newbuf() noex ;
 
 
 /* local data structures */
@@ -425,7 +425,7 @@ void fixdisplay(char *remotehost) noex {
 #endif /* COMMENT */
 
 
-static int quotevalue(vs,buf,buflen,nvpp)
+local int quotevalue(vs,buf,buflen,nvpp)
 char		vs[] ;
 char		buf[] ;
 int		buflen ;
@@ -533,11 +533,7 @@ badalloc:
 /* end subroutine (quotevalue) */
 
 
-static int newbuf(curbuf,curbuflen,f,nbpp)
-int	curbuflen, f ;
-char	*curbuf ;
-char	**nbpp ;
-{
+local int newbuf(char *curbuf,int curbuflen,int f,char **nbpp) noex {
 	int		rs = SR_OK ;
 	int		newbuflen = 0 ;
 	caddr_t		p ;
@@ -561,12 +557,9 @@ char	**nbpp ;
 }
 /* end subroutine (newbuf) */
 
-
+#ifdef	COMMENT /* in some standard library now */
 /* compare host names */
-static int hostequiv(h1,h2,localdomain)
-const char	h1[], h2[] ;
-const char	localdomain[] ;
-{
+local int hostequiv(cchar *h1,cchar *h2,cchar *localdomain) noex {
 	int		len1, len2 ;
 	int		f_h1 = FALSE ;
 	int		f_h2 = FALSE ;
@@ -608,7 +601,7 @@ const char	localdomain[] ;
 		return FALSE ;
 
 	return (strncasecmp(h1,h2,len2) == 0) ;
-}
-/* end subroutine (hostequiv) */
+} /* end subroutine (hostequiv) */
+#endif /* COMMENT */
 
 
