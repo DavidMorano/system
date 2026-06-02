@@ -26,11 +26,11 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -105,7 +105,7 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 /* file pointer already used? (yes this is a dangerous hack) */
 
 #if	CF_DANGERHACK
-	        if (fpa[i]->magic == BFILE_MAGIC) return SR_OPEN ;
+	        if (fpa[i]->magval == BFILE_MAGIC) return SR_OPEN ;
 #endif
 
 	        if ((rs = u_pipe(pipes[i])) < 0)
