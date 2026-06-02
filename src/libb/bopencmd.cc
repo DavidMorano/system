@@ -37,15 +37,15 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBU */
 #include	<strwcpy.h>
 #include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
 #include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -108,7 +108,7 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 
 	for (i = 0 ; i < 3 ; i += 1) {
 
-	    if ((fpa[i] != nullptr) && (fpa[i]->magic == BFILE_MAGIC))
+	    if ((fpa[i] != nullptr) && (fpa[i]->magval == BFILE_MAGIC))
 	        return SR_OPEN ;
 
 	} /* end for */
