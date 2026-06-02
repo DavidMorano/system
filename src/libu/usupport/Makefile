@@ -47,7 +47,7 @@ OBJ03= usupport_cfhex.o usupport_cfinet.o
 OBJ04= usupport_toxc.o usupport_snwcpy.o 
 OBJ05= usupport_rmx.o
 OBJ06= usupport_ustrftime.o 
-OBJ07= usupport_ctdec.o
+OBJ07= usupport_ctdec.o usupport_cthex.o
 
 OBJ08= usupport_getsign.o
 OBJ09= usupport_strnxchr.o usupport_strnxbrk.o
@@ -255,6 +255,7 @@ usupport_itimer.o:	usupport_itimer.cc	usupport_itimer.hh	$(INCS)
 usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.hh	$(INCS)
 usupport_hasnot.o:	usupport_hasnot.cc	usupport_hasnot.hh	$(INCS)
 usupport_ctdec.o:	usupport_ctdec.cc	usupport_ctdec.hh	$(INCS)
+usupport_cthex.o:	usupport_cthex.cc	usupport_cthex.hh	$(INCS)
 usupport_matostr.o:	usupport_matostr.cc	usupport_matostr.hh	$(INCS)
 usupport_matstr.o:	usupport_matstr.cc	usupport_matstr.hh	$(INCS)
 usupport_nleadkeystr.o:	usupport_nleadkeystr.cc	usupport_nleadkeystr.hh	$(INCS)
