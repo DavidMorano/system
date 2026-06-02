@@ -28,37 +28,34 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<bufsizevar.hh>
 #include	<sysval.hh>
-#include	<stdfnames.h>
+#include	<stdfnames.h>		/* LIBU */
 #include	<snx.h>
 #include	<cfdec.h>
-#include	<intsat.h>
-#include	<intceil.h>
-#include	<mkchar.h>
+#include	<intsat.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
 #include	<ischarx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
-
-using std::nullptr_t ;			/* type */
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -144,13 +141,13 @@ int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	            if ((rs = bfile_bufbegin(op,bsize)) >= 0) {
 			op->of = oflags ;
 		        op->bm = bfilebm_line ;
-	                op->magic = BFILE_MAGIC ;
+	                op->magval = BFILE_MAGIC ;
 	            } /* end if (buffer-allocation) */
 	    }
 	    if (rs < 0) {
 		u_close(op->fd) ;
 		op->fd = -1 ;
-	    }
+	    } /* end if (error) */
 	} /* end if (opened) */
 	} /* end if (ok) */
 
