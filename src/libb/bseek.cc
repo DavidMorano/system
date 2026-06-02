@@ -40,8 +40,8 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -71,7 +71,7 @@
 
 /* forward references */
 
-static int	notappend(bfile *op,off_t wo,int w) noex ;
+local int	notappend(bfile *op,off_t wo,int w) noex ;
 
 
 /* local variables */
@@ -121,7 +121,7 @@ int bseek(bfile *op,off_t wo,int w) noex {
 
 /* local subroutines */
 
-static int notappend(bfile *op,off_t wo,int w) noex {
+local int notappend(bfile *op,off_t wo,int w) noex {
 	int		rs = 1 ;
 	if (! (op->of & O_APPEND)) {
 	    coff	foff = off_t(op->offset) ;
@@ -131,7 +131,6 @@ static int notappend(bfile *op,off_t wo,int w) noex {
 	    if (f) rs = 0 ;
 	} /* end if (not-append) */
 	return rs ;
-}
-/* end subroutine (notappend) */
+} /* end subroutine (notappend) */
 
 
