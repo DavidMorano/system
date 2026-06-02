@@ -27,16 +27,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-/* local defines */
+import libutil ;			/* |lenstr(3u)| */
+
+}/* local defines */
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -63,25 +77,25 @@ int bdup(bfile *op,bfile *fnewp) noex {
 	int		rs ;
 	if ((rs = bfile_magic(op,fnewp)) > 0) {
 	    bfile	*bnewp = fnewp ;
-	    memcpy(bnewp,op) ; /* shallow-copy */
+	    memcopy(bnewp,op) ; /* shallow-copy */
 	    if ((rs = bfile_flush(op)) >= 0) {
 	        if ((rs = u_dup(op->fd)) >= 0) {
 	            fnewp->fd = rs ;
-	            if (op->bsize > 0) {
-			cint	bsz = op->bsize ;
-		        if (void *vp ; (rs = uc_malloc(bsz,&vp)) >= 0) {
-	                    fnewp->bdata = (char *) vp ;
-	                    fnewp->bbp = (char *) vp ;
-	                    fnewp->bp = (char *) vp ;
-	                }
-	            }
+	            if (op->bsz > 0) {
+			cint	bsz = op->bsz ;
+		        if (void *vp ; (rs = mem.mall(bsz,&vp)) >= 0) {
+	                    fnewp->bdata = charp(vp) ;
+	                    fnewp->bbp = charp(vp) ;
+	                    fnewp->bp = charp(vp) ;
+	                } /* end if (memory-acquire) */
+	            } /* end if */
 		    if (rs < 0) {
 		        uc_close(fnewp->fd) ;
 		        fnewp->fd = -1 ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (u_dup) */
 	        if (rs < 0) {
-		    fnewp->magic = 0 ;
+		    fnewp->magval = 0 ;
 	        }
 	    } /* end if (bfile_flush) */
 	} /* end if (magic) */
