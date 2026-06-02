@@ -57,7 +57,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<vecstr.h>
 #include	<mkpathx.h>
 #include	<isnot.h>
@@ -243,9 +243,9 @@ int geter::cdb() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 		nodenamelen = rs ;
 		elen = (rs * EBUFMULT) ;
 	    }
