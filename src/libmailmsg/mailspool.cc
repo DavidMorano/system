@@ -58,7 +58,6 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<bufsizevar.hh>
