@@ -45,7 +45,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
@@ -971,9 +971,9 @@ static int mkdirfile(char *bufp,cc *dp,int dl,cc *dnp,int dnl) noex {
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = maxpathlen) == 0) {
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
-	        if ((rs = getbufsize(bufsize_ml)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_ml)) >= 0) {
 	            maxlinelen = rs ;
 	        }
 	    }
