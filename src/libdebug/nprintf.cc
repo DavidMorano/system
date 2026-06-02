@@ -69,14 +69,14 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>	
+#include	<ucopen.h>
 #include	<ucdesc.h>
 #include	<rmx.h>
 #include	<fmtstr.h>
 #include	<localmisc.h>
-#include	<debug.h>
+#include	<libdebug.h>		/* LIBEBUG */
 
 #include	"nprintf.h"
-#include	"debugmkhex.h"		/* |mkhexstr(3debug)| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -91,9 +91,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* imported namespaces */
-
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
