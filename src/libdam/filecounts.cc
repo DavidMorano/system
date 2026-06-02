@@ -55,7 +55,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<linebuffer.h>
 #include	<filer.h>
 #include	<lockfile.h>
@@ -917,7 +917,7 @@ static int vcmpoff(cvoid **v1pp,cvoid **v2pp) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	    maxnamelen = rs ;
 	    uentlen = (rs + UENTADDER) ;
 	}
