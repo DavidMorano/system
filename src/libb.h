@@ -20,12 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>		/* |ustat| */
-#include	<unistd.h>
-#include	<stdarg.h>		/* |va_list(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdfnames.h>
+#include	<sys/stat.h>		/* POSIX |ustat| */
+#include	<unistd.h>		/* POSIX */
+#include	<stdarg.h>		/* CSTD |va_list(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdfnames.h>		/* LIBU */
 
 
 /* objects */
@@ -205,10 +205,10 @@ struct bfile_head {
 	size_t		fsize ;		/* current? file size */
 	dev_t		dev ;
 	BFILE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
-	int		pagesize ;	/* system page size */
-	int		bsize ;		/* allocated buffer size */
+	int		pagesz ;	/* system page size */
+	int		bsz ;		/* allocated buffer size */
 	int		of ;		/* open flags */
 	int		len ;		/* data remaining(r) or filled(w) */
 	int		bm ;		/* buffer mode */
@@ -258,7 +258,6 @@ struct bfile_co {
 	} ;
 } ; /* end struct (bfile_co) */
 struct bfile : bfile_head {
-    	typedef nullptr_t	null ;
 	bfile_pr	println ;
 	bfile_pr	print ;
 	bfile_co	size ;
@@ -268,55 +267,57 @@ struct bfile : bfile_head {
 	bfile_co	rewind ;
 	bfile_co	close ;
 	bfile() noex {
-	    println(this,0) ;
-	    print(this,0) ;
-	    size(this,bfilemem_size) ;
-	    getc(this,bfilemem_getc) ;
-	    isterm(this,bfilemem_isterm) ;
-	    flush(this,bfilemem_flush) ;
-	    rewind(this,bfilemem_rewind) ;
-	    close(this,bfilemem_close) ;
-	    magic = 0 ;
+	    println	(this,0) ;
+	    print	(this,0) ;
+	    size	(this,bfilemem_size) ;
+	    getc	(this,bfilemem_getc) ;
+	    isterm	(this,bfilemem_isterm) ;
+	    flush	(this,bfilemem_flush) ;
+	    rewind	(this,bfilemem_rewind) ;
+	    close	(this,bfilemem_close) ;
+	    magval	= 0 ;
+	    bdata	= nullptr ;
+	    bbp		= nullptr ;
+	    bp		= nullptr ;
 	} ; /* end ctor */
 	bfile(const bfile &) = delete ;
 	bfile &operator = (const bfile &) = delete ;
-	int open(cc *,cc * = nullptr,mode_t = 0) noex ;
-	int opene(cc *,cc * = nullptr,mode_t = 0,int = -1) noex ;
-	int openmod(cc *,cc * = nullptr,mode_t = 0) noex ;
-	int wasteln(char *,int) noex ;
-	int reade(void *,int,int,int) noex ;
-	int read(void *,int) noex ;
-	int readlnto(char *,int,int = -1) noex ;
-	int readln(char *lp,int ll) noex {
+	int open	(cc *,cc * = nullptr,mode_t = 0) noex ;
+	int opene	(cc *,cc * = nullptr,mode_t = 0,int = -1) noex ;
+	int openmod	(cc *,cc * = nullptr,mode_t = 0) noex ;
+	int wasteln	(char *,int) noex ;
+	int reade	(void *,int,int,int) noex ;
+	int read	(void *,int) noex ;
+	int readlnto	(char *,int,int = -1) noex ;
+	int readln	(char *lp,int ll) noex {
 	    return readlnto(lp,ll,-1) ;
 	} ;
-	int readlns(char *,int,int,int *) noex ;
-	int seek(off_t,int) noex ;
-	int tell(off_t *) noex ;
-	int write(cvoid *,int) noex ;
-	int writeblock(bfile *,int) noex ;
-	int writefile(cchar *) noex ;
-	int writeblanks(int) noex ;
-	int writechrs(int,int) noex ;
-	int putc(int) noex ;
-	int printf(cchar *,...) noex ;
-	int vprintf(cchar *,va_list) noex ;
-	int printlns(int,cchar *,int) noex ;
+	int readlns	(char *,int,int,int *) noex ;
+	int seek	(off_t,int) noex ;
+	int tell	(off_t *) noex ;
+	int write	(cvoid *,int) noex ;
+	int writeblock	(bfile *,int) noex ;
+	int writefile	(cchar *) noex ;
+	int writeblanks	(int) noex ;
+	int writechrs	(int,int) noex ;
+	int putc	(int) noex ;
+	int printf	(cchar *,...) noex ;
+	int vprintf	(cchar *,va_list) noex ;
+	int printlns	(int,cchar *,int) noex ;
 	int printcleanln(cchar *,int) noex ;
 	int printcleanlns(int,cchar *,int) noex ;
-	int copyblock(bfile *,int) noex ;
-	int copyfile(bfile *,char *,int) noex ;
-	int truncate(off_t) noex ;
-	int reserve(int) noex ;
-	int minmod(mode_t) noex ;
-	int flushn(int) noex ;
-	int control(int,...) noex ;
-	int controlv(int,va_list) noex ;
-	int stat(ustat *) noex ;
-	int dup(bfile *) noex ;
+	int copyblock	(bfile *,int) noex ;
+	int copyfile	(bfile *,char *,int) noex ;
+	int truncate	(off_t = 0z) noex ;
+	int reserve	(int) noex ;
+	int minmod	(mode_t) noex ;
+	int flushn	(int) noex ;
+	int control	(int,...) noex ;
+	int controlv	(int,va_list) noex ;
+	int stat	(ustat *) noex ;
 	void dtor() noex ;
 	destruct bfile() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (bfile) */
 #else	/* __cplusplus */
@@ -325,66 +326,65 @@ typedef BFILE		bfile ;
 
 EXTERNC_begin
 
-extern int	bopen(bfile *,cchar *,cchar *,mode_t) noex ;
-extern int	bopene(bfile *,cchar *,cchar *,mode_t,int) noex ;
-extern int	bopenprog(bfile *,cchar *,cchar *,mainv,mainv) noex ;
-extern int	bopentmp(bfile *,cchar *,cchar *,mode_t) noex ;
-extern int	bopenmod(bfile *,cchar *,cchar *,mode_t) noex ;
-extern int	bopenlock(bfile *,cchar *,int,int) noex ;
-extern int	bcontrol(bfile *,int,...) noex ;
-extern int	bcontrolv(bfile *,int,va_list) noex ;
-extern int	bstat(bfile *,ustat *) noex ;
-extern int	bsize(bfile *) noex ;
-extern int	bseek(bfile *,off_t,int) noex ;
-extern int	btell(bfile *,off_t *) noex ;
-extern int	brewind(bfile *) noex ;
-extern int	bwasteln(bfile *,char *,int) noex ;
-extern int	breade(bfile *,void *,int,int,int) noex ;
-extern int	bread(bfile *,void *,int) noex ;
-extern int	breadlnto(bfile *,char *,int,int) noex ;
-extern int	breadlns(bfile *,char *,int,int,int *) noex ;
-extern int	bgetc(bfile *) noex ;
-extern int	bwrite(bfile *,cvoid *,int) noex ;
-extern int	bwriteblock(bfile *,bfile *,int) noex ;
-extern int	bwritefile(bfile *,cchar *) noex ;
-extern int	bwriteblanks(bfile *,int) noex ;
-extern int	bwritechrs(bfile *,int,int) noex ;
-extern int	bputc(bfile *,int) noex ;
-extern int	bprintf(bfile *,cchar *,...) noex ;
-extern int	bvprintf(bfile *,cchar *,va_list) noex ;
-extern int	bprintln(bfile *,cchar *,int) noex ;
-extern int	bprintlns(bfile *,int,cchar *,int) noex ;
-extern int	bprintcleanln(bfile *,cchar *,int) noex ;
-extern int	bprintcleanlns(bfile *,int,cchar *,int) noex ;
-extern int	bcopyblock(bfile *,bfile *,int) noex ;
-extern int	bcopyfile(bfile *,bfile *,char *,int) noex ;
-extern int	btruncate(bfile *,off_t) noex ;
-extern int	breserve(bfile *,int) noex ;
-extern int	bisterm(bfile *) noex ;
-extern int	bminmod(bfile *,mode_t) noex ;
-extern int	bflush(bfile *) noex ;
-extern int	bflushn(bfile *,int) noex ;
-extern int	bdup(bfile *,bfile *) noex ;
-extern int	bclose(bfile *) noex ;
+extern int	bopen		(bfile *,cchar *,cchar *,mode_t) noex ;
+extern int	bopene		(bfile *,cchar *,cchar *,mode_t,int) noex ;
+extern int	bopenprog	(bfile *,cchar *,cchar *,mainv,mainv) noex ;
+extern int	bopentmp	(bfile *,cchar *,cchar *,mode_t) noex ;
+extern int	bopenmod	(bfile *,cchar *,cchar *,mode_t) noex ;
+extern int	bopenlock	(bfile *,cchar *,int,int) noex ;
+extern int	bcontrol	(bfile *,int,...) noex ;
+extern int	bcontrolv	(bfile *,int,va_list) noex ;
+extern int	bstat		(bfile *,ustat *) noex ;
+extern int	bsize		(bfile *) noex ;
+extern int	bseek		(bfile *,off_t,int) noex ;
+extern int	btell		(bfile *,off_t *) noex ;
+extern int	brewind		(bfile *) noex ;
+extern int	bwasteln	(bfile *,char *,int) noex ;
+extern int	breade		(bfile *,void *,int,int,int) noex ;
+extern int	bread		(bfile *,void *,int) noex ;
+extern int	breadlnto	(bfile *,char *,int,int) noex ;
+extern int	breadlns	(bfile *,char *,int,int,int *) noex ;
+extern int	bgetc		(bfile *) noex ;
+extern int	bwrite		(bfile *,cvoid *,int) noex ;
+extern int	bwriteblock	(bfile *,bfile *,int) noex ;
+extern int	bwritefile	(bfile *,cchar *) noex ;
+extern int	bwriteblanks	(bfile *,int) noex ;
+extern int	bwritechrs	(bfile *,int,int) noex ;
+extern int	bputc		(bfile *,int) noex ;
+extern int	bprintf		(bfile *,cchar *,...) noex ;
+extern int	bvprintf	(bfile *,cchar *,va_list) noex ;
+extern int	bprintln	(bfile *,cchar *,int) noex ;
+extern int	bprintlns	(bfile *,int,cchar *,int) noex ;
+extern int	bprintcleanln	(bfile *,cchar *,int) noex ;
+extern int	bprintcleanlns	(bfile *,int,cchar *,int) noex ;
+extern int	bcopyblock	(bfile *,bfile *,int) noex ;
+extern int	bcopyfile	(bfile *,bfile *,char *,int) noex ;
+extern int	btruncate	(bfile *,off_t) noex ;
+extern int	breserve	(bfile *,int) noex ;
+extern int	bisterm		(bfile *) noex ;
+extern int	bminmod		(bfile *,mode_t) noex ;
+extern int	bflush		(bfile *) noex ;
+extern int	bflushn		(bfile *,int) noex ;
+extern int	bclose		(bfile *) noex ;
 
-extern int	bfile_bufreset(bfile *) noex ;
-extern int	bfile_acc(bfile *,bool) noex ;
-extern int	bfile_ckrd(bfile *) noex ;
-extern int	bfile_ckwr(bfile *) noex ;
-extern int	bfile_flush(bfile *) noex ;
-extern int	bfile_flushn(bfile *,int) noex ;
-extern int	bfile_pagein(bfile *,off_t,int) noex ;
+extern int	bfile_bufreset	(bfile *) noex ;
+extern int	bfile_acc	(bfile *,bool) noex ;
+extern int	bfile_ckrd	(bfile *) noex ;
+extern int	bfile_ckwr	(bfile *) noex ;
+extern int	bfile_flush	(bfile *) noex ;
+extern int	bfile_flushn	(bfile *,int) noex ;
+extern int	bfile_pagein	(bfile *,off_t,int) noex ;
 
-static inline int breadln(bfile *fp,char *ubuf,int ulen) noex {
+local inline int breadln(bfile *fp,char *ubuf,int ulen) noex {
 	return breadlnto(fp,ubuf,ulen,-1) ;
 }
-static inline int bprint(bfile *fp,cchar *lbuf,int llen) noex {
+local inline int bprint(bfile *fp,cchar *lbuf,int llen) noex {
 	return bprintln(fp,lbuf,llen) ;
 }
-static inline int bprintline(bfile *fp,cchar *lbuf,int llen) noex {
+local inline int bprintline(bfile *fp,cchar *lbuf,int llen) noex {
 	return bprintln(fp,lbuf,llen) ;
 }
-static inline int bprintlines(bfile *fp,int flen,cchar *lbuf,int llen) noex {
+local inline int bprintlines(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 	return bprintlns(fp,flen,lbuf,llen) ;
 }
 
@@ -393,17 +393,16 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename ... Args>
-static inline int bfile_magic(bfile *op,Args ... args) noex {
+local inline int bfile_magic(bfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_NOTOPEN ;
-	    if (op->magic == BFILE_MAGIC) {
+	    if (op->magval == BFILE_MAGIC) {
 		rs = (op->fl.nullfile) ? 0 : 1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bfile_magic) */
+} /* end subroutine (bfile_magic) */
 
 #endif /* __cplusplus */
 
