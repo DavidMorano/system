@@ -41,21 +41,21 @@ LIBS +=
 
 
 OBJ00= systypenames.o
-OBJ01= getdefzdata.o getbufsize.o
+OBJ01=
 OBJ02= getaddr.o getaf.o getarch.o 
-OBJ03= gethz.o getmailgid.o getmjd.o
+OBJ03= gethz.o getlogx.o getmailgid.o getmjd.o
 OBJ04= getnfile.o getngroups.o getnodedomain.o
-OBJ05= getnodeinfo.o getnprocessors.o
+OBJ05= getnodeinfo.o getnprocessors.o getostype.o
 OBJ06= getpassword.o getportnum.o getprogpath.o
-OBJ07= getproto.o getpf.o getpwd.o
-OBJ08= getpwentry.o getrand.o getrunlevel.o
+OBJ07= getproto.o getpf.o getpwd.o getprogexec.o
+OBJ08= getpwentry.o getpwlogname.o getpwx.o 
 OBJ09= getseed.o getserial.o getserv.o
 OBJ10= getsocktype.o getsyslogx.o getsystypenum.o
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
-OBJ13= getnisdomain.o getfstype.o
-OBJ14= getoflags.o getpwx.o 
-OBJ15= gettmpdir.o geteaddrinfo.o
+OBJ13= getnisdomain.o getfstype.o getuserterm.o
+OBJ14= getoflags.o getrand.o getstacksize.o
+OBJ15= gettmpdir.o geteaddrinfo.o getrunlevel.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o 
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -192,7 +192,6 @@ objd.o:			$(OBJD)
 
 
 systypenames.o:		systypenames.cc		systypenames.h		$(INCS)
-getbufsize.o:		getbufsize.cc		getbufsize.h		$(INCS)
 
 getaddr.o:		getaddr.cc		getaddr.h		$(INCS)
 getaf.o:		getaf.cc		getaf.h			$(INCS)
@@ -202,6 +201,7 @@ getdefzdata.o:		getdefzdata.cc		getdefzdata.h		$(INCS)
 geteaddrinfo.o:		geteaddrinfo.cc		geteaddrinfo.h		$(INCS)
 getev.o:		getev.cc		getev.h			$(INCS)
 gethz.o:		gethz.cc		gethz.h			$(INCS)
+getlogx.o:		getlogx.cc		getlogx.h		$(INCS)
 getmailgid.o:		getmailgid.cc		getmailgid.h		$(INCS)
 getmjd.o:		getmjd.cc		getmjd.h		$(INCS)
 getnfile.o:		getnfile.cc		getnfile.h		$(INCS)
@@ -209,29 +209,34 @@ getngroups.o:		getngroups.cc		getngroups.h		$(INCS)
 getnodedomain.o:	getnodedomain.cc	getnodedomain.h		$(INCS)
 getnodeinfo.o:		getnodeinfo.cc		getnodeinfo.h		$(INCS)
 getnprocessors.o:	getnprocessors.cc	getnprocessors.h	$(INCS)
+getostype.o:		getostype.cc		getostype.h
 getpassword.o:		getpassword.cc		getpassword.h		$(INCS)
 getportnum.o:		getportnum.cc		getportnum.h		$(INCS)
+getprogexec.o:		getprogexec.cc		getprogexec.h		$(INCS)
 getprogpath.o:		getprogpath.cc		getprogpath.h		$(INCS)
 getproto.o:		getproto.cc		getproto.h		$(INCS)
 getpwd.o:		getpwd.cc		getpwd.h		$(INCS)
+getpwx.o:		getpwx.cc		getpwx.h		$(INCS)
 getpwentry.o:		getpwentry.cc		getpwentry.h		$(INCS)
+getpwlogname.o:		getpwlogname.cc		getpwlogname.h		$(INCS)
 getrand.o:		getrand.cc		getrand.h		$(INCS)
 getrunlevel.o:		getrunlevel.cc		getrunlevel.h		$(INCS)
 getseed.o:		getseed.cc		getseed.h		$(INCS)
 getserial.o:		getserial.cc		getserial.h		$(INCS)
 getserv.o:		getserv.cc		getserv.h		$(INCS)
 getsocktype.o:		getsocktype.cc		getsocktype.h		$(INCS)
+getstacksize.o:		getstacksize.cc		getstacksize.h		$(INCS)
 getsyslogx.o:		getsyslogx.cc		getsyslogx.h		$(INCS)
 getsystypenum.o:	getsystypenum.cc	getsystypenum.h		$(INCS)
-getuserhome.o:		getuserhome.cc		getuserhome.h		$(INCS)
-getuserorg.o:		getuserorg.cc		getuserorg.h		$(INCS)
-getuserterms.o:		getuserterms.cc		getuserterms.h		$(INCS)
-getxid.o:		getxid.cc		getxid.h		$(INCS)
 getopendial.o:		getopendial.cc		getopendial.h		$(INCS)
 getmaxpid.o:		getmaxpid.cc		getmaxpid.h		$(INCS)
 getnisdomain.o:		getnisdomain.cc		getnisdomain.h		$(INCS)
-getpwx.o:		getpwx.cc		getpwx.h		$(INCS)
 getoflags.o:		getoflags.cc		getoflags.h		$(INCS)
 getfstype.o:		getfstype.cc		getfstype.h		$(INCS)
+getuserhome.o:		getuserhome.cc		getuserhome.h		$(INCS)
+getuserorg.o:		getuserorg.cc		getuserorg.h		$(INCS)
+getuserterm.o:		getuserterm.cc		getuserterm.h		$(INCS)
+getuserterms.o:		getuserterms.cc		getuserterms.h		$(INCS)
+getxid.o:		getxid.cc		getxid.h		$(INCS)
 
 
