@@ -26,10 +26,10 @@
 #include	<sys/wait.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<mkfile.h>
@@ -54,8 +54,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	quotevalue(cchar *,char *,int,cchar **) noex ;
-static int	newbuf(char *,int,int,char **) noex ;
+local int	quotevalue(cchar *,char *,int,cchar **) noex ;
+local int	newbuf(char *,int,int,char **) noex ;
 
 
 /* global data */
@@ -440,7 +440,7 @@ char	host[] ;
 #endif /* COMMENT */
 
 
-static int quotevalue(vs,buf,buflen,nvpp)
+local int quotevalue(vs,buf,buflen,nvpp)
 cchar	vs[] ;
 char		buf[] ;
 int		buflen ;
@@ -547,10 +547,9 @@ badalloc:
 
 	rs = SR_NOMEM ;
 	goto ret0 ;
-}
-/* end subroutine (quotevalue) */
+} /* end subroutine (quotevalue) */
 
-static int newbuf(char *curbuf,int curbuflen,int f,char **nbpp) noex {
+local int newbuf(char *curbuf,int curbuflen,int f,char **nbpp) noex {
 	int		rs ;
 	int		newbuflen = 0 ;
 	caddr_t		p ;
@@ -571,7 +570,6 @@ static int newbuf(char *curbuf,int curbuflen,int f,char **nbpp) noex {
 	    *nbpp = (char *) p ;
 
 	return (rs >= 0) ? newbuflen : rs ;
-}
-/* end subroutine (newbuf) */
+} /* end subroutine (newbuf) */
 
 
