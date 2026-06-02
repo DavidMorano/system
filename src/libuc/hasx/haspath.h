@@ -52,13 +52,19 @@ EXTERNC_begin
 
 extern bool haspathuser		(cchar *,int) noex ;
 extern bool haspathvar		(cchar *,int) noex ;
-extern bool haspathmulti	(cchar *,int) noex ;
 extern bool haspathprefix	(cchar *,int) noex ;
 local inline bool haspathexp(cchar *sp,int sl) noex {
 	return haspathprefix	(sp,sl) ;
 } /* end subroutine (haspathexp) */
 
 EXTERNC_end
+
+#ifndef	DECLARATION_HASPATHMULTI
+#define	DECLARATION_HASPATHMULTI
+EXTERNC_begin
+extern bool haspathmulti	(cchar *,int) noex ;
+EXTERNC_end
+#endif /* DECLARATION_HASPATHMULTI */
 
 
 #endif /* HASPATH_INCLUDE */
