@@ -93,11 +93,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdint>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
-#include	<cstdio>		/* CSYD */
+#include	<cstdio>		/* CSTD */
 #include	<new>			/* C++STD |nothrow(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
