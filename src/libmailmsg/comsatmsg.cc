@@ -64,7 +64,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sbuf.h>
 #include	<strn.h>
 #include	<sncpyx.h>
@@ -213,9 +213,9 @@ int comsatmsg_rd(comsatmsg *op,char *mbuf,int mlen) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_un)) >= 0) {
+	if ((rs = bufsizeget(bufsize_un)) >= 0) {
 	    usernamelen = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 		maxpathlen = rs ;
 	    }
 	}
