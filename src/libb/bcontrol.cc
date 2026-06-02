@@ -38,7 +38,7 @@
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<clanguage.h>		/* LIBU */
