@@ -40,14 +40,14 @@ MODS +=
 LIBS +=
 
 
-OBJ0_FILER=
-OBJ1_FILER=
-OBJ2_FILER=
-OBJ3_FILER=
+OBJ0= filer_prime.o filer_obj.o
+OBJ1= filer_read.o
+OBJ2= filer_writers.o 
+OBJ3=
 
-OBJA_FILER= filer_prime.o filer_writers.o filer_obj.o
+OBJA= obj0.o obj1.o obj2.o
 
-OBJ_FILER= $(OBJA_FILER)
+OBJ= obja.o
 
 
 INCDIRS=
@@ -97,10 +97,10 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_FILER)
+$(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-$(T).a:			$(OBJ_FILER)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).o
@@ -116,16 +116,16 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_filer.o:	$(OBJ0_FILER)
+obj0.o:			$(OBJ0)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_filer.o:	$(OBJ1_FILER)
+obj1.o:			$(OBJ1)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_filer.o:	$(OBJ2_FILER)
+obj2.o:			$(OBJ2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_filer.o:	$(OBJ3_FILER)
+obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -137,6 +137,7 @@ objb.o:			$(OBJB)
 
 
 filer_prime.o:		filer_prime.cc		$(INCS)
+filer_read.o:		filer_read.cc		$(INCS)
 filer_writers.o:	filer_writers.cc	$(INCS)
 filer_obj.o:		filer_obj.cc		$(INCS)
 
