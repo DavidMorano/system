@@ -55,7 +55,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strchr(3c)| */
-#include	<getbufsize.h>		/* for |bufsize_mailaddr| */
+#include	<bufsizeget.h>		/* for |bufsize_mailaddr| */
 #include	<storebuf.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<sncpyx.h>
@@ -320,9 +320,9 @@ int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,mat type) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	    hostnamelen = rs ;
-	    if ((rs = getbufsize(bufsize_mailaddr)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mailaddr)) >= 0) {
 	        mailaddrlen = rs ;
 	    }
 	}
