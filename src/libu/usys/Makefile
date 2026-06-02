@@ -227,7 +227,6 @@ usys_ufstype.o:		usys_ufstype.cc		usys_ufstype.h		$(INCS)
 usys_pathpid.o:		usys_pathpid.cc		usys_pathpid.h		$(INCS)
 usys_umaxmsglen.o:	usys_umaxmsglen.cc	usys_umaxmsglen.h	$(INCS)
 usys_plock.o:		usys_plock.cc		usys_plock.h		$(INCS)
-usysargz.o:		usysargz.cc		usysargz.hh		$(INCS)
 
 # missing operating system calls or facilities
 usys_task.o:		usys_task.cc		usys_task.h		$(INCS)
@@ -256,5 +255,8 @@ usys_getnetname.o:	usys_getnetname.cc	usys_getnetname.h	$(INCS)
 usys_getauid.o:		usys_getauid.cc		usys_getauid.h		$(INCS)
 usys_atox.o:		usys_atox.cc		usys_atox.h		$(INCS)
 usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
+
+# special
+usysargz.o:		usysargz.cc		usysargz.hh		$(INCS)
 
 
