@@ -57,7 +57,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bfile.h>
 #include	<sbuf.h>
 #include	<mailmsg.h>		/* MAILMSG */
@@ -1306,7 +1306,7 @@ local int msgent_msgtimes(ME *mep,mbcache *op) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mailaddr)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mailaddr)) >= 0) ylikely {
 	    hdrbuflen = (rs * HDRBUFMULT) ;
 	}
 	return rs ;
