@@ -94,7 +94,7 @@
 	endp	the ending pointer position of a supplied buffer
 
 	Notes:
-	As it stands now, these subroutines do not perform any
+	1. As it stands now, these subroutines do not perform any
 	special tenchiques to try to make this process faster.
 	These subroutines are, therefore, probably the slowest such
 	conversions routinely available.  To really move (execute)
@@ -106,6 +106,11 @@
 	has such instructions.  But short of assembly (and and the
 	required machine instructions) this present implemtnation
 	is adequate.
+	2. Just a note about the double division loop (one loop
+	after the other) for the longer division operands below.
+	This is an old trick from almost the beginning (1979 or
+	1980 or so) to use the best built-in division operator given
+	the division operands (dividend and divisor).
 
 *******************************************************************************/
 
@@ -195,7 +200,7 @@ constexpr int sxxtostr(char *endp,int b,ST v) noex {
             rp = (endp - rs) ;
             if (v < 0) *--rp = '-' ;
         }
-    }
+    } /* end if (non-null) */
     return (rs >= 0) ? intconv(endp - rp) : rs ;
 } /* end subroutine (sxxtostr) */
 
@@ -255,7 +260,7 @@ constexpr int sxxtostr10(char *endp,ST v) noex {
             rp = (endp - rs) ;
             if (v < 0) *--rp = '-' ;
         }
-    }
+    } /* end if (non-null) */
     return (rs >= 0) ? intconv(endp - rp) : rs ;
 } /* end subroutine (sxxtostr10) */
 
