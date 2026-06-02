@@ -21,23 +21,21 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<atomic>
-#include	<mutex>			/* |once_flag(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<atomic>		/* C++STD */
+#include	<mutex>			/* C++STD |once_flag(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
-
-using std::once_flag ;
 
 namespace usys {
     struct usysargz {
     	char		*name{} ;
-	once_flag	ox ;
+	std::once_flag	ox ;
 	int		nlen ;
 	int		rss = SR_OK ;
 	usysargz() = default ;
