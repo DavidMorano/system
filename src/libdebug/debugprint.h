@@ -20,13 +20,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdarg.h>		/* |va_list(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<stdarg.h>		/* CSTD |va_list(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define DEBUGPRINTF(FMT, ...)					\
     debugprintx(__func__,FMT __VA_OPT__(,) __VA_ARGS__)
+
+#define DEBUGCLOSE(FMT, ...)					\
+	debugclose() ;
 
 
 EXTERNC_begin
@@ -36,10 +39,18 @@ extern int debugclose		(void) noex ;
 extern int debugwrite		(cchar *,int) noex ;
 extern int debugprint		(cchar *,int) noex ;
 extern int debugprintf		(cchar *,...) noex ;
-extern int debugprintx		(cchar *,cchar *,...) noex ;
+extern int debugprintx		(cchar *,cchar *,...) noex ; /* special */
 extern int debugvprintf		(cchar *,va_list) noex ;
+extern int debugprintfsize	(cchar *,int) noex ;
+
+extern int debugsetfd		(int) noex ;
+extern int debuggetfd		(void) noex ;
+
 extern int debugprinthexblock	(cchar *,int,cvoid *,int) noex ;
-extern int debugprinthex	(cchar *,int,cchar *,int) noex ;
+extern int debugprintdeci	(cchar *,int) noex ;
+extern int debugprinthexi	(cchar *,int) noex ;
+extern int debugprintnum	(cchar *,int) noex ;
+
 
 EXTERNC_end
 
