@@ -46,8 +46,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<sigblocker.h>
@@ -88,34 +88,35 @@ extern int	sfdirname(cchar *,int,cchar **) ;
 
 /* forward references */
 
-static int mkxfn(char *,cchar *) ;
-static int mktmpdirs(cchar *,mode_t) ;
+local intt mkxfn(char *,cchar *) ;
+local intt mktmpdirs(cchar *,mode_t) ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bopentmp(bfile *fp,cchar *tname,cchar *ostr,mode_t om)
-{
+int bopentmp(bfile *fp,cchar *tname,cchar *ostr,mode_t om) noex {
 	int		rs ;
 	char		xfname[MAXPATHLEN + 1] ;
 
-	if (fp == NULL) return SR_FAULT ;
-	if (ostr == NULL) return SR_FAULT ;
+	if (fp == nullptr) return SR_FAULT ;
+	if (ostr == nullptr) return SR_FAULT ;
 
 	if (ostr[0] == '\0') return SR_INVALID ;
 
-	if ((tname == NULL) || (tname[0] == '\0')) {
+	if ((tname == nullptr) || (tname[0] == '\0')) {
 	    tname = BFILE_TEMPLATE ;
 	}
 
 	if ((rs = mkxfn(xfname,tname)) >= 0) {
 	    if ((rs = mktmpdirs(xfname,om)) >= 0) {
 	        SIGBLOCK	b ;
-	        if ((rs = sigblocker_start(&b,NULL)) >= 0) {
+	        if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
 		    char	tbuf[MAXPATHLEN + 1] ;
     	
 	            if ((rs = mktmpfile(tbuf,om,xfname)) >= 0) {
@@ -135,24 +136,19 @@ int bopentmp(bfile *fp,cchar *tname,cchar *ostr,mode_t om)
 
 /* local subroutines */
 
-
-static int mkxfn(char *xfname,cchar *tname)
-{
+local intt mkxfn(char *xfname,cchar *tname) noex {
 	int		rs ;
 	if (tname[0] != '/') {
 	    cchar	*tmpdname = getenv(VARTMPDNAME) ;
-	    if (tmpdname == NULL) tmpdname = TMPDNAME ;
+	    if (tmpdname == nullptr) tmpdname = TMPDNAME ;
 	    rs = mkpath2(xfname,tmpdname,tname) ;
 	} else {
 	    rs = mkpath1(xfname,tname) ;
 	}
 	return rs ;
-}
-/* end subroutine (mkxfn) */
+} /* end subroutine (mkxfn) */
 
-
-static int mktmpdirs(cchar *xfname,mode_t om)
-{
+local intt mktmpdirs(cchar *xfname,mode_t om) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*cp ;
@@ -163,7 +159,6 @@ static int mktmpdirs(cchar *xfname,mode_t om)
 	    }
 	}
 	return rs ;
-} 
 /* end subrouine (mktmpdirs) */
 
 
