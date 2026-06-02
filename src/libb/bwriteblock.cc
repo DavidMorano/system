@@ -39,12 +39,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<algorithm>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -58,7 +60,7 @@
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -90,7 +92,7 @@ namespace {
 	int		ulen ;
 	writer(bfile *p,bfile *ip,int ul) noex : op(p), ifp(ip), ulen(ul) { 
 	    rd(this) ;
-	} ;
+	} ; /* end ctor */
 	operator int () noex ;
 	int abegin() noex ;
 	int aend() noex ;
@@ -101,7 +103,7 @@ namespace {
 		rs = bread(ifp,tbuf,rl) ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end method (ird) */
     } ; /* end struct (writer) */
 } /* end namespace */
 
@@ -151,33 +153,29 @@ writer::operator int () noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (allocation) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end method (writer::operator) */
+} /* end method (writer::operator) */
 
 int writer::abegin() noex {
-	tlen = (op->pagesize * BFILE_NPAGES) ;
-	if (ulen >= 0) {
+	if (tlen = (op->pagesz * BFILE_NPAGES) ; ulen >= 0) {
 	    if (ulen < tlen) tlen = ulen ;
 	} else {
 	    ulen = INT_MAX ;
 	}
-	return uc_valloc(tlen,&tbuf) ;
-}
-/* end method (writer::abegin) */
+	return mem.vall(tlen,&tbuf) ;
+} /* end method (writer::abegin) */
 
 int writer::aend() noex {
 	int		rs = SR_BUGCHECK ;
 	if (tbuf) {
-	    rs = uc_free(tbuf) ;
+	    rs = mem.free(tbuf) ;
 	    tbuf = nullptr ;
 	    tlen = 0 ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end method (writer::aend) */
+} /* end method (writer::aend) */
 
 writer_rd::operator int () noex {
 	return wrp->ird() ;
-}
+} /* end method */
 
 
