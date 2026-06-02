@@ -39,7 +39,6 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
 #include	<sbuf.h>
 #include	<sfx.h>
 #include	<mkpathx.h>
