@@ -19,6 +19,7 @@
 
 	Name:
 	hasbasename
+	hasbasestem
 
 	Description:
 	Determine if if the specified counted c-string (interpreted
@@ -26,11 +27,13 @@
 
 	Synopsis:
 	int hasbasename(cchar *sp,int sl,cchar *bname) noex
+	int hasbasestem(cchar *sp,int sl,cchar *sname) noex
 
 	Arguments:
 	sp		c-string to test pointer
 	sl		c-string to test length
 	bname		base-name
+	sname		stem-name
 
 	Returns:
 	false		assertion fails
@@ -39,17 +42,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usupport.h>		/* |strwcmp(3u)| */
-#include	<strwcmp.h>
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |isalphalatin(3u)| */
-#include	<localmisc.h>		/* |UC(3dam)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC |isalphalatin(3u)| */
+#include	<localmisc.h>		/* LIBU |UC(3u)| */
 
 #include	"hasbasename.h"
 
@@ -63,6 +66,8 @@ import ureserve ;			/* |sfbasename(3u)| */
 
 
 /* imported namespaces */
+
+using libu::strnrchr ;			/* subroutine */
 
 
 /* local typedefs */
@@ -91,8 +96,7 @@ import ureserve ;			/* |sfbasename(3u)| */
 bool hasbasename(cchar *sp,int 탎l,cchar *bname) noex {
         bool            f = false ;
 	if (int sl ; bname && ((sl = getlenstr(sp,탎l)) > 0)) {
-	    if (bname[0]) {
-		cchar *cp ;
+	    if (cchar *cp ; bname[0]) {
 		if (int cl ; (cl = sfbasename(sp,sl,&cp)) > 0) {
 		    f = (strwcmp(bname,cp,cl) == 0) ;
                 } /* end if (sfbasename) */
@@ -100,5 +104,20 @@ bool hasbasename(cchar *sp,int 탎l,cchar *bname) noex {
 	} /* end if (getlenstr) */
         return f ;
 } /* end subroutine (hasbasename) */
+
+bool hasbasestem(cchar *sp,int 탎l,cchar *sname) noex {
+        bool            f = false ;
+	if (int sl ; sname && ((sl = getlenstr(sp,탎l)) > 0)) {
+	    if (cchar *cp ; sname[0]) {
+		if (int cl ; (cl = sfbasename(sp,sl,&cp)) > 0) {
+		    if (cchar *tp = strnrchr(cp,cl,'.') ; tp) {
+			cint tl = intconv(tp - cp) ;
+		        f = (strwcmp(sname,cp,tl) == 0) ;
+		    }
+                } /* end if (sfbasename) */
+	    } /* end if (valid) */
+	} /* end if (getlenstr) */
+        return f ;
+} /* end subroutine (hasbasestem) */
 
 
