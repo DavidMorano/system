@@ -55,9 +55,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<sbuf.h>
@@ -87,7 +87,7 @@
 
 /* forward references */
 
-static int	schedexpand(cchar *,VECSTR *,cchar *,char *,int) noex ;
+local int	schedexpand(cchar *,VECSTR *,cchar *,char *,int) noex ;
 
 
 /* local variables */
@@ -116,9 +116,9 @@ int		permission ;
 	char		openmode[MODELEN + 1], *omp = openmode ;
 	char		*tmpfname ;
 
-	if ((fp == NULL) || (sched == NULL)) return SR_FAULT ;
+	if ((fp == nullptr) || (sched == nullptr)) return SR_FAULT ;
 
-	if (nsp == NULL) return SR_NOEXIST ;
+	if (nsp == nullptr) return SR_NOEXIST ;
 
 /* no check on 'fname' because that may be OK! */
 
@@ -179,7 +179,7 @@ int		permission ;
 	    sl = schedexpand(sched[i],nsp,fname,tmpfname,MAXPATHLEN) ;
 	    if (sl < 0) continue ;
 
-	    if ((rs = perm(tmpfname,-1,-1,NULL,R_OK)) >= 0)
+	    if ((rs = perm(tmpfname,-1,-1,nullptr,R_OK)) >= 0)
 	        break ;
 
 	} /* end for */
@@ -218,15 +218,7 @@ ret0:
 
 /* local subroutines */
 
-
-static int schedexpand(fmt,nsp,fname,buf,buflen)
-cchar	*fmt ;
-VECSTR		*nsp ;
-cchar	fname[] ;
-char		buf[] ;
-int		buflen ;
-{
-	SBUF		buffer ;
+local int schedexpand(cc *fmt,vecstr *nsp,cc *fname,char *buf,int buflen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar	*fp ;
@@ -241,107 +233,41 @@ int		buflen ;
 	if (buflen <= 0)
 	    return SR_TOOBIG ;
 
-	rs = sbuf_start(&buffer,buf,buflen) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-#if	CF_DEBUGS
-	debugprintf("bopensched/expand: about to while\n") ;
-#endif
-
+	sbuf		buffer ;
+	if ((rs = sbuf_start(&buffer,buf,buflen)) >= 0) {
 	for (fp = fmt ; *fp && (rs >= 0) ; fp += 1) {
-
-#if	CF_DEBUGS
-	    debugprintf("bopensched/expand: char=>%c<\n",*fp) ;
-#endif
-
 	    if (*fp == '%') {
-
 	        fp += 1 ;
-	        if (! *fp) 
-		    break ;
-
-#if	CF_DEBUGS
-	        debugprintf("bopensched/expand: key=>%c<\n",*fp) ;
-#endif
-
+	        if (! *fp) break ;
 	        if (*fp == '%') {
-
 	            rs = sbuf_chr(&buffer,'%') ;
-
 	        } else if (*fp == 'f') {
-
 	            rs = SR_FAULT ;
-	            if (fname != NULL)
+	            if (fname != nullptr) {
 	                rs = sbuf_strw(&buffer,fname,-1) ;
-
+		    }
 	        } else {
-
-#if	CF_DEBUGS
-	            debugprintf("bopensched/expand: got key=>%c<\n",*fp) ;
-#endif
-
 	            rs = vecstr_finder(nsp,KEYBUF(*fp),vstrkeycmp,&cp) ;
-
-#if	CF_DEBUGS
-	            debugprintf("bopensched/expand: rs=%d key_value=%s\n",
-			rs,cp) ;
-#endif
-
 	            if (rs >= 0) {
-
 	                rs = 0 ;
-	                if ((tp = strchr(cp,'=')) != NULL) {
-
-#if	CF_DEBUGS
-	                    debugprintf("bopensched/expand: storing value=%s\n",
-	                        (tp+1)) ;
-#endif
-
+	                if ((tp = strchr(cp,'=')) != nullptr) {
 	                    rs = sbuf_strw(&buffer,(tp+1),-1) ;
-
-#if	CF_DEBUGS
-	                    debugprintf("bopensched/expand: store rs=%d\n",rs) ;
-#endif
-
 	                }
 	            }
-
 	        }
-
 	    } else {
-
-#if	CF_DEBUGS
-	        debugprintf("bopensched/expand: storing regular char=>%c<\n",
-			*fp) ;
-#endif
-
 	        rs = sbuf_chr(&buffer,*fp) ;
-
 	    } /* end if */
-
-#if	CF_DEBUGS
-	    {
-	        int	len = sbuf_getlen(&buffer) ;
-
-	        debugprintf("bopensched/expand: bottom 'for', rs=%d\n",rs) ;
-	        debugprintf("bopensched/expand: buflen=%d buf=%s\n",len,buf) ;
-	    }
-#endif
-
 	} /* end for */
-
 	rs1 = sbuf_finish(&buffer) ;
 	if (rs >= 0) rs = rs1 ;
-
-ret0:
+	} /* end if (sbuf) */
 
 #if	CF_DEBUGS
 	debugprintf("bopensched/expand: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (schedexpand) */
+} /* end subroutine (schedexpand) */
 
 
