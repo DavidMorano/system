@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
 
 
 #define	ENVLIST			struct envlist_head
@@ -59,20 +59,21 @@ struct envlist : envlist_head {
 	envlist_co	count ;
 	envlist_co	finish ;
 	envlist() noex {
-	    start(this,envlistmem_start) ;
-	    count(this,envlistmem_count) ;
-	    finish(this,envlistmem_finish) ;
+	    start	(this,envlistmem_start) ;
+	    count	(this,envlistmem_count) ;
+	    finish	(this,envlistmem_finish) ;
 	    elp = nullptr ;
-	} ;
+	    store = nullptr ;
+	} ; /* end ctor */
 	envlist(const envlist &) = delete ;
 	envlist &operator = (const envlist &) = delete ;
-	int addkeyval(cchar *,cchar *,int = -1) noex ;
-	int add(cchar *,int = -1) noex ;
-	int present(cchar *,int = -1,cchar ** = nullptr) noex ;
+	int addkeyval	(cchar *,cchar *,int = -1) noex ;
+	int add		(cchar *,int = -1) noex ;
+	int present	(cchar *,int = -1,cchar ** = nullptr) noex ;
 	void dtor() noex ;
 	destruct envlist() {
 	    if (elp) dtor() ;
-	} ;
+	} ; /* end destruct */
 } ; /* end struct (envlist) */
 #else	/* __cplusplus */
 typedef ENVLIST		envlist ;
