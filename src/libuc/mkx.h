@@ -39,6 +39,7 @@
 #include	<mkgecosname.h>
 #include	<mklineclean.h>
 #include	<mkmagic.h>
+#include	<mkmid.h>
 #include	<mknpath.h>
 #include	<mkprogenv.h>
 #include	<mkpath.h>
@@ -61,7 +62,6 @@ extern int	mkrealname(char *,int,cchar *,int) noex ;
 extern int	mknoise(uint *a,int n) noex ;
 extern int	mkintfname(char *,cchar *,cchar *,cchar *) noex ;
 extern int	mktagfname(char *,cchar *,cchar *,int) noex ;
-extern int	mkmid(char *,int,cchar *,cchar *,pid_t,int) noex ;
 extern int	mkonefrom(char *,int,cchar *,int) noex ;
 extern int	mkmailname(char *,int,cchar *,int) noex ;
 extern int	mkshlibname(char *,cchar *,int) noex ;
