@@ -40,22 +40,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |UC(3dam)| */
-#include	<strnul.hh>
-#include	<dprint.hh>		/* |DPRINTF(3dam)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |UC(3u)| */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
-#include	"hasinet.h"
 #include	"hasall.h"		/* |hasalldig(3uc)| */
+#include	"hasinet.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -117,7 +117,7 @@ bool hasinet4addrstr(cchar *sp,int µsl) noex {
 	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        c += 1 ;
-	    } /* end while */
+	    } /* end for */
 	    if (f) {
 		f = false ;
 		if (sl > 0) {
@@ -177,10 +177,10 @@ bool hasinet6addrstr(cchar *sp,int µsl) noex {
 		f = f && !((ndouble >= 1) && (c > 6)) ;
 		f = f && !((ndouble == 0) && (c < 8)) ;
 		if (! f) {
-		    f = f || ((n == 2) && (c == 0)) ;
+		    f = f || ((c == 0) && (n == 2)) ;
 	            f = f || ((c == 8) && (n == 7)) ;
 	            f = f || ((c >= 1) && (n == 2) && (cz == 2)) ;
-		}
+		} /* end if */
 	    } /* end if (going) */
 	} /* end if (getlenstr) */
 	DPRINTF("ret f=%u\n",f) ;
