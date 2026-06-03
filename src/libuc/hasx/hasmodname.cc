@@ -44,15 +44,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<localmisc.h>		/* |UC(3dam)| */
+#include	<localmisc.h>		/* LIBU |UC(3u)| */
 
 #include	"hasmodname.h"
 
