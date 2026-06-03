@@ -1,6 +1,6 @@
 /* ustream HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* support some buffered file operations */
 /* version %I% last-modified %G% */
@@ -151,7 +151,7 @@ struct ustream {
 	int writefd	(char *,int,int,int) noex ;
 	destruct ustream() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end destruct */
 	int iwrite(cvoid *,int) noex ;
     private:
 	int iclose() noex ;
