@@ -101,18 +101,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<char.h>		/* |CHAR_TOVAL(3uc)| */
-#include	<ischarx.h>		/* |ishdrkey(3uc)| + |iswht(3uc)| */
-#include	<localmisc.h>		/* |UC(3dam)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<char.h>		/* LIBUC |CHAR_TOVAL(3uc)| */
+#include	<ischarx.h>		/* LIBUC |ishdrkey(3uc)| */
+#include	<localmisc.h>		/* LIBU |UC(3u)| */
 
 #include	"hasall.h"
 
