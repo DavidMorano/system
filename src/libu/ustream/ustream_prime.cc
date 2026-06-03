@@ -129,7 +129,6 @@ local int	ustream_bufcpy(ustream *,cchar *,int) noex ;
 /* local variables */
 
 cint		nfds = 1 ;
-
 cbool		f_debug		= CF_DEBUG ;
 
 static cint	pagesz		= ulibval.pagesz ;
@@ -225,46 +224,45 @@ namespace ustream_ns {
 
 namespace ustream_ns {
     int ustream_read(ustream *op,void *rbuf,int rlen,int to) noex {
+        cint        fmo = FM_TIMED ;
 	int		rs = SR_OK ;
 	int		tlen = 0 ;
-	    cint	fmo = FM_TIMED ;
-	    int		rc = (op->fl.net) ? USTREAM_RCNET : 1 ;
-	    bool	f_timedout = false ;
-	    char	*dbp = charp(rbuf) ;
-	    char	*bp ;
-	    char	*lastp ;
-	    while (tlen < rlen) {
-	        int	mlen ;
-	        while ((op->blen == 0) && (rc-- > 0)) {
-		    cint	fd = op->fd ;
-		    cint	bsz = op->dlen ;
-		    char	*buf = op->dbuf ;
-	            op->bptr = op->dbuf ;
-		    if (to >= 0) {
-	                rs = ureade(fd,buf,bsz,to,fmo) ;
-		    } else {
-	                rs = uread(fd,buf,bsz) ;
-		    }
-	            if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
-	                f_timedout = true ;
-	                rs = SR_OK ;
-	                break ;
-	            }
-	            if (rs < 0) break ;
-	            op->blen = rs ;
-	        } /* end while (refill) */
-	        if ((op->blen == 0) || f_timedout) break ;
-	        mlen = min(op->blen,(rlen - tlen)) ;
-	        bp = op->bptr ;
-	        lastp = op->bptr + mlen ;
-	        while (bp < lastp) {
-	            *dbp++ = *bp++ ;
-	        }
-	        op->bptr += mlen ;
-	        tlen += mlen ;
-	        op->blen -= mlen ;
-	    } /* end while */
-	    if (rs >= 0) op->foff += tlen ;
+        bool        f_timedout = false ;
+        char        *dbp = charp(rbuf) ;
+        while (tlen < rlen) {
+            int		rc = (op->fl.net) ? USTREAM_RCNET : 1 ;
+            while ((op->blen == 0) && (rc-- > 0)) {
+                cint        fd = op->fd ;
+                cint        bsz = op->dlen ;
+                char        *buf = op->dbuf ;
+                op->bptr = op->dbuf ;
+                if (to >= 0) {
+                    rs = ureade(fd,buf,bsz,to,fmo) ;
+                } else {
+                    rs = uread(fd,buf,bsz) ;
+                }
+                if ((rs == SR_TIMEDOUT) && (tlen > 0)) {
+                    f_timedout = true ;
+                    rs = SR_OK ;
+                    break ;
+                } /* end if (time-out) */
+                if (rs < 0) break ;
+                op->blen = rs ;
+            } /* end while (refill) */
+            if ((op->blen == 0) || f_timedout) break ;
+            if (int mlen = min(op->blen,(rlen - tlen)) ; mlen > 0) {
+                char *bp = op->bptr ;
+                for (cchar *lastp = op->bptr + mlen ; bp < lastp ; ) {
+                    *dbp++ = *bp++ ;
+                } /* end for */
+                op->bptr += mlen ;
+                tlen += mlen ;
+                op->blen -= mlen ;
+            } /* end if (copy-out of buffer) */
+        } /* end while */
+	if (rs >= 0) {
+	    op->foff += tlen ;
+	} /* end if */
 	return (rs >= 0) ? tlen : rs ;
     } /* end subroutine (ustream_read) */
 } /* end namespace (ustream_ns) */
