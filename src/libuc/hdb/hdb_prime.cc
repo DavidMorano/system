@@ -306,16 +306,15 @@ consteval DAT mkdatnull() noex {
 } /* end subroutine */
 
 local uint defhashfun(cvoid *vp,int vl) noex {
-	cchar		*cp = charp(vp) ;
+	cchar	*cp = charp(vp) ;
 	return hash_elf(cp,vl) ;
 } /* end subroutine */
 
 
 /* local variables */
 
-local const DAT	nulldatum = mkdatnull() ;
-
-local const CUR	icur = mkcurnull() ;
+local const DAT	nulldatum	= mkdatnull() ;
+local const CUR	icur		= mkcurnull() ;
 
 
 /* exported variables */
@@ -674,10 +673,10 @@ int hdb_fetch(hdb *op,HDB_D key,CUR *curp,DAT *valp) noex {
 }
 /* end subroutine (hdb_fetch) */
 
-/* fetch the next whole record by key-cursor combination */
+/* fetch the next whole record by key-cursor ('curp' ptr optional) */
 int hdb_fetchrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	int		rs ;
-	if ((rs = hdb_magic(op,curp,key.buf)) >= 0) ylikely {
+	if ((rs = hdb_magic(op,key.buf)) >= 0) ylikely {
             FETCUR          fc ;
             CUR             ncur ;
             int             htlen = op->htlen ;
@@ -697,17 +696,17 @@ int hdb_fetchrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
                     rs = hdb_findkeye(op,&fc,&key,&ep) ;
                 }
                 if (rs >= 0) {
-                    if (curp != nullptr) *curp = ncur ;
+                    if (curp) *curp = ncur ;
                     if (ep) {
                         if (keyp) *keyp = ep->key ;
                         if (valp) *valp = ep->val ;
                     }
-                }
+                } /* end if (ok) */
             } /* end if (fetchcur_load) */
             if (rs < 0) {
                 if (keyp) *keyp = nulldatum ;
                 if (valp) *valp = nulldatum ;
-            } /* end if */
+            } /* end if (error) */
 	} /* end if (magic) */
 	return rs ;
 }
