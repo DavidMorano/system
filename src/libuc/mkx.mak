@@ -83,9 +83,7 @@ OBJ_MKX= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -276,9 +274,9 @@ mknpathexp.o:		mknpathexp.cc	mknpathxx.h		$(INCS)
 mknpathuser.o:		mknpathuser.cc	mknpathxx.h		$(INCS)
 mknpathvar.o:		mknpathvar.cc	mknpathxx.h		$(INCS)
 
-mkfdfname.o:		mkfdfname.cc		$(INCS) mkfdfname.h
-mkgecosname.o:		mkgecosname.cc		$(INCS) mkgecosname.h
-mkmid.o:		mkmid.cc		$(INCS)
+mkfdfname.o:		mkfdfname.cc	mkfdfname.h		$(INCS)
+mkgecosname.o:		mkgecosname.cc	mkgecosname.h		$(INCS)
+mkmid.o:		mkmid.cc				$(INCS)
 mkaltext.o:		mkaltext.cc				$(INCS)
 
 mkaddrname.o:		mkaddrname.cc		$(INCS)
@@ -300,7 +298,7 @@ mkufname.o:		mkufname.cc	mkufname.h		$(INCS)
 mkunique.o:		mkunique.cc				$(INCS)
 mkfmtphone.o:		mkfmtphone.cc				$(INCS)
 mkfingerquery.o:	mkfingerquery.cc			$(INCS)
-mklinelcean.o:		mklineclean.cc	mklineclean.h		$(INCS)
+mklineclean.o:		mklineclean.cc	mklineclean.h		$(INCS)
 
 mkpr.o:			mkpr.cc		mkpr.h			$(INCS)
 mkxdisp.o:		mkxdisp.cc	mkxdisp.h		$(INCS)
