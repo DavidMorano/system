@@ -150,7 +150,7 @@ reader::operator int () noex {
 	    if ((rs = bufcopy(tlen)) >= 0) {
 		tlen += rs ;
 		rs = bufread(tlen) ;
-	    }
+	    } /* end if (copy-out from buffer) */
 	} /* end while */
 	return (rs >= 0) ? tlen : rs ;
 } /* end method (reader::operator) */
@@ -193,9 +193,9 @@ int reader::bufread(int tlen) noex {
                     fto = true ;
                     rs = SR_OK ;
                     break ;
-                }
+                } /* end if (time-out) */
                 if (rs < 0) break ;
-                op->len = rs ;
+                op->len = len ;
 	    } /* end for (refill) */
 	    if ((rs >= 0) && (len == 0) && (rc == 0)) {
 	        feof = true ;
