@@ -28,21 +28,21 @@
 
 EXTERNC_begin
 
-extern bool hasallalpha(cchar *,int) noex ;
-extern bool hasallalnum(cchar *,int) noex ;
-extern bool hasalldigit(cchar *,int) noex ;
-extern bool hasalldigex(cchar *,int) noex ;
-extern bool hasalloctal(cchar *,int) noex ;
-extern bool hasallwhite(cchar *,int) noex ;
-extern bool hasallblank(cchar *,int) noex ;
-extern bool hasallprint(cchar *,int) noex ;
-extern bool hasalllc(cchar *,int) noex ;
-extern bool hasalluc(cchar *,int) noex ;
+extern bool hasallalpha	(cchar *,int) noex ;
+extern bool hasallalnum	(cchar *,int) noex ;
+extern bool hasalldigit	(cchar *,int) noex ;
+extern bool hasalldigex	(cchar *,int) noex ;
+extern bool hasalloctal	(cchar *,int) noex ;
+extern bool hasallwhite	(cchar *,int) noex ;
+extern bool hasallblank	(cchar *,int) noex ;
+extern bool hasallprint	(cchar *,int) noex ;
+extern bool hasalllc	(cchar *,int) noex ;
+extern bool hasalluc	(cchar *,int) noex ;
 extern bool hasallhdrkey(cchar *,int) noex ;
-extern bool hasallterm(cchar *,int) noex ;
-extern bool hasallbase(cchar *,int,int) noex ;
-extern bool hasallchr(cchar *,int,int) noex ;
-extern bool hasallset(cchar *,int,cchar *) noex ;
+extern bool hasallterm	(cchar *,int) noex ;
+extern bool hasallbase	(cchar *,int,int) noex ;
+extern bool hasallchr	(cchar *,int,int) noex ;
+extern bool hasallset	(cchar *,int,cchar *) noex ;
 
 local inline bool hasalldig(cchar *sp,int sl) noex {
     	return hasalldigit(sp,sl) ;
