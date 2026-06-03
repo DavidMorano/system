@@ -61,11 +61,11 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>		/* |O_{xx}| */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -76,7 +76,7 @@
 #include	<field.h>
 #include	<fieldterminit.hh>
 #include	<sfx.h>			/* |sfcontent(3uc)| */
-#include	<localmisc.h>		/* |BCEIL(3dam)| */
+#include	<localmisc.h>		/* LIBU |BCEIL(3u)| */
 
 #include	"setstrx.hh"
 
