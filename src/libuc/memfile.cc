@@ -74,7 +74,7 @@ typedef size_t		sz ;
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
     extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_fdatasync(int) noex ;
+    extern int uc_fsyncdata(int) noex ;
 } /* end extern */
 
 
@@ -390,7 +390,7 @@ local int memfile_mapextend(memfile *op,size_t ext) noex {
 	    }
 	} else if (rs == 0) { /* do we need to remap entirely? */
 	    cint	fd = op->fd ;
-	    if ((rs = uc_fdatasync(fd)) >= 0) ylikely {
+	    if ((rs = uc_fsyncdata(fd)) >= 0) ylikely {
 		ma = op->dbuf ;
 	        ms = op->dlen ;
 	        rs = u_mmapend(ma,ms) ;
