@@ -50,7 +50,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<field.h>
 #include	<fieldterms.h>
 #include	<vecobj.h>
@@ -1052,11 +1052,11 @@ local int mkterms() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_hostname)) >= 0) {
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	    maxhostlen = rs ;
-	    if ((rs = getbufsize(bufsize_ml)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_ml)) >= 0) {
 		lineslen = ((rs + 1) * LINEBUFMULT) ;
-	        if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 		    entbuflen = (rs * NODEDB_ENTLENMULT) ;
 		}
 	    }
