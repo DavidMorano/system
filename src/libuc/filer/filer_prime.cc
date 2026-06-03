@@ -329,7 +329,7 @@ int filer_update(filer *op,off_t roff,cchar *rbuf,int rlen) noex {
 		    f_exit = true ;
 		    rlen = 0 ;
 	        }
-	    }
+	    } /* end if */
 	    if ((! f_exit) && (rext > bext)) {
 	        if (roff < bext) {
 	            rlen -= (rext - bext) ;
@@ -338,11 +338,11 @@ int filer_update(filer *op,off_t roff,cchar *rbuf,int rlen) noex {
 		    f_exit = true ;
 		    rlen = 0 ;
 	        }
-	    }
+	    } /* end if */
 	    if ((! f_exit) && (rlen > 0)) {
 	        bdiff = intconv(roff - boff) ;
 	        memcopy((op->dbuf + bdiff),rbuf,rlen) ;
-	    }
+	    } /* end if */
 	} /* end if (magic) */
 	DPRINTF("ret rs=%d len=%d\n",rs,rlen) ;
 	return (rs >= 0) ? rlen : rs ;
@@ -392,7 +392,7 @@ int filer_write(filer *op,cvoid *abuf,int alen) noex {
 	    } /* end while */
 	    if (rs >= 0) {
 	        op->off += alen ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d len=%d\n",rs,alen) ;
 	return (rs >= 0) ? alen : rs ;
@@ -426,12 +426,12 @@ int filer_println(filer *op,cchar *sp,int sl) noex {
 	    if ((rs >= 0) && (sl > 0)) {
 	        rs = filer_write(op,sp,sl) ;
 	        wlen += rs ;
-	    }
+	    } /* end if */
 	    if ((rs >= 0) && feol) {
 	        char	buf[2] = { '\n' } ;
 	        rs = filer_write(op,buf,1) ;
 	        wlen += rs ;
-	    }
+	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (filer_println) */
@@ -510,12 +510,12 @@ int filer_seek(filer *op,off_t woff,int w) noex {
 			off_t	noff ;
 	                rs = uc_seeko(op->fd,woff,w,&noff) ;
 	                op->off = noff ;
-	            }
+	            } /* end if (ok) */
 	        } else { /* read */
 	            off_t	aoff = 0 ;
 	            switch (w) {
 	            case SEEK_CUR:
-	                aoff = (- op->len) ;
+	                aoff = (neg op->len) ;
 	                break ;
 	            case SEEK_SET:
 	            case SEEK_END:
@@ -528,7 +528,7 @@ int filer_seek(filer *op,off_t woff,int w) noex {
 			off_t	noff ;
 	                rs = uc_seeko(op->fd,(woff + aoff),w,&noff) ;
 	                op->off = noff ;
-	            }
+	            } /* end if (ok) */
 	            op->bp = op->dbuf ;
 	            op->len = 0 ;
 	        } /* end if (write or read)  */
@@ -672,7 +672,7 @@ local int filer_bufcpy(filer *op,cchar *abp,int mlen) noex {
 	    char	*bp = op->bp ;
 	    for (int i = 0 ; i < mlen ; i += 1) {
 	        *bp++ = *abp++ ;
-	    }
+	    } /* end for */
 	} /* end if */
 	op->bp += mlen ;
 	return mlen ;
