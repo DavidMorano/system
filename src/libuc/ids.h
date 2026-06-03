@@ -41,7 +41,7 @@ enum idsmems {
 	idsmem_release,
 	idsmem_refresh,
 	idsmem_overlast
-} ;
+} ; /* end enum */
 struct ids ;
 struct ids_co {
 	ids		*op{} ;
@@ -73,7 +73,7 @@ struct ids : ids_head {
 	void dtor() noex ;
 	destruct ids() {
 	    if (gids) dtor() ;
-	} ;
+	} ; /* end destruct */
 } ; /* end struct (ids) */
 #else	/* __cplusplus */
 typedef IDS		ids ;
