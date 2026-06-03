@@ -49,10 +49,11 @@
 	<0		did not get a field delimited by specified delimiters
 
 	Notes:
-	"next" versions	allow white-space around delimiter characters
-	"chr" version	use given character exactly
-	"brk" verion	use given characters exactly
-	oper version	like 'next' versions but allow for just white-space
+	"next"		find white-space OR specified delimiter(s)
+	"sp"		find delimeter and remove surrounding white-space
+	"chr"		find delimeter only
+	"brk"		find delimeter only
+	"operator"	like 'next' versions
 
 *******************************************************************************/
 
