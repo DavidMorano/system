@@ -67,9 +67,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| + |strncmp(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -78,9 +78,9 @@
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<matstr.h>		/* |matstr(3uc)| used below */
 #include	<stdfnames.h>		/* |stdfname| used below */
-#include	<mkchar.h>
+#include	<mkchar.h>		/* LIBU */
 #include	<char.h>
-#include	<localmisc.h>		/* |UC(3dam)| */
+#include	<localmisc.h>		/* LIBU |UC(3u)| */
 
 #include	"hasmisc.h"
 
