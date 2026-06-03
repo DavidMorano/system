@@ -5,6 +5,7 @@
 /* environment variable management */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -27,17 +28,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<uclibmem.h>
-#include	<strpack.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strnul.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"envlist.h"
 
@@ -50,19 +53,21 @@ import libutil ;			/* |lenstr(3u)| */
 #define	EL_DEFENT	10
 #define	EL_CHUNKSIZE	ENVLIST_CHUNKSIZE
 
-#define	EL_DBINIT(op,n,at,hash,cmp)	\
-					hdb_start((op),(n),(at),(hash),(cmp))
-#define	EL_DBSTORE(op,k,v)		hdb_store((op),(k),(v))
+#define	EL_DBSTART(op,n,at,hash,cmp)	\
+				hdb_start((op),(n),(at),(hash),(cmp))
+#define	EL_DBSTORE(op,k,v)	hdb_store((op),(k),(v))
 #define	EL_DBFETCH(op,k,c,vp)	hdb_fetch((op),(k),(c),(vp))
 #define	EL_DBCOUNT(op)		hdb_count((op))
-#define	EL_DBFREE(op)		hdb_finish((op))
+#define	EL_DBFINISH(op)		hdb_finish((op))
 
-#define	EL_DBDATA			HDB_DATUM
+#define	EL_DBDATA		HDB_DATUM
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -84,13 +89,14 @@ typedef strpack	*	strpackp ;
 template<typename ... Args>
 local int envlist_ctor(envlist *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->store = nullptr ;
-	    if ((op->elp = new(nothrow) hdb) != np) ylikely {
+	    if ((op->elp = new(nt) hdb) != np) ylikely {
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (envlist_ctor) */
@@ -102,7 +108,7 @@ local int envlist_dtor(envlist *op) noex {
 	    if (op->elp) {
 		delete op->elp ;
 		op->elp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (envlist_dtor) */
@@ -113,6 +119,8 @@ local int	envlist_storer(envlist *) noex ;
 
 /* local variables */
 
+cbool		f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -121,12 +129,15 @@ local int	envlist_storer(envlist *) noex ;
 
 int envlist_start(envlist *op,int ne) noex {
 	int		rs ;
+	DPRINTF("ent\n") ;
 	if ((rs = envlist_ctor(op)) >= 0) ylikely {
-	    rs = EL_DBINIT(op->elp,ne,0,nullptr,nullptr) ;
+	    DPRINTF("elp=%p\n",op->elp) ;
+	    rs = EL_DBSTART(op->elp,ne,0,nullptr,nullptr) ;
 	    if (rs < 0) {
 		envlist_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 }
 /* end subroutine (envlist_start) */
@@ -134,6 +145,7 @@ int envlist_start(envlist *op,int ne) noex {
 int envlist_finish(envlist *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	DPRINTF("ent\n") ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->store) ylikely {
@@ -149,7 +161,7 @@ int envlist_finish(envlist *op) noex {
 	        op->store = nullptr ;
 	    } /* end if (store) */
 	    if (op->elp) ylikely {
-	        rs1 = EL_DBFREE(op->elp) ;
+	        rs1 = EL_DBFINISH(op->elp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -157,6 +169,7 @@ int envlist_finish(envlist *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 }
 /* end subroutine (envlist_finish) */
@@ -223,28 +236,39 @@ int envlist_count(envlist *op) noex {
 }
 /* end subroutine (envlist_count) */
 
-int envlist_present(envlist *op,cchar *sp,int sl,cchar **rpp) noex {
+int envlist_present(envlist *op,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		vl = 0 ;
-	if (op && sp) ylikely {
+	int		vlen = 0 ; /* return-value */
+	DPRINTF("ent kp=%s\n",kp) ;
+	if (op && kp) ylikely {
 	    EL_DBDATA	key ;
 	    EL_DBDATA	val{} ;
-	    int		kl = 0 ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    kl += sl ;
-	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
-		kl = intconv(tp - sp) ; /* overwrite previous value */
+	    DPRINTF("elp=%p\n",op->elp) ;
+	    if (kl < 0) kl = lenstr(kp) ;
+	    {
+		strnul ds(kp,kl) ;
+	        DPRINTF("test s=%s\n",ccp(ds)) ;
 	    }
-	    key.buf = sp ;
+	    if (cchar *tp = strnchr(kp,kl,'=') ; tp) {
+		kl = intconv(tp - kp) ; /* overwrite previous value */
+	    } /* end if */
+	    {
+		strnul ks(kp,kl) ;
+	        DPRINTF("test s=%s\n",ccp(ks)) ;
+	    }
+	    key.buf = kp ;
 	    key.len = kl ;
 	    if ((rs = EL_DBFETCH(op->elp,key,nullptr,&val)) >= 0) {
-		vl = val.len ;
-	    }
+		DPRINTF("el-defetch() rs=%d\n",rs) ;
+		vlen = val.len ;
+	    } /* end if (fetch) */
+		DPRINTF("el-defetch-out rs=%d\n",rs) ;
 	    if (rpp) {
 	        *rpp = (rs >= 0) ? charp(val.buf) : nullptr ;
 	    }
 	} /* end if (non-null) */
-	return (rs >= 0) ? vl : rs ;
+	DPRINTF("ret rs=%d vlen=%d\n",rs,vlen) ;
+	return (rs >= 0) ? vlen : rs ;
 }
 /* end subroutine (envlist_present) */
 
@@ -259,10 +283,9 @@ local int envlist_store(envlist *op,cchar *sp,int sl) noex {
 	    if ((rs = strpack_store(spp,sp,sl,&ep)) >= 0) ylikely {
 		rs = envlist_add(op,ep,rs) ;
 	    }
-	}
+	} /* end if (envlist_storer) */
 	return rs ;
-}
-/* end subroutine (envlist_store) */
+} /* end subroutine (envlist_store) */
 
 local int envlist_storer(envlist *op) noex {
 	int		rs = SR_OK ;
@@ -280,8 +303,7 @@ local int envlist_storer(envlist *op) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (envlist_storer) */
+} /* end subroutine (envlist_storer) */
 
 int envlist::addkeyval(cchar *kp,cchar *sp,int sl) noex {
 	return envlist_addkeyval(this,kp,sp,sl) ;
@@ -299,7 +321,7 @@ void envlist::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("envlist",rs,"fini-finish") ;
 	}
-}
+} /* end method (envlist::dtor) */
 
 int envlist_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
@@ -317,7 +339,6 @@ int envlist_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (envlist_co::operator) */
+} /* end method (envlist_co::operator) */
 
 
