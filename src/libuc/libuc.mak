@@ -40,12 +40,11 @@ MODS += bstree.ccm sview.ccm strfilter.ccm
 MODS += mapblock.ccm memtrack.ccm addrset.ccm
 MODS += sif.ccm
 
-LIBS= -lu -lsecdb
+LIBS= -lu -lsecdb -lnss
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -78,14 +77,14 @@ OBJ05_INIT=
 OBJ06_INIT=
 OBJ07_INIT=
 
-OBJ00= deb.o matxstr.o toxc.o char.o 
+OBJ00= matxstr.o toxc.o char.o 
 OBJ01= strn.o strnxcmp.o
 OBJ02= snwcpy.o strcpyx.o strdcpy.o
 OBJ03= strw.o strx.o mnw.o
 
 OBJ04= isx.o
 OBJ05= nleadx.o
-OBJ06= mapex.o
+OBJ06=
 OBJ07=
 
 OBJ08= caches.o
@@ -94,7 +93,7 @@ OBJ10= ctx.o cfx.o mapblock.o memtrack.o
 OBJ11= field.o termx.o
 
 OBJ12= nonpath.o
-OBJ13=
+OBJ13= msghdr.o conmsghdr.o
 OBJ14=
 OBJ15=
 
@@ -108,15 +107,15 @@ OBJ21=
 OBJ22=
 OBJ23=
 
-OBJ24= ucdescbase.o
+OBJ24= ucopen.o nonpath.o ucdescbase.o
 OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
 OBJ26= ucdescmisc.o ucdesclock.o
 OBJ27= ucproc.o ucdata.o
 
-OBJ28= ucttyname.o uctc.o ucsysconf.o
+OBJ28= uctc.o ucsysconf.o
 OBJ29= uclibmem.o ucyserattr.o
 OBJ30= ucsys.o ucatexit.o ucatfork.o
-OBJ31= tcx.o
+OBJ31= tcx.o ucpts.o ucpwcache.o
 
 OBJ=
 OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
@@ -160,7 +159,7 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).so:		$(OBJ) Makefile
@@ -236,6 +235,10 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat bstree		gcm.cache
+	rmsubpat sview		gcm.cache
+	rmsubpat bufsizedata	gcm.cache
+	rmsubpat mapblock	gcm.cache
 
 control:
 	(uname -n ; date) > Control
@@ -374,9 +377,9 @@ ucobjmode.o:		ucobjmode.cc
 ucunlink.o:		ucunlink.cc
 uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
 ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
+ucinfo.o:		ucinfo.cc	ucinfo.h		$(INCS)
 
 ucdescbase.o:		ucdescbase.cc	ucdescbase.hh		$(INCS)
-ucdescmisc.o:		ucdescmisc.cc	ucdescmisc.h		$(INCS)
 
 # uctimeout (time-out call-backs)
 uctimeout.o:		uctimeout.cc
@@ -391,9 +394,6 @@ uc_openuser.o:		uc_openuser.c opensysfs.h
 
 uckvamatch.o:		uckvamatch.cc	uckvamatch.h		$(INCS)
 
-hostinfo.o:		hostinfo.cc hostinfo.h
-hostaddr.o:		hostaddr.cc hostaddr.h
-hostent.o:		hostent.cc hostent.h
 inetaddr.o:		inetaddr.cc inetaddr.h
 sockaddress.o:		sockaddress.cc sockaddress.h
 
@@ -413,14 +413,12 @@ randomvar.o:		randomvar.cc randomvar.h
 serialbuf.o:		serialbuf.cc serialbuf.h stdorder.h
 stdorder.o:		stdorder.cc stdorder.h
 
-mapex.o:		mapex.cc mapex.h
 sigevent.o:		sigevent.cc sigevent.h
 timeout.o:		timeout.cc timeout.h
 upt.o:			upt.cc upt.h
 spawnproc.o:		spawnproc.cc spawnproc.h
 
 memfile.o:		memfile.cc memfile.h
-filemap.o:		filemap.cc filemap.h
 
 numsign.o:		numsign.cc numsign.h
 
@@ -460,7 +458,7 @@ ucproject.o:		ucproject.cc ucproject.h
 
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.ccm
-	makemodule mapblock
+	gxx -c -x c++ -o $@ -O $<
 
 # MEMTRACK
 memtrack.o:		memtrack.dir
@@ -512,6 +510,11 @@ ucdescsock.dir:
 # UCDESCLOCK
 ucdesclock.o:		ucdesclock.dir
 ucdesclock.dir:
+	makesubdir $@
+
+# UCDESCMISC
+ucdescmisc.o:		ucdescmisc.dir
+ucdescmisc.dir:
 	makesubdir $@
 
 # UCIDS
@@ -937,11 +940,9 @@ ucinetconv.o:		ucinetconv.cc ucinetconv.h
 # tab and character column handling
 tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
 
-# INET
-inetconv.o:		inetconv.cc inetconv.h
-
 # LIBUC
-ucpts.o:		ucpts.cc	ucpts.h
+ucpts.o:		ucpts.cc	ucpts.h			$(INCS)
+ucpwcache.o:		ucpwcache.cc	ucpwcache.h		$(INCS)
 tcx.o:			tcx.cc		tcx.h			$(INCS)
 
 # other objects
@@ -949,7 +950,6 @@ expcook.o:		expcook.cc	expcook.h		$(INCS)
 keyopt.o:		keyopt.cc	keyopt.h		$(INCS)
 utf8decoder.o:		utf8decoder.cc	utf8decoder.h		$(INCS)
 td.o:			td.cc		td.h termstr.h
-recip.o:		recip.cc	recip.h
 querystr.o:		querystr.cc	querystr.h
 absfn.o:		absfn.cc	absfn.h
 posname.o:		posname.cc	posname.h
@@ -960,8 +960,6 @@ userattrdb.o:		userattrdb.cc	userattrdb.h
 pmq.o:			pmq.cc		pmq.h
 filegrp.o:		filegrp.cc	filegrp.h
 unameo.o:		unameo.cc	unameo.h
-hostaddr.o:		hostaddr.cc	hostaddr.h
-hostinfo.o:		hostinfo.cc	hostinfo.h
 lookaside.o:		lookaside.cc	lookaside.h
 memfile.o:		memfile.cc	memfile.h		$(INCS)
 dirlist.o:		dirlist.cc	dirlist.h		$(INCS)
@@ -1024,11 +1022,6 @@ termx.o:		termx.dir
 termx.dir:
 	makesubdir $@
 
-# DEBUG
-deb.o:			deb.dir
-deb.dir:
-	makesubdir $@
-
 # RECIP
 recip.o:		recip.dir
 recip.dir:
@@ -1064,6 +1057,11 @@ timestr.o:		timestr.dir
 timestr.dir:
 	makesubdir $@
 
+# HOST
+host.o:			host.dir
+host.dir:
+	makesubdir $@
+
 # GETHE
 gethe.o:		gethe.dir
 gethe.dir:
@@ -1083,14 +1081,13 @@ inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 strwcmp.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 sysnoise.o:		sysnoise.cc sysnoise.h
-findfilepath.o:		findfilepath.cc findfilepath.h
-findxfile.o:		findxfile.cc findxfile.h
+findfilepath.o:		findfilepath.cc findfilepath.h		$(INCS)
+findxfile.o:		findxfile.cc	findxfile.h		$(INCS)
 calstrs.o:		calstrs.cc	calstrs.h		$(INCS)
 ipow.o:			ipow.cc		ipow.h			$(INCS)
 base64.o:		base64.cc	base64.h		$(INCS)
 shellunder.o:		shellunder.cc	shellunder.h		$(INCS)
 itcontrol.o:		itcontrol.cc	itcontrol.h		$(INCS)
-dictdiff.o:		dictdiff.cc	dictdiff.h		$(INCS)
 rsfree.o:		rsfree.cc	rsfree.h		$(INCS)
 xfile.o:		xfile.cc	xfile.h			$(INCS)
 sysmemutil.o:		sysmemutil.cc	sysmemutil.h		$(INCS)
@@ -1100,12 +1097,13 @@ conallof.o:		conallof.cc	conallof.h		$(INCS)
 nchr.o:			nchr.cc		nchr.h			$(INCS)
 inaddrbad.o:		inaddrbad.cc	inaddrbad.hh		$(INCS)
 retstat.o:		retstat.cc	retstat.h		$(INCS)
+msghdr.o:		msghdr.cc	msghdr.h		$(INCS)
+conmsghdr.o:		conmsghdr.cc	conmsghdr.h		$(INCS)
 
 # integer-conversion-to-string-digits
 strval.o:		strval.cc strval.h
 
 # emulated system kernel calls
-uinfo.o:		uinfo.cc uinfo.h
 umask.o:		umask.cc umask.h
 unameo.o:		unameo.cc unameo.h
 
@@ -1115,12 +1113,15 @@ strenv.o:		strenv.cc	strenv.hh	$(INCS)
 
 # BSTREE
 bstree.o:		bstree.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 # SVIEW
 sview.o:		sview.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 # BUFSIZEDATA
 bufsizedata.o:		bufsizedata.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 
 obj00_mod.o:		$(OBJ00_MOD)
