@@ -52,15 +52,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>		/* |CH_{xx}| */
-#include	<strmgr.h>
-#include	<mkchar.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_{xx}| */
+#include	<strmgr.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<ischarx.h>		/* |iseol(3uc)| + |isprintlatin(3uc)| */
-#include	<localmisc.h>		/* |UC(3dam)| */
+#include	<localmisc.h>		/* LIBU */
 #include	<linecleanopt.h>	/* cleaning options */
 
 #include	"mklineclean.h"
@@ -98,7 +98,7 @@ namespace {
 	    mf.nonsub = !!(m & linecleanoptm.nonsub) ;
 	    mf.nulsub = !!(m & linecleanoptm.nulsub) ;
 	    mf.nulign = !!(m & linecleanoptm.nulign) ;
-	} ;
+	} ; /* end ctor */
 	int operator () (cc *,int) noex ;
 	int	clean1(cc *,int) noex ;
 	int	clean2(cc *,int) noex ;
@@ -108,8 +108,8 @@ namespace {
 
 /* forward references */
 
-static bool	isshift(int) noex ;
-static bool	ischarok(int) noex ;
+local bool	isshift(int) noex ;
+local bool	ischarok(int) noex ;
 
 
 /* local variables */
@@ -124,7 +124,7 @@ cbool		f_clean1 = CF_CLEAN1 ;	/* use CLEAN-1 */
 
 /* exported subroutines */
 
-int mklineclean(char *rbuf,int rlen,int m,char *lp,int ll) noex {
+int mklineclean(char *rbuf,int rlen,int m,cchar *lp,int ll) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && lp) ylikely {
 	    rs = SR_INVALID ;
@@ -132,7 +132,7 @@ int mklineclean(char *rbuf,int rlen,int m,char *lp,int ll) noex {
 	        if (ll < 0) ll = lenstr(lp) ;
 	        while ((ll > 0) && iseol(lp[ll - 1])) {
 	            ll -= 1 ;
-	        }
+	        } /* end while */
 	        {
 		    cleaner c(rbuf,rlen,m) ;
 		    rs = c(lp,ll) ;
@@ -206,14 +206,14 @@ int cleaner::clean2(cchar *lp,int ll) noex {
 	return rs ;
 } /* end method (cleaner::clean2) */
 
-static bool isshift(int ch) noex {
-	int		f = false ;
+local bool isshift(int ch) noex {
+	bool	f = false ;
 	f = f || (ch == CH_SS2) ;
 	f = f || (ch == CH_SS3) ;
 	return f ;
 } /* end subroutine (isshift) */
 
-static bool ischarok(int ch) noex {
+local bool ischarok(int ch) noex {
 	return (ch == '\t') || (ch == '\n') ;
 } /* end subroutine (ischarok) */
 
