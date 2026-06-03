@@ -13,10 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<strpack.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
 
 
 #define	MKPROGENV	struct mkprogenv_head
