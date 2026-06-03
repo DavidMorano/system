@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* <- for |uid_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucentpw.h>
+#include	<sys/types.h>		/* POSIX |uid_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucentpw.h>		/* LIBU */
 
 
 #define	GETXUSER	struct getxuser_head
@@ -48,9 +48,9 @@ typedef GETXUSER	getxuser ;
 
 EXTERNC_begin
 
-extern int getxusername(getxuser *) noex ;
-extern int getusername(char *,int,uid_t) noex ;
-extern int getpwusername(ucentpw *,char *,int,uid_t) noex ;
+extern int getxusername		(getxuser *) noex ;
+extern int getusername		(char *,int,uid_t) noex ;
+extern int getpwusername	(ucentpw *,char *,int,uid_t) noex ;
 
 EXTERNC_end
 
