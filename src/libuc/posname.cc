@@ -28,18 +28,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sncpyxw.h>		/* |sncpy2w(3uc)| */
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sncpyxw.h>		/* LIBUC |sncpy2w(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"posname.h"
 
@@ -66,8 +63,8 @@ import ulibvals ;			/* |maxpathlen(3u)| */
 
 /* forward references */
 
-static int	posname_loadslash(posname *,cchar *,int,cchar **) noex ;
-static int	posname_loadnul(posname *,cchar *,int,cchar **) noex ;
+local int	posname_loadslash(posname *,cchar *,int,cchar **) noex ;
+local int	posname_loadnul(posname *,cchar *,int,cchar **) noex ;
 
 
 /* local variables */
@@ -123,7 +120,7 @@ int posname_finish(posname *op) noex {
 
 /* local subroutines */
 
-static int posname_loadslash(posname *op,cchar *sp,int sl,cchar **rpp) noex {
+local int posname_loadslash(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		nl = 0 ; /* return-value */
@@ -146,10 +143,9 @@ static int posname_loadslash(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (ulibval.maxpathlen) */
 	return (rs >= 0) ? nl : rs ;
-}
-/* end subroutine (posname_loadslash) */
+} /* end subroutine (posname_loadslash) */
 
-static int posname_loadnul(posname *op,cchar *sp,int sl,cchar **rpp) noex {
+local int posname_loadnul(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ; /* return-value */
 	if (sl > POSNAME_SHORTLEN) {
@@ -164,8 +160,7 @@ static int posname_loadnul(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	    nl = rs ;
 	} /* end if */
 	return (rs >= 0) ? nl : rs ;
-}
-/* end subroutine (posname_loadnul) */
+} /* end subroutine (posname_loadnul) */
 
 int posname::start(cchar *sp,int sl,cchar **rpp) noex {
 	return posname_start(this,sp,sl,rpp) ;
@@ -187,7 +182,6 @@ posname_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (posname_co::operator) */
+} /* end method (posname_co::operator) */
 
 
