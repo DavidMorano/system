@@ -104,7 +104,7 @@ int ids_load(ids *op) noex {
 	int		rs ;
 	int		ng = 0 ; /* return-value */
 	if ((rs = ids_ctor(op)) >= 0) ylikely {
-	    if ((rs = var) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		cint	nmax = rs ;
 	        cint	sz = ((rs + 1) * szof(gid_t)) ;
 	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
@@ -121,7 +121,7 @@ int ids_load(ids *op) noex {
 	    } /* end if (vars) */
 	    if (rs < 0) {	
 		ids_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ids_ctor) */
 	return (rs >= 0) ? ng : rs ;
 }
@@ -171,7 +171,7 @@ int ids_refresh(ids *op) noex {
 	    }
 	    if (rs >= 0) {
 		rs = ids_load(op) ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return rs ;
 }
