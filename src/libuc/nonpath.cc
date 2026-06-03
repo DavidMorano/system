@@ -42,16 +42,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bitset>		/* <- currently unused */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<six.h>			/* |siochr(3uc)| */
-#include	<ascii.h>		/* |CH_{xx}| */
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bitset>		/* C++STD <- currently unused */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<six.h>			/* LIBUC |siochr(3uc)| */
+#include	<ascii.h>		/* LIBU |CH_{xx}| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nonpath.h"
 
@@ -133,7 +133,7 @@ int nonpath(cchar *fp,int µfl) noex {
 	                    if (int si ; (si = siobrk(fp,fl,&bs.ss)) >= 0) {
 			        t = (si + nonpath_dialer) ;
 			    }
-			}
+			} /* end if */
 	            } /* end if (nonpath_user) */
 	        } /* end if (relative path) */
 	    } /* end if (getlenstr) */
