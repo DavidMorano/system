@@ -31,38 +31,38 @@ extern int pathnaddx(char *,int,int,int,cchar *,...) noex ;
 
 local inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp) noex {
 	return pathnaddw(pbuf,plen,pl,sp,-1) ;
-}
+} /* end subroutine */
 
 extern int pathaddw(char *,int,cchar *,int) noex ;
 extern int pathaddx(char *,int,int,cchar *,...) noex ;
 
 local inline int pathadd(char *pbuf,int pl,cchar *sp) noex {
 	return pathaddw(pbuf,pl,sp,-1) ;
-}
+} /* end subroutine */
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-local inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
+inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	return pathnaddw(pbuf,plen,pl,sp,sl) ;
-}
+} /* end subroutine */
 
 template<typename ... Args>
 inline int pathnadd(char *dbuf,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return pathnaddx(dbuf,dl,na,args ...) ;
-}
+} /* end subroutine */
 
-local inline int pathadd(char *pbuf,int pl,cchar *sp,int sl) noex {
+inline int pathadd(char *pbuf,int pl,cchar *sp,int sl) noex {
 	return pathaddw(pbuf,pl,sp,sl) ;
-}
+} /* end subroutine */
 
 template<typename ... Args>
 inline int pathadd(char *dbuf,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return pathaddx(dbuf,dl,na,args ...) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
