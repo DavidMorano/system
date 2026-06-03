@@ -32,11 +32,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	POSNAME			struct posname_head
@@ -52,7 +49,7 @@ struct posname_head {
 enum posnamemems {
 	posnamemem_finish,
 	posnamemem_overlast
-} ;
+} ; /* end enum */
 struct posname ;
 struct posname_co {
 	posname		*op = nullptr ;
