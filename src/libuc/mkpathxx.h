@@ -27,10 +27,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkpathrooted.h>
-#include	<mkpathmulti.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkpathrooted.h>	/* LIBUC */
+#include	<mkpathmulti.h>		/* LIBUC */
 
 
 EXTERNC_begin
