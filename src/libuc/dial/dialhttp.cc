@@ -242,7 +242,7 @@ static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
 	int		rs1 ;
 	int		rl = 0 ;
 	rbuf[0] = '\0' ;
-	if (char *dn ; (rs = lm_hn(&dn)) >= 0) {
+	if (char *dn ; (rs = lm_hostname(&dn)) >= 0) {
 	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
 	        cint	sz = ((maxpathlen + 1) * 2) ;
 	        cchar	*bdname = BINDNAME ;
