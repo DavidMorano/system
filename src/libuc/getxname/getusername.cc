@@ -5,6 +5,7 @@
 /* get the best current username */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_UTMPACC	1		/* use |utmpacc(3uc)| */
 #define	CF_GETUTMPNAME	1		/* use |getutmpname(3dam)| */
 
@@ -119,34 +120,35 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* <- for |uid_t| */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<pwd.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<utility>		/* |unreachable(c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucgetpid.h>
-#include	<ucproguser.h>
-#include	<ucentpw.h>
-#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<bufsizeget.h>
-#include	<getutmpent.h>		/* <- for |getutmpname(3uc)| */
-#include	<aflag.hh>
-#include	<utmpacc.h>
-#include	<strlibval.hh>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX <- for |uid_t| */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<pwd.h>			/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<utility>		/* C++STD |unreachable(c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetpid.h>		/* LIBUC */
+#include	<ucproguser.h>		/* LIBUC */
+#include	<ucentpw.h>		/* LIBUC */
+#include	<ucpwcache.h>		/* LIBUC |ucpwcache_name(3uc)| */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getutmpent.h>		/* LIBUC |getutmpname(3uc)| */
+#include	<aflag.hh>		/* LIBU */
+#include	<utmpacc.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"getusername.h"
 
@@ -159,13 +161,14 @@ import ureserve ;			/* |vecstr(3u)| */
 /* local defines */
 
 #define	GETXSTATE	getxusername_state
-
 #define	DEBFNAME	"/var/tmp/debuguid.txt"
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 #ifndef	CF_UTMPACC
 #define	CF_UTMPACC	0
 #endif
-
 #ifndef	CF_GETUTMPNAME
 #define	CF_GETUTMPNAME	0
 #endif
@@ -206,16 +209,16 @@ struct mapent {
 
 /* forward references */
 
-local int	getusernamer(char *,int,uid_t) noex ;
+local int	getusernamer		(char *,int,uid_t) noex ;
 
-local int	getxusername_self(getxuser *) noex ;
-local int	getxusername_varenv(getxuser *) noex ;
-local int	getxusername_utmp(getxuser *) noex ;
-local int	getxusername_map(getxuser *) noex ;
-local int	getxusername_uid(getxuser *) noex ;
+local int	getxusername_self	(getxuser *) noex ;
+local int	getxusername_varenv	(getxuser *) noex ;
+local int	getxusername_utmp	(getxuser *) noex ;
+local int	getxusername_map	(getxuser *) noex ;
+local int	getxusername_uid	(getxuser *) noex ;
 
-local int	getxusername_varbase(getxuser *,cchar *) noex ;
-local int	getxusername_lookup(getxuser *,cchar *) noex ;
+local int	getxusername_varbase	(getxuser *,cchar *) noex ;
+local int	getxusername_lookup	(getxuser *,cchar *) noex ;
 
 
 /* local variables */
@@ -254,6 +257,7 @@ static strlibval	var_logname	(strlibval_logname) ;
 static strlibval	var_home	(strlibval_home) ;
 static strlibval	var_mail	(strlibval_mail) ;
 
+constexpr bool		f_debug		= CF_DEBUG ;
 constexpr bool		f_utmpacc	= CF_UTMPACC ;
 constexpr bool		f_getutmpname	= CF_GETUTMPNAME ;
 
@@ -283,12 +287,16 @@ int getusername(char *ubuf,int ulen,uid_t uid) noex {
 int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
+	DPRINTF("ent uid=%u\n",uid) ;
 	if (pwp && pwbuf) ylikely {
 	    rs = SR_INVALID ;
+	    DPRINTF("1\n") ;
 	    if (pwlen > 0) ylikely {
+	        DPRINTF("2\n") ;
 	        if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		    getxuser	xu{} ;
 		    cint	ulen = rs ;
+	            DPRINTF("bufsizeget() un rs=%d\n",rs) ;
 		    char	ubuf[rs + 1] ;	/* <- on the stack */
 	            xu.pwp = pwp ;
 	            xu.pwbuf = pwbuf ;
@@ -296,11 +304,14 @@ int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	            xu.ubuf = ubuf ;
 	            xu.ulen = ulen ;
 	            xu.uid = uid ;
+		    DPRINTF("-> getxusername\n") ;
 	            rs = getxusername(&xu) ;
+		    DPRINTF("getxusername() rs=%d\n",rs) ;
 		    len = rs ;
 	        } /* end if (bufsizeget) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getpwusername) */
@@ -312,16 +323,24 @@ local int getxusername_µcache(getxuser *) noex ;
 int getxusername(getxuser *xup) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
 	if (xup) ylikely {
+	DPRINTF("1\n") ;
 	    if (xup->pwp && xup->ubuf) ylikely {
+	DPRINTF("2\n") ;
+	DPRINTF("-> getxusername_uprep\n") ;
 		if ((rs = getxusername_µprep(xup)) >= 0) ylikely {
+	DPRINTF("getxusername_uprep() rs=%d\n",rs) ;
 		    if ((rs = getxusername_µtryer(xup)) > 0) ylikely {
+	DPRINTF("getxusername_utryer() rs=%d\n",rs) ;
 		        len = rs ;
 		        rs = getxusername_µcache(xup) ;
+	DPRINTF("getxusername_ucache() rs=%d\n",rs) ;
 		    } /* end if (got one) */
 		} /* end if (preparation) */
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getxusername) */
@@ -382,27 +401,39 @@ local int getxusername_µtryer(getxuser *xup) noex {
     	int		rs = SR_NOMEM ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
         if (vecstr *nlp ; (nlp = new(nt) vecstr) != np) ylikely {
 	    cint	vn = 10 ;
+	DPRINTF("1\n") ;
 	    xup->nlp = nlp ;
             if ((rs = nlp->start(vn)) >= 0) ylikely {
+	DPRINTF("vecstr_start() rs=%d\n",rs) ;
 		{
                     for (int i = 0 ; getxusernames[i] ; i += 1) {
                         getxuser_f  fun = getxusernames[i] ;
+	DPRINTF("for i=%d\n",i) ;
                         rs = fun(xup) ;
+	DPRINTF("for fun rs=%d\n",rs) ;
                         if (rs) break ;
                     } /* end for */
+	DPRINTF("for-out rs=%d\n",rs) ;
                     len = rs ;
 		} /* end block */
+	DPRINTF("-> vecstr_finish\n") ;
                 rs1 = nlp->finish ;
                 if (rs >= 0) rs = rs1 ;
+	DPRINTF("vecstr_finish() rs=%d\n",rs) ;
             } /* end if (vecstr) */
+	DPRINTF("vecstr_start-out  rs=%d\n",rs) ;
             if ((rs >= 0) && (len == 0)) {
 		rs = SR_NOTFOUND ;
 	    }
+	    {
             delete nlp ;
             xup->nlp = nullptr ;
+	    } /* end if (memory-release) */
         } /* end if (new-vecstr) */
+	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (getxusername_µtryer) */
 
@@ -421,18 +452,24 @@ local int getxusername_self(getxuser *xup) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
 	xup->unl = 0 ;
+	DPRINTF("ent\n") ;
 	if (xup->f_self && (! xup->f_tried)) {
 	    const uid_t	uid = xup->uid ;
 	    char	*ubuf = xup->ubuf ;
 	    cint	ulen = xup->ulen ;
+	    DPRINTF("1\n") ;
 	    if ((rs = ucproguser_nameget(ubuf,ulen,uid)) > 0) {
+	        DPRINTF("ucproguser_nameget() rs=%d\n",rs) ;
 		xup->unl = rs ;
 		len = rs ;
 		if ((rs = getxusername_lookup(xup,xup->ubuf)) == 0) {
+	            DPRINTF("getxusername_lookup() rs=%d\n",rs) ;
 		    len = 0 ;
-		}
+		} /* end if */
+	        DPRINTF("getxusername_lookup- out rs=%d\n",rs) ;
 	    } /* end if (ucproguser_nameget) */
 	} /* end if (self) */
+	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (getxusername_self) */
 
@@ -488,7 +525,7 @@ local int getxusername_utmp(getxuser *xup) noex {
 		        } else {
 		            rs = SR_NOTFOUND ;
 		            xup->ubuf[0] = '\0' ;
-		        }
+		        } /* end if */
 		    } /* end if (utmpacc_entsid) */
 		    rs1 = lm_free(uebuf) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -513,11 +550,11 @@ local int getxusername_utmp(getxuser *xup) noex {
 	    } else {
 		len = 0 ;
 	        rs = SR_OK ;
-	    }
+	    } /* end if */
 	} else if (isNotPresent(rs)) {
 	    len = 0 ;
 	    rs = SR_OK ;
-	}
+	} /* end if (was not present) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (getxusername_utmp) */
 
@@ -569,7 +606,7 @@ local int getxusername_varbase(getxuser *xup,cchar *vv) noex {
 	    if (int sl ; (sl = sfbasename(vv,-1,&sp)) > 0) {
 	        while ((sl > 0) && (sp[sl - 1] == '/')) {
 	            sl -= 1 ;
-	        }
+	        } /* end while */
 	        if ((sl > 0) && (sp[0] != '/')) {
 	            if ((rs = snwcpy(xup->ubuf,xup->ulen,sp,sl)) >= 0) {
 			len = rs ;
