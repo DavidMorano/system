@@ -104,7 +104,7 @@ enum atypes {
 local int	mkaddrx(char *,int,cchar *,int) noex ;
 local int	emaentry_bestfrom(ema_ent *,char *,int) noex ;
 
-static bool	isBadAddr(int) noex ;
+local bool	isBadAddr(int) noex ;
 
 
 /* local variables */
@@ -165,8 +165,7 @@ local int mkaddrx(char *rbuf,int rlen,cchar *sp,int sl) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (ema) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkaddrx) */
+} /* end subroutine (mkaddrx) */
 
 local int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	int		rs = SR_OK ;
@@ -226,12 +225,10 @@ local int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	    } /* end if (positive) */
 	} /* end if_constexpr (f_massage) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (emaentry_bestfrom) */
+} /* end subroutine (emaentry_bestfrom) */
 
-static bool isBadAddr(int rs) noex {
+local bool isBadAddr(int rs) noex {
 	return isOneOf(rsbadaddr,rs) ;
-}
-/* end subroutine (emaentry_bestfrom) */
+} /* end subroutine (emaentry_bestfrom) */
 
 
