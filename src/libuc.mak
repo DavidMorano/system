@@ -400,8 +400,6 @@ sockaddress.o:		sockaddress.cc sockaddress.h
 storeitem.o:		storeitem.cc storeitem.h
 storebuf.o:		storebuf.cc storebuf.h
 
-varray.o:		varray.cc varray.h
-
 lookaside.o:		lookaside.cc lookaside.h
 
 spawner.o:		spawner.cc spawner.h
@@ -428,8 +426,6 @@ spwdent.o:		spwdent.cc spwdent.h
 groupent.o:		groupent.cc groupent.h
 projectent.o:		projectent.cc projectent.h
 userattrent.o:		userattrent.cc userattrent.h
-
-mkprogenv.o:		mkprogenv.cc mkprogenv.h
 
 strcpyxc.o:		strcpyxc.cc strcpyxc.h
 
@@ -963,7 +959,6 @@ unameo.o:		unameo.cc	unameo.h
 lookaside.o:		lookaside.cc	lookaside.h
 memfile.o:		memfile.cc	memfile.h		$(INCS)
 dirlist.o:		dirlist.cc	dirlist.h		$(INCS)
-varray.o:		varray.cc	varray.h		$(INCS)
 csem.o:			csem.cc		csem.h			$(INCS)
 pwcache.o:		pwcache.cc	pwcache.h		$(INCS)
 lockrw.o:		lockrw.cc	lockrw.h		$(INCS)
