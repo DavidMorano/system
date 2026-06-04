@@ -45,7 +45,7 @@ namespace ucgetx {
     } ; /* end struct (gethzer) */
 } /* end namespace (ucgetx) */
 
-extern ucgetx::gethzer	gethz ;
+extern ucgetx::gethzer	syshz ;
 
 #endif /* __cplusplus */
 
