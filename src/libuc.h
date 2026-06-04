@@ -62,12 +62,8 @@
 #include	<dirent.h>
 #include	<dstr.h>
 #include	<dupstr.h>
-#include	<envhelp.h>
-#include	<envlist.h>
-#include	<envmgr.h>
 #include	<envs.h>
-#include	<envstandards.h>	/* MUST be first to configure */
-#include	<envstandards.h>	/* ordered first to configure */
+#include	<envx.h>
 #include	<epsem.h>
 #include	<errno.h>
 #include	<estrings.h>
@@ -132,12 +128,10 @@
 #include	<mkdirs.h>
 #include	<mkfile.h>
 #include	<mklogid.h>
-#include	<mkprogenv.h>
 #include	<mkdirs.h>
 #include	<mkfile.h>
 #include	<mklogid.h>
 #include	<mkpathxx.h>
-#include	<mkprogenv.h>
 #include	<mktmp.h>
 #include	<mkx.h>
 #include	<modload.h>
