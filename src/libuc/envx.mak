@@ -41,11 +41,11 @@ LIBS +=
 
 
 OBJ0= envhelp.o envlist.o envmgr.o
-OBJ1=
+OBJ1= envmk.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 
 OBJ= obja.o
 
@@ -133,8 +133,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-envmgr.o:		envmgr.cc envmgr.h	$(INCS)
-envhelp.o:		envhelp.cc envhelp.h	$(INCS)
-envlist.o:		envlist.cc envlist.h	$(INCS)
+envmgr.o:		envmgr.cc	envmgr.h	$(INCS)
+envhelp.o:		envhelp.cc	envhelp.h	$(INCS)
+envlist.o:		envlist.cc	envlist.h	$(INCS)
+envmk.o:		envmk.cc	envmk.h		$(INCS)
 
 
