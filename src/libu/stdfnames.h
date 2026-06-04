@@ -23,11 +23,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdfiles.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdfiles.h>		/* LIBU */
 
 
 #ifndef	STDFNIN
