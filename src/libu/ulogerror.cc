@@ -40,15 +40,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdio>		/* |snprintf(3c)| */
-#include	<cstring>		/* |strlcpy(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)|  */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |getenv(3c)| */
+#include	<cstdio>		/* CSTD |snprintf(3c)| */
+#include	<cstring>		/* CSTD |strlcpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ulogerror.h"		/* <- redundant */
 
@@ -63,9 +62,6 @@
 
 /* imported namespaces */
 
-using std::min ;		/* subroutine-template */
-using std::max ;		/* subroutine-template */
-
 
 /* local typedefs */
 
@@ -79,21 +75,23 @@ using std::max ;		/* subroutine-template */
 /* local structures */
 
 namespace {
-   struct ulogerrmgr_ent {
+    struct ulogerrmgr_ent {
 	int		err ;
 	char		id[ULOGERRMGR_IDLEN+1] ;
 	char		msg[ULOGERRMGR_MSGLEN+1] ;
-   } ;
-   struct ulogerrmgr {
+    } ; /* end struct */
+    struct ulogerrmgr {
 	ulogerrmgr_ent	ents[ULOGERRMGR_NENTS] = {} ;
 	int		c = 0 ;
 	int record(cchar *,int,cchar * = nullptr) noex ;
 	void fini() noex ;
 	destruct ulogerrmgr() noex {
 	    fini() ;
-	} ;
+	} ; /* end destruct */
+    private:
+	void fini_ents(int) noex ;
     } ; /* end struct ulogerrmgr) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -108,7 +106,7 @@ static charp strdcpyu(char *dp,int dl,cchar *sp) noex {
 	        cint	sl = int(rsz) ;
 	        rp = charp(dp+sl) ;
 	    }
-	}
+	} /* end if (non-zero positive) */
 	return rp ;
 } /* end subroutine (strdcpyu) */
 
@@ -116,9 +114,7 @@ static charp strdcpyu(char *dp,int dl,cchar *sp) noex {
 /* local variables */
 
 static constexpr int		wlen = (ULOGERRMGR_MSGLEN*2) ;
-
 static constexpr char		var[] = ULOGERRMGR_VARNAME ;
-
 static constinit ulogerrmgr	ulogerrmgr_data ;
 
 
@@ -158,23 +154,27 @@ int ulogerrmgr::record(cchar *id,int err,cchar *msg) noex {
 void ulogerrmgr::fini() noex {
 	static cint	fd = FD_STDERR ;
 	cchar		*announce = "ulogerror: dump\n" ;
-	cchar		*fmt = "ulogerror: %s (%3d) %s\n" ;
-	if (cchar *vp ; (vp = getenv(var)) != nullptr) {
-	    if (vp[0] && (c > 0)) {
-		cauto	snfmt = snprintf ;
-		char	wbuf[wlen+1] ;
+	if (cchar *vnp = getenv(var) ; vnp) {
+	    if (vnp[0] && (c > 0)) {
 		write(fd,announce,strlen(announce)) ;
-	        for (int i = 0 ; i < c ; i += 1) {
-		    csize	wsize = size_t(wlen + 1) ;
-	            cint	err = ents[i].err ;
-	            cchar	*id = ents[c].id ;
-	            cchar	*msg = ents[c].msg ;
-		    if (int wl ; (wl = snfmt(wbuf,wsize,fmt,id,err,msg)) > 0) {
-		        write(fd,wbuf,wl) ;
-		    } /* end if (snprintf) */
-		} /* end for */
+		fini_ents(fd) ;
 	    } /* end if (have valid) */
 	} /* end if (have variable) */
 } /* end subroutine (ulogerrmgr::fini) */
+
+void ulogerrmgr::fini_ents(int fd) noex {
+	cauto	snfmt = snprintf ;
+	char	wbuf[wlen+1] ;
+	cchar	*fmt = "ulogerror: %s (%3d) %s\n" ;
+	for (int i = 0 ; i < c ; i += 1) {
+	    csize	wsize = size_t(wlen + 1) ;
+	    cint	err = ents[i].err ;
+	    cchar	*id = ents[c].id ;
+	    cchar	*msg = ents[c].msg ;
+	    if (int wl ; (wl = snfmt(wbuf,wsize,fmt,id,err,msg)) > 0) {
+		write(fd,wbuf,wl) ;
+	    } /* end if (snprintf) */
+	} /* end for */
+} /* end subroutine (ulogerrmgr::fini_ents) */
 
 
