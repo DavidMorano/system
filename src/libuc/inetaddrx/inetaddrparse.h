@@ -6,6 +6,13 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-02-14, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	INETADDRPARSE_INCLUDE
@@ -13,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	INETADDRPARSE		struct inetaddrparse_head
