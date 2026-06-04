@@ -13,13 +13,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
-#include	<expcook.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<expcook.h>		/* LIBUC*/
+#include	<vecstr.h>		/* LIBUC*/
+#include	<localmisc.h>		/* LIBU */
 
 
 #define	ENVS		struct envs_head
