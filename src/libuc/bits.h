@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 #define	BITS		struct bits_head
@@ -96,7 +96,7 @@ struct bits : bits_head {
 	void dtor() noex ;
 	destruct bits() {
 	    if (a) dtor() ;
-	} ;
+	} ; /* end destruct */
 } ; /* end struct (bits) */
 
 #else /* __cplusplus */
