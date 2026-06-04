@@ -5,7 +5,7 @@
 /* does the given string have all of the given characters? */
 /* version %I% last-modified %G% */
 
-#define	CF_BITSET	1		/* compile in alternative version */
+#define	CF_bitsET	1		/* compile in alternative version */
 
 /* revision history:
 
@@ -57,8 +57,8 @@
 
 /* local defines */
 
-#ifndef	CF_BITSET
-#define	CF_BITSET	1		/* compile in alternative version */
+#ifndef	CF_bitsET
+#define	CF_bitsET	1		/* compile in alternative version */
 #endif
 
 
@@ -88,7 +88,7 @@ local int conallof_dupstr(cchar *,int,cchar *) noex ;
 /* local variables */
 
 cint		nchars		= (UCHAR_MAX + 1) ;
-cbool		f_bitset	= CF_BITSET ;
+cbool		f_bitset	= CF_bitsET ;
 
 
 /* exported variables */
