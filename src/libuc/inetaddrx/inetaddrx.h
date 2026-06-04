@@ -8,7 +8,7 @@
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
+	= 1998-02-14, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<inetaddr.h>
 #include	<inetaddrparse.h>
