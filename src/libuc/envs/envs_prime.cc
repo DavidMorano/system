@@ -27,15 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<hdb.h>
-#include	<vecstr.h>
-#include	<nulstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"envs.h"
 
