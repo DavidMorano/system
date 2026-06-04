@@ -36,16 +36,16 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cwchar>		/* |wchar_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cwchar>		/* CSTD |wchar_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
