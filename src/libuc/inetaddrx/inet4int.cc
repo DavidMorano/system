@@ -22,15 +22,18 @@
 	inet4int
 
 	Description:
-        We convert an INETv4 address (in network form) to a host
-        unsigned-integer in network order.
+	I convert an INETv4 address (in network-order form) to a
+	host (host-ordered) unsigned-integer.  Here I just interpret
+	"network-order" as "big-endian" order.  This subroutine 
+	should be essentially almost identical to |ntohl(3c)|.
 
 	Synopsis:
-	uint inet4int(cvoid *ap,int al) noex
+	uint inet4int(cvoid *ap) noex
 
 	Arguments:
-	ap		pointer to INETv4 address in network form
-	al		length of INETv4 address
+	ap		pointer to INETv4 address in network form;
+			address in byte order: <33><22><11><00>
+
 
 	Returns:
 	-		integer that is the INETv4 address in network order
@@ -38,11 +41,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>		/* |UC(3local)| */
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |UC(3u)| */
 
 #include	"inet4int.h"
 
@@ -82,7 +88,7 @@ uint inet4int(cvoid *ap) noex {
 	    cchar	*cp = charp(ap) ;
 	    for (int i = 0 ; i < 4 ; i += 1) {
 	        uint	uv = UC(cp[i]) ;
-	        v <<= 8 ;
+	        v <<= CHAR_BIT ;
 	        v |= uv ;
 	    } /* end for */
 	} /* end if (non-null) */
