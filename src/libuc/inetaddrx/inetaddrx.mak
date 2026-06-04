@@ -157,6 +157,7 @@ inetconv.o:		inetconv.cc		inetconv.h		$(INCS)
 inet4int.o:		inet4int.cc		inet4int.h		$(INCS)
 inaddrbad.o:		inaddrbad.cc		inaddrbad.hh		$(INCS)
 
+# this has been archived because I use the version in LIBU-USUPPORT
 cfinet.o:		cfinet.cc		cfinet.hh
 
 
