@@ -132,7 +132,7 @@ static hzmgr		gethz_data ;
 
 /* exported variables */
 
-ucgetx::gethzer		gethz ;
+ucgetx::gethzer		syshz ;
 
 
 /* exported subroutines */
