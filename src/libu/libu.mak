@@ -92,7 +92,7 @@ OBJ35= utmptypes.o utmpsizes.o ascii.o
 
 OBJ36= mapex.o deb.o
 OBJ37= syspredefined.o
-OBJ38=
+OBJ38= ffbs.o flbs.o
 OBJ39=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -104,7 +104,7 @@ OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
 OBJI= obj32.o obj33.o obj34.o obj35.o
-OBJJ= obj36.o obj37.o
+OBJJ= obj36.o obj37.o obj38.o
 
 OBJ += obja.o objb.o objc.o objd.o 
 OBJ += obje.o objf.o objg.o objh.o
@@ -611,6 +611,12 @@ ischx1.o:		ischx1.cc	ischx0.o	ischx.hh	$(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 udiv.o:			udiv.ccm	udiv.hh				$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+ffbs.o:			ffbs.ccm	ffbs.h				$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+flbs.o:			flbs.ccm	flbs.h				$(ICNS)
 	gxx -c -x c++ -o $@ -O $<
 
 # singles
