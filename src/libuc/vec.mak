@@ -31,13 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= vec.h
+INCS += vec.h
 
 MODS += 
 
-LIBS=
+LIBS +=
 
 
 # vecstr
@@ -84,16 +84,14 @@ OBJ_VECELEM= vecelem_prime.o vecelem_obj.o
 OBJA_VEC= obj_vecstr.o obj_vecpstr.o obj_vecstrx.o
 OBJB_VEC= vechand.o vecitem.o vecsorthand.o
 OBJC_VEC= vecint.o veclong.o vsetstr.o
-OBJD_VEC= recarr.o raqhand.o obj_vecobj.o
-OBJE_VEC= obj_vecelem.o
+OBJD_VEC= recarr.o raqhand.o varray.o
+OBJE_VEC= obj_vecelem.o obj_vecobj.o
 
 OBJ_VEC= obja_vec.o objb_vec.o objc_vec.o objd_vec.o obje_vec.o
 
 
 INCDIRS += 
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -136,7 +134,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ_VEC)
@@ -279,5 +277,6 @@ vsetstr.o:		vsetstr.cc		vsetstr.h	$(INCS)
 
 raqhand.o:		raqhand.cc		raqhand.h	$(INCS)
 recarr.o:		recarr.cc		recarr.h	$(INCS)
+varray.o:		varray.cc		varray.h	$(INCS)
 
 
