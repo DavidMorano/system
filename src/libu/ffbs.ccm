@@ -1,0 +1,163 @@
+/* ffbs MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* find the first bit set in various integer types */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-04-10, David A­D­ Morano
+        This code was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/******************************************************************************* 
+	Group:
+	ffbs{x}
+
+	Names:
+	ffbsi
+	ffbsl
+	ffbsll
+	ffbsui
+	ffbsul
+	ffbsull
+
+	Description:
+	These subroutines find the first bit set in various integer
+	types.
+
+	Synopsis:
+	int ffbsi(int) noex 
+	int ffbsl(long) noex 
+	int ffbsll(longlong) noex 
+	int ffbsui(uint) noex 
+	int ffbsul(ulong) noex 
+	int ffbsull(ulonglong) noex 
+
+	Arguments:
+	-		value to analyze
+
+	Returns:
+	>=0		first (lowest) bit number found to be set
+	<0		did not find any set bits
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<concepts>		/* C++STD |integral(3c++)| */
+#include	<bit>			/* C++STD |countl_zero(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"ffbs.h"
+
+export module ffbs ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::integral ;			/* concept */
+using std::integral_unsigned ;		/* concept */
+using std::integral_signed ;		/* concept */
+using std::countr_zero ;		/* subroutine-template */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+export {
+    template<integral T> constexpr int ffbs(T v) noex {
+	int		bn = -1 ; /* return-value */
+	if (v) {
+	    if_constexpr (szof(T) == szof(int)) {
+	        uint		vu = uint(v) ;
+	        {
+	    	    bn = countr_zero(vu) ;
+	        }
+	    } else if_constexpr (szof(T) == szof(long)) {
+	        ulong		vu = ulong(v) ;
+	        {
+	    	    bn = countr_zero(vu) ;
+	        }
+	    } else if_constexpr (szof(T) == szof(longlong)) {
+	        ulonglong	vu = ulonglong(v) ;
+	        {
+	    	    bn = countr_zero(vu) ;
+	        }
+	    } /* end if_constexpr */
+	} /* end if (non-zero positive) */
+	return bn ;
+    } /* end subroutine-template (ffbs) */
+} /* end export */
+
+
+/* local variables */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+export {
+    extern "C" {
+	int ffbsi	(int v)		noex {
+	    cuint	uv = uint(v) ;
+	    return ffbs(uv) ;
+	}
+	int ffbsl	(long v)	noex {
+	    culong	uv = ulong(v) ;
+	    return ffbs(uv) ;
+	}
+	int ffbsll	(longlong v)	noex {
+	    culonglong	uv = ulonglong(v) ;
+	    return ffbs(uv) ;
+	}
+    } /* end extern (C) */
+} /* end export */
+
+export {
+    extern "C" {
+	int ffbsui	(uint uv)	noex {
+	   return ffbs(uv) ;
+	}
+	int ffbsul	(ulong uv)	noex {
+	   return ffbs(uv) ;
+	}
+	int ffbsull	(ulonglong uv)	noex {
+	   return ffbs(uv) ;
+	}
+    } /* end extern (C) */
+} /* end export */
+
+
