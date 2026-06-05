@@ -33,26 +33,27 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>
-#include	<unistd.h>
-#include	<fcntl.h>		/* |mode_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX |mode_t| */
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
-#define	UCOPENINFO	ucopeninfo_head
+#define	UCOPENINFO	struct ucopeninfo_head
 
 
 struct ucopeninfo_head {
 	mainv		envv ;
-	cchar		*fname ;
+	cchar		*fname ;	/* caller argument */
 	int		clinks ;
 	int		oflags ;
 	int		to ;
 	int		opts ;
+	int		pf ;		/* protocol-family */
+	int		pt ;		/* protocol-type */
+	int		proto ;		/* protocol */
 	mode_t		operms ;
 } ; /* end struct (ucopeninfo) */
 
@@ -60,9 +61,9 @@ typedef UCOPENINFO	ucopeninfo ;
 
 EXTERNC_begin
 
-extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
-extern int	uc_openinfo(ucopeninfo *) noex ;
-extern int	uc_openuserinfo(ucopeninfo *) noex ;
+extern int	uc_openex	(cchar *,int,mode_t,int,int) noex ;
+extern int	uc_openinfo	(ucopeninfo *) noex ;
+extern int	uc_openuserinfo	(ucopeninfo *) noex ;
 
 EXTERNC_end
 
