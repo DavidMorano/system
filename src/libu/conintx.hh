@@ -21,12 +21,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<type_traits>
-#include	<concepts>
-#include	<clanguage.h>
-#include	<stdintx.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<type_traits>		/* C++STD */
+#include	<concepts>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 template<typename T>
