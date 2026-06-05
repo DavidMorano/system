@@ -64,8 +64,8 @@ import chrset ;
 /* external subroutines */
 
 extern "C++" {
-    int		siobrk(cchar *,int,const chrset &) noex ;
-    int		sirbrk(cchar *,int,const chrset &) noex ;
+    int		siobrk(cchar *,int,con chrset *) noex ;
+    int		sirbrk(cchar *,int,con chrset *) noex ;
 }
 
 
@@ -104,7 +104,7 @@ int siext(cchar *fp,int µfl) noex {
 	    while ((fl > 0) && (fp[fl - 1] == CH_SLASH)) {
 	        fl -= 1 ;
 	    }
-	    if ((si = sirbrk(fp,fl,bi.brks)) >= 0) {
+	    if ((si = sirbrk(fp,fl,&bi.brks)) >= 0) {
 		if (fp[si] == CH_DOT) {
 		    si += 1 ;
 		} else {
