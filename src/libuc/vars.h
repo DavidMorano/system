@@ -28,7 +28,6 @@
 #include	<varhdr.h>		/* <- the money shot */
 
 
-#define	VARS_MAGIC	0x88773421
 #define	VARS		struct vars_head
 #define	VARS_FL		struct vars_flags
 #define	VARS_INFO	struct vars_information
@@ -36,6 +35,7 @@
 #define	VARS_CUR	struct vars_cursor
 #define	VARS_FM		struct vars_fmap
 #define	VARS_MI		struct vars_mindex
+#define	VARS_MAGIC	0x88773421
 
 
 struct vars_flags {
