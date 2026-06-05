@@ -68,6 +68,8 @@
 
 /* imported namespaces */
 
+using libuc::libmem ;
+
 
 /* local typedefs */
 
@@ -83,7 +85,7 @@
 struct terment {
 	cchar		*devpath ;
 	time_t		atime ;
-} ;
+} ; /* end struct */
 
 typedef terment *	termentp ;
 
@@ -104,17 +106,17 @@ namespace {
 	int entfins(vecobj *) noex ;
 	operator int () noex ;
     } ; /* end struct (subinfo) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int	terment_start(terment *,cchar *,int,time_t) noex ;
-static int	terment_finish(terment *) noex ;
+local int	terment_start(terment *,cchar *,int,time_t) noex ;
+local int	terment_finish(terment *) noex ;
 
-static int	mktermfname(char *,int,cchar *,int) noex ;
-static int	getatime(cchar *,time_t *) noex ;
-static int	revsortfunc(cvoid **,cvoid **) noex ;
+local int	mktermfname(char *,int,cchar *,int) noex ;
+local int	getatime(cchar *,time_t *) noex ;
+local int	revsortfunc(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
@@ -133,9 +135,9 @@ int tmpx_getuserterms(tmpx *op,vecstr *lp,cchar *username) noex {
 	if (op && lp && username) {
 	    rs = SR_INVALID ;
 	    if (username[0]) {
-		subinfo		go(op,lp,username) ;
-		rs = go ;
-		c = rs ;
+		if (subinfo go(op,lp,username) ; (rs = go) >= 0) {
+		    c = rs ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -147,33 +149,31 @@ int tmpx_getuserterms(tmpx *op,vecstr *lp,cchar *username) noex {
 
 int subinfo::start() noex {
 	int		rs ;
-	if ((rs = lm_mp(&tbuf)) >= 0) {
+	if ((rs = libmem.mp(&tbuf)) >= 0) {
 	    tlen = rs ;
 	    if ((rs = mkpath(tbuf,devdname)) >= 0) {
 		dnl = rs ;
 	    } /* end if (mkpath) */
 	    if (rs < 0) {
-		lm_free(tbuf) ;
+		libmem.free(tbuf) ;
 		tbuf = nullptr ;
 		tlen = 0 ;
 	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end method (subinfo::start) */
+} /* end method (subinfo::start) */
 
 int subinfo::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (tbuf) {
-	    rs1 = lm_free(tbuf) ;
+	    rs1 = libmem.free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    tbuf = nullptr ;
 	    tlen = 0 ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end method (subinfo::finish) */
+} /* end method (subinfo::finish) */
 
 subinfo::operator int () noex {
 	int		rs = SR_OK ;
@@ -188,8 +188,7 @@ subinfo::operator int () noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (start-finish) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (subinfo::operator) */
+} /* end method (subinfo::operator) */
 
 int subinfo::entget() noex {
 	vecobj		elist, *elp = &elist ;
@@ -235,8 +234,7 @@ int subinfo::entget() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecobj) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (subinfo::operator) */
+} /* end method (subinfo::operator) */
 
 int subinfo::entproc(vecobj *elp,int tl) noex {
 	time_t		ti_access{} ;
@@ -254,8 +252,7 @@ int subinfo::entproc(vecobj *elp,int tl) noex {
 	    } /* end if (terment_start) */
 	} /* end if (we had a better one) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (subinfo::entproc) */
+} /* end method (subinfo::entproc) */
 
 int subinfo::entstore(vecobj *elp) noex {
 	int		rs ;
@@ -270,8 +267,7 @@ int subinfo::entstore(vecobj *elp) noex {
 	    } /* end for */
 	} /* end if (vecobj_sort) */
 	return rs ;
-}
-/* end method (subinfo::entstore) */
+} /* end method (subinfo::entstore) */
 
 int subinfo::entfins(vecobj *elp) noex {
 	int		rs = SR_OK ;
@@ -287,10 +283,9 @@ int subinfo::entfins(vecobj *elp) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end method (subinfo::entfins) */
+} /* end method (subinfo::entfins) */
 
-static int terment_start(terment *ep,cchar *fp,int fl,time_t t) noex {
+local int terment_start(terment *ep,cchar *fp,int fl,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if (ep && fp) {
 	    ep->atime = t ;
@@ -299,31 +294,28 @@ static int terment_start(terment *ep,cchar *fp,int fl,time_t t) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_start) */
+} /* end subroutine (terment_start) */
 
-static int terment_finish(terment *ep) noex {
+local int terment_finish(terment *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (ep) {
 	    rs = SR_OK ;
 	    if (ep->devpath) {
 		void *vp = voidp(ep->devpath) ;
-	        rs1 = lm_free(vp) ;
+	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->devpath = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_finish) */
+} /* end subroutine (terment_finish) */
 
-static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl) noex {
+local int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl) noex {
 	return pathaddw(rbuf,ddnl,sp,sl) ; /* <- nice refactor here */
-}
-/* end subroutine (mktermfname) */
+} /* end subroutine (mktermfname) */
 
-static int getatime(cchar *termdev,time_t *rp) noex {
+local int getatime(cchar *termdev,time_t *rp) noex {
 	int		rs ;
 	int		f = true ;
 	*rp = 0 ;
@@ -334,10 +326,9 @@ static int getatime(cchar *termdev,time_t *rp) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (getatime) */
+} /* end subroutine (getatime) */
 
-static int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
+local int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
 	cvoid		*v1p = *v1pp ;
 	cvoid		*v2p = *v2pp ;
 	int		rc = 0 ;
@@ -357,7 +348,6 @@ static int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
 	    } 
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (revsortfunc) */
+} /* end subroutine (revsortfunc) */
 
 
