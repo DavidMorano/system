@@ -62,8 +62,8 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* CSYD */
-#include	<cstddef>		/* CSYD |nullptr_t| */
+#include	<unistd.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
