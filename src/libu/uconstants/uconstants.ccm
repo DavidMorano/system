@@ -48,10 +48,10 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #include	<varnames.hh>
 #include	<syswords.hh>
@@ -60,6 +60,7 @@ export module uconstants ;
 
 export import valuelims ;
 export import digbufsizes ;
+export import numbasedigs ;
 
 export {
     extern "C++"
@@ -70,6 +71,8 @@ export {
         const valuelims		valuelimit ;
     extern "C++"
         const digbufsizes	digbufsize ;
+    extern "C++"
+        const numbasedigs	numbasedig ;
 } /* end export */
 
 
