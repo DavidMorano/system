@@ -63,7 +63,7 @@
 #include	<utmpx.h>		/* POSIX */
 #include	<csignal>		/* CSTD |sig_atomic_t| */
 #include	<climits>		/* CSTD */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdio>		/* CSTD */
 #include	<atomic>		/* C++STD */
@@ -71,6 +71,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucfork.h>		/* LIBUC */
 #include	<ucatfork.h>		/* LIBUC */
@@ -353,9 +354,10 @@ namespace {
 	utmpacc_icur() noex : fbp(nullptr), entp(nullptr), fd(-1) { 
 	    magval = 0 ;
 	} ; /* end ctor */
+	void dtor() noex ;
 	destruct utmpacc_icur() {
 	    if (magval) {
-		finish() ;
+		dtor() ;
 	    }
 	} ; /* end destruct */
     } ; /* end struct (utmpacc_icur) */
@@ -560,6 +562,12 @@ int icur::entenum(utmpx **epp) noex {
 	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end method (icur::entenum) */
+
+void icur::dtor() noex {
+	if (cint rs = finish() ; rs < 0) {
+	    ulogerror("utmpacc",rs,"icur-destruct") ;
+	} /* end if */
+} /* end method (icur::dtor) */
 
 int utmpacc_curbegin(utmpacc_cur *curp) noex {
 	int		rs = SR_FAULT ;
