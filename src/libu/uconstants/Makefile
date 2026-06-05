@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += uconstants.h
 
-MODS += valuelims.ccm digbufsizes.ccm
+MODS += valuelims.ccm digbufsizes.ccm numbasedigs.ccm
 
 LIBS +=
 
