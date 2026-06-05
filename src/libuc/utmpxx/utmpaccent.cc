@@ -45,7 +45,7 @@
 #include	<sys/types.h>		/* POSIX */
 #include	<sys/param.h>		/* POSIX */
 #include	<utmpx.h>		/* POSIX |UTMPX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
