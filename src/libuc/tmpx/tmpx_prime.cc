@@ -114,17 +114,17 @@ extern "C" {
 
 /* forward references */
 
-static int	tmpx_writable	(tmpx *,int) noex ;
-static int	tmpx_openbegin	(tmpx *,cchar *) noex ;
-static int	tmpx_openend	(tmpx *) noex ;
-static int	tmpx_filesize	(tmpx *,time_t) noex ;
-static int	tmpx_fileopen	(tmpx *,time_t) noex ;
-static int	tmpx_fileopener	(tmpx *op) noex ;
-static int	tmpx_fileclose	(tmpx *) noex ;
-static int	tmpx_mapents	(tmpx *,int,int,tmpx_ent **) noex ;
-static int	tmpx_mapper	(tmpx *,int,uint,uint) noex ;
+local int	tmpx_writable	(tmpx *,int) noex ;
+local int	tmpx_openbegin	(tmpx *,cchar *) noex ;
+local int	tmpx_openend	(tmpx *) noex ;
+local int	tmpx_filesize	(tmpx *,time_t) noex ;
+local int	tmpx_fileopen	(tmpx *,time_t) noex ;
+local int	tmpx_fileopener	(tmpx *op) noex ;
+local int	tmpx_fileclose	(tmpx *) noex ;
+local int	tmpx_mapents	(tmpx *,int,int,tmpx_ent **) noex ;
+local int	tmpx_mapper	(tmpx *,int,uint,uint) noex ;
 
-static int	isproctype(int) noex ;
+local int	isproctype(int) noex ;
 
 
 /* local variables */
@@ -300,7 +300,7 @@ int tmpx_fetchpid(tmpx *op,tmpx_ent *ep,pid_t pid) noex {
 	int		ei = 0 ;
 	if ((rs = tmpx_magic(op,ep)) >= 0) ylikely {
             if (op->ncursors == 0) {
-                rs = tmpx_filesize(op,0L) ;
+                rs = tmpx_filesize(op,0z) ;
             }
             if (rs >= 0) ylikely {
                 tmpx_ent    *up ;
@@ -338,7 +338,7 @@ int tmpx_fetchuser(tmpx *op,tmpx_cur *curp,tmpx_ent *ep,cchar *name) noex {
                 ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
             }
             if (op->ncursors == 0) {
-                rs = tmpx_filesize(op,0L) ;
+                rs = tmpx_filesize(op,0z) ;
             }
             if (rs >= 0) ylikely {
                 tmpx_ent    *up ;
@@ -380,7 +380,7 @@ int tmpx_read(tmpx *op,int ei,tmpx_ent *ep) noex {
             if (ei >= 0) ylikely {
                 rs = SR_OK ;
                 if (op->ncursors == 0) {
-                    rs = tmpx_filesize(op,0L) ;
+                    rs = tmpx_filesize(op,0z) ;
                 }
                 if (rs >= 0) ylikely {
                     tmpx_ent        *up ;
@@ -412,7 +412,7 @@ int tmpx_nusers(tmpx *op) noex {
                 en = TMPX_NENTS ;
             } /* end if_constexpr (f_dynents) */
             if (op->ncursors == 0) {
-                rs = tmpx_filesize(op,0L) ;
+                rs = tmpx_filesize(op,0z) ;
             }
             if (rs >= 0) ylikely {
                 tmpx_ent    *ep ;
@@ -437,7 +437,7 @@ int tmpx_nusers(tmpx *op) noex {
 
 /* private subroutines */
 
-static int tmpx_writable(tmpx *op,int oflags) noex {
+local int tmpx_writable(tmpx *op,int oflags) noex {
 	int		rs = SR_OK ;
 	int		amode = (oflags & O_ACCMODE) ;
 	switch (amode) {
@@ -445,7 +445,7 @@ static int tmpx_writable(tmpx *op,int oflags) noex {
 	        break ;
 	    case O_WRONLY:
 	        amode = O_RDWR ;
-	        oflags = ((oflags & (~ O_ACCMODE)) | amode) ;
+	        oflags = ((oflags & (compl O_ACCMODE)) | amode) ;
 		break ;
 	    case O_RDWR:
 	        break ;
@@ -455,10 +455,9 @@ static int tmpx_writable(tmpx *op,int oflags) noex {
 	} /* end switch */
 	op->fl.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
 	return rs ;
-}
-/* end subroutine (tmpx_writable) */
+} /* end subroutine (tmpx_writable) */
 
-static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
+local int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 	int		rs ;
 	if (cchar *cp ; (rs = libmem.strw(dbfn,-1,&cp)) >= 0) ylikely {
 	    custime	dt = getustime ;
@@ -472,19 +471,18 @@ static int tmpx_openbegin(tmpx *op,cchar *dbfn) noex {
 		} /* end if (stat) */
 		if (rs < 0) {
 		    tmpx_fileclose(op) ;
-		}
+		} /* end if (error) */
 	    } /* end if (tmpx-fileopen) */
 	    if (rs < 0) {
 		void *vp = voidp(op->fname) ;
 		libmem.free(vp) ;
 		op->fname = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
-} 
-/* end subroutine (tmpx_openbegin) */
+} /* end subroutine (tmpx_openbegin) */
 
-static int tmpx_openend(tmpx *op) noex {
+local int tmpx_openend(tmpx *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) ylikely {
@@ -498,10 +496,9 @@ static int tmpx_openend(tmpx *op) noex {
 	    op->fname = nullptr ;
 	}
 	return rs ;
-} 
-/* end subroutine (tmpx_openend) */
+} /* end subroutine (tmpx_openend) */
 
-static int tmpx_filesize(tmpx *op,time_t dt) noex {
+local int tmpx_filesize(tmpx *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    rs = tmpx_fileopen(op,dt) ;
@@ -513,10 +510,9 @@ static int tmpx_filesize(tmpx *op,time_t dt) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (tmpx_filesize) */
+} /* end subroutine (tmpx_filesize) */
 
-static int tmpx_fileopen(tmpx *op,time_t dt) noex {
+local int tmpx_fileopen(tmpx *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    if ((rs = tmpx_fileopener(op)) >= 0) ylikely {
@@ -531,11 +527,10 @@ static int tmpx_fileopen(tmpx *op,time_t dt) noex {
 	    }
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (tmpx_fileopen) */
+} /* end subroutine (tmpx_fileopen) */
 
 /* this is where I modified some code (David Morano, 2025) */
-static int tmpx_fileopener(tmpx *op) noex {
+local int tmpx_fileopener(tmpx *op) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	if_constexpr (f_utmpacc) { /* new code */
@@ -548,7 +543,7 @@ static int tmpx_fileopener(tmpx *op) noex {
 		}
 		if (rs < 0) {
 		    uc_close(fd) ;
-		}
+		} /* end if (error) */
 	    } /* end if (opentmp) */
 	} else { /* old code (still here) */
 	    if ((rs = getfdfile(op->fname,-1)) >= 0) {
@@ -563,13 +558,12 @@ static int tmpx_fileopener(tmpx *op) noex {
 	        if ((rs = uc_open(op->fname,of,om)) >= 0) {
 	            op->fd = rs ;
 	        }
-	    }
+	    } /* end if */
 	} /* end if_constexpr (f_utmpacc) */
 	return rs ;
-}
-/* end subroutine (tmpx_fileopener) */
+} /* end subroutine (tmpx_fileopener) */
 
-static int tmpx_fileclose(tmpx *op) noex {
+local int tmpx_fileclose(tmpx *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) {
@@ -578,10 +572,9 @@ static int tmpx_fileclose(tmpx *op) noex {
 	    op->fd = -1 ;
 	} /* end if (was open) */
 	return rs ;
-}
-/* end subroutine (tmpx_fileclose) */
+} /* end subroutine (tmpx_fileclose) */
 
-static int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
+local int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
 	cint		esz = TMPX_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
@@ -626,10 +619,9 @@ static int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
 	    }
 	} /* end if (non-equal-zero) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (tmpx_mapents) */
+} /* end subroutine (tmpx_mapents) */
 
-static int tmpx_mapper(tmpx *op,int ei,uint woff,uint wsz) noex {
+local int tmpx_mapper(tmpx *op,int ei,uint woff,uint wsz) noex {
     	cnullptr	np{} ;
 	csize		ms = size_t(wsz) ;
 	coff		mo = off_t(woff) ;
@@ -663,17 +655,15 @@ static int tmpx_mapper(tmpx *op,int ei,uint woff,uint wsz) noex {
 	    } /* end if (madvise) */
 	} /* end if (mapped) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (tmpx_mapper) */
+} /* end subroutine (tmpx_mapper) */
 
-static int isproctype(int type) noex {
+local int isproctype(int type) noex {
 	int		f = false ;
 	for (int i = 0 ; proctypes[i] >= 0 ; i += 1) {
 	    f = (type == proctypes[i]) ;
 	    if (f) break ;
 	} /* end for */
 	return f ;
-}
-/* end subroutine (isproctype) */
+} /* end subroutine (isproctype) */
 
 
