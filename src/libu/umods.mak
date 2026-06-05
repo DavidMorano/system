@@ -45,19 +45,19 @@ MODS += usysbasic.ccm
 LIBS +=
 
 
-OBJ00_UMODS = valuelims.o digbufsizes.o 
+OBJ00_UMODS = valuelims.o 
 OBJ01_UMODS = builtin.o
 OBJ02_UMODS = digtab.o
 OBJ03_UMODS = bitop.o
 OBJ04_UMODS = unixfnames.o 
 OBJ05_UMODS = constdiv.o 
 OBJ06_UMODS = usysbasic.o
-OBJ07_UMODS = 
+OBJ07_UMODS = digbufsizes.o numbasedigs.o
 
 OBJA_UMODS= obj00_umods.o obj01_umods.o 
 OBJB_UMODS= obj02_umods.o obj03_umods.o
 OBJC_UMODS= obj04_umods.o obj05_umods.o 
-OBJD_UMODS= obj06_umods.o
+OBJD_UMODS= obj06_umods.o obj07_umods.o
 
 OBJ_UMODS= obja_umods.o objb_umods.o objc_umods.o objd_umods.o
 
@@ -138,6 +138,7 @@ clean:
 	rmsubpat valuelims	gcm.cache
 	rmsubpat digbufsizes	gcm.cache
 	rmsubpat usysbasic	gcm.cache
+	rmsubpat numbasedigs	gcm.cache
 	rmobj
 
 control:
@@ -255,5 +256,9 @@ usysbasic0.o:		usysbasic.ccm
 
 usysbasic1.o:		usysbasic1.cc usysbasic0.o
 	$(COMPILE.cc) $<
+
+# NUMBASEDIGS (module)
+numbasedigs.o:		numbasedigs.ccm
+	gxx -c -x c++ -o $@ -O $<
 
 
