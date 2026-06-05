@@ -39,17 +39,17 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdintx>
-#include	<concepts>		/* |integral(3c++)| */
-#include	<bit>			/* |countl_zero(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<concepts>		/* C++STD |integral(3c++)| */
+#include	<bit>			/* C++STD |countl_zero(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nextpowtwo.h"
 
@@ -106,20 +106,6 @@ export {
     } /* end subroutine-template (flbs) */
 } /* end export */
 
-export {
-    extern "C" {
-        int flbsi(int v) noex {
-	    return flbs(v) ;
-        }
-        int flbsl(long v) noex {
-	    return flbs(v) ;
-        }
-        int flbsll(longlong v) noex {
-	    return flbs(v) ;
-        }
-    } /* end extern (C) */
-} /* end export */
-
 
 /* local variables */
 
@@ -128,5 +114,33 @@ export {
 
 
 /* exported subroutines */
+
+export {
+    extern "C" {
+        int flbsi	(int v)		noex {
+	    return flbs(v) ;
+        }
+        int flbsl	(long v)	noex {
+	    return flbs(v) ;
+        }
+        int flbsll	(longlong v)	noex {
+	    return flbs(v) ;
+        }
+    } /* end extern (C) */
+} /* end export */
+
+export {
+    extern "C" {
+        int flbsui	(uint uv)	noex {
+	    return flbs(uv) ;
+        }
+        int flbsul	(ulong uv)	noex {
+	    return flbs(uv) ;
+        }
+        int flbsull	(ulonglong uv)	noex {
+	    return flbs(uv) ;
+	}
+    } /* end extern (C) */
+} /* end export */
 
 
