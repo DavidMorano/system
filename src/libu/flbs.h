@@ -42,45 +42,24 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	flbsi(int) noex ;
-extern int	flbsl(long) noex ;
-extern int	flbsll(longlong) noex ;
+extern int	flbsi	(int)		noex ;
+extern int	flbsl	(long)		noex ;
+extern int	flbsll	(longlong)	noex ;
 
-extern int	flbsui(uint) noex ;
-extern int	flbsul(ulong) noex ;
-extern int	flbsull(ulonglong) noex ;
+extern int	flbsui	(uint)		noex ;
+extern int	flbsul	(ulong)		noex ;
+extern int	flbsull	(ulonglong)	noex ;
 
 EXTERNC_end
-
-#ifdef	__cplusplus
-
-local inline int flbs(int v) noex {
-	return flbsi(v) ;
-}
-local inline int flbs(long v) noex {
-	return flbsl(v) ;
-}
-local inline int flbs(longlong v) noex {
-	return flbsll(v) ;
-}
-
-local inline int flbs(uint uv) noex {
-	return flbsui(uv) ;
-}
-local inline int flbs(ulong uv) noex {
-	return flbsul(uv) ;
-}
-local inline int flbs(ulonglong uv) noex {
-	return flbsull(uv) ;
-}
-
-#endif /* __cplusplus */
 
 
 #endif /* FLBS_INCLUDE */
