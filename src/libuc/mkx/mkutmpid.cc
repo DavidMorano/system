@@ -164,30 +164,30 @@ namespace {
 	int special(cchar *,int) noex ;
 	int something(cchar *,int) noex ;
     } ; /* end struct (tmper) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int	idcpy(char *,int,cchar *,int,cchar *,int) noex ;
+local int	idcpy(char *,int,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
 
-static constexpr struct prefix	prefixes[] = {
+constexpr prefix	prefixes[] = {
 	{ "pts", "P" },
 	{ "term", "" },
 	{ "tty", "" },
 	{ "rx", "R" },
 	{ "xt", "X" },
 	{ nullptr, nullptr }
-} ;
+} ; /* end array (prefixes) */
 
-static constexpr struct prefix	specials[] = {
+constexpr prefix	specials[] = {
 	{ "console", "co" },
 	{ "syscon", "cs" },
 	{ nullptr, nullptr }
-} ;
+} ; /* end array (specials) */
 
 static tmp_m	tmpcalls[] {
 	&tmper::subdirs,
@@ -195,9 +195,9 @@ static tmp_m	tmpcalls[] {
 	&tmper::special,
 	&tmper::something,
 	nullptr
-} ;
+} ; /* end array (tmpcalls) */
 
-static constexpr cchar		dpre[] = "/dev/" ;	/* device prefix */
+constexpr cchar		dpre[] = "/dev/" ;	/* device prefix */
 
 
 /* exported variables */
@@ -235,8 +235,7 @@ tmper::operator int () noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (tmper::operator) */
+} /* end method (tmper::operator) */
 
 int tmper::extdev(cchar **rpp) noex {
 	static constexpr int	dl = lenstr(dpre) ;
@@ -252,8 +251,7 @@ int tmper::extdev(cchar **rpp) noex {
 	if (ll < 1) rs = SR_INVALID ;
 	*rpp = lp ;
 	return (rs >= 0) ? ll : rs ;
-}
-/* end method (tmper::extdev) */
+} /* end method (tmper::extdev) */
 
 int tmper::subdirs(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
@@ -277,8 +275,7 @@ int tmper::subdirs(cchar *lp,int ll) noex {
 	    } /* end if (tried for a directory match) */
 	} /* end if (needed) */
 	return rs ;
-}
-/* end method (tmper::subdirs) */
+} /* end method (tmper::subdirs) */
 
 int tmper::basename(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
@@ -298,8 +295,7 @@ int tmper::basename(cchar *lp,int ll) noex {
 	    } /* end if */
 	} /* end if (needed) */
 	return rs ;
-}
-/* end method (tmper::basename) */
+} /* end method (tmper::basename) */
 
 int tmper::special(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
@@ -317,8 +313,7 @@ int tmper::special(cchar *lp,int ll) noex {
 	    } /* end if */
 	} /* end if (needed) */
 	return rs ;
-}
-/* end method (tmper::special) */
+} /* end method (tmper::special) */
 
 int tmper::something(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
@@ -339,10 +334,9 @@ int tmper::something(cchar *lp,int ll) noex {
 	    }
 	} /* end if (needed) */
 	return rs ;
-}
-/* end method (tmper::something) */
+} /* end method (tmper::something) */
 
-static int idcpy(char *idbuf,int idlen,cchar *pp,int pl,cchar *cp,int cl) noex {
+local int idcpy(char *idbuf,int idlen,cchar *pp,int pl,cchar *cp,int cl) noex {
 	int		rs ;
 	int		j = 0 ;
 	for (int k = 0 ; (j < idlen) && (k < pl) ; j += 1) {
@@ -356,7 +350,6 @@ static int idcpy(char *idbuf,int idlen,cchar *pp,int pl,cchar *cp,int cl) noex {
 	    idbuf[j++] = '\0' ;
 	}
 	return rs ;
-}
-/* end subroutine (idcpy) */
+} /* end subroutine (idcpy) */
 
 
