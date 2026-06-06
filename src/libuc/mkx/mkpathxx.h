@@ -27,17 +27,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkpathrooted.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkpathrooted.h>	/* LIBUC */
+#include	<mkpathmulti.h>		/* LIBUC */
 
 
 EXTERNC_begin
 
-extern int	mkpathuser(char *,cchar *,cchar *,int) noex ;
-extern int	mkpathvar(char *,cchar *,int) noex ;
-extern int	mkpathexp(char *,cchar *,int) noex ;
-extern int	mkpathmulti(char *,cchar *,int) noex ;
+extern int	mkpathexp	(char *,cchar *,int) noex ;
+extern int	mkpathuser	(char *,cchar *,cchar *,int) noex ;
+extern int	mkpathvar	(char *,cchar *,int) noex ;
 
 EXTERNC_end
 
