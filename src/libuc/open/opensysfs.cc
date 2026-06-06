@@ -60,7 +60,7 @@
 #include	<uclibmem.h>
 #include	<ucopen.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<endian.h>		/* |ENDIANSTR(3u)| */
 #include	<ids.h>
 #include	<vecpstr.h>
@@ -181,8 +181,7 @@ namespace libuc {
 	    rs = SR_BADF ;
 	    if (ttl < 0) ttl = OPENSYSFS_DEFTTL ;
 	    if ((of & O_ACCMODE) == O_RDONLY) {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
 	            switch (w) {
 	            case opensysdb_userhomes:
 	            case opensysdb_usernames:
@@ -587,11 +586,11 @@ static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	    maxnamelen = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
-	        if ((rs = getbufsize(bufsize_un)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_un)) >= 0) {
 		    usernamelen = rs ;
 	        }
 	    }
