@@ -67,7 +67,7 @@ OBJ22_MKX= mkpathexp.o
 OBJ23_MKX= mkpathmulti.o
 OBJ24_MKX= mklineclean.o linecleanopt.o
 OBJ25_MKX= mksoname.o
-OBJ26_MKX=
+OBJ26_MKX= mknpathexp.o mknpathuser.o mknpathvar.o
 OBJ27_MKX=
 
 OBJA_MKX= obj00.o obj01.o obj02.o obj03.o
@@ -76,16 +76,14 @@ OBJC_MKX= obj08.o obj09.o obj10.o obj11.o
 OBJD_MKX= obj12.o obj13.o obj14.o obj15.o
 OBJE_MKX= obj16.o obj17.o obj18.o obj19.o
 OBJF_MKX= obj20.o obj21.o obj22.o obj23.o
-OBJG_MKX= obj24.o obj25.o
+OBJG_MKX= obj24.o obj25.o obj26.o
 #OBJG_MKX= obj24.o obj25.o obj26.o obj27.o
 
 OBJ_MKX= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -260,21 +258,25 @@ objg.o:			$(OBJG_MKX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-mkpathx.o:		mkpathx.cc	mkpath.h	$(INCS)
-mkpathxw.o:		mkpathxw.cc	mkpath.h	$(INCS)
+mkpathx.o:		mkpathx.cc	mkpath.h		$(INCS)
+mkpathxw.o:		mkpathxw.cc	mkpath.h		$(INCS)
 
-mkpathrooted.o:		mkpathrooted.cc	mkpath.h	$(INCS)
-mkpathuser.o:		mkpathuser.cc			$(INCS)
-mkpathvar.o:		mkpathvar.cc			$(INCS)
-mkpathexp.o:		mkpathexp.cc			$(INCS)
-mkpathmulti.o:		mkpathmulti.cc			$(INCS)
+mkpathrooted.o:		mkpathrooted.cc	mkpath.h		$(INCS)
+mkpathuser.o:		mkpathuser.cc	mkpathxx.h		$(INCS)
+mkpathvar.o:		mkpathvar.cc	mkpathxx.h		$(INCS)
+mkpathexp.o:		mkpathexp.cc	mkpathxx.h		$(INCS)
+mkpathmulti.o:		mkpathmulti.cc	mkpathmulti.h		$(INCS)
 
-mknpathx.o:		mknpathx.cc	mknpath.h	$(INCS)
-mknpathxw.o:		mknpathxw.cc	mknpath.h	$(INCS)
+mknpathx.o:		mknpathx.cc	mknpath.h		$(INCS)
+mknpathxw.o:		mknpathxw.cc	mknpath.h		$(INCS)
 
-mkfdfname.o:		mkfdfname.cc		$(INCS) mkfdfname.h
-mkgecosname.o:		mkgecosname.cc		$(INCS) mkgecosname.h
-mkmid.o:		mkmid.cc		$(INCS)
+mknpathexp.o:		mknpathexp.cc	mknpathxx.h		$(INCS)
+mknpathuser.o:		mknpathuser.cc	mknpathxx.h		$(INCS)
+mknpathvar.o:		mknpathvar.cc	mknpathxx.h		$(INCS)
+
+mkfdfname.o:		mkfdfname.cc	mkfdfname.h		$(INCS)
+mkgecosname.o:		mkgecosname.cc	mkgecosname.h		$(INCS)
+mkmid.o:		mkmid.cc				$(INCS)
 mkaltext.o:		mkaltext.cc				$(INCS)
 
 mkaddrname.o:		mkaddrname.cc		$(INCS)
@@ -292,11 +294,11 @@ mkintfname.o:		mkintfname.cc		$(INCS)
 mkonefrom.o:		mkonefrom.cc		$(INCS)
 
 mkmaildirtest.o:	mkmaildirtest.cc			$(INCS)
-mkufname.o:		mkufname.cc		$(INCS)
+mkufname.o:		mkufname.cc	mkufname.h		$(INCS)
 mkunique.o:		mkunique.cc				$(INCS)
 mkfmtphone.o:		mkfmtphone.cc				$(INCS)
 mkfingerquery.o:	mkfingerquery.cc			$(INCS)
-mklinelcean.o:		mklineclean.cc	mklineclean.h		$(INCS)
+mklineclean.o:		mklineclean.cc	mklineclean.h		$(INCS)
 
 mkpr.o:			mkpr.cc		mkpr.h			$(INCS)
 mkxdisp.o:		mkxdisp.cc	mkxdisp.h		$(INCS)
