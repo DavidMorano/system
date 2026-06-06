@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += fmtflag.h
+INCS += fmtflag.hh
 
 MODS +=
 
