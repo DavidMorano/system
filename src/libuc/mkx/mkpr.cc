@@ -64,7 +64,6 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
 #include	<getpwx.h>
 #include	<getuserhome.h>
 #include	<bufsizevar.hh>
@@ -271,8 +270,7 @@ local int getpr(const si_f *tries,char *rb,int rl,cchar *prn,cchar *dom) noex {
 	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getrootdname) */
+} /* end subroutine (getrootdname) */
 
 local int si_start(SI *sip,cchar *prname,cchar *domain) noex {
 	int		rs = SR_OK ;
@@ -289,15 +287,14 @@ local int si_start(SI *sip,cchar *prname,cchar *domain) noex {
                     if ((rs = libmem.strw(dbuf,rs,&cp)) >= 0) ylikely {
                         sip->open.dname = true ;
                         sip->dname = cp ;
-                    } /* end if (memory-allocation) */
+                    } /* end if (memory-acquire) */
                 } /* end if (sncpylc) */
 	        rs1 = lm_free(dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
         } /* end if (had some upper-case) */
 	return rs ;
-}
-/* end subroutine (si_start) */
+} /* end subroutine (si_start) */
  
 local int si_finish(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -315,8 +312,7 @@ local int si_finish(SI *sip) noex {
             sip->dname = nullptr ;
         }
 	return rs ;
-}
-/* end subroutine (si_finish) */
+} /* end subroutine (si_finish) */
 
 local int si_checkid(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -327,10 +323,9 @@ local int si_checkid(SI *sip) noex {
 	        sip->open.ids = true ;
 	    }
 	    f = sip->open.ids ;
-	}
+	} /* end if */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (si_checkid) */
+} /* end subroutine (si_checkid) */
 
 local int si_dirok(SI *sip,cchar *dname,mode_t dm) noex {
 	int		rs ;
@@ -343,8 +338,7 @@ local int si_dirok(SI *sip,cchar *dname,mode_t dm) noex {
 	    }
 	} /* end if (uc_stat) */
 	return rs ;
-}
-/* end subroutine (si_dirok) */
+} /* end subroutine (si_dirok) */
 
 local int si_env(SI *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
@@ -366,8 +360,7 @@ local int si_env(SI *sip,char *rbuf,int rlen) noex {
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_env) */
+} /* end subroutine (si_env) */
 
 local int si_enver(SI *sip,char *rbuf,int rlen,cc *envp) noex {
 	int		rs = SR_OK ;
@@ -381,8 +374,7 @@ local int si_enver(SI *sip,char *rbuf,int rlen,cc *envp) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_enver) */
+} /* end subroutine (si_enver) */
 
 local int si_domain(SI *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
@@ -406,7 +398,7 @@ local int si_domain(SI *sip,char *rbuf,int rlen) noex {
 		            rs = si_domainer(sip,rbuf,rlen,dbuf,rs) ;
 	                }
 		    } else {
-		        if (char *dbuf ; (rs = lm_hn(&dbuf)) >= 0) {
+		        if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) {
 		            cint	dlen = rs ;
 	                    if ((rs = snwcpylc(dbuf,dlen,dnp,dnl)) > 0) {
 		                rs = si_domainer(sip,rbuf,rlen,dbuf,rs) ;
@@ -421,8 +413,7 @@ local int si_domain(SI *sip,char *rbuf,int rlen) noex {
 	    } /* end if (still positive) */
 	} /* end if (have a domain to lookup) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_domain) */
+} /* end subroutine (si_domain) */
 
 local int si_domainer(SI *sip,char *rbuf,int rlen,cc *dnp,int dnl) noex {
 	int		rs = SR_OK ;
@@ -446,8 +437,7 @@ local int si_domainer(SI *sip,char *rbuf,int rlen,cc *dnp,int dnl) noex {
 	    }
 	} /* end if (got a domain match) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_domainer) */
+} /* end subroutine (si_domainer) */
 
 local int si_user(SI *sip,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -472,8 +462,7 @@ local int si_user(SI *sip,char *rbuf,int rlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_user) */
+} /* end subroutine (si_user) */
 
 local int si_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
 	int		rs ;
@@ -507,8 +496,7 @@ local int si_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
 	    rs = SR_OK ;
         } /* end if (have SWD directory entry) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_users) */
+} /* end subroutine (si_users) */
 
 local int si_prmap(SI *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
@@ -529,8 +517,7 @@ local int si_prmap(SI *sip,char *rbuf,int rlen) noex {
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_prmap) */
+} /* end subroutine (si_prmap) */
 
 local int si_home(SI *sip,char *rbuf,int rlen) noex {
     	static cchar	*vhome = getenv(varname.home) ;
@@ -552,8 +539,7 @@ local int si_home(SI *sip,char *rbuf,int rlen) noex {
 	    } /* end if (m-a-f) */
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_home) */
+} /* end subroutine (si_home) */
 
 local int si_homer(SI *sip,char *rbuf,int rlen,cchar *hn) noex {
 	int		rs = SR_OK ;
@@ -567,8 +553,7 @@ local int si_homer(SI *sip,char *rbuf,int rlen,cchar *hn) noex {
 	    }
 	} /* end if (got a HOME directory) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_homer) */
+} /* end subroutine (si_homer) */
 
 local int si_bases(SI *sip,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -594,8 +579,7 @@ local int si_bases(SI *sip,char *rbuf,int rlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (si_bases) */
+} /* end subroutine (si_bases) */
 
 local int dirsearch(cchar *basedname,cchar *username) noex {
 	int		rs ;
@@ -619,7 +603,6 @@ local int dirsearch(cchar *basedname,cchar *username) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f_found : rs ;
-}
-/* end subroutine (dirsearch) */
+} /* end subroutine (dirsearch) */
 
 
