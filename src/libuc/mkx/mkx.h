@@ -39,15 +39,16 @@
 #include	<mkgecosname.h>
 #include	<mklineclean.h>
 #include	<mkmagic.h>
+#include	<mkmid.h>
 #include	<mknpath.h>
-#include	<mkprogenv.h>
 #include	<mkpath.h>
 #include	<mkpathxx.h>
-#include	<mkpr.h>
+#include	<mknpathxx.h>
 #include	<mkpr.h>
 #include	<mkquoted.h>
 #include	<mksofname.h>
 #include	<mksoname.h>
+#include	<mkufname.h>
 #include	<mkunique.h>
 #include	<mkutmpid.h>
 #include	<mkuuid.h>
@@ -60,13 +61,11 @@ extern int	mkrealname(char *,int,cchar *,int) noex ;
 extern int	mknoise(uint *a,int n) noex ;
 extern int	mkintfname(char *,cchar *,cchar *,cchar *) noex ;
 extern int	mktagfname(char *,cchar *,cchar *,int) noex ;
-extern int	mkmid(char *,int,cchar *,cchar *,pid_t,int) noex ;
 extern int	mkonefrom(char *,int,cchar *,int) noex ;
 extern int	mkmailname(char *,int,cchar *,int) noex ;
 extern int	mkshlibname(char *,cchar *,int) noex ;
 extern int	mkshmname(char *,cchar *,int,cchar *,int) noex ;
 extern int	mksofname(char *,cchar *,cchar *,cchar *) noex ;
-extern int	mkufname(char *,cchar *,cchar *) noex ;
 extern int	mkaltext(char *,cchar *,cchar *) noex ;
 extern int	mkmaildirtest(char *,cchar *,int) noex ;
 extern int	mkfmtphone(char *,int,cchar *,int) noex ;
