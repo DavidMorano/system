@@ -36,6 +36,7 @@ enum opendials {
 	opendial_ussnls,
 	opendial_ticotsord,
 	opendial_ticotsordnls,
+	opendial_ticotsordmux,
 	opendial_pass,
 	opendial_open,
 	opendial_prog,
