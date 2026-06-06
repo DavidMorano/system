@@ -64,11 +64,6 @@ import libutil ;			/* |lensr(3u)| + |getlenstr(3u)| */
 
 /* external subroutines */
 
-extern "C" {
-    extern int	mkpathuser(char *,cchar *,cchar *,int) noex ;
-    extern int	mkpathvar(char *,cchar *,int) noex ;
-}
-
 
 /* external variables */
 
