@@ -164,7 +164,6 @@ int maxpather::operator () (int plen) noex {
 	    rs = maxpathlen ;
 	}
 	return rs ;
-}
-/* end method (maxpather::operator) */
+} /* end method (maxpather::operator) */
 
 
