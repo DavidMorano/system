@@ -1,11 +1,11 @@
-/* fmtsub2 MODULE */
+/* fmtsub2 MODULE (implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to format string output */
 /* version %I% last-modified %G% */
 
-#define	CF_CLEANSTR	0		/* clean-up string data? */
+#define	CF_STRCLEAN	0		/* clean-up string data? */
 
 /* revision history:
 
@@ -35,26 +35,28 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<cstdarg>
-#include	<cstring>
-#include	<cwchar>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<umem.hh>
-#include	<stdintx.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<cwchar>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<umem.hh>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 #include	<ascii.h>		/* |CH_{x}| */
-#include	<strn.h>
-#include	<mkchar.h>
-#include	<hasx.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<strn.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<hasx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fmtopts.h"
+#include	"fmtutil.hh"
+#include	"fmtsub.hh"
 
 module fmtsub ;
 
@@ -66,8 +68,8 @@ import fmtutil ;
 #define	MAXPREC		41		/* maximum floating precision */
 #define	BUFLEN		MAX((310+MAXPREC+2),((8*szof(longlong))+1))
 
-#ifndef	CF_CLEANSTR
-#define	CF_CLEANSTR	0		/* clean-up string data? */
+#ifndef	CF_STRCLEAN
+#define	CF_STRCLEAN	0		/* clean-up string data? */
 #endif
 
 
@@ -95,13 +97,10 @@ using libu::umem ;			/* variable */
 
 /* local variables */
 
-constexpr fmtoptms	fopt ;
-
-constexpr cchar		blanka[] = "        " ;
-
-constexpr cint		blankn = lenstr(blanka) ;
-
-constexpr bool		f_cleanstr = CF_CLEANSTR ;
+local constexpr fmtoptms	fopt ;
+local constexpr char		blanka[]	= "        " ;
+local constexpr int		blankn		= clenstr(blanka) ;
+local constexpr bool		f_strclean	= CF_STRCLEAN ;
 
 
 /* exported variables */
@@ -111,12 +110,16 @@ constexpr bool		f_cleanstr = CF_CLEANSTR ;
 
 int fmtsub_start(fmtsub *op,char *ubuf,int ulen,int fm) noex {
 	int		rs = SR_FAULT ;
-	if (op && ubuf) {
+	if (op && ubuf) ylikely {
 	    op->ubuf = ubuf ;
 	    op->ulen = ulen ;
 	    op->mode = fm ;
-	    op->fl.mclean	= !!(fm & fopt.clean) ;
-	    op->fl.mnooverr	= !!(fm & fopt.nooverr) ;
+	    op->numbase = 0 ;
+	    {
+	        op->fl.mclean	= !!(fm & fopt.clean) ;
+	        op->fl.mnooverr	= !!(fm & fopt.nooverr) ;
+	        op->fl.mminfill = !!(fm & fopt.minfill) ;
+	    }
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -126,7 +129,7 @@ int fmtsub_start(fmtsub *op,char *ubuf,int ulen,int fm) noex {
 int fmtsub_finish(fmtsub *op) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->ubuf) {
 	        len = op->len ;
@@ -145,7 +148,7 @@ int fmtsub_finish(fmtsub *op) noex {
 int fmtsub_reserve(fmtsub *op,int n) noex {
 	int		rs = SR_OVERFLOW ;
 	if (! op->fl.ov) {
-	    int		rlen = (op->ulen - op->len) ;
+	    cint	rlen = (op->ulen - op->len) ;
 	    rs = SR_OK ;
 	    if (n > rlen) {
 	        op->fl.ov = true ;
@@ -199,12 +202,12 @@ int fmtsub_blanks(fmtsub *op,int n) noex {
 }
 /* end subroutine (fmtsub_blanks) */
 
-int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
+int fmtsub_strclean(fmtsub *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	char		*abuf = nullptr ;
 	if (sl < 0) sl = lenstr(sp) ;
-	if_constexpr (f_cleanstr) {
+	if_constexpr (f_strclean) {
 	    if (op->fl.mclean) {
 	        int	hl = sl ;
 	        bool	f_eol = false ;
@@ -228,7 +231,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	            } /* end if (memory-acquire) */
 	        } /* end if (hasourbad) */
 	    } /* end if (option-clean) */
-	} /* end if_constexpr (f_cleanstr) */
+	} /* end if_constexpr (f_strclean) */
 	if (rs >= 0) {
 	    rs = fmtsub_strw(op,sp,sl) ;
 	    len = rs ;
@@ -238,7 +241,7 @@ int fmtsub_cleanstrw(fmtsub *op,cchar *sp,int sl) noex {
 	} /* end if (memory-release) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (fmtsub_cleanstrw) */
+/* end subroutine (fmtsub_strclean) */
 
 int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	int		rs = SR_OK ;
@@ -254,7 +257,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	if (f_wint || f_wchar) {
 	    const wint_t	*lsp = sdp->lsp ;
 	    const wchar_t	*wsp = sdp->wsp ;
-	    int			i = 0 ;
+	    int			i = 0 ; /* used-multiple */
 	    bool		f_notnull = false ;
 	    if (f_wint) {
 	        f_notnull = (lsp != nullptr) ;
@@ -262,7 +265,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	            while (sl && (lsp[i] != 0)) {
 	                i += 1 ;
 	                sl -= 1 ;
-	            }
+	            } /* end while */
 	        }
 	    } else {
 	        f_notnull = (wsp != nullptr) ;
@@ -270,9 +273,9 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	            while (sl && (wsp[i] != 0)) {
 	                i += 1 ;
 	                sl -= 1 ;
-	            }
+	            } /* end while */
 	        }
-	    }
+	    } /* end if */
 	    if (f_notnull) {
 	        cint 	sz = (i + 1) * szof(char) ;
 	        if (char *p ; (rs = umem.mall(sz,&p)) >= 0) {
@@ -330,7 +333,7 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	    }
 	} /* end if */
 	if (rs >= 0) {
-	    rs = fmtsub_cleanstrw(op,sp,sl) ;
+	    rs = fmtsub_strclean(op,sp,sl) ;
 	} /* end if (ok) */
 	if ((rs >= 0) && fsp->fl.left) {
 	    if ((width > 0) && (width > sl)) {
