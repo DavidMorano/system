@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= sigblocker.o sigman.o
+OBJ0= sigman.o
 OBJ1= sighand.o sigign.o
 OBJ2=
 OBJ3=
@@ -51,9 +51,7 @@ OBJ= $(OBJA)
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,7 +94,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -137,7 +135,6 @@ objb.o:			$(OBJB)
 
 sighand.o:		sighand.cc sighand.h		$(INCS)
 sigign.o:		sigign.cc sigign.h		$(INCS)
-sigblocker.o:		sigblocker.cc sigblocker.h	$(INCS)
 sigman.o:		sigman.cc sigman.h		$(INCS)
 
 
