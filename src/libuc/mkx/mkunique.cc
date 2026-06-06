@@ -21,9 +21,9 @@
 	mkunique
 
 	Description:
-	Create a new c-string (in the given result buffer) that
-	duplicates the source c-string but with all duplicated
-	character removed.
+	Create a new c-string (in the given result buffer) that is
+	a copy of the source c-string but with all duplicated
+	characters removed.
 
 	Synopsis:
 	int mkunique(char *rbuf,int rlen,cchar *sp,int sl) noex
@@ -31,8 +31,8 @@
 	Arguments:
 	rbuf		result buffer pointer
 	rlen		result buffer length
-	sp		string to test
-	sl		length of string to test
+	sp		source test-string pointer
+	sl		source test-string length
 
 	Returns:
 	>=0		length of given string
@@ -53,9 +53,9 @@
 
 #include	"mkunique.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -90,32 +90,28 @@ constexpr int		nchars = (UCHAR_MAX + 1) ;
 
 /* exported subroutines */
 
-int mkunique(char *rbuf,int rlen,cchar *sp,int bl) noex {
+int mkunique(char *rbuf,int rlen,cchar *sp,int µsl) noex {
     	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	if (rbuf && sp) ylikely {
 	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
 	    if (rlen >= 0) {
-	        if (bl < 0) bl = lenstr(sp) ;
-	        rbuf[0] = '\0' ;
-	        if (bl > 0) ylikely {
+		rs = SR_OK ;
+		if (int sl = getlenstr(sp,µsl) ; sl > 0) ylikely {
 		    if (strmgr m ; (rs = m.start(rbuf,rlen)) >= 0) {
-	                if (bl > 1) ylikely {
-	                    bitset<nchars>	seen ;
-	                    while ((rs >= 0) && bl-- && *sp) {
-	                        cint	ch = mkchar(*sp++) ;
-		                if (! seen[ch]) {
-		                    rs = m.chr(ch) ;
-	                            seen[ch] = true ;
-		                }
-	                    } /* end while */
-	                } else {
-			    rs = m.chr(*sp++) ;
-	                } /* end if */
+	                bitset<nchars>	seen ;
+			for (int ch ; sl-- && ((ch = mkchar(*sp))) ; ++sp) {
+		            if (! seen[ch]) {
+		                rs = m.chr(ch) ;
+	                        seen[ch] = true ;
+		            }
+			    if (rs < 0) break ;
+	                } /* end for */
 		        rl = m.finish ;
 		        if (rs >= 0) rs = rl ;
 	            } /* end if (strmgr) */
-	        } /* end if (non-zero positive) */
+	        } /* end if (getlenstr) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
