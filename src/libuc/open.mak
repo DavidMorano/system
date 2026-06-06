@@ -44,7 +44,7 @@ OBJ0_OPEN= openaddrinfo.o opensockaddr.o openshm.o
 OBJ1_OPEN= openport.o openportmsg.o
 OBJ2_OPEN= opendefstds.o opensysfs.o
 OBJ3_OPEN= openusd.o 
-OBJ4_OPEN= openqotd.o opensys_banner.o
+OBJ4_OPEN= opensys_banner.o
 OBJ5_OPEN= opendial.o opendials.o
 OBJ6_OPEN= opensysdbs.o
 OBJ7_OPEN=
@@ -57,8 +57,7 @@ OBJ_OPEN= obja.o objb.o objc.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -163,7 +162,6 @@ openportmsg.o:		openportmsg.cc		openportmsg.h	$(INCS)
 openaddrinfo.o:		openaddrinfo.cc		openaddrinfo.h	$(INCS)
 opensockaddr.o:		opensockaddr.cc		opensockaddr.h	$(INCS)
 opendefstds.o:		opendefstds.cc				$(INCS)
-openqotd.o:		openqotd.cc		openqotd.h	$(INCS)
 openshm.o:		openshm.cc		openshm.h	$(INCS)
 opensysfs.o:		opensysfs.cc		opensysfs.hh	$(INCS)
 openusd.o:		openusd.cc				$(INCS)
