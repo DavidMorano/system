@@ -95,12 +95,12 @@ enum atypes {
 	atype_address,
 	atype_route,
 	atype_overlast
-} ;
+} ; /* end enum (atypes) */
 
 
 /* forward references */
 
-static int	emaentry_bestfrom(ema_ent *,char *,int) noex ;
+local int	emaentry_bestfrom(ema_ent *,char *,int) noex ;
 
 
 /* local variables */
@@ -145,7 +145,7 @@ int mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
+local int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ;
 	int		atype = -1 ;
@@ -203,7 +203,6 @@ static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	    } /* end if (positive) */
 	} /* end if_constexpr (f_massage) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (emaentry_bestfrom) */
+} /* end subroutine (emaentry_bestfrom) */
 
 
