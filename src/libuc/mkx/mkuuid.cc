@@ -104,16 +104,16 @@ namespace {
 
 /* forward references */
 
-static uint64_t		loadbytes(cc *,int) noex ;
+local uint64_t		loadbytes(cc *,int) noex ;
 
 
 /* local variables */
 
-constexpr mkuu_m	mems[] = {
+constexpr mkuu_m	makes[] = {
 	&mkuu::mkuutime,
 	&mkuu::mkuuclk,
 	&mkuu::mkuunode
-} ;
+} ; /* end array (makes) */
 
 
 /* exported variables */
@@ -124,7 +124,7 @@ constexpr mkuu_m	mems[] = {
 int mkuuid(uuid_dat *up,int ver) noex {
 	int		rs = SR_FAULT ;
 	if (up) ylikely {
-    	    mkuu	uu(up) ;
+    	    mkuu uu(up) ;
 	    rs = uu(ver) ;
 	}
     	return rs ;
@@ -141,14 +141,13 @@ int mkuu::operator () (int ver) noex {
 	memclear(up) ;
 	if ((rs = getrand(rwords,rsz)) >= 0) ylikely {
 	    up->version = uchar(ver & 0x0F) ; /* <- four (4) bits */
-	    for (cauto &m : mems) {
+	    for (cauto &m : makes) {
 		rs = (this->*m)() ;
 		if (rs < 0) break ;
 	    }
 	} /* end if (reading random) */
 	return rs ;
-}
-/* end method (mkuu::operator) */
+} /* end method (mkuu::operator) */
 
 int mkuu::mkuutime() noex {
     	int		rs ;
@@ -168,8 +167,7 @@ int mkuu::mkuutime() noex {
 	    up->time = rt ;
 	} /* end if (uc_gettimeofday) */
 	return rs ;
-}
-/* end method (mkuu::mkuutime) */
+} /* end method (mkuu::mkuutime) */
 
 int mkuu::mkuuclk() noex {
 	uint64_t	v ;
@@ -179,8 +177,7 @@ int mkuu::mkuuclk() noex {
 	}
 	up->clk = ushort(v) ;
 	return 0 ;
-}
-/* end method (mkuu::mkuuclk) */
+} /* end method (mkuu::mkuuclk) */
 
 /* contributes six bytes */
 int mkuu::mkuunode() noex {
@@ -205,11 +202,10 @@ int mkuu::mkuunode() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end method (mkuu::mkuunode) */
+} /* end method (mkuu::mkuunode) */
 
 /* only need six significant bytes */
-static uint64_t loadbytes(cc *nbuf,int nl) noex {
+local uint64_t loadbytes(cc *nbuf,int nl) noex {
     	cint		six = 6 ; /* <- six bytes */
     	uint64_t	rv = 0 ;
 	uint64_t	v ;
@@ -220,7 +216,6 @@ static uint64_t loadbytes(cc *nbuf,int nl) noex {
 	    rv |= v ;
 	}
 	return rv ;
-}
-/* end subroutine (loadbytes) */
+} /* end subroutine (loadbytes) */
 
 
