@@ -72,8 +72,8 @@
 #include	<usyscalls.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
-#include	<sfx.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
+#include	<sfx.h>
 #include	<pathadd.h>
 #include	<strwcpy.h>
 #include	<mkchar.h>
@@ -104,14 +104,11 @@ import uconstants ;
 
 /* external subroutines */
 
-extern "C" cchar	*getenver(cchar *,int) noex ;
-
 
 /* external variables */
 
 
 /* local structures */
-
 namespace {
     class mksub {
 	cchar		*plist = nullptr ;
@@ -128,42 +125,13 @@ namespace {
 	    ebuf = µebuf ;
 	    vp = sp ;
 	} ; /* end ctor */
-	int getvarname() noex {
-	    if (cchar *tp ; (tp = strnchr(sp,sl,'/')) != nullptr) {
-		vl = intconv(tp - sp) ;
-		sl -= intconv((tp + 1) - sp) ;
-		sp = (tp + 1) ;
-	    }
-	    return vl ;
-	} ; /* end method (getvarname) */
-	int getplist() noex {
-	    cnothrow	nt{} ;
-	    cnullptr	np{} ;
-	    int		rs = SR_OK ;
-	    if (vl > 0) {
-		if (char *vn ; (vn = new(nt) char [vl+1]) != np) {
-		    strwcpyuc(vn,vp,vl) ;
-		    plist = getenver(vn,vl) ;
-		    delete [] vn ;
-		} else {
-		    rs = SR_NOMEM ;
-	 	} /* end if (m-a-f) */
-	    } else {
-		static cchar	*vvp = getenv(varname.cdpath) ;
-		plist = vvp ;
-	    }
-	    return rs ;
-	} ; /* end method (getplist) */
-	int getbasename() noex {
-	    if ((bl = sfbasename(sp,sl,&bp)) > 0) {
-		sl = intconv(bp - sp - 1) ;
-	    }
-	    return sl ;
-	} ; /* end method (getbasename) */
-	int testpath(cchar *,int) noex ;
-	int mkjoin(cchar *,int) noex ;
-	int testpaths() noex ;
-	int mkresult() noex ;
+	int getvarname	()		noex ;
+	int getplist	()		noex ;
+	int getbasename	()		noex ;
+	int testpath	(cchar *,int)	noex ;
+	int mkjoin	(cchar *,int)	noex ;
+	int testpaths	()		noex ;
+	int mkresult	()		noex ;
     } ; /* end class (mksub) */
     typedef int (mksub::*mksub_m)() noex ;
 } /* end namespace */
@@ -176,13 +144,13 @@ namespace {
 
 static bufsizevar	maxpathlen(bufsize_mp,MKPATHVAR_MP) ;
 
-static const mksub_m	mems[] = {
+constexpr mksub_m	mksubs[] = {
     &mksub::getvarname,
     &mksub::getplist,
     &mksub::getbasename,
     &mksub::testpaths,
     &mksub::mkresult
-} ; /* end array (mems) */
+} ; /* end array (mksubs) */
 
 
 /* exported variables */
@@ -207,7 +175,7 @@ int mkpathvar(char *ebuf,cchar *fp,int µfl) noex {
 		    cchar	*sp = (fp + 1) ;
 		    rs = SR_NOMEM ;
 	            if (mksub *sip ; (sip = new(nt) mksub(ebuf,sp,sl)) != np) {
-		        for (cauto &m : mems) {
+		        for (cauto &m : mksubs) {
 			    rs = (sip->*m)() ;
 			    if (rs <= 0) break ;
 		        } /* end for */
@@ -223,6 +191,41 @@ int mkpathvar(char *ebuf,cchar *fp,int µfl) noex {
 
 
 /* local srubroutines */
+
+int mksub::getvarname() noex {
+	if (cchar *tp ; (tp = strnchr(sp,sl,'/')) != nullptr) {
+	    vl = intconv(tp - sp) ;
+	    sl -= intconv((tp + 1) - sp) ;
+	    sp = (tp + 1) ;
+	}
+	return vl ;
+} /* end method (mksub::getvarname) */
+
+int mksub::getplist() noex {
+	cnothrow	nt{} ;
+	cnullptr	np{} ;
+	int		rs = SR_OK ;
+	if (vl > 0) {
+	    if (char *vn ; (vn = new(nt) char [vl+1]) != np) {
+		strwcpyuc(vn,vp,vl) ;
+		plist = getenver(vn,vl) ;
+		delete [] vn ;
+	    } else {
+		rs = SR_NOMEM ;
+	    } /* end if (m-a-f) */
+	} else {
+	    static cchar *vvp = getenver(varname.cdpath) ;
+	    plist = vvp ;
+	}
+	return rs ;
+} /* end method (mksub::getplist) */
+
+int mksub::getbasename() noex {
+	if ((bl = sfbasename(sp,sl,&bp)) > 0) {
+	    sl = intconv(bp - sp - 1) ;
+	}
+	return sl ;
+} /* end method (mksub::getbasename) */
 
 int mksub::testpaths() noex {
     	cnullptr	np{} ;
@@ -246,8 +249,7 @@ int mksub::testpaths() noex {
 	    }
 	} /* end if (plist) */
 	return (rs >= 0) ? el : rs ;
-}
-/* end subroutine (mksub::testpaths) */
+} /* end subroutine (mksub::testpaths) */
 
 int mksub::testpath(cchar *cp,int cl) noex {
 	int		rs ;
@@ -264,8 +266,7 @@ int mksub::testpath(cchar *cp,int cl) noex {
 	    }
 	} /* end if (mkjoin) */
 	return rs ;
-}
-/* end subroutine (mksub::testpath) */
+} /* end subroutine (mksub::testpath) */
 
 int mksub::mkjoin(cchar *cp,int cl) noex {
 	int		rs ;
@@ -282,12 +283,10 @@ int mksub::mkjoin(cchar *cp,int cl) noex {
 	    } /* end if (storebuf) */
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mksub::mkjoin) */
+} /* end subroutine (mksub::mkjoin) */
 
 int mksub::mkresult() noex {
 	return pathaddw(ebuf,el,bp,bl) ;
-}
-/* end subroutine (mksub::mkresult) */
+} /* end subroutine (mksub::mkresult) */
 
 
