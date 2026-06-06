@@ -25,6 +25,8 @@
 
 #include	<sfcasesub.h>
 #include	<sfext.h>
+#include	<sfkey.h>
+#include	<sfkeyval.h>
 #include	<sfnext.h>
 #include	<sfxchr.h>
 #include	<sfxbrk.h>
@@ -36,11 +38,8 @@ EXTERNC_begin
 
 extern int sfbaselib	(cchar *,int,cchar **) noex ;
 extern int sfbracketval	(cchar *,int,cchar **) noex ;
-extern int sfcontent	(cchar *,int,cchar **) noex ;
 extern int sfcookkey	(cchar *,int,cchar **) noex ;
 extern int sfdequote	(cchar *,int,cchar **) noex ;
-extern int sfkey	(cchar *,int,cchar **) noex ;
-extern int sfkeyval	(cchar *,int,cchar *,cchar **) noex ;
 extern int sflast	(cchar *,int,int,cchar **) noex ;
 extern int sfnamecomp	(cchar *,int,cchar **) noex ;
 
