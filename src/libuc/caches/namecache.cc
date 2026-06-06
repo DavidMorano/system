@@ -36,7 +36,6 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>		/* |getustime(3u)| */
 #include	<uclibmem.h>
-#include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<realname.h>
@@ -173,7 +172,7 @@ int namecache_start(NC *op,cchar *vname,int nmax,int ttl) noex {
 		        lm_free(vp) ;
 		        op->vname = nullptr ;
 	            }
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		namecache_dtor(op) ;
@@ -298,7 +297,7 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 	            } /* end if (hdb_fetch) */
 	            rs1 = lm_free(pwbuf) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	        if (rpp) {
 	            *rpp = (rs >= 0) ? rp : nullptr ;
 	        }
@@ -345,7 +344,7 @@ local int namecache_newent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 	    if (rs < 0) {
 		lm_free(ep) ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (namecache_newent) */
@@ -483,7 +482,7 @@ local int entry_loadnames(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	    bp = (strwcpy(bp,up,-1)+1) ;
 	    ep->realname = bp ;
 	    bp = (strwcpy(bp,rp,rl)+1) ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (entry_loadnames) */
