@@ -5,7 +5,7 @@
 /* subroutine to format string output */
 /* version %I% last-modified %G% */
 
-#define	CF_SPECIALHEX	1	/* perform special HEX function */
+#define	CF_DEBUG	0	/* debugging */
 #define	CF_BINARYMIN	1	/* perform binary conversion minimally */
 
 /* revision history:
@@ -89,7 +89,7 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |CHAR_BIT| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdint>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
@@ -105,8 +105,11 @@ module ;
 #include	<snwcpyx.h>		/* LIBUC |snwcpyexpesc(3uc)| */
 #include	<strdcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
+#include	"fmtstr.h"		/* |FMTSTR_MINFILL| */
 #include	"fmtopts.h"
+#include	"fmtobj.hh"
 
 module fmtobj ;
 
@@ -122,6 +125,16 @@ import fmtflag ;
 /* TBUFLEN must be large enough for both large floats and binaries */
 #define	MAXPREC		41		/* maximum floating precision */
 #define	TBUFLEN		MAX((310+MAXPREC+2),((CHAR_BIT * szof(longlong))+1))
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0	/* debugging */
+#endif
+
+#ifdef	FMTSTR_SPECAILHEX
+#define	F_MINFILL	FMTSTR_MINFILL
+#else
+#define	F_MINFILL	0
+#endif
 
 
 /* imported namespaces */
@@ -148,11 +161,10 @@ typedef fmtstrdata	strdata ;
 
 /* local variables */
 
-constexpr cchar		digtable_hi[] = "0123456789ABCDEF" ;
-constexpr cchar		digtable_lo[] = "0123456789abcdef" ;
-
-constexpr cbool		f_specialhex	= CF_SPECIALHEX ;
-constexpr cbool		f_binarymin	= CF_BINARYMIN ;
+local constexpr char	digtable_hi[]	= "0123456789ABCDEF" ;
+local constexpr char	digtable_lo[]	= "0123456789abcdef" ;
+local constexpr bool	f_debug		= CF_DEBUG ;
+local constexpr bool	f_binarymin	= CF_BINARYMIN ;
 
 
 /* exported variables */
@@ -167,20 +179,22 @@ int fmtobj::operator () (va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
+	DPRINTF("ent\n") ;
 	if (ap) {
-	    if ((rs = start()) >= 0) {
+	    if ((rs = start) >= 0) {
 	        {
 		    rs = loop(ap) ;
 		    len = rs ;
 	        }
-	        rs1 = finish() ;
+	        rs1 = finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end method */
 
-int fmtobj::start() noex {
+int fmtobj::istart() noex {
     	int		rs = SR_FAULT ;
 	if (ubuf && fmt) {
 	    rs = SR_NOMEM ;
@@ -191,9 +205,9 @@ int fmtobj::start() noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-} /* end method */
+} /* end method (fmtobj::istart) */
 
-int fmtobj::finish() noex {
+int fmtobj::ifinish() noex {
 	int		rs = SR_NOTOPEN ;
 	if (tbuf) {
 	    delete [] tbuf ;
@@ -202,21 +216,20 @@ int fmtobj::finish() noex {
 	    rs = SR_OK ;
 	} /* end if (memory-release) */
 	return rs ;
-} /* end method */
+} /* end method (fmtobj::ifinish) */
 
 int fmtobj::loop(va_list ap) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = sub.start(ubuf,ulen,fm)) >= 0) {
-	    cchar	*tp ;
-	    while (*fmt && ((tp = strchr(fmt,'%')) != np)) {
+	    for (cchar	*tp ; *fmt && ((tp = strchr(fmt,'%')) != np) ; ) {
 		cint tl = intconv(tp - fmt) ;
-		if ((rs = sub.cleanstrw(fmt,tl)) >= 0) {
-		    if ((rs = spec.start(ap,(tp+1))) >= 0) {
+		if ((rs = sub.strclean(fmt,tl)) >= 0) {
+		    if ((rs = spec.start(ap,(tp + 1))) >= 0) {
 			fcode = rs ;
 			if ((rs = decide(ap)) >= 0) {
-			    if ((rs = sub.emitter(&spec,bp,bl)) >= 0) {
+			    if ((rs = sub.emit(&spec,bp,bl)) >= 0) {
 				fmt += tl ;
 			        fmt += (spec.skiplen + 1) ;
 			    } /* end if (emitter) */
@@ -224,11 +237,11 @@ int fmtobj::loop(va_list ap) noex {
 			rs1 = spec.finish ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (fmtspec) */
-		} /* end if (sub::cleanstrw) */
+		} /* end if (sub::strclean) */
 		if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs >= 0) && *fmt) {
-		rs = sub.cleanstrw(fmt) ;
+		rs = sub.strclean(fmt) ;
 	    } /* end if (remainder) */
 	    rs1 = sub.finish ;		/* <- result length */
 	    if (rs >= 0) rs = rs1 ;
@@ -240,6 +253,7 @@ int fmtobj::decide(va_list ap) noex {
     	int		rs = SR_OK ;
 	bp = nullptr ;			/* <- this is a reset */
 	bl = 0 ;
+	DPRINTF("ent fcode=>%c<\n",fcode) ;
 	switch (fcode) {
 	case 0:
 	    rs = SR_BADFMT ;
@@ -252,19 +266,21 @@ int fmtobj::decide(va_list ap) noex {
 	    fcode = 0 ;
 	    rs = sub.blanks(spec.width) ;
 	    break ;
-	case 'c':			/* <- regular character */
-	case 'C':			/* <- wide character */
+	case 'c':			/* <- character regular */
+	case 'C':			/* <- character wide */
 	    rs = code_chr(ap) ;
 	    break ;
 	case chx_expand:
 	    rs = code_exp(ap) ;
 	    break ;
-	case 'r':			/* <- counted c-string */
-	case 's':			/* <- regular c-string */
-	case 'S':			/* <- wide c-string */
+	case 's':			/* <- c-string regular */
+	case 'S':			/* <- c-string wide */
+	case 'r':			/* <- c-string regular counted */
+	case 'R':			/* <- c-string wide counted */
 	    rs = code_str(ap) ;
 	    break ;
-	case chx_binary:
+	case 'b':
+	case 'B':
 	    rs = code_bin(ap) ;
 	    break ;
 	case 'o':
@@ -279,6 +295,7 @@ int fmtobj::decide(va_list ap) noex {
 	case 'P':
 	case 'x':
 	case 'X':
+	    DPRINTF("-> code_hex\n") ;
 	    rs = code_hex(ap) ;
 	    break ;
 	case 'a':
@@ -295,8 +312,9 @@ int fmtobj::decide(va_list ap) noex {
 	    rs = SR_NOMSG ;
 	    break ;
 	} /* end switch */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end method (fmtobj::decode) */
+} /* end method (fmtobj::decide) */
 
 int fmtobj::code_chr(va_list ap) noex {
     	int		rs = SR_OK ;
@@ -341,13 +359,12 @@ int fmtobj::code_chr(va_list ap) noex {
 } /* end method (fmtobj::code_chr) */
 
 int fmtobj::code_exp(va_list ap) noex {
-    	cnullptr	np{} ;
     	int		rs = SR_OK ;
         strdata		sd ;
         cchar		*sp = (cchar *) va_arg(ap,char *) ;
 	if (sp) {
 	    if (cint sl = lenstr(sp) ; sl >= 0) {
-		if (char *bufp ; (bufp = new(nothrow) char[sl+1]) != np) {
+		if (char *bufp = new(nothrow) char[sl+1] ; bufp) {
 		    cint bufl = sl ;
 		    if ((rs = snwcpyexpesc(bufp,bufl,sp,sl)) >= 0) {
 			sd.sp = bufp ;
@@ -359,7 +376,7 @@ int fmtobj::code_exp(va_list ap) noex {
 	    } /* end if (xsrlen) */
 	} else {
             rs = sub.formstr(&spec,&sd) ;
-	}
+	} /* end if */
         fcode = 0 ;
 	return rs ;
 } /* end method (fmtobj::code_exp) */
@@ -367,7 +384,7 @@ int fmtobj::code_exp(va_list ap) noex {
 int fmtobj::code_str(va_list ap) noex {
     	int		rs = SR_OK ;
         strdata		sd ;
-        if (fcode == 'S') {
+        if ((fcode == 'S') || (fcode == 'R')) {
             sd.fl.wchar = true ;
         } else {
             switch (spec.lenmod) {
@@ -386,7 +403,7 @@ int fmtobj::code_str(va_list ap) noex {
         } else {
             sd.sp = (cchar *) va_arg(ap,char *) ;
         }
-        if (fcode == 't') {
+        if ((fcode == 'r') || (fcode == 'R')) {
             sd.sl = (int) va_arg(ap,int) ;
         }
 #ifdef  COMMENT /* null-pointer check (done later) */
@@ -414,82 +431,88 @@ int fmtobj::code_str(va_list ap) noex {
 int fmtobj::code_bin(va_list ap) noex {
     	int		rs = SR_OK ;
         ulonglong       unum ;
-        int             ndigits = 0 ;
-        cchar   	*digtable = digtable_lo ;
+        int             ndigs = 0 ;
+	sub.numbase = numbase.bin ;
         switch (spec.lenmod) {
         case lenmod_longlong:
             unum = (ulonglong) va_arg(ap,longlong) ;
-            ndigits = (CHAR_BIT * szof(longlong)) ;
+            ndigs = (CHAR_BIT * szof(longlong)) ;
             break ;
         case lenmod_long:
             unum = (ulonglong) va_arg(ap,long) ;
-            ndigits = (CHAR_BIT * szof(long)) ;
+            ndigs = (CHAR_BIT * szof(long)) ;
             break ;
         default:
             unum = (ulonglong) va_arg(ap,int) ;
-            ndigits = (CHAR_BIT * szof(int)) ;
-            if (spec.lenmod == lenmod_half) {
+            ndigs = (CHAR_BIT * szof(int)) ;
+	    if (spec.lenmod == lenmod_half) {
                 unum &= USHORT_MAX ;
-                ndigits = (CHAR_BIT * szof(short)) ;
-            }
+                ndigs = (CHAR_BIT * szof(short)) ;
+	    } else if (spec.lenmod ==  lenmod_halfhalf) {
+                unum &= UCHAR_MAX ;
+                ndigs = (CHAR_BIT * szof(char)) ;
+	    } /* end if */
             break ;
         } /* end switch */
-	if_constexpr (f_binarymin) {
-            int		ch ;
-            bool	f_got = false ;
-            bp = tbuf ;
-            if ((szof(ulonglong) > 4) && (ndigits > 32)) {
-                for (int i = 63 ; i >= 32 ; i -= 1) {
+	if (rs >= 0) {
+            cchar   	*digtable = digtable_lo ;
+	    if_constexpr (f_binarymin) {
+                int	ch ;
+                bool	f_got = false ;
+                bp = tbuf ;			/* forward */
+                if ((szof(ulonglong) > 4) && (ndigs > 32)) {
+                    for (int i = 63 ; i >= 32 ; i -= 1) {
+                        ch = digtable[(unum >> i) & 1] ;
+                        if (f_got || (ch != '0')) {
+                            f_got = true ;
+                            *bp++ = char(ch) ;
+                        }
+                    } /* end for */
+                } /* end if */
+                if (ndigs > 16) {
+                    for (int i = 31 ; i >= 16 ; i -= 1) {
+                        ch = digtable[(unum >> i) & 1] ;
+                        if (f_got || (ch != '0')) {
+                            f_got = true ;
+                            *bp++ = char(ch) ;
+                        }
+                    } /* end for */
+                } /* end if */
+                for (int i = 15 ; i >= 0 ; i -= 1) {
                     ch = digtable[(unum >> i) & 1] ;
                     if (f_got || (ch != '0')) {
                         f_got = true ;
                         *bp++ = char(ch) ;
                     }
                 } /* end for */
-            } /* end if */
-            if (ndigits > 16) {
-                for (int i = 31 ; i >= 16 ; i -= 1) {
-                    ch = digtable[(unum >> i) & 1] ;
-                    if (f_got || (ch != '0')) {
-                        f_got = true ;
-                        *bp++ = char(ch) ;
-                    }
-                } /* end for */
-            } /* end if */
-            for (int i = 15 ; i >= 0 ; i -= 1) {
-                ch = digtable[(unum >> i) & 1] ;
-                if (f_got || (ch != '0')) {
-                    f_got = true ;
-                    *bp++ = char(ch) ;
+                if (! f_got) {
+                    *bp++ = '0' ;
                 }
-            } /* end for */
-            if (! f_got) {
-                *bp++ = '0' ;
-            }
-            *bp = '\0' ;
-            bl = intconv(bp - tbuf) ;
-            bp = tbuf ;
-        } else {
-            /* form the digits that we will (maximally) need */
-            bp = (tbuf + tlen) ;
-            *bp = '\0' ;
-            for (int i = (ndigits-1) ; i >= 0 ; i -= 1) {
-                *--bp = digtable[unum & 1] ;
-                unum >>= 1 ;
-                if ((! f_specialhex) && (unum == 0)) break ;
-            } /* end for (making the digits) */
-            bl = intconv(bp - (tbuf + tlen)) ;
-        } /* end if_constexpr (f_binarymin) */
+                *bp = '\0' ;
+                bl = intconv(bp - tbuf) ;	/* forward */
+                bp = tbuf ;			/* forward */
+            } else {
+                /* form the digits that we will (maximally) need */
+                bp = (tbuf + tlen) ;		/* backward */
+                *bp = '\0' ;
+                for (int i = (ndigs - 1) ; (unum > 0) && (i >= 0) ; i -= 1) {
+                    *--bp = digtable[unum & 1] ;
+                    unum >>= 1 ;
+                } /* end for (making the digits) */
+		if (*bp == '\0') *--bp = '0' ;
+                bl = intconv((tbuf + tlen) - bp) ; /* backward */
+            } /* end if_constexpr (f_binarymin) */
+	} /* end if (ok) */
 	return rs ;
 } /* end method (fmtobj::code_bin) */
 
 int fmtobj::code_oct(va_list ap) noex {
     	int		rs = SR_OK ;
         ulonglong       unum ;
-        short		lenmod = spec.lenmod ;
         int     nd = 0 ;
         cchar   *digtable = digtable_lo ;
-        switch (lenmod) {
+	sub.numbase = numbase.oct ;
+        switch (spec.lenmod) {
         case lenmod_longlong:
             unum = (ulonglong) va_arg(ap,longlong) ;
             nd = (((CHAR_BIT * szof(longlong))+2)/3) ;
@@ -501,22 +524,28 @@ int fmtobj::code_oct(va_list ap) noex {
         default:
             unum = (ulonglong) va_arg(ap,uint) ;
             nd = (((CHAR_BIT * szof(uint))+2)/3) ;
-            if (lenmod == lenmod_half) {
+            if (spec.lenmod == lenmod_half) {
+		unum &= USHORT_MAX ;
                 nd = (((CHAR_BIT * szof(ushort))+2)/3) ;
-            }
+            } else if (spec.lenmod == lenmod_halfhalf) {
+		unum &= UCHAR_MAX ;
+                nd = (((CHAR_BIT * szof(uchar))+2)/3) ;
+	    } /* end if */
             break ;
         } /* end switch */
-        /* form the digits that we will (maximally) need */
-        bp = (tbuf + tlen) ;
-        *bp = '\0' ;
-        for (int i = (nd-1) ; (unum > 0) && (i >= 0) ; i -= 1) {
-            *--bp = digtable[unum & 7] ;
-            unum >>= 3 ;
-        } /* end for (making the digits) */
-        *--bp = '0' ;
-        bl = intconv((tbuf + tlen) - bp) ;
+	if (rs >= 0) {
+            /* form the digits that we will (maximally) need */
+            bp = (tbuf + tlen) ;		/* backward */
+            *bp = '\0' ;
+            for (int i = (nd - 1) ; (unum > 0) && (i >= 0) ; i -= 1) {
+                *--bp = digtable[unum & 7] ;
+                unum >>= 3 ;
+            } /* end for (making the digits) */
+            if (*bp == '\0') *--bp = '0' ;
+            bl = intconv((tbuf + tlen) - bp) ;	/* backward */
+	} /* end if (ok) */
 	return rs ;
-} /* end method (fmtobj::code_octal) */
+} /* end method (fmtobj::code_oct) */
 
 /* handle decimal */
 int fmtobj::code_dec(va_list ap) noex {
@@ -525,6 +554,7 @@ int fmtobj::code_dec(va_list ap) noex {
         longlong        snum = 0 ;
         ulonglong       unum = 0 ;
         bool		f_signed = ((fcode == 'i') || (fcode == 'd')) ;
+	sub.numbase = numbase.dec ;
         switch (spec.lenmod) {
         case lenmod_longlong:
             if (f_signed) {
@@ -549,25 +579,31 @@ int fmtobj::code_dec(va_list ap) noex {
             if (spec.lenmod == lenmod_half) {
                 unum &= USHORT_MAX ;
                 snum &= USHORT_MAX ;
-            }
+	    } else if (spec.lenmod ==  lenmod_halfhalf) {
+                unum &= UCHAR_MAX ;
+                snum &= UCHAR_MAX ;
+            } /* end if */
             break ;
         } /* end switch */
-        /* if signed, is the number negative? */
-        if (f_signed) {
-            unum = (ulonglong) snum ;
-            if (snum < 0) unum = (- unum) ;
-        }
-        if ((bp = ulltostr(unum,(tbuf + tlen))) != np) {
-            if (f_signed && (snum < 0)) {
-                *--bp = '-' ;
-                fl.misign = true ;
+	if (rs >= 0) {
+            /* if signed, is the number negative? */
+            if (f_signed) {
+                unum = (ulonglong) snum ;
+                if (snum < 0) unum = (neg unum) ;
             }
-	} else {
-	    bp = tbuf ;
-	    strdcpy(tbuf,tlen,"domain-error") ;
-	    rs = SR_DOM ;
-	}
-        bl = intconv((tbuf + tlen) - bp) ;
+            if ((bp = ulltostr(unum,(tbuf + tlen))) != np) { /* backward */
+                if (f_signed && (snum < 0)) {
+                    *--bp = '-' ;
+                    fl.misign = true ;
+                }
+                bl = intconv((tbuf + tlen) - bp) ;	/* backward */
+	    } else {
+	        bp = strdcpy(tbuf,tlen,"¿domain-error¿") ;
+		bl = intconv(bp - tbuf) ;	/* forward */
+		bp = tbuf ;			/* forward */
+	        rs = SR_DOM ;
+	    } /* end if */
+	} /* end if (ok) */
 	return rs ;
 } /* end method (fmtobj::code_dec) */
 
@@ -575,43 +611,49 @@ int fmtobj::code_dec(va_list ap) noex {
 int fmtobj::code_hex(va_list ap) noex {
     	int		rs = SR_OK ;
         ulonglong       unum ;
-        short		lenmod = spec.lenmod ;
-        int     ndigits = 0 ;
-        bool     f_lc = ((fcode == 'p') || (fcode == 'x')) ;
-        cchar   *digtable ;
+        int	ndigs = 0 ;
+        bool	f_lc = ((fcode == 'p') || (fcode == 'x')) ;
+	DPRINTF("ent\n") ;
+	sub.numbase = numbase.hex ;
         if ((fcode == 'p') || (fcode == 'P')) {
             uintptr_t   ul = (uintptr_t) va_arg(ap,void *) ;
             unum = (ulonglong) ul ;
-            ndigits = (2 * szof(void *)) ;
+            ndigs = (2 * szof(void *)) ;
         } else {
-            switch (lenmod) {
+            switch (spec.lenmod) {
             case lenmod_longlong:
                 unum = (ulonglong) va_arg(ap,ulonglong) ;
-                ndigits = (2 * szof(ulonglong)) ;
+                ndigs = (2 * szof(ulonglong)) ;
                 break ;
             case lenmod_long:
                 unum = (ulonglong) va_arg(ap,ulong) ;
-                ndigits = (2 * szof(ulong)) ;
+                ndigs = (2 * szof(ulong)) ;
                 break ;
             default:
                 unum = (ulonglong) va_arg(ap,uint) ;
-                ndigits = (2 * szof(uint)) ;
-                if (lenmod == lenmod_half) {
-                    ndigits = (2 * szof(ushort)) ;
-                }
+                ndigs = (2 * szof(uint)) ;
+                if (spec.lenmod == lenmod_half) {
+                    ndigs = (2 * szof(ushort)) ;
+		} else if (spec.lenmod == lenmod_halfhalf) {
+                    ndigs = (2 * szof(uchar)) ;
+                } /* end if */
                 break ;
             } /* end switch */
         } /* end if */
-        digtable = (f_lc) ? digtable_lo : digtable_hi ;
-        /* form the digits that we will (maximally) need */
-        bp = (tbuf + tlen) ;
-        *bp = '\0' ;
-        for (int i = (ndigits-1) ; i >= 0 ; i -= 1) {
-            *--bp = digtable[unum & 0x0F] ;
-            unum >>= 4 ;
-            if ((! f_specialhex) && (unum == 0)) break ;
-        } /* end for (making the digits) */
-        bl = intconv(bp - (tbuf + tlen)) ;
+	if (rs >= 0) {
+            cchar *digtable = (f_lc) ? digtable_lo : digtable_hi ;
+            /* form the digits that we will (maximally) need */
+            bp = (tbuf + tlen) ;		/* backward */
+            *bp = '\0' ;
+            for (int i = (ndigs - 1) ; i >= 0 ; i -= 1) {
+                *--bp = digtable[unum & 0x0F] ;
+                unum >>= 4 ;
+                if (unum == 0) break ;
+            } /* end for (making the digits) */
+            bl = intconv((tbuf + tlen) - bp) ;	/* backward */
+	    DPRINTF("bp=%s\n",bp) ;
+	} /* end if (ok) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (fmtobj::code_hex) */
 
@@ -647,5 +689,20 @@ void fmtobj::dtor() noex {
 	    ulogerror("fmtobj",rs,"fini-finish") ;
 	}
 } /* end method (fmtobj::dtor) */
+
+fmtobj_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case fmtobjmem_start:
+	        rs = op->istart() ;
+	        break ;
+	    case fmtobjmem_finish:
+	        rs = op->ifinish() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (fmtobj_co::operator) */
 
 
