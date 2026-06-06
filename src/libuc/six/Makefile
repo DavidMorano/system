@@ -56,8 +56,7 @@ OBJ= obja.o objb.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -100,7 +99,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -180,11 +179,17 @@ sileadchr.o:		sileadchr.cc	sileadchr.h	$(INCS)
 siwht.o:		siwht0.o siwht1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+# module primary
 siwht0.o:		siwht.ccm			$(INCS)
-	makemodule siwht
+	gxx -c -x c++ -o $@ -O $<
 
-siwht1.o:		siwht1.cc siwht.ccm		$(INCS)
-	makemodule siwht
+# module implementation
+siwht1.o:		siwht1.cc siwht0.o strn.o	$(INCS)
 	$(COMPILE.cc) $<
+
+# STRN
+strn.o:			strn.dir
+strn.dir:
+	makesubdir $@
 
 
