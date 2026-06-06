@@ -42,7 +42,7 @@ LIBS +=
 
 OBJ0_SNX= snadd.o snaddw.o sncpyarray.o
 OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o
-OBJ2_SNX= snfilemode.o snflags.o snflagsx.o sninetaddr.o
+OBJ2_SNX= snfilemode.o snflags.o snflager.o sninetaddr.o
 OBJ3_SNX= snkeyval.o snloadavg.o
 OBJ4_SNX= snrealname.o snshellunder.o sntid.o
 OBJ5_SNX= sntmtime.o snuuid.o snxxx.o snwx.o
@@ -58,10 +58,9 @@ OBJ_SNX= obja.o objb.o objc.o objd.o
 
 
 INCDIRS=
+LIBDIRS= -L lib
 
-LIBDIRS= -L$(LIBDIR)
-
-
+RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -102,7 +101,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ_SNX)
@@ -175,6 +174,6 @@ snabbrname.o:		snabbrname.cc	snabbr.h	$(INCS)
 snabbrnum.o:		snabbrnum.cc	snabbr.h	$(INCS)
 
 snflags.o:		snflags.cc	snflags.h	$(INCS)
-snflagsx.o:		snflagsx.cc	snflagsx.h	$(INCS)
+snflager.o:		snflager.cc	snflager.h	$(INCS)
 
 
