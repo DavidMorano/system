@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 2001-04-11, David A­D­ Morano
-	Copied from |gethz(3dam)|.
+	Copied from |gethz(3uc)|.
 
 */
 
