@@ -20,17 +20,17 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int mkpathrooted(char *,cchar *) noex ;
+extern int		mkpathrooted(char *,cchar *) noex ;
 
-static inline int mkpathabs(char *rbuf,cchar *sp) noex {
+local inline int	mkpathabs(char *rbuf,cchar *sp) noex {
     	return mkpathrooted(rbuf,sp) ;
-}
+} /* end subroutine */
 
 EXTERNC_end
 
