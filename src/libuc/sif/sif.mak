@@ -40,20 +40,23 @@ MODS +=
 LIBS +=
 
 
-OBJ0= sif0.o 
+OBJPART=
+
+OBJPRIME= sif0.o
+
+OBJ0= sif0.o
 OBJ1= sif1.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj1.o
 OBJB=
 
-OBJ= obja.o
+OBJIMPL= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,11 +99,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ)
-	makemodule sif
+$(T).o:			objprime.o objimpl.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
@@ -111,6 +113,7 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat sif		gcm.cache
 
 control:
 	(uname -n ; date) > Control
@@ -136,11 +139,22 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-sif0.o:			sif.ccm			$(INCS)
-	makemodule sif
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-sif1.o:			sif1.cc sif0.o		$(INCS)
-	makemodule sif
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module primary
+sif0.o:			sif.ccm $(OBJPART)		$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+# module implementation
+sif1.o:			sif1.cc sif0.o			$(INCS)
 	$(COMPILE.cc) $<
 
 
