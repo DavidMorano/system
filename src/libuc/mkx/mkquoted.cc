@@ -155,8 +155,7 @@ quoter::operator int () noex {
 	    rs = snwcpy(qbuf,qlen,abuf,alen) ;
 	}
 	return rs ;
-}
-/* end method (quoter::operator) */
+} /* end method (quoter::operator) */
 
 int quoter::mkq() noex {
 	int		rs ;
@@ -185,7 +184,6 @@ int quoter::mkq() noex {
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (quoter::mkq) */
+} /* end method (quoter::mkq) */
 
 
