@@ -45,7 +45,7 @@ template<typename ... Args>
 inline int mknpath(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return mknpathx(dp,dl,na,args ...) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
