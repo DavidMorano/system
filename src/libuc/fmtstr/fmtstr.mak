@@ -43,9 +43,11 @@ LIBS +=
 
 DEPS_MAIN	+= $(MODS) mods.o
 DEPS_OBJ	+= fmtsub.o fmtspec.o fmtstrdata.o fmtutil.o fmtflag.o
-DEPS_SUB	+= fmtstrdata.o fmtspec.o fmtutil.o cvtfloat.o
-DEPS_SPEC	+=
-DEPS_UTIL	+=
+DEPS_SUB	+= fmtstrdata.o fmtspec.o fmtutil.o cvtfloat.o fmtsub.hh
+DEPS_SPEC	+= fmtspec.hh
+DEPS_FMTSTRDATA	+= fmtstrdata.hh
+DEPS_UTIL	+= fmtutil.hh
+DEPS_CVTFLOAT	+= cvtfloat.hh
 
 MOBJ += fmtutil.o fmtstrdata.o fmtspec.o 
 MOBJ += fmtsub.o fmtobj.o
@@ -172,7 +174,7 @@ fmtobj0.o:		fmtobj.ccm $(DEPS_OBJ)			$(INCS)
 fmtobj1.o:		fmtobj1.cc fmtobj0.o $(DEPS_OBJ)	$(INCS)
 	$(COMPILE.cc) $<
 
-fmtstrdata.o:		fmtstrdata.ccm				$(INCS)
+fmtstrdata.o:		fmtstrdata.ccm $(DEPS_FMTSTRDATA)	$(INCS)
 
 fmtsub.o:		$(MOBJ_SUB)				$(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ_SUB)
@@ -205,10 +207,10 @@ fmtutil.o:		fmtutil0.o fmtutil1.o
 fmtutil0.o:		fmtutil.ccm $(DEPS_UTIL)		$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
-fmtutil1.o:		fmtutil1.cc fmtutil0.o			$(INCS)
+fmtutil1.o:		fmtutil1.cc fmtutil0.o $(DEPS_UTIL)	$(INCS)
 	$(COMPILE.cc) $<
 
-cvtfloat.o:		cvtfloat.ccm fmtflag.o			$(INCS)
+cvtfloat.o:		cvtfloat.ccm fmtflag.o $(DEPS_CVTFLOAT)	$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
 fmtflag.o:		fmtflag.dir
