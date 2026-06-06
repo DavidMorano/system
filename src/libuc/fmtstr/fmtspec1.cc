@@ -1,4 +1,4 @@
-/* fmrspec1 MODULE */
+/* fmrspec1 MODULE (implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -46,6 +46,8 @@ module ;
 #include	<stdintx.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+
+#include	"fmtspec.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -96,7 +98,7 @@ constexpr fmtproc_m	fmtmems[] = {
 	&fmtproc::coder
 } ; /* end array (fmtmems) */
 
-constexpr cshort	ten = short(10) ;
+local constexpr cshort	ten = short(10) ;
 
 
 /* exported variables */
@@ -126,7 +128,7 @@ int fmtspec::start(va_list ap,cchar *sp,int µsl) noex {
 
 int fmtproc::operator () (va_list ap) noex {
 	int		rs = SR_OK ;
-	for (auto m : fmtmems) {
+	for (cauto m : fmtmems) {
 	    rs = (this->*m)(ap) ;
 	    if (rs < 0) break ;
 	} /* end for */
@@ -175,7 +177,7 @@ int fmtproc::widther(va_list ap) noex {
                 width = (short) va_arg(ap,int) ;
                 (sl--,sp++) ;
                 if (width < 0) {
-                    width = -width ;
+                    width = (neg width) ;
                     fl.left = (! fl.left) ;
                 }
             } else if ((*sp >= '0') && (*sp <= '9')) {
@@ -214,7 +216,7 @@ int fmtproc::precer(va_list ap) noex {
 /* check for a format length-modifier */
 int fmtproc::moder(va_list) noex {
 	int		rs = SR_OK ;
-	short		lenmod = 0 ;
+	short		lenmod = -1 ;
 	if (sl > 0) {
             schar       nhalf = 0 ;
             schar       nlong = 0 ;
@@ -264,7 +266,9 @@ int fmtproc::moder(va_list) noex {
             if (nimax > 1) {
                 lenmod = lenmod_imaxmax ;
             } /* end if (longlong) */
-	    op->lenmod = lenmod ;
+	    if (lenmod >= 0) {
+		op->lenmod = lenmod ;
+	    }
 	} /* end block (possible format-length specifier) */
 	return rs ;
 } /* end method */
