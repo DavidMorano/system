@@ -42,16 +42,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<sbuf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX |pid_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
-#include	"mkx.h"
+#include	"mkmid.h"
 
 
 /* local defines */
@@ -98,7 +98,7 @@ int mkmid(char *rbuf,int rlen,cchar *dn,cchar *nn,pid_t pid,int serial) noex {
 	                mb.dec(serial) ;
 	                mb.chr('@') ;
 	                mb.strw(dn) ;
-		    }
+		    } /* end block */
 	            rs1 = mb.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (sbuf) */
