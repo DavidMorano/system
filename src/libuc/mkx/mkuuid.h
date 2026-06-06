@@ -41,7 +41,7 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int mkuuid(uuid_dat *udp) noex {
+local inline int mkuuid(uuid_dat *udp) noex {
     	return mkuuid(udp,0) ;
 }
 
