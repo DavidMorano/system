@@ -5,6 +5,12 @@
 /* object to manipulate INET adresses */
 /* version %I% last-modified %G% */
 
+/* revision history:
+
+	= 1998-02-14, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -13,10 +19,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<netinet/in.h>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<netinet/in.h>		/* POSIX */
+#include	<netdb.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	INETADDR	union inetaddr_head
