@@ -121,6 +121,7 @@ int mkshlibname(char *rbuf,cchar *pre,cchar *base,cchar *ext) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-} /* end subroutine (mkshlibname) */
+}
+/* end subroutine (mkshlibname) */
 
 
