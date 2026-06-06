@@ -52,6 +52,7 @@
 	-----------------------------------
 	1<<0	clean up bad strings (with bad characters) by substitution
 	1<<1	return error on overflow
+	1<<2	perform minimum zero-filling on some number bases
 
 	Options:
 	There are several compile time options available through the
@@ -104,6 +105,7 @@
 #include	<stdintx.h>		/* LIBU extended integer types */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"fmtobj.hh"
 #include	"fmtstr.h"
 
 import fmtobj ;
