@@ -35,15 +35,16 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cwchar>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cwchar>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<ischarx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fmtstr.h"
 
@@ -60,7 +61,20 @@ export {
     bool hasourbad(cchar *,int) noex ;
     inline bool isourbad(int ch) noex {
     	return (! isprintterm(ch)) ;
-    }
+    } /* end subroutine */
+} /* end export */
+
+export {
+    struct numbases {
+	static constexpr int	bin	= 2 ;
+	static constexpr int	oct	= 8 ;
+	static constexpr int	dec	= 10 ;
+	static constexpr int	hex	= 16 ;
+    } ; /* end struct (numbases) */
+} /* end export */
+
+export {
+    extern const numbases	numbase ;
 } /* end export */
 
 
