@@ -52,6 +52,10 @@ local inline int siwht(cchar *sp,int sl) noex {
 }
 #endif /* COMMENT */
 
+local inline int siblk(cchar *sp,int sl) noex {
+	return siblank(sp,sl) ;
+}
+
 EXTERNC_end
 
 
