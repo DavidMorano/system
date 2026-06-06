@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkpathxw.h>
-#include	<mknpathx.h>
-#include	<mknpathxw.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkpathxw.h>		/* LIBUC */
+#include	<mknpathx.h>		/* LINUC */
+#include	<mknpathxw.h>		/* LINUC */
 
 
 EXTERNC_begin
@@ -44,7 +44,7 @@ template<typename ... Args>
 inline int mkpath(char *dp,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return mknpathx(dp,-1,na,args ...) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
