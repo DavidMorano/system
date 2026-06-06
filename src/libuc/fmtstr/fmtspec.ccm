@@ -68,7 +68,7 @@ export {
 	lenmod_imaxmax,			/* two (or more) 'j' */
 	lenmod_longdouble,
 	lenmod_wide,			/* 'w' for type |wint_t| */
-	lenmod_diff,			/* 't' */
+	lenmod_diff,			/* 't' for type |ptrdiff_t| */
 	lenmod_size,			/* 'z' */
 	lenmod_overlast
     } ; /* end enum */
