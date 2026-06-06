@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	DUPSTR		struct dupstr_head
@@ -31,13 +31,13 @@
 struct dupstr_head {
 	char		*as ;	/* allocated string */
 	char		buf[DUPSTR_SHORTLEN+1] ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum dupstrmems {
 	dupstrmem_finish,
 	dupstrmem_overlast
-} ;
+} ; /* end enum */
 struct dupstr ;
 struct dupstr_co {
 	dupstr		*op = nullptr ;
@@ -56,14 +56,14 @@ struct dupstr : dupstr_head {
 	dupstr() noex {
 	    finish(this,dupstrmem_finish) ;
 	    as = nullptr ;
-	} ;
+	} ; /* end ctor */
 	dupstr(const dupstr &) = delete ;
 	dupstr &operator = (const dupstr &) = delete ;
-	int start(cchar *,int,char **) noex ;
+	int start	(cchar *,int,char **) noex ;
 	void dtor() noex ;
 	destruct dupstr() {
 	    if (as) dtor() ;
-	} ;
+	} ; /* end destruct */
 } ; /* end struct (dupstr) */
 #else	/* __cplusplus */
 typedef DUPSTR		dupstr ;
