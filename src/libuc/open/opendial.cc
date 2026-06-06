@@ -51,6 +51,8 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<dial.h>		/* <- money shot! */
 #include	<opendials.h>
 #include	<localmisc.h>
@@ -70,10 +72,6 @@ typedef const mainv	cmv ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_openenv(cchar *,int,mode_t,con mainv,int) noex ;
-}
 
 
 /* external variables */
@@ -138,6 +136,9 @@ int opendial(int di,int af,cc *hn,cc *ps,cc *svc,
 	            break ;
 	        case opendial_ticotsordnls:
 	            rs = dialticotsordnls(ps,-1,svc,to,opts) ;
+	            break ;
+	        case opendial_ticotsordmux:
+	            rs = dialticotsordmux(ps,-1,svc,av,to,opts) ;
 	            break ;
 	        case opendial_pass:
 	            cp = ps ;
