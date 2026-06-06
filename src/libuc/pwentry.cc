@@ -58,7 +58,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<strn.h>		/* |strnchr(3uc)| */
 #include	<snx.h>
 #include	<snwcpy.h>
@@ -497,9 +497,9 @@ local int loaditem(cchar **rpp,cchar *vp,int vl) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_pw)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_pw)) >= 0) ylikely {
 	    pwlen += rs ;
-	    if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 	        pwlen += rs ; /* additional size for some extra stuff */
 	    }
 	}
