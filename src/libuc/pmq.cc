@@ -43,7 +43,6 @@
 #include	<uclibmem.h>
 #include	<usysflag.h>
 #include	<utimeout.h>		/* |uto_{x}(3u)| */
-#include	<getbufsize.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include        <errtimer.hh>
