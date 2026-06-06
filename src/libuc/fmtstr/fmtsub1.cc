@@ -1,4 +1,4 @@
-/* fmtsub1 MODULE */
+/* fmtsub1 MODULE (implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -35,17 +35,19 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<cstdarg>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<stdintx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LINU */
+#include	<usysbase.h>		/* LINU */
+#include	<usyscalls.h>		/* LINU */
+#include	<stdintx.h>		/* LINU */
+#include	<localmisc.h>		/* LINU */
+
+#include	"fmtsub.hh"
 
 module fmtsub ;
 
@@ -85,8 +87,8 @@ int fmtsub::start(char *ub,int ul,int fm) noex {
 	return fmtsub_start(this,ub,ul,fm) ;
 }
 
-int fmtsub::cleanstrw(cchar *sp,int sl) noex {
-	return fmtsub_cleanstrw(this,sp,sl) ;
+int fmtsub::strclean(cchar *sp,int sl) noex {
+	return fmtsub_strclean(this,sp,sl) ;
 }
 
 int fmtsub::strw(cchar *sp,int sl) noex {
@@ -107,7 +109,7 @@ int fmtsub::emitter(fmtspec *fsp,cchar *bp,int bl) noex {
 	    rs = emit(fsp,bp,bl) ;
 	}
 	return rs ;
-}
+} /* end method (fmtsub::emitter) */
 
 int fmtsub::emit(fmtspec *fsp,cchar *sp,int sl) noex {
 	return fmtsub_emit(this,fsp,sp,sl) ;
