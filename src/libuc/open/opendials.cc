@@ -47,6 +47,8 @@
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<matstr.h>		/* |matstr(3uc)| */
 #include	<localmisc.h>
 
@@ -81,21 +83,22 @@
 
 namespace libuc {
     consteval void opendialer::mkname() noex {
-	    name[opendial_unspec] 	= "unspec" ; 
-	    name[opendial_udp] 		= "udp" ; 
-	    name[opendial_tcp] 		= "tcp" ; 
-	    name[opendial_tcpmux] 	= "tcpmux" ; 
-	    name[opendial_tcpnls] 	= "tcpnls" ; 
-	    name[opendial_uss] 		= "uss" ; 
-	    name[opendial_ussmux] 	= "ussmux" ; 
-	    name[opendial_ussnls] 	= "ussnls" ; 
-	    name[opendial_ticotsord]	= "ticotsord" ;
-	    name[opendial_ticotsordnls] = "ticotsordnls" ; 
-	    name[opendial_pass] 	= "pass" ; 
-	    name[opendial_open] 	= "open" ; 
-	    name[opendial_prog] 	= "prog" ; 
-	    name[opendial_finger] 	= "finger" ; 
-	    name[opendial_overlast] 	= nullptr ;
+	name[opendial_unspec]		= "unspec" ; 
+	name[opendial_udp] 		= "udp" ; 
+	name[opendial_tcp] 		= "tcp" ; 
+	name[opendial_tcpmux]		= "tcpmux" ; 
+	name[opendial_tcpnls]		= "tcpnls" ; 
+	name[opendial_uss] 		= "uss" ; 
+	name[opendial_ussmux]		= "ussmux" ; 
+	name[opendial_ussnls]		= "ussnls" ; 
+	name[opendial_ticotsord]	= "ticotsord" ;
+	name[opendial_ticotsordnls]	= "ticotsordnls" ;
+	name[opendial_ticotsordmux]	= "ticotsordmux" ; 
+	name[opendial_pass] 		= "pass" ; 
+	name[opendial_open]		= "open" ; 
+	name[opendial_prog]		= "prog" ; 
+	name[opendial_finger]		= "finger" ; 
+	name[opendial_overlast] 	= nullptr ;
     } ; /* end metbod (opendialer::mkname) */
     consteval opendialer::opendialer() noex {
 	mkname() ;
@@ -111,5 +114,8 @@ namespace libuc {
 
 
 /* exported subroutines */
+
+
+/* local subroutines */
 
 
