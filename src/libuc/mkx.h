@@ -41,7 +41,6 @@
 #include	<mkmagic.h>
 #include	<mkmid.h>
 #include	<mknpath.h>
-#include	<mkprogenv.h>
 #include	<mkpath.h>
 #include	<mkpathxx.h>
 #include	<mknpathxx.h>
