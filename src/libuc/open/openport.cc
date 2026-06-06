@@ -56,7 +56,9 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
 #include	<nulstr.h>
 #include	<sockaddress.h>
@@ -98,7 +100,6 @@ import uconstants ;
 
 extern "C" {
     extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_close(int) ;
 } /* end extern */
 
 
@@ -199,9 +200,9 @@ openporter::operator int () noex {
 int openporter::start() noex {
 	int		rs ;
 	if ((rs = u_getenviron(&envv)) >= 0) {
-	    if ((rs = getbufsize(bufsize_un)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_un)) >= 0) {
 	        ulen = rs ;
-	        if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 		    cint	sz = (ulen+1) + (rs+1) ;
 		    plen = rs ;
 		    if ((rs = lm_mall(sz,&a)) >= 0) {
@@ -213,13 +214,13 @@ int openporter::start() noex {
 			    ubuf = nullptr ;
 			    pbuf = nullptr ;
 		        } /* end if (error) */
-		    } /* end if (memory-allocation) */
-	        } /* end if (getbufsize) */
+		    } /* end if (memory-acquire) */
+	        } /* end if (bufsizeget) */
 	        if (rs < 0) {
 		    plen = 0 ;
 		    ulen = 0 ;
 	        } /* end if (error) */
-	    } /* end if (getbufsize) */
+	    } /* end if (bufsizeget) */
 	} /* end if (u_getenviron) */
 	return rs ;
 } /* end method (openporter::start) */
