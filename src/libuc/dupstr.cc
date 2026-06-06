@@ -42,14 +42,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dupstr.h"
 
@@ -89,16 +89,16 @@ import libutil ;			/* |lenstr(3u)| */
 int dupstr_start(dupstr *op,cchar *sp,int µsl,char **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		cl = 0 ;
-	if (op && rpp) {
-	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	if (op && rpp) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	        rs = SR_OK ;
 	        op->as = nullptr ;
 	        if (sl > DUPSTR_SHORTLEN) {
-	            if (char *bp ; (rs = lm_mall((sl + 1),&bp)) >= 0) {
+	            if (char *bp ; (rs = lm_mall((sl + 1),&bp)) >= 0) ylikely {
 	                cl = intconv(strwcpy(bp,sp,sl) - bp) ;
 	                *rpp = bp ;
 	                op->as = bp ;
-	            } /* end if (m-a) */
+	            } /* end if (memory-acquire) */
 	        } else {
 	            *rpp = op->buf ;
 	            cl = intconv(strwcpy(op->buf,sp,sl) - op->buf) ;
@@ -118,7 +118,7 @@ int dupstr_finish(dupstr *op) noex {
 	        rs1 = lm_free(op->as) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->as = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->buf[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
@@ -140,7 +140,7 @@ void dupstr::dtor() noex {
 
 dupstr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case dupstrmem_finish:
 	        rs = dupstr_finish(op) ;
