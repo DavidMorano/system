@@ -1,4 +1,4 @@
-/* openqotd HEADER */
+/* prqotd_open HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -26,7 +26,7 @@
 
 EXTERNC_begin
 
-extern int	openqotd(cchar *,int,int,int) noex ;
+extern int	prqotd_open(cchar *,int,int,int) noex ;
 
 EXTERNC_end
 
