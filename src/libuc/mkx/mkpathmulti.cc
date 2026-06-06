@@ -48,21 +48,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getbufsize.h>
-#include	<vecstr.h>
-#include	<storebuf.h>
-#include	<bufsizevar.hh>
-#include	<hasx.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 #include	"mkpathxx.h"
@@ -75,7 +75,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	MKVARPATH_MP	(4*1024)
 
-#undef	CHX_EXPAND
 #define	CHX_EXPAND	'%'
 
 
@@ -87,10 +86,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* external subroutines */
 
-extern "C" {
-    extern cchar	*getenver(cchar *,int) noex ;
-}
-
 
 /* external variables */
 
@@ -100,9 +95,9 @@ extern "C" {
 
 /* forward references */
 
-static int	mkpathmulti_list(char *,cchar *,cchar *) noex ;
-static int	mkpathmulti_one(char *,vecstr *,cchar *,int,cchar *) noex ;
-static int	mkpathmulti_join(char *,cchar *,int,cchar *) noex ;
+local int	mkpathmulti_list(char *,cchar *,cchar *) noex ;
+local int	mkpathmulti_one(char *,vecstr *,cchar *,int,cchar *) noex ;
+local int	mkpathmulti_join(char *,cchar *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -130,7 +125,7 @@ int mkpathmulti(char *rbuf,cchar *fp,int fl) noex {
                 cchar       *vp = (fp + 1) ;
                 cchar       *rp = nullptr ;
                 cchar       *cp ;
-                if (vl && (vp[0] == chx_ec)) { /* check for prefix character */
+                if (vl && (vp[0] == chx_ec)) { /* prefix character? */
                     vp += 1 ;
                     vl -= 1 ;
                 }
@@ -146,8 +141,8 @@ int mkpathmulti(char *rbuf,cchar *fp,int fl) noex {
                                 vbuf = p ;
                                 strwcpyuc(vbuf,vp,vl) ;
                                 cp = getenver(vbuf,vl) ;
-                            }
-                        }
+                            } /* end if (memory-acquire) */
+                        } /* end if (haslc) */
                     } /* end if (getenver) */
                     if (rs >= 0) ylikely {
                         if (cp != nullptr) {
@@ -157,12 +152,14 @@ int mkpathmulti(char *rbuf,cchar *fp,int fl) noex {
                             } else {
                                 rs = mkpathmulti_join(rbuf,cp,-1,rp) ;
                                 pl = rs ;
-                            }
-                            if (rs == SR_OVERFLOW) rs = SR_NAMETOOLONG ;
+                            } /* end if */
+                            if (rs == SR_OVERFLOW) {
+				rs = SR_NAMETOOLONG ;
+			    }
                         } else {
                             rs = (rp != nullptr) ? SR_NOTDIR : SR_NOENT ;
                         }
-                    } /* end if */
+                    } /* end if (ok) */
                     if (vbuf) {
                         lm_free(vbuf) ;
                     }
@@ -178,13 +175,13 @@ int mkpathmulti(char *rbuf,cchar *fp,int fl) noex {
 
 /* local subroutines */
 
-static int mkpathmulti_list(char *rbuf,cchar *pathlist,cchar *rp) noex {
+local int mkpathmulti_list(char *rbuf,cchar *pathlist,cchar *rp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
 	if (vecstr paths ; (rs = paths.start(2,0)) >= 0) ylikely {
 	    int		sl ;
-	    int		f_zero = false ;
+	    bool	f_zero = false ;
 	    cchar	*sp = pathlist ;
 	    for (cchar *tp ; (tp = strchr(sp,':')) != nullptr ; ) {
 	        sl = intconv(tp - sp) ;
@@ -199,15 +196,14 @@ static int mkpathmulti_list(char *rbuf,cchar *pathlist,cchar *rp) noex {
 	    if ((rs >= 0) && (pl == 0) && ((sp[0] != '\0') || (! f_zero))) {
 	        rs = mkpathmulti_one(rbuf,&paths,sp,-1,rp) ;
 	        pl = rs ;
-	    }
+	    } /* end if */
 	    rs1 = paths.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (paths) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (mkpathmulti_list) */
+} /* end subroutine (mkpathmulti_list) */
 
-static int mkpathmulti_one(char *rbuf,vecstr *plp,cc *sp,int sl,cc *rp) noex {
+local int mkpathmulti_one(char *rbuf,vecstr *plp,cc *sp,int sl,cc *rp) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
@@ -220,22 +216,21 @@ static int mkpathmulti_one(char *rbuf,vecstr *plp,cc *sp,int sl,cc *rp) noex {
 	        if ((rs1 == SR_OVERFLOW) || (rs1 == SR_NAMETOOLONG)) {
 	            rs1 = SR_OK ;
 	            pl = 0 ;
-	        }
+	        } /* end if */
 	        if ((rs1 >= 0) && (pl > 0) && (rbuf[0] != '\0')) ylikely {
 	            if (ustat sb ; (rs = u_lstat(rbuf,&sb)) >= 0) {
 			rs = 0 ; /* <- dummy action */
 		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
 	                pl = 0 ;
-		    }
-	        }
+		    } /* end if */
+	        } /* end if */
 	    } /* end if (vecstr_add) */
 	} /* end if (not-found) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (mkpathmulti_one) */
+} /* end subroutine (mkpathmulti_one) */
 
-static int mkpathmulti_join(char *rbuf,cchar *sp,int sl,cchar *rp) noex {
+local int mkpathmulti_join(char *rbuf,cchar *sp,int sl,cchar *rp) noex {
 	int		rs ;
 	int		pl = 0 ;
 	if ((rs = maxpathlen) >= 0) ylikely {
@@ -248,7 +243,6 @@ static int mkpathmulti_join(char *rbuf,cchar *sp,int sl,cchar *rp) noex {
 	    if (rs == SR_OVERFLOW) rs = SR_NAMETOOLONG ;
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (mkpathmulti_join) */
+} /* end subroutine (mkpathmulti_join) */
 
 
