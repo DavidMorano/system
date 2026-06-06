@@ -43,6 +43,7 @@
 	-----------------------------------
 	1<<0	clean up bad strings (with bad characters) by substitution
 	1<<1	return error on overflow
+	1<<2	perform minimum zero-filling on some number bases
 
 	Options:
 	There are several compile time options available through the
@@ -86,12 +87,14 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"fmtobj.hh"
 
 export module fmtobj ;
 
@@ -115,12 +118,34 @@ import fmtspec ;
 
 /* local structures */
 
+enum fmtobjmems {
+    	fmtobjmem_start,
+	fmtobjmem_finish,
+	fmtobjmem_overlast
+} ; /* end enum */
+
 export {
+    struct fmtobj ;
     struct fmtobj_fl {
-	uint		plsign:1 ;	/* plus-sign encountered */
-	uint		misign:1 ;	/* misus-sign encountered */
+	uint		plsign:1 ;	/* sign encountered (plus) */
+	uint		misign:1 ;	/* sign encountered (minus) */
     } ; /* end struct */
+    struct fmtobj_co {
+	fmtobj		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (fmtobj *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+    } ; /* end struct (fmtobj_co) */
     struct fmtobj {
+	friend		fmtobj_co ;
+	fmtobj_co	start ;
+	fmtobj_co	finish ;
 	fmtsub		sub ;
 	fmtspec		spec ;
 	cchar		*fmt ;		/* supplied from caller */
@@ -134,12 +159,12 @@ export {
 	int		bl{} ;
 	int		fcode ;
 	fmtobj(char *b,int l,int m,cchar *f) noex : ubuf(b), ulen(l) {
+	    start	(this,fmtobjmem_start) ;
+	    finish	(this,fmtobjmem_finish) ;
 	    fm = m ;
 	    fmt = f ;
 	} ; /* end ctor */
 	int operator () (va_list) noex ;
-	int start	() noex ;
-	int finish	() noex ;
 	int loop	(va_list) noex ;
 	int decide	(va_list) noex ;
 	int code_chr	(va_list) noex ;
@@ -154,6 +179,9 @@ export {
 	destruct fmtobj() {
 	    if (tbuf) dtor() ;
 	} ; /* end destruct */
+    private:
+	int istart	() noex ;
+	int ifinish	() noex ;
     } ; /* end struct (fmtobj) */
 } /* end export */
 
