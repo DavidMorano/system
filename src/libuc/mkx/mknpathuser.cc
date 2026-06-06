@@ -51,7 +51,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
@@ -189,7 +189,7 @@ local int mknpathun(char *rbuf,int rlen,cc *up,int ul,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 	    cint	ulen = rs ;
 	    cchar	*un = up ;
 	    char	ubuf[ulen+1] ;		/* <- VLA */
@@ -221,7 +221,7 @@ local int mknpathun(char *rbuf,int rlen,cc *up,int ul,cc *sp,int sl) noex {
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (ok) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (mknpathun) */
 
