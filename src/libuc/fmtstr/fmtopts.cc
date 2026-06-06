@@ -1,4 +1,4 @@
-/* fmtopts SUÞPORT */
+/* fmtopts SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -37,6 +37,7 @@
 
 cint	fmtoptms::clean		= (1 << fmtopt_clean) ;
 cint	fmtoptms::nooverr	= (1 << fmtopt_nooverr) ;
+cint	fmtoptms::minfill	= (1 << fmtopt_minfill) ;
 
 const fmtoptms		fmtoptm ;
 
