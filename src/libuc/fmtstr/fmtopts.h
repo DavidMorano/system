@@ -27,6 +27,7 @@
 enum fmtopts {
 	fmtopt_clean,			/* clean up the string-data */
 	fmtopt_nooverr,			/* no-overflow-error */
+	fmtopt_minfill,			/* perform minimum zero-filling */
 	fmtopt_overlast
 } ; /* end enum (fmtopts) */
 
@@ -35,6 +36,7 @@ enum fmtopts {
 struct fmtoptms {
 	static cint	clean ;
 	static cint	nooverr ;
+	static cint	minfill ;
 } ; /* end struct (fmtoptms) */
 
 extern const fmtoptms	fmtoptm ;
@@ -43,6 +45,7 @@ extern const fmtoptms	fmtoptm ;
 
 #define	FMTOPT_OCLEAN		(1 << fmtopt_clean)
 #define	FMTOPT_ONOOVERR		(1 << fmtopt_nooverr)
+#define	FMTOPT_OMINFILL		(1 << fmtopt_minfill)
 
 
 #endif /* FMTOPTS_INCLUDE */
