@@ -35,7 +35,6 @@
 #include	<usyscalls.h>		/* |getustime(3u)| */
 #include	<uclibmem.h>
 #include        <ucgetpw.h>
-#include        <getbufsize.h>
 #include        <strwcpy.h>
 #include        <localmisc.h>
 
