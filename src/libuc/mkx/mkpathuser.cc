@@ -50,7 +50,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
@@ -68,6 +68,10 @@
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#ifndef	CHX_MICRO
+#define	CHX_MICRO	'µ'
+#endif
 
 
 /* imported namespaces */
@@ -90,9 +94,9 @@ using std::max ;			/* subroutine-template */
 
 /* forward references */
 
-static int	mkpathsquiggle(char *,cchar *,cchar *,int) noex ;
-static int	mkpathuserfs(char *,cchar *,int) noex ;
-static int	mkpathusername(char *,cchar *,int,cchar *,int) noex ;
+local int	mkpathsquiggle	(char *,cchar *,cchar *,int)		noex ;
+local int	mkpathuserfs	(char *,cchar *,int)			noex ;
+local int	mkpathusername	(char *,cchar *,int,cchar *,int)	noex ;
 
 
 /* local variables */
@@ -117,7 +121,7 @@ int mkpathuser(char *rbuf,cchar *un,cchar *pp,int µpl) noex {
 	            pp += 1 ;
 	            pl -= 1 ;
 	            rs = mkpathsquiggle(rbuf,un,pp,pl) ;
-	        } else if (pp[0] == 'µ') {
+	        } else if (pp[0] == CHX_MICRO) {
 	            rs = mkpathuserfs(rbuf,pp,pl) ;
 	        }
 	    } /* end if */
@@ -129,7 +133,7 @@ int mkpathuser(char *rbuf,cchar *un,cchar *pp,int µpl) noex {
 
 /* local subroutines */
 
-static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
+local int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 	int		rs = SR_FAULT ;
 	int		ul = pl ;
 	cchar		*up = pp ;
@@ -148,10 +152,9 @@ static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 	}
 	rs = mkpathusername(rbuf,up,ul,pp,pl) ;
 	return rs ;
-}
-/* end subroutine (mkpathsqiggle) */
+} /* end subroutine (mkpathsqiggle) */
 
-static int mkpathuserfs(char *rbuf,cchar *pp,int pl) noex {
+local int mkpathuserfs(char *rbuf,cchar *pp,int pl) noex {
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	if ((pl >= 2) && (strncmp("µ/",pp,2) == 0)) {
@@ -178,14 +181,13 @@ static int mkpathuserfs(char *rbuf,cchar *pp,int pl) noex {
 	    } /* end if (positive) */
 	} /* end if (user-fs called for) */
 	return rs ;
-}
-/* end subroutine (mkpathuserfs) */
+} /* end subroutine (mkpathuserfs) */
 
-static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
+local int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 	    cint	ulen = rs ;
 	    cchar	*un = up ;
 	    char	ubuf[ulen+1] ;		/* <- VLA */
@@ -217,9 +219,8 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (ok) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mkpathusername) */
+} /* end subroutine (mkpathusername) */
 
 
