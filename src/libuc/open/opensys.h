@@ -22,7 +22,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<opensysfs.h>
+#include	<opensysfs.hh>
 
 
 EXTERNC_begin
