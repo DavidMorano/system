@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* special memory-allocation free-up */
+/* special memory-acquire free-up */
 /* version %I% last-modified %G% */
 
 
