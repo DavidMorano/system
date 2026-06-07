@@ -107,7 +107,7 @@ module ;
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
-#include	"fmtstr.h"		/* |FMTSTR_MINFILL| */
+#include	"fmtstr.h"
 #include	"fmtopts.h"
 #include	"fmtobj.hh"
 
@@ -128,12 +128,6 @@ import fmtflag ;
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0	/* debugging */
-#endif
-
-#ifdef	FMTSTR_SPECAILHEX
-#define	F_MINFILL	FMTSTR_MINFILL
-#else
-#define	F_MINFILL	0
 #endif
 
 
@@ -178,7 +172,7 @@ local constexpr bool	f_binarymin	= CF_BINARYMIN ;
 int fmtobj::operator () (va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	DPRINTF("ent\n") ;
 	if (ap) {
 	    if ((rs = start) >= 0) {
@@ -195,14 +189,15 @@ int fmtobj::operator () (va_list ap) noex {
 } /* end method */
 
 int fmtobj::istart() noex {
+    	cnullptr	np{} ;
     	int		rs = SR_FAULT ;
 	if (ubuf && fmt) {
 	    rs = SR_NOMEM ;
-	    if ((tbuf = new(nothrow) char[TBUFLEN+1]) != nullptr) {
+	    if ((tbuf = new(nothrow) char[TBUFLEN + 1]) != np) {
 	        rs = SR_OK ;
 	        tlen = TBUFLEN ;
         	tbuf[tlen] = '\0' ;
-	    }
+	    } /* end if (new-char) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (fmtobj::istart) */
@@ -295,7 +290,6 @@ int fmtobj::decide(va_list ap) noex {
 	case 'P':
 	case 'x':
 	case 'X':
-	    DPRINTF("-> code_hex\n") ;
 	    rs = code_hex(ap) ;
 	    break ;
 	case 'a':
@@ -364,7 +358,7 @@ int fmtobj::code_exp(va_list ap) noex {
         cchar		*sp = (cchar *) va_arg(ap,char *) ;
 	if (sp) {
 	    if (cint sl = lenstr(sp) ; sl >= 0) {
-		if (char *bufp = new(nothrow) char[sl+1] ; bufp) {
+		if (char *bufp = new(nothrow) char[sl + 1] ; bufp) {
 		    cint bufl = sl ;
 		    if ((rs = snwcpyexpesc(bufp,bufl,sp,sl)) >= 0) {
 			sd.sp = bufp ;
