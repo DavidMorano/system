@@ -31,9 +31,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* CSTD */
 
 
 #define	TIMEOUT		struct timeout_entry
