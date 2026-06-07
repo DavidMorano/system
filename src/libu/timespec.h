@@ -30,8 +30,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* CSTD */
 
 
 EXTERNC_begin
