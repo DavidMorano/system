@@ -35,7 +35,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>		/* |geustime(3u)| */
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getgroupname.h>
 #include	<vechand.h>
 #include	<cq.h>
@@ -447,7 +447,7 @@ local int gncache_allocrec(GN *op,rec **rpp) noex {
 	    cint	sz = sizeof(rec) ;
 	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	        *rpp = recp(vp) ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (cq_rem) */
 	return rs ;
 }
@@ -516,7 +516,7 @@ local int record_start(rec *rp,time_t dt,gid_t gid,cchar *gn) noex {
 		if (char *cp ; (rs = lm_gn(&cp)) >= 0) ylikely {
 		    rp->gn = cp ;
 	            gl = intconv(strwcpy(rp->gn,gn,gnl) - rp->gn) ;
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? gl : rs ;
@@ -593,7 +593,7 @@ local int record_access(rec *rp,time_t dt) noex {
 
 local int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_gn)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_gn)) >= 0) ylikely {
 	    var.groupnamelen = rs ;
 	}
 	return rs ;
