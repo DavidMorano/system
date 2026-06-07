@@ -112,6 +112,10 @@
 #define	con			const
 #endif /* __cplusplus */
 
+#ifndef	vol
+#define	vol			volatile
+#endif /* __cplusplus */
+
 
 #endif /* CLANGUAGEKEYWORDS_INCLUDE */
 
