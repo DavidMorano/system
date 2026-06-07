@@ -52,8 +52,7 @@ OBJ_STRN= obja.o objb.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,7 +95,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ_STRN)
@@ -135,6 +134,16 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 strnxchr.o:		strnxchr.cc	strnxchr.h	$(INCS)
 strnxbrk.o:		strnxbrk.cc	strnxbrk.h	$(INCS)
 strnxsub.o:		strnxsub.cc	strnxsub.h	$(INCS)
@@ -150,9 +159,13 @@ strnwcpyxc.o:		strnwcpyxc.cc	strnwcpyxc.h	$(INCS)
 strnwht.o:		strnwht0.o strnwht1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-strnwht0.o:		strnwht.ccm
+
+# module primary
+strnwht0.o:		strnwht.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+# module implementation
 strnwht1.o:		strnwht1.cc strnwht0.o		$(INCS)
-	makemodule strnwht
 	$(COMPILE.cc) $<
 
 
