@@ -47,6 +47,7 @@
 #include	<ucftruncate.h>
 #include	<ucfminmod.h>
 #include	<ucfstat.h>
+#include	<ucfsync.h>
 #include	<ucndelay.h>
 #include	<ucnonblock.h>
 #include	<ucsetappend.h>
