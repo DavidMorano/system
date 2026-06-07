@@ -74,7 +74,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<ctime>
 #include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
