@@ -55,11 +55,12 @@
 #include	<usysbase.h>
 
 #include	<ucdescbase.hh>
+#include	<ucdesclock.h>
+#include	<ucdescmanip.h>
 #include	<ucdescmisc.h>
 #include	<ucdescread.h>
 #include	<ucdescwrite.h>
 #include	<ucdescsock.h>
-#include	<ucdesclock.h>
 #include	<ucclose.h>
 
 
