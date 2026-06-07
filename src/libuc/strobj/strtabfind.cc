@@ -48,15 +48,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<nleadstr.h>
-#include	<hash.h>		/* |hash_elf(3uc)| + ... */
-#include	<hashindex.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC |hash_elf(3uc)| + ... */
+#include	<hashindex.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strtabfind.h"
 
@@ -86,7 +86,7 @@ typedef int (*it_t)[3] ;
 
 /* forward references */
 
-static bool	ismatkey(cchar *,cchar *,int) noex ;
+local bool	ismatkey(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -145,14 +145,13 @@ int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
 
 /* local subroutines */
 
-static bool ismatkey(cchar *key,cchar *kp,int kl) noex {
+local bool ismatkey(cchar *key,cchar *kp,int kl) noex {
 	bool		f = (key[0] == kp[0]) ;
 	if (f) {
 	    cint	m = nleadstr(key,kp,kl) ;
 	    f = (m == kl) && (key[m] == '\0') ;
 	}
 	return f ;
-}
-/* end subroutine (ismatkey) */
+} /* end subroutine (ismatkey) */
 
 
