@@ -6,6 +6,7 @@
 /* get or set a cached username given a UID */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -19,24 +20,28 @@
 /*******************************************************************************
 
 	Name:
-	ucproguser
+	ucproguser{x}
 
 	Description:
 	Set (as if for a cache) and get a username given a UID.
 
 	Synopsis:
+    	int ucproguser_init() noex
+    	int ucproguser_fini() noex
 	int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex
 	int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex
 
 	Arguments:
-	rbuf		buffer to receive the requested username
-	rlen		length of supplied buffer
-	uid		UID of user to get name for
+	cbuf		installing username pointer
+	clen		installing username length
+	rbuf		result buffer pointer
+	rlen		result buffer length
+	uid		UID of user to store or get
 	ttl		time-to-live
 
 	Returns:
-	==0		could not get a name
 	>0		string length of found username
+	==0		could not get a name
 	<0		error (system-return)
 
 	Design note:
@@ -58,9 +63,9 @@
 	   implementation.
 
 	Q. Are there ways to clean this up further?
-	A. Probably, but it looks I have already done more to this 
-	   simple function than may have been ever warranted to
-	   begin with!
+	A. Probably, but it looks like I have already done more to 
+	   this simple function than may have been ever warranted
+	   to begin with!
 
 	Q. Did these subroutines have to be Async-Signal-Safe?
 	A. Not really.
@@ -76,31 +81,34 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<uclibmem.h>
-#include	<ucatexit.h>
-#include	<ucatfork.h>
-#include	<ucfork.h>
-#include	<sigblocker.h>
-#include	<ptm.h>
-#include	<sncpyx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucfork.h>		/* LIBUC */
+#include	<sigblocker.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"ucproguser.h"
 
 
 /* local defines */
 
-#define	UCPU		ucproguser
-
 #define	TO_TTL		(2*3600) /* two hours */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -130,26 +138,30 @@ extern "C" {
 /* local structures */
 
 namespace {
-    struct ucproguser {
+    struct pumgr {
 	ptm		mx ;		/* data mutex */
 	time_t		et ;
 	cchar		*username ;	/* memory-allocated */
 	cchar		*userhome ;	/* memory-allocated */
-	uid_t		uid ;
+	uid_t		muid ;		/* managed UID */
 	int		ttl ;		/* time-to-live */
 	vaflag		f_void ;
 	vaflag		f_init ;
 	vaflag		f_initdone ;
+	int namer	(cchar *,int) noex ;
+	int namemall	(cchar *,int) noex ;
+	int namefree	() noex ;
+	int namefin	() noex ;
+	int namegeter	(char *,int,uid_t) noex ;
 	void dtor() noex ;
-	destruct ucproguser() {
+	destruct pumgr() {
 	    if (username || userhome) dtor() ;
 	} ; /* end dtor */
-    } ; /* end struct (ucproguser) */
+    } ; /* end struct (pumgr) */
 } /* end namespace */
 
 
 /* forward references */
-
 
 extern "C" {
     local void	ucproguser_atforkbefore() noex ;
@@ -157,15 +169,12 @@ extern "C" {
     local void	ucproguser_exit() noex ;
 }
 
-static int	ucproguser_namer(UCPU *,cchar *,int) noex ;
-static int	ucproguser_namealloc(UCPU *,cchar *,int) noex ;
-static int	ucproguser_namefree(UCPU *) noex ;
-static int	ucproguser_nameend(UCPU *) noex ;
-
 
 /* local variables */
 
-static UCPU	ucproguser_data ;
+static pumgr	ucproguser_data ;
+
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -174,7 +183,7 @@ static UCPU	ucproguser_data ;
 /* exported subroutines */
 
 int ucproguser_init() noex {
-	UCPU		*uip = &ucproguser_data ;
+	pumgr		*uip = &ucproguser_data ;
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (! uip->f_void) {
@@ -182,31 +191,33 @@ int ucproguser_init() noex {
 	    if (! uip->f_init) {
 		ptm *mxp = &uip->mx ;
 	        uip->f_init = true ;
-	        if ((rs = mxp->create(nullptr)) >= 0) {
+	        if ((rs = mxp->create) >= 0) {
 	            void_f	b = ucproguser_atforkbefore ;
 	            void_f	a = ucproguser_atforkafter ;
 	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(ucproguser_exit)) >= 0) {
 	                    uip->f_initdone = true ;
 	                    f = true ;
-	                }
+	                } /* end if (good) */
 	                if (rs < 0) {
 	                    uc_atforkexp(b,a,a) ;
-			}
+			} /* end if (error) */
 	            } /* end if (uc_atfork) */
 	            if (rs < 0) {
 	                mxp->destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
 	            uip->f_init = false ;
-		}
+		} /* end if (error) */
 	    } else if (! uip->f_initdone) {
 	        while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	            rs = msleep(1) ;
 	            if (rs == SR_INTR) rs = SR_OK ;
-	        }
-	        if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKFAIL ;
+	        } /* end while */
+	        if ((rs >= 0) && (! uip->f_init)) {
+		    rs = SR_LOCKFAIL ;
+		}
 	    } /* end if */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
@@ -214,13 +225,13 @@ int ucproguser_init() noex {
 /* end subroutine (ucproguser_init) */
 
 int ucproguser_fini() noex {
-	UCPU		*uip = &ucproguser_data ;
+	pumgr		*uip = &ucproguser_data ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->f_initdone && (! uip->f_void)) {
 	    uip->f_void = true ;
 	    {
-	        rs1 = ucproguser_nameend(uip) ;
+	        rs1 = uip->namefin() ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -252,18 +263,16 @@ int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
 	        if (ttl < 0) ttl = TO_TTL ;
 		if (sigblocker b ; (rs = b.start) >= 0) {
 	            if ((rs = ucproguser_init()) >= 0) {
-			typedef int (*un_f)(UCPU *,cchar *,int) noex ;
-	                UCPU	*uip = &ucproguser_data ;
+	                pumgr	*uip = &ucproguser_data ;
 	                if ((rs = uc_forklockbegin(-1)) >= 0) {
 			    ptm *mxp = &uip->mx ;
 	                    if ((rs = mxp->lockbegin) >= 0) {
-				un_f	unr = ucproguser_namer ;
-				if ((rs = unr(uip,cbuf,clen)) >= 0) {
+				if ((rs = uip->namer(cbuf,clen)) >= 0) {
 				    ul = rs ;
 				    uip->et = time(nullptr) ;
-				    uip->uid = uid ;
+				    uip->muid = uid ;
 				    uip->ttl = ttl ;
-				}
+				} /* end if */
 	                        rs1 = mxp->lockend ;
 	                        if (rs >= 0) rs = rs1 ;
 	                    } /* end if (mutex) */
@@ -278,46 +287,43 @@ int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? ul : rs ;
 }
-/* end subroutine (ucproguser_set) */
+/* end subroutine (ucproguser_nameset) */
 
 int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
-	UCPU		*uip = &ucproguser_data ;
+	pumgr		*uip = &ucproguser_data ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
+	DPRINTF("ent uid=%u\n",uid) ;
 	if (rbuf) {
 	    if (uid == 0) uid = getuid() ;
 	    rbuf[0] = '\0' ;
-	    if (uip->username[0] != '\0') {
-	        if (sigblocker b ; (rs = b.start) >= 0) {
-	            if ((rs = ucproguser_init()) >= 0) {
-	                if ((rs = uc_forklockbegin(-1)) >= 0) {
-			    ptm *mxp = &uip->mx ;
-	                    if ((rs = mxp->lockbegin) >= 0) {
-	                        if (uip->username[0] != '\0') {
-	                            if (uip->et > 0) {
-		                        custime		dt = time(nullptr) ;
-				        if ((dt-uip->et) < uip->ttl) {
-	                                    if (uip->uid == uid) {
-					        cchar	*un = uip->username ;
-	                                        rs = sncpy1(rbuf,rlen,un) ;
-	                                        len = rs ;
-	                                    }
-	                                } /* end if (not timed-out) */
-				    } /* end if (possible) */
-			        } /* end if (nul-terminated) */
-	                        rs1 = mxp->lockend ;
+	    rs = SR_OK ;
+	    if (uip->username) {
+	        if (uip->username[0] != '\0') {
+	            if (sigblocker b ; (rs = b.start) >= 0) {
+	                if ((rs = ucproguser_init()) >= 0) {
+	                    if ((rs = uc_forklockbegin(-1)) >= 0) {
+			        ptm *mxp = &uip->mx ;
+	                        if ((rs = mxp->lockbegin) >= 0) {
+				    {
+				        rs = uip->namegeter(rbuf,rlen,uid) ;
+				        len = rs ;
+				    }
+	                            rs1 = mxp->lockend ;
+	                            if (rs >= 0) rs = rs1 ;
+	                        } /* end if (mutex) */
+	 		        rs1 = uc_forklockend() ;
 	                        if (rs >= 0) rs = rs1 ;
-	                    } /* end if (mutex) */
-	 		    rs1 = uc_forklockend() ;
-	                    if (rs >= 0) rs = rs1 ;
-	                } /* end if (forklock) */
-	            } /* end if (ucproguser_init) */
-	            rs1 = b.finish ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (sigblock) */
-	    } /* end if (possible match) */
+	                    } /* end if (forklock) */
+	                } /* end if (ucproguser_init) */
+	                rs1 = b.finish ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (sigblock) */
+	        } /* end if (have some username) */
+	    } /* end if (non-null) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (ucproguser_nameget) */
@@ -325,60 +331,71 @@ int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
 
 /* local subroutines */
 
-static int ucproguser_namer(UCPU *uip,cchar *cbuf,int clen) noex {
+int pumgr::namer(cchar *cbuf,int clen) noex {
 	int		rs ;
-	if ((rs = ucproguser_namefree(uip)) >= 0) {
-	    rs = ucproguser_namealloc(uip,cbuf,clen) ;
+	if ((rs = namefree()) >= 0) {
+	    rs = namemall(cbuf,clen) ;
 	}
 	return rs ;
-}
-/* end subnroutines (ucproguser_namer) */
+} /* end method (pumgr::namer) */
 
-static int ucproguser_namealloc(UCPU *uip,cchar *cbuf,int clen) noex {
+int pumgr::namemall(cchar *cbuf,int clen) noex {
 	int		rs = SR_BUGCHECK ;
-	if (uip->username == nullptr) {
+	if (username == nullptr) {
 	    if (cchar *up ; (rs =  libmem.strw(cbuf,clen,&up)) >= 0) {
-		uip->username = up ;
-	    } /* end if (m-a) */	
+		username = up ;
+	    } /* end if (memory-acquire) */	
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subnroutines (ucproguser_namelloc) */
+} /* end method (pumgr::namemall) */
 
-static int ucproguser_namefree(UCPU *uip) noex {
+int pumgr::namefree() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (uip->username) {
-	    char *bp = cast_const<charp>(uip->username) ;
+	if (username) {
+	    char *bp = cast_const<charp>(username) ;
 	    rs1 = libmem.free(bp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    uip->username = nullptr ;
-	}
+	    username = nullptr ;
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (ucproguser_namefree) */
+} /* end method (pumgr::namefree) */
 
-static int ucproguser_nameend(UCPU *uip) noex {
+int pumgr::namefin() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (uip->userhome) {
-	    char *bp = cast_const<charp>(uip->userhome) ;
+	if (userhome) {
+	    char *bp = cast_const<charp>(userhome) ;
 	    rs1 = libmem.free(bp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    uip->userhome = nullptr ;
-	}
-	if (uip->username) {
-	    char *bp = cast_const<charp>(uip->username) ;
-	    rs1 = libmem.free(bp) ;
+	    userhome = nullptr ;
+	} /* end if (memory-release) */
+	if (username) {
+	    rs1 = namefree() ;
 	    if (rs >= 0) rs = rs1 ;
-	    uip->username = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (ucproguser_nameend) */
+} /* end method (pumgr::namefin) */
+
+int pumgr::namegeter(char *rbuf,int rlen,uid_t uid) noex {
+    	int		rs = SR_OK ;
+	int		len = 0 ; /* return-value */
+        if (username[0] != '\0') {
+            if (et > 0) {
+                custime         dt = time(nullptr) ;
+                if ((dt - et) < ttl) {
+                    if (muid == uid) {
+                        rs = sncpy1(rbuf,rlen,username) ;
+                        len = rs ;
+                    } /* end if (match) */
+                } /* end if (not timed-out) */
+            } /* end if (possible) */
+        } /* end if (not empty) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (pumgr::namegeter) */
 
 local void ucproguser_atforkbefore() noex {
-	UCPU	*uip = &ucproguser_data ;
+	pumgr	*uip = &ucproguser_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbegin() ;
@@ -386,7 +403,7 @@ local void ucproguser_atforkbefore() noex {
 } /* end subroutine (ucproguser_atforkbefore) */
 
 local void ucproguser_atforkafter() noex {
-	UCPU	*uip = &ucproguser_data ;
+	pumgr	*uip = &ucproguser_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
@@ -399,10 +416,10 @@ local void ucproguser_exit() noex {
 	}
 } /* end subroutine (ucproguser_exit) */
 
-void ucproguser::dtor() noex {
+void pumgr::dtor() noex {
 	if (cint rs = ucproguser_fini() ; rs < 0) {
 	    ulogerror("ucproguser",rs,"dtor-fini") ;
 	}
-} /* end method (ucproguser::dtor) */
+} /* end method (pumgr::dtor) */
 
 
