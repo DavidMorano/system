@@ -51,7 +51,7 @@ module ;
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
-#include	"fmtstr.h"		/* |FMTSTR_MINFILL| */
+#include	"fmtstr.h"
 #include	"fmtutil.hh"
 #include	"fmtsub.hh"
 
@@ -67,7 +67,7 @@ import fmtutil ;
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
