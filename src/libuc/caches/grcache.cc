@@ -37,7 +37,6 @@
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<string>		/* |string(3c++)| */
-#include	<getbufsize.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibmem.h>
@@ -569,7 +568,7 @@ local int grcache_allocrec(grcache *op,rec **rpp) noex {
 	    cint	sz = szof(rec) ;
 	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	        *rpp = recp(vp) ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (cq_rem) */
 	return rs ;
 }
@@ -630,7 +629,7 @@ local int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 		            if (rs < 0) {
 				lm_free(grbuf) ;
 			    }
-	                } /* end if (memory-allocation) */
+	                } /* end if (memory-acquire) */
 	            } else if (rs == rsn) {
 	                rp->grl = 0 ; /* optional */
 	                grl = 0 ; /* indicates an empty (not-found) entry */
@@ -642,7 +641,7 @@ local int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
 	                    rp->ti_access = dt ;
 	                    rp->wcount = wc ;
 	                    rp->magic = RECORD_MAGIC ;
-			} /* end if (memory-allocation) */
+			} /* end if (memory-acquire) */
 	            } /* end if (ok) */
 	            rs1 = lm_free(grbuf) ; /* free first one up at top */
 		    if (rs >= 0) rs = rs1 ;
