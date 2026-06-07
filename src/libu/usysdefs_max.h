@@ -52,6 +52,11 @@
 #define	MAXBASE		64		/* standard (common) value */
 #endif
 
+/* maximum type (number of bits) for normal numeric conversions */
+#ifndef	MAXTYPE
+#define	MAXTYPE		10		/* (2 ** 10 power) bits in max type */
+#endif
+
 /* maximum PID on the system (could be wrong) */
 #ifndef	PID_MAX
 #define	PID_MAX		999999		/* historic value (in decimal) */
