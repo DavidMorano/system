@@ -22,24 +22,24 @@
 
 	Description:
 	This object allows for some specialized manipulations on a
-	counted-string object.  The given string is supplied by the
-	caller and is read-only.
+	read-only counted-string object.  The given string is
+	supplied by the caller and is read-only.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
 #include	<six.h>			/* |siwhtbrk(3uc)| */
-#include	<baops.h>
-#include	<mkchar.h>
+#include	<baops.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
 #include	<char.h>		/* |char_iswhite(3uc)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strop.h"
 
