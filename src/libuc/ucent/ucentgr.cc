@@ -21,9 +21,8 @@
 	uc_entgr{x}
 
 	Description:
-	These subroutines manage some simple tasks for the GROUP
-	object, referenced as 'struct group'. This object is defined
-	by UNIX® standards.
+	These subroutines facilitate read-nnly access to the the
+	system GROUP database.
 
 *******************************************************************************/
 
@@ -79,7 +78,7 @@ using ucent::si_copystr ;		/* local group subroutine */
 
 /* forward references */
 
-static int ucentgr_parseusers(GRE *,SI *,cchar *,int) noex ;
+local int ucentgr_parseusers(GRE *,SI *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -91,16 +90,16 @@ static int ucentgr_parseusers(GRE *,SI *,cchar *,int) noex ;
 /* exported subroutines */
 
 int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && grbuf && sp) {
+	if (grbuf && sp) ylikely {
 	    GROUP *gep = this ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(gep) ; /* shallow copy */
-	    if (storeitem si ; (rs = si.start(grbuf,grlen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(grbuf,grlen)) >= 0) ylikely {
 	        int	fi = 0 ;
-	        cchar	*tp ;
-	        while ((tp = strnchr(sp,sl,':')) != nullptr) {
+	        for (cchar *tp ; (tp = strnchr(sp,sl,':')) != np ; ) {
 		    cint	tl = intconv(tp - sp) ;
 	            int		v = -1 ;
 	            cchar	**vpp = nullptr ;
@@ -124,18 +123,18 @@ int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
 	    	        if (int cl ; (cl = sfshrink(sp,tl,&cp)) >= 0) {
 	        	    rs = si.strw(cp,cl,vpp) ;
 	    	        }
-		    }
+		    } /* end if */
 	            sl -= intconv((tp + 1) - sp) ;
 	            sp = (tp + 1) ;
 	            if (rs < 0) break ;
-	        } /* end while */
-	        if (rs >= 0) {
+	        } /* end for */
+	        if (rs >= 0) ylikely {
 		    if ((fi == 3) && sl && sp[0]) {
 		        fi += 1 ;
 		        rs = ucentgr_parseusers(this,&si,sp,sl) ;
 		    }
 		    if ((rs >= 0) && (fi < 3)) rs = SR_BADFMT ;
-	        }
+	        } /* end if (ok) */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -147,17 +146,15 @@ int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
 int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && grbuf && sgrp) {
+	if (grbuf && sgrp) ylikely {
 	    GROUP *gep = this ;
 	    *gep = *sgrp ; /* shallow copy */
-	    if (storeitem si ; (rs = si.start(grbuf,grlen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(grbuf,grlen)) >= 0) ylikely {
 	        if (sgrp->gr_mem) {
-	            int		n ; /* used-afterwards */
-	            for (n = 0 ; sgrp->gr_mem[n] ; n += 1) ;
+	            cint	n = lenstrarr(sgrp->gr_mem) ;
 	            if (void **ptab{} ; (rs = si.ptab(n,&ptab)) >= 0) {
 	                int	i ; /* used-afterwards */
-	                char	**tab = charpp(ptab) ;
-	                gr_mem = tab ;
+	                gr_mem = charpp(ptab) ;
 	                for (i = 0 ; (rs >= 0) && sgrp->gr_mem[i] ; i += 1) {
 			    char	**rpp = (gr_mem + i) ;
 	                    rs = si_copystr(&si,rpp,sgrp->gr_mem[i]) ;
@@ -167,8 +164,10 @@ int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 	        } else {
 	            gr_mem = nullptr ;
 	        }
-	        si_copystr(&si,&gr_name,sgrp->gr_name) ;
-	        si_copystr(&si,&gr_passwd,sgrp->gr_passwd) ;
+		if (rs >= 0) {
+	            si_copystr(&si,&gr_name,sgrp->gr_name) ;
+	            si_copystr(&si,&gr_passwd,sgrp->gr_passwd) ;
+		} /* end if (ok) */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -180,8 +179,8 @@ int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 int ucentgr::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (rbuf) ylikely {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 4 ; i += 1) {
 	            if (i > 0) rs = b.chr(':') ;
 	            if (rs >= 0) {
@@ -216,8 +215,7 @@ int ucentgr::format(char *rbuf,int rlen) noex {
 /* end subroutine (ucentgr::format) */
 
 int ucentgr::size() noex {
-	int		rs = SR_FAULT ;
-	if (this) {
+	int		rs = SR_OK ;
 	    int		sz = 1 ;
 	    if (gr_name) {
 	        sz += (lenstr(gr_name) + 1) ;
@@ -229,15 +227,13 @@ int ucentgr::size() noex {
 	        int	i = 0 ;
 	        while (gr_mem[i]) {
 	            sz += (lenstr(gr_mem[i++]) + 1) ;
-	        } /* end for */
-	        sz += ((i+1)*szof(cchar *)) ;
+	        } /* end while */
+	        sz += ((i + 1) * szof(cchar *)) ;
 	    } /* end if (group members) */
 	    rs = iceil(sz,szof(cchar *)) ;
-	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ucentgr::size) */
-
 
 int ucentgr::getent(char *grbuf,int grlen) noex {
 	return uc_getgrent(this,grbuf,grlen) ;
@@ -254,13 +250,13 @@ int ucentgr::getgid(char *grbuf,int grlen,gid_t gid) noex {
 
 /* local subroutines */
 
-static int ucentgr_parseusers(ucentgr *grp,SI *sip,cchar *sp,int sl) noex {
+local int ucentgr_parseusers(ucentgr *grp,SI *sip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	if (vechand u ; (rs = u.start(8,0)) >= 0) {
-	    if ((rs = si_loadnames(sip,&u,sp,sl)) > 0) {
+	if (vechand u ; (rs = u.start(8,0)) >= 0) ylikely {
+	    if ((rs = si_loadnames(sip,&u,sp,sl)) > 0) ylikely {
 	        cint	n = rs ;
-	        if (void **ptab{} ; (rs = sip->ptab(n,&ptab)) >= 0) {
+	        if (void **ptab{} ; (rs = sip->ptab(n,&ptab)) >= 0) ylikely {
 		    int		i ; /* used afterwards */
 	            void	*vp{} ;
 	            grp->gr_mem = charpp(ptab) ;
@@ -276,7 +272,6 @@ static int ucentgr_parseusers(ucentgr *grp,SI *sip,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
 	return rs ;
-}
-/* end subroutine (ucentgr_parseusers) */
+} /* end subroutine (ucentgr_parseusers) */
 
 
