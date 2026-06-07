@@ -20,18 +20,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<lookaside.h>
-#include	<hdb.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<lookaside.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
 
 
-#define	STRSTORE_MAGIC		0x42114682
 #define	STRSTORE		struct strstore_head
 #define	STRSTORE_CUR		struct strstore_cursor
 #define	STRSTORE_CH		struct strstore_chunk
-
+#define	STRSTORE_MAGIC		0x42114682
 #define	STRSTORE_STARTLEN	10
 #define	STRSTORE_CHUNKSIZE	512
 
