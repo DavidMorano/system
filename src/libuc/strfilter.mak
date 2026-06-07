@@ -40,20 +40,22 @@ MODS +=
 LIBS +=
 
 
-OBJ0= strfilter0.o 
-OBJ1= strfilter1.o
+OBJPART=
+
+OBJPRIME= strfilter0.o 
+
+OBJ0= strfilter1.o 
+OBJ1=
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o
 
-OBJ= obja.o
+OBJIMPL= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,11 +98,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
-$(T).o:			$(OBJ)
-	makemodule strfilter
+$(T).o:			objprime.o objimpl.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
@@ -136,11 +137,22 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-strfilter0.o:		strfilter.ccm			$(INCS)
-	makemodule strfilter
+objpart.o:		$(OBJPART)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-strfilter1.o:		strfilter1.cc strfilter.ccm	$(INCS)
-	makemodule strfilter
+objprime.o:		$(OBJPRIME)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objimpl.o:		$(OBJIMPL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+# module primary
+strfilter0.o:		strfilter.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+# module implementation
+strfilter1.o:		strfilter1.cc objprime.o	$(INCS)
 	$(COMPILE.cc) $<
 
 
