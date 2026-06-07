@@ -49,7 +49,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
