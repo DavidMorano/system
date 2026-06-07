@@ -1,3 +1,17 @@
+/* tty_waitoo SUPPORT */
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<localmisc.h>
+
 static int tty_wait(uterm *op,int timeout) noex {
 	POLLFD		fds[2] ;
 	time_t		daytime = getustime ;
