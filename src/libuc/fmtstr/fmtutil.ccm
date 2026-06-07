@@ -77,4 +77,14 @@ export {
     extern const numbases	numbase ;
 } /* end export */
 
+#ifdef	COMMENT
+export {
+    template<typename T>
+    constexpr bool isoneof(int ch,Args ... args) noex {
+	(void) args ;
+	return false ;
+    } /* end subrutine-template */
+} /* end export */
+#endif /* COMMENT */
+
 
