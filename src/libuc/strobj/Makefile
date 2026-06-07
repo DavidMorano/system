@@ -57,9 +57,7 @@ OBJ= obja.o objb.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -102,7 +100,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -168,10 +166,9 @@ asstr.o:		asstr0.o asstr1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 asstr0.o:		asstr.ccm				$(INCS)
-	makemodule asstr
+	gxx -c -x c++ -o $@ -O $<
 
-asstr1.o:		asstr1.cc				$(INCS)
-	makemodule asstr
+asstr1.o:		asstr1.cc asstr0.o			$(INCS)
 	$(COMPILE.cc) $<
 
 
