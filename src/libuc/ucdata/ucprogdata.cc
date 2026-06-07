@@ -76,24 +76,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucatexit.h>
-#include	<ucatfork.h>
-#include	<sigblocker.h>
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<varray.h>
-#include	<strwcpy.h>
-#include	<sncpyxw.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<varray.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<sncpyxw.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucprogdata.h"
 
@@ -104,7 +104,7 @@ import libutil ;			/* |getlenstr(3u)| */
 /* local defines */
 
 #define	UCPD		ucprogdata_head
-#define	UCPD_ENT	ucprogdata_ent
+#define	UCPD_ENT	ucprogdata_entry
 
 #define	TO_TTL		(2*3600)	/* two hours */
 
@@ -141,36 +141,36 @@ struct ucprogdata_head {
 	vaflag		f_init ;
 	vaflag		f_initdone ;
 	vaflag		f_capture ;	/* capture flag */
-} ;
+} ; /* end struct */
 
-struct ucprogdata_ent {
+struct ucprogdata_entry {
 	cchar		*vp ;
 	time_t		et ;		/* entry-time (load-time) */
 	int		vl ;
 	int		ttl ;		/* time-to-live */
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 extern "C" {
-    static void	ucprogdata_atforkbefore() noex ;
-    static void	ucprogdata_atforkafter() noex ;
-    static void	ucprogdata_exit() noex ;
+    local void	ucprogdata_atforkbefore() noex ;
+    local void	ucprogdata_atforkafter() noex ;
+    local void	ucprogdata_exit() noex ;
 }
 
-static int	ucprogdata_struct(UCPD *) noex ;
-static int	ucprogdata_begin(UCPD *) noex ;
-static int	ucprogdata_end(UCPD *) noex ;
-static int	ucprogdata_entfins(UCPD *) noex ;
-static int	ucprogdata_capbegin(UCPD *,int) noex ;
-static int	ucprogdata_capend(UCPD *) noex ;
-static int	ucprogdata_seter(UCPD *,int,cchar *,int,int) noex ;
-static int	ucprogdata_geter(UCPD *,int,char *,int) noex ;
+local int	ucprogdata_struct	(UCPD *) noex ;
+local int	ucprogdata_begin	(UCPD *) noex ;
+local int	ucprogdata_end		(UCPD *) noex ;
+local int	ucprogdata_entfins	(UCPD *) noex ;
+local int	ucprogdata_capbegin	(UCPD *,int) noex ;
+local int	ucprogdata_capend	(UCPD *) noex ;
+local int	ucprogdata_seter	(UCPD *,int,cchar *,int,int) noex ;
+local int	ucprogdata_geter	(UCPD *,int,char *,int) noex ;
 
-static int entry_start(UCPD_ENT *,cchar *,int,int) noex ;
-static int entry_reload(UCPD_ENT *,cchar *,int,int) noex ;
-static int entry_finish(UCPD_ENT *) noex ;
+local int entry_start	(UCPD_ENT *,cchar *,int,int) noex ;
+local int entry_reload	(UCPD_ENT *,cchar *,int,int) noex ;
+local int entry_finish	(UCPD_ENT *) noex ;
 
 
 /* local variables */
@@ -203,26 +203,26 @@ int ucprogdata_init() noex {
 	                    }
 	                    if (rs < 0) {
 	                        uc_atforkexp(b,a,a) ;
-			    }
+			    } /* end if (error) */
 	                } /* end if (uc_atfork) */
 	                if (rs < 0) {
 	                    cnp->destroy() ;
-			}
+			} /* end if (error) */
 	            } /* end if (ptc_create) */
 	            if (rs < 0) {
 	                mxp->destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
 	            uip->f_init = false ;
-		}
+		} /* end if (error) */
 	    } else {
 	        while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	            rs = msleep(1) ;
 	            if (rs == SR_INTR) rs = SR_OK ;
 	        }
 	        if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKFAIL ;
-	    }
+	    } /* end if */
 	} /* end if (not-void) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -322,36 +322,34 @@ int ucprogdata_get(int di,char *rbuf,int rlen) noex {
 
 /* local subroutines */
 
-static int ucprogdata_struct(UCPD *uip) noex {
+local int ucprogdata_struct(UCPD *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
 	    rs = ucprogdata_begin(uip) ;
 	}
 	return rs ;
-}
-/* end subroutine (ucprogdata_struct) */
+} /* end subroutine (ucprogdata_struct) */
 
-static int ucprogdata_begin(UCPD *uip) noex {
+local int ucprogdata_begin(UCPD *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
 	    cint	osz = szof(varray) ;
 	    if (void *vp ; (rs = libmem.mall(osz,&vp)) >= 0) {
-	        cint		esz = szof(UCPD_ENT) ;
-	        cint		n = 4 ;
-	        varray		*ents = (varray *) vp ;
-	        if ((rs = varray_start(ents,esz,n)) >= 0) {
+	        cint	esz = szof(UCPD_ENT) ;
+	        cint	en = 4 ;
+	        varray	*ents = (varray *) vp ;
+	        if ((rs = varray_start(ents,esz,en)) >= 0) {
 	            uip->ents = ents ;
-		}
+		} /* end if (varray_start) */
 	        if (rs < 0) {
 	            libmem.free(vp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-acquire) */
 	} /* end if (needed initialization) */
 	return rs ;
-}
-/* end subroutine (ucprogdata_begin) */
+} /* end subroutine (ucprogdata_begin) */
 
-static int ucprogdata_end(UCPD *uip) noex {
+local int ucprogdata_end(UCPD *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->ents) {
@@ -367,29 +365,27 @@ static int ucprogdata_end(UCPD *uip) noex {
 	    {
 	        rs1 = libmem.free(uip->ents) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if (memory-release) */
 	    uip->ents = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucprogdata_end) */
+} /* end subroutine (ucprogdata_end) */
 
-static int ucprogdata_entfins(UCPD *uip) noex {
+local int ucprogdata_entfins(UCPD *uip) noex {
 	varray		*vap = (varray *) uip->ents ;
-	UCPD_ENT	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	for (int i = 0 ; varray_enum(vap,i,&ep) >= 0 ; i += 1) { 
-	    if (ep != nullptr) {
+	UCPD_ENT	*ep ;
+	for (int i = 0 ; varray_enumer(vap,i,&ep) >= 0 ; i += 1) { 
+	    if (ep) {
 	        rs1 = entry_finish(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (ucprogdata_entfins) */
+} /* end subroutine (ucprogdata_entfins) */
 
-static int ucprogdata_capbegin(UCPD *uip,int to) noex {
+local int ucprogdata_capbegin(UCPD *uip,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	ptm *mxp = &uip->mx ;
@@ -409,10 +405,9 @@ static int ucprogdata_capbegin(UCPD *uip,int to) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end subroutine (ucprogdata_capbegin) */
+} /* end subroutine (ucprogdata_capbegin) */
 
-static int ucprogdata_capend(UCPD *uip) noex {
+local int ucprogdata_capend(UCPD *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	ptm *mxp = &uip->mx ;
@@ -428,10 +423,9 @@ static int ucprogdata_capend(UCPD *uip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end subroutine (ucprogdata_capend) */
+} /* end subroutine (ucprogdata_capend) */
 
-static int ucprogdata_seter(UCPD *uip,int di,cc *cbuf,int clen,int ttl) noex {
+local int ucprogdata_seter(UCPD *uip,int di,cc *cbuf,int clen,int ttl) noex {
 	varray		*vap = (varray *) uip->ents ;
 	UCPD_ENT	*ep ;
 	int		rs ;
@@ -443,10 +437,9 @@ static int ucprogdata_seter(UCPD *uip,int di,cc *cbuf,int clen,int ttl) noex {
 	    } /* end if (varray_mk) */
 	} /* end if (array access) */
 	return rs ;
-}
-/* end subroutine (ucprogdata_seter) */
+} /* end subroutine (ucprogdata_seter) */
 
-static int ucprogdata_geter(UCPD *uip,int di,char *rbuf,int rlen) noex {
+local int ucprogdata_geter(UCPD *uip,int di,char *rbuf,int rlen) noex {
 	varray		*vap = (varray *) uip->ents ;
 	int		rs ;
 	int		len = 0 ;
@@ -458,29 +451,25 @@ static int ucprogdata_geter(UCPD *uip,int di,char *rbuf,int rlen) noex {
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ucprogdata_geter) */
+} /* end subroutine (ucprogdata_geter) */
 
-static void ucprogdata_atforkbefore() noex {
+local void ucprogdata_atforkbefore() noex {
 	UCPD	*uip = &ucprogdata_data ;
 	ucprogdata_capbegin(uip,-1) ;
-}
-/* end subroutine (ucprogdata_atforkbefore) */
+} /* end subroutine (ucprogdata_atforkbefore) */
 
-static void ucprogdata_atforkafter() noex {
+local void ucprogdata_atforkafter() noex {
 	UCPD	*uip = &ucprogdata_data ;
 	ucprogdata_capend(uip) ;
-}
-/* end subroutine (ucprogdata_atforkafter) */
+} /* end subroutine (ucprogdata_atforkafter) */
 
-static void ucprogdata_exit() noex {
+local void ucprogdata_exit() noex {
 	if (cint rs = ucprogdata_fini() ; rs < 0) {
 	    ulogerror("ucprogdata",rs,"exit-fini") ;
 	}
-}
-/* end subroutine (ucprogdata_exit) */
+} /* end subroutine (ucprogdata_exit) */
 
-static int entry_start(UCPD_ENT *ep,cchar *vp,int µvl,int ttl) noex {
+local int entry_start(UCPD_ENT *ep,cchar *vp,int µvl,int ttl) noex {
 	custime		dt = getustime ;
 	int		rs = SR_FAULT ;
 	if (int vl ; (vl = getlenstr(vp,µvl)) >= 0) {
@@ -493,10 +482,9 @@ static int entry_start(UCPD_ENT *ep,cchar *vp,int µvl,int ttl) noex {
 	    } /* end if (m-a) */
 	} /* end if (getlenstr) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
-static int entry_finish(UCPD_ENT *ep) noex {
+local int entry_finish(UCPD_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->vp) {
@@ -504,23 +492,21 @@ static int entry_finish(UCPD_ENT *ep) noex {
 	    rs1 = libmem.free(p) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->vp = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
-static int entry_reload(UCPD_ENT *ep,cc *vp,int vl,int ttl) noex {
+local int entry_reload(UCPD_ENT *ep,cc *vp,int vl,int ttl) noex {
 	int		rs = SR_OK ;
 	if (ep->vp) {
 	    void *p = voidp(ep->vp) ;
 	    rs = libmem.free(p) ;
 	    ep->vp = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (rs >= 0) {
 	    rs = entry_start(ep,vp,vl,ttl) ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_reload) */
+} /* end subroutine (entry_reload) */
 
 
