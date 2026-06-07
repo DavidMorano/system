@@ -20,16 +20,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int ucproguser_init() noex ;
-extern int ucproguser_nameset(cchar *,int,uid_t,int) noex ;
-extern int ucproguser_nameget(char *,int,uid_t) noex ;
-extern int ucproguser_fini() noex ;
+extern int ucproguser_init	() noex ;
+extern int ucproguser_nameset	(cchar *,int,uid_t,int) noex ;
+extern int ucproguser_nameget	(char *,int,uid_t) noex ;
+extern int ucproguser_fini	() noex ;
 
 EXTERNC_end
 
