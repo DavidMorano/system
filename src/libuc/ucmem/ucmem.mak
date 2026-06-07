@@ -52,8 +52,7 @@ OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,7 +95,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -136,7 +135,6 @@ objb.o:			$(OBJB)
 
 
 ucmem_prime.o:		ucmem_prime.cc		$(INCS)
-
 ucmemla.o:		ucmemla.cc		$(INCS)
 
 
