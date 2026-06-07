@@ -44,7 +44,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>
 #include	<clanguage.h>
 #include	<usysbase.h>
