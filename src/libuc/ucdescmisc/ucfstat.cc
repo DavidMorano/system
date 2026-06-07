@@ -17,18 +17,18 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<climits>		/* <- for |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfstat.h"
 
@@ -67,7 +67,7 @@ int uc_fstat(int fd,ustat *sbp) noex {
 	    if ((rs = u_fstat(fd,sbp)) >= 0) {
 	        csize fsize = size_t(sbp->st_size) ;
 	        rs = intsat(fsize) ;
-	    }
+	    } /* end if (u_fstat) */
 	} /* end if (non-null) */
 	return rs ;
 }
