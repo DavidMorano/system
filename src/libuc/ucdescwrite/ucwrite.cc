@@ -25,11 +25,9 @@
 
 /*******************************************************************************
 
-	This is an enhanced |write(2)|-like subroutine that waits
-	until a write will not hang before making the actual write.
-
-
-	Name:
+  	Names:
+	uc_writeto
+	uc_write
 	uc_writen
 
 	Description:
@@ -38,7 +36,9 @@
 	bytes that we wanted to.
 
 	Synopsis:
-	int uc_writen(int fd,cvoid *ubuf,int ulen) noex
+	int uc_writen	(int fd,cvoid *ubuf,int ulen) noex
+	int uc_writeto	(int,cvoid *,int,int) noex
+	int uc_write	(int,cvoid *,int) noex
 
 	Arguments:
 	fd		file descriptor
@@ -115,6 +115,7 @@ int uc_writeto(int fd,cvoid *ubuf,int ulen,int to) noex {
 	        time_t		ti_start ;
 	        int		nfds = 0 ;
 	        bool		fexit = false ;
+		rs = SR_OK ;
 	        if (to >= 0) {
 	            ti_now = time(nullptr) ;
 	            ti_start = ti_now ;
@@ -171,6 +172,7 @@ int uc_writen(int fd,cvoid *abuf,int µalen) noex {
             rs = SR_BADF ;
 	    if (fd >= 0) {
 	        cchar	*abp = charp(abuf) ;
+		rs = SR_OK ;
 		if (int alen ; (alen = getlenstr(abp,µalen)) > 0) {
 	            for (int alenr = alen ; (rs >= 0) && (alenr > 0) ; ) {
 	                if ((rs = u_write(fd,abp,alenr)) >= 0) {
