@@ -25,7 +25,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<localmisc.h>		/* |LEQUIV(3dam)| */
+#include	<localmisc.h>		/* LIBU |LEQUIV(3u)| */
 
 #include	"uccloseonexec.h"
 
