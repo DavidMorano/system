@@ -33,7 +33,7 @@
 	that sort of situation.  
 
 	Arguments:
-	op		pointer to the strstore object
+	op		pointer to the STRSTORE object
 	<others>
 
 	Returns:
@@ -43,21 +43,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<vecobj.h>
-#include	<intceil.h>
-#include	<hash.h>
-#include	<hashindex.h>
-#include	<nextpowtwo.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LINUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<intceil.h>		/* LIBU */
+#include	<hash.h>		/* LIBUC */
+#include	<hashindex.h>		/* LIBUC */
+#include	<nextpowtwo.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strstore.h"
 
@@ -97,7 +97,7 @@ struct strentry {
 	uint	khash ;
 	uint	hi ;
 	uint	si ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -616,18 +616,17 @@ local int strstore_chunknew(strstore *op,int amount) noex {
 	                chunk_adv(cep) ;
 	                op->totalsize = 1 ;
 		    }
-		}
+		} /* end if (vechand_add) */
 		if (rs < 0) {
 		    chunk_finish(cep) ;
-		}
-	    }
+		} /* end if (error) */
+	    } /* end if (chunk_start) */
 	    if (rs < 0) {
 	        lm_free(cep) ;
-	    }
-	} /* end if (memory-acquires) */
+	    } /* end if (error */
+	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (strstore_chunknew) */
+} /* end subroutine (strstore_chunknew) */
 
 local int strstore_chunkfins(strstore *op) noex {
 	vechand		*clp = op->clp ;
@@ -648,8 +647,7 @@ local int strstore_chunkfins(strstore *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (strstore_chunkfins) */
+} /* end subroutine (strstore_chunkfins) */
 
 local int strstore_manage(strstore *op,cchar *kp,int kl,int si) noex {
 	int		rs ;
@@ -664,11 +662,10 @@ local int strstore_manage(strstore *op,cchar *kp,int kl,int si) noex {
 	    rs = hdb_store(op->hlp,key,val) ;
 	    if (rs < 0) {
 	        lookaside_release(op->lap,ip) ;
-	    }
-	} /* end if */
+	    } /* end if (error) */
+	} /* end if (lookaside_get) */
 	return rs ;
-}
-/* end subroutine (strstore_manage) */
+} /* end subroutine (strstore_manage) */
 
 local int chunk_start(strstore_ch *cnp,int csz) noex {
 	int		rs = SR_INVALID ;
@@ -678,15 +675,13 @@ local int chunk_start(strstore_ch *cnp,int csz) noex {
 	    rs = lm_mall(csz,&cnp->cdata) ;
 	}
 	return rs ;
-}
-/* end subroutine (chunk_start) */
+} /* end subroutine (chunk_start) */
 
 local int chunk_adv(strstore_ch *cnp) noex {
 	cnp->cdata[0] = '\0' ;
 	cnp->i += 1 ;
 	return SR_OK ;
-}
-/* end subroutine (chunk_adv) */
+} /* end subroutine (chunk_adv) */
 
 local int chunk_finish(strstore_ch *cnp) noex {
 	int		rs = SR_OK ;
@@ -695,12 +690,11 @@ local int chunk_finish(strstore_ch *cnp) noex {
 	    rs1 = lm_free(cnp->cdata) ;
 	    if (rs >= 0) rs = rs1 ;
 	    cnp->cdata = nullptr ;
-	}
+	} /* end if (memory-release) */
 	cnp->csz = 0 ;
 	cnp->i = 0 ;
 	cnp->c = 0 ;
 	return rs ;
-}
-/* end subroutine (chunk_finish) */
+} /* end subroutine (chunk_finish) */
 
 
