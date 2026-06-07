@@ -20,19 +20,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<userattr.h>		/* <- the money shot */
 
 
 EXTERNC_begin
 
-extern int	uc_userattrbegin() noex ;
-extern int	uc_userattrent(userattr **) noex ;
-extern int	uc_userattrnam(userattr **,cchar *) noex ;
-extern int	uc_userattruid(userattr **,uid_t) noex ;
-extern int	uc_userattrfree(userattr *) noex ;
-extern int	uc_userattrend() noex ;
+extern int	uc_userattrbegin	() noex ;
+extern int	uc_userattrent		(userattr **) noex ;
+extern int	uc_userattrnam		(userattr **,cchar *) noex ;
+extern int	uc_userattruid		(userattr **,uid_t) noex ;
+extern int	uc_userattrfree		(userattr *) noex ;
+extern int	uc_userattrend		() noex ;
 
 EXTERNC_end
 
