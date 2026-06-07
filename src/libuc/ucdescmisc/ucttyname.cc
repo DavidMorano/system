@@ -32,12 +32,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<unistd.h>		/* |ttyname_r(3c)| */
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX |ttyname_r(3c)| */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<usyscalls.h>		/* CSTD */
+#include	<localmisc.h>		/* CSTD */
 
 #include	"ucttyname.h"
 
