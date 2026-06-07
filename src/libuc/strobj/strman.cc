@@ -22,7 +22,7 @@
 
 	Description:
         This object allows for some specialized manipulations on a
-        counted-string object.
+        read-only counted-string object.
 
 *******************************************************************************/
 
