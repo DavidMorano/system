@@ -340,7 +340,7 @@ local int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 		if (rs < 0) {
 		    libmem.free(ep) ;
 		}
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if */
 	return (rs >= 0) ? f_hit : rs ;
 }
@@ -359,7 +359,7 @@ local int entry_start(ent *ep,cchar *sp,int sl) noex {
 		void *vp = voidp(cp) ;
 	        libmem.free(vp) ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
