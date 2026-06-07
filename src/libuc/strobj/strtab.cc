@@ -103,22 +103,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<vecobj.h>
-#include	<sysval.hh>
-#include	<intceil.h>
-#include	<hash.h>
-#include	<hashindex.h>
-#include	<nextpowtwo.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<intceil.h>		/* LIBU */
+#include	<hash.h>		/* LIBUC */
+#include	<hashindex.h>		/* LIBUC */
+#include	<nextpowtwo.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strtab.h"
 
@@ -621,8 +621,7 @@ local int strtab_stuff(strtab *op,cchar *sp,int sl) noex {
 	    } /* end if (chunk-add) */
 	} /* end if (extend) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (strtab_stuff) */
+} /* end subroutine (strtab_stuff) */
 
 local int strtab_finishchunks(strtab *op) noex {
 	vechand		*clp = op->clp ;
@@ -646,8 +645,7 @@ local int strtab_finishchunks(strtab *op) noex {
 	} /* end for */
 	op->chp = nullptr ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (strtab_finishchunks) */
+} /* end subroutine (strtab_finishchunks) */
 
 local int strtab_extend(strtab *op,int amount) noex {
 	int		rs = SR_OK ;
@@ -662,8 +660,7 @@ local int strtab_extend(strtab *op,int amount) noex {
 	    rs = strtab_newchunk(op,amount) ;
 	}
 	return rs ;
-}
-/* end subroutine (strtab_extend) */
+} /* end subroutine (strtab_extend) */
 
 local int strtab_newchunk(strtab *op,int amount) noex {
 	cint		sz = szof(strtab_ch) ;
@@ -690,8 +687,7 @@ local int strtab_newchunk(strtab *op,int amount) noex {
 	    }
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (strtab_newchunk) */
+} /* end subroutine (strtab_newchunk) */
 
 local int chunk_start(strtab_ch *chp,int chsize,int start) noex {
 	static constexpr int	minsize = STRTAB_MINCHUNKSIZE ;
@@ -706,8 +702,7 @@ local int chunk_start(strtab_ch *chp,int chsize,int start) noex {
 	    chp->cl = start ;
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (chunk_start) */
+} /* end subroutine (chunk_start) */
 
 local int chunk_finish(strtab_ch *chp) noex {
 	int		rs = SR_OK ;
@@ -720,8 +715,7 @@ local int chunk_finish(strtab_ch *chp) noex {
 	chp->csz = 0 ;
 	chp->cl = 0 ;
 	return rs ;
-}
-/* end subroutine (chunk_finish) */
+} /* end subroutine (chunk_finish) */
 
 local int chunk_check(strtab_ch *chp,int amount) noex {
 	int		rs = SR_OK ;
@@ -729,8 +723,7 @@ local int chunk_check(strtab_ch *chp,int amount) noex {
 	    rs = SR_OVERFLOW ;
 	}
 	return rs ;
-}
-/* end subroutine (chunk_check) */
+} /* end subroutine (chunk_check) */
 
 local int chunk_add(strtab_ch *chp,cc *sp,int sl,cc **spp) noex {
 	cint		amount = (sl + 1) ;
@@ -746,7 +739,6 @@ local int chunk_add(strtab_ch *chp,cc *sp,int sl,cc **spp) noex {
 	    rs = SR_NOANODE ;
 	}
 	return rs ;
-}
-/* end subroutine (chunk_add) */
+} /* end subroutine (chunk_add) */
 
 
