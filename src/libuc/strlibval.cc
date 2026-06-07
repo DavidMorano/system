@@ -43,7 +43,6 @@
 #include	<ucfork.h>
 #include	<ucatfork.h>
 #include	<ucatexit.h>
-#include	<getbufsize.h>
 #include	<timewatch.hh>
 #include	<bufsizevar.hh>
 #include	<ptm.h>
