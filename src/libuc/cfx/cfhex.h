@@ -20,42 +20,42 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int cfhexi(cchar *,int,int *) noex ;
-extern int cfhexl(cchar *,int,long *) noex ;
-extern int cfhexll(cchar *,int,longlong *) noex ;
+extern int cfhexi	(cchar *,int,int *)		noex ;
+extern int cfhexl	(cchar *,int,long *)		noex ;
+extern int cfhexll	(cchar *,int,longlong *)	noex ;
 
-extern int cfhexui(cchar *,int,uint *) noex ;
-extern int cfhexul(cchar *,int,ulong *) noex ;
-extern int cfhexull(cchar *,int,ulonglong *) noex ;
+extern int cfhexui	(cchar *,int,uint *)		noex ;
+extern int cfhexul	(cchar *,int,ulong *)		noex ;
+extern int cfhexull	(cchar *,int,ulonglong *)	noex ;
 
 EXTERNC_end
 
 #if	__cplusplus
 
-inline int cfhex(cchar *sp,int sl,int *rp) noex {
+inline int cfhex(cchar *sp,int sl,int *rp)		noex {
 	return cfhexi(sp,sl,rp) ;
 }
-inline int cfhex(cchar *sp,int sl,long *rp) noex {
+inline int cfhex(cchar *sp,int sl,long *rp)		noex {
 	return cfhexl(sp,sl,rp) ;
 }
-inline int cfhex(cchar *sp,int sl,longlong *rp) noex {
+inline int cfhex(cchar *sp,int sl,longlong *rp)		noex {
 	return cfhexll(sp,sl,rp) ;
 }
 
-inline int cfhex(cchar *sp,int sl,uint *rp) noex {
+inline int cfhex(cchar *sp,int sl,uint *rp)		noex {
 	return cfhexui(sp,sl,rp) ;
 }
-inline int cfhex(cchar *sp,int sl,ulong *rp) noex {
+inline int cfhex(cchar *sp,int sl,ulong *rp)		noex {
 	return cfhexul(sp,sl,rp) ;
 }
-inline int cfhex(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfhex(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfhexull(sp,sl,rp) ;
 }
 
