@@ -56,12 +56,12 @@ module ;
 #include	"fmtsub.hh"
 
 #pragma		GCC dependency		"mod/uconstants.ccm"
-#pragma		GCC dependency		"mod/ffbs.ccm"
+#pragma		GCC dependency		"mod/findbit.ccm"
 
 module fmtsub ;
 
 import uconstants ;			/* |numbasedig(3u)| */
-import ffbs ;
+import findbit ;			/* |f{x}b{c}(3u)| */
 import fmtutil ;
 
 /* local defines */
@@ -92,9 +92,9 @@ namespace {
 	uint		plsign:1 ;
 	uint		misign:1 ;
 	uint		pmsign:1 ;
-	uint		truncleft:1 ;
-	uint		ishex:1 ;
+	uint		ismin:1 ;
 	uint		isdig:1 ;
+	uint		istru:1 ;
     } ; /* end struct (subinfo_fl) */
     struct subinfo {
 	fmtsub		*op ;
@@ -113,7 +113,6 @@ namespace {
 	operator int () noex ;
 	int loadvals	() noex ;
 	int loadflags	() noex ;
-	int calctrunc	() noex ;
 	int calcfill	() noex ;
 	int calcsign	() noex ;
 	int adj1	() noex ;
@@ -139,7 +138,6 @@ namespace {
 constexpr subinfo_m	subs[] = {
 	&subinfo::loadvals,
 	&subinfo::loadflags,
-	&subinfo::calctrunc,
 	&subinfo::calcfill,
 	&subinfo::calcsign,
 	&subinfo::adj1,
@@ -154,8 +152,9 @@ constexpr subinfo_m	subs[] = {
 	&subinfo::putfin
 } ; /* end array (subs) */
 
-local cchar		hexcodes[]	= "pxPX" ;
+local cchar		mincodes[]	= "pxPX" ;
 local cchar		digcodes[]	= "aboiduxpefgABEGPX" ;
+local cchar		trucodes[]	= "rsRS" ;
 local cbool		f_debug		= CF_DEBUG ;
 
 
@@ -206,32 +205,11 @@ int subinfo::loadflags() noex {
 	fl.left		= fsp->fl.left ;
 	fl.zerofill	= fsp->fl.zerofill ;
 	fl.plsign	= fsp->fl.plsign ;
-	fl.ishex	= (strchr(hexcodes,fcode) != nullptr) ;
-	fl.isdig	= fl.ishex || (strchr(digcodes,fcode) != nullptr) ;
+	fl.ismin	= (strchr(mincodes,fcode) != nullptr) ;
+	fl.isdig	= fl.ismin || (strchr(digcodes,fcode) != nullptr) ;
+	fl.istru	= fl.isdig || (strchr(trucodes,fcode) != nullptr) ;
 	return rs ;
 } /* end method (subinfo::loadflags) */
-
-int subinfo::calctrunc() noex {
-    	int		rs = SR_OK ;
-	switch (fcode) {
-	case 's':
-	case 'S':
-	case 'r':
-	case 'T':
-	case 'i':
-	case 'd':
-	case 'u':
-	case chx_binary:
-	case 'o':
-	case 'x':
-	case 'X':
-	case 'p':
-	case 'P':
-	    fl.truncleft = true ;
-	    break ;
-	} /* end switch */
-	return rs ;
-} /* end method (subinfo::calctrunc) */
 
 local int subinfo_minfill(subinfo *sip) noex {
 	fmtsub		*op	= sip->op ;
@@ -261,9 +239,9 @@ local int subinfo_minfill(subinfo *sip) noex {
 	    sz = szof(int) ;
 	} /* end if (had a length modifier) */
 	if (sz > 0) {
-	    cint typecode = ffbs(sz) ;
-	    DPRINTF("type-code=%d\n",typecode) ;
-	    mfill = numbasedig.digs[typecode][op->numbase] ;
+	    cint tc = ffbs(sz) ;
+	    DPRINTF("type-code=%d\n",tc) ;
+	    mfill = numbasedig.digs[tc][op->numbase] ;
 	} /* end if */
 	DPRINTF("ret rs=%d mfill=%d\n",rs,mfill) ;
 	return (rs >= 0) ? mfill : rs ;
@@ -310,7 +288,7 @@ int subinfo::adj1() noex {
     	int		rs = SR_OK ;
 	if (prec >= 0) {
 	    if (sl > prec) {
-	        if (fl.truncleft) {
+	        if (fl.istru) {
 	            sp += (sl - prec) ; /* truncate on left */
 	            sl -= (sl - prec) ;
 	        } else {
@@ -438,7 +416,7 @@ int subinfo::putprecfill() noex {
 int subinfo::putstr() noex {
     	int		rs = SR_OK ;
 	if (sl > 0) {
-	    if (fl.ishex) { /* truncation for HEX */
+	    if (fl.ismin) { /* truncation for HEX */
 	        if ((width >= 0) && (sl > width)) {
 	            cint	skip = (sl - width) ;
 	            sp += skip ;
