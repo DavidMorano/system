@@ -27,13 +27,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
-#include	<sfx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cfroman.h"
 
@@ -52,8 +52,8 @@
 
 /* forward references */
 
-static int	conv(cchar *,int,ulonglong *) noex ;
-static int	toval(int) noex ;
+local int	conv(cchar *,int,ulonglong *) noex ;
+local int	toval(int) noex ;
 
 
 /* local variables */
@@ -121,7 +121,7 @@ int cfromanull(cchar *sp,int sl,ulonglong *rp) noex {
 
 /* local subroutines */
 
-static int conv(cchar *sbuf,int slen,ulonglong *rp) noex {
+local int conv(cchar *sbuf,int slen,ulonglong *rp) noex {
 	int		val = 0 ;
 	cchar		*sp ;
 	if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) ylikely {
@@ -139,10 +139,9 @@ static int conv(cchar *sbuf,int slen,ulonglong *rp) noex {
 	    *rp = val ;
 	} /* end if (positive) */
 	return 0 ;
-}
-/* end subroutine (conv) */
+} /* end subroutine (conv) */
 
-static int toval(int ch) noex {
+local int toval(int ch) noex {
 	int		val = 0 ;
 	switch (ch) {
 	case 'I': val = 1 ; break ;
@@ -154,7 +153,6 @@ static int toval(int ch) noex {
 	case 'M': val = 1000 ; break ;
 	} /* end switch */
 	return val ;
-}
-/* end subroutine (toval) */
+} /* end subroutine (toval) */
 
 
