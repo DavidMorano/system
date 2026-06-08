@@ -149,10 +149,6 @@ namespace {
 
 /* forward references */
 
-template <integral T> consteval int nzeros(T v) noex {
-    	return ffbs(v) ;
-} /* end subroutine (nzeros) */
-
 local int		base128_dg(cchar *,char *) noex ;
 
 local void		base128_eg(cchar *,char *) noex ;
@@ -162,7 +158,7 @@ local void		base128_eg(cchar *,char *) noex ;
 
 constexpr helper	base128mgr ;
 
-constexpr int		bits		= nzeros(base) ;
+constexpr int		bits		= ffbs(base) ;
 constexpr int		bmask		= (base - 1) ;
 constexpr int		stagelen	= BASE128_STAGELEN ;
 constexpr int		outlen		= BASE128_OUTLEN ;
