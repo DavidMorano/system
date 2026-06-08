@@ -21,8 +21,8 @@
 	uc_entsv{x}
 
 	Description:
-	I provide the normal (usual) subroutines for managing the
-	UCENTSV (UNIX® |SERVENT| database entries) object.
+	These subroutines facilitate read-nnly access to the the
+	system SERVICES database.
 
 *******************************************************************************/
 
@@ -79,10 +79,10 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 /* forward references */
 
-static int ucentsv_parsenum(SVE *,SI *,cchar *,int) noex ;
-static int ucentsv_parsestrs(SVE *,SI *,cchar *,int) noex ;
+local int ucentsv_parsenum(SVE *,SI *,cchar *,int) noex ;
+local int ucentsv_parsestrs(SVE *,SI *,cchar *,int) noex ;
 
-static int ucentsv_formatnum(SVE *,sbuf *) noex ;
+local int ucentsv_formatnum(SVE *,sbuf *) noex ;
 
 
 /* local variables */
@@ -96,15 +96,15 @@ static int ucentsv_formatnum(SVE *,sbuf *) noex ;
 int ucentsv::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && ebuf && sp) {
+	if (ebuf && sp) ylikely {
 	    SERVENT *sep = this ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(sep) ;
-	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) ylikely {
 	        cchar	*cp{} ;
 		if (int idx ; (idx = sichr(sp,sl,'#')) >= 0) {
 		    sl = idx ;
-		}
+		} /* end if */
 	        for (int cl, fi = 0 ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
 	            cchar	**vpp = nullptr ;
 	            switch (fi++) {
@@ -124,7 +124,7 @@ int ucentsv::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	            sl -= intconv((cp + cl) - sp) ;
 	            sp = (cp + cl) ;
 	            if (rs < 0) break ;
-	        } /* end while */
+	        } /* end for */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -136,14 +136,13 @@ int ucentsv::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 int ucentsv::load(char *rbuf,int rlen,const ucentsv *csvp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf && csvp) {
+	if (rbuf && csvp) ylikely {
 	    SERVENT	*sep = this ;
 	    *sep = *csvp ; /* shallow copy */
-	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) ylikely {
 	        if (csvp->s_aliases) {
-	            int	n ; /* used-afterwards */
-	            for (n = 0 ; csvp->s_aliases[n] ; n += 1) ;
-	            if (void **tab{} ; (rs = si.ptab(n,&tab)) >= 0) {
+	            cint	n = lenstrarr(csvp->s_aliases) ;
+	            if (void **tab{} ; (rs = si.ptab(n,&tab)) >= 0) ylikely {
 		        cchar	**aliases = ccharpp(csvp->s_aliases) ;
 		        int	i ; /* used-afterwards */
 	                s_aliases = charpp(tab) ;
@@ -157,9 +156,9 @@ int ucentsv::load(char *rbuf,int rlen,const ucentsv *csvp) noex {
 	        } else {
 		    s_aliases = nullptr ;
 	        } /* end if (aliases) */
-		if (rs >= 0) {
+		if (rs >= 0) ylikely {
 		    rs = si_copystr(&si,&s_name,csvp->s_name) ;
-		}
+		} /* end if (ok) */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -171,11 +170,11 @@ int ucentsv::load(char *rbuf,int rlen,const ucentsv *csvp) noex {
 int ucentsv::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (rbuf) ylikely {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 3 ; i += 1) {
 	            if (i > 0) rs = b.chr(' ') ;
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                switch (i) {
 	                case 0:
 	                    rs = b.str(s_name) ;
@@ -202,8 +201,7 @@ int ucentsv::format(char *rbuf,int rlen) noex {
 /* end subroutine (ucentsv::format) */
 
 int ucentsv::size() noex {
-	int		rs = SR_FAULT ;
-	if (this) {
+	int		rs = SR_OK ;
 	    int		sz = 1 ;
 	    if (s_name) {
 	        sz += (lenstr(s_name) + 1) ;
@@ -216,7 +214,6 @@ int ucentsv::size() noex {
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (group members) */
 	    rs = iceil(sz,szof(cchar *)) ;
-	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ucentsv::size) */
@@ -236,7 +233,7 @@ int ucentsv::getnum(char *rb,int rl,int n,cchar *p) noex {
 
 /* local subroutines */
 
-static int ucentsv_parsenum(SVE *op,SI *sbp,cchar *sp,int sl) noex {
+local int ucentsv_parsenum(SVE *op,SI *sbp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (cchar *tp ; (tp = strnchr(sp,sl,'/')) != nullptr) {
 	    cint	tl = intconv(tp - sp) ;
@@ -247,19 +244,18 @@ static int ucentsv_parsenum(SVE *op,SI *sbp,cchar *sp,int sl) noex {
 		if (cchar *rp{} ; (rs = sbp->strw(cp,cl,&rp)) >= 0) {
 		    op->s_proto = charp(rp) ;
 		}
-	    }
-	}
+	    } /* end if */
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (ucentsv_parsenum) */
+} /* end subroutine (ucentsv_parsenum) */
 
-static int ucentsv_parsestrs(ucentsv *prp,SI *sip,cchar *sp,int sl) noex {
+local int ucentsv_parsestrs(ucentsv *prp,SI *sip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	if (vechand u ; (rs = u.start(8,0)) >= 0) {
-	    if ((rs = si_loadnames(sip,&u,sp,sl)) > 0) {
+	if (vechand u ; (rs = u.start(8,0)) >= 0) ylikely {
+	    if ((rs = si_loadnames(sip,&u,sp,sl)) > 0) ylikely {
 	        cint	n = rs ;
-	        if (void **ptab{} ; (rs = sip->ptab(n,&ptab)) >= 0) {
+	        if (void **ptab{} ; (rs = sip->ptab(n,&ptab)) >= 0) ylikely {
 		    int		i ; /* used-afterwards */
 	            void	*vp{} ;
 	            prp->s_aliases = charpp(ptab) ;
@@ -275,18 +271,16 @@ static int ucentsv_parsestrs(ucentsv *prp,SI *sip,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
 	return rs ;
-}
-/* end subroutine (ucentsv_parsestrs) */
+} /* end subroutine (ucentsv_parsestrs) */
 
-static int ucentsv_formatnum(SVE *op,sbuf *sbp) noex {
+local int ucentsv_formatnum(SVE *op,sbuf *sbp) noex {
 	int		rs ;
-	if ((rs = sbp->dec(op->s_port)) >= 0) {
+	if ((rs = sbp->dec(op->s_port)) >= 0) ylikely {
 	    if ((rs = sbp->chr('/')) >= 0) {
 		rs = sbp->strw(op->s_proto,-1) ;
 	    }
-	}
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (ucentsv_formatnum) */
+} /* end subroutine (ucentsv_formatnum) */
 
 
