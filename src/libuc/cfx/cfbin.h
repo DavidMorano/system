@@ -20,42 +20,42 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int cfbini(cchar *,int,int *) noex ;
-extern int cfbinl(cchar *,int,long *) noex ;
-extern int cfbinll(cchar *,int,longlong *) noex ;
+extern int cfbini	(cchar *,int,int *)		noex ;
+extern int cfbinl	(cchar *,int,long *)		noex ;
+extern int cfbinll	(cchar *,int,longlong *)	noex ;
 
-extern int cfbinui(cchar *,int,uint *) noex ;
-extern int cfbinul(cchar *,int,ulong *) noex ;
-extern int cfbinull(cchar *,int,ulonglong *) noex ;
+extern int cfbinui	(cchar *,int,uint *)		noex ;
+extern int cfbinul	(cchar *,int,ulong *)		noex ;
+extern int cfbinull	(cchar *,int,ulonglong *)	noex ;
 
 EXTERNC_end
 
 #if	__cplusplus
 
-inline int cfbin(cchar *sp,int sl,int *rp) noex {
+inline int cfbin(cchar *sp,int sl,int *rp)		noex {
 	return cfbini(sp,sl,rp) ;
 }
-inline int cfbin(cchar *sp,int sl,long *rp) noex {
+inline int cfbin(cchar *sp,int sl,long *rp)		noex {
 	return cfbinl(sp,sl,rp) ;
 }
-inline int cfbin(cchar *sp,int sl,longlong *rp) noex {
+inline int cfbin(cchar *sp,int sl,longlong *rp)		noex {
 	return cfbinll(sp,sl,rp) ;
 }
 
-inline int cfbin(cchar *sp,int sl,uint *rp) noex {
+inline int cfbin(cchar *sp,int sl,uint *rp)		noex {
 	return cfbinui(sp,sl,rp) ;
 }
-inline int cfbin(cchar *sp,int sl,ulong *rp) noex {
+inline int cfbin(cchar *sp,int sl,ulong *rp)		noex {
 	return cfbinul(sp,sl,rp) ;
 }
-inline int cfbin(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfbin(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfbinull(sp,sl,rp) ;
 }
 
