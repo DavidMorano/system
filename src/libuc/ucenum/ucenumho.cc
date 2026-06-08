@@ -105,13 +105,13 @@ int ucenumho_reset(ucenumho *op) noex {
 
 int ucenumho::readent(ucenumho_ent *uap,char *uabuf,int ualen) noex {
 	return ucenumho_readent(this,uap,uabuf,ualen) ;
-}
+} /* end method (ucenumho::readent) */
 
 void ucenumho::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumho",rs,"fini-close") ;
 	}
-}
+} /* end method (ucenumho::dtor) */
 
 int ucenumho_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
@@ -123,8 +123,7 @@ int ucenumho_op::operator () (cchar *fn) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumho_op::operator) */
+} /* end method (ucenumho_op::operator) */
 
 ucenumho_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -139,7 +138,6 @@ ucenumho_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumho_co::operator) */
+} /* end method (ucenumho_co::operator) */
 
 
