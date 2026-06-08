@@ -52,7 +52,7 @@ DEPS_CVTFLOAT	+= cvtfloat.hh
 MOBJ += fmtutil.o fmtstrdata.o fmtspec.o 
 MOBJ += fmtsub.o fmtobj.o
 
-MOBJ_SUB += fmtsub0.o fmtsub1.o fmtsub2.o fmtsub3.o
+MOBJ_SUB += fmtsub0.o fmtsub1.o fmtsub2.o fmtsub3.o fmtsub4.o
 
 OBJ0= fmtstr_prime.o 
 OBJ1= fmtstrdata.o fmtspec.o 
@@ -189,6 +189,9 @@ fmtsub2.o:		fmtsub2.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
 	$(COMPILE.cc) $<
 
 fmtsub3.o:		fmtsub3.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
+	$(COMPILE.cc) $<
+
+fmtsub4.o:		fmtsub4.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
 	$(COMPILE.cc) $<
 
 fmtspec.o:		fmtspec0.o fmtspec1.o
