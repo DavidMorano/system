@@ -55,16 +55,16 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| + |stpcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
-#include	<snx.h>			/* |snwprintf(3uc)| */
-#include	<xxtostr.h>		/* |itostr(3u)| */
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| + |stpcpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<snx.h>			/* LIBUC |snwprintf(3uc)| */
+#include	<xxtostr.h>		/* LIBU |itostr(3u)| */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
 
 export module cvtfloat ;
 
