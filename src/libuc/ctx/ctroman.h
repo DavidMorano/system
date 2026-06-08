@@ -20,57 +20,57 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int ctromani(char *,int,int) noex ;
-extern int ctromanl(char *,int,long) noex ;
-extern int ctromanll(char *,int,longlong) noex ;
+extern int ctromani	(char *,int,int)		noex ;
+extern int ctromanl	(char *,int,long)		noex ;
+extern int ctromanll	(char *,int,longlong)		noex ;
 
-extern int ctromanui(char *,int,uint) noex ;
-extern int ctromanul(char *,int,ulong) noex ;
-extern int ctromanull(char *,int,ulonglong) noex ;
+extern int ctromanui	(char *,int,uint)		noex ;
+extern int ctromanul	(char *,int,ulong)		noex ;
+extern int ctromanull	(char *,int,ulonglong)		noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
 template<typename T>
-inline int ctroman(char *,int,T) noex {
+inline int ctroman(char *,int,T)			noex {
 	return SR_NOSYS ;
 }
 
 template<>
-inline int ctroman(char *dp,int dl,int v) noex {
+inline int ctroman(char *dp,int dl,int v)		noex {
 	return ctromani(dp,dl,v) ;
 }
 
 template<>
-inline int ctroman(char *dp,int dl,long v) noex {
+inline int ctroman(char *dp,int dl,long v)		noex {
 	return ctromanl(dp,dl,v) ;
 }
 
 template<>
-inline int ctroman(char *dp,int dl,longlong v) noex {
+inline int ctroman(char *dp,int dl,longlong v)		noex {
 	return ctromanll(dp,dl,v) ;
 }
 
 template<>
-inline int ctroman(char *dp,int dl,uint v) noex {
+inline int ctroman(char *dp,int dl,uint v)		noex {
 	return ctromanui(dp,dl,v) ;
 }
 
 template<>
-inline int ctroman(char *dp,int dl,ulong v) noex {
+inline int ctroman(char *dp,int dl,ulong v)		noex {
 	return ctromanul(dp,dl,v) ;
 }
 
 template<>
-inline int ctroman(char *dp,int dl,ulonglong v) noex {
+inline int ctroman(char *dp,int dl,ulonglong v)		noex {
 	return ctromanull(dp,dl,v) ;
 }
 
