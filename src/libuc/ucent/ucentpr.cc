@@ -21,8 +21,8 @@
 	uc_entpr{x}
 
 	Description:
-	I provide the normal (usual) subroutines for managing the
-	UCENTPR (UNIX® |PROTOENT| database entries) object.
+	These subroutines facilitate read-nnly access to the the
+	system PROTOCOLS database.
 
 *******************************************************************************/
 
@@ -79,7 +79,7 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 /* forward references */
 
-static int ucentpr_parsestrs(PRE *,SI *,cchar *,int) noex ;
+local int ucentpr_parsestrs(PRE *,SI *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -93,15 +93,15 @@ static int ucentpr_parsestrs(PRE *,SI *,cchar *,int) noex ;
 int ucentpr::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && ebuf && sp) {
+	if (ebuf && sp) ylikely {
 	    PROTOENT *pep = this ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(pep) ;
-	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) ylikely {
 	        cchar	*cp{} ;
 		if (int idx ; (idx = sichr(sp,sl,'#')) >= 0) {
 		    sl = idx ;
-		}
+		} /* end if */
 	        for (int cl, fi = 0 ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
 	            int		v = -1 ;
 	            cchar	**vpp = nullptr ;
@@ -123,7 +123,7 @@ int ucentpr::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	            sl -= intconv((cp + cl) - sp) ;
 	            sp = (cp + cl) ;
 	            if (rs < 0) break ;
-	        } /* end while */
+	        } /* end for */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -135,13 +135,12 @@ int ucentpr::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 int ucentpr::load(char *rbuf,int rlen,const ucentpr *cprp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf && cprp) {
+	if (rbuf && cprp) {
 	    PROTOENT *pep = this ;
 	    *pep = *cprp ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
 	        if (cprp->p_aliases) {
-	            int		n ; /* used-afterwards */
-	            for (n = 0 ; cprp->p_aliases[n] ; n += 1) ;
+	            cint	n = lenstrarr(cprp->p_aliases) ;
 	            if (void **tab{} ; (rs = si.ptab(n,&tab)) >= 0) {
 		        cchar	**aliases = ccharpp(cprp->p_aliases) ;
 		        int	i ; /* used-afterwards */
@@ -158,7 +157,7 @@ int ucentpr::load(char *rbuf,int rlen,const ucentpr *cprp) noex {
 	        } /* end if (aliases) */
 		if (rs >= 0) {
 		    rs = si_copystr(&si,&p_name,cprp->p_name) ;
-		}
+		} /* end if (ok) */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -170,8 +169,8 @@ int ucentpr::load(char *rbuf,int rlen,const ucentpr *cprp) noex {
 int ucentpr::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (rbuf) ylikely {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 3 ; i += 1) {
 	            if (i > 0) rs = b.chr(' ') ;
 	            if (rs >= 0) {
@@ -203,8 +202,7 @@ int ucentpr::format(char *rbuf,int rlen) noex {
 /* end subroutine (ucentpr::format) */
 
 int ucentpr::size() noex {
-	int		rs = SR_FAULT ;
-	if (this) {
+	int		rs = SR_OK ;
 	    int		sz = 1 ;
 	    if (p_name) {
 	        sz += (lenstr(p_name) + 1) ;
@@ -217,7 +215,6 @@ int ucentpr::size() noex {
 	        sz += ((i+1) * szof(cchar *)) ;
 	    } /* end if (group members) */
 	    rs = iceil(sz,szof(cchar *)) ;
-	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ucentpr::size) */
@@ -237,13 +234,13 @@ int ucentpr::getnum(char *prbuf,int prlen,int num) noex {
 
 /* local subroutines */
 
-static int ucentpr_parsestrs(ucentpr *prp,SI *sip,cchar *sp,int sl) noex {
+local int ucentpr_parsestrs(ucentpr *prp,SI *sip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	if (vechand u ; (rs = u.start(8,0)) >= 0) {
-	    if ((rs = si_loadnames(sip,&u,sp,sl)) > 0) {
+	if (vechand u ; (rs = u.start(8,0)) >= 0) ylikely {
+	    if ((rs = si_loadnames(sip,&u,sp,sl)) > 0) ylikely {
 	        cint	n = rs ;
-	        if (void **ptab{} ; (rs = sip->ptab(n,&ptab)) >= 0) {
+	        if (void **ptab{} ; (rs = sip->ptab(n,&ptab)) >= 0) ylikely {
 		    int		i ; /* used-afterwards */
 	            void	*vp{} ;
 	            prp->p_aliases = charpp(ptab) ;
@@ -259,7 +256,6 @@ static int ucentpr_parsestrs(ucentpr *prp,SI *sip,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
 	return rs ;
-}
-/* end subroutine (ucentpr_parsestrs) */
+} /* end subroutine (ucentpr_parsestrs) */
 
 
