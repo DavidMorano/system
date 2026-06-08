@@ -40,14 +40,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucstrto.h>		/* |ucstrto{x}(3u)| */
-#include	<sfx.h>			/* |sfdigs(3uc)| */
-#include	<strnul.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucstrto.h>		/* LIBUC |ucstrto{x}(3u)| */
+#include	<sfx.h>			/* LIBUC |sfdigs(3uc)| */
+#include	<strnul.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cfdecf.h"
 #include	"cfutil.hh"
