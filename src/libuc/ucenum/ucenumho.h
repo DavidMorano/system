@@ -50,7 +50,7 @@ enum ucenumhomems {
 	ucenumhomem_reset,
 	ucenumhomem_close,
 	ucenumhomem_overlast
-} ;
+} ; /* end enum */
 struct ucenumho ;
 struct ucenumho_op {
 	ucenumho	*op = nullptr ;
@@ -84,14 +84,14 @@ struct ucenumho : ucenumxx {
 	    open(this,ucenumhomem_open) ;
 	    reset(this,ucenumhomem_reset) ;
 	    close(this,ucenumhomem_close) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ;
 	ucenumho(const ucenumho &) = delete ;
 	ucenumho &operator = (const ucenumho &) = delete ;
 	int readent(ucenumho_ent *,char *,int) noex ;
 	void dtor() noex ;
 	destruct ucenumho() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (ucenumho) */
 #else	/* __cplusplus */
@@ -100,10 +100,10 @@ typedef UCENUMXX	ucenumho ;
 
 EXTERNC_begin
 
-extern int ucenumho_open(ucenumho *,cchar *) noex ;
-extern int ucenumho_close(ucenumho *) noex ;
-extern int ucenumho_readent(ucenumho *,ucenumho_ent *,char *,int) noex ;
-extern int ucenumho_reset(ucenumho *) noex ;
+extern int ucenumho_open	(ucenumho *,cchar *) noex ;
+extern int ucenumho_close	(ucenumho *) noex ;
+extern int ucenumho_readent	(ucenumho *,ucenumho_ent *,char *,int) noex ;
+extern int ucenumho_reset	(ucenumho *) noex ;
 
 EXTERNC_end
 
