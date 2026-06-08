@@ -20,19 +20,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	cfdecf(cchar *,int,float *) noex ;
-extern int	cfdecd(cchar *,int,double *) noex ;
-extern int	cfdecld(cchar *,int,longdouble *) noex ;
+extern int	cfdecf	(cchar *,int,float *)		noex ;
+extern int	cfdecd	(cchar *,int,double *)		noex ;
+extern int	cfdecld	(cchar *,int,longdouble *)	noex ;
 
 /* historical (from about 1995 or earlier) */
-static inline int cfdouble(cchar *sp,int sl,double *rp) noex {
+static inline int cfdouble(cchar *sp,int sl,double *rp)	noex {
     	return cfdecd(sp,sl,rp) ;
 }
 
