@@ -23,42 +23,42 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int ctxxxi(char *,int,int,int) noex ;
-extern int ctxxxl(char *,int,int,long) noex ;
-extern int ctxxxll(char *,int,int,longlong) noex ;
+extern int ctxxxi	(char *,int,int,int)		noex ;
+extern int ctxxxl	(char *,int,int,long)		noex ;
+extern int ctxxxll	(char *,int,int,longlong)	noex ;
 
-extern int ctxxxui(char *,int,int,uint) noex ;
-extern int ctxxxul(char *,int,int,ulong) noex ;
-extern int ctxxxull(char *,int,int,ulonglong) noex ;
+extern int ctxxxui	(char *,int,int,uint)		noex ;
+extern int ctxxxul	(char *,int,int,ulong)		noex ;
+extern int ctxxxull	(char *,int,int,ulonglong)	noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int ctxxx(char *bp,int bl,int b,int v) noex {
+inline int ctxxx(char *bp,int bl,int b,int v)		noex {
 	return ctxxxi(bp,bl,b,v) ;
 }
-inline int ctxxx(char *bp,int bl,int b,long v) noex {
+inline int ctxxx(char *bp,int bl,int b,long v)		noex {
 	return ctxxxl(bp,bl,b,v) ;
 }
-inline int ctxxx(char *bp,int bl,int b,longlong v) noex {
+inline int ctxxx(char *bp,int bl,int b,longlong v)	noex {
 	return ctxxxll(bp,bl,b,v) ;
 }
 
-inline int ctxxx(char *bp,int bl,int b,uint v) noex {
+inline int ctxxx(char *bp,int bl,int b,uint v)		noex {
 	return ctxxxui(bp,bl,b,v) ;
 }
-inline int ctxxx(char *bp,int bl,int b,ulong v) noex {
+inline int ctxxx(char *bp,int bl,int b,ulong v)		noex {
 	return ctxxxul(bp,bl,b,v) ;
 }
-inline int ctxxx(char *bp,int bl,int b,ulonglong v) noex {
+inline int ctxxx(char *bp,int bl,int b,ulonglong v)	noex {
 	return ctxxxull(bp,bl,b,v) ;
 }
 
