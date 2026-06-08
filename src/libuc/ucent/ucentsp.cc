@@ -21,8 +21,8 @@
 	uc_entsp{x}
 
 	Description:
-	These subroutines perform some SHADOW-structure management
-	functions.
+	These subroutines facilitate read-nnly access to the the
+	system SHADOW database.
 
 *******************************************************************************/
 
@@ -75,8 +75,8 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 /* forward references */
 
-static int ucentsp_parseone(ucentsp *,SI *,int,cchar *,int) noex ;
-static int ucentsp_parsedefs(ucentsp *,SI *,int) noex ;
+local int ucentsp_parseone(ucentsp *,SI *,int,cchar *,int) noex ;
+local int ucentsp_parsedefs(ucentsp *,SI *,int) noex ;
 
 
 /* local variables */
@@ -90,12 +90,12 @@ static int ucentsp_parsedefs(ucentsp *,SI *,int) noex ;
 int ucentsp::parse(char *spbuf,int splen,cchar *sp,int sl) noex {
 	int		rs  = SR_FAULT ;
 	int		rs1 ;
-	if (spbuf && sp) {
+	if (spbuf && sp) ylikely {
 	    SPWD *sep = this ;
 	    memclear(sep) ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) {
-	        int		fi = 0 ;
+	    if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) ylikely {
+	        int	fi = 0 ;
 	        for (int idx ; (idx = sichr(sp,sl,':')) >= 0 ; ) {
 	            rs = ucentsp_parseone(this,&si,fi++,sp,idx) ;
 	            sl -= (idx +1) ;
@@ -121,14 +121,14 @@ int ucentsp::parse(char *spbuf,int splen,cchar *sp,int sl) noex {
 int ucentsp::load(char *spbuf,int splen,const ucentsp *sspp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (spbuf && sspp) {
+	if (spbuf && sspp) ylikely {
 	    SPWD *sep = this ;
 	    *sep = *sspp ;
-	    if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(spbuf,splen)) >= 0) ylikely {
 		{
 	            si_copystr(&si,&sp_namp,sspp->sp_namp) ;
 	            si_copystr(&si,&sp_pwdp,sspp->sp_pwdp) ;
-		}
+		} /* end block */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -140,11 +140,11 @@ int ucentsp::load(char *spbuf,int splen,const ucentsp *sspp) noex {
 int ucentsp::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (rbuf) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (rbuf) ylikely {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 9 ; i += 1) {
 	            if (i > 0) rs = b.chr(':') ;
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                long	v  = -1 ;
 	                switch (i) {
 	                case 0:
@@ -201,8 +201,7 @@ int ucentsp::format(char *rbuf,int rlen) noex {
 /* end subroutine (ucentsp::format) */
 
 int ucentsp::size() noex {
-	int		rs = SR_FAULT ;
-	if (this) {
+	int		rs = SR_OK ;
 	    int		sz = 1 ;
 	    if (sp_namp) {
 	        sz += (lenstr(sp_namp) + 1) ;
@@ -211,7 +210,6 @@ int ucentsp::size() noex {
 	        sz += (lenstr(sp_pwdp) + 1) ;
 	    }
 	    rs = sz ;
-	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ucentsp::size) */
@@ -227,7 +225,7 @@ int ucentsp::getnam(char *spbuf,int splen,cchar *name) noex {
 
 /* local subroutines */
 
-static int ucentsp_parseone(ucentsp *spp,SI *sip,int fi,cc *vp,int vl) noex {
+local int ucentsp_parseone(ucentsp *spp,SI *sip,int fi,cc *vp,int vl) noex {
 	int		rs = SR_OK ;
 	long		v = -1 ;
 	cchar		**vpp = nullptr ;
@@ -272,7 +270,7 @@ static int ucentsp_parseone(ucentsp *spp,SI *sip,int fi,cc *vp,int vl) noex {
 	        if (ulong uv{} ; (rs = cfdecul(vp,vl,&uv)) >= 0) {
 	            spp->sp_flag = uv ;
 		}
-	    }
+	    } /* end if */
 	    break ;
 	} /* end switch */
 	if ((rs >= 0) && vpp) {
@@ -280,12 +278,11 @@ static int ucentsp_parseone(ucentsp *spp,SI *sip,int fi,cc *vp,int vl) noex {
 	    if (int cl ; (cl = sfshrink(vp,vl,&cp)) >= 0) {
 	        rs = sip->strw(cp,cl,vpp) ;
 	    }
-	}
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (ucentsp_parseone) */
+} /* end subroutine (ucentsp_parseone) */
 
-static int ucentsp_parsedefs(ucentsp *spp,SI *sip,int sfi) noex {
+local int ucentsp_parsedefs(ucentsp *spp,SI *sip,int sfi) noex {
 	int		rs = SR_OK ;
 	if (sfi == 1) {
 	    cchar	**vpp = ccharpp(&spp->sp_pwdp) ;
@@ -294,9 +291,8 @@ static int ucentsp_parsedefs(ucentsp *spp,SI *sip,int sfi) noex {
 	    vp = (sp + lenstr(sp)) ;
 	    sfi += 1 ;
 	    rs = sip->strw(vp,0,vpp) ;
-	}
+	} /* end if */
 	return (rs >= 0) ? sfi : rs ;
-}
-/* end subroutine (ucentsp_parsedefs) */
+} /* end subroutine (ucentsp_parsedefs) */
 
 
