@@ -21,9 +21,8 @@
 	uc_entua{x}
 
 	Description:
-	These subroutines manage some simple tasks for the USERATTR
-	object, referenced as 'userattr'. This object is defined
-	by UNIX® (really Solaris®) standards.
+	These subroutines facilitate read-nnly access to the the
+	system USERATTR database.
 
 *******************************************************************************/
 
@@ -78,12 +77,12 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 /* forward references */
 
-static int userattrent_parseattr(UA *,storeitem *,cchar *,int) noex ;
-static int userattrent_parseattrload(UA *,storeitem *,vecstr *,int) noex ;
+local int userattrent_parseattr(UA *,storeitem *,cchar *,int) noex ;
+local int userattrent_parseattrload(UA *,storeitem *,vecstr *,int) noex ;
 
-static int si_attrload(storeitem *,kv_t *,int,cchar *) noex ;
+local int si_attrload(storeitem *,kv_t *,int,cchar *) noex ;
 
-static int sbuf_fmtattrs(sbuf *,kva_t *) noex ;
+local int sbuf_fmtattrs(sbuf *,kva_t *) noex ;
 
 
 /* local variables */
@@ -99,7 +98,7 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (this && uabuf && sp) ylikely {
+	if (uabuf && sp) ylikely {
 	    USERATTR *uep = this ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = memclear(uep) ;
@@ -138,7 +137,7 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	            } /* end for */
 	            if ((rs >= 0) && (fi == 4) && sl && sp[0]) {
 	                rs = userattrent_parseattr(this,&si,sp,sl) ;
-	            }
+	            } /* end if */
 	            rs1 = si.finish ;
 	            if (rs >= 0) rs = rs1 ;
 		    wlen = rs1 ;
@@ -153,7 +152,7 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (this && uabuf && suap) ylikely {
+	if (uabuf && suap) ylikely {
 	    USERATTR *uep = this ;
 	    *uep = *suap ; /* shallow copy */
 	    if (storeitem si ; (rs = si.start(uabuf,ualen)) >= 0) ylikely {
@@ -161,12 +160,11 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	            cint	ksz = szof(kva_t) ;
 	            cint	al = szof(void *) ;
 	            cint	n = suap->attr->length ;
-	            void	*p{} ;
-	            if ((rs = si.block(ksz,al,&p)) >= 0) {
+	            if (void *p ; (rs = si.block(ksz,al,&p)) >= 0) ylikely {
 	                kva_t	*kvap = (kva_t *) p ;
-	                int	dsize = (n * szof(kv_t)) ;
+	                cint	dsz = (n * szof(kv_t)) ;
 	                attr = kvap ;
-	                if ((rs = si.block(dsize,al,&p)) >= 0) {
+	                if ((rs = si.block(dsz,al,&p)) >= 0) ylikely {
 	                    kv_t	*kvp = (kv_t *) p ;
 	                    attr->length = n ;
 	                    attr->data = kvp ;
@@ -179,7 +177,7 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	                            if ((rs = si_copystr(&si,&rp,dp)) >= 0) {
 	                                kvp[i].value = rp ;
 	                            }
-	                        }
+	                        } /* end if */
 	                        if (rs < 0) break ;
 	                    } /* end for */
 	                } /* end if (storeitem_block) */
@@ -189,8 +187,8 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	            char *rp{} ;
 		    if ((rs = si_copystr(&si,&rp,suap->name)) >= 0) {
 	                name = rp ;
-		    }
-	        }
+		    } /* end if */
+	        } /* end if (ok) */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 		wlen = rs1 ;
@@ -203,11 +201,11 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 int ucentua::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf) ylikely {
+	if (rbuf) ylikely {
 	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 5 ; i += 1) {
 	            if (i > 0) rs = b.chr(':') ;
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                switch (i) {
 	                case 0:
 	                    rs = b.str(name) ;
@@ -245,25 +243,23 @@ int ucentua::format(char *rbuf,int rlen) noex {
 /* end subroutine (userattrent_format) */
 
 int ucentua::size() noex {
-	int		rs = SR_FAULT ;
-	if (this) ylikely {
+	int		rs = SR_OK ;
 	    int		sz = 1 ;
 	    kva_t	*kvap = attr ;
 	    if (name) {
-	        sz += (lenstr(name)+1) ;
+	        sz += (lenstr(name) + 1) ;
 	    }
 	    if (attr) ylikely {
 	        kv_t	*kvp = kvap->data ;
 	        cint	n = kvap->length ;
 	        sz += szof(kva_t) ;
 	        for (int i = 0 ; i < n ; i += 1) {
-	            sz += (lenstr(kvp[i].key)+1) ;
-	            sz += (lenstr(kvp[i].value)+1) ;
+	            sz += (lenstr(kvp[i].key) + 1) ;
+	            sz += (lenstr(kvp[i].value) + 1) ;
 	        } /* end for */
-	        sz += ((n+1)*szof(kv_t)) ;
+	        sz += ((n + 1) * szof(kv_t)) ;
 	    } /* end if */
 	    rs = iceil(sz,szof(cchar *)) ;
-	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (userattrent_size) */
@@ -283,14 +279,14 @@ int ucentua::getuid(char *uabuf,int ualen,uid_t uid) noex {
 
 /* local subroutines */
 
-static int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
+local int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (vecstr a ; (rs = a.start(0,0)) >= 0) ylikely {
 	    cint	sch = ';' ;
-	    cchar	*tp ;
-	    while ((tp = strnchr(sp,sl,sch)) != nullptr) {
+	    for (cchar *tp ; (tp = strnchr(sp,sl,sch)) != np ; ) {
 	        if (cint tl = intconv(tp - sp) ; tl > 0) {
 		    c += 1 ;
 	            rs = a.add(sp,tl) ;
@@ -298,30 +294,29 @@ static int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
 	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs >= 0) && (sl > 0)) {
 		c += 1 ;
 	        rs = a.add(sp,sl) ;
-	    }
+	    } /* end if */
 	    if ((rs >= 0) && ((rs = a.count) > 0)) {
 	        rs = userattrent_parseattrload(uap,sip,&a,rs) ;
-	    }
+	    } /* end if */
 	    rs1 = a.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	return rs ;
-}
-/* end subroutine (userattrent_parseattr) */
+} /* end subroutine (userattrent_parseattr) */
 
-static int userattrent_parseattrload(UA *uap,SI *sip,vecstr *alp,int n) noex {
+local int userattrent_parseattrload(UA *uap,SI *sip,vecstr *alp,int n) noex {
 	cint		ksz = szof(kva_t) ;
 	cint		al = szof(void *) ;
 	int		rs ;
 	if (void *p ; (rs = sip->block(ksz,al,&p)) >= 0) ylikely {
 	    kva_t	*kvap = (kva_t *) p ;
-	    int		dsize = (n*szof(kv_t)) ;
+	    cint	dsz = (n * szof(kv_t)) ;
 	    uap->attr = kvap ;
-	    if ((rs = sip->block(dsize,al,&p)) >= 0) ylikely {
+	    if ((rs = sip->block(dsz,al,&p)) >= 0) ylikely {
 	        kv_t	*kvp = (kv_t *) p ;
 	        cchar	*ep{} ;
 	        uap->attr->length = n ;
@@ -335,10 +330,9 @@ static int userattrent_parseattrload(UA *uap,SI *sip,vecstr *alp,int n) noex {
 	    } /* end if (storeitem_block) */
 	} /* end if (storeitem_block) */
 	return rs ;
-}
-/* end subroutine (userattrent_parseattrload) */
+} /* end subroutine (userattrent_parseattrload) */
 
-static int si_attrload(SI *sip,kv_t *kvp,int i,cchar *ep) noex {
+local int si_attrload(SI *sip,kv_t *kvp,int i,cchar *ep) noex {
 	int		rs ;
 	int		el = -1 ;
 	cchar		*vp ;
@@ -354,14 +348,13 @@ static int si_attrload(SI *sip,kv_t *kvp,int i,cchar *ep) noex {
 	        kvp[i].key = rp ;
 	        if ((rs = si_copystr(sip,&rp,vp)) >= 0) {
 	            kvp[i].value = rp ;
-	        }
-	    }
-	}
+	        } /* end if */
+	    } /* end if */
+	} /* end block */
 	return rs ;
-}
-/* end subroutine (si_attrload) */
+} /* end subroutine (si_attrload) */
 
-static int sbuf_fmtattrs(sbuf *sbp,kva_t *attr) noex {
+local int sbuf_fmtattrs(sbuf *sbp,kva_t *attr) noex {
 	int		rs = SR_FAULT ;
 	if (sbp && attr) ylikely {
 	    kv_t	*kv = attr->data ;
@@ -381,7 +374,6 @@ static int sbuf_fmtattrs(sbuf *sbp,kva_t *attr) noex {
 	    } /* end for */
 	} /* end if (non-null attr) */
 	return rs ;
-}
-/* end subroutine (sbuf_fmtattrs) */
+} /* end subroutine (sbuf_fmtattrs) */
 
 
