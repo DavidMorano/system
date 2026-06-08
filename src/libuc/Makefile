@@ -1067,7 +1067,6 @@ sysdbfiles.o:		sysdbfiles.cc	sysdbfiles.h
 sysdbfn.o:		sysdbfn.cc	sysdbfn.h
 
 # SINGLES
-findbit.o:		findbit.cc	findbit.h		$(INCS)
 termtypemat.o:		termtypemat.cc	termtypemat.h
 termcmd.o:		termcmd.cc	termcmd.h
 matparam.o:		matparam.cc	matparam.h
