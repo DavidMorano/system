@@ -20,46 +20,46 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int cthexc(char *,int,int) noex ;
-extern int cthexs(char *,int,int) noex ;
-extern int cthexi(char *,int,int) noex ;
-extern int cthexl(char *,int,long) noex ;
-extern int cthexll(char *,int,longlong) noex ;
+extern int cthexc	(char *,int,int)		noex ;
+extern int cthexs	(char *,int,int)		noex ;
+extern int cthexi	(char *,int,int)		noex ;
+extern int cthexl	(char *,int,long)		noex ;
+extern int cthexll	(char *,int,longlong)		noex ;
 
-extern int cthexuc(char *,int,uint) noex ;
-extern int cthexus(char *,int,uint) noex ;
-extern int cthexui(char *,int,uint) noex ;
-extern int cthexul(char *,int,ulong) noex ;
-extern int cthexull(char *,int,ulonglong) noex ;
+extern int cthexuc	(char *,int,uint)		noex ;
+extern int cthexus	(char *,int,uint)		noex ;
+extern int cthexui	(char *,int,uint)		noex ;
+extern int cthexul	(char *,int,ulong)		noex ;
+extern int cthexull	(char *,int,ulonglong)		noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int cthex(char *bp,int bl,int v) noex {
+inline int cthex(char *bp,int bl,int v)			noex {
 	return cthexi(bp,bl,v) ;
 }
-inline int cthex(char *bp,int bl,long v) noex {
+inline int cthex(char *bp,int bl,long v)		noex {
 	return cthexl(bp,bl,v) ;
 }
-inline int cthex(char *bp,int bl,longlong v) noex {
+inline int cthex(char *bp,int bl,longlong v)		noex {
 	return cthexll(bp,bl,v) ;
 }
 
-inline int cthex(char *bp,int bl,uint v) noex {
+inline int cthex(char *bp,int bl,uint v)		noex {
 	return cthexui(bp,bl,v) ;
 }
-inline int cthex(char *bp,int bl,ulong v) noex {
+inline int cthex(char *bp,int bl,ulong v)		noex {
 	return cthexul(bp,bl,v) ;
 }
-inline int cthex(char *bp,int bl,ulonglong v) noex {
+inline int cthex(char *bp,int bl,ulonglong v)		noex {
 	return cthexull(bp,bl,v) ;
 }
 
