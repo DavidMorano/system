@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 #include	<cfdect.h>
 #include	<cfdecmf.h>
@@ -31,35 +31,35 @@
 
 EXTERNC_begin
 
-extern int cfdeci(cchar *,int,int *) noex ;
-extern int cfdecl(cchar *,int,long *) noex ;
-extern int cfdecll(cchar *,int,longlong *) noex ;
+extern int cfdeci	(cchar *,int,int *)		noex ;
+extern int cfdecl	(cchar *,int,long *)		noex ;
+extern int cfdecll	(cchar *,int,longlong *)	noex ;
 
-extern int cfdecui(cchar *,int,uint *) noex ;
-extern int cfdecul(cchar *,int,ulong *) noex ;
-extern int cfdecull(cchar *,int,ulonglong *) noex ;
+extern int cfdecui	(cchar *,int,uint *)		noex ;
+extern int cfdecul	(cchar *,int,ulong *)		noex ;
+extern int cfdecull	(cchar *,int,ulonglong *)	noex ;
 
 EXTERNC_end
 
 #if	__cplusplus
 
-inline int cfdec(cchar *sp,int sl,int *rp) noex {
+inline int cfdec(cchar *sp,int sl,int *rp)		noex {
 	return cfdeci(sp,sl,rp) ;
 }
-inline int cfdec(cchar *sp,int sl,long *rp) noex {
+inline int cfdec(cchar *sp,int sl,long *rp)		noex {
 	return cfdecl(sp,sl,rp) ;
 }
-inline int cfdec(cchar *sp,int sl,longlong *rp) noex {
+inline int cfdec(cchar *sp,int sl,longlong *rp)		noex {
 	return cfdecll(sp,sl,rp) ;
 }
 
-inline int cfdec(cchar *sp,int sl,uint *rp) noex {
+inline int cfdec(cchar *sp,int sl,uint *rp)		noex {
 	return cfdecui(sp,sl,rp) ;
 }
-inline int cfdec(cchar *sp,int sl,ulong *rp) noex {
+inline int cfdec(cchar *sp,int sl,ulong *rp)		noex {
 	return cfdecul(sp,sl,rp) ;
 }
-inline int cfdec(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfdec(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfdecull(sp,sl,rp) ;
 }
 
