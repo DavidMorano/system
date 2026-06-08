@@ -20,42 +20,42 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int ctbini(char *,int,int) noex ;
-extern int ctbinl(char *,int,long) noex ;
-extern int ctbinll(char *,int,longlong) noex ;
+extern int ctbini	(char *,int,int)		noex ;
+extern int ctbinl	(char *,int,long)		noex ;
+extern int ctbinll	(char *,int,longlong)		noex ;
 
-extern int ctbinui(char *,int,uint) noex ;
-extern int ctbinul(char *,int,ulong) noex ;
-extern int ctbinull(char *,int,ulonglong) noex ;
+extern int ctbinui	(char *,int,uint)		noex ;
+extern int ctbinul	(char *,int,ulong)		noex ;
+extern int ctbinull	(char *,int,ulonglong)		noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int ctbin(char *bp,int bl,int v) noex {
+inline int ctbin(char *bp,int bl,int v)			noex {
 	return ctbini(bp,bl,v) ;
 }
-inline int ctbin(char *bp,int bl,long v) noex {
+inline int ctbin(char *bp,int bl,long v)		noex {
 	return ctbinl(bp,bl,v) ;
 }
-inline int ctbin(char *bp,int bl,longlong v) noex {
+inline int ctbin(char *bp,int bl,longlong v)		noex {
 	return ctbinll(bp,bl,v) ;
 }
 
-inline int ctbin(char *bp,int bl,uint v) noex {
+inline int ctbin(char *bp,int bl,uint v)		noex {
 	return ctbinui(bp,bl,v) ;
 }
-inline int ctbin(char *bp,int bl,ulong v) noex {
+inline int ctbin(char *bp,int bl,ulong v)		noex {
 	return ctbinul(bp,bl,v) ;
 }
-inline int ctbin(char *bp,int bl,ulonglong v) noex {
+inline int ctbin(char *bp,int bl,ulonglong v)		noex {
 	return ctbinull(bp,bl,v) ;
 }
 
