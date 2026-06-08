@@ -43,19 +43,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
-#include	<bitset>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<intsat.h>		/* |intsat(3u)| */
-#include	<six.h>			/* |sialpha(3uc)| */
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<cfdec.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<bitset>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU |intsat(3u)| */
+#include	<six.h>			/* LIBUC |sialpha(3uc)| */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<cfdec.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cfdect.h"
 
