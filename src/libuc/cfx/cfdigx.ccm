@@ -83,9 +83,9 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| + |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<climits>		/* CSTD |CHAR_BIT| + |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -101,8 +101,10 @@ module ;
 
 export module cfdigx ;
 
+import typecodes ;			/* |numbits(3u)| */
+
 template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
-	cint		nb = (szof(T) * CHAR_BIT) ;
+	cint		nb = numbits<T> ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
 	T		cutoff ;
