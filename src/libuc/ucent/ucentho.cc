@@ -21,8 +21,8 @@
 	uc_entho{x}
 
 	Description:
-	I provide the normal (usual) subroutines for managing the
-	UCENTHO (UNIX® |HOSTENT| database entries) object.
+	These subroutines facilitate read-nnly access to the the
+	system HOSTS database.
 
 *******************************************************************************/
 
@@ -59,24 +59,6 @@ import libutil ;			/* |memclear(3u)| */
 #define	CNWE	const ucentho
 #define	SI	storeitem
 
-#ifndef INET4ADDRLEN
-#define INET4ADDRLEN            szof(in_addr_t)
-#endif
-
-#ifndef INET6ADDRLEN
-#define INET6ADDRLEN            szof(in6_addr_t)
-#endif
-
-#ifndef INET4_ADDRSTRLEN
-#define INET4_ADDRSTRLEN        16
-#endif
-
-#ifndef INET6_ADDRSTRLEN
-#define INET6_ADDRSTRLEN        46      /* Solaris® says this is 46! */
-#endif
-
-#define ASTRLEN                 MAX(INET4_ADDRSTRLEN,INET6_ADDRSTRLEN)
-
 
 /* imported namespaces */
 
@@ -101,20 +83,20 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 /* local variables */
 
-constexpr int                   inet4addrlen = int(INET4ADDRLEN) ;
-constexpr int                   inet6addrlen = int(INET6ADDRLEN) ;
-constexpr int                   inetxaddrlen = max(inet4addrlen,inet6addrlen) ;
-constexpr int                   astrlen = int(ASTRLEN) ;
+constexpr int		inet4addrlen	= int(INET4ADDRLEN) ;
+constexpr int		inet6addrlen	= int(INET6ADDRLEN) ;
+constexpr int		inetxaddrlen	= max(inet4addrlen,inet6addrlen) ;
+constexpr int		astrlen		= int(INETX_ADDRSTRLEN) ;
 
 
 /* forward references */
 
-static int ucentho_parseaddr(NWE *,SI *,cchar *,int) noex ;
-static int ucentho_parsestrs(NWE *,SI *,cchar *,int) noex ;
-static int ucentho_formataddr(NWE *,sbuf *) noex ;
-static int ucentho_formatname(NWE *,sbuf *) noex ;
+local int ucentho_parseaddr(NWE *,SI *,cchar *,int) noex ;
+local int ucentho_parsestrs(NWE *,SI *,cchar *,int) noex ;
+local int ucentho_formataddr(NWE *,sbuf *) noex ;
+local int ucentho_formatname(NWE *,sbuf *) noex ;
 
-static inline int getaflen(int) noex ;
+local inline int getaflen(int) noex ;
 
 
 /* local variables */
@@ -128,19 +110,17 @@ static inline int getaflen(int) noex ;
 int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && ebuf && sp) {
+	if (ebuf && sp) ylikely {
 	    HOSTENT *hep = this ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(hep) ;
 	    h_addrtype = AF_INET4 ;	/* <- mandatory */
-	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) {
-	        int	fi = 0 ;
-		int	cl ;
+	    if (storeitem si ; (rs = si.start(ebuf,elen)) >= 0) ylikely {
 	        cchar	*cp{} ;
 		if (int idx ; (idx = sichr(sp,sl,'#')) >= 0) {
 		    sl = idx ;
-		}
-	        while ((cl = sfnext(sp,sl,&cp)) > 0) {
+		} /* end if */
+	        for (int cl, fi = 0 ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
 	            cchar	**vpp = nullptr ;
 	            switch (fi++) {
 	            case 0:
@@ -159,7 +139,7 @@ int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	            sl -= intconv((cp + cl) - sp) ;
 	            sp = (cp + cl) ;
 	            if (rs < 0) break ;
-	        } /* end while */
+	        } /* end for */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -171,13 +151,12 @@ int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 int ucentho::load(char *rbuf,int rlen,const ucentho *chop) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf && chop) {
+	if (rbuf && chop) ylikely {
 	    HOSTENT *hep = this ;
 	    *hep = *chop ; /* shallow copy */
-	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) ylikely {
 	        if (chop->h_aliases) {
-	            int		n ; /* used-afterwards */
-	            for (n = 0 ; chop->h_aliases[n] ; n += 1) ;
+	            cint	n = lenstrarr(chop->h_aliases) ;
 	            if (void **tab{} ; (rs = si.ptab(n,&tab)) >= 0) {
 		        cchar	**aliases = ccharpp(chop->h_aliases) ;
 		        int	i ; /* used-afterwards */
@@ -193,7 +172,7 @@ int ucentho::load(char *rbuf,int rlen,const ucentho *chop) noex {
 	        } /* end if (aliases) */
 		if (rs >= 0) {
 		    rs = si_copystr(&si,&h_name,chop->h_name) ;
-		}
+		} /* end if (ok) */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -205,11 +184,11 @@ int ucentho::load(char *rbuf,int rlen,const ucentho *chop) noex {
 int ucentho::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (rbuf) ylikely { 
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 3 ; i += 1) {
 	            if (i > 0) rs = b.chr(' ') ;
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                switch (i) {
 	                case 0:
 			    rs = ucentho_formataddr(this,&b) ;
@@ -236,8 +215,7 @@ int ucentho::format(char *rbuf,int rlen) noex {
 /* end subroutine (ucentho::format) */
 
 int ucentho::size() noex {
-	int		rs = SR_FAULT ;
-	if (this) {
+	int		rs = SR_OK ;
 	    int		sz = 1 ;
 	    if (h_name) {
 	        sz += (lenstr(h_name) + 1) ;
@@ -250,15 +228,14 @@ int ucentho::size() noex {
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if (name-alias list) */
 	    if (h_addr_list) {
-		cint	asize = h_length ;
+		cint	asz = h_length ;
 	        int	i = 0 ; /* used-afterwards */
 	        for (i = 0 ; h_addr_list[i] ; i += 1) {
-	            sz += (asize+1) ;
+	            sz += (asz + 1) ;
 	        } /* end for */
-	        sz += ((i+1)*szof(cchar *)) ;
+	        sz += ((i + 1) * szof(cchar *)) ;
 	    } /* end if (addr-alias list) */
 	    rs = iceil(sz,szof(cchar *)) ;
-	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ucentho::size) */
@@ -278,7 +255,7 @@ int ucentho::getadd(char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 
 /* local subroutines */
 
-static int ucentho_parseaddr(ucentho *hep,SI *sip,cchar *sp,int sl) noex {
+local int ucentho_parseaddr(ucentho *hep,SI *sip,cchar *sp,int sl) noex {
 	constexpr int	alen = inetxaddrlen ;
 	int		rs ;
 	char		abuf[inetxaddrlen+1] ;
@@ -297,10 +274,9 @@ static int ucentho_parseaddr(ucentho *hep,SI *sip,cchar *sp,int sl) noex {
 	    } /* end if (storeitem_buf) */
 	} /* end if (inetpton) */
 	return rs ;
-}
-/* end subroutine (ucentho_parseaddr) */
+} /* end subroutine (ucentho_parseaddr) */
 
-static int ucentho_parsestrs(ucentho *prp,SI *sip,cchar *sp,int sl) noex {
+local int ucentho_parsestrs(ucentho *prp,SI *sip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vechand u ; (rs = u.start(8,0)) >= 0) {
@@ -322,10 +298,9 @@ static int ucentho_parsestrs(ucentho *prp,SI *sip,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
 	return rs ;
-}
-/* end subroutine (ucentho_parsestrs) */
+} /* end subroutine (ucentho_parsestrs) */
 
-static int ucentho_formataddr(ucentho *hep,sbuf *sbp) noex {
+local int ucentho_formataddr(ucentho *hep,sbuf *sbp) noex {
 	cint		af = hep->h_addrtype ;
 	cint		plen = astrlen ;
 	int		rs ;
@@ -335,10 +310,9 @@ static int ucentho_formataddr(ucentho *hep,sbuf *sbp) noex {
 	    rs = sbp->strw(pbuf,rs) ;
 	}
 	return rs ;
-}
-/* end subroutine (ucentho_formataddr) */
+} /* end subroutine (ucentho_formataddr) */
 
-static int ucentho_formatname(ucentho *hep,sbuf *sbp) noex {
+local int ucentho_formatname(ucentho *hep,sbuf *sbp) noex {
 	cint		clen = 16 ;
 	int		rs ;
 	if ((rs = sbp->getlen) >= 0) {
@@ -347,12 +321,11 @@ static int ucentho_formatname(ucentho *hep,sbuf *sbp) noex {
 	    if ((rs = sbp->blanks(nb)) >= 0) {
 		rs = sbp->str(hep->h_name) ;
 	    }
-	}
+	} /*end if */
 	return rs ;
-}
-/* end subroutine (ucentho_formatname) */
+} /* end subroutine (ucentho_formatname) */
 
-static inline int getaflen(int af) noex {
+local inline int getaflen(int af) noex {
 	int	aflen = 0 ;
 	switch (af) {
 	case AF_INET4:
@@ -363,7 +336,6 @@ static inline int getaflen(int af) noex {
 	    break ;
 	} /* end switch */
 	return aflen ;
-}
-/* end subroutine (getaflen) */
+} /* end subroutine (getaflen) */
 
 
