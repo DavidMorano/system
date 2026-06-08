@@ -20,26 +20,26 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int cfdecti(cchar *,int,int *) noex ;
+extern int cfdecti	(cchar *,int,int *)			noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-local inline int cfdect(cchar *sp,int sl,int *rp = nullptr) noex {
+local inline int cfdect(cchar *sp,int sl,int *rp = nullptr)	noex {
 	return cfdecti(sp,sl,rp) ;
 }
 
 #else /* __cplusplus */
 
-local inline int cfdect(cchar *sp,int sl,int *rp) noex {
+local inline int cfdect(cchar *sp,int sl,int *rp)		noex {
 	return cfdecti(sp,sl,rp) ;
 }
 
