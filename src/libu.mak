@@ -92,7 +92,7 @@ OBJ35= utmptypes.o utmpsizes.o ascii.o
 
 OBJ36= mapex.o deb.o
 OBJ37= syspredefined.o
-OBJ38= ffbs.o flbs.o
+OBJ38= typecodes.o
 OBJ39=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -192,6 +192,7 @@ clean:
 	makeclean $(ALL)
 	rmsubpat ischx		gcm.cache
 	rmsubpat findbit	gcm.cache
+	rmsubpat typecodes	gcm.cache
 	rmsubpat bitmanip	gcm.cache
 	rmsubpat bitgrp		gcm.cache
 	rmsubpat chrset		gcm.cache
@@ -613,10 +614,7 @@ ischx1.o:		ischx1.cc	ischx0.o	ischx.hh	$(INCS)
 udiv.o:			udiv.ccm	udiv.hh				$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
-ffbs.o:			ffbs.ccm	ffbs.h				$(INCS)
-	gxx -c -x c++ -o $@ -O $<
-
-flbs.o:			flbs.ccm	flbs.h				$(ICNS)
+typecodes.o:		typecodes.ccm	ffbs.h				$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
 # singles
