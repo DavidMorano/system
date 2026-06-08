@@ -39,15 +39,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<string>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<string>		/* S++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ctwords.hh"
 
@@ -181,8 +181,7 @@ local int speak_billions(string *sp,int v) {
 	speak_group(sp,lv) ;
 	sp->append(" Billion") ;
 	return 0 ;
-}
-/* end subroutine (speak_nillions) */
+} /* end subroutine (speak_nillions) */
 
 local int speak_millions(string *sp,int v) {
 	cint	lv = (v/1000000) ;
@@ -222,21 +221,21 @@ local int speak_hundreds(string *sp,int v) {
 	speak_ones(sp,h) ;
 	sp->append(" Hundred") ;
 	return 0 ;
-}
+} /* end subroutine */
 
 local int speak_tens(string *sp,int v) {
 	cint	t = (v / 10) ;
 	sp->append(" ") ;
 	sp->append(tens[t]) ;
 	return 0 ;
-}
+} /* end subroutine */
 
 local int speak_teens(string *sp,int v) {
 	cint	t = (v % 10) ;
 	sp->append(" ") ;
 	sp->append(teens[t]) ;
 	return 0 ;
-}
+} /* end subroutine */
 
 local int speak_ones(string *sp,int v) {
 	sp->append(" ") ;
