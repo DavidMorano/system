@@ -108,13 +108,13 @@ int ucenumgr_reset(ucenumgr *op) noex {
 
 int ucenumgr::readent(ucenumgr_ent *uap,char *uabuf,int ualen) noex {
 	return ucenumgr_readent(this,uap,uabuf,ualen) ;
-}
+} /* end method (ucenumgr::readent) */
 
 void ucenumgr::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumgr",rs,"fini-close") ;
 	}
-}
+} /* end method (ucenumgr::dtor) */
 
 int ucenumgr_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
@@ -126,8 +126,7 @@ int ucenumgr_op::operator () (cchar *fn) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumgr_op::operator) */
+} /* end method (ucenumgr_op::operator) */
 
 ucenumgr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -142,7 +141,6 @@ ucenumgr_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumgr_co::operator) */
+} /* end method (ucenumgr_co::operator) */
 
 
