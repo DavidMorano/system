@@ -1,4 +1,4 @@
-/* bufos_aux SUPPORT HEADER */
+/* bufos_aux SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++98 */
 
@@ -26,15 +26,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<string>		/* |string(3c++)| */
-#include	<string_view>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<string>		/* C++STD |string(3c++)| */
+#include	<string_view>		/* C__STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bufos.hh"
 
