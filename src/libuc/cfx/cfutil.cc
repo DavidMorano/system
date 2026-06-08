@@ -39,15 +39,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysdefs.h>
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<char.h>
-#include	<ischarx.h>		/* |iszero(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC |iszero(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cfutil.hh"
 
