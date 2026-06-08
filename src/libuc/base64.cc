@@ -70,16 +70,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>		/* |uint32_t| */
-#include	<bit>			/* |countl_zero(3c++)| */
-#include	<concepts>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>		/* |mkchar(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uint32_t| */
+#include	<bit>			/* C++STD |countl_zero(3c++)| */
+#include	<concepts>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU |mkchar(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"base64.h"
 
@@ -144,10 +144,6 @@ namespace {
 
 /* forward references */
 
-template <integral T> constexpr int nzeros(T v) noex {
-    	return ffbs(v) ;
-} /* end subroutine (nzeros) */
-
 local int	base64_dg(cchar *,char *) noex ;
 
 local void	base64_eg(cchar *,char *) noex ;
@@ -157,7 +153,7 @@ local void	base64_eg(cchar *,char *) noex ;
 
 constexpr mkdecoder	base64decode ;
 
-constexpr int		bits		= nzeros(base) ;
+constexpr int		bits		= ffbs(base) ;
 constexpr int		bmask		= (base - 1) ;
 constexpr int		stagelen	= BASE64_STAGELEN ;
 constexpr int		outlen		= BASE64_OUTLEN ;
