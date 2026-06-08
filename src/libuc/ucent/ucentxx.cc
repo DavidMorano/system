@@ -21,8 +21,8 @@
 	si_{x}
 
 	Description:
-	These are utility subroutines for the UCENT group within
-	the UCSYS subsystem (itself in the UC library).
+	These are utility subroutines for the UCENT subroutine group
+	within LIBUC library.
 
 *******************************************************************************/
 
@@ -50,8 +50,6 @@
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -85,24 +83,23 @@ namespace ucent {
     int sbuf_fmtstr(sbuf *sbp,cchar *sp) noex {
 	cint		clen = 16 ;
 	int		rs ;
-	if ((rs = sbp->getlen) >= 0) {
+	if ((rs = sbp->getlen) >= 0) ylikely {
 	    cint	idx = rs ;
 	    cint	nb = (idx >= clen) ? 1 : (clen-idx) ;
 	    if ((rs = sbp->blanks(nb)) >= 0) {
 		rs = sbp->str(sp) ;
 	    }
-	}
+	} /* end if */
 	return rs ;
     } /* end subroutine (sbuf_fmtstr) */
-}
+} /* end namespace (ucent) */
 #endif /* COMMENT (currently unused) */
 
 namespace ucent {
     int si_loadnames(SI *sip,vechand *ulp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	cchar		*tp ;
-	while ((tp = strnbrk(sp,sl," ,")) != nullptr) {
+	for (cchar *tp ; (tp = strnbrk(sp,sl," ,")) != nullptr ; ) {
 	    if (cint tl = intconv(tp - sp) ; tl > 0) {
 		c += 1 ;
 		rs = si_loadname(sip,ulp,sp,tl) ;
@@ -110,14 +107,14 @@ namespace ucent {
 	    sl -= intconv((tp + 1) - sp) ;
 	    sp = (tp + 1) ;
 	    if (rs < 0) break ;
-	} /* end while */
+	} /* end for */
 	if ((rs >= 0) && sl && sp[0]) {
 	    c += 1 ;
 	    rs = si_loadname(sip,ulp,sp,sl) ;
-	}
+	} /* end if */
 	return (rs >= 0) ? c : rs ;
     } /* end subroutine (si_loadnames) */
-}
+} /* end namespace (ucent) */
 
 namespace ucent {
     int si_loadname(SI *sip,vechand *ulp,cchar *sp,int sl) noex {
@@ -127,7 +124,7 @@ namespace ucent {
 	}
 	return rs ;
     } /* end subroutine (si_loadname) */
-}
+} /* end namespace (ucent) */
 
 namespace ucent {
     int si_copystr(SI *sip,char **pp,cchar *sp) noex {
@@ -139,6 +136,6 @@ namespace ucent {
 	}
 	return rs ;
     } /* end subroutine (si_copystr) */
-}
+} /* end namespace (ucent) */
 
 
