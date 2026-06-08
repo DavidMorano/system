@@ -15,9 +15,8 @@
 	myself back in the old days.
 
 	= 2020-04-23, David A-D- Morano
-	I updated the |ffbsi| subroutine below to use the new C++20
-	find-first-bit-set intrinsic (often a single machine
-	instruction).
+	I updated the code to use the |typecode(3u)| pseudo-intrinsic
+	(a templated variable) instead of |ffbs(3u)|.
 
 */
 
@@ -62,14 +61,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |ULONG_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bit>			/* |countr_zero(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |ULONG_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bit>			/* C++STD |countr_zero(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ctdec.h"
 
@@ -77,6 +76,7 @@
 #pragma		GCC dependency		"mod/digtab.ccm"
 
 import uconstants ;			/* |digbufsize(3u)| */
+import typecodes ;			/* |typecode(3u)| */
 import digtab ;
 
 /* local defines */
@@ -100,11 +100,6 @@ constexpr int           div100 = 100 ;
 
 
 /* forward references */
-
-local inline constexpr int ffbsi(int b) noex {
-	cuint	uv = uint(b) ;
-	return std::countr_zero(uv) ;	/* <- first bit set */
-} /* end subroutine (ffbsi) */
 
 
 /* local variables */
@@ -156,21 +151,20 @@ local constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
 	} else {
 	    rl = 1 ;
 	    *--rp = '0' ;
-	}
+	} /* end if */
 	return rl ;
 } /* end subroutine-template (ctdecx) */
 
 template<typename UT,typename ST>
 local int ctdecsx(char *dp,int dl,const ST &v) noex {
 	UT		uv = (UT) v ;
-	cint		n = szof(ST) ;
+	cint		tc = typecode<ST> ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	if (v < 0) uv = (neg uv) ;
 	if (dp) {
-	    cint	t = ffbsi(n) ;
 	    {
-	        cint	dlen = digbufsize.bufsize[t][base] ;
+	        cint	dlen = digbufsize.bufsize[tc][base] ;
 		int	len ;
 		{
 		    char dbuf[dlen+1] ;
@@ -186,13 +180,12 @@ local int ctdecsx(char *dp,int dl,const ST &v) noex {
 
 template<typename UT>
 local int ctdecux(char *dp,int dl,const UT &uv) noex {
-	cint		n = szof(UT) ;
+	cint		tc = typecode<UT> ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	if (dp) {
-	    cint	t = ffbsi(n) ;
 	    {
-	        cint	dlen = digbufsize.bufsize[t][base] ;
+	        cint	dlen = digbufsize.bufsize[tc][base] ;
 		int	len ;
 		{
 		    char dbuf[dlen+1] ;
