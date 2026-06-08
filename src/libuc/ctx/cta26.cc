@@ -43,14 +43,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
-#include	<conintx.hh>		/* concept |stdintx| */
-#include	<sncpyx.h>
-#include	<localmisc.h>		/* |HEXBUFLEN| + |DIGBUFLEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<conintx.hh>		/* LINU concept |stdintx| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |HEXBUFLEN| + |DIGBUFLEN| */
 
 #include	"cta26.h"
 
@@ -85,7 +87,7 @@
 constexpr bool	f_remainder = CF_REMAINDER ;
 
 template<stdintx UT>
-static constexpr int icta26x(char *rbuf,int rlen,int type,int prec,UT v) noex {
+local constexpr int icta26x(char *rbuf,int rlen,int type,int prec,UT v) noex {
 	constexpr uint	base = DIGBASE ;
 	int		rl = 0 ;
 	char		*rp = (rbuf + rlen) ;
@@ -116,7 +118,7 @@ static constexpr int icta26x(char *rbuf,int rlen,int type,int prec,UT v) noex {
 } /* end subroutine-template (icta26x) */
 
 template<stdintx UT,stdintx ST>
-static int cta26sx(char *rbuf,int rlen,int type,int prec,ST v) noex {
+local int cta26sx(char *rbuf,int rlen,int type,int prec,ST v) noex {
 	UT		uv = (UT)(v) ;
 	cint		diglen = A26BUFLEN ;
 	int		len ;
@@ -128,7 +130,7 @@ static int cta26sx(char *rbuf,int rlen,int type,int prec,ST v) noex {
 } /* end subroutine (cta26sx) */
 
 template<stdintx T>
-static int cta26ux(char *rbuf,int rlen,int type,int prec,T uv) noex {
+local int cta26ux(char *rbuf,int rlen,int type,int prec,T uv) noex {
 	cint		diglen = A26BUFLEN ;
 	int		len ;
 	char		digbuf[A26BUFLEN + 1] ;
