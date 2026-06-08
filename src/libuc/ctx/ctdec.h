@@ -23,9 +23,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 #include	<ctdecf.h>		/* <- extra convenience */
 #include	<ctdecp.h>		/* <- extra convenience */
@@ -33,35 +33,35 @@
 
 EXTERNC_begin
 
-extern int ctdeci(char *,int,int) noex ;
-extern int ctdecl(char *,int,long) noex ;
-extern int ctdecll(char *,int,longlong) noex ;
+extern int ctdeci	(char *,int,int)		noex ;
+extern int ctdecl	(char *,int,long)		noex ;
+extern int ctdecll	(char *,int,longlong)		noex ;
 
-extern int ctdecui(char *,int,uint) noex ;
-extern int ctdecul(char *,int,ulong) noex ;
-extern int ctdecull(char *,int,ulonglong) noex ;
+extern int ctdecui	(char *,int,uint)		noex ;
+extern int ctdecul	(char *,int,ulong)		noex ;
+extern int ctdecull	(char *,int,ulonglong)		noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int ctdec(char *bp,int bl,int v) noex {
+inline int ctdec(char *bp,int bl,int v)			noex {
 	return ctdeci(bp,bl,v) ;
 }
-inline int ctdec(char *bp,int bl,long v) noex {
+inline int ctdec(char *bp,int bl,long v)		noex {
 	return ctdecl(bp,bl,v) ;
 }
-inline int ctdec(char *bp,int bl,longlong v) noex {
+inline int ctdec(char *bp,int bl,longlong v)		noex {
 	return ctdecll(bp,bl,v) ;
 }
 
-inline int ctdec(char *bp,int bl,uint v) noex {
+inline int ctdec(char *bp,int bl,uint v)		noex {
 	return ctdecui(bp,bl,v) ;
 }
-inline int ctdec(char *bp,int bl,ulong v) noex {
+inline int ctdec(char *bp,int bl,ulong v)		noex {
 	return ctdecul(bp,bl,v) ;
 }
-inline int ctdec(char *bp,int bl,ulonglong v) noex {
+inline int ctdec(char *bp,int bl,ulonglong v)		noex {
 	return ctdecull(bp,bl,v) ;
 }
 
