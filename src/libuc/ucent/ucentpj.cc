@@ -21,9 +21,8 @@
 	uc_entpj{x}
 
 	Description:
-	These subroutines manage some simple tasks for the PROJECT
-	object, referenced as 'struct project'. This object is
-	defined by UNIX® (really Solaris®) standards.
+	These subroutines facilitate read-nnly access to the the
+	system PROJECT database.
 
 *******************************************************************************/
 
@@ -78,8 +77,8 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 /* forward references */
 
-static int si_storestrs(SI *,int,cchar *,int,char ***) noex ;
-static int si_loadstrs(SI *,vechand *,int,cc *,int) noex ;
+local int si_storestrs(SI *,int,cchar *,int,char ***) noex ;
+local int si_loadstrs(SI *,vechand *,int,cc *,int) noex ;
 
 
 /* local variables */
@@ -91,16 +90,17 @@ static int si_loadstrs(SI *,vechand *,int,cc *,int) noex ;
 /* exported subroutines */
 
 int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && pjbuf && sp) {
+	if (pjbuf && sp) ylikely {
 	    PROJECT *pep = this ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(pep) ;
-	    if (storeitem si ; (rs = si.start(pjbuf,pjlen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(pjbuf,pjlen)) >= 0) ylikely {
 	        int	fi = 0 ;
 	        cchar	**vpp ;
-	        for (cc *tp ; (tp = strnchr(sp,sl,':')) != nullptr ; ) {
+	        for (cc *tp ; (tp = strnchr(sp,sl,':')) != np ; ) ylikely {
 		    cint	tl = intconv(tp - sp) ;
 	            int		v = -1 ;
 	            char	**sv{} ;
@@ -137,7 +137,7 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	            sl -= intconv((tp + 1) - sp) ;
 	            sp = (tp + 1) ;
 	            if (rs < 0) break ;
-	        } /* end while */
+	        } /* end for */
 	        if ((rs >= 0) && (fi == 5) && sl && sp[0]) {
 	            cchar	*cp{} ;
 		    vpp = ccharpp(&pj_attr) ;
@@ -157,16 +157,16 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 int ucentpj::load(char *pjbuf,int pjlen,CPJE *cpjp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && pjbuf && cpjp) {
+	if (pjbuf && cpjp) ylikely {
 	    PROJECT *pep = this ;
 	    *pep = *cpjp ; /* shallow copy */
-	    if (storeitem si ; (rs = si.start(pjbuf,pjlen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(pjbuf,pjlen)) >= 0) ylikely {
 	        int	n ; /* used-afterwards */
 	        void	**ptab{} ; /* used twice below */
 	        if (cpjp->pj_users) {
-	            for (n = 0 ; cpjp->pj_users[n] ; n += 1) ;
+		    n = lenstrarr(cpjp->pj_users) ;
 	            if ((rs = si.ptab(n,&ptab)) >= 0) {
-	                int	i = 0 ;
+	                int	i = 0 ; /* used-afterwards */
 	                char	**tab = charpp(ptab) ;
 	                pj_users = tab ;
 	                while ((rs >= 0) && cpjp->pj_users[i]) {
@@ -178,9 +178,9 @@ int ucentpj::load(char *pjbuf,int pjlen,CPJE *cpjp) noex {
 	            } /* end if (storeitem-ptab) */
 	        } /* end if (users) */
 	        if (cpjp->pj_groups) {
-	            for (n = 0 ; cpjp->pj_groups[n] ; n += 1) ;
-	            if ((rs = si.ptab(n,&ptab)) >= 0) {
-	                int	i = 0 ;
+		    n = lenstrarr(cpjp->pj_groups) ;
+	            if ((rs = si.ptab(n,&ptab)) >= 0) ylikely {
+	                int	i = 0 ; /* used-afterwards */
 	                char	**tab = charpp(ptab) ;
 	                pj_groups = tab ;
 	                while ((rs >= 0) && cpjp->pj_groups[i]) {
@@ -191,11 +191,11 @@ int ucentpj::load(char *pjbuf,int pjlen,CPJE *cpjp) noex {
 	                pj_groups[i] = nullptr ;
 	            } /* end if (storeitem-ptab) */
 	        } /* end if (groups) */
-		{
+		if (rs >= 0) ylikely {
 	            si_copystr(&si,&pj_name,cpjp->pj_name) ;
 	            si_copystr(&si,&pj_comment,cpjp->pj_comment) ;
 	            si_copystr(&si,&pj_attr,cpjp->pj_attr) ;
-		}
+		} /* end if (ok) */
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
@@ -207,8 +207,8 @@ int ucentpj::load(char *pjbuf,int pjlen,CPJE *cpjp) noex {
 int ucentpj::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (rbuf) ylikely {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 6 ; i += 1) {
 	            if (i > 0) rs = b.chr(':') ;
 	            if (rs >= 0) {
@@ -252,8 +252,7 @@ int ucentpj::format(char *rbuf,int rlen) noex {
 /* end subroutine (ucentpj::format) */
 
 int ucentpj::size() noex {
-	int		rs = SR_FAULT ;
-	if (this) {
+	int		rs = SR_OK ;
 	    int		sz = 1 ;
 	    int		i = 0 ;
 	    if (pj_name) {
@@ -278,7 +277,6 @@ int ucentpj::size() noex {
 	        sz += ((i+1)*szof(cchar *)) ;
 	    } /* end if */
 	    rs = iceil(sz,szof(cchar *)) ;
-	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ucentpj::size) */
@@ -302,16 +300,16 @@ int ucentpj::getdef(char *pjbuf,int pjlen,cchar *name) noex {
 
 /* local subroutines */
 
-static int si_storestrs(SI *sip,int sch,cc *sp,int sl,char ***svp) noex {
+local int si_storestrs(SI *sip,int sch,cc *sp,int sl,char ***svp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (vechand u ; (rs = u.start(8,0)) >= 0) {
-	    if ((rs = si_loadstrs(sip,&u,sch,sp,sl)) > 0) {
+	if (vechand u ; (rs = u.start(8,0)) >= 0) ylikely {
+	    if ((rs = si_loadstrs(sip,&u,sch,sp,sl)) > 0) ylikely {
 	        cint	n = rs ;
 	        if (void **ptab{} ; (rs = sip->ptab(n,&ptab)) >= 0) {
 		    int		i ; /* used-afterwards */
 	            void	*vp{} ;
-	            *svp = (char **) ptab ;
+	            *svp = charpp(ptab) ;
 		    for (i = 0 ; u.get(i,&vp) >= 0 ; i += 1) {
 	                (*svp)[i] = (char *) vp ;
 	            } /* end for */
@@ -324,16 +322,15 @@ static int si_storestrs(SI *sip,int sch,cc *sp,int sl,char ***svp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
 	return rs ;
-}
-/* end subroutine (si_storestrs) */
+} /* end subroutine (si_storestrs) */
 
-static int si_loadstrs(SI *sip,vechand *ulp,int sch,cc *sp,int sl) noex {
+local int si_loadstrs(SI *sip,vechand *ulp,int sch,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	for (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr ; ) {
-	    if (cint tl = intconv(tp - sp) ; tl > 0) {
+	    if (cint tl = intconv(tp - sp) ; tl > 0) ylikely {
 		cchar	*zp{} ;
-		if (int zl ; (zl = sfshrink(sp,tl,&zp)) > 0) {
+		if (int zl ; (zl = sfshrink(sp,tl,&zp)) > 0) ylikely {
 	            if (cc *cp ; (rs = sip->strw(zp,zl,&cp)) >= 0) {
 		        c += 1 ;
 		        rs = ulp->add(cp) ;
@@ -349,9 +346,8 @@ static int si_loadstrs(SI *sip,vechand *ulp,int sch,cc *sp,int sl) noex {
 		c += 1 ;
 		rs = ulp->add(cp) ;
 	    }
-	}
+	} /* end if */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (si_loadstrs) */
+} /* end subroutine (si_loadstrs) */
 
 
