@@ -42,15 +42,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<digval.h>		/* |digvalhex(3uc)| */
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |ishexlatin(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<digval.h>		/* LIBUC |digvalhex(3uc)| */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<ischarx.h>		/* LIBUC |ishexlatin(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cfhexstr.h"
 
