@@ -20,57 +20,57 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	ctdecpi(char *,int,int,int) noex ;
-extern int	ctdecpl(char *,int,int,long) noex ;
-extern int	ctdecpll(char *,int,int,longlong) noex ;
+extern int	ctdecpi		(char *,int,int,int)		noex ;
+extern int	ctdecpl		(char *,int,int,long)		noex ;
+extern int	ctdecpll	(char *,int,int,longlong)	noex ;
 
-extern int	ctdecpui(char *,int,int,uint) noex ;
-extern int	ctdecpul(char *,int,int,ulong) noex ;
-extern int	ctdecpull(char *,int,int,ulonglong) noex ;
+extern int	ctdecpui	(char *,int,int,uint)		noex ;
+extern int	ctdecpul	(char *,int,int,ulong)		noex ;
+extern int	ctdecpull	(char *,int,int,ulonglong)	noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
 template<typename T>
-inline int ctdecp(char *,int,int,T) noex {
+inline int ctdecp(char *,int,int,T)				noex {
 	return SR_NOSYS ;
 }
 
 template<>
-inline int ctdecp(char *dp,int dl,int p,int v) noex {
+inline int ctdecp(char *dp,int dl,int p,int v)			noex {
 	return ctdecpi(dp,dl,p,v) ;
 }
 
 template<>
-inline int ctdecp(char *dp,int dl,int p,long v) noex {
+inline int ctdecp(char *dp,int dl,int p,long v)			noex {
 	return ctdecpl(dp,dl,p,v) ;
 }
 
 template<>
-inline int ctdecp(char *dp,int dl,int p,longlong v) noex {
+inline int ctdecp(char *dp,int dl,int p,longlong v)		noex {
 	return ctdecpll(dp,dl,p,v) ;
 }
 
 template<>
-inline int ctdecp(char *dp,int dl,int p,uint v) noex {
+inline int ctdecp(char *dp,int dl,int p,uint v)			noex {
 	return ctdecpui(dp,dl,p,v) ;
 }
 
 template<>
-inline int ctdecp(char *dp,int dl,int p,ulong v) noex {
+inline int ctdecp(char *dp,int dl,int p,ulong v)		noex {
 	return ctdecpul(dp,dl,p,v) ;
 }
 
 template<>
-inline int ctdecp(char *dp,int dl,int p,ulonglong v) noex {
+inline int ctdecp(char *dp,int dl,int p,ulonglong v)		noex {
 	return ctdecpull(dp,dl,p,v) ;
 }
 
