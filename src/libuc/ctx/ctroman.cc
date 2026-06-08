@@ -39,12 +39,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sbuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -61,7 +61,7 @@
 
 /* forward references */
 
-static int	ictroman(char *,int,ulonglong) noex ;
+local int	ictroman(char *,int,ulonglong) noex ;
 
 
 /* local variables */
@@ -153,7 +153,7 @@ int ctromanull(char *dbuf,int dlen,ulonglong v) noex {
 
 /* local subroutines */
 
-static int ictroman(char *dbuf,int dlen,ulonglong v) noex {
+local int ictroman(char *dbuf,int dlen,ulonglong v) noex {
 	int		rs ;
 	int		rs1 ;
 	mainv		tabs[] = { hundreds, tens, ones } ;
@@ -178,7 +178,6 @@ static int ictroman(char *dbuf,int dlen,ulonglong v) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sbuf) */
 	return rs ;
-}
-/* end subroutine (ictroman) */
+} /* end subroutine (ictroman) */
 
 
