@@ -15,7 +15,7 @@
 	myself back in the old days.
 
 	= 2020-04-23, David A-D- Morano
-	I updated the |ffbsi| subroutine below to use the new C++20
+	I updated the |ffbs| subroutine below to use the new C++20
 	find-first-bit-set intrinsic (often a single machine
 	instruction).
 
@@ -64,31 +64,28 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bit>			/* <- for |countr_zero(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bit>			/* C++STD |countr_zero(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/digtab.ccm"
+#pragma		GCC dependency		"mod/findbit.ccm"
 
 export module cvtdig ;
 
 import digtab ;				/* |getdig(3u)| + |maxbase(3u)| */
+import findbit ;			/* |ffbs(3u)| */
 
 inline cint	cvtdig_maxbase = digtab.maxbase ; /* <- from |digtab(3u)| */
-
-constexpr inline int cvtdig_ffbsi(int b) noex {
-	cuint		ub = uint(b) ;
-	return std::countr_zero(ub) ;
-} /* end subroutine (cvtdig_ffbsi) */
 
 export {
     template<typename UT>
     int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
-	cint		nshift = cvtdig_ffbsi(b) ;
+	cint		nshift = ffbs(b) ;
 	int		rs = SR_INVALID ;
 	int		ndig = 0 ;
 	if ((b > 1) && (b <= cvtdig_maxbase)) {
