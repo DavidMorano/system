@@ -79,7 +79,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdint>		/* CSTD |int64_t| */
 #include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
@@ -103,6 +103,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import typecodes ;			/* |numbits(3u)| */
 
 /* local defines */
 
@@ -148,7 +149,7 @@ local inline bool ourwht(cchar c) noex {
 
 template<typename T> local int inrange(int64_t v) noex {
     	cint		nbx = szof(int64_t) ;
-    	cint		nb = szof(T) ;
+	cint		nb = numbits<T> ;
     	int		rs = SR_OK ;
 	DPRINTF("ent\n") ;
 	if (nb <= nbx) {
