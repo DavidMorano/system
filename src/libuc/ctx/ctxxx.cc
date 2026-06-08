@@ -15,9 +15,8 @@
 	myself back in the old days.
 
 	= 2020-04-23, David A-D- Morano
-	I updated the |ffbsi| subroutine below to use the new C++20
-	find-first-bit-set intrinsic (often a single machine
-	instruction).
+	I updated the code to use the |typecode(3u)| pseudo-intrinsic
+	(a templated variable) instead of |ffbs(3u)|.
 
 */
 
@@ -64,16 +63,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |ULONG_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bit>			/* |countr_zero(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<stdintx.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |ULONG_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bit>			/* C++STD |countr_zero(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ctxxx.h"
 
@@ -82,6 +81,7 @@
 
 import digtab ;				/* |getdig(3u)| + |maxbase(3u)| */
 import uconstants ;			/* |digbufsize(3u)| */
+import typecodes ;			/* |typecode(3u)| */
 
 /* local defines */
 
@@ -103,15 +103,10 @@ import uconstants ;			/* |digbufsize(3u)| */
 
 /* forward references */
 
-local inline constexpr int ffbsi(int b) noex {
-	cuint	uv = uint(b) ;
-	return std::countr_zero(uv) ;	/* <- first bit set */
-} /* end subroutine (ffbsi) */
-
 
 /* local variables */
 
-constexpr int		maxstack = (256+1) ;	/* |int256_t| in binary */
+constexpr int		maxstack = (256 + 1) ;	/* |int256_t| in binary */
 
 
 /* local subroutine-templates */
@@ -154,22 +149,21 @@ local constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 template<typename UT,typename ST>
 local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 	UT		uv = (UT) v ;
-	cint		n = szof(ST) ;
+	cint		tc = typecode<ST> ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ; /* return-value */
 	if (v < 0) uv = (neg uv) ;
 	if (dp) {
-	    cint	t = ffbsi(n) ;
 	    rs = SR_NOTSUP ;
 	    if ((b >= 2) && (b <= digtab.maxbase)) {
-	        cint	dlen = digbufsize.bufsize[t][b] ;
+	        cint	dlen = digbufsize.bufsize[tc][b] ;
 		int	len ;
 		if (dlen > maxstack) {
 		    if (char *dbuf ; (rs = lm_mall((dlen+1),&dbuf)) >= 0) {
 			{
 		            len = ctxxxx(dbuf,dlen,b,uv) ;
-		            if (v < 0) dbuf[dlen-(++len)] = '-' ;
+		            if (v < 0) dbuf[dlen - (++len)] = '-' ;
 		            rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 			    rl = rs ;
 			}
@@ -179,7 +173,7 @@ local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 		} else {
 		    char dbuf[dlen+1] ;
 		    len = ctxxxx(dbuf,dlen,b,uv) ;
-		    if (v < 0) dbuf[dlen-(++len)] = '-' ;
+		    if (v < 0) dbuf[dlen - (++len)] = '-' ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		    rl = rs ;
 		} /* end block */
@@ -190,14 +184,13 @@ local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 
 template<typename UT>
 local int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
-	cint		n = szof(UT) ;
+	cint		tc = typecode<UT> ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	if (dp) {
-	    cint	t = ffbsi(n) ;
 	    rs = SR_NOTSUP ;
 	    if ((b >= 2) && (b <= digtab.maxbase)) {
-	        cint	dlen = digbufsize.bufsize[t][b] ;
+	        cint	dlen = digbufsize.bufsize[tc][b] ;
 		int	len ;
 		{
 		    char dbuf[dlen+1] ;
