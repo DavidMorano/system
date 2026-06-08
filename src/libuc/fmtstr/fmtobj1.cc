@@ -312,9 +312,9 @@ int fmtobj::decide(va_list ap) noex {
 
 int fmtobj::code_chr(va_list ap) noex {
     	int		rs = SR_OK ;
-        int     ch ;
-        bool     f_wchar = false ;
-        bool     f_wint = false ;
+        int		ch ;
+        bool		f_wchar = false ;
+        bool		f_wint = false ;
         if (fcode != 'C') {
             switch (spec.lenmod) {
             case lenmod_wide:
@@ -489,11 +489,11 @@ int fmtobj::code_bin(va_list ap) noex {
                 /* form the digits that we will (maximally) need */
                 bp = (tbuf + tlen) ;		/* backward */
                 *bp = '\0' ;
-                for (int i = (ndigs - 1) ; (unum > 0) && (i >= 0) ; i -= 1) {
+                for (int i = (ndigs - 1) ; i >= 0 ; i -= 1) {
                     *--bp = digtable[unum & 1] ;
                     unum >>= 1 ;
+		    if (unum == 0) break ;
                 } /* end for (making the digits) */
-		if (*bp == '\0') *--bp = '0' ;
                 bl = intconv((tbuf + tlen) - bp) ; /* backward */
             } /* end if_constexpr (f_binarymin) */
 	} /* end if (ok) */
@@ -503,8 +503,7 @@ int fmtobj::code_bin(va_list ap) noex {
 int fmtobj::code_oct(va_list ap) noex {
     	int		rs = SR_OK ;
         ulonglong       unum ;
-        int     nd = 0 ;
-        cchar   *digtable = digtable_lo ;
+        int     	nd = 0 ;
 	sub.numbase = numbase.oct ;
         switch (spec.lenmod) {
         case lenmod_longlong:
@@ -528,14 +527,15 @@ int fmtobj::code_oct(va_list ap) noex {
             break ;
         } /* end switch */
 	if (rs >= 0) {
+            cchar   *digtable = digtable_lo ;
             /* form the digits that we will (maximally) need */
             bp = (tbuf + tlen) ;		/* backward */
             *bp = '\0' ;
-            for (int i = (nd - 1) ; (unum > 0) && (i >= 0) ; i -= 1) {
+            for (int i = (nd - 1) ; i >= 0 ; i -= 1) {
                 *--bp = digtable[unum & 7] ;
                 unum >>= 3 ;
+		if (unum == 0) break ;
             } /* end for (making the digits) */
-            if (*bp == '\0') *--bp = '0' ;
             bl = intconv((tbuf + tlen) - bp) ;	/* backward */
 	} /* end if (ok) */
 	return rs ;
@@ -605,8 +605,8 @@ int fmtobj::code_dec(va_list ap) noex {
 int fmtobj::code_hex(va_list ap) noex {
     	int		rs = SR_OK ;
         ulonglong       unum ;
-        int	ndigs = 0 ;
-        bool	f_lc = ((fcode == 'p') || (fcode == 'x')) ;
+        int		ndigs = 0 ;
+        bool		f_lc = ((fcode == 'p') || (fcode == 'x')) ;
 	DPRINTF("ent\n") ;
 	sub.numbase = numbase.hex ;
         if ((fcode == 'p') || (fcode == 'P')) {
