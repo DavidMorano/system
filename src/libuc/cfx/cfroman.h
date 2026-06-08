@@ -20,22 +20,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int cfromani(cchar *,int,int *) noex ;
-extern int cfromanl(cchar *,int,long *) noex ;
-extern int cfromanll(cchar *,int,longlong *) noex ;
+extern int cfromani	(cchar *,int,int *)		noex ;
+extern int cfromanl	(cchar *,int,long *)		noex ;
+extern int cfromanll	(cchar *,int,longlong *)	noex ;
 
-extern int cfromanui(cchar *,int,uint *) noex ;
-extern int cfromanul(cchar *,int,ulong *) noex ;
-extern int cfromanull(cchar *,int,ulonglong *) noex ;
+extern int cfromanui	(cchar *,int,uint *)		noex ;
+extern int cfromanul	(cchar *,int,ulong *)		noex ;
+extern int cfromanull	(cchar *,int,ulonglong *)	noex ;
 
-static inline int cfroman(cchar *sp,int sl,int *rp) noex {
+static inline int cfroman(cchar *sp,int sl,int *rp)	noex {
 	return cfromani(sp,sl,rp) ;
 }
 
@@ -43,19 +43,19 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int cfroman(cchar *sp,int sl,long *rp) noex {
+inline int cfroman(cchar *sp,int sl,long *rp)		noex {
 	return cfromanl(sp,sl,rp) ;
 }
-inline int cfroman(cchar *sp,int sl,longlong *rp) noex {
+inline int cfroman(cchar *sp,int sl,longlong *rp)	noex {
 	return cfromanll(sp,sl,rp) ;
 }
-inline int cfroman(cchar *sp,int sl,uint *rp) noex {
+inline int cfroman(cchar *sp,int sl,uint *rp)		noex {
 	return cfromanui(sp,sl,rp) ;
 }
-inline int cfroman(cchar *sp,int sl,ulong *rp) noex {
+inline int cfroman(cchar *sp,int sl,ulong *rp)		noex {
 	return cfromanul(sp,sl,rp) ;
 }
-inline int cfroman(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfroman(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfromanull(sp,sl,rp) ;
 }
 
