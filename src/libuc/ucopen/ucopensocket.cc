@@ -44,6 +44,8 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
@@ -51,6 +53,8 @@
 #include	<mkpathx.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
+
+#include	"ucsockprime.h"
 
 
 /* local defines */
