@@ -32,16 +32,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |qsort(3c)| */
-#include	<cstring>		/* |memcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
-#include	<deb.hh>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD |qsort(3c)| */
+#include	<cstring>		/* CSTD |memcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBUC */
 
 #include	"vecelem.h"
 
@@ -71,12 +71,6 @@ extern "C" {
 
 /* forward references */
 
-local int	vecelem_ctor(vecelem *) noex ;
-local int	vecelem_dtor(vecelem *) noex ;
-local int	vecelem_setopts(vecelem *,int) noex ;
-local int	vecelem_extend(vecelem *) noex ;
-local int	vecelem_validx(vecelem *,int) noex ;
-
 template<typename ... Args>
 local inline int vecelem_magic(vecelem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
@@ -85,6 +79,12 @@ local inline int vecelem_magic(vecelem *op,Args ... args) noex {
 	}
 	return rs ;
 } /* end subroutine (vecelem_magic) */
+
+local int	vecelem_ctor(vecelem *) noex ;
+local int	vecelem_dtor(vecelem *) noex ;
+local int	vecelem_setopts(vecelem *,int) noex ;
+local int	vecelem_extend(vecelem *) noex ;
+local int	vecelem_validx(vecelem *,int) noex ;
 
 
 /* local variables */
