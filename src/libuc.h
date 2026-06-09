@@ -74,7 +74,6 @@
 #include	<filegrp.h>
 #include	<filemap.h>
 #include	<filer.h>
-#include	<findbit.h>
 #include	<findfilepath.h>
 #include	<findinline.h>
 #include	<findxfile.h>
