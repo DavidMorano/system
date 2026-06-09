@@ -88,6 +88,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
+#include	<ucopen.h>
 #include	<getnodedomain.h>
 #include	<ids.h>
 #include	<sncpyx.h>
@@ -191,26 +192,25 @@ constexpr cpcchar		soexts[] = {
 /* exported subroutines */
 
 int uc_opendialer(cc *prn,cc *svc,int of,m_t om,mv argv,mv envv,int to) noex {
-	SI		si, *sip = &si ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		fd = -1 ;
-
-	if ((prn == nullptr) && (svc == nullptr)) return SR_FAULT ;
-
-	if ((prn[0] == '\0') && (svc[0] == '\0')) return SR_INVALID ;
-
-	if ((rs = subinfo_start(&si,prn,svc,of,om,argv,envv,to)) >= 0) {
-	    if ((rs = subinfo_search(&si)) > 0) { /* >0 means found */
-		fd = sip->fd ;
-	    } else if (rs == 0) {
-		rs = SR_NOENT ;
-	    }
-	    rs1 = subinfo_finish(&si) ;
-	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-	} /* end if (subinfo) */
-
+	int		fd = -1 ; /* return-value */
+	if (prn && svc) {
+	    rs = SR_INVALID ;
+	    if (prn[0] && svc[0]) {
+	        SI si, *sip = &si ;
+	        if ((rs = subinfo_start(&si,prn,svc,of,om,argv,envv,to)) >= 0) {
+	            if ((rs = subinfo_search(&si)) > 0) { /* >0 means found */
+		        fd = sip->fd ;
+	            } else if (rs == 0) {
+		        rs = SR_NOENT ;
+	            }
+	            rs1 = subinfo_finish(&si) ;
+	            if (rs >= 0) rs = rs1 ;
+	            if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (uc_opendialer) */
@@ -232,13 +232,12 @@ local int subinfo_start(SI *sip,cc *prn,cc *svc,int of,mode_t om,
 	           sip->to = to ;
 	           sip->fd = -1 ;
 	           {
-		       cint		mn = MAXNAMELEN ;
+		       cint	mn = MAXNAMELEN ;
 	               cchar	*prefix = SVCSYMPREFIX ;
-	               char		dialsym[mn +1] ;
+	               char	dialsym[mn +1] ;
 	               if ((rs = sncpy2(dialsym,mn,prefix,sip->prn)) >= 0) {
-		           auto		mall = lm_strw ;
 		           cchar	*sp = dialsym ;
-	                   if (cchar *cp ; (rs = mall(sp,rs,&cp)) >= 0) {
+	                   if (cchar *cp ; (rs = lm_strw(sp,rs,&cp)) >= 0) {
 	                       sip->dialsym = const_cast<char *>(cp) ;
 		           }
 	               }
@@ -252,7 +251,7 @@ local int subinfo_start(SI *sip,cc *prn,cc *svc,int of,mode_t om,
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (sip->dialsym != nullptr) {
+	if (sip->dialsym) {
 	    rs1 = lm_free(sip->dialsym) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->dialsym = nullptr ;
@@ -264,15 +263,15 @@ local int subinfo_search(SI *sip) noex {
 	cint	plen = MAXPATHLEN ;
 	int		rs ;
 	int		rs1 ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if ((rs = subinfo_idbegin(sip)) >= 0) {
-	    cint	size = ((plen+1)*3) ;
-	    char	*abuf ;
-	    if ((rs = lm_mall(size,&abuf)) >= 0) {
+	    cint	sz = ((plen+1)*3) ;
+	    int		ai = 0 ;
+	    if (char	*abuf ; (rs = lm_mall(sz,&abuf)) >= 0) {
 	        char	dn[MAXHOSTNAMELEN+1] ;
-	        char	*pdn = (abuf+(0*(plen+1))) ;
-	        char	*sdn = (abuf+(1*(plen+1))) ;
-	        char	*sfn = (abuf+(2*(plen+1))) ;
+	        char	*pdn = (abuf+(ai++*(plen+1))) ;
+	        char	*sdn = (abuf+(ai++*(plen+1))) ;
+	        char	*sfn = (abuf+(ai++*(plen+1))) ;
 	        if ((rs = getnodedomain(nullptr,dn)) >= 0) {
 		    ustat	sb ;
 	            for (int i = 0 ; prns[i] != nullptr ; i += 1) {
@@ -379,7 +378,7 @@ local int subinfo_idend(SI *sip) noex {
 	        rs1 = ids_release(&sip->id) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (subinfo_idend) */
 
