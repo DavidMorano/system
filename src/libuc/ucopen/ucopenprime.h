@@ -32,14 +32,16 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
 extern int uc_open	(cchar *,int,mode_t)			noex ;
 extern int uc_opene	(cchar *,int,mode_t,int)		noex ;
+extern int uc_openenv	(cchar *,int,mode_t,con mainv,int)	noex ;
+
 extern int uc_socket	(int,int,int)				noex ;
 extern int uc_dupmin	(int,int)				noex ;
 extern int uc_dupmince	(int,int)				noex ;
