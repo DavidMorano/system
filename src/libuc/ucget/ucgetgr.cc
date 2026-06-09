@@ -115,7 +115,7 @@ namespace {
 
 /* forward references */
 
-static constexpr bool bit(uint v,int b) noex {
+constexpr bool bit(uint v,int b) noex {
 	return bool((v >> b) & 1) ;
 }
 
