@@ -27,11 +27,11 @@
 
 EXTERNC_begin
 
-extern int	uc_getpwbegin() noex ;
-extern int	uc_getpwent(ucentpw *,char *,int) noex ;
-extern int	uc_getpwnam(ucentpw *,char *,int,cchar *) noex ;
-extern int	uc_getpwuid(ucentpw *,char *,int,uid_t) noex ;
-extern int	uc_getpwend() noex ;
+extern int	uc_getpwbegin	() noex ;
+extern int	uc_getpwent	(ucentpw *,char *,int) noex ;
+extern int	uc_getpwnam	(ucentpw *,char *,int,cchar *) noex ;
+extern int	uc_getpwuid	(ucentpw *,char *,int,uid_t) noex ;
+extern int	uc_getpwend	() noex ;
 
 EXTERNC_end
 
