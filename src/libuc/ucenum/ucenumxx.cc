@@ -44,8 +44,6 @@
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -60,11 +58,12 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 local inline int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
+    	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
-	    if ((op->fmp = new(nothrow) filemap) != nullptr) {
+	    op->magval = 0 ;
+	    if ((op->fmp = new(nt) filemap) != nullptr) {
 		rs = SR_OK ;
 	    } /* end if (new-filemap) */
 	} /* end if (non-null) */
@@ -78,7 +77,7 @@ local inline int ucenumxx_dtor(ucenumxx *op) noex {
 	    if (op->fmp) {
 		delete op->fmp ;
 		op->fmp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine ucenumxx_dtor) */
@@ -97,20 +96,19 @@ int ucenumxxbase::open(cchar *efname) noex {
 	if ((rs = ucenumxx_ctor(op,efname)) >= 0) {
 	    csize	nmax = INT_MAX ;
 	    if ((rs = filemap_open(fmp,efname,nmax)) >= 0) {
-	        magic = mxx ;
+	        magval = mxx ;
 	    }
 	    if (rs < 0) {
 		ucenumxx_dtor(op) ;
 	    }
 	} /* end if (ucenumxx_ctor) */
 	return rs ;
-}
-/* end if (ucenumxxbase::open) */
+} /* end if (ucenumxxbase::open) */
 
 int ucenumxxbase::close() noex {
 	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
-	if (op->magic == mxx) {
+	if (op->magval == mxx) {
 	    rs = SR_OK ;
 	    if (op->fmp) {
 		rs1 = filemap_close(op->fmp) ;
@@ -120,19 +118,17 @@ int ucenumxxbase::close() noex {
 		rs1 = ucenumxx_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-} 
-/* end subroutine (ucenumxxbase::close) */
+} /* end subroutine (ucenumxxbase::close) */
 
 int ucenumxxbase::reset() noex {
 	int		rs = SR_NOTOPEN ;
-	if (op->magic == mxx) {
+	if (op->magval == mxx) {
 	    rs = filemap_rewind(op->fmp) ;
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (ucenumxxbase::reset) */
+} /* end subroutine (ucenumxxbase::reset) */
 
 
