@@ -6,7 +6,7 @@
 /* open a file-system (?) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -33,14 +33,12 @@
 	int		opts ;
 
 	Arguments:
-
 	passfname	the pass filename
 	oflags		options to specify read-only or write-only
 	timeout		time-out
 	opts		options
 
 	Returns:
-
 	>=0		file descriptor to program STDIN and STDOUT
 	<0		error (system-error)
 
@@ -59,14 +57,15 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<permx.h>
 #include	<localmisc.h>
 
+#include	"ucopeninfo.h"
 
 /* local defines */
-
-#ifndef	NOFILE
-#define	NOFILE		20
-#endif
 
 #define	NENVS		100
 
@@ -89,29 +88,40 @@
 #define	DEFPATH		"/usr/bin:/bin"
 
 
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(char *,...) ;
-#endif
+extern "C" {
+    extern int dialpass(cchar *,int,int) noex ;
+}
 
 
 /* external variables */
 
 
-/* forward reference */
-
-local int	accmode(int) ;
-
-
-/* local variables */
+/* local structures */
 
 enum accmodes {
 	accmode_rdonly,
 	accmode_wronly,
 	accmode_rdwr,
 	accmode_overlast
-} ;
+} ; /* end enum (accmodes) */
+
+
+/* forward reference */
+
+local int	accmode(int) noex ;
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -119,10 +129,10 @@ enum accmodes {
 
 /* exported subroutines */
 
-int uc_openfs(cchar *passfname,int oflags,int timeout,int opts) noex {
+int uc_openfs(cchar *passfname,int oflags,int to,int opts) noex {
 	int		rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uc_openfs: passfname=%s\n",passfname) ;
 #endif
 
@@ -137,7 +147,7 @@ int uc_openfs(cchar *passfname,int oflags,int timeout,int opts) noex {
 	        passfname += 1 ;
 	    }
 	    if ((rs = perm(passfname,-1,-1,NULL,(W_OK))) >= 0) {
-	        rs = dialpass(passfname,timeout,opts) ;
+	        rs = dialpass(passfname,to,opts) ;
 	    }
 	}
 
