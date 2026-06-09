@@ -113,9 +113,9 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void		ucgetus_atforkbefore() noex ;
-    static void		ucgetus_atforkafter() noex ;
-    static void		ucgetus_exit() noex ;
+    local void		ucgetus_atforkbefore() noex ;
+    local void		ucgetus_atforkafter() noex ;
+    local void		ucgetus_exit() noex ;
 }
 
 
@@ -172,7 +172,7 @@ int ucgetus::init() noex {
 	        auto lamb = [this] () -> int {
 	            int		rsl = SR_OK ; /* GCC 'shadow' complaint */
 	            if (!finit) {
-		        rsl = SR_LOCKLOST ;		/* <- failure */
+		        rsl = SR_LOCKFAIL ;		/* <- failure */
 	            } else if (finitdone) {
 		        rsl = 1 ;			/* <- OK ready */
 	            }
@@ -288,17 +288,17 @@ int ucgetus::getusent(char *rbuf,int rlen) noex {
 }
 /* end subroutine (ucgetus::getusent) */
 
-static void ucgetus_atforkbefore() noex {
+local void ucgetus_atforkbefore() noex {
 	ucgetus_data.atforkbefore() ;
 }
 /* end subroutine (ucgetus_atforkbefore) */
 
-static void ucgetus_atforkafter() noex {
+local void ucgetus_atforkafter() noex {
 	ucgetus_data.atforkafter() ;
 }
 /* end subroutine (ucgetus_atforkafter) */
 
-static void ucgetus_exit() noex {
+local void ucgetus_exit() noex {
 	if (cint rs = ucgetus_data.fini() ; rs < 0) {
 	    ulogerror("ucgetus",rs,"exit-fini") ;
 	}
