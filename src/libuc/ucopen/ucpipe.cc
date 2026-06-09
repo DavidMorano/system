@@ -18,13 +18,16 @@
 /*******************************************************************************
 
 	Name:
-	uc_pipe2
+	uc_pipe
+	uc_pipes
+	uc_piper
 
 	Description:
 	Enhanced |pipe(2)|.
 
 	Synopsis:
-	int uc_pipe2(int pipes[2],int of) noex
+	int uc_pipe(int pipes[2]) noex
+	int uc_pipes(int pipes[2],int of) noex
 	int uc_piper(int pipes[2],int of,min) noex
 
 	Arguments:
@@ -72,17 +75,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
+#include	"ucpipe.h"
 
 /* local defines */
 
@@ -115,7 +120,11 @@ constexpr bool		f_pipes = F_PIPES ;
 
 /* exported subroutines */
 
-int uc_pipe2(int *pipes,int of) noex {
+int uc_pipe(int *pipes) noex {
+    	return u_pipe(pipes) ;
+}
+
+int uc_pipes(int *pipes,int of) noex {
 	int		rs ;
 	if_constexpr (f_pipes) {
 	    rs = u_pipe2(pipes,of) ;
@@ -141,10 +150,6 @@ int uc_pipe2(int *pipes,int of) noex {
 	return rs ;
 }
 /* end subroutine (uc_pipe2) */
-
-int uc_pipes(int *pipes,int of) noex {
-	return uc_pipe2(pipes,of) ;
-}
 
 int uc_piper(int *pipes,int of,int minfd) noex {
 	int		rs = SR_FAULT ;
