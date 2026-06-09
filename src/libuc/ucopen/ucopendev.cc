@@ -35,13 +35,18 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>		/* |uc_closeonexec(3uc)| */
 #include	<getx.h>
-#include	<opensysfs.h>
+#include	<opensysfs.hh>
 #include	<mkpathx.h>
 #include	<strn.h>		/* |strnchr(3c)| */
 #include	<strwcpy.h>
 #include	<matstr.h>
 #include	<localmisc.h>
+
+#include	"ucopeninfo.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -51,12 +56,11 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	OPENDEV_DEVDNAME	"/dev"
 
-#define	INETARGS	struct inetargs
-
 
 /* imported namespaces */
 
-using libuc::opensysfs ;
+using libuc::opensysfs ;		/* subroutine */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -77,7 +81,7 @@ extern "C" {
 struct argitem {
 	cchar		*p ;
 	int		l ;
-} ;
+} ; /* end struct */
 
 enum das {
 	da_proto,
@@ -85,12 +89,12 @@ enum das {
 	da_host,
 	da_svc,
 	da_overlast
-} ;
+} ; /* end struct */
 
 struct inetargs {
 	argitem		ia[da_overlast] ;
 	char		*a ;		/* memory allocation */
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -98,8 +102,8 @@ struct inetargs {
 local int opendev_default(cchar *,int,mode_t) noex ;
 local int opendev_inet(int,cchar *,int,int,int) noex ;
 
-local int inetargs_start(INETARGS *,cchar *,int) noex ;
-local int inetargs_finish(INETARGS *) noex ;
+local int inetargs_start(inetargs *,cchar *,int) noex ;
+local int inetargs_finish(inetargs *) noex ;
 
 
 /* local variables */
@@ -111,22 +115,22 @@ enum devnames {
 	devname_tcp,
 	devname_udp,
 	devname_overlast
-} ;
+} ; /* end enum */
 
-static cpcchar			devnames[] = {
+constexpr cpcchar		subnames[] = {
 	"users",
 	"groups",
 	"projects",
 	"tcp",
 	"udp",
 	nullptr
-} ;
+} ; /* end array */
 
-static const opensysdbs		whiches[] = {
+constexpr opensysdbs		whiches[] = {
 	opensysdb_usernames,
 	opensysdb_groupnames,
 	opensysdb_projectnames
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -135,55 +139,57 @@ static const opensysdbs		whiches[] = {
 /* exported subroutines */
 
 int uc_opendev(cchar *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
-	int		rs = SR_OK ;
-	int		fl = -1 ;
-	int		fi ;
-	int		f_more = false ;
-	cchar		*tp ;
+	int		rs = SR_FAULT ;
+	int		fd = -1 ; /* return-value */
 	(void) envv ;
 	(void) opts ;
-
-	if (fname == nullptr) return SR_FAULT ;
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	while (fname[0] == '/') fname += 1 ;
-
-	if ((tp = strchr(fname,'/')) != nullptr) {
-	    fl = intconv(tp - fname) ;
-	    while (fl && (fname[fl-1] == '/')) fl -= 1 ;
-	    while (tp[0] == '/') tp += 1 ;
-	    f_more = (tp[0] != '\0') ;
-	}
-
-	if ((fi = matstr(devnames,fname,fl)) >= 0) {
-	    switch (fi) {
-	    case devname_users:
-	    case devname_groups:
-	    case devname_projects:
-		{
-	            opensysdbs	w = whiches[fi] ;
-	            rs = opensysfs(w,of,-1) ;
-		}
-		break ;
-	    case devname_tcp:
-	    case devname_udp:
-		{
-		    if (f_more) {
-		        rs = opendev_inet(fi,fname,of,to,opts) ;
-		    } else {
-			rs = opendev_default(fname,of,om) ;
-		    }
-		}
-		break ;
-	    default:
-		rs = opendev_default(fname,of,om) ;
-		break ;
-	    } /* end switch */
-	} else {
-	    rs = opendev_default(fname,of,om) ;
-	}
-
-	return rs ;
+	if (fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		int fl = -1 ;
+		bool f_more = false ;
+	        while (fname[0] == '/') fname += 1 ;
+	        if (cchar*tp ; (tp = strchr(fname,'/')) != nullptr) {
+	            fl = intconv(tp - fname) ;
+	            while (fl && (fname[fl-1] == '/')) fl -= 1 ;
+	            while (tp[0] == '/') tp += 1 ;
+	            f_more = (tp[0] != '\0') ;
+	        } /* end if */
+	        if (int fi ; (fi = matstr(subnames,fname,fl)) >= 0) {
+	            switch (fi) {
+	            case devname_users:
+	            case devname_groups:
+	            case devname_projects:
+		        {
+	                    opensysdbs	w = whiches[fi] ;
+	                    rs = opensysfs(w,of,-1) ;
+			    fd = rs ;
+		        }
+		        break ;
+	            case devname_tcp:
+	            case devname_udp:
+		        {
+		            if (f_more) {
+		                rs = opendev_inet(fi,fname,of,to,opts) ;
+			        fd = rs ;
+		            } else {
+			        rs = opendev_default(fname,of,om) ;
+			        fd = rs ;
+		            }
+		        }
+		        break ;
+	            default:
+		        rs = opendev_default(fname,of,om) ;
+			fd = rs ;
+		        break ;
+	            } /* end switch */
+	        } else {
+	            rs = opendev_default(fname,of,om) ;
+		    fd = rs ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fd : rs ;;
 }
 /* end subroutine (uc_opendev) */
 
@@ -196,31 +202,27 @@ local int opendev_default(cchar *fname,int of,mode_t om) noex {
 	int		sz = 0 ;
 	int		fd = -1 ;
 	cchar		*devdname = OPENDEV_DEVDNAME ;
-	char		*fnbuf ;
-
 	sz += intconv(lenstr(devdname) + 1) ;
 	sz += 1 ;
 	sz += intconv(lenstr(fname) + 1) ;
 	sz += 1 ;
-	if ((rs = lm_mall(sz,&fnbuf)) >= 0) {
+	if (char *fnbuf ; (rs = lm_mall(sz,&fnbuf)) >= 0) {
 	    if ((rs = mkpath2(fnbuf,devdname,fname)) >= 0) {
 	        rs = u_open(fnbuf,of,om) ;
 		fd = rs ;
 	    }
 	    rs1 = lm_free(fnbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (opendev_default) */
 
 local int opendev_inet(int fi,cchar *fname,int of,int to,int ne) noex {
-	INETARGS	ia ;
+	inetargs	ia ;
 	int		rs ;
 	int		fd = -1 ;
-
 	if ((rs = inetargs_start(&ia,fname,-1)) >= 0) {
 	    cchar	*a = ia.ia[da_af].p ;
 	    cchar	*h = ia.ia[da_host].p ;
@@ -255,7 +257,7 @@ local int opendev_inet(int fi,cchar *fname,int of,int to,int ne) noex {
 }
 /* end subroutine (opendev_inet) */
 
-local int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
+local int inetargs_start(inetargs *iap,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (sl < 0) sl = lenstr(sp) ;
 	memclear(iap) ;
@@ -302,7 +304,7 @@ local int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
 	    } /* end for */
 	    for (int i = 0 ; i < da_overlast ; i += 1) {
 		sz += (iap->ia[i].p != nullptr) ? (iap->ia[i].l+1) : 1 ;
-	    }
+	    } /* end for */
 	    if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
 		cchar	*asp ;
 		iap->a = bp ;
@@ -315,14 +317,14 @@ local int inetargs_start(INETARGS *iap,cchar *sp,int sl) noex {
 		    }
 		    iap->ia[i].p = asp ;
 		} /* end for */
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end block */
 
 	return rs ;
 }
 /* end subroutine (inetargs_start) */
 
-local int inetargs_finish(INETARGS *iap) noex {
+local int inetargs_finish(inetargs *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iap->a != nullptr) {
