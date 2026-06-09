@@ -105,13 +105,13 @@ int ucenumpr_reset(ucenumpr *op) noex {
 
 int ucenumpr::readent(ucenumpr_ent *uap,char *uabuf,int ualen) noex {
 	return ucenumpr_readent(this,uap,uabuf,ualen) ;
-}
+} /* end method (ucenumpr::readent) */
 
 void ucenumpr::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumpr",rs,"fini-close") ;
 	}
-}
+} /* end method (ucenumpr::dtor) */
 
 int ucenumpr_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
@@ -123,8 +123,7 @@ int ucenumpr_op::operator () (cchar *fn) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumpr_op::operator) */
+} /* end method (ucenumpr_op::operator) */
 
 ucenumpr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -139,7 +138,6 @@ ucenumpr_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumpr_co::operator) */
+} /* end method (ucenumpr_co::operator) */
 
 
