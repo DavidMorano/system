@@ -98,6 +98,9 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<getaf.h>
 #include	<openshm.h>
 #include	<ascii.h>
@@ -122,9 +125,10 @@
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
+#include	<upt.h>
+#include	<dial.h>
 
-#include	"ucopen.h"
-#include	"upt.h"
+#include	"ucopeninfo.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -132,7 +136,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	SUBINFO		subinfo
+#define	SI		subinfo
 
 #define	TICOTSORDARGS	ticotsordargs
 
@@ -152,10 +156,6 @@ import libutil ;			/* |lenstr(3u)| */
 #define	REQBUFLEN	(4 * MAXPATHLEN)
 #endif
 
-#ifndef	POLL_INTMULT
-#define	POLL_INTMULT	1000
-#endif
-
 #ifndef	PORTSPEC_FINGER
 #define	PORTSPEC_FINGER	"finger"
 #endif
@@ -163,9 +163,6 @@ import libutil ;			/* |lenstr(3u)| */
 #ifndef	CHAR_ISEND
 #define	CHAR_ISEND(c)	(((c) == '\r') || ((c) == '\n'))
 #endif
-
-#undef	COLUMNS
-#define	COLUMNS		80		/* display columns for FINGER */
 
 #undef	COLBUFLEN
 #define	COLBUFLEN	((2*COLUMNS) + 1) /* must be *twice* COLUMN length */
@@ -176,7 +173,13 @@ import libutil ;			/* |lenstr(3u)| */
 #define	TO_DIAL		30
 #define	TO_READ		(1*60)
 
-#define	SI		SUBINFO
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -206,7 +209,7 @@ struct subinfo {
 	cchar		*pap ;		/* caller supplied (protocol-args) */
 	int		pnl ;
 	int		pal ;
-} ;
+} ; /* end struct */
 
 struct inetargs {
 	cchar		*protop ;	/* only specially used */
@@ -222,29 +225,29 @@ struct inetargs {
 	int		portl ;
 	int		svcl ;
 	int		f_args ;
-} ;
+} ; /* end struct */
 
 struct ticotsordargs {
 	storeitem	ss ;
 	cchar		*addr ;
 	cchar		*svc ;
 	int		c ;
-} ;
+} ; /* end struct */
 
 struct socktype {
 	int		proto ;
 	int		type ;
-} ;
+} ; /* end struct */
 
 struct spacename {
 	cchar		*name ;
 	int		af ;
-} ;
+} ; /* end struct */
 
 struct fingerargs {
 	int		nfd ;
 	int		cfd ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -312,9 +315,9 @@ enum protonames {
 	protoname_finger,
 	protoname_http,
 	protoname_overlast
-} ;
+} ; /* end enum (protonames) */
 
-static constexpr cpcchar	protonames[] = {
+constexpr cpcchar	protonames[] = {
 	"ticotsord",
 	"ticotsordnls",
 	"ticotsordmux",
@@ -338,7 +341,7 @@ static constexpr cpcchar	protonames[] = {
 /* exported subroutines */
 
 int uc_openproto(cchar *fname,int of,int to,int opts) noex {
-	SUBINFO		si ;
+	SI		si ;
 	int		rs = SR_OK ;
 	int		pni ;
 	int		pnl, pal ;
@@ -518,8 +521,7 @@ local int openproto_inet(SI *sip,int pni,cchar *ap,int to,int no) noex {
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openproto_inet) */
+} /* end subroutine (openproto_inet) */
 
 #if	CF_TICOTSORD
 local int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
@@ -584,8 +586,7 @@ local int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (openproto_ticotsord) */
+} /* end subroutine (openproto_ticotsord) */
 #else /* CF_TICOTSORD */
 /* ARGSUSED */
 local int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
@@ -598,8 +599,7 @@ local int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
 }
 #endif /* CF_TICOTSORD */
 
-local int openproto_ussmux(SI *sip,cchar *fpath,cchar *svc,
-		int to,int no) noex {
+local int openproto_ussmux(SI *sip,cc *fpath,cc *svc,int to,int no) noex {
 	int		rs = SR_OK ;
 	int		f_args = false ;
 	cchar		*tp ;
@@ -634,18 +634,16 @@ local int openproto_ussmux(SI *sip,cchar *fpath,cchar *svc,
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (openproto_ussmux) */
+} /* end subroutine (openproto_ussmux) */
 
 local int openproto_finger(SI *sip,cchar *sp,int of,int to) noex {
-	inetargs	a ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
 
 	if (hasBadOflags(of)) return SR_ROFS ;
 
-	if ((rs = inetargs_start(&a,sp)) >= 0) {
+	if (inetargs a ; (rs = inetargs_start(&a,sp)) >= 0) {
 	    if ((rs = getaf(a.afp)) >= 0) {
 	        cint	af = rs ;
 	        cchar		*psp = nullptr ;
@@ -684,8 +682,7 @@ local int openproto_finger(SI *sip,cchar *sp,int of,int to) noex {
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openproto_finger) */
+} /* end subroutine (openproto_finger) */
 
 local int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
 	int		rs = SR_FAULT ;
@@ -716,8 +713,7 @@ local int openproto_http(SI *sip,cchar *sp,int of,int to) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openproto_http) */
+} /* end subroutine (openproto_http) */
 
 local int inetargs_start(inetargs *iap,cchar *args) noex {
 	int		rs = SR_OK ;
@@ -759,11 +755,10 @@ local int inetargs_start(inetargs *iap,cchar *args) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (inetargs_start) */
+} /* end subroutine (inetargs_start) */
 
 local int inetargs_starter(inetargs *iap,cchar *sp) noex {
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	if ((rs = vecstr_start(&iap->args,4,vo)) >= 0) {
 	    cchar	*tp ;
@@ -790,8 +785,7 @@ local int inetargs_starter(inetargs *iap,cchar *sp) noex {
 	    }
 	} /* end if (vecstr_start) */
 	return rs ;
-}
-/* end subroutine (inetargs_starter) */
+} /* end subroutine (inetargs_starter) */
 
 local int inetargs_finish(inetargs *iap) noex {
 	int		rs = SR_OK ;
@@ -808,8 +802,7 @@ local int inetargs_finish(inetargs *iap) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (inetargs_finish) */
+} /* end subroutine (inetargs_finish) */
 
 local int inetargs_alloc(inetargs *iap) noex {
 	int		rs = SR_OK ;
@@ -861,10 +854,9 @@ local int inetargs_alloc(inetargs *iap) noex {
 	        bp = (strwcpy(bp,iap->svcp,iap->svcl) + 1) ;
 	        iap->svcp = cp ;
 	    }
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (inetargs_alloc) */
+} /* end subroutine (inetargs_alloc) */
 
 #if	CF_TICOTSORD
 
@@ -893,13 +885,11 @@ local int ticotsordargs_start(TICOTSORDARGS *tap,char *abuf,int alen,
 	    }
 	} /* end if (storeitem) */
 	return rs ;
-}
-/* end subroutine (ticotsordargs_start) */
+} /* end subroutine (ticotsordargs_start) */
 
 local int ticotsordargs_finish(TICOTSORDARGS *tap) noex {
 	return storeitem_finish(&tap->ss) ;
-}
-/* end subroutine (ticotsordargs_finish) */
+} /* end subroutine (ticotsordargs_finish) */
 
 local int ticotsordargs_load(TICOTSORDARGS *tap,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -914,8 +904,7 @@ local int ticotsordargs_load(TICOTSORDARGS *tap,cchar *sp,int sl) noex {
 	    } /* end switch */
 	} /* end if (non-zero-length string) */
 	return rs ;
-}
-/* end subroutine (ticotsordargs_load) */
+} /* end subroutine (ticotsordargs_load) */
 
 #endif /* CF_TICOTSORD */
 
@@ -986,8 +975,7 @@ local int dialfinger(inetargs *iap,cchar *psp,int af,int to,int of) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialfinger) */
+} /* end subroutine (dialfinger) */
 
 #if	CF_FINGERCLEAN
 #if	CF_FINGERBACK
@@ -1016,8 +1004,7 @@ local int fingerclean(int nfd) noex {
 	    }
 	} /* end if (pipe) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (fingerclean) */
+} /* end subroutine (fingerclean) */
 
 local int fingerworker(FINGERARGS *fap) noex {
 	filer		out, *ofp = &out ;
@@ -1046,8 +1033,7 @@ local int fingerworker(FINGERARGS *fap) noex {
 	u_close(cfd) ;
 	wlen &= INT_MAX ;
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (fingerworker) */
+} /* end subroutine (fingerworker) */
 
 local int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 		int cols,int ind,int to) noex {
@@ -1095,8 +1081,7 @@ local int fingerworker_loop(FINGERARGS *fap,filer *ofp,filer *ifp,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (fingerworker_loop) */
+} /* end subroutine (fingerworker_loop) */
 
 local int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
 		int ind,int ln,cc *sp,int sl) noex {
@@ -1164,10 +1149,9 @@ local int fingerworker_liner(FINGERARGS *fap,filer *ofp,int cols,
 	    } /* end while */
 	    rs1 = lm_free(cbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (memory-allocation) */
+	} /* end if (memory-acquire) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (fingerworker_liner) */
+} /* end subroutine (fingerworker_liner) */
 #else /* CF_FINGERBACK */
 local int fingerclean(cint fd) noex {
 	cmode		om = 0664 ;
@@ -1182,11 +1166,12 @@ local int fingerclean(cint fd) noex {
 	        cint		llen = LINEBUFLEN ;
 	        cint		clen = LINEBUFLEN ;
 	        int		sz = 0 ;
+		int		ai = 0 ;
 	        sz += (llen+1) ;
 	        sz += (clen+1) ;
 	        if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
-	            char	*lbuf = bp ;
-	            int		cbuf = (bp+(llen+1)) ;
+	            char	*lbuf = (bp + (ai++ * (llen + 1))) ;
+	            char	*cbuf = (bp + (ai++ * (llen + 1))) ;
 	            while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 	                int	len = rs ;
 	                if (hasmseol(lbuf,len)) {
@@ -1216,8 +1201,7 @@ local int fingerclean(cint fd) noex {
 	    if (rs < 0) u_close(nfd) ;
 	} /* end if (tmp-file) */
 	return (rs >= 0) ? nfd : rs ;
-}
-/* end subroutine (fingerclean) */
+} /* end subroutine (fingerclean) */
 #endif /* CF_FINGERBACK */
 #endif /* CF_FINGERCLEAN */
 
@@ -1237,8 +1221,7 @@ local int loadargs(vecstr *alp,cchar *sp) noex {
 	    rs = vecstr_add(alp,sp,-1) ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (loadargs) */
+} /* end subroutine (loadargs) */
 
 local int sockshut(int fd,int of) noex {
 	cint		am = (of & O_ACCMODE) ;
@@ -1252,8 +1235,7 @@ local int sockshut(int fd,int of) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end subroutine (sockshut) */
+} /* end subroutine (sockshut) */
 
 #if	CF_FINGERCLEAN
 
@@ -1275,8 +1257,7 @@ local int getline(int linelen,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-zero) */
 	return len ;
-}
-/* end subroutine (getline) */
+} /* end subroutine (getline) */
 
 local int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl) noex {
 	sbuf		d ;
@@ -1298,8 +1279,7 @@ local int mkexpandtab(char *dp,int dl,int ci,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkexpandtab) */
+} /* end subroutine (mkexpandtab) */
 
 #endif /* CF_FINGERBACK */
 
@@ -1309,8 +1289,7 @@ local bool hasmseol(cchar *lp,int ll) noex {
 	    f = ((lp[ll-2] == CH_CR) && (lp[ll-1] == CH_NL)) ;
 	}
 	return f ;
-}
-/* end subroutine (hasmseol) */
+} /* end subroutine (hasmseol) */
 
 local bool hasdirty(cchar *lp,int ll) noex {
 	int		ch ;
@@ -1321,8 +1300,7 @@ local bool hasdirty(cchar *lp,int ll) noex {
 	    if (f) break ;
 	} /* end for */
 	return f ;
-}
-/* end subroutine (hasdirty) */
+} /* end subroutine (hasdirty) */
 
 local bool isdirty(int ch) noex {
 	bool		f = false ;
