@@ -95,7 +95,7 @@ import usysconfitems ;
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
@@ -316,9 +316,10 @@ int usysconf::getvalcache(int req) noex {
 		if ((rs = getvalsys(req)) > 0) {
 		    udata.d[ii].store(rs,memord_relaxed) ;
 		}
-	    } else if (rs > 0) {
+	    } /* end if (filling cache) */
+	    if (rs >= 0) {
 		if (lp) *lp = long(rs) ;
-	    }
+	    } /* end if (result) */
 	} /* end if */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
