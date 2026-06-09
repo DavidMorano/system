@@ -50,7 +50,7 @@ enum ucenumpwmems {
 	ucenumpwmem_reset,
 	ucenumpwmem_close,
 	ucenumpwmem_overlast
-} ;
+} ; /* end enum */
 struct ucenumpw ;
 struct ucenumpw_op {
 	ucenumpw	*op = nullptr ;
@@ -84,14 +84,14 @@ struct ucenumpw : ucenumxx {
 	    open(this,ucenumpwmem_open) ;
 	    reset(this,ucenumpwmem_reset) ;
 	    close(this,ucenumpwmem_close) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ;
 	ucenumpw(const ucenumpw &) = delete ;
 	ucenumpw &operator = (const ucenumpw &) = delete ;
 	int readent(ucenumpw_ent *,char *,int) noex ;
 	void dtor() noex ;
 	destruct ucenumpw() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (ucenumpw) */
 #else	/* __cplusplus */
@@ -100,10 +100,10 @@ typedef UCENUMXX	ucenumpw ;
 
 EXTERNC_begin
 
-extern int ucenumpw_open(ucenumpw *,cchar *) noex ;
-extern int ucenumpw_close(ucenumpw *) noex ;
-extern int ucenumpw_readent(ucenumpw *,ucenumpw_ent *,char *,int) noex ;
-extern int ucenumpw_reset(ucenumpw *) noex ;
+extern int ucenumpw_open	(ucenumpw *,cchar *) noex ;
+extern int ucenumpw_close	(ucenumpw *) noex ;
+extern int ucenumpw_readent	(ucenumpw *,ucenumpw_ent *,char *,int) noex ;
+extern int ucenumpw_reset	(ucenumpw *) noex ;
 
 EXTERNC_end
 
