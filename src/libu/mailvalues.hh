@@ -36,13 +36,13 @@
 
 
 struct mailvalues {
-	static const int	nodenamemult ;
-	static const int	hostnamemult ;
-	static const int	mailaliaslen ;
+	static int	nodenamemult ;
+	static int	hostnamemult ;
+	static int	mailaliaslen ;
 } ; /* end struct (mailvalues) */
 
 
-extern const mailvalues		mailvalue ;
+extern mailvalues	mailvalue ;
 
 
 #endif /* __cplusplus (C++ only) */
