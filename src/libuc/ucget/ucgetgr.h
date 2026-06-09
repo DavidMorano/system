@@ -27,11 +27,11 @@
 
 EXTERNC_begin
 
-extern int	uc_getgrbegin() noex ;
-extern int	uc_getgrent(ucentgr *,char *,int) noex ;
-extern int	uc_getgrnam(ucentgr *,char *,int,cchar *) noex ;
-extern int	uc_getgrgid(ucentgr *,char *,int,gid_t) noex ;
-extern int	uc_getgrend() noex ;
+extern int	uc_getgrbegin	() noex ;
+extern int	uc_getgrent	(ucentgr *,char *,int) noex ;
+extern int	uc_getgrnam	(ucentgr *,char *,int,cchar *) noex ;
+extern int	uc_getgrgid	(ucentgr *,char *,int,gid_t) noex ;
+extern int	uc_getgrend	() noex ;
 
 EXTERNC_end
 
