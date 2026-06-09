@@ -33,59 +33,41 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |mode_t| ? */
-#include	<sys/socket.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<sys/types.h>		/* POSIX |mode_t| ? */
+#include	<sys/socket.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<ucopeninfo.h>
+#include	<ucopenprime.h>
+#include	<ucopensys.h>
+#include	<ucopensysdb.h>
+#include	<ucopenxsvc.h>
+#include	<ucpipe.h>
+#include	<ucclose.h>
 
 
 EXTERNC_begin
 
-extern int uc_open(cchar *,int,mode_t) noex ;
-extern int uc_opene(cchar *,int,mode_t,int) noex ;
-extern int uc_openenv(cchar *,int,mode_t,mainv,int) noex ;
-extern int uc_socket(int,int,int) noex ;
-extern int uc_dupmin(int,int) noex ;
-extern int uc_dupmince(int,int) noex ;
-extern int uc_accepte(int,SOCKADDR *,int *,int) noex ;
+extern int uc_accepte		(int,SOCKADDR *,int *,int) noex ;
 
-extern int uc_create(cchar *,mode_t) noex ;
-extern int uc_createfile(cchar *,mode_t) noex ;
-extern int uc_open(cchar *,int,mode_t) noex ;
-extern int uc_opene(cchar *,int,mode_t,int) noex ;
-extern int uc_openex(cchar *,int,mode_t,int,int) noex ;
-extern int uc_openenv(cchar *,int,mode_t,mainv,int) noex ;
-extern int uc_opensocket(cchar *,int,int) noex ;
-extern int uc_openproto(cchar *,int,int,int) noex ;
-extern int uc_openpass(cchar *,int,int,int) noex ;
-extern int uc_openuser(cchar *,cchar *,int,mode_t,int) noex ;
-extern int uc_openprog(cchar *,int,mainv,mainv) noex ;
-extern int uc_opendialer(cchar *,cchar *,int,mode_t,
-			mainv,mainv,int) noex ;
-extern int uc_openfsvc(cchar *,cchar *,cchar *,int,mode_t,
-			mainv,mainv,int) noex ;
-extern int uc_openusvc(cchar *,cchar *,cchar *,int,mode_t,
-			mainv,mainv,int) noex ;
-extern int uc_openfint(cchar *,cchar *,cchar *,
-			cchar *, cchar *, int,mode_t,
-			mainv,mainv,int) noex ;
-extern int uc_opensys(cchar *,int,mode_t,mainv,int,int) noex ;
-extern int uc_opendev(cchar *,int,mode_t,mainv,int,int) noex ;
-extern int uc_opensysdb(int,int,mode_t) noex ;
-extern int uc_openpt(int) noex ;
-extern int uc_openshm(cchar *,int,mode_t) noex ;
-extern int uc_openshmto(cchar *,int,mode_t,int) noex ;
-
-static inline int uc_dup(int fd) noex {
-	return uc_dupmin(fd,0) ;
-}
+extern int uc_create		(cchar *,mode_t) noex ;
+extern int uc_createfile	(cchar *,mode_t) noex ;
+extern int uc_openex		(cchar *,int,mode_t,int,int) noex ;
+extern int uc_opensocket	(cchar *,int,int) noex ;
+extern int uc_openproto		(cchar *,int,int,int) noex ;
+extern int uc_openpass		(cchar *,int,int,int) noex ;
+extern int uc_openuser		(cchar *,cchar *,int,mode_t,int) noex ;
+extern int uc_openprog		(cchar *,int,con mainv,con mainv) noex ;
+extern int uc_openprogerr	(cchar *,int,con mainv,con mainv,int *) noex ;
+extern int uc_opendialer	(cchar *,cchar *,int,mode_t,
+			con mainv,con mainv,int) noex ;
+extern int uc_opendev		(cchar *,int,mode_t,con mainv,int,int) noex ;
+extern int uc_openpt		(int) noex ;
+extern int uc_openshm		(cchar *,int,mode_t) noex ;
+extern int uc_openshmto		(cchar *,int,mode_t,int) noex ;
 
 EXTERNC_end
 
