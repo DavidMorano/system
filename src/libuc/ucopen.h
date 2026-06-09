@@ -33,12 +33,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |mode_t| ? */
-#include	<sys/socket.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX |mode_t| ? */
+#include	<sys/socket.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<ucopeninfo.h>
 #include	<ucopenprime.h>
