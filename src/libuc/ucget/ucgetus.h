@@ -26,9 +26,9 @@
 
 EXTERNC_begin
 
-extern int	uc_getusbegin() noex ;
-extern int	uc_getusent(char *,int) noex ;
-extern int	uc_getusend() noex ;
+extern int	uc_getusbegin	() noex ;
+extern int	uc_getusent	(char *,int) noex ;
+extern int	uc_getusend	() noex ;
 
 EXTERNC_end
 
