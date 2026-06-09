@@ -50,7 +50,7 @@ enum ucenumsvmems {
 	ucenumsvmem_reset,
 	ucenumsvmem_close,
 	ucenumsvmem_overlast
-} ;
+} ; /* end enum */
 struct ucenumsv ;
 struct ucenumsv_op {
 	ucenumsv	*op = nullptr ;
@@ -84,14 +84,14 @@ struct ucenumsv : ucenumxx {
 	    open(this,ucenumsvmem_open) ;
 	    reset(this,ucenumsvmem_reset) ;
 	    close(this,ucenumsvmem_close) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ;
 	ucenumsv(const ucenumsv &) = delete ;
 	ucenumsv &operator = (const ucenumsv &) = delete ;
 	int readent(ucenumsv_ent *,char *,int) noex ;
 	void dtor() noex ;
 	destruct ucenumsv() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (ucenumsv) */
 #else	/* __cplusplus */
@@ -100,10 +100,10 @@ typedef UCENUMXX	ucenumsv ;
 
 EXTERNC_begin
 
-extern int ucenumsv_open(ucenumsv *,cchar *) noex ;
-extern int ucenumsv_close(ucenumsv *) noex ;
-extern int ucenumsv_readent(ucenumsv *,ucenumsv_ent *,char *,int) noex ;
-extern int ucenumsv_reset(ucenumsv *) noex ;
+extern int ucenumsv_open	(ucenumsv *,cchar *) noex ;
+extern int ucenumsv_close	(ucenumsv *) noex ;
+extern int ucenumsv_readent	(ucenumsv *,ucenumsv_ent *,char *,int) noex ;
+extern int ucenumsv_reset	(ucenumsv *) noex ;
 
 EXTERNC_end
 
