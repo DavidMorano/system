@@ -6,7 +6,7 @@
 /* connect to a local program */
 /* version %I% last-modified %G% */
 
-#define	CF_ENVLOAD	0		/* |mkprogenv_load()| */
+#define	CF_ENVLOAD	0		/* |envmk_load()| */
 
 /* revision history:
 
@@ -20,12 +20,14 @@
 /*******************************************************************************
 
 	Name:
+	uc_openprogerr
 	uc_openprog
 
 	Description:
 	This is a dialer to connect to a local program.
 
 	Synopsis:
+	int uc_openprogerr(cc *fname,int of,mainv argv,mainv envv,int *fdp) noex
 	int uc_openprog(cc *fname,int of,mainv argv,mainv envv) noex
 
 	Arguments:
@@ -33,6 +35,7 @@
 	of		options to specify read-only or write-only
 	argv		arguments to program
 	envv		environment to program
+	fdp		pointer to resulting error-FD
 
 	Returns:
 	>=0		file descriptor to program STDIN and STDOUT
@@ -67,26 +70,37 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<getprogpath.h>
 #include	<estrings.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<mkx.h>
+#include	<mkpathxx.h>
 #include	<mkpathx.h>
-#include	<mkprogenv.h>
+#include	<envmk.h>
 #include	<spawnproc.h>
 #include	<permx.h>
 #include	<localmisc.h>
 
+#include	"ucopeninfo.h"
 
 /* local defines */
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern "C" {
-    extern int	mkpathuser(char *,cchar *,cchar *,int) noex ;
-}
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
+
+typedef const mainv	cmv ;
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -101,11 +115,11 @@ local int	mkepath(char *,cchar *) noex ;
 local int	mkfindpath(char *,cchar *) noex ;
 
 #if	CF_ENVLOAD
-local int	mkprogenv_load(MKPROGENV *,cchar *,mainv) noex ;
+local int	envmk_load(envmk *,cchar *,con mainv) noex ;
 #endif
 
-local int	openproger(cchar *,int,mainv,mainv,int *) noex ;
-local int	spawnit(cchar *,int,mainv,mainv,int *) noex ;
+local int	openprogs(cchar *,int,cmv,cmv,int *) noex ;
+local int	spawnit(cchar *,int,cmv,cmv,int *) noex ;
 
 local int	accmode(int) noex ;
 
@@ -117,7 +131,7 @@ enum accmodes {
 	accmode_wronly,
 	accmode_rdwr,
 	accmode_overlast
-} ;
+} ; /* end enum (accmodes) */
 
 
 /* exported variables */
@@ -125,29 +139,30 @@ enum accmodes {
 
 /* exported subroutines */
 
-int uc_openprogerr(cchar *pfn,int of,mainv argv,mainv envv,int *efdp) noex {
-	int		rs ;
-	int		fd = -1 ;
-
-	if (pfn == nullptr) return SR_FAULT ;
-
-	if (pfn[0] == '\0') return SR_INVALID ;
-
-	while ((pfn[0] == '/') && (pfn[1] == '/')) {
-	    pfn += 1 ;
-	}
-
-/* argument check */
-
-	if ((rs = accmode(of)) >= 0) {
-	    char	ebuf[MAXPATHLEN + 1] ;
-	    if ((rs = mkepath(ebuf,pfn)) >= 0) {
-		if (rs > 0) pfn = ebuf ;
-		rs = openproger(pfn,of,argv,envv,efdp) ;
-		fd = rs ;
-	    } /* end if (mkepath) */
-	} /* end if (accmode) */
-
+int uc_openprogerr(cchar *pfn,int of,cmv argv,cmv envv,int *efdp) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		fd = -1 ; /* return-value */
+	if (pfn && argv && envv) {
+	    rs = SR_INVALID ;
+	    if (pfn[0]) {
+	        while ((pfn[0] == '/') && (pfn[1] == '/')) {
+	            pfn += 1 ;
+	        } /* end while */
+	        /* argument check */
+	        if ((rs = accmode(of)) >= 0) {
+	            if (char *ebuf ;(rs = lm_mp(&ebuf)) >= 0) {
+	                if ((rs = mkepath(ebuf,pfn)) >= 0) {
+		            if (rs > 0) pfn = ebuf ;
+		            rs = openprogs(pfn,of,argv,envv,efdp) ;
+		            fd = rs ;
+	                } /* end if (mkepath) */
+			rs1 = lm_free(ebuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	        } /* end if (accmode) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (uc_openprogerr) */
@@ -161,38 +176,42 @@ int uc_openprog(cchar *pfn,int of,mainv argv,mainv envv) noex {
 /* local subroutines */
 
 local int mkepath(char *ebuf,cchar *pfn) noex {
+	cint		rsn = SR_NOENT ;
 	int		rs ;
-	int		el = 0 ;
-	if ((rs = mkvarpath(ebuf,pfn,-1)) >= 0) {
+	int		rs1 ;
+	int		el = 0 ; /* return-value */
+	if ((rs = mkpathvar(ebuf,pfn,-1)) >= 0) ylikely {
 	    if (rs > 0) {
 	        el = rs ;
 		pfn = ebuf ;
-	    }
+	    } /* end if (non-zero positive) */
 	    if (strncmp(pfn,"/u/",3) == 0) {
-	        char	tbuf[MAXPATHLEN+1] ;
-	        if ((rs = mkpathuser(tbuf,nullptr,pfn,-1)) > 0) {
-		    el = rs ;
-	            rs = mkpath1(ebuf,tbuf) ;
-	            pfn = ebuf ;
-		}
-	    }
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+		    if ((rs = mkpathuser(tbuf,nullptr,pfn,-1)) > 0) {
+		        el = rs ;
+	                rs = mkpath1(ebuf,tbuf) ;
+	                pfn = ebuf ;
+		    } /* end if (mkpathuser) */
+		    rs1 = lm_free(tbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (special) */
 	    if ((rs >= 0) && (strchr(pfn,'/') == nullptr)) {
-		cint	rsn = SR_NOENT ;
 		if ((rs = perm(pfn,-1,-1,nullptr,X_OK)) == rsn) {
-		    cchar	*tp ;
-		    if ((tp = strchr(pfn,':')) != nullptr) {
+		    if (cchar *tp ; (tp = strchr(pfn,':')) != nullptr) {
 			if (((tp-pfn) == 3) && (strncmp(pfn,"sys",3) == 0)) {
 			    pfn = (tp+1) ;
 			}
-		    }
+		    } /* end if */
+		    {
 		        rs = mkfindpath(ebuf,pfn) ;
 		        el = rs ;
+		    } /* end block */
 		} /* end if (perm) */
 	    } /* end if (ok) */
-	} /* end if (mkvarpath) */
+	} /* end if (mkpathexp) */
 	return (rs >= 0) ? el : rs ;
-}
-/* end subroutine (mkepath) */
+} /* end subroutine (mkepath) */
 
 local int mkfindpath(char *ebuf,cchar *pfn) noex {
 	ids		id ;
@@ -212,55 +231,52 @@ local int mkfindpath(char *ebuf,cchar *pfn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return (rs >= 0) ? el : rs ;
-}
-/* end subroutine (mkfindpath) */
+} /* end subroutine (mkfindpath) */
 
-local int openproger(cc *pfn,int of,mainv argv,mainv envv,int *efdp) noex {
+local int openprogs(cc *pfn,int of,cmv argv,cmv envv,int *efdp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (mkprogenv pe ; (rs = mkprogenv_start(&pe,envv)) >= 0) {
-	    if (mainv ev ; (rs = mkprogenv_getvec(&pe,&ev)) >= 0) {
+	if (envmk pe ; (rs = envmk_start(&pe,envv)) >= 0) {
+	    if (mainv ev ; (rs = envmk_getvec(&pe,&ev)) >= 0) {
 		rs = spawnit(pfn,of,argv,ev,efdp) ;
 		fd = rs ;
 	    }
-	    rs1 = mkprogenv_finish(&pe) ;
+	    rs1 = envmk_finish(&pe) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (mkprogenv) */
+	} /* end if (envmk) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openproger) */
+} /* end subroutine (openprogs) */
 
 #if	CF_ENVLOAD
-local int mkprogenv_load(MKPROGENV *pep,cchar *pfn,mainv argv) noex {
+local int envmk_load(envmk *pep,cchar *pfn,mainv argv) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mkprogenv_envset(pep,"_EF",pfn,-1)) >= 0) {
+	if ((rs = envmk_envset(pep,"_EF",pfn,-1)) >= 0) {
 	    int		al = -1 ;
 	    cchar	*ap = nullptr ;
 	    if (argv != nullptr) ap = argv[0] ;
 	    if (ap == nullptr) al = sfbasename(pfn,-1,&ap) ;
-	    if ((rs = mkprogenv_envset(pep,"_A0",ap,al)) >= 0) {
+	    if ((rs = envmk_envset(pep,"_A0",ap,al)) >= 0) {
 		cint	sulen = (lenstr(pfn)+22) ;
 		if (char *subuf ; (rs = lm_mall((sulen+1),&subuf)) >= 0) {
 		    if ((rs = ucpid) >= 0 {
 	    	        const pid_t	pid = rs ;
 	    	        if ((rs = snshellunder(subuf,sulen,pid,pfn)) > 0) {
-	        	    rs = mkprogenv_envset(pep,"_",subuf,rs) ;
+	        	    rs = envmk_envset(pep,"_",subuf,rs) ;
 	    	        }
 		    } /* end if (ucgetpid) */
 	    	    rs1 = lm_free(subuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
-	    } /* end if (mkprogenv_envset) */
-	} /* end if (mkprogenv_envset) */
+	    } /* end if (envmk_envset) */
+	} /* end if (envmk_envset) */
 	return rs ;
-}
-/* end subroutine (mkprogenv_load) */
+} /* end subroutine (envmk_load) */
 #endif /* CF_ENVLOAD */
 
-int spawnit(cchar *pfn,int of,mainv argv,mainv envv,int *fd2p) noex {
+int spawnit(cchar *pfn,int of,cmv argv,cmv envv,int *fd2p) noex {
 	int		rs ;
 	int		fd = -1 ;
 	if (int pout[2] ; (rs = uc_piper(pout,0,3)) >= 0) {
@@ -308,8 +324,7 @@ int spawnit(cchar *pfn,int of,mainv argv,mainv envv,int *fd2p) noex {
 	} /* end if (uc_piper) */
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (spawnit) */
+} /* end subroutine (spawnit) */
 
 local int accmode(int of) noex {
 	cint		am = (of & O_ACCMODE) ;
@@ -329,7 +344,6 @@ local int accmode(int of) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end subroutine (accmode) */
+} /* end subroutine (accmode) */
 
 
