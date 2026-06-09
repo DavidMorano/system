@@ -51,7 +51,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<getportnum.h>
 #include	<pwcache.h>
@@ -566,7 +566,7 @@ local int userports_procenter(UP *op,uid_t uid,cc *pn,cc *ps) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 	    var.usernamelen = rs ;
 	}
 	return rs ;
