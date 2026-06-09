@@ -134,6 +134,15 @@ struct strentry {
 
 /* forward references */
 
+template<typename ... Args>
+local inline int vecpstr_magic(vecpstr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == VECPSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (vecpstr_magic) */
+
 local int	vecpstr_ctor(vecpstr *) noex ;
 local int	vecpstr_dtor(vecpstr *) noex ;
 local int	vecpstr_setopts(vecpstr *,int) noex ;
@@ -146,15 +155,6 @@ local int	vecpstr_record(vecpstr *,cchar *) noex ;
 local int	vecpstr_reset(vecpstr *) noex ;
 local int	vecpstr_validx(vecpstr *,int) noex ;
 local void	vecpstr_arrsort(vecpstr *,vecpstr_vcmp) noex ;
-
-template<typename ... Args>
-local inline int vecpstr_magic(vecpstr *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) ylikely {
-	    rs = (op->magval == VECPSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (vecpstr_magic) */
 
 local int chunk_start(VPS_CH *,int) noex ;
 local int chunk_finish(VPS_CH *) noex ;
