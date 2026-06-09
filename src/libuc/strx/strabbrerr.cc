@@ -41,12 +41,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |ctdec(3u)| */
-#include	<ucodenames.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |ctdec(3u)| */
+#include	<ucodenames.h>		/* LIBU */
 #include	<localmisc.h>		/* |DECBUFLEN| */
 
 #include	"strabbrerr.h"
