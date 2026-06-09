@@ -51,7 +51,7 @@ enum ucenumuamems {
 	ucenumuamem_reset,
 	ucenumuamem_close,
 	ucenumuamem_overlast
-} ;
+} ; /* end enum */
 struct ucenumua ;
 struct ucenumua_op {
 	ucenumua	*op = nullptr ;
@@ -85,14 +85,14 @@ struct ucenumua : ucenumxx {
 	    open(this,ucenumuamem_open) ;
 	    reset(this,ucenumuamem_reset) ;
 	    close(this,ucenumuamem_close) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ;
 	ucenumua(const ucenumua &) = delete ;
 	ucenumua &operator = (const ucenumua &) = delete ;
 	int readent(ucenumua_ent *,char *,int) noex ;
 	void dtor() noex ;
 	destruct ucenumua() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (ucenumua) */
 #else	/* __cplusplus */
@@ -101,10 +101,10 @@ typedef UCENUMXX	ucenumua ;
 
 EXTERNC_begin
 
-extern int ucenumua_open(ucenumua *,cchar *) noex ;
-extern int ucenumua_close(ucenumua *) noex ;
-extern int ucenumua_readent(ucenumua *,ucenumua_ent *,char *,int) noex ;
-extern int ucenumua_reset(ucenumua *) noex ;
+extern int ucenumua_open	(ucenumua *,cchar *) noex ;
+extern int ucenumua_close	(ucenumua *) noex ;
+extern int ucenumua_readent	(ucenumua *,ucenumua_ent *,char *,int) noex ;
+extern int ucenumua_reset	(ucenumua *) noex ;
 
 EXTERNC_end
 
