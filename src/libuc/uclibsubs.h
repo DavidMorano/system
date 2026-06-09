@@ -62,12 +62,8 @@
 #include	<dirent.h>
 #include	<dstr.h>
 #include	<dupstr.h>
-#include	<envhelp.h>
-#include	<envlist.h>
-#include	<envmgr.h>
 #include	<envs.h>
-#include	<envstandards.h>	/* MUST be first to configure */
-#include	<envstandards.h>	/* ordered first to configure */
+#include	<envx.h>
 #include	<epsem.h>
 #include	<errno.h>
 #include	<estrings.h>
@@ -78,7 +74,6 @@
 #include	<filegrp.h>
 #include	<filemap.h>
 #include	<filer.h>
-#include	<findbit.h>
 #include	<findfilepath.h>
 #include	<findinline.h>
 #include	<findxfile.h>
@@ -86,7 +81,6 @@
 #include	<fsdir.h>
 #include	<fsdirtree.h>
 #include	<gecos.h>
-#include	<getbufsize.h>
 #include	<getexecname.h>
 #include	<gethe.h>
 #include	<getngroups.h>
@@ -133,12 +127,10 @@
 #include	<mkdirs.h>
 #include	<mkfile.h>
 #include	<mklogid.h>
-#include	<mkprogenv.h>
 #include	<mkdirs.h>
 #include	<mkfile.h>
 #include	<mklogid.h>
 #include	<mkpathxx.h>
-#include	<mkprogenv.h>
 #include	<mktmp.h>
 #include	<mkx.h>
 #include	<modload.h>
@@ -262,7 +254,6 @@
 #include	<ucgetpid.h>
 #include	<ucgetrandom.h>
 #include	<ucgetx.h>
-#include	<ucids.h>
 #include	<ucinetconv.h>
 #include	<uckvamatch.h>
 #include	<uclibmem.h>
