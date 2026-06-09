@@ -50,12 +50,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |sort(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |sort(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
 
 #include	"ucodenames.h"
 
