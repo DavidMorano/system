@@ -37,29 +37,29 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/utsname.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>		/* |S_IS{x}| + S_IF{x}| */
-#include	<limits.h>		/* |{xxx}_MIN| + |{xxx}_MAX| */
-#include	<signal.h>		/* |SIG{x}| */
-#include	<unistd.h>		/* |_SC_{x}| + |_PC_{x}| */
-#include	<fcntl.h>		/* |O_{x}| */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/utsname.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX |S_IS{x}| + S_IF{x}| */
+#include	<unistd.h>		/* POSIX |_SC_{x}| + |_PC_{x}| */
+#include	<fcntl.h>		/* POSIX |O_{x}| */
+#include	<limits.h>		/* CSTD |{xxx}_MIN| + |{xxx}_MAX| */
+#include	<signal.h>		/* CSTD |SIG{x}| */
 
 
 /* missing UNIX® signals */
-enum missingsignals {
-	missingsignal_pwr = 1000,
-	missingsignal_cancel,
-	missingsignal_lost,
-	missingsignal_waiting,
-	missingsignal_lwp,
-	missingsignal_freeze,
-	missingsignal_thaw,
-	missingsignal_rtmin,
-	missingsignal_rtmax,
-	missingsignal_overlast,
-	missingsignal_start = missingsignal_pwr
+enum missingsigs {
+	missingsig_synthetic = 1000,
+	missingsig_pwr,
+	missingsig_cancel,
+	missingsig_lost,
+	missingsig_waiting,
+	missingsig_lwp,
+	missingsig_freeze,
+	missingsig_thaw,
+	missingsig_rtmin,
+	missingsig_rtmax,
+	missingsig_overlast,
 } ; /* end enum */
 
 /* signal aliases */
@@ -87,31 +87,31 @@ enum missingsignals {
 #define	SIGPOLL		SIGIO
 #endif
 #ifndef	SIGPWR
-#define	SIGPWR		missingsignal_pwr
+#define	SIGPWR		missingsig_pwr
 #endif
 #ifndef	SIGCANCEL
-#define	SIGCANCEL	missingsignal_cancel
+#define	SIGCANCEL	missingsig_cancel
 #endif
 #ifndef	SIGLOST
-#define	SIGLOST		missingsignal_lost
+#define	SIGLOST		missingsig_lost
 #endif
 #ifndef	SIGWAITING
-#define	SIGWAITING	missingsignal_waiting
+#define	SIGWAITING	missingsig_waiting
 #endif
 #ifndef	SIGLWP
-#define	SIGLWP		missingsignal_lwp
+#define	SIGLWP		missingsig_lwp
 #endif
 #ifndef	SIGFREEZE
-#define	SIGFREEZE	missingsignal_freeze
+#define	SIGFREEZE	missingsig_freeze
 #endif
 #ifndef	SIGTHAW
-#define	SIGTHAW		missingsignal_thaw
+#define	SIGTHAW		missingsig_thaw
 #endif
 #ifndef	SIGRTMIN
-#define	SIGRTMIN	missingsignal_rtmin
+#define	SIGRTMIN	missingsig_rtmin
 #endif
 #ifndef	SIGRTMAX
-#define	SIGRTMAX	missingsignal_rtmax
+#define	SIGRTMAX	missingsig_rtmax
 #endif
 
 
