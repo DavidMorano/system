@@ -56,6 +56,8 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<errtimer.hh>
 #include	<posname.h>
 #include	<localmisc.h>
