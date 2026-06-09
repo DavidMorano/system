@@ -68,9 +68,11 @@
 
 /* exported variables */
 
-const int	mailvalues::nodenamemult =	NODENAMEMULT ;
-const int	mailvalues::hostnamemult =	HOSTNAMEMULT ;
-const int	mailvalues::mailaliaslen =	MAILALIASLEN ;
+int	mailvalues::nodenamemult =	NODENAMEMULT ;
+int	mailvalues::hostnamemult =	HOSTNAMEMULT ;
+int	mailvalues::mailaliaslen =	MAILALIASLEN ;
+
+mailvalues		mailvalue ;
 
 
 /* exported subroutines */
