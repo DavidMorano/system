@@ -1066,7 +1066,7 @@ void vecstr::dtor() noex {
 
 vecstr::operator int () noex {
     	int		rs = SR_NOTOPEN ;
-	if (n > 0) {
+	if (n >= 0) {
 	    rs = c ;
 	}
 	return rs ;
