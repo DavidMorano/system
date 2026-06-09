@@ -30,6 +30,8 @@ extern int	uc_openusvc(cc *,cc *,cc *,int,mode_t,
 			con mainv,con mainv,int) noex ;
 extern int	uc_openfsvc(cc *,cc *,cc *,int,mode_t,
 			con mainv,con mainv,int) noex ;
+extern int	uc_openisvc(cc *,cc *,cc *,int,mode_t,
+			con mainv,con mainv,int) noex ;
 
 EXTERNC_end
 
