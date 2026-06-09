@@ -35,7 +35,9 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<opensysfs.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<opensysfs.hh>
 #include	<ipasswd.h>
 #include	<strn.h>
 #include	<sfx.h>
@@ -43,6 +45,8 @@
 #include	<strwcmp.h>
 #include	<strx.h>
 #include	<localmisc.h>
+
+#include	"ucopensys.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -96,7 +100,7 @@ enum sysnames {
 	sysname_overlast
 } ; /* end enum (sysnames) */
 
-static constexpr cpcchar	sysname[] = {
+constexpr cpcchar	sysname[] = {
 	"userhomes",
 	"usernames",
 	"groupnames",
@@ -116,7 +120,7 @@ static constexpr cpcchar	sysname[] = {
 	nullptr
 } ;
 
-static const opensysdbs		whiches[] = {
+const opensysdbs		whiches[] = {
 	opensysdb_userhomes,
 	opensysdb_usernames,
 	opensysdb_groupnames,
@@ -191,8 +195,7 @@ int uc_opensys(cc *fname,int of,mode_t om,mainv envv,int to,int oo) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_opensys) */
+} /* end subroutine (uc_opensys) */
 
 
 /* local subroutines */
@@ -212,8 +215,8 @@ local int isRealName(cchar *fname,int fl) noex {
 			len = intconv(tp - fname) ;
 		    }
 		}
-	    }
-	}
+	    } /* end if (strnrchr) */
+	} /* end if (sfbasename) */
 	return len ;
 } /* end subroutine (isRealName) */
 
