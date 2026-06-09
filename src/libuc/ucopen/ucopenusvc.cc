@@ -112,14 +112,34 @@
 #include	<usyscalls.h>
 #include	<localmisc.h>
 
+#include	"ucopenxsvc.h"
+
+#pragma		GCC dependency		"mod/openxsvc.ccm"
+
 import openxsvc ;
 
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int uc_openxsvc(openxsvc *) noex ;
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
