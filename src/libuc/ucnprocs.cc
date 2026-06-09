@@ -164,7 +164,7 @@ procer::operator int () noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = setid()) >= 0) ylikely {
-	    if ((rs = var) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = var) >= 0) ylikely {
 		nlen = var.maxnamelen ;
 	        if ((rs = libmem.mall((nlen + 1),&nbuf)) >= 0) ylikely {
 		    {
