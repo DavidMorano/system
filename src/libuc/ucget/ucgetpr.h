@@ -27,11 +27,11 @@
 
 EXTERNC_begin
 
-extern int	uc_getprbegin(int) noex ;
-extern int	uc_getprent(ucentpr *,char *,int) noex ;
-extern int	uc_getprnam(ucentpr *,char *,int,cchar *) noex ;
-extern int	uc_getprnum(ucentpr *,char *,int,int) noex ;
-extern int	uc_getprend() noex ;
+extern int	uc_getprbegin	(int) noex ;
+extern int	uc_getprent	(ucentpr *,char *,int) noex ;
+extern int	uc_getprnam	(ucentpr *,char *,int,cchar *) noex ;
+extern int	uc_getprnum	(ucentpr *,char *,int,int) noex ;
+extern int	uc_getprend	() noex ;
 
 EXTERNC_end
 
