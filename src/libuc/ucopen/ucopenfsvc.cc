@@ -1,9 +1,10 @@
-/* ucopenxsvc (open-facility-service) */
+/* ucopenfsvc SUPPORT (open-facility-service) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open a facility-service */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,7 +19,7 @@
 /*******************************************************************************
 
   	Name:
-	uc_openxsvc
+	uc_openfsvc
 
 	Description:
 	This subroutine opens what is referred to as a "facility-service."
@@ -54,8 +55,8 @@
 	filesystem as symbolic links.
 
 	Synopsis:
-	int uc_openxsvc(cc *pr,cc *prn,cc *svc,int of,mode_t om,
-		mainv argv,mainv envv,int to) noex
+	int uc_openfsvc(cc *pr,cc *prn,cc *svc,int of,mode_t om,
+		con mainv argv,con mainv envv,int to) noex
 
 	Arguments:
 	pr		program-root
@@ -80,7 +81,7 @@
 	subroutine looks like:
 
 	int opensvc_<svc>(cc *pr,cc *prn,int of,mode_t om,
-		mainv argv,mainv envv,int to) noex
+		con mainv argv,con mainv envv,int to) noex
 
 	Multiple services can be actually implemented in the same
 	shared-object.  But the actual file of that object should
@@ -97,7 +98,12 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<ucopen.h>
 #include	<localmisc.h>
+
+#include	"ucopenxsvc.h"
+
+#pragma		GCC dependency		"mod/openxsvc.ccm"
 
 import openxsvc ;
 
@@ -106,20 +112,18 @@ import openxsvc ;
 
 /* external subroutines */
 
-extern int uc_openxsvc(openxsvc *) noex ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int uc_openxsvc(cc *pr,cc *prn,cc *svc,int of,mode_t om,
-		mainv argv,mainv envv,int to) noex {
+int uc_openfsvc(cc *pr,cc *prn,cc *svc,int of,mode_t om,
+		con mainv argv,con mainv envv,int to) noex {
     	openxsvc	os(pr,prn,svc,of,om,argv,envv,to) ;
 	os.prefix = "opensvc" ;
 	return uc_openxsvc(&os) ;
 }
-/* end subroutine (uc_openxsvc) */
+/* end subroutine (uc_openfsvc) */
 
 
