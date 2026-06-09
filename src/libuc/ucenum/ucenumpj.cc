@@ -105,13 +105,13 @@ int ucenumpj_reset(ucenumpj *op) noex {
 
 int ucenumpj::readent(ucenumpj_ent *uap,char *uabuf,int ualen) noex {
 	return ucenumpj_readent(this,uap,uabuf,ualen) ;
-}
+} /* end method (ucenumpj::readent) */
 
 void ucenumpj::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumpj",rs,"fini-close") ;
 	}
-}
+} /* end method (ucenumpj::dtor) */
 
 int ucenumpj_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
@@ -123,8 +123,7 @@ int ucenumpj_op::operator () (cchar *fn) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumpj_op::operator) */
+} /* end method (ucenumpj_op::operator) */
 
 ucenumpj_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -139,7 +138,6 @@ ucenumpj_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumpj_co::operator) */
+} /* end method (ucenumpj_co::operator) */
 
 
