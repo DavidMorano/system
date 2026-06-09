@@ -20,16 +20,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	mkfiledate(char *,cchar *,cchar *,mode_t) noex ;
-extern int	mkfilejob(char *,cchar *,mode_t) noex ;
-extern int	mkfileart(char *,cchar *,cchar *,int,mode_t) noex ;
+extern int	mkfiledate	(char *,cchar *,cchar *,mode_t) noex ;
+extern int	mkfilejob	(char *,cchar *,mode_t) noex ;
+extern int	mkfileart	(char *,cchar *,cchar *,int,mode_t) noex ;
 
 EXTERNC_end
 
