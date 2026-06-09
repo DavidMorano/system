@@ -28,13 +28,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBYC */
+#include	<ucdesc.h>		/* LIBYC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucopeninfo.h"
-#include	"ucopen.h"
+#include	"ucopenprime.h"
 
 
 /* local defines */
@@ -58,18 +62,18 @@
 /* exported subroutines */
 
 int uc_open(cchar *fn,int of,mode_t om) noex {
-	int		oo = 0 ;
+	cint		oo = 0 ;
 	return uc_openex(fn,of,om,-1,oo) ;
 }
 /* end subroutine (uc_open) */
 
 int uc_opene(cchar *fn,int of,mode_t om,int to) noex {
-	int		oo = 0 ;
+	cint		oo = 0 ;
 	return uc_openex(fn,of,om,to,oo) ;
 }
 /* end subroutine (uc_opene) */
 
-int uc_openenv(cchar *fn,int of,mode_t om,mainv ev,int to) noex {
+int uc_openenv(cchar *fn,int of,mode_t om,con mainv ev,int to) noex {
 	ucopeninfo	oi{} ;
 	oi.fname = fn ;
 	oi.oflags = of ;
