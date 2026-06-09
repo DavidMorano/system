@@ -26,7 +26,8 @@
 
 	Description:
 	This subroutine is similar to the standard library |getenv(3c)|
-	subroutine but uses a local environment array instead.
+	subroutine but uses a caller-supplied environment array
+	instead.
 
 	Synopsis:
 	cchar *getourenv(cchar *const *envv,cchar *key) noex
@@ -42,13 +43,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* <- |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getourenv.h"
 
@@ -76,7 +77,7 @@ using libu::matkeystr ;			/* subroutine */
 /* forward references */
 
 
-/* local varialbes */
+/* local variables */
 
 
 /* exported variables */
