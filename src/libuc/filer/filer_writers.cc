@@ -80,11 +80,11 @@
 	We provide some extra small function for special circumstances.
 
 	Synopsis:
-	int filer_writezero(FILER *bp,int size) noex
+	int filer_writezero(FILER *bp,int sz) noex
 
 	Arguments:
 	bp		FILER object pointer
-	size		amount of zeros to write
+	sz		amount of zeros to write
 
 	Returns:
 	>=0		number of bytes written
@@ -200,28 +200,26 @@ int filer_writefill(filer *op,cchar *sp,int sl) noex {
 	if ((rs = filer_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = (lenstr(sp) + 1) ;
 	    if ((rs = filer_write(op,sp,sl)) >= 0) {
-	        cint	asize = szof(int) ;
+	        cint	asz = szof(int) ;
 	        wlen = rs ;
-	        rs = filer_writealign(op,asize) ;
+	        rs = filer_writealign(op,asz) ;
 	        wlen += rs ;
-	    }
+	    } /* end if (filer_write) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (filer_writefill) */
 
-int filer_writealign(filer *op,int asize) noex {
+int filer_writealign(filer *op,int asz) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = filer_magic(op)) >= 0) ylikely {
 	    if (off_t foff ; (rs = filer_tell(op,&foff)) >= 0) ylikely {
-	        cint	r = int(foff & (asize - 1)) ;
-	        if (r > 0) {
-	            cint	nzero = (asize - r) ;
-	            if (nzero > 0) {
+	        if (cint r = int(foff & (asz - 1)) ; r > 0) {
+	            if (cint nzero = (asz - r) ; nzero > 0) {
 	                rs = filer_writezero(op,nzero) ;
 	                wlen += rs ;
-	            }
-	        }
+	            } /* end if (non-zero postive) */
+	        } /* end if (non-zero positive) */
 	    } /* end if (filer_tell) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
