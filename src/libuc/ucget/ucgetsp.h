@@ -27,10 +27,10 @@
 
 EXTERNC_begin
 
-extern int	uc_getspbegin() noex ;
-extern int	uc_getspent(ucentsp *,char *,int) noex ;
-extern int	uc_getspnam(ucentsp *,char *,int,cchar *) noex ;
-extern int	uc_getspend() noex ;
+extern int	uc_getspbegin	() noex ;
+extern int	uc_getspent	(ucentsp *,char *,int) noex ;
+extern int	uc_getspnam	(ucentsp *,char *,int,cchar *) noex ;
+extern int	uc_getspend	() noex ;
 
 EXTERNC_end
 
