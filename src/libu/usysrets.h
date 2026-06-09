@@ -229,47 +229,47 @@ enum missingerrnos {
 #endif
 
 #ifndef	EBADRPC         /* Apple-Darwin */
-#define EBADRPC         missingerrno_badrpc
+#define	EBADRPC         missingerrno_badrpc
 #endif
 #ifndef	ERPCMISMATCH	/* Apple-Darwin */
-#define ERPCMISMATCH    missingerrno_rpcmismatch
+#define	ERPCMISMATCH    missingerrno_rpcmismatch
 #endif
 #ifndef	EPROGUNAVAIL	/* Apple-Darwin */
-#define EPROGUNAVAIL    missingerrno_progunavail
+#define	EPROGUNAVAIL    missingerrno_progunavail
 #endif
 #ifndef	EPROGMISMATCH	/* Apple-Darwin */
-#define EPROGMISMATCH   missingerrno_progmismatch
+#define	EPROGMISMATCH   missingerrno_progmismatch
 #endif
 #ifndef	EPROCUNAVAIL	/* Apple-Darwin */
-#define EPROCUNAVAIL    missingerrno_procunavail
+#define	EPROCUNAVAIL    missingerrno_procunavail
 #endif
 
 #ifndef	EFTYPE		/* Apple-Darwin */
-#define EFTYPE          missingerrno_ftype
+#define	EFTYPE          missingerrno_ftype
 #endif
 #ifndef	EAUTH		/* Apple-Darwin */
-#define EAUTH           missingerrno_auth
+#define	EAUTH           missingerrno_auth
 #endif
 #ifndef	ENEEDAUTH	/* Apple-Darwin */
-#define ENEEDAUTH       missingerrno_needauth
+#define	ENEEDAUTH       missingerrno_needauth
 #endif
 #ifndef	EPWROFF		/* Apple-Darwin */
-#define EPWROFF         missingerrno_pwroff
+#define	EPWROFF         missingerrno_pwroff
 #endif
 #ifndef	EDEVERR		/* Apple-Darwin */
-#define EDEVERR         missingerrno_deverr
+#define	EDEVERR         missingerrno_deverr
 #endif
 #ifndef	EBADEXEC	/* Apple-Darwin */
-#define EBADEXEC        missingerrno_badexec
+#define	EBADEXEC        missingerrno_badexec
 #endif
 #ifndef	EBADARCH	/* Apple-Darwin */
-#define EBADARCH        missingerrno_badarch
+#define	EBADARCH        missingerrno_badarch
 #endif
 #ifndef	ESHLIBVERS	/* Apple-Darwin */
-#define ESHLIBVERS      missingerrno_shlibvers
+#define	ESHLIBVERS      missingerrno_shlibvers
 #endif
 #ifndef	EBADMACHO 	/* Apple-Darwin */
-#define EBADMACHO       missingerrno_shlibvers
+#define	EBADMACHO       missingerrno_shlibvers
 #endif
 
 #ifndef	EPROCLIM	/* Apple-Darin */
