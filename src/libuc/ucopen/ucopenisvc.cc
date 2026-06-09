@@ -109,7 +109,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<getbufsize.h>
 #include	<ids.h>
 #include	<sncpyx.h>
 #include	<mkx.h>			/* |mksofname(3uc)| */
