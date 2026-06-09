@@ -105,13 +105,13 @@ int ucenumua_reset(ucenumua *op) noex {
 
 int ucenumua::readent(ucenumua_ent *uap,char *uabuf,int ualen) noex {
 	return ucenumua_readent(this,uap,uabuf,ualen) ;
-}
+} /* end method (ucenumua::readent) */
 
 void ucenumua::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumua",rs,"fini-close") ;
 	}
-}
+} /* end method (ucenumua::dtor) */
 
 int ucenumua_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
@@ -123,8 +123,7 @@ int ucenumua_op::operator () (cchar *fn) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumua_op::operator) */
+} /* end method (ucenumua_op::operator) */
 
 ucenumua_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -139,7 +138,6 @@ ucenumua_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumua_co::operator) */
+} /* end method (ucenumua_co::operator) */
 
 
