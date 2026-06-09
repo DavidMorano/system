@@ -1,4 +1,4 @@
-/* varray SUPPORT */
+/* varray SUPPORT (Void-Array) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -33,6 +33,7 @@
 #include	<new>			/* C++STD |nothrow(3c++) */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<lookaside.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -73,9 +74,9 @@ local inline int varray_ctor(varray *op,Args ... args) noex {
 	    rs = SR_NOMEM ;
 	    op->va = nullptr ;
 	    op->esz = 0 ;
-	    op->c = 0 ;
-	    op->n = 0 ;
-	    op->imax = 0 ;
+	    op->cnt = 0 ;
+	    op->ext = 0 ;
+	    op->umax = 0 ;
 	    if ((op->lap = new(nothrow) lookaside) != nullptr) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-lookaside) */
@@ -117,7 +118,7 @@ int varray_start(varray *op,int esz,int n) noex {
 	        if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 	            memclear(vp,sz) ;
 	            op->va = (void **) vp ;
-	            op->n = n ;
+	            op->ext = n ;
 	            rs = lookaside_start(op->lap,esz,n) ;
 	            if (rs < 0) {
 	                libmem.free(vp) ;
@@ -154,14 +155,14 @@ int varray_finish(varray *op) noex {
 		rs1 = varray_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->c = 0 ;
-	    op->n = 0 ;
+	    op->cnt = 0 ;
+	    op->ext = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (varray_finish) */
 
-int varray_enum(varray *op,int i,void *rp) noex {
+int varray_enumer(varray *op,int i,void *rp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
@@ -169,7 +170,7 @@ int varray_enum(varray *op,int i,void *rp) noex {
 		rs = SR_INVALID ;
 	        if (i >= 0) ylikely {
 		    rs = SR_NOTFOUND ;
-	            if (i < (op->imax + 1)) {
+	            if (i < (op->umax + 1)) {
 	                if (op->va[i]) rs = 1 ; /* <- return-status */
 	            } /* end if */
 	            if (rp) {
@@ -181,7 +182,7 @@ int varray_enum(varray *op,int i,void *rp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (varray_enum) */
+/* end subroutine (varray_enumer) */
 
 int varray_acc(varray *op,int i,void *rp) noex {
 	int		rs = SR_FAULT ;
@@ -192,7 +193,7 @@ int varray_acc(varray *op,int i,void *rp) noex {
 	        if (i >= 0) ylikely {
 		    rs = SR_NOTFOUND ;
 		    void	*ep = nullptr ;
-	            if (i < op->n) {
+	            if (i < op->ext) {
 	                ep = (op->va)[i] ;
 	                rs = (ep != nullptr) ; /* <- return-status */
 	            } /* end if */
@@ -216,22 +217,22 @@ int varray_mk(varray *op,int i,void *rp) noex {
 		rs = SR_INVALID ;
 	        if (i >= 0) ylikely {
 		    rs = SR_OK ;
-	            if (i >= op->n) {
+	            if (i >= op->ext) {
 	                rs = varray_extend(op,i) ;
 	            }
 	            if ((rs >= 0) && op->va[i]) {
 	                void	*ep ;
 	                if ((rs = lookaside_get(op->lap,&ep)) >= 0) {
-	                    if (i > op->imax) op->imax = i ;
-	                    op->c += 1 ;
+	                    if (i > op->umax) op->umax = i ;
+	                    op->cnt += 1 ;
 	                    op->va[i] = ep ;
-			    c = op->c ;
+			    c = op->cnt ;
 	                }
 	            } /* end if */
 	            if (rp) {
 	                void	**rpp = (void **) rp ;
 	                *rpp = (rs >= 0) ? (op->va)[i] : nullptr ;
-	            }
+	            } /* end if */
 		} /* end if (valid) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -246,13 +247,13 @@ int varray_del(varray *op,int i) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 		rs = SR_INVALID ;
-	        if ((i > 0) && (i < op->n)) {
+	        if ((i > 0) && (i < op->ext)) {
 		    void	*ep = op->va[i] ;
 	            if (ep) {
 	                if ((rs = lookaside_release(op->lap,ep)) >= 0) {
 	                    op->va[i] = nullptr ;
-	                    op->c -= 1 ;
-		            c = op->c ;
+	                    op->cnt -= 1 ;
+		            c = op->cnt ;
 	                }
 	            }
 		} /* end if (valid) */
@@ -269,7 +270,7 @@ int varray_delall(varray *op) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 		rs = SR_OK ;
-	        for (int i = 0 ; i < op->n ; i += 1) {
+	        for (int i = 0 ; i < op->ext ; i += 1) {
 		    void	*ep = op->va[i] ;
 	    	    if (ep) {
 			rs1 = lookaside_release(op->lap,ep) ;
@@ -288,12 +289,33 @@ int varray_count(varray *op) noex {
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
-		rs = op->c ;
+		rs = op->cnt ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (varray_count) */
+
+int varray_find(varray *op,void *oep) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ;
+	if (op && oep) ylikely {
+	    rs = SR_NOTOPEN ;
+	    if (op->va) ylikely {
+		cint	esz = op->esz ;
+		for (i = 0 ; i < op->ext ; i += 1) {
+		    void	*ep = op->va[i] ;
+	            if (ep) {
+			csize	esize = size_t(esz) ;
+	                if (memcmp(oep,ep,esize) == 0) break ;
+		    }
+	        } /* end for */
+	        rs = (i < op->ext) ? SR_OK : SR_NOTFOUND ;
+	    } /* end if (open) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (varray_find) */
 
 int varray_search(varray *op,void *oep,varray_vcmp fvcmp,void *vrp) noex {
 	int		rs = SR_FAULT ;
@@ -303,13 +325,13 @@ int varray_search(varray *op,void *oep,varray_vcmp fvcmp,void *vrp) noex {
 	    if (op->va) ylikely {
 		void	**rpp = (void **) vrp ;
 		cvoid	*cep = (cvoid *) oep ;
-	        for (i = 0 ; i < op->n ; i += 1) {
+	        for (i = 0 ; i < op->ext ; i += 1) {
 	            if (op->va[i]) {
 			cvoid	**cva = (cvoid **) (op->va+i) ;
 	                if (fvcmp(&cep,cva) == 0) break ;
 	            }
 	        } /* end for */
-	        rs = (i < op->n) ? SR_OK : SR_NOTFOUND ;
+	        rs = (i < op->ext) ? SR_OK : SR_NOTFOUND ;
 	        if (rpp) {
 	            *rpp = (rs >= 0) ? op->va[i] : nullptr ;
 	        }
@@ -319,41 +341,20 @@ int varray_search(varray *op,void *oep,varray_vcmp fvcmp,void *vrp) noex {
 }
 /* end subroutine (varray_search) */
 
-int varray_find(varray *op,void *oep) noex {
-	int		rs = SR_FAULT ;
-	int		i = 0 ;
-	if (op && oep) ylikely {
-	    rs = SR_NOTOPEN ;
-	    if (op->va) ylikely {
-		cint	esz = op->esz ;
-		for (i = 0 ; i < op->n ; i += 1) {
-		    void	*ep = op->va[i] ;
-	            if (ep) {
-			csize	esize = size_t(esz) ;
-	                if (memcmp(oep,ep,esize) == 0) break ;
-		    }
-	        } /* end for */
-	        rs = (i < op->n) ? SR_OK : SR_NOTFOUND ;
-	    } /* end if (open) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (varray_find) */
-
 int varray_audit(varray *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
-	        for (int i = 0 ; i < op->n ; i += 1) {
+	        for (int i = 0 ; i < op->ext ; i += 1) {
 	            if (op->va[i]) {
 	                cint	*ip = (int *) op->va[i] ;
 	                c += 1 ;
 	                rs |= *ip ;		/* access might SEGFAULT */
 	            }
 	        } /* end for */
-	        rs = (c == op->c) ? SR_OK : SR_BADFMT ;
+	        rs = (c == op->cnt) ? SR_OK : SR_BADFMT ;
 	        if (rs >= 0) {
 	            rs = lookaside_audit(op->lap) ;
 	        }
@@ -368,13 +369,13 @@ int varray_audit(varray *op) noex {
 
 local int varray_extend(varray *op,int ni) noex {
 	int		rs = SR_OK ;
-	if (ni >= op->n) ylikely {
+	if (ni >= op->ext) {
 	    cint	ninc = VARRAY_DEFENTS ;
-	    cint	ndif = ((ni+1)-op->n) ;
+	    cint	ndif = ((ni + 1) - op->ext) ;
 	    int		nn ;
 	    int		sz ;
 	    void	*vp{} ; /* used-multiple */
-	    nn = (op->n + MAX(ndif,ninc)) ;
+	    nn = (op->ext + MAX(ndif,ninc)) ;
 	    sz = nn * szof(void **) ;
 	    if (op->va == nullptr) {
 	        if ((rs = libmem.mall(sz,&vp)) >= 0) {
@@ -382,20 +383,89 @@ local int varray_extend(varray *op,int ni) noex {
 	        } /* end if (memory-acquire) */
 	    } else {
 	        if ((rs = libmem.rall(op->va,sz,&vp)) >= 0) {
-	            void	**nva = (void **) vp ;
-	            cint	nndif = (nn-op->n) ;
+	            void	**nva = voidpp(vp) ;
+	            cint	nndif = (nn - op->ext) ;
 	            int		dsize ;
 	            dsize = (nndif * szof(void **)) ;
-	            memclear((nva+op->n),dsize) ;
+	            memclear((nva+op->ext),dsize) ;
 	            op->va = nullptr ;
 	        } /* end if (memory-acquire) */
 	    } /* end if */
 	    if (rs >= 0) {
-	        op->va = (void **) vp ;
-	        op->n = nn ;
-	    }
+	        op->va = voidpp(vp) ;
+	        op->ext = nn ;
+	    } /* end if (ok) */
 	} /* end if (re-allocation needed) */
 	return rs ;
 } /* end subroutine (varray_extend) */
+
+int varray::start(int sz,int en) noex {
+	return varray_start(this,sz,en) ;
+}
+
+int varray::enumer(int ii,void *rp) noex {
+	return varray_enumer(this,ii,rp) ;
+}
+
+int varray::acc(int ii,void *rp) noex {
+	return varray_acc(this,ii,rp) ;
+}
+
+int varray::mk(int ii,void *rp) noex {
+	return varray_mk(this,ii,rp) ;
+}
+
+int varray::del(int ai) noex {
+    	int		rs = SR_OK ;
+    	if (ai >= 0) {
+	    rs = varray_del(this,ai) ;
+	} else {
+	    rs = varray_delall(this) ;
+	}
+	return rs ;
+} /* emd method (varray::del) */
+
+int varray::find(void *oep) noex {
+	return varray_find(this,oep) ;
+}
+
+int varray::search(void *oep,varray_vcmp fvcmp,void *vrp) noex {
+	return varray_search(this,oep,fvcmp,vrp) ;
+}
+
+void varray::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("varray",rs,"fini-finish") ;
+	}
+} /* end method (varray::dtor) */
+
+varray::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (ext >= 0) {
+	    rs = cnt ;
+	}
+	return rs ;
+} /* end method (varray::operator) */
+
+varray_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case varraymem_count:
+	        rs = varray_count(op) ;
+	        break ;
+	    case varraymem_delall:
+	        rs = varray_delall(op) ;
+	        break ;
+	    case varraymem_audit:
+	        rs = varray_audit(op) ;
+	        break ;
+	    case varraymem_finish:
+	        rs = varray_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (varray_co::operator) */
 
 
