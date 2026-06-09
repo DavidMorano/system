@@ -105,13 +105,13 @@ int ucenumpw_reset(ucenumpw *op) noex {
 
 int ucenumpw::readent(ucenumpw_ent *uap,char *uabuf,int ualen) noex {
 	return ucenumpw_readent(this,uap,uabuf,ualen) ;
-}
+} /* end method (ucenumpw::readent) */
 
 void ucenumpw::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumpw",rs,"fini-close") ;
 	}
-}
+} /* end method (ucenumpw::dtor) */
 
 int ucenumpw_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
@@ -123,8 +123,7 @@ int ucenumpw_op::operator () (cchar *fn) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumpw_op::operator) */
+} /* end method (ucenumpw_op::operator) */
 
 ucenumpw_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -139,7 +138,6 @@ ucenumpw_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucenumpw_co::operator) */
+} /* end method (ucenumpw_co::operator) */
 
 
