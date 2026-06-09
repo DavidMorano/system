@@ -40,32 +40,31 @@ MODS +=
 LIBS +=
 
 
-OBJ00= mods.o ucopenmain.o ucaccepte.o
+OBJ00= mods.o ucopenprime.o ucaccepte.o
 OBJ01= ucopensysdb.o ucopenuser.o
 OBJ02= ucopeninfo.o ucopenpt.o 
 OBJ03= ucopensocket.o ucopensys.o
 
-OBJ04= ucopendev.o ucopendialer.o
-OBJ05= ucopenfint.o ucopenfsvc.o ucopenusvc.o
+OBJ04= uccreate.o ucpipe.o
+OBJ05= ucopendev.o ucopendialer.o
 OBJ06= ucopenfs.o ucopenpass.o
 OBJ07= ucopenprog.o ucopenproto.o
 
 OBJ08= ucopenshm.o
-OBJ09= uccreate.o
-OBJ10= ucopenxsvc.o
-OBJ11= 
+OBJ09= ucopenxsvc.o
+OBJ10= ucopenisvc.o ucopenfsvc.o ucopenusvc.o
+OBJ11=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
-OBJC= obj08.o obj09.o obj10.o 
+OBJC= obj08.o obj09.o obj10.o
 
-OBJ_UCOPEN= obja.o objb.o objc.o
+OBJ= obja.o objb.o objc.o
 
 
 INCDIRS=
 
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -111,8 +110,8 @@ all:			$(ALL)
 	makemodule $(*)
 
 
-$(T).o:			$(OBJ_UCOPEN)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_UCOPEN)
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -151,6 +150,7 @@ obj06.o:		$(OBJ06)
 obj07.o:		$(OBJ07)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+
 obj08.o:		$(OBJ08)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -177,7 +177,11 @@ objd.o:			$(OBJD)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ucopenmain.o:		ucopenmain.cc		$(INCS)
+obj.o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+ucopenprime.o:		ucopenprime.cc		$(INCS)
 ucaccepte.o:		ucaccepte.cc		$(INCS)
 ucopeninfo.o:		ucopeninfo.cc		$(INCS)
 ucopenpt.o:		ucopenpt.cc		$(INCS)
@@ -187,30 +191,31 @@ ucopensys.o:		ucopensys.cc		$(INCS)
 ucopensysdb.o:		ucopensysdb.cc		$(INCS)
 ucopenuser.o:		ucopenuser.cc		$(INCS)
 
-uccreate.o:		uccreate.cc		$(INCS)
-ucopendev.o:		ucopendev.cc		$(INCS)
-ucopendialer.o:		ucopendialer.cc		$(INCS)
-ucopenfs.o:		ucopenfs.cc		$(INCS)
-ucopenpass.o:		ucopenpass.cc		$(INCS)
-ucopenprog.o:		ucopenprog.cc		$(INCS)
-ucopenproto.o:		ucopenproto.cc		$(INCS)
+uccreate.o:		uccreate.cc				$(INCS)
+ucpipe.o:		ucpipe.cc	ucpipe.h		$(INCS)
+ucopendev.o:		ucopendev.cc				$(INCS)
+ucopendialer.o:		ucopendialer.cc				$(INCS)
+ucopenfs.o:		ucopenfs.cc				$(INCS)
+ucopenpass.o:		ucopenpass.cc				$(INCS)
+ucopenprog.o:		ucopenprog.cc				$(INCS)
+ucopenproto.o:		ucopenproto.cc				$(INCS)
 
-ucopenfsvc.o:		ucopenfsvc.cc openxsvc.ccm		$(INCS)
+ucopenfsvc.o:		ucopenfsvc.cc openxsvc.o		$(INCS)
 	makemodule openxsvc
-	$(COMPILE.cc) $(*).cc
+	$(COMPILE.cc) $<
 
-ucopenfint.o:		ucopenfint.cc openxsvc.ccm		$(INCS)
+ucopenisvc.o:		ucopenisvc.cc openxsvc.o		$(INCS)
 	makemodule openxsvc
-	$(COMPILE.cc) $(*).cc
+	$(COMPILE.cc) $<
 
-ucopenusvc.o:		ucopenusvc.cc openxsvc.ccm		$(INCS)
+ucopenusvc.o:		ucopenusvc.cc openxsvc.o		$(INCS)
 	makemodule openxsvc
-	$(COMPILE.cc) $(*).cc
+	$(COMPILE.cc) $<
 
 # UTILITY
-ucopenxsvc.o:		ucopenxsvc.cc openxsvc.ccm 		$(INCS)
+ucopenxsvc.o:		ucopenxsvc.cc openxsvc.o 		$(INCS)
 	makemodule openxsvc
-	$(COMPILE.cc) $(*).cc
+	$(COMPILE.cc) $<
 
 mods.o:			openxsvc.o
 	$(LD) -r $(LDFLAGS) -o $@ openxsvc.o
