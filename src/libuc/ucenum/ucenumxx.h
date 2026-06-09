@@ -42,8 +42,8 @@
 
 struct ucenumxx_head {
 	filemap		*fmp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 
@@ -67,7 +67,7 @@ struct ucenumxxco : ucenumxxbase {
 	    int		len = 0 ;
 	    if (op && ep && bp) {
 	        rs = SR_NOTOPEN ;
-	        if (op->magic == mxx) {
+	        if (op->magval == mxx) {
 		    cchar	*lp ;
 		    while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
 	    	        rs = ep->parse(bp,bl,lp,rs) ;
