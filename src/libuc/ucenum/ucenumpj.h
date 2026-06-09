@@ -50,7 +50,7 @@ enum ucenumpjmems {
 	ucenumpjmem_reset,
 	ucenumpjmem_close,
 	ucenumpjmem_overlast
-} ;
+} ; /* end enum */
 struct ucenumpj ;
 struct ucenumpj_op {
 	ucenumpj	*op = nullptr ;
@@ -84,14 +84,14 @@ struct ucenumpj : ucenumxx {
 	    open(this,ucenumpjmem_open) ;
 	    reset(this,ucenumpjmem_reset) ;
 	    close(this,ucenumpjmem_close) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ;
 	ucenumpj(const ucenumpj &) = delete ;
 	ucenumpj &operator = (const ucenumpj &) = delete ;
 	int readent(ucenumpj_ent *,char *,int) noex ;
 	void dtor() noex ;
 	destruct ucenumpj() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (ucenumpj) */
 #else	/* __cplusplus */
@@ -100,10 +100,10 @@ typedef UCENUMXX	ucenumpj ;
 
 EXTERNC_begin
 
-extern int ucenumpj_open(ucenumpj *,cchar *) noex ;
-extern int ucenumpj_close(ucenumpj *) noex ;
-extern int ucenumpj_readent(ucenumpj *,ucenumpj_ent *,char *,int) noex ;
-extern int ucenumpj_reset(ucenumpj *) noex ;
+extern int ucenumpj_open	(ucenumpj *,cchar *) noex ;
+extern int ucenumpj_close	(ucenumpj *) noex ;
+extern int ucenumpj_readent	(ucenumpj *,ucenumpj_ent *,char *,int) noex ;
+extern int ucenumpj_reset	(ucenumpj *) noex ;
 
 EXTERNC_end
 
