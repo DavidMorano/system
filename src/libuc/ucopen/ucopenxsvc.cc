@@ -1,9 +1,10 @@
-/* ucopenxsvc (open-facility-service) */
+/* ucopenxsvc SUPPORT (open-facility-service) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open a facility-service */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -55,7 +56,7 @@
 
 	Synopsis:
 	int uc_openxsvc(cc *pr,cc *prn,cc *svc,int of,mode_t om,
-		mainv argv,mainv envv,int to) noex
+		con mainv argv,con mainv envv,int to) noex
 
 	Arguments:
 	pr		program-root
@@ -102,7 +103,8 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<ids.h>
 #include	<sncpyx.h>
 #include	<mkx.h>			/* |mksofname(3uc)| */
@@ -111,6 +113,8 @@
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"ucopenxsvc.h"
 
 #pragma		GCC dependency		"mod/openxsvc.ccm"
 
@@ -124,11 +128,15 @@ import openxsvc ;
 
 /* imported namespaces */
 
+using libuc::libmem ;			/* variable */
+
 
 /* local typedefs */
 
+typedef const mainv	cmv ;
+
 extern "C" {
-    typedef int (*subsvc_f)(cc *,cc *,int,mode_t,mainv,mainv,int) noex ;
+    typedef int (*subsvc_f)(cc *,cc *,int,mode_t,cmv,cmv,int) noex ;
 }
 
 /* external subroutines */
@@ -141,12 +149,12 @@ extern "C" {
 
 struct subinfo_flags {
 	uint		dummy:1 ;
-} ;
+} ; /* end struct */
 
 namespace {
     struct subinfo : openxsvc {
-	subinfo(const openxsvc &so) noex : openxsvc(so) { } ;
-	subinfo(const openxsvc *sop) noex : openxsvc(sop) { } ;
+	subinfo(con openxsvc &so) noex : openxsvc(so) { } ;
+	subinfo(con openxsvc *sop) noex : openxsvc(sop) { } ;
 	mainv		envv ;
 	char		*basename ;	/* memory-allocated */
 	char		*svcdname ;	/* memory-allocated */
@@ -169,7 +177,7 @@ namespace {
 
 /* forward references */
 
-local int	subinfo_envv(DI *,mainv) noex ;
+local int	subinfo_envv(SI *,mainv) noex ;
 
 local bool	isNoAcc(int) noex ;
 
@@ -195,7 +203,7 @@ constexpr cint		rsnoacc[] = {
 
 /* exported subroutines */
 
-int uc_openxsvc(const openxsvc *oscp) noex {
+int uc_openxsvc(con openxsvc *oscp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ; /* return-value */
@@ -254,7 +262,7 @@ int subinfo::starts() noex {
 			lm_free(basename) ;
 			basename = nullptr ;
 		    } /* end if (error) */
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (sncpy) */
 	    rs = lm_rsfree(rs,bbuf) ;
 	} /* end if (m-a-f) */
@@ -263,7 +271,7 @@ int subinfo::starts() noex {
 
 int subinfo::startdir() noex {
     	int		rs ;
-	if (char *dbuf ; (rs = lm_lmp(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
 	    if ((rs = mkpath(dbuf,pr,"lib",basename)) >= 0) {
 	        cint	pl = rs ;
 		cchar	*pp = dbuf ;
@@ -276,7 +284,7 @@ int subinfo::startdir() noex {
 				lm_free(svcdname) ;
 				svcdname = nullptr ;
 			    } /* end if (error) */
-		        } /* end if (memory-allocation) */
+		        } /* end if (memory-acquire) */
 		    } else {
 	    	        rs = SR_NOTDIR ;
 		    }
@@ -293,7 +301,7 @@ int subinfo::startsym() noex {
 	    if ((rs = sncpy(sbuf,rs,prefix,"_",svc)) >= 0) {
 		if (cc *cp ; (rs = lm_strw(sbuf,rs,&cp)) >= 0) {
 		    dialsym = cast_const<charp>(cp) ;
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (sncpy) */
 	    rs = lm_rsfree(rs,sbuf) ;
 	} /* end if (m-a-f) */
@@ -403,8 +411,6 @@ local int subinfo_envv(subinfo *op,mainv envv) noex {
 	}
 	return rs ;
 } /* end subroutine (subinfo_envv) */
-
-
 
 local bool isNoAcc(int rs) noex {
 	return isOneOf(rsnoacc,rs) ;
