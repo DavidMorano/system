@@ -47,16 +47,25 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<syswords.hh>		/* |sysword(3u)| */
+#include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<sysdbfiles.h>		/* |sysdbfile(uc)| */
 #include	<mknpathx.h>
 #include	<localmisc.h>
 
+#include	"ucopensysdb.h"
+
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using libuc::libmem ;
 
 
 /* local typedefs */
@@ -99,7 +108,9 @@ int uc_opensysdb(sysdbfiles id,int oflags,mode_t operms) noex {
 		rs1 = lm_free(nbuf) ;
 		if (rs >= 0) rs = rs1 ;
 		{
-		    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
+		    if ((rs < 0) && (fd >= 0)) {
+			uc_close(fd) ;
+		    }
 		}
 	    } /* end if (m-a-f) */
 	} /* end if (valid) */
