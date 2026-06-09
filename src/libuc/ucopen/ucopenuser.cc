@@ -34,12 +34,15 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
+#include	<uclibmem.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
-#include	<opensysfs.h>
+#include	<opensysfs.hh>
 #include	<opensysdbs.h>
 #include	<snwcpy.h>
 #include	<mkpathx.h>
@@ -48,6 +51,8 @@
 #include	<strdcpy.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
+
+#include	"ucopeninfo.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -58,7 +63,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using libuc::opensysfs ;
+using libuc::opensysfs ;		/* subroutine */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -82,8 +88,8 @@ namespace {
 	int		maxpathlen ;
 	int		usernamelen ;
 	operator int () noex ;
-    } ; /* end struct vars) */
-}
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
@@ -106,8 +112,7 @@ int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to) noex {
 	if (un && upath) {
 	    rs = SR_INVALID ;
 	    if (un[0]) {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
 	            if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	                ucentpw		pw ;
 	                cint		pwlen = rs ;
@@ -234,13 +239,13 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(bufsize_un)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_un)) >= 0) {
 	        usernamelen = rs ;
 	    }
 	}
 	return rs ;
-}
+} /* end method (vars::operator) */
 
 
