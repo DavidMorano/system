@@ -27,12 +27,12 @@
 
 EXTERNC_begin
 
-extern int	uc_getpjbegin() noex ;
-extern int	uc_getpjent(ucentpj *,char *,int) noex ;
-extern int	uc_getpjnam(ucentpj *,char *,int,cchar *) noex ;
-extern int	uc_getpjpid(ucentpj *,char *,int,projid_t) noex ;
-extern int	uc_getpjdef(ucentpj *,char *,int,cchar *) noex ;
-extern int	uc_getpjend() noex ;
+extern int	uc_getpjbegin	() noex ;
+extern int	uc_getpjent	(ucentpj *,char *,int) noex ;
+extern int	uc_getpjnam	(ucentpj *,char *,int,cchar *) noex ;
+extern int	uc_getpjpid	(ucentpj *,char *,int,projid_t) noex ;
+extern int	uc_getpjdef	(ucentpj *,char *,int,cchar *) noex ;
+extern int	uc_getpjend	() noex ;
 
 EXTERNC_end
 
