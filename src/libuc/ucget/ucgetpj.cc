@@ -123,7 +123,7 @@ namespace {
 
 /* forward references */
 
-static constexpr bool bit(uint v,int b) noex {
+constexpr bool bit(uint v,int b) noex {
 	return bool((v >> b) & 1) ;
 }
 
@@ -319,7 +319,7 @@ int ucgetpj::getpj_def(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
-		if (rs == SR_BADF) rs = SR_NOENT ;
+	   if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
 }
