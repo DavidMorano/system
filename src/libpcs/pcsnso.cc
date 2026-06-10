@@ -44,7 +44,7 @@
 #include	<uclibmem.h>
 #include	<getpx.h>
 #include	<getpwx.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
 #include	<getax.h>
 #include	<estrings.h>
@@ -447,7 +447,7 @@ local int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr)
 {
 	int		rs ;
 
-	if ((rs = getbufsize(bufsize_pw)) >= 0) {
+	if ((rs = bufsizeget(bufsize_pw)) >= 0) {
 	    cint	pwlen = rs ;
 	    int		size = 0 ;
 	    char	*bp ;
@@ -461,7 +461,7 @@ local int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr)
 	        op->pr = bp ;
 	        strwcpy(bp,pr,-1) ;
 	    } /* end if (m-a) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 
 	return rs ;
 }
@@ -1018,7 +1018,7 @@ local int getprojinfo_sysdb(SI *sip) noex {
 	debugprintf("pcsgetnames/getprojinfo_sysdb: un=%d\n",sip->un) ;
 #endif
 
-	if ((rs = getbufsize(bufsize_pj)) >= 0) {
+	if ((rs = bufsizeget(bufsize_pj)) >= 0) {
 	    PROJECT	pj ;
 	    cint	pjlen = rs ;
 	    char	*pjbuf ;
@@ -1044,7 +1044,7 @@ local int getprojinfo_sysdb(SI *sip) noex {
 	        rs1 = lm_free(pjbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 
 #if	CF_DEBUGS
 	debugprintf("pcsgetnames/getprojinfo_sysdb: rs=%d len=%u\n",rs,len) ;
