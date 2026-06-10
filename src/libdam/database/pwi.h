@@ -21,9 +21,9 @@
 #include	<ipasswd.h>
 
 
-#define	PWI_MAGIC	0x99889998
 #define	PWI		struct pwi_head
 #define	PWI_CUR		struct pwi_cursor
+#define	PWI_MAGIC	0x99889998
 
 
 struct pwi_cursor {
