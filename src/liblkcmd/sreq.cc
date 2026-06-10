@@ -33,13 +33,13 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mallocxx.h>
 #include	<estrings.h>
 #include	<mktmp.h>
@@ -52,6 +52,9 @@
 #include	"sreq.h"
 #include	"mfslocinfo.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -69,10 +72,12 @@
 
 /* local typedefs */
 
-typedef int	(*objstart_t)(void *,cchar *,SREQ *,cchar **,cchar **) noex ;
-typedef int	(*objcheck_t)(void *) noex ;
-typedef int	(*objabort_t)(void *) noex ;
-typedef int	(*objfinish_t)(void *) noex ;
+extern "C" {
+    typedef int	(*objstart_t)(void *,cchar *,SREQ *,cchar **,cchar **) noex ;
+    typedef int	(*objcheck_t)(void *) noex ;
+    typedef int	(*objabort_t)(void *) noex ;
+    typedef int	(*objfinish_t)(void *) noex ;
+}
 
 
 /* external subroutines */
