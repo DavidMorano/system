@@ -84,8 +84,8 @@
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<mallocxx.h>
 #include	<linebuffer.h>
 #include	<ascii.h>
