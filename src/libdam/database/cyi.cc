@@ -41,7 +41,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -56,7 +56,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<endian.h>
 #include	<ids.h>
 #include	<storebuf.h>
@@ -126,7 +126,7 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static int cyi_ctor(cyi *op,Args ... args) noex {
+local int cyi_ctor(cyi *op,Args ... args) noex {
     	CYI		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
@@ -135,7 +135,7 @@ static int cyi_ctor(cyi *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (cyi_ctor) */
 
-static int cyi_dtor(cyi *op) noex {
+local int cyi_dtor(cyi *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -144,7 +144,7 @@ static int cyi_dtor(cyi *op) noex {
 } /* end subroutine (cyi_dtor) */
 
 template<typename ... Args>
-static inline int cyi_magic(cyi *op,Args ... args) noex {
+local inline int cyi_magic(cyi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == CYI_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -152,31 +152,31 @@ static inline int cyi_magic(cyi *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (cyi_magic) */
 
-static int	cyi_dbfind(cyi *,time_t,cchar *,cchar *,int) noex ;
-static int	cyi_dbfindname(cyi *,ids *,time_t,char *,cc *,cc *,int) noex ;
-static int	cyi_dbfindone(cyi *,time_t,cchar *,cchar *) noex ;
-static int	cyi_dblose(cyi *) noex ;
+local int	cyi_dbfind(cyi *,time_t,cchar *,cchar *,int) noex ;
+local int	cyi_dbfindname(cyi *,ids *,time_t,char *,cc *,cc *,int) noex ;
+local int	cyi_dbfindone(cyi *,time_t,cchar *,cchar *) noex ;
+local int	cyi_dblose(cyi *) noex ;
 
-static int	cyi_loadbegin(cyi *,time_t,cchar *) noex ;
-static int	cyi_loadend(cyi *) noex ;
-static int	cyi_mapcreate(cyi *,time_t,cchar *) noex ;
-static int	cyi_mapdestroy(cyi *) noex ;
-static int	cyi_proc(cyi *,time_t) noex ;
-static int	cyi_verify(cyi *,time_t) noex ;
-static int	cyi_auditvt(cyi *) noex ;
-static int	cyi_checkupdate(cyi *,time_t) noex ;
-static int	cyi_loadbve(cyi *,cyi_ent *,char *,int,uint *) noex ;
+local int	cyi_loadbegin(cyi *,time_t,cchar *) noex ;
+local int	cyi_loadend(cyi *) noex ;
+local int	cyi_mapcreate(cyi *,time_t,cchar *) noex ;
+local int	cyi_mapdestroy(cyi *) noex ;
+local int	cyi_proc(cyi *,time_t) noex ;
+local int	cyi_verify(cyi *,time_t) noex ;
+local int	cyi_auditvt(cyi *) noex ;
+local int	cyi_checkupdate(cyi *,time_t) noex ;
+local int	cyi_loadbve(cyi *,cyi_ent *,char *,int,uint *) noex ;
 
-static int	cyi_bsearch(cyi *,uint (*)[5],int,uint *) noex ;
-static int	cyi_lsearch(cyi *,uint (*)[5],int,uint *) noex ;
+local int	cyi_bsearch(cyi *,uint (*)[5],int,uint *) noex ;
+local int	cyi_lsearch(cyi *,uint (*)[5],int,uint *) noex ;
 
-static int	mkydname(char *,cchar *,int) noex ;
-static int	mkcitekey(uint *,cyi_q *) noex ;
-static int	vtecmp(cvoid *,cvoid *) noex ;
+local int	mkydname(char *,cchar *,int) noex ;
+local int	mkcitekey(uint *,cyi_q *) noex ;
+local int	vtecmp(cvoid *,cvoid *) noex ;
 
 #if	CF_ISOUR
-static bool	isOurSuffix(cchar *,cchar *) noex ;
-static bool	isNotOurFile(int) noex ;
+local bool	isOurSuffix(cchar *,cchar *) noex ;
+local bool	isNotOurFile(int) noex ;
 #endif
 
 
@@ -392,7 +392,7 @@ int cyi_curenum(cyi *op,cyi_cur *curp,cyi_ent *bvep,char *ebuf,int elen) noex {
 
 /* private subroutines */
 
-static int cyi_dbfind(cyi *op,time_t dt,cchar *dname,cchar *cname,int y) noex {
+local int cyi_dbfind(cyi *op,time_t dt,cchar *dname,cchar *cname,int y) noex {
 	int		rs ;
 	int		rs1 ;
 	int		tl = 0 ;
@@ -410,10 +410,9 @@ static int cyi_dbfind(cyi *op,time_t dt,cchar *dname,cchar *cname,int y) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return (rs >= 0) ? tl : rs ;
-}
-/* end subroutine (cyi_dbfind) */
+} /* end subroutine (cyi_dbfind) */
 
-static int cyi_dbfindname(cyi *op,ids *idp,time_t dt,char *tbuf,
+local int cyi_dbfindname(cyi *op,ids *idp,time_t dt,char *tbuf,
 		cchar *dname,cchar *cal,int y) noex {
 	int		rs ;
 	int		tl = 0 ;
@@ -445,10 +444,9 @@ static int cyi_dbfindname(cyi *op,ids *idp,time_t dt,char *tbuf,
 	    rs = rsfree(rs,a) ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? tl : rs ;
-}
-/* end subroutine (cyi_dbfindname) */
+} /* end subroutine (cyi_dbfindname) */
 
-static int cyi_dbfindone(cyi *op,time_t dt,cchar *cal,cchar *tmpfname) noex {
+local int cyi_dbfindone(cyi *op,time_t dt,cchar *cal,cchar *tmpfname) noex {
 	cyi_fmi		*mip = &op->fmi ;
 	cyihdr		*hip = &op->fhi ;
 	int		rs ;
@@ -463,10 +461,9 @@ static int cyi_dbfindone(cyi *op,time_t dt,cchar *cal,cchar *tmpfname) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (cyi_dbfindone) */
+} /* end subroutine (cyi_dbfindone) */
 
-static int cyi_dblose(cyi *op) noex {
+local int cyi_dblose(cyi *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -479,10 +476,9 @@ static int cyi_dblose(cyi *op) noex {
 	    op->fname = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (cyi_dblose) */
+} /* end subroutine (cyi_dblose) */
 
-static int cyi_loadbegin(cyi *op,time_t dt,cchar *fname) noex {
+local int cyi_loadbegin(cyi *op,time_t dt,cchar *fname) noex {
 	int		rs ;
 	int		fsize = 0 ;
 	if ((rs = cyi_mapcreate(op,dt,fname)) >= 0) {
@@ -493,10 +489,9 @@ static int cyi_loadbegin(cyi *op,time_t dt,cchar *fname) noex {
 	    }
 	}
 	return (rs >= 0) ? fsize : rs ;
-}
-/* end subroutine (cyi_loadbegin) */
+} /* end subroutine (cyi_loadbegin) */
 
-static int cyi_loadend(cyi *op) noex {
+local int cyi_loadend(cyi *op) noex {
 	cyi_fmi		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -510,10 +505,9 @@ static int cyi_loadend(cyi *op) noex {
 	    mip->lt = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (cyi_loadend) */
+} /* end subroutine (cyi_loadend) */
 
-static int cyi_mapcreate(cyi *op,time_t dt,cchar *fname) noex {
+local int cyi_mapcreate(cyi *op,time_t dt,cchar *fname) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
@@ -543,10 +537,9 @@ static int cyi_mapcreate(cyi *op,time_t dt,cchar *fname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file) */
 	return (rs >= 0) ? fsize : rs ;
-}
-/* end subroutine (cyi_mapcreate) */
+} /* end subroutine (cyi_mapcreate) */
 
-static int cyi_mapdestroy(cyi *op) noex {
+local int cyi_mapdestroy(cyi *op) noex {
 	cyi_fmi		*mip = &op->fmi ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -560,10 +553,9 @@ static int cyi_mapdestroy(cyi *op) noex {
 	    mip->ti_map = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (cyi_mapdestroy) */
+} /* end subroutine (cyi_mapdestroy) */
 
-static int cyi_checkupdate(cyi *op,time_t dt) noex {
+local int cyi_checkupdate(cyi *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (op->ncursors == 0) {
@@ -584,10 +576,9 @@ static int cyi_checkupdate(cyi *op,time_t dt) noex {
 	    } /* end if (timed out) */
 	} /* end if (no cursors out) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (cyi_checkupdate) */
+} /* end subroutine (cyi_checkupdate) */
 
-static int cyi_proc(cyi *op,time_t dt) noex {
+local int cyi_proc(cyi *op,time_t dt) noex {
 	cyi_fmi		*mip = &op->fmi ;
 	cyihdr		*hip = &op->fhi ;
 	int		rs ;
@@ -601,10 +592,9 @@ static int cyi_proc(cyi *op,time_t dt) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (cyi_proc) */
+} /* end subroutine (cyi_proc) */
 
-static int cyi_verify(cyi *op,time_t dt) noex {
+local int cyi_verify(cyi *op,time_t dt) noex {
 	cyi_fmi		*mip = &op->fmi ;
 	cyihdr		*hip = &op->fhi ;
 	uint		utime = (uint) dt ;
@@ -633,10 +623,9 @@ static int cyi_verify(cyi *op,time_t dt) noex {
 	    rs = SR_BADFMT ;
 	}
 	return rs ;
-}
-/* end subroutine (cyi_verify) */
+} /* end subroutine (cyi_verify) */
 
-static int cyi_auditvt(cyi *op) noex {
+local int cyi_auditvt(cyi *op) noex {
 	cyi_fmi		*mip = &op->fmi ;
 	cyihdr		*hip = &op->fhi ;
 	uint		(*vt)[5] ;
@@ -663,10 +652,9 @@ static int cyi_auditvt(cyi *op) noex {
 	    }
 	} /* end for (record table entries) */
 	return rs ;
-}
-/* end subroutine (cyi_auditvt) */
+} /* end subroutine (cyi_auditvt) */
 
-static int cyi_bsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
+local int cyi_bsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
 	int		rs = SR_FAULT ;
 	int		vi = 0 ;
 	if (op) ylikely {
@@ -683,10 +671,9 @@ static int cyi_bsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (cyi_bsearch) */
+} /* end subroutine (cyi_bsearch) */
 
-static int cyi_lsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
+local int cyi_lsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
 	int		rs = SR_FAULT ;
 	int		vi = 0 ; /* used-afterwards */
 	if (op) ylikely {
@@ -697,10 +684,9 @@ static int cyi_lsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
 	    rs = (vi < vtlen) ? vi : SR_NOTFOUND ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (cyi_lsearch) */
+} /* end subroutine (cyi_lsearch) */
 
-static int cyi_loadbve(cyi *op,cyi_ent *bvep,char *ebuf,int ebuflen,
+local int cyi_loadbve(cyi *op,cyi_ent *bvep,char *ebuf,int ebuflen,
 		uint vte[5]) noex {
 	int		rs = SR_OVERFLOW ;
 	int		rlen = 0 ;
@@ -747,10 +733,9 @@ static int cyi_loadbve(cyi *op,cyi_ent *bvep,char *ebuf,int ebuflen,
 	    }
 	} /* end if (valid) */
 	return (rs >= 0) ? rlen : rs ;
-}
-/* end subroutine (cyi_loadbve) */
+} /* end subroutine (cyi_loadbve) */
 
-static int mkydname(char *rbuf,cchar *dname,int year) noex {
+local int mkydname(char *rbuf,cchar *dname,int year) noex {
 	cint		rlen = var.maxpathlen ;
 	int		rs ;
 	int		len = 0 ;
@@ -761,30 +746,27 @@ static int mkydname(char *rbuf,cchar *dname,int year) noex {
 	    len = sb.idx ;
 	} /* end if (storebuf) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkydname) */
+} /* end subroutine (mkydname) */
 
-static int mkcitekey(uint *cip,cyi_q *bvp) noex {
+local int mkcitekey(uint *cip,cyi_q *bvp) noex {
 	uint		ci = 0 ;
 	ci |= ((bvp->m & UCHAR_MAX) << 8) ;
 	ci |= ((bvp->d & UCHAR_MAX) << 0) ;
 	*cip = ci ;
 	return SR_OK ;
-}
-/* end subroutine (mkcitekey) */
+} /* end subroutine (mkcitekey) */
 
-static int vtecmp(cvoid *v1p,cvoid *v2p) noex {
+local int vtecmp(cvoid *v1p,cvoid *v2p) noex {
 	uint		*vte1 = (uint *) v1p ;
 	uint		*vte2 = (uint *) v2p ;
 	int		c1, c2 ;
 	c1 = vte1[3] & 0x0000FFFF ;
 	c2 = vte2[3] & 0x0000FFFF ;
 	return (c1 - c2) ;
-}
-/* end subroutine (vtecmp) */
+} /* end subroutine (vtecmp) */
 
 #if	CF_ISOUR
-static bool isOurSuffix(cchar *name,cchar *fsuf) noex {
+local bool isOurSuffix(cchar *name,cchar *fsuf) noex {
     	cnullptr	np{} ;
 	bool		f = false ;
 	cchar		*tp ;
@@ -792,28 +774,25 @@ static bool isOurSuffix(cchar *name,cchar *fsuf) noex {
 	    f = true ;
 	}
 	return f ;
-}
-/* end subroutine (isOurSuffix) */
+} /* end subroutine (isOurSuffix) */
 #endif /* CF_ISOUR */
 
 #if	CF_ISOUR
-static bool isNotOurFile(int rs) noex {
+local bool isNotOurFile(int rs) noex {
 	bool		f = false ;
 	f = f || isNotPresent(rs) ;
 	f = f || (rs == SR_NOMSG) ;
 	f = f || (rs == SR_NOCSI) ;
 	return f ;
-}
-/* end subroutine (isNotOurFile) */
+} /* end subroutine (isNotOurFile) */
 #endif /* CF_ISOUR */
 
 int vars::mkvars() noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	}
     	return rs ;
-}
-/* end method (vars::mkvars) */
+} /* end method (vars::mkvars) */
 
 
