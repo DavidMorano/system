@@ -48,7 +48,7 @@ export {
 	    }
 	} /* end if (non-null) */
     	return rs ;
-    }
+    } /* end subroutine */
     template<typename T> inline int memclear(T *objp,int sz) noex {
 	int	rs = SR_FAULT ;
 	if (objp) {
@@ -58,7 +58,7 @@ export {
 	    rs = memclearer(objp,sz) ;
 	} /* end if (non-null) */
     	return rs ;
-    }
+    } /* end subroutine-template */
     template<typename T> inline int memclear(T *objp) noex {
 	int	rs = SR_FAULT ;
 	if (objp) {
@@ -66,7 +66,7 @@ export {
 	    rs = memclearer(objp,sz) ;
 	} /* end if (non-null) */
 	return rs ;
-    }
+    } /* end subroutine-template */
 } /* end export */
 
 
