@@ -13,7 +13,7 @@
 
 */
 
-/* Copyright © 1987 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	EXPANDLINE_INCLUDE
 #define	EXPANDLINE_INCLUDE
