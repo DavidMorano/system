@@ -147,7 +147,7 @@ local int config_ctor(config *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->pfp ;
 		    op->pfp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-paramfile) */
 	} /* end if (non-null) */
 	return rs ;
@@ -243,7 +243,7 @@ namespace prqotd {
 	                    }
 	                    if (rs < 0) {
 	                        pfp->close() ;
-		            }
+		            } /* end if (error) */
 	                } else if (isNotPresent(rs)) {
 	                    rs = SR_OK ;
 	                }
