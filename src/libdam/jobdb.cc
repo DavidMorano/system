@@ -18,31 +18,27 @@
 
 /*******************************************************************************
 
-        This module is responsible for providing means to store a job and the
-        retrieve it later by its PID.
-
+	This module is responsible for providing means to store a
+	job and the retrieve it later by its PID.
 
 *******************************************************************************/
 
-
-#define	JOBDB_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
-#include	<vecitem.h>
+#include	<rmdirfiles.h>
 #include	<localmisc.h>
 
 #if	CF_DEBUGS
@@ -51,6 +47,9 @@
 
 #include	"jobdb.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -64,14 +63,6 @@
 
 
 /* external subroutines */
-
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	chmods(cchar *,mode_t) ;
-extern int	rmdirfiles(cchar *,cchar *,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
