@@ -30,10 +30,10 @@
 #include	<uunames.h>
 
 
-#define	UUNAME_MAGIC	0x99447243
 #define	UUNAME		struct uuname_head
 #define	UUNAME_FL	struct uuname_flags
 #define	UUNAME_CUR	struct uuname_cursor
+#define	UUNAME_MAGIC	0x99447243
 #define	UUNAME_MODBNAME	"uunames"
 #define	UUNAME_OBJNAME	"uunames"
 
