@@ -30,7 +30,6 @@
 #include	<calcite.h>
 
 
-#define	CYI_MAGIC	0x88773421
 #define	CYI		struct cyi_head
 #define	CYI_OBJ		struct cyi_object
 #define	CYI_Q		CALCITE
@@ -40,6 +39,7 @@
 #define	CYI_LINE	struct cyi_liner
 #define	CYI_INFO	struct cyi_information
 #define	CYI_FMI		struct cyi_fmier
+#define	CYI_MAGIC	0x88773421
 
 
 struct cyi_object {
