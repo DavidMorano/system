@@ -42,7 +42,7 @@ LIBS +=
 
 OBJ0= prqotd_prog.o
 OBJ1= prqotd_open.o
-OBJ2= prqotd_subinfo.o
+OBJ2= prqotd_config.o prqotd_subinfo.o
 OBJ3= prqotd_util.o
 OBJ4= prqotd_maint.o
 OBJ5= argutils.o
