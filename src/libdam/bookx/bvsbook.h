@@ -1,6 +1,6 @@
-/* bvsbook HESADER */
+/* bvsbook HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
+/* lang=C20 */
 
 /* manage a BVS "book" entry */
 /* version %I% last-modified %G% */
@@ -20,11 +20,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 #define	BVSBOOK		struct bvsbook_head
@@ -37,7 +39,7 @@ struct bvsbook_head {
 	ushort		ci ;		/* chapter index */
 	uchar		book ;
 	uchar		al ;		/* also is the number of chapters */
-} ;
+} ; /* end struct */
 
 typedef	BVSBOOK		bvsbook ;
 
