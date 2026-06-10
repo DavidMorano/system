@@ -360,25 +360,24 @@ int var_curenum(VAR *op,VAR_CUR *curp,char *kbuf,int klen,
 }
 /* end subroutine (var_curenum) */
 
-int varinfo(VARINFO *vip,cchar dbnp[],int dbnl) noex {
+int varinfo(VARINFO *vip,cchar *dbnp,int dbnl) noex {
 	int		rs ;
 	int		rs1 ;
-	cchar	*np ;
 
 	if (vip == nullptr) return SR_FAULT ;
 	if (dbnp == nullptr) return SR_FAULT ;
 
 	if (dbnp[0] == '\0') return SR_INVALID ;
 
-	if (nulstr ns ; (rs = ns.start(dbnp,dbnl,&np)) >= 0) {
+	cchar		*namp ;
+	if (nulstr ns ; (rs = ns.start(dbnp,dbnl,&namp)) >= 0) {
 	    cchar	*end = ENDIANSTR ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
 	    memclear(vip) ;
 
-	    if ((rs = mkfnamesuf2(tmpfname,np,INDSUF,end)) >= 0) {
-	        USTAT	sb ;
-		if ((rs = u_stat(tmpfname,&sb)) >= 0) {
+	    if ((rs = mkfnamesuf2(tmpfname,namp,INDSUF,end)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(tmpfname,&sb)) >= 0) {
 		    vip->size = sb.st_size ;
 		    vip->mtime = sb.st_mtime ;
 		}
@@ -395,16 +394,16 @@ int varinfo(VARINFO *vip,cchar dbnp[],int dbnl) noex {
 int varunlink(cchar *dbnp,int dbnl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	cchar	*np ;
 
 	if (dbnp == nullptr) return SR_FAULT ;
 	if (dbnp[0] == '\0') return SR_INVALID ;
 
-	if (nulstr ns ; (rs = ns.start(dbnp,dbnl,&np)) >= 0) {
+	cchar	*namp ;
+	if (nulstr ns ; (rs = ns.start(dbnp,dbnl,&namp)) >= 0) {
 	    cchar	*end = ENDIANSTR ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
-	    if ((rs = mkfnamesuf2(tmpfname,np,INDSUF,end)) >= 0) {
+	    if ((rs = mkfnamesuf2(tmpfname,namp,INDSUF,end)) >= 0) {
 		rs = uc_unlink(tmpfname) ;
 	    }
 
@@ -429,7 +428,7 @@ local int var_objloadbegin(VAR *op,cchar *objname) noex {
 	    if ((rs = mkpr(pr,MAXPATHLEN,prname,dn)) >= 0) {
 		vecstr	syms ;
 	        cint	vn = nelem(subs) ;
-		cint	vo = VECSTR_OCOMPACT ;
+		cint	vo = vecstrm.compact ;
 
 	        if ((rs = vecstr_start(&syms,vn,vo)) >= 0) {
 		    cint	snl = SYMNAMELEN ;
@@ -481,8 +480,7 @@ local int var_objloadbegin(VAR *op,cchar *objname) noex {
 	} /* end if (getnodedomain) */
 
 	return rs ;
-}
-/* end subroutine (var_objloadbegin) */
+} /* end subroutine (var_objloadbegin) */
 
 local int var_objloadend(VAR *op) noex {
 	int		rs = SR_OK ;
@@ -498,8 +496,7 @@ local int var_objloadend(VAR *op) noex {
 	if (rs >= 0) rs = rs1 ;
 
 	return rs ;
-}
-/* end subroutine (var_objloadend) */
+} /* end subroutine (var_objloadend) */
 
 local int var_loadcalls(VAR *op,cchar *objname) noex {
 	modload		*lp = &op->loader ;
@@ -559,8 +556,7 @@ local int var_loadcalls(VAR *op,cchar *objname) noex {
 	} /* end for (subs) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (var_loadcalls) */
+} /* end subroutine (var_loadcalls) */
 
 local bool isrequired(int i) noex {
 	bool		f = false ;
@@ -576,7 +572,6 @@ local bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
