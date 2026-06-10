@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_WRITETO	1		/* time out writes */
-#define	CF_PARAMFILE	1		/* use |paramfile(3dam)| */
+#define	CF_paramfile	1		/* use |paramfile(3dam)| */
 
 /* revision history:
 
@@ -132,8 +132,8 @@ import libutil ;			/* |loadstrs(3u)| */
 #ifndef	CF_WRITETO
 #define	CF_WRITETO	1		/* time out writes */
 #endif
-#ifndef	CF_PARAMFILE
-#define	CF_PARAMFILE	1		/* use |paramfile(3dam)| */
+#ifndef	CF_paramfile
+#define	CF_paramfile	1		/* use |paramfile(3dam)| */
 #endif
 
 
@@ -315,7 +315,7 @@ cint			msgbuflen	= MSGBUFLEN ;
 cint			diglen		= DECBUFLEN ;
 
 cbool			f_writeto 	= CF_WRITETO ;
-cbool			f_paramfile 	= CF_PARAMFILE ;
+cbool			f_paramfile 	= CF_paramfile ;
 
 
 /* exported variables */
