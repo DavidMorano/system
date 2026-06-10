@@ -20,15 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vechand.h>
-#include	<buffer.h>
-#include	<bfile.h>
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
 
 
 /* object defines */
@@ -48,11 +44,11 @@ enum varsubos {
 
 #ifdef	__cplusplus
 struct varsubms {
-    	inline static cint	blank 		= (1 << varsubo_blank) ;
-    	inline static cint	noblank 	= (1 << varsubo_noblank) ;
-    	inline static cint	badnokey 	= (1 << varsubo_badnokey) ;
-    	inline static cint	brace 		= (1 << varsubo_brace) ;
-    	inline static cint	paren 		= (1 << varsubo_paren) ;
+    	static inline cint	blank 		= (1 << varsubo_blank) ;
+    	static inline cint	noblank 	= (1 << varsubo_noblank) ;
+    	static inline cint	badnokey 	= (1 << varsubo_badnokey) ;
+    	static inline cint	brace 		= (1 << varsubo_brace) ;
+    	static inline cint	paren 		= (1 << varsubo_paren) ;
 } ; /* end struct (varsubms) */
 #endif /* __cplusplus */
 
@@ -78,7 +74,7 @@ struct varsub_cursor {
 struct varsub_head {
 	vechand		*slp ;
 	VARSUB_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		n ;		/* current allocated length */
 	int		i ;		/* maximum length used */
 	int		badline ;
@@ -102,7 +98,6 @@ extern int	varsub_del(varsub *,cchar *,int) noex ;
 extern int	varsub_fetch(varsub *,cchar *,int,cchar **) noex ;
 extern int	varsub_exp(varsub *,char *,int,cchar *,int) noex ;
 extern int	varsub_expbuf(varsub *,buffer *,cchar *,int) noex ;
-extern int	varsub_expfile(varsub *,bfile *,bfile *) noex ;
 extern int	varsub_loadfile(varsub *,cchar *) noex ;
 extern int	varsub_addvec(varsub *,vecstr *) noex ;
 extern int	varsub_finish(varsub *) noex ;
