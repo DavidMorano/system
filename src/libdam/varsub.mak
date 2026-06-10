@@ -40,21 +40,21 @@ MODS +=
 LIBS +=
 
 
+DEPS= varsub_util.o
+
 OBJ0_VARSUB= varsub_prime.o
 OBJ1_VARSUB= varsub_loadfile.o
 OBJ2_VARSUB= varsub_addvec.o
-OBJ3_VARSUB=
+OBJ3_VARSUB= varsub_util.o
 
 OBJA_VARSUB= obj0_varsub.o obj1_varsub.o
-OBJB_VARSUB= obj2_varsub.o
+OBJB_VARSUB= obj2_varsub.o obj3_varsub.o
 
 OBJ_VARSUB= obja_varsub.o objb_varsub.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -97,11 +97,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ_VARSUB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_VARSUB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -136,9 +136,11 @@ objb_varsub.o:		$(OBJB_VARSUB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-varsub_prime.o:		varsub_prime.cc		$(INCS)
-varsub_addvec.o:	varsub_addvec.cc	$(INCS)
-varsub_loadfile.o:	varsub_loadfile.cc	$(INCS)
-varsub_extras.o:	varsub_extras.cc	$(INCS)
+varsub_prime.o:		varsub_prime.cc				$(DEPS) $(INCS)
+varsub_addvec.o:	varsub_addvec.cc			$(DEPS) $(INCS)
+varsub_loadfile.o:	varsub_loadfile.cc			$(DEPS) $(INCS)
+varsub_extras.o:	varsub_extras.cc			$(DEPS) $(INCS)
+
+varsub_util.o:		varsub_util.ccm		varsub_util.hh		$(INCS)
 
 
