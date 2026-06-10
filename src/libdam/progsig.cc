@@ -46,7 +46,7 @@
 #include	<ucatexit.h>
 #include	<ucatfork.h>
 #include	<ucfork.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<aflag.hh>
 #include	<upt.h>
 #include	<ptm.h>
@@ -834,7 +834,7 @@ local int progsig_reqopen(progsig *uip) noex {
 	int		rv = 0 ;
 	cchar		*dname = PROGSIG_SESDN ;
 	if ((rs = sdir(dname,dm)) >= 0) {
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        cint	sz = ((rs + 1) * 2) ;
 	        cint	maxpath = rs ;
 	        int	ai = 0 ;
@@ -853,7 +853,7 @@ local int progsig_reqopen(progsig *uip) noex {
 		    rs1 = lm_free(a) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
-	    } /* end if (getbufsize) */
+	    } /* end if (bufsizeget) */
 	} /* end if (sdir) */
 	return (rs >= 0) ? rv : rs ;
 }
