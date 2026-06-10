@@ -38,7 +38,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
