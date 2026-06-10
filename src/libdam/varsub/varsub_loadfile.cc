@@ -38,25 +38,32 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<climits>		/* for |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<stdfnames.h>		/* |STDFNIN| */
-#include	<bfile.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<rmx.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX */
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstrings>		/* CSTD |strncasecmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<stdfnames.h>		/* LIBU |STDFNIN| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucstream.hh>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"varsub.h"
+#include	"varsub_util.hh"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ucstream.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import ucstream ;
+import varsub_util ;
 
 /* local defines */
 
@@ -82,22 +89,25 @@ namespace {
 	    abuf = ab ;
 	    llen = ll ;
 	    alen = al ;
-	} ;
+	} ; /* end ctor */
 	int operator () (cchar *) noex ;
+	int procln	(cchar *,int) noex ;
     } ; /* end struct (sub_loadfile) */
+    struct vars {
+	operator int () noex ;
+    } ; /* end struct (vars) */
 } /* end namespace */
 
 
 /* forward references */
 
-static int	mkterms() noex ;
-
-static bool	hasexport(cchar *,int) noex ;
+local bool	hasexport(cchar *,int) noex ;
 
 
 /* local variables */
 
-static char		fterms[fieldterms_termsize] ;
+static char	fterms[fieldterms_termsize] ;
+static vars	var ;
 
 
 /* exported variables */
@@ -108,13 +118,12 @@ static char		fterms[fieldterms_termsize] ;
 int varsub_loadfile(varsub *op,cchar *fn) noex {
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if ((fn == nullptr) || (fn[0] == '\0') || (fn[0] == '-')) {
 	    fn = STDFNIN ; /* standard-input */
 	}
-	if (op) {
-	     static cint	rst = mkterms() ;
-	     if ((rs = rst) >= 0) {
+	if ((rs = varsub_magic(op)) >= 0) {
+	     if (static cint rsv = var ; (rs = rsv) >= 0) {
 	        if (char *lbuf ; (rs = lm_mp(&lbuf)) >= 0) {
 	            cint	llen = rs ;
 	            if (char *abuf{} ; (rs = lm_mp(&abuf)) >= 0) {
@@ -130,7 +139,7 @@ int varsub_loadfile(varsub *op,cchar *fn) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (mkterms) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (varsub_loadfile) */
@@ -139,58 +148,60 @@ int varsub_loadfile(varsub *op,cchar *fn) noex {
 /* local subroutines */
 
 int sub_loadfile::operator () (cchar *fn) noex {
-	bfile		vfile, *vfp = &vfile ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = bopen(vfp,fn,"r",0666)) >= 0) {
+	if (ucstream fi ; (rs = fi.open(fn,"r",0666)) >= 0) {
 	    cint	to = -1 ;
-	    int		bl ;
-	    while ((rs = breadlns(vfp,lbuf,llen,to,nullptr)) > 0) {
+	    while ((rs = fi.readlns(lbuf,llen,to,nullptr)) > 0) {
 		if (int len ; (len = rmcomment(lbuf,llen)) > 0) {
-	            cchar	*cp = lbuf ;
-	            int		cl = len ;
-		    if (field fsb ; (rs = fsb.start(cp,cl)) >= 0) {
-	    		cchar	*kp{} ;
-	                if (int kl ; (kl = fsb.get(fterms,&kp)) > 0) {
-		            int		al = alen ;
-	                    char	*bp = abuf ;
-	                    if ((kl == 6) && hasexport(kp,kl)) {
-	                        kl = fsb.get(fterms,&kp) ;
-	                    }
-	                    while (al > 0) {
-			        bl = fsb.sharg(fterms,bp,al) ;
-			        if (bl < 0) break ;
-	                        if (bl > 0) bp += bl ;
-	                        al = intconv(abuf + alen - bp) ;
-	                        if (fsb.term == '#') break ;
-	                    } /* end while */
-	                    *bp = '\0' ;
-			    al = intconv(bp - abuf) ;
-	                    rs = varsub_add(op,kp,kl,abuf,al) ;
-			    if (rs < INT_MAX) c += 1 ;
-	                } /* end if (have a variable keyname) */
-	                rs1 = fsb.finish ;
-		        if (rs >= 0) rs = rs1 ;
-	            } /* end if (field) */
+		    rs = procln(lbuf,len) ;
+		    c = rs ;
 		} /* end if (comment) */
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
-	    rs1 = bclose(vfp) ;
+	    rs1 = fi.close ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (open-file) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (sub_loadfile::operator) */
+} /* end method (sub_loadfile::operator) */
 
-static int mkterms() noex {
+int sub_loadfile::procln(cchar *sp,int sl) noex {
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+        if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
+            cchar   *kp{} ;
+            if (int kl ; (kl = fsb.get(fterms,&kp)) > 0) {
+                int         al = alen ;
+                char        *ap = abuf ;
+                if ((kl == 6) && hasexport(kp,kl)) {
+                    kl = fsb.get(fterms,&kp) ;
+                } /* end if (skipping 'export' keyword') */
+                for (int fl ; al > 0 ; ) {
+                    fl = fsb.sharg(fterms,ap,al) ;
+                    if (fl < 0) break ;
+                    if (fl > 0) ap += fl ;
+                    al = intconv(abuf + alen - ap) ;
+                    if (fsb.term == '#') break ;
+                } /* end for */
+                *ap = '\0' ;
+                al = intconv(ap - abuf) ;
+                rs = varsub_add(op,kp,kl,abuf,al) ;
+                if (rs < INT_MAX) c += 1 ;
+            } /* end if (have a variable keyname) */
+            rs1 = fsb.finish ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (field) */
+	return (rs >= 0) ? c : rs ;
+} /* end method (sub_loadfile::procln) */
+
+vars::operator int () noex {
 	return fieldterms(fterms,false,' ','#','=') ;
-}
-/* end subroutine (mkterms) */
+} /* end method (vars::operator) */
 
-static bool hasexport(cchar *sp,int sl) noex {
+local bool hasexport(cchar *sp,int sl) noex {
 	return (strncasecmp(sp,"export",sl) == 0) ;
-}
-/* end subroutine (hasexport) */
+} /* end subroutine (hasexport) */
 
 
