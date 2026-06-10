@@ -36,13 +36,13 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bvsbook.h"
 
@@ -82,7 +82,7 @@ int bvsbook_set(bvsbook *bep,ushort *a) noex {
 	    a[1] = bep->ci ;
 	    a[2] = bep->nverses ;
 	    a[3] = bep->nzverses ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (bvsbook_set) */
