@@ -21,15 +21,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<usysbase.h>
 
 
 EXTERNC_begin
 
-extern int	chownsame(cchar *,cchar *) noex ;
-extern int	chownref(cchar *,cchar *) noex ;
+extern int	chownsame	(cchar *,cchar *) noex ;
+extern int	chownref	(cchar *,cchar *) noex ;
 
 EXTERNC_end
 
