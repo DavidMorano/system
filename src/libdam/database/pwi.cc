@@ -57,7 +57,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucpwcache.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<endian.h>
 #include	<ids.h>
 #include	<mkpathx.h>
@@ -452,8 +452,7 @@ int opener::start() noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (opener::start) */
+} /* end method (opener::start) */
 
 int opener::finish() noex {
 	int		rs = SR_OK ;
@@ -470,8 +469,7 @@ int opener::finish() noex {
 	    fl.dbname = false ;
 	}
 	return rs ;
-}
-/* end method (opener::finish) */
+} /* end method (opener::finish) */
 
 int opener::mkidxdname() noex {
     	cint		nodelen = var.nodenamelen ;
@@ -508,8 +506,7 @@ int opener::mkidxdname() noex {
 	    rs = idxload(dbname) ;
 	} /* end if (empty specification) */
 	return rs ;
-}
-/* end method (opener::mkidxdname) */
+} /* end method (opener::mkidxdname) */
 
 int opener::idxload(cc *dp,int dl) noex {
 	int		rs ;
@@ -517,8 +514,7 @@ int opener::idxload(cc *dp,int dl) noex {
 	    idxdname = cp ;
 	}
 	return rs ;
-}
-/* end method (opener::idxload) */
+} /* end method (opener::idxload) */
 
 int opener::mk() noex {
         int		rs ;
@@ -537,8 +533,7 @@ int opener::mk() noex {
 	    rs = rsfree(rs,pbuf) ;
 	} /* end if (m-a-f) */
         return (rs >= 0) ? rv : rs ;
-}
-/* end method (opener::mk) */
+} /* end method (opener::mk) */
 
 int opener::mkbegin(char *pbuf) noex {
     	int		rs ;
@@ -563,13 +558,11 @@ int opener::mkbegin(char *pbuf) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (opener::mkbegin) */
+} /* end method (opener::mkbegin) */
 
 int opener::mkend() noex {
     	return SR_OK ;
-}
-/* end method (opener::mkend) */
+} /* end method (opener::mkend) */
 
 int opener::mkproc(cchar *pbuf) noex {
 	cint		vn = 10 ;
@@ -604,8 +597,7 @@ int opener::mkproc(cchar *pbuf) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	return (rs >= 0) ? cpid : rs ;
-}
-/* end method (opener::mkproc) */
+} /* end method (opener::mkproc) */
 
 int opener::mkspawn(cchar *pbuf,mainv av,vecstr *elp) noex {
     	int		rs ;
@@ -625,8 +617,7 @@ int opener::mkspawn(cchar *pbuf,mainv av,vecstr *elp) noex {
 	    cpid = rs ;
 	} /* end if (vecstr_getvec) */
 	return (rs >= 0) ? cpid : rs ;
-}
-/* end method (opener::mkspawn) */
+} /* end method (opener::mkspawn) */
 
 int opener::mkwait(int cpid) noex {
     	int		rs = SR_OK ;
@@ -645,8 +636,7 @@ int opener::mkwait(int cpid) noex {
 	    } /* end if (process finished) */
 	} /* end if (ok) */
 	return rs ;
-}
-/* end method (opener::mkwait) */
+} /* end method (opener::mkwait) */
 
 int opener::mkenv(vecstr *elp) noex {
         int		rs ;
@@ -662,8 +652,7 @@ int opener::mkenv(vecstr *elp) noex {
 	    } /* end for */
 	}
 	return rs ;
-}
-/* end method (opener:mkenv) */
+} /* end method (opener:mkenv) */
 
 local int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
 	int		rs ;
@@ -685,18 +674,17 @@ local int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
 	    } /* end if (query does not have special extras) */
 	} /* end if (realname_getlast) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (realname_isextra) */
+} /* end subroutine (realname_isextra) */
 
 int vars::mkvars() noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	        maxnamelen = rs ;
-	        if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 		    nodenamelen = rs ;
-	            if ((rs = getbufsize(bufsize_un)) >= 0) {
+	            if ((rs = bufsizeget(bufsize_un)) >= 0) {
 			usernamelen = rs ;
 			realnamelen = REALNAMELEN ;
 		    }
@@ -704,7 +692,6 @@ int vars::mkvars() noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::mkvars) */
+} /* end method (vars::mkvars) */
 
 
