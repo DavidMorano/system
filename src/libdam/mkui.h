@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LINU */
+#include	<usysbase.h>		/* LINU */
 
 
 EXTERNC_begin
