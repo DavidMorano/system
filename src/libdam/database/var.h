@@ -32,11 +32,11 @@
 #include	<vars.h>
 
 
-#define	VAR_MAGIC	0x99447246
 #define	VAR		struct var_head
 #define	VAR_CUR		struct var_cursor
 #define	VAR_INFO	struct var_information
 #define	VAR_CALLS	struct var_callsubs
+#define	VAR_MAGIC	0x99447246
 
 #define	VARINFO_DAT	struct varinfo_data
 
