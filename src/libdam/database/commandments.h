@@ -20,12 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<cmi.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<cmi.h>			/* LIBU */
 
 
 #define	COMMANDMENTS		struct commandments_head
@@ -42,8 +39,8 @@
 
 struct commandments_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct commandments_information {
@@ -58,7 +55,7 @@ struct commandments_entry {
 } ; /* end struct */
 
 struct commandments_cursor {
-	CMI_CUR		vicur ;
+	cmi_cur		*vicurp ;
 } ; /* end struct */
 
 struct commandments_flags {
@@ -68,14 +65,14 @@ struct commandments_flags {
 } ; /* end struct */
 
 struct commandments_head {
-	CMI		idx ;
+	cmi		*idxp ;
 	void		*a ;
 	cchar		*pr ;
 	cchar		*dbname ;
 	cchar		*uhome ;		/* user home dir */
 	cchar 		*fname ;
-	cchar		*data_db ;
-	size_t		size_db ;		/* srouce DB size */
+	voidp		db_data ;
+	size_t		db_size ;		/* srouce DB size */
 	time_t		ti_db ;			/* source DB m-time */
 	time_t		ti_idx ;		/* index modification */
 	time_t		ti_map ;		/* map */
@@ -84,7 +81,7 @@ struct commandments_head {
 	uid_t		uid_pr ;
 	gid_t		gid_pr ;
 	COMMANDMENTS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 	int		nents ;
 	int		maxent ;
@@ -106,12 +103,14 @@ extern int	commandments_max(commandments *) noex ;
 extern int	commandments_read(commandments *,char *,int,int) noex ;
 extern int	commandments_get(commandments *,int,char *,int) noex ;
 extern int	commandments_curbegin(commandments *,commandments_cur *) noex ;
-extern int	commandments_enum(commandments *,commandments_cur *,
+extern int	commandments_curenum(commandments *,commandments_cur *,
 			commandments_ent *,char *,int) noex ;
 extern int	commandments_curend(commandments *,commandments_cur *) noex ;
 extern int	commandments_close(commandments *) noex ;
 
 EXTERNC_end
+
+extern const commandments_obj	commandments_modinfo ;
 
 
 #endif /* COMMANDMENTS_INCLUDE */
