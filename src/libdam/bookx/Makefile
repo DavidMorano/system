@@ -35,16 +35,25 @@ DEFS +=
 
 INCS += bookx.h
 
+MODS +=
+
 LIBS +=
 
 
+OBJ0= bvshdr.o bvshdr.o bvsmk.o
+OBJ1= bcspec.o
+OBJ2= bpihdr.o
+OBJ3= 
+
+OBJA= obj0.o obj1.o
+
+OBJ= $(OBJA)
+
+
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,17 +64,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= 
-OBJ1= 
-OBJ2= 
-OBJ3= 
-
-OBJA= obj0.o obj1.o
-
-OBJ= $(OBJA)
-
-
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -79,6 +78,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -91,12 +93,15 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	gxx -c -x c++ -o $@ -O $<
+
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $^
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 $(T).order:		$(OBJ) $(T).a
 	$(LORDER) $(T).a | $(TSORT) > $(T).order
@@ -114,29 +119,40 @@ control:
 
 
 obj0.o:			$(OBJ0)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj1.o:			$(OBJ1)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj2.o:			$(OBJ2)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj4.o:			$(OBJ4)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj5.o:			$(OBJ5)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
+
+bvshdr.o:		bvshdr.cc	bvshdr.h			$(INCS)
+bvsbook.o:		bvsbook.cc	bvsnook.h			$(INCS)
+bvsmk.o:		bvsmk.cc	bvsmk.h				$(INCS)
+
+bvs.o:			bvs.cc		bvs.h				$(INCS)
+bvses.o:		bvses.cc	bvses.h				$(INCS)
+
+bpihdr.o:		bpihdr.cc	bpihdr.h			$(INCS)
+
+bcspec.o:		bcspec.cc	bcspec.h			$(INCS)
 
 
