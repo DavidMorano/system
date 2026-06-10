@@ -38,13 +38,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<userinfo.h>
-#include	<localmisc.h>
-#include	<mkui.h>		/* |mkuibang(3dam)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<userinfo.h>		/* LIBUC */
+#include	<mkui.h>		/* LINUC |mkuibang(3dam)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkbangname.h"
 
