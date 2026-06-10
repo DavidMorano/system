@@ -41,13 +41,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<userinfo.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<userinfo.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkui.h"
 
@@ -92,7 +92,7 @@ constexpr bool		f_mailname  = CF_MAILNAME ;
 
 /* exported subroutines */
 
-int uibang(char *rbuf,int rlen,userinfo *uip) noex {
+int mkuibang(char *rbuf,int rlen,userinfo *uip) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && uip) ylikely {
 	    rbuf[0] = '\0' ;
