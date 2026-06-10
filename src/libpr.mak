@@ -37,7 +37,7 @@ INCS += libpr.h
 
 MODS +=
 
-LIBS +=
+LIBS += -ldebug -luo -lu
 
 
 OBJ0= prgetclustername.o prgetprogpath.o
@@ -52,8 +52,7 @@ OBJ= $(OBJA)
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,11 +95,14 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+$(T).so:		$(T).o
+	$(LD) -shared $(LDFLAGS) -o $@ $^ $(RUNINFO) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
