@@ -348,7 +348,7 @@ int uuname_enum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 local int uuname_objloadbegin(UN *op,cchar *pr,cchar *objn) noex {
 	modload		*mlp = op->mlp ;
 	cint		vn = sub_overlast ;
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
@@ -391,8 +391,7 @@ local int uuname_objloadbegin(UN *op,cchar *pr,cchar *objn) noex {
 	    }
 	} /* end if (vecstr-syms) */
 	return rs ;
-}
-/* end subroutine (uuname_objloadbegin) */
+} /* end subroutine (uuname_objloadbegin) */
 
 local int uuname_objloadend(UN *op) noex {
 	int		rs = SR_OK ;
@@ -408,8 +407,7 @@ local int uuname_objloadend(UN *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (uuname_objloadend) */
+} /* end subroutine (uuname_objloadend) */
 
 local int uuname_loadcalls(UN *op,vecstr *slp) noex {
 	modload		*mlp = op->mlp ;
@@ -455,8 +453,7 @@ local int uuname_loadcalls(UN *op,vecstr *slp) noex {
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (uuname_loadcalls) */
+} /* end subroutine (uuname_loadcalls) */
 
 local bool isrequired(int i) noex {
 	bool		f = false ;
@@ -471,7 +468,6 @@ local bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
