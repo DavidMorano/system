@@ -186,7 +186,7 @@ template<typename ... Args>
 local inline int modload_magic(modload *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MODLOAD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MODLOAD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (modload_magic) */
@@ -254,7 +254,7 @@ int modload_open(ML *op,cc *pr,cc *modfn,cc *modname,int opts,mv syms) noex {
 	            op->modname = modname ;
 	            if ((rs = si.start()) >= 0) {
 	                if ((rs = si.objload()) >= 0) {
-	                    op->magic = MODLOAD_MAGIC ;
+	                    op->magval = MODLOAD_MAGIC ;
 	                }
 	                rs1 = si.finish((rs < 0)) ;
 	                if (rs >= 0) rs = rs1 ;
@@ -281,7 +281,7 @@ int modload_close(ML *op) noex {
 		rs1 = modload_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -565,11 +565,11 @@ int subinfo::sofindprs(dirseen *dsp,int dlm) noex {
 	    int		ai = 0 ;
 	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
 		cint	dl = var.maxhostlen ;
-	        char	*dn = (a + ((maxhost + 1) * ai++)) ;
+	        char	*dn = (a + (ai++ * (maxhost + 1))) ;
 	        if ((rs = getinetdomain(dn,dl)) >= 0) {
 	            cint	prlen = var.maxpathlen ;
-	            char	*prbuf = (a + ((maxhost + 1) * ai++)) ;
-	            for (int i = 0 ; prnames[i] != nullptr ; i += 1) {
+	            char	*prbuf = (a + (ai++ * (maxhost + 1))) ;
+	            for (int i = 0 ; prnames[i] ; i += 1) {
 	                if ((rs = mkpr(prbuf,prlen,prnames[i],dn)) >= 0) {
 	                    if ((rs = sofindroot(dsp,dlm,prbuf)) > 0) {
 			        len = rs ;
@@ -590,7 +590,7 @@ int subinfo::sofindsdirs(dirseen *dsp,int dlm) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
 	if (fl.liball || fl.libsdirs) {
-	    for (int i = 0 ; sysprs[i] != nullptr ; i += 1) {
+	    for (int i = 0 ; sysprs[i] ; i += 1) {
 	        cchar	*dirname = sysprs[i] ;
 	        if ((rs = sofindroot(dsp,dlm,dirname)) > 0) {
 		    len = rs ;
