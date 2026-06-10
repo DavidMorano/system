@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>		/* |MAXHOSTNAMELEN| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |MAXHOSTNAMELEN| */
 
 
 #define	USERINFO		struct userinfo_head
@@ -65,7 +65,7 @@ struct userinfo_head {
 	pid_t		pid ;
 	uid_t		uid, euid ;
 	gid_t		gid, egid ;
-	uint		magic ;
+	uint		magval ;
 	int		ostype ;
 } ; /* end struct (userinfo_head) */
 
@@ -101,13 +101,13 @@ struct userinfo : userinfo_head {
 	userinfo() noex {
 	    start(this) ;
 	    finish(this,userinfomem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	userinfo(const userinfo &) = delete ;
 	userinfo &operator = (const userinfo &) = delete ;
 	void dtor() noex ;
 	destruct userinfo() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (userinfo) */
 #else	/* __cplusplus */
@@ -116,9 +116,9 @@ typedef USERINFO	userinfo ;
 
 EXTERNC_begin
 
-extern int userinfo_start(userinfo *,cchar *) noex ;
-extern int userinfo_finish(userinfo *) noex ;
-extern int userinfo_data(userinfo *,char *,int,cchar *) noex ;
+extern int userinfo_start	(userinfo *,cchar *) noex ;
+extern int userinfo_finish	(userinfo *) noex ;
+extern int userinfo_data	(userinfo *,char *,int,cchar *) noex ;
 
 EXTERNC_end
 
