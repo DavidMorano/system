@@ -43,19 +43,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cmihdr.h"
 
@@ -72,7 +72,7 @@
 /* local structures */
 
 enum his {
-	hi_dbsize,			/* DB file size */
+	hi_dbsz,			/* DB file size */
 	hi_dbtime,			/* DB modification-time */
 	hi_idxsize,			/* IDX file size */
 	hi_idxtime,			/* IDX modification-time */
@@ -91,9 +91,9 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize = hi_overlast * szof(uint) ;
-constexpr int		magicsize = CMIHDR_MAGICSIZE ;
-constexpr char		magicstr[] = CMIHDR_MAGICSTR ;
+constexpr int		headsize	= hi_overlast * szof(uint) ;
+constexpr int		magicsize	= CMIHDR_MAGICSIZE ;
+constexpr char		magicstr[]	= CMIHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -108,6 +108,7 @@ int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	if (op && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
+	    rs = SR_INVALID ;
 	    if (bl >= (magicsize + 4)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
@@ -119,16 +120,16 @@ int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
 	        	uint	*header = uintp(bp) ;
-	        	header[hi_dbsize] = op->dbsize ;
-	        	header[hi_dbtime] = op->dbtime ;
-	        	header[hi_idxsize] = op->idxsize ;
-	        	header[hi_idxtime] = op->idxtime ;
-	        	header[hi_vioff] = op->vioff ;
-	        	header[hi_vilen] = op->vilen ;
-	        	header[hi_vloff] = op->vloff ;
-	        	header[hi_vllen] = op->vllen ;
-	        	header[hi_nents] = op->nents ;
-	        	header[hi_maxent] = op->maxent ;
+	        	header[hi_dbsz]		= op->dbsz ;
+	        	header[hi_dbtime]	= op->dbtime ;
+	        	header[hi_idxsize]	= op->idxsize ;
+	        	header[hi_idxtime]	= op->idxtime ;
+	        	header[hi_vioff]	= op->vioff ;
+	        	header[hi_vilen]	= op->vilen ;
+	        	header[hi_vloff]	= op->vloff ;
+	        	header[hi_vllen]	= op->vllen ;
+	        	header[hi_nents]	= op->nents ;
+	        	header[hi_maxent]	= op->maxent ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
 			len = intconv(bp - hbuf) ;
@@ -173,16 +174,16 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
 	                uint	*header = uintp(bp) ;
-	                op->dbsize = header[hi_dbsize] ;
-	                op->dbtime = header[hi_dbtime] ;
-	                op->idxsize = header[hi_idxsize] ;
-	                op->idxtime = header[hi_idxtime] ;
-	                op->vioff = header[hi_vioff] ;
-	                op->vilen = header[hi_vilen] ;
-	                op->vloff = header[hi_vloff] ;
-	                op->vllen = header[hi_vllen] ;
-	                op->nents = header[hi_nents] ;
-	                op->maxent = header[hi_maxent] ;
+	                op->dbsz	= header[hi_dbsz] ;
+	                op->dbtime	= header[hi_dbtime] ;
+	                op->idxsize	= header[hi_idxsize] ;
+	                op->idxtime	= header[hi_idxtime] ;
+	                op->vioff	= header[hi_vioff] ;
+	                op->vilen	= header[hi_vilen] ;
+	                op->vloff	= header[hi_vloff] ;
+	                op->vllen	= header[hi_vllen] ;
+	                op->nents	= header[hi_nents] ;
+	                op->maxent	= header[hi_maxent] ;
 	                bp += headsize ;
 	                bl -= headsize ;
 			len = intconv(bp - hbuf) ;
@@ -197,5 +198,18 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (cmihdr_wr) */
+
+
+/* local subroutines */
+
+int cmihdr::rd(char *rbuf,int rlen) noex {
+    	return cmihdr_rd(this,rbuf,rlen) ;
+} /* end method (cmihdr::rd) */
+
+int cmihdr::wr(cchar *wbuf,int wlen) noex {
+    	return cmihdr_wr(this,wbuf,wlen) ;
+} /* end method (cmihdr::wr) */
+
+
 
 
