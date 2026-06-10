@@ -40,14 +40,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>		/* |_PC_{xx}| */
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX |_PC_{xx}| */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"chownsame.h"
 
@@ -97,6 +99,6 @@ int chownsame(cchar *dname,cchar *ref) noex {
 
 int chownref(cchar *dname,cchar *ref) noex {
     	return chownsame(dname,ref) ;
-}
+} /* end subroutine */
 
 
