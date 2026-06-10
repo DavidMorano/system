@@ -26,11 +26,11 @@
 #include	<vecobj.h>
 
 
-#define	UUNAMES_MAGIC	0x99889298
 #define	UUNAMES		struct uunames_head
 #define	UUNAMES_FL	struct uunames_flags
 #define	UUNAMES_OBJ	struct uunames_object
 #define	UUNAMES_CUR	struct uunames_cursor
+#define	UUNAMES_MAGIC	0x99889298
 
 
 struct uunames_object {
