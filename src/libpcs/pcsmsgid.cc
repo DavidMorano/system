@@ -45,7 +45,7 @@
 #include	<usysbase.h>
 #include	<usupport.h>		/* |getustime(3u)| */
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getnodedomain.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
@@ -161,11 +161,11 @@ local int mkstr(char *rp,int rl,cchar *dn,cchar *nn,int sn) noex {
 
 variables::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 	    nodenamelen = rs ;
-	    if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	        hostnamelen = rs ;
-	        if ((rs = getbufsize(bufsize_un)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_un)) >= 0) {
 		    usernamelen = rs ;
 		}
 	    }
