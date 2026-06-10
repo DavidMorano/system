@@ -20,13 +20,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-#include	<commandments.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
+#include	<commandments.h>	/* LIBUC */
 
 
 #define	COMMANDMENT		struct commandment_head
@@ -41,7 +38,7 @@ struct commandment_flags {
 
 struct commandment_cursor {
 	void		*scp ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct commandment_head {
@@ -49,7 +46,7 @@ struct commandment_head {
 	void		*obj ;		/* object pointer */
 	void		*callp ;
 	COMMANDMENT_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		objsz ;
 	int		cursz ;
 } ; /* end struct */
