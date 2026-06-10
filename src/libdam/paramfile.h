@@ -20,16 +20,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<varsub.h>
+#include	<sys/param.h>		/* POSIX */
+#include	<limits.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<varsub.h>		/* LIBUC */
 
 
 #define	PARAMFILE		struct paramfile_head
@@ -37,7 +37,6 @@
 #define	PARAMFILE_CUR		struct paramfile_cursor
 #define	PARAMFILE_ENT		struct paramfile_entry
 #define	PARAMFILE_ERROR		struct paramfile_errline
-
 #define	PARAMFILE_MAGIC		0x12349876
 #define	PARAMFILE_INTCHECK	2	/* file check interval (seconds) */
 #define	PARAMFILE_INTCHANGE	2	/* wait change interval (seconds) */
@@ -53,7 +52,7 @@ struct paramfile_flags {
 
 struct paramfile_head {
 	mainv		envv ;		/* program startup environment */
-	cchar		*a ;		/* memory allocation */
+	char		*a ;		/* memory allocation */
 	char		*lbuf ;
 	char		*fbuf ;
 	vecobj		*filep ;	/* files */
@@ -102,7 +101,7 @@ struct paramfile_co {
 	int operator () (int = 1) noex ;
 	operator int () noex {
 	    return operator () (1) ;
-	}
+	} ; /* end method */
 } ; /* end struct (paramfile_co) */
 struct paramfile : paramfile_head {
     	paramfile_co	checkint ;
@@ -110,8 +109,10 @@ struct paramfile : paramfile_head {
 	paramfile() noex {
 	    checkint(this,paramfilemem_checkint) ;
 	    close(this,paramfilemem_close) ;
-	} ;
-    	int open	(mainv,cchar * = nullptr) noex ;
+	    magval = 0 ;
+	    a = nullptr ;
+	} ; /* end ctor */
+    	int open	(con mainv,cchar * = nullptr) noex ;
 	int fileadd	(cchar *) noex ;
 	int setdefines	(vecstr *) noex ;
 	int curbegin	(paramfile_cur *) noex ;
@@ -122,7 +123,7 @@ struct paramfile : paramfile_head {
 	void dtor() noex ;
 	destruct paramfile() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end destruct */
 } ; /* end struct (paramfile) */
 #else
 typedef PARAMFILE	paramfile ;
@@ -130,18 +131,18 @@ typedef PARAMFILE	paramfile ;
 
 EXTERNC_begin
 
-extern int paramfile_open(paramfile *,mainv,cchar *) noex ;
-extern int paramfile_fileadd(paramfile *,cchar *) noex ;
-extern int paramfile_setdefines(paramfile *,vecstr *) noex ;
-extern int paramfile_curbegin(paramfile *,paramfile_cur *) noex ;
-extern int paramfile_curend(paramfile *,paramfile_cur *) noex ;
-extern int paramfile_curenum(paramfile *,paramfile_cur *,paramfile_ent *,
+extern int paramfile_open	(paramfile *,con mainv,cchar *) noex ;
+extern int paramfile_fileadd	(paramfile *,cchar *) noex ;
+extern int paramfile_setdefines	(paramfile *,vecstr *) noex ;
+extern int paramfile_curbegin	(paramfile *,paramfile_cur *) noex ;
+extern int paramfile_curend	(paramfile *,paramfile_cur *) noex ;
+extern int paramfile_curenum	(paramfile *,paramfile_cur *,paramfile_ent *,
 		char *,int) noex ;
-extern int paramfile_fetch(paramfile *,cchar *,paramfile_cur *,
+extern int paramfile_fetch	(paramfile *,cchar *,paramfile_cur *,
 		char *,int) noex ;
-extern int paramfile_checkint(paramfile *,int) noex ;
-extern int paramfile_check(paramfile *,time_t) noex ;
-extern int paramfile_close(paramfile *) noex ;
+extern int paramfile_checkint	(paramfile *,int) noex ;
+extern int paramfile_check	(paramfile *,time_t) noex ;
+extern int paramfile_close	(paramfile *) noex ;
 
 EXTERNC_end
 
