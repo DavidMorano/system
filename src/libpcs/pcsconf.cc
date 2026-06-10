@@ -48,7 +48,8 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<ucinfo.h>
+#include	<bufsizeget.h>
 #include	<getnodedomain.h>
 #include	<getusername.h>
 #include	<getpwx.h>
@@ -57,7 +58,6 @@
 #include	<vecstr.h>
 #include	<modload.h>
 #include	<nulstr.h>
-#include	<uinfo.h>
 #include	<expcook.h>
 #include	<snx.h>
 #include	<sfx.h>
@@ -136,8 +136,8 @@ struct cookmgr_nd {
 
 struct cookmgr {
 	expcook		cooks ;
-	uinfo_names	uname ;
-	uinfo_auxs	uaux ;
+	ucinfo_names	uname ;
+	ucinfo_auxs	uaux ;
 	cchar		*pr ;
 	cookmgr_nd	nd ;
 	cookmgr_flags	fl ;
@@ -1045,7 +1045,7 @@ local int cookmgr_uname(CM *cmp) noex {
 	int		rs = SR_OK ;
 	if (! cmp->fl.uname) {
 	    cmp->fl.uname = true ;
-	    rs = uinfo_name(&cmp->uname) ;
+	    rs = ucinfo_name(&cmp->uname) ;
 	}
 	return rs ;
 }
@@ -1055,7 +1055,7 @@ local int cookmgr_uaux(CM *cmp) noex {
 	int		rs = SR_OK ;
 	if (! cmp->fl.uaux) {
 	    cmp->fl.uaux = true ;
-	    rs = uinfo_aux(&cmp->uaux) ;
+	    rs = ucinfo_aux(&cmp->uaux) ;
 	}
 	return rs ;
 }
@@ -1111,13 +1111,13 @@ local int cookmgr_finish(CM *cmp) noex {
 
 variables::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 	    nodenamelen = rs ;
-	    if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	        hostnamelen = rs ;
-	        if ((rs = getbufsize(bufsize_un)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_un)) >= 0) {
 	            usernamelen = rs ;
-	            if ((rs = getbufsize(bufsize_sn)) >= 0) {
+	            if ((rs = bufsizeget(bufsize_sn)) >= 0) {
 		        symnamelen = rs ;
 	            }
 		}
