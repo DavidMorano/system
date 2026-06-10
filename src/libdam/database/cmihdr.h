@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	CMIHDR			struct cmihdr_head
@@ -27,7 +24,7 @@
 
 
 struct cmihdr_head {
-	uint		dbsize ;	/* DB-file size */
+	uint		dbsz ;		/* DB-file size */
 	uint		dbtime ;	/* DB modification-time */
 	uint		idxsize ;	/* IDX-file size */
 	uint		idxtime ;	/* IDX creation-time */
@@ -40,7 +37,14 @@ struct cmihdr_head {
 	uchar		vetu[4] ;
 } ; /* end struct */
 
+#ifdef	__cplusplus
+struct cmihdr : cmihdr_head {
+    	int rd(char *,int) noex ;
+    	int wr(cchar *,int) noex ;
+} ; /* end struct (bvshdr) */
+#else /* __cplusplus */
 typedef	CMIHDR		cmihdr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
