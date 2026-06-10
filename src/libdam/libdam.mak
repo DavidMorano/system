@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-I00= usystem.h exitcodes.h localmisc.h
+I00=
 I01= vechand.h vecstr.h vecitem.h vecobj.h vecint.h veclong.h vecelem.h
 I02=
 I03=
@@ -702,7 +702,6 @@ msgbuf.o:		msgbuf.cc msgbuf.h
 sysrealname.o:		sysrealname.cc sysrealname.h
 dayofmonth.o:		dayofmonth.cc dayofmonth.h
 netfile.o:		netfile.cc netfile.h
-calmgr.o:		calmgr.cc calmgr.h
 sysnamedb.o:		sysnamedb.cc sysnamedb.h
 dirdb.o:		dirdb.cc dirdb.h
 cgi.o:			cgi.cc cgi.h
