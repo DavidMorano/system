@@ -31,6 +31,7 @@
 #define	FMTSTR_NULLSTR		"(null)"
 #endif
 
+
 EXTERNC_begin
 
 extern int	fmtstr(char *,int,int,cchar *,va_list) noex ;
