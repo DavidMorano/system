@@ -136,7 +136,6 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<usysflag.h>
-#include	<getbufsize.h>
 #include	<getfstype.h>
 #include	<sysval.hh>
 #include	<endian.h>
