@@ -20,17 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<cmihdr.h>		/* this is the hash-file-header */
 
 
-#define	CMI_MAGIC	0x88773427
-#define	CMI_SUF		"cmi"		/* variable-index */
 #define	CMI		struct cmi_head
 #define	CMI_OBJ		struct cmi_object
 #define	CMI_CUR		struct cmi_cursor
@@ -38,12 +32,14 @@
 #define	CMI_LINE	struct cmi_liner
 #define	CMI_INFO	struct cmi_information
 #define	CMI_FMI		struct cmi_fmidx
+#define	CMI_MAGIC	0x88773427
+#define	CMI_SUF		"cmi"		/* variable-index */
 
 
 struct cmi_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct cmi_information {
@@ -88,7 +84,7 @@ struct cmi_head {
 	CMI_FMI		fmi ;		/* file-map information */
 	CMIHDR		fhi ;		/* file-header information */
 	time_t		ti_lastcheck ;	/* time last check of file */
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 } ; /* end struct */
 
@@ -102,15 +98,15 @@ typedef	CMI_FMI		cmi_fmi ;
 
 EXTERNC_begin
 
-extern int	cmi_open(cmi *,cchar *) noex ;
-extern int	cmi_count(cmi *) noex ;
-extern int	cmi_getinfo(cmi *,cmi_info *) noex ;
-extern int	cmi_read(cmi *,cmi_ent *,char *,int,uint) noex ;
-extern int	cmi_curbegin(cmi *,cmi_cur *) noex ;
-extern int	cmi_enum(cmi *,cmi_cur *,cmi_ent *,char *,int) noex ;
-extern int	cmi_curend(cmi *,cmi_cur *) noex ;
-extern int	cmi_audit(cmi *) noex ;
-extern int	cmi_close(cmi *) noex ;
+extern int	cmi_open	(cmi *,cchar *) noex ;
+extern int	cmi_count	(cmi *) noex ;
+extern int	cmi_getinfo	(cmi *,cmi_info *) noex ;
+extern int	cmi_read	(cmi *,cmi_ent *,char *,int,uint) noex ;
+extern int	cmi_curbegin	(cmi *,cmi_cur *) noex ;
+extern int	cmi_curenum	(cmi *,cmi_cur *,cmi_ent *,char *,int) noex ;
+extern int	cmi_curend	(cmi *,cmi_cur *) noex ;
+extern int	cmi_audit	(cmi *) noex ;
+extern int	cmi_close	(cmi *) noex ;
 
 EXTERNC_end
 
