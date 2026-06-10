@@ -68,7 +68,7 @@ struct modload_head {
 	void		*sop ;		/* shared-object (SO) pointer */
 	cchar		*modname ;
 	MODLOAD_MI	*midp ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 #ifdef	__cplusplus
@@ -93,7 +93,8 @@ struct modload : modload_head {
 	modload_co	close ;
 	modload() noex {
 	    close	(this,modloadmem_close) ;
-	} ;
+	    magval = 0 ;
+	} ; /* end ctor */
 	modload(const modload &) = delete ;
 	modload &operator = (const modload &) = delete ;
 	int open	(cchar *,cchar *,cchar *,int,mainv) noex ;
@@ -102,7 +103,7 @@ struct modload : modload_head {
 	int getsym	(cchar *,cvoid **) noex ;
 	void dtor() noex ;
 	destruct modload() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (modload) */
 #else	/* __cplusplus */
