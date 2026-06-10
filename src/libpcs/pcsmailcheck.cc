@@ -77,7 +77,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
 #include	<estrings.h>
 #include	<vecstr.h>
@@ -702,9 +702,9 @@ checker::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(bufsize_mailaddr)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mailaddr)) >= 0) {
 		mailaddrlen = rs ;
 	    }
 	}
