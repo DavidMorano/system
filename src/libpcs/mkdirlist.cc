@@ -62,7 +62,7 @@
 #include	<usyscalls.h>
 #include	<uclibmem.h>
 #include	<ucdesc.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bfile.h>
 #include	<filer.h>
 #include	<fsdirtree.h>
@@ -603,7 +603,7 @@ local int vcmporder(cvoid **v1pp,cvoid **v2pp) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
 	}
 	return rs ;
