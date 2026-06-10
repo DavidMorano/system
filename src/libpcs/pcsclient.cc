@@ -82,7 +82,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
 #include	<getax.h>
 #include	<getpwx.h>
@@ -650,7 +650,7 @@ local int pcsclient_shmwr(PC *op,int fd,mode_t om) noex {
 
 #ifdef	COMMENT /* not needed for shared memory on single system */
 	if (rs >= 0)
-	    rs = uc_fdatasync(fd) ;
+	    rs = uc_fsyncdata(fd) ;
 #endif
 
 	return (rs >= 0) ? fileoff : rs ;
@@ -1012,7 +1012,7 @@ local int loadinfo_chown(LOADINFO *lip,int fd,int shmi) noex {
 	int		rs1 ;
 	if (lip) {
 	    ucentpw	pw ;
-	    cint	pwlen = getbufsize(bufsize_pw) ;
+	    cint	pwlen = bufsizeget(bufsize_pw) ;
 	    cchar	*sysuser = "sys" ;
 	    char	*pwbuf{} ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
