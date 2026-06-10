@@ -27,19 +27,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<modload.h>
-#include	<vecstr.h>
-#include	<sncpy.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<modload.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sncpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"commandment.h"
 #include	"commandments.h"
@@ -58,23 +58,24 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local namespaces */
 
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 extern "C" {
-    typedef int	(*soopen_f)(void *,cchar *,cchar *) noex ;
-    typedef int	(*soaudit_f)(void *) noex ;
-    typedef int	(*socount_f)(void *) noex ;
-    typedef int	(*sonummax_f)(void *) noex ;
-    typedef int	(*soread_f)(void *,char *,int,uint) noex ;
-    typedef int	(*soget_f)(void *,int,char *,int) noex ;
-    typedef int	(*socurbegin_f)(void *,void *) noex ;
-    typedef int	(*socurend_f)(void *,void *) noex ;
-    typedef int	(*socurenum_f)(void *,void *,void *,char *,int) noex ;
-    typedef int	(*soclose_f)(void *) noex ;
-}
+    typedef int	(*soopen_f)	(void *,cchar *,cchar *) noex ;
+    typedef int	(*soaudit_f)	(void *) noex ;
+    typedef int	(*socount_f)	(void *) noex ;
+    typedef int	(*sonummax_f)	(void *) noex ;
+    typedef int	(*soread_f)	(void *,char *,int,uint) noex ;
+    typedef int	(*soget_f)	(void *,int,char *,int) noex ;
+    typedef int	(*socurbegin_f)	(void *,void *) noex ;
+    typedef int	(*socurend_f)	(void *,void *) noex ;
+    typedef int	(*socurenum_f)	(void *,void *,void *,char *,int) noex ;
+    typedef int	(*soclose_f)	(void *) noex ;
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -120,7 +121,7 @@ local int commandment_ctor(CMD *op,Args ... args) noex {
                 if (rs < 0) {
                     delete op->mlp ;
                     op->mlp = nullptr ;
-                }
+                } /* end if (error) */
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
@@ -147,7 +148,7 @@ template<typename ... Args>
 local inline int commandment_magic(CMD *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == COMMANDMENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == COMMANDMENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (commandment_magic) */
@@ -178,7 +179,7 @@ enum subs {
 	sub_overlast
 } ; /* end enum (subs) */
 
-constexpr cpcchar	subs[] = {
+constexpr cpcchar	subnames[] = {
 	"open",
 	"audit",
 	"count",
@@ -190,7 +191,7 @@ constexpr cpcchar	subs[] = {
 	"curenum",
 	"close",
 	nullptr
-} ; /* end array (subs) */
+} ; /* end array (subnames) */
 
 
 /* exported variables */
@@ -210,17 +211,17 @@ int commandment_open(CMD *op,cchar *pr,cchar *dbname) noex {
 		    if (callp->open) {
 			auto 	co = callp->open ;
 	                if ((rs = co(op->obj,pr,dbname)) >= 0) {
-		            op->magic = COMMANDMENT_MAGIC ;
+		            op->magval = COMMANDMENT_MAGIC ;
 	                }
 		    } /* end if (open) */
 	            if (rs < 0) {
 		        commandment_objloadend(op) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		commandment_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -246,7 +247,7 @@ int commandment_close(CMD *op) noex {
 		rs1 = commandment_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -328,23 +329,23 @@ int commandment_curbegin(CMD *op,CMD_CUR *curp) noex {
 	    memclear(curp) ;
 	    if (callp->curbegin) {
 		cint	csz = op->cursz ;
-	        if (void *vp ; (rs = uc_malloc(csz,&vp)) >= 0) {
+	        if (void *vp ; (rs = mem.mall(csz,&vp)) >= 0) {
 		    curp->scp = vp ;
-		    auto 	co = callp->curbegin ;
+		    cauto 	co = callp->curbegin ;
 		    if ((rs = co(op->obj,curp->scp)) >= 0) {
-		         curp->magic = COMMANDMENT_MAGIC ;
+		         curp->magval = COMMANDMENT_MAGIC ;
 		    }
 	            if (rs < 0) {
-		        uc_free(curp->scp) ;
+		        mem.free(curp->scp) ;
 		        curp->scp = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (memory-allocation) */
 	    } else {
 	        rs = SR_NOTSOCK ;
 	    }
 	    if (rs < 0) {
 	        memclear(curp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -356,18 +357,18 @@ int commandment_curend(CMD *op,CMD_CUR *curp) noex {
 	if ((rs = commandment_magic(op,curp)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if ((curp->magic == COMMANDMENT_MAGIC) && curp->scp) {
+	    if ((curp->magval == COMMANDMENT_MAGIC) && curp->scp) {
 	        if (callp->curend) {
 		    auto 	co = callp->curend ;
 	            rs1 = co(op->obj,curp->scp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
 		{
-	            rs1 = uc_free(curp->scp) ;
+	            rs1 = mem.free(curp->scp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            curp->scp = nullptr ;
-		}
-	        curp->magic = 0 ;
+		} /* end if (memory-release) */
+	        curp->magval = 0 ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -389,7 +390,7 @@ int commandment_curenum(CMD *op,CMD_CUR *curp,uint *cnp,
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (commandment_enum) */
+/* end subroutine (commandment_curenum) */
 
 #ifdef	COMMENT
 
@@ -405,6 +406,7 @@ int commandment_search(CMD *op,cc *s,cmpfunc,cchar **rpp) noex {
 		    csize	qn = size_t(op->i) ;
 		    csize	qsz = szof(char *) ;
 	            qsort(op->va,qn,qsz,cmpfunc) ;
+		} /* end if (non-zero positive) */
 	    } /* end if (sorting) */
 	    if (op->fl.issorted) {
 	        csize	bn = size_t(op->i) ;
@@ -443,7 +445,7 @@ local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
 	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = CMD_MODBNAME ;
 	            cchar	*on = objn ;
@@ -458,19 +460,19 @@ local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 			    cint	osz = mv[0] ;
 	                    op->objsz = mv[0] ;
 	                    op->cursz = mv[1] ;
-			    if (void *vp ; (rs = uc_malloc(osz,&vp)) >= 0) {
+			    if (void *vp ; (rs = mem.mall(osz,&vp)) >= 0) {
 	                        op->obj = vp ;
 	                        rs = commandment_loadcalls(op,&syms) ;
 	                        if (rs < 0) {
-	                            uc_free(op->obj) ;
+	                            mem.free(op->obj) ;
 	                            op->obj = nullptr ;
-	                        }
+	                        } /* end if (error) */
 	                    } /* end if (memory-allocation) */
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 		            op->fl.modload = false ;
 	                    modload_close(lp) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
 	    } /* end if (vecstr_addsyms) */
@@ -479,28 +481,26 @@ local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
 		modload_close(lp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (vecstr-syms) */
 	return rs ;
-}
-/* end subroutine (commandment_objloadbegin) */
+} /* end subroutine (commandment_objloadbegin) */
 
 local int commandment_objloadend(CMD *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
-	    rs1 = uc_free(op->obj) ;
+	    rs1 = mem.free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->mlp && op->fl.modload) {
 	    op->fl.modload = false ;
 	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (commandment_objloadend) */
+} /* end subroutine (commandment_objloadend) */
 
 local int commandment_loadcalls(CMD *op,vecstr *slp) noex {
 	modload		*mlp = op->mlp ;
@@ -552,8 +552,7 @@ local int commandment_loadcalls(CMD *op,vecstr *slp) noex {
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (commandment_loadcalls) */
+} /* end subroutine (commandment_loadcalls) */
 
 local bool isrequired(int i) noex {
 	bool		f = false ;
@@ -570,7 +569,6 @@ local bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
