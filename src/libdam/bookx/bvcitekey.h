@@ -16,12 +16,9 @@
 #define	BVCITEKEY_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	BVCITEKEY		struct bvcitekey_head
@@ -32,7 +29,7 @@ struct bvcitekey_head {
 	uchar		b ;
 	uchar		c ;
 	uchar		v ;
- } ;
+ } ; /* end struct */
 
 typedef BVCITEKEY	bvcitekey ;
 
