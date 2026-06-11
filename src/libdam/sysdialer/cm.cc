@@ -41,7 +41,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
 #include	<expcook.h>
 #include	<vecstr.h>
@@ -572,17 +572,17 @@ local int cm_trysysargs(cm *op,SI *sip,vecstr *alp,
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mn)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 	    maxnamelen = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 		maxpathlen = rs ;
-	    	if ((rs = getbufsize(bufsize_un)) >= 0) ylikely {
+	    	if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		    usernamelen = rs ;
-	    	    if ((rs = getbufsize(bufsize_nn)) >= 0) ylikely {
+	    	    if ((rs = bufsizeget(bufsize_nn)) >= 0) ylikely {
 			nodenamelen = rs ;
-	    	    	if ((rs = getbufsize(bufsize_hn)) >= 0) ylikely {
+	    	    	if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 			    hostnamelen = rs ;
-	    	    	    if ((rs = getbufsize(bufsize_ma)) >= 0) ylikely {
+	    	    	    if ((rs = bufsizeget(bufsize_ma)) >= 0) ylikely {
 				maxarg = rs ;
 				rs = fieldterms(terms,0," \t") ;
 			    }
