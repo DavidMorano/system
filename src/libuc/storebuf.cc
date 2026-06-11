@@ -59,15 +59,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ctbin.h>
-#include	<ctoct.h>
-#include	<ctdec.h>
-#include	<cthex.h>
-#include	<strwcpy.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ctbin.h>		/* LIBUC */
+#include	<ctoct.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"storebuf.h"
