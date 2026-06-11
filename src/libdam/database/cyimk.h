@@ -21,12 +21,12 @@
 #include	<vecobj.h>
 
 
-#define	CYIMK_MAGIC	0x88773422
 #define	CYIMK		struct cyimk_head
 #define	CYIMK_FL	struct cyimk_flags
 #define	CYIMK_LN	struct cyimk_liner
 #define	CYIMK_OBJ	struct cyimk_object
 #define	CYIMK_ENT	struct cyimk_entry
+#define	CYIMK_MAGIC	0x88773422
 #define	CYIMK_INTOPEN	(10*60)
 #define	CYIMK_INTSTALE	(5*60)
 
