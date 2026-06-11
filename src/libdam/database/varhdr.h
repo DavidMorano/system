@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	VARHDR			struct varhdr_head
@@ -28,7 +25,7 @@
 
 
 struct varhdr_head {
-	uint		fsize ;
+	uint		fsz ;
 	uint		wtime ;
 	uint		ksoff ;
 	uint		kslen ;
@@ -43,7 +40,14 @@ struct varhdr_head {
 	uchar		vetu[4] ;
 } ; /* end struct */
 
+#ifdef	__cplusplus
+struct varhdr : varhdr_head {
+    	int rd		(char *,int) noex ;
+    	int wr		(cchar *,int) noex ;
+} ; /* end struct (bvshdr) */
+#else /* __cplusplus */
 typedef	VARHDR		varhdr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
