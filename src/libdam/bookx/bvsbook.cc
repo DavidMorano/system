@@ -91,8 +91,8 @@ int bvsbook_get(bvsbook *bep,ushort *a) noex {
     	int		rs = SR_FAULT ;
 	if (bep && a) {
 	    rs = SR_OK ;
-	    bep->al = (uchar) a[0] ;
-	    bep->ci = a[1] ;
+	    bep->al = uchar(a[0]) ;
+	    bep->ci = uchar(a[1]) ;
 	    bep->nverses = a[2] ;
 	    bep->nzverses = a[3] ;
 	} /* end if (non-null) */
