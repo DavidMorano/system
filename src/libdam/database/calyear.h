@@ -9,7 +9,7 @@
 #define	CALYEAR_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -18,13 +18,13 @@
 #include	<calyears.h>
 
 
-#define	CALYEAR_MAGIC	0x99447246
 #define	CALYEAR		struct calyear_head
 #define	CALYEAR_Q	struct calyear_q
 #define	CALYEAR_QUERY	struct calyear_q
 #define	CALYEAR_CITE	struct calyear_q
 #define	CALYEAR_CUR	struct calyear_c
 #define	CALYEAR_CALLS	struct calyear_calls
+#define	CALYEAR_MAGIC	0x99447246
 
 
 struct calyear_q {
