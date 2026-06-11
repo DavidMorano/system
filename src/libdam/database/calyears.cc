@@ -53,7 +53,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
 #include	<estrings.h>
 #include	<mktmp.h>
@@ -293,7 +293,7 @@ extern const calyears_obj	calyears_modinfo = {
 	"calyears",
 	szof(calyears),
 	szof(calyears_cur)
-} ;
+} ; /* extern array */
 
 
 /* exported subroutines */
@@ -1514,7 +1514,7 @@ local int subinfo_regacc(SI *sip,cchar *fn,int am) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_un)) >= 0) {
+	if ((rs = bufsizeget(bufsize_un)) >= 0) {
 	    usernamelen = rs ;
 	}
 	return rs ;
