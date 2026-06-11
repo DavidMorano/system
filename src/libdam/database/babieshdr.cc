@@ -39,24 +39,27 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
-#include	<unistd.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<unistd.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"babieshdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -75,9 +78,10 @@
 
 /* local variables */
 
-constexpr int		headsize = babieshdrh_overlast * szof(uint) ;
-constexpr int		magicsize = BABIESHDR_MAGICSIZE ;
-constexpr char		magicstr[] = BABIESHDR_MAGICSTR ;
+constexpr int		headsize	= babieshdrh_overlast * szof(uint) ;
+constexpr int		magicsize	= BABIESHDR_MAGICSIZE ;
+constexpr int		vsz		= szof(uint) ;	/* VETU */
+constexpr char		magicstr[]	= BABIESHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -92,27 +96,27 @@ int babieshdr_rd(babieshdr *ep,char *hbuf,int hlen) noex {
 	if (ep && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + 4)) {
+	    if (bl >= (magicsize + vsz)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	    	    memcpy(bp,ep->vetu,4) ;
-	    	    bp[0] = BABIESHDR_VERSION ;
-	    	    bp[1] = charconv(ENDIAN) ;
-	    	    bp += 4 ;
-	    	    bl -= 4 ;
+	    	    memcopy(bp,ep->vetu,vsz) ;
+	    	    bp[0] = uchar(BABIESHDR_VERSION) ;
+	    	    bp[1] = uchar(ENDIAN) ;
+	    	    bp += vsz ;
+	    	    bl -= vsz ;
 	    	    if (bl >= headsize) {
-	        	uint	*header = uintp(bp) ;
-	        	header[babieshdrh_shmsize] = ep->shmsize ;
-	        	header[babieshdrh_dbsize] = ep->dbsize ;
-	        	header[babieshdrh_dbtime] = ep->dbtime ;
-	        	header[babieshdrh_wtime] = ep->wtime ;
-	        	header[babieshdrh_atime] = ep->atime ;
-	        	header[babieshdrh_acount] = ep->acount ;
-	        	header[babieshdrh_muoff] = ep->muoff ;
-	        	header[babieshdrh_musize] = ep->musize ;
-	        	header[babieshdrh_btoff] = ep->btoff ;
-	        	header[babieshdrh_btlen] = ep->btlen ;
+	        	uint				*header = uintp(bp) ;
+	        	header[babieshdrh_shmsize]	= ep->shmsize ;
+	        	header[babieshdrh_dbsize]	= ep->dbsize ;
+	        	header[babieshdrh_dbtime]	= ep->dbtime ;
+	        	header[babieshdrh_wtime]	= ep->wtime ;
+	        	header[babieshdrh_atime]	= ep->atime ;
+	        	header[babieshdrh_acount]	= ep->acount ;
+	        	header[babieshdrh_muoff]	= ep->muoff ;
+	        	header[babieshdrh_musize]	= ep->musize ;
+	        	header[babieshdrh_btoff]	= ep->btoff ;
+	        	header[babieshdrh_btlen]	= ep->btlen ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
 			len = intconv(bp - hbuf) ;
@@ -140,33 +144,33 @@ int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
 	        bp += magicsize ;
 	        bl -= magicsize ;
 		/* read out the VETU information */
-	        if (bl >= 4) {
+	        if (bl >= vsz) {
 		    uchar	ech = uchar(ENDIAN) ;
-	            memcpy(ep->vetu,bp,4) ;
+	            memcopy(ep->vetu,bp,vsz) ;
 	            if (ep->vetu[0] != BABIESHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
 	            if ((rs >= 0) && (ep->vetu[1] != ech)) {
 	                rs = SR_PROTOTYPE ;
 		    }
-	            bp += 4 ;
-	            bl -= 4 ;
+	            bp += vsz ;
+	            bl -= vsz ;
 	        } else {
 	            rs = SR_ILSEQ ;
 		}
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
-	                uint	*header = uintp(bp) ;
-	                ep->shmsize = header[babieshdrh_shmsize] ;
-	                ep->dbsize = header[babieshdrh_dbsize] ;
-	                ep->dbtime = header[babieshdrh_dbtime] ;
-	                ep->wtime = header[babieshdrh_wtime] ;
-	                ep->atime = header[babieshdrh_atime] ;
-	                ep->acount = header[babieshdrh_acount] ;
-	                ep->muoff = header[babieshdrh_muoff] ;
-	                ep->musize = header[babieshdrh_musize] ;
-	                ep->btoff = header[babieshdrh_btoff] ;
-	                ep->btlen = header[babieshdrh_btlen] ;
+	                const uint	*header = uintp(bp) ;
+	                ep->shmsize	= header[babieshdrh_shmsize] ;
+	                ep->dbsize	= header[babieshdrh_dbsize] ;
+	                ep->dbtime	= header[babieshdrh_dbtime] ;
+	                ep->wtime	= header[babieshdrh_wtime] ;
+	                ep->atime	= header[babieshdrh_atime] ;
+	                ep->acount	= header[babieshdrh_acount] ;
+	                ep->muoff	= header[babieshdrh_muoff] ;
+	                ep->musize	= header[babieshdrh_musize] ;
+	                ep->btoff	= header[babieshdrh_btoff] ;
+	                ep->btlen	= header[babieshdrh_btlen] ;
 	                bp += headsize ;
 	                bl -= headsize ;
 			len = intconv(bp - hbuf) ;
@@ -181,5 +185,16 @@ int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (babieshdr_wr) */
+
+
+/* local subroutines */
+
+int babieshdr::rd(char *rbuf,int rlen) noex {
+    	return babieshdr_rd(this,rbuf,rlen) ;
+} /* end method (babieshdr::rd) */
+
+int babieshdr::wr(cchar *wbuf,int wlen) noex {
+    	return babieshdr_wr(this,wbuf,wlen) ;
+} /* end method (babieshdr::wr) */
 
 
