@@ -80,7 +80,7 @@
 #include	<getpwd.h>		/* LIBUC */
 #include	<gethz.h>		/* LIBUC */
 #include	<getxname.h>		/* LIBUC */
-#include	<getnisdomain.h>	/* |getnisdomain(3uc)| */
+#include	<getnisdomain.h>	/* LINUC |getnisdomain(3uc)| */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<envlist.h>		/* LIBUC */
@@ -616,7 +616,7 @@ local int envmk_mkenvsys(envmk *op,EL *etp,mainv envs) noex {
                                     vp = vbuf ;
                                     rs = ctdecl(vbuf,vlen,rs) ;
                                     vl = rs ;
-                                }
+                                } /* end if (gethz) */
                                 break ;
                             case 'T':
                                 if (op->un == nullptr) {
