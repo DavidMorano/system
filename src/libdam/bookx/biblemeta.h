@@ -12,12 +12,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LINUC */
 
 
-#define	BIBLEMETA_MAGIC		0x99447244
 #define	BIBLEMETA		struct biblemeta_head
 #define	BIBLEMETA_OBJ		struct biblemeta_object
+#define	BIBLEMETA_MAGIC		0x99447244
 
 
 enum biblemetas {
@@ -29,29 +31,29 @@ enum biblemetas {
  	biblemeta_thebookof,
  	biblemeta_book,
 	biblemeta_overlast
-} ;
+} ; /* end enum */
 
 struct biblemeta_object {
 	cchar		*name ;
-	uint		objsize ;
-} ;
+	uint		objsz ;
+} ; /* end struct */
 
 struct biblemeta_head {
 	vecstr		*dbp ;		/* data-base-pointer */
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef	BIBLEMETA	biblemeta ;
 typedef	BIBLEMETA_OBJ	biblemeta_obj ;
 
 EXTERNC_begin
 
-extern int	biblemeta_open(biblemeta *,cchar *,cchar *) noex ;
-extern int	biblemeta_count(biblemeta *) noex ;
-extern int	biblemeta_nummax(biblemeta *) noex ;
-extern int	biblemeta_get(biblemeta *,int,char *,int) noex ;
-extern int	biblemeta_audit(biblemeta *) noex ;
-extern int	biblemeta_close(biblemeta *) noex ;
+extern int	biblemeta_open		(biblemeta *,cchar *,cchar *) noex ;
+extern int	biblemeta_count		(biblemeta *) noex ;
+extern int	biblemeta_nummax	(biblemeta *) noex ;
+extern int	biblemeta_get		(biblemeta *,int,char *,int) noex ;
+extern int	biblemeta_audit		(biblemeta *) noex ;
+extern int	biblemeta_close		(biblemeta *) noex ;
 
 EXTERNC_end
 
