@@ -41,18 +41,22 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
-#include	<usystem.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bpihdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -66,7 +70,7 @@
 /* local structures */
 
 enum his {
-	hi_fsize,			/* file size */
+	hi_fsz,				/* file size */
 	hi_wtime,			/* creation time */
 	hi_vioff,			/* key-string table */
 	hi_vilen,
@@ -75,7 +79,7 @@ enum his {
 	hi_maxbook,
 	hi_maxchapter,
 	hi_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
@@ -83,9 +87,10 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize = hi_overlast * szof(uint) ;
-constexpr int		magicsize = BPIHDR_MAGICSIZE ;
-constexpr char		magicstr[] = BPIHDR_MAGICSTR ;
+constexpr int		headsize	= hi_overlast * szof(uint) ;
+constexpr int		magicsize	= BPIHDR_MAGICSIZE ;
+constexpr int		vsz		= szof(uint) ;	/* VETU */
+constexpr char		magicstr[]	= BPIHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -99,18 +104,19 @@ int bpihdr_rd(bpihdr *op,char *hbuf,int hlen) noex {
 	if (op && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + 4)) {
+	    rs = SR_INVALID ;
+	    if (bl >= (magicsize + vsz)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	            memcpy(bp,op->vetu,4) ;
-	            bp[0] = BPIHDR_VERSION ;
-	            bp[1] = ENDIAN ;
-	            bp += 4 ;
-	            bl -= 4 ;
+	            memcopy(bp,op->vetu,vsz) ;
+	            bp[0] = uchar(BPIHDR_VERSION) ;
+	            bp[1] = uchar(ENDIAN) ;
+	            bp += vsz ;
+	            bl -= vsz ;
 	            if (bl >= headsize) {
 	                uint	*header = (uint *) bp ;
-	                header[hi_fsize] = op->fsize ;
+	                header[hi_fsz] = op->fsz ;
 	                header[hi_wtime] = op->wtime ;
 	                header[hi_vioff] = op->vioff ;
 	                header[hi_vilen] = op->vilen ;
@@ -120,7 +126,7 @@ int bpihdr_rd(bpihdr *op,char *hbuf,int hlen) noex {
 	                header[hi_maxchapter] = op->maxchapter ;
 	                bp += headsize ;
 	                bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -144,33 +150,33 @@ int bpihdr_wr(bpihdr *op,cchar *hbuf,int hlen) noex {
 	        bp += magicsize ;
 	        bl -= magicsize ;
 		/* read out the VETU information */
-	        if (bl >= 4) {
-	            memcpy(op->vetu,bp,4) ;
+	        if (bl >= vsz) {
+	            memcopy(op->vetu,bp,vsz) ;
 	            if (op->vetu[0] != BPIHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 	            }
 	            if ((rs >= 0) && (op->vetu[1] != ENDIAN)) {
 	                rs = SR_PROTOTYPE ;
 	            }
-	            bp += 4 ;
-	            bl -= 4 ;
+	            bp += vsz ;
+	            bl -= vsz ;
 	        } else {
 	            rs = SR_ILSEQ ;
-	        }
+	        } /* end if */
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
-	                uint	*header = (uint *) bp ;
-	                op->fsize = header[hi_fsize] ;
-	                op->wtime = header[hi_wtime] ;
-	                op->vioff = header[hi_vioff] ;
-	                op->vilen = header[hi_vilen] ;
-	                op->nverses = header[hi_nverses] ;
-	                op->nzverses = header[hi_nzverses] ;
-	                op->maxbook = header[hi_maxbook] ;
-	                op->maxchapter = header[hi_maxchapter] ;
+	                const uint	*header = uintp(bp) ;
+	                op->fsz		= header[hi_fsz] ;
+	                op->wtime	= header[hi_wtime] ;
+	                op->vioff	= header[hi_vioff] ;
+	                op->vilen	= header[hi_vilen] ;
+	                op->nverses	= header[hi_nverses] ;
+	                op->nzverses	= header[hi_nzverses] ;
+	                op->maxbook	= header[hi_maxbook] ;
+	                op->maxchapter	= header[hi_maxchapter] ;
 	                bp += headsize ;
 	                bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
 	            }
@@ -183,4 +189,16 @@ int bpihdr_wr(bpihdr *op,cchar *hbuf,int hlen) noex {
 }
 /* end subroutine (bpihdr_wr) */
 	
+
+/* local subroutines */
+
+int bpihdr::rd(char *rbuf,int rlen) noex {
+    	return bpihdr_rd(this,rbuf,rlen) ;
+} /* end method (bpihdr::rd) */
+
+int bpihdr::wr(cchar *wbuf,int wlen) noex {
+    	return bpihdr_wr(this,wbuf,wlen) ;
+} /* end method (bpihdr::wr) */
+
+
 
