@@ -50,7 +50,6 @@ import libutil ;			/* |memclear(3u)| */
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -69,6 +68,8 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 local inline int varray_ctor(varray *op,Args ... args) noex {
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
@@ -77,7 +78,7 @@ local inline int varray_ctor(varray *op,Args ... args) noex {
 	    op->cnt = 0 ;
 	    op->ext = 0 ;
 	    op->umax = 0 ;
-	    if ((op->lap = new(nothrow) lookaside) != nullptr) ylikely {
+	    if ((op->lap = new(nt) lookaside) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-lookaside) */
 	} /* end if (non-null) */
