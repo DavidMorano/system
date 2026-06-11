@@ -63,7 +63,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -288,9 +288,9 @@ int cmimk_close(cmimk *op) noex {
 	    op->nfd = -1 ;
 	}
 	{
-	rs1 = cmimk_listend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	f_go = f_go && (rs1 >= 0) ;
+	    rs1 = cmimk_listend(op) ;
+	    if (rs >= 0) rs = rs1 ;
+	    f_go = f_go && (rs1 >= 0) ;
 	}
 	if ((nents > 0) && f_go) {
 	    rs1 = cmimk_renamefiles(op) ;
@@ -300,10 +300,15 @@ int cmimk_close(cmimk *op) noex {
 	    rs1 = cmimk_filesend(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	if (op->dbname != nullptr) {
-	    rs1 = uc_free(op->dbname) ;
+	if (op->dbname) {
+	    void *vp = voidp(op->dbname) ;
+	    rs1 = uc_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dbname = nullptr ;
+	} /* end if (memory-release) */
+	{
+	    rs1 = cmimk_dtor(op) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	op->magic = 0 ;
 	} /* end if (magic) */
