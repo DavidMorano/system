@@ -402,7 +402,7 @@ static int biblebook_objloadbegin(BIBLEBOOK *op,cchar *pr,cchar *objname) noex {
 	int		rs1 ;
 	int		opts ;
 
-	opts = VECSTR_OCOMPACT ;
+	opts = vecstrm.compact ;
 	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
 	    cint	nlen = SYMNAMELEN ;
 	    int		i ;
