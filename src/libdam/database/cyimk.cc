@@ -71,33 +71,33 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<endian.h>
-#include	<estrings.h>
-#include	<ids.h>
-#include	<storebuf.h>
-#include	<filer.h>
-#include	<tmtime.hh>
-#include	<opentmp.h>
-#include	<char.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<endian.h>		/* LIBU */
+#include	<estrings.h>		/* LIBU */
+#include	<ids.h>			/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cyimk.h"
 #include	"cyihdr.h"
@@ -151,36 +151,36 @@ struct blentry {
 
 /* forward references */
 
-static int	cyimk_idbegin(CYIMK *,cchar *,int) ;
-static int	cyimk_idend(CYIMK *) ;
-static int	cyimk_idxdir(CYIMK *,IDS *,cchar *) ;
-static int	cyimk_minown(CYIMK *,cchar *,mode_t) ;
+local int	cyimk_idbegin(CYIMK *,cchar *,int) ;
+local int	cyimk_idend(CYIMK *) ;
+local int	cyimk_idxdir(CYIMK *,IDS *,cchar *) ;
+local int	cyimk_minown(CYIMK *,cchar *,mode_t) ;
 
-static int	cyimk_filesbegin(CYIMK *) ;
-static int	cyimk_filesbeginc(CYIMK *) ;
-static int	cyimk_filesbeginwait(CYIMK *) ;
-static int	cyimk_filesbegincreate(CYIMK *,cchar *,int,mode_t) ;
-static int	cyimk_filesend(CYIMK *) ;
+local int	cyimk_filesbegin(CYIMK *) ;
+local int	cyimk_filesbeginc(CYIMK *) ;
+local int	cyimk_filesbeginwait(CYIMK *) ;
+local int	cyimk_filesbegincreate(CYIMK *,cchar *,int,mode_t) ;
+local int	cyimk_filesend(CYIMK *) ;
 
-static int	cyimk_listbegin(CYIMK *,int) ;
-static int	cyimk_listend(CYIMK *) ;
+local int	cyimk_listbegin(CYIMK *,int) ;
+local int	cyimk_listend(CYIMK *) ;
 
-static int	cyimk_mkidx(CYIMK *) ;
-static int	cyimk_mkidxmain(CYIMK *,CYIHDR *) ;
-static int	cyimk_mkidxhdr(CYIMK *,CYIHDR *,FILER *) ;
-static int	cyimk_mkidxstrs(CYIMK *,CYIHDR *,FILER *,int) ;
-static int	cyimk_mkidxents(CYIMK *,CYIHDR *,FILER *,int) ;
-static int	cyimk_mkidxlines(CYIMK *,CYIHDR *,FILER *,int) ;
-static int	cyimk_nidxopen(CYIMK *) ;
-static int	cyimk_nidxclose(CYIMK *) ;
-static int	cyimk_renamefiles(CYIMK *) ;
+local int	cyimk_mkidx(CYIMK *) ;
+local int	cyimk_mkidxmain(CYIMK *,CYIHDR *) ;
+local int	cyimk_mkidxhdr(CYIMK *,CYIHDR *,filer *) ;
+local int	cyimk_mkidxstrs(CYIMK *,CYIHDR *,filer *,int) ;
+local int	cyimk_mkidxents(CYIMK *,CYIHDR *,filer *,int) ;
+local int	cyimk_mkidxlines(CYIMK *,CYIHDR *,filer *,int) ;
+local int	cyimk_nidxopen(CYIMK *) ;
+local int	cyimk_nidxclose(CYIMK *) ;
+local int	cyimk_renamefiles(CYIMK *) ;
 
-static int	mkydname(char *,cchar *,int) ;
-static int	mkcitation(uint *,CYIMK_ENT *) ;
-static int	mknewfname(char *,int,cchar *,cchar *) ;
-static int	unlinkstale(cchar *,int) ;
+local int	mkydname(char *,cchar *,int) ;
+local int	mkcitation(uint *,CYIMK_ENT *) ;
+local int	mknewfname(char *,int,cchar *,cchar *) ;
+local int	unlinkstale(cchar *,int) ;
 
-static int	vvecmp(const void *,const void *) ;
+local int	vvecmp(cvoid *,cvoid *) ;
 
 
 /* local variables */
@@ -302,9 +302,7 @@ int cyimk_close(CYIMK *op)
 }
 /* end subroutine (cyimk_close) */
 
-
-int cyimk_add(CYIMK *op,CYIMK_ENT *bvp)
-{
+int cyimk_add(CYIMK *op,CYIMK_ENT *bvp) noex {
 	uint		li = UINT_MAX ;
 	int		rs = SR_OK ;
 
@@ -347,9 +345,7 @@ int cyimk_add(CYIMK *op,CYIMK_ENT *bvp)
 }
 /* end subroutine (cyimk_add) */
 
-
-int cyimk_abort(CYIMK *op,int f)
-{
+int cyimk_abort(CYIMK *op,int f) noex {
 	op->fl.abort = f ;
 	return SR_OK ;
 }
@@ -358,7 +354,7 @@ int cyimk_abort(CYIMK *op,int f)
 
 /* private subroutines */
 
-static int cyimk_idbegin(CYIMK *op,cchar *dname,int year) noex {
+local int cyimk_idbegin(CYIMK *op,cchar *dname,int year) noex {
 	int		rs ;
 	if (USTAT sb ; (rs = uc_stat(dname,&sb)) >= 0) {
 	    cint	am = (W_OK|X_OK) ;
@@ -380,17 +376,13 @@ static int cyimk_idbegin(CYIMK *op,cchar *dname,int year) noex {
 	    } /* end if (ids) */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (cyimk_idbegin) */
+} /* end subroutine (cyimk_idbegin) */
 
-
-static int cyimk_idxdir(CYIMK *op,IDS *idp,cchar *ydname)
-{
-	ustat	sb ;
-	const mode_t	dm = 0777 ;
-	cint	nrs = SR_NOENT ;
+local int cyimk_idxdir(CYIMK *op,IDS *idp,cchar *ydname) noex {
+	cmode		dm = 0777 ;
+	cint		nrs = SR_NOENT ;
 	int		rs = SR_OK ;
-	if ((rs = uc_stat(ydname,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_stat(ydname,&sb)) >= 0) {
 	    cint	am = (W_OK|X_OK) ;
 	    uid_t	uid_yd = sb.st_uid ;
 	    gid_t	gid_yd = sb.st_gid ;
@@ -406,41 +398,32 @@ static int cyimk_idxdir(CYIMK *op,IDS *idp,cchar *ydname)
 	    if ((rs = mkdirs(ydname,dm)) >= 0) {
 		rs = cyimk_minown(op,ydname,dm) ;
 	    } /* end if (mkdirs) */
+	} /* end if */
+	return rs ;
+} /* end subroutine (cyimk_idxdir) */
+
+local int cyimk_minown(CYIMK *op,cchar *dname,mode_t dm) noex {
+	int		rs ;
+	if ((rs = uc_minmod(dname,dm)) >= 0) {
+	    gid_t	gid = op->gid ;
+	    uid_t	uid = op->uid ;
+	    rs = uc_chown(dname,uid,gid) ;
 	}
 	return rs ;
-}
-/* end subroutine (cyimk_idxdir) */
+} /* end subroutine (cyimk_minown) */
 
-
-static int cyimk_minown(CYIMK *op,cchar *dname,mode_t dm)
-{
-	int		rs ;
-		if ((rs = uc_minmod(dname,dm)) >= 0) {
-		    gid_t	gid = op->gid ;
-		    uid_t	uid = op->uid ;
-		    uc_chown(dname,uid,gid) ;
-		}
-	return rs ;
-}
-/* end subroutine (cyimk_minown) */
-
-
-static int cyimk_idend(CYIMK *op)
-{
+local int cyimk_idend(CYIMK *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->idname != NULL) {
+	if (op->idname) {
 	    rs1 = uc_free(op->idname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->idname = NULL ;
 	}
 	return rs ;
-}
-/* end subroutine (cyimk_idend) */
+} /* end subroutine (cyimk_idend) */
 
-
-static int cyimk_filesbegin(CYIMK *op)
-{
+local int cyimk_filesbegin(CYIMK *op) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (op->fl.ofcreat) {
@@ -450,78 +433,69 @@ static int cyimk_filesbegin(CYIMK *op)
 	    c = rs ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (cyimk_filesbegin) */
+} /* end subroutine (cyimk_filesbegin) */
 
-
-static int cyimk_filesbeginc(CYIMK *op)
-{
-	cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
+local int cyimk_filesbeginc(CYIMK *op) noex {
+	cint		type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	int		rs ;
 	char		dbn[MAXPATHLEN+1] ;
 	if ((rs = mkpath2(dbn,op->idname,op->cname)) >= 0) {
-	cchar		*suf = FSUF_IDX	 ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
-	    const mode_t	om = op->om ;
-	    cchar		*tfn = tbuf ;
-	    char		rbuf[MAXPATHLEN+1] ;
-	    if (type) {
-	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
-	            op->fl.created = true ;
-	            tfn = rbuf ;
+	    cchar	*suf = FSUF_IDX	 ;
+	    char	tbuf[MAXPATHLEN+1] ;
+	    if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
+	        cmode	om = op->om ;
+	        cchar	*tfn = tbuf ;
+	        char	rbuf[MAXPATHLEN+1] ;
+	        if (type) {
+	            if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
+	                op->fl.created = true ;
+	                tfn = rbuf ;
+	            }
 	        }
-	    }
-	    if (rs >= 0) {
-	        mode_t	om = op->om ;
-	        int	of = O_CREAT ;
-	        if (op->fl.ofexcl) of |= O_EXCL ;
-	        rs = cyimk_filesbegincreate(op,tfn,of,om) ;
-	        if ((rs < 0) && type) {
-	            uc_unlink(rbuf) ;
-	        }
-	    } /* end if (ok) */
-	} /* end if (mknewfname) */
+	        if (rs >= 0) {
+	            mode_t	om = op->om ;
+	            int	of = O_CREAT ;
+	            if (op->fl.ofexcl) of |= O_EXCL ;
+	            rs = cyimk_filesbegincreate(op,tfn,of,om) ;
+	            if ((rs < 0) && type) {
+	                uc_unlink(rbuf) ;
+	            }
+	        } /* end if (ok) */
+	    } /* end if (mknewfname) */
 	} /* end if (mkpath) */
 	return rs ;
-}
-/* end subroutine (cyimk_filesbeginc) */
+} /* end subroutine (cyimk_filesbeginc) */
 
-
-static int cyimk_filesbeginwait(CYIMK *op)
-{
+local int cyimk_filesbeginwait(CYIMK *op) noex {
 	int		rs ;
 	int		c = 0 ;
 	char		dbn[MAXPATHLEN+1] ;
 	if ((rs = mkpath2(dbn,op->idname,op->cname)) >= 0) {
-	cchar		*suf = FSUF_IDX	 ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
-	    const mode_t	om = op->om ;
-	    cint		to_stale = CYIMK_INTSTALE ;
-	    cint		nrs = SR_EXISTS ;
-	    cint		of = (O_CREAT|O_WRONLY|O_EXCL) ;
-	    int			to = CYIMK_INTOPEN ;
-	    while ((rs = cyimk_filesbegincreate(op,tbuf,of,om)) == nrs) {
-	        c = 1 ;
-	        sleep(1) ;
-	        unlinkstale(tbuf,to_stale) ;
-	        if (to-- == 0) break ;
-	    } /* end while (db exists) */
-	    if (rs == nrs) {
-	        op->fl.ofcreat = false ;
-	        c = 0 ;
-	        rs = cyimk_filesbeginc(op) ;
-	    }
-	} /* end if (mknewfname) */
+	    cchar	*suf = FSUF_IDX	 ;
+	    char	tbuf[MAXPATHLEN+1] ;
+	    if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
+	        cmode	om = op->om ;
+	        cint	to_stale = CYIMK_INTSTALE ;
+	        cint	nrs = SR_EXISTS ;
+	        cint	of = (O_CREAT|O_WRONLY|O_EXCL) ;
+	        int	to = CYIMK_INTOPEN ;
+	        while ((rs = cyimk_filesbegincreate(op,tbuf,of,om)) == nrs) {
+	            c = 1 ;
+	            sleep(1) ;
+	            unlinkstale(tbuf,to_stale) ;
+	            if (to-- == 0) break ;
+	        } /* end while (db exists) */
+	        if (rs == nrs) {
+	            op->fl.ofcreat = false ;
+	            c = 0 ;
+	            rs = cyimk_filesbeginc(op) ;
+	        }
+	    } /* end if (mknewfname) */
 	} /* end if (mkpath) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (cyimk_filesbeginwait) */
+} /* end subroutine (cyimk_filesbeginwait) */
 
-
-static int cyimk_filesbegincreate(CYIMK *op,cchar *tfn,int of,mode_t om)
-{
+local int cyimk_filesbegincreate(CYIMK *op,cchar *tfn,int of,mode_t om) noex {
 	int		rs ;
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
 	    cint	fd = rs ;
@@ -532,24 +506,18 @@ static int cyimk_filesbegincreate(CYIMK *op,cchar *tfn,int of,mode_t om)
 	    }
 	    u_close(fd) ;
 	} /* end if (create) */
-
 	return rs ;
-}
-/* end subroutine (cyimk_filesbegincreate) */
+} /* end subroutine (cyimk_filesbegincreate) */
 
-
-static int cyimk_filesend(CYIMK *op)
-{
+local int cyimk_filesend(CYIMK *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->nfd >= 0) {
 	    rs1 = u_close(op->nfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nfd = -1 ;
 	}
-
-	if (op->nidxfname != NULL) {
+	if (op->nidxfname) {
 	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        rs1 = u_unlink(op->nidxfname) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -558,14 +526,10 @@ static int cyimk_filesend(CYIMK *op)
 	    if (rs >= 0) rs = rs1 ;
 	    op->nidxfname = NULL ;
 	}
-
 	return rs ;
-}
-/* end subroutine (cyimk_filesend) */
+} /* end subroutine (cyimk_filesend) */
 
-
-static int cyimk_listbegin(CYIMK *op,int n)
-{
+local int cyimk_listbegin(CYIMK *op,int n) noex {
 	int		rs ;
 	int		sz ;
 	int		opts ;
@@ -583,28 +547,23 @@ static int cyimk_listbegin(CYIMK *op,int n)
 	}
 
 	return rs ;
-}
-/* end subroutine (cyimk_listbegin) */
+} /* end subroutine (cyimk_listbegin) */
 
-
-static int cyimk_listend(CYIMK *op)
-{
+local int cyimk_listend(CYIMK *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
+	{
 	rs1 = vecobj_finish(&op->lines) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = vecobj_finish(&op->verses) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	return rs ;
-}
-/* end subroutine (cyimk_listend) */
+} /* end subroutine (cyimk_listend) */
 
-
-static int cyimk_mkidx(CYIMK *op)
-{
+local int cyimk_mkidx(CYIMK *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -629,7 +588,7 @@ static int cyimk_mkidx(CYIMK *op)
 	        if ((rs = cyihdr(&hdr,0,hbuf,hlen)) >= 0) {
 	            cint	bl = rs ;
 	            if ((rs = u_pwrite(op->nfd,hbuf,bl,0L)) >= 0) {
-	                const mode_t	om = op->om ;
+	                cmode	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
 	            }
 	        }
@@ -641,13 +600,10 @@ static int cyimk_mkidx(CYIMK *op)
 	} /* end if (cyimk_nidx) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cyimk_mkidx) */
+} /* end subroutine (cyimk_mkidx) */
 
-
-static int cyimk_mkidxmain(CYIMK *op,CYIHDR *hdrp)
-{
-	FILER		hf, *hfp = &hf ;
+local int cyimk_mkidxmain(CYIMK *op,CYIHDR *hdrp) noex {
+	filer		hf, *hfp = &hf ;
 	cint	nfd = op->nfd ;
 	cint	ps = getpagesize() ;
 	int		bsz ;
@@ -675,14 +631,11 @@ static int cyimk_mkidxmain(CYIMK *op,CYIHDR *hdrp)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 	return (rs >= 0) ? off : rs ;
-}
-/* end subroutine (cyimk_mkidxmain) */
-
+} /* end subroutine (cyimk_mkidxmain) */
 
 /* ARGSUSED */
-static int cyimk_mkidxhdr(CYIMK *op,CYIHDR *hdrp,FILER *hfp)
-{
-	cint	hlen = HDRBUFLEN ;
+local int cyimk_mkidxhdr(CYIMK *op,CYIHDR *hdrp,filer *hfp) noex {
+	cint		hlen = HDRBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		hbuf[HDRBUFLEN+1] ;
@@ -692,12 +645,9 @@ static int cyimk_mkidxhdr(CYIMK *op,CYIHDR *hdrp,FILER *hfp)
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cyimk_mkidxhdr) */
+} /* end subroutine (cyimk_mkidxhdr) */
 
-
-static int cyimk_mkidxstrs(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
-{
+local int cyimk_mkidxstrs(CYIMK *op,CYIHDR *hdrp,filer *hfp,int off) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	char		tbuf[MAXPATHLEN + 1] ;
@@ -717,12 +667,9 @@ static int cyimk_mkidxstrs(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 	} /* end if (pathclean) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cyimk_mkidxstrs) */
+} /* end subroutine (cyimk_mkidxstrs) */
 
-
-static int cyimk_mkidxents(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
-{
+local int cyimk_mkidxents(CYIMK *op,CYIHDR *hdrp,filer *hfp,int off) noex {
 	struct bventry	*bvep ;
 	vecobj		*elp = &op->verses ;
 	uint		a[5] ;
@@ -750,12 +697,9 @@ static int cyimk_mkidxents(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 	hdrp->vilen = n ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cyimk_mkidxents) */
+} /* end subroutine (cyimk_mkidxents) */
 
-
-static int cyimk_mkidxlines(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
-{
+local int cyimk_mkidxlines(CYIMK *op,CYIHDR *hdrp,filer *hfp,int off) noex {
 	struct blentry	*blep ;
 	vecobj		*llp = &op->lines ;
 	uint		a[2] ;
@@ -767,7 +711,7 @@ static int cyimk_mkidxlines(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 
 	hdrp->vloff = off ;
 	for (i = 0 ; vecobj_get(llp,i,&blep) >= 0 ; i += 1) {
-	    if (blep != NULL) {
+	    if (blep) {
 	        a[0] = blep->loff ;
 	        a[1] = blep->llen ;
 	        n += 1 ;
@@ -780,13 +724,10 @@ static int cyimk_mkidxlines(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 	hdrp->vllen = n ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cyimk_mkidxlines) */
+} /* end subroutine (cyimk_mkidxlines) */
 
-
-static int cyimk_nidxopen(CYIMK *op)
-{
-	const mode_t	om = op->om ;
+local int cyimk_nidxopen(CYIMK *op) noex {
+	cmode		om = op->om ;
 	int		rs ;
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
@@ -823,12 +764,9 @@ static int cyimk_nidxopen(CYIMK *op)
 	    fd = rs ;
 	}
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (cyimk_nidxopen) */
+} /* end subroutine (cyimk_nidxopen) */
 
-
-static int cyimk_nidxclose(CYIMK *op)
-{
+local int cyimk_nidxclose(CYIMK *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nfd >= 0) {
@@ -837,34 +775,28 @@ static int cyimk_nidxclose(CYIMK *op)
 	    op->nfd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (cyimk_nidxclose) */
+} /* end subroutine (cyimk_nidxclose) */
 
-
-static int cyimk_renamefiles(CYIMK *op)
-{
+local int cyimk_renamefiles(CYIMK *op) noex {
 	int		rs ;
 	cchar		*suf = FSUF_IDX ;
 	cchar		*end = ENDIANSTR ;
 	char		dbn[MAXPATHLEN+1] ;
 	if ((rs = mkpath2(dbn,op->idname,op->cname)) >= 0) {
 	    char	idxfname[MAXPATHLEN + 1] ;
-	if ((rs = mkfnamesuf2(idxfname,dbn,suf,end)) >= 0) {
-	    if ((rs = u_rename(op->nidxfname,idxfname)) >= 0) {
-	        op->nidxfname[0] = '\0' ;
-	    } else {
-	        u_unlink(op->nidxfname) ;
-	        op->nidxfname[0] = '\0' ;
-	    }
-	} /* end if (mkfnamesuf) */
+	    if ((rs = mkfnamesuf2(idxfname,dbn,suf,end)) >= 0) {
+	        if ((rs = u_rename(op->nidxfname,idxfname)) >= 0) {
+	            op->nidxfname[0] = '\0' ;
+	        } else {
+	            u_unlink(op->nidxfname) ;
+	            op->nidxfname[0] = '\0' ;
+	        }
+	    } /* end if (mkfnamesuf) */
 	} /* end if (mkpath) */
 	return rs ;
-}
-/* end subroutine (cyimk_renamefiles) */
+} /* end subroutine (cyimk_renamefiles) */
 
-
-static int mkcitation(uint *cip,CYIMK_ENT *bvp)
-{
+local int mkcitation(uint *cip,CYIMK_ENT *bvp) noex {
 	uint		ci = 0 ;
 	uint		nlines ;
 
@@ -876,10 +808,9 @@ static int mkcitation(uint *cip,CYIMK_ENT *bvp)
 
 	*cip = ci ;
 	return SR_OK ;
-}
-/* end subroutine (mkcitation) */
+} /* end subroutine (mkcitation) */
 
-static int mkydname(char *rbuf,cchar *dname,int year) noex {
+local int mkydname(char *rbuf,cchar *dname,int year) noex {
 	cint	rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
@@ -900,21 +831,16 @@ static int mkydname(char *rbuf,cchar *dname,int year) noex {
 	    i += rs ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mkydname) */
+} /* end subroutine (mkydname) */
 
-
-static int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf)
-{
+local int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
 	cchar		*end = ENDIANSTR ;
 	cchar		*fin = (type) ? "xXXXX" : "n" ;
 	return mkfnamesuf3(tbuf,dbn,suf,end,fin) ;
 }
 /* end subroutine (mknewfname) */
 
-
-static int unlinkstale(cchar *fn,int to)
-{
+local int unlinkstale(cchar *fn,int to) {
 	ustat	sb ;
 	const time_t	dt = time(NULL) ;
 	int		rs ;
@@ -929,28 +855,24 @@ static int unlinkstale(cchar *fn,int to)
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (unlinkstale) */
+} /* end subroutine (unlinkstale) */
 
-
-static int vvecmp(const void *v1p,const void *v2p)
-{
+local int vvecmp(cvoid *v1p,cvoid *v2p) noex {
 	struct bventry	**e1pp = (struct bventry **) v1p ;
 	struct bventry	**e2pp = (struct bventry **) v2p ;
 	int		rc = 0 ;
-
-	if (*e1pp != NULL) {
-	    if (*e2pp != NULL) {
+	if (*e1pp) {
+	    if (*e2pp) {
 	        uint	vc1 = (*e1pp)->citation & 0x0000FFFF ;
 	        uint	vc2 = (*e2pp)->citation & 0x0000FFFF ;
 	        rc = (vc1 - vc2) ;
-	    } else
+	    } else {
 	        rc = -1 ;
-	} else
+	    }
+	} else {
 	    rc = 1 ;
-
+	}
 	return rc ;
-}
-/* end subroutine (vvecmp) */
+} /* end subroutine (vvecmp) */
 
 
