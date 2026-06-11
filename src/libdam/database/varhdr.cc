@@ -39,20 +39,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"varhdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -66,7 +69,7 @@
 /* local structures */
 
 enum his {
-	hi_fsize,			/* file size */
+	hi_fsz,				/* file size */
 	hi_wtime,			/* creation time */
 	hi_ksoff,			/* key-string table */
 	hi_kslen,
@@ -87,9 +90,10 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize = hi_overlast * szof(uint) ;
-constexpr int		magicsize = VARHDR_MAGICSIZE ;
-constexpr char		magicstr[] = VARHDR_MAGICSTR ;
+constexpr int		headsize	= hi_overlast * szof(uint) ;
+constexpr int		magicsize	= VARHDR_MAGICSIZE ;
+constexpr int		vsz		= szof(uint) ;	/* VETU */
+constexpr char		magicstr[]	= VARHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -103,31 +107,32 @@ int varhdr_rd(varhdr *ep,char *hbuf,int hlen) noex {
 	if (ep && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + 4)) {
+	    if (bl >= (magicsize + vsz)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	    	    memcpy(bp,ep->vetu,4) ;
-	    	    *bp = VARHDR_VERSION ;
-	    	    bp += 4 ;
-	    	    bl -= 4 ;
+	    	    memcopy(bp,ep->vetu,vsz) ;
+	    	    bp[0] = uchar(VARHDR_VERSION) ;
+	    	    bp[1] = uchar(ENDIAN) ;
+	    	    bp += vsz ;
+	    	    bl -= vsz ;
 	            if (bl >= headsize) {
-	        	uint	*header = (uint *) bp ;
-	        	header[hi_fsize] = ep->fsize ;
-	        	header[hi_wtime] = ep->wtime ;
-	        	header[hi_ksoff] = ep->ksoff ;
-	        	header[hi_kslen] = ep->kslen ;
-	        	header[hi_vsoff] = ep->vsoff ;
-	        	header[hi_vslen] = ep->vslen ;
-	        	header[hi_rtoff] = ep->rtoff ;
-	        	header[hi_rtlen] = ep->rtlen ;
-	        	header[hi_itoff] = ep->itoff ;
-	        	header[hi_itlen] = ep->itlen ;
-	        	header[hi_nvars] = ep->nvars ;
-	        	header[hi_nskip] = ep->nskip ;
+	        	uint			*header = uintp(bp) ;
+	        	header[hi_fsz]		= ep->fsz ;
+	        	header[hi_wtime]	= ep->wtime ;
+	        	header[hi_ksoff]	= ep->ksoff ;
+	        	header[hi_kslen]	= ep->kslen ;
+	        	header[hi_vsoff]	= ep->vsoff ;
+	        	header[hi_vslen]	= ep->vslen ;
+	        	header[hi_rtoff]	= ep->rtoff ;
+	        	header[hi_rtlen]	= ep->rtlen ;
+	        	header[hi_itoff]	= ep->itoff ;
+	        	header[hi_itlen]	= ep->itlen ;
+	        	header[hi_nvars]	= ep->nvars ;
+	        	header[hi_nskip]	= ep->nskip ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 		    } else {
 			rs = SR_OVERFLOW ;
 		    } /* end if */
@@ -151,37 +156,37 @@ int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
 	        bp += magicsize ;
 	        bl -= magicsize ;
 		/* read out the VETU information */
-	        if (bl >= 4) {
-	            memcpy(ep->vetu,bp,4) ;
+	        if (bl >= vsz) {
+	            memcopy(ep->vetu,bp,vsz) ;
 	            if (ep->vetu[0] != VARHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
 	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
 	                rs = SR_PROTOTYPE ;
 		    }
-	            bp += 4 ;
-	            bl -= 4 ;
+	            bp += vsz ;
+	            bl -= vsz ;
 	        } else {
 	            rs = SR_ILSEQ ;
 		}
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
-	                uint	*header = (uint *) bp ;
-	                ep->fsize = header[hi_fsize] ;
-	                ep->wtime = header[hi_wtime] ;
-	                ep->ksoff = header[hi_ksoff] ;
-	                ep->kslen = header[hi_kslen] ;
-	                ep->vsoff = header[hi_vsoff] ;
-	                ep->vslen = header[hi_vslen] ;
-	                ep->rtoff = header[hi_rtoff] ;
-	                ep->rtlen = header[hi_rtlen] ;
-	                ep->itoff = header[hi_itoff] ;
-	                ep->itlen = header[hi_itlen] ;
-	                ep->nvars = header[hi_nvars] ;
-	                ep->nskip = header[hi_nskip] ;
+	                const uint	*header = uintp(bp) ;
+	                ep->fsz		= header[hi_fsz] ;
+	                ep->wtime	= header[hi_wtime] ;
+	                ep->ksoff	= header[hi_ksoff] ;
+	                ep->kslen	= header[hi_kslen] ;
+	                ep->vsoff	= header[hi_vsoff] ;
+	                ep->vslen	= header[hi_vslen] ;
+	                ep->rtoff	= header[hi_rtoff] ;
+	                ep->rtlen	= header[hi_rtlen] ;
+	                ep->itoff	= header[hi_itoff] ;
+	                ep->itlen	= header[hi_itlen] ;
+	                ep->nvars	= header[hi_nvars] ;
+	                ep->nskip	= header[hi_nskip] ;
 	                bp += headsize ;
 	                bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
 		    }
@@ -193,5 +198,16 @@ int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (varhdr_wr) */
+
+
+/* local subroutines */
+
+int varhdr::rd(char *rbuf,int rlen) noex {
+    	return varhdr_rd(this,rbuf,rlen) ;
+} /* end method (varhdr::rd) */
+
+int varhdr::wr(cchar *wbuf,int wlen) noex {
+    	return varhdr_wr(this,wbuf,wlen) ;
+} /* end method (varhdr::wr) */
 
 
