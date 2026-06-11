@@ -60,7 +60,7 @@
 #include	<uclibmem.h>
 #include	<ucsysmisc.h>
 #include	<ucsigset.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<endian.h>
 #include	<sigblocker.h>
 #include	<bfile.h>
@@ -1246,7 +1246,7 @@ vars::operator int () noex {
     	int		rs ;
 	if ((rs = ucpagesize) >= 0) {
 	    pagesize = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 		maxpathlen = rs ;
 	    }
 	}
