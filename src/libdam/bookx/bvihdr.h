@@ -20,11 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	BVIHDR			struct bvihdr_head
@@ -34,7 +31,7 @@
 
 
 struct bvihdr_head {
-	uint		fsize ;
+	uint		fsz ;
 	uint		wtime ;
 	uint		vioff ;
 	uint		vilen ;
@@ -45,9 +42,16 @@ struct bvihdr_head {
 	uint		maxbook ;
 	uint		maxchapter ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct (bvihdr) */
 
+#ifdef	__cplusplus
+struct bvihdr : bvihdr_head {
+    	int rd		(char *,int)	noex ;
+    	int wr		(cchar *,int)	noex ;
+} ; /* end struct (bvihdr) */
+#else /* __cplusplus */
 typedef	BVIHDR		bvihdr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
