@@ -10,16 +10,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
-#include	<bpi.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bpi.h>			/* LIBDAM */
 
 
-#define	BIBLEPARAS_MAGIC	0x99447246
 #define	BIBLEPARAS		struct bibleparas_head
 #define	BIBLEPARAS_OBJ		struct bibleparas_object
 #define	BIBLEPARAS_FL		struct bibleparas_flags
@@ -27,15 +22,16 @@
 #define	BIBLEPARAS_Q		struct bibleparas_query
 #define	BIBLEPARAS_CUR		struct bibleparas_cursor
 #define	BIBLEPARAS_INFO		struct bibleparas_information
+#define	BIBLEPARAS_MAGIC	0x99447246
 /* default DB name */
 #define	BIBLEPARAS_DBNAME	"default"
 
 
 struct bibleparas_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
-} ;
+	uint		objsz ;
+	uint		cursz ;
+} ; /* end struct */
 
 struct bibleparas_information {
 	time_t		dbtime ;		/* db-time */
@@ -44,19 +40,19 @@ struct bibleparas_information {
 	uint		maxchapter ;
 	uint		nverses ;
 	uint		nzverses ;
-} ;
+} ; /* end struct */
 
 struct bibleparas_query {
 	uchar		b, c, v ;
-} ;
+} ; /* end struct */
 
 struct bibleparas_cursor {
 	BPI_CUR		vicur ;
-} ;
+} ; /* end struct */
 
 struct bibleparas_flags {
 	uint		vind:1 ;		/* index is loaded */
-} ;
+} ; /* end struct */
 
 struct bibleparas_head {
 	cchar		*pr ;
@@ -71,10 +67,10 @@ struct bibleparas_head {
 	size_t		mapsize ;		/* map size */
 	size_t		filesize ;		/* file size */
 	BIBLEPARAS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		nverses ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	BIBLEPARAS		bibleparas ;
 typedef	BIBLEPARAS_OBJ		bibleparas_obj ;
