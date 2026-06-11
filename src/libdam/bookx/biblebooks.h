@@ -17,43 +17,40 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecpstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecpstr.h>		/* LIBUC */
 
 
-#define	BIBLEBOOKS_MAGIC	0x99447243
 #define	BIBLEBOOKS		struct biblebooks_head
 #define	BIBLEBOOKS_OBJ		struct biblebooks_object
+#define	BIBLEBOOKS_MAGIC	0x99447243
 
 
 struct biblebooks_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
-} ;
+	uint		objsz ;
+	uint		cursz ;
+} ; /* end struct */
 
 struct biblebooks_head {
-	uint		magic ;
 	vecpstr		db ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef	BIBLEBOOKS		biblebooks ;
 typedef	BIBLEBOOKS_OBJ		biblebooks_obj ;
 
 EXTERNC_begin
 
-extern int	biblebooks_open(BIBLEBOOKS *,cchar *,cchar *) noex ;
-extern int	biblebooks_count(BIBLEBOOKS *) noex ;
-extern int	biblebooks_max(BIBLEBOOKS *) noex ;
-extern int	biblebooks_lookup(BIBLEBOOKS *,char *,int,int) noex ;
-extern int	biblebooks_get(BIBLEBOOKS *,int,char *,int) noex ;
-extern int	biblebooks_size(BIBLEBOOKS *) noex ;
-extern int	biblebooks_audit(BIBLEBOOKS *) noex ;
-extern int	biblebooks_close(BIBLEBOOKS *) noex ;
+extern int	biblebooks_open(biblebooks *,cchar *,cchar *) noex ;
+extern int	biblebooks_count(biblebooks *) noex ;
+extern int	biblebooks_max(biblebooks *) noex ;
+extern int	biblebooks_lookup(biblebooks *,char *,int,int) noex ;
+extern int	biblebooks_get(biblebooks *,int,char *,int) noex ;
+extern int	biblebooks_size(biblebooks *) noex ;
+extern int	biblebooks_audit(biblebooks *) noex ;
+extern int	biblebooks_close(biblebooks *) noex ;
 
 EXTERNC_end
 
