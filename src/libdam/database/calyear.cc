@@ -5,7 +5,7 @@
 /* CALYEAR object loader */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_LOOKSELF	0		/* try searching "SELF" for SO */
 
 /* revision history:
@@ -47,6 +47,7 @@
 #include	<vecstr.h>
 #include	<modload.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"calyear.h"
 #include	"calyears.h"
@@ -139,7 +140,7 @@ int calyear_open(calyear *op,cc *pr,cc *dirnames,cc *calnames) noex {
 		calyear_objloadend(op) ;
 	} /* end if (objload-begin) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("calyear_open: ret rs=%d\n",rs) ;
 #endif
 
@@ -288,7 +289,7 @@ int calyear_lookcite(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp)
 	    if (op->call.lookcite != nullptr) {
 	        ocurp = (CALYEARS_CUR *) curp->scp ;
 	        rs = (*op->call.lookcite)(op->obj,ocurp,qp) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 		debugprintf("calyuear_lookcite: calyears_lookcite() rs=%d\n",
 			rs) ;
 #endif
@@ -297,7 +298,7 @@ int calyear_lookcite(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp)
 	} else
 	    rs = SR_NOTSOCK ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("calyuear_lookcite: ret rs=%d\n",rs) ;
 #endif
 
@@ -344,7 +345,7 @@ local int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname) noex {
 	int		rs1 ;
 	int		opts ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("calyear_objloadbegin: pr=%s\n",pr) ;
 	debugprintf("calyear_objloadbegin: objname=%s\n",objname) ;
 #endif
@@ -381,7 +382,7 @@ local int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname) noex {
 		modload_close(lp) ;
 	} /* end if (allocation) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("calyear_objloadbegin: modload_open() rs=%d\n",rs) ;
 #endif
 
@@ -445,7 +446,7 @@ local int calyear_loadcalls(CALYEAR *op,cchar *objname) noex {
 
 	    if (rs < 0) break ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("calyear_loadcalls: call=%s %c\n",
 		subs[i],
 		((snp != nullptr) ? 'Y' : 'N')) ;
