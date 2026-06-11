@@ -79,12 +79,13 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 local int biblemeta_ctor(biblemeta *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
     	BIBLEMETA	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->dbp = new(nothrow) vecstr) != np) {
+	    if ((op->dbp = new(nt) vecstr) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
@@ -98,7 +99,7 @@ local int biblemeta_dtor(biblemeta *op) noex {
 	    if (op->dbp) ylikely {
 		delete op->dbp ;
 		op->dbp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (biblemeta_dtor) */
@@ -108,7 +109,7 @@ local inline int biblemeta_magic(biblemeta *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == BIBLEMETA_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (biblemeta_magic) */
 
