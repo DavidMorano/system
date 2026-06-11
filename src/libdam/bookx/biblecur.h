@@ -21,41 +21,42 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-#include	<biblebook.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<biblebook.h>		/* LIBDAM */
 
 
-#define	BIBLECUR_MAGIC	0x87361524
 #define	BIBLECUR	struct biblecur_head
 #define	BIBLECUR_FL	struct biblecur_flags
+#define	BIBLECUR_MAGIC	0x87361524
 
 
 struct biblecur_flags {
 	uint		newbook:1 ;
 	uint		newchapter:1 ;
 	uint		newverse:1 ;
-} ;
+} ; /* end struct */
 
 struct biblecur_head {
 	BIBLECUR_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		book ;
 	int		chapter ;
 	int		verse ;
 	char		bookname[BIBLEBOOK_LEN + 1] ;
-} ;
+} ; /* end struct */
 
 typedef	BIBLECUR	biblecur ;
 typedef	BIBLECUR_FL	biblecur_fl ;
 
 EXTERNC_begin
 
-extern int biblecur_start(biblecur *) noex ;
-extern int biblecur_finish(biblecur *) noex ;
-extern int biblecur_check(biblecur *,cchar *,int) noex ;
-extern int biblecur_newbook(biblecur *,biblebook *) noex ;
-extern int biblecur_newchapter(biblecur *) noex ;
-extern int biblecur_newverse(biblecur *,int) noex ;
+extern int biblecur_start	(biblecur *) noex ;
+extern int biblecur_finish	(biblecur *) noex ;
+extern int biblecur_check	(biblecur *,cchar *,int) noex ;
+extern int biblecur_newbook	(biblecur *,biblebook *) noex ;
+extern int biblecur_newchapter	(biblecur *) noex ;
+extern int biblecur_newverse	(biblecur *,int) noex ;
 
 EXTERNC_end
 
