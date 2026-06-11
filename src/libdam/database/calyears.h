@@ -29,7 +29,6 @@
 #include	<calcite.h>
 
 
-#define	CALYEARS_MAGIC	0x99447245
 #define	CALYEARS	struct calyears_head
 #define	CALYEARS_OBJ	struct calyears_object
 #define	CALYEARS_Q	CALCITE
@@ -37,6 +36,7 @@
 #define	CALYEARS_CITE	CALCITE
 #define	CALYEARS_CUR	struct calyears_cursor
 #define	CALYEARS_FL	struct calyears_flags
+#define	CALYEARS_MAGIC	0x99447245
 
 
 struct calyears_object {
