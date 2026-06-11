@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* constant division */
+/* number of digits for various types and number bases */
 /* version %I% last-modified %G% */
 
 
