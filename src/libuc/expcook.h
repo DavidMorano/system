@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdbstr.h>
-#include	<buffer.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdbstr.h>		/* LIBU */
+#include	<buffer.h>		/* LIBU */
 
 
 #define	EXPCOOK		struct expcook_head
