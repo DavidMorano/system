@@ -636,7 +636,7 @@ static int bibleparas_indopenseq(BIBLEPARAS *op,SUBINFO *sip)
 
 	if ((rs = dirseen_start(&ds)) >= 0) {
 	    vecstr	sdirs ;
-	    const int	vopts = VECSTR_OCOMPACT ;
+	    const int	vopts = vecstrm.compact ;
 	    if ((rs = vecstr_start(&sdirs,6,vopts)) >= 0) {
 	        EXPCOOK	cooks ;
 	        if ((rs = expcook_start(&cooks)) >= 0) {
