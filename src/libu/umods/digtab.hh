@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* convert a single character to a given case */
+/* retrieve a digit from the digit-table (DIGTAB) */
 /* version %I% last-modified %G% */
 
 
