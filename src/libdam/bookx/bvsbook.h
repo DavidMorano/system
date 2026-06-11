@@ -21,12 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
-#include	<usysrets.h>		/* LIBU */
-#include	<usyscalls.h>		/* LIBU */
-#include	<localmisc.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	BVSBOOK		struct bvsbook_head
@@ -36,7 +31,7 @@ struct bvsbook_head {
 	uchar		*ap ;		/* array of verses for each chapter */
 	ushort		nverses ;	/* total for the whole book */
 	ushort		nzverses ;	/* non-zero for the whole book */
-	ushort		ci ;		/* chapter index */
+	uchar		ci ;		/* chapter index */
 	uchar		book ;
 	uchar		al ;		/* also is the number of chapters */
 } ; /* end struct */
