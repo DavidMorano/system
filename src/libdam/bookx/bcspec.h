@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	BCSPEC		struct bcspec_head
@@ -27,7 +24,7 @@ struct bcspec_head {
 	cchar		*sp ;
 	int		sl ;
 	schar		b, c, v ;
-} ;
+} ; /* end struct */
 
 typedef BCSPEC		bcspec ;
 
