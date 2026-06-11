@@ -40,26 +40,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<endian.h>
-#include	<strn.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ttihdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -73,7 +74,7 @@
 /* local structures */
 
 enum his {
-	hi_fsize,			/* file-size */
+	hi_fsz,				/* file-size */
 	hi_ctime,			/* creation-time */
 	hi_rectab,			/* record-table */
 	hi_reclen,			/* record-legnth */
@@ -88,9 +89,10 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize = hi_overlast * szof(uint) ;
-constexpr int		magicsize = TTIHDR_MAGICSIZE ;
-constexpr char		magicstr[] = TTIHDR_MAGICSTR ;
+constexpr int		headsize	= hi_overlast * szof(uint) ;
+constexpr int		magicsize	= TTIHDR_MAGICSIZE ;
+constexpr int		vsz		= szof(uint) ;	/* VETU */
+constexpr char		magicstr[]	= TTIHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -104,23 +106,23 @@ int ttihdr_rd(ttihdr *op,char *hbuf,int hlen) noex {
         if (op && hbuf) {
             int         bl = hlen ;
             char        *bp = hbuf ;
-            if (bl >= (magicsize + 4)) {
+            if (bl >= (magicsize + vsz)) {
                 if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
                     bp += magicsize ;
                     bl -= magicsize ;
-                    memcpy(bp,op->vetu,4) ;
-                    bp[0] = TTIHDR_VERSION ;
-                    bp[1] = char(ENDIAN) ;
-                    bp += 4 ;
-                    bl -= 4 ;
+                    memcopy(bp,op->vetu,vsz) ;
+                    bp[0] = uchar(TTIHDR_VERSION) ;
+                    bp[1] = uchar(ENDIAN) ;
+                    bp += vsz ;
+                    bl -= vsz ;
                     if (bl >= headsize) {
-                        uint    *header = uintp(bp) ;
-	        	header[hi_fsize] = op->fsize ;
-	        	header[hi_ctime] = op->ctime ;
-	        	header[hi_rectab] = op->rectab ;
-	        	header[hi_reclen] = op->reclen ;
-	        	header[hi_ostrtab] = op->ostrlen ;
-	        	header[hi_ostrlen] = op->ostrlen ;
+                        uint    		*header = uintp(bp) ;
+	        	header[hi_fsz]		= op->fsz ;
+	        	header[hi_ctime]	= op->ctime ;
+	        	header[hi_rectab]	= op->rectab ;
+	        	header[hi_reclen]	= op->reclen ;
+	        	header[hi_ostrtab]	= op->ostrlen ;
+	        	header[hi_ostrlen]	= op->ostrlen ;
                         bp += headsize ;
                         bl -= headsize ;
                         len = intconv(bp - hbuf) ;
@@ -147,28 +149,28 @@ int ttihdr_wr(ttihdr *op,cchar *hbuf,int hlen) noex {
                 bp += magicsize ;
                 bl -= magicsize ;
                 /* read out the VETU information */
-                if (bl >= 4) {
-                    memcpy(op->vetu,bp,4) ;
+                if (bl >= vsz) {
+                    memcopy(op->vetu,bp,vsz) ;
                     if (op->vetu[0] != TTIHDR_VERSION) {
                         rs = SR_PROTONOSUPPORT ;
                     }
                     if ((rs >= 0) && (op->vetu[1] != ENDIAN)) {
                         rs = SR_PROTOTYPE ;
                     }
-                    bp += 4 ;
-                    bl -= 4 ;
+                    bp += vsz ;
+                    bl -= vsz ;
                 } else {
                     rs = SR_ILSEQ ;
                 }
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
-	                uint	*header = uintp(bp) ;
-	                op->fsize = header[hi_fsize] ;
-	                op->ctime = header[hi_ctime] ;
-	                op->rectab = header[hi_rectab] ;
-	                op->reclen = header[hi_reclen] ;
-	                op->ostrtab = header[hi_ostrtab] ;
-	                op->ostrlen = header[hi_ostrlen] ;
+	                const uint	*header = uintp(bp) ;
+	                op->fsz		= header[hi_fsz] ;
+	                op->ctime	= header[hi_ctime] ;
+	                op->rectab	= header[hi_rectab] ;
+	                op->reclen	= header[hi_reclen] ;
+	                op->ostrtab	= header[hi_ostrtab] ;
+	                op->ostrlen	= header[hi_ostrlen] ;
 	                bp += headsize ;
 	                bl -= headsize ;
 		        len = intconv(bp - hbuf) ;
@@ -183,5 +185,16 @@ int ttihdr_wr(ttihdr *op,cchar *hbuf,int hlen) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (ttihdr_wr) */
+
+
+/* local subroutines */
+
+int ttihdr::rd(char *rbuf,int rlen) noex {
+    	return ttihdr_rd(this,rbuf,rlen) ;
+} /* end method (ttihdr::rd) */
+
+int ttihdr::wr(cchar *wbuf,int wlen) noex {
+    	return ttihdr_wr(this,wbuf,wlen) ;
+} /* end method (ttihdr::wr) */
 
 
