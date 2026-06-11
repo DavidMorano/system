@@ -50,17 +50,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>		/* |HZ| for those that have it */
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<cfdec.h>
-#include	<isnot.h>		/* |isNotValid(3uc)| */
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX |HZ| for those that have it */
+#include	<unistd.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC |isNotValid(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"gethz.h"
 
@@ -85,11 +86,14 @@ import uconstants ;
 #define	HZ_GUESS	100		/* guessed value (AT&T 3B2 series) */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern "C" {
-    extern int uc_sysconfval(int,long *) noex ;
-}
 
 /* external variables */
 
@@ -98,26 +102,27 @@ extern "C" {
 
 namespace {
     struct hzmgr ;
-    typedef int (hzmgr::*hzmgr_m)(int) noex ;
+    typedef int (hzmgr::*hzmgr_m)(gethzes) noex ;
     struct hzmgr {
 	int		hz ;
-	int operator () (int) noex ;
-	int getany(int) noex ;
-	int tryenv(int) noex ;
-	int tryconf(int) noex ;
-	int tryconst(int) noex ;
-	int trytck(int) noex ;
-	int tryguess(int) noex ;
+	int operator () (gethzes) noex ;
+	bool isUs	(gethzes,gethzes) noex ;
+	int getany	(gethzes) noex ;
+	int tryenv	(gethzes) noex ;
+	int tryconf	(gethzes) noex ;
+	int tryconst	(gethzes) noex ;
+	int trytck	(gethzes) noex ;
+	int tryguess	(gethzes) noex ;
     } ; /* end struct (hzmgr) */
 } /* end namespace */
 
-constexpr hzmgr_m	mems[] = {
+constexpr hzmgr_m	tries[] = {
 	&hzmgr::tryenv,
 	&hzmgr::tryconf,
 	&hzmgr::tryconst,
 	&hzmgr::trytck,
 	&hzmgr::tryguess
-} ; /* end array (mems) */
+} ; /* end array (tries) */
 
 
 /* forward references */
@@ -138,15 +143,20 @@ ucgetx::gethzer		syshz ;
 /* exported subroutines */
 
 namespace ucgetx {
-    int gethzer::operator () (int w) noex {
-	return gethz_data(w) ;
+    int gethzer::operator () (gethzes w) noex {
+    	return gethz_data(w) ;
     } /* end method (gethzer::operator) */
 } /* end namespace (ucgetx) */
+
+int gethz(int wi) noex {
+    	gethzes	w = gethzes(wi) ;
+    	return gethz_data(w) ;
+} /* end subroutine (gethz) */
 
 
 /* local subroutines */
 
-int hzmgr::operator () (int w) noex {
+int hzmgr::operator () (gethzes w) noex {
 	int		rs = SR_OK ;
 	if ((hz == 0) || (w > 0)) {
 	    rs = getany(w) ;
@@ -156,18 +166,22 @@ int hzmgr::operator () (int w) noex {
 	return rs ;
 } /* end method (hzmgr::operator) */
 
-int hzmgr::getany(int w) noex {
+bool hzmgr::isUs(gethzes wme,gethzes w) noex {
+    	return ((hz == 0) && ((w == gethz_any) || (w == wme))) ;
+} /* end method (hdmgr::isUs) */
+
+int hzmgr::getany(gethzes w) noex {
 	int		rs = SR_OK ;
-	for (cauto &m : mems) {
+	for (cauto &m : tries) {
 	    rs = (this->*m)(w) ;
 	    if (rs != 0) break ;
 	} /* end for */
 	return rs ;
 } /* end method (hzmgr::getany) */
 
-int hzmgr::tryenv(int w) noex {
+int hzmgr::tryenv(gethzes w) noex {
 	int		rs = SR_OK ;
-	if ((hz == 0) && ((w == gethz_any) || (w == gethz_env))) {
+	if (isUs(gethz_env,w)) {
 	    static cchar *val = getenver(varname.hz) ;
 	    if (val) {
 	        if ((rs = decval(val)) > 0) {
@@ -176,13 +190,13 @@ int hzmgr::tryenv(int w) noex {
 		    rs = SR_OK ;
 		}
 	    } /* end if (HZ environment) */
-	}
+	} /* end if (isUs) */
 	return rs ;
 } /* end method (hzmgr::tryenv) */
 
-int hzmgr::tryconf(int w) noex {
+int hzmgr::tryconf(gethzes w) noex {
 	int		rs = SR_OK ;
-	if ((hz == 0) && ((w == gethz_any) || (w == gethz_conf))) {
+	if (isUs(gethz_conf,w)) {
 	    if (cint cmd = _SC_CLK_TCK ; cmd >= 0) {
 	        if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) {
 		    hz = rs ;
@@ -190,39 +204,39 @@ int hzmgr::tryconf(int w) noex {
 		    rs = SR_OK ;
 		}
 	    }
-	}
+	} /* end if (isUs) */
 	return rs ;
 } /* end method (hzmgr::tryconf) */
 
-int hzmgr::tryconst(int w) noex {
+int hzmgr::tryconst(gethzes w) noex {
 	int		rs = SR_OK ;
-	if ((hz == 0) && ((w == gethz_any) || (w == gethz_const))) {
+	if (isUs(gethz_const,w)) {
 	    rs = HZ ;
 	    hz = rs ;
-	}
+	} /* end if (isUs) */
 	return rs ;
 } /* end method (hzmgr::tryconst) */
 
-int hzmgr::trytck(int w) noex {
+int hzmgr::trytck(gethzes w) noex {
 	int		rs = SR_OK ;
-	if ((hz == 0) && ((w == gethz_any) || (w == gethz_tck))) {
+	if (isUs(gethz_tck,w)) {
 	    rs = CLK_TCK ;
 	    hz = rs ;
-	}
+	} /* end if (isUs) */
 	return rs ;
 } /* end method (hzmgr::trytck) */
 
-int hzmgr::tryguess(int w) noex {
+int hzmgr::tryguess(gethzes w) noex {
 	int		rs = SR_OK ;
-	if ((hz == 0) && ((w == gethz_any) || (w == gethz_guess))) {
+	if (isUs(gethz_guess,w)) {
 	    rs = HZ_GUESS ;
-	}
+	} /* end if (isUs) */
 	return rs ;
 } /* end method (hzmgr::tryguess) */
 
 local int decval(cchar *s) noex {
 	int		rs ;
-	int		rv = 0 ;
+	int		rv = 0 ; /* return-value */
 	if ((rs = cfdeci(s,-1,&rv)) >= 0) {
 	    if (rv < 0) rs = SR_DOM ;
 	}
