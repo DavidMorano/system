@@ -113,7 +113,7 @@ int biblecur_start(biblecur *op) noex {
 	    op->verse = -1 ;
 	    if (rs < 0) {
 		biblecur_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (biblecur_ctor) */
 	return rs ;
 }
@@ -146,7 +146,7 @@ int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	    while (sl && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    if (sl > 0) {
 	        /* start of new line */
 	        int	ch = MKCHAR(*sp) ;
