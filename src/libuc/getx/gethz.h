@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum gethzes {
@@ -34,13 +34,19 @@ enum gethzes {
 	gethz_overlast
 } ; /* end enum (gethzes) */
 
+EXTERNC_begin
+
+extern int	gethz(int) noex ;
+
+EXTERNC_end
+
 #ifdef	__cplusplus
 
 namespace ucgetx {
     struct gethzer {
-	int operator () (int = 0) noex ;
+	int operator () (gethzes = gethz_any) noex ;
 	operator int () noex {
-	    return operator () (0) ;
+	    return operator () (gethz_any) ;
 	} ;
     } ; /* end struct (gethzer) */
 } /* end namespace (ucgetx) */
