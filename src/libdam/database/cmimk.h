@@ -22,13 +22,13 @@
 #include	<vecobj.h>
 
 
-#define	CMIMK_MAGIC	0x88773425
 #define	CMIMK		struct cmimk_head
 #define	CMIMK_OBJ	struct cmimk_object
 #define	CMIMK_ENT	struct cmimk_entry
 #define	CMIMK_LINE	struct cmimk_liner
 #define	CMIMK_INFO	struct cmimk_information
 #define	CMIMK_FL	struct cmimk_flags
+#define	CMIMK_MAGIC	0x88773425
 #define	CMIMK_NE	4
 #define	CMIMK_INTOPEN	(10*60)
 #define	CMIMK_INTSTALE	(5*60)
