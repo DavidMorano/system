@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	CYIHDR			struct cyihdr_head
@@ -27,7 +24,7 @@
 
 
 struct cyihdr_head {
-	uint		fsize ;
+	uint		fsz ;
 	uint		wtime ;
 	uint		diroff ;
 	uint		caloff ;
@@ -41,7 +38,14 @@ struct cyihdr_head {
 	uchar		vetu[4] ;
 } ; /* end struct */
 
+#ifdef	__cplusplus
+struct cyihdr : cyihdr_head {
+    	int rd		(char *,int) noex ;
+    	int wr		(cchar *,int) noex ;
+} ; /* end struct (bvshdr) */
+#else /* __cplusplus */
 typedef	CYIHDR		cyihdr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
