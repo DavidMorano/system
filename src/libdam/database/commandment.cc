@@ -59,7 +59,6 @@ import libutil ;			/* |memclear(3u)| */
 /* local namespaces */
 
 using libuc::mem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -108,13 +107,14 @@ template<typename ... Args>
 local int commandment_ctor(CMD *op,Args ... args) noex {
 	COMMANDMENT	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->mlp = new(nothrow) modload) != np) ylikely {
+	    if ((op->mlp = new(nt) modload) != np) ylikely {
 		commandment_calls    *callp ;
-                if ((callp = new(nothrow) commandment_calls) != np) ylikely {
+                if ((callp = new(nt) commandment_calls) != np) ylikely {
                     op->callp = callp ;
                     rs = SR_OK ;
                 } /* end if (new-commandment_calls) */
@@ -149,13 +149,13 @@ local inline int commandment_magic(CMD *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == COMMANDMENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (commandment_magic) */
 
-local int	commandment_objloadbegin(CMD *,cchar *,cchar *) noex ;
-local int	commandment_objloadend(CMD *) noex ;
-local int	commandment_loadcalls(CMD *,vecstr *) noex ;
+local int	commandment_objloadbegin	(CMD *,cchar *,cchar *) noex ;
+local int	commandment_objloadend		(CMD *) noex ;
+local int	commandment_loadcalls		(CMD *,vecstr *) noex ;
 
 local bool	isrequired(int) noex ;
 
@@ -199,7 +199,7 @@ constexpr cpcchar	subnames[] = {
 
 /* exported subroutines */
 
-int commandment_open(CMD *op,cchar *pr,cchar *dbname) noex {
+int commandment_open(CMD *op,cchar *pr,cchar *dbn) noex {
 	int		rs ;
 	if ((rs = commandment_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
@@ -209,8 +209,8 @@ int commandment_open(CMD *op,cchar *pr,cchar *dbname) noex {
 		    commandment_calls	*callp = callsp(op->callp) ;
 		    rs = SR_NOSYS ;
 		    if (callp->open) {
-			auto 	co = callp->open ;
-	                if ((rs = co(op->obj,pr,dbname)) >= 0) {
+			cauto 	co = callp->open ;
+	                if ((rs = co(op->obj,pr,dbn)) >= 0) {
 		            op->magval = COMMANDMENT_MAGIC ;
 	                }
 		    } /* end if (open) */
@@ -222,7 +222,7 @@ int commandment_open(CMD *op,cchar *pr,cchar *dbname) noex {
 	    if (rs < 0) {
 		commandment_dtor(op) ;
 	    } /* end if (error) */
-	} /* end if (non-null) */
+	} /* end if (commandment_ctor) */
 	return rs ;
 }
 /* end subroutine (commandment_open) */
@@ -233,7 +233,7 @@ int commandment_close(CMD *op) noex {
 	if ((rs = commandment_magic(op)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    if (callp->close) {
-		auto 	co = callp->close ;
+		cauto 	co = callp->close ;
 	        rs1 = co(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
@@ -259,7 +259,7 @@ int commandment_audit(CMD *op) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->audit) {
-		auto 	co = callp->audit ;
+		cauto 	co = callp->audit ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
@@ -273,7 +273,7 @@ int commandment_count(CMD *op) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->count) {
-		auto 	co = callp->count ;
+		cauto 	co = callp->count ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
@@ -287,7 +287,7 @@ int commandment_nummax(CMD *op) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->nummax) {
-		auto 	co = callp->nummax ;
+		cauto 	co = callp->nummax ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
@@ -301,7 +301,7 @@ int commandment_read(CMD *op,char *rbuf,int rlen,uint cn) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->read) {
-		auto 	co = callp->read ;
+		cauto 	co = callp->read ;
     		rs = co(op->obj,rbuf,rlen,cn) ;
 	    }
 	} /* end if (magic) */
@@ -515,34 +515,34 @@ local int commandment_loadcalls(CMD *op,vecstr *slp) noex {
                 c += 1 ;
                 switch (i) {
                 case sub_open:
-                    callp->open = soopen_f(snp) ;
+                    callp->open		= soopen_f(snp) ;
                     break ;
                 case sub_count:
-                    callp->count = socount_f(snp) ;
+                    callp->count	= socount_f(snp) ;
                     break ;
                 case sub_get:
-                    callp->get = soget_f(snp) ;
+                    callp->get		= soget_f(snp) ;
                     break ;
                 case sub_read:
-                    callp->read = soread_f(snp) ;
+                    callp->read		= soread_f(snp) ;
                     break ;
                 case sub_nummax:
-                    callp->nummax = sonummax_f(snp) ;
+                    callp->nummax	= sonummax_f(snp) ;
                     break ;
                 case sub_curbegin:
-                    callp->curbegin = socurbegin_f(snp) ;
+                    callp->curbegin	= socurbegin_f(snp) ;
                     break ;
                 case sub_curenum:
-                    callp->curenum = socurenum_f(snp) ;
+                    callp->curenum	= socurenum_f(snp) ;
                     break ;
                 case sub_curend:
-                    callp->curend = socurend_f(snp) ;
+                    callp->curend	= socurend_f(snp) ;
                     break ;
                 case sub_audit:
-                    callp->audit = soaudit_f(snp) ;
+                    callp->audit	= soaudit_f(snp) ;
                     break ;
                 case sub_close:
-                    callp->close = soclose_f(snp) ;
+                    callp->close	= soclose_f(snp) ;
                     break ;
                 } /* end switch */
             } else if (rs == rsn) {
