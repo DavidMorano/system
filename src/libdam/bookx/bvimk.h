@@ -20,29 +20,27 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
-#define	BVIMK_MAGIC	0x88773422
 #define	BVIMK		struct bvimk_head
 #define	BVIMK_FL	struct bvimk_flags
 #define	BVIMK_OBJ	struct bvimk_object
 #define	BVIMK_V		struct bvimk_verse
 #define	BVIMK_LINE	struct bvimk_liner
 #define	BVIMK_INFO	struct bvimk_information
+#define	BVIMK_MAGIC	0x88773422
 #define	BVIMK_INTOPEN	(10*60)
 #define	BVIMK_INTSTALE	(5*60)
 
 
 struct bvimk_object {
 	cchar		*name ;
-	uint		objsize ;
-} ;
+	uint		objsz ;
+	uint		cursz ;
+} ; /* end struct */
 
 struct bvimk_information {
 	uint		maxbook ;
@@ -50,19 +48,19 @@ struct bvimk_information {
 	uint		maxverse ;
 	uint		nverses ;
 	uint		nzverses ;
-} ;
+} ; /* end struct */
 
 struct bvimk_liner {
 	uint		loff ;
 	uint		llen ;
-} ;
+} ; /* end struct */
 
 struct bvimk_verse {
 	BVIMK_LINE	*lines ;
 	uint		voff ;
 	uint		vlen ;
 	uchar		nlines, b, c, v ;
-} ;
+} ; /* end struct */
 
 struct bvimk_flags {
 	uint		notsorted:1 ;
@@ -71,14 +69,14 @@ struct bvimk_flags {
 	uint		inprogress:1 ;
 	uint		created:1 ;
 	uint		abort:1 ;
-} ;
+} ; /* end struct */
 
 struct bvimk_head {
 	cchar 		*dbname ;
 	cchar		*idname ;
 	char		*nidxfname ;
-	vecobj		verses ;
-	vecobj		lines ;
+	vecobj		*vlp ;		/* verse-list-pointer */
+	vecobj		*llp ;		/* line-list-pointer */
 	BVIMK_FL	fl ;
 	uint		pcitation ;
 	uint		maxbook ;
@@ -86,10 +84,10 @@ struct bvimk_head {
 	uint		maxverse ;
 	uint		nverses ;
 	uint		nzverses ;
-	uint		magic ;
+	uint		magval ;
 	int		nfd ;
 	mode_t		om ;
-} ;
+} ; /* end struct */
 
 typedef	BVIMK		bvimk ;
 typedef	BVIMK_FL	bvimk_fl ;
@@ -100,11 +98,11 @@ typedef	BVIMK_INFO	bvimk_info ;
 
 EXTERNC_begin
 
-extern int	bvimk_open(bvimk *,cchar *,int,mode_t) noex ;
-extern int	bvimk_add(bvimk *,bvimk_v *) noex ;
-extern int	bvimk_abort(bvimk *,int) noex ;
-extern int	bvimk_info(bvimk *,bvimk_info *) noex ;
-extern int	bvimk_close(bvimk *) noex ;
+extern int	bvimk_open	(bvimk *,cchar *,int,mode_t) noex ;
+extern int	bvimk_add	(bvimk *,bvimk_v *) noex ;
+extern int	bvimk_abort	(bvimk *,int) noex ;
+extern int	bvimk_getinfo	(bvimk *,bvimk_info *) noex ;
+extern int	bvimk_close	(bvimk *) noex ;
 
 EXTERNC_end
 
