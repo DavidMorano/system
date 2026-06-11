@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	BPIHDR			struct bpihdr_head
@@ -27,23 +24,31 @@
 
 
 struct bpihdr_head {
-	uint		fsize ;
-	uint		wtime ;
-	uint		vioff ;
-	uint		vilen ;
-	uint		nverses ;
-	uint		nzverses ;
-	uint		maxbook ;
-	uint		maxchapter ;
+	uint		fsz ;		/* file-size */
+	uint		wtime ;		/* write-time */
+	uint		vioff ;		/* Verse-Index offset */
+	uint		vilen ;		/* Verse-Index length */
+	uint		nverses ;	/* number total verses */
+	uint		nzverses ;	/* number non-zero verses */
+	uint		maxbook ;	/* maximum book number */
+	uint		maxchapter ;	/* maximum chapter number */
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
+#ifdef	__cplusplus
+struct bpihdr : bpihdr_head {
+    	int rd		(char *,int)	noex ;
+    	int wr		(cchar *,int)	noex ;
+} ; /* end struct (bvshdr) */
+#else /* __cplusplus */
 typedef	BPIHDR		bpihdr ;
+#endif /* __cplusplus */
+
 
 EXTERNC_begin
 
-extern int	bpihdr_rd(bpihdr *,char *,int) noex ;
-extern int	bpihdr_wr(bpihdr *,cchar *,int) noex ;
+extern int	bpihdr_rd(bpihdr *,char *,int)	noex ;
+extern int	bpihdr_wr(bpihdr *,cchar *,int)	noex ;
 
 EXTERNC_end
 
