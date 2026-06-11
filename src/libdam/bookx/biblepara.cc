@@ -373,7 +373,7 @@ static int biblepara_objloadbegin(BIBLEPARA *op,cchar *pr,cchar *objname)
 	debugprintf("biblepara_objloadbegin: objname=%s\n",objname) ;
 #endif
 
-	opts = VECSTR_OCOMPACT ;
+	opts = vecstrm.compact ;
 	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
 	    const int	nlen = SYMNAMELEN ;
 	    int		i ;
