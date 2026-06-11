@@ -30,12 +30,12 @@
 #include	<babycalcs.h>
 
 
-#define	BABYCALC_MAGIC		0x97147229
 #define	BABYCALC		struct babycalc_head
 #define	BABYCALC_FL		struct babycalc_flags
 #define	BABYCALC_INFO		struct babycalc_information
 #define	BABYCALC_MODBNAME	"babycalcs"
 #define	BABYCALC_OBJNAME	"babycalcs"
+#define	BABYCALC_MAGIC		0x97147229
 
 
 struct babycalc_information {
