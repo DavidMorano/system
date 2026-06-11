@@ -41,18 +41,22 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
-#include	<usystem.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bvihdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -66,7 +70,7 @@
 /* local structures */
 
 enum his {
-	hi_fsize,			/* file size */
+	hi_fsz,				/* file size */
 	hi_wtime,			/* creation time */
 	hi_vioff,			/* key-string table */
 	hi_vilen,
@@ -77,7 +81,7 @@ enum his {
 	hi_maxbook,
 	hi_maxchapter,
 	hi_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
@@ -85,9 +89,10 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize = hi_overlast * szof(uint) ;
-constexpr int		magicsize = BVIHDR_MAGICSIZE ;
-constexpr char		magicstr[] = BVIHDR_MAGICSTR ;
+constexpr int		headsize	= hi_overlast * szof(uint) ;
+constexpr int		magicsize	= BVIHDR_MAGICSIZE ;
+constexpr int		vsz		= szof(uint) ;	/* VETU */
+constexpr char		magicstr[]	= BVIHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -101,30 +106,31 @@ int bvihdr_rd(bvihdr *op,char *hbuf,int hlen) noex {
 	if (op && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + 4)) {
+	    rs = SR_INVALID ;
+	    if (bl >= (magicsize + vsz)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	            memcpy(bp,op->vetu,4) ;
-	            bp[0] = BVIHDR_VERSION ;
-	            bp[1] = ENDIAN ;
-	            bp += 4 ;
-	            bl -= 4 ;
+	            memcopy(bp,op->vetu,vsz) ;
+	            bp[0] = uchar(BVIHDR_VERSION) ;
+	            bp[1] = uchar(ENDIAN) ;
+	            bp += vsz ;
+	            bl -= vsz ;
 	            if (bl >= headsize) {
-	                uint	*header = (uint *) bp ;
-	                header[hi_fsize] = op->fsize ;
-	                header[hi_wtime] = op->wtime ;
-	                header[hi_vioff] = op->vioff ;
-	                header[hi_vilen] = op->vilen ;
-	                header[hi_vloff] = op->vloff ;
-	                header[hi_vllen] = op->vllen ;
-	                header[hi_nverses] = op->nverses ;
-	                header[hi_nzverses] = op->nzverses ;
-	                header[hi_maxbook] = op->maxbook ;
-	                header[hi_maxchapter] = op->maxchapter ;
+	                uint			*header = uintp(bp) ;
+	                header[hi_fsz]		=  op->fsz ;
+	                header[hi_wtime]	= op->wtime ;
+	                header[hi_vioff]	= op->vioff ;
+	                header[hi_vilen]	= op->vilen ;
+	                header[hi_vloff]	= op->vloff ;
+	                header[hi_vllen]	= op->vllen ;
+	                header[hi_nverses]	= op->nverses ;
+	                header[hi_nzverses]	= op->nzverses ;
+	                header[hi_maxbook]	= op->maxbook ;
+	                header[hi_maxchapter]	= op->maxchapter ;
 	                bp += headsize ;
 	                bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -147,35 +153,35 @@ int bvihdr_wr(bvihdr *op,cchar *hbuf,int hlen) noex {
 	        bp += magicsize ;
 	        bl -= magicsize ;
 		/* read out the VETU information */
-	        if (bl >= 4) {
-	            memcpy(op->vetu,bp,4) ;
+	        if (bl >= vsz) {
+	            memcopy(op->vetu,bp,vsz) ;
 	            if (op->vetu[0] != BVIHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 	            }
 	            if ((rs >= 0) && (op->vetu[1] != ENDIAN)) {
 	                rs = SR_PROTOTYPE ;
 	            }
-	            bp += 4 ;
-	            bl -= 4 ;
+	            bp += vsz ;
+	            bl -= vsz ;
 	        } else {
 	            rs = SR_ILSEQ ;
 	        }
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
-	                uint	*header = (uint *) bp ;
-	                op->fsize = header[hi_fsize] ;
-	                op->wtime = header[hi_wtime] ;
-	                op->vioff = header[hi_vioff] ;
-	                op->vilen = header[hi_vilen] ;
-	                op->vloff = header[hi_vloff] ;
-	                op->vllen = header[hi_vllen] ;
-	                op->nverses = header[hi_nverses] ;
-	                op->nzverses = header[hi_nzverses] ;
-	                op->maxbook = header[hi_maxbook] ;
-	                op->maxchapter = header[hi_maxchapter] ;
+	                const uint	*header = uintp(bp) ;
+	                op->fsz		= header[hi_fsz] ;
+	                op->wtime	= header[hi_wtime] ;
+	                op->vioff	= header[hi_vioff] ;
+	                op->vilen	= header[hi_vilen] ;
+	                op->vloff	= header[hi_vloff] ;
+	                op->vllen	= header[hi_vllen] ;
+	                op->nverses	= header[hi_nverses] ;
+	                op->nzverses	= header[hi_nzverses] ;
+	                op->maxbook	= header[hi_maxbook] ;
+	                op->maxchapter	= header[hi_maxchapter] ;
 	                bp += headsize ;
 	                bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
 	            }
@@ -187,5 +193,16 @@ int bvihdr_wr(bvihdr *op,cchar *hbuf,int hlen) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (bvihdr_wr) */
+
+
+/* local subroutines */
+
+int bvihdr::rd(char *rbuf,int rlen) noex {
+    	return bvihdr_rd(this,rbuf,rlen) ;
+} /* end method (bvihdr::rd) */
+
+int bvihdr::wr(cchar *wbuf,int wlen) noex {
+    	return bvihdr_wr(this,wbuf,wlen) ;
+} /* end method (bvihdr::wr) */
 
 
