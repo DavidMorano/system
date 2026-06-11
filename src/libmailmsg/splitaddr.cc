@@ -13,7 +13,7 @@
 
 */
 
-/* Copyright © 1889 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
