@@ -20,15 +20,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdarg.h>		/* |va_list| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<stdarg.h>		/* CSTD |va_list| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int bufprintf(char *,int,cchar *,...) noex ;
-extern int bufvprintf(char *,int,cchar *,va_list) noex ;
+extern int bufprintf	(char *,int,cchar *,...) noex ;
+extern int bufvprintf	(char *,int,cchar *,va_list) noex ;
 
 EXTERNC_end
 
