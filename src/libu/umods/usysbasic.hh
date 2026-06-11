@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* convert a single character to a given case */
+/* some basic system calls */
 /* version %I% last-modified %G% */
 
 
