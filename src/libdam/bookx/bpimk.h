@@ -10,28 +10,26 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
-#define	BPIMK_MAGIC	0x88773423
 #define	BPIMK		struct bpimk_head
 #define	BPIMK_OBJ	struct bpimk_object
+#define	BPIMK_FL	struct bpimk_flags
 #define	BPIMK_VER	struct bpimk_verser
 #define	BPIMK_INFO	struct bpimk_information
-#define	BPIMK_FL	struct bpimk_flags
+#define	BPIMK_MAGIC	0x88773423
 #define	BPIMK_INTOPEN	(10*60)
 #define	BPIMK_INTSTALE	(5*60)
 
 
 struct bpimk_object {
 	cchar		*name ;
-	uint		objsize ;
-} ;
+	uint		objsz ;
+	uint		cursz ;
+} ; /* end struct */
 
 struct bpimk_information {
 	uint		maxbook ;
@@ -39,11 +37,11 @@ struct bpimk_information {
 	uint		maxverse ;
 	uint		nverses ;
 	uint		nzverses ;
-} ;
+} ; /* end struct */
 
 struct bpimk_verser {
 	uchar		nlines, b, c, v ;
-} ;
+} ; /* end struct */
 
 struct bpimk_flags {
 	uint		notsorted:1 ;
@@ -52,15 +50,15 @@ struct bpimk_flags {
 	uint		inprogress:1 ;
 	uint		created:1 ;
 	uint		abort:1 ;
-} ;
+} ; /* end struct */
 
 struct bpimk_head {
-	uint		magic ;
 	cchar 		*dbname ;
 	cchar		*idname ;
 	char		*nidxfname ;
 	vecobj		verses ;
 	BPIMK_FL	fl ;
+	uint		magval ;
 	uint		pcitation ;
 	uint		maxbook ;
 	uint		maxchapter ;
@@ -69,7 +67,7 @@ struct bpimk_head {
 	uint		nzverses ;
 	int		nfd ;
 	mode_t		om ;
-} ;
+} ; /* end struct */
 
 typedef BPIMK		bpimk ;
 typedef	BPIMK_FL	bpimk_fl ;
