@@ -17,49 +17,45 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<eigendb.h>
-
-#include	<txtindex.h>
+#include	<clanguage.h>		/* LINU */
+#include	<usysbase.h>		/* LIBU */
+#include	<eigendb.h>		/* LIBUC */
+#include	<txtindex.h>		/* LIBDAM */
 
 
-#define	BIBLEQS_MAGIC	0x99889298
 #define	BIBLEQS		struct bibleqs_head
 #define	BIBLEQS_CUR	struct bibleqs_cursor
 #define	BIBLEQS_OBJ	struct bibleqs_object
 #define	BIBLEQS_Q	struct bibleqs_query
 #define	BIBLEQS_CITE	struct bibleqs_query
 #define	BIBLEQS_FL	struct bibleqs_flags
+#define	BIBLEQS_MAGIC	0x99889298
 /* query options */
 #define	BIBLEQS_OPREFIX	0x01		/* prefix match */
 
 
 struct bibleqs_query {
 	uchar		b, c, v ;
-} ;
+} ; /* end struct */
 
 struct bibleqs_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
-} ;
+	uint		objsz ;
+	uint		cursz ;
+} ; /* end struct */
 
 struct bibleqs_cursor {
 	uint		*verses ;		/* file-offsets to tags */
 	uint		nverses ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct bibleqs_flags {
 	uint		ind:1 ;			/* text-index (opened) */
 	uint		edb:1 ;
 	uint		edbinit:1 ;
 	uint		prefix:1 ;		/* prefix key-matches */
-} ;
+} ; /* end struct */
 
 struct bibleqs_head {
 	cchar		*pr ;
@@ -74,11 +70,11 @@ struct bibleqs_head {
 	time_t		ti_tind ;		/* text-index */
 	size_t		dbmsize ;		/* DB map-size */
 	BIBLEQS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		minwlen ;		/* minimum key-word length */
 	int		ncursors ;
 	uchar		wterms[32] ;
-} ;
+} ; /* end struct */
 
 typedef	BIBLEQS		bibleqs ;
 typedef	BIBLEQS_FL	bibleqs_fl ;
