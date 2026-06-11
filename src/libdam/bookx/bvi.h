@@ -36,8 +36,8 @@
 
 struct bvi_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct bvi_information {
@@ -65,9 +65,9 @@ struct bvi_verse {
 	uchar		nlines, b, c, v ;
 } ; /* end struct */
 
-struct bvi_c {
+struct bvi_cursor {
 	int		i ;
-} ; /* end struct */
+} ; /* end struct (bvi_cursor) */
 
 struct bvi_filemap {
 	char		*mapdata ;	/* file map */
@@ -81,10 +81,10 @@ struct bvi_filemap {
 struct bvi_head {
 	cchar 		*dbname ;
 	cchar		*fname ;
-	BVI_FMI		fmi ;		/* file-map information */
-	bvihdr		fhi ;		/* file-header information */
+	BVI_FMI		*fmip ;		/* file-map information */
+	bvihdr		*fhip ;		/* file-header information */
 	time_t		ti_lastcheck ;	/* time last check of file */
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 } ; /* end struct */
 
@@ -112,6 +112,9 @@ extern int	bvi_chapters	(bvi *,int,uchar *,int) noex ;
 extern int	bvi_close	(bvi *) noex ;
 
 EXTERNC_end
+
+extern const bvi_obj		bvi_modinfo ;
+
 
 #endif /* BVI_INCLUDE */
 
