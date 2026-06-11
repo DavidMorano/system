@@ -20,11 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	BVSHDR			struct bvshdr_head
@@ -34,24 +31,31 @@
 
 
 struct bvshdr_head {
-	uint		fsize ;		/* file-size */
+	uint		fsz ;		/* file-size */
 	uint		wtime ;		/* write-time */
-	uint		nverses ;	/* total verses */
-	uint		nzverses ;	/* non-zero verses */
-	uint		nzbooks ;	/* number of non-zero books */
-	uint		btoff ;		/* book-table */
-	uint		btlen ;
-	uint		ctoff ;		/* chapter-table */
-	uint		ctlen ;
+	uint		nverses ;	/* number total verses */
+	uint		nzverses ;	/* number non-zero verses */
+	uint		nzbooks ;	/* number non-zero books */
+	uint		btoff ;		/* book-table offset */
+	uint		btlen ;		/* book-table length */
+	uint		ctoff ;		/* chapter-table offset */
+	uint		ctlen ;		/* chapter-table length */
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct (bvshdr_head) */
 
+#ifdef	__cplusplus
+struct bvshdr : bvshdr_head {
+    	int rd		(char *,int)	noex ;
+    	int wr		(cchar *,int)	noex ;
+} ; /* end struct (bvshdr) */
+#else /* __cplusplus */
 typedef	BVSHDR		bvshdr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
 extern int	bvshdr_rd(bvshdr *,char *,int) noex ;
-extern int	bvshdr_wr(bvshdr *,char *,int) noex ;
+extern int	bvshdr_wr(bvshdr *,cchar *,int) noex ;
 
 EXTERNC_end
 
