@@ -10,23 +10,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-
-#include	<bibleparas.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
+#include	<bibleparas.h>		/* LIBDAM */
 
 
-#define	BIBLEPARA_MAGIC		0x99447246
 #define	BIBLEPARA		struct biblepara_head
 #define	BIBLEPARA_CITE		struct biblepara_query
 #define	BIBLEPARA_Q		struct biblepara_query
 #define	BIBLEPARA_CUR		struct biblepara_cursor
 #define	BIBLEPARA_INFO		struct biblepara_information
 #define	BIBLEPARA_CA		struct biblepara_calls
+#define	BIBLEPARA_MAGIC		0x99447246
 
 
 struct biblepara_information {
@@ -36,16 +32,16 @@ struct biblepara_information {
 	uint	maxchapter ;
 	uint	nverses ;
 	uint	nzverses ;
-} ;
+} ; /* end struct */
 
 struct biblepara_query {
 	uchar	b, c, v ;
-} ;
+} ; /* end struct */
 
 struct biblepara_cursor {
-	uint	magic ;
 	void	*scp ;
-} ;
+	uint	magval ;
+} ; /* end struct */
 
 EXTERNC_begin
 struct biblepara_calls {
@@ -62,13 +58,13 @@ struct biblepara_calls {
 EXTERNC_end
 
 struct biblepara_head {
-	uint		magic ;
 	MODLOAD		loader ;
 	BIBLEPARA_CALLS	call ;
-	void		*obj ;			/* object pointer */
-	int		objsize ;		/* object size */
-	int		cursize ;		/* cursor size */
-} ;
+	void		*obj ;		/* object pointer */
+	uint		magic ;
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
+} ; /* end struct */
 
 typedef	BIBLEPARA		biblepara ;
 typedef	BIBLEPARA_CITE		biblepara_cute ;
