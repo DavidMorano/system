@@ -59,15 +59,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |abs(3c)| */
-#include	<cmath>			/* |log2(3c++)| + |ceil(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |abs(3c)| */
+#include	<cmath>			/* CSTD |log2(3c++)| + |ceil(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ndigit.h"
 
@@ -100,7 +100,7 @@ using std::ceil ;			/* C++ subroutine (template) */
 
 /* forward references */
 
-template<typename T> static int ndivx(T v,int b) noex {
+template<typename T> local int ndivx(T v,int b) noex {
 	int		n = 0 ;
 	if (v >= 0) {
 	    const uint	ub = uint(b) ;	/* unsigned division is faster? */
@@ -116,17 +116,16 @@ template<typename T> static int ndivx(T v,int b) noex {
 	    } /* end if (valid base) */
 	} /* end if (valid) */
 	return n ;
-}
-/* end subroutine-template (ndivx) */
+} /* end subroutine-template (ndivx) */
 
-template<typename T> static T abs(T v) noex {
+template<typename T> local T abs(T v) noex {
     	return 0 ;
-}
+} /* end subroutine-template */
 
 template<> [[maybe_unused]] longlong abs(longlong v) noex {
     	if (v < 0) v = (- v) ;
     	return v ;
-}
+} /* end subroutine-template */
 
 
 /* local variables */
@@ -136,7 +135,7 @@ cbool		f_math = CF_MATH ;
 
 /* local subroutine-templates */
 
-template<typename T> static int ndigitx(T v,int b) noex {
+template<typename T> local int ndigitx(T v,int b) noex {
     	int		n = 0 ;
 	if (b >= 2) {
 	    if_constexpr (f_math && (szof(T) <= szof(long))) {
@@ -145,7 +144,7 @@ template<typename T> static int ndigitx(T v,int b) noex {
 		    cdouble	fbase = double(b) ;
 	            cdouble	fbits = double(log2(fv)) ;
 		    n = int(ceil(fbits / log2(fbase))) ;
-	        }
+	        } /* end block */
 	    } else {
 	        n = ndivx(v,b) ;
 	    } /* end if_constexpr (f_math) */
