@@ -620,7 +620,7 @@ int bibleqs_lookup(BIBLEQS *op,BIBLEQS_CUR *curp,int qo,cchar **qsp)
 	}
 
 	if ((rs = searchkeys_start(&sk,qsp)) >= 0) {
-	    cint	vopts = (VECSTR_OCOMPACT) ;
+	    cint	vopts = (vecstrm.compact) ;
 	    if ((rs = vecstr_start(&hkeys,10,vopts)) >= 0) {
 	        if ((rs = bibleqs_mkhkeys(op,&hkeys,&sk)) >= 0) {
 		    rs = bibleqs_lookuper(op,curp,qo,&sk,&hkeys) ;
@@ -1467,9 +1467,9 @@ static int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname)
 
 	if (rs >= 0) {
 	    vecstr	envs ;
-	    cint	vo = VECSTR_OCOMPACT ;
+	    cint	vo = vecstrm.compact ;
 
-	if ((rs = vecstr_start(&envs,20,VECSTR_OCOMPACT)) >= 0) {
+	if ((rs = vecstr_start(&envs,20,vecstrm.compact)) >= 0) {
 	    if (rs >= 0) {
 	        rs = vecstr_envadd(&envs,VARPRBIBLEQS,op->pr,-1) ;
 	    }
