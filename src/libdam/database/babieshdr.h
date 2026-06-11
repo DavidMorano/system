@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	BABIESHDR		struct babieshdr_head
@@ -55,7 +52,14 @@ struct babieshdr_head {
 	uchar		vetu[4] ;
 } ; /* end struct */
 
+#ifdef	__cplusplus
+struct babieshdr : babieshdr_head {
+    	int rd		(char *,int) noex ;
+    	int wr		(cchar *,int) noex ;
+} ; /* end struct (bvshdr) */
+#else /* __cplusplus */
 typedef	BABIESHDR	babieshdr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
