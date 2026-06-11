@@ -117,7 +117,7 @@ constexpr cpcchar	subs[] = {
 
 int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 	int		rs ;
-	cchar	*objname = VARMK_OBJNAME ;
+	cchar		*objname = VARMK_OBJNAME ;
 	char		dn[MAXHOSTNAMELEN+1] ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -136,8 +136,9 @@ int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 	            if ((rs = (*op->call.open)(op->obj,dbname,of,om,n)) >= 0) {
 	                op->magic = VARMK_MAGIC ;
 	            }
-	            if (rs < 0)
+	            if (rs < 0) {
 	                varmk_objloadend(op) ;
+		    }
 	        } /* end if (objloadbegin) */
 	    } /* end if (mkpr) */
 	} /* end if (getnodedomain) */
@@ -146,31 +147,28 @@ int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 }
 /* end subroutine (varmk_open) */
 
-
 /* free up the entire vector string data structure object */
-int varmk_close(VARMK *op)
-{
+int varmk_close(VARMK *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARMK_MAGIC) return SR_NOTOPEN ;
-
+	{
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = varmk_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	op->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (varmk_close) */
 
-
-int varmk_addvar(VARMK *op,cchar k[],cchar vp[],int vl)
-{
+int varmk_addvar(VARMK *op,cchar *k,cchar *vp,int vl) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -183,9 +181,7 @@ int varmk_addvar(VARMK *op,cchar k[],cchar vp[],int vl)
 }
 /* end subroutine (varmk_addvar) */
 
-
-int varmk_abort(VARMK *op)
-{
+int varmk_abort(VARMK *op) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -200,9 +196,7 @@ int varmk_abort(VARMK *op)
 }
 /* end subroutine (varmk_abort) */
 
-
-int varmk_chgrp(VARMK *op,gid_t gid)
-{
+int varmk_chgrp(VARMK *op,gid_t gid) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -224,7 +218,7 @@ local int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	vecstr		syms ;
 	cint		ne = sub_overlast ;
-	cint		vo = VECSTR_OCOMPACT ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 
@@ -282,25 +276,22 @@ local int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname) noex {
 	} /* end if (modload_open) */
 
 	return rs ;
-}
-/* end subroutine (varmk_objloadbegin) */
+} /* end subroutine (varmk_objloadbegin) */
 
 local int varmk_objloadend(VARMK *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->obj) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-
+	{
 	rs1 = modload_close(&op->loader) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	return rs ;
-}
-/* end subroutine (varmk_objloadend) */
+} /* end subroutine (varmk_objloadend) */
 
 local int varmk_loadcalls(VARMK *op,cchar *soname) noex {
 	modload		*lp = &op->loader ;
@@ -346,16 +337,11 @@ local int varmk_loadcalls(VARMK *op,cchar *soname) noex {
 	        case sub_close:
 	            op->call.close = (int (*)(void *)) snp ;
 	            break ;
-
 	        } /* end switch */
-
 	    } /* end if (it had the call) */
-
 	} /* end for (subs) */
-
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (varmk_loadcalls) */
+} /* end subroutine (varmk_loadcalls) */
 
 local bool isrequired(int i) noex {
 	bool		f = false ;
@@ -367,7 +353,6 @@ local bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
