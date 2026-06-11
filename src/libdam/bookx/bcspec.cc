@@ -22,7 +22,7 @@
 
 	Description:
 	This object parses and loads a given Bible-Citation-Specification
-	string into itself. The given citation-specification string
+	string into itself.  The given citation-specification string
 	looks like:
 
 		<bookname>[:]<chapter>[:<verse>]
@@ -38,19 +38,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<cfdec.h>
-#include	<estrings.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<climits>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<estrings.h>		/* LIBU */
+#include	<cfdec.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bcspec.h"
 
@@ -75,7 +76,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
-static int	siourbrk(cchar *,int,int) noex ;
+local int	siourbrk(cchar *,int,int) noex ;
 
 
 /* local variables */
@@ -94,9 +95,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	    rs = memclear(hop) ;
 	    op->c = 1 ;
 	    op->v = 1 ;
-	    if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
-	        int	v ;
-		int	si ;
+	    if (int v, si, sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
 	        int	ch = mkchar(sp[0]) ;
 	        if (isalphalatin(ch)) {
 		    op->sp = sp ;
@@ -118,25 +117,26 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	        } else if (isdigitlatin(ch)) {
 	            if ((si = siourbrk(sp,sl,true)) > 0) {
 		        rs = cfdeci(sp,si,&v) ;
-		        op->b = v ;
+		        op->b = schar(v) ;
 	            }
 	        } else {
 	            rs = SR_DOM ;
-	        }
+	        } /* end if */
 	        if ((rs >= 0) && (sl > 0)) {
-		    if (cchar *tp ; (tp = strnchr(sp,sl,':')) != nullptr) {
-		        if ((rs = cfdeci(sp,(tp-sp),&v)) >= 0) {
-			    op->c = v ;
-			    sl -= ((tp+1)-sp) ;
+		    if (cchar *tp = strnchr(sp,sl,':') ; tp) {
+			cint tl = intconv(tp - sp) ;
+		        if ((rs = cfdeci(sp,tl,&v)) >= 0) {
+			    op->c = schar(v) ;
+			    sl -= intconv((tp + 1) - sp) ;
 			    sp = (tp+1) ;
 			    if (sl > 0) {
 		    	        rs = cfdeci(sp,sl,&v) ;
-		    	        op->v = v ;
+		    	        op->v = schar(v) ;
 			    }
 		        } /* end if (cfdec) */
 		    } else {
 		        rs = cfdeci(sp,sl,&v) ;
-		        op->c = v ;
+		        op->c = schar(v) ;
 		    }
 	        } /* end if */
 	    } else {
@@ -150,7 +150,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 
 /* local subroutines */
 
-static int siourbrk(cchar *sp,int sl,int f_dig) noex {
+local int siourbrk(cchar *sp,int sl,int f_dig) noex {
 	int		i = -1 ; /* used afterwards */
 	bool		f = false ;
 	for (i = 0 ; i < sl ; i += 1) {
@@ -164,7 +164,6 @@ static int siourbrk(cchar *sp,int sl,int f_dig) noex {
 	    if (f) break ;
 	} /* end for */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (siourbrk) */
+} /* end subroutine (siourbrk) */
 
 
