@@ -17,30 +17,26 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-
-#include	<bibleqs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
+#include	<bibleqs.h>		/* LIBDAM */
 
 
-#define	BIBLEQ_MAGIC	0x99447243
 #define	BIBLEQ		struct bibleq_head
-#define	BIBLEQ_CUR	struct bibleq_c
+#define	BIBLEQ_CUR	struct bibleq_cursor
 #define	BIBLEQ_CA	struct bibleq_calls
 #define	BIBLEQ_Q	BIBLEQS_CITE
 #define	BIBLEQ_CITE	BIBLEQS_CITE
+#define	BIBLEQ_MAGIC	0x99447243
 /* query options */
 #define	BIBLEQ_OPREFIX	BIBLEQS_OPREFIX		/* prefix match */
 
 
 struct bibleq_cursor  {
-	uint	magic ;
 	void	*scp ;		/* SO-cursor pointer */
-} ;
+	uint	magval ;
+} ; /* end struct */
 
 EXTERNC_begin
 struct bibleq_calls {
@@ -56,25 +52,29 @@ struct bibleq_calls {
 EXTERNC_end
 
 struct bibleq_head {
-	uint		magic ;
-	modload		loader ;
-	BIBLEQ_CA	call ;
 	void		*obj ;		/* object pointer */
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size */
-} ;
+	modload		*mlp ;
+	BIBLEQ_CA	*callp ;
+	uint		magval ;
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
+} ; /* end struct */
 
+typedef	BIBLEQ		bibleq ;
+typedef	BIBLEQ_CUR	bibleq_cur ;
+typedef	BIBLEQ_CA	bibleq_ca ;
+typedef	BIBLEQ_Q	bibleq_q ;
 
 EXTERNC_begin
 
-extern int bibleq_open(BIBLEQ *,cchar *,cchar *) noex ;
-extern int bibleq_count(BIBLEQ *) noex ;
-extern int bibleq_curbegin(BIBLEQ *,BIBLEQ_CUR *) noex ;
-extern int bibleq_lookup(BIBLEQ *,BIBLEQ_CUR *,int,cchar **) noex ;
-extern int bibleq_read(BIBLEQ *,BIBLEQ_CUR *,BIBLEQ_CITE *,char *,int) noex ;
-extern int bibleq_curend(BIBLEQ *,BIBLEQ_CUR *) noex ;
-extern int bibleq_audit(BIBLEQ *) noex ;
-extern int bibleq_close(BIBLEQ *) noex ;
+extern int bibleq_open(bibleq *,cchar *,cchar *) noex ;
+extern int bibleq_count(bibleq *) noex ;
+extern int bibleq_curbegin(bibleq *,bibleq_cur *) noex ;
+extern int bibleq_lookup(bibleq *,bibleq_cur *,int,cchar **) noex ;
+extern int bibleq_read(bibleq *,bibleq_cur *,bibleq_q *,char *,int) noex ;
+extern int bibleq_curend(bibleq *,bibleq_cur *) noex ;
+extern int bibleq_audit(bibleq *) noex ;
+extern int bibleq_close(bibleq *) noex ;
 
 EXTERNC_end
 
