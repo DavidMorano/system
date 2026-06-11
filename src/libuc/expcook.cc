@@ -41,19 +41,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<hdbstr.h>
 #include	<sbuf.h>
 #include	<buffer.h>
 #include	<snwcpy.h>
 #include	<strwcpy.h>
 #include	<strn.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"expcook.h"
 
