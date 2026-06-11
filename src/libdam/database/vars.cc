@@ -126,17 +126,17 @@ extern const vars_obj	vars_modinfo = {
 	"vars",
 	szof(vars),
 	szof(vars_cur)
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
 
 int vars_open(VARS *op,cchar *dbname) noex {
-	time_t		dt = time(NULL) ;
+	time_t		dt = time(nullptr) ;
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
@@ -154,8 +154,7 @@ int vars_open(VARS *op,cchar *dbname) noex {
 	        }
 	    }
 	    if (rs >= 0) {
-	    	cchar	*cp ;
-	        if ((rs = lm_strw(dbname,pl,&cp)) >= 0) {
+	    	if (cchar *cp ; (rs = lm_strw(dbname,pl,&cp)) >= 0) {
 	            op->dbname = cp ;
 		    if ((rs = vars_dbloadbegin(op,dt)) >= 0) {
 			op->ti_lastcheck = dt ;
@@ -163,8 +162,8 @@ int vars_open(VARS *op,cchar *dbname) noex {
 		    }
 		    if (rs < 0) {
 	    		lm_free(op->dbname) ;
-	    		op->dbname = NULL ;
-		    }
+	    		op->dbname = nullptr ;
+		    } /* end if (error) */
 		} /* end if (memory-allocation) */
 	    } /* end if */
 	} /* end block */
@@ -177,17 +176,17 @@ int vars_close(VARS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
-
+	{
 	rs1 = vars_dbloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
-	if (op->dbname != NULL) {
+	}
+	if (op->dbname) {
 	    rs1 = lm_free(op->dbname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = NULL ;
+	    op->dbname = nullptr ;
 	}
 
 	op->magic = 0 ;
@@ -200,8 +199,8 @@ int vars_getinfo(VARS *op,VARS_INFO *vip) noex {
 	VARHDR		*hip ;
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (vip == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (vip == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
 
@@ -223,7 +222,7 @@ int vars_getinfo(VARS *op,VARS_INFO *vip) noex {
 int vars_audit(VARS *op) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
 
@@ -239,7 +238,7 @@ int vars_count(VARS *op) noex {
 	VARHDR		*hip ;
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
 
@@ -251,8 +250,8 @@ int vars_count(VARS *op) noex {
 
 int vars_curbegin(VARS *op,VARS_CUR *curp) noex {
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
 
@@ -266,8 +265,8 @@ int vars_curbegin(VARS *op,VARS_CUR *curp) noex {
 
 int vars_curend(VARS *op,VARS_CUR *curp) noex {
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
 
@@ -298,12 +297,12 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,
 	cchar	*vp ;
 	cchar	*cp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (kp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (kp == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
 
-	if (curp == NULL) {
+	if (curp == nullptr) {
 	    curp = &dcur ;
 	    curp->i = 0 ;
 	}
@@ -311,7 +310,7 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,
 	if (kl < 0)
 	    kl = lenstr(kp) ;
 
-	if (vbuf != NULL)
+	if (vbuf != nullptr)
 	    vbuf[0] = '\0' ;
 
 	mip = &op->mi ;
@@ -404,7 +403,7 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,
 
 	    vi = rt[ri][1] ;
 	    vp = (vst + vi) ;
-	    if (vbuf != NULL) {
+	    if (vbuf != nullptr) {
 	        rs = sncpy1(vbuf,vlen,vp) ;
 	        vl = rs ;
 	    } else {
@@ -430,15 +429,15 @@ int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,
 	int		vl = 0 ;
 	cchar	*kp, *vp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (kbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (kbuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
 
 	if (op->ncursors == 0) return SR_INVALID ;
 
-	if (vbuf != NULL)
+	if (vbuf != nullptr)
 	    vbuf[0] = '\0' ;
 
 	mip = &op->mi ;
@@ -452,19 +451,22 @@ int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,
 	        kp = mip->kst + ki ;
 		if ((rs = sncpy1(kbuf,klen,kp)) >= 0) {
 		    vp = mip->vst + vi ;
-		    if (vbuf != NULL) {
+		    if (vbuf != nullptr) {
 			rs = sncpy1(vbuf,vlen,vp) ;
 			vl = rs ;
 		    } else {
 			vl = lenstr(vp) ;
 		    }
 		} /* end if */
-		if (rs >= 0)
+		if (rs >= 0) {
 		    curp->i = ri ;
-	    } else
+		}
+	    } else {
 		rs = SR_BADFMT ;
-	} else
+	    }
+	} else {
 	    rs = SR_NOTFOUND ;
+	}
 
 	return (rs >= 0) ? vl : rs ;
 }
@@ -475,16 +477,14 @@ int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,
 
 local int vars_dbloadbegin(VARS *op,time_t dt) noex {
 	int		rs ;
-
 	if ((rs = vars_dbmapcreate(op,dt)) >= 0) {
 	    rs = vars_dbproc(op,dt) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 		vars_dbmapdestroy(op) ;
+	    }
 	}
-
 	return rs ;
-}
-/* end subroutine (vars_dbloadbegin) */
+} /* end subroutine (vars_dbloadbegin) */
 
 local int vars_dbloadend(VARS *op) noex {
 	VARS_MI		*mip ;
@@ -495,41 +495,36 @@ local int vars_dbloadend(VARS *op) noex {
 	if (rs >= 0) rs = rs1 ;
 	}
 	mip = &op->mi ;
-	mip->rt = NULL ;
-	mip->it = NULL ;
-	mip->kst = NULL ;
-	mip->vst = NULL ;
+	mip->rt = nullptr ;
+	mip->it = nullptr ;
+	mip->kst = nullptr ;
+	mip->vst = nullptr ;
 	return rs ;
-}
-/* end subroutine (vars_dbloadend) */
+} /* end subroutine (vars_dbloadend) */
 
 local int vars_dbmapcreate(VARS *op,time_t dt) noex {
 	int		rs ;
 	cchar	*end = ENDIANSTR ;
 	char		tmpfname[MAXPATHLEN + 1] ;
-
 	if ((rs = mkfnamesuf2(tmpfname,op->dbname,FE_VI,end)) >= 0) {
 	    rs = vars_filemapcreate(op,&op->vf,tmpfname,dt) ;
 	}
-
 	return rs ;
-}
-/* end subroutine (vars_dbmapcreate) */
+} /* end subroutine (vars_dbmapcreate) */
 
 local int vars_dbmapdestroy(VARS *op) noex {
 	int		rs ;
-
+	{
 	rs = vars_filemapdestroy(op,&op->vf) ;
-
+	}
 	return rs ;
-}
-/* end subroutine (vars_dbmapdestroy) */
+} /* end subroutine (vars_dbmapdestroy) */
 
 local int vars_filemapcreate(VARS *op,VARS_FM *fip,cchar *fname,
 		time_t dt) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
 	    cint	fd = rs ;
@@ -539,7 +534,7 @@ local int vars_filemapcreate(VARS *op,VARS_FM *fip,cchar *fname,
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
 	            void	*md ;
-	            if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
+	            if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                fip->mdata = md ;
 	                fip->msize = ms ;
 	                fip->ti_mod = sb.st_mtime ;
@@ -552,26 +547,24 @@ local int vars_filemapcreate(VARS *op,VARS_FM *fip,cchar *fname,
 	} /* end if (mapped file) */
 
 	return rs ;
-}
-/* end subroutine (vars_filemapcreate) */
+} /* end subroutine (vars_filemapcreate) */
 
 local int vars_filemapdestroy(VARS *op,VARS_FM *fip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (fip->mdata != NULL) {
+	if (fip->mdata != nullptr) {
 	    rs1 = u_munmap(fip->mdata,fip->msize) ;
 	    if (rs >= 0) rs = rs1 ;
-	    fip->mdata = NULL ;
+	    fip->mdata = nullptr ;
 	    fip->msize = 0 ;
 	    fip->ti_map = 0 ;
 	}
 
 	return rs ;
-}
-/* end subroutine (vars_filemapdestroy) */
+} /* end subroutine (vars_filemapdestroy) */
 
 local int vars_dbproc(VARS *op,time_t dt) noex {
 	VARS_FM		*fip = &op->vf ;
@@ -589,8 +582,7 @@ local int vars_dbproc(VARS *op,time_t dt) noex {
 	} /* end if (varhdr) */
 
 	return rs ;
-}
-/* end subroutine (vars_dbproc) */
+} /* end subroutine (vars_dbproc) */
 
 local int vars_viverify(VARS *op,time_t dt) noex {
 	VARS_FM		*fip = &op->vf ;
@@ -629,8 +621,7 @@ local int vars_viverify(VARS *op,time_t dt) noex {
 	    rs = SR_BADFMT ;
 
 	return rs ;
-}
-/* end subroutine (vars_viverify) */
+} /* end subroutine (vars_viverify) */
 
 local int vars_ouraudit(VARS *op) noex {
 	VARS_MI		*mip = &op->mi ;
@@ -673,7 +664,7 @@ local int vars_ouraudit(VARS *op) noex {
 	    }
 
 	    if (rs >= 0) {
-	        rs = vars_fetch(op,cp,cl,NULL,NULL,0) ;
+	        rs = vars_fetch(op,cp,cl,nullptr,nullptr,0) ;
 	    }
 
 	    if (rs < 0) break ;
@@ -682,8 +673,9 @@ local int vars_ouraudit(VARS *op) noex {
 /* index table */
 
 	if ((rs >= 0) && 
-	    ((it[0][0] != 0) || (it[0][1] != 0) || (it[0][2] != 0)))
+	    ((it[0][0] != 0) || (it[0][1] != 0) || (it[0][2] != 0))) {
 	    rs = SR_BADFMT ;
+	}
 
 	for (i = 1 ; (rs >= 0) && (i < hip->itlen) ; i += 1) {
 
@@ -718,8 +710,7 @@ local int vars_ouraudit(VARS *op) noex {
 	} /* end for (index table entries) */
 
 	return rs ;
-}
-/* end subroutine (vars_ouraudit) */
+} /* end subroutine (vars_ouraudit) */
 
 local bool ismatkey(cchar *key,cchar *kp,int kl) noex {
 	bool		f = (key[0] == kp[0]) ;
@@ -728,7 +719,6 @@ local bool ismatkey(cchar *key,cchar *kp,int kl) noex {
 	    f = (m == kl) && (key[m] == '\0') ;
 	}
 	return f ;
-}
-/* end subroutine (ismatkey) */
+} /* end subroutine (ismatkey) */
 
 
