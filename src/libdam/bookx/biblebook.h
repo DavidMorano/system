@@ -20,18 +20,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
+#include	<clanguage.h>		/* LINU */
+#include	<usysbase.h>		/* LINU */
+#include	<modload.h>		/* LINUC */
 
 
-#define	BIBLEBOOK_MAGIC		0x99447242
 #define	BIBLEBOOK		struct biblebook_head
 #define	BIBLEBOOK_FL		struct biblebook_flags
 #define	BIBLEBOOK_CA		struct biblebook_calls
+#define	BIBLEBOOK_MAGIC		0x99447242
 #define	BIBLEBOOK_LEN		80 /* bible-book-name length */
 #define	BIBLEBOOK_NBOOKS	66
 
@@ -47,12 +44,12 @@ struct biblebook_calls {
 	int	(*size)(void *) ;
 	int	(*audit)(void *) ;
 	int	(*close)(void *) ;
-} ;
+} ; /* end struct */
 EXTERNC_end
 
 struct biblebook_flags {
 	int		localdb:1 ;	/* using local DB */
-} ;
+} ; /* end struct */
 
 struct biblebook_head {
 	modload		loader ;
@@ -64,7 +61,7 @@ struct biblebook_head {
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		namesize ;	/* names-size */
-} ;
+} ; /* end struct */
 
 typedef	BIBLEBOOK		biblebook ;
 typedef	BIBLEBOOK_FL		biblebook_fl ;
@@ -72,16 +69,16 @@ typedef	BIBLEBOOK_CA		biblebook_ca ;
 
 EXTERNC_begin
 
-extern int	biblebook_open(biblebook *,cchar *,cchar *) noex ;
-extern int	biblebook_count(biblebook *) noex ;
-extern int	biblebook_max(biblebook *) noex ;
-extern int	biblebook_read(biblebook *,char *,int,int) noex ;
+extern int	biblebook_open	(biblebook *,cchar *,cchar *) noex ;
+extern int	biblebook_count	(biblebook *) noex ;
+extern int	biblebook_max	(biblebook *) noex ;
+extern int	biblebook_read	(biblebook *,char *,int,int) noex ;
 extern int	biblebook_lookup(biblebook *,char *,int,int) noex ;
-extern int	biblebook_get(biblebook *,int,char *,int) noex ;
-extern int	biblebook_match(biblebook *,cchar *,int) noex ;
-extern int	biblebook_size(biblebook *) noex ;
-extern int	biblebook_audit(biblebook *) noex ;
-extern int	biblebook_close(biblebook *) noex ;
+extern int	biblebook_get	(biblebook *,int,char *,int) noex ;
+extern int	biblebook_match	(biblebook *,cchar *,int) noex ;
+extern int	biblebook_size	(biblebook *) noex ;
+extern int	biblebook_audit	(biblebook *) noex ;
+extern int	biblebook_close	(biblebook *) noex ;
 
 EXTERNC_end
 
