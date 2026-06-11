@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	PWIHDR			struct pwihdr_head
@@ -28,7 +25,7 @@
 
 
 enum pwihdrs {
-	pwihdr_fsize,		/* source DB file size */
+	pwihdr_fsz,		/* source DB file size */
 	pwihdr_wrtime,
 	pwihdr_wrcount,
 	pwihdr_rectab,
@@ -48,7 +45,7 @@ enum pwihdrs {
 } ; /* end enum */
 
 struct pwihdr_head {
-	uint		fsize ;
+	uint		fsz ;
 	uint		wrtime ;
 	uint		wrcount ;
 	uint		rectab ;
@@ -67,7 +64,14 @@ struct pwihdr_head {
 	uchar		vetu[4] ;
 } ; /* end struct */
 
+#ifdef	__cplusplus
+struct pwihdr : pwihdr_head {
+    	int rd		(char *,int) noex ;
+    	int wr		(cchar *,int) noex ;
+} ; /* end struct (bvshdr) */
+#else /* __cplusplus */
 typedef PWIHDR		pwihdr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
