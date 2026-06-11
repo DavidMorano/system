@@ -20,11 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	TTIHDR			struct ttihdr_head
@@ -34,7 +31,7 @@
 
 
 struct ttihdr_head {
-	uint		fsize ;		/* file-size */
+	uint		fsz ;		/* file-size */
 	uint		ctime ;		/* create-time */
 	uint		rectab ;	/* record-table */
 	uint		reclen ;	/* recotd-table-length */
@@ -43,7 +40,14 @@ struct ttihdr_head {
 	uchar		vetu[4] ;	/* VETU */
 } ; /* end struct */
 
+#ifdef	__cplusplus
+struct ttihdr : ttihdr_head {
+    	int rd		(char *,int) noex ;
+    	int wr		(cchar *,int) noex ;
+} ; /* end struct (bvshdr) */
+#else /* __cplusplus */
 typedef	TTIHDR		ttihdr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
