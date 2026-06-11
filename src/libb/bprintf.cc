@@ -92,7 +92,7 @@ int bvprintf(bfile *op,cchar *fmt,va_list ap) noex {
 /* local subroutines */
 
 local int bwritefmt(bfile *op,cchar *fmt,va_list ap) noex {
-    	cint		fo = fmtoptm.clean ;
+    	cint		fo = (fmtoptm.clean | fmtoptm.minfill) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
