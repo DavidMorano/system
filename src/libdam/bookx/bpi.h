@@ -20,16 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
-#include	<bpihdr.h>		/* this is the hash-file-header */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bpihdr.h>		/* LIBDAM hash-file-header */
 
 
-#define	BPI_SUF		"bpi"		/* bible-paragraph-index */
 #define	BPI		struct bpi_head
 #define	BPI_FMI		struct bpi_filemap
 #define	BPI_Q		struct bpi_query
@@ -37,13 +32,14 @@
 #define	BPI_OBJ		struct bpi_object
 #define	BPI_CUR		struct bpi_cursor
 #define	BPI_INFO	struct bpi_infomation
+#define	BPI_SUF		"bpi"		/* bible-paragraph-index */
 
 
 struct bpi_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
-} ;
+	uint		objsz ;
+	uint		cursz ;
+} ; /* end struct */
 
 struct bpi_information {
 	time_t		ctime ;
@@ -52,19 +48,19 @@ struct bpi_information {
 	uint		maxchapter ;
 	uint		count ;
 	uint		nzverses ;
-} ;
+} ; /* end struct */
 
 struct bpi_query {
 	uchar		b, c, v ;
-} ;
+} ; /* end struct */
 
 struct bpi_verse {
 	uchar		nlines, b, c, v ;
-} ;
+} ; /* end struct */
 
 struct bpi_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct bpi_filemap {
 	char		*mapdata ;	/* file map */
@@ -80,9 +76,9 @@ struct bpi_head {
 	BPI_FMI		fmi ;		/* file-map information */
 	bpihdr		fhi ;		/* file-header information */
 	time_t		ti_lastcheck ;	/* time last check of file */
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	BPI		bpi ;
 typedef	BPI_FMI		bpi_fmi ;
