@@ -73,7 +73,7 @@
 
 /* forward references */
 
-static int	digs(double) noex ;
+local int	digs(double) noex ;
 
 
 /* local variables */
@@ -98,7 +98,7 @@ int ndigmax(double *la,int n,int m) noex {
 	double		c = 1.0 ;
 	for (int i = 0 ; i < m ; i += 1) {
 	    c = c * 10.0 ;
-	}
+	} /* end for */
 	c = (c - 0.1) ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    if (la[i] > c) la[i] = c ;
@@ -110,13 +110,12 @@ int ndigmax(double *la,int n,int m) noex {
 
 /* local subroutines */
 
-static int digs(double f) noex {
+local int digs(double f) noex {
 	int		i{} ;
 	for (i = 0 ; (f > 1.0) ; i += 1) {
 	    f = f / 10.0 ;
 	}
 	return i ;
-}
-/* end subroutine (digs) */
+} /* end subroutine (digs) */
 
 
