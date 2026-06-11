@@ -145,7 +145,7 @@ local int bfile_rdreg(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 		if (len == 0) {
 		    neof += 1 ;
 		} else {
-		    neof = 0 ;
+		    neof = 0 ; /* reset */
 		}
 	        if (op->len < op->bsz) {
 	            f_already = true ;
