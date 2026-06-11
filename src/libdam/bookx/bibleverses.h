@@ -18,16 +18,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
-#include	<bvi.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bvi.h>			/* LIBDAM */
 
 
-#define	BIBLEVERSES_MAGIC	0x99447245
 #define	BIBLEVERSES		struct bibleverses_head
 #define	BIBLEVERSES_FL		struct bibleverses_flags
 #define	BIBLEVERSES_OBJ		struct bibleverses_object
@@ -35,14 +30,15 @@
 #define	bibleverses_q		struct bibleverses_query
 #define	BIBLEVERSES_CUR		struct bibleverses_cursor
 #define	BIBLEVERSES_INFO	struct bibleverses_information
+#define	BIBLEVERSES_MAGIC	0x99447245
 #define	BIBLEVERSES_DBNAME	"av"
 
 
 struct bibleverses_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
-} ;
+	uint		objsz ;
+	uint		cursz ;
+} ; /* end struct */
 
 struct bibleverses_information {
 	time_t		dbtime ;		/* db-time */
@@ -51,19 +47,19 @@ struct bibleverses_information {
 	uint		maxchapter ;
 	uint		nverses ;
 	uint		nzverses ;
-} ;
+} ; /* end struct */
 
 struct bibleverses_query {
 	uchar		b, c, v ;
-} ;
+} ; /* end struct */
 
 struct bibleverses_cursor {
 	BVI_CUR		vicur ;
-} ;
+} ; /* end struct */
 
 struct bibleverses_flags {
 	uint		vind:1 ;		/* index is loaded */
-} ;
+} ; /* end struct */
 
 struct bibleverses_head {
 	cchar		*pr ;
@@ -81,13 +77,13 @@ struct bibleverses_head {
 	uint		magic ;
 	int		nverses ;
 	int		ncursors ;
-} ;
+} ; /* end struct */
 
 typedef	BIBLEVERSES		bibleverses ;
 typedef	BIBLEVERSES_FL		bibleverses_fl ;
 typedef	BIBLEVERSES_OBJ		bibleverses_obj ;
 typedef	BIBLEVERSES_CITE	bibleverses_cite ;
-typedef	bibleverses_q		bibleverses_q ;
+typedef	BIBLEVERSES_Q		bibleverses_q ;
 typedef	BIBLEVERSES_CUR		bibleverses_cur ;
 typedef	BIBLEVERSES_INFO	bibleverses_info ;
 
@@ -99,7 +95,7 @@ extern int bibleverses_read(bibleverses *,char *,int,bibleverses_q *) noex ;
 extern int bibleverses_get(bibleverses *,bibleverses_q *,char *,int) noex ;
 extern int bibleverses_curbegin(bibleverses *,bibleverses_cur *) noex ;
 extern int bibleverses_enum(bibleverses *,bibleverses_cur *,
-			bibleverses_qUERY *,char *,int) noex ;
+			bibleverses_q *,char *,int) noex ;
 extern int bibleverses_curend(bibleverses *,bibleverses_cur *) noex ;
 extern int bibleverses_audit(bibleverses *) noex ;
 extern int bibleverses_info(bibleverses *,bibleverses_info *) noex ;
