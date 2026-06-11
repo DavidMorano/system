@@ -59,6 +59,9 @@
 
 #include	"cmihdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -93,6 +96,7 @@ enum his {
 
 constexpr int		headsize	= hi_overlast * szof(uint) ;
 constexpr int		magicsize	= CMIHDR_MAGICSIZE ;
+constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= CMIHDR_MAGICSTR ;
 
 
@@ -109,17 +113,17 @@ int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
 	    rs = SR_INVALID ;
-	    if (bl >= (magicsize + 4)) {
+	    if (bl >= (magicsize + vsz)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	    	    memcpy(bp,op->vetu,4) ;
-	    	    bp[0] = CMIHDR_VERSION ;
+	    	    memcopy(bp,op->vetu,vsz) ;
+	    	    bp[0] = uchar(CMIHDR_VERSION) ;
 	    	    bp[1] = uchar(ENDIAN) ;
-	    	    bp += 4 ;
-	    	    bl -= 4 ;
+	    	    bp += vsz ;
+	    	    bl -= vsz ;
 	    	    if (bl >= headsize) {
-	        	uint	*header = uintp(bp) ;
+	        	uint			*header = uintp(bp) ;
 	        	header[hi_dbsz]		= op->dbsz ;
 	        	header[hi_dbtime]	= op->dbtime ;
 	        	header[hi_idxsize]	= op->idxsize ;
@@ -159,21 +163,21 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 		/* read out the VETU information */
 	        if (bl >= 4) {
 		    uchar	ech = uchar(ENDIAN) ;
-	            memcpy(op->vetu,bp,4) ;
+	            memcopy(op->vetu,bp,vsz) ;
 	            if (op->vetu[0] != CMIHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
 	            if ((rs >= 0) && (op->vetu[1] != ech)) {
 	                rs = SR_PROTOTYPE ;
 		    }
-	            bp += 4 ;
-	            bl -= 4 ;
+	            bp += vsz ;
+	            bl -= vsz ;
 	        } else {
 	            rs = SR_ILSEQ ;
 		}
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
-	                uint	*header = uintp(bp) ;
+	                const uint	*header = uintp(bp) ;
 	                op->dbsz	= header[hi_dbsz] ;
 	                op->dbtime	= header[hi_dbtime] ;
 	                op->idxsize	= header[hi_idxsize] ;
@@ -209,7 +213,5 @@ int cmihdr::rd(char *rbuf,int rlen) noex {
 int cmihdr::wr(cchar *wbuf,int wlen) noex {
     	return cmihdr_wr(this,wbuf,wlen) ;
 } /* end method (cmihdr::wr) */
-
-
 
 
