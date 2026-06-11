@@ -42,23 +42,26 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cyihdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -72,7 +75,7 @@
 /* local structures */
 
 enum his {
-	hi_fsize,			/* file size */
+	hi_fsz,				/* file size */
 	hi_wtime,			/* creation time */
 	hi_diroff,			/* directory-name */
 	hi_caloff,			/* calendar-name */
@@ -92,9 +95,10 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize = hi_overlast * szof(uint) ;
-constexpr int		magicsize = CYIHDR_MAGICSIZE ;
-constexpr char		magicstr[] = CYIHDR_MAGICSTR ;
+constexpr int		headsize	= hi_overlast * szof(uint) ;
+constexpr int		magicsize	= CYIHDR_MAGICSIZE ;
+constexpr int		vsz		= szof(uint) ;	/* VETU */
+constexpr char		magicstr[]	= CYIHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -108,31 +112,31 @@ int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex {
 	if (op && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + 4)) {
+	    if (bl >= (magicsize + vsz)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
-	    	    memcpy(bp,op->vetu,4) ;
-	    	    bp[0] = CYIHDR_VERSION ;
-	    	    bp[1] = ENDIAN ;
-	    	    bp += 4 ;
-	    	    bl -= 4 ;
+	    	    memcopy(bp,op->vetu,vsz) ;
+	    	    bp[0] = uchar(CYIHDR_VERSION) ;
+	    	    bp[1] = uchar(ENDIAN) ;
+	    	    bp += vsz ;
+	    	    bl -= vsz ;
 	    	    if (bl >= headsize) {
-	        	uint	*header = uintp(bp) ;
-	        	header[hi_fsize] = op->fsize ;
-	        	header[hi_wtime] = op->wtime ;
-	        	header[hi_diroff] = op->diroff ;
-	        	header[hi_caloff] = op->caloff ;
-	        	header[hi_vioff] = op->vioff ;
-	        	header[hi_vilen] = op->vilen ;
-	        	header[hi_vloff] = op->vloff ;
-	        	header[hi_vllen] = op->vllen ;
-	        	header[hi_nentries] = op->nentries ;
-	        	header[hi_nskip] = op->nskip ;
-	        	header[hi_year] = op->year ;
+	        	uint			*header = uintp(bp) ;
+	        	header[hi_fsz]		= op->fsz ;
+	        	header[hi_wtime]	= op->wtime ;
+	        	header[hi_diroff]	= op->diroff ;
+	        	header[hi_caloff]	= op->caloff ;
+	        	header[hi_vioff]	= op->vioff ;
+	        	header[hi_vilen]	= op->vilen ;
+	        	header[hi_vloff]	= op->vloff ;
+	        	header[hi_vllen]	= op->vllen ;
+	        	header[hi_nentries]	= op->nentries ;
+	        	header[hi_nskip]	= op->nskip ;
+	        	header[hi_year]		= op->year ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -156,36 +160,36 @@ int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex {
 	        bp += magicsize ;
 	        bl -= magicsize ;
 		/* read out the VETU information */
-		if (bl >= 4) {
-	            memcpy(op->vetu,bp,4) ;
+		if (bl >= vsz) {
+	            memcopy(op->vetu,bp,vsz) ;
 	            if (op->vetu[0] != CYIHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
 	            if ((rs >= 0) && (op->vetu[1] != ENDIAN)) {
 	                rs = SR_PROTOTYPE ;
 		    }
-	            bp += 4 ;
-	            bl -= 4 ;
+	            bp += vsz ;
+	            bl -= vsz ;
 		} else {
 		    rs = SR_ILSEQ ;
 		}
 	        if (rs >= 0) {
 		    if (bl >= headsize) {
-	                uint	*header = uintp(bp) ;
-	                op->fsize = header[hi_fsize] ;
-	                op->wtime = header[hi_wtime] ;
-	                op->diroff = header[hi_diroff] ;
-	                op->caloff = header[hi_caloff] ;
-	                op->vioff = header[hi_vioff] ;
-	                op->vilen = header[hi_vilen] ;
-	                op->vloff = header[hi_vloff] ;
-	                op->vllen = header[hi_vllen] ;
-	                op->nentries = header[hi_nentries] ;
-	                op->nskip = header[hi_nskip] ;
-	                op->year = header[hi_year] ;
+	                const uint	*header = uintp(bp) ;
+	                op->fsz		= header[hi_fsz] ;
+	                op->wtime	= header[hi_wtime] ;
+	                op->diroff	= header[hi_diroff] ;
+	                op->caloff	= header[hi_caloff] ;
+	                op->vioff	= header[hi_vioff] ;
+	                op->vilen	= header[hi_vilen] ;
+	                op->vloff	= header[hi_vloff] ;
+	                op->vllen	= header[hi_vllen] ;
+	                op->nentries	= header[hi_nentries] ;
+	                op->nskip	= header[hi_nskip] ;
+	                op->year	= header[hi_year] ;
 	                bp += headsize ;
 	        	bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
 	            }
@@ -197,5 +201,16 @@ int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (cyihdr_wr) */
+
+
+/* local subroutines */
+
+int cyihdr::rd(char *rbuf,int rlen) noex {
+    	return cyihdr_rd(this,rbuf,rlen) ;
+} /* end method (cyihdr::rd) */
+
+int cyihdr::wr(cchar *wbuf,int wlen) noex {
+    	return cyihdr_wr(this,wbuf,wlen) ;
+} /* end method (cyihdr::wr) */
 
 
