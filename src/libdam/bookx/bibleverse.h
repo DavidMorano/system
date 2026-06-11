@@ -17,23 +17,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-
-#include	<bibleverses.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
+#include	<bibleverses.h>		/* LIBDAM */
 
 
-#define	BIBLEVERSE_MAGIC	0x99447246
 #define	BIBLEVERSE		struct bibleverse_head
 #define	BIBLEVERSE_Q		struct bibleverse_query
 #define	BIBLEVERSE_CITE		struct bibleverse_query
 #define	BIBLEVERSE_CUR		struct bibleverse_cursor
 #define	BIBLEVERSE_INFO		struct bibleverse_information
 #define	BIBLEVERSE_CA		struct bibleverse_calls
+#define	BIBLEVERSE_MAGIC	0x99447246
 
 
 struct bibleverse_information {
@@ -43,16 +39,16 @@ struct bibleverse_information {
 	uint	maxchapter ;
 	uint	nverses ;
 	uint	nzverses ;
-} ;
+} ; /* end struct */
 
 struct bibleverse_query {
 	uchar	b, c, v ;
-} ;
+} ; /* end struct */
 
 struct bibleverse_cursor {
 	void	*scp ;
-	uint	magic ;
-} ;
+	uint	magval ;
+} ; /* end struct */
 
 EXTERNC_begin
 struct bibleverse_calls {
@@ -73,12 +69,12 @@ EXTERNC_end
 
 struct bibleverse_head {
 	void		*obj ;		/* object pointer */
-	modload		loader ;
-	BIBLEVERSE_CA	call ;
-	uint		magic ;
+	modload		*mlp ;
+	BIBLEVERSE_CA	*callp ;
+	uint		magval ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
-} ;
+} ; /* end struct */
 
 typedef	BIBLEVERSE		bibleverse ;
 typedef	BIBLEVERSE_Q		bibleverse_q ;
