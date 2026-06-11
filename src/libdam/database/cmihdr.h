@@ -39,8 +39,8 @@ struct cmihdr_head {
 
 #ifdef	__cplusplus
 struct cmihdr : cmihdr_head {
-    	int rd(char *,int) noex ;
-    	int wr(cchar *,int) noex ;
+    	int rd		(char *,int) noex ;
+    	int wr		(cchar *,int) noex ;
 } ; /* end struct (bvshdr) */
 #else /* __cplusplus */
 typedef	CMIHDR		cmihdr ;
