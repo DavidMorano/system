@@ -23,13 +23,13 @@
 #include	<babieshdr.h>
 
 
-#define	BABYCALCS_DBNAME	"babies"
-#define	BABYCALCS_MAGIC		0x43628199
 #define	BABYCALCS		struct babycalcs_head
 #define	BABYCALCS_FL		struct babycalcs_flags
 #define	BABYCALCS_OBJ		struct babycalcs_object
 #define	BABYCALCS_INFO		struct babycalcs_information
 #define	BABYCALCS_ENT		struct babycalcs_entry
+#define	BABYCALCS_DBNAME	"babies"
+#define	BABYCALCS_MAGIC		0x43628199
 
 
 struct babycalcs_object {
