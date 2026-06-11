@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* constant division */
+/* constants for buffer sizes to hold digits of various types and bases */
 /* version %I% last-modified %G% */
 
 
