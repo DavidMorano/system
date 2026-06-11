@@ -314,7 +314,7 @@ static int bibleq_objloadbegin(BIBLEQ *op,cchar *pr,cchar *objname)
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
 	const int	n = nelem(subs) ;
-	const int	vo = VECSTR_OCOMPACT ;
+	const int	vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 
