@@ -30,14 +30,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |sort(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |sort(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LINUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"recarr.h"
 
@@ -121,7 +121,7 @@ int recarr_start(recarr *op,int n,int opts) noex {
 	    if (rs < 0) {
 		recarr_dtor(op) ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (recarr_ctor) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (recarr_start) */
