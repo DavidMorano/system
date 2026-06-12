@@ -1416,8 +1416,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                c += 1 ;
 	                switch (oi) {
 	                case akoname_bible:
-	                    if (! pip->final.optbible) {
-	                        pip->final.optbible = TRUE ;
+	                    if (! pip->finval.optbible) {
+	                        pip->finval.optbible = TRUE ;
 	                        pip->have.optbible = TRUE ;
 	                        pip->fl.optbible = TRUE ;
 	                        if (vl > 0) {
@@ -1427,8 +1427,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_nofile:
-	                    if (! pip->final.optnofile) {
-	                        pip->final.optnofile = TRUE ;
+	                    if (! pip->finval.optnofile) {
+	                        pip->finval.optnofile = TRUE ;
 	                        pip->have.optnofile = TRUE ;
 	                        pip->fl.optnofile = TRUE ;
 	                        if (vl > 0) {
@@ -1438,8 +1438,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_keyfold:
-	                    if (! pip->final.keyfold) {
-	                        pip->final.keyfold = TRUE ;
+	                    if (! pip->finval.keyfold) {
+	                        pip->finval.keyfold = TRUE ;
 	                        pip->have.keyfold = TRUE ;
 	                        pip->fl.keyfold = TRUE ;
 	                        if (vl > 0) {
@@ -1449,8 +1449,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_par:
-	                    if (! pip->final.optpar) {
-	                        pip->final.optpar = TRUE ;
+	                    if (! pip->finval.optpar) {
+	                        pip->finval.optpar = TRUE ;
 	                        pip->have.optpar = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1460,8 +1460,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_tablen:
 	                case akoname_tl:
-	                    if (! pip->final.tablen) {
-	                        pip->final.tablen = TRUE ;
+	                    if (! pip->finval.tablen) {
+	                        pip->finval.tablen = TRUE ;
 	                        pip->have.tablen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecmfi(vp,vl,&v) ;
@@ -1470,8 +1470,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_linelen:
-	                    if (! pip->final.linelen) {
-	                        pip->final.linelen = TRUE ;
+	                    if (! pip->finval.linelen) {
+	                        pip->finval.linelen = TRUE ;
 	                        pip->have.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1480,8 +1480,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_indent:
-	                    if (! pip->final.indent) {
-	                        pip->final.indent = TRUE ;
+	                    if (! pip->finval.indent) {
+	                        pip->finval.indent = TRUE ;
 	                        pip->have.indent = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1490,8 +1490,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_uniq:
-	                    if (! pip->final.optuniq) {
-	                        pip->final.optuniq = TRUE ;
+	                    if (! pip->finval.optuniq) {
+	                        pip->finval.optuniq = TRUE ;
 	                        pip->have.optuniq = TRUE ;
 	                        pip->fl.optuniq = TRUE ;
 	                        if (vl > 0) {
@@ -1501,8 +1501,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_audit:
-	                    if (! pip->final.optaudit) {
-	                        pip->final.optaudit = TRUE ;
+	                    if (! pip->finval.optaudit) {
+	                        pip->finval.optaudit = TRUE ;
 	                        pip->have.optaudit = TRUE ;
 	                        pip->fl.optaudit = TRUE ;
 	                        if (vl > 0) {
@@ -1512,8 +1512,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_sendparams:
-	                    if (! pip->final.optsendparams) {
-	                        pip->final.optsendparams = TRUE ;
+	                    if (! pip->finval.optsendparams) {
+	                        pip->finval.optsendparams = TRUE ;
 	                        pip->have.optsendparams = TRUE ;
 	                        pip->fl.optsendparams = TRUE ;
 	                        if (vl > 0) {
@@ -1523,8 +1523,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_nodebug:
-	                    if (! pip->final.nodebug) {
-	                        pip->final.nodebug = TRUE ;
+	                    if (! pip->finval.nodebug) {
+	                        pip->finval.nodebug = TRUE ;
 	                        pip->have.nodebug = TRUE ;
 	                        pip->fl.nodebug = TRUE ;
 	                        if (vl > 0) {
@@ -1534,8 +1534,8 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    }
 	                    break ;
 	                case akoname_iacc:
-	                    if (! pip->final.iacc) {
-	                        pip->final.iacc = TRUE ;
+	                    if (! pip->finval.iacc) {
+	                        pip->finval.iacc = TRUE ;
 	                        pip->have.iacc = TRUE ;
 	                        pip->fl.iacc = TRUE ;
 	                        if (vl > 0) {
@@ -1572,7 +1572,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,cchar *afn)
 	cchar		*fmt ;
 
 	if (rs >= 0) {
-	    BITS	*bop = &aip->pargs ;
+	    bits	*bop = &aip->pargs ;
 	    int		ai ;
 	    int		f ;
 	    cchar	**argv = aip->argv ;
