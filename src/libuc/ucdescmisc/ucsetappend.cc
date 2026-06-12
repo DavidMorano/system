@@ -16,13 +16,13 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<poll.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
