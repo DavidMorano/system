@@ -76,7 +76,7 @@ local inline int vecelem_magic(vecelem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == VECELEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (vecelem_magic) */
 
