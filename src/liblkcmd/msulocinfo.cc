@@ -51,7 +51,7 @@
 #include	<grp.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<vecstr.h>
 #include	<lfm.h>
 #include	<utmpacc.h>
@@ -349,13 +349,13 @@ int locinfo_lockcheck(LOCINFO *lip)
 	}
 #endif /* CF_DEBUG */
 
-	    if (rs == SR_LOCKLOST) msumainlockprint(pip,pip->pidfname,&ci) ;
+	    if (rs == SR_LOCKFAIL) msumainlockprint(pip,pip->pidfname,&ci) ;
 
 	} /* end if (pidlock) */
 
 	if ((rs >= 0) && lip->open.tmplock) {
 	    rs = lfm_check(&lip->tmplock,&ci,pip->daytime) ;
-	    if (rs == SR_LOCKLOST) msumainlockprint(pip,lip->tmpfname,&ci) ;
+	    if (rs == SR_LOCKFAIL) msumainlockprint(pip,lip->tmpfname,&ci) ;
 	}
 
 	return rs ;
@@ -512,7 +512,7 @@ int locinfo_msfile(LOCINFO *lip)
 	        if (uid == euid) { /* we are not running SUID */
 		    if ((rs = proginfo_rootname(pip)) >= 0) {
 	                struct passwd	pw ;
-			const int	pwlen = getbufsize(bufsize_pw) ;
+			const int	pwlen = bufsizeget(bufsize_pw) ;
 	                char		*pwbuf ;
 			if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 			    cchar	*rn = pip->rootname ;
@@ -655,7 +655,7 @@ int locinfo_gidrootname(LOCINFO *lip)
 	if (lip->gid_rootname == 0) {
 	    if ((rs = proginfo_rootname(pip)) >= 0) {
 	        struct passwd	pw ;
-	        const int	pwlen = getbufsize(bufsize_pw) ;
+	        const int	pwlen = bufsizeget(bufsize_pw) ;
 	        char		*pwbuf ;
 	        lip->gid_rootname = 0 ; /* super (unwanted) default */
 		if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
@@ -755,7 +755,7 @@ static int locinfo_lockbeginone(LOCINFO *lip,LFM *lfp,cchar *lockfname)
 	                            pip->progname,rs) ;
 #endif /* COMMENT */
 
-	        if ((rs == SR_LOCKLOST) || (rs == SR_AGAIN)) {
+	        if ((rs == SR_LOCKFAIL) || (rs == SR_AGAIN)) {
 		    msumainlockprint(pip,ccp,&lc) ;
 		}
 	    } /* end if */
