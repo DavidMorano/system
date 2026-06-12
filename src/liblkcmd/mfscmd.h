@@ -18,7 +18,7 @@
 #ifndef	MFSCMD_INCLUDE
 #define	MFSCMD_INCLUDE	1
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	"mfsmain.h"
 #include	"defs.h"		/* for PROGINFO */
