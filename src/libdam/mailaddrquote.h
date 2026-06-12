@@ -1,4 +1,5 @@
 /* mailaddrquote HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* quote mail-addresses */
@@ -12,29 +13,26 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<bufstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufstr.h>		/* LIBUC */
 
 
 #define	MAILADDRQUOTE		struct mailaddrquote_head
 #define	MAILADDRQUOTE_FL	struct mailaddrquote_flags
-#define	MAILADDRQUOTE_LEN	100		/* default value */
 #define	MAILADDRQUOTE_MAGIC	0x08938725	/* magic */
+#define	MAILADDRQUOTE_LEN	100		/* default value */
 
 
 struct mailaddrquote_flags {
 	uint		qaddr:1 ;
-} ;
+} ; /* end struct */
 
 struct mailaddrquote_head {
 	bufstr			*bsp ;	/* buffer-string-pointer */
 	MAILADDRQUOTE_FL	fl ;
-	uint			magic ;
-} ;
+	uint			magval ;
+} ; /* end struct */
 
 typedef	MAILADDRQUOTE		mailaddrquote ;
 typedef	MAILADDRQUOTE_FL	mailaddrquote_fl ;
