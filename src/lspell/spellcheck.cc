@@ -249,7 +249,7 @@ int		wl ;
 
 int spellcheck_looks(op,bop,wa,wn)
 SPELLCHECK	*op ;
-BITS		*bop ;
+bits		*bop ;
 const char	**wa ;
 int		wn ;
 {
@@ -562,7 +562,7 @@ const char	objname[] ;
 
 		case sub_looks:
 		    op->call.looks = 
-			(int (*)(void *,BITS *,const char **,int)) snp ;
+			(int (*)(void *,bits *,const char **,int)) snp ;
 		    break ;
 
 		case sub_curbegin:
