@@ -42,7 +42,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
-#include	<time.h>
+#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -414,11 +414,11 @@ cchar	fname[] ;
 	            struct tm	ts ;
 	            uint	year ;
 
-	            rs1 = uc_localtime(&pfp->date,&ts) ;
+	            rs1 = uc_timelocal(&pfp->date,&ts) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	            debugprintf("progfile: uc_localtime() rs=%d\n",rs) ;
+	            debugprintf("progfile: uc_timelocal() rs=%d\n",rs) ;
 	            debugprintf("progfile: date=>%s<\n",
 	                timestr_log(pfp->date,timebuf)) ;
 	}
