@@ -308,9 +308,9 @@ local int config_reader(CONFIG *cfp)
 {
 	PROGINFO	*pip = cfp->pip ;
 	LOCINFO		*lip ;
-	PARAMFILE	*pfp = &cfp->p ;
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile	*pfp = &cfp->p ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	int		rs ;
 
 #if	CF_DEBUG
@@ -382,31 +382,31 @@ local int config_reader(CONFIG *cfp)
 	            if ((rs = cfdecti(ebuf,el,&v)) >= 0) {
 	                switch (pi) {
 	                case param_intrun:
-	                    if (! pip->final.intrun)
+	                    if (! pip->finval.intrun)
 	                        pip->intrun = v ;
 	                    break ;
 	                case param_mspoll:
 	                case param_intpoll:
-	                    if (! pip->final.intpoll)
+	                    if (! pip->finval.intpoll)
 	                        pip->intpoll = v ;
 	                    break ;
 	                case param_intmark:
-	                    if (! pip->final.intmark)
+	                    if (! pip->finval.intmark)
 	                        pip->intmark = v ;
 	                    break ;
 	                case param_intlock:
-	                    if (! pip->final.intlock)
+	                    if (! pip->finval.intlock)
 	                        pip->intlock = v ;
 	                    break ;
 	                case param_intspeed:
-			    if (! lip->final.intspeed)
+			    if (! lip->finval.intspeed)
 	                        lip->intspeed = v ;
 	                    break ;
 	                } /* end switch */
 	            } /* end if (cfdecti) */
 	            break ;
 	        case param_pidfile:
-	            if (! pip->final.pidfname) {
+	            if (! pip->finval.pidfname) {
 	                pip->have.pidfname = TRUE ;
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    RUNDNAME,pip->nodename,PIDFNAME) ;
@@ -420,7 +420,7 @@ local int config_reader(CONFIG *cfp)
 	            }
 	            break ;
 	        case param_msfile:
-	            if (! lip->final.msfname) {
+	            if (! lip->finval.msfname) {
 	                lip->have.msfname = TRUE ;
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    MSDNAME,MSFNAME,"") ;
@@ -434,7 +434,7 @@ local int config_reader(CONFIG *cfp)
 	            }
 	            break ;
 	        case param_logfile:
-	            if (! pip->final.logprog) {
+	            if (! pip->finval.logprog) {
 	                pip->have.logprog = TRUE ;
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    LOGDNAME,pip->searchname,"") ;
@@ -448,7 +448,7 @@ local int config_reader(CONFIG *cfp)
 	            } /* end if */
 	            break ;
 	        case param_reqfile:
-	            if (! lip->final.reqfname) {
+	            if (! lip->finval.reqfname) {
 	                lip->have.reqfname = TRUE ;
 #ifdef	COMMENT
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
@@ -472,7 +472,7 @@ local int config_reader(CONFIG *cfp)
 		    }
 	            break ;
 	        case param_speedname:
-	            if (! lip->final.speedname) {
+	            if (! lip->finval.speedname) {
 	                lip->have.speedname = TRUE ;
 	                ccp = lip->speedname ;
 	                if ((ccp == NULL) ||
