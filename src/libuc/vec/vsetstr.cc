@@ -77,7 +77,7 @@ local int vsetstr_ctor(vsetstr *op,Args ... args) noex {
 	    if (vecpstr *elp ; (elp = new(nothrow) vecpstr) != np) ylikely {
 		op->elp = elp ;
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-vecpstr) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (vsetstr_ctor) */
@@ -90,7 +90,7 @@ local int vsetstr_dtor(vsetstr *op) noex {
 	    if (elp) ylikely {
 		delete elp ;
 		op->elp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (vsetstr_dtor) */
@@ -100,7 +100,7 @@ local inline int vsetstr_magic(vsetstr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == VSETSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (vsetstr_magic) */
 
@@ -124,7 +124,7 @@ int vsetstr_start(VS *op,int vn) noex {
 	    if (rs < 0) {
 		vsetstr_dtor(op) ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (vsetstr_ctor) */
 	return rs ;
 }
 /* end subroutine (vsetstr_start) */
