@@ -1,4 +1,5 @@
 /* postwrite SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* postwrite the input files */
@@ -42,11 +43,13 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
@@ -57,6 +60,10 @@
 #include	"config.h"
 #include	"defs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import findbit ;
 
 /* local defines */
 
@@ -68,16 +75,6 @@
 
 
 /* external subroutines */
-
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	ffbsi(uint) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	iceil(int,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -97,8 +94,10 @@ struct header {
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int postwrite(pip,hasha,nhash,mfp,indexname)
 struct proginfo	*pip ;
@@ -108,14 +107,10 @@ MEMFILE		*mfp ;		/* post MEMFILE */
 cchar	indexname[] ;
 {
 	struct postentry	*posta ;
-
 	off_t	hoff ;
-
 	bfile	pfile ;
-
 	uint	hi, npi, himask, nfo ;
 	uint	pi ;
-
 	int	rs ;
 	int	i, j, len ;
 	int	size ;
@@ -138,10 +133,10 @@ cchar	indexname[] ;
 	}
 #endif
 
-	len = uceil(sizeof(struct postentry),sizeof(uint)) ;
+	len = uceil(szof(struct postentry),szof(uint)) ;
 
 	himask = (nhash - 1) ;
-	shift = ffbsi(len) ;
+	shift = ffbs(len) ;
 
 /* get the starting offset of the posting file */
 
@@ -185,14 +180,14 @@ cchar	indexname[] ;
 	    struct header	h ;
 	    h.wtime = (uint) time(NULL) ;
 	    h.nhash = nhash ;
-	    bwrite(&pfile,&h,sizeof(struct header)) ;
+	    bwrite(&pfile,&h,szof(struct header)) ;
 	}
 
 /* make space for the hash table */
 
 	btell(&pfile,&hoff) ;
 
-	size = nhash * sizeof(uint) ;
+	size = nhash * szof(uint) ;
 	rs = bseek(&pfile,(off_t) size,SEEK_CUR) ;
 
 /* write out the link data */
@@ -207,7 +202,7 @@ cchar	indexname[] ;
 	            npi = j ;
 	            nfo = posta[pi].noff ;
 	            j += 1 ;
-	            rs = bwrite(&pfile,&nfo,sizeof(uint)) ;
+	            rs = bwrite(&pfile,&nfo,szof(uint)) ;
 
 	            c += 1 ;
 	            pi = posta[pi].next ;
@@ -217,7 +212,7 @@ cchar	indexname[] ;
 
 	        nfo = (uint) EOP ;		/* End-Of-Post */
 	        j += 1 ;
-	        if (rs >= 0) rs = bwrite(&pfile,&nfo,sizeof(uint)) ;
+	        if (rs >= 0) rs = bwrite(&pfile,&nfo,szof(uint)) ;
 
 /* update the hash table with the new proper index to the posting data */
 
@@ -231,7 +226,7 @@ cchar	indexname[] ;
 
 	if (rs >= 0) {
 	    bseek(&pfile,hoff,SEEK_SET) ;
-	    size = nhash * sizeof(uint) ;
+	    size = nhash * szof(uint) ;
 	    rs = bwrite(&pfile,hasha,size) ;
 	}
 
