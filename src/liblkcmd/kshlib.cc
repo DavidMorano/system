@@ -1190,7 +1190,7 @@ local int kshlib_init(void)
 	        rs = msleep(1) ;
 	        if (rs == SR_INTR) rs = SR_OK ;
 	    }
-	    if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKLOST ;
+	    if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKFAIL ;
 	}
 #if	CF_DEBUGN
 	nprintf(NDF,"kshlib_init: ret rs=%d\n",rs) ;
