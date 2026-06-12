@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	(defined(KSHBUILTIN) && (KSHBUILTIN > 0))
 #include	<shell.h>
