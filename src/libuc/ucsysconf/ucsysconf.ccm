@@ -45,15 +45,15 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<atomic>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<errtimer.hh>
-#include	<sysconfcmds.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<atomic>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsysconf.h"
 
@@ -115,10 +115,6 @@ using std::atomic_int ;			/* type */
 
 
 /* local variables */
-
-ucdatamgr		ucdata ;	/* <- module linkage */
-
-constexpr size_t	minusone = -1uz ;
 
 
 /* exported variables */
