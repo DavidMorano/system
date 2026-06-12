@@ -1,23 +1,28 @@
-/* md5calc */
+/* md5calc HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
-/* address type headers */
+/* calculate a MD5 digest */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MD5CALC_INCLUDE
-#define	MD5CALC_INCLUDE	1
+#define	MD5CALC_INCLUDE
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int md5calc(ULONG *,const char *,int) ;
+extern int md5calc(ulong *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* MD5CALC_INCLUDE */
 
