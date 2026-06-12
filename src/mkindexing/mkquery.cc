@@ -216,7 +216,7 @@ cchar	dbname[] ;
 
 	opts = VECSTR_OCOMPACT ;
 	if ((rs >= 0) && ((rs = vecstr_start(&qstr,5,opts)) >= 0)) {
-	    BITS	*bop = &aip->pargs ;
+	    bits	*bop = &aip->pargs ;
 	    int		c = 0 ;
 
 	    for (ai = 1 ; ai < aip->argc ; ai += 1) {
