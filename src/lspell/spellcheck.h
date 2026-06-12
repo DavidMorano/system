@@ -16,7 +16,7 @@
 #define	SPELLCHECK_INCLUDE	1
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 
@@ -42,7 +42,7 @@ struct spellcheck_calls {
 	int	(*start)(void *,const char *,const char *) ;
 	int	(*count)(void *) ;
 	int	(*look)(void *,const char *,int) ;
-	int	(*looks)(void *,BITS *,const char **,int) ;
+	int	(*looks)(void *,bits *,const char **,int) ;
 	int	(*curbegin)(void *,SPELLCHECKS_CUR *) ;
 	int	(*enumerate)(void *,SPELLCHECKS_CUR *,char *,int) ;
 	int	(*curend)(void *,SPELLCHECKS_CUR *) ;
@@ -69,7 +69,7 @@ extern "C" {
 extern int	spellcheck_start(SPELLCHECK *,const char *,const char *) ;
 extern int	spellcheck_count(SPELLCHECK *) ;
 extern int	spellcheck_look(SPELLCHECK *,const char *,int) ;
-extern int	spellcheck_looks(SPELLCHECK *,BITS *,const char **,int) ;
+extern int	spellcheck_looks(SPELLCHECK *,bits *,const char **,int) ;
 extern int	spellcheck_curbegin(SPELLCHECK *,SPELLCHECK_CUR *) ;
 extern int	spellcheck_enum(SPELLCHECK *,SPELLCHECK_CUR *,char *,int) ;
 extern int	spellcheck_curend(SPELLCHECK *,SPELLCHECK_CUR *) ;
