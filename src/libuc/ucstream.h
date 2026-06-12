@@ -17,6 +17,7 @@
 
 #ifndef	UCSTREAM_INCLUDE
 #define	UCSTREAM_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -24,6 +25,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
+#endif /* __cplusplus */
 #endif /* UCSTREAM_INCLUDE */
 
 
