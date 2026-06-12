@@ -22,7 +22,7 @@
 #define	MFSC_INCLUDE
 
 
-#include	<envstandards.h>	/* must be fist to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* system types */
 
 
