@@ -19,7 +19,7 @@
 #ifndef	DIRSHOWN_INCLUDE
 #define	DIRSHOWN_INCLUDE
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<vechand.h>
