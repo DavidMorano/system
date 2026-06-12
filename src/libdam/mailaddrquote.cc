@@ -41,25 +41,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<usystem.h>
-#include	<baops.h>
-#include	<ascii.h>
-#include	<bufstr.h>
-#include	<fieldterms.h>
-#include	<strn.h>
-#include	<six.h>			/* |siterm(3uc)| */
-#include	<sncpyx.h>
-#include	<mkchar.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<bufstr.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC |siterm(3uc)| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailaddrquote.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -67,8 +70,6 @@ import libutil ;
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -86,50 +87,48 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int mailaddrquote_ctor(MAQ *op,Args ... args) noex {
+local int mailaddrquote_ctor(MAQ *op,Args ... args) noex {
     	MAQ		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->bsp = new(nothrow) bufstr) != np) ylikely {
+	    if ((op->bsp = new(nt) bufstr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-bufstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailaddrquote_ctor) */
+} /* end subroutine (mailaddrquote_ctor) */
 
-static int mailaddrquote_dtor(MAQ *op) noex {
+local int mailaddrquote_dtor(MAQ *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->bsp) ylikely {
 		delete op->bsp ;
 		op->bsp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailaddrquote_dtor) */
+} /* end subroutine (mailaddrquote_dtor) */
 
 template<typename ... Args>
-static inline int mailaddrquote_magic(MAQ *op,Args ... args) noex {
+local inline int mailaddrquote_magic(MAQ *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAILADDRQUOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	    rs = (op->magval == MAILADDRQUOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (mailaddrquote_magic) */
+} /* end subroutine (mailaddrquote_magic) */
 
-static int	mailaddrquote_quote(MAQ *,cchar *,int) noex ;
+local int	mailaddrquote_quote(MAQ *,cchar *,int) noex ;
 
 
 /* local variables */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
+constexpr int		termsize = ((UCHAR_MAX +1 ) / CHAR_BIT) ;
 
 constexpr char		qchars[] = R"xx("\<>())xx" ;
 
@@ -156,15 +155,15 @@ int mailaddrquote_start(MAQ *op,cc *abuf,int alen,cc **rpp) noex {
 	            if ((rs = mailaddrquote_quote(op,abuf,alen)) >= 0) {
 	                rs = bufstr_get(op->bsp,&rp) ;
 	                len = rs ;
-	            }
-	        }
+	            } /* end if (mailaddrquote_quote) */
+	        } /* end if */
 		if (rs >= 0) {
-		    op->magic = MAILADDRQUOTE_MAGIC ;
-		}
+		    op->magval = MAILADDRQUOTE_MAGIC ;
+		} /* end if (ok) */
 	    } /* end if (fieldterms) */
 	    if (rs < 0) {
 		mailaddrquote_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (mailaddrquote_ctor) */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? rp : nullptr ;
@@ -179,10 +178,11 @@ int mailaddrquote_finish(MAQ *op) noex {
 	int		len = 0 ;
 	if ((rs = mailaddrquote_magic(op)) >= 0) {
 	    if (op->bsp && op->fl.qaddr) {
+		bufstr *bsp = op->bsp ;
 	        op->fl.qaddr = false ;
-	        len = bufstr_finish(op->bsp) ;
+	        len = bsp->finish ;
 	        if (rs >= 0) rs = len ;
-	    }
+	    } /* end if (possible cleanup) */
 	    {
 		rs1 = mailaddrquote_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -195,31 +195,36 @@ int mailaddrquote_finish(MAQ *op) noex {
 
 /* local subroutines */
 
-static int mailaddrquote_quote(MAQ *op,cc *abuf,int alen) noex {
-	bufstr		*bsp = op->bsp ;
+local int mailaddrquote_quote(MAQ *op,cc *abuf,int alen) noex {
 	int		rs ;
-	if ((rs = bufstr_start(bsp)) >= 0) {
-	    int		si ;
-	    int		al = alen ;
-	    cchar	*ap = abuf ;
+	int		rs1 ;
+	if (bufstr *bsp = op->bsp ; (rs = bsp->start) >= 0) {
 	    op->fl.qaddr = true ;
-	    bufstr_chr(bsp,CH_DQUOTE) ;
-	    while ((rs >= 0) && ((si = siterm(ap,al,qterms)) >= 0)) {
-	        bufstr_strw(bsp,ap,si) ;
-	        bufstr_chr(bsp,CH_BSLASH) ;
-	        rs = bufstr_chr(bsp,ap[si]) ;
-	        ap += (si+1) ;
-	        al -= (si+1) ;
-	    } /* end while */
-	    if ((rs >= 0) && (al > 0)) {
-	        rs = bufstr_strw(bsp,ap,al) ;
-	    }
-	    if (rs >= 0) {
-	        rs = bufstr_chr(bsp,CH_DQUOTE) ;
-	    }
+	    {
+	        int	al = alen ;
+	        cchar	*ap = abuf ;
+	        if ((rs = bsp->chr(CH_DQUOTE)) >= 0) {
+	            for (int si ; (si = siterm(ap,al,qterms)) >= 0 ; ) {
+	                bsp->strw(ap,si) ;
+	                bsp->chr(CH_BSLASH) ;
+	                rs = bsp->chr(ap[si]) ;
+	                ap += (si + 1) ;
+	                al -= (si + 1) ;
+		        if (rs < 0) break ;
+	            } /* end for */
+	            if ((rs >= 0) && (al > 0)) {
+	                rs = bsp->strw(ap,al) ;
+	            }
+	            if (rs >= 0) {
+	                rs = bsp->chr(CH_DQUOTE) ;
+	            }
+		} /* end if (bufstr_chr) */
+	    } /* end block */
+	    op->fl.qaddr = true ;
+	    rs1 = bsp->finish ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer_start) */
 	return rs ;
-}
-/* end subroutine (mkquoted_quote) */
+} /* end subroutine (mkquoted_quote) */
 
 
