@@ -32,7 +32,6 @@ ucgetdefaultproj
 ucgetlogin
 ucgetnetname
 ucgetpriority
-uchold
 ucinetconv
 ucinitgroups
 ucisaexecve
@@ -84,3 +83,4 @@ ucwritable
 ucwrite
 ucwritedesc
 ucwritefile
+ucmincore
