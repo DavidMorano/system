@@ -211,7 +211,7 @@ int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck)
 #endif
 
 	if (lip->open.cooks) {
-	    PARAMFILE	*pfp = &cfp->p ;
+	    paramfile	*pfp = &cfp->p ;
 	    if ((rs = paramfile_open(pfp,pip->envv,cfname)) >= 0) {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -264,7 +264,7 @@ int config_finish(CONFIG *cfp)
 #endif
 
 	if (cfp->fl.p) {
-	    PARAMFILE	*pfp = &cfp->p ;
+	    paramfile	*pfp = &cfp->p ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("config_finish: fins\n") ;
@@ -389,9 +389,9 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 {
 	PROGINFO	*pip = cfp->pip ;
 	LOCINFO		*lip ;
-	PARAMFILE	*pfp = &cfp->p ;
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile	*pfp = &cfp->p ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	int		rs ;
 	int		rs1 ;
 
@@ -460,26 +460,26 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	            if ((rs = cfdecti(ebuf,el,&v)) >= 0) {
 	                switch (pi) {
 	                case param_intrun:
-	                    if (! pip->final.intrun) pip->intrun = v ;
+	                    if (! pip->finval.intrun) pip->intrun = v ;
 	                    break ;
 	                case param_mspoll:
 	                case param_intpoll:
-	                    if (! pip->final.intpoll) pip->intpoll = v ;
+	                    if (! pip->finval.intpoll) pip->intpoll = v ;
 	                    break ;
 	                case param_intmark:
-	                    if (! pip->final.intmark) pip->intmark = v ;
+	                    if (! pip->finval.intmark) pip->intmark = v ;
 	                    break ;
 	                case param_intlock:
-	                    if (! pip->final.intlock) pip->intlock = v ;
+	                    if (! pip->finval.intlock) pip->intlock = v ;
 	                    break ;
 	                case param_intspeed:
-			    if (! lip->final.intspeed) lip->intspeed = v ;
+			    if (! lip->finval.intspeed) lip->intspeed = v ;
 	                    break ;
 	                } /* end switch */
 	            } /* end if (cfdectinumber) */
 	            break ;
 	        case param_msfile:
-	            if (! lip->final.msfname) {
+	            if (! lip->finval.msfname) {
 	                lip->have.msfname = TRUE ;
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    MSDNAME,MSFNAME,"") ;
@@ -493,7 +493,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	            }
 	            break ;
 	        case param_pidfile:
-	            if (! pip->final.pidfname) {
+	            if (! pip->finval.pidfname) {
 	                pip->have.pidfname = TRUE ;
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    RUNDNAME,pip->nodename,PIDFNAME) ;
@@ -507,7 +507,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	            }
 	            break ;
 	        case param_logfile:
-	            if (! pip->final.logprog) {
+	            if (! pip->finval.logprog) {
 	                pip->have.logprog = TRUE ;
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    LOGDNAME,pip->searchname,"") ;
@@ -521,7 +521,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	            } /* end if */
 	            break ;
 	        case param_reqfile:
-	            if (! lip->final.reqfname) {
+	            if (! lip->finval.reqfname) {
 	                lip->have.reqfname = TRUE ;
 #ifdef	COMMENT
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
@@ -539,16 +539,16 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	            } /* end if */
 	            break ;
 	        case param_svctab:
-	            if (! lip->final.svcfname) {
+	            if (! lip->finval.svcfname) {
 			cchar	**vpp = &lip->svcfname ;
-	                lip->final.svcfname = TRUE ;
+	                lip->finval.svcfname = TRUE ;
 	                rs = locinfo_setentry(lip,vpp,ebuf,el) ;
 	            }
 	            break ;
 	        case param_acctab:
-	            if (! lip->final.accfname) {
+	            if (! lip->finval.accfname) {
 			cchar	**vpp = &lip->accfname ;
-	                lip->final.accfname = TRUE ;
+	                lip->finval.accfname = TRUE ;
 	                rs = locinfo_setentry(lip,vpp,ebuf,el) ;
 	            }
 	            break ;
@@ -559,7 +559,7 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 		    }
 	            break ;
 	        case param_speedname:
-	            if (! lip->final.speedname) {
+	            if (! lip->finval.speedname) {
 	                lip->have.speedname = TRUE ;
 	                ccp = lip->speedname ;
 	                if ((ccp == NULL) ||
@@ -577,14 +577,14 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 		    break ;
 	       case param_svctype:
 	            if (pip->fl.daemon && (el > 0)) {
-			if (! lip->final.svctype) {
+			if (! lip->finval.svctype) {
 	                    rs = locinfo_svctype(lip,ebuf,el) ;
 			}
 		    }
 		    break ;
 	       case param_users:
-	            if (! lip->final.users) {
-			lip->final.users = TRUE ;
+	            if (! lip->finval.users) {
+			lip->finval.users = TRUE ;
 			lip->fl.users = TRUE ;
 			if (el > 0) {
 	                    rs = optbool(ebuf,el) ;
