@@ -113,7 +113,7 @@ struct locinfo {
 	cchar		*msfname ;
 	proginfo	*pip ;
 	void		*adj ;		/* adjunct local data */
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	lfm		pidlock, tmplock ;
 	envhelp		envs ;
