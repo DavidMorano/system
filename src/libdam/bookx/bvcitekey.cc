@@ -17,17 +17,22 @@
 
 /*******************************************************************************
 
+  	Name:
+	bvcitekey
+
+	Description:
 	We manage a BV cite-key object.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bvcitekey.h"
 
@@ -62,6 +67,7 @@ int bvcitekey_set(bvcitekey *bvp,uint *ckp) noex {
 	int		rs = SR_FAULT ;
 	if (bvp && ckp) {
 	    uint	ck = 0 ;
+	    rs = SR_OK  ;
 	    ck |= (bvp->nlines & UCHAR_MAX) ;
 	    ck = (ck << 8) ;
 	    ck |= (bvp->b & UCHAR_MAX) ;
@@ -79,6 +85,7 @@ int bvcitekey_get(bvcitekey *bvp,uint *ckp) noex {
 	int		rs = SR_FAULT ;
 	if (bvp && ckp) {
 	    uint	ck = *ckp ;
+	    rs = SR_OK  ;
 	    bvp->v = (ck & UCHAR_MAX) ;
 	    ck = (ck >> 8) ;
 	    bvp->c = (ck & UCHAR_MAX) ;
