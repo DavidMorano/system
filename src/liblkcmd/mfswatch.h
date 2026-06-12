@@ -18,7 +18,7 @@
 #ifndef	MFSWATCH_INCLUDE
 #define	MFSWATCH_INCLUDE	1
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<poller.h>
 #include	<svcfile.h>
