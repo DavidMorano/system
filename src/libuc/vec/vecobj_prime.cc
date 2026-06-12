@@ -52,7 +52,6 @@
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -115,7 +114,7 @@ int vecobj_start(vecobj *op,int osize,int n,int opts) noex {
 	    if (rs < 0) {
 		vecobj_dtor(op) ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (vecobj_ctor) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (vecobj_start) */
@@ -136,14 +135,14 @@ int vecobj_finish(vecobj *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 		    op->va = nullptr ;
 		}
-		{
-		    rs1 = vecobj_dtor(op) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
 		op->c = 0 ;
 		op->i = 0 ;
 		op->n = 0 ;
 	    } /* end if (open) */
+		{
+		    rs1 = vecobj_dtor(op) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -640,6 +639,7 @@ int vecobj_audit(vecobj *op) noex {
 
 local int vecobj_ctor(vecobj *op) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
@@ -649,9 +649,9 @@ local int vecobj_ctor(vecobj *op) noex {
 	    op->n = 0 ;
 	    op->fi = 0 ;
 	    op->esz = 0 ;
-	    if ((op->lap = new(nothrow) lookaside) != np) ylikely {
+	    if ((op->lap = new(nt) lookaside) != np) ylikely {
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-lookaside) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (vecobj_ctor) */
@@ -661,7 +661,7 @@ local int vecobj_dtor(vecobj *op) noex {
 	if (op->lap) ylikely {
 	    delete op->lap ;
 	    op->lap = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 }
 /* end subroutine (vecobj_dtor) */
