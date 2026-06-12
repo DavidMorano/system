@@ -67,25 +67,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<string>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<nulstr.h>
-#include	<vechand.h>
-#include	<vstrcmp.h>
-#include	<nleadstr.h>
-#include	<strwcpy.h>
-#include	<intceil.h>
-#include	<nextpowtwo.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<string>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<vstrcmp.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<intceil.h>		/* LIBUC */
+#include	<nextpowtwo.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"vecpstr.h"
 
@@ -195,7 +197,7 @@ int vecpstr_start(vecpstr *op,int vn,int vsz,int vo) noex {
 	    if (rs < 0) {
 		vecpstr_dtor(op) ;
 	    } /* end if(error) */
-	} /* end if (non-null) */
+	} /* end if (vecpstr_ctor) */
 	return rs ;
 }
 /* end subroutine (vecpstr_start) */
@@ -875,7 +877,7 @@ local int vecpstr_dtor(vecpstr *op) noex {
 	if (op->clp) ylikely {
 	    delete op->clp ;
 	    op->clp = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (vecpstr_dtor) */
 
