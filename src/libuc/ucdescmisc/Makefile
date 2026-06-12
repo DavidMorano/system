@@ -45,7 +45,7 @@ OBJ1= ucftruncate.o ucfminmod.o
 OBJ2= ucfstat.o ucdescmanip.o
 OBJ3= ucnonblock.o ucndelay.o ucfsync.o
 
-OBJ4= ucttyname.o
+OBJ4= ucttyname.o ucsetappend.o
 OBJ5= ucclose.o
 OBJ6= 
 OBJ7= 
@@ -162,5 +162,6 @@ ucndelay.o:		ucndelay.cc		ucndelay.h		$(INCS)
 ucnonblock.o:		ucnonblock.cc		ucnonblock.h		$(INCS)
 ucclose.o:		ucclose.cc		ucclose.h		$(INCS)
 ucttyname.o:		ucttyname.cc		ucttyname.h		$(INCS)
+ucsetappend.o:		ucsetappend.cc		ucsetappend.h		$(INCS)
 
 
