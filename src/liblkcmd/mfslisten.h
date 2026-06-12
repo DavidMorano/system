@@ -18,7 +18,7 @@
 #ifndef	MFSLISTEN_INCLUDE
 #define	MFSLISTEN_INCLUDE	1
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<vecobj.h>
 #include	<listenspec.h>
