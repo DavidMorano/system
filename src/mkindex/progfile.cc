@@ -1,12 +1,13 @@
-/* progfile */
+/* progfile SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* process a file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG 	0		/* switchable debug print-outs */
 #define	CF_LINE		1		/* use line number instead of offset */
-
 
 /* revision history:
 
@@ -15,38 +16,35 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1994 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Name:
+
+	Description:
 	This subroutine processes a single file.
 
 	Synopsis:
-
 	int progfile(pip,hasha,nhash,mfp,nfp,fname)
 	struct proginfo	*pip ;
 	uint		hasha[] ;
 	int		nhash ;
 	MEMFILE		*mfp ;
 	bfile		*nfp ;
-	const char	fname[] ;
+	cchar	fname[] ;
 
 	Arguments:
-
 	- pip		program information pointer
 	- fname	file to process
 
 	Returns:
-
 	>=0		OK
 	<0		error code
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -55,7 +53,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
@@ -67,22 +66,15 @@
 #include	"config.h"
 #include	"defs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import findbit ;
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	ffbsi(uint) ;
-extern int	iceil(int,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylow(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -93,29 +85,23 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* forward references */
 
-static int	procdata(struct proginfo *,char *,int,uint *,int,
-			MEMFILE *,bfile *, const char *) ;
+local int	procdata(struct proginfo *,char *,int,uint *,int,
+			MEMFILE *,bfile *, cchar *) ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progfile(pip,hasha,nhash,mfp,nfp,fname)
-struct proginfo	*pip ;
-uint		hasha[] ;
-int		nhash ;
-MEMFILE		*mfp ;		/* post MEMFILE */
-bfile		*nfp ;		/* name file pointer */
-const char	fname[] ;
-{
-	const int	size = (pip->pagesize * 4) ;
-
+int progfile(PI *pip,uint hasha,int nhash,memfile *mfp,bfile *nfp,
+		ccchar *fname) noex {
+	cint	size = (pip->pagesize * 4) ;
 	int	rs ;
 	int	llen = (size-1) ;
-
 	char	*lbuf ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
@@ -134,8 +120,7 @@ const char	fname[] ;
 
 /* local subroutines */
 
-
-static int procdata(pip,lbuf,llen,hasha,nhash,mfp,nfp,fname)
+local int procdata(pip,lbuf,llen,hasha,nhash,mfp,nfp,fname)
 struct proginfo	*pip ;
 char		lbuf[] ;
 int		llen ;
@@ -143,7 +128,7 @@ uint		hasha[] ;
 int		nhash ;
 MEMFILE		*mfp ;		/* post MEMFILE */
 bfile		*nfp ;		/* name file pointer */
-const char	fname[] ;
+cchar	fname[] ;
 {
 	struct postentry	*posta, e ;
 
@@ -161,8 +146,7 @@ const char	fname[] ;
 	int	li ;
 	int	shift ;
 
-	const char	*sp, *cp, *ep ;
-
+	cchar	*sp, *cp, *ep ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
@@ -171,10 +155,10 @@ const char	fname[] ;
 	}
 #endif
 
-	len = iceil(sizeof(struct postentry),sizeof(int)) ;
+	len = iceil(szof(postentry),szof(int)) ;
 
 	himask = (nhash - 1) ;
-	shift = ffbsi(len) ;
+	shift = ffbs(len) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -207,7 +191,7 @@ const char	fname[] ;
 	if (rs >= 0) {
 	e.noff = 0 ;
 	e.next = 0 ;
-	rs = memfile_write(mfp,&e,sizeof(struct postentry)) ;
+	rs = memfile_write(mfp,&e,szof(struct postentry)) ;
 	}
 
 /* go to it, read the file line by line */
@@ -387,7 +371,7 @@ const char	fname[] ;
 #endif
 
 	            e.next = 0 ;
-	            rs = memfile_write(mfp,&e,sizeof(struct postentry)) ;
+	            rs = memfile_write(mfp,&e,szof(struct postentry)) ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(5))
