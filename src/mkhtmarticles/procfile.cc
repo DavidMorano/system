@@ -40,7 +40,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -48,7 +48,7 @@
 #include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>
@@ -419,11 +419,11 @@ const char	fname[] ;
 	            struct tm	ts ;
 	            uint	year ;
 
-	            rs1 = uc_localtime(&pfp->date,&ts) ;
+	            rs1 = uc_timelocal(&pfp->date,&ts) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	            debugprintf("progfile: uc_localtime() rs=%d\n",rs) ;
+	            debugprintf("progfile: uc_timelocal() rs=%d\n",rs) ;
 	            debugprintf("progfile: date=>%s<\n",
 	                timestr_log(pfp->date,timebuf)) ;
 	}
