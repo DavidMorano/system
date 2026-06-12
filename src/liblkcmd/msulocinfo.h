@@ -70,7 +70,7 @@ struct locinfo {
 	cchar		*mntfname ;
 	cchar		*speedname ;
 	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	LFM		pidlock, tmplock ;
 	time_t		ti_lastlock ;
