@@ -1,4 +1,9 @@
-/* md5calc */
+/* md5calc SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* calculate a MD5 digest */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,54 +17,72 @@
 
 /*******************************************************************************
 
-        This subroutine is used to form a digest of some data using the MD5 hash
-        algorithm.
+  	Name:
+	md5calc
 
+	Description:
+	This subroutine is used to form a digest of some data using
+	the MD5 hash algorithm.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<md5.h>			/* LIBDAM */
 
-#include	<sys/types.h>
-#include	<md5.h>
-
-#include	<usystem.h>
-#include	<endian.h>
-#include	<localmisc.h>
+#include	"md5caclc.h"
 
 
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int md5calc(ULONG *rp,cchar *sp,int sl)
-{
-	ULONG		hv = 0 ;
-	ULONG		v ;
-	int		i ;
-	uchar		out[16] ;
-
-	if (rp == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
-	md5_calc(out,(uchar *) sp,(uint) sl) ;
-
-	for (i = 0 ; i < 8 ; i += 1) {
-	    v = out[i] ;
-	    if (ENDIAN) {
-	        hv = ((hv << 8) | v) ;
-	    } else {
-	        v = (v << (i * 8)) ;
-	        hv |= v ;
-	    }
-	} /* end for */
-
-	*rp = hv ;
-	return SR_OK ;
-}
-/* end subroutine (md5calc) */
+int md5calc(ulong *rp,cchar *sp,int sl) noex {
+    	int		rs = SR_FAULT ;
+	if (rp && sp) {
+	    ulong	hv = 0 ;
+	    uchar	out[16] ;
+	    md5_calc(out,(uchar *) sp,(uint) sl) ;
+	    for (int i = 0 ; i < 8 ; i += 1) {
+	        ulong v = out[i] ;
+	        if (ENDIAN) {
+	            hv = ((hv << 8) | v) ;
+	        } else {
+	            v = (v << (i * 8)) ;
+	            hv |= v ;
+	        } /* end if */
+	    } /* end for */
+	    *rp = hv ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (md5calc) */
 
 
