@@ -226,8 +226,8 @@ int mfscmd_svcname(PROGINFO *pip,int idx,cchar **rpp)
 static int mfscmder(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 {
 	LOCINFO		*lip = pip->lip ;
-	KEYOPT		*kop ;
-	KEYOPT_CUR	kcur ;
+	keyopt		*kop ;
+	keyopt_cur	kcur ;
 	int		rs ;
 	int		c = 0 ;
 
