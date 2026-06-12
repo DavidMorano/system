@@ -21,7 +21,7 @@
 #define	MFSADJ_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<poller.h>
 #include	"defs.h"
 
