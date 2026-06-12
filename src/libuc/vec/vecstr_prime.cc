@@ -187,7 +187,7 @@ int vecstr_start(vecstr *op,int vn,int vo) noex {
 	    if (rs < 0) {
 		vecstr_dtor(op) ;
 	    } /* end if (error) */
-	} /* end if (non-null) */
+	} /* end if (vecstr_ctor) */
 	return (rs >= 0) ? vn : rs ;
 }
 /* end subroutine (vecstr_start) */
@@ -210,7 +210,7 @@ int vecstr_finish(vecstr *op) noex {
 	            rs1 = libmem.free(op->va) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->va = nullptr ;
-		}
+		} /* end if (memory-release) */
 	    } /* end if (populated) */
 	    op->c = 0 ;
 	    op->i = 0 ;
