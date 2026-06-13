@@ -1,5 +1,5 @@
 /* bvcitekey SUPPORT */
-/* charset=ISO8859-1 */
+/* charset=ISOUCHAR_BITUCHAR_BIT59-1 */
 /* lang=C++20 */
 
 /* manage BV cite key */
@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2008-10-01, David A­D­ Morano
+	= 200UCHAR_BIT-10-01, David A­D­ Morano
 	This module was originally written.
 
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 200UCHAR_BIT David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -36,6 +36,9 @@
 
 #include	"bvcitekey.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |getbyte(3u)| */
 
 /* local defines */
 
@@ -63,18 +66,21 @@
 
 /* exported subroutines */
 
+local uint loadshift(uint ck,uchar item) noex {
+    	ck <<= UCHAR_BIT ;
+	ck |= uint(item) ;
+    	return ck ;
+} /* end subroutine (loadshft) */
+
 int bvcitekey_set(bvcitekey *bvp,uint *ckp) noex {
 	int		rs = SR_FAULT ;
 	if (bvp && ckp) {
 	    uint	ck = 0 ;
 	    rs = SR_OK  ;
-	    ck |= (bvp->nlines & UCHAR_MAX) ;
-	    ck = (ck << 8) ;
-	    ck |= (bvp->b & UCHAR_MAX) ;
-	    ck = (ck << 8) ;
-	    ck |= (bvp->c & UCHAR_MAX) ;
-	    ck = (ck << 8) ;
-	    ck |= (bvp->v & UCHAR_MAX) ;
+	    ck = loadshift(ck,bvp->nlines) ;
+	    ck = loadshift(ck,bvp->b) ;
+	    ck = loadshift(ck,bvp->c) ;
+	    ck = loadshift(ck,bvp->v) ;
 	    *ckp = ck ;
 	} /* end if (non-null) */
 	return rs ;
@@ -86,13 +92,10 @@ int bvcitekey_get(bvcitekey *bvp,uint *ckp) noex {
 	if (bvp && ckp) {
 	    uint	ck = *ckp ;
 	    rs = SR_OK  ;
-	    bvp->v = (ck & UCHAR_MAX) ;
-	    ck = (ck >> 8) ;
-	    bvp->c = (ck & UCHAR_MAX) ;
-	    ck = (ck >> 8) ;
-	    bvp->b = (ck & UCHAR_MAX) ;
-	    ck = (ck >> 8) ;
-	    bvp->nlines = (ck & UCHAR_MAX) ;
+	    bvp->v	= getbyte(ck,0) ;
+	    bvp->c	= getbyte(ck,1) ;
+	    bvp->b	= getbyte(ck,2) ;
+	    bvp->nlines	= getbyte(ck,3) ;
 	} /* end if (non-null) */
 	return rs ;
 }
