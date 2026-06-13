@@ -25,9 +25,10 @@
 #define	BVI		struct bvi_head
 #define	BVI_OBJ		struct bvi_object
 #define	BVI_CUR		struct bvi_cursor
+#define	BVI_LINE	struct bvi_liner
 #define	BVI_V		struct bvi_verse
 #define	BVI_Q		struct bvi_query
-#define	BVI_LINE	struct bvi_liner
+#define	BVI_L		struct bvi_liner
 #define	BVI_INFO	struct bvi_information
 #define	BVI_FMI		struct bvi_filemap
 #define	BVI_MAGIC	0x88773421
@@ -70,10 +71,10 @@ struct bvi_cursor {
 } ; /* end struct (bvi_cursor) */
 
 struct bvi_filemap {
-	char		*mapdata ;	/* file map */
+	charp		mapdata ;	/* file map data */
 	time_t		ti_mod ;	/* time file modication */
 	time_t		ti_map ;	/* time file map */
-	size_t		mapsize ;
+	size_t		mapsize ;	/* file map size */
 	uint		(*vt)[4] ;	/* mapped verses table */
 	uint		(*lt)[2] ;	/* mapped lines table */
 } ; /* end struct */
