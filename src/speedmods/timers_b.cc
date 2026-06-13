@@ -2,9 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-
 #define	CF_DEBUGS	0
-
 
 /*****************************************************/
 /* Various timer routines.                           */
@@ -187,7 +185,7 @@ double dtime()
 #ifdef BORLAND_C
 #include <ctype.h>
 #include <dos.h>
-#include <time.h>
+#include <ctime>
 
 #define HZ 100
 struct time tnow;
@@ -210,7 +208,7 @@ double dtime()
 /*  Microsoft C (MSC) dtime() for DOS */
 /**************************************/
 #ifdef MSC
-#include <time.h>
+#include <ctime>
 #include <ctype.h>
 
 #define HZ CLOCKS_PER_SEC
@@ -232,7 +230,7 @@ double dtime()
 /*  Macintosh (MAC) Think C dtime()  */
 /*************************************/
 #ifdef MAC
-#include <time.h>
+#include <ctime>
 
 #define HZ 60
 
@@ -288,7 +286,7 @@ double dtime()
 /*  dority@craysea.cray.com                                */
 /***********************************************************/
 #ifdef CTimer
-#include <time.h>
+#include <ctime>
 
 double dtime()
 {
@@ -306,7 +304,7 @@ double dtime()
 /* However, getrusage() is preferred.       */
 /********************************************/
 #ifdef GTODay
-#include <sys/time.h>
+#include <sys/ctime>
 
 double dtime()
 {
@@ -399,7 +397,7 @@ double  dtime( )
 /*  Provided by: Georg Wambach, gw@informatik.uni-koeln.de */
 /***********************************************************/
 #ifdef PARIX
-#include <sys/time.h>
+#include <sys/ctime>
 
 double dtime()
 {
@@ -417,7 +415,7 @@ double dtime()
 /************************************************/
 #ifdef WEIRDPOSIX
 
-#include <sys/time.h>
+#include <sys/ctime>
 #include <sys/resource.h>
 #include <sys/rusage.h>
 
