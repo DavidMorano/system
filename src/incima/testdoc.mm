@@ -1,3 +1,5 @@
+.\"_ testing of including JPH picture files
+.\"_ TROFF (Memorandum Macros)
 
 
 
