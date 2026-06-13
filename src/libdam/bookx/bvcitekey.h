@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
+/* manage BV cite key */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -23,6 +26,8 @@
 
 #define	BVCITEKEY		struct bvcitekey_head
 
+
+const uint		bvcitekey_vmask = 0x00FFFFFFU ;
 
 struct bvcitekey_head {
 	uchar		nlines ;
