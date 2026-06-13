@@ -173,7 +173,7 @@ static const char *netrcfiles[] = {
 int main(int argc,cchar *argv[],cchar *envv[])
 {
 	PROGINFO	pi, *pip = &pi ;
-	BITS		pargs ;
+	bits		pargs ;
 	bfile		errfile ;
 
 	int		argr, argl, aol, akl, avl, kwi ;
