@@ -1,6 +1,7 @@
 STRER
 
-This command prints out the corresponding error (ERRNO) number.
+This command prints out the string-code corresponding error (ERRNO)
+number.
 
 Synopsis:
 $ strer <num(s)> [-V]
