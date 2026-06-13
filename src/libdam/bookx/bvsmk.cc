@@ -79,6 +79,9 @@
 #include	<estrings.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<ucsysauxinfo.h>	/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
@@ -142,25 +145,62 @@ const bvsmk_obj		bvsmk_modinfo = {
 
 /* forward references */
 
-local int	bvsmk_filesbegin(bvsmk *) noex ;
-local int	bvsmk_filesbeginc(bvsmk *) noex ;
-local int	bvsmk_filesbeginwait(bvsmk *) noex ;
-local int	bvsmk_filesbegincreate(bvsmk *,cchar *,int,mode_t) noex ;
-local int	bvsmk_filesend(bvsmk *) noex ;
-local int	bvsmk_listbegin(bvsmk *,int) noex ;
-local int	bvsmk_listend(bvsmk *) noex ;
-local int	bvsmk_mkidx(bvsmk *) noex ;
-local int	bvsmk_mkidxwrmain(bvsmk *,bvshdr *) noex ;
-local int	bvsmk_mkidxwrhdr(bvsmk *,bvshdr *,filer *) noex ;
-local int	bvsmk_mkidxchaptab(bvsmk *,bvshdr *,filer *,int) noex ;
-local int	bvsmk_mkidxbooktab(bvsmk *,bvshdr *,filer *,int) noex ;
-local int	bvsmk_nidxopen(bvsmk *) noex ;
-local int	bvsmk_nidxclose(bvsmk *) noex ;
-local int	bvsmk_renamefiles(bvsmk *) noex ;
+template<typename ... Args>
+local int bvsmk_ctor(bvsmk *op,Args ... args) noex {
+	BVSMK		*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->blp = new(nt) vecobj) != np) ylikely {
+		rs = SR_OK ;
+	    } /* end if (new-verobj) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (bvsmk_ctor) */
 
-local int	mkdname(cchar *,mode_t) noex ;
-local int	mknifname(char *,int,cchar *,cchar *,cchar *) noex ;
-local int	unlinkstale(cchar *,int) noex ;
+local int bvsmk_dtor(bvsmk *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+	    if (op->blp) ylikely {
+		delete op->blp ;
+		op->blp = nullptr ;
+	    } /* end if (memory-release) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (bvsmk_dtor) */
+
+template<typename ... Args>
+local inline int bvsmk_magic(bvsmk *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == BVSMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (bvsmk_magic) */
+
+local int	bvsmk_filesbegin	(bvsmk *) noex ;
+local int	bvsmk_filesbeginc	(bvsmk *) noex ;
+local int	bvsmk_filesbeginwait	(bvsmk *) noex ;
+local int	bvsmk_filesbegincreate	(bvsmk *,cchar *,int,mode_t) noex ;
+local int	bvsmk_filesend		(bvsmk *) noex ;
+local int	bvsmk_listbegin		(bvsmk *,int) noex ;
+local int	bvsmk_listend		(bvsmk *) noex ;
+local int	bvsmk_mkidx		(bvsmk *) noex ;
+local int	bvsmk_mkidxwrmain	(bvsmk *,bvshdr *) noex ;
+local int	bvsmk_mkidxwrhdr	(bvsmk *,bvshdr *,filer *) noex ;
+local int	bvsmk_mkidxchaptab	(bvsmk *,bvshdr *,filer *,int) noex ;
+local int	bvsmk_mkidxbooktab	(bvsmk *,bvshdr *,filer *,int) noex ;
+local int	bvsmk_nidxopen		(bvsmk *) noex ;
+local int	bvsmk_nidxclose		(bvsmk *) noex ;
+local int	bvsmk_renamefiles	(bvsmk *) noex ;
+
+local int	mkdname		(cchar *,mode_t) noex ;
+local int	mknifname	(char *,int,cchar *,cchar *,cchar *) noex ;
+local int	unlinkstale	(cchar *,int) noex ;
 
 
 /* local variables */
@@ -172,130 +212,96 @@ local int	unlinkstale(cchar *,int) noex ;
 /* exported subroutines */
 
 int bvsmk_open(bvsmk *op,cchar *pr,cchar *db,int of,mode_t µom) noex {
-	cint	n = BVSMK_NENTRIES ;
 	int		rs ;
-	int		sz = 0 ;
 	int		c = 0 ;
-	char		*bp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-	if (db == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-	if (db[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_open: ent pr=%s\n",pr) ;
-	debugprintf("bvsmk_open: dbname=%s\n",dbname) ;
-#endif /* CF_DEBUG */
-
-	memclear(op) ;
-	op->omode = µom ;
-	op->nfd = -1 ;
-
-	op->fl.ofcreat	= MKBOOL(of & O_CREAT) ;
-	op->fl.ofexcl	= MKBOOL(of & O_EXCL) ;
-
-	sz += (lenstr(pr)+1) ;
-	sz += (lenstr(db)+1) ;
-	if ((rs = mem.mall(sz,&bp)) >= 0) {
-	    op->a = bp ;
-	    op->pr = bp ;
-	    bp = (strwcpy(bp,pr,-1)+1) ;
-	    op->db = bp ;
-	    bp = (strwcpy(bp,db,-1)+1) ;
-	        if ((rs = bvsmk_filesbegin(op)) >= 0) {
-		    c = rs ;
-		    if ((rs = bvsmk_listbegin(op,n)) >= 0) {
-			op->magval = BVSMK_MAGIC ;
-		    }
+	if ((rs = bvsmk_ctor(op,pr,db)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0] && db[0]) {
+	        cint	n = BVSMK_NENTRIES ;
+	        int	sz = 0 ;
+	        DEBUGPRINTF("ent pr=%s\n",pr) ;
+	        DEBUGPRINTF("db=%s\n",db) ;
+	        op->omode = µom ;
+	        op->nfd = -1 ;
+	        op->fl.ofcreat	= MKBOOL(of & O_CREAT) ;
+	        op->fl.ofexcl	= MKBOOL(of & O_EXCL) ;
+	        sz += (lenstr(pr)+1) ;
+	        sz += (lenstr(db)+1) ;
+	        if (char *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
+	            op->a = bp ;
+	            op->pr = bp ;
+	            bp = (strwcpy(bp,pr,-1)+1) ;
+	            op->db = bp ;
+	            bp = (strwcpy(bp,db,-1)+1) ;
+	            if ((rs = bvsmk_filesbegin(op)) >= 0) {
+		        c = rs ;
+		        if ((rs = bvsmk_listbegin(op,n)) >= 0) {
+			    op->magval = BVSMK_MAGIC ;
+		        }
+		        if (rs < 0) {
+			    bvsmk_filesend(op) ;
+		        } /* end if (error) */
+		    } /* end if (files-begin) */
 		    if (rs < 0) {
-			bvsmk_filesend(op) ;
+		        mem.free(op->a) ;
+		        op->a = nullptr ;
 		    } /* end if (error) */
-		} /* end if (files-begin) */
-		if (rs < 0) {
-		    mem.free(op->a) ;
-		    op->a = nullptr ;
-		} /* end if (error) */
-	} /* end if (memory-acquire) */
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_open: ret rs=%d\n",rs) ;
-#endif
-
+	        } /* end if (memory-acquire) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		bvsmk_dtor(op) ;
+	    } /* end if (error) */
+	} /* end if (bvsk_ctor) */
+	DEBUGPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bvsmk_open) */
 
 int bvsmk_close(bvsmk *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-	int		nverses = 0 ;
-	int		f_go = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BVSMK_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_close: nverses=%u\n",op->nverses) ;
-	debugprintf("bvsmk_close: nzverses=%u\n",op->nzverses) ;
-#endif
-
-	f_go = (! op->fl.abort) ;
-	nverses = op->nverses ;
-	if (nverses > 0) {
-	    rs1 = bvsmk_mkidx(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	    f_go = f_go && (rs1 >= 0) ;
-	}
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_close: bvsmk_mkidx() rs=%d\n",rs) ;
-#endif
-
-	if (op->nfd >= 0) {
-	    rs1 = u_close(op->nfd) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->nfd = -1 ;
-	}
-
-	rs1 = bvsmk_listend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	f_go = f_go && (rs1 >= 0) ;
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_close: bvsmk_listend() rs=%d\n",rs) ;
-#endif
-
-	if ((rs >= 0) && (nverses > 0) && f_go) {
-	    rs1 = bvsmk_renamefiles(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_close: bvsmk_renamefiles() rs=%d\n",rs) ;
-#endif
-
-	rs1 = bvsmk_filesend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_close: bvsmk_filesend() rs=%d\n",rs) ;
-#endif
-
-	if (op->db) {
-	    rs1 = mem.free(op->a) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->a = nullptr ;
-	} /* end if (memory-release) */
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_close: ret rs=%d\n",rs) ;
-#endif
-
-	op->magval = 0 ;
-	return (rs >= 0) ? nverses : rs ;
+	int		nv = 0 ; /* return-value */
+	if ((rs = bvsmk_magic(op)) >= 0) {
+	    DEBUGPRINTF("ent nverses=%u\n",op->nverses) ;
+	    DEBUGPRINTF("nzverses=%u\n",op->nzverses) ;
+	    int		f_go = false ;
+	    f_go = (! op->fl.abort) ;
+	    nv = op->nverses ;
+	    if (nv > 0) {
+	        rs1 = bvsmk_mkidx(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	        f_go = f_go && (rs1 >= 0) ;
+	    } /* end if */
+	    if (op->nfd >= 0) {
+	        rs1 = u_close(op->nfd) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->nfd = -1 ;
+	    }
+	    {
+	       rs1 = bvsmk_listend(op) ;
+	       if (rs >= 0) rs = rs1 ;
+	       f_go = f_go && (rs1 >= 0) ;
+	    }
+	    if ((rs >= 0) && (nv > 0) && f_go) {
+	        rs1 = bvsmk_renamefiles(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	       rs1 = bvsmk_filesend(op) ;
+	       if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->db) {
+	        rs1 = mem.free(op->a) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->a = nullptr ;
+	    } /* end if (memory-release) */
+	    {
+	        rs1 = bvsmk_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
+	} /* end if (bvsmk_magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	return (rs >= 0) ? nv : rs ;
 } /* end subroutine (bvsmk_close) */
 
 int bvsmk_add(bvsmk *op,int book,uchar *ap,int al) noex {
@@ -310,7 +316,7 @@ int bvsmk_add(bvsmk *op,int book,uchar *ap,int al) noex {
 	    if (al > 0) {
 		cint	sz = (al * szof(uchar)) ;
 		if (uchar *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
-		    vecobj	*blp = &op->books ;
+		    vecobj	*blp = op->blp ;
 		    bvsbook	be{} ;
 	            uint	nzverses ;
 	            uint	nverses = 0 ;
@@ -512,7 +518,7 @@ local int bvsmk_filesend(bvsmk *op) noex {
 } /* end subroutine (bvsmk_filesend) */
 
 local int bvsmk_listbegin(bvsmk *op,int n) noex {
-    	vecobj		*blp = &op->books ;
+    	vecobj		*blp = op->blp ;
 	int		rs ;
 	int		vo = 0 ;
 	{
@@ -526,7 +532,7 @@ local int bvsmk_listbegin(bvsmk *op,int n) noex {
 } /* end subroutine (bvsmk_listbegin) */
 
 local int bvsmk_listend(bvsmk *op) noex {
-    	vecobj		*blp = &op->books ;
+    	vecobj		*blp = op->blp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void *vp ;
@@ -597,30 +603,29 @@ local int bvsmk_mkidx(bvsmk *op) noex {
 } /* end subroutine (bvsmk_mkidx) */
 
 local int bvsmk_mkidxwrmain(bvsmk *op,bvshdr *hdrp) noex {
-	filer		hf, *hfp = &hf ;
-	cint	nfd = op->nfd ;
-	cint	ps = getpagesize() ;
-	int		bsz ;
 	int		rs ;
 	int		rs1 ;
-	int		foff = 0 ;
-	bsz = (ps * 4) ;
-	if ((rs = filer_start(hfp,nfd,0,bsz,0)) >= 0) {
-	    if ((rs = bvsmk_mkidxwrhdr(op,hdrp,hfp)) >= 0) {
-	        foff += rs ;
-		op->maxbook = 0 ;
-	        if (rs >= 0) {
-	            rs = bvsmk_mkidxchaptab(op,hdrp,hfp,foff) ;
+	int		foff = 0 ; /* return-value */
+	if ((rs = ucpagesize) >= 0) {
+	    cint bsz = (rs * 4) ;
+	    cint nfd = op->nfd ;
+	    if (filer hf ; (rs = hf.start(nfd,0,bsz,0)) >= 0) {
+	        if ((rs = bvsmk_mkidxwrhdr(op,hdrp,&hf)) >= 0) {
 	            foff += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = bvsmk_mkidxbooktab(op,hdrp,hfp,foff) ;
-	            foff += rs ;
-	        }
-	    } /* end if (bvsmk_mkidxwrhdr) */
-	    rs1 = filer_finish(hfp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filer) */
+		    op->maxbook = 0 ;
+	            if (rs >= 0) {
+	                rs = bvsmk_mkidxchaptab(op,hdrp,&hf,foff) ;
+	                foff += rs ;
+	            } /* end if (ok) */
+	            if (rs >= 0) {
+	                rs = bvsmk_mkidxbooktab(op,hdrp,&hf,foff) ;
+	                foff += rs ;
+	            } /* end if (ok) */
+	        } /* end if (bvsmk_mkidxwrhdr) */
+	        rs1 = hf.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (filer) */
+	} /* end if (ucpagesize) */
 	return (rs >= 0) ? foff : rs ;
 } /* end subroutine (bvsmk_mkidxwrmain) */
 
@@ -639,7 +644,7 @@ local int bvsmk_mkidxwrhdr(bvsmk *op,bvshdr *hdrp,filer *hfp) noex {
 } /* end subroutine (bvsmk_mkidxwrhdr) */
 
 local int bvsmk_mkidxchaptab(bvsmk *op,bvshdr *hdrp,filer *hfp,int foff) noex {
-	vecobj		*blp = &op->books ;
+	vecobj		*blp = op->blp ;
 	int		rs = SR_OK ;
 	int		ctlen = 0 ;
 	int		n = 0 ;
@@ -667,7 +672,7 @@ local int bvsmk_mkidxchaptab(bvsmk *op,bvshdr *hdrp,filer *hfp,int foff) noex {
 } /* end subroutine (bvsmk_mkidxchaptab) */
 
 local int bvsmk_mkidxbooktab(bvsmk *op,bvshdr *hdrp,filer *hfp,int foff) noex {
-	vecobj		*blp = &op->books ;
+	vecobj		*blp = op->blp ;
 	cint		n = (op->maxbook + 1) ;
 	cint		hsz = szof(ushort) ;
 	cint		narrval = 4 ;
