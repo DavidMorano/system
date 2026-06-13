@@ -140,44 +140,45 @@ struct bibleverses_e {
 
 /* forward references */
 
-static int	bibleverses_dbloadbegin(BIBLEVERSES *,SUBINFO *) ;
-static int	bibleverses_dbloadend(BIBLEVERSES *) ;
-static int	bibleverses_dbmapcreate(BIBLEVERSES *,time_t) ;
-static int	bibleverses_dbmapdestroy(BIBLEVERSES *) ;
-static int	bibleverses_checkupdate(BIBLEVERSES *,time_t) ;
-static int	bibleverses_loadbuf(BIBLEVERSES *,BVI_VERSE *,char *,int) ;
-static int	bibleverses_indopen(BIBLEVERSES *,SUBINFO *) ;
+local int	bibleverses_dbloadbegin(BIBLEVERSES *,SUBINFO *) noex ;
+local int	bibleverses_dbloadend(BIBLEVERSES *) noex ;
+local int	bibleverses_dbmapcreate(BIBLEVERSES *,time_t) noex ;
+local int	bibleverses_dbmapdestroy(BIBLEVERSES *) noex ;
+local int	bibleverses_checkupdate(BIBLEVERSES *,time_t) noex ;
+local int	bibleverses_loadbuf(BIBLEVERSES *,BVI_VERSE *,char *,int) noex ;
+local int	bibleverses_indopen(BIBLEVERSES *,SUBINFO *) noex ;
 
-static int	bibleverses_indclose(BIBLEVERSES *) ;
-static int	bibleverses_indmk(BIBLEVERSES *,cchar *,time_t) ;
-static int	bibleverses_indmkdata(BIBLEVERSES *,cchar *,mode_t) ;
-static int	bibleverses_indopenseq(BIBLEVERSES *,SUBINFO *) ;
-static int	bibleverses_indopenseqer(BIBLEVERSES *,SUBINFO *,
-			DIRSEEN *,EXPCOOK *) ;
-static int	bibleverses_indopencheck(BIBLEVERSES *,cchar *) ;
-static int	bibleverses_indopenmk(BIBLEVERSES *,SUBINFO *,cchar *) ;
+local int	bibleverses_indclose(BIBLEVERSES *) noex ;
+local int	bibleverses_indmk(BIBLEVERSES *,cchar *,time_t) noex ;
+local int	bibleverses_indmkdata(BIBLEVERSES *,cchar *,mode_t) noex ;
+local int	bibleverses_indopenseq(BIBLEVERSES *,SUBINFO *) noex ;
+local int	bibleverses_indopenseqer(BIBLEVERSES *,SUBINFO *,
+			DIRSEEN *,EXPCOOK *) noex ;
+local int	bibleverses_indopencheck(BIBLEVERSES *,cchar *) noex ;
+local int	bibleverses_indopenmk(BIBLEVERSES *,SUBINFO *,cchar *) noex ;
 
-static int	bibleverses_loadcooks(BIBLEVERSES *,EXPCOOK *) ;
-static int	bibleverses_dirok(BIBLEVERSES *,DIRSEEN *,IDS *,cchar *,int) ;
-static int	bibleverses_mkdir(BIBLEVERSES *,cchar *) ;
+local int	bibleverses_loadcooks(BIBLEVERSES *,EXPCOOK *) noex ;
+local int	bibleverses_dirok(BIBLEVERSES *,DIRSEEN *,IDS *,
+			cchar *,int) noex ;
+local int	bibleverses_mkdir(BIBLEVERSES *,cchar *) noex ;
 
-static int	subinfo_start(SUBINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_start(SUBINFO *) noex ;
+local int	subinfo_finish(SUBINFO *) noex ;
 
-static int	entry_start(BIBLEVERSES_ENT *,BIBLEVERSES_Q *,uint,uint) ;
-static int	entry_add(BIBLEVERSES_ENT *,uint,uint) ;
-static int	entry_finish(BIBLEVERSES_ENT *) ;
+local int	entry_start(BIBLEVERSES_ENT *,BIBLEVERSES_Q *,uint,uint) noex ;
+local int	entry_add(BIBLEVERSES_ENT *,uint,uint) noex ;
+local int	entry_finish(BIBLEVERSES_ENT *) noex ;
 
-static int	bvemk_start(BVIMK_VERSE *,BIBLEVERSES_ENT *) ;
-static int	bvemk_finish(BVIMK_VERSE *) ;
+local int	bvemk_start(BVIMK_VERSE *,BIBLEVERSES_ENT *) noex ;
+local int	bvemk_finish(BVIMK_VERSE *) noex ;
 
-static int	mkdname(cchar *,mode_t) ;
-static int	checkdname(cchar *) ;
+local int	mkdname(cchar *,mode_t) noex ;
+local int	checkdname(cchar *) noex ;
 
-static int	isempty(cchar *,int) ;
-static int	isstart(cchar *,int,BIBLEVERSES_Q *,int *) ;
+local int	isempty(cchar *,int) noex ;
+local int	isstart(cchar *,int,BIBLEVERSES_Q *,int *) noex ;
 
-static int	isNeedIndex(int) ;
+local bool	isNeedIndex(int) noex ;
 
 
 /* local variables */
@@ -189,13 +190,13 @@ constexpr cpcchar	idxdirs[] = {
 	"/var/tmp",
 	"/tmp",
 	"%T",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 constexpr int		rsneeds[] = {
 	SR_STALE,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -204,7 +205,10 @@ extern const bibleverses_obj	bibleverses_modinfo = {
 	"bibleverses",
 	szof(bibleverses),
 	szof(bibleverses_cur)
-} ;
+} ; /* end initialization */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -218,14 +222,14 @@ int bibleverses_open(BIBLEVERSES *op,cchar *pr,cchar *dbname) noex {
 	char		cbuf[MAXNAMELEN + 1] ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 #endif
 
-	if (pr == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	if ((dbname == NULL) || (dbname[0] == '\0')) {
+	if ((dbname == nullptr) || (dbname[0] == '\0')) {
 	    dbname = BIBLEVERSES_DBNAME ;
 	}
 
@@ -237,7 +241,7 @@ int bibleverses_open(BIBLEVERSES *op,cchar *pr,cchar *dbname) noex {
 	    cchar	*dn = BIBLEVERSES_DBDNAME ;
 	    char	dbfname[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath3(dbfname,pr,dn,cbuf)) >= 0) {
-	        cchar	*cp = NULL ;
+	        cchar	*cp = nullptr ;
 	        if ((rs = uc_mallocstrw(dbfname,-1,&cp)) >= 0) {
 	            op->dbfname = cp ;
 	            if ((rs = subinfo_start(&si)) >= 0) {
@@ -249,7 +253,7 @@ int bibleverses_open(BIBLEVERSES *op,cchar *pr,cchar *dbname) noex {
 	            } /* end if (subinfo) */
 	            if (rs < 0) {
 	                uc_free(op->dbfname) ;
-	                op->dbfname = NULL ;
+	                op->dbfname = nullptr ;
 	            }
 	        } /* end if (m-a) */
 	    } /* end if (mkpath) */
@@ -271,7 +275,7 @@ int bibleverses_close(BIBLEVERSES *op)
 #endif
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
@@ -290,10 +294,10 @@ int bibleverses_close(BIBLEVERSES *op)
 	rs1 = bibleverses_dbloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->dbfname != NULL) {
+	if (op->dbfname != nullptr) {
 	    rs1 = uc_free(op->dbfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dbfname = NULL ;
+	    op->dbfname = nullptr ;
 	}
 
 #if	CF_DEBUGS
@@ -311,7 +315,7 @@ int bibleverses_count(BIBLEVERSES *op)
 	int		rs ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
@@ -328,7 +332,7 @@ int bibleverses_audit(BIBLEVERSES *op)
 	int		rs = SR_OK ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
@@ -353,12 +357,12 @@ int bibleverses_read(BIBLEVERSES *op,char *vbuf,int vlen,BIBLEVERSES_Q *qp)
 	int		len = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (qp == NULL) return SR_FAULT ;
+	if (qp == nullptr) return SR_FAULT ;
 
 /* check for update */
 
@@ -373,7 +377,7 @@ int bibleverses_read(BIBLEVERSES *op,char *vbuf,int vlen,BIBLEVERSES_Q *qp)
 	    viq.c = qp->c ;
 	    viq.v = qp->v ;
 	    if ((rs = bvi_read(&op->vind,&viv,lb,lsize,&viq)) >= 0) {
-	        if (vbuf != NULL) {
+	        if (vbuf != nullptr) {
 	            rs = bibleverses_loadbuf(op,&viv,vbuf,vlen) ;
 		    len = rs ;
 	        }
@@ -401,12 +405,12 @@ int bibleverses_curbegin(BIBLEVERSES *op,BIBLEVERSES_CUR *curp)
 	int		rs ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if ((rs = bvi_curbegin(&op->vind,&curp->vicur)) >= 0) {
 	    op->ncursors += 1 ;
@@ -423,12 +427,12 @@ int bibleverses_curend(BIBLEVERSES *op,BIBLEVERSES_CUR *curp)
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	rs1 = bvi_curend(&op->vind,&curp->vicur) ;
 	if (rs >= 0) rs = rs1 ;
@@ -453,16 +457,16 @@ int		vlen ;
 	int		len = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
-	if (qp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (qp == nullptr) return SR_FAULT ;
 
 #ifdef	COMMENT
-	if (vbuf == NULL) return SR_FAULT ;
+	if (vbuf == nullptr) return SR_FAULT ;
 #endif
 
 /* check for update */
@@ -477,11 +481,11 @@ int		vlen ;
 	    BVI_LINE	lines[BIBLEVERSES_NLINES + 1] ;
 	    cint	ls = ((BIBLEVERSES_NLINES + 1) * szof(BVI_LINE)) ;
 	    if ((rs = bvi_enum(&op->vind,bcurp,&viv,(char *) lines,ls)) >= 0) {
-	        if (vbuf != NULL) {
+	        if (vbuf != nullptr) {
 	            rs = bibleverses_loadbuf(op,&viv,vbuf,vlen) ;
 		    len = 0 ;
 	        }
-	        if ((rs >= 0) && (qp != NULL)) {
+	        if ((rs >= 0) && (qp != nullptr)) {
 	            qp->b = viv.b ;
 	            qp->c = viv.c ;
 	            qp->v = viv.v ;
@@ -505,14 +509,14 @@ int bibleverses_info(BIBLEVERSES *op,BIBLEVERSES_INFO *ip)
 	int		nverses = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if ((rs = bvi_info(&op->vind,&bi)) >= 0) {
 	    nverses = bi.count ;
-	    if (ip != NULL) {
+	    if (ip != nullptr) {
 	        memclear(ip) ;
 	        ip->dbtime = op->ti_db ;
 	        ip->vitime = op->ti_vind ;
@@ -543,7 +547,7 @@ int bibleverses_chapters(BIBLEVERSES *op,int book,uchar *ap,int al)
 #endif
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEVERSES_MAGIC) return SR_NOTOPEN ;
 #endif
@@ -555,7 +559,7 @@ int bibleverses_chapters(BIBLEVERSES *op,int book,uchar *ap,int al)
 	debugprintf("bibleverses_chapters: b=%u al=%u\n",book,al) ;
 #endif
 
-	if (ap != NULL) {
+	if (ap != nullptr) {
 	    if (op->ncursors == 0) {
 	        rs = bibleverses_checkupdate(op,0L) ;
 	    }
@@ -576,9 +580,7 @@ int bibleverses_chapters(BIBLEVERSES *op,int book,uchar *ap,int al)
 
 /* private subroutines */
 
-
-static int bibleverses_dbloadbegin(BIBLEVERSES *op,SUBINFO *sip)
-{
+local int bibleverses_dbloadbegin(BIBLEVERSES *op,SUBINFO *sip) noex {
 	int		rs ;
 
 #if	CF_DEBUGS
@@ -596,12 +598,9 @@ static int bibleverses_dbloadbegin(BIBLEVERSES *op,SUBINFO *sip)
 #endif
 
 	return rs ;
-}
-/* end subroutine (bibleverses_dbloadbegin) */
+} /* end subroutine (bibleverses_dbloadbegin) */
 
-
-static int bibleverses_dbloadend(BIBLEVERSES *op)
-{
+local int bibleverses_dbloadend(BIBLEVERSES *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -620,12 +619,9 @@ static int bibleverses_dbloadend(BIBLEVERSES *op)
 #endif
 
 	return rs ;
-}
-/* end subroutine (bibleverses_dbloadend) */
+} /* end subroutine (bibleverses_dbloadend) */
 
-
-static int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt)
-{
+local int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt) noex {
 	int		rs ;
 
 #if	CF_DEBUGS
@@ -647,7 +643,7 @@ static int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt)
 #if	CF_DEBUGS
 	                debugprintf("bibleverses_dbmapcreate: ms=%ld\n",ms) ;
 #endif
-	                if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
+	                if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                    const caddr_t	ma = md ;
 	                    cint		madv = MADV_RANDOM ;
 	                    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
@@ -662,7 +658,7 @@ static int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt)
 #endif
 	                    if (rs < 0) {
 	                        u_munmap(md,ms) ;
-	                        op->mapdata = NULL ;
+	                        op->mapdata = nullptr ;
 	                    }
 	                } /* end if (u_mmap) */
 #if	CF_DEBUGS
@@ -682,19 +678,16 @@ static int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt)
 #endif
 
 	return rs ;
-}
-/* end subroutine (bibleverses_dbmapcreate) */
+} /* end subroutine (bibleverses_dbmapcreate) */
 
-
-static int bibleverses_dbmapdestroy(BIBLEVERSES *op)
-{
+local int bibleverses_dbmapdestroy(BIBLEVERSES *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->mapdata != NULL) {
+	if (op->mapdata != nullptr) {
 	    rs1 = u_munmap(op->mapdata,op->mapsize) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->mapdata = NULL ;
+	    op->mapdata = nullptr ;
 	}
 
 #if	CF_DEBUGS
@@ -702,18 +695,15 @@ static int bibleverses_dbmapdestroy(BIBLEVERSES *op)
 #endif
 
 	return rs ;
-}
-/* end subroutine (bibleverses_dbmapdestroy) */
+} /* end subroutine (bibleverses_dbmapdestroy) */
 
-
-static int bibleverses_checkupdate(BIBLEVERSES *op,time_t dt)
-{
+local int bibleverses_checkupdate(BIBLEVERSES *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if (op->ncursors == 0) {
-	    if (dt <= 0) dt = time(NULL) ;
+	    if (dt <= 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	        ustat	sb ;
 	        op->ti_lastcheck = dt ;
@@ -740,14 +730,10 @@ static int bibleverses_checkupdate(BIBLEVERSES *op,time_t dt)
 	} /* end if (no cursors out) */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (bibleverses_checkupdate) */
+} /* end subroutine (bibleverses_checkupdate) */
 
-
-static int bibleverses_loadbuf(BIBLEVERSES *op,BVI_VERSE *vivp,
-		char *rbuf,int rlen)
-{
-	SBUF		b ;
+local int bibleverses_loadbuf(BIBLEVERSES *op,BVI_VERSE *vivp,
+		char *rbuf,int rlen) noex {
 	int		rs ;
 	int		len = 0 ;
 
@@ -756,14 +742,12 @@ static int bibleverses_loadbuf(BIBLEVERSES *op,BVI_VERSE *vivp,
 	    vivp->voff,vivp->vlen) ;
 #endif
 
-	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	if (sbuf b ; (rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	    BVI_LINE	*lines = vivp->lines ;
 	    cint	nlines = vivp->nlines ;
-	    int		i ;
 	    int		ll ;
 	    cchar	*lp ;
-
-	    for (i = 0 ; i < nlines ; i += 1) {
+	    for (int i = 0 ; i < nlines ; i += 1) {
 
 	        if (i > 0)
 	            sbuf_chr(&b,' ') ;
@@ -780,12 +764,9 @@ static int bibleverses_loadbuf(BIBLEVERSES *op,BVI_VERSE *vivp,
 	} /* end if (sbuf) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (bibleverses_loadbuf) */
+} /* end subroutine (bibleverses_loadbuf) */
 
-
-static int bibleverses_indopen(BIBLEVERSES *op,SUBINFO *sip)
-{
+local int bibleverses_indopen(BIBLEVERSES *op,SUBINFO *sip) noex {
 	int		rs ;
 
 #if	CF_DEBUGS
@@ -804,12 +785,9 @@ static int bibleverses_indopen(BIBLEVERSES *op,SUBINFO *sip)
 #endif
 
 	return rs ;
-}
-/* end subroutine (bibleverses_indopen) */
+} /* end subroutine (bibleverses_indopen) */
 
-
-static int bibleverses_indopenseq(BIBLEVERSES *op,SUBINFO *sip)
-{
+local int bibleverses_indopenseq(BIBLEVERSES *op,SUBINFO *sip) noex {
 	DIRSEEN		ds ;
 	int		rs ;
 	int		rs1 ;
@@ -832,13 +810,10 @@ static int bibleverses_indopenseq(BIBLEVERSES *op,SUBINFO *sip)
 #endif
 
 	return rs ;
-}
-/* end subroutines (bibleverses_indopenseq) */
+} /* end subroutines (bibleverses_indopenseq) */
 
-
-static int bibleverses_indopenseqer(BIBLEVERSES *op,SUBINFO *sip,
-		DIRSEEN *dsp,EXPCOOK *ckp)
-{
+local int bibleverses_indopenseqer(BIBLEVERSES *op,SUBINFO *sip,
+		DIRSEEN *dsp,EXPCOOK *ckp) noex {
 	IDS		id ;
 	cint	elen = MAXPATHLEN ;
 	int		rs ;
@@ -855,7 +830,7 @@ static int bibleverses_indopenseqer(BIBLEVERSES *op,SUBINFO *sip,
 	    int		i ;
 	    char	ebuf[MAXPATHLEN + 1] ;
 	    char	pbuf[MAXPATHLEN + 1] ;
-	    for (i = 0 ; (rs >= 0) && (idxdirs[i] != NULL) ; i += 1) {
+	    for (i = 0 ; (rs >= 0) && (idxdirs[i] != nullptr) ; i += 1) {
 	        cchar	*dir = idxdirs[i] ;
 #if	CF_DEBUGS
 	debugprintf("bibleverses_indopenseqer: dir=%s\n",dir) ;
@@ -888,62 +863,52 @@ static int bibleverses_indopenseqer(BIBLEVERSES *op,SUBINFO *sip,
 #endif
 
 	return (rs >= 0) ? nverses : rs ;
-}
-/* end subroutines (bibleverses_indopenseqer) */
+} /* end subroutines (bibleverses_indopenseqer) */
 
-
-static int bibleverses_dirok(BIBLEVERSES *op,DIRSEEN *dsp,IDS *idp,
-		cchar *dp,int dl)
-{
-	cint	rsn = SR_NOTFOUND ;
+local int bibleverses_dirok(BIBLEVERSES *op,DIRSEEN *dsp,IDS *idp,
+		cchar *dp,int dl) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	int		f_ok = FALSE ;
+	int		f_ok = false ;
 	if ((rs = dirseen_havename(dsp,dp,dl)) == rsn) {
 	    USTAT	sb ;
 	    if ((rs = uc_stat(dp,&sb)) >= 0) {
 		if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
 		    cint	am = (W_OK|R_OK|X_OK) ;
 		    if ((rs = permid(idp,&sb,am)) >= 0) {
-			f_ok = TRUE ;
+			f_ok = true ;
 		    } else if (isNotPresent(rs)) {
 			rs = dirseen_add(dsp,dp,dl,&sb) ;
 		    }
 		}
 	    } else if (isNotPresent(rs)) {
 		if ((rs = bibleverses_mkdir(op,dp)) > 0) {
-		    f_ok = TRUE ;
+		    f_ok = true ;
 		}
 	    }
 	} /* end if (dirseen_havename) */
 
 	return (rs >= 0) ? f_ok : rs ;
-}
-/* end subroutine (bibleverses_dirok) */
+} /* end subroutine (bibleverses_dirok) */
 
-
-static int bibleverses_mkdir(BIBLEVERSES *op,cchar *dp)
-{
-	const mode_t	dm = 0777 ;
+local int bibleverses_mkdir(BIBLEVERSES *op,cchar *dp) noex {
+	cmode	dm = 0777 ;
 	int		rs ;
-	int		f_ok = FALSE ;
+	int		f_ok = false ;
 	if ((rs = mkdirs(dp,dm)) >= 0) {
 	     if ((rs = uc_minmod(dp,dm)) >= 0) {
 		if ((rs = chownsame(dp,op->pr)) >= 0) {
-	            f_ok = TRUE ;
+	            f_ok = true ;
 	        }
 	    }
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? f_ok : rs ;
-}
-/* end subroutine (bibleverses_mkdir) */
+} /* end subroutine (bibleverses_mkdir) */
 
-
-static int bibleverses_loadcooks(BIBLEVERSES *op,EXPCOOK *ecp)
-{
+local int bibleverses_loadcooks(BIBLEVERSES *op,EXPCOOK *ecp) noex {
 	int		rs = SR_OK ;
-	int		i ;
 	int		kch ;
 	int		vl ;
 	cchar		*tmpdname = getenv(VARTMPDNAME) ;
@@ -951,12 +916,12 @@ static int bibleverses_loadcooks(BIBLEVERSES *op,EXPCOOK *ecp)
 	cchar		*vp ;
 	char		kbuf[2] ;
 
-	if (tmpdname == NULL) tmpdname = TMPDNAME ;
+	if (tmpdname == nullptr) tmpdname = TMPDNAME ;
 
 	kbuf[1] = '\0' ;
-	for (i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
+	for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
 	    kch = MKCHAR(ks[i]) ;
-	    vp = NULL ;
+	    vp = nullptr ;
 	    vl = -1 ;
 	    switch (kch) {
 	    case 'R':
@@ -969,7 +934,7 @@ static int bibleverses_loadcooks(BIBLEVERSES *op,EXPCOOK *ecp)
 	        vp = tmpdname ;
 	        break ;
 	    } /* end switch */
-	    if ((rs >= 0) && (vp != NULL)) {
+	    if ((rs >= 0) && (vp != nullptr)) {
 	        kbuf[0] = kch ;
 	        rs = expcook_add(ecp,kbuf,vp,vl) ;
 	    }
@@ -978,7 +943,7 @@ static int bibleverses_loadcooks(BIBLEVERSES *op,EXPCOOK *ecp)
 	if (rs >= 0) {
 	    cchar	*prname ;
 	    if ((rs = sfbasename(op->pr,-1,&prname)) >= 0) {
-	        if (prname != NULL) {
+	        if (prname != nullptr) {
 	            rs = expcook_add(ecp,"PRN",prname,rs) ;
 	        } else {
 	            rs = SR_NOENT ;
@@ -987,12 +952,9 @@ static int bibleverses_loadcooks(BIBLEVERSES *op,EXPCOOK *ecp)
 	}
 
 	return rs ;
-}
-/* end subroutines (bibleverses_loadcooks) */
+} /* end subroutines (bibleverses_loadcooks) */
 
-
-static int bibleverses_indopencheck(BIBLEVERSES *op,cchar *idir)
-{
+local int bibleverses_indopencheck(BIBLEVERSES *op,cchar *idir) noex {
 	int		rs ;
 	int		nverses = 0 ;
 	cchar		*db = op->dbname ;
@@ -1016,7 +978,7 @@ static int bibleverses_indopencheck(BIBLEVERSES *op,cchar *idir)
 	            if (binfo.ctime < op->ti_db) {
 	                rs = SR_STALE ;
 	            } else {
-	                op->fl.vind = TRUE ;
+	                op->fl.vind = true ;
 	            }
 	            if (rs < 0)
 	                bvi_close(&op->vind) ;
@@ -1030,12 +992,9 @@ static int bibleverses_indopencheck(BIBLEVERSES *op,cchar *idir)
 #endif
 
 	return (rs >= 0) ? nverses : rs ;
-}
-/* end subroutine (bibleverses_indopencheck) */
+} /* end subroutine (bibleverses_indopencheck) */
 
-
-static int bibleverses_indopenmk(BIBLEVERSES *op,SUBINFO *sip,cchar *idir)
-{
+local int bibleverses_indopenmk(BIBLEVERSES *op,SUBINFO *sip,cchar *idir) noex {
 	int		rs ;
 	int		nverses = 0 ;
 
@@ -1044,26 +1003,23 @@ static int bibleverses_indopenmk(BIBLEVERSES *op,SUBINFO *sip,cchar *idir)
 	    if ((rs = mkpath2(tbuf,idir,op->dbname)) >= 0) {
 		if ((rs = bvi_open(&op->vind,tbuf)) >= 0) {
 	            nverses = rs ;
-		    op->fl.vind = TRUE ;
+		    op->fl.vind = true ;
 		}
 	    }
 	}
 
 	return (rs >= 0) ? nverses : rs ;
-}
-/* end subroutines (bibleverses_indopenmk) */
+} /* end subroutines (bibleverses_indopenmk) */
 
-
-static int bibleverses_indmk(BIBLEVERSES *op,cchar *dname,time_t dt)
-{
-	const mode_t	dm = BIBLEVERSES_DIRMODE ;
+local int bibleverses_indmk(BIBLEVERSES *op,cchar *dname,time_t dt) noex {
 	int		rs ;
 	int		c = 0 ;
+	cmode	dm = BIBLEVERSES_DIRMODE ;
 
 	if ((rs = mkdname(dname,dm)) >= 0) {
 	    char	indname[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath2(indname,dname,op->dbname)) >= 0) {
-	        const mode_t	om = BIBLEVERSES_IDXMODE ;
+	        cmode	om = BIBLEVERSES_IDXMODE ;
 	        if ((rs = bibleverses_indmkdata(op,indname,om)) >= 0) {
 	            c += rs ;
 	            op->ti_vind = dt ;
@@ -1076,12 +1032,9 @@ static int bibleverses_indmk(BIBLEVERSES *op,cchar *dname,time_t dt)
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (bibleverses_indmk) */
+} /* end subroutine (bibleverses_indmk) */
 
-
-static int bibleverses_indmkdata(BIBLEVERSES *op,cchar *indname,mode_t om)
-{
+local int bibleverses_indmkdata(BIBLEVERSES *op,cchar *indname,mode_t om) noex {
 	BVIMK		bvind ;
 	BVIMK_VERSE	bve ;
 	int		rs ;
@@ -1103,11 +1056,11 @@ static int bibleverses_indmkdata(BIBLEVERSES *op,cchar *indname,mode_t om)
 	        int		ml = (op->filesize & INT_MAX) ;
 	        int		ll ;
 	        int		si ;
-	        int		f_ent = FALSE ;
+	        int		f_ent = false ;
 	        cchar		*mp = op->mapdata ;
 	        cchar		*tp, *lp ;
 
-	        while ((tp = strnchr(mp,ml,'\n')) != NULL) {
+	        while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
 
 	            len = ((tp + 1) - mp) ;
 	            lp = mp ;
@@ -1120,7 +1073,7 @@ static int bibleverses_indmkdata(BIBLEVERSES *op,cchar *indname,mode_t om)
 	                    lp,strnlen(lp,MIN(ll,40))) ;
 #endif
 
-	                if ((tp = strnchr(lp,ll,'#')) != NULL) {
+	                if ((tp = strnchr(lp,ll,'#')) != nullptr) {
 	                    ll = (tp - lp) ;
 	                }
 
@@ -1132,14 +1085,14 @@ static int bibleverses_indmkdata(BIBLEVERSES *op,cchar *indname,mode_t om)
 	                            rs = bvimk_add(&bvind,&bve) ;
 	                            bvemk_finish(&bve) ;
 	                        }
-	                        f_ent = FALSE ;
+	                        f_ent = false ;
 	                        entry_finish(&e) ;
 	                    }
 
 	                    if (rs >= 0) {
 	                        rs = entry_start(&e,&q,(foff + si),(ll - si)) ;
 	                        if (rs >= 0) {
-	                            f_ent = TRUE ;
+	                            f_ent = true ;
 	                        }
 	                    }
 
@@ -1160,7 +1113,7 @@ static int bibleverses_indmkdata(BIBLEVERSES *op,cchar *indname,mode_t om)
 	                        rs = bvimk_add(&bvind,&bve) ;
 	                        bvemk_finish(&bve) ;
 	                    }
-	                    f_ent = FALSE ;
+	                    f_ent = false ;
 	                    entry_finish(&e) ;
 	                }
 #else
@@ -1182,12 +1135,12 @@ static int bibleverses_indmkdata(BIBLEVERSES *op,cchar *indname,mode_t om)
 	                rs = bvimk_add(&bvind,&bve) ;
 	                bvemk_finish(&bve) ;
 	            }
-	            f_ent = FALSE ;
+	            f_ent = false ;
 	            entry_finish(&e) ;
 	        }
 
 	        if (f_ent) {
-	            f_ent = FALSE ;
+	            f_ent = false ;
 	            entry_finish(&e) ;
 	        }
 
@@ -1218,51 +1171,44 @@ static int bibleverses_indmkdata(BIBLEVERSES *op,cchar *indname,mode_t om)
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (bibleverses_indmkdata) */
+} /* end subroutine (bibleverses_indmkdata) */
 
-
-static int bibleverses_indclose(BIBLEVERSES *op)
-{
+local int bibleverses_indclose(BIBLEVERSES *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->fl.vind) {
-	    op->fl.vind = FALSE ;
+	    op->fl.vind = false ;
 	    rs1 = bvi_close(&op->vind) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("bibleverses_indclose: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
-}
-/* end subroutine (bibleverses_indclose) */
+} /* end subroutine (bibleverses_indclose) */
 
-static int subinfo_start(SUBINFO *sip) noex {
-	int		rs = SR_OK ;
-	memclear(sip) ;
-	sip->dt = time(NULL) ;
+local int subinfo_start(SUBINFO *sip) noex {
+	int		rs = SR_FAULT ;
+	if (sip) {
+	    rs = memclear(sip) ;
+	    sip->dt = time(nullptr) ;
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
-	if (sip == NULL) return SR_FAULT ;
-	return SR_OK ;
-}
-/* end subroutine (subinfo_finish) */
+local int subinfo_finish(SUBINFO *sip) noex {
+    	int		rs = SR_FAULT ;
+	if (sip) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (subinfo_finish) */
 
-static int entry_start(BIBLEVERSES_ENT *ep,BIBLEVERSES_Q *qp,
+local int entry_start(BIBLEVERSES_ENT *ep,BIBLEVERSES_Q *qp,
 		uint loff,uint llen) noex {
 	cint	ne = BIBLEVERSES_NLE ;
 	int		rs ;
 	int		size ;
 	void		*p ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	memclear(ep) ;
 	ep->b = qp->b ;
@@ -1288,14 +1234,14 @@ static int entry_start(BIBLEVERSES_ENT *ep,BIBLEVERSES_Q *qp,
 /* end subroutine (entry_start) */
 
 
-static int entry_add(BIBLEVERSES_ENT *ep,uint loff,uint llen)
+local int entry_add(BIBLEVERSES_ENT *ep,uint loff,uint llen)
 {
 	BIBLEVERSES_EL	*elp ;
 	int		rs = SR_OK ;
 	int		ne ;
 	int		size ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	if (ep->e <= 0) return SR_NOTOPEN ;
 
@@ -1323,21 +1269,21 @@ static int entry_add(BIBLEVERSES_ENT *ep,uint loff,uint llen)
 /* end subroutine (entry_add) */
 
 
-static int entry_finish(BIBLEVERSES_ENT *ep)
+local int entry_finish(BIBLEVERSES_ENT *ep)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	if (ep->e <= 0) return SR_NOTOPEN ;
 
 	if ((ep->i < 0) || (ep->i > ep->e)) return SR_BADFMT ;
 
-	if (ep->lines != NULL) {
+	if (ep->lines != nullptr) {
 	    rs1 = uc_free(ep->lines) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->lines = NULL ;
+	    ep->lines = nullptr ;
 	}
 
 	ep->i = 0 ;
@@ -1347,19 +1293,19 @@ static int entry_finish(BIBLEVERSES_ENT *ep)
 /* end subroutine (entry_finish) */
 
 
-static int bvemk_start(BVIMK_VERSE *bvep,BIBLEVERSES_ENT *ep)
+local int bvemk_start(BVIMK_VERSE *bvep,BIBLEVERSES_ENT *ep)
 {
 	uint		nlines = 0 ;
 	int		rs = SR_OK ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	bvep->b = ep->b ;
 	bvep->c = ep->c ;
 	bvep->v = ep->v ;
 	bvep->voff = ep->voff ;
 	bvep->vlen = ep->vlen ;
-	bvep->lines = NULL ;
+	bvep->lines = nullptr ;
 
 	nlines = ep->i ;
 	if (nlines <= UCHAR_MAX) {
@@ -1385,16 +1331,16 @@ static int bvemk_start(BVIMK_VERSE *bvep,BIBLEVERSES_ENT *ep)
 }
 /* end subroutine (bvemk_start) */
 
-static int bvemk_finish(BVIMK_VERSE *bvep) noex {
+local int bvemk_finish(BVIMK_VERSE *bvep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (bvep == NULL) return SR_FAULT ;
+	if (bvep == nullptr) return SR_FAULT ;
 
-	if (bvep->lines != NULL) {
+	if (bvep->lines != nullptr) {
 	    rs1 = uc_free(bvep->lines) ;
 	    if (rs >= 0) rs = rs1 ;
-	    bvep->lines = NULL ;
+	    bvep->lines = nullptr ;
 	}
 
 	return rs ;
@@ -1402,7 +1348,7 @@ static int bvemk_finish(BVIMK_VERSE *bvep) noex {
 /* end subroutine (bvemk_finish) */
 
 
-static int mkdname(cchar *dname,mode_t dm)
+local int mkdname(cchar *dname,mode_t dm)
 {
 	cint	nrs = SR_NOENT ;
 	int		rs ;
@@ -1414,7 +1360,7 @@ static int mkdname(cchar *dname,mode_t dm)
 /* end subroutine (mkdname) */
 
 
-static int checkdname(cchar *dname)
+local int checkdname(cchar *dname)
 {
 	int		rs = SR_OK ;
 
@@ -1423,7 +1369,7 @@ static int checkdname(cchar *dname)
 	    if ((rs = u_stat(dname,&sb)) >= 0) {
 	        if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
 	        if (rs >= 0) {
-	            rs = perm(dname,-1,-1,NULL,W_OK) ;
+	            rs = perm(dname,-1,-1,nullptr,W_OK) ;
 	        }
 	    } /* end if (stat) */
 	} else {
@@ -1435,10 +1381,10 @@ static int checkdname(cchar *dname)
 /* end subroutine (checkdname) */
 
 
-static int isempty(cchar *lp,int ll)
+local int isempty(cchar *lp,int ll)
 {
 	int		cl ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar	*cp ;
 
 	f = f || (ll == 0) ;
@@ -1454,7 +1400,7 @@ static int isempty(cchar *lp,int ll)
 /* end subroutine (isempty) */
 
 
-static int isstart(lp,ll,qp,sip)
+local int isstart(lp,ll,qp,sip)
 cchar	*lp ;
 int		ll ;
 BIBLEVERSES_Q	*qp ;
@@ -1464,7 +1410,7 @@ int		*sip ;
 	int		sl = ll ;
 	int		ch ;
 	int		si = 0 ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar	*sp = lp ;
 
 #if	CF_DEBUGS && CF_DEBUGSTART
@@ -1488,7 +1434,7 @@ int		*sip ;
 
 	        cp = sp ;
 	        cl = sl ;
-	        if ((tp = strnbrk(sp,sl,": \t\n")) != NULL) {
+	        if ((tp = strnbrk(sp,sl,": \t\n")) != nullptr) {
 	            cl = (tp - sp) ;
 	            sl -= ((tp + 1) - sp) ;
 	            sp = (tp + 1) ;
@@ -1531,7 +1477,7 @@ int		*sip ;
 
 	} /* end if (have a start) */
 
-	if (sip != NULL) {
+	if (sip != nullptr) {
 	    *sip = (f) ? si : 0 ;
 	}
 
@@ -1543,14 +1489,11 @@ int		*sip ;
 }
 /* end subroutine (isstart) */
 
-
-static int isNeedIndex(int rs)
-{
-	int		f = FALSE ;
+local bool isNeedIndex(int rs) noex {
+	bool		f = false ;
 	f = f || isOneOf(rsneeds,rs) ;
 	f = f || isNotPresent(rs) ;
 	return f ;
-}
-/* end subroutine (isNeedIndex) */
+} /* end subroutine (isNeedIndex) */
 
 
