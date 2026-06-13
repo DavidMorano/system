@@ -48,7 +48,7 @@
 #include	<fcntl.h>
 #include	<csignal>
 #include	<poll.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstring>
 
 #include	<usystem.h>
