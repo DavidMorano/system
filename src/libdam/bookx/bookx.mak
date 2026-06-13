@@ -41,18 +41,18 @@ LIBS +=
 
 
 OBJ0= bvshdr.o bvsbook.o bvsmk.o bvses.o bvs.o
-OBJ1= bvihdr.o bvimk.o
-OBJ2= bpihdr.o
-OBJ3= 
+OBJ1= bvihdr.o bvimk.o bvi.o
+OBJ2= bvcitekey.o bvchapters.o
+OBJ3= bpihdr.o bpimk.o
 
 OBJ4= bcspec.o
 OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o obj2.o 
+OBJA= obj0.o obj1.o obj2.o obj3.o
 #OBJB= obj4.o obj5.o obj6.o obj7.o
-OBJB= obj4.o 
+OBJB= obj4.o
 
 OBJ= obja.o objb.o
 
@@ -170,14 +170,18 @@ obj.o:			$(OBJ)
 bvshdr.o:		bvshdr.cc	bvshdr.h			$(INCS)
 bvsbook.o:		bvsbook.cc	bvsbook.h			$(INCS)
 bvsmk.o:		bvsmk.cc	bvsmk.h				$(INCS)
-
 bvs.o:			bvs.cc		bvs.h				$(INCS)
 bvses.o:		bvses.cc	bvses.h				$(INCS)
 
 bvihdr.o:		bvihdr.cc	bvihdr.h			$(INCS)
 bvimk.o:		bvimk.cc	bvimk.h				$(INCS)
+bvi.o:			bvi.cc		bvi.h	bvchapters.hh		$(INCS)
 
 bpihdr.o:		bpihdr.cc	bpihdr.h			$(INCS)
+bpimk.o:		bpimk.cc	bpimk.h				$(INCS)
+
+bvcitekey.o:		bvcitekey.cc	bvcitekey.h			$(ICCS)
+bvchapters.o:		bvchapters.cc	bvchapters.hh			$(ICCS)
 
 bcspec.o:		bcspec.cc	bcspec.h			$(INCS)
 
