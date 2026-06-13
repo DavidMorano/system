@@ -1,12 +1,13 @@
-/* process */
+/* process SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a data file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-#define	CF_CFDECULL	0		/* use 'cfdecull()' */
-
+#define	CF_CFDECULL	0		/* use |cfdecull()| */
 
 /* revision history:
 
@@ -22,21 +23,19 @@
 
 	This subroutine processes a file that contains numeric pairs.
 
-
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<cfdec.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -56,19 +55,10 @@
 
 /* external subroutines */
 
-extern int	strnnlen(cchar *,int,int) ;
-extern int	cfdecf(cchar *,int,double *) ;
-extern int	cfdecul(cchar *,int,ulong *) ;
-extern int	cfdecull(cchar *,int,ULONG *) ;
-
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -262,7 +252,7 @@ static int getval(PROGINFO *pip,cchar *sp,int sl,double *vp)
 	if (strnchr(sp,sl,'.') != NULL) {
 
 	    pip->fl.fdec = TRUE ;
-	    rs = cfdecf(sp,sl,vp) ;
+	    rs = cfdecd(sp,sl,vp) ;
 
 	} else {
 	    ulong	v ;
