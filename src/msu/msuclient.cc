@@ -59,7 +59,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -67,13 +67,13 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<dlfcn.h>
 #include	<cstdlib>
 #include	<cstring>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<estrings.h>
 #include	<endian.h>
 #include	<nulstr.h>
@@ -81,7 +81,7 @@
 #include	<expcook.h>
 #include	<getax.h>
 #include	<getusername.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<ascii.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -671,7 +671,7 @@ static int msuclient_shmwr(MSUCLIENT *op,int fd,mode_t om)
 
 #ifdef	COMMENT /* not needed for shared memory on single system */
 	if (rs >= 0)
-	    rs = uc_fdatasync(fd) ;
+	    rs = uc_fsyncdata(fd) ;
 #endif
 
 	return (rs >= 0) ? fileoff : rs ;
@@ -1054,7 +1054,7 @@ int		fd ;
 int		shmi ;
 {
 	struct passwd	pw ;
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	const int	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs = SR_OK ;
 	const char	*sysuser = "sys" ;
 	char		*pwbuf ;
