@@ -191,7 +191,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
