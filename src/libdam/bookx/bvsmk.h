@@ -54,7 +54,7 @@ struct bvsmk_head {
 	cchar 		*db ;
 	cchar		*idname ;
 	char		*nidxfname ;
-	vecobj		books ;
+	vecobj		*blp ;		/* book-list-pointer */
 	BVSMK_FL	fl ;
 	uint		magval ;
 	int		nverses ;
