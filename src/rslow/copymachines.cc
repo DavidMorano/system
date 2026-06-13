@@ -31,7 +31,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstring>
 #include	<ctype.h>
 #include	<pwd.h>
