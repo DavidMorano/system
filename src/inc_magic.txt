@@ -1,0 +1,11 @@
+
+template<typename ... Args>
+local inline int vecpstr_magic(vecpstr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == VECPSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (vecpstr_magic) */
+
+
