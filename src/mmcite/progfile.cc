@@ -1,14 +1,12 @@
 /* progfile (Program-File) */
+/* charset=ISO8859-1 */
 /* lang=C99 */
 
 /* process a file by inserting bibliographical references */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_MULTICITE	1		/* allow multiple citations */
-
 
 /* revision history:
 
@@ -16,11 +14,12 @@
 	This code was originally written.
 
 	= 1998-09-01, David A­D­ Morano
-        This subroutine was modified to process the way MMCITE does citation. It
-        used to use the old GNU 'lookbib' program in addition to the (old)
-        standard UNIX version. But neither of these are used now. Straight out
-        citeation keywrd lookup is done directly in a BIB database (files of
-        which are suffixed 'rbd').
+	This subroutine was modified to process the way MMCITE does
+	citation.  It used to use the old GNU 'lookbib' program in
+	addition to the (old) standard UNIX version. But neither
+	of these are used now.  Straight out citeation keywrd lookup
+	is done directly in a BIB database (files of which are
+	suffixed 'rbd').
 
 */
 
@@ -28,64 +27,57 @@
 
 /*******************************************************************************
 
-        This subroutine processes a file by looking up and inserting the
-        bibliographical references into the text. All input is copied to the
-        output with the addition of the bibliographical references.
-
+  	Description:
+	This subroutine processes a file by looking up and inserting
+	the bibliographical references into the text.  All input is
+	copied to the output with the addition of the bibliographical
+	references.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
+#include	<cstdlib>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<paramopt.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<field.h>
-#include	<ascii.h>
+#include	<ascii.h>		/* LIBU */
 #include	<char.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3u)| */
 
 #include	"config.h"
 #include	"defs.h"
 #include	"bdb.h"
 #include	"citedb.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	SUBINFO		struct subinfo
-#define	MBDINFO		struct mbdinfo
+#ifndef	PI
+#define	PI		proginfo
+#endif
+
+#define	SUBINFO		subinfo
+#define	MBDINFO		mbdinfo
 
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfsub(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	sicite(const char *,int,const char *,int) ;
-extern int	silbrace(const char *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-
 extern int	bprinter(bfile *,int,cchar *,int) ;
-extern int	findbibfile(PROGINFO *,PARAMOPT *,cchar *,char *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strnchr(cchar *,int,int) ;
+extern int	findbibfile(PI *,PARAMOPT *,cchar *,char *) ;
 
 
 /* external variables */
@@ -95,15 +87,15 @@ extern char	*strnchr(cchar *,int,int) ;
 
 struct subinfo {
 	PARAMOPT	*app ;
-	BDB		*bdbp ;
+	bdb		*bdbp ;
 	CITEDB		*cdbp ;
 	int		fi ;
 } ;
 
 struct mbdinfo {
-	const char	*pp ;
-	const char	*rp ;
-	const char	*kp ;
+	cchar	*pp ;
+	cchar	*rp ;
+	cchar	*kp ;
 	uint		loff ;
 	int		pl ;
 	int		rl ;
@@ -113,21 +105,21 @@ struct mbdinfo {
 
 /* forward references */
 
-static int	procmacro(PROGINFO *,SUBINFO *,cchar *,int,int) ;
-static int	procescape(PROGINFO *,SUBINFO *,MBDINFO *) ;
+local int	procmacro(PI *,SUBINFO *,cchar *,int,int) ;
+local int	procescape(PI *,SUBINFO *,MBDINFO *) ;
 
-static int	mbdmacro(PROGINFO *,cchar *,int) ;
-static int	mbdmacrofiles(PROGINFO *,VECSTR *,cchar *,int) ;
-static int	mbdescape(PROGINFO *,MBDINFO *,uint,cchar *,int) ;
+local int	mbdmacro(PI *,cchar *,int) ;
+local int	mbdmacrofiles(PI *,vecstr *,cchar *,int) ;
+local int	mbdescape(PI *,MBDINFO *,uint,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*macronames[] = {
+constexpr cpcchar	macronames[] = {
 	BIBMACRO1,
 	BIBMACRO2,
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 /****
 	  9	(tab)
@@ -139,7 +131,7 @@ static const char	*macronames[] = {
 	 44	,
 ****/
 
-static const uchar	fterms[] = {
+constexpr char		fterms[] = {
 	0x00, 0x3E, 0x00, 0x00,
 	0x01, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -148,30 +140,32 @@ static const uchar	fterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int progfile(PROGINFO *pip,PARAMOPT *app,BDB *bdbp,CITEDB *cdbp,cchar *fname)
-{
+int progfile(PI *pip,PARAMOPT *app,bdb *bdbp,CITEDB *cdbp,
+		cc *fname) noex {
 	SUBINFO		pc ;
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("progfile: fname=%s\n",fname) ;
 #endif
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	memset(&pc,0,sizeof(SUBINFO)) ;
+	memclear(&pc) ;
 	pc.app = app ;
 	pc.bdbp = bdbp ;
 	pc.cdbp = cdbp ;
@@ -198,7 +192,7 @@ int progfile(PROGINFO *pip,PARAMOPT *app,BDB *bdbp,CITEDB *cdbp,cchar *fname)
 
 	    if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
 	        MBDINFO		info ;
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        uint		foff = pip->tf.tlen ;
 	        int		ll ;
 	        int		li ;
@@ -211,7 +205,7 @@ int progfile(PROGINFO *pip,PARAMOPT *app,BDB *bdbp,CITEDB *cdbp,cchar *fname)
 	            debugprintf("progfile: while-above\n") ;
 #endif
 
-	        f_bol = TRUE ;
+	        f_bol = true ;
 	        while ((rs = breadln(ifp,lbuf,llen)) > 0) {
 	            uint	loff = (foff+tlen) ;
 	            int		len = rs ;
@@ -271,10 +265,8 @@ int progfile(PROGINFO *pip,PARAMOPT *app,BDB *bdbp,CITEDB *cdbp,cchar *fname)
 
 /* local subroutines */
 
-
-static int procmacro(PROGINFO *pip,SUBINFO *pcp,cchar *lp,int ll,int li)
-{
-	VECSTR		mbs ;
+local int procmacro(PI *pip,SUBINFO *pcp,cchar *lp,int ll,int li) noex {
+	vecstr		mbs ;
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
@@ -292,7 +284,7 @@ static int procmacro(PROGINFO *pip,SUBINFO *pcp,cchar *lp,int ll,int li)
 	        char	tmpfname[MAXPATHLEN+1] ;
 
 	        for (i = 0 ; vecstr_get(&mbs,i,&cp) >= 0 ; i += 1) {
-	            if (cp != NULL) {
+	            if (cp != nullptr) {
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
@@ -348,7 +340,7 @@ static int procmacro(PROGINFO *pip,SUBINFO *pcp,cchar *lp,int ll,int li)
 #endif
 
 	        if (rs >= 0) {
-	            const int	all= (ll-1) ;
+	            cint	all= (ll-1) ;
 	            cchar	*alp = (lp+1) ;
 	            rs = bprintf(tfp,".\\\"_ %r\n",alp,all) ;
 	            tlen = rs ;
@@ -360,19 +352,16 @@ static int procmacro(PROGINFO *pip,SUBINFO *pcp,cchar *lp,int ll,int li)
 	} /* end if (mbs) */
 
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (procmacro) */
+} /* end subroutine (procmacro) */
 
-
-static int procescape(PROGINFO *pip,SUBINFO *pcp,MBDINFO *eip)
-{
+local int procescape(PI *pip,SUBINFO *pcp,MBDINFO *eip) noex {
 	bfile		*tfp = &pip->tf.tfile ;
 	uint		loff = eip->loff ;
 	uint		coff ;
 	int		rs = SR_OK ;
 	int		sl ;
 	int		tlen = 0 ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	if (eip->pl > 0) {
 
@@ -439,18 +428,15 @@ static int procescape(PROGINFO *pip,SUBINFO *pcp,MBDINFO *eip)
 	}
 
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (procescape) */
-
+} /* end subroutine (procescape) */
 
 /* do we have a MBD macro? */
-static int mbdmacro(PROGINFO *pip,cchar *lp,int ll)
-{
+local int mbdmacro(PI *pip,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		li = 0 ;
 
 	if (ll < 0)
-	    ll = strlen(lp) ;
+	    ll = lenstr(lp) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -485,18 +471,15 @@ static int mbdmacro(PROGINFO *pip,cchar *lp,int ll)
 #endif
 
 	return (rs >= 0) ? li : rs ;
-}
-/* end subroutine (mbdmacro) */
-
+} /* end subroutine (mbdmacro) */
 
 /* extract the RBD file names from an RBD macro invocation */
-static int mbdmacrofiles(PROGINFO *pip,VECSTR *flp,cchar *lp,int ll)
-{
+local int mbdmacrofiles(PI *pip,vecstr *flp,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
 	if (ll < 0)
-	    ll = strlen(lp) ;
+	    ll = lenstr(lp) ;
 
 	if (ll >= 1) {
 	    FIELD	fsb ;
@@ -539,21 +522,18 @@ static int mbdmacrofiles(PROGINFO *pip,VECSTR *flp,cchar *lp,int ll)
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mbdmacrofiles) */
+} /* end subroutine (mbdmacrofiles) */
 
-
-static int mbdescape(PROGINFO *pip,MBDINFO *ip,uint loff,cchar *lp,int ll)
-{
-	const int	el = strlen(BIBESCAPE) ;
+local int mbdescape(PI *pip,MBDINFO *ip,uint loff,cchar *lp,int ll) noex {
+	cint	el = lenstr(BIBESCAPE) ;
 	int		si ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	memset(ip,0,sizeof(MBDINFO)) ;
+	memclear(ip) ;
 	ip->loff = loff ;
 	ip->pp = lp ;
 	ip->pl = ll ;
-	ip->kp = NULL ;
+	ip->kp = nullptr ;
 	ip->kl = 0 ;
 	ip->rp = lp ;
 	ip->rl = ll ;
@@ -575,11 +555,8 @@ static int mbdescape(PROGINFO *pip,MBDINFO *ip,uint loff,cchar *lp,int ll)
 
 	        cp = (sp + si + 1) ;
 	        cl = sl - (cp - sp) ;
-	        tp = strnchr(cp,cl,CH_RBRACE) ;
-
-	        if (tp != NULL) {
-
-	            f = TRUE ;
+	        if ((tp = strnchr(cp,cl,CH_RBRACE)) != nullptr) {
+	            f = true ;
 
 #if	CF_MULTICITE
 	            ip->kp = cp ;
@@ -592,7 +569,7 @@ static int mbdescape(PROGINFO *pip,MBDINFO *ip,uint loff,cchar *lp,int ll)
 	            ip->rl = sl - ((tp + 1) - sp) ;
 
 	        } else {
-	            f = FALSE ;
+	            f = false ;
 	        }
 
 	    } /* end if (open brace) */
@@ -605,7 +582,6 @@ static int mbdescape(PROGINFO *pip,MBDINFO *ip,uint loff,cchar *lp,int ll)
 #endif
 
 	return f ;
-}
-/* end subroutine (mbdescape) */
+} /* end subroutine (mbdescape) */
 
 
