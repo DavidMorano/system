@@ -110,7 +110,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 			        sp += 1 ;
 			        sl -= 1 ;
 			    }
-		        }
+		        } /* end if (non-zero positive) */
 	            } else {
 		        sl = 0 ;
 		    }
@@ -118,7 +118,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	            if ((si = siourbrk(sp,sl,true)) > 0) {
 		        rs = cfdeci(sp,si,&v) ;
 		        op->b = schar(v) ;
-	            }
+	            } /* end if (non-zero positive) */
 	        } else {
 	            rs = SR_DOM ;
 	        } /* end if */
@@ -137,7 +137,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 		    } else {
 		        rs = cfdeci(sp,sl,&v) ;
 		        op->c = schar(v) ;
-		    }
+		    } /* end if (strnchr) */
 	        } /* end if */
 	    } else {
 	        rs = SR_DOM ;
