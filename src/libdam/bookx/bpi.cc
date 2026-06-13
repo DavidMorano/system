@@ -39,21 +39,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<climits>		/* |UINT_MAX| */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<storebuf.h>
-#include	<char.h>
-#include	<endian.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |UINT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bpi.h"
 #include	"bpihdr.h"
@@ -86,11 +87,11 @@ import libutil ;			/* |memclear(3u)| */
 
 /* exported variables */
 
-bpi_obj bpi_modinfo = {
+const bpi_obj bpi_modinfo = {
 	"bpi",
 	szof(bpi),
 	szof(bpi_cir)
-} ;
+} ; /* end initialization */
 
 
 /* local structures */
@@ -98,21 +99,21 @@ bpi_obj bpi_modinfo = {
 
 /* forward references */
 
-static int	bpi_loadbegin(bpi *,time_t) noex ;
-static int	bpi_loadend(bpi *) noex ;
-static int	bpi_mapcreate(bpi *,time_t) noex ;
-static int	bpi_mapdestroy(bpi *) noex ;
-static int	bpi_proc(bpi *,time_t) noex ;
-static int	bpi_verify(bpi *,time_t) noex ;
-static int	bpi_auditvt(bpi *) noex ;
-static int	bpi_checkupdate(bpi *,time_t) noex ;
-static int	bpi_search(bpi *,bpi_q *) noex ;
-static int	bpi_loadbve(bpi *,bpi_v *,int) noex ;
+local int	bpi_loadbegin(bpi *,time_t) noex ;
+local int	bpi_loadend(bpi *) noex ;
+local int	bpi_mapcreate(bpi *,time_t) noex ;
+local int	bpi_mapdestroy(bpi *) noex ;
+local int	bpi_proc(bpi *,time_t) noex ;
+local int	bpi_verify(bpi *,time_t) noex ;
+local int	bpi_auditvt(bpi *) noex ;
+local int	bpi_checkupdate(bpi *,time_t) noex ;
+local int	bpi_search(bpi *,bpi_q *) noex ;
+local int	bpi_loadbve(bpi *,bpi_v *,int) noex ;
 
-static int	mkcitekey(bpi_q *,uint *) noex ;
+local int	mkcitekey(bpi_q *,uint *) noex ;
 
 #if	CF_SEARCH
-static int	vtecmp(cvoid *,cvoid *) noex ;
+local int	vtecmp(cvoid *,cvoid *) noex ;
 #endif
 
 
@@ -330,7 +331,7 @@ int bpi_enum(bpi *op,bpi_cur *curp,bpi_v *bvep) noex {
 
 /* private subroutines */
 
-static int bpi_loadbegin(bpi *op,time_t daytime) noex {
+local int bpi_loadbegin(bpi *op,time_t daytime) noex {
 	int		rs ;
 	int		nverses = 0 ;
 
@@ -346,7 +347,7 @@ static int bpi_loadbegin(bpi *op,time_t daytime) noex {
 }
 /* end subroutine (bpi_loadbegin) */
 
-static int bpi_loadend(bpi *op) noex {
+local int bpi_loadend(bpi *op) noex {
 	bpi_fmi		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -360,7 +361,7 @@ static int bpi_loadend(bpi *op) noex {
 }
 /* end subroutine (bpi_loadend) */
 
-static int bpi_mapcreate(bpi *op,time_t daytime) noex {
+local int bpi_mapcreate(bpi *op,time_t daytime) noex {
 	bpi_fmi		*mip = &op->fmi ;
 	int		rs ;
 
@@ -393,7 +394,7 @@ static int bpi_mapcreate(bpi *op,time_t daytime) noex {
 }
 /* end subroutine (bpi_mapcreate) */
 
-static int bpi_mapdestroy(bpi *op) noex {
+local int bpi_mapdestroy(bpi *op) noex {
 	bpi_fmi		*mip = &op->fmi ;
 	int		rs = SR_OK ;
 
@@ -408,7 +409,7 @@ static int bpi_mapdestroy(bpi *op) noex {
 }
 /* end subroutine (bpi_mapdestroy) */
 
-static int bpi_checkupdate(bpi *op,time_t dt) noex {
+local int bpi_checkupdate(bpi *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 
@@ -435,7 +436,7 @@ static int bpi_checkupdate(bpi *op,time_t dt) noex {
 }
 /* end subroutine (bpi_checkupdate) */
 
-static int bpi_proc(bpi *op,time_t daytime) noex {
+local int bpi_proc(bpi *op,time_t daytime) noex {
 	bpi_fmi		*mip = &op->fmi ;
 	bpihdr		*hip = &op->fhi ;
 	int		rs ;
@@ -456,7 +457,7 @@ static int bpi_proc(bpi *op,time_t daytime) noex {
 }
 /* end subroutine (bpi_proc) */
 
-static int bpi_verify(bpi *op,time_t daytime) noex {
+local int bpi_verify(bpi *op,time_t daytime) noex {
 	bpi_fmi		*mip = &op->fmi ;
 	bpihdr		*hip = &op->fhi ;
 	uint		utime = (uint) daytime ;
@@ -464,33 +465,24 @@ static int bpi_verify(bpi *op,time_t daytime) noex {
 	int		size ;
 	int		f = true ;
 
-	f = f && (hip->fsize == mip->mapsize) ;
+	f = f && (hip->fsz == mip->mapsize) ;
 	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
-
-/* alignment restriction */
-
+	/* alignment restriction */
 	f = f && ((hip->vioff & (szof(int)-1)) == 0) ;
-
-/* size restrictions */
-
+	/* size restrictions */
 	f = f && (hip->vioff <= mip->mapsize) ;
 	size = (hip->vilen * 1) * szof(uint) ;
 	f = f && ((hip->vioff + size) <= mip->mapsize) ;
-
-/* something restriction? */
-
+	/* something restriction? */
 	f = f && (hip->vilen == hip->nverses) ;
-
-/* get out */
-
-	if (! f)
+	/* get out */
+	if (! f) {
 	    rs = SR_BADFMT ;
-
+	}
 	return rs ;
-}
-/* end subroutine (bpi_verify) */
+} /* end subroutine (bpi_verify) */
 
-static int bpi_auditvt(bpi *op) noex {
+local int bpi_auditvt(bpi *op) noex {
 	bpi_fmi		*mip = &op->fmi ;
 	bpihdr		*hip = &op->fhi ;
 	uint		(*vt)[1] ;
@@ -512,7 +504,7 @@ static int bpi_auditvt(bpi *op) noex {
 }
 /* end subroutine (bpi_auditvt) */
 
-static int bpi_search(bpi *op,bpi_q *qp) noex {
+local int bpi_search(bpi *op,bpi_q *qp) noex {
 	bpi_fmi		*mip = &op->fmi ;
 	bpihdr		*hip = &op->fhi ;
 	uint		(*vt)[1] ;
@@ -553,35 +545,28 @@ static int bpi_search(bpi *op,bpi_q *qp) noex {
 }
 /* end subroutine (bpi_search) */
 
-static int bpi_loadbve(bpi *op,bpi_v *bvep,int vi) noex {
+local int bpi_loadbve(bpi *op,bpi_v *bvep,int vi) noex {
 	bpi_fmi		*mip = &op->fmi ;
 	bpihdr		*hip = &op->fhi ;
-	uint		*vte ;
-	int		rs = SR_OK ;
-	int		vtlen ;
-
-	if (bvep == nullptr) return SR_FAULT ;
-
-	memclear(bvep) ;
-
-	vtlen = hip->vilen ;
-	if (vi >= vtlen) rs = SR_NOANODE ;
-
-/* load the basic stuff */
-
-	if (rs >= 0) {
-	    vte = mip->vt[vi] ;
-	    bvep->nlines = (vte[0] >> 24) & 0xFF ;
-	    bvep->b = (vte[0] >> 16) & 0xFF ;
-	    bvep->c = (vte[0] >> 8) & 0xFF ;
-	    bvep->v = (vte[0] >> 0) & 0xFF ;
-	} /* end if */
-
+	int		rs = SR_FAULT ;
+	if (op && bvep) {
+	    rs = memclear(bvep) ;
+	    if (cint vtlen = int(hip->vilen) ; vi >= vtlen) {
+	        rs = SR_NOANODE ;
+	    }
+	    /* load the basic stuff */
+	    if (rs >= 0) {
+	        uint *vte = mip->vt[vi] ;
+	        bvep->nlines	= (vte[0] >> 24) & 0xFF ;
+	        bvep->b		= (vte[0] >> 16) & 0xFF ;
+	        bvep->c		= (vte[0] >> 8) & 0xFF ;
+	        bvep->v		= (vte[0] >> 0) & 0xFF ;
+	    } /* end if (ok) */
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bpi_loadbve) */
+} /* end subroutine (bpi_loadbve) */
 
-static int mkcitekey(bpi_q *bvp,uint *cip) noex {
+local int mkcitekey(bpi_q *bvp,uint *cip) noex {
 	uint		ci = 0 ;
 	ci |= (bvp->b & UCHAR_MAX) ;
 	ci = (ci << 8) ;
@@ -590,19 +575,17 @@ static int mkcitekey(bpi_q *bvp,uint *cip) noex {
 	ci |= (bvp->v & UCHAR_MAX) ;
 	*cip = ci ;
 	return SR_OK ;
-}
-/* end subroutine (mkcitekey) */
+} /* end subroutine (mkcitekey) */
 
 #if	CF_SEARCH
-static int vtecmp(cvoid *v1p,cvoid *v2p) noex {
-	uint		*vte1 = (uint *) v1p ;
-	uint		*vte2 = (uint *) v2p ;
+local int vtecmp(cvoid *v1p,cvoid *v2p) noex {
+	uint		*vte1 = uintp(v1p) ;
+	uint		*vte2 = uintp(v2p) ;
 	uint		c1, c2 ;
 	c1 = vte1[0] & 0x00FFFFFF ;
 	c2 = vte2[0] & 0x00FFFFFF ;
 	return (c1 - c2) ;
-}
-/* end subroutine (vtecmp) */
+} /* end subroutine (vtecmp) */
 #endif /* CF_SEARCH */
 
 
