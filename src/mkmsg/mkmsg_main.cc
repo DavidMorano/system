@@ -123,7 +123,7 @@ struct locinfo_flags {
 } ; /* end struct */
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	proginfo	*pip ;
@@ -820,7 +820,7 @@ local int mainsub(int argc,cchar **argv,cchar **envv)
 	                            argl = lenstr(argp) ;
 	                            if (argl) {
 	                                pip->have.h_org = true ;
-	                                pip->final.h_org = true ;
+	                                pip->finval.h_org = true ;
 	                                if (argp[0] != '-') {
 	                                    pip->fl.h_org = true ;
 	                                    pip->org = argp ;
@@ -912,7 +912,7 @@ local int mainsub(int argc,cchar **argv,cchar **envv)
 /* header-FROM */
 	                    case 'f':
 	                        pip->have.h_from = true ;
-	                        pip->final.h_from = true ;
+	                        pip->finval.h_from = true ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -1435,10 +1435,10 @@ local int procopts(PI *pip,keyopt *kop) noex {
 
 	                switch (oi) {
 	                case akoname_organization:
-	                    if (! pip->final.h_org) {
+	                    if (! pip->finval.h_org) {
 	                        if (vl >= 0) {
 	                            cchar	**vpp = &pip->org ;
-	                            pip->final.h_org = true ;
+	                            pip->finval.h_org = true ;
 	                            pip->have.h_org = true ;
 	                            pip->fl.h_org = true ;
 	                            rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -1446,9 +1446,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_crnl:
-	                    if (! pip->final.crnl) {
+	                    if (! pip->finval.crnl) {
 	                        pip->have.crnl = true ;
-	                        pip->final.crnl = true ;
+	                        pip->finval.crnl = true ;
 	                        pip->fl.crnl = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1457,9 +1457,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_addfrom:
-	                    if (! pip->final.add_from) {
+	                    if (! pip->finval.add_from) {
 	                        pip->have.add_from = true ;
-	                        pip->final.add_from = true ;
+	                        pip->finval.add_from = true ;
 	                        pip->fl.add_from = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1468,9 +1468,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_addorg:
-	                    if (! pip->final.add_org) {
+	                    if (! pip->finval.add_org) {
 	                        pip->have.add_org = true ;
-	                        pip->final.add_org = true ;
+	                        pip->finval.add_org = true ;
 	                        pip->fl.add_org = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1479,9 +1479,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_addface:
-	                    if (! pip->final.add_face) {
+	                    if (! pip->finval.add_face) {
 	                        pip->have.add_face = true ;
-	                        pip->final.add_face = true ;
+	                        pip->finval.add_face = true ;
 	                        pip->fl.add_face = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1490,9 +1490,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_addreplyto:
-	                    if (! pip->final.add_replyto) {
+	                    if (! pip->finval.add_replyto) {
 	                        pip->have.add_replyto = true ;
-	                        pip->final.add_replyto = true ;
+	                        pip->finval.add_replyto = true ;
 	                        pip->fl.add_replyto = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1501,9 +1501,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_addsender:
-	                    if (! pip->final.add_sender) {
+	                    if (! pip->finval.add_sender) {
 	                        pip->have.add_sender = true ;
-	                        pip->final.add_sender = true ;
+	                        pip->finval.add_sender = true ;
 	                        pip->fl.add_sender = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1512,9 +1512,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_inline:
-	                    if (! pip->final.dis_inline) {
+	                    if (! pip->finval.dis_inline) {
 	                        pip->have.dis_inline = true ;
-	                        pip->final.dis_inline = true ;
+	                        pip->finval.dis_inline = true ;
 	                        pip->fl.dis_inline = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1523,9 +1523,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_mime:
-	                    if (! pip->final.mime) {
+	                    if (! pip->finval.mime) {
 	                        pip->have.mime = true ;
-	                        pip->final.mime = true ;
+	                        pip->finval.mime = true ;
 	                        pip->fl.mime = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1779,7 +1779,7 @@ local int procextras_begin(PI *pip,PROCMORE *mp) noex {
 	    debugprintf("main: user org=»%s«\n",pip->org) ;
 #endif
 
-	if ((! pip->final.add_org) && pip->have.h_org && pip->fl.h_org) {
+	if ((! pip->finval.add_org) && pip->have.h_org && pip->fl.h_org) {
 	    pip->fl.add_org = true ;
 	}
 
@@ -1793,7 +1793,7 @@ local int procextras_begin(PI *pip,PROCMORE *mp) noex {
 	    }
 	} /* end if (hdr-org) */
 
-	if ((rs >= 0) && (! pip->final.h_org) && pip->fl.add_org) {
+	if ((rs >= 0) && (! pip->finval.h_org) && pip->fl.add_org) {
 	    cchar	*un = pip->username ;
 	    cchar	*org = pip->org ;
 	    if ((org == nullptr) || (org[0] == '\0')) org = getenv(VARORG) ;
@@ -1860,7 +1860,7 @@ local int procextras_begin(PI *pip,PROCMORE *mp) noex {
 	    if ((rs = mkaddrfrom(pip)) >= 0) {
 	        if (pip->hdr_from != nullptr) {
 	            pip->have.h_from = true ;
-	            pip->final.h_from = true ;
+	            pip->finval.h_from = true ;
 	            pip->fl.h_from = true ;
 	            rs = ema_parse((adds+ha_from),pip->hdr_from,-1) ;
 	        }
