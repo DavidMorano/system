@@ -1,0 +1,24 @@
+template<typename ... Args>
+local inline int commandments_ctor(commandments *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = SR_OK ;
+	    op->va = nullptr ;
+	    op->c = 0 ;
+	    op->i = 0 ;
+	    op->n = 0 ;
+	    op->fi = 0 ;
+	    op->fl = {} ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (commandments_ctor) */
+
+local int commandments_dtor(commandments *op) noex {
+	int		rs = SR_OK ;
+	if (op->clp) ylikely {
+	    delete op->clp ;
+	    op->clp = nullptr ;
+	}
+	return rs ;
+} /* end subroutine (commandments_dtor) */
+
