@@ -24,6 +24,9 @@
   	Name:
 	main
 
+	Description:
+	This is a remove-execution program.
+
 	Synopsis:
 	$ rshe [-n] [-l user] [-d] [-e=file] remotehost command [args]
 
@@ -1273,9 +1276,9 @@ badret:
 
 	Arguements:
 	name		name given to us
-	rhost		name returned (possibly fully qualified)
-	rnode		node name returned
-	rdomain		domain name returned
+	rhost		result name returned (possibly fully qualified)
+	rnode		result node name returned
+	rdomain		result domain name returned
 
 *******************************************************************************/
 
