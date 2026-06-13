@@ -78,6 +78,9 @@
 #include	<endian.h>		/* LIBU */
 #include	<estrings.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<ucsysauxinfo.h>	/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
@@ -163,12 +166,12 @@ local int bvimk_ctor(bvimk *op,Args ... args) noex {
 	    if ((op->vlp = new(nt) vecobj) != np) ylikely {
                 if ((op->llp = new(nt) vecobj) != np) ylikely {
                     rs = SR_OK ;
-                } /* end if (new-bvimkcalls) */
+                } /* end if (new-vecobj) */
                 if (rs < 0) {
                     delete op->vlp ;
                     op->vlp = nullptr ;
                 } /* end if (error) */
-	    } /* end if (new-modload) */
+	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (bvimk_ctor) */
@@ -574,29 +577,28 @@ local int bvimk_mkidx(bvimk *op) noex {
 } /* end subroutine (bvimk_mkidx) */
 
 local int bvimk_mkidxwrmain(bvimk *op,bvihdr *hdrp) noex {
-	filer		hf, *hfp = &hf ;
-	cint	nfd = op->nfd ;
-	cint	ps = getpagesize() ;
-	int		bsize ;
 	int		rs ;
 	int		rs1 ;
-	int		off = 0 ;
-	bsize = (ps * 4) ;
-	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
-	    if ((rs = bvimk_mkidxwrhdr(op,hdrp,hfp)) >= 0) {
-	        off += rs ;
-	        if (rs >= 0) {
-	            rs = bvimk_mkidxwrverses(op,hdrp,hfp,off) ;
+	int		off = 0 ; /* return-value */
+	if ((rs = ucpagesize) >= 0) {
+	    cint bsz = (rs * 4) ;
+	    cint nfd = op->nfd ;
+	    if (filer hf ; (rs = hf.start(nfd,0,bsz,0)) >= 0) {
+	        if ((rs = bvimk_mkidxwrhdr(op,hdrp,&hf)) >= 0) {
 	            off += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = bvimk_mkidxwrlines(op,hdrp,hfp,off) ;
-	            off += rs ;
-	        }
-	    } /* end if (bvimk_mkidxwrhdr) */
-	    rs1 = filer_finish(hfp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filer) */
+	            if (rs >= 0) {
+	                rs = bvimk_mkidxwrverses(op,hdrp,&hf,off) ;
+	                off += rs ;
+	            } /* end if (ok) */
+	            if (rs >= 0) {
+	                rs = bvimk_mkidxwrlines(op,hdrp,&hf,off) ;
+	                off += rs ;
+	            } /* end if (ok) */
+	        } /* end if (bvimk_mkidxwrhdr) */
+	        rs1 = hf.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (filer) */
+	} /* end if (ucpagesize) */
 	return (rs >= 0) ? off : rs ;
 } /* end subroutine (bvimk_mkidxwrmain) */
 
