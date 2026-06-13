@@ -1,29 +1,33 @@
-/* progbuildmsg */
+/* progbuildmsg SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* part of the MKMSG program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_FORCEINPUT	0		/* ?? */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
-/* Copyright © 1997 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This subroutine builds the message out of the input and the attachments.
+  	Name:
+	progbuildmsg
 
-        NOTE: According to maybe RFC822 (STD11), headers (if present) should
-        appear in the order:
+  	Description:
+	This subroutine builds the message out of the input and the
+	attachments.  NOTE: According to maybe RFC822 (STD11),
+	headers (if present) should appear in the order:
 
 		date
 		from
@@ -41,22 +45,20 @@
 		date
 		subject
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>
 #include	<cstdlib>
-#include	<strings.h>		/* for |strcasecmp(3c)| */
-
-#include	<usystem.h>
+#include	<cstrings>		/* for |strcasecmp(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<sbuf.h>
@@ -127,8 +129,8 @@ extern char	*timestr_hdate(time_t,char *) ;
 
 /* forward references */
 
-static int	progbuildmsghdrs(PROGINFO *,EMA *,PARAMOPT *,int) ;
-static int	progbuildmsgothers(PROGINFO *,PARAMOPT *,int) ;
+static int	progbuildmsghdrs(PROGINFO *,EMA *,paramopt *,int) ;
+static int	progbuildmsgothers(PROGINFO *,paramopt *,int) ;
 static int	printct(PROGINFO *,cchar *,cchar *,cchar *) ;
 static int	ishigh(int) ;
 
@@ -142,7 +144,7 @@ static int	ishigh(int) ;
 int progbuildmsg(pip,adds,hlp,mtp,iep,alp)
 PROGINFO	*pip ;
 EMA		adds[] ;
-PARAMOPT	*hlp ;
+paramopt	*hlp ;
 MIMETYPES	*mtp ;
 MAILMSGATTENT	*iep ;
 MAILMSGATT	*alp ;
@@ -407,7 +409,7 @@ MAILMSGATT	*alp ;
 /* local subroutines */
 
 
-static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,PARAMOPT *hlp,int f_mime)
+static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,paramopt *hlp,int f_mime)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -587,9 +589,9 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,PARAMOPT *hlp,int f_mime)
 /* end subroutine (progbuildmsghdrs) */
 
 
-static int progbuildmsgothers(PROGINFO *pip,PARAMOPT *hlp,int f_date)
+static int progbuildmsgothers(PROGINFO *pip,paramopt *hlp,int f_date)
 {
-	PARAMOPT_CUR	kcur, vcur ;
+	paramopt_cur	kcur, vcur ;
 	int		rs ;
 	int		wlen = 0 ;
 
