@@ -25,7 +25,7 @@
 #include	<dirent.h>
 #include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-#include	<time.h>
+#include	<ctime>
 #include	<ftw.h>
 
 #include	<bfile.h>
@@ -200,7 +200,7 @@ struct vecelem	*aqp ;
 	    if ((a.articleid[0] == '\0') || (isdigit(a.articleid[0]))) {
 
 	        a.f_jobfile = TRUE ;
-	        mkjobfile("/tmp",0644,tmpfname) ;
+	        mkfilejob("/tmp",0644,tmpfname) ;
 
 	        l = sfbasename(tmpfname,-1,&cp) ;
 
