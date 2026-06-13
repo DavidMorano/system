@@ -1,31 +1,34 @@
-/* initinfo */
+/* initinfo SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Initialization Information */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
-
 /******************************************************************************
 
+  	Description:
 	This is a hack to make the SFIO stuff useable an interchangeable
-	way when not in an SFIO environment.  This generally occurs when a
-	subroutine is used both in a SHELL builtin as well as stand-alone.
-
+	way when not in an SFIO environment.  This generally occurs
+	when a subroutine is used both in a SHELL builtin as well
+	as stand-alone.
 
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<paramfile.h>
 #include	<localmisc.h>
 
@@ -50,12 +53,7 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	vstrkeycmp(void *,void *) ;
-extern int	procdefvar(VECSTR *,const char *) ;
+extern int	procdefvar(VECSTR *,cchar *) ;
 
 
 /* forward references */
@@ -65,13 +63,6 @@ extern int	procdefvar(VECSTR *,const char *) ;
 
 #ifdef	COMMENT
 
-static const char	*fnames[] = {
-	STDFNIN,
-	STDFNOUT,
-	STDFNERR,
-	NULL
-} ;
-
 enum fnames {
 	fname_stdin,
 	fname_stdout,
@@ -79,15 +70,24 @@ enum fnames {
 	fname_overlast
 } ;
 
+constexpr cpcchar	fnames[] = {
+	STDFNIN,
+	STDFNOUT,
+	STDFNERR,
+	NULL
+} ;
+
 #endif /* COMMENT */
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
 int initinfo_open(op,pr)
 INITINFO	*op ;
-const char	pr[] ;
+cchar	pr[] ;
 {
 	int	rs ;
 	int	opts ;
@@ -266,7 +266,7 @@ int		vbuflen ;
 /* query: returns value-length */
 int initinfo_query(op,key,vbuf,vbuflen)
 INITINFO	*op ;
-const char	key[] ;
+cchar	key[] ;
 char		vbuf[] ;
 int		vbuflen ;
 {
