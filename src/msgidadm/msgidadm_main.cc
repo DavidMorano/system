@@ -107,7 +107,7 @@ struct locinfo {
 
 static int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,vecstr *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,vecstr *,cchar *) ;
 static int	procout(PROGINFO *,vecstr *,cchar *,cchar *) ;
 
 static int	loadname(PROGINFO *,vecstr *,cchar *,int) ;
@@ -213,8 +213,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -545,7 +545,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -779,7 +779,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    vecstr	recips ;
 	    if ((rs = vecstr_start(&recips,10,0)) >= 0) {
 		ARGINFO	*aip = &ainfo ;
-		BITS	*bop = &pargs ;
+		bits	*bop = &pargs ;
 		if ((rs = procargs(pip,aip,bop,&recips,afname)) >= 0) {
 		    rs = procout(pip,&recips,dbfname,ofname) ;
 		}
@@ -895,7 +895,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 		vecstr *rlp,cchar *afn)
 {
 	int		rs = SR_OK ;
