@@ -5,7 +5,7 @@
 /* read or audit a BVI database */
 /* version %I% last-modified %G% */
 
-#define	CF_SEARCH	1		/* use 'bsearch(3c)' */
+#define	CF_SEARCH	1		/* use |bsearch(3c)| */
 
 /* revision history:
 
@@ -48,9 +48,13 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
+#include	<mkfname.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<endian.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<bvchapters.hh>		/* LIBDAM */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"bvihdr.h"
@@ -63,7 +67,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	bvi_fmi		struct bvi_fmi
 #define	BVI_KA		szof(bvi_line)
 #define	BVI_BO(v)	((BVI_KA - ((v) % BVI_KA)) % BVI_KA)
 
@@ -72,6 +75,10 @@ import libutil ;			/* |memclear(3u)| */
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
 #define	TO_CHECK	4
+
+#ifndef	CF_SEARCH
+#define	CF_SEARCH	0		/* use |bsearch(3c)| */
+#endif
 
 
 /* imported namespaces */
@@ -89,12 +96,6 @@ using libuc::mem ;			/* variable */
 
 
 /* local structures */
-
-chapters {
-	uchar		*ap ;
-	int		al ;
-	int		ci ;
-} ; /* end struct (chapters) */
 
 
 /* forward references */
@@ -160,18 +161,13 @@ local int	bvi_search		(bvi *,bvi_q *) noex ;
 local int	bvi_loadbve		(bvi *,bvi_v *,char *,int,int) noex ;
 local int	bvi_loadchapters	(bvi *,int,uchar *,int) noex ;
 
-local int	chapters_start		(chapters *,uchar *,int) noex ;
-local int	chapters_set		(chapters *,int,int) noex ;
-local int	chapters_finish		(chapters *) noex ;
-
-local int	mkcitekey(bvi_q *,uint *) noex ;
-
-#if	CF_SEARCH
-local int	vtecmp(cvoid **,cvoid **) noex ;
-#endif
+local int	mkcitekey(uint *,bvi_q *) noex ;
+local int	vtecmp(cvoid *,cvoid *) noex ;
 
 
 /* local variables */
+
+cbool		f_search		= CF_SEARCH ;
 
 
 /* exported variables */
@@ -183,21 +179,18 @@ const bvi_obj		bvi_modinfo = {
 } ; /* end initialization */
 
 
-/* exported variables */
-
-
 /* exported subroutines */
 
-local int bvi_opens(bvi *op,cchar *dbn) noex {
+local int bvi_opens(bvi *op) noex {
     	int		rs ;
 	int		rs1 ;
 	int		nv = 0 ; /* return-value */
 	cchar		*es = ENDIANSTR ;
 	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
-	    if ((rs = mkfnamesuf2(tbuf,op->dbn,BVI_SUF,es)) >= 0) {
+	    if ((rs = mkfnamesuf2(tbuf,op->dbname,BVI_SUF,es)) >= 0) {
 	        custime	dt = time(nullptr) ;
 	        cint	tl = rs ;
-	        if ((rs = mem.strw(tbuf,tl,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = mem.strw(tbuf,tl,&cp)) >= 0) {
 	            op->fname = cp ;
 	            if ((rs = bvi_loadbegin(op,dt)) >= 0) {
 	                nv = rs ;
@@ -213,6 +206,8 @@ local int bvi_opens(bvi *op,cchar *dbn) noex {
 	            } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (mkfnamesuf2) */
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? nv : rs ;
 } /* end subroutine (bvi_opens) */
@@ -225,7 +220,7 @@ int bvi_open(bvi *op,cchar *dbn) noex {
 	    if (dbn[0]) {
 	        if (cchar *cp ; (rs = mem.strw(dbn,-1,&cp)) >= 0) {
 	            op->dbname = cp ;
-	            if ((rs = bv_opens(op)) >= 0) {
+	            if ((rs = bvi_opens(op)) >= 0) {
 	                op->magval = BVI_MAGIC ;
 	                nv = rs ;
 	            } /* end if */
@@ -261,7 +256,7 @@ int bvi_close(bvi *op) noex {
 	        op->fname = nullptr ;
 	    } /* end if (memory-release) */
 	    if (op->dbname) {
-	        void *vp = voidp(op->dname) ;
+	        void *vp = voidp(op->dbname) ;
 	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbname = nullptr ;
@@ -293,19 +288,20 @@ int bvi_count(bvi *op) noex {
 	    bvihdr	*hip = op->fhip ;
 	    nv = hip->nverses ;
 	} /* end if (bvi_magic) */
-	return (rs >= 0) ? rv : rs ;
+	return (rs >= 0) ? nv : rs ;
 }
 /* end subroutine (bvi_count) */
 
-int bvi_info(bvi *op,bvi_info *ip) noex {
+int bvi_getinfo(bvi *op,bvi_info *ip) noex {
 	int		rs ;
 	int		nv = 0 ; /* return-value */
 	if ((rs = bvi_magic(op)) >= 0) {
+	    bvi_fmi	*fip = op->fmip ;
 	    bvihdr	*hip = op->fhip ;
 	    nv = hip->nverses ;
 	    if (ip) {
 	        memclear(ip) ;
-	        ip->mtime	= op->fmi.ti_mod ;
+	        ip->mtime	= fip->ti_mod ;
 	        ip->ctime	= (time_t) hip->wtime ;
 	        ip->maxbook	= hip->maxbook ;
 	        ip->maxchapter	= hip->maxchapter ;
@@ -315,12 +311,12 @@ int bvi_info(bvi *op,bvi_info *ip) noex {
 	} /* end if (bvi_magic) */
 	return (rs >= 0) ? nv : rs ;
 }
-/* end subroutine (bvi_info) */
+/* end subroutine (bvi_getinfo) */
 
 int bvi_read(bvi *op,bvi_v *bvep,char *vbuf,int vlen,bvi_q *qp) noex {
 	int		rs ;
 	int		vi = 0 ; /* return-value */
-	if ((rs = bvi_magic(op,bvep,vbuf,gp)) >= 0) {
+	if ((rs = bvi_magic(op,bvep,vbuf,qp)) >= 0) {
 	    /* check for update */
 	    if ((rs >= 0) && (op->ncursors == 0)) {
 	        rs = bvi_checkup(op,0) ;
@@ -367,18 +363,17 @@ int bvi_curenum(bvi *op,bvi_cur *curp,bvi_v *bvep,char *vbuf,int vlen) noex {
 	int		rs ;
 	int		nlines = 0 ; /* return-value */
 	if ((rs = bvi_magic(op,curp,bvep,vbuf)) >= 0) {
+	    bvihdr	*hip = op->fhip ;
 	    rs = SR_INVALID ;
 	    if (op->ncursors > 0) {
-	        bvihdr	*hip = op->fhip ;
 	        cint	vi = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	        if (vi < hip->vilen) {
+	        rs = SR_NOTFOUND ;
+		if (cint vilen = int(hip->vilen) ; vi < vilen) {
 	            if ((rs = bvi_loadbve(op,bvep,vbuf,vlen,vi)) >= 0) {
 		        nlines = rs ;
 	                curp->i = vi ;
-	            }
-	        } else {
-	            rs = SR_NOTFOUND ;
-	        }
+	            } /* end if (bvi_loadbve) */
+	        } /* end if (valid) */
 	    } /* end if (valid) */
 	} /* end if (bvi_magic) */
 	return (rs >= 0) ? nlines : rs ;
@@ -386,25 +381,22 @@ int bvi_curenum(bvi *op,bvi_cur *curp,bvi_v *bvep,char *vbuf,int vlen) noex {
 /* end subroutine (bvi_curenum) */
 
 int bvi_chapters(bvi *op,int book,uchar *ap,int al) noex {
-	bvi_q	q ;
 	int		rs ;
-	int		n = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BVI_MAGIC) return SR_NOTOPEN ;
-
-	if (book < 0) return SR_INVALID ;
-
-	q.b = (book & UCHAR_MAX) ;
-	q.c = 1 ;
-	q.v = 1 ;
-	if ((rs = bvi_search(op,&q)) >= 0) {
-	    int	vi = rs ;
-	    rs = bvi_loadchapters(op,vi,ap,al) ;
-	    n += rs ;
-	}
-
+	int		n = 0 ; /* return-value */
+	if ((rs = bvi_magic(op,ap)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (book >= 0) {
+	        bvi_q	q{} ;
+	        q.b = uchar(book & UCHAR_MAX) ;
+	        q.c = 1 ;
+	        q.v = 1 ;
+	        if ((rs = bvi_search(op,&q)) >= 0) {
+	            cint	vi = rs ;
+	            rs = bvi_loadchapters(op,vi,ap,al) ;
+	            n += rs ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (bvi_magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (bvi_chapters) */
@@ -443,36 +435,35 @@ local int bvi_loadend(bvi *op) noex {
 local int bvi_mapcreate(bvi *op,time_t dt) noex {
 	bvi_fmi		*mip = op->fmip ;
 	cnullptr	np{} ;
-	int		rs ;
+	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-
-	if (op->fname == nullptr) return SR_BUGCHECK ;
-
-	if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
-	    int		fd = rs ;
-	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
-	        csize	fsize = (sb.st_size & UINT_MAX) ;
-	        if (fsize > 0) {
-	            csize	ms = fsize ;
-	            cint	mp = PROT_READ ;
-	            cint	mf = MAP_SHARED ;
-	            void	*md ;
-	            if ((rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
-	                mip->mapdata = md ;
-	                mip->mapsize = ms ;
-	                mip->ti_mod = sb.st_mtime ;
-	                mip->ti_map = dt ;
-	                rs = fsize ;
-	            } /* end if (mmap) */
-	        } else {
-	            rs = SR_UNATCH ;
-		}
-	    } /* end if (stat) */
-	    rs1 = u_close(fd) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (open) */
-
-	return rs ;
+	int		fsz = 0 ; /* return-value */
+	if (op->fname) {
+	    if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
+	        cint	fd = rs ;
+	        if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	            csize	fsize = size_t(sb.st_size) ;
+	            if (fsize > 0) {
+	                csize	ms = fsize ;
+	                cint	mp = PROT_READ ;
+	                cint	mf = MAP_SHARED ;
+	                void	*md ;
+	                if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	                    mip->mapdata = charp(md) ;
+	                    mip->mapsize = ms ;
+	                    mip->ti_mod = sb.st_mtime ;
+	                    mip->ti_map = dt ;
+	                    fsz = intconv(fsize) ;
+	                } /* end if (mmap) */
+	            } else {
+	                rs = SR_UNATCH ;
+		    }
+	        } /* end if (stat) */
+	        rs1 = u_close(fd) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (open) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fsz : rs ;
 } /* end subroutine (bvi_mapcreate) */
 
 local int bvi_mapdestroy(bvi *op) noex {
@@ -480,7 +471,9 @@ local int bvi_mapdestroy(bvi *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (mip->mapdata) {
-	    rs1 = u_munmap(mip->mapdata,mip->mapsize) ;
+	    csize ms = mip->mapsize ;
+	    voidp md = mip->mapdata ;
+	    rs1 = u_mmapend(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mip->mapdata = nullptr ;
 	    mip->mapsize = 0 ;
@@ -492,14 +485,12 @@ local int bvi_mapdestroy(bvi *op) noex {
 local int bvi_checkup(bvi *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
-
 	if (op->ncursors == 0) {
 	    if (dt <= 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
-	        USTAT		sb ;
 	        bvi_fmi		*mip = op->fmip ;
 	        op->ti_lastcheck = dt ;
-	        if ((rs = u_stat(op->fname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(op->fname,&sb)) >= 0) {
 	            f = f || (sb.st_mtime > mip->ti_mod) ;
 	            f = f || (sb.st_mtime > mip->ti_map) ;
 	            if (f) {
@@ -511,7 +502,6 @@ local int bvi_checkup(bvi *op,time_t dt) noex {
 	        }
 	    } /* end if (time-checked out) */
 	} /* end if (no cursors out) */
-
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (bvi_checkup) */
 
@@ -520,49 +510,49 @@ local int bvi_proc(bvi *op,time_t dt) noex {
 	bvihdr		*hip = op->fhip ;
 	int		rs ;
 	int		nv = 0 ;
-	if ((rs = bvihdr(hip,1,mip->mapdata,mip->mapsize)) >= 0) {
-	    nverses = hip->nverses ;
+	cint msz = int(hip->fsz) ;
+	if ((rs = hip->wr(mip->mapdata,msz)) >= 0) {
+	    nv = hip->nverses ;
 	    if ((rs = bvi_verify(op,dt)) >= 0) {
 	        mip->vt = (uint (*)[4]) (mip->mapdata + hip->vioff) ;
 	        mip->lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;
-	    }
-	}
-	return (rs >= 0) ? nverses : rs ;
+	    } /* end if (bvi_verify) */
+	} /* end if (bvihdr_wr) */
+	return (rs >= 0) ? nv : rs ;
 } /* end subroutine (bvi_proc) */
 
 local int bvi_verify(bvi *op,time_t dt) noex {
 	bvi_fmi		*mip = op->fmip ;
 	bvihdr		*hip = op->fhip ;
 	int		rs = SR_OK ;
-	int		size ;
+	int		sz ;
 	int		f = true ;
 
-	f = f && (hip->fsize == mip->mapsize) ;
+	f = f && (hip->fsz == mip->mapsize) ;
 	f = f && (hip->wtime > 0) ;
 	if (f) {
-	    time_t	tt = (time_t) hip->wtime ;
+	    custime	tt = time_t(hip->wtime) ;
 	    f = (dt >= tt) ;
 	}
 
 #ifdef	COMMENT
 	{
-	    const uint	utime = (uint) dt ;
+	    cuint	utime = (uint) dt ;
 	    f = f && (hip->wtime <= (utime + SHIFTINT)) ;
 	}
 #endif
 
-/* alignment restriction */
-
+	/* alignment restriction */
 	f = f && ((hip->vioff & (szof(int)-1)) == 0) ;
 	f = f && (hip->vioff <= mip->mapsize) ;
-	size = hip->vilen * 4 * szof(uint) ;
-	f = f && ((hip->vioff + size) <= mip->mapsize) ;
+	sz = hip->vilen * 4 * szof(uint) ;
+	f = f && ((hip->vioff + sz) <= mip->mapsize) ;
 	/* alignment restriction */
 	f = f && ((hip->vloff & (szof(int)-1)) == 0) ;
 	/* size restrictions */
 	f = f && (hip->vloff <= mip->mapsize) ;
-	size = (hip->vllen * 2 * szof(uint)) ;
-	f = f && ((hip->vloff + size) <= mip->mapsize) ;
+	sz = (hip->vllen * 2 * szof(uint)) ;
+	f = f && ((hip->vloff + sz) <= mip->mapsize) ;
 	/* size restrictions */
 	f = f && (hip->vilen == hip->nverses) ;
 	/* get out */
@@ -576,278 +566,204 @@ local int bvi_verify(bvi *op,time_t dt) noex {
 local int bvi_auditvt(bvi *op) noex {
 	bvi_fmi		*mip = op->fmip ;
 	bvihdr		*hip = op->fhip ;
-	uint		(*vt)[4] ;
-	uint		pcitcmpval = 0 ;
-	uint		citcmpval ;
 	int		rs = SR_OK ;
-	int		i, li ;
-
-	vt = mip->vt ;
-
-/* "verses" table */
-
-	for (i = 1 ; (rs >= 0) && (i < hip->vilen) ; i += 1) {
-
-/* verify no line-index is longer than the "lines" table itself */
-
-	    li = vt[i][2] ;
-	    if (li >= hip->vllen) {
-	        rs = SR_BADFMT ;
-	        break ;
-	    }
-
-/* verify all entries are ordered w/ increasing citations */
-
-	    citcmpval = vt[i][3] & 0x00FFFFFF ;
-	    if (citcmpval < pcitcmpval) {
-	        rs = SR_BADFMT ;
-	        break ;
-	    }
-	    pcitcmpval = citcmpval ;
-
-	} /* end for (record table entries) */
-
+	{
+	   uint		(*vt)[4] = mip->vt ;
+	   uint		pcitcmpval = 0 ;
+	   uint		citcmpval ;
+	   /* "verses" table */
+	   cint n = int(hip->vilen) ;
+	   for (int i = 1 ; (rs >= 0) && (i < n) ; i += 1) {
+	       /* verify no line-index is LT the "lines" table itself */
+	       if (cuint li = vt[i][2] ; li >= hip->vllen) {
+	           rs = SR_BADFMT ;
+	           break ;
+	       }
+	       /* verify all entries are ordered w/ increasing citations */
+	       citcmpval = vt[i][3] & 0x00FFFFFF ;
+	       if (citcmpval < pcitcmpval) {
+	           rs = SR_BADFMT ;
+	           break ;
+	       }
+	       pcitcmpval = citcmpval ;
+	   } /* end for (record table entries) */
+	} /* end block */
 	return rs ;
 } /* end subroutine (bvi_auditvt) */
 
 local int bvi_search(bvi *op,bvi_q *qp) noex {
-	bvi_fmi		*mip ;
-	bvihdr		*hip ;
-	uint		(*vt)[4] ;
-	uint		citekey ;
-	uint		vte[4] ;
+	bvi_fmi		*mip = op->fmip ;
+	bvihdr		*hip = op->fhip ;
 	int		rs = SR_OK ;
-	int		vtlen ;
-	int		vi = 0 ;
-
-	mip = op->fmip ;
-	hip = op->fhip ;
-
-	vt = mip->vt ;
-	vtlen = hip->vilen ;
-
-/* search for entry */
-
-	mkcitekey(qp,&citekey) ;
-
-	vte[3] = citekey ;
-
-#if	CF_SEARCH
+	int		vi = 0 ; /* return-value */
 	{
-	    uint	*vtep ;
-	    int		vtesize = (4 * szof(uint)) ;
-
-	    vtep = (uint *) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
-
-	    rs = (vtep != nullptr) ? ((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
-	    vi = rs ;
-	}
-#else /* CF_SEARCH */
-	{
-	    for (vi = 0 ; vi < vtlen ; vi += 1) {
-	        if ((vt[vi][3] & 0x00FFFFFF) == citekey) {
-	            break ;
-	        }
-	    }
-	    rs = (vi < vtlen) ? vi : SR_NOTFOUND ;
-	}
-#endif /* CF_SEARCH */
-
+	    int		vtlen = hip->vilen ;
+	    uint	(*vt)[4] = mip->vt ;
+	    uint	vte[4] ;
+	    /* search for entry */
+	    if (uint citekey ; (rs = mkcitekey(&citekey,qp)) >= 0) {
+	        vte[3] = citekey ;
+	        if_constexpr (f_search) {
+	            uint	*vtep ;
+	            csize	vtesize = (4 * szof(uint)) ;
+	            {
+	                vtep = (uint *) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
+	            }
+	            rs = (vtep) ? intconv((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
+	            vi = rs ;
+	        } else {
+	            for (vi = 0 ; vi < vtlen ; vi += 1) {
+	                if ((vt[vi][3] & 0x00FFFFFF) == citekey) {
+	                    break ;
+	                }
+	            } /* end if */
+	            rs = (vi < vtlen) ? vi : SR_NOTFOUND ;
+	        } /* end if_constexpr (f_search) */
+	    } /* end if (mkcitekey) */
+	} /* end block */
 	return (rs >= 0) ? vi : rs ;
 } /* end subroutine (bvi_search) */
 
 local int bvi_loadbve(bvi *op,bvi_v *bvep,char *ebuf,int elen,int vi) noex {
-	BVI_LINE	*lines ;
-	bvi_fmi		*mip ;
-	bvihdr		*hip ;
-	ulong		uebuf = (ulong) ebuf ;
-	uint		*vte ;
-	uint		(*lt)[2] ;
-	uint		li ;
-	uint		bo ;
-	int		rs = SR_OK ;
-	int		i ;
-	int		linesize ;
-	int		nlines ;
-
-	if (bvep == nullptr) return SR_FAULT ;
-	if (ebuf == nullptr) return SR_FAULT ;
-
-	if (elen <= 0) return SR_OVERFLOW ;
-
-	mip = op->fmip ;
-	hip = op->fhip ;
-
-	vte = mip->vt[vi] ;
-
-/* load the basic stuff */
-
-	memclear(bvep) ;
-	bvep->voff = vte[0] ;
-	bvep->vlen = vte[1] ;
-	bvep->nlines = (vte[3] >> 24) & 0xFF ;
-	bvep->b = (vte[3] >> 16) & 0xFF ;
-	bvep->c = (vte[3] >> 8) & 0xFF ;
-	bvep->v = (vte[3] >> 0) & 0xFF ;
-
-/* load the lines */
-
-	li = vte[2] ;
-	nlines = bvep->nlines ;
-
-	if (li < hip->vllen) {
-
-	    bo = BVI_BO(uebuf) ;
-	    linesize = ((nlines + 1) * szof(BVI_LINE)) ;
-	    if (linesize <= (elen - (bo-uebuf))) {
-
-	        lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;
-	        lines = (BVI_LINE *) (uebuf + bo) ;
-	        bvep->lines = lines ;
-
-	        for (i = 0 ; i < nlines ; i += 1) {
-	            lines[i].loff = lt[li+i][0] ;
-	            lines[i].llen = lt[li+i][1] ;
-	        } /* end for */
-
-	        if (rs >= 0) {
-	            lines[i].loff = 0 ;
-	            lines[i].llen = 0 ;
+	bvi_fmi		*mip = op->fmip ;
+	bvihdr		*hip = op->fhip ;
+	int		rs = SR_FAULT ;
+	int		nlines = 0 ; /* return-value */
+	if (bvep && ebuf) {
+	    rs = SR_OVERFLOW ;
+	    if (elen > 0) {
+	        uintptr_t	uebuf = uintptr_t(ebuf) ;
+	        bvi_line	*lines ;
+	        uint		*vte = mip->vt[vi] ;
+	        uint		(*lt)[2] ;
+	        uint		li ;
+	        /* load the basic stuff */
+	        memclear(bvep) ;
+	        bvep->voff	= vte[0] ;
+	        bvep->vlen	= vte[1] ;
+	        bvep->nlines	= getbyte(vte[3],3) ;
+	        bvep->b		= getbyte(vte[3],2) ;
+	        bvep->c		= getbyte(vte[3],1) ;
+	        bvep->v		= getbyte(vte[3],0) ;
+	        /* load the lines */
+	        li = vte[2] ;
+	        nlines = bvep->nlines ; /* return-value */
+	        if (li < hip->vllen) {
+	            cint	linesz = ((nlines + 1) * szof(bvi_line)) ;
+	            uint	bo = BVI_BO(uebuf) ;
+	            if (linesz <= (elen - intconv(bo - uebuf))) {
+		        int i ; /* used-afterwards */
+			rs = SR_OK ;
+	                lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;
+	                lines = (bvi_line *) (uebuf + bo) ;
+	                bvep->lines = lines ;
+	                for (i = 0 ; i < nlines ; i += 1) {
+	                    lines[i].loff = lt[li+i][0] ;
+	                    lines[i].llen = lt[li+i][1] ;
+	                } /* end for */
+	                if (rs >= 0) {
+	                    lines[i].loff = 0 ;
+	                    lines[i].llen = 0 ;
+	                } /* end if (ok) */
+	            } else {
+	                rs = SR_OVERFLOW ;
+	            }
+	        } else {
+	            rs = SR_BADFMT ;
 	        }
-
-	    } else {
-	        rs = SR_OVERFLOW ;
-	    }
-
-	} else {
-	    rs = SR_BADFMT ;
-	}
-
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? nlines : rs ;
 } /* end subroutine (bvi_loadbve) */
 
 local int bvi_loadchapters(bvi *op,int vi,uchar *ap,int al) noex {
-	chapters	cm ;
-	BVCITEKEY	ck ;
-	bvi_fmi		*mip ;
-	bvihdr		*hip ;
+	bvi_fmi		*mip = op->fmip ;
+	bvihdr		*hip = op->fhip ;
 	uint		(*vt)[4] ;
 	uint		b, c, v ;
 	int		rs = SR_OK ;
-	int		i ;
+	int		rs1 ;
 	int		vtlen ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 
-	mip = op->fmip ;
-	hip = op->fhip ;
-
+	{
 	vt = mip->vt ;
 	vtlen = hip->vilen ;
-
+	}
 	if (vi < vtlen) {
-
+	    bvcitekey	ck ;
+	    bvchapters	cm ;
 	    bvcitekey_get(&ck,(vt[vi]+3)) ;
 	    b = ck.b ;
 	    c = ck.c ;
-
-	    if (ap != nullptr) rs = chapters_start(&cm,ap,al) ;
-
+	    if (ap) {
+		rs = cm.start(ap,al) ;
+	    }
 	    if (rs >= 0) {
-
 	        v = 0 ;
-	        for (i = vi ; (rs >= 0) && (i < vtlen) ; i += 1) {
+	        for (int i = vi ; (rs >= 0) && (i < vtlen) ; i += 1) {
 	            bvcitekey_get(&ck,(vt[i]+3)) ;
 	            if (b != ck.b)
 	                break ;
 	            if (c != ck.c) {
-	                if (ap != nullptr) rs = chapters_set(&cm,c,v) ;
+	                if (ap) {
+			    rs = cm.load(c,v) ;
+			}
 	                c = ck.c ;
 	            }
 	            v = ck.v ;
 	        } /* end for */
-
 	        if (rs >= 0) {
-	            if (ap != nullptr) rs = chapters_set(&cm,c,v) ;
+	            if (ap) {
+			rs = cm.load(c,v) ;
+		    }
 	            c += 1 ;
-	        }
-
-	        n = c ;
-	        if (ap != nullptr) chapters_finish(&cm) ;
-
+	        } /* end if (ok) */
+	        n = c ; /* return-value */
+	        if (ap) {
+		    rs1 = cm.finish() ;
+		    if (rs >= 0) rs = rs1 ;
+		}
 	    } /* end if (ok) */
-
 	} /* end if */
 
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (bvi_loadchapters) */
 
-local int chapters_start(chapters *cp,uchar *ap,int al) noex {
-    	int		rs = SR_FAULT ;
-	if (op && ap) {
-	    rs = SR_OK ;
-	    cp->ap = ap ;
-	    cp->al = al ;
-	    cp->ci = 0 ;
-	} /* end if (non-null) */
-	return rs ;
-} /* end subroutine (chapters_start) */
+local uint mkciteload(uint ci,uchar item) noex {
+	ci = (ci << CHAR_BIT) ;
+	ci |= uint(item) ;
+	return ci ; 
+} /* end subroutine (mkciteload) */
 
-local int chapters_set(chapters *cp,int ci,int nv) noex {
-    	int		rs = SR_OK ;
-	int		ci = 0 ; /* return-value */
-	if (nv <= UCHAR_MAX) {
-	    if (ci < cp->al) {
-		rs = SR_OK ;
-	        while (cp->ci < ci) {
-	            cp->ap[cp->ci++] = 0 ;
-	        } /* end while */
-	        if (cp->ci == ci) {
-	            cp->ap[cp->ci++] = nv ;
-	        }
-	        ci = cp-ci ;
-	    } else {
-	        rs = SR_OVERFLOW ;
-	    }
-	} else {
-	    rs = SR_RANGE ;
-	}
-	return (rs >= 0) ? ci : rs ;
-} /* end subroutine (chapters_set) */
-
-local int chapters_finish(chapters *cp) noex {
-    	int		rs = SR_FAULT ;
-	int		ci = 0 ; /* return-value */
-	if (op) {
-	    rs = SR_OK ;
-	    ci = cp->ci ;
-	} /* end if (non-null) */
-	return (rs >= 0) ? ci : rs ;
-} /* end subroutine (chapters_finish) */
-
-local int mkcitekey(bvi_q *bvp,uint *cip) noex {
+local int mkcitekey(uint *cip,bvi_q *bvp) noex {
     	int		rs = SR_FAULT ;
 	if (bvp && cip) {
 	    uint	ci = 0 ;
 	    rs = SR_OK ;
-	    ci |= (bvp->b & UCHAR_MAX) ;
-	    ci = (ci << 8) ;
-	    ci |= (bvp->c & UCHAR_MAX) ;
-	    ci = (ci << 8) ;
-	    ci |= (bvp->v & UCHAR_MAX) ;
+	    ci = mkciteload(ci,bvp->b) ;
+	    ci = mkciteload(ci,bvp->c) ;
+	    ci = mkciteload(ci,bvp->v) ;
 	    *cip = ci ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (mkcitekey) */
 
-#if	CF_SEARCH
+local int entcmp(cuint *vte1,cuint *vte2) noex {
+	uint		vmask = 0x00FFFFFF ;
+	int		rc = 0 ;
+	{
+	    int	c1 = int(vte1[3] & vmask) ;
+	    int	c2 = int(vte2[3] & vmask) ;
+	    rc = (c1 - c2) ;
+	}
+	return rc ;
+} /* end subroutine (entcmp) */
+
 local int vtecmp(cvoid *v1p,cvoid *v2p) noex {
-	uint		*vte1 = (uint *) v1p ;
-	uint		*vte2 = (uint *) v2p ;
-	uint		c1, c2 ;
-	c1 = vte1[3] & 0x00FFFFFF ;
-	c2 = vte2[3] & 0x00FFFFFF ;
-	return (c1 - c2) ;
+	uint		*vte1 = uintp(v1p) ;
+	uint		*vte2 = uintp(v2p) ;
+	return entcmp(vte1,vte2) ;
 } /* end subroutine (vtecmp) */
-#endif /* CF_SEARCH */
 
 
