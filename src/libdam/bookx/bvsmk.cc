@@ -85,6 +85,7 @@
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
 #include	<nulstr.h>		/* LIBUC */
@@ -92,6 +93,7 @@
 #include	<mkdirs.h>		/* LIBUC */
 #include	<mktmp.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
@@ -111,10 +113,15 @@ import libutil ;			/* |memclear(3u)| */
 #define	BVSMK_IDMODE	0777
 
 #define	HDRBUFLEN	(szof(bvshdr) + 128)
+#define	PAGEBUFMULT	4		/* page-size buffer multiplier */
 
 #define	FSUF_IDX	"bvs"
 
 #define	TO_OLDFILE	(5 * 60)
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
 
 
 /* imported namespaces */
@@ -141,6 +148,13 @@ const bvsmk_obj		bvsmk_modinfo = {
 
 
 /* local structures */
+
+namespace {
+    struct vars {
+	int	maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
@@ -205,6 +219,9 @@ local int	unlinkstale	(cchar *,int) noex ;
 
 /* local variables */
 
+static vars		var ;
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -217,36 +234,38 @@ int bvsmk_open(bvsmk *op,cchar *pr,cchar *db,int of,mode_t µom) noex {
 	if ((rs = bvsmk_ctor(op,pr,db)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && db[0]) {
-	        cint	n = BVSMK_NENTRIES ;
-	        int	sz = 0 ;
 	        DEBUGPRINTF("ent pr=%s\n",pr) ;
 	        DEBUGPRINTF("db=%s\n",db) ;
-	        op->omode = µom ;
-	        op->nfd = -1 ;
-	        op->fl.ofcreat	= MKBOOL(of & O_CREAT) ;
-	        op->fl.ofexcl	= MKBOOL(of & O_EXCL) ;
-	        sz += (lenstr(pr)+1) ;
-	        sz += (lenstr(db)+1) ;
-	        if (char *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
-	            op->a = bp ;
-	            op->pr = bp ;
-	            bp = (strwcpy(bp,pr,-1)+1) ;
-	            op->db = bp ;
-	            bp = (strwcpy(bp,db,-1)+1) ;
-	            if ((rs = bvsmk_filesbegin(op)) >= 0) {
-		        c = rs ;
-		        if ((rs = bvsmk_listbegin(op,n)) >= 0) {
-			    op->magval = BVSMK_MAGIC ;
-		        }
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
+	            cint	n = BVSMK_NENTRIES ;
+	            int		sz = 0 ;
+	            op->omode = µom ;
+	            op->nfd = -1 ;
+	            op->fl.ofcreat	= MKBOOL(of & O_CREAT) ;
+	            op->fl.ofexcl	= MKBOOL(of & O_EXCL) ;
+	            sz += (lenstr(pr) + 1) ;
+	            sz += (lenstr(db) + 1) ;
+	            if (char *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
+	                op->a = bp ;
+	                op->pr = bp ;
+	                bp = (strwcpy(bp,pr,-1)+1) ;
+	                op->db = bp ;
+	                bp = (strwcpy(bp,db,-1)+1) ;
+	                if ((rs = bvsmk_filesbegin(op)) >= 0) {
+		            c = rs ;
+		            if ((rs = bvsmk_listbegin(op,n)) >= 0) {
+			        op->magval = BVSMK_MAGIC ;
+		            }
+		            if (rs < 0) {
+			        bvsmk_filesend(op) ;
+		            } /* end if (error) */
+		        } /* end if (files-begin) */
 		        if (rs < 0) {
-			    bvsmk_filesend(op) ;
+		            mem.free(op->a) ;
+		            op->a = nullptr ;
 		        } /* end if (error) */
-		    } /* end if (files-begin) */
-		    if (rs < 0) {
-		        mem.free(op->a) ;
-		        op->a = nullptr ;
-		    } /* end if (error) */
-	        } /* end if (memory-acquire) */
+	            } /* end if (memory-acquire) */
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		bvsmk_dtor(op) ;
@@ -263,8 +282,7 @@ int bvsmk_close(bvsmk *op) noex {
 	if ((rs = bvsmk_magic(op)) >= 0) {
 	    DEBUGPRINTF("ent nverses=%u\n",op->nverses) ;
 	    DEBUGPRINTF("nzverses=%u\n",op->nzverses) ;
-	    int		f_go = false ;
-	    f_go = (! op->fl.abort) ;
+	    bool	f_go = (! op->fl.abort) ;
 	    nv = op->nverses ;
 	    if (nv > 0) {
 	        rs1 = bvsmk_mkidx(op) ;
@@ -305,57 +323,48 @@ int bvsmk_close(bvsmk *op) noex {
 } /* end subroutine (bvsmk_close) */
 
 int bvsmk_add(bvsmk *op,int book,uchar *ap,int al) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (ap == nullptr) return SR_FAULT ;
-
-	if (op->magval != BVSMK_MAGIC) return SR_NOTOPEN ;
-
-	if ((book >= 0) && (al >= 0)) {
-	    if (al > 0) {
-		cint	sz = (al * szof(uchar)) ;
-		if (uchar *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
-		    vecobj	*blp = op->blp ;
-		    bvsbook	be{} ;
-	            uint	nzverses ;
-	            uint	nverses = 0 ;
-	            for (int i = 0 ; i < al ; i += 1) {
-	                bp[i] = ap[i] ;
-	                nverses += ap[i] ;
-	            } /* end for */
-	            nzverses = (nverses - ap[0]) ;
-	            be.book	= uchar(book) ;
-	            be.nverses	= uchar(nverses) ;
-	            be.nzverses	= uchar(nzverses) ;
-	            be.al	= uchar(al) ;
-	            be.ap = bp ;
-	            if ((rs = blp->add(&be)) >= 0) {
-		        op->nverses += nverses ;
-		        if (book > 0) op->nzverses += nzverses ;
-	            } /* end if (vecobj_add) */
-	            if (rs < 0) {
-	                mem.free(bp) ;
-		    } /* end if (error) */
-	        } /* end if (memory-allocation) */
-	    } /* end if (greater) */
-	} else {
-	    rs = SR_INVALID ;
-	}
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_add: ret rs=%d\n",rs) ;
-#endif
-
+	int		rs ;
+	if ((rs = bvsmk_magic(op,ap)) >= 0) {
+	    if ((book >= 0) && (al >= 0)) {
+	        if (al > 0) {
+		    cint	sz = (al * szof(uchar)) ;
+		    if (uchar *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
+		        vecobj	*blp = op->blp ;
+		        bvsbook	be{} ;
+	                uint	nzverses ;
+	                uint	nverses = 0 ;
+	                for (int i = 0 ; i < al ; i += 1) {
+	                    bp[i] = ap[i] ;
+	                    nverses += ap[i] ;
+	                } /* end for */
+	                nzverses	= (nverses - ap[0]) ;
+	                be.book		= uchar(book) ;
+	                be.nverses	= uchar(nverses) ;
+	                be.nzverses	= uchar(nzverses) ;
+	                be.al		= uchar(al) ;
+	                be.ap		= bp ;
+	                if ((rs = blp->add(&be)) >= 0) {
+		            op->nverses += nverses ;
+		            if (book > 0) op->nzverses += nzverses ;
+	                } /* end if (vecobj_add) */
+	                if (rs < 0) {
+	                    mem.free(bp) ;
+		        } /* end if (error) */
+	            } /* end if (memory-acquire) */
+	        } /* end if (greater) */
+	    } else {
+	        rs = SR_INVALID ;
+	    }
+	} /* end if (bvsmk_magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bvsmk_add) */
 
 int bvsmk_abort(bvsmk *op,int f) noex {
-    	int		rs = SR_FAULT ;
-	if (op) {
+    	int		rs ;
+	if ((rs = bvsmk_magic(op)) >= 0) {
 	    op->fl.abort = !!f ;
-	    rs = SR_OK ;
-	} /* end if (non-null) */
+	} /* end if (bvsmk_magic) */
 	return rs ;
 } /* end subroutine (bvsmk_abort) */
 
@@ -364,134 +373,137 @@ int bvsmk_abort(bvsmk *op,int f) noex {
 
 local int bvsmk_filesbegin(bvsmk *op) noex {
 	int		rs ;
-	int		dnl ;
+	int		rs1 ;
 	int		c = 0 ;
-	cchar		*idname = BVSMK_IDNAME ;
-	cchar	*dnp ;
-	char		tbuf[MAXPATHLEN + 1] ;
-
-	dnp = tbuf ;
-	if ((rs = mkpath2(tbuf,op->pr,idname)) >= 0) {
-	    cmode	dm = 0777 ;
-	    dnl = rs ;
-	    if ((rs = mkdname(tbuf,dm)) >= 0) {
-	        if (cchar *cp ; (rs = mem.strw(dnp,dnl,&cp)) >= 0) {
-	            op->idname = cp ;
-	            if (op->fl.ofcreat) {
-	                rs = bvsmk_filesbeginc(op) ;
-	            } else {
-	                rs = bvsmk_filesbeginwait(op) ;
-	                c = rs ;
-	            } /* end if */
-	            if (rs < 0) {
-	                void *vp = voidp(op->idname) ;
-	                mem.free(vp) ;
-	                op->idname = nullptr ;
-	            } /* end if (erro) */
-	        } /* end if (memory-acquire) */
-	    } /* end if (mkdname) */
-	} /* end if (mkpath) */
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_filesbegin: ret rs=%d c=%u\n",rs,c) ;
-#endif
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	    cchar	*idname = BVSMK_IDNAME ;
+	    cchar	*dnp = tbuf ;
+	    if ((rs = mkpath2(tbuf,op->pr,idname)) >= 0) {
+	        cint	dnl = rs ;
+	        cmode	dm = 0777 ;
+	        if ((rs = mkdname(tbuf,dm)) >= 0) {
+	            if (cchar *cp ; (rs = mem.strw(dnp,dnl,&cp)) >= 0) {
+	                op->idname = cp ;
+	                if (op->fl.ofcreat) {
+	                    rs = bvsmk_filesbeginc(op) ;
+	                } else {
+	                    rs = bvsmk_filesbeginwait(op) ;
+	                    c = rs ;
+	                } /* end if */
+	                if (rs < 0) {
+	                    void *vp = voidp(op->idname) ;
+	                    mem.free(vp) ;
+	                    op->idname = nullptr ;
+	                } /* end if (erro) */
+	            } /* end if (memory-acquire) */
+	        } /* end if (mkdname) */
+	    } /* end if (mkpath) */
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bvsmk_filesbegin) */
 
 local int bvsmk_filesbeginc(bvsmk *op) noex {
 	cint		type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
+	cint		maxpath = var.maxpathlen ;
 	int		rs ;
-	cchar		*id = op->idname ;
-	cchar		*db = op->db;
-	cchar		*suf = FSUF_IDX	 ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknifname(tbuf,type,id,db,suf)) >= 0) {
-	    cmode	om = op->omode ;
-	    cchar	*tfn = tbuf ;
-	    char	rbuf[MAXPATHLEN+1] ;
-	    if (type) {
-	        if ((rs = mktmpfile(rbuf,tbuf,om)) >= 0) {
-	            op->fl.created = true ;
-	            tfn = rbuf ;
-	        }
-	    } /* end if (type) */
-	    if (rs >= 0) {
-	        int	of = O_CREAT ;
-	        if (op->fl.ofexcl) of |= O_EXCL ;
-	        rs = bvsmk_filesbegincreate(op,tfn,of,om) ;
-		if ((rs < 0) && type) {
-		    uc_unlink(rbuf) ;
-		} /* end if (error) */
-	    } /* end if (ok) */
-	} /* end if (mknifname) */
+	int		rs1 ;
+	int		ai = 2 ; /* two path buffers */
+	{
+	    cchar	*id = op->idname ;
+	    cchar	*db = op->db ;
+	    cchar	*suf = FSUF_IDX	;
+	    cint sz = (ai * (var.maxpathlen + 1)) ;
+	    if (char *a ; (rs = mem.mall(sz,&a)) >= 0) {
+		char *tbuf = (a + (--ai * (maxpath + 1))) ;
+	        if ((rs = mknifname(tbuf,type,id,db,suf)) >= 0) {
+	            cmode	om = op->omode ;
+	            cchar	*tfn = tbuf ;
+	            char	*rbuf = (a + (--ai * (maxpath + 1))) ;
+	            if (type) {
+	                if ((rs = mktmpfile(rbuf,tbuf,om)) >= 0) {
+	                    op->fl.created = true ;
+	                    tfn = rbuf ;
+	                }
+	            } /* end if (type) */
+	            if (rs >= 0) {
+	                int	of = O_CREAT ;
+	                if (op->fl.ofexcl) of |= O_EXCL ;
+	                rs = bvsmk_filesbegincreate(op,tfn,of,om) ;
+		        if ((rs < 0) && type) {
+		            uc_unlink(rbuf) ;
+		        } /* end if (error) */
+	            } /* end if (ok) */
+	        } /* end if (mknifname) */
+	        rs1 = mem.free(a) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end block */
 	return rs ;
 } /* end subroutine (bvsmk_filesbeginc) */
 
 local int bvsmk_filesbeginwait(bvsmk *op) noex {
+	cint		rse = SR_EXISTS ;
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-	cchar		*id = op->idname ;
-	cchar		*db = op->db ;
-	cchar		*suf = FSUF_IDX	 ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknifname(tbuf,false,id,db,suf)) >= 0) {
-	    cmode	om = op->omode ;
-	    cint		to_stale = BVSMK_INTSTALE ;
-	    cint		rsn = SR_EXISTS ;
-	    cint		of = (O_CREAT|O_WRONLY|O_EXCL) ;
-	    int			to = BVSMK_INTOPEN ;
-	    while ((rs = bvsmk_filesbegincreate(op,tbuf,of,om)) == rsn) {
-#if	CF_DEBUG
-	        debugprintf("bvsmk_filesbeginwait: loop ret rs=%d\n",rs) ;
-#endif
-	        c = 1 ;
-	        sleep(1) ;
-	        unlinkstale(tbuf,to_stale) ;
-	        if (to-- == 0) break ;
-	    } /* end while (db exists) */
-	    if (rs == rsn) {
-	        op->fl.ofcreat = false ;
-	        c = 0 ;
-	        rs = bvsmk_filesbeginc(op) ;
-	    }
-	} /* end if (mknifname) */
-#if	CF_DEBUG
-	debugprintf("bvsmk_filesbeginwait: ret ret rs=%d\n",rs) ;
-#endif
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	    cchar	*id = op->idname ;
+	    cchar	*db = op->db ;
+	    cchar	*suf = FSUF_IDX	 ;
+	    if ((rs = mknifname(tbuf,false,id,db,suf)) >= 0) {
+	        cint	to_stale = BVSMK_INTSTALE ;
+	        cint	of = (O_CREAT|O_WRONLY|O_EXCL) ;
+	        int	to = BVSMK_INTOPEN ;
+	        cmode	om = op->omode ;
+	        while ((rs = bvsmk_filesbegincreate(op,tbuf,of,om)) == rse) {
+	            c = 1 ;
+	            msleep(200) ;
+	            unlinkstale(tbuf,to_stale) ;
+	            if (to-- == 0) break ;
+	        } /* end while (db exists) */
+	        if (rs == rse) {
+	            op->fl.ofcreat = false ;
+	            c = 0 ;
+	            rs = bvsmk_filesbeginc(op) ;
+	        } /* end if (not-found) */
+	    } /* end if (mknifname) */
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	DEBUGPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bvsmk_filesbeginwait) */
 
 local int bvsmk_filesbegincreate(bvsmk *op,cchar *tfn,int of,mode_t om) noex {
 	int		rs ;
+	int		rs1 ;
 #if	CF_DEBUG
 	{
 	    char	obuf[100+1] ;
 	    snflagsopen(obuf,100,of) ;
-	    debugprintf("bvsmk_filesbegincreate: ent of=%s\n",obuf) ;
-	    debugprintf("bvsmk_filesbegincreate: om=%05o\n",om) ;
+	    DEBUGPRINTF("ent of=%s\n",obuf) ;
+	    DEBUGPRINTF("om=%05o\n",om) ;
 	}
 #endif
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
 	    cint	fd = rs ;
-	    cchar	*cp ;
 	    op->fl.created = true ;
-	    if ((rs = mem.strw(tfn,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
 	        op->nidxfname = (char *) cp ;
 	    } /* end if (memory-acquire) */
-	    u_close(fd) ;
+	    rs1 = u_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (create) */
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_filesbegincreate: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bvsmk_filesbegincreate) */
 
 local int bvsmk_filesend(bvsmk *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->nidxfname) {
 	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
@@ -502,18 +514,14 @@ local int bvsmk_filesend(bvsmk *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->nidxfname = nullptr ;
 	    } /* end if (memory-release) */
-	}
+	} /* end if (non-null) */
 	if (op->idname) {
 	    void *vp = voidp(op->idname) ;
 	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->idname = nullptr ;
 	} /* end if (memory-release) */
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_filesend: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bvsmk_filesend) */
 
@@ -545,19 +553,12 @@ local int bvsmk_listend(bvsmk *op) noex {
 		} /* end if (memory-release) */
 	    }
 	} /* end for */
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_listend: mid rs=%d\n",rs) ;
-#endif
+	DEBUGPRINTF("mid rs=%d\n",rs) ;
 	{
 	    rs1 = blp->finish ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_listend: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bvsmk_listend) */
 
@@ -565,20 +566,16 @@ local int bvsmk_mkidx(bvsmk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_mkidx: ent\n") ;
-#endif
-
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = bvsmk_nidxopen(op)) >= 0) {
 	    bvshdr	hdr{} ;
-	    hdr.vetu[0] = uchar(BVSHDR_VERSION) ;
-	    hdr.vetu[1] = uchar(ENDIAN) ;
-	    hdr.vetu[2] = 0 ;
-	    hdr.vetu[3] = 0 ;
-	    hdr.wtime = (uint) time(nullptr) ;
-	    hdr.nverses = op->nverses ;
-	    hdr.nzverses = op->nverses ;
+	    hdr.vetu[0]		= uchar(BVSHDR_VERSION) ;
+	    hdr.vetu[1]		= uchar(ENDIAN) ;
+	    hdr.vetu[2]		= 0 ;
+	    hdr.vetu[3]		= 0 ;
+	    hdr.wtime		= (uint) time(nullptr) ;
+	    hdr.nverses		= op->nverses ;
+	    hdr.nzverses	= op->nverses ;
 	    if ((rs = bvsmk_mkidxwrmain(op,&hdr)) >= 0) {
 	        cint	hlen = HDRBUFLEN ;
 	        char	hbuf[HDRBUFLEN+1] ;
@@ -594,11 +591,7 @@ local int bvsmk_mkidx(bvsmk *op) noex {
 	    rs1 = bvsmk_nidxclose(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bvsmk_nidx) */
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_mkidx: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d wlen=%u\n",rs,wlen) ;
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (bvsmk_mkidx) */
 
@@ -607,7 +600,7 @@ local int bvsmk_mkidxwrmain(bvsmk *op,bvshdr *hdrp) noex {
 	int		rs1 ;
 	int		foff = 0 ; /* return-value */
 	if ((rs = ucpagesize) >= 0) {
-	    cint bsz = (rs * 4) ;
+	    cint bsz = (rs * PAGEBUFMULT) ;
 	    cint nfd = op->nfd ;
 	    if (filer hf ; (rs = hf.start(nfd,0,bsz,0)) >= 0) {
 	        if ((rs = bvsmk_mkidxwrhdr(op,hdrp,&hf)) >= 0) {
@@ -636,7 +629,7 @@ local int bvsmk_mkidxwrhdr(bvsmk *op,bvshdr *hdrp,filer *hfp) noex {
 	    cint	hlen = HDRBUFLEN ;
 	    char	hbuf[HDRBUFLEN+1] ;
 	    if ((rs = hdrp->rd(hbuf,hlen)) >= 0) {
-	        rs = filer_writefill(hfp,hbuf,rs) ;
+	        rs = hfp->writefill(hbuf,rs) ;
 	        wlen += rs ;
 	    } /* end if (bvshdr_rd) */
 	} /* end if (non-null) */
@@ -660,7 +653,7 @@ local int bvsmk_mkidxchaptab(bvsmk *op,bvshdr *hdrp,filer *hfp,int foff) noex {
 		}
 		ctlen += bep->al ;
 	        bep->ci = ucharconv(foff - hdrp->ctoff) ;
-	        rs = filer_write(hfp,bep->ap,bep->al) ;
+	        rs = hfp->write(bep->ap,bep->al) ;
 	        foff += rs ;
 		wlen += rs ;
 	        if (rs < 0) break ;
@@ -696,64 +689,68 @@ local int bvsmk_mkidxbooktab(bvsmk *op,bvshdr *hdrp,filer *hfp,int foff) noex {
 	        if (rs >= 0) {
 	            hdrp->btoff = foff ;
 	            hdrp->btlen = n ;
-	            rs = filer_write(hfp,arrp,sz) ;
+	            rs = hfp->write(arrp,sz) ;
 	            wlen += rs ;
 	        } /* end if (ok) */
 	        rs1 = mem.free(arrp) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (filer_writealign) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (bvsmk_mkidxbooktab) */
 
 local int bvsmk_nidxopen(bvsmk *op) noex {
-	cmode		om = op->omode ;
+    	cint		maxpath = var.maxpathlen ;
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
-#if	CF_DEBUG
-	debugprintf("bvsmk_nidxopen: ent nidxfname=%s\n",op->nidxfname) ;
-#endif
+	int		ai = 2 ; /* two path buffers */
+	cmode		om = op->omode ;
+	DEBUGPRINTF("ent nidxfname=%s\n",op->nidxfname) ;
 	if (op->nidxfname == nullptr) {
 	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
+	    cint	sz = (ai * (maxpath + 1)) ;
 	    cchar	*id = op->idname ;
 	    cchar	*db = op->db ;
 	    cchar	*suf = FSUF_IDX ;
-	    char	tbuf[MAXPATHLEN+1] ;
-	    if ((rs = mknifname(tbuf,type,id,db,suf)) >= 0) {
-	        cchar	*tfn = tbuf ;
-	        char	rbuf[MAXPATHLEN+1] ;
-	        if (type) {
-	            rs = opentmpfile(tbuf,of,om,rbuf) ;
-	            op->nfd = rs ;
-		    fd = rs ;
-	            tfn = rbuf ;
-	        } else {
-	            if (op->fl.ofexcl) of |= O_EXCL ;
-	            rs = uc_open(tbuf,of,om) ;
-	            op->nfd = rs ;
-		    fd = rs ;
-	        }
-	        if (rs >= 0) {
-	            if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
-	                op->nidxfname = (char *) cp ;
-	            } /* end if (memory-acquire) */
-		    if (rs < 0) {
-			u_close(fd) ;
-			op->nfd = -1 ;
-			if (type) u_unlink(rbuf) ;
-		    } /* end if (error) */
-	        } /* end if (ok) */
-	    } /* end if (mknewfname) */
+	    if (char *a ; (rs = mem.mall(sz,&a)) >= 0) {
+	        char	*tbuf = (a + (--ai * (maxpath + 1))) ;
+	        if ((rs = mknifname(tbuf,type,id,db,suf)) >= 0) {
+	            cchar	*tfn = tbuf ;
+	            char	*rbuf = (a + (--ai * (maxpath + 1))) ;
+	            if (type) {
+	                rs = opentmpfile(tbuf,of,om,rbuf) ;
+	                op->nfd = rs ;
+		        fd = rs ;
+	                tfn = rbuf ;
+	            } else {
+	                if (op->fl.ofexcl) of |= O_EXCL ;
+	                rs = uc_open(tbuf,of,om) ;
+	                op->nfd = rs ;
+		        fd = rs ;
+	            } /* end if */
+	            if (rs >= 0) {
+	                if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
+	                    op->nidxfname = (char *) cp ;
+	                } /* end if (memory-acquire) */
+		        if (rs < 0) {
+			    u_close(fd) ;
+			    op->nfd = -1 ;
+			    if (type) u_unlink(rbuf) ;
+		        } /* end if (error) */
+	            } /* end if (ok) */
+	        } /* end if (mknewfname) */
+	        rs1 = mem.free(a) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} else {
 	    if (op->fl.ofexcl) of |= O_EXCL ;
 	    rs = uc_open(op->nidxfname,of,om) ;
 	    op->nfd = rs ;
 	    fd = rs ;
 	} /* end if */
-#if	CF_DEBUG
-	debugprintf("bvsmk_nidxopen: ret rs=%d\n",rs) ;
-#endif
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (bvsmk_nidxopen) */
 
@@ -769,35 +766,34 @@ local int bvsmk_nidxclose(bvsmk *op) noex {
 } /* end subroutine (bvsmk_nidxclose) */
 
 local int bvsmk_renamefiles(bvsmk *op) noex {
-	cint	clen = MAXNAMELEN ;
+    	cint		maxpath = var.maxpathlen ;
 	int		rs ;
-	cchar		*suf = FSUF_IDX ;
-	cchar		*end = ENDIANSTR ;
-	char		cbuf[MAXNAMELEN+1] ;
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_renamefiles: ent\n") ;
-	debugprintf("bvsmk_renamefiles: idname=%s\n",op->idname) ;
-	debugprintf("bvsmk_renamefiles: dbname=%s\n",op->db) ;
-	debugprintf("bvsmk_renamefiles: nfname=%s\n",op->nidxfname) ;
-#endif
-
-	if ((rs = sncpy4(cbuf,clen,op->db,".",suf,end)) >= 0) {
-	    char	idxfname[MAXPATHLEN + 1] ;
-	    if ((rs = mkpath2(idxfname,op->idname,cbuf)) >= 0) {
-	        if ((rs = u_rename(op->nidxfname,idxfname)) >= 0) {
-	            op->nidxfname[0] = '\0' ;
-	        } else {
-	            u_unlink(op->nidxfname) ;
-	            op->nidxfname[0] = '\0' ;
-	        } /* end if */
-	    } /* end if (mkpath) */
-	} /* end if (ok) */
-
-#if	CF_DEBUG
-	debugprintf("bvsmk_renamefiles: ret rs=%d\n",rs) ;
-#endif
-
+	int		rs1 ;
+	int		ai = 2 ; /* two path buffers */
+	DEBUGPRINTF("ent\n") ;
+	{
+	    cint	psz = (ai * (maxpath + 1)) ;
+	    if (char *a ; (rs = mem.mall(psz,&a)) >= 0) {
+	        cint	clen = maxpath ;
+	        cchar	*suf = FSUF_IDX ;
+	        cchar	*end = ENDIANSTR ;
+	        char	*cbuf = (a + (--ai * (maxpath + 1))) ;
+	        if ((rs = sncpy4(cbuf,clen,op->db,".",suf,end)) >= 0) {
+	            char	*idxfname = (a + (--ai * (maxpath + 1))) ;
+	            if ((rs = mkpath2(idxfname,op->idname,cbuf)) >= 0) {
+	                if ((rs = u_rename(op->nidxfname,idxfname)) >= 0) {
+	                    op->nidxfname[0] = '\0' ;
+	                } else {
+	                    u_unlink(op->nidxfname) ;
+	                    op->nidxfname[0] = '\0' ;
+	                } /* end if */
+	            } /* end if (mkpath) */
+	        } /* end if (ok) */
+		rs1 = mem.free(a) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end block */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bvsmk_renamefiles) */
 
@@ -810,22 +806,22 @@ local int mkdname(cchar *dname,mode_t dm) noex {
 		rs = uc_minmod(dname,dm) ;
 	    }
 	} /* end if (creating directory) */
-
-#if	CF_DEBUG
-	debugprintf("mkdname: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (mkdname) */
 
 local int mknifname(char *rbuf,int type,cchar *id,cchar *db,cchar *suf) noex {
 	int		rs ;
+	int		rs1 ;
 	cchar		*end = ENDIANSTR ;
 	cchar		*fin = (type) ? "xXXXX" : "n" ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mkpath2(tbuf,id,db)) >= 0) {
-	    rs = mkfnamesuf3(rbuf,tbuf,suf,end,fin) ;
-	}
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	    if ((rs = mkpath2(tbuf,id,db)) >= 0) {
+	        rs = mkfnamesuf3(rbuf,tbuf,suf,end,fin) ;
+	    }
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (mknifname) */
 
@@ -844,5 +840,13 @@ local int unlinkstale(cchar *fn,int to) noex {
 	}
 	return rs ;
 } /* end subroutine (unlinkstale) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    maxpathlen = rs ;
+	} /* end if (bufsizeget) */
+    	return rs ;
+} /* end if (vars::operator) */
 
 
