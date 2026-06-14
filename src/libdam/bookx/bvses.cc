@@ -61,13 +61,14 @@
 #include	<mkpathx.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<endian.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	"bvses.h"
 #include	"bvshdr.h"
 #include	"bvsbook.h"
+#include	"bvses.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -196,7 +197,7 @@ const bvses_obj		vcses_modinfo = {
 
 /* exported subroutines */
 
-local int vcses_opens(bvses *op) noex {
+local int bvses_opens(bvses *op) noex {
     	int		rs ;
 	int		rs1 ;
 	if (char *cbuf ; (rs = mem.mn(&cbuf)) >= 0) {
@@ -242,7 +243,7 @@ int bvses_open(bvses *op,cchar *pr,cchar *dbname) noex {
 	            if ((rs = mem.strw(dbname,-1,&cp)) >= 0) {
 	                op->dbname = cp ;
 		        {
-		            rs = vcses_opens(op) ;
+		            rs = bvses_opens(op) ;
 		        }
 	                if (rs < 0) {
 	                    voidp vp = voidp(op->dbname) ;
@@ -329,7 +330,7 @@ int bvses_getinfo(bvses *op,BVSES_INFO *ip) noex {
 		bvses_fmi	*fmip = op->fmip ;
 	        memclear(ip) ;
 	        ip->mtime	= fmip->ti_mod ;
-	        ip->ctime	= (time_t) hip->wtime ;
+	        ip->ctime	= time_t(hip->wtime) ;
 	        ip->nzbooks	= hip->nzbooks ;
 	        ip->nbooks	= hip->btlen ;
 	        ip->nchapters	= hip->ctlen ;
@@ -447,10 +448,10 @@ local int bvses_mapbeginer(bvses *op,time_t dt) noex {
 	int		rs1 ;
 	int		fsz = 0 ; /* return-value */
 	if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
-	    int		fd = rs ;
+	    cint	fd = rs ;
 	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	        if (csize fsize = sb.st_size ; fsize > 0) {
-	            size_t	ms = fsize ;
+	            csize	ms = fsize ;
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
 	            void	*md ;
@@ -490,7 +491,9 @@ local int bvses_mapend(bvses *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (mip->mapdata) {
-	    rs1 = u_munmap(mip->mapdata,mip->mapsize) ;
+	    voidp	md = mip->mapdata ;
+	    csize	ms = mip->mapsize ;
+	    rs1 = u_mmapend(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mip->mapdata = nullptr ;
 	    mip->mapsize = 0 ;
@@ -502,23 +505,27 @@ local int bvses_mapend(bvses *op) noex {
 local int bvses_checkup(bvses *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if (op->ncursors == 0) {
 	    if (dt <= 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	        bvses_fmi	*mip = op->fmip ;
 	        op->ti_lastcheck = dt ;
-	        if (ustat sb ; (rs1 = u_stat(op->fname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(op->fname,&sb)) >= 0) {
 	            f = false ;
 	            f = f || (sb.st_mtime > mip->ti_mod) ;
 	            f = f || (sb.st_mtime > mip->ti_map) ;
 	            if (f) {
-	                rs1 = bvses_loadend(op) ;
-	                if (rs >= 0) rs = rs1 ;
+			{
+	                    rs1 = bvses_loadend(op) ;
+	                    if (rs >= 0) rs = rs1 ;
+			}
 	                if (rs >= 0) {
 	                    rs = bvses_loadbegin(op,dt) ;
 	  	        }
 	            } /* end if (update) */
+		} else if(isNotPresent(rs)) {
+		    rs = SR_OK ;
 	        } /* end if (stat) */
 	    } /* end if (time-out) */
 	} /* end if (no cursors out) */
@@ -528,7 +535,7 @@ local int bvses_checkup(bvses *op,time_t dt) noex {
 local int bvses_proc(bvses *op,time_t dt) noex {
 	bvses_fmi	*mip = op->fmip ;
 	bvshdr		*hip = op->fhip ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	if (mip) {
 	    cint msz = intconv(mip->mapsize) ;
 	    if ((rs = hip->wr(mip->mapdata,msz)) >= 0) {
@@ -544,12 +551,12 @@ local int bvses_proc(bvses *op,time_t dt) noex {
 local int bvses_verify(bvses *op,time_t dt) noex {
 	bvses_fmi	*mip = op->fmip ;
 	bvshdr		*hip = op->fhip ;
-	uint		dtime = (uint) dt ;
+	uint		dtime = uintconv(dt) ;
 	int		rs = SR_OK ;
-	int		sz ;
 	{
 	    cuint	msz = intconv(mip->mapsize) ;
-	    int		f = true ;
+	    int		sz ;
+	    bool	f = true ;
 	    DEBUGPRINTF("ent nverses=%u\n",hip->nverses) ;
 	    f = f && (hip->nverses > 0) ;
 	    f = f && (hip->fsz == msz) ;
