@@ -551,7 +551,7 @@ static int logzones_updater(LZ *op,cc *znb,int znl,int off,cc *st) noex {
 	                        entry_update(&e,st) ;
 	                        entry_write(&e,ebp,ebl) ;
 				/* write into the actual memory window */
-	                        rs = u_pwrite(op->fd,ebp,ebl,eoff) ;
+	                        rs = u_writep(op->fd,ebp,ebl,eoff) ;
 			    }
 			    /* ok, we are done (with just this item) */
 	                    rs1 = entry_finish(&e) ;
@@ -565,7 +565,7 @@ static int logzones_updater(LZ *op,cc *znb,int znl,int off,cc *st) noex {
 	                if ((rs = entry_start(&e,znb,znl,off,np)) >= 0) {
 	                    entry_update(&e,st) ;
 	                    entry_write(&e,ebp,ebl) ;
-	                    if ((rs = u_pwrite(op->fd,ebp,ebl,fsize)) >= 0) {
+	                    if ((rs = u_writep(op->fd,ebp,ebl,fsize)) >= 0) {
 	                        if (rs == ebl) {
 	                            op->fsize += ebl ;
 			        }
