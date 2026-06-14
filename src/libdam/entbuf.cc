@@ -195,7 +195,7 @@ int entbuf_write(entbuf *op,int ei,cvoid *ubuf) noex {
 	            if (ei < 0) ei = op->nentries ;
 	            if (rp) {
 		        coff	poff = op->soff + (ei * op->esz) ;
-	                if ((rs = u_pwrite(op->fd,rp,op->esz,poff)) >= 0) {
+	                if ((rs = u_writep(op->fd,rp,op->esz,poff)) >= 0) {
 		            if (ei >= op->nentries) {
 		                op->nentries = (ei + 1) ;
 		            }
