@@ -33,19 +33,14 @@
 	char		username[] ;
 
 	Arguments:
-
 	pip	program information pointer
 
 	Returns:
-
-	OK	doesn't really matter in the current implementation
-
+	OK	does not really matter in the current implementation
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -55,19 +50,20 @@
 #include	<sys/uio.h>
 #include	<sys/msg.h>
 #include	<netinet/in.h>
+#include	<dirent.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<csignal>
-#include	<time.h>
 #include	<netdb.h>
-#include	<dirent.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
 #include	<pwd.h>
-
-#include	<usystem.h>
+#include	<ctime>
+#include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<field.h>
