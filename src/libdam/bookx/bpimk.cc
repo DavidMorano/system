@@ -117,6 +117,10 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	BVENT		bventry
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+
 
 /* imported namespaces */
 
@@ -146,6 +150,13 @@ const bpimk_obj		bpimk_modinfo = {
 struct bventry {
 	uint	citation ;		/* (nlines, b, c, v) */
 } ; /* end struct (bventry) */
+
+namespace {
+    struct vars {
+	int	maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
@@ -211,8 +222,10 @@ local int	vvecmp			(cvoid **,cvoid **) noex ;
 
 /* local variables */
 
-constexpr uint		bvcitemask = bvcitekey_vmask ;
-static int		maxpathlen(bufsize_mp) ;
+constexpr uint		bvcitemask	= bvcitekey_vmask ;
+static vars		var ;
+static int		maxpathlen	(bufsize_mp) ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -226,28 +239,30 @@ int bpimk_open(bpimk *op,ccharp dbn,int of,mode_t om) noex {
 	if ((rs = bpimk_ctor(op,dbn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (dbn[0]) {
-	        op->om = (om | 0600) ;
-	        op->nfd = -1 ;
-	        op->fl.ofcreat	= MKBOOL(of & O_CREAT) ;
-	        op->fl.ofexcl	= MKBOOL(of & O_EXCL) ;
-	        if (cchar *cp ; (rs = mem.strw(dbn,-1,&cp)) >= 0) {
-	            op->dbname = cp ;
-	            if ((rs = bpimk_filesbegin(op)) >= 0) {
-	                if ((rs = bpimk_listbegin(op,n)) >= 0) {
-	                    op->magval = BPIMK_MAGIC ;
-	                } /* end if */
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
+	            op->om = (om | 0600) ;
+	            op->nfd = -1 ;
+	            op->fl.ofcreat	= MKBOOL(of & O_CREAT) ;
+	            op->fl.ofexcl	= MKBOOL(of & O_EXCL) ;
+	            if (cchar *cp ; (rs = mem.strw(dbn,-1,&cp)) >= 0) {
+	                op->dbname = cp ;
+	                if ((rs = bpimk_filesbegin(op)) >= 0) {
+	                    if ((rs = bpimk_listbegin(op,n)) >= 0) {
+	                        op->magval = BPIMK_MAGIC ;
+	                    } /* end if */
+	                    if (rs < 0) {
+	                        bpimk_filesend(op) ;
+		            } /* end if (error) */
+	                } /* end if (files) */
 	                if (rs < 0) {
-	                    bpimk_filesend(op) ;
-		        } /* end if (error) */
-	            } /* end if (files) */
-	            if (rs < 0) {
-	                if (op->dbname) {
-			    voidp vp = voidp(op->dbname) ;
-	                    mem.free(vp) ;
-	                    op->dbname = nullptr ;
-	                } /* end if (memory-release) */
-	            } /* end if (error) */
-	        } /* end if (memory-acquire) */
+	                    if (op->dbname) {
+			        voidp vp = voidp(op->dbname) ;
+	                        mem.free(vp) ;
+	                        op->dbname = nullptr ;
+	                    } /* end if (memory-release) */
+	                } /* end if (error) */
+	            } /* end if (memory-acquire) */
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 	        bpimk_dtor(op) ;
@@ -385,7 +400,7 @@ local int bpimk_filesbegin(bpimk *op) noex {
 local int bpimk_filesbeginc(bpimk *op) noex {
 	int		rs ;
 	int		rs1 ;
-	int		ai = 2 ;
+	int		ai = 2 ; /* two path buffers */
 	if ((rs = maxpathlen) >= 0) {
 	    cint	sz = (ai * (rs + 1)) ;
 	    cint	maxpath = rs ;
@@ -416,7 +431,7 @@ local int bpimk_filesbeginc(bpimk *op) noex {
 	        rs1 = mem.free(a) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	} /* end if (bufsizeget) */
+	} /* end if (maxpathlen) */
 	return rs ;
 } /* end subroutine (bpimk_filesbeginc) */
 
@@ -453,6 +468,7 @@ local int bpimk_filesbeginwait(bpimk *op) noex {
 
 local int bpimk_filesbegincreate(bpimk *op,cchar *tfn,int of,mode_t om) noex {
 	int		rs ;
+	int		rs1 ;
 #if	CF_DEBUG
 	{
 	    char	obuf[100+1] ;
@@ -465,9 +481,10 @@ local int bpimk_filesbegincreate(bpimk *op,cchar *tfn,int of,mode_t om) noex {
 	    cint	fd = rs ;
 	    op->fl.created = true ;
 	    if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
-	        op->nidxfname = (char *) cp ;
+	        op->nidxfname = charp(cp) ;
 	    } /* end if (memory-acquire) */
-	    u_close(fd) ;
+	    rs1 = u_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (create) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
@@ -531,10 +548,10 @@ local int bpimk_mkidx(bpimk *op) noex {
 	    hdr.vetu[1] = uchar(ENDIAN) ;
 	    hdr.vetu[2] = 0 ;
 	    hdr.vetu[3] = 0 ;
-	    hdr.wtime = (uint) time(nullptr) ;
-	    hdr.nverses = op->nverses ;
-	    hdr.nzverses = op->nzverses ;
-	    hdr.maxbook = op->maxbook ;
+	    hdr.wtime		= (uint) time(nullptr) ;
+	    hdr.nverses		= op->nverses ;
+	    hdr.nzverses	= op->nzverses ;
+	    hdr.maxbook		= op->maxbook ;
 	    hdr.maxchapter = op->maxchapter ;
 	    if ((rs = bpimk_mkidxwrmain(op,&hdr)) >= 0) {
 	        cint	hlen = HDRBUFLEN ;
@@ -588,7 +605,7 @@ local int bpimk_mkidxwrhdr(bpimk *op,bpihdr *hdrp,filer *hfp,int off) noex {
 	    char	hbuf[HDRBUFLEN+1] ;
 	    if ((rs = hdrp->rd(hbuf,hlen)) >= 0) {
 	        cint	bl = rs ;
-	        rs = filer_writefill(hfp,hbuf,bl) ;
+	        rs = hfp->writefill(hbuf,bl) ;
 	        wlen += rs ;
 	    } /* end if (bpihdr_rd) */
 	} /* end if (non-null) */
@@ -597,7 +614,7 @@ local int bpimk_mkidxwrhdr(bpimk *op,bpihdr *hdrp,filer *hfp,int off) noex {
 
 local int bpimk_mkidxwrtab(bpimk *op,bpihdr *hdrp,filer *hfp,int off) noex {
     	vecobj		*vlp = op->vlp ;
-	uint		a[4] ;
+	uint		a[4] = {} ;
 	cint		sz = (1 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ; /* return-value */
@@ -620,34 +637,42 @@ local int bpimk_mkidxwrtab(bpimk *op,bpihdr *hdrp,filer *hfp,int off) noex {
 
 local int bpimk_nidxopen(bpimk *op) noex {
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ;
 	int		of = (O_CREAT|O_WRONLY) ;
+	int		ai = 2 ; /* two path buffes */
 	cmode		om = op->om ;
 	if (op->nidxfname == nullptr) {
-	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
-	    cchar	*dbn = op->dbname ;
-	    cchar	*suf = FSUF_IDX ;
-	    char	tbuf[MAXPATHLEN+1] ;
-	    if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
-	        cchar	*tfn = tbuf ;
-	        char	rbuf[MAXPATHLEN+1] ;
-	        if (type) {
-	            rs = opentmpfile(tbuf,of,om,rbuf) ;
-	            op->nfd = rs ;
-		    fd = rs ;
-	            tfn = rbuf ;
-	        } else {
-	            if (op->fl.ofexcl) of |= O_EXCL ;
-	            rs = uc_open(tbuf,of,om) ;
-	            op->nfd = rs ;
-		    fd = rs ;
-	        }
-	        if (rs >= 0) {
-	            if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
-	                op->nidxfname = cast_const<charp>(cp) ;
-	            } /* end if (memory-acquire) */
-	        } /* end if (ok) */
-	    } /* end if (mknewfname) */
+	    cint psz = (ai * (var.maxpathlen + 1)) ;
+	    cint maxpath = var.maxpathlen ;
+	    if (char *a ; (rs = mem.mall(psz,&a)) >= 0) {
+	        cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
+	        cchar	*dbn = op->dbname ;
+	        cchar	*suf = FSUF_IDX ;
+	        char	*tbuf = (a + (--ai * (maxpath + 1))) ;
+	        if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
+	            cchar	*tfn = tbuf ;
+	            char	*rbuf = (a + (--ai * (maxpath + 1))) ;
+	            if (type) {
+	                rs = opentmpfile(tbuf,of,om,rbuf) ;
+	                op->nfd = rs ;
+		        fd = rs ;
+	                tfn = rbuf ;
+	            } else {
+	                if (op->fl.ofexcl) of |= O_EXCL ;
+	                rs = uc_open(tbuf,of,om) ;
+	                op->nfd = rs ;
+		        fd = rs ;
+	            } /* end if */
+	            if (rs >= 0) {
+	                if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
+	                    op->nidxfname = cast_const<charp>(cp) ;
+	                } /* end if (memory-acquire) */
+	            } /* end if (ok) */
+	        } /* end if (mknewfname) */
+	        rs1 = mem.free(a) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} else {
 	    if (op->fl.ofexcl) of |= O_EXCL ;
 	    rs = uc_open(op->nidxfname,of,om) ;
@@ -670,22 +695,26 @@ local int bpimk_nidxclose(bpimk *op) noex {
 
 local int bpimk_renamefiles(bpimk *op) noex {
 	int		rs ;
-	cchar	*suf = FSUF_IDX ;
-	cchar	*end = ENDIANSTR ;
-	char		idxfname[MAXPATHLEN + 1] ;
-	if ((rs = mkfnamesuf2(idxfname,op->dbname,suf,end)) >= 0) {
-	    if ((rs = u_rename(op->nidxfname,idxfname)) >= 0) {
-	        op->nidxfname[0] = '\0' ;
-	    } else {
-	        u_unlink(op->nidxfname) ;
-	        op->nidxfname[0] = '\0' ;
-	    }
-	} /* end if (mkfnamesuf) */
+	int		rs1 ;
+	if (char *idxfname ; (rs = mem.mp(&idxfname)) >= 0) {
+	    cchar	*suf = FSUF_IDX ;
+	    cchar	*end = ENDIANSTR ;
+	    if ((rs = mkfnamesuf2(idxfname,op->dbname,suf,end)) >= 0) {
+	        if ((rs = u_rename(op->nidxfname,idxfname)) >= 0) {
+	            op->nidxfname[0] = '\0' ;
+	        } else {
+	            u_unlink(op->nidxfname) ;
+	            op->nidxfname[0] = '\0' ;
+	        }
+	    } /* end if (mkfnamesuf) */
+	    rs1 = mem.free(idxfname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (bpimk_renamefiles) */
 
 local uint mkciteload(uint ci,uchar item) noex {
-	ci = (ci << CHAR_BIT) ;
+	ci = (ci << UCHAR_BIT) ;
 	ci |= uint(item) ;
 	return ci ; 
 } /* end subroutine (mkciteload) */
@@ -694,6 +723,7 @@ local int mkcitation(uint *cip,bpimk_v *bvp) noex {
     	int		rs = SR_FAULT ;
 	if (cip && bvp) {
 	    uint	ci = 0 ;
+	    rs = SR_OK ;
 	    ci = mkciteload(ci,0) ;
 	    ci = mkciteload(ci,bvp->b) ;
 	    ci = mkciteload(ci,bvp->c) ;
@@ -727,34 +757,40 @@ local int unlinkstale(cchar *fn,int to) noex {
 
 local int entcmp(BVENT *e1p,BVENT *e2p) noex {
     	int		rc = 0 ;
-	{
-	    cint vc1 = intconv(e1p->citation & bvcitemask) ;
-	    cint vc2 = intconv(e2p->citation & bvcitemask) ;
-	    rc = (vc1 - vc2) ;
-	}
+	if (e1p || e2p) {
+	    if (e1p) {
+	        if (e2p) {
+	    	    cint vc1 = intconv(e1p->citation & bvcitemask) ;
+	    	    cint vc2 = intconv(e2p->citation & bvcitemask) ;
+	    	    rc = (vc1 - vc2) ;
+	        } else {
+	            rc = -1 ;
+	        }
+	    } else {
+	        rc = +1 ;
+	    }
+	} /* end if (non-null) */
 	return rc ;
 } /* end subroutine (entcmp) */
 
 local int vvecmp(cvoid **v1pp,cvoid **v2pp) noex {
-	bventry	**e1pp = (bventry **) v1pp ;
-	bventry	**e2pp = (bventry **) v2pp ;
+	bventry		**e1pp = (bventry **) v1pp ;
+	bventry		**e2pp = (bventry **) v2pp ;
 	int		rc = 0 ;
-	{
+	if (e1pp && e2pp) {
 	    bventry	*e1p = *e1pp ;
 	    bventry	*e2p = *e2pp ;
-	    if (e1p && e2p) {
-	        if (e1p) {
-	            if (e2p) {
-			rc = entcmp(e1p,e2p) ;
-	            } else {
-	                rc = -1 ;
-	            }
-	        } else {
-	            rc = +1 ;
-	        }
-	    } /* end if (non-null) */
+	    rc = entcmp(e1p,e2p) ;
 	} /* end block */
 	return rc ;
 } /* end subroutine (vvecmp) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    maxpathlen = rs ;
+	} /* end if (bufsizeget) */
+    	return rs ;
+} /* end if (vars::operator) */
 
 
