@@ -587,7 +587,7 @@ local int cyimk_mkidx(CYIMK *op) noex {
 
 	        if ((rs = cyihdr(&hdr,0,hbuf,hlen)) >= 0) {
 	            cint	bl = rs ;
-	            if ((rs = u_pwrite(op->nfd,hbuf,bl,0L)) >= 0) {
+	            if ((rs = u_writep(op->nfd,hbuf,bl,0L)) >= 0) {
 	                cmode	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
 	            }
