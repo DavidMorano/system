@@ -5,7 +5,7 @@
 /* process a possible bible citation */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* used for little object below */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -18,17 +18,20 @@
 
 /*******************************************************************************
 
+  	Object:
+	biblecite
+
   	Description:
 	This subroutine determines if a string is a bible citation.
 
 	Synopsis:
-	int isbiblecite(sp,sl,bcp,sip)
-	cchar	*sp ;
-	int		sl ;
-	BIBLECITE	*bcp ;
-	int		*sip ;
+	int biblecite_ver(biblecite *qp,cchar *lp,int ll,int *sip) noex
 
 	Arguments:
+	qp		object pointer
+	lp		source string pointer
+	ll		source string length
+	sip		??
 
 	Returns:
 	>=0		OK
@@ -37,17 +40,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<char.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DPRINTF(3debug)| */
 
 #include	"biblecite.h"
 
@@ -56,6 +63,10 @@
 import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* external subroutines */
@@ -72,93 +83,73 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local variables */
 
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int isbiblecite(BIBLECITE *qp,cchar *lp,int ll,int *sip) noex {
-	uint		v ;
+int biblecite_ver(biblecite *qp,cchar *lp,int ll,int *sip) noex {
+    	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		sl, cl ;
-	int		i ;
-	int		ch ;
-	int		si ;
-	int		f = FALSE ;
-	cchar	*tp, *sp, *cp ;
-
-	memclear(qp) ;
-
-	sp = lp ;
-	sl = ll ;
-	if ((si = siskipwhite(lp,ll)) > 0) {
-	    sp += si ;
-	    sl -= si ;
-	}
-
-	ch = MKCHAR(sp[0]) ;
-	if ((sl >= 5) && isdigitlatin(ch)) {
-
-	for (i = 0 ; i < 3 ; i += 1) {
-
-	    cp = sp ;
-	    cl = sl ;
-	    if ((tp = strnbrk(sp,sl,": \t\n")) != NULL) {
-	        cl = (tp - sp) ;
-	        sl -= ((tp + 1) - sp) ;
-	        sp = (tp + 1) ;
-	    } else {
-	        cl = sl ;
-	        sp += sl ;
-	        sl = 0 ;
+	int		si = 0 ; /* return-value */
+	bool		f = false ;
+	if (qp) {
+	    int		ch ;
+	    int		sl = ll ;
+	    cchar	*sp = lp ;
+	    rs = memclear(qp) ;
+	    if ((si = siskipwhite(lp,ll)) > 0) {
+	        sp += si ;
+	        sl -= si ;
+	    } /* end if */
+	    ch = MKCHAR(sp[0]) ;
+	    if ((sl >= 5) && isdigitlatin(ch)) {
+	        int i{} ;
+	        for (i = 0 ; i < 3 ; i += 1) {
+	            cchar	*cp = sp ;
+	    	    uint	v ;
+	            int		cl = sl ;
+	            if (cchar *tp = strnbrk(sp,sl,": \t\n") ; tp) {
+	                cl = intconv(tp - sp) ;
+	                sl -= intconv((tp + 1) - sp) ;
+	                sp = (tp + 1) ;
+	            } else {
+	                cl = sl ;
+	                sp += sl ;
+	                sl = 0 ;
+	            } /* end if */
+	            if (cl == 0) break ;
+	            si = intconv((cp + cl) - lp) ;
+	            rs1 = cfdecui(cp,cl,&v) ;
+	            DEBUGPRINTF("cfdecui() rs=%d\n",rs1) ;
+	            if (rs1 < 0) break ;
+	            switch (i) {
+	            case 0:
+	                qp->b = v ;
+	                break ;
+	            case 1:
+	                qp->c = v ;
+	                break ;
+	            case 2:
+	                qp->v = v ;
+	                break ;
+	            } /* end switch */
+	        } /* end for */
+	        f = (i == 3) ;
+	        if (f) {
+	            si += siskipwhite(sp,sl) ;
+	        }
+	    } /* end if (ok) */
+	    if (sip) {
+	        *sip = (f) ? si : 0 ;
 	    }
-
-	    if (cl == 0)
-	        break ;
-
-	    si = ((cp + cl) - lp) ;
-	    rs1 = cfdecui(cp,cl,&v) ;
-
-#if	CF_DEBUGS && 0
-	debugprintf("isbiblecite: cfdecui() rs=%d\n",rs1) ;
-#endif
-
-	    if (rs1 < 0)
-	        break ;
-
-	    switch (i) {
-	    case 0:
-	        qp->b = v ;
-	        break ;
-	    case 1:
-	        qp->c = v ;
-	        break ;
-	    case 2:
-	        qp->v = v ;
-	        break ;
-	    } /* end switch */
-
-	} /* end for */
-
-	f = (i == 3) ;
-	if (f) {
-	    si += siskipwhite(sp,sl) ;
-	}
-
-	} /* end if (ok) */
-
-	if (sip != NULL) {
-	    *sip = (f) ? si : 0 ;
-	}
-
-#if	CF_DEBUGS && 0
-	debugprintf("isbiblecite: f=%u si=%u\n",f,si) ;
-#endif
-
-	return (f) ? si : 0  ;
-}
-/* end subroutine (isbiblecite) */
-
+	    if (!f) si = 0 ;
+	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d f=%u si=%u\n",rs,f,si) ;
+	return (rs >= 0) ? si : 0 ;
+} /* end subroutine (biblecite_ver) */
 
 
