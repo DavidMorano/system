@@ -211,7 +211,7 @@ int termenq_write(TE *op,int ei,TE_ENT *ep) noex {
 	        }
 	        if (rs >= 0) {
 	            coff	poff = off_t(ei * esz) ;
-	            rs = u_pwrite(op->fd,ep,esz,poff) ;
+	            rs = u_writep(op->fd,ep,esz,poff) ;
 	        }
 	    } else {
 	        rs = SR_BADF ;
