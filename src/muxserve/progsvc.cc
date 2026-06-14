@@ -1,19 +1,19 @@
-/* progsvc */
+/* progsvc SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle some service processing */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
 #define	CF_DEBUGN	0		/* special (live) debugging */
 
-
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-	This subroutine was borrowed and modified from previous generic
-	front-end 'main' subroutines!
+	This subroutine was borrowed and modified from previous
+	generic front-end 'main' subroutines!
 
 */
 
@@ -21,25 +21,24 @@
 
 /*******************************************************************************
 
-        This module handles initializing, checking, and freeing the service-file
-        object.
-
+  	Description:
+	This module handles initializing, checking, and freeing the
+	service-file object.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
+#include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<logfile.h>
 #include	<svcfile.h>
@@ -55,10 +54,6 @@
 #define	VARPATH		"PATH"
 #endif
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 #undef	DEBFNAME
 #define	DEBFNAME	"svcfile.deb"
 
@@ -71,36 +66,13 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	getfname(const char *,const char *,int,char *) ;
-
-extern int	securefile(const char *,uid_t,gid_t) ;
-
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -115,42 +87,42 @@ int	progsvcopen(PROGINFO *) ;
 int	progsvcclose(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-static int	proclist(PROGINFO *,const char *) ;
+static int	proclist(PROGINFO *,cchar *) ;
 #endif
 
 
 /* local variables */
 
 /* 'conf' for most regular programs */
-static const char	*sched_system[] = {
+constexpr cpcchar	sched_system[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
-	NULL
+	nullptr
 } ;
 
-static const char	*sched_user[] = {
+constexpr cpcchar	sched_user[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
 	"%h/%n.%f",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int progsvcopen(pip)
-PROGINFO	*pip ;
-{
-	const int	tlen = MAXPATHLEN ;
+int progsvcopen(proginfo *pip) noex {
+	cint	tlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cl ;
 	int		f_secreq = TRUE ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
@@ -172,7 +144,7 @@ PROGINFO	*pip ;
 	    debugprintf("progsvcopen: 0 svcfname=%r\n",cp,cl) ;
 #endif
 
-	if ((cp == NULL) || (cp[0] == '+')) {
+	if ((cp == nullptr) || (cp[0] == '+')) {
 	    cp = SVCFNAME ;
 	    cl = -1 ;
 	}
@@ -182,7 +154,7 @@ PROGINFO	*pip ;
 	    debugprintf("progsvcopen: 1 svcfname=%r\n",cp,cl) ;
 #endif
 
-	if (strchr(cp,'/') == NULL) {
+	if (strchr(cp,'/') == nullptr) {
 	    VECSTR	*plp = &pip->svars ;
 	    cchar	**sched ;
 
@@ -237,7 +209,7 @@ PROGINFO	*pip ;
 	}
 #endif
 
-	if ((rs >= 0) && (rs1 >= 0) && (cp != NULL)) {
+	if ((rs >= 0) && (rs1 >= 0) && (cp != nullptr)) {
 	    cchar	**vpp = &pip->svcfname ;
 	    rs = proginfo_setentry(pip,vpp,cp,cl) ;
 #if	CF_DEBUG
@@ -258,7 +230,7 @@ PROGINFO	*pip ;
 	if (pip->open.logprog)
 	    proglog_printf(pip,"svc=%s\n",pip->svcfname) ;
 
-	if ((rs = perm(pip->svcfname,-1,-1,NULL,R_OK)) >= 0) {
+	if ((rs = perm(pip->svcfname,-1,-1,nullptr,R_OK)) >= 0) {
 	    if (pip->fromconf.svcfname) {
 	        pip->fl.secure_svcfile = 
 	            pip->fl.secure_root && pip->fl.secure_conf ;
@@ -416,16 +388,16 @@ PROGINFO	*pip ;
 #if	CF_DEBUG && CF_DEBUGN && defined(DEBFNAME)
 	if ((rs >= 0) && c) {
 	    SVCFILE_ENT	sv ;
-	    const int	svlen = SVBUFLEN ;
+	    cint	svlen = SVBUFLEN ;
 	    int		rs1 ;
 	    int		i ;
-	    const char	*sn = "helloworld" ;
+	    cchar	*sn = "helloworld" ;
 	    char	svbuf[SVBUFLEN + 1] ;
-	    rs1 = svcfile_fetch(&pip->stab,sn,NULL,&sv,svbuf,svlen) ;
+	    rs1 = svcfile_fetch(&pip->stab,sn,nullptr,&sv,svbuf,svlen) ;
 	    nprintf(DEBFNAME,"progsvccheck: svcfile_fetch() rs=%d\n",rs1) ;
 	    if (rs1 >= 0) {
 	        nprintf(DEBFNAME,"progsvccheck: svc=%s\n",sv.svc) ;
-	        for (i = 0 ; sv.keyvals[i][0] != NULL ; i += 1) {
+	        for (i = 0 ; sv.keyvals[i][0] != nullptr ; i += 1) {
 	            nprintf(DEBFNAME,"progsvccheck: k=%s v=>%s<\n",
 	                sv.keyvals[i][0],sv.keyvals[i][1]) ;
 		}
@@ -447,11 +419,11 @@ ret0:
 
 static int proclist(pip,s)
 PROGINFO	*pip ;
-const char	*s ;
+cchar	*s ;
 {
 	SVCFILE		*svcp = &pip->stab ;
 	SVCFILE_CUR	cur ;
-	const int	svclen = SVCBUFLEN ;
+	cint	svclen = SVCBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl ;
@@ -461,7 +433,7 @@ const char	*s ;
 	if (! pip->open.svcfname)
 	    goto ret0 ;
 
-	if (s == NULL) s = "" ;
+	if (s == nullptr) s = "" ;
 
 	if ((rs = svcfile_curbegin(svcp,&cur)) >= 0) {
 
