@@ -45,7 +45,7 @@ template<typename ... Args>
 inline int mkfname(char *dp,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return mkfnamex(dp,na,args ...) ;
-}
+} /* end subroutine-template */
 
 #endif /* __cplusplus */
 
