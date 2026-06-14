@@ -161,8 +161,8 @@ local int	bvi_search		(bvi *,bvi_q *) noex ;
 local int	bvi_loadbve		(bvi *,bvi_v *,char *,int,int) noex ;
 local int	bvi_loadchapters	(bvi *,int,uchar *,int) noex ;
 
-local int	mkcitekey(uint *,bvi_q *) noex ;
-local int	vtecmp(cvoid *,cvoid *) noex ;
+local int	mkcitekey	(uint *,bvi_q *) noex ;
+local int	vtecmp		(cvoid *,cvoid *) noex ;
 
 
 /* local variables */
@@ -238,8 +238,7 @@ int bvi_open(bvi *op,cchar *dbn) noex {
 	    } /* end if (error) */
 	} /* end if (bvi_ctor) */
 	return (rs >= 0) ? nv : rs ;
-}
-/* end subroutine (bvi_open) */
+} /* end subroutine (bvi_open) */
 
 int bvi_close(bvi *op) noex {
 	int		rs ;
@@ -268,8 +267,7 @@ int bvi_close(bvi *op) noex {
 	    op->magval = 0 ;
 	} /* end if (bvi_magic) */
 	return rs ;
-}
-/* end subroutine (bvi_close) */
+} /* end subroutine (bvi_close) */
 
 int bvi_audit(bvi *op) noex {
 	int		rs ;
@@ -278,8 +276,7 @@ int bvi_audit(bvi *op) noex {
 	    rs = bvi_auditvt(op) ;
 	} /* end if (bvi_magic) */
 	return rs ;
-}
-/* end subroutine (bvi_audit) */
+} /* end subroutine (bvi_audit) */
 
 int bvi_count(bvi *op) noex {
 	int		rs ;
@@ -289,8 +286,7 @@ int bvi_count(bvi *op) noex {
 	    nv = hip->nverses ;
 	} /* end if (bvi_magic) */
 	return (rs >= 0) ? nv : rs ;
-}
-/* end subroutine (bvi_count) */
+} /* end subroutine (bvi_count) */
 
 int bvi_getinfo(bvi *op,bvi_info *ip) noex {
 	int		rs ;
@@ -310,8 +306,7 @@ int bvi_getinfo(bvi *op,bvi_info *ip) noex {
 	    } /* end if (non-null) */
 	} /* end if (bvi_magic) */
 	return (rs >= 0) ? nv : rs ;
-}
-/* end subroutine (bvi_getinfo) */
+} /* end subroutine (bvi_getinfo) */
 
 int bvi_read(bvi *op,bvi_v *bvep,char *vbuf,int vlen,bvi_q *qp) noex {
 	int		rs ;
@@ -329,13 +324,11 @@ int bvi_read(bvi *op,bvi_v *bvep,char *vbuf,int vlen,bvi_q *qp) noex {
 	    } /* end if (ok) */
 	} /* end if (bvi_magic) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (bvi_read) */
+} /* end subroutine (bvi_read) */
 
 int bvi_get(bvi *op,bvi_q *qp,bvi_v *bvep,char *vbuf,int vlen) noex {
 	return bvi_read(op,bvep,vbuf,vlen,qp) ;
-}
-/* end subroutine (bvi_get) */
+} /* end subroutine (bvi_get) */
 
 int bvi_curbegin(bvi *op,bvi_cur *curp) noex {
     	int		rs ;
@@ -344,8 +337,7 @@ int bvi_curbegin(bvi *op,bvi_cur *curp) noex {
 	    op->ncursors += 1 ;
 	} /* end if (bvi_magic) */
 	return rs ;
-}
-/* end subroutine (bvi_curbegin) */
+} /* end subroutine (bvi_curbegin) */
 
 int bvi_curend(bvi *op,bvi_cur *curp) noex {
     	int		rs ;
@@ -356,8 +348,7 @@ int bvi_curend(bvi *op,bvi_cur *curp) noex {
 	    }
 	} /* end if (bvi_magic) */
 	return rs ;
-}
-/* end subroutine (bvi_curend) */
+} /* end subroutine (bvi_curend) */
 
 int bvi_curenum(bvi *op,bvi_cur *curp,bvi_v *bvep,char *vbuf,int vlen) noex {
 	int		rs ;
@@ -377,8 +368,7 @@ int bvi_curenum(bvi *op,bvi_cur *curp,bvi_v *bvep,char *vbuf,int vlen) noex {
 	    } /* end if (valid) */
 	} /* end if (bvi_magic) */
 	return (rs >= 0) ? nlines : rs ;
-}
-/* end subroutine (bvi_curenum) */
+} /* end subroutine (bvi_curenum) */
 
 int bvi_chapters(bvi *op,int book,uchar *ap,int al) noex {
 	int		rs ;
@@ -398,8 +388,7 @@ int bvi_chapters(bvi *op,int book,uchar *ap,int al) noex {
 	    } /* end if (valid) */
 	} /* end if (bvi_magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (bvi_chapters) */
+} /* end subroutine (bvi_chapters) */
 
 
 /* private subroutines */
@@ -526,22 +515,19 @@ local int bvi_verify(bvi *op,time_t dt) noex {
 	bvihdr		*hip = op->fhip ;
 	int		rs = SR_OK ;
 	int		sz ;
-	int		f = true ;
-
+	bool		f = true ;
 	f = f && (hip->fsz == mip->mapsize) ;
 	f = f && (hip->wtime > 0) ;
 	if (f) {
 	    custime	tt = time_t(hip->wtime) ;
 	    f = (dt >= tt) ;
 	}
-
 #ifdef	COMMENT
 	{
 	    cuint	utime = (uint) dt ;
 	    f = f && (hip->wtime <= (utime + SHIFTINT)) ;
 	}
 #endif
-
 	/* alignment restriction */
 	f = f && ((hip->vioff & (szof(int)-1)) == 0) ;
 	f = f && (hip->vioff <= mip->mapsize) ;
@@ -559,7 +545,6 @@ local int bvi_verify(bvi *op,time_t dt) noex {
 	if (! f) {
 	    rs = SR_BADFMT ;
 	}
-
 	return rs ;
 } /* end subroutine (bvi_verify) */
 
@@ -685,10 +670,9 @@ local int bvi_loadchapters(bvi *op,int vi,uchar *ap,int al) noex {
 	int		rs1 ;
 	int		vtlen ;
 	int		n = 0 ; /* return-value */
-
 	{
-	vt = mip->vt ;
-	vtlen = hip->vilen ;
+	    vt = mip->vt ;
+	    vtlen = hip->vilen ;
 	}
 	if (vi < vtlen) {
 	    bvcitekey	ck ;
@@ -726,7 +710,6 @@ local int bvi_loadchapters(bvi *op,int vi,uchar *ap,int al) noex {
 		}
 	    } /* end if (ok) */
 	} /* end if */
-
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (bvi_loadchapters) */
 
