@@ -27,13 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<vecpstr.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"biblebooks.h"
 
@@ -63,11 +64,14 @@
 
 /* exported variables */
 
-extern const biblebooks_obj	biblebooks_modinfo = {
+const biblebooks_obj	biblebooks_modinfo = {
 	"biblebooks",
 	szof(biblebooks),
 	szof(int)
-} ;
+} ; /* end initialization */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -101,13 +105,10 @@ int biblebooks_open(BIBLEBOOKS *op,cchar *pr,cchar *dbname) noex {
 	} /* end if (vecpstr_start) */
 
 	return rs ;
-}
-/* end subroutine (biblebooks_open) */
-
+} /* end subroutine (biblebooks_open) */
 
 /* free up the entire vector string data structure object */
-int biblebooks_close(BIBLEBOOKS *op)
-{
+int biblebooks_close(BIBLEBOOKS *op) {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -120,12 +121,9 @@ int biblebooks_close(BIBLEBOOKS *op)
 
 	op->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (biblebooks_close) */
+} /* end subroutine (biblebooks_close) */
 
-
-int biblebooks_count(BIBLEBOOKS *op)
-{
+int biblebooks_count(BIBLEBOOKS *op) {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -135,12 +133,9 @@ int biblebooks_count(BIBLEBOOKS *op)
 	rs = vecpstr_count(&op->db) ;
 
 	return rs ;
-}
-/* end subroutine (biblebooks_count) */
+} /* end subroutine (biblebooks_count) */
 
-
-int biblebooks_max(BIBLEBOOKS *op)
-{
+int biblebooks_max(BIBLEBOOKS *op) {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -152,12 +147,9 @@ int biblebooks_max(BIBLEBOOKS *op)
 	}
 
 	return rs ;
-}
-/* end subroutine (biblebooks_max) */
+} /* end subroutine (biblebooks_max) */
 
-
-int biblebooks_audit(BIBLEBOOKS *op)
-{
+int biblebooks_audit(BIBLEBOOKS *op) {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -167,12 +159,9 @@ int biblebooks_audit(BIBLEBOOKS *op)
 	rs = vecpstr_audit(&op->db) ;
 
 	return rs ;
-}
-/* end subroutine (biblebooks_audit) */
+} /* end subroutine (biblebooks_audit) */
 
-
-int biblebooks_lookup(BIBLEBOOKS *op,char *rbuf,int rlen,int bi)
-{
+int biblebooks_lookup(BIBLEBOOKS *op,char *rbuf,int rlen,int bi) {
 	int		rs ;
 	const char	*cp ;
 
@@ -194,23 +183,16 @@ int biblebooks_lookup(BIBLEBOOKS *op,char *rbuf,int rlen,int bi)
 #endif
 
 	return rs ;
-}
-/* end subroutine (biblebooks_lookup) */
+} /* end subroutine (biblebooks_lookup) */
 
-
-int biblebooks_get(BIBLEBOOKS *op,int bi,char *rbuf,int rlen)
-{
+int biblebooks_get(BIBLEBOOKS *op,int bi,char *rbuf,int rlen) {
 	return biblebooks_lookup(op,rbuf,rlen,bi) ;
-}
-/* end subroutine (biblebooks_get) */
+} /* end subroutine (biblebooks_get) */
 
-
-int biblebooks_size(BIBLEBOOKS *op)
-{
+int biblebooks_size(BIBLEBOOKS *op) {
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
 	return vecpstr_strsize(&op->db) ;
-}
-/* end subroutine (biblebooks_size) */
+} /* end subroutine (biblebooks_size) */
 
 
