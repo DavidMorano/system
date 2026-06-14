@@ -27,7 +27,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<math.h>
