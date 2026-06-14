@@ -28,16 +28,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<vecstr.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD*/
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"biblemeta.h"
 
@@ -125,7 +125,7 @@ biblemeta_obj	biblemeta_modinfo = {
 	"biblemeta",
 	szof(biblemeta),
 	0
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -146,8 +146,7 @@ int biblemeta_open(BM *op,cchar *pr,cchar *dbn) noex {
 	    }
 	} /* end if (biblemeta_ctor) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (biblemeta_open) */
+} /* end subroutine (biblemeta_open) */
 
 int biblemeta_close(BM *op) noex {
 	int		rs ;
@@ -164,8 +163,7 @@ int biblemeta_close(BM *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (biblemeta_close) */
+} /* end subroutine (biblemeta_close) */
 
 int biblemeta_count(BM *op) noex {
 	int		rs ;
@@ -173,8 +171,7 @@ int biblemeta_count(BM *op) noex {
 	    rs = vecstr_count(op->dbp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (biblemeta_count) */
+} /* end subroutine (biblemeta_count) */
 
 int biblemeta_nummax(BM *op) noex {
 	int		rs ;
@@ -184,8 +181,7 @@ int biblemeta_nummax(BM *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (biblemeta_nummax) */
+} /* end subroutine (biblemeta_nummax) */
 
 int biblemeta_audit(BM *op) noex {
 	int		rs ;
@@ -193,8 +189,7 @@ int biblemeta_audit(BM *op) noex {
 	    rs = vecstr_audit(op->dbp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (biblemeta_audit) */
+} /* end subroutine (biblemeta_audit) */
 
 int biblemeta_get(BM *op,int i,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -204,8 +199,7 @@ int biblemeta_get(BM *op,int i,char *rbuf,int rlen) noex {
 	}
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (biblemeta_get) */
+} /* end subroutine (biblemeta_get) */
 
 
 /* local subroutines */
@@ -232,7 +226,6 @@ local int biblemeta_opener(BM *op,cc *pr,cc *dbn) noex {
 	    }
 	} /* end if (vecstr_start) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (biblemeta_opener) */
+} /* end subroutine (biblemeta_opener) */
 
 
