@@ -900,11 +900,11 @@ local int ts_filetopwrite(ts *op,time_t dt) noex {
 	        op->vetu[vetu_type] = 0 ;
 	        op->h = {} ;
 	    }
-	    if ((rs = u_pwrite(op->fd,op->topbuf,bl,poff)) >= 0) {
+	    if ((rs = u_writep(op->fd,op->topbuf,bl,poff)) >= 0) {
 	        op->filesize = rs ;
 	        op->topsize = rs ;
 	        op->fl.fileinit = true ;
-	    } /* end if (u_pwrite) */
+	    } /* end if (u_writep) */
 	} /* end if (mkmagic) */
 	return rs ;
 }
@@ -1235,7 +1235,7 @@ local int ts_headwrite(ts *op) noex {
 	    cchar	*bp = (op->topbuf + headtaboff) ;
 	    cint	bl = (taboff - headtaboff) ;
 	    coff	poff = headtaboff ;
-	    rs = u_pwrite(op->fd,bp,bl,poff) ;
+	    rs = u_writep(op->fd,bp,bl,poff) ;
 	}
 	return rs ;
 }
