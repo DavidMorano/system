@@ -60,6 +60,10 @@ import libutil ;			/* |memclear(3u)| */
 #define	SYMNAMELEN	60
 #endif
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
+
 
 /* imported namespaces */
 
@@ -169,15 +173,23 @@ enum subs {
 	sub_overlast
 } ; /* end enum */
 
-constexpr cpcchar	subnames[] = {
-	"open",
-	"count",
-	"getinfo",
-	"mkmodq",
-	"audit",
-	"close",
-	nullptr
-} ; /* end array (subnames) */
+namespace {
+    struct subnamer {
+	cchar		*n[sub_overlast + 1] ;
+        consteval subnamer() noex {
+	    n[sub_open]		= "open" ;
+	    n[sub_count]	= "count" ;
+	    n[sub_getinfo]	= "getinfo" ;
+	    n[sub_mkmodq]	= "mkmodq" ;
+	    n[sub_audit]	= "audit" ;
+	    n[sub_close]	= "close" ;
+	    n[sub_overlast]	= nullptr ;
+	} ; /* end ctor */
+    } ; /* end struct (subnamer) */
+} /* end namespace */
+
+constexpr subnamer	subname ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -251,7 +263,7 @@ int bvs_count(bvs *op) noex {
 	return rs ;
 } /* end subroutine (bvs_count) */
 
-int bvs_getinfo(bvs *op,BVS_INFO *ip) noex {
+int bvs_getinfo(bvs *op,bvs_info *ip) noex {
 	int		rs ;
 	int		n = 0 ; /* return-value */
 	if ((rs = bvs_magic(op)) >= 0) {
@@ -324,7 +336,7 @@ local int bvs_objloadbegin(bvs *op,cchar *pr,cchar *objn) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) {
 	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = BVS_MODBNAME ;
 	            cchar	*on = objn ;
