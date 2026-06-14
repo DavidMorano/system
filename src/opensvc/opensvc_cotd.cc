@@ -188,8 +188,8 @@ cchar	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
