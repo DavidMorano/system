@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<modload.h>		/* LIBUC */
 
-#include	<bvses.h>
+#include	<bvses.h>		/* LIBDAM */
 
 
 #define	BVS		struct bvs_head
