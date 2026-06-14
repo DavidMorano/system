@@ -27,20 +27,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>
-#include	<usystem.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<six.h>
-#include	<cfdec.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"biblecur.h"
 
@@ -67,34 +68,31 @@ extern "C" {
 /* forward references */
 
 template<typename ... Args>
-static int biblecur_ctor(biblecur *op,Args ... args) noex {
+local int biblecur_ctor(biblecur *op,Args ... args) noex {
     	BIBLECUR	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (biblecur_ctor) */
+} /* end subroutine (biblecur_ctor) */
 
-static int biblecur_dtor(biblecur *op) noex {
+local int biblecur_dtor(biblecur *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (biblecur_dtor) */
+} /* end subroutine (biblecur_dtor) */
 
 template<typename ... Args>
-static inline int biblecur_magic(biblecur *op,Args ... args) noex {
+local inline int biblecur_magic(biblecur *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == BIBLECUR_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (biblecur_magic) */
+} /* end subroutine (biblecur_magic) */
 
 
 /* local variables */
@@ -116,8 +114,7 @@ int biblecur_start(biblecur *op) noex {
 	    } /* end if (error) */
 	} /* end if (biblecur_ctor) */
 	return rs ;
-}
-/* end subroutine (biblecur_start) */
+} /* end subroutine (biblecur_start) */
 
 int biblecur_finish(biblecur *op) noex {
     	int		rs ;
@@ -132,8 +129,7 @@ int biblecur_finish(biblecur *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (biblecur_finish) */
+} /* end subroutine (biblecur_finish) */
 
 int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	int		rs ;
@@ -206,8 +202,7 @@ int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	    } /* end if (positive) */
 	} /* end if (magic) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (biblecur_check) */
+} /* end subroutine (biblecur_check) */
 
 int biblecur_newbook(biblecur *op,biblebook *bbp) noex {
 	int		rs ;
@@ -224,8 +219,7 @@ int biblecur_newbook(biblecur *op,biblebook *bbp) noex {
 	    op->fl.newbook = false ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (biblecur_newbook) */
+} /* end subroutine (biblecur_newbook) */
 
 int biblecur_newchapter(biblecur *op) noex {
     	int		rs ;
@@ -235,8 +229,7 @@ int biblecur_newchapter(biblecur *op) noex {
 	     op->fl.newchapter = false ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (biblecur_newchapter) */
+} /* end subroutine (biblecur_newchapter) */
 
 int biblecur_newverse(biblecur *op,int sl) noex {
     	int		rs ;
@@ -248,7 +241,6 @@ int biblecur_newverse(biblecur *op,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (biblecur_newverse) */
+} /* end subroutine (biblecur_newverse) */
 
 
