@@ -51,12 +51,19 @@ OBJPART05= libutil-resumelife.o libutil-stpcpy.o
 OBJPART06= libutil-strcopy.o libutil-strcpy.o
 OBJPART07= libutil-memload.o libutil-strcmp.o
 
+OBJPART08= libutil-getbyte.o
+OBJPART09=
+OBJPART10=
+OBJPART11=
+
 OBJPARTA= objpart00.o objpart01.o 
 OBJPARTB= objpart02.o objpart03.o 
 OBJPARTC= objpart04.o objpart05.o 
 OBJPARTD= objpart06.o objpart07.o
+OBJPARTE= objpart08.o
 
-OBJPART= objparta.o objpartb.o objpartc.o objpartd.o
+OBJPART+= objparta.o objpartb.o objpartc.o objpartd.o
+OBJPART+= objparte.o
 
 OBJPRIME= libutil0.o
 
@@ -160,6 +167,18 @@ objpart06.o:		$(OBJPART06)
 objpart07.o:		$(OBJPART07)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objpart08.o:		$(OBJPART08)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart09.o:		$(OBJPART09)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart10.o:		$(OBJPART10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpart11.o:		$(OBJPART11)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 objparta.o:		$(OBJPARTA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -171,6 +190,18 @@ objpartc.o:		$(OBJPARTC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objpartd.o:		$(OBJPARTD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objparte.o:		$(OBJPARTE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpartf.o:		$(OBJPARTF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objpartg.o:		$(OBJPARTG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objparth.o:		$(OBJPARTH)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -247,6 +278,18 @@ libutil6.o:		libutil6.cc libutil.ccm
 libutil7.o:		libutil7.cc libutil.ccm
 	$(COMPILE.cc) $<
 
+libutil8.o:		libutil8.cc libutil.ccm
+	$(COMPILE.cc) $<
+
+libutil9.o:		libutil9.cc libutil.ccm
+	$(COMPILE.cc) $<
+
+libutil10.o:		libutil10.cc libutil.ccm
+	$(COMPILE.cc) $<
+
+libutil11.o:		libutil11.cc libutil.ccm
+	$(COMPILE.cc) $<
+
 libutil-cvtconst.o:	libutil-cvtconst.ccm			$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
@@ -293,6 +336,9 @@ libutil-strcopy.o:	libutil-strcopy.ccm			$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
 libutil-strcmp.o:	libutil-strcmp.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
+
+libutil-getbyte.o:	libutil-getbyte.ccm			$(INCS)
 	gxx -c -x c++ -o $@ -O $<
 
 
