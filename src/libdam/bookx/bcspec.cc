@@ -144,8 +144,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bcspec_load) */
+} /* end subroutine (bcspec_load) */
 
 
 /* local subroutines */
