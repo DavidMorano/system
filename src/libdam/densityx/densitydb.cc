@@ -471,7 +471,7 @@ int densitydb_update(DD *op,time_t dt,int idx,DD_ENT *ep) noex {
 	    eoff = DENSITYDB_FOTAB + (ei * op->ebs) ;
 
 	    uoff = eoff ;
-	    rs = u_pwrite(op->fd,bep,wlen,uoff) ;
+	    rs = u_writep(op->fd,bep,wlen,uoff) ;
 
 	    if (rs >= wlen) {
 
@@ -652,7 +652,7 @@ local int densitydb_fileinit(DD *op,time_t dt) noex {
 
 /* write them to the file */
 
-	        rs = u_pwrite(op->fd,fbuf,bl,0L) ;
+	        rs = u_writep(op->fd,fbuf,bl,0L) ;
 
 	        if (rs > 0) {
 
@@ -966,7 +966,7 @@ local int densitydb_writehead(DD *op) noex {
 	if ((rs = filehead(fbuf,0,&op->h)) >= 0) {
 	    coff	uoff = DENSITYDB_FOHEAD ;
 	    cint	bl = rs ;
-	    rs = u_pwrite(op->fd,fbuf,bl,uoff) ;
+	    rs = u_writep(op->fd,fbuf,bl,uoff) ;
 	}
 	return rs ;
 }
