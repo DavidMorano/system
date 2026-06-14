@@ -67,7 +67,7 @@
 #include	<cstring>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<char.h>
@@ -177,8 +177,8 @@ const char	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	const int	ulen = USERNAMELEN ;
 	const int	llen = LINEBUFLEN ;
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -556,7 +556,7 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
 {
 	PASSWDENT	pw ;
-	const int	pwlen = getbufsize(bufsize_pw) ;
+	const int	pwlen = bufsizeget(bufsize_pw) ;
 	int		f_blocks = sip->fl.blocks ;
 	int		rs ;
 	int		ll = 0 ;
