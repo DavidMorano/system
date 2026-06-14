@@ -51,7 +51,7 @@ OBJ02= timewatch.o timecount.o clanguage.o
 OBJ03= libutil.o usysconf.o umods.o 
 
 OBJ04= utimeout.o utimeouts.o utimeoutdefs.o
-OBJ05= ulogerror.o ischx.o strtox.o
+OBJ05= ulogerror.o ischx.o strtox.o ulimits.o
 OBJ06= ulibvals.o uconstants.o usupport.o
 OBJ07= umem.o usigsets.o usigblock.o umisc.o
 
@@ -382,12 +382,14 @@ itimerspec.o:		itimerspec.cc	itimerspec.h		$(INCS)
 
 # SUPPORT helpers
 usysflag.o:		usysflag.cc	usysflag.h		$(INCS)
+ulimits.o:		ulimits.cc	ulimits.h			$(INCS)
 utimeout.o:		utimeout.c	utimeout.h		$(INCS)
 utimeouts.o:		utimeouts.cc	utimeouts.h		$(INCS)
 utimeoutdefs.o:		utimeoutdefs.cc	utimeoutdefs.h		$(INCS)
 usyscallbase.o:		usyscallbase.cc	usyscallbase.hh		$(INCS)
 usysutility.o:		usysutility.cc	usysutility.hh		$(INCS)
 usysdata.o:		usysdata.cc	usysdata.h		$(INCS)
+ulogerror.o:		ulogerror.cc	ulogerror.h			$(INCS)
 
 # requires USYSBASIC
 uatfork.o:		umods.o usigblock.o
@@ -554,7 +556,6 @@ binchunk.o:		binchunk.cc	binchunk.hh			$(INCS)
 sigblocker.o:		sigblocker.cc	sigblocker.h			$(INCS)
 
 # OTHER subroutine-groups
-ulogerror.o:		ulogerror.cc	ulogerror.h			$(INCS)
 umem.o:			umem.cc		umem.hh				$(INCS)
 um.o:			um.cc		um.h				$(INCS)
 usig.o:			usig.cc		usig.h				$(INCS)
@@ -621,6 +622,7 @@ typecodes.o:		typecodes.ccm	ffbs.h				$(INCS)
 conintx.o:		conintx.cc		conintx.hh		$(INCS)
 stdintx.o:		stdintx.cc		stdintx.h		$(INCS)
 xxtostr.o:		xxtostr.cc		xxtostr.h		$(INCS)
+getbyte.o:		getbyte.ccm		getbyte.hh		$(INCS)
 
 # various types
 utmptypes.o:		utmptypes.cc		utmptypes.hh		$(INCS)
