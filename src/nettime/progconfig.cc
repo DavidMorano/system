@@ -42,7 +42,7 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<netdb.h>
 
 #include	<usystem.h>
@@ -374,9 +374,9 @@ struct config	*cfp ;
 	struct proginfo	*pip ;
 	struct locinfo	*lip ;
 
-	PARAMFILE		*pfp = &cfp->p ;
-	PARAMFILE_CUR		cur ;
-	PARAMFILE_ENT		pe ;
+	paramfile		*pfp = &cfp->p ;
+	paramfile_cur		cur ;
+	paramfile_ent		pe ;
 
 	const int	elen = EBUFLEN ;
 
@@ -470,22 +470,22 @@ struct config	*cfp ;
 	                    switch (pi) {
 
 	                    case param_intrun:
-	                        if (! pip->final.intrun)
+	                        if (! pip->finval.intrun)
 	                            pip->intrun = v ;
 	                        break ;
 
 	                    case param_intpoll:
-	                        if (! pip->final.intpoll)
+	                        if (! pip->finval.intpoll)
 	                            pip->intpoll = v ;
 	                        break ;
 
 	                    case param_intmark:
-	                        if (! pip->final.intmark)
+	                        if (! pip->finval.intmark)
 	                            pip->intmark = v ;
 	                        break ;
 
 	                    case param_intlock:
-	                        if (! pip->final.intlock)
+	                        if (! pip->finval.intlock)
 	                            pip->intlock = v ;
 	                        break ;
 
@@ -499,7 +499,7 @@ struct config	*cfp ;
 	                break ;
 
 	            case param_pidfile:
-	                if (! lip->final.pidfname) {
+	                if (! lip->finval.pidfname) {
 
 	                    lip->have.pidfname = TRUE ;
 	                    rs1 = setfname(pip,tmpfname,ebuf,el,TRUE,
@@ -517,7 +517,7 @@ struct config	*cfp ;
 	                break ;
 
 	            case param_msfile:
-	                if (! lip->final.msfname) {
+	                if (! lip->finval.msfname) {
 
 	                    lip->have.msfname = TRUE ;
 	                    rs1 = setfname(pip,tmpfname,ebuf,el,TRUE,
@@ -535,7 +535,7 @@ struct config	*cfp ;
 	                break ;
 
 	            case param_logfile:
-	                if (! pip->final.logfile) {
+	                if (! pip->finval.logfile) {
 
 	                    pip->have.logfile = TRUE ;
 	                    rs1 = setfname(pip,tmpfname,ebuf,el,TRUE,
@@ -553,7 +553,7 @@ struct config	*cfp ;
 	                break ;
 
 	            case param_reqfile:
-	                if (! lip->final.reqfname) {
+	                if (! lip->finval.reqfname) {
 
 	                    lip->have.reqfname = TRUE ;
 #ifdef	COMMENT
