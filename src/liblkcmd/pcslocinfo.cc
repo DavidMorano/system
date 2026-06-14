@@ -53,7 +53,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<getpwx.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<vecstr.h>
 #include	<lfm.h>
@@ -317,14 +317,14 @@ int locinfo_lockcheck(LOCINFO *lip)
 
 	    if ((rs >= 0) && lip->open.pidlock) {
 	        rs = lfm_check(&lip->pidlock,&ci,pip->daytime) ;
-	        if (rs == SR_LOCKLOST) {
+	        if (rs == SR_LOCKFAIL) {
 		    locinfo_genlockprint(lip,pip->pidfname,&ci) ;
 	        }
 	    } /* end if (pidlock) */
 
 	    if ((rs >= 0) && lip->open.tmplock) {
 	        rs = lfm_check(&lip->tmplock,&ci,pip->daytime) ;
-	        if (rs == SR_LOCKLOST) {
+	        if (rs == SR_LOCKFAIL) {
 		    locinfo_genlockprint(lip,lip->tmpfname,&ci) ;
 	        }
 	    } /* end if (tmplock) */
@@ -519,7 +519,7 @@ int locinfo_rootids(LOCINFO *lip)
 	if (lip->gid_rootname < 0) {
 	    if ((rs = proginfo_rootname(pip)) >= 0) {
 	        struct passwd	pw ;
-	        const int	pwlen = getbufsize(bufsize_pw) ;
+	        const int	pwlen = bufsizeget(bufsize_pw) ;
 	        char		*pwbuf ;
 		if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 		    cchar	*rn = pip->rootname ;
@@ -674,7 +674,7 @@ int locinfo_cmdsload(LOCINFO *lip,cchar *sp,int sl)
 	if (sl > 0) {
 	    lip->fl.cmds = TRUE ;
 	    if ((rs = locinfo_cmdsbegin(lip)) >= 0) {
-		KEYOPT	*kop = &lip->cmds ;
+		keyopt	*kop = &lip->cmds ;
 		rs = keyopt_loads(kop,sp,sl) ;
 	    }
 	}
@@ -687,7 +687,7 @@ int locinfo_cmdscount(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (lip->open.cmds) {
-	    KEYOPT	*kop = &lip->cmds ;
+	    keyopt	*kop = &lip->cmds ;
 	    rs = keyopt_count(kop) ;
 	}
 	return rs ;
@@ -738,7 +738,7 @@ static int locinfo_cmdsbegin(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (! lip->open.cmds) {
-	    KEYOPT	*kop = &lip->cmds ;
+	    keyopt	*kop = &lip->cmds ;
 	    if ((rs = keyopt_start(kop)) >= 0) {
 		lip->open.cmds = TRUE ;
 	    }
@@ -753,7 +753,7 @@ static int locinfo_cmdsend(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (lip->open.cmds) {
-	    KEYOPT	*kop = &lip->cmds ;
+	    keyopt	*kop = &lip->cmds ;
 	    lip->open.cmds = FALSE ;
 	    rs1 = keyopt_finish(kop) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -866,7 +866,7 @@ static int locinfo_genlockbegin(LOCINFO *lip,LFM *lfp,cchar *lfn)
 	    cchar	*bn = pip->banner ;
 	    if ((rs = lfm_start(lfp,lfn,ltype,to_lock,&lc,nn,un,bn)) >= 0) {
 	        f = TRUE ;
-	    } else if ((rs == SR_LOCKLOST) || (rs == SR_AGAIN)) {
+	    } else if ((rs == SR_LOCKFAIL) || (rs == SR_AGAIN)) {
 		locinfo_genlockprint(lip,lfn,&lc) ;
 	    }
 	}
@@ -924,7 +924,7 @@ static int locinfo_genlockprint(LOCINFO *lip,cchar *lfn,LFM_CHECK *lcp)
 	case SR_AGAIN:
 	    np = "busy" ;
 	    break ;
-	case SR_LOCKLOST:
+	case SR_LOCKFAIL:
 	    np = "lost" ;
 	    break ;
 	default:
