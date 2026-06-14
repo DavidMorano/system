@@ -83,11 +83,11 @@ struct locinfo {
 	cchar		*speedname ;
 	PROGINFO	*pip ;
 	void		*adj ;		/* adjunct local data */
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	LFM		pidlock, tmplock ;
 	PCSNS		ns ;
-	KEYOPT		cmds ;
+	keyopt		cmds ;
 	time_t		ti_lastlock ;
 	time_t		ti_start ;
 	time_t		ti_marklog ;
