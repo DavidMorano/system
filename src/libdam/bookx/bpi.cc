@@ -5,7 +5,7 @@
 /* read or audit a BPI (Bible Paragraph Index) database */
 /* version %I% last-modified %G% */
 
-#define	CF_SEARCH	1		/* use 'bsearch(3c)' */
+#define	CF_SEARCH	1		/* use |bsearch(3c)| */
 
 /* revision history:
 
@@ -99,18 +99,18 @@ const bpi_obj bpi_modinfo = {
 
 /* forward references */
 
-local int	bpi_loadbegin(bpi *,time_t) noex ;
-local int	bpi_loadend(bpi *) noex ;
-local int	bpi_mapcreate(bpi *,time_t) noex ;
-local int	bpi_mapdestroy(bpi *) noex ;
-local int	bpi_proc(bpi *,time_t) noex ;
-local int	bpi_verify(bpi *,time_t) noex ;
-local int	bpi_auditvt(bpi *) noex ;
-local int	bpi_checkupdate(bpi *,time_t) noex ;
-local int	bpi_search(bpi *,bpi_q *) noex ;
-local int	bpi_loadbve(bpi *,bpi_v *,int) noex ;
+local int	bpi_loadbegin	(bpi *,time_t) noex ;
+local int	bpi_loadend	(bpi *) noex ;
+local int	bpi_mapcreate	(bpi *,time_t) noex ;
+local int	bpi_mapdestroy	(bpi *) noex ;
+local int	bpi_proc	(bpi *,time_t) noex ;
+local int	bpi_verify	(bpi *,time_t) noex ;
+local int	bpi_auditvt	(bpi *) noex ;
+local int	bpi_checkupdate	(bpi *,time_t) noex ;
+local int	bpi_search	(bpi *,bpi_q *) noex ;
+local int	bpi_loadbve	(bpi *,bpi_v *,int) noex ;
 
-local int	mkcitekey(bpi_q *,uint *) noex ;
+local int	mkcitekey	(bpi_q *,uint *) noex ;
 
 #if	CF_SEARCH
 local int	vtecmp(cvoid *,cvoid *) noex ;
