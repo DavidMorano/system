@@ -84,8 +84,7 @@ int bvsbook_set(bvsbook *bep,ushort *a) noex {
 	    a[3] = bep->nzverses ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bvsbook_set) */
+} /* end subroutine (bvsbook_set) */
 
 int bvsbook_get(bvsbook *bep,ushort *a) noex {
     	int		rs = SR_FAULT ;
@@ -97,7 +96,6 @@ int bvsbook_get(bvsbook *bep,ushort *a) noex {
 	    bep->nzverses = a[3] ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bvsbook_get) */
+} /* end subroutine (bvsbook_get) */
 
 
