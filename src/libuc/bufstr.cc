@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	bufstr
 
 	Description:
@@ -33,19 +33,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<strwcpy.h>
-#include	<ctbin.h>
-#include	<ctoct.h>
-#include	<ctdec.h>
-#include	<cthex.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<ctbin.h>		/* LIBUC */
+#include	<ctoct.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"bufstr.h"
 
@@ -94,32 +94,27 @@ local inline int bufstr_xxxx(bufstr *op,ctxxx_f<T> ctxxx,T v) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine-template (bufstr_xxxx) */
+} /* end subroutine-template (bufstr_xxxx) */
 
 template<typename T>
 local inline int bufstr_binx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,ctbin,v) ;
-}
-/* end subroutine-template (bufstr_binx) */
+} /* end subroutine-template (bufstr_binx) */
 
 template<typename T>
 local inline int bufstr_octx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,ctoct,v) ;
-}
-/* end subroutine-template (bufstr_octx) */
+} /* end subroutine-template (bufstr_octx) */
 
 template<typename T>
 local inline int bufstr_decx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,ctdec,v) ;
-}
-/* end subroutine-template (bufstr_decx) */
+} /* end subroutine-template (bufstr_decx) */
 
 template<typename T>
 local inline int bufstr_hexx(bufstr *sbp,T v) noex {
 	return bufstr_xxxx(sbp,cthex,v) ;
-}
-/* end subroutine-template (bufstr_hexx) */
+} /* end subroutine-template (bufstr_hexx) */
 
 
 /* local variables */
