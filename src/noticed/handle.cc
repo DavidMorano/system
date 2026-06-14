@@ -61,11 +61,11 @@
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<netdb.h>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecstr.h>
@@ -235,7 +235,7 @@ struct clientinfo	*cip ;
 
 /* pop off the service name */
 
-	rs = uc_readlinetimed(ifd,svcspec,BUFLEN,TO_SVC) ;
+	rs = uc_readlnto(ifd,svcspec,BUFLEN,TO_SVC) ;
 	len = rs ;
 	if (rs <= 1) {
 
@@ -394,7 +394,7 @@ struct clientinfo	*cip ;
 
 	{
 	    PASSWDENT	pw ;
-	    const int	pwlen = getbufsize(getbufsize_pw) ;
+	    const int	pwlen = bufsizeget(bufsize_pw) ;
 	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 		cchar	*svc = cip->serivice ;
