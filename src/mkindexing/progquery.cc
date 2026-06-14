@@ -215,7 +215,7 @@ static int procdb(PROGINFO *pip,ARGINFO *aip,bfile *ofp,cchar *dbname) noex {
 
 	        opts = VECSTR_OCOMPACT ;
 	        if ((rs >= 0) && ((rs = vecstr_start(&qstr,5,opts)) >= 0)) {
-	            BITS	*bop = &aip->pargs ;
+	            bits	*bop = &aip->pargs ;
 	            int		c = 0 ;
 		    cchar	**argv = aip->argv ;
 
