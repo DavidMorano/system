@@ -36,11 +36,11 @@ typedef	BIBLECITE	biblecite ;
 
 EXTERNC_begin
 
-extern int	isbiblecite(biblecite *,cchar *,int,int *) noex ;
+extern int	biblecite_ver(biblecite *,cchar *,int,int *) noex ;
 
 EXTERNC_end
 
 
-#endif /* biblecite_INCLUDE */
+#endif /* BIBLECITE_INCLUDE */
 
 
