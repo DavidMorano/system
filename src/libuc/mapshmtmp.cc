@@ -151,7 +151,7 @@ static int shmalloc(int fd,int shmlen) noex {
 	    cint	wlen = szof(int) ;
 	    char	wbuf[szof(int) + 1] = {} ;
 	    while ((rs >= 0) && (off < shmlen)) {
-	        rs = u_pwrite(fd,wbuf,wlen,off) ;
+	        rs = u_writep(fd,wbuf,wlen,off) ;
 	        off += ps ;
 	    } /* end while */
 	} /* end if (pagesz) */
