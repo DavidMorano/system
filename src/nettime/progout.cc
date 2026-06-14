@@ -57,22 +57,10 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	onckeyalready(const char *) ;
-extern int	onckeygetset(cchar *,const char *) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
