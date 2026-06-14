@@ -26,16 +26,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC  */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bibleq.h"
 #include	"bibleqs.h"
@@ -61,46 +62,23 @@ import libutil ;			/* |memclear(3u)| */
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,const char *,const char *,const char *,
-			const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	bibleq_objloadbegin(BIBLEQ *,const char *,const char *) ;
-static int	bibleq_objloadend(BIBLEQ *) ;
-static int	bibleq_loadcalls(BIBLEQ *,const char *) ;
+local int	bibleq_objloadbegin(BIBLEQ *,cchar *,cchar *) ;
+local int	bibleq_objloadend(BIBLEQ *) ;
+local int	bibleq_loadcalls(BIBLEQ *,cchar *) ;
 
-static int	isrequired(int) ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
 
 
 /* local variables */
-
-static const char	*subs[] = {
-	"open",
-	"count",
-	"curbegin",
-	"lookup",
-	"read",
-	"curend",
-	"audit",
-	"close",
-	NULL
-} ;
 
 enum subs {
 	sub_open,
@@ -112,24 +90,37 @@ enum subs {
 	sub_audit,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum */
+
+constexpr cpcchar	subnames[] = {
+	"open",
+	"count",
+	"curbegin",
+	"lookup",
+	"read",
+	"curend",
+	"audit",
+	"close",
+	nullptr
+} ; /* end array (subnames) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bibleq_open(BIBLEQ *op,cchar *pr,cchar *dbname)
-{
+int bibleq_open(BIBLEQ *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
-	const char	*objname = BIBLEQ_OBJNAME ;
+	cchar	*objname = BIBLEQ_OBJNAME ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-#ifdef	COMMENT /* we let both NULL and NIL go down */
+#ifdef	COMMENT /* we let both nullptr and NIL go down */
 	if (dbname[0] == '\0')
 	    return SR_INVALID ;
 #endif
@@ -148,16 +139,13 @@ int bibleq_open(BIBLEQ *op,cchar *pr,cchar *dbname)
 #endif
 
 	return rs ;
-}
-/* end subroutine (bibleq_open) */
+} /* end subroutine (bibleq_open) */
 
-
-int bibleq_close(BIBLEQ *op)
-{
+int bibleq_close(BIBLEQ *op) {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
@@ -169,53 +157,46 @@ int bibleq_close(BIBLEQ *op)
 
 	op->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (bibleq_close) */
+} /* end subroutine (bibleq_close) */
 
-
-int bibleq_audit(BIBLEQ *op)
-{
+int bibleq_audit(BIBLEQ *op) {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.audit != NULL) {
+	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
 	}
 
 	return rs ;
-}
-/* end subroutine (bibleq_audit) */
+} /* end subroutine (bibleq_audit) */
 
-
-int bibleq_count(BIBLEQ *op)
-{
+int bibleq_count(BIBLEQ *op) {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.count != NULL) {
+	if (op->call.count != nullptr) {
 	    rs = (*op->call.count)(op->obj) ;
 	}
 
 	return rs ;
-}
-/* end subroutine (bibleq_count) */
+} /* end subroutine (bibleq_count) */
 
 int bibleq_curbegin(BIBLEQ *op,BIBLEQ_CUR *curp) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
 	memclear(curp) ;
-	if (op->call.curbegin != NULL) {
+	if (op->call.curbegin != nullptr) {
 	    void	*p ;
 	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
 		curp->scp = p ;
@@ -224,53 +205,48 @@ int bibleq_curbegin(BIBLEQ *op,BIBLEQ_CUR *curp) noex {
 		}
 		if (rs < 0) {
 	    	    uc_free(curp->scp) ;
-	    	    curp->scp = NULL ;
+	    	    curp->scp = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
-	} else
+	} else {
 	    rs = SR_NOTSUP ;
+	}
 
 	return rs ;
-}
-/* end subroutine (bibleq_curbegin) */
+} /* end subroutine (bibleq_curbegin) */
 
-
-int bibleq_curend(BIBLEQ *op,BIBLEQ_CUR *curp)
-{
+int bibleq_curend(BIBLEQ *op,BIBLEQ_CUR *curp) {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->scp != NULL) {
-	    if (op->call.curend != NULL) {
+	if (curp->scp != nullptr) {
+	    if (op->call.curend != nullptr) {
 	        rs1 = (*op->call.curend)(op->obj,curp->scp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    rs1 = uc_free(curp->scp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    curp->scp = NULL ;
+	    curp->scp = nullptr ;
 	} else
 	    rs = SR_NOTSUP ;
 
 	curp->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (bibleq_curend) */
-
+} /* end subroutine (bibleq_curend) */
 
 /* lookup tags by strings */
-int bibleq_lookup(BIBLEQ *op,BIBLEQ_CUR *curp,int qo,cchar **klp)
-{
+int bibleq_lookup(BIBLEQ *op,BIBLEQ_CUR *curp,int qo,cchar **klp) {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (klp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (klp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
@@ -278,43 +254,37 @@ int bibleq_lookup(BIBLEQ *op,BIBLEQ_CUR *curp,int qo,cchar **klp)
 	rs = (*op->call.lookup)(op->obj,curp->scp,qo,klp) ;
 
 	return rs ;
-}
-/* end subroutine (bibleq_lookup) */
-
+} /* end subroutine (bibleq_lookup) */
 
 /* enumerate entries */
 int bibleq_read(BIBLEQ *op,BIBLEQ_CUR *curp,BIBLEQ_CITE *bcp,
-		char *vbuf,int vlen)
-{
+		char *vbuf,int vlen) {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (bcp == NULL) return SR_FAULT ;
-	if (vbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (bcp == nullptr) return SR_FAULT ;
+	if (vbuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.enumerate != NULL) {
+	if (op->call.enumerate != nullptr) {
 	    rs = (*op->call.enumerate)(op->obj,curp->scp,bcp,vbuf,vlen) ;
 	}
 
 	return rs ;
-}
-/* end subroutine (bibleq_read) */
+} /* end subroutine (bibleq_read) */
 
 
 /* private subroutines */
 
-
 /* find and load the DB-access object */
-static int bibleq_objloadbegin(BIBLEQ *op,cchar *pr,cchar *objname)
-{
+local int bibleq_objloadbegin(BIBLEQ *op,cchar *pr,cchar *objname) {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
-	const int	n = nelem(subs) ;
-	const int	vo = vecstrm.compact ;
+	cint	n = nelem(subs) ;
+	cint	vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 
@@ -324,12 +294,12 @@ static int bibleq_objloadbegin(BIBLEQ *op,cchar *pr,cchar *objname)
 #endif
 
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
+	    cint	nlen = SYMNAMELEN ;
 	    int		i ;
-	    int		f_modload = FALSE ;
+	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
@@ -342,9 +312,9 @@ static int bibleq_objloadbegin(BIBLEQ *op,cchar *pr,cchar *objname)
 		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
 #if	CF_LOOKOTHER
-	            const int	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
+	            cint	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
 #else
-	            const int	mo = 0 ;
+	            cint	mo = 0 ;
 #endif
 	            cchar	*modbname = BIBLEQ_MODBNAME ;
 	            rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
@@ -374,7 +344,7 @@ static int bibleq_objloadbegin(BIBLEQ *op,cchar *pr,cchar *objname)
 		    rs = bibleq_loadcalls(op,objname) ;
 		    if (rs < 0) {
 			uc_free(op->obj) ;
-			op->obj = NULL ;
+			op->obj = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 	    } /* end if (getmva) */
@@ -383,44 +353,38 @@ static int bibleq_objloadbegin(BIBLEQ *op,cchar *pr,cchar *objname)
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (bibleq_objloadbegin) */
+} /* end subroutine (bibleq_objloadbegin) */
 
-
-static int bibleq_objloadend(BIBLEQ *op)
-{
+local int bibleq_objloadend(BIBLEQ *op) {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj != nullptr) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
 	if (rs >= 0) rs = rs1 ;
 
 	return rs ;
-}
-/* end subroutine (bibleq_objloadend) */
+} /* end subroutine (bibleq_objloadend) */
 
-
-static int bibleq_loadcalls(BIBLEQ *op,cchar *objname)
-{
+local int bibleq_loadcalls(BIBLEQ *op,cchar *objname) {
 	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+	cint	nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	const void	*snp ;
+	cvoid	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = NULL ;
+		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
@@ -430,15 +394,15 @@ static int bibleq_loadcalls(BIBLEQ *op,cchar *objname)
 #if	CF_DEBUGS
 	    debugprintf("bibleq_loadcalls: call=%s %c\n",
 		subs[i],
-		((snp != NULL) ? 'Y' : 'N')) ;
+		((snp != nullptr) ? 'Y' : 'N')) ;
 #endif
 
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 	        c += 1 ;
 		switch (i) {
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *,const char *)) snp ;
+			(int (*)(void *,cchar *,cchar *)) snp ;
 		    break ;
 		case sub_count:
 		    op->call.count = (int (*)(void *)) snp ;
@@ -449,7 +413,7 @@ static int bibleq_loadcalls(BIBLEQ *op,cchar *objname)
 		    break ;
 		case sub_lookup:
 		    op->call.lookup = 
-			(int (*)(void *,void *,int,const char **)) snp ;
+			(int (*)(void *,void *,int,cchar **)) snp ;
 		    break ;
 		case sub_read:
 		    op->call.enumerate = 
@@ -471,13 +435,10 @@ static int bibleq_loadcalls(BIBLEQ *op,cchar *objname)
 	} /* end for (subs) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (bibleq_loadcalls) */
+} /* end subroutine (bibleq_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int		f = FALSE ;
+local bool isrequired(int i) noex {
+	bool	f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_curbegin:
@@ -485,11 +446,10 @@ static int isrequired(int i)
 	case sub_read:
 	case sub_curend:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
