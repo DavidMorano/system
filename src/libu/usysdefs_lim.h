@@ -37,10 +37,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/utsname.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>		/* |S_IS{x}| + S_IF{x}| */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/utsname.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX |S_IS{x}| + S_IF{x}| */
 #include	<limits.h>		/* |{xxx}_MIN| + |{xxx}_MAX| */
 #include	<signal.h>		/* |SIG{x}| */
 #include	<unistd.h>		/* |_SC_{x}| + |_PC_{x}| */
