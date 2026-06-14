@@ -125,8 +125,8 @@ const char	**argv ;
 const char	**envv ;
 int		to ;
 {
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	const int	am = (of & O_ACCMODE) ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
