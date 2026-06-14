@@ -179,19 +179,26 @@ enum subs {
 	sub_overlast
 } ; /* end enum (subs) */
 
-constexpr cpcchar	subnames[] = {
-	"open",
-	"audit",
-	"count",
-	"max",
-	"read",
-	"get",
-	"curbegin",
-	"curend",
-	"curenum",
-	"close",
-	nullptr
-} ; /* end array (subnames) */
+namespace {
+    struct subnamer {
+	cchar		*n[sub_overlast + 1] ;
+	consteval subnamer() noex {
+	    n[sub_open]		= "open" ;
+	    n[sub_audit]	= "audit" ;
+	    n[sub_count]	= "count" ;
+	    n[sub_nummax]	= "max" ;
+	    n[sub_read]		= "read" ;
+	    n[sub_get]		= "get" ;
+	    n[sub_curbegin]	= "curbegin" ;
+	    n[sub_curend]	= "curend" ;
+	    n[sub_curenum]	= "curenum" ;
+	    n[sub_close]	= "close" ;
+	    n[sub_overlast]	= nullptr ;
+	} ; /* end ctor */
+    } ; /* end struct (subnamer) */
+} /* end namespace */
+
+constexpr subnamer	subname ;
 
 
 /* exported variables */
@@ -445,7 +452,7 @@ local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) {
 	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = CMD_MODBNAME ;
 	            cchar	*on = objn ;
