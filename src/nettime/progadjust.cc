@@ -1,11 +1,12 @@
-/* progadjust */
+/* progadjust SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to get time from a network time server host */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
@@ -18,36 +19,35 @@
 
 /*******************************************************************************
 
+  	Description:
 	This program will get the time-of-day from a time server specified by a
 	hostname given on the command line.  The program tries to connect to a
 	TCP listener on the time server and will read 4 bytes out of the
 	socket.  These four bytes, when organized as a long word in network
-	byte order, represent the time in seconds since Jan 1, 1900.  We will
+	byte order, represent the time in seconds since 1 Jan 1900.  We will
 	subtract the value "86400 * ((365 * 70) + 17)" to get the time in
 	seconds since Jan 1, 1970 (which was when the UNIX OS started, or
 	something like this).  The bytes received from the socket are in
 	network byte order, so we will have to convert them into a long word
 	order recognized by the local machine.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<sys/time.h>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
