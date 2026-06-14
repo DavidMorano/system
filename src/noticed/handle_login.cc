@@ -1,4 +1,5 @@
 /* handle_login SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* handle the login-based serivce */
@@ -23,6 +24,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	Handle a request for which we have a matching login entry.
 
 *******************************************************************************/
@@ -31,14 +33,14 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<pwd.h>
+#include	<grp.h>
+#include	<ctime>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-#include	<pwd.h>
-#include	<grp.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<varsub.h>
@@ -67,13 +69,6 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	findfilepath(char *,char *,int,char *) ;
-extern int	vstrkeycmp(char *const *,char *const *) ;
-extern int	mkquoted(char *,int,cchar *,int) ;
-
-extern char	*strbasename(char *) ;
-
 
 /* external variables */
 
@@ -84,8 +79,10 @@ extern char	*strbasename(char *) ;
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int handle_login(pip,cip,cnp,sap,ofd,pep)
 struct proginfo		*pip ;
@@ -93,7 +90,7 @@ struct clientinfo	*cip ;
 CONNECTION	*cnp ;
 vecstr		*sap ;
 int		ofd ;
-struct passwd	*pep ;
+PASSWD	*pep ;
 {
 	time_t	daytime ;
 
