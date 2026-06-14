@@ -201,7 +201,7 @@ int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 	                if ((rs = memfile_mapextend(op,e)) >= 0) {
 		            char	zbuf[2] = {} ;
 	                    for (size_t off = a ; off < (a + e) ; off += ps) {
-	                        rs = u_pwrite(op->fd,zbuf,1,(off + pmo)) ;
+	                        rs = u_writep(op->fd,zbuf,1,(off + pmo)) ;
 	                        if (rs < 0) break ;
 	                    } /* end for */
 	                } /* end if (extending file) */
@@ -212,7 +212,7 @@ int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 	            }
 	        } /* end if (writing beyond file end) */
 	        if (rs >= 0) ylikely {
-	            if ((rs = u_pwrite(op->fd,wbuf,wlen,op->off)) >= 0) {
+	            if ((rs = u_writep(op->fd,wbuf,wlen,op->off)) >= 0) {
 	                if ((op->off + wlen) > fsize) {
 	                    op->fsize = (op->off + wlen) ;
 			}
@@ -360,7 +360,7 @@ local int memfile_extend(memfile *op) noex {
 		    {
 		        cint dl = intconv(dsize) ;
 		        coff off = off_t(soff) ;
-	                rs = u_pwrite(op->fd,zbuf,dl,off) ;
+	                rs = u_writep(op->fd,zbuf,dl,off) ;
 	                soff += dl ;
 		    } /* end block (dsize) */
 	        } /* end block (clen) */
