@@ -139,8 +139,7 @@ int bvshdr_rd(bvshdr *op,char *hbuf,int hlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (bvshdr_rd) */
+} /* end subroutine (bvshdr_rd) */
 
 int bvshdr_wr(bvshdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
@@ -191,8 +190,7 @@ int bvshdr_wr(bvshdr *op,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (bvshdr_wr) */
+} /* end subroutine (bvshdr_wr) */
 
 
 /* local subroutines */
