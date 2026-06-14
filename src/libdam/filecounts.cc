@@ -546,7 +546,7 @@ static int filecounts_updateone(FC *op,cchar *tbuf,WORKER_ENT *wep) noex {
 	    if ((rs = mkentry(ubuf,ulen,nv,nd,tbuf,tlen,np)) >= 0) {
 	        coff	uoff = wep->eoff ;
 	        wlen = rs ;
-	        rs = u_pwrite(op->fd,ubuf,wlen,uoff) ;
+	        rs = u_writep(op->fd,ubuf,wlen,uoff) ;
 	    }
 	    rs1 = lm_free(ubuf) ;
 	    if (rs >= 0) rs = rs1 ;
