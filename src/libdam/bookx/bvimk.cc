@@ -5,6 +5,7 @@
 /* make a BVI database */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -95,8 +96,9 @@
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"bvimk.h"
+#include	"bvcitekey.h"
 #include	"bvihdr.h"
+#include	"bvimk.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -108,12 +110,17 @@ import libutil ;			/* |memclear(3u)| */
 #define	BVIMK_NSKIP	5
 #define	HDRBUFLEN	(szof(bvihdr) + 128)
 #define	BUFLEN		(szof(bvihdr) + 128)
+#define	PAGEBUFMULT	4		/* page-size buffer multiplier */
 
 #define	FSUF_IDX	"bvi"
 
 #define	TO_OLDFILE	(5 * 60)
 
 #define	MODP2(v,n)	((v) & ((n) - 1))
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -201,30 +208,34 @@ local inline int bvimk_magic(bvimk *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (bvimk_magic) */
 
-local int	bvimk_filesbegin(bvimk *) noex ;
-local int	bvimk_filesbeginc(bvimk *) noex ;
-local int	bvimk_filesbeginwait(bvimk *) noex ;
-local int	bvimk_filesbegincreate(bvimk *,cchar *,int,mode_t) noex ;
-local int	bvimk_filesend(bvimk *) noex ;
-local int	bvimk_listbegin(bvimk *,int) noex ;
-local int	bvimk_listend(bvimk *) noex ;
-local int	bvimk_mkidx(bvimk *) noex ;
-local int	bvimk_mkidxwrmain(bvimk *,bvihdr *) noex ;
-local int	bvimk_mkidxwrhdr(bvimk *,bvihdr *,filer *) noex ;
-local int	bvimk_mkidxwrverses(bvimk *,bvihdr *,filer *,int) noex ;
-local int	bvimk_mkidxwrlines(bvimk *,bvihdr *,filer *,int) noex ;
-local int	bvimk_nidxopen(bvimk *) noex ;
-local int	bvimk_nidxclose(bvimk *) noex ;
-local int	bvimk_renamefiles(bvimk *) noex ;
+local int	bvimk_filesbegin	(bvimk *) noex ;
+local int	bvimk_filesbeginc	(bvimk *) noex ;
+local int	bvimk_filesbeginwait	(bvimk *) noex ;
+local int	bvimk_filesbegincreate	(bvimk *,cchar *,int,mode_t) noex ;
+local int	bvimk_filesend		(bvimk *) noex ;
+local int	bvimk_listbegin		(bvimk *,int) noex ;
+local int	bvimk_listend		(bvimk *) noex ;
+local int	bvimk_mkidx		(bvimk *) noex ;
+local int	bvimk_mkidxwrmain	(bvimk *,bvihdr *) noex ;
+local int	bvimk_mkidxwrhdr	(bvimk *,bvihdr *,filer *) noex ;
+local int	bvimk_mkidxwrverses	(bvimk *,bvihdr *,filer *,int) noex ;
+local int	bvimk_mkidxwrlines	(bvimk *,bvihdr *,filer *,int) noex ;
+local int	bvimk_nidxopen		(bvimk *) noex ;
+local int	bvimk_nidxclose		(bvimk *) noex ;
+local int	bvimk_renamefiles	(bvimk *) noex ;
 
-local int	mkcitation(uint *,bvimk_v *) noex ;
-local int	mknewfname(char *,int,cchar *,cchar *) noex ;
-local int	unlinkstale(cchar *,int) noex ;
+local int	mkcitation		(uint *,bvimk_v *) noex ;
+local int	mknewfname		(char *,int,cchar *,cchar *) noex ;
+local int	unlinkstale		(cchar *,int) noex ;
 
-local int	ventcmp(cvoid **,cvoid **) noex ;
+local int	ventcmp			(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
+
+static vars		var ;
+cuint			vmask		= bvcitekey_vmask ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -234,8 +245,6 @@ const bvimk_obj		bvimk_modinfo = {
 	szof(bvimk),
 	0
 } ; /* end initialization */
-
-static vars		var ;
 
 
 /* exported variables */
@@ -251,7 +260,6 @@ int bvimk_open(bvimk *op,cchar *dbn,int of,mode_t om) noex {
 	    if (dbn[0]) {
 		if (static cint rsv = var ; (rs = rsv) >= 0) {
 	            cint	n = BVIMK_NENTS ;
-	            memclear(op) ;
 	            op->om = (om|0600) ;
 	            op->nfd = -1 ;
 	            op->fl.ofcreat	= MKBOOL(of & O_CREAT) ;
@@ -354,7 +362,7 @@ int bvimk_add(bvimk *op,bvimk_v *bvp) noex {
 	        bve.vlen = bvp->vlen ;
 	        bve.li = li ;
 	        mkcitation(&bve.citation,bvp) ;
-	        citcmpval = (bve.citation & 0x00FFFFFF) ;
+	        citcmpval = (bve.citation & vmask) ;
 	        if (citcmpval < op->pcitation) {
 	            op->fl.notsorted = true ;
 	        }
@@ -447,28 +455,32 @@ local int bvimk_filesbeginc(bvimk *op) noex {
 
 local int bvimk_filesbeginwait(bvimk *op) noex {
 	int		rs ;
-	int		c = 0 ;
-	cchar		*dbn = op->dbname ;
-	cchar		*suf = FSUF_IDX	 ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
-	    cint	to_stale = BVIMK_INTSTALE ;
-	    cint	rsn = SR_EXISTS ;
-	    cint	of = (O_CREAT|O_WRONLY|O_EXCL) ;
-	    int		to = BVIMK_INTOPEN ;
-	    cmode	om = op->om ;
-	    while ((rs = bvimk_filesbegincreate(op,tbuf,of,om)) == rsn) {
-	        c = 1 ;
-	        sleep(1) ;
-	        unlinkstale(tbuf,to_stale) ;
-	        if (to-- == 0) break ;
-	    } /* end while (db exists) */
-	    if (rs == rsn) {
-	        op->fl.ofcreat = false ;
-	        c = 0 ;
-	        rs = bvimk_filesbeginc(op) ;
-	    } /* end if (not-found) */
-	} /* end if (mknewfname) */
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if (char *tbuf; (rs = mem.mp(&tbuf)) >= 0) {
+	    cchar	*dbn = op->dbname ;
+	    cchar	*suf = FSUF_IDX	 ;
+	    if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
+	        cint	to_stale = BVIMK_INTSTALE ;
+	        cint	rsn = SR_EXISTS ;
+	        cint	of = (O_CREAT|O_WRONLY|O_EXCL) ;
+	        int	to = BVIMK_INTOPEN ;
+	        cmode	om = op->om ;
+	        while ((rs = bvimk_filesbegincreate(op,tbuf,of,om)) == rsn) {
+	            c = 1 ;
+	            sleep(1) ;
+	            unlinkstale(tbuf,to_stale) ;
+	            if (to-- == 0) break ;
+	        } /* end while (db exists) */
+	        if (rs == rsn) {
+	            op->fl.ofcreat = false ;
+	            c = 0 ;
+	            rs = bvimk_filesbeginc(op) ;
+	        } /* end if (not-found) */
+	    } /* end if (mknewfname) */
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bvimk_filesbeginwait) */
 
@@ -511,20 +523,20 @@ local int bvimk_filesend(bvimk *op) noex {
 } /* end subroutine (bvimk_filesend) */
 
 local int bvimk_listbegin(bvimk *op,int n) noex {
+    	vecobj		*vlp = op->vlp ;
+    	vecobj		*llp = op->llp ;
+	cint		sz = szof(struct bventry) ;
 	int		rs ;
-	int		sz ;
-	int		opts = 0 ;
-	opts |= VECOBJ_OCOMPACT ;
-	opts |= VECOBJ_OORDERED ;
-	opts |= VECOBJ_OSTATIONARY ;
-	sz = szof(struct bventry) ;
-	if ((rs = vecobj_start(op->vlp,sz,n,opts)) >= 0) {
-	    rs = vecobj_start(op->llp,sz,(n * 2),opts) ;
+	int		vo = 0 ;
+	vo |= vecobjm.compact ;
+	vo |= vecobjm.ordered ;
+	vo |= vecobjm.stationary ;
+	if ((rs = vlp->start(sz,n,vo)) >= 0) {
+	    rs = llp->start(sz,(n * 2),vo) ;
 	    if (rs < 0) {
-	        vecobj_finish(op->vlp) ;
+	        vlp->finish() ;
 	    } /* end if (error) */
-	}
-
+	} /* end if (vecobj_start) */
 	return rs ;
 } /* end subroutine (bvimk_listbegin) */
 
@@ -581,7 +593,7 @@ local int bvimk_mkidxwrmain(bvimk *op,bvihdr *hdrp) noex {
 	int		rs1 ;
 	int		off = 0 ; /* return-value */
 	if ((rs = ucpagesize) >= 0) {
-	    cint bsz = (rs * 4) ;
+	    cint bsz = (rs * PAGEBUFMULT) ;
 	    cint nfd = op->nfd ;
 	    if (filer hf ; (rs = hf.start(nfd,0,bsz,0)) >= 0) {
 	        if ((rs = bvimk_mkidxwrhdr(op,hdrp,&hf)) >= 0) {
@@ -609,7 +621,7 @@ local int bvimk_mkidxwrhdr(bvimk *op,bvihdr *hdrp,filer *hfp) noex {
 	    cint	hlen = HDRBUFLEN ;
 	    char	hbuf[HDRBUFLEN+1] ;
 	    if ((rs = hdrp->rd(hbuf,hlen)) >= 0) {
-	        rs = filer_writefill(hfp,hbuf,rs) ;
+	        rs = hfp->writefill(hbuf,rs) ;
 	        wlen += rs ;
 	    } /* end if (bvihdr) */
 	} /* end if (non-null) */
@@ -617,7 +629,7 @@ local int bvimk_mkidxwrhdr(bvimk *op,bvihdr *hdrp,filer *hfp) noex {
 } /* end subroutine (bvimk_mkidxwrhdr) */
 
 local int bvimk_mkidxwrverses(bvimk *op,bvihdr *hdrp,filer *hfp,int off) noex {
-	uint		a[4] ;
+	uint		a[4] = {} ;
 	cint		sz = (4 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ; /* return-value */
@@ -632,7 +644,7 @@ local int bvimk_mkidxwrverses(bvimk *op,bvihdr *hdrp,filer *hfp,int off) noex {
 	        a[2] = bvep->li ;
 	        a[3] = bvep->citation ;
 	        n += 1 ;
-	        rs = filer_write(hfp,a,sz) ;
+	        rs = hfp->write(a,sz) ;
 	        wlen += rs ;
 	    }
 	    if (rs < 0) break ;
@@ -642,7 +654,7 @@ local int bvimk_mkidxwrverses(bvimk *op,bvihdr *hdrp,filer *hfp,int off) noex {
 } /* end subroutine (bvimk_mkidxwrverses) */
 
 local int bvimk_mkidxwrlines(bvimk *op,bvihdr *hdrp,filer *hfp,int off) noex {
-	uint		a[4] ;
+	uint		a[4] = {} ;
 	cint		sz = (2 * szof(uint)) ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ; /* return-value */
@@ -655,7 +667,7 @@ local int bvimk_mkidxwrlines(bvimk *op,bvihdr *hdrp,filer *hfp,int off) noex {
 	        a[0] = blep->loff ;
 	        a[1] = blep->llen ;
 	        n += 1 ;
-	        rs = filer_write(hfp,a,sz) ;
+	        rs = hfp->write(a,sz) ;
 	        wlen += rs ;
 	    }
 	    if (rs < 0) break ;
@@ -669,12 +681,12 @@ local int bvimk_nidxopen(bvimk *op) noex {
 	int		rs1 ;
 	int		fd = -1 ;/* return-value */
 	int		of = (O_CREAT|O_WRONLY) ;
-	int		ai = 2 ;
+	int		ai = 2 ; /* two path buffers */
 	cmode		om = op->om ;
 	if (op->nidxfname == nullptr) {
 	    cint	maxpath = var.maxpathlen ;
 	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
-	    cint	psz = (ai + var.maxpathlen) ;
+	    cint	psz = (ai + (var.maxpathlen + 1)) ;
 	    cchar	*dbn = op->dbname ;
 	    cchar	*suf = FSUF_IDX ;
 	    if (char *a ; (rs = mem.mall(psz,&a)) >= 0) {
@@ -742,21 +754,28 @@ local int bvimk_renamefiles(bvimk *op) noex {
 	return rs ;
 } /* end subroutine (bvimk_renamefiles) */
 
+local uint mkciteload(uint ci,uchar item) noex {
+	ci = (ci << UCHAR_BIT) ;
+	ci |= uint(item) ;
+	return ci ; 
+} /* end subroutine (mkciteload) */
+
 local int mkcitation(uint *cip,bvimk_v *bvp) noex {
-	uint		ci = 0 ;
-	uint		nlines = 0 ;
-	if (bvp->lines) {
-	    nlines = bvp->nlines ;
-	}
-	ci |= (nlines & UCHAR_MAX) ;
-	ci = (ci << 8) ;
-	ci |= (bvp->b & UCHAR_MAX) ;
-	ci = (ci << 8) ;
-	ci |= (bvp->c & UCHAR_MAX) ;
-	ci = (ci << 8) ;
-	ci |= (bvp->v & UCHAR_MAX) ;
-	*cip = ci ;
-	return SR_OK ;
+    	int		rs = SR_FAULT ;
+	if (cip && bvp) {
+	    uint	ci = 0 ;
+	    uint	nlines = 0 ;
+	    rs = SR_OK ;
+	    if (bvp->lines) {
+	        nlines = bvp->nlines ;
+	    }
+	    ci = mkciteload(ci,uchar(nlines)) ;
+	    ci = mkciteload(ci,bvp->b) ;
+	    ci = mkciteload(ci,bvp->c) ;
+	    ci = mkciteload(ci,bvp->v) ;
+	    *cip = ci ;
+	} /* end if (non-null) */
+	return rs ;
 } /* end subroutine (mkcitation) */
 
 local int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
@@ -782,12 +801,20 @@ local int unlinkstale(cchar *fn,int to) noex {
 } /* end subroutine (unlinkstale) */
 
 local int entcmp(bventry *e1p,bventry *e2p) noex {
-	uint	vc1 = e1p->citation & 0x00FFFFFF ;
-	uint	vc2 = e2p->citation & 0x00FFFFFF ;
 	int	rc = 0 ;
-	{
-	rc = (vc1 - vc2) ;
-	}
+	if (e1p || e2p) {
+	    if (e1p) {
+	        if (e2p) {
+		    cint	vc1 = int(e1p->citation & vmask) ;
+		    cint	vc2 = int(e2p->citation & vmask) ;
+	   	    rc = (vc1 - vc2) ;
+	        } else {
+	            rc = -1 ;
+	        }
+	    } else {
+	        rc = +1 ;
+	    }
+	} /* end if */
 	return rc ;
 } /* end subroutine (entcmp) */
 
@@ -798,17 +825,7 @@ local int ventcmp(cvoid **v1pp,cvoid **v2pp) noex {
 	if (e1pp && e2pp) {
 	    bventry	*e1p = *e1pp ;
 	    bventry	*e2p = *e2pp ;
-	    if (e1p || e2p) {
-	        if (e1p) {
-	            if (e2p) {
-	                rc = entcmp(e1p,e2p) ;
-	            } else {
-	                rc = -1 ;
-	            }
-	        } else {
-	            rc = +1 ;
-	        }
-	    } /* end if */
+	    rc = entcmp(e1p,e2p) ;
 	} /* end block */
 	return rc ;
 } /* end subroutine (ventcmp) */
