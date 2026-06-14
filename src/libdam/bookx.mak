@@ -45,7 +45,7 @@ OBJ1= bvihdr.o bvimk.o bvi.o
 OBJ2= bvcitekey.o bvchapters.o
 OBJ3= bpihdr.o bpimk.o
 
-OBJ4= bcspec.o
+OBJ4= bcspec.o biblecite.o
 OBJ5=
 OBJ6=
 OBJ7=
@@ -180,9 +180,9 @@ bvi.o:			bvi.cc		bvi.h	bvchapters.hh		$(INCS)
 bpihdr.o:		bpihdr.cc	bpihdr.h			$(INCS)
 bpimk.o:		bpimk.cc	bpimk.h				$(INCS)
 
-bvcitekey.o:		bvcitekey.cc	bvcitekey.h			$(ICCS)
-bvchapters.o:		bvchapters.cc	bvchapters.hh			$(ICCS)
+bvcitekey.o:		bvcitekey.cc	bvcitekey.h			$(INCS)
+bvchapters.o:		bvchapters.cc	bvchapters.hh			$(INCS)
 
 bcspec.o:		bcspec.cc	bcspec.h			$(INCS)
-
+biblecite.o:		biblecite.cc	biblecite.h			$(INCS)
 
