@@ -85,7 +85,7 @@ extern int	strlinelen(const char *,int,int) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 
 static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
 static int	procuserinfo_end(PROGINFO *) ;
@@ -165,7 +165,7 @@ int main(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -819,7 +819,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	const int	olen = ORGLEN ;
 	int		rs = SR_OK ;
