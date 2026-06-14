@@ -35,21 +35,21 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<sys/time.h>		/* |adjtime(2)| */
-#include	<unistd.h>
-#include	<time.h>		/* |time(2)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>
+#include	<unistd.h>		/* POSIX */
+#include	<time.h>		/* VSTD |time(2)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int u_adjtime(CTIMEVAL *tvp,TIMEVAL *ovp) noex ;
-extern int u_stime(time_t *tp) noex ;
-extern int u_time(time_t *rp) noex ;
+extern int u_adjtime	(CTIMEVAL *tvp,TIMEVAL *ovp) noex ;
+extern int u_stime	(time_t *tp) noex ;
+extern int u_time	(time_t *rp) noex ;
 
 EXTERNC_end
 
