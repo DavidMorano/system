@@ -177,8 +177,8 @@ cchar		**argv ;
 cchar		**envv ;
 int		to ;
 {
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	uid_t		uid = 0 ;
 	const int	ulen = USERNAMELEN ;
 	const int	olen = ORGLEN ;
@@ -352,7 +352,7 @@ int		to ;
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-				    KEYOPT	*kop = &akopts ;
+				    keyopt	*kop = &akopts ;
 	                            rs = keyopt_loads(kop,argp,argl) ;
 				}
 			    } else
