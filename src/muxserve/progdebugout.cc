@@ -51,10 +51,6 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
 
 /* forward references */
 
