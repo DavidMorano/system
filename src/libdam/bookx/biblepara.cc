@@ -5,7 +5,7 @@
 /* BIBLEPARA object-load management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_LOOKSELF	0		/* try searching "SELF" for SO */
 
 /* revision history:
@@ -19,21 +19,27 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that allows access
-	to the BIBLEPARA datbase.
+  	Name:
+	biblepara
+
+	Description:
+	This module implements an interface (a trivial one) that
+	allows access to the BIBLEPARA datbase.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"biblepara.h"
 #include	"bibleparas.h"
@@ -60,46 +66,23 @@ import libutil ;			/* |memclear(3u)| */
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,const char *,const char *,const char *,
-			const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	biblepara_objloadbegin(BIBLEPARA *,const char *,const char *) ;
-static int	biblepara_objloadend(BIBLEPARA *) ;
-static int	biblepara_loadcalls(BIBLEPARA *,const char *) ;
+local int	biblepara_objloadbegin(BIBLEPARA *,cchar *,cchar *) ;
+local int	biblepara_objloadend(BIBLEPARA *) ;
+local int	biblepara_loadcalls(BIBLEPARA *,cchar *) ;
 
-static int	isrequired(int) ;
+local int	isrequired(int) ;
 
 
 /* external variables */
 
 
 /* local variables */
-
-static const char	*subs[] = {
-	"open",
-	"count",
-	"ispara",
-	"curbegin",
-	"enum",
-	"curend",
-	"audit",
-	"info",
-	"close",
-	NULL
-} ;
 
 enum subs {
 	sub_open,
@@ -112,7 +95,20 @@ enum subs {
 	sub_info,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum */
+
+constexpr cpcchar	subnames[] = {
+	"open",
+	"count",
+	"ispara",
+	"curbegin",
+	"enum",
+	"curend",
+	"audit",
+	"info",
+	"close",
+	nullptr
+} ; /* end array (subnames) */
 
 
 /* exported variables */
@@ -124,8 +120,8 @@ int biblepara_open(BIBLEPARA *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	cchar		*objname = BIBLEPARA_OBJNAME ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
@@ -138,86 +134,76 @@ int biblepara_open(BIBLEPARA *op,cchar *pr,cchar *dbname) noex {
 		biblepara_objloadend(op) ;
 	} /* end if (biblepara_objloadbegin) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("biblepara_open: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (biblepara_open) */
+} /* end subroutine (biblepara_open) */
 
 int biblepara_close(BIBLEPARA *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("biblepara_close: OBJ_close() rs=%d\n",rs) ;
 #endif
 
 	rs1 = biblepara_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("biblepara_close: _objloadend() rs=%d\n",rs) ;
 #endif
 
 	op->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (biblepara_close) */
+} /* end subroutine (biblepara_close) */
 
-
-int biblepara_count(BIBLEPARA *op)
-{
+int biblepara_count(BIBLEPARA *op) {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.count != NULL)
+	if (op->call.count != nullptr)
 	    rs = (*op->call.count)(op->obj) ;
 
 	return rs ;
-}
-/* end subroutine (biblepara_count) */
+} /* end subroutine (biblepara_count) */
 
-
-int biblepara_audit(BIBLEPARA *op)
-{
+int biblepara_audit(BIBLEPARA *op) {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.audit != NULL)
+	if (op->call.audit != nullptr)
 	    rs = (*op->call.audit)(op->obj) ;
 
 	return rs ;
-}
-/* end subroutine (biblepara_audit) */
-
+} /* end subroutine (biblepara_audit) */
 
 /* get a string by its index */
-int biblepara_ispara(BIBLEPARA *op,BIBLEPARA_CITE *qp)
-{
+int biblepara_ispara(BIBLEPARA *op,BIBLEPARA_CITE *qp) {
 	BIBLEPARAS_CITE	sq ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (qp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (qp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("biblepara_ispara: q=%u:%u:%u\n",
 		qp->b,qp->c,qp->v) ;
 #endif
@@ -227,25 +213,22 @@ int biblepara_ispara(BIBLEPARA *op,BIBLEPARA_CITE *qp)
 	sq.v = qp->v ;
 	rs = (*op->call.ispara)(op->obj,&sq) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("biblepara_ispara: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (biblepara_ispara) */
+} /* end subroutine (biblepara_ispara) */
 
-
-int biblepara_curbegin(BIBLEPARA *op,BIBLEPARA_CUR *curp)
-{
+int biblepara_curbegin(BIBLEPARA *op,BIBLEPARA_CUR *curp) {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.curbegin != NULL) {
+	if (op->call.curbegin != nullptr) {
 	    void	*p ;
 	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
 		curp->scp = p ;
@@ -254,7 +237,7 @@ int biblepara_curbegin(BIBLEPARA *op,BIBLEPARA_CUR *curp)
 		}
 		if (rs < 0) {
 		    uc_free(curp->scp) ;
-		    curp->scp = NULL ;
+		    curp->scp = nullptr ;
 		}
 	    } /* end if (m-a) */
 	    if (rs < 0)
@@ -262,51 +245,45 @@ int biblepara_curbegin(BIBLEPARA *op,BIBLEPARA_CUR *curp)
 	} /* end if (curbegin) */
 
 	return rs ;
-}
-/* end subroutine (biblepara_curbegin) */
+} /* end subroutine (biblepara_curbegin) */
 
-
-int biblepara_curend(BIBLEPARA *op,BIBLEPARA_CUR *curp)
-{
+int biblepara_curend(BIBLEPARA *op,BIBLEPARA_CUR *curp) {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->scp == NULL) return SR_NOTSOCK ;
+	if (curp->scp == nullptr) return SR_NOTSOCK ;
 
-	if (op->call.curend != NULL) {
+	if (op->call.curend != nullptr) {
 	    rs1 = (*op->call.curend)(op->obj,curp->scp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	rs1 = uc_free(curp->scp) ;
 	if (rs >= 0) rs = rs1 ;
-	curp->scp = NULL ;
+	curp->scp = nullptr ;
 
 	curp->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (biblepara_curend) */
-
+} /* end subroutine (biblepara_curend) */
 
 /* enumerate entries */
-int biblepara_enum(BIBLEPARA *op,BIBLEPARA_CUR *curp,BIBLEPARA_CITE *qp)
-{
+int biblepara_enum(BIBLEPARA *op,BIBLEPARA_CUR *curp,BIBLEPARA_CITE *qp) {
 	BIBLEPARAS_CITE	sq ;
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.enumerate != NULL) {
+	if (op->call.enumerate != nullptr) {
 	    if ((rs = (*op->call.enumerate)(op->obj,curp->scp,&sq)) >= 0) {
 	        qp->b = sq.b ;
 	        qp->c = sq.c ;
@@ -314,33 +291,30 @@ int biblepara_enum(BIBLEPARA *op,BIBLEPARA_CUR *curp,BIBLEPARA_CITE *qp)
 	    }
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("biblepara_enum: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (biblepara_enum) */
+} /* end subroutine (biblepara_enum) */
 
-
-int biblepara_info(BIBLEPARA *op,BIBLEPARA_INFO *ip)
-{
+int biblepara_info(BIBLEPARA *op,BIBLEPARA_INFO *ip) {
 	BIBLEPARAS_INFO	bi ;
 	int		rs = SR_NOSYS ;
 	int		nverses = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
-	if (ip != NULL)
+	if (ip != nullptr)
 	    memset(ip,0,sizeof(BIBLEPARAS_INFO)) ;
 
-	if (op->call.info != NULL)
+	if (op->call.info != nullptr)
 	    rs = (*op->call.info)(op->obj,&bi) ;
 
 	nverses = bi.nverses ;
-	if (ip != NULL) {
+	if (ip != nullptr) {
 	    memset(ip,0,sizeof(BIBLEPARA_INFO)) ;
 	    ip->dbtime = bi.dbtime ;
 	    ip->vitime = bi.vitime ;
@@ -351,36 +325,33 @@ int biblepara_info(BIBLEPARA *op,BIBLEPARA_INFO *ip)
 	}
 
 	return (rs >= 0) ? nverses : rs ;
-}
-/* end subroutine (biblepara_info) */
+} /* end subroutine (biblepara_info) */
 
 
 /* private subroutines */
 
-
 /* find and load the DB-access object */
-static int biblepara_objloadbegin(BIBLEPARA *op,cchar *pr,cchar *objname)
-{
+local int biblepara_objloadbegin(BIBLEPARA *op,cchar *pr,cchar *objname) {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
-	const int	n = nelem(subs) ;
+	cint	n = nelem(subs) ;
 	int		rs ;
 	int		rs1 ;
 	int		opts ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("biblepara_objloadbegin: pr=%s\n",pr) ;
 	debugprintf("biblepara_objloadbegin: objname=%s\n",objname) ;
 #endif
 
 	opts = vecstrm.compact ;
 	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
+	    cint	nlen = SYMNAMELEN ;
 	    int		i ;
-	    int		f_modload = FALSE ;
+	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
@@ -390,9 +361,9 @@ static int biblepara_objloadbegin(BIBLEPARA *op,cchar *pr,cchar *objname)
 	    } /* end for */
 
 	    if (rs >= 0) {
-		const char	**sv ;
+		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*modbname = BIBLEPARA_MODBNAME ;
+	            cchar	*modbname = BIBLEPARA_MODBNAME ;
 	            opts = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
 	            rs = modload_open(lp,pr,modbname,objname,opts,sv) ;
 		    f_modload = (rs >= 0) ;
@@ -405,7 +376,7 @@ static int biblepara_objloadbegin(BIBLEPARA *op,cchar *pr,cchar *objname)
 		modload_close(lp) ;
 	} /* end if (allocation) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("biblepara_objloadbegin: modload_open() rs=%d\n",rs) ;
 #endif
 
@@ -420,7 +391,7 @@ static int biblepara_objloadbegin(BIBLEPARA *op,cchar *pr,cchar *objname)
 		    rs = biblepara_loadcalls(op,objname) ;
 		    if (rs < 0) {
 			uc_free(op->obj) ;
-			op->obj = NULL ;
+			op->obj = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 	    } /* end if (getmva) */
@@ -429,64 +400,58 @@ static int biblepara_objloadbegin(BIBLEPARA *op,cchar *pr,cchar *objname)
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (biblepara_objloadbegin) */
+} /* end subroutine (biblepara_objloadbegin) */
 
-
-static int biblepara_objloadend(BIBLEPARA *op)
-{
+local int biblepara_objloadend(BIBLEPARA *op) {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj != nullptr) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
 	if (rs >= 0) rs = rs1 ;
 
 	return rs ;
-}
-/* end subroutine (biblepara_objloadend) */
+} /* end subroutine (biblepara_objloadend) */
 
-
-static int biblepara_loadcalls(BIBLEPARA *op,cchar *objname)
-{
+local int biblepara_loadcalls(BIBLEPARA *op,cchar *objname) {
 	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+	cint	nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	const void	*snp ;
+	cvoid	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = NULL ;
+		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
 
 	    if (rs < 0) break ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("biblepara_loadcalls: call=%s %c\n",
 		subs[i],
-		((snp != NULL) ? 'Y' : 'N')) ;
+		((snp != nullptr) ? 'Y' : 'N')) ;
 #endif
 
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 
 	        c += 1 ;
 		switch (i) {
 
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *,const char *)) snp ;
+			(int (*)(void *,cchar *,cchar *)) snp ;
 		    break ;
 
 		case sub_count:
@@ -531,24 +496,18 @@ static int biblepara_loadcalls(BIBLEPARA *op,cchar *objname)
 	} /* end for (subs) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (biblepara_loadcalls) */
+} /* end subroutine (biblepara_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int	f = FALSE ;
-
+local bool isrequired(int i) noex {
+	bool	f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_ispara:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
-
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
