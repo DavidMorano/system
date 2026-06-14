@@ -76,7 +76,7 @@ int bvcitekey_set(bvcitekey *bvp,uint *ckp) noex {
 	int		rs = SR_FAULT ;
 	if (bvp && ckp) {
 	    uint	ck = 0 ;
-	    rs = SR_OK  ;
+	    rs = SR_OK ;
 	    ck = loadshift(ck,bvp->nlines) ;
 	    ck = loadshift(ck,bvp->b) ;
 	    ck = loadshift(ck,bvp->c) ;
@@ -84,21 +84,19 @@ int bvcitekey_set(bvcitekey *bvp,uint *ckp) noex {
 	    *ckp = ck ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bvcitekey_set) */
+} /* end subroutine (bvcitekey_set) */
 
 int bvcitekey_get(bvcitekey *bvp,uint *ckp) noex {
 	int		rs = SR_FAULT ;
 	if (bvp && ckp) {
 	    uint	ck = *ckp ;
-	    rs = SR_OK  ;
+	    rs = SR_OK ;
 	    bvp->v	= getbyte(ck,0) ;
 	    bvp->c	= getbyte(ck,1) ;
 	    bvp->b	= getbyte(ck,2) ;
 	    bvp->nlines	= getbyte(ck,3) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bvcitekey_get) */
+} /* end subroutine (bvcitekey_get) */
 
 
