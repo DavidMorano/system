@@ -38,6 +38,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 
+#include	<usysdefs_data.h>	/* miscellaneous system data */
 #include	<usysdefs_af.h>		/* address families */
 #include	<usysdefs_pf.h>		/* protocol families */
 #include	<usysdefs_fcntl.h>
