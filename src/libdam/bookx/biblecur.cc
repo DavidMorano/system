@@ -89,7 +89,7 @@ template<typename ... Args>
 local inline int biblecur_magic(biblecur *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == BIBLECUR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == BIBLECUR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	} /* end if */
 	return rs ;
 } /* end subroutine (biblecur_magic) */
