@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* BIBLEBOOKS object implementation */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -43,14 +46,14 @@ typedef	BIBLEBOOKS_OBJ		biblebooks_obj ;
 
 EXTERNC_begin
 
-extern int	biblebooks_open(biblebooks *,cchar *,cchar *) noex ;
-extern int	biblebooks_count(biblebooks *) noex ;
-extern int	biblebooks_max(biblebooks *) noex ;
-extern int	biblebooks_lookup(biblebooks *,char *,int,int) noex ;
-extern int	biblebooks_get(biblebooks *,int,char *,int) noex ;
-extern int	biblebooks_size(biblebooks *) noex ;
-extern int	biblebooks_audit(biblebooks *) noex ;
-extern int	biblebooks_close(biblebooks *) noex ;
+extern int	biblebooks_open		(biblebooks *,cchar *,cchar *) noex ;
+extern int	biblebooks_count	(biblebooks *) noex ;
+extern int	biblebooks_max		(biblebooks *) noex ;
+extern int	biblebooks_lookup	(biblebooks *,char *,int,int) noex ;
+extern int	biblebooks_get		(biblebooks *,int,char *,int) noex ;
+extern int	biblebooks_size		(biblebooks *) noex ;
+extern int	biblebooks_audit	(biblebooks *) noex ;
+extern int	biblebooks_close	(biblebooks *) noex ;
 
 EXTERNC_end
 
