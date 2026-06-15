@@ -45,7 +45,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<sbuf.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>
@@ -146,7 +146,7 @@ int progmsgid(proginfo *pip,char *mbuf,int mlen,int serial) noex {
 
 static int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_un)) >= 0) {
+	if ((rs = bufsizeget(bufsize_un)) >= 0) {
 	    var.usernamelen = rs ;
 	}
 	return rs ;
