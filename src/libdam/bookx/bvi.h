@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* read or audit a BVI database */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
