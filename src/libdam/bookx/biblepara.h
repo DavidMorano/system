@@ -2,6 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* BIBLEPARA object-load management */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	- 2008-10-01, David A­D­ Morano
+	This module was originally written.
+
+*/
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
@@ -61,7 +71,7 @@ struct biblepara_head {
 	MODLOAD		loader ;
 	BIBLEPARA_CALLS	call ;
 	void		*obj ;		/* object pointer */
-	uint		magic ;
+	uint		magval ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
 } ; /* end struct */
@@ -79,10 +89,11 @@ extern int	biblepara_open(biblepara *,cchar *,cchar *) noex ;
 extern int	biblepara_count(biblepara *) noex ;
 extern int	biblepara_ispara(biblepara *,biblepara_q *) noex ;
 extern int	biblepara_curbegin(biblepara *,biblepara_cur *) noex ;
-extern int	biblepara_enum(biblepara *,biblepara_cur *,biblepara_q *) noex ;
+extern int	biblepara_curenum(biblepara *,biblepara_cur *,
+			biblepara_q *) noex ;
 extern int	biblepara_curend(biblepara *,biblepara_cur *) noex ;
 extern int	biblepara_audit(biblepara *) noex ;
-extern int	biblepara_info(biblepara *,biblepara_info *) noex ;
+extern int	biblepara_getinfo(biblepara *,biblepara_info *) noex ;
 extern int	biblepara_close(biblepara *) noex ;
 
 EXTERNC_end
