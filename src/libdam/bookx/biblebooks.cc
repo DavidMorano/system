@@ -94,13 +94,13 @@ int biblebooks_open(BIBLEBOOKS *op,cchar *pr,cchar *dbname) noex {
 	    char	tbuf[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath3(tbuf,pr,dname,dbname)) >= 0) {
 		if ((rs = vecpstr_loadfile(&op->db,FALSE,tbuf)) >= 0) {
-		    op->magic = BIBLEBOOKS_MAGIC ;
+		    op->magval = BIBLEBOOKS_MAGIC ;
 		    rs = vecpstr_count(&op->db) ;
 		}
 	    }
 	    if (rs < 0) {
 	        vecpstr_finish(&op->db) ;
-		op->magic = 0 ;
+		op->magval = 0 ;
 	    }
 	} /* end if (vecpstr_start) */
 
@@ -114,12 +114,12 @@ int biblebooks_close(BIBLEBOOKS *op) {
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (op->magic != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = vecpstr_finish(&op->db) ;
 	if (rs >= 0) rs = rs1 ;
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (biblebooks_close) */
 
@@ -128,7 +128,7 @@ int biblebooks_count(BIBLEBOOKS *op) {
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (op->magic != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
 
 	rs = vecpstr_count(&op->db) ;
 
@@ -140,7 +140,7 @@ int biblebooks_max(BIBLEBOOKS *op) {
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (op->magic != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
 
 	if ((rs = vecpstr_count(&op->db)) > 0) {
 	    rs -= 1 ;
@@ -154,7 +154,7 @@ int biblebooks_audit(BIBLEBOOKS *op) {
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (op->magic != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
 
 	rs = vecpstr_audit(&op->db) ;
 
@@ -168,7 +168,7 @@ int biblebooks_lookup(BIBLEBOOKS *op,char *rbuf,int rlen,int bi) {
 	if (op == NULL) return SR_FAULT ;
 	if (rbuf == NULL) return SR_FAULT ;
 
-	if (op->magic != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	debugprintf("biblebooks_get: bi=%d\n",bi) ;
@@ -191,7 +191,7 @@ int biblebooks_get(BIBLEBOOKS *op,int bi,char *rbuf,int rlen) {
 
 int biblebooks_size(BIBLEBOOKS *op) {
 	if (op == NULL) return SR_FAULT ;
-	if (op->magic != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
 	return vecpstr_strsize(&op->db) ;
 } /* end subroutine (biblebooks_size) */
 
