@@ -452,15 +452,15 @@ local int bvses_mapbeginer(bvses *op,time_t dt) noex {
 	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	        if (csize fsize = sb.st_size ; fsize > 0) {
 	            csize	ms = fsize ;
-	            int		mp = PROT_READ ;
-	            int		mf = MAP_SHARED ;
+	            cint	mp = PROT_READ ;
+	            cint	mf = MAP_SHARED ;
 	            void	*md ;
 	            if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 			bvses_fmi *mip = op->fmip ;
-	                mip->mapdata = charp(md) ;
-	                mip->mapsize = ms ;
-	                mip->ti_mod = sb.st_mtime ;
-	                mip->ti_map = dt ;
+	                mip->mapdata	= charp(md) ;
+	                mip->mapsize	= ms ;
+	                mip->ti_mod	= sb.st_mtime ;
+	                mip->ti_map	= dt ;
 			fsz = intconv(fsize) ;
 	            } /* end if (u_mamp) */
 	        } else {
@@ -533,50 +533,51 @@ local int bvses_checkup(bvses *op,time_t dt) noex {
 } /* end subroutine (bvses_checkup) */
 
 local int bvses_proc(bvses *op,time_t dt) noex {
-	bvses_fmi	*mip = op->fmip ;
-	bvshdr		*hip = op->fhip ;
-	int		rs = SR_FAULT ;
-	if (mip) {
+	int		rs = SR_BUGCHECK ;
+	if (bvses_fmi *mip = op->fmip ; mip) {
 	    cint msz = intconv(mip->mapsize) ;
-	    if ((rs = hip->wr(mip->mapdata,msz)) >= 0) {
-	        if ((rs = bvses_verify(op,dt)) >= 0) {
-	            mip->bt = (ushort (*)[4])	(mip->mapdata + hip->btoff) ;
-	            mip->ct = (uchar *)		(mip->mapdata + hip->ctoff) ;
+	    if (bvshdr *hip = op->fhip ; hip) {
+	        if ((rs = hip->wr(mip->mapdata,msz)) >= 0) {
+	            if ((rs = bvses_verify(op,dt)) >= 0) {
+	                mip->bt = (ushort (*)[4])(mip->mapdata + hip->btoff) ;
+	                mip->ct = (uchar *)	(mip->mapdata + hip->ctoff) ;
+	            } /* end if */
 	        } /* end if */
-	    } /* end if */
-	} /* end block */
+	    } /* end if (bug-check) */
+	} /* end if (bug-check) */
 	return rs ;
 } /* end subroutine (bvses_proc) */
 
 local int bvses_verify(bvses *op,time_t dt) noex {
-	bvses_fmi	*mip = op->fmip ;
-	bvshdr		*hip = op->fhip ;
-	uint		dtime = uintconv(dt) ;
-	int		rs = SR_OK ;
-	{
-	    cuint	msz = intconv(mip->mapsize) ;
-	    int		sz ;
-	    bool	f = true ;
-	    DEBUGPRINTF("ent nverses=%u\n",hip->nverses) ;
-	    f = f && (hip->nverses > 0) ;
-	    f = f && (hip->fsz == msz) ;
-	    f = f && (hip->wtime > 0) && (hip->wtime <= (dtime + SHIFTINT)) ;
-	    /* alignment restriction */
-	    f = f && ((hip->btoff & (szof(uint) - 1)) == 0) ;
-	    /* size restrictions */
-	    f = f && (hip->btoff <= msz) ;
-	    sz = hip->btlen * 4 * szof(ushort) ;
-	    f = f && ((hip->btoff + sz) <= msz) ;
-	    /* size restrictions */
-	    f = f && (hip->ctoff <= mip->mapsize) ;
-	    sz = hip->ctlen * 1 * szof(uchar) ;
-	    /* size restrictions */
-	    f = f && (hip->btlen <= hip->ctlen) ;
-	    /* get out */
-	    if (! f) {
-	        rs = SR_BADFMT ;
-	    }
-	} /* end block */
+	int		rs = SR_BUGCHECK ;
+	if (bvses_fmi *mip = op->fmip ; mip) {
+	    if (bvshdr *hip = op->fhip ; hip) {
+	        cuint	dtime = uintconv(dt) ;
+	        cuint	msz = uintconv(mip->mapsize) ;
+	        cint	si = SHIFTINT ;
+	        int	sz{} ;
+	        bool	f = true ;
+	        DEBUGPRINTF("ent nverses=%u\n",hip->nverses) ;
+	        f = f && (hip->nverses > 0) ;
+	        f = f && (hip->fsz == msz) ;
+	        f = f && (hip->wtime > 0) && (hip->wtime <= (dtime + si)) ;
+	        /* alignment restriction */
+	        f = f && ((hip->btoff & (szof(uint) - 1)) == 0) ;
+	        /* size restrictions */
+	        f = f && (hip->btoff <= msz) ;
+	        sz = hip->btlen * 4 * szof(ushort) ;
+	        f = f && ((hip->btoff + sz) <= msz) ;
+	        /* size restrictions */
+	        f = f && (hip->ctoff <= msz) ;
+	        sz = hip->ctlen * 1 * szof(uchar) ;
+	        /* size restrictions */
+	        f = f && (hip->btlen <= hip->ctlen) ;
+	        /* get out */
+	        if (! f) {
+	            rs = SR_BADFMT ;
+	        }
+	    } /* end if (bug-check) */
+	} /* end if (bug-check) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bvses_verify) */
@@ -613,7 +614,7 @@ local int bvses_auditct(bvses *op) noex {
 	    uchar	*ct = mip->ct ;
 	    uint	nv = 0 ;
 	    for (uint i = 0 ; (rs >= 0) && (i < hip->ctlen) ; i += 1) {
-	        nv += (ct[i] & UCHAR_MAX) ;
+	        nv += int(ct[i] & UCHAR_MAX) ;
 	    } /* end for (record table entries) */
 	    if ((rs >= 0) && (nv > hip->nverses)) {
 	        rs = SR_BADFMT ;
