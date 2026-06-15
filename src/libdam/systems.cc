@@ -46,7 +46,7 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getpwd.h>
 #include	<absfn.h>
 #include	<mkpathx.h>
@@ -676,9 +676,9 @@ local int entry_finish(ENT *ep) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mp)) >= 0) ylikely {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
-	    if ((rs = getbufsize(bufsize_ml)) >= 0) ylikely {
+	    if ((rs = bufsizeget(bufsize_ml)) >= 0) ylikely {
 		maxlinelen = rs ;
 		filelinelen = (maxlinelen * FILELINEMULT) ;
 		fileargslen = (maxpathlen * FILEARGSMULT) ;
