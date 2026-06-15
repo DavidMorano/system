@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2013-02-07, David A­D­ Morano
+	= 2008-02-07, David A­D­ Morano
 	This code was originally written.  
 
 */
 
-/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -96,8 +96,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	    op->c = 1 ;
 	    op->v = 1 ;
 	    if (int v, si, sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
-	        int	ch = mkchar(sp[0]) ;
-	        if (isalphalatin(ch)) {
+	        if (int	ch = mkchar(sp[0]) ; isalphalatin(ch)) {
 		    op->sp = sp ;
 	  	    op->sl = sl ;
 	            if ((si = siourbrk(sp,sl,true)) > 0) {
@@ -105,11 +104,10 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 		        sp += si ;
 		        sl -= si ;
 		        if (sl > 0) {
-			    ch = mkchar(sp[0]) ;
-		 	    if (ch == ':') {
+			    if (ch = mkchar(sp[0]) ; ch == ':') {
 			        sp += 1 ;
 			        sl -= 1 ;
-			    }
+			    } /* end if */
 		        } /* end if (non-zero positive) */
 	            } else {
 		        sl = 0 ;
@@ -117,7 +115,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	        } else if (isdigitlatin(ch)) {
 	            if ((si = siourbrk(sp,sl,true)) > 0) {
 		        rs = cfdeci(sp,si,&v) ;
-		        op->b = schar(v) ;
+		        op->b = uchar(v) ;
 	            } /* end if (non-zero positive) */
 	        } else {
 	            rs = SR_DOM ;
@@ -126,17 +124,17 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 		    if (cchar *tp = strnchr(sp,sl,':') ; tp) {
 			cint tl = intconv(tp - sp) ;
 		        if ((rs = cfdeci(sp,tl,&v)) >= 0) {
-			    op->c = schar(v) ;
+			    op->c = uchar(v) ;
 			    sl -= intconv((tp + 1) - sp) ;
 			    sp = (tp+1) ;
 			    if (sl > 0) {
 		    	        rs = cfdeci(sp,sl,&v) ;
-		    	        op->v = schar(v) ;
+		    	        op->v = uchar(v) ;
 			    }
 		        } /* end if (cfdec) */
 		    } else {
 		        rs = cfdeci(sp,sl,&v) ;
-		        op->c = schar(v) ;
+		        op->c = uchar(v) ;
 		    } /* end if (strnchr) */
 	        } /* end if */
 	    } else {
