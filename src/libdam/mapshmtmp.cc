@@ -151,7 +151,7 @@ static int shmalloc(int fd,int shmlen)
 	memset(wbuf,0,wlen) ;
 
 	while ((rs >= 0) && (off < shmlen)) {
-	    rs = u_pwrite(fd,wbuf,wlen,off) ;
+	    rs = u_writep(fd,wbuf,wlen,off) ;
 	    off += ps ;
 	} /* end while */
 
