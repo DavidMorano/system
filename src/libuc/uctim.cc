@@ -60,35 +60,35 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<sys/time.h>		/* <- interval timers are here */
-#include	<pthread.h>		/* |PTHREAD_SCOPE_SYSTEM| */
-#include	<ucontext.h>
-#include	<ctime>			/* i-timer types */
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<numeric>		/* |cast_saturate(3c++)| */
-#include	<queue>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<upt.h>
-#include	<timewatch.hh>
-#include	<itimers.hh>		/* i-timer selection */
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<pta.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/time.h>		/* POSIX <- interval timers are here */
+#include	<pthread.h>		/* POSIX |PTHREAD_SCOPE_SYSTEM| */
+#include	<ucontext.h>		/* POSIX */
+#include	<ctime>			/* CSTD i-timer types */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<numeric>		/* C++STD |cast_saturate(3c++)| */
+#include	<queue>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<itimers.hh>		/* LIBU i-timer selection */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<pta.h>			/* LIBU */
+#include	<upt.h>			/* LIBUC */
 #include	<vechand.h>		/* vector-handles */
-#include	<vecsorthand.h>		/* vector-sorted-handles */
-#include	<ciq.h>			/* container-interlocked-queue */
-#include	<timespec.h>
-#include	<itimerspec.h>
-#include	<sigevent.h>
-#include	<psem.h>		/* POSIX® semaphore */
-#include	<localmisc.h>
+#include	<vecsorthand.h>		/* LIBUC vector-sorted-handles */
+#include	<ciq.h>			/* LIBUC container-interlocked-queue */
+#include	<timespec.h>		/* LIBU */
+#include	<itimerspec.h>		/* LIBU */
+#include	<sigevent.h>		/* LIBUC */
+#include	<psem.h>		/* LIBUC POSIX® semaphore */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uctim.h"
 
@@ -195,7 +195,7 @@ namespace {
 	pthread_t	tid_siger ;
 	pthread_t	tid_disper ;
 	timemgr_fl	fl ;
-	volatile int	waiters ;	/* n-waiters for general capture */
+	vol int		waiters ;	/* n-waiters for general capture */
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
@@ -275,9 +275,7 @@ extern "C" {
 /* local variables */
 
 static timemgr		timemgr_data ;
-
 cint			wt = itimer.real ;
-
 cbool			f_childthrs = CF_CHILDTHRS ;
 
 
