@@ -2,10 +2,20 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
+/* vector string operations */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	- 2008-10-01, David A­D­ Morano
+	This object module was originally written for some previous
+	purpose and was adapted for the present use.
+
+*/
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 /* version %I% last-modified %G% */
-
 
 #ifndef	BIBLEMETA_INCLUDE
 #define	BIBLEMETA_INCLUDE
@@ -36,6 +46,7 @@ enum biblemetas {
 struct biblemeta_object {
 	cchar		*name ;
 	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct biblemeta_head {
