@@ -851,10 +851,10 @@ SRVREG_ENT	*ep ;
 
 	eoff = SRVREG_FOTAB + (ei * ebs) ;
 	uoff = eoff ;
-	rs = u_pwrite(op->fd,ebuf,ebs,uoff) ;
+	rs = u_writep(op->fd,ebuf,ebs,uoff) ;
 
 #if	CF_DEBUGS
-	debugprintf("srvreg_write: u_pwrite() rs=%d\n",rs) ;
+	debugprintf("srvreg_write: u_writep() rs=%d\n",rs) ;
 #endif
 
 	if (rs >= 0) {
@@ -1063,7 +1063,7 @@ time_t		daytime ;
 	        op->h = {} ;
 	        bl += filehead((fbuf + bl),0,&op->h) ;
 
-	        rs = u_pwrite(op->fd,fbuf,bl,0L) ;
+	        rs = u_writep(op->fd,fbuf,bl,0L) ;
 	        if (rs > 0) {
 	            op->filesize = rs ;
 		    op->mtime = daytime ;
@@ -1673,7 +1673,7 @@ SRVREG		*op ;
 	bl = filehead(fbuf,0,&op->h) ;
 
 	uoff = SRVREG_FOHEAD ;
-	rs = u_pwrite(op->fd,fbuf,bl,uoff) ;
+	rs = u_writep(op->fd,fbuf,bl,uoff) ;
 
 	return rs ;
 }
