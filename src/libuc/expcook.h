@@ -22,8 +22,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<hdbstr.h>		/* LIBU */
-#include	<buffer.h>		/* LIBU */
+#include	<hdbstr.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
 
 
 #define	EXPCOOK		struct expcook_head
