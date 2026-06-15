@@ -43,16 +43,16 @@ LIBS +=
 OBJ0= bvshdr.o bvsbook.o bvsmk.o bvses.o bvs.o
 OBJ1= bvihdr.o bvimk.o bvi.o
 OBJ2= bvcitekey.o bvchapters.o
-OBJ3= bpihdr.o bpimk.o
+OBJ3= bpihdr.o bpimk.o bpi.o
 
-OBJ4= bcspec.o biblecite.o
-OBJ5=
+OBJ4= bcspec.o 
+OBJ5= biblecite.o biblemeta.o
 OBJ6=
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
 #OBJB= obj4.o obj5.o obj6.o obj7.o
-OBJB= obj4.o
+OBJB= obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
@@ -179,10 +179,13 @@ bvi.o:			bvi.cc		bvi.h	bvchapters.hh		$(INCS)
 
 bpihdr.o:		bpihdr.cc	bpihdr.h			$(INCS)
 bpimk.o:		bpimk.cc	bpimk.h				$(INCS)
+bpi.o:			bpi.cc		bpi.h				$(INCS)
 
 bvcitekey.o:		bvcitekey.cc	bvcitekey.h			$(INCS)
 bvchapters.o:		bvchapters.cc	bvchapters.hh			$(INCS)
 
 bcspec.o:		bcspec.cc	bcspec.h			$(INCS)
 biblecite.o:		biblecite.cc	biblecite.h			$(INCS)
+biblemta.o:		biblemeta.cc	biblemeta.h			$(INCS)
+
 
