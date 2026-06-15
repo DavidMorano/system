@@ -1259,7 +1259,7 @@ static int msfile_filetopwrite(MS *op) noex {
 	op->fileversion = MSFILE_FILEVERSION ;
 	op->filetype = 0 ;
 	op->h = {} ;
-	if ((rs = u_pwrite(op->fd,op->topbuf,bl,poff)) >= 0) {
+	if ((rs = u_writep(op->fd,op->topbuf,bl,poff)) >= 0) {
 	    op->filesize = rs ;
 	    op->topsize = rs ;
 	    opop->fl.fileinit = true ;
@@ -1694,7 +1694,7 @@ static int msfile_headwrite(MS *op) noex {
 	    bp = (op->topbuf + htoff) ;
 	    bl = (toff - htoff) ;
 	    poff = htoff ;
-	    rs = u_pwrite(op->fd,bp,bl,poff) ;
+	    rs = u_writep(op->fd,bp,bl,poff) ;
 	}
 
 	return rs ;
