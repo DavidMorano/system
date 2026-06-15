@@ -31,9 +31,9 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD*/
-#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBU */
 #include	<vecstr.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
@@ -57,9 +57,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -108,7 +106,7 @@ template<typename ... Args>
 local inline int biblemeta_magic(biblemeta *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == BIBLEMETA_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == BIBLEMETA_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	} /* end if */
 	return rs ;
 } /* end subroutine (biblemeta_magic) */
@@ -117,6 +115,8 @@ local int	biblemeta_opener(BM *,cc *,cc *) noex ;
 
 
 /* local variables */
+
+constexpr char		dbdname[]	= BIBLEMETA_DBDNAME ;
 
 
 /* exported variables */
@@ -134,7 +134,9 @@ int biblemeta_open(BM *op,cchar *pr,cchar *dbn) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rc = 0 ;
-	if ((dbn == np) || (dbn[0] == '\0')) dbn = BIBLEMETA_DBNAME ;
+	if ((dbn == np) || (dbn[0] == '\0')) {
+	    dbn = BIBLEMETA_DBNAME ;
+	}
 	if ((rs = biblemeta_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
@@ -143,7 +145,7 @@ int biblemeta_open(BM *op,cchar *pr,cchar *dbn) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		biblemeta_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (biblemeta_ctor) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (biblemeta_open) */
@@ -152,15 +154,15 @@ int biblemeta_close(BM *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = biblemeta_magic(op)) >= 0) {
-	    {
-	        rs1 = vecstr_finish(op->dbp) ;
+	    if (vecstr *dbp = op->dbp ; dbp) {
+	        rs1 = dbp->finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
 		rs1 = biblemeta_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (biblemeta_close) */
@@ -168,25 +170,29 @@ int biblemeta_close(BM *op) noex {
 int biblemeta_count(BM *op) noex {
 	int		rs ;
 	if ((rs = biblemeta_magic(op)) >= 0) {
-	    rs = vecstr_count(op->dbp) ;
+	    vecstr *dbp = op->dbp ;
+	    rs = dbp->count ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (biblemeta_count) */
 
 int biblemeta_nummax(BM *op) noex {
 	int		rs ;
+	int		num = 0 ;
 	if ((rs = biblemeta_magic(op)) >= 0) {
-	    if ((rs = vecstr_count(op->dbp)) > 0) {
-	        rs -= 1 ;
+	    vecstr *dbp = op->dbp ;
+	    if ((rs = dbp->count) > 0) {
+	        num = (rs - 1) ;
 	    }
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? num : rs ;
 } /* end subroutine (biblemeta_nummax) */
 
 int biblemeta_audit(BM *op) noex {
 	int		rs ;
 	if ((rs = biblemeta_magic(op)) >= 0) {
-	    rs = vecstr_audit(op->dbp) ;
+	    vecstr *dbp = op->dbp ;
+	    rs = dbp->audit ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (biblemeta_audit) */
@@ -194,9 +200,10 @@ int biblemeta_audit(BM *op) noex {
 int biblemeta_get(BM *op,int i,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = biblemeta_magic(op,rbuf)) >= 0) {
-	    if (cchar *cp{} ; (rs = vecstr_get(op->dbp,i,&cp)) >= 0) {
+	    vecstr *dbp = op->dbp ;
+	    if (cchar *cp{} ; (rs = dbp->get(i,&cp)) >= 0) {
 	        rs = sncpy1(rbuf,rlen,cp) ;
-	}
+	    }
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (biblemeta_get) */
@@ -205,25 +212,28 @@ int biblemeta_get(BM *op,int i,char *rbuf,int rlen) noex {
 /* local subroutines */
 
 local int biblemeta_opener(BM *op,cc *pr,cc *dbn) noex {
+	vecstr		*dbp = op->dbp ;
 	cint		vn = BIBLEMETA_DEFENTS ;
 	cint		vo = 0 ;
 	int		rs ;
-	int		c = 0 ;
-	if ((rs = vecstr_start(op->dbp,vn,vo)) >= 0) {
-	    if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
-	        if ((rs = mkpath3(tbuf,pr,BIBLEMETA_DBDNAME,dbn)) >= 0) {
-	            if ((rs = vecstr_loadfile(op->dbp,false,tbuf)) >= 0) {
-	                if ((rs = vecstr_count(op->dbp)) >= 0) {
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if ((rs = dbp->start(vn,vo)) >= 0) {
+	    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	        if ((rs = mkpath3(tbuf,pr,dbdname,dbn)) >= 0) {
+	            if ((rs = dbp->loadfile(false,tbuf)) >= 0) {
+	                if ((rs = dbp->count) >= 0) {
 			    c = rs ;
-	                    op->magic = BIBLEMETA_MAGIC ;
+	                    op->magval = BIBLEMETA_MAGIC ;
 	                }
 	            } /* end if (vecstr_loadfile) */
 	        } /* end if (mkpath) */
-		rs = rsfree(rs,tbuf) ;
+		rs1 = mem.free(tbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    if (rs < 0) {
-		vecstr_finish(op->dbp) ;
-	    }
+		dbp->finish() ;
+	    } /* end if (error) */
 	} /* end if (vecstr_start) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (biblemeta_opener) */
