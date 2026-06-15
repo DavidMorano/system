@@ -89,7 +89,9 @@
 
 #include	"rex.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -157,7 +159,7 @@ namespace {
 	operator int () noex ;
 	int mainsub() noex ;
     } ; /* end struct (rexer) */
-}
+} /* end namespace */
 
 
 /* forward subroutines */
@@ -266,7 +268,8 @@ int rexer::mainsub() noex {
 		rs = getsv_name(&se,cmdbuf,CMDBUFLEN,tp,"tcp") ;
 #endif
 	        if (sp != nullptr) {
-	            port = ntohs(sp->s_port) ;
+		    cshort sport = short(sp->s_port) ;
+	            port = int(ntohs(sport)) ;
 	        }
 
 	    } /* end if (bad decimal conversion) */
@@ -293,7 +296,8 @@ int rexer::mainsub() noex {
 	    }
 
 	    if (sp != nullptr) {
-	        port = ntohs(sp->s_port) ;
+		cshort sport = short(sp->s_port) ;
+	        port = int(ntohs(sport)) ;
 	    } else {
 	        port = REX_DEFEXECSERVICE ;
 	    }
