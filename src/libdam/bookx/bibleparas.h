@@ -2,6 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* BIBLEPARAS implementation */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	- 2008-10-01, David A­D­ Morano
+	This object module was originally written.
+
+*/
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
@@ -86,10 +96,11 @@ extern int bibleparas_open(bibleparas *,cchar *,cchar *) noex ;
 extern int bibleparas_count(bibleparas *) noex ;
 extern int bibleparas_ispara(bibleparas *,bibleparas_q *) noex ;
 extern int bibleparas_curbegin(bibleparas *,bibleparas_cur *) noex ;
-extern int bibleparas_enum(bibleparas *,bibleparas_cur *,bibleparas_q *) noex ;
+extern int bibleparas_curenum(bibleparas *,bibleparas_cur *,
+		bibleparas_q *) noex ;
 extern int bibleparas_curend(bibleparas *,bibleparas_cur *) noex ;
 extern int bibleparas_audit(bibleparas *) noex ;
-extern int bibleparas_info(bibleparas *,bibleparas_info *) noex ;
+extern int bibleparas_getinfo(bibleparas *,bibleparas_info *) noex ;
 extern int bibleparas_close(bibleparas *) noex ;
 
 EXTERNC_end
