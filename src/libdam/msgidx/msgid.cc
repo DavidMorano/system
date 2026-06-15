@@ -590,7 +590,7 @@ local int msgid_updates(msgid *op,time_t dt,msgid_key *kp,msgide *ep) noex {
                 /* write back this entry */
                 eoff = MSGID_FOTAB + (ei * op->entsz) ;
                 uoff = eoff ;
-                if ((rs = u_pwrite(op->fd,bep,wlen,uoff)) >= wlen) {
+                if ((rs = u_writep(op->fd,bep,wlen,uoff)) >= wlen) {
                     op->h.wcount += 1 ;
                     op->h.wtime = uint(dt) ;
                     if (f_addition) {
@@ -738,7 +738,7 @@ local int msgid_fileinit(msgid *op,time_t dt) noex {
 	                    if ((rs = filehead(&op->h,fc,headp)) >= 0) {
 			        bl += rs ;
 		    	        /* write them to the file */
-	            	        if ((rs = u_pwrite(op->fd,fbuf,bl,0z)) > 0) {
+	            	        if ((rs = u_writep(op->fd,fbuf,bl,0z)) > 0) {
 				    op->filesize = rs ;
 	                            op->mtime = dt ;
 	                            if (op->fl.remote) u_fsync(op->fd) ;
@@ -1197,7 +1197,7 @@ local int msgid_writehead(msgid *op) noex {
 	char		fbuf[MSGID_FBUFLEN + 1] ;
 	{
 	    cint	bl = filehead(&op->h,funmode::rd,fbuf) ;
-	    rs = u_pwrite(op->fd,fbuf,bl,uoff) ;
+	    rs = u_writep(op->fd,fbuf,bl,uoff) ;
 	}
 	return rs ;
 }
