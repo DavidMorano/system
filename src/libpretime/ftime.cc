@@ -42,7 +42,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/timeb.h>		/* |ftime(3c)| */
 #include	<cerrno>
