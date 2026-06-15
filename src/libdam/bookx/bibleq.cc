@@ -128,7 +128,7 @@ int bibleq_open(BIBLEQ *op,cchar *pr,cchar *dbname) noex {
 	memclear(op) ;
 	if ((rs = bibleq_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
-		op->magic = BIBLEQ_MAGIC ;
+		op->magval = BIBLEQ_MAGIC ;
 	    }
 	    if (rs < 0)
 		bibleq_objloadend(op) ;
@@ -147,7 +147,7 @@ int bibleq_close(BIBLEQ *op) {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
@@ -155,7 +155,7 @@ int bibleq_close(BIBLEQ *op) {
 	rs1 = bibleq_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (bibleq_close) */
 
@@ -164,7 +164,7 @@ int bibleq_audit(BIBLEQ *op) {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
@@ -178,7 +178,7 @@ int bibleq_count(BIBLEQ *op) {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.count != nullptr) {
 	    rs = (*op->call.count)(op->obj) ;
@@ -193,7 +193,7 @@ int bibleq_curbegin(BIBLEQ *op,BIBLEQ_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
 	memclear(curp) ;
 	if (op->call.curbegin != nullptr) {
@@ -201,7 +201,7 @@ int bibleq_curbegin(BIBLEQ *op,BIBLEQ_CUR *curp) noex {
 	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
 		curp->scp = p ;
 		if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
-	    	    curp->magic = BIBLEQ_MAGIC ;
+	    	    curp->magval = BIBLEQ_MAGIC ;
 		}
 		if (rs < 0) {
 	    	    uc_free(curp->scp) ;
@@ -222,8 +222,8 @@ int bibleq_curend(BIBLEQ *op,BIBLEQ_CUR *curp) {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->scp != nullptr) {
 	    if (op->call.curend != nullptr) {
@@ -236,7 +236,7 @@ int bibleq_curend(BIBLEQ *op,BIBLEQ_CUR *curp) {
 	} else
 	    rs = SR_NOTSUP ;
 
-	curp->magic = 0 ;
+	curp->magval = 0 ;
 	return rs ;
 } /* end subroutine (bibleq_curend) */
 
@@ -248,8 +248,8 @@ int bibleq_lookup(BIBLEQ *op,BIBLEQ_CUR *curp,int qo,cchar **klp) {
 	if (curp == nullptr) return SR_FAULT ;
 	if (klp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
 	rs = (*op->call.lookup)(op->obj,curp->scp,qo,klp) ;
 
@@ -266,8 +266,8 @@ int bibleq_read(BIBLEQ *op,BIBLEQ_CUR *curp,BIBLEQ_CITE *bcp,
 	if (bcp == nullptr) return SR_FAULT ;
 	if (vbuf == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != BIBLEQ_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.enumerate != nullptr) {
 	    rs = (*op->call.enumerate)(op->obj,curp->scp,bcp,vbuf,vlen) ;
