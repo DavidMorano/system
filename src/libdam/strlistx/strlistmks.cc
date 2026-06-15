@@ -650,7 +650,7 @@ sub_wrsfile::operator int () noex {
 	  	    if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
 			coff	moff = STRLISTHDR_MAGICSIZE ;
 	        	cint	hl = rs ;
-	        	if ((rs = u_pwrite(op->nfd,hbuf,hl,moff)) >= 0) {
+	        	if ((rs = u_writep(op->nfd,hbuf,hl,moff)) >= 0) {
 			    if_constexpr (f_minmod) {
 	    			rs = uc_fminmod(op->nfd,op->om) ;
 			    } /* end if_constexpr (f_minmod) */
