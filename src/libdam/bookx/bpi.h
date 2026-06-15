@@ -31,7 +31,8 @@
 #define	BPI_V		struct bpi_verse
 #define	BPI_OBJ		struct bpi_object
 #define	BPI_CUR		struct bpi_cursor
-#define	BPI_INFO	struct bpi_infomation
+#define	BPI_INFO	struct bpi_information
+#define	BPI_MAGIC	0x88773422
 #define	BPI_SUF		"bpi"		/* bible-paragraph-index */
 
 
@@ -68,13 +69,13 @@ struct bpi_filemap {
 	time_t		ti_mod ;	/* time file modication */
 	time_t		ti_map ;	/* time file map */
 	size_t		mapsize ;
-} ;
+} ; /* end struct (bpi_filemap) */
 
 struct bpi_head {
 	cchar 		*dbname ;
 	cchar		*fname ;
-	BPI_FMI		fmi ;		/* file-map information */
-	bpihdr		fhi ;		/* file-header information */
+	BPI_FMI		*fmip ;		/* file-map	information pointer */
+	bpihdr		*fhip ;		/* file-header	information pointer */
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magval ;
 	int		ncursors ;
@@ -90,15 +91,15 @@ typedef	BPI_INFO	bpi_info ;
 
 EXTERNC_begin
 
-extern int	bpi_open(bpi *,cchar *) noex ;
-extern int	bpi_count(bpi *) noex ;
-extern int	bpi_info(bpi *,bpi_i *) noex ;
-extern int	bpi_get(bpi *,bpi_q *) noex ;
-extern int	bpi_curbegin(bpi *,bpi_cir *) noex ;
-extern int	bpi_enum(bpi *,bpi_cir *,bpi_v *) noex ;
-extern int	bpi_curend(bpi *,bpi_cir *) noex ;
-extern int	bpi_audit(bpi *) noex ;
-extern int	bpi_close(bpi *) noex ;
+extern int	bpi_open	(bpi *,cchar *) noex ;
+extern int	bpi_count	(bpi *) noex ;
+extern int	bpi_getinfo	(bpi *,bpi_info *) noex ;
+extern int	bpi_get		(bpi *,bpi_q *) noex ;
+extern int	bpi_curbegin	(bpi *,bpi_cur *) noex ;
+extern int	bpi_curenum	(bpi *,bpi_cur *,bpi_v *) noex ;
+extern int	bpi_curend	(bpi *,bpi_cur *) noex ;
+extern int	bpi_audit	(bpi *) noex ;
+extern int	bpi_close	(bpi *) noex ;
 
 EXTERNC_end
 
