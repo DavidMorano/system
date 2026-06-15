@@ -6,7 +6,15 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 2007-03-01, David A­D­ Morano
+	This code was originally written.
+
+*/
+
+
+/* Copyright © 2007 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BPIHDR_INCLUDE
 #define	BPIHDR_INCLUDE
