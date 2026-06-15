@@ -21,7 +21,7 @@
 #include	<netfile.h>
 
 
-#define	REX_DEFEXECSERVICE		512
+#define	REX_DEFEXECSERVICE	512
 
 /* 
 This (next) flag is used in the same namespace as the |open(2)| open 
@@ -39,6 +39,7 @@ enum rexopts {
 
 #define	REX_FL		struct rex_flags
 #define	REX_AU		struct rex_auth
+#define	REX_AUTH	struct rex_auth
 
 
 struct rex_flags {
