@@ -34,7 +34,7 @@ struct bvsbook_head {
 	uchar		ci ;		/* chapter index */
 	uchar		book ;
 	uchar		al ;		/* also is the number of chapters */
-} ; /* end struct */
+} ; /* end struct (bvsbook_head) */
 
 typedef	BVSBOOK		bvsbook ;
 
