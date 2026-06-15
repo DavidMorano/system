@@ -5,6 +5,7 @@
 /* read or audit a BVI database */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_SEARCH	1		/* use |bsearch(3c)| */
 
 /* revision history:
@@ -76,6 +77,9 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	TO_CHECK	4
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 #ifndef	CF_SEARCH
 #define	CF_SEARCH	0		/* use |bsearch(3c)| */
 #endif
@@ -167,6 +171,8 @@ local int	vtecmp		(cvoid *,cvoid *) noex ;
 
 /* local variables */
 
+cuint		vmask			= bvcitekey_vmask ;
+cbool		f_debug			= CF_DEBUG ;
 cbool		f_search		= CF_SEARCH ;
 
 
@@ -495,56 +501,56 @@ local int bvi_checkup(bvi *op,time_t dt) noex {
 } /* end subroutine (bvi_checkup) */
 
 local int bvi_proc(bvi *op,time_t dt) noex {
-	bvi_fmi		*mip = op->fmip ;
-	bvihdr		*hip = op->fhip ;
-	int		rs ;
+	int		rs = SR_BUGCHECK ;
 	int		nv = 0 ;
-	cint msz = int(hip->fsz) ;
-	if ((rs = hip->wr(mip->mapdata,msz)) >= 0) {
-	    nv = hip->nverses ;
-	    if ((rs = bvi_verify(op,dt)) >= 0) {
-	        mip->vt = (uint (*)[4]) (mip->mapdata + hip->vioff) ;
-	        mip->lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;
-	    } /* end if (bvi_verify) */
-	} /* end if (bvihdr_wr) */
+	if (bvi_fmi *mip = op->fmip ; mip) {
+	    cint msz = intconv(mip->mapsize) ;
+	    if (bvihdr *hip = op->fhip ; hip) {
+	        if ((rs = hip->wr(mip->mapdata,msz)) >= 0) {
+	            nv = hip->nverses ;
+	            if ((rs = bvi_verify(op,dt)) >= 0) {
+	                mip->vt = (uint (*)[4]) (mip->mapdata + hip->vioff) ;
+	                mip->lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;
+	            } /* end if (bvi_verify) */
+	        } /* end if (bvihdr_wr) */
+	    } /* end if (bug-check) */
+	} /* end if (bug-check) */
 	return (rs >= 0) ? nv : rs ;
 } /* end subroutine (bvi_proc) */
 
 local int bvi_verify(bvi *op,time_t dt) noex {
-	bvi_fmi		*mip = op->fmip ;
-	bvihdr		*hip = op->fhip ;
-	int		rs = SR_OK ;
-	int		sz ;
-	bool		f = true ;
-	f = f && (hip->fsz == mip->mapsize) ;
-	f = f && (hip->wtime > 0) ;
-	if (f) {
-	    custime	tt = time_t(hip->wtime) ;
-	    f = (dt >= tt) ;
-	}
-#ifdef	COMMENT
-	{
-	    cuint	utime = (uint) dt ;
-	    f = f && (hip->wtime <= (utime + SHIFTINT)) ;
-	}
-#endif
-	/* alignment restriction */
-	f = f && ((hip->vioff & (szof(int)-1)) == 0) ;
-	f = f && (hip->vioff <= mip->mapsize) ;
-	sz = hip->vilen * 4 * szof(uint) ;
-	f = f && ((hip->vioff + sz) <= mip->mapsize) ;
-	/* alignment restriction */
-	f = f && ((hip->vloff & (szof(int)-1)) == 0) ;
-	/* size restrictions */
-	f = f && (hip->vloff <= mip->mapsize) ;
-	sz = (hip->vllen * 2 * szof(uint)) ;
-	f = f && ((hip->vloff + sz) <= mip->mapsize) ;
-	/* size restrictions */
-	f = f && (hip->vilen == hip->nverses) ;
-	/* get out */
-	if (! f) {
-	    rs = SR_BADFMT ;
-	}
+	int		rs = SR_BUGCHECK ;
+	if (bvi_fmi *mip = op->fmip ; mip) {
+	    if (bvihdr *hip = op->fhip ; hip) {
+		cuint	msz = uintconv(mip->mapsize) ;
+		int	sz{} ;
+		bool	f = true ;
+		rs = SR_OK ;
+	        f = f && (hip->fsz == mip->mapsize) ;
+	        f = f && (hip->wtime > 0) ;
+	        if (f) {
+	            custime tt = time_t(hip->wtime) ;
+	            f = (dt >= tt) ;
+	        }
+	        /* alignment restriction */
+	        f = f && ((hip->vioff & (szof(int)-1)) == 0) ;
+	        f = f && (hip->vioff <= msz) ;
+	        sz = hip->vilen * 4 * szof(uint) ;
+	        f = f && ((hip->vioff + sz) <= msz) ;
+	        /* alignment restriction */
+	        f = f && ((hip->vloff & (szof(int) - 1)) == 0) ;
+	        /* size restrictions */
+	        f = f && (hip->vloff <= msz) ;
+	        sz = (hip->vllen * 2 * szof(uint)) ;
+	        f = f && ((hip->vloff + sz) <= msz) ;
+	        /* size restrictions */
+	        f = f && (hip->vilen == hip->nverses) ;
+	        /* get out */
+	        if (! f) {
+	            rs = SR_BADFMT ;
+	        }
+	    } /* end if (bug-check) */
+	} /* end if (bug-check) */
 	return rs ;
 } /* end subroutine (bvi_verify) */
 
@@ -565,7 +571,7 @@ local int bvi_auditvt(bvi *op) noex {
 	           break ;
 	       }
 	       /* verify all entries are ordered w/ increasing citations */
-	       citcmpval = vt[i][3] & 0x00FFFFFF ;
+	       citcmpval = vt[i][3] & vmask ;
 	       if (citcmpval < pcitcmpval) {
 	           rs = SR_BADFMT ;
 	           break ;
@@ -598,7 +604,7 @@ local int bvi_search(bvi *op,bvi_q *qp) noex {
 	            vi = rs ;
 	        } else {
 	            for (vi = 0 ; vi < vtlen ; vi += 1) {
-	                if ((vt[vi][3] & 0x00FFFFFF) == citekey) {
+	                if ((vt[vi][3] & vmask) == citekey) {
 	                    break ;
 	                }
 	            } /* end if */
@@ -714,14 +720,14 @@ local int bvi_loadchapters(bvi *op,int vi,uchar *ap,int al) noex {
 } /* end subroutine (bvi_loadchapters) */
 
 local uint mkciteload(uint ci,uchar item) noex {
-	ci = (ci << CHAR_BIT) ;
+	ci = (ci << UCHAR_BIT) ;
 	ci |= uint(item) ;
 	return ci ; 
 } /* end subroutine (mkciteload) */
 
 local int mkcitekey(uint *cip,bvi_q *bvp) noex {
-    	int		rs = SR_FAULT ;
-	if (bvp && cip) {
+    	int		rs = SR_BUGCHECK ;
+	if (cip && bvp) {
 	    uint	ci = 0 ;
 	    rs = SR_OK ;
 	    ci = mkciteload(ci,bvp->b) ;
@@ -733,7 +739,6 @@ local int mkcitekey(uint *cip,bvi_q *bvp) noex {
 } /* end subroutine (mkcitekey) */
 
 local int entcmp(cuint *vte1,cuint *vte2) noex {
-	uint		vmask = 0x00FFFFFF ;
 	int		rc = 0 ;
 	{
 	    int	c1 = int(vte1[3] & vmask) ;
