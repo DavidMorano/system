@@ -44,8 +44,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<uinfo.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucinfo.h>
 #include	<localmisc.h>
 
 #include	"proginfo.hh"
