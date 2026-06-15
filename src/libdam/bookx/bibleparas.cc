@@ -235,7 +235,7 @@ int bibleparas_open(BIBLEPARAS *op,cchar *pr,cchar *dbname) noex {
 	            if ((rs = subinfo_start(&si)) >= 0) {
 	    	        if ((rs = bibleparas_dbloadbegin(op,&si)) >= 0) {
 			    nverses = op->nverses ;
-			    op->magic = BIBLEPARAS_MAGIC ;
+			    op->magval = BIBLEPARAS_MAGIC ;
 	                }
 	    	        subinfo_finish(&si) ;
 		    } /* end if (subinfo) */
@@ -258,7 +258,7 @@ int bibleparas_close(BIBLEPARAS *op) {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	rs1 = bibleparas_dbloadend(op) ;
@@ -270,7 +270,7 @@ int bibleparas_close(BIBLEPARAS *op) {
 	    op->dbfname = nullptr ;
 	}
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (bibleparas_close) */
 
@@ -280,7 +280,7 @@ int bibleparas_count(BIBLEPARAS *op) {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	rs = op->nverses ;
@@ -294,7 +294,7 @@ int bibleparas_audit(BIBLEPARAS *op) {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if (op->fl.vind) {
@@ -313,7 +313,7 @@ int bibleparas_ispara(BIBLEPARAS *op,BIBLEPARAS_Q *qp) {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if (qp == nullptr) return SR_FAULT ;
@@ -353,7 +353,7 @@ int bibleparas_curbegin(BIBLEPARAS *op,BIBLEPARAS_CUR *curp) {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if (curp == nullptr) return SR_FAULT ;
@@ -371,7 +371,7 @@ int bibleparas_curend(BIBLEPARAS *op,BIBLEPARAS_CUR *curp) {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if (curp == nullptr) return SR_FAULT ;
@@ -390,7 +390,7 @@ int bibleparas_enum(BIBLEPARAS *op,BIBLEPARAS_CUR *curp,BIBLEPARAS_Q *qp) {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if (curp == nullptr) return SR_FAULT ;
@@ -426,7 +426,7 @@ int bibleparas_info(BIBLEPARAS *op,BIBLEPARAS_INFO *ip) {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if ((rs = bpi_info(&op->vind,&bi)) >= 0) {
@@ -482,26 +482,22 @@ local int bibleparas_dbloadend(BIBLEPARAS *op) {
 } /* end subroutine (bibleparas_dbloadend) */
 
 local int bibleparas_dbmapcreate(BIBLEPARAS *op,time_t dt) {
+    	cnullptr	np{} ;
 	int		rs ;
-
-#if	CF_DEBUG
 	debugprintf("bibleparas_dbmapcreate: dbfname=%s\n",op->dbfname) ;
-#endif
-
 	if ((rs = u_open(op->dbfname,O_RDONLY,0666)) >= 0) {
-	    ustat	sb ;
-	    int			fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    cint	fd = rs ;
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 	            if (sb.st_size <= INT_MAX) {
 	                size_t	ms ;
-	                int	mp = PROT_READ ;
-	                int	mf = MAP_SHARED ;
+	                cint	mp = PROT_READ ;
+	                cint	mf = MAP_SHARED ;
 	                void	*md ;
 			op->filesize = (sb.st_size & UINT_MAX) ;
 			op->ti_db = sb.st_mtime ;
 	    		ms = (size_t) op->filesize ;
-	    		if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
+	    		if ((rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 			    cint	madv = MADV_RANDOM ;
 			    const caddr_t	ma = md ;
 	        	    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
@@ -514,7 +510,7 @@ local int bibleparas_dbmapcreate(BIBLEPARAS *op,time_t dt) {
 		    	        u_munmap(md,ms) ;
 	                        op->mapdata = nullptr ;
 	                        op->mapsize = 0 ;
-	                    }
+	                    } /* end if (error) */
 	                } /* end if (u_mmap) */
 	            } else
 	                rs = SR_TOOBIG ;
