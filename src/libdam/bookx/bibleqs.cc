@@ -428,7 +428,7 @@ int bibleqs_open(BIBLEQS *op,cchar *pr,cchar *dbname) noex {
 		if ((rs = bibleqs_dbmapcreate(op,si.dt)) >= 0) {
 		    mkfieldterms(op->wterms) ;
 		    if ((rs = bibleqs_indopen(op,&si)) >= 0) {
-			op->magic = BIBLEQS_MAGIC ;
+			op->magval = BIBLEQS_MAGIC ;
 		    }
 		    if (rs < 0)
 			bibleqs_dbmapdestroy(op) ;
@@ -460,7 +460,7 @@ int bibleqs_close(BIBLEQS *op) {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = bibleqs_indclose(op) ;
 	if (rs >= 0) rs = rs1 ;
@@ -484,7 +484,7 @@ int bibleqs_close(BIBLEQS *op) {
 	debugprintf("bibleqs_close: ret rs=%d\n",rs) ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (bibleqs_close) */
 
@@ -497,7 +497,7 @@ int bibleqs_count(BIBLEQS *op) {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.ind) {
 	   rs = txtindex_count(&op->ind) ;
@@ -515,7 +515,7 @@ int bibleqs_audit(BIBLEQS *op) {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
 	rs = txtindex_audit(&op->ind) ;
 
@@ -536,7 +536,7 @@ int bibleqs_curbegin(BIBLEQS *op,BIBLEQS_CUR *curp) {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
 	memclear(curp) ;
 	op->ncursors += 1 ;
@@ -555,7 +555,7 @@ int bibleqs_curend(BIBLEQS *op,BIBLEQS_CUR *curp) {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->verses != nullptr) {
 	    rs1 = uc_free(curp->verses) ;
@@ -585,7 +585,7 @@ int bibleqs_lookup(BIBLEQS *op,BIBLEQS_CUR *curp,int qo,cchar **qsp) {
 	if (curp == nullptr) return SR_FAULT ;
 	if (qsp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	{
@@ -636,7 +636,7 @@ int bibleqs_read(BIBLEQS *op,BIBLEQS_CUR *curp,BIBLEQS_Q *citep,
 	if (citep == nullptr) return SR_FAULT ;
 	if (vbuf == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEQS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
 	if ((curp->nverses > 0) && (curp->verses != nullptr)) {
 	    uint	recoff ;
@@ -764,24 +764,21 @@ local int bibleqs_infoloadend(BIBLEQS *op) {
 } /* end subroutine (bibleqs_infoloadend) */
 
 local int bibleqs_dbmapcreate(BIBLEQS *op,time_t dt) {
+    	cnullptr	np{} ;
 	int		rs ;
-
-#if	CF_DEBUGS
+	int		rs1 ;
 	debugprintf("bibleqs_dbmapcreate: dbfname=%s\n",op->dbfname) ;
-#endif
-
 	if ((rs = u_open(op->dbfname,O_RDONLY,0666)) >= 0) {
-	    USTAT		sb ;
-	    cint		fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
-		size_t	fsize = (size_t) (sb.st_size & INT_MAX) ;
+	    cint	fd = rs ;
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+		csize	fsize = size_t(sb.st_size) ;
 		if (S_ISREG(sb.st_mode) && (sb.st_size >= 0)) {
-	    		size_t	ms = (size_t) fsize ;
-	    		int	mp = PROT_READ ;
-	    		int	mf = MAP_SHARED ;
+	    		csize	ms = fsize ;
+	    		cint	mp = PROT_READ ;
+	    		cint	mf = MAP_SHARED ;
 	    		void	*md ;
 			op->ti_db = sb.st_mtime ;
-	                if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
+	                if ((rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 		            cint	madv = MADV_RANDOM ;
 		            const caddr_t	ma = md ;
 	                    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
@@ -794,28 +791,27 @@ local int bibleqs_dbmapcreate(BIBLEQS *op,time_t dt) {
 		                u_munmap(md,ms) ;
 	                        op->dbmdata = nullptr ;
 	                        op->dbmsize = 0 ;
-		            }
+		            } /* end if (error) */
 	                } /* end if (u_mmap) */
 	            } /* end if (ok) */
-		} else
+		} else {
 	    	    rs = SR_NOTSUP ;
-	    u_close(fd) ;
-	} /* end if (file) */
-
+		}
+	    rs1 = u_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (map-file) */
 	return rs ;
 } /* end subroutine (bibleqs_dbmapcreate) */
 
 local int bibleqs_dbmapdestroy(BIBLEQS *op) {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->dbmdata != nullptr) {
+	if (op->dbmdata) {
 	    rs1 = u_munmap(op->dbmdata,op->dbmsize) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dbmdata = nullptr ;
 	    op->dbmsize = 0 ;
-	}
-
+	} /* end if */
 	return rs ;
 } /* end subroutine (bibleqs_dbmapdestroy) */
 
