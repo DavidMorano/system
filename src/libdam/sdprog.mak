@@ -40,7 +40,7 @@ MODS +=
 LIBS= -lu
 
 
-OBJ00= sdprog_main.o
+OBJ00= sdprog_prime.o
 OBJ01=
 OBJ02= 
 OBJ03= 
@@ -150,6 +150,6 @@ objb.o:			$(OBJB)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJB)
 
 
-sdprog_main.o:		sdprog_main.cc		$(INCS)
+sdprog_prime.o:		sdprog_prime.cc		$(INCS)
 
 
