@@ -128,7 +128,7 @@ int biblepara_open(BIBLEPARA *op,cchar *pr,cchar *dbname) noex {
 	memclear(op) ;
 	if ((rs = biblepara_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
-		op->magic = BIBLEPARA_MAGIC ;
+		op->magval = BIBLEPARA_MAGIC ;
 	    }
 	    if (rs < 0)
 		biblepara_objloadend(op) ;
@@ -147,7 +147,7 @@ int biblepara_close(BIBLEPARA *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
@@ -163,7 +163,7 @@ int biblepara_close(BIBLEPARA *op) noex {
 	debugprintf("biblepara_close: _objloadend() rs=%d\n",rs) ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (biblepara_close) */
 
@@ -172,7 +172,7 @@ int biblepara_count(BIBLEPARA *op) {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.count != nullptr)
 	    rs = (*op->call.count)(op->obj) ;
@@ -185,7 +185,7 @@ int biblepara_audit(BIBLEPARA *op) {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.audit != nullptr)
 	    rs = (*op->call.audit)(op->obj) ;
@@ -201,7 +201,7 @@ int biblepara_ispara(BIBLEPARA *op,BIBLEPARA_CITE *qp) {
 	if (op == nullptr) return SR_FAULT ;
 	if (qp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUG
 	debugprintf("biblepara_ispara: q=%u:%u:%u\n",
@@ -226,14 +226,14 @@ int biblepara_curbegin(BIBLEPARA *op,BIBLEPARA_CUR *curp) {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.curbegin != nullptr) {
 	    void	*p ;
 	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
 		curp->scp = p ;
 	        if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
-		    curp->magic = BIBLEPARA_MAGIC ;
+		    curp->magval = BIBLEPARA_MAGIC ;
 		}
 		if (rs < 0) {
 		    uc_free(curp->scp) ;
@@ -254,8 +254,8 @@ int biblepara_curend(BIBLEPARA *op,BIBLEPARA_CUR *curp) {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->scp == nullptr) return SR_NOTSOCK ;
 
@@ -268,7 +268,7 @@ int biblepara_curend(BIBLEPARA *op,BIBLEPARA_CUR *curp) {
 	if (rs >= 0) rs = rs1 ;
 	curp->scp = nullptr ;
 
-	curp->magic = 0 ;
+	curp->magval = 0 ;
 	return rs ;
 } /* end subroutine (biblepara_curend) */
 
@@ -280,8 +280,8 @@ int biblepara_enum(BIBLEPARA *op,BIBLEPARA_CUR *curp,BIBLEPARA_CITE *qp) {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.enumerate != nullptr) {
 	    if ((rs = (*op->call.enumerate)(op->obj,curp->scp,&sq)) >= 0) {
@@ -305,7 +305,7 @@ int biblepara_info(BIBLEPARA *op,BIBLEPARA_INFO *ip) {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != BIBLEPARA_MAGIC) return SR_NOTOPEN ;
 
 	if (ip != nullptr)
 	    memset(ip,0,sizeof(BIBLEPARAS_INFO)) ;
