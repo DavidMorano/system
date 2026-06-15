@@ -167,7 +167,7 @@ int preload_init() noex {
 	            rs = msleep(1) ;
 	            if (rs == SR_INTR) rs = SR_OK ;
 	        }
-	        if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKLOST ;
+	        if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKFAIL ;
 	    } /* end if */
 	} /* end if (not-voided) */
 	return rs ;
@@ -326,7 +326,7 @@ static int preload_entryntfins(preload *uip) noex {
 	preload_ent	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	for (int i = 0 ; varray_enum(vap,i,&ep) >= 0 ; i += 1) { 
+	for (int i = 0 ; varray_enumer(vap,i,&ep) >= 0 ; i += 1) { 
 	    if (ep != nullptr) {
 	        rs1 = entry_finish(ep) ;
 		if (rs >= 0) rs = rs1 ;
