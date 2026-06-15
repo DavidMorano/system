@@ -34,11 +34,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/time.h>		/* <- interval timers are here */
-#include	<time.h>		/* i-timer types */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* IPOSIX system types */
+#include	<sys/time.h>		/* POSIX <- interval timers are here */
+#include	<time.h>		/* CSTD i-timer types */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<psen.h>		/* POSIX® semaphore */
 
 
