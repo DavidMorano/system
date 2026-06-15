@@ -453,13 +453,6 @@ projectent.o:		projectent.c projectent.h
 
 userattrent.o:		userattrent.c userattrent.h
 
-utmpaccent.o:		utmpaccent.c utmpaccent.h
-
-findbit.o:		findbit.c findbit.h
-
-snflags.o:		snflags.c snflags.h
-
-
 dialudp.o:		dialudp.c
 
 dialtcp.o:		dialtcp.c
