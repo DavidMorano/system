@@ -90,11 +90,11 @@ extern int	bibleverse_count(bibleverse *) noex ;
 extern int	bibleverse_read(bibleverse *,char *,int,bibleverse_q *) noex ;
 extern int	bibleverse_get(bibleverse *,bibleverse_q *,char *,int) noex ;
 extern int	bibleverse_curbegin(bibleverse *,bibleverse_cur *) noex ;
-extern int	bibleverse_enum(bibleverse *,bibleverse_cur *,
+extern int	bibleverse_curenum(bibleverse *,bibleverse_cur *,
 			bibleverse_q *,char *,int) noex ;
 extern int	bibleverse_curend(bibleverse *,bibleverse_cur *) noex ;
 extern int	bibleverse_audit(bibleverse *) noex ;
-extern int	bibleverse_info(bibleverse *,bibleverse_info *) noex ;
+extern int	bibleverse_getinfo(bibleverse *,bibleverse_info *) noex ;
 extern int	bibleverse_chapters(bibleverse *,int,uchar *,int) noex ;
 extern int	bibleverse_close(bibleverse *) noex ;
 
