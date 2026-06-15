@@ -5,6 +5,7 @@
 /* read or audit a BPI (Bible Paragraph Index) database */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_SEARCH	1		/* use |bsearch(3c)| */
 
 /* revision history:
@@ -52,13 +53,20 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
+#include	<mkpath.h>		/* LIBUC */
+#include	<mkfname.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"bpi.h"
 #include	"bpihdr.h"
 #include	"bvcitekey.h"
+#include	"bpi.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -66,7 +74,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	BPI_MAGIC	0x88773422
 #define	BPI_KA		szof(BPI_LINE)
 #define	BPI_BO(v)	((BPI_KA - ((v) % BPI_KA)) % BPI_KA)
 
@@ -77,6 +84,21 @@ import libutil ;			/* |memclear(3u)| */
 #endif
 
 #define	TO_CHECK	4
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+#ifndef	CF_SEARCH
+#define	CF_SEARCH	0		/* use |bsearch(3c)| */
+#endif
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -90,7 +112,7 @@ import libutil ;			/* |memclear(3u)| */
 const bpi_obj bpi_modinfo = {
 	"bpi",
 	szof(bpi),
-	szof(bpi_cir)
+	szof(bpi_cur)
 } ; /* end initialization */
 
 
@@ -98,6 +120,55 @@ const bpi_obj bpi_modinfo = {
 
 
 /* forward references */
+
+template<typename ... Args>
+local inline int bpi_ctor(bpi *op,Args ... args) noex {
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = SR_NOMEM ;
+	    op->dbname	= np ;
+	    op->fname	= np ;
+	    op->fhip	= np ;
+	    op->magval	= 0 ;
+	    if ((op->fmip = new(nt) bpi_fmi) != np) {
+	        if ((op->fhip = new(nt) bpihdr) != np) {
+		    rs = SR_OK ;
+		} /* end if (new-bvshdr) */
+		if (rs < 0) {
+		    delete op->fmip ;
+		    op->fmip = nullptr ;
+		} /* end if (error) */
+	    } /* end if (new-fmi) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (bpi_ctor) */
+
+local int bpi_dtor(bpi *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->fhip) {
+		delete op->fhip ;
+		op->fhip = nullptr ;
+	    } /* end if (memory-release) */
+	    if (op->fmip) {
+		delete op->fmip ;
+		op->fmip = nullptr ;
+	    } /* end if (memory-release) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (bpi_dtor) */
+
+template<typename ... Args>
+local inline int bpi_magic(bpi *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == BPI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (bpi_magic) */
 
 local int	bpi_loadbegin	(bpi *,time_t) noex ;
 local int	bpi_loadend	(bpi *) noex ;
@@ -110,14 +181,15 @@ local int	bpi_checkupdate	(bpi *,time_t) noex ;
 local int	bpi_search	(bpi *,bpi_q *) noex ;
 local int	bpi_loadbve	(bpi *,bpi_v *,int) noex ;
 
-local int	mkcitekey	(bpi_q *,uint *) noex ;
-
-#if	CF_SEARCH
-local int	vtecmp(cvoid *,cvoid *) noex ;
-#endif
+local int	mkcitekey	(uint *,bpi_q *) noex ;
+local int	vtecmp		(cvoid *,cvoid *) noex ;
 
 
 /* local variables */
+
+cuint		vmask		= bvcitekey_vmask ;
+cbool		f_debug 	= CF_DEBUG ;
+cbool		f_search	= CF_SEARCH ;
 
 
 /* exported variables */
@@ -125,301 +197,260 @@ local int	vtecmp(cvoid *,cvoid *) noex ;
 
 /* exported subroutines */
 
-int bpi_open(bpi *op,cchar *dbname) noex {
-	ctime_t		dt = time(nullptr) ;
-	int		rs = SR_OK ;
-	int		tl ;
-	int		nverses = 0 ;
-	cchar		*cp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (dbname == nullptr) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
-	    cchar	*suf = BPI_SUF ;
-	    cchar	*end = ENDIANSTR ;
-	    char	tbuf[MAXPATHLEN + 1] ;
-	    op->dbname = cp ;
-	    if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
-	        tl = rs ;
-	        if ((rs = uc_mallocstrw(tbuf,tl,&cp)) >= 0) {
-	            op->fname = cp ;
-	            if ((rs = bpi_loadbegin(op,dt)) >= 0) {
-	                op->ti_lastcheck = dt ;
-	                op->magic = BPI_MAGIC ;
-	            }
-	            if (rs < 0) {
-	                uc_free(op->fname) ;
-	                op->fname = nullptr ;
-	            }
-	        } /* end if (m-a) */
-	    } /* end if (mkfnamesuf) */
+int bpi_open(bpi *op,cchar *dbn) noex {
+	int		rs ;
+	int		rs1 ;
+	int		nv = 0 ; /* return-value */
+	if ((rs = bpi_ctor(op,dbn)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (dbn[0]) {
+	        custime		dt = time(nullptr) ;
+	        int		tl ;
+	        if (cchar *cp ; (rs = mem.strw(dbn,-1,&cp)) >= 0) {
+	            cchar	*suf = BPI_SUF ;
+	            cchar	*end = ENDIANSTR ;
+		    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	    	        op->dbname = cp ;
+	    		if ((rs = mkfnamesuf2(tbuf,cp,suf,end)) >= 0) {
+	                    tl = rs ;
+	                    if ((rs = mem.strw(tbuf,tl,&cp)) >= 0) {
+	            		op->fname = cp ;
+	            		if ((rs = bpi_loadbegin(op,dt)) >= 0) {
+	                	    op->ti_lastcheck = dt ;
+	                	    op->magval = BPI_MAGIC ;
+	            		} /* end if (bpi_loadbegin) */
+	            		if (rs < 0) {
+				    voidp vp = voidp(op->fname) ;
+	              		    mem.free(vp) ;
+	              		    op->fname = nullptr ;
+	            		} /* end if (error) */
+	        	    } /* end if (memory-acquire) */
+	    		} /* end if (mkfnamesuf) */
+		        rs1 = mem.free(tbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	   	    if (rs < 0) {
+			voidp vp = voidp(op->dbname) ;
+	        	mem.free(vp) ;
+	        	op->dbname = nullptr ;
+	   	    } /* end if (error) */
+		} /* end if (memory-acquire) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-	        uc_free(op->dbname) ;
-	        op->dbname = nullptr ;
-	    }
-	} /* end if (m-a) */
-
-	return (rs >= 0) ? nverses : rs ;
-}
-/* end subroutine (bpi_open) */
+		bpi_dtor(op) ;
+	    } /* end if (error) */
+	} /* end if (bpi_ctor) */
+	return (rs >= 0) ? nv : rs ;
+} /* end subroutine (bpi_open) */
 
 int bpi_close(bpi *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = bpi_loadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->fname != nullptr) {
-	    rs1 = uc_free(op->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fname = nullptr ;
-	}
-
-	if (op->dbname != nullptr) {
-	    rs1 = uc_free(op->dbname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = nullptr ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = bpi_magic(op)) >= 0) {
+	    {
+	        rs1 = bpi_loadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fname) {
+	        voidp vp = voidp(op->fname) ;
+	        rs1 = uc_free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fname = nullptr ;
+	    }
+	    if (op->dbname) {
+	        voidp vp = voidp(op->dbname) ;
+	        rs1 = uc_free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->dbname = nullptr ;
+	    }
+	    {
+	        rs1 = bpi_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
+	} /* end if (bpi_magic) */
 	return rs ;
-}
-/* end subroutine (bpi_close) */
+} /* end subroutine (bpi_close) */
 
 int bpi_audit(bpi *op) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
-
-/* verify that all list pointers and list entries are valid */
-
-	rs = bpi_auditvt(op) ;
-
+	if ((rs = bpi_magic(op)) >= 0) {
+	    /* verify that all list pointers and list entries are valid */
+	    rs = bpi_auditvt(op) ;
+	} /* end if (bpi_magic) */
 	return rs ;
-}
-/* end subroutine (bpi_audit) */
+} /* end subroutine (bpi_audit) */
 
 int bpi_count(bpi *op) noex {
-	bpihdr		*hip ;
-	int		rs = SR_OK ;
+	int		rs ;
+	int		nv = 0 ; /* return-value */
+	if ((rs = bpi_magic(op)) >= 0) {
+	    bpihdr	*hip = op->fhip ;
+	    nv = hip->nverses ;
+	} /* end if (bpi_magic) */
+	return (rs >= 0) ? nv : rs ;
+} /* end subroutine (bpi_count) */
 
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
-
-	hip = &op->fhi ;
-	return (rs >= 0) ? hip->nverses : rs ;
-}
-/* end subroutine (bpi_count) */
-
-int bpi_info(bpi *op,bpi_i *ip) noex {
-	bpihdr		*hip ;
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
-
-	hip = &op->fhi ;
-
-	if (ip != nullptr) {
-	    rs = memclear(ip) ;
-	    ip->mtime = op->fmi.ti_mod ;
-	    ip->ctime = time_t(hip->wtime) ;
-	    ip->maxbook = hip->maxbook ;
-	    ip->maxchapter = hip->maxchapter ;
-	    ip->count = hip->nverses ;
-	    ip->nzverses = hip->nzverses ;
-	}
-
-	return (rs >= 0) ? hip->nverses : rs ;
-}
-/* end subroutine (bpi_info) */
+int bpi_getinfo(bpi *op,bpi_info *ip) noex {
+	int		rs ;
+	int		nv = 0 ; /* return-value */
+	if ((rs = bpi_magic(op)) >= 0) {
+	    bpihdr	*hip = op->fhip ;
+	    if (ip) {
+		bpi_fmi *fip = op->fmip ;
+	        memclear(ip) ;
+	        ip->mtime	= fip->ti_mod ;
+	        ip->ctime	= time_t(hip->wtime) ;
+	        ip->maxbook	= hip->maxbook ;
+	        ip->maxchapter	= hip->maxchapter ;
+	        ip->count	= hip->nverses ;
+	        ip->nzverses	= hip->nzverses ;
+	    } /* end if (non-null) */
+	    nv = hip->nverses ;
+	} /* end if (bpi_magic) */
+	return (rs >= 0) ? nv : rs ;
+} /* end subroutine (bpi_getinfo) */
 
 int bpi_get(bpi *op,bpi_q *qp) noex {
-	int		rs = SR_OK ;
-	int		vi = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (qp == nullptr) return SR_FAULT ;
-
-	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
-
-/* check for update */
-
-	if (op->ncursors == 0) {
-	    rs = bpi_checkupdate(op,0) ;
-	}
-
-	if (rs >= 0) {
-	    rs = bpi_search(op,qp) ;
-	    vi = rs ;
-	}
-
+	int		rs ;
+	int		vi = 0 ; /* return-value */
+	if ((rs = bpi_magic(op,qp)) >= 0) {
+	    /* check for update */
+	    if (op->ncursors == 0) {
+	        rs = bpi_checkupdate(op,0) ;
+	    }
+	    if (rs >= 0) {
+	        rs = bpi_search(op,qp) ;
+	        vi = rs ;
+	    } /* end if (ok) */
+	} /* end if (bpi_magic) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (bpi_get) */
+} /* end subroutine (bpi_get) */
 
 int bpi_curbegin(bpi *op,bpi_cur *curp) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = 0 ;
-	op->ncursors += 1 ;
-
-	return SR_OK ;
-}
-/* end subroutine (bpi_curbegin) */
+    	int		rs ;
+	if ((rs = bpi_magic(op,curp)) >= 0) {
+	    curp->i = 0 ;
+	    op->ncursors += 1 ;
+	} /* end if (bpi_magic) */
+	return rs ;
+} /* end subroutine (bpi_curbegin) */
 
 int bpi_curend(bpi *op,bpi_cur *curp) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = 0 ;
-	if (op->ncursors > 0)
-	    op->ncursors -= 1 ;
-
-	return SR_OK ;
-}
-/* end subroutine (bpi_curend) */
-
-int bpi_enum(bpi *op,bpi_cur *curp,bpi_v *bvep) noex {
-	bpihdr		*hip ;
-	int		rs = SR_OK ;
-	int		vi ;
-	int		vtlen ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (bvep == nullptr) return SR_FAULT ;
-
-	if (op->magic != BPI_MAGIC) return SR_NOTOPEN ;
-
-	if (op->ncursors == 0) return SR_INVALID ;
-
-	vi = (curp->i < 0) ? 0 : (curp->i + 1) ;
-
-	hip = &op->fhi ;
-	vtlen = hip->vilen ;
-	if (vi >= vtlen) rs = SR_NOTFOUND ;
-
-	if (rs >= 0) {
-	    if ((rs = bpi_loadbve(op,bvep,vi)) >= 0) {
-	    	curp->i = vi ;
+    	int		rs ;
+	if ((rs = bpi_magic(op,curp)) >= 0) {
+	    curp->i = 0 ;
+	    if (op->ncursors > 0) {
+	        op->ncursors -= 1 ;
 	    }
-	}
-
+	} /* end if (bpi_magic) */
 	return rs ;
-}
-/* end subroutine (bpi_enum) */
+} /* end subroutine (bpi_curend) */
+
+int bpi_curenum(bpi *op,bpi_cur *curp,bpi_v *bvep) noex {
+	int		rs ;
+	if ((rs = bpi_magic(op,curp,bvep)) >= 0) {
+	   bpihdr	*hip = op->fhip ;
+	    rs = SR_INVALID ;
+	    if (op->ncursors > 0) {
+		int	vi = (curp->i < 0) ? 0 : (curp->i + 1) ;
+		int	vtlen = hip->vilen ;
+		rs = SR_NOTFOUND ;
+		if (vi < vtlen) {
+	            if ((rs = bpi_loadbve(op,bvep,vi)) >= 0) {
+	    	        curp->i = vi ;
+	            }
+	        } /* end if (valid) */
+	    } /* end if (valid) */
+	} /* end if (bpi_magic) */
+	return rs ;
+} /* end subroutine (bpi_curenum) */
 
 
 /* private subroutines */
 
 local int bpi_loadbegin(bpi *op,time_t daytime) noex {
 	int		rs ;
-	int		nverses = 0 ;
-
+	int		nv = 0 ; /* return-value */
 	if ((rs = bpi_mapcreate(op,daytime)) >= 0) {
 	    rs = bpi_proc(op,daytime) ;
-	    nverses = rs ;
+	    nv = rs ;
 	    if (rs < 0) {
 		bpi_mapdestroy(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (map) */
-
-	return (rs >= 0) ? nverses : rs ;
-}
-/* end subroutine (bpi_loadbegin) */
+	return (rs >= 0) ? nv : rs ;
+} /* end subroutine (bpi_loadbegin) */
 
 local int bpi_loadend(bpi *op) noex {
-	bpi_fmi		*mip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
 	    rs1 = bpi_mapdestroy(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	mip = &op->fmi ;
-	mip->vt = nullptr ;
+	{
+	    bpi_fmi	*mip = op->fmip ;
+	    mip->vt = nullptr ;
+	}
 	return rs ;
-}
-/* end subroutine (bpi_loadend) */
+} /* end subroutine (bpi_loadend) */
 
 local int bpi_mapcreate(bpi *op,time_t daytime) noex {
-	bpi_fmi		*mip = &op->fmi ;
-	int		rs ;
-
-	if (op->fname == nullptr) return SR_FAULT ;
-
-	if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
-	    USTAT	sb ;
-	    cint	fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
-	        csize	fsize = (sb.st_size & UINT_MAX) ;
-	        if (fsize > 0) {
-	            size_t	ms = (size_t) fsize ;
-	            int		mp = PROT_READ ;
-	            int		mf = MAP_SHARED ;
-	            void	*md ;
-	            if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
-	                mip->mapdata = md ;
-	                mip->mapsize = ms ;
-	                mip->ti_mod = sb.st_mtime ;
-	                mip->ti_map = daytime ;
-	            } /* end if (u_mmap) */
-	        } else {
-		    rs = SR_UNATCH ;
-		}
-	    } /* end if (stat) */
-	    u_close(fd) ;
-	} /* end if (file-open) */
-
+    	cnullptr	np{} ;
+	int		rs = SR_BUGCHECK ;
+	int		rs1 ;
+	if (op->fname) {
+	    bpi_fmi	*mip = op->fmip ;
+	    if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
+	        cint	fd = rs ;
+	        if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	            csize	fsize = size_t(sb.st_size) ;
+	            if (fsize > 0) {
+	                csize	ms = fsize ;
+	                cint	mp = PROT_READ ;
+	                cint	mf = MAP_SHARED ;
+	                void	*md ;
+	                if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	                    mip->mapdata = charp(md) ;
+	                    mip->mapsize = ms ;
+	                    mip->ti_mod = sb.st_mtime ;
+	                    mip->ti_map = daytime ;
+	                } /* end if (u_mmap) */
+	            } else {
+		        rs = SR_UNATCH ;
+		    }
+	        } /* end if (stat) */
+	        rs1 = u_close(fd) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (file-open) */
+	} /* end if (bug-check) */
 	return rs ;
-}
-/* end subroutine (bpi_mapcreate) */
+} /* end subroutine (bpi_mapcreate) */
 
 local int bpi_mapdestroy(bpi *op) noex {
-	bpi_fmi		*mip = &op->fmi ;
+	bpi_fmi		*mip = op->fmip ;
 	int		rs = SR_OK ;
-
-	if (mip->mapdata != nullptr) {
-	    rs = u_munmap(mip->mapdata,mip->mapsize) ;
+	if (mip->mapdata) {
+	    csize ms = mip->mapsize ;
+	    voidp md = mip->mapdata ;
+	    rs = u_munmap(md,ms) ;
 	    mip->mapdata = nullptr ;
 	    mip->mapsize = 0 ;
 	    mip->ti_map = 0 ;
-	}
-
+	} /* end if (un-map) */
 	return rs ;
-}
-/* end subroutine (bpi_mapdestroy) */
+} /* end subroutine (bpi_mapdestroy) */
 
 local int bpi_checkupdate(bpi *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		f = false ;
-
+	int		f = false ; /* return-value */
 	if (op->ncursors == 0) {
 	    if (dt <= 0) dt = time(nullptr) ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
-	        USTAT		sb ;
-	        bpi_fmi		*mip = &op->fmi ;
+	        bpi_fmi		*mip = op->fmip ;
 	        op->ti_lastcheck = dt ;
-	        if ((rs = u_stat(op->fname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(op->fname,&sb)) >= 0) {
 	            f = f || (sb.st_mtime > mip->ti_mod) ;
 	            f = f || (sb.st_mtime > mip->ti_map) ;
 	            if (f) {
@@ -430,124 +461,111 @@ local int bpi_checkupdate(bpi *op,time_t dt) noex {
 	            rs = SR_OK ;
 	        }
 	    } /* end if (needed checking) */
-	}
-
+	} /* end if (cursor-open) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (bpi_checkupdate) */
+} /* end subroutine (bpi_checkupdate) */
 
-local int bpi_proc(bpi *op,time_t daytime) noex {
-	bpi_fmi		*mip = &op->fmi ;
-	bpihdr		*hip = &op->fhi ;
-	int		rs ;
-	int		nverses = 0 ;
+local int bpi_proc(bpi *op,time_t dt) noex {
+	int		rs = SR_BUGCHECK ;
+	int		nv = 0 ; /* return-value */
+	if (bpi_fmi *mip = op->fmip ; mip) {
+	    cint msz = intconv(mip->mapsize) ;
+	    if (bpihdr *hip = op->fhip ; hip) {
+	        if ((rs = hip->wr(mip->mapdata,msz)) >= 0) {
+	            if ((rs = bpi_verify(op,dt)) >= 0) {
+	                nv = hip->nverses ;
+	                mip->vt = (uint (*)[1]) (mip->mapdata + hip->vioff) ;
+	            }
+	        } /* end if (bpihdr_wr) */
+	    } /* end if (bug-check) */
+	} /* end if (bug-check) */
+	return (rs >= 0) ? nv : rs ;
+} /* end subroutine (bpi_proc) */
 
-	rs = bpihdr(hip,1,mip->mapdata,mip->mapsize) ;
-
-	if (rs >= 0) {
-	    rs = bpi_verify(op,daytime) ;
-	    nverses = hip->nverses ;
-	}
-
-	if (rs >= 0) {
-	    mip->vt = (uint (*)[1]) (mip->mapdata + hip->vioff) ;
-	}
-
-	return (rs >= 0) ? nverses : rs ;
-}
-/* end subroutine (bpi_proc) */
-
-local int bpi_verify(bpi *op,time_t daytime) noex {
-	bpi_fmi		*mip = &op->fmi ;
-	bpihdr		*hip = &op->fhi ;
-	uint		utime = (uint) daytime ;
-	int		rs = SR_OK ;
-	int		size ;
-	int		f = true ;
-
-	f = f && (hip->fsz == mip->mapsize) ;
-	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
-	/* alignment restriction */
-	f = f && ((hip->vioff & (szof(int)-1)) == 0) ;
-	/* size restrictions */
-	f = f && (hip->vioff <= mip->mapsize) ;
-	size = (hip->vilen * 1) * szof(uint) ;
-	f = f && ((hip->vioff + size) <= mip->mapsize) ;
-	/* something restriction? */
-	f = f && (hip->vilen == hip->nverses) ;
-	/* get out */
-	if (! f) {
-	    rs = SR_BADFMT ;
-	}
+local int bpi_verify(bpi *op,time_t dt) noex {
+	int		rs = SR_BUGCHECK ;
+	if (bpi_fmi *mip = op->fmip ; mip) {
+	    if (bpihdr *hip = op->fhip ; hip) {
+		cuint	utime = uint(dt) ;
+		cuint	msz = uintconv(mip->mapsize) ;
+		cint	si = SHIFTINT ;
+		int	sz{} ;
+		bool	f = true ;
+		rs = SR_OK ;
+	        f = f && (hip->fsz == msz) ;
+	        f = f && (hip->wtime > 0) && (hip->wtime <= (utime + si)) ;
+	        /* alignment restriction */
+	        f = f && ((hip->vioff & (szof(int) - 1)) == 0) ;
+	        /* size restrictions */
+	        f = f && (hip->vioff <= msz) ;
+	        sz = (hip->vilen * 1) * szof(uint) ;
+	        f = f && ((hip->vioff + sz) <= msz) ;
+	        /* something restriction? */
+	        f = f && (hip->vilen == hip->nverses) ;
+	        /* get out */
+	        if (! f) {
+	            rs = SR_BADFMT ;
+	        }
+	    } /* end if (bug-check) */
+	} /* end if (bug-check) */
 	return rs ;
 } /* end subroutine (bpi_verify) */
 
 local int bpi_auditvt(bpi *op) noex {
-	bpi_fmi		*mip = &op->fmi ;
-	bpihdr		*hip = &op->fhi ;
-	uint		(*vt)[1] ;
-	uint		pcitcmpval = 0 ;
-	uint		citcmpval ;
-	int		rs = SR_OK ;
-	vt = mip->vt ;
-/* "verses" table */
-	for (int i = 1 ; (rs >= 0) && (i < hip->vilen) ; i += 1) {
-/* verify all entries are ordered w/ increasing citations */
-	    citcmpval = vt[i][0] & 0x00FFFFFF ;
-	    if (citcmpval < pcitcmpval) {
-	        rs = SR_BADFMT ;
-	        break ;
-	    }
-	    pcitcmpval = citcmpval ;
-	} /* end for (record table entries) */
+	int		rs = SR_BUGCHECK ;
+	if (bpi_fmi *mip = op->fmip ; mip) {
+	    if (bpihdr *hip = op->fhip ; hip) {
+	        uint	(*vt)[1] = mip->vt ;
+	        uint	pcitcmpval = 0 ;
+		int	vilen = int(hip->vilen) ;
+		rs = SR_OK ;
+	        /* "verses" table */
+	        for (int i = 1 ; (rs >= 0) && (i < vilen) ; i += 1) {
+	            cuint citcmpval = vt[i][0] & vmask ;
+	            if (citcmpval < pcitcmpval) {
+	                rs = SR_BADFMT ;
+	                break ;
+	            }
+	            pcitcmpval = citcmpval ;
+	        } /* end for (record table entries) */
+	    } /* end if (bug-check) */
+	} /* end if (bug-check) */
 	return rs ;
-}
-/* end subroutine (bpi_auditvt) */
+} /* end subroutine (bpi_auditvt) */
 
 local int bpi_search(bpi *op,bpi_q *qp) noex {
-	bpi_fmi		*mip = &op->fmi ;
-	bpihdr		*hip = &op->fhi ;
+	bpi_fmi		*mip = op->fmip ;
+	bpihdr		*hip = op->fhip ;
 	uint		(*vt)[1] ;
 	uint		citekey ;
 	uint		vte[1] ;
 	int		rs = SR_OK ;
 	int		vtlen ;
-	int		vi = 0 ;
-
+	int		vi = 0 ; /* return-value */
 	vt = mip->vt ;
 	vtlen = hip->vilen ;
-
-/* search for entry */
-
-	mkcitekey(qp,&citekey) ;
-
+	/* search for entry */
+	mkcitekey(&citekey,qp) ;
 	vte[0] = citekey ;
-
-#if	CF_SEARCH
-	{
+	if_constexpr (f_search) {
 	    uint	*vtep ;
 	    int		vtesize = (1 * szof(uint)) ;
 	    vtep = (uint *) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
-	    rs = (vtep != nullptr) ? ((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
+	    rs = (vtep) ? intconv((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
 	    vi = rs ;
-	}
-#else /* CF_SEARCH */
-	{
+	} else {
 	    for (vi = 0 ; vi < vtlen ; vi += 1) {
-	        if ((vt[vi][0] & 0x00FFFFFF) == citekey)
+	        if ((vt[vi][0] & vmask) == citekey)
 		    break ;
-	    }
+	    } /* end for */
 	    rs = (vi < vtlen) ? vi : SR_NOTFOUND ;
-	}
-#endif /* CF_SEARCH */
-
+	} /* end if_constexpr (f_search) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (bpi_search) */
+} /* end subroutine (bpi_search) */
 
 local int bpi_loadbve(bpi *op,bpi_v *bvep,int vi) noex {
-	bpi_fmi		*mip = &op->fmi ;
-	bpihdr		*hip = &op->fhi ;
+	bpi_fmi		*mip = op->fmip ;
+	bpihdr		*hip = op->fhip ;
 	int		rs = SR_FAULT ;
 	if (op && bvep) {
 	    rs = memclear(bvep) ;
@@ -557,35 +575,44 @@ local int bpi_loadbve(bpi *op,bpi_v *bvep,int vi) noex {
 	    /* load the basic stuff */
 	    if (rs >= 0) {
 	        uint *vte = mip->vt[vi] ;
-	        bvep->nlines	= (vte[0] >> 24) & 0xFF ;
-	        bvep->b		= (vte[0] >> 16) & 0xFF ;
-	        bvep->c		= (vte[0] >> 8) & 0xFF ;
-	        bvep->v		= (vte[0] >> 0) & 0xFF ;
+	        bvep->nlines	= getbyte(vte[0],3) ;
+	        bvep->b		= getbyte(vte[0],2) ;
+	        bvep->c		= getbyte(vte[0],1) ;
+	        bvep->v		= getbyte(vte[0],0) ;
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (bpi_loadbve) */
 
-local int mkcitekey(bpi_q *bvp,uint *cip) noex {
-	uint		ci = 0 ;
-	ci |= (bvp->b & UCHAR_MAX) ;
-	ci = (ci << 8) ;
-	ci |= (bvp->c & UCHAR_MAX) ;
-	ci = (ci << 8) ;
-	ci |= (bvp->v & UCHAR_MAX) ;
-	*cip = ci ;
-	return SR_OK ;
+local uint mkciteload(uint ci,uchar item) noex {
+	ci = (ci << UCHAR_BIT) ;
+	ci |= uint(item) ;
+	return ci ; 
+} /* end subroutine (mkciteload) */
+
+local int mkcitekey(uint *cip,bpi_q *bvp) noex {
+    	int		rs = SR_BUGCHECK ;
+	if (cip && bvp) {
+	    uint	ci = 0 ;
+	    rs = SR_OK ;
+	    ci = mkciteload(ci,bvp->b) ;
+	    ci = mkciteload(ci,bvp->c) ;
+	    ci = mkciteload(ci,bvp->v) ;
+	    *cip = ci ;
+	} /* end if (non-null) */
+	return rs ;
 } /* end subroutine (mkcitekey) */
 
-#if	CF_SEARCH
 local int vtecmp(cvoid *v1p,cvoid *v2p) noex {
 	uint		*vte1 = uintp(v1p) ;
 	uint		*vte2 = uintp(v2p) ;
-	uint		c1, c2 ;
-	c1 = vte1[0] & 0x00FFFFFF ;
-	c2 = vte2[0] & 0x00FFFFFF ;
-	return (c1 - c2) ;
+	int		rc = 0 ;
+	{
+	    cint c1 = int(vte1[0] & vmask) ;
+	    cint c2 = int(vte2[0] & vmask) ;
+	    rc = (c1 - c2) ;
+	}
+	return rc ;
 } /* end subroutine (vtecmp) */
-#endif /* CF_SEARCH */
 
 
