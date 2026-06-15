@@ -58,7 +58,7 @@ struct biblebook_head {
 	cchar		*namestrs ;
 	BIBLEBOOK_CA	call ;
 	BIBLEBOOK_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		objsize ;	/* object size */
 	int		namesize ;	/* names-size */
 } ; /* end struct */
