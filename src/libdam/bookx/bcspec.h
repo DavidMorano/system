@@ -6,7 +6,14 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 2008-02-07, David A­D­ Morano
+	This code was originally written.  
+
+*/
+
+/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BCSPEC_INCLUDE
 #define	BCSPEC_INCLUDE
@@ -23,7 +30,7 @@
 struct bcspec_head {
 	cchar		*sp ;
 	int		sl ;
-	schar		b, c, v ;
+	uchar		b, c, v ;
 } ; /* end struct */
 
 typedef BCSPEC		bcspec ;
