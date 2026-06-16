@@ -1,19 +1,21 @@
-/* progmoder */
+/* progmoder SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a newsgroup (an entire newsgroup) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_SHOW		1		/* actually show */
 
-
 /* revision history:
 
 	= 1994-01-17, David A­D­ Morano
-	I have made major modifications from a previous version of this
-	subroutine (which was total junk!).  The previous functions that are
-	now in this subroutine were scattered all over the place in the past.
-	The code was previously unmaintainable!
+	I have made major modifications from a previous version of
+	this subroutine (which was total junk!).  The previous
+	functions that are now in this subroutine were scattered
+	all over the place in the past.  The code was previously
+	unmaintainable!
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -24,34 +26,38 @@
 
 /*******************************************************************************
 
-	This subroutine is the main routine that processes newsgroups.  It
-	switches on the current program mode and performs the appropriate
-	actions for the given mode.
+  	Name:
+	progmoder
 
+	Description:
+	This subroutine is the main routine that processes newsgroups.
+	It switches on the current program mode and performs the
+	appropriate actions for the given mode.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<fcntl.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<buffer.h>
 #include	<expcook.h>
+#include	<mkpathx.h>
+#include	<mkdirlist.h>
+#include	<dirshown.h>
+#include	<artlist.h>
 #include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
-#include	"mkdirlist.h"
-#include	"dirshown.h"
-#include	"artlist.h"
 
 
 /* local defines */
@@ -62,19 +68,14 @@
 
 /* external subroutines */
 
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
-
 extern int	progng(PROGINFO *,DIRSHOWN *,MKDIRLIST_ENT *,
-			int (*)(PROGINFO *,...),int) ;
-extern int	bbcpy(char *,cchar *) ;
-extern int	emit_test(PROGINFO *,...) ;
-extern int	emit_article(PROGINFO *,...) ;
-extern int	emit_count(PROGINFO *,...) ;
-extern int	emit_header(PROGINFO *,...) ;
-extern int	emit_mailbox(PROGINFO *,...) ;
-
-extern char	*strnchr(cchar *,int,int) ;
+			int (*)(PROGINFO *,...),int) noex ;
+extern int	bbcpy(char *,cchar *) noex ;
+extern int	emit_test(PROGINFO *,...) noex ;
+extern int	emit_article(PROGINFO *,...) noex ;
+extern int	emit_count(PROGINFO *,...) noex ;
+extern int	emit_header(PROGINFO *,...) noex ;
+extern int	emit_mailbox(PROGINFO *,...) noex ;
 
 
 /* external variables */
@@ -82,9 +83,9 @@ extern char	*strnchr(cchar *,int,int) ;
 
 /* forward references */
 
-static int	procqueryout(PROGINFO *,bfile *,int) ;
-static int	procqueryoutprep(PROGINFO *,EXPCOOK *,int) ;
-static int	description(PROGINFO *,bfile *,MKDIRLIST_ENT *) ;
+local int	procqueryout(PROGINFO *,bfile *,int) noex ;
+local int	procqueryoutprep(PROGINFO *,EXPCOOK *,int) noex ;
+local int	description(PROGINFO *,bfile *,MKDIRLIST_ENT *) noex ;
 
 
 /* local variables */
@@ -249,7 +250,7 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 /* local subroutines */
 
 
-static int procqueryout(PROGINFO *pip,bfile *ofp,int tc)
+local int procqueryout(PROGINFO *pip,bfile *ofp,int tc)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -286,7 +287,7 @@ static int procqueryout(PROGINFO *pip,bfile *ofp,int tc)
 /* end subroutine (procqueryout) */
 
 
-static int procqueryoutprep(pip,ecp,tc)
+local int procqueryoutprep(pip,ecp,tc)
 PROGINFO	*pip ;
 EXPCOOK		*ecp ;
 int		tc ;
@@ -303,8 +304,7 @@ int		tc ;
 }
 /* end subroutine (procqueryoutprep) */
 
-
-static int description(pip,ofp,dsp)
+local int description(pip,ofp,dsp)
 PROGINFO	*pip ;
 bfile		*ofp ;
 MKDIRLIST_ENT	*dsp ;
