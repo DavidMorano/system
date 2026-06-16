@@ -1,4 +1,5 @@
 /* mm_getfield SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the value of the specified header within specified message */
@@ -20,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	mm_getfield
+
+	Description:
 	These are subroutines to aid in handling parts of a message.
 
 	IMPORTANT NOTE:
@@ -55,10 +60,14 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<baops.h>
+#include	<hmatch.h>		/* PCS */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -67,8 +76,6 @@
 
 
 /* external subroutines */
-
-extern int	hmatch(cchar *,cchar *) ;
 
 
 /* external variables */
@@ -89,7 +96,7 @@ int mm_getfield(mfp,moff,mlen,h,fvalue,buflen)
 bfile		*mfp ;
 off_t	moff ;
 int		mlen ;
-const char	h[] ;
+cchar	h[] ;
 char		fvalue[] ;
 int		buflen ;
 {
@@ -100,7 +107,7 @@ int		buflen ;
 	int		f_boh = false ;
 
 	if ((rs = bseek(mfp,moff,SEEK_SET)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		i, l, ml, len ;
 	    cchar	*cp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
