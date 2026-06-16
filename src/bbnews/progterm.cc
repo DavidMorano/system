@@ -38,7 +38,7 @@
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<tzfile.h>
 #include	<netdb.h>
 
