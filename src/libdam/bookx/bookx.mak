@@ -47,7 +47,7 @@ OBJ3= bpihdr.o bpimk.o bpi.o
 
 OBJ4= bcspec.o 
 OBJ5= biblecite.o biblemeta.o
-OBJ6=
+OBJ6= bibleverses.o
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
@@ -187,5 +187,7 @@ bvchapters.o:		bvchapters.cc	bvchapters.hh			$(INCS)
 bcspec.o:		bcspec.cc	bcspec.h			$(INCS)
 biblecite.o:		biblecite.cc	biblecite.h			$(INCS)
 biblemta.o:		biblemeta.cc	biblemeta.h			$(INCS)
+
+bibleverses.o:		bibleverses.cc	bibleverses.h			$(INCS)
 
 
