@@ -1,12 +1,12 @@
-/* progconf */
+/* progconf SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program configuration */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
@@ -19,30 +19,30 @@
 
 /*******************************************************************************
 
-	This module contains the subroutines that manage program configuration.
-
+  	Description:
+	This module contains the subroutines that manage program
+	configuration.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<ascii.h>
+#include	<prmkfname.h>
 #include	<localmisc.h>
 
-#include	"prmkfname.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -107,7 +107,7 @@ struct pconf {
 	PROGINFO	*pip ;
 	const char	**envv ;
 	PCONF_FL	f ;
-	PARAMFILE	params ;
+	paramfile	params ;
 	int		nf ;		/* n-files */
 } ;
 
@@ -408,7 +408,7 @@ static int pconf_finish(PCONF *csp)
 
 static int pconf_fileadd(PCONF *csp,const char *fname)
 {
-	PARAMFILE	*pfp = &csp->params ;
+	paramfile	*pfp = &csp->params ;
 	int		rs ;
 	if (csp->nf == 0) {
 	    const char	**envv = csp->envv ;
@@ -442,7 +442,7 @@ static int pconf_check(PCONF *csp,time_t dt)
 static int pconf_load(PCONF *csp)
 {
 	PROGINFO	*pip = csp->pip ;
-	PARAMFILE	*pfp = &csp->params ;
+	paramfile	*pfp = &csp->params ;
 	int		rs = SR_OK ;
 
 	if (pip == NULL) return SR_FAULT ; /* ¥ GCC false complaint */
@@ -467,9 +467,9 @@ static int pconf_load(PCONF *csp)
 static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 {
 	PROGINFO	*pip = csp->pip ;
-	PARAMFILE	*pfp = &csp->params ;
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile	*pfp = &csp->params ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	int		rs ;
 	int		rs1 ;
 
@@ -531,13 +531,13 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 	        switch (pi) {
 
 	        case param_mailcheck:
-	            if ((el > 0) && (! pip->final.mailcheck)) {
+	            if ((el > 0) && (! pip->finval.mailcheck)) {
 	                if (hasalldig(ebuf,el)) {
 	                    if ((rs = cfdecti(ebuf,el,&v)) >= 0) {
 	                        if (v >= 0) {
 	                            pip->have.mailcheck = TRUE ;
 	                            pip->changed.mailcheck = TRUE ;
-	                            pip->final.mailcheck = TRUE ;
+	                            pip->finval.mailcheck = TRUE ;
 	                            pip->mailcheck = v ;
 	                        }
 	                    }
@@ -547,13 +547,13 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 
 	        case param_loglen:
 	        case param_logsize:
-	            if ((el > 0) && (! pip->final.logsize)) {
+	            if ((el > 0) && (! pip->finval.logsize)) {
 	                if (hasalldig(ebuf,el)) {
 	                    rs1 = cfdecmfi(ebuf,el,&v) ;
 	                    if ((rs1 >= 0) && (v >= 0)) {
 	                        pip->have.logsize = TRUE ;
 	                        pip->changed.logsize = TRUE ;
-	                        pip->final.logsize = TRUE ;
+	                        pip->finval.logsize = TRUE ;
 	                        pip->logsize = v ;
 	                    }
 	                }
@@ -561,15 +561,15 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 	            break ;
 
 	        case param_cmdkey:
-	            if (! pip->final.cmdfname) {
+	            if (! pip->finval.cmdfname) {
 	                pip->have.cmdfname = TRUE ;
-	                tl = prsetfname(pr,tfname,ebuf,el,TRUE,
+	                tl = prmkfname(pr,tfname,ebuf,el,TRUE,
 	                    CMDMAPFNAME,pip->searchname,"") ;
 	                f = (pip->cmdfname == NULL) ;
 	                f = f || (strcmp(pip->cmdfname,tfname) != 0) ;
 	                if (f) {
 	                    const char	**vpp = &pip->cmdfname ;
-	                    pip->final.cmdfname = TRUE ;
+	                    pip->finval.cmdfname = TRUE ;
 	                    pip->changed.cmdfname = TRUE ;
 	                    rs = proginfo_setentry(pip,vpp,tfname,tl) ;
 	                }
@@ -577,15 +577,15 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 	            break ;
 
 	        case param_logfile:
-	            if (! pip->final.lfname) {
+	            if (! pip->finval.lfname) {
 	                pip->have.lfname = TRUE ;
-	                tl = prsetfname(pr,tfname,ebuf,el,TRUE,
+	                tl = prmkfname(pr,tfname,ebuf,el,TRUE,
 	                    LOGCNAME,pip->searchname,"") ;
 	                f = (pip->lfname == NULL) ;
 	                f = f || (strcmp(pip->lfname,tfname) != 0) ;
 	                if (f) {
 	                    const char	**vpp = &pip->lfname ;
-	                    pip->final.lfname = TRUE ;
+	                    pip->finval.lfname = TRUE ;
 	                    pip->changed.lfname = TRUE ;
 	                    rs = proginfo_setentry(pip,vpp,tfname,tl) ;
 	                }
