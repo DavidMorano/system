@@ -23,10 +23,10 @@
 /* Copyright © 1995,1998,2000 David A­D­ Morano.  All rights reserved. */
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstring>
 
 #include	<usystem.h>
