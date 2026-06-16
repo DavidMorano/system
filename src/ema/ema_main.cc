@@ -56,7 +56,7 @@
 
 extern int	printhelp(bfile *,cchar *,cchar *,cchar *) noex ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const pivars *) noex ;
-extern int	progfile(PROGINFO *,PARAMOPT *,bfile *,cchar *) noex ;
+extern int	progfile(PROGINFO *,paramopt *,bfile *,cchar *) noex ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) noex ;
@@ -80,12 +80,12 @@ extern int	strlinelen(cchar *,int,int) noex ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procsubpart(PROGINFO *,PARAMOPT *,CMD_LOCAL *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,PARAMOPT *,
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procsubpart(PROGINFO *,paramopt *,CMD_LOCAL *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,
 			cchar *,cchar *,cchar *) ;
 
-static int	procmsgfile(PROGINFO *,PARAMOPT *,void *,cchar *,int) ;
+static int	procmsgfile(PROGINFO *,paramopt *,void *,cchar *,int) ;
 
 
 /* local variables */
@@ -191,9 +191,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
 	CMD_LOCAL	localstate, *lsp = &localstate ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	bits		pargs ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -486,7 +486,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            rs = SR_INVALID ;
 	                    }
 	                    if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
-				PARAMOPT	*pop = &aparams ;
+				paramopt	*pop = &aparams ;
 	                        rs = paramopt_loadu(pop,cp,cl) ;
 	                    }
 	                    break ;
@@ -568,7 +568,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                                rs = SR_INVALID ;
 	                        }
 	                        if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
-				    PARAMOPT	*pop = &aparams ;
+				    paramopt	*pop = &aparams ;
 	                            cchar	*po = PO_HEADER ;
 	                            rs = paramopt_loads(pop,po,cp,cl) ;
 	                        }
@@ -609,7 +609,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                PARAMOPT	*pop = &aparams ;
+	                                paramopt	*pop = &aparams ;
 	                                cchar	*po = PO_SUBPART ;
 	                                rs = paramopt_loads(pop,po,argp,argl) ;
 	                            }
@@ -787,7 +787,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    PARAMOPT_CUR	c ;
+	    paramopt_cur	c ;
 	    cchar	*ccp ;
 	    debugprintf("main: parameter keys are:\n") ;
 	    paramopt_curbegin(&aparams,&c) ;
@@ -955,7 +955,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program options */
-static int procopts(PROGINFO *pip,KEYOPT *akp)
+static int procopts(PROGINFO *pip,keyopt *akp)
 {
 	CMD_LOCAL	*lsp = pip->lsp ;
 	int		rs = SR_OK ;
@@ -967,7 +967,7 @@ static int procopts(PROGINFO *pip,KEYOPT *akp)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	cur ;
+	    keyopt_cur	cur ;
 	    if ((rs = keyopt_curbegin(akp,&cur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -1020,9 +1020,9 @@ static int procopts(PROGINFO *pip,KEYOPT *akp)
 /* end subroutine (procopts) */
 
 
-static int procsubpart(PROGINFO *pip,PARAMOPT *pop,CMD_LOCAL *lsp)
+static int procsubpart(PROGINFO *pip,paramopt *pop,CMD_LOCAL *lsp)
 {
-	PARAMOPT_CUR	c ;
+	paramopt_cur	c ;
 	int		rs ;
 	int		spc = 0 ;
 
@@ -1092,7 +1092,7 @@ static int procsubpart(PROGINFO *pip,PARAMOPT *pop,CMD_LOCAL *lsp)
 /* end subroutine (procsubpart) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
 		cchar *ofn,cchar *ifn,cchar *afn)
 {
 	CMD_LOCAL	*lsp = pip->lsp ;
@@ -1215,7 +1215,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
 /* end subroutine (procargs) */
 
 
-static int procmsgfile(PROGINFO *pip,PARAMOPT *app,void *ofp,cchar *fp,int fl)
+static int procmsgfile(PROGINFO *pip,paramopt *app,void *ofp,cchar *fp,int fl)
 {
 	NULSTR		f ;
 	int		rs ;
