@@ -36,11 +36,14 @@
 
 /*******************************************************************************
 
+  	Name:
+	emit_article
+
+	Description:
 	This subroutine is one of the "EMIT" subroutines used for
 	"emitting" articles in different ways.
 
 	Synopsis:
-
 	int emit_article(pip,dsp,ai,aep,ngdir,af)
 	struct proginfo	*pip ;
 	MKDIRLIST_ENT	*dsp ;
@@ -72,25 +75,28 @@
 #include	<setjmp.h>
 #endif /* CF_SIGJMP */
 #include	<unistd.h>
-#include	<csignal>
 #include	<ctime>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<strings.h>
 #include	<pwd.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getfiledirs.h>
 #include	<bfile.h>
 #include	<strn.h>
-#include	<strwcpy.h>
 #include	<strx.h>
+#include	<strwcpy.h>
+#include	<mkdirlist.h>
+#include	<artlist.h>
+#include	<monthname.h>
+#include	<hmatch.h>		/* PCS */
 #include	<char.h>
 #include	<localmisc.h>
 
-#include	"artlist.h"
 #include	"headerkeys.h"
-#include	"mkdirlist.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -109,30 +115,21 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	strwcmp(cchar *,cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-
+extern "C" {
 extern int	cmd_save() ;
 extern int	cmd_printout() ;
 extern int	cmd_follow() ;
 extern int	cmd_output() ;
+}
 
 #if	CF_REPLY
 extern int	cmd_reply() ;
 #endif
 
+extern "C" {
 extern int	bbcpy(char *,cchar *) ;
-extern int	hmatch(cchar *,cchar *) ;
 extern int	proglinecheck(struct proginfo *) ;
+}
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
@@ -143,20 +140,18 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* external variables */
 
-extern cchar	*monthname[] ;
-
 
 /* forward references */
 
-static int	deluser() ;
-static int	hastabs(cchar *) ;
+local int	deluser() ;
+local int	hastabs(cchar *) ;
 
 #if	CF_ISUS
-static int	isus(bfile *,cchar *) ;
+local int	isus(bfile *,cchar *) ;
 #endif
 
 #if	CF_DEKREMOTE
-static int	delremote() ;
+local int	delremote() ;
 #endif
 
 
@@ -180,12 +175,14 @@ constexpr cpcchar	deleteusers[] = {
 	"news",
 	"dam",
 	"morano",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int emit_article(pip,dsp,ai,ap,ngdir,af)
 struct proginfo	*pip ;
@@ -243,10 +240,10 @@ cchar	af[] ;
 	}
 #endif /* CF_DEBUG */
 
-	if (ngdir == NULL)
+	if (ngdir == nullptr)
 	    return EMIT_DONE ;
 
-	if (af == NULL)
+	if (af == nullptr)
 	    return EMIT_OK ;
 
 #if	CF_DEBUG
@@ -275,7 +272,7 @@ cchar	af[] ;
 	        debugprintf("emit_article: mailbox a=\"%s\"\n",afname) ;
 #endif
 
-	    cmd_save(pip,ap,ngdir,afname,SMODE_OUT,NULL) ;
+	    cmd_save(pip,ap,ngdir,afname,SMODE_OUT,nullptr) ;
 
 	    bflush(pip->ofp) ;
 
@@ -601,7 +598,7 @@ start:
 /* do we need a "from" header */
 
 	    if ((! f_from) &&
-	        ((pp = getpwuid(sb.st_uid)) != NULL)) {
+	        ((pp = getpwuid(sb.st_uid)) != nullptr)) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -736,7 +733,7 @@ start:
 #endif
 
 	if (pip->fl.interactive && (! f_text) && 
-	    (getenv("NOMETAMAIL") == NULL)) {
+	    (getenv("NOMETAMAIL") == nullptr)) {
 
 	    struct termios	ttystatein, ttystateout ;
 
@@ -1219,7 +1216,7 @@ prompt:
 		int		f_new = FALSE ;
 		cchar	*tp ;
 		char		mbname[MAXNAMELEN+1] ;
-		while ((tp = strbrk(resp," ,\t")) != NULL) {
+		while ((tp = strbrk(resp," ,\t")) != nullptr) {
 		    if ((rs = sncpy1w(mbname,mblen,resp,(tp-resp))) > 0) {
 			f_new = f_new || (strcmp(mbname,"new") == 0) ;
 	                rs = cmd_save(pip,ap,ngdir,afname,m,mbname) ;
@@ -1417,7 +1414,7 @@ prompt:
 	    if (deluser(pip,deleteusers,un)) {
 	        char	cmdbuf[CMDBUFLEN + 1] ;
 
-	        if (getfiledirs(NULL,pip->prog_editor,"x",NULL) > 0) {
+	        if (getfiledirs(nullptr,pip->prog_editor,"x",nullptr) > 0) {
 
 	            bufprintf(cmdbuf,CMDBUFLEN,"%s %s",
 	                pip->prog_editor,afname) ;
@@ -1455,7 +1452,7 @@ ret0:
 
 
 /* is the specified user allow to perform deletes? */
-static int deluser(pip,deleteusers,username)
+local int deluser(pip,deleteusers,username)
 struct proginfo	*pip ;
 cchar	*deleteusers[] ;
 cchar	username[] ;
@@ -1468,7 +1465,7 @@ cchar	username[] ;
 	    debugprintf("emit_article/deluser: ent\n") ;
 #endif
 
-	for (i = 0 ; deleteusers[i] != NULL ; i += 1) {
+	for (i = 0 ; deleteusers[i] != nullptr ; i += 1) {
 
 	    if (strcmp(deleteusers[i],username) == 0)
 	        return TRUE ;
@@ -1487,7 +1484,7 @@ cchar	username[] ;
 
 /* delete an article which is on a remote machine */
 #if	CF_DEKREMOTE
-static int delremote(pip,afname)
+local int delremote(pip,afname)
 struct proginfo	*pip ;
 char		afname[] ;
 {
@@ -1511,8 +1508,8 @@ char		afname[] ;
 
 
 	fpa[0] = &file0 ;
-	fpa[1] = NULL ;
-	fpa[2] = NULL ;
+	fpa[1] = nullptr ;
+	fpa[2] = nullptr ;
 	bufprintf(cmd,CMDBUFLEN,"rm -f %s",afname) ;
 
 	mkpath2(bbhostsfname, pip->pr,BBHOSTSFILE) ;
@@ -1605,7 +1602,7 @@ char		afname[] ;
 
 /* is this host us (lookup in "us" file) */
 #if	CF_ISUS
-static int isus(nfp,hostbuf)
+local int isus(nfp,hostbuf)
 bfile		*nfp ;
 cchar	hostbuf[] ;
 {
@@ -1638,14 +1635,10 @@ cchar	hostbuf[] ;
 /* end subroutine (isus) */
 #endif /* CF_ISUS */
 
-
-static int hastabs(cchar *s)
-{
-
+local int hastabs(cchar *s) noex {
 	while (*s && (*s != '\t')) {
 	    s += 1 ;
 	}
-
 	return (*s) ? TRUE : FALSE ;
 }
 /* end subroutine (hastabs) */
