@@ -1,4 +1,4 @@
-/* emit_mailbox */
+/* emit_mailbox SUPPORT (bbnews) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -60,27 +60,28 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<strings.h>
-#include	<cstring>
-#include	<time.h>
 #include	<pwd.h>
-
-#include	<usystem.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<strings.h>
 #include	<bfile.h>
+#include	<headerkeys.h>		/* LIBMAILMSG */
+#include	<mkdirlist.h>		/* LIBPCS */
+#include	<artlist.h>		/* LIBPCS */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
-#include	"mkdirlist.h"
-#include	"artlist.h"
-#include	"headerkeys.h"
 
 
 /* local defines */
@@ -91,47 +92,25 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-
-extern int	progmsgenv_begin(struct proginfo *) ;
-extern int	progmsgenv_envstr(struct proginfo *,char *,int) ;
-extern int	progmsgenv_end(struct proginfo *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
 
 /* external variables */
 
 
 /* forward references */
 
-static int procenv(struct proginfo *,bfile *,bfile *) ;
+local int procmsgenv(proginfo *,bfile *,bfile *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
 int emit_mailbox(pip,dsp,ai,ap,ngdir,af)
-struct proginfo	*pip ;
+proginfo	*pip ;
 MKDIRLIST_ENT	*dsp ;
 int		ai ;
 ARTLIST_ENT	*ap ;
@@ -139,17 +118,13 @@ cchar	ngdir[] ;
 cchar	af[] ;
 {
 	bfile	*ofp = pip->ofp ;
-
 	int	rs = SR_OK ;
 	int	wlen = 0 ;
-
 	cchar	*nd = pip->newsdname ;
-
 	char	afname[MAXPATHLEN + 1] ;
 
-
-	if (ngdir == NULL) return EMIT_DONE ;
-	if (af == NULL) return EMIT_OK ;
+	if (ngdir == nullptr) return EMIT_DONE ;
+	if (af == nullptr) return EMIT_OK ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
@@ -168,14 +143,13 @@ cchar	af[] ;
 
 		while ((rs = breadln(afp,lbuf,llen)) > 0) {
 		    len = rs ;
-
 		    if (line++ == 0) {
 			if (strncmp(lbuf,"From ",5) != 0) {
-			    rs = procenv(pip,ofp,afp) ;
+			    rs = procmsgenv(pip,ofp,afp) ;
 			    wlen += rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("emit_mailbox: procenv() rs=%d\n",rs) ;
+	    debugprintf("emit_mailbox: procmsgenv() rs=%d\n",rs) ;
 #endif
 			}
 		    }
@@ -212,17 +186,10 @@ cchar	af[] ;
 
 /* local subroutines */
 
-
-static int procenv(pip,ofp,afp)
-struct proginfo	*pip ;
-bfile		*ofp ;
-bfile		*afp ;
-{
-	bfile_stat	sb ;
+local int procmsgenv(profinfo *pip,bfile *ofp,bfile *afp) noex {
 	int	rs ;
 	int	wlen = 0 ;
-
-	if ((rs = bstat(afp,&sb)) >= 0) {
+	if (ustat sb ; (rs = bstat(afp,&sb)) >= 0) {
 	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    if ((rs = getusername(ubuf,ulen,sb.st_uid)) >= 0) {
@@ -239,9 +206,8 @@ bfile		*afp ;
 		}
 	    } /* end if (getusername) */
 	} /* end if (bstat) */
-
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (procenv) */
+/* end subroutine (procmsgenv) */
 
 
