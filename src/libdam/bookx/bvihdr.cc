@@ -79,7 +79,7 @@ enum his {
 	hi_nverses,
 	hi_nzverses,
 	hi_maxbook,
-	hi_maxchapter,
+	hi_maxchap,
 	hi_overlast
 } ; /* end enum */
 
@@ -127,7 +127,7 @@ int bvihdr_rd(bvihdr *op,char *hbuf,int hlen) noex {
 	                header[hi_nverses]	= op->nverses ;
 	                header[hi_nzverses]	= op->nzverses ;
 	                header[hi_maxbook]	= op->maxbook ;
-	                header[hi_maxchapter]	= op->maxchapter ;
+	                header[hi_maxchap]	= op->maxchap ;
 	                bp += headsize ;
 	                bl -= headsize ;
 			len = intconv(bp - hbuf) ;
@@ -178,7 +178,7 @@ int bvihdr_wr(bvihdr *op,cchar *hbuf,int hlen) noex {
 	                op->nverses	= header[hi_nverses] ;
 	                op->nzverses	= header[hi_nzverses] ;
 	                op->maxbook	= header[hi_maxbook] ;
-	                op->maxchapter	= header[hi_maxchapter] ;
+	                op->maxchap	= header[hi_maxchap] ;
 	                bp += headsize ;
 	                bl -= headsize ;
 			len = intconv(bp - hbuf) ;
