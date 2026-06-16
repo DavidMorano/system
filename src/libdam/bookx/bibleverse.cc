@@ -106,7 +106,7 @@ enum subs {
 	sub_read,
 	sub_get,
 	sub_curbegin,
-	sub_enum,
+	sub_curenum,
 	sub_curend,
 	sub_audit,
 	sub_info,
@@ -121,7 +121,7 @@ constexpr cpcchar	subnames[] = {
 	"read",
 	"get",
 	"curbegin",
-	"enum",
+	"curenum",
 	"curend",
 	"audit",
 	"info",
@@ -339,7 +339,7 @@ int bibleverse_curenum(BV *op,BV_CUR *curp,BV_CUTE *qp,
 
 	return rs ;
 }
-/* end subroutine (bibleverse_enum) */
+/* end subroutine (bibleverse_curenum) */
 
 int bibleverse_info(BV *op,BIBLEVERSE_INFO *ip) noex {
 	BIBLEVERSES_I	bi ;
@@ -544,7 +544,7 @@ local int bibleverse_loadcalls(BV *op,cchar *objname) noex {
 			(int (*)(void *,BVS_C *)) snp ;
 		    break ;
 
-		case sub_enum:
+		case sub_curenum:
 		    op->call.enumerate = 
 			(int (*)(void *,BVS_C *,BVS_Q *,char *,int)) snp ;
 		    break ;
