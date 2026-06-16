@@ -35,7 +35,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -68,11 +68,6 @@
 
 /* external subroutines */
 
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isFailOpen(int) ;
-
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
@@ -80,8 +75,6 @@ extern int	debugprinthex(const char *,int,const char *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
 
 
 /* external variables */
@@ -94,7 +87,7 @@ extern cchar	*getourenv(cchar **,cchar *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
 static int	procerrstat(PROGINFO *) ;
 static int	procout(PROGINFO *,cchar *) ;
 static int	procreduce(PROGINFO *) ;
@@ -162,8 +155,8 @@ int main(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO	pi, *pip = &pi ;
 	CKSUM		sum ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	bfile		errfile ;
 	bfile		outfile, *ofp = &outfile ;
 	uint		sv ;
@@ -320,7 +313,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-				    KEYOPT	*kop = &akopts ;
+				    keyopt	*kop = &akopts ;
 	                            rs = keyopt_loads(kop,argp,argl) ;
 	                        }
 	                    } else
@@ -442,7 +435,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-				        KEYOPT	*kop = &akopts ;
+				        keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -583,7 +576,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (rs >= 0) {
 	    ARGINFO	*aip = &ainfo ;
-	    BITS	*bop = &pargs ;
+	    bits	*bop = &pargs ;
 	    cchar	*ofn = ofname ;
 	    cchar	*afn = afname ;
 	    if ((rs = procargs(pip,aip,bop,afn)) >= 0) {
@@ -713,7 +706,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
