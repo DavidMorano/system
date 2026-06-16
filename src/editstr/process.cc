@@ -27,7 +27,6 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -35,10 +34,10 @@
 #include	<csignal>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<paramopt.h>
 #include	<fsdir.h>
@@ -51,6 +50,8 @@
 
 /* local defines */
 
+#define	PI		proginfo
+
 #ifndef	SUFBUFLEN
 #define	SUFBUFLEN	MAXNAMELEN
 #endif
@@ -58,15 +59,7 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-
-extern int	procfile(struct proginfo *,PARAMOPT *,const char *) ;
-
-extern char	*timestr_logz(time_t,char *) ;
+extern int	procfile(PI *,paramopt *,cchar *) noex ;
 
 
 /* external variables */
@@ -79,32 +72,25 @@ extern int	if_int ;
 
 /* forward references */
 
-static int isdotdir(const char *) ;
+local bool	isdotdir(cchar *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int process(pip,pop,fname)
-struct proginfo	*pip ;
-PARAMOPT	*pop ;
-const char	fname[] ;
-{
+int process(PI *pip,paramopt *pop,cchar *fname) noex {
 	ustat	sb ;
-
 	int	rs ;
 	int	c ;
 	int	f_dir ;
 
-
-	if (fname == NULL)
-	    return SR_FAULT ;
-
-	if (fname[0] == '\0')
-	    return SR_INVALID ;
+	if (fname == NULL) return SR_FAULT ;
+	if (fname[0] == '\0') return SR_INVALID ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -133,54 +119,13 @@ const char	fname[] ;
 
 
 	    if (pip->fl.recurse) {
-
-	        FSDIRTREE	dt ;
-
-	        int	dtopts = 0 ;
-
+		cauto &fdm = fsdirtreem ;
+	        fsdirtree	dt ;
+	        int	fdo = 0 ;
 	        char	dename[MAXPATHLEN + 1] ;
-
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("process: recursing\n") ;
-#endif
-
-	        dtopts |= ((pip->fl.follow) ? FSDIRTREE_MFOLLOW : 0) ;
-	        rs = fsdirtree_open(&dt,fname,dtopts) ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("process: fsdirtree_open() rs=%d\n",rs) ;
-#endif
-
-	        if (rs < 0) {
-
-	            if (! pip->fl.quiet) {
-
-	                printf(pip->efp,
-	                    "%s: could not open directory (%d)\n",
-	                    pip->progname,rs) ;
-
-	                printf(pip->efp,
-	                    "%s: directory=%s\n",
-	                    pip->progname,fname) ;
-
-	            }
-
-	            if (! pip->fl.nostop)
-	                goto bad0 ;
-
-	        } /* end if (could not open directory) */
-
-	        if (rs >= 0) {
-		    const int	mpl = MAXPATHLEN ;
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("process: reading\n") ;
-#endif
-
+	        fdo |= ((pip->fl.follow) ? fdm.follow : 0) ;
+	        if ((rs = fsdirtree_open(&dt,fname,fmo)) >= 0) {
+		    cint	mpl = MAXPATHLEN ;
 	            while (! if_int) {
 
 	                del = fsdirtree_read(&dt,&sb,dename,mpl) ;
@@ -191,8 +136,7 @@ const char	fname[] ;
 	                        del) ;
 #endif
 
-	                if (del <= 0)
-	                    break ;
+	                if (del <= 0) break ;
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
@@ -201,8 +145,9 @@ const char	fname[] ;
 
 	                if (isdotdir(fname)) {
 	                    rs = mkpath1(tmpfname,dename) ;
-	                } else
+	                } else {
 	                    rs = mkpath2(tmpfname,fname,dename) ;
+			}
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
@@ -210,68 +155,23 @@ const char	fname[] ;
 #endif
 
 	                if (rs > 0) {
-
 	                    rs = procfile(pip,pop,tmpfname) ;
-
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(4))
-	                        debugprintf("process: procfile() rs=%d\n",rs) ;
-#endif
-
-	                    if (rs > 0)
-	                        c += 1 ;
-
+			    c += rs ;
 	                }
-
-	                if ((rs < 0) && (! pip->fl.nostop))
-	                    break ;
-
+	                if ((rs < 0) && (! pip->fl.nostop)) break ;
 	            } /* end while (looping through entries) */
-
 	            fsdirtree_close(&dt) ;
-
 	        } /* end if (opened directory tree) */
-
 	    } else {
-
-	        FSDIR		d ;
-
-	        FSDIR_ENT	ds ;
-
+	        fsdir		d ;
+	        fsdir_ent	ds ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
 	            debugprintf("process: not recursing\n") ;
 #endif
 
-	        rs = fsdir_open(&d,fname) ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("process: fsdir_open() rs=%d\n",rs) ;
-#endif
-
-	        if (rs < 0) {
-
-	            if (! pip->fl.quiet) {
-
-	                printf(pip->efp,
-	                    "%s: could not open directory (%d)\n",
-	                    pip->progname,rs) ;
-
-	                printf(pip->efp,
-	                    "%s: directory=%s\n",
-	                    pip->progname,fname) ;
-
-	            }
-
-	            if (! pip->fl.nostop)
-	                goto bad0 ;
-
-	        } /* end if (could not open directory) */
-
-	        if (rs >= 0) {
-
+	        if ((rs = fsdir_open(&d,fname)) >= 0) {
 	            while ((! if_int) &&
 	                ((del = fsdir_read(&d,&ds)) > 0)) {
 
@@ -286,11 +186,11 @@ const char	fname[] ;
 	                        continue ;
 	                }
 
-	                if (isdotdir(fname))
+	                if (isdotdir(fname)) {
 	                    rs = mkpath1(tmpfname,ds.name) ;
-
-	                else
+			} else {
 	                    rs = mkpath2(tmpfname,fname,ds.name) ;
+			}
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
@@ -299,7 +199,6 @@ const char	fname[] ;
 #endif
 
 	                if (rs > 0) {
-
 	                    rs = procfile(pip,pop,tmpfname) ;
 
 #if	CF_DEBUG
@@ -316,20 +215,12 @@ const char	fname[] ;
 	                    break ;
 
 	            } /* end while (looping through entries) */
-
 	            fsdir_close(&d) ;
-
 	        } /* end if (opened directory tree) */
-
 	    } /* end if (directory) */
-
 	} else if (S_ISREG(sb.st_mode)) {
-
 	    rs = procfile(pip,pop,fname) ;
-
-	    if (rs > 0)
-	        c += 1 ;
-
+	    c += rs ;
 	} /* end if */
 
 ret0:
@@ -345,29 +236,18 @@ bad0:
 /* end subroutine (process) */
 
 
+/* local subroutines */
 
-/* LOCAL SUBROUTINES */
-
-
-
-static int isdotdir(dname)
-const char	dname[] ;
-{
-	int	f = FALSE ;
-
-
+local bool isdotdir(cchar *dname) noex {
+	int	f = false ;
 	if (dname[0] == '.') {
-
 	    f = (dname[1] == '\0') ;
-
-	    if (! f)
+	    if (! f) {
 	        f = ((dname[1] == '/') && (dname[2] == '\0')) ;
-
+	    }
 	}
-
 	return f ;
 }
 /* end subroutine (isdotdir) */
-
 
 
