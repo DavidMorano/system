@@ -40,7 +40,7 @@ struct bvihdr_head {
 	uint		nverses ;
 	uint		nzverses ;
 	uint		maxbook ;
-	uint		maxchapter ;
+	uint		maxchap ;
 	uchar		vetu[4] ;
 } ; /* end struct (bvihdr) */
 
