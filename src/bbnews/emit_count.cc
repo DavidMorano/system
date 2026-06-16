@@ -1,11 +1,12 @@
-/* emit_count */
+/* emit_count SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* counts number of articles on the given newsgroup */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debuging */
+#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
@@ -22,8 +23,10 @@
 
 /*******************************************************************************
 
-	Synopsis:
+  	Name:
+	emit_header
 
+	Synopsis:
 	int emit_header(pip,dsp,ai,ap,ngdir,af)
 	PROGINFO	*pip ;
 	MKDIRLIST_ENT	*dsp ;
@@ -33,7 +36,6 @@
 	char		af[] ;
 
 	Arguments:
-
 	pip		program information pointer
 	dsp		user structure pointer
 	int		article index within newsgroup
@@ -42,18 +44,17 @@
 	af		article base file name
 
 	Returns:
-
-	<0		error
 	>=0		emit-codes
-
+	<0		error
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-
+#include	<cstddef>
+#include	<cstdlib>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"artlist.h"
@@ -68,8 +69,17 @@
 /* external variables */
 
 
-/* exported subroutines */
+/* local structures */
 
+
+/* forward references */
+
+/* local variables */
+
+/* exported variables */
+
+
+/* exported subroutines */
 
 int emit_count(pip,dsp,ai,ap,ngdir,af)
 PROGINFO	*pip ;
