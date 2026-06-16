@@ -1,11 +1,12 @@
-/* progfile */
+/* progfile SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process the input files */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG 	0		/* run-time switchable */
-
 
 /* revision history:
 
@@ -18,42 +19,38 @@
 
 /*******************************************************************************
 
+  	Description:
 	Here we process a message for its addresses.
 
 	Synopsis:
-
 	int progfile(pip,pp,ofp,fname)
 	PROGINFO	*pip ;
-	PARAMOPT	*pp ;
+	paramopt	*pp ;
 	bfile		*ofp ;
-	const char	fname[] ;
+	cchar	fname[] ;
 
 	Arguments:
-
 	- pip		program information pointer
 	- pp		paramter option pointer
 	- ofp		output (BIO) file pointer
 	- fname		file to process
 
 	Returns:
-
 	>=0		OK
 	<0		error code
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<nulstr.h>
 #include	<bfile.h>
 #include	<paramopt.h>
@@ -71,20 +68,14 @@
 
 /* external subroutines */
 
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	mailmsg_loadfile(MAILMSG *,bfile *) ;
-extern int	bprintlns(bfile *,int,const char *,int) ;
-
 extern int	progentryinfo(PROGINFO *,bfile *,EMA_ENT *,int) ;
 extern int	progentryaddr(PROGINFO *,bfile *,EMA_ENT *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
 
 
 /* external variables */
@@ -95,7 +86,7 @@ extern cchar	*getourenv(const char **,const char *) ;
 
 /* forward references */
 
-static int	procinfile(PROGINFO *,PARAMOPT *,bfile *,EMA *,cchar *) ;
+static int	procinfile(PROGINFO *,paramopt *,bfile *,EMA *,cchar *) ;
 static int	procinfiler(PROGINFO *,bfile *,EMA *,MAILMSG *,cchar *,int) ;
 
 static int	progfile_info(PROGINFO *,bfile *,EMA_ENT *,int) ;
@@ -104,7 +95,7 @@ static int	progfile_addr(PROGINFO *,bfile *,EMA_ENT *,int) ;
 
 /* local variables */
 
-static const char	*emas[] = {
+static cchar	*emas[] = {
 	"message-id",
 	"errors-to",
 	"return-path",
@@ -124,7 +115,7 @@ static const char	*emas[] = {
 /* exported subroutines */
 
 
-int progfile(PROGINFO *pip,PARAMOPT *pp,bfile *ofp,cchar *fname)
+int progfile(PROGINFO *pip,paramopt *pp,bfile *ofp,cchar *fname)
 {
 	CMD_LOCAL	*lsp = pip->lsp ;
 	EMA		adds ;
@@ -180,10 +171,10 @@ int progfile(PROGINFO *pip,PARAMOPT *pp,bfile *ofp,cchar *fname)
 
 static int procinfile(pip,pp,ofp,emap,fname)
 PROGINFO	*pip ;
-PARAMOPT	*pp ;
+paramopt	*pp ;
 bfile		*ofp ;
 EMA		*emap ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	bfile		infile, *ifp = &infile ;
 	int		rs ;
@@ -201,11 +192,11 @@ const char	fname[] ;
 	    MAILMSG	m ;
 	    if ((rs = mailmsg_start(&m)) >= 0) {
 	        if ((rs = mailmsg_loadfile(&m,ifp)) >= 0) {
-	            PARAMOPT_CUR	cur ;
+	            paramopt_cur	cur ;
 	            if ((rs = paramopt_curbegin(pp,&cur)) >= 0) {
 	                int		hl ;
-	                const char	*po = PO_HEADER ;
-	                const char	*hp ;
+	                cchar	*po = PO_HEADER ;
+	                cchar	*hp ;
 	                while (rs >= 0) {
 	                    hl = paramopt_curenumval(pp,po,&cur,&hp) ;
 	                    if (hl == SR_NOTFOUND) break ;
