@@ -32,14 +32,14 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
