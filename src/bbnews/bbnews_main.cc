@@ -1586,9 +1586,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 
 	                switch (oi) {
 	                case akoname_query:
-	                    if (! pip->final.query) {
+	                    if (! pip->finval.query) {
 	                        pip->have.query = true ;
-	                        pip->final.query = true ;
+	                        pip->finval.query = true ;
 	                        pip->fl.query = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1597,9 +1597,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_test:
-	                    if (! pip->final.test) {
+	                    if (! pip->finval.test) {
 	                        pip->have.test = true ;
-	                        pip->final.test = true ;
+	                        pip->finval.test = true ;
 	                        pip->fl.test = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1608,9 +1608,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_term:
-	                    if (! pip->final.term) {
+	                    if (! pip->finval.term) {
 	                        pip->have.term = true ;
-	                        pip->final.term = true ;
+	                        pip->finval.term = true ;
 	                        pip->fl.term = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1619,9 +1619,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_useclen:
-	                    if (! pip->final.useclen) {
+	                    if (! pip->finval.useclen) {
 	                        pip->have.useclen = true ;
-	                        pip->final.useclen = true ;
+	                        pip->finval.useclen = true ;
 	                        pip->fl.useclen = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1630,9 +1630,9 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_useclines:
-	                    if (! pip->final.useclines) {
+	                    if (! pip->finval.useclines) {
 	                        pip->have.useclines = true ;
-	                        pip->final.useclines = true ;
+	                        pip->finval.useclines = true ;
 	                        pip->fl.useclines = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
