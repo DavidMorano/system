@@ -1,19 +1,21 @@
-/* progmoder */
+/* progmoder SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a newsgroup (an entire newsgroup) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_SHOW		1		/* actually show */
 
-
 /* revision history:
 
 	= 1994-01-17, David A­D­ Morano
-	I have made major modifications from a previous version of this
-	subroutine (which was total junk!).  The previous functions that are
-	now in this subroutine were scattered all over the place in the past.
-	The code was previously unmaintainable!
+	I have made major modifications from a previous version of
+	this subroutine (which was total junk!).  The previous
+	functions that are now in this subroutine were scattered
+	all over the place in the past.  The code was previously
+	unmaintainable!
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -24,24 +26,23 @@
 
 /*******************************************************************************
 
-        This subroutine is the main routine that processes newsgroups. It
-        switches on the current program mode and performs the appropriate
-        actions for the given mode.
-
+  	Description:
+	This subroutine is the main routine that processes newsgroups.
+	It switches on the current program mode and performs the
+	appropriate actions for the given mode.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<buffer.h>
 #include	<expcook.h>
@@ -63,9 +64,6 @@
 
 typedef int	(*emit_t)(PROGINFO *,...) ;
 
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
-
 extern int	progng(PROGINFO *,DIRSHOWN *,MKDIRLIST_ENT *,emit_t) ;
 extern int	bbcpy(char *,cchar *) ;
 extern int	emit_test(PROGINFO *,...) ;
@@ -78,10 +76,6 @@ extern int	emit_mailbox(PROGINFO *,...) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
