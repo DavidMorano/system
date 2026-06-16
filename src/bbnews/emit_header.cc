@@ -63,8 +63,7 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
-#include	<ugetpw.h>
-#include	<getbufsize.h>
+#include	<getpwx.h>
 #include	<getax.h>
 #include	<estrings.h>
 #include	<bfile.h>
