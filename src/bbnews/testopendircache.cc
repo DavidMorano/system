@@ -1,4 +1,5 @@
-/* testopendircache */
+/* testopendircache SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C89 */
 
 
@@ -14,11 +15,16 @@
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debugging memory-allocations */
-#include	<envstandards.h>
+
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
 #include	<cstdio>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getx.h>
 #include	<fsdir.h>
 #include	<pcsopendircache.h>
 #include	<filer.h>
@@ -42,18 +48,13 @@
 
 #define	VARDEBUGFNAME	"TESTOPENDIRCACHE_DEBUGFILE"
 
-extern int	bufprintf(char *,int,const char *,...) ;
-
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern const char 	*getourenv(const char **,const char *) ;
-
-extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
@@ -62,9 +63,8 @@ static int dumpdir(int,int) ;
 
 /* exported subroutines */
 
-int main(int argc,const char **argv,const char **envv)
-{
-	const char	*pr = getourenv(envv,VARPRPCS) ;
+int main(int argc,cchar **argv,cchar **envv) {
+	cchar	*pr = getourenv(envv,VARPRPCS) ;
 
 #if	CF_DEBUGS && CF_DEBUGMALL
 	uint		mo_start = 0 ;
@@ -75,7 +75,7 @@ int main(int argc,const char **argv,const char **envv)
 
 #if	CF_DEBUGS
 	{
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL)
 	        debugopen(cp) ;
 	    debugprintf("main: starting\n") ;
@@ -88,13 +88,13 @@ int main(int argc,const char **argv,const char **envv)
 #endif
 
 	if (argv != NULL) {
-	    const mode_t	om = 0666 ;
+	    cmode	om = 0666 ;
 	    cint	to = -1 ;
 	    cint	llen = LINEBUFLEN ;
 	    int		ai ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    for (ai = 1 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
-	        const char	*fn = argv[ai] ;
+	        cchar	*fn = argv[ai] ;
 	        cint	of = O_RDONLY ;
 #if	CF_DEBUGS
 	        debugprintf("main: fn=%s\n",fn) ;
