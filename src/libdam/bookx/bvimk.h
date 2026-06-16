@@ -44,8 +44,8 @@ struct bvimk_object {
 
 struct bvimk_information {
 	uint		maxbook ;
-	uint		maxchapter ;
-	uint		maxverse ;
+	uint		maxchap ;
+	uint		maxvers ;
 	uint		nverses ;
 	uint		nzverses ;
 } ; /* end struct */
@@ -80,8 +80,8 @@ struct bvimk_head {
 	BVIMK_FL	fl ;
 	uint		pcitation ;
 	uint		maxbook ;
-	uint		maxchapter ;
-	uint		maxverse ;
+	uint		maxchap ;
+	uint		maxvers ;
 	uint		nverses ;
 	uint		nzverses ;
 	uint		magval ;
