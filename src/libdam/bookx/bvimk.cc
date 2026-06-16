@@ -288,16 +288,14 @@ int bvimk_open(bvimk *op,cchar *dbn,int of,mode_t om) noex {
 	    } /* end if (error) */
 	} /* end if (bvimk_ctor) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (bvimk_open) */
+} /* end subroutine (bvimk_open) */
 
 int bvimk_close(bvimk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		nv = 0 ; /* return-value */
 	if ((rs = bvimk_magic(op)) >= 0) {
-	    bool	f_go = false ;
-	    f_go = (! op->fl.abort) ;
+	    bool	f_go = (! op->fl.abort) ;
 	    if (op->fl.notsorted) {
 	        vecobj_sort(op->vlp,ventcmp) ;
 	    }
@@ -338,16 +336,20 @@ int bvimk_close(bvimk *op) noex {
 	    op->magval = 0 ;
 	} /* end if (bvimk_magic) */
 	return (rs >= 0) ? nv : rs ;
-}
-/* end subroutine (bvimk_close) */
+} /* end subroutine (bvimk_close) */
+
+local inline void vmax(uint *uip,uchar v) noex {
+    if (uint vv = uint(v) ; vv > *uip) {
+	*uip = vv ;
+    }
+} /* end subrooutine (vmax) */
 
 int bvimk_add(bvimk *op,bvimk_v *bvp) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	if ((rs = bvimk_magic(op,bvp)) >= 0) {
-	    bventry	bve{} ;
-	    blentry	ble{} ;
 	    uint	li = UINT_MAX ;
 	    if (bvp->lines && (bvp->nlines > 0)) {
+	        blentry	ble{} ;
 	        for (int i = 0 ; i < bvp->nlines ; i += 1) {
 	            ble.loff = bvp->lines[i].loff ;
 	            ble.llen = bvp->lines[i].llen ;
@@ -357,29 +359,28 @@ int bvimk_add(bvimk *op,bvimk_v *bvp) noex {
 	        } /* end for */
 	    } /* end if */
 	    if (rs >= 0) {
+		vecobj	*vlp = op->vlp ;
+	        bventry	bve{} ;
 	        uint	citcmpval ;
 	        bve.voff = bvp->voff ;
 	        bve.vlen = bvp->vlen ;
 	        bve.li = li ;
-	        mkcitation(&bve.citation,bvp) ;
-	        citcmpval = (bve.citation & vmask) ;
-	        if (citcmpval < op->pcitation) {
-	            op->fl.notsorted = true ;
-	        }
-	        op->pcitation = citcmpval ;
-	        if ((rs = vecobj_add(op->vlp,&bve)) >= 0) {
-		    uint	v ;
-	            op->nverses += 1 ;
-	            if ((bvp->b > 0) && (bvp->c > 0) && (bvp->v > 0)) {
-	                op->nzverses += 1 ;
+	        if ((rs = mkcitation(&bve.citation,bvp)) >= 0) {
+	            citcmpval = (bve.citation & vmask) ;
+	            if (citcmpval < op->pcitation) {
+	                op->fl.notsorted = true ;
 	            }
-	            v = bvp->b ;
-	            if (v > op->maxbook) op->maxbook = v ;
-	            v = bvp->c ;
-	            if (v > op->maxchapter) op->maxchapter = v ;
-	            v = bvp->v ;
-	            if (v > op->maxverse) op->maxverse = v ;
-	        } /* end if (add) */
+	            op->pcitation = citcmpval ;
+	            if ((rs = vlp->add(&bve)) >= 0) {
+	                op->nverses += 1 ;
+	                if ((bvp->b > 0) && (bvp->c > 0) && (bvp->v > 0)) {
+	                    op->nzverses += 1 ;
+	                }
+			vmax(&op->maxbook,bvp->b) ;
+			vmax(&op->maxchap,bvp->c) ;
+			vmax(&op->maxvers,bvp->v) ;
+	            } /* end if (add) */
+		} /* end if (mkcitation) */
 	    } /* end if (ok) */
 	} /* end if (bvimk_magic) */
 	return rs ;
@@ -401,8 +402,8 @@ int bvimk_getinfo(bvimk *op,BVIMK_INFO *bip) noex {
 	    if (bip) {
 		memclear(bip) ;
 	        bip->maxbook = op->maxbook ;
-	        bip->maxchapter = op->maxchapter ;
-	        bip->maxverse = op->maxverse ;
+	        bip->maxchap = op->maxchap ;
+	        bip->maxvers = op->maxvers ;
 	        bip->nverses = op->nverses ;
 	        bip->nzverses = op->nzverses ;
 	    } /* end if (non-null) */
@@ -568,7 +569,7 @@ local int bvimk_mkidx(bvimk *op) noex {
 	    hdr.nverses		= op->nverses ;
 	    hdr.nzverses	= op->nzverses ;
 	    hdr.maxbook		= op->maxbook ;
-	    hdr.maxchapter	= op->maxchapter ;
+	    hdr.maxchap		= op->maxchap ;
 	    if ((rs = bvimk_mkidxwrmain(op,&hdr)) >= 0) {
 	        cint	hlen = HDRBUFLEN ;
 	        char	hbuf[HDRBUFLEN+1] ;
@@ -764,12 +765,12 @@ local int mkcitation(uint *cip,bvimk_v *bvp) noex {
     	int		rs = SR_FAULT ;
 	if (cip && bvp) {
 	    uint	ci = 0 ;
-	    uint	nlines = 0 ;
-	    rs = SR_OK ;
-	    if (bvp->lines) {
-	        nlines = bvp->nlines ;
-	    }
-	    ci = mkciteload(ci,uchar(nlines)) ;
+            uchar	nl = 0 ;
+            rs = SR_OK ;
+            if (bvp->lines) {
+	        nl = uchar(bvp->nlines) ;
+            }
+	    ci = mkciteload(ci,nl) ;
 	    ci = mkciteload(ci,bvp->b) ;
 	    ci = mkciteload(ci,bvp->c) ;
 	    ci = mkciteload(ci,bvp->v) ;
