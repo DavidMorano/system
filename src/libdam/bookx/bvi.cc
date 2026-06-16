@@ -306,7 +306,7 @@ int bvi_getinfo(bvi *op,bvi_info *ip) noex {
 	        ip->mtime	= fip->ti_mod ;
 	        ip->ctime	= (time_t) hip->wtime ;
 	        ip->maxbook	= hip->maxbook ;
-	        ip->maxchapter	= hip->maxchapter ;
+	        ip->maxchap	= hip->maxchap ;
 	        ip->count	= hip->nverses ;
 	        ip->nzverses	= hip->nzverses ;
 	    } /* end if (non-null) */
