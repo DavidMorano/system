@@ -1,7 +1,9 @@
-/* progng */
+/* progng SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* process a newsgroup */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
@@ -10,14 +12,14 @@
 #define	CF_DIRSHOWN	1		/* |dirshown_()| */
 #define	CF_ARTLOAD	1		/* art-load */
 
-
 /* revision history:
 
 	= 1994-01-17, David A­D­ Morano
-        I have made major modifications from a previous version of this
-        subroutine (which was total junk!). The previous functions that are now
-        in this subroutine were scattered all over the place in the past. The
-        code was previously unmaintainable!
+	I have made major modifications from a previous version of
+	this subroutine (which was total junk!). The previous
+	functions that are now in this subroutine were scattered
+	all over the place in the past. The code was previously
+	unmaintainable!
 
 	= 1998-11-22, David A­D­ Morano
         I did some clean-up.
@@ -28,13 +30,14 @@
 
 /*******************************************************************************
 
-        This subroutine processes articles on a particular newsgroup passed down
-        as an argument using the user's newsgroup pointer entry. Also passed
-        down is what articles on the newsgroup are to be selected for processing
-        ; namely, old articles, all articles, or new articles.
+  	Description:
+	This subroutine processes articles on a particular newsgroup
+	passed down as an argument using the user's newsgroup pointer
+	entry.  Also passed down is what articles on the newsgroup
+	are to be selected for processing; namely, old articles,
+	all articles, or new articles.
 
  	Synopsis:
-
 	int progng(pip,sdp,dsp,emit)
 	PROGINFO	*pip ;
 	DIRSHOWN	*sdp ;
@@ -50,21 +53,19 @@
  			typically print bulletin or report title
  
 	Returns:
-
 	<0		error
 	>=0		EMIT-code
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<fsdir.h>
@@ -79,29 +80,21 @@
 
 /* typedefs */
 
-typedef int	(*emit_t)(PROGINFO *,...) ;
+extern"C" {
+    typedef int	(*emit_t)(PROGINFO *,...) noex ;
+}
+
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	pathadd(char *,int,const char *) ;
-extern int	isNotPresent(int) ;
-
-extern int	bbcpy(char *,const char *) ;
+extern "C" {
+    extern int	bbcpy(char *,cchar *) noex ;
+}
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -109,26 +102,27 @@ extern char	*timestr_log(time_t,char *) ;
 
 /* forward references */
 
-static int procartload(PROGINFO *,DIRSHOWN *,ARTLIST *,MKDIRLIST_ENT *) ;
-static int procartdir(PROGINFO *,ARTLIST *,const char *) ;
-static int procartlook(PROGINFO *,ARTLIST *,MKDIRLIST_ENT *,emit_t) ;
+local int procartload(PROGINFO *,DIRSHOWN *,artlist *,MKDIRLIST_ENT *) ;
+local int procartdir(PROGINFO *,artlist *,cchar *) ;
+local int procartlook(PROGINFO *,artlist *,MKDIRLIST_ENT *,emit_t) ;
 
 
 /* local (static) variables */
 
-static const char	*ignorefiles[] = {
+constexpr cpcchar	ignorefiles[] = {
 	"core",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit)
-{
-	struct timeb	now = pip->now ;
-	ARTLIST		al ;
+int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit) noex {
+	TIMEB		now = pip->now ;
+	artlist		al ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		retval = EMIT_DONE ;
@@ -141,8 +135,8 @@ int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit)
 	    }
 #endif
 
-	if (sdp == NULL) return SR_FAULT ;
-	if (dsp == NULL) return SR_FAULT ;
+	if (sdp == nullptr) return SR_FAULT ;
+	if (dsp == nullptr) return SR_FAULT ;
 
 /* initialization functions */
 
@@ -156,7 +150,7 @@ int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit)
 	            cchar	*np ;
 	            time_t	a ;
 	            debugprintf("progng: artlist so far¬\n") ;
-	            for (i = 0 ; artlist_get(&al,i,NULL,&np,&a) >= 0 ; i += 1) {
+	            for (i = 0 ; artlist_get(&al,i,nullptr,&np,&a) >= 0 ; i += 1) {
 	                debugprintf("progng: i=%d name=%s\n",i,np) ;
 		    }
 	        }
@@ -204,7 +198,7 @@ int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit)
 /* local subroutines */
 
 
-static int procartload(PROGINFO *pip,DIRSHOWN *sdp,ARTLIST *alp,
+local int procartload(PROGINFO *pip,DIRSHOWN *sdp,artlist *alp,
 		MKDIRLIST_ENT *dsp)
 {
 	MKDIRLIST_ENT	*dsp2 ;
@@ -212,7 +206,7 @@ static int procartload(PROGINFO *pip,DIRSHOWN *sdp,ARTLIST *alp,
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	while ((rs >= 0) && (dsp != NULL)) {
+	while ((rs >= 0) && (dsp != nullptr)) {
 
 #if	CF_DIRSHOWN
 	    if ((rs = dirshown_already(sdp,dsp,&dsp2)) == rsn) {
@@ -238,12 +232,12 @@ static int procartload(PROGINFO *pip,DIRSHOWN *sdp,ARTLIST *alp,
 /* end subroutine (procartload) */
 
 
-static int procartdir(PROGINFO *pip,ARTLIST *alp,cchar *ngd)
+local int procartdir(PROGINFO *pip,artlist *alp,cchar *ngd)
 {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	const char	*nd = pip->newsdname ;
+	cchar	*nd = pip->newsdname ;
 	char		apath[MAXPATHLEN + 2] ;
 
 #if	CF_DEBUG
@@ -251,7 +245,7 @@ static int procartdir(PROGINFO *pip,ARTLIST *alp,cchar *ngd)
 	    debugprintf("procartdir: ent ngd=%s\n",ngd) ;
 #endif
 
-	if (ngd == NULL)
+	if (ngd == nullptr)
 	    return SR_FAULT ;
 
 	if ((rs = mkpath2(apath,nd,ngd)) >= 0) {
@@ -295,11 +289,10 @@ static int procartdir(PROGINFO *pip,ARTLIST *alp,cchar *ngd)
 }
 /* end subroutine (procartdir) */
 
-
-static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
+local int procartlook(PROGINFO *pip,artlist *alp,MKDIRLIST_ENT *dsp,
 		emit_t emit)
 {
-	ARTLIST_ENT	*aep ;
+	artlist_ent	*aep ;
 	time_t		mtime_seen = DATE1970 ;
 	time_t		amt ;
 	int		rs = SR_OK ;
@@ -310,9 +303,9 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 	int		f_previous = FALSE ;
 	int		f_exit = FALSE ;
 	int		f ;
-	const char	*fmt ;
-	const char	*fname ;
-	const char	*ngd ;
+	cchar	*fmt ;
+	cchar	*fname ;
+	cchar	*ngd ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -324,7 +317,7 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 	if (pip->fl.all) cmode = CM_ALL ;
 
 	for (ai = 0 ; artlist_get(alp,ai,&ngd,&fname,&amt) >= 0 ; ai += 1) {
-	    if (fname != NULL) {
+	    if (fname != nullptr) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
@@ -450,11 +443,11 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 	    debugprintf("progng/procartlook: for-out rs=%d\n", rs) ;
 #endif /* CF_DEBUG */
 
-/* call the same 'emit' routine with NULL final argument (for some reason) */
+/* call the same 'emit' routine with nullptr final argument (for some reason) */
 
 #ifdef	COMMENT
 	if ((rs >= 0) && (retval >= 0))
-	    (void) (*emit)(pip,ngname,0,-1,NULL) ;
+	    (void) (*emit)(pip,ngname,0,-1,nullptr) ;
 #endif
 
 	if (rs >= 0) {
