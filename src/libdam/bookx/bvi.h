@@ -48,7 +48,7 @@ struct bvi_information {
 	time_t		ctime ;
 	time_t		mtime ;
 	uint		maxbook ;
-	uint		maxchapter ;
+	uint		maxchap ;
 	uint		count ;
 	uint		nzverses ;
 } ; /* end struct */
