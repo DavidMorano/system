@@ -75,26 +75,30 @@
 #include	<sys/stat.h>
 #include	<termios.h>
 #include	<unistd.h>
+#include	<fcntl.h>
 #include	<setjmp.h>
-#include	<csignal>
+#include	<pwd.h>
 #include	<ctime>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<strings.h>
-#include	<pwd.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getfiledirs.h>
 #include	<bfile.h>
 #include	<strx.h>
+#include	<mkdirlist.h>
+#include	<artlist.h>
+#include	<monthname.h>
+#include	<hmatch.h>		/* PCS */
 #include	<char.h>
 #include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
 #include	"headerkeys.h"
-#include	"mkdirlist.h"
-#include	"artlist.h"
 
 
 /* local defines */
@@ -111,40 +115,35 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-
+extern "C" {
 extern int	cmd_save() ;
 extern int	cmd_printout() ;
 extern int	cmd_follow() ;
 extern int	cmd_output() ;
+}
 
 #if	CF_REPLY
 extern int	cmd_reply() ;
 #endif
 
+extern "C" {
 extern int	bbcpy(char *,char *) ;
-extern int	hmatch() ;
 extern int	term_linecheck(struct proginfo *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
+}
 
 
 /* external variables */
 
-extern cchar	*monthname[] ;
-
 
 /* forward references */
 
-static int	deluser() ;
-static int	delremote() ;
-static int	isus() ;
-static int	hastabs(cchar *) ;
+local int	deluser() ;
+local int	delremote() ;
+local int	isus() ;
+local int	hastabs(cchar *) ;
 
-static void	rslowit() ;
-static void	onintr() ;
+local void	rslowit() ;
+local void	onintr() ;
 
 
 /* local variables */
@@ -1463,7 +1462,7 @@ bad:
 
 
 /* is the specified user allow to perform deletes ? */
-static int deluser(gp,deleteusers,username)
+local int deluser(gp,deleteusers,username)
 struct proginfo	*gp ;
 char		*deleteusers[] ;
 char		username[] ;
@@ -1493,7 +1492,7 @@ char		username[] ;
 
 
 /* delete an article which is on a remote machine */
-static int delremote(gp,afname)
+local int delremote(gp,afname)
 struct proginfo	*gp ;
 char		afname[] ;
 {
@@ -1613,7 +1612,7 @@ char		afname[] ;
 
 
 /* is this host us (lookup in "us" file) */
-static int isus(nfp,hostbuf)
+local int isus(nfp,hostbuf)
 bfile	*nfp ;
 char	hostbuf[] ;
 {
@@ -1652,15 +1651,12 @@ char	hostbuf[] ;
 }
 /* end subroutine (isus) */
 
-
-static void rslowit(hostname,cmd)
+local void rslowit(hostname,cmd)
 char	hostname[] ;
 char	cmd[] ;
 {
 	int	rs1 ;
-
 	char	buf[CMDBUFLEN + 1] ;
-
 
 	rs1 = bufprintf(buf,CMDBUFLEN,
 	    "rslow > /dev/null 2>&1 -Un %s!/usr/spool/uucppublic/rslow %s",
@@ -1672,7 +1668,7 @@ char	cmd[] ;
 }
 /* end subroutine (rslowit) */
 
-static int hastabs(* s) noex {
+local int hastabs(* s) noex {
 	while (*s && (*s != '\t')) {
 		s += 1 ;
 	}
@@ -1680,7 +1676,7 @@ static int hastabs(* s) noex {
 }
 /* end subroutine (hastabs) */
 
-static void onintr() noex {
+local void onintr() noex {
 	longjmp(jmpenv, 1) ;
 }
 
