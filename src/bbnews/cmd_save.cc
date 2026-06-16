@@ -1,4 +1,5 @@
 /* cmd_save SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* save a bulletin board article */
@@ -21,12 +22,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	cmd_save
+
+	Description:
 	Save a bulletin board article to either a mailbox or to standard
 	output depending on the mode we are called with.
 
 	mode=SMODE_MAILBOX	save article to mailbox
 	mode=SMODE_OUT		write article to standard output
-
 
 *******************************************************************************/
 
@@ -34,22 +38,25 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstring>
 #include	<pwd.h>
-#include	<usystem.h>
-#include	<getbufsize.h>
-#include	<ugetpw.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<bufsizeget.h>
+#include	<getpwx.h>
 #include	<getax.h>
 #include	<bfile.h>
 #include	<dater.h>
 #include	<mailmsgmatenv.h>
+#include	<artlist.h>		/* LIBPCS */
+#include	<headerkeys.h>		/* LIBPCS */
+#include	<timestr.h>
 #include	<char.h>
 #include	<localmisc.h>
 
-#include	"artlist.h"
-#include	"headerkeys.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -86,21 +93,7 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	mkmailname(char *,int,cchar *,int) ;
-
 extern int	bbcpy(char *,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	strbasename(char *) ;
-extern char	*timestr_edate(time_t,char *) ;
-extern char	*timestr_hdate(time_t,char *) ;
 
 
 /* external variables */
@@ -248,7 +241,7 @@ int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
 	{
 	    struct passwd	pw ;
 	    const uid_t		uid = stat_a.st_uid ;
-	    cint		pwlen = getbufsize(getbufsize_pw) ;
+	    cint		pwlen = bufsizeget(bufsize_pw) ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = GETPW_UID(&pw,pwbuf,pwlen,uid)) >= 0) {
