@@ -383,7 +383,7 @@ int bibleparas_curend(BIBLEPARAS *op,BIBLEPARAS_CUR *curp) {
 	return rs ;
 } /* end subroutine (bibleparas_curend) */
 
-int bibleparas_enum(BIBLEPARAS *op,BIBLEPARAS_CUR *curp,BIBLEPARAS_Q *qp) {
+int bibleparas_curenum(BIBLEPARAS *op,BIBLEPARAS_CUR *curp,BIBLEPARAS_Q *qp) {
 	time_t		dt = 0 ;
 	int		rs = SR_OK ;
 
@@ -402,13 +402,13 @@ int bibleparas_enum(BIBLEPARAS *op,BIBLEPARAS_CUR *curp,BIBLEPARAS_Q *qp) {
 
 	if (rs >= 0) {
 	    BPI_VERSE	viv ;
-	    if ((rs = bpi_enum(&op->vind,&curp->vicur,&viv)) >= 0) {
-	        if (qp != nullptr) {
+	    if ((rs = bpi_curenum(&op->vind,&curp->vicur,&viv)) >= 0) {
+	        if (qp) {
 		    qp->b = viv.b ;
 		    qp->c = viv.c ;
 		    qp->v = viv.v ;
 	        }
-	    } /* end if (bpi_enum) */
+	    } /* end if (bpi_curenum) */
 	} /* end if (ok) */
 
 #if	CF_DEBUG
@@ -416,7 +416,7 @@ int bibleparas_enum(BIBLEPARAS *op,BIBLEPARAS_CUR *curp,BIBLEPARAS_Q *qp) {
 #endif
 
 	return rs ;
-} /* end subroutine (bibleparas_enum) */
+} /* end subroutine (bibleparas_curenum) */
 
 int bibleparas_info(BIBLEPARAS *op,BIBLEPARAS_INFO *ip) {
 	BPI_INFO	bi ;
@@ -638,7 +638,7 @@ local int bibleparas_indopenseqer(BIBLEPARAS *op,SUBINFO *sip,DIRSEEN *dsp,
 	    DIRSEEN_CUR	cur ;
 	    if ((rs = dirseen_curbegin(dsp,&cur)) >= 0) {
 		int	el ;
-	        while ((el = dirseen_enum(dsp,&cur,ebuf,elen)) >= 0) {
+	        while ((el = dirseen_curenum(dsp,&cur,ebuf,elen)) >= 0) {
 		    if ((rs = mkpath2(pbuf,ebuf,op->dbname)) >= 0) {
 		        rs = vecstr_add(sdp,pbuf,rs) ;
 		    }
@@ -728,7 +728,7 @@ local int bibleparas_indopenalt(BIBLEPARAS *op,SUBINFO *sip,DIRSEEN *dsp) {
 	    char	ebuf[MAXPATHLEN + 1] ;
 	    char	indname[MAXPATHLEN + 1] ;
 
-	    while ((el = dirseen_enum(dsp,&cur,ebuf,elen)) >= 0) {
+	    while ((el = dirseen_curenum(dsp,&cur,ebuf,elen)) >= 0) {
 	        if (el > 0) {
 	            if ((rs = bibleparas_indmk(op,ebuf,sip->dt)) >= 0) {
 		        if ((rs = mkpath2(indname,ebuf,op->dbname)) >= 0) {
