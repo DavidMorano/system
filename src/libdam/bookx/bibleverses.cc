@@ -6,10 +6,9 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGTART	0		/* debug |sistart()| */
+#define	CF_DEBUGTART	0		/* debug |vercite()| */
 #define	CF_DEUGMKDATA	0		/* debug make-data */
 #define	CF_EMPTYTERM	1		/* terminate entry on empty line */
-#define	CF_SAFE		0		/* normal safety */
 
 /* revision history:
 
@@ -27,7 +26,7 @@
 
 	Description:
 	This module implements the (actual) interface to the
-	BIBLEVERSES datbase.
+	BIBLEVERSES database.
 
 *******************************************************************************/
 
@@ -42,13 +41,33 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<expcook.h>		/* LIBUC */
 #include	<dirseen.h>		/* LIBUC */
+#include	<mkdirs.h>		/* LIBUC */
+#include	<chownsame.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfcontent(3uc)| */
+#include	<snx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<path.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -57,8 +76,10 @@
 #include	"bibleverses.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |memclear(3u)| */
+import uconstants ;			/* |varname(3u)| + |sysword(3u)| */
 
 /* local defines */
 
@@ -72,22 +93,6 @@ import libutil ;			/* |memclear(3u)| */
 #define	BIBLEVERSES_IDXMODE	0664
 #define	BIBLEVERSES_NLINES	20
 
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME	"TMPDIR"
-#endif
-
-#ifndef	TMPDNAME
-#define	TMPDNAME	"/tmp"
-#endif
-
-#ifndef	VTMPDNAME
-#define	VTMPDNAME	"/var/tmp"
-#endif
-
-#ifndef	VCNAME
-#define	VCNAME		"var"
-#endif
-
 #define	INDDNAME	"bibleverses"
 #define	INDNAME		"bibleverses"
 #define	INDSUF		"vi"
@@ -96,10 +101,11 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	EC		expcook
 
-#define	BVS		bibleverses
+#define	BVSS		bibleverses
 #define	BVSS_ENT	bibleverses_entry
 #define	BVSS_EL		bibleverses_eline
 #define	BVSS_INFO	bibleverses_info
+#define	BVSS_CUR	bibleverses_cur
 #define	BVSS_Q		bibleverses_q
 
 #define	SI		subinfo
@@ -173,7 +179,7 @@ local inline int bibleverses_ctor(bibleverses *op,Args ... args) noex {
 	    rs = SR_NOMEM ;
 	    op->pr	= np ;
 	    op->dbname	= np ;
-	    op->fname	= np ;
+	    op->dbfname	= np ;
 	    op->mapdata	= np ;
 	    op->magval	= 0 ;
 	    if ((op->bvip = new(nt) bvi) != np) {
@@ -215,15 +221,11 @@ local int	bibleverses_indopen(BVSS *,SI *) noex ;
 local int	bibleverses_indclose(BVSS *) noex ;
 local int	bibleverses_indmk(BVSS *,cchar *,time_t) noex ;
 local int	bibleverses_indmkdata(BVSS *,cchar *,mode_t) noex ;
-local int	bibleverses_indopenseq(BVSS *,SI *) noex ;
-local int	bibleverses_indopenseqer(BVSS *,SI *,
-			DS *,EC *) noex ;
 local int	bibleverses_indopencheck(BVSS *,cchar *) noex ;
 local int	bibleverses_indopenmk(BVSS *,SI *,cchar *) noex ;
 
 local int	bibleverses_loadcooks(BVSS *,EC *) noex ;
-local int	bibleverses_dirok(BVSS *,DS *,ids *,
-			cchar *,int) noex ;
+local int	bibleverses_dirok(BVSS *,DS *,ids *,cchar *,int) noex ;
 local int	bibleverses_mkdir(BVSS *,cchar *) noex ;
 
 local int	subinfo_start(SI *) noex ;
@@ -238,7 +240,7 @@ local int	bvemk_finish	(bvimk_v *) noex ;
 
 local int	mkdname		(cchar *,mode_t) noex ;
 local int	checkdname	(cchar *) noex ;
-local int	sistart		(cchar *,int,BVSS_Q *,int *) noex ;
+local int	vercite		(BVSS_Q *,cchar *,int) noex ;
 
 local bool	isempty		(cchar *,int) noex ;
 local bool	isNeedIndex	(int) noex ;
@@ -263,6 +265,7 @@ constexpr int		rsneeds[] = {
 
 static vars		var ;
 cbool			f_debug		= CF_DEBUG ;
+cbool			f_emptyterm	= CF_EMPTYTERM ;
 
 
 /* exported variables */
@@ -279,7 +282,7 @@ extern const bibleverses_obj	bibleverses_modinfo = {
 
 /* exported subroutines */
 
-local bibleverses_opener(bibleverses *op) noex {
+local int bibleverses_opener(bibleverses *op) noex {
      	int		rs  ;
 	int		rs1 ;
 	int		nv = 0 ; /* return-value */
@@ -298,7 +301,7 @@ local int bibleverses_opens(BVSS *op,cc *pr,cc *dbn) noex {
     	int		rs ;
 	int		rs1 ;
 	int		nv = 0 ; /* return-value */
-	cchar	*suf = BIBLEVERSES_DBSUF ;
+	cchar		*suf = BIBLEVERSES_DBSUF ;
 	op->pr = pr ;
 	op->dbname = dbn ;
 	if (char *cbuf ; (rs = mem.mn(&cbuf)) >= 0) {
@@ -330,18 +333,19 @@ local int bibleverses_opens(BVSS *op,cc *pr,cc *dbn) noex {
 
 int bibleverses_open(BVSS *op,cchar *pr,cchar *dbn) noex {
 	int		rs ;
-	int		rs1 ;
 	int		nv = 0 ; /* return-value */
 	if ((dbn == nullptr) || (dbn[0] == '\0')) {
 	    dbn = BIBLEVERSES_DBNAME ;
 	} /* end if */
-	if ((rs = bibleverse_magic(op,pr)) >= 0) {
+	if ((rs = bibleverses_ctor(op,pr)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
-		rs = bibleverses_opens(op,pr,dbn) ;
-		nv = rs ;
+	        if (static cint rsv = var ; (rs = rsv) >= 0) {
+		    rs = bibleverses_opens(op,pr,dbn) ;
+		    nv = rs ;
+	        } /* end if (vars) */
 	    } /* end if (valid) */
-	} /* end if (bpi_magic) */
+	} /* end if (bpi_ctor) */
 	return (rs >= 0) ? nv : rs ;
 } /* end subroutine (bibleverses_open) */
 
@@ -427,15 +431,15 @@ int bibleverses_curbegin(BVSS *op,BVSS_CUR *curp) noex {
 	int		rs ;
 	if ((rs = bibleverses_magic(op,curp)) >= 0) {
 	    rs = SR_NOMEM ;
-	    if (bvi_cur *vicurp = new(nt) bvi_cur ; vucurp) {
+	    if (bvi_cur *vicurp = new(nt) bvi_cur ; vicurp) {
 		curp->vicurp = vicurp ;
 	        if ((rs = bvi_curbegin(op->bvip,vicurp)) >= 0) {
 	            op->ncursors += 1 ;
 	        }
 		if (rs < 0) {
 		    delete vicurp ;
-		    curp->vucurp = nullptr ;
-		} /* end if (new-bvi_cur) */
+		    curp->vicurp = nullptr ;
+		} /* end if (error) */
 	    } /* end if (new-bvi_cur) */
 	} /* end if (bibleverses_magic) */
 	return rs ;
@@ -454,11 +458,11 @@ int bibleverses_curend(BVSS *op,BVSS_CUR *curp) noex {
 	        }
 	        if (op->ncursors > 0) {
 	            op->ncursors -= 1 ;
-	        }
+	        } /* end if */
 		{
 		    delete vicurp ;
-		    curp->cicurp = nullptr ;
-		}
+		    curp->vicurp = nullptr ;
+		} /* end block (memory-release) */
 	    } /* end if (cursor non-null) */
 	} /* end if (bibleverses_magic) */
 	return rs ;
@@ -477,13 +481,12 @@ int bibleverses_curenum(BVSS *op,BVSS_CUR *curp,BVSS_Q *qp,
 		rs = SR_OK ;
 	        if (op->ncursors == 0) {
 	            rs = bibleverses_checkup(op,dt) ;
-	        }
+	        } /* end if (check-up) */
 	        if (rs >= 0) {
-	            bvi_cur	*bcurp = &curp->vicur ;
 	            bvi_v	viv{} ;
 	            cint	lsz = ((linen + 1) * szof(bvi_line)) ;
 	            char	*lb = charp(linea) ;
-	            if ((rs = bvi_curenum(op->bvip,bcurp,&viv,lb,lsz)) >= 0) {
+	            if ((rs = bvi_curenum(op->bvip,vicurp,&viv,lb,lsz)) >= 0) {
 	                if (vbuf) {
 	                    rs = bibleverses_loadbuf(op,&viv,vbuf,vlen) ;
 		            len = 0 ;
@@ -511,7 +514,7 @@ int bibleverses_getinfo(BVSS *op,BVSS_INFO *ip) noex {
 	            ip->dbtime		= op->ti_db ;
 	            ip->vitime		= op->ti_vind ;
 	            ip->maxbook		= bi.maxbook ;
-	            ip->maxchapter	= bi.maxchapter ;
+	            ip->maxchap		= bi.maxchap ;
 	            ip->nverses		= bi.count ;
 	            ip->nzverses	= bi.nzverses ;
 	        } /* end if (non-null) */
@@ -531,7 +534,7 @@ int bibleverses_chapters(BVSS *op,int book,uchar *ap,int al) noex {
 	        if (ap) {
 	            if (op->ncursors == 0) {
 	                rs = bibleverses_checkup(op,0L) ;
-	            }
+	            } /* end if (check-up) */
 	            if (rs >= 0) {
 	                rs = bvi_chapters(op->bvip,book,ap,al) ;
 	                n = rs ;
@@ -552,7 +555,7 @@ local int bibleverses_dbloadbegin(BVSS *op,SI *sip) noex {
 	    if (rs < 0) {
 	        bibleverses_dbmapdestroy(op) ;
 	    } /* end if (error) */
-	}
+	} /* end if (bibleverses_dbmapcreate) */
 	return rs ;
 } /* end subroutine (bibleverses_dbloadbegin) */
 
@@ -573,7 +576,7 @@ local int bibleverses_dbloadend(BVSS *op) noex {
 local int bibleverses_dbmapcreate(BVSS *op,time_t dt) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	inr		rs1 ;
+	int		rs1 ;
 	if ((rs = u_open(op->dbfname,O_RDONLY,0666)) >= 0) {
 	    cint	fd = rs ;
 	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
@@ -586,11 +589,11 @@ local int bibleverses_dbmapcreate(BVSS *op,time_t dt) noex {
 	                op->filesize = ms ;
 	                op->ti_db = sb.st_mtime ;
 	                debugprintf("bibleverses_dbmapcreate: ms=%ld\n",ms) ;
-	                if ((rs = u_mmapbegin(nl,ms,mp,mf,fd,0z,&md)) >= 0) {
-	                    const caddr_t	ma = md ;
+	                if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	                    const caddr_t	ma = caddr_t(md) ;
 	                    cint		madv = MADV_RANDOM ;
 	                    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
-	                        op->mapdata = md ;
+	                        op->mapdata = charp(md) ;
 	                        op->mapsize = ms ;
 	                        op->ti_map = dt ;
 	                        op->ti_lastcheck = dt ;
@@ -623,7 +626,7 @@ local int bibleverses_dbmapdestroy(BVSS *op) noex {
 	    rs1 = u_mmapend(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->mapdata = nullptr ;
-	    op->mapszie = 0 ;
+	    op->mapsize = 0 ;
 	} /* end if (un-map) */
 	return rs ;
 } /* end subroutine (bibleverses_dbmapdestroy) */
@@ -660,110 +663,117 @@ local int bibleverses_checkup(BVSS *op,time_t dt) noex {
 local int bibleverses_loadbuf(BVSS *op,bvi_v *vivp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
-	if (sbuf b ; (rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	    bvi_line	*lines = vivp->lines ;
-	    cint	nlines = vivp->nlines ;
+	if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	    bvi_line	*linea = vivp->lines ;
+	    cint	linen = vivp->nlines ;
 	    int		ll ;
 	    cchar	*lp ;
-	    for (int i = 0 ; i < nlines ; i += 1) {
+	    for (int i = 0 ; i < linen ; i += 1) {
 	        if (i > 0) {
-	            sbuf_chr(&b,' ') ;
+	            b.chr(' ') ;
 		}
-	        lp = (op->mapdata + lines[i].loff) ;
-	        ll = lines[i].llen ;
-	        rs = sbuf_strw(&b,lp,ll) ;
+	        lp = (op->mapdata + linea[i].loff) ;
+	        ll = linea[i].llen ;
+	        rs = b.strw(lp,ll) ;
 	        if (rs < 0) break ;
 	    } /* end for */
-	    len = sbuf_finish(&b) ;
+	    len = b.finish ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (bibleverses_loadbuf) */
 
+namespace {
+    struct indopener {
+	BVSS		*op ;
+	SI		*sip ;
+	indopener(BVSS *o,SI *s) noex : op(o), sip(s) { } ;
+	operator int () noex ;
+	int opens	(DS *,EC *) noex ;
+	int opener	(DS *,EC *,ids *) noex ;
+    } ; /* end struct (indopener) */
+} /* end namespace */
+
+indopener::operator int () noex {
+	int		rs ;
+	int		rs1 ;
+	int		nv = 0 ; /* return-value */
+	if (DS ds ; (rs = ds.start) >= 0) {
+	    if (EC ck ; (rs = ck.start) >= 0) {
+	        if ((rs = bibleverses_loadcooks(op,&ck)) >= 0) {
+	            rs = opens(&ds,&ck) ;
+		    nv = rs ;
+	        }
+	        rs1 = ck.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (expcook) */
+	    rs1 = ds.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (dirseen) */
+	return (rs >= 0) ? nv : rs ;
+} /* end method (incopener::operator) */
+
+int indopener::opens(DS *dsp,EC *ecp) noex {
+	int		rs ;
+	int		rs1 ;
+	int		nv = 0 ; /* return-value */
+	if (ids id ; (rs = id.load) >= 0) {
+	    {
+	        rs = opener(dsp,ecp,&id) ;
+	        nv = rs ;
+	    }
+	    rs1 = id.release ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (ids) */
+	return (rs >= 0) ? nv : rs ;
+} /* end subroutines (bibleverses_indopens) */
+
+int indopener::opener(DS *dsp,EC *ecp,ids *idp) noex {
+    	cint		maxpath = var.maxpathlen ;
+	cint		sz = (2 * (var.maxpathlen + 1)) ;
+    	int		rs ;
+	int		rs1 ;
+    	int		ai = 2 ; /* two path buffers */
+	int		nv = 0 ; /* return-value */
+	if (char *a ; (rs = mem.mall(sz,&a)) >= 0) {
+	    cint	elen = var.maxpathlen ;
+	    char	*ebuf = (a + (--ai & (maxpath + 1))) ;
+	    char	*pbuf = (a + (--ai & (maxpath + 1))) ;
+	    for (int i = 0 ; (rs >= 0) && idxdirs[i] ; i += 1) {
+	        cchar	*dir = idxdirs[i] ;
+	        if ((rs = ecp->exp('\0',ebuf,elen,dir,-1)) >= 0) {
+	            if ((rs = pathclean(pbuf,ebuf,rs)) > 0) {
+		        if ((rs = bibleverses_dirok(op,dsp,idp,pbuf,rs)) > 0) {
+	            	    rs = bibleverses_indopencheck(op,pbuf) ;
+			    nv = rs ;
+			    if ((rs < 0) && isNeedIndex(rs)) {
+			        rs = bibleverses_indopenmk(op,sip,pbuf) ;
+			        nv = rs ;
+			    } /* end if (new index needed) */
+		        } /* end if (bibleverses_dirok) */
+		    } /* end if (pathclean) */
+	        } /* end if (expcook_exp) */
+		if (nv > 0) break ;
+	        if (rs < 0) break ;
+	    } /* end for */
+	    rs1 = mem.free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? nv : rs ;
+} /* end method (indopener::opener) */
+
 local int bibleverses_indopen(BVSS *op,SI *sip) noex {
 	int		rs ;
-	if ((rs = bibleverses_indopenseq(op,sip)) >= 0) {
+	if (indopener io(op,sip) ; (rs = io) >= 0) {
 	    if (op->fl.vind) {
 	        rs = bvi_count(op->bvip) ;
 	        op->nverses = rs ;
 	    }
-	} /* end if (bibleverses_indopenseq) */
+	} /* end if (indopener) */
 	return rs ;
 } /* end subroutine (bibleverses_indopen) */
 
-local int bibleverses_indopenseq(BVSS *op,SI *sip) noex {
-	int		rs ;
-	int		rs1 ;
-	if (DS ds ; (rs = dirseen_start(&ds)) >= 0) {
-	    EC cooks, *ckp = &cooks ;
-	    if ((rs = expcook_start(ckp)) >= 0) {
-	        if ((rs = bibleverses_loadcooks(op,ckp)) >= 0) {
-	            rs = bibleverses_indopenseqer(op,sip,&ds,ckp) ;
-	        }
-	        rs1 = expcook_finish(ckp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (cooks) */
-	    rs1 = dirseen_finish(&ds) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (ds) */
-	return rs ;
-} /* end subroutines (bibleverses_indopenseq) */
-
-local int bibleverses_indopenseqer(BVSS *op,SI *sip,
-		DS *dsp,EC *ckp) noex {
-	ids		id ;
-	cint	elen = MAXPATHLEN ;
-	int		rs ;
-	int		rs1 ;
-	int		nverses = 0 ;
-
-#if	CF_DEBUG
-	debugprintf("bibleverses_indopenseqer: ent\n") ;
-#endif
-
-/* first phase: expand possible directory paths */
-
-	if ((rs = ids_load(&id)) >= 0) {
-	    int		i ;
-	    char	ebuf[MAXPATHLEN + 1] ;
-	    char	pbuf[MAXPATHLEN + 1] ;
-	    for (i = 0 ; (rs >= 0) && (idxdirs[i] != nullptr) ; i += 1) {
-	        cchar	*dir = idxdirs[i] ;
-#if	CF_DEBUG
-	debugprintf("bibleverses_indopenseqer: dir=%s\n",dir) ;
-#endif
-	        if ((rs = expcook_exp(ckp,'\0',ebuf,elen,dir,-1)) >= 0) {
-	            if ((rs = pathclean(pbuf,ebuf,rs)) > 0) {
-		        if ((rs = bibleverses_dirok(op,dsp,&id,pbuf,rs)) > 0) {
-	            	    rs = bibleverses_indopencheck(op,pbuf) ;
-			    nverses = rs ;
-			    if ((rs < 0) && isNeedIndex(rs)) {
-			        rs = bibleverses_indopenmk(op,sip,pbuf) ;
-			        nverses = rs ;
-			    }
-		        } /* end if (bibleverses_dirok) */
-		    } /* end if (pathclean) */
-	        } /* end if (expcook_exp) */
-#if	CF_DEBUG
-		debugprintf("bibleverses_indopenseqer: bot rs=%d nv=%u\n",
-		rs,nverses) ;
-#endif
-		if (nverses > 0) break ;
-	        if (rs < 0) break ;
-	    } /* end for */
-	    rs1 = ids_release(&id) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (ids) */
-
-#if	CF_DEBUG
-	debugprintf("bibleverses_indopenseqer: ret rs=%d nv=%u\n",rs,nverses) ;
-#endif
-
-	return (rs >= 0) ? nverses : rs ;
-} /* end subroutines (bibleverses_indopenseqer) */
-
-local int bibleverses_dirok(BVSS *op,DS *dsp,ids *idp,
-		cchar *dp,int dl) noex {
+local int bibleverses_dirok(BVSS *op,DS *dsp,ids *idp,cc *dp,int dl) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		f_ok = false ; /* return-value */
@@ -781,7 +791,7 @@ local int bibleverses_dirok(BVSS *op,DS *dsp,ids *idp,
 		if ((rs = bibleverses_mkdir(op,dp)) > 0) {
 		    f_ok = true ;
 		}
-	    }
+	    } /* end if */
 	} /* end if (dirseen_havename) */
 	return (rs >= 0) ? f_ok : rs ;
 } /* end subroutine (bibleverses_dirok) */
@@ -795,7 +805,7 @@ local int bibleverses_mkdir(BVSS *op,cchar *dp) noex {
 		if ((rs = chownsame(dp,op->pr)) >= 0) {
 	            f_ok = true ;
 	        }
-	    }
+	    } /* end if (uc_minmod) */
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	}
@@ -803,267 +813,228 @@ local int bibleverses_mkdir(BVSS *op,cchar *dp) noex {
 } /* end subroutine (bibleverses_mkdir) */
 
 local int bibleverses_loadcooks(BVSS *op,EC *ecp) noex {
+	static cchar	*tmpdname = getenver(varname.tmpdir) ;
 	int		rs = SR_OK ;
-	int		kch ;
-	int		vl ;
-	cchar		*tmpdname = getenv(VARTMPDNAME) ;
 	cchar		*ks = "RST" ;
-	cchar		*vp ;
-	char		kbuf[2] ;
-
-	if (tmpdname == nullptr) tmpdname = TMPDNAME ;
-
+	char		kbuf[2] = {} ;
+	if (tmpdname == nullptr) {
+	    tmpdname = sysword.w_tmpdir ;
+	}
 	kbuf[1] = '\0' ;
 	for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
-	    kch = MKCHAR(ks[i]) ;
-	    vp = nullptr ;
-	    vl = -1 ;
+	    int		kch = MKCHAR(ks[i]) ;
+	    cchar	*vap = nullptr ;
+	    int		val = -1 ;
 	    switch (kch) {
 	    case 'R':
-	        vp = op->pr ;
+	        vap = op->pr ;
 	        break ;
 	    case 'S':
-	        vp = INDDNAME ;
+	        vap = INDDNAME ;
 	        break ;
 	    case 'T':
-	        vp = tmpdname ;
+	        vap = tmpdname ;
 	        break ;
 	    } /* end switch */
-	    if ((rs >= 0) && vp) {
-	        kbuf[0] = kch ;
-	        rs = expcook_add(ecp,kbuf,vp,vl) ;
+	    if ((rs >= 0) && vap) {
+	        kbuf[0] = char(kch) ;
+	        rs = expcook_add(ecp,kbuf,vap,val) ;
 	    }
 	} /* end for */
 	if (rs >= 0) {
 	    if (cchar *prname ; (rs = sfbasename(op->pr,-1,&prname)) >= 0) {
 	        if (prname) {
-	            rs = expcook_add(ecp,"PRN",prname,rs) ;
+	            rs = ecp->add("PRN",prname,rs) ;
 	        } else {
 	            rs = SR_NOENT ;
 		}
-	    }
+	    } /* end if (sfbasename) */
 	} /* end if (ok) */
-
 	return rs ;
 } /* end subroutines (bibleverses_loadcooks) */
 
 local int bibleverses_indopencheck(BVSS *op,cchar *idir) noex {
 	int		rs ;
-	int		nverses = 0 ;
+	int		rs1 ;
+	int		nv = 0 ; /* return-value */
+	DEBUGPRINTF("ent idir=%s\n",idir) ;
 	cchar		*db = op->dbname ;
-	char		dbname[MAXPATHLEN+1] ;
-
-#if	CF_DEBUG
-	debugprintf("bibleverses_indopencheck: ent idir=%s\n",idir) ;
-#endif
-
-	if ((rs = mkpath2(dbname,idir,db)) >= 0) {
-	    if ((rs = bvi_open(op->bvip,dbname)) >= 0) {
-	        bvi_info	binfo ;
-	        nverses = rs ;
-
-#if	CF_DEBUG
-	    debugprintf("bibleverses_indopencheck: bvi_open() rs=%d\n",
-		rs) ;
-#endif
-
-	        if ((rs = bvi_getinfo(op->bvip,&binfo)) >= 0) {
-	            if (binfo.ctime < op->ti_db) {
-	                rs = SR_STALE ;
-	            } else {
-	                op->fl.vind = true ;
-	            }
-	            if (rs < 0) {
-	                bvi_close(op->bvip) ;
-		    }
-	        } /* end if (bvi_getinfo) */
-	    } /* end if (bvi_open) */
-	} /* end if (mkpath) */
-
-#if	CF_DEBUG
-	debugprintf("bibleverses_indopencheck: ret rs=%d nv=%u\n",
-	    rs,nverses) ;
-#endif
-
-	return (rs >= 0) ? nverses : rs ;
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	    if ((rs = mkpath2(tbuf,idir,db)) >= 0) {
+	        if ((rs = bvi_open(op->bvip,tbuf)) >= 0) {
+	            nv = rs ;
+	            bvi_info binfo ;
+		    if ((rs = bvi_getinfo(op->bvip,&binfo)) >= 0) {
+	                if (binfo.ctime < op->ti_db) {
+	                    rs = SR_STALE ;
+	                } else {
+	                    op->fl.vind = true ;
+	                } /* end if */
+	                if (rs < 0) {
+	                    bvi_close(op->bvip) ;
+		        } /* end if (error) */
+	            } /* end if (bvi_getinfo) */
+	        } /* end if (bvi_open) */
+	    } /* end if (mkpath) */
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	DEBUGPRINTF("ret rs=%d nv=%u\n",rs,nv) ;
+	return (rs >= 0) ? nv : rs ;
 } /* end subroutine (bibleverses_indopencheck) */
 
 local int bibleverses_indopenmk(BVSS *op,SI *sip,cchar *idir) noex {
 	int		rs ;
-	int		nverses = 0 ;
-
+	int		rs1 ;
+	int		nv = 0 ; /* return-value */
 	if ((rs = bibleverses_indmk(op,idir,sip->dt)) >= 0) {
-	    char	tbuf[MAXPATHLEN+1] ;
-	    if ((rs = mkpath2(tbuf,idir,op->dbname)) >= 0) {
-		if ((rs = bvi_open(op->bvip,tbuf)) >= 0) {
-	            nverses = rs ;
-		    op->fl.vind = true ;
-		}
-	    }
-	}
-
-	return (rs >= 0) ? nverses : rs ;
+	    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	        if ((rs = mkpath2(tbuf,idir,op->dbname)) >= 0) {
+		    if ((rs = bvi_open(op->bvip,tbuf)) >= 0) {
+	                nv = rs ;
+		        op->fl.vind = true ;
+		    } /* end if (bvi_open) */
+	        } /* end if (mkpath) */
+	        rs1 = mem.free(tbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (bibleverses_indmk) */
+	return (rs >= 0) ? nv : rs ;
 } /* end subroutines (bibleverses_indopenmk) */
 
 local int bibleverses_indmk(BVSS *op,cchar *dname,time_t dt) noex {
 	int		rs ;
-	int		c = 0 ;
-	cmode	dm = BIBLEVERSES_DIRMODE ;
-
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	cmode		dm = BIBLEVERSES_DIRMODE ;
 	if ((rs = mkdname(dname,dm)) >= 0) {
-	    char	indname[MAXPATHLEN + 1] ;
-	    if ((rs = mkpath2(indname,dname,op->dbname)) >= 0) {
-	        cmode	om = BIBLEVERSES_IDXMODE ;
-	        if ((rs = bibleverses_indmkdata(op,indname,om)) >= 0) {
-	            c += rs ;
-	            op->ti_vind = dt ;
-	        }
-	    } /* end if (mkpath) */
+	    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	        if ((rs = mkpath2(tbuf,dname,op->dbname)) >= 0) {
+	            cmode	om = BIBLEVERSES_IDXMODE ;
+	            if ((rs = bibleverses_indmkdata(op,tbuf,om)) >= 0) {
+	                c += rs ;
+	                op->ti_vind = dt ;
+	            }
+	        } /* end if (mkpath) */
+	        rs1 = mem.free(tbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (mkdname) */
-
-#if	CF_DEBUG
-	debugprintf("bibleverses_indmk: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleverses_indmk) */
 
 local int bibleverses_indmkdata(BVSS *op,cchar *indname,mode_t om) noex {
-	BVIMK		bvind ;
-	bvimk_v	bve ;
+    	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		of = 0 ;
-	int		c = 0 ;
-
-#if	CF_DEBUG
-	debugprintf("bibleverses_indmkdata: ent indname=%s\n",indname) ;
-#endif
-
-	if ((rs = bvimk_open(&bvind,indname,of,om)) >= 0) {
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent indname=%s\n",indname) ;
+	if (bvimk bvind ; (rs = bvimk_open(&bvind,indname,of,om)) >= 0) {
 	    c = rs ;
 	    if (rs == 0) {
 	        BVSS_ENT	e ;
-	        BVSS_Q	q ;
+	        BVSS_Q		q ;
+	        bvimk_v		bve ;
 	        int		foff = 0 ;
-	        int		len ;
-	        int		ml = (op->filesize & INT_MAX) ;
+	        int		ml = intconv(op->filesize & INT_MAX) ;
 	        int		ll ;
 	        int		si ;
-	        int		f_ent = false ;
+	        bool		f_ent = false ;
 	        cchar		*mp = op->mapdata ;
-	        cchar		*tp, *lp ;
-
-	        while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
-
-	            len = ((tp + 1) - mp) ;
+	        cchar		*lp ;
+	        for (cc *tp ; (tp = strnchr(mp,ml,'\n')) != np ; ) {
+	            cint len = intconv((tp + 1) - mp) ;
 	            lp = mp ;
 	            ll = (len - 1) ;
-
 	            if ((ll > 0) && (! isempty(lp,ll))) {
-
 #if	CF_DEBUG && CF_DEBUGMKDATA
-	                debugprintf("bibleverses_indmkdata: line>%r<\n",
-	                    lp,strnlen(lp,MIN(ll,40))) ;
+	                DEBUGPRINTF("line>%r<\n",lp,strlinelen(lp,ll,40)) ;
 #endif
-
-	                if ((tp = strnchr(lp,ll,'#')) != nullptr) {
-	                    ll = (tp - lp) ;
+	                if ((tp = strnchr(lp,ll,'#')) != np) {
+	                    ll = intconv(tp - lp) ;
 	                }
-
-	                if ((rs = sistart(lp,ll,&q,&si)) > 0) {
-
+	                if ((rs = vercite(&q,lp,ll)) > 0) {
+			    si = rs ;
 	                    if (f_ent) {
 	                        c += 1 ;
 	                        if ((rs = bvemk_start(&bve,&e)) >= 0) {
-	                            rs = bvimk_add(&bvind,&bve) ;
-	                            bvemk_finish(&bve) ;
-	                        }
+				    {
+	                                rs = bvimk_add(&bvind,&bve) ;
+				    }
+	                            rs1 = bvemk_finish(&bve) ;
+				    if (rs >= 0) rs = rs1 ;
+	                        } /* end if (bvemk) */
 	                        f_ent = false ;
 	                        entry_finish(&e) ;
-	                    }
-
+	                    } /* end if (existing entry) */
 	                    if (rs >= 0) {
-	                        rs = entry_start(&e,&q,(foff + si),(ll - si)) ;
+				cint eo = foff + si ;
+				cint el = ll - si ;
+	                        rs = entry_start(&e,&q,eo,el) ;
 	                        if (rs >= 0) {
 	                            f_ent = true ;
 	                        }
-	                    }
-
+	                    } /* end if (start new entry) */
 	                } else if (rs >= 0) {
-
 	                    if (f_ent) {
 	                        rs = entry_add(&e,foff,ll) ;
-	                    }
-
+	                    } /* end if (entry) */
 	                } /* end if (entry start of add) */
-
 	            } else {
-
-#if	CF_EMPTYTERM
-	                if (f_ent) {
-	                    c += 1 ;
-	                    if ((rs = bvemk_start(&bve,&e)) >= 0) {
-	                        rs = bvimk_add(&bvind,&bve) ;
-	                        bvemk_finish(&bve) ;
-	                    }
-	                    f_ent = false ;
-	                    entry_finish(&e) ;
-	                }
-#else
-	                rs = SR_OK ;
-#endif /* CF_EMPTYTERM */
-
+			if_constexpr (f_emptyterm) {
+	                    if (f_ent) {
+	                        c += 1 ;
+	                        if ((rs = bvemk_start(&bve,&e)) >= 0) {
+				    {
+	                                rs = bvimk_add(&bvind,&bve) ;
+				    }
+	                            rs1 = bvemk_finish(&bve) ;
+				    if (rs >= 0) rs = rs1 ;
+	                        } /* end if (bvemk) */
+	                        f_ent = false ;
+	                        entry_finish(&e) ;
+	                    } /* end if (entry) */
+			} /* end if_constexpr (f_emptyterm) */
 	            } /* end if (not empty) */
-
 	            foff += len ;
 	            ml -= len ;
 	            mp += len ;
-
 	            if (rs < 0) break ;
 	        } /* end while (readling lines) */
-
 	        if ((rs >= 0) && f_ent) {
 	            c += 1 ;
 	            if ((rs = bvemk_start(&bve,&e)) >= 0) {
-	                rs = bvimk_add(&bvind,&bve) ;
-	                bvemk_finish(&bve) ;
-	            }
+			{
+	                    rs = bvimk_add(&bvind,&bve) ;
+			}
+	                rs1 = bvemk_finish(&bve) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (bvemk) */
 	            f_ent = false ;
 	            entry_finish(&e) ;
-	        }
-
+	        } /* end if */
 	        if (f_ent) {
 	            f_ent = false ;
 	            entry_finish(&e) ;
-	        }
-
+	        } /* end if */
 #if	CF_DEBUG && CF_DEBUGMKDATA
 	        {
-	            BVIMK_INFO	bi ;
-	            rs1 = bvimk_info(&bvind,&bi) ;
-	            debugprintf("bibleverses_indmkdata: maxbook=%u\n",
-	                bi.maxbook) ;
-	            debugprintf("bibleverses_indmkdata: maxchapter=%u\n",
-	                bi.maxchapter) ;
-	            debugprintf("bibleverses_indmkdata: maxverse=%u\n",
-	                bi.maxverse) ;
-	            debugprintf("bibleverses_indmkdata: nverses=%u\n",
-	                bi.nverses) ;
-	            debugprintf("bibleverses_indmkdata: nzverses=%u\n",
-	                bi.nzverses) ;
+	            bvimk_info	bi ;
+	            bvimk_getinfo(&bvind,&bi) ;
+	            DEBUGPRINTF("maxbook=%u\n", bi.maxbook) ;
+	            DEBUGPRINTF("maxchapter=%u\n", bi.maxchapter) ;
+	            DEBUGPRINTF("maxverse=%u\n", bi.maxverse) ;
+	            DEBUGPRINTF("nverses=%u\n", bi.nverses) ;
+	            DEBUGPRINTF("nzverses=%u\n", bi.nzverses) ;
 	        }
 #endif /* CF_DEBUG */
-
 	    } /* end if (creation needed) */
 	    rs1 = bvimk_close(&bvind) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bvimk) */
-
-#if	CF_DEBUG
-	debugprintf("bibleverses_indmkdata: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleverses_indmkdata) */
 
@@ -1080,7 +1051,6 @@ local int bibleverses_indclose(BVSS *op) noex {
 
 local int subinfo_start(SI *sip) noex {
 	int		rs = SR_BUGCHECK ;
-	int		rs1 ;
 	if (sip) {
 	    rs = memclear(sip) ;
 	    sip->dt = time(nullptr) ;
@@ -1111,7 +1081,7 @@ local int entry_start(BVSS_ENT *ep,BVSS_Q *qp,uint loff,uint llen) noex {
 	        ep->lines = resumelife<BVSS_EL>(p) ;
 	        ep->e = ne ;
 	        {
-	            BVSS_EL *elp = p ;
+	            BVSS_EL *elp = ep->lines ;
 	            ep->i += 1 ;
 	            elp->loff = loff ;
 	            elp->llen = llen ;
@@ -1121,38 +1091,39 @@ local int entry_start(BVSS_ENT *ep,BVSS_Q *qp,uint loff,uint llen) noex {
 	return rs ;
 } /* end subroutine (entry_start) */
 
-local int entry_add(BVSS_ENT *ep,uint loff,uint llen) {
-	int		rs = SR_OK ;
-	int		ne ;
-	int		sz ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (ep->e <= 0) return SR_NOTOPEN ;
-
-	if ((ep->i < 0) || (ep->i > ep->e)) return SR_BADFMT ;
-	BVSS_EL	*elp ;
-
-	if (ep->i == ep->e) {
-	    ne = ep->e + BIBLEVERSES_NLE ;
-	    sz = (ne * szof(BVSS_EL)) ;
-	    if ((rs = uc_realloc(ep->lines,sz,&elp)) >= 0) {
-	        ep->lines = elp ;
-	        ep->e = ne ;
-	    }
-	} /* end if */
-	if (rs >= 0) {
-	    ep->vlen = ((loff + llen) - ep->voff) ;
-	    elp = (ep->lines + ep->i) ;
-	    elp->loff = loff ;
-	    elp->llen = llen ;
-	    ep->i += 1 ;
-	} /* end if (ok) */
-
+local int entry_add(BVSS_ENT *ep,uint loff,uint llen) noex {
+	int		rs = SR_BUGCHECK ;
+	if (ep) {
+	    rs = SR_NOTOPEN ;
+	    if (ep->e > 0) {
+	        rs = SR_BADFMT ;
+	        if ((ep->i >= 0) && (ep->i <= ep->e)) {
+	            BVSS_EL	*elp ;
+	            int		ne ;
+	            int		sz ;
+		    rs = SR_OK ;
+	            if (ep->i == ep->e) {
+	                ne = ep->e + BIBLEVERSES_NLE ;
+	                sz = (ne * szof(BVSS_EL)) ;
+	                if ((rs = mem.rall(ep->lines,sz,&elp)) >= 0) {
+	                    ep->lines = elp ;
+	                    ep->e = ne ;
+	                } /* end if (memory-realloc) */
+	            } /* end if */
+	            if (rs >= 0) {
+	                ep->vlen = ((loff + llen) - ep->voff) ;
+	                elp = (ep->lines + ep->i) ;
+	                elp->loff = loff ;
+	                elp->llen = llen ;
+	                ep->i += 1 ;
+	            } /* end if (ok) */
+	        } /* end if (good-format) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (entry_add) */
 
-local int entry_finish(BVSS_ENT *ep) {
+local int entry_finish(BVSS_ENT *ep) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	if (ep) {
@@ -1174,7 +1145,7 @@ local int entry_finish(BVSS_ENT *ep) {
 	return rs ;
 } /* end subroutine (entry_finish) */
 
-local int bvemk_start(bvimk_v *bvep,BVSS_ENT *ep) {
+local int bvemk_start(bvimk_v *bvep,BVSS_ENT *ep) noex {
 	int		rs = SR_BUGCHECK ;
 	int		nlines = 0 ; /* return-value */
 	if (bvep && ep) {
@@ -1188,9 +1159,9 @@ local int bvemk_start(bvimk_v *bvep,BVSS_ENT *ep) {
 	    nlines = ep->i ;
 	    if (nlines <= UCHAR_MAX) {
 	        cint	sz = (nlines + 1) * szof(bvimk_line) ;
-	        bvep->nlines = nlines ;
+	        bvep->nlines = uchar(nlines) ;
 	        if (void *vp ; (rs = mem.mall(sz,&vp)) >= 0) {
-	            bvimk_line *lines = resumelife<vbimk_line>(vp) ;
+	            bvimk_line *lines = resumelife<bvimk_line>(vp) ;
 	            int	i ; /* used-afterwards */
 	            bvep->lines = lines ;
 	            for (i = 0 ; i < nlines ; i += 1) {
@@ -1221,7 +1192,7 @@ local int bvemk_finish(bvimk_v *bvep) noex {
 	return rs ;
 } /* end subroutine (bvemk_finish) */
 
-local int mkdname(cchar *dname,mode_t dm) {
+local int mkdname(cchar *dname,mode_t dm) noex {
 	cint		nrs = SR_NOENT ;
 	int		rs ;
 	if ((rs = checkdname(dname)) == nrs) {
@@ -1230,7 +1201,7 @@ local int mkdname(cchar *dname,mode_t dm) {
 	return rs ;
 } /* end subroutine (mkdname) */
 
-local int checkdname(cchar *dname) {
+local int checkdname(cchar *dname) noex {
 	int		rs = SR_INVALID ;
 	if (dname[0] == '/') {
 	    if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
@@ -1254,89 +1225,66 @@ vars::operator int () noex {
     	return rs ;
 } /* end if (vars::operator) */
 
-local int sistart(cchar *lp,int ll,BVSS_Q *qp,int sip) noex {
-	int		rs1 ;
-	int		sl = ll ;
-	int		ch ;
-	int		si = 0 ;
-	bool		f = false ;
-	cchar	*sp = lp ;
-
-#if	CF_DEBUG && CF_DEBUGTART
-	debugprintf("bibleqs/isstart: ent l=>%r<\n",lp,
-	    strlinelen(lp,ll,40)) ;
-#endif
-
-	if (CHAR_ISWHITE(sp[0]) && ((si = siskipwhite(lp,ll)) > 0)) {
-	    sp += si ;
-	    sl -= si ;
-	}
-
-	ch = MKCHAR(sp[0]) ;
-	if ((sl >= 5) && isdigitlatin(ch)) {
-	    int		i ;
-	    int		cl ;
-	    int		v ;
-	    cchar	*tp, *cp ;
-
-	    for (i = 0 ; i < 3 ; i += 1) {
-
-	        cp = sp ;
-	        cl = sl ;
-	        if ((tp = strnbrk(sp,sl,": \t\n")) != nullptr) {
-	            cl = (tp - sp) ;
-	            sl -= ((tp + 1) - sp) ;
-	            sp = (tp + 1) ;
-	        } else {
-	            cl = sl ;
-	            sp += sl ;
-	            sl = 0 ;
+/****
+  0	=start-no
+  >0	=start-yes	- and this is the beginning of the remaining text
+  <0	=error
+****/
+local int vercite(BVSS_Q *qp,cchar *lp,int ll) noex {
+    	int		rs = SR_FAULT ;
+	int		si = 0 ; /* return-value */
+	if (lp && qp) {
+	    int		sl = ll ;
+	    cchar	*sp = lp ;
+	    DEBUGPRINTF("ent l=>%r<\n",lp,strlinelen(lp,ll,40)) ;
+	    if (CHAR_ISWHITE(sp[0]) && ((si = siskipwhite(lp,ll)) > 0)) {
+	        sp += si ;
+	        sl -= si ;
+	    } /* end if */
+	    if (int ch = MKCHAR(sp[0]) ; (sl >= 5) && isdigitlatin(ch)) {
+	        bool	f = false ;
+	        for (int i = 0 ; i < 3 ; i += 1) {
+	            cchar	*cp = sp ;
+	            int		cl = sl ;
+	            if (cchar *tp = strnbrk(sp,sl,": \t\n") ; tp) {
+	                cl = intconv(tp - sp) ;
+	                sl -= intconv((tp + 1) - sp) ;
+	                sp = (tp + 1) ;
+	            } else {
+	                cl = sl ;
+	                sp += sl ;
+	                sl = 0 ;
+	            } /* end if */
+	            if (cl == 0) break ;
+	            si = intconv((cp + cl) - lp) ;
+	            if (int v ; (rs = cfdeci(cp,cl,&v)) >= 0) {
+	                switch (i) {
+	                case 0:
+	                    qp->b = uchar(v) ;
+	                    break ;
+	                case 1:
+	                    qp->c = uchar(v) ;
+	                    break ;
+	                case 2:
+	                    qp->v = uchar(v) ;
+	                    break ;
+	                } /* end switch */
+		    } else {
+	                DEBUGPRINTF("cfdeci() rs=%d\n",rs) ;
+		    } /* end if (cfdec) */
+		    f = (i == 3) ;
+		    if (rs < 0) break ;
+	        } /* end for */
+	        if (f) {
+	            si += siskipwhite(sp,sl) ;
+		} else {
+		    si = 0 ;
 	        }
-
-	        if (cl == 0)
-	            break ;
-
-	        si = ((cp + cl) - lp) ;
-	        rs1 = cfdeci(cp,cl,&v) ;
-
-#if	CF_DEBUG && CF_DEBUGTART
-	        debugprintf("bibleqs/isstart: cfdeci() rs=%d\n",rs1) ;
-#endif
-
-	        if (rs1 < 0)
-	            break ;
-
-	        switch (i) {
-	        case 0:
-	            qp->b = (uchar) v ;
-	            break ;
-	        case 1:
-	            qp->c = (uchar) v ;
-	            break ;
-	        case 2:
-	            qp->v = (uchar) v ;
-	            break ;
-	        } /* end switch */
-
-	    } /* end for */
-
-	    f = (i == 3) ;
-	    if (f) {
-	        si += siskipwhite(sp,sl) ;
-	    }
-
-	} /* end if (have a start) */
-
-	if (sip != nullptr) {
-	    *sip = (f) ? si : 0 ;
-	}
-
-#if	CF_DEBUG && CF_DEBUGTART
-	debugprintf("bibleqs/isstart: f=%u si=%u\n",f,si) ;
-#endif
-
-	return (f) ? si : 0  ;
-} /* end subroutine (sistart) */
+	    } /* end if (have a start) */
+	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d si=%u\n",rs,si) ;
+	return (rs >= 0) ? si : rs ;
+} /* end subroutine (vercite) */
 
 local bool isempty(cchar *lp,int ll) noex {
 	bool		f = false ;
