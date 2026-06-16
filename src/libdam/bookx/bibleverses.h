@@ -43,7 +43,7 @@ struct bibleverses_information {
 	time_t		dbtime ;		/* db-time */
 	time_t		vitime ;		/* vi-time */
 	uint		maxbook ;
-	uint		maxchapter ;
+	uint		maxchap ;
 	uint		nverses ;
 	uint		nzverses ;
 } ; /* end struct */
@@ -53,7 +53,7 @@ struct bibleverses_query {
 } ; /* end struct */
 
 struct bibleverses_cursor {
-	BVI_CUR		*vicurp ;
+	bvi_cur		*vicurp ;
 } ; /* end struct */
 
 struct bibleverses_flags {
