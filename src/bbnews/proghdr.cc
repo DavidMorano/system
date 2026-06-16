@@ -1,11 +1,12 @@
-/* proghdr */
+/* proghdr SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* translate a header string into Latin-1 character set */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
@@ -18,22 +19,21 @@
 
 /*******************************************************************************
 
-        These subroutine facilitate translating header strings into the Latin-1
-        character set.
-
+  	Description:
+	These subroutine facilitate translating header strings into
+	the Latin-1 character set.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<estrings.h>
 #include	<hdrdecode.h>
 #include	<localmisc.h>
@@ -47,19 +47,10 @@
 
 /* external subroutines */
 
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkaddrdisp(char *,int,cchar *,int) ;
-extern int	isNotPresent(int) ;
-
-
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
