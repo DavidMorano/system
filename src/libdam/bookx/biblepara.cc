@@ -89,7 +89,7 @@ enum subs {
 	sub_count,
 	sub_ispara,
 	sub_curbegin,
-	sub_enum,
+	sub_curenum,
 	sub_curend,
 	sub_audit,
 	sub_info,
@@ -102,7 +102,7 @@ constexpr cpcchar	subnames[] = {
 	"count",
 	"ispara",
 	"curbegin",
-	"enum",
+	"curenum",
 	"curend",
 	"audit",
 	"info",
@@ -273,7 +273,7 @@ int biblepara_curend(BIBLEPARA *op,BIBLEPARA_CUR *curp) {
 } /* end subroutine (biblepara_curend) */
 
 /* enumerate entries */
-int biblepara_enum(BIBLEPARA *op,BIBLEPARA_CUR *curp,BIBLEPARA_CITE *qp) {
+int biblepara_curenum(BIBLEPARA *op,BIBLEPARA_CUR *curp,BIBLEPARA_CITE *qp) {
 	BIBLEPARAS_CITE	sq ;
 	int		rs = SR_NOSYS ;
 
@@ -296,7 +296,7 @@ int biblepara_enum(BIBLEPARA *op,BIBLEPARA_CUR *curp,BIBLEPARA_CITE *qp) {
 #endif
 
 	return rs ;
-} /* end subroutine (biblepara_enum) */
+} /* end subroutine (biblepara_curenum) */
 
 int biblepara_info(BIBLEPARA *op,BIBLEPARA_INFO *ip) {
 	BIBLEPARAS_INFO	bi ;
@@ -467,7 +467,7 @@ local int biblepara_loadcalls(BIBLEPARA *op,cchar *objname) {
 			(int (*)(void *,BVS_C *)) snp ;
 		    break ;
 
-		case sub_enum:
+		case sub_curenum:
 		    op->call.enumerate = 
 			(int (*)(void *,BVS_C *,BVS_Q *)) snp ;
 		    break ;
