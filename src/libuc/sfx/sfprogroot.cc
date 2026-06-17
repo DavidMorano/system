@@ -110,7 +110,6 @@ int sfprogroot(cchar *pp,int pl,cchar **rpp) noex {
 	    *rpp = (sl >= 0) ? sp : nullptr ;
 	}
 	return sl ;
-}
-/* end subroutine (sfprogroot) */
+} /* end subroutine (sfprogroot) */
 
 
