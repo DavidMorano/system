@@ -81,7 +81,6 @@ int sfrootname(cchar *sp,int sl,cchar **rpp) noex {
 	    rl = sfbasename(sp,sl,rpp) ;
 	}
 	return rl ;
-}
-/* end subroutine (sfrootname) */
+} /* end subroutine (sfrootname) */
 
 
