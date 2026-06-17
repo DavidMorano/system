@@ -105,7 +105,6 @@ int sfsign(cchar *sp,int sl,cchar **rpp,bool *bp) noex {
 	if (rpp) *rpp = sp ;
 	if (bp) *bp = fneg ;
 	return sl ;
-}
-/* end subroutine (sfsign) */
+} /* end subroutine (sfsign) */
 
 
