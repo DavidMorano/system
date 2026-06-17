@@ -84,7 +84,6 @@ int silbrace(cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return si ;
-}
-/* end subroutine (silbrace) */
+} /* end subroutine (silbrace) */
 
 
