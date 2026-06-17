@@ -86,8 +86,7 @@ local int sinon(isnon_f isx,cchar *sp,int sl) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (sinon) */
+} /* end subroutine (sinon) */
 
 
 /* local variables */
