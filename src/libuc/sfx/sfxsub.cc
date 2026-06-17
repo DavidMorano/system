@@ -109,8 +109,7 @@ int sfosub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (f) ? sslen : -1 ;
-}
-/* end subroutine (sfosub) */
+} /* end subroutine (sfosub) */
 
 int sfrsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		sslen = 0 ; /* return-value */
@@ -135,7 +134,6 @@ int sfrsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (f) ? sslen : -1 ;
-}
-/* end subroutine (sfrsub) */
+} /* end subroutine (sfrsub) */
 
 
