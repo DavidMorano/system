@@ -42,7 +42,7 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getportnum.h>
 #include	<bfile.h>
 #include	<vecobj.h>
@@ -285,7 +285,7 @@ static int prognotifyrecipnode(proginfo *pip,vecobj *mip,REPORTINFO *rip,
 	HOSTENT		he, *hep = &he ;
 	MSGINFO		mi, *iep = &mi ;
 	int		moff ;
-	cint		helen = getbufsize(bufsize_ho) ;
+	cint		helen = bufsizeget(bufsize_ho) ;
 	cint		af = AF_INET4 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
