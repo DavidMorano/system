@@ -20,7 +20,7 @@
 	sileadzero
 
 	Description:
-	Find a string-index that skips over leading zero character
+	Find a string-index that skips over leading zero characters
 	('0') or leading whitespace (until one reaches a non-zero
 	character and a non-whitespace character).  A trailing zero
 	character or a trailing whitespace character is left alone.
@@ -31,8 +31,8 @@
 	int sileadzero(cchar *sp,int sl) noex
 
 	Arguments:
-	sp		c-string buffer
-	sl		c-string length
+	sp		c-string buffer pointer
+	sl		c-string buffer length
 
 	Returns:
 	-		length of remaining c-string after skipping leads
@@ -40,14 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"six.h"
 
@@ -78,14 +79,12 @@
 int sileadzero(cchar *sp,int sl) noex {
 	int		i = -1 ; /* return-value */
 	if (sp) ylikely {
-	    cauto isx = [] (int ch) -> bool {
-	        ch &= UCHAR_MAX ;
-		return iszero(ch) || iswhitelatin(ch) ;
-	    } ; /* end lambda (isx) */
-	    for (i = 0 ; (i < (sl - 1)) && isx(sp[0]) ; i += 1) ;
+	    for (i = 0 ; (i < (sl - 1)) ; i += 1) {
+		cint ch = mkchar(sp[i]) ;
+		if (iszero(ch) || iswhitelatin(ch)) break ;
+	    } /* end for */
 	} /* end if (non-null) */
 	return i ;
-}
-/* end subroutine (sileadzero) */
+} /* end subroutine (sileadzero) */
 
 
