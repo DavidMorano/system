@@ -36,15 +36,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ischarx.h>		/* |iszero(3uc)| + |iswht(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ischarx.h>		/* LIBUC |iszero(3uc)| + |iswht(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"rmleadzero.h"
 
@@ -89,7 +89,6 @@ int rmleadzero(cchar *sp,int µsl) noex {
 	    } /* end for */
 	} /* end if (getlenstr) */
 	return nsl ;
-}
-/* end subroutine (rmleadzero) */
+} /* end subroutine (rmleadzero) */
 
 
