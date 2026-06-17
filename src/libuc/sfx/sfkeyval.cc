@@ -28,8 +28,8 @@
 	specified in the call.
 
 	Synopsis:
-	int sfcontent(cchar *sp,int sl,cchar **rpp) noex
-	int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex
+	int sfcontent	(cchar *sp,int sl,cchar **rpp) noex
+	int sfkeyval	(cchar *sp,int sl,cchar *key,cchar **rpp) noex
 
 	Arguments:
 	sp		base string pointer
@@ -44,7 +44,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -83,14 +83,13 @@ import libutil ;			/* lenstr(3u) */
 
 /* exported subroutines */
 
-int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
+int sfcontent(cchar *sp,int µsl,cchar **rpp) noex {
 	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (sp) ylikely {
+	if (int sl = getlenstr(sp,µsl) ; sl >= 0) ylikely {
 	    rl = 0 ;
-	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl > 0) ylikely {
-	        if (int si ; (si = sichr(sp,sl,'#')) >= 0) {
+	        if (int si = sichr(sp,sl,'#') ; si >= 0) {
 		    sl = si ;
 	        } else {
 		    while (sl && iseol(sp[sl - 1])) {
@@ -103,20 +102,19 @@ int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 		    rp = sp ;
 		}
 	    } /* end if (non-zero positive) */
-	} /* end if (non-null) */
+	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
 	return rl ;
-}
-/* end subroutine (sfcontent) */
+} /* end subroutine (sfcontent) */
 
 int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex {
 	int		vl = -1 ; /* return-value */
 	cchar		*vp = nullptr ;
 	if (sp) ylikely {
-	    cchar	*cp{} ;
-	    if (int cl ; (cl = sfcontent(sp,sl,&cp)) > 0) {
-		cchar	*kp{} ;
-		if (int kl ; (kl = sfnext(cp,cl,&kp)) > 0) {
+	    cchar *cp{} ;
+	    if (int cl = sfcontent(sp,sl,&cp) ; cl > 0) {
+		cchar *kp{} ;
+		if (int kl = sfnext(cp,cl,&kp) ; kl > 0) {
 		    if (strwcmp(key,kp,kl) == 0) {
 			cint	xl = intconv((cp + cl) - (kp + kl)) ;
 			cchar	*xp = (kp + kl) ;
@@ -129,7 +127,6 @@ int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex {
 	    *rpp = (vl >= 0) ? vp : nullptr ;
 	}
 	return vl ;
-}
-/* end subroutine (sfkeyval) */
+} /* end subroutine (sfkeyval) */
 
 
