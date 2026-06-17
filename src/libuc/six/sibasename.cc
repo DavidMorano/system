@@ -92,7 +92,6 @@ int sibasename(cchar *sp,int µsl) noex {
 	    }
 	} /* end if (getlenstr) */
 	return si ;
-}
-/* end subroutine (sibasename) */
+} /* end subroutine (sibasename) */
 
 
