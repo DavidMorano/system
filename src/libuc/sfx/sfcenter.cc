@@ -99,7 +99,6 @@ int sfcenter(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	    *rpp = (cl >= 0) ? cp : nullptr ;
 	}
 	return cl ;
-}
-/* end subroutine (sfcenter) */
+} /* end subroutine (sfcenter) */
 
 
