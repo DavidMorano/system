@@ -43,14 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>		/* |CH_{xx}| */
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_{xx}| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -59,6 +59,8 @@
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* external subroutines */
@@ -87,35 +89,31 @@ int sfsubstance(cchar *sp,int sl,cchar **rpp) noex {
     	if (sp) ylikely {
 	    int		ch ; /* used-mulitple */
 	    if (sl < 0) sl = lenstr(sp) ;
-	    while (sl > 0) {
-	        ch = mkchar(sp[0]) ;
+	    for ( ; sl > 0 ; sl -= 1) {
+	        ch = mkchar(*sp) ;
 	        if (isnotours(ch)) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
+		sp += 1 ;
 	    } /* end while */
-	    while (sl > 0) {
+	    for ( ; sl > 0 ; sl -= 1) {
 	        ch = mkchar(sp[sl - 1]) ;
 	        if (isnotours(ch)) break ;
-	        sl -= 1 ;
 	    } /* end while */
 	} else {
 	    sl = -1 ;
 	} /* end if (non-null) */
 	if (rpp) *rpp = sp ;
 	return sl ;
-}
-/* end subroutine (sfsubstance) */
+} /* end subroutine (sfsubstance) */
 
 
 /* local subroutines */
 
 local bool isnotours(int ch) noex {
 	bool		f = false ;
-	f = f || CHAR_ISWHITE(ch) ;
+	f = f || ISWHT(ch) ;
 	f = f || (ch == CH_DQUOTE) ;
 	f = f || (ch == CH_SQUOTE) ;
 	return (! f) ;
-}
-/* end subroutine (isnotours) */
+} /* end subroutine (isnotours) */
 
 
