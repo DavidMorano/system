@@ -21,12 +21,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	DIRSEEN		struct dirseen_head
@@ -144,17 +141,17 @@ inline int dirseen_magic(dirseen *op,Args ... args) noex {
 
 EXTERNC_begin
 
-extern int dirseen_start(dirseen *) noex ;
-extern int dirseen_add(dirseen *,cchar *,int,ustat *) noex ;
-extern int dirseen_havename(dirseen *,cchar *,int) noex ;
-extern int dirseen_havedevino(dirseen *,ustat *) noex ;
-extern int dirseen_count(dirseen *) noex ;
-extern int dirseen_curbegin(dirseen *,dirseen_cur *) noex ;
-extern int dirseen_curend(dirseen *,dirseen_cur *) noex ;
-extern int dirseen_curenum(dirseen *,dirseen_cur *,char *,int) noex ;
-extern int dirseen_notseen(dirseen *,ustat *,cchar *,int) noex ;
-extern int dirseen_notadd(dirseen *,ustat *,cchar *,int) noex ;
-extern int dirseen_finish(dirseen *) noex ;
+extern int dirseen_start	(dirseen *) noex ;
+extern int dirseen_add		(dirseen *,cchar *,int,ustat *) noex ;
+extern int dirseen_havename	(dirseen *,cchar *,int) noex ;
+extern int dirseen_havedevino	(dirseen *,ustat *) noex ;
+extern int dirseen_count	(dirseen *) noex ;
+extern int dirseen_curbegin	(dirseen *,dirseen_cur *) noex ;
+extern int dirseen_curend	(dirseen *,dirseen_cur *) noex ;
+extern int dirseen_curenum	(dirseen *,dirseen_cur *,char *,int) noex ;
+extern int dirseen_notseen	(dirseen *,ustat *,cchar *,int) noex ;
+extern int dirseen_notadd	(dirseen *,ustat *,cchar *,int) noex ;
+extern int dirseen_finish	(dirseen *) noex ;
 
 EXTERNC_end
 
