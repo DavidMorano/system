@@ -123,8 +123,7 @@ int siochr(cchar *sp,int sl,int sch) noex {
 	    } /* end if_constexpr (f_strchr) */
 	} /* end if (non-null) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (siochr) */
+} /* end subroutine (siochr) */
 
 int sirchr(cchar *sp,int µsl,int sch) noex {
 	int		i = 0 ; /* return-value */
@@ -137,7 +136,6 @@ int sirchr(cchar *sp,int µsl,int sch) noex {
 	    } /* end for */
 	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (sirchr) */
+} /* end subroutine (sirchr) */
 
 
