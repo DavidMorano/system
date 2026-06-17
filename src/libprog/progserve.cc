@@ -44,8 +44,8 @@
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getbufsize.h>
-#include	<getourenv.h>
+#include	<usyscalls.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<field.h>
 #include	<vecstr.h>
@@ -330,7 +330,7 @@ cchar	*sav[] ;
 	if ((rs >= 0) && (! f_served) && pip->fl.loginsvc) {
 	    if (pip->fl.useracct && (strcmp(cip->service,"help") != 0)) {
 	        struct passwd	pw ;
-	        const int	pwlen = getbufsize(bufsize_pw) ;
+	        const int	pwlen = bufsizeget(bufsize_pw) ;
 	        char		*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	            cchar	*svc = cip->service ;
@@ -1320,9 +1320,9 @@ local int loadaccgroups(PROGINFO *pip,vecstr *glp,cchar *accbuf,int acclen)
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	    maxnamelen = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
 	    }
 	}
