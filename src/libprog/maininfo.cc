@@ -5,9 +5,7 @@
 /* main information */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* special debugging */
-#define	CF_PROGINFO	0		/* use 'maininfo_xxx()' */
 #define	CF_SIGHAND	1		/* install csignalandlers */
 #define	CF_SIGALTSTACK	0		/* do *not* define */
 
@@ -24,7 +22,7 @@
 
 /*******************************************************************************
 
-  	Name:
+  	Object:
 	maininfo
 
 	Descroption:
@@ -42,8 +40,11 @@
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<vecstr.h>
 #include	<upt.h>
+#include	<sncpyx.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG */
 
@@ -54,6 +55,11 @@
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	MI	maininfo
+
+
+/* local namespaces */
 
 
 /* local typedefs */
@@ -74,7 +80,7 @@ extern "C" {
 
 /* forward references */
 
-local int	maininfo_utiler(MAININFO *) noex ;
+local int	maininfo_utiler(MI *) noex ;
 
 
 /* local variables */
@@ -85,36 +91,35 @@ local int	maininfo_utiler(MAININFO *) noex ;
 
 /* exported subroutines */
 
-int maininfo_start(MAININFO *mip,int argc,mainv argv) noex {
+int maininfo_start(MI *mip,int argc,mainv argv) noex {
+    	cnullptr	np{} ;
 	sigset_t	ss ;
 	cint	sig = SIGTIMEOUT ;
 	int		rs ;
-	cchar	*argz = NULL ;
+	cchar	*argz = nullptr ;
 
 	memclear(mip) ;
-	if ((argc > 0) && (argv != NULL)) argz = argv[0] ;
+	if ((argc > 0) && (argv != nullptr)) argz = argv[0] ;
 
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-	if (argz == NULL) argz = getexecname() ;
+	if (argz == nullptr) argz = getexecname() ;
 #endif
 
 	uc_sigsetempty(&ss) ;
 	uc_sigsetadd(&ss,sig) ;
 	if ((rs = u_sigmask(SIG_BLOCK,&ss,&mip->savemask)) >= 0) {
 	    if ((rs = vecstr_start(&mip->stores,2,0)) >= 0) {
-	        int	cl ;
 	        cchar	*cp ;
-	        if ((cl = sfbasename(argz,-1,&cp)) > 0) {
+	        if (int cl ; (cl = sfbasename(argz,-1,&cp)) > 0) {
 	            cchar	**vpp = &mip->progname ;
 	            if (cp[0] == '-') {
-	                mip->fl.progdash = TRUE ;
+	                mip->fl.progdash = true ;
 	                cp += 1 ;
 	                cl -= 1 ;
 	            }
 	            if (cl > 0) {
-	                cchar	*tp ;
-	                if ((tp = strnrchr(cp,cl,'.')) != NULL) {
-	                    cl = (tp-cp) ;
+	                if (cchar *tp = strnrchr(cp,cl,'.') ; tp) {
+	                    cl = intconv(tp - cp) ;
 	                }
 	            }
 	            if (cl > 0) {
@@ -134,50 +139,52 @@ int maininfo_start(MAININFO *mip,int argc,mainv argv) noex {
 }
 /* end subroutine (maininfo_start) */
 
-int maininfo_finish(MAININFO *mip) noex {
-	int		rs = SR_OK ;
+int maininfo_finish(MI *mip) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (mip == NULL) return SR_FAULT ;
-
-	rs1 = vecstr_finish(&mip->stores) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = u_sigmask(SIG_SETMASK,&mip->savemask,NULL) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (mip) {
+	    rs = SR_OK ;
+	    {
+	        rs1 = vecstr_finish(&mip->stores) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = u_sigmask(SIG_SETMASK,&mip->savemask,nullptr) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (maininfo_finish) */
 
-int maininfo_setentry(MAININFO *mip,cchar **epp,cchar *vp,int vl) noex {
-	int		rs = SR_OK ;
-	int		oi = -1 ;
-	int		len = 0 ;
-
-	if (mip == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_INVALID ;
-
-	if (*epp != NULL) {
-	    oi = vecstr_findaddr(&mip->stores,*epp) ;
-	}
-	if (vp != NULL) {
-	    len = strnlen(vp,vl) ;
-	    rs = vecstr_store(&mip->stores,vp,len,epp) ;
-	} else {
-	    *epp = NULL ;
-	}
-	if ((rs >= 0) && (oi >= 0)) {
-	    vecstr_del(&mip->stores,oi) ;
-	}
-
+int maininfo_setentry(MI *mip,cchar **epp,cchar *vp,int vl) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (mip && epp) {
+	    int		oi = -1 ;
+	    rs = SR_OK ;
+	    if (*epp) {
+	        oi = vecstr_findaddr(&mip->stores,*epp) ;
+	    }
+	    if (vp) {
+	        len = strnlen(vp,vl) ;
+	        rs = vecstr_store(&mip->stores,vp,len,epp) ;
+	    } else {
+	        *epp = nullptr ;
+	    }
+	    if ((rs >= 0) && (oi >= 0)) {
+	        rs1 = vecstr_del(&mip->stores,oi) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (maininfo_setentry) */
 
 #if	CF_SIGALTSTACK
-int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,cint *sigcatches)
-{
+int maininfo_sigbegin(MI *mip,maininfohand_t sh,cint *sigcatches) noex {
+    	cnullptr	np{} ;
 	size_t		ms ;
 	cint	ps = getpagesize() ;
 	cint	ss = (2*SIGSTKSZ) ;
@@ -187,22 +194,22 @@ int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,cint *sigcatches)
 	int		fd = -1 ;
 	void		*md ;
 	ms = iceil(ss,ps) ;
-	if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
+	if ((rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	    mip->mdata = md ;
 	    mip->msize = ms ;
 	    mip->astack.ss_size = ms ;
 	    mip->astack.ss_sp = md ;
 	    mip->astack.ss_flags = 0 ;
-	    if ((rs = u_sigaltstack(&mip->astack,NULL)) >= 0) {
-	        rs = sighand_start(&mip->sh,NULL,NULL,sigcatches,sh) ;
+	    if ((rs = u_sigaltstack(&mip->astack,nullptr)) >= 0) {
+	        rs = sighand_start(&mip->sh,np,np,sigcatches,sh) ;
 	        if (rs < 0) {
 	            mip->astack.ss_flags = SS_DISABLE ;
-	            u_sigaltstack(&mip->astack,NULL) ;
+	            u_sigaltstack(&mip->astack,nullptr) ;
 	        }
 	    } /* end if (u_sigaltstack) */
 	    if (rs < 0) {
 	        u_munmap(mip->mdata,mip->msize) ;
-	        mip->mdata = NULL ;
+	        mip->mdata = nullptr ;
 	    }
 	} /* end if (mmap) */
 #if	CF_DEBUGN
@@ -212,11 +219,11 @@ int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,cint *sigcatches)
 }
 /* end subroutine (maininfo_sigbegin) */
 #else /* CF_SIGALTSTACK */
-int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,cint *sigcatches)
-{
+int maininfo_sigbegin(MI *mip,maininfohand_t sh,cint *sigcatches) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 #if	CF_SIGHAND
-	rs = sighand_start(&mip->sh,NULL,NULL,sigcatches,sh) ;
+	rs = sighand_start(&mip->sh,np,np,sigcatches,sh) ;
 #endif
 #if	CF_DEBUGN
 	nprintf(NDF,"maininfo_sigbegin: ret rs=%d\n",rs) ;
@@ -226,57 +233,57 @@ int maininfo_sigbegin(MAININFO *mip,maininfohand_t sh,cint *sigcatches)
 /* end subroutine (maininfo_sigbegin) */
 #endif /* CF_SIGALTSTACK */
 
-
-int maininfo_sigend(MAININFO *mip)
-{
-	int		rs = SR_OK ;
+int maininfo_sigend(MI *mip) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
+	if (mip) {
+	    rs = SR_OK ;
 #if	CF_SIGHAND
-	rs1 = sighand_finish(&mip->sh) ;
-	if (rs >= 0) rs = rs1 ;
+	{
+	    rs1 = sighand_finish(&mip->sh) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 #endif
-
 #if	CF_SIGALTSTACK
-	mip->astack.ss_flags = SS_DISABLE ;
-	rs1 = u_sigaltstack(&mip->astack,NULL) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (mip->mdata != NULL) {
+	{
+	    mip->astack.ss_flags = SS_DISABLE ;
+	    rs1 = u_sigaltstack(&mip->astack,nullptr) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	if (mip->mdata) {
 	    rs1 = u_munmap(mip->mdata,mip->msize) ;
 	    if (rs >= 0) rs = rs1 ;
-	    mip->mdata = NULL ;
+	    mip->mdata = nullptr ;
 	    mip->msize = 0 ;
 	}
 #endif /* CF_SIGALTSTACK */
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (maininfo_sigend) */
 
-
-int maininfo_utilbegin(MAININFO *op,int f_run)
-{
-	pthread_t	tid ;
-	thrsub		w = (thrsub) maininfo_utiler ;
-	int		rs = SR_OK ;
-
-	if (f_run) {
-	    if ((rs = uptcreate(&tid,NULL,w,op)) >= 0) {
-	        op->tid = tid ;
-	        op->fl.utilout = TRUE ;
-	    }
-	} /* end if (run) */
-
+int maininfo_utilbegin(MI *op,int f_run) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (f_run) {
+	        thrsub	w = (thrsub) maininfo_utiler ;
+	        pthread_t	tid ;
+	        if ((rs = uptcreate(&tid,nullptr,w,op)) >= 0) {
+	            op->tid = tid ;
+	            op->fl.utilout = true ;
+	        }
+	    } /* end if (run) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (maininfo_utilbegin) */
 
-int maininfo_utilend(MAININFO *op) noex {
+int maininfo_utilend(MI *op) noex {
 	int		rs = SR_OK ;
 	if (op->fl.utilout) {
 	    int		trs = SR_OK ;
-	    op->fl.utilout = FALSE ;
+	    op->fl.utilout = false ;
 	    if ((rs = uptjoin(op->tid,&trs)) >= 0) {
 	        rs = trs ;
 	    }
@@ -285,20 +292,22 @@ int maininfo_utilend(MAININFO *op) noex {
 }
 /* end subroutine (maininfo_utilend) */
 
-int maininfo_srchname(MAININFO *mip,cchar **rpp) noex {
-	int		rs = SR_OK ;
-	cchar		*srch = mip->progname ;
-	if (rpp == NULL) return SR_FAULT ;
-	*rpp = srch ;
-	if (hasuc(srch,-1)) {
-	    cint	slen = MAXNAMELEN ;
-	    char	sbuf[MAXNAMELEN+1] ;
-	    if ((rs = sncpylc(sbuf,slen,srch)) >= 0) {
-	        rs = maininfo_setentry(mip,rpp,sbuf,rs) ;
+int maininfo_srchname(MI *mip,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (mip && rpp) {
+	    cchar	*srch = mip->progname ;
+	    rs = SR_OK ;
+	    *rpp = srch ;
+	    if (hasuc(srch,-1)) {
+	        cint	slen = MAXNAMELEN ;
+	        char	sbuf[MAXNAMELEN+1] ;
+	        if ((rs = sncpylc(sbuf,slen,srch)) >= 0) {
+	            rs = maininfo_setentry(mip,rpp,sbuf,rs) ;
+	        }
+	    } else {
+	        rs = lenstr(srch) ;
 	    }
-	} else {
-	    rs = strlen(srch) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (maininfo_srchname) */
@@ -306,12 +315,12 @@ int maininfo_srchname(MAININFO *mip,cchar **rpp) noex {
 
 /* private subroutines */
 
-local int maininfo_utiler(MAININFO *mip) noex {
-	cint	of = (O_WRONLY|O_APPEND) ;
-	int		rs = SR_OK ;
+local int maininfo_utiler(MI *mip) noex {
+	cint		of = (O_WRONLY|O_APPEND) ;
+	int		rs ;
 	int		rs1 ;
+	int		len = 0 ; /* return-value */
 	cchar		*fn = "here.txt" ;
-
 	if ((rs = u_open(fn,of,0664)) >= 0) {
 	    cint	wlen = LINEBUFLEN ;
 	    cint	fd = rs ;
@@ -319,16 +328,15 @@ local int maininfo_utiler(MAININFO *mip) noex {
 	    char	wbuf[LINEBUFLEN+1] ;
 	    if ((rs = bufprintf(wbuf,wlen,fmt)) >= 0) {
 	        rs = u_write(fd,wbuf,rs) ;
+		len = rs ;
 	    }
 	    rs1 = u_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	} /* end if (open) */
-
-	mip->f_done = TRUE ;
-	return rs ;
-}
-/* end subroutine (maininfo_utiler) */
+	mip->f_done = true ;
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (maininfo_utiler) */
 
 
