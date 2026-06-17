@@ -86,8 +86,8 @@
 
 /* forward references */
 
-static int	sfshrinkmore(cchar *,int,cchar **) noex ;
-static bool	iswhitemore(int) noex ;
+local int	sfshrinkmore(cchar *,int,cchar **) noex ;
+local bool	iswhitemore(int) noex ;
 
 
 /* local variables */
@@ -156,13 +156,12 @@ int sfword(cchar *sp,int sl,cchar **rpp) noex {
 	} /* end if (non-null) */
 	if (rpp) *rpp = cp ;
 	return cl ;
-}
-/* end subroutine (sfword) */
+} /* end subroutine (sfword) */
 
 
 /* local subroutines */
 
-static int sfshrinkmore(cchar *sp,int sl,cchar **rpp) noex {
+local int sfshrinkmore(cchar *sp,int sl,cchar **rpp) noex {
 	int		cl = 0 ;
 	cchar		*cp ;
 	if ((cl = sfshrink(sp,sl,&cp)) > 0) {
@@ -176,12 +175,10 @@ static int sfshrinkmore(cchar *sp,int sl,cchar **rpp) noex {
 	    }
 	} /* end if (sfshrink) */
 	return cl ;
-}
-/* end subroutine (sfshrinkmore) */
+} /* end subroutine (sfshrinkmore) */
 
-static bool iswhitemore(int ch) noex {
+local bool iswhitemore(int ch) noex {
 	return CHAR_ISWHITE(ch) || (ch == '-') ;
-}
-/* end subroutine (iswhitemore) */
+} /* end subroutine (iswhitemore) */
 
 
