@@ -104,7 +104,6 @@ int sfbasename(cchar *sp,int µsl,cchar **rpp) noex {
 	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
 	return rl ;
-}
-/* end subroutine (sfbasename) */
+} /* end subroutine (sfbasename) */
 
 
