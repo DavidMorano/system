@@ -24,16 +24,15 @@
 	Given a file-name (a counted c-string) I determine if it
 	has a file-extension.  If it has a file-extension, I return
 	the length (character count) of the origial string up to
-	the startof the file-extension (after the dot character).
+	the start of the file-extension (after the dot character).
 	For no file-extension, I return -1.
 
 	Synopsis:
-	int siext(cchar *fp,int fl,mainv exts) noex
+	int siext(cchar *fp,int fl) noex
 
 	Arguments:
 	fp		file-name string
 	fl		file-name length
-	exts		arrays of strings (allowable extensions)
 
 	Returns:
 	>=0		leading length up to found file-extension
@@ -42,12 +41,14 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"six.h"			/* |sirbrk(3uc)| */
 #include	"siext.h"
@@ -113,7 +114,6 @@ int siext(cchar *fp,int µfl) noex {
 	    } /* end if (hit something) */
 	} /* end if (getlenstr) */
 	return si ;
-}
-/* end subroutine (siext) */
+} /* end subroutine (siext) */
 
 
