@@ -95,7 +95,6 @@ int sfbaselib(cchar *pnp,int pnl,cchar **rpp) noex {
 	} /* end if (non-null) */
 	if (rpp) *rpp = charp(pnp) ;
 	return pnl ;
-}
-/* end subroutine (sfbaselib) */
+} /* end subroutine (sfbaselib) */
 
 
