@@ -90,7 +90,6 @@ int sifext(cchar *fp,int µfl,mainv exts) noex {
 	    } /* end if (had extension) */
 	} /* end if (getlenstr) */
 	return si ;
-}
-/* end subroutine (sifext) */
+} /* end subroutine (sifext) */
 
 
