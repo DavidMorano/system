@@ -20,14 +20,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
 extern int	sfobrk	(cchar *,int,cchar *,cchar **) noex ;
 extern int	sfrbrk	(cchar *,int,cchar *,cchar **) noex ;
+local inline int sfbrk(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
+	return sfobrk(sp,sl,ss,rpp) ;
+}
 
 EXTERNC_end
 
