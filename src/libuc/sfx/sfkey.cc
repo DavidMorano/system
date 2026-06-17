@@ -99,7 +99,6 @@ int sfkey(cchar *sp,int sl,cchar **rpp) noex {
 	    *rpp = (kl >= 0) ? sp : nullptr ;
 	}
 	return kl ;
-}
-/* end subroutine (sfkey) */
+} /* end subroutine (sfkey) */
 
 
