@@ -99,7 +99,6 @@ int sinext(cchar *sp,int µsl) noex {
 	    }
 	} /* end if (getlenstr) */
 	return si ;
-}
-/* end subroutine (sinext) */
+} /* end subroutine (sinext) */
 
 
