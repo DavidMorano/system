@@ -20,8 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+
 
 EXTERNC_begin
 
@@ -30,6 +33,9 @@ extern int sfnextchr	(cchar *,int,int,cchar **) noex ;
 extern int sfnextbrk	(cchar *,int,cchar *,cchar **) noex ;
 extern int sfnextterm	(cchar *,int,cchar *,cchar **) noex ;
 extern int sfnextqtok	(cchar *,int,cchar **) noex ;
+local inline int nextfield(cchar *sp,int sl,cchar **rpp) noex {
+	return sfnext(sp,sl,rpp) ;
+}
 
 EXTERNC_end
 
