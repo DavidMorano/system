@@ -83,7 +83,6 @@ int sfbracketval(cchar *sp,int sl,cchar **rpp) noex {
 	} /* end if (non-null) */
 	if (rpp) *rpp = sp ;
 	return sl ;
-}
-/* end subroutine (sfbracketval) */
+} /* end subroutine (sfbracketval) */
 
 
