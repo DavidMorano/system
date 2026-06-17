@@ -100,7 +100,6 @@ int sidquote(cchar *sp,int sl) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return i ;
-}
-/* end subroutine (sidquote) */
+} /* end subroutine (sidquote) */
 
 
