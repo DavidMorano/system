@@ -30,7 +30,7 @@
 	Arguments:
 	sp	string to be examined
 	sl 	length of string to be examined
-	sb	null-terminated string of break characters to break on
+	ss	null-terminated string of break characters to break on
 	rpp	result pointer of beginning of found break-string
 
 	Returns:
@@ -46,13 +46,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnobrk(3uc)| */
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnobrk(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -99,10 +99,9 @@ namespace {
 /* exported subroutines */
 
 int sfweirdo(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
-    	sfxbrk		sx(strnobrk) ;
+    	sfxbrk sx(strnobrk) ;
 	return sx(sp,sl,sb,rpp) ;
-}
-/* end subroutine (sfweirdo) */
+} /* end subroutine (sfweirdo) */
 
 
 /* local subroutines */
