@@ -57,7 +57,8 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getbufsize.h>
+#include	<ucgetx.h>
+#include	<bufsizeget.h>
 #include	<filer.h>
 #include	<ascii.h>
 #include	<linefold.h>
@@ -340,13 +341,13 @@ local int proguseracct_pop(PI *pip,int ofd,PASSWDENT *pep,
 
 local int proguseracct_projinfo(PI *pip,int ofd,PASSWDENT *pep) noex {
 	PROJECT		pj ;
-	cint		pjlen = getbufsize(bufsize_pj) ;
+	cint		pjlen = bufsizeget(bufsize_pj) ;
 	int		rs ;
 	int		c = 0 ;
 	char		*pjbuf ;
 	if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
 	    cchar	*n = pep->pw_name ;
-	    if ((rs = uc_getdefproj(n,&pj,pjbuf,pjlen)) >= 0) {
+	    if ((rs = uc_getprojdef(n,&pj,pjbuf,pjlen)) >= 0) {
 	        cint	outlen = (pjlen*2) ;
 	        if (pj.pj_comment != nullptr) {
 	            int		ol ;
