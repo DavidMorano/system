@@ -53,13 +53,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |isdigitlatin(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"six.h"			/* |sibrk(3uc)| + |siskipwht(3uc)| */
 
@@ -100,14 +100,14 @@ int sileader(cchar *sp,int sl) noex {
 	        if ((si = siskipwhite(sp,sl)) > 0) {
 	            sp += si ;
 	            sl -= si ;
-	        }
+	        } /* end if (skipped) */
 		if (sl > 0) {
 	            if (cint ch = mkchar(sp[0]) ; isdigitlatin(ch)) {
 		        if (int ci ; (ci = sibrk(sp,sl," \t")) >= 0) {
 	                    si += (ci + 1) ;
 			    {
-				cint	cl = (sl - (ci+1)) ;
-				cchar	*cp = (sp + (ci+1)) ;
+				cint	cl = (sl - (ci + 1)) ;
+				cchar	*cp = (sp + (ci + 1)) ;
 	                        si += siskipwhite(cp,cl) ;
 			    } /* end block */
 	                } else {
@@ -122,7 +122,6 @@ int sileader(cchar *sp,int sl) noex {
 	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	return si ;
-}
-/* end subroutine (sileader) */
+} /* end subroutine (sileader) */
 
 
