@@ -20,14 +20,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
 extern int sfochr(cchar *,int,int,cchar **) noex ;
 extern int sfrchr(cchar *,int,int,cchar **) noex ;
+local inline int sfchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
+	return sfochr(sp,sl,sch,rpp) ;
+}
 
 EXTERNC_end
 
