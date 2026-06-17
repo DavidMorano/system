@@ -88,8 +88,7 @@ int sioterm(cchar *sp,int µsl,cchar *terms) noex {
 	    } /* end for */
 	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (sioterm) */
+} /* end subroutine (sioterm) */
 
 int sirterm(cchar *sp,int µsl,cchar *terms) noex {
 	int		i = 0 ; /* return-value */
@@ -102,7 +101,6 @@ int sirterm(cchar *sp,int µsl,cchar *terms) noex {
 	    } /* end for */
 	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (sirterm) */
+} /* end subroutine (sirterm) */
 
 
