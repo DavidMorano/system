@@ -20,13 +20,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int sinext(cchar *,int) noex ;
+extern int	sinext(cchar *,int) noex ;
 
 EXTERNC_end
 
