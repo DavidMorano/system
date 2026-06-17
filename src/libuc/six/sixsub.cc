@@ -146,8 +146,7 @@ int sibasesub(cchar *sp,int sl,cchar *ss) noex {
 	    } /* end if (length given or not) */
 	} /* end if (non-null) */
 	return si ;
-}
-/* end subroutine (sibasesub) */
+} /* end subroutine (sibasesub) */
 
 int sicasesub(cchar *sp,int sl,cchar *ss) noex {
     	int		si = -1 ;
@@ -155,8 +154,7 @@ int sicasesub(cchar *sp,int sl,cchar *ss) noex {
 	    si = sixsub<touc,nleadcasestr>(sp,sl,ss) ;
 	} /* end if (non-null) */
 	return si ;
-}
-/* end subroutine (sicasesub) */
+} /* end subroutine (sicasesub) */
 
 int sifoldsub(cchar *sp,int sl,cchar *ss) noex {
     	int		si = -1 ;
@@ -164,7 +162,6 @@ int sifoldsub(cchar *sp,int sl,cchar *ss) noex {
 	    si = sixsub<tofc,nleadfoldstr>(sp,sl,ss) ;
 	} /* end if (non-null) */
 	return si ;
-}
-/* end subroutine (sifoldsub) */
+} /* end subroutine (sifoldsub) */
 
 
