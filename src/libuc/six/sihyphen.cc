@@ -113,7 +113,6 @@ int sihyphen(cchar *sp,int µsl) noex {
 	    } /* end if_constexpr (f_strnchr) */
 	} /* end if (getlenstr) */
 	return (f) ? si : -1 ;
-}
-/* end subroutine (sihyphen) */
+} /* end subroutine (sihyphen) */
 
 
