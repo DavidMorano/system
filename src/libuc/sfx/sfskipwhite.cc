@@ -35,16 +35,17 @@
 
 	Returns:
 	>=0		non-white-space string length
+	<0		error (-1)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -54,11 +55,13 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
-/* forward references */
+
+/* external subroutines */
 
 
-/* forward variables */
+/* external variables */
 
 
 /* local structures */
@@ -78,20 +81,21 @@ import libutil ;			/* |lenstr(3u)| */
 int sfskipwhite(cchar *sp,int sl,cchar **rpp) noex {
     	if (sp) ylikely {
 	    if (sl < 0) {
-	        while (CHAR_ISWHITE(*sp)) sp += 1 ;
+	        while (ISWHT(*sp)) {
+		    sp += 1 ;
+		} /* end while */
 	        sl = lenstr(sp) ;
 	    } else {
-	        while (sl && CHAR_ISWHITE(*sp)) {
+	        while (sl && ISWHT(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
-	        }
+	        } /* end while */
 	    } /* end if */
 	} else {
 	    sl = -1 ;
 	} /* end if (non-null) */
 	if (rpp) *rpp = sp ;
 	return sl ;
-}
-/* end subroutine (sfskipwhite) */
+} /* end subroutine (sfskipwhite) */
 
 
