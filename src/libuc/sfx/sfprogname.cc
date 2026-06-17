@@ -97,7 +97,6 @@ int sfprogname(cchar *sp,int sl,cchar **rpp) noex {
 	} /* end if (non-null) */
 	if (rpp) *rpp = cp ;
 	return cl ;
-}
-/* end subroutine (sfprogname) */
+} /* end subroutine (sfprogname) */
 
 
