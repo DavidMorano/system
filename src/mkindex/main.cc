@@ -35,7 +35,7 @@
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<bits.h>
 #include	<bfile.h>
@@ -53,6 +53,9 @@
 #include	"defs.h"
 #include	"memfile.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -128,7 +131,7 @@ struct hashinfo {
 
 static int	usage(struct proginfo *) ;
 
-static int	procargs(struct proginfo *,struct arginfo *,BITS *,
+static int	procargs(struct proginfo *,struct arginfo *,bits *,
 			HASHINFO *,cchar *,cchar *) ;
 
 static int	hashinfo_begin(HASHINFO *,struct proginfo *,int,cchar *) ;
@@ -200,7 +203,7 @@ int main(int argc,cchar **argv,cchar **envv)
 {
 	struct proginfo	pi, *pip = &pi ;
 	struct arginfo	ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	USERINFO	u ;
 	bfile		errfile ;
 
@@ -927,7 +930,7 @@ struct proginfo	*pip ;
 static int procargs(pip,aip,app,hip,ofname,afname)
 struct proginfo	*pip ;
 struct arginfo	*aip ;
-BITS		*app ;
+bits		*app ;
 HASHINFO	*hip ;
 cchar	*afname ;
 cchar	*ofname ;
