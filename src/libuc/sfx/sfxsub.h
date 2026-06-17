@@ -20,14 +20,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
 extern int sfosub(cchar *,int,cchar *,cchar **) noex ;
 extern int sfrsub(cchar *,int,cchar *,cchar **) noex ;
+local inline int sfsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
+    	return sfosub(sp,sl,ss,rpp) ;
+}
 
 EXTERNC_end
 
