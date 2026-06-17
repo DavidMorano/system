@@ -1,7 +1,8 @@
-/* maininfo SUPPORT */
+/* maininfo HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
+/* support object for early program initialization */
 /* version %I% last-modified %G% */
 
 
@@ -22,21 +23,17 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<pthread.h>
-#include	<csignal>
-#include	<cstddef>
-#include	<cstdlib>
+#include	<signal.h>
+#include	<stddef.h>
+#include	<stdlib.h>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<vecstr.h>
-
-#include	"sighand.h"
+#include	<sighand.h>
 
 
 #define	MAININFO	struct maininfo
 #define	MAININFO_FL	struct maininfo_flags
-
-
-typedef void		(*maininfohand_t)(int,siginfo_t *,void *) noex ;
 
 
 struct maininfo_flags {
@@ -54,7 +51,7 @@ struct maininfo {
 	cchar		*srchname ;
 	cchar		*symname ;
 	void		*mdata ;
-	MAININFO_FL	have, f, changed, final ;
+	MAININFO_FL	have, f, changed, finval ;
 	MAININFO_FL	open ;
 	sigset_t	savemask ;
 	pthread_t	tid ;
@@ -62,7 +59,11 @@ struct maininfo {
 	volatile int	f_done ;
 } ; /* end struct */
 
+typedef MAININFO	maininfo ;
+
 EXTERNC_begin
+
+typedef void		(*maininfohand_t)(int,siginfo_t *,void *) noex ;
 
 extern int maininfo_start(MAININFO *,int,cchar **) noex ;
 extern int maininfo_finish(MAININFO *) noex ;
