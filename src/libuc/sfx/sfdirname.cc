@@ -124,7 +124,6 @@ int sfdirname(cchar *sp,int µsl,cchar **rpp) noex {
 	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
 	return rl ;
-}
-/* end subroutine (sfdirname) */
+} /* end subroutine (sfdirname) */
 
 
