@@ -93,7 +93,6 @@ int sflast(cchar *sp,int sl,int n,cchar **rpp) noex {
 	}
 	if (rpp) *rpp = sp ;
 	return sl ;
-}
-/* end subroutine (sflast) */
+} /* end subroutine (sflast) */
 
 
