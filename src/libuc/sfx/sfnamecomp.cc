@@ -80,8 +80,7 @@ local inline bool isleader(cchar *sp) noex {
 	f = f && (sp[--i] == '/') ;
 	f = f && (sp[--i] == '/') ;
 	return f ;
-}
-/* end subroutine (isleader) */
+} /* end subroutine (isleader) */
 
 
 /* local variables */
@@ -100,7 +99,7 @@ int sfnamecomp(cchar *sp,int sl,cchar **rpp) noex {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        } /* end while */
-	        while ((sl > 1) && (sp[sl-1] == '/')) {
+	        while ((sl > 1) && (sp[sl - 1] == '/')) {
 	            sl -= 1 ;
 	        }
 	    } /* end if (non-zero positive) */
@@ -109,7 +108,6 @@ int sfnamecomp(cchar *sp,int sl,cchar **rpp) noex {
 	} /* end if (non-null) */
 	if (rpp) *rpp = sp ;
 	return sl ;
-}
-/* end subroutine (sfnamecomp) */
+} /* end subroutine (sfnamecomp) */
 
 
