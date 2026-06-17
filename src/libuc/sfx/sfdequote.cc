@@ -69,7 +69,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	isours(int) noex ;
+local int	isours(int) noex ;
 
 
 /* local variables */
@@ -96,15 +96,13 @@ int sfdequote(cchar *sp,int sl,cchar **rpp) noex {
 	    sl = -1 ;
 	} /* end if (non-null) */
 	return sl ;
-}
-/* end subroutine (sfdequote) */
+} /* end subroutine (sfdequote) */
 
 
 /* local subroutines */
 
-static int isours(int ch) noex {
+local int isours(int ch) noex {
 	return (CHAR_ISWHITE(ch) || (ch == CH_QUOTE)) ;
-}
-/* end subroutine (isours) */
+} /* end subroutine (isours) */
 
 
