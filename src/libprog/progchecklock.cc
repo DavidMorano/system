@@ -92,7 +92,7 @@ int progchecklock(PI *pip,bfile *fp,cc *fn,cc *bn,cc *dt) noex {
 				    bool	f = false ;
 				    f = f || (sb.st_dev != svo.st_dev) ;
 				    f = f || (sb.st_ino != svo.st_ino) ;
-				    rs = SR_LOCKLOST ;
+				    rs = SR_LOCKFAIL ;
 				    if (f) {
 				        rs = progchecker(pip,fp,dt) ;
 				    }
