@@ -30,7 +30,7 @@
 #ifdef	__cplusplus
 
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdarg>
 #include	<clanguage.h>
 #include	<utypedefs.h>
