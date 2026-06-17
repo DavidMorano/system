@@ -74,9 +74,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	getthing(cchar *,int,cchar *,cchar **) noex ;
-static bool	hasgood(cchar *,int) noex ;
-static bool	isour(int) noex ;
+local int	getthing(cchar *,int,cchar *,cchar **) noex ;
+local bool	hasgood(cchar *,int) noex ;
+local bool	isour(int) noex ;
 
 
 /* local variables */
@@ -110,13 +110,12 @@ int sfthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	    *rpp = (cl >= 0) ? cp : nullptr ;
 	}
 	return cl ;
-}
-/* end subroutine (sfthing) */
+} /* end subroutine (sfthing) */
 
 
 /* local subroutines */
 
-static int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
+local int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = 0 ;
 	bool		f = false ;
 	cchar		*cp = nullptr ;
@@ -139,10 +138,9 @@ static int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	    *rpp = (f) ? cp : nullptr ;
 	}
 	return (f) ? cl : -1 ;
-}
-/* end subroutine (getthing) */
+} /* end subroutine (getthing) */
 
-static bool hasgood(cchar *sp,int sl) noex {
+local bool hasgood(cchar *sp,int sl) noex {
 	bool		f = true ;
 	for (int i = 0 ; i < sl ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
@@ -151,14 +149,12 @@ static bool hasgood(cchar *sp,int sl) noex {
 	    if (! f) break ;
 	} /* end for */
 	return f ;
-}
-/* end subroutine (hasgood) */
+} /* end subroutine (hasgood) */
 
-static bool isour(int ch) noex {
+local bool isour(int ch) noex {
 	bool		f = isalnumlatin(ch) ;
 	f = f || (ch == '_') || (ch == '-') || (ch == '=') || (ch == '/') ;
 	return f ;
-}
-/* end subroutine (isour) */
+} /* end subroutine (isour) */
 
 
