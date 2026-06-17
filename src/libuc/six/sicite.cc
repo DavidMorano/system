@@ -98,7 +98,6 @@ int sicite(cchar *sp,int sl,cchar *ep,int el) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return si ;
-}
-/* end subroutine (sicite) */
+} /* end subroutine (sicite) */
 
 
