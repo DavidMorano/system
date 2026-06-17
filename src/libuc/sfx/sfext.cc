@@ -135,7 +135,6 @@ int sfext(cchar *sp,int µsl,cchar **rpp) noex {
 	    *rpp = ep ;
 	} /* end if (non-null) */
 	return el ;
-}
-/* end subroutine (sfext) */
+} /* end subroutine (sfext) */
 
 
