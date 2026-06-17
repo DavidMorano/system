@@ -40,13 +40,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sileadchr.h"
 
@@ -56,7 +56,7 @@ import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
-#define	ISW		CHAR_ISWHITE
+#define	ISWHT(ch)		CHAR_ISWHITE(ch)
 
 
 /* local namespaces */
@@ -91,12 +91,11 @@ int sileadchr(cchar *sp,int µsl,int chx) noex {
 	if (int ch, sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    for (i = 0 ; i < sl ; i += 1) {
 		ch = mkchar(sp[i]) ;
-	        if (! ISW(ch)) break ;
+	        if (! ISWHT(ch)) break ;
 	    } /* end for */
 	    f = (i < sl) && (ch == chx) ;
 	} /* end if (getlenstr) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (sileadchr) */
+} /* end subroutine (sileadchr) */
 
 
