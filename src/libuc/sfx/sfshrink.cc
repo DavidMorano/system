@@ -35,17 +35,18 @@
 	rpp	pointer to pointer to resulting string
 
 	Returns:
-	+ non-white-space string length (if OK), otherwise 0
+	>=0	non-white-space string length (if OK), otherwise 0
+	<0	error (-1)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -54,6 +55,8 @@
 import libutil ;			/* |lenstr(3u{)| */
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* local namespaces */
@@ -85,18 +88,18 @@ import libutil ;			/* |lenstr(3u{)| */
 int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
     	if (sp) ylikely {
 	    if (sl >= 0) {
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        while ((sl > 0) && ISWHT(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        } /* end while */
 	        if (sp[0] == '\0') sl = 0 ;
 	    } else {
-	        while (CHAR_ISWHITE(*sp)) {
+	        while (ISWHT(*sp)) {
 	            sp += 1 ;
 	        }
 	        sl = lenstr(sp) ;
 	    } /* end if */
-	    while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
+	    while ((sl > 0) && ISWHT(sp[sl - 1])) {
 	        sl -= 1 ;
 	    }
 	} else {
@@ -104,7 +107,6 @@ int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
 	}
 	if (rpp) *rpp = sp ;
 	return sl ;
-}
-/* end subroutine (sfshrink) */
+} /* end subroutine (sfshrink) */
 
 
