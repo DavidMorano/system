@@ -41,19 +41,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdio>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<strn.h>		/* |strn{x}chr(3uc)| */
-#include	<six.h>			/* |siext(3uc)| */
-#include	<ischarx.h>		/* |iseol(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<strn.h>		/* LINUC |strn{x}chr(3uc)| */
+#include	<six.h>			/* LINUC |siext(3uc)| */
+#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"rmx.h"
 
@@ -100,8 +99,7 @@ int rmext(cchar *sp,int sl) noex {
 	    sl = -1 ;
 	} /* end if (non-null) */
     	return sl ;
-}
-/* end subroutine (rmext) */
+} /* end subroutine (rmext) */
 
 int rmcomment(cchar *lp,int ll) noex {
 	int		rl = -1 ;
@@ -112,7 +110,6 @@ int rmcomment(cchar *lp,int ll) noex {
 	    }
 	} /* end if (non-null) */
 	return rl ;
-}
-/* end subroutine (rmcomment) */
+} /* end subroutine (rmcomment) */
 
 
