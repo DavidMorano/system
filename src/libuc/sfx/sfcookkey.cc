@@ -74,7 +74,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	getkey(cchar *,int,cchar *,cchar **) noex ;
+local int	getkey(cchar *,int,cchar *,cchar **) noex ;
 
 
 /* local variables */
@@ -111,13 +111,12 @@ int sfcookkey(cchar *sp,int sl,cchar **rpp) noex {
 	    *rpp = (cl >= 0) ? cp : nullptr ;
 	}
 	return cl ;
-}
-/* end subroutine (sfcookkey) */
+} /* end subroutine (sfcookkey) */
 
 
 /* local subroutines */
 
-static int getkey(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
+local int getkey(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = -1 ; /* return-value */
 	cchar		*cp = nullptr ;
 	if (sp && ss) {
@@ -139,7 +138,5 @@ static int getkey(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	    *rpp = (cl >= 0) ? cp : nullptr ;
 	}
 	return cl ;
-}
-/* end subroutine (getkey) */
-
+} /* end subroutine (getkey) */
 
