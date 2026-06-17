@@ -112,7 +112,6 @@ int sfnextqtok(cchar *sp,int µsl,cchar **rpp) noex {
 	    len -= sl ;
 	} /* end if (getlenstr) */
 	return len ;
-}
-/* end subroutine (sfnextqtok) */
+} /* end subroutine (sfnextqtok) */
 
 
