@@ -42,19 +42,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdio>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<strn.h>		/* |strn{x}chr(3uc)| */
-#include	<six.h>			/* |siext(3uc)| */
-#include	<ischarx.h>		/* |iseol(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD  |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strn{x}chr(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"rmx.h"
 
@@ -89,7 +86,7 @@ extern "C" {
 local int rmxchr(strnx_f sx,cchar *sp,int sl,int ch) noex {
     	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (cchar *tp ; (tp = sx(sp,sl,ch)) != nullptr) {
+	    if (cchar *tp = sx(sp,sl,ch) ; tp) {
 	        sl = intconv(tp - sp) ;
 	    }
 	} else {
