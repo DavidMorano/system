@@ -91,20 +91,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<baops.h>		/* |batst(2uc)| */
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LINU */
+#include	<usysbase.h>		/* LINU */
+#include	<baops.h>		/* LIBU |batst(2uc)| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfnext.h"
 
 
 /* local defines */
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 
 /* imported namespaces */
@@ -135,7 +137,7 @@ namespace {
 	    bool	f = false ;
 	    ch &= UCHAR_MAX ;
 	    f = f || (ch == '\n') ;
-	    f = f || CHAR_ISWHITE(ch) ;
+	    f = f || ISWHT(ch) ;
 	    f = f || termx(ch) ;
 	    return f ;
 	} ;
@@ -155,7 +157,7 @@ namespace {
 /* exported subroutines */
 
 int sfnext(cchar *sp,int sl,cchar **rpp) noex {
-	sfnextx		sf(sp,sl,rpp) ;
+	sfnextx sf(sp,sl,rpp) ;
 	return sf ;
 } /* end subroutine (sfnext) */
 
@@ -217,7 +219,7 @@ sfnextx::operator int () noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
 	if (sp && rpp) ylikely {
-	    while (sl && CHAR_ISWHITE(*sp)) {
+	    while (sl && ISWHT(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
