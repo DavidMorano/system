@@ -102,14 +102,12 @@ namespace {
 int sfobrk(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
     	sfxbrk sx(strnobrk) ;
 	return sx(sp,sl,sb,rpp) ;
-}
-/* end subroutine (sfobrk) */
+} /* end subroutine (sfobrk) */
 
 int sfrbrk(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
     	sfxbrk sx(strnrbrk) ;
 	return sx(sp,sl,sb,rpp) ;
-}
-/* end subroutine (sfrbrk) */
+} /* end subroutine (sfrbrk) */
 
 
 /* local subroutines */
