@@ -56,13 +56,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnxchr(3uc)| */
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnxchr(3uc)| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -137,8 +137,8 @@ int sub_sfxchr::operator () (cchar *sp,int µsl,int sch,cchar **rpp) noex {
 	    while (sl && ISWHT(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
-	    if (cchar *tp ; (tp = fun(sp,sl,sch)) != nullptr) {
+	    } /* end while */
+	    if (cchar *tp = fun(sp,sl,sch) ; tp) {
 	        rl = intconv(tp - sp) ;
 		rp = sp ;
 	        while (rl && ISWHT(rp[rl - 1])) {
