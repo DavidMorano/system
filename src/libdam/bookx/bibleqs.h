@@ -89,8 +89,9 @@ extern int bibleqs_open(bibleqs *,cchar	 *,cchar *) noex ;
 extern int bibleqs_count(bibleqs *) noex ;
 extern int bibleqs_audit(bibleqs *) noex ;
 extern int bibleqs_curbegin(bibleqs *,bibleqs_cur *) noex ;
-extern int bibleqs_lookup(bibleqs *,bibleqs_cur *,int,cchar **) noex ;
-extern int bibleqs_read(bibleqs *,bibleqs_cur *,bibleqs_q *,char *,int) noex ;
+extern int bibleqs_curlook(bibleqs *,bibleqs_cur *,int,cchar **) noex ;
+extern int bibleqs_curenum(bibleqs *,bibleqs_cur *,bibleqs_q *,
+		char *,int) noex ;
 extern int bibleqs_curend(bibleqs *,bibleqs_cur *) noex ;
 extern int bibleqs_close(bibleqs *) noex ;
 
