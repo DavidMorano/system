@@ -6,7 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGTART	0		/* debug |vercite()| */
 #define	CF_DEUGMKDATA	0		/* debug make-data */
 #define	CF_EMPTYTERM	1		/* terminate entry on empty line */
 
@@ -36,7 +35,7 @@
 #include	<sys/stat.h>		/* POSIX */
 #include	<sys/mman.h>		/* POSIX */
 #include	<ctime>			/* CSTD */
-#include	<climits>		/* CSTD */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -68,6 +67,7 @@
 #include	<isoneof.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
+#include	<biblecite.h>		/* LIBDAM */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -96,6 +96,9 @@ import uconstants ;			/* |varname(3u)| + |sysword(3u)| */
 #define	INDDNAME	"bibleverses"
 #define	INDNAME		"bibleverses"
 #define	INDSUF		"vi"
+
+#define	ISWHT(ch)	iswhitelatin(ch)
+#define	ISDIG(ch)	isdigitlatin(ch)
 
 #define	DS		dirseen
 
@@ -240,9 +243,10 @@ local int	bvemk_finish	(bvimk_v *) noex ;
 
 local int	mkdname		(cchar *,mode_t) noex ;
 local int	checkdname	(cchar *) noex ;
-local int	vercite		(BVSS_Q *,cchar *,int) noex ;
 
+#ifdef	COMMENT
 local bool	isempty		(cchar *,int) noex ;
+#endif /* COMMENT */
 local bool	isNeedIndex	(int) noex ;
 
 
@@ -392,7 +396,7 @@ int bibleverses_audit(BVSS *op) noex {
 	return rs ;
 } /* end subroutine (bibleverses_audit) */
 
-int bibleverses_read(BVSS *op,char *vbuf,int vlen,BVSS_Q *qp) noex {
+int bibleverses_read(BVSS *op,char *vbuf,int vlen,con BVSS_Q *qp) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
 	if ((rs = bibleverses_magic(op,vbuf,qp)) >= 0) {
@@ -939,24 +943,17 @@ local int bibleverses_indmkdata(BVSS *op,cchar *indname,mode_t om) noex {
 	        bvimk_v		bve ;
 	        int		foff = 0 ;
 	        int		ml = intconv(op->filesize & INT_MAX) ;
-	        int		ll ;
-	        int		si ;
 	        bool		f_ent = false ;
 	        cchar		*mp = op->mapdata ;
-	        cchar		*lp ;
 	        for (cc *tp ; (tp = strnchr(mp,ml,'\n')) != np ; ) {
 	            cint len = intconv((tp + 1) - mp) ;
-	            lp = mp ;
-	            ll = (len - 1) ;
-	            if ((ll > 0) && (! isempty(lp,ll))) {
+		    cchar *lp ;
+		    if (int ll = sfcontent(mp,(len - 1),&lp) ; ll > 0) {
 #if	CF_DEBUG && CF_DEBUGMKDATA
 	                DEBUGPRINTF("line>%r<\n",lp,strlinelen(lp,ll,40)) ;
 #endif
-	                if ((tp = strnchr(lp,ll,'#')) != np) {
-	                    ll = intconv(tp - lp) ;
-	                }
-	                if ((rs = vercite(&q,lp,ll)) > 0) {
-			    si = rs ;
+	                if ((rs = biblecite_ver(&q,lp,ll)) > 0) {
+			    int si = rs ;
 	                    if (f_ent) {
 	                        c += 1 ;
 	                        if ((rs = bvemk_start(&bve,&e)) >= 0) {
@@ -981,7 +978,7 @@ local int bibleverses_indmkdata(BVSS *op,cchar *indname,mode_t om) noex {
 	                    if (f_ent) {
 	                        rs = entry_add(&e,foff,ll) ;
 	                    } /* end if (entry) */
-	                } /* end if (entry start of add) */
+	                } /* end if (biblecite_ver) */
 	            } else {
 			if_constexpr (f_emptyterm) {
 	                    if (f_ent) {
@@ -1225,72 +1222,12 @@ vars::operator int () noex {
     	return rs ;
 } /* end if (vars::operator) */
 
-/****
-  0	=start-no
-  >0	=start-yes	- and this is the beginning of the remaining text
-  <0	=error
-****/
-local int vercite(BVSS_Q *qp,cchar *lp,int ll) noex {
-    	int		rs = SR_FAULT ;
-	int		si = 0 ; /* return-value */
-	if (lp && qp) {
-	    int		sl = ll ;
-	    cchar	*sp = lp ;
-	    DEBUGPRINTF("ent l=>%r<\n",lp,strlinelen(lp,ll,40)) ;
-	    if (CHAR_ISWHITE(sp[0]) && ((si = siskipwhite(lp,ll)) > 0)) {
-	        sp += si ;
-	        sl -= si ;
-	    } /* end if */
-	    if (int ch = MKCHAR(sp[0]) ; (sl >= 5) && isdigitlatin(ch)) {
-	        bool	f = false ;
-	        for (int i = 0 ; i < 3 ; i += 1) {
-	            cchar	*cp = sp ;
-	            int		cl = sl ;
-	            if (cchar *tp = strnbrk(sp,sl,": \t\n") ; tp) {
-	                cl = intconv(tp - sp) ;
-	                sl -= intconv((tp + 1) - sp) ;
-	                sp = (tp + 1) ;
-	            } else {
-	                cl = sl ;
-	                sp += sl ;
-	                sl = 0 ;
-	            } /* end if */
-	            if (cl == 0) break ;
-	            si = intconv((cp + cl) - lp) ;
-	            if (int v ; (rs = cfdeci(cp,cl,&v)) >= 0) {
-	                switch (i) {
-	                case 0:
-	                    qp->b = uchar(v) ;
-	                    break ;
-	                case 1:
-	                    qp->c = uchar(v) ;
-	                    break ;
-	                case 2:
-	                    qp->v = uchar(v) ;
-	                    break ;
-	                } /* end switch */
-		    } else {
-	                DEBUGPRINTF("cfdeci() rs=%d\n",rs) ;
-		    } /* end if (cfdec) */
-		    f = (i == 3) ;
-		    if (rs < 0) break ;
-	        } /* end for */
-	        if (f) {
-	            si += siskipwhite(sp,sl) ;
-		} else {
-		    si = 0 ;
-	        }
-	    } /* end if (have a start) */
-	} /* end if (non-null) */
-	DEBUGPRINTF("ret rs=%d si=%u\n",rs,si) ;
-	return (rs >= 0) ? si : rs ;
-} /* end subroutine (vercite) */
-
+#ifdef	COMMENT
 local bool isempty(cchar *lp,int ll) noex {
 	bool		f = false ;
 	f = f || (ll == 0) ;
 	f = f || (lp[0] == '#') ;
-	if ((! f) && CHAR_ISWHITE(*lp)) {
+	if ((! f) && ISWHT(*lp)) {
 	    cchar	*cp ;
 	    cint cl = sfskipwhite(lp,ll,&cp) ;
 	    f = f || (cl == 0) ;
@@ -1298,6 +1235,7 @@ local bool isempty(cchar *lp,int ll) noex {
 	} /* end if */
 	return f ;
 } /* end subroutine (isempty) */
+#endif /* COMMENT */
 
 local bool isNeedIndex(int rs) noex {
 	bool		f = false ;
