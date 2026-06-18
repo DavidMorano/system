@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-#define	BVCITEKEY		struct bvcitekey_head
+#define	BVCITEKEY	struct bvcitekey_head
 
 
 const uint		bvcitekey_vmask = 0x00FFFFFFU ;
