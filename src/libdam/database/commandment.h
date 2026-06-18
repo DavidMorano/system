@@ -43,8 +43,8 @@ struct commandment_cursor {
 
 struct commandment_head {
 	modload		*mlp ;		/* module-load-pointer */
-	void		*obj ;		/* object pointer */
 	void		*callp ;
+	void		*obj ;		/* object pointer */
 	COMMANDMENT_FL	fl ;
 	uint		magval ;
 	int		objsz ;
