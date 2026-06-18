@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 enum localfses {
@@ -55,7 +55,6 @@ enum localfses {
 	localfs_sysv,
 	localfs_overlast
 } ; /* end enum (localfses) */
-
 
 EXTERNC_begin
 
