@@ -5,6 +5,7 @@
 /* BIBLEBOOK object-load management */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -36,6 +37,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -52,16 +54,41 @@ import libutil ;			/* |memclear(3u)| */
 #define	BIBLEBOOK_MODBNAME	"biblebooks"
 #define	BIBLEBOOK_OBJNAME	"biblebooks"
 
-#ifndef	SYMNAMELEN
-#define	SYMNAMELEN	60
-#endif
-
 #define	BB		biblebook
+#define	BB_FL		biblebook_fl
+#define	BB_CA		biblebook_calls
+#define	BB_MAG		BIBLEBOOK_MAGIC
 #define	BB_LEN		BIBLEBOOK_LEN
 
 #define	tolc(c)		CHAR_TOLC(c)
 #define	touc(c)		CHAR_TOUC(c)
 #define	tofc(c)		CHAR_TOFC(c)
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
+
+/* imported namespaces */
+
+using libic::mem ;		/* variable */
+
+
+/* local typedefs */
+
+extern "C" {
+    typedef int	(*soopen_f)	(void *,cchar *,cchar *) noex ;
+    typedef int	(*socount_f)	(void *) noex ;
+    typedef int	(*somax_f)	(void *) noex ;
+    typedef int	(*solook_f)	(void *,char *,int,int) noex ;
+    typedef int	(*soget_f)	(void *,int,char *,int) noex ;
+    typedef int	(*somatch_f)	(void *,cchar *,int) noex ;
+    typedef int	(*sosize_f)	(void *) noex ;
+    typedef int	(*soaudit_f)	(void *) noex ;
+    typedef int	(*soclose_f)	(void *) noex ;
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -69,15 +96,79 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
+struct biblebook_calls {
+    soopen_f		open ;
+    socount_f		count ;
+    somax_f		max ;
+    solook_f		look ;
+    soget_f		get ;
+    somatch_f		match ;
+    sosize_f		size ;
+    soaudit_f		audit ;
+    soclose_f		close ;
+} ; /* end struct (biblebook_calls) */
+
+typedef biblebook_calls *	callsp ;
+
 
 /* forward references */
 
-local int	biblebook_openload(BB *,cchar *,cchar *) noex ;
-local int	biblebook_openlocal(BB *) noex ;
+template<typename ... Args>
+local int biblebook_ctor(BB *op,Args ... args) noex {
+	BIBLEBOOK	*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->mlp = new(nt) modload) != np) ylikely {
+		biblebook_calls    *callp ;
+                if ((callp = new(nt) biblebook_calls) != np) ylikely {
+                    op->callp = callp ;
+                    rs = SR_OK ;
+                } /* end if (new-biblebook_calls) */
+                if (rs < 0) {
+                    delete op->mlp ;
+                    op->mlp = nullptr ;
+                } /* end if (error) */
+	    } /* end if (new-modload) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (biblebook_ctor) */
 
-local int	biblebook_objloadbegin(BB *,cchar *,cchar *) noex ;
-local int	biblebook_objloadend(BB *) noex ;
-local int	biblebook_loadcalls(BB *,cchar *) noex ;
+local int biblebook_dtor(BB *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+            if (op->callp) ylikely {
+                biblebook_calls    *callp = callsp(op->callp) ;
+                delete callp ;
+                op->callp = nullptr ;
+            }
+	    if (op->mlp) ylikely {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (biblebook_dtor) */
+
+template<typename ... Args>
+local inline int biblebook_magic(BB *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == BB_MAG) ? SR_OK : SR_NOTOPEN ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (biblebook_magic) */
+
+local int	biblebook_objloadbegin	(BB *,cchar *,cchar *) noex ;
+local int	biblebook_objloadend	(BB *) noex ;
+local int	biblebook_loadcalls	(BB *,vecstr *) noex ;
+
+local int	biblebook_opendb(BB *,cchar *,cchar *) noex ;
+local int	biblebook_openlocal(BB *) noex ;
 
 local int	biblebook_matcher(BB *,cchar *,int) noex ;
 local int	biblebook_loadnames(BB *) noex ;
@@ -98,7 +189,7 @@ enum subs {
 	sub_open,
 	sub_count,
 	sub_max,
-	sub_lookup,
+	sub_look,
 	sub_get,
 	sub_match,
 	sub_size,
@@ -114,7 +205,7 @@ namespace {
 	    n[sub_open]		= "open" ;
 	    n[sub_count]	= "count" ;
 	    n[sub_max]		= "max" ;
-	    n[sub_lookup]	= "lookup" ;
+	    n[sub_look]		= "look" ;
 	    n[sub_get]		= "get" ;
 	    n[sub_match]	= "match" ;
 	    n[sub_size]		= "size" ;
@@ -125,7 +216,7 @@ namespace {
     } ; /* end struct (subnamer) */
 } /* end namespace */
 
-constexpt cpcchar	booknames[] = {
+constexpr cpcchar	booknames[] = {
 	"Bible",
 	"Genesis",
 	"Exodus",
@@ -205,51 +296,53 @@ cint			bb_len		= BB_LEN ;
 
 /* exported subroutines */
 
-int biblebook_open(BB *op,cchar *pr,cchar *dbname) noex {
-	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	if ((rs = biblebook_openload(op,pr,dbname)) == SR_NOENT) {
+local int biblebook_opens(BB *op,cchar *pr,cchar *dbn) noex {
+    	int		rs ;
+	if ((rs = biblebook_opendb(op,pr,dbn)) == SR_NOENT) {
 	    rs = biblebook_openlocal(op) ;
 	}
-	if (rs >= 0) {
-	    op->magval = BIBLEBOOK_MAGIC ;
-	}
+	return rs ;
+} /* end subroutine (biblebook_opens) */
 
+int biblebook_open(BB *op,cchar *pr,cchar *dbn) noex {
+	int		rs ;
+	if ((rs = biblebook_ctor(op,pr,dbn)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0] && dbn[0]) {
+		if ((rs = biblebook_opens(op,pr,dbn)) >= 0) {
+	    	    op->magval = BIBLEBOOK_MAGIC ;
+		}
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		biblebook_dtor(op) ;
+	    } /* end if (error) */
+	} /* end if (biblebook_ctor) */
 	return rs ;
 } /* end subroutine (biblebook_open) */
 
 int biblebook_close(BB *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEBOOK_MAGIC) return SR_NOTOPEN ;
-
-	if (op->names != nullptr) {
-	    rs1 = uc_free(op->names) ;
+	if ((rs = biblebook_close(op)) >= 0) {
+	if (op->names) {
+	    voidp vp = voidp(op->names) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->names = nullptr ;
 	}
-
 	if (! op->fl.localdb) {
-
+	    {
 	    rs1 = (*op->call.close)(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-
+	    }
+	    {
 	    rs1 = biblebook_objloadend(op) ;
 	    if (rs >= 0) rs = rs1 ;
+	    }
 
 	} /* end if */
-
 	op->magval = 0 ;
+	} /* end if (biblebook_magic) */
 	return rs ;
 } /* end subroutine (biblebook_close) */
 
@@ -299,7 +392,7 @@ int biblebook_audit(BB *op) noex {
 	return rs ;
 } /* end subroutine (biblebook_audit) */
 
-int biblebook_lookup(BB *op,char *rbuf,int rlen,int bi) noex {
+int biblebook_look(BB *op,char *rbuf,int rlen,int bi) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -317,18 +410,18 @@ int biblebook_lookup(BB *op,char *rbuf,int rlen,int bi) noex {
 	        rs = SR_NOTFOUND ;
 	    }
 	} else {
-	    rs = (*op->call.lookup)(op->obj,rbuf,rlen,bi) ;
+	    rs = (*op->call.look)(op->obj,rbuf,rlen,bi) ;
 	}
 
 	return rs ;
-} /* end subroutine (biblebook_lookup) */
+} /* end subroutine (biblebook_look) */
 
 int biblebook_read(BB *op,char *rbuf,int rlen,int bi) noex {
-	return biblebook_lookup(op,rbuf,rlen,bi) ;
+	return biblebook_look(op,rbuf,rlen,bi) ;
 } /* end subroutine (biblebook_read) */
 
 int biblebook_get(BB *op,int bi,char *rbuf,int rlen) noex {
-	return biblebook_lookup(op,rbuf,rlen,bi) ;
+	return biblebook_look(op,rbuf,rlen,bi) ;
 } /* end subroutine (biblebook_get) */
 
 int biblebook_match(BB *op,cchar *mbuf,int mlen) noex {
@@ -354,6 +447,7 @@ int biblebook_match(BB *op,cchar *mbuf,int mlen) noex {
 } /* end subroutine (biblebook_match) */
 
 int biblebook_size(BB *op) noex {
+    	int		rs ;
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magval != BIBLEBOOK_MAGIC) return SR_NOTOPEN ;
 	return biblebook_loadnames(op) ;
@@ -362,77 +456,78 @@ int biblebook_size(BB *op) noex {
 
 /* private subroutines */
 
-local int biblebook_openload(BB *op,cchar *pr,cchar *dbname) noex {
+local int biblebook_opendb(BB *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
-	cchar	*objname = BIBLEBOOK_OBJNAME ;
-
-	if ((rs = biblebook_objloadbegin(op,pr,objname)) >= 0) {
-	    rs = (*op->call.open)(op->obj,pr,dbname) ;
-	    if (rs < 0)
-	        biblebook_objloadend(op) ;
-	}
-
+	cchar		*objname = BIBLEBOOK_OBJNAME ;
+        if ((rs = biblebook_objloadbegin(op,pr,objname)) >= 0) ylikely {
+            biblebook_calls *callp = callsp(op->callp) ;
+            rs = SR_NOSYS ;
+            if (cauto co = callp->open ; co) ylikely {
+                if ((rs = co(op->obj,pr,dbn)) >= 0) ylikely {
+                    op->magval = BQ_MAG ;
+                }
+            } /* end if (non-null) */
+            if (rs < 0) {
+                biblebook_objloadend(op) ;
+            } /* end if (error) */
+        } /* end if (objload-begin) */
 	return rs ;
-} /* end subroutine (biblebook_openload) */
+} /* end subroutine (biblebook_opendb) */
 
 local int biblebook_openlocal(BB *op) noex {
-	op->fl.localdb = true ;
-	return SR_OK ;
+    	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    op->fl.localdb = true ;
+	    rs = SR_OK ;
+	}
+	return rs ;
 } /* end subroutine (biblebook_openlocal) */
 
 local int biblebook_objloadbegin(BB *op,cchar *pr,cchar *objn) noex {
-	modload		*lp = &op->loader ;
-	cint		n = sub_overlast ;
+	modload		*mlp = op->mlp ;
+	cint		vn = sub_overlast ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-
-	cint vo = vecstrm.compact ;
-	vecstr		syms ;
-	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-	    cint	nlen = SYMNAMELEN ;
-	    int		i ;
-	    int		f_modload = false ;
-	    char	nbuf[SYMNAMELEN + 1] ;
-
-	    for (i = 0 ; (i < n) && subname.n[i] ; i += 1) {
-	        if (isrequired(i)) {
-	            if ((rs = sncpy3(nbuf,nlen,objn,"_",subname.n[i])) >= 0) {
-			rs = vecstr_add(&syms,nbuf,rs) ;
-		    }
-		}
-		if (rs < 0) break ;
-	    } /* end for */
-	    if (rs >= 0) {
-		cchar	**sv ;
-	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            cchar	*modbname = BIBLEBOOK_MODBNAME ;
-	            opts = (modloadm.libvar | modloadm.libsdirs) ;
-	            rs = modload_open(lp,pr,modbname,objn,opts,sv) ;
-		    f_modload = (rs >= 0)  ;
-		}
-	    } /* end if (ok) */
-	    rs1 = vecstr_finish(&syms) ;
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) ylikely {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
+	            cchar	*mn = BB_MODBNAME ;
+	            cchar	*on = objn ;
+	            int		mo = 0 ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
+	            mo |= modloadm.avail ;
+	            if ((rs = modload_open(mlp,pr,mn,on,mo,sv)) >= 0) ylikely {
+		        op->fl.modload = true ;
+	                if (int mv[2] ; (rs = modload_getmva(mlp,mv,2)) >= 0) {
+			    cint	osz = mv[0] ;
+	                    op->objsz = mv[0] ;
+	                    op->cursz = mv[1] ;
+			    if (void *vp ; (rs = mem.mall(osz,&vp)) >= 0) {
+	                        op->obj = vp ;
+	                        rs = biblebook_loadcalls(op,&syms) ;
+	                        if (rs < 0) {
+	                            mem.free(op->obj) ;
+	                            op->obj = nullptr ;
+	                        } /* end if (error) */
+	                    } /* end if (memory-allocation) */
+	                } /* end if (modload_getmva) */
+	                if (rs < 0) {
+		            op->fl.modload = false ;
+	                    modload_close(mlp) ;
+	                } /* end if (error) */
+	            } /* end if (modload_open) */
+		} /* end if (vecstr_getvec) */
+	    } /* end if (vecstr_addsyms) */
+	    rs1 = syms.finish ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_modload) {
-		modload_close(lp) ;
+	    if ((rs < 0) && op->fl.modload) {
+		op->fl.modload = false ;
+		modload_close(mlp) ;
 	    } /* end if (error) */
-	} /* end if (allocation) */
-	if (rs >= 0) {
-	    if ((rs = modload_getmv(lp,0)) >= 0) {
-		op->objsize = rs ;
-		if (void *p ; (rs = uc_malloc(op->objsize,&p)) >= 0) {
-		    op->obj = p ;
-		    rs = biblebook_loadcalls(op,objn) ;
-		    if (rs < 0) {
-			uc_free(op->obj) ;
-			op->obj = nullptr ;
-		    } /* end if (error) */
-		} /* end if (memory-allocation) */
-	    } /* end if (getmva) */
-	    if (rs < 0) {
-		modload_close(lp) ;
-	    } /* end if (erro) */
-	} /* end if (ok) */
+	} /* end if (vecstr-syms) */
 	return rs ;
 } /* end subroutine (biblebook_objloadbegin) */
 
@@ -440,17 +535,65 @@ local int biblebook_objloadend(BB *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
-	    rs1 = uc_free(op->obj) ;
+	    rs1 = mem.free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
-	}
-	{
-	rs1 = modload_close(&op->loader) ;
-	if (rs >= 0) rs = rs1 ;
-	}
+	} /* end if (memory-release) */
+	if (op->mlp && op->fl.modload) {
+	    op->fl.modload = false ;
+	    rs1 = modload_close(op->mlp) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if */
 	return rs ;
 } /* end subroutine (biblebook_objloadend) */
 
+local int biblebook_loadcalls(BB *op,vecstr *slp) noex {
+	modload		*mlp = op->mlp ;
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	cchar		*sname{} ;
+	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) ylikely {
+	    if (cvoid *snp{} ; (rs = modload_getsym(mlp,sname,&snp)) >= 0) {
+                biblebook_calls   *callp = callsp(op->callp) ;
+                c += 1 ;
+                switch (i) {
+                case sub_open:
+                    callp->open		= soopen_f(snp) ;
+                    break ;
+                case sub_count:
+                    callp->count	= socount_f(snp) ;
+                    break ;
+                case sub_curbegin:
+                    callp->curbegin	= socurbegin_f(snp) ;
+                    break ;
+                case sub_curend:
+                    callp->curend	= socurend_f(snp) ;
+                    break ;
+                case sub_curenum:
+                    callp->curenum	= socurenum_f(snp) ;
+                    break ;
+                case sub_curlook:
+                    callp->curlook	= socurlook_f(snp) ;
+                    break ;
+                case sub_audit:
+                    callp->audit	= soaudit_f(snp) ;
+                    break ;
+                case sub_close:
+                    callp->close	= soclose_f(snp) ;
+                    break ;
+                } /* end switch */
+            } else if (rs == rsn) {
+                if (! isrequired(i)) rs = SR_OK ;
+            } /* end if (it had the call) */
+	    if (rs < 0) break ;
+	} /* end for (vecstr_get) */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (biblebook_loadcalls) */
+
+#ifdef	COMMENT
 local int biblebook_loadcalls(BB *op,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	cint		nlen = SYMNAMELEN ;
@@ -483,8 +626,8 @@ local int biblebook_loadcalls(BB *op,cchar *objname) noex {
 	        case sub_max:
 	            op->call.max = (int (*)(void *)) snp ;
 	            break ;
-	        case sub_lookup:
-	            op->call.lookup = (int (*)(void *,char *,int,int)) snp ;
+	        case sub_look:
+	            op->call.look = (int (*)(void *,char *,int,int)) snp ;
 	            break ;
 	        case sub_get:
 	            op->call.get = (int (*)(void *,int,char *,int)) snp ;
@@ -508,29 +651,24 @@ local int biblebook_loadcalls(BB *op,cchar *objname) noex {
 
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (biblebook_loadcalls) */
+#endif /* COMMENT */
 
 local int biblebook_matcher(BB *op,cchar *mbuf,int mlen) noex {
 	int		rs = SR_OK ;
-	int		i = 0 ;
-
+	int		i = 0 ; /* return-value */
 	if (op->names == nullptr) {
 	    rs = biblebook_loadnames(op) ;
 	}
-
 	if (rs >= 0) {
-	    int		ml ;
+	    int		ml = MIN(mlen,bb_len) ;
 	    int		bl ;
 	    char	bbuf[bb_len + 1] ;
-
-	    ml = MIN(mlen,bb_len) ;
-	    bl = strwcpyspecial(bbuf,mbuf,ml) - bbuf ;
-
-	    rs = matostr(op->names,1,bbuf,bl) ;
-	    i = rs ;
-	    if (rs < 0) rs = SR_NOTFOUND ;
-
+	    {
+	        bl = strwcpyspecial(bbuf,mbuf,ml) - bbuf ;
+	    }
+	    i = matostr(op->names,1,bbuf,bl) ;
+	    if (i < 0) rs = SR_NOTFOUND ;
 	} /* end if (ok) */
-
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (biblebook_matcher) */
 
@@ -551,20 +689,18 @@ local int biblebook_loadnames(BB *op) noex {
 local int biblebook_loadnameslocal(BB *op) noex {
 	int		rs ;
 	int		sizetab ;
-	int		size = 0 ;
-	int		namesize = 0 ;
-	int		n ;
+	int		sz = 0 ;
+	int		namesize = 0 ; /* return-value */
+	int		n ; /* used-afterwards */
 	char		*mp ;
-
-	for (n = 0 ; booknames[n] != nullptr ; n += 1) {
+	for (n = 0 ; booknames[n] ; n += 1) {
 	    namesize += (lenstr(booknames[n]) + 1) ;
-	}
-
+	} /* end for */
 	sizetab = (n + 1) * szof(cchar *) ;
-	size += sizetab ;
-	size += namesize ;
-	if ((rs = uc_malloc(size,&mp)) >= 0) {
-	    int		i ;
+	sz += sizetab ;
+	sz += namesize ;
+	if ((rs = mem.mall(sz,&mp)) >= 0) {
+	    int		i ; /* used-afterwards */
 	    cchar	**names = (cchar **) mp ;
 	    char	*bp = mp ;
 	    bp = (mp + sizetab) ;
@@ -576,8 +712,7 @@ local int biblebook_loadnameslocal(BB *op) noex {
 	    names[i] = nullptr ;
 	    op->names = names ;
 	    op->namesize = namesize ;
-	} /* end if (memory-allocation) */
-
+	} /* end if (memory-acquire) */
 	return (rs >= 0) ? namesize : rs ;
 } /* end subroutine (biblebook_loadnameslocal) */
 
@@ -585,9 +720,8 @@ local int biblebook_loadnamesremote(BB *op) noex {
 	cint		blen = bb_len ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
-	int		namesize = 0 ;
+	int		namesize = 0 ; /* return-value */
 	char		bbuf[bb_len + 1] ;
-
 	if (op->call.size != nullptr) {
 	    if ((rs = (*op->call.size)(op->obj)) >= 0) {
 		namesize = rs ;
@@ -604,17 +738,16 @@ local int biblebook_loadnamesremote(BB *op) noex {
 	        }
 	    } /* end for */
 	} /* end if */
-
 	if (rs >= 0) {
 	    cint	sizetab = (n + 1) * szof(cchar *) ;
-	    int		size = namesize ;
+	    int		sz = namesize ;
 	    int		bl ;
 	    char	*mp ;
-	    size += sizetab ;
-	    if ((rs = uc_malloc(size,&mp)) >= 0) {
-		int		i ;
+	    sz += sizetab ;
+	    if ((rs = mem.mall(sz,&mp)) >= 0) {
+		int	i ; /* used-afterwards */
 		cchar	**names = (cchar **) mp ;
-		char		*bp = (mp + sizetab) ;
+		char	*bp = (mp + sizetab) ;
 	        op->namestrs = bp ;
 	        for (i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	            if ((rs = (*op->call.get)(op->obj,i,bbuf,blen)) >= 0) {
@@ -626,12 +759,12 @@ local int biblebook_loadnamesremote(BB *op) noex {
 	        names[i] = nullptr ;
 	        op->namesize = namesize ;
 	        if (rs < 0) { /* should not or cannot fail! */
-	            uc_free(mp) ;
-	        } else
+	            mem._free(mp) ;
+	        } else {
 	            op->names = names ;
+		}
 	    } /* end if (m-a) */
 	} /* end if (ok) */
-
 	return (rs >= 0) ? namesize : rs ;
 } /* end subroutine (biblebook_loadnamesremote) */
 
@@ -640,7 +773,7 @@ local bool isrequired(int i) noex {
 	switch (i) {
 	case sub_open:
 	case sub_count:
-	case sub_lookup:
+	case sub_look:
 	case sub_close:
 	    f = true ;
 	    break ;
