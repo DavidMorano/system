@@ -27,45 +27,30 @@
 
 #define	BIBLEBOOK		struct biblebook_head
 #define	BIBLEBOOK_FL		struct biblebook_flags
-#define	BIBLEBOOK_CA		struct biblebook_calls
 #define	BIBLEBOOK_MAGIC		0x99447242
 #define	BIBLEBOOK_LEN		80 /* bible-book-name length */
 #define	BIBLEBOOK_NBOOKS	66
 
 
-EXTERNC_begin
-struct biblebook_calls {
-	int	(*open)(void *,cchar *,cchar *) ;
-	int	(*count)(void *) ;
-	int	(*max)(void *) ;
-	int	(*lookup)(void *,char *,int,int) ;
-	int	(*get)(void *,int,char *,int) ;
-	int	(*match)(void *,cchar *,int) ;
-	int	(*size)(void *) ;
-	int	(*audit)(void *) ;
-	int	(*close)(void *) ;
-} ; /* end struct */
-EXTERNC_end
-
 struct biblebook_flags {
+        uint		modload:1 ;	/* dynamic load module */
 	int		localdb:1 ;	/* using local DB */
 } ; /* end struct */
 
 struct biblebook_head {
-	modload		loader ;
+	modload		*mlp ;		/* module-loeader-pointer */
+	void		callp ;		/* call-pointer */
 	void		*obj ;		/* object pointer */
 	cchar		**names ;
 	cchar		*namestrs ;
-	BIBLEBOOK_CA	call ;
 	BIBLEBOOK_FL	fl ;
 	uint		magval ;
-	int		objsize ;	/* object size */
+	int		objsz ;		/* object size */
 	int		namesize ;	/* names-size */
 } ; /* end struct */
 
 typedef	BIBLEBOOK		biblebook ;
 typedef	BIBLEBOOK_FL		biblebook_fl ;
-typedef	BIBLEBOOK_CA		biblebook_ca ;
 
 EXTERNC_begin
 
@@ -73,7 +58,7 @@ extern int	biblebook_open	(biblebook *,cchar *,cchar *) noex ;
 extern int	biblebook_count	(biblebook *) noex ;
 extern int	biblebook_max	(biblebook *) noex ;
 extern int	biblebook_read	(biblebook *,char *,int,int) noex ;
-extern int	biblebook_lookup(biblebook *,char *,int,int) noex ;
+extern int	biblebook_look	biblebook *,char *,int,int) noex ;
 extern int	biblebook_get	(biblebook *,int,char *,int) noex ;
 extern int	biblebook_match	(biblebook *,cchar *,int) noex ;
 extern int	biblebook_size	(biblebook *) noex ;
