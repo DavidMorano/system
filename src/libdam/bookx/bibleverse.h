@@ -21,9 +21,11 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<modload.h>		/* LIBUC */
 #include	<bibleverses.h>		/* LIBDAM */
+#include	<biblecite.h>		/* LIBDAM */
 
 
 #define	BIBLEVERSE		struct bibleverse_head
+#define	BIBLEVERSE_FL		struct bibleverse_flags
 #define	BIBLEVERSE_Q		struct bibleverse_query
 #define	BIBLEVERSE_CITE		struct bibleverse_query
 #define	BIBLEVERSE_CUR		struct bibleverse_cursor
@@ -32,48 +34,36 @@
 #define	BIBLEVERSE_MAGIC	0x99447246
 
 
+struct bibleverse_flags {
+        uint		modload:1 ;
+} ; /* end struct */
+
 struct bibleverse_information {
-	time_t	dbtime ;		/* db-time */
-	time_t	vitime ;		/* vi-time */
-	uint	maxbook ;
-	uint	maxchapter ;
-	uint	nverses ;
-	uint	nzverses ;
+	time_t		dbtime ;	/* db-time */
+	time_t		vitime ;	/* vi-time */
+	uint		maxbook ;
+	uint		maxchap ;
+	uint		nverses ;
+	uint		nzverses ;
 } ; /* end struct */
 
 struct bibleverse_query {
-	uchar	b, c, v ;
+	uchar		b, c, v ;
 } ; /* end struct */
 
 struct bibleverse_cursor {
-	void	*scp ;
-	uint	magval ;
+	void		*scp ;
+	uint		magval ;
 } ; /* end struct */
 
-EXTERNC_begin
-struct bibleverse_calls {
-	int	(*open)(void *,cchar *,cchar *) noex ;
-	int	(*count)(void *) noex ;
-	int	(*read)(void *,char *,int,BIBLEVERSES_QUERY *) noex ;
-	int	(*get)(void *,BIBLEVERSES_QUERY *,char *,int) noex ;
-	int	(*curbegin)(void *,BIBLEVERSES_CUR *) noex ;
-	int	(*enumerate)(void *,BIBLEVERSES_CUR *,
-			BIBLEVERSES_QUERY *,char *,int) noex ;
-	int	(*curend)(void *,BIBLEVERSES_CUR *) noex ;
-	int	(*audit)(void *) noex ;
-	int	(*info)(void *,BIBLEVERSES_INFO *) noex ;
-	int	(*chapters)(void *,int,uchar *,int) noex ;
-	int	(*close)(void *) noex ;
-} ;
-EXTERNC_end
-
 struct bibleverse_head {
-	void		*obj ;		/* object pointer */
 	modload		*mlp ;
-	BIBLEVERSE_CA	*callp ;
+	void		*callp ;
+	void		*obj ;		/* object pointer */
+	BIBLEVERSE_FL	fl ;
 	uint		magval ;
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size */
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
 } ; /* end struct */
 
 typedef	BIBLEVERSE		bibleverse ;
@@ -87,8 +77,10 @@ EXTERNC_begin
 
 extern int	bibleverse_open(bibleverse *,cchar *,cchar *) noex ;
 extern int	bibleverse_count(bibleverse *) noex ;
-extern int	bibleverse_read(bibleverse *,char *,int,bibleverse_q *) noex ;
-extern int	bibleverse_get(bibleverse *,bibleverse_q *,char *,int) noex ;
+extern int	bibleverse_read(bibleverse *,char *,int,
+			con bibleverse_q *) noex ;
+extern int	bibleverse_get(bibleverse *,con bibleverse_q *,
+			char *,int) noex ;
 extern int	bibleverse_curbegin(bibleverse *,bibleverse_cur *) noex ;
 extern int	bibleverse_curenum(bibleverse *,bibleverse_cur *,
 			bibleverse_q *,char *,int) noex ;
