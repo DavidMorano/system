@@ -264,8 +264,7 @@ int commandments_open(CMS *op,cchar *pr,cchar *dbn) noex {
 	    } /* end if (error) */
 	} /* end if (ctor) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (commandments_open) */
+} /* end subroutine (commandments_open) */
 
 int commandments_close(CMS *op) noex {
 	int		rs = SR_OK ;
@@ -357,8 +356,7 @@ int commandments_read(CMS *op,char *vbuf,int vlen,uint cn) noex {
 	} /* end if (magic) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (commandments_read) */
+} /* end subroutine (commandments_read) */
 
 int commandments_curbegin(CMS *op,CMS_CUR *curp) noex {
 	int		rs ;
