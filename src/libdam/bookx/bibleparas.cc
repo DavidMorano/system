@@ -50,6 +50,7 @@
 #include	<vecstr.h>		/* LIBUC */
 #include	<expcook.h>		/* LIBUC */
 #include	<dirseen.h>		/* LIBUC */
+#include	<biblecite.h>		/* LIBDAM */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"bibleparas.h"
@@ -305,7 +306,7 @@ int bibleparas_audit(BIBLEPARAS *op) {
 } /* end subroutine (bibleparas_audit) */
 
 /* get a string by its index */
-int bibleparas_ispara(BIBLEPARAS *op,BIBLEPARAS_Q *qp) {
+int bibleparas_ispara(BIBLEPARAS *op,con BIBLEPARAS_Q *qp) {
 	time_t		dt = 0 ;
 	int		rs = SR_OK ;
 	int		f = false ;
@@ -418,7 +419,7 @@ int bibleparas_curenum(BIBLEPARAS *op,BIBLEPARAS_CUR *curp,BIBLEPARAS_Q *qp) {
 	return rs ;
 } /* end subroutine (bibleparas_curenum) */
 
-int bibleparas_info(BIBLEPARAS *op,BIBLEPARAS_INFO *ip) {
+int bibleparas_getinfo(BIBLEPARAS *op,BIBLEPARAS_INFO *ip) noex {
 	BPI_INFO	bi ;
 	int		rs ;
 	int		nverses = 0 ;
@@ -429,7 +430,7 @@ int bibleparas_info(BIBLEPARAS *op,BIBLEPARAS_INFO *ip) {
 	if (op->magval != BIBLEPARAS_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if ((rs = bpi_info(&op->vind,&bi)) >= 0) {
+	if ((rs = bpi_getinfo(&op->vind,&bi)) >= 0) {
 	    nverses = bi.count ;
 	    if (ip != nullptr) {
 	        memclear(ip) ;
@@ -440,10 +441,10 @@ int bibleparas_info(BIBLEPARAS *op,BIBLEPARAS_INFO *ip) {
 	        ip->nverses = bi.count ;
 	        ip->nzverses = bi.nzverses ;
 	    }
-	} /* end if (bpi_info) */
+	} /* end if (bpi_getinfo) */
 
 	return (rs >= 0) ? nverses : rs ;
-} /* end subroutine (bibleparas_info) */
+} /* end subroutine (bibleparas_getinfo) */
 
 
 /* private subroutines */
@@ -767,15 +768,16 @@ local int bibleparas_indopencheck(BIBLEPARAS *op,cchar *dbname) noex {
 
 	if ((rs = bpi_open(&op->vind,dbname)) >= 0) {
 	    BPI_INFO	binfo ;
-	    if ((rs = bpi_info(&op->vind,&binfo)) >= 0) {
+	    if ((rs = bpi_getinfo(&op->vind,&binfo)) >= 0) {
 		if (binfo.ctime >= op->ti_db) {
 		    op->fl.vind = true ;
 		} else {
 		    rs = SR_STALE ;
 		}
-	    } /* end if (bpi_info) */
-	    if (rs < 0)
+	    } /* end if (bpi_getinfo) */
+	    if (rs < 0) {
 	        bpi_close(&op->vind) ;
+	    }
 	} /* end if (bpi_open) */
 
 #if	CF_DEBUG
@@ -828,7 +830,7 @@ local int bibleparas_indmkdata(BIBLEPARAS *op,cchar indname[],mode_t om) noex {
 	        int		ml = op->mapsize ;
 	        int		ll ;
 	        int		si ;
-	        int		f_ent = false ;
+	        bool		f_ent = false ;
 	        cchar		*mp = op->mapdata ;
 		cchar		*lp ;
 	        cchar		*tp ;
@@ -845,9 +847,9 @@ local int bibleparas_indmkdata(BIBLEPARAS *op,cchar indname[],mode_t om) noex {
 		lp,strnlen(lp,MIN(ll,40))) ;
 #endif
 
-	        if ((tp = strnchr(lp,ll,'#')) != nullptr)
+	        if ((tp = strnchr(lp,ll,'#')) != nullptr) {
 	            ll = (tp - lp) ;
-
+		}
 	        if ((rs = isstart(lp,ll,&q,&si)) > 0) {
 
 	            if (f_ent) {
@@ -894,7 +896,7 @@ local int bibleparas_indmkdata(BIBLEPARAS *op,cchar indname[],mode_t om) noex {
 #if	CF_DEBUG
 	{
 	    BPIMK_INFO	bi ;
-	    rs1 = bpimk_info(&bpind,&bi) ;
+	    rs1 = bpimk_getinfo(&bpind,&bi) ;
 	    debugprintf("bibleparas_indmkdata: maxbook=%u\n",
 		bi.maxbook) ;
 	    debugprintf("bibleparas_indmkdata: maxchapter=%u\n",
