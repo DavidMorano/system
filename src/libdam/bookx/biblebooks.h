@@ -49,7 +49,7 @@ EXTERNC_begin
 extern int	biblebooks_open		(biblebooks *,cchar *,cchar *) noex ;
 extern int	biblebooks_count	(biblebooks *) noex ;
 extern int	biblebooks_max		(biblebooks *) noex ;
-extern int	biblebooks_lookup	(biblebooks *,char *,int,int) noex ;
+extern int	biblebooks_look		(biblebooks *,char *,int,int) noex ;
 extern int	biblebooks_get		(biblebooks *,int,char *,int) noex ;
 extern int	biblebooks_size		(biblebooks *) noex ;
 extern int	biblebooks_audit	(biblebooks *) noex ;
