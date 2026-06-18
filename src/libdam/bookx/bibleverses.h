@@ -20,13 +20,14 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<bvi.h>			/* LIBDAM */
+#include	<biblecite.h>		/* LIBDAM */
 
 
 #define	BIBLEVERSES		struct bibleverses_head
 #define	BIBLEVERSES_FL		struct bibleverses_flags
 #define	BIBLEVERSES_OBJ		struct bibleverses_object
-#define	BIBLEVERSES_CITE	struct bibleverses_query
-#define	BIBLEVERSES_Q		struct bibleverses_query
+#define	BIBLEVERSES_CITE	biblecite
+#define	BIBLEVERSES_Q		biblecite
 #define	BIBLEVERSES_CUR		struct bibleverses_cursor
 #define	BIBLEVERSES_INFO	struct bibleverses_information
 #define	BIBLEVERSES_MAGIC	0x99447245
@@ -46,10 +47,6 @@ struct bibleverses_information {
 	uint		maxchap ;
 	uint		nverses ;
 	uint		nzverses ;
-} ; /* end struct */
-
-struct bibleverses_query {
-	uchar		b, c, v ;
 } ; /* end struct */
 
 struct bibleverses_cursor {
@@ -90,7 +87,8 @@ EXTERNC_begin
 
 extern int bibleverses_open(bibleverses *,cchar *,cchar *) noex ;
 extern int bibleverses_count(bibleverses *) noex ;
-extern int bibleverses_read(bibleverses *,char *,int,bibleverses_q *) noex ;
+extern int bibleverses_read(bibleverses *,char *,int,
+			con bibleverses_q *) noex ;
 extern int bibleverses_get(bibleverses *,bibleverses_q *,char *,int) noex ;
 extern int bibleverses_curbegin(bibleverses *,bibleverses_cur *) noex ;
 extern int bibleverses_curenum(bibleverses *,bibleverses_cur *,
