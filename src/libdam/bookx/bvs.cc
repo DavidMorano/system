@@ -330,14 +330,14 @@ int bvs_audit(bvs *op) noex {
 /* private subroutines */
 
 local int bvs_objloadbegin(bvs *op,cchar *pr,cchar *objn) noex {
-	modload		*lp = op->mlp ;
+	modload		*mlp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) {
-	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) ylikely {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
 	            cchar	*mn = BVS_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
@@ -345,9 +345,9 @@ local int bvs_objloadbegin(bvs *op,cchar *pr,cchar *objn) noex {
 	            mo |= modloadm.libprs ;
 	            mo |= modloadm.libsdirs ;
 	            mo |= modloadm.avail ;
-	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
+	            if ((rs = modload_open(mlp,pr,mn,on,mo,sv)) >= 0) ylikely {
 		        op->fl.modload = true ;
-	                if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
+	                if (int mv[2] ; (rs = modload_getmva(mlp,mv,2)) >= 0) {
 			    cint	osz = mv[0] ;
 	                    op->objsz = mv[0] ;
 	                    op->cursz = mv[1] ;
@@ -362,7 +362,7 @@ local int bvs_objloadbegin(bvs *op,cchar *pr,cchar *objn) noex {
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 		            op->fl.modload = false ;
-	                    modload_close(lp) ;
+	                    modload_close(mlp) ;
 	                } /* end if (error) */
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
@@ -371,7 +371,7 @@ local int bvs_objloadbegin(bvs *op,cchar *pr,cchar *objn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
-		modload_close(lp) ;
+		modload_close(mlp) ;
 	    } /* end if (error) */
 	} /* end if (vecstr-syms) */
 	return rs ;
