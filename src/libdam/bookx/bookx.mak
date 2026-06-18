@@ -42,19 +42,22 @@ LIBS +=
 
 OBJ0= bvshdr.o bvsbook.o bvsmk.o bvses.o bvs.o
 OBJ1= bvihdr.o bvimk.o bvi.o
-OBJ2= bvcitekey.o bvchapters.o
-OBJ3= bpihdr.o bpimk.o bpi.o
+OBJ2= bpihdr.o bpimk.o bpi.o
+OBJ3= bvcitekey.o bvchapters.o
 
 OBJ4= bcspec.o 
-OBJ5= biblecite.o biblemeta.o
-OBJ6= bibleverses.o
-OBJ7=
+OBJ5= biblecite.o biblemeta.o biblecur.o
+OBJ6= bibleverses.o bibleverse.o
+OBJ7= bibleq.o
+
+OBJ8= biblepara.o
+OBJ9=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-#OBJB= obj4.o obj5.o obj6.o obj7.o
-OBJB= obj4.o obj5.o
+OBJB= obj4.o obj5.o obj6.o obj7.o
+OBJC= obj8.o
 
-OBJ= obja.o objb.o
+OBJ= obja.o objb.o objc.o
 
 
 INCDIRS +=
@@ -150,6 +153,13 @@ obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj8.o:			$(OBJ8)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj9.o:			$(OBJ9)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -187,7 +197,13 @@ bvchapters.o:		bvchapters.cc	bvchapters.hh			$(INCS)
 bcspec.o:		bcspec.cc	bcspec.h			$(INCS)
 biblecite.o:		biblecite.cc	biblecite.h			$(INCS)
 biblemta.o:		biblemeta.cc	biblemeta.h			$(INCS)
+biblecur.o:		biblecur.cc	biblecur.h			$(INCS)
 
 bibleverses.o:		bibleverses.cc	bibleverses.h			$(INCS)
+bibleverse.o:		bibleverse.cc	bibleverse.h			$(INCS)
+
+bibleq.o:		bibleq.cc	bibleq.h			$(INCS)
+
+biblepara.o:		biblepara.cc	biblepara.h			$(INCS)
 
 
