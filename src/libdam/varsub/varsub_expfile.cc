@@ -44,7 +44,6 @@
 #include	<estrings.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<ucstream.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<buffer.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
