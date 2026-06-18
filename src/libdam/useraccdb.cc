@@ -757,7 +757,7 @@ local int upinfo_upone(UPI *uip,UPI_REC *urp,int type) noex {
 	    useraccdb	*op = uip->op ;
 	    int		rl = rs ;
 	    if (urp->found) {
-	        rs = u_pwrite(op->fd,rbuf,rl,urp->ro) ;
+	        rs = u_writep(op->fd,rbuf,rl,urp->ro) ;
 	    } else {
 	        if ((rs = u_seek(op->fd,0L,SEEK_END)) >= 0) {
 	            rs = u_write(op->fd,rbuf,rl) ;
