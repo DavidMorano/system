@@ -33,16 +33,16 @@
 
 struct biblecur_flags {
 	uint		newbook:1 ;
-	uint		newchapter:1 ;
-	uint		newverse:1 ;
+	uint		newchap:1 ;
+	uint		newvers:1 ;
 } ; /* end struct */
 
 struct biblecur_head {
 	BIBLECUR_FL	fl ;
 	uint		magval ;
 	int		book ;
-	int		chapter ;
-	int		verse ;
+	int		chap ;
+	int		vers ;
 	char		bookname[BIBLEBOOK_LEN + 1] ;
 } ; /* end struct */
 
