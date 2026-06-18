@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* bible-citation */
+/* find if present and process a possible bible citation */
 /* version %I% last-modified %G% */
 
 
@@ -28,14 +28,14 @@
 
 
 struct biblecite_head {
-	uint	b, c, v ;
+	uchar		b, c, v ;
 } ; /* end struct */
 
 typedef	BIBLECITE	biblecite ;
 
 EXTERNC_begin
 
-extern int	biblecite_ver(biblecite *,cchar *,int,int *) noex ;
+extern int	biblecite_ver(biblecite *,cchar *,int) noex ;
 
 EXTERNC_end
 
