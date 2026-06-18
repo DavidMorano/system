@@ -215,8 +215,7 @@ int commandment_open(CMD *op,cchar *pr,cchar *dbn) noex {
 	        if ((rs = commandment_objloadbegin(op,pr,objn)) >= 0) {
 		    commandment_calls	*callp = callsp(op->callp) ;
 		    rs = SR_NOSYS ;
-		    if (callp->open) {
-			cauto 	co = callp->open ;
+		    if (cauto co = callp->open ; co) {
 	                if ((rs = co(op->obj,pr,dbn)) >= 0) {
 		            op->magval = COMMANDMENT_MAGIC ;
 	                }
@@ -224,23 +223,21 @@ int commandment_open(CMD *op,cchar *pr,cchar *dbn) noex {
 	            if (rs < 0) {
 		        commandment_objloadend(op) ;
 	            } /* end if (error) */
-	        } /* end if */
+	        } /* end if (objload-begin) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		commandment_dtor(op) ;
 	    } /* end if (error) */
 	} /* end if (commandment_ctor) */
 	return rs ;
-}
-/* end subroutine (commandment_open) */
+} /* end subroutine (commandment_open) */
 
 int commandment_close(CMD *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = commandment_magic(op)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
-	    if (callp->close) {
-		cauto 	co = callp->close ;
+	    if (cauto co = callp->close ; co) {
 	        rs1 = co(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
@@ -257,64 +254,55 @@ int commandment_close(CMD *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (commandment_close) */
+} /* end subroutine (commandment_close) */
 
 int commandment_audit(CMD *op) noex {
 	int		rs ;
 	if ((rs = commandment_magic(op)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (callp->audit) {
-		cauto 	co = callp->audit ;
+	    if (cauto co = callp->audit ; co) {
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (commandment_audit) */
+} /* end subroutine (commandment_audit) */
 
 int commandment_count(CMD *op) noex {
 	int		rs ;
 	if ((rs = commandment_magic(op)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (callp->count) {
-		cauto 	co = callp->count ;
+	    if (cauto co = callp->count ; co) {
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (commandment_count) */
+} /* end subroutine (commandment_count) */
 
 int commandment_nummax(CMD *op) noex {
 	int		rs ;
 	if ((rs = commandment_magic(op)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (callp->nummax) {
-		cauto 	co = callp->nummax ;
+	    if (cauto co = callp->nummax ; co) {
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (commandment_nummax) */
+} /* end subroutine (commandment_nummax) */
 
 int commandment_read(CMD *op,char *rbuf,int rlen,uint cn) noex {
 	int		rs ;
 	if ((rs = commandment_magic(op,rbuf)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (callp->read) {
-		cauto 	co = callp->read ;
+	    if (cauto co = callp->read ; co) {
     		rs = co(op->obj,rbuf,rlen,cn) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (commandment_read) */
+} /* end subroutine (commandment_read) */
 
 int commandment_get(CMD *op,int i,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -326,19 +314,17 @@ int commandment_get(CMD *op,int i,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (commandment_get) */
+} /* end subroutine (commandment_get) */
 
 int commandment_curbegin(CMD *op,CMD_CUR *curp) noex {
 	int		rs ;
 	if ((rs = commandment_magic(op,curp)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    memclear(curp) ;
-	    if (callp->curbegin) {
+	    if (cauto co = callp->curbegin ; co) {
 		cint	csz = op->cursz ;
 	        if (void *vp ; (rs = mem.mall(csz,&vp)) >= 0) {
 		    curp->scp = vp ;
-		    cauto 	co = callp->curbegin ;
 		    if ((rs = co(op->obj,curp->scp)) >= 0) {
 		         curp->magval = COMMANDMENT_MAGIC ;
 		    }
@@ -355,8 +341,7 @@ int commandment_curbegin(CMD *op,CMD_CUR *curp) noex {
 	    } /* end if (error) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (commandment_curbegin) */
+} /* end subroutine (commandment_curbegin) */
 
 int commandment_curend(CMD *op,CMD_CUR *curp) noex {
 	int		rs ;
@@ -365,8 +350,7 @@ int commandment_curend(CMD *op,CMD_CUR *curp) noex {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
 	    if ((curp->magval == COMMANDMENT_MAGIC) && curp->scp) {
-	        if (callp->curend) {
-		    auto 	co = callp->curend ;
+	        if (cauto co = callp->curend ; co) {
 	            rs1 = co(op->obj,curp->scp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
@@ -378,8 +362,7 @@ int commandment_curend(CMD *op,CMD_CUR *curp) noex {
 	        curp->magval = 0 ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
-	return rs ;
-}
+	return rs ; }
 /* end subroutine (commandment_curend) */
 
 int commandment_curenum(CMD *op,CMD_CUR *curp,uint *cnp,
@@ -388,16 +371,14 @@ int commandment_curenum(CMD *op,CMD_CUR *curp,uint *cnp,
 	if ((rs = commandment_magic(op,curp,rbuf)) >= 0) {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (callp->curenum) {
+	    if (cauto co = callp->curenum ; co) {
 	        COMMANDMENTS_ENT	cse{} ;
-		auto 	co = callp->curenum ;
 	        rs = co(op->obj,curp->scp,&cse,rbuf,rlen) ;
 	        if (cnp) *cnp = cse.cn ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (commandment_curenum) */
+} /* end subroutine (commandment_curenum) */
 
 #ifdef	COMMENT
 
@@ -437,8 +418,7 @@ int commandment_search(CMD *op,cc *s,cmpfunc,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (commandment_search) */
+} /* end subroutine (commandment_search) */
 
 #endif /* COMMENT */
 
@@ -446,14 +426,14 @@ int commandment_search(CMD *op,cc *s,cmpfunc,cchar **rpp) noex {
 /* private subroutines */
 
 local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
-	modload		*lp = op->mlp ;
+	modload		*mlp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) {
-	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) ylikely {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
 	            cchar	*mn = CMD_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
@@ -461,9 +441,9 @@ local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	            mo |= modloadm.libprs ;
 	            mo |= modloadm.libsdirs ;
 	            mo |= modloadm.avail ;
-	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
+	            if ((rs = modload_open(mlp,pr,mn,on,mo,sv)) >= 0) ylikely {
 		        op->fl.modload = true ;
-	                if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
+	                if (int mv[2] ; (rs = modload_getmva(mlp,mv,2)) >= 0) {
 			    cint	osz = mv[0] ;
 	                    op->objsz = mv[0] ;
 	                    op->cursz = mv[1] ;
@@ -478,7 +458,7 @@ local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 		            op->fl.modload = false ;
-	                    modload_close(lp) ;
+	                    modload_close(mlp) ;
 	                } /* end if (error) */
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
@@ -487,7 +467,7 @@ local int commandment_objloadbegin(CMD *op,cchar *pr,cchar *objn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
-		modload_close(lp) ;
+		modload_close(mlp) ;
 	    } /* end if (error) */
 	} /* end if (vecstr-syms) */
 	return rs ;
