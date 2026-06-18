@@ -1,67 +1,66 @@
-/* fdb */
+/* fdb SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* file database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 
-
 /* revision history:
 
-	= 96/03/01, David A­D­ Morano
-
-	The subroutine was adapted from others programs that
-	did similar types of functions.
-
+	= 1996-03-01, David A­D­ Morano
+	The subroutine was adapted from others programs that did
+	similar types of functions.
 
 */
 
+/* Copyright © 1996 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /******************************************************************************
 
+  	Name:
+	fdb
+
+	Description:
 	This subroutine manages the default printer database.
 
-
 	Synopsis:
-
 	int fdbinit(pip,fname)
 	struct proginfo	*pip ;
 	const char	fname[] ;
 
-
 	Arguments:
-
 	pip		program information pointer
 	fname		filename to open
 
-
 	Returns:
-
 	>=0		good
-	<0		error
-
+	<0		error (system-error)
 
 ******************************************************************************/
 
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<field.h>
+#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
-
 
 
 /* local defines */
@@ -69,15 +68,7 @@
 #define	DEFENTRIES		20
 
 
-
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strshrink(char *) ;
 
 
 /* external variables */
@@ -91,7 +82,7 @@ extern char	*strshrink(char *) ;
 
 /* local variables */
 
-static const uchar	fterms[32] = {
+constexpr char		fterms[] = {
 	0x00, 0x04, 0x00, 0x00,
 	0x08, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -103,20 +94,16 @@ static const uchar	fterms[32] = {
 } ;
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
-
-
-int fdbinit(pip,fname)
-struct proginfo	*pip ;
-const char	fname[] ;
-{
-	FIELD	fsb ;
-
+int fdbinit(proginfo *pip,cchar *fname) noex {
+	field	fsb ;
 	bfile	infile ;
-
-	int	rs = SR_OK, rs1 ;
+	int	rs = SR_OK ;
+	int	rs1 ;
 	int	len, cl ;
 	int	opts, c ;
 	int	kl, vl ;
@@ -124,7 +111,6 @@ const char	fname[] ;
 	char	linebuf[LINEBUFLEN + 1] ;
 	char	*kp, *vp ;
 	char	*tp, *cp ;
-
 
 	if (fname == NULL)
 	    return SR_FAULT ;
