@@ -161,7 +161,7 @@ int biblebooks_audit(BIBLEBOOKS *op) {
 	return rs ;
 } /* end subroutine (biblebooks_audit) */
 
-int biblebooks_lookup(BIBLEBOOKS *op,char *rbuf,int rlen,int bi) {
+int biblebooks_look(BIBLEBOOKS *op,char *rbuf,int rlen,int bi) {
 	int		rs ;
 	const char	*cp ;
 
@@ -183,10 +183,10 @@ int biblebooks_lookup(BIBLEBOOKS *op,char *rbuf,int rlen,int bi) {
 #endif
 
 	return rs ;
-} /* end subroutine (biblebooks_lookup) */
+} /* end subroutine (biblebooks_look) */
 
 int biblebooks_get(BIBLEBOOKS *op,int bi,char *rbuf,int rlen) {
-	return biblebooks_lookup(op,rbuf,rlen,bi) ;
+	return biblebooks_look(op,rbuf,rlen,bi) ;
 } /* end subroutine (biblebooks_get) */
 
 int biblebooks_size(BIBLEBOOKS *op) {
