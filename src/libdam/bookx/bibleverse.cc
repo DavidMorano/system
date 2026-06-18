@@ -5,7 +5,7 @@
 /* BV object-load management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -17,6 +17,9 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Object:
+	bibleverse
 
   	Description:
 	This module implements an interface (a trivial one) that
@@ -36,10 +39,12 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
+#include	<biblecite.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	"bibleverse.h"
 #include	"bibleverses.h"
+#include	"bibleverse.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -51,20 +56,19 @@ import libutil ;			/* |memclear(3u)| */
 #define	BIBLEVERSE_MODBNAME	"bibleverses"
 #define	BIBLEVERSE_OBJNAME	"bibleverses"
 
-#ifndef	SYMNAMELEN
-#define	SYMNAMELEN	60
-#endif
-
 #define	BV		bibleverse
 #define	BV_CUR		bibleverse_cur
 #define	BV_CITE		bibleverse_cite
 #define	BV_Q		bibleverse_q
-#define	BV_INFO		bibleverse_info
+#define	BV_I		bibleverse_info
 #define	BV_CA		bibleverse_ca
+#define	BV_MODBNAME	BIBLEVERSE_MODBNAME
+#define	BV_MAG		BIBLEVERSE_MAGIC
 
-#define	BVS_Q		bibleverses_cite
-#define	BVS_C		bibleverses_cur
-#define	BVS_I		bibleverses_info
+#define	BVSS		bibleverses
+#define	BVSS_Q		bibleverses_q
+#define	BVSS_C		bibleverses_cur
+#define	BVSS_I		bibleverses_info
 
 
 /* imported namespaces */
@@ -74,6 +78,19 @@ using libuc::mem ;			/* variable */
 
 /* local typedefs */
 
+extern "C" {
+    typedef int	(*soopen_f)	(void *,cchar *,cchar *) noex ;
+    typedef int	(*socount_f)	(void *) noex ;
+    typedef int	(*soread_f)	(void *,char *,int,con BVSS_Q *) noex ;
+    typedef int	(*soget_f)	(void *,con BVSS_Q *,char *,int) noex ;
+    typedef int	(*socurbegin_f)	(void *,BVSS_C *) noex ;
+    typedef int	(*socurend_f)	(void *,BVSS_C *) noex ;
+    typedef int	(*socurenum_f)	(void *,BVSS_C *,BVSS_Q *,char *,int) noex ;
+    typedef int	(*soaudit_f)	(void *) noex ;
+    typedef int	(*sogetinfo_f)	(void *,BVSS_I *) noex ;
+    typedef int	(*sochapters_f)	(void *,int,uchar *,int) noex ;
+    typedef int	(*soclose_f)	(void *) noex ;
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -84,13 +101,78 @@ using libuc::mem ;			/* variable */
 
 /* local structures */
 
+struct bibleverse_calls {
+    soopen_f		open ;
+    socount_f		count ;
+    soread_f		read ;
+    soget_f		get ;
+    socurbegin_f	curbegin ;
+    socurend_f		curend ;
+    socurenum_f		curenum ;
+    soaudit_f		audit ;
+    sogetinfo_f		getinfo ;
+    sochapters_f	chapters ;
+    soclose_f		close ;
+} ; /* end struct (bibleverse_calls) */
+
+typedef bibleverse_calls *	callsp ;
+
 
 /* forward references */
 
-local int	bibleverse_objloadbegin(BV *,cchar *,cchar *) noex ;
-local int	bibleverse_objloadbeginer(BV *op,cchar *,cchar *) noex ;
-local int	bibleverse_objloadend(BV *) noex ;
-local int	bibleverse_loadcalls(BV *,cchar *) noex ;
+template<typename ... Args>
+local int bibleverse_ctor(BV *op,Args ... args) noex {
+	BIBLEVERSE	*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->mlp = new(nt) modload) != np) ylikely {
+		bibleverse_calls    *callp ;
+                if ((callp = new(nt) bibleverse_calls) != np) ylikely {
+                    op->callp = callp ;
+                    rs = SR_OK ;
+                } /* end if (new-bibleverse_calls) */
+                if (rs < 0) {
+                    delete op->mlp ;
+                    op->mlp = nullptr ;
+                } /* end if (error) */
+	    } /* end if (new-modload) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (bibleverse_ctor) */
+
+local int bibleverse_dtor(BV *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+            if (op->callp) ylikely {
+                bibleverse_calls    *callp = callsp(op->callp) ;
+                delete callp ;
+                op->callp = nullptr ;
+            }
+	    if (op->mlp) ylikely {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (bibleverse_dtor) */
+
+template<typename ... Args>
+local inline int bibleverse_magic(BV *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == BV_MAG) ? SR_OK : SR_NOTOPEN ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (bibleverse_magic) */
+
+local int	bibleverse_objloadbegin	(BV *,cchar *,cchar *) noex ;
+local int	bibleverse_objloadend	(BV *) noex ;
+local int	bibleverse_loadcalls	(BV *,vecstr *) noex ;
 
 local bool	isrequired(int) noex ;
 
@@ -109,26 +191,33 @@ enum subs {
 	sub_curenum,
 	sub_curend,
 	sub_audit,
-	sub_info,
+	sub_getinfo,
 	sub_chapters,
 	sub_close,
 	sub_overlast
 } ; /* end enum (subs) */
 
-constexpr cpcchar	subnames[] = {
-	"open",
-	"count",
-	"read",
-	"get",
-	"curbegin",
-	"curenum",
-	"curend",
-	"audit",
-	"info",
-	"chapters",
-	"close",
-	nullptr
-} ; /* end array (subs) */
+namespace {
+    struct subnamer {
+	cchar		*n[sub_overlast + 1] ;
+	consteval subnamer() noex {
+	    n[sub_open]		= "open" ;
+	    n[sub_count]	= "count" ;
+	    n[sub_read]		= "read" ;
+	    n[sub_get]		= "get" ;
+	    n[sub_curbegin]	= "curbegin" ;
+	    n[sub_curenum]	= "curenum" ;
+	    n[sub_curend]	= "curend" ;
+	    n[sub_audit]	= "audit" ;
+	    n[sub_getinfo]	= "getinfo" ;
+	    n[sub_chapters]	= "chapters" ;
+	    n[sub_close]	= "close" ;
+	    n[sub_overlast]	= nullptr ;
+	} ; /* end ctor */
+    } ; /* end struct (subnamer) */
+} /* end namespace */
+
+constexpr subnamer	subname ;
 
 
 /* exported variables */
@@ -136,446 +225,344 @@ constexpr cpcchar	subnames[] = {
 
 /* exported subroutines */
 
-int bibleverse_open(BV *op,cchar *pr,cchar *dbname) noex {
+int bibleverse_open(BV *op,cchar *pr,cchar *dbn) noex {
 	int		rs ;
-	cchar		*objname = BIBLEVERSE_OBJNAME ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	if ((rs = bibleverse_objloadbegin(op,pr,objname)) >= 0) {
-	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
-		op->magval = BIBLEVERSE_MAGIC ;
-	    }
+	cchar		*objn = BIBLEVERSE_OBJNAME ;
+	if ((rs = bibleverse_ctor(op,pr,dbn)) >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if (pr[0]) ylikely {
+	        if ((rs = bibleverse_objloadbegin(op,pr,objn)) >= 0) ylikely {
+		    bibleverse_calls *callp = callsp(op->callp) ;
+		    rs = SR_NOSYS ;
+		    if (cauto co = callp->open ; co) ylikely {
+                        if ((rs = co(op->obj,pr,dbn)) >= 0) {
+		            op->magval = BV_MAG ;
+			}
+	            } /* end if (non-null) */
+	            if (rs < 0) {
+		        bibleverse_objloadend(op) ;
+	            } /* end if (error) */
+	        } /* end if (objload-begin) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-		bibleverse_objloadend(op) ;
+		bibleverse_dtor(op) ;
 	    } /* end if (error) */
-	} /* end if (objload-begin) */
-
-#if	CF_DEBUGS
-	debugprintf("bibleverse_open: ret rs=%d\n",rs) ;
-#endif
-
+	} /* end if (bibleverse_ctor) */
 	return rs ;
-}
-/* end subroutine (bibleverse_open) */
+} /* end subroutine (bibleverse_open) */
 
 /* finish the entire vector string data structure object */
 int bibleverse_close(BV *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleverse_close: ent\n") ;
-#endif
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-	{
-	rs1 = (*op->call.close)(op->obj) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	{
-	rs1 = bibleverse_objloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("bibleverse_close: ret rs=%d\n",rs) ;
-#endif
-
-	op->magval = 0 ;
+	if ((rs = bibleverse_magic(op)) >= 0) ylikely {
+            bibleverse_calls   *callp = callsp(op->callp) ;
+            if (cauto co = callp->close ; co) ylikely {
+                rs1 = co(op->obj) ;
+                if (rs >= 0) rs = rs1 ;
+            } else {
+                rs = SR_NOSYS ;
+            }
+	    {
+	        rs1 = bibleverse_objloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = bibleverse_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
+	} /* end if (bibleverse_magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (bibleverse_close) */
+} /* end subroutine (bibleverse_close) */
 
 int bibleverse_count(BV *op) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.count != nullptr) {
-	    rs = (*op->call.count)(op->obj) ;
-	}
-
+	int		rs ;
+	if ((rs = bibleverse_magic(op)) >= 0) ylikely {
+            bibleverse_calls   *callp = callsp(op->callp) ;
+            rs = SR_NOSYS ;
+            if (cauto co = callp->count ; co) ylikely {
+                rs = co(op->obj) ;
+            }
+	} /* end if (bibleverse_magic) */
 	return rs ;
-}
-/* end subroutine (bibleverse_count) */
+} /* end subroutine (bibleverse_count) */
 
 int bibleverse_audit(BV *op) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.audit != nullptr) {
-	    rs = (*op->call.audit)(op->obj) ;
-	}
-
-	return rs ;
-}
-/* end subroutine (bibleverse_audit) */
-
-int bibleverse_read(BV *op,char *vbuf,int vlen,BIBLEVERSE_Q *qp) noex {
-	BIBLEVERSES_Q	sq ;
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (qp == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleverse_read: ent q=%u:%u:%u\n",
-		qp->b,qp->c,qp->v) ;
-#endif
-
-	sq.b = qp->b ;
-	sq.c = qp->c ;
-	sq.v = qp->v ;
-	rs = (*op->call.read)(op->obj,vbuf,vlen,&sq) ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleverse_read: ret rs=%d\n",rs) ;
-#endif
-
+	if ((rs = bibleverse_magic(op)) >= 0) {
+            bibleverse_calls   *callp = callsp(op->callp) ;
+            rs = SR_NOSYS ;
+            if (callp->audit) {
+                cauto   co = callp->audit ;
+                rs = co(op->obj) ;
+            } 
+	} /* end if (bibleverse_magic) */
 	return rs ;
-}
-/* end subroutine (bibleverse_read) */
+} /* end subroutine (bibleverse_audit) */
 
-int bibleverse_get(BV *op,BIBLEVERSE_Q *qp,char *vbuf,int vlen) noex {
+int bibleverse_read(BV *op,char *vbuf,int vlen,con BV_Q *qp) noex {
+	int		rs ;
+	DEBUGPRINTF("ent q=%u:%u:%u\n", qp->b,qp->c,qp->v) ;
+	if ((rs = bibleverse_magic(op,vbuf,qp)) >= 0) ylikely {
+            bibleverse_calls   *callp = callsp(op->callp) ;
+	    BVSS_Q	sq{} ;
+	    sq.b = qp->b ;
+	    sq.c = qp->c ;
+	    sq.v = qp->v ;
+            rs = SR_NOSYS ;
+            if (cauto co = callp->read ; co) {
+                rs = co(op->obj,vbuf,vlen,&sq) ;
+            }
+	} /* end if (bibleverse_magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (bibleverse_read) */
+
+int bibleverse_get(BV *op,con BV_Q *qp,char *vbuf,int vlen) noex {
 	return bibleverse_read(op,vbuf,vlen,qp) ;
-}
-/* end subroutine (bibleverse_get) */
+} /* end subroutine (bibleverse_get) */
 
 int bibleverse_curbegin(BV *op,BV_CUR *curp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.curbegin != nullptr) {
-	    if (void *p ; (rs = mem.mall(op->cursize,&p)) >= 0) {
-		curp->scp = p ;
-		if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
-		     curp->magval = BIBLEVERSE_MAGIC ;
-		}
-	        if (rs < 0) {
-		    mem.free(curp->scp) ;
-		    curp->scp = nullptr ;
-	        } /* end if (error) */
-	    } /* end if (memory-acquire) */
-	} else {
-	    rs = SR_NOTSOCK ;
-	}
-	if (rs < 0) {
-	    memclear(curp) ;
-	} /* end if (error) */
-
+    	cnothrow	nt{} ;
+	int		rs ;
+	if ((rs = bibleverse_magic(op,curp)) >= 0) ylikely {
+	    rs = SR_BUGCHECK ;
+            if (bibleverse_calls *callp = callsp(op->callp) ; callp) ylikely {
+		rs = SR_NOSYS ;
+		if (cauto co = callp->curbegin ; co) ylikely {
+		    rs = SR_NOMEM ;
+		    if (BVSS_C *bcurp = new(nt) BVSS_C ; bcurp) ylikely {
+			curp->scp = bcurp ;
+                        if ((rs = co(op->obj,bcurp)) >= 0) ylikely {
+			    curp->magval = BV_MAG ;
+			} /* end if */
+	                if (rs < 0) {
+		            delete bcurp ;
+		            curp->scp = nullptr ;
+	                } /* end if (error) */
+		    } /* end if (non-null) */
+		} /* end if (new-BVSS_C) */
+	    } /* end if (non-null) */
+	    if (rs < 0) {
+	        memclear(curp) ;
+	    } /* end if (error) */
+	} /* end if (bibleverse_magic) */
 	return rs ;
-}
-/* end subroutine (bibleverse_curbegin) */
+} /* end subroutine (bibleverse_curbegin) */
 
 int bibleverse_curend(BV *op,BV_CUR *curp) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-	if (curp->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-
-	if (curp->scp != nullptr) {
-	    if (op->call.curend != nullptr) {
-	        rs1 = (*op->call.curend)(op->obj,curp->scp) ;
-		if (rs >= 0) rs = rs1 ;
-	    }
-	    rs1 = mem.free(curp->scp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    curp->scp = nullptr ;
-	} else
-	    return SR_NOTSUP ;
-
-	curp->magval = 0 ;
+	if ((rs = bibleverse_magic(op,curp)) >= 0) ylikely {
+            bibleverse_calls   *callp = callsp(op->callp) ;
+	    rs = SR_NOTOPEN ;
+	    if (BVSS_C *bcurp = resumelife<BVSS_C>(curp->scp) ; bcurp) ylikely {
+		rs = SR_BADFMT ;
+		if (curp->magval == BV_MAG) ylikely {
+		    rs = SR_NOSYS ;
+                    if (cauto co = callp->curend ; co) ylikely {
+	                rs1 = co(op->obj,bcurp) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } else {
+            	        rs = SR_NOSYS ;
+	            }
+	            {
+			delete bcurp ;
+	                curp->scp = nullptr ;
+	            }
+		    curp->magval = 0 ;
+		} /* end if (good cursor magic) */
+	    } /* end if (non-null) */
+	} /* end if (bibleverse_magic) */
 	return rs ;
-}
-/* end subroutine (bibleverse_curend) */
+} /* end subroutine (bibleverse_curend) */
 
-/* enumerate entries */
-int bibleverse_curenum(BV *op,BV_CUR *curp,BV_CUTE *qp,
-		char *vbuf,int vlen) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (vbuf == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-	if (curp->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.enumerate != nullptr) {
-	    BIBLEVERSES_Q	sq ;
-	    rs = (*op->call.enumerate)(op->obj,curp->scp,&sq,vbuf,vlen) ;
-	    if (rs >= 0) {
-	        qp->b = sq.b ;
-	        qp->c = sq.c ;
-	        qp->v = sq.v ;
-	    }
-	}
-
-#if	CF_DEBUGS
-	debugprintf("bibleverse_enum: ret rs=%d\n",rs) ;
-#endif
-
+int bibleverse_curenum(BV *op,BV_CUR *curp,BV_Q *qp,char *vbuf,int vlen) noex {
+	int		rs ;
+	if ((rs = bibleverse_magic(op,curp,qp,vbuf)) >= 0) ylikely {
+            bibleverse_calls   *callp = callsp(op->callp) ;
+	    rs = SR_NOTOPEN ;
+	    if (BVSS_C *bcurp = resumelife<BVSS_C>(curp->scp) ; bcurp) ylikely {
+		rs = SR_BADFMT ;
+		if (curp->magval == BV_MAG) ylikely {
+            	    rs = SR_NOSYS ;
+                    if (cauto co = callp->curenum ; co) ylikely {
+	    	        BVSS_Q	sq{} ;
+	    	        if ((rs = co(op->obj,bcurp,&sq,vbuf,vlen)) >= 0) {
+	        	    qp->b = sq.b ;
+	        	    qp->c = sq.c ;
+	        	    qp->v = sq.v ;
+	    	        } /* end if (object-call) */
+		    } /* end if (non-null) */
+		} /* end if (good cursor magic) */
+	    } /* end if (non-null) */
+	} /* end if (bibleverse_magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (bibleverse_curenum) */
+} /* end subroutine (bibleverse_curenum) */
 
-int bibleverse_info(BV *op,BIBLEVERSE_INFO *ip) noex {
-	BIBLEVERSES_I	bi ;
-	int		rs = SR_NOSYS ;
-	int		nverses = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleverse_info: ent\n") ;
-#endif
-
-	if (ip) {
-	    memclear(ip) ;
-	}
-	if (op->call.info) {
-	    if ((rs = (*op->call.info)(op->obj,&bi)) >= 0) {
-	        nverses = bi.nverses ;
-	        if (ip) {
-	            memclear(ip) ;
-	            ip->dbtime = bi.dbtime ;
-	            ip->vitime = bi.vitime ;
-	            ip->maxbook = bi.maxbook ;
-	            ip->maxchapter = bi.maxchapter ;
-	            ip->nverses = bi.nverses ;
-	            ip->nzverses = bi.nzverses ;
-		} /* end if */
-	    } /* end if */
-	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("bibleverse_info: ret rs=%d nv=%u\n",rs,nverses) ;
-#endif
-
-	return (rs >= 0) ? nverses : rs ;
-}
-/* end subroutine (bibleverse_info) */
+int bibleverse_getinfo(BV *op,BV_I *ip) noex {
+	int		rs ;
+	int		nv = 0 ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
+	if ((rs = bibleverse_magic(op,ip)) >= 0) ylikely {
+            bibleverse_calls   *callp = callsp(op->callp) ;
+	    rs = SR_NOSYS ;
+            if (cauto co = callp->getinfo ; co) ylikely {
+	        if (BVSS_I bi{} ; (rs = co(op->obj,&bi)) >= 0) ylikely {
+	            nv = bi.nverses ;
+	            if (ip) {
+	                memclear(ip) ;
+	                ip->dbtime	= bi.dbtime ;
+	                ip->vitime	= bi.vitime ;
+	                ip->maxbook	= bi.maxbook ;
+	                ip->maxchap	= bi.maxchap ;
+	                ip->nverses	= bi.nverses ;
+	                ip->nzverses	= bi.nzverses ;
+		    } /* end if */
+	        } /* end if (object-call) */
+	    } /* end if (non-null) */
+	    if (ip && (rs < 0)) {
+	        memclear(ip) ;
+	    } /* end if (error) */
+	} /* end if (bibleverse_magic) */
+	DEBUGPRINTF("ret rs=%d nv=%u\n",rs,nv) ;
+	return (rs >= 0) ? nv : rs ;
+} /* end subroutine (bibleverse_getinfo) */
 
 int bibleverse_chapters(BV *op,int book,uchar *ap,int al) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEVERSE_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.chapters != nullptr) {
-	    rs = (*op->call.chapters)(op->obj,book,ap,al) ;
-	}
-
+	int		rs ;
+	if ((rs = bibleverse_magic(op,ap)) >= 0) ylikely {
+            bibleverse_calls   *callp = callsp(op->callp) ;
+            rs = SR_NOSYS ;
+            if (cauto co = callp->chapters ; co) ylikely {
+                rs = co(op->obj,book,ap,al) ;
+            }
+	} /* end if (bibleverse_magic) */
 	return rs ;
-}
-/* end subroutine (bibleverse_chapters) */
+} /* end subroutine (bibleverse_chapters) */
 
 
 /* private subroutines */
 
-/* find and load the DB-access object */
-local int bibleverse_objloadbegin(BV *op,cchar *pr,cchar *objname) noex {
-	int		rs ;
-
-	if ((rs = bibleverse_objloadbeginer(op,pr,objname)) >= 0) {
-	    modload	*lp = &op->loader ;
-	    int		mv[2] ;
-	    if ((rs = modload_getmva(lp,mv,2)) >= 0) {
-		void	*p ;
-		op->objsize = mv[0] ;
-		op->cursize = mv[1] ;
-		if ((rs = mem.mall(op->objsize,&p)) >= 0) {
-		    op->obj = p ;
-		    rs = bibleverse_loadcalls(op,objname) ;
-		    if (rs < 0) {
-			mem.free(op->obj) ;
-			op->obj = nullptr ;
-		    } /* end if (error) */
-		} /* end if (memory-acquire) */
-	    } /* end if (getmva) */
-	    if (rs < 0) {
-		modload_close(lp) ;
-	    } /* end if (error) */
-	} /* end if (ok) */
-
-	return rs ;
-} /* end subroutine (bibleverse_objloadbegin) */
-
-local int bibleverse_objloadbeginer(BV *op,cchar *pr,cchar *objname) noex {
-	modload		*lp = &op->loader ;
-	VECSTR		syms ;
-	cint	n = nelem(subnames) ;
+local int bibleverse_objloadbegin(BV *op,cchar *pr,cchar *objn) noex {
+	modload		*mlp = op->mlp ;
+	cint		vn = sub_overlast ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	int		opts ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleverse_objloadbegin: pr=%s\n",pr) ;
-	debugprintf("bibleverse_objloadbegin: objname=%s\n",objname) ;
-#endif
-
-	opts = vecstrm.compact ;
-	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
-	    cint	nlen = SYMNAMELEN ;
-	    int		i ;
-	    int		f_modload = false ;
-	    char	nbuf[SYMNAMELEN + 1] ;
-
-	    for (i = 0 ; (i < n) && subsnames[i] ; i += 1) {
-	        if (isrequired(i)) {
-		    cc *sn = subnames[i] ;
-	            if ((rs = sncpy3(nbuf,nlen,objname,"_",sn)) >= 0) {
-			rs = vecstr_add(&syms,nbuf,rs) ;
-		    }
-		}
-		if (rs < 0) break ;
-	    } /* end for */
-
-	    if (rs >= 0) {
-		cchar	**sv ;
-	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            cchar	*modbname = BIBLEVERSE_MODBNAME ;
-	            opts = (modload_OLIBVAR | modload_OSDIRS) ;
-	            rs = modload_open(lp,pr,modbname,objname,opts,sv) ;
-		    f_modload = (rs >= 0)  ;
-		}
-	    }
-
-	    rs1 = vecstr_finish(&syms) ;
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) ylikely {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
+	            cchar	*mn = BV_MODBNAME ;
+	            cchar	*on = objn ;
+	            int		mo = 0 ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
+	            mo |= modloadm.avail ;
+	            if ((rs = modload_open(mlp,pr,mn,on,mo,sv)) >= 0) ylikely {
+		        op->fl.modload = true ;
+	                if (int mv[2] ; (rs = modload_getmva(mlp,mv,2)) >= 0) {
+			    cint	osz = mv[0] ;
+	                    op->objsz = mv[0] ;
+	                    op->cursz = mv[1] ;
+			    if (void *vp ; (rs = mem.mall(osz,&vp)) >= 0) {
+	                        op->obj = vp ;
+	                        rs = bibleverse_loadcalls(op,&syms) ;
+	                        if (rs < 0) {
+	                            mem.free(op->obj) ;
+	                            op->obj = nullptr ;
+	                        } /* end if (error) */
+	                    } /* end if (memory-allocation) */
+	                } /* end if (modload_getmva) */
+	                if (rs < 0) {
+		            op->fl.modload = false ;
+	                    modload_close(mlp) ;
+	                } /* end if (error) */
+	            } /* end if (modload_open) */
+		} /* end if (vecstr_getvec) */
+	    } /* end if (vecstr_addsyms) */
+	    rs1 = syms.finish ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_modload) {
-		modload_close(lp) ;
+	    if ((rs < 0) && op->fl.modload) {
+		op->fl.modload = false ;
+		modload_close(mlp) ;
 	    } /* end if (error) */
-	} /* end if (allocation) */
-
+	} /* end if (vecstr-syms) */
 	return rs ;
-} /* end subroutine (bibleverse_objloadbeginer) */
+} /* end subroutine (bibleverse_objloadbegin) */
 
 local int bibleverse_objloadend(BV *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->obj) {
+	if (op->obj) ylikely {
 	    rs1 = mem.free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	} /* end if (memory-release) */
-	{
-	    rs1 = modload_close(&op->loader) ;
+	if (op->mlp && op->fl.modload) ylikely {
+	    op->fl.modload = false ;
+	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (bibleverse_objloadend) */
 
-local int bibleverse_loadcalls(BV *op,cchar *objname) noex {
-	modload		*lp = &op->loader ;
-	cint		nlen = SYMNAMELEN ;
+local int bibleverse_loadcalls(BV *op,vecstr *slp) noex {
+	modload		*mlp = op->mlp ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
-	int		i ;
+	int		rs1 ;
 	int		c = 0 ;
-	char		nbuf[SYMNAMELEN + 1] ;
-	cvoid		*snp = nullptr ;
-
-	for (i = 0 ; subs[i] != nullptr ; i += 1) {
-
-	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
-	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = nullptr ;
-		     if (! isrequired(i)) rs = SR_OK ;
-		}
-	    }
-
-	    if (rs < 0) break ;
-
-#if	CF_DEBUGS
-	    debugprintf("bibleverse_loadcalls: call=%s %c\n",
-		subs[i],
-		((snp != nullptr) ? 'Y' : 'N')) ;
-#endif
-
-	    if (snp != nullptr) {
-
-	        c += 1 ;
-		switch (i) {
-
-		case sub_open:
-		    op->call.open = 
-			(int (*)(void *,cchar *,cchar *)) snp ;
+	cchar		*sname{} ;
+	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
+	    if (cvoid *snp{} ; (rs = modload_getsym(mlp,sname,&snp)) >= 0) {
+                bibleverse_calls   *callp = callsp(op->callp) ;
+                c += 1 ;
+                switch (i) {
+                case sub_open:
+                    callp->open		= soopen_f(snp) ;
+                    break ;
+                case sub_count:
+                    callp->count	= socount_f(snp) ;
+                    break ;
+                case sub_read:
+                    callp->read		= soread_f(snp) ;
+                    break ;
+                case sub_get:
+                    callp->get		= soget_f(snp) ;
+                    break ;
+                case sub_curbegin:
+                    callp->curbegin	= socurbegin_f(snp) ;
+                    break ;
+                case sub_curenum:
+                    callp->curenum	= socurenum_f(snp) ;
+                    break ;
+                case sub_curend:
+                    callp->curend	= socurend_f(snp) ;
+                    break ;
+                case sub_audit:
+                    callp->audit	= soaudit_f(snp) ;
+                    break ;
+		case sub_getinfo:
+		    callp->getinfo	= sogetinfo_f(snp) ;
 		    break ;
-
-		case sub_count:
-		    op->call.count = (int (*)(void *)) snp ;
-		    break ;
-
-		case sub_read:
-		    op->call.read = (int (*)(void *,char *,int,BVS_Q *)) snp ;
-		    break ;
-
-		case sub_get:
-		    op->call.get = (int (*)(void *,BVS_Q *,char *,int)) snp ;
-		    break ;
-
-		case sub_curbegin:
-		    op->call.curbegin = 
-			(int (*)(void *,BVS_C *)) snp ;
-		    break ;
-
-		case sub_curenum:
-		    op->call.enumerate = 
-			(int (*)(void *,BVS_C *,BVS_Q *,char *,int)) snp ;
-		    break ;
-
-		case sub_curend:
-		    op->call.curend= 
-			(int (*)(void *,BVS_C *)) snp ;
-		    break ;
-
-		case sub_audit:
-		    op->call.audit = (int (*)(void *)) snp ;
-		    break ;
-
-		case sub_info:
-		    op->call.info = (int (*)(void *,BVS_I *)) snp ;
-		    break ;
-
 		case sub_chapters:
-		    op->call.chapters = (int (*)(void *,int,uchar *,int)) snp ;
+		    callp->chapters	= sochapters_f(snp) ;
 		    break ;
-
-		case sub_close:
-		    op->call.close = (int (*)(void *)) snp ;
-		    break ;
-
-		} /* end switch */
-
-	    } /* end if (it had the call) */
-
-	} /* end for (subs) */
-
+                case sub_close:
+                    callp->close	= soclose_f(snp) ;
+                    break ;
+                } /* end switch */
+            } else if (rs == rsn) {
+                if (! isrequired(i)) rs = SR_OK ;
+            } /* end if (it had the call) */
+	    if (rs < 0) break ;
+	} /* end for (vecstr_get) */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleverse_loadcalls) */
 
