@@ -70,6 +70,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<estrings.h>		/* LIBU */
 #include	<baops.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<vecint.h>		/* LIBUC */
@@ -85,12 +86,13 @@
 #include	<char.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"naturalwords.h"
-#include	"txtindexmk.h"
-#include	"txtindex.h"
-#include	"xwords.h"
+#include	<naturalwords.h>	/* LIBDAM */
+#include	<txtindexmk.h>		/* LIBDAM */
+#include	<txtindex.h>		/* LIBDAM */
+#include	<xwords.h>		/* LIBDAM */
+#include	<searchkeys.h>		/* LIBDAM */
+
 #include	"bibleqs.h"
-#include	"searchkeys.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -107,11 +109,11 @@ import libutil ;			/* |memclear(3u)| */
 #define	BIBLEQS_DBDNAME	"share/bibledbs"
 #define	BIBLEQS_DBNAME	"av"
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
+#define	SI		subinfo
+#define	SI_FL		subinfo_fl
 
-#define	KTAG		struct ktag_head
-#define	KTAG_PARAMS	struct ktag_params
+#define	KTAG		ktag_head
+#define	KTAG_PARAMS	ktag_params
 #define	KTAG_KEY	TXTINDEXMK_KEY
 
 #ifndef	VARSYSNAME
@@ -210,6 +212,14 @@ import libutil ;			/* |memclear(3u)| */
 #define	NDF		"/tmp/bibleqs.deb"
 
 
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -218,13 +228,13 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
-struct subinfo_flags {
+struct subinfo_fl {
 	uint		id:1 ;
 } ; /* end struct */
 
 struct subinfo {
 	ids		id ;
-	SUBINFO_FL	f ;
+	SI_FL		fl ;
 	time_t		dt ;
 } ; /* end struct */
 
@@ -233,7 +243,7 @@ struct ktag_params {
 	uchar		*wterms ;
 	int		minwlen ;
 	int		f_eigen ;
-} ;
+} ; /* end struct */
 
 struct ktag_head {
 	KTAG_PARAMS	*kap ;
@@ -251,7 +261,7 @@ struct ktag_head {
 
 local int	bibleqs_infoloadbegin(BIBLEQS *,cchar *,cchar *) ;
 local int	bibleqs_infoloadend(BIBLEQS *) ;
-local int	bibleqs_indopen(BIBLEQS *,SUBINFO *) ;
+local int	bibleqs_indopen(BIBLEQS *,SI *) ;
 
 local int	bibleqs_indclose(BIBLEQS *) ;
 local int	bibleqs_indmk(BIBLEQS *,cchar *,time_t) ;
@@ -266,10 +276,10 @@ local int	bibleqs_matchkeys(BIBLEQS *,SEARCHKEYS *,SEARCHKEYS_POP *,
 			cchar *,int) ;
 local int	bibleqs_loadbuf(BIBLEQS *,uint,char *,int) ;
 local int	bibleqs_mkhkeys(BIBLEQS *,vecstr *,SEARCHKEYS *) ;
-local int	bibleqs_indopenseq(BIBLEQS *,SUBINFO *) ;
-local int	bibleqs_indopenseqer(BIBLEQS *,SUBINFO *,DIRSEEN *,EXPCOOK *) ;
+local int	bibleqs_indopenseq(BIBLEQS *,SI *) ;
+local int	bibleqs_indopenseqer(BIBLEQS *,SI *,DIRSEEN *,EXPCOOK *) ;
 local int	bibleqs_indopencheck(BIBLEQS *,cchar *) ;
-local int	bibleqs_indopenmk(BIBLEQS *,SUBINFO *,cchar *) ;
+local int	bibleqs_indopenmk(BIBLEQS *,SI *,cchar *) ;
 
 local int	bibleqs_loadcooks(BIBLEQS *,EXPCOOK *) ;
 local int	bibleqs_dirok(BIBLEQS *,DIRSEEN *,ids *,cchar *,int) ;
@@ -291,11 +301,11 @@ local int	bibleqs_lookuper(BIBLEQS *,BIBLEQS_CUR *,int,
 local int	bibleqs_mksysvarsi(BIBLEQS *,cchar *) ;
 #endif
 
-local int	subinfo_start(SUBINFO *) ;
-local int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_start(SI *) ;
+local int	subinfo_finish(SI *) ;
 
 #ifdef	COMMENT
-local int	subinfo_ids(SUBINFO *) ;
+local int	subinfo_ids(SI *) ;
 #endif
 
 local int	ktag_start(KTAG *,KTAG_PARAMS *,size_t,cchar *,int) ;
@@ -430,11 +440,13 @@ int bibleqs_open(BIBLEQS *op,cchar *pr,cchar *dbname) noex {
 		    if ((rs = bibleqs_indopen(op,&si)) >= 0) {
 			op->magval = BIBLEQS_MAGIC ;
 		    }
-		    if (rs < 0)
+		    if (rs < 0) {
 			bibleqs_dbmapdestroy(op) ;
+		    }
 	        } /* end if (bibleqs_dbmapcreate) */
-		if (rs < 0)
+		if (rs < 0) {
 		    bibleqs_infoloadend(op) ;
+		}
 	    } /* end if (bibleqs_infoloadbegin) */
 	    rs1 = subinfo_finish(&si) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -462,25 +474,26 @@ int bibleqs_close(BIBLEQS *op) {
 
 	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
 
+	{
 	rs1 = bibleqs_indclose(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 #if	CF_EXTRASTRONG
+	{
 	rs1 = bibleqs_eigenclose(op) ;
 	if (rs >= 0) rs = rs1 ;
+	}
 #endif
-
+	{
 	rs1 = bibleqs_dbmapdestroy(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = bibleqs_infoloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 #if	CF_DEBUGN
 	nprintf(NDF,"bibleqs_close: ret rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUGS
 	debugprintf("bibleqs_close: ret rs=%d\n",rs) ;
 #endif
 
@@ -574,7 +587,7 @@ int bibleqs_curend(BIBLEQS *op,BIBLEQS_CUR *curp) {
 	return rs ;
 } /* end subroutine (bibleqs_curend) */
 
-int bibleqs_lookup(BIBLEQS *op,BIBLEQS_CUR *curp,int qo,cchar **qsp) {
+int bibleqs_curlook(BIBLEQS *op,BIBLEQS_CUR *curp,int qo,cchar **qsp) {
 	SEARCHKEYS	sk ;
 	vecstr		hkeys ;			/* hash-keys */
 	int		rs ;
@@ -624,9 +637,9 @@ int bibleqs_lookup(BIBLEQS *op,BIBLEQS_CUR *curp,int qo,cchar **qsp) {
 #endif
 
 	return (rs >= 0) ? c : rs ;
-} /* end subroutine (bibleqs_lookup) */
+} /* end subroutine (bibleqs_curlook) */
 
-int bibleqs_read(BIBLEQS *op,BIBLEQS_CUR *curp,BIBLEQS_Q *citep,
+int bibleqs_curenum(BIBLEQS *op,BIBLEQS_CUR *curp,BIBLEQS_Q *citep,
 		char *vbuf,int vlen) {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -644,12 +657,9 @@ int bibleqs_read(BIBLEQS *op,BIBLEQS_CUR *curp,BIBLEQS_Q *citep,
 	    int		si ;
 	    int		ml ;
 	    cchar	*mp ;
-
-
 #if	CF_DEBUGS
 	debugprintf("bibleqs_read: c_i=%u\n",ei) ;
 #endif
-
 	recoff = curp->verses[ei] ;
 	if ((ei < curp->nverses) && (recoff != UINT_MAX)) {
 
@@ -705,7 +715,7 @@ int bibleqs_read(BIBLEQS *op,BIBLEQS_CUR *curp,BIBLEQS_Q *citep,
 #endif
 
 	return (rs >= 0) ? len : rs ;
-} /* end subroutine (bibleqs_read) */
+} /* end subroutine (bibleqs_curenum) */
 
 
 /* private subroutines */
@@ -728,9 +738,8 @@ local int bibleqs_infoloadbegin(BIBLEQS *op,cchar *pr,cchar *dbname) {
 	        debugprintf("bibleqs_infoloadbegin: dbfname=%s\n",dbfname) ;
 #endif
 	        if ((rs = uc_mallocstrw(dbfname,fnl,&cp)) >= 0) {
-	            USTAT		sb ;
 		    op->dbfname = cp ;
-	            if ((rs = u_stat(op->dbfname,&sb)) >= 0) {
+	            if (ustat sb ; (rs = u_stat(op->dbfname,&sb)) >= 0) {
 	                if (S_ISREG(sb.st_mode)) {
 	                    rs = perm(op->dbfname,-1,-1,nullptr,R_OK) ;
 	                } else {
@@ -740,7 +749,7 @@ local int bibleqs_infoloadbegin(BIBLEQS *op,cchar *pr,cchar *dbname) {
 		    if (rs < 0) {
 		        uc_free(op->dbfname) ;
 		        op->dbfname = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (m-a) */
 	    } /* end if (mkfnamesuf) */
 	} /* end if (mkpath) */
@@ -815,7 +824,7 @@ local int bibleqs_dbmapdestroy(BIBLEQS *op) {
 	return rs ;
 } /* end subroutine (bibleqs_dbmapdestroy) */
 
-local int bibleqs_indopen(BIBLEQS *op,SUBINFO *sip) {
+local int bibleqs_indopen(BIBLEQS *op,SI *sip) {
 	int		rs ;
 
 	rs = bibleqs_indopenseq(op,sip) ;
@@ -827,7 +836,7 @@ local int bibleqs_indopen(BIBLEQS *op,SUBINFO *sip) {
 	return rs ;
 } /* end subroutine (bibleqs_indopen) */
 
-local int bibleqs_indopenseq(BIBLEQS *op,SUBINFO *sip) {
+local int bibleqs_indopenseq(BIBLEQS *op,SI *sip) {
 	DIRSEEN		ds ;
 	int		rs ;
 	int		rs1 ;
@@ -848,7 +857,7 @@ local int bibleqs_indopenseq(BIBLEQS *op,SUBINFO *sip) {
 	return rs ;
 } /* end subroutines (bibleqs_indopenseq) */
 
-local int bibleqs_indopenseqer(BIBLEQS *op,SUBINFO *sip,
+local int bibleqs_indopenseqer(BIBLEQS *op,SI *sip,
 		DIRSEEN *dsp,EXPCOOK *ckp) {
 	ids		id ;
 	cint	elen = MAXPATHLEN ;
@@ -1001,9 +1010,9 @@ local int bibleqs_indopencheck(BIBLEQS *op,cchar *idir) {
 	        debugprintf("bibleqs_indopencheck: txtindex_open() rs=%d\n",
 			rs) ;
 #endif
-	        if ((rs = txtindex_info(&op->ind,&tinfo)) >= 0) {
+	        if ((rs = txtindex_getinfo(&op->ind,&tinfo)) >= 0) {
 	            if (tinfo.ctime < op->ti_db) rs = SR_STALE ;
-	        } /* end if (txtindex_info) */
+	        } /* end if (txtindex_getinfo) */
 	        if (rs < 0) {
 		    op->fl.ind = false ;
 	            txtindex_close(&op->ind) ;
@@ -1018,7 +1027,7 @@ local int bibleqs_indopencheck(BIBLEQS *op,cchar *idir) {
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleqs_indopencheck) */
 
-local int bibleqs_indopenmk(BIBLEQS *op,SUBINFO *sip,cchar *idir) {
+local int bibleqs_indopenmk(BIBLEQS *op,SI *sip,cchar *idir) {
 	int		rs ;
 	int		c = 0 ;
 
@@ -1769,11 +1778,9 @@ local int bibleqs_eigenclose(BIBLEQS *op)
 	}
 
 	return rs ;
-}
-/* end subroutine (bibleqs_eigenopen) */
+} /* end subroutine (bibleqs_eigenopen) */
 
 #endif /* CF_EXTRASTRONG */
-
 
 local int bibleqs_lookuper(op,curp,qo,skp,hkp)
 BIBLEQS		*op ;
@@ -1887,7 +1894,7 @@ local int bibleqs_mkhkeys(BIBLEQS *op,vecstr *hkp,SEARCHKEYS *skp) noex {
 	return (rs >= 0) ? nkeys : rs ;
 } /* end subroutine (bibleqs_mkhkeys) */
 
-local int subinfo_start(SUBINFO *sip) noex {
+local int subinfo_start(SI *sip) noex {
 	int		rs = SR_OK ;
 	memclear(sip) ;
 	sip->dt = time(nullptr) ;
@@ -1895,7 +1902,7 @@ local int subinfo_start(SUBINFO *sip) noex {
 } /* end subroutine (subinfo_start) */
 
 #ifdef	COMMENT
-local int subinfo_ids(SUBINFO *sip) noex {
+local int subinfo_ids(SI *sip) noex {
 	int		rs = SR_OK ;
 	if (! sip->fl.id) {
 	    sip->fl.id = TRUE ;
@@ -1905,7 +1912,7 @@ local int subinfo_ids(SUBINFO *sip) noex {
 } /* end subroutine (subinfo_ids) */
 #endif /* COMMENT */
 
-local int subinfo_finish(SUBINFO *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sip->fl.id) {
