@@ -47,7 +47,7 @@ struct bibleparas_information {
 	time_t		dbtime ;		/* db-time */
 	time_t		vitime ;		/* vi-time */
 	uint		maxbook ;
-	uint		maxchapter ;
+	uint		maxchap ;
 	uint		nverses ;
 	uint		nzverses ;
 } ; /* end struct */
@@ -94,7 +94,7 @@ EXTERNC_begin
 
 extern int bibleparas_open(bibleparas *,cchar *,cchar *) noex ;
 extern int bibleparas_count(bibleparas *) noex ;
-extern int bibleparas_ispara(bibleparas *,bibleparas_q *) noex ;
+extern int bibleparas_ispara(bibleparas *,con bibleparas_q *) noex ;
 extern int bibleparas_curbegin(bibleparas *,bibleparas_cur *) noex ;
 extern int bibleparas_curenum(bibleparas *,bibleparas_cur *,
 		bibleparas_q *) noex ;
