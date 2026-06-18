@@ -107,8 +107,8 @@ int biblecur_start(biblecur *op) noex {
     	int		rs ;
 	if ((rs = biblecur_ctor(op)) >= 0) {
 	    op->book = -1 ;
-	    op->chapter = -1 ;
-	    op->verse = -1 ;
+	    op->chap = -1 ;
+	    op->vers = -1 ;
 	    if (rs < 0) {
 		biblecur_dtor(op) ;
 	    } /* end if (error) */
@@ -121,8 +121,8 @@ int biblecur_finish(biblecur *op) noex {
 	int		rs1 ;
 	if ((rs = biblecur_magic(op)) >= 0) {
 	    op->book = -1 ;
-	    op->chapter = -1 ;
-	    op->verse = -1 ;
+	    op->chap = -1 ;
+	    op->vers = -1 ;
 	    {
 		rs1 = biblecur_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
@@ -148,8 +148,8 @@ int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	        int	ch = MKCHAR(*sp) ;
 	        if (isdigitlatin(ch)) {
 	            int		n_book = -1 ;
-	            int		n_chapter = -1 ;
-	            int		n_verse = -1 ;
+	            int		n_chap = -1 ;
+	            int		n_vers = -1 ;
 	            char	nterms[32] ;
 	            fieldterms(nterms,false,": \t") ;
 	            if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
@@ -159,16 +159,16 @@ int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	                for (int fl ; (fl = fsb.word(nterms,&fp)) >= 0 ; ) {
 	                    if (fl > 0) {
 	                        si = intconv((fp + fl) - sqp) ;
-	                        if ((rs = cfdeci(fp,fl,&nval)) >= 0) {
+	                        if ((rs = cfdec(fp,fl,&nval)) >= 0) {
 	                            switch (i) {
 	                            case 0:
 	                                n_book = nval ;
 	                                break ;
 	                            case 1:
-	                                n_chapter = nval ;
+	                                n_chap = nval ;
 	                                break ;
 	                            case 2:
-	                                n_verse = nval ;
+	                                n_vers = nval ;
 	                                break ;
 	                            } /* end switch */
 	                        } /* end if (ctdeci) */
@@ -183,18 +183,18 @@ int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	            if (rs >= 0) {
 	                if ((n_book >= 0) && (n_book != op->book)) {
 	                    op->fl.newbook = true ;
-	                    op->fl.newchapter = true ;
-	                    op->fl.newverse = true ;
+	                    op->fl.newchap = true ;
+	                    op->fl.newvers = true ;
 	                    op->book = n_book ;
 	                }
-	                if ((n_chapter >= 0) && (n_chapter != op->chapter)) {
-	                    op->fl.newchapter = true ;
-	                    op->fl.newverse = true ;
-	                    op->chapter = n_chapter ;
+	                if ((n_chap >= 0) && (n_chap != op->chap)) {
+	                    op->fl.newchap = true ;
+	                    op->fl.newvers = true ;
+	                    op->chap = n_chap ;
 	                }
-	                if ((n_verse >= 0) && (n_verse != op->verse)) {
-	                    op->fl.newverse = true ;
-	                    op->verse = n_verse ;
+	                if ((n_vers >= 0) && (n_vers != op->vers)) {
+	                    op->fl.newvers = true ;
+	                    op->vers = n_vers ;
 	                }
 	                si += siskipwhite((sp + si),(sl - si)) ;
 	            } /* end if (ok) */
@@ -225,8 +225,8 @@ int biblecur_newchapter(biblecur *op) noex {
     	int		rs ;
 	int		f = false ;
 	if ((rs = biblecur_magic(op)) >= 0) {
-	     f = op->fl.newchapter ;
-	     op->fl.newchapter = false ;
+	     f = op->fl.newchap ;
+	     op->fl.newchap = false ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (biblecur_newchapter) */
@@ -235,9 +235,9 @@ int biblecur_newverse(biblecur *op,int sl) noex {
     	int		rs ;
 	int		f = false ;
 	if ((rs = biblecur_magic(op)) >= 0) {
-	    if (op->fl.newverse && (sl > 0)) {
+	    if (op->fl.newvers && (sl > 0)) {
 	        f = true ;
-	        op->fl.newverse = false ;
+	        op->fl.newvers = false ;
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
