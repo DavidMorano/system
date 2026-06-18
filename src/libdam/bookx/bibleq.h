@@ -24,54 +24,48 @@
 
 
 #define	BIBLEQ		struct bibleq_head
+#define	BIBLEQ_FL	struct bibleq_flags
 #define	BIBLEQ_CUR	struct bibleq_cursor
 #define	BIBLEQ_CA	struct bibleq_calls
-#define	BIBLEQ_Q	BIBLEQS_CITE
+#define	BIBLEQ_Q	BIBLEQS_Q
 #define	BIBLEQ_CITE	BIBLEQS_CITE
 #define	BIBLEQ_MAGIC	0x99447243
 /* query options */
 #define	BIBLEQ_OPREFIX	BIBLEQS_OPREFIX		/* prefix match */
 
 
+struct bibleq_flags {
+        uint		modload:1 ;
+} ; /* end struct */
+
 struct bibleq_cursor  {
 	void	*scp ;		/* SO-cursor pointer */
 	uint	magval ;
 } ; /* end struct */
 
-EXTERNC_begin
-struct bibleq_calls {
-	int	(*open)(void *,cchar *,cchar *) noex ;
-	int	(*count)(void *) noex ;
-	int	(*curbegin)(void *,void *) noex ;
-	int	(*lookup)(void *,void *,int,cchar **) noex ;
-	int	(*enumerate)(void *,void *,BIBLEQS_CITE *,char *,int) noex ;
-	int	(*curend)(void *,void *) noex ;
-	int	(*audit)(void *) noex ;
-	int	(*close)(void *) noex ;
-} ;
-EXTERNC_end
-
 struct bibleq_head {
-	void		*obj ;		/* object pointer */
 	modload		*mlp ;
-	BIBLEQ_CA	*callp ;
+	void		*callp ;
+	void		*obj ;		/* object pointer */
+	BIBLEQ_FL	fl ;
 	uint		magval ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
-} ; /* end struct */
+} ; /* end struct (bibleq_head) */
 
 typedef	BIBLEQ		bibleq ;
-typedef	BIBLEQ_CUR	bibleq_cur ;
+typedef	BIBLEQ_FL	bibleq_fl ;
 typedef	BIBLEQ_CA	bibleq_ca ;
 typedef	BIBLEQ_Q	bibleq_q ;
+typedef	BIBLEQ_CUR	bibleq_cur ;
 
 EXTERNC_begin
 
 extern int bibleq_open(bibleq *,cchar *,cchar *) noex ;
 extern int bibleq_count(bibleq *) noex ;
 extern int bibleq_curbegin(bibleq *,bibleq_cur *) noex ;
-extern int bibleq_lookup(bibleq *,bibleq_cur *,int,cchar **) noex ;
-extern int bibleq_read(bibleq *,bibleq_cur *,bibleq_q *,char *,int) noex ;
+extern int bibleq_curlook(bibleq *,bibleq_cur *,int,cchar **) noex ;
+extern int bibleq_curenum(bibleq *,bibleq_cur *,bibleq_q *,char *,int) noex ;
 extern int bibleq_curend(bibleq *,bibleq_cur *) noex ;
 extern int bibleq_audit(bibleq *) noex ;
 extern int bibleq_close(bibleq *) noex ;
