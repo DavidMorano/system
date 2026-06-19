@@ -24,11 +24,15 @@
 #include	<usysbase.h>		/* LIBU */
 
 #include	<bcspec.h>
+#include	<biblebook.h>
+#include	<biblebooks.h>
 #include	<biblecite.h>
 #include	<biblemta.h>
 #include	<biblecur.h>
-#include	<bibleverses.h>
+#include	<biblepara.h>
+#include	<bibleparas.h>
 #include	<bibleverse.h>
+#include	<bibleverses.h>
 #include	<bpihdr.h>
 #include	<bpimk.h>
 #include	<bpi.h>
