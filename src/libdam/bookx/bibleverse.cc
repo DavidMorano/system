@@ -190,9 +190,9 @@ enum subs {
 	sub_curbegin,
 	sub_curenum,
 	sub_curend,
-	sub_audit,
 	sub_getinfo,
 	sub_chapters,
+	sub_audit,
 	sub_close,
 	sub_overlast
 } ; /* end enum (subs) */
@@ -208,9 +208,9 @@ namespace {
 	    n[sub_curbegin]	= "curbegin" ;
 	    n[sub_curenum]	= "curenum" ;
 	    n[sub_curend]	= "curend" ;
-	    n[sub_audit]	= "audit" ;
 	    n[sub_getinfo]	= "getinfo" ;
 	    n[sub_chapters]	= "chapters" ;
+	    n[sub_audit]	= "audit" ;
 	    n[sub_close]	= "close" ;
 	    n[sub_overlast]	= nullptr ;
 	} ; /* end ctor */
@@ -256,22 +256,25 @@ int bibleverse_close(BV *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = bibleverse_magic(op)) >= 0) ylikely {
-            bibleverse_calls   *callp = callsp(op->callp) ;
-            if (cauto co = callp->close ; co) ylikely {
-                rs1 = co(op->obj) ;
-                if (rs >= 0) rs = rs1 ;
-            } else {
-                rs = SR_NOSYS ;
-            }
-	    {
-	        rs1 = bibleverse_objloadend(op) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    {
-	        rs1 = bibleverse_dtor(op) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    op->magval = 0 ;
+	    rs = SR_BUGCHECK ;
+            if (bibleverse_calls *callp = callsp(op->callp) ; callp) ylikely {
+		rs = SR_OK ;
+                if (cauto co = callp->close ; co) ylikely {
+                    rs1 = co(op->obj) ;
+                    if (rs >= 0) rs = rs1 ;
+                } else {
+                    rs = SR_NOSYS ;
+                }
+	        {
+	            rs1 = bibleverse_objloadend(op) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = bibleverse_dtor(op) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        op->magval = 0 ;
+	    } /* end if (valid) */
 	} /* end if (bibleverse_magic) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
@@ -288,19 +291,6 @@ int bibleverse_count(BV *op) noex {
 	} /* end if (bibleverse_magic) */
 	return rs ;
 } /* end subroutine (bibleverse_count) */
-
-int bibleverse_audit(BV *op) noex {
-	int		rs ;
-	if ((rs = bibleverse_magic(op)) >= 0) {
-            bibleverse_calls   *callp = callsp(op->callp) ;
-            rs = SR_NOSYS ;
-            if (callp->audit) {
-                cauto   co = callp->audit ;
-                rs = co(op->obj) ;
-            } 
-	} /* end if (bibleverse_magic) */
-	return rs ;
-} /* end subroutine (bibleverse_audit) */
 
 int bibleverse_read(BV *op,char *vbuf,int vlen,con BV_Q *qp) noex {
 	int		rs ;
@@ -443,6 +433,19 @@ int bibleverse_chapters(BV *op,int book,uchar *ap,int al) noex {
 	} /* end if (bibleverse_magic) */
 	return rs ;
 } /* end subroutine (bibleverse_chapters) */
+
+int bibleverse_audit(BV *op) noex {
+	int		rs ;
+	if ((rs = bibleverse_magic(op)) >= 0) {
+            bibleverse_calls   *callp = callsp(op->callp) ;
+            rs = SR_NOSYS ;
+            if (callp->audit) {
+                cauto   co = callp->audit ;
+                rs = co(op->obj) ;
+            } 
+	} /* end if (bibleverse_magic) */
+	return rs ;
+} /* end subroutine (bibleverse_audit) */
 
 
 /* private subroutines */
