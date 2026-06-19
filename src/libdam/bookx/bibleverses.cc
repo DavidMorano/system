@@ -274,7 +274,7 @@ cbool			f_emptyterm	= CF_EMPTYTERM ;
 
 /* exported variables */
 
-extern const bibleverses_obj	bibleverses_modinfo = {
+const bibleverses_obj	bibleverses_modinfo = {
 	"bibleverses",
 	szof(bibleverses),
 	szof(bibleverses_cur)
@@ -1083,7 +1083,7 @@ local int entry_start(BVSS_ENT *ep,BVSS_Q *qp,uint loff,uint llen) noex {
 	            elp->loff = loff ;
 	            elp->llen = llen ;
 	        } /* end block (first line) */
-	    } /* end if (memory-qcquire) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (entry_start) */
