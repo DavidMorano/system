@@ -22,6 +22,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<biblecite.h>		/* LIBDAM */
 #include	<bpi.h>			/* LIBDAM */
 
 
@@ -57,7 +58,7 @@ struct bibleparas_query {
 } ; /* end struct */
 
 struct bibleparas_cursor {
-	BPI_CUR		vicur ;
+	bpi_cur		*vicurp ;
 } ; /* end struct */
 
 struct bibleparas_flags {
@@ -69,7 +70,7 @@ struct bibleparas_head {
 	cchar 		*dbname ;		/* DB-name */
 	cchar 		*dbfname ;		/* DB file-name */
 	char		*mapdata ;		/* memory-map address */
-	BPI		vind ;			/* verse-index */
+	bpi		*vindp ;		/* verse-index-pointer */
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* last check of file */
@@ -80,7 +81,7 @@ struct bibleparas_head {
 	uint		magval ;
 	int		nverses ;
 	int		ncursors ;
-} ; /* end struct */
+} ; /* end struct (bibleparas_head) */
 
 typedef	BIBLEPARAS		bibleparas ;
 typedef	BIBLEPARAS_OBJ		bibleparas_obj ;
@@ -104,6 +105,8 @@ extern int bibleparas_getinfo(bibleparas *,bibleparas_info *) noex ;
 extern int bibleparas_close(bibleparas *) noex ;
 
 EXTERNC_end
+
+extern const bibleparas_obj	bibleparas_modinfo ;
 
 
 #endif /* BIBLEPARAS_INCLUDE */
