@@ -263,18 +263,6 @@ int bibleq_close(BQ *op) noex {
 	return rs ;
 } /* end subroutine (bibleq_close) */
 
-int bibleq_audit(BQ *op) noex {
-	int		rs ;
-	if ((rs = bibleq_magic(op)) >= 0) ylikely {
-            bibleq_calls   *callp = callsp(op->callp) ;
-	    rs = SR_NOSYS ;
-            if (cauto co = callp->audit ; co) ylikely {
-	        rs = co(op->obj) ;
-	    }
-	} /* end if (bibleq_magic) */
-	return rs ;
-} /* end subroutine (bibleq_audit) */
-
 int bibleq_count(BQ *op) noex {
 	int		rs ;
 	if ((rs = bibleq_magic(op)) >= 0) ylikely {
@@ -381,6 +369,18 @@ int bibleq_curlook(BQ *op,BQ_C *curp,int qo,cchar **klp) noex {
 	} /* end if (bibleq_magic) */
 	return rs ;
 } /* end subroutine (bibleq_curlook) */
+
+int bibleq_audit(BQ *op) noex {
+	int		rs ;
+	if ((rs = bibleq_magic(op)) >= 0) ylikely {
+            bibleq_calls   *callp = callsp(op->callp) ;
+	    rs = SR_NOSYS ;
+            if (cauto co = callp->audit ; co) ylikely {
+	        rs = co(op->obj) ;
+	    }
+	} /* end if (bibleq_magic) */
+	return rs ;
+} /* end subroutine (bibleq_audit) */
 
 
 /* private subroutines */
