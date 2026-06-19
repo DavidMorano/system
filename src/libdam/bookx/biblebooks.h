@@ -37,7 +37,7 @@ struct biblebooks_object {
 } ; /* end struct */
 
 struct biblebooks_head {
-	vecpstr		db ;
+	vecpstr		*dbp ;
 	uint		magval ;
 } ; /* end struct */
 
@@ -56,6 +56,8 @@ extern int	biblebooks_audit	(biblebooks *) noex ;
 extern int	biblebooks_close	(biblebooks *) noex ;
 
 EXTERNC_end
+
+extern const biblebooks_obj	biblebooks_modinfo ;
 
 
 #endif /* BIBLEBOOKS_INCLUDE */
