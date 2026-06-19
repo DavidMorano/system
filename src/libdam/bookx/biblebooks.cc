@@ -5,6 +5,7 @@
 /* BIBLEBOOKS object implementation */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -27,17 +28,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* POSIX */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
 #include	<vecpstr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"biblebooks.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -45,6 +51,21 @@
 #define	BIBLEBOOKS_DBDNAME	"share/biblebooks"
 #define	BIBLEBOOKS_DBTITLE	"Bible"
 #define	BIBLEBOOKS_DEFENTS	67
+
+#define	BBS		biblebooks
+#define	BBS_MAG		BIBLEBOOKS_MAGIC
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0	/* debugging */
+#endif
+
+
+/* imported namespaces */
+
+using libuc::mem ;		/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -58,8 +79,47 @@
 
 /* forward references */
 
+template<typename ... Args>
+local inline int biblebooks_ctor(BBS *op,Args ... args) noex {
+    	BIBLEBOOKS	*hop = op ;
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->dbp = new(nt) vecpstr) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-vecpstr) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (biblebooks_ctor) */
+
+local int biblebooks_dtor(BBS *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->dbp) {
+		delete op->dbp ;
+		op->dbp = nullptr ;
+	    } /* end if (memory-release) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (biblebooks_dtor) */
+
+template<typename ... Args>
+local inline int biblebooks_magic(BBS *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == BBS_MAG) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (biblebooks_magic) */
+
 
 /* local variables */
+
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -76,123 +136,115 @@ const biblebooks_obj	biblebooks_modinfo = {
 
 /* exported subroutines */
 
-int biblebooks_open(BIBLEBOOKS *op,cchar *pr,cchar *dbname) noex {
-	cint		n = BIBLEBOOKS_DEFENTS ;
+int biblebooks_open(BBS *op,cchar *pr,cchar *dbn) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	if ((dbname == NULL) || (dbname[0] == '\0')) {
-	    dbname = BIBLEBOOKS_DBNAME ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if ((dbn == nullptr) || (dbn[0] == '\0')) {
+	    dbn = BIBLEBOOKS_DBNAME ;
 	}
-
-	if ((rs = vecpstr_start(&op->db,(n*14),n,0)) >= 0) {
-	    cchar	*dname = BIBLEBOOKS_DBDNAME ;
-	    char	tbuf[MAXPATHLEN + 1] ;
-	    if ((rs = mkpath3(tbuf,pr,dname,dbname)) >= 0) {
-		if ((rs = vecpstr_loadfile(&op->db,FALSE,tbuf)) >= 0) {
-		    op->magval = BIBLEBOOKS_MAGIC ;
-		    rs = vecpstr_count(&op->db) ;
-		}
-	    }
+	if ((rs = biblebooks_ctor(op,pr)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+		vecpstr	*dbp = op->dbp ;
+	        cint	vn	= BIBLEBOOKS_DEFENTS ;
+		cint	vsz	= 900 ;
+		cint	vo	= 0 ;
+	        if ((rs = dbp->start(vn,vsz,vo)) >= 0) {
+	            cchar	*dname = BIBLEBOOKS_DBDNAME ;
+		    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	                if ((rs = mkpath(tbuf,pr,dname,dbn)) >= 0) {
+		            if ((rs = dbp->loadfile(false,tbuf)) >= 0) {
+		                op->magval = BIBLEBOOKS_MAGIC ;
+		                rs = vecpstr_count(op->dbp) ;
+				c = rs ;
+		            }
+	                } /* end if (mkpath) */
+			rs1 = mem.free(tbuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	            if (rs < 0) {
+	                dbp->finish() ;
+		        op->magval = 0 ;
+	            } /* end if (error) */
+	        } /* end if (vecpstr_start) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-	        vecpstr_finish(&op->db) ;
-		op->magval = 0 ;
+		biblebooks_dtor(op) ;
 	    }
-	} /* end if (vecpstr_start) */
-
-	return rs ;
+        } /* end if (biblebooks_ctor) */
+	return (rs >= 0) ? c : rs ;
 } /* end subroutine (biblebooks_open) */
 
-/* free up the entire vector string data structure object */
-int biblebooks_close(BIBLEBOOKS *op) {
-	int		rs = SR_OK ;
+int biblebooks_close(BBS *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = vecpstr_finish(&op->db) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magval = 0 ;
+	if ((rs = biblebooks_magic(op)) >= 0) {
+	    if (op->dbp) {
+		vecpstr *dbp = op->dbp ;
+	        rs1 = dbp->finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = biblebooks_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
+        } /* end if (biblebooks_magic) */
 	return rs ;
 } /* end subroutine (biblebooks_close) */
 
-int biblebooks_count(BIBLEBOOKS *op) {
+int biblebooks_count(BBS *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
-
-	rs = vecpstr_count(&op->db) ;
-
+        if ((rs = biblebooks_magic(op)) >= 0) ylikely {
+	    vecpstr *dbp = op->dbp ;
+	    rs = dbp->count ;
+        } /* end if (biblebooks_magic) */
 	return rs ;
 } /* end subroutine (biblebooks_count) */
 
-int biblebooks_max(BIBLEBOOKS *op) {
+int biblebooks_max(BBS *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = vecpstr_count(&op->db)) > 0) {
-	    rs -= 1 ;
-	}
-
+        if ((rs = biblebooks_magic(op)) >= 0) ylikely {
+	    vecpstr *dbp = op->dbp ;
+	    if ((rs = dbp->count) > 0) {
+	        rs -= 1 ;
+	    }
+        } /* end if (biblebooks_magic) */
 	return rs ;
 } /* end subroutine (biblebooks_max) */
 
-int biblebooks_audit(BIBLEBOOKS *op) {
+int biblebooks_audit(BBS *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
-
-	rs = vecpstr_audit(&op->db) ;
-
+        if ((rs = biblebooks_magic(op)) >= 0) ylikely {
+	    vecpstr *dbp = op->dbp ;
+	    rs = dbp->audit ;
+        } /* end if (biblebooks_magic) */
 	return rs ;
 } /* end subroutine (biblebooks_audit) */
 
-int biblebooks_look(BIBLEBOOKS *op,char *rbuf,int rlen,int bi) {
+int biblebooks_look(BBS *op,char *rbuf,int rlen,int bi) noex {
 	int		rs ;
-	const char	*cp ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("biblebooks_get: bi=%d\n",bi) ;
-#endif
-
-	if ((rs = vecpstr_get(&op->db,bi,&cp)) >= 0) {
-	    rs = sncpy1(rbuf,rlen,cp) ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("biblebooks_get: ret rs=%d\n",rs) ;
-#endif
-
+        if ((rs = biblebooks_magic(op,rbuf)) >= 0) ylikely {
+	    vecpstr *dbp = op->dbp ;
+	    if (cchar *cp ; (rs = dbp->get(bi,&cp)) >= 0) {
+	        rs = sncpy1(rbuf,rlen,cp) ;
+	    }
+        } /* end if (biblebooks_magic) */
 	return rs ;
 } /* end subroutine (biblebooks_look) */
 
-int biblebooks_get(BIBLEBOOKS *op,int bi,char *rbuf,int rlen) {
+int biblebooks_get(BBS *op,int bi,char *rbuf,int rlen) noex {
 	return biblebooks_look(op,rbuf,rlen,bi) ;
 } /* end subroutine (biblebooks_get) */
 
-int biblebooks_size(BIBLEBOOKS *op) {
-	if (op == NULL) return SR_FAULT ;
-	if (op->magval != BIBLEBOOKS_MAGIC) return SR_NOTOPEN ;
-	return vecpstr_strsize(&op->db) ;
+int biblebooks_size(BBS *op) noex {
+    	int		rs ;
+        if ((rs = biblebooks_magic(op)) >= 0) ylikely {
+	    vecpstr *dbp = op->dbp ;
+	    rs = dbp->strsize ;
+        } /* end if (biblebooks_magic) */
+	return rs ;
 } /* end subroutine (biblebooks_size) */
 
 
