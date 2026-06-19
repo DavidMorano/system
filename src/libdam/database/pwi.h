@@ -13,12 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ipasswd.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ipasswd.h>		/* LIBU */
 
 
 #define	PWI		struct pwi_head
@@ -32,8 +29,7 @@ struct pwi_cursor {
 
 struct pwi_head {
 	ipasswd		*dbp ;
-	uint		magic ;
-	int		i ;
+	uint		magval ;
 } ; /* end struct */
 
 typedef PWI		pwi ;
@@ -41,9 +37,9 @@ typedef PWI_CUR		pwi_cur ;
 
 EXTERNC_begin
 
-extern int pwi_open(pwi *,cchar *,cchar *) noex ;
-extern int pwi_lookup(pwi *,char *,int,cchar *) noex ;
-extern int pwi_close(pwi *) noex ;
+extern int pwi_open	(pwi *,cchar *,cchar *) noex ;
+extern int pwi_lookup	(pwi *,char *,int,cchar *) noex ;
+extern int pwi_close	(pwi *) noex ;
 
 EXTERNC_end
 
