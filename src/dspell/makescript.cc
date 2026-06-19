@@ -3,7 +3,7 @@
 /* program to aid in spelling corrections */
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include <cstdio>
 
