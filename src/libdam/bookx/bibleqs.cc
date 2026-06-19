@@ -85,6 +85,7 @@
 #include	<sbuf.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	<naturalwords.h>	/* LIBDAM */
 #include	<txtindexmk.h>		/* LIBDAM */
@@ -408,7 +409,7 @@ constexpr int	rsneeds[] = {
 
 /* exported variables */
 
-extern const bibleqs_obj	bibleqs_modinfo = {
+const bibleqs_obj	bibleqs_modinfo = {
 	"bibleqs",
 	szof(bibleqs),
 	szof(bibleqs_cur)
@@ -1838,8 +1839,9 @@ vecstr		*hkp ;
 	                    memcpy(curp->verses,a,size) ;
 	                    curp->verses[c] = UINT_MAX ;
 		        }
-	            } else
+	            } else {
 	                curp->verses = nullptr ;
+		    }
 	        } /* end if (ok) */
 
 	    } /* end if (getvec) */
