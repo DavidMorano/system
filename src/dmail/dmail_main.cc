@@ -54,11 +54,11 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getpwx.h>
-#include	<getbufsize.h>
 #include	<getportnum.h>
-#include	<getourenv.h>
 #include	<getx.h>
 #include	<getxname.h>
 #include	<getax.h>
@@ -187,9 +187,9 @@ local int	procnodecluster(PI *pip) noex ;
 local int	procuucpinfo(PI *) noex ;
 local int	procenvfromaddr(PI *) noex ;
 local int	procprotospec(PI *) noex ;
-local int	process(PI *,ARGINFO *,BITS *,paramopt *,
+local int	process(PI *,ARGINFO *,bits *,paramopt *,
 			cchar *,cchar *,cchar *) noex ;
-local int	processing(PI *,ARGINFO *,BITS *,
+local int	processing(PI *,ARGINFO *,bits *,
 			cchar *,cchar *,cchar *) noex ;
 local int	processings(PI *,VECOBJ *,VECOBJ *,cchar *) noex ;
 local int	procfindfiles(PI *) noex ;
@@ -200,7 +200,7 @@ local int	procfindmbtab(PI *,vecstr *) noex ;
 local int	procdefs(PI *) noex ;
 local int	procuserboxes(PI *pip) noex ;
 local int	procloginfo(PI *) noex ;
-local int	procargs(PI *,ARGINFO *,BITS *,VECOBJ *,cchar *) noex ;
+local int	procargs(PI *,ARGINFO *,bits *,VECOBJ *,cchar *) noex ;
 local int	procin(PI *,vecobj *,bfile *,vecobj *,cchar *) noex ;
 local int	procmaildirdead(PI *,cchar *,int) noex ;
 local int	procmaildircopy(PI *,cchar *,int) noex ;
@@ -464,7 +464,7 @@ int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	keyopt		akopts ;
 	PARAMOPT	akparams ;
 	bfile		errfile ;
@@ -1157,7 +1157,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if ((rs = proglog_begin(pip,&u)) >= 0) {
 	                        {
 	                            ARGINFO	*aip = &ainfo ;
-	                            BITS	*bop = &pargs ;
+	                            bits	*bop = &pargs ;
 	                            PARAMOPT	*aop = &akparams ;
 	                            cchar	*ofn = ofname ;
 	                            cchar	*afn = afname ;
@@ -2195,7 +2195,7 @@ local int procloginfo(PI *pip)
 /* end subroutine (procloginfo) */
 
 
-local int procargs(PI *pip,ARGINFO *aip,BITS *app,VECOBJ *rlp,cchar *afn)
+local int procargs(PI *pip,ARGINFO *aip,bits *app,VECOBJ *rlp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2417,7 +2417,7 @@ local int loadrecip(PI *pip,VECOBJ *nlp,cchar np[],int nl)
 local int processing(pip,aip,bop,ofn,afn,ifn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-BITS		*bop ;
+bits		*bop ;
 cchar		*ofn ;
 cchar		*afn ;
 cchar		*ifn ;
