@@ -34,20 +34,21 @@
 
 struct biblebook_flags {
         uint		modload:1 ;	/* dynamic load module */
-	int		localdb:1 ;	/* using local DB */
+	uint		localdb:1 ;	/* using local DB */
 } ; /* end struct */
 
 struct biblebook_head {
 	modload		*mlp ;		/* module-loeader-pointer */
-	void		callp ;		/* call-pointer */
-	void		*obj ;		/* object pointer */
+	voidp		callp ;		/* call-pointer */
+	voidp		obj ;		/* object pointer */
 	cchar		**names ;
 	cchar		*namestrs ;
 	BIBLEBOOK_FL	fl ;
 	uint		magval ;
 	int		objsz ;		/* object size */
-	int		namesize ;	/* names-size */
-} ; /* end struct */
+	int		cursz ;		/* object size */
+	int		namesz ;	/* names-size */
+} ; /* end struct (biblebook_head) */
 
 typedef	BIBLEBOOK		biblebook ;
 typedef	BIBLEBOOK_FL		biblebook_fl ;
@@ -58,7 +59,7 @@ extern int	biblebook_open	(biblebook *,cchar *,cchar *) noex ;
 extern int	biblebook_count	(biblebook *) noex ;
 extern int	biblebook_max	(biblebook *) noex ;
 extern int	biblebook_read	(biblebook *,char *,int,int) noex ;
-extern int	biblebook_look	biblebook *,char *,int,int) noex ;
+extern int	biblebook_look	(biblebook *,char *,int,int) noex ;
 extern int	biblebook_get	(biblebook *,int,char *,int) noex ;
 extern int	biblebook_match	(biblebook *,cchar *,int) noex ;
 extern int	biblebook_size	(biblebook *) noex ;
