@@ -229,23 +229,26 @@ int bvs_close(bvs *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = bvs_magic(op)) >= 0) {
-	    bvs_calls	*callp = callsp(op->callp) ;
-	    if (callp->close) {
-		cauto 	co = callp->close ;
-	        rs1 = co(op->obj) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } else {
-		rs = SR_NOSYS ;
-	    }
-	    {
-	        rs1 = bvs_objloadend(op) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    {
-	        rs1 = bvs_dtor(op) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    op->magval = 0 ;
+	    rs = SR_BUGCHECK ;
+	    if (bvs_calls *callp = callsp(op->callp) ; callp) {
+		rs = SR_OK ;
+	        if (callp->close) {
+		    cauto 	co = callp->close ;
+	            rs1 = co(op->obj) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } else {
+		    rs = SR_NOSYS ;
+	        }
+	        {
+	            rs1 = bvs_objloadend(op) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = bvs_dtor(op) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        op->magval = 0 ;
+	    } /* end if (valid) */
 	} /* end if (bvs_magic) */
 	return rs ;
 } /* end subroutine (bvs_close) */
