@@ -29,23 +29,22 @@
 
 /*******************************************************************************
 
+  	Description:
 	This module provides the handling for COMSAT matters.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<ctype.h>
-
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
@@ -80,41 +79,12 @@
 
 /* external subroutines */
 
-extern int	snscs(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	headkeymat(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,cchar *) ;
-extern int	getserial(cchar *) ;
-extern int	getheour(cchar *,cchar *,struct hostent *,char *,int) ;
-extern int	mkgecosname(char *,int,cchar *) ;
-extern int	mkrealame(char *,int,cchar *,int) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
-extern int	issamehostname(cchar *,cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
-
 extern int	parsenodespec(PROGINFO *,char *,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -139,11 +109,12 @@ static int	mkcsmsg(char *,int,cchar *,int,uint) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progcomsat(PROGINFO	*pip,vecobj *rsp)
-{
+int progcomsat(PROGINFO	*pip,vecobj *rsp) {
 	const int	pf = PF_INET4 ;
 	int		rs ;
 	int		rs1 ;
@@ -262,7 +233,7 @@ int		fd ;
 int		defport ;
 {
 	struct hostent	he, *hep = &he ;
-	const int	helen = getbufsize(getbufsize_he) ;
+	const int	helen = bufsizeget(bufsize_ho) ;
 	int		rs ;
 	int		n = 0 ;
 	char		*hebuf ;
