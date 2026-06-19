@@ -59,7 +59,7 @@
 #include	<grp.h>
 #include	<usystem.h>
 #include	<cucgetpw.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<sbuf.h>
 #include	<bfile.h>
@@ -167,7 +167,7 @@ int progboxer(PROGINFO *pip,int tfd,RECIP *rp)
 	struct passwd	pw ;
 	OPENS		os ;
 	LOCINFO		*lip = pip->lip ;
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	const int	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
