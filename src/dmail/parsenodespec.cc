@@ -1,10 +1,11 @@
-/* dmail_parsenodespec SUPPORT */
+/* parsenodespec SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* parse a COMSAT node specification into node and port */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -19,7 +20,7 @@
 /******************************************************************************
 
   	Name:
-	parsenodespec
+	parrsenodespec
 
 	Description:
 	This little subroutine just parses out a node specification.
@@ -33,7 +34,7 @@
 	port that was passed by the caller is returned instead.
 
 	Synopsis:
-	int parsenodespec(proginfo *pip,char *rbuf,cc *nsp,int nsl) noex
+	int parsenodespec(PROGINFO *pip,char *rbuf,cchar *nsp,int nsl) noex
 
 	Arguments:
 	pip		pointer to program information
@@ -53,15 +54,15 @@
 #include	<sys/stat.h>
 #include	<netinet/in.h>
 #include	<unistd.h>
-#include	<csignal>
 #include	<ctime>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<getportnum.h>
-#include	<strwcpy.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -85,6 +86,10 @@ extern int	matstr(cchar **,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
+
+#if	CF_DEBUGS || CF_DEBUG
+extern int	debugprintf(cchar *,...) ;
+#endif
 
 extern char	*strdcpy1(char *,int,cchar *) ;
 extern char	*strdcpy1w(char *,int,cchar *,int) ;
@@ -112,9 +117,12 @@ typedef unsigned int	in_addr_t ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* external subroutines */
 
-int parsenodespec(PROGINFO *pip,char rbuf[],cchar *nsp,int nsl) noex {
+int parsenodespec(PROGINFO *pip,char *rbuf,cchar *nsp,int nsl) noex {
 	int		rs = SR_OK ;
 	int		nl, pl ;
 	int		port = 0 ;
@@ -155,6 +163,11 @@ int parsenodespec(PROGINFO *pip,char rbuf[],cchar *nsp,int nsl) noex {
 	    }
 
 	} /* end if (positive) */
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(5))
+	    debugprintf("parsenodespec: ret rs=%d port=%u\n",rs,port) ;
+#endif
 
 	return (rs >= 0) ? port : rs ;
 }
