@@ -97,6 +97,8 @@ extern int bibleqs_close(bibleqs *) noex ;
 
 EXTERNC_end
 
+extern const bibleqs_obj	bibleqs_modinfo ;
+
 
 #endif /* BIBLEQS_INCLUDE */
 
