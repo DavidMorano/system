@@ -125,7 +125,7 @@ struct prepname {
 
 local int	usage(PI *) ;
 
-local int	procargs(PI *,ARGINFO *,BITS *,cchar *,cchar *) ;
+local int	procargs(PI *,ARGINFO *,bits *,cchar *,cchar *) ;
 
 local int	procname(PI *,bfile *,cchar *) ;
 local int	procspecial(PI *,bfile *,cchar *,int) ;
@@ -213,8 +213,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -569,7 +569,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -717,7 +717,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if (rs >= 0) {
 	    ARGINFO	*aip = &ainfo ;
-	    BITS	*bop = &pargs ;
+	    bits	*bop = &pargs ;
 	    cchar	*ofn = ofname ;
 	    cchar	*afn = afname ;
 	    rs = procargs(pip,aip,bop,ofn,afn) ;
@@ -834,7 +834,7 @@ local int usage(PI *pip)
 /* end subroutine (usage) */
 
 
-local int procargs(PI *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs ;
