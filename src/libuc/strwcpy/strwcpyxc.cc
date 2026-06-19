@@ -41,14 +41,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<toxc.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<toxc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strwcpyxc.h"
 
@@ -94,8 +94,7 @@ local char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
 	    dp = nullptr ;
 	} /* end if (non-null) */
 	return dp ;
-}
-/* end subroutine-template (strwcpyxc) */
+} /* end subroutine-template (strwcpyxc) */
 
 
 /* local variables */
