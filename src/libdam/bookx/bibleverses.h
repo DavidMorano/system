@@ -101,6 +101,8 @@ extern int bibleverses_close(bibleverses *) noex ;
 
 EXTERNC_end
 
+extern const bibleverses_obj	bibleverses_modinfo ;
+
 
 #endif /* BIBLEVERSES_INCLUDE */
 
