@@ -158,10 +158,10 @@ local int	vecpstr_reset(vecpstr *) noex ;
 local int	vecpstr_validx(vecpstr *,int) noex ;
 local void	vecpstr_arrsort(vecpstr *,vecpstr_vcmp) noex ;
 
-local int chunk_start(VPS_CH *,int) noex ;
-local int chunk_finish(VPS_CH *) noex ;
-local int chunk_check(VPS_CH *,int) noex ;
-local int chunk_add(VPS_CH *,cchar *,int,cchar **) noex ;
+local int chunk_start	(VPS_CH *,int) noex ;
+local int chunk_finish	(VPS_CH *) noex ;
+local int chunk_check	(VPS_CH *,int) noex ;
+local int chunk_add	(VPS_CH *,cchar *,int,cchar **) noex ;
 local int chunk_addkeyval(VPS_CH *,cchar *,int,cchar *,int,cchar **) noex ;
 
 local int	indexlen(int) noex ;
