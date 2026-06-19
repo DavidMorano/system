@@ -64,9 +64,9 @@
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
+#include	<ucinfo.h>
 #include	<getnodedomain.h>	/* |getnetdomain(3uc)| */
 #include	<getsystypenum.h>
-#include	<uinfo.h>
 #include	<userinfo.h>
 #include	<userattr.h>
 #include	<keyopt.h>
@@ -178,7 +178,7 @@ struct ourconf {
 	vecstr		stores ;
 	OURCONF_FL	open ;
 	PROGINFO	*pip ;
-	PARAMOPT	*pop ;
+	paramopt	*pop ;
 	cchar		*defprog ;
 } ;
 
@@ -202,7 +202,7 @@ struct intprog {
 
 local int	usage(PROGINFO *) ;
 
-local int	procopts(PROGINFO *,KEYOPT *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
 
 local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
 local int	procuserinfo_end(PROGINFO *) ;
@@ -214,7 +214,7 @@ local int	procuserinfo_logid(PROGINFO *) ;
 local int	procexpcooks_begin(PROGINFO *) ;
 local int	procexpcooks_end(PROGINFO *) ;
 
-local int	procourconf_begin(PROGINFO *,PARAMOPT *) ;
+local int	procourconf_begin(PROGINFO *,paramopt *) ;
 local int	procourconf_end(PROGINFO *) ;
 local int	procourconf_cfname(PROGINFO *) ;
 local int	procourconf_getdefprog(PROGINFO *,cchar **) ;
@@ -229,7 +229,7 @@ local int	procexps_begin(PROGINFO *,cchar *) ;
 local int	procexps_end(PROGINFO *) ;
 
 local int	procloadinfo(PROGINFO *) ;
-local int	process(PROGINFO *,ARGINFO *,PARAMOPT *,cchar *,cchar *) ;
+local int	process(PROGINFO *,ARGINFO *,paramopt *,cchar *,cchar *) ;
 local int	processor(PROGINFO *,ARGINFO *,cchar *) ;
 local int	procnopreload(PROGINFO *) ;
 
@@ -264,7 +264,7 @@ local int	loadxsched(PROGINFO *,cchar **) ;
 local int	loadpvars(PROGINFO *,cchar **,cchar *) ;
 local int	loadpvarsdef(PROGINFO *,cchar **) ;
 
-local int	ourconf_start(OURCONF *,PROGINFO *,PARAMOPT *) ;
+local int	ourconf_start(OURCONF *,PROGINFO *,paramopt *) ;
 local int	ourconf_finish(OURCONF *) ;
 local int	ourconf_setentry(OURCONF *,cchar **,cchar *,int) ;
 local int	ourconf_read(OURCONF *) ;
@@ -564,8 +564,8 @@ int main(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -947,7 +947,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                            rs = SR_INVALID ;
 			    }
 	                    if ((rs >= 0) && (cp != nullptr)) {
-				PARAMOPT	*pop = &aparams ;
+				paramopt	*pop = &aparams ;
 				cchar		*po = PO_NOPRELOAD ;
 	                        rs = paramopt_loads(pop,po,cp,cl) ;
 	                    }
@@ -976,7 +976,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                pip->have.cfname = true ;
-	                                pip->final.cfname = true ;
+	                                pip->finval.cfname = true ;
 	                                pip->cfname = argp ;
 	                            }
 	                        } else
@@ -1262,7 +1262,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    if ((rs = userinfo_start(&u,nullptr)) >= 0) {
 	        if ((rs = procuserinfo_begin(pip,&u)) >= 0) {
 		    if ((rs = procexpcooks_begin(pip)) >= 0) {
-			PARAMOPT	*pop = &aparams ;
+			paramopt	*pop = &aparams ;
 			if ((rs = procourconf_begin(pip,pop)) >= 0) {
 		            if ((rs = procdefs_begin(pip)) >= 0) {
 		                if ((rs = procenvs_begin(pip)) >= 0) {
@@ -1496,7 +1496,7 @@ local int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-local int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1507,7 +1507,7 @@ local int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -2037,7 +2037,7 @@ local int procexpcooks_end(PROGINFO *pip)
 /* end subroutine (procexpcooks_end) */
 
 
-local int procourconf_begin(PROGINFO *pip,PARAMOPT *pop)
+local int procourconf_begin(PROGINFO *pip,paramopt *pop)
 {
 	int		rs = SR_OK ;
 	if (pip->config == nullptr) {
@@ -2290,7 +2290,7 @@ local int procloadinfo(PROGINFO *pip)
 
 
 /* ARGSUSED */
-local int process(PROGINFO *pip,ARGINFO *aip,PARAMOPT *pop,
+local int process(PROGINFO *pip,ARGINFO *aip,paramopt *pop,
 		cchar *svdb,cchar *prog)
 {
 	ENVS		*enp = &pip->xenvs ;
@@ -2654,7 +2654,7 @@ local int loadaux(PROGINFO *pip)
 	UINFO_AUX	ua ;
 	int		rs ;
 
-	if ((rs = uinfo_aux(&ua)) >= 0) {
+	if ((rs = ucinfo_aux(&ua)) >= 0) {
 	    int		i ;
 	    cchar	*cp ;
 	    cchar	*vn ;
@@ -2690,7 +2690,7 @@ local int loadaux(PROGINFO *pip)
 	            rs = proginfo_setentry(pip,vpp,vp,-1) ;
 	        }
 	    } /* end for */
-	} /* end if (uinfo_aux) */
+	} /* end if (ucinfo_aux) */
 
 	return rs ;
 }
@@ -3151,7 +3151,7 @@ local int loadxsched(PROGINFO *pip,cchar *sched[])
 /* end subroutine (loadxsched) */
 
 
-local int ourconf_start(OURCONF *ocp,PROGINFO *pip,PARAMOPT *pop)
+local int ourconf_start(OURCONF *ocp,PROGINFO *pip,paramopt *pop)
 {
 	memset(ocp,0,sizeof(OURCONF)) ;
 	ocp->pip = pip ;
@@ -3214,8 +3214,8 @@ local int ourconf_setentry(OURCONF *lip,cchar **epp,cchar *vp,int vl)
 local int ourconf_read(OURCONF *ocp)
 {
 	PROGINFO	*pip = ocp->pip ;
-	PARAMFILE	pf ;
-	PARAMFILE_CUR	cur ;
+	paramfile	pf ;
+	paramfile_cur	cur ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -3350,7 +3350,7 @@ local int ourconf_defprog(OURCONF *ocp,cchar *vp,int vl)
 local int ourconf_nopreload(OURCONF *ocp,cchar *sp,int sl)
 {
 	PROGINFO	*pip = ocp->pip ;
-	PARAMOPT	*pop = ocp->pop ;
+	paramopt	*pop = ocp->pop ;
 	int		rs ;
 	cchar		*po = PO_NOPRELOAD ;
 	if (pip == nullptr) return SR_FAULT ; /* lint */
@@ -3376,8 +3376,8 @@ local int ourconf_getdefprog(OURCONF *ocp,cchar **rpp)
 
 local int ourconf_ifnopreload(OURCONF *ocp) noex {
 	PROGINFO	*pip = ocp->pip ;
-	PARAMOPT	*pop = ocp->pop ;
-	PARAMOPT_CUR	cur ;
+	paramopt	*pop = ocp->pop ;
+	paramopt_cur	cur ;
 	int		rs  ;
 	int		rs1 ;
 	int		f = FALSE ;
