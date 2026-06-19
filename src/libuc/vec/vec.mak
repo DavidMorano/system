@@ -154,85 +154,85 @@ control:
 
 
 obja_vecstr.o:		$(OBJA_VECSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objb_vecstr.o:		$(OBJB_VECSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objc_vecstr.o:		$(OBJC_VECSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objd_vecstr.o:		$(OBJD_VECSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 obje_vecstr.o:		$(OBJE_VECSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objf_vecstr.o:		$(OBJF_VECSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj_vecstr.o:		$(OBJ_VECSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obja_vecpstr.o:		$(OBJA_VECPSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objb_vecpstr.o:		$(OBJB_VECPSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objc_vecpstr.o:		$(OBJC_VECPSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objd_vecpstr.o:		$(OBJD_VECPSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 obje_vecpstr.o:		$(OBJE_VECPSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objf_vecpstr.o:		$(OBJF_VECPSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj_vecpstr.o:		$(OBJ_VECPSTR)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj0_vecstrx.o:		$(OBJ0_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 obj1_vecstrx.o:		$(OBJ1_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 obj2_vecstrx.o:		$(OBJ2_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 obj3_vecstrx.o:		$(OBJ3_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 obj4_vecstrx.o:		$(OBJ4_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 obj5_vecstrx.o:		$(OBJ5_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 obj6_vecstrx.o:		$(OBJ6_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obja_vecstrx.o:		$(OBJA_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objb_vecstrx.o:		$(OBJB_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objc_vecstrx.o:		$(OBJC_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objd_vecstrx.o:		$(OBJD_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj_vecstrx.o:		$(OBJ_VECSTRX)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obja_vecobj.o:		$(OBJA_VECOBJ)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objb_vecobj.o:		$(OBJB_VECOBJ)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj_vecobj.o:		$(OBJ_VECOBJ)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj_vecelem.o:		$(OBJ_VECELEM)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obja_vec.o:		$(OBJA_VEC)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objb_vec.o:		$(OBJB_VEC)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objc_vec.o:		$(OBJC_VEC)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 objd_vec.o:		$(OBJD_VEC)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 obje_vec.o:		$(OBJE_VEC)
-	$(LD) -r -o $@ $^
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 # vecstr
