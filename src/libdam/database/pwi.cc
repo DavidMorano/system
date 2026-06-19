@@ -25,8 +25,8 @@
 	Description:
 	This is a small hack for use by the USERINFO built-in command
 	that is part of the Korn Shell (KSH).  This object provides
-	some front-end glue for using the Iucentpw object on an
-	Iucentpw database.
+	some front-end glue for using the IPASSWD object on an
+	IPASSWD database.
 
 	Notes:
 
@@ -35,67 +35,61 @@
 	If a PWI DB name is passed to us, we only search for that
 	DB.  If no PWI DB is passwed, we search first for a DB with
 	the same name as our cluster name (if we have one); otherwise
-	failing that we search for a DB with our node name.
-
-	If no DB is present then we either make (a-fresh) the DB
-	given to us by name, or we make a DB using our cluster name.
+	failing that we search for a DB with our node name.  If no
+	DB is present then we either make (a-fresh) the DB given
+	to us by name, or we make a DB using our cluster name.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucpwcache.h>
-#include	<bufsizeget.h>
-#include	<endian.h>
-#include	<ids.h>
-#include	<mkpathx.h>
-#include	<mkfname.h>
-#include	<sfx.h>			/* |sfbasename(3uc)| */
-#include	<snx.h>
-#include	<snwcpy.h>
-#include	<strwcpy.h>
-#include	<strn.h>
-#include	<mkfnamesuf.h>
-#include	<mkgecosname.h>
-#include	<realname.h>
-#include	<ipasswd.h>
-#include	<vecstr.h>
-#include	<spawnproc.h>
-#include	<getnodename.h>
-#include	<prgetclustername.h>
-#include	<permx.h>
-#include	<char.h>
-#include	<hasx.h>
-#include	<isnot.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBUC */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucpwcache.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkfname.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfbasename(3uc)| */
+#include	<snx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<mkgecosname.h>		/* LIBUC */
+#include	<realname.h>		/* LIBUC */
+#include	<ipasswd.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<prgetclustername.h>	/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"pwi.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |memclear(3u)| */
+import uconstants ;
 
 /* local defines */
-
-#if	CF_PWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#define	GETPW_UID	ucpwcache_uid
-#else
-#define	GETPW_NAME	getpw_name
-#define	GETPW_UID	getpw_uid
-#endif /* CF_PWCACHE */
 
 #define	DBDNAME		"var/pwi"
 
@@ -122,7 +116,7 @@ import libutil ;			/* |memclear(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -195,11 +189,12 @@ template<typename ... Args>
 local int pwi_ctor(pwi *op,Args ... args) noex {
     	PWI		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->dbp = new(nothrow) ipasswd) != np) {
+	    if ((op->dbp = new(nt) ipasswd) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-ipasswd) */
 	} /* end if (non-null) */
@@ -222,7 +217,7 @@ template<typename ... Args>
 local inline int pwi_magic(pwi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == PWI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == PWI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (pwi_magic) */
@@ -277,7 +272,7 @@ int pwi_open(pwi *op,cchar *pr,cchar *dbname) noex {
 				cc *sfn = so.idxdname ;
 				if ((rs = ipasswd_open(op->dbp,sfn)) >= 0) {
 				    rv = rs ;
-	    			    op->magic = PWI_MAGIC ;
+	    			    op->magval = PWI_MAGIC ;
 				}
 			    }
 	                } /* end if (opener_midname) */
@@ -291,17 +286,17 @@ int pwi_open(pwi *op,cchar *pr,cchar *dbname) noex {
 	    }
 	} /* end if (pwi_ctor) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (pwi_open) */
+} /* end subroutine (pwi_open) */
 
 int opener::decide() noex {
 	cint		to = TO_FILEMOD ;
 	int		rs ;
-	if (char *fbuf{} ; (rs = malloc_mp(&fbuf)) >= 0) {
+	int		rs1 ;
+	if (char *fbuf ; (rs = libmem.mp(&fbuf)) >= 0) {
 	    cchar	*suf = IPASSWD_SUF ;
 	    cchar	*endstr = ENDIANSTR ;
 	    if ((rs = mkfnamesuf(fbuf,idxdname,suf,endstr)) >= 0) {
-		if (USTAT sb ; (rs = u_stat(fbuf,&sb)) >= 0) {
+		if (ustat sb ; (rs = u_stat(fbuf,&sb)) >= 0) {
 		    custime	dt = getustime ;
 		    time_t	ti_pwi = sb.st_mtime ;
 		    bool	fmk = false ;
@@ -316,11 +311,11 @@ int opener::decide() noex {
 	            rs = mk() ;
 		}
 	    } /* end if (mkfnamesuf) */
-	    rs = rsfree(rs,fbuf) ;
+	    rs1 = libmem.free(fbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (opener::decide) */
+} /* end subroutine (opener::decide) */
 
 int pwi_close(pwi *op) noex {
 	int		rs ;
@@ -334,11 +329,10 @@ int pwi_close(pwi *op) noex {
 		rs1 = pwi_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pwi_close) */
+} /* end subroutine (pwi_close) */
 
 namespace {
     struct lookuper {
@@ -354,10 +348,11 @@ namespace {
 	int operator () (char *,int) noex ;
 	int proc(cchar *,int) noex ;
     } ; /* end struct (lookuper) */
-}
+} /* end namespace */
 
 int pwi_lookup(pwi *op,char *rbuf,int rlen,cchar *name) noex {
     	int		rs ;
+	int		rs1 ;
 	int		ul = 0 ;
 	if ((rs = pwi_magic(op,rbuf,name)) >= 0) {
 	    cint	nl = lenstr(name) ;
@@ -365,19 +360,19 @@ int pwi_lookup(pwi *op,char *rbuf,int rlen,cchar *name) noex {
 	    rbuf[0] = '\0' ;
 	    if (name[0]) {
 		cint	nlen = min(REALNAMELEN,nl) ;
-		if (char *nbuf{} ; (rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
+		if (char *nbuf ; (rs = libmem.mall((nlen+1),&nbuf)) >= 0) {
 		    lookuper	lo(op,rbuf,rlen,name) ;
 		    {
 		        rs = lo(nbuf,nlen) ;
 		        ul = rs ;
 		    }
-		    rs = rsfree(rs,nbuf) ;
+		    rs1 = libmem.free(nbuf) ;
+		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (pwi_lookup) */
+} /* end subroutine (pwi_lookup) */
 
 int lookuper::operator () (char *nbuf,int nlen) noex {
     	int		rs = SR_OK ;
@@ -392,24 +387,23 @@ int lookuper::operator () (char *nbuf,int nlen) noex {
 	if (rs >= 0) {
 	    rs = proc(sp,sl) ;
 	    ul = rs ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end method (lookuper::operator) */
+} /* end method (lookuper::operator) */
 
 int lookuper::proc(cchar *sp,int sl) noex {
     	int		rs ;
 	int		rs1 ;
 	int		ul = 0 ;
 	int		c = 0 ;
-	if (char *pwbuf{} ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = libmem.pw(&pwbuf)) >= 0) {
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
 	    if (realname rn ; (rs = rn.start(sp,sl)) >= 0) {
 		ipasswd		*iop = op->dbp ;
 		auto		ip_cb = ipasswd_curbegin ;
 		if (ipasswd_cur	cur ; (rs = ip_cb(iop,&cur)) >= 0) {
-		    if (char *un{} ; (rs = malloc_un(&un)) >= 0) {
+		    if (char *un ; (rs = libmem.un(&un)) >= 0) {
 			pwdesc	pd(&pw,pwbuf,pwlen) ;
 		        cint	fopts = 0 ;
 	                while (rs >= 0) {
@@ -424,7 +418,8 @@ int lookuper::proc(cchar *sp,int sl) noex {
 			        }
 			    }
 	                } /* end while */
-			rs = rsfree(rs,un) ;
+			rs1 = libmem.free(un) ;
+		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	            rs1 = ipasswd_curend(op->dbp,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -432,7 +427,8 @@ int lookuper::proc(cchar *sp,int sl) noex {
 	        rs1 = rn.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (realname) */
-	    rs = rsfree(rs,pwbuf) ;
+	    rs1 = libmem.free(pwbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	if_constexpr (f_onlyuniq) {
 	    if ((rs >= 0) && (c > 1)) {
@@ -440,8 +436,7 @@ int lookuper::proc(cchar *sp,int sl) noex {
 	    }
 	} /* end if (f_onlyuniq) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end method (lookuper::proc) */
+} /* end method (lookuper::proc) */
 
 
 /* private subroutines */
@@ -458,26 +453,29 @@ int opener::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (idxdname) ylikely {
-	    rs1 = uc_free(idxdname) ;
+	    voidp vp = voidp(idxdname) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    idxdname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (fl.dbname && dbname) ylikely {
-	    rs1 = uc_free(dbname) ;
+	    voidp vp = voidp(dbname) ;
+	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    dbname = nullptr ;
 	    fl.dbname = false ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end method (opener::finish) */
 
 int opener::mkidxdname() noex {
     	cint		nodelen = var.nodenamelen ;
 	int		rs ;
+	int		rs1 ;
 	if ((dbname == nullptr) || (dbname[0] == '\0')) {
 	    int		ai = 0 ;
 	    cint	sz = ((nodelen + 1) * 2) ;
-	    if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) ylikely {
+	    if (char *a ; (rs = libmem.mall(sz,&a)) >= 0) ylikely {
 	        cint	nlen = nodelen ;
 	        cint	clen = nodelen ;
 	        char	*nbuf = (a + (ai++ * (nodelen + 1))) ;
@@ -492,15 +490,17 @@ int opener::mkidxdname() noex {
 		        nn = nbuf ;
 		    }
 		    if (rs >= 0) {
-		        if (char *tbuf{} ; (rs = malloc_mp(&tbuf)) >= 0) {
+		        if (char *tbuf ; (rs = libmem.mp(&tbuf)) >= 0) {
 	                    if ((rs = mkpath(tbuf,pr,DBDNAME,nn)) >= 0) {
 	    		        rs = idxload(tbuf,rs) ;
 		            }
-		    	    rs = rsfree(rs,tbuf) ;
+		    	    rs1 = libmem.free(tbuf) ;
+			    if (rs >= 0) rs = rs1 ;
 		        } /* end if (m-a-f) */
 		    } /* end if (ok) */
 	        } /* end if (getnodename) */
-	    	rs = rsfree(rs,a) ;
+	    	rs1 = libmem.free(a) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
 	    rs = idxload(dbname) ;
@@ -510,9 +510,9 @@ int opener::mkidxdname() noex {
 
 int opener::idxload(cc *dp,int dl) noex {
 	int		rs ;
-	if (cchar *cp{} ; (rs = uc_mallocstrw(dp,dl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(dp,dl,&cp)) >= 0) {
 	    idxdname = cp ;
-	}
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end method (opener::idxload) */
 
@@ -520,7 +520,7 @@ int opener::mk() noex {
         int		rs ;
         int		rs1 ;
         int		rv = 0 ;
-	if (char *pbuf{} ; (rs = malloc_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = libmem.mp(&pbuf)) >= 0) {
 	    pbuf[0] = '\0' ;
             if ((rs = mkbegin(pbuf)) >= 0) {
     		{
@@ -530,7 +530,8 @@ int opener::mk() noex {
 	        rs1 = mkend() ;
 	        if (rs >= 0) rs = rs1 ;
             } /* end if (mk) */
-	    rs = rsfree(rs,pbuf) ;
+	    rs1 = libmem.free(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
         return (rs >= 0) ? rv : rs ;
 } /* end method (opener::mk) */
@@ -569,9 +570,9 @@ int opener::mkproc(cchar *pbuf) noex {
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	int		cpid = 0 ;
+	int		cpid = 0 ; /* return-value */
 	if (vecstr envs ; (rs = vecstr_start(&envs,vn,vo)) >= 0) {
-	    if (char *abuf{} ; (rs = malloc_mn(&abuf)) >= 0) {
+	    if (char *abuf ; (rs = libmem.mn(&abuf)) >= 0) {
 		cint	alen = rs ;
 	        int	ai = 0 ;
 	        cchar	*av[10] ;
@@ -587,11 +588,12 @@ int opener::mkproc(cchar *pbuf) noex {
 		/* setup environment */
 		if ((rs = mkenv(&envs)) >= 0) {
 		    if ((rs = mkspawn(pbuf,av,&envs)) >= 0) {
-		        cint	cpid = rs ;
+		        cpid = rs ;
 			rs = mkwait(cpid) ;
 		    }
 	        } /* end if (mkenv) */
-		rs = rsfree(rs,abuf) ;
+		rs1 = libmem.free(abuf) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    rs1 = envs.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -663,7 +665,7 @@ local int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
 		ucentpw		*pwp = pdp->pwp ;
 		cint		pwlen = pdp->pwlen ;
 		char		*pwbuf = pdp->pwbuf ;
-		if ((rs = GETPW_NAME(pwp,pwbuf,pwlen,un)) > 0) {
+		if ((rs = getpwx_name(pwp,pwbuf,pwlen,un)) > 0) {
 		    cchar	*gecos = pwp->pw_gecos ;
 		    if (cchar *sp{} ; (rs = getgecosname(gecos,-1,&sp)) > 0) {
 			f = (strnbrk(sp,rs,extras) != nullptr) ;
