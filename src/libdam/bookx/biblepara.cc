@@ -41,6 +41,7 @@
 #include	<vecstr.h>		/* LIBUC */
 #include	<biblecite.h>		/* LIBDAM */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"bibleparas.h"
 #include	"biblepara.h"
@@ -283,18 +284,6 @@ int biblepara_count(BPA *op) noex {
 	return rs ;
 } /* end subroutine (biblepara_count) */
 
-int biblepara_audit(BPA *op) noex {
-	int		rs ;
-	if ((rs = biblepara_magic(op)) >= 0) ylikely {
-            biblepara_calls   *callp = callsp(op->callp) ;
-            if (cauto co = callp->audit ; co) ylikely {
-	        rs = co(op->obj) ;
-	    }
-	} /* end if (biblepara_magic) */
-	return rs ;
-} /* end subroutine (biblepara_audit) */
-
-/* get a string by its index */
 int biblepara_ispara(BPA *op,con BPA_Q *qp) noex {
     	int		rs ;
 	if ((rs = biblepara_magic(op,qp)) >= 0) ylikely {
@@ -414,6 +403,17 @@ int biblepara_getinfo(BPA *op,BPA_I *ip) noex {
 	} /* end if (biblepara_magic) */
 	return (rs >= 0) ? nv : rs ;
 } /* end subroutine (biblepara_getinfo) */
+
+int biblepara_audit(BPA *op) noex {
+	int		rs ;
+	if ((rs = biblepara_magic(op)) >= 0) ylikely {
+            biblepara_calls   *callp = callsp(op->callp) ;
+            if (cauto co = callp->audit ; co) ylikely {
+	        rs = co(op->obj) ;
+	    }
+	} /* end if (biblepara_magic) */
+	return rs ;
+} /* end subroutine (biblepara_audit) */
 
 
 /* private subroutines */
