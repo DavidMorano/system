@@ -220,7 +220,7 @@ struct proginfo {
 	gid_t		gid, egid, gid_maildir ;
 	gid_t		gid_mail ;
 	pid_t		pid ;
-	PROGINFO_FL	have, changed, final ;
+	PROGINFO_FL	have, changed, finval ;
 	PROGINFO_FL	fl ;
 	PROGINFO_FL	arg ;
 	PROGINFO_FL	open ;
