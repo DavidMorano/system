@@ -126,17 +126,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<sfx.h>			/* |sfnext(3cu)| */
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC |sfnext(3cu)| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strwcpyxx.h"
 
@@ -185,8 +185,7 @@ char *strwcpychrs(char *dp,int ch,int n) noex {
 	    *dp = '\0' ;
 	} /* end if (non-null) */
 	return dp ;
-}
-/* end subroutine (strwcpychrs) */
+} /* end subroutine (strwcpychrs) */
 
 char *strwcpycompact(char *dp,cchar *sp,int sl) noex {
     	if (dp && sp) ylikely {
@@ -205,8 +204,7 @@ char *strwcpycompact(char *dp,cchar *sp,int sl) noex {
 	    dp = nullptr ;
 	} /* end if (non-null) */
 	return dp ;
-}
-/* end subroutine (strwcpycompact) */
+} /* end subroutine (strwcpycompact) */
 
 char *strwcpyopaque(char *dp,cchar *sp,int sl) noex {
     	if (dp && sp) ylikely {
@@ -227,8 +225,7 @@ char *strwcpyopaque(char *dp,cchar *sp,int sl) noex {
 	    dp = nullptr ;
 	}
 	return dp ;
-}
-/* end subroutine (strwcpyopaque) */
+} /* end subroutine (strwcpyopaque) */
 
 char *strwcpyrev(char *dp,cchar *sp,int sl) noex {
     	if (dp && sp) ylikely {
@@ -241,8 +238,7 @@ char *strwcpyrev(char *dp,cchar *sp,int sl) noex {
 	    dp = nullptr ;
 	}
 	return dp ;
-}
-/* end subroutine (strwcpyrev) */
+} /* end subroutine (strwcpyrev) */
 
 char *strwcpywide(char *dp,const wchar_t *sp,int sl) noex {
     	if (dp && sp) ylikely {
@@ -263,7 +259,6 @@ char *strwcpywide(char *dp,const wchar_t *sp,int sl) noex {
 	    dp = nullptr ;
 	}
 	return dp ;
-}
-/* end subroutine (strwcpywide) */
+} /* end subroutine (strwcpywide) */
 
 
