@@ -51,11 +51,11 @@ OBJ6= bibleverses.o bibleverse.o
 OBJ7= bibleq.o
 
 OBJ8= biblepara.o
-OBJ9=
+OBJ9= biblebook.o biblebooks.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
-OBJC= obj8.o
+OBJC= obj8.o obj9.o
 
 OBJ= obja.o objb.o objc.o
 
@@ -206,4 +206,6 @@ bibleq.o:		bibleq.cc	bibleq.h			$(INCS)
 
 biblepara.o:		biblepara.cc	biblepara.h			$(INCS)
 
+biblebook.o:		biblebook.cc	biblebook.h			$(INCS)
+biblebooks.o:		biblebooks.cc	biblebooks.h			$(INCS)
 
