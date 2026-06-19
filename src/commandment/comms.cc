@@ -35,7 +35,7 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<climits>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
