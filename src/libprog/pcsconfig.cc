@@ -263,9 +263,9 @@ int config_read(PC *cfp)
 int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 {
 	proginfo	*pip = cfp->pip ;
-	PARAMFILE	*pfp = &cfp->p ;
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile	*pfp = &cfp->p ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	int		rs ;
 	int		rs1 ;
 	int		pi ;
@@ -336,7 +336,7 @@ int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 	                        pip->intlock = v ;
 	                    break ;
 	                case param_intspeed:
-			    if (! lip->final.intspeed)
+			    if (! lip->finval.intspeed)
 	                        lip->intspeed = v ;
 	                    break ;
 	                } /* end switch */
@@ -357,7 +357,7 @@ int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 	            }
 	            break ;
 	        case param_msfile:
-	            if (! lip->final.msfname) {
+	            if (! lip->finval.msfname) {
 	                lip->have.msfname = true ;
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,true,
 	                    MSDNAME,MSFNAME,"") ;
@@ -385,7 +385,7 @@ int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 	            } /* end if */
 	            break ;
 	        case param_reqfile:
-	            if (! lip->final.reqfname) {
+	            if (! lip->finval.reqfname) {
 	                lip->have.reqfname = true ;
 #ifdef	COMMENT
 	                rs1 = prmkfname(pr,tbuf,ebuf,el,true,
@@ -408,7 +408,7 @@ int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 	                strwcpy(lip->cmd,ebuf,ml) ;
 	            break ;
 	        case param_speedname:
-	            if (! lip->final.speedname) {
+	            if (! lip->finval.speedname) {
 	                lip->have.speedname = true ;
 	                ccp = lip->speedname ;
 	                if ((ccp == nullptr) ||
