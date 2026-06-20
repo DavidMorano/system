@@ -136,15 +136,6 @@ using libuc::mem ;			/* variable */
 /* external variables */
 
 
-/* exported variables */
-
-const bpimk_obj		bpimk_modinfo = {
-	"bpimk",
-	szof(bpimk),
-	0
-} ; /* end initialization */
-
-
 /* local structures */
 
 struct bventry {
@@ -229,6 +220,12 @@ cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
+
+const bpimk_obj		bpimk_modinfo = {
+	"bpimk",
+	szof(bpimk),
+	0
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -346,9 +343,9 @@ int bpimk_add(bpimk *op,bpimk_v *bvp) noex {
 	            v = bvp->b ;
 	            if (v > op->maxbook)	op->maxbook = v ;
 	            v = bvp->c ;
-	            if (v > op->maxchapter)	op->maxchapter = v ;
+	            if (v > op->maxchap)	op->maxchap = v ;
 	            v = bvp->v ;
-	            if (v > op->maxverse)	op->maxverse = v ;
+	            if (v > op->maxvers)	op->maxvers = v ;
 	        } /* end if (vecobj_add) */
 	    } /* end if (mkcitation) */
 	} /* end if (bpi_magic) */
@@ -372,8 +369,8 @@ int bpimk_getinfo(bpimk *op,bpimk_info *bip) noex {
 	    if (bip) {
 		memclear(bip) ;
 	        bip->maxbook	= op->maxbook ;
-	        bip->maxchapter	= op->maxchapter ;
-	        bip->maxverse	= op->maxverse ;
+	        bip->maxchap	= op->maxchap ;
+	        bip->maxvers	= op->maxvers ;
 	        bip->nverses	= op->nverses ;
 	        bip->nzverses	= op->nzverses ;
 	    } /* end if (non-null) */
@@ -552,7 +549,7 @@ local int bpimk_mkidx(bpimk *op) noex {
 	    hdr.nverses		= op->nverses ;
 	    hdr.nzverses	= op->nzverses ;
 	    hdr.maxbook		= op->maxbook ;
-	    hdr.maxchapter = op->maxchapter ;
+	    hdr.maxchap		= op->maxchap ;
 	    if ((rs = bpimk_mkidxwrmain(op,&hdr)) >= 0) {
 	        cint	hlen = HDRBUFLEN ;
 	        char	hbuf[HDRBUFLEN+1] ;
