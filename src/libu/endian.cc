@@ -49,13 +49,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bit>			/* |endian(3c++)| + |byteswap(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bit>			/* C++STD |endian(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"endian.h"
 
@@ -84,7 +85,7 @@ namespace {
     struct endianhelp {
 	endianhelp() noex ;
     } ; /* end struct (endianhelp) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -129,7 +130,6 @@ endianhelp::endianhelp() noex {
 	    endianval = 2 ;
 	    endianstr = "2" ;
 	} /* end if_constexpr (endian) */
-}
-/* end ctor (endianhelp::endianhelp) */
+} /* end ctor (endianhelp::endianhelp) */
 
 
