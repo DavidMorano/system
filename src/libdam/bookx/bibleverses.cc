@@ -68,6 +68,7 @@
 #include	<isnot.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
 #include	<biblecite.h>		/* LIBDAM */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -101,6 +102,7 @@ import uconstants ;			/* |varname(3u)| + |sysword(3u)| */
 #define	ISDIG(ch)	isdigitlatin(ch)
 
 #define	DS		dirseen
+#define	DS_C		dirseen_cur
 
 #define	EC		expcook
 
@@ -213,26 +215,26 @@ local inline int bibleverses_magic(bibleverses *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (bibleverses_magic) */
 
-local int	bibleverses_dbloadbegin(BVSS *,SI *) noex ;
-local int	bibleverses_dbloadend(BVSS *) noex ;
-local int	bibleverses_dbmapcreate(BVSS *,time_t) noex ;
+local int	bibleverses_dbloadbegin	(BVSS *,SI *) noex ;
+local int	bibleverses_dbloadend	(BVSS *) noex ;
+local int	bibleverses_dbmapcreate	(BVSS *,time_t) noex ;
 local int	bibleverses_dbmapdestroy(BVSS *) noex ;
-local int	bibleverses_checkup(BVSS *,time_t) noex ;
-local int	bibleverses_loadbuf(BVSS *,bvi_v *,char *,int) noex ;
-local int	bibleverses_indopen(BVSS *,SI *) noex ;
+local int	bibleverses_checkup	(BVSS *,time_t) noex ;
+local int	bibleverses_loadbuf	(BVSS *,bvi_v *,char *,int) noex ;
+local int	bibleverses_indopen	(BVSS *,SI *) noex ;
 
-local int	bibleverses_indclose(BVSS *) noex ;
-local int	bibleverses_indmk(BVSS *,cchar *,time_t) noex ;
-local int	bibleverses_indmkdata(BVSS *,cchar *,mode_t) noex ;
+local int	bibleverses_indclose	(BVSS *) noex ;
+local int	bibleverses_indmk	(BVSS *,cchar *,time_t) noex ;
+local int	bibleverses_indmkdata	(BVSS *,cchar *,mode_t) noex ;
 local int	bibleverses_indopencheck(BVSS *,cchar *) noex ;
-local int	bibleverses_indopenmk(BVSS *,SI *,cchar *) noex ;
+local int	bibleverses_indopenmk	(BVSS *,SI *,cchar *) noex ;
 
-local int	bibleverses_loadcooks(BVSS *,EC *) noex ;
-local int	bibleverses_dirok(BVSS *,DS *,ids *,cchar *,int) noex ;
-local int	bibleverses_mkdir(BVSS *,cchar *) noex ;
+local int	bibleverses_loadcooks	(BVSS *,EC *) noex ;
+local int	bibleverses_dirok	(BVSS *,DS *,ids *,cchar *,int) noex ;
+local int	bibleverses_mkdir	(BVSS *,cchar *) noex ;
 
-local int	subinfo_start(SI *) noex ;
-local int	subinfo_finish(SI *) noex ;
+local int	subinfo_start	(SI *) noex ;
+local int	subinfo_finish	(SI *) noex ;
 
 local int	entry_start	(BVSS_ENT *,BVSS_Q *,uint,uint) noex ;
 local int	entry_add	(BVSS_ENT *,uint,uint) noex ;
@@ -244,9 +246,6 @@ local int	bvemk_finish	(bvimk_v *) noex ;
 local int	mkdname		(cchar *,mode_t) noex ;
 local int	checkdname	(cchar *) noex ;
 
-#ifdef	COMMENT
-local bool	isempty		(cchar *,int) noex ;
-#endif /* COMMENT */
 local bool	isNeedIndex	(int) noex ;
 
 
@@ -279,9 +278,6 @@ const bibleverses_obj	bibleverses_modinfo = {
 	szof(bibleverses),
 	szof(bibleverses_cur)
 } ; /* end initialization */
-
-
-/* exported variables */
 
 
 /* exported subroutines */
@@ -730,7 +726,7 @@ int indopener::opens(DS *dsp,EC *ecp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return (rs >= 0) ? nv : rs ;
-} /* end subroutines (bibleverses_indopens) */
+} /* end subroutines (inopener::opens) */
 
 int indopener::opener(DS *dsp,EC *ecp,ids *idp) noex {
     	cint		maxpath = var.maxpathlen ;
@@ -824,9 +820,8 @@ local int bibleverses_loadcooks(BVSS *op,EC *ecp) noex {
 	if (tmpdname == nullptr) {
 	    tmpdname = sysword.w_tmpdir ;
 	}
-	kbuf[1] = '\0' ;
 	for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
-	    int		kch = MKCHAR(ks[i]) ;
+	    cint	kch = MKCHAR(ks[i]) ;
 	    cchar	*vap = nullptr ;
 	    int		val = -1 ;
 	    switch (kch) {
@@ -842,15 +837,14 @@ local int bibleverses_loadcooks(BVSS *op,EC *ecp) noex {
 	    } /* end switch */
 	    if ((rs >= 0) && vap) {
 	        kbuf[0] = char(kch) ;
-	        rs = expcook_add(ecp,kbuf,vap,val) ;
+	        rs = ecp->add(kbuf,vap,val) ;
 	    }
 	} /* end for */
 	if (rs >= 0) {
 	    if (cchar *prname ; (rs = sfbasename(op->pr,-1,&prname)) >= 0) {
+	        rs = SR_NOENT ;
 	        if (prname) {
 	            rs = ecp->add("PRN",prname,rs) ;
-	        } else {
-	            rs = SR_NOENT ;
 		}
 	    } /* end if (sfbasename) */
 	} /* end if (ok) */
@@ -1021,8 +1015,8 @@ local int bibleverses_indmkdata(BVSS *op,cchar *indname,mode_t om) noex {
 	            bvimk_info	bi ;
 	            bvimk_getinfo(&bvind,&bi) ;
 	            DEBUGPRINTF("maxbook=%u\n", bi.maxbook) ;
-	            DEBUGPRINTF("maxchapter=%u\n", bi.maxchapter) ;
-	            DEBUGPRINTF("maxverse=%u\n", bi.maxverse) ;
+	            DEBUGPRINTF("maxchap=%u\n", bi.maxchap) ;
+	            DEBUGPRINTF("maxvers=%u\n", bi.maxvers) ;
 	            DEBUGPRINTF("nverses=%u\n", bi.nverses) ;
 	            DEBUGPRINTF("nzverses=%u\n", bi.nzverses) ;
 	        }
@@ -1221,21 +1215,6 @@ vars::operator int () noex {
 	} /* end if (bufsizeget) */
     	return rs ;
 } /* end if (vars::operator) */
-
-#ifdef	COMMENT
-local bool isempty(cchar *lp,int ll) noex {
-	bool		f = false ;
-	f = f || (ll == 0) ;
-	f = f || (lp[0] == '#') ;
-	if ((! f) && ISWHT(*lp)) {
-	    cchar	*cp ;
-	    cint cl = sfskipwhite(lp,ll,&cp) ;
-	    f = f || (cl == 0) ;
-	    f = f || (cp[0] == '#') ;
-	} /* end if */
-	return f ;
-} /* end subroutine (isempty) */
-#endif /* COMMENT */
 
 local bool isNeedIndex(int rs) noex {
 	bool		f = false ;
