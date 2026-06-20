@@ -49,9 +49,6 @@ import libutil ;			/* |getbyte(3u)| */
 /* external variables */
 
 
-/* exported variables */
-
-
 /* local structures */
 
 
