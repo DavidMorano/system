@@ -53,6 +53,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
@@ -62,7 +63,7 @@
 #include	<sncpyx.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
-#include	<endian.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -190,9 +191,6 @@ const bvses_obj		vcses_modinfo = {
 	szof(bvses),
 	0
 } ; /* end initializætion */
-
-
-/* exported variables */
 
 
 /* exported subroutines */
