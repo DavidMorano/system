@@ -35,12 +35,12 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strnlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucme.h>
 #include	<getnodename.h>
 #include	<getpwd.h>
-#include	<getourenv.h>
-#include	<getev.h>
 #include	<vecstr.h>
 #include	<shellunder.h>
 #include	<sfx.h>
