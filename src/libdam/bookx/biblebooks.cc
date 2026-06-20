@@ -131,9 +131,6 @@ const biblebooks_obj	biblebooks_modinfo = {
 } ; /* end initialization */
 
 
-/* exported variables */
-
-
 /* exported subroutines */
 
 int biblebooks_open(BBS *op,cchar *pr,cchar *dbn) noex {
