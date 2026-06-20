@@ -22,12 +22,13 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<biblecite.h>		/* LIBDAM */
 #include	<bvshdr.h>		/* LIBDAM file-header */
 
 
 #define	BVSES		struct bvses_head
 #define	BVSES_OBJ	struct bvses_object
-#define	BVSES_V		struct bvses_verse
+#define	BVSES_V		biblecite
 #define	BVSES_INFO	struct bvses_information
 #define	BVSES_FMI	struct bvses_filemap
 #define	BVSES_MAGIC	0x88773421
@@ -48,10 +49,6 @@ struct bvses_information {
 	uint		nchapters ;
 	uint		nverses ;
 	uint		nzverses ;
-} ; /* end struct */
-
-struct bvses_verse {
-	uchar		b, c, v ;
 } ; /* end struct */
 
 struct bvses_filemap {
