@@ -43,8 +43,8 @@ struct bpimk_object {
 
 struct bpimk_information {
 	uint		maxbook ;
-	uint		maxchapter ;
-	uint		maxverse ;
+	uint		maxchap ;
+	uint		maxvers ;
 	uint		nverses ;
 	uint		nzverses ;
 } ; /* end struct */
@@ -71,8 +71,8 @@ struct bpimk_head {
 	uint		magval ;
 	uint		pcitation ;
 	uint		maxbook ;
-	uint		maxchapter ;
-	uint		maxverse ;
+	uint		maxchap ;
+	uint		maxvers ;
 	uint		nverses ;
 	uint		nzverses ;
 	int		nfd ;
