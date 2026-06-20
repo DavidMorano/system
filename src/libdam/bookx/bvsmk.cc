@@ -138,15 +138,6 @@ using libuc::mem ;			/* variable */
 /* external variables */
 
 
-/* exported variables */
-
-const bvsmk_obj		bvsmk_modinfo = {
-	"bvsmk",
-	szof(bvsmk),
-	0
-} ; /* end initializætion */
-
-
 /* local structures */
 
 namespace {
@@ -224,6 +215,12 @@ cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
+
+const bvsmk_obj		bvsmk_modinfo = {
+	"bvsmk",
+	szof(bvsmk),
+	0
+} ; /* end initializætion */
 
 
 /* exported subroutines */
