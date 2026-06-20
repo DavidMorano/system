@@ -107,15 +107,6 @@ using libuc::mem ;			/* variable */
 /* external variables */
 
 
-/* exported variables */
-
-const bpi_obj bpi_modinfo = {
-	"bpi",
-	szof(bpi),
-	szof(bpi_cur)
-} ; /* end initialization */
-
-
 /* local structures */
 
 
@@ -193,6 +184,12 @@ cbool		f_search	= CF_SEARCH ;
 
 
 /* exported variables */
+
+const bpi_obj bpi_modinfo = {
+	"bpi",
+	szof(bpi),
+	szof(bpi_cur)
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -302,7 +299,7 @@ int bpi_getinfo(bpi *op,bpi_info *ip) noex {
 	        ip->mtime	= fip->ti_mod ;
 	        ip->ctime	= time_t(hip->wtime) ;
 	        ip->maxbook	= hip->maxbook ;
-	        ip->maxchapter	= hip->maxchapter ;
+	        ip->maxchap	= hip->maxchap ;
 	        ip->count	= hip->nverses ;
 	        ip->nzverses	= hip->nzverses ;
 	    } /* end if (non-null) */
