@@ -873,20 +873,17 @@ local int commandments_dbproc(CMS *op,cmimk *cmp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ml = (op->db_size & INT_MAX) ;
-	int		ll ;
-	int		si ;
-	int		len ;
 	int		n = 0 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	int		f_ent = false ;
-	cchar	*lp ;
-	cchar	*mp = charp(op->db_data) ;
+	cchar		*mp = charp(op->db_data) ;
 	DEBUGPRINTF("ent ml=%d\n",ml) ;
 	for (cchar *tp ; (tp = strnchr(mp,ml,'\n')) != np ; ) {
-	    len = intconv((tp + 1) - mp) ;
-	    lp = mp ;
-	    ll = (len - 1) ;
-	    if (! isempty(lp,ll)) {
+	    cint	len = intconv((tp + 1) - mp) ;
+	    cchar	*lp = mp ;
+	    mut int	ll = (len - 1) ;
+	    if ((ll > 0) && (! isempty(lp,ll))) {
+		int	si ;
 	        if ((tp = strnchr(lp,ll,'#')) != nullptr) {
 	            ll = intconv(tp - lp) ;
 		}
