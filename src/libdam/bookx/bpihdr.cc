@@ -77,7 +77,7 @@ enum his {
 	hi_nverses,
 	hi_nzverses,
 	hi_maxbook,
-	hi_maxchapter,
+	hi_maxchap,
 	hi_overlast
 } ; /* end enum */
 
@@ -116,14 +116,14 @@ int bpihdr_rd(bpihdr *op,char *hbuf,int hlen) noex {
 	            bl -= vsz ;
 	            if (bl >= headsize) {
 	                uint	*header = (uint *) bp ;
-	                header[hi_fsz] = op->fsz ;
-	                header[hi_wtime] = op->wtime ;
-	                header[hi_vioff] = op->vioff ;
-	                header[hi_vilen] = op->vilen ;
-	                header[hi_nverses] = op->nverses ;
-	                header[hi_nzverses] = op->nzverses ;
-	                header[hi_maxbook] = op->maxbook ;
-	                header[hi_maxchapter] = op->maxchapter ;
+	                header[hi_fsz]		= op->fsz ;
+	                header[hi_wtime]	= op->wtime ;
+	                header[hi_vioff]	= op->vioff ;
+	                header[hi_vilen]	= op->vilen ;
+	                header[hi_nverses]	= op->nverses ;
+	                header[hi_nzverses]	= op->nzverses ;
+	                header[hi_maxbook]	= op->maxbook ;
+	                header[hi_maxchap]	= op->maxchap ;
 	                bp += headsize ;
 	                bl -= headsize ;
 			len = intconv(bp - hbuf) ;
@@ -173,7 +173,7 @@ int bpihdr_wr(bpihdr *op,cchar *hbuf,int hlen) noex {
 	                op->nverses	= header[hi_nverses] ;
 	                op->nzverses	= header[hi_nzverses] ;
 	                op->maxbook	= header[hi_maxbook] ;
-	                op->maxchapter	= header[hi_maxchapter] ;
+	                op->maxchap	= header[hi_maxchap] ;
 	                bp += headsize ;
 	                bl -= headsize ;
 			len = intconv(bp - hbuf) ;
