@@ -68,8 +68,10 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<estrings.h>		/* LIBU */
 #include	<baops.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
@@ -79,11 +81,13 @@
 #include	<eigendb.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<dirseen.h>		/* LIBUC */
+#include	<mkdirs.h>		/* LIBUC */
 #include	<expcook.h>		/* LIBUC */
-#include	<ascii.h>		/* LIBU */
 #include	<field.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
+#include	<biblecite.h>		/* LIBDAM */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -96,8 +100,10 @@
 #include	"bibleqs.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |memclear(3u)| */
+import uconstants ;			/* |varname(3u)| + |sysword(3u)| */
 
 /* local defines */
 
@@ -931,7 +937,7 @@ local int bibleqs_dirok(BIBLEQS *op,DIRSEEN *dsp,ids *idp,
 } /* end subroutine (bibleqs_dirok) */
 
 local int bibleqs_mkdir(BIBLEQS *op,cchar *dp) {
-	cmode	dm = 0777 ;
+	cmode		dm = 0777 ;
 	int		rs ;
 	int		f_ok = false ;
 	if ((rs = mkdirs(dp,dm)) >= 0) {
@@ -947,49 +953,41 @@ local int bibleqs_mkdir(BIBLEQS *op,cchar *dp) {
 } /* end subroutine (bibleqs_mkdir) */
 
 local int bibleqs_loadcooks(BIBLEQS *op,EXPCOOK *ecp) {
+	static cchar	*tmpdname = getenver(varnames.tmpdir) ;
 	int		rs = SR_OK ;
-	int		i ;
-	int		kch ;
-	int		vl ;
-	cchar		*tmpdname = getenv(VARTMPDNAME) ;
 	cchar		*ks = "RST" ;
-	cchar		*vp ;
-	char		kbuf[2] ;
-
-	if (tmpdname == nullptr) tmpdname = TMPDNAME ;
-
-	kbuf[1] = '\0' ;
-	for (i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
-	    kch = MKCHAR(ks[i]) ;
-	    vp = nullptr ;
-	    vl = -1 ;
+	char		kbuf[2] = {} ;
+	if (tmpdname == nullptr) {
+	    tmpdname = sysword.w_tmpdir ;
+	}
+	for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
+	    cint	kch = MKCHAR(ks[i]) ;
+	    vap = nullptr ;
+	    val = -1 ;
 	    switch (kch) {
 	    case 'R':
-		vp = op->pr ;
+		vap = op->pr ;
 		break ;
 	    case 'S':
-		vp = INDDNAME ;
+		vap = INDDNAME ;
 		break ;
 	    case 'T':
-		vp = tmpdname ;
+		vap = tmpdname ;
 		break ;
 	    } /* end switch */
-	    if ((rs >= 0) && (vp != nullptr)) {
+	    if ((rs >= 0) && vap) {
 		kbuf[0] = kch ;
 		rs = expcook_add(ecp,kbuf,vp,vl) ;
 	    }
 	} /* end for */
-
 	if (rs >= 0) {
-	    cchar	*prname ;
-	    if ((rs = sfbasename(op->pr,-1,&prname)) >= 0) {
+	    if (cchar *prname ; (rs = sfbasename(op->pr,-1,&prname)) >= 0) {
 	        rs = SR_NOENT ;
-	        if (prname != nullptr) {
-	            rs = expcook_add(ecp,"PRN",prname,-1) ;
+	        if (prname) {
+	            rs = ecp->add("PRN",prname,-1) ;
 		}
-	    }
-	}
-
+	    } /* end if (sfbasename) */
+	} /* end if (ok) */
 	return rs ;
 } /* end subroutines (bibleqs_loadcooks) */
 
