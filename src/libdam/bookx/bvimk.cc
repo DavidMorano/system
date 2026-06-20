@@ -247,9 +247,6 @@ const bvimk_obj		bvimk_modinfo = {
 } ; /* end initialization */
 
 
-/* exported variables */
-
-
 /* exported subroutines */
 
 int bvimk_open(bvimk *op,cchar *dbn,int of,mode_t om) noex {
