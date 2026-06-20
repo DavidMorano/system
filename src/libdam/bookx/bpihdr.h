@@ -39,7 +39,7 @@ struct bpihdr_head {
 	uint		nverses ;	/* number total verses */
 	uint		nzverses ;	/* number non-zero verses */
 	uint		maxbook ;	/* maximum book number */
-	uint		maxchapter ;	/* maximum chapter number */
+	uint		maxchap ;	/* maximum chapter number */
 	uchar		vetu[4] ;
 } ; /* end struct */
 
