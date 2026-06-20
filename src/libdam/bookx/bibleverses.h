@@ -19,8 +19,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<bvi.h>			/* LIBDAM */
 #include	<biblecite.h>		/* LIBDAM */
+#include	<bvi.h>			/* LIBDAM */
 
 
 #define	BIBLEVERSES		struct bibleverses_head
