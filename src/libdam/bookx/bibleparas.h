@@ -29,8 +29,8 @@
 #define	BIBLEPARAS		struct bibleparas_head
 #define	BIBLEPARAS_OBJ		struct bibleparas_object
 #define	BIBLEPARAS_FL		struct bibleparas_flags
-#define	BIBLEPARAS_CITE		struct bibleparas_query
-#define	BIBLEPARAS_Q		struct bibleparas_query
+#define	BIBLEPARAS_CITE		struct biblecite
+#define	BIBLEPARAS_Q		struct biblecite
 #define	BIBLEPARAS_CUR		struct bibleparas_cursor
 #define	BIBLEPARAS_INFO		struct bibleparas_information
 #define	BIBLEPARAS_MAGIC	0x99447246
@@ -51,10 +51,6 @@ struct bibleparas_information {
 	uint		maxchap ;
 	uint		nverses ;
 	uint		nzverses ;
-} ; /* end struct */
-
-struct bibleparas_query {
-	uchar		b, c, v ;
 } ; /* end struct */
 
 struct bibleparas_cursor {
