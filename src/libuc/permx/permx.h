@@ -31,14 +31,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* UNIX® system types */
-#include	<sys/stat.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ids.h>
-#include	<vecstr.h>
+#include	<sys/types.h>		/* POSIX UNIX® system types */
+#include	<sys/stat.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ids.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
 
-#include	<permsched.h>
+#include	<permsched.h>		/* LIBUC */
 
 EXTERNC_begin
 
