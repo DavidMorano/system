@@ -220,21 +220,21 @@ int readcmdkey(readcmdkey *ckp,uterm *utp,int to,int ch) noex {
 static int isinter(int ch) noex {
 	return ((ch >= 0x20) && (ch <= 0x2F)) ;
 }
-/* end subroutines (isinter) */
+/* end subroutine (isinter) */
 
 static int isfinalesc(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x7E)) ;
 }
-/* end subroutines (isfinalesc) */
+/* end subroutine (isfinalesc) */
 
 static int isfinalcsi(int ch) noex {
 	return ((ch >= 0x40) && (ch <= 0x7E)) ;
 }
-/* end subroutines (isfinalcsi) */
+/* end subroutine (isfinalcsi) */
 
 static int isparam(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x3F)) ;
 }
-/* end subroutines (isparam) */
+/* end subroutine (isparam) */
 
 
