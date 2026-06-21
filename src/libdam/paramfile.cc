@@ -866,7 +866,7 @@ local int paramfile_envload(PF *op) noex {
 	    }
 	} /* end if */
 	return rs ;
-} /* end subroutines (paramfile_envload) */
+} /* end subroutine (paramfile_envload) */
 
 local int paramfile_defbegin(PF *op,vecstr *dvp) noex {
 	int		rs = SR_OK ;
@@ -879,7 +879,7 @@ local int paramfile_defbegin(PF *op,vecstr *dvp) noex {
 	    rs = paramfile_defload(op,dvp) ;
 	}
 	return rs ;
-} /* end subroutines (paramfile_defbegin) */
+} /* end subroutine (paramfile_defbegin) */
 
 local int paramfile_defend(PF *op) noex {
 	int		rs = SR_OK ;
