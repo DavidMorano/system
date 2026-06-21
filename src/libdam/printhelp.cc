@@ -482,9 +482,9 @@ static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 
 static int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(bufsize_hn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	    var.maxhostlen = rs ;
-	    if ((rs = getbufsize(bufsize_nn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 	        var.maxnodelen = rs ;
 		var.maxcombolen = ((var.maxhostlen + 1) + rs) ;
 	    }
