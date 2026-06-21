@@ -21,6 +21,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<eigendb.h>		/* LIBUC */
 #include	<txtindex.h>		/* LIBDAM */
+#include	<biblecite.h>		/* LIBDAM */
 
 
 #define	BIBLEQS		struct bibleqs_head
