@@ -29,8 +29,8 @@
 #define	BIBLEPARAS		struct bibleparas_head
 #define	BIBLEPARAS_OBJ		struct bibleparas_object
 #define	BIBLEPARAS_FL		struct bibleparas_flags
-#define	BIBLEPARAS_CITE		struct biblecite
-#define	BIBLEPARAS_Q		struct biblecite
+#define	BIBLEPARAS_CITE		biblecite
+#define	BIBLEPARAS_Q		biblecite
 #define	BIBLEPARAS_CUR		struct bibleparas_cursor
 #define	BIBLEPARAS_INFO		struct bibleparas_information
 #define	BIBLEPARAS_MAGIC	0x99447246
@@ -55,6 +55,7 @@ struct bibleparas_information {
 
 struct bibleparas_cursor {
 	bpi_cur		*vicurp ;
+	uint		magval ;
 } ; /* end struct */
 
 struct bibleparas_flags {
