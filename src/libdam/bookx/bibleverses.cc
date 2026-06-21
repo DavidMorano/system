@@ -726,7 +726,7 @@ int indopener::opens(DS *dsp,EC *ecp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return (rs >= 0) ? nv : rs ;
-} /* end subroutines (inopener::opens) */
+} /* end subroutine (inopener::opens) */
 
 int indopener::opener(DS *dsp,EC *ecp,ids *idp) noex {
     	cint		maxpath = var.maxpathlen ;
@@ -849,7 +849,7 @@ local int bibleverses_loadcooks(BVSS *op,EC *ecp) noex {
 	    } /* end if (sfbasename) */
 	} /* end if (ok) */
 	return rs ;
-} /* end subroutines (bibleverses_loadcooks) */
+} /* end subroutine (bibleverses_loadcooks) */
 
 local int bibleverses_indopencheck(BVSS *op,cchar *idir) noex {
 	int		rs ;
@@ -898,7 +898,7 @@ local int bibleverses_indopenmk(BVSS *op,SI *sip,cchar *idir) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (bibleverses_indmk) */
 	return (rs >= 0) ? nv : rs ;
-} /* end subroutines (bibleverses_indopenmk) */
+} /* end subroutine (bibleverses_indopenmk) */
 
 local int bibleverses_indmk(BVSS *op,cchar *dname,time_t dt) noex {
 	int		rs ;
