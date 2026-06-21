@@ -240,6 +240,6 @@ static int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutines (clientinfo_load) */
+/* end subroutine (clientinfo_load) */
 
 
