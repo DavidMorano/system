@@ -502,6 +502,6 @@ static int mkfile(cchar *template,cchar **rpp)
 
 	return (rs >= 0) ? tl : rs ;
 }
-/* end subroutines (mkfile) */
+/* end subroutine (mkfile) */
 
 
