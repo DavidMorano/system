@@ -40,8 +40,8 @@ MODS +=
 LIBS +=
 
 
-OBJ0= permx_prime.o
-OBJ1= permsched.o
+OBJ0= perm_prime.o
+OBJ1= perm_sched.o
 OBJ2= 
 OBJ3=
 
@@ -52,8 +52,7 @@ OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,7 +95,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -147,7 +146,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-permsched.o:		permsched.cc				$(INCS)
-permx_prime.o:		permx_prime.cc				$(INCS)
+perm_sched.o:		perm_sched.cc				$(INCS)
+perm_prime.o:		perm_prime.cc				$(INCS)
 
 
