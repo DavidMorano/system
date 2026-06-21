@@ -862,7 +862,7 @@ local int bibleqs_indopenseq(BIBLEQS *op,SI *sip) {
 	} /* end if (ds) */
 
 	return rs ;
-} /* end subroutines (bibleqs_indopenseq) */
+} /* end subroutine (bibleqs_indopenseq) */
 
 local int bibleqs_indopenseqer(BIBLEQS *op,SI *sip,
 		DIRSEEN *dsp,EXPCOOK *ckp) {
@@ -908,7 +908,7 @@ local int bibleqs_indopenseqer(BIBLEQS *op,SI *sip,
 #endif
 
 	return (rs >= 0) ? c : rs ;
-} /* end subroutines (bibleqs_indopenseqer) */
+} /* end subroutine (bibleqs_indopenseqer) */
 
 local int bibleqs_dirok(BIBLEQS *op,DIRSEEN *dsp,ids *idp,
 		cchar *dp,int dl) {
@@ -989,7 +989,7 @@ local int bibleqs_loadcooks(BIBLEQS *op,EXPCOOK *ecp) {
 	    } /* end if (sfbasename) */
 	} /* end if (ok) */
 	return rs ;
-} /* end subroutines (bibleqs_loadcooks) */
+} /* end subroutine (bibleqs_loadcooks) */
 
 local int bibleqs_indopencheck(BIBLEQS *op,cchar *idir) {
 	int		rs ;
@@ -1044,7 +1044,7 @@ local int bibleqs_indopenmk(BIBLEQS *op,SI *sip,cchar *idir) {
 	} /* end if (bibleqs_indmk) */
 
 	return (rs >= 0) ? c : rs ;
-} /* end subroutines (bibleqs_indopenmk) */
+} /* end subroutine (bibleqs_indopenmk) */
 
 local int bibleqs_indmk(BIBLEQS *op,cchar *dname,time_t dt) {
 	cmode	dm = BIBLEQS_DIRMODE ;
