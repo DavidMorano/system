@@ -1,14 +1,29 @@
-/* bbspec */
+/* bbspec HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* load a bible-book-specification */
+/* version %I% last-modified %G% */
 
 
-/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 2000-02-07, David A­D­ Morano
+	This code was originally written.  
+
+*/
+
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BBSPEC_INCLUDE
-#define	BBSPEC_INCLUDE	1
+#define	BBSPEC_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 #include	<localmisc.h>		/* for the signed special types */
 
 
@@ -16,25 +31,17 @@
 
 
 struct bbspec {
-	const char	*np ;
-	int		nl ;
+	cchar		*namp ;
+	int		naml ;
 	schar		b, c, v ;
-} ;
+} ; /* end struct */
 
+EXTERNC_begin
 
-#if	(! defined(BBSPEC_MASTER)) || (BBSPEC_MASTER == 0)
+extern int bbspec_load(bbspec *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int bbspec_load(BBSPEC *,const char *,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* BBSPEC_MASTER */
 
 #endif /* BBSPEC_INCLUDE */
 
