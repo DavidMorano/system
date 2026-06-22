@@ -1,4 +1,5 @@
-/* bbspec */
+/* bbspec SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* load a bible-book-specification */
@@ -7,12 +8,12 @@
 
 /* revision history:
 
-	= 2013-02-07, David A­D­ Morano
+	= 2000-02-07, David A­D­ Morano
 	This code was originally written.  
 
 */
 
-/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -31,20 +32,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctype.h>
-#include	<usystem.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<estrings.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<estrings.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bbspec.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -57,18 +65,13 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef cchar	cchar ;
-#endif
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	siourbrk(cchar *,int,int) noex ;
+local int	siourbrk(cchar *,int,int) noex ;
 
 
 /* local variables */
@@ -78,31 +81,26 @@ static int	siourbrk(cchar *,int,int) noex ;
 
 int bbspec_load(BBSPEC *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		ch ;
-	int		v ;
-	int		si ;
-	int		tl ;
-	cchar	*tp ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
-	memset(op,0,sizeof(BBSPEC)) ;
+	memclear(op) ; /* <- potentially dangerous */
 	op->v = 1 ;
 
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 
-	if ((tl = sfshrink(sp,sl,&tp)) > 0) {
-	    sp = tp ;
-	    sl = tl ;
-	}
+	cchar *cp ;
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	    sp = cp ;
+	    sl = cl ;
+	} /* end if (sfshrink) */
 
-	if (sl > 0) {
-	    ch = mkchar(sp[0]) ;
+	if (int si, v ; sl > 0) {
+	    int ch = mkchar(sp[0]) ;
 	    if (isalphalatin(ch)) {
-	        if ((si = siourbrk(sp,sl,TRUE)) > 0) {
-		    op->np = sp ;
-	  	    op->nl = si ;
+	        if ((si = siourbrk(sp,sl,true)) > 0) {
+		    op->namp = sp ;
+	  	    op->naml = si ;
 		    sp += si ;
 		    sl -= si ;
 		    if (sl > 0) {
@@ -111,34 +109,39 @@ int bbspec_load(BBSPEC *op,cchar *sp,int sl) noex {
 			    sp += 1 ;
 			    sl -= 1 ;
 			}
-		    }
-	        }
+		    } /* end if (non-zero positive) */
+	        } /* end if (siourbrk) */
 	    } else if (isdigitlatin(ch)) {
-	        if ((si = siourbrk(sp,sl,TRUE)) > 0) {
-		    rs = cfdeci(sp,si,&v) ;
-		    op->b = v ;
-	        }
-	    } else
+	        if ((si = siourbrk(sp,sl,true)) > 0) {
+		    if ((rs = cfdeci(sp,si,&v)) >= 0) {
+		        op->b = schar(v) ;
+		    }
+	        } /* end if (siourbrk) */
+	    } else {
 	        rs = SR_DOM ;
+	    }
 	    if ((rs >= 0) && (sl > 0)) {
-		if ((tp = strnchr(sp,sl,':')) != NULL) {
-		    if ((rs = cfdeci(sp,(tp-sp),&v)) >= 0) {
-			op->b = v ;
-			sl -= ((tp+1)-sp) ;
-			sp = (tp+1) ;
+		if (cchar *tp = strnchr(sp,sl,':') ; tp) {
+		    cint tl = intconv(tp - sp) ;
+		    if ((rs = cfdeci(sp,tl,&v)) >= 0) {
+			op->b = schar(v) ;
+			sl -= intconv((tp + 1) - sp) ;
+			sp = (tp +1 ) ;
 			if (sl > 0) {
 		    	    rs = cfdeci(sp,sl,&v) ;
-		    	    op->v = v ;
+		    	    op->v = schar(v) ;
 			}
-		    }
+		    } /* end if (cfdeci) */
 		} else {
 		    rs = cfdeci(sp,sl,&v) ;
-		    op->b = v ;
-		}
-	    } else
+		    op->b = schar(v) ;
+		} /* end if */
+	    } else {
 	        rs = SR_DOM ;
-	} else
+	    }
+	} else {
 	    rs = SR_DOM ;
+	}
 
 #if	CF_DEBUGS
 	debugprintf("bbspec_parse: ret rs=%d\n",rs) ;
@@ -152,21 +155,20 @@ int bbspec_load(BBSPEC *op,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int siourbrk(cchar *sp,int sl,int f_dig) noex {
-	int	i = -1 ;
-	int	ch ;
-	int	f = FALSE ;
+local int siourbrk(cchar *sp,int sl,int f_dig) noex {
+	int	i = -1 ; /* return-value */
+	bool	f = false ;
 	for (i = 0 ; i < sl ; i += 1) {
-	    ch = (sp[i] & 0xff) ;
+	    cint ch = (sp[i] & UCHAR_MAX) ;
 	    if (f_dig) {
 		f = isdigitlatin(ch) ;
-	    } else
+	    } else {
 		f = isalphalatin(ch) ;
+	    }
 	    f = f || (ch == ':') ;
 	    if (f) break ;
 	} /* end for */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (siourbrk) */
+} /* end subroutine (siourbrk) */
 
 
