@@ -1,4 +1,4 @@
-BibleBookSpec (BBSPEC)
+Bible-Citation-Specification (BCSPEC)
 
 
 = parsing citations
