@@ -1,24 +1,25 @@
-/* process */
+/* process SPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* process the directory tree */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG 	0
 #define	CF_REMOVE 	1
 
-
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
 	This code was originally written.
-
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /***********************************************************************
+
+  	Description:
 
 	Arguments:
 	- basedir	directory at top of tree
@@ -30,53 +31,50 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<unistd.h>
-#include	<cstring>
 #include	<dirent.h>
+#include	<unistd.h>
 #include	<climits>
-#include	<usystem.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sfx.h>
 #include	<bfile.h>
 #include	<fsdir.h>
+#include	<mktmp.h>		/* |mktmpfile(3uc)| */
 #include	<localmisc.h>
 
 #include	"defs.h"
 #include	"pror.h"
 
 
-/* local routine defines */
+/* local defines */
 
 #define	LINEBUFLEN		(MAXPATHLEN + 10)
 
 
 /* external subroutines */
 
-extern int	mktmpfile(char *,mode_t,const char *) ;
-
 
 /* external variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int process(pip,basedir)
-struct proginfo	*pip ;
-const char	basedir[] ;
-{
-	struct dirent	*dep ;
-
-	ustat	se ;
-
-	FSDIR		dir ;
-	FSDIR_ENT	ds ;
-
+int process(proginfo *pip,cchar *basedir) noex {
+	DIRENT		*dep ;
+	fsdir		dir ;
+	fsdir_ent	ds ;
+	ustat		se ;
 	bfile		namefile, *nfp = &namefile ;
 	bfile		nnfile, *nnfp = &nnfile ;
-
-	const int	llen = LINEBUFLEN ;
-
+	cint	llen = LINEBUFLEN ;
 	int	rs ;
+	int	ex = EXIT_SUCCESS ;
 	int	blen, len, slen, dlen, wlen ;
 	int	realdirlen ;
 	int	capbaselen ;
@@ -84,15 +82,13 @@ const char	basedir[] ;
 	int	ndel = 0 ;
 	int	f_seed = TRUE ;
 	int	f_cap ;
-
-	const char	*cp ;
-
+	cchar	*cp ;
 	char	*lbuf ;
 	char	nfname[MAXPATHLEN + 1] ;
 	char	dirbuf[(MAXPATHLEN * 2) + 1] ;
 	char	realdirbuf[(MAXPATHLEN * 2) + 1] ;
 	char	debugbuf[(MAXPATHLEN * 2) + 1] ;
-	char	debuf[sizeof(struct dirent) + _POSIX_PATH_MAX + 1] ;
+	char	debuf[szof(DIRENT) + _POSIX_PATH_MAX + 1] ;
 	char	*bdp, *dnp ;
 	char	*capbasep ;
 	char	*dirnamep ;
@@ -103,7 +99,7 @@ const char	basedir[] ;
 
 	debugprintf("process: basedir=\"%r\"\n",cp,len) ;
 
-	if (basedir != NULL) 
+	if (basedir != nullptr) 
 		return 0 ;
 #endif
 
@@ -123,7 +119,7 @@ const char	basedir[] ;
 
 	nfname[0] = '\0' ;
 	bdp = basedir ;
-	if ((bdp == NULL) || (strcmp(bdp,".") == 0)) 
+	if ((bdp == nullptr) || (strcmp(bdp,".") == 0)) 
 		bdp = "" ;
 
 	if ((rs = mktmpfile(nfname,0600,"/tmp/dirnamXXXXXXXX")) < 0)
@@ -201,11 +197,11 @@ const char	basedir[] ;
 
 /* if we cannot open the directory, it can't be too important to us */
 
-	    if (blen == 0)
+	    if (blen == 0) {
 	        dirnamep = "." ;
-
-	    else
+	    } else {
 	        dirnamep = dirbuf ;
+	    }
 
 	    if (fsdir_open(&dir,dirnamep) < 0) 
 		continue ;
@@ -237,10 +233,8 @@ const char	basedir[] ;
 
 #if	CF_DEBUG
 		strcpy(debugbuf,dirbuf) ;
-
 		debugprintf("process: cp=\"%r\"\n",cp,realdirlen) ;
-
-		debugprintf("process: dirname=\"%s\"\n",strdirname(debugbuf)) ;
+		debugprintf("process: dbuf=\"%s\"\n",debugbuf) ;
 #endif
 
 	        strwcpy(realdirbuf,cp,realdirlen) ;
@@ -284,14 +278,12 @@ const char	basedir[] ;
 	            dnp) ;
 #endif
 
-/* PROGRAM NOTE :
-		
-	At this point :
+/**** PROGRAM NOTE:
+	At this point:
 	= blen		base length (inluding a trailing slash character)
 	= len		length of current directory from base
 	= slen		will account for the slash character if needed
-
-*/
+****/
 
 /* is this a CAP special directory ? */
 
@@ -449,20 +441,14 @@ const char	basedir[] ;
 /* clean up on a good exit */
 exit:
 	bclose(nfp) ;
-
 	bclose(nnfp) ;
 
 	if (pip->fl.verbose && (ndel > 0)) {
-
-	    bprintf(pip->ofp,"subdirectories scanned: %d\n",
-	        ndir) ;
-
-	    bprintf(pip->ofp,"number files deleted:   %d\n",
-	        ndel) ;
-
+	    bprintf(pip->ofp,"subdirectories scanned: %d\n", ndir) ;
+	    bprintf(pip->ofp,"number files deleted:   %d\n", ndel) ;
 	}
 
-	return ndir ;
+	return ex ;
 
 /* handle the bad errors and associated cleanup */
 bad3:
@@ -472,13 +458,13 @@ bad2:
 	bclose(nfp) ;
 
 bad1:
-	if ((nfname != NULL) && (nfname[0] != '\0'))
+	if ((nfname != nullptr) && (nfname[0] != '\0')) {
 	    unlink(nfname) ;
+	}
 
 badret:
-	return rs ;
+	return ex ;
 }
 /* end subroutine (process) */
-
 
 
