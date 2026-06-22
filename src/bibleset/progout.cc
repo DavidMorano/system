@@ -372,7 +372,7 @@ int procoutbeginer(PROGINFO *pip,bfile *ofp)
 
 /* create the page-information */
 
-	        tmtime_localtime(&tmt,pip->daytime) ;
+	        tmtime_timelocal(&tmt,pip->daytime) ;
 
 	        bufprintf(pop->pageinfo,TIMEBUFLEN,
 	            "%s %02u%02u%02u %s %02u:%02u",
