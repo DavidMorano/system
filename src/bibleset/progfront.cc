@@ -136,6 +136,6 @@ bfile		*ofp ;
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutines (progfront) */
+/* end subroutine (progfront) */
 
 
