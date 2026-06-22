@@ -397,8 +397,6 @@ vecstr_adduniqs.o:	vecstr_adduniqs.c
 
 vecstr.o:		vecstr.c vecstr.h
 
-keyopt.o:		keyopt.c keyopt.h
-
 realname.o:		realname.c realname.h
 
 ipasswd.o:		ipasswd.c ipasswd.h
