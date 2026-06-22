@@ -126,10 +126,10 @@ struct vzlw {
 static int	usage(PI *) ;
 
 static int	procopts(PI *,keyopt *) ;
-static int	process(PI *,ARGINFO *,BITS *,
+static int	process(PI *,ARGINFO *,bits *,
 			cchar *,cchar *,cchar *,cchar *) ;
-static int	procargs(PI *,ARGINFO *,BITS *,void *,cchar *) ;
-static int	procout(PI *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procargs(PI *,ARGINFO *,bits *,void *,cchar *) ;
+static int	procout(PI *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procpagetitle(PI *) ;
 
 static int	loadpvs(PI *,cchar *,int) ;
@@ -263,7 +263,7 @@ constexpr cpcchar	akonames[] = {
 int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	keyopt		akopts ;
 	bfile		errfile ;
 
@@ -605,7 +605,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    }
 	                    if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
 	                        pip->have.ps = true ;
-	                        pip->final.ps = true ;
+	                        pip->finval.ps = true ;
 	                        rs = optvalue(cp,cl) ;
 	                        pip->vs = rs ;
 	                    }
@@ -661,7 +661,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            rs = SR_INVALID ;
 	                    } /* end if */
 	                    pip->have.frontmatter = true ;
-	                    pip->final.frontmatter = true ;
+	                    pip->finval.frontmatter = true ;
 	                    if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
 	                        pip->fl.frontmatter = true ;
 	                        pip->frontfname = cp ;
@@ -680,7 +680,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        }
 	                    } /* end if */
 	                    pip->have.backmatter = true ;
-	                    pip->final.backmatter = true ;
+	                    pip->finval.backmatter = true ;
 	                    pip->fl.backmatter = true ;
 	                    if ((cp != nullptr) && (cl > 0)) {
 	                        rs = optbool(cp,cl) ;
@@ -700,7 +700,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        }
 	                    } /* end if */
 	                    pip->have.ibz = true ;
-	                    pip->final.ibz = true ;
+	                    pip->finval.ibz = true ;
 	                    pip->fl.ibz = true ;
 	                    if ((cp != nullptr) && (cl > 0)) {
 	                        rs = optbool(cp,cl) ;
@@ -731,7 +731,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            rs = SR_INVALID ;
 	                    } /* end if */
 	                    pip->have.ff = true ;
-	                    pip->final.ff = true ;
+	                    pip->finval.ff = true ;
 	                    if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
 	                        pip->ff = cp ;
 	                    }
@@ -760,7 +760,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            rs = SR_INVALID ;
 	                    } /* end if */
 	                    pip->have.ff = true ;
-	                    pip->final.ff = true ;
+	                    pip->finval.ff = true ;
 #if	CF_DEBUGS
 	                    debugprintf("main: cover c=%r\n",cp,cl) ;
 #endif
@@ -781,7 +781,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        }
 	                    } /* end if */
 	                    pip->have.tc = true ;
-	                    pip->final.tc = true ;
+	                    pip->finval.tc = true ;
 	                    pip->fl.tc = true ;
 	                    if ((cp != nullptr) && (cl > 0)) {
 	                        rs = optbool(cp,cl) ;
@@ -802,7 +802,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        }
 	                    } /* end if */
 	                    pip->have.pagetitle = true ;
-	                    pip->final.pagetitle = true ;
+	                    pip->finval.pagetitle = true ;
 	                    pip->fl.pagetitle = true ;
 	                    if ((cp != nullptr) && (cl > 0)) {
 	                        pip->pagetitle = cp ;
@@ -1234,7 +1234,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_hyphenate:
 	                    if (! pip->have.hyphenate) {
 	                        pip->have.hyphenate = true ;
-	                        pip->final.hyphenate = true ;
+	                        pip->finval.hyphenate = true ;
 	                        pip->fl.hyphenate = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1246,7 +1246,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_ha:
 	                    if (! pip->have.ha) {
 	                        pip->have.ha = true ;
-	                        pip->final.ha = true ;
+	                        pip->finval.ha = true ;
 	                        pip->fl.ha = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1264,7 +1264,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_vs:
 	                    if (! pip->have.vs) {
 	                        pip->have.vs = true ;
-	                        pip->final.vs = true ;
+	                        pip->finval.vs = true ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            pip->fl.vs = rs ;
@@ -1281,7 +1281,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_front:
 	                    if (! pip->have.frontmatter) {
 	                        pip->have.frontmatter = true ;
-	                        pip->final.frontmatter = true ;
+	                        pip->finval.frontmatter = true ;
 	                        pip->fl.frontmatter = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &pip->frontfname ;
@@ -1294,7 +1294,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_back:
 	                    if (! pip->have.backmatter) {
 	                        pip->have.backmatter = true ;
-	                        pip->final.backmatter = true ;
+	                        pip->finval.backmatter = true ;
 	                        pip->fl.backmatter = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1306,7 +1306,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_pagenums:
 	                    if (! pip->have.pagenums) {
 	                        pip->have.pagenums = true ;
-	                        pip->final.pagenums = true ;
+	                        pip->finval.pagenums = true ;
 	                        pip->fl.pagenums = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1318,7 +1318,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_ibz:
 	                    if (! pip->have.ibz) {
 	                        pip->have.ibz = true ;
-	                        pip->final.ibz = true ;
+	                        pip->finval.ibz = true ;
 	                        pip->fl.ibz = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1330,7 +1330,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_tc:
 	                    if (! pip->have.tc) {
 	                        pip->have.tc = true ;
-	                        pip->final.tc = true ;
+	                        pip->finval.tc = true ;
 	                        pip->fl.tc = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1343,7 +1343,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_title:
 	                    if (! pip->have.pagetitle) {
 	                        pip->have.pagetitle = true ;
-	                        pip->final.pagetitle = true ;
+	                        pip->finval.pagetitle = true ;
 	                        pip->fl.pagetitle = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &pip->pagetitle ;
@@ -1355,7 +1355,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 	                case akoname_pub:
 	                    if (! pip->have.pub) {
 	                        pip->have.pub = true ;
-	                        pip->final.pub = true ;
+	                        pip->finval.pub = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &pip->pub ;
 	                            rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -1382,7 +1382,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 static int process(pip,aip,bop,ndb,wdb,ofn,afn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-BITS		*bop ;
+bits		*bop ;
 cchar		*ndb ;
 cchar		*wdb ;
 cchar		*ofn ;
@@ -1431,7 +1431,7 @@ cchar		*afn ;
 /* end subroutine (process) */
 
 
-static int procout(PI *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int procout(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs = SR_OK ;
@@ -1482,7 +1482,7 @@ static int procout(PI *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procout) */
 
 
-static int procargs(PI *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
+static int procargs(PI *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1570,7 +1570,7 @@ static int procargs(PI *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
 static int procpagetitle(PI *pip)
 {
 	int		rs = SR_OK ;
-	if ((pip->pagetitle == nullptr) && (! pip->final.pagetitle)) {
+	if ((pip->pagetitle == nullptr) && (! pip->finval.pagetitle)) {
 	    const int	blen = BIBLEBOOK_LEN ;
 	    char	bbuf[BIBLEBOOK_LEN + 1] ;
 	    if ((rs = biblebook_get(&pip->bb,0,bbuf,blen)) >= 0) {
@@ -1630,17 +1630,17 @@ static int loadpvs(PI *pip,cchar *ap,int al)
 	        rs = cfdecui(sp,sl,&ps) ;
 
 	    if (rs >= 0) {
-	        if ((ps > 0) && (! pip->final.ps)) {
-	            pip->final.ps = true ;
+	        if ((ps > 0) && (! pip->finval.ps)) {
+	            pip->finval.ps = true ;
 	            pip->have.ps = true ;
 	            pip->ps = ps ;
 	        }
-	        if (! pip->final.vs) {
+	        if (! pip->finval.vs) {
 	            if ((vs == 0) && (ps > 0)) {
 	                vs = (ps + 2) ;
 		    }
 	            if (vs > 0) {
-	                pip->final.vs = true ;
+	                pip->finval.vs = true ;
 	                pip->have.vs = true ;
 	                pip->vs = vs ;
 	            }
@@ -1690,13 +1690,13 @@ static int loadvzlw(PI *pip,cchar *ap,int al)
 	            vzlb = (uint) (((double) vzlw) * percent) ;
 	        }
 
-	        if ((vzlw > 0) && (! pip->final.vzlw)) {
-	            pip->final.vzlw = true ;
+	        if ((vzlw > 0) && (! pip->finval.vzlw)) {
+	            pip->finval.vzlw = true ;
 	            pip->have.vzlw = true ;
 	            pip->vzlw = vzlw ;
 	        }
-	        if ((vzlb > 0) && (! pip->final.vzlb)) {
-	            pip->final.vzlb = true ;
+	        if ((vzlb > 0) && (! pip->finval.vzlb)) {
+	            pip->finval.vzlb = true ;
 	            pip->have.vzlb = true ;
 	            pip->vzlb = vzlb ;
 	        }
