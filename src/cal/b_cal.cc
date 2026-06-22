@@ -1,4 +1,4 @@
-/* b_cal SUPPORT */
+/* b_cal SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -56,7 +56,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
@@ -235,8 +235,8 @@ int p_cal(int argc,mainv argv,mainv envv,void *contextp) noex {
 static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	CA	ca ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -1284,7 +1284,7 @@ static int getdefyear(CA *cap) noex {
 
 	if ((cap->defyear == 0) && (cap->defmonth == 0)) {
 
-	    if ((rs = uc_localtime(&daytime,&ts)) >= 0) {
+	    if ((rs = uc_timelocal(&daytime,&ts)) >= 0) {
 	        cap->defyear = (ts.tm_year + TM_YEAR_BASE) ;
 	        cap->defmonth = (ts.tm_mon + 1) ;
 	    }
