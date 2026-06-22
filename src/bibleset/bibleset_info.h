@@ -274,7 +274,7 @@ struct proginfo {
 	cchar	*ff ;		/* font-family */
 	char		*word[word_overlast + 1] ;
 	void		*efp ;
-	PROGINFO_FL	have, f, changed, final ;
+	PROGINFO_FL	have, f, changed, finval ;
 	PROGINFO_FL	open ;
 	PROGINFO_COUNTS	c ;
 	PROGINFO_POUT	pout ;
