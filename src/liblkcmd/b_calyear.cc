@@ -1,8 +1,9 @@
-/* b_calyear */
+/* b_calyear SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* translate a bible number to its corresponding name */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -15,7 +16,6 @@
 #define	CF_LOCSETENT	0		/* compile |locinfo_setentry()| */
 #define	CF_CONFIGCHECK	0		/* compile |config_check()| */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
@@ -27,8 +27,13 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+  	Name:
+	b_calyear
+
+	Description:
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
 	$ calyear [<query(s)>|-a] [-n <name>]
@@ -123,41 +128,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	nleadcasestr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	matpcasestr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isalphalatin(int) ;
-extern int	isdigitlatin(int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	vecstr_adds(vecstr *,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	hasnonwhite(cchar *,int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-extern int	isStrEmpty(cchar *,int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -168,10 +138,6 @@ extern int	debugclose() ;
 extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -219,7 +185,7 @@ struct locinfo {
 	const char	*fullname ;
 	void		*ofp ;
 	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	LOCINFO_TODAY	today ;
 	time_t		ti_tmtime ;
@@ -241,7 +207,7 @@ struct config_flags {
 
 struct config {
 	PROGINFO	*pip ;
-	PARAMFILE	params ;
+	paramfile	params ;
 	EXPCOOK		cooks ;
 	CONFIG_FL	f ;
 } ;
@@ -257,11 +223,11 @@ static int	usage(PROGINFO *) ;
 static int	config_check(CONFIG *) ;
 #endif /* CF_CONFIGCHECK */
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procspecs(PROGINFO *,const char *,int) ;
 static int	procspec(PROGINFO *,const char *,int) ;
-static int	procnames(PROGINFO *,PARAMOPT *) ;
+static int	procnames(PROGINFO *,paramopt *) ;
 
 static int	procval(PROGINFO *,int,int) ;
 static int	procqueries(PROGINFO *,CALYEAR_CITE *,int) ;
@@ -457,9 +423,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	LOCINFO		li, *lip = &li ;
 	CONFIG		co ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	bits		pargs ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -702,7 +668,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_monthname:
 	                    lip->have.monthname = TRUE ;
-	                    lip->final.monthname = TRUE ;
+	                    lip->finval.monthname = TRUE ;
 	                    lip->fl.monthname = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -735,7 +701,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                pip->have.cfname = TRUE ;
-	                                pip->final.cfname = TRUE ;
+	                                pip->finval.cfname = TRUE ;
 	                                cfname = argp ;
 	                            }
 	                        } else
@@ -787,10 +753,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                PARAMOPT	*pop = &aparams ;
+	                                paramopt	*pop = &aparams ;
 	                                cchar		*po = PO_NAME ;
 	                                lip->have.calnames = TRUE ;
-	                                lip->final.calnames = TRUE ;
+	                                lip->finval.calnames = TRUE ;
 	                                rs = paramopt_loads(pop,po,argp,argl) ;
 	                            }
 	                        } else
@@ -804,7 +770,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -835,7 +801,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                lip->have.linelen = TRUE ;
-	                                lip->final.linelen = TRUE ;
+	                                lip->finval.linelen = TRUE ;
 	                                rs = optvalue(argp,argl) ;
 	                                lip->linelen = rs ;
 	                            }
@@ -859,7 +825,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* use GMT */
 	                    case 'z':
-	                        lip->final.gmt = TRUE ;
+	                        lip->finval.gmt = TRUE ;
 	                        lip->have.gmt = TRUE ;
 	                        lip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
@@ -971,7 +937,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if ((lip->nitems <= 0) && (argval != NULL)) {
 	    lip->have.nitems = TRUE ;
-	    lip->final.nitems = TRUE ;
+	    lip->finval.nitems = TRUE ;
 	    rs = optvalue(argval,-1) ;
 	    lip->nitems = rs ;
 	}
@@ -1015,9 +981,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* calendar directories */
 
-	if ((rs >= 0) && (! lip->final.caldirs)) {
+	if ((rs >= 0) && (! lip->finval.caldirs)) {
 	    if ((cp = getourenv(envv,VARCALDNAMES)) != NULL) {
-	        lip->final.caldirs = TRUE ;
+	        lip->finval.caldirs = TRUE ;
 	        lip->have.caldirs = TRUE ;
 	        rs = locinfo_loaddirs(lip,cp,-1) ;
 
@@ -1040,9 +1006,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    rs = procnames(pip,&aparams) ;
 	} /* end if */
 
-	if ((rs >= 0) && (! lip->final.calnames) && (! lip->fl.allcals)) {
+	if ((rs >= 0) && (! lip->finval.calnames) && (! lip->fl.allcals)) {
 	    if ((cp = getourenv(envv,VARCALNAMES)) != NULL) {
-	        lip->final.calnames = TRUE ;
+	        lip->finval.calnames = TRUE ;
 	        lip->have.calnames = TRUE ;
 	        rs = locinfo_loadnames(lip,cp,-1) ;
 
@@ -1169,7 +1135,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                if (rs >= 0) {
 	                    ARGINFO	*aip = &ainfo ;
-	                    BITS	*bop = &pargs ;
+	                    bits	*bop = &pargs ;
 	                    rs = procargs(pip,aip,bop,of,af) ;
 	                }
 
@@ -1364,7 +1330,7 @@ static int vecstr_addourkeys(vecstr *svp,PROGINFO *pip)
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1376,7 +1342,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -1390,9 +1356,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_audit:
-	                    if (! lip->final.audit) {
+	                    if (! lip->finval.audit) {
 	                        lip->have.audit = TRUE ;
-	                        lip->final.audit = TRUE ;
+	                        lip->finval.audit = TRUE ;
 	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1401,9 +1367,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_linelen:
-	                    if (! lip->final.linelen) {
+	                    if (! lip->finval.linelen) {
 	                        lip->have.linelen = TRUE ;
-	                        lip->final.linelen = TRUE ;
+	                        lip->finval.linelen = TRUE ;
 	                        lip->fl.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1412,9 +1378,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_indent:
-	                    if (! lip->final.indent) {
+	                    if (! lip->finval.indent) {
 	                        lip->have.indent = TRUE ;
-	                        lip->final.indent = TRUE ;
+	                        lip->finval.indent = TRUE ;
 	                        lip->fl.indent = TRUE ;
 	                        lip->indent = DEFINDENT ;
 	                        if (vl > 0) {
@@ -1424,9 +1390,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_monthname:
-	                    if (! lip->final.monthname) {
+	                    if (! lip->finval.monthname) {
 	                        lip->have.monthname = TRUE ;
-	                        lip->final.monthname = TRUE ;
+	                        lip->finval.monthname = TRUE ;
 	                        lip->fl.monthname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1435,9 +1401,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_separate:
-	                    if (! lip->final.separate) {
+	                    if (! lip->finval.separate) {
 	                        lip->have.separate = TRUE ;
-	                        lip->final.separate = TRUE ;
+	                        lip->finval.separate = TRUE ;
 	                        lip->fl.separate = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1446,9 +1412,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_interactive:
-	                    if (! lip->final.interactive) {
+	                    if (! lip->finval.interactive) {
 	                        lip->have.interactive = TRUE ;
-	                        lip->final.interactive = TRUE ;
+	                        lip->finval.interactive = TRUE ;
 	                        lip->fl.interactive = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1457,9 +1423,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_citebreak:
-	                    if (! lip->final.citebreak) {
+	                    if (! lip->finval.citebreak) {
 	                        lip->have.citebreak = TRUE ;
-	                        lip->final.citebreak = TRUE ;
+	                        lip->finval.citebreak = TRUE ;
 	                        lip->fl.citebreak = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1468,9 +1434,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_default:
-	                    if (! lip->final.defnull) {
+	                    if (! lip->finval.defnull) {
 	                        lip->have.defnull = TRUE ;
-	                        lip->final.defnull = TRUE ;
+	                        lip->finval.defnull = TRUE ;
 	                        lip->fl.defnull = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1479,9 +1445,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_gmt:
-	                    if (! lip->final.gmt) {
+	                    if (! lip->finval.gmt) {
 	                        lip->have.gmt = TRUE ;
-	                        lip->final.gmt = TRUE ;
+	                        lip->finval.gmt = TRUE ;
 	                        lip->fl.gmt = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1507,7 +1473,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
@@ -1665,10 +1631,10 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procnames(PROGINFO *pip,PARAMOPT *app)
+static int procnames(PROGINFO *pip,paramopt *app)
 {
 	LOCINFO		*lip = pip->lip ;
-	PARAMOPT_CUR	cur ;
+	paramopt_cur	cur ;
 	int		rs ;
 	int		nl ;
 	int		c = 0 ;
@@ -2192,7 +2158,7 @@ static int locinfo_deflinelen(LOCINFO *lip)
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (rs >= def) {
 	                lip->have.linelen = TRUE ;
-	                lip->final.linelen = TRUE ;
+	                lip->finval.linelen = TRUE ;
 	                lip->linelen = rs ;
 		    }
 	        }
@@ -2467,9 +2433,9 @@ static int locinfo_tmtime(LOCINFO *lip)
 	        lip->ti_tmtime = pip->daytime ;
 	        lip->fl.tmtime = TRUE ;
 	        if (lip->fl.gmt) {
-	            rs = tmtime_gmtime(&lip->tm,pip->daytime) ;
+	            rs = tmtime_timegm(&lip->tm,pip->daytime) ;
 	        } else {
-	            rs = tmtime_localtime(&lip->tm,pip->daytime) ;
+	            rs = tmtime_timelocal(&lip->tm,pip->daytime) ;
 	        }
 	    }
 	} /* end if */
@@ -2491,7 +2457,7 @@ static int locinfo_setfolder(LOCINFO *lip,cchar *vp,int vl)
 	if (vp == NULL) return SR_FAULT ;
 
 	pip = lip->pip ;
-	if (lip->final.folder)
+	if (lip->finval.folder)
 	    goto ret0 ;
 
 	if (vl < 0)
@@ -2535,7 +2501,7 @@ static int locinfo_setmbname(LOCINFO *lip,cchar *vp,int vl)
 	if (vp == NULL) return SR_FAULT ;
 
 	pip = lip->pip ;
-	if (! lip->final.mbname) {
+	if (! lip->finval.mbname) {
 	    if (vl < 0) vl = strlen(vp) ;
 	    if (vl > 0) {
 	        int		f = TRUE ;
@@ -2680,7 +2646,7 @@ static int config_fileadd(CONFIG *cfp,const char *cfname)
 {
 	int		rs ;
 	if ((rs = config_params(cfp)) >= 0) {
-	    PARAMFILE	*pfp = &cfp->params ;
+	    paramfile	*pfp = &cfp->params ;
 	    rs = paramfile_fileadd(pfp,cfname) ;
 	}
 	return rs ;
@@ -2693,7 +2659,7 @@ static int config_params(CONFIG *cfp)
 	PROGINFO	*pip = cfp->pip ;
 	int		rs = SR_OK ;
 	if (! cfp->fl.params) {
-	    PARAMFILE	*pfp = &cfp->params ;
+	    paramfile	*pfp = &cfp->params ;
 	    if ((rs = paramfile_open(pfp,pip->envv,NULL)) >= 0) {
 	        cfp->fl.params = TRUE ;
 	    }
@@ -2888,9 +2854,9 @@ static int config_read(CONFIG *cfp)
 {
 	PROGINFO	*pip = cfp->pip ;
 	LOCINFO		*lip ;
-	PARAMFILE	*pfp = &cfp->params ;
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile	*pfp = &cfp->params ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	int		rs ;
 	int		rs1 ;
 	int		v ;
@@ -2961,16 +2927,16 @@ static int config_read(CONFIG *cfp)
 
 	        switch (i) {
 	        case param_logsize:
-	            if ((! pip->final.logsize) && (el > 0)) {
+	            if ((! pip->finval.logsize) && (el > 0)) {
 	                pip->have.logsize = TRUE ;
 	                if ((rs1 = cfdecmfi(ebuf,el,&v)) >= 0)
 	                    pip->logsize = v ;
 	            }
 	            break ;
 	        case param_logfile:
-	            if (! pip->final.lfname) {
+	            if (! pip->finval.lfname) {
 	                pip->have.lfname = TRUE ;
-	                rs1 = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                rs1 = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                    LOGDNAME,pip->searchname,"") ;
 	                ccp = pip->lfname ;
 	                if ((ccp == NULL) || (strcmp(ccp,tbuf) != 0)) {
@@ -2981,12 +2947,12 @@ static int config_read(CONFIG *cfp)
 	            }
 	            break ;
 	        case param_caldirs:
-	            if ((! lip->final.caldirs) && (el > 0)) {
+	            if ((! lip->finval.caldirs) && (el > 0)) {
 	                rs = locinfo_loaddirs(lip,ebuf,el) ;
 	            }
 	            break ;
 	        case param_calnames:
-	            if ((! lip->final.calnames) && (el > 0)) {
+	            if ((! lip->finval.calnames) && (el > 0)) {
 	                rs = locinfo_loadnames(lip,ebuf,el) ;
 	            }
 	            break ;
