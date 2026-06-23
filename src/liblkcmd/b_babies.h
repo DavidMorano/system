@@ -1,4 +1,9 @@
-/* config */
+/* babies_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* babies database */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,16 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	BABIESCONFIG_INCLUDE
+#define	BABIESCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #define	VERSION		"0"
@@ -96,5 +111,8 @@
 #define	DBNAME		"babies"
 
 #define	LOGSIZE		(80*1024)
+
+
+#endif /* BABIESCONFIG_INCLUDE */
 
 
