@@ -1,4 +1,9 @@
-/* config */
+/* l_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* this is a SHELL built-in version of |l(1)| */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,17 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+
+#ifndef	LCONFIG_INCLUDE
+#define	LCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #define	VERSION		"0"
@@ -70,5 +86,8 @@
 #define	PIDFNAME	"run/l"			/* mutex PID file */
 #define	LOGFNAME	"var/log/l"		/* activity log */
 #define	LOCKFNAME	"spool/locks/l"		/* lock mutex file */
+
+
+#endif /* LCONFIG_INCLUDE */
 
 
