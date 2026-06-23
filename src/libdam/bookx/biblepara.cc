@@ -55,8 +55,6 @@ import libutil ;			/* |memclear(3u)| */
 #define	BIBLEPARA_DEFENTS	(44 * 1000)
 
 #define	BIBLEPARA_CA		biblepara_calls
-#define	BIBLEPARA_MODBNAME	"bibleparas"
-#define	BIBLEPARA_OBJNAME	"bibleparas"
 
 #define	BPA		biblepara
 #define	BPA_Q		biblepara_q
@@ -64,8 +62,8 @@ import libutil ;			/* |memclear(3u)| */
 #define	BPA_I		biblepara_info
 #define	BPA_CA		biblepara_calls
 #define	BPA_MAG		BIBLEPARA_MAGIC
-#define	BPA_MODBNAME	BIBLEPARA_MODBNAME
-#define	BPA_OBJNAME	BIBLEPARA_OBJNAME
+#define	BPA_MOD		BIBLEPARA_MODBNAME
+#define	BPA_OBJN	BIBLEPARA_OBJNAME
 
 #define	BPAS_Q		bibleparas_q
 #define	BPAS_C		bibleparas_cur
@@ -427,7 +425,7 @@ local int biblepara_objloadbegin(BPA *op,cchar *pr,cchar *objn) noex {
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
 	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) ylikely {
 	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
-	            cchar	*mn = BPA_MODBNAME ;
+	            cchar	*mn = BPA_MOD ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
 	            mo |= modloadm.libvar ;
