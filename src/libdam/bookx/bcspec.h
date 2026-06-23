@@ -28,8 +28,8 @@
 
 
 struct bcspec_head {
-	cchar		*sp ;
-	int		sl ;
+	cchar		*namp ;
+	int		naml ;
 	uchar		b, c, v ;
 } ; /* end struct */
 
