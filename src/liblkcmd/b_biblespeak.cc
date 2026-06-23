@@ -1,15 +1,15 @@
-/* b_biblespeak */
+/* b_biblespeak SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* translate a bible number to its corresponding name */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_COOKIE	0		/* use cookie as separator */
 #define	CF_DEFQUERY	1		/* allow default query */
-
 
 /* revision history:
 
@@ -22,16 +22,18 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+  	Name:
+	b_biblespeak
+
+  	Description:
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
-
 	$ biblespeak <spec(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -47,23 +49,25 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<estrings.h>
 #include	<ascii.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
-#include	<char.h>
 #include	<vecstr.h>
 #include	<wordfill.h>
 #include	<bcspec.h>
-#include	<strn.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -102,36 +106,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	siskipwhite(const char *,int) ;
-extern int	sicasesub(const char *,int,const char *) ;
-extern int	sibrk(const char *,int,const char *) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	nleadcasestr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	vecstr_adds(vecstr *,const char *,int) ;
-extern int	hasnonwhite(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isalphalatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isStrEmpty(cchar *,int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -141,11 +115,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwhite(const char *) ;
 
 
 /* external variables */
@@ -164,12 +133,12 @@ enum words {
 	word_thebookof,
 	word_book,
 	word_overlast
-} ;
+} ; /* end enum */
 
 struct str {
-	const char	*sp ;
+	cchar		*sp ;
 	int		sl ;
-} ;
+} ; /* end struct */
 
 struct locinfo_flags {
 	uint		audit:1 ;
@@ -182,83 +151,68 @@ struct locinfo_flags {
 	uint		bookchapters:1 ;
 	uint		nchapters:1 ;
 	uint		all:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
 	BIBLEBOOK	ndb ;		/* bible book-name DB */
 	BIBLEMETA	wdb ;		/* bible meta-word DB */
 	BIBLEVERSE	vdb ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	PROGINFO	*pip ;
 	void		*ofp ;
-	const char	*ndbname ;
-	const char	*wdbname ;
-	const char	*word[word_overlast + 1] ;
+	cchar	*ndbname ;
+	cchar	*wdbname ;
+	cchar	*word[word_overlast + 1] ;
 	int		linelen ;
 	int		indent ;
 	int		count, max, precision ;
 	int		cout ;
 	int		nchapters ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) noex ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
-static int	procspecs(PROGINFO *,const char *,int) ;
-static int	procspec(PROGINFO *,const char *,int) ;
-static int	procall(PROGINFO *) ;
+local int	procopts(PROGINFO *,keyopt *) noex ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) noex ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) noex ;
+local int	procspecs(PROGINFO *,cchar *,int) noex ;
+local int	procspec(PROGINFO *,cchar *,int) noex ;
+local int	procall(PROGINFO *) noex ;
 
-static int	proctitlebook(PROGINFO *,int) ;
-static int	proctitlechapter(PROGINFO *,int,int) ;
+local int	proctitlebook(PROGINFO *,int) noex ;
+local int	proctitlechapter(PROGINFO *,int,int) noex ;
 
-static int	proclines(PROGINFO *,WORDFILL *,const char *,int) ;
-static int	procwords(PROGINFO *,WORDFILL *,const char *,int) ;
-static int	procword(PROGINFO *,WORDFILL *,const char *,int) ;
+local int	proclines(PROGINFO *,WORDFILL *,cchar *,int) noex ;
+local int	procwords(PROGINFO *,WORDFILL *,cchar *,int) noex ;
+local int	procword(PROGINFO *,WORDFILL *,cchar *,int) noex ;
 
-static int	procout(PROGINFO *,BIBLEVERSE_CITE *,const char *,int) ;
-static int	procoutline(PROGINFO *,int,const char *,int) ;
-static int	procparse(PROGINFO *,BIBLEVERSE_CITE *,cchar *,int) ;
+local int	procout(PROGINFO *,BIBLEVERSE_CITE *,cchar *,int) noex ;
+local int	procoutline(PROGINFO *,int,cchar *,int) noex ;
+local int	procparse(PROGINFO *,BIBLEVERSE_CITE *,cchar *,int) noex ;
 
-static int	metawordsbegin(PROGINFO *) ;
-static int	metawordsfins(PROGINFO *) ;
-static int	metawordsend(PROGINFO *) ;
+local int	metawordsbegin(PROGINFO *) noex ;
+local int	metawordsfins(PROGINFO *) noex ;
+local int	metawordsend(PROGINFO *) noex ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_deflinelen(LOCINFO *) ;
-static int	locinfo_nlookup(LOCINFO *,char *,int,int) ;
-static int	locinfo_bookmatch(LOCINFO *,const char *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
+local int	locinfo_finish(LOCINFO *) noex ;
+local int	locinfo_deflinelen(LOCINFO *) noex ;
+local int	locinfo_nlookup(LOCINFO *,char *,int,int) noex ;
+local int	locinfo_bookmatch(LOCINFO *,cchar *,int) noex ;
 
-static int	mkwordclean(char *,int,const char *,int) ;
+local int	mkwordclean(char *,int,cchar *,int) noex ;
 
-static char	*firstup(char *) ;
-static char	*alldown(char *) ;
+static char	*firstup(char *) noex ;
+static char	*alldown(char *) noex ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"ndb",
-	"wdb",
-	"vdb",
-	"bookname",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -273,17 +227,32 @@ enum argopts {
 	argopt_vdb,
 	argopt_bookname,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static const PIVARS	initvars = {
+constexpr char	*argopts[] = {
+	"ROOT",
+	"VERSION",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"ndb",
+	"wdb",
+	"vdb",
+	"bookname",
+	nullptr
+} ; /* end array */
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
-static const MAPEX	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -295,17 +264,7 @@ static const MAPEX	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
-
-static const char	*akonames[] = {
-	"audit",
-	"linelen",
-	"indent",
-	"bookname",
-	"interactive",
-	"bookchapters",
-	NULL
-} ;
+} ; /* end array */
 
 enum akonames {
 	akoname_audit,
@@ -315,11 +274,21 @@ enum akonames {
 	akoname_interactive,
 	akoname_bookchapters,
 	akoname_overlast
-} ;
+} ; /* end enum */
 
-static const char	blanks[] = "                    " ;
+constexpr char		*akonames[] = {
+	"audit",
+	"linelen",
+	"indent",
+	"bookname",
+	"interactive",
+	"bookchapters",
+	nullptr
+} ; /* end arrauy */
 
-static const uchar	aterms[] = {
+static cchar		blanks[] = "                    " ;
+
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -328,34 +297,35 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
-static const char	*leaders[] = {
+constexpr char		*leaders[] = {
 	"i",
 	"ii",
 	"iii",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
-static const char	*leadsubs[] = {
+constexpr char		*leadsubs[] = {
 	"first",
 	"second",
 	"third",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int b_biblespeak(int argc,cchar *argv[],void *contextp)
-{
+int b_biblespeak(int argc,cchar *argv[],void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
 
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -368,8 +338,7 @@ int b_biblespeak(int argc,cchar *argv[],void *contextp)
 /* end subroutine (b_biblespeak) */
 
 
-int p_biblespeak(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_biblespeak(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_biblespeak) */
@@ -377,15 +346,13 @@ int p_biblespeak(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 	SHIO		outfile, *ofp = &outfile ;
 
@@ -404,21 +371,21 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ndbname = NULL ;
-	const char	*wdbname = NULL ;
-	const char	*vdbname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*ndbname = nullptr ;
+	cchar	*wdbname = nullptr ;
+	cchar	*vdbname = nullptr ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_biblespeak: starting DFD=%d\n",rs) ;
 	}
@@ -435,7 +402,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) {
+	    cp = BANNER ;
+	}
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
@@ -464,7 +433,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -475,7 +444,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -492,14 +461,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -665,7 +634,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_bookname:
 	                    lip->have.bookname = TRUE ;
-	                    lip->final.bookname = TRUE ;
+	                    lip->finval.bookname = TRUE ;
 	                    lip->fl.bookname = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -686,7 +655,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -738,7 +707,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* number-of-chapters */
 	                    case 'c':
 	                        lip->have.nchapters = TRUE ;
-	                        lip->final.nchapters = TRUE ;
+	                        lip->finval.nchapters = TRUE ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -758,7 +727,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -789,7 +758,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                lip->have.linelen = TRUE ;
-	                                lip->final.linelen = TRUE ;
+	                                lip->finval.linelen = TRUE ;
 	                                rs = optvalue(argp,argl) ;
 	                                lip->linelen = rs ;
 	                            }
@@ -826,8 +795,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -874,7 +843,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_SFIO
 	    printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	}
 
@@ -887,10 +856,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* argument processing */
 
 	rs1 = (DEFPRECISION + 2) ;
-	if ((rs >= 0) && (lip->linelen < rs1) && (argval != NULL)) {
+	if ((rs >= 0) && (lip->linelen < rs1) && (argval != nullptr)) {
 	    rs = cfdeci(argval,-1,&v) ;
 	    lip->have.linelen = TRUE ;
-	    lip->final.linelen = TRUE ;
+	    lip->finval.linelen = TRUE ;
 	    lip->linelen = rs ;
 	}
 
@@ -902,14 +871,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* argument defaults */
 
-	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(envv,VARAFNAME) ;
 
 /* bible-name DB */
 
-	if (ndbname == NULL) ndbname = getourenv(envv,VARNDB) ;
+	if (ndbname == nullptr) ndbname = getourenv(envv,VARNDB) ;
 
 #ifdef	OPTIONAL
-	if (ndbname == NULL)
+	if (ndbname == nullptr)
 	    ndbname = NDBNAME ;
 #endif
 
@@ -931,8 +900,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* bible-verse DB */
 
-	if (vdbname == NULL) vdbname = getourenv(envv,VARVDB) ;
-	if (vdbname == NULL) vdbname = VDBNAME ;
+	if (vdbname == nullptr) vdbname = getourenv(envv,VARVDB) ;
+	if (vdbname == nullptr) vdbname = VDBNAME ;
 
 	if (pip->debuglevel > 0) {
 	    shio_printf(pip->efp,"%s: vdbname=%s\n",
@@ -960,7 +929,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (rs >= 0) {
 	if ((rs = bibleverse_open(&lip->vdb,pip->pr,vdbname)) >= 0) {
-	    const int	nverses = rs ;
+	    cint	nverses = rs ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -1015,7 +984,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    switch (rs) {
 	    default:
 	        if (! pip->fl.quiet) {
-	            const char	*fmt = "%s: could not perform function (%d)\n" ;
+	            cchar	*fmt = "%s: could not perform function (%d)\n" ;
 	            shio_printf(pip->efp,fmt,pip->progname,rs) ;
 	        }
 /* FALLTHROUGH */
@@ -1042,10 +1011,10 @@ retearly:
 	        pip->progname,ex,rs) ;
 	}
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = FALSE ;
 	    shio_close(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
@@ -1089,13 +1058,11 @@ badarg:
 }
 /* end subroutine (b_biblespeak) */
 
-
-static int usage(PROGINFO *pip)
-{
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<number(s)>|<string(s)> ...] [-a]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1109,21 +1076,19 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
-{
+local int procopts(PROGINFO *pip,keyopt *kop) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
-	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
+	if ((cp = getourenv(pip->envv,VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -1133,13 +1098,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case akoname_audit:
-	                    if (! lip->final.audit) {
+	                    if (! lip->finval.audit) {
 	                        lip->have.audit = TRUE ;
-	                        lip->final.audit = TRUE ;
+	                        lip->finval.audit = TRUE ;
 	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1148,9 +1113,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_linelen:
-	                    if (! lip->final.linelen) {
+	                    if (! lip->finval.linelen) {
 	                        lip->have.linelen = TRUE ;
-	                        lip->final.linelen = TRUE ;
+	                        lip->finval.linelen = TRUE ;
 	                        lip->fl.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1159,9 +1124,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_indent:
-	                    if (! lip->final.indent) {
+	                    if (! lip->finval.indent) {
 	                        lip->have.indent = TRUE ;
-	                        lip->final.indent = TRUE ;
+	                        lip->finval.indent = TRUE ;
 	                        lip->fl.indent = TRUE ;
 	                        lip->indent = 1 ;
 	                        if (vl > 0) {
@@ -1171,9 +1136,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_bookname:
-	                    if (! lip->final.bookname) {
+	                    if (! lip->finval.bookname) {
 	                        lip->have.bookname = TRUE ;
-	                        lip->final.bookname = TRUE ;
+	                        lip->finval.bookname = TRUE ;
 	                        lip->fl.bookname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1182,9 +1147,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_interactive:
-	                    if (! lip->final.interactive) {
+	                    if (! lip->finval.interactive) {
 	                        lip->have.interactive = TRUE ;
-	                        lip->final.interactive = TRUE ;
+	                        lip->finval.interactive = TRUE ;
 	                        lip->fl.interactive = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1193,9 +1158,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_bookchapters:
-	                    if (! lip->final.bookchapters) {
+	                    if (! lip->finval.bookchapters) {
 	                        lip->have.bookchapters = TRUE ;
-	                        lip->final.bookchapters = TRUE ;
+	                        lip->finval.bookchapters = TRUE ;
 	                        lip->fl.bookchapters = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1221,16 +1186,15 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 }
 /* end subroutine (procopts) */
 
-
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
-{
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,
+		cchar *ofn) noex {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
@@ -1244,7 +1208,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
 	        wlen += rs ;
 	    }
 
-	    lip->ofp = NULL ;
+	    lip->ofp = nullptr ;
 	    rs1 = shio_close(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
@@ -1258,15 +1222,13 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
 }
 /* end subroutine (process) */
 
-
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afname)
-{
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afname) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pan = 0 ;
 	int		wlen = 0 ;
 	int		cl ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (rs >= 0) {
 	    int	ai ;
@@ -1274,7 +1236,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afname)
 	    for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	        f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	        if (f) {
 	            cp = aip->argv[ai] ;
 	            if (cp[0] != '\0') {
@@ -1290,14 +1252,14 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afname)
 	    } /* end for (looping through positional arguments) */
 	} /* end if (positional arguments) */
 
-	if ((rs >= 0) && (afname != NULL) && (afname[0] != '\0')) {
+	if ((rs >= 0) && (afname != nullptr) && (afname[0] != '\0')) {
 	    SHIO	afile, *afp = &afile ;
 
 	    if (strcmp(afname,"-") == 0)
 	        afname = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afname,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1330,9 +1292,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afname)
 }
 /* end subroutine (procargs) */
 
-
-static int procall(PROGINFO *pip)
-{
+local int procall(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		nbl ;
@@ -1355,22 +1315,20 @@ static int procall(PROGINFO *pip)
 }
 /* end subroutine (procargs) */
 
-
-static int procspecs(PROGINFO *pip,cchar *sp,int sl)
-{
+local int procspecs(PROGINFO *pip,cchar *sp,int sl) noex {
 	LOCINFO		*lip = pip->lip ;
 	FIELD		fsb ;
 	int		rs ;
 	int		wlen = 0 ;
 
-	if (sp == NULL) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (lip->fl.interactive) lip->cout = 0 ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	    const int	flen = sl ;
+	    cint	flen = sl ;
 	    char	*fbuf ;
 	    if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	        int	fl ;
@@ -1393,9 +1351,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 }
 /* end subroutine (procspecs) */
 
-
-static int procspec(PROGINFO *pip,cchar sp[],int sl)
-{
+local int procspec(PROGINFO *pip,cchar *sp,int sl) noex {
 	LOCINFO		*lip = pip->lip ;
 	BIBLEVERSE_CITE	q ;
 	int		rs = SR_OK ;
@@ -1407,7 +1363,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	int		f_titlebook = FALSE ;
 	int		f_titlechapter = FALSE ;
 
-	if (sp == NULL) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 	if (sp[0] == '\0') return SR_INVALID ;
 
 #if	CF_DEBUG
@@ -1418,7 +1374,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 	if ((rs = procparse(pip,&q,sp,sl)) >= 0) {
 	    BIBLEVERSE	*bvp = &lip->vdb ;
 	    uint	cstart, cend ;
-	    const int	comlen = COMBUFLEN ;
+	    cint	comlen = COMBUFLEN ;
 	    char	combuf[COMBUFLEN + 1] ;
 
 #if	CF_DEBUG
@@ -1537,19 +1493,17 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 }
 /* end subroutine (procspec) */
 
-
-static int procparse(PROGINFO *pip,BIBLEVERSE_Q *qp,cchar sp[],int sl)
-{
+local int procparse(PROGINFO *pip,BIBLEVERSE_Q *qp,cchar *sp,int sl) noex {
 	BCSPEC		bb ;
 	int		rs ;
 
 	if ((rs = bcspec_load(&bb,sp,sl)) >= 0) {
-	    const int	nl = bb.nl ;
+	    cint	nl = bb.nl ;
 	    cchar	*np = bb.np ;
 	    qp->b = bb.b ;
 	    qp->c = bb.c ;
 	    qp->v = bb.v ;
-	    if (np != NULL) {
+	    if (np != nullptr) {
 	        LOCINFO		*lip = pip->lip ;
 	        rs = locinfo_bookmatch(lip,np,nl) ;
 	        qp->b = rs ;
@@ -1568,18 +1522,16 @@ static int procparse(PROGINFO *pip,BIBLEVERSE_Q *qp,cchar sp[],int sl)
 }
 /* end subroutine (procparse) */
 
-
-static int proctitlebook(PROGINFO *pip,int nbook)
-{
+local int proctitlebook(PROGINFO *pip,int nbook) noex {
 	LOCINFO		*lip = pip->lip ;
-	const int	blen = BOOKBUFLEN ;
+	cint	blen = BOOKBUFLEN ;
 	int		rs = SR_OK ;
 	int		bbl ;
 	int		i ;
 	int		bl ;
 	int		wlen = 0 ;
-	const char	*tp ;
-	const char	*bp ;
+	cchar	*tp ;
+	cchar	*bp ;
 	char		bbuf[BOOKBUFLEN + 1] ;
 
 #if	CF_DEBUG
@@ -1605,12 +1557,12 @@ static int proctitlebook(PROGINFO *pip,int nbook)
 #endif
 
 	    if (rs >= 0) {
-	        const char	*w = lip->word[word_thebookof] ;
+	        cchar	*w = lip->word[word_thebookof] ;
 	        rs = shio_printf(lip->ofp,"%s\n",w) ;
 	        wlen += rs ;
 	    }
 
-	    if ((rs >= 0) && ((tp = strwhite(bbuf)) != NULL)) {
+	    if ((rs >= 0) && ((tp = strwhite(bbuf)) != nullptr)) {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -1655,13 +1607,11 @@ static int proctitlebook(PROGINFO *pip,int nbook)
 }
 /* end subroutine (proctitlebook) */
 
-
-static int proctitlechapter(PROGINFO *pip,int nbook,int nchapter)
-{
+local int proctitlechapter(PROGINFO *pip,int nbook,int nchapter) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*n ;
+	cchar	*n ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1689,19 +1639,18 @@ static int proctitlechapter(PROGINFO *pip,int nbook,int nchapter)
 }
 /* end subroutine (proctitlechapter) */
 
-
-static int procout(PROGINFO *pip,BIBLEVERSE_CITE *qp,cchar bvbuf[],int bvlen)
-{
+local int procout(PROGINFO *pip,BIBLEVERSE_CITE *qp,cchar *bvbuf,
+		int bvlen) noex {
 	LOCINFO		*lip = pip->lip ;
 	WORDFILL	w ;
-	const int	clen = COLBUFLEN ;
+	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		cbl ;
 	int		line = 0 ;
 	int		wlen = 0 ;
 	int		f_blank = FALSE ;
-	const char	*fmt ;
+	cchar	*fmt ;
 	char		cbuf[COLBUFLEN + 1] ;
 
 	if (bvlen <= 0)
@@ -1743,7 +1692,7 @@ static int procout(PROGINFO *pip,BIBLEVERSE_CITE *qp,cchar bvbuf[],int bvlen)
 /* print out the text-data itself */
 
 	if (rs >= 0) {
-	    if ((rs = wordfill_start(&w,NULL,0)) >= 0) {
+	    if ((rs = wordfill_start(&w,nullptr,0)) >= 0) {
 
 	        if ((rs = proclines(pip,&w,bvbuf,bvlen)) >= 0) {
 
@@ -1786,10 +1735,8 @@ ret0:
 }
 /* end subroutine (procout) */
 
-
 /* ARGSUSED */
-static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
-{
+local int procoutline(PROGINFO *pip,int line,cchar *lp,int ll) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		indent ;
@@ -1803,12 +1750,10 @@ static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
 }
 /* end subroutine (procoutline) */
 
-
-static int proclines(PROGINFO *pip,WORDFILL *wp,cchar bvbuf[],int bvlen)
-{
+local int proclines(PROGINFO *pip,WORDFILL *wp,cchar bvbuf[],int bvlen) noex {
 	int		rs = SR_OK ;
 
-	if (strnbrk(bvbuf,bvlen,"[]") != NULL) {
+	if (strnbrk(bvbuf,bvlen,"[]") != nullptr) {
 	    rs = procwords(pip,wp,bvbuf,bvlen) ;
 	} else {
 	    rs = wordfill_addlines(wp,bvbuf,bvlen) ;
@@ -1818,15 +1763,13 @@ static int proclines(PROGINFO *pip,WORDFILL *wp,cchar bvbuf[],int bvlen)
 }
 /* end subroutine (proclines) */
 
-
-static int procwords(PROGINFO *pip,WORDFILL *wp,cchar buf[],int buflen)
-{
+local int procwords(PROGINFO *pip,WORDFILL *wp,cchar *buf,int buflen) noex {
 	int		rs = SR_OK ;
 	int		len ;
 	int		bl, sl, cl ;
-	const char	*bp, *sp ;
-	const char	*tp ;
-	const char	*cp ;
+	cchar	*bp, *sp ;
+	cchar	*tp ;
+	cchar	*cp ;
 
 	bp = buf ;
 	bl = buflen ;
@@ -1835,7 +1778,7 @@ static int procwords(PROGINFO *pip,WORDFILL *wp,cchar buf[],int buflen)
 	    sp = bp ;
 	    sl = bl ;
 	    len = bl ;
-	    if ((tp = strnchr(bp,bl,'\n')) != NULL) {
+	    if ((tp = strnchr(bp,bl,'\n')) != nullptr) {
 	        len = ((tp + 1) - bp) ;
 	        sp = bp ;
 	        sl -= (tp - bp) ;
@@ -1861,24 +1804,22 @@ static int procwords(PROGINFO *pip,WORDFILL *wp,cchar buf[],int buflen)
 }
 /* end subroutine (procwords) */
 
-
-static int procword(PROGINFO *pip,WORDFILL *wp,cchar *cp,int cl)
-{
+local int procword(PROGINFO *pip,WORDFILL *wp,cchar *cp,int cl) noex {
 	int		rs = SR_OK ;
 	char		wordbuf[WORDBUFLEN + 1] ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if (cl > 0) {
 
-	    if (strnbrk(cp,cl,"[]") != NULL) {
+	    if (strnbrk(cp,cl,"[]") != nullptr) {
 
 	        if (cp[0] == CH_LBRACK) {
 	            cp += 1 ;
 	            cl -= 1 ;
 	        }
 
-	        if (strnbrk(cp,cl,"[]") != NULL) {
+	        if (strnbrk(cp,cl,"[]") != nullptr) {
 	            rs = mkwordclean(wordbuf,WORDBUFLEN,cp,cl) ;
 	            cl = rs ;
 	            cp = wordbuf ;
@@ -1896,12 +1837,10 @@ static int procword(PROGINFO *pip,WORDFILL *wp,cchar *cp,int cl)
 }
 /* end subroutine (procword) */
 
-
-static int metawordsbegin(PROGINFO *pip)
-{
+local int metawordsbegin(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
-	const char	*wdbname = lip->wdbname ;
+	cchar	*wdbname = lip->wdbname ;
 
 	if ((rs = biblemeta_open(&lip->wdb,pip->pr,wdbname)) >= 0) {
 	    int		mi ;
@@ -1965,19 +1904,17 @@ static int metawordsbegin(PROGINFO *pip)
 }
 /* end subroutine (metawordsbegin) */
 
-
-static int metawordsfins(PROGINFO *pip)
-{
+local int metawordsfins(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		mi ;
 
 	for (mi = 0 ; mi < word_overlast ; mi += 1) {
-	    if (lip->word[mi] != NULL) {
+	    if (lip->word[mi] != nullptr) {
 	        rs1 = uc_free(lip->word[mi]) ;
 	        if (rs >= 0) rs = rs1 ;
-	        lip->word[mi] = NULL ;
+	        lip->word[mi] = nullptr ;
 	    }
 	} /* end for */
 
@@ -1985,9 +1922,7 @@ static int metawordsfins(PROGINFO *pip)
 }
 /* end subroutine (metawordsfins) */
 
-
-static int metawordsend(PROGINFO *pip)
-{
+local int metawordsend(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2005,9 +1940,7 @@ static int metawordsend(PROGINFO *pip)
 }
 /* end subroutine (metawordsend) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
 	memset(lip,0,sizeof(LOCINFO)) ;
@@ -2020,9 +1953,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -2042,14 +1973,12 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_deflinelen(LOCINFO *lip)
-{
-	const int	def = (DEFPRECISION + 2) ;
+local int locinfo_deflinelen(LOCINFO *lip) noex {
+	cint	def = (DEFPRECISION + 2) ;
 	int		rs = SR_OK ;
 	if (lip->linelen < def) {
 	    PROGINFO	*pip = lip->pip ;
-	    cchar	*cp = NULL ;
+	    cchar	*cp = nullptr ;
 	    if (isStrEmpty(cp,-1)) {
 		cp = getourenv(pip->envv,VARLINELEN) ;
 	    }
@@ -2060,7 +1989,7 @@ static int locinfo_deflinelen(LOCINFO *lip)
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (rs >= def) {
 	                lip->have.linelen = TRUE ;
-	                lip->final.linelen = TRUE ;
+	                lip->finval.linelen = TRUE ;
 	                lip->linelen = rs ;
 		    }
 	        }
@@ -2071,9 +2000,7 @@ static int locinfo_deflinelen(LOCINFO *lip)
 }
 /* end subroutine (locinfo_deflinelen) */
 
-
-static int locinfo_nlookup(LOCINFO *lip,char *rbuf,int rlen,int bi)
-{
+local int locinfo_nlookup(LOCINFO *lip,char *rbuf,int rlen,int bi) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -2093,9 +2020,7 @@ static int locinfo_nlookup(LOCINFO *lip,char *rbuf,int rlen,int bi)
 }
 /* end subroutine (locinfo_nlookup) */
 
-
-static int locinfo_bookmatch(LOCINFO *lip,cchar *mbuf,int mlen)
-{
+local int locinfo_bookmatch(LOCINFO *lip,cchar *mbuf,int mlen) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		bi = 0 ;
@@ -2114,9 +2039,7 @@ static int locinfo_bookmatch(LOCINFO *lip,cchar *mbuf,int mlen)
 }
 /* end subroutine (locinfo_bookmatch) */
 
-
-static int mkwordclean(char *wordbuf,int wordbuflen,cchar *cp,int cl)
-{
+local int mkwordclean(char *wordbuf,int wordbuflen,cchar *cp,int cl) noex {
 	int		i = 0 ;
 
 	while ((i < wordbuflen) && cl && cp[0]) {
