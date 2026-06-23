@@ -1,4 +1,9 @@
-/* config */
+/* bibleq_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* query the bible database using words as the query keys */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,9 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	BIBLEQCONFIG_INCLUDE
+#define	BIBLEQCONFIG_INCLUDE
 
 
 #define	VERSION		"0"
@@ -87,7 +95,10 @@
 
 #define	DEFPRECISION	5		/* default precision numbers */
 
-#define	OPT_BOOKNAME	TRUE
+#define	OPT_BOOKNAME	true
 #define	OPT_INDENT	1
+
+
+#endif /* BIBLEQCONFIG_INCLUDE */
 
 
