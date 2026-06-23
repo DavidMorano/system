@@ -13,18 +13,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<strtab.h>
-#include	<bfile.h>
-
-#include	<txtindexhdr.h>		/* this is the hash-file-header */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtab.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBB */
+#include	<txtindexhdr.h>		/* LIBDAM hash-file-header */
 
 
-#define	TXTINDEXMKS_MAGIC	0x88773422
 #define	TXTINDEXMKS		struct txtindexmks_head
 #define	TXTINDEXMKS_FL		struct txtindexmks_flags
 #define	TXTINDEXMKS_OBJ		struct txtindexmks_object
@@ -32,6 +27,7 @@
 #define	TXTINDEXMKS_TAG		struct txtindexmks_tagitems
 #define	TXTINDEXMKS_KEY		struct txtindexmks_keyer
 #define	TXTINDEXMKS_TI		struct txtindexmks_titan
+#define	TXTINDEXMKS_MAGIC	0x88773422
 #define	TXTINDEXMKS_INTOPEN	(10*60)
 #define	TXTINDEXMKS_INTSTALE	(5*60)
 #define	TXTINDEXMKS_MINWLEN	3
@@ -40,8 +36,8 @@
 
 struct txtindexmks_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		dummy ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct txtindexmks_patient {
