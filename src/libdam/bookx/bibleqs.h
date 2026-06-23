@@ -25,30 +25,22 @@
 
 
 #define	BIBLEQS		struct bibleqs_head
+#define	BIBLEQS_FL	struct bibleqs_flags
 #define	BIBLEQS_CUR	struct bibleqs_cursor
 #define	BIBLEQS_OBJ	struct bibleqs_object
-#define	BIBLEQS_Q	struct bibleqs_query
-#define	BIBLEQS_CITE	struct bibleqs_query
-#define	BIBLEQS_FL	struct bibleqs_flags
+#define	BIBLEQS_Q	biblecite
+#define	BIBLEQS_CITE	biblecite
 #define	BIBLEQS_MAGIC	0x99889298
+#define	BIBLEQS_DBDNAME	"share/bibledbs"
+#define	BIBLEQS_DBNAME	"av"
 /* query options */
 #define	BIBLEQS_OPREFIX	0x01		/* prefix match */
 
-
-struct bibleqs_query {
-	uchar		b, c, v ;
-} ; /* end struct */
 
 struct bibleqs_object {
 	cchar		*name ;
 	uint		objsz ;
 	uint		cursz ;
-} ; /* end struct */
-
-struct bibleqs_cursor {
-	uint		*verses ;		/* file-offsets to tags */
-	uint		nverses ;
-	int		i ;
 } ; /* end struct */
 
 struct bibleqs_flags {
@@ -58,13 +50,19 @@ struct bibleqs_flags {
 	uint		prefix:1 ;		/* prefix key-matches */
 } ; /* end struct */
 
+struct bibleqs_cursor {
+	uint		*verses ;		/* file-offsets to tags */
+	uint		nverses ;
+	int		i ;
+} ; /* end struct */
+
 struct bibleqs_head {
 	cchar		*pr ;
 	cchar		*dbname ;		/* DB database name */
 	cchar		*dbfname ;		/* DB filename */
 	char		*dbmdata ;		/* DB map-data */
-	eigendb		edb ;
-	txtindex	ind ;
+	eigendb		*edbp ;
+	txtindex	*indp ;
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* map */
 	time_t		ti_lastcheck ;
