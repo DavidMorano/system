@@ -13,14 +13,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<eigendb.h>
-#include	<txtindex.h>
-#include	<rtags.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<eigendb.h>		/* LIBUC */
+#include	<txtindex.h>		/* LIBUC */
+#include	<rtags.h>		/* LIBUC */
 
 
-#define	TEXTLOOK_MAGIC	0x99889298
 #define	TEXTLOOK	struct textlook_head
 #define	TEXTLOOK_FL	struct textlook_flags
 #define	TEXTLOOK_CUR	struct textlook_cursor
@@ -28,6 +27,7 @@
 #define	TEXTLOOK_TAG	struct textlook_taget
 #define	TEXTLOOK_INFO	struct textlook_information
 /* query options */
+#define	TEXTLOOK_MAGIC	0x99889298
 #define	TEXTLOOK_OPREFIX	(1 << 0)	/* prefix match */
 
 
@@ -47,15 +47,15 @@ struct textlook_taget {
 
 struct textlook_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct textlook_cursor {
     	char		*tbuf ;
 	rtags		tags ;
 	rtags_cur	tcur ;
-	uint		magic ;
+	uint		magval ;
 	int		tlen ;
 	int		ntags ;
 } ; /* end struct */
@@ -79,9 +79,9 @@ struct textlook_head {
 	time_t		ti_lastcheck ;
 	time_t		ti_tind ;		/* text-index */
 	TEXTLOOK_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		pagesz ;
-	int		dbfsize ;		/* DB file-size */
+	int		dbfsz ;			/* DB file-size */
 	int		minwlen ;		/* minimum key-word length */
 	int		ncursors ;
 } ; /* end struct */
@@ -109,6 +109,8 @@ extern int textlook_audit(textlook *) noex ;
 extern int textlook_close(textlook *) noex ;
 
 EXTERNC_end
+
+extern const textlook_obj	textlook_modinfo ;
 
 
 #endif /* TEXTLOOK_INCLUDE */
