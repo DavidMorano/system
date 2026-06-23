@@ -159,8 +159,7 @@ bool isFailOpen(int rs) noex {
 	    f = f || isOneOf(rfailopen,rs) ;
 	}
 	return f ;
-}
-/* end subroutine (isFailOpen) */
+} /* end subroutine (isFailOpen) */
 
 bool isFailConn(int rs) noex {
 	int		f = false ;
@@ -168,27 +167,22 @@ bool isFailConn(int rs) noex {
 	    f = isOneOf(rfailconn,rs) ;
 	}
 	return f ;
-}
-/* end subroutine (isFailConn) */
+} /* end subroutine (isFailConn) */
 
 bool isBadSend(int rs) noex {
 	return isOneOf(rbadsend,rs) ;
-}
-/* end subroutine (isBadSend) */
+} /* end subroutine (isBadSend) */
 
 bool isBadRecv(int rs) noex {
 	return isOneOf(rbadrecv,rs) ;
-}
-/* end subroutine (isBadRecv) */
+} /* end subroutine (isBadRecv) */
 
 bool isBadMsg(int rs) noex {
 	return isOneOf(rbadmsg,rs) ;
-}
-/* end subroutine (isBadMsg) */
+} /* end subroutine (isBadMsg) */
 
 bool isIOError(int rs) noex {
 	return isOneOf(rioerror,rs) ;
-}
-/* end subroutine (isIOError) */
+} /* end subroutine (isIOError) */
 
 
