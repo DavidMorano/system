@@ -13,14 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<sockaddress.h>
-#include	<vecstr.h>
+#include	<sys/types.h>		/* POSIX |pid_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
 
 
 #define	CLIENTINFO	struct clientinfo_head
@@ -45,15 +42,15 @@ struct clientinfo_head {
 	int		fd_output ;
 	int		f_long ;		/* the "long" switch */
 	int		f_local ;		/* client is local */
-} ;
+} ; /* end struct (clientinfo_head) */
 
 typedef	CLIENTINFO	clientinfo ;
 
 EXTERNC_begin
 
-extern int clientinfo_start(clientinfo *) noex ;
-extern int clientinfo_finish(clientinfo *) noex ;
-extern int clientinfo_loadnames(clientinfo *,cchar *) noex ;
+extern int clientinfo_start	(clientinfo *) noex ;
+extern int clientinfo_finish	(clientinfo *) noex ;
+extern int clientinfo_loadnames	(clientinfo *,cchar *) noex ;
 
 EXTERNC_end
 
