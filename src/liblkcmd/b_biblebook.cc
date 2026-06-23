@@ -1,14 +1,14 @@
-/* b_biblebook */
+/* b_biblebook SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* translate a bible number to its corresponding name */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_BBMATCH	0		/* use 'biblebook_match(3dam)' */
-
 
 /* revision history:
 
@@ -21,16 +21,18 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+  	Name:
+	b_biblebook
+
+  	Descripion:
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
-
 	$ biblebook <bbspec(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -90,37 +92,8 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
 
 
 /* external variables */
@@ -139,7 +112,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	BIBLEBOOK	bbdb ;
 	PROGINFO	*pip ;
 	BIBLEBOOK	*dbp ;
@@ -152,26 +125,26 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procsome(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
-static int	procall(PROGINFO *) ;
-static int	procspecs(PROGINFO *,cchar *,int) ;
-static int	procspec(PROGINFO *,cchar *,int) ;
-static int	procout(PROGINFO *,int,cchar *,int) ;
-static int	procoutextra(PROGINFO *,int) ;
-static int	loadprecision(PROGINFO *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procsome(PROGINFO *,ARGINFO *,bits *,cchar *) ;
+local int	procall(PROGINFO *) ;
+local int	procspecs(PROGINFO *,cchar *,int) ;
+local int	procspec(PROGINFO *,cchar *,int) ;
+local int	procout(PROGINFO *,int,cchar *,int) ;
+local int	procoutextra(PROGINFO *,int) ;
+local int	loadprecision(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 static char	*strwcpyspecial(char *,cchar *,int) ;
 
-static int	isNotGoodCite(int) ;
+local int	isNotGoodCite(int) ;
 
 
 /* local variables */
@@ -282,13 +255,13 @@ int p_biblebook(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -616,7 +589,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -870,7 +843,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -895,7 +868,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -907,7 +880,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -922,9 +895,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 
 	                case akoname_audit:
-	                    if (! lip->final.audit) {
+	                    if (! lip->finval.audit) {
 	                        lip->have.audit = TRUE ;
-	                        lip->final.audit = TRUE ;
+	                        lip->finval.audit = TRUE ;
 	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -934,9 +907,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_interactive:
-	                    if (! lip->final.interactive) {
+	                    if (! lip->finval.interactive) {
 	                        lip->have.interactive = TRUE ;
-	                        lip->final.interactive = TRUE ;
+	                        lip->finval.interactive = TRUE ;
 	                        lip->fl.interactive = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -963,7 +936,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
@@ -1011,7 +984,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
+local int procsome(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1101,7 +1074,7 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 /* end subroutine (procsome) */
 
 
-static int procspecs(PROGINFO *pip,cchar *sp,int sl)
+local int procspecs(PROGINFO *pip,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	FIELD		fsb ;
@@ -1129,7 +1102,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (procspecs) */
 
 
-static int procspec(PROGINFO *pip,cchar *sp,int sl)
+local int procspec(PROGINFO *pip,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1235,7 +1208,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (procspec) */
 
 
-static int procall(PROGINFO *pip)
+local int procall(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	BIBLEBOOK	*dbp ;
@@ -1262,7 +1235,7 @@ static int procall(PROGINFO *pip)
 /* end subroutine (procall) */
 
 
-static int procout(PROGINFO *pip,int n,cchar *sp,int sl)
+local int procout(PROGINFO *pip,int n,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1279,7 +1252,7 @@ static int procout(PROGINFO *pip,int n,cchar *sp,int sl)
 /* end subroutine (procout) */
 
 
-static int procoutextra(PROGINFO *pip,int bi)
+local int procoutextra(PROGINFO *pip,int bi)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1314,7 +1287,7 @@ static int procoutextra(PROGINFO *pip,int bi)
 /* end subroutine (procoutextra) */
 
 
-static int loadprecision(PROGINFO *pip)
+local int loadprecision(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1355,7 +1328,7 @@ static int loadprecision(PROGINFO *pip)
 /* end subroutine (loadprecision) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
@@ -1368,7 +1341,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	if (lip == NULL) return SR_FAULT ;
 	return SR_OK ;
@@ -1398,7 +1371,7 @@ static char *strwcpyspecial(char *dp,cchar *sp,int sl)
 /* end subroutine (strwcpyspecial) */
 
 
-static int isNotGoodCite(int rs)
+local int isNotGoodCite(int rs)
 {
 	int		f = FALSE ;
 	f = f || (rs == SR_NOTFOUND) ;
