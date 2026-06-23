@@ -41,10 +41,10 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<estrings.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
 #include	<buffer.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
 #include	<strwcmp.h>		/* LIBUC */
