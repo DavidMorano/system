@@ -87,9 +87,9 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<uclibmem.h>		/* LIBUC */
 #include	<endian.h>		/* LIBU */
-#include	<estrings.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
