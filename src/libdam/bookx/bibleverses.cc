@@ -838,7 +838,7 @@ local int bibleverses_loadcooks(BVSS *op,EC *ecp) noex {
 	    if ((rs >= 0) && vap) {
 	        kbuf[0] = char(kch) ;
 	        rs = ecp->add(kbuf,vap,val) ;
-	    }
+	    } /* end if (add) */
 	} /* end for */
 	if (rs >= 0) {
 	    if (cchar *prname ; (rs = sfbasename(op->pr,-1,&prname)) >= 0) {
@@ -947,7 +947,7 @@ local int bibleverses_indmkdata(BVSS *op,cchar *indname,mode_t om) noex {
 	                DEBUGPRINTF("line>%r<\n",lp,strlinelen(lp,ll,40)) ;
 #endif
 	                if ((rs = biblecite_ver(&q,lp,ll)) > 0) {
-			    int si = rs ;
+			    cint si = rs ;
 	                    if (f_ent) {
 	                        c += 1 ;
 	                        if ((rs = bvemk_start(&bve,&e)) >= 0) {
