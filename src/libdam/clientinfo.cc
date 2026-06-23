@@ -27,21 +27,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<vecstr.h>
-#include	<sockaddress.h>
-#include	<connection.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/socket.h>		/* POSIX */
+#include	<netinet/in.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<connection.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"clientinfo.h"
 
@@ -54,6 +56,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -72,11 +75,11 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int clientinfo_ctor(clientinfo *op,Args ... args) noex {
+local int clientinfo_ctor(clientinfo *op,Args ... args) noex {
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    clientinfo_head	*hop = cast_static<clientinfo_head *>(op) ;
-	    cnullptr	np{} ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->sap = new(nothrow) sockaddress) != np) {
@@ -87,19 +90,18 @@ static int clientinfo_ctor(clientinfo *op,Args ... args) noex {
 		    if (rs < 0) {
 		        delete op->nlp ;
 		        op->nlp = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (new-vecstr) */
 		if (rs < 0) {
 		    delete op->sap ;
 		    op->sap = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-sockaddress) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (clientinfo_ctor) */
+} /* end subroutine (clientinfo_ctor) */
 
-static int clientinfo_dtor(clientinfo *op) noex {
+local int clientinfo_dtor(clientinfo *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -117,10 +119,9 @@ static int clientinfo_dtor(clientinfo *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (clientinfo_dtor) */
+} /* end subroutine (clientinfo_dtor) */
 
-static int	clientinfo_load(clientinfo *,cchar *,vecstr *) noex ;
+local int	clientinfo_load(clientinfo *,cchar *,vecstr *) noex ;
 
 
 /* local variables */
@@ -140,11 +141,10 @@ int clientinfo_start(clientinfo *cip) noex {
 	    rs = vecstr_start(cip->slp,1,0) ;
 	    if (rs < 0) {
 		clientinfo_dtor(cip) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (clientinfo_ctor) */
 	return rs ;
-}
-/* end subroutine (clientinfo_start) */
+} /* end subroutine (clientinfo_start) */
 
 int clientinfo_finish(clientinfo *cip) noex {
 	int		rs = SR_FAULT ;
@@ -176,8 +176,7 @@ int clientinfo_finish(clientinfo *cip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (clientinfo_finish) */
+} /* end subroutine (clientinfo_finish) */
 
 int clientinfo_loadnames(clientinfo *cip,cchar *dname) noex {
 	int		rs = SR_FAULT ;
@@ -196,18 +195,17 @@ int clientinfo_loadnames(clientinfo *cip,cchar *dname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (clientinfo_loadnames) */
+} /* end subroutine (clientinfo_loadnames) */
 
 
 /* local subroutines */
 
-static int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
+local int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (cip && nlp) {
-	    if (char *hnbuf ; (rs = malloc_hn(&hnbuf)) >= 0) {
+	    if (char *hnbuf ; (rs = mem.hostname(&hnbuf)) >= 0) {
 		cint		hnlen = rs ;
 	        connection	conn, *cnp = &conn ;
 	        if ((rs = connection_start(cnp,dname)) >= 0) {
@@ -234,12 +232,11 @@ static int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
 	            rs1 = connection_finish(&conn) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (connection_start) */
-		rs1 = uc_free(hnbuf) ;
+		rs1 = mem.free(hnbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (clientinfo_load) */
+} /* end subroutine (clientinfo_load) */
 
 
