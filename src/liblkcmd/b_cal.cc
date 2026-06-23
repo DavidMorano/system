@@ -1,4 +1,4 @@
-/* b_cal SUPPORT */
+/* b_cal SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -56,7 +56,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
@@ -80,23 +80,10 @@
 
 /* local defines */
 
+#define	CA		struct calarger
+
 
 /* external subroutines */
-
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matcasestr(cchar **,cchar *,int) ;
-extern int	matocasestr(cchar **,int,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	opentmp(cchar *,int,mode_t) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
@@ -107,10 +94,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -142,22 +125,22 @@ struct monyear {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+static int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-static int	usage(PROGINFO *) ;
+static int	usage(PROGINFO *) noex ;
 
-static int	procarger(PROGINFO *,struct calarger *) ;
-static int	process(PROGINFO *,struct calarger *,cchar *,int) ;
-static int	procexec(PROGINFO *,struct calarger *,int) ;
-static int	procerrout(PROGINFO *,int,cchar *,int) ;
-static int	procline(PROGINFO *,int,cchar *,int) ;
+static int	procarger(PROGINFO *,CA *) noex ;
+static int	process(PROGINFO *,CA *,cchar *,int) noex ;
+static int	procexec(PROGINFO *,CA *,int) noex ;
+static int	procerrout(PROGINFO *,int,cchar *,int) noex ;
+static int	procline(PROGINFO *,int,cchar *,int) noex ;
 
-static int	getstuff(PROGINFO *,struct monyear *,cchar *) ;
+static int	getstuff(PROGINFO *,struct monyear *,cchar *) noex ;
 
-static int	getdefyear(struct calarger *) ;
+static int	getdefyear(CA *) noex ;
 
-static int	whichmonth(cchar *,int) ;
-static int	getval(cchar *,int) ;
+static int	whichmonth(cchar *,int) noex ;
+static int	getval(cchar *,int) noex ;
 
 
 /* local variables */
@@ -217,11 +200,12 @@ static const MAPEX	mapexs[] = {
 static const char	blanks[] = "        " ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_cal(int argc,cchar *argv[],void *contextp)
-{
+int b_cal(int argc,mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
@@ -239,9 +223,7 @@ int b_cal(int argc,cchar *argv[],void *contextp)
 }
 /* end subroutine (b_cal) */
 
-
-int p_cal(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_cal(int argc,mainv argv,mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_cal) */
@@ -249,14 +231,12 @@ int p_cal(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
-	struct calarger	ca ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	CA	ca ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -771,7 +751,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* crunch on the arguments (if any), and then do it */
 
-	memset(&ca,0,sizeof(struct calarger)) ;
+	memset(&ca,0,sizeof(CA)) ;
 	ca.cols = cols ;
 	ca.progcal = progcal ;
 	ca.specyear = specyear ;
@@ -849,9 +829,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -869,9 +847,7 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
-static int procarger(PROGINFO *pip,struct calarger *cap)
-{
+static int procarger(PROGINFO *pip,CA *cap) noex {
 	struct monyear	my, *myp = &my ;
 	int		rs = SR_OK ;
 
@@ -967,9 +943,7 @@ static int procarger(PROGINFO *pip,struct calarger *cap)
 }
 /* end subroutine (procarger) */
 
-
-static int process(PROGINFO *pip,struct calarger *cap,cchar *ofn,int ncals)
-{
+static int process(PROGINFO *pip,CA *cap,cchar *ofn,int ncals) noex {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
@@ -1048,9 +1022,7 @@ static int process(PROGINFO *pip,struct calarger *cap,cchar *ofn,int ncals)
 }
 /* end subroutine (process) */
 
-
-static int procexec(PROGINFO *pip,struct calarger *cap,int ofd)
-{
+static int procexec(PROGINFO *pip,CA *cap,int ofd) noex {
 	SPAWNPROC	ps ;
 	pid_t		pid ;
 	int		rs = SR_OK ;
@@ -1194,11 +1166,9 @@ static int procerrout(PROGINFO *pip,int cols,cchar *s,int ofd) noex {
 }
 /* end subroutine (procerrout) */
 
-
-static int procline(PROGINFO *pip,int cols,cchar lp[],int ll)
-{
+static int procline(PROGINFO *pip,int cols,cchar *lp,int ll) noex {
 	SHIO		*fp = pip->efp ;
-	const int	indent = 2 ;
+	cint		indent = 2 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		leadlen ;
@@ -1231,10 +1201,8 @@ static int procline(PROGINFO *pip,int cols,cchar lp[],int ll)
 }
 /* end subroutine (procline) */
 
-
 /* get the month and-or year out of a string argument */
-static int getstuff(PROGINFO *pip,struct monyear *myp,cchar s[])
-{
+static int getstuff(PROGINFO *pip,struct monyear *myp,cchar *s) noex {
 	int		rs = SR_OK ;
 	int		v ;
 	cchar		*tp ;
@@ -1307,10 +1275,8 @@ static int getstuff(PROGINFO *pip,struct monyear *myp,cchar s[])
 }
 /* end subroutine (getstuff) */
 
-
-static int getdefyear(struct calarger *cap)
-{
-	struct tm	ts ;
+static int getdefyear(CA *cap) noex {
+	TM		ts ;
 	const time_t	daytime = time(NULL) ;
 	int		rs = SR_OK ;
 	int		v ;
@@ -1318,7 +1284,7 @@ static int getdefyear(struct calarger *cap)
 
 	if ((cap->defyear == 0) && (cap->defmonth == 0)) {
 
-	    if ((rs = uc_localtime(&daytime,&ts)) >= 0) {
+	    if ((rs = uc_timelocal(&daytime,&ts)) >= 0) {
 	        cap->defyear = (ts.tm_year + TM_YEAR_BASE) ;
 	        cap->defmonth = (ts.tm_mon + 1) ;
 	    }
@@ -1331,48 +1297,41 @@ static int getdefyear(struct calarger *cap)
 
 	    if ((rs >= 0) && (cap->specmonth != NULL)) {
 	        v = whichmonth(cap->specmonth,-1) ;
-	        if (v < 0)
+	        if (v < 0) {
 	            rs = cfdeci(cap->specmonth,-1,&v) ;
+		}
 	        cap->defmonth = v ;
 	        n |= 0x02 ;
 	    }
 
 	    cap->n = n ;
 
-	} else
+	} else {
 	    n = cap->n ;
+	}
 
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (getdefyear) */
 
-
-static int whichmonth(cchar sp[],int sl)
-{
+static int whichmonth(cchar *sp,int sl) noex {
 	int		i = -1 ;
 	int		cl ;
 	cchar		*cp ;
-
 	if ((cl = sfshrink(sp,sl,&cp)) > 0) {
 	    i = matocasestr(calstrs_months,2,cp,cl) ;
 	}
-
 	return ((i >= 0) ? (i + 1) : -1) ;
 }
 /* end subroutine (whichmonth) */
 
-
-static int getval(cchar *sp,int sl)
-{
+static int getval(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
-	int		cl ;
 	int		v = 0 ;
 	cchar		*cp ;
-
-	if ((cl = sfshrink(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
 	    rs = cfdeci(cp,cl,&v) ;
 	}
-
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (getval) */
