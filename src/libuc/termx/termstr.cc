@@ -248,7 +248,7 @@ int termstr_finish(termstr *op) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutines (termstr_finish) */
+/* end subroutine (termstr_finish) */
 
 int termstr_clean(termstr *op) noex {
 	int		rs ;
@@ -257,7 +257,7 @@ int termstr_clean(termstr *op) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutines (termstr_clean) */
+/* end subroutine (termstr_clean) */
 
 int termstr_write(termstr *op,cchar *bp,int bl) noex {
 	int		rs ;
@@ -268,7 +268,7 @@ int termstr_write(termstr *op,cchar *bp,int bl) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutines (termstr_write) */
+/* end subroutine (termstr_write) */
 
 /* write to the buffer w/ graphic-rendition */
 int termstr_writegr(termstr *op,int gr,cchar *bp,int bl) noex {
@@ -298,7 +298,7 @@ int termstr_writegr(termstr *op,int gr,cchar *bp,int bl) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutines (termstr_writegr) */
+/* end subroutine (termstr_writegr) */
 
 int termstr_char(termstr *op,int ch) noex {
 	int		rs ;
@@ -307,7 +307,7 @@ int termstr_char(termstr *op,int ch) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutines (termstr_char) */
+/* end subroutine (termstr_char) */
 
 int termstr_get(termstr *op,cchar **rpp) noex {
 	int		rs ;
@@ -316,7 +316,7 @@ int termstr_get(termstr *op,cchar **rpp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutines (termstr_get) */
+/* end subroutine (termstr_get) */
 
 /* erase-display (ED) */
 int termstr_ed(termstr *op,int type) noex {
