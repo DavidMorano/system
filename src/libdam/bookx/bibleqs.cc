@@ -5,9 +5,8 @@
 /* bible-query database manager */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUGSTART	0		/* debug |isstart()| */
-#define	CF_DEBUGN	0		/* special debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
+#define	CF_DEBUGTART	0		/* debug |isstart()| */
 #define	CF_DEBUGPW	0		/* debug |ktag_procword()| */
 #define	CF_DEBUGPL	0		/* debug |ktac_procline()| */
 #define	CF_EMPTYTERM	1		/* empty line terminates entry */
@@ -62,16 +61,17 @@
 #include	<sys/stat.h>		/* POSIX */
 #include	<sys/mman.h>		/* POSIX */
 #include	<ctime>			/* CSTD */
-#include	<climits>		/* CSTD */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<estrings.h>		/* LIBU */
 #include	<baops.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
 #include	<ucmem.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
@@ -83,9 +83,11 @@
 #include	<dirseen.h>		/* LIBUC */
 #include	<mkdirs.h>		/* LIBUC */
 #include	<expcook.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
 #include	<biblecite.h>		/* LIBDAM */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -113,11 +115,23 @@ import uconstants ;			/* |varname(3u)| + |sysword(3u)| */
 #define	BIBLEQS_NEIGEN	2000		/* number of keys in chunk */
 #define	BIBLEQS_DIRMODE	0777		/* parent directory */
 #define	BIBLEQS_IDXMODE	0664		/* the index files */
-#define	BIBLEQS_DBDNAME	"share/bibledbs"
-#define	BIBLEQS_DBNAME	"av"
+
+#define	VS		vecstr
+
+#define	DS		dirseen
+
+#define	EC		expcook
+
+#define	BQS		bibleqs
+#define	BQS_Q		bibleqs_q
+#define	BQS_C		bibleqs_cur
+#define	BQS_MAG		BIBLEQS_MAGIC
 
 #define	SI		subinfo
 #define	SI_FL		subinfo_fl
+
+#define	EDB		eigendb
+#define	EDB_C		eigendb_cur
 
 #define	KTAG		ktag_head
 #define	KTAG_PARAMS	ktag_params
@@ -206,6 +220,7 @@ import uconstants ;			/* |varname(3u)| + |sysword(3u)| */
 #define	DBSUF		"txt"
 #define	INDSUF		"hash"
 #define	TAGSUF		"tag"
+#define	PROG_MKBIBLEQSI	"mkbibleqsi"
 
 #ifndef	KEYBUFLEN
 #define	KEYBUFLEN	NATURALWORDLEN
@@ -214,9 +229,14 @@ import uconstants ;			/* |varname(3u)| + |sysword(3u)| */
 #define	TO_FILEMOD	(60 * 24 * 3600)
 #define	TO_MKWAIT	(5 * 50)
 
-#define	PROG_MKBIBLEQSI	"mkbibleqsi"
-
 #define	NDF		"/tmp/bibleqs.deb"
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+#ifndef	CF_EXTRASTRONG
+#define	CF_EXTRASTRONG	0		/* do not use Strong's eigen-words */
+#endif
 
 
 /* imported namespaces */
@@ -246,7 +266,7 @@ struct subinfo {
 } ; /* end struct */
 
 struct ktag_params {
-	EIGENDB		*edbp ;
+	EDB		*edbp ;
 	uchar		*wterms ;
 	int		minwlen ;
 	int		f_eigen ;
@@ -263,74 +283,128 @@ struct ktag_head {
 	int		f_store ;
 } ; /* end struct */
 
+namespace {
+    struct vars {
+	int	maxnamelen ;
+	int	maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
-local int	bibleqs_infoloadbegin(BIBLEQS *,cchar *,cchar *) ;
-local int	bibleqs_infoloadend(BIBLEQS *) ;
-local int	bibleqs_indopen(BIBLEQS *,SI *) ;
+template<typename ... Args>
+local inline int bibleqs_ctor(bibleqs *op,Args ... args) noex {
+    	BIBLEQS		*hop = op ;
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    op->pr	= np ;
+	    op->dbname	= np ;
+	    op->dbfname	= np ;
+	    op->dbmdata = np ;
+	    op->magval	= 0 ;
+	    if ((op->edbp = new(nt) eigendb) != np) {
+	        if ((op->indp = new(nt) txtindex) != np) {
+		    rs = SR_OK ;
+	        } /* end if (new-txtindex) */
+		if (rs < 0) {
+		    delete op->edbp ;
+		    op->edbp = nullptr ;
+		} /* end if (error) */
+	    } /* end if (new-eigendb) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (bibleqs_ctor) */
 
-local int	bibleqs_indclose(BIBLEQS *) ;
-local int	bibleqs_indmk(BIBLEQS *,cchar *,time_t) ;
-local int	bibleqs_indmkeigen(BIBLEQS *,TXTINDEXMK *) ;
-local int	bibleqs_indmkdata(BIBLEQS *,TXTINDEXMK *) ;
-local int	bibleqs_dbmapcreate(BIBLEQS *,time_t) ;
-local int	bibleqs_dbmapdestroy(BIBLEQS *) ;
-local int	bibleqs_havekeys(BIBLEQS *,TXTINDEX_TAG *,int,SEARCHKEYS *) ;
-local int	bibleqs_havekeysline(BIBLEQS *,SEARCHKEYS *,SEARCHKEYS_POP *,
-			cchar *,int) ;
-local int	bibleqs_matchkeys(BIBLEQS *,SEARCHKEYS *,SEARCHKEYS_POP *,
-			cchar *,int) ;
-local int	bibleqs_loadbuf(BIBLEQS *,uint,char *,int) ;
-local int	bibleqs_mkhkeys(BIBLEQS *,vecstr *,SEARCHKEYS *) ;
-local int	bibleqs_indopenseq(BIBLEQS *,SI *) ;
-local int	bibleqs_indopenseqer(BIBLEQS *,SI *,DIRSEEN *,EXPCOOK *) ;
-local int	bibleqs_indopencheck(BIBLEQS *,cchar *) ;
-local int	bibleqs_indopenmk(BIBLEQS *,SI *,cchar *) ;
+local int bibleqs_dtor(bibleqs *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->indp) {
+		delete op->indp ;
+		op->indp = nullptr ;
+	    } /* end if (memory-release) */
+	    if (op->edbp) {
+		delete op->edbp ;
+		op->edbp = nullptr ;
+	    } /* end if (memory-release) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (bibleqs_dtor) */
 
-local int	bibleqs_loadcooks(BIBLEQS *,EXPCOOK *) ;
-local int	bibleqs_dirok(BIBLEQS *,DIRSEEN *,ids *,cchar *,int) ;
-local int	bibleqs_mkdir(BIBLEQS *,cchar *) ;
+template<typename ... Args>
+local inline int bibleqs_magic(bibleqs *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == BQS_MAG) ? SR_OK : SR_NOTOPEN ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (bibleqs_magic) */
+
+local int	bibleqs_infoloadbegin(BQS *,cchar *,cchar *) noex ;
+local int	bibleqs_infoloadend(BQS *) noex ;
+local int	bibleqs_indopen(BQS *,SI *) noex ;
+
+local int	bibleqs_indclose(BQS *) noex ;
+local int	bibleqs_indmk(BQS *,cchar *,time_t) noex ;
+local int	bibleqs_indmkeigen(BQS *,TXTINDEXMK *) noex ;
+local int	bibleqs_indmkdata(BQS *,TXTINDEXMK *) noex ;
+local int	bibleqs_dbmapcreate(BQS *,time_t) noex ;
+local int	bibleqs_dbmapdestroy(BQS *) noex ;
+local int	bibleqs_havekeys(BQS *,TXTINDEX_TAG *,int,SEARCHKEYS *) noex ;
+local int	bibleqs_havekeysline(BQS *,SEARCHKEYS *,SEARCHKEYS_POP *,
+			cchar *,int) noex ;
+local int	bibleqs_matchkeys(BQS *,SEARCHKEYS *,SEARCHKEYS_POP *,
+			cchar *,int) noex ;
+local int	bibleqs_loadbuf(BQS *,uint,char *,int) noex ;
+local int	bibleqs_mkhkeys(BQS *,vecstr *,SEARCHKEYS *) noex ;
+local int	bibleqs_indopenseq(BQS *,SI *) noex ;
+local int	bibleqs_indopenseqer(BQS *,SI *,DS *,EC *) noex ;
+local int	bibleqs_indopencheck(BQS *,cchar *) noex ;
+local int	bibleqs_indopenmk(BQS *,SI *,cchar *) noex ;
+
+local int	bibleqs_loadcooks(BQS *,EC *) noex ;
+local int	bibleqs_dirok(BQS *,DS *,ids *,cchar *,int) noex ;
+local int	bibleqs_mkdir(BQS *,cchar *) noex ;
 
 #if	CF_MKBIBLEQSI
-local int	bibleqs_mkbibleqsi(BIBLEQS *,cchar *) ;
+local int	bibleqs_mkbibleqsi(BQS *,cchar *) noex ;
 #endif
 
-#if	CF_EXTRASTRONG
-local int	bibleqs_eigenopen(BIBLEQS *) ;
-local int	bibleqs_eigenclose(BIBLEQS *) ;
-#endif
-
-local int	bibleqs_lookuper(BIBLEQS *,BIBLEQS_CUR *,int,
-			SEARCHKEYS *,vecstr *) ;
+local int	bibleqs_eigenopen(BQS *) noex ;
+local int	bibleqs_eigenclose(BQS *) noex ;
+local int	bibleqs_lookuper(BQS *,BQS_C *,int,
+			SEARCHKEYS *,vecstr *) noex ;
 
 #ifdef	COMMENT
-local int	bibleqs_mksysvarsi(BIBLEQS *,cchar *) ;
+local int	bibleqs_mksysvarsi(BQS *,cchar *) noex ;
 #endif
 
-local int	subinfo_start(SI *) ;
-local int	subinfo_finish(SI *) ;
+local int	subinfo_start(SI *) noex ;
+local int	subinfo_finish(SI *) noex ;
 
 #ifdef	COMMENT
-local int	subinfo_ids(SI *) ;
+local int	subinfo_ids(SI *) noex ;
 #endif
 
-local int	ktag_start(KTAG *,KTAG_PARAMS *,size_t,cchar *,int) ;
-local int	ktag_add(KTAG *,cchar *,int) ;
-local int	ktag_procline(KTAG *,cchar *,int) ;
-local int	ktag_mktag(KTAG *,size_t,TXTINDEXMK_TAG *) ;
-local int	ktag_finish(KTAG *) ;
-local int	ktag_procword(KTAG *,cchar *,int) ;
-local int	ktag_storelc(KTAG *,cchar **,cchar *,int) ;
+local int	ktag_start(KTAG *,KTAG_PARAMS *,size_t,cchar *,int) noex ;
+local int	ktag_add(KTAG *,cchar *,int) noex ;
+local int	ktag_procline(KTAG *,cchar *,int) noex ;
+local int	ktag_mktag(KTAG *,size_t,TXTINDEXMK_TAG *) noex ;
+local int	ktag_finish(KTAG *) noex ;
+local int	ktag_procword(KTAG *,cchar *,int) noex ;
+local int	ktag_storelc(KTAG *,cchar **,cchar *,int) noex ;
 
-local int	mkdname(cchar *,mode_t) ;
-local int	checkdname(cchar *) ;
+local int	mkdname(cchar *,mode_t) noex ;
+local int	checkdname(cchar *) noex ;
+local int	eigenfind(EDB *,cchar *,cchar *,int) noex ;
 
-#if	CF_EXTRASTRONG
-local int	eigenfind(EIGENDB *,cchar *,cchar *,int) noex ;
-#endif
-
-local int	isstart(cchar *,int,BIBLEQS_Q *,int *) ;
+local int	isstart(cchar *,int,BQS_Q *,int *) noex ;
 local int	mkfieldterms(uchar *) noex ;
 
 local int	vesrch(cvoid *,cvoid *) noex ;
@@ -379,8 +453,6 @@ constexpr cpcchar	idxdirs[] = {
 	nullptr
 } ; /* end array (ifxdirs) */
 
-#if	CF_EXTRASTRONG
-
 constexpr cpcchar	eigenfnames[] = {
 	"lib/bibleqs/%n.%f",
 	"lib/bibleqs/%f",
@@ -391,8 +463,6 @@ constexpr cpcchar	eigenfnames[] = {
 	"/usr/share/lib/dict/eign",
 	nullptr
 } ; /* end array (eigenfnames) */
-
-#else /* CF_EXTRASTRONG */
 
 /* these are not likely to change since their publication in 1890! */
 constexpr cpcchar	strongseigens[] = {
@@ -405,12 +475,15 @@ constexpr cpcchar	strongseigens[] = {
 	nullptr
 } ; /* end array (strongseigens) */
 
-#endif /* CF_EXTRASTRONG */
-
 constexpr int	rsneeds[] = {
 	SR_STALE,
 	0
 } ; /* end array (rsneeds) */
+
+static vars		var ;
+cint			nchars		= (UCHAR_MAX + 1) ;
+cbool			f_debug		= CF_DEBUG ;
+cbool			f_extrastrong	= CF_EXTRASTRONG ;
 
 
 /* exported variables */
@@ -424,406 +497,306 @@ const bibleqs_obj	bibleqs_modinfo = {
 
 /* exported subroutines */
 
-int bibleqs_open(BIBLEQS *op,cchar *pr,cchar *dbname) noex {
+int bibleqs_open(BQS *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_open: dbname=%s\n",dbname) ;
-#endif
-
-	memclear(op) ;
-	subinfo		si ;
-	if ((rs = subinfo_start(&si)) >= 0) {
-	    op->minwlen = BIBLEQS_MINWLEN ;
-	    if ((rs = bibleqs_infoloadbegin(op,pr,dbname)) >= 0) {
-		if ((rs = bibleqs_dbmapcreate(op,si.dt)) >= 0) {
-		    mkfieldterms(op->wterms) ;
-		    if ((rs = bibleqs_indopen(op,&si)) >= 0) {
-			op->magval = BIBLEQS_MAGIC ;
-		    }
-		    if (rs < 0) {
-			bibleqs_dbmapdestroy(op) ;
-		    }
-	        } /* end if (bibleqs_dbmapcreate) */
-		if (rs < 0) {
-		    bibleqs_infoloadend(op) ;
-		}
-	    } /* end if (bibleqs_infoloadbegin) */
-	    rs1 = subinfo_finish(&si) ;
-	    if (rs >= 0) rs = rs1 ;
+	DEBUGPRINTF("ent dbname=%s\n",dbname) ;
+	if ((rs = bibleqs_ctor(op,pr)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
+		    if (SI si ; (rs = subinfo_start(&si)) >= 0) {
+	    		op->minwlen = BIBLEQS_MINWLEN ;
+	    		if ((rs = bibleqs_infoloadbegin(op,pr,dbname)) >= 0) {
+			    if ((rs = bibleqs_dbmapcreate(op,si.dt)) >= 0) {
+		    		mkfieldterms(op->wterms) ;
+		    		if ((rs = bibleqs_indopen(op,&si)) >= 0) {
+				    op->magval = BIBLEQS_MAGIC ;
+		    		}
+		    		if (rs < 0) {
+				    bibleqs_dbmapdestroy(op) ;
+		    		} /* end if (error) */
+	        	    } /* end if (bibleqs_dbmapcreate) */
+			    if (rs < 0) {
+		    	        bibleqs_infoloadend(op) ;
+			    } /* end if (error) */
+	    		} /* end if (bibleqs_infoloadbegin) */
+	    		rs1 = subinfo_finish(&si) ;
+	    		if (rs >= 0) rs = rs1 ;
+	    		if (rs < 0) {
+			    bibleqs_close(op) ;
+	    		} /* end if (error) */
+		    } /* end if (subinfo) */
+	        } /* end if (vars) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-		bibleqs_close(op) ;
-	    }
-	} /* end if (subinfo) */
-
-#if	CF_DEBUGN
-	nprintf(NDF,"bibleqs_open: ret rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_open: ret rs=%d\n",rs) ;
-#endif
-
+		bibleqs_dtor(op) ;
+	    } /* end if (error) */
+        } /* end if (bibleparas_ctor) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bibleqs_open) */
 
-int bibleqs_close(BIBLEQS *op) {
-	int		rs = SR_OK ;
+int bibleqs_close(BQS *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
-
-	{
-	rs1 = bibleqs_indclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-#if	CF_EXTRASTRONG
-	{
-	rs1 = bibleqs_eigenclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-#endif
-	{
-	rs1 = bibleqs_dbmapdestroy(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	{
-	rs1 = bibleqs_infoloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-#if	CF_DEBUGN
-	nprintf(NDF,"bibleqs_close: ret rs=%d\n",rs) ;
-	debugprintf("bibleqs_close: ret rs=%d\n",rs) ;
-#endif
-
-	op->magval = 0 ;
+	if ((rs = bibleqs_magic(op)) >= 0) {
+	    {
+	        rs1 = bibleqs_indclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if_constexpr (f_extrastrong) {{
+	        rs1 = bibleqs_eigenclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if_constexpr (f_extrastrong) */
+	    {
+	        rs1 = bibleqs_dbmapdestroy(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = bibleqs_infoloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = bibleqs_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
+        } /* end if (bibleqs_magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bibleqs_close) */
 
-int bibleqs_count(BIBLEQS *op) {
-	int		rs = SR_NOTOPEN ;
-
-#if	CF_DEBUGN
-	nprintf(NDF,"bibleqs_count: ent\n") ;
-#endif
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
-
-	if (op->fl.ind) {
-	   rs = txtindex_count(&op->ind) ;
-	}
-
-#if	CF_DEBUGN
-	nprintf(NDF,"bibleqs_count: ret rs=%d\n",rs) ;
-#endif
-
+int bibleqs_count(BQS *op) noex {
+	int		rs ;
+	if ((rs = bibleqs_magic(op)) >= 0) {
+	    if (op->fl.ind) {
+	       rs = txtindex_count(&op->ind) ;
+	    }
+        } /* end if (bibleqs_magic) */
 	return rs ;
 } /* end subroutine (bibleqs_count) */
 
-int bibleqs_audit(BIBLEQS *op) {
+int bibleqs_audit(BQS *op) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
-
-	rs = txtindex_audit(&op->ind) ;
-
-#if	CF_DEBUGN
-	nprintf(NDF,"bibleqs_audit: ret rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_audit: txtindex_audit() rs=%d\n",rs) ;
-#endif
-
+	if ((rs = bibleqs_magic(op)) >= 0) {
+	    rs = txtindex_audit(&op->ind) ;
+        } /* end if (bibleqs_magic) */
 	return rs ;
 } /* end subroutine (bibleqs_audit) */
 
-int bibleqs_curbegin(BIBLEQS *op,BIBLEQS_CUR *curp) {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
-
-	memclear(curp) ;
-	op->ncursors += 1 ;
-
-#if	CF_DEBUGN
-	nprintf(NDF,"bibleqs_curbegin: ret rs=%d\n",rs) ;
-#endif
-
+int bibleqs_curbegin(BQS *op,BQS_C *curp) noex {
+	int		rs ;
+	if ((rs = bibleqs_magic(op,curp)) >= 0) {
+	    memclear(curp) ;
+	    op->ncursors += 1 ;
+        } /* end if (bibleqs_magic) */
 	return rs ;
 } /* end subroutine (bibleqs_curbegin) */
 
-int bibleqs_curend(BIBLEQS *op,BIBLEQS_CUR *curp) {
-	int		rs = SR_OK ;
+int bibleqs_curend(BQS *op,BQS_C *curp) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
-
-	if (curp->verses != nullptr) {
-	    rs1 = uc_free(curp->verses) ;
-	    if (rs >= 0) rs = rs1 ;
-	    curp->verses = nullptr ;
-	}
-
-	curp->nverses = 0 ;
-	if (op->ncursors > 0)
-	    op->ncursors -= 1 ;
-
-#if	CF_DEBUGN
-	nprintf(NDF,"bibleqs_curend: ret rs=%d\n",rs) ;
-#endif
-
+	if ((rs = bibleqs_magic(op,curp)) >= 0) {
+	    if (curp->verses) {
+	        voidp vp = voidp(curp->verses) ;
+	        rs1 = mem.free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        curp->verses = nullptr ;
+	    } /* end if (memory-release) */
+	    curp->nverses = 0 ;
+	    if (op->ncursors > 0) {
+	        op->ncursors -= 1 ;
+	    }
+        } /* end if (bibleqs_magic) */
 	return rs ;
 } /* end subroutine (bibleqs_curend) */
 
-int bibleqs_curlook(BIBLEQS *op,BIBLEQS_CUR *curp,int qo,cchar **qsp) {
-	SEARCHKEYS	sk ;
-	vecstr		hkeys ;			/* hash-keys */
+int bibleqs_curlook(BQS *op,BQS_C *curp,int qo,cchar **qsp) noex {
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (qsp == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    for (i = 0 ; qsp[i] != nullptr ; i += 1)
-		debugprintf("bibleqs_lookup: qs=>%s<\n",qsp[i]) ;
-	}
-#endif /* CF_DEBUGS */
-
-	curp->nverses = 0 ;
-	if (curp->verses != nullptr) {
-	    uc_free(curp->verses) ;
-	    curp->verses = nullptr ;
-	}
-
-	if ((rs = searchkeys_start(&sk,qsp)) >= 0) {
-	    cint	vopts = (vecstrm.compact) ;
-	    if ((rs = vecstr_start(&hkeys,10,vopts)) >= 0) {
-	        if ((rs = bibleqs_mkhkeys(op,&hkeys,&sk)) >= 0) {
-		    rs = bibleqs_lookuper(op,curp,qo,&sk,&hkeys) ;
-		    c = rs ;
-	        } /* end if (bibleqs_mkhkeys) */
-	        rs1 = vecstr_finish(&hkeys) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (vecstr_start) */
-	    rs1 = searchkeys_finish(&sk) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (searchkeys) */
-
-#if	CF_DEBUGN
-	nprintf(NDF,"bibleqs_lookup: ret rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_lookup: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	int		c = 0 ; /* return-value */
+	if ((rs = bibleqs_magic(op,curp,qsp)) >= 0) {
+#if	CF_DEBUG
+	    {
+	        for (int i = 0 ; qsp[i] != nullptr ; i += 1)
+		    DEBUGPRINTF("qs=>%s<\n",qsp[i]) ;
+	        } /* end for */
+	    }
+#endif /* CF_DEBUG */
+	    curp->nverses = 0 ;
+	    if (curp->verses) {
+	        voidp vp = voidp(curp->verses) ;
+	        mem.free(vp) ;
+	        curp->verses = nullptr ;
+	    } /* end if (memory-release) */
+	    if (SEARCHKEYS sk ; (rs = searchkeys_start(&sk,qsp)) >= 0) {
+		cint	vn = 10 ;
+	        cint	vo = (vecstrm.compact) ;
+	        if (vecstr hkeys ; (rs = vecstr_start(&hkeys,vn,vo)) >= 0) {
+	            if ((rs = bibleqs_mkhkeys(op,&hkeys,&sk)) >= 0) {
+		        rs = bibleqs_lookuper(op,curp,qo,&sk,&hkeys) ;
+		        c = rs ;
+	            } /* end if (bibleqs_mkhkeys) */
+	            rs1 = vecstr_finish(&hkeys) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (vecstr_start) */
+	        rs1 = searchkeys_finish(&sk) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (searchkeys) */
+	    DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
+        } /* end if (bibleqs_magic) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleqs_curlook) */
 
-int bibleqs_curenum(BIBLEQS *op,BIBLEQS_CUR *curp,BIBLEQS_Q *citep,
-		char *vbuf,int vlen) {
-	int		rs = SR_OK ;
-	int		len = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (citep == nullptr) return SR_FAULT ;
-	if (vbuf == nullptr) return SR_FAULT ;
-
-	if (op->magval != BIBLEQS_MAGIC) return SR_NOTOPEN ;
-
-	if ((curp->nverses > 0) && (curp->verses != nullptr)) {
-	    uint	recoff ;
-	    int		ei = (curp->i >= 0) ? curp->i : 0 ;
-	    int		si ;
-	    int		ml ;
-	    cchar	*mp ;
-#if	CF_DEBUGS
-	debugprintf("bibleqs_read: c_i=%u\n",ei) ;
-#endif
-	recoff = curp->verses[ei] ;
-	if ((ei < curp->nverses) && (recoff != UINT_MAX)) {
-
-#if	CF_DEBUGS
-	    debugprintf("bibleqs_read: recoff=%u\n",recoff) ;
-#endif
-
-	    mp = (cchar *) (op->dbmdata + recoff) ;
-	    ml = (op->dbmsize - recoff) ;
-
-#if	CF_DEBUGS
-	    debugprintf("bibleqs_read: line=>%r<\n",
-	        mp,strnlen(mp,MIN(ml,40))) ;
-#endif
-
-	    if (isstart(mp,ml,citep,&si)) {
-	        recoff += si ;
-	        mp += si ;
-	        ml -= si ;
-	        if ((ml > 0) && (mp[0] == '\n')) {
-	            recoff += 1 ;
+int bibleqs_curenum(BQS *op,BQS_C *curp,BQS_Q *citep,
+		char *vbuf,int vlen) noex {
+	int		rs ;
+	int		len = 0 ; /* return-value */
+	if ((rs = bibleqs_magic(op,curp,citep,vbuf)) >= 0) {
+	    if ((curp->nverses > 0) && (curp->verses != nullptr)) {
+	        uint	recoff ;
+		int	ei = (curp->i >= 0) ? curp->i : 0 ;
+		int	si ;
+		int	ml ;
+		cchar	*mp ;
+		DEBUGPRINTF("c_i=%u\n",ei) ;
+		recoff = curp->verses[ei] ;
+	        if ((ei < curp->nverses) && (recoff != UINT_MAX)) {
+	            DEBUGPRINTF("recoff=%u\n",recoff) ;
+	            mp = (cchar *) (op->dbmdata + recoff) ;
+	            ml = (op->dbmsize - recoff) ;
+	            DEBUGPRINTF("line=>%r<\n",mp,strnlen(mp,MIN(ml,40))) ;
+	            if (isstart(mp,ml,citep,&si)) {
+	                recoff += si ;
+	                mp += si ;
+	                ml -= si ;
+	                if ((ml > 0) && (mp[0] == '\n')) {
+	                    recoff += 1 ;
+	                }
+	            }
+	            DEBUGPRINTF("_loadbuf() \n") ;
+	            rs = bibleqs_loadbuf(op,recoff,vbuf,vlen) ;
+	            len = rs ;
+	        } else {
+	            rs = SR_NOTFOUND ;
 	        }
+	        if (rs >= 0) {
+	            curp->i = (ei + 1) ;
+	        }
+	    } else {
+	        rs = SR_NOTFOUND ;
 	    }
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_read: _loadbuf() \n") ;
-#endif
-
-	    rs = bibleqs_loadbuf(op,recoff,vbuf,vlen) ;
-	    len = rs ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_read: _loadbuf() rs=%d\n",rs) ;
-#endif
-
-	} else {
-	    rs = SR_NOTFOUND ;
-	}
-	if (rs >= 0) {
-	    curp->i = (ei + 1) ;
-	}
-
-	} else {
-	    rs = SR_NOTFOUND ;
-	}
-
-#if	CF_DEBUGN
-	nprintf(NDF,"bibleqs_read: ret rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_read: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
+        } /* end if (bibleqs_magic) */
+	DEBUGPRINTF("ret rs=%d len=%u\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (bibleqs_curenum) */
 
 
 /* private subroutines */
 
-local int bibleqs_infoloadbegin(BIBLEQS *op,cchar *pr,cchar *dbname) {
+local int bibleqs_infoloadbegin(BQS *op,cchar *pr,cchar *dbn) noex {
+	cint		psz = (2 * (var.maxpathlen + 1)) ;
+	cint		maxpath = var.maxpathlen ;
+    	int		ai = 2 ; /* two path buffers */
 	int		rs ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-
-	if ((dbname == nullptr) || (dbname[0] == '\0'))
-	    dbname = BIBLEQS_DBNAME ;
-
+	int		rs1 ;
+	if ((dbn == nullptr) || (dbn[0] == '\0')) {
+	    dbn = BIBLEQS_DBNAME ;
+	}
 	op->pr = pr ;
-	op->dbname = dbname ;
-	if ((rs = mkpath3(tmpfname,pr,BIBLEQS_DBDNAME,dbname)) >= 0) {
-	    char	dbfname[MAXPATHLEN + 1] ;
-	    if ((rs = mkfnamesuf1(dbfname,tmpfname,DBSUF)) >= 0) {
-		cchar	*cp ;
-		int		fnl = rs ;
-#if	CF_DEBUGS
-	        debugprintf("bibleqs_infoloadbegin: dbfname=%s\n",dbfname) ;
-#endif
-	        if ((rs = uc_mallocstrw(dbfname,fnl,&cp)) >= 0) {
-		    op->dbfname = cp ;
-	            if (ustat sb ; (rs = u_stat(op->dbfname,&sb)) >= 0) {
-	                if (S_ISREG(sb.st_mode)) {
-	                    rs = perm(op->dbfname,-1,-1,nullptr,R_OK) ;
-	                } else {
-	                    rs = SR_NOTSUP ;
-			}
-	            } /* end if (stat) */
-		    if (rs < 0) {
-		        uc_free(op->dbfname) ;
-		        op->dbfname = nullptr ;
-		    } /* end if (error) */
-	        } /* end if (m-a) */
-	    } /* end if (mkfnamesuf) */
-	} /* end if (mkpath) */
-
+	op->dbname = dbn ;
+	if (char *a ; (rs = mem.mall(psz,&a)) >= 0) {
+	    char	*tbuf = (a + (--ai * (maxpath + 1))) ;
+	    if ((rs = mkpath3(tbuf,pr,BIBLEQS_DBDNAME,dbn)) >= 0) {
+	        char	*dbuf = (a + (--ai * (maxpath + 1))) ;
+	        if ((rs = mkfnamesuf1(dbuf,tbuf,DBSUF)) >= 0) {
+		    cint	fnl = rs ;
+		    if (cchar *cp ; (rs = mem.strw(dbuf,fnl,&cp)) >= 0) {
+		        op->dbfname = cp ;
+	                if (ustat sb ; (rs = u_stat(op->dbfname,&sb)) >= 0) {
+	                    if (S_ISREG(sb.st_mode)) {
+	                        rs = perm(op->dbfname,-1,-1,nullptr,R_OK) ;
+	                    } else {
+	                        rs = SR_NOTSUP ;
+			    }
+	                } /* end if (stat) */
+		        if (rs < 0) {
+		            voidp vp = voidp(op->dbfname) ;
+		            mem.free(vp) ;
+		            op->dbfname = nullptr ;
+		        } /* end if (error) */
+	            } /* end if (m-a) */
+	        } /* end if (mkfnamesuf) */
+	    } /* end if (mkpath) */
+	    rs1 = mem.free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (bibleqs_infoloadbegin) */
 
-local int bibleqs_infoloadend(BIBLEQS *op) {
+local int bibleqs_infoloadend(BQS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->dbfname != nullptr) {
-	    rs1 = uc_free(op->dbfname) ;
+	if (op->dbfname) {
+	    voidp vp = voidp(op->dbfname) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dbfname = nullptr ;
-	}
-
+	} /* end if (memory-release) */
 	op->pr = nullptr ;
 	op->dbname = nullptr ;
 	return rs ;
 } /* end subroutine (bibleqs_infoloadend) */
 
-local int bibleqs_dbmapcreate(BIBLEQS *op,time_t dt) {
+local int bibleqs_dbmapcreate(BQS *op,time_t dt) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
-	debugprintf("bibleqs_dbmapcreate: dbfname=%s\n",op->dbfname) ;
+	DEBUGPRINTF("ent dbfname=%s\n",op->dbfname) ;
 	if ((rs = u_open(op->dbfname,O_RDONLY,0666)) >= 0) {
 	    cint	fd = rs ;
 	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 		csize	fsize = size_t(sb.st_size) ;
 		if (S_ISREG(sb.st_mode) && (sb.st_size >= 0)) {
-	    		csize	ms = fsize ;
-	    		cint	mp = PROT_READ ;
-	    		cint	mf = MAP_SHARED ;
-	    		void	*md ;
-			op->ti_db = sb.st_mtime ;
-	                if ((rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
-		            cint	madv = MADV_RANDOM ;
-		            const caddr_t	ma = md ;
-	                    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
-	                        op->dbmdata = md ;
-	                        op->dbmsize = ms ;
-	                        op->ti_map = dt ;
-	                        op->ti_lastcheck = dt ;
-	                    }
-	                    if (rs < 0) {
-		                u_munmap(md,ms) ;
-	                        op->dbmdata = nullptr ;
-	                        op->dbmsize = 0 ;
-		            } /* end if (error) */
-	                } /* end if (u_mmap) */
-	            } /* end if (ok) */
-		} else {
-	    	    rs = SR_NOTSUP ;
-		}
+		    csize	ms = fsize ;
+		    cint	mp = PROT_READ ;
+		    cint	mf = MAP_SHARED ;
+		    void	*md ;
+		    op->ti_db = sb.st_mtime ;
+	            if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+		        cint	madv = MADV_RANDOM ;
+		        const caddr_t	ma = md ;
+	                if ((rs = u_madvise(ma,ms,madv)) >= 0) {
+	                    op->dbmdata = md ;
+	                    op->dbmsize = ms ;
+	                    op->ti_map = dt ;
+	                    op->ti_lastcheck = dt ;
+	                }
+	                if (rs < 0) {
+		            u_mmapend(md,ms) ;
+	                    op->dbmdata = nullptr ;
+	                    op->dbmsize = 0 ;
+		        } /* end if (error) */
+	            } /* end if (u_mmap) */
+	        } /* end if (ok) */
+	    } else {
+		rs = SR_NOTSUP ;
+	    }
 	    rs1 = u_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (map-file) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bibleqs_dbmapcreate) */
 
-local int bibleqs_dbmapdestroy(BIBLEQS *op) {
+local int bibleqs_dbmapdestroy(BQS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->dbmdata) {
-	    rs1 = u_munmap(op->dbmdata,op->dbmsize) ;
+	    voidp	md = op->dbmdata ;
+	    csize	ms = op->dbmsize ;
+	    rs1 = u_mmapend(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dbmdata = nullptr ;
 	    op->dbmsize = 0 ;
@@ -831,119 +804,103 @@ local int bibleqs_dbmapdestroy(BIBLEQS *op) {
 	return rs ;
 } /* end subroutine (bibleqs_dbmapdestroy) */
 
-local int bibleqs_indopen(BIBLEQS *op,SI *sip) {
+local int bibleqs_indopen(BQS *op,SI *sip) noex {
 	int		rs ;
-
-	rs = bibleqs_indopenseq(op,sip) ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indopen: ret rs=%d\n",rs) ;
-#endif
-
+	{
+	    rs = bibleqs_indopenseq(op,sip) ;
+	}
 	return rs ;
 } /* end subroutine (bibleqs_indopen) */
 
-local int bibleqs_indopenseq(BIBLEQS *op,SI *sip) {
-	DIRSEEN		ds ;
+local int bibleqs_indopenseq(BQS *op,SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
-
-	if ((rs = dirseen_start(&ds)) >= 0) {
-	        EXPCOOK	cooks ;
-	        if ((rs = expcook_start(&cooks)) >= 0) {
-	            if ((rs = bibleqs_loadcooks(op,&cooks)) >= 0) {
-	                rs = bibleqs_indopenseqer(op,sip,&ds,&cooks) ;
-	            }
-		    rs1 = expcook_finish(&cooks) ;
-		    if (rs < 0) rs = rs1 ;
-		} /* end if (cooks) */
-	    rs1 = dirseen_finish(&ds) ;
+	if (DS ds ; (rs = ds.start) >= 0) {
+	    if (EC cooks ; (rs = cooks.start) >= 0) {
+	        if ((rs = bibleqs_loadcooks(op,&cooks)) >= 0) {
+	            rs = bibleqs_indopenseqer(op,sip,&ds,&cooks) ;
+	        }
+		rs1 = cooks.finish ;
+		if (rs < 0) rs = rs1 ;
+	    } /* end if (cooks) */
+	    rs1 = ds.finish ;
 	    if (rs < 0) rs = rs1 ;
 	} /* end if (ds) */
-
 	return rs ;
 } /* end subroutine (bibleqs_indopenseq) */
 
-local int bibleqs_indopenseqer(BIBLEQS *op,SI *sip,
-		DIRSEEN *dsp,EXPCOOK *ckp) {
-	ids		id ;
-	cint	elen = MAXPATHLEN ;
+local int bibleqs_indopenseqer(BQS *op,SI *sip,DS *dsp,EC *ckp) noex {
+    	cint		psz = (2 * (var.maxpathlen + 1)) ;
+	cint		maxpath = var.maxpathlen ;
+    	int		ai = 2 ; /* two path buffers */
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indopenseqer: ent\n") ;
-#endif
-
-/* first phase: expand possible directory paths */
-
-	if ((rs = ids_load(&id)) >= 0) {
-	    int		i ;
-	    char	ebuf[MAXPATHLEN + 1] ;
-	    char	pbuf[MAXPATHLEN + 1] ;
-	    for (i = 0 ; (rs >= 0) && (idxdirs[i] != nullptr) ; i += 1) {
-	        cchar	*dir = idxdirs[i] ;
-	        if ((rs = expcook_exp(ckp,'\0',ebuf,elen,dir,-1)) >= 0) {
-	            if ((rs = pathclean(pbuf,ebuf,rs)) > 0) {
-		        if ((rs = bibleqs_dirok(op,dsp,&id,pbuf,rs)) > 0) {
-	            	    rs = bibleqs_indopencheck(op,pbuf) ;
-			    c = rs ;
-			    if ((rs < 0) && isNeedIndex(rs)) {
-			        rs = bibleqs_indopenmk(op,sip,pbuf) ;
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
+	if (char *a ; (rs = mem.mall(psz,&a)) >= 0) {
+	    cint	elen = maxpath ;
+	    char	*ebuf = (a + (--ai * (maxpath + 1))) ;
+	    char	*pbuf = (a + (--ai * (maxpath + 1))) ;
+	    /* first phase: expand possible directory paths */
+	    if (ids id ; (rs = id.load) >= 0) {
+	        for (int i = 0 ; (rs >= 0) && idxdirs[i] ; i += 1) {
+	            cchar	*dir = idxdirs[i] ;
+	            if ((rs = expcook_exp(ckp,'\0',ebuf,elen,dir,-1)) >= 0) {
+	                if ((rs = pathclean(pbuf,ebuf,rs)) > 0) {
+		            if ((rs = bibleqs_dirok(op,dsp,&id,pbuf,rs)) > 0) {
+	            	        rs = bibleqs_indopencheck(op,pbuf) ;
 			        c = rs ;
-			    }
-		        } /* end if (bibleqs_dirok) */
-		    } /* end if (pathclean) */
-	        } /* end if (expcook_exp) */
-		if (c > 0) break ;
-	        if (rs < 0) break ;
-	    } /* end for */
-	    rs1 = ids_release(&id) ;
+			        if ((rs < 0) && isNeedIndex(rs)) {
+			            rs = bibleqs_indopenmk(op,sip,pbuf) ;
+			            c = rs ;
+			        }
+		            } /* end if (bibleqs_dirok) */
+		        } /* end if (pathclean) */
+	            } /* end if (expcook_exp) */
+		    if (c > 0) break ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	        rs1 = id.release ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (ids) */
+	    rs1 = mem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (ids) */
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indopenseqer: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	} /* end if (m-a-f) */
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleqs_indopenseqer) */
 
-local int bibleqs_dirok(BIBLEQS *op,DIRSEEN *dsp,ids *idp,
-		cchar *dp,int dl) {
-	cint	rsn = SR_NOTFOUND ;
+local int bibleqs_dirok(BQS *op,DS *dsp,ids *idp,cchar *dp,int dl) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	int		f_ok = false ;
+	int		f_ok = false ; /* return-value */
 	if ((rs = dirseen_havename(dsp,dp,dl)) == rsn) {
-	    USTAT	sb ;
-	    if ((rs = uc_stat(dp,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_stat(dp,&sb)) >= 0) {
 		if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
 		    cint	am = (W_OK|R_OK|X_OK) ;
 		    if ((rs = permid(idp,&sb,am)) >= 0) {
-			f_ok = TRUE ;
+			f_ok = true ;
 		    } else if (isNotPresent(rs)) {
 			rs = dirseen_add(dsp,dp,dl,&sb) ;
 		    }
 		}
 	    } else if (isNotPresent(rs)) {
 		if ((rs = bibleqs_mkdir(op,dp)) > 0) {
-		    f_ok = TRUE ;
+		    f_ok = true ;
 		}
-	    }
+	    } /* end if */
 	} /* end if (dirseen_havename) */
-
 	return (rs >= 0) ? f_ok : rs ;
 } /* end subroutine (bibleqs_dirok) */
 
-local int bibleqs_mkdir(BIBLEQS *op,cchar *dp) {
+local int bibleqs_mkdir(BQS *op,cchar *dp) noex {
 	cmode		dm = 0777 ;
 	int		rs ;
 	int		f_ok = false ;
 	if ((rs = mkdirs(dp,dm)) >= 0) {
 	     if ((rs = uc_minmod(dp,dm)) >= 0) {
 		if ((rs = chownsame(dp,op->pr)) >= 0) {
-	            f_ok = TRUE ;
+	            f_ok = true ;
 	        }
 	    }
 	} else if (isNotPresent(rs)) {
@@ -952,7 +909,7 @@ local int bibleqs_mkdir(BIBLEQS *op,cchar *dp) {
 	return (rs >= 0) ? f_ok : rs ;
 } /* end subroutine (bibleqs_mkdir) */
 
-local int bibleqs_loadcooks(BIBLEQS *op,EXPCOOK *ecp) {
+local int bibleqs_loadcooks(BQS *op,EC *ecp) noex {
 	static cchar	*tmpdname = getenver(varnames.tmpdir) ;
 	int		rs = SR_OK ;
 	cchar		*ks = "RST" ;
@@ -961,7 +918,7 @@ local int bibleqs_loadcooks(BIBLEQS *op,EXPCOOK *ecp) {
 	    tmpdname = sysword.w_tmpdir ;
 	}
 	for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
-	    cint	kch = MKCHAR(ks[i]) ;
+	    cint	kch = MKCHAR(ks[i]) ; /* used-throughout */
 	    vap = nullptr ;
 	    val = -1 ;
 	    switch (kch) {
@@ -991,228 +948,186 @@ local int bibleqs_loadcooks(BIBLEQS *op,EXPCOOK *ecp) {
 	return rs ;
 } /* end subroutine (bibleqs_loadcooks) */
 
-local int bibleqs_indopencheck(BIBLEQS *op,cchar *idir) {
+local int bibleqs_indopencheck(BQS *op,cchar *idir) noex {
 	int		rs ;
-	int		c = 0 ;
-	char		tbuf[MAXPATHLEN+1] ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indopencheck: ent idxdir=%s\n",idir) ;
-#endif
-
-	if ((rs = mkpath2(tbuf,idir,op->dbname)) >= 0) {
-	    if ((rs = txtindex_open(&op->ind,op->pr,tbuf)) >= 0) {
-	        TXTINDEX_INFO	tinfo ;
-		c = rs ;
-	        op->fl.ind = TRUE ;
-#if	CF_DEBUGS
-	        debugprintf("bibleqs_indopencheck: txtindex_open() rs=%d\n",
-			rs) ;
-#endif
-	        if ((rs = txtindex_getinfo(&op->ind,&tinfo)) >= 0) {
-	            if (tinfo.ctime < op->ti_db) rs = SR_STALE ;
-	        } /* end if (txtindex_getinfo) */
-	        if (rs < 0) {
-		    op->fl.ind = false ;
-	            txtindex_close(&op->ind) ;
-		}
-	    } /* end if (txtindex_open) */
-	} /* end if (mkpath) */
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indopencheck: ret rs=%d\n",rs) ;
-#endif
-
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent idxdir=%s\n",idir) ;
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	    if ((rs = mkpath2(tbuf,idir,op->dbname)) >= 0) {
+	        if ((rs = txtindex_open(&op->ind,op->pr,tbuf)) >= 0) {
+	            TXTINDEX_INFO	tinfo ;
+		    c = rs ;
+	            op->fl.ind = true ;
+	            if ((rs = txtindex_getinfo(&op->ind,&tinfo)) >= 0) {
+	                if (tinfo.ctime < op->ti_db) rs = SR_STALE ;
+	            } /* end if (txtindex_getinfo) */
+	            if (rs < 0) {
+		        op->fl.ind = false ;
+	                txtindex_close(&op->ind) ;
+		    }
+	        } /* end if (txtindex_open) */
+	    } /* end if (mkpath) */
+	    rs1 = mem.free(&tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleqs_indopencheck) */
 
-local int bibleqs_indopenmk(BIBLEQS *op,SI *sip,cchar *idir) {
+local int bibleqs_indopenmk(BQS *op,SI *sip,cchar *idir) noex {
 	int		rs ;
-	int		c = 0 ;
-
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
 	if ((rs = bibleqs_indmk(op,idir,sip->dt)) >= 0) {
-	    char	tbuf[MAXPATHLEN+1] ;
-	    if ((rs = mkpath2(tbuf,idir,op->dbname)) >= 0) {
-	        rs = txtindex_open(&op->ind,op->pr,tbuf) ;
-		c = rs ;
-	        op->fl.ind = (rs >= 0) ;
-#if	CF_DEBUGS
-	        debugprintf("bibleqs_indopenalt: txtindex_open() rs=%d\n",
-	            rs) ;
-#endif
-	    } /* end if (mkpath) */
+	    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	        if ((rs = mkpath2(tbuf,idir,op->dbname)) >= 0) {
+	            rs = txtindex_open(&op->ind,op->pr,tbuf) ;
+		    c = rs ;
+	            op->fl.ind = (rs >= 0) ;
+	        } /* end if (mkpath) */
+	        rs1 = mem.free(tbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (bibleqs_indmk) */
-
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleqs_indopenmk) */
 
-local int bibleqs_indmk(BIBLEQS *op,cchar *dname,time_t dt) {
-	cmode	dm = BIBLEQS_DIRMODE ;
+local int bibleqs_indmk(BQS *op,cchar *dname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indmk: ent dname=%s\n",dname) ;
-#endif
-
+	cmode		dm = BIBLEQS_DIRMODE ;
+	DEBUGPRINTF("ent dname=%s\n",dname) ;
 	if ((rs = mkdname(dname,dm)) >= 0) {
-	    char	indname[MAXPATHLEN + 1] ;
-	    if ((rs = mkpath2(indname,dname,op->dbname)) >= 0) {
-		TXTINDEXMK	mk ;
-		TXTINDEXMK_PA	ta{} ;
-		cmode	om = BIBLEQS_IDXMODE ;
-		cint	of = 0 ; /* auto-make */
-
-		ta.tablen = 0 ;			/* use default! */
-		ta.minwlen = op->minwlen ;
-		ta.maxwlen = BIBLEQS_MAXWLEN ;
-		ta.sfn = op->dbfname ;
-
-		if ((rs = txtindexmk_open(&mk,&ta,indname,of,om)) >= 0) {
-		    if (rs == 0) {
-		        if ((rs = bibleqs_indmkeigen(op,&mk)) >= 0) {
-	    		    if ((rs = bibleqs_indmkdata(op,&mk)) >= 0) {
-	    		        op->ti_tind = dt ;
-			        c += rs ;
-			    }
+	    if (char *ibuf ; (rs = mem.mp(&ibuf)) >= 0) {
+	        if ((rs = mkpath2(ibuf,dname,op->dbname)) >= 0) {
+		    TXTINDEXMK_PA	ta{} ;
+		    cmode	om = BIBLEQS_IDXMODE ;
+		    cint	of = 0 ; /* auto-make */
+		    ta.tablen = 0 ;			/* use default! */
+		    ta.minwlen = op->minwlen ;
+		    ta.maxwlen = BIBLEQS_MAXWLEN ;
+		    ta.sfn = op->dbfname ;
+		    TXTINDEXMK mk ;
+		    if ((rs = txtindexmk_open(&mk,&ta,ibuf,of,om)) >= 0) {
+		        if (rs == 0) {
+		            if ((rs = bibleqs_indmkeigen(op,&mk)) >= 0) {
+	    		        if ((rs = bibleqs_indmkdata(op,&mk)) >= 0) {
+	    		            op->ti_tind = dt ;
+			            c += rs ;
+			        }
+		            } /* end if (bibleqs_indmkeigen) */
+		        } else {
+			    c = rs ;
 		        }
-		    } else {
-			c = rs ;
-		    }
-		    rs1 = txtindexmk_close(&mk) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (txtindexmk) */
-
-	    } /* end if (mkpath) */
+		        rs1 = txtindexmk_close(&mk) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (txtindexmk) */
+	        } /* end if (mkpath) */
+	        rs1 = mem.free(ibuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (mkdname) */
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indmk: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleqs_indmk) */
 
-#if	CF_EXTRASTRONG
+local int bibleqs_indmkeigenloc(BQS *op,TXTINDEXMK *tip) noex ;
+local int bibleqs_indmkeigenrem(BQS *op,TXTINDEXMK *tip) noex ;
 
-local int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip) {
-	EIGENDB_CUR	ecur ;
-	EIGENDB		*edbp = &op->edb ;
+local int bibleqs_indmkeigen(BQS *op,TXTINDEXMK *tip) noex {
+    	int		rs ;
+	if_constexpr (f_extrasrong)
+	    rs = bibleqs_indmkeigenrem(op,tip) ;
+	} else {
+	    rs = bibleqs_indmkeigenloc(op,tip) ;
+	} /* end if_constexpr (f_extrastrong) */
+	return rs ;
+} /* end subroutine (bibleqs_indmkeigen) */
+
+local int bibleqs_indmkeigenrem(BQS *op,TXTINDEXMK *tip) noex {
+	EDB		*edbp = &op->edb ;
 	TXTINDEXMK_KEY	*keys = nullptr ;
-	cint	nkeys = BIBLEQS_NEIGEN ;
-	int		rs ;
+	cint		nkeys = BIBLEQS_NEIGEN ;
+	int		rs = SR_OK ;
 	int		rs1 ;
-	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indmkeigen: f_edb=%u\n",op->fl.edb) ;
-#endif
-
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent f_edb=%u\n",op->fl.edb) ;
 	if (op->fl.edb) {
-	    cint	size = (nkeys + 1) * szof(TXTINDEXMK_KEY) ;
-	if ((rs = uc_malloc(size,&keys)) >= 0) {
-	    int	i = 0 ;
-	int		wl ;
-	cchar	*wp ;
+	    cint sz = (nkeys + 1) * szof(TXTINDEXMK_KEY) ;
+	    if (voidp vp ; (rs = mem.mall(sz,&vp)) >= 0) {
+		TXTINDEXMK_KEY	*keys = resumelife<TXTINDEXMK_KEY>(vp) ;
+	    	int	i = 0 ; /* used-afterwards */
+		if (EDB_C ecur ; (rs = eigendb_curbegin(edbp,&ecur)) >= 0) {
+		    int		wl ;
+		    cchar	*wp ;
+	            while ((wl = eigendb_enum(edbp,&ecur,&wp)) >= 0) {
+	                if (wl == 0) continue ;
+	                DEBUGPRINTF("w=%r\n",wp,wl) ;
+	                if (i >= nkeys) {
+	                    c += i ;
+	                    rs = txtindexmk_addeigens(tip,keys,i) ;
+	                    i = 0 ;
+	                }
+	                keys[i].kp = wp ;
+	                keys[i].kl = wl ;
+	                i += 1 ;
+	                if (rs < 0) break ;
+	            } /* end while */
+	            rs1 = eigendb_curend(edbp,&ecur) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (cursor) */
+	        if ((rs >= 0) && (i > 0)) {
+	            c += i ;
+	            rs = txtindexmk_addeigens(tip,keys,i) ;
+	            i = 0 ;
+	        } /* end if (afterwards) */
+	        rs1 = uc_free(keys) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if */
+	} /* end if (EDB-open) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (bibleqs_indmkeigenrem) */
 
-	    if ((rs = eigendb_curbegin(edbp,&ecur)) >= 0) {
-
-	        while ((wl = eigendb_enum(edbp,&ecur,&wp)) >= 0) {
-	            if (wl == 0) continue ;
-
-#if	CF_DEBUGS
-	            debugprintf("bibleqs_indmkeigen: w=%r\n",wp,wl) ;
-#endif
-
-	            if (i >= nkeys) {
-	                c += i ;
-	                rs = txtindexmk_addeigens(tip,keys,i) ;
-	                i = 0 ;
-	            }
-
+local int bibleqs_indmkeigenloc(BQS *op,TXTINDEXMK *tip) noex {
+	cint		nkeys = nelem(strongseigens) ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (op) {
+	    int		sz = (nkeys + 1) * szof(TXTINDEXMK_KEY) ;
+	    if (voidp vp ; (rs = mem.mall(sz,&vp)) >= 0) {
+	        TXTINDEXMK_KEY *keys = resumelife<TXTINDEXMK_KEY>(vp) ;
+	        int	i ; /* used-afterwards */
+	        int	wl ;
+	        cchar	*wp ;
+	        /* populate */
+	        for (i = 0 ; (i < nkeys) && strongseigens[i] ; i += 1) {
+	            wp = strongseigens[i] ;
+	            wl = lenstr(wp) ;
 	            keys[i].kp = wp ;
 	            keys[i].kl = wl ;
-	            i += 1 ;
-
-	            if (rs < 0) break ;
 	        } /* end while */
-
-	        rs1 = eigendb_curend(edbp,&ecur) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (cursor) */
-
-	    if ((rs >= 0) && (i > 0)) {
-	        c += i ;
+	        keys[i].kp = nullptr ;	/* just for us (not needed) */
+	        keys[i].kl = 0 ;
+	        /* use */
 	        rs = txtindexmk_addeigens(tip,keys,i) ;
-	        i = 0 ;
-	    }
-
-	    rs1 = uc_free(keys) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if */
-	} /* end if (EDB-open) */
-
-	return (rs >= 0) ? c : rs ;
-} /* end subroutine (bibleqs_indmkeigen) */
-
-#else /* CF_EXTRASTRONG */
-
-local int bibleqs_indmkeigen(BIBLEQS *op,TXTINDEXMK *tip) {
-	TXTINDEXMK_KEY	*keys = nullptr ;
-	cint	nkeys = nelem(strongseigens) ;
-	int		rs ;
-	int		rs1 ;
-	int		size ;
-	int		i = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	size = (nkeys + 1) * szof(TXTINDEXMK_KEY) ;
-	if ((rs = uc_malloc(size,&keys)) >= 0) {
-	    int		wl ;
-	    cchar	*wp ;
-
-/* populate */
-
-	    for (i = 0 ; (i < nkeys) && (strongseigens[i] != nullptr) ; i += 1) {
-	        wp = strongseigens[i] ;
-	        wl = lenstr(wp) ;
-	        keys[i].kp = wp ;
-	        keys[i].kl = wl ;
-	    } /* end while */
-	    keys[i].kp = nullptr ;		/* this is just for us (not needed) */
-	    keys[i].kl = 0 ;
-
-/* use */
-
-	    rs = txtindexmk_addeigens(tip,keys,i) ;
-
-/* despose of */
-
-	    rs1 = uc_free(keys) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indmkeigen: ret rs=%d i=%u\n",rs,i) ;
-#endif
-
+	        /* despose of */
+	        rs1 = mem.free(keys) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? i : rs ;
-} /* end subroutine (bibleqs_indmkeigen) */
+} /* end subroutine (bibleqs_indmkeigenloc) */
 
-#endif /* CF_EXTRASTRONG */
-
-local int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip) {
+local int bibleqs_indmkdata(BQS *op,TXTINDEXMK *tip) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_indmkdata: ent\n") ;
-#endif
-
+	DEBUGPRINTF("ent\n") ;
 	if (op->dbmdata != nullptr) {
-	    BIBLEQS_Q		q ;
+	    BQS_Q		q ;
 	    TXTINDEXMK_TAG	t ;
 	    KTAG		e ;
 	    KTAG_PARAMS		ka ;
@@ -1222,26 +1137,20 @@ local int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip) {
 	    int			len ;
 	    int			f_ent = false ;
 	    cchar		*tp, *mp, *lp ;
-
-/* paramters for KTAGing */
-
+	    /* paramters for KTAGing */
 	ka.edbp = &op->edb ;
 	ka.f_eigen = op->fl.edb ;
 	ka.minwlen = op->minwlen ;
 	ka.wterms = op->wterms ;
-
-/* start in */
-
+	    /* start in */
 	mp = op->dbmdata ;
 	ml = (op->dbmsize & INT_MAX) ;
-
 	while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
-
 	    len = ((tp + 1) - mp) ;
 	    lp = mp ;
 	    ll = (len - 1) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("bibleqs_indmkdata: l=>%r<\n",
 		lp,strlinelen(lp,ll,40)) ;
 #endif
@@ -1251,14 +1160,13 @@ local int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip) {
 	        ll -= 1 ;
 	    }
 
-	    if ((tp = strnchr(lp,ll,'#')) != nullptr)
+	    if ((tp = strnchr(lp,ll,'#')) != nullptr) {
 	        ll = (tp - lp) ;
-
+	    }
 	    if (ll > 0) {
-
 	        if (isstart(lp,ll,&q,&si)) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    	    debugprintf("bibleqs_indmkdata: isstart=YES f_ent=%u\n",
 			f_ent) ;
 #endif
@@ -1274,18 +1182,18 @@ local int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip) {
 	            if (rs >= 0) {
 	                rs = ktag_start(&e,&ka,fileoff,(lp+si),(ll-si)) ;
 	                if (rs >= 0)
-	                    f_ent = TRUE ;
+	                    f_ent = true ;
 	            }
 
 	        } else {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    	    debugprintf("bibleqs_indmkdata: isstart=NO f_ent=%u\n",
 				f_ent) ;
 #endif
 	            if (f_ent) {
 	                rs = ktag_add(&e,lp,ll) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    	    debugprintf("bibleqs_indmkdata: ktab_add() rs=%d\n",rs) ;
 #endif
 		    }
@@ -1294,7 +1202,7 @@ local int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip) {
 
 	    } else {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    	    debugprintf("bibleqs_indmkdata: empty-line\n") ;
 #endif
 
@@ -1313,15 +1221,13 @@ local int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip) {
 #endif /* CF_EMPTYTERM */
 
 	    } /* end if (not empty) */
-
 	    fileoff += len ;
 	    ml -= len ;
 	    mp += len ;
-
 	    if (rs < 0) break ;
 	} /* end while (readling lines) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_indmkdata: while-out rs=%d f_ent=%u\n",
 		rs,f_ent) ;
 #endif
@@ -1335,38 +1241,40 @@ local int bibleqs_indmkdata(BIBLEQS *op,TXTINDEXMK *tip) {
 	    ktag_finish(&e) ;
 	}
 
-	if (f_ent)
+	if (f_ent) {
 	    ktag_finish(&e) ;
+	}
 
-	} else
+	} else {
 	    rs = SR_NOANODE ;
+	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_indmkdata: ret rs=%d c=%u\n",rs,c) ;
 #endif
 
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleqs_indmkdata) */
 
-local int bibleqs_indclose(BIBLEQS *op) {
+local int bibleqs_indclose(BQS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.ind) {
 	    op->fl.ind = false ;
 	    rs1 = txtindex_close(&op->ind) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end if (close) */
 	return rs ;
 } /* end subroutine (bibleqs_inclose) */
 
 /* make the index */
 #if	CF_MKBIBLEQSI
-local int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname) {
+local int bibleqs_mkbibleqsi(BQS *op,cchar *dname) noex {
 	int		rs ;
 	int		rs1 ;
 	char		dbname[MAXPATHLEN + 1] ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_mkbibleqsi: dname=%s\n",dname) ;
 #endif
 
@@ -1376,18 +1284,18 @@ local int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname) {
 
 	if ((rs = mkpath2(dbname,dname,op->dbname)) >= 0) {
 	pid_t		cpid = 0 ;
-	int		i, cstat ;
-	cchar	*prog = PROG_MKBIBLEQSI ;
+	int		cstat ;
+	cchar		*prog = PROG_MKBIBLEQSI ;
 	char		pbuf[MAXPATHLEN + 1] ;
 
-	for (i = 0 ; prbins[i] != nullptr ; i += 1) {
+	for (int i = 0 ; prbins[i] != nullptr ; i += 1) {
 	    if ((rs = mkpath3(pbuf,op->pr,prbins[i],prog)) >= 0) {
 	        rs = perm(pbuf,-1,-1,nullptr,X_OK) ;
 	    }
 	    if (rs >= 0) break ;
 	} /* end for */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_mkbibleqsi: pr=%s\n",op->pr) ;
 	debugprintf("bibleqs_mkbibleqsi: pbuf=%s\n",pbuf) ;
 	debugprintf("bibleqs_mkbibleqsi: perm() rs=%d\n",rs) ;
@@ -1406,7 +1314,7 @@ local int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname) {
 	    }
 	    if (rs >= 0) {
 		cchar	*cp ;
-	        for (i = 0 ; envchild[i] != nullptr ; i += 1) {
+	        for (int i = 0 ; envchild[i] ; i += 1) {
 	            if ((cp = getenv(envchild[i])) != nullptr) {
 	                rs = vecstr_envadd(&envs,envchild[i],cp,-1) ;
 	            }
@@ -1417,12 +1325,12 @@ local int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname) {
 	            if ((rs = vecstr_getvec(&envs,&ev)) >= 0) {
 			SPAWNPROC	ps{} ;
 			cchar	*av[10] ;
-	    		i = 0 ;
-	    		av[i++] = prog ;
-	    		av[i++] = nullptr ;
+	    		int ai = 0 ;
+	    		av[ai++] = prog ;
+	    		av[ai++] = nullptr ;
 	                ps.opts |= SPAWNPROC_OIGNINTR ;
 	                ps.opts |= SPAWNPROC_OSETPGRP ;
-	                for (i = 0 ; i < 3 ; i += 1) {
+	                for (int i = 0 ; i < 3 ; i += 1) {
 		            switch (i) {
 		            case 0:
 		            case 1:
@@ -1462,7 +1370,7 @@ local int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname) {
 
 	} /* end if (mkpath) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_mkbibleqsi: ret rs=%d\n",rs) ;
 #endif
 
@@ -1471,7 +1379,7 @@ local int bibleqs_mkbibleqsi(BIBLEQS *op,cchar *dname) {
 #endif /* CF_MKBIBLEQSI */
 
 /* does this primary tag have the query keys? */
-local int bibleqs_havekeys(BIBLEQS *op,TXTINDEX_TAG *tagp,int qo,
+local int bibleqs_havekeys(BQS *op,TXTINDEX_TAG *tagp,int qo,
 		SEARCHERS *skp) noex {
 	SEARCHKEYS_POP	pkeys ;
 	cint		f_prefix = (qo & BIBLEQS_OPREFIX) ;
@@ -1480,20 +1388,17 @@ local int bibleqs_havekeys(BIBLEQS *op,TXTINDEX_TAG *tagp,int qo,
 	int		f = false ;
 
 	if ((rs = searchkeys_popbegin(skp,&pkeys,f_prefix)) >= 0) {
-	    BIBLEQS_Q	q ;
+	    BQS_Q	q ;
 	    int		c = rs ;
 	    int		si ;
 	    int		len ;
 	    int		ml, ll ;
 	    cchar	*tp, *mp, *lp ;
 
-	    if (c == 0) f = TRUE ;
-
-/* process this tag */
-
+	    if (c == 0) f = true ;
+	   /* process this tag */
 	    mp = (cchar *) (op->dbmdata + tagp->recoff) ;
 	    ml = tagp->reclen ;
-
 	    while ((! f) && ((tp = strnchr(mp,ml,'\n')) != nullptr)) {
 
 	        len = ((tp + 1) - mp) ;
@@ -1535,97 +1440,74 @@ local int bibleqs_havekeys(BIBLEQS *op,TXTINDEX_TAG *tagp,int qo,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (searchkeys-pop) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_havekeys: ret rs=%d f=%u\n",rs,f) ;
 #endif
 
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (bibleqs_havekeys) */
 
-local int bibleqs_havekeysline(BIBLEQS *op,SEARCHKEYS *skp,
+local int bibleqs_havekeysline(BQS *op,SEARCHKEYS *skp,
 		SEARCHKEYS_POP *pkp,cchar *lp,int ll) noex {
-	field		fsb ;
 	int		rs ;
+	int		rs1 ; 
 	int		f = false ;
-
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_havekeysline: line\n") ;
 	debugprintf(">%r<\n",lp,ll) ;
 #endif
-
-	if ((rs = field_start(&fsb,lp,ll)) >= 0) {
+	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
 	    int		fl, kl ;
 	    cchar	*fp, *kp ;
 	    char	keybuf[KEYBUFLEN + 1] ;
-
-	    while ((fl = field_word(&fsb,op->wterms,&fp)) >= 0) {
-
+	    while ((fl = fsb.word(op->wterms,&fp)) >= 0) {
 	        if (fl && (fp[0] == CH_SQUOTE)) {
 	            fp += 1 ;
 	            fl -= 1 ;
 	        }
-
 	        if (fl == 0) continue ;
-
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("bibleqs_havekeysline: fl=%u fp=>%r<\n",
 	            fl,fp,fl) ;
 #endif
-
 	        kl = sfword(fp,fl,&kp) ;
-
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("bibleqs_havekeysline: kl=%u k=>%r<\n",
 	            kl,kp,kl) ;
 #endif
 
 	        if (kl <= 0) continue ;
-
-	        if (kl > KEYBUFLEN)		/* prevents overflow */
+	        if (kl > KEYBUFLEN) {		/* prevents overflow */
 	            kl = KEYBUFLEN ;
-
+		}
 	        if (hasuc(kp,kl)) {
 	            strwcpylc(keybuf,kp,kl) ;	/* can't overflow */
 	            kp = keybuf ;
 	        }
-
 	        rs = bibleqs_matchkeys(op,skp,pkp,kp,kl) ;
 	        f = (rs > 0) ;
-
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("bibleqs_havekeysline: match? w=>%r< f=%u\n",
 	            kp,kl,f) ;
 #endif
-
 	        if (f) break ;
 	        if (rs < 0) break ;
 	    } /* end while (fielding words) */
-
-	    field_finish(&fsb) ;
+	    rs1 = fsb.finish ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs_havekeysline: ret rs=%d f=%u\n",rs,f) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d f=%u\n",rs,f) ;
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (bibleqs_havekeysline) */
-
+} /* end subroutine (bibleqs_havekeysline) */
 
 /* do the keys match? */
-local int bibleqs_matchkeys(op,skp,pkp,sp,sl)
-BIBLEQS		*op ;
-SEARCHKEYS	*skp ;
-SEARCHKEYS_POP	*pkp ;
-cchar	*sp ;
-int		sl ;
-{
-	xwords		xw ;
+local int bibleqs_matchkeys(BQS *op,SEARCHKEYS *skp,
+		SEARCHKEYS_POP *pkp,cchar *sp,int sl) noex {
 	int		rs ;
+	int		rs1 ;
 	int		f = false ;
 
-#if	CF_DEBUGS 
+#if	CF_DEBUG 
 	debugprintf("bibleqs_matchkeys: ent s=>%r<\n",sp,sl) ;
 #endif
 
@@ -1634,14 +1516,16 @@ int		sl ;
 /* deal with extra (ex: possessive) words */
 
 #if	CF_SINGLEWORD
+	xwords		xw ;
 	if ((rs = xwords_start(&xw,sp,sl)) >= 0) {
-
+	    {
 	    rs = searchkeys_processxw(skp,pkp,&xw) ;
 	    f = (rs > 0) ;
-
+	    }
 	    xwords_finish(&xw) ;
 	} /* end if (xwords) */
 #else /* CF_SINGLEWORD */
+	xwords		xw ;
 	if ((rs = xwords_start(&xw,sp,sl)) >= 0) {
 	    int		rs1 ;
 	    int		wi ;
@@ -1651,7 +1535,7 @@ int		sl ;
 	    f = false ;
 	    for (wi = 0 ; ((cl = xwords_get(&xw,wi,&cp)) > 0) ; wi += 1) {
 
-#if	CF_DEBUGS 
+#if	CF_DEBUG 
 	        debugprintf("bibleqs_matchkeys: xwords_get() rs=%d\n",cl) ;
 	        if (cl >= 0)
 	            debugprintf("bibleqs_matchkeys: c=>%r<\n",cp,cl) ;
@@ -1660,47 +1544,38 @@ int		sl ;
 	        rs1 = searchkeys_process(skp,pkp,cp,cl) ;
 	        f = (rs1 > 0) ;
 
-#if	CF_DEBUGS 
+#if	CF_DEBUG 
 	        debugprintf("bibleqs_matchkeys: searchkeys_process() f=%u\n",
 	            f) ;
 #endif
 
 	        if (f) break ;
 	    } /* end for (matching words) */
-
 	    xwords_finish(&xw) ;
 	} /* end if (xwords) */
 #endif /* CF_SINGLEWORD */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_matchkeys: ret rs=%d f=%u\n",rs,f) ;
 #endif
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (bibleqs_matchkeys) */
+} /* end subroutine (bibleqs_matchkeys) */
 
-
-local int bibleqs_loadbuf(op,recoff,vbuf,vlen)
-BIBLEQS		*op ;
-uint		recoff ;
-char		vbuf[] ;
-int		vlen ;
-{
-	SBUF		b ;
+local int bibleqs_loadbuf(BQS *op,uint recoff,char *vbuf,int vlen) noex {
 	int		rs ;
 	int		ml ;
 	int		len = 0 ;
 	cchar	*mp ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_loadbuf: ent\n") ;
 #endif
 
 	mp = (cchar *) (op->dbmdata + recoff) ;
 	ml = (op->dbmsize - recoff) ;
 
-	if ((rs = sbuf_start(&b,vbuf,vlen)) >= 0) {
+	if (sbuf b ; (rs = sbuf_start(&b,vbuf,vlen)) >= 0) {
 	    int		ll ;
 	    int		j = 0 ;
 	    cchar	*tp, *lp ;
@@ -1712,7 +1587,7 @@ int		vlen ;
 	        ll = (len - 1) ;
 	        if (ll <= 0) break ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("bibleqs_loadbuf: line=>%r<¬\n",
 	            lp,strnlen(lp,MIN(ll,40))) ;
 #endif
@@ -1733,67 +1608,47 @@ int		vlen ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("bibleqs_loadbuf: ret rs=%d len=%u\n",rs,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (bibleqs_loadbuf) */
-
+} /* end subroutine (bibleqs_loadbuf) */
 
 #if	CF_EXTRASTRONG
 
-local int bibleqs_eigenopen(BIBLEQS *op)
-{
+local int bibleqs_eigenopen(BQS *op) noex {
+    	int		rs = SR_OK ;
 	int		rs1 = 0 ;
-	int		f = false ;
-
+	int		f = false ; /* return-value */
 	if (! op->fl.edbinit) {
-	op->fl.edbinit = TRUE ;
-	rs1 = eigenfind(&op->edb,op->pr,op->dbname,op->minwlen) ;
-	op->fl.edb = (rs1 > 0) ;
-	f = op->fl.edb ;
+	    op->fl.edbinit = true ;
+	    rs1 = eigenfind(&op->edb,op->pr,op->dbname,op->minwlen) ;
+	    op->fl.edb = (rs1 > 0) ;
+	    f = op->fl.edb ;
 	}
+	return (rs >= 0) ? f : ;
+} /* end subroutine (bibleqs_eigenopen) */
 
-#if	CF_DEBUGS
-	debugprintf("bibleqs_eigenopen: eigenfind() rs=%d\n",rs1) ;
-#endif
-
-	return f ;
-}
-/* end subroutine (bibleqs_eigenopen) */
-
-
-local int bibleqs_eigenclose(BIBLEQS *op)
-{
+local int bibleqs_eigenclose(BQS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->fl.edb) {
 	    op->fl.edb = false ;
 	    rs1 = eigendb_close(&op->edb) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
-
+	} /* end if (eigen-db close) */
 	return rs ;
 } /* end subroutine (bibleqs_eigenopen) */
 
 #endif /* CF_EXTRASTRONG */
 
-local int bibleqs_lookuper(op,curp,qo,skp,hkp)
-BIBLEQS		*op ;
-BIBLEQS_CUR	*curp ;
-int		qo ;
-SEARCHKEYS	*skp ;
-vecstr		*hkp ;
-{
-	VECINT		recoffs ;
+local int bibleqs_lookuper(BQS *op,BQS_C *curp,int qo,
+		SEARCHKEYS *skp,VS *hkp) noex {
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
-
-	if ((rs = vecint_start(&recoffs,10,0)) >= 0) {
+	int		c = 0 ; /* return-value */
+	if (vecint recoffs ; (rs = vecint_start(&recoffs,10,0)) >= 0) {
 	    cchar	**hkeya ;
 	    if ((rs = vecstr_getvec(hkp,&hkeya)) >= 0) {
 	        TXTINDEX_CUR	tcur ;
@@ -1801,10 +1656,10 @@ vecstr		*hkp ;
 	        if ((rs = txtindex_curbegin(&op->ind,&tcur)) >= 0) {
 	            TXTINDEX_TAG	ttag ;
 		    int			ntags ;
-
+		    {
 	            rs = txtindex_lookup(&op->ind,&tcur,hkeya) ;
 	            ntags = rs ;
-
+		    }
 	            while ((rs >= 0) && (ntags-- > 0)) {
 	                rs1 = txtindex_read(&op->ind,&tcur,&ttag) ;
 	                if (rs1 == SR_NOTFOUND) break ;
@@ -1814,27 +1669,23 @@ vecstr		*hkp ;
 	                        c += 1 ;
 	                        rs = vecint_add(&recoffs,ttag.recoff) ;
 	                    }
-	                }
+	                } /* end if (ok) */
 	            } /* end while */
 	            rs1 = txtindex_curend(&op->ind,&tcur) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (cursor) */
-
-/* sort the secondary tags */
-
+		/* sort the secondary tags */
 	        if ((rs >= 0) && (c > 1)) {
 	            vecint_sort(&recoffs,vcmpint) ;
 		}
-
-/* store results (file-record offsets) */
-
+		/* store results (file-record offsets) */
 	        if (rs >= 0) {
-	            cint	size = (c + 1) * szof(uint) ;
-	            if ((rs = uc_malloc(size,&curp->verses)) >= 0) {
+	            cint	sz = (c + 1) * szof(uint) ;
+	            if ((rs = uc_malloc(sz,&curp->verses)) >= 0) {
 	                int *a ;
 	                if ((rs = vecint_getvec(&recoffs,&a)) >= 0) {
 	                    curp->nverses = c ;
-	                    memcpy(curp->verses,a,size) ;
+	                    memcopy(curp->verses,a,sz) ;
 	                    curp->verses[c] = UINT_MAX ;
 		        }
 	            } else {
@@ -1846,16 +1697,15 @@ vecstr		*hkp ;
 	    rs1 = vecint_finish(&recoffs) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (recoffs) */
-
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (bibleqs_lookuper) */
 
-local int bibleqs_mkhkeys(BIBLEQS *op,vecstr *hkp,SEARCHKEYS *skp) noex {
-	SEARCHKEYS_CUR	cur ;
+local int bibleqs_mkhkeys(BQS *op,vecstr *hkp,SEARCHKEYS *skp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		nkeys = 0 ;
 
+	SEARCHKEYS_CUR	cur ;
 	if ((rs = searchkeys_curbegin(skp,&cur)) >= 0) {
 	    int		kl ;
 	    cchar	*kp ;
@@ -1874,8 +1724,9 @@ local int bibleqs_mkhkeys(BIBLEQS *op,vecstr *hkp,SEARCHKEYS *skp) noex {
 	        rs1 = SR_NOTFOUND ;
 
 #if	CF_EXTRAEIGEN
-	        if (op->fl.edb)
+	        if (op->fl.edb) {
 	            rs1 = eigendb_exists(&op->edb,kp,kl) ;
+		}
 #endif
 
 	        if (rs1 == SR_NOTFOUND) {
@@ -1905,7 +1756,7 @@ local int subinfo_start(SI *sip) noex {
 local int subinfo_ids(SI *sip) noex {
 	int		rs = SR_OK ;
 	if (! sip->fl.id) {
-	    sip->fl.id = TRUE ;
+	    sip->fl.id = true ;
 	    rs = ids_load(&sip->id) ;
 	}
 	return rs ;
@@ -1938,8 +1789,7 @@ local int ktag_start(KTAG *kop,KTAG_PARAMS *kap,size_t soff,cchar *lp,int ll) {
 	} /* end if (vecobj_start) */
 
 	return rs ;
-}
-/* end subroutine (ktag_start) */
+} /* end subroutine (ktag_start) */
 
 local int ktag_add(KTAG *kop,cchar *lp,int ll) noex {
 	int		rs ;
@@ -1949,15 +1799,11 @@ local int ktag_add(KTAG *kop,cchar *lp,int ll) noex {
 	return rs ;
 } /* end subroutine (ktag_add) */
 
-local int ktag_mktag(kop,endoff,tagp)
-KTAG		*kop ;
-size_t		endoff ;
-TXTINDEXMK_TAG	*tagp ;
-{
+local int ktag_mktag(KATG *kop,size_t endoff,TXTINDEXMK_TAG *tagp) noex {
 	TXTINDEXMK_KEY	*kea = nullptr ;
 	KTAG_KEY	**va ;
 	int		rs ;
-	int		size ;
+	int		sz ;
 	int		i ;
 
 	kop->reclen = (endoff - kop->recoff) ;
@@ -1969,17 +1815,17 @@ TXTINDEXMK_TAG	*tagp ;
 	if ((rs = vecobj_getvec(&kop->keys,&va)) >= 0) {
 	    tagp->nkeys = rs ;
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	{
 	    KTAG_KEY	*ep ;
 	    for (i = 0 ; vecobj_get(&kop->keys,i,&ep) >= 0 ; i += 1) {
 	        debugprintf("ktag_mktag: key=>%r<\n",ep->kp,ep->kl) ;
 	    }
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-	size = tagp->nkeys * szof(TXTINDEXMK_KEY) ;
-	if ((rs = uc_malloc(size,&kea)) >= 0) {
+	sz = tagp->nkeys * szof(TXTINDEXMK_KEY) ;
+	if ((rs = uc_malloc(sz,&kea)) >= 0) {
 
 	    kop->tkeys = kea ;		/* kea: save for us (free later) */
 	    for (i = 0 ; i < tagp->nkeys ; i += 1) {
@@ -1988,12 +1834,12 @@ TXTINDEXMK_TAG	*tagp ;
 
 	    tagp->keys = kea ;		/* kea: store in the tag */
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	    for (i = 0 ; i < tagp->nkeys ; i += 1) {
 	        debugprintf("ktag_mktag: key=>%r<\n",
 	            tagp->keys[i].kp, tagp->keys[i].kl) ;
 	    }
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	} /* end if (memory-allocation) */
 
@@ -2005,7 +1851,7 @@ TXTINDEXMK_TAG	*tagp ;
 local int ktag_procline(KTAH *kop,cchar *lp,int ll) noex {
 	int		rs ;
 
-#if	CF_DEBUGS && CF_DEBUGPL
+#if	CF_DEBUG && CF_DEBUGPL
 	debugprintf("bibleqs/ktab_procline: ent l=>%r<\n",
 		lp,strlinelen(lp,ll,40)) ;
 #endif
@@ -2022,7 +1868,7 @@ local int ktag_procline(KTAH *kop,cchar *lp,int ll) noex {
 
 	    while ((fl = field_word(&fsb,kap->wterms,&fp)) >= 0) {
 
-#if	CF_DEBUGS && CF_DEBUGPL
+#if	CF_DEBUG && CF_DEBUGPL
 		debugprintf("bibleqs/ktab_procline: f=>%r<\n",fp,fl) ;
 #endif
 
@@ -2039,7 +1885,7 @@ local int ktag_procline(KTAH *kop,cchar *lp,int ll) noex {
 
 	        sl = sfword(fp,fl,&sp) ;
 
-#if	CF_DEBUGS && CF_DEBUGPL
+#if	CF_DEBUG && CF_DEBUGPL
 		debugprintf("bibleqs/ktab_procline: sfword() sl=%d\n",sl) ;
 #endif
 
@@ -2068,7 +1914,7 @@ local int ktag_procline(KTAH *kop,cchar *lp,int ll) noex {
 	    field_finish(&fsb) ;
 	} /* end if (field) */
 
-#if	CF_DEBUGS && CF_DEBUGPL
+#if	CF_DEBUG && CF_DEBUGPL
 	debugprintf("bibleqs/ktab_procline: ret rs=%d\n",rs) ;
 #endif
 
@@ -2076,78 +1922,65 @@ local int ktag_procline(KTAH *kop,cchar *lp,int ll) noex {
 } /* end subroutine (ktag_procline) */
 
 local int ktag_procword(KTAG *kop,cchar *cp,int cl) noex {
-	VECOBJ		*klp = &kop->keys ;
+	vecobj		*klp = &kop->keys ;
 	KTAG_KEY	key ;
-	cint	nrs = SR_NOTFOUND ;
+	cint		nrs = SR_NOTFOUND ;
 	int		rs = SR_OK ;
-	int		f_needstore = false ;
-	int		f_cont = TRUE ;
-	cchar	*lcp ;
+	bool		f_needstore = false ;
+	bool		f_cont = true ;
+	cchar		*lcp ;
 	char		kbuf[KEYBUFLEN + 1] ;
 
-#if	CF_DEBUGS && CF_DEBUGPW
+#if	CF_DEBUG && CF_DEBUGPW
 	debugprintf("ktag_procword: ent k=%r\n",cp,cl) ;
 #endif
 
-	if (cl > KEYBUFLEN)
+	if (cl > KEYBUFLEN) {
 	    cl = KEYBUFLEN ;
-
+	}
 	if (hasuc(cp,cl)) {
-	    f_needstore = TRUE ;
+	    f_needstore = true ;
 	    strwcpylc(kbuf,cp,cl) ;
 	    cp = kbuf ;
 	}
-
-/* note that the TXTINDEX object filters out eigen keys also */
-
-#if	CF_EXTRASTRONG
-	{
+	/* note that the TXTINDEX object filters out eigen keys also */
+	if_constexpr (f_extrastrong) {
 	    KTAG_PARAMS	*kap = kop->kap ;
 	    if (kap->f_eigen && (eigendb_exists(kap->edbp,cp,cl) >= 0)) {
 	        f_cont = false ;
 	    }
-	}
-#endif /* CF_EXTRASTRONG */
-
+	} /* end if_constexpr (f_extrastrong) */
 	if (f_cont) {
-	key.kp = cp ;
-	key.kl = cl ;
-	if ((rs = vecobj_search(klp,&key,vesrch,nullptr)) == nrs) {
-	    rs = SR_OK ;
-
-	    if (f_needstore) {
-	        rs = ktag_storelc(kop,&lcp,cp,cl) ;
-	        cl = rs ;
-	        cp = lcp ;
-	    }
-
-	    if (rs >= 0) {
-	        key.kp = cp ;
-	        key.kl = cl ;
-	        rs = vecobj_add(klp,&key) ;
-	    }
-
-	} /* end if (unique key) */
+	    key.kp = cp ;
+	    key.kl = cl ;
+	    if ((rs = vecobj_search(klp,&key,vesrch,nullptr)) == nrs) {
+	        rs = SR_OK ;
+	        if (f_needstore) {
+	            rs = ktag_storelc(kop,&lcp,cp,cl) ;
+	            cl = rs ;
+	            cp = lcp ;
+	        }
+	        if (rs >= 0) {
+	            key.kp = cp ;
+	            key.kl = cl ;
+	            rs = vecobj_add(klp,&key) ;
+	        } /* end if (ok) */
+	    } /* end if (unique key) */
 	} /* end if (continue) */
 
-#if	CF_DEBUGS && CF_DEBUGPW
+#if	CF_DEBUG && CF_DEBUGPW
 	debugprintf("bibleqs/ktab_procword: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (ktag_procword) */
+} /* end subroutine (ktag_procword) */
 
-
-local int ktag_storelc(KTAG *kop,cchar **rpp,cchar *cp,int cl)
-{
+local int ktag_storelc(KTAG *kop,cchar **rpp,cchar *cp,int cl) noex {
 	int		rs = SR_OK ;
-
 	if (! kop->f_store) {
 	    rs = vecstr_start(&kop->store,5,0) ;
 	    kop->f_store = (rs >= 0) ;
 	}
-
 	if (rs >= 0) {
 	    if (kop->f_store) {
 	        if ((rs = vecstr_add(&kop->store,cp,cl)) >= 0) {
@@ -2157,53 +1990,41 @@ local int ktag_storelc(KTAG *kop,cchar **rpp,cchar *cp,int cl)
 	        rs = SR_NOANODE ;
 	    }
 	} /* end if (ok) */
-
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (ktag_storelc) */
+} /* end subroutine (ktag_storelc) */
 
-
-local int ktag_finish(KTAG *kop)
-{
+local int ktag_finish(KTAG *kop) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (kop->tkeys != nullptr) {
+	if (kop->tkeys) {
 	    rs1 = uc_free(kop->tkeys) ;
 	    if (rs >= 0) rs = rs1 ;
 	    kop->tkeys = nullptr ;
-	}
-
+	} /* end if (memory-release) */
 	if (kop->f_store) {
 	    rs1 = vecstr_finish(&kop->store) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-	rs1 = vecobj_finish(&kop->keys) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = vecobj_finish(&kop->keys) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
-}
-/* end subroutine (ktag_finish) */
+} /* end subroutine (ktag_finish) */
 
-
-local int mkdname(cchar *dname,mode_t dm)
-{
-	cint	nrs = SR_NOENT ;
+local int mkdname(cchar *dname,mode_t dm) noex {
+	cint		nrs = SR_NOENT ;
 	int		rs ;
 	if ((rs = checkdname(dname)) == nrs) {
 	    rs = mkdirs(dname,dm) ;
 	}
 	return rs ;
-}
-/* end subroutine (mkdname) */
+} /* end subroutine (mkdname) */
 
-
-local int checkdname(cchar *dname)
-{
+local int checkdname(cchar *dname) noex {
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("checkdname: ent dname=%s\n",dname) ;
 #endif
 
@@ -2218,17 +2039,14 @@ local int checkdname(cchar *dname)
 	} else
 	    rs = SR_INVALID ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("checkdname: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (checkdname) */
+} /* end subroutine (checkdname) */
 
-
-local int isstart(cchar *lp,int ll,BIBLEQS_Q *qp,int *sip)
-{
+local int isstart(cchar *lp,int ll,BQS_Q *qp,int *sip) noex {
 	int		rs1 ;
 	int		sl = ll ;
 	int		ch ;
@@ -2236,7 +2054,7 @@ local int isstart(cchar *lp,int ll,BIBLEQS_Q *qp,int *sip)
 	int		f = false ;
 	cchar	*sp = lp ;
 
-#if	CF_DEBUGS && CF_DEBUGSTART
+#if	CF_DEBUG && CF_DEBUGTART
 	    debugprintf("bibleqs/isstart: ent l=>%r<\n",lp,
 		strlinelen(lp,ll,40)) ;
 #endif
@@ -2272,7 +2090,7 @@ local int isstart(cchar *lp,int ll,BIBLEQS_Q *qp,int *sip)
 	    si = ((cp + cl) - lp) ;
 	    rs1 = cfdeci(cp,cl,&v) ;
 
-#if	CF_DEBUGS && CF_DEBUGSTART
+#if	CF_DEBUG && CF_DEBUGTART
 	    debugprintf("bibleqs/isstart: cfdeci() rs=%d\n",rs1) ;
 #endif
 
@@ -2302,98 +2120,103 @@ local int isstart(cchar *lp,int ll,BIBLEQS_Q *qp,int *sip)
 	if (sip != nullptr)
 	    *sip = (f) ? si : 0 ;
 
-#if	CF_DEBUGS && CF_DEBUGSTART
+#if	CF_DEBUG && CF_DEBUGTART
 	debugprintf("bibleqs/isstart: f=%u si=%u\n",f,si) ;
 #endif
 
 	return (f) ? si : 0  ;
-}
-/* end subroutine (isstart) */
+} /* end subroutine (isstart) */
 
 #if	CF_EXTRASTRONG
 
-local int eigenfind(eigendb *edbp,cc *pr,cc *dbname,int minwlen) noex {
+local int eigenfinds(EDB *edbp,ids *idp,EC *ecp) noex ;
+
+local int eigenfind(EDB *edbp,cc *pr,cc *dbname,int minwlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (ids id ; (rs = ids_load(&id)) >= 0) {
-	    if (expcool	cooks ; (rs = expcook_start(&cooks)) >= 0) {
-
-	if ((rs = expcook_add(&cooks,"n",dbname,-1)) >= 0) {
-	    rs = expcook_add(&cooks,"f","eign",-1) ;
-	}
-
-	if (rs >= 0) {
-	USTAT		sb ;
-	int		i ;
-	int		efl ;
-	cchar	*efp = nullptr ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-	char		efname[MAXPATHLEN + 1] ;
-
-	rs = SR_NOTOPEN ;
-	efname[0] = '\0' ;
-	for (i = 0 ; eigenfnames[i] != nullptr ; i += 1) {
-
-	    rs = SR_OK ;
-	    efp = eigenfnames[i] ;
-	    efl = -1 ;
-	    if (efp[0] != '/') {
-	        rs = mkpath2(tmpfname,pr,efp) ;
-	        efl = rs ;
-	        if (rs <= 0) {
-	            rs = SR_NOENT ;
-	            efp = nullptr ;
-	        } else
-	            efp = tmpfname ;
-	    }
-
-	    if (rs >= 0) {
-	        rs = expcook_exp(&cooks,0,efname,MAXPATHLEN,efp,efl) ;
-	    }
-	    if (rs >= 0) {
-	        rs = u_stat(efname,&sb) ;
-	    }
-	    if ((rs >= 0) && S_ISDIR(sb.st_mode)) {
-	        rs = SR_ISDIR ;
-	    }
-	    if (rs >= 0) {
-	        rs = permid(&id,&sb,R_OK) ;
-
-#if	CF_DEBUGS
-	    debugprintf("bibleqs/eigenfind: fname=%s rs=%d\n",
-	        efname,rs) ;
-#endif
-
-	    if (rs >= 0) break ;
-	} /* end for */
-
-	if (rs >= 0) {
-	    rs = eigendb_open(edbp,efname) ;
-	}
-
-	} /* end if (ok) */
-
-#if	CF_DEBUGS
-	debugprintf("bibleqs/eigenfind: eigendb_open() rs=%d\n",rs) ;
-#endif
-
+	int		rv = 0 ; /* return-value */
+	if (ids id ; (rs = id.load) >= 0) {
+	    if (EC ck ; (rs = ck.start) >= 0) {
+	        if ((rs = ck.add("n",dbname,-1)) >= 0) {
+	            if ((rs = ck.add("f","eign",-1)) >= 0) {
+			rs = eigenfinds(edbp,&id,&ck) ;
+		    }
+		} /* end if */
 	        rs1 = expcook_finish(&cooks) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if */
+	    } /* end if (expcook) */
 	    rs1 = ids_release(&id) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if */
-
-	return rs ;
+	} /* end if (ids) */
+	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (eigenfind) */
+
+local int eigenfinds(EDB *edbp,ids *idp,EC *ecp) noex {
+	cint		psz = (2 * (var.maxpathlen + 1)) ;
+	cint		maxpath = var.maxpathlen ;
+	int		ai = 2 ; /* two path buffers */
+	int		rs ;
+	int		rs1 ;
+	if (char *a ; (rs = mem.mall(psz,&a)) >= 0) {
+	    cint elen = maxpath ;
+	    char *tbuf = (a + (--ai * (maxpath + 1))) ;
+	    char *ebuf = (a + (--ai * (maxpath + 1))) ;
+	    rs = SR_NOTOPEN ;
+	    efname[0] = '\0' ;
+	    for (int i = 0 ; eigenfnames[i] ; i += 1) {
+	        cchar *efp = eigenfnames[i] ;
+	        int   efl = -1 ;
+	        rs = SR_OK ;
+	        if (efp[0] != '/') {
+	            if ((rs = mkpath2(tbuf,pr,efp)) > 0) {
+	                efp = tbuf ;
+	                efl = rs ;
+		    } else (rs == 0) {
+	                rs = SR_NOENT ;
+	                efp = nullptr ;
+		    }
+	        } /* end if */
+	        if (rs >= 0) {
+	            if ((rs = ecp->exp(0,ebuf,elen,efp,efl)) >= 0) {
+		        if (ustat sb ; (rs = u_stat(efname,&sb)) >= 0) {
+			    rs = SR_ISDIR ;
+			    if (! S_ISDIR(sb.st_mode)) {
+	        	        rs = permid(idp,&sb,R_OK) ;
+			    }
+		        } /* end if (u_stat) */
+		    } /* end if (expcook_exp) */
+	        } /* end if (ok) */
+	        if (rs >= 0) break ;
+	    } /* end for */
+	    if (rs >= 0) {
+	        rs = edbp->open(ebuf) ;
+	    }
+	    rs1 = mem.free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (eigenfinds) */
 
 #endif /* CF_EXTRASTRONG */
 
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
+	    maxnamelen = rs ;
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	        maxpathlen = rs ;
+	    } /* end if (bufsizeget) */
+	} /* end if (bufsizeget) */
+    	return rs ;
+} /* end if (vars::operator) */
+
 local int mkfieldterms(uchar *wterms) noex {
-	for (int i = 0 ; i < 32 ; i += 1) {
-	    wterms[i] = 0xFF ;
-	}
-	for (int i = 0 ; i < 256 ; i += 1) {
+    	cint n = fieldterms_termsize ;
+	for (int i = 0 ; i < n ; i += 1) {
+	    wterms[i] = UCHAR_MAX ;
+	} /* end for */
+	for (int i = 0 ; i < nchars ; i += 1) {
 	    if (isalnumlatin(i)) {
 	        BACLR(wterms,i) ;
 	    }
@@ -2415,10 +2238,12 @@ local int vesrch(cvoid *v1p,cvoid *v2p) noex {
 	                    rc = memcmp((*e1pp)->kp,(*e2pp)->kp,(*e1pp)->kl) ;
 		        }
 	            }
-	        } else
+	        } else {
 	            rc = -1 ;
-	    } else
-	        rc = 1 ;
+		}
+	    } else {
+	        rc = +1 ;
+	    }
 	}
 	return rc ;
 } /* end subroutine (vesrch) */
