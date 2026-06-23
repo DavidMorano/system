@@ -133,7 +133,7 @@ struct locinfo {
 	COMMANDMENT	cdb ;
 	void		*ofp ;
 	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	TMTIME		tm ;
 	int		linelen ;
 	int		indent ;
@@ -149,9 +149,9 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *,int) ;
-static int	procsome(PROGINFO *,ARGINFO *,BITS *,cchar *,int) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,int) ;
+static int	procsome(PROGINFO *,ARGINFO *,bits *,cchar *,int) ;
 static int	procspecs(PROGINFO *,const char *,int) ;
 static int	procspec(PROGINFO *,const char *,int) ;
 static int	procall(PROGINFO *) ;
@@ -302,8 +302,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -602,7 +602,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -633,7 +633,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                lip->have.linelen = TRUE ;
-	                                lip->final.linelen = TRUE ;
+	                                lip->finval.linelen = TRUE ;
 	                                rs = optvalue(argp,argl) ;
 	                                lip->linelen = rs ;
 	                            }
@@ -643,7 +643,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* use GMT */
 	                    case 'z':
-	                        lip->final.gmt = TRUE ;
+	                        lip->finval.gmt = TRUE ;
 	                        lip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -916,7 +916,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -928,7 +928,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -942,9 +942,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_audit:
-	                    if (! lip->final.audit) {
+	                    if (! lip->finval.audit) {
 	                        lip->have.audit = TRUE ;
-	                        lip->final.audit = TRUE ;
+	                        lip->finval.audit = TRUE ;
 	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -953,9 +953,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_linelen:
-	                    if (! lip->final.linelen) {
+	                    if (! lip->finval.linelen) {
 	                        lip->have.linelen = TRUE ;
-	                        lip->final.linelen = TRUE ;
+	                        lip->finval.linelen = TRUE ;
 	                        lip->fl.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -964,9 +964,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_indent:
-	                    if (! lip->final.indent) {
+	                    if (! lip->finval.indent) {
 	                        lip->have.indent = TRUE ;
-	                        lip->final.indent = TRUE ;
+	                        lip->finval.indent = TRUE ;
 	                        lip->fl.indent = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -975,9 +975,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_separate:
-	                    if (! lip->final.separate) {
+	                    if (! lip->finval.separate) {
 	                        lip->have.separate = TRUE ;
-	                        lip->final.separate = TRUE ;
+	                        lip->finval.separate = TRUE ;
 	                        lip->fl.separate = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -986,9 +986,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_interactive:
-	                    if (! lip->final.interactive) {
+	                    if (! lip->finval.interactive) {
 	                        lip->have.interactive = TRUE ;
-	                        lip->final.interactive = TRUE ;
+	                        lip->finval.interactive = TRUE ;
 	                        lip->fl.interactive = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -997,9 +997,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_defall:
-	                    if (! lip->final.defall) {
+	                    if (! lip->finval.defall) {
 	                        lip->have.defall = TRUE ;
-	                        lip->final.defall = TRUE ;
+	                        lip->finval.defall = TRUE ;
 	                        lip->fl.defall = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1009,9 +1009,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case akoname_defnull:
 	                case akoname_default:
-	                    if (! lip->final.defnull) {
+	                    if (! lip->finval.defnull) {
 	                        lip->have.defnull = TRUE ;
-	                        lip->final.defnull = TRUE ;
+	                        lip->finval.defnull = TRUE ;
 	                        lip->fl.defnull = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1020,9 +1020,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_rotate:
-	                    if (! lip->final.rotate) {
+	                    if (! lip->finval.rotate) {
 	                        lip->have.rotate = TRUE ;
-	                        lip->final.rotate = TRUE ;
+	                        lip->finval.rotate = TRUE ;
 	                        lip->fl.rotate = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1031,9 +1031,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_gmt:
-	                    if (! lip->final.gmt) {
+	                    if (! lip->finval.gmt) {
 	                        lip->have.gmt = TRUE ;
-	                        lip->final.gmt = TRUE ;
+	                        lip->finval.gmt = TRUE ;
 	                        lip->fl.gmt = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1062,7 +1062,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 static int process(pip,aip,bop,ofn,afn,f_apm)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-BITS		*bop ;
+bits		*bop ;
 const char	*ofn;
 const char	*afn;
 int		f_apm ;
@@ -1102,7 +1102,7 @@ int		f_apm ;
 /* end subroutine (process) */
 
 
-static int procsome(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,int f_apm)
+static int procsome(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,int f_apm)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1614,7 +1614,7 @@ static int locinfo_deflinelen(LOCINFO *lip) noex {
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (rs >= def) {
 	                lip->have.linelen = TRUE ;
-	                lip->final.linelen = TRUE ;
+	                lip->finval.linelen = TRUE ;
 	                lip->linelen = rs ;
 		    }
 	        }
