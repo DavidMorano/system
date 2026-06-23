@@ -20,6 +20,23 @@
 	Names:
 	filelines
 
+	Description:
+	Count line in a (refular) file.
+
+	Synopsis:
+	int filelines(cchar *fn) noex
+
+	Arguments:
+	fn		file-name of (regular) file to count line within
+
+	Returns:
+	>=0		number of lines found in the file
+	<0		eror (system-return)
+
+	Notes:
+	This subroutine only counts lines in a regular file, like not
+	in a pipe or socket, and so forth.
+
 *******************************************************************************/
 
 module ;
@@ -30,7 +47,7 @@ module ;
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX |O_{xx}| */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |memchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
@@ -38,7 +55,7 @@ module ;
 #include	<usyscalls.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<deb.hh>		/* |DEBPRINTF| */
+#include	<deb.hh>		/* LIBUC |DEBPRINTF(3uc)| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/deb.ccm"
@@ -116,8 +133,7 @@ int filelines(cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? lines : rs ;
-}
-/* end subroutine (filelines) */
+} /* end subroutine (filelines) */
 
 
 /* local subroutines */
