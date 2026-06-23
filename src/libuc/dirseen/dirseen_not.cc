@@ -43,20 +43,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usyscalls.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<pathclean.h>
-#include	<strnul.hh>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<pathclean.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dirseen.h"
 
@@ -105,8 +105,7 @@ int dirseen_notseen(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex {
 	    } /* end if (dirseen_havename) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (dirseen_notseen) */
+} /* end subroutine (dirseen_notseen) */
 
 int dirseen_notadd(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex {
 	int		rs ;
@@ -121,8 +120,7 @@ int dirseen_notadd(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirseen_notadd) */
+} /* end subroutine (dirseen_notadd) */
 
 
 /* local subroutines */
