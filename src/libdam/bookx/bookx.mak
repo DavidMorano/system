@@ -48,9 +48,9 @@ OBJ3= bvcitekey.o bvchapters.o
 OBJ4= bcspec.o 
 OBJ5= biblecite.o biblemeta.o biblecur.o
 OBJ6= bibleverses.o bibleverse.o
-OBJ7= bibleq.o
+OBJ7= bibleq.o 
 
-OBJ8= biblepara.o
+OBJ8= biblepara.o bibleparas.o
 OBJ9= biblebook.o biblebooks.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
@@ -203,8 +203,10 @@ bibleverses.o:		bibleverses.cc	bibleverses.h			$(INCS)
 bibleverse.o:		bibleverse.cc	bibleverse.h			$(INCS)
 
 bibleq.o:		bibleq.cc	bibleq.h			$(INCS)
+bibleqs.o:		bibleqs.cc	bibleqs.h			$(INCS)
 
 biblepara.o:		biblepara.cc	biblepara.h			$(INCS)
+bibleparas.o:		bibleparas.cc	bibleparas.h			$(INCS)
 
 biblebook.o:		biblebook.cc	biblebook.h			$(INCS)
 biblebooks.o:		biblebooks.cc	biblebooks.h			$(INCS)
