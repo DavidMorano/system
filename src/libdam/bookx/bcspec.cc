@@ -46,7 +46,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<estrings.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
@@ -97,10 +97,10 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	    op->v = 1 ;
 	    if (int v, si, sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
 	        if (int	ch = mkchar(sp[0]) ; isalphalatin(ch)) {
-		    op->sp = sp ;
-	  	    op->sl = sl ;
+		    op->namp = sp ;
+	  	    op->naml = sl ;
 	            if ((si = siourbrk(sp,sl,true)) > 0) {
-	  	        op->sl = si ;
+	  	        op->naml = si ;
 		        sp += si ;
 		        sl -= si ;
 		        if (sl > 0) {
