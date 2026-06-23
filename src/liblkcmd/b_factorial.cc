@@ -1,14 +1,14 @@
-/* b_factorial */
+/* b_factorial SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_TESTFACT	0		/* test using our function */
-
 
 /* revision history:
 
@@ -21,13 +21,13 @@
 
 /*******************************************************************************
 
-	Synopsis:
+  	Name:
+	b_factorial
 
+	Synopsis:
 	$ factorial <num(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -47,7 +47,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<bits.h>
@@ -70,39 +70,8 @@
 
 /* external subroutines */
 
-extern LONG	factorial(int) ;
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -124,16 +93,16 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,void *,cchar *,int) ;
-static int	procspec(PROGINFO *,void *,const char *,int) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procspecs(PROGINFO *,void *,cchar *,int) ;
+local int	procspec(PROGINFO *,void *,const char *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_TESTFACT
 static LONG	ourfact(int) ;
@@ -234,13 +203,13 @@ int p_factorial(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -518,7 +487,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -734,7 +703,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -754,7 +723,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -858,7 +827,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
+local int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -882,7 +851,7 @@ static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 
 
 /* process a specification name */
-static int procspec(PROGINFO *pip,void *ofp,cchar *np,int nl)
+local int procspec(PROGINFO *pip,void *ofp,cchar *np,int nl)
 {
 	int		n ;
 	int		rs ;
@@ -926,7 +895,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *np,int nl)
 /* end subroutine (procspec) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	if (lip == NULL) return SR_FAULT ;
@@ -938,7 +907,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	if (lip == NULL) return SR_FAULT ;
 	return SR_OK ;
