@@ -1,13 +1,13 @@
-/* b_babies */
+/* b_babies SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to for specialized DB access */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -20,13 +20,13 @@
 
 /*******************************************************************************
 
-	Synopsis:
+  	Name:
+	b_babies
 
+	Synopsis:
 	$ babies <date(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -42,29 +42,38 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<cvtdater.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"shio.h"
 #include	"kshlib.h"
 #include	"b_babies.h"
 #include	"defs.h"
-#include	"cvtdater.h"
 #include	"babycalc.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	PI		proginfo
 
 #define	LOCINFO		struct locinfo
 #define	LOCINFO_FL	struct locinfo_flags
@@ -72,22 +81,8 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) ;
@@ -95,12 +90,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -114,54 +103,40 @@ struct locinfo_flags {
 	uint		cvtdater:1 ;
 	uint		babycalc:1 ;
 	uint		info:1 ;
-} ;
+} ; /* end struct (loginfo_flags) */
 
 struct locinfo {
 	cchar		*dbname ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, fl, changed, finval ;
 	LOCINFO_FL	open ;
-	PROGINFO	*pip ;
-	CVTDATER	cvt ;
+	PI		*pip ;
+	cvtdater	cvt ;
 	BABYCALC	bc ;
-} ;
+} ; /* end struct (loginfo_flags) */
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,mainv,mainv,void *) noex ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PI *) noex ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,void *,cchar *,int) ;
-static int	procinfo(PROGINFO *,void *) ;
-static int	procspec(PROGINFO *,void *, cchar *,int) ;
+local int	procargs(PI *,ARGINFO *,bits *,cchar *,cchar *) noex ;
+local int	procspecs(PI *,void *,cchar *,int) noex ;
+local int	procinfo(PI *,void *) noex ;
+local int	procspec(PI *,void *, cchar *,int) noex ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_dbname(LOCINFO *,cchar *) ;
-static int	locinfo_dbopen(LOCINFO *) ;
-static int	locinfo_lookinfo(LOCINFO *,BABYCALC_INFO *) ;
-static int	locinfo_lookup(LOCINFO *,cchar *,int,uint *) ;
-static int	locinfo_cvtdater(LOCINFO *) ;
-static int	locinfo_cvtdaterfin(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PI *) noex ;
+local int	locinfo_finish(LOCINFO *) noex ;
+local int	locinfo_dbname(LOCINFO *,cchar *) noex ;
+local int	locinfo_dbopen(LOCINFO *) noex ;
+local int	locinfo_lookinfo(LOCINFO *,BABYCALC_INFO *) noex ;
+local int	locinfo_lookup(LOCINFO *,cchar *,int,uint *) noex ;
+local int	locinfo_cvtdater(LOCINFO *) noex ;
+local int	locinfo_cvtdaterfin(LOCINFO *) noex ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"db",
-	"info",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -175,17 +150,31 @@ enum argopts {
 	argopt_db,
 	argopt_info,
 	argopt_overlast
-} ;
+} ; /* end enum (argopts) */
 
-static const PIVARS	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"db",
+	"info",
+	nullptr
+} ; /* end array */
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
-static const MAPEX	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -197,9 +186,9 @@ static const MAPEX	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array (mapexs) */
 
-static const uchar	aterms[] = {
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -208,37 +197,32 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array (aterms) */
 
 
-/* persistent local variables (special class of local variables) */
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int b_babies(int argc,cchar *argv[],void *contextp)
-{
+int b_babies(int argc,mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
-
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    cchar	**envv = (cchar **) environ ;
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
+	    mainv	envv = mainv(environ) ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ksh) */
-
-	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
-
+	if ((rs < 0) && (ex == EX_OK)) {
+	    ex = EX_DATAERR ;
+	}
 	return ex ;
 }
 /* end subroutine (b_babies) */
 
-
-int p_babies(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_babies(int argc,mainv argv,cchar *envv[],void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_babies) */
@@ -246,15 +230,12 @@ int p_babies(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
-	PROGINFO	pi, *pip = &pi ;
+local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
+	PI		pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -271,18 +252,18 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = FALSE ;
 
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*ofname = NULL ;
-	cchar		*dbname = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*ofname = nullptr ;
+	cchar		*dbname = nullptr ;
 	cchar		*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_babies: starting DFD=%d\n",rs) ;
 	}
@@ -299,13 +280,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
 
 	pip->verboselevel = 1 ;
-	pip->daytime = time(NULL) ;
+	pip->daytime = time(nullptr) ;
 
 	pip->lip = lip ;
 	if (rs >= 0) rs = locinfo_start(lip,pip) ;
@@ -325,18 +306,18 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
 
 	    argp = argv[ai] ;
-	    argl = strlen(argp) ;
+	    argl = lenstr(argp) ;
 
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -353,14 +334,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -374,7 +355,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
-	                        argl = strlen(argp) ;
+	                        argl = lenstr(argp) ;
 	                        if (argl)
 	                            pr = argp ;
 	                    } else
@@ -414,7 +395,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                sn = argp ;
 	                        } else
@@ -432,7 +413,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                afname = argp ;
 	                        } else
@@ -450,7 +431,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                efname = argp ;
 	                        } else
@@ -468,7 +449,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                ofname = argp ;
 	                        } else
@@ -486,7 +467,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                dbname = argp ;
 	                        } else
@@ -515,7 +496,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -541,7 +522,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl)
 	                                pr = argp ;
 	                        } else
@@ -558,9 +539,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
+	                            argl = lenstr(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -612,8 +593,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -666,7 +647,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_SFIO
 	    printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	} /* end if */
 
@@ -678,16 +659,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* initialization */
 
-	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(envv,VARAFNAME) ;
 
-	if (dbname == NULL) dbname = getourenv(envv,VARDBNAME) ;
+	if (dbname == nullptr) dbname = getourenv(envv,VARDBNAME) ;
 
 	if (pip->debuglevel > 0) {
 	    shio_printf(pip->efp,"%s: dbname=%s\n",
 	        pip->progname,dbname) ;
 	}
 
-	if ((rs >= 0) && (pip->n == 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->n == 0) && (argval != nullptr)) {
 	    rs = optvalue(argval,-1) ;
 	    pip->n = rs ;
 	}
@@ -755,10 +736,10 @@ retearly:
 	    debugprintf("b_babies: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = FALSE ;
 	    shio_close(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
@@ -802,9 +783,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-
-static int usage(PROGINFO *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -826,9 +805,7 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
-{
+local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn) noex {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -837,7 +814,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
@@ -853,11 +830,11 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	    if (rs >= 0) {
 	        int	ai ;
-	        int	f ;
+	        bool	f ;
 	        cchar	**argv = aip->argv ;
 	        for (ai = 1 ; ai < aip->argc ; ai += 1) {
 	            f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	            f = f || ((ai > aip->ai_pos) && (argv[ai] != NULL)) ;
+	            f = f || ((ai > aip->ai_pos) && (argv[ai] != nullptr)) ;
 	            if (f) {
 	                cp = argv[ai] ;
 	                if (cp[0] != '\0') {
@@ -872,14 +849,14 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	        } /* end for (handling positional arguments) */
 	    } /* end if (ok) */
 
-	    if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	    if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	        SHIO	afile, *afp = &afile ;
 
 	        if (strcmp(afn,"-") == 0)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
 	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -931,38 +908,34 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 }
 /* end subroutine (procargs) */
 
-
-static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
-{
-	FIELD		fsb ;
+local int procspecs(PI *pip,void *ofp,cchar *lbuf,int llen) noex {
 	int		rs ;
+	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
-	    int		fl ;
+	if (field fsb ; (rs = field_start(&fsb,lbuf,llen)) >= 0) {
 	    cchar	*fp ;
-	    while ((fl = field_get(&fsb,aterms,&fp)) >= 0) {
+	    for (int dl ; (fl = field_get(&fsb,aterms,&fp)) >= 0 ; ) {
 	        if (fl > 0) {
 	            rs = procspec(pip,ofp,fp,fl) ;
 	            wlen += rs ;
 	        }
 	        if (fsb.term == '#') break ;
 	        if (rs < 0) break ;
-	    } /* end while */
-	    field_finish(&fsb) ;
+	    } /* end for */
+	    rs1 = field_finish(&fsb) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procspecs) */
 
-
 /* process an information request */
-static int procinfo(PROGINFO *pip,void *ofp)
-{
+local int procinfo(PI *pip,void *ofp) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (ofp != NULL) {
+	if (ofp != nullptr) {
 	    BABYCALC_INFO	bi ;
 	    if ((rs = locinfo_lookinfo(lip,&bi)) >= 0) {
 	        if (pip->verboselevel > 0) {
@@ -995,16 +968,14 @@ static int procinfo(PROGINFO *pip,void *ofp)
 }
 /* end subroutine (procinfo) */
 
-
 /* process a specification name */
-static int procspec(PROGINFO *pip,void *ofp,cchar np[],int nl)
-{
+local int procspec(PI *pip,void *ofp,cchar *nap,int nal) noex {
 	LOCINFO		*lip = pip->lip ;
 	uint		count = 0 ;
 	int		rs ;
 	int		wlen = 0 ;
 
-	if (np == NULL) return SR_FAULT ;
+	if (nap == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1015,7 +986,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar np[],int nl)
 	    shio_printf(pip->efp,"%s: reqdate=%r\n",pip->progname,np,nl) ;
 	}
 
-	rs = locinfo_lookup(lip,np,nl,&count) ;
+	rs = locinfo_lookup(lip,nap,nal,&count) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1042,30 +1013,24 @@ static int procspec(PROGINFO *pip,void *ofp,cchar np[],int nl)
 }
 /* end subroutine (procspec) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
-
-	if (lip == NULL) return SR_FAULT ;
-
-	memset(lip,0,sizeof(LOCINFO)) ;
+local int locinfo_start(LOCINFO *lip,PI *pip) noex {
+	if (lip == nullptr) return SR_FAULT ;
+	memclear(lip) ;
 	lip->pip = pip ;
 
 	return SR_OK ;
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip == NULL) return SR_FAULT ;
-
+	if (lip == nullptr) return SR_FAULT ;
+	{
 	rs1 = locinfo_cvtdaterfin(lip) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	if (lip->open.babycalc) {
 	    lip->open.babycalc = FALSE ;
 	    rs1 = babycalc_close(&lip->bc) ;
@@ -1076,24 +1041,19 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_dbname(LOCINFO *lip,cchar *dbname)
-{
-
-	if (lip == NULL) return SR_FAULT ;
+local int locinfo_dbname(LOCINFO *lip,cchar *dbname) noex {
+	if (lip == nullptr) return SR_FAULT ;
 
 	lip->dbname = dbname ;
 	return SR_OK ;
 }
 /* end subroutine (locinfo_dbname) */
 
-
-static int locinfo_dbopen(LOCINFO *lip)
-{
-	PROGINFO	*pip ;
+local int locinfo_dbopen(LOCINFO *lip) noex {
+	PI		*pip ;
 	int		rs = SR_OK ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	pip = lip->pip ;
 	if (! lip->fl.babycalc) {
@@ -1115,12 +1075,11 @@ static int locinfo_dbopen(LOCINFO *lip)
 /* end subroutine (locinfo_dbopen) */
 
 
-static int locinfo_lookinfo(LOCINFO *lip,BABYCALC_INFO *bip)
-{
+local int locinfo_lookinfo(LOCINFO *lip,BABYCALC_INFO *bip) noex {
 	int		rs = SR_OK ;
 
-	if (lip == NULL) return SR_FAULT ;
-	if (bip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
+	if (bip == nullptr) return SR_FAULT ;
 
 	if (! lip->fl.babycalc) {
 	    rs = locinfo_dbopen(lip) ;
@@ -1134,20 +1093,18 @@ static int locinfo_lookinfo(LOCINFO *lip,BABYCALC_INFO *bip)
 }
 /* end subroutine (locinfo_lookinfo) */
 
-
-static int locinfo_lookup(LOCINFO *lip,cchar *np,int nl,uint *rp)
-{
-	PROGINFO	*pip = lip->pip ;
+local int locinfo_lookup(LOCINFO *lip,cchar *nap,int nal,uint *rp) noex {
+	PI		*pip = lip->pip ;
 	int		rs = SR_OK ;
 
-	if (np == NULL) return SR_FAULT ;
+	if (nap == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("b_babies/locinfo_lookup: ent q=%r\n",np,nl) ;
 #endif
 
-	if (nl < 0) nl = strlen(np) ;
+	if (nl < 0) nl = lenstr(nap) ;
 
 	if (! lip->fl.babycalc) {
 	    rs = locinfo_dbopen(lip) ;
@@ -1156,7 +1113,7 @@ static int locinfo_lookup(LOCINFO *lip,cchar *np,int nl,uint *rp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("b_babies/locinfo_lookup: mid1 rs=%d q=%r\n",
-	        rs,np,strlinelen(np,nl,50)) ;
+	        rs,nap,strlinelen(nap,nl,50)) ;
 #endif
 
 	if (rs >= 0) {
@@ -1168,8 +1125,8 @@ static int locinfo_lookup(LOCINFO *lip,cchar *np,int nl,uint *rp)
 	            debugprintf("b_babies/locinfo_lookup: mid2 rs=%d\n",rs) ;
 #endif
 
-	        if ((rs >= 0) && (nl > 0) && (np[0] != '-')) {
-	            rs = cvtdater_load(&lip->cvt,&rd,np,nl) ;
+	        if ((rs >= 0) && (nl > 0) && (nap[0] != '-')) {
+	            rs = cvtdater_load(&lip->cvt,&rd,nap,nl) ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
 	                debugprintf("b_babies/locinfo_lookup: "
@@ -1181,7 +1138,7 @@ static int locinfo_lookup(LOCINFO *lip,cchar *np,int nl,uint *rp)
 	            rs = babycalc_lookup(&lip->bc,rd,rp) ;
 	        } /* end if */
 
-	        if ((rs < 0) && (rp != NULL)) {
+	        if ((rs < 0) && (rp != nullptr)) {
 	            *rp = 0 ;
 	        }
 
@@ -1197,13 +1154,11 @@ static int locinfo_lookup(LOCINFO *lip,cchar *np,int nl,uint *rp)
 }
 /* end subroutine (locinfo_lookup) */
 
-
-static int locinfo_cvtdater(LOCINFO *lip)
-{
+local int locinfo_cvtdater(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	if (! lip->fl.cvtdater) {
-	    PROGINFO	*pip = lip->pip ;
-	    CVTDATER	*cdp = &lip->cvt ;
+	    PI		*pip = lip->pip ;
+	    cvtdater	*cdp = &lip->cvt ;
 	    lip->fl.cvtdater = TRUE ;
 	    rs = cvtdater_start(cdp,pip->daytime) ;
 	    lip->open.cvtdater = (rs >= 0) ;
@@ -1212,13 +1167,11 @@ static int locinfo_cvtdater(LOCINFO *lip)
 }
 /* end subroutine (locinfo_cvtdater) */
 
-
-static int locinfo_cvtdaterfin(LOCINFO *lip)
-{
+local int locinfo_cvtdaterfin(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (lip->open.cvtdater) {
-	    CVTDATER	*cdp = &lip->cvt ;
+	    cvtdater	*cdp = &lip->cvt ;
 	    lip->open.cvtdater = FALSE ;
 	    rs1 = cvtdater_finish(cdp) ;
 	    if (rs >= 0) rs = rs1 ;
