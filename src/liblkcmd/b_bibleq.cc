@@ -1,4 +1,5 @@
-/* b_bibleq SUPPORT */
+/* b_bibleq SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* query the bible database using words as the query keys */
@@ -20,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_bibleq
+
+	Description:
 	This is a built-in command to the KSH shell.  This little
 	program looks up a number in a database and returns the
 	corresponding string.
@@ -44,18 +49,21 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<bits.h>
-#include	<keyopt.h>
-#include	<estrings.h>
-#include	<field.h>
-#include	<vecstr.h>
-#include	<wordfill.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bits.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<wordfill.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -80,45 +88,16 @@
 
 #define	NBLANKS		20
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#define	PI		proginfo
+
+#define	LI		locinfo
+#define	LI_FL	locinfo_fl
 
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	hasnonwhite(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isStrEmpty(cchar *,int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
+extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
 
 
 /* external variables */
@@ -128,7 +107,7 @@ extern char	**environ ;		/* definition required by AT&T AST */
 
 /* local structures */
 
-struct locinfo_flags {
+struct locinfo_fl {
 	uint		n:1 ;
 	uint		audit:1 ;
 	uint		linelen:1 ;
@@ -141,7 +120,7 @@ struct locinfo_flags {
 	uint		separate:1 ;
 	uint		para:1 ;
 	uint		clump:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
 	BIBLEBOOK	ndb ;		/* bible-book-name DB */
@@ -151,54 +130,39 @@ struct locinfo {
 	cchar		*ndbname ;	/* name-db */
 	cchar		*vdbname ;	/* verse-db name */
 	cchar		*pdbname ;	/* paragraph-db name */
-	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, changed, final ;
-	LOCINFO_FL	open ;
+	PI	*pip ;
+	LI_FL	have, fl, changed, finval ;
+	LI_FL	open ;
 	int		linelen ;
 	int		indent ;
 	int		nverses ;
 	int		count, max, precision ;
 	int		cout ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,con mainv,con mainv,void *) noex ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_nlookup(LOCINFO *,int,char *,int) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_deflinelen(LOCINFO *) ;
-static int	locinfo_ispara(LOCINFO *,BIBLEQ_Q *) ;
+local int	locinfo_start(LI *,PI *) ;
+local int	locinfo_nlookup(LI *,int,char *,int) ;
+local int	locinfo_finish(LI *) ;
+local int	locinfo_deflinelen(LI *) ;
+local int	locinfo_ispara(LI *,BIBLEQ_Q *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PI *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,cchar *,int) ;
-static int	procspec(PROGINFO *,vecstr *) ;
-static int	procoutcite(PROGINFO *,BIBLEQ_Q *,int) ;
-static int	procout(PROGINFO *,BIBLEQ_QUERY *,cchar *,int) ;
-static int	procoutline(PROGINFO *,cchar *,int) ;
+local int	procopts(PI *,keyopt *) ;
+local int	procargs(PI *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procspecs(PI *,cchar *,int) ;
+local int	procspec(PI *,vecstr *) ;
+local int	procoutcite(PI *,BIBLEQ_Q *,int) ;
+local int	procout(PI *,BIBLEQ_QUERY *,cchar *,int) ;
+local int	procoutline(PI *,cchar *,int) ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"ndb",
-	"pdb",
-	"vdb",
-	"bookname",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -213,17 +177,32 @@ enum argopts {
 	argopt_vdb,
 	argopt_bookname,
 	argopt_overlast
-} ;
+} ; /* end enum (argopts) */
 
-static const PIVARS	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"ndb",
+	"pdb",
+	"vdb",
+	"bookname",
+	nullptr
+} ; /* end array */
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
-static const MAPEX	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -235,20 +214,7 @@ static const MAPEX	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
-
-static const char	*akonames[] = {
-	"audit",
-	"linelen",
-	"indent",
-	"bookname",
-	"interactive",
-	"prefix",
-	"separate",
-	"para",
-	"clump",
-	NULL
-} ;
+} ; /* end array */
 
 enum akonames {
 	akoname_audit,
@@ -261,11 +227,22 @@ enum akonames {
 	akoname_para,
 	akoname_clump,
 	akoname_overlast
-} ;
+} ; /* end enum */
 
-static const char	blanks[NBLANKS+1] = "                    " ;
+constexpr cpcchar	akonames[] = {
+	"audit",
+	"linelen",
+	"indent",
+	"bookname",
+	"interactive",
+	"prefix",
+	"separate",
+	"para",
+	"clump",
+	nullptr
+} ; /* end array */
 
-static const uchar	aterms[] = {
+constexpr char		aterms[] = {
 	0x00, 0x0A, 0x00, 0x00,
 	0x09, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -274,19 +251,22 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
+
+constexpr char		blanks[NBLANKS+1] = "                    " ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int b_bibleq(int argc,cchar *argv[],void *contextp)
-{
+int b_bibleq(int argc,con mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
 
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
 	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
@@ -296,28 +276,21 @@ int b_bibleq(int argc,cchar *argv[],void *contextp)
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
 
 	return ex ;
-}
-/* end subroutine (b_bibleq) */
+} /* end subroutine (b_bibleq) */
 
-
-int p_bibleq(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_bibleq(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
-}
-/* end subroutine (p_bibleq) */
+} /* end subroutine (p_bibleq) */
 
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
-	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
+	PI	pi, *pip = &pi ;
+	LI		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -329,25 +302,25 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		rs, rs1 ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
 
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*ofname = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*ndbname = NULL ;
-	cchar		*pdbname = NULL ;
-	cchar		*vdbname = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*ofname = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*ndbname = nullptr ;
+	cchar		*pdbname = nullptr ;
+	cchar		*vdbname = nullptr ;
 	cchar		*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("bibleq: starting DFD=%d\n",rs) ;
 	}
@@ -364,7 +337,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
@@ -391,7 +364,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -402,7 +375,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -418,15 +391,15 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -439,7 +412,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -447,7 +420,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* program root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -463,13 +436,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -487,7 +460,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* argument file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -505,7 +478,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -523,7 +496,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* output file */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -541,7 +514,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* BibleName DB name */
 	                case argopt_ndb:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ndbname = avp ;
 	                    } else {
@@ -559,7 +532,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* paragraph-db name */
 	                case argopt_pdb:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pdbname = avp ;
 	                    } else {
@@ -577,7 +550,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* BibleVverse DB name */
 	                case argopt_vdb:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            vdbname = avp ;
 	                    } else {
@@ -593,11 +566,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_bookname:
-	                    lip->have.bookname = TRUE ;
-	                    lip->final.bookname = TRUE ;
-	                    lip->fl.bookname = TRUE ;
+	                    lip->have.bookname = true ;
+	                    lip->finval.bookname = true ;
+	                    lip->fl.bookname = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->fl.bookname = (rs > 0) ;
@@ -615,7 +588,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -623,7 +596,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -633,7 +606,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->fl.quiet = TRUE ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -650,7 +623,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 	                    case 'n':
@@ -659,8 +632,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                lip->have.nverses = TRUE ;
-	                                lip->final.nverses = TRUE ;
+	                                lip->have.nverses = true ;
+	                                lip->finval.nverses = true ;
 	                                rs = optvalue(argp,argl) ;
 	                                lip->nverses = rs ;
 	                            }
@@ -675,7 +648,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -683,7 +656,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'p':
-	                        lip->fl.prefix = TRUE ;
+	                        lip->fl.prefix = true ;
 	                        break ;
 
 	                    case 'q':
@@ -694,7 +667,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -709,8 +682,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                lip->have.linelen = TRUE ;
-	                                lip->final.linelen = TRUE ;
+	                                lip->have.linelen = true ;
+	                                lip->finval.linelen = true ;
 	                                rs = optvalue(argp,argl) ;
 	                                lip->linelen = rs ;
 	                            }
@@ -719,7 +692,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -747,12 +720,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -800,7 +773,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_SFIO
 	    printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	}
 
@@ -812,10 +785,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* argument processing */
 
-	if ((rs >= 0) && (lip->nverses <= 0) && (argval != NULL)) {
+	if ((rs >= 0) && (lip->nverses <= 0) && (argval != nullptr)) {
 	    if ((rs = optvalue(argval,-1)) >= 0) {
-	        lip->have.nverses = TRUE ;
-	        lip->final.nverses = TRUE ;
+	        lip->have.nverses = true ;
+	        lip->finval.nverses = true ;
 	        lip->nverses = rs ;
 	    }
 	}
@@ -828,20 +801,20 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* argument defaults */
 
-	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(envv,VARAFNAME) ;
 
-	if (ndbname == NULL) ndbname = getourenv(envv,VARNDB) ;
+	if (ndbname == nullptr) ndbname = getourenv(envv,VARNDB) ;
 	lip->ndbname = ndbname ;
 
 /* paragraph-db name */
 
-	if (pdbname == NULL) pdbname = getourenv(envv,VARPDB) ;
+	if (pdbname == nullptr) pdbname = getourenv(envv,VARPDB) ;
 	lip->pdbname = pdbname ;
 
 /* verse-db name */
 
-	if (vdbname == NULL) vdbname = getourenv(envv,VARVDB) ;
-	if (vdbname == NULL) vdbname = VDBNAME ;
+	if (vdbname == nullptr) vdbname = getourenv(envv,VARVDB) ;
+	if (vdbname == nullptr) vdbname = VDBNAME ;
 
 /* display some answers */
 
@@ -850,13 +823,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    cchar	*fmt ;
 	    fmt = "%s: ndb=%s\n" ;
 	    shio_printf(pip->efp,fmt,pn,
-		((ndbname != NULL) ? ndbname : "NULL")) ;
+		((ndbname != nullptr) ? ndbname : "nullptr")) ;
 	    fmt = "%s: pdb=%s\n" ;
 	    shio_printf(pip->efp,fmt,pn,
-	        ((pdbname != NULL) ? pdbname : "NULL")) ;
+	        ((pdbname != nullptr) ? pdbname : "nullptr")) ;
 	    fmt = "%s: vdb=%s\n" ;
 	    shio_printf(pip->efp,fmt,pn,
-	        ((vdbname != NULL) ? vdbname : "NULL")) ;
+	        ((vdbname != nullptr) ? vdbname : "nullptr")) ;
 	}
 
 	if (rs >= 0) {
@@ -915,7 +888,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        shio_printf(pip->efp,"%s: vdb=%s\n",pn,vdbname) ;
 	        ex = EX_CONFIG ;
 	    }
-	    lip->dbp = NULL ;
+	    lip->dbp = nullptr ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: invalid argument or configuration (%d)\n" ;
@@ -951,14 +924,14 @@ retearly:
 	    debugprintf("bibleq: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	if (pip->efp != nullptr) {
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -995,12 +968,9 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (mainsub) */
+} /* end subroutine (mainsub) */
 
-
-static int usage(PROGINFO *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -1019,24 +989,21 @@ static int usage(PROGINFO *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
-
+} /* end subroutine (usage) */
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
-{
-	LOCINFO		*lip = pip->lip ;
+local int procopts(PI *pip,keyopt *kop) noex {
+	LI		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
 
-	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
+	if ((cp = getourenv(pip->envv,VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -1046,15 +1013,15 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 
 	                case akoname_audit:
-	                    if (! lip->final.audit) {
-	                        lip->have.audit = TRUE ;
-	                        lip->final.audit = TRUE ;
-	                        lip->fl.audit = TRUE ;
+	                    if (! lip->finval.audit) {
+	                        lip->have.audit = true ;
+	                        lip->finval.audit = true ;
+	                        lip->fl.audit = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.audit = (rs > 0) ;
@@ -1063,10 +1030,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_linelen:
-	                    if (! lip->final.linelen) {
-	                        lip->have.linelen = TRUE ;
-	                        lip->final.linelen = TRUE ;
-	                        lip->fl.linelen = TRUE ;
+	                    if (! lip->finval.linelen) {
+	                        lip->have.linelen = true ;
+	                        lip->finval.linelen = true ;
+	                        lip->fl.linelen = true ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->linelen = rs ;
@@ -1075,9 +1042,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_indent:
-	                    if (! lip->final.indent) {
-	                        lip->have.indent = TRUE ;
-	                        lip->final.indent = TRUE ;
+	                    if (! lip->finval.indent) {
+	                        lip->have.indent = true ;
+	                        lip->finval.indent = true ;
 	                        lip->indent = 1 ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1087,10 +1054,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_bookname:
-	                    if (! lip->final.bookname) {
-	                        lip->have.bookname = TRUE ;
-	                        lip->final.bookname = TRUE ;
-	                        lip->fl.bookname = TRUE ;
+	                    if (! lip->finval.bookname) {
+	                        lip->have.bookname = true ;
+	                        lip->finval.bookname = true ;
+	                        lip->fl.bookname = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.bookname = (rs > 0) ;
@@ -1099,10 +1066,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_interactive:
-	                    if (! lip->final.interactive) {
-	                        lip->have.interactive = TRUE ;
-	                        lip->final.interactive = TRUE ;
-	                        lip->fl.interactive = TRUE ;
+	                    if (! lip->finval.interactive) {
+	                        lip->have.interactive = true ;
+	                        lip->finval.interactive = true ;
+	                        lip->fl.interactive = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.interactive = (rs > 0) ;
@@ -1111,10 +1078,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_prefix:
-	                    if (! lip->final.prefix) {
-	                        lip->have.prefix = TRUE ;
-	                        lip->final.prefix = TRUE ;
-	                        lip->fl.prefix = TRUE ;
+	                    if (! lip->finval.prefix) {
+	                        lip->have.prefix = true ;
+	                        lip->finval.prefix = true ;
+	                        lip->fl.prefix = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.prefix = (rs > 0) ;
@@ -1123,10 +1090,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_separate:
-	                    if (! lip->final.separate) {
-	                        lip->have.separate = TRUE ;
-	                        lip->final.separate = TRUE ;
-	                        lip->fl.separate = TRUE ;
+	                    if (! lip->finval.separate) {
+	                        lip->have.separate = true ;
+	                        lip->finval.separate = true ;
+	                        lip->fl.separate = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.separate = (rs > 0) ;
@@ -1135,10 +1102,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_para:
-	                    if (! lip->final.para) {
-	                        lip->have.para = TRUE ;
-	                        lip->final.para = TRUE ;
-	                        lip->fl.para = TRUE ;
+	                    if (! lip->finval.para) {
+	                        lip->have.para = true ;
+	                        lip->finval.para = true ;
+	                        lip->fl.para = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.para = (rs > 0) ;
@@ -1147,10 +1114,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_clump:
-	                    if (! lip->final.clump) {
-	                        lip->have.clump = TRUE ;
-	                        lip->final.clump = TRUE ;
-	                        lip->fl.clump = TRUE ;
+	                    if (! lip->finval.clump) {
+	                        lip->have.clump = true ;
+	                        lip->finval.clump = true ;
+	                        lip->fl.clump = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.clump = (rs > 0) ;
@@ -1172,13 +1139,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	} /* end if (ok) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procopts) */
+} /* end subroutine (procopts) */
 
-
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
-{
-	LOCINFO		*lip = pip->lip ;
+local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn) noex {
+	LI		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
@@ -1186,12 +1150,12 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
-	    VECSTR	qstr ;
-	    const int	opts = VECSTR_OCOMPACT ;
+	    vecstr	qstr ;
+	    cint	vo = vecstrm.compact ;
 	    int		cl ;
 	    int		pan = 0 ;
 	    cchar	*cp ;
@@ -1200,13 +1164,13 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    if ((rs = vecstr_start(&qstr,5,opts)) >= 0) {
 
 	        if (rs >= 0) {
-	            const int	argc = aip->argc ;
+	            cint	argc = aip->argc ;
 	            int		ai ;
 	            int		f ;
 	            cchar	**argv = aip->argv ;
 	            for (ai = 1 ; ai < argc ; ai += 1) {
 	                f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	                f = f || ((ai > aip->ai_pos) && (argv[ai] != NULL)) ;
+	                f = f || ((ai > aip->ai_pos) && (argv[ai] != nullptr)) ;
 	                if (f) {
 	                    cp = argv[ai] ;
 			    if (cp[0] != '\0') {
@@ -1235,13 +1199,13 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (qstr) */
 
-	    if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	    if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	        SHIO	afile, *afp = &afile ;
 
 	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1274,7 +1238,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 	    } /* end if (argument-file arguments) */
 
-	    lip->ofp = NULL ;
+	    lip->ofp = nullptr ;
 	    rs1 = shio_close(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
@@ -1289,19 +1253,16 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procargs) */
+} /* end subroutine (procargs) */
 
-
-static int procspecs(PROGINFO *pip,cchar *sp,int sl)
-{
-	LOCINFO		*lip = pip->lip ;
-	VECSTR		qstr ;
+local int procspecs(PI *pip,cchar *sp,int sl) noex {
+	LI		*lip = pip->lip ;
+	vecstr		qstr ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if (sp == NULL) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1317,7 +1278,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 	    int		c = 0 ;
 
 	    if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	        const int	flen = sl ;
+	        cint	flen = sl ;
 	        const uchar	*at = aterms ;
 	        char		*fbuf ;
 	        if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
@@ -1350,13 +1311,10 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procspecs) */
+} /* end subroutine (procspecs) */
 
-
-static int procspec(PROGINFO *pip,vecstr *qsp)
-{
-	LOCINFO		*lip = pip->lip ;
+local int procspec(PI *pip,vecstr *qsp) noex {
+	LI		*lip = pip->lip ;
 	BIBLEQ		*bqp ;
 	BIBLEQ_CUR	cur ;
 	BIBLEQ_CITE	q ;
@@ -1370,13 +1328,13 @@ static int procspec(PROGINFO *pip,vecstr *qsp)
 	    debugprintf("bibleq/procspec: ent\n") ;
 #endif
 
-	if (qsp == NULL) return SR_FAULT ;
+	if (qsp == nullptr) return SR_FAULT ;
 
 	if (lip->fl.prefix) qopts |= BIBLEQ_OPREFIX ;
 
 	bqp = lip->dbp ;
 	if ((rs = bibleq_curbegin(bqp,&cur)) >= 0) {
-	    const int	comlen = BVBUFLEN ;
+	    cint	comlen = BVBUFLEN ;
 	    int		cbl ;
 	    cchar	**qkeya ;
 	    char	combuf[BVBUFLEN + 1] ;
@@ -1386,13 +1344,13 @@ static int procspec(PROGINFO *pip,vecstr *qsp)
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3)) {
 	        int	i ;
-	        for (i = 0 ; qkeya[i] != NULL ; i += 1)
+	        for (i = 0 ; qkeya[i] != nullptr ; i += 1)
 	            debugprintf("bibleq/procspec: sk=>%s<\n",qkeya[i]) ;
 	    }
 #endif /* CF_DEBUG */
 
 	    if ((rs = bibleq_lookup(bqp,&cur,qopts,qkeya)) >= 0) {
-	        const int	ntags = rs ;
+	        cint	ntags = rs ;
 
 	        while ((rs >= 0) && (ntags > 0)) {
 
@@ -1425,21 +1383,18 @@ static int procspec(PROGINFO *pip,vecstr *qsp)
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procspec) */
+} /* end subroutine (procspec) */
 
-
-static int procoutcite(PROGINFO *pip,BIBLEQ_Q *qp,int edays)
-{
-	LOCINFO		*lip = pip->lip ;
-	const int	clen = COLBUFLEN ;
+local int procoutcite(PI *pip,BIBLEQ_Q *qp,int edays) noex {
+	LI		*lip = pip->lip ;
+	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		b = qp->b ;
 	int		c = qp->c ;
 	int		v = qp->v ;
 	int		wlen = 0 ;
-	int		f_havebook = FALSE ;
+	int		f_havebook = false ;
 	cchar		*fmt ;
 	char		cbuf[COLBUFLEN + 1] ;
 
@@ -1461,13 +1416,13 @@ static int procoutcite(PROGINFO *pip,BIBLEQ_Q *qp,int edays)
 /* print out the text-data itself */
 
 	    if (lip->fl.bookname) {
-	        const int	blen = BIBLEBOOK_LEN ;
+	        cint	blen = BIBLEBOOK_LEN ;
 	        int		bbl ;
 	        char	bbuf[BIBLEBOOK_LEN + 1] ;
 
 	        if ((bbl = locinfo_nlookup(lip,qp->b,bbuf,blen)) > 0) {
 
-	            f_havebook = TRUE ;
+	            f_havebook = true ;
 	            fmt = (edays > 0) ? "%r %u:%u (%u)" : "%r %u:%u" ;
 	            rs = bufprintf(cbuf,clen,fmt,bbuf,bbl,c,v,(edays+1)) ;
 	            cl = rs ;
@@ -1495,15 +1450,12 @@ static int procoutcite(PROGINFO *pip,BIBLEQ_Q *qp,int edays)
 	} /* end if (ok) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procoutcite) */
+} /* end subroutine (procoutcite) */
 
-
-static int procout(PROGINFO *pip,BIBLEQ_Q *qp,cchar *vp,int vl)
-{
-	LOCINFO		*lip = pip->lip ;
-	WORDFILL	w ;
-	const int	clen = COLBUFLEN ;
+local int procout(PI *pip,BIBLEQ_Q *qp,cchar *vp,int vl) noex {
+	LI		*lip = pip->lip ;
+	wordfill	w ;
+	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl = vl ;
@@ -1511,7 +1463,7 @@ static int procout(PROGINFO *pip,BIBLEQ_Q *qp,cchar *vp,int vl)
 	int		cbl ;
 	int		line = 0 ;
 	int		wlen = 0 ;
-	int		f_p = FALSE ;
+	int		f_p = false ;
 	cchar		*sp = vp ;
 	char		cbuf[COLBUFLEN + 1] ;
 
@@ -1524,7 +1476,7 @@ static int procout(PROGINFO *pip,BIBLEQ_Q *qp,cchar *vp,int vl)
 
 /* print out the text-data itself */
 
-	if (f_p) sp = NULL ;
+	if (f_p) sp = nullptr ;
 
 	if (rs >= 0) {
 	    if ((rs = wordfill_start(&w,sp,sl)) >= 0) {
@@ -1539,13 +1491,11 @@ static int procout(PROGINFO *pip,BIBLEQ_Q *qp,cchar *vp,int vl)
 	            cl = wordfill_mklinefull(&w,cbuf,cbl) ;
 	            if ((cl == 0) || (cl == SR_NOTFOUND)) break ;
 	            rs = cl ;
-
 	            if (rs >= 0) {
 	                rs = procoutline(pip,cbuf,cl) ;
 	                wlen += rs ;
 	                line += 1 ;
 	            }
-
 	        } /* end while (full lines) */
 
 	        if (rs >= 0) {
@@ -1553,8 +1503,9 @@ static int procout(PROGINFO *pip,BIBLEQ_Q *qp,cchar *vp,int vl)
 	                rs = procoutline(pip,cbuf,cl) ;
 	                wlen += rs ;
 	                line += 1 ;
-	            } else if (cl != SR_NOTFOUND)
+	            } else if (cl != SR_NOTFOUND) {
 	                rs = cl ;
+		    }
 	        } /* end if (partial lines) */
 
 	        rs1 = wordfill_finish(&w) ;
@@ -1563,73 +1514,56 @@ static int procout(PROGINFO *pip,BIBLEQ_Q *qp,cchar *vp,int vl)
 	} /* end if (ok) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procout) */
+} /* end subroutine (procout) */
 
-
-static int procoutline(PROGINFO *pip,cchar *lp,int ll)
-{
-	LOCINFO		*lip = pip->lip ;
+local int procoutline(PI *pip,cchar *lp,int ll) noex {
+	LI		*lip = pip->lip ;
 	int		rs ;
 	int		indent ;
 	int		wlen = 0 ;
-
+	{
 	indent = MIN(lip->indent,NBLANKS) ;
-	rs = shio_printf(lip->ofp,"%r%r\n", blanks,indent, lp,ll) ;
+	rs = shio_printf(lip->ofp,"%r%r\n",blanks,indent,lp,ll) ;
 	wlen += rs ;
-
+	}
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procoutline) */
+} /* end subroutine (procoutline) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+local int locinfo_start(LI *lip,PI *pip) noex {
 	int		rs = SR_OK ;
-
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 	lip->count = -1 ;
 	lip->max = -1 ;
-	lip->fl.separate = TRUE ;
+	lip->fl.separate = true ;
 	lip->indent = OPT_INDENT ;
 	lip->fl.bookname = OPT_BOOKNAME ;
-
 	return rs ;
-}
-/* end subroutine (locinfo_start) */
+} /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+local int locinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (lip->open.para) {
-	    lip->open.para = FALSE ;
+	    lip->open.para = false ;
 	    rs1 = biblepara_close(&lip->pdb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	if (lip->have.ndb && lip->fl.ndb) {
-	    lip->have.ndb = FALSE ;
-	    lip->fl.ndb = FALSE ;
+	    lip->have.ndb = false ;
+	    lip->fl.ndb = false ;
 	    rs1 = biblebook_close(&lip->ndb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
-}
-/* end subroutine (locinfo_finish) */
+} /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_deflinelen(LOCINFO *lip)
-{
-	const int	def = (DEFPRECISION + 2) ;
+local int locinfo_deflinelen(LI *lip) noex {
+	cint	def = (DEFPRECISION + 2) ;
 	int		rs = SR_OK ;
 	if (lip->linelen < def) {
-	    PROGINFO	*pip = lip->pip ;
-	    cchar	*cp = NULL ;
+	    PI	*pip = lip->pip ;
+	    cchar	*cp = nullptr ;
 	    if (isStrEmpty(cp,-1)) {
 		cp = getourenv(pip->envv,VARLINELEN) ;
 	    }
@@ -1639,22 +1573,21 @@ static int locinfo_deflinelen(LOCINFO *lip)
 	    if (hasnonwhite(cp,-1)) {
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (rs >= def) {
-	                lip->have.linelen = TRUE ;
-	                lip->final.linelen = TRUE ;
+	                lip->have.linelen = true ;
+	                lip->finval.linelen = true ;
 	                lip->linelen = rs ;
 		    }
 	        }
 	    }
 	}
-	if (lip->linelen < def ) lip->linelen = COLUMNS ;
+	if (lip->linelen < def) {
+	    lip->linelen = COLUMNS ;
+	}
 	return rs ;
-}
-/* end subroutine (locinfo_deflinelen) */
+} /* end subroutine (locinfo_deflinelen) */
 
-
-static int locinfo_nlookup(LOCINFO *lip,int bi,char nbuf[],int nlen)
-{
-	PROGINFO	*pip = lip->pip ;
+local int locinfo_nlookup(LI *lip,int bi,char *nbuf,int nlen) noex {
+	PI	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -1665,7 +1598,7 @@ static int locinfo_nlookup(LOCINFO *lip,int bi,char nbuf[],int nlen)
 
 	nbuf[0] = '\0' ;
 	if (! lip->have.ndb) {
-	    lip->have.ndb = TRUE ;
+	    lip->have.ndb = true ;
 	    rs = biblebook_open(&lip->ndb,pip->pr,lip->ndbname) ;
 	    lip->fl.ndb = (rs >= 0) ;
 
@@ -1691,17 +1624,14 @@ static int locinfo_nlookup(LOCINFO *lip,int bi,char nbuf[],int nlen)
 #endif
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_nlookup) */
+} /* end subroutine (locinfo_nlookup) */
 
-
-static int locinfo_ispara(LOCINFO *lip,BIBLEQ_Q *qp)
-{
-	PROGINFO	*pip = lip->pip ;
+local int locinfo_ispara(LI *lip,BIBLEQ_Q *qp) noex {
+	PI	*pip = lip->pip ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	if (qp == NULL) return SR_FAULT ;
+	if (qp == nullptr) return SR_FAULT ;
 
 	if (lip->fl.para) {
 
@@ -1733,7 +1663,6 @@ static int locinfo_ispara(LOCINFO *lip,BIBLEQ_Q *qp)
 	} /* end if (ispara) */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (locinfo_ispara) */
+} /* end subroutine (locinfo_ispara) */
 
 
