@@ -1,4 +1,9 @@
-/* config */
+/* bibleverse_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* retrieve bible verses by citation */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,17 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+
+#ifndef	BIBLEVERSECONFIG_INCLUDE
+#define	BIBLEVERSECONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #define	VERSION		"0"
@@ -92,10 +108,13 @@
 
 #define	TO_MKWAIT	(1 * 50)	/* make-db timeout */
 
-#define	OPT_BOOKNAME	TRUE		/* boolean */
 #define	OPT_INDENT	1		/* value */
-#define	OPT_DEFNULL	TRUE		/* boolean */
-#define	OPT_SEPARATE	FALSE		/* boolean */
-#define	OPT_TRYCACHE	TRUE		/* boolean */
+#define	OPT_BOOKNAME	true		/* boolean */
+#define	OPT_DEFNULL	true		/* boolean */
+#define	OPT_SEPARATE	false		/* boolean */
+#define	OPT_TRYCACHE	true		/* boolean */
+
+
+#endif /* BIBLEVERSECONFIG_INCLUDE */
 
 
