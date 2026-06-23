@@ -548,7 +548,7 @@ local int sysvars_indopenseq(SVS *op,SUBINFO *sip) noex {
 	} /* end if (dirseen) */
 	return rs ;
 }
-/* end subroutines (sysvars_indopenseq) */
+/* end subroutine (sysvars_indopenseq) */
 
 local int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
 		vecstr *sdp,expcook *ecp) noex {
@@ -656,7 +656,7 @@ local int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 	} /* end if (ok) */
 	return rs ;
 }
-/* end subroutines (sysvars_loadcooks) */
+/* end subroutine (sysvars_loadcooks) */
 
 local int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
 	int		rs ;
@@ -703,7 +703,7 @@ local int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
 
 	return rs ;
 }
-/* end subroutines (sysvars_indopenalt) */
+/* end subroutine (sysvars_indopenalt) */
 
 local int sysvars_indmk(SVS *op,cchar *dname) noex {
 	cint		rsn = SR_NOTFOUND ;
