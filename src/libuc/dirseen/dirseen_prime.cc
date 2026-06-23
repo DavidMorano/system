@@ -29,19 +29,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>		/* |ustat| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<nulstr.h>
-#include	<sncpyx.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX |ustat| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dirseen.h"
 
@@ -57,7 +57,6 @@ import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -93,12 +92,12 @@ typedef dirseen_ent	**entpp ;
 
 /* forward references */
 
-static int entry_start(dirseen_ent *,cchar *,int,dev_t,ino_t) noex ;
-static int entry_finish(dirseen_ent *) noex ;
+local int entry_start	(dirseen_ent *,cchar *,int,dev_t,ino_t) noex ;
+local int entry_finish	(dirseen_ent *) noex ;
 
 extern "C" {
-    static int vcmpname(cvoid **,cvoid **) noex ;
-    static int vcmpdevino(cvoid **,cvoid **) noex ;
+    local int vcmpname		(cvoid **,cvoid **) noex ;
+    local int vcmpdevino	(cvoid **,cvoid **) noex ;
 }
 
 
@@ -132,8 +131,7 @@ int dirseen_start(dirseen *op) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dirseen_start) */
+} /* end subroutine (dirseen_start) */
 
 int dirseen_finish(dirseen *op) noex {
 	int		rs ;
@@ -162,8 +160,7 @@ int dirseen_finish(dirseen *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirseen_finish) */
+} /* end subroutine (dirseen_finish) */
 
 int dirseen_add(dirseen *op,cchar *sp,int sl,ustat *sbp) noex {
 	cnullptr	np{} ;
@@ -193,8 +190,7 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,ustat *sbp) noex {
 	    } /* end if (vecobj_search) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirseen_add) */
+} /* end subroutine (dirseen_add) */
 
 int dirseen_havename(dirseen *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -203,8 +199,7 @@ int dirseen_havename(dirseen *op,cchar *sp,int sl) noex {
 	    rs = vecobj_search(op->dlistp,&e,vcmpname,nullptr) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirseen_havename) */
+} /* end subroutine (dirseen_havename) */
 
 int dirseen_havedevino(dirseen *op,ustat *sbp) noex {
 	int		rs ;
@@ -213,8 +208,7 @@ int dirseen_havedevino(dirseen *op,ustat *sbp) noex {
 	    rs = vecobj_search(op->dlistp,&e,vcmpdevino,nullptr) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirseen_havedevino) */
+} /* end subroutine (dirseen_havedevino) */
 
 int dirseen_count(dirseen *op) noex {
 	int		rs ;
@@ -222,8 +216,7 @@ int dirseen_count(dirseen *op) noex {
 	    rs = vecobj_count(op->dlistp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirseen_count) */
+} /* end subroutine (dirseen_count) */
 
 int dirseen_curbegin(dirseen *op,dirseen_cur *curp) noex {
 	int		rs ;
@@ -231,8 +224,7 @@ int dirseen_curbegin(dirseen *op,dirseen_cur *curp) noex {
 	    memclear(curp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirseen_curbegin) */
+} /* end subroutine (dirseen_curbegin) */
 
 int dirseen_curend(dirseen *op,dirseen_cur *curp) noex {
 	int		rs ;
@@ -240,8 +232,7 @@ int dirseen_curend(dirseen *op,dirseen_cur *curp) noex {
 	    memclear(curp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirseen_curend) */
+} /* end subroutine (dirseen_curend) */
 
 int dirseen_curenum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -259,8 +250,7 @@ int dirseen_curenum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 	    } /* end if (got one) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirseen_curenum) */
+} /* end subroutine (dirseen_curenum) */
 
 
 /* private subroutines */
@@ -277,11 +267,23 @@ int dirseen::havedevino(ustat *sbp) noex {
 	return dirseen_havedevino(this,sbp) ;
 }
 
+int dirseen::curbegin(dirseen_cur *curp) noex {
+	return dirseen_curbegin(this,curp) ;
+}
+
+int dirseen::curend(dirseen_cur *curp) noex {
+	return dirseen_curend(this,curp) ;
+}
+
+int dirseen::curenum(dirseen_cur *curp,char *rbuf,int rlen) noex {
+	return dirseen_curenum(this,curp,rbuf,rlen) ;
+}
+
 void dirseen::dtor() noex {
 	if (int rs ; (rs = finish) < 0) {
 	    ulogerror("dirseen",rs,"dtor-finish") ;
 	}
-}
+} /* end method (dirseen::dtor) */
 
 int dirseen_co::operator () () noex {
 	int		rs = SR_BUGCHECK ;
@@ -297,8 +299,7 @@ int dirseen_co::operator () () noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end method (dirseen_co::operator) */
+} /* end method (dirseen_co::operator) */
 
 int entry_start(dirseen_ent *ep,cchar *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs ;
@@ -309,8 +310,7 @@ int entry_start(dirseen_ent *ep,cchar *sp,int sl,dev_t dev,ino_t ino) noex {
 	    ep->namel = rs ;
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 int entry_finish(dirseen_ent *ep) noex {
 	int		rs = SR_FAULT ;
@@ -326,10 +326,9 @@ int entry_finish(dirseen_ent *ep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
-static int cmpname(const entp e1p,const entp e2p) noex {
+local int cmpname(const entp e1p,const entp e2p) noex {
         cint    ml = min(e1p->namel,e2p->namel) ;
         cint    ch1 = mkchar(e1p->namep[0]) ;
         cint    ch2 = mkchar(e2p->namep[0]) ;
@@ -340,7 +339,7 @@ static int cmpname(const entp e1p,const entp e2p) noex {
         return rc ;
 } /* end subroutine (cmpname) */
 
-static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	dirseen_ent	**e1pp = entpp(v1pp) ;
 	dirseen_ent	**e2pp = entpp(v2pp) ;
 	int		rc = 0 ;
@@ -358,10 +357,9 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	    } /* end if */
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpname) */
+} /* end subroutine (vcmpname) */
 
-static int cmpdevino(const entp e1p,const entp e2p) noex {
+local int cmpdevino(const entp e1p,const entp e2p) noex {
         const dev_t	dev = (e1p->dev - e2p->dev) ;
         int		rc = 0 ;
         if (dev == 0) {
@@ -375,7 +373,7 @@ static int cmpdevino(const entp e1p,const entp e2p) noex {
 	return rc ;
 } /* end subroutine (cmpdevino) */
 
-static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
 	dirseen_ent	**e1pp = entpp(v1pp) ;
 	dirseen_ent	**e2pp = entpp(v2pp) ;
 	int		rc = 0 ;
