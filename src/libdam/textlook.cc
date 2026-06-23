@@ -61,53 +61,53 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<ctime>			/* |time_t| */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<ucsysmisc.h>		/* |ucpagesize(3u)| */
-#include	<uclibmem.h>
-#include	<upt.h>
-#include	<baops.h>
-#include	<vecstr.h>
-#include	<ids.h>
-#include	<ascii.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<sbuf.h>
-#include	<bfile.h>
-#include	<psem.h>
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<ciq.h>
-#include	<intfloor.h>
-#include	<intceil.h>
-#include	<naturalwords.h>
-#include	<txtindexmk.h>
-#include	<txtindex.h>
-#include	<xwords.h>
-#include	<searchkeys.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<mkpathx.h>
-#include	<sncpyx.h>
-#include	<strwcpy.h>
-#include	<strdcpy.h>
-#include	<rtags.h>
-#include	<char.h>
-#include	<hasx.h>
-#include	<isnot.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++SRD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<ucsysmisc.h>		/* LIBU |ucpagesize(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<upt.h>			/* LIBUC */
+#include	<baops.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<ascii.h>		/* LIBU */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBUC */
+#include	<psem.h>		/* LIBUC */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<intfloor.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<ciq.h>			/* LIBUC */
+#include	<naturalwords.h>	/* LIBUC */
+#include	<txtindexmk.h>		/* LIBUC */
+#include	<txtindex.h>		/* LIBUC */
+#include	<xwords.h>		/* LIBUC */
+#include	<searchkeys.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<rtags.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"textlook.h"
 
@@ -207,10 +207,10 @@ struct disp_args {
 
 struct disp_thr {
 	pthread_t	tid ;
-	volatile int	f_busy ;
-	volatile int	f_exiting ;
-	volatile int	f_active ;
-	volatile int	rs ;
+	vol int		f_busy ;
+	vol int		f_exiting ;
+	vol int		f_active ;
+	vol int		rs ;
 } ; /* end struct */
 
 struct disp_head {
@@ -219,14 +219,14 @@ struct disp_head {
 	tagq		wq ;		/* work-queue */
 	psem		sem_wq ;	/* work-queue semaphore */
 	psem		sem_done ;	/* done-semaphore */
-	ptm		mx ;		/* nbusy-mutex */
-	ptc		cn ;		/* condition variable */
-	volatile int	f_exit ;	/* assumed atomic */
-	volatile int	f_done ;	/* assumed atomic */
-	volatile int	f_ready ;	/* ready for workers to access */
+	ptm		*mxp ;		/* nbusy-mutex */
+	ptc		*cvp ;		/* condition variable */
+	vol int		f_exit ;	/* assumed atomic */
+	vol int		f_done ;	/* assumed atomic */
+	vol int		f_ready ;	/* ready for workers to access */
 	int		qlen ;		/* max work-queue length */
 	int		nthr ;		/* bumber of threads configured */
-} ; /* end struct */
+} ; /* end struct (disp_head)  
 
 
 /* forward references */
@@ -246,7 +246,7 @@ local int textlook_ctor(textlook *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->edp ;
 		    op->edp = nullptr ;
-		}
+		} /* enf if (error) */
 	    } /* end if (new-eigendb) */
 	} /* end if (non-null) */
 	return rs ;
@@ -272,7 +272,7 @@ template<typename ... Args>
 local inline int textlook_magic(textlook *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == TEXTLOOK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == TEXTLOOK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (textlook_magic) */
@@ -341,7 +341,7 @@ constexpr bool		f_singleword = CF_SINGLEWORD ;
 
 /* exported variables */
 
-extern const textlook_obj	textlook_modinfo = {
+const textlook_obj	textlook_modinfo = {
 	"textlook",
 	szof(textlook),
 	szof(textlook_cur)
@@ -366,7 +366,7 @@ int textlook_open(TL *op,cchar *pr,cchar *dbname,cchar *bdname) noex {
 			    if (subinfo si ; (rs = subinfo_start(&si)) >= 0) {
 	                        if ((rs = textlook_indopen(op,&si)) >= 0) {
 				    rv = rs ;
-	                   	    op->magic = TEXTLOOK_MAGIC ;
+	                   	    op->magval = TEXTLOOK_MAGIC ;
 				}
 	                        rs1 = subinfo_finish(&si) ;
 	                        if (rs >= 0) rs = rs1 ;
@@ -380,11 +380,10 @@ int textlook_open(TL *op,cchar *pr,cchar *dbname,cchar *bdname) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		textlook_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (textlook_ctor) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (textlook_open) */
+} /* end subroutine (textlook_open) */
 
 int textlook_close(TL *op) noex {
 	int		rs ;
@@ -410,11 +409,10 @@ int textlook_close(TL *op) noex {
 	        rs1 = textlook_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (textlook_close) */
+} /* end subroutine (textlook_close) */
 
 int textlook_audit(TL *op) noex {
 	int		rs ;
@@ -422,8 +420,7 @@ int textlook_audit(TL *op) noex {
 	    rs = txtindex_audit(op->idp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (textlook_audit) */
+} /* end subroutine (textlook_audit) */
 
 int textlook_getinfo(TL *op,TL_IN *tlip) noex {
 	int		rs ;
@@ -439,8 +436,7 @@ int textlook_getinfo(TL *op,TL_IN *tlip) noex {
 	    } /* end if (textindex_getinfo) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (textlook_getinfo) */
+} /* end subroutine (textlook_getinfo) */
 
 int textlook_getsdn(TL *op,char *rb,int rl) noex {
 	int		rs ;
@@ -448,8 +444,7 @@ int textlook_getsdn(TL *op,char *rb,int rl) noex {
 	    rs = txtindex_getsdn(op->idp,rb,rl) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (textlook_getsdn) */
+} /* end subroutine (textlook_getsdn) */
 
 int textlook_getsfn(TL *op,char *rb,int rl) noex {
 	int		rs ;
@@ -457,8 +452,7 @@ int textlook_getsfn(TL *op,char *rb,int rl) noex {
 	    rs = txtindex_getsfn(op->idp,rb,rl) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (textlook_getsfn) */
+} /* end subroutine (textlook_getsfn) */
 
 int textlook_curbegin(TL *op,TL_CUR *curp) noex {
 	int		rs ;
@@ -470,11 +464,11 @@ int textlook_curbegin(TL *op,TL_CUR *curp) noex {
 		    rtags_cur	*rcp = &curp->tcur ;
 	            if ((rs = rtags_curbegin(&curp->tags,rcp)) >= 0) {
 	                op->ncursors += 1 ;
-	                curp->magic = TEXTLOOK_MAGIC ;
+	                curp->magval = TEXTLOOK_MAGIC ;
 	            }
 	            if (rs < 0) {
 	                rtags_finish(&curp->tags) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (rtags_start) */
 		if (rs < 0) {
 		    lm_free(tb) ;
@@ -483,15 +477,14 @@ int textlook_curbegin(TL *op,TL_CUR *curp) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (textlook_curbegin) */
+} /* end subroutine (textlook_curbegin) */
 
 int textlook_curend(TL *op,TL_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = textlook_magic(op,curp)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == TEXTLOOK_MAGIC) {
+	    if (curp->magval == TEXTLOOK_MAGIC) {
 		{
 		    rs1 = rtags_curend(&curp->tags,&curp->tcur) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -504,17 +497,16 @@ int textlook_curend(TL *op,TL_CUR *curp) noex {
 		    rs1 = lm_free(curp->tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		    curp->tbuf = nullptr ;
-		}
+		} /* end if (memory-release) */
 	        curp->ntags = 0 ;
 	        if (op->ncursors > 0) {
 	            op->ncursors -= 1 ;
 	        }
-		curp->magic = 0 ;
+		curp->magval = 0 ;
 	    } /* end if (valid-subcursor) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (textlook_curend) */
+} /* end subroutine (textlook_curend) */
 
 int textlook_curlook(TL *op,TL_CUR *curp,int qo,cchar **qsp) noex {
 	cnullptr	np{} ;
@@ -523,7 +515,7 @@ int textlook_curlook(TL *op,TL_CUR *curp,int qo,cchar **qsp) noex {
 	int		c = 0 ;
 	if ((rs = textlook_magic(op,curp,qsp)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == TEXTLOOK_MAGIC) {
+	    if (curp->magval == TEXTLOOK_MAGIC) {
 	        /* as a curtesy, dump any prior results */
 	        if (curp->ntags > 0) {
 	            curp->ntags = 0 ;
@@ -559,8 +551,7 @@ int textlook_curlook(TL *op,TL_CUR *curp,int qo,cchar **qsp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (textlook_curlook) */
+} /* end subroutine (textlook_curlook) */
 
 int textlook_curread(TL *op,TL_CUR *curp,TL_TAG *tagp,char *bp,int bl) noex {
 	int		rs ;
@@ -568,7 +559,7 @@ int textlook_curread(TL *op,TL_CUR *curp,TL_TAG *tagp,char *bp,int bl) noex {
 	if ((rs = textlook_magic(op,curp,tagp,bp)) >= 0) {
 	    rs = SR_NOTOPEN ;
 	    bp[0] = '\0' ;
-	    if (curp->magic == TEXTLOOK_MAGIC) {
+	    if (curp->magval == TEXTLOOK_MAGIC) {
 	        if (curp->ntags > 0) {
 		    rtags	*rtp = &curp->tags ;
 		    rtags_cur	*rcp = &curp->tcur ;
@@ -585,8 +576,7 @@ int textlook_curread(TL *op,TL_CUR *curp,TL_TAG *tagp,char *bp,int bl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (textlook_curread) */
+} /* end subroutine (textlook_curread) */
 
 int textlook_count(TL *op) noex {
 	int		rs ;
@@ -594,8 +584,7 @@ int textlook_count(TL *op) noex {
 	    rs = txtindex_count(op->idp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (textlook_count) */
+} /* end subroutine (textlook_count) */
 
 
 /* private subroutines */
@@ -613,11 +602,10 @@ local int textlook_inbegin(TL *op,cchar *dbname,cchar *bdname) noex {
 		void *vp = voidp(op->dbname) ;
 	        lm_free(vp) ;
 		op->dbname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (textlook_inbegin) */
+} /* end subroutine (textlook_inbegin) */
 
 local int textlook_inend(TL *op) noex {
 	int		rs = SR_OK ;
@@ -627,16 +615,15 @@ local int textlook_inend(TL *op) noex {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->bdname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->dbname) {
 	    void *vp = voidp(op->dbname) ;
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dbname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (textlook_inend) */
+} /* end subroutine (textlook_inend) */
 
 local int textlook_indopen(TL *op,SI *sip) noex {
     	int		rs = SR_FAULT ;
@@ -650,8 +637,7 @@ local int textlook_indopen(TL *op,SI *sip) noex {
 	    } /* end if (txtindex_open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (textlook_indopen) */
+} /* end subroutine (textlook_indopen) */
 
 local int textlook_snbegin(TL *op) noex {
 	int		rs ;
@@ -681,7 +667,7 @@ local int textlook_snbegin(TL *op) noex {
 	                        void *vp = voidp(op->sdn) ;
 	                        lm_free(vp) ;
 	                        op->sdn = nullptr ;
-	                    }
+	                    } /* end if (memory-release) */
 	                } /* end if (error-handling) */
 		    } /* end if (ok) */
 	        } /* end if (txtindex_getsdn) */
@@ -690,8 +676,7 @@ local int textlook_snbegin(TL *op) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (textlook_snend) */
 	return rs ;
-}
-/* end subroutines (textlook_snbegin) */
+} /* end subroutine (textlook_snbegin) */
 
 local int textlook_snend(TL *op) noex {
 	int		rs = SR_OK ;
@@ -701,16 +686,15 @@ local int textlook_snend(TL *op) noex {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->sfn = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->sdn) ylikely {
 	    void *vp = voidp(op->sdn) ;
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->sdn = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutines (textlook_snend) */
+} /* end subroutine (textlook_snend) */
 
 local int textlook_indclose(TL *op) noex {
 	int		rs = SR_OK ;
@@ -725,8 +709,7 @@ local int textlook_indclose(TL *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (textlook_inclose) */
+} /* end subroutine (textlook_inclose) */
 
 local int textlook_havekeys(TL *op,TI_TAG *tagp,cc *fp,int fl,
 		int qo,SK *skp) noex {
@@ -759,7 +742,7 @@ local int textlook_havekeys(TL *op,TI_TAG *tagp,cc *fp,int fl,
 			        auto tl_hk = textlook_havekeyer ;
 	                        rs = tl_hk(op,tagp,qo,skp,&pkeys,fn) ;
 	                        f = rs ;
-	                    }
+	                    } /* end if (ok) */
 			    rs1 = lm_free(fbuf) ;
 			    if (rs >= 0) rs = rs1 ;
 			} /* end if (m-a-f) */
@@ -770,15 +753,14 @@ local int textlook_havekeys(TL *op,TI_TAG *tagp,cc *fp,int fl,
 	    } /* end if (searchkeys-pop) */
 	} /* end if (positive) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (textlook_havekeys) */
+} /* end subroutine (textlook_havekeys) */
 
 local int textlook_havekeyer(TL *op,TI_TAG *tagp,int qo,
 		SK *skp,SK_POP *pkp,cchar *fn) noex {
 	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if ((rs = u_open(fn,of,0666)) >= 0) ylikely {
 	    cint	fd = rs ;
 	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
@@ -796,8 +778,7 @@ local int textlook_havekeyer(TL *op,TI_TAG *tagp,int qo,
 	    rs = SR_OK ;
 	} /* end if (file) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (textlook_havekeyer) */
+} /* end subroutine (textlook_havekeyer) */
 
 local int textlook_havekeyers(TL *op,TI_TAG *tagp,int qo,
 		SK *skp,int fd,SK_POP *pkp) noex {
@@ -842,8 +823,7 @@ local int textlook_havekeyers(TL *op,TI_TAG *tagp,int qo,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-map) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (textlook_havekeyers) */
+} /* end subroutine (textlook_havekeyers) */
 
 local int textlook_havekeysln(TL *op,SK *skp,SK_POP *pkp,
 		cc *lp,int ll) noex {
@@ -882,8 +862,7 @@ local int textlook_havekeysln(TL *op,SK *skp,SK_POP *pkp,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (textlook_havekeysln) */
+} /* end subroutine (textlook_havekeysln) */
 
 /* do the keys match? */
 local int textlook_matchkeys(TL *op,SK *skp,SK_POP *pkp,cc *sp,int sl) noex {
@@ -921,8 +900,7 @@ local int textlook_matchkeys(TL *op,SK *skp,SK_POP *pkp,cc *sp,int sl) noex {
 	    } /* end if_constexpr (f_singleword) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (textlook_matchkeys) */
+} /* end subroutine (textlook_matchkeys) */
 
 local int textlook_mkhkeys(TL *op,vecstr *hkp,SK *skp) noex {
 	int		rs ;
@@ -944,8 +922,7 @@ local int textlook_mkhkeys(TL *op,vecstr *hkp,SK *skp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
 	return (rs >= 0) ? nkeys : rs ;
-}
-/* end subroutine (textlook_mkhkeys) */
+} /* end subroutine (textlook_mkhkeys) */
 
 local int textlook_lookuper(TL *op,TL_CUR *curp,int qo,SK *skp,
 		mainv hkeya) noex {
@@ -984,8 +961,7 @@ local int textlook_lookuper(TL *op,TL_CUR *curp,int qo,SK *skp,
 	    c = rs ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (textlook_lookuper) */
+} /* end subroutine (textlook_lookuper) */
 
 local int textlook_checkdisp(TL *op,int qo,SK *skp,rtags *rtp) noex {
 	int		rs = SR_OK ;
@@ -993,8 +969,7 @@ local int textlook_checkdisp(TL *op,int qo,SK *skp,rtags *rtp) noex {
 	    rs = textlook_dispstart(op,qo,skp,rtp) ;
 	}
 	return rs ;
-}
-/* end subroutine (textlook_checkdisp) */
+} /* end subroutine (textlook_checkdisp) */
 
 local int textlook_dispstart(TL *op,int qo,SK *skp,rtags *rtp) noex {
 	int		rs = SR_OK ;
@@ -1017,13 +992,12 @@ local int textlook_dispstart(TL *op,int qo,SK *skp,rtags *rtp) noex {
 	            } /* end block */
 	            if (rs < 0) {
 		        lm_free(p) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (uptgetconcurrency) */
 	} /* end if (needed start-up) */
 	return rs ;
-}
-/* end subroutine (textlook_dispstart) */
+} /* end subroutine (textlook_dispstart) */
 
 local int textlook_dispfinish(TL *op) noex {
 	int		rs = SR_OK ;
@@ -1039,11 +1013,10 @@ local int textlook_dispfinish(TL *op) noex {
 	        rs1 = lm_free(dop) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->disp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	}
 	return rs ;
-}
-/* end subroutine (textlook_dispfinish) */
+} /* end subroutine (textlook_dispfinish) */
 
 local int subinfo_start(SI *sip) noex {
 	int		rs = SR_FAULT ;
@@ -1052,8 +1025,7 @@ local int subinfo_start(SI *sip) noex {
 	    sip->daytime = getustime ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -1064,8 +1036,7 @@ local int subinfo_finish(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 local int disp_start(DISP *dop,DISP_ARGS *dap) noex {
 	cint		qlen = TEXTLOOK_QLEN ;
@@ -1109,8 +1080,7 @@ local int disp_start(DISP *dop,DISP_ARGS *dap) noex {
 	    } /* end if (ptm-create) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (disp_start) */
+} /* end subroutine (disp_start) */
 
 local int disp_starter(DISP *dop) noex {
 	cint		sz = (dop->nthr * szof(DISP_THR)) ;
@@ -1148,8 +1118,7 @@ local int disp_starter(DISP *dop) noex {
 	    } /* end if (error) */
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (disp_starter) */
+} /* end subroutine (disp_starter) */
 
 local int disp_finish(DISP *dop,int f_abort) noex {
 	int		rs = SR_FAULT ;
@@ -1192,14 +1161,13 @@ local int disp_finish(DISP *dop,int f_abort) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        ptm *mxp = &op->mx ;
+	        ptm *mxp = dop->mxp ;
 	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (disp_finish) */
+} /* end subroutine (disp_finish) */
 
 local int disp_addwork(DISP *dop,TI_TAG *tagp,cc *fp,int fl) noex {
 	int		rs ;
@@ -1207,8 +1175,7 @@ local int disp_addwork(DISP *dop,TI_TAG *tagp,cc *fp,int fl) noex {
 	    rs = psem_post(&dop->sem_wq) ; /* post always (more parallelism) */
 	}
 	return rs ;
-}
-/* end subroutine (disp_addwork) */
+} /* end subroutine (disp_addwork) */
 
 /* worker threads call this to set their "busy" status */
 local int disp_setstate(DISP *dop,DISP_THR *tip,int f) noex {
@@ -1226,8 +1193,7 @@ local int disp_setstate(DISP *dop,DISP_THR *tip,int f) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 	return (rs >= 0) ? f_prev : rs ;
-}
-/* end subroutine (disp_setstate) */
+} /* end subroutine (disp_setstate) */
 
 /* main or manager thread calls this to find out how many workers are busy */
 local int disp_nbusy(DISP *dop) noex {
@@ -1241,8 +1207,7 @@ local int disp_nbusy(DISP *dop) noex {
 	    }
 	}
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (disp_nbusy) */
+} /* end subroutine (disp_nbusy) */
 
 /* manager thread calls this get get number of exited workers */
 local int disp_nexiting(DISP *dop) noex {
@@ -1253,8 +1218,7 @@ local int disp_nexiting(DISP *dop) noex {
 	    if (dtp[i].f_exiting) n += 1 ;
 	}
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (disp_nexiting) */
+} /* end subroutine (disp_nexiting) */
 
 /* main-thread calls this to wait for a parallel query to complete */
 local int disp_waitdone(DISP *dop) noex {
@@ -1291,8 +1255,7 @@ local int disp_waitdone(DISP *dop) noex {
 	    }
 	} /* end for (waiting for done-ness) */
 	return rs ;
-}
-/* end subroutine (disp_waitdone) */
+} /* end subroutine (disp_waitdone) */
 
 local int disp_worker(DISP *dop) noex {
 	int		rs ;
@@ -1325,8 +1288,7 @@ local int disp_worker(DISP *dop) noex {
 	    dtp->f_exiting = true ;
 	} /* end if (disp_getourthr) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (disp_worker) */
+} /* end subroutine (disp_worker) */
 
 local int disp_workone(DISP *dop,TI_TAG *qvp,cc *fp,int fl) noex {
 	TL	*op = dop->a.op ;
@@ -1343,8 +1305,7 @@ local int disp_workone(DISP *dop,TI_TAG *qvp,cc *fp,int fl) noex {
 	    rs = rtags_add(rtp,&rt,fp,fl) ;
 	} /* end if (found a key) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (disp_workone) */
+} /* end subroutine (disp_workone) */
 
 /* child thread calls this to get its own local-data pointer */
 local int disp_getourthr(DISP *dop,DISP_THR **rpp) noex {
@@ -1366,8 +1327,7 @@ local int disp_getourthr(DISP *dop,DISP_THR **rpp) noex {
 	    }
 	} /* end if (disp_readywait) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (disp_getourthr) */
+} /* end subroutine (disp_getourthr) */
 
 /* main-thread calls this to indicate sub-threads can read completed object */
 local int disp_readyset(DISP *dop) noex {
@@ -1384,8 +1344,7 @@ local int disp_readyset(DISP *dop) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end subroutine (disp_readyset) */
+} /* end subroutine (disp_readyset) */
 
 /* sub-threads call this to wait until object is ready */
 local int disp_readywait(DISP *dop) noex {
@@ -1404,8 +1363,7 @@ local int disp_readywait(DISP *dop) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end subroutine (disp_readywait) */
+} /* end subroutine (disp_readywait) */
 
 /* this object ('tagq') forms the Q of work going into the worker threads */
 local int tagq_start(tagq *tqp,int n) noex {
@@ -1419,8 +1377,7 @@ local int tagq_start(tagq *tqp,int n) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (tagq_start) */
+} /* end subroutine (tagq_start) */
 
 local int tagq_finish(tagq *tqp) noex {
 	int		rs = SR_FAULT ;
@@ -1432,7 +1389,7 @@ local int tagq_finish(tagq *tqp) noex {
 	    for (char *p ; (rs2 = ciq_rem(cqp,&p)) >= 0 ; ) {
 	        rs1 = lm_free(p) ; /* these things are opaque */
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end for (releassig memory) */
 	    if ((rs >= 0) && (rs2 != SR_NOTFOUND)) rs = rs2 ;
 	    {
 	        rs1 = ciq_finish(cqp) ;
@@ -1444,13 +1401,11 @@ local int tagq_finish(tagq *tqp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tagq_finish) */
+} /* end subroutine (tagq_finish) */
 
 local int tagq_count(tagq *tqp) noex {
 	return ciq_count(&tqp->q) ;
-}
-/* end subroutine (tagq_finish) */
+} /* end subroutine (tagq_finish) */
 
 local int tagq_ins(tagq *tqp,TI_TAG *tagp,cc *fp,int fl) noex {
 	cint		sz = szof(tagq_thing) + fl + 1 ;
@@ -1467,11 +1422,10 @@ local int tagq_ins(tagq *tqp,TI_TAG *tagp,cc *fp,int fl) noex {
 	    }
 	    if (rs < 0) {
 		lm_free(p) ;
-	    }
+	    } /* end if (error) */
 	} /* end if */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (tagq_ins) */
+} /* end subroutine (tagq_ins) */
 
 local int tagq_rem(tagq *tqp,TI_TAG *tagp,char *fbuf,int flen) noex {
 	int		rs ;
@@ -1486,16 +1440,15 @@ local int tagq_rem(tagq *tqp,TI_TAG *tagp,char *fbuf,int flen) noex {
 	    rs = SR_OK ;
 	} /* end if (ciq_rem) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (tagq_rem) */
+} /* end subroutine (tagq_rem) */
 
 local int mkfieldterms(char *terms) noex {
     	int		rs = SR_FAULT ;
 	if (terms) ylikely {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < 32 ; i += 1) {
-	        terms[i] = 0xFF ;
-	    }
+	        terms[i] = UCHAR_MAX ;
+	    } /* end for */
 	    for (int i = 0 ; i < 256 ; i += 1) {
 	        if (isalnumlatin(i)) {
 	            baclr(terms,i) ;
@@ -1506,7 +1459,6 @@ local int mkfieldterms(char *terms) noex {
 	    baclr(terms,'-') ;			/* allow minus-sign */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkfieldterms) */
+} /* end subroutine (mkfieldterms) */
 
 
