@@ -20,22 +20,18 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-
-#include	<txtindexmks.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
+#include	<txtindexmks.h>		/* LIBDAM */
 
 
-#define	TXTINDEXMK_MAGIC	0x99447246
 #define	TXTINDEXMK		struct txtindexmk_head
 #define	TXTINDEXMK_FL		struct txtindexmk_flags
-#define	TXTINDEXMK_PA		TXTINDEXMKS_PA
-#define	TXTINDEXMK_TAG		TXTINDEXMKS_TAG
-#define	TXTINDEXMK_KEY		TXTINDEXMKS_KEY
+#define	TXTINDEXMK_PA		txtindexmks_pa
+#define	TXTINDEXMK_TAG		txtindexmks_tag
+#define	TXTINDEXMK_KEY		txtindexmks_key
+#define	TXTINDEXMK_MAGIC	0x99447246
 
 
 struct txtindexmk_flags {
