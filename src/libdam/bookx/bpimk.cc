@@ -77,7 +77,6 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
-#include	<estrings.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucsysmisc.h>		/* LIBUC */
 #include	<ucsysconf.h>		/* LIBUC */
@@ -86,6 +85,7 @@
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
 #include	<opentmp.h>		/* LIBUC */
