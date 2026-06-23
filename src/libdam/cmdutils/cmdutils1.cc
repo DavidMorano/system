@@ -109,7 +109,6 @@ int optval(cchar *sp,int µsl) noex {
 	    } /* end if (non-zero positive) */
 	} /* end if (getlenstr) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (optval) */
+} /* end subroutine (optval) */
 
 
