@@ -59,8 +59,8 @@ import libutil ;			/* |memclear(3u)| */
 #define	BQ_Q		bibleq_q
 #define	BQ_C		bibleq_cur
 #define	BQ_MAG		BIBLEQ_MAGIC
-#define	BQ_MODBNAME	BIBLEQ_MODBNAME
-#define	BQ_OBJNAME	BIBLEQ_OBJNAME
+#define	BQ_MOD		BIBLEQ_MODBNAME
+#define	BQ_OBJN		BIBLEQ_OBJNAME
 
 #define	BQS		bibleqs
 #define	BQS_C		bibleqs_cur
@@ -214,7 +214,7 @@ cbool			f_debug		= CF_DEBUG ;
 int bibleq_open(BQ *op,cchar *pr,cchar *dbn) noex {
 	int		rs ;
 	if ((rs = bibleq_ctor(op,pr,dbn)) >= 0) ylikely {
-	    cchar	*objname = BQ_OBJNAME ;
+	    cchar	*objname = BQ_OBJN ;
 	    if (pr[0] && dbn[0]) ylikely {
 	        if ((rs = bibleq_objloadbegin(op,pr,objname)) >= 0) ylikely {
                     bibleq_calls *callp = callsp(op->callp) ;
@@ -394,7 +394,7 @@ local int bibleq_objloadbegin(BQ *op,cchar *pr,cchar *objn) noex {
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
 	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) ylikely {
 	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
-	            cchar	*mn = BQ_MODBNAME ;
+	            cchar	*mn = BQ_MOD ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
 	            mo |= modloadm.libvar ;
