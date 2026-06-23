@@ -23,6 +23,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<modload.h>		/* LIBUC */
+#include	<biblecite.h>		/* LIBDAM */
 #include	<bibleparas.h>		/* LIBDAM */
 
 
@@ -33,6 +34,8 @@
 #define	BIBLEPARA_CUR		struct biblepara_cursor
 #define	BIBLEPARA_INFO		struct biblepara_information
 #define	BIBLEPARA_MAGIC		0x99447246
+#define	BIBLEPARA_MODBNAME	"bibleparas"
+#define	BIBLEPARA_OBJNAME	"bibleparas"
 
 
 struct biblepara_flags {
