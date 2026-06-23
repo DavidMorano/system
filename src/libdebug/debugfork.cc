@@ -107,6 +107,6 @@ int debugfork(cchar *s) noex {
 	debugprintf("debugfork: ret rs=%d (parent)\n",rs) ;
 	return rs ;
 }
-/* end subroutines (debugfork) */
+/* end subroutine (debugfork) */
 
 
