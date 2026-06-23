@@ -39,21 +39,25 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<expcook.h>		/* LIBUC */
 #include	<dirseen.h>		/* LIBUC */
 #include	<mkdirs.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<path.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<snx.h>			/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<biblecite.h>		/* LIBDAM */
@@ -123,6 +127,8 @@ import uconstants ;
 
 /* imported namespaces */
 
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using libuc::mem ;			/* variable */
 
 
@@ -206,8 +212,6 @@ local int	bibleparas_indopencheck	(BPAS *,cchar *) noex ;
 local int	bibleparas_indclose	(BPAS *) noex ;
 local int	bibleparas_indmk	(BPAS *,cchar *,time_t) noex ;
 local int	bibleparas_indmkdata	(BPAS *,cchar *,mode_t) noex ;
-local int	bibleparas_indopens	(BPAS *,SI *) noex ;
-local int	bibleparas_indopenser	(BPAS *,SI *,DS *,VS *,EC *) noex ;
 local int	bibleparas_loadcooks	(BPAS *,EC *) noex ;
 local int	bibleparas_indopenalt	(BPAS *,SI *,DS *) noex ;
 
@@ -216,6 +220,7 @@ local int	subinfo_finish		(SI *) noex ;
 
 local int	entry_start		(BPAS_E *,BPAS_Q *) noex ;
 local int	entry_finish		(BPAS_E *) noex ;
+local int	entry_add		(BPAS_E *,int,int) noex ;
 
 local int	bvemk_start		(bpimk_v *,BPAS_E *) noex ;
 local int	bvemk_finish		(bpimk_v *) noex ;
@@ -357,7 +362,7 @@ int bibleparas_ispara(BPAS *op,con BPAS_Q *qp) noex {
 	        rs = bibleparas_checkup(op,dt) ;
 	    }
 	    if (rs >= 0) {
-	        BPI_Q	viq{} ;
+	        bpi_q	viq{} ;
 	        viq.b = qp->b ;
 	        viq.c = qp->c ;
 	        viq.v = qp->v ;
@@ -371,13 +376,13 @@ int bibleparas_ispara(BPAS *op,con BPAS_Q *qp) noex {
 } /* end subroutine (bibleparas_ispara) */
 
 int bibleparas_curbegin(BPAS *op,BPAS_C *curp) noex {
+    	cnothrow	nt{} ;
 	int		rs ;
-	int		rs1 ;
 	if ((rs = bibleparas_magic(op,curp)) >= 0) {
 	    rs = SR_NOMEM ;
 	    if (bpi_cur *bcurp = new(nt) bpi_cur ; bcurp) ylikely {
 		if ((rs = bpi_curbegin(op->vindp,bcurp)) >= 0) {
-		    curp->bicurp = bcurp ;
+		    curp->vicurp = bcurp ;
 	    	    curp->magval = BPAS_MAG ;
 	    	    op->ncursors += 1 ;
 		} /* end if (bpi_curbegin) */
@@ -397,15 +402,24 @@ int bibleparas_curend(BPAS *op,BPAS_C *curp) noex {
 	int		rs1 ;
 	if ((rs = bibleparas_magic(op,curp)) >= 0) {
 	    rs = SR_NOTOPEN ;
-
-	    {
-	rs1 = bpi_curend(op->vindp,curp->vicurp) ;
-	if (rs >= 0) rs = rs1 ;
-	    }
-	if (op->ncursors > 0) {
-	    op->ncursors -= 1 ;
-	}
-
+	    if (curp->magval == BPAS_MAG) {
+		rs = SR_BUGCHECK ;
+		if (curp->vicurp) {
+		    rs = SR_OK ;
+	            {
+		        rs1 = bpi_curend(op->vindp,curp->vicurp) ;
+		        if (rs >= 0) rs = rs1 ;
+	            }
+	            if (op->ncursors > 0) {
+	                op->ncursors -= 1 ;
+	            }
+		    {
+			delete curp->vicurp ;
+			curp->vicurp = nullptr ;
+		    } /* end if (memory-release) */
+		    curp->magval = 0 ;
+		} /* end if (bug-check) */
+	    } /* end if (valid-cursor) */
         } /* end if (bibleparas_magic) */
 	return rs ;
 } /* end subroutine (bibleparas_curend) */
@@ -413,20 +427,20 @@ int bibleparas_curend(BPAS *op,BPAS_C *curp) noex {
 int bibleparas_curenum(BPAS *op,BPAS_C *curp,BPAS_Q *qp) noex {
 	int		rs ;
 	if ((rs = bibleparas_magic(op,curp,qp)) >= 0) {
-	time_t		dt = 0 ;
-	if (op->ncursors == 0) {
-	    rs = bibleparas_checkup(op,dt) ;
-	}
-	if (rs >= 0) {
-	    bpi_v	viv ;
-	    if ((rs = bpi_curenum(op->vindp,curp->vicurp,&viv)) >= 0) {
-	        if (qp) {
-		    qp->b = viv.b ;
-		    qp->c = viv.c ;
-		    qp->v = viv.v ;
-	        }
-	    } /* end if (bpi_curenum) */
-	} /* end if (ok) */
+	    time_t	dt = 0 ;
+	    if (op->ncursors == 0) {
+	       rs = bibleparas_checkup(op,dt) ;
+	   }
+	   if (rs >= 0) {
+	       bpi_v	viv ;
+	       if ((rs = bpi_curenum(op->vindp,curp->vicurp,&viv)) >= 0) {
+	           if (qp) {
+		       qp->b = viv.b ;
+		       qp->c = viv.c ;
+		       qp->v = viv.v ;
+	           }
+	       } /* end if (bpi_curenum) */
+	   } /* end if (ok) */
         } /* end if (bibleparas_magic) */
 	DEBUGPRINTF("ret rs=%d\n", rs) ;
 	return rs ;
@@ -501,7 +515,7 @@ local int bibleparas_dbmapcreate(BPAS *op,time_t dt) noex {
 		csize fsize = size_t(sb.st_size) ;
 	        if (S_ISREG(sb.st_mode)) {
 	            if (sb.st_size <= INT_MAX) {
-	                csize	ms = filesize ;
+	                csize	ms = fsize ;
 	                cint	mp = PROT_READ ;
 	                cint	mf = MAP_SHARED ;
 	                void	*md ;
@@ -509,9 +523,9 @@ local int bibleparas_dbmapcreate(BPAS *op,time_t dt) noex {
 			op->ti_db = sb.st_mtime ;
 	    		if ((rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 			    cint	madv = MADV_RANDOM ;
-			    const caddr_t	ma = md ;
+			    const caddr_t	ma = caddr_t(md) ;
 	        	    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
-	            		op->mapdata = md ;
+	            		op->mapdata = charp(md) ;
 	            		op->mapsize = ms ;
 	            		op->ti_map = dt ;
 	            		op->ti_lastcheck = dt ;
@@ -582,32 +596,32 @@ namespace {
         SI              *sip ;
 	char		*a ;
 	char		*ebuf ;
-	char		*tbuf ;
+	char		*pbuf ;
 	int		elen ;
-	int		tlen ;
+	int		plen ;
         indopener(BPAS *o,SI *s) noex : op(o), sip(s) { 
 	    a = nullptr ;
 	} ;
         operator int () noex ;
-        int opens       (DS *,EC *) noex ;
-	int ph1(DS *,VS *,EC *) noex ;
-	int ph2(DS *,VS *,EC *) noex ;
-	int ph3(DS *,VS *,EC *) noex ;
+        int opens       (DS *,VS *,EC *) noex ;
+	int ph1		(DS *,VS *,EC *) noex ;
+	int ph2		(DS *,VS *,EC *) noex ;
+	int ph3		(DS *,VS *,EC *) noex ;
     } ; /* end struct (indopener) */
 } /* end namespace */
 
 local int bibleparas_indopen(BPAS *op,SI *sip) noex {
 	int		rs ;
-	if ((rs = bibleparas_indopens(op,sip)) >= 0) {
+	if (indopener indo(op,sip) ; ((rs = indo) >= 0)) {
 	    if (op->fl.vind) {
 	        rs = bpi_count(op->vindp) ;
 	        op->nverses = rs ;
 	    }
-	}
+	} /* end if (indopener) */
 	return rs ;
 } /* end subroutine (bibleparas_indopen) */
 
-intopener::operator int (sip) noex {
+indopener::operator int () noex {
 	int		rs ;
 	int		rs1 ;
 	if (DS ds ; (rs = ds.start) >= 0) {
@@ -633,9 +647,9 @@ intopener::operator int (sip) noex {
 typedef int (indopener::*indopener_m)(DS *,VS *,EC *) noex ;
 
 constexpr indopener_m	phases[] = {
-    &indopener::ph1,
-    &indopener::ph2,
-    &indopener::ph3
+	&indopener::ph1,
+	&indopener::ph2,
+	&indopener::ph3
 } ; /* end array (methods) */
 
 int indopener::opens(DS *dsp,VS *sdp,EC *ecp) noex {
@@ -651,7 +665,7 @@ int indopener::opens(DS *dsp,VS *sdp,EC *ecp) noex {
 	    plen = maxpath ;
 	    {
 		for (cauto &m : phases) {
-		    (this->&m)(dsp,sdp,ecp) ;
+		    (this->*m)(dsp,sdp,ecp) ;
 		    if (rs < 0) break ;
 		} /* end for */
 	    }
@@ -662,7 +676,7 @@ int indopener::opens(DS *dsp,VS *sdp,EC *ecp) noex {
 } /* end method (indopener::opens) */
 
 /* first phase: expand possible directory paths */
-int indopener::ph1(DS *dsp,VS *sdp,EC *ecp) noex {
+int indopener::ph1(DS *dsp,VS *,EC *ecp) noex {
     	cint		rsn = SR_NOTFOUND ;
     	int		rs = SR_OK ;
 	for (int i = 0 ; (rs >= 0) && idxdirs[i] ; i += 1) {
@@ -678,7 +692,7 @@ int indopener::ph1(DS *dsp,VS *sdp,EC *ecp) noex {
 	return rs ;
 } /* end method (indopener::ph1) */
 
-int indopener::ph2(DS *dsp,VS *sdp,EC *ecp) noex {
+int indopener::ph2(DS *dsp,VS *sdp,EC *) noex {
     	cint		rsn = SR_NOTFOUND ;
     	int		rs = SR_OK ;
 	int		rs1 ;
@@ -690,21 +704,20 @@ int indopener::ph2(DS *dsp,VS *sdp,EC *ecp) noex {
 		    }
 		    if (rs < 0) break ;
 	        } /* end while */
-		if ((rs >= 0) && (el != SR_NOTFOUND)) rs = el ;
+		if ((rs >= 0) && (el != rsn)) rs = el ;
 	        rs1 = dsp->curend(&cur) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (dirseen-cur) */
 	    return rs ;
 } /* end method (indopener::ph2) */
 
-int indopener::ph3(DS *dsp,VS *sdp,EC *ecp) noex {
+int indopener::ph3(DS *dsp,VS *sdp,EC *) noex {
     	int		rs ;
-	int		rs1 ;
 	if (mainv dv ; (rs = sdp->getvec(&dv)) >= 0) {
-		for (int i = 0 ; dv[i] ; i += 1) {
-		    rs = bibleparas_indopencheck(op,dv[i]) ;
-		    if ((rs >= 0) || (! isNotPresent(rs))) break ;
-		} /* end for */
+	    for (int i = 0 ; dv[i] ; i += 1) {
+		rs = bibleparas_indopencheck(op,dv[i]) ;
+		if ((rs >= 0) || (! isNotPresent(rs))) break ;
+	    } /* end for */
 	} /* end if (vecstr_getvex) */
 	if ((rs < 0) && isNotPresent(rs)) {
 	    rs = bibleparas_indopenalt(op,sip,dsp) ;
@@ -736,9 +749,9 @@ local int bibleparas_loadcooks(BPAS *op,EC *ecp) noex {
 	        break ;
 	    } /* end switch */
 	    if ((rs >= 0) && vap) {
-	        kbuf[0] = kch ;
+	        kbuf[0] = char(kch) ;
 	        rs = ecp->add(kbuf,vap,val) ;
-	    }
+	    } /* end if (add) */
 	} /* end for */
 	if (rs >= 0) {
 	    if (cchar *prname ; (rs = sfbasename(op->pr,-1,&prname)) >= 0) {
@@ -811,6 +824,7 @@ local int bibleparas_indopencheck(BPAS *op,cchar *dbname) noex {
 local int bibleparas_indmk(BPAS *op,cchar dname[],time_t dt) noex {
 	cmode		dm = BIBLEPARAS_DIRMODE ;
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ; /* return-value */
 	if ((rs = mkdname(dname,dm)) >= 0) {
 	    cchar	*db = op->dbname ;
@@ -842,22 +856,24 @@ local int bibleparas_indmkdata(BPAS *op,cchar indname[],mode_t om) noex {
 	        BPAS_E	e ;
 	        BPAS_Q	q ;
 	        int	foff = 0 ;
-	        int	ml = op->mapsize ;
+	        int	ml	= intconv(op->mapsize & INT_MAX) ;
+	        cchar	*mp	= op->mapdata ;
 	        bool	f_ent = false ;
-	        cchar	*mp = op->mapdata ;
 	        for (cc *tp ; (tp = strnchr(mp,ml,'\n')) != np ; ) {
-	    	    cint len = ((tp + 1) - mp) ;
+	    	    cint len = intconv((tp + 1) - mp) ;
 		    cchar *lp ;
-		    if (int ll = sfcontent(mp,(len - 1),&lp) ; ll > 0) {
+		    if (cint ll = sfcontent(mp,(len - 1),&lp) ; ll > 0) {
 			DEBUGPRINTF("line>%r<\n", lp,strnlen(lp,MIN(ll,40))) ;
 	                if ((rs = biblecite_ver(&q,lp,ll)) > 0) {
-		            cint si = rs ;
 	                    if (f_ent) {
 	                        c += 1 ;
 	                        if ((rs = bvemk_start(&bve,&e)) >= 0) {
-	                            rs = bpimk_add(&bpind,&bve) ;
-			            bvemk_finish(&bve) ;
-		                }
+				    {
+	                               rs = bpimk_add(&bpind,&bve) ;
+				    }
+			            rs1 = bvemk_finish(&bve) ;
+				    if (rs >= 0) rs = rs1 ;
+		                } /* end if (bvemk) */
 			        f_ent = false ;
 	                        entry_finish(&e) ;
 	                    } /* end if (entry) */
@@ -894,9 +910,12 @@ local int bibleparas_indmkdata(BPAS *op,cchar indname[],mode_t om) noex {
 	        if ((rs >= 0) && f_ent) {
 	            c += 1 ;
 	            if ((rs = bvemk_start(&bve,&e)) >= 0) {
-	                rs = bpimk_add(&bpind,&bve) ;
-		        bvemk_finish(&bve) ;
-	            }
+			{
+	                    rs = bpimk_add(&bpind,&bve) ;
+			}
+		        rs1 = bvemk_finish(&bve) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (bvemk) */
 	            f_ent = false ;
 	            entry_finish(&e) ;
 	        } /* end if (entry) */
@@ -969,6 +988,16 @@ local int entry_finish(BPAS_E *ep) noex {
 	}
 	return rs ;
 } /* end subroutine (entry_finish) */
+
+local int entry_add(BPAS_E *ep,int foff,int ll) noex {
+    	int		rs = SR_FAULT ;
+	(void) foff ;
+	(void) ll ;
+	if (ep) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+    	return rs ;
+} /* end subroutine (entry_add) */
 
 local int bvemk_start(bpimk_v *bvep,BPAS_E *ep) noex {
 	int		rs = SR_BUGCHECK ;
