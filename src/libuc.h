@@ -300,7 +300,6 @@
 #include	<utypealiases.h>
 #include	<utypedefs.h>
 #include	<varray.h>
-#include	<vars.h>
 #include	<vec.h>
 #include	<vstrcmp.h>
 #include	<vstrkeycmp.h>
