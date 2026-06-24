@@ -20,13 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<vstrorders.h>
-
-#include	<vstrkeycmp.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<vstrorders.h>		/* LIBUC */
+#include	<vstrkeycmp.h>		/* LIBUC */
 
 
 EXTERNC_begin
