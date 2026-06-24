@@ -32,9 +32,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<netdb.h>		/* <- the money shot */
+#include	<netdb.h>		/* POSIX <- the money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #ifndef	PROTOENT
