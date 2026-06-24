@@ -47,7 +47,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<getx.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getax.h>
 #include	<field.h>
 #include	<vecstr.h>
@@ -64,7 +64,7 @@
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<char.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<svckey.h>
 #include	<procse.h>
 #include	<localmisc.h>
@@ -373,7 +373,7 @@ cchar	*sav[] ;
 	if ((rs >= 0) && (! f_served) && pip->fl.loginsvc) {
 	    if (pip->fl.useracct && (strcmp(cip->service,"help") != 0)) {
 	        struct passwd	pw ;
-	        cint	pwlen = getbufsize(bufsize_pw) ;
+	        cint	pwlen = bufsizeget(bufsize_pw) ;
 	        char		*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	            cchar	*svc = cip->service ;
@@ -1241,7 +1241,7 @@ badnoprog:
 ret0:
 	return rs ;
 }
-/* end subroutines (procserverexec) */
+/* end subroutine (procserverexec) */
 
 
 local inr procfindprog(pip,plp,prdirs,progfname,pnp,pnl)
@@ -1297,7 +1297,7 @@ int		pnl ;
 
 	return (rs >= 0) ? rlen : rs ;
 }
-/* end subroutines (procfindprog) */
+/* end subroutine (procfindprog) */
 
 
 #if	CF_CHECKACCESS
@@ -1601,7 +1601,7 @@ local inr loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutines (loadpeernames) */
+/* end subroutine (loadpeernames) */
 
 local inr loadaccgroups(PROGINFO *pip,vecstr *glp,cchar *accbuf,int acclen) {
 	int		rs = SR_OK ;
@@ -1651,9 +1651,9 @@ local inr loadaccgroups(PROGINFO *pip,vecstr *glp,cchar *accbuf,int acclen) {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = getbufsize(bufsize_mn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	    maxnamelen = rs ;
-	    if ((rs = getbufsize(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        maxpathlen = rs ;
 	    }
 	}
