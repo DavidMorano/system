@@ -44,9 +44,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<pwd.h>			/* <- the money shot */
+#include	<pwd.h>			/* POSIX <- the money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 /* GETPWXXXR begin */
@@ -64,7 +64,6 @@ EXTERNC_begin
 extern unixret_t	getpwent_rp(PASSWD *,char *,int) noex ;
 extern unixret_t	getpwnam_rp(PASSWD *,char *,int,cchar *) noex ;
 extern unixret_t	getpwuid_rp(PASSWD *,char *,int,uid_t) noex ;
-
 
 EXTERNC_end
 
