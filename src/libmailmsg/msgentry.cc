@@ -27,24 +27,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<fdliner.h>
-#include	<mailmsghdrs.h>
-#include	<mailmsg.h>
-#include	<comparse.h>
-#include	<mhcom.h>
-#include	<strn.h>
-#include	<six.h>
-#include	<mkpathx.h>
-#include	<hdrextnum.h>
-#include	<char.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<fdliner.h>		/* LIBUC */
+#include	<mailmsghdrs.h>		/* LIBUC */
+#include	<mailmsg.h>		/* LIBUC */
+#include	<comparse.h>		/* LIBUC */
+#include	<mhcom.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<hdrextnum.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"msgentry.h"
 
@@ -95,8 +95,7 @@ int msgentry_start(msgentry *mep) noex {
 	    rs = mailmsg_start(&mep->m) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgentry_start) */
+} /* end subroutine (msgentry_start) */
 
 int msgentry_finish(msgentry *mep) noex {
 	int		rs = SR_FAULT ;
@@ -111,8 +110,7 @@ int msgentry_finish(msgentry *mep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgentry_finish) */
+} /* end subroutine (msgentry_finish) */
 
 int msgentry_loadline(msgentry *mep,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
@@ -120,8 +118,7 @@ int msgentry_loadline(msgentry *mep,cchar *lp,int ll) noex {
 	    rs = mailmsg_loadline(&mep->m,lp,ll) ;
 	}
 	return rs ;
-}
-/* end subroutine (msgentry_loadline) */
+} /* end subroutine (msgentry_loadline) */
 
 int msgentry_loadhdrs(msgentry *mep,fdliner *lsp) noex {
 	int		rs ;
@@ -141,8 +138,7 @@ int msgentry_loadhdrs(msgentry *mep,fdliner *lsp) noex {
 	} /* end while */
 	mep->fl.eoh = f_eoh ;
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (msgentry_loadhdrs) */
+} /* end subroutine (msgentry_loadhdrs) */
 
 int msgentry_getclen(msgentry *mep) noex {
 	int		rs = SR_OK ;
@@ -159,8 +155,7 @@ int msgentry_getclen(msgentry *mep) noex {
 	    }
 	} /* end if (only once) */
 	return (rs >= 0) ? clen : rs ;
-}
-/* end subroutine (msgentry_getclen) */
+} /* end subroutine (msgentry_getclen) */
 
 int msgentry_setclen(msgentry *mep,int clen) noex {
 	int		rs = SR_FAULT ;
@@ -170,8 +165,7 @@ int msgentry_setclen(msgentry *mep,int clen) noex {
 	    mep->clen = clen ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgentry_setclen) */
+} /* end subroutine (msgentry_setclen) */
 
 int msgentry_setflags(msgentry *mep) noex {
 	int		rs ;
@@ -181,8 +175,7 @@ int msgentry_setflags(msgentry *mep) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (msgentry_setflags) */
+} /* end subroutine (msgentry_setflags) */
 
 int msgentry_setct(msgentry *mep) noex {
 	int		rs = SR_OK ;
@@ -209,8 +202,7 @@ int msgentry_setct(msgentry *mep) noex {
 	    } /* end if (mhcom) */
 	} /* end if (positive) */
 	return rs ;
-}
-/* end subroutine (msgentry_setct) */
+} /* end subroutine (msgentry_setct) */
 
 int msgentry_setce(msgentry *mep) noex {
 	int		rs = SR_OK ;
@@ -237,8 +229,7 @@ int msgentry_setce(msgentry *mep) noex {
 	    } /* end if (comparse) */
 	} /* end if (mailmsg_hdrval) */
 	return rs ;
-}
-/* end subroutine (msgentry_setce) */
+} /* end subroutine (msgentry_setce) */
 
 int msgentry_getclines(msgentry *mep) noex {
 	int		rs = SR_OK ;
@@ -255,8 +246,7 @@ int msgentry_getclines(msgentry *mep) noex {
 	    clines = mep->clines ;
 	}
 	return (rs >= 0) ? clines : rs ;
-}
-/* end subroutine (msgentry_getclines) */
+} /* end subroutine (msgentry_getclines) */
 
 int msgentry_setclines(msgentry *mep,int clines) noex {
     	int		rs = SR_FAULT ;
@@ -266,8 +256,7 @@ int msgentry_setclines(msgentry *mep,int clines) noex {
 	    mep->clines = clines ;
 	}
 	return rs ;
-}
-/* end subroutine (msgentry_setclines) */
+} /* end subroutine (msgentry_setclines) */
 
 int msgentry_setoff(msgentry *mep,off_t boff) noex {
     	int		rs = SR_FAULT ;
@@ -276,8 +265,7 @@ int msgentry_setoff(msgentry *mep,off_t boff) noex {
 	    mep->boff = boff ;
 	}
 	return rs ;
-}
-/* end subroutine (msgentry_setoff) */
+} /* end subroutine (msgentry_setoff) */
 
 int msgentry_setlen(msgentry *mep,int blen) noex {
     	int		rs = SR_FAULT ;
@@ -286,8 +274,7 @@ int msgentry_setlen(msgentry *mep,int blen) noex {
 	    mep->blen = blen ;
 	}
 	return rs ;
-}
-/* end subroutine (msgentry_setoff) */
+} /* end subroutine (msgentry_setoff) */
 
 int msgentry_gethdrnum(msgentry *mep,cchar *kn) noex {
 	mailmsg		*mmp = &mep->m ;
@@ -303,7 +290,6 @@ int msgentry_gethdrnum(msgentry *mep,cchar *kn) noex {
 	    if (rs >= 0) break ;
 	} /* end for */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (msgentry_gethdrnum) */
+} /* end subroutine (msgentry_gethdrnum) */
 
 
