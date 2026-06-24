@@ -31,13 +31,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |off_t| */
-#include	<stdlib.h>
-#include	<string.h>		/* |memcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mailmsg.h>
-#include	<fdliner.h>
+#include	<sys/types.h>		/* POSIX |off_t| */
+#include	<stdlib.h>		/* CSTD */
+#include	<string.h>		/* CSTD |memcpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mailmsg.h>		/* LIBUC */
+#include	<fdliner.h>		/* LIBUC */
 
 
 #define	MSGENTRY	struct msgentry_head
@@ -53,7 +53,7 @@ struct msgentry_flags {
 	uint		clen:1 ;
 	uint		clines:1 ;
 	uint		eoh:1 ;
-} ;
+} ; /* end struct */
 
 struct msgentry_head {
 	mailmsg		m ;
@@ -63,27 +63,27 @@ struct msgentry_head {
 	int		blen ;		/* w/ tmpfile */
 	int		clen ;		/* supplied or calculated */
 	int		clines ;	/* supplied or calculated */
-} ;
+} ; /* end struct */
 
 typedef MSGENTRY	msgentry ;
 typedef MSGENTRY_FL	msgentry_fl ;
 
 EXTERNC_begin
 
-extern int	msgentry_start(msgentry *) noex ;
-extern int	msgentry_finish(msgentry *) noex ;
-extern int	msgentry_loadline(msgentry *,cchar *,int) noex ;
-extern int	msgentry_loadhdrs(msgentry *,fdliner *) noex ;
-extern int	msgentry_setflags(msgentry *) noex ;
-extern int	msgentry_setct(msgentry *) noex ;
-extern int	msgentry_setce(msgentry *) noex ;
-extern int	msgentry_getclines(msgentry *) noex ;
-extern int	msgentry_setclines(msgentry *,int) noex ;
-extern int	msgentry_getclen(msgentry *) noex ;
-extern int	msgentry_setclen(msgentry *,int) noex ;
-extern int	msgentry_setoff(msgentry *,off_t) noex ;
-extern int	msgentry_setlen(msgentry *,int) noex ;
-extern int	msgentry_gethdrnum(msgentry *,cchar *) noex ;
+extern int	msgentry_start		(msgentry *) noex ;
+extern int	msgentry_finish		(msgentry *) noex ;
+extern int	msgentry_loadline	(msgentry *,cchar *,int) noex ;
+extern int	msgentry_loadhdrs	(msgentry *,fdliner *) noex ;
+extern int	msgentry_setflags	(msgentry *) noex ;
+extern int	msgentry_setct		(msgentry *) noex ;
+extern int	msgentry_setce		(msgentry *) noex ;
+extern int	msgentry_getclines	(msgentry *) noex ;
+extern int	msgentry_setclines	(msgentry *,int) noex ;
+extern int	msgentry_getclen	(msgentry *) noex ;
+extern int	msgentry_setclen	(msgentry *,int) noex ;
+extern int	msgentry_setoff		(msgentry *,off_t) noex ;
+extern int	msgentry_setlen		(msgentry *,int) noex ;
+extern int	msgentry_gethdrnum	(msgentry *,cchar *) noex ;
 
 EXTERNC_end
 
