@@ -20,11 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	COMSATMSG	struct comsatmsg_head
@@ -35,7 +32,7 @@ struct comsatmsg_head {
 	char		*username ;
 	char		*fname ;
 	ulong		offset ;
-} ; /* end struct */
+} ; /* end struct (comsatmsg_head) */
 
 #ifdef	__cplusplus
 enum comsatmsgmems {
@@ -79,10 +76,10 @@ typedef COMSATMSG	comsatmsg ;
 
 EXTERNC_begin
 
-extern int comsatmsg_start(comsatmsg *) noex ;
-extern int comsatmsg_rd(comsatmsg,char *,int) noex ;
-extern int comsatmsg_wr(comsatmsg,cchar *,int) noex ;
-extern int comsatmsg_finish(comsatmsg *) noex ;
+extern int comsatmsg_start	(comsatmsg *) noex ;
+extern int comsatmsg_rd		(comsatmsg,char *,int) noex ;
+extern int comsatmsg_wr		(comsatmsg,cchar *,int) noex ;
+extern int comsatmsg_finish	(comsatmsg *) noex ;
 
 EXTERNC_end
 
