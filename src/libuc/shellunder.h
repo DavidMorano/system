@@ -14,8 +14,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* system-types */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	SHELLUNDER_DAT	struct shellunder_data
