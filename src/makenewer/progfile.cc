@@ -1,18 +1,17 @@
-/* progfile */
+/* progfile SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* process a name */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 
-
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
 	The subroutine was written from scratch.
-
 
 */
 
@@ -20,30 +19,32 @@
 
 /******************************************************************************
 
-	We process each file individually.
+  	Name:
+	progfile
 
+  	Description:
+	We process each file individually.
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<utime.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -55,25 +56,10 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	isNotPresent(int) ;
-
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnrchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -85,11 +71,11 @@ extern char	*strnrchr(const char *,int,int) ;
 /* forward references */
 
 static int	procfiler(struct proginfo *,int,ustat *,
-			const char *,const char *) ;
+			cchar *,cchar *) ;
 
 static int	filesuf(struct proginfo *,vecstr *,char *,
-			const char *,int) ;
-static int	mknewfname(char *,const char *,const char *,const char *) ;
+			cchar *,int) ;
+static int	mknewfname(char *,cchar *,cchar *,cchar *) ;
 
 
 /* local variables */
@@ -100,8 +86,8 @@ static int	mknewfname(char *,const char *,const char *,const char *) ;
 
 int progfile(pip,dstdname,name)
 struct proginfo	*pip ;
-const char	dstdname[] ;
-const char	name[] ;
+cchar	dstdname[] ;
+cchar	name[] ;
 {
 	ustat	ssb ;
 
@@ -109,7 +95,7 @@ const char	name[] ;
 	int	of ;
 	int	f_updated = FALSE ;
 
-	const char	*fname ;
+	cchar	*fname ;
 
 	char	mapfname[MAXPATHLEN + 1] ;
 
@@ -188,8 +174,8 @@ int procfiler(pip,sfd,ssbp,dstdname,fname)
 struct proginfo	*pip ;
 int		sfd ;
 ustat	*ssbp ;
-const char	dstdname[] ;
-const char	fname[] ;
+cchar	dstdname[] ;
+cchar	fname[] ;
 {
 	struct utimbuf	ut ;
 
@@ -205,7 +191,7 @@ const char	fname[] ;
 	int	f_updated = FALSE ;
 	int	f ;
 
-	const char	*bfname ;
+	cchar	*bfname ;
 
 	char	dstfname[MAXPATHLEN + 2] ;
 	char	tmpfname[MAXPATHLEN + 1] ;
@@ -228,7 +214,7 @@ const char	fname[] ;
 	if (bfnamelen > 0) {
 
 	    if (pip->fl.rmsuf) {
-	        const char	*tp = strnrchr(bfname,bfnamelen,'.') ;
+	        cchar	*tp = strnrchr(bfname,bfnamelen,'.') ;
 	        int	bfl ;
 
 	        bfl = (tp != NULL) ? (tp-bfname) : -1 ;
@@ -357,7 +343,7 @@ const char	fname[] ;
 
 	            if (rs >= 0) {
 	                f_updated = TRUE ;
-	                u_utime(dstfname,&ut) ;
+	                u_ufileime(dstfname,&ut) ;
 	            }
 
 	        } /* end if (allowable actual update) */
@@ -383,7 +369,7 @@ static int filesuf(pip,slp,newfname,fname,fnamelen)
 struct proginfo	*pip ;
 vecstr		*slp ;
 char		newfname[] ;
-const char	fname[] ;
+cchar	fname[] ;
 int		fnamelen ;
 {
 	int	rs = SR_OK ;
@@ -392,8 +378,8 @@ int		fnamelen ;
 	int	bnl ;
 	int	fl = 0 ;
 
-	const char	*tp, *sp ;
-	const char	*bnp ;
+	cchar	*tp, *sp ;
+	cchar	*bnp ;
 
 
 #if	CF_DEBUG
@@ -419,7 +405,7 @@ int		fnamelen ;
 
 	        {
 	            char	sufbuf[SUFLEN + 1] ; /* could be variable */
-	            const char	*cp ;
+	            cchar	*cp ;
 
 	            rs1 = snwcpy(sufbuf,SUFLEN,sp,sl) ;
 
@@ -454,16 +440,14 @@ ret0:
 
 static int mknewfname(newfname,fname,sp,cp)
 char		newfname[] ;
-const char	fname[] ;
-const char	*sp ;
-const char	*cp ;
+cchar	fname[] ;
+cchar	*sp ;
+cchar	*cp ;
 {
 	int	rs ;
 	int	buflen = MAXPATHLEN ;
 	int	i = 0 ;
-
-	const char	*tp ;
-
+	cchar	*tp ;
 
 	rs = storebuf_strw(newfname,buflen,i,fname,(sp - fname)) ;
 	i += rs ;
