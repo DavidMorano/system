@@ -1,11 +1,12 @@
-/* auditdb */
+/* auditdb SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* audit an index database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG 	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
@@ -18,49 +19,48 @@
 
 /*******************************************************************************
 
+  	Name:
+	auditdb
+
+	Description:
 	This subroutine processes a single file.
 
 	Synopsis:
-
-	int auditdb(pip,dbname)
-	struct proginfo	*pip ;
-	const uchar	dbname[] ;
+	int auditdb(PI *pip,cchar *dbname) noex
 
 	Arguments:
-
 	- pip		program information pointer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<climits>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<vecstr.h>
-#include	<storebuf.h>
-#include	<char.h>
-#include	<eigendb.h>
-#include	<endian.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bfile.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<eigendb.h>		/* LIBUC */
+#include	<naturalwords.h>	/* LIBDAM */
+#include	<rtags.h>		/* LIBDAM */
+#include	<endian.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"offindex.h"
-#include	"rtags.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -82,21 +82,7 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-
 extern int	hashmapverify(struct proginfo *,struct hashmap *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -107,35 +93,28 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* forward references */
 
-static int	offindex_tags(OFFINDEX *,bfile *) ;
-static int	verifyentries(struct proginfo *,struct hashmap *) ;
-static int	tag_parse(RTAGS_TAG *,const char *,const char *,
-			const char *,int) ;
+local int	offindex_tags(OFFINDEX *,bfile *) ;
+local int	verifyentries(struct proginfo *,struct hashmap *) ;
+local int	tag_parse(RTAGS_TAG *,cchar *,cchar *,
+			cchar *,int) ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int auditdb(pip,dbname)
-struct proginfo	*pip ;
-const char	dbname[] ;
-{
+int auditdb(PI *pip,cchar *dbname) noex {
 	ustat	sb ;
-
-	struct hashmap	hmi ;
-
+	hashmap	hmi ;
 	OFFINDEX	oi ;
-
 	bfile	tagfile ;
-
 	int	rs ;
 	int	fd_hash ;
-
 	char	tmpfname[MAXPATHLEN + 1] ;
-
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -318,9 +297,8 @@ ret0:
 
 /* local subroutines */
 
-
 /* index the beginning-of-line offsets in the TAG file */
-static int offindex_tags(oip,tfp)
+local int offindex_tags(oip,tfp)
 OFFINDEX	*oip ;
 bfile		*tfp ;
 {
@@ -357,7 +335,7 @@ bfile		*tfp ;
 /* end subroutine (offindex_tags) */
 
 
-static int verifyentries(pip,hmip)
+local int verifyentries(pip,hmip)
 struct proginfo	*pip ;
 struct hashmap	*hmip ;
 {
@@ -484,15 +462,13 @@ struct hashmap	*hmip ;
 
 ret0:
 	return rs ;
-}
-/* end subroutine (verifyentries) */
+} /* end subroutine (verifyentries) */
 
-
-static int tag_parse(tip,dnp,fnp,tagbuf,tagbuflen)
+local int tag_parse(tip,dnp,fnp,tagbuf,tagbuflen)
 RTAGS_TAG	*tip ;
-const char	*dnp ;
-const char	*fnp ;
-const char	tagbuf[] ;
+cchar	*dnp ;
+cchar	*fnp ;
+cchar	tagbuf[] ;
 int		tagbuflen ;
 {
 	int	rs = SR_OK ;
@@ -549,8 +525,6 @@ int		tagbuflen ;
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (tag_parse) */
-
+} /* end subroutine (tag_parse) */
 
 
