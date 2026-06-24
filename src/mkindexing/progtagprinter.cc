@@ -1,11 +1,11 @@
-/* progtagprinter */
+/* progtagprinter SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* process key tags */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* used for little object below */
 #define	CF_DEBUG 	0		/* run-time debugging */
-
 
 /* revision history:
 
@@ -18,20 +18,18 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine processes a single tag.
 
 	Synopsis:
-
-	int progtagprinter(pip,basedname,bbp,ofi,ofp,tag)
-	PROGINFO	*pip ;
-	const char	basedname[] ;
-	BIBLEBOOK	*bbp ;
+	int progtagprinter(PI *pip,basedname,bbp,ofi,ofp,tag)
+	cchar	basedname[] ;
+	biblebook	*bbp ;
 	int		ofi ;
 	bfile		*ofp ;
-	const char	tag[] ;
+	cchar	tag[] ;
 
 	Arguments:
-
 	pip		program information pointer
 	basedname	base directory path
 	ofi		output-format-index
@@ -39,36 +37,33 @@
 	tag		tag-string to process
 
 	Returns:
-
 	>=0		OK
 	<0		error
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<baops.h>
-#include	<bfile.h>
-#include	<fifostr.h>
-#include	<biblebook.h>
-#include	<biblecite.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<fifostr.h>		/* LIBUC */
+#include	<biblebook.h>		/* LIBDAM */
+#include	<biblecite.h>		/* LIBDAM */
+#include	<outfmt.h>		/* LIBDAM */
+#include	<taginfo.h>		/* LIBDAM */
+#include	<sfill.h>		/* LIBDAM */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"config.h"
 #include	"defs.h"
-#include	"outfmt.h"
-#include	"taginfo.h"
-#include	"sfill.h"
 
 
 /* local defines */
@@ -84,24 +79,9 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	bwriteblanks(bfile *,int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern int	mktagfname(char *,const char *,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern "C" {
+extern int	mktagfname(char *,cchar *,cchar *,int) ;
+}
 
 
 /* external variables */
@@ -112,30 +92,31 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	procoutcite(PROGINFO *,BIBLEBOOK *,bfile	*,
-			BIBLECITE *) ;
+local int	procoutcite(PI *,biblebook *,bfile *,biblecite *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
 int progtagprinter(pip,basedname,bbp,ofi,ofp,tag)
-PROGINFO	*pip ;
-const char	basedname[] ;
-BIBLEBOOK	*bbp ;
+PI	*pip ;
+cchar	basedname[] ;
+biblebook	*bbp ;
 int		ofi ;
 bfile		*ofp ;
-const char	tag[] ;
+cchar	tag[] ;
 {
-	SFILL		fillout ;
-	BIBLECITE	bc ;
-	TAGINFO		ti ;
+	sfill		fillout ;
+	biblecite	bc ;
+	taginfo		ti ;
 	bfile		itagfile, *tfp = &itagfile ;
-	off_t	boff ;
-	const int	llen = LINEBUFLEN ;
+	off_t		boff ;
+	cint		llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		ki, li ;
@@ -237,11 +218,9 @@ const char	tag[] ;
 		debugprintf("progtagprinter: >%r<\n",
 			lbuf,strlinelen(lbuf,len,60)) ;
 #endif
-
 	    lp = lbuf ;
 	    ll = len ;
 	    switch (ofi) {
-
 	    case outfmt_raw:
 		if (pip->indent > 0) {
 	            rs = bwriteblanks(ofp,pip->indent) ;
@@ -251,44 +230,31 @@ const char	tag[] ;
 	            rs = bwrite(ofp,lp,ll) ;
 	    	    wlen += rs ;
 		}
-
 	        break ;
-
 	    case outfmt_bible:
-	        if (isbiblecite(&bc,lp,ll,&li)) {
-
+	        if (( rs = biblecite_ver(&bc,lp,ll)) > 0) {
+		    li = rs ;
 		    lp += li ;
 		    ll -= li ;
-
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
 		debugprintf("progtagprinter: isbiblecite() li=%u\n",li) ;
 #endif
-
 		    rs = procoutcite(pip,bbp,ofp,&bc) ;
 	    	    wlen += rs ;
-
 	        } /* end if */
-
-/* FALLTHROUGH */
+		falldown ;
 	    case outfmt_fill:
 		if (rs >= 0) {
 	            rs = sfill_proc(&fillout,pip->linelen,lp,ll) ;
 	    	    wlen += rs ;
 		}
-
 	        break ;
-
 	    } /* end switch */
-
 	    tlen += len ;
-	    if (rs < 0)
-	        break ;
-
+	    if (rs < 0) break ;
 	} /* end while (reading lines) */
-
-/* finish up with outputting the data */
-
+	/* finish up with outputting the data */
 	if (rs >= 0) {
 	    int	rs1 ;
 	    switch (ofi) {
@@ -306,11 +272,8 @@ const char	tag[] ;
 	        break ;
 	    } /* end switch */
 	} /* end if */
-
-/* close the tag file */
-
+	/* close the tag file */
 	pip->nprocessed += 1 ;
-
 badproc:
 badtagseek:
 	bclose(tfp) ;
@@ -324,14 +287,8 @@ ret0:
 
 /* local subroutines */
 
-
-static int procoutcite(pip,bbp,ofp,bcp) 
-PROGINFO	*pip ;
-BIBLEBOOK	*bbp ;
-bfile		*ofp ;
-BIBLECITE	*bcp ;
-{
-	const int	olen = BUFLEN ;
+local int procoutcite(PI *pip,biblebook *bbp,bfile *ofp,bcp) noex {
+	cint	olen = BUFLEN ;
 	int		rs ;
 	int		bi ;
 	int		bl ;
