@@ -1,10 +1,11 @@
-/* progaudit */
+/* progaudit SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* audito an index database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG 	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
@@ -17,11 +18,16 @@
 
 /*******************************************************************************
 
+  	Name:
+	progaudit
+
+	Description:
 	This subroutine processes a single file.
 
 	Synopsis:
-
 	int progaudit(pip,aip,terms,dbname,outfname)
+
+	Arguments:
 	struct proginfo	*pip ;
 	struct arginfo	*aip ;
 	const uchar	terms[] ;
@@ -29,38 +35,36 @@
 	char		outfname[] ;
 
 	Arguments:
-
 	- pip		program information pointer
 
 	Returns:
-
 	>=0		OK
 	<0		error code
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<bfile.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<eigendb.h>		/* LIBUC */
+#include	<naturalwords.h>	/* LIBDAM */
+#include	<rtags.h>		/* LIBDAM */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<climits>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<baops.h>
-#include	<bfile.h>
-#include	<vecstr.h>
-#include	<field.h>
-#include	<eigendb.h>
-#include	<localmisc.h>
-
-#include	"rtags.h"
 #include	"offindex.h"
 #include	"config.h"
 #include	"defs.h"
@@ -83,17 +87,7 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-
 extern int	hashmapverify(struct proginfo *,struct hashmap *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
 
 
 /* external variables */
@@ -107,8 +101,8 @@ extern char	*strwcpylc(char *,const char *,int) ;
 static int	tagindex(bfile *,HDB *) ;
 static int	procquery(struct proginfo *,struct hashmap *,
 			const uchar *,vecstr *,vecstr *,bfile *,bfile *) ;
-static int	tag_parse(RTAGS_TAG *,const char *,const char *,
-			const char *,int) ;
+static int	tag_parse(RTAGS_TAG *,cchar *,cchar *,
+			cchar *,int) ;
 
 
 /* local variables */
@@ -122,31 +116,21 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int progaudit(pip,aip,terms,dbname,outfname)
-struct proginfo	*pip ;
-struct arginfo	*aip ;
-const uchar	terms[] ;
-const char	dbname[] ;
-char		outfname[] ;
-{
+int progaudit(PI *pip,AI *aip,cchar *terms,cc *dbname,char *outfname) noex {
 	int	rs ;
-
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	debugprintf("progaudit: dbname=%s\n",dbname) ;
-#endif
-
+	DEBUGPRINTF("progaudit: dbname=%s\n",dbname) ;
+	{
 	rs = auditdb(pip,dbname) ;
-
+	}
 	return rs ;
-}
-/* end subroutine (progaudit) */
+} /* end subroutine (progaudit) */
 
 
