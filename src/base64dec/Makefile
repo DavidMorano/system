@@ -40,11 +40,11 @@ MODS +=
 LIBS += -lf -luo -lu
 
 
-DEPS_MAIN += b64decoder.o base64.o nzeros.o
+DEPS_MAIN += b64decoder.o base64.o
 
 OBJ0= base64dec_main.o
 OBJ1= base64dec_dec.o
-OBJ2= b64decoder.o base64.o nzeros.o
+OBJ2= b64decoder.o base64.o
 OBJ3= bufos.o bufslide.o binchunk.o
 
 OBJ= obj0.o obj1.o obj2.o obj3.o
@@ -180,7 +180,6 @@ bufslide.dir:
 base64.o:		base64.cc	base64.h
 base128.o:		base128.cc	base128.h
 b64decoder.o:		b64decoder.cc	b64decoder.h
-nzeros.o:		nzeros.ccm	nzeros.h
 binchunk.o:		binchunk.cc	binchunk.hh
 
 
