@@ -52,9 +52,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<spwd.h>		/* <- the money shot */
+#include	<spwd.h>		/* POSIX <- the money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 /* GETSPXXXR begin */
