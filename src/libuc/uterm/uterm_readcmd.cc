@@ -590,22 +590,22 @@ local int sub_loadparam(sub *sip,cchar *dbuf,int dl) noex {
 local bool isinter(int ch) noex {
 	return ((ch >= 0x20) && (ch <= 0x2F)) ;
 }
-/* end subroutines (isinter) */
+/* end subroutine (isinter) */
 
 local bool isfinalesc(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x7E)) ;
 }
-/* end subroutines (isfinalesc) */
+/* end subroutine (isfinalesc) */
 
 local bool isfinalcsi(int ch) noex {
 	return ((ch >= 0x40) && (ch <= 0x7E)) ;
 }
-/* end subroutines (isfinalcsi) */
+/* end subroutine (isfinalcsi) */
 
 local bool isparam(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x3F)) ;
 }
-/* end subroutines (isparam) */
+/* end subroutine (isparam) */
 
 local bool iscancel(int ch) noex {
 	bool		f = false ;
@@ -615,6 +615,6 @@ local bool iscancel(int ch) noex {
 	}
 	return f ;
 }
-/* end subroutines (iscancel) */
+/* end subroutine (iscancel) */
 
 
