@@ -27,16 +27,16 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
-#include	<stdorder.h>
-#include	<serialbuf.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<stdorder.h>		/* LIBUC */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mcmsg.hh"
 
@@ -107,8 +107,7 @@ int mcmsg_request(mcmsg_req *sp,int f,char *abuf,int alen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (mcmsg_request) */
+} /* end subroutine (mcmsg_request) */
 
 int mcmsg_rep::rd(char *abuf,int alen) noex {
     	cint	frd = true ;
@@ -163,8 +162,7 @@ int mcmsg_report(mcmsg_rep *sp,int f,char *abuf,int alen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (mcmsg_report) */
+} /* end subroutine (mcmsg_report) */
 
 int mcmsg_ack::rd(char *abuf,int alen) noex {
     	cint	frd = true ;
@@ -205,8 +203,7 @@ int mcmsg_acknowledge(mcmsg_ack *sp,int f,char *abuf,int alen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (mcmsg_acknowledge) */
+} /* end subroutine (mcmsg_acknowledge) */
 
 
 /* local subroutines */
