@@ -58,7 +58,8 @@
 #include	<char.h>
 #include	<ascii.h>
 #include	<ischarx.h>
-#include	<localmisc.h>		/* |NATURALWORDLEN| */
+#include	<naturalwords.h>	/* LIBDAM |NATURALWORDLEN| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"config.h"
 #include	"defs.h"
