@@ -32,28 +32,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<bfile.h>
-#include	<contypevals.h>
-#include	<contentencodings.h>
-#include	<permx.h>
-#include	<mktmp.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<mkpathx.h>
-#include	<matstr.h>
-#include	<stdfiles.h>
-#include	<strstdfname.h>
-#include	<mkchar.h>
-#include	<ismmclass.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<stdfiles.h>		/* LIBUC */
+#include	<strstdfname.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<ismmclass.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<contypevals.h>		/* LIBMAILMSG */
+#include	<contentencodings.h>	/* LIBMAILMSG */
 
 #include	"mailmsgattent.h"
 
@@ -168,8 +168,7 @@ int mailmsgattent_start(MME *op,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgattent_start) */
+} /* end subroutine (mailmsgattent_start) */
 
 int mailmsgattent_finish(MME *op) noex {
 	int		rs ;
@@ -212,8 +211,7 @@ int mailmsgattent_finish(MME *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgattent_finish) */
+} /* end subroutine (mailmsgattent_finish) */
 
 /* find the (minimally required) content-type for this particular attachment */
 int mailmsgattent_type(MME *op,MT *mtp) noex {
@@ -282,8 +280,7 @@ int mailmsgattent_type(MME *op,MT *mtp) noex {
 	    } /* end if (needed a type) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailmsgattent_type) */
+} /* end subroutine (mailmsgattent_type) */
 
 int mailmsgattent_typeset(MME *op,cchar *tstr,cchar *ststr) noex {
 	int		rs ;
@@ -323,24 +320,22 @@ int mailmsgattent_typeset(MME *op,cchar *tstr,cchar *ststr) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgattent_typeset) */
+} /* end subroutine (mailmsgattent_typeset) */
 
 int mailmsgattent_isplaintext(MME *op) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = mailmsgattent_magic(op)) >= 0) ylikely {
 	    if ((op->type != nullptr) && (op->subtype != nullptr)) {
-	        cchar	*str_text = contypevals[contypeval_text] ;
-	        cchar	*str_plain = contypevals[contypeval_plain] ;
+	        cchar	*str_text	= contypenames[contypeval_text] ;
+	        cchar	*str_plain	= contypenames[contypeval_plain] ;
 	        f = (strcmp(op->type,str_text) == 0) ;
 	        f = f && (strcmp(op->subtype,str_plain) == 0) ;
 	    }
 	    op->f_plaintext = f ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailmsgattent_isplaintext) */
+} /* end subroutine (mailmsgattent_isplaintext) */
 
 int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	int		rs ;
@@ -391,8 +386,7 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? code : rs ;
-}
-/* end subroutine (mailmsgattent_code) */
+} /* end subroutine (mailmsgattent_code) */
 
 int mailmsgattent_setcode(MME *op,int code) noex {
 	int		rs ;
@@ -410,8 +404,7 @@ int mailmsgattent_setcode(MME *op,int code) noex {
             }
         } /* end if (magic) */
         return rs ;
-}
-/* end subroutine (mailmsgattent_setcode) */
+} /* end subroutine (mailmsgattent_setcode) */
 
 /* analyze (as best as we can) an attachment */
 int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
@@ -464,8 +457,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
             } /* end if (file-open) */
 	} /* end if (non-null) */
         return (rs >= 0) ? code : rs ;
-}
-/* end subroutine (mailmsgattent_analyze) */
+} /* end subroutine (mailmsgattent_analyze) */
 
 
 /* private subroutines */
@@ -485,8 +477,7 @@ local int mailmsgattent_startfn(MME *op,cchar *sp,int sl) noex {
             } /* end if (memory-allocation) */
         } /* end if */
         return rs ;
-}
-/* end subroutine (mailmsgattent_startfn) */
+} /* end subroutine (mailmsgattent_startfn) */
 
 local int mailmsgattent_startct(MME *op,cchar *sp,int sl) noex {
         int             rs = SR_OK ;
@@ -499,18 +490,17 @@ local int mailmsgattent_startct(MME *op,cchar *sp,int sl) noex {
         } else {
             cchar       *ep ;
             if (int el ; (el = sfshrink(sp,sl,&ep)) > 0) {
-                if (int oi ; (oi = matcasestr(contypevals,ep,el)) >= 0) {
+                if (int oi ; (oi = matcasestr(contypenames,ep,el)) >= 0) {
                     rs = mailmsgattent_startctpri(op,ep,el) ;
                 } else {
                     if (cchar *ext ; (rs = libmem.strw(ep,el,&ext)) >= 0) {
                         op->ext = ext ;
                     } /* end if (memory-allocation) */
-                }
+                } /* end if */
             } /* end if */
         } /* end if */
         return rs ;
-}
-/* end subroutine (mailmsgattent_startct) */
+} /* end subroutine (mailmsgattent_startct) */
 
 local int mailmsgattent_startctpri(MME *op,cchar *sp,int sl) noex {
         int             rs = SR_OK ;
@@ -519,10 +509,9 @@ local int mailmsgattent_startctpri(MME *op,cchar *sp,int sl) noex {
             if (cchar *fn ; (rs = libmem.strw(cp,cl,&fn)) >= 0) {
                 op->type = fn ;
             } /* end if (memory-allocation) */
-        }
+        } /* end if */
         return rs ;
-}
-/* end subroutine (mailmsgattent_startctpri) */
+} /* end subroutine (mailmsgattent_startctpri) */
 
 local int mailmsgattent_startctsub(MME *op,cchar *sp,int sl) noex {
         int             rs = SR_OK ;
@@ -531,22 +520,20 @@ local int mailmsgattent_startctsub(MME *op,cchar *sp,int sl) noex {
             if (cchar *fn ; (rs = libmem.strw(cp,cl,&fn)) >= 0) {
                 op->subtype = fn ;
             } /* end if (memory-allocation) */
-        }
+        } /* end if */
         return rs ;
-}
-/* end subroutine (mailmsgattent_startctsub) */
+} /* end subroutine (mailmsgattent_startctsub) */
 
 local int mailmsgattent_checkatt(MME *op) noex {
         int             rs = SR_OK ;
         cchar           *fn = op->attfname ;
-        if (fn != nullptr) {
+        if (fn) {
             if (strcmp(fn,"-") != 0) {
                 rs = perm(fn,-1,-1,nullptr,R_OK) ;
             }
-        }
+        } /* end if */
         return rs ;
-}
-/* end subroutine (mailmsgattent_checkatt) */
+} /* end subroutine (mailmsgattent_checkatt) */
 
 local int mailmsgattent_needaux(MME *op,cc *tmpdn,char *abuf,bfile *afp) noex {
 	int		rs = SR_FAULT ;
@@ -583,8 +570,7 @@ local int mailmsgattent_needaux(MME *op,cc *tmpdn,char *abuf,bfile *afp) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgattent) */
+} /* end subroutine (mailmsgattent) */
 
 local int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
         int             rs ;
@@ -624,8 +610,7 @@ local int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
         return (rs >= 0) ? code : rs ;
-}
-/* end subroutine (mailmsgattent_analyzer) */
+} /* end subroutine (mailmsgattent_analyzer) */
 
 local int freeit(void *p) noex {
         int             rs = SR_OK ;
@@ -633,9 +618,8 @@ local int freeit(void *p) noex {
         if (*pp != nullptr) {
             rs = libmem.free(*pp) ;
             *pp = nullptr ;
-        }
+        } /* end if */
         return rs ;
-}
-/* end subroutine (freeit) */
+} /* end subroutine (freeit) */
 
 
