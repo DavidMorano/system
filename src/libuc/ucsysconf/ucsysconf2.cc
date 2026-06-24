@@ -65,7 +65,7 @@ module ;
 #include	<sys/utsname.h>		/* POSIX |uname(2)| */
 #include	<unistd.h>		/* POSIX */
 #include	<utmpx.h>		/* POSIX */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -73,6 +73,7 @@ module ;
 #include	<ustd.h>		/* LIBU |ustd_conf{x}| */
 #include	<intsat.h>		/* LIBU */
 #include	<sysconfcmds.h>		/* LIBU */
+#include	<isoneof.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"ucsysconf.h"
@@ -104,8 +105,19 @@ using libu::ustd_confstr ;		/* subroutine */
 
 /* forward references */
 
+local bool	isNoSup(int) noex ;
+
 
 /* local variables */
+
+constexpr int	rsnosup[] = {
+    	SR_NOSYS,
+	SR_NOTSUP,
+	SR_INVALID,
+	0
+} ; /* end array */
+
+ucdatamgr		ucdata ;	/* <- module linkage */
 
 
 /* exported variables */
@@ -166,11 +178,11 @@ int ucsysconf::getvalcache(int req) noex {
 	int		ii = -1 ;
 	switch (req) {
         case _SC_PAGESIZE:              ii = dataitem_pagesz ;          break ;
-	case _SC_PID_MAX:		ii = dataitem_maxpid ;	break ;
-	case _SC_ARG_MAX:		ii = dataitem_maxarg ;	break ;
-	case _SC_LINE_MAX:		ii = dataitem_maxline ; break ;
-	case _SC_LINK_MAX:		ii = dataitem_maxlink ; break ;
-	case _SC_LOGIN_NAME_MAX:	ii = dataitem_maxlogin ; break ;
+	case _SC_PID_MAX:		ii = dataitem_maxpid ;		break ;
+	case _SC_ARG_MAX:		ii = dataitem_maxarg ;		break ;
+	case _SC_LINE_MAX:		ii = dataitem_maxline ;		break ;
+	case _SC_LINK_MAX:		ii = dataitem_maxlink ;		break ;
+	case _SC_LOGIN_NAME_MAX:	ii = dataitem_maxlogin ;	break ;
 	case _SC_NGROUPS_MAX:		ii = dataitem_maxgroups ;	break ;
         case _SC_SYMLOOP_MAX:           ii = dataitem_symlinks ;        break ;
         case _SC_SYMBOL_MAX:            ii = dataitem_maxsymbol ;       break ;
@@ -208,9 +220,10 @@ int ucsysconf::getvalcache(int req) noex {
 		if ((rs = getval(req)) > 0) {
 		    ucdata.d[ii].store(rs,memord_relaxed) ;
 		}
-	    } else if (rs > 0) {
+	    } /* end if (filling cache) */
+	    if (rs >= 0) {
 	        if (lp) *lp = long(rs) ;
-	    }
+	    } /* end if (store value) */
 	} /* end if */
 	return rs ;
 } /* end method (ucsysconf::getvalcache) */
@@ -317,16 +330,25 @@ int ucsysconf::getvalsyn(int req) noex {
 
 int ucsysconf::getval(int req) noex {
     	int		rs ;
+	int		val = 0 ;
 	if (req >= sysconfcmd_synthetic) {
 	    rs = getvalsyn(req) ;
-	} else {
-	    rs = getstd(req) ;
-	}
-	return rs ;
+	    val = rs ;
+	} else if ((rs = getstd(req)) > 0) {
+	    val = rs ;
+	} else if ((rs < 0) && isNoSup(rs)) {
+	    rs = getvalsyn(req) ;
+	    val = rs ;
+	} /* end if */
+	return (rs >= 0) ? val : rs ;
 } /* end method (ucsysconf::getval) */
 
 int ucsysconf::mconfval(int req) noex {
     	return ustd_confval(req,lp) ;
 } /* end method (ucsysconf::mconfval) */
+
+local bool isNoSup(int rs) noex {
+	return isOneOf(rsnosup,rs) ;
+} /* end wubtoutine (isNoSup) */
 
 
