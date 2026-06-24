@@ -69,7 +69,7 @@ struct mcmsg_co {
 	int operator () () noex {
 	    return operator int () ;
 	} ;
-} ;
+} ; /* end struct */
 
 extern int mcmsg_coreq(mcmsg_req *,int) noex ;
 extern int mcmsg_corep(mcmsg_rep *,int) noex ;
@@ -78,17 +78,17 @@ extern int mcmsg_coack(mcmsg_ack *,int) noex ;
 template<>
 mcmsg_co<mcmsg_req>::operator int () noex {
     	return mcmsg_coreq(op,w) ;
-}
+} /* end subroutine */
 
 template<>
 mcmsg_co<mcmsg_rep>::operator int () noex {
     	return mcmsg_corep(op,w) ;
-}
+} /* end subroutine */
 
 template<>
 mcmsg_co<mcmsg_ack>::operator int () noex {
     	return mcmsg_coack(op,w) ;
-}
+} /* end subroutine */
 
 /* client request message */
 struct mcmsg_req {
@@ -134,12 +134,12 @@ struct mcmsg_rep {
 	mcmsg_rep() noex {
 	    start(this,mcmsgmem_start) ;
 	    finish(this,mcmsgmem_finish) ;
-	} ;
+	} ; /* end ctor */
 	void dtor() noex ;
-	~mcmsg_rep() {
+	destruct mcmsg_rep() {
 	    dtor() ;
-	} ;
-} ;
+	} ; /* end destruct */
+} ; /* end struct (mcmsg_rep) */
 
 /* general acknowledgement */
 struct mcmsg_ack {
@@ -157,10 +157,10 @@ struct mcmsg_ack {
 	    finish(this,mcmsgmem_finish) ;
 	} ;
 	void dtor() noex ;
-	~mcmsg_ack() {
+	destruct mcmsg_ack() {
 	    dtor() ;
-	} ;
-} ;
+	} ; /* end destruct */
+} ; /* end struct (mcmsg_ack) */
 
 /* request types */
 enum mcmsgtypes {
@@ -168,7 +168,7 @@ enum mcmsgtypes {
 	mcmsgtype_report,
 	mcmsgtype_ack,
 	mcmsgtype_overlast
-} ;
+} ; /* end enum */
 
 /* response codes */
 enum mcmsgrcs {
@@ -177,13 +177,13 @@ enum mcmsgrcs {
 	mcmsgrc_notavail,
 	mcmsgrc_goingdown,
 	mcmsgrc_overlast
-} ;
+} ; /* end enum */
 
 EXTERNC_begin
 
-extern int	mcmsg_request(mcmsg_req *,int,char *,int) noex ;
-extern int	mcmsg_report(mcmsg_rep *,int,char *,int) noex ;
-extern int	mcmsg_acknowledge(mcmsg_ack *,int,char *,int) noex ;
+extern int	mcmsg_request		(mcmsg_req *,int,char *,int) noex ;
+extern int	mcmsg_report		(mcmsg_rep *,int,char *,int) noex ;
+extern int	mcmsg_acknowledge	(mcmsg_ack *,int,char *,int) noex ;
 
 EXTERNC_end
 
