@@ -76,35 +76,45 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<climits>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |abs(3c)| */
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<sysval.hh>
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<strw.h>		/* |strwblanks(3uc)| */
-#include	<strn.h>		/* |strnblanks(3uc)| */
-#include	<lockfile.h>
-#include	<cfdec.h>
-#include	<ctdec.h>
-#include	<mkchar.h>
-#include	<hasx.h>
-#include	<isfiledesc.h>		/* |isfsremote(3uc)| */
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<netdb.h>		/* POSIX */
+#include	<ctime>			/* LIBU */
+#include	<climits>		/* LIBU */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* CSTD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strw.h>		/* LIBUC |strwblanks(3uc)| */
+#include	<strn.h>		/* LIBUC |strnblanks(3uc)| */
+#include	<lockfile.h>		/* LINUC */
+#include	<cfdec.h>		/* LINUC */
+#include	<ctdec.h>		/* LINUC */
+#include	<hasx.h>		/* LINUC */
+#include	<isfiledesc.h>		/* LINUC |isfsremote(3uc)| */
+#include	<ischarx.h>		/* LINUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"logzones.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -140,6 +150,7 @@ import libutil ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -158,32 +169,31 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static inline int logzones_magic(logzones *op,Args ... args) noex {
+local inline int logzones_magic(logzones *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LOGZONES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LOGZONES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (logzones_magic) */
+} /* end subroutine (logzones_magic) */
 
-static int	logzones_opener(LZ *,cc *,int,mode_t) noex ;
-static int	logzones_fileopen(LZ *,time_t) noex ;
-static int	logzones_fileclose(LZ *) noex ;
-static int	logzones_lockacq(LZ *,time_t,int) noex ;
-static int	logzones_lockrel(LZ *) noex ;
-static int	logzones_updater(LZ *,cc *,int,int,cc *) noex ;
-static int	logzones_search(LZ *,char *,int,int,char **) noex ;
-static int	logzones_enteropen(LZ *,time_t) noex ;
+local int	logzones_opener(LZ *,cc *,int,mode_t) noex ;
+local int	logzones_fileopen(LZ *,time_t) noex ;
+local int	logzones_fileclose(LZ *) noex ;
+local int	logzones_lockacq(LZ *,time_t,int) noex ;
+local int	logzones_lockrel(LZ *) noex ;
+local int	logzones_updater(LZ *,cc *,int,int,cc *) noex ;
+local int	logzones_search(LZ *,char *,int,int,char **) noex ;
+local int	logzones_enteropen(LZ *,time_t) noex ;
 
-static int entry_start(LZ_ENT *,cchar *,int,int,cchar *) noex ;
-static int entry_startbuf(LZ_ENT *,cchar *,int) noex ;
-static int entry_update(LZ_ENT *,cchar *) noex ;
-static int entry_write(LZ_ENT *,char *,int) noex ;
-static int entry_finish(LZ_ENT *) noex ;
+local int entry_start(LZ_ENT *,cchar *,int,int,cchar *) noex ;
+local int entry_startbuf(LZ_ENT *,cchar *,int) noex ;
+local int entry_update(LZ_ENT *,cchar *) noex ;
+local int entry_write(LZ_ENT *,char *,int) noex ;
+local int entry_finish(LZ_ENT *) noex ;
 
-static bool	hasoffset(int) noex ;
-static bool	fieldmatch(cchar *,cchar *,int,int) noex ;
+local bool	hasoffset(int) noex ;
+local bool	fieldmatch(cchar *,cchar *,int,int) noex ;
 
 
 /* local variables */
@@ -216,33 +226,32 @@ int logzones_open(LZ *op,cchar *fname,int of,mode_t om) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (logzones_open) */
+} /* end subroutine (logzones_open) */
 
 int logzones_close(LZ *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = logzones_magic(op)) >= 0) {
 	    if (op->buf) {
-	        rs1 = uc_free(op->buf) ;
+	        rs1 = mem.free(op->buf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->buf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->fd >= 0) {
 	        rs1 = u_close(op->fd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fd = -1 ;
 	    }
 	    if (op->fname) {
-	        rs1 = uc_free(op->fname) ;
+	        voidp vp = voidp(op->fname) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
-	    }
-	    op->magic = 0 ;
+	    } /* end if (memory-release) */
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logzones_close) */
+} /* end subroutine (logzones_close) */
 
 /* initialize a cursor */
 int logzones_curbegin(LZ *op,LZ_CUR *curp) noex {
@@ -254,8 +263,7 @@ int logzones_curbegin(LZ *op,LZ_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logzones_curbegin) */
+} /* end subroutine (logzones_curbegin) */
 
 int logzones_curend(LZ *op,LZ_CUR *curp) noex {
 	int		rs ;
@@ -273,8 +281,7 @@ int logzones_curend(LZ *op,LZ_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logzones_curend) */
+} /* end subroutine (logzones_curend) */
 
 int logzones_curenum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 	int		rs ;
@@ -303,7 +310,7 @@ int logzones_curenum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 	                    if ((eoff + ebl) <= op->fsize) {
 	                        if (ep) {
 				    cint	fd = op->fd ;
-	                            if ((rs = u_pread(fd,ebp,ebl,eoff)) >= 0) {
+	                            if ((rs = u_readp(fd,ebp,ebl,eoff)) >= 0) {
 					cchar	*ebuf = (op->buf + eoff) ;
 	                                rs = entry_startbuf(ep,ebuf,ebl) ;
 	                            }
@@ -323,8 +330,7 @@ int logzones_curenum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (logzones_curenum) */
+} /* end subroutine (logzones_curenum) */
 
 int logzones_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 	int		rs ;
@@ -369,8 +375,7 @@ int logzones_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 	    } /* end if (enter-open) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (logzones_match) */
+} /* end subroutine (logzones_match) */
 
 int logzones_update(LZ *op,cchar *znb,int znl,int off,cchar *st) noex {
 	int		rs ;
@@ -383,8 +388,7 @@ int logzones_update(LZ *op,cchar *znb,int znl,int off,cchar *st) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (logzones_update) */
+} /* end subroutine (logzones_update) */
 
 int logzones_check(LZ *op,time_t dt) noex {
 	int		rs ;
@@ -400,17 +404,16 @@ int logzones_check(LZ *op,time_t dt) noex {
 	    } /* end if (already open) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logzones_check) */
+} /* end subroutine (logzones_check) */
 
 
 /* private subroutines */
 
-static int logzones_opener(LZ *op,cc *fname,int of,mode_t om) noex {
+local int logzones_opener(LZ *op,cc *fname,int of,mode_t om) noex {
 	int		rs ;
 	if ((rs = u_open(fname,of,om)) >= 0) {
 	    op->fd = rs ;
-	    if (cchar *cp ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
 	        custime		dt = getustime ;
 	        op->fname = cp ;
 	        op->oflags = (of &= (~ O_TRUNC)) ;
@@ -433,30 +436,30 @@ static int logzones_opener(LZ *op,cc *fname,int of,mode_t om) noex {
 	                        cint	sz = (ne * entlen) ;
 	                        char	*bp{} ;
 	                        op->fl.remote = (rs > 0) ;
-	                        if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	                        if ((rs = mem.mall(sz,&bp)) >= 0) {
 	                            op->bufsize = sz ;
 	                            op->buf = bp ;
-	                            op->magic = LOGZONES_MAGIC ;
-	                        }
+	                            op->magval = LOGZONES_MAGIC ;
+	                        } /* end if (memory-acquire) */
 	                    } /* end if (isfsremote) */
 			} /* end if (filesize) */
 	            } /* end if (uc_fstat) */
 	        } /* end if (uc_closeonexec) */
 	        if (rs < 0) {
-	            uc_free(op->fname) ;
+	            voidp vp = voidp(op->fname) ;
+	            mem.free(vp) ;
 	            op->fname = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (m-a) */
 	    if (rs < 0) {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
-	    }
+	    } /* end if (error) */
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (logzones_opener) */
+} /* end subroutine (logzones_opener) */
 
-static int logzones_lockacq(LZ *op,time_t dt,int f_read) noex {
+local int logzones_lockacq(LZ *op,time_t dt,int f_read) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (op->fd < 0) {
@@ -488,10 +491,9 @@ static int logzones_lockacq(LZ *op,time_t dt,int f_read) noex {
 	    } /* end if (lockfile) */
 	} /* end if (ok) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (logzones_lockacq) */
+} /* end subroutine (logzones_lockacq) */
 
-static int logzones_lockrel(LZ *op) noex {
+local int logzones_lockrel(LZ *op) noex {
 	int		rs = SR_OK ;
 	if (op->fl.lockedread || op->fl.lockedwrite) {
 	    if (op->fd >= 0) {
@@ -503,10 +505,9 @@ static int logzones_lockrel(LZ *op) noex {
 	    op->fl.lockedwrite = false ;
 	}
 	return rs ;
-}
-/* end subroutine (logzones_lockrel) */
+} /* end subroutine (logzones_lockrel) */
 
-static int logzones_updater(LZ *op,cc *znb,int znl,int off,cc *st) noex {
+local int logzones_updater(LZ *op,cc *znb,int znl,int off,cc *st) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	int		rs1 ;
@@ -593,10 +594,9 @@ static int logzones_updater(LZ *op,cc *znb,int znl,int off,cc *st) noex {
 	    } /* end if (ok) */
 	} /* end if (enter-open) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (logzones_updater) */
+} /* end subroutine (logzones_updater) */
 
-static int logzones_search(LZ *op,char *ebp,int ebl,int soff,char **rpp) noex {
+local int logzones_search(LZ *op,char *ebp,int ebl,int soff,char **rpp) noex {
 	int		rs ;
 	if ((rs = u_seek(op->fd,0z,SEEK_SET)) >= 0) {
 	    uint	off = 0 ;
@@ -636,10 +636,9 @@ static int logzones_search(LZ *op,char *ebp,int ebl,int soff,char **rpp) noex {
 	    }
 	} /* end if (seek) */
 	return rs ;
-}
-/* end subroutine (logzones_search) */
+} /* end subroutine (logzones_search) */
 
-static int logzones_fileopen(LZ *op,time_t dt) noex {
+local int logzones_fileopen(LZ *op,time_t dt) noex {
 	int		rs ;
 	if (op->fd < 0) {
 	    cint	of = op->oflags ;
@@ -657,10 +656,9 @@ static int logzones_fileopen(LZ *op,time_t dt) noex {
 	    rs = op->fd ;
 	}
 	return rs ;
-}
-/* end subroutine (logzones_fileopen) */
+} /* end subroutine (logzones_fileopen) */
 
-static int logzones_fileclose(LZ *op) noex {
+local int logzones_fileclose(LZ *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) {
@@ -669,20 +667,18 @@ static int logzones_fileclose(LZ *op) noex {
 	    op->fd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (logzones_fileclose) */
+} /* end subroutine (logzones_fileclose) */
 
-static int logzones_enteropen(LZ *op,time_t dt) noex {
+local int logzones_enteropen(LZ *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    if (dt == 0) dt = getustime ;
 	    rs = logzones_fileopen(op,dt) ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (logzones_enteropen) */
+} /* end subroutine (logzones_enteropen) */
 
-static int entry_start(LZ_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
+local int entry_start(LZ_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
 	int		rs = SR_FAULT ;
 	if (ep && znb) ylikely {
 	    cint	ml = min(znl,LOGZONES_ZNAMESIZE) ;
@@ -698,10 +694,9 @@ static int entry_start(LZ_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
-static int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
+local int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 	int		rs = SR_FAULT ;
 	if (ep && ebuf) ylikely {
 	    rs = SR_INVALID ;
@@ -744,10 +739,9 @@ static int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_startbuf) */
+} /* end subroutine (entry_startbuf) */
 
-static int entry_update(LZ_ENT *ep,cchar *st) noex {
+local int entry_update(LZ_ENT *ep,cchar *st) noex {
 	int		rs = SR_FAULT ;
 	if (ep) ylikely {
 	    rs = SR_OK ;
@@ -759,10 +753,9 @@ static int entry_update(LZ_ENT *ep,cchar *st) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_update) */
+} /* end subroutine (entry_update) */
 
-static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
+local int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
 	int		rs = SR_FAULT ;
 	if (ep && ebuf) ylikely {
 	    cint	clen = EFL_COUNT ;
@@ -829,27 +822,23 @@ static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
 	    } /* end if (overflow) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_write) */
+} /* end subroutine (entry_write) */
 
-static int entry_finish(LZ_ENT *ep) noex {
+local int entry_finish(LZ_ENT *ep) noex {
 	int		rs = SR_FAULT ;
 	if (ep) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
-static bool hasoffset(int off) noex {
+local bool hasoffset(int off) noex {
 	return (abs(off) <= (12 * 60)) ;
-}
-/* end subroutine (hasoffset) */
+} /* end subroutine (hasoffset) */
 
 /* return true if a field matched up */
-static bool fieldmatch(cchar *ebp,cchar *mbp,int fo,int fl) noex {
+local bool fieldmatch(cchar *ebp,cchar *mbp,int fo,int fl) noex {
 	return (strncmp((ebp + fo),(mbp + fo),fl) == 0) ;
-}
-/* end subroutine (fieldmatch) */
+} /* end subroutine (fieldmatch) */
 
 
