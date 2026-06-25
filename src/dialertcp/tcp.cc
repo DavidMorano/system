@@ -1,16 +1,17 @@
-/* tcp */
+/* sd_tcp SUPPORT (Sys-Dialer) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* TCP dialer */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-        This was created as one of the first dialer modules for the SYSDIALER
-        object.
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
 
 */
 
@@ -18,47 +19,53 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is a dialer module.
 
 	Synopsis:
-
 	tcp [[<host>:]<port>] [-f <af>]
 
 	Arguments:
-
-	host		override hn
+	host		hostname
 	port		service port
 	af		address family
 
 	Returns:
-
 	<0		error
 	>=0		file-descriptor
 
-
 *******************************************************************************/
 
-
-#define	TCP_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<ucfileop.h>
+#include	<dial.h>		/* |dialtcp(3uc)| */
+#include	<strwcpy.h>
+#include	<matstr.h>		/* |matostr(3uc)| */
+#include	<cfdec.h>
 #include	<baops.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
-#include	"tcp.h"
 #include	"sysdialer.h"
+#include	"sd_tcp.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -74,26 +81,18 @@
 #define	SVCNAMELEN	32
 #endif
 
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
-
 #define	NPARG		2	/* number of positional arguments */
 #define	MAXARGINDEX	100
 #define	NARGPRESENT	(MAXARGINDEX/8 + 1)
 
 
+/* iported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getpwd(char *,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	isdigitlatin(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -102,83 +101,88 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local structures */
 
 struct afamily {
-	const char	*name ;
+	cchar		*name ;
 	int		af ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-
-/* external variables (module information) */
-
-SYSDIALER_INFO	tcp = {
-	TCP_MNAME,
-	TCP_VERSION,
-	TCP_INAME,
-	sizeof(TCP),
-	TCP_FLAGS
-} ;
+template<typename ... Args>
+local inline int tcp_magic(TCP *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TCP_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (tcp_magic) */
 
 
 /* local variables */
-
-static cchar	*argopts[] = {
-	"ROOT",
-	"af",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
 	argopt_af,
 	argopt_overlast
-} ;
+} ; /* end enum (argopts) */
 
-static const struct afamily	afs[] = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"af",
+	nullptr
+} ; /* end array (argopts) */
+
+constexpr afamily	afs[] = {
 	{ "inet", AF_INET },
 	{ "inet4", AF_INET },
 #ifdef	AF_INET6
 	{ "inet6", AF_INET6 },
 #endif
-	{ NULL, 0 }
-} ;
+	{ nullptr, 0 }
+} ; /* end array (afs) */
+
+
+/* external variables (module information) */
+
+SYSDIALER_INFO	sd_tcp = {
+	TCP_MNAME,
+	TCP_VERSION,
+	TCP_INAME,
+	szof(TCP),
+	TCP_FLAGS
+} ; /* end object (sd_tcp) */
 
 
 /* exported subroutines */
 
-
-int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
-{
-	int		rs = SR_OK ;
+int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar *hn,cchar *svc,mainv) noex {
+	int		rs ;
+	int		fd = 0 ; /* return-value */
+	if ((rs = tcp_magic(op,ap,hn,svc)) >= 0) {
 	int		to = -1 ;
 	int		af = AF_UNSPEC ;
 	int		opts = 0 ;
-	cchar		*pr = NULL ;
 	char		hnbuf[MAXHOSTNAMELEN + 1] ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic == TCP_MAGIC) return SR_INUSE ;
 
 #if	CF_DEBUGS
 	debugprintf("tcp_open: entered hn=%s svc=%s\n",
 	    hn,svc) ;
 #endif
 
-	if (ap != NULL) {
+	if (ap != nullptr) {
 	    int	argl, aol, avl ;
 	    int	maxai, pan, npa, kwi, i ;
 	    int	argnum ;
 	    int	cl ;
 	    int	f_optminus, f_optplus, f_optequal ;
-	    int	f_bad = FALSE ;
+	    int	f_bad = false ;
 
-	    const char	**argv, *argp, *aop, *avp ;
+	    mainv	argv ;
+	    cchar	*argp, *aop, *avp ;
 	    char	argpresent[NARGPRESENT] ;
-	    const char	*afspec = NULL ;
-	    const char	*hostsvc = NULL ;
-	    const char	*cp ;
+	    cchar	*afspec = nullptr ;
+	    cchar	*hostsvc = nullptr ;
+	    cchar	*cp ;
 
 
 #if	CF_DEBUGS
@@ -190,7 +194,6 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 	    to = ap->timeout ;
 	    opts = ap->options ;
 	    argv = ap->argv ;
-	    pr = ap->pr ;
 
 /* process program arguments */
 
@@ -199,10 +202,10 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 	    npa = 0 ;			/* number of positional so far */
 	    maxai = 0 ;
 	    i = 0 ;
-	    while ((argv[i] != NULL) && (argv[i + 1] != NULL)) {
+	    while ((argv[i] != nullptr) && (argv[i + 1] != nullptr)) {
 
 	        argp = argv[++i] ;
-	        argl = strlen(argp) ;
+	        argl = lenstr(argp) ;
 
 #if	CF_DEBUGS
 	        debugprintf("tcp_open: argl=%u argp=%p\n",argl,argp) ;
@@ -213,7 +216,7 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 	        if ((argl > 0) && (f_optminus || f_optplus)) {
 
 	            if (argl > 1) {
-			const int	ach = MKCHAR(argp[1]) ;
+			cint	ach = MKCHAR(argp[1]) ;
 
 	                if (isdigitlatin(ach)) {
 
@@ -228,62 +231,37 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 
 	                    aop = argp + 1 ;
 	                    aol = argl - 1 ;
-	                    f_optequal = FALSE ;
-	                    if ((avp = strchr(aop,'=')) != NULL) {
+	                    f_optequal = false ;
+	                    if ((avp = strchr(aop,'=')) != nullptr) {
 
 #if	CF_DEBUGS
 	                        debugprintf("main: key w/ value\n") ;
 #endif
 
-	                        aol = avp - aop ;
+	                        aol = intconv(avp - aop) ;
 	                        avp += 1 ;
-	                        avl = aop + argl - 1 - avp ;
-	                        f_optequal = TRUE ;
+	                        avl = intconv(aop + argl - 1 - avp) ;
+	                        f_optequal = true ;
 
 	                    } else
 	                        avl = 0 ;
 
 	                    if ((kwi = matostr(argopts,2,aop,aol)) >= 0) {
-
 	                        switch (kwi) {
-
-/* program root */
-	                        case argopt_root:
-	                            if (f_optequal) {
-
-	                                f_optequal = FALSE ;
-	                                if (avl)
-	                                    pr = avp ;
-
-	                            } else {
-
-	                                if (argv[i + 1] == NULL)
-	                                    goto badargnum ;
-
-	                                argp = argv[++i] ;
-	                                argl = strlen(argp) ;
-
-	                                if (argl)
-	                                    pr = argp ;
-
-	                            }
-
-	                            break ;
-
 	                        case argopt_af:
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl)
 	                                    afspec = avp ;
 
 	                            } else {
 
-	                                if (argv[i + 1] == NULL)
+	                                if (argv[i + 1] == nullptr)
 	                                    goto badargnum ;
 
 	                                argp = argv[++i] ;
-	                                argl = strlen(argp) ;
+	                                argl = lenstr(argp) ;
 
 	                                if (argl)
 	                                    afspec = argp ;
@@ -297,16 +275,16 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 	                    } else {
 
 	                        while (aol--) {
-				    const int	kc = MKCHAR(*aop) ;
+				    cint	kc = MKCHAR(*aop) ;
 
 	                            switch (kc) {
 
 	                            case 'f':
-	                                if (argv[i + 1] == NULL)
+	                                if (argv[i + 1] == nullptr)
 	                                    goto badargnum ;
 
 	                                argp = argv[++i] ;
-	                                argl = strlen(argp) ;
+	                                argl = lenstr(argp) ;
 
 	                                if (argl)
 	                                    afspec = argp ;
@@ -315,11 +293,11 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 
 /* service name */
 	                            case 's':
-	                                if (argv[i + 1] == NULL)
+	                                if (argv[i + 1] == nullptr)
 	                                    goto badargnum ;
 
 	                                argp = argv[++i] ;
-	                                argl = strlen(argp) ;
+	                                argl = lenstr(argp) ;
 
 	                                if (argl)
 	                                    svc = argp ;
@@ -328,11 +306,11 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 
 /* timeout */
 	                            case 't':
-	                                if (argv[i + 1] == NULL)
+	                                if (argv[i + 1] == nullptr)
 	                                    goto badargnum ;
 
 	                                argp = argv[++i] ;
-	                                argl = strlen(argp) ;
+	                                argl = lenstr(argp) ;
 
 	                                if (argl) {
 
@@ -345,7 +323,7 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 	                                break ;
 
 	                            default:
-	                                f_bad = TRUE ;
+	                                f_bad = true ;
 					break ;
 
 	                            } /* end switch */
@@ -375,7 +353,7 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 	                maxai = i ;
 	                npa += 1 ;
 	            } else {
-	                f_bad = TRUE ;
+	                f_bad = true ;
 	            }
 
 	        } /* end if (key letter/word or positional) */
@@ -402,35 +380,37 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 	        } /* end for */
 	    } /* end if (positional arguments) */
 
-	    if ((hostsvc != NULL) && (hostsvc[0] != '\0')) {
-
-	        if ((cp = strchr(hostsvc,':')) != NULL) {
-
-	            cl = MIN((cp - hostsvc),SVCNAMELEN) ;
+	    if ((hostsvc != nullptr) && (hostsvc[0] != '\0')) {
+	        if ((cp = strchr(hostsvc,':')) != nullptr) {
+		    cint svcl = 
+	            intconv(cp - hostsvc) ;
+	            cl = MIN(svcl,SVCNAMELEN) ;
 	            if (cl > 0) {
 	                hn = hnbuf ;
 	                strwcpy(hnbuf,hostsvc,cl) ;
 	            }
 
 	            cp += 1 ;
-	            if (cp[0] != '\0')
+	            if (cp[0] != '\0') {
 	                svc = cp ;
+		    }
 
-	        } else
+	        } else {
 	            svc = hostsvc ;
+		}
 
 	    } /* end if */
 
-	    if ((afspec != NULL) && (afspec[0] != '\0')) {
+	    if ((afspec != nullptr) && (afspec[0] != '\0')) {
 
-	        for (i = 0 ; afs[i].name != NULL ; i += 1) {
+	        for (i = 0 ; afs[i].name != nullptr ; i += 1) {
 
 	            if (strcmp(afs[i].name,afspec) == 0)
 	                break ;
 
 	        }
 
-	        if (afs[i].name != NULL) {
+	        if (afs[i].name != nullptr) {
 	            af = afs[i].af ;
 		} else
 	            rs = SR_INVALID ;
@@ -455,179 +435,102 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar hn[],cchar svc[],cchar *av[])
 
 	if (rs >= 0) {
 	    op->magic = TCP_MAGIC ;
-	    uc_closeonexec(op->fd,TRUE) ;
+	    uc_closeonexec(op->fd,true) ;
 	}
-
-ret0:
 
 #if	CF_DEBUGS
 	debugprintf("tcp_open: ret rs=%d fd=%d\n",rs,op->fd) ;
 #endif
 
-	return (rs >= 0) ? op->fd : rs ;
-
-/* bad stuff */
 badargval:
 badargnum:
 badarg:
-	rs = SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("tcp_open: ret BAD \n") ;
-#endif
-
-	goto ret0 ;
+	    fd = op->fd ;
+	} /* end if (magic) */
+	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (tcp_open) */
 
-
-int tcp_reade(TCP *op,char *buf,int blen,int to,int opts)
-{
+int tcp_reade(TCP *op,char *bufp,int blen,int to,int opts) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = uc_reade(op->fd,buf,blen,to,opts) ;
-
+	if ((rs = tcp_magic(op,bufp)) >= 0) {
+	    rs = uc_reade(op->fd,bufp,blen,to,opts) ;
+	} /* end if (magic) */
 	return rs ;
 }
 
-
-int tcp_recve(TCP *op,char *buf,int blen,int flags,int to,int opts)
-{
+int tcp_recve(TCP *op,char *bufp,int blen,int flags,int to,int opts) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = uc_recve(op->fd,buf,blen,flags,to,opts) ;
-
+	if ((rs = tcp_magic(op,bufp)) >= 0) {
+	    rs = uc_recve(op->fd,bufp,blen,flags,to,opts) ;
+	} /* end if (magic) */
 	return rs ;
 }
 
-
-int tcp_recvfrome(op,buf,blen,flags,sap,salenp,to,opts)
-TCP		*op ;
-char		buf[] ;
-int		blen ;
-int		flags ;
-void		*sap ;
-int		*salenp ;
-int		to, opts ;
-{
+int tcp_recvfrome(TCP *op,char *bufp,int blen,int flags,
+		void *sap,int *salenp,int to,int opts) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = uc_recvfrome(op->fd,buf,blen,flags,sap,salenp,to,opts) ;
-
+	if ((rs = tcp_magic(op,bufp)) >= 0) {
+	    rs = uc_recvfrome(op->fd,bufp,blen,flags,sap,salenp,to,opts) ;
+	} /* end if (magic) */
 	return rs ;
 }
 
-
-int tcp_recvmsge(TCP *op,MSGHDR *msgp,int flags,int to,int opts)
-{
+int tcp_recvmsge(TCP *op,MSGHDR *msgp,int flags,int to,int opts) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = uc_recvmsge(op->fd,msgp,flags,to,opts) ;
-
+	if ((rs = tcp_magic(op)) >= 0) {
+	    rs = uc_recvmsge(op->fd,msgp,flags,to,opts) ;
+	} /* end if (magic) */
 	return rs ;
 }
 
-
-int tcp_write(TCP *op,cchar *buf,int blen)
-{
+int tcp_write(TCP *op,cchar *bufp,int blen) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = uc_writen(op->fd,((void *) buf),blen) ;
-
+	if ((rs = tcp_magic(op,bufp)) >= 0) {
+	    rs = uc_writen(op->fd,bufp,blen) ;
+	} /* end if (magic) */
 	return rs ;
 }
 
-
-int tcp_send(TCP *op,cchar *buf,int blen,int flags)
-{
+int tcp_send(TCP *op,cchar *bufp,int blen,int flags) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = u_send(op->fd,buf,blen,flags) ;
-
+	if ((rs = tcp_magic(op,bufp)) >= 0) {
+	    rs = u_send(op->fd,bufp,blen,flags) ;
+	} /* end if (magic) */
 	return rs ;
 }
 
-
-int tcp_sendto(TCP *op,cchar *buf,int blen,int flags,void *sap,int salen)
-{
+int tcp_sendto(TCP *op,cc *bufp,int blen,int flags,void *sap,int salen) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = u_sendto(op->fd,buf,blen,flags,sap,salen) ;
-
+	if ((rs = tcp_magic(op,bufp)) >= 0) {
+	    rs = u_sendto(op->fd,bufp,blen,flags,sap,salen) ;
+	} /* end if (magic) */
 	return rs ;
 }
 
-
-int tcp_sendmsg(TCP *op,MSGHDR *msgp,int flags)
-{
+int tcp_sendmsg(TCP *op,MSGHDR *msgp,int flags) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = u_sendmsg(op->fd,msgp,flags) ;
-
+	if ((rs = tcp_magic(op,msgp)) >= 0) {
+	    rs = u_sendmsg(op->fd,msgp,flags) ;
+	} /* end if (magic) */
 	return rs ;
 }
 
-
-/* shutdown */
-int tcp_shutdown(TCP *op,int cmd)
-{
+int tcp_shutdown(TCP *op,int cmd) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = u_shutdown(op->fd,cmd) ;
-
+	if ((rs = tcp_magic(op)) >= 0) {
+	    rs = u_shutdown(op->fd,cmd) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (tcp_shutdown) */
 
-
-/* close the connection */
-int tcp_close(TCP *op)
-{
+int tcp_close(TCP *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TCP_MAGIC) return SR_NOTOPEN ;
-
-	rs = u_close(op->fd) ;
-
-	op->magic = 0 ;
+	if ((rs = tcp_magic(op)) >= 0) {
+	    rs = u_close(op->fd) ;
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (tcp_close) */
