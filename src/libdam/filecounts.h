@@ -13,18 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<fcntl.h>		/* |mode_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<fcntl.h>		/* POSIX |mode_t| */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
-
-#define	FILECOUNTS_MAGIC	0x22436893
-#define	FILECOUNTS_NUMDIGITS	9	
-#define	FILECOUNTS_LOGZLEN	23	/* total (theoretical) length */
 
 #define	FILECOUNTS		struct filecounts_head
 #define	FILECOUNTS_N		struct filecounts_name
@@ -32,6 +25,9 @@
 #define	FILECOUNTS_CUR		struct filecounts_cursor
 #define	FILECOUNTS_II		struct filecounts_iil
 #define	FILECOUNTS_FL		struct filecounts_flags
+#define	FILECOUNTS_MAGIC	0x22436893
+#define	FILECOUNTS_NUMDIGITS	9	
+#define	FILECOUNTS_LOGZLEN	23	/* total (theoretical) length */
 
 
 struct filecounts_iil {
@@ -42,7 +38,7 @@ struct filecounts_iil {
 
 struct filecounts_cursor {
 	FILECOUNTS_II	*listp ;	/* list-pointer */
-	uint		magic ;
+	uint		magval ;
 	int		listn ;		/* list-number */
 	int		i ;
 } ; /* end struct */
@@ -64,7 +60,7 @@ struct filecounts_flags {
 struct filecounts_head {
 	cchar		*fname ;	/* file-name */
 	FILECOUNTS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
 	int		ncursors ;
 } ; /* end struct */
