@@ -45,10 +45,10 @@ OBJ1= bvihdr.o bvimk.o bvi.o
 OBJ2= bpihdr.o bpimk.o bpi.o
 OBJ3= bvcitekey.o bvchapters.o
 
-OBJ4= bcspec.o 
+OBJ4= bcspec.o strongeigens.o
 OBJ5= biblecite.o biblemeta.o biblecur.o
 OBJ6= bibleverses.o bibleverse.o
-OBJ7= bibleq.o 
+OBJ7= bibleq.o bibleqs.o
 
 OBJ8= biblepara.o bibleparas.o
 OBJ9= biblebook.o biblebooks.o
@@ -210,5 +210,7 @@ bibleparas.o:		bibleparas.cc	bibleparas.h			$(INCS)
 
 biblebook.o:		biblebook.cc	biblebook.h			$(INCS)
 biblebooks.o:		biblebooks.cc	biblebooks.h			$(INCS)
+
+strongeigens.o:		strongeigens.cc	strongeigens.h			$(INCS)
 
 
