@@ -1199,8 +1199,8 @@ local int checkdname(cchar *dname) noex {
 		rs = SR_NOTDIR ;
 	        if (S_ISREG(sb.st_mode))  {
 	            rs = perm(dname,-1,-1,nullptr,W_OK) ;
-	        }
-	    } /* end if (stat) */
+	        } /* end if (directory) */
+	    } /* end if (u_stat) */
 	} /* end if (valid) */
 	return rs ;
 } /* end subroutine (checkdname) */
