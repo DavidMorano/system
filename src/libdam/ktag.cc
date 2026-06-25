@@ -1,8 +1,8 @@
-/* ktag SUPPORT */
+/* ktag SUPPORT (Key-Tag) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* tag accummulator object */
+/* key-tag accummulator object */
 /* version %I% last-modified %G% */
 
 
@@ -27,24 +27,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<txtindexmk.h>
-#include	<eigendb.h>
-#include	<vecstr.h>
-#include	<vecobj.h>
-#include	<field.h>
-#include	<ascii.h>
-#include	<snwcpyx.h>
-#include	<sfx.h>
-#include	<strwcpyx.h>
-#include	<hasx.h>
-#include	<xwords.h>
-#include	<naturalwords.h>
-#include	<localmisc.h>		/* |NATURALWORDLEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<txtindexmk.h>		/* LIBUC */
+#include	<eigendb.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<snwcpyx.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpyx.h>		/* LIBUC */
+#include	<xwords.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<naturalwords.h>	/* LIBDAM |NATURALWORDLEN| */
+#include	<ascii.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ktag.h"
 
@@ -98,7 +98,7 @@ local int ktag_ctor(ktag *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->klp ;
 		    op->klp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
@@ -124,12 +124,13 @@ template<typename ... Args>
 local inline int ktag_magic(ktag *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == KTAG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == KTAG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (ktag_magic) */
 
 extern "C" {
+    local int	vercmp(KT_KEY *,KT_KEY *) noex ;
     local int	vesrch(cvoid **,cvoid **) noex ;
 }
 
@@ -159,7 +160,7 @@ int ktag_start(KT *op,KT_PA *kap,uint soff,cchar *lp,int ll) noex {
 	        } /* end if_constexpr (f_comment) */
 	        if (rs >= 0) {
 	            if ((rs = ktag_procline(op,lp,ll)) >= 0) {
-			op->magic = KTAG_MAGIC ;
+			op->magval = KTAG_MAGIC ;
 		    }
 	            if (rs < 0) {
 	                if (op->f_store) {
@@ -169,15 +170,14 @@ int ktag_start(KT *op,KT_PA *kap,uint soff,cchar *lp,int ll) noex {
 	        } /* end if (ok) */
 	        if (rs < 0) {
 	            vecobj_finish(op->klp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (vecobj_start) */
 	    if (rs < 0) {
 		ktag_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ktag_ctor) */
 	return rs ;
-}
-/* end subroutine (ktag_start) */
+} /* end subroutine (ktag_start) */
 
 int ktag_finish(KT *op) noex {
 	int		rs ;
@@ -187,7 +187,7 @@ int ktag_finish(KT *op) noex {
 	        rs1 = lm_free(op->tkeys) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->tkeys = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->f_store && op->slp) {
 	        rs1 = vecstr_finish(op->slp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -200,11 +200,10 @@ int ktag_finish(KT *op) noex {
 	        rs1 = ktag_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ktag_finish) */
+} /* end subroutine (ktag_finish) */
 
 int ktag_add(KT *op,cchar *lp,int ll) noex {
 	int		rs ;
@@ -212,8 +211,7 @@ int ktag_add(KT *op,cchar *lp,int ll) noex {
 	    rs = ktag_procline(op,lp,ll) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ktag_add) */
+} /* end subroutine (ktag_add) */
 
 int ktag_mktag(KT *op,uint endoff,KT_TAG *tagp) noex {
 	int		rs ;
@@ -238,8 +236,7 @@ int ktag_mktag(KT *op,uint endoff,KT_TAG *tagp) noex {
 	    } /* end if (vecobj_getvec) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ktag_mktag) */
+} /* end subroutine (ktag_mktag) */
 
 int ktag_procline(KT *op,cchar *lp,int ll) noex {
 	int		rs ;
@@ -248,8 +245,6 @@ int ktag_procline(KT *op,cchar *lp,int ll) noex {
 	    KT_PA	*kap = op->kap ;
 	    if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
 		cchar	*wt = charp(kap->wterms) ;
-	        xwords	w ;
-	        int	i ;
 	        int	fl, sl, cl ;
 	        cchar	*fp, *sp, *cp ;
 	        while ((fl = fsb.word(wt,&fp)) >= 0) {
@@ -264,15 +259,14 @@ int ktag_procline(KT *op,cchar *lp,int ll) noex {
 		    /* remove short words */
 	            if (sl < kap->minwlen) continue ;
 		    /* be liberal and fabricate extra keys */
-	            if ((sl > 0) && ((rs = xwords_start(&w,sp,sl)) >= 0)) {
-	                i = 0 ;
-	                while ((rs >= 0) &&
-	                    ((cl = xwords_get(&w,i++,&cp)) > 0)) {
+	            if (xwords w ; (rs = w.start(sp,sl)) >= 0) {
+			for (int i = 0 ; (cl = w.get(i++,&cp)) > 0 ; ) {
 	                    if (cl >= kap->minwlen) {
 	                        rs = ktag_procword(op,cp,cl) ;
 			    }
-	                } /* end while */
-	                rs1 = xwords_finish(&w) ;
+			    if (rs < 0) break ;
+	                } /* end for */
+	                rs1 = w.finish ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (xwords) */
 	            if (rs < 0) break ;
@@ -282,8 +276,7 @@ int ktag_procline(KT *op,cchar *lp,int ll) noex {
 	    } /* end if (field) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ktag_procline) */
+} /* end subroutine (ktag_procline) */
 
 int ktag_procword(KT *op,cchar *cp,int cl) noex {
     	cnullptr	np{} ;
@@ -320,8 +313,7 @@ int ktag_procword(KT *op,cchar *cp,int cl) noex {
 	    } /* end if (unique key) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ktag_procword) */
+} /* end subroutine (ktag_procword) */
 
 int ktag_storelc(KT *op,cchar **rpp,cchar *cp,int cl) noex {
 	int		rs ;
@@ -341,16 +333,13 @@ int ktag_storelc(KT *op,cchar **rpp,cchar *cp,int cl) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (ktag_storelc) */
+} /* end subroutine (ktag_storelc) */
 
 
 /* private subroutines */
 
-local int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
-	KT_KEY		*e1p = (KTAG_KEY *) *v1pp ;
-	KT_KEY		*e2p = (KTAG_KEY *) *v2pp ;
-	int		rc = 0 ;
+local int vercmp(KT_KEY *e1p,KT_KEY *e2p) noex {
+    	int		rc = 0 ; /* return-value */
 	if (e1p || e2p) {
 	    if (e1p) {
 	        if (e2p) {
@@ -367,7 +356,16 @@ local int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vesrch) */
+} /* end subroutine (vercmp) */
+
+local int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
+	int		rc = 0 ;
+	if (v1pp && v2pp) {
+	    KT_KEY *e1p = (KTAG_KEY *) *v1pp ;
+	    KT_KEY *e2p = (KTAG_KEY *) *v2pp ;
+	    rc = vercmp(e1p,e2p) ;
+	}
+	return rc ;
+} /* end subroutine (vesrch) */
 
 
