@@ -20,18 +20,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	LOGZONES		struct logzones_head
 #define	LOGZONES_FL		struct logzones_flags
 #define	LOGZONES_ENT		struct logzones_entry
 #define	LOGZONES_CUR		struct logzones_cursor
-
 #define	LOGZONES_MAGIC		91824563
 #define	LOGZONES_ENTLEN		48
 #define	LOGZONES_NENTS		100
@@ -46,7 +42,7 @@ struct logzones_entry {
 	short		znl ;
 	char		znb[LOGZONES_ZNAMESIZE + 1] ;
 	char		st[LOGZONES_STAMPSIZE + 1] ;
-} ;
+} ; /* end struct */
 
 struct logzones_flags {
 	uint		writable:1 ;
@@ -56,7 +52,7 @@ struct logzones_flags {
 	uint		cursorlockbroken:1 ;	/* cursor lock broken */
 	uint		cursoracc:1 ;		/* accessed while cursored ? */
 	uint		remote:1 ;		/* remote mounted file */
-} ;
+} ; /* end struct */
 
 struct logzones_head {
 	cchar		*fname ;
@@ -66,17 +62,17 @@ struct logzones_head {
 	time_t		timod ;			/* file modification time */
 	off_t		fsize ;
 	LOGZONES_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		oflags ;
 	int		pagesize ;
 	int		bufsize ;
 	int		fd ;
 	mode_t		operms ;
-} ;
+} ; /* end struct */
 
 struct logzones_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef LOGZONES	logzones ;
 typedef	LOGZONES_ENT	logzones_ent ;
