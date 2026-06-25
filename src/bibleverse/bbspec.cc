@@ -41,7 +41,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<estrings.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
