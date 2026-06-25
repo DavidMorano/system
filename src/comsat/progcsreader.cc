@@ -1,4 +1,5 @@
 /* progcsreader SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutine to read the messages coming in */
@@ -22,6 +23,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	progcsreader
+
+	Description:
 	This subroutine reads in the COMAST messages and disposes
 	of them appropriately.
 
@@ -33,12 +38,13 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<time.h>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
@@ -89,38 +95,18 @@ typedef int (*workthr)(void *) ;
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int,int *) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	getnprocessors(const char **,int) ;
-extern int	isasocket(int) ;
+extern int	progcsmsg(PROGINFO *,cchar *,int) noex ;
+extern int	progexit(PROGINFO *) noex ;
+extern int	progloglock_begin(PROGINFO *) noex ;
+extern int	progloglock_printf(PROGINFO *,cchar *,...) noex ;
+extern int	progloglock_end(PROGINFO *) noex ;
+extern int	progloglock_maint(PROGINFO *) noex ;
 
-extern int	progcsmsg(PROGINFO *,const char *,int) ;
-extern int	progexit(PROGINFO *) ;
-extern int	progloglock_begin(PROGINFO *) ;
-extern int	progloglock_printf(PROGINFO *,const char *,...) ;
-extern int	progloglock_end(PROGINFO *) ;
-extern int	progloglock_maint(PROGINFO *) ;
-
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) noex ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) noex ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -130,9 +116,9 @@ extern char	*timestr_logz(time_t,char *) ;
 
 struct subinfo {
 	PROGINFO	*pip ;
-	IDS		id ;
+	ids		id ;
 	HDRDECODE	d ;		/* header-decode */
-	PTM		dm ;		/* header-decode mutex */
+	ptm		dm ;		/* header-decode mutex */
 } ;
 
 struct disp {
@@ -149,36 +135,39 @@ struct disp {
 
 /* forward references */
 
-int 		progeprintf(PROGINFO *,const char *,...) ;
+int 		progeprintf(PROGINFO *,cchar *,...) noex ;
 
-static int	procreaders(PROGINFO *) ;
+local int	procreaders(PROGINFO *) noex ;
 
-static int	subinfo_start(SUBINFO *,PROGINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_hdr(SUBINFO *,wchar_t *,int,cchar *,int) ;
-static int	subinfo_reader(SUBINFO *,DISP *) ;
-static int	subinfo_procmsg(SUBINFO *,DISP *,const char *,int) ;
+local int	subinfo_start(SUBINFO *,PROGINFO *) noex ;
+local int	subinfo_finish(SUBINFO *) noex ;
+local int	subinfo_hdr(SUBINFO *,wchar_t *,int,cchar *,int) noex ;
+local int	subinfo_reader(SUBINFO *,DISP *) noex ;
+local int	subinfo_procmsg(SUBINFO *,DISP *,cchar *,int) noex ;
 
 #ifdef	COMMENT
-static int	ereport(PROGINFO *,const char *,int) ;
+local int	ereport(PROGINFO *,cchar *,int) noex ;
 #endif
 
-static int	disp_start(DISP *,PROGINFO *,SUBINFO *) ;
-static int	disp_addwork(DISP *,const char *,int) ;
-static int	disp_finish(DISP *,int) ;
-static int	disp_worker(DISP *) ;
+local int	disp_start(DISP *,PROGINFO *,SUBINFO *) noex ;
+local int	disp_addwork(DISP *,cchar *,int) noex ;
+local int	disp_finish(DISP *,int) noex ;
+local int	disp_worker(DISP *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progcsreader(PROGINFO *pip)
-{
+int progcsreader(PROGINFO *pip) noex {
+	ptm		*emp = &pip->efm ;
 	int		rs ;
 	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 
 	if (isasocket(pip->fd_msg)) pip->fl.issocket = TRUE ;
 
@@ -195,14 +184,16 @@ int progcsreader(PROGINFO *pip)
 	}
 #endif /* CF_DEBUG */
 
-	if ((rs = ptm_create(&pip->efm,NULL)) >= 0) {
+	if ((rs = emp->create) >= 0) {
 	    if ((rs = progloglock_begin(pip)) >= 0) {
 	        if ((rs = termnote_open(&pip->tn,pip->pr)) >= 0) {
-	            if ((rs = ptm_create(&pip->tmutex,NULL)) >= 0) {
+	            ptm *tmp = &pip->tmutex ;
+	            if ((rs = tmp->create) >= 0) {
 	                {
 	                    rs = procreaders(pip) ;
+			    rv = rs ;
 	                }
-	                ptm_destroy(&pip->tmutex) ;
+	                tmp->destroy() ;
 	            } /* end if (ptm) */
 	            rs1 = termnote_close(&pip->tn) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -210,7 +201,7 @@ int progcsreader(PROGINFO *pip)
 	        rs1 = progloglock_end(pip) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (progloglock) */
-	    rs1 = ptm_destroy(&pip->efm) ;
+	    rs1 = emp->destroy ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 
@@ -219,18 +210,16 @@ int progcsreader(PROGINFO *pip)
 	    debugprintf("progcsreader: ret rs=%d\n",rs) ;
 #endif
 
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (progcsreader) */
 
-
-int progeprintf(PROGINFO *pip,const char *fmt,...)
-{
+int progeprintf(PROGINFO *pip,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_OK ;
-
 	if (pip->debuglevel > 0) {
-	    if (ptm_lock(&pip->efm) >= 0) {
-	        va_list	ap ;
+	    ptm *emp = &pip->efm ;
+	    if ((rs = emp->lockbegin) >= 0) {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
@@ -241,10 +230,9 @@ int progeprintf(PROGINFO *pip,const char *fmt,...)
 	        rs = bvprintf(pip->efp,fmt,ap) ;
 	        va_end(ap) ;
 
-	        ptm_unlock(&pip->efm) ;
+	        emp->lockend() ;
 	    } /* end if (error-file lock) */
 	} /* end if (debugging) */
-
 	return rs ;
 }
 /* end subroutine (progeprintf) */
@@ -252,9 +240,7 @@ int progeprintf(PROGINFO *pip,const char *fmt,...)
 
 /* local subroutines */
 
-
-static int procreaders(PROGINFO *pip)
-{
+local int procreaders(PROGINFO *pip) noex {
 	SUBINFO		si, *sip = &si ;
 	int		rs ;
 	int		rs1 ;
@@ -262,7 +248,7 @@ static int procreaders(PROGINFO *pip)
 	if ((rs = subinfo_start(sip,pip)) >= 0) {
 	    DISP	disp ;
 	    int		f ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 #if	CF_DISP
 	    if ((rs = disp_start(&disp,pip,sip)) >= 0) {
@@ -287,18 +273,17 @@ static int procreaders(PROGINFO *pip)
 }
 /* end subroutine (procreaders) */
 
-
-static int subinfo_start(SUBINFO *sip,PROGINFO *pip)
-{
+local int subinfo_start(SUBINFO *sip,PROGINFO *pip) noex {
 	int		rs ;
 
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ; /* dangerous */
 	sip->pip = pip ;
 
 	if ((rs = ids_load(&sip->id)) >= 0) {
 	    cchar	*pr = pip->pr ;
 	    if ((rs = hdrdecode_start(&sip->d,pr)) >= 0) {
-	        rs = ptm_create(&sip->dm,NULL) ;
+	        ptm *dmp = &sip->dm ;
+	        rs = dmp->create ;
 	        if (rs < 0) {
 	            hdrdecode_finish(&sip->d) ;
 	        }
@@ -312,63 +297,63 @@ static int subinfo_start(SUBINFO *sip,PROGINFO *pip)
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+local int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = ptm_destroy(&sip->dm) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = hdrdecode_finish(&sip->d) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = ids_release(&sip->id) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    ptm *dmp = &sip->dm ;
+	    rs1 = dmp->destroy ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = hdrdecode_finish(&sip->d) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = ids_release(&sip->id) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_hdr(SUBINFO *sip,wchar_t *ibuf,int ilen,cchar *sp,int sl)
-{
+local int subinfo_hdr(SUBINFO *sip,wchar_t *ibuf,int ilen,cc *sp,int sl) noex {
+	ptm *dmp = &sip->dm ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = ptm_lock(&sip->dm)) >= 0) {
+	if ((rs = dmp->lockbegin) >= 0) {
 	    HDRDECODE	*hdp = &sip->d ;
-	    rs = hdrdecode_proc(hdp,ibuf,ilen,sp,sl) ;
-	    len = rs ;
-	    rs1 = ptm_unlock(&sip->dm) ;
+	    {
+	        rs = hdrdecode_proc(hdp,ibuf,ilen,sp,sl) ;
+	        len = rs ;
+	    }
+	    rs1 = dmp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end if (mutex) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_hdr) */
 
-
-static int subinfo_reader(SUBINFO *sip,DISP *dop)
-{
+local int subinfo_reader(SUBINFO *sip,DISP *dop) noex {
 	PROGINFO	*pip = sip->pip ;
-	struct pollfd	fds[NFDS] ;
+	POLLFD		fds[NFDS] ;
 	time_t		ti_start = pip->daytime ;
 	time_t		ti_termnote = pip->daytime ;
 	time_t		ti_hangup = 0 ;
-	const int	to_poll = TO_POLL ;
-	const int	to = TO_READ ;	/* read time-out */
-	const int	msglen = MSGBUFLEN ;
-	const int	opts = FM_TIMED ;
-	const int	fd_msg = pip->fd_msg ;
+	cint	to_poll = TO_POLL ;
+	cint	to = TO_READ ;	/* read time-out */
+	cint	msglen = MSGBUFLEN ;
+	cint	opts = FM_TIMED ;
+	cint	fd_msg = pip->fd_msg ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		intrun ;
 	int		intnote ;
 	int		nfds ;
 	int		f ;
-	const char	*pn = pip->progname ;
-	const char	*cp ;
+	cchar	*pn = pip->progname ;
+	cchar	*cp ;
 	char		msgbuf[MSGBUFLEN+1] ;
 
 #if	CF_DEBUG
@@ -419,10 +404,10 @@ static int subinfo_reader(SUBINFO *sip,DISP *dop)
 
 	    if ((rs = u_poll(fds,nfds,pollwait)) > 0) {
 	        int	i ;
-	        pip->daytime = time(NULL) ;
+	        pip->daytime = time(nullptr) ;
 	        for (i = 0 ; (rs >= 0) && (i < nfds) ; i += 1) {
-	            const int	re = fds[i].revents ;
-	            const int	fd = fds[i].fd ;
+	            cint	re = fds[i].revents ;
+	            cint	fd = fds[i].fd ;
 	            int		ml = 0 ;
 
 #if	CF_DEBUG
@@ -502,7 +487,7 @@ static int subinfo_reader(SUBINFO *sip,DISP *dop)
 
 	        } /* end for */
 	    } else if (rs == SR_INTR) {
-	        pip->daytime = time(NULL) ;
+	        pip->daytime = time(nullptr) ;
 	        rs = SR_OK ;
 	    }
 
@@ -525,21 +510,17 @@ static int subinfo_reader(SUBINFO *sip,DISP *dop)
 
 	    if ((rs >= 0) && ((pip->daytime - ti_termnote) >= intnote)) {
 	        ti_termnote = pip->daytime ;
-	        if ((rs = ptm_lock(&pip->tmutex)) >= 0) {
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("progcsreader/_reader: "
-	                    "termnote_check()\n") ;
-#endif
-	            rs = termnote_check(&pip->tn,pip->daytime) ;
-
-	            ptm_unlock(&pip->tmutex) ;
+		ptm *tmp = &pip->tmutex ;
+	        if ((rs = tmp->lockbegin) >= 0) {
+		    {
+	                rs = termnote_check(&pip->tn,pip->daytime) ;
+		    }
+	            tmp->lockend() ;
 	        } /* end if (mutex-lock) */
 	    } /* end if (termnote_check) */
-
-	    if (rs >= 0) rs = progexit(pip) ;
-
+	    if (rs >= 0) {
+		rs = progexit(pip) ;
+	    }
 	} /* end while (looping) */
 
 #if	CF_DEBUG
@@ -551,18 +532,16 @@ static int subinfo_reader(SUBINFO *sip,DISP *dop)
 }
 /* end subroutine (subinfo_reader) */
 
-
-static int subinfo_procmsg(SUBINFO *sip,DISP *dop,cchar mbuf[],int mlen)
-{
+local int subinfo_procmsg(SUBINFO *sip,DISP *dop,cchar *mbuf,int mlen) noex {
 	PROGINFO	*pip = sip->pip ;
 	int		rs = SR_OK ;
 
 	if (mbuf[0] != '\0') {
 	    int		ml = strnlen(mbuf,mlen) ;
-	    const char	*tp ;
-	    const char	*mp = mbuf ;
+	    cchar	*tp ;
+	    cchar	*mp = mbuf ;
 
-	    while ((tp = strnchr(mp,ml,'\n')) != NULL) {
+	    while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
 
 	        rs = disp_addwork(dop,mp,(tp-mp)) ;
 	        pip->c_processed += 1 ;
@@ -584,15 +563,13 @@ static int subinfo_procmsg(SUBINFO *sip,DISP *dop,cchar mbuf[],int mlen)
 }
 /* end subroutine (subinfo_procmsg) */
 
-
-static int disp_start(DISP *dop,PROGINFO *pip,SUBINFO *sip)
-{
+local int disp_start(DISP *dop,PROGINFO *pip,SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (dop == NULL) return SR_FAULT ;
+	if (dop == nullptr) return SR_FAULT ;
 
-	memset(dop,0,sizeof(DISP)) ;
+	memclear(dop) ;
 	dop->pip = pip ;
 	dop->sip = sip ;
 
@@ -623,15 +600,16 @@ static int disp_start(DISP *dop,PROGINFO *pip,SUBINFO *sip)
 	if (rs >= 0) {
 	    if ((rs = fsi_start(&dop->wq)) >= 0) {
 	        if ((rs = psem_create(&dop->wq_sem,FALSE,0)) >= 0) {
-	            const int	size = sizeof(pthread_t) ;
-	            const int	vo = (VECOBJ_OREUSE) ;
-	            if ((rs = vecobj_start(&dop->tids,size,10,vo)) >= 0) {
+	            cint	psz = szof(pthread_t) ;
+		    cint	vn = 10 ;
+	            cint	vo = (VECOBJ_OREUSE) ;
+	            if ((rs = vecobj_start(&dop->tids,psz,vn,vo)) >= 0) {
 	                pthread_t	tid, *tidp ;
 	                workthr		w = (workthr) disp_worker ;
 	                int		i ;
 /* create threads to handle it */
 	                for (i = 0 ; (rs >= 0) && (i < dop->n) ; i += 1) {
-	                    if ((rs = uptcreate(&tid,NULL,w,dop)) >= 0) {
+	                    if ((rs = uptcreate(&tid,nullptr,w,dop)) >= 0) {
 	                        rs = vecobj_add(&dop->tids,&tid) ;
 	                    }
 	                } /* end for */
@@ -643,8 +621,8 @@ static int disp_start(DISP *dop,PROGINFO *pip,SUBINFO *sip)
 	                    }
 	                    i = 0 ;
 	                    while (vecobj_get(&dop->tids,i,&tidp) >= 0) {
-	                        if (tidp != NULL) {
-	                            uptjoin(*tidp,NULL) ;
+	                        if (tidp != nullptr) {
+	                            uptjoin(*tidp,nullptr) ;
 	                        }
 	                        i += 1 ;
 	                    } /* end while */
@@ -664,9 +642,7 @@ static int disp_start(DISP *dop,PROGINFO *pip,SUBINFO *sip)
 }
 /* end subroutine (disp_start) */
 
-
-static int disp_finish(DISP *dop,int f_abort)
-{
+local int disp_finish(DISP *dop,int f_abort) noex {
 	PROGINFO	*pip ;
 	pthread_t	*tidp ;
 	int		rs = SR_OK ;
@@ -674,7 +650,7 @@ static int disp_finish(DISP *dop,int f_abort)
 	int		trs ;
 	int		i ;
 
-	if (dop == NULL) return SR_FAULT ;
+	if (dop == nullptr) return SR_FAULT ;
 
 	pip = dop->pip ;
 	dop->f_done = TRUE ;
@@ -685,7 +661,7 @@ static int disp_finish(DISP *dop,int f_abort)
 	}
 
 	for (i = 0 ; vecobj_get(&dop->tids,i,&tidp) >= 0 ; i += 1) {
-	    if (tidp != NULL) {
+	    if (tidp != nullptr) {
 	        rs1 = uptjoin(*tidp,&trs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        if (trs > 0) pip->c_updated += trs ;
@@ -706,9 +682,7 @@ static int disp_finish(DISP *dop,int f_abort)
 }
 /* end subroutine (disp_finish) */
 
-
-static int disp_addwork(DISP *dop,cchar mbuf[],int mlen)
-{
+local int disp_addwork(DISP *dop,cchar *mbuf,int mlen) noex {
 	int		rs ;
 
 	if ((rs = fsi_add(&dop->wq,mbuf,mlen)) >= 0) {
@@ -719,12 +693,10 @@ static int disp_addwork(DISP *dop,cchar mbuf[],int mlen)
 }
 /* end subroutine (disp_addwork) */
 
-
 /* of course this runs in parallel threads */
-static int disp_worker(DISP *dop)
-{
+local int disp_worker(DISP *dop) noex {
 	PROGINFO	*pip = dop->pip ;
-	const int	mlen = MSGBUFLEN ;
+	cint	mlen = MSGBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -741,7 +713,7 @@ static int disp_worker(DISP *dop)
 	while ((rs >= 0) && (! dop->f_exit)) {
 	    if ((rs = psem_wait(&dop->wq_sem)) >= 0) {
 	        if ((rs = fsi_remove(&dop->wq,mbuf,mlen)) >= 0) {
-	            const int	ml = rs ;
+	            cint	ml = rs ;
 	            if (ml > 0) {
 	                rs = progcsmsg(pip,mbuf,ml) ;
 	                if (rs > 0) c += 1 ;
@@ -767,22 +739,22 @@ static int disp_worker(DISP *dop)
 }
 /* end subroutine (disp_worker) */
 
-
 #ifdef	COMMENT
-static int ereport(PROGINFO *pip,cchar fname[],int frs)
-{
+local int ereport(PROGINFO *pip,cchar *fname,int frs) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (! pip->fl.quiet) {
-	    const char	*pn = pip->progname ;
-	    const char	*fmt = "%s: file-processing error (%d)\n" ;
+	    cchar	*pn = pip->progname ;
+	    cchar	*fmt = "%s: file-processing error (%d)\n" ;
+	    {
 	    rs1 = progeprintf(pip,fmt,pn,frs) ;
 	    if (rs >= 0) rs = rs1 ;
+	    }
+	    {
 	    rs1 = progeprintf(pip,"%s: file=%s\n",pn,fname) ;
 	    if (rs >= 0) rs = rs1 ;
+	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (ereport) */
