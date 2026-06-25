@@ -684,7 +684,7 @@ local int densitydb_fileinit(DD *op,time_t dt) noex {
 	        f_locked = true ;
 	    }
 
-	    rs = u_pread(op->fd,fbuf,DENSITYDB_FBUFLEN,0L) ;
+	    rs = u_readp(op->fd,fbuf,DENSITYDB_FBUFLEN,0L) ;
 
 	    if (rs >= DENSITYDB_FLTOP) {
 
@@ -726,7 +726,7 @@ local int densitydb_filechanged(DD *op) noex {
 	        fch = fch || (sb.st_mtime != op->timod) ;
 	    if ((! fch) && op->fl.fileinit) {
 	        char	hbuf[DENSITYDB_FLTOP + 1] ;
-	        id ((rs = u_pread(op->fd,hbuf,DENSITYDB_FLTOP,0z)) >= 0) {
+	        id ((rs = u_readp(op->fd,hbuf,DENSITYDB_FLTOP,0z)) >= 0) {
 	            if (rs < DENSITYDB_FLTOP) {
 	                op->fl.fileinit = false ;
 	            }
@@ -882,7 +882,7 @@ local int densitydb_buf(DD *op,uint roff,int rlen,char **rpp) noex {
 
 	        len = (fext - foff) ;
 
-	        if ((rs = u_pread(op->fd,rbuf,len,foff)) >= 0) {
+	        if ((rs = u_readp(op->fd,rbuf,len,foff)) >= 0) {
 	            op->b.len += rs ;
 	            len = MIN(((op->b.off + op->b.len) - roff),rlen) ;
 	        }
@@ -904,7 +904,7 @@ local int densitydb_buf(DD *op,uint roff,int rlen,char **rpp) noex {
 	            fext = bend ;
 
 	        len = fext - foff ;
-	        if ((rs = u_pread(op->fd,op->b.bup,len,foff)) >= 0) {
+	        if ((rs = u_readp(op->fd,op->b.bup,len,foff)) >= 0) {
 	            op->b.len = rs ;
 	            len = MIN(rs,rlen) ;
 	        }
