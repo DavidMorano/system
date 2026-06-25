@@ -1,8 +1,8 @@
-/* ktag HEADER */
+/* ktag HEADER (Key-Tag) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* tag accummulator object */
+/* key-tag accummulator object */
 /* version %I% last-modified %G% */
 
 
@@ -13,22 +13,22 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<txtindexmk.h>
-#include	<eigendb.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<txtindexmk.h>		/* LIBDAM */
+#include	<eigendb.h>		/* LIBDAM */
 
 
 #define	KTAG		struct ktag_head
 #define	KTAG_PA		struct ktag_params
+#define	KTAG_KEY	txtindexmk_key
+#define	KTAG_TAG	txtindexmk_tag
 #define	KTAG_MAGIC	0x70811238
-#define	KTAG_KEY	TXTINDEXMK_KEY
-#define	KTAG_TAG	TXTINDEXMK_TAG
 
 
 struct ktag_params {
 	eigendb		*edbp ;
-	uchar		*wterms ;
+	char		*wterms ;
 	int		minwlen ;
 	int		f_eigen ;
 } ; /* end struct */
@@ -41,7 +41,7 @@ struct ktag_head {
 	vecstr		*slp ;		/* string-list-pointer */
 	uint		recoff ;
 	uint		reclen ;
-	uint		magic ;
+	uint		magval ;
 	int		f_store ;
 } ; /* end struct */
 
@@ -52,13 +52,13 @@ typedef	KTAG_TAG	ktag_tag ;
 
 EXTERNC_begin
 
-extern int	ktag_start(ktag *,ktag_pa *,uint,cchar *,int) noex ;
-extern int	ktag_add(ktag *,cchar *,int) noex ;
-extern int	ktag_procline(ktag *,cchar *,int) noex ;
-extern int	ktag_procword(ktag *,cchar *,int) noex ;
-extern int	ktag_mktag(ktag *,uint,ktag_tag *) noex ;
-extern int	ktag_storelc(ktag *,cchar **,cchar *,int) noex ;
-extern int	ktag_finish(ktag *) noex ;
+extern int	ktag_start	(ktag *,ktag_pa *,uint,cchar *,int) noex ;
+extern int	ktag_add	(ktag *,cchar *,int) noex ;
+extern int	ktag_procline	(ktag *,cchar *,int) noex ;
+extern int	ktag_procword	(ktag *,cchar *,int) noex ;
+extern int	ktag_mktag	(ktag *,uint,ktag_tag *) noex ;
+extern int	ktag_storelc	(ktag *,cchar **,cchar *,int) noex ;
+extern int	ktag_finish	(ktag *) noex ;
 
 EXTERNC_end
 
