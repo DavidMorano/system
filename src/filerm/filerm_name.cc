@@ -9,7 +9,7 @@
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-	The subroutine was adapated from other programs that do
+	The subroutine was adapted from other programs that do
 	similar types of functions.
 
 */
@@ -54,7 +54,7 @@
 
 /* external subroutines */
 
-extern int	checkname(cchar *,USTAT *,proginfo *) noex ;
+extern int	checkname(cchar *,ustat *,proginfo *) noex ;
 
 
 /* external variables */
@@ -77,7 +77,7 @@ extern int	checkname(cchar *,USTAT *,proginfo *) noex ;
 int filerm_name(proginfo *pip,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	if (pip && name) {
-	    if (USTAT sb ; (rs = u_lstat(name,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_lstat(name,&sb)) >= 0) {
 	        int	wopts = 0 ;
 	        bool	f_dir = S_ISDIR(sb.st_mode) ;
 	        if ((! f_dir) && S_ISLNK(sb.st_mode) && pip->fl.follow) {
