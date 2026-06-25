@@ -1,8 +1,9 @@
-/* progwatch */
+/* progwatch SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* progwatch (listen on) the specified socket */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
@@ -13,14 +14,13 @@
 #define	CF_MKSUBLOGID	1		/* use 'mklogidsub(3dam)' */
 #define	CF_LOGCHECK	1		/* call 'proglog_check()' */
 
-
 /* revision history:
 
 	= 2008-06-23, David A­D­ Morano
-        I updated this subroutine to just poll for machine status and write the
-        Machine Status (MS) file. This was a cheap excuse for not writing a
-        whole new daemon program just to poll for machine status. I hope this
-        works out! :-)
+	I updated this subroutine to just poll for machine status
+	and write the Machine Status (MS) file. This was a cheap
+	excuse for not writing a whole new daemon program just to
+	poll for machine status. I hope this works out! :-)
 
 */
 
@@ -28,34 +28,28 @@
 
 /*******************************************************************************
 
-        This subroutine is responsible for listening on the given socket and
-        spawning off a program to handle any incoming connection. Some of the
-        "internal" messages are handled here (the easy ones -- or the ones that
-        fit here best). The rest (that look like client-sort-of requests) are
-        handled in the 'standing' object module.
+  	Description:
+	This subroutine is responsible for listening on the given
+	socket and spawning off a program to handle any incoming
+	connection. Some of the "internal" messages are handled
+	here (the easy ones -- or the ones that fit here best). The
+	rest (that look like client-sort-of requests) are handled
+	in the 'standing' object module.
 
 	Synopsis:
-
-	int progwatch(pip,nlp)
-	PROGINFO	*pip ;
-	vecstr		*nlp ;
+	int progwatch(proginfo *pip,vecstr *nlp) noex
 
 	Arguments:
-
 	pip	program information pointer
 	nlp	name-list pointer
 
 	Returns:
-
 	>=0	good
-	<0	error
-
+	<0	error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -66,15 +60,19 @@
 #include	<fcntl.h>
 #include	<csignal>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<opendefstds.h>
 #include	<bfile.h>
 #include	<varsub.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
 #include	<connection.h>
+#include	<strx.h>
+#include	<rmdirfiles.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -128,26 +126,6 @@
 
 /* external subroutines */
 
-extern int	snddd(char *,int,uint,uint) ;
-extern int	snsdd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	bufprintf(const char *,int,...) ;
-extern int	dupup(int,int) ;
-extern int	nlspeername(const char *,const char *,char *) ;
-extern int	mklogidsub(char *,int,const char *,int) ;
-extern int	rmdirfiles(cchar *,cchar *,int) ;
-extern int	acceptpass(int,struct strrecvfd *,int) ;
-extern int	varsub_addvec(VARSUB *,VECSTR *) ;
-extern int	isasocket(int) ;
-extern int	isBadSend(int) ;
-
 extern int	progpidbegin(PROGINFO *,int) ;
 extern int	progpidcheck(PROGINFO *) ;
 extern int	progpidend(PROGINFO *) ;
@@ -158,7 +136,7 @@ extern int	progipcbegin(PROGINFO *) ;
 extern int	progipcend(PROGINFO *) ;
 extern int	proghandle(PROGINFO *,
 			STANDING *,BUILTIN *,CLIENTINFO *) ;
-extern int	proglogout(PROGINFO *,const char *,const char *) ;
+extern int	proglogout(PROGINFO *,cchar *,cchar *) ;
 extern int	progsvccheck(PROGINFO *) ;
 extern int	progacccheck(PROGINFO *) ;
 extern int	progpeername(PROGINFO *,CLIENTINFO *,char *) ;
@@ -171,13 +149,6 @@ extern int	debugprinthexblock(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	progexports(PROGINFO *,cchar *) ;
 #endif /* CF_DEBUGS */
-
-extern cchar	*strsigabbr(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -244,7 +215,7 @@ static int	procwatchpollipc_cmd(PROGINFO *,
 static int	procwatchmaint(PROGINFO *,SUBINFO *) ;
 static int	procwatchmaintout(PROGINFO *,LISTENSPEC_INFO *,int,int) ;
 
-static int	procwatchsubcmd(PROGINFO *,const char *) ;
+static int	procwatchsubcmd(PROGINFO *,cchar *) ;
 
 static int	procwatchsubcmd_clear(PROGINFO *) ;
 
@@ -261,9 +232,9 @@ static volatile int	if_exit ;
 static volatile int	if_int ;
 static volatile int	if_child ;
 
-static const char	*subcmds[] = {
+static cchar	*subcmds[] = {
 	"clear",
-	NULL
+	nullptr
 } ;
 
 enum subcmds {
@@ -321,7 +292,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 /* before we go too far, are we the only one on this PID mutex? */
 
 	if ((pip->fl.defpidlock && (! pip->fl.named)) || pip->fl.daemon) {
-	    const char	*pidmsg ;
+	    cchar	*pidmsg ;
 
 	    rs = progpidbegin(pip,TO_LOCK) ;
 
@@ -353,15 +324,8 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 
 /* we want to receive the new socket (from 'accept') above these guys */
 
-	if (pip->fl.daemon) {
-	    for (i = 0 ; i < 3 ; i += 1) {
-	        oflags = (i == 2) ? O_WRONLY : O_RDONLY ;
-	        if (u_fstat(i,&sb) < 0)
-	            u_open(NULLFNAME,oflags,0666) ;
-	    }
-	} /* end if (daemon mode) */
-
-	pip->daytime = time(NULL) ;
+	opendefstds(3) ;
+	pip->daytime = time(nullptr) ;
 
 /* more initialization */
 
@@ -410,35 +374,35 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 	sigs.sa_handler = SIG_IGN ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = 0 ;
-	u_sigaction(SIGHUP,&sigs,NULL) ;
+	u_sigaction(SIGHUP,&sigs,nullptr) ;
 
 	sigs.sa_handler = int_interrupt ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = 0 ;
-	u_sigaction(SIGINT,&sigs,NULL) ;
+	u_sigaction(SIGINT,&sigs,nullptr) ;
 
 	sigs.sa_handler = int_interrupt ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = 0 ;
-	u_sigaction(SIGUSR1,&sigs,NULL) ;
+	u_sigaction(SIGUSR1,&sigs,nullptr) ;
 
 	sigs.sa_handler = int_exit ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = 0 ;
-	u_sigaction(SIGTERM,&sigs,NULL) ;
+	u_sigaction(SIGTERM,&sigs,nullptr) ;
 
 #if	CF_SIGCHILD
 
 	sigs.sa_handler = int_child ;
 	sigs.sa_mask = signalmask ;
 	sigs.sa_flags = SA_NOCLDSTOP ;
-	u_sigaction(SIGCHLD,&sigs,NULL) ;
+	u_sigaction(SIGCHLD,&sigs,nullptr) ;
 
 #endif /* CF_SIGCHILD */
 
 	if (pip->fl.daemon && pip->open.logprog) {
-	    const char	*ts = timestr_logz(pip->daytime,timebuf) ;
-	    pip->daytime = time(NULL) ;
+	    cchar	*ts = timestr_logz(pip->daytime,timebuf) ;
+	    pip->daytime = time(nullptr) ;
 	    proglog_printf(pip,"%s ready",ts) ;
 	    proglog_flush(pip) ;
 	    if (pip->debuglevel > 0)
@@ -789,7 +753,7 @@ static int procwatchmark(PROGINFO *pip,SUBINFO *wip,int f_force)
 	        pip->nodename) ;
 
 	for (i = 0 ; vecobj_get(llp,i,&lsp) >= 0 ; i += 1) {
-	    if (lsp != NULL) {
+	    if (lsp != nullptr) {
 	        if ((rs = listenspec_info(lsp,&li)) > 0) {
 		    int		ls = li.state ;
 		    cchar 	*sn ;
@@ -878,7 +842,7 @@ static int procwatchpoll(PROGINFO *pip,SUBINFO *wip)
 	    debugprintf("progwatchpoll: poller_wait() rs=%d\n",rs) ;
 #endif
 
-	pip->daytime = time(NULL) ;
+	pip->daytime = time(nullptr) ;
 	if (rs == SR_INTR) rs = SR_OK ;
 
 	if (rs <= 0)
@@ -1004,7 +968,7 @@ static int procwatchpollipc(PROGINFO *pip,SUBINFO *wip)
 	IPCMSGINFO	mi, *mip = &mi ;
 	PROGINFO_IPC	*ipp = &pip->ipc ;
 	int		rs ;
-	int		*ip = NULL ;
+	int		*ip = nullptr ;
 	int		f_logged = FALSE ;
 
 	ipcmsginfo_init(mip) ;
@@ -1019,12 +983,12 @@ static int procwatchpollipc(PROGINFO *pip,SUBINFO *wip)
 	if (mp->msg_controllen > 0) {
 	    struct cmsghdr	*cmp = CMSG_FIRSTHDR(mp) ;
 	    const int		fdlen = sizeof(int) ;
-	    while (cmp != NULL) {
+	    while (cmp != nullptr) {
 
 	        ip = (int *) CMSG_DATA(cmp) ;
 	        if ((cmp->cmsg_level == SOL_SOCKET) && 
 	            (cmp->cmsg_len == CMSG_LEN(fdlen)) &&
-	            (cmp->cmsg_type == SCM_RIGHTS) && (ip != NULL)) {
+	            (cmp->cmsg_type == SCM_RIGHTS) && (ip != nullptr)) {
 
 	            if ((mip->ns < 0) && (rcode == muximsgtype_passfd)) {
 	                mip->ns = *ip ;
@@ -1115,7 +1079,7 @@ static int procwatchpollipc_noop(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	blen = rs ;
 	if (rs >= 0) {
 
-	    mip->ipcmsg.msg_control = NULL ;
+	    mip->ipcmsg.msg_control = nullptr ;
 	    mip->ipcmsg.msg_controllen = 0 ;
 	    mip->vecs[0].iov_len = blen ;
 	    rs = u_sendmsg(ipp->fd_req,&mip->ipcmsg,0) ;
@@ -1219,7 +1183,7 @@ static int procwatchpollipc_passfd(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	    blen = rs ;
 	    if (rs >= 0) {
 
-	        mip->ipcmsg.msg_control = NULL ;
+	        mip->ipcmsg.msg_control = nullptr ;
 	        mip->ipcmsg.msg_controllen = 0 ;
 	        mip->vecs[0].iov_len = blen ;
 	        rs = u_sendmsg(ipp->fd_req,&mip->ipcmsg,0) ;
@@ -1267,7 +1231,7 @@ static int procwatchpollipc_exit(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	blen = rs ;
 	if (rs >= 0) {
 
-	    mip->ipcmsg.msg_control = NULL ;
+	    mip->ipcmsg.msg_control = nullptr ;
 	    mip->ipcmsg.msg_controllen = 0 ;
 	    mip->vecs[0].iov_len = blen ;
 	    rs = u_sendmsg(ipp->fd_req,&mip->ipcmsg,0) ;
@@ -1321,7 +1285,7 @@ static int procwatchpollipc_getlistener(PROGINFO *pip,SUBINFO *wip,
 	idx = i9.idx ;
 	rs1 = vecobj_get(&pip->listens,idx,&lsp) ;
 
-	if ((rs1 >= 0) && (lsp != NULL)) {
+	if ((rs1 >= 0) && (lsp != nullptr)) {
 	    if ((rs1 = listenspec_info(lsp,&li)) >= 0) {
 
 #if	CF_DEBUG
@@ -1358,7 +1322,7 @@ static int procwatchpollipc_getlistener(PROGINFO *pip,SUBINFO *wip,
 
 	if (rs >= 0) {
 
-	    mip->ipcmsg.msg_control = NULL ;
+	    mip->ipcmsg.msg_control = nullptr ;
 	    mip->ipcmsg.msg_controllen = 0 ;
 	    mip->vecs[0].iov_len = blen ;
 	    rs = u_sendmsg(ipp->fd_req,&mip->ipcmsg,0) ;
@@ -1398,7 +1362,7 @@ static int procwatchpollipc_gethelp(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	int		rs1 ;
 	int		idx ;
 	int		blen ;
-	const char	*cnp = NULL ;	/* command name-pointer */
+	cchar	*cnp = nullptr ;	/* command name-pointer */
 
 	if ((rs1 = muximsg_gethelp(&i13,1,mip->ipcbuf,IPCBUFLEN)) >= 0) {
 
@@ -1412,7 +1376,7 @@ static int procwatchpollipc_gethelp(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	idx = i13.idx ;
 	rs1 = progcmdname(pip,idx,&cnp) ;
 
-	if ((rs1 >= 0) && (cnp != NULL)) {
+	if ((rs1 >= 0) && (cnp != nullptr)) {
 	    rs1 = sncpy1(i14.name,MUXIMSG_LNAMELEN,cnp) ;
 	    if (rs1 < 0)
 		i14.rc = muximsgrc_overflow ;
@@ -1432,7 +1396,7 @@ static int procwatchpollipc_gethelp(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 
 	if (rs >= 0) {
 
-	    mip->ipcmsg.msg_control = NULL ;
+	    mip->ipcmsg.msg_control = nullptr ;
 	    mip->ipcmsg.msg_controllen = 0 ;
 	    mip->vecs[0].iov_len = blen ;
 	    rs = u_sendmsg(ipp->fd_req,&mip->ipcmsg,0) ;
@@ -1467,7 +1431,7 @@ static int procwatchpollipc_mark(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	    if ((rs1 = muximsg_response(&i0,0,mip->ipcbuf,ipclen)) >= 0) {
 	        int	blen = rs1 ;
 
-	        mip->ipcmsg.msg_control = NULL ;
+	        mip->ipcmsg.msg_control = nullptr ;
 	        mip->ipcmsg.msg_controllen = 0 ;
 	        mip->vecs[0].iov_len = blen ;
 	        rs = u_sendmsg(ipp->fd_req,&mip->ipcmsg,0) ;
@@ -1517,7 +1481,7 @@ static int procwatchpollipc_cmd(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 		break ;
 	    } /* end switch */
 
-	    mip->ipcmsg.msg_control = NULL ;
+	    mip->ipcmsg.msg_control = nullptr ;
 	    mip->ipcmsg.msg_controllen = 0 ;
 	    mip->vecs[0].iov_len = blen ;
 	    rs = u_sendmsg(ipp->fd_req,&mip->ipcmsg,0) ;
@@ -1548,7 +1512,7 @@ static int procwatchpollipc_default(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 
 	if ((rs = standing_request(osp,dt,rcode,mip->ipcbuf,resbuf)) >= 0) {
 	    len = rs ;
-	    mip->ipcmsg.msg_control = NULL ;
+	    mip->ipcmsg.msg_control = nullptr ;
 	    mip->ipcmsg.msg_controllen = 0 ;
 	    mip->vecs[0].iov_base = resbuf ;
 	    mip->vecs[0].iov_len = len ;
@@ -1619,10 +1583,10 @@ static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 
 	    } else if (WIFSIGNALED(cs)) {
 		const int	sig = WTERMSIG(cs) ;
-		const char	*ss ;
+		cchar	*ss ;
 		char		sigbuf[20+1] ;
 
-		if ((ss = strsigabbr(sig)) == NULL) {
+		if ((ss = strabbrsig(sig)) == nullptr) {
 		     ctdeci(sigbuf,20,sig) ;
 		     ss = sigbuf ;
 		}
@@ -2056,7 +2020,7 @@ static int procwatchmaint(PROGINFO *pip,SUBINFO	 *wip)
 #endif
 
 	for (i = 0 ; vecobj_get(llp,i,&lsp) >= 0 ; i += 1) {
-	    if (lsp == NULL) continue ;
+	    if (lsp == nullptr) continue ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5)) {
@@ -2100,7 +2064,7 @@ static int procwatchmaint(PROGINFO *pip,SUBINFO	 *wip)
 #endif
 
 	for (i = 0 ; (rs >= 0) && (vecobj_get(llp,i,&lsp) >= 0) ; i += 1) {
-	    if (lsp == NULL) continue ;
+	    if (lsp == nullptr) continue ;
 
 	    rs1 = listenspec_info(lsp,&li) ;
 
@@ -2193,7 +2157,7 @@ static int procwatchpolling(PROGINFO *pip,SUBINFO *wip,int fd,int re)
 #endif
 
 	for (i = 0 ; vecobj_get(llp,i,&lsp) >= 0 ; i += 1) {
-	    if (lsp == NULL) continue ;
+	    if (lsp == nullptr) continue ;
 
 	    if ((lfd = listenspec_getfd(lsp)) == fd) {
 
@@ -2327,7 +2291,7 @@ static int procwatchsubcmd_clear(PROGINFO *pip)
 	int		c = 0 ;
 
 	for (i = 0 ; vecobj_get(llp,i,&lsp) >= 0 ; i += 1) {
-	    if (lsp != NULL) {
+	    if (lsp != nullptr) {
 	        if ((rs = listenspec_info(lsp,&li)) >= 0) {
 	            if (li.state & LISTENSPEC_MBROKEN) {
 		        c += 1 ;
@@ -2351,8 +2315,8 @@ int			ls ;
 {
 	int		rs = SR_OK ;
 	int		f_logged = FALSE ;
-	const char	*statstr ;
-	const char	*broken = "broken" ;
+	cchar	*statstr ;
+	cchar	*broken = "broken" ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 	char		tmpbuf[LOGIDLEN + 1] ;
 
