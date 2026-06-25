@@ -1,16 +1,17 @@
-/* udp */
+/* sd_udp SUPPORT (Sys-Dialer) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SYSDIALER "udp" dialer */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
-
 /* revision history:
 
-	= 2003-11-04, David A­D­ Morano
-        This was created as one of the first dialer modules for the SYSDIALER
-        object.
+	= 1998-11-04, David A­D­ Morano
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
 
 */
 
@@ -18,42 +19,39 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is a SYSDIALER module.
 
 	Synopsis:
-
 	udp [[<host>:]<port>] [-f af] [-bp <backupport>]
 
 	Arguments:
-
-	+ host		override hostname
+	+ host		hostname
 	+ port		service port
 	+ af		address family
 
-
 *******************************************************************************/
 
-
-#define	UDP_MASTER	0
-
-
-#include	<envstandards.h>	/* MUST be first to configure */
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<localmisc.h>
 
-#include	"udp.h"
 #include	"sysdialer.h"
+#include	"sd_udp.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -69,24 +67,12 @@
 #define	SVCNAMELEN	32
 #endif
 
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
-
 #define	NPARG		2	/* number of positional arguments */
 #define	MAXARGINDEX	100
 #define	NARGPRESENT	(MAXARGINDEX/8 + 1)
 
 
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getpwd(char *,int) ;
-extern int	dialudp(const char *,const char *,int,int,int) ;
-extern int	isdigitlatin(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -95,34 +81,15 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local structures */
 
 struct afamily {
-	const char	*name ;
+	cchar		*name ;
 	int		af ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 
-/* external variables (module information) */
-
-SYSDIALER_INFO	udp = {
-	UDP_MNAME,
-	UDP_VERSION,
-	UDP_INAME,
-	sizeof(UDP),
-	UDP_MF
-} ;
-
-
 /* local variables */
-
-static const char *argopts[] = {
-	"ROOT",
-	"RN",
-	"af",
-	"bp",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -130,27 +97,45 @@ enum argopts {
 	argopt_af,
 	argopt_bp,
 	argopt_overlast
-} ;
+} ; /* end enum (argopts) */
 
-static const struct afamily	afs[] = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"RN",
+	"af",
+	"bp",
+	nullptr
+} ; /* end array (argopts) */
+
+constexpr afamily	afs[] = {
 	{ "inet", AF_INET },
 	{ "inet4", AF_INET },
 #ifdef	AF_INET6
 	{ "inet6", AF_INET6 },
 #endif
-	{ NULL, 0 }
-} ;
+	{ nullptr, 0 }
+} ; /* end array (afs) */
+
+
+/* external variables (module information) */
+
+SYSDIALER_INFO	sd_udp = {
+	UDP_MNAME,
+	UDP_VERSION,
+	UDP_INAME,
+	szof(UDP),
+	UDP_MF
+} ; /* end object */
 
 
 /* exported subroutines */
 
-
 int udp_open(op,ap,hostname,svcname,av)
 UDP		*op ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
+cchar	hostname[] ;
+cchar	svcname[] ;
+cchar	*av[] ;
 {
 	int		rs = SR_OK ;
 	int		to = -1 ;
@@ -159,10 +144,10 @@ const char	*av[] ;
 
 	char		hostnamebuf[MAXHOSTNAMELEN + 1] ;
 	char		svcnamebuf[SVCNAMELEN + 1] ;
-	char		*pr = NULL ;
-	char		*bpspec = NULL ;
+	char		*pr = nullptr ;
+	char		*bpspec = nullptr ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic == UDP_MAGIC) return SR_INUSE ;
 
@@ -171,7 +156,7 @@ const char	*av[] ;
 		hostname,svcname) ;
 #endif
 
-	if (ap != NULL) {
+	if (ap != nullptr) {
 
 	    int	argr, argl, aol, avl ;
 	    int	ai, maxai, pan, npa, kwi ;
@@ -179,12 +164,12 @@ const char	*av[] ;
 	    int	rs, i ;
 	    int	cl ;
 	    int	f_optminus, f_optplus, f_optequal ;
-	    int	f_extra = FALSE ;
+	    int	f_extra = false ;
 
 	    char	**argv, *argp, *aop, *avp ;
 	    char	argpresent[NARGPRESENT] ;
-	    char	*afspec = NULL ;
-	    char	*hostsvc = NULL ;
+	    char	*afspec = nullptr ;
+	    char	*hostsvc = nullptr ;
 	    char	*cp ;
 
 #if	CF_DEBUGS
@@ -197,7 +182,7 @@ const char	*av[] ;
 	    to = ap->timeout ;
 	    opts = ap->options ;
 	    argv = (char **) ap->argv ;
-	    if (ap->pr != NULL)
+	    if (ap->pr != nullptr)
 	        pr = (char *) ap->pr ;
 
 /* process program arguments */
@@ -209,7 +194,7 @@ const char	*av[] ;
 	    maxai = 0 ;
 	    ai = 0 ;
 	    while ((rs >= 0) && 
-		(argv[ai] != NULL) && (argv[ai + 1] != NULL)) {
+		(argv[ai] != nullptr) && (argv[ai + 1] != nullptr)) {
 
 	        argp = argv[++ai] ;
 	        argl = strlen(argp) ;
@@ -228,13 +213,13 @@ const char	*av[] ;
 
 	                    aop = argp + 1 ;
 	                    aol = argl - 1 ;
-	                    f_optequal = FALSE ;
-	                    if ((avp = strchr(aop,'=')) != NULL) {
+	                    f_optequal = false ;
+	                    if ((avp = strchr(aop,'=')) != nullptr) {
 
 	                        aol = avp - aop ;
 	                        avp += 1 ;
 	                        avl = aop + argl - 1 - avp ;
-	                        f_optequal = TRUE ;
+	                        f_optequal = true ;
 
 	                    } else
 	                        avl = 0 ;
@@ -247,13 +232,13 @@ const char	*av[] ;
 	                        case argopt_root:
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl)
 	                                    pr = avp ;
 
 	                            } else {
 
-	                                if (argv[ai + 1] == NULL) {
+	                                if (argv[ai + 1] == nullptr) {
 					    rs = SR_INVALID ;
 	                                    break ;
 					}
@@ -271,13 +256,13 @@ const char	*av[] ;
 	                        case argopt_af:
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl)
 						afspec = avp ;
 
 	                            } else {
 
-	                                if (argv[ai + 1] == NULL) {
+	                                if (argv[ai + 1] == nullptr) {
 					    rs = SR_INVALID ;
 	                                    break ;
 					}
@@ -295,13 +280,13 @@ const char	*av[] ;
 	                        case argopt_bp:
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl)
 						bpspec = avp ;
 
 	                            } else {
 
-	                                if (argv[ai + 1] == NULL) {
+	                                if (argv[ai + 1] == nullptr) {
 					    rs = SR_INVALID ;
 	                                    break ;
 					}
@@ -325,7 +310,7 @@ const char	*av[] ;
 	                            switch ((int) *aop) {
 
 	                            case 'f':
-	                                if (argv[ai + 1] == NULL) {
+	                                if (argv[ai + 1] == nullptr) {
 					    rs = SR_INVALID ;
 	                                    break ;
 					}
@@ -340,7 +325,7 @@ const char	*av[] ;
 
 /* service name */
 	                            case 's':
-	                                if (argv[ai + 1] == NULL) {
+	                                if (argv[ai + 1] == nullptr) {
 					    rs = SR_INVALID ;
 	                                    break ;
 					}
@@ -355,7 +340,7 @@ const char	*av[] ;
 
 /* timeout */
 	                            case 't':
-	                                if (argv[ai + 1] == NULL) {
+	                                if (argv[ai + 1] == nullptr) {
 					    rs = SR_INVALID ;
 	                                    break ;
 					}
@@ -397,7 +382,7 @@ const char	*av[] ;
 	            } else {
 
 			rs = SR_INVALID ;
-	                f_extra = TRUE ;
+	                f_extra = true ;
 	            }
 
 	        } /* end if (key letter/word or positional) */
@@ -427,9 +412,9 @@ const char	*av[] ;
 
 	    } /* end if (positional arguments) */
 
-	    if ((hostsvc != NULL) && (hostsvc[0] != '\0')) {
+	    if ((hostsvc != nullptr) && (hostsvc[0] != '\0')) {
 
-	        if ((cp = strchr(hostsvc,':')) != NULL) {
+	        if ((cp = strchr(hostsvc,':')) != nullptr) {
 
 	            cl = MIN((cp - hostsvc),SVCNAMELEN) ;
 	            if (cl > 0) {
@@ -448,16 +433,16 @@ const char	*av[] ;
 
 	    } /* end if */
 
-		if ((afspec != NULL) && (afspec[0] != '\0')) {
+		if ((afspec != nullptr) && (afspec[0] != '\0')) {
 
-			for (i = 0 ; afs[i].name != NULL ; i += 1) {
+			for (i = 0 ; afs[i].name != nullptr ; i += 1) {
 
 				if (strcmp(afs[i].name,afspec) == 0)
 					break ;
 
 			}
 
-			if (afs[i].name != NULL)
+			if (afs[i].name != nullptr)
 				af = afs[i].af ;
 
 			else
@@ -480,7 +465,7 @@ const char	*av[] ;
 
 		rs = dialudp(hostname,svcname,af,to,opts) ;
 
-		if ((rs < 0) && (bpspec != NULL))
+		if ((rs < 0) && (bpspec != nullptr))
 			rs = dialudp(hostname,bpspec,af,to,opts) ;
 
 	}
@@ -489,7 +474,7 @@ const char	*av[] ;
 	if (rs >= 0) {
 
 	    op->magic = UDP_MAGIC ;
-		uc_closeonexec(op->fd,TRUE) ;
+		uc_closeonexec(op->fd,true) ;
 
 	}
 
@@ -521,7 +506,7 @@ int		to, opts ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
@@ -540,7 +525,7 @@ int		to, opts ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
@@ -561,7 +546,7 @@ int		to, opts ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
@@ -579,7 +564,7 @@ int		to, opts ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
@@ -591,12 +576,12 @@ int		to, opts ;
 
 int udp_write(op,buf,blen)
 UDP		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		blen ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
@@ -608,13 +593,13 @@ int		blen ;
 
 int udp_send(op,buf,blen,flags)
 UDP		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		blen ;
 int		flags ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
@@ -626,7 +611,7 @@ int		flags ;
 
 int udp_sendto(op,buf,blen,flags,sap,salen)
 UDP		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		blen ;
 int		flags ;
 void		*sap ;
@@ -634,7 +619,7 @@ int		salen ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
@@ -651,7 +636,7 @@ int		flags ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
@@ -668,7 +653,7 @@ int		cmd ;
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
@@ -686,7 +671,7 @@ UDP		*op ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
 
