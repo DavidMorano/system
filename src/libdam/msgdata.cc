@@ -26,15 +26,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<sockaddress.h>
-#include	<conmsghdr.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<conmsghdr.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"msgdata.h"
 
@@ -51,9 +56,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -70,7 +73,7 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int	msgdata_setrecv(msgdata *) noex ;
+local int	msgdata_setrecv(msgdata *) noex ;
 
 
 /* local variables */
@@ -118,8 +121,7 @@ int msgdata_init(msgdata *mip,int mlen) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ml : rs ;
-}
-/* end subroutine (msgdata_init) */
+} /* end subroutine (msgdata_init) */
 
 int msgdata_fini(msgdata *mip) noex {
 	int		rs = SR_FAULT ;
@@ -138,40 +140,34 @@ int msgdata_fini(msgdata *mip) noex {
 	    mip->clen = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgdata_fini) */
+} /* end subroutine (msgdata_fini) */
 
 int msgdata_bufsizeget(msgdata *mip) noex {
 	return mip->mlen ;
-}
-/* end subroutine (msgdata_bufsize) */
+} /* end subroutine (msgdata_bufsize) */
 
 int msgdata_getbuf(msgdata *mip,char **rpp) noex {
 	if (rpp) {
 	    *rpp = mip->mbuf ;
 	}
 	return mip->mlen ;
-}
-/* end subroutine (msgdata_get) */
+} /* end subroutine (msgdata_get) */
 
 int msgdata_getdatalen(msgdata *mip) noex {
 	return mip->ml ;
-}
-/* end subroutine (msgdata_getdatalen) */
+} /* end subroutine (msgdata_getdatalen) */
 
 int msgdata_setdatalen(msgdata *mip,int dlen) noex {
 	mip->ml = dlen ;
 	return dlen ;
-}
-/* end subroutine (msgdata_setdatalen) */
+} /* end subroutine (msgdata_setdatalen) */
 
 int msgdata_getdata(msgdata *mip,char **rpp) noex {
 	if (rpp) {
 	    *rpp = mip->mbuf ;
 	}
 	return mip->ml ;
-}
-/* end subroutine (msgdata_getdata) */
+} /* end subroutine (msgdata_getdata) */
 
 int msgdata_recvto(msgdata *mip,int fd,int to) noex {
 	MSGHDR		*mp = &mip->msg ;
@@ -181,8 +177,7 @@ int msgdata_recvto(msgdata *mip,int fd,int to) noex {
 	    mip->ml = rs ;
 	}
 	return rs ;
-}
-/* end subroutine (msgdata_recvto) */
+} /* end subroutine (msgdata_recvto) */
 
 int msgdata_recv(msgdata *mip,int fd) noex {
 	MSGHDR		*mp = &mip->msg ;
@@ -192,8 +187,7 @@ int msgdata_recv(msgdata *mip,int fd) noex {
 	    mip->ml = rs ;
 	}
 	return rs ;
-}
-/* end subroutine (msgdata_recv) */
+} /* end subroutine (msgdata_recv) */
 
 int msgdata_send(msgdata *mip,int fd,int dl,int cl) noex {
 	int		rs ;
@@ -206,8 +200,7 @@ int msgdata_send(msgdata *mip,int fd,int dl,int cl) noex {
 	    rs = SR_TOOBIG ;
 	}
 	return rs ;
-}
-/* end subroutine (msgdata_send) */
+} /* end subroutine (msgdata_send) */
 
 /* receive or reject a passed FD (f=1 -> receive, f=0 -> reject) */
 int msgdata_conpass(msgdata *mip,int f_passfd) noex {
@@ -232,15 +225,13 @@ int msgdata_conpass(msgdata *mip,int f_passfd) noex {
 	    } /* end while */
 	} /* end if (had a control-part) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (msgdata_conpass) */
+} /* end subroutine (msgdata_conpass) */
 
 int msgdata_getpassfd(msgdata *mip) noex {
 	int		rs = mip->ns ;
 	if (rs < 0) rs = SR_NOTOPEN ;
 	return rs ;
-}
-/* end subroutine (msgdata_getpassfd) */
+} /* end subroutine (msgdata_getpassfd) */
 
 int msgdata_setaddr(msgdata *mip,cvoid *sap,int sal) noex {
 	cint		flen = szof(SOCKADDRESS) ;
@@ -253,8 +244,7 @@ int msgdata_setaddr(msgdata *mip,cvoid *sap,int sal) noex {
 	    rs = SR_TOOBIG ;
 	}
 	return rs ;
-}
-/* end subroutine (msgdata_setaddr) */
+} /* end subroutine (msgdata_setaddr) */
 
 int msgdata_rmeol(msgdata *mip) noex {
 	while (mip->ml > 0) {
@@ -263,13 +253,12 @@ int msgdata_rmeol(msgdata *mip) noex {
 	    mip->ml -= 1 ;
 	}
 	return mip->ml ;
-}
-/* end subroutine (msgdata_rmeol) */
+} /* end subroutine (msgdata_rmeol) */
 
 
 /* private subroutines */
 
-static int msgdata_setrecv(msgdata *mip) noex {
+local int msgdata_setrecv(msgdata *mip) noex {
 	MSGHDR		*mp = &mip->msg ;
 	mip->mbuf[0] = '\0' ;
 	mip->vecs[0].iov_base = mip->mbuf ;
@@ -277,7 +266,6 @@ static int msgdata_setrecv(msgdata *mip) noex {
 	mip->ml = 0 ;
 	mp->msg_controllen = mip->clen ;
 	return SR_OK ;
-}
-/* end subroutine (msgdata_setrecv) */
+} /* end subroutine (msgdata_setrecv) */
 
 
