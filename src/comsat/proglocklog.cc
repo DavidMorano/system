@@ -1,17 +1,16 @@
-/* progloglock */
+/* progloglock SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a locked-log-file note */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* switchable debug print-outs */
-
 
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-
 	The subroutine was written from scratch.
-
 
 */
 
@@ -19,21 +18,24 @@
 
 /*******************************************************************************
 
-        These subroutine process log-file messages, but we have a lock around
-        them because we can be called from multiple threads.
+  	Name:
+	progloglock
 
+	Description:
+	These subroutine process log-file messages, but we have a
+	lock around them because we can be called from multiple
+	threads.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -44,20 +46,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -75,11 +63,12 @@ extern char	*strnchr(const char *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progloglock_begin(PROGINFO *pip)
-{
+int progloglock_begin(PROGINFO *pip) noex {
 	PROGINFO_LOG	*ldp = &pip->logdata ;
 	int		rs = SR_OK ;
 
@@ -93,7 +82,8 @@ int progloglock_begin(PROGINFO *pip)
 	    ldp->intlogflush = DEFINTLOGFLUSH ;
 
 	    if (! pip->open.lm) {
-	        rs = ptm_create(&ldp->lm,NULL) ;
+	        ptm *lmp = &ldp->lm ;
+	        rs = lmp->create ;
 	        pip->open.lm = (rs >= 0) ;
 	    }
 	}
@@ -102,17 +92,16 @@ int progloglock_begin(PROGINFO *pip)
 }
 /* end subroutine (progloglock_begin) */
 
-
-int progloglock_end(PROGINFO *pip)
-{
+int progloglock_end(PROGINFO *pip) noex {
 	PROGINFO_LOG	*ldp = &pip->logdata ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (pip->open.logprog) {
 	    if (pip->open.lm) {
-	        pip->open.lm = FALSE ;
-	        rs1 = ptm_destroy(&ldp->lm) ;
+	        pip->open.lm = false ;
+	        ptm *lmp = &ldp->lm ;
+	        rs1 = lmp->destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	}
@@ -121,37 +110,38 @@ int progloglock_end(PROGINFO *pip)
 }
 /* end subroutine (progloglock_end) */
 
-
-int progloglock_printf(PROGINFO *pip,const char *fmt,...)
-{
+int progloglock_printf(PROGINFO *pip,cchar *fmt,...) noex {
+	va_list		ap ;
 	PROGINFO_LOG	*ldp = &pip->logdata ;
 	int		rs = SR_OK ;
+	int		rs1 ;
+	int		len = 0 ;
 
 	if (pip->open.logprog && pip->open.lm) {
-	    if ((rs = ptm_lock(&ldp->lm)) >= 0) {
+	    ptm *lmp = &ldp->lm ;
+	    if ((rs = lmp->lockbegin) >= 0) {
 		{
-		    va_list	ap ;
 	            va_begin(ap,fmt) ;
 	            rs = logfile_vprintf(&pip->lh,fmt,ap) ;
+		    len = rs ;
 	            va_end(ap) ;
 		}
-	        ptm_unlock(&ldp->lm) ;
+	        rs1 = lmp->lockend ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (log-lock) */
 	} /* end block */
-
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (progloglockprintf) */
 
-
-int progloglock_maint(PROGINFO *pip)
-{
+int progloglock_maint(PROGINFO *pip) noex {
 	PROGINFO_LOG	*ldp = &pip->logdata ;
 	int		rs = SR_OK ;
-
+	int		rs1 ;
 	if (pip->open.logprog && pip->open.lm) {
-	    if ((rs = ptm_lock(&ldp->lm)) >= 0) {
-		const time_t	dt = pip->daytime ;
+	    ptm *lmp = &ldp->lm ;
+	    if ((rs = lmp->lockbegin) >= 0) {
+		custime	dt = pip->daytime ;
 
 	        if ((dt - ldp->ti_logsize) >= ldp->intlogsize) {
 	            ldp->ti_logsize = pip->daytime ;
@@ -164,7 +154,8 @@ int progloglock_maint(PROGINFO *pip)
 	            logfile_flush(&pip->lh) ;
 	        }
 
-	        ptm_unlock(&ldp->lm) ;
+	        rs1 = lmp->lockend ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (log-lock) */
 	} /* end if (log open) */
 
