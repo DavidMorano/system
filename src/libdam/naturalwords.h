@@ -37,11 +37,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 /* English-language natural-word length */
@@ -51,7 +51,7 @@
 
 #ifdef	__cplusplus
 struct naturalwords {
-    inline static cint		wordlen = NATURALWORDLEN ;
+    static inline cint		wordlen = NATURALWORDLEN ;
 } ; /* end (struct naturalwords) */
 #endif /* __cplusplus */
 
