@@ -25,7 +25,7 @@
 	order to check if a filename is marked for some disposition.
 
 	Synopsis:
-	int checkname(proginfo *pip,cchar *name,USTAT *sbp) noex
+	int checkname(proginfo *pip,cchar *name,ustat *sbp) noex
 
 	Arguments:
 	pip		user specified argument
@@ -88,8 +88,8 @@ static int	mkpathadd(char *,cchar *,int,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int checkname(proginfo *,cchar *name,USTAT *sbp) noex {
-	USTAT		sb2 ;
+int checkname(proginfo *,cchar *name,ustat *sbp) noex {
+	ustat		sb2 ;
 	randomvar	*rvp = pip->rvp ;
 	int		rs = SR_OK ;
 	int	rs1 = 0 ;
