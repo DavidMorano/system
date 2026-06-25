@@ -24,12 +24,12 @@
 
 /*******************************************************************************
 
+  	Description:
 	Prepare to do some servicing.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -39,9 +39,10 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<strx.h>
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 
@@ -50,34 +51,11 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	sfshrink(cchar *,int,char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	getserial(cchar *) ;
-extern int	getfname(cchar *,cchar *,int,char *) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-
 #if	CF_DEBUGS || CF_DEBUG 
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	progexports(struct proginfo *,cchar *) ;
 #endif /* CF_DEBUGS */
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -91,13 +69,13 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* local variables */
 
-static cchar	*prbins[] = {
+constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
 	NULL
 } ;
 
-static cchar	*prlibs[] = {
+constexpr cpcchar	prlibs[] = {
 	"lib",
 	NULL
 } ;
@@ -106,9 +84,7 @@ static cchar	*prlibs[] = {
 /* exported subroutines */
 
 
-
 /* static subroutines */
-
 
 static int loadpath(pip,plp,varname,prdirs,defpath)
 struct proginfo	*pip ;
@@ -117,11 +93,9 @@ cchar	*varname ;
 cchar	**prdirs ;
 cchar	*defpath ;
 {
-	VECSTR	*elp = &pip->exports ;
-
+	vecstr	*elp = &pip->exports ;
 	int	rs = SR_OK ;
 	int	c = 0 ;
-
 	cchar	*pp ;
 
 /* system-administrative environment */
