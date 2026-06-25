@@ -50,12 +50,11 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<ctime>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -86,19 +85,6 @@
 extern "C" int	b_cksumpass(int,cchar **,void *) ;
 extern "C" int	p_cksumpass(int,cchar **,cchar **,void *) ;
 
-extern "C" int	matstr(const char **,const char *,int) ;
-extern "C" int	matostr(const char **,int,const char *,int) ;
-extern "C" int	sfshrink(const char *,int,const char **) ;
-extern "C" int	sfskipwhite(const char *,int,const char **) ;
-extern "C" int	nextfield(const char *,int,const char **) ;
-extern "C" int	cfdeci(const char *,int,int *) ;
-extern "C" int	cfdecf(const char *,int, double *) ;
-extern "C" int	optbool(const char *,int) ;
-extern "C" int	optvalue(const char *,int) ;
-extern "C" int	isdigitlatin(int) ;
-extern "C" int	isFailOpen(int) ;
-extern "C" int	isNotPresent(int) ;
-
 extern "C" int	printhelp(void *,const char *,const char *,const char *) ;
 extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -108,15 +94,6 @@ extern "C" int	debugprintf(cchar *,...) ;
 extern "C" int	debugclose() ;
 extern "C" int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern "C" cchar	*getourenv(const char **,const char *) ;
-
-extern "C" char		*strwcpy(char *,const char *,int) ;
-extern "C" char		*strnchr(const char *,int,int) ;
-
-extern "C" double	fsum(double *,int) ;
-extern "C" double	fam(double *,int) ;
-extern "C" double	fhm(double *,int) ;
 
 
 /* external variables */
@@ -150,7 +127,7 @@ struct locinfo_stat {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	LOCINFO_STAT	st, sf ;
 	vecstr		stores ;
@@ -168,9 +145,9 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,SHIO *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *,cchar *) ;
 static int	procoutfile(PROGINFO *,cchar *) ;
 static int	procoutall(PROGINFO *) ;
 
@@ -316,8 +293,8 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -525,7 +502,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-	                            KEYOPT	*kop = &akopts ;
+	                            keyopt	*kop = &akopts ;
 	                            rs = keyopt_loads(kop,argp,argl) ;
 	                        }
 	                    } else
@@ -662,7 +639,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -828,7 +805,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 	if (rs >= 0) {
 	    ARGINFO	*aip = &ainfo ;
-	    BITS	*bop = &pargs ;
+	    bits	*bop = &pargs ;
 	    rs = process(pip,aip,bop,ofname,afname,ifname) ;
 	} else if (ex == EX_OK) {
 	    SHIO	*efp = (SHIO *) pip->efp ;
@@ -945,7 +922,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -959,7 +936,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    KEYOPT_CUR	cur ;
+	    keyopt_cur	cur ;
 	    debugprintf("main: progopts specified:\n") ;
 	    keyopt_curbegin(kop,&cur) ;
 	    while ((rs = keyopt_enumkeys(kop,&cur,&cp)) >= 0) {
@@ -973,7 +950,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	if (rs >= 0) {
 	    int		ki ;
 	    for (ki = 0 ; progopts[ki] != NULL ; ki += 1) {
-	        KEYOPT_CUR	cur ;
+	        keyopt_cur	cur ;
 	        if ((rs = keyopt_curbegin(kop,&cur)) >= 0) {
 
 	            while (rs >= 0) {
@@ -1002,7 +979,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,
 		cchar *ofn,cchar *afn,cchar *ifn)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
@@ -1053,7 +1030,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,SHIO *ofp,
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,
 		cchar *afn,cchar *ifn)
 {
 	int		rs = SR_OK ;
