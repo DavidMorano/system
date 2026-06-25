@@ -37,7 +37,7 @@
 #include	<cstring>		/* |strchr(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<userinfo.h>
@@ -673,7 +673,7 @@ ret0:
 
 local int printinfo(PI *pip,int f_auth,bfile *ofp,cc *name,int as
 		char *,cname) noex {
-	cint	helen = getbufsize(bufsize_ho) ;
+	cint	helen = bufsizeget(bufsize_ho) ;
 	int		rs ;
 	int		rs1 ;
 	char		*hebuf ;
