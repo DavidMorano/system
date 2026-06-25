@@ -20,22 +20,25 @@
 
 /*******************************************************************************
 
+	Description:
 	This is a fairly generic front-end subroutine for a program.
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
 #include	<ctime>
+#include	<csignal>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bits.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -44,6 +47,7 @@
 #include	<egs.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"removename.h"
 #include	"config.h"
@@ -59,32 +63,8 @@
 
 /* external subroutines */
 
-extern uint	hash_elf(const char *,int) ;
-
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	getrand(char *,int) ;
-extern int	progname(PROGINFO *,const char *) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern int	printhelp(void *,cchat *,cchat *,cchat *) ;
 
 
 /* forward references */
@@ -98,25 +78,6 @@ static int	mkrn(PROGINFO *) ;
 
 
 /* local variables */
-
-static const char *argopts[] = {
-	"ROOT",
-	"HELP",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"APPLEDOUBLE",
-	"LINKS",
-	"CORES",
-	"name",
-	"burn",
-	"sn",
-	"af",
-	"of",
-	"ef",
-	"follow",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -137,7 +98,26 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const struct pivars	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"HELP",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"APPLEDOUBLE",
+	"LINKS",
+	"CORES",
+	"name",
+	"burn",
+	"sn",
+	"af",
+	"of",
+	"ef",
+	"follow",
+	NULL
+} ;
+
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -145,7 +125,7 @@ static const struct pivars	initvars = {
 	VARPRLOCAL
 } ;
 
-static const struct mapex	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -160,14 +140,15 @@ static const struct mapex	mapexs[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,cchar **argv,cchar **envv) {
 	PROGINFO	pi, *pip = &pi ;
 	randomvar	rv ;
-	BITS		pargs ;
+	bits		pargs ;
 	bfile		errfile ;
 	bfile		outfile, *ofp = &outfile ;
 
@@ -188,15 +169,14 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_outopen = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*cp ;
-
+	cchat	*argp, *aop, *akp, *avp ;
+	cchat	*argval = NULL ;
+	cchat	*pr = NULL ;
+	cchat	*sn = NULL ;
+	cchat	*afname = NULL ;
+	cchat	*ofname = NULL ;
+	cchat	*efname = NULL ;
+	cchat	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -888,7 +868,7 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
+	cchat	*pn = pip->progname ;
 	cchar		*fmt ;
 
 	fmt = "%s: USAGE> %s [<dir(s)> ...] [-s <search> [-s <search>]]\n" ;
@@ -919,7 +899,7 @@ static int mkrn(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		i ;
 	int		v ;
-	const char	**envv = pip->envv ;
+	cchat	**envv = pip->envv ;
 
 #ifdef	COMMENT
 	if ((cp = getenv(VARRANDOM)) != NULL) {
