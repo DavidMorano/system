@@ -1,4 +1,4 @@
-/* tcpmux SUPPORT */
+/* sd_tcpmux SUPPORT (Sys-Dialer) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -29,7 +29,7 @@
 	tcpmux [[<host>:]<port>] [-f <af>]
 
 	Arguments:
-	+ host		override hostname
+	+ host		hostname
 	+ port		service port
 	+ af		address family
 
@@ -42,13 +42,20 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<uclibmem.h>
 #include	<baops.h>
 #include	<localmisc.h>
 
-#include	"tcpmux.h"
 #include	"sysdialer.h"
+#include	"sd_tcpmux.h"
+#include	"sd_tcp.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -67,23 +74,12 @@
 #define	SVCNAMELEN	32
 #endif
 
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
-
 #define	NPARG		2	/* number of positional arguments */
 #define	MAXARGINDEX	100
 #define	NARGPRESENT	(MAXARGINDEX/8 + 1)
 
 
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	isdigitlatin(int) ;
 
 
 /* external variables */
@@ -92,58 +88,57 @@ extern int	isdigitlatin(int) ;
 /* local structures */
 
 struct afamily {
-	const char	*name ;
+	cchar		*name ;
 	int		af ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 
-/* external variables (module information) */
-
-SYSDIALER_INFO	tcpmux = {
-	TCPMUX_MNAME,
-	TCPMUX_VERSION,
-	TCPMUX_INAME,
-	sizeof(TCPMUX),
-	TCPMUX_MF
-} ;
-
-
 /* local variables */
-
-static const char *argopts[] = {
-	"ROOT",
-	"af",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
 	argopt_af,
 	argopt_overlast
-} ;
+} ; /* end enum (argopts) */
 
-static const struct afamily	afs[] = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"af",
+	nullptr
+} ; /* end array (argopts) */
+
+constexpr afamily	afs[] = {
 	{ "inet", AF_INET },
 	{ "inet4", AF_INET },
 #ifdef	AF_INET6
 	{ "inet6", AF_INET6 },
 #endif
-	{ NULL, 0 }
-} ;
+	{ nullptr, 0 }
+} ; /* end array (afs) */
+
+
+/* external variables (module information) */
+
+SYSDIALER_INFO	sd_tcpmux = {
+	TCPMUX_MNAME,
+	TCPMUX_VERSION,
+	TCPMUX_INAME,
+	szof(TCPMUX),
+	TCPMUX_MF
+} ; /* end if (object) */
 
 
 /* exported subroutines */
 
-
 int tcpmux_open(op,ap,hostname,svcname,av)
 TCPMUX		*op ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
+cchar	hostname[] ;
+cchar	svcname[] ;
+cchar	*av[] ;
 {
 	int	rs = SR_OK ;
 	int	fd ;
@@ -151,14 +146,14 @@ const char	*av[] ;
 	int	af = 0 ;
 	int	opts = 0 ;
 
-	const char	*pr = NULL ;
-	const char	*portname = TCPMUX_PORTNAME ;
+	cchar	*pr = nullptr ;
+	cchar	*portname = TCPMUX_PORTNAME ;
 
 	char	hostnamebuf[MAXHOSTNAMELEN + 1] ;
 	char	svcnamebuf[SVCNAMELEN + 1] ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic == TCPMUX_MAGIC)
@@ -169,20 +164,20 @@ const char	*av[] ;
 		hostname,svcname) ;
 #endif
 
-	if (ap != NULL) {
+	if (ap != nullptr) {
 	    int	argr, argl, aol, avl ;
 	    int	maxai, pan, npa, kwi, i ;
 	    int	argnum ;
 	    int	cl ;
 	    int	f_optminus, f_optplus, f_optequal ;
-	    int	f_extra = FALSE ;
-	    int	f_bad = FALSE ;
+	    int	f_extra = false ;
+	    int	f_bad = false ;
 
-	    const char	**argv, *argp, *aop, *avp ;
+	    cchar	**argv, *argp, *aop, *avp ;
 	    char	argpresent[NARGPRESENT] ;
-	    const char	*afspec = NULL ;
-	    const char	*hostport = NULL ;
-	    const char	*cp ;
+	    cchar	*afspec = nullptr ;
+	    cchar	*hostport = nullptr ;
+	    cchar	*cp ;
 
 
 #if	CF_DEBUGS
@@ -195,7 +190,7 @@ const char	*av[] ;
 	    to = ap->timeout ;
 	    opts = ap->options ;
 	    argv = ap->argv ;
-	    if (ap->pr != NULL)
+	    if (ap->pr != nullptr)
 	        pr = (char *) ap->pr ;
 
 /* process program arguments */
@@ -205,7 +200,7 @@ const char	*av[] ;
 	    npa = 0 ;			/* number of positional so far */
 	    maxai = 0 ;
 	    i = 0 ;
-	    while ((argv[i] != NULL) && (argv[i + 1] != NULL)) {
+	    while ((argv[i] != nullptr) && (argv[i + 1] != nullptr)) {
 
 	        argp = argv[++i] ;
 	        argl = strlen(argp) ;
@@ -234,8 +229,8 @@ const char	*av[] ;
 
 	                    aop = argp + 1 ;
 	                    aol = argl - 1 ;
-	                    f_optequal = FALSE ;
-	                    if ((avp = strchr(aop,'=')) != NULL) {
+	                    f_optequal = false ;
+	                    if ((avp = strchr(aop,'=')) != nullptr) {
 
 #if	CF_DEBUGS
 	                        debugprintf("main: key w/ value\n") ;
@@ -244,7 +239,7 @@ const char	*av[] ;
 	                        aol = avp - aop ;
 	                        avp += 1 ;
 	                        avl = aop + argl - 1 - avp ;
-	                        f_optequal = TRUE ;
+	                        f_optequal = true ;
 
 	                    } else
 	                        avl = 0 ;
@@ -257,13 +252,13 @@ const char	*av[] ;
 	                        case argopt_root:
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl)
 	                                    pr = avp ;
 
 	                            } else {
 
-	                                if (argv[i + 1] == NULL)
+	                                if (argv[i + 1] == nullptr)
 	                                    goto badargnum ;
 
 	                                argp = argv[++i] ;
@@ -279,13 +274,13 @@ const char	*av[] ;
 	                        case argopt_af:
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl)
 						afspec = avp ;
 
 	                            } else {
 
-	                                if (argv[i + 1] == NULL)
+	                                if (argv[i + 1] == nullptr)
 	                                    goto badargnum ;
 
 	                                argp = argv[++i] ;
@@ -311,7 +306,7 @@ const char	*av[] ;
 	                            switch ((int) *aop) {
 
 	                            case 'f':
-	                                if (argv[i + 1] == NULL)
+	                                if (argv[i + 1] == nullptr)
 	                                    goto badargnum ;
 
 	                                argp = argv[++i] ;
@@ -324,7 +319,7 @@ const char	*av[] ;
 
 /* service name */
 	                            case 's':
-	                                if (argv[i + 1] == NULL)
+	                                if (argv[i + 1] == nullptr)
 	                                    goto badargnum ;
 
 	                                argp = argv[++i] ;
@@ -337,7 +332,7 @@ const char	*av[] ;
 
 /* timeout */
 	                            case 't':
-	                                if (argv[i + 1] == NULL)
+	                                if (argv[i + 1] == nullptr)
 	                                    goto badargnum ;
 
 	                                argp = argv[++i] ;
@@ -355,8 +350,8 @@ const char	*av[] ;
 	                                break ;
 
 	                            default:
-	                                f_extra = TRUE ;
-	                                f_bad = TRUE ;
+	                                f_extra = true ;
+	                                f_bad = true ;
 
 	                            } /* end switch */
 
@@ -392,8 +387,8 @@ const char	*av[] ;
 
 	            } else {
 
-	                f_extra = TRUE ;
-	                f_bad = TRUE ;
+	                f_extra = true ;
+	                f_bad = true ;
 	            }
 
 	        } /* end if (key letter/word or positional) */
@@ -425,9 +420,9 @@ const char	*av[] ;
 
 	    } /* end if (positional arguments) */
 
-	    if ((hostport != NULL) && (hostport[0] != '\0')) {
+	    if ((hostport != nullptr) && (hostport[0] != '\0')) {
 
-	        if ((cp = strchr(hostport,':')) != NULL) {
+	        if ((cp = strchr(hostport,':')) != nullptr) {
 
 	            cl = MIN((cp - hostport),SVCNAMELEN) ;
 	            if (cl > 0) {
@@ -444,14 +439,14 @@ const char	*av[] ;
 
 	    } /* end if */
 
-		if ((afspec != NULL) && (afspec[0] != '\0')) {
+		if ((afspec != nullptr) && (afspec[0] != '\0')) {
 
-			for (i = 0 ; afs[i].name != NULL ; i += 1) {
+			for (i = 0 ; afs[i].name != nullptr ; i += 1) {
 				if (strcmp(afs[i].name,afspec) == 0)
 					break ;
 			}
 
-			if (afs[i].name != NULL) {
+			if (afs[i].name != nullptr) {
 				af = afs[i].af ;
 			} else
 			rs = SR_INVALID ;
@@ -476,7 +471,7 @@ const char	*av[] ;
 
 	if (rs >= 0) {
 	    op->magic = TCPMUX_MAGIC ;
-	    uc_closeonexec(op->fd,TRUE) ;
+	    uc_closeonexec(op->fd,true) ;
 	}
 
 ret0:
@@ -511,7 +506,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -534,7 +529,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -559,7 +554,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -581,7 +576,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -596,13 +591,13 @@ int		to, opts ;
 
 int tcpmux_write(op,buf,buflen)
 TCPMUX		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -617,14 +612,14 @@ int		buflen ;
 
 int tcpmux_send(op,buf,buflen,flags)
 TCPMUX		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 {
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -639,7 +634,7 @@ int		flags ;
 
 int tcpmux_sendto(op,buf,buflen,flags,sap,salen)
 TCPMUX		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 void		*sap ;
@@ -648,7 +643,7 @@ int		salen ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -669,7 +664,7 @@ int		flags ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -689,7 +684,7 @@ int		cmd ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -709,7 +704,7 @@ TCPMUX		*op ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != TCPMUX_MAGIC)
@@ -723,8 +718,6 @@ TCPMUX		*op ;
 /* end subroutine (tcpmux_close) */
 
 
-
-/* INTERNAL SUBROUTINES */
-
+/* local subroutines */
 
 
