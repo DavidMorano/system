@@ -27,29 +27,37 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c)| */
-#include	<memory>
-#include	<usystem.h>
-#include	<estrings.h>
-#include	<strpack.h>
-#include	<hdb.h>
-#include	<filer.h>
-#include	<naturalwords.h>
-#include	<intceil.h>
-#include	<strn.h>
-#include	<six.h>
-#include	<sfx.h>
-#include	<strwcpyx.h>
-#include	<linebuffer.h>
-#include	<char.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<memory>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<naturalwords.h>	/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpyx.h>		/* LIBUC */
+#include	<linebuffer.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"eigendb.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/sif.ccm"
 
 import libutil ;
 import sif ;
@@ -73,8 +81,6 @@ import sif ;
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -91,15 +97,16 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int eigendb_ctor(eigendb *op,Args ... args) noex {
+local int eigendb_ctor(eigendb *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->dbp = nullptr ;
-	    if ((op->spp = new(nothrow) strpack) != np) ylikely {
-	        if ((op->dbp = new(nothrow) hdb) != np) ylikely {
+	    if ((op->spp = new(nt) strpack) != np) ylikely {
+	        if ((op->dbp = new(nt) hdb) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-hdb) */
 		if (rs < 0) {
@@ -109,40 +116,37 @@ static int eigendb_ctor(eigendb *op,Args ... args) noex {
 	    } /* end if (new-strapck) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (eigendb_ctor) */
+} /* end subroutine (eigendb_ctor) */
 
-static int eigendb_dtor(eigendb *op) noex {
+local int eigendb_dtor(eigendb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->dbp) ylikely {
 		delete op->dbp ;
 		op->dbp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->spp) ylikely {
 		delete op->spp ;
 		op->spp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (eigendb_dtor) */
+} /* end subroutine (eigendb_dtor) */
 
 template<typename ... Args>
-static int eigendb_magic(eigendb *op,Args ... args) noex {
+local int eigendb_magic(eigendb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == EIGENDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == EIGENDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (eigendb_magic) */
+} /* end subroutine (eigendb_magic) */
 
-static int	eigendb_fileparse(eigendb *,cchar *) noex ;
-static int	eigendb_fileparsereg(eigendb *,int,int) noex ;
-static int	eigendb_fileparsemap(eigendb *,int,int) noex ;
-static int	eigendb_fileline(eigendb *,cchar *,int) noex ;
+local int	eigendb_fileparse(eigendb *,cchar *) noex ;
+local int	eigendb_fileparsereg(eigendb *,int,int) noex ;
+local int	eigendb_fileparsemap(eigendb *,int,int) noex ;
+local int	eigendb_fileline(eigendb *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -156,14 +160,14 @@ constexpr int	keybuflen = KEYBUFLEN ;
 /* exported subroutines */
 
 int eigendb_open(eigendb *op,cchar *fname) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = eigendb_ctor(op)) >= 0) {
 	    cint	ne = EIGENDB_DEFENT ;
 	    cint	chsz = EIGENDB_CHUNKSIZE ;
 	    if ((rs = strpack_start(op->spp,chsz)) >= 0) {
-		cnullptr	np{} ;
 	        if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) {
-	            op->magic = EIGENDB_MAGIC ;
+	            op->magval = EIGENDB_MAGIC ;
 	            if (fname) {
 		        if (fname[0] != '\0') {
 	                    rs = eigendb_fileparse(op,fname) ;
@@ -173,20 +177,19 @@ int eigendb_open(eigendb *op,cchar *fname) noex {
 	            } /* end if (non-null) */
 	            if (rs < 0) {
 	                hdb_finish(op->dbp) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (hdb-start) */
 	        if (rs < 0) {
 	            strpack_finish(op->spp) ;
-	            op->magic = 0 ;
-	        }
+	            op->magval = 0 ;
+	        } /* end if (error) */
 	    } /* end if (strpack-start) */
 	    if (rs < 0) {
 		eigendb_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (eigendb_ctor) */
 	return rs ;
-}
-/* end subroutine (eigendb_open) */
+} /* end subroutine (eigendb_open) */
 
 int eigendb_close(eigendb *op) noex {
 	int		rs ;
@@ -204,11 +207,10 @@ int eigendb_close(eigendb *op) noex {
 		rs1 = eigendb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (eigendb_close) */
+} /* end subroutine (eigendb_close) */
 
 int eigendb_addfile(eigendb *op,cchar *fname) noex {
 	int		rs ;
@@ -216,17 +218,16 @@ int eigendb_addfile(eigendb *op,cchar *fname) noex {
 	    rs = eigendb_fileparse(op,fname) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (eigendb_addfile) */
+} /* end subroutine (eigendb_addfile) */
 
 int eigendb_addword(eigendb *op,cchar *wp,int wl) noex {
+	cnullptr	np{} ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if ((rs = eigendb_magic(op,wp)) >= 0) {
 	    if (wl < 0) wl = lenstr(wp) ;
 	    if (wl > 0) {
-		cnullptr	np{} ;
-		cint		rsn = SR_NOTFOUND ;
 	        hdb_dat		key ;
 	        hdb_dat		value ;
 	        char		keybuf[keybuflen + 1] ;
@@ -251,22 +252,21 @@ int eigendb_addword(eigendb *op,cchar *wp,int wl) noex {
 	    } /* end if (non-zero word) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (eigendb_addword) */
+} /* end subroutine (eigendb_addword) */
 
 int eigendb_exists(eigendb *op,cchar *wp,int wl) noex {
+	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = eigendb_magic(op,wp)) >= 0) {
 	    if (wl < 0) wl = lenstr(wp) ;
 	    if (wl > 0) {
-		cnullptr	np{} ;
 	        hdb_dat		key ;
 	        char		keybuf[keybuflen + 1] ;
 	        if (hasuc(wp,wl)) {
 	            if (wl > keybuflen) wl = keybuflen ;
 	            strwcpylc(keybuf,wp,wl) ;
 	            wp = keybuf ;
-	        }
+	        } /* end if (hasuc) */
 	        key.buf = wp ;
 	        key.len = wl ;
 	        rs = hdb_fetch(op->dbp,key,np,np) ;
@@ -275,8 +275,7 @@ int eigendb_exists(eigendb *op,cchar *wp,int wl) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (eigendb_exists) */
+} /* end subroutine (eigendb_exists) */
 
 int eigendb_count(eigendb *op) noex {
 	int		rs ;
@@ -284,20 +283,20 @@ int eigendb_count(eigendb *op) noex {
 	    rs = hdb_count(op->dbp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (eigendb_count) */
+} /* end subroutine (eigendb_count) */
 
 int eigendb_curbegin(eigendb *op,eigendb_cur *curp) noex {
+    	cnullptr	np{} ;
+    	cnothrow	nt{} ;
 	int		rs ;
 	if ((rs = eigendb_magic(op,curp)) >= 0) {
 	    rs = SR_NOMEM ;
-	    if ((curp->hcp = new(nothrow) hdb_cur) != nullptr) {
+	    if ((curp->hcp = new(nt) hdb_cur) != np) {
 		rs = hdb_curbegin(op->dbp,curp->hcp) ;
 	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (eigendb_curbegin) */
+} /* end subroutine (eigendb_curbegin) */
 
 int eigendb_curend(eigendb *op,eigendb_cur *curp) noex {
 	int		rs ;
@@ -315,12 +314,11 @@ int eigendb_curend(eigendb *op,eigendb_cur *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (eigendb_curend) */
+} /* end subroutine (eigendb_curend) */
 
-int eigendb_enum(eigendb *op,eigendb_cur *curp,cchar **rpp) noex {
+int eigendb_curenum(eigendb *op,eigendb_cur *curp,cchar **rpp) noex {
 	int		rs ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
 	if ((rs = eigendb_magic(op,curp)) >= 0) {
 	    rs = SR_BUGCHECK ;
@@ -337,20 +335,19 @@ int eigendb_enum(eigendb *op,eigendb_cur *curp,cchar **rpp) noex {
 	} /* end if (magic) */
 	if (rpp) *rpp = rp ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (eigendb_enum) */
+} /* end subroutine (eigendb_curenum) */
 
 
 /* private subroutines */
 
-static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
+local int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
 	cmode		om = 0666 ;
 	if ((rs = uc_open(fname,of,om)) >= 0) {
 	    cint	fd = rs ;
-	    if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	        if (! S_ISDIR(sb.st_mode)) {
 	            csize	mfsize = EIGENDB_MAXFILESIZE ;
 	            csize	fsize = sb.st_size ;
@@ -370,20 +367,19 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (open-file) */
 	return rs ;
-}
-/* end subroutine (eigendb_fileparse) */
+} /* end subroutine (eigendb_fileparse) */
 
-static int eigendb_fileparsereg(eigendb *op,int fd,int fsize) noex {
+local int eigendb_fileparsereg(eigendb *op,int fd,int fsz) noex {
 	cint		to = TO_READ ;
 	int		rs ;
 	int		rs1 ;
-	int		bsize = 0 ;
+	int		bsz = 0 ;
 	int		c = 0 ;
-	if (fsize >= 0) {
-	    bsize = iceil(fsize,1024) ;
+	if (fsz >= 0) {
+	    bsz = iceil(fsz,1024) ;
 	}
 	if (linebuffer lb ; (rs = lb.start) >= 0) {
-	    if (filer fb ; (rs = filer_start(&fb,fd,0z,bsize,0)) >= 0) {
+	    if (filer fb ; (rs = filer_start(&fb,fd,0z,bsz,0)) >= 0) {
 	        cint	llen = lb.llen ;
 	        char	*lbuf = lb.lbuf ;
 	        while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {
@@ -398,12 +394,11 @@ static int eigendb_fileparsereg(eigendb *op,int fd,int fsize) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (linebuffer) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (eigendb_fileparsereg) */
+} /* end subroutine (eigendb_fileparsereg) */
 
-static int eigendb_fileparsemap(eigendb *op,int fd,int fsize) noex {
+local int eigendb_fileparsemap(eigendb *op,int fd,int fsz) noex {
 	cnullptr	np{} ;
-	csize		ms = size_t(fsize) ;
+	csize		ms = size_t(fsz) ;
 	cint		mp = PROT_READ ;
 	cint		mf = MAP_SHARED ;
 	int		rs ;
@@ -412,8 +407,7 @@ static int eigendb_fileparsemap(eigendb *op,int fd,int fsize) noex {
 	if (void *md{} ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	    char	*sp = charp(md) ;
 	    int		sl = int(ms) ;
-	    int		si ;
-	    while ((si = siochr(sp,sl,'\n')) >= 0) {
+	    for (int si ; (si = siochr(sp,sl,'\n')) >= 0 ; ) {
 		rs = eigendb_fileline(op,sp,si) ;
 		c += rs ;
 		sl -= (si+1) ;
@@ -424,10 +418,9 @@ static int eigendb_fileparsemap(eigendb *op,int fd,int fsize) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (map-file) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (eigendb_fileparsemap) */
+} /* end subroutine (eigendb_fileparsemap) */
 
-static int eigendb_fileline(eigendb *op,cchar *lbuf,int llen) noex {
+local int eigendb_fileline(eigendb *op,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*sp{} ;
@@ -441,7 +434,55 @@ static int eigendb_fileline(eigendb *op,cchar *lbuf,int llen) noex {
 	    } /* end while */
 	} /* end if (sfcontent) */
 	return (rs >= 0) ? c : rs ;
+} /* end subroutine (eigendb_fileline) */
+
+int eigendb::addfile(cchar *fname) noex {
+	return eigendb_addfile(this,fname) ;
 }
-/* end subroutine (eigendb_fileline) */
+
+int eigendb::addword(cchar *wp,int wl) noex {
+	return eigendb_addword(this,wp,wl) ;
+}
+
+int eigendb::exists(cchar *wp,int wl) noex {
+	return eigendb_exists(this,wp,wl) ;
+}
+
+int eigendb::curbegin(eigendb_cur *curp) noex {
+	return eigendb_curbegin(this,curp) ;
+}
+
+int eigendb::curend(eigendb_cur *curp) noex {
+	return eigendb_curend(this,curp) ;
+}
+
+int eigendb::curenum(eigendb_cur *curp,cchar **rpp) noex {
+	return eigendb_curenum(this,curp,rpp) ;
+}
+
+void eigendb::dtor() noex {
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("eigendb",rs,"fini-close") ;
+	}
+} /* end method (eigendb::dtor) */
+
+eigendb::operator int () noex {
+	return eigendb_count(this) ;
+} /* end method (eigendb::operator) */
+
+eigendb_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case eigendbmem_count:
+	        rs = eigendb_count(op) ;
+	        break ;
+	    case eigendbmem_close:
+	        rs = eigendb_close(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (eigendb_co::operator) */
 
 
