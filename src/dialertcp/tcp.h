@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* TCP dialer */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -21,7 +24,6 @@
 #include	<utypealiases.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
-#include	<usyscalls.h>
 #include	<sysdialer.h>
 
 
@@ -32,7 +34,7 @@
 struct tcp_head {
 	uint		magic ;
 	int		fd ;
-} ;
+} ; /* end struct */
 
 typedef	TCP		tcp ;
 
