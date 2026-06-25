@@ -46,7 +46,7 @@ I09=
 I10= userinfo.h openport.h
 I11= char.h ansigr.h baops.h bwops.h
 I12= envs.h
-I13= raqhand.h
+I13= raqhand.h ktag.h
 I14=
 I15=
 
@@ -64,9 +64,7 @@ LIBS += -lb -luc
 
 
 INCDIRS=
-
 LIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -393,7 +391,7 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ) Makefile
@@ -714,20 +712,23 @@ termtrans.o:		termtrans.cc termtrans.h
 termout.o:		termout.cc termout.h
 modload.o:		modload.cc modload.h
 shmalloc.o:		shmalloc.cc shmalloc.h
-kbdinfo.o:		kbdinfo.cc kbdinfo.h
-userid.o:		userid.cc userid.hh
+kbdinfo.o:		kbdinfo.cc	kbdinfo.h		$(INCS)
+userid.o:		userid.cc	userid.hh		$(INCS)
 motd.o:			motd.cc		motd.h			$(INCS)
 issue.o:		issue.cc	issue.h			$(INCS)
 statmsg.o:		statmsg.cc	statmsg.h		$(INCS)
 defvar.o:		defvar.cc	defvar.h		$(INCS)
 schedvar.o:		schedvar.cc	schedvar.h		$(INCS)
+cmdmap.o:		cmdmap.cc	cmdmap.h		$(INCS)
 
 # TEXT related
 textlook.o:		textlook.cc	textlook.h		$(INCS)
 searchkeys.o:		searchkeys.cc	searchkeys.h		$(INCS)
 xwords.o:		xwords.cc	xwords.h		$(INCS)
 rtags.o:		rtags.cc	rtags.h			$(INCS)
+ktag.o:			ktag.cc		ktag.h			$(INCS)
 wordfill.o:		wordfill.cc	wordfill.h		$(INCS)
+eigendb.o:		eigendb.cc	eigendb.h		$(INCS)
 
 # DATABASE
 database.o:		database.dir
@@ -925,48 +926,48 @@ quickselecti.o:		quickselecti.cc		quickselecti.h		$(INCS)
 fsdirtreestat.o:	fsdirtreestat.cc	fsdirtreestat.h		$(INCS)
 makedirs.o:		makedirs.cc		makedirs.h		$(INCS)
 naturalwords.o:		naturalwords.cc		naturalwords.h		$(INCS)
+termcmdkey.o:		termcmdkey.cc		termcmdkey.h		$(INCS)
 
 # DFSA
 dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
-	makemodule dfsa
-	$(LD) -r -o $@ $(LDFLAGS) dfsa0.o dfsa1.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
 dfsa0.o:		dfsa.ccm			$(INCS)
-	makemodule dfsa
-dfsa1.o:		dfsa1.cc dfsa.ccm		$(INCS)
-	makemodule dfsa
-	$(COMPILE.cc) dfsa1.cc
+	gxx -c -x c++ -o $@ -O $<
+
+dfsa1.o:		dfsa1.cc dfsa0.o		$(INCS)
+	$(COMPILE.cc) $<
 
 # DFSB
 dfsb.o:			dfsb0.o dfsb1.o			$(INCS)
-	makemodule dfsb
-	$(LD) -r -o $@ $(LDFLAGS) dfsb0.o dfsb1.o
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
 dfsb0.o:		dfsb.ccm			$(INCS)
-	makemodule dfsb
-dfsb1.o:		dfsb1.cc dfsb.ccm		$(INCS)
-	makemodule dfsb
-	$(COMPILE.cc) dfsb1.cc
+	gxx -c -x c++ -o $@ -O $<
+
+dfsb1.o:		dfsb1.cc dfsb0.o		$(INCS)
+	$(COMPILE.cc) $<
 
 sort_merge.o:		sort_merge.ccm			$(INCS)
-	makemodule sort_merge
+	gxx -c -x c++ -o $@ -O $<
 
 sort_insertion.o:	sort_insertion.ccm		$(INCS)
-	makemodule sort_insertion
+	gxx -c -x c++ -o $@ -O $<
 
 # CCMUTEX
 ccmutex.o:		ccmutex.ccm			$(INCS)
-	makemodule ccmutex
+	gxx -c -x c++ -o $@ -O $<
 
 # MINMAXELEM
 minmaxelem.o:		minmaxelem.ccm			$(INCS)
-	makemodule minmaxelem
+	gxx -c -x c++ -o $@ -O $<
 
 # HASDUPLICATE
 hascount.o:		hascount.ccm			$(INCS)
-	makemodule hascount
+	gxx -c -x c++ -o $@ -O $<
 
 # BINCHAR
-binchar.o:		binchar.ccm
-	makemodule rshiftx
-	makemodule binchar
+binchar.o:		binchar.ccm			$(INCS)
+	gxx -c -x c++ -o $@ -O $<
 
 
