@@ -2,34 +2,47 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* SYSDIALER "usd" dialer */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2003-11-04, David A­D­ Morano
+	This was created as one of the first dialer modules for the
+	DIALER object.
+
+*/
+
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	USD_INCLUDE
 #define	USD_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<logfile.h>
+#include	<sysdialer.h>
 
-#include	"sysdialer.h"
 
-
-#define	USD_MAGIC	31415926
 #define	USD		struct usd_head
 #define	USD_FL		struct usd_flags
+#define	USD_MAGIC	31415926
 
 
 struct usd_flags {
 	uint		log:1 ;
-} ;
+} ; /* end struct */
 
 struct usd_head {
-	LOGFILE		lh ;
+	logfile		lh ;
 	USD_FL		fl ;
 	uint		magic ;
 	int		tlen ;
 	int		fd ;
-} ;
+} ; /* end struct */
 
 EXTERNC_begin
 
