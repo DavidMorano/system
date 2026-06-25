@@ -92,15 +92,6 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	ecmsg_loadfile(ECMSG *,cchar *) ;
-extern int	isNotAccess(int) ;
-extern int	isFailOpen(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	lightnoise(PROGINFO *,USERINFO *,cchar *) ;
@@ -116,8 +107,6 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern char	*getourenv(cchar **,cchar *) ;
-
 
 /* external variables */
 
@@ -131,7 +120,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	ECMSG		extra ;
@@ -144,7 +133,7 @@ struct locinfo {
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
 static int	process(PROGINFO *,cchar *,cchar *) ;
 static int	procereport(PROGINFO *,FILEINFO *,int) ;
 
@@ -248,7 +237,7 @@ int main(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	bfile		errfile ;
 
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -601,7 +590,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -898,7 +887,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -911,7 +900,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	v ;
 	        int	oi ;
@@ -926,9 +915,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_audit:
-	                    if (! lip->final.audit) {
+	                    if (! lip->finval.audit) {
 	                        lip->have.audit = true ;
-	                        lip->final.audit = true ;
+	                        lip->finval.audit = true ;
 	                        lip->fl.audit = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -937,9 +926,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_logsize:
-	                    if (! pip->final.logsize) {
+	                    if (! pip->finval.logsize) {
 	                        pip->have.logsize = true ;
-	                        pip->final.logsize = true ;
+	                        pip->finval.logsize = true ;
 	                        if (vl > 0) {
 	                            rs = cfdecmfi(vp,vl,&v) ;
 	                            pip->logsize = v ;
