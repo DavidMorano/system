@@ -19,6 +19,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LINU */
 #include	<usysbase.h>		/* LIBU */
+#include	<fieldterms.h>		/* LIBUC */
 #include	<eigendb.h>		/* LIBUC */
 #include	<txtindex.h>		/* LIBDAM */
 #include	<biblecite.h>		/* LIBDAM */
@@ -33,9 +34,20 @@
 #define	BIBLEQS_MAGIC	0x99889298
 #define	BIBLEQS_DBDNAME	"share/bibledbs"
 #define	BIBLEQS_DBNAME	"av"
-/* query options */
-#define	BIBLEQS_OPREFIX	0x01		/* prefix match */
 
+enum bibleqos {
+	bibleqo_prefix,
+	bibleqo_overlast
+} ; /* end enum (bibleqos) */
+
+#ifdef	__cplusplus
+struct bibleqms {
+	static constexpr int	prefix	= (1 << bibleqo_prefix) ;
+} ; /* end struct (bibleqms) */
+#endif /* __cplusplus */
+
+/* query options */
+#define	BIBLEQS_OPREFIX		(1 << bibleqo_prefix)	/* prefix match */
 
 struct bibleqs_object {
 	cchar		*name ;
@@ -52,7 +64,7 @@ struct bibleqs_flags {
 
 struct bibleqs_cursor {
 	uint		*verses ;		/* file-offsets to tags */
-	uint		nverses ;
+	int		nverses ;
 	int		i ;
 } ; /* end struct */
 
@@ -72,7 +84,6 @@ struct bibleqs_head {
 	uint		magval ;
 	int		minwlen ;		/* minimum key-word length */
 	int		ncursors ;
-	uchar		wterms[32] ;
 } ; /* end struct */
 
 typedef	BIBLEQS		bibleqs ;
@@ -97,6 +108,7 @@ extern int bibleqs_close(bibleqs *) noex ;
 EXTERNC_end
 
 extern const bibleqs_obj	bibleqs_modinfo ;
+extern const bibleqms		bibleqm ;
 
 
 #endif /* BIBLEQS_INCLUDE */
