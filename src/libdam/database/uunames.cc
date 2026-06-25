@@ -1020,18 +1020,15 @@ local int uunames_indcheck(UU *op,time_t) noex {
 } /* end subroutine (uunames_indcheck) */
 
 local int checkdname(cchar *dname) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_INVALID ;
 	if (dname[0] == '/') {
 	    if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
+		rs = SR_NOTDIR ;
 		if (S_ISDIR(sb.st_mode)) {
 	    	    rs = perm(dname,-1,-1,nullptr,W_OK) ;
-		} else {
-	            rs = SR_NOTDIR ;
-		}
-	    } /* end if (stat) */
-	} else {
-	    rs = SR_INVALID ;
-	}
+		} /* end if (directory) */
+	    } /* end if (u_stat) */
+	} /* end if */
 	return rs ;
 } /* end subroutine (checkdname) */
 
