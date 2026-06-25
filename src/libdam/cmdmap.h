@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	CMDMAP		struct cmdmap_head
@@ -43,7 +43,7 @@ struct cmdmap_flags {
 struct cmdmap_head {
 	vecobj		*mlp ;		/* map-list-pointer */
 	CMDMAP_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 typedef	CMDMAP		cmdmap ;
@@ -52,10 +52,10 @@ typedef	CMDMAP_ENT	cmdmap_ent ;
 
 EXTERNC_begin
 
-extern int cmdmap_start(cmdmap *,const cmdmap_ent *) noex ;
-extern int cmdmap_finish(cmdmap *) noex ;
-extern int cmdmap_load(cmdmap *,int,int) noex ;
-extern int cmdmap_lookup(cmdmap *,int) noex ;
+extern int cmdmap_start		(cmdmap *,const cmdmap_ent *) noex ;
+extern int cmdmap_finish	(cmdmap *) noex ;
+extern int cmdmap_load		(cmdmap *,int,int) noex ;
+extern int cmdmap_lookup	(cmdmap *,int) noex ;
 
 EXTERNC_end
 
