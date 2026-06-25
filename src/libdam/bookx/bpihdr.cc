@@ -79,7 +79,7 @@ enum his {
 	hi_maxbook,
 	hi_maxchap,
 	hi_overlast
-} ; /* end enum */
+} ; /* end enum (his) */
 
 
 /* forward references */
