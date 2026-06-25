@@ -75,7 +75,7 @@
 #include	<storebuf.h>
 #include	<snx.h>			/* |snabbrname(3uc)| */
 #include	<mkui.h>		/* |mkuiname(3dam)| */
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -752,7 +752,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    } /* end if */
 	                    if ((rs >= 0) && (cp != nullptr)) {
 	                        pip->have.lfname = TRUE ;
-	                        pip->final.lfname = TRUE ;
+	                        pip->finval.lfname = TRUE ;
 	                        pip->fl.lfname = TRUE ;
 	                        pip->lfname = cp ;
 	                    }
@@ -863,7 +863,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* reuse-address */
 	                case argopt_ra:
 	                    pip->have.reuseaddr = TRUE ;
-	                    pip->final.reuseaddr = TRUE ;
+	                    pip->finval.reuseaddr = TRUE ;
 	                    pip->fl.reuseaddr = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -877,7 +877,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* logging? */
 	                case argopt_log:
 	                    pip->have.logprog = TRUE ;
-	                    pip->final.logprog = TRUE ;
+	                    pip->finval.logprog = TRUE ;
 	                    pip->fl.logprog = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -965,7 +965,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                pip->have.pidfname = TRUE ;
-	                                pip->final.pidfname = TRUE ;
+	                                pip->finval.pidfname = TRUE ;
 	                                pip->pidfname = argp ;
 	                            }
 	                        } else
@@ -993,7 +993,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
-	                                pip->final.intrun = TRUE ;
+	                                pip->finval.intrun = TRUE ;
 	                                pip->have.intrun = TRUE ;
 	                                pip->intrun = -1 ;
 	                                if (avp[0] != '-') {
@@ -1007,7 +1007,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* force a run */
 	                    case 'f':
 	                        pip->fl.force = TRUE ;
-	                        pip->final.intmin = TRUE ;
+	                        pip->finval.intmin = TRUE ;
 	                        pip->have.intmin = TRUE ;
 	                        pip->intmin = 0 ;
 	                        break ;
@@ -1015,7 +1015,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* minimum interval */
 	                    case 'm':
 	                        pip->have.intmin = TRUE ;
-	                        pip->final.intmin = TRUE ;
+	                        pip->finval.intmin = TRUE ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -1046,7 +1046,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* poll interval */
 	                    case 'p':
 	                        pip->have.intpoll = TRUE ;
-	                        pip->final.intpoll = TRUE ;
+	                        pip->finval.intpoll = TRUE ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -1068,7 +1068,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case 'u':
 	                        pip->fl.uniq = TRUE ;
 	                        pip->have.uniq = TRUE ;
-	                        pip->final.uniq = TRUE ;
+	                        pip->finval.uniq = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -1195,7 +1195,7 @@ int main(int argc,mainv argv,mainv envv) {
 #endif /* CF_DEBUG */
 
 	if ((rs >= 0) && (pip->intpoll <= 0) && (argval != nullptr)) {
-	    pip->final.intpoll = TRUE ;
+	    pip->finval.intpoll = TRUE ;
 	    pip->have.intpoll = TRUE ;
 	    rs = cfdecti(argval,-1,&v) ;
 	    pip->intpoll = v ;
@@ -1226,7 +1226,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (rs > 7) {
 	                pip->have.linelen = TRUE ;
-	                pip->final.linelen = TRUE ;
+	                pip->finval.linelen = TRUE ;
 	                pip->linelen = rs ;
 		    }
 	        }
@@ -2177,8 +2177,8 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 
 	                switch (oi) {
 	                case akoname_cf:
-			    if (! pip->final.cfname) {
-			        pip->final.cfname = TRUE ;
+			    if (! pip->finval.cfname) {
+			        pip->finval.cfname = TRUE ;
 				if (vl > 0) {
 				    cchar	**vpp = &pip->cfname ;
 				    rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -2186,8 +2186,8 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 			    }
 			    break ;
 	                case akoname_lf:
-			    if (! pip->final.lfname) {
-			        pip->final.lfname = TRUE ;
+			    if (! pip->finval.lfname) {
+			        pip->finval.lfname = TRUE ;
 				if (vl > 0) {
 				    cchar	**vpp = &pip->lfname ;
 				    rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -2195,7 +2195,7 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 			    }
 			    break ;
 	                case akoname_log:
-	                    if (! pip->final.logprog) {
+	                    if (! pip->finval.logprog) {
 	                        pip->have.logprog = TRUE ;
 	                        pip->fl.logprog = TRUE ;
 	                        if (vl > 0) {
@@ -2205,7 +2205,7 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_intpoll:
-	                    if (! pip->final.intpoll) {
+	                    if (! pip->finval.intpoll) {
 	                        if (vl > 0) {
 	                            pip->have.intpoll = TRUE ;
 	                            rs = optvalue(vp,vl) ;
@@ -2217,7 +2217,7 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 	                    break ;
 	                case akoname_ra:
 	                case akoname_reuseaddr:
-	                    if (! pip->final.reuseaddr) {
+	                    if (! pip->finval.reuseaddr) {
 	                        pip->have.reuseaddr = TRUE ;
 	                        pip->fl.reuseaddr = TRUE ;
 	                        if (vl > 0) {
@@ -2227,7 +2227,7 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_showsysbanner:
-	                    if (! pip->final.showsysbanner) {
+	                    if (! pip->finval.showsysbanner) {
 	                        pip->have.showsysbanner = TRUE ;
 	                        pip->fl.showsysbanner = TRUE ;
 	                        if (vl > 0) {
@@ -2237,7 +2237,7 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_uniq:
-	                    if (! pip->final.uniq) {
+	                    if (! pip->finval.uniq) {
 	                        pip->have.uniq = TRUE ;
 	                        pip->fl.uniq = TRUE ;
 	                        if (vl > 0) {
@@ -2247,7 +2247,7 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_quiet:
-	                    if (! pip->final.quiet) {
+	                    if (! pip->finval.quiet) {
 	                        pip->have.quiet = TRUE ;
 	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
@@ -2257,9 +2257,9 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_tmptype:
-	                    if (! pip->final.tmptype) {
+	                    if (! pip->finval.tmptype) {
 	                        pip->have.tmptype = TRUE ;
-	                        pip->final.tmptype = TRUE ;
+	                        pip->finval.tmptype = TRUE ;
 	                        if (vl > 0) {
 	                            int	tt = matpstr(tmptypes,1,vp,vl) ;
 	                            if (tt >= 0) pip->tmptype = tt ;
