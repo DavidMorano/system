@@ -107,7 +107,7 @@
 #include	<clusterdb.h>
 #include	<mkcexsync.h>
 #include	<strxcmp.h>		/* |strkeycmp(3uc)| */
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 #include	<debug.h>
 
