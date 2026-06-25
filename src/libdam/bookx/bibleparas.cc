@@ -1040,7 +1040,7 @@ local int mkdname(cchar *dname,mode_t dm) noex {
 } /* end subroutine (mkdname) */
 
 local int checkdname(cchar *dname) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_INVALID ;
 	if (dname[0] == '/') {
 	    if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
 		rs = SR_NOTDIR ;
@@ -1048,9 +1048,7 @@ local int checkdname(cchar *dname) noex {
 		    rs = perm(dname,-1,-1,nullptr,W_OK) ;
 		} /* end if (is-dir) */
 	    } /* end if (u_stat) */
-	} else {
-	    rs = SR_INVALID ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (checkdname) */
 
