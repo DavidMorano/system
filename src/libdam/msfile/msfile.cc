@@ -1273,7 +1273,7 @@ static int msfile_filetopread(MS *op) noex {
 	off_t	poff = 0L ;
 	int		rs ;
 
-	rs = u_pread(op->fd,op->topbuf,MSFILE_TOPLEN,poff) ;
+	rs = u_readp(op->fd,op->topbuf,MSFILE_TOPLEN,poff) ;
 	op->topsize = rs ;
 
 	return rs ;
