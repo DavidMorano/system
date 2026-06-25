@@ -32,21 +32,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucmem.h>
-#include	<intfloor.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memset(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<intfloor.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"entbuf.h"
 
@@ -78,7 +78,7 @@ using libuc::mem ;			/* variable */
 struct oldentry {
 	time_t		utime ;
 	int		ei ;
-} ;
+} ; /* end struct (oldentry) */
 
 
 /* forward references */
@@ -139,8 +139,7 @@ int entbuf_start(entbuf *op,int fd,uint soff,int esz,int nways,int npw) noex {
 	    } /* end if (fstat) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entbuf_start) */
+} /* end subroutine (entbuf_start) */
 
 int entbuf_finish(entbuf *op) noex {
 	int		rs ;
@@ -158,8 +157,7 @@ int entbuf_finish(entbuf *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (entbuf_finish) */
+} /* end subroutine (entbuf_finish) */
 
 int entbuf_read(entbuf *op,int ei,char **rpp) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -172,8 +170,7 @@ int entbuf_read(entbuf *op,int ei,char **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (entbuf_read) */
+} /* end subroutine (entbuf_read) */
 
 int entbuf_write(entbuf *op,int ei,cvoid *ubuf) noex {
 	int		rs ;
@@ -205,8 +202,7 @@ int entbuf_write(entbuf *op,int ei,cvoid *ubuf) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (entbuf_write) */
+} /* end subroutine (entbuf_write) */
 
 int entbuf_invalidate(entbuf *op,int n) noex {
 	int		rs ;
@@ -221,8 +217,7 @@ int entbuf_invalidate(entbuf *op,int n) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (entbuf_invalidate) */
+} /* end subroutine (entbuf_invalidate) */
 
 int entbuf_count(entbuf *op) noex {
 	int		rs ;
@@ -230,8 +225,7 @@ int entbuf_count(entbuf *op) noex {
 	    rs = op->nentries ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (entbuf_count) */
+} /* end subroutine (entbuf_count) */
 
 int entbuf_sync(entbuf *op) noex {
 	int		rs ;
@@ -239,8 +233,7 @@ int entbuf_sync(entbuf *op) noex {
 	    rs = u_fsync(op->fd) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (entbuf_count) */
+} /* end subroutine (entbuf_count) */
 
 
 /* private subroutines */
@@ -253,8 +246,7 @@ local int entbuf_waybegin(entbuf *op,int wi) noex {
 	    wp->wbuf = charp(vp) ;
 	}
 	return rs ;
-}
-/* end subroutine (entbuf_waybegin) */
+} /* end subroutine (entbuf_waybegin) */
 
 local int entbuf_wayend(entbuf *op,int wi) noex {
     	int		rs = SR_OK ;
@@ -267,8 +259,7 @@ local int entbuf_wayend(entbuf *op,int wi) noex {
 	}
 	memclear(wp) ;
 	return rs ;
-}
-/* end subroutine (entbuf_wayend) */
+} /* end subroutine (entbuf_wayend) */
 
 local int entbuf_search(entbuf *op,int ei,char **rpp) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -281,8 +272,7 @@ local int entbuf_search(entbuf *op,int ei,char **rpp) noex {
 	    *rpp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (entbuf_search) */
+} /* end subroutine (entbuf_search) */
 
 local int entbuf_get(entbuf *op,int wi,int ei,char **rpp) noex {
 	int		rs = SR_OK ;
@@ -301,8 +291,7 @@ local int entbuf_get(entbuf *op,int wi,int ei,char **rpp) noex {
 	    *rpp = (rs >= 0) ? (wp->wbuf + roff) : nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (entbuf_get) */
+} /* end subroutine (entbuf_get) */
 
 local int entbuf_load(entbuf *op,int ei,char **rpp) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -320,8 +309,7 @@ local int entbuf_load(entbuf *op,int ei,char **rpp) noex {
 	    n = rs ;
 	}
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (entbuf_load) */
+} /* end subroutine (entbuf_load) */
 
 local int entbuf_wayfindfin(entbuf *op) noex {
 	int		rs = SR_OK ;
@@ -347,8 +335,7 @@ local int entbuf_wayfindfin(entbuf *op) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? wi : rs ;
-}
-/* end subroutine (entbuf_wayfindfin) */
+} /* end subroutine (entbuf_wayfindfin) */
 
 local int entbuf_wayfindevict(entbuf *op) noex {
 	WAY		*wp = nullptr ;
@@ -367,8 +354,7 @@ local int entbuf_wayfindevict(entbuf *op) noex {
 	    rs = entbuf_wayevict(op,wi) ;
 	}
 	return (rs >= 0) ? wi : rs ;
-}
-/* end subroutine (entbuf_wayfindevict) */
+} /* end subroutine (entbuf_wayfindevict) */
 
 local int entbuf_wayevict(entbuf *op,int wi) noex {
 	WAY		*wp = (op->ways + wi) ;
@@ -380,8 +366,7 @@ local int entbuf_wayevict(entbuf *op,int wi) noex {
 	wp->utime = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (entbuf_wayevict) */
+} /* end subroutine (entbuf_wayevict) */
 
 local int entbuf_wayloadread(entbuf *op,int wi,int ei,char **rpp) noex {
 	WAY		*wp = (op->ways + wi) ;
@@ -395,7 +380,7 @@ local int entbuf_wayloadread(entbuf *op,int wi,int ei,char **rpp) noex {
 	    uint	woff = op->soff + (ei * op->esz) ;
 	    int		wsz = (op->npw * op->esz) ;
 	    poff = off_t(woff) ;
-	    if ((rs = u_pread(op->fd,wp->wbuf,wsz,poff)) > 0) {
+	    if ((rs = u_readp(op->fd,wp->wbuf,wsz,poff)) > 0) {
 	        cint	len = rs ;
 		n = (len / op->esz) ;
 		wp->woff = woff ;
@@ -411,7 +396,6 @@ local int entbuf_wayloadread(entbuf *op,int wi,int ei,char **rpp) noex {
 	    *rpp = (rs >= 0) ? wp->wbuf : nullptr ;
 	}
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (entbuf_wayloadread) */
+} /* end subroutine (entbuf_wayloadread) */
 
 
