@@ -1,4 +1,5 @@
 /* progcs SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* subroutine to read the messages coming in */
@@ -22,6 +23,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	progcs
+
+	Description:
 	This subroutine reads in the COMAST messages and disposes
 	of them appropriately.
 
@@ -33,12 +38,13 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<time.h>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
 #include	<char.h>
@@ -84,42 +90,23 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int,int *) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getnprocessors(const char **,int) ;
-extern int	isasocket(int) ;
+extern int	progexit(PROGINFO *) noex ;
+extern int	progcsmsg(PROGINFO *,cchar *,int) noex ;
 
-extern int	progexit(PROGINFO *) ;
-extern int	progcsmsg(PROGINFO *,const char *,int) ;
+extern int 	progerr_printf(PROGINFO *,cchar *,...) noex ;
 
-extern int 	progerr_printf(PROGINFO *,const char *,...) ;
+extern int 	prognote_check(PROGINFO *) noex ;
 
-extern int 	prognote_check(PROGINFO *) ;
+extern int	progloglock_begin(PROGINFO *) noex ;
+extern int	progloglock_printf(PROGINFO *,cchar *,...) noex ;
+extern int	progloglock_end(PROGINFO *) noex ;
+extern int	progloglock_maint(PROGINFO *) noex ;
 
-extern int	progloglock_begin(PROGINFO *) ;
-extern int	progloglock_printf(PROGINFO *,const char *,...) ;
-extern int	progloglock_end(PROGINFO *) ;
-extern int	progloglock_maint(PROGINFO *) ;
-
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) noex ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) noex ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -130,23 +117,24 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	progcs_begin(PROGINFO *,PROGCS *) ;
-static int	progcs_end(PROGINFO *) ;
-static int	progcs_hdrdecode(PROGINFO *) ;
-static int	progcs_reader(PROGINFO *,DISPATCHER *) ;
-static int	progcs_procmsg(PROGINFO *,DISPATCHER *,const char *,int) ;
-static int	progcs_procmsger(PROGINFO *,DISPATCHER *,cchar *,int) ;
-static int	progcs_worker(PROGINFO *,PROGCS_JOB *) ;
+local int	progcs_begin(PROGINFO *,PROGCS *) noex ;
+local int	progcs_end(PROGINFO *) noex ;
+local int	progcs_hdrdecode(PROGINFO *) noex ;
+local int	progcs_reader(PROGINFO *,DISPATCHER *) noex ;
+local int	progcs_procmsg(PROGINFO *,DISPATCHER *,cchar *,int) noex ;
+local int	progcs_procmsger(PROGINFO *,DISPATCHER *,cchar *,int) noex ;
+local int	progcs_worker(PROGINFO *,PROGCS_JOB *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progcs(PROGINFO *pip)
-{
+int progcs(PROGINFO *pip) noex {
 	PROGCS		si, *sip = &si ;
 	int		rs ;
 	int		rs1 ;
@@ -160,7 +148,7 @@ int progcs(PROGINFO *pip)
 	if ((rs = progcs_begin(pip,sip)) >= 0) {
 	    if ((rs = getnprocessors(pip->envv,0)) >= 0) {
 	        DISPATCHER	d ;
-	        const int	n = (rs+1) ;
+	        cint	n = (rs+1) ;
 	        void		*sub = (void *) progcs_worker ;
 	        if ((rs = dispatcher_start(&d,n,sub,pip)) >= 0) {
 		    int	f_abort ;
@@ -191,19 +179,20 @@ int progcs(PROGINFO *pip)
 }
 /* end subroutine (progcs) */
 
-
-int progcs_trans(PROGINFO *pip,wchar_t *ibuf,int ilen,cchar *sp,int sl)
-{
+int progcs_trans(PROGINFO *pip,wchar_t *ibuf,int ilen,cchar *sp,int sl) noex {
 	PROGCS		*sip = pip->progcs ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = progcs_hdrdecode(pip)) >= 0) {
-	    if ((rs = ptm_lock(&sip->dm)) >= 0) {
+	    ptm *dmp = &sip->dm ;
+	    if ((rs = dmp->lockbegin) >= 0) {
 	        HDRDECODE	*hdp = &sip->d ;
-	        rs = hdrdecode_proc(hdp,ibuf,ilen,sp,sl) ;
-	        len = rs ;
-	        rs1 = ptm_unlock(&sip->dm) ;
+		{
+	            rs = hdrdecode_proc(hdp,ibuf,ilen,sp,sl) ;
+	            len = rs ;
+		}
+	        rs1 = dmp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (progcs_hdrdecode) */
@@ -214,52 +203,53 @@ int progcs_trans(PROGINFO *pip,wchar_t *ibuf,int ilen,cchar *sp,int sl)
 
 /* local subroutines */
 
-
-static int progcs_begin(PROGINFO *pip,PROGCS *sip)
-{
+local int progcs_begin(PROGINFO *pip,PROGCS *sip) noex {
 	int		rs ;
 
 	pip->progcs = sip ;
-	memset(sip,0,sizeof(PROGCS)) ;
+	memclear(sip) ; /* dangerous */
 	sip->pip = pip ;
-	rs = ids_load(&sip->id) ;
-
+	{
+	    rs = ids_load(&sip->id) ;
+	}
 	return rs ;
 }
 /* end subroutine (progcs_begin) */
 
-
-static int progcs_end(PROGINFO *pip)
-{
+local int progcs_end(PROGINFO *pip) noex {
 	PROGCS		*sip = pip->progcs ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (sip->open.hdrdecode) {
-	    rs1 = ptm_destroy(&sip->dm) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = hdrdecode_finish(&sip->d) ;
+	    {
+	        ptm *dmp = &sip->dm ;
+	        rs1 = dmp->destroy ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = hdrdecode_finish(&sip->d) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	}
+	{
+	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-	rs1 = ids_release(&sip->id) ;
-	if (rs >= 0) rs = rs1 ;
-
-	pip->progcs = NULL ;
+	pip->progcs = nullptr ;
 	return rs ;
 }
 /* end subroutine (progcs_end) */
 
-
-static int progcs_hdrdecode(PROGINFO *pip)
-{
+local int progcs_hdrdecode(PROGINFO *pip) noex {
 	PROGCS		*sip = pip->progcs ;
 	int		rs = SR_OK ;
 	if (! sip->open.hdrdecode) {
 	    cchar	*pr = pip->pr ;
 	    if ((rs = hdrdecode_start(&sip->d,pr)) >= 0) {
-		if ((rs = ptm_create(&sip->dm,NULL)) >= 0) {
-		    sip->open.hdrdecode = TRUE ;
+	        ptm *dmp = &sip->dm ;
+		if ((rs = dmp->create) >= 0) {
+		    sip->open.hdrdecode = true ;
 		}
 		if (rs < 0) {
 	    	    hdrdecode_finish(&sip->d) ;
@@ -270,25 +260,23 @@ static int progcs_hdrdecode(PROGINFO *pip)
 }
 /* end subroutine (progcs_begin) */
 
-
-static int progcs_reader(PROGINFO *pip,DISPATCHER *dop)
-{
-	struct pollfd	fds[NFDS] ;
+local int progcs_reader(PROGINFO *pip,DISPATCHER *dop) noex {
+	POLLFD		fds[NFDS] = {} ;
 	time_t		ti_start = pip->daytime ;
 	time_t		ti_termnote = pip->daytime ;
 	time_t		ti_hangup = 0 ;
-	const int	to_poll = TO_POLL ;
-	const int	to = TO_READ ;	/* read time-out */
-	const int	msglen = MSGBUFLEN ;
-	const int	opts = FM_TIMED ;
-	const int	fd_msg = pip->fd_msg ;
+	cint	to_poll = TO_POLL ;
+	cint	to = TO_READ ;	/* read time-out */
+	cint	msglen = MSGBUFLEN ;
+	cint	opts = FM_TIMED ;
+	cint	fd_msg = pip->fd_msg ;
 	int		rs = SR_OK ;
 	int		intrun ;
 	int		intnote ;
 	int		nfds ;
 	int		c = 0 ;
-	int		f_eof = FALSE ;
-	const char	*pn = pip->progname ;
+	int		f_eof = false ;
+	cchar	*pn = pip->progname ;
 	char		msgbuf[MSGBUFLEN+1] ;
 
 #if	CF_DEBUG
@@ -320,7 +308,7 @@ static int progcs_reader(PROGINFO *pip,DISPATCHER *dop)
 	fds[nfds].events = 0 ;
 
 	while (rs >= 0) {
-	    const int	pollwait = (to_poll*POLL_INTMULT) ;
+	    cint	pollwait = (to_poll*POLL_INTMULT) ;
 
 #if	CF_DEBUG && 0
 	    if (DEBUGLEVEL(4)) {
@@ -336,10 +324,10 @@ static int progcs_reader(PROGINFO *pip,DISPATCHER *dop)
 
 	    if ((rs = u_poll(fds,nfds,pollwait)) > 0) {
 		int	i ;
-	        pip->daytime = time(NULL) ;
+	        pip->daytime = time(nullptr) ;
 	        for (i = 0 ; (rs >= 0) && (i < nfds) ; i += 1) {
-		    const int	fd = fds[i].fd ;
-	            const int	re = fds[i].revents ;
+		    cint	fd = fds[i].fd ;
+	            cint	re = fds[i].revents ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
@@ -425,9 +413,9 @@ static int progcs_reader(PROGINFO *pip,DISPATCHER *dop)
 		    if (f_eof) break ;
 		} /* end for (file-descriptors) */
 	    } else if (rs == 0) {
-	        pip->daytime = time(NULL) ;
+	        pip->daytime = time(nullptr) ;
 	    } else if (rs == SR_INTR) {
-	        pip->daytime = time(NULL) ;
+	        pip->daytime = time(nullptr) ;
 		rs = SR_OK ;
 	    }
 
@@ -478,17 +466,15 @@ static int progcs_reader(PROGINFO *pip,DISPATCHER *dop)
 }
 /* end subroutine (progcs_reader) */
 
-
-static int progcs_procmsg(PROGINFO *pip,DISPATCHER *dop,cchar *mbuf,int mlen)
-{
+local int progcs_procmsg(PROGINFO *pip,DISPATCHER *dop,cc *mbuf,int mlen) noex {
 	int		rs = SR_OK ;
 
 	if (mbuf[0] != '\0') {
 	    int		ml = strnlen(mbuf,mlen) ;
-	    const char	*tp ;
-	    const char	*mp = mbuf ;
+	    cchar	*tp ;
+	    cchar	*mp = mbuf ;
 
-	    while ((tp = strnchr(mp,ml,'\n')) != NULL) {
+	    while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
 
 	        rs = progcs_procmsger(pip,dop,mp,(tp-mp)) ;
 	        pip->c_processed += 1 ;
@@ -510,21 +496,19 @@ static int progcs_procmsg(PROGINFO *pip,DISPATCHER *dop,cchar *mbuf,int mlen)
 }
 /* end subroutine (progcs_procmsg) */
 
-
-static int progcs_procmsger(PROGINFO *pip,DISPATCHER *dop,cchar *mp,int ml)
-{
+local int progcs_procmsger(PROGINFO *pip,DISPATCHER *dop,cc *mp,int ml) noex {
 	PROGCS_JOB	*jp ;
 	int		rs ;
-	int		size = sizeof(PROGCS_JOB) ;
+	int		psz = szof(PROGCS_JOB) ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	debugprintf("progcs_procmsger: ent m=>%r<\n",mp,ml) ;
 #endif
-	if (pip == NULL) return SR_FAULT ;
-	if ((rs = uc_malloc(size,&jp)) >= 0) {
+	if (pip == nullptr) return SR_FAULT ;
+	if ((rs = uc_malloc(psz,&jp)) >= 0) {
 	    cchar	*cp ;
-	    if ((rs = uc_mallocstrw(mp,ml,&cp)) >= 0) {
-	        memset(jp,0,size) ;
+	    if ((rs = lm_strw(mp,ml,&cp)) >= 0) {
+	        memclear(jp,psz) ;
 	        jp->mp = cp ;
 	        jp->ml = ml ;
 #if	CF_DEBUG
@@ -533,21 +517,19 @@ static int progcs_procmsger(PROGINFO *pip,DISPATCHER *dop,cchar *mp,int ml)
 #endif
 	        rs = dispatcher_add(dop,jp) ;
 		if (rs < 0) {
-		    uc_free(cp) ;
+		    lm_free(cp) ;
 		}
 	    } /* end if (memory-allocation) */
 	    if (rs < 0) {
-		uc_free(jp) ;
+		lm_free(jp) ;
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (progcs_procmsger) */
 
-
 /* this is a subroutine that runs in a parallel thread */
-static int progcs_worker(PROGINFO *pip,PROGCS_JOB *jp)
-{
+local int progcs_worker(PROGINFO *pip,PROGCS_JOB *jp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -563,9 +545,9 @@ static int progcs_worker(PROGINFO *pip,PROGCS_JOB *jp)
 	rs1 = progcsmsg(pip,jp->mp,jp->ml) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (jp != NULL) {
-	    if (jp->mp != NULL) uc_free(jp->mp) ;
-	    uc_free(jp) ;
+	if (jp != nullptr) {
+	    if (jp->mp != nullptr) lm_free(jp->mp) ;
+	    lm_free(jp) ;
 	}
 
 #if	CF_DEBUG
