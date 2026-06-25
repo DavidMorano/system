@@ -30,13 +30,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cmdmap.h"
 
@@ -52,8 +52,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -77,11 +75,12 @@ template<typename ... Args>
 local int cmdmap_ctor(cmdmap *op,Args ... args) noex {
 	CMDMAP		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->mlp = new(nothrow) vecobj) != np) {
+	    if ((op->mlp = new(nt) vecobj) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
@@ -104,7 +103,7 @@ template<typename ... Args>
 local inline int cmdmap_magic(cmdmap *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CMDMAP_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CMDMAP_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (cmdmap_magic) */
@@ -137,7 +136,7 @@ int cmdmap_start(cmdmap *op,const cmdmap_ent *defmap) noex {
 		    rs = cmdmap_defmap(op,defmap) ;
 		}
 	        if (rs >= 0) {
-	            op->magic = CMDMAP_MAGIC ;
+	            op->magval = CMDMAP_MAGIC ;
 	        }
 	        if (rs < 0) {
 		    vecobj_finish(op->mlp) ;
@@ -148,8 +147,7 @@ int cmdmap_start(cmdmap *op,const cmdmap_ent *defmap) noex {
 	    }
 	} /* end if (cmdmap_ctor) */
 	return rs ;
-}
-/* end subroutine (cmdmap_start) */
+} /* end subroutine (cmdmap_start) */
 
 int cmdmap_finish(cmdmap *op) noex {
 	int		rs ;
@@ -163,11 +161,10 @@ int cmdmap_finish(cmdmap *op) noex {
 		rs1 = cmdmap_dtor(op) ;
 		if (rs < 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cmdmap_finish) */
+} /* end subroutine (cmdmap_finish) */
 
 int cmdmap_load(cmdmap *op,int key,int cmd) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -199,8 +196,7 @@ int cmdmap_load(cmdmap *op,int key,int cmd) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cmdmap_load) */
+} /* end subroutine (cmdmap_load) */
 
 int cmdmap_lookup(cmdmap *op,int key) noex {
 	int		rs ;
@@ -228,8 +224,7 @@ int cmdmap_lookup(cmdmap *op,int key) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? cmd : rs ;
-}
-/* end subroutine (cmdmap_lookup) */
+} /* end subroutine (cmdmap_lookup) */
 
 
 /* private subroutines */
@@ -249,8 +244,7 @@ local int cmdmap_defmap(cmdmap *op,const cmdmap_ent *defmap) noex {
 	    } /* end for */
 	} /* end if_constexpr (f_fastdef) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (cmdmap_defmap) */
+} /* end subroutine (cmdmap_defmap) */
 
 local int vcmpfind(cvoid **v1pp,cvoid **v2pp) noex {
 	cmdmap_ent	*e1p = (cmdmap_ent *) *v1pp ;
@@ -266,7 +260,6 @@ local int vcmpfind(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpfind) */
+} /* end subroutine (vcmpfind) */
 
 
