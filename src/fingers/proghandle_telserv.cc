@@ -119,7 +119,7 @@
 #include <cstdio>
 
 #include	<vecstr.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -635,7 +635,7 @@ int			svcspeclen ;
 ret0:
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutines (procsvcspec) */
+/* end subroutine (procsvcspec) */
 
 
 /*
@@ -2224,10 +2224,11 @@ suboption()
 			return;
 		c = SB_GET();
 		if (c == TELQUAL_IS) {
-			if (subchar == TELOPT_OLD_ENVIRON)
+			if (subchar == TELOPT_OLD_ENVIRON) {
 				settimer(oenvironsubopt);
-			else
+			} else {
 				settimer(environsubopt);
+			}
 		} else if (c != TELQUAL_INFO) {
 			return;
 		}
