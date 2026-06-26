@@ -20,14 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/socket.h>		/* socket types */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<sockaddress.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<sys/socket.h>		/* POSIX socket types */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sockaddress.h>		/* LIBUC */
 
 
 #ifndef	MSGBUFLEN
@@ -56,7 +53,7 @@ struct msgdata_head {
 	int		mlen ;		/* fixed at buffer size */
 	int		ml ;		/* variable as used */
 	int		ns ;
-} ;
+} ; /* end struct (msgdata_head) */
 
 typedef MSGDATA		msgdata ;
 
