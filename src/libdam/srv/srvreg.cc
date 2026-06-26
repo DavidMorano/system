@@ -1092,10 +1092,10 @@ time_t		daytime ;
 	        f_locked = TRUE ;
 	    }
 
-	    rs = u_pread(op->fd,fbuf,FBUFLEN,0L) ;
+	    rs = u_readp(op->fd,fbuf,FBUFLEN,0L) ;
 
 #if	CF_DEBUGS
-	        debugprintf("srvreg_fileinit: u_pread() rs=%d\n",rs) ;
+	        debugprintf("srvreg_fileinit: u_readp() rs=%d\n",rs) ;
 #endif
 
 	    if (rs >= SRVREG_FLTOP) {
@@ -1214,10 +1214,10 @@ SRVREG		*op ;
 	    char	hbuf[SRVREG_FLTOP + 1] ;
 
 
-	    rs = u_pread(op->fd,hbuf,SRVREG_FLTOP,0) ;
+	    rs = u_readp(op->fd,hbuf,SRVREG_FLTOP,0) ;
 
 #if	CF_DEBUGS
-	debugprintf("srvreg_filechanged: u_pread() rs=%d\n",rs) ;
+	debugprintf("srvreg_filechanged: u_readp() rs=%d\n",rs) ;
 #endif
 
 	    if (rs < 0)
@@ -1547,14 +1547,14 @@ char		**rpp ;
 	        len = fext - foff ;
 
 #if	CF_DEBUGS
-	        debugprintf("srvreg_buf: u_pread() foff=%llu len=%u\n",
+	        debugprintf("srvreg_buf: u_readp() foff=%llu len=%u\n",
 	            foff,len) ;
 #endif
 
-	        rs = u_pread(op->fd,rbuf,len, foff) ;
+	        rs = u_readp(op->fd,rbuf,len, foff) ;
 
 #if	CF_DEBUGS
-	        debugprintf("srvreg_buf: u_pread() rs=%d\n",rs) ;
+	        debugprintf("srvreg_buf: u_readp() rs=%d\n",rs) ;
 #endif
 
 	        if (rs >= 0) {
@@ -1589,7 +1589,7 @@ char		**rpp ;
 	            fext = bend ;
 
 	        len = fext - foff ;
-	        if ((rs = u_pread(op->fd,op->b.buf,len, foff)) >= 0) {
+	        if ((rs = u_readp(op->fd,op->b.buf,len, foff)) >= 0) {
 	            op->b.len = rs ;
 	            len = MIN(rs,rlen) ;
 	        }
