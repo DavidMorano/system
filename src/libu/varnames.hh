@@ -109,6 +109,7 @@ struct varnames {
 	static const char editor[] ;
 	static const char visual[] ;
 	static const char random[] ;
+	static const char seconds[] ;
 	static const char hz[] ;
 	static const char ncpu[] ;
 	static const char nisdomain[] ;
