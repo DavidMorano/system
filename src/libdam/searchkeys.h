@@ -13,51 +13,48 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<strpack.h>
-#include	<xwords.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strpack.h>		/* LIBDAM */
+#include	<xwords.h>		/* LIBDAM */
 
 
-#define	SEARCHKEYS_MAGIC	0x00885543
 #define	SEARCHKEYS		struct searchkeys_head
 #define	SEARCHKEYS_POP		struct searchkeys_popper
 #define	SEARCHKEYS_CUR		struct searchkeys_cursor
 #define	SEARCHKEYS_KW		struct searchkeys_kword
 #define	SEARCHKEYS_PH		struct searchkeys_kphrase
+#define	SEARCHKEYS_MAGIC	0x00885543
 
 
 struct searchkeys_cursor {
 	int		i ;
 	int		j ;
-} ;
+} ; /* end struct */
 
 struct searchkeys_kword {
 	cchar		*kp ;
 	int		kl ;
-} ;
+} ; /* end struct */
 
 struct searchkeys_kphrase {
 	SEARCHKEYS_KW	*kwords ;
 	int		nwords ;
-} ;
+} ; /* end struct */
 
 struct searchkeys_popper {
 	int		*nmatch ;
-	uint		magic ;
+	uint		magval ;
 	int		cphrases ;
 	int		f_prefix ;
-} ;
+} ; /* end struct */
 
 struct searchkeys_head {
 	strpack		*spp ;		/* String-Pack-Pointer */
 	SEARCHKEYS_PH	*kphrases ;
-	uint		magic ;
+	uint		magval ;
 	int		nphrases ;
-} ;
+} ; /* end struct */
 
 typedef	SEARCHKEYS	searchkeys ;
 typedef	SEARCHKEYS_POP	searchkeys_pop ;
