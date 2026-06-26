@@ -43,7 +43,7 @@
 #include	<strxcmp.h>
 #include	<matstr.h>
 #include	<strxcmp.h>		/* |strkeycmp(3uc)| */
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<isnot.h>
 #include	<localmisc.h>
 
