@@ -21,18 +21,15 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<svcfile.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<svcfile.h>		/* LIBUC */
 
 
-#define	PDB_MAGIC	0x77446329
 #define	PDB		struct pdb_head
 #define	PDB_DB		struct pdb_dbase
+#define	PDB_MAGIC	0x77446329
 
 
 enum pdbs {
