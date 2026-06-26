@@ -28,17 +28,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecobj.h>
-#include	<six.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"xwords.h"
 
@@ -128,8 +128,7 @@ int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (xwords_start) */
+} /* end subroutine (xwords_start) */
 
 int xwords_get(xwords *op,int i,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -148,8 +147,7 @@ int xwords_get(xwords *op,int i,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (xwords_get) */
+} /* end subroutine (xwords_get) */
 
 int xwords_finish(xwords *op) noex {
 	int		rs = SR_FAULT ;
@@ -160,12 +158,11 @@ int xwords_finish(xwords *op) noex {
 	        rs1 = lm_free(op->xa) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->xa = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->nwords = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (xwords_finish) */
+} /* end subroutine (xwords_finish) */
 
 
 /* private subroutines */
@@ -236,6 +233,10 @@ int xwords::start(cchar *wbuf,int wlen) noex {
 	return xwords_start(this,wbuf,wlen) ;
 } /* end method (xwords::start) */
 
+int xwords::get(int i,cchar **rpp) noex {
+	return xwords_get(this,i,rpp) ;
+}
+
 void xwords::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("xwords",rs,"fini-finish") ;
@@ -253,6 +254,5 @@ xwords_co::operator int () noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (xwords_co::operator) */
-
 
 
