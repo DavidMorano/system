@@ -31,10 +31,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<userinfo.h>
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<userinfo.h>		/* LIBUC */
 
 #include	<proginfo.hh>
 
@@ -46,21 +46,21 @@
 
 EXTERNC_begin
 
-extern int proglog_begin(proginfo *,userinfo *) noex ;
-extern int proglog_end(proginfo *) noex ;
-extern int proglog_intro(proginfo *,userinfo *) noex ;
-extern int proglog_checksize(proginfo *) noex ;
-extern int proglog_check(proginfo *) noex ;
-extern int proglog_print(proginfo *,cchar *,int) noex ;
-extern int proglog_printf(proginfo *,cchar *,...) noex ;
-extern int proglog_vprintf(proginfo *,cchar *,va_list) noex ;
-extern int proglog_printfold(proginfo *,cchar *,cchar *,int) noex ;
-extern int proglog_getid(proginfo *,char *,int) noex ;
-extern int proglog_setid(proginfo *,cchar *,int) noex ;
-extern int proglog_ssprint(proginfo *,cchar *,cchar *,int) noex ;
-extern int proglog_ssprintf(proginfo *,cchar *,cchar *,...) noex ;
-extern int proglog_ssvprintf(proginfo *,cchar *,cchar *,va_list) noex ;
-extern int proglog_flush(proginfo *) noex ;
+extern int proglog_begin	(proginfo *,userinfo *) noex ;
+extern int proglog_end		(proginfo *) noex ;
+extern int proglog_intro	(proginfo *,userinfo *) noex ;
+extern int proglog_checksize	(proginfo *) noex ;
+extern int proglog_check	(proginfo *) noex ;
+extern int proglog_print	(proginfo *,cchar *,int) noex ;
+extern int proglog_printf	(proginfo *,cchar *,...) noex ;
+extern int proglog_vprintf	(proginfo *,cchar *,va_list) noex ;
+extern int proglog_printfold	(proginfo *,cchar *,cchar *,int) noex ;
+extern int proglog_getid	(proginfo *,char *,int) noex ;
+extern int proglog_setid	(proginfo *,cchar *,int) noex ;
+extern int proglog_ssprint	(proginfo *,cchar *,cchar *,int) noex ;
+extern int proglog_ssprintf	(proginfo *,cchar *,cchar *,...) noex ;
+extern int proglog_ssvprintf	(proginfo *,cchar *,cchar *,va_list) noex ;
+extern int proglog_flush	(proginfo *) noex ;
  
 EXTERNC_end
 
