@@ -32,37 +32,37 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getax.h>
-#include	<getusername.h>
-#include	<getuserhome.h>
-#include	<ids.h>
-#include	<vecstr.h>
-#include	<vecobj.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<nulstr.h>
-#include	<sfx.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<matstr.h>
-#include	<char.h>
-#include	<isnot.h>
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getuserhome.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 #include	"mxalias.h"
 
@@ -152,7 +152,7 @@ struct bufdesc {
 /* forward references */
 
 template<typename ... Args>
-static int mxalias_ctor(mxalias *op,Args ... args) noex {
+local int mxalias_ctor(mxalias *op,Args ... args) noex {
     	MXALIAS		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -170,10 +170,9 @@ static int mxalias_ctor(mxalias *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mxalias_ctor) */
+} /* end subroutine (mxalias_ctor) */
 
-static int mxalias_dtor(mxalias *op) noex {
+local int mxalias_dtor(mxalias *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -187,63 +186,61 @@ static int mxalias_dtor(mxalias *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mxalias_dtor) */
+} /* end subroutine (mxalias_dtor) */
 
 template<typename ... Args>
-static inline int mxalias_magic(mxalias *op,Args ... args) noex {
+local inline int mxalias_magic(mxalias *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MXALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MXALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mxalias_magic) */
+} /* end subroutine (mxalias_magic) */
 
-static int	mxalias_username(MA *,cchar *) noex ;
-static int	mxalias_userdname(MA *) noex ;
-static int	mxalias_mkuserfname(MA *,char *) noex ;
-static int	mxalias_curlooks(MA *,MA_CUR *,cc *,int) noex ;
-static int	mxalias_filesadd(MA *,time_t) noex ;
-static int	mxalias_fileadd(MA *,cchar *) noex ;
-static int	mxalias_filereg(MA *,ustat *,cchar *) noex ;
-static int	mxalias_fileparse(MA *,int) noex ;
-static int	mxalias_fileparser(MA *,int,bfile *) noex ;
-static int	mxalias_fileparseln(MA *,int,BD *,cchar *,int) noex ;
-static int	mxalias_filedump(MA *,int) noex ;
-static int	mxalias_filedels(MA *) noex ;
-static int	mxalias_filedel(MA *,int) noex ;
-static int	mxalias_finents(MA *) noex ;
-static int	mxalias_mkvals(MA *,MA_CUR *,vecstr *) noex ;
-static int	mxalias_addvals(MA *,vecstr *,vecstr *,cchar *) noex ;
-static int	mxalias_finallocs(MA *) noex ;
+local int	mxalias_username(MA *,cchar *) noex ;
+local int	mxalias_userdname(MA *) noex ;
+local int	mxalias_mkuserfname(MA *,char *) noex ;
+local int	mxalias_curlooks(MA *,MA_CUR *,cc *,int) noex ;
+local int	mxalias_filesadd(MA *,time_t) noex ;
+local int	mxalias_fileadd(MA *,cchar *) noex ;
+local int	mxalias_filereg(MA *,ustat *,cchar *) noex ;
+local int	mxalias_fileparse(MA *,int) noex ;
+local int	mxalias_fileparser(MA *,int,bfile *) noex ;
+local int	mxalias_fileparseln(MA *,int,BD *,cchar *,int) noex ;
+local int	mxalias_filedump(MA *,int) noex ;
+local int	mxalias_filedels(MA *) noex ;
+local int	mxalias_filedel(MA *,int) noex ;
+local int	mxalias_finents(MA *) noex ;
+local int	mxalias_mkvals(MA *,MA_CUR *,vecstr *) noex ;
+local int	mxalias_addvals(MA *,vecstr *,vecstr *,cchar *) noex ;
+local int	mxalias_finallocs(MA *) noex ;
 
-static int	mxalias_fileparseln_alias(MA *,int,BD *,field *) noex ;
-static int	mxalias_fileparseln_unalias(MA *,int,BD *,field *) noex ;
-static int	mxalias_fileparseln_source(MA *,int,BD *,field *) noex ;
+local int	mxalias_fileparseln_alias(MA *,int,BD *,field *) noex ;
+local int	mxalias_fileparseln_unalias(MA *,int,BD *,field *) noex ;
+local int	mxalias_fileparseln_source(MA *,int,BD *,field *) noex ;
 
 #ifdef	COMMENT
-static int	mxalias_filealready(MA *,dev_t,ino_t) noex ;
+local int	mxalias_filealready(MA *,dev_t,ino_t) noex ;
 #endif
 
 #if	CF_FILECHECK
-static int	mxalias_filechecks(MA *,time_t) noex ;
+local int	mxalias_filechecks(MA *,time_t) noex ;
 #endif
 
-static int	file_start(MA_FI *,ustat *,cchar *) noex ;
-static int	file_finish(MA_FI *) noex ;
+local int	file_start(MA_FI *,ustat *,cchar *) noex ;
+local int	file_finish(MA_FI *) noex ;
 
-static int	bufdesc_start(BD *,int) noex ;
-static int	bufdesc_finish(BD *) noex ;
+local int	bufdesc_start(BD *,int) noex ;
+local int	bufdesc_finish(BD *) noex ;
 
-static int	cmpfe(MA_FI *,MA_FI *) noex ;
+local int	cmpfe(MA_FI *,MA_FI *) noex ;
 
 extern "C" {
-    static int	vcmpfe(cvoid **,cvoid **) noex ;
+    local int	vcmpfe(cvoid **,cvoid **) noex ;
 }
 
-static bool	isnotspecial(int) noex ;
-static bool	isOurFileType(mode_t) noex ;
+local bool	isnotspecial(int) noex ;
+local bool	isOurFileType(mode_t) noex ;
 
 
 /* local variables */
@@ -257,7 +254,7 @@ constexpr char		kterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array (kterms) */
 
 /* all white space plus comma (',') */
 constexpr char		vterms[] = {
@@ -269,7 +266,7 @@ constexpr char		vterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array (vterms) */
 
 enum keywords {
 	keyword_alias,
@@ -278,16 +275,16 @@ enum keywords {
 	keyword_ungroup,
 	keyword_source,
 	keyword_overlast
-} ;
+} ; /* end enum (keywords) */
 
-constexpr cpcchar	keywords[] = {
+constexpr cpcchar	keynames[] = {
 	"alias",
 	"group",
 	"unalias",
 	"ungroup",
 	"source",
 	nullptr
-} ;
+} ; /* end array (keynames) */
 
 static vars		var ;
 
@@ -319,7 +316,7 @@ int mxalias_open(MA *op,cchar *pr,cchar *username) noex {
 	                        custime		dt = getustime ;
 	                        op->ti_access = dt ;
 	                        op->ti_check = dt ;
-	                        op->magic = MXALIAS_MAGIC ;
+	                        op->magval = MXALIAS_MAGIC ;
 				if_constexpr (f_fileadd) {
 	                            if ((rs = mxalias_filesadd(op,dt)) >= 0) {
 	                                c = rs ;
@@ -328,7 +325,7 @@ int mxalias_open(MA *op,cchar *pr,cchar *username) noex {
 	                        if (rs < 0) {
 	                            mxalias_finents(op) ;
 	                            keyvals_finish(op->elp) ;
-	                            op->magic = 0 ;
+	                            op->magval = 0 ;
 	                        } /* end if (error handling) */
 	                    } /* end if (entries) */
 	                    if (rs < 0) {
@@ -344,11 +341,10 @@ int mxalias_open(MA *op,cchar *pr,cchar *username) noex {
 	    } /* end if (vars) */
 	    if (rs < 0) {
 		mxalias_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (mxalias_ctor) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_open) */
+} /* end subroutine (mxalias_open) */
 
 int mxalias_close(MA *op) noex {
 	int		rs ;
@@ -378,11 +374,10 @@ int mxalias_close(MA *op) noex {
 	        rs1 = mxalias_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mxalias_close) */
+} /* end subroutine (mxalias_close) */
 
 int mxalias_audit(MA *op) noex {
 	int		rs ;
@@ -391,8 +386,7 @@ int mxalias_audit(MA *op) noex {
 	    rs = keyvals_check(op->elp,dt) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mxalias_audit) */
+} /* end subroutine (mxalias_audit) */
 
 int mxalias_count(MA *op) noex {
 	int		rs ;
@@ -400,8 +394,7 @@ int mxalias_count(MA *op) noex {
 	    rs = keyvals_count(op->elp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mxalias_count) */
+} /* end subroutine (mxalias_count) */
 
 int mxalias_curbegin(MA *op,MA_CUR *curp) noex {
 	int		rs ;
@@ -411,12 +404,11 @@ int mxalias_curbegin(MA *op,MA_CUR *curp) noex {
 	    curp->vbuf = nullptr ;
 	    curp->vals = nullptr ;
 	    curp->nvals = 0 ;
-	    curp->magic = MXALIAS_MAGIC ;
+	    curp->magval = MXALIAS_MAGIC ;
 	    op->ncursors += 1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mxalias_curbegin) */
+} /* end subroutine (mxalias_curbegin) */
 
 int mxalias_curend(MA *op,MA_CUR *curp) noex {
 	int		rs ;
@@ -449,11 +441,10 @@ int mxalias_curend(MA *op,MA_CUR *curp) noex {
 	        }
 	    }
 	    op->ncursors -= 1 ;
-	    curp->magic = 0 ;
+	    curp->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mxalias_curend) */
+} /* end subroutine (mxalias_curend) */
 
 int mxalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
@@ -461,7 +452,7 @@ int mxalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	int		kl = 0 ;
 	if ((rs = mxalias_magic(op,curp,kbuf)) >= 0) {
 	    rs = SR_INVALID ;
-	    if ((curp->magic == MXALIAS_MAGIC) && (op->ncursors > 0)) {
+	    if ((curp->magval == MXALIAS_MAGIC) && (op->ncursors > 0)) {
 	        keyvals_cur	*kvcp = curp->kvcp ;
 		rs = SR_OK ;
 	        if (kvcp == nullptr) {
@@ -491,8 +482,7 @@ int mxalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (mxalias_curenum) */
+} /* end subroutine (mxalias_curenum) */
 
 /* lookup an entry by key-name */
 int mxalias_curlook(MA *op,MA_CUR *curp,cchar *kbuf,int klen) noex {
@@ -500,7 +490,7 @@ int mxalias_curlook(MA *op,MA_CUR *curp,cchar *kbuf,int klen) noex {
 	int		c = 0 ;
 	if ((rs = mxalias_magic(op,curp,kbuf)) >= 0) {
 	    rs = SR_INVALID ;
-	    if ((curp->magic == MXALIAS_MAGIC) && (op->ncursors > 0)) {
+	    if ((curp->magval == MXALIAS_MAGIC) && (op->ncursors > 0)) {
 	        if (kbuf[0]) {
 		    rs = mxalias_curlooks(op,curp,kbuf,klen) ;
 		    c = rs ;
@@ -508,10 +498,9 @@ int mxalias_curlook(MA *op,MA_CUR *curp,cchar *kbuf,int klen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_curlook) */
+} /* end subroutine (mxalias_curlook) */
 
-static int mxalias_curlooks(MA *op,MA_CUR *curp,cc *kbuf,int klen) noex {
+local int mxalias_curlooks(MA *op,MA_CUR *curp,cc *kbuf,int klen) noex {
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -551,8 +540,7 @@ static int mxalias_curlooks(MA *op,MA_CUR *curp,cc *kbuf,int klen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_curlooks) */
+} /* end subroutine (mxalias_curlooks) */
 
 int mxalias_curread(MA *op,MA_CUR *curp,char *vbuf,int vlen) noex {
 	int		rs ;
@@ -579,13 +567,12 @@ int mxalias_curread(MA *op,MA_CUR *curp,char *vbuf,int vlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (mxalias_curread) */
+} /* end subroutine (mxalias_curread) */
 
 
 /* private subroutines */
 
-static int mxalias_username(MA *op,cchar *username) noex {
+local int mxalias_username(MA *op,cchar *username) noex {
 	int		rs ;
 	if ((username == nullptr) || (username[0] == '\0')) {
 	    username = "-" ;
@@ -594,10 +581,9 @@ static int mxalias_username(MA *op,cchar *username) noex {
 	    op->username = cp ;
 	}
 	return rs ;
-}
-/* end subroutine (mxalias_username) */
+} /* end subroutine (mxalias_username) */
 
-static int mxalias_userdname(MA *op) noex {
+local int mxalias_userdname(MA *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		hl = 0 ;
@@ -618,10 +604,9 @@ static int mxalias_userdname(MA *op) noex {
 	    hl = lenstr(op->userdname) ;
 	} /* end if (null) */
 	return (rs >= 0) ? hl : rs ;
-}
-/* end subroutine (mxalias_userdname) */
+} /* end subroutine (mxalias_userdname) */
 
-static int mxalias_filesadd(MA *op,time_t dt) noex {
+local int mxalias_filesadd(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -649,8 +634,7 @@ static int mxalias_filesadd(MA *op,time_t dt) noex {
 	    } /* end if (m-a-f) */
 	} /* end if_constexpr (f_filesys || f_fileuser) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_filesadd) */
+} /* end subroutine (mxalias_filesadd) */
 
 /* add a file to the list of files */
 int mxalias_fileadd(MA *op,cchar *atfname) noex {
@@ -680,7 +664,7 @@ int mxalias_fileadd(MA *op,cchar *atfname) noex {
 	                        } /* end if (needed registration) */
 	                        if (rs < 0) {
 	                            mxalias_filedel(op,fi) ;
-		                }
+		                } /* end if (error) */
 	                    } /* end if (mxalias_filereg) */
 		        } /* end if (allowed file-type) */
 	            } else if (isNotPresent(rs)) {
@@ -694,10 +678,9 @@ int mxalias_fileadd(MA *op,cchar *atfname) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_fileadd) */
+} /* end subroutine (mxalias_fileadd) */
 
-static int mxalias_filereg(MA *op,ustat *sbp,cchar *fn) noex {
+local int mxalias_filereg(MA *op,ustat *sbp,cchar *fn) noex {
 	int		rs ;
 	int		fi = INT_MAX ;
 	if (MA_FI fe ; (rs = file_start(&fe,sbp,fn)) >= 0) {
@@ -712,13 +695,12 @@ static int mxalias_filereg(MA *op,ustat *sbp,cchar *fn) noex {
 	    }
 	} /* end if (file_start) */
 	return (rs >= 0) ? fi : rs ;
-}
-/* end subroutine (mxalias_filereg) */
+} /* end subroutine (mxalias_filereg) */
 
 #if	CF_FILECHECK
 
 /* check if files have changed */
-static int mxalias_filechecks(MA *op,time_t dt) noex {
+local int mxalias_filechecks(MA *op,time_t dt) noex {
     	vecobj		*flp = op->flp ;
 	int		rs = SR_OK ;
 	int		c_changed = 0 ;
@@ -740,13 +722,12 @@ static int mxalias_filechecks(MA *op,time_t dt) noex {
 	} /* end for */
 	op->ti_check = daytime ;
 	return (rs >= 0) ? c_changed : rs ;
-}
-/* end subroutine (mxalias_filechecks) */
+} /* end subroutine (mxalias_filechecks) */
 
 #endif /* CF_FILECHECK */
 
 #ifdef	COMMENT
-static int mxalias_filealready(MA *op,dev_t dev,ino_t ino) noex {
+local int mxalias_filealready(MA *op,dev_t dev,ino_t ino) noex {
     	vecobj		*flp = op->flp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -759,11 +740,10 @@ static int mxalias_filealready(MA *op,dev_t dev,ino_t ino) noex {
 	} /* end for */
 	if ((rs >= 0) && (rs1 >= 0)) rs = SR_EXIST ;
 	return rs ;
-}
-/* end subroutine (mxalias_filealready) */
+} /* end subroutine (mxalias_filealready) */
 #endif /* COMMENT */
 
-static int mxalias_fileparse(MA *op,int fi) noex {
+local int mxalias_fileparse(MA *op,int fi) noex {
     	vecobj		*flp = op->flp ;
 	int		rs ;
 	int		rs1 ;
@@ -799,10 +779,9 @@ static int mxalias_fileparse(MA *op,int fi) noex {
 	    }
 	} /* end if (vecobj_get) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_fileparse) */
+} /* end subroutine (mxalias_fileparse) */
 
-static int mxalias_fileparser(MA *op,int fi,bfile *lfp) noex {
+local int mxalias_fileparser(MA *op,int fi,bfile *lfp) noex {
 	cint		llen = var.maxlinelen ;
 	int		rs ;
 	int		rs1 ;
@@ -821,17 +800,16 @@ static int mxalias_fileparser(MA *op,int fi,bfile *lfp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bufdesc) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_fileparser) */
+} /* end subroutine (mxalias_fileparser) */
 
-static int mxalias_fileparseln(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
+local int mxalias_fileparseln(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
 	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
 	    cchar	*fp ;
 	    if (int fl ; (fl = fsb.get(kterms,&fp)) > 0) {
-	        if (int ki ; (ki = matstr(keywords,fp,fl)) >= 0) {
+	        if (int ki ; (ki = matstr(keynames,fp,fl)) >= 0) {
 	            switch (ki) {
 	            case keyword_alias:
 	            case keyword_group:
@@ -853,10 +831,9 @@ static int mxalias_fileparseln(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_fileparseln) */
+} /* end subroutine (mxalias_fileparseln) */
 
-static int mxalias_fileparseln_alias(MA *op,int fi,BD *bdp,field *fsbp) noex {
+local int mxalias_fileparseln_alias(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	cint		flen = bdp->flen ;
 	cint		klen = bdp->klen ;
 	int		rs = SR_OK ;
@@ -884,10 +861,9 @@ static int mxalias_fileparseln_alias(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	    rs = keyvals_add(op->elp,fi,kbuf,fbuf,0) ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_fileparseln_alias) */
+} /* end subroutine (mxalias_fileparseln_alias) */
 
-static int mxalias_fileparseln_unalias(MA *op,int fi,BD *bdp,field *fsbp) noex {
+local int mxalias_fileparseln_unalias(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	cint		flen = bdp->flen ;
 	int		rs ;
 	char		*fbuf = bdp->fbuf ;
@@ -898,10 +874,9 @@ static int mxalias_fileparseln_unalias(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (mxalias_fileparseln_unalias) */
+} /* end subroutine (mxalias_fileparseln_unalias) */
 
-static int mxalias_fileparseln_source(MA *op,int fi,BD *bdp,field *fsbp) noex {
+local int mxalias_fileparseln_source(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	cint		flen = bdp->flen ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
@@ -912,10 +887,9 @@ static int mxalias_fileparseln_source(MA *op,int fi,BD *bdp,field *fsbp) noex {
 	    c = rs ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_fileparseln_source) */
+} /* end subroutine (mxalias_fileparseln_source) */
 
-static int mxalias_filedump(MA *op,int fi) noex {
+local int mxalias_filedump(MA *op,int fi) noex {
 	int		rs = SR_OK ;
 	if (fi >= 0) {
 	    rs = keyvals_delset(op->elp,fi) ;
@@ -929,10 +903,9 @@ static int mxalias_filedump(MA *op,int fi) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (mxalias_filedump) */
+} /* end subroutine (mxalias_filedump) */
 
-static int mxalias_filedel(MA *op,int fi) noex {
+local int mxalias_filedel(MA *op,int fi) noex {
     	vecobj		*flp = op->flp ;
 	int		rs ;
 	int		rs1 ;
@@ -950,10 +923,9 @@ static int mxalias_filedel(MA *op,int fi) noex {
 	    }
 	} /* end if (vecobj_get) */
 	return rs ;
-}
-/* end subroutine (mxalias_filedel) */
+} /* end subroutine (mxalias_filedel) */
 
-static int mxalias_filedels(MA *op) noex {
+local int mxalias_filedels(MA *op) noex {
     	vecobj		*flp = op->flp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -966,12 +938,11 @@ static int mxalias_filedels(MA *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (mxalias_filedels) */
+} /* end subroutine (mxalias_filedels) */
 
 #if	CF_FILECHECK
 
-static int mxalias_filechanged(MA *op,ustat *sbp) noex {
+local int mxalias_filechanged(MA *op,ustat *sbp) noex {
     	int		rs = SR_FAULT ;
     	int		f = false ;
 	if (sbp) ylikely {
@@ -981,10 +952,9 @@ static int mxalias_filechanged(MA *op,ustat *sbp) noex {
 	    f = f || (op->fi.dev != sbp->st_dev) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mxalias_filechanged) */
+} /* end subroutine (mxalias_filechanged) */
 
-static int mxalias_fileold(MA *op,time_t daytime) noex {
+local int mxalias_fileold(MA *op,time_t daytime) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ; /* return-value */
@@ -1007,12 +977,11 @@ static int mxalias_fileold(MA *op,time_t daytime) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (mxalias_aprofile) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mxalias_fileold) */
+} /* end subroutine (mxalias_fileold) */
 
 #endif /* CF_FILECHECK */
 
-static int mxalias_mkuserfname(MA *op,char *fname) noex {
+local int mxalias_mkuserfname(MA *op,char *fname) noex {
 	int		rs ;
 	fname[0] = '\0' ;
 	if ((rs = mxalias_userdname(op)) >= 0) {
@@ -1020,10 +989,9 @@ static int mxalias_mkuserfname(MA *op,char *fname) noex {
 	    rs = mkpath(fname,homedname,MXALIAS_USERDB) ;
 	}
 	return rs ;
-}
-/* end subroutine (mxalias_mkuserfname) */
+} /* end subroutine (mxalias_mkuserfname) */
 
-static int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
+local int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
@@ -1061,10 +1029,9 @@ static int mxalias_addvals(MA *op,vecstr *klp,vecstr *vlp,cchar *kp) noex {
 	    }
 	} /* end if (non-nul) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_addvals) */
+} /* end subroutine (mxalias_addvals) */
 
-static int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
+local int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ; /* return-value */
 	if (op) ylikely {
@@ -1100,10 +1067,9 @@ static int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mxalias_mkvals) */
+} /* end subroutine (mxalias_mkvals) */
 
-static int mxalias_finallocs(MA *op) noex {
+local int mxalias_finallocs(MA *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->pwd) {
@@ -1131,19 +1097,17 @@ static int mxalias_finallocs(MA *op) noex {
 	    op->pr = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (mxalias_finallocs) */
+} /* end subroutine (mxalias_finallocs) */
 
-static int mxalias_finents(MA *op) noex {
+local int mxalias_finents(MA *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (mxalias_finents) */
+} /* end subroutine (mxalias_finents) */
 
-static int file_start(MA_FI *fep,ustat *sbp,cchar *fname) noex {
+local int file_start(MA_FI *fep,ustat *sbp,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (fep && sbp && fname) ylikely {
 	    memclear(fep) ;
@@ -1158,10 +1122,9 @@ static int file_start(MA_FI *fep,ustat *sbp,cchar *fname) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_start) */
+} /* end subroutine (file_start) */
 
-static int file_finish(MA_FI *fep) noex {
+local int file_finish(MA_FI *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (fep) ylikely {
@@ -1174,10 +1137,9 @@ static int file_finish(MA_FI *fep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_finish) */
+} /* end subroutine (file_finish) */
 
-static int bufdesc_start(BD *bdp,int llen) noex {
+local int bufdesc_start(BD *bdp,int llen) noex {
 	cint		klen = KEYBUFLEN ;
 	int		sz ;
 	int		rs ;
@@ -1195,10 +1157,9 @@ static int bufdesc_start(BD *bdp,int llen) noex {
 	    bdp->klen = klen ;
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (bufdesc_start) */
+} /* end subroutine (bufdesc_start) */
 
-static int bufdesc_finish(BD *bdp) noex {
+local int bufdesc_finish(BD *bdp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (bdp->a) {
@@ -1207,8 +1168,7 @@ static int bufdesc_finish(BD *bdp) noex {
 	    bdp->a = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (bufdesc_finish) */
+} /* end subroutine (bufdesc_finish) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -1218,7 +1178,7 @@ vars::operator int () noex {
 	return rs ;
 }
 
-static int cmpfe(MA_FI *e1p,MA_FI *e2p) noex {
+local int cmpfe(MA_FI *e1p,MA_FI *e2p) noex {
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    if (e1p) {
@@ -1240,24 +1200,21 @@ static int cmpfe(MA_FI *e1p,MA_FI *e2p) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (cmpfe) */
+} /* end subroutine (cmpfe) */
 
-static int vcmpfe(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpfe(cvoid **v1pp,cvoid **v2pp) noex {
 	MA_FI	*e1p = (MA_FI *) *v1pp ;
 	MA_FI	*e2p = (MA_FI *) *v2pp ;
 	return cmpfe(e1p,e2p) ;
 }
 
-static bool isnotspecial(int ch) noex {
+local bool isnotspecial(int ch) noex {
 	ch &= 255 ;
 	return (ch != '/') && (ch != '|') ;
-}
-/* end subroutine (isnotspecial) */
+} /* end subroutine (isnotspecial) */
 
-static bool isOurFileType(mode_t m) noex {
+local bool isOurFileType(mode_t m) noex {
 	return S_ISREG(m) || S_ISSOCK(m) || S_ISFIFO(m) || S_ISCHR(m) ;
-}
-/* end subroutine (isOurFileType) */
+} /* end subroutine (isOurFileType) */
 
 
