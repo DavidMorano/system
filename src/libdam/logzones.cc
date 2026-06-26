@@ -343,14 +343,14 @@ int logzones_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 	    char	ebp[LZ_ENTLEN + 1] ;
 	    char	*bp ;
 	    if ((rs = logzones_enteropen(op,dt)) >= 0) {
-/* capture the lock if we do not already have it */
+		/* capture the lock */
 	        if ((! op->fl.lockedread) && (! op->fl.lockedwrite)) {
 	            rs = logzones_lockacq(op,dt,1) ;
 	        }
-/* we do comparisons in "string" representation form (much faster !) */
+		/* do comparisons in "string" form */
 	        if (rs >= 0) {
 	            if ((rs = entry_start(&e,znb,znl,off,nullptr)) >= 0) {
-/* formulate the search string in the buffer */
+			/* formulate the search string in the buffer */
 	                entry_write(&e,ebp,ebl) ;
 	                if ((rs = logzones_search(op,ebp,ebl,off,&bp)) >= 0) {
 	                    ei = rs ;
@@ -359,12 +359,12 @@ int logzones_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 	                rs1 = entry_finish(&e) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (entry) */
-/* optionally release our lock if we didn't have a cursor outstanding */
+		    /* optionally release our lock */
 	            if (rs >= 0) {
 	                if (! op->fl.cursor) {
 			    rs = logzones_lockrel(op) ;
 		        }
-/* update access time as appropriate */
+			/* update access time as appropriate */
 	                if (! op->fl.cursor) {
 	                    op->accesstime = dt ;
 	                } else {
@@ -450,7 +450,7 @@ local int logzones_opener(LZ *op,cc *fname,int of,mode_t om) noex {
 	            mem.free(vp) ;
 	            op->fname = nullptr ;
 	        } /* end if (error) */
-	    } /* end if (m-a) */
+	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
@@ -523,12 +523,12 @@ local int logzones_updater(LZ *op,cc *znb,int znl,int off,cc *st) noex {
 		op->fl.lockedread = false ;
 #endif /* OPTIONAL */
 	    } /* end if */
-/* so that we can get a WRITE lock */
+	    /* so that we can get a WRITE lock */
 	    if (rs >= 0) {
 		if (! op->fl.lockedwrite) {
 		    rs = logzones_lockacq(op,dt,0) ;
 		}
-/* we do comparisons in "string" representation form (much faster !) */
+		/* we do comparisons in "string" form */
 		if (rs >= 0) {
 	            cnullptr	np{} ;
 	            LZ_ENT	e ;
@@ -536,17 +536,17 @@ local int logzones_updater(LZ *op,cc *znb,int znl,int off,cc *st) noex {
 	            char	ebp[LZ_ENTLEN + 1] ;
 	            char	*bp ;
 		    if ((rs = entry_start(&e,znb,znl,off,np)) >= 0) {
-/* formulate the search string in the buffer */
+			/* formulate the search string in the buffer */
 	                entry_write(&e,ebp,ebl) ;
 	                rs = logzones_search(op,ebp,ebl,off,&bp) ;
 	                ei = rs ;
 	                rs1 = entry_finish(&e) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (entry) */
-/* update the entry that we found and write it back */
+		    /* update the entry that we found and write it back */
 	            if (rs >= 0) {
 	                uint	eoff = (ei * ebl) ;
-/* found existing entry (update in memory) */
+			/* found existing entry (update in memory) */
 	                if ((rs = entry_startbuf(&e,bp,ebl)) >= 0) {
 			    {
 	                        entry_update(&e,st) ;
